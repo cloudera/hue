@@ -460,6 +460,7 @@ def test_app_permissions():
 
     # Access to nothing
     check_app(401, 'beeswax')
+    check_app(401, 'hive')
     check_app(401, 'impala')
     check_app(401, 'hbase')
     check_app(401, 'pig')
@@ -479,9 +480,13 @@ def test_app_permissions():
     assert_false('scheduler' in apps, apps)
     assert_false('sdkapps' in apps, apps)
 
-    # Add access to beeswax
+    # Should always be enabled as it is a lib
     grant_access(USERNAME, GROUPNAME, "beeswax")
+
+    # Add access to hive
+    grant_access(USERNAME, GROUPNAME, "hive")
     check_app(200, 'beeswax')
+    check_app(200, 'hive')
     check_app(401, 'impala')
     check_app(401, 'hbase')
     check_app(401, 'pig')
@@ -504,6 +509,7 @@ def test_app_permissions():
     # Add access to hbase
     grant_access(USERNAME, GROUPNAME, "hbase")
     check_app(200, 'beeswax')
+    check_app(200, 'hive')
     check_app(401, 'impala')
     check_app(200, 'hbase')
     check_app(401, 'pig')
@@ -571,7 +577,7 @@ def test_app_permissions():
 
     # Oozie Editor and Browser
     grant_access(USERNAME, GROUPNAME, "oozie")
-    check_app(401, 'beeswax')
+    check_app(401, 'hive')
     check_app(200, 'impala')
     check_app(401, 'hbase')
     check_app(401, 'pig')
@@ -586,7 +592,7 @@ def test_app_permissions():
     assert_false('spark' in apps.get('editor', {}).get('interpreter_names', []), apps)
 
     grant_access(USERNAME, GROUPNAME, "pig")
-    check_app(401, 'beeswax')
+    check_app(401, 'hive')
     check_app(200, 'impala')
     check_app(401, 'hbase')
     check_app(200, 'pig')
@@ -603,7 +609,7 @@ def test_app_permissions():
 
     if 'search' not in desktop.conf.APP_BLACKLIST.get():
       grant_access(USERNAME, GROUPNAME, "search")
-      check_app(401, 'beeswax')
+      check_app(401, 'hive')
       check_app(200, 'impala')
       check_app(401, 'hbase')
       check_app(200, 'pig')
@@ -620,7 +626,7 @@ def test_app_permissions():
 
     if 'spark' not in desktop.conf.APP_BLACKLIST.get():
       grant_access(USERNAME, GROUPNAME, "spark")
-      check_app(401, 'beeswax')
+      check_app(401, 'hive')
       check_app(200, 'impala')
       check_app(401, 'hbase')
       check_app(200, 'pig')
