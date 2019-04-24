@@ -9,10 +9,12 @@ Assuming you have a Kubernetes cluster configured with Helm installed and images
 
 * [Helm](helm)
    * [Hue](helm/hue)
-* YAML
-   * [Hue](yaml/hue.yaml)
+* [YAML](yaml)
+   * [Hue](yaml/hue)
+   * Postgres (TBD)
    * NGINX (TBD)
-   * Task Server (TBD)
+   * Celery (TBD)
+   * Daphne (TBD)
 * [Container Images](/tools/docker)
    * [Hue](/tools/docker/hue)
 
@@ -72,4 +74,4 @@ HTTP LoadBalancer. This avoids creating global static ips.
 
 ## Images
 
-All the images are on Docker Hub or can be built via Docker at [/tools/docker](/tools/docker).
+All the images are on Docker Hub or can be built via Docker at [tools/docker](/tools/docker).
