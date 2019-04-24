@@ -296,6 +296,25 @@ FROM déclenché c, c.addresses a"""
 
 
 class MockedApi(Api):
+  def execute(self, notebook, snippet):
+    return {
+      'sync': True,
+      'has_result_set': True,
+      'result': {
+        'has_more': False,
+        'data': [['test']],
+        'meta': [{
+          'name': 'test',
+          'type': '',
+          'comment': ''
+        }],
+        'type': 'table'
+      }
+    }
+
+  def close_statement(self, notebook, snippet):
+    pass
+
   def export_data_as_hdfs_file(self, snippet, target_file, overwrite):
     return {'destination': target_file}
 
@@ -420,6 +439,33 @@ class TestNotebookApiMocked(object):
         assert_equal(0, data['status'], data)
         assert_equal('adl:/user/hue/path.csv', data['watch_url']['destination'], data)
 
+  def test_download_result(self):
+    notebook_json = """
+      {
+        "selectedSnippet": "hive",
+        "showHistory": false,
+        "description": "Test Hive Query",
+        "name": "Test Hive Query",
+        "sessions": [
+            {
+                "type": "hive",
+                "properties": [],
+                "id": null
+            }
+        ],
+        "type": "query-hive",
+        "id": null,
+        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement":"select * from web_logs","properties":{"settings":[],"variables":[],"files":[],"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"select * from web_logs","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
+        "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a"
+    }
+    """
+    response = self.client.post(reverse('notebook:download'), {
+        'notebook': notebook_json,
+        'snippet': json.dumps(json.loads(notebook_json)['snippets'][0]),
+        'format': 'csv'
+    })
+    content = "".join(response)
+    assert_true(len(content) > 0)
 
 def test_get_interpreters_to_show():
   default_interpreters = OrderedDict((

@@ -38,7 +38,7 @@ from desktop.lib import export_csvxls
 from desktop.lib import fsmanager
 from desktop.settings import CACHES_CELERY_KEY
 
-from notebook.connectors.base import get_api, QueryExpired, ResultWrapper
+from notebook.connectors.base import get_api, QueryExpired, ExecutionWrapper
 from notebook.sql_utils import get_current_statement
 
 LOG_TASK = get_task_logger(__name__)
@@ -60,7 +60,7 @@ STATE_MAP = {
 storage_info = json.loads(TASK_SERVER.RESULT_FILE_STORAGE.get())
 storage = get_storage_class(storage_info.get('backend'))(**storage_info.get('properties', {}))
 
-class ResultWrapperCallback(object):
+class ExecutionWrapperCallback(object):
   def __init__(self, uuid, meta, f_log):
     self.meta = meta
     self.uuid = uuid
@@ -96,7 +96,7 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
   meta = {'row_counter': 0, 'handle': {}, 'status': '', 'truncated': False}
 
   with storage.open(_log_key(notebook), 'wb') as f_log:
-    result_wrapper = ResultWrapper(api, notebook, snippet, ResultWrapperCallback(notebook['uuid'], meta, f_log))
+    result_wrapper = ExecutionWrapper(api, notebook, snippet, ExecutionWrapperCallback(notebook['uuid'], meta, f_log))
     content_generator = data_export.DataAdapter(result_wrapper, max_rows=max_rows, store_data_type_in_header=True) #TODO: Move PREFETCH_RESULT_COUNT to front end
     response = export_csvxls.create_generator(content_generator, file_format)
 
