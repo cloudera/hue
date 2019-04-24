@@ -1,6 +1,8 @@
 
-# How to run and remove
+# How to install
 
-    kubectl apply -f hue.yaml
+    kubectl apply -f hue/
 
-    kubectl delete -f hue.yaml
+# How to uninstall
+
+    kubectl delete -f hue/
