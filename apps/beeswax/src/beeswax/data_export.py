@@ -23,7 +23,7 @@ import types
 from django.utils.translation import ugettext as _
 
 from desktop.lib import export_csvxls
-from beeswax import common
+from beeswax import common, conf
 
 
 LOG = logging.getLogger(__name__)
@@ -32,7 +32,8 @@ LOG = logging.getLogger(__name__)
 FETCH_SIZE = 1000
 DOWNLOAD_COOKIE_AGE = 1800 # 30 minutes
 
-def download(format, db, id=None, file_name='query_result', user_agent=None, max_rows=-1, max_bytes=-1, store_data_type_in_header=False, start_over=True):
+
+def download(handle, format, db, id=None, file_name='query_result', user_agent=None):
   """
   download(query_model, format) -> HttpResponse
 
@@ -42,7 +43,10 @@ def download(format, db, id=None, file_name='query_result', user_agent=None, max
     LOG.error('Unknown download format "%s"' % (format,))
     return
 
-  content_generator = DataAdapter(db, max_rows=max_rows, start_over=start_over, max_bytes=max_bytes, store_data_type_in_header=store_data_type_in_header)
+  max_rows = conf.DOWNLOAD_ROW_LIMIT.get()
+  max_bytes = conf.DOWNLOAD_BYTES_LIMIT.get()
+
+  content_generator = DataAdapter(db, handle=handle, max_rows=max_rows, max_bytes=max_bytes)
   generator = export_csvxls.create_generator(content_generator, format)
 
   resp = export_csvxls.make_response(generator, format, file_name, user_agent=user_agent)
@@ -71,7 +75,7 @@ def upload(path, handle, user, db, fs, max_rows=-1, max_bytes=-1):
   else:
     fs.do_as_user(user.username, fs.create, path)
 
-  content_generator = DataAdapter(handle, db, max_rows=max_rows, start_over=True, max_bytes=max_bytes)
+  content_generator = DataAdapter(db, handle=handle, max_rows=max_rows, start_over=True, max_bytes=max_bytes)
   for header, data in content_generator:
     dataset = export_csvxls.dataset(None, data)
     fs.do_as_user(user.username, fs.append, path, dataset.csv)
@@ -79,7 +83,8 @@ def upload(path, handle, user, db, fs, max_rows=-1, max_bytes=-1):
 
 class DataAdapter:
 
-  def __init__(self, db, max_rows=-1, start_over=True, max_bytes=-1, store_data_type_in_header=False):
+  def __init__(self, db, handle=None, max_rows=-1, start_over=True, max_bytes=-1, store_data_type_in_header=False):
+    self.handle = handle
     self.db = db
     self.max_rows = max_rows
     self.max_bytes = max_bytes
@@ -129,15 +134,16 @@ class DataAdapter:
     return size
 
   def next(self):
-    results = self.db.fetch(start_over=self.start_over, rows=self.fetch_size)
+    results = self.db.fetch(self.handle, start_over=self.start_over, rows=self.fetch_size)
     if self.first_fetched:
       self.first_fetched = False
       self.start_over = False
-      self.num_cols = len(results['meta'])
+      results_headers = results.full_cols()
+      self.num_cols = len(results_headers)
       if self.store_data_type_in_header:
-        self.headers = [column['name'] + '|' + column['type'] for column in results['meta']]
+        self.headers = [column['name'] + '|' + column['type'] for column in results_headers]
       else:
-        self.headers = [column['name'] for column in results['meta']]
+        self.headers = [column['name'] for column in results_headers]
       if self.limit_bytes:
         self.bytes_counter += max(self.num_cols - 1, 0)
         for header in self.headers:
@@ -149,10 +155,10 @@ class DataAdapter:
         self.fetch_size = 100
 
     if self.has_more and not self.is_truncated:
-      self.has_more = results['has_more']
+      self.has_more = results.has_more
       data = []
 
-      for row in results['data']:
+      for row in results.rows():
         num_bytes = self._getsizeofascii(row)
         if self.limit_rows and self.row_counter + 1 > self.max_rows:
           LOG.warn('The query results exceeded the maximum row limit of %d and has been truncated to first %d rows.' % (self.max_rows, self.row_counter))
@@ -168,5 +174,5 @@ class DataAdapter:
 
       return self.headers, data
     else:
-      self.db.close()
+      self.db.close(self.handle)
       raise StopIteration
