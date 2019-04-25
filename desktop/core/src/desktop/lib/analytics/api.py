@@ -14,3 +14,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import logging
+
+from desktop.auth.backend import is_admin
+from desktop.lib.django_util import JsonResponse
+
+from notebook.models import Analytics
+
+
+LOG = logging.getLogger(__name__)
+
+
+def admin_stats(request):
+  if is_admin(user=request.user):
+    return JsonResponse({
+      'admin_stats': Analytics.admin_stats()
+    })
