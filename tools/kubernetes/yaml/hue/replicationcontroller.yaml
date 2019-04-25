@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: hue
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hue
+    spec:
+      containers:
+        - name: hue
+          image: gethue/hue:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8888
+          volumeMounts:
+          - name: config-volume
+            mountPath: /usr/share/hue/desktop/conf/z-hue.ini
+            subPath: hue-ini
+      volumes:
+        - name: config-volume
+          configMap:
+            name: hue-config
