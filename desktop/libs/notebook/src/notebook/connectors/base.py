@@ -351,7 +351,7 @@ def get_api(request, snippet):
   LOG.info('Selected cluster %s %s interface %s' % (cluster_name, cluster, interface))
   snippet['interface'] = interface
 
-  if interface == 'hiveserver2':
+  if interface == 'hiveserver2' or interface == 'hms':
     from notebook.connectors.hiveserver2 import HS2Api
     return HS2Api(user=request.user, request=request, cluster=cluster)
   elif interface == 'oozie':
