@@ -22,4 +22,6 @@ from desktop.lib.analytics import views, api
 
 urlpatterns = [
   url(r'^$', views.index, name='desktop.lib.analytics.views.index'),
+
+  url(r'^api/admin_stats/?$', api.admin_stats, name='analytics.api.admin_stats'),
 ]
