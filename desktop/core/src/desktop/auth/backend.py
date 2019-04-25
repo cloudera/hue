@@ -434,12 +434,11 @@ class LdapBackend(object):
         setattr(self._backend.settings, 'USER_DN_TEMPLATE', "%(user)s@" + nt_domain)
 
     # Certificate-related config settings
+    setattr(self._backend.settings, 'START_TLS', ldap_config.USE_START_TLS.get())
     if ldap_config.LDAP_CERT.get():
-      setattr(self._backend.settings, 'START_TLS', ldap_config.USE_START_TLS.get())
       ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_DEMAND)
       ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, ldap_config.LDAP_CERT.get())
     else:
-      setattr(self._backend.settings, 'START_TLS', False)
       ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
 
     if ldap_config.FOLLOW_REFERRALS.get():
