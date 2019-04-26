@@ -157,7 +157,7 @@ class LdapConnection(object):
       ldap.set_option(ldap.OPT_DEBUG_LEVEL, ldap_config.DEBUG_LEVEL.get())
 
     self.ldap_handle = ldap.initialize(uri=ldap_url, trace_level=ldap_config.TRACE_LEVEL.get())
-    if self.ldap_config.USE_START_TLS.get():
+    if self.ldap_config.USE_START_TLS.get() and not ldap_url.lower().startswith('ldaps'):
       self.ldap_handle.start_tls_s()
 
     if bind_user:

@@ -433,8 +433,11 @@ class LdapBackend(object):
         # %(user)s is a special string that will get replaced during the authentication process
         setattr(self._backend.settings, 'USER_DN_TEMPLATE', "%(user)s@" + nt_domain)
 
+    # If Secure ldaps is specified in hue.ini then ldap code automatically use SSL/TLS communication
+    if not ldap_url.lower().startswith('ldaps'):
+      setattr(self._backend.settings, 'START_TLS', ldap_config.USE_START_TLS.get())
+
     # Certificate-related config settings
-    setattr(self._backend.settings, 'START_TLS', ldap_config.USE_START_TLS.get())
     if ldap_config.LDAP_CERT.get():
       ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_DEMAND)
       ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, ldap_config.LDAP_CERT.get())
