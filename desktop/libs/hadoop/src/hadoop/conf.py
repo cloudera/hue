@@ -54,6 +54,10 @@ UPLOAD_CHUNK_SIZE = Config(
   default=1024 * 1024 * 64)
 
 
+def has_hdfs_enabled():
+  return HDFS_CLUSTERS.keys()
+
+
 HDFS_CLUSTERS = UnspecifiedConfigSection(
   "hdfs_clusters",
   help="One entry for each HDFS cluster",
