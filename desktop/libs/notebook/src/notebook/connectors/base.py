@@ -282,7 +282,7 @@ def get_api(request, snippet):
 
   interpreter = [
     interpreter
-    for interpreter in get_ordered_interpreters(request.user) if snippet['type'] in (interpreter['type'], interpreter['name'])
+    for interpreter in get_ordered_interpreters(request.user) if snippet['type'] in (interpreter['type'], interpreter['interface'])
   ]
   if not interpreter:
     if snippet['type'] == 'hbase':
