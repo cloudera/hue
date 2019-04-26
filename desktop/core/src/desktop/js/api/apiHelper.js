@@ -1573,20 +1573,14 @@ class ApiHelper {
     const self = this;
     const deferred = $.Deferred();
 
-    let url;
+    let url = '/notebook/api/describe/' + options.path[0];
 
-    if (options.path.length === 1) {
-      url = '/metastore/databases/' + options.path[0] + '/metadata';
-    } else {
-      url = '/notebook/api/describe/' + options.path[0];
+    if (options.path.length > 1) {
+      url += '/' + options.path[1] + '/';
+    }
 
-      if (options.path.length > 1) {
-        url += '/' + options.path[1] + '/';
-      }
-
-      if (options.path.length > 2) {
-        url += 'stats/' + options.path.slice(2).join('/');
-      }
+    if (options.path.length > 2) {
+      url += 'stats/' + options.path.slice(2).join('/');
     }
 
     const data = {
