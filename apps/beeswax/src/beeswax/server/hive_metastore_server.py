@@ -122,8 +122,15 @@ class HiveMetastoreClient:
     ]
 
   def get_table(self, *args, **kwargs):
-    table = self.meta_client.get_table(*args, **kwargs)
-    return HiveTable(table)
+    meta_table = self.meta_client.get_table(*args, **kwargs)
+
+    table = HiveTable(meta_table)
+    setattr(table, 'details', {})
+    setattr(table, 'properties', {})
+    setattr(table, 'stats', {})
+    setattr(table, 'is_impala_only', False)
+
+    return table
 
 
   def get_partitions(self, db_name, tbl_name, max_parts):
