@@ -25,13 +25,16 @@ High Level Roadmap
 * [ ] Public REST APIs [HUE-1450](https://issues.cloudera.org/browse/HUE-1450)
 * [ ] Git integration [HUE-951](https://issues.cloudera.org/browse/HUE-951)
 
+Done
+
 * [x] Web Server [NGINX](http://gethue.com/using-nginx-to-speed-up-hue-3-8-0/)
 * [x] Documentation refresh [HUE-8741](https://issues.cloudera.org/browse/HUE-8741)
 * [x] Frontend moved to Webpack [HUE-8687](https://issues.cloudera.org/browse/HUE-8687)
 
 
+Links
+
 * [Open Tasks](https://issues.cloudera.org/projects/HUE/issues)
 * [Easy Tasks](https://issues.cloudera.org/browse/HUE-8745?filter=10431)
-* [Designs][/docs/designs]
-
-How to [contribute](CONTRIBUTING.md).
+* [Designs](/docs/designs)
+* How to [contribute](CONTRIBUTING.md).
