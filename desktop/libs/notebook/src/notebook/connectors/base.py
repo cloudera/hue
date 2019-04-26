@@ -378,6 +378,9 @@ def get_api(request, snippet):
     if interpreter['options'] and interpreter['options'].get('url', '').find('teradata') >= 0:
       from notebook.connectors.jdbc_teradata import JdbcApiTeradata
       return JdbcApiTeradata(request.user, interpreter=interpreter)
+    if interpreter['options'] and interpreter['options'].get('url', '').find('awsathena') >= 0:
+      from notebook.connectors.jdbc_athena import JdbcApiAthena
+      return JdbcApiAthena(request.user, interpreter=interpreter)
     elif interpreter['options'] and interpreter['options'].get('url', '').find('presto') >= 0:
       from notebook.connectors.jdbc_presto import JdbcApiPresto
       return JdbcApiPresto(request.user, interpreter=interpreter)
@@ -390,6 +393,9 @@ def get_api(request, snippet):
   elif interface == 'teradata':
     from notebook.connectors.jdbc import JdbcApiTeradata
     return JdbcApiTeradata(request.user, interpreter=interpreter)
+  elif interface == 'athena':
+    from notebook.connectors.jdbc import JdbcApiAthena
+    return JdbcApiAthena(request.user, interpreter=interpreter)
   elif interface == 'presto':
     from notebook.connectors.jdbc_presto import JdbcApiPresto
     return JdbcApiPresto(request.user, interpreter=interpreter)
