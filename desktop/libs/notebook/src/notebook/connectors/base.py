@@ -280,7 +280,10 @@ def get_api(request, snippet):
   if snippet['type'] == 'report':
     snippet['type'] = 'impala'
 
-  interpreter = [interpreter for interpreter in get_ordered_interpreters(request.user) if interpreter['type'] == snippet['type']]
+  interpreter = [
+    interpreter
+    for interpreter in get_ordered_interpreters(request.user) if snippet['type'] in (interpreter['type'], interpreter['name'])
+  ]
   if not interpreter:
     if snippet['type'] == 'hbase':
       interpreter = [{
