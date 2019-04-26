@@ -27,10 +27,12 @@ import hadoop.cluster
 from desktop.lib import thrift_util
 from desktop.conf import KERBEROS
 from hive_metastore import ThriftHiveMetastore
+from TCLIService.ttypes import TOperationState
 
-from beeswax import conf
-from beeswax import models
 from beeswax import hive_site
+from beeswax.conf import SERVER_CONN_TIMEOUT
+from beeswax.server.hive_server2_lib import ResultCompatible
+from beeswax.models import HiveServerQueryHandle, QueryHistory
 from beeswax.server.dbms import Table, DataTable
 
 
@@ -126,7 +128,7 @@ class HiveMetastoreClient:
 
     table = HiveTable(meta_table)
     setattr(table, 'details', {'properties': {'table_type': meta_table.tableType}, 'stats': {'val': 1}})
-    setattr(table, 'properties', {'val': 1})
+    setattr(table, 'properties', [])
     setattr(table, 'stats', [{'val': 1}])
     setattr(table, 'is_impala_only', False)
 
@@ -139,8 +141,32 @@ class HiveMetastoreClient:
     return self.meta_client.get_partitions(db_name, tbl_name, max_parts)
 
 
-  def getStatus(self):
-    return self.meta_client.getStatus()
+  def use(self, query):
+    pass
+
+
+  def query(self, query, statement=0, with_multiple_session=False):
+    return HiveServerQueryHandle(secret='mock', guid='mock')
+
+
+  def get_state(self, handle):
+    return QueryHistory.STATE.available
+
+
+  def close(self, handle):
+    pass
+
+
+  def get_operation_status(self, handle):
+    return MockFinishedOperation()
+
+
+  def get_default_configuration(self, *args, **kwargs):
+    return []
+
+
+  def fetch(self, handle, start_over=False, max_rows=None):
+    return EmptyResultCompatible()
 
 
   @classmethod
@@ -258,9 +284,32 @@ class HiveMetastoreClient:
         service_name="Hive Metastore Server",
         kerberos_principal=kerberos_principal_short_name,
         use_sasl=use_sasl,
-        timeout_seconds=conf.SERVER_CONN_TIMEOUT.get()
+        timeout_seconds=SERVER_CONN_TIMEOUT.get()
     )
     return UnicodeMetastoreClient(client)
+
+
+class EmptyResultCompatible:
+  def __init__(self):
+    self.data_table = type('Col', (object,), {'cols': self.cols})
+    self.rows = lambda: []
+    self.has_more = False
+    self.ready = True
+
+  @property
+  def columns(self):
+    return self.cols()
+
+  def cols(self):
+    return []
+
+  def full_cols(self):
+    return []
+
+
+class MockFinishedOperation():
+  def __init__(self):
+    self.operationState = TOperationState.FINISHED_STATE
 
 
 def _decode_struct_attr(struct, attr):
