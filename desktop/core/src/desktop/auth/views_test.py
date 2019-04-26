@@ -275,13 +275,17 @@ class TestLdapLogin(PseudoHdfsTestBase):
     assert_false(self.cluster.fs.do_as_user(self.test_username, cluster.fs.exists, "/user/%s" % self.test_username))
     fs.do_as_superuser(fs.create, "/user/%s" % self.test_username)
 
-    response = self.c.post('/hue/accounts/login/', {
-        'username': self.test_username,
-        'password': "test-hue-ldap2",
-        'server': "LDAP"
-    }, follow=True)
-    assert_equal(200, response.status_code, "Expected ok status.")
-    assert_true('/beeswax' in response.content, response.content)
+    finish = conf.LDAP.SYNC_GROUPS_ON_LOGIN.set_for_testing(False)
+    try:
+      response = self.c.post('/hue/accounts/login/', {
+          'username': self.test_username,
+          'password': "test-hue-ldap2",
+          'server': "LDAP"
+      }, follow=True)
+      assert_equal(200, response.status_code, "Expected ok status.")
+      assert_true('/about' in response.content, response.content)
+    finally:
+      finish()
     # Custom login process should not do 'http-equiv="refresh"' but call the correct view
     # 'Could not create home directory.' won't show up because the messages are consumed before
 
@@ -817,7 +821,7 @@ class MockLdapBackend(object):
   def get_or_create_user(self, username, ldap_user):
     return User.objects.get_or_create(username)
 
-  def authenticate(self, username=None, password=None, server=None):
+  def authenticate(self, request=None, username=None, password=None, server=None):
     user, created = self.get_or_create_user(username, None)
     return user
 
