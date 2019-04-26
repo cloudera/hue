@@ -114,6 +114,13 @@ class HiveMetastoreClient:
     return self.meta_client.get_tables(*args, **kwargs)
 
 
+  def get_tables_meta(self, *args, **kwargs):
+    meta_tables = self.meta_client.get_table_meta(*args, **kwargs)
+    return [
+      {'name': table.tableName, 'type': table.tableType, 'comment': table.comments, 'database': table.dbName}
+      for table in meta_tables
+    ]
+
   def get_table(self, *args, **kwargs):
     table = self.meta_client.get_table(*args, **kwargs)
     return HiveTable(table)
