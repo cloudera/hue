@@ -17,14 +17,15 @@
 
 import binascii
 import copy
-import logging
 import json
+import logging
 import re
 import urllib
 
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
+from desktop.auth.backend import is_admin
 from desktop.conf import USE_DEFAULT_CONFIGURATION
 from desktop.lib.conf import BoundConfig
 from desktop.lib.exceptions import StructuredException
@@ -36,8 +37,6 @@ from desktop.models import DefaultConfiguration, Document2
 from metadata.optimizer_client import OptimizerApi
 
 from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported, _get_snippet_name, Notebook
-
-from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
@@ -698,8 +697,12 @@ DROP TABLE IF EXISTS `%(table)s`;
       name = 'hive'
     elif snippet['type'] == 'impala':
       name = 'impala'
+    elif self.interface == 'hms':
+      name = 'hms'
+    elif self.interface.startswith('hiveserver2-'):
+      name = self.interface.replace('hiveserver2-', '')
     else:
-      name = 'sparksql'
+      name = 'sparksql' # Backward compatibility until HUE-8758
 
     return dbms.get(self.user, query_server=get_query_server_config(name=name, cluster=cluster))
 

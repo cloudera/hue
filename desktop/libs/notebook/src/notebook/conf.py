@@ -46,7 +46,6 @@ def check_permissions(user, interpreter, user_apps=None):
          (interpreter in ('java', 'spark2', 'mapreduce', 'shell', 'sqoop1', 'distcp') and 'oozie' not in user_apps)
 
 
-
 def get_ordered_interpreters(user=None):
   from desktop.lib.connectors.api import CONFIGURED_CONNECTORS
   global CONFIGURED_CONNECTORS
