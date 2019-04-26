@@ -125,9 +125,9 @@ class HiveMetastoreClient:
     meta_table = self.meta_client.get_table(*args, **kwargs)
 
     table = HiveTable(meta_table)
-    setattr(table, 'details', {})
-    setattr(table, 'properties', {})
-    setattr(table, 'stats', {})
+    setattr(table, 'details', {'properties': {'table_type': meta_table.tableType}, 'stats': {'val': 1}})
+    setattr(table, 'properties', {'val': 1})
+    setattr(table, 'stats', [{'val': 1}])
     setattr(table, 'is_impala_only', False)
 
     return table
