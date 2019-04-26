@@ -328,7 +328,6 @@ def get_api(request, snippet):
     }
     snippet['type'] = snippet['type'].split('-', 2)[0]
     cluster.update(interpreter['options'])
-    print cluster
   # Multi cluster
   elif has_multi_cluster():
     cluster = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API or Notebook create sessions
@@ -351,9 +350,9 @@ def get_api(request, snippet):
   LOG.info('Selected cluster %s %s interface %s' % (cluster_name, cluster, interface))
   snippet['interface'] = interface
 
-  if interface == 'hiveserver2' or interface == 'hms':
+  if interface.startswith('hiveserver2') or interface == 'hms':
     from notebook.connectors.hiveserver2 import HS2Api
-    return HS2Api(user=request.user, request=request, cluster=cluster)
+    return HS2Api(user=request.user, request=request, cluster=cluster, interface=interface)
   elif interface == 'oozie':
     return OozieApi(user=request.user, request=request)
   elif interface == 'livy':
@@ -429,12 +428,13 @@ def _get_snippet_session(notebook, snippet):
 
 class Api(object):
 
-  def __init__(self, user, interpreter=None, request=None, cluster=None, query_server=None):
+  def __init__(self, user, interpreter=None, request=None, cluster=None, query_server=None, interface=None):
     self.user = user
     self.interpreter = interpreter
     self.request = request
     self.cluster = cluster
     self.query_server = query_server
+    self.interface = interface
 
   def create_session(self, lang, properties=None):
     return {
@@ -550,11 +550,13 @@ class Api(object):
   def get_log_is_full_log(self, notebook, snippet):
     return True
 
+
 def _get_snippet_name(notebook, unique=False, table_format=False):
   name = (('%(name)s' + ('-%(id)s' if unique else '') if notebook.get('name') else '%(type)s-%(id)s') % notebook)
   if table_format:
     name = re.sub('[-|\s:]', '_', name)
   return name
+
 
 class ExecutionWrapper():
   def __init__(self, api, notebook, snippet, callback=None):
