@@ -844,8 +844,8 @@ for x in sys.stdin:
       handle = self.db.execute_and_wait(query)
       resp = download(handle, 'xls', self.db)
       sheet_data = _read_xls_sheet_data(resp)
-      # It should have 5 lines
-      assert_equal(len(sheet_data), 5, sheet_data)
+      # It should have 6 lines (header + 5 lines)
+      assert_equal(len(sheet_data), 6, sheet_data)
     finally:
       finish()
 
