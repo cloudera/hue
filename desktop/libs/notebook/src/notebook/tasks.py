@@ -31,6 +31,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import FileResponse, HttpRequest
 
+from beeswax import data_export
 from desktop.auth.backend import rewrite_user
 from desktop.celery import app
 from desktop.conf import TASK_SERVER
@@ -40,6 +41,7 @@ from desktop.settings import CACHES_CELERY_KEY
 
 from notebook.connectors.base import get_api, QueryExpired, ExecutionWrapper
 from notebook.sql_utils import get_current_statement
+
 
 LOG_TASK = get_task_logger(__name__)
 LOG = logging.getLogger(__name__)
@@ -59,6 +61,7 @@ STATE_MAP = {
 }
 storage_info = json.loads(TASK_SERVER.RESULT_STORAGE.get())
 storage = get_storage_class(storage_info.get('backend'))(**storage_info.get('properties', {}))
+
 
 class ExecutionWrapperCallback(object):
   def __init__(self, uuid, meta, f_log):
@@ -88,7 +91,6 @@ class ExecutionWrapperCallback(object):
 #TODO: UI should be able to close a query that is available, but not expired
 @app.task()
 def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs):
-  from beeswax import data_export
   download_to_file.update_state(task_id=notebook['uuid'], state='STARTED', meta={})
   request = _get_request(**kwargs)
   api = get_api(request, snippet)
@@ -118,6 +120,18 @@ def cancel_async(notebook, snippet, **kwargs):
 def close_statement_async(notebook, snippet, **kwargs):
   request = _get_request(**kwargs)
   get_api(request, snippet).close_statement(notebook, snippet)
+
+
+@app.task(ignore_result=True)
+def batch_execute_query(doc_id, user):
+  # get SQL
+  # Add INSERT INTO table
+  # Add variables?
+  # execute query
+  # return when done. send email notification. get taskid.
+
+  # see in Flower API for listing runs?
+
 
 #TODO: Convert csv to excel if needed
 def download(*args, **kwargs):

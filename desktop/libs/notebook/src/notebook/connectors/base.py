@@ -580,10 +580,12 @@ class ExecutionWrapper():
           self.callback.on_execute(handle)
         self.should_close = True
         self._until_available()
+
     if self.snippet['result']['handle'].get('sync', False):
       result = self.snippet['result']['handle']['result']
     else:
       result = self.api.fetch_result(self.notebook, self.snippet, rows, start_over)
+
     return ResultWrapper(result.get('meta'), result.get('data'), result.get('has_more'))
 
   def _until_available(self):
@@ -593,6 +595,7 @@ class ExecutionWrapper():
     sleep_seconds = 1
     check_status_count = 0
     get_log_is_full_log = self.api.get_log_is_full_log(self.notebook, self.snippet)
+
     while True:
       response = self.api.check_status(self.notebook, self.snippet)
       if self.callback and hasattr(self.callback, 'on_status'):
