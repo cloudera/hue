@@ -72,7 +72,7 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
                   namespace=None, compute=None):
   '''
   skip_historify: do not add the task to the query history. e.g. SQL Dashboard
-  isManaged: true when being a managed by Hue operation (include_managed=True in document), e.g. exporting query result, dropping some tables
+  is_task / isManaged: true when being a managed by Hue operation (include_managed=True in document), e.g. exporting query result, dropping some tables
   '''
   from notebook.connectors.hiveserver2 import HS2Api
 

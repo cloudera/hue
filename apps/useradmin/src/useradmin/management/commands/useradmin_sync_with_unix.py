@@ -14,11 +14,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from useradmin.views import sync_unix_users_and_groups
 
 from django.core.management.base import BaseCommand
-
 from django.utils.translation import ugettext_lazy as _
+
+from useradmin.views import sync_unix_users_and_groups
+
 
 class Command(BaseCommand):
   """

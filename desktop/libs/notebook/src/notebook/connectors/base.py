@@ -23,7 +23,7 @@ import uuid
 
 from django.utils.translation import ugettext as _
 
-from desktop.conf import has_multi_cluster
+from desktop.conf import has_multi_cluster, TASK_SERVER
 from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
@@ -275,7 +275,7 @@ class Notebook(object):
 def get_api(request, snippet):
   from notebook.connectors.oozie_batch import OozieApi
 
-  if snippet.get('wasBatchExecuted'):
+  if snippet.get('wasBatchExecuted') and not TASK_SERVER.ENABLED.get():
     return OozieApi(user=request.user, request=request)
 
   if snippet['type'] == 'report':
