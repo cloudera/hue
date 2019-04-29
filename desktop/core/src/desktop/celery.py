@@ -5,8 +5,7 @@ import os
 from celery import Celery
 from celery.schedules import crontab
 
-from desktop.settings import TIME_ZONE
-from desktop.conf import TASK_SERVER
+from desktop.settings import TIME_ZONE, INSTALLED_APPS
 
 
 # Set the default Django settings module for the 'celery' program.
@@ -30,13 +29,15 @@ def debug_task(self):
   print('Request: {0!r}'.format(self.request))
   return 'Hello'
 
-#
-if TASK_SERVER.BEAT_ENABLED.get():
-  app.conf.beat_schedule = {
-    'add-every-monday-morning': {
-      'task': 'desktop.celery.debug_task',
-      'schedule': crontab(minute='*'),
-      # 'schedule': crontab(hour=7, minute=30, day_of_week=1),
-      #'args': (16, 16),
-    },
-  }
+
+if 'django_celery_beat' in INSTALLED_APPS:
+  app.conf.beat_schedule = {}
+
+  if True:
+    app.conf.beat_schedule.update({
+      'add-every-monday-morning2': {
+        'task': 'desktop.celery.debug_task',
+        'schedule': crontab(minute='*'),
+        #'args': (16, 16),
+      },
+    })
