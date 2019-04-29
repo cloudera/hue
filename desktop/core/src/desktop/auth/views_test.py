@@ -64,6 +64,7 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
     self.c = Client()
 
     self.reset.append( conf.AUTH.BACKEND.set_for_testing(['desktop.auth.backend.AllowFirstUserDjangoBackend']) )
+    self.reset.append(conf.LDAP.SYNC_GROUPS_ON_LOGIN.set_for_testing(False))
 
   def tearDown(self):
     User.objects.all().delete()
@@ -117,7 +118,7 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
       }, follow=True)
 
     assert_equal(200, response.status_code, "Expected ok status.")
-    assert_true('/beeswax' in response.content, response.content)
+    assert_true('/about' in response.content, response.content)
     # Custom login process should not do 'http-equiv="refresh"' but call the correct view
     # 'Could not create home directory.' won't show up because the messages are consumed before
 
@@ -183,6 +184,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
     self.c = Client()
     self.reset.append( conf.AUTH.BACKEND.set_for_testing(['desktop.auth.backend.LdapBackend']) )
     self.reset.append(conf.LDAP.LDAP_URL.set_for_testing('does not matter'))
+    self.reset.append(conf.LDAP.SYNC_GROUPS_ON_LOGIN.set_for_testing(False))
 
   def tearDown(self):
     User.objects.all().delete()
@@ -206,6 +208,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
         'password': "ldap1",
         'server': "LDAP"
     })
+
     assert_equal(302, response.status_code, "Expected ok redirect status.")
     assert_true(self.cluster.fs.do_as_user(self.test_username, self.fs.exists, "/user/%s" % self.test_username))
 
@@ -275,17 +278,13 @@ class TestLdapLogin(PseudoHdfsTestBase):
     assert_false(self.cluster.fs.do_as_user(self.test_username, cluster.fs.exists, "/user/%s" % self.test_username))
     fs.do_as_superuser(fs.create, "/user/%s" % self.test_username)
 
-    finish = conf.LDAP.SYNC_GROUPS_ON_LOGIN.set_for_testing(False)
-    try:
-      response = self.c.post('/hue/accounts/login/', {
-          'username': self.test_username,
-          'password': "test-hue-ldap2",
-          'server': "LDAP"
-      }, follow=True)
-      assert_equal(200, response.status_code, "Expected ok status.")
-      assert_true('/about' in response.content, response.content)
-    finally:
-      finish()
+    response = self.c.post('/hue/accounts/login/', {
+        'username': self.test_username,
+        'password': "test-hue-ldap2",
+        'server': "LDAP"
+    }, follow=True)
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_true('/about' in response.content, response.content)
     # Custom login process should not do 'http-equiv="refresh"' but call the correct view
     # 'Could not create home directory.' won't show up because the messages are consumed before
 
@@ -821,7 +820,7 @@ class MockLdapBackend(object):
   def get_or_create_user(self, username, ldap_user):
     return User.objects.get_or_create(username)
 
-  def authenticate(self, request=None, username=None, password=None, server=None):
+  def authenticate(self, username=None, password=None, server=None):
     user, created = self.get_or_create_user(username, None)
     return user
 
