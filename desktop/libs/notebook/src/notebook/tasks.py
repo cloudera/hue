@@ -124,12 +124,12 @@ def close_statement_async(notebook, snippet, **kwargs):
 
 @app.task(ignore_result=True)
 def batch_execute_query(doc_id, user):
+  '''Independently run a query as a user and insert the result into another table.'''
   # get SQL
   # Add INSERT INTO table
   # Add variables?
   # execute query
   # return when done. send email notification. get taskid.
-
   # see in Flower API for listing runs?
 
 

@@ -591,6 +591,7 @@ class ExecutionWrapper():
   def _until_available(self):
     if self.snippet['result']['handle'].get('sync', False):
       return # Request is already completed
+
     count = 0
     sleep_seconds = 1
     check_status_count = 0
@@ -621,6 +622,7 @@ class ExecutionWrapper():
     if self.should_close:
       self.should_close = False
       self.api.close_statement(self.notebook, self.snippet)
+
 
 class ResultWrapper():
   def __init__(self, cols, rows, has_more):
