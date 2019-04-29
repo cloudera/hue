@@ -18,14 +18,13 @@
 import json
 import logging
 
-from beeswax.data_export import DOWNLOAD_COOKIE_AGE
-
 from django.urls import reverse
 from django.db.models import Q
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 
+from beeswax.data_export import DOWNLOAD_COOKIE_AGE
 from desktop.conf import ENABLE_DOWNLOAD, USE_NEW_EDITOR, TASK_SERVER
 from desktop.lib import export_csvxls
 from desktop.lib.django_util import render, JsonResponse
@@ -33,9 +32,9 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document2, Document, FilesystemException
 from desktop.views import serve_403_error
-
 from metadata.conf import has_optimizer, has_catalog, has_workload_analytics
 
+from notebook import tasks as ntasks
 from notebook.conf import get_ordered_interpreters, SHOW_NOTEBOOKS
 from notebook.connectors.base import Notebook, get_api as _get_api, _get_snippet_name
 from notebook.connectors.spark_shell import SparkApi
@@ -43,10 +42,9 @@ from notebook.decorators import check_editor_access_permission, check_document_a
 from notebook.management.commands.notebook_setup import Command
 from notebook.models import make_notebook
 
+
 LOG = logging.getLogger(__name__)
 
-if TASK_SERVER.ENABLED.get():
-  import notebook.tasks as ntasks
 
 class ApiWrapper(object):
   def __init__(self, request, snippet):
