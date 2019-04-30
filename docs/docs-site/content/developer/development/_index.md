@@ -21,6 +21,33 @@ This section goes into greater detail on how to build and reuse the components o
 * [Bootstrap](http://twitter.github.com/bootstrap/)
 * [Knockout js](http://knockoutjs.com/)
 
+### Quick Start
+
+Build once:
+
+    make apps
+
+Then start the dev server (which will auto reload):
+
+    ./build/env/bin/hue runserver
+
+If you are changing Javascript or CSS files, also start:
+
+    npm run dev
+
+Then it is recommended to use MySQL or PostGres as the [database](({{% param baseURL %}}).
+
+Open the `hue.ini` file in a text editor. Directly below the
+`[[database]]` line, add the following options (and modify accordingly for
+your MySQL setup):
+
+    host=localhost
+    port=3306
+    engine=mysql
+    user=hue
+    password=secretpassword
+    name=hue
+
 ### Javascript
 
 The javascript files are currently being migrated to webpack bundles, during this process some files will live under src/desktop/static/ and some will live under src/dekstop/js

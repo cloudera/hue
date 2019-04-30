@@ -1,8 +1,8 @@
 ---
-title: "SQL Editor"
+title: "Editor"
 date: 2019-03-13T18:28:09-07:00
 draft: false
-weight: 1
+weight: 2
 ---
 
 The goal of the Editor is to open-up data to more users by making self service querying easy and productive.
@@ -94,6 +94,10 @@ Display an analysis panel post Impala queries executions with some hints and sug
 
       [notebook]
       enable_query_analysis=true
+
+### Query Optimization
+
+In the `[metadata]` section, Hue is supporting Cloudera Navigator Optimiser and soon other services. The goal is to provide recommendation on how to write better queries and get risk alerts on dangerous operations directly within the [editor]({{% param baseURL %}}user/editor/).
 
 ### One-click scheduling
 
