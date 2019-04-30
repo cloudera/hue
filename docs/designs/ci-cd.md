@@ -13,13 +13,13 @@ The docker images could be forked for QA and comes with a series of flags.
 
 ### Documentation
 
-By updating the makefile to build the new [Website](/docs/docs-site). Would need to install Hugo and [http://cloudera.github.io/hue/latest/developer/development/#documentation](build it).
+By updating the makefile to build the new [Website](/docs/docs-site). Would need to install Hugo and [build it](http://cloudera.github.io/hue/latest/developer/development/#documentation).
 
 Step 2 would be to setup so that the doc get [published automatically](https://docs.travis-ci.com/user/deployment/pages/).
 
 ### Release
 
-[`make prod`](make prod) should work, and the tarball release should be automatically installed and checked if boots normally.
+`make prod` should work, and the tarball release should be automatically installed and checked if boots normally.
 
 ### Docker images
 
@@ -49,7 +49,7 @@ Those tests would run on:
 
 Several areas to track:
 
-* js and py lint
+* js and pylint
 * code coverage
 
 # Proposal
@@ -57,6 +57,8 @@ Several areas to track:
 Investigate:
 
 * Docker based CI (e.g. [CI in Docker](https://itnext.io/shift-your-ci-scripts-to-docker-build-92453bca9f75)...)
+* [Tox](https://tox.readthedocs.io)
+* Pypi package
 
 Starting with these basic steps:
 
