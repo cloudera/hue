@@ -45,8 +45,8 @@ from desktop import api as desktop_api
 from desktop import api2 as desktop_api2
 from notebook import views as notebook_views
 from desktop.configuration import api as desktop_configuration_api
-from useradmin import views as useradmin_views
 from desktop.lib.vcs import api as desktop_lib_vcs_api
+from useradmin import views as useradmin_views
 
 # Django expects handler404 and handler500 to be defined.
 # django.conf.urls provides them. But we want to override them.
@@ -202,6 +202,10 @@ if ANALYTICS.IS_ENABLED.get():
   dynamic_patterns += [
     url(r'^desktop/analytics/?', include('desktop.lib.analytics.urls'))
   ]
+
+dynamic_patterns += [
+  url(r'^desktop/scheduler/', include('desktop.lib.scheduler.urls'))
+]
 
 dynamic_patterns += [
   url(r'^admin/?', include(admin.site.urls)),

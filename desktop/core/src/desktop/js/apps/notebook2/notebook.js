@@ -547,7 +547,7 @@ class Notebook {
 
       const getCoordinator = function() {
         $.get(
-          '/oozie/editor/coordinator/' + action + '/',
+          '/scheduler/api/schedule/' + action + '/',
           {
             format: 'json',
             document: self.uuid(),
@@ -825,7 +825,7 @@ class Notebook {
   showSubmitPopup() {
     const self = this;
     $.get(
-      '/oozie/editor/coordinator/submit/' + self.coordinatorUuid(),
+      '/scheduler/api/submit/' + self.coordinatorUuid(),
       {
         format: 'json'
       },

@@ -18,17 +18,25 @@
 import logging
 
 from desktop.auth.backend import is_admin
+from desktop.conf import TASK_SERVER
 from desktop.lib.django_util import JsonResponse
+
+from oozie.views.editor2 import edit_coordinator, new_coordinator, submit_coordinator
 
 
 LOG = logging.getLogger(__name__)
 
 
+def new_schedule(request):
+  return new_coordinator(request)
+
+
 def get_schedule(request):
-  return JsonResponse({
-  })
+  return edit_coordinator(request)
 
 
 def submit_schedule(request):
-  return JsonResponse({
-  })
+  if TASK_SERVER.ENABLED.get():
+    pass
+  else:
+    return submit_coordinator(request)
