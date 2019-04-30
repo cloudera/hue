@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Hugo 0.55.1" />
+    <meta name="generator" content="Hugo 0.55.4" />
     <meta name="description" content="">
 
 
@@ -12,19 +12,19 @@
     <title>Other services :: Hue Documentation</title>
 
     
-    <link href="/hue/latest/css/nucleus.css?1555339015" rel="stylesheet">
-    <link href="/hue/latest/css/fontawesome-all.min.css?1555339015" rel="stylesheet">
-    <link href="/hue/latest/css/hybrid.css?1555339015" rel="stylesheet">
-    <link href="/hue/latest/css/featherlight.min.css?1555339015" rel="stylesheet">
-    <link href="/hue/latest/css/perfect-scrollbar.min.css?1555339015" rel="stylesheet">
-    <link href="/hue/latest/css/auto-complete.css?1555339015" rel="stylesheet">
-    <link href="/hue/latest/css/theme.css?1555339015" rel="stylesheet">
-    <link href="/hue/latest/css/hugo-theme.css?1555339015" rel="stylesheet">
+    <link href="/hue/latest/css/nucleus.css" rel="stylesheet">
+    <link href="/hue/latest/css/fontawesome-all.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/hybrid.css" rel="stylesheet">
+    <link href="/hue/latest/css/featherlight.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/perfect-scrollbar.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/auto-complete.css" rel="stylesheet">
+    <link href="/hue/latest/css/theme.css" rel="stylesheet">
+    <link href="/hue/latest/css/hugo-theme.css" rel="stylesheet">
     
-      <link href="/hue/latest/css/theme-hue.css?1555339015" rel="stylesheet">
+      <link href="/hue/latest/css/theme-hue.css" rel="stylesheet">
     
 
-    <script src="/hue/latest/js/jquery-2.x.min.js?1555339015"></script>
+    <script src="/hue/latest/js/jquery-2.x.min.js"></script>
 
     <style type="text/css">
       :root #header + #content > #left > #rlblock_left{
@@ -53,15 +53,15 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1555339015"></script>
-<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1555339015"></script>
+<script type="text/javascript" src="/hue/latest/js/lunr.min.js"></script>
+<script type="text/javascript" src="/hue/latest/js/auto-complete.js"></script>
 <script type="text/javascript">
     
         var baseurl = "http:\/\/cloudera.github.io\/hue\/latest\/";
     
     var fileSearchBlacklist = "";
 </script>
-<script type="text/javascript" src="/hue/latest/js/search.js?1555339015"></script>
+<script type="text/javascript" src="/hue/latest/js/search.js"></script>
 
     
   </div>
@@ -174,9 +174,9 @@
  
   
     
-      <li data-nav-id="/hue/latest/administrator/installation/docker/" title="Docker" class="dd-item ">
-        <a href="/hue/latest/administrator/installation/docker/">
-        Docker
+      <li data-nav-id="/hue/latest/administrator/installation/containers/" title="Containers" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/containers/">
+        Containers
         
         </a>
     </li>
@@ -248,13 +248,13 @@
  
   
     
-    <li data-nav-id="/hue/latest/administrator/configuration/hue/" title="Hue" class="dd-item 
+    <li data-nav-id="/hue/latest/administrator/configuration/server/" title="Server" class="dd-item 
         
         
         
         ">
-      <a href="/hue/latest/administrator/configuration/hue/">
-          Hue
+      <a href="/hue/latest/administrator/configuration/server/">
+          Server
           
       </a>
       
@@ -272,13 +272,13 @@
  
   
     
-    <li data-nav-id="/hue/latest/administrator/configuration/editor/" title="SQL Editor" class="dd-item 
+    <li data-nav-id="/hue/latest/administrator/configuration/editor/" title="Editor" class="dd-item 
         
         
         
         ">
       <a href="/hue/latest/administrator/configuration/editor/">
-          SQL Editor
+          Editor
           
       </a>
       
@@ -296,13 +296,13 @@
  
   
     
-    <li data-nav-id="/hue/latest/administrator/configuration/dashboard/" title="Dashboard &amp; Query Builder" class="dd-item 
+    <li data-nav-id="/hue/latest/administrator/configuration/dashboard/" title="Dashboard" class="dd-item 
         
         
         
         ">
       <a href="/hue/latest/administrator/configuration/dashboard/">
-          Dashboard &amp; Query Builder
+          Dashboard
           
       </a>
       
@@ -1550,13 +1550,10 @@
 <li>
 <ul>
 <li><a href="#data-catalog">Data Catalog</a></li>
-<li><a href="#query-optimization">Query Optimization</a></li>
-<li><a href="#yarn-cluster">YARN Cluster</a></li>
 <li><a href="#spark">Spark</a></li>
 <li><a href="#kafka">Kafka</a></li>
-<li><a href="#solr-search">Solr Search</a></li>
 <li><a href="#oozie">Oozie</a></li>
-<li><a href="#hbase">HBase</a></li>
+<li><a href="#yarn-cluster">YARN Cluster</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -1578,28 +1575,6 @@
 
 <p>In the <code>[metadata]</code> section, Hue is supporting Cloudera Navigator and soon Apache Atlas (<a href="https://issues.cloudera.org/browse/HUE-8749">HUE-8749</a>) in order to enrich the <a href="http://cloudera.github.io/hue/latest/user/browsers/">data catalog</a>.</p>
 
-<h2 id="query-optimization">Query Optimization</h2>
-
-<p>In the <code>[metadata]</code> section, Hue is supporting Cloudera Navigator Optimiser and soon other services. The goal is to provide recommendation on how to write better queries and get risk alerts on dangerous operations directly within the <a href="http://cloudera.github.io/hue/latest/user/editor/">editor</a>.</p>
-
-<h2 id="yarn-cluster">YARN Cluster</h2>
-
-<p>Hue supports one or two Yarn clusters (two for HA). These clusters should be defined
-under the <code>[[[default]]]</code> and <code>[[[ha]]]</code> sub-sections.</p>
-
-<pre><code># Configuration for YARN (MR2)
-# ------------------------------------------------------------------------
-[[yarn_clusters]]
-
-  [[[default]]]
-
-    resourcemanager_host=yarn-rm.com
-    resourcemanager_api_url=http://yarn-rm.com:8088/
-    proxy_api_url=http://yarn-proxy.com:8088/
-    resourcemanager_port=8032
-    history_server_api_url=http://yarn-rhs-com:19888/
-</code></pre>
-
 <h2 id="spark">Spark</h2>
 
 <p>The <code>[spark]</code> section details how to point to <a href="https://livy.incubator.apache.org/">Livy</a> in order to execute interactive Spark snippets in Scala or Python.</p>
@@ -1616,20 +1591,9 @@ under the <code>[[[default]]]</code> and <code>[[[ha]]]</code> sub-sections.</p>
 
 <p>The configuration is in <code>[kafka]</code> but the service is still experiemental.</p>
 
-<h2 id="solr-search">Solr Search</h2>
-
-<p>In the <code>[search]</code> section of the configuration file, you should
-specify:</p>
-
-<pre><code>[search]
-  # URL of the Solr Server
-  solr_url=http://solr-server.com:8983/solr/
-</code></pre>
-
 <h2 id="oozie">Oozie</h2>
 
-<p>In the <code>[liboozie]</code> section of the configuration file, you should
-specify:</p>
+<p>In oder to schedule workflows, the <code>[liboozie]</code> section of the configuration file:</p>
 
 <pre><code>[liboozie]
   oozie_url=http://oozie-server.com:11000/oozie
@@ -1650,41 +1614,22 @@ specify:</p>
 &lt;/property&gt;
 </code></pre>
 
-<h2 id="hbase">HBase</h2>
+<h2 id="yarn-cluster">YARN Cluster</h2>
 
-<p>Specify the HBase Thrift Server1 in Hue:</p>
+<p>Hue supports one or two Yarn clusters (two for HA). These clusters should be defined
+under the <code>[[[default]]]</code> and <code>[[[ha]]]</code> sub-sections.</p>
 
-<pre><code>[hbase]
-hbase_clusters=(Cluster|localhost:9090)
-</code></pre>
+<pre><code># Configuration for YARN (MR2)
+# ------------------------------------------------------------------------
+[[yarn_clusters]]
 
-<p>HBase Impersonation:</p>
+  [[[default]]]
 
-<p>Enable impersonation for the Thrift server by adding the following properties to hbase-site.xml on each Thrift gateway:</p>
-
-<pre><code>&lt;property&gt;
-  &lt;name&gt;hbase.regionserver.thrift.http&lt;/name&gt;
-  &lt;value&gt;true&lt;/value&gt;
-&lt;/property&gt;
-&lt;property&gt;
-  &lt;name&gt;hbase.thrift.support.proxyuser&lt;/name&gt;
-  &lt;value&gt;true/value&gt;
-&lt;/property&gt;
-</code></pre>
-
-<p>Note: If you use framed transport, you cannot use doAs impersonation, because SASL does not work with Thrift framed transport.</p>
-
-<p>doAs Impersonation provides a flexible way to use the same client to impersonate multiple principals. doAs is supported only in Thrift 1.
-Enable doAs support by adding the following properties to hbase-site.xml on each Thrift gateway:</p>
-
-<pre><code>&lt;property&gt;
-  &lt;name&gt;hbase.regionserver.thrift.http&lt;/name&gt;
-  &lt;value&gt;true&lt;/value&gt;
-&lt;/property&gt;
-&lt;property&gt;
-  &lt;name&gt;hbase.thrift.support.proxyuser&lt;/name&gt;
-  &lt;value&gt;true/value&gt;
-&lt;/property&gt;
+    resourcemanager_host=yarn-rm.com
+    resourcemanager_api_url=http://yarn-rm.com:8088/
+    proxy_api_url=http://yarn-proxy.com:8088/
+    resourcemanager_port=8032
+    history_server_api_url=http://yarn-rhs-com:19888/
 </code></pre>
 
 
@@ -2747,20 +2692,20 @@ Enable doAs support by adding the following properties to hbase-site.xml on each
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/hue/latest/js/clipboard.min.js?1555339015"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.min.js?1555339015"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1555339015"></script>
-    <script src="/hue/latest/js/jquery.sticky.js?1555339015"></script>
-    <script src="/hue/latest/js/featherlight.min.js?1555339015"></script>
-    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1555339015"></script>
-    <script src="/hue/latest/js/highlight.pack.js?1555339015"></script>
+    <script src="/hue/latest/js/clipboard.min.js"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.min.js"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js"></script>
+    <script src="/hue/latest/js/jquery.sticky.js"></script>
+    <script src="/hue/latest/js/featherlight.min.js"></script>
+    <script src="/hue/latest/js/html5shiv-printshiv.min.js"></script>
+    <script src="/hue/latest/js/highlight.pack.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/hue/latest/js/modernizr.custom.71422.js?1555339015"></script>
-    <script src="/hue/latest/js/learn.js?1555339015"></script>
-    <script src="/hue/latest/js/hugo-learn.js?1555339015"></script>
+    <script src="/hue/latest/js/modernizr.custom.71422.js"></script>
+    <script src="/hue/latest/js/learn.js"></script>
+    <script src="/hue/latest/js/hugo-learn.js"></script>
 
-    <link href="/hue/latest/mermaid/mermaid.css?1555339015" type="text/css" rel="stylesheet" />
-    <script src="/hue/latest/mermaid/mermaid.js?1555339015"></script>
+    <link href="/hue/latest/mermaid/mermaid.css" type="text/css" rel="stylesheet" />
+    <script src="/hue/latest/mermaid/mermaid.js"></script>
     <script>
         mermaid.initialize({ startOnLoad: true });
     </script>

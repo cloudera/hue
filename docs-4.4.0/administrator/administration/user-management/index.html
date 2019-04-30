@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Hugo 0.55.1" />
+    <meta name="generator" content="Hugo 0.55.4" />
     <meta name="description" content="">
 
 
@@ -12,19 +12,19 @@
     <title>User Management :: Hue Documentation</title>
 
     
-    <link href="/hue/latest/css/nucleus.css?1555339015" rel="stylesheet">
-    <link href="/hue/latest/css/fontawesome-all.min.css?1555339015" rel="stylesheet">
-    <link href="/hue/latest/css/hybrid.css?1555339015" rel="stylesheet">
-    <link href="/hue/latest/css/featherlight.min.css?1555339015" rel="stylesheet">
-    <link href="/hue/latest/css/perfect-scrollbar.min.css?1555339015" rel="stylesheet">
-    <link href="/hue/latest/css/auto-complete.css?1555339015" rel="stylesheet">
-    <link href="/hue/latest/css/theme.css?1555339015" rel="stylesheet">
-    <link href="/hue/latest/css/hugo-theme.css?1555339015" rel="stylesheet">
+    <link href="/hue/latest/css/nucleus.css" rel="stylesheet">
+    <link href="/hue/latest/css/fontawesome-all.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/hybrid.css" rel="stylesheet">
+    <link href="/hue/latest/css/featherlight.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/perfect-scrollbar.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/auto-complete.css" rel="stylesheet">
+    <link href="/hue/latest/css/theme.css" rel="stylesheet">
+    <link href="/hue/latest/css/hugo-theme.css" rel="stylesheet">
     
-      <link href="/hue/latest/css/theme-hue.css?1555339015" rel="stylesheet">
+      <link href="/hue/latest/css/theme-hue.css" rel="stylesheet">
     
 
-    <script src="/hue/latest/js/jquery-2.x.min.js?1555339015"></script>
+    <script src="/hue/latest/js/jquery-2.x.min.js"></script>
 
     <style type="text/css">
       :root #header + #content > #left > #rlblock_left{
@@ -53,15 +53,15 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1555339015"></script>
-<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1555339015"></script>
+<script type="text/javascript" src="/hue/latest/js/lunr.min.js"></script>
+<script type="text/javascript" src="/hue/latest/js/auto-complete.js"></script>
 <script type="text/javascript">
     
         var baseurl = "http:\/\/cloudera.github.io\/hue\/latest\/";
     
     var fileSearchBlacklist = "";
 </script>
-<script type="text/javascript" src="/hue/latest/js/search.js?1555339015"></script>
+<script type="text/javascript" src="/hue/latest/js/search.js"></script>
 
     
   </div>
@@ -174,9 +174,9 @@
  
   
     
-      <li data-nav-id="/hue/latest/administrator/installation/docker/" title="Docker" class="dd-item ">
-        <a href="/hue/latest/administrator/installation/docker/">
-        Docker
+      <li data-nav-id="/hue/latest/administrator/installation/containers/" title="Containers" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/containers/">
+        Containers
         
         </a>
     </li>
@@ -248,13 +248,13 @@
  
   
     
-    <li data-nav-id="/hue/latest/administrator/configuration/hue/" title="Hue" class="dd-item 
+    <li data-nav-id="/hue/latest/administrator/configuration/server/" title="Server" class="dd-item 
         
         
         
         ">
-      <a href="/hue/latest/administrator/configuration/hue/">
-          Hue
+      <a href="/hue/latest/administrator/configuration/server/">
+          Server
           
       </a>
       
@@ -272,13 +272,13 @@
  
   
     
-    <li data-nav-id="/hue/latest/administrator/configuration/editor/" title="SQL Editor" class="dd-item 
+    <li data-nav-id="/hue/latest/administrator/configuration/editor/" title="Editor" class="dd-item 
         
         
         
         ">
       <a href="/hue/latest/administrator/configuration/editor/">
-          SQL Editor
+          Editor
           
       </a>
       
@@ -296,13 +296,13 @@
  
   
     
-    <li data-nav-id="/hue/latest/administrator/configuration/dashboard/" title="Dashboard &amp; Query Builder" class="dd-item 
+    <li data-nav-id="/hue/latest/administrator/configuration/dashboard/" title="Dashboard" class="dd-item 
         
         
         
         ">
       <a href="/hue/latest/administrator/configuration/dashboard/">
-          Dashboard &amp; Query Builder
+          Dashboard
           
       </a>
       
@@ -1553,15 +1553,15 @@
 <li><a href="#users">Users</a>
 <ul>
 <li><a href="#adding-a-user">Adding a User</a></li>
-<li><a href="#importing-users-from-an-ldap-directory">Importing Users from an LDAP Directory</a></li>
-<li><a href="#syncing-users-and-groups-with-an-ldap-directory">Syncing Users and Groups with an LDAP Directory</a></li>
+<li><a href="#importing-users">Importing Users</a></li>
+<li><a href="#syncing-users-and-groups">Syncing Users and Groups</a></li>
 </ul></li>
 <li><a href="#reset-a-password">Reset a password</a></li>
 <li><a href="#groups">Groups</a>
 <ul>
 <li><a href="#adding-a-group">Adding a Group</a></li>
-<li><a href="#limit-users-can-login-only-if-they-are-belong-to-one-of-listed-ldap-groups">Limit users can login only if they are belong to one of listed LDAP groups</a></li>
-<li><a href="#importing-groups-from-an-ldap-directory">Importing Groups from an LDAP Directory</a></li>
+<li><a href="#limit-users-can-login">Limit users can login</a></li>
+<li><a href="#importing-groups">Importing Groups</a></li>
 </ul></li>
 <li><a href="#permissions">Permissions</a></li>
 </ul></li>
@@ -1672,7 +1672,7 @@ the <strong>Add User</strong> wizard or click <strong>Next</strong>.</li>
 the <strong>Add User</strong> wizard.</li>
 </ol>
 
-<h3 id="importing-users-from-an-ldap-directory">Importing Users from an LDAP Directory</h3>
+<h3 id="importing-users">Importing Users</h3>
 
 <p><strong>Note</strong>:</p>
 
@@ -1703,7 +1703,7 @@ in User Admin is synced with what is currently in the LDAP
 directory.</p></li>
 </ol>
 
-<h3 id="syncing-users-and-groups-with-an-ldap-directory">Syncing Users and Groups with an LDAP Directory</h3>
+<h3 id="syncing-users-and-groups">Syncing Users and Groups</h3>
 
 <p>You can sync the Hue user database with the current state of the LDAP
 directory using the <strong>Sync LDAP users/groups</strong> function. This updates
@@ -1806,14 +1806,14 @@ Group</strong>.</li>
 <li>Click <strong>Add group</strong>.</li>
 </ol>
 
-<h3 id="limit-users-can-login-only-if-they-are-belong-to-one-of-listed-ldap-groups">Limit users can login only if they are belong to one of listed LDAP groups</h3>
+<h3 id="limit-users-can-login">Limit users can login</h3>
 
 <pre><code>[desktop]
 [[ldap]]
 login_groups=ldap_grp1,ldap_grp2,ldap_grp3
 </code></pre>
 
-<h3 id="importing-groups-from-an-ldap-directory">Importing Groups from an LDAP Directory</h3>
+<h3 id="importing-groups">Importing Groups</h3>
 
 <ol>
 <li>From the <strong>Groups</strong> tab, click <strong>Add/sync LDAP group</strong>.</li>
@@ -2914,20 +2914,20 @@ Groups column in the <strong>Hue Permissions</strong> list.</li>
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/hue/latest/js/clipboard.min.js?1555339015"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.min.js?1555339015"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1555339015"></script>
-    <script src="/hue/latest/js/jquery.sticky.js?1555339015"></script>
-    <script src="/hue/latest/js/featherlight.min.js?1555339015"></script>
-    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1555339015"></script>
-    <script src="/hue/latest/js/highlight.pack.js?1555339015"></script>
+    <script src="/hue/latest/js/clipboard.min.js"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.min.js"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js"></script>
+    <script src="/hue/latest/js/jquery.sticky.js"></script>
+    <script src="/hue/latest/js/featherlight.min.js"></script>
+    <script src="/hue/latest/js/html5shiv-printshiv.min.js"></script>
+    <script src="/hue/latest/js/highlight.pack.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/hue/latest/js/modernizr.custom.71422.js?1555339015"></script>
-    <script src="/hue/latest/js/learn.js?1555339015"></script>
-    <script src="/hue/latest/js/hugo-learn.js?1555339015"></script>
+    <script src="/hue/latest/js/modernizr.custom.71422.js"></script>
+    <script src="/hue/latest/js/learn.js"></script>
+    <script src="/hue/latest/js/hugo-learn.js"></script>
 
-    <link href="/hue/latest/mermaid/mermaid.css?1555339015" type="text/css" rel="stylesheet" />
-    <script src="/hue/latest/mermaid/mermaid.js?1555339015"></script>
+    <link href="/hue/latest/mermaid/mermaid.css" type="text/css" rel="stylesheet" />
+    <script src="/hue/latest/mermaid/mermaid.js"></script>
     <script>
         mermaid.initialize({ startOnLoad: true });
     </script>

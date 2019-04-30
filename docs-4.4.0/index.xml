@@ -368,7 +368,8 @@ After installing Cloudera Desktop 0.3.0, the first username and password you use
       <guid>http://cloudera.github.io/hue/latest/administrator/administration/reference/</guid>
       <description>A recommended setup consists in:
  2 Hues and 1 Load Balancer Databases: MySQL InnoDB, PostgreSQL, Oracle Authentication: LDAP or Username/Password  Load Balancers Hue is often run with:
- Cherrypy with NGINX (recommended) Cherrypy with HTTPD (built-in when using Cloudera Manager) Gunicorn is coming soon with HUE-8739 Apache mod Python  Task Server The task server is currently a work in progress to outsource all the blocking or resource intensive operations outside of the API server.</description>
+ Cherrypy with NGINX (recommended) Cherrypy with HTTPD (built-in when using Cloudera Manager) Gunicorn is coming with HUE-8739 Apache mod Python  Task Server ** Not fully supported yet**
+The task server is currently a work in progress to outsource all the blocking or resource intensive operations outside of the API server.</description>
     </item>
     
     <item>
@@ -387,7 +388,8 @@ After installing Cloudera Desktop 0.3.0, the first username and password you use
       <pubDate>Wed, 13 Mar 2019 18:28:08 -0700</pubDate>
       
       <guid>http://cloudera.github.io/hue/latest/administrator/installation/install/</guid>
-      <description>Configure $PREFIX with the path where you want to install Hue by running:
+      <description>Start from a release tarball or building the project yourself.
+Then configure $PREFIX with the path where you want to install Hue by running:
 PREFIX=/usr/share make install cd /usr/share/hue  You can install Hue anywhere on your system, and run Hue as a non-root user.
 It is a good practice to create a new user for Hue and either install Hue in that user&amp;rsquo;s home directory, or in a directory within /usr/share.</description>
     </item>
@@ -403,13 +405,14 @@ Click the Hue Administration icon in the top right navigation bar under your use
     </item>
     
     <item>
-      <title>Docker</title>
-      <link>http://cloudera.github.io/hue/latest/administrator/installation/docker/</link>
+      <title>Containers</title>
+      <link>http://cloudera.github.io/hue/latest/administrator/installation/containers/</link>
       <pubDate>Wed, 13 Mar 2019 18:28:08 -0700</pubDate>
       
-      <guid>http://cloudera.github.io/hue/latest/administrator/installation/docker/</guid>
-      <description>Alternatively to building Hue into an image, the Hue Docker Guide is available.
-It details how to start a Hue in one command line or build a container image with all the dependencies.</description>
+      <guid>http://cloudera.github.io/hue/latest/administrator/installation/containers/</guid>
+      <description>Docker In addition to providing to providing a ready to use image, the Docker Guide shows how to build it.
+It then details how to start the containers and parameterize them.
+Kubernetes The Kubernetes Guide shows how to run the services via Helm or native YAML configs.</description>
     </item>
     
     <item>

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Hugo 0.55.1" />
+    <meta name="generator" content="Hugo 0.55.4" />
     <meta name="description" content="">
 
 
@@ -12,19 +12,19 @@
     <title>Database :: Hue Documentation</title>
 
     
-    <link href="/hue/latest/css/nucleus.css?1555339015" rel="stylesheet">
-    <link href="/hue/latest/css/fontawesome-all.min.css?1555339015" rel="stylesheet">
-    <link href="/hue/latest/css/hybrid.css?1555339015" rel="stylesheet">
-    <link href="/hue/latest/css/featherlight.min.css?1555339015" rel="stylesheet">
-    <link href="/hue/latest/css/perfect-scrollbar.min.css?1555339015" rel="stylesheet">
-    <link href="/hue/latest/css/auto-complete.css?1555339015" rel="stylesheet">
-    <link href="/hue/latest/css/theme.css?1555339015" rel="stylesheet">
-    <link href="/hue/latest/css/hugo-theme.css?1555339015" rel="stylesheet">
+    <link href="/hue/latest/css/nucleus.css" rel="stylesheet">
+    <link href="/hue/latest/css/fontawesome-all.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/hybrid.css" rel="stylesheet">
+    <link href="/hue/latest/css/featherlight.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/perfect-scrollbar.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/auto-complete.css" rel="stylesheet">
+    <link href="/hue/latest/css/theme.css" rel="stylesheet">
+    <link href="/hue/latest/css/hugo-theme.css" rel="stylesheet">
     
-      <link href="/hue/latest/css/theme-hue.css?1555339015" rel="stylesheet">
+      <link href="/hue/latest/css/theme-hue.css" rel="stylesheet">
     
 
-    <script src="/hue/latest/js/jquery-2.x.min.js?1555339015"></script>
+    <script src="/hue/latest/js/jquery-2.x.min.js"></script>
 
     <style type="text/css">
       :root #header + #content > #left > #rlblock_left{
@@ -53,15 +53,15 @@
     <span data-search-clear=""><i class="fas fa-times"></i></span>
 </div>
 
-<script type="text/javascript" src="/hue/latest/js/lunr.min.js?1555339015"></script>
-<script type="text/javascript" src="/hue/latest/js/auto-complete.js?1555339015"></script>
+<script type="text/javascript" src="/hue/latest/js/lunr.min.js"></script>
+<script type="text/javascript" src="/hue/latest/js/auto-complete.js"></script>
 <script type="text/javascript">
     
         var baseurl = "http:\/\/cloudera.github.io\/hue\/latest\/";
     
     var fileSearchBlacklist = "";
 </script>
-<script type="text/javascript" src="/hue/latest/js/search.js?1555339015"></script>
+<script type="text/javascript" src="/hue/latest/js/search.js"></script>
 
     
   </div>
@@ -174,9 +174,9 @@
  
   
     
-      <li data-nav-id="/hue/latest/administrator/installation/docker/" title="Docker" class="dd-item ">
-        <a href="/hue/latest/administrator/installation/docker/">
-        Docker
+      <li data-nav-id="/hue/latest/administrator/installation/containers/" title="Containers" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/containers/">
+        Containers
         
         </a>
     </li>
@@ -248,13 +248,13 @@
  
   
     
-    <li data-nav-id="/hue/latest/administrator/configuration/hue/" title="Hue" class="dd-item 
+    <li data-nav-id="/hue/latest/administrator/configuration/server/" title="Server" class="dd-item 
         
         
         
         ">
-      <a href="/hue/latest/administrator/configuration/hue/">
-          Hue
+      <a href="/hue/latest/administrator/configuration/server/">
+          Server
           
       </a>
       
@@ -272,13 +272,13 @@
  
   
     
-    <li data-nav-id="/hue/latest/administrator/configuration/editor/" title="SQL Editor" class="dd-item 
+    <li data-nav-id="/hue/latest/administrator/configuration/editor/" title="Editor" class="dd-item 
         
         
         
         ">
       <a href="/hue/latest/administrator/configuration/editor/">
-          SQL Editor
+          Editor
           
       </a>
       
@@ -296,13 +296,13 @@
  
   
     
-    <li data-nav-id="/hue/latest/administrator/configuration/dashboard/" title="Dashboard &amp; Query Builder" class="dd-item 
+    <li data-nav-id="/hue/latest/administrator/configuration/dashboard/" title="Dashboard" class="dd-item 
         
         
         
         ">
       <a href="/hue/latest/administrator/configuration/dashboard/">
-          Dashboard &amp; Query Builder
+          Dashboard
           
       </a>
       
@@ -1553,8 +1553,14 @@
 <ul>
 <li><a href="#inspecting-the-database">Inspecting the Database</a></li>
 <li><a href="#backing-up-the-database">Backing up the Database</a></li>
+<li><a href="#clean-up-the-database">Clean up the database</a></li>
 <li><a href="#configuring-to-access-another-database">Configuring to Access Another Database</a></li>
 <li><a href="#configuring-to-store-data-in-mysql">Configuring to Store Data in MySQL</a></li>
+<li><a href="#migrate-the-hue-database">Migrate the Hue Database</a>
+<ul>
+<li><a href="#postgresql">PostgreSQL</a></li>
+<li><a href="#oracle">Oracle</a></li>
+</ul></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -1607,6 +1613,15 @@ or troubleshooting.</p>
 another node for backup. It is recommended that you back it up on a regular
 schedule, and also that you back it up before any upgrade to a new version of
 Hue.</p>
+
+<h3 id="clean-up-the-database">Clean up the database</h3>
+
+<p>When the database has too many entries in certain tables, it will cause performance issue. Now Hue config check will help superuser to find this issue. Login as superuser and go to “Hue Administration”, this sample screenshot will be displayed in the quick start wizard when the tables have too many entries.</p>
+
+<p>Run following clean up command:</p>
+
+<p>cd /opt/cloudera/parcels/CDH/lib/hue # Hue home directory
+  ./build/env/bin/hue desktop_document_cleanup</p>
 
 <h3 id="configuring-to-access-another-database">Configuring to Access Another Database</h3>
 
@@ -1671,6 +1686,180 @@ mysql -uhue -psecretpassword -e "DELETE FROM hue.django_content_type;"
 </ol>
 
 <p>Your system is now configured and you can start the Hue server as normal.</p>
+
+<h3 id="migrate-the-hue-database">Migrate the Hue Database</h3>
+
+<p>Note: Hue Custom Databases includes database-specific pages on how to migrate from an old to a new database. This page summarizes across supported database types.
+When you change Hue databases, you can migrate the existing data to your new database. If the data is dispensable, there is no need to migrate.</p>
+
+<p>The Hue database stores things like user accounts, SQL queries, and Oozie workflows, and you may have accounts, queries, and workflows worth saving. See How to Populate the Hue Database.</p>
+
+<p>Dump Database</p>
+
+<p>Note: Refresh the page to ensure that the Hue service is stopped: Service Stopped icon.
+Select Actions &gt; Dump Database and click Dump Database. The file is written to /tmp/hue_database_dump.json on the host of the Hue server.</p>
+
+<p>Log on to the host of the Hue server in a command-line terminal. You can find the hostname on the Dump Database window and at Hue &gt; Hosts.
+Edit /tmp/hue_database_dump.json by removing all objects with useradmin.userprofile in the model field. For example:</p>
+
+<p>Count number of objects</p>
+
+<pre><code>grep -c useradmin.userprofile /tmp/hue_database_dump.json
+vi /tmp/hue_database_dump.json
+{
+  &quot;pk&quot;: 1,
+  &quot;model&quot;: &quot;useradmin.userprofile&quot;,
+  &quot;fields&quot;: {
+    &quot;last_activity&quot;: &quot;2016-10-03T10:06:13&quot;,
+    &quot;creation_method&quot;: &quot;HUE&quot;,
+    &quot;first_login&quot;: false,
+    &quot;user&quot;: 1,
+    &quot;home_directory&quot;: &quot;/user/admin&quot;
+  }
+},
+</code></pre>
+
+<p>Connect New Database</p>
+
+<p>Set the appropriate database parameters :</p>
+
+<pre><code>Hue Database Type: MySQL or PostgreSQL or Oracle
+Hue Database Hostname: &lt;fqdn of host with database server&gt;
+Hue Database Port: 3306 or 5432 or 1521
+Hue Database Username: &lt;hue database username&gt;
+Hue Database Password: &lt;hue database password&gt;
+Hue Database Name: &lt;hue database name or SID&gt;
+</code></pre>
+
+<p>Oracle users only should add support for a multithreaded environment:</p>
+
+<p>Add support for a multithreaded environment by setting Hue Service Advanced Configuration Snippet (Safety Valve) for hue_safety_valve.ini:
+    [desktop]
+    [[database]]
+    options={&ldquo;threaded&rdquo;:True}</p>
+
+<p>In the Hue Web UI, click the home icon Hue Home icon to ensure that all documents were migrated.</p>
+
+<pre><code>MariaDB / MySQL
+Synchronize Database in Cloudera Manager.
+Log on to MySQL:
+mysql -u root -p
+Enter password: &lt;root password&gt;
+</code></pre>
+
+<p>Drop the foreign key constraint from the hue.auth_permission table:</p>
+
+<p>Execute the following statement to find the content_type_id_refs<em>id</em><value> in the CONSTRAINT clause of the CREATE TABLE statement for the hue.auth_permission table:</p>
+
+<pre><code>SHOW CREATE TABLE hue.auth_permission;
+</code></pre>
+
+<p>This SHOW CREATE TABLE statement produces output similar to the following:</p>
+
+<pre><code>|  auth_permission | CREATE TABLE 'auth_permission' (
+  'id' int(11) NOT NULL AUTO-INCREMENT,
+  'name' varchar(50) NOT NULL,
+  'content_type_id' int(11) NOT NULL,
+  'CODENAME' VARCHAR(100) NOT NULL,
+  PRIMARY KEY ('id'),
+  UNIQUE KEY 'content_type_id' ('content_type_id', 'codename'),
+  KEY 'auth_permission_37ef4eb4' ('content_type_id'),
+  CONSTRAINT 'content_type_id_refs_id_d043b34a' FOREIGN KEY ('content_type_id')
+REFERENCES 'django_content_type' ('id')
+) ENGINE=InnoDB AUTO_INCREMENT=229 DEFAULT CHARSET=utf8 |
+</code></pre>
+
+<p>Then execute the following statement to drop the foreign key constraint:</p>
+
+<pre><code>ALTER TABLE hue.auth_permission DROP FOREIGN KEY
+content_type_id_refs_id_&lt;value&gt;;
+</code></pre>
+
+<p>For example, if you used the above output from the SHOW CREATE TABLE statement, you would use the following ALTER TABLE statement:</p>
+
+<pre><code>ALTER TABLE hue.auth_permission DROP FOREIGN KEY
+content_type_id_refs_id_d043b34a;
+</code></pre>
+
+<p>Delete the contents of django_content_type:</p>
+
+<pre><code>DELETE FROM hue.django_content_type;
+</code></pre>
+
+<p>Load Database.</p>
+
+<pre><code>Add the foreign key, content_type_id, to auth_permission:
+
+ALTER TABLE hue.auth_permission ADD FOREIGN KEY (content_type_id) REFERENCES django_content_type (id);
+</code></pre>
+
+<h4 id="postgresql">PostgreSQL</h4>
+
+<p>Log on to PostgreSQL:
+    psql -h localhost -U hue -d hue</p>
+
+<p>Password for user hue:</p>
+
+<p>Drop the foreign key constraint from auth_permission:</p>
+
+<pre><code>\d auth_permission;
+ALTER TABLE auth_permission DROP CONSTRAINT content_type_id_refs_id_&lt;id value&gt;;
+</code></pre>
+
+<p>Delete the contents of django_content_type:</p>
+
+<pre><code>TRUNCATE django_content_type CASCADE;
+</code></pre>
+
+<p>Load Database.</p>
+
+<pre><code>Add the foreign key, content_type_id, to auth_permission:
+ALTER TABLE auth_permission ADD FOREIGN KEY (content_type_id) REFERENCES django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+</code></pre>
+
+<h4 id="oracle">Oracle</h4>
+
+<p>Oracle users should delete all content from the Oracle tables after synchronizing and before loading:</p>
+
+<p>Log on to Oracle:</p>
+
+<pre><code>su - oracle
+sqlplus / as sysdba
+</code></pre>
+
+<p>Grant a quota to the tablespace where tables are created (the default is SYSTEM). For example:</p>
+
+<pre><code>ALTER USER hue quota 100m on system;
+</code></pre>
+
+<p>Log on as the hue:</p>
+
+<pre><code>sqlplus hue/&lt;hue password&gt;
+</code></pre>
+
+<p>Create a spool script that creates a delete script to clean the content of all tables.</p>
+
+<pre><code>vi spool_statements.ddl
+</code></pre>
+
+<p>Save in spool_statements.ddl (which generates delete_from_tables.ddl)</p>
+
+<pre><code>spool delete_from_tables.ddl
+set pagesize 100;
+SELECT 'DELETE FROM ' || table_name || ';' FROM user_tables;
+commit;
+spool off
+quit
+</code></pre>
+
+<p>Run both scripts:</p>
+
+<pre><code>-- Create delete_from_tables.ddl
+sqlplus hue/&lt;your hue password&gt; &lt; spool_statements.ddl
+
+-- Run delete_from_tables.ddl
+sqlplus hue/&lt;your hue password&gt; &lt; delete_from_tables.ddl
+</code></pre>
 
 
 <footer class=" footline" >
@@ -2733,20 +2922,20 @@ mysql -uhue -psecretpassword -e "DELETE FROM hue.django_content_type;"
     <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
       <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
     </div>
-    <script src="/hue/latest/js/clipboard.min.js?1555339015"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.min.js?1555339015"></script>
-    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js?1555339015"></script>
-    <script src="/hue/latest/js/jquery.sticky.js?1555339015"></script>
-    <script src="/hue/latest/js/featherlight.min.js?1555339015"></script>
-    <script src="/hue/latest/js/html5shiv-printshiv.min.js?1555339015"></script>
-    <script src="/hue/latest/js/highlight.pack.js?1555339015"></script>
+    <script src="/hue/latest/js/clipboard.min.js"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.min.js"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js"></script>
+    <script src="/hue/latest/js/jquery.sticky.js"></script>
+    <script src="/hue/latest/js/featherlight.min.js"></script>
+    <script src="/hue/latest/js/html5shiv-printshiv.min.js"></script>
+    <script src="/hue/latest/js/highlight.pack.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
-    <script src="/hue/latest/js/modernizr.custom.71422.js?1555339015"></script>
-    <script src="/hue/latest/js/learn.js?1555339015"></script>
-    <script src="/hue/latest/js/hugo-learn.js?1555339015"></script>
+    <script src="/hue/latest/js/modernizr.custom.71422.js"></script>
+    <script src="/hue/latest/js/learn.js"></script>
+    <script src="/hue/latest/js/hugo-learn.js"></script>
 
-    <link href="/hue/latest/mermaid/mermaid.css?1555339015" type="text/css" rel="stylesheet" />
-    <script src="/hue/latest/mermaid/mermaid.js?1555339015"></script>
+    <link href="/hue/latest/mermaid/mermaid.css" type="text/css" rel="stylesheet" />
+    <script src="/hue/latest/mermaid/mermaid.js"></script>
     <script>
         mermaid.initialize({ startOnLoad: true });
     </script>

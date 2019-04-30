@@ -6,7 +6,7 @@
     <description>Recent content in Installation on Hue Documentation</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 13 Mar 2019 18:28:08 -0700</lastBuildDate>
+    <lastBuildDate>Wed, 13 Mar 2019 18:28:09 -0700</lastBuildDate>
     
 	<atom:link href="http://cloudera.github.io/hue/latest/administrator/installation/index.xml" rel="self" type="application/rss+xml" />
     
@@ -17,19 +17,21 @@
       <pubDate>Wed, 13 Mar 2019 18:28:08 -0700</pubDate>
       
       <guid>http://cloudera.github.io/hue/latest/administrator/installation/install/</guid>
-      <description>Configure $PREFIX with the path where you want to install Hue by running:
+      <description>Start from a release tarball or building the project yourself.
+Then configure $PREFIX with the path where you want to install Hue by running:
 PREFIX=/usr/share make install cd /usr/share/hue  You can install Hue anywhere on your system, and run Hue as a non-root user.
 It is a good practice to create a new user for Hue and either install Hue in that user&amp;rsquo;s home directory, or in a directory within /usr/share.</description>
     </item>
     
     <item>
-      <title>Docker</title>
-      <link>http://cloudera.github.io/hue/latest/administrator/installation/docker/</link>
+      <title>Containers</title>
+      <link>http://cloudera.github.io/hue/latest/administrator/installation/containers/</link>
       <pubDate>Wed, 13 Mar 2019 18:28:08 -0700</pubDate>
       
-      <guid>http://cloudera.github.io/hue/latest/administrator/installation/docker/</guid>
-      <description>Alternatively to building Hue into an image, the Hue Docker Guide is available.
-It details how to start a Hue in one command line or build a container image with all the dependencies.</description>
+      <guid>http://cloudera.github.io/hue/latest/administrator/installation/containers/</guid>
+      <description>Docker In addition to providing to providing a ready to use image, the Docker Guide shows how to build it.
+It then details how to start the containers and parameterize them.
+Kubernetes The Kubernetes Guide shows how to run the services via Helm or native YAML configs.</description>
     </item>
     
     <item>
