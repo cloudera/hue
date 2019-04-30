@@ -44,16 +44,20 @@ Starting the Task server:
 
     ./build/env/bin/celery worker -l info -A desktop
 
-Running a test tasks:
+Available tasks
 
-    ./build/env/bin/hue shell
+#### Query Task
 
-    from desktop.celery import debug_task
+When the task server is enabled, SQL queries are going to be submitted outside of the Hue servers.
 
-    debug_task.delay()
-    debug_task.delay().get() # Works if result backend is setup and task_server is true in the hue.ini
+To configure the storage to use to persist those, edit the `result_file_storage` setting:
 
-Task Scheduler server
+    [desktop]
+    [[task_server]]
+    result_file_storage='{"backend": "django.core.files.storage.FileSystemStorage", "properties": {"location": "/var/lib/hue/query-results"}}'
+
+
+### Task Scheduler
 
 For schedules configured statically in Python:
 
