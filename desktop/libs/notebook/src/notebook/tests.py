@@ -368,8 +368,10 @@ class TestNotebookApiMocked(object):
 
     grant_access("test", "default", "notebook")
     grant_access("test", "default", "beeswax")
+    grant_access("test", "default", "hive")
     grant_access("not_perm_user", "default", "notebook")
     grant_access("not_perm_user", "default", "beeswax")
+    grant_access("not_perm_user", "default", "hive")
     add_permission('test', 'has_adls', permname='adls_access', appname='filebrowser')
 
   def tearDown(self):
