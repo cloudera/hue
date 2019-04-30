@@ -21,7 +21,6 @@ Interfaces for Hadoop filesystem access via HttpFs/WebHDFS
 
 from future import standard_library
 standard_library.install_aliases()
-from builtins import str
 from builtins import oct
 from builtins import object
 import errno
@@ -225,7 +224,7 @@ class WebHdfs(Hdfs):
 
   def strip_normpath(self, path):
     split = urlparse(path)
-    path = split._replace(scheme="", netloc="").geturl()
+    path = split._replace(scheme=u'', netloc=u'').geturl()
     return Hdfs.normpath(path)
 
   def normpath(self, path):

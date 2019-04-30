@@ -17,7 +17,6 @@
 #
 # Adapted from http://code.google.com/p/django-mako/source/browse/trunk/djangomako/shortcuts.py
 
-from builtins import str
 import os
 import tempfile
 
