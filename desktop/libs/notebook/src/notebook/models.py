@@ -494,6 +494,7 @@ class Analytics():
     stats.append(('\nAll', ''))
     stats.append(('Active users 30 days', User.objects.filter(last_login__gte=one_month).count()))
     stats.append(('Sessions 30 days', Session.objects.filter(expire_date__gte=one_month).count()))
+    stats.append(('Executed queries 30 days', Document2.objects.filter(last_modified__gte=one_month, is_history=True, type__startswith='query-').count()))
     stats.append(('Active users 90 days', User.objects.filter(last_login__gte=three_months).count()))
 
     return stats
