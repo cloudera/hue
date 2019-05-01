@@ -5,7 +5,7 @@ draft: false
 weight: 2
 ---
 
-## Quick Start Wizard
+## Admin Wizard
 
 The Quick Start wizard allows you to perform the following Hue setup
 operations by clicking the tab of each step or sequentially by clicking
@@ -22,7 +22,7 @@ Next in each screen:
     import users and a checkbox to enable and disable collection of
     usage information.
 
-## Configuration
+### Configuration
 
 Displays a list of the installed Hue applications and their
 configuration. The location of the folder containing the Hue
@@ -63,14 +63,8 @@ located in the `/etc/hue` directory.  Files that are alphabetically later
 take precedence.
 </div>
 
-# Administration
 
-Now that you've installed and started Hue, you can feel free to skip ahead
-to the <<usage,Using Hue>> section. Administrators may want to refer to this
-section for more details about managing and operating a Hue installation.
-
-
-## Configuration Validation
+### Configuration Validation
 
 Hue can detect certain invalid configuration.
 
@@ -79,19 +73,19 @@ To view the configuration of a running Hue instance, navigate to
 application.
 
 
-## Server Logs
+### Server Logs
 
 Displays the Hue Server log and allows you to download the log to your
 local system in a zip file.
 
-## Threads
+### Threads
 
 Read more on the [Threads and Metrics pages
  blog post](http://gethue.com/easier-administration-of-hue-with-the-new-threads-and-metrics-pages/)
 
 Threads page can be very helpful in debugging purposes. It includes a daemonic thread and the thread objects serving concurrent requests. The host name, thread name identifier and current stack frame of each are displayed. Those are useful when Hue “hangs”, sometimes in case of a request too CPU intensive. There is also a REST API to get the dump of Threads using 'desktop/debug/threads'
 
-## Metrics
+### Metrics
 
 Read more on the [Threads and Metrics pages
  blog post](http://gethue.com/easier-administration-of-hue-with-the-new-threads-and-metrics-pages/)
@@ -111,7 +105,7 @@ The below metrics of most concern to us are displayed on the page:
 One of the most useful ones are the percentiles of response time of requests and the count of active users.
 Admins can either filter a particular property in all the metrics or select a particular metric for all properties
 
-## Logging
+### Logging
 
 The Hue logs are found in `/var/log/hue`, or in a `logs` directory under your
 Hue installation root. Inside the log directory you can find:
@@ -131,12 +125,21 @@ If users on your cluster have problems running Hue, you can often find error
 messages in these log files. If you are unable to start Hue from the init
 script, the `supervisor.log` log file can often contain clues.
 
-### Viewing Recent Log Messages
-
 In addition to logging `INFO` level messages to the `logs` directory, the Hue
 web server keeps a small buffer of log messages at all levels in memory. You can
 view these logs by visiting `http://myserver:8888/hue/logs`. The `DEBUG` level
 messages shown can sometimes be helpful in troubleshooting issues.
+
+## Commands
+
+Type the following command from the Hue installation root.
+
+    cd /usr/lib/hue (or /opt/cloudera/parcels/CDH-XXXXX/share/hue if using parcels and CM)
+    build/env/bin/hue shell
+
+To list all the available commands:
+
+    build/env/bin/hue
 
 ## Troubleshooting
 
