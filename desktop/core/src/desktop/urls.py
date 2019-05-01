@@ -204,7 +204,7 @@ if ANALYTICS.IS_ENABLED.get():
   ]
 
 dynamic_patterns += [
-  url(r'^desktop/scheduler/', include('desktop.lib.scheduler.urls'))
+  url(r'^scheduler/', include('desktop.lib.scheduler.urls'))
 ]
 
 dynamic_patterns += [
