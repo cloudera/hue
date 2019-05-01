@@ -44,7 +44,7 @@ From top to bottom we have:
 Learn more on the [The Hue 4 user interface in detail](http://gethue.com/the-hue-4-user-interface-in-detail/).
 
 
-## Top search
+### Top search
 
 Have you ever struggled to remember table names related to your project? Does it take much too long to find those columns or views? Hue now lets you easily search for any table, view, or column across all databases in the cluster. With the ability to search across tens of thousands of tables, you're able to quickly find the tables that are relevant for your needs for faster data discovery.
 
@@ -63,21 +63,21 @@ Example of searches:
 
 Learn more on the [Tagging](https://blog.cloudera.com/blog/2017/05/new-in-cloudera-enterprise-5-11-hue-data-search-and-tagging/).
 
-## Tagging
+### Tagging
 
 In addition, you can also now tag objects with names to better categorize them and group them to different projects. These tags are searchable, expediting the exploration process through easier, more intuitive discovery.
 
-## Left assist
+### Left assist
 
 Data where you need it when you need it.
 
 Find your documents, HDFS and S3 files and more in the left assist panel, right-clicking items will show a list of actions, you can also drag-and-drop a file to get the path in your editor and more.
 
-## Right assist
+### Right assist
 
 This assistant content depends on the context of the application selected and will display the current tables or available UDFs.
 
-## Sample popup
+### Sample popup
 
 This popup offers a quick way to see sample of the data and other statistics on databases, tables, and columns. You can open the popup from the SQL Assist or with a right-click on any SQL object (table, column, function…). In this release, it also opens faster and caches the data.
 
@@ -100,7 +100,9 @@ Shared documents will show-up with a little blue icon in the homepage.
 
 Via the Home page, saved documents can be exported for backups or transferring to another Hue.
 
-## Changing the language
+## Settings
+
+### Changing the language
 
 The language is automatically detected from the Browser or OS. English, Spanish, French, German, Korean, Japanese and Chinese are supported.
 
