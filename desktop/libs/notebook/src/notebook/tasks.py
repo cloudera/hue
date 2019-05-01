@@ -57,7 +57,7 @@ STATE_MAP = {
   states.REJECTED: 'rejected',
   states.IGNORED: 'ignored'
 }
-storage_info = json.loads(TASK_SERVER.RESULT_FILE_STORAGE.get())
+storage_info = json.loads(TASK_SERVER.RESULT_STORAGE.get())
 storage = get_storage_class(storage_info.get('backend'))(**storage_info.get('properties', {}))
 
 class ExecutionWrapperCallback(object):
@@ -97,7 +97,7 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
 
   with storage.open(_log_key(notebook), 'wb') as f_log:
     result_wrapper = ExecutionWrapper(api, notebook, snippet, ExecutionWrapperCallback(notebook['uuid'], meta, f_log))
-    content_generator = data_export.DataAdapter(result_wrapper, max_rows=max_rows, store_data_type_in_header=True) #TODO: Move PREFETCH_RESULT_COUNT to front end
+    content_generator = data_export.DataAdapter(result_wrapper, max_rows=max_rows, store_data_type_in_header=True) #TODO: Move FETCH_RESULT_LIMIT to front end
     response = export_csvxls.create_generator(content_generator, file_format)
 
     with storage.open(_result_key(notebook), 'wb') as f:
@@ -143,7 +143,7 @@ def _patch_status(notebook):
 def execute(*args, **kwargs):
   notebook = args[0]
   snippet = args[1]
-  kwargs['max_rows'] = TASK_SERVER.PREFETCH_RESULT_COUNT.get()
+  kwargs['max_rows'] = TASK_SERVER.FETCH_RESULT_LIMIT.get()
   _patch_status(notebook)
   download_to_file.apply_async(args=args, kwargs=kwargs, task_id=notebook['uuid'])
 
