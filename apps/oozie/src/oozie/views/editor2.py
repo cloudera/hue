@@ -676,6 +676,7 @@ def coordinator_parameters(request):
 @check_editor_access_permission
 @check_document_access_permission()
 def submit_coordinator(request, doc_id):
+  # TODO: Replace URL by desktop/scheduler API
   if doc_id.isdigit():
     coordinator = Coordinator(document=Document2.objects.get(id=doc_id))
   else:

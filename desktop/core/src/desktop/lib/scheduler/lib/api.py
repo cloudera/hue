@@ -15,15 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from desktop.lib.scheduler.lib.beat import CeleryBeatApi
-from desktop.lib.scheduler.lib.oozie import OozieApi
-
 
 def get_api(request, interface):
-
   if interface == 'beat':
+    from desktop.lib.scheduler.lib.beat import CeleryBeatApi
     return CeleryBeatApi(user=request.user)
   elif interface == 'oozie':
+    from desktop.lib.scheduler.lib.oozie import OozieApi
     return OozieApi(user=request.user)
   else:
     raise PopupException(_('Scheduler connector interface not recognized: %s') % interface)
@@ -31,9 +29,13 @@ def get_api(request, interface):
 
 class Api():
 
+  def __init__(self, interface, user):
+    self.interface = interface
+    self.user = user
+
   def get_schedule():
     return JsonResponse({
     })
 
-  def submit_schedule():
-    return
+  def submit_schedule(request, coordinator, mapping):
+    pass

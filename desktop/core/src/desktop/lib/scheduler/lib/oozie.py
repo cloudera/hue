@@ -1,8 +1,10 @@
 
-from desktop.lib.scheduler.lib.base import Api
+from desktop.lib.scheduler.lib.api import Api
+
+from oozie.views.editor2 import _submit_coordinator
 
 
 class OozieApi(Api):
 
-  def __init__(self, user=None):
-    pass
+  def submit_schedule(request, coordinator, mapping):
+    return _submit_coordinator(request, coordinator, mapping)

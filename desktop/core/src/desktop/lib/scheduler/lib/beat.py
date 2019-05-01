@@ -1,9 +1,7 @@
 
 
-from desktop.lib.scheduler.lib.base import Api
+from desktop.lib.scheduler.lib.api import Api
 
 
 class CeleryBeatApi(Api):
-
-  def __init__(self, user=None):
-    pass
+  pass
