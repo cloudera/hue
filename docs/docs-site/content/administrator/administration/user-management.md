@@ -127,7 +127,7 @@ groups. It does not import any new users or groups.
 3.  In the **Sync LDAP users and groups** dialog, click **Sync** to
     perform the sync.
 
-## Reset a password
+### Reset a password
 
 **Programmatically**
 
