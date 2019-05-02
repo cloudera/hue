@@ -75,13 +75,15 @@ var MetastoreViewModel = (function () {
             }))
           }
         });
-        clusterConfig.app_config.catalogs.forEach(function (interpreter) {
-          sources.push(new MetastoreSource({
-            metastoreViewModel: self,
-            name: interpreter.name,
-            type: interpreter.type
-          }))
-        });
+        if (clusterConfig.app_config.catalogs) {
+          clusterConfig.app_config.catalogs.forEach(function (interpreter) {
+            sources.push(new MetastoreSource({
+              metastoreViewModel: self,
+              name: interpreter.name,
+              type: interpreter.type
+            }))
+          });
+        }
         if (!sources.length) {
           sources.push(new MetastoreSource({
             metastoreViewModel: self,
