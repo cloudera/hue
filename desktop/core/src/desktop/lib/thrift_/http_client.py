@@ -78,6 +78,8 @@ class THttpClient(TTransportBase):
     return self._data
 
   def write(self, buf):
+    if isinstance(buf, bytes):
+      buf = buf.decode("utf-8", "ignore")
     self._wbuf.write(buf)
 
   def flush(self):

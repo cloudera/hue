@@ -69,7 +69,7 @@ class HBaseApi(Api):
       else:
         raise PopupException('Could not find column `%s`.`%s`.`%s`' % (database, table, column))
     except Exception as e:
-      LOG.warn('Autocomplete data fetching error: %s' % e)
+      LOG.error('Autocomplete data fetching error: %s' % e)
       response['code'] = 500
       response['error'] = e.message
 

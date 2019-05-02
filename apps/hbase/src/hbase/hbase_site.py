@@ -18,6 +18,7 @@
 import errno
 import logging
 import os.path
+from io import open
 
 from hadoop import confparse
 from desktop.lib.security_util import get_components
@@ -93,13 +94,17 @@ def _parse_site():
   #Avoid circular import
   from hbase.conf import HBASE_CONF_DIR
   SITE_PATH = os.path.join(HBASE_CONF_DIR.get(), 'hbase-site.xml')
+
+  file = open(SITE_PATH)
   try:
-    data = file(SITE_PATH, 'r').read()
+    data = file.read()
   except IOError as err:
     if err.errno != errno.ENOENT:
       LOG.error('Cannot read from "%s": %s' % (SITE_PATH, err))
       return
     data = ""
+  finally:
+    file.close()
 
   SITE_DICT = confparse.ConfParse(data)
 

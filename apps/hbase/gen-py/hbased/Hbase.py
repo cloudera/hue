@@ -20,6 +20,43 @@ try:
 except:
   fastbinary = None
 
+from django.utils.functional import wraps
+
+
+### Do as / Impersonation support.
+### This should be put back if rerenerating the Thrift.
+### As well as all the @do_as in Client.
+
+import logging
+
+from django.utils.encoding import smart_str
+from hbase.hbase_site import is_impersonation_enabled
+
+LOG = logging.getLogger(__name__)
+
+
+def do_as(func):
+  def decorate(*args, **kwargs):
+    self = args[0]
+    username = kwargs.pop('doas')
+
+    try:
+      if is_impersonation_enabled():
+        if hasattr(self._oprot.trans, 'TFramedTransport'):
+          trans_client = self._oprot.trans._TFramedTransport__trans
+        else:
+          trans_client = self._oprot.trans._TBufferedTransport__trans
+
+        trans_client.setCustomHeaders({'doAs': username})
+
+    except AttributeError as e:
+      LOG.error('Could not set doAs parameter: %s' % smart_str(e))
+
+    return func(*args, **kwargs)
+  return wraps(func)(decorate)
+
+###
+
 
 class Iface(object):
   def enableTable(self, tableName):
@@ -623,6 +660,7 @@ class Client(Iface):
       self._oprot = oprot
     self._seqid = 0
 
+  @do_as
   def enableTable(self, tableName):
     """
     Brings a table on-line (enables it)
@@ -656,6 +694,7 @@ class Client(Iface):
       raise result.io
     return
 
+  @do_as
   def disableTable(self, tableName):
     """
     Disables a table (takes it off-line) If it is being served, the master
@@ -690,6 +729,7 @@ class Client(Iface):
       raise result.io
     return
 
+  @do_as
   def isTableEnabled(self, tableName):
     """
     @return true if table is on-line
@@ -725,6 +765,7 @@ class Client(Iface):
       raise result.io
     raise TApplicationException(TApplicationException.MISSING_RESULT, "isTableEnabled failed: unknown result")
 
+  @do_as
   def compact(self, tableNameOrRegionName):
     """
     Parameters:
@@ -756,6 +797,7 @@ class Client(Iface):
       raise result.io
     return
 
+  @do_as
   def majorCompact(self, tableNameOrRegionName):
     """
     Parameters:
@@ -787,6 +829,7 @@ class Client(Iface):
       raise result.io
     return
 
+  @do_as
   def getTableNames(self):
     """
     List all the userspace tables.
@@ -797,7 +840,7 @@ class Client(Iface):
     return self.recv_getTableNames()
 
   def send_getTableNames(self):
-    self._oprot.writeMessageBegin('getTableNames', TMessageType.CALL, self._seqid)
+    self._oprot.writeMessageBegin(u'getTableNames', TMessageType.CALL, self._seqid)
     args = getTableNames_args()
     args.write(self._oprot)
     self._oprot.writeMessageEnd()
@@ -820,6 +863,7 @@ class Client(Iface):
       raise result.io
     raise TApplicationException(TApplicationException.MISSING_RESULT, "getTableNames failed: unknown result")
 
+  @do_as
   def getColumnDescriptors(self, tableName):
     """
     List all the column families assoicated with a table.
@@ -857,6 +901,7 @@ class Client(Iface):
       raise result.io
     raise TApplicationException(TApplicationException.MISSING_RESULT, "getColumnDescriptors failed: unknown result")
 
+  @do_as
   def getTableRegions(self, tableName):
     """
     List the regions associated with a table.
@@ -894,6 +939,7 @@ class Client(Iface):
       raise result.io
     raise TApplicationException(TApplicationException.MISSING_RESULT, "getTableRegions failed: unknown result")
 
+  @do_as
   def createTable(self, tableName, columnFamilies):
     """
     Create a table with the specified column families.  The name
@@ -940,6 +986,7 @@ class Client(Iface):
       raise result.exist
     return
 
+  @do_as
   def deleteTable(self, tableName):
     """
     Deletes a table
@@ -976,6 +1023,7 @@ class Client(Iface):
       raise result.io
     return
 
+  @do_as
   def get(self, tableName, row, column, attributes):
     """
     Get a single TCell for the specified table, row, and column at the
@@ -1020,6 +1068,7 @@ class Client(Iface):
       raise result.io
     raise TApplicationException(TApplicationException.MISSING_RESULT, "get failed: unknown result")
 
+  @do_as
   def getVer(self, tableName, row, column, numVersions, attributes):
     """
     Get the specified number of versions for the specified table,
@@ -1066,6 +1115,7 @@ class Client(Iface):
       raise result.io
     raise TApplicationException(TApplicationException.MISSING_RESULT, "getVer failed: unknown result")
 
+  @do_as
   def getVerTs(self, tableName, row, column, timestamp, numVersions, attributes):
     """
     Get the specified number of versions for the specified table,
@@ -1115,6 +1165,7 @@ class Client(Iface):
       raise result.io
     raise TApplicationException(TApplicationException.MISSING_RESULT, "getVerTs failed: unknown result")
 
+  @do_as
   def getRow(self, tableName, row, attributes):
     """
     Get all the data for the specified table and row at the latest
@@ -1157,6 +1208,7 @@ class Client(Iface):
       raise result.io
     raise TApplicationException(TApplicationException.MISSING_RESULT, "getRow failed: unknown result")
 
+  @do_as
   def getRowWithColumns(self, tableName, row, columns, attributes):
     """
     Get the specified columns for the specified table and row at the latest
@@ -1201,6 +1253,7 @@ class Client(Iface):
       raise result.io
     raise TApplicationException(TApplicationException.MISSING_RESULT, "getRowWithColumns failed: unknown result")
 
+  @do_as
   def getRowTs(self, tableName, row, timestamp, attributes):
     """
     Get all the data for the specified table and row at the specified
@@ -1245,6 +1298,7 @@ class Client(Iface):
       raise result.io
     raise TApplicationException(TApplicationException.MISSING_RESULT, "getRowTs failed: unknown result")
 
+  @do_as
   def getRowWithColumnsTs(self, tableName, row, columns, timestamp, attributes):
     """
     Get the specified columns for the specified table and row at the specified
@@ -1291,6 +1345,7 @@ class Client(Iface):
       raise result.io
     raise TApplicationException(TApplicationException.MISSING_RESULT, "getRowWithColumnsTs failed: unknown result")
 
+  @do_as
   def getRows(self, tableName, rows, attributes):
     """
     Get all the data for the specified table and rows at the latest
@@ -1333,6 +1388,7 @@ class Client(Iface):
       raise result.io
     raise TApplicationException(TApplicationException.MISSING_RESULT, "getRows failed: unknown result")
 
+  @do_as
   def getRowsWithColumns(self, tableName, rows, columns, attributes):
     """
     Get the specified columns for the specified table and rows at the latest
@@ -1377,6 +1433,7 @@ class Client(Iface):
       raise result.io
     raise TApplicationException(TApplicationException.MISSING_RESULT, "getRowsWithColumns failed: unknown result")
 
+  @do_as
   def getRowsTs(self, tableName, rows, timestamp, attributes):
     """
     Get all the data for the specified table and rows at the specified
@@ -1421,6 +1478,7 @@ class Client(Iface):
       raise result.io
     raise TApplicationException(TApplicationException.MISSING_RESULT, "getRowsTs failed: unknown result")
 
+  @do_as
   def getRowsWithColumnsTs(self, tableName, rows, columns, timestamp, attributes):
     """
     Get the specified columns for the specified table and rows at the specified
@@ -1467,6 +1525,7 @@ class Client(Iface):
       raise result.io
     raise TApplicationException(TApplicationException.MISSING_RESULT, "getRowsWithColumnsTs failed: unknown result")
 
+  @do_as
   def mutateRow(self, tableName, row, mutations, attributes):
     """
     Apply a series of mutations (updates/deletes) to a row in a
@@ -1511,6 +1570,7 @@ class Client(Iface):
       raise result.ia
     return
 
+  @do_as
   def mutateRowTs(self, tableName, row, mutations, timestamp, attributes):
     """
     Apply a series of mutations (updates/deletes) to a row in a
@@ -1557,6 +1617,7 @@ class Client(Iface):
       raise result.ia
     return
 
+  @do_as
   def mutateRows(self, tableName, rowBatches, attributes):
     """
     Apply a series of batches (each a series of mutations on a single row)
@@ -1599,6 +1660,7 @@ class Client(Iface):
       raise result.ia
     return
 
+  @do_as
   def mutateRowsTs(self, tableName, rowBatches, timestamp, attributes):
     """
     Apply a series of batches (each a series of mutations on a single row)
@@ -1643,6 +1705,7 @@ class Client(Iface):
       raise result.ia
     return
 
+  @do_as
   def atomicIncrement(self, tableName, row, column, value):
     """
     Atomically increment the column value specified.  Returns the next value post increment.
@@ -1686,6 +1749,7 @@ class Client(Iface):
       raise result.ia
     raise TApplicationException(TApplicationException.MISSING_RESULT, "atomicIncrement failed: unknown result")
 
+  @do_as
   def deleteAll(self, tableName, row, column, attributes):
     """
     Delete all cells that match the passed row and column.
@@ -1725,6 +1789,7 @@ class Client(Iface):
       raise result.io
     return
 
+  @do_as
   def deleteAllTs(self, tableName, row, column, timestamp, attributes):
     """
     Delete all cells that match the passed row and column and whose
@@ -1767,6 +1832,7 @@ class Client(Iface):
       raise result.io
     return
 
+  @do_as
   def deleteAllRow(self, tableName, row, attributes):
     """
     Completely delete the row's cells.
@@ -1804,6 +1870,7 @@ class Client(Iface):
       raise result.io
     return
 
+  @do_as
   def increment(self, increment):
     """
     Increment a cell by the ammount.
@@ -1840,6 +1907,7 @@ class Client(Iface):
       raise result.io
     return
 
+  @do_as
   def incrementRows(self, increments):
     """
     Parameters:
@@ -1871,6 +1939,7 @@ class Client(Iface):
       raise result.io
     return
 
+  @do_as
   def deleteAllRowTs(self, tableName, row, timestamp, attributes):
     """
     Completely delete the row's cells marked with a timestamp
@@ -1911,6 +1980,7 @@ class Client(Iface):
       raise result.io
     return
 
+  @do_as
   def scannerOpenWithScan(self, tableName, scan, attributes):
     """
     Get a scanner on the current table, using the Scan instance
@@ -1951,6 +2021,7 @@ class Client(Iface):
       raise result.io
     raise TApplicationException(TApplicationException.MISSING_RESULT, "scannerOpenWithScan failed: unknown result")
 
+  @do_as
   def scannerOpen(self, tableName, startRow, columns, attributes):
     """
     Get a scanner on the current table starting at the specified row and
@@ -1998,6 +2069,7 @@ class Client(Iface):
       raise result.io
     raise TApplicationException(TApplicationException.MISSING_RESULT, "scannerOpen failed: unknown result")
 
+  @do_as
   def scannerOpenWithStop(self, tableName, startRow, stopRow, columns, attributes):
     """
     Get a scanner on the current table starting and stopping at the
@@ -2049,6 +2121,7 @@ class Client(Iface):
       raise result.io
     raise TApplicationException(TApplicationException.MISSING_RESULT, "scannerOpenWithStop failed: unknown result")
 
+  @do_as
   def scannerOpenWithPrefix(self, tableName, startAndPrefix, columns, attributes):
     """
     Open a scanner for a given prefix.  That is all rows will have the specified
@@ -2093,6 +2166,7 @@ class Client(Iface):
       raise result.io
     raise TApplicationException(TApplicationException.MISSING_RESULT, "scannerOpenWithPrefix failed: unknown result")
 
+  @do_as
   def scannerOpenTs(self, tableName, startRow, columns, timestamp, attributes):
     """
     Get a scanner on the current table starting at the specified row and
@@ -2143,6 +2217,7 @@ class Client(Iface):
       raise result.io
     raise TApplicationException(TApplicationException.MISSING_RESULT, "scannerOpenTs failed: unknown result")
 
+  @do_as
   def scannerOpenWithStopTs(self, tableName, startRow, stopRow, columns, timestamp, attributes):
     """
     Get a scanner on the current table starting and stopping at the
@@ -2197,6 +2272,7 @@ class Client(Iface):
       raise result.io
     raise TApplicationException(TApplicationException.MISSING_RESULT, "scannerOpenWithStopTs failed: unknown result")
 
+  @do_as
   def scannerGet(self, id):
     """
     Returns the scanner's current row value and advances to the next
@@ -2243,6 +2319,7 @@ class Client(Iface):
       raise result.ia
     raise TApplicationException(TApplicationException.MISSING_RESULT, "scannerGet failed: unknown result")
 
+  @do_as
   def scannerGetList(self, id, nbRows):
     """
     Returns, starting at the scanner's current row value nbRows worth of
@@ -2291,6 +2368,7 @@ class Client(Iface):
       raise result.ia
     raise TApplicationException(TApplicationException.MISSING_RESULT, "scannerGetList failed: unknown result")
 
+  @do_as
   def scannerClose(self, id):
     """
     Closes the server-state associated with an open scanner.
@@ -2328,6 +2406,7 @@ class Client(Iface):
       raise result.ia
     return
 
+  @do_as
   def getRowOrBefore(self, tableName, row, family):
     """
     Get the row just before the specified one.
@@ -2369,6 +2448,7 @@ class Client(Iface):
       raise result.io
     raise TApplicationException(TApplicationException.MISSING_RESULT, "getRowOrBefore failed: unknown result")
 
+  @do_as
   def getRegionInfo(self, row):
     """
     Get the regininfo for the specified row. It scans
