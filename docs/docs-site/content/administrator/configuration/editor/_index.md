@@ -208,12 +208,12 @@ Direct interface:
 
 JDBC:
 
-The client driver is maintained by the Presto Team and can be downloaded here: https://prestodb.io/docs/current/installation/jdbc.html
+The client driver is maintained by the Presto Team and can be downloaded here: https://prestosql.io/docs/current/installation/jdbc.html
 
     [[[presto]]]
     name=Presto JDBC
     interface=jdbc
-    options='{"url": "jdbc:presto://localhost:8080/", "driver": "com.facebook.presto.jdbc.PrestoDriver"}'
+    options='{"url": "jdbc:presto://localhost:8080/", "driver": "io.prestosql.jdbc.PrestoDriver"}'
 
 ### Oracle
 
