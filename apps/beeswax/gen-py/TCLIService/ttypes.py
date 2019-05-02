@@ -2196,7 +2196,7 @@ class TByteColumn(object):
           iprot.skip(ftype)
       elif fid == 2:
         if ftype == TType.STRING:
-          self.nulls = iprot.readString()
+          self.nulls = iprot.readBinary()
         else:
           iprot.skip(ftype)
       else:
@@ -2218,7 +2218,7 @@ class TByteColumn(object):
       oprot.writeFieldEnd()
     if self.nulls is not None:
       oprot.writeFieldBegin('nulls', TType.STRING, 2)
-      oprot.writeString(self.nulls)
+      oprot.writeBinary(self.nulls)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -2466,7 +2466,7 @@ class TI64Column(object):
           iprot.skip(ftype)
       elif fid == 2:
         if ftype == TType.STRING:
-          self.nulls = iprot.readString()
+          self.nulls = iprot.readBinary()
         else:
           iprot.skip(ftype)
       else:
@@ -2488,7 +2488,7 @@ class TI64Column(object):
       oprot.writeFieldEnd()
     if self.nulls is not None:
       oprot.writeFieldBegin('nulls', TType.STRING, 2)
-      oprot.writeString(self.nulls)
+      oprot.writeBinary(self.nulls)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
