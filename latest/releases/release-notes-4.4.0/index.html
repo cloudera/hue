@@ -1,0 +1,3405 @@
+<!DOCTYPE html>
+<html lang="en" class="js csstransforms3d">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="Hugo 0.55.5" />
+    <meta name="description" content="">
+
+
+    <link rel="shortcut icon" href="http://cloudera.github.io/hue/latest/images/favicon.png" type="image/x-icon" />
+
+    <title>4.4.0 :: Hue Documentation</title>
+
+    
+    <link href="/hue/latest/css/nucleus.css" rel="stylesheet">
+    <link href="/hue/latest/css/fontawesome-all.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/hybrid.css" rel="stylesheet">
+    <link href="/hue/latest/css/featherlight.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/perfect-scrollbar.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/auto-complete.css" rel="stylesheet">
+    <link href="/hue/latest/css/theme.css" rel="stylesheet">
+    <link href="/hue/latest/css/hugo-theme.css" rel="stylesheet">
+    
+      <link href="/hue/latest/css/theme-hue.css" rel="stylesheet">
+    
+
+    <script src="/hue/latest/js/jquery-2.x.min.js"></script>
+
+    <style type="text/css">
+      :root #header + #content > #left > #rlblock_left{
+          display:none !important;
+      }
+      
+    </style>
+    
+  </head>
+  <body class="" data-url="/hue/latest/releases/release-notes-4.4.0/">
+    <nav id="sidebar" class="">
+
+
+
+  <div id="header-wrapper">
+    <div id="header">
+      <a href="http://gethue.com">
+  <img src="http://cloudera.github.io/hue/latest/images/hue_logo.png" alt="alt text" title="Hue Logo">
+</a>
+
+    </div>
+    
+        <div class="searchbox">
+    <label for="search-by"><i class="fas fa-search"></i></label>
+    <input data-search-input id="search-by" type="search" placeholder="Search...">
+    <span data-search-clear=""><i class="fas fa-times"></i></span>
+</div>
+
+<script type="text/javascript" src="/hue/latest/js/lunr.min.js"></script>
+<script type="text/javascript" src="/hue/latest/js/auto-complete.js"></script>
+<script type="text/javascript">
+    
+        var baseurl = "http:\/\/cloudera.github.io\/hue\/latest\/";
+    
+    var fileSearchBlacklist = "";
+</script>
+<script type="text/javascript" src="/hue/latest/js/search.js"></script>
+
+    
+  </div>
+
+    <div class="highlightable">
+    <ul class="topics">
+
+        
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/" title="Administrator" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/">
+          <b>1. </b>Administrator
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/installation/" title="Installation" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/installation/">
+          Installation
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/installation/dependencies/" title="Dependencies" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/installation/dependencies/">
+          Dependencies
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/installation/install/" title="Install" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/install/">
+        Install
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/installation/containers/" title="Containers" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/containers/">
+        Containers
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/installation/starting/" title="Running" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/starting/">
+        Running
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/" title="Configuration" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/">
+          Configuration
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/server/" title="Server" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/server/">
+          Server
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/editor/" title="Editor" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/editor/">
+          Editor
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/dashboard/" title="Dashboard" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/dashboard/">
+          Dashboard
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/files/" title="Files and Stores" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/files/">
+          Files and Stores
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/external/" title="Other services" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/external/">
+          Other services
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/administration/" title="Administration" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/administration/">
+          Administration
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/reference/" title="Reference Architecture" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/reference/">
+        Reference Architecture
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/operations/" title="Operations" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/operations/">
+        Operations
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/user-management/" title="User Management" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/user-management/">
+        User Management
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/database/" title="Database" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/database/">
+        Database
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/" title="User" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/">
+          <b>2. </b>User
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/concept/" title="Concepts" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/concept/">
+          Concepts
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/editor/" title="SQL Editor / Notebook" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/editor/">
+          SQL Editor / Notebook
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/dashboards/" title="Dashboard" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/dashboards/">
+          Dashboard
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/browsers/" title="Data Catalog" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/browsers/">
+          Data Catalog
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/scheduler/" title="Scheduler" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/scheduler/">
+          Scheduler
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/contrib/" title="Contrib" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/contrib/">
+          Contrib
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/" title="Developer" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/">
+          <b>3. </b>Developer
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/development/" title="Development" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/development/">
+          Development
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/editor/" title="Editor / Notebook" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/editor/">
+          Editor / Notebook
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/api/" title="APIs" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/api/">
+          APIs
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/browsers/" title="Browsers" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/browsers/">
+          Browsers
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/application/" title="Applications" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/application/">
+          Applications
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/releases/" title="Releases" class="dd-item 
+        parent
+        
+        
+        ">
+      <a href="/hue/latest/releases/">
+          <b>4. </b>Releases
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.4.0/" title="4.4.0" class="dd-item active">
+        <a href="/hue/latest/releases/release-notes-4.4.0/">
+        4.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.3.0/" title="4.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.3.0/">
+        4.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.2.0/" title="4.2.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.2.0/">
+        4.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.1.0/" title="4.1.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.1.0/">
+        4.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.0.0/" title="4.0.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.0.0/">
+        4.0.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.12.0/" title="3.12.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.12.0/">
+        3.12.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.11.0/" title="3.11.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.11.0/">
+        3.11.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.10.0/" title="3.10.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.10.0/">
+        3.10.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.9.0/" title="3.9.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.9.0/">
+        3.9.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.8.0/" title="3.8.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.8.0/">
+        3.8.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.7.0/" title="3.7.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.7.0/">
+        3.7.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.6.0/" title="3.6.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.6.0/">
+        3.6.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.5.0/" title="3.5.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.5.0/">
+        3.5.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.0.0/" title="3.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.0.0/">
+        3.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.5.0/" title="2.5.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.5.0/">
+        2.5.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.4.0/" title="2.4.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.4.0/">
+        2.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.3.0/" title="2.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.3.0/">
+        2.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.2.0/" title="2.2.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.2.0/">
+        2.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.1.0/" title="2.1.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.1.0/">
+        2.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.0.1/" title="2.0.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.0.1/">
+        2.0.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.0.0-beta/" title="2.0.0-beta" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.0.0-beta/">
+        2.0.0-beta
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.2.0/" title="1.2.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.2.0/">
+        1.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.1.0/" title="1.1.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.1.0/">
+        1.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.0.1/" title="1.0.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.0.1/">
+        1.0.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.0.0/" title="1.0.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.0.0/">
+        1.0.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.9.1/" title="0.9.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.9.1/">
+        0.9.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.9.0/" title="0.9.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.9.0/">
+        0.9.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.4.2/" title="0.4.2" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.4.2/">
+        0.4.2
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.4.1/" title="0.4.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.4.1/">
+        0.4.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.4.0/" title="0.4.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.4.0/">
+        0.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.3.0/" title="0.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.3.0/">
+        0.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+         
+    </ul>
+
+    
+    
+      <section id="shortcuts">
+        <h3>More</h3>
+        <ul>
+          
+              <li> 
+                  <a class="padding" href="https://github.com/cloudera/hue"><i class='fab fa-fw fa-github'></i> GitHub</a>
+              </li>
+          
+              <li> 
+                  <a class="padding" href="http://demo.gethue.com"><i class='fas fa-fw fa-play'></i> Demo</a>
+              </li>
+          
+              <li> 
+                  <a class="padding" href="http://gethue.com"><i class='fas fa-fw fa-bookmark'></i> gethue.com</a>
+              </li>
+          
+        </ul>
+      </section>
+    
+
+    
+    <section id="footer">
+      <p>Built with <a href="https://github.com/matcornic/hugo-theme-learn">Learn</a> and <a href="http://gohugo.io/">Hugo</a></p>
+
+    </section>
+  </div>
+</nav>
+
+
+
+
+
+        <section id="body">
+        <div id="overlay"></div>
+        <div class="padding highlightable">
+              
+              <div>
+                <div id="top-bar">
+                
+                  
+                  
+                  
+                  <div id="top-github-link">
+                    <a class="github-link" title='Edit this page' href="https://github.com/cloudera/hue/blob/master/docs/docs-site/content/releases/release-notes-4.4.0.md" target="blank">
+                      <i class="fas fa-code-branch"></i>
+                      <span id="top-github-link-text">Edit this page</span>
+                    </a>
+                  </div>
+                  
+                
+                <div id="breadcrumbs" itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb">
+                    <span id="sidebar-toggle-span">
+                        <a href="#" id="sidebar-toggle" data-sidebar-toggle="">
+                          <i class="fas fa-bars"></i>
+                        </a>
+                    </span>
+                  <span class="links">
+                 
+                 
+                    
+            
+            
+              
+              
+            
+            
+              
+              
+            
+            
+              <a href='/hue/latest/'>Hue Guide</a> > <a href='/hue/latest/releases/'>Releases</a> > 4.4.0
+            
+          
+            
+          
+            
+          
+                 
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+
+        
+        <div class="body-outer">
+          
+          
+              <aside class="toc">
+  <div class="wrapper">
+    <header>
+    <h4>What's on this Page</h4>
+    </header>
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#hue-v4-4-0-released-march-28th-2019">Hue v4.4.0, released March 28th 2019</a></li>
+</ul></li>
+<li><a href="#summary">Summary</a></li>
+<li><a href="#notable-changes">Notable Changes</a></li>
+<li><a href="#compatibility">Compatibility</a></li>
+<li><a href="#list-of-450-commits">List of 450+ Commits</a></li>
+<li><a href="#contributors">Contributors</a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</aside>
+          
+          <div id="body-inner">
+
+            
+              <h1>4.4.0</h1>
+            
+
+          
+
+
+
+
+<h3 id="hue-v4-4-0-released-march-28th-2019">Hue v4.4.0, released March 28th 2019</h3>
+
+<p>Hue, <a href="http://gethue.com">http://gethue.com</a>, is Hue is an open source SQL Cloud Assistant for developing and accessing SQL/Data Apps.</p>
+
+<p>Its main features:</p>
+
+<ul>
+<li>Editors to query with SQL any database and submit jobs</li>
+<li>Dashboards to dynamically interact and visualize data</li>
+<li>Scheduler of jobs and workflows</li>
+<li>Browsers for data and a Data Catalog</li>
+</ul>
+
+<p>Read the complete list of improvements on <a href="http://gethue.com/hue-4-4-and-its-improvements-are-out/">Hue 4.4 is out!</a>.</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>The focus of this release was to improve the self service SQL troubleshooting and stability.</p>
+
+<h2 id="notable-changes">Notable Changes</h2>
+
+<ul>
+<li>Easier Self Service Query Troubleshooting
+
+<ul>
+<li>Prettier display of the SQL Query Profile</li>
+</ul></li>
+<li>Better compatibility with Hive in HDP
+
+<ul>
+<li>Apache Hive has typically been very innovative in the Hortonworks distribution. Support for Tez and Hive LLAP was bumped.</li>
+<li>The jobs will show up in Job Browser</li>
+<li>The query ID is printed</li>
+<li>The progress is displayed</li>
+</ul></li>
+<li>Misc Improvements
+
+<ul>
+<li>More than 80 bugs were fixed to improve the supportability and stability. The full list is in the release notes but here are the top ones:</li>
+<li><a href="https://issues.cloudera.org/browse/HUE-7474">HUE-7474</a> [core] Add ability to enable/disable Hue data/file &ldquo;download&rdquo; options globally</li>
+<li><a href="https://issues.cloudera.org/browse/HUE-7128">HUE-7128</a> [core] Apply config ENABLE_DOWNLOAD to search dashboard</li>
+<li><a href="https://issues.cloudera.org/browse/HUE-8680">HUE-8680</a> [core] Fill in Impalad WEBUI username passwords automatically</li>
+<li><a href="https://issues.cloudera.org/browse/HUE-8585">HUE-8585</a> [useradmin] Bubbling up errors for Add Sync Ldap Users</li>
+<li><a href="https://issues.cloudera.org/browse/HUE-8690">HUE-8690</a> [backend] Fix Hue allows unsigned SAML assertions</li>
+<li><a href="https://issues.cloudera.org/browse/HUE-8140">HUE-8140</a> [editor] Improve multi-statement execution</li>
+<li><a href="https://issues.cloudera.org/browse/HUE-8662">HUE-8662</a> [core] Fix missing static URLs</li>
+</ul></li>
+<li>The <a href="https://github.com/cloudera/hue/tree/master/tools/docker">Hue Docker image</a> was simplified</li>
+<li><a href="http://cloudera.github.io/hue/latest/">Upstream</a> documentations has a better table of contents, restyling, update of old instructions&hellip; Reporting issues or sending a suggestion is one click away via GitHub, so feel free to send some pull requests!</li>
+</ul>
+
+<h2 id="compatibility">Compatibility</h2>
+
+<p>Runs on CentOS versions 6.8+, Red Hat Enterprise Linux (RHEL 6, 7), and Ubuntu 16.04 and 18.04.</p>
+
+<p>Tested with CDH6. Specifically:</p>
+
+<ul>
+<li>Hadoop 3.0</li>
+<li>Hive 2.1 / 3.0</li>
+<li>Oozie 5.0</li>
+<li>HBase 2.0</li>
+<li>Pig 0.17</li>
+<li>Impala 3.0</li>
+<li>Solr 7.4</li>
+<li>Spark 2.2</li>
+</ul>
+
+<p>Other versions should work, but not tested.</p>
+
+<p>Supported Browsers:</p>
+
+<p>Hue works with the two most recent versions of the following browsers.</p>
+
+<ul>
+<li>Chrome</li>
+<li>Firefox LTS</li>
+<li>Safari (not supported on Windows)</li>
+<li>Internet Explorer / Edge</li>
+</ul>
+
+<p>Runs with Python 2.7+</p>
+
+<p>Note: CentOS 6 and RHEL 6 require EPEL python 2.7 package.</p>
+
+<h2 id="list-of-450-commits">List of 450+ Commits</h2>
+
+<ul>
+<li>3d2c2a4 <a href="https://issues.cloudera.org/browse/HUE-8769">HUE-8769</a> [core] Perform 4.4 release</li>
+<li>64c5ea1 <a href="https://issues.cloudera.org/browse/HUE-8740">HUE-8740</a> [docs] Refactor some of the old dev content</li>
+<li>43a1329 <a href="https://issues.cloudera.org/browse/HUE-8770">HUE-8770</a> [docs] Document about Livy CSRF option</li>
+<li>2222250 <a href="https://issues.cloudera.org/browse/HUE-8772">HUE-8772</a> [core] Add custom commit on top of Django upgrade fixing &lsquo;user is missing in mako context&rsquo;</li>
+<li>e9a6a03 <a href="https://issues.cloudera.org/browse/HUE-8772">HUE-8772</a> [core] Upgrade Django from 1.11 to 1.11.20</li>
+<li>b14016e <a href="https://issues.cloudera.org/browse/HUE-8770">HUE-8770</a> [spark] Send proper header to Livy when CSRF protection is enabled (#823)</li>
+<li>9d68e94 <a href="https://issues.cloudera.org/browse/HUE-8756">HUE-8756</a> [docs] Better nodejs installation instructions of nodejs for Ubuntu</li>
+<li>664992c <a href="https://issues.cloudera.org/browse/HUE-8756">HUE-8756</a> [docs] Add dev steps for pycharm / eclipse.</li>
+<li>bd7ae37 <a href="https://issues.cloudera.org/browse/HUE-6238">HUE-6238</a> [doc] Update Hue admin config doc</li>
+<li>1100dcf <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Fix for removed ko_components.mako</li>
+<li>5d0b85c <a href="https://issues.cloudera.org/browse/HUE-8760">HUE-8760</a> [core] Fix TestStrictRedirection.test_redirection_blocked</li>
+<li>bfeb97b <a href="https://issues.cloudera.org/browse/HUE-8756">HUE-8756</a> [docs] Add the list of authentication backends</li>
+<li>6b8a6f3 <a href="https://issues.cloudera.org/browse/HUE-8756">HUE-8756</a> [docs] Add missing proxy user information</li>
+<li>e353ff5 <a href="https://issues.cloudera.org/browse/HUE-8756">HUE-8756</a> [docs] Add a reference to Gunicorn</li>
+<li>5d97755 <a href="https://issues.cloudera.org/browse/HUE-8756">HUE-8756</a> [docs] Starting to update the Editor end user section</li>
+<li>792b687 <a href="https://issues.cloudera.org/browse/HUE-8756">HUE-8756</a> [docs] Refactoring of the developer section</li>
+<li>4814746 <a href="https://issues.cloudera.org/browse/HUE-8756">HUE-8756</a> [docs] Another pass of clean-up on the user section</li>
+<li>aa350b8 <a href="https://issues.cloudera.org/browse/HUE-8756">HUE-8756</a> [docs] Adding source version control documentation</li>
+<li>f2501b7 <a href="https://issues.cloudera.org/browse/HUE-8756">HUE-8756</a> [docs] Refactor and refresh SQL connectors</li>
+<li>945098b <a href="https://issues.cloudera.org/browse/HUE-8759">HUE-8759</a> [importer] Fix import to index, importing to hive instead.</li>
+<li>b51ecc0 <a href="https://issues.cloudera.org/browse/HUE-8704">HUE-8704</a> [jb] Add resizing for profile details.</li>
+<li>1ac4457 <a href="https://issues.cloudera.org/browse/HUE-8704">HUE-8704</a> [jb] Fix profile ellipsis for Firefox</li>
+<li>3e6ed07 <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Improve scroll to top behaviour in docs</li>
+<li>f0d5737 <a href="https://issues.cloudera.org/browse/HUE-8763">HUE-8763</a> [autocomplete] Add definitions to the autocomplete parse results</li>
+<li>e434298 <a href="https://issues.cloudera.org/browse/HUE-8762">HUE-8762</a> [frontend] Stabilize parser generation</li>
+<li>9e05a0a <a href="https://issues.cloudera.org/browse/HUE-8691">HUE-8691</a> [useradmin] Fix group sync fail to import member</li>
+<li>ccc31bc <a href="https://issues.cloudera.org/browse/HUE-8756">HUE-8756</a> [docs] Add Druid to the list of connectors</li>
+<li>17b3889 <a href="https://issues.cloudera.org/browse/HUE-8756">HUE-8756</a> [docs] Pass updating the content and reorganazing the configuration toc</li>
+<li>55b06f3 <a href="https://issues.cloudera.org/browse/HUE-8756">HUE-8756</a> [doc] Fix a series of broken links</li>
+<li>14cb3e9 <a href="https://issues.cloudera.org/browse/HUE-8760">HUE-8760</a>: [core] Error with redirect to page</li>
+<li>be6b453 <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Tone down the logo and left and right navigation chevrons</li>
+<li>f19efdb <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Add scroll to top button</li>
+<li>30a6d44 <a href="https://issues.cloudera.org/browse/HUE-8754">HUE-8754</a> [editor] Fix various js exceptions from the charts when switching between chart types</li>
+<li>fd63d83 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Move reminding chart components into webpack bundles</li>
+<li>5f9ba5d <a href="https://issues.cloudera.org/browse/HUE-8753">HUE-8753</a> [frontend] Fix about page step 2 js exception</li>
+<li>be77ac4 <a href="https://issues.cloudera.org/browse/HUE-8749">HUE-8749</a> [catalog] Rename get_navigator_url() to get_catalog_url()</li>
+<li>869d366 <a href="https://issues.cloudera.org/browse/HUE-8749">HUE-8749</a> [catalog] Remove hardcoded Navigator from the messages</li>
+<li>932f8c8 <a href="https://issues.cloudera.org/browse/HUE-8749">HUE-8749</a> [catalog] Rename has_navigator() to has_catalog()</li>
+<li>2acd475 <a href="https://issues.cloudera.org/browse/HUE-8749">HUE-8749</a> [catalog] Rename has_file_search method to be generic</li>
+<li>cb51e9b <a href="https://issues.cloudera.org/browse/HUE-8775">HUE-8775</a>: [editor] Boolean variable substitution fails with coercion error</li>
+<li>8a1469e <a href="https://issues.cloudera.org/browse/HUE-8752">HUE-8752</a>: [editor] Variable substitution does not use the default value when empty (#814)</li>
+<li>a236969 <a href="https://issues.cloudera.org/browse/HUE-8717">HUE-8717</a> [oozie] Fix Sqoop1 editor fail to execute</li>
+<li>b50914b <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [editor] Fix timing issue when loading the editor</li>
+<li>7cc87bc <a href="https://issues.cloudera.org/browse/HUE-8751">HUE-8751</a> [editor] Prevent showing all editor types in the header briefly on load</li>
+<li>5add249 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Fetch topo json on demand for map charts</li>
+<li>f9fb4f5 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Move datamap topo graphs into webpack</li>
+<li>0d724dc <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] How to document how to access the shell and count documents</li>
+<li>268622c <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Do not leave install top page empty</li>
+<li>86064ae <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Clean-up the Administration hierarchy</li>
+<li>8c5e683 <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Split Hue administration and configuration in two</li>
+<li>6025056 <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Instruction on how to run the doc site in dev mode</li>
+<li>2c5878a <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Adding Hue favicon</li>
+<li>657301f <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Use correct path for the search</li>
+<li>b4d5219 <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Move build instruction to the top in the development section</li>
+<li>ce18113 <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Add correct link for the images</li>
+<li>66fb38a <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Fix for removed ko_components.mako</li>
+<li>35277c0 <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Add Apache Ranger, Atlas and Knox integrations to the roadmap</li>
+<li>2525d3b <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Add GA to doc footer</li>
+<li>2342db3 <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Tweak menu footer to be lighter for now</li>
+<li>165f0a8 <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Add back the search and a way to skip release notes from indexing</li>
+<li>f45df0b <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Add instruction on how to build the new website</li>
+<li>2dccc0e <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] New documentation website</li>
+<li>5395b88 <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Add links to jiras to the roadmap page</li>
+<li>acd1027 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Move all the common ko components into webpack modules</li>
+<li>dbaf300 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Introduce an I18n global js function</li>
+<li>1606475 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Move D3 and chart bindings into webpack</li>
+<li>cda0268 <a href="https://issues.cloudera.org/browse/HUE-8746">HUE-8746</a> [pig] Add hcat support in the Pig Editor in Hue</li>
+<li>ad3c4c4 <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Fix typo in roadmap about NGINX</li>
+<li>e3d4132 <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Add a few more top jiras to the roadmap</li>
+<li>e9ebc51 <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Clean-up of the end user guide</li>
+<li>7ab3fde <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] TOC re-organization of the SDK</li>
+<li>d48508e <a href="https://issues.cloudera.org/browse/HUE-8742">HUE-8742</a> [catalog] Fix navigation on table create.</li>
+<li>d0a3897 <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Add info about SparkSQL Livy connector</li>
+<li>abec26e <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Add a high level roadmap</li>
+<li>97b23f3 <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] List more supported DBs</li>
+<li>2feb553 <a href="https://issues.cloudera.org/browse/HUE-8728">HUE-8728</a> [jb] Fix optimzer_api test.</li>
+<li>c41b8ec <a href="https://issues.cloudera.org/browse/HUE-8728">HUE-8728</a> [jb] Fix download test.</li>
+<li>af7338c <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Add contributing page to repo</li>
+<li>6b09493 <a href="https://issues.cloudera.org/browse/HUE-8741">HUE-8741</a> [doc] Refresh Admin documentation content</li>
+<li>368c2dd <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [doc] Fix link to Docker page</li>
+<li>503132c <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [doc] Improve syling of js parser command instructions</li>
+<li>cdab63f <a href="https://issues.cloudera.org/browse/HUE-8735">HUE-8735</a> [jb] Handle null bytes in query id</li>
+<li>5cc202b <a href="https://issues.cloudera.org/browse/HUE-7621">HUE-7621</a> [sqlalchemy] Adding connector example in the inis</li>
+<li>8a9a0f9 <a href="https://issues.cloudera.org/browse/HUE-7621">HUE-7621</a> [sqlalchemy] Avoid list index out of range on empty result</li>
+<li>f5f58e5 <a href="https://issues.cloudera.org/browse/HUE-8704">HUE-8704</a> [jb] Add back codegen to profile.</li>
+<li>7aa2c46 <a href="https://issues.cloudera.org/browse/HUE-8704">HUE-8704</a> [jb] Fix Kudu icon in profile</li>
+<li>bb8b15f <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [doc] Improve instructions on how to re-generate the js SQL parser</li>
+<li>e075de2 <a href="https://issues.cloudera.org/browse/HUE-8732">HUE-8732</a> [jb] Convert FINISHED state to SUCCEEDED in API comment</li>
+<li>9fd8b2d <a href="https://issues.cloudera.org/browse/HUE-8732">HUE-8732</a> [jb] Force Knockout to handle the update of rerunModalContent before trying to modify its DOM</li>
+<li>b7d188a <a href="https://issues.cloudera.org/browse/HUE-8732">HUE-8732</a> [jb] Fix rerun_coord_popup for normal JB mode and mini JB mode</li>
+<li>ec488cc <a href="https://issues.cloudera.org/browse/HUE-8732">HUE-8732</a> [jb] Rerun button for scheduler tasks is not working</li>
+<li>e12e9fe <a href="https://issues.cloudera.org/browse/HUE-8732">HUE-8732</a> [jb] &lsquo;Select all&rsquo; button is not working for sheduler tasks</li>
+<li>ce523a6 <a href="https://issues.cloudera.org/browse/HUE-8730">HUE-8730</a> [docker] Workaround the webpack generation</li>
+<li>02791a2 <a href="https://issues.cloudera.org/browse/HUE-8730">HUE-8730</a> [docker] Hook-in webpack bundle generation into the image</li>
+<li>b4e8d56 <a href="https://issues.cloudera.org/browse/HUE-8730">HUE-8730</a> [docker] Add npm packages to compile the js properly</li>
+<li>c7f0acd <a href="https://issues.cloudera.org/browse/HUE-8734">HUE-8734</a> [editor] Fix zero width column filter in the results</li>
+<li>279be3f <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [editor] Split notebook.ko.js and move js code blocks from editor_components into webpack</li>
+<li>66f4daf <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [editor] Move additional editor dependencies into webpack and add a runtime bundle</li>
+<li>251a654 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Speed up bundle generation by separating workers and login generation</li>
+<li>1da717c <a href="https://issues.cloudera.org/browse/HUE-8729">HUE-8729</a> [oozie] Add property archive to Spark Action</li>
+<li>89589f7 <a href="https://issues.cloudera.org/browse/HUE-8730">HUE-8730</a> [docker] Refactor and organize the image building</li>
+<li>4cb5abd <a href="https://issues.cloudera.org/browse/HUE-8728">HUE-8728</a> [jb] Redirect client for file download.</li>
+<li>5321892 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Fix sprintf in ko</li>
+<li>6206c4d <a href="https://issues.cloudera.org/browse/HUE-8731">HUE-8731</a> [oozie] Can not save coordinator from examples (#807)</li>
+<li>ce743a0 <a href="https://issues.cloudera.org/browse/HUE-8608">HUE-8608</a> [useradmin] Add config check on num of QueryHistory, SavedQuery, and Job</li>
+<li>8fac8c2 <a href="https://issues.cloudera.org/browse/HUE-8298">HUE-8298</a> [core] Update configuration flag for Cloudera Manager API URL</li>
+<li>0d0a776 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Fix less generation and add style linter</li>
+<li>4658b81 <a href="https://issues.cloudera.org/browse/HUE-8727">HUE-8727</a> [frontend] Prevent Chrome from autofilling user name in various input elements</li>
+<li>a88901f <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Move the reminding autocompleter logic into the webpack bundle</li>
+<li>7a14481 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Move all the jasmine tests into the new js structure</li>
+<li>1b99978 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Add webpack-stats.json to gitignore</li>
+<li>3544332 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Move all the remaining parsers into webpack bundles</li>
+<li>fbd3b2c <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [notebook] Support any type of computes in multi cluster</li>
+<li>c0f91d9 <a href="https://issues.cloudera.org/browse/HUE-8725">HUE-8725</a> [core] Adding python-crontab lib for Celery Beat</li>
+<li>aeb9c8a <a href="https://issues.cloudera.org/browse/HUE-8725">HUE-8725</a> [core] Adding django-timezone-field lib for Celery Beat</li>
+<li>9b9caec <a href="https://issues.cloudera.org/browse/HUE-8725">HUE-8725</a> [core] Add configuration for Celery Beat</li>
+<li>4827624 <a href="https://issues.cloudera.org/browse/HUE-8725">HUE-8725</a> [core] Adding Django Celery Beat lib</li>
+<li>634ddbb <a href="https://issues.cloudera.org/browse/HUE-8259">HUE-8259</a> [core] Integrate task server in the configuration</li>
+<li>eaa8c1c <a href="https://issues.cloudera.org/browse/HUE-8259">HUE-8259</a> [core] Integrating Celery</li>
+<li>92cf5a5 <a href="https://issues.cloudera.org/browse/HUE-8259">HUE-8259</a> [core] Adding python packages dependencies of Task Service</li>
+<li>dcca94e <a href="https://issues.cloudera.org/browse/HUE-8724">HUE-8724</a> [k8s] Provide how to run Hue server in Kubernetes</li>
+<li>f8631e1 <a href="https://issues.cloudera.org/browse/HUE-8723">HUE-8723</a> [editor] Remove old autocompleter and use the new one for all SQL editors</li>
+<li>cfff677 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Move the hue.mako view models into webpack</li>
+<li>3a82479 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Add &ldquo;npm install&rdquo; to make apps and update the sdk docs</li>
+<li>f779446 <a href="https://issues.cloudera.org/browse/HUE-8721">HUE-8721</a> [frontend] Remove the is_hue_4 and disable_hue_3 configuration flags</li>
+<li>a3f50f7 <a href="https://issues.cloudera.org/browse/HUE-8720">HUE-8720</a> [importer] Fix importer with custom separator</li>
+<li>d1c8af9 <a href="https://issues.cloudera.org/browse/HUE-8704">HUE-8704</a> [jb] Fix profile exchange time.</li>
+<li>a2906a1 <a href="https://issues.cloudera.org/browse/HUE-8704">HUE-8704</a> [jb] Display IO + CPU time on profile node.</li>
+<li>51956bd <a href="https://issues.cloudera.org/browse/HUE-8704">HUE-8704</a> [jb] Hide profile health risks behind flag.</li>
+<li>b66e735 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Add generated js bundles to .gitignore</li>
+<li>8542cef <a href="https://issues.cloudera.org/browse/HUE-8713">HUE-8713</a> [jb] Fetch log name list dynamically for Yarn jobs.</li>
+<li>d0969cd <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Add initial notebook bundle</li>
+<li>2d7d2cc <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Add custom js bundle for the login page</li>
+<li>2de3fa5 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Add automatic bundle cleaning when running &ldquo;npm run dev&rdquo;</li>
+<li>c40271f <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Update sdk docs and licence file for npm and webpack bundling</li>
+<li>6ac54c5 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Drop the use of expose-loader</li>
+<li>5ed04bd <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Move additional third party dependencies to the webpack bundle</li>
+<li>282d0c3 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Migrate additional jquery plugins to webpack</li>
+<li>ea80b4d <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Modularize all custom ko bindings</li>
+<li>d60d130 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Modularize the SQL syntax parser and add a dedicated web worker bundle</li>
+<li>cee13ff <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Fix linting issues</li>
+<li>9449dc6 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Move the assist models into the wepback bundle</li>
+<li>8bf78c9 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Modularize the context catalog</li>
+<li>827da5e <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Modularize the data catalog</li>
+<li>361770c <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Modularize and bundle the ApiHelper and related util classes</li>
+<li>50b77d8 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Add eslint</li>
+<li>9b5cfc5 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Prevent initially garbled page when switching apps</li>
+<li>dead422 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Fix jquery upgrade issue with draggable</li>
+<li>d92d831 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Migrate various jquery plugins to webpack</li>
+<li>6b2d0ae <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Bundle additional modules</li>
+<li>0ef3c51 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Upgrade jQuery to 3.3.1</li>
+<li>339c922 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Refactor and modularize hue.utils.js</li>
+<li>5004838 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Fix issue with page.js routing</li>
+<li>634bc81 <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Bump versions for webpack and babel to the latest</li>
+<li>4b534cb <a href="https://issues.cloudera.org/browse/HUE-8687">HUE-8687</a> [frontend] Add webpack for js modularity and bundling</li>
+<li>1e85de1 <a href="https://issues.cloudera.org/browse/HUE-8718">HUE-8718</a> [doc] Add info on how to build the Ace editor</li>
+<li>045be23 <a href="https://issues.cloudera.org/browse/HUE-8713">HUE-8713</a> [assist] Add missing column in TEZ.</li>
+<li>9ad1b33 <a href="https://issues.cloudera.org/browse/HUE-8713">HUE-8713</a> [notebook] Add progress updates for TEZ jobs.</li>
+<li>403c6f8 <a href="https://issues.cloudera.org/browse/HUE-8713">HUE-8713</a> [jb] Support TEZ jobs.</li>
+<li>318fb85 <a href="https://issues.cloudera.org/browse/HUE-8708">HUE-8708</a> [jb] Less aggresive job fetching.</li>
+<li>7969581 <a href="https://issues.cloudera.org/browse/HUE-8714">HUE-8714</a> [core] force flag use_new_editor is true all the time</li>
+<li>af64f77 <a href="https://issues.cloudera.org/browse/HUE-8717">HUE-8717</a> [oozie] Fix Oozie action Sqoop job failed to execute</li>
+<li>cd2701d <a href="https://issues.cloudera.org/browse/HUE-8716">HUE-8716</a> [core] Default value of ssl_cipher_list in hue.ini does not match with real value in desktop/conf.py (#805)</li>
+<li>c78a800 PR795 [editor] Add a ClickHouse connector using jdbc (#795)</li>
+<li>c169794 <a href="https://issues.cloudera.org/browse/HUE-8693">HUE-8693</a> [useradmin] Fix Security app only display 100 user in impersonate list</li>
+<li>f18726d <a href="https://issues.cloudera.org/browse/HUE-7258">HUE-7258</a> [jb] Get conf via CM if Spnego enabled on Spark history server</li>
+<li>afa1f28 <a href="https://issues.cloudera.org/browse/HUE-8709">HUE-8709</a> [useradmin] Fix black transparent screen remains after confirmation modal is hidden</li>
+<li>9e50d5b <a href="https://issues.cloudera.org/browse/HUE-8692">HUE-8692</a> [useradmin] Fix group sync stops when a group member is not found</li>
+<li>d4276fe <a href="https://issues.cloudera.org/browse/HUE-8707">HUE-8707</a> [doc] Add info for building the sql autocomplete</li>
+<li>197b12b <a href="https://issues.cloudera.org/browse/HUE-8706">HUE-8706</a> [frontend] Add Dashboard to DW left menu</li>
+<li>b52380c <a href="https://issues.cloudera.org/browse/HUE-8707">HUE-8707</a> [doc] Add a footer with link to the page source on github</li>
+<li>3ea64aa <a href="https://issues.cloudera.org/browse/HUE-8704">HUE-8704</a> [jb] Update generated thrift for profile.</li>
+<li>a16e201 <a href="https://issues.cloudera.org/browse/HUE-8691">HUE-8691</a> [useradmin] Fix importing users failed silently if objectClass posixGroup exists in group</li>
+<li>b1406a0 <a href="https://issues.cloudera.org/browse/HUE-8704">HUE-8704</a> [jb] Fix profile expand doesn&rsquo;t respond to click.</li>
+<li>074c509 <a href="https://issues.cloudera.org/browse/HUE-8704">HUE-8704</a> [jb] Improve profile performance.</li>
+<li>8d23228 PR798 [oozie] Fix workflow widget id colliding bug (#798)</li>
+<li>e509718 <a href="https://issues.cloudera.org/browse/HUE-8704">HUE-8704</a> [jb] Fix profile unit test.</li>
+<li>9c8c32c <a href="https://issues.cloudera.org/browse/HUE-8704">HUE-8704</a> [jb] Fixed profile with missing stats.</li>
+<li>2c5dcb5 PR800 [notebook] Add JDBC Assist for Presto (#800)</li>
+<li>8f48ba6 <a href="https://issues.cloudera.org/browse/HUE-8705">HUE-8705</a> [oozie] Fix hiding chooseWorkflowDemiModal clickable in coordinator</li>
+<li>60d6518 <a href="https://issues.cloudera.org/browse/HUE-8690">HUE-8690</a> [core] Add allows unsigned SAML assertions properties to inis</li>
+<li>804d095 <a href="https://issues.cloudera.org/browse/HUE-8706">HUE-8706</a> [frontend] Change the top nav logo in DW mode</li>
+<li>ab56d8d <a href="https://issues.cloudera.org/browse/HUE-8706">HUE-8706</a> [frontend] Change the left nav design in DW mode</li>
+<li>9d8c013 <a href="https://issues.cloudera.org/browse/HUE-8584">HUE-8584</a> [useradmin] Bubbling up errors for Add Sync Ldap Group</li>
+<li>96fbe70 <a href="https://issues.cloudera.org/browse/HUE-8704">HUE-8704</a> [jb] Add health risks to profile.</li>
+<li>d5d479c <a href="https://issues.cloudera.org/browse/HUE-8585">HUE-8585</a> [useradmin] Bubbling up errors for Add Sync Ldap Users</li>
+<li>8b99e35 <a href="https://issues.cloudera.org/browse/HUE-8703">HUE-8703</a> [editor] Clear the URL parameters when creating a new editor</li>
+<li>0d755eb <a href="https://issues.cloudera.org/browse/HUE-8140">HUE-8140</a> [editor] Additional improvements to multi statement execution</li>
+<li>66b8645 <a href="https://issues.cloudera.org/browse/HUE-8701">HUE-8701</a> [tb] Prevent eternal spinner when there are no namespaces</li>
+<li>b17973e <a href="https://issues.cloudera.org/browse/HUE-8701">HUE-8701</a> [editor] Prevent js exception in the context selector when no namespaces exist</li>
+<li>2307f53 <a href="https://issues.cloudera.org/browse/HUE-8700">HUE-8700</a> [editor] Highlight empty variables.</li>
+<li>60dc8c9 <a href="https://issues.cloudera.org/browse/HUE-8674">HUE-8674</a> [jb] Added overview details on profile.</li>
+<li>0fd4d3c <a href="https://issues.cloudera.org/browse/HUE-8674">HUE-8674</a> [jb] Update metrics on profile.</li>
+<li>5f3170e <a href="https://issues.cloudera.org/browse/HUE-8699">HUE-8699</a> [jb] Disable recurrent Yarn job browser status check for now in k8s mode</li>
+<li>2dcf14e <a href="https://issues.cloudera.org/browse/HUE-8699">HUE-8699</a> [core] Adding skeleton of Hue on Kubernetes</li>
+<li>712372e <a href="https://issues.cloudera.org/browse/HUE-8674">HUE-8674</a> [jb] Added IO to cpu time in profile.</li>
+<li>899148b <a href="https://issues.cloudera.org/browse/HUE-8690">HUE-8690</a> [backend] Fix Hue allows unsigned SAML assertions</li>
+<li>73764c9 <a href="https://issues.cloudera.org/browse/HUE-8674">HUE-8674</a> [jb] Fetch jobs only if interface is defined.</li>
+<li>6754e44 <a href="https://issues.cloudera.org/browse/HUE-8674">HUE-8674</a> [jb] Added simplified timeline to profile.</li>
+<li>716ef9f <a href="https://issues.cloudera.org/browse/HUE-8695">HUE-8695</a> [importer] Do not show the command but submit when clicking on submit button</li>
+<li>e066d05 <a href="https://issues.cloudera.org/browse/HUE-8694">HUE-8694</a> [frontend] Fix scroll in the database dropdown</li>
+<li>c05be9e <a href="https://issues.cloudera.org/browse/HUE-8140">HUE-8140</a> [editor] Improve multi-statement execution</li>
+<li>e211a8a <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [jb] Remove unused C3 lib</li>
+<li>1b77b93 <a href="https://issues.cloudera.org/browse/HUE-8674">HUE-8674</a> [jb] Add network time to profile.</li>
+<li>e66d5bc <a href="https://issues.cloudera.org/browse/HUE-8674">HUE-8674</a> [jb] Add filters and groupby conditions to profile</li>
+<li>48a1b5b <a href="https://issues.cloudera.org/browse/HUE-8674">HUE-8674</a> [jb] Add more metrics to query plan.</li>
+<li>5146aec <a href="https://issues.cloudera.org/browse/HUE-8674">HUE-8674</a> [jb] Add more metrics to query plan.</li>
+<li>cacf60f <a href="https://issues.cloudera.org/browse/HUE-8688">HUE-8688</a> [core] update Chinese language code to enable Hue Chinese localization</li>
+<li>5e78413 <a href="https://issues.cloudera.org/browse/HUE-8674">HUE-8674</a> [jb] Fix timeline for multicluster.</li>
+<li>b0bd9f7 <a href="https://issues.cloudera.org/browse/HUE-8679">HUE-8679</a> [impala] Fix hostname in remote cluster profile fetching</li>
+<li>f3d4ac7 <a href="https://issues.cloudera.org/browse/HUE-8674">HUE-8674</a> [jb] Add timeline to profile.</li>
+<li>dadf7b5 <a href="https://issues.cloudera.org/browse/HUE-8680">HUE-8680</a> [core] Fill in Impalad WEBUI username passwords automatically if needed</li>
+<li>4082346 <a href="https://issues.cloudera.org/browse/HUE-8682">HUE-8682</a> [backend] Update third party README</li>
+<li>72fbdb0 <a href="https://issues.cloudera.org/browse/HUE-8679">HUE-8679</a> [jb] Fix query interface single cluster after query</li>
+<li>56b665d <a href="https://issues.cloudera.org/browse/HUE-7258">HUE-7258</a> [jb] Add config check for Spark history server URL</li>
+<li>f67abf3 <a href="https://issues.cloudera.org/browse/HUE-8577">HUE-8577</a> [editor] Fix internal topic links in the language reference</li>
+<li>78b9c97 <a href="https://issues.cloudera.org/browse/HUE-8577">HUE-8577</a> [editor] Sync the built in UDF library with the Impala language reference</li>
+<li>30ba0ce <a href="https://issues.cloudera.org/browse/HUE-8577">HUE-8577</a> [editor] Preserve formatting in language reference code blocks</li>
+<li>46ef524 <a href="https://issues.cloudera.org/browse/HUE-8577">HUE-8577</a> [editor] Update the Impala Language Reference to the latest version</li>
+<li>c5cb6f2 <a href="https://issues.cloudera.org/browse/HUE-8577">HUE-8577</a> [autocomplete] Add support for Impala ALTER DATABASE statements</li>
+<li>1193436 <a href="https://issues.cloudera.org/browse/HUE-8577">HUE-8577</a> [autocomplete] Update the Impala SET options and UDFs</li>
+<li>81cb646 <a href="https://issues.cloudera.org/browse/HUE-8577">HUE-8577</a> [autocomplete] Add support for the Impala REFRESH AUTHORIZATION statement</li>
+<li>884b58b <a href="https://issues.cloudera.org/browse/HUE-8682">HUE-8682</a> [backend] Change PAM lib to python-pam-1.8.4</li>
+<li>8d66b0b <a href="https://issues.cloudera.org/browse/HUE-8685">HUE-8685</a> [importer] DB importer always shows DB already exists</li>
+<li>02a236e <a href="https://issues.cloudera.org/browse/HUE-8679">HUE-8679</a> [jb] Fix query interface single cluster</li>
+<li>a61122c <a href="https://issues.cloudera.org/browse/HUE-8674">HUE-8674</a> [jb] Add additional metrics to query profile.</li>
+<li>6bd7d7d <a href="https://issues.cloudera.org/browse/HUE-8679">HUE-8679</a> [jb] Only show chart metrics when the API is enabled</li>
+<li>367a905 <a href="https://issues.cloudera.org/browse/HUE-8679">HUE-8679</a> [cluster] Add Warehouse title without tabs</li>
+<li>1bc3ff8 <a href="https://issues.cloudera.org/browse/HUE-8679">HUE-8679</a> [cluster] Hide extra apps in k8s mode too</li>
+<li>2466152 <a href="https://issues.cloudera.org/browse/HUE-8679">HUE-8679</a> [core] Avoid config checks false positive error in multi cluster mode</li>
+<li>f735b4f <a href="https://issues.cloudera.org/browse/HUE-8679">HUE-8679</a> [cluster] Add proper Impala API in multicluster Impala</li>
+<li>b27dc3f <a href="https://issues.cloudera.org/browse/HUE-8679">HUE-8679</a> [notebook] Order of ini properties is not properly loaded in global constant file</li>
+<li>1856351 <a href="https://issues.cloudera.org/browse/HUE-8679">HUE-8679</a> [jb] Show query profile in multi cluster multi cluster logic</li>
+<li>ad2cbe5 <a href="https://issues.cloudera.org/browse/HUE-8679">HUE-8679</a> [notebook] Open query profile in correct cluster</li>
+<li>88f944d <a href="https://issues.cloudera.org/browse/HUE-8681">HUE-8681</a> [assist] Include non-opened topics in the language ref filter</li>
+<li>4a0b2e9 <a href="https://issues.cloudera.org/browse/HUE-8677">HUE-8677</a> [oozie] Oozie batch snippet hangs (#787)</li>
+<li>bd24275 PR737 [oozie] Support multiple groups in workflow permissions (#737)</li>
+<li>4db8f45 [<a href="https://issues.cloudera.org/browse/HUE-7919">HUE-7919</a>] oozie error &lsquo;NoneType&rsquo; object has no attribute &lsquo;is_superuser&rsquo; (#775)</li>
+<li>52e8b9a PR791 [docker] correct the command to copy the hue.ini file (#791)</li>
+<li>c6fff47 <a href="https://issues.cloudera.org/browse/HUE-8665">HUE-8665</a> [libanalyse] Add missing localization folder</li>
+<li>ad820d7 <a href="https://issues.cloudera.org/browse/HUE-8598">HUE-8598</a> [autocomplete] Improve autocomplete for CREATE statements</li>
+<li>f91ebbb <a href="https://issues.cloudera.org/browse/HUE-8671">HUE-8671</a> [autocomplete] handle two escape character within quotes (#780)</li>
+<li>02be9ec <a href="https://issues.cloudera.org/browse/HUE-8598">HUE-8598</a> [autocomplete] Split the rules WithSerdeproperties and OptionalWithSerdeproperties into one for Impala and one for Hive (#749)</li>
+<li>03850f1 <a href="https://issues.cloudera.org/browse/HUE-8674">HUE-8674</a> [jb] Add reset button to Impala plan.</li>
+<li>c331f37 <a href="https://issues.cloudera.org/browse/HUE-8587">HUE-8587</a> [jb] Make impala api cache url specific.</li>
+<li>5fa75c3 <a href="https://issues.cloudera.org/browse/HUE-8675">HUE-8675</a> [core] Fix external users created as superuser</li>
+<li>74af933 <a href="https://issues.cloudera.org/browse/HUE-8674">HUE-8674</a> [jb] Add more icons to Impala plan &amp; fix Subplan</li>
+<li>cc15921 <a href="https://issues.cloudera.org/browse/HUE-8676">HUE-8676</a> [jb] Fix pagination with is_hue_4 flag off</li>
+<li>fb3eb25 <a href="https://issues.cloudera.org/browse/HUE-8674">HUE-8674</a> [jb] Revamp UX for Impala query plan.</li>
+<li>c6ea3ca <a href="https://issues.cloudera.org/browse/HUE-8587">HUE-8587</a> [jb] Fix Jobbrowser to work with Smart Connection Pool</li>
+<li>0113911 <a href="https://issues.cloudera.org/browse/HUE-8673">HUE-8673</a> [notebook] Flag for the Impala query hints</li>
+<li>c05d0fb <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [frontend] Make sure we alway have values for metrics in the resource graph</li>
+<li>39dc303 <a href="https://issues.cloudera.org/browse/HUE-8673">HUE-8673</a> [metrics] Get metrics for the proper cluster only</li>
+<li>0116bef <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [impala] Add back query count metric variable</li>
+<li>9c1bf12 <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [frontend] Show a message when metrics are being loaded</li>
+<li>bc2cd5e <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [frontend] Get some metrics from prometheus instead of random data</li>
+<li>fcb7d10 <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [frontend] Add some transitions and format the performance graph axes</li>
+<li>b8d23df <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [frontend] Switch to checkboxes for the legend in the performance graph</li>
+<li>3d91405 <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [frontend] Add custom brush handles and improve colors in the performance graph</li>
+<li>362339d <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [frontend] Fix issue with flickering tooltip in the performance graph</li>
+<li>4901183 <a href="https://issues.cloudera.org/browse/HUE-8672">HUE-8672</a> [jb] Protect against basic graph display when data is empty</li>
+<li>cf01c37 <a href="https://issues.cloudera.org/browse/HUE-8672">HUE-8672</a> [jb] Stopped cluster is different than terminated and should be in running category</li>
+<li>a80b889 <a href="https://issues.cloudera.org/browse/HUE-8672">HUE-8672</a> [jb] Fix signature of profile function of get clusters</li>
+<li>c1fac4c <a href="https://issues.cloudera.org/browse/HUE-8672">HUE-8672</a> [jb] Partially hook-in the metric stats to the usage chart</li>
+<li>1c748a3 <a href="https://issues.cloudera.org/browse/HUE-8672">HUE-8672</a> [core] Rename parameter steps to step in the Prometheus API</li>
+<li>3bab502 <a href="https://issues.cloudera.org/browse/HUE-8672">HUE-8672</a> [core] Provide an entry point to the Prometheus API</li>
+<li>359ad79 <a href="https://issues.cloudera.org/browse/HUE-8672">HUE-8672</a> [core] Add Prometheus querying API</li>
+<li>b3fdedd <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [frontend] Remember the selected granularity in the performance graph</li>
+<li>fce9f2f <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [frontend] Remember which graph is enabled in the performance graph</li>
+<li>a8bb7ab <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [frontend] Improve focus indicators and add date to focus tooltip in the performance graph</li>
+<li>f322ba4 <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [frontend] Fix closest point detection on hover in the performance graph</li>
+<li>e155009 <a href="https://issues.cloudera.org/browse/HUE-8564">HUE-8564</a> [useradmin] Fix last activity update for jobbrowser oozie logs</li>
+<li>41f94ff <a href="https://issues.cloudera.org/browse/HUE-8665">HUE-8665</a> [editor] Update scanner_filter rule with supported predicates.</li>
+<li>9748f96 <a href="https://issues.cloudera.org/browse/HUE-8665">HUE-8665</a> [editor] Fix execution analysis disposal.</li>
+<li>3c8df3f <a href="https://issues.cloudera.org/browse/HUE-8665">HUE-8665</a> [editor] Add predicate optimization rule for Kudu.</li>
+<li>7cfd6c9 <a href="https://issues.cloudera.org/browse/HUE-8665">HUE-8665</a> [editor] Fix Kudu missing stats reason.</li>
+<li>1dcb093 <a href="https://issues.cloudera.org/browse/HUE-8665">HUE-8665</a> [editor] Add navigation from risk to plan.</li>
+<li>0bc55aa <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [frontend] Add Y axis labels to the performance graph</li>
+<li>1084ac8 <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [frontend] Add granularity options to the performance graph</li>
+<li>b38051b <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [frontend] Have the performance graph roll over instead of append</li>
+<li>ae8daa2 <a href="https://issues.cloudera.org/browse/HUE-8760">HUE-8760</a> [jb] Polish hpa logic to display desired replicas and current CPU usage</li>
+<li>4eef24e <a href="https://issues.cloudera.org/browse/HUE-8670">HUE-8670</a> [jb] Reset or load autoscaling info properly in the forms</li>
+<li>6d83ff8 <a href="https://issues.cloudera.org/browse/HUE-8665">HUE-8665</a> [editor] Add fix for missing statistics.</li>
+<li>7b66215 <a href="https://issues.cloudera.org/browse/HUE-8670">HUE-8670</a> [cluster] Switch Terminating cluster to Stopped when properly shutdown</li>
+<li>5ad4813 <a href="https://issues.cloudera.org/browse/HUE-8670">HUE-8670</a> [cluster] Wire-in the autoscale API</li>
+<li>6a656d9 <a href="https://issues.cloudera.org/browse/HUE-8670">HUE-8670</a> [jb] Add more air to mini Impala query browser to promote the query plan</li>
+<li>78eaae3 <a href="https://issues.cloudera.org/browse/HUE-8670">HUE-8670</a> [cluster] Adding auto resize option to the update cluster API</li>
+<li>d397106 <a href="https://issues.cloudera.org/browse/HUE-8670">HUE-8670</a> [cluster] Updating UI to display auto scale properties</li>
+<li>9fa9340 <a href="https://issues.cloudera.org/browse/HUE-8665">HUE-8665</a> [editor] Add background color and formatting to heatmap popup.</li>
+<li>53c2a75 <a href="https://issues.cloudera.org/browse/HUE-8665">HUE-8665</a> [editor] Hide execution analysis tab prior to query execution.</li>
+<li>cf29e40 <a href="https://issues.cloudera.org/browse/HUE-8665">HUE-8665</a> [editor] Hide nodes that do not have risks.</li>
+<li>641f23a <a href="https://issues.cloudera.org/browse/HUE-8665">HUE-8665</a> [editor] Add rule to check if statistics are missing.</li>
+<li>48b8d74 <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [frontend] Add tooltip and stacked bars for queries</li>
+<li>d7734e4 <a href="https://issues.cloudera.org/browse/HUE-8668">HUE-8668</a> [editor] Add table names to syntax checker suggestions</li>
+<li>07a0919 <a href="https://issues.cloudera.org/browse/HUE-8667">HUE-8667</a> [autocomplete] Fix issue where order by and group by suggestions aren&rsquo;t displayed properly</li>
+<li>85ff344 <a href="https://issues.cloudera.org/browse/HUE-8666">HUE-8666</a> [autocomplete] Fix timing issue with &ldquo;&hellip; ? from table&rdquo; completion</li>
+<li>ea6df5e <a href="https://issues.cloudera.org/browse/HUE-8665">HUE-8665</a> [editor] Add rule to detect missing metadata.</li>
+<li>e74c096 <a href="https://issues.cloudera.org/browse/HUE-8665">HUE-8665</a> [editor] Add number to risk alerts.</li>
+<li>6c5e764 <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [importer] Do not actually create the table when displaying the command</li>
+<li>dd09085 <a href="https://issues.cloudera.org/browse/HUE-8664">HUE-8664</a> [importer] Fixed Flume source import properties initialization</li>
+<li>9e817b3 <a href="https://issues.cloudera.org/browse/HUE-8665">HUE-8665</a> [editor] Add basic execution analysis for Impala</li>
+<li>61f2e40 <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [jb] Create ApiHelper skeleton and fetch random stats every second in the performance graph</li>
+<li>5c2b2f4 <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [jb] Add support for appending data in the performance graph</li>
+<li>938a9a2 <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [jb] Support arbitrary amount of performance graphs</li>
+<li>521c644 <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [jb] Switch to D3 for rendering the performance graph</li>
+<li>6c1dfdc <a href="https://issues.cloudera.org/browse/HUE-8140">HUE-8140</a> [editor] Add additional statement types to automatic multi query execution</li>
+<li>cbf84f0 <a href="https://issues.cloudera.org/browse/HUE-8661">HUE-8661</a> [assist] Enable scrollbars in context popover view sql</li>
+<li>abfa446 <a href="https://issues.cloudera.org/browse/HUE-7128">HUE-7128</a> [core] Apply config ENABLE_DOWNLOAD to search dashboard download</li>
+<li>a8aae58 <a href="https://issues.cloudera.org/browse/HUE-8664">HUE-8664</a> [metadata] Perform prefix search only</li>
+<li>48da580 <a href="https://issues.cloudera.org/browse/HUE-8663">HUE-8663</a> [core] Fix SAML TemplateDoesNotExist</li>
+<li>dbabd5c <a href="https://issues.cloudera.org/browse/HUE-8662">HUE-8662</a> [core] Fix missing static URLs</li>
+<li>5d94781 <a href="https://issues.cloudera.org/browse/HUE-8660">HUE-8660</a> [assist] Support multiple # in file names for assist preview</li>
+<li>c7365a4 <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [jb] Show multiple resources in the performance graph</li>
+<li>d5ba166 <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [jb] Add auto resize threshold to performance graphs</li>
+<li>4c045e1 <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [jb] Add zoom and style the performance graph</li>
+<li>5346841 <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [jb] Switch to C3js for rendering performance graphs</li>
+<li>6362225 <a href="https://issues.cloudera.org/browse/HUE-8649">HUE-8649</a> [frontend] Add a performance graph component</li>
+<li>7df4c16 <a href="https://issues.cloudera.org/browse/HUE-8659">HUE-8659</a> [importer] Fix js exception with the field editor</li>
+<li>4291704 <a href="https://issues.cloudera.org/browse/HUE-8660">HUE-8660</a> [core] Fix page routing issues with file browser paths containing #</li>
+<li>cf89af8 <a href="https://issues.cloudera.org/browse/HUE-8660">HUE-8660</a> [assist] Fix file preview in left assist for files with # in the name</li>
+<li>f043d76 <a href="https://issues.cloudera.org/browse/HUE-8658">HUE-8658</a> [frontend] Fix popover alignment on first show</li>
+<li>b467c1c <a href="https://issues.cloudera.org/browse/HUE-8657">HUE-8657</a> [jb] Add cluster configure action to single cluster view</li>
+<li>12ccdf0 <a href="https://issues.cloudera.org/browse/HUE-8657">HUE-8657</a> [jb] Adjust headings and paginator for warehouses mode</li>
+<li>8ab6d78 <a href="https://issues.cloudera.org/browse/HUE-8657">HUE-8657</a> [frontend] Switch to popover for create cluster options</li>
+<li>2cc120b <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> test_fetch_result_size_mr increase timeout.</li>
+<li>d058bf9 <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [notebook] Disable by default showing the file snippet selector</li>
+<li>e6ea83f <a href="https://issues.cloudera.org/browse/HUE-8656">HUE-8656</a> [tb] Make sure a compute is always set in the table browser</li>
+<li>b3ea40d <a href="https://issues.cloudera.org/browse/HUE-8655">HUE-8655</a> [editor] Have the location handler wait for a compute and namespace to be set</li>
+<li>4253f9a <a href="https://issues.cloudera.org/browse/HUE-8654">HUE-8654</a> [editor] Prevent setting empty object for namespace and compute</li>
+<li>70d0367 <a href="https://issues.cloudera.org/browse/HUE-8654">HUE-8654</a> [editor] Guarantee a namespace and compute is set in single cluster mode</li>
+<li>5c4b159 <a href="https://issues.cloudera.org/browse/HUE-8652">HUE-8652</a> [frontend] Fix JS exception in jquery.hiveautocomplete when no namespaces are returned</li>
+<li>123fa67 <a href="https://issues.cloudera.org/browse/HUE-8651">HUE-8651</a> [editor] Add a dedicated execution analysis tab in the editor</li>
+<li>d4b188f <a href="https://issues.cloudera.org/browse/HUE-8651">HUE-8651</a> [frontend] Add an execution analysis component</li>
+<li>b56f954 <a href="https://issues.cloudera.org/browse/HUE-8651">HUE-8651</a> [assist] Remove execution analysis from the right assist</li>
+<li>551769b <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] test_get_interpreters_to_show reset DESKTOP_APPS redux</li>
+<li>077fd90 <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] xxd_test SkipTest import</li>
+<li>0479b9d <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] test_get_interpreters_to_show reset DESKTOP_APPS</li>
+<li>2b38919 <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] xxd_test SkipTest if xxd is not found.</li>
+<li>85dcb96 <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] TestResourceManagerHaNoHadoop tearDown reset API_CACHE</li>
+<li>7cadf0d <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] Fix solr_client_test reset_properties correctly.</li>
+<li>26e7f35 <a href="https://issues.cloudera.org/browse/HUE-8647">HUE-8647</a> [assist] Show DB info icon regardless of nav configuration</li>
+<li>f1e1be2 <a href="https://issues.cloudera.org/browse/HUE-8631">HUE-8631</a> [hbase] pull thrift transport from hbase-site.xml</li>
+<li>16f2e75 <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] Fix impala integration tests setup.</li>
+<li>255aa7c <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] Fix test_get_interpreters_to_show reset blacklist</li>
+<li>fce4687 <a href="https://issues.cloudera.org/browse/HUE-8648">HUE-8648</a> [importer] sqoop configured rdbms fails</li>
+<li>ab79f5c [core] Hue-8644 fixing test_user_admin</li>
+<li>10306fa <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] dbms swap caching key username to id.</li>
+<li>d98fff7 <a href="https://issues.cloudera.org/browse/HUE-8645">HUE-8645</a> [jb] Clear cluster selection after killing a cluster</li>
+<li>ecbde74 <a href="https://issues.cloudera.org/browse/[HUE-8645](https://issues.cloudera.org/browse/HUE-8645)"><a href="https://issues.cloudera.org/browse/HUE-8645">HUE-8645</a></a> [assist] Refresh namespaces when a cluster is killed</li>
+<li>bb0fe68 <a href="https://issues.cloudera.org/browse/[HUE-8645](https://issues.cloudera.org/browse/HUE-8645)"><a href="https://issues.cloudera.org/browse/HUE-8645">HUE-8645</a></a> [assist] Poll for namespace status change when a namespace is starting</li>
+<li>ae25884 PR770 [doc] Edited markdown headers (#770)</li>
+<li>4723c65 <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] Fix test_db_migrations_mysql mysql not installed.</li>
+<li>5842bac <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] TestDashboard catch_unicode_time unable to parse date</li>
+<li>ffb6a19 <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] Fix test_dump_config &amp; test_config_check HUE_CONF_DIR</li>
+<li>3c2f1d8 <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] Fix tests_doc2 test_import_owned_document data</li>
+<li>507bd41 <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] Fix notebook get_sample_data operation default</li>
+<li>45364f0 <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [metadata] Skip tests that fail when the catalog is to slow to update</li>
+<li>f141c1f <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] Fix test_show_tables metastore table post</li>
+<li>841da88 <a href="https://issues.cloudera.org/browse/HUE-8643">HUE-8643</a> [importer] Fix showing the import command</li>
+<li>3b2be2c [core] <a href="https://issues.cloudera.org/browse/HUE-8640">HUE-8640</a> adding missing parameters like statement_raw and variables in snippets to fix test in TestNotebookApi</li>
+<li>a7ac485 <a href="https://issues.cloudera.org/browse/HUE-8641">HUE-8641</a> [frontend] Trigger a namespace refresh when the context catalog is cleared</li>
+<li>b11d426 <a href="https://issues.cloudera.org/browse/HUE-8638">HUE-8638</a> [importer] Enable context popover and syntax error highlighting in the importer field editor</li>
+<li>9719948 <a href="https://issues.cloudera.org/browse/HUE-8638">HUE-8638</a> [core] Remove dead webworker code for embedded mode</li>
+<li>91b7e4b <a href="https://issues.cloudera.org/browse/HUE-8638">HUE-8638</a> [frontend] Disable operations in the context popover for temporary entries</li>
+<li>c6f0648 <a href="https://issues.cloudera.org/browse/HUE-8638">HUE-8638</a> [frontend] Enable breadcrumb navigation in the context popover for temporary entries</li>
+<li>740c138 <a href="https://issues.cloudera.org/browse/HUE-8638">HUE-8638</a> [frontend] Add samples to temporary catalog entries</li>
+<li>55f5253 <a href="https://issues.cloudera.org/browse/HUE-8638">HUE-8638</a> [frontend] Make sure a temporary source is created in the data catalog for temporary tables</li>
+<li>af6b424 <a href="https://issues.cloudera.org/browse/HUE-8638">HUE-8638</a> [editor] Move context popover and tooltip logic out of the aceEditor binding</li>
+<li>b1e0243 <a href="https://issues.cloudera.org/browse/HUE-8638">HUE-8638</a> [editor] Extract editor webworker logic to global handler</li>
+<li>643ce72 <a href="https://issues.cloudera.org/browse/HUE-8638">HUE-8638</a> [importer] Pre-fill a complete statement for the field editor</li>
+<li>d28c18f <a href="https://issues.cloudera.org/browse/HUE-8638">HUE-8638</a> [importer] Improve the query editor table name</li>
+<li>1d091ea <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] Fix TestBeeswaxWithHadoop describe_table post</li>
+<li>64014ca <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] sql_tests missing sourceType</li>
+<li>42b2198 <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] Fix test_create_database metastore url</li>
+<li>918dd21 <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] Fix install_samples loaddata atomic</li>
+<li>0b7ce11 <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] Fix import_documents loaddata atomic</li>
+<li>f63c4ab <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] Fix test_db_migrations_mysql missing mysql command</li>
+<li>62424ef <a href="https://issues.cloudera.org/browse/HUE-8639">HUE-8639</a> [metadata] Include the docstring into the configuration</li>
+<li>fa4a904 <a href="https://issues.cloudera.org/browse/HUE-8638">HUE-8638</a> [importer] Add autocomplete of source fields to the editor in the importer</li>
+<li>2383933 <a href="https://issues.cloudera.org/browse/HUE-8638">HUE-8638</a> [frontend] Add default set of metadata for temporary entries</li>
+<li>3917cc8 <a href="https://issues.cloudera.org/browse/HUE-8638">HUE-8638</a> [frontend] Add the ability to create temporary tables in the data catalog</li>
+<li>fd0cd4f <a href="https://issues.cloudera.org/browse/HUE-8639">HUE-8639</a> [metadata] Do not do Sentry filtering when Sentry is not configured</li>
+<li>291ec57 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [metastore] Update describe table tests to use POST and not GET now</li>
+<li>3a9fc19 <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] Fix test_make_log_links hue 4 links</li>
+<li>eb5cc60 <a href="https://issues.cloudera.org/browse/HUE-8630">HUE-8630</a> [core] Fix test_db_migrations_sqlite missing import</li>
+<li>9f99f69 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [cluster] Keep only external cluster configs in [[clusters]]</li>
+<li>38c59fd <a href="https://issues.cloudera.org/browse/HUE-8636">HUE-8636</a> [assist] Fix the show in assist link in the language reference context popover</li>
+<li>1263ece <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [sql] Remove hardcoding to timeout after 5s when executing statement</li>
+<li>3c85e44 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [core] API should not check for remote cloud clusters if they are not configured</li>
+<li>1f2229d <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [frontend] Improve font in wxm images when Roboto isn&rsquo;t available</li>
+<li>cec46c1 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [importer] Improve SFDC import autocomplete</li>
+<li>1a20edc <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [frontend] Use oozie icon for workflows in the sidebar</li>
+<li>b2041f9 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [frontend] Fix invalidate flush in K8S mode</li>
+<li>09607f4 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [frontend] Have the sidebar items depend on the current cluster mode</li>
+<li>215c7d4 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [frontend] Increase the size of the DE logo</li>
+<li>8e3e247 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [frontend] Add pubSub to switch between DE and DW mode</li>
+<li>026c972 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [cluster] Hide json message when creating a k8 cluster</li>
+<li>489b710 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [cluster] Fix bug disabling the Kill button for k8s services</li>
+<li>d89f5fd <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [impapal] Fix _get_impala_result_size when using multi cluster</li>
+<li>a96edec <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [js] Fix typo when importing cluster flag</li>
+<li>fc58c39 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [frontend] Use URL to determine which left nav item is active</li>
+<li>2b83a35 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [frontend] Change the workflows icon</li>
+<li>f5056fa <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [frontend] Add DE logo</li>
+<li>41eefcb <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [frontend] Always flush all on invalidate in K8 only mode</li>
+<li>7fb0945 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [cluster] Use smaller input for the number of replicas</li>
+<li>468906f <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [jb] Move resize action to show on the same line</li>
+<li>dab24a4 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [cluster] Tweak the menu to show clusters in the bottom</li>
+<li>cfcc227 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [frontend] Use cluster icon for warehouses</li>
+<li>95da0bc <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [frontend] Save sidebar collapsed state in total storage and have it open by default</li>
+<li>321c7ae <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [jb] Add tabs in cluster view</li>
+<li>cdbcbcd <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [frontend] Prevent initial js error in the dw sidebar when no app is set</li>
+<li>160d5fd <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [frontend] Add warehouses icon</li>
+<li>ecb4723 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [frontend] Keep left sidebar items constant</li>
+<li>438f496 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [jb] Simplify cluster service page</li>
+<li>4555512 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [frontend] Remove double level menu links for now</li>
+<li>69927f3 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [frontend] Tweak the menu to only show the core apps</li>
+<li>19515d3 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [frontend] Add an inner left nav for multi cluster only mode</li>
+<li>c937a14 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [frontend] Remove home, data eng and stewart from the left hamburger menu</li>
+<li>f3cfe08 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [frontend] Add dw logos</li>
+<li>e78a63c <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [core] Tweak the left menu items</li>
+<li>67e565f <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [impala] Remove mocked impalad http address</li>
+<li>193582e <a href="https://issues.cloudera.org/browse/HUE-8610">HUE-8610</a> [tb] Convert GET format to POST for describe table</li>
+<li>93029ba <a href="https://issues.cloudera.org/browse/HUE-8610">HUE-8610</a> [tb] Post the source type when calling describe table</li>
+<li>f48ba7e <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [jb] Add PoC WXM Summary</li>
+<li>2621aef <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [cluster] Add more information to the service section</li>
+<li>26a2d82 <a href="https://issues.cloudera.org/browse/HUE-8617">HUE-8617</a> [impala] Support multi cluster in invalidate metadata</li>
+<li>0b32fb6 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [cluster] Split cluster and service creation in two</li>
+<li>6f08a22 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [cluster] Consolidate the menu</li>
+<li>4b763ca <a href="https://issues.cloudera.org/browse/HUE-8616">HUE-8616</a> [cluster] getNamespaces for impala returns namespace with hive compute</li>
+<li>7275c9c <a href="https://issues.cloudera.org/browse/HUE-8605">HUE-8605</a> [metadata] Only show the Table Privilege tab when Sentry is enabled</li>
+<li>68d65c0 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [importer] Show generated command for Flume pipelines</li>
+<li>8e6e155 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [metadata] DESCRIBE EXTENTED DATABASE incompability with Impala</li>
+<li>22bc6e8 <a href="https://issues.cloudera.org/browse/HUE-8586">HUE-8586</a> [metastore] Support multi cluster parameters</li>
+<li>b409450 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [importer] Saving pipeline API skeleton</li>
+<li>9237f43 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [importer] Skeleton of show command popup for Sqoop import</li>
+<li>7baece9 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [importer] Skeleton of show command popup for CREATE TABLE from a file</li>
+<li>96afa5b <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [importer] Include morphline files into the tasks</li>
+<li>e04e5e8 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [importer] Do not disable submit when input is Kafka and output Kudu and table already exists</li>
+<li>98cdc84 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [importer] Add skeleton support for from Kafka to Solr</li>
+<li>602f50f <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [importer] Example of from Kafka to Kudu via Spark</li>
+<li>2afc770 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [importer] Automatically prefill output table name when sqooping one table</li>
+<li>487fc7f <a href="https://issues.cloudera.org/browse/HUE-8586">HUE-8586</a> [notebook] Add selected cluster to the sample popup check status call</li>
+<li>3f28d33 <a href="https://issues.cloudera.org/browse/HUE-8586">HUE-8586</a> [notebook] Fix interface name conflict on data API calls with multi cluster</li>
+<li>798709a <a href="https://issues.cloudera.org/browse/HUE-8586">HUE-8586</a> [metadata] Integrate sample API with the multi cluster logic</li>
+<li>fce62d6 <a href="https://issues.cloudera.org/browse/HUE-8330">HUE-8330</a> [metadata] Convert /impala-hive/api API to support multi cluster</li>
+<li>326ca89 <a href="https://issues.cloudera.org/browse/HUE-8586">HUE-8586</a> [cluster] Properly list compute clusters in compute API with k8s</li>
+<li>05c4501 <a href="https://issues.cloudera.org/browse/HUE-8586">HUE-8586</a> [notebook] Add selected cluster to the create session call</li>
+<li>28d756e <a href="https://issues.cloudera.org/browse/HUE-8586">HUE-8586</a> [cluster] Rename k8 properties to k8s</li>
+<li>3ea20d8 PR759 [doc] Update installation guide for MacOS (#759)</li>
+</ul>
+
+<h2 id="contributors">Contributors</h2>
+
+<p>This Hue release is made possible thanks to the contribution from:</p>
+
+<ul>
+<li>Aaron Newton</li>
+<li>Aaron Peddle</li>
+<li>Aaron T. Myers</li>
+<li>abec</li>
+<li>Abraham Elmahrek</li>
+<li>Aditya Acharya</li>
+<li>Adrian Yavorskyy</li>
+<li>aig</li>
+<li>airokey</li>
+<li>Alex Breshears</li>
+<li>Alex Newman</li>
+<li>Alex (posi) Newman</li>
+<li>alheio</li>
+<li>alphaskade</li>
+<li>Ambreen Kazi</li>
+<li>Amit Kabra</li>
+<li>Andrei Savu</li>
+<li>Andrew Bayer</li>
+<li>Andrew Yao</li>
+<li>Andy Braslavskiy</li>
+<li>Ann McCown</li>
+<li>antbell</li>
+<li>Antonio Bellezza</li>
+<li>arahuja</li>
+<li>Ashu Pachauri</li>
+<li>Atupal</li>
+<li>Avindra Goolcharan</li>
+<li>bcwalrus</li>
+<li>bc Wong</li>
+<li>Ben Bishop</li>
+<li>Ben Gooley</li>
+<li>Ben White</li>
+<li>Bhargava Kalathuru</li>
+<li>Bruce Mitchener</li>
+<li>Bruno Mahé</li>
+<li>bschell</li>
+<li>bwang</li>
+<li>cconner</li>
+<li>Chris Conner</li>
+<li>Chris Stephens</li>
+<li>Christopher Conner</li>
+<li>Christopher McConnell</li>
+<li>Christopherwq Conner</li>
+<li>cmconner156</li>
+<li>Craig Minihan</li>
+<li>cwalet</li>
+<li>Daehan Kim</li>
+<li>dbeech</li>
+<li>denniszag</li>
+<li>Derek Chen-Becker</li>
+<li>Diego Sevilla Ruiz</li>
+<li>Dominik Gehl</li>
+<li>Eli Collins</li>
+<li>Enrico Berti</li>
+<li>Erick Tryzelaar</li>
+<li>Ewan Higgs</li>
+<li>fatherfox</li>
+<li>gdgt</li>
+<li>Gilad Wolff</li>
+<li>grundprinzip</li>
+<li>Grzegorz Kokosiński</li>
+<li>Guido Serra</li>
+<li>happywind</li>
+<li>Harsh</li>
+<li>Harsh J</li>
+<li>Hector Acosta</li>
+<li>Henry Robinson</li>
+<li>Igor Wiedler</li>
+<li>Ilkka Turunen</li>
+<li>Istvan</li>
+<li>Ivan Dzikovsky</li>
+<li>Ivan Orlov</li>
+<li>Jack McCracken</li>
+<li>Jaguar Xiong</li>
+<li>Jakub Kukul</li>
+<li>Jarcek</li>
+<li>jdesjean</li>
+<li>jeff.melching</li>
+<li>Jenny Kim</li>
+<li>jheyming</li>
+<li>Joe Crobak</li>
+<li>Joey Echeverria</li>
+<li>Johan Ahlen</li>
+<li>Johan Åhlén</li>
+<li>Jon Natkins</li>
+<li>Josh Walters</li>
+<li>Karissa McKelvey</li>
+<li>Kevin Wang</li>
+<li>Khwunchai Jaengsawang</li>
+<li>Kostas Sakellis</li>
+<li>krish</li>
+<li>Lars Francke</li>
+<li>Li Jiahong</li>
+<li>linchan-ms</li>
+<li>Linden Hillenbrand</li>
+<li>Luca Natali</li>
+<li>Luke Carmichael</li>
+<li>lvziling</li>
+<li>maiha</li>
+<li>Marcus McLaughlin</li>
+<li>Mariusz Strzelecki</li>
+<li>Mathias Rangel Wulff</li>
+<li>Matías Javier Rossi</li>
+<li>Max T</li>
+<li>Michael Prim</li>
+<li>Michal Ferlinski</li>
+<li>Michalis Kongtongk</li>
+<li>Mobin Ranjbar</li>
+<li>motta</li>
+<li>mrmrs</li>
+<li>Mykhailo Kysliuk</li>
+<li>Nicolas Fouché</li>
+<li>NikolayZhebet</li>
+<li>Olaf Flebbe</li>
+<li>Oren Mazor</li>
+<li>oxpa</li>
+<li>Pala M Muthaia Chettiar</li>
+<li>Patricia Sz</li>
+<li>Patrick Carlson</li>
+<li>Patrycja Szabłowska</li>
+<li>pat white</li>
+<li>Paul Battaglia</li>
+<li>Paul McCaughtry</li>
+<li>peddle</li>
+<li>Peter Slawski</li>
+<li>Philip Zeyliger</li>
+<li>Piotr Ackermann</li>
+<li>pkuwm</li>
+<li>Prachi Poddar</li>
+<li>Prakash Ranade</li>
+<li>Prasad Mujumdar</li>
+<li>Qi Xiao</li>
+<li>rainysia</li>
+<li>raphi</li>
+<li>Renxia Wang</li>
+<li>Rick Bernotas</li>
+<li>Ricky Saltzer</li>
+<li>robrotheram</li>
+<li>Romain Rigaux</li>
+<li>Roman Shaposhnik</li>
+<li>Roohi</li>
+<li>Roohi Syeda</li>
+<li>Rui Pereira</li>
+<li>Sai Chirravuri</li>
+<li>Scott Kahler</li>
+<li>Sean Mackrory</li>
+<li>Shahab Tajik</li>
+<li>Shawarma</li>
+<li>Shawn Van Ittersum</li>
+<li>shobull</li>
+<li>Shrijeet</li>
+<li>Shrijeet Paliwal</li>
+<li>Shuo Diao</li>
+<li>Siddhartha Sahu</li>
+<li>Simon Beale</li>
+<li>Simon Whittaker</li>
+<li>sky4star</li>
+<li>spaztic1215</li>
+<li>Stefano Palazzo</li>
+<li>Stephanie Bodoff</li>
+<li>Suhas Satish</li>
+<li>TAKLON STEPHEN WU</li>
+<li>Tamas Sule</li>
+<li>Tatsuo Kawasaki</li>
+<li>Taylor Ainsworth</li>
+<li>Thai Bui</li>
+<li>thinker0</li>
+<li>Thomas Aylott</li>
+<li>Thomas Poepping</li>
+<li>Tianjin Gu</li>
+<li>tjphilpot</li>
+<li>todaychi</li>
+<li>Todd Lipcon</li>
+<li>Tom Mulder</li>
+<li>Vadim Markovtsev</li>
+<li>van Orlov</li>
+<li>vinithra</li>
+<li>voyageth</li>
+<li>vybs</li>
+<li>Wang, Xiaozhe</li>
+<li>Weixia Xu</li>
+<li>William Bourque</li>
+<li>wilson</li>
+<li>Word</li>
+<li>Xavier Morera</li>
+<li>Xhxiong</li>
+<li>Xiao Kang</li>
+<li>Xingang Zhang</li>
+<li>xq262144</li>
+<li>Ying Chen</li>
+<li>Yixiao Lin</li>
+<li>Yoer</li>
+<li>Yuriy Hupalo</li>
+<li>ywheel</li>
+<li>Zachary York</li>
+<li>Zach York</li>
+<li>Zhang Bo</li>
+<li>Zhang Ruiqiang</li>
+<li>zhengkai</li>
+<li>Zhihai Xu</li>
+<li>z-york</li>
+<li>小龙哥</li>
+</ul>
+
+
+<footer class=" footline" >
+	
+</footer>
+
+
+        
+        </div> 
+        
+
+      </div>
+
+    <div id="navigation">
+        
+        
+        
+        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+            
+        
+        
+        
+
+
+	 
+	 
+    </div>
+
+    </section>
+    
+    <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
+      <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
+    </div>
+    <script src="/hue/latest/js/clipboard.min.js"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.min.js"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js"></script>
+    <script src="/hue/latest/js/jquery.sticky.js"></script>
+    <script src="/hue/latest/js/featherlight.min.js"></script>
+    <script src="/hue/latest/js/html5shiv-printshiv.min.js"></script>
+    <script src="/hue/latest/js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="/hue/latest/js/modernizr.custom.71422.js"></script>
+    <script src="/hue/latest/js/learn.js"></script>
+    <script src="/hue/latest/js/hugo-learn.js"></script>
+
+    <link href="/hue/latest/mermaid/mermaid.css" type="text/css" rel="stylesheet" />
+    <script src="/hue/latest/mermaid/mermaid.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-37637545-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-37637545-1');
+</script>
+  </body>
+</html>
+

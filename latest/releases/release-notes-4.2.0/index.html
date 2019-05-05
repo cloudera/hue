@@ -1,0 +1,4268 @@
+<!DOCTYPE html>
+<html lang="en" class="js csstransforms3d">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="Hugo 0.55.5" />
+    <meta name="description" content="">
+
+
+    <link rel="shortcut icon" href="http://cloudera.github.io/hue/latest/images/favicon.png" type="image/x-icon" />
+
+    <title>4.2.0 :: Hue Documentation</title>
+
+    
+    <link href="/hue/latest/css/nucleus.css" rel="stylesheet">
+    <link href="/hue/latest/css/fontawesome-all.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/hybrid.css" rel="stylesheet">
+    <link href="/hue/latest/css/featherlight.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/perfect-scrollbar.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/auto-complete.css" rel="stylesheet">
+    <link href="/hue/latest/css/theme.css" rel="stylesheet">
+    <link href="/hue/latest/css/hugo-theme.css" rel="stylesheet">
+    
+      <link href="/hue/latest/css/theme-hue.css" rel="stylesheet">
+    
+
+    <script src="/hue/latest/js/jquery-2.x.min.js"></script>
+
+    <style type="text/css">
+      :root #header + #content > #left > #rlblock_left{
+          display:none !important;
+      }
+      
+    </style>
+    
+  </head>
+  <body class="" data-url="/hue/latest/releases/release-notes-4.2.0/">
+    <nav id="sidebar" class="">
+
+
+
+  <div id="header-wrapper">
+    <div id="header">
+      <a href="http://gethue.com">
+  <img src="http://cloudera.github.io/hue/latest/images/hue_logo.png" alt="alt text" title="Hue Logo">
+</a>
+
+    </div>
+    
+        <div class="searchbox">
+    <label for="search-by"><i class="fas fa-search"></i></label>
+    <input data-search-input id="search-by" type="search" placeholder="Search...">
+    <span data-search-clear=""><i class="fas fa-times"></i></span>
+</div>
+
+<script type="text/javascript" src="/hue/latest/js/lunr.min.js"></script>
+<script type="text/javascript" src="/hue/latest/js/auto-complete.js"></script>
+<script type="text/javascript">
+    
+        var baseurl = "http:\/\/cloudera.github.io\/hue\/latest\/";
+    
+    var fileSearchBlacklist = "";
+</script>
+<script type="text/javascript" src="/hue/latest/js/search.js"></script>
+
+    
+  </div>
+
+    <div class="highlightable">
+    <ul class="topics">
+
+        
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/" title="Administrator" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/">
+          <b>1. </b>Administrator
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/installation/" title="Installation" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/installation/">
+          Installation
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/installation/dependencies/" title="Dependencies" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/installation/dependencies/">
+          Dependencies
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/installation/install/" title="Install" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/install/">
+        Install
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/installation/containers/" title="Containers" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/containers/">
+        Containers
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/installation/starting/" title="Running" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/starting/">
+        Running
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/" title="Configuration" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/">
+          Configuration
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/server/" title="Server" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/server/">
+          Server
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/editor/" title="Editor" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/editor/">
+          Editor
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/dashboard/" title="Dashboard" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/dashboard/">
+          Dashboard
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/files/" title="Files and Stores" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/files/">
+          Files and Stores
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/external/" title="Other services" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/external/">
+          Other services
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/administration/" title="Administration" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/administration/">
+          Administration
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/reference/" title="Reference Architecture" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/reference/">
+        Reference Architecture
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/operations/" title="Operations" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/operations/">
+        Operations
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/user-management/" title="User Management" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/user-management/">
+        User Management
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/database/" title="Database" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/database/">
+        Database
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/" title="User" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/">
+          <b>2. </b>User
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/concept/" title="Concepts" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/concept/">
+          Concepts
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/editor/" title="SQL Editor / Notebook" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/editor/">
+          SQL Editor / Notebook
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/dashboards/" title="Dashboard" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/dashboards/">
+          Dashboard
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/browsers/" title="Data Catalog" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/browsers/">
+          Data Catalog
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/scheduler/" title="Scheduler" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/scheduler/">
+          Scheduler
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/contrib/" title="Contrib" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/contrib/">
+          Contrib
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/" title="Developer" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/">
+          <b>3. </b>Developer
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/development/" title="Development" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/development/">
+          Development
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/editor/" title="Editor / Notebook" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/editor/">
+          Editor / Notebook
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/api/" title="APIs" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/api/">
+          APIs
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/browsers/" title="Browsers" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/browsers/">
+          Browsers
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/application/" title="Applications" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/application/">
+          Applications
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/releases/" title="Releases" class="dd-item 
+        parent
+        
+        
+        ">
+      <a href="/hue/latest/releases/">
+          <b>4. </b>Releases
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.4.0/" title="4.4.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.4.0/">
+        4.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.3.0/" title="4.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.3.0/">
+        4.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.2.0/" title="4.2.0" class="dd-item active">
+        <a href="/hue/latest/releases/release-notes-4.2.0/">
+        4.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.1.0/" title="4.1.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.1.0/">
+        4.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.0.0/" title="4.0.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.0.0/">
+        4.0.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.12.0/" title="3.12.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.12.0/">
+        3.12.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.11.0/" title="3.11.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.11.0/">
+        3.11.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.10.0/" title="3.10.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.10.0/">
+        3.10.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.9.0/" title="3.9.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.9.0/">
+        3.9.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.8.0/" title="3.8.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.8.0/">
+        3.8.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.7.0/" title="3.7.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.7.0/">
+        3.7.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.6.0/" title="3.6.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.6.0/">
+        3.6.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.5.0/" title="3.5.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.5.0/">
+        3.5.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.0.0/" title="3.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.0.0/">
+        3.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.5.0/" title="2.5.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.5.0/">
+        2.5.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.4.0/" title="2.4.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.4.0/">
+        2.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.3.0/" title="2.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.3.0/">
+        2.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.2.0/" title="2.2.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.2.0/">
+        2.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.1.0/" title="2.1.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.1.0/">
+        2.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.0.1/" title="2.0.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.0.1/">
+        2.0.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.0.0-beta/" title="2.0.0-beta" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.0.0-beta/">
+        2.0.0-beta
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.2.0/" title="1.2.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.2.0/">
+        1.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.1.0/" title="1.1.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.1.0/">
+        1.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.0.1/" title="1.0.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.0.1/">
+        1.0.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.0.0/" title="1.0.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.0.0/">
+        1.0.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.9.1/" title="0.9.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.9.1/">
+        0.9.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.9.0/" title="0.9.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.9.0/">
+        0.9.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.4.2/" title="0.4.2" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.4.2/">
+        0.4.2
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.4.1/" title="0.4.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.4.1/">
+        0.4.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.4.0/" title="0.4.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.4.0/">
+        0.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.3.0/" title="0.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.3.0/">
+        0.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+         
+    </ul>
+
+    
+    
+      <section id="shortcuts">
+        <h3>More</h3>
+        <ul>
+          
+              <li> 
+                  <a class="padding" href="https://github.com/cloudera/hue"><i class='fab fa-fw fa-github'></i> GitHub</a>
+              </li>
+          
+              <li> 
+                  <a class="padding" href="http://demo.gethue.com"><i class='fas fa-fw fa-play'></i> Demo</a>
+              </li>
+          
+              <li> 
+                  <a class="padding" href="http://gethue.com"><i class='fas fa-fw fa-bookmark'></i> gethue.com</a>
+              </li>
+          
+        </ul>
+      </section>
+    
+
+    
+    <section id="footer">
+      <p>Built with <a href="https://github.com/matcornic/hugo-theme-learn">Learn</a> and <a href="http://gohugo.io/">Hugo</a></p>
+
+    </section>
+  </div>
+</nav>
+
+
+
+
+
+        <section id="body">
+        <div id="overlay"></div>
+        <div class="padding highlightable">
+              
+              <div>
+                <div id="top-bar">
+                
+                  
+                  
+                  
+                  <div id="top-github-link">
+                    <a class="github-link" title='Edit this page' href="https://github.com/cloudera/hue/blob/master/docs/docs-site/content/releases/release-notes-4.2.0.md" target="blank">
+                      <i class="fas fa-code-branch"></i>
+                      <span id="top-github-link-text">Edit this page</span>
+                    </a>
+                  </div>
+                  
+                
+                <div id="breadcrumbs" itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb">
+                    <span id="sidebar-toggle-span">
+                        <a href="#" id="sidebar-toggle" data-sidebar-toggle="">
+                          <i class="fas fa-bars"></i>
+                        </a>
+                    </span>
+                  <span class="links">
+                 
+                 
+                    
+            
+            
+              
+              
+            
+            
+              
+              
+            
+            
+              <a href='/hue/latest/'>Hue Guide</a> > <a href='/hue/latest/releases/'>Releases</a> > 4.2.0
+            
+          
+            
+          
+            
+          
+                 
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+
+        
+        <div class="body-outer">
+          
+          
+              <aside class="toc">
+  <div class="wrapper">
+    <header>
+    <h4>What's on this Page</h4>
+    </header>
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#hue-v4-2-0-released-april-4th-2018">Hue v4.2.0, released April 4th 2018</a></li>
+</ul></li>
+<li><a href="#summary">Summary</a></li>
+<li><a href="#notable-changes">Notable Changes</a></li>
+<li><a href="#compatibility">Compatibility</a></li>
+<li><a href="#list-of-1200-commits">List of 1200+ Commits</a></li>
+<li><a href="#contributors">Contributors</a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</aside>
+          
+          <div id="body-inner">
+
+            
+              <h1>4.2.0</h1>
+            
+
+          
+
+
+
+
+<h3 id="hue-v4-2-0-released-april-4th-2018">Hue v4.2.0, released April 4th 2018</h3>
+
+<p>Hue, <a href="http://gethue.com">http://gethue.com</a>, is an open source Analytic Workbench.</p>
+
+<p>Its main features:</p>
+
+<ul>
+<li>Editors for SQL querying (Hive, Impala, MySQL, Oracle, PostgreSQL, SparkSQL, Solr SQL, Phoenix &hellip;) or job submission: Spark, MapReduce, Pig&hellip;</li>
+<li>Dashboards to dynamically interact and visualize data with Solr or SQL</li>
+<li>Scheduler of jobs and workflows</li>
+<li>Browsers for Jobs, Metadata (Tables, Indexes, Sentry permissions) and files (HDFS, S3, ADLS)</li>
+</ul>
+
+<p>Read the complete list of improvements on <a href="http://gethue.com/hue-4-2-and-its-self-service-bi-improvements-are-out/">Hue 4.2 and its Self Service BI improvements are out!</a>.</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>The focus of this release was to keep making progress on the self service BI theme and prepare the ground for next release that will include an upgraded backend and a revamped Dashboard and more improvements to the Data Catalog and Query Assistance.
+The release comes with a <a href="http://gethue.com/self-service-bi-doing-a-customer-360-by-querying-and-joining-salesforce-marketing-and-log-datasets/">Customer 360 demo</a> showcasing the Editor to query credit card transaction data that is saved in an object store in the cloud (here S3) and in a Kudu table. The demos leverages the Data Catalog search and tagging as well as the Query Assistant.</p>
+
+<p>Quality release</p>
+
+<ul>
+<li>No major core changes</li>
+<li>200+ jiras / 100+ bugs</li>
+</ul>
+
+<p>3 main areas of focus:</p>
+
+<p>Cloud</p>
+
+<ul>
+<li>ADLS Browser</li>
+<li>Analytic DB</li>
+</ul>
+
+<p>Top Search UX</p>
+
+<ul>
+<li>SQL Syntax checker</li>
+<li>Impala Query Browser</li>
+</ul>
+
+<p>Supportability</p>
+
+<ul>
+<li>SAML update</li>
+<li>Documentation revamp</li>
+<li>Metric page</li>
+</ul>
+
+<h2 id="notable-changes">Notable Changes</h2>
+
+<p>Cloud</p>
+
+<ul>
+<li>ADLS Browser (similar to HFS &amp; S3 Browser)</li>
+<li>Exploring ADLS in file browser</li>
+<li>Create Hive Tables Directly From ADLS</li>
+<li>Save Query Results to ADLS</li>
+</ul>
+
+<p>Data Catalog Search</p>
+
+<ul>
+<li>Available in the top bar</li>
+<li>Since 5.11 but getting simpler</li>
+<li>Search Tables, Columns and Saved queries</li>
+<li>Example of searches:
+** table:customer → Find the customer table
+** table:tax* tags:finance → List all the tables starting with tax and tagged with ‘finance’</li>
+</ul>
+
+<p>Syntax Checker</p>
+
+<ul>
+<li>Warn before executing</li>
+<li>Can suggest simple fix</li>
+</ul>
+
+<p>Impala Query Browser</p>
+
+<ul>
+<li>Goal: built-in Troubleshooting for:
+** Queries
+** Profiles
+** Plans
+** Memory</li>
+</ul>
+
+<p>Apache Solr dynamic Dashboards</p>
+
+<ul>
+<li>Dashboard autocomplete</li>
+<li>&lsquo;More Like This&rsquo; functionality</li>
+<li>Collection page</li>
+</ul>
+
+<p>Supportability</p>
+
+<ul>
+<li>SAML update (with idle session fix)</li>
+<li>Documentation revamp</li>
+<li>Thread page</li>
+</ul>
+
+<p>Bug fixes</p>
+
+<ul>
+<li>UX improvements (document listing, opening back query history scroll, CTRL+Z&hellip;)</li>
+<li>Performances (concurrency, file downloads, query timeouts)</li>
+<li>Support multi-authentication with LDAP</li>
+<li>YARN &ldquo;Diagnostics&rdquo; info in Job Browser</li>
+<li>Option to disable concurrent user sessions &ldquo;concurrent_user_session_limit&rdquo;</li>
+<li>Rebalance user on log out</li>
+<li>Editor grid result not correctly aligned when browser zoom is not 100%</li>
+</ul>
+
+<h2 id="compatibility">Compatibility</h2>
+
+<p>Runs on CentOS versions 5 to 6, Red Hat Enterprise Linux (RHEL 5, 6, 7), and Ubuntu 12.04, 14.04 and 16.04.</p>
+
+<p>Tested with CDH5. Specifically:</p>
+
+<ul>
+<li>Hadoop 2.6.0</li>
+<li>Hive 1.1</li>
+<li>Oozie 4.1</li>
+<li>HBase 1.2</li>
+<li>Pig 0.12</li>
+<li>Impala 2.5</li>
+<li>Solr 4.10</li>
+<li>Sqoop2 1.99.5</li>
+<li>Spark 1.6</li>
+</ul>
+
+<p>These minimum versions should work (not tested):</p>
+
+<ul>
+<li>Hadoop 0.20 / 1.2.0 / 2.0.0</li>
+<li>Hive 0.12.0</li>
+<li>Oozie 3.2</li>
+<li>HBase 0.92</li>
+<li>Pig 0.8</li>
+<li>Impala 1.0</li>
+<li>Solr 3.6</li>
+<li>Sqoop2 1.99.3</li>
+<li>Spark 1.4</li>
+</ul>
+
+<p>Supported Browsers:</p>
+
+<p>Hue works with the two most recent versions of the following browsers. Make sure cookies and JavaScript are turned on for the browser.</p>
+
+<ul>
+<li>Chrome</li>
+<li>Firefox LTS</li>
+<li>Safari (not supported on Windows)</li>
+<li>Internet Explorer / Edge</li>
+</ul>
+
+<p>Hue might work with Chrome 23, Firefox 23, IE10, Safari 6, or older browser version, but you might not be able to use all of the features.</p>
+
+<p>Runs with Python 2.6.5+</p>
+
+<p>Note: CentOS 5 and RHEL 5 requires EPEL python 2.6 package.</p>
+
+<h2 id="list-of-1200-commits">List of 1200+ Commits</h2>
+
+<ul>
+<li>3cdcbf6 HUE-8169 [doc] Simplify the readme to link to the documentation</li>
+<li>136e053 HUE-8150 [core] Add static list of facets to the catalog page</li>
+<li>22e3ef6 HUE-8150 [core] Catalog search page skeleton</li>
+<li>5800ddc HUE-8161 [metadata] Automatically create a namespace to enrich the catalog</li>
+<li>a65d88c HUE-8161 [metadata] API to map a namespace entity to a class</li>
+<li>bf730c2 HUE-8161 [metadata] API to create a namespace</li>
+<li>6f20796 HUE-8161 [metadata] Support creating a namespace property</li>
+<li>6def9d1 HUE-8161 [metadata] Support retrieving a namespace</li>
+<li>b648631 HUE-8161 [doc] Avoid breaking toc with title tags in ini example</li>
+<li>b9c6c6c HUE-8111 [core] Perform 4.2 release</li>
+<li>af1b31e HUE-8161 [metastore] Add Partitioned information to table type</li>
+<li>4d2c4e0 HUE-8169 [docs] Add extended requirements and cx_Oracle compiling section to the admin manual</li>
+<li>c4ea4b4 HUE-8163 [frontend] Move dashboard-specific selectize css out of the common css</li>
+<li>f9af8ec HUE-8159 [oozie] Unable to create Workflow/Schedule using Java document Action</li>
+<li>110eeab HUE-8155 [metastore] Improve general alignment and spacing in the Table Browser page</li>
+<li>6e6146d HUE-8155 [metastore] Move the edit description icon inline</li>
+<li>dd1a1c1 HUE-8155 [metastore] Only show description expand link on hover</li>
+<li>3a525a6 HUE-8167 [dashboard] Dragging/Dropping on an empty widget should remove the dropzone</li>
+<li>0d8bd22 HUE-8163 [frontend] Avoid a few pixels push down when opening any selectize</li>
+<li>75f2485 HUE-8166 [frontend] Check in package-lock.json</li>
+<li>40e7a25 HUE-8164 [editor] The record viewer should wrap its content</li>
+<li>525f09e HUE-8146 [dashboard] Avoid wrong widget clones on right assist drag&rsquo;n&rsquo;drop</li>
+<li>ba157b9 HUE-8154 [dashboard] Dropping on the center of a widget should behave as southern edge drop</li>
+<li>e205752 HUE-8153 [docs] TOC Search input should have a fixed position</li>
+<li>a86118a HUE-8073 [editor] Add default value for variable calendar widget</li>
+<li>3a2e20f HUE-8158 [metastore] Hide internal metadata properties</li>
+<li>7590c0b HUE-8118 [core] Fine grain tracking of the memory usage</li>
+<li>e410494 HUE-8153 [docs] Show expanded TOC tree by default and highlight search keyword</li>
+<li>4ac4f83 Fixing C6 build issue, pypi.python.org wants to enforce TLS 1.2 based requests. Hue uses pypi.python.org for python modules installation. This change contains two fixes.</li>
+<li>e06da4a HUE-8155 [metastore] Js typo in listing table popularity</li>
+<li>bc2655a HUE-8157 [search] Strip default. prefix of collection names when browsing them</li>
+<li>75062dc HUE-8156 [search] Properly fill up data sample popup section with Solr</li>
+<li>023af21 HUE-8095 [metadata] Fix entity boosting that was triggering too many matches</li>
+<li>7eb49ee HUE-7989 [useradmin] Provide better UI message and message in logs when ldap server down</li>
+<li>be24b38 HUE-8104 [editor] FIX variables for new sample popup.</li>
+<li>e23a67a HUE-8153 [docs] Introduce tree and search on TOC</li>
+<li>0e50cce HUE-8155 [metastore] Improve column and table lists in the table browser</li>
+<li>78a7a92 HUE-8155 [metastore] General improvement of contents and layout of the table browser</li>
+<li>f4258c9 HUE-8075 [docs] Restructured documentation for editor export</li>
+<li>76cf572 HUE-8123 [dashboard] Consolidate the resizing of widgets when dragging over the southern border</li>
+<li>534fdb9 HUE-8123 [dashboard] Avoid horizontal double dropzones between widgets</li>
+<li>152be3a HUE-8124 [dashboard] Horizontal dropzones should always be for the full row and not for the widget size</li>
+<li>fff06e5 HUE-8148 [dashboard] Fix dropping on the southern part of a widget</li>
+<li>d87627b HUE-8147 [metastore] Switch to knockout for handling the table browser tabs</li>
+<li>0502076 HUE-8145 [metastore] Make sure partitions and samples are refreshed after pressing refresh in the table browser</li>
+<li>9d07438 HUE-8144 [assist] Show the context popover footer open actions after navigating to tables and databases in the context popover</li>
+<li>8cc0280 HUE-8143 [assist] Limit the column description length in the table context popover</li>
+<li>5d06d0b HUE-8124 [dashboard] Improve weight of hover coordinates</li>
+<li>c5c7dc9 HUE-8124 [dashboard] Remove dropzones from the areas that don&rsquo;t have widgets</li>
+<li>b44d459 HUE-8023 [oozie] Weird styling on Oozie info page</li>
+<li>fdf3cdb HUE-8022 [jb] Oozie workflow text filter is too small or should be hidden in mini browser</li>
+<li>b8a7a35 HUE-8142 [assist] Limit the tags to two rows in the context popover</li>
+<li>da8ee1e HUE-8141 [dashboard] Hide the min count / HAVING option</li>
+<li>febed80 HUE-8138 [dashboard] List available fields depending on selected metrics for dimensions</li>
+<li>3fd09eb HUE-8138 [dashboard] Fix dependencies after a dashboard reload</li>
+<li>31000e1 HUE-8138 [dashboard] Add trackArrayChanges extension to the computed to make &lsquo;arrayChange&rsquo; subscriptions work</li>
+<li>bbfe2e3 HUE-8138 [dashboard] Add metrics with compatible fields</li>
+<li>7ae1de0 HUE-5969 [charts] Aggregation of line and bar chart</li>
+<li>c5b3af0 HUE-8137 [core] Refresh translations files for 4.2</li>
+<li>54c8eae HUE-8136 [assist] Limit the description to two lines in the context popover</li>
+<li>57be515 HUE-8135 [assist] Fix comment loading of multiple tables when a table has a custom name in Navigator</li>
+<li>447e9d6 HUE-8131 [assist] Use plain text for column sample titles in the context popover</li>
+<li>4bcf3a7 HUE-8130 [assist] Don&rsquo;t wait for navigator to load before showing the table in the context popover</li>
+<li>c68ff90 HUE-8129 [frontend] Reuse existing table samples for columns in the DataCatalog</li>
+<li>90324e1 HUE-8134 [editor] Fix scroll of left side snippet buttons on chart view</li>
+<li>bbeb345 HUE-8132 [dashboard] Fix the page rendering on IE11 and Edge</li>
+<li>8e0a86f HUE-8133 [dashboard] Maximize the grid space when loading a saved dashboard too</li>
+<li>4a5f8b3 HUE-8125 [dashboard] Prevent JS error on hit widget delete</li>
+<li>94cc5bc HUE-8114 [dashboard] Add helper arrows/pointers on an empty dashboard</li>
+<li>7f5a2f2 HUE-8122 [dashboard] Resize siblings of the original position after a widget move</li>
+<li>226903b HUE-8126 [dashboard] Improve dimensions dragging</li>
+<li>9dbc495 HUE-8127 [assist] Fix issue where the context popover throws js error for complex entries</li>
+<li>dd4d212 HUE-8119 [frontend] Drop the border between search result entries in the top search</li>
+<li>6343526 HUE-8121 [dashboard] Delete widget should be always available</li>
+<li>d9e49e8 HUE-8120 [dashboard] Ensure correct serialization of widgets on save and reload</li>
+<li>9b8c7be HUE-8117 [editor] Horizontal scroll of the record popup is not reseted to zero on reopen</li>
+<li>2992823 HUE-8113 [editor] Hide the dots menu on presentation mode</li>
+<li>c123ee0 HUE-8104 [editor] FIX variable selection in presentation mode</li>
+<li>7a06d02 HUE-8089 [editor] Update last part of the test</li>
+<li>b9da528 HUE-8116 [frontend] Remove sorting of top search results from the UI to not interfere with backend sorting</li>
+<li>2a90bde HUE-8115 [assist] Indicate which columns are partition keys in the context popover</li>
+<li>a76368d HUE-7980 [editor] The toolbar icon dropdowns should be aligned to the right to avoid horizontal scroll</li>
+<li>753a233 HUE-8112 [legal] Order alphabetically the 3rd party UI libraries on Readme</li>
+<li>5347930 HUE-8086 [core] Remove UI related logic and unused code from the ApiHelper</li>
+<li>920816e HUE-8108 [assist] Make sure the spinner is shown in the context popover for huge tables</li>
+<li>1b0cdb1 HUE-8107 [editor] Fix user variable type resolution in the editor</li>
+<li>3558dee HUE-8097 [assist] Use the old context popover for Solr fields</li>
+<li>ac7d980 HUE-8098 [assist] Make sure empty rows have a fixed height in the context popover column samples table</li>
+<li>2b9e873 HUE-8094 [assist] Display popularity in the SQL context popover</li>
+<li>6fb2d1f HUE-8095 [metadata] Update test to take field boosting into account</li>
+<li>f9cfc8a HUE-8089 [core] Update Excel hyperlinking to be compatible with Python 2.6</li>
+<li>e05c470 HUE-8110 [core] Update integration test tarball to the latest version</li>
+<li>0dc1d4f HUE-8105 [dashboard] Simplify the legend of the number of records in grid widget</li>
+<li>8a1a8d4 HUE-8095 [metadata] Boost entities with non null important fields</li>
+<li>098a743 HUE-8095 [metadata] Boost matching name, description and tags of entities</li>
+<li>863c514 HUE-8086 [core] Unify sample data fetching with dashboards</li>
+<li>b99f14e HUE-8106 [editor] Convert fixed headers and column to a more performant CSS solution</li>
+<li>3f8b0ee HUE-8109 [dashboard] Fix loading back a saved dashboard</li>
+<li>0b6ff4a HUE-8104 [editor] Fix variables for new sample popup</li>
+<li>50519ba HUE-8103 [dashboard] Dragging a top widget to the top widget bar shouldn&rsquo;t create a Gridster widget</li>
+<li>0a88c77 HUE-8102 [dashboard] Empty widgets should have a dropzone on top too</li>
+<li>53814ba HUE-8101 [dashboard] Adding a widget should trigger a resize on the window to recalculate the virtual Gridster grid</li>
+<li>9764894 HUE-8100 [editor] Avoid stacked bar chart JS error on some resultsets</li>
+<li>dc7f14d HUE-8074 [charts] Better handling of more than a few legend items</li>
+<li>35d45cd HUE-8080 [jb] Log more information when a job has expired</li>
+<li>5b59c88 HUE-8096 [dashboard] Widget drag helpers should follow the page scroll</li>
+<li>235f982 HUE-8088 [metadata] Prevent losing entity description when editing tags</li>
+<li>8ace1ea HUE-8089 [core] Automatically add HYPERLINK to links in Excel downloads</li>
+<li>326bd30 HUE-8093 [dashboard] Prevent moving of widgets on dimensions drag</li>
+<li>5e34a69 HUE-8092 [frontend] Restyle selectize globally to avoid weird control heights in various apps</li>
+<li>547cfc9 HUE-8092 [frontend] Move selectize specific CSS from global to editor</li>
+<li>84e1559 HUE-8091 [frontend] Increase the data catalog version to support changes for cached samples</li>
+<li>f568120 HUE-8090 [assist] Move the context popover attributes for a column to the title</li>
+<li>1778fa0 HUE-8075 [editor] Avoid a rendering error on the page if download_size_limit is not defined</li>
+<li>62720b5 HUE-8062 [editor] FIX variables select alignment</li>
+<li>1d8f809 HUE-8075 [editor] Offer a download_size_limit option for result download</li>
+<li>f802a72 HUE-8084 [dashboard] Enable the new drag system for the empty widgets too</li>
+<li>0e0df28 HUE-8085 [dashboard] Support SQL ORDER BY for the grid widget</li>
+<li>d508358 HUE-7917 [frontend] New improved context popover for SQL entities</li>
+<li>6f8e566 HUE-8083 [dashboard] Make cases of column types insensitive</li>
+<li>2f85d4f HUE-8058 [dashboard] Prevent adding extra space when placing a Gridster widget</li>
+<li>8294bf5 HUE-8078 [search] Add clearable to new dashboard selectized list of collections</li>
+<li>7ba9511 HUE-8072 [assist] Generic empty message when there is no entries</li>
+<li>94193c7 HUE-8078 [search] List proper aggregate function for the counter widget</li>
+<li>b08ce3c HUE-8078 [search] Prevent selecting a non dimension on the first widget</li>
+<li>3dcac04 HUE-8077 [search] Avoid error with timeline widget and manual search returns no result</li>
+<li>6d0acc1 HUE-8071 [dashboard] Rename widget bar to promote analytics functions</li>
+<li>6fa46b7 HUE-8081 [frontend] Add clear button plugin to the Selectize binding</li>
+<li>4e4850c HUE-8079 [core] Enable sync groups on login by default</li>
+<li>8778ba6 HUE-8069 [core] Fix code format and exception logging</li>
+<li>e815c36 HUE-7946 [jb] Link to subworkflow on workflow dashboard page 404s in Hue 4 (Fix regression in Hue 3)</li>
+<li>85cfbbc HUE-8069 [core] Pyformance reporter thread stops on exceptions in guage callbacks</li>
+<li>4231267 HUE-8070 [dashboard] Properly try to display timeline data as timeline</li>
+<li>7ee80bb HUE-8067 [dashboard] Avoid double execute call on SQL dashboard opening</li>
+<li>33136fe HUE-8053 Fix unit test</li>
+<li>10b4704 HUE-7945 [jb] Fix oozie launcher stderr log during state running</li>
+<li>e5d0c77 HUE-8066 [editor] Open query result in dashboard opens in importer</li>
+<li>dd6b3cd HUE-8021 [indexer] Support splitting a field with SOLR REST indexing</li>
+<li>7032f5f HUE-8062 [editor] Variables polish: long values, squeeze, ordering</li>
+<li>222e7f9 HUE-8063 [fb] Better error message when HTTPFS is not working</li>
+<li>68b323c HUE-8053 [useradmin] LDAP authentication with sync_groups_on_login=true fails with KeyError exception</li>
+<li>95e4234 HUE-8055 [desktop] Support multiple LDAP servers in LDAP Test command</li>
+<li>c11071d HUE-8061 [home] Moving document out of a folder does not refresh the list</li>
+<li>de6e53f HUE-8054 [dashboard] Allow to specify time in fixed time settings</li>
+<li>60fdbe2 HUE-8056 [home] Move to trash refreshes the documents only on second time</li>
+<li>201d811 HUE-8060 [dashboard] Show &lsquo;drag to move&rsquo; title on the widget headers</li>
+<li>25c9fbb HUE-8057 [assist] Make sure table popularity cache is cleared for parents</li>
+<li>04606a1 HUE-8014 [core] Add test for /account/login</li>
+<li>96e02fe HUE-8043 [editor] Cancel a query using ctrl-enter shortcut</li>
+<li>806add3 HUE-8051 [dashboard] Recalculate Gridster size on left and right assist resize</li>
+<li>432cef4 HUE-8049 [dashboard] Gridster shouldn&rsquo;t throw an error if trying to drop more that 4 widgets on a row</li>
+<li>bcbb954 HUE-8042 [editor] Avoid 500 error when the previous query handle was missing</li>
+<li>d2ad5a0 HUE-8042 [editor] Better prevention of double query submissions</li>
+<li>6cd47e1 HUE-8048 [dashboard] Fix the initial grid calculation when opening a dashboard without reloading the browser</li>
+<li>d424f3a HUE-8046 [frontend] Improve the global search result list layout</li>
+<li>ce8785e HUE-8045 [editor] Prevent js exception from stale locations</li>
+<li>73ddafd HUE-7949 [dashboard] Disable Gridster drag and resize when in Query Builder mode</li>
+<li>aade631 HUE-7949 [dashboard] Avoid triggering unnecessary window.resize events</li>
+<li>9b34dc0 HUE-7949 [dashboard] Always show dimensions when in Query Builder mode</li>
+<li>ed85bd4 HUE-7949 [dashboard] Disable dropping outside an empty widget when in Query Builder mode</li>
+<li>bfb63c6 HUE-7318 [core] Hue doesn&rsquo;t let owners share document/directory if somebody else has a file there</li>
+<li>6f945a8 HUE-8014 [core] FIX login cmf/systest</li>
+<li>a652bdc HUE-8029 [editor] Variable sampling can conflict with entered value</li>
+<li>29fbdfe HUE-7985 [editor] Fix various syntax checker false positives</li>
+<li>2d65298 HUE-8038 [assist] Fix js error in the context popover when showing the popover is slow</li>
+<li>ba0cdda HUE-8041 [editor] Editing a long saved query after a reload shouldn&rsquo;t expand the editor automatically</li>
+<li>03ad5d9 HUE-8040 [editor] Avoid jumping on the initial loading of the query history</li>
+<li>e06921f HUE-7949 [dashboard] Disable widget removal when in Query Builder mode</li>
+<li>77db9f1 HUE-7949 [dashboard] Remove plus button when in Query Builder mode</li>
+<li>3c040f6 HUE-8037 [editor] Do not try to load past query history of a saved query</li>
+<li>6b91a41 HUE-8037 [editor] Restore cursor position for query history only</li>
+<li>4dc3485 HUE-7949 [dashboard] Only show dimension swapping icon when there is more than one</li>
+<li>f9055b6 HUE-8035 [core] Fix the broken tests related to check config</li>
+<li>7100892 HUE-7949 [dashboard] Safety net avoiding loading back overlapped widgets</li>
+<li>ccfe80d HUE-7949 [dashboard] Update Gridster model after deleting a widget</li>
+<li>f910748 HUE-7949 [dashboard] Swap edit and move dimension</li>
+<li>a1ed144 HUE-8036 [presentation] Protect from storm of API calls when loading back a query with presentation</li>
+<li>fc01dcc HUE-8036 [hive] Properly log invalid query handle to be less confusing</li>
+<li>a71593e HUE-8032 [core] XSS in Hue Admin Interface</li>
+<li>1b5ba3c HUE-7949 [dashboard] Fix UX of drag and drop of dimensions</li>
+<li>cb0c2ad HUE-7949 [dashboard] Avoid cleaning up occupied rows and remove autosizing when the widget is too big</li>
+<li>0f2b60b HUE-7949 [dashboard] Reduce number of total available columns to speed up renderings</li>
+<li>f1fef91 HUE-7949 [dashboard] Increase default size of Text facet values when using gridster</li>
+<li>5de8b8f HUE-8031 [core] Add connection ID to Thrift pool get logging</li>
+<li>c52ecd7 HUE-7949 [dashboard] Automatically resize also the widgets that have a lot of whitespace</li>
+<li>6a3200b HUE-7949 [dashboard] Use the whole width of the page for the widgets after loading an existing dashboard</li>
+<li>aa08938 HUE-7949 [dashboard] Avoid scrollbars on text facets</li>
+<li>a45988e HUE-7949 [dashboard] Fix scroll and drag issues and visually hint while dragging where the widget is going to be moved</li>
+<li>da7c851 HUE-8031 [core] Also log slow REST calls</li>
+<li>a0ba2a1 HUE-8017 [core] Check config error on hue.ini validation check</li>
+<li>d906b38 HUE-8030 [core] Correct warning Thrift call delays to be in proper time unit</li>
+<li>8868fb9 HUE-8030 [core] Log page hits on their return call so that they can be timed</li>
+<li>ffd7013 HUE-8030 [core] Only enable scheduler status polling when the integrated scheduler in on</li>
+<li>3477cbea HUE-8030 [core] Properly log the analytics and error calls</li>
+<li>b767bd1 HUE-7949 [dashboard] Improved text widget filter display</li>
+<li>08b1c4b HUE-8026 [indexer] Properly sort the list of indexes</li>
+<li>dde4c7f HUE-8025 [metadata] Do not show the deleted databasess/tables in the search</li>
+<li>670a55f HUE-8001 [autocomplete] Improve ranking and select list suggestions</li>
+<li>2fa3ad4 HUE-8028 [metastore] Make invalidate calls more specific when we know the specific database or table</li>
+<li>7b4dd93 HUE-8027 [metastore] Fix for broken table page in the table browser</li>
+<li>78bfffa HUE-7987 [autocomplete] Update the autocompleter and UDF library for Hive</li>
+<li>7b3bc40 HUE-7253 [editor] FIX file download content-disposition test</li>
+<li>ed09de0 HUE-7941 [impala] Reset the status of the query link for new queries</li>
+<li>2111965 HUE-8014 [core] Login with wrong password reloads page without message</li>
+<li>cacd698 HUE-8018 [assist] Refresh the right assistant when a catalog entry is refreshed</li>
+<li>09d3f40 HUE-8019 [assist] Make sure cached only catalog requests don&rsquo;t affect the non cached requests</li>
+<li>1cd10d5 HUE-8016 [notebook] Avoid to have function address in error log</li>
+<li>5f4efa6 HUE-8015 [indexer] Set SQL NULL as Solr empty values so that rows with NULL cells are still indexed</li>
+<li>b07c20e HUE-8006 [home] Document sharing inconsistencies</li>
+<li>541e5ea HUE-7758 [dashboard] Multi select and single select text facet</li>
+<li>3e295ca HUE-7873 [core] Update the AutoComplete for Document share in /home page</li>
+<li>36366c0 HUE-7253 [editor] Exporting results throws error if query name has comma</li>
+<li>010eb96 HUE-7942 [editor] FIX variables with incorrect placeholder.</li>
+<li>4b95d08 HUE-7848 [dashboard] Add widget&rsquo;s field list could present more metadata</li>
+<li>493b7dd HUE-7990 [autocomplete] Don&rsquo;t show the comment in the autocomplete suggestion details header</li>
+<li>2d43613 HUE-7982 [autocomplete] Give arrow key usage priority over mouse hover in the autocomplete suggestions list</li>
+<li>5c43d83 HUE-8011 [editor] Fix the asterisk column expansion popover</li>
+<li>08ac4b8 HUE-8010 [metastore] Load comments from the parent entry instead of for each table or column</li>
+<li>a31c47f HUE-8007 [frontend] Show a dropdown for facet values in the inline autocomplete</li>
+<li>953d14f HUE-7986 [autocomplete] Update the autocompleter and UDF library for Impala</li>
+<li>0b5ecb9 HUE-8009 [useradmin] Fix login page error for invalid local user when LDAP also enabled</li>
+<li>7caaea6 HUE-8005 [core] Remove id search that was not used and could conflict with the home page folder</li>
+<li>92ad84c HUE-7996 [editor] Fix height calculation of the history panel on reloading a saved query</li>
+<li>40fa5f7 HUE-8002 [home] The new document icons should use the new SVG versions of them</li>
+<li>f0cc6fa HUE-7949 [dashboard] Set widgets previous sizes on right assist drag too</li>
+<li>e962bb6 HUE-7949 [dashboard] Avoid autoresizing widgets when dragging a new one or operating on the existing widgets sizes</li>
+<li>e13c571 HUE-7949 [dashboard] Remove the fake drop zone when dragging a Gridster widget</li>
+<li>22d97e3 HUE-7996 [editor] Give a minimal height to the query history panel to cover the empty list content</li>
+<li>0dd4175 HUE-8000 [dashboard] Do not use the layout with a right column when gridster is on</li>
+<li>c069c0f HUE-7999 [core] &lsquo;Collections&rsquo; is still used in left assist and right assist instead of &lsquo;Indexes&rsquo;</li>
+<li>6eff97a HUE-7998 [editor] Add bit of styling to the click section of the inline help</li>
+<li>5d0af64 HUE-7997 [backend] Python LDAP library exposes password</li>
+<li>adcd6cf HUE-7978 [dashboard] Saving dashboard via <enter> redirects</li>
+<li>b37f4db HUE-7984 [frontend] Improve the global search</li>
+<li>4443a45 HUE-8004 [home] The document copy icon should have the same width of the other icons</li>
+<li>84ff8ea HUE-7996 [editor] The history height calculation is wrong for multi line queries</li>
+<li>9e63be0 HUE-7947 [dashboard] Ctrl-S does not work without changing collection</li>
+<li>47a72a3 HUE-7981 [frontend] Move all the NavOpt popularity data for tables to the data catalog</li>
+<li>7662377 HUE-7994 [frontend] Mitigate the propagation of the new common dashboard css to the other apps that use it</li>
+<li>78a55f8 HUE-7949 [dashboard] Avoid breaking the dashboard if the collection name is missing</li>
+<li>a8b55d6 HUE-7949 [dashboard] Better align the save as dropdown</li>
+<li>d9ebce9 HUE-7949 [dashboard] Add no flex to the search bar operations to avoid horizontal scroll</li>
+<li>4ec58d3 HUE-7945 [jb] FIX view logs of oozie workflow</li>
+<li>c245a4d HUE-7932 [oozie] Clicking on workflow with several decision nodes hangs Hue (Bugfix, fix Actions tab, rerun, incorrect &lsquo;Drop your actions here&rsquo; message)</li>
+<li>52312cd HUE-7955 [importer] Correctly convert SQL result column types to Solr types</li>
+<li>d67c6e2 HUE-7949 [dashboard] Turn on the new simplified layout</li>
+<li>2c983dc HUE-7955 [importer] Hide query list in regular importer node</li>
+<li>ced6158 HUE-7992 [oozie] Big workflows show horizontally scroll in Hue 4</li>
+<li>aaef3f6 HUE-7983 [assist] Use the data catalog for the context popover</li>
+<li>5dfaae9 HUE-7943 [editor] Variable list are not being refreshed</li>
+<li>d823dc2 HUE-6983 [jb] View Logs of a killed workflow gives 500 error</li>
+<li>442e309 HUE-7947 [search] Use selectize for the list of collections</li>
+<li>5590445 HUE-7913 [editor] Provide sample data for variables</li>
+<li>3edf8e2 HUE-7949 [dashboard] Sync the position to the model on widget add and remove</li>
+<li>0e00040 HUE-7949 [dashboard] Add correct app identifier for the widget size interval</li>
+<li>b8d3dc4 HUE-7888 [frontend] Override default BS2 navbar hover style and padding to align better the app headers</li>
+<li>8061678 HUE-7979 [doc] Integrate Metric blog post to upstream documentation</li>
+<li>e454073 HUE-7975 [core] Open newly copied document (type: dashboard) throws error: HTTP ERROR 404</li>
+<li>9118ce3 Revert &ldquo;HUE-7680 [frontend] Get rid of the Nicescroll plugin&rdquo;</li>
+<li>2b7a19f Revert &ldquo;HUE-7680 [frontend] Tone down the scrollbars for webkit browsers&rdquo;</li>
+<li>5c78dc5 Revert &ldquo;HUE-7680 [editor] Fix scroll in autocomplete dropdown&rdquo;</li>
+<li>bee50d7 Revert &ldquo;HUE-7680 [frontend] Improve CSS on not-so-top-of-the-line screens&rdquo;</li>
+<li>97f9bc5 Revert &ldquo;HUE-7680 [frontend] Fix overflow for the sample tables in the popovers&rdquo;</li>
+<li>6567d59 Revert &ldquo;HUE-7680 [frontend] Get rid of the mCustomScrollbar plugin&rdquo;</li>
+<li>39acf41 Revert &ldquo;HUE-7680 [frontend] Make horizontal scrollbars thin as well&rdquo;</li>
+<li>76be608 Revert &ldquo;HUE-7680 [frontend] The custom Hue horizontal scrollbar should look and behave like the other scrollbars&rdquo;</li>
+<li>b3e8763 Revert &ldquo;HUE-7977 [editor] Use delayedOverflow for the results columns&rdquo;</li>
+<li>e4b9d1b Revert &ldquo;HUE-7888 [frontend] Override default BS2 navbar hover style and padding to align better the app headers&rdquo;</li>
+<li>44f0cbe HUE-7974 [metastore] Open Database location opens in Hue 3</li>
+<li>fc4a779 HUE-7888 [frontend] Override default BS2 navbar hover style and padding to align better the app headers</li>
+<li>e5f9869 HUE-7977 [editor] Use delayedOverflow for the results columns</li>
+<li>166d8fb HUE-7680 [frontend] The custom Hue horizontal scrollbar should look and behave like the other scrollbars</li>
+<li>1139ecd HUE-7680 [frontend] Make horizontal scrollbars thin as well</li>
+<li>a5cf75a HUE-7680 [frontend] Get rid of the mCustomScrollbar plugin</li>
+<li>ae18ac5 HUE-7680 [frontend] Fix overflow for the sample tables in the popovers</li>
+<li>0bf366f HUE-7680 [frontend] Improve CSS on not-so-top-of-the-line screens</li>
+<li>638a412 HUE-7680 [editor] Fix scroll in autocomplete dropdown</li>
+<li>7b56ad4 HUE-7680 [frontend] Tone down the scrollbars for webkit browsers</li>
+<li>b1fcb13 HUE-7680 [frontend] Get rid of the Nicescroll plugin</li>
+<li>a0d9678 HUE-7949 [dashboard] Avoid collision of the remove icon with the resize handle</li>
+<li>b8eab9d HUE-7965 [docs] Explain Hue configurable SASL buffer size</li>
+<li>f10f149 HUE-7675 [core] Warn on startup for any invalid configurations in hue.ini (Step#2)</li>
+<li>c3dcfb5 HUE-7675 [core] Warn on startup for any invalid configurations in hue.ini (Step#1)</li>
+<li>9a88856 HUE-7258 [jb] Fix fetching Spark job logs in Kerberized environment</li>
+<li>0219bfc HUE-7945 [jb] Add oozie launcher job browser type</li>
+<li>b7db4b2 HUE-7973 [core] Do not error on home page when oozie is disabled</li>
+<li>52729d1 HUE-7820 [metastore] Fix js error when two tables are equally popular in the table browser</li>
+<li>d8b5cec HUE-7972 [editor] Fix reporting of missing databases in the syntax checker</li>
+<li>266665b HUE-7971 [editor] Make sure a database is set for column locations</li>
+<li>2788d5e HUE-7969 [metastore] Only enable editing of database descriptions if navigator is enabled</li>
+<li>364d29f HUE-7949 [editor] Hide modal after click to export to a collection</li>
+<li>8e04493 HUE-7970 [assist] Open the last opened database in the assist for apps other than the editor</li>
+<li>16f85a3 HUE-7969 [metastore] Enable editing of database descriptions in the table browser</li>
+<li>d2a2539 HUE-7968 [metastore] Disable the description HTML editor in the table browser</li>
+<li>6fe1c9a HUE-7967 [metastore] Fix the context popover for tables and columns in the table browser</li>
+<li>7ba06a2 HUE-7966 [assist] Show the correct comment for tables and columns in the context popover</li>
+<li>f1c8ca7 HUE-7949 [search] Avoid js error on facet click on non gridster dashboards</li>
+<li>847b560 HUE-7949 [dashboard] Fix hidden x-overflow problems and autofit widgets over time</li>
+<li>c4a10db HUE-7964 [core] Do not crash on admin wizard page when oozie is blacklisted</li>
+<li>56f5c5b HUE-7962 [assist] Show the comment in the title for entities if set</li>
+<li>61b8c6b HUE-7949 [dashboard] Fix dropping of a widget on empty space</li>
+<li>2ef0599 HUE-7961 [metastore] Make sure we always show at least 5 columns in the initial column list</li>
+<li>bbee6f5 HUE-7959 [metadata] Don&rsquo;t keep unused tags in the cache</li>
+<li>368006f HUE-7958 [editor] Prevent cancelling assist API calls when the autocomplete results are closed</li>
+<li>01cc62c HUE-7960 [editor] Fix issue where the autocomplete spinner sticks after cancelled requests</li>
+<li>3f5e96a HUE-7957 [assist] Don&rsquo;t throw errors when a user doesn&rsquo;t have permissions for location updates</li>
+<li>5ababfb HUE-7956 [assist] Disable the browser cache when the TTL is set to 0</li>
+<li>8fa74cf HUE-7949 [dashboard] Furtherly stabilize resizing and re-ordering of the widgets</li>
+<li>5b21b34 HUE-7949 [dashboard] Removed auto resize for any widget</li>
+<li>89dd8c6 HUE-7949 [dashboard] Avoid shrinking empty widgets when hovering them</li>
+<li>59363ee HUE-7955 [importer] Backend clean-up of the creation of an index via a live query</li>
+<li>271f5c1 HUE-7955 [importer] Properly load the prefilling of other sources than manual or file</li>
+<li>982874a HUE-7944 [editor] Provide an aync table sample api</li>
+<li>7ea865e HUE-7940 [notebook] Backend linking to describe metadata of query documents</li>
+<li>d7a95b3 HUE-7955 [importer] Support indexing from a saved or history query</li>
+<li>75941a8 HUE-7955 [importer] Move auditing code to main submit API</li>
+<li>6ec5cc4 HUE-7955 [notebook] Add async to get sample data API</li>
+<li>0e0a746 HUE-7955 [importer] Support saved SQL query as source</li>
+<li>ca25e37 HUE-7932 [oozie] Clicking on workflow with several decision nodes hangs Hue</li>
+<li>1a50f51 HUE-7743 [frontend] Support initial URL search parameters in embedded mode</li>
+<li>d5e1399 HUE-7949 [dashboard] Correct Gridster seldom invalid calculation of widget heights after a resize</li>
+<li>4e30213 HUE-7949 [dashboard] Enable auto regenerating of Gridster stylesheets to avoid invalid X widget sizes</li>
+<li>26da50d HUE-7949 [dashboard] Remove widget border on hover</li>
+<li>ff88575 HUE-7894 [assist] Enable drop file into assist</li>
+<li>f74aaa4 HUE-7708 [indexer] Columns with parenthesis will fail to be importer into Solr</li>
+<li>90f0ec1 HUE-7954 [metastore] Don&rsquo;t invalidate when opening the table browser from the left nav</li>
+<li>554fae3 HUE-7952 [frontend] Only load comments from Nav for databases, tables and columns</li>
+<li>8f7dabd HUE-7952 [autocomplete] Add a delay of loading the comments for the autocomplete suggestions if not already known</li>
+<li>2d27ab2 HUE-7951 [editor] Properly handle complex fields in the assist and autocomplete suggestions</li>
+<li>f96b563 HUE-7950 [assist] Clear all tables cascaded when refreshing a DB in the assist panel</li>
+<li>872253b HUE-7948 [assist] Check the database metadata before loading tables in the right assistant</li>
+<li>119d9db HUE-7949 [dashboard] The main page droppable should accept just some specific draggables</li>
+<li>c418edf HUE-7949 [dashboard] Prevent a JS error on non-Gridster dashboards</li>
+<li>9a9638b HUE-7949 [dashboard] Avoid scrollbars on the widgets with charts</li>
+<li>2133514 HUE-7949 [dashboard] Show dimensions just on widget hover</li>
+<li>371b786 HUE-7949 [dashboard] Move Gridster draggable handle to the widget title</li>
+<li>fc76192 HUE-7946 [jb] Link to subworkflow on workflow dashboard page 404s in Hue 4</li>
+<li>41a517f HUE-7860 [core] Add SSL/TLS support for Gunicorn</li>
+<li>204dc48 HUE-7940 [dashboard] Initial support for queries in the right assistant panel</li>
+<li>fe0b8d8 HUE-7921 [editor] Allow opening of an editor after landing on a non-existing/non-viewable document</li>
+<li>49b398b HUE-7938 [dashboard] Improve dimensions editing UX</li>
+<li>3ed4716 HUE-7939 [metastore] Make sure the metastore is refreshed after creating tables or databases</li>
+<li>053ca72 HUE-7820 [assist] Only refresh the open SQL entity in the assist panel</li>
+<li>bc92b80 HUE-7933 [dashboard] Enable autocomplete of values after whitespace</li>
+<li>817bc22 HUE-7937 [dashboard] Show widget side menu just on hover</li>
+<li>9f994c0 HUE-7936 [dashboard] Editing a Gridster dashboard should have the delete icon too</li>
+<li>403495e HUE-7926 [dashboard] Improve drop preview to build a better user anticipation</li>
+<li>4408ec0 HUE-7931 [dashboard] Comment missing facet option as not finalized</li>
+<li>02cd20e HUE-7935 [metadata] Force put call to Navigator to send json mimetype</li>
+<li>38fe673 HUE-7928 [metastore] Config flag to force metadata calls to go to HiveServer2</li>
+<li>b1b0938 HUE-7934 [importer] Unselecting has Header checkbox has no effect</li>
+<li>1559c52 HUE-7931 [dashboard] Hide sorting icon of hit widgets</li>
+<li>4ad5940 HUE-7931 [dashboard] Feature flag for widget filter and compare</li>
+<li>419b75f HUE-7931 [dashboard] Counter widgets should have one editable dimension</li>
+<li>13a2d60 HUE-7931 [dashboard] Restrict resizing to horizontal only</li>
+<li>f09cd16 HUE-7931 [dashboard] Rename add widget HTML title</li>
+<li>d372737 HUE-7924 [dashboard] Fix JS errors on drag and remove on the old layout mode</li>
+<li>54f54ee HUE-7924 [dashboard] Make old and new layout modes co-exist</li>
+<li>de2cdff HUE-7929 [indexes] Field list table on the index page should have an horizontal scrollbar</li>
+<li>9d674ef HUE-7925 [frontend] Remove unnecessary imports on the login page</li>
+<li>411aaf6 HUE-7927 [metastore] Sample view on the main table page should have an horizontal scrollbar</li>
+<li>3a3b13a HUE-7920 [frontend] The stacked graph shouldn&rsquo;t have empty areas in the stacks</li>
+<li>a64b558 HUE-7853 [editor] Changed help dialog title + link to online doc</li>
+<li>36615ab HUE-7882 [dashboard] Make pretty metrics available to non-gridster dashboards too</li>
+<li>da5872c HUE-7882 [dashboard] Add pretty metrics to the other widgets too</li>
+<li>efdb33a HUE-7882 [dashboard] Prettify and simplify the edit/non-edit modes</li>
+<li>9689915 HUE-7892 [metrics] Show a message when there are no filtered results in the &lsquo;All&rsquo; section</li>
+<li>1d1118b HUE-7918 [presentation] Exiting resets the query type to the first editor language opened</li>
+<li>7e6a63f HUE-7918 [presentation] Menu in mode should still show up even if the query is not saved yet</li>
+<li>93abf9c HUE-7916 [frontend] Avoid breaking of scatterplot chart for some grouping values</li>
+<li>62cf649 HUE-7860 [core] Integrate non IO blocking Python Webserver   Add runserver command</li>
+<li>167bb90 HUE-7860 [core] Integrate non IO blocking Python Webserver   Add eventlet 0.21.0 and enum-compat 0.0.2</li>
+<li>76ad046 HUE-7860 [core] Integrate non IO blocking Python Webserver   Add greenlet 0.4.12</li>
+<li>8f18ecd HUE-7860 [core] Integrate non IO blocking Python Webserver   Add gunicorn 19.7.1</li>
+<li>b3de898 HUE-7909 [editor] Hide options in session settings</li>
+<li>0b0783a [core] Hiding most of the unused metrics on the Metrics page</li>
+<li>36dcfda HUE-7820 [assist] Fix js error in the context popover for databases and columns</li>
+<li>a1c726d HUE-7820 [metastore] Don&rsquo;t refresh the analysis on load and load DB metadata via the DataCatalog</li>
+<li>d784df1 HUE-7915 [assist] Increase the frontend cache TTL to 10 days</li>
+<li>1380500 HUE-7820 [metastore] Use the DataCatalog for the tag editor</li>
+<li>3000dc4 HUE-7907 [frontend] Improved dropped areas for side widgets and new rows</li>
+<li>9244fa2 HUE-7907 [frontend] Dropping on overflowing widgets should create a new widget too</li>
+<li>cdbe953 HUE-7907 [frontend] Create a fix for the .droppable binding missing event handling</li>
+<li>c597cd7 HUE-7911 [hbase] HBase browser create table js error</li>
+<li>80a6c7d HUE-7913 [autocomplete] Report quoted variable locations with possible column references</li>
+<li>fb32aef HUE-6722 [jb] Task progress shows as 1 and not 100%</li>
+<li>59d68ad HUE-7846 [dashboard] Remove duplicate keydown bindings</li>
+<li>ef85ecb HUE-7914 [editor] Remove duplicate ID from the save results and download form</li>
+<li>5c77f46 HUE-7913 [autocomplete] Pair variable locations with columns where possible</li>
+<li>d606ec6 HUE-7913 [frontend] Fix failing jasmine tests</li>
+<li>c8bcf48 HUE-7913 [autocomplete] Add variable locations to the autocomplete parser</li>
+<li>6a0d28c HUE-7459 [jb] YARN Metadata job page can freeze when huge</li>
+<li>41512b0 HUE-7142 [jb] Job log links to HDFS path opens on Hue 3</li>
+<li>04ca6db HUE-7876 [presentation] Persist isHidingCode setting</li>
+<li>dbdd4a8 HUE-7876 [presentation] Switch to presentation mode when opening a presentation query</li>
+<li>3925fa7 HUE-7876 [presentation] Editor should not convert to Notebook in presentation mode when saving</li>
+<li>bf8494d HUE-7876 [presentation] Group the default toggle action inside the presentation mode</li>
+<li>a74fe29 HUE-7876 [presentation] Allow to publish presentation mode turned on</li>
+<li>f8114cc HUE-7876 [editor] Move isPresentation subscription to the Notebook</li>
+<li>07cd46f HUE-7876 [presentation] Persist when the document is in Presentation mode</li>
+<li>3f02a89 HUE-7876 [presentation] Only hide right assist when toggling on</li>
+<li>d2c36cf HUE-7876 [editor] Refactor editor menu action into a template</li>
+<li>2579ac5 HUE-7912 [jb] Hide some properties in mini browser mode of Query Browser to make some space</li>
+<li>c0e4c4c HUE-7910 [editor] Improve readability of the new inline help</li>
+<li>63c94b8 HUE-7820 [assist] Don&rsquo;t fetch navigator data for children that already have it</li>
+<li>9737aec HUE-7820 [assist] Fix issue where some columns won&rsquo;t expand in assist</li>
+<li>2c5825c HUE-7820 [frontend] Silence errors from Navigator and NavOpt by default</li>
+<li>64b8c72 HUE-7820 [metastore] Load metadata in parallel in the table browser and use the DataCatalog for navopt details</li>
+<li>f9d2a42 HUE-7820 [frontend] Add NavOpt table details metadata to the DataCatalog</li>
+<li>4243331 HUE-7820 [metastore] Use analysis from the DataCatalog in the table browser</li>
+<li>b702995 HUE-7820 [frontend] Add analysis to the DataCatalog</li>
+<li>45c11ad HUE-7820 [metastore] Only refresh the open entity in the table browser instead of refreshing everything</li>
+<li>f7d408f HUE-7820 [frontend] Add pubsub to refresh a particular catalog entry</li>
+<li>7f98468 HUE-7820 [frontend] Add versioning to the DataCatalog and debug helper</li>
+<li>05492f2 HUE-7822 [core] Unable to clone oozie workflow in Hue 4.0</li>
+<li>d77ed0f HUE-7906 [dashboard] Fix new dashboard creation</li>
+<li>4315b02 HUE-7908 [frontend] Fix spinner overlay z-index</li>
+<li>1a16bf6 HUE-7877 [dashboard] Support a query history from a multi statement query</li>
+<li>da6c018 HUE-7907 [dashboard] Remove whitespaces on widget drag, resize, remove and add</li>
+<li>99ebe47 HUE-7907 [dashboard] Introduce helper to clean the Gridster whitespace</li>
+<li>68dc4e2 HUE-7907 [dashboard] Fix alignement of layout boxes</li>
+<li>d54f0f4 HUE-7907 [dashboard] Removing a widget should automatically resize its siblings</li>
+<li>4afd275 HUE-7907 [dashboard] Recalculate grid base width on window resize</li>
+<li>934883c HUE-7901 [editor] Query History search make the scrolling jumps back to the top</li>
+<li>cfc75f7 HUE-7900 [hbase] Switch to Thrift transport default to use framed instead of buffered</li>
+<li>d49d443 HUE-7853 [editor] Add help section for syntax</li>
+<li>c08884e HUE-7898 [editor] Impala query expiration shows update max_row_size help</li>
+<li>41a7733 HUE-7889 [frontend] Remove html page source from the notifications</li>
+<li>61c8021 HUE-7895 [editor] Give the user a feedback of editor loading when opening an assist document</li>
+<li>8510c85 HUE-7820 [metastore] Use the DataCatalog in the table browser</li>
+<li>466f504 HUE-7820 [frontend] Add navigator tag add and delete operations to the DataCatalogEntry</li>
+<li>bc8eb74 HUE-7743 [frontend] Fix js error when the IS_EMBEDDED flag isn&rsquo;t defined</li>
+<li>8767987 HUE-7899 [hbase] HBase django.po file translation error (#649)</li>
+<li>b960875 HUE-7893 [docs] Fix navbar overlap with the content</li>
+<li>5138cdf HUE-7897 [doc] Integrate Solr wine blog post into the docs</li>
+<li>3df6108 HUE-7897 [doc] Add more info about Solr Sentry privileges</li>
+<li>2a51f61 HUE-7884 [jb] Lighten up the border of the query graph and use the CUI colors</li>
+<li>c48baa6 HUE-7883 [jb] Restyle queries side panel to look like the other sections</li>
+<li>6b05c0f HUE-7886 [dashboard] Fix misplaced global JS variable in the common dashboard</li>
+<li>5f1ba79 HUE-7820 [assist] Fix js error in dashboard assistant</li>
+<li>cc2731e HUE-7820 [assist] Fix broken context menu for SQL assist entries</li>
+<li>4532667 HUE-7820 [assist] Don&rsquo;t show the comment in a tooltip on hover</li>
+<li>e5fe532 HUE-7820 [autocomplete] Use the data catalog mini context panel to show the proper comments for autocomplete suggestions</li>
+<li>143c693 HUE-7820 [autocomplete] Add a component to show a mini context panel for a catalog entry</li>
+<li>462f4c5 HUE-7820 [autocomplete] Use the DataCatalog for the autocompleter</li>
+<li>b926031 HUE-7820 [frontend] Add option to load navopt column meta for multiple tables in one go</li>
+<li>fb89e45 HUE-7743 [frontend] Make sure we remove /hue in embedded URLs</li>
+<li>71526e1 HUE-7743 [frontend] Fix js error when executing multiple statements in embedded mode</li>
+<li>557071a HUE-7820 [frontend] Use IndexedDB instead of TotalStorage for the DataCatalog</li>
+<li>57bf075 HUE-7820 [frontend] Add LocalForage library for managing indexedDB requests</li>
+<li>a1f8e00 HUE-7820 [frontend] Add navopt metadata to the datacatalog and make all promises cancellable</li>
+<li>f6a9f53 HUE-7820 [frontend] Add sample to the data catalog entries</li>
+<li>6ca38e0 HUE-7743 [core] Automatically use Impersonation backend when in embedded mode</li>
+<li>3c86fa9 HUE-7874 [oozie] SSH action missing configuration for retry-max and retry-interval</li>
+<li>6e83146 HUE-7861 [jb] Handle Impala query timeout</li>
+<li>6a727cb HUE-7880 [editor] Improve spacing of chart settings labels</li>
+<li>0e16243 HUE-7881 [core] Fix font loading problems that affect the autocompleters</li>
+<li>0af18ca HUE-6838 [jb] Show confimation dialog when killing jobs</li>
+<li>95c3572 HUE-7875 [dashboard] Properly set the source of the data collection</li>
+<li>10739a0 HUE-7870 [dashboard] Improve reliability of Gridster smart placement of widgets</li>
+<li>605970e HUE-7875 [dashboard] Update tests about edit record permission being available to anyone</li>
+<li>87a340a HUE-7877 [dashboard] Automatically give a friendler name to SQL sub query dashboards</li>
+<li>ce8cfa4 HUE-7877 [hive] Move subquery table to the core HiveServer2 API</li>
+<li>8a83aa7 HUE-7877 [dashboard] Automatically pull SQL statement of query history</li>
+<li>ef97728 HUE-7877 [dashboard] Plug-in subquery metadata and submission logic</li>
+<li>74d800e HUE-7877 [dashboard] Add Explore from SQL step 2</li>
+<li>df2c3d8 HUE-7877 [doc] Bumping-up who is using Hue section in README</li>
+<li>f561697 HUE-7877 [editor] Preparing getting metadata of a sub query</li>
+<li>38ad27d HUE-7877 [assist] Remove right click to open collection page</li>
+<li>ea21ccd HUE-7877 [reporting] Skeleton for creating a new report</li>
+<li>7fc5cd0 HUE-7833 [doc] Add analytics to pages</li>
+<li>8b511ab HUE-7878 [hbase] Avoid throwing a JS error when the server is not reachable</li>
+<li>dca1c56 HUE-7879 [core] Avoid leaking of Security CSS into Hue</li>
+<li>92ed35e HUE-4627 [editor] Re-organize and rename Save query to Export results</li>
+<li>d1212ed HUE-7875 [dashboard] Add links to column results starting with http or https</li>
+<li>d65511e HUE-7875 [dashboard] Only show edit document when the source as a PK</li>
+<li>03cdf8f HUE-7875 [dashboard] Better experience when trying to retrieve a table document with no PK</li>
+<li>ab5441d HUE-7875 [dashboard] Remove reporting from new layouts and add empty middle row</li>
+<li>0ab39b4 HUE-4627 [editor] Show download result icon on page refresh if query is not expired</li>
+<li>9d82a81 HUE-7858 [dashboard] Improve default height for the counter widgets</li>
+<li>4bf035c HUE-7871 [dashboard] Set a min length for the search bar to avoid its disappearance</li>
+<li>ad4b99e HUE-7833 [doc] Smaller font for the tables</li>
+<li>fc8123a HUE-7833 [doc] Explain how to manually change the language</li>
+<li>21203bd HUE-7859 [dashboard] Remove error message when stats not supported</li>
+<li>7b75742 HUE-7757 [dashboard] Text label for older saved dashboard</li>
+<li>9dc17d4 HUE-7866 [dashboard] Limit width of dashboard name</li>
+<li>105bbed HUE-7868 [core] Change successful logins to log at INFO (#646)</li>
+<li>dbb640e HUE-7856 [dashboard] Add dropzones around each widget</li>
+<li>bac8a5c HUE-7869 [dashboard] Avoid dropping of a widget on an invalid grid position</li>
+<li>b0f70ff HUE-7843 [editor] Improve UX of the grid results renderer</li>
+<li>243604c HUE-7847 [search] Show PK field in the right assist</li>
+<li>1b65ad8 HUE-7732 [editor] Change select variables from datalist to selectize</li>
+<li>de3a280 HUE-7865 [autocomplete] Show the complete sample value in the details panel for long values</li>
+<li>7065306 HUE-7820 [assist] Show the proper database comment in the context popover</li>
+<li>b08af64 HUE-7864 [assist] Open top search document folders in the assist instead of home</li>
+<li>8a22023 HUE-7820 [assist] Fetch navigator metadata for databases</li>
+<li>1aaebb7 HUE-7820 [assist] Show comment tooltips for entries in the left and right assist</li>
+<li>5681886 HUE-7820 [assist] Use the new data catalog for the left and right assist trees</li>
+<li>355d3c2 HUE-7820 [metadata] Refresh the navigator cache after setting the comment</li>
+<li>041a860 HUE-7820 [metadata] Introduce a generic data catalog that handles metadata for any datasource</li>
+<li>3110e9e HUE-7820 [metadata] Properly update entities properties or custom metadata</li>
+<li>f123bed HUE-7820 [core] Add ability to load navigator metadata for all children of a sqlMetadata instance in one go</li>
+<li>74d6c54 HUE-7820 [metadata] Allow raw querying of the navigator entity search API</li>
+<li>ca38d90 HUE-7820 [core] Add ability to set comments through the sqlMetadata object</li>
+<li>9c3773e HUE-7820 [core] Introduce a comment observable in sqlMeta</li>
+<li>70a6ff0 HUE-7820 [core] Add Navigator metadata to the sqlMetadata object</li>
+<li>5ed9719 HUE-7820 [core] Introduce a generic sqlMetadata object</li>
+<li>2dc34be HUE-7743 [frontend] Use hash-based page routing in embedded mode</li>
+<li>e014910 HUE-7863 [dashboard] Remove duplicate element IDs</li>
+<li>b18e4a5 HUE-7846 [dashboard] Left align dashboard save as input</li>
+<li>29ffa48 HUE-7857 [dashboard] Auto resize current widgets when dropping on the same row</li>
+<li>b456fc3 HUE-7756 [search] Do not break filtering when a selected value is a False boolean</li>
+<li>abf0421 HUE-7728 [jb] Do not error in the SQL query browser when pointing to an old Impala</li>
+<li>20fc449 HUE-7855 [editor] Fixed JS error on subscription removal</li>
+<li>8c9487d HUE-7855 [editor] Disable the editor auto-resize when running a saved query</li>
+<li>5f475f7 HUE-7852 [core] Metric page fails on cherrypy server</li>
+<li>ffb525e HUE-7743 [core] Directly fails with 403 in embedded mode if not logged-in</li>
+<li>bfc66f1 Revert &ldquo;Revert &ldquo;HUE-6909 [libsentry] Use the new sentry config property sentry.service.client.server.rpc-addresses&rdquo;&rdquo;</li>
+<li>af45f8b HUE-7854 [core] Update translations files for 4.2</li>
+<li>283511f HUE-7846 [dashboard] Save as button rounded corner + save as shortcut</li>
+<li>4c082bf Revert &ldquo;HUE-7758 [dashboard] Allow to collapse facets&rdquo;</li>
+<li>46c49e2 HUE-7757 [dashboard] Give a text label to the dimension</li>
+<li>d5b32ce HUE-7732 Support CTRL + S when inside a variable input</li>
+<li>6b5d951 HUE-7743 [frontend] Hide the top nav bar in embedded mode</li>
+<li>f0c1912 HUE-7743 [editor] Don&rsquo;t show the query name and description in embedded mode</li>
+<li>e7f99d4 HUE-7743 [frontend] Revert param-based page routing in embedded mode</li>
+<li>acf18ad HUE-7743 [frontend] Hide table browser links in embedded mode</li>
+<li>bf95f9b HUE-7743 [frontend] Disable documents in embedded mode</li>
+<li>26f8443 HUE-7832 [assist] Allow filtering in the document types drop-down</li>
+<li>b1700d6 HUE-7743 [frontend] Also adapt img src urls in embedded mode</li>
+<li>8229dcb HUE-7851 [dashboard] Collection not always refreshed when creating a new dasboard</li>
+<li>b8f9ea8 HUE-7850 [editor] Presentation mode will fail if past queries are expired</li>
+<li>4449d14 HUE-7849 [search] Support selection on pie chart of two dimension facet</li>
+<li>4ded863 HUE-7849 [search] Fix slecting one value in graph of one dimension</li>
+<li>d2ddf63 HUE-7849 [search] Support same aggregate in different dimension</li>
+<li>e0aa618 HUE-7849 [search] Correctly support selecting values in N dimensions with N aggregates in between</li>
+<li>5ae36d2 HUE-7849 [search] Support having aggregates between two dimensions</li>
+<li>bb3dbcc HUE-7846 [dashboard] New dashboard should be proposed to be &lsquo;saved as&rsquo;</li>
+<li>1f3ffd6 HUE-2902 [hive] Temporary skip top_term test as slow and API is not used</li>
+<li>fcad3b4 HUE-7654 [core] Integrate Threads page as page on /about page (Fix test)</li>
+<li>f6937f7 HUE-7774 [core] Increase the limit of User and Group list in Hue Autocomplete box</li>
+<li>8ea38e0 HUE-7833 [doc] Add more description to the data import wizard</li>
+<li>e014b3f HUE-7800 [core] Remove Flash of Unstyled Content in loading the apps</li>
+<li>03a5228 HUE-7845 [editor] Get rid of printing specific CSS</li>
+<li>397498e HUE-7844 [editor] Fix rendering of barcharts when the first value is missing</li>
+<li>7186d69 HUE-7812 [core] Metrics and Threads page don&rsquo;t get refreshed Step #2(loadApp)</li>
+<li>b0cfa09 HUE-7258 [jb] Fix test_spark_job in TestMapReduce2NoHadoop</li>
+<li>2e9e60f HUE-7827 [search] Switch to fuzzy matching for autocomplete term search</li>
+<li>45619c3 HUE-7842 [dashboard] Avoid extra search call when dropping a new facet in a new row</li>
+<li>b3651a4 HUE-7839 [dashboard] Support the new counter form in SQL</li>
+<li>0001d64 HUE-7838 [dashboard] Support select on 2 dimension in SQL</li>
+<li>b511ea5 HUE-7833 [doc] Add more information about how to reset a password</li>
+<li>aab4a5c HUE-7837 [presentation] Toggle hiding/showing the code snippets should also hide the log panels</li>
+<li>0c45219 HUE-7832 [editor] Show query document link with link handle on hover</li>
+<li>ee50ae6 HUE-7812 [core] Metrics and Threads page don&rsquo;t get refreshed Step #2(loadApp)</li>
+<li>d7218b6 HUE-7812 [core] Metrics and Threads page don&rsquo;t get refreshed Step#1(Threads Only)</li>
+<li>06ecb02 HUE-7835 Add hive/impala HA configure post content</li>
+<li>33e96e1 HUE-7834 [search] Facet download when no fields are selected fails</li>
+<li>87d8dd3 HUE-7836 [frontend] Fix for mini job browsers not showing any contents</li>
+<li>8aca6af HUE-7832 [frontend] Use the assist to list app specific documents throughout</li>
+<li>96e8157 HUE-7832 [editor] Show editor documents in the left assist instead of home</li>
+<li>6beb7fd HUE-7832 [frontend] Extract a global list of available document types</li>
+<li>96aa933 HUE-7832 [frontend] Add a publish KO binding to publish to huePubSub on click</li>
+<li>8bc0e43 HUE-7833 [doc] Adding link to Impala and HiveServer2 configuration post</li>
+<li>37dd5b9 HUE-7833 [doc] Moving hue specific configs into the same section</li>
+<li>f5dd702 HUE-7646 [sentry] Changing role privileges removes HDFS ACLs</li>
+<li>dc05d52 HUE-7258 [jb] Properly fetch YARN Spark job logs</li>
+<li>c348711 HUE-7831 [search] Make sure we invalidate the record cache when enabling More like This</li>
+<li>900048e HUE-7831 [search] Offer more like results</li>
+<li>0d09d5a HUE-7827 [search] Case insensitive term search for the autocomplete</li>
+<li>db38f4b HUE-7827 [search] Perform term search in a distibuted way if available</li>
+<li>efd42f5 HUE-7830 [core] Non supported feature use_default_configuration doesn&rsquo;t work in Hue 4</li>
+<li>ed06952 HUE-7743 [frontend] Prevent js error on empty stylesheets in embedded mode</li>
+<li>6a2fd64 HUE-7743 [frontend] Detect hash changes and abort page.js routing in embedded mode</li>
+<li>3e50917 HUE-7743 [frontend] Adjust top-nav z-index for embedded mode</li>
+<li>87ffd05 HUE-7743 [frontend] Allow any URL base path in embedded mode</li>
+<li>79f46604 HUE-7743 [metastore] Use the app parameter for table browser navigation in embedded mode</li>
+<li>e059c6b HUE-7743 [frontend] Use parameter based page routing in embedded mode</li>
+<li>6524298 HUE-2890 [doc] Correct a series of links</li>
+<li>df420b2 HUE-2890 [doc] Update README to point to the documentation</li>
+<li>8823770 HUE-2890 [doc] Include all the last recent blog posts into the documentation</li>
+<li>8c4a007 HUE-2890 [doc] Revamped hierarchy of user guide again</li>
+<li>a2e2c37 HUE-2890 [doc] Integrate back some information from the blog into the docs</li>
+<li>b531763 HUE-2890 [doc] Use proper hierarchy in admnistration section</li>
+<li>026ef5f HUE-2890 [doc] Clean-up SDK hierarchy</li>
+<li>1c0c9be HUE-2890 [doc] Move manual to its own Admin manual section</li>
+<li>a1ab3b2 HUE-2890 [doc] Remove old repo file and references</li>
+<li>da3f3d3 HUE-2890 [doc] Merge dev doc to SDK doc</li>
+<li>0452cce HUE-2890 [doc] Clean-up old SDK</li>
+<li>5b12646 HUE-2890 [doc] Revamp of the user guide</li>
+<li>cbc3318 HUE-2890 [doc] Clean-up of the user-guide</li>
+<li>afde680 HUE-2890 [doc] Clean-up of the manual</li>
+<li>cf1ee36 HUE-7820 [metastore] Skeleton call to fetch a batch of columns with metadata comment of a table</li>
+<li>5cdae7e HUE-7820 [metastore] Disable lineage fetching for now as not displayed</li>
+<li>b0b8425 HUE-7820 [metadata] Add helper to fetch metadata of a query</li>
+<li>1476349 HUE-3439 [indexer] Metadata does not show if the termVectors are stored for a field</li>
+<li>6eb4399 HUE-7829 [useradmin] Fixed error in message about LDAP users/groups being successfully synced</li>
+<li>56b8037 HUE-7826 [security] Uncaught TypeError: privilege.privilegeScope is not a function error when deleting a Solr privilege</li>
+<li>8931b28 HUE-7825 [sentry] Integrate new &lsquo;admin&rsquo; Sentry Solr permissions</li>
+<li>cbc2911 HUE-7824 [metastore] Hide table or DB location links when in embedded mode</li>
+<li>4a4229f HUE-7823 [core] Remove data search text from top search if metadata is not enabled</li>
+<li>501db18 HUE-7807 [core] Add an ImpersonationBackend</li>
+<li>4619cb2 HUE-7743 [frontend] Allow adaption of clearable background image in embedded mode</li>
+<li>48a7b10 HUE-7743 [frontend] Disable Google Analytics tracking in embedded mode</li>
+<li>b140690 HUE-7743 [editor] Improve positioning of close button for presentation and full screen results in embedded mode</li>
+<li>4ff701e HUE-7743 [frontend] Append popovers to the Hue container in embedded mode</li>
+<li>f4cb026 HUE-7816 [frontend] Use the Hue version as a parameter instead of a random number to control caching of non-static resources</li>
+<li>38b49aa HUE-7803 [jb] Missing import causing global name &lsquo;LinkJobLogs&rsquo; is not defined</li>
+<li>9d7487e HUE-7819 [metastore] Update table comment to metadata server if available</li>
+<li>ba21678 HUE-7713 [importer] Avoid printing Skipped records warning by mistake</li>
+<li>f6f14cd HUE-7758 [dashboard] Allow to collapse facets</li>
+<li>f101969 HUE-7818 [search] Range facets and up support for timelines and bar charts</li>
+<li>262375a HUE-7815 [dashboard] Pie charts should support numerical range faceting</li>
+<li>5a778e6 HUE-7815 [dashboard] Field type of a numeric range facet disappears</li>
+<li>842db9e HUE-7743 [frontend] Make sure modals open correctly in embedded mode</li>
+<li>59dff8b HUE-7743 [frontend] Make sure the top search results are positioned above the page contents in embedded mode</li>
+<li>452e7a5 HUE-7743 [frontend] Use fixed font size for the context popover title</li>
+<li>10d686b HUE-7743 [frontend] Default to no navbar padding in embedded mode</li>
+<li>8bfb942 HUE-7743 [frontend] Use content-box as default box-sizing in embedded mode</li>
+<li>cb7b7e8 HUE-7743 [editor] Enable webworkers in embedded mode</li>
+<li>f1c784c HUE-7743 [frontend] Update third-party licence details</li>
+<li>103b6b8 HUE-7743 [frontend] Only use knockout deferred updates when supported</li>
+<li>fa5e2ad HUE-7743 [frontend] Load all scripts synchronously before appending the app page contents</li>
+<li>da944cc HUE-7743 [frontend] Don&rsquo;t adjust all links in embedded mode to /hue</li>
+<li>c4c9cc1 HUE-7813 [useradmin] Add login dropdown when there is only one item</li>
+<li>3da1466 HUE-7756 [dashboard] Add other as facet option</li>
+<li>d78f992 HUE-7810 [oozie] Fix Dashboard ignores ACL permissions (#638)</li>
+<li>3c17aaa HUE-7809 [reporting] Missing : in mako templat breaking the page</li>
+<li>cde0278 HUE-7755 [oozie] Adding Distcp arguments and properties</li>
+<li>a8a5699 HUE-7776 [dashboard] Move Solr exceptionextractor to the model to avoid import conflicts</li>
+<li>15fec8d HUE-7808 [editor] Solr icon for Solr SQL</li>
+<li>5539bf5 HUE-7808 [editor] Properly bubble-up errors in Solr SQL queries</li>
+<li>faeb234 HUE-7766 [search] Add query facet filter to counter widgets</li>
+<li>8c4b41e HUE-7766 [dashboard] Query facet for widget level filtering</li>
+<li>7cfcda1 HUE-7766 [dashboard] Move counter display into its own template</li>
+<li>fffd242 HUE-7766 [dashboard] Do not error when using a timeline and rolling window</li>
+<li>d6135f4 HUE-7766 [dashboard] Return 0 instead of null when no data for textSqueezer for now</li>
+<li>131fc3e HUE-7766 [dashboard] Skeleton to compare with past data intervals in counter widget</li>
+<li>c945456 HUE-7766 [dashboard] Comparison with previous time facet option</li>
+<li>1c68cf7 HUE-7809 [reporting] Adding Counter widget as a graph option</li>
+<li>79b1694 HUE-7809 [reporting] Skeleton of independent SQL widgets</li>
+<li>f4bc273 HUE-7809 [reporting] Add report into Dashboard submenu</li>
+<li>ae5fa81 HUE-7806 [core] Show all the users &ldquo;Switch to Hue 4&rdquo; option</li>
+<li>9c7dfee HUE-7805 [impala] Lower idle session timeout from 1 hour to 30 minutes</li>
+<li>34b2fe6 HUE-7803 [jb] Remove references to MR1 in the tests</li>
+<li>37fa3f1 HUE-7794 [fb] Modify/upload file failed if S3 bucket encryption is SSE-KMS</li>
+<li>004deab HUE-7803 [core] Remove old imports to JT and NN plugins in minicluster</li>
+<li>dd5fd49 HUE-7743 [frontend] Allow custom page mappings in embedded mode</li>
+<li>fb699bb HUE-7743 [frontend] Make sure sidebar templates won&rsquo;t conflict in embedded mode</li>
+<li>4d7922f HUE-7743 [frontend] Allow a different page.js base for embedded mode</li>
+<li>7e915cb HUE-7743 [frontend] Add missing import to the editor page</li>
+<li>c521bfd HUE-7743 [frontend] Add page.js as a separate dependency in embedded mode</li>
+<li>8751d37 HUE-7743 [frontend] Disable web workers in embedded mode</li>
+<li>6f06bb0 HUE-7743 [core] Fix issue where collectstatic fails because of missing files</li>
+<li>cf8f56a HUE-7803 [jb] Remove old reference to hadoop gen-py lib</li>
+<li>652ce7e HUE-7803 [jb] Remove old call to java tests in Makefile</li>
+<li>5746e0f HUE-7803 [jb] Remove old references to MR in hue.ini</li>
+<li>c6be075 HUE-7803 [jb] Update through Hue to remove JT references in code path</li>
+<li>2ec5604 HUE-7803 [jb] Remove Job Browser API for MR1</li>
+<li>cdaaaea HUE-7803 [core] Remove notion of MR_CLUSTERS</li>
+<li>70d2f57 HUE-7803 [core] Remove deprecated JobTracker Python class</li>
+<li>71cfd66 HUE-7803 [core] Remove deprecated HadoopFileSystem Python part</li>
+<li>2bd88b5 HUE-7803 [core] Remove old maven references to the Hadoop plugins</li>
+<li>08c980f HUE-7803 [core] Remove old Thrift Hadoop libs</li>
+<li>79189b9 HUE-7588 [core] Disable old Hue 3 UI by default</li>
+<li>121f91a HUE-3286 [cluster] Hide logo when in embedded mode</li>
+<li>36595a1 HUE-7802 [dashboard] Protect against missing function in old dashboards</li>
+<li>24ba2de HUE-7641 [dashboard] Properly align download facet icon in SQL dashboard</li>
+<li>bad0e8d Revert &ldquo;HUE-6909 [libsentry] Use the new sentry config property sentry.service.client.server.rpc-addresses&rdquo;</li>
+<li>ec69bc3 Hadoop 3 rebase: removing JobTracker plugin; updating poms.</li>
+<li>02e51bc HUE-7692 [editor] Upgrade failure from from CDH &lt;= 5.4</li>
+<li>1fe6f45 HUE-7623 [editor] Test connection on create_session</li>
+<li>bd24284 HUE-7778 [dashboard] Only show the new toolbar plus action with grister</li>
+<li>9354c52 HUE-7798 [dashboard] Avoid seldom JS errors when dropping new widgets onto Gridster</li>
+<li>8bfefeb HUE-7799 [dashboard] Removing a widget from Gridster should remove the instance in the items too</li>
+<li>86e9e17 HUE-7797 [dashboard] Avoid drag highlighting over already populated gridster items</li>
+<li>b69a778 HUE-7791 [dashboard] Dropping a counter on Gridster shouldn&rsquo;t clone the last one dropped</li>
+<li>922a44a HUE-7779 [jb] Add job type in the API calls</li>
+<li>a484953 HUE-3286 [cluster] Prevent YARN job status polling in analytic db mode</li>
+<li>27e3951 HUE-3286 [cluster] Automatically hide other job types in Job Browser</li>
+<li>21f2e5b HUE-3286 [cluster] Automatically disable the non compatible app in an analytic db cluster</li>
+<li>1ef784c HUE-3286 [cluster] Cleaning-up various modes so that it works in Editor only</li>
+<li>491044a HUE-7778 [dashboard] Move the &lsquo;add widget&rsquo; toolbar to a plus button</li>
+<li>b5baefb HUE-7691 [core] Restyled metrics tables and ordered all metrics sections alphabetically</li>
+<li>22d936d HUE-7743 [frontend] Fix the header in the new tableExtender using absolute positioning</li>
+<li>b9c495a HUE-7743 [frontend] Add a new tableExtender that uses absolute positioning for the first column</li>
+<li>094640a HUE-7743 [frontend] Isolate the Hue sidebar styles</li>
+<li>7c7a48f HUE-7743 [frontend] Append tooltips to the embedded container in embedded mode</li>
+<li>d23fbe1 HUE-7743 [frontend] Add a DEV_EMBEDDED config flag that will render hue inside a div in the page</li>
+<li>d3b3ecd HUE-7743 [core] Rename the EMBEDDED_MODE setting to IS_EMBEDDED</li>
+<li>3da4823 HUE-7743 [frontend] Prevent bootstrap from leaking styles outside the container in embedded mode</li>
+<li>e17cdef HUE-7743 [frontend] Keep the jobs panel anchored below the toggle button</li>
+<li>065a3cd HUE-7743 [frontend] Keep the history panel anchored below the toggle button</li>
+<li>c187d77 HUE-7743 [frontend] Append new elements to the embedded container instead of body in embedded mode</li>
+<li>7cb649b HUE-7743 [frontend] Prevent Hue styles from leaking outside the embedded container</li>
+<li>56a99c7 HUE-7743 [core] Extract and consolidate global JS variables into one js file</li>
+<li>4142c1a HUE-7743 [core] Add a config flag to enable embedded mode</li>
+<li>00d7453 HUE-7790 [assist] Silence all API errors in the right assistant</li>
+<li>304969f HUE-7789 [dashboard] Dragging on top of an existing Gridster widget shouldn&rsquo;t show the drop background</li>
+<li>1e850f7 Revert &ldquo;HUE-7500 [frontend] Upgrade Nicescroll to the latest&rdquo;</li>
+<li>8bf9d8c HUE-7691 [core] Integrate Metrics as page on /about page</li>
+<li>a6b4bcf HUE-7691 [core] Restyle metrics page and fix for the dockable binding</li>
+<li>3ddac34 HUE-7691 [core] Integrate Metrics as page on /about page</li>
+<li>4cbb6bc HUE-7635 [dashboard] Implement min count for SQL</li>
+<li>a5bde7f HUE-7639 [dashboard] Support median &amp; percentiles in SQL</li>
+<li>023f792 PR436 [hive] Document using multiple sessions for Tez jobs</li>
+<li>99c499f HUE-7786 [dashboard] Canceling adding a widget should not add an empty widget to Gridster</li>
+<li>f3f50f8 HUE-7785 [dashboard] Widgets should have a gray border just on edit mode</li>
+<li>2fa7ed1 HUE-7788 [dashboard] Enable automatic layout on Gridster to avoid overlapping widgets</li>
+<li>e793c87 HUE-7783 [editor] Add log toggling functionality to the presentation mode</li>
+<li>3f65373 HUE-7782 [metastore] Fix overflow on the settings panel</li>
+<li>0c8aa50 HUE-7784 [dashboard] Fix JS error on right assist filtering</li>
+<li>687a15f HUE-7598 [indexer] Prettify json config of a collection</li>
+<li>42d3375 HUE-7598 [indexer] Add the collection config to the collection page</li>
+<li>31c639f HUE-7760 [jb] ADLS browser submenu is missing on hue3 UI</li>
+<li>4abb362 HUE-7728 [jb] 500% progress in live Impala query browser sometimes</li>
+<li>e0717a3 HUE-7776 [dashboard] Enable drop from assist in Gridster</li>
+<li>6d160b1 HUE-7775 [dashboard] Enable drop anywhere in Gridster</li>
+<li>f4b508f HUE-7777 [core] Properly style the go to top anchors</li>
+<li>d20a446 HUE-7750 [desktop] Use display_name instead of nice_name for SDK apps page URL in Hue 4.x. (#632)</li>
+<li>36dfc3b HUE-7773 [azure] Do not hide the name of the keys</li>
+<li>7ce7954 HUE-7713 [search] Support handling indexing of documents with bad fields</li>
+<li>6928023 HUE-7759 [core] Fix CSS push down for the top banner</li>
+<li>487ff9e HUE-7691 [core] Restyle metrics page and fix for the dockable binding</li>
+<li>786000d HUE-7691 [core] Integrate Metrics as page on /about page</li>
+<li>cbc7384 HUE-7320 [frontend] Use nicescroll for the sql columns table</li>
+<li>d18193a HUE-7751 [core] Update tarball links to very latest CDH</li>
+<li>528556b HUE-7752 [core] Remove sample popup column filtering toggling icon</li>
+<li>e65c240 HUE-7692 - [editor] Upgrade failure from from CDH &lt;= 5.4</li>
+<li>1d67e6e HUE-7320 [frontend] Add multiCheck binding that supports foreachVisible</li>
+<li>7ba84f6 HUE-7311 [editor] Limit asterisk expansion to the tables in the select statement</li>
+<li>903f3b5 HUE-7751 [core] Update public tarball links of the integration tests</li>
+<li>ebd891a HUE-7624 [core] Fix LDAP unit test</li>
+<li>165401f HUE-7749 [editor] Don&rsquo;t mark columns from subqueries as missing</li>
+<li>a770850 HUE-7748 [frontend] Preselect the first entry in the global search result list</li>
+<li>5653b4d HUE-7747 [frontend] Show a spinner when the global search results are being updated</li>
+<li>4afc3e2 HUE-7746 [assist] Show a spinner when searching in the right assistant while columns are being loaded</li>
+<li>56f375b HUE-7745 [dashboard] Added square brackets to the supported operators</li>
+<li>9f398be HUE-7745 [dashboard] Create Solr keywords highlighter for Ace</li>
+<li>d1f2750 HUE-7744 [dashboard] Enable Ace Hue theme in the single line Ace editor</li>
+<li>564c1e9 HUE-7730 [fb] Refresh assist document list after creating workflow</li>
+<li>1f3be23 HUE-7734 [metadata] Avoid silent error when tenant id retrieval is empty</li>
+<li>24281e5 HUE-7731 [core] Move new and document list to top menu</li>
+<li>1a8fff3 HUE-7729 [search] Support collections with hyphens in name</li>
+<li>35f8a00 HUE-7714 [editor] Add column type to column name of row detail popup</li>
+<li>502fefa HUE-7739 [metastore] Fix column context popover in the table browser</li>
+<li>90df79d HUE-7737 [frontend] Make sure popovers are aligned when opened the first time</li>
+<li>ced8231 HUE-7736 [assist] Make sure filtering the file panels resets the current page</li>
+<li>680ee3d HUE-7735 [editor] Prevent JS error from the risk suggestions</li>
+<li>eb50610 HUE-7624 [core] Support multi-authentication with AllowFirstUserDjangoBackend and LdapBackend</li>
+<li>f941289 HUE-7553 [jb] Attempt object has no attribute &lsquo;task_attempt_counters&rsquo;</li>
+<li>e986e8e HUE-7710 [search] Prettify facet dimension humane description</li>
+<li>7175cbd HUE-7709 [search] Dimension 2 facet selection display the same 1st column twice</li>
+<li>36977b7 HUE-7726 [editor] Prevent statement parser error on &lsquo;-&rsquo; and &lsquo;/&rsquo;</li>
+<li>22d93cb HUE-7725 [autocomplete] Make sure we don&rsquo;t make suggestions on stale editor contents</li>
+<li>8092912 HUE-7724 [assist] Keep the state of the right assist tabs and refresh the assistant when needed</li>
+<li>989ffee HUE-7723 [editor] Only check for syntax in the Hive and Impala editors</li>
+<li>05d9aba HUE-7718 [editor] Enable presentation mode just for SQL editors</li>
+<li>6be9a70 HUE-7717 [editor] Double click on snippet title shouldn&rsquo;t add a new snippet in presentation mode</li>
+<li>cba4a98 HUE-7719 [editor] Consolidate the Pyspark mode</li>
+<li>f4c9074 HUE-7716 [editor] Add a bit of left margin to the presentation mode</li>
+<li>2d43813 HUE-7722 [editor] Avoid JS error when user tries to execute zero queries in presentation mode</li>
+<li>fd7dfd0 HUE-7720 [home] Emptying the trash shouldn&rsquo;t show a constant spinner</li>
+<li>4dca702 HUE-7721 [home] Improve &ldquo;Empty trash&rdquo; discoverability</li>
+<li>fdda567 HUE-7667 [core] Fix http client pool by correctly mounting Transport Adapter to a prefix.</li>
+<li>034f173 HUE-7707 [assist] Show in assist should scroll just the left assist</li>
+<li>bd61cc5 HUE-7697 [core] Allow Kerberos Renewer to retry kinit multiple times</li>
+<li>f79c67c Revert &ldquo;HUE-7697 [core] Allow Kerberos Renewer to retry kinit multiple times&rdquo;</li>
+<li>b6a3833 HUE-7699 [oozie] Shell document action are not listing any saved shell query</li>
+<li>11d3963 Revert &ldquo;HUE-7315 [core] Change HBase icon for assist and app&rdquo;</li>
+<li>96a2c2d HUE-7706 [frontend] Fix js error in top search results</li>
+<li>9a85e8d HUE-7695 [editor] Limit suggested values for the syntax checker</li>
+<li>64f58ab HUE-6688 [autocomplete] Switch to foreachVisible for the autocomplete results</li>
+<li>9d22196 HUE-6688 [autocomplete] Make sure all running ajax requests are cancelled when closing the autocomplete</li>
+<li>6553557 HUE-7695 [editor] Only mark syntax errors in the active statement</li>
+<li>fd4dd0c HUE-7695 [editor] Only identify complex locations for Impala</li>
+<li>ca70cfe HUE-7695 [editor] Limit background location checks to cached data only</li>
+<li>89eea5f HUE-7695 [assist] Limit prefetching of columns in the right assist to the first 10 tables</li>
+<li>89a4cdc HUE-7695 [editor] Check identifier existence async</li>
+<li>c02e8b4 HUE-7683 [assist] Add &lsquo;Open in assist&rsquo; functionality for the right assist items</li>
+<li>1e4e896 HUE-7694 [assist] Add sample tab to the collection context popover</li>
+<li>6c0c22a HUE-7701 [search] Input focus reseted when filtering terms in column popup</li>
+<li>c9a3f79 HUE-7703 [solr] Add collection sampling to the notebook API</li>
+<li>2026612 HUE-7702 [editor] Marker map lat and lon column section fields are always empty</li>
+<li>3867842 HUE-7704 [frontend] Fix wrong alignment of share dropdown options</li>
+<li>5bd992a HUE-7697 [core] Allow Kerberos Renewer to retry kinit multiple times</li>
+<li>189ef93 HUE-7616 [editor] Shell job fails with TypeError: for +: &lsquo;dict&rsquo; and &lsquo;str&rsquo;</li>
+<li>cb63bda HUE-7685 [assist] Show table title in the right assist</li>
+<li>245cfab Revert &ldquo;HUE-7680 [frontend] Get rid of Nicescroll to improve general performances&rdquo;</li>
+<li>29cd2b1 Revert &ldquo;HUE-7680 [editor] Fix scroll in autocomplete dropdown&rdquo;</li>
+<li>e35b44b Revert &ldquo;HUE-7680 [frontend] Tone down the scrollbars for webkit browsers&rdquo;</li>
+<li>398dd4b Revert &ldquo;HUE-7680 [frontend] Improve CSS on not-so-top-of-the-line screens&rdquo;</li>
+<li>7752a60 HUE-7686 [dashboard] Improve reliability of the db/table chooser</li>
+<li>59ce57b HUE-7680 [frontend] Improve CSS on not-so-top-of-the-line screens</li>
+<li>9dcaf3a HUE-7694 [assist] Add show details to the collections name in left and right assist</li>
+<li>b02c2e3 HUE-7684 [assist] Add context menu to the collections title in left and right assist</li>
+<li>7edcf9d HUE-7680 [frontend] Tone down the scrollbars for webkit browsers</li>
+<li>99ff3f9 HUE-7680 [editor] Fix scroll in autocomplete dropdown</li>
+<li>7ba57d0 HUE-7693 [assist] Make sure the right database is opened when a query is opened</li>
+<li>34312c6 HUE-7247 [editor] Show custom context menu when dragging views into the editor</li>
+<li>09a04f4 HUE-7631 [core] Keep older login URL for backward compatibility</li>
+<li>41e762b Revert &ldquo;Revert &ldquo;HUE-7631 [core] Have login page also prefixed with /hue&rdquo;&rdquo;</li>
+<li>22f8466 HUE-7678 [oozie] Running an old workflow from 3.7 might fail</li>
+<li>93e2b6b HUE-7654 [core] Little polishing of the new thread page</li>
+<li>9d64faa HUE-7682 [assist] Expand the right assist content if there&rsquo;s just one table present</li>
+<li>e2ee997 HUE-7681 [assist] Differentiate font sizes between the two assists</li>
+<li>293f897 HUE-7688 [metastore] Prevent the table browser from leaking css styles to other apps</li>
+<li>05ee598 HUE-7687 [metastore] Supply the source type when updating table and column comments</li>
+<li>1ecc547 HUE-7679 [dashboard] Add clearable to the simple ace editor</li>
+<li>569d7b3 HUE-7680 [frontend] Get rid of Nicescroll to improve general performances</li>
+<li>d5e5e55 HUE-7689 [frontend] Avoid JS import error in old Hue</li>
+<li>f4f7eb7 HUE-7647 [core] Group sync fails when a non-standard (not uid) user_name_attr is used</li>
+<li>6e01143 HUE-7635 [dashboard] Implement min count for SQL</li>
+<li>06b85b8 HUE-7676 [core] skip_trash for hue_config_validation</li>
+<li>edee870 HUE-7250 [assist] Improve performance when showing a table in assist</li>
+<li>dcd61f3 HUE-7343 [assist] Exclude CTE aliases from the tables in the right assistant</li>
+<li>0797bbe HUE-7663 [frontend] Add weights to global search result and keep selection after update</li>
+<li>d869692 HUE-7673 [dashboard] Enable vertical scroll inside the Gridster widgets</li>
+<li>181c74b HUE-7663 [frontend] Group all Hue apps in one global search category and only match if the name starts with the query</li>
+<li>fe5e846 HUE-7671 [assist] Fix the inline autocomplete in the dashboard assistant</li>
+<li>127a23f HUE-7506 [editor] Use the inline autocomplete in the result column search</li>
+<li>1affd33 HUE-7671 [frontend] Include names in the inline autocomplete suggestions</li>
+<li>c4648b8 HUE-7670 [frontend] Update the inline autocomplete after inserting suggestions</li>
+<li>5f01f4e HUE-7507 [frontend] Use the inline autocomplete in the context popover column filter</li>
+<li>b689e89 HUE-7669 [assist] Update the inline autocomplete on backspace</li>
+<li>bef804a HUE-7672 [dashboard] The layout chooser should not error after creating a new dashboard programmatically</li>
+<li>9b0863f HUE-5568 [editor] Grid result not correctly aligned when browser zoom is not 100%</li>
+<li>d257120 HUE-7668 [frontend] Use up and down arrow keys to cycle suggestions in the inline autocomplete</li>
+<li>10e73b7 HUE-6650 [autocomplete] Merge popular group and order by column suggestions with existing column suggetions</li>
+<li>5f29c0d HUE-6129 [metastore] Show actual sample API errors in the panel instead of generic message</li>
+<li>18b4666 HUE-7281 [editor] Mark the correct lines for errors in multi query execution</li>
+<li>11e5323 HUE-7272 [autocomplete] Cycle the autocomplete suggestions on up/down at the limits</li>
+<li>f139d13 Revert &ldquo;HUE-7631 [core] Have login page also prefixed with /hue&rdquo;</li>
+<li>2fa4359 HUE-7666 [editor] Presentation mode with variables shouldn&rsquo;t break the editor</li>
+<li>4513c4c HUE-7665 [editor] A failed query in presentation mode should reset the global play/stop icon</li>
+<li>b4f4e6a HUE-7663 [frontend] Enable search for Hue apps in the global search</li>
+<li>781d045 HUE-7661 [frontend] Center the top search bar</li>
+<li>7c76cf3 HUE-7660 [editor] Update the Hive UDF library</li>
+<li>e10dc9f HUE-7660 [editor] Update the Impala UDF library</li>
+<li>17ff1c5 HUE-2451 [dashboard] Use SQL autocomplete for the query input</li>
+<li>3d75bba HUE-7662 [editor] Reloading a presentation mode page doesn&rsquo;t allow to load the editor again</li>
+<li>034ccf8 HUE-7656 [dashboard] Fix loading back the Gridster layout</li>
+<li>730b591 HUE-7658 [dashboard] Improve widget margins</li>
+<li>3c64cc3 HUE-7657 [dashboard] Fix converting from old dashboard to Gridster</li>
+<li>951dc7b HUE-7654 [core] Integrate Threads page as page on /about page</li>
+<li>8f30e78 HUE-7248 [adls] Added client_id &amp; tenant_id script handling</li>
+<li>50608b7 HUE-7655 [dashboard] Add transitions to Gridster icons</li>
+<li>bc943d6 HUE-7651 [dashboard] Show widget delete icon on hover on Gridster mode</li>
+<li>d41145e HUE-6958 [autocomplete] Fix issue with autocomplete after Hive GROUPING SETS</li>
+<li>7ef398f HUE-6958 [autocomplete] Improve autocomplete of Hive windowing statements</li>
+<li>1406843 HUE-7648 [editor] Only mark missing identifiers when there are suggestions</li>
+<li>ca44a34 HUE-6958 [autocomplete] Add autocomplete for Hive MERGE statements</li>
+<li>bb9367e HUE-7650 [dashboard] Remove widget resize and move icons on Gridster mode</li>
+<li>c99997d HUE-7644 [dashboard] Optimize initial search bar for smaller resolutions too</li>
+<li>7a357da HUE-7649 [core] Add Jison to Notice file</li>
+<li>c847e5a HUE-7643 [editor] Only mark syntax errors for which there are suggestions</li>
+<li>05f9b8d HUE-7642 [editor] Anchor the marked syntax errors to have them move automatically with the text</li>
+<li>a4a13d1 HUE-7643 [editor] Prevent the syntax checker from marking stale editor identifiers as missing</li>
+<li>6afe750 HUE-7642 [editor] Don&rsquo;t mark words as syntax errors while they&rsquo;re being typed</li>
+<li>a56d4b7 HUE-7637 [jb] Task attemps log size is very small</li>
+<li>c5a3941 HUE-7634 [dashboard] Persist and reload the gridster layout</li>
+<li>25cf9b3 HUE-7353 [search] Timeline chart shouldn&rsquo;t degrade the page performance</li>
+<li>3994d09 HUE-7636 [dashboard] Gridster should expand on assist collapse</li>
+<li>9382d0c HUE-7597 [core] Update 3rd party Readme with frontend libraries</li>
+<li>9b2e71a HUE-7248 [adls] Add support for password script</li>
+<li>5cb213a HUE-7420 [jb] Hide empty Impala tabs</li>
+<li>a97cb67 HUE-7487 [editor] Propose setting &lsquo;max_row_size&rsquo; on error</li>
+<li>cd0e726 HUE-7588 [core] Option to disable Hue 3 switching</li>
+<li>457cf23 HUE-7631 [core] Have login page also prefixed with /hue</li>
+<li>59a28e2 HUE-2451 [dashboard] Perform search on enter in the query editor</li>
+<li>2f1d0b8 HUE-7626 [editor] Fix issue where incorrect keywords were no longer marked by the syntax checker</li>
+<li>6824568 HUE-7625 [assist] Sort the folders in the documents panel and home by name</li>
+<li>b9d5240 HUE-7539 [fb] Avoid error on directory creation from choose a file modal</li>
+<li>a07f168 HUE-3228 [dashboard] Avoid redirecting to no collection page if SQL default db is empty</li>
+<li>77d7289 HUE-3228 [dashboard] Do not show facet limit for SQL</li>
+<li>5c422c5 HUE-7632 [dashboard] Set base size for each widget type to avoid expensive calculations</li>
+<li>e759085 HUE-7633 [dashboard] Resizing a Gridster widget should resize its content too</li>
+<li>fe37ef1 HUE-7633 [dashboard] Resizing a Gridster widget should resize its content too</li>
+<li>6feab0d HUE-7571 [doc] Update thirdparty README</li>
+<li>2b06296 HUE-3228 [dashboard] Split SQL API in hierarchies to support different SQL engines</li>
+<li>865f193 HUE-7630 [dashboard] Add a basic query builder layout</li>
+<li>c625745 HUE-7615 [doc] Add upgrade instructions</li>
+<li>b7264eb HUE-7620 [indexer] Offer to index split a field into a multi-valued field</li>
+<li>abe5efc HUE-7619 [indexer] Morphline indexer should not be on by default yet</li>
+<li>724f2e0 HUE-7629 [assist] Bump the field/column font size by one pixel</li>
+<li>fbdf9fa HUE-7628 [assist] Accept different kind of dashboard engines for the right assistant</li>
+<li>e589b2c HUE-7627 [editor] Fix scroll to column after visiting metastore</li>
+<li>dbc09bb HUE-7622 [jb] Reruning a wokflow redirects to a json result</li>
+<li>d76aebd HUE-7617 [fb] Compress can fail with output.properties data exceeds its limit</li>
+<li>37ceb7d HUE-7612 [dashboard] Recalculate height of non graphical widgets</li>
+<li>7186260 HUE-7614 [dashboard] Enable drag&rsquo;n&rsquo;drop from assist</li>
+<li>5b043c4 HUE-7611 [dashboard] Add drop functionality to an empty widget</li>
+<li>9d4485d HUE-7613 [dashboard] Make resize icon more prominent</li>
+<li>17700bc HUE-7610 [dashboard] Add delete functionality to an empty widget</li>
+<li>9f1e090 HUE-7603 [dashboard] Smaller default empty widget</li>
+<li>ee917a5 HUE-2451 [dashboard] Make top terms limit parameterizable</li>
+<li>971da2b HUE-2451 [dashboard] Round the left border of the query input</li>
+<li>dc789bc HUE-2451 [dashboard] Don&rsquo;t use the Solr query autocomplete when engines other than Solr are used</li>
+<li>2556f59 HUE-2451 [dashboard] Use prefix when fetching terms for value autocomplete</li>
+<li>6430acc HUE-2451 [dashboard] Use the terms API instead of samples when suggesting values in the query autocomplete</li>
+<li>db2332e HUE-2451 [dashboard] Enable placeholder for the simple ace editor component</li>
+<li>787c4fd HUE-7603 [dashboard] Initial layout chooser should create the layout in Gridster too</li>
+<li>c1e4fb7 HUE-7560 [assist] Added Solr specific facet values for the filter</li>
+<li>cb2028b HUE-7560 [assist] Extracted filtered computed creation to AssistantUtils</li>
+<li>996ff42 HUE-7560 [assist] Removed collection specific panel and re-used db one</li>
+<li>7071366 HUE-7560 [assist] Simplified loading of the right assist collection panel</li>
+<li>e32d3b5 HUE-7560 [assist] Fix filtering of fields in the right assist collection panel</li>
+<li>d295731 HUE-7560 [assist] Re-use the new collections panel on the dashboard right assist</li>
+<li>216cdfe HUE-7601 [indexer] Fix sample popover integration</li>
+<li>9ca4f6c HUE-7602 [assist] Remove unused AssistCollectionEntry references</li>
+<li>55c36c9 HUE-7600 [assist] Split the column entry assist for the right assistant</li>
+<li>8f86fcd HUE-7248 [adls] Remove compress feature</li>
+<li>329b7c7 HUE-7599 [autocomplete] Remove some unsuitable SET options</li>
+<li>34f3d44 HUE-2451 [dashboard] Suggest fields, sample values and keywords in the query input</li>
+<li>da01616 HUE-2451 [dashboard] Use the simple Ace editor as the query input in the search bar</li>
+<li>713f5ed HUE-2451 [dashboard] Use flex layout for the top search bar to adjust the width of the query input automatically</li>
+<li>a7a82ec HUE-2451 [dashboard] Don&rsquo;t handle partial values in the query parser</li>
+<li>57d39d6 HUE-2451 [dashboard] Add query autocomplete of keyword matching, values and boolean expressions</li>
+<li>520cf37 HUE-2451 [dashboard] Initial generation setup of Solr query parser</li>
+<li>06e6167 HUE-2451 [dashboard] Rename the Solr expression parser to Solr formula parser</li>
+<li>1a0a121 HUE-2451 [core] Split parser generation in the makefile</li>
+<li>8053d2d HUE-7592 [jb] Hide older browser if the new ones is enabled</li>
+<li>09576ad HUE-7591 [pig] Also add hive to the sharelib when using hcatalog</li>
+<li>c8197d6 HUE-7596 [assist] Avoid fetching the top columns for the collections panel</li>
+<li>557baaa HUE-7594 [core] Adjust project license to be valid</li>
+<li>6162c77 HUE-7464 [editor] Refactor SQL sessions to be less confusing</li>
+<li>f98f837 HUE-7595 [editor] The spacing of the new notebook icon is off</li>
+<li>864bef2 HUE-7445 [editor] Add session id to the Session panel</li>
+<li>cffda11 HUE-7464 [editor] Do not save SQL sessions as they become stale</li>
+<li>53df364 HUE-7464 [editor] Inform if the session was recreated or not in the create_session API</li>
+<li>dc59507 HUE-7567 [all] Fix test desktop.lib.rest.test_clear_cookies</li>
+<li>7a97710 HUE-7420 [jb] Fix test jobbrowser.tests.TestImpalaApi.test_apps</li>
+<li>b589902 HUE-7475 [core] Merge HUE-3102 to pysaml2 v4.4.0</li>
+<li>628a6b6 HUE-7419 [core] Update SAML libraries   Fix undefined failure_function for handling SAML response parsing exception</li>
+<li>83cc6e7 HUE-7419 [core] Update SAML libraries   add dependencies defusedxml(0.4.1), future(0.16.0),   and pycryptodomex(3.4.7 removed lib/Crypto/SelfTest/)</li>
+<li>10c8a39 HUE-7419 [core] Update SAML libraries   upgrade djangosaml2 (0.13.0 &ndash;&gt; 0.16.4) and pysaml2 (2.4.0 &ndash;&gt; 4.4.0)</li>
+<li>0a3bb04 HUE-7583 [editor] Export result to table throws already exists error</li>
+<li>704d710 HUE-6238 [useradmin] ConcurrentUserSessionMiddleware - missing user</li>
+<li>04284a1 HUE-7587 [indexer] Fix csv format type guessing test</li>
+<li>36d8e46 HUE-7062 [core] Fix all the &lsquo;ascii&rsquo; codec can&rsquo;t decode from Solr function descriptions</li>
+<li>92ea3a5 HUE-7585 [indexer] Delete collection when data indexing fails in the wizard</li>
+<li>a9d4031 HUE-7587 [search] Properly create collection with default field when specified</li>
+<li>41d42d0 HUE-7464 [editor] Show log panel by default</li>
+<li>5b0d84f HUE-7585 [core] Tweak config creation to not override the base one</li>
+<li>5983cf9 HUE-7585 [core] Integrate Sentry protected schemas in config creation</li>
+<li>4598fc7 HUE-7585 [core] Properly detect if Solr is kerberized but not Sentry protected</li>
+<li>73d6292 HUE-7584 [solr] Support default field via the config API</li>
+<li>10bbdd4 HUE-7584 [solr] Support deleting configSet via the config API</li>
+<li>f90b9af HUE-7584 [solr] Support creating configSet via the config API</li>
+<li>a09fa37 HUE-2173 [dashboard] Convert timeline widget to th nested facets</li>
+<li>9d9a0b3 HUE-2173 [dashboard] Only add term prefix when it is not empty</li>
+<li>62a358a HUE-2173 [dashboard] Allow min and max metrics for date types</li>
+<li>5c58297 HUE-2173 [dashboard] Show sorting and facet limit when it makes sense</li>
+<li>6169990 HUE-2173 [dashboard] Port the range &amp; up next text facet</li>
+<li>5a98bc6 HUE-7062 [dashboard] Always suggest aggregate functions in the formula autocomplete</li>
+<li>63e644d HUE-6106 [autocomplete] Add / as an initial suggestion for empty file paths</li>
+<li>5322493 HUE-6799 [editor] Use the last cursor position when opening from the query history</li>
+<li>dd87a0c HUE-6799 [editor] Save the cursor position with the snippet</li>
+<li>f782e9a HUE-7251 [editor] Don&rsquo;t select all and move cursor on undo after paste</li>
+<li>fb220e1 HUE-5480 [autocomplete] Suggest S3 and ADLS paths in the autocompleter</li>
+<li>ca37faa HUE-7573 [assist] Sort the documents in the assist panel according to last modified time with folders on top</li>
+<li>281e0d3 HUE-7578 [assist] Fetch more entries when scrolling to the end in the S3 and ADLS panels</li>
+<li>826c34a HUE-7586 [assist] Re-wire collection refresh subscriber</li>
+<li>6c0eb62 [HUE-7564] Remove one of the get_connection(ldap_config) function in ldap_access.py.</li>
+<li>657c4ef HUE-7539 [filebrowser] fixing downloading a file hangs the full Hue. We have done some performance analysis and found out that 1MB buffer size works best.</li>
+<li>e6bce8a HUE-7552 [fb] Copy Folder Into Itself Causes Endless Loop</li>
+<li>21a935c HUE-7554 [jb] Job Browser should provide YARN &ldquo;Diagnostics&rdquo; info when non empty</li>
+<li>575af2e HUE-7420 [jb] Incorrect number of Impala queries</li>
+<li>e450559 HUE-7572 [editor] Show the complete statement in the document context popover</li>
+<li>9ab0186 HUE-7568 [frontend] Show description match in bold instead of italic for the top search results</li>
+<li>d1ca684 HUE-7580 [metadata] Split in two ddl and stats uploads</li>
+<li>55efff0 [doc] Update thirdparty README</li>
+<li>01c6d38 HUE-7567 [all] Add default timeout to REST calls</li>
+<li>98e2496 HUE-7490 [assist] File assist does not have an initial spinner</li>
+<li>982f1b6 HUE-7420 [jb] Adding Impala text to the query page to prevent confusions with other SQL engines</li>
+<li>8ff5b69 HUE-7420 [editor] Open correct mini browser tab depending on the type of query</li>
+<li>ca9dd93 HUE-7579 [frontend] Fix anonymous user render of login page</li>
+<li>503f982 HUE-7576 [assist] List collections aliases on the Solr assist</li>
+<li>74a8298 HUE-7570 [core] Bump ConnectionPooler to have a poolsize of CHERRYPY_SERVER_THREADS</li>
+<li>1e9c409 HUE-7569 [core] Adding Thrift arguments to the logging of the return call</li>
+<li>62e358f HUE-7569 [core] Finer grained Thrift pool instrumentation</li>
+<li>f1a8258 HUE-7568 [core] Top search document description can contains <em> for matching highlights</li>
+<li>2341c19 HUE-7062 [dashboard] Convert arithmetic operators to their corresponding functions in the formula editor</li>
+<li>099a8a0 HUE-7062 [dashboard] Move formula editor cursor between the parentheses and trigger autocomplete when inserting functions</li>
+<li>e77fd07 HUE-7062 [dashboard] Suggest fields in the formula editor</li>
+<li>2f25ad8 HUE-7062 [dashboard] Prevent line breaks when typing fast in the single line Ace editor</li>
+<li>332729d HUE-7062 [dashboard] Only suggest aggregate functions when the formula editor is empty</li>
+<li>d6ca048 HUE-7577 [editor] Don&rsquo;t assume databases have been loaded for all sources</li>
+<li>a5d95e5 HUE-7062 [frontend] Move context popover and related ko components to ko_components</li>
+<li>b8ba9ca HUE-7062 [frontend] Extract all ko components to separate files</li>
+<li>d03dbe4 HUE-7062 [dashboard] Improve the size of the formula editor</li>
+<li>057e3c0 HUE-7575 [assist] Hide filter icon from the Solr assist</li>
+<li>fae12bc HUE-7559 [assist] Pre-select the source and root item for the collections panel</li>
+<li>5d73b1f HUE-7574 [assist] Create index from the Solr assist</li>
+<li>6b22204 HUE-7315 [core] Change HBase icon for assist and app</li>
+<li>dda957a HUE-2173 [search] Avoid breaking search bar layout on normal resolutions</li>
+<li>4a8896b HUE-7062 [autocomplete] Link formula to the autocomplete</li>
+<li>35a2e09 HUE-2173 [dashboard] Port timeline to the nested facets</li>
+<li>8390502 HUE-7420 [jb] Fix mini Impala jb expand + Styling</li>
+<li>fe147df HUE-7565 [dashboard] Allow dragging to dashboard to create a new widget</li>
+<li>8cfe667 HUE-7062 [dashboard] Suggest Solr functions in the dashboard formula editor</li>
+<li>951043a HUE-7062 [dashboard] Add Solr function library to the autocompleter</li>
+<li>ff380e2 HUE-7062 [autocomplete] Extract commonly used autocomplete functionality to SqlUtils</li>
+<li>6f79f42 HUE-7062 [frontend] Add a generic Ace editor component that supports the Hue autocomplete dropdown</li>
+<li>12813d0 HUE-7566 [dashboard] Allow removing a Gridster widget</li>
+<li>6ee1041 HUE-2173 [dashboard] Do not error on sorting on text facets</li>
+<li>53807b7 HUE-7563 [metastore] Fields in nested column have a leading comma when preceded by array in type struct</li>
+<li>16768b2 HUE-3228 [dashboard] Add ORDER BY functionality to SQL</li>
+<li>bdf1ef9 HUE-3228 [dashboard] Port SQL API to use the new nested facets</li>
+<li>7ab9b55 HUE-2173 [dashboard] Port the gradient map to the nested faceting</li>
+<li>fc1cb7f HUE-2173 [dashboard] Longer search bar when analytics is supported</li>
+<li>35511ae HUE-7562 [core] Allow building Hue with Java 9</li>
+<li>16609e8 HUE-7558 [assist] Update the context menu for the collections items</li>
+<li>779edb6 HUE-7557 [assist] Wire in the right sample popup for the collections items</li>
+<li>bcfdcfb HUE-7556 [assist] Improve icons and i18n for the collections panel</li>
+<li>dc74cfd HUE-7420 [jb] Fix TestImpalaApi.test_app</li>
+<li>2db2368 HUE-7545 [search] Reset query string in URL when it becomes empty</li>
+<li>0a39e02 HUE-7555 [importer] Type guessing for table sets everything as string</li>
+<li>2c69cb6 HUE-7561 [sentry] Bump single user caching for metadata search</li>
+<li>5eddd05 HUE-7555 [core] Rename Amin section link in the top right user menu</li>
+<li>c4b4b72 HUE-2173 [dashboard] Reformat some part of the code</li>
+<li>34eb533 HUE-2173 [dashboard] Port timeline and gradient map widgets to recursive nested facets</li>
+<li>a29c9ba HUE-2173 [dashboard] Pass to clean-up recursive facets template</li>
+<li>5d68dce HUE-2173 [dashboard] Do not show sorting option on hit widget</li>
+<li>787f8df HUE-2173 [dashboard] Disable removing the last nested facet of a widget</li>
+<li>d54bc88 HUE-2173 [dashboard] Add observable subscribes to newly added facets</li>
+<li>fcc9ca1 HUE-2173 [dashboard] Hit widget compatibility with recursive facets</li>
+<li>cce050c HUE-2173 [dashboard] First pass of backend to support recursive facets</li>
+<li>8de4611 HUE-2173 [dashboard] Refactor model to support N dimensions: UI part</li>
+<li>8e6b0ce HUE-2173 [search] Harmonize indexer to use simpler field types</li>
+<li>8bedad5 HUE-2173 [dashboard] Support new facets in old dashboards</li>
+<li>07dba5f HUE-2173 [dashboard] Mini skeleton for static dashboard</li>
+<li>d3a5393 HUE-2173 [search] Protect against empty nested facet buckets when nothing matches</li>
+<li>97177b1 HUE-7420 [jb] Remove white space from impala title</li>
+<li>727b448 HUE-7420 [jb] Queries: bring up bottom panel</li>
+<li>95c86ed HUE-7420 [jb] Queries: bring up bottom panel</li>
+<li>6c94d83 HUE-7420 [jb] Fix impala link in editor log</li>
+<li>0492496 HUE-7468 [assist] Convert collection assist into tree mode</li>
+<li>65992fb HUE-7420 [jb] Fix impala duration &amp; progress</li>
+<li>49a6cd9 HUE-7420 [jb] Fix impala summary &amp; plan whitespace + perf</li>
+<li>d24c5fa HUE-7542 [metadata] Only cache for a limited amount of time the list of cluster ids</li>
+<li>9f4f66a HUE-7548 [metastore] Create table time conversion to local time can fail</li>
+<li>73e99dc HUE-7549 [metastore] Drop table does not refresh the page</li>
+<li>249330d HUE-7516 [fb] . dir can be selected and allowed to copy into itself</li>
+<li>6417a99 HUE-7551 [autocomplete] Fix issue where suggestions are missing when there&rsquo;s no alias for a complex reference</li>
+<li>04e38e2 HUE-7463 [editor] Don&rsquo;t mark Impala complex types as missing</li>
+<li>e1acf5b HUE-7547 [editor] Improve location handling for Impala complex identifiers</li>
+<li>b3d7068  HUE-7546 [dashboard] Automatically apply height to the Gridster widgets on Leaflet draw</li>
+<li>adb86cf  HUE-7546 [dashboard] Automatically apply height to the Gridster widgets on load and on plotly afterplot</li>
+<li>7b07d4a HUE-7546 [dashboard] Auto calculate height of tile based on content</li>
+<li>eb28275 HUE-7420 [jb] query browser &lsquo;NoneType&rsquo; object has no attribute &lsquo;group&rsquo;</li>
+<li>f9483d2 HUE-7533 [fb] Wrong error message in UI with 500 error when user tries to edit read_only file in File browser</li>
+<li>fa858e5 HUE-7420 [jb] queries are not in sorted order</li>
+<li>ee8654f HUE-7420 [jb] total number of impala queries incorrect</li>
+<li>77dfec4 HUE-7286 [editor] Move sql identifier object to the beginning of the tooltip</li>
+<li>4320e79 HUE-7286 [editor] Only show the main type for columns in the tooltip</li>
+<li>aa7f7b5 HUE-7544 [editor] Make identifier existence validator less eager when editing the identifier</li>
+<li>d26ffc4 HUE-7543 [editor] Prevent the risk icon from moving the editor down</li>
+<li>a690eeb HUE-7280 [editor] Mark the executed statement in the gutter when multiple statements are selected</li>
+<li>0748dae HUE-7541 [assist] Missing styles from the Hue 3 assist</li>
+<li>0729331 HUE-7431 [core] When idle session timeout is enabled it causes issues with IDP initiated SAML</li>
+<li>607c61e HUE-7420 [jb] query plan border color</li>
+<li>438d5be HUE-7286 [editor] Show column type in the hover tooltip if the details of the column is cached</li>
+<li>bbef487 HUE-7538 [frontend] Override default knockout html binding to prevent XSS</li>
+<li>fb5c224 HUE-7537 [editor] Make SqlFunctions optional for the parsers</li>
+<li>35c1587 HUE-6159 [autocomplete] Don&rsquo;t mark column alias references as columns belonging to a table</li>
+<li>4ca2264 HUE-7535 [editor] Fix issue where the syntax checker marks incomplete statements as complete</li>
+<li>fc63969 HUE-7471 [assist] Don&rsquo;t show a scroll bar for entries with a spinner</li>
+<li>d63a13c HUE-7534 [editor] Fix IE js error on missing endsWith in the syntax checker</li>
+<li>6da4969 HUE-7536 [frontend] Avoid XSS in the table row display modal, HueDatatable and TableExtender2</li>
+<li>141ac77 HUE-7529 [metastore] Show primary keys in the column list for a table</li>
+<li>36cab75 HUE-7528 [editor] Show partition key details for columns in the contexts popover</li>
+<li>84e1c8c HUE-7527 [assist] Prevent scroll on drag in the foreachVisible binding</li>
+<li>c87aa7e HUE-7525 [home] Prevent js error when dragging to select documents</li>
+<li>ac7e88e HUE-6238 [useradmin] Option to disable concurrent user sessions</li>
+<li>0468283 HUE-7532 [home] Move create folder to the create document menu</li>
+<li>5ca296a HUE-7531 [frontend] Allow double click to see detail on old dataTables too</li>
+<li>c797f0d HUE-7530 [editor] Avoid red error popup on close of expired query</li>
+<li>91a2a79 HUE-7526 [frontend] Avoid XSS in the wysiwyg5 editor and fix the binding in Hue 4</li>
+<li>a26fbc3 HUE-7500 [frontend] Upgrade Nicescroll to the latest</li>
+<li>ba4000a HUE-7524 [oozie] Avoid parsing XML with resolve_entities</li>
+<li>13eebe0 HUE-7420 [adls] replaced REFRESH_URL for TENANT_ID</li>
+<li>a1440c3 HUE-7508 [editor] Have the column filter visible by default in the context popover</li>
+<li>6da3b21 HUE-7523 [assist] Enable drag and drop of documents in the assist panel</li>
+<li>49d7c4f HUE-7521 [security] Prevent JS error on printAcl not defined</li>
+<li>00c834a HUE-7505 [fb] Add a visual hint (green) to the upload status bar when successfully uploaded, and same for failures</li>
+<li>50e0adf HUE-7505 [fb] Home link has a different highlight background than the path</li>
+<li>8805a03 HUE-7505 [fb] The file properties in the file viewer are too close to the action menu</li>
+<li>14bafa4 HUE-7505 [fb] Style file editor should be the same as file viewer</li>
+<li>4e72f67 HUE-7522 [frontend] Link to the latest editor from the oldest editor alert</li>
+<li>79f6cf1 HUE-7520 [editor] Prevent JS error from being thrown when closing the session</li>
+<li>61b27c5 HUE-7519 [assist] Fix JS error when the sample tab can&rsquo;t load samples</li>
+<li>eefa31d HUE-7257 [autocomplete] Remove the SET options for Hive</li>
+<li>08b4e16 HUE-7517 [frontend] Properly close the global search results when opening a document</li>
+<li>ec3c413 HUE-7510 [editor] Improve cursor position after dragging tables and columns to the editor</li>
+<li>31b020d HUE-7511 [fb] Fix replication factor for the currently selected file</li>
+<li>1d1fdba HUE-7512 [home] Select json on the import documents modal is weirdly big</li>
+<li>cb82fbe HUE-7513 [frontend] Top global search input is smaller than the query blue button and misaligned</li>
+<li>f03449d HUE-7518 [editor] Remove bottom margin from the result field list filter</li>
+<li>37d1d3b HUE-7492 [fb] Second upload from Upload button seems to error</li>
+<li>f48f12d HUE-7501 [dashboard] Aggregate field does not exist in older samples</li>
+<li>f7cd3d2 HUE-7502 [aws] upload file to s3 location throws error: undefined</li>
+<li>1458daa HUE-7504 [editor] Prevent an infinite loop when changing the snippet type</li>
+<li>65a5fd3 HUE-7239 [editor] Use only one instance of the web workers for all snippets</li>
+<li>5d6d185 HUE-7501 [dashboard] Do not break the page when gridster is off</li>
+<li>8baf763 HUE-7503 [dashboard] Rename generated formula to plain formula</li>
+<li>0e6d7ed HUE-7503 [search] Keep sorting toggles in sync between facets of same dimension</li>
+<li>61156e1 HUE-7503 [dashboard] Generate sort within the same dimension facet</li>
+<li>1ea1796 HUE-7503 [dashboard] Step 1 of sorting on aggregates of any dimension</li>
+<li>92e40ec HUE-7503 [dashboard] Add sorting to Nth dimension</li>
+<li>4f79707 HUE-7503 [dashboard] Add more than one dimension</li>
+<li>4df6aeb HUE-7503 [dashboard] Use new metric template for dimension 1</li>
+<li>f5d9918 HUE-7503 [dashboard] Analytics lean-up for counter widget</li>
+<li>d026128 HUE-7503 [dashboard] Move nested facet properties to measure template</li>
+<li>e17e4cf HUE-7503 [dashboard] Only show Add measure button when a field is selected</li>
+<li>35d6972 HUE-7503 [dashboard] Convert add new measure to the new measure-form</li>
+<li>c4cbb29 HUE-7503 [dashboard] New measure template</li>
+<li>38b1a46 HUE-7503 [dashboard] Simpler dimensions template</li>
+<li>da8b100 HUE-7496 [core] Bump cherrypy threads by 10</li>
+<li>c0b5496 HUE-7491 [fb] Newly uploaded file via the Upload button does not get the blue selection anymore</li>
+<li>7ae3e29 HUE-7501 [dashboard] MVP of the gridster integration under a feature flag</li>
+<li>d52f55d HUE-7501 [dashboard] Keep old layout intact and return a list of the new format</li>
+<li>9f6bbe2 HUE-7501 [dashboard] Convert layout to gridster format</li>
+<li>361a74f HUE-7426 [frontend] Add gridster Knockout binding</li>
+<li>c19f3a6 HUE-7501 [dashboard] Add configuration flag to enable the new layout</li>
+<li>a822810 HUE-7420 [jb] enable query browser by default</li>
+<li>7d28f2a HUE-7499 [dashboard] Fix general typeahead positioning</li>
+<li>15519f5 HUE-7248 [adls] fix test_export_result</li>
+<li>bd98ed2 HUE-7498 [importer] Also show file type on create index wizard from assist panel</li>
+<li>8f8f00b HUE-7498 [importer] Avoid js error when switching input types on a badly read data sample</li>
+<li>0e600b3 HUE-7497 [indexer] Fix the checking of an existing index or not while indexing</li>
+<li>dceef93 HUE-7497 [indexer] Fix the link to an existing collection</li>
+<li>e759caf HUE-7497 [indexer] Refresh assist collection list on index creation</li>
+<li>4875867 HUE-7495 [editor] Copy to clipboard adds an extra \t at the beginning of header line</li>
+<li>e71f9b6 HUE-7494 [core] RM HA does not seem to get persisted</li>
+<li>e212434 HUE-7489 [editor] CloseOperation when GetOperationStatus is in an ERROR_STATE</li>
+<li>4a8ca7e HUE-7062 [search] Add backend logic for formula and remove old ops</li>
+<li>97dd205 HUE-7248 [adls] fix test_export_result</li>
+<li>db396f7 HUE-7420 [jb] impala kill job + filter</li>
+<li>a66e51d HUE-7248 [adls] fix export to file</li>
+<li>67bb5a2 HUE-7257 [autocomplete] Add autocompletion of SET options for Hive and Impala</li>
+<li>0987de1 HUE-7493 [editor] Remove fuzzy feeling from the autocompleter match</li>
+<li>f4e439c HUE-7400 [editor] Made close logs icon more visible and reliable</li>
+<li>11b7d02 HUE-7484 [editor] Avoid old headers sticking for one second on result full screen mode exit</li>
+<li>a39e711 HUE-7482 [metadata] Display last time of data refresh if available</li>
+<li>515bb41 HUE-7486 [oozie] 500 error when trying to submit Hive Workflow when beeswax blacklisted (#605)</li>
+<li>4a4e7e7 HUE-7485 [frontend] Allow partial matching for facet values in the inline autocomplete</li>
+<li>5ee0bb7 HUE-7483 [backend] validate property in hue.ini is ignored (#603)</li>
+<li>20cc078 HUE-7400 [editor] Made close logs icon bigger</li>
+<li>ec30720 HUE-7391 [autocomplete] Limit the autocompleter to the active statement only</li>
+<li>426c113 HUE-7481 [frontend] Close the global search when clicking on show in assist or table browser</li>
+<li>0eebb8c HUE-7400 [editor] Moved bigger icons to the specifics CSS classes</li>
+<li>374fe88 HUE-7480 [oozie] Also check for group permission for dashboard action</li>
+<li>3a4428c HUE-7474 [impala] Log the query planning phase</li>
+<li>23f331d HUE-7430 [core] Update translations files</li>
+<li>cfb8290 HUE-7478 [indexes] Re-use Solr sample popover in the index field list</li>
+<li>ba615ae HUE-7467 [frontend] Fix missing subtitle for the popovers</li>
+<li>6df0f9e HUE-7467 [frontend] Create Solr sample popup</li>
+<li>2597280 HUE-7477 [frontend] Close the left nav on click</li>
+<li>823e36a HUE-7476 [core] Add Hue shell command to set CM environment</li>
+<li>ce7f72b HUE-7420 [jb] Impala Query integration</li>
+<li>ad40573 HUE-7462 [assist] Highlight matching parts of the functions filter</li>
+<li>e735582 HUE-7415 [editor] The editor textarea should retain its size on new query</li>
+<li>84b503f HUE-6851 [metastore] Don&rsquo;t show the database while loading a table</li>
+<li>66c75d2 HUE-7470 [editor] Only check for risks when a snippet has focus</li>
+<li>b5ecaf3 HUE-7463 [autocomplete] Improve location handling for map and array column references in Hive</li>
+<li>77387c0 HUE-7465 [assist] Fetch right assistant columns synchronously to reduce backend load</li>
+<li>595fcc3 HUE-6958 [autocomplete] Update the Hive TABLESAMPLE autocomplete</li>
+<li>33c2083 HUE-7466 [dashboard] Fix alignment of facet add typeahead</li>
+<li>ac9918b HUE-6998 [frontend] Improve configurability of Leaflet maps</li>
+<li>5ac0e0c HUE-7440 [core] Remove load balancer cookie on login if not authenticated</li>
+<li>2592b2d HUE-7453 [frontend] Refactored bar, time and line chart to use the common basic chart builder</li>
+<li>6c4f3a9 HUE-7453 [frontend] Create basic timeline chart port</li>
+<li>b31f908 HUE-7453 [frontend] Added multiserie to line chart</li>
+<li>841e252 HUE-7453 [frontend] Added multiserie to bar chart</li>
+<li>91cddb9 HUE-7453 [frontend] Create basic linechart port</li>
+<li>91a26f7 HUE-7453 [frontend] Bump binding throttle to 200ms</li>
+<li>31ff8ac HUE-7453 [frontend] Create basic barchart port and refactor common plotly options</li>
+<li>e3649bd HUE-7458 [editor] Fix js error in syntax checker for subquery references</li>
+<li>9d414d5 HUE-7450 [editor] Fix broken jasmine tests</li>
+<li>0a15113 HUE-6958 [autocomplete] Add INNER JOIN to the Hive suggestions</li>
+<li>bd3f66b HUE-6958 [autocomplete] Update autocompleter for the Hive LIMIT clause</li>
+<li>8aaf803 HUE-7457 [assist] Don&rsquo;t fetch top columns for tables in the right assistant</li>
+<li>a9b115f HUE-7450 [editor] Don&rsquo;t suggest aliases when a qualified identifier isn&rsquo;t found by the syntax checker</li>
+<li>e19afe9 HUE-7449 [editor] Don&rsquo;t mark columns from CTEs as missing</li>
+<li>1f26e9e HUE-7062 [search] Add custom autocomplete parser for solr formulas</li>
+<li>8f98962 HUE-7456 [core] Do not retry Thrift call on read operation timed out from ssl.SSLError</li>
+<li>64db82c HUE-7447 [core] Skip test on last access time as feature disabled</li>
+<li>3880da8 HUE-7447 [core] Convert logged REST path to proper unicode</li>
+<li>a5247fb HUE-7448 [indexer] Support CTRL+A as field delimiter</li>
+<li>c162656 HUE-7447 [core] Log metrics into debug info</li>
+<li>7ba5a09 HUE-7447 [core] Add thread stack traces to debug log</li>
+<li>89a319b HUE-7447 [metadata] Add call tracking to navop calls</li>
+<li>91c4f81 HUE-7447 [core] Add thread tracebacks into the logs in debug mode</li>
+<li>6f99129 HUE-7447 [core] Stop logging user pages counts</li>
+<li>46e87fb HUE-7447 [core] Track return call of REST calls</li>
+<li>bc2956b HUE-7447 [core] Log access page return time</li>
+<li>18890c9 HUE-7446 [core] RM HA gets called by mistake on each navopt call</li>
+<li>b7985ba HUE-6093 [frontend] Improved timeout mechanism for Pie charts</li>
+<li>64d6c97 HUE-6093 [frontend] Added resize support for Pie charts</li>
+<li>cacb3dc HUE-6093 [frontend] Added support for basic Pie chart on Plotly</li>
+<li>9a83fc1 HUE-7444 [dashboard] Fix missing d3v3.tip declaration</li>
+<li>1186643 HUE-7441 [core] Allow to blacklist all the apps but dbms and file browser</li>
+<li>e2a97d6 HUE-7439 [editor] Move optimizer call to after check status</li>
+<li>2edfc34 HUE-7440 [core] Remove load balancer cookie in logout view</li>
+<li>2e68d65 HUE-7443 [dashboard] Fix widget add dropdown menu style</li>
+<li>67fc092 HUE-7438 [editor] Query execution time is not updated on short queries</li>
+<li>8eee0f7 HUE-7435 [frontend] Extract Leaflet renderers to a separate common file</li>
+<li>3397098 HUE-7436 [frontend] Avoid overriding of charting data transformers between editor and dashboard</li>
+<li>57a58cb HUE-7434 [core] Support more than one level URLs for custom apps in Hue 4</li>
+<li>d3b87f6 HUE-7437 [dashboard] History back sometimes shows the list of dashboards</li>
+<li>7af41ff HUE-6958 [autocomplete] Add support for Hive ABORT statement</li>
+<li>6099686 HUE-6958 [autocomplete] Improve Hive SHOW TBLPROPERTIES</li>
+<li>9de48d8 HUE-7433 [frontend] Add switch to enable new charting library</li>
+<li>037115b HUE-7432 [frontend] Upgrade Knockout to the latest</li>
+<li>b56a8bf HUE-6244 [home] Menu simplification</li>
+<li>701920f HUE-7428 [core] Opening a view directly from top search lands on a 404</li>
+<li>9b969e1 HUE-7425 [frontend] Add gridster.js library</li>
+<li>949a99a HUE-7427 [editor] Keep the selected database after execution of a statement that refreshes the assist panel</li>
+<li>fce10ed HUE-7078 [editor] Fix console error on hover over old syntax error token</li>
+<li>d9c8b3a HUE-7078 [editor] Improve handling of backticked values in the syntax checker</li>
+<li>df354a2 HUE-7078 [editor] Don&rsquo;t mark custom variables as missing</li>
+<li>f08b853 HUE-7362 [assist] Switch to matching all text values in the sql search instead of at least one</li>
+<li>be1d10f HUE-7424 [frontend] Remove double jQuery library</li>
+<li>90c7ba4 HUE-7418 [hive] Table stats do not have numRows if the stats are not accurate</li>
+<li>4d5e882 HUE-7417 [editor] Variables can override default values depending order</li>
+<li>fe3e8fd HUE-7416 [useradmin] Only display edited users on group change</li>
+<li>417a9cc HUE-7402 [core] Truncate SEARCH Column in Document2 for Oracle database</li>
+<li>aa71cec HUE-7409 [search] More subtle way of converting old types to new types</li>
+<li>a072027 HUE-7362 [assist] Improve the facet handling for the right assistant filter</li>
+<li>e3d922d HUE-7362 [frontend] Improve the autocomplete logic of the inline autocompleter</li>
+<li>bab09db HUE-7362 [assist] Enable filter on column types in the left assist</li>
+<li>5225839 HUE-7362 [assist] Use the new inline autocomplete input for assist filters</li>
+<li>825900f HUE-7362 [assist] Include free text parts in the query specification from the global search parser</li>
+<li>840cc35 HUE-7362 [assist] Extract a generic inline autocomplete component</li>
+<li>d4acb30 HUE-7362 [assist] Extend the global search parser to also include the facet values in the parse results</li>
+<li>42aa66d HUE-7140 [editor] Add select variables</li>
+<li>b167cad HUE-7263 [editor] Resize handle off when scrolled down on editor and variables are present</li>
+<li>f24ffb2 HUE-7234 [editor] New variable should be empty</li>
+<li>cf1eb8a HUE-7186 [editor] Support commenting variables</li>
+<li>a9ad470 HUE-7140 [editor] Add select variables</li>
+<li>6916ae2 HUE-7413 [fb] parent directory should not be selectable</li>
+<li>a8ffe65 HUE-7308 [assist] Refresh files in assist and browser</li>
+<li>aa1f06b HUE-7405 [assist] S3 document filter loses focus on search</li>
+<li>60a1618 HUE-7393 [editor] dash is not recognized in variables</li>
+<li>d742759 HUE-7248 [adls] filter filesystems for copy/save</li>
+<li>6df64e3 HUE-7403 [core] Add 4.1 release notes</li>
+</ul>
+
+<h2 id="contributors">Contributors</h2>
+
+<p>This Hue release is made possible thanks to the contribution from:</p>
+
+<ul>
+<li>Aaron Newton</li>
+<li>Aaron Peddle</li>
+<li>Aaron T. Myers</li>
+<li>abec</li>
+<li>Abraham Elmahrek</li>
+<li>Aditya Acharya</li>
+<li>Adrian Yavorskyy</li>
+<li>airokey</li>
+<li>Alex Breshears</li>
+<li>Alex Newman</li>
+<li>Alex (posi) Newman</li>
+<li>alheio</li>
+<li>alphaskade</li>
+<li>Ambreen Kazi</li>
+<li>Amit Kabra</li>
+<li>Andrei Savu</li>
+<li>Andrew Bayer</li>
+<li>Andrew Yao</li>
+<li>Andy Braslavskiy</li>
+<li>Ann McCown</li>
+<li>antbell</li>
+<li>Antonio Bellezza</li>
+<li>arahuja</li>
+<li>Ashu Pachauri</li>
+<li>Atupal</li>
+<li>Avindra Goolcharan</li>
+<li>bcwalrus</li>
+<li>bc Wong</li>
+<li>Ben Bishop</li>
+<li>Ben Gooley</li>
+<li>Ben White</li>
+<li>Bhargava Kalathuru</li>
+<li>Bruce Mitchener</li>
+<li>Bruno Mahé</li>
+<li>bwang</li>
+<li>cconner</li>
+<li>Chris Conner</li>
+<li>Chris Stephens</li>
+<li>Christopher Conner</li>
+<li>Christopher McConnell</li>
+<li>Christopherwq Conner</li>
+<li>cmconner156</li>
+<li>Craig Minihan</li>
+<li>cwalet</li>
+<li>Daehan Kim</li>
+<li>dbeech</li>
+<li>denniszag</li>
+<li>Derek Chen-Becker</li>
+<li>Diego Sevilla Ruiz</li>
+<li>Dominik Gehl</li>
+<li>Eli Collins</li>
+<li>Enrico Berti</li>
+<li>Erick Tryzelaar</li>
+<li>Ewan Higgs</li>
+<li>fatherfox</li>
+<li>gdgt</li>
+<li>Gilad Wolff</li>
+<li>grundprinzip</li>
+<li>Guido Serra</li>
+<li>happywind</li>
+<li>Harsh</li>
+<li>Harsh J</li>
+<li>Henry Robinson</li>
+<li>Igor Wiedler</li>
+<li>Ilkka Turunen</li>
+<li>Istvan</li>
+<li>Ivan Dzikovsky</li>
+<li>Ivan Orlov</li>
+<li>Jack McCracken</li>
+<li>Jaguar Xiong</li>
+<li>Jakub Kukul</li>
+<li>Jarcek</li>
+<li>jdesjean</li>
+<li>jeff.melching</li>
+<li>Jenny Kim</li>
+<li>Joe Crobak</li>
+<li>Joey Echeverria</li>
+<li>Johan Ahlen</li>
+<li>Johan Åhlén</li>
+<li>Jon Natkins</li>
+<li>Josh Walters</li>
+<li>Karissa McKelvey</li>
+<li>Kevin Wang</li>
+<li>Kostas Sakellis</li>
+<li>krish</li>
+<li>Lars Francke</li>
+<li>Li Jiahong</li>
+<li>linchan-ms</li>
+<li>Linden Hillenbrand</li>
+<li>Luca Natali</li>
+<li>Luke Carmichael</li>
+<li>lvziling</li>
+<li>Marcus McLaughlin</li>
+<li>Mariusz Strzelecki</li>
+<li>Mathias Rangel Wulff</li>
+<li>Matías Javier Rossi</li>
+<li>Michael Prim</li>
+<li>Michal Ferlinski</li>
+<li>Michalis Kongtongk</li>
+<li>Mobin Ranjbar</li>
+<li>motta</li>
+<li>mrmrs</li>
+<li>Nicolas Fouché</li>
+<li>NikolayZhebet</li>
+<li>Olaf Flebbe</li>
+<li>Oren Mazor</li>
+<li>oxpa</li>
+<li>Pala M Muthaia Chettiar</li>
+<li>Patricia Sz</li>
+<li>Patrycja Szabłowska</li>
+<li>pat white</li>
+<li>Paul Battaglia</li>
+<li>Paul McCaughtry</li>
+<li>peddle</li>
+<li>Peter Slawski</li>
+<li>Philip Zeyliger</li>
+<li>Piotr Ackermann</li>
+<li>Prachi Poddar</li>
+<li>Prakash Ranade</li>
+<li>Prasad Mujumdar</li>
+<li>Qi Xiao</li>
+<li>rainysia</li>
+<li>raphi</li>
+<li>Renxia Wang</li>
+<li>Rick Bernotas</li>
+<li>Ricky Saltzer</li>
+<li>robrotheram</li>
+<li>Romain Rigaux</li>
+<li>Roman Shaposhnik</li>
+<li>Roohi</li>
+<li>Roohi Syeda</li>
+<li>Rui Pereira</li>
+<li>Sai Chirravuri</li>
+<li>Scott Kahler</li>
+<li>Sean Mackrory</li>
+<li>Shahab Tajik</li>
+<li>Shawn Van Ittersum</li>
+<li>shobull</li>
+<li>Shrijeet</li>
+<li>Shrijeet Paliwal</li>
+<li>Shuo Diao</li>
+<li>Siddhartha Sahu</li>
+<li>Simon Beale</li>
+<li>Simon Whittaker</li>
+<li>sky4star</li>
+<li>spaztic1215</li>
+<li>Stefano Palazzo</li>
+<li>Stephanie Bodoff</li>
+<li>Suhas Satish</li>
+<li>TAKLON STEPHEN WU</li>
+<li>Tatsuo Kawasaki</li>
+<li>thinker0</li>
+<li>Thomas Aylott</li>
+<li>Thomas Poepping</li>
+<li>Tianjin Gu</li>
+<li>todaychi</li>
+<li>Todd Lipcon</li>
+<li>Tom Mulder</li>
+<li>Vadim Markovtsev</li>
+<li>van Orlov</li>
+<li>vinithra</li>
+<li>voyageth</li>
+<li>vybs</li>
+<li>Wang, Xiaozhe</li>
+<li>Weixia Xu</li>
+<li>William Bourque</li>
+<li>wilson</li>
+<li>Word</li>
+<li>Xavier Morera</li>
+<li>Xhxiong</li>
+<li>xq262144</li>
+<li>Ying Chen</li>
+<li>Yixiao Lin</li>
+<li>Yoer</li>
+<li>Yuriy Hupalo</li>
+<li>ywheel</li>
+<li>Zachary York</li>
+<li>Zach York</li>
+<li>Zhang Ruiqiang</li>
+<li>Zhihai Xu</li>
+<li>z-york</li>
+<li>小龙哥</li>
+</ul>
+
+
+<footer class=" footline" >
+	
+</footer>
+
+
+        
+        </div> 
+        
+
+      </div>
+
+    <div id="navigation">
+        
+        
+        
+        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+            
+        
+        
+        
+
+
+	 
+	 
+    </div>
+
+    </section>
+    
+    <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
+      <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
+    </div>
+    <script src="/hue/latest/js/clipboard.min.js"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.min.js"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js"></script>
+    <script src="/hue/latest/js/jquery.sticky.js"></script>
+    <script src="/hue/latest/js/featherlight.min.js"></script>
+    <script src="/hue/latest/js/html5shiv-printshiv.min.js"></script>
+    <script src="/hue/latest/js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="/hue/latest/js/modernizr.custom.71422.js"></script>
+    <script src="/hue/latest/js/learn.js"></script>
+    <script src="/hue/latest/js/hugo-learn.js"></script>
+
+    <link href="/hue/latest/mermaid/mermaid.css" type="text/css" rel="stylesheet" />
+    <script src="/hue/latest/mermaid/mermaid.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-37637545-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-37637545-1');
+</script>
+  </body>
+</html>
+

@@ -1,0 +1,3683 @@
+<!DOCTYPE html>
+<html lang="en" class="js csstransforms3d">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="Hugo 0.55.5" />
+    <meta name="description" content="">
+
+
+    <link rel="shortcut icon" href="http://cloudera.github.io/hue/latest/images/favicon.png" type="image/x-icon" />
+
+    <title>3.11.0 :: Hue Documentation</title>
+
+    
+    <link href="/hue/latest/css/nucleus.css" rel="stylesheet">
+    <link href="/hue/latest/css/fontawesome-all.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/hybrid.css" rel="stylesheet">
+    <link href="/hue/latest/css/featherlight.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/perfect-scrollbar.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/auto-complete.css" rel="stylesheet">
+    <link href="/hue/latest/css/theme.css" rel="stylesheet">
+    <link href="/hue/latest/css/hugo-theme.css" rel="stylesheet">
+    
+      <link href="/hue/latest/css/theme-hue.css" rel="stylesheet">
+    
+
+    <script src="/hue/latest/js/jquery-2.x.min.js"></script>
+
+    <style type="text/css">
+      :root #header + #content > #left > #rlblock_left{
+          display:none !important;
+      }
+      
+    </style>
+    
+  </head>
+  <body class="" data-url="/hue/latest/releases/release-notes-3.11.0/">
+    <nav id="sidebar" class="">
+
+
+
+  <div id="header-wrapper">
+    <div id="header">
+      <a href="http://gethue.com">
+  <img src="http://cloudera.github.io/hue/latest/images/hue_logo.png" alt="alt text" title="Hue Logo">
+</a>
+
+    </div>
+    
+        <div class="searchbox">
+    <label for="search-by"><i class="fas fa-search"></i></label>
+    <input data-search-input id="search-by" type="search" placeholder="Search...">
+    <span data-search-clear=""><i class="fas fa-times"></i></span>
+</div>
+
+<script type="text/javascript" src="/hue/latest/js/lunr.min.js"></script>
+<script type="text/javascript" src="/hue/latest/js/auto-complete.js"></script>
+<script type="text/javascript">
+    
+        var baseurl = "http:\/\/cloudera.github.io\/hue\/latest\/";
+    
+    var fileSearchBlacklist = "";
+</script>
+<script type="text/javascript" src="/hue/latest/js/search.js"></script>
+
+    
+  </div>
+
+    <div class="highlightable">
+    <ul class="topics">
+
+        
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/" title="Administrator" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/">
+          <b>1. </b>Administrator
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/installation/" title="Installation" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/installation/">
+          Installation
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/installation/dependencies/" title="Dependencies" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/installation/dependencies/">
+          Dependencies
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/installation/install/" title="Install" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/install/">
+        Install
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/installation/containers/" title="Containers" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/containers/">
+        Containers
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/installation/starting/" title="Running" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/starting/">
+        Running
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/" title="Configuration" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/">
+          Configuration
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/server/" title="Server" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/server/">
+          Server
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/editor/" title="Editor" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/editor/">
+          Editor
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/dashboard/" title="Dashboard" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/dashboard/">
+          Dashboard
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/files/" title="Files and Stores" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/files/">
+          Files and Stores
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/external/" title="Other services" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/external/">
+          Other services
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/administration/" title="Administration" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/administration/">
+          Administration
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/reference/" title="Reference Architecture" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/reference/">
+        Reference Architecture
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/operations/" title="Operations" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/operations/">
+        Operations
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/user-management/" title="User Management" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/user-management/">
+        User Management
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/database/" title="Database" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/database/">
+        Database
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/" title="User" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/">
+          <b>2. </b>User
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/concept/" title="Concepts" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/concept/">
+          Concepts
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/editor/" title="SQL Editor / Notebook" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/editor/">
+          SQL Editor / Notebook
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/dashboards/" title="Dashboard" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/dashboards/">
+          Dashboard
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/browsers/" title="Data Catalog" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/browsers/">
+          Data Catalog
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/scheduler/" title="Scheduler" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/scheduler/">
+          Scheduler
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/contrib/" title="Contrib" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/contrib/">
+          Contrib
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/" title="Developer" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/">
+          <b>3. </b>Developer
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/development/" title="Development" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/development/">
+          Development
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/editor/" title="Editor / Notebook" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/editor/">
+          Editor / Notebook
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/api/" title="APIs" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/api/">
+          APIs
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/browsers/" title="Browsers" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/browsers/">
+          Browsers
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/application/" title="Applications" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/application/">
+          Applications
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/releases/" title="Releases" class="dd-item 
+        parent
+        
+        
+        ">
+      <a href="/hue/latest/releases/">
+          <b>4. </b>Releases
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.4.0/" title="4.4.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.4.0/">
+        4.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.3.0/" title="4.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.3.0/">
+        4.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.2.0/" title="4.2.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.2.0/">
+        4.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.1.0/" title="4.1.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.1.0/">
+        4.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.0.0/" title="4.0.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.0.0/">
+        4.0.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.12.0/" title="3.12.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.12.0/">
+        3.12.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.11.0/" title="3.11.0" class="dd-item active">
+        <a href="/hue/latest/releases/release-notes-3.11.0/">
+        3.11.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.10.0/" title="3.10.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.10.0/">
+        3.10.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.9.0/" title="3.9.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.9.0/">
+        3.9.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.8.0/" title="3.8.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.8.0/">
+        3.8.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.7.0/" title="3.7.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.7.0/">
+        3.7.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.6.0/" title="3.6.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.6.0/">
+        3.6.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.5.0/" title="3.5.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.5.0/">
+        3.5.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.0.0/" title="3.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.0.0/">
+        3.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.5.0/" title="2.5.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.5.0/">
+        2.5.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.4.0/" title="2.4.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.4.0/">
+        2.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.3.0/" title="2.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.3.0/">
+        2.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.2.0/" title="2.2.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.2.0/">
+        2.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.1.0/" title="2.1.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.1.0/">
+        2.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.0.1/" title="2.0.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.0.1/">
+        2.0.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.0.0-beta/" title="2.0.0-beta" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.0.0-beta/">
+        2.0.0-beta
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.2.0/" title="1.2.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.2.0/">
+        1.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.1.0/" title="1.1.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.1.0/">
+        1.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.0.1/" title="1.0.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.0.1/">
+        1.0.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.0.0/" title="1.0.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.0.0/">
+        1.0.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.9.1/" title="0.9.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.9.1/">
+        0.9.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.9.0/" title="0.9.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.9.0/">
+        0.9.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.4.2/" title="0.4.2" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.4.2/">
+        0.4.2
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.4.1/" title="0.4.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.4.1/">
+        0.4.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.4.0/" title="0.4.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.4.0/">
+        0.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.3.0/" title="0.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.3.0/">
+        0.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+         
+    </ul>
+
+    
+    
+      <section id="shortcuts">
+        <h3>More</h3>
+        <ul>
+          
+              <li> 
+                  <a class="padding" href="https://github.com/cloudera/hue"><i class='fab fa-fw fa-github'></i> GitHub</a>
+              </li>
+          
+              <li> 
+                  <a class="padding" href="http://demo.gethue.com"><i class='fas fa-fw fa-play'></i> Demo</a>
+              </li>
+          
+              <li> 
+                  <a class="padding" href="http://gethue.com"><i class='fas fa-fw fa-bookmark'></i> gethue.com</a>
+              </li>
+          
+        </ul>
+      </section>
+    
+
+    
+    <section id="footer">
+      <p>Built with <a href="https://github.com/matcornic/hugo-theme-learn">Learn</a> and <a href="http://gohugo.io/">Hugo</a></p>
+
+    </section>
+  </div>
+</nav>
+
+
+
+
+
+        <section id="body">
+        <div id="overlay"></div>
+        <div class="padding highlightable">
+              
+              <div>
+                <div id="top-bar">
+                
+                  
+                  
+                  
+                  <div id="top-github-link">
+                    <a class="github-link" title='Edit this page' href="https://github.com/cloudera/hue/blob/master/docs/docs-site/content/releases/release-notes-3.11.0.md" target="blank">
+                      <i class="fas fa-code-branch"></i>
+                      <span id="top-github-link-text">Edit this page</span>
+                    </a>
+                  </div>
+                  
+                
+                <div id="breadcrumbs" itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb">
+                    <span id="sidebar-toggle-span">
+                        <a href="#" id="sidebar-toggle" data-sidebar-toggle="">
+                          <i class="fas fa-bars"></i>
+                        </a>
+                    </span>
+                  <span class="links">
+                 
+                 
+                    
+            
+            
+              
+              
+            
+            
+              
+              
+            
+            
+              <a href='/hue/latest/'>Hue Guide</a> > <a href='/hue/latest/releases/'>Releases</a> > 3.11.0
+            
+          
+            
+          
+            
+          
+                 
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+
+        
+        <div class="body-outer">
+          
+          
+              <aside class="toc">
+  <div class="wrapper">
+    <header>
+    <h4>What's on this Page</h4>
+    </header>
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#hue-v3-11-0-released-aug-17th-2016">Hue v3.11.0, released Aug 17th 2016</a></li>
+</ul></li>
+<li><a href="#latest-notable-features">Latest Notable Features</a></li>
+<li><a href="#compatibility">Compatibility</a></li>
+<li><a href="#list-of-756-commits">List of 756 Commits</a></li>
+<li><a href="#contributors">Contributors</a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</aside>
+          
+          <div id="body-inner">
+
+            
+              <h1>3.11.0</h1>
+            
+
+          
+
+
+
+
+<h3 id="hue-v3-11-0-released-aug-17th-2016">Hue v3.11.0, released Aug 17th 2016</h3>
+
+<p>Hue, <a href="http://gethue.com">http://gethue.com</a>, is an open source Web UI for easily doing Big Data analysis with Hadoop.</p>
+
+<p>Its main features:</p>
+
+<ul>
+<li>SQL editors for Hive, Impala, MySQL, Oracle, PostGresl, SparkSQL, Solr SQL, Phoenix&hellip;</li>
+<li>Dynamic Search dashboards with Solr</li>
+<li>Spark and Hadoop notebooks</li>
+<li>Scheduling of jobs and workflows through an Oozie Editor and Dashboard</li>
+</ul>
+
+<p>More user and developer documentation is available at <a href="http://gethue.com">http://gethue.com</a>.</p>
+
+<h2 id="latest-notable-features">Latest Notable Features</h2>
+
+<p>The complete list and video demos are on (Hue 3.11 with its new S3 Browser and SQL Autocomplete is out!
+)[<a href="http://gethue.com/hue-3-11-with-its-new-s3-browser-and-sql-autocomplete-is-out/">http://gethue.com/hue-3-11-with-its-new-s3-browser-and-sql-autocomplete-is-out/</a>].</p>
+
+<p>S3 Browser</p>
+
+<ul>
+<li>List, browse</li>
+<li>Upload, download</li>
+<li>Create external Hive table</li>
+<li>Export query result</li>
+<li>List S3 URI in Sentry</li>
+<li>Set Oozie coordinator dependencies on S3 paths</li>
+</ul>
+
+<p>SQL Autocompleter</p>
+
+<ul>
+<li>Brand new SQL grammar for Hive and Impala</li>
+<li>Support all the major operations like SELECT, CREATE, DROP</li>
+<li>Autocomplete UDFs and show their documentation</li>
+<li>Weight keywords and columns by importance</li>
+<li>Infer the types and propose compatible columns or UDFs</li>
+<li>See more in <a href="https://issues.cloudera.org/browse/HUE-4039">https://issues.cloudera.org/browse/HUE-4039</a></li>
+</ul>
+
+<p>SQL Result Refinements</p>
+
+<ul>
+<li>Result grid improvements</li>
+<li>Timeout popup when Impala hangs on fetch result</li>
+<li>Offer to fix certain rows</li>
+<li>Search through the results</li>
+<li>Excel download now has a progress status</li>
+<li>Fixed resultset legend and header when scrolling throught the results</li>
+<li>Column and type search</li>
+<li>Optimized to display hundred columns</li>
+<li>Export SQL query result to Solr</li>
+</ul>
+
+<p>Solr Indexer</p>
+
+<ul>
+<li>New indexer</li>
+<li>Leverage Morphline to submit a MapReduce jobs that scales</li>
+<li>Offer light ETL operations like splitting a field, GeoIp, replace, grok</li>
+</ul>
+
+<h2 id="compatibility">Compatibility</h2>
+
+<p>Runs on CentOS versions 5 to 6, Red Hat Enterprise Linux (RHEL 5 and 6), and Ubuntu 12.04 and 14.04.</p>
+
+<p>Tested with CDH5. Specifically:</p>
+
+<ul>
+<li>Hadoop 2.6.0</li>
+<li>Hive 1.1</li>
+<li>Oozie 4.1</li>
+<li>HBase 1.2</li>
+<li>Pig 0.12</li>
+<li>Impala 2.5</li>
+<li>Solr 4.10</li>
+<li>Sqoop2 1.99.5</li>
+<li>Spark 1.6</li>
+</ul>
+
+<p>These minimum versions should work (not tested):</p>
+
+<ul>
+<li>Hadoop 0.20 / 1.2.0 / 2.0.0</li>
+<li>Hive 0.12.0</li>
+<li>Oozie 3.2</li>
+<li>HBase 0.92</li>
+<li>Pig 0.8</li>
+<li>Impala 1.0</li>
+<li>Solr 3.6</li>
+<li>Sqoop2 1.99.3</li>
+<li>Spark 1.4</li>
+</ul>
+
+<p>Supported Browsers:</p>
+
+<p>Hue works with the two most recent versions of the following browsers. Make sure cookies and JavaScript are turned on for the browser.</p>
+
+<ul>
+<li>Chrome</li>
+<li>Firefox LTS</li>
+<li>Safari (not supported on Windows)</li>
+<li>Internet Explorer</li>
+</ul>
+
+<p>Hue might work with Chrome 23, Firefox 23, IE8, Safari 6, or older browser version, but you might not be able to use all of the features.</p>
+
+<p>Runs with Python 2.6.5+</p>
+
+<p>Note: CentOS 5 and RHEL 5 requires EPEL python 2.6 package.</p>
+
+<h2 id="list-of-756-commits">List of 756 Commits</h2>
+
+<ul>
+<li>d1222a2 HUE-4658 [doc] Update release 3.11</li>
+<li>1842de1 HUE-4567 [aws] Read AWS credentials from configured script files</li>
+<li>cd6f67b HUE-4403 [aws] Close file after read using fast=True</li>
+<li>c810ce2 HUE-4579 [editor] The new autocompleter should support Hive INSERT statements</li>
+<li>34979a0 HUE-4587 [editor] The new autocompleter should completely support EXPLAIN</li>
+<li>06320ef HUE-4637 [editor] Scroll on column list is extremly slow on Linux</li>
+<li>49ec11d HUE-4625 [fb] S3 filechooser popup do not display the parent directory as ..</li>
+<li>d527018 HUE-4650 [fb] Selecting S3A from filechooser is not displaying the S3 filesystem</li>
+<li>3d8965b HUE-4651 [fb] Prevent inline display of non authorized mime types</li>
+<li>f60472e HUE-4652 [core] Add settings for django-axes AXES_BEHIND_REVERSE_PROXY and AXES_REVERSE_PROXY_HEADER</li>
+<li>e9851a9 HUE-2971 [oozie] Some links of a Fork can point to deleted nodes</li>
+<li>ed3bb9a HUE-3831 [oozie] Show operations inside the HDFS fs graph node for external workflows</li>
+<li>47bbea3 HUE-4649 [sqoop] SqoopResource got broken after change in Resource</li>
+<li>99f3ada HUE-4502 [editor] Fix issue with column type precision</li>
+<li>27b5055 HUE-4641 [indexer] GeoIP will stop indexing if an IP is missing from it&rsquo;s lookup table</li>
+<li>f89353d HUE-4582 [editor] The new autocompleter should fully support LOAD</li>
+<li>991b482 HUE-4577 [editor] The new autocompleter should support CREATE, DROP and SET ROLE</li>
+<li>e0f85d7 HUE-4574 [editor] Enable autocompletion after &lsquo;-&rsquo; without whitespace</li>
+<li>cbae56e HUE-4638 [editor] Infinite scroll blinks the fixed legend when fetching the next 100 batch</li>
+<li>1619501 HUE-4610 [editor] Avoid trembling of fixed headers on query editing</li>
+<li>5ee139c HUE-4648 [security] The File ACLs tree doesn&rsquo;t render if there&rsquo;s a file in the HDFS root</li>
+<li>cfc91cc HUE-4647 [home] Better align new document dropdown</li>
+<li>65b202c HUE-4646 [core] The initial welcome wizard redirects to the old home</li>
+<li>89f5242 HUE-4067 [assist] Fix issue with truncated columns of the last assist entry</li>
+<li>ee0a6a1 HUE-4644 [editor] Don&rsquo;t refresh the assist 5 seconds after loading a query</li>
+<li>9b21a3d HUE-4598 [editor] Empty table list sometimes the first time</li>
+<li>b4578d3 HUE-4642 [editor] Ace autocomplete should honour the weights for partial matching</li>
+<li>00e77ec HUE-4643 [editor] Autocompleter is silent for the second argument of concat</li>
+<li>40281e5 HUE-4645 [core] Disable inline display of SVG files</li>
+<li>7ffccce HUE-4626 [fb] S3 in the filechooser do not show up with FF</li>
+<li>5b2879d HUE-4560 [core] Add permissions controls to authorize access to S3 across all components</li>
+<li>808dd74 HUE-4522 [beeswax] Remove max_rows limit for HiveServer2 get_configuration</li>
+<li>5fced5e HUE-4634 [editor] The autocompleter should allow some errors in the select list</li>
+<li>8e2c3eb HUE-4586 [editor] The new autocompleter should completely support SELECT</li>
+<li>a6c4982 HUE-4635 [jb] Fix duration on jobs page for running jobs</li>
+<li>bdeb8d3 HUE-4506 [editor] Update test with new detailed error message</li>
+<li>30f2923 HUE-4632 [oozie] Log which type of oozie action are created in workflows</li>
+<li>432d52b HUE-4611 [editor] Export to S3 should not say HDFS</li>
+<li>7490137 HUE-4569 [editor] If we don&rsquo;t have a query history select the saved query tab</li>
+<li>c215733 HUE-4506 [editor] Provide more information why query couldn&rsquo;t be saved</li>
+<li>082f60b HUE-4628 [useradmin] Prettify and unify help icons</li>
+<li>14680cd HUE-4604 [editor] Locked rows does not go well with headers</li>
+<li>00e3440 HUE-4315 [editor] Error when sharing a query with R permission</li>
+<li>5502082 HUE-4621 [core] Fix tests due to closed stdout handle</li>
+<li>0c01184 HUE-4568 [editor] Export a query to an index</li>
+<li>8042ff0 HUE-4526 [indexer] Submit notebook as batch job</li>
+<li>8baecf4 HUE-4586 [editor] The new autocompleter should support GROUPING SETS, CUBE and ROLLUP</li>
+<li>0bf4a75 HUE-4581 [editor] The new autocompleter should support DROP FUNCTION</li>
+<li>3f5e1e0 HUE-4580 [editor] The new autocompleter should support ANALYZE TABLE</li>
+<li>5cf870b HUE-4600 [editor] Result table headers breaks on sort</li>
+<li>0d0def2 HUE-4609 [editor] Resizing the window should resize also the column list/grid</li>
+<li>cccb67f HUE-4618 [editor] Query selection highlighting does not stay</li>
+<li>f60c4ee HUE-4614 [editor] Query result search box always present when switching tabs</li>
+<li>0fb990b HUE-4603 [fb] Disable bucket move and copy</li>
+<li>1f56edc HUE-4623 [editor] ON and ASC and DESC are not being highlighted on Impala</li>
+<li>48fa31b HUE-4624 [editor] Doing enter in the query result search box could go to the next match</li>
+<li>5fe014e HUE-4397 [fb] Hide upload archive in S3</li>
+<li>059f4ae HUE-4601 [fb] Creating a bucket with a not allowed name on S3 will HTTP 500</li>
+<li>7c3324d HUE-4621 [core] On loaddata failure, print stdout to logs</li>
+<li>5e73a61 HUE-4616 [editor] Only select the snippet DB when executing the first statement</li>
+<li>20ae4d6 HUE-4563 [impala] Handle case for non-string partition keys or values</li>
+<li>a150dd2 HUE-4570 [editor] Autocomplete popup disappears even when calling it when typing</li>
+<li>76a8068 HUE-4575 [core] Add notice to hue.ini regarding the custom maps and security</li>
+<li>34d9893 HUE-4572 [core] Fix HueDataTable with multiple instances on the same page</li>
+<li>4158ab4 HUE-4576 [editor] Fix autocompletion before OR in value expressions</li>
+<li>592a023 HUE-4374 [editor] No autocomplete appearing in ORDER BY with an operation</li>
+<li>8685080 HUE-4573 [editor] The autocompleter should support carriage return in statements</li>
+<li>dc89922 HUE-4465 [notebook] Bump the darkness of the non selected icons</li>
+<li>f72ea7a HUE-4519 [fb] Fix upload test with updated message</li>
+<li>bbd851f HUE-4566 [metastore] Query created by Browse Data action should have a limit and semi-colon</li>
+<li>8b97243 HUE-4565 [core] Update natural sort algorithm</li>
+<li>7202728 HUE-4564 [core] Log stderr on failure to coerce password from script</li>
+<li>2384b67 HUE-4535 [editor] Add additional autocompletion for ALTER, CREATE and DROP</li>
+<li>e5e8f80 HUE-4335 [editor] New autocompleter should handle date types</li>
+<li>a4fe3af HUE-4551 [editor] The new autocompleter should support CTEs (WITH) and UNION</li>
+<li>014aa88 HUE-4562 [editor] Switching to marker map makes the page freeze</li>
+<li>63f788c HUE-4552 [editor] Improve performance on checking/unchecking all fields</li>
+<li>aa2e9ad HUE-4555 [core] Avoid opening file chooser on enter key</li>
+<li>7c44807 HUE-4519 [fb] Check for user permissions first before uploading</li>
+<li>bfdc73b HUE-4559 [indexer] Enable Select Fields button when a path has been entered into wizard</li>
+<li>dcf56cb HUE-4556 [core] Fix coverage failure due to missing source files</li>
+<li>7275422 HUE-4524 [hadoop] Fix test_yarn_ssl_validate which assumes default YARN_CLUSTER is defined</li>
+<li>6f005fd HUE-4553 [oozie] The dashboard table scrolls horizontally</li>
+<li>bdc87a4 HUE-4469 [editor] Can have lot of white spaces below the query</li>
+<li>0dfcc7a HUE-4554 [editor] Status checking can go in infinite loop in batch mode</li>
+<li>ad0fde2 HUE-4549 [core] Missing file for the collect static plugin</li>
+<li>6ea74a9 HUE-4550 [fb] Fix file chooser for S3 after S3A migration</li>
+<li>272fb7d HUE-4548 [editor] Sample popup tab seems off</li>
+<li>8e602ed HUE-4513 [editor] Add default autocompletion weights for columns, tables, functions etc.</li>
+<li>14926bc HUE-4281 [editor] Fail gracefully and return an error when trying to import a wrong/corrupted JSON file</li>
+<li>2560694 HUE-4417 [aws] Switch from s3 to s3a to enable direct save to S3</li>
+<li>f134a3c HUE-4544 [indexer] Extend Parquet morphline to support generic fields</li>
+<li>35a4385 HUE-4401 [fb] Do not return any date for bucket and directory objects</li>
+<li>6e55ce9 HUE-4513 [editor] Use weights for keyword autocompletion</li>
+<li>cd0db36 HUE-4488 [editor] Show result row detail view</li>
+<li>1d42dc8 HUE-4530 [indexer] Fix field type guessing from a table</li>
+<li>adfb382 HUE-4530 [indexer] Re-introduce job link for now</li>
+<li>5468e61 HUE-4542 [editor] Column filter should be 100% of the column list width</li>
+<li>19fb1df HUE-4530 [indexer] Improved look&rsquo;n&rsquo;feel of the app</li>
+<li>ac40704 HUE-4511 [editor] Field scroll does not scroll or grey the column</li>
+<li>6c4bc66 HUE-4495 [assist] Switching DB does not display the tables</li>
+<li>d6ba984 HUE-4530 [indexer] Enable the full assist and dragging options</li>
+<li>2a5f7c5 HUE-4539 [search] Remove field collapse icon</li>
+<li>93794f7 HUE-4538 [search] Field detail popup cannot always be closed</li>
+<li>80e29a6 HUE-4540 [jb] Lower max number of jobs displayed on the main page</li>
+<li>9df36a6 HUE-4530 [indexer] Progress bar on indexing</li>
+<li>52653b1 HUE-4530 [indexer] Hook up EditorViewModel with the table indexer</li>
+<li>38c5701 HUE-4530 [indexer] Prettify file format to stay on the same line</li>
+<li>bb2c54b HUE-4530 [indexer] Add parquet format and full column types for nested types</li>
+<li>b6b7636 HUE-4530 [indexer] Submit notebooks as batch</li>
+<li>25dbd6d HUE-4530 [indexer] Add hardcoded parquet format</li>
+<li>b1334a7 HUE-4530 [indexer] Fix file type load</li>
+<li>4d5dd79 HUE-4530 [notebook] Submit indexer as a batch job</li>
+<li>3a1233f HUE-4530 [indexer] Enable dropdown to change file type</li>
+<li>2d7e8f6 HUE-4530 [indexer] First pass for nested fields style</li>
+<li>730ea7f HUE-4530 [indexer] Fixed nested add operation</li>
+<li>c8c630f HUE-4530 [indexer] UX to ask the user to fill up the collection name in any case</li>
+<li>42af931 HUE-4530 [indexer] Allow to select parquet tables</li>
+<li>50b2440 HUE-4530 [indexer] Add link to Solr collection</li>
+<li>0599222 HUE-4530 [indexer] Dynamically pickup the column separator for test tables</li>
+<li>cedbf46 HUE-4530 [indexer] Started restyling first step</li>
+<li>3948309 HUE-4530 [indexer] Added hive chooser</li>
+<li>364aff0 HUE-4530 [indexer] Move format selection to step 2</li>
+<li>2328c4a HUE-4530 [indexer] Index all the data of a CSV table</li>
+<li>1c091f9 HUE-4530 [indexer] Removed big loading and put spinner in the wizard circles</li>
+<li>dbc5f4e HUE-4530 [indexer] Get full table metadata to get the correct field types</li>
+<li>d1d7299 HUE-4530 [indexer] Added wizard circles</li>
+<li>1c9e5ee HUE-4530 [indexer] Work with the sample_07 table</li>
+<li>051b270 HUE-4530 [indexer] Basic metadata pulling for Hive tables</li>
+<li>cf1532d HUE-4534 [indexer] Fix syslog groking for smart indexer</li>
+<li>56c808e HUE-4530 [indexer] Skeleton for file and table selection</li>
+<li>33ad8f8 HUE-4530 [indexer] Added wizard skeleton</li>
+<li>527e4e6 HUE-4530 [indexer] List available saved Hive queries</li>
+<li>5c1bc6b HUE-4530 [indexer] Added spinner for field type guessing</li>
+<li>ea6c9a9 HUE-4530 [indexer] Removed horizontal scroll from the page</li>
+<li>6d91117 HUE-4530 [indexer] Offer 3 new input file formats</li>
+<li>47c4ee8 HUE-4530 [indexer] Only warn when the collection name is empty</li>
+<li>cd5de7b HUE-4526 [oozie] Add tests to the generation of workflows</li>
+<li>587ef1c HUE-4526 [oozie] Rename test file to follow the _tests convention</li>
+<li>ac53520 HUE-4526 [oozie] Refactor to have only one way to save a workflow</li>
+<li>a72a419 HUE-4526 [oozie] API to generate sequential workflow with sequential document actions</li>
+<li>b245e19 HUE-4395 [fb] S3 delete bucket implementation</li>
+<li>17585b7 HUE-4537 [core] Fix database_logging in hue config so it logs debug database messages</li>
+<li>f82c280 HUE-4399 [fb] Renaming a key (non-bucket directory) creates an extraneous empty file</li>
+<li>f232d86 HUE-4531 [fb] Enable deleting buckets on S3</li>
+<li>78ca1b7 HUE-4536 [editor] Load query generates JS error</li>
+<li>221ac4f HUE-4535 [editor] Add autocomplete for CREATE and ALTER statements</li>
+<li>411b335 HUE-4489 [editor] The new autocompleter should allow white space between UDF name and parenthesis</li>
+<li>6ae35be HUE-4533 [core] Disable password reveal on IE</li>
+<li>14f603e HUE-4512 [editor] Header and column not always aligned</li>
+<li>a8837c1 HUE-4523 [editor] Enable resizing of the column list panel</li>
+<li>01bcbd4 HUE-4398 [fb] API should check if bucket already exists in the region and bubble up the error</li>
+<li>bbbe104 HUE-4430 [editor] Batch execution often fails to show any output</li>
+<li>e4c3a81 HUE-4527 [indexer] Date fields that aren&rsquo;t required can crash the indexing job</li>
+<li>3922210 HUE-4515 [oozie] Remove oozie.bundle.application.path from properties when rerunning workflow</li>
+<li>014a8d6 HUE-4518 [editor] Update basic state icon</li>
+<li>5a8e81a HUE-4518 [editor] Use different icon for the column list</li>
+<li>4f70b95 HUE-4521 [editor] Hide/show column doesn&rsquo;t work on fixed rows</li>
+<li>6d9284b HUE-4508 [editor] Search in result set is js erroring</li>
+<li>9bc2d5b HUE-4503 [fb] Update tests with for bucket dates</li>
+<li>945de4e HUE-4514 [beeswax] Fix test_explain_query and test_explain_query_i18n for default execution engine Tez</li>
+<li>fa56692 HUE-4516 [indexer] Switching file types doesn&rsquo;t update fields properly in the indexer wizard</li>
+<li>758c3fc HUE-4501 [indexer] Add basic hive CSV file format outline to indexer</li>
+<li>91c977c HUE-4503 [fb] Disable timestamp for S3 buckets and folders</li>
+<li>3955f47 HUE-4492 [indexer] Rename test file to follow convention</li>
+<li>16a63c3 HUE-4492 [indexer] Migrate to the oozie library to submit the java indexer job</li>
+<li>383d91f HUE-4490 [oozie] Generate workflow from Java snippet</li>
+<li>14f2b3f HUE-4507 [editor] Cannot see column names in the gradient map visualization</li>
+<li>28f174f HUE-4505 [editor] Resultset search is too transparent</li>
+<li>0b8e7b4 HUE-4499 [editor] Gradient map not always showing on the editor</li>
+<li>63731ae HUE-4491 [fb] Enable creating buckets on S3</li>
+<li>e128f66 HUE-4494 [indexer] Add a load from JSON function to Create Index Wizard</li>
+<li>702dbeb HUE-4479 [indexer] Allow indexing multiple files on the same collection</li>
+<li>22eddf3 HUE-4493 [oozie] Fix sync-workflow action when Workflow includes sub-workflow</li>
+<li>9cec497 HUE-4487 [editor] Result table search</li>
+<li>8fef8d2 HUE-4486 [editor] Add back sorting to the result table</li>
+<li>fc380a3 HUE-4485 [editor] Scroll to assist entries from search result</li>
+<li>08f74de HUE-4484 [editor] Add column name and type to the title of column browser</li>
+<li>293b0eb HUE-4480 [meta] Add description and parent info to columns and partitions</li>
+<li>ea01b79 HUE-4480 [meta] Search parameters are not all sent to the API</li>
+<li>a7e16eb HUE-4483 [core] Do not use backticks in the ini files</li>
+<li>e35d4ed HUE-4882 [editor] Redraw fixed header on column toggling</li>
+<li>8ca3005 HUE-4480 [core] JSON download is actually not a generator</li>
+<li>bd2bc1c HUE-4481 [editor] Show a message when the Excel results have been truncated</li>
+<li>cc311ca HUE-4480 [meta] Filter SQL objects in the backend</li>
+<li>6bb0b14 HUE-4462 [editor] Status and progress report when downloading large Excel files</li>
+<li>32809cc HUE-4441 [editor] Set result menu as fixed</li>
+<li>ef6f90e HUE-4442 [editor] Prettify column list scroll bars</li>
+<li>b28b5e2 HUE-3308 [oozie] Remove commented parts not used</li>
+<li>a751f0c HUE-3308 [oozie] Generate graph of worklows not coming from the editor</li>
+<li>d61b94e HUE-3308 [oozie] Display the selected Java program in the document action</li>
+<li>03378b2 HUE-3308 [editor] Get the output of the Java command</li>
+<li>2f0d543 HUE-3308 [oozie] Generate the workflow from the save document</li>
+<li>53eb8a7 HUE-3308 [editor] Jar snippet</li>
+<li>b67941a HUE-3227 [connector] Java snippet</li>
+<li>368e6a6 HUE-3838 [oozie] Deprecate jar_path copy and use oozie.libpath instead for actions with jars</li>
+<li>3080671 HUE-4474 [indexer] Let user set an existing field to unique id</li>
+<li>2c748b0 HUE-4478 [editor] Style the editor settings panel</li>
+<li>d1a3a98 HUE-4386 [editor] Make it possible to turn autocomplete on or off</li>
+<li>e92d12d HUE-4433 [editor] The new autocompleter should handle analytical functions</li>
+<li>0addcba HUE-4477 [security] Select All is not filtering out the non visible roles from the selection</li>
+<li>e485732 PR405 [build] Avoid make failure when default python is python3</li>
+<li>c52f0f4 HUE-4476 [editor] Add RESET to the Hive highlight</li>
+<li>9dde45e HUE-4475 [editor] Lines are not expanded when loading a long query from the cookie</li>
+<li>fafb5c5 HUE-4470 [editor] Snippet properties for File filechooser always starts at /</li>
+<li>1480fef HUE-4463 [editor] Result column search on column types too</li>
+<li>fb79880 HUE-4464 [editor] Result column quick scroll does not scroll with a search</li>
+<li>cede73e HUE-4461 [metastore] If create external table is selected, input path needs to be a directory</li>
+<li>c70e6c3 HUE-4471 [indexer] Add geoip operation automatically to hue format</li>
+<li>732a8e0 HUE-4445 [fb] Fixed CSS for file uploader</li>
+<li>fcda9d2 HUE-3308 [spark] Some more refactoring after moving Livy to external project</li>
+<li>8a93323 HUE-3394 [notebook] Jar submit button is always disabled</li>
+<li>14e240f HUE-4358 [metastore] Remove toggling meta switch</li>
+<li>f211725 HUE-3308 [spark] Moving out references to Livy as it moved to its project</li>
+<li>27c7fa2 HUE-4445 [fb] Return correct result response on file upload</li>
+<li>e1f30dc HUE-4466 [security] deliver csrftoken cookie with secure bit set if possible.</li>
+<li>0ee9a5d HUE-4080 [editor] Delete queries from editor does not send to the trash</li>
+<li>104e72f HUE-4452 [metadata] Restore tagging functionality to Navigator API client</li>
+<li>57e0031 HUE-4452 [metadata] Fix optimizer view name and update navigator API version to v9</li>
+<li>de560a3 HUE-4467 [indexer] Add field operation morphline generation tests for each operation</li>
+<li>2af74a7 HUE-4455 [security] secure_content_security_policy breaks the editor and GA</li>
+<li>6de223d HUE-4459 [indexer] Add morphline generation tests for each file format</li>
+<li>749908d HUE-4438 [editor] Progress status and truncating warning whendirect downloading results as Excel</li>
+<li>8c86fb2 HUE-4451 [editor] Add tooltips to result set legend</li>
+<li>d7a2b9a HUE-3308 [spark] Migrate Livy to external respository</li>
+<li>08383c4 HUE-4379 [editor] Autocompleter should support CREATE TABLE statements</li>
+<li>b9e9456 HUE-4457 [editor] Column legend horizontal scroll bar are missing until we scroll down</li>
+<li>158b86f HUE-3960 [editor] Avoid redrawing on every horizontal scroll</li>
+<li>2d9feae HUE-3960 [editor] Furtherly improved initial rendering of the table</li>
+<li>3884632 HUE-4450 [desktop] Fix HTTPS termination using X-Forwarded-Proto header</li>
+<li>33b85b9 HUE-4448 [hbase] Change test_list_tables hbase test to query each cluster name</li>
+<li>9f52773 HUE-4454 [security] Disclosure of Web Server Information</li>
+<li>68b9434 HUE-4443 [security] Automatically default secure_ssl_redirect to True when HTTPS is setup</li>
+<li>d428e97 HUE-4444 [beeswax] test_analyze_table_and_read_statistics doesn&rsquo;t test correctly with Hive 2</li>
+<li>76d944f HUE-4449 [indexer] Add ruby log to indexer</li>
+<li>2c00e06 HUE-4311 [fb] Add boto http_socket_timeout configuration</li>
+<li>772c542 HUE-4372 [core] Backport Django Security middleware or add HTTP security headers</li>
+<li>2318ad1 HUE-3960 [editor] Increase generation performance of the fixed header</li>
+<li>a399c7a HUE-3960 [editor] Avoid complete redrawing of the fixed header</li>
+<li>b55b0f2 HUE-4440 [editor] Assist slightly scrolls horizontally</li>
+<li>f613b5c HUE-4427 [metastore] Filepicker should allow directories when selecting external table</li>
+<li>44e9ddf HUE-3960 [editor] Increase generation performance of the fixed first column</li>
+<li>0ebb013 HUE-4434 [editor] Fixed header has a wrong offset in fullscreen when the editor is manually resized</li>
+<li>db996e5 HUE-4439 [notebook] Fix notebook TestHiveserver2ApiWithHadoop.test_explain</li>
+<li>b021216 HUE-4345 [fb] Remove incorrect mkdir/listdir test for directory name with invalid chars</li>
+<li>2e95812 HUE-4345 [fb] Fix filebrowser tests by avoiding unicode decoding</li>
+<li>89e64c2 HUE-4435 [test] Add list_modules subcommand to hue test</li>
+<li>49b4e41 HUE-4436 [hive] Fix test_install_examples tests to point at the database configured in BeeswaxSampleProvide</li>
+<li>9182f6b HUE-4431 [editor] Batch mode does not always update the query</li>
+<li>a525bdf HUE-4331 [editor] Log call should return only the additional ones after the first call</li>
+<li>8ee9f9c HUE-4345 [aws] Fix Actions when viewing an S3 file in filebrowser</li>
+<li>1cef9b4 HUE-4437 [editor] The autocompleter should handle multiple db references in table primaries for Impala</li>
+<li>94c99c9 HUE-4429 [oozie] Generate unique workspace for managed workflows</li>
+<li>7fbe1c8 HUE-4432 [editor] The new autocompleter should be more forgiving when editing incomplete UDFs in select list</li>
+<li>47ea04f HUE-3960 [editor] Removed performance degrading CSS</li>
+<li>105c1cc HUE-4416 [editor] Do not save the coordinator constants in the json model</li>
+<li>e5c719d HUE-3960 [editor] Improved performances of the new datatable</li>
+<li>548ead4 HUE-4291 [metastore] Do not use smallints in the create table from file wizard</li>
+<li>4554c5a HUE-4418 [editor] Sessions tab doesn&rsquo;t display properly once the Settings is expanded</li>
+<li>69f85ee HUE-4425 [metastore] UX create table from a file, S3 or from a directory</li>
+<li>0075185 HUE-4366 [metastore] Avoid lowercasing non-S3 paths in create table wizard</li>
+<li>20ad49d HUE-4426 [editor] The new autocompleter should work with all SQL dialects</li>
+<li>962e026 HUE-4366 [metastore] Add an option to create a table from a file in an external location</li>
+<li>655de2f HUE-4414 [editor] Allow to send queries even after closing the session</li>
+<li>8be462b HUE-4413 [dbms] Security: Full XSS in DBQuery editor</li>
+<li>cabc9ff HUE-4424 [librdbms] Support more than one database</li>
+<li>5123af8 HUE-4423 [editor] Persist the coordinator ID of a submitted schedule</li>
+<li>4780ddd HUE-4421 [editor] New saved query should be schedulable</li>
+<li>008a132 HUE-4419 [editor] The new autocompleter should suggest columns from sub-queries</li>
+<li>46d0f0e HUE-4367 [editor] Export query result to S3</li>
+<li>ba1d7c7 HUE-4406 [core] Fails to start if Hive/Impala Not Installed</li>
+<li>3d46a4c HUE-4412 [editor] Errors should scroll to the line AND the column too</li>
+<li>7b3836d HUE-4391 [editor] Editor should not depend on Oozie</li>
+<li>40eb606 HUE-4390 [core] Do not recreate a new user for each request in demo mode</li>
+<li>e67693a HUE-4402 [fb] S3 copy action is not using the picker and fails</li>
+<li>c9a1378 HUE-4393 [fb] S3 bucket should not have any file upload or file creation action</li>
+<li>1d8264b HUE-4411 [editor] Enable scrolling past the end of the editor</li>
+<li>f67b990 HUE-4400 [fb] Disable chmod and summary for S3 for now</li>
+<li>b557a58 HUE-4392 [fb] S3 buckets should have a different icon</li>
+<li>3861a2a HUE-4394 [fb] Home button redirects to HDFS even if on S3</li>
+<li>b909a7f HUE-4396 [fb] Delete button should be &lsquo;delete forever&rsquo; all the time</li>
+<li>840b261 HUE-4407 [assist] Tables and views checkboxes can&rsquo;t be clicked</li>
+<li>67f267d HUE-4409 [editor] Main right scrollbar does not scoll when on the very right of the screen</li>
+<li>750ad2f HUE-4410 [editor] Fix editor size issue for large pasted queries</li>
+<li>2e7180f HUE-4391 [editor] Blacklisting oozie should not break the editor</li>
+<li>210b57a HUE-4327 [editor] Disable batch submit by default when oozie is not setup</li>
+<li>73ef431 HUE-4383 [editor] Trashed queries are showing up in the list of saved queries</li>
+<li>5d213fc HUE-4385 [indexer] Stop the indexer from dropping text fields that are under 100 character long</li>
+<li>1e49e73 HUE-4384 [indexer] Add support for combined apache log files</li>
+<li>5fbccf1 HUE-4380 [assist] Only enable navigator search when configured</li>
+<li>73ee047 HUE-4375 [editor] Horizontal scrollbar can be hidden under the first fixed column</li>
+<li>a2d887b HUE-4378 [core] File chooser with multiple options overflow the modals</li>
+<li>ed23d2b HUE-4376 [indexer] Added assist panel and filechooser</li>
+<li>9870020 HUE-4377 [editor] Autocompleter should support variable references like var in statements</li>
+<li>847c38f HUE-4337 [editor] The autocompleter should suggest backticked values when applicable</li>
+<li>1127d73 HUE-4313 [editor] The new autocompleter should accept non-reserved keywords for DBs, tables, columns etc.</li>
+<li>868d0da HUE-4058 [home] Rename a directory</li>
+<li>618542f HUE-4317 [jb] Logs on attempt page do not make links to job id</li>
+<li>dde952e HUE-4324 [editor] Batch API get_jobs() should return the job ids</li>
+<li>d94c1f7 HUE-4133 [search] Queries don&rsquo;t handle field names that contain spaces</li>
+<li>aec2251 HUE-4360 [editor] Search enabling should be ko based</li>
+<li>53b2793 HUE-4326 [editor] Keep snippet DB list in sync like the assist</li>
+<li>ef4b32d HUE-4371 [editor] Enable the new autocompleter by default</li>
+<li>3b05015 HUE-4365 [metastore] No information surfaced when LOAD data from Create table from file fails</li>
+<li>25e6f3c HUE-4364 [metastore] Handle files with carriage return in create table from a file</li>
+<li>0c85dd4 HUE-4362 [oozie] List more oozie workflow parameters on the workflow dashboard page</li>
+<li>39f203c HUE-3960 [editor] Fixed locked rows with new HueDatatable</li>
+<li>f1060e6 HUE-4184 [editor] Set the result legend section as fixed</li>
+<li>41bccb9 HUE-4358 [meta] Tests need to use the new is enabled flag</li>
+<li>3666894 HUE-4360 [meta] Protect when the configuration files are missing</li>
+<li>b75c497 HUE-4357 [oozie] Return the launcher task logs when submitting Oozie batch job</li>
+<li>96123f4 HUE-4363 [core] Do not rely on import hadoop config before loading core</li>
+<li>0fce233 HUE-4358 [meta] Database list view needs the metadata enabled flag</li>
+<li>a22d9ab HUE-4360 [meta] Read configuration from a properties file</li>
+<li>b302a5a HUE-4032 [editor] Identify locations of databases, tables, columns and functions</li>
+<li>b0074bb HUE-4174 [editor] Fix nested type autocompletion of arrays, maps and structs</li>
+<li>7e22dd8 HUE-4358 [meta] Split metadata services into two</li>
+<li>8769ac7 HUE-4048 [editor] Clicking on .. of a file settings deletes the snippet header and the row</li>
+<li>d16cfbb HUE-4356 [fb] File chooser picker does not select S3 tab when opening an existing path</li>
+<li>9c06051 HUE-4166 [metastore] Sample data dialog can&rsquo;t display very long table name properly</li>
+<li>9c5c722 HUE-4074 [editor] Clicking on table in assist sometimes expand or insert the name</li>
+<li>5cd65e4 HUE-3278 [core] Migrate Google Analytics from ga.js to analytics.js and use https if possible</li>
+<li>83cc700 HUE-3960 [editor] Optimize furtherly the count of visible rows</li>
+<li>f73dd6c HUE-4312 [editor] Load query history, loses editor type when clicking on new query</li>
+<li>23d1e15 HUE-4062 [editor] Formatting action add extra spaces after group by and skip LIMIT</li>
+<li>cd9d817 HUE-4329 [editor] Fix typo in handle reset</li>
+<li>9be92a4 HUE-4118 [fb] Context menu can be hidden by bottom bar</li>
+<li>71064b3 HUE-4354 [core] Warn than SQLite is the cause of the &lsquo;Database locked&rsquo; error</li>
+<li>9e30cde HUE-4351 [editor] Show number of columns in the query result</li>
+<li>7046389 HUE-4322 [impala] Better error message when user already downloaded all the impala resultset cache</li>
+<li>62a944a HUE-4078 [oozie] Drag &amp; Drop hive queries shows queries from the trash</li>
+<li>a3153f4 HUE-4353 [search] Typing in the search bar always redirect to the end of the input</li>
+<li>e3b4c25 HUE-4328 [editor] File chooser in &lsquo;In HDFS (large file)&rsquo; always open on /</li>
+<li>afa51cf HUE-3960 [editor] Optimize rendering of rows and white space</li>
+<li>735eacb HUE-3960 [editor] Improved performances of the header rendering on scroll</li>
+<li>a458f77 HUE-4355 [indexer] Add i18n for arguments and extension based file type guessing</li>
+<li>f66ebd8 HUE-4352 [indexer] Fix typo for grok dictionary file exists check</li>
+<li>98a9a01 HUE-3960 [editor] Implement virtual rendering of the result table</li>
+<li>fbbe393 HUE-4320 [editor] The new autocompleter should be aware of column reference types in value expressions</li>
+<li>b58e6d0 HUE-4325 [editor] Toggle the execute action depending on if last execution was batch or not</li>
+<li>1c08549 HUE-4224 [home] &lsquo;Did you know&rsquo; on home page is gone</li>
+<li>bc44c17 HUE-4303 [useradmin] Re-introduce &lsquo;?&rsquo; icon displaying description of each field</li>
+<li>a99b9da HUE-4348 [indexer] Refactor format types such that all information is in one place</li>
+<li>d55758d HUE-2975 [core] Only register S3FileUploadHandler is S3 is enabled</li>
+<li>88d01c5 HUE-2975 [aws] Add S3 UploadFileHandler and implement upload to S3</li>
+<li>a3db25e HUE-4347 [core] Rename tests_convert.py to follow test conventions</li>
+<li>96836c6 HUE-4346 [editor] Query History disappeared after upgrade to 3.10</li>
+<li>1e053fc HUE-4342 [editor] DB prefix autocomplete can be lost</li>
+<li>59828fa HUE-4343 [editor] Improved autocompletion in select list</li>
+<li>8eaa533 HUE-4329 [editor] Multi query does not go past statement 1</li>
+<li>46266f1 HUE-4320 [editor] New autocompleter should make suggestions based on types in functions</li>
+<li>4922bd3 HUE-4320 [editor] New autocompleter should make suggestions based on type in value expressions</li>
+<li>7af37c1 HUE-4341 [indexer] Use info level logging for morphlines, add error handling for invalid dates</li>
+<li>badf3fe HUE-4340 [indexer] Fix double matching and set required field default to false</li>
+<li>65fef05 HUE-4332 [indexer] Add hue logs as a supported file type</li>
+<li>7d4e1cc HUE-4334 [editor] Update status to error when canceling batch job</li>
+<li>4f7cfd2 HUE-4333 [core] Properly reset API_CACHE on failover</li>
+<li>3057fd9 HUE-4278 [useradmin] Restrict access to useradmin API to superusers</li>
+<li>8174f36 HUE-3647 [editor] SELECT statement that starts with a comment cannot be saved to table</li>
+<li>e355d5c HUE-4321 [editor] Batch submit of SQL show USE the correct DB</li>
+<li>8cce716 HUE-4187 [editor] Integrate batch submission in the UI</li>
+<li>07267ff HUE-4186 [editor] Create a batch_oozie connector</li>
+<li>76bb4bb HUE-3765 [editor] Graphing with many columns is not readable</li>
+<li>d30152d HUE-4223 [oozie] No indication that ${} can be used as parameters</li>
+<li>9d06dac HUE-4232 [notebook] Bulk operation button is gone</li>
+<li>393a8b2 HUE-4251 [editor] Explain on incorrect query should not error</li>
+<li>567d8f2 HUE-4306 [editor] The new autocompleter should complete CASE functions</li>
+<li>c419f98 HUE-4285 [editor] Fix Scatter plot display</li>
+<li>dd1161b HUE-4304 [core] Pie slices shrink after wrong timing of resize of the pie</li>
+<li>0039fc3 HUE-4309 [editor] UX lock rows should tooltip about clicking to lock and delete icon on hover</li>
+<li>0dda68b HUE-4308 [editor] UX lock rows keep adding rows when clicking on the same</li>
+<li>ddd48c2 HUE-4307 [editor] Goto line number shorter conflicts with highlighting the address bar contents in Safari</li>
+<li>398a9fa HUE-4310 [fb] File chooser picker modal should have action buttons fixed to the bottom</li>
+<li>24e59d6 HUE-4278 [useradmin] Provide basic useradmin API</li>
+<li>0c2a890 HUE-4302 [editor] New autocompleter should suggest DISTINCT or ALL where appropriate in aggregate functions</li>
+<li>70f53f6 HUE-4301 [editor] Autocomplete for Impala extract function</li>
+<li>e7b4365 HUE-4204 [editor] Add autocompletion support for CAST functions</li>
+<li>1e15498 HUE-4266 [indexer] Add geo, host, grok, split operations</li>
+<li>a392661 HUE-4298 [security] Offer ability to resize the Impersonate the user drop down in Hue security app</li>
+<li>6266cf3 HUE-4300 [fb] Avoid double file listing call on folder search</li>
+<li>b12073e HUE-4027 [editor] New autocompleter should support functions with descriptors and types</li>
+<li>d74a159 HUE-4271 [editor] Autocomplete aggregate functions and various autocompleter improvements</li>
+<li>79fcd81 HUE-4296 [core] Need info message if kt_renwer exits due to no hue_keytab</li>
+<li>76008b0 HUE-4279 [editor] Shrink back the editor if the query is not big enough and it hasn&rsquo;t been resized manually</li>
+<li>798ce11 HUE-4290 [editor] Style the coordinator history on the context panel</li>
+<li>95ff8b3 HUE-4270 [fb] Enable S3 on the file pickers</li>
+<li>44e0fa9 HUE-4277 [fb] Add endpoint that returns enabled status for each filesystem</li>
+<li>88a7aca HUE-4276 [editor] Autocomplete around arithmetic operations and support BETWEEN, EXISTS, RLIKE and REGEX</li>
+<li>84fa031 HUE-4271 [editor] New autocompleter should support UDAFs and numeric expressions</li>
+<li>00a2a0a HUE-4269 [editor] Improve sample popover</li>
+<li>0e19137 HUE-4085 [editor] Fixed result col headers when cell is wide</li>
+<li>071a085 HUE-4268 [core] Do not remove the table fixed rows on plugin redraw</li>
+<li>8d3523e HUE-4275 [core] Avoid filechooser modals to scroll to the action buttons on modal open</li>
+<li>ceb9a55 HUE-3795 [editor] Scroll lock a row to enable comparison with other rows</li>
+<li>4f062ec HUE-4238 [doc2] Ignore history docs in find_jobs_with_no_doc during sync documents</li>
+<li>a12c90f HUE-4267 [core] Fix livy maven dependencies</li>
+<li>f547dd3 HUE-4177 [editor] Horizontal scroll in FF (Chrome fine) with touch pad is extremely slow</li>
+<li>b91e1b6 HUE-4265 [beeswax] Bring back the show preview in the assist</li>
+<li>9208846 HUE-4020 [editor] Canceling query at wrong timing breaks the editor</li>
+<li>f577b94 HUE-4262 [editor] Improve performances of the table fixed header</li>
+<li>144591a HUE-4018 [editor] Error when canceling a query that is slow being submitted</li>
+<li>e70fe5a HUE-4207 [doc2] Delete history command to clean up old history or orphaned history</li>
+<li>bd91651 HUE-4170 [aws] Fix S3 object timestamp</li>
+<li>53cc6f0 HUE-4258 [jb] Close and pool Spark History Server connections</li>
+<li>e5e7eba HUE-4252 [core] Handle 307 redirect from YARN upon standby failover</li>
+<li>d6010d0 HUE-4242 [editor] Retry should use generic callback for the current operation</li>
+<li>6f53190 HUE-4239 [liboauth] Does no handle &ldquo;next&rdquo; urls, always sending user back to homepage</li>
+<li>3dd029b HUE-4248 [liboauth] OAuth integration Redirect URL is Assumed to be HTTP</li>
+<li>407747e HUE-4246 [libsaml] SAML Integration Doesn&rsquo;t Check Forwarded Protocol</li>
+<li>28990b4 HUE-4175 [editor] Improved autocompletion after WHERE</li>
+<li>5fda503 HUE-4242 [editor] Show a modal to retry the query</li>
+<li>d865e61 HUE-4242 [editor] Offer retries when submission or result fetching timed out</li>
+<li>ea91f82 HUE-4242 [editor] Add a message when query submission takes time</li>
+<li>2d63fa6 HUE-4250 [editor] Add configurable timeout for autocompletion API calls</li>
+<li>d81acde HUE-4245 [editor] Autocomplete subqueries in FROM and WHERE</li>
+<li>bd6a0eb HUE-4252 [core] Handle 307 redirect from YARN upon standby failover</li>
+<li>203e2a1 HUE-4253 [editor] Prompt for variables just once per variable name</li>
+<li>611a51a HUE-4081 [core] Skip idle session timeout relogin popup on running jb jobs call when idle session timeout is disabled</li>
+<li>0bbd5ca HUE-4234 [editor] Improved JOIN autocompletion</li>
+<li>25276d5 HUE-4243 [aws] Only raise aws warning if default account configs are provided</li>
+<li>af51f4c HUE-4244 [indexer] First skeleton on scalable indexer</li>
+<li>79ada34 HUE-4192 [editor] Document2 matching query does not exist when saving</li>
+<li>8fccedc HUE-4241 [editor] Schedule are showing up in home</li>
+<li>f515b9d HUE-4240 [filebrowser] Remove unused sortby param returned from listdir</li>
+<li>94f085f HUE-4238 [doc2] Ignore history docs in find_jobs_with_no_doc during sync documents</li>
+<li>6c1224a HUE-4212 [hive] Also provide if the job is started or finished</li>
+<li>e569229 HUE-4149 [editor] Integrated progress report of MR jobs</li>
+<li>fe5f147 HUE-4236 [editor] Changing fields of a query we chart should re-select default values for the axis</li>
+<li>406fb88 HUE-4225 [editor] Colors are flipped when sorting bar results in reverse order</li>
+<li>f0e3dac HUE-4217 [editor] Autocomplete for DESCRIBE</li>
+<li>a12947d HUE-4228 [search] Used to be able to toggle the field list of grid widget</li>
+<li>d412a8f HUE-4230 [core] Finer version number logging</li>
+<li>211c940 HUE-4220 [oozie] Saving a workflow make the save button blink</li>
+<li>17645b4 HUE-4218 [oozie] Refresh parameters of a d&amp;dropped action</li>
+<li>1f0d785 HUE-4219 [oozie] Add quick link to selected d&amp;dropped query</li>
+<li>9cd79a7 HUE-4229 [oozie] js error when selecting another query in the hive document action</li>
+<li>2884aca HUE-4227 [yarn] Fix unittest for MR API Cache</li>
+<li>f2a5141 HUE-4215 [yarn] Reset API_CACHE on logout</li>
+<li>3fea69c HUE-4200 [editor] Autocompletion of SHOW statements</li>
+<li>0c41ae8 HUE-4216 [editor] The editor type title blinks at page load and shows all the different types</li>
+<li>574fd75 HUE-4206 [notebook] Ignore history and other calls in notebook mode</li>
+<li>6d3dae2 HUE-4201 [editor] Add warning about max limit of cells before truncation in the export / download query result</li>
+<li>52dffd6 HUE-4199 [editor] Make the editor &lsquo;editorMode&rsquo; a ko variable</li>
+<li>a9ee56f HUE-4105 [editor] Make the editor &lsquo;editorType&rsquo; a ko variable</li>
+<li>502479c HUE-4144 [editor] Add search functionality to snippet DB selection</li>
+<li>bba7356 HUE-4210 [editor] Don&rsquo;t revert to Hive on browser refresh of new Impala query</li>
+<li>abe248d HUE-4203 [editor] Column search on resultset is not empty, do a scroll to any column will hide the search input</li>
+<li>d0df22c HUE-4068 [metastore] Format date and file size of table stats</li>
+<li>02caa95 HUE-4211 [editor] Autoexpand query editor sometimes bugs the result headers</li>
+<li>cd345bd HUE-4209 [editor] Fix Regex for deleting SQL comments</li>
+<li>e226625 HUE-4205 [doc2] Ignore history dependencies on import</li>
+<li>5aff350 HUE-4202 [jb] Enable offset param for fetching jobbrowser logs</li>
+<li>eacfe0d HUE-4197 [editor] Autocomplete for DROP TABLE, DATABASE and SCHEMA</li>
+<li>26989ac HUE-4198 [metastore] Sample fetch breaks the page when it fails with error 1</li>
+<li>4269910 HUE-4068 [metastore] Show owners and last time instead of files and size</li>
+<li>74af668 HUE-4196 [editor] Add return code so that we can load saved queries</li>
+<li>37d2ff6 HUE-4190 [oozie] Option to return coordinator id instead of redirect in coordinator submission popup</li>
+<li>f96fc84 HUE-4193 [search] Toggling on all the fields of a grid widgets breaks</li>
+<li>bcd5ad2 HUE-4195 [editor] Last digit of multiquery can be hidden</li>
+<li>125520c HUE-4196 [editor] Catch open notebook errors</li>
+<li>e65e102 HUE-4194 [editor] Autocomplete CREATE DATABASE</li>
+<li>fcd1124 HUE-4158 [oozie] Do not lose existing values when renaming variables</li>
+<li>ea996ac HUE-4191 [oozie] Prevent 500 error when listing a workflow which coordinator is none</li>
+<li>41a8c25 HUE-4176 [editor] Autocomplete field values</li>
+<li>b2e8aac HUE-4173 [editor] Enable autocomplete when there are backticks in table and database names</li>
+<li>a4638dc HUE-4180 [editor] JS error on help icon</li>
+<li>1a01014 HUE-4167 [aws] Implement S3 rmtree operation</li>
+<li>8ef0d31 HUE-4183 [fb] Offer two File Browser links when S3 is configured</li>
+<li>5a67846 HUE-4164 [editor] The ApiHelper should treat any negative status in the response as an error</li>
+<li>0163fcf HUE-4157 [aws] Fix aws is_enabled</li>
+<li>2fe746e HUE-4141 [oozie] Graph breaks for external workflows when there is more than one kill node</li>
+<li>c741084 HUE-4163 [aws] Implement S3 mkdir operation</li>
+<li>4621ea9 HUE-4157 [aws] Fix aws config check</li>
+<li>7e24660 HUE-4161 [editor] Autocomplete tables and columns in update statements</li>
+<li>9c8cc31 HUE-4155 [home] Improve document drag to select</li>
+<li>1e325e2 HUE-4160 [editor] Do not create multiple coordinator for a new saved query</li>
+<li>981cf11 HUE-4156 [oozie] Do not list the managed worklows in the coordinator editor</li>
+<li>a45fe6a HUE-4137 [editor] Fix typo when updating the list of saved queries</li>
+<li>6efda7f HUE-4147 [editor] Older queries after upgrade do not have any document1</li>
+<li>002b257 HUE-4157 [aws] Fix aws config_check</li>
+<li>33ea726 HUE-4151 [oozie] Avoid dashboard page crash when coordinator does not exist in Oozie</li>
+<li>e7afa07 HUE-4152 [oozie] Managed document property blocks access to workflows of coordinators</li>
+<li>087d123 HUE-4137 [editor] Open editor, create query and save it, click on Saved queries will have one item</li>
+<li>1444af2 HUE-4129 [impala] Long running query getting terminated when leaving the editor</li>
+<li>f02ad20 HUE-4148 [editor] Improve import testing of beeswax queries to notebook format</li>
+<li>e33a030 HUE-4142 [aws] Enable S3 browse option in filebrowser</li>
+<li>e1f7114 HUE-4153 [impala] Report last seen progress when running impala query</li>
+<li>ebd99e5 HUE-4143 [editor] Snippet configuration layout is broken</li>
+<li>cb684f9 HUE-4131 [assist] Search on the query editors should be case insensitive</li>
+<li>9f4d66f HUE-4071 [metastore] Table columns should sorted on their initial table order</li>
+<li>456a554 HUE-4116 [editor] Extracted running coordinator model</li>
+<li>7f5040c HUE-4116 [editor] Avoid JS error on coordinator save</li>
+<li>ba178f7 HUE-4116 [editor] Submit the correct workflow</li>
+<li>9054363 HUE-4140 [editor] Do not reload saved query list when opening a saved query</li>
+<li>fc3e5af HUE-4116 [oozie] Add a dependency from the coordinator to the query</li>
+<li>7011f31 HUE-4116 [oozie] Add dependency from coordinator to query</li>
+<li>2b75cdd HUE-4116 [editor] Added ignore properties for mapping</li>
+<li>e635351 HUE-4116 [editor] Render jqCron on query load as well</li>
+<li>53040ce HUE-4135 [editor] Automatically update on save the variables of a scheduled query</li>
+<li>50a0061 HUE-4127 [oozie] SLA can not be enabled for a coordinator</li>
+<li>f238dff5 HUE-4116 [oozie] Cleaner way to refresh the parameters of a workflow in a coordinator</li>
+<li>174141c HUE-4116 [editor] Accept non observables on select2 parameters</li>
+<li>6b5649b HUE-3797 [editor] Add refresh parameter call</li>
+<li>b186e49 HUE-3797 [editor] Loading a saved query should stay on the Saved query tab</li>
+<li>211300c HUE-4116 [editor] Do not break on unsaved query</li>
+<li>5e8bd50 HUE-3797 [editor] Add basic coordinator submit</li>
+<li>c2f664f HUE-4122 [editor] Examples should have isSaved set to true</li>
+<li>3ccbc07 HUE-4116 [editor] Removed icons from tab names</li>
+<li>b41cad2 HUE-4116 [editor] Avoid creating more than one instance of jQCron</li>
+<li>affcc3f HUE-4116 [editor] Restyled workflow parameters</li>
+<li>953ab12 HUE-4116 [editor] Resolved all the jQCron issues</li>
+<li>dfc938c HUE-4116 [editor] ChangeTracker now works in hybrid mode</li>
+<li>8ef5003 HUE-4116 [editor] Converted coordinator ko to Require</li>
+<li>8876178 HUE-4116 [editor] Prettified context panel</li>
+<li>d543f46 HUE-4116 [editor] Removed margins from the embedded coordinator version</li>
+<li>a066440 HUE-4116 [editor] Remove debug variable</li>
+<li>146c5ca HUE-4116 [editor] Move out cron specific JS</li>
+<li>0ee3a61 HUE-4116 [editor] Remove commenting of dependencies</li>
+<li>e183490 HUE-4116 [editor] Automatically load the schedule of a query</li>
+<li>e8d546a HUE-4116 [editor] First reorganization of the coordinator html</li>
+<li>94e91c6 HUE-4116 [editor] Integrate saving schedule into the main save button</li>
+<li>25bf2b2 HUE-4116 [editor] Loads the coordinator of the query</li>
+<li>cfc527c HUE-4115 [oozie] Autoatically persist the coordinator of a scheduled query</li>
+<li>6163384 HUE-4112 [oozie] Automatically persist the workflow of a scheduled query</li>
+<li>2d3f72a HUE-4110 [editor] Skeleton of running schedule actions</li>
+<li>39400d7 HUE-4109 [oozie] First pass at refactoring Coordinator editor to be pluggable</li>
+<li>23afa3e HUE-3797 [oozie] Move the workflow creation logic out of the view</li>
+<li>6cfacdd HUE-4107 [desktop] Add a &lsquo;managed&rsquo; field to Document2</li>
+<li>70e516c HUE-4106 [editor] Move schedule edition to the context panel</li>
+<li>410a064 HUE-3797 [oozie] API to create workflow for Hive documents</li>
+<li>8550f57 HUE-4146 [editor] Older saved queries defaults to default&rsquo; DB</li>
+<li>dc029fd HUE-4145 [editor] Older queries after upgrade do not provide direct save</li>
+<li>8badf5b HUE-4138 [editor] Last modified time of a saved query is not in the correct timezone</li>
+<li>45547f5 HUE-3956 [sentry] Browse to table does not load the object in v1</li>
+<li>f91ed51 HUE-4051 [hive] Have lighter Impala and Hive check configs call than list DBs</li>
+<li>f5006ad HUE-4136 [aws] Fix aws tests and only enable aws filesystem if configured</li>
+<li>3b33dd9 HUE-4136 [fb] Fix normpath and parent path logic for aws fs</li>
+<li>1d4b8ca HUE-4134 [liboozie] Avoid logging truststore credentials</li>
+<li>724f8f7 HUE-4130 [core] Triple amount of lines in the /logs page</li>
+<li>e66bd1a HUE-4123 [beeswax] Fix tests by only checking design_id if not None</li>
+<li>ddb0adf HUE-4123 [core] Verify id parameter values in GET requests</li>
+<li>7b636e4 HUE-4119 [jobbrowser] Change list jobs call to POST</li>
+<li>7040a60 HUE-3998 [oozie] Blacklisting oozie prevents hue launch</li>
+<li>510a6d3 HUE-4121 [oozie] Improve UX of entering args to distcp action in workflow editor</li>
+<li>ba7b337 HUE-4120 [core] Update NVD3 color palette</li>
+<li>a778126 HUE-4075 [editor] Hue will not start if impala is blacklisted</li>
+<li>cfd2483 HUE-4111 [editor] Toggle to show or hide the column search field on result is always on</li>
+<li>8e9eccf HUE-4092 [security] Can&rsquo;t type any / in the HDFS ACLs path input</li>
+<li>94f0adb HUE-4100 [core] First user login checks are not displayed</li>
+<li>3a1865b HUE-3908 [useradmin] Ignore (objectclass=*) filter when searching for LDAP users</li>
+<li>82a0acd HUE-4099 [editor] Allow searching of raw SQL in query history</li>
+<li>7223b30 HUE-4097 [core] Still print error message when Oracle connector is not configured</li>
+<li>bb92959 HUE-4059 [editor] Lost the green bar when the query finishes on query execution</li>
+<li>e2cc753 HUE-4101 [editor] Hide search input when input is empty and it loses focus</li>
+<li>a6109e9 HUE-4102 [editor] Move session settings to a context panel</li>
+<li>0f55dd6 HUE-4103 [core] Upgrade Font Awesome to 4.6.3</li>
+<li>8f22fe0 HUE-4104 [core] Introduce Roboto as a main font</li>
+<li>aa94ca2 HUE-3065 [desktop] Fix test_redact_statements</li>
+<li>2fab3d0 HUE-3065 [desktop] Add Document2 search field migration</li>
+<li>c9b17a2 HUE-3065 [desktop] Allow searching of raw SQL in saved queries</li>
+<li>9bd1d98 HUE-4096 [oozie] Fix unit tests for HUE-4054</li>
+<li>ce0c152 HUE-4087 [jobbrowser] Unable to kill jobs with Resource Manager HA enabled</li>
+<li>50a9397 HUE-4055 [oozie] Upgrade oozie spark action to support spark-action:0.2 schema version</li>
+<li>0036d91 HUE-3981 [core] Restyle the login page a little</li>
+<li>fc1a889 HUE-4089 [editor] Keyboard shortcut for a new query and save query</li>
+<li>15e2d39 HUE-4088 [oozie] Make workflow action parameter dragabble</li>
+<li>828c4df HUE-4070 [editor] Uncheck all freezes the browser with many columns</li>
+<li>c819785 HUE-4076 [editor] Column value autocomplete does not filter duplicates</li>
+<li>7f8ebc4 HUE-4063 [home] &lsquo;done&rsquo; button on wizard redirects to old home2</li>
+<li>67374ba HUE-4061 [jb] Job attempt logs not appearing for running jobs</li>
+<li>a76e654 HUE-4075 [editor] Hue will not start if impala is blacklisted</li>
+<li>3243219 HUE-4084 [metastore] Drop table popup confirmation button is not accessible</li>
+<li>499aa7b HUE-4079 [editor] Amount of 2M is missing a zero in the Y axis of bar charts</li>
+<li>6ec3fe2 HUE-4077 [editor] Decimal not supported in bar charts</li>
+<li>6cccb42 HUE-4083 [editor] Bar charts gets all of the same color</li>
+<li>a00d73c HUE-4073 [editor] Scroll to column in result set does not update the horizontal scroll bar</li>
+<li>deb7125 HUE-4069 [metastore] Add scroll to top on sample and column pages of a table</li>
+<li>d0c0c3c HUE-4072 [editor] Focus on input search box when opening result column filtering</li>
+<li>4365e9f HUE-4064 [editor] Format creation and update date on the table details popover</li>
+<li>8af04a1 HUE-4066 [editor] Put a toggle all columns in the result column list</li>
+<li>82d71b0 HUE-4053 [oozie] Fix oozie share workflow test to work with old and new editor mode</li>
+<li>18341c5 HUE-4053 [oozie] Fix oozie share workflow test</li>
+<li>b7a2243 HUE-4053 [oozie] Check permissions based on USE_NEW_EDITOR status</li>
+<li>0d492db HUE-3997 [core] Add useradmin feature that resets axes lockouts</li>
+<li>4c67407 HUE-4056 [home] Click on trash icons errors</li>
+<li>dceafa4 HUE-4054 [oozie] Light prettifying of bundle inputs</li>
+<li>814e08a HUE-3897 [metastore] Add column search on the table page</li>
+<li>b997dd1 HUE-3764 [editor] When exporting results to a new table, the new table is not shown</li>
+<li>50c997e HUE-3913 [editor] Drag and drop table names is flaky</li>
+<li>a626919 HUE-3348 [indexer] Update deprecated field in schema.xml</li>
+<li>288681b HUE-4023 [useradmin] update AuthenticationForm to allow activated users to login</li>
+<li>28df8cc HUE-3885 [metastore] Add check to prevent space in table name in both create table wizards</li>
+<li>fc2d67a HUE-3788 [home] No way to middle click to open document in a new tab</li>
+<li>9cbbd45 HUE-4044 [editor] Copy pasted query with \u2002 fails</li>
+<li>746b918 HUE-4040 [editor] US map blinks when hovering texas</li>
+<li>1b8a59d HUE-4041 [editor] Auto select axes value if there is only one possible choice</li>
+<li>891c5e0 HUE-4037 [doc] Update docker image with 3.10</li>
+<li>edbbaf1 HUE-3786 [editor] Search box and foreach binding in the snippet DB list dropdown</li>
+<li>03a620f HUE-4043 [editor] Bubble up error about queries with \u2002 fails</li>
+<li>3718d8c HUE-3799 [editor] Impala logs have a new line</li>
+<li>428e8ad HUE-4022 [doc] Promote docker image to get ramped up quicker</li>
+<li>9129a79 HUE-4025 [editor] Add keyword completion based on the current parser capabilities</li>
+<li>1fbde55 HUE-4024 [editor] The new autocompleter should suggest identifiers and aliases</li>
+<li>9543e7a HUE-4021 [libsolr] Allow customization of the Solr path in ZooKeeper</li>
+<li>58a3389 HUE-4019 [impala] Always fetch the logs on check status</li>
+<li>0a68343 HUE-4019 [impala] Do not blank error on query with good syntax but invalid query</li>
+<li>3ce9a15 HUE-4017 [editor] Make ace editor suggestions from the new autocompleter</li>
+<li>5d61845 HUE-4016 [editor] Add configuration option to enable the new autocompleter</li>
+<li>72ce3f6 HUE-4008 [core] Expandable and fixed close icon for error popup</li>
+<li>4d773e9 HUE-4014 [editor] Weird scroll and menu part hidden when a few rows</li>
+<li>d4a7ab2 HUE-4007 [oozie] Fix deployement_dir for the bundle in oozie example fixtures</li>
+<li>fa0550b HUE-4006 [oozie] Create new deployment directory when coordinator or bundle is copied</li>
+<li>0e19a1d HUE-4005 [oozie] Remove oozie.coord.application.path from properties when rerunning workflow</li>
+<li>961e152 HUE-3941 [search] Use sentry base solr config for examples when Sentry is on</li>
+<li>dd8115e HUE-4004 [editor] Make all parser tests pass from the previous autocompleter</li>
+<li>51a46c5 HUE-4003 [editor] Add parser support for HDFS path completion</li>
+<li>ded4731 HUE-4002 [editor] Add parser support for all generic SQL test cases from the old autocompleter</li>
+<li>fc2e6cd HUE-3329 [editor] Include database references with table suggestions</li>
+<li>8988acd HUE-3328 [editor] Follow case in keyword suggestions</li>
+<li>7bdab74 HUE-3327 [editor] Suggest tables after select</li>
+<li>9072772 HUE-3326 [editor] Introduce the cursor and add suggestions for possible statements</li>
+<li>b353348 HUE-3325 [editor] Generate the parser using the makefile</li>
+<li>771be07 HUE-3324 [editor] Create initial jison parser</li>
+<li>b603688 [oozie] Don&rsquo;t modify start_date and end_date vairable for workflow submissions</li>
+<li>4f61fa1 HUE-3999 [oozie] list_oozie_workflow page shouldn&rsquo;t break incase of bad json from oozie</li>
+<li>bbaf74f HUE-3896 [editor] Add search on column list result set</li>
+<li>74a3d96 HUE-4001 [search] Field list does not display the field analysis icon if it has vertical scroll</li>
+<li>790ec25 HUE-3959 [core] Double blurry login popup on /security/solr page</li>
+<li>cda428f HUE-3921 [fb] Clicking outside of an empty upload window does not close it</li>
+<li>b0eb884 HUE-4000 [doc] Wrong year listed in the release summary</li>
+<li>a70e2fd ISSUE-381 [spark] Fix rules for stderror in spark_shell</li>
+<li>e33db63 HUE-3954 [search] Editing record more than once will error because of old version id</li>
+<li>509733e HUE-3988 [search] Support schemaless collections</li>
+<li>dd38bb2 HUE-3994 [editor] Canceled Hive queries stays as running in the history</li>
+<li>8ca9351 HUE-3992 [editor] Losing results after resize in results of 100 columns</li>
+<li>4c9ad8d HUE-3991 [editor] Removing a result column in a table &gt; 300 rows breaks the grid</li>
+<li>629388f HUE-3960 [editor] Optimize result set of thousand of columns</li>
+<li>f75c05e HUE-3822 [pig] Display logs when found</li>
+<li>ce66f01 HUE-3756 [editor] Better update of the available queries in the History refresh</li>
+<li>93f42db HUE-3957 [editor] Clicking on failed query should still open it and not another one</li>
+<li>e3f3e95 HUE-3975 [core] Add docstring to dynamic_default function</li>
+<li>37edd6d HUE-3975 [core] Rename login_lock_out_by_combination_user_and_ip to login_lock_out_use_user_agent</li>
+<li>bb6addc HUE-3969 [oozie] Create a new workflow js error</li>
+<li>8d26ccf HUE-3980 [hbase] Silence errors from getColumnDescriptors API call</li>
+<li>4738932 HUE-3973 [core] Show or hide configuration based on the config flag</li>
+<li>590e280 HUE-3974 [editor] Query builder gives an error</li>
+<li>c9f97d9 HUE-3979 [notebook] Prevent id conflict in the sample notebook</li>
+<li>21bd5c3 HUE-3978 [notebook] Backward compatibility for older notebooks</li>
+<li>7775392 HUE-3977 [editor] Session failing when opening Hive on a blank DB</li>
+<li>e4acf9d HUE-3976 [doc2] Exporting doc dependencies should not include history docs</li>
+<li>18cec50 HUE-3958 [core] Allow Oracle database config to use service name configuration by setting host and port to empty</li>
+<li>74040cb HUE-3973 [core] Add a global flag to enable/disable the new configuration system</li>
+<li>47fea8f HUE-3974 [editor] Query builder gives an error in IE 11</li>
+<li>769497f HUE-3914 [editor] Fix mouse wheel vertical scroll in result table for IE 11</li>
+<li>c80abf0 HUE-3972 [core] Do not update saved configuration if properties is an empty list</li>
+<li>d3290f0 HUE-3971 [editor] Hide &ldquo;Set as default settings&rdquo; from the session config</li>
+<li>81c2f0c HUE-3970 [core] Hide the configurations menu alternative</li>
+<li>4d61962 HUE-3964 [core] Expand first property in configuration</li>
+<li>b57ab11 HUE-3968 [core] Job XML configuration for Oozie gives an error</li>
+<li>765701f HUE-3967 [core] There are missing properties when opening existing group overrides</li>
+<li>b506c52 HUE-3963 [core] Rename “Group override” to “Role”</li>
+<li>9c5dcde HUE-3966 [core] Error message when adding “Queue” to spark properties</li>
+<li>fcc8ef6 HUE-3962 [core] Hide Global Properties in configuration</li>
+<li>1f0050f HUE-3961 [sentry] Add Collection links from privilege</li>
+<li>b236923 HUE-3953 [sentry] Collection links on Toles section should point to the Browse section</li>
+<li>69b15ae PR378 [rdbms] Result escape for XML xml</li>
+<li>1a81044 HUE-3718 [fb] Opening and scrolling in a file can lag a lot</li>
+<li>b9fb838 HUE-3756 [editor] Only insert the saved as in the saved query list</li>
+<li>4f31442 HUE-3951 [solr] Cleaner user message when missing UPDATE privilege permission</li>
+<li>2f02ca9 HUE-3952 [oozie] Hive document should get its credentials checked with kerberos</li>
+<li>04b6104 HUE-3756 [editor] Append the new saved query in to the list of saved queries</li>
+<li>79feae7 HUE-3945 [core] Allow to disable the &lsquo;beeswax&rsquo; app</li>
+<li>dcc4c54 HUE-3935 [core] Also use error code 10 in the catch all of the is_db_alive command</li>
+<li>620855a HUE-3742 [editor] Stop losing the saved query list when opening other queries</li>
+<li>38c20c8 HUE-3912 [editor] Dotted line when clicking on assist</li>
+<li>7df8dc2 HUE-3938 [editor] Query history parsing error on alter table</li>
+<li>2ec649c HUE-3942 [editor] Exiting full screen seems to refresh or redraw the assist</li>
+<li>507417f HUE-3943 [editor] History and query search string can overlay with the clearable icon</li>
+<li>a788447 HUE-3950 [core] Re-login from auto-login popup is missing the hue icon</li>
+<li>1af3035 HUE-3933 [editor] Improve performances with hundreds of columns</li>
+<li>4d7af63 HUE-3944 [doc] Updates Readme to comply with Apache trademark rules</li>
+<li>afd5c5a HUE-3937 [editor] Remove ignored hive.server2.logging settings</li>
+<li>3912120 HUE-3939 [doc2] Support import of 5.5 doc2 into 5.7+ versions</li>
+<li>d6cbec4 HUE-3677 [impala] Check handle state before attempting download</li>
+<li>9e85595 HUE-3935 [core] Use error code 10 for missing Oracle connector in the is_db_alive command</li>
+<li>10f92e4 HUE-3932 [core] Don&rsquo;t reset session TTL by avoiding setting test cookie every request</li>
+<li>040f2ee HUE-3925 [sentry] New privilege from the Roles section are not blank</li>
+<li>c4d033b HUE-3927 [sentry] Disallow to create an empty privilege</li>
+<li>5f5e1f1 HUE-3934 [core] Remove system default clear button from IE</li>
+<li>3e7a57a HUE-3928 [sentry] Add clearable icon to the role search box</li>
+<li>8186247 HUE-3933 [editor] Improve performances with hundreds of columns</li>
+<li>e7fedf2 HUE-3924 [core] Refresh login page a little</li>
+<li>9abf60c HUE-3931 [hive] Update impersonation tests to expect a default value of true</li>
+<li>2714fcc HUE-3930 [sentry] Fix Solr privileges filtering view</li>
+<li>fb85538 HUE-3929 [sentry] Fix role filtering for solr</li>
+<li>8c06cce HUE-3926 [sentry] Link to the search collections on the Roles section</li>
+<li>a175e93 HUE-3922 [core] Truncate log buffer size to be more performant</li>
+<li>6db38b4 HUE-3923 [core] Simplify force debug logic option</li>
+<li>fd2ac2a HUE-3920 [jb] Inform the user when Hive impersonation is off</li>
+<li>38f2af9 HUE-3906 [sentry] Offer role name autocomplete by just clicking in name field of add or select role popup</li>
+<li>500db74 HUE-3891 [sentry] Disallow to create a URI privilege that has an empty path</li>
+<li>6619cb7 HUE-3917 [core] Catch missing Oracle connector in is_db_alive command</li>
+<li>062e0e3 HUE-3916 [core] Check more globally for MySql error code in is_db_alive command</li>
+<li>4f1f9cb HUE-3909 [editor] Fetching saved query order is not deterministic</li>
+<li>c597b70 HUE-3669 [jb] Display the proxied user of a HS2 map reduce job</li>
+<li>6cfac76 HUE-3856 [editor] Backend search for the query history</li>
+<li>1065e4a HUE-3845 [sentry] Sometimes see group as editable on role section</li>
+<li>d381bf4 [desktop] requests should only set tls hostname if supported</li>
+<li>6bece41 HUE-3866 [core] Upgrade requests to 2.10.0</li>
+<li>ca9965d HUE-3902 [sentry] Provide * to select all the collections or configs</li>
+<li>b2ca087 HUE-3825 [editor] We can see the same table twice in the autocomplete</li>
+<li>81ca89c HUE-3849 [editor] Sample popup does not fail gracefully when failing to load a table</li>
+<li>60c6655 HUE-3780 [metastore] Hide refresh stats button if user does not have the permissions on col stats</li>
+<li>9ddf7b7 HUE-3910 [editor] Don&rsquo;t show a dotted box on execute in Firefox</li>
+<li>fe77312 HUE-3828 [sentry] Autocomplete list of configs</li>
+<li>176874c HUE-3829 [sentry] Preset the privilege to the selected one when creating from browse section</li>
+<li>b5314b3 HUE-3907 [sentry] Delete then add new privileges</li>
+<li>12b2965 HUE-3904 [search] Get minimum list of collection fields through REST API</li>
+<li>c3c937a HUE-3903 [search] Still display collections even if we can&rsquo;t list cores</li>
+<li>dcdbc70 HUE-3905 [beeswax] Reset beeswax.conf params in beeswax.tests:test_hiveserver2_jdbc_url</li>
+<li>2adbc59 HUE-3892 [oozie] [core] Fix fetch of saved properties for Oozie user</li>
+<li>4a012e1 HUE-3901 [core] Update API document tests to look at uuids</li>
+<li>61e80b3 PR372 [doc] Fix postgresql spelling in README.md</li>
+<li>5bacf8e HUE-3895 [sentry] Rename Sentry Table section to Hive Tables</li>
+<li>6aead05 HUE-3894 [core] Validate LDAP server&rsquo;s certificate</li>
+<li>1de7fa7 HUE-3893 [sentry] Use the same component and serviceName as the Solr Sentry service</li>
+<li>dc0cf66 HUE-3735 [editor] History API filter on text</li>
+<li>0735050 HUE-3889 [core] uuid of documents and json do not match in sample queries</li>
+<li>819f800 HUE-3869 [editor] If a DDL doesn’t execute, it’s not part of the history</li>
+<li>03074fa HUE-3862 [editor] Fetch status timers are not cleared when switching queries</li>
+<li>2c89520 HUE-3875 [home] Right click context menu is oddly positioned when scrolling</li>
+<li>4d3ab8a HUE-3782 [editor] The shared permissions do not show up when sharing from list of query page</li>
+<li>e11527e HUE-3813 [editor] Persist select columns and graph selection in saved queries</li>
+<li>ba345a7 HUE-3768 [editor] Graph tooltips can be hidden by editor</li>
+<li>6c97925 HUE-3884 [editor] Opening a query from saved query tab should not switch to the history tab</li>
+<li>44606a3 HUE-3883 [editor] Update background of optional currently selected history or saved query</li>
+<li>906bdd6 HUE-3873 [core] Sort configuration and properties by name</li>
+<li>964018d HUE-3729 [editor] Display the address of the impalad of the current session</li>
+<li>6208065 HUE-3874 [home] Default sorting on the name</li>
+<li>418159a HUE-3881 [core] Increase truncation limit of external API responses in DEBUG mode</li>
+<li>588d3a8 HUE-3729 [editor] Display the address of the impala of the current session</li>
+<li>65c6463 HUE-3880 [core] Add importlib directly for Python 2.6</li>
+<li>a4cd513 HUE-3876 [editor] Sometimes query history is ordered weirdly</li>
+<li>3e0b288 HUE-3789 [editor] Improved close icon in full editor mode</li>
+<li>36303ce HUE-3859 [editor] History not sending back past queries</li>
+<li>dcb85bd HUE-3559 [editor] Expired result message not always obvious when scrolling</li>
+<li>b660eaf HUE-3816 [editor] Re-highlight the statement of a multi query statement when opening it in history</li>
+<li>97ced2c HUE-3806 [search] Long fields in grid widget legend scroll weirdly</li>
+<li>bb13485 HUE-3762 [editor] Improve showing it’s a query history query</li>
+<li>f323589 HUE-3867 [editor] Resizing issue when dropping large query with already a result</li>
+<li>9ac0a65 HUE-3854 [core] Add delete action for configuration default and group overrides</li>
+<li>816b0e1 HUE-3837 [core] Implement parameters config type</li>
+<li>15e0a0d HUE-3872 [core] Add options combobox to properties that have options defined</li>
+<li>bdf625b HUE-3853 [core] Configuration help icon wraps when label is long</li>
+<li>6934b3f HUE-3865 [editor] Flag to enable the query scheduling</li>
+<li>a5ec8b5 HUE-3842 [core] HTTP 500 while emptying Hue 3.9 trash directory</li>
+</ul>
+
+<h2 id="contributors">Contributors</h2>
+
+<p>This Hue release is made possible thanks to the contribution from:</p>
+
+<ul>
+<li>Aaron Newton</li>
+<li>Aaron T. Myers</li>
+<li>abec</li>
+<li>Abraham Elmahrek</li>
+<li>Aditya Acharya</li>
+<li>airokey</li>
+<li>Alex Breshears</li>
+<li>Alex Newman</li>
+<li>Alex (posi) Newman</li>
+<li>alheio</li>
+<li>alphaskade</li>
+<li>Ambreen Kazi</li>
+<li>Amit Kabra</li>
+<li>Andrei Savu</li>
+<li>Andrew Bayer</li>
+<li>Andrew Yao</li>
+<li>Ann McCown</li>
+<li>Antonio Bellezza</li>
+<li>arahuja</li>
+<li>Ashu Pachauri</li>
+<li>Atupal</li>
+<li>Avindra Goolcharan</li>
+<li>bcwalrus</li>
+<li>bc Wong</li>
+<li>Ben Bishop</li>
+<li>Ben Gooley</li>
+<li>Ben White</li>
+<li>Bhargava Kalathuru</li>
+<li>Bruce Mitchener</li>
+<li>Bruno Mahé</li>
+<li>bwang</li>
+<li>Chris Conner</li>
+<li>Chris Stephens</li>
+<li>Christopher Conner</li>
+<li>Christopher McConnell</li>
+<li>Christopherwq Conner</li>
+<li>Craig Minihan</li>
+<li>cwalet</li>
+<li>Daehan Kim</li>
+<li>dbeech</li>
+<li>Derek Chen-Becker</li>
+<li>Dominik Gehl</li>
+<li>Eli Collins</li>
+<li>Enrico Berti</li>
+<li>Erick Tryzelaar</li>
+<li>fatherfox</li>
+<li>gdgt</li>
+<li>Gilad Wolff</li>
+<li>grundprinzip</li>
+<li>Guido Serra</li>
+<li>happywind</li>
+<li>Harsh</li>
+<li>Harsh J</li>
+<li>Henry Robinson</li>
+<li>Igor Wiedler</li>
+<li>Ilkka Turunen</li>
+<li>Istvan</li>
+<li>Ivan Orlov</li>
+<li>Jaguar Xiong</li>
+<li>Jakub Kukul</li>
+<li>Jarcek</li>
+<li>jeff.melching</li>
+<li>Jenny Kim</li>
+<li>Joe Crobak</li>
+<li>Joey Echeverria</li>
+<li>Johan Ahlen</li>
+<li>Johan Åhlén</li>
+<li>Jon Natkins</li>
+<li>Josh Walters</li>
+<li>Karissa McKelvey</li>
+<li>Kevin Wang</li>
+<li>krish</li>
+<li>Lars Francke</li>
+<li>linchan-ms</li>
+<li>Linden Hillenbrand</li>
+<li>Luca Natali</li>
+<li>Luke Carmichael</li>
+<li>lvziling</li>
+<li>Marcus McLaughlin</li>
+<li>Mariusz Strzelecki</li>
+<li>Matías Javier Rossi</li>
+<li>Michael Prim</li>
+<li>Michal Ferlinski</li>
+<li>Michalis Kongtongk</li>
+<li>Mobin Ranjbar</li>
+<li>motta</li>
+<li>mrmrs</li>
+<li>Nicolas Fouché</li>
+<li>Olaf Flebbe</li>
+<li>Oren Mazor</li>
+<li>oxpa</li>
+<li>Pala M Muthaia Chettiar</li>
+<li>Patricia Sz</li>
+<li>Patrycja Szabłowska</li>
+<li>Paul Battaglia</li>
+<li>Paul McCaughtry</li>
+<li>Peter Slawski</li>
+<li>Philip Zeyliger</li>
+<li>Piotr Ackermann</li>
+<li>Prasad Mujumdar</li>
+<li>Qi Xiao</li>
+<li>raphi</li>
+<li>Renxia Wang</li>
+<li>Rick Bernotas</li>
+<li>Ricky Saltzer</li>
+<li>Romain Rigaux</li>
+<li>Roman Shaposhnik</li>
+<li>Rui Pereira</li>
+<li>Sai Chirravuri</li>
+<li>Scott Kahler</li>
+<li>Sean Mackrory</li>
+<li>Shawn Van Ittersum</li>
+<li>shobull</li>
+<li>Shrijeet</li>
+<li>Shrijeet Paliwal</li>
+<li>Shuo Diao</li>
+<li>Siddhartha Sahu</li>
+<li>Simon Beale</li>
+<li>Simon Whittaker</li>
+<li>sky4star</li>
+<li>Stephanie Bodoff</li>
+<li>Suhas Satish</li>
+<li>Tatsuo Kawasaki</li>
+<li>thinker0</li>
+<li>Thomas Aylott</li>
+<li>Tianjin Gu</li>
+<li>Todd Lipcon</li>
+<li>Tom Mulder</li>
+<li>Vadim Markovtsev</li>
+<li>van Orlov</li>
+<li>vinithra</li>
+<li>voyageth</li>
+<li>vybs</li>
+<li>William Bourque</li>
+<li>wilson</li>
+<li>Word</li>
+<li>Xhxiong</li>
+<li>xq262144</li>
+<li>Yixiao Lin</li>
+<li>Yoer</li>
+<li>Zachary York</li>
+<li>Zach York</li>
+<li>Zhihai Xu</li>
+</ul>
+
+
+<footer class=" footline" >
+	
+</footer>
+
+
+        
+        </div> 
+        
+
+      </div>
+
+    <div id="navigation">
+        
+        
+        
+        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+            
+        
+        
+        
+
+
+	 
+	 
+    </div>
+
+    </section>
+    
+    <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
+      <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
+    </div>
+    <script src="/hue/latest/js/clipboard.min.js"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.min.js"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js"></script>
+    <script src="/hue/latest/js/jquery.sticky.js"></script>
+    <script src="/hue/latest/js/featherlight.min.js"></script>
+    <script src="/hue/latest/js/html5shiv-printshiv.min.js"></script>
+    <script src="/hue/latest/js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="/hue/latest/js/modernizr.custom.71422.js"></script>
+    <script src="/hue/latest/js/learn.js"></script>
+    <script src="/hue/latest/js/hugo-learn.js"></script>
+
+    <link href="/hue/latest/mermaid/mermaid.css" type="text/css" rel="stylesheet" />
+    <script src="/hue/latest/mermaid/mermaid.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-37637545-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-37637545-1');
+</script>
+  </body>
+</html>
+

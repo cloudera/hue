@@ -1,0 +1,3568 @@
+<!DOCTYPE html>
+<html lang="en" class="js csstransforms3d">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="Hugo 0.55.5" />
+    <meta name="description" content="">
+
+
+    <link rel="shortcut icon" href="http://cloudera.github.io/hue/latest/images/favicon.png" type="image/x-icon" />
+
+    <title>3.6.0 :: Hue Documentation</title>
+
+    
+    <link href="/hue/latest/css/nucleus.css" rel="stylesheet">
+    <link href="/hue/latest/css/fontawesome-all.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/hybrid.css" rel="stylesheet">
+    <link href="/hue/latest/css/featherlight.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/perfect-scrollbar.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/auto-complete.css" rel="stylesheet">
+    <link href="/hue/latest/css/theme.css" rel="stylesheet">
+    <link href="/hue/latest/css/hugo-theme.css" rel="stylesheet">
+    
+      <link href="/hue/latest/css/theme-hue.css" rel="stylesheet">
+    
+
+    <script src="/hue/latest/js/jquery-2.x.min.js"></script>
+
+    <style type="text/css">
+      :root #header + #content > #left > #rlblock_left{
+          display:none !important;
+      }
+      
+    </style>
+    
+  </head>
+  <body class="" data-url="/hue/latest/releases/release-notes-3.6.0/">
+    <nav id="sidebar" class="">
+
+
+
+  <div id="header-wrapper">
+    <div id="header">
+      <a href="http://gethue.com">
+  <img src="http://cloudera.github.io/hue/latest/images/hue_logo.png" alt="alt text" title="Hue Logo">
+</a>
+
+    </div>
+    
+        <div class="searchbox">
+    <label for="search-by"><i class="fas fa-search"></i></label>
+    <input data-search-input id="search-by" type="search" placeholder="Search...">
+    <span data-search-clear=""><i class="fas fa-times"></i></span>
+</div>
+
+<script type="text/javascript" src="/hue/latest/js/lunr.min.js"></script>
+<script type="text/javascript" src="/hue/latest/js/auto-complete.js"></script>
+<script type="text/javascript">
+    
+        var baseurl = "http:\/\/cloudera.github.io\/hue\/latest\/";
+    
+    var fileSearchBlacklist = "";
+</script>
+<script type="text/javascript" src="/hue/latest/js/search.js"></script>
+
+    
+  </div>
+
+    <div class="highlightable">
+    <ul class="topics">
+
+        
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/" title="Administrator" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/">
+          <b>1. </b>Administrator
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/installation/" title="Installation" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/installation/">
+          Installation
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/installation/dependencies/" title="Dependencies" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/installation/dependencies/">
+          Dependencies
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/installation/install/" title="Install" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/install/">
+        Install
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/installation/containers/" title="Containers" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/containers/">
+        Containers
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/installation/starting/" title="Running" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/starting/">
+        Running
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/" title="Configuration" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/">
+          Configuration
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/server/" title="Server" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/server/">
+          Server
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/editor/" title="Editor" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/editor/">
+          Editor
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/dashboard/" title="Dashboard" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/dashboard/">
+          Dashboard
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/files/" title="Files and Stores" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/files/">
+          Files and Stores
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/external/" title="Other services" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/external/">
+          Other services
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/administration/" title="Administration" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/administration/">
+          Administration
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/reference/" title="Reference Architecture" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/reference/">
+        Reference Architecture
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/operations/" title="Operations" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/operations/">
+        Operations
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/user-management/" title="User Management" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/user-management/">
+        User Management
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/database/" title="Database" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/database/">
+        Database
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/" title="User" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/">
+          <b>2. </b>User
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/concept/" title="Concepts" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/concept/">
+          Concepts
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/editor/" title="SQL Editor / Notebook" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/editor/">
+          SQL Editor / Notebook
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/dashboards/" title="Dashboard" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/dashboards/">
+          Dashboard
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/browsers/" title="Data Catalog" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/browsers/">
+          Data Catalog
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/scheduler/" title="Scheduler" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/scheduler/">
+          Scheduler
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/contrib/" title="Contrib" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/contrib/">
+          Contrib
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/" title="Developer" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/">
+          <b>3. </b>Developer
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/development/" title="Development" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/development/">
+          Development
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/editor/" title="Editor / Notebook" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/editor/">
+          Editor / Notebook
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/api/" title="APIs" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/api/">
+          APIs
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/browsers/" title="Browsers" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/browsers/">
+          Browsers
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/application/" title="Applications" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/application/">
+          Applications
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/releases/" title="Releases" class="dd-item 
+        parent
+        
+        
+        ">
+      <a href="/hue/latest/releases/">
+          <b>4. </b>Releases
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.4.0/" title="4.4.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.4.0/">
+        4.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.3.0/" title="4.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.3.0/">
+        4.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.2.0/" title="4.2.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.2.0/">
+        4.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.1.0/" title="4.1.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.1.0/">
+        4.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.0.0/" title="4.0.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.0.0/">
+        4.0.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.12.0/" title="3.12.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.12.0/">
+        3.12.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.11.0/" title="3.11.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.11.0/">
+        3.11.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.10.0/" title="3.10.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.10.0/">
+        3.10.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.9.0/" title="3.9.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.9.0/">
+        3.9.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.8.0/" title="3.8.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.8.0/">
+        3.8.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.7.0/" title="3.7.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.7.0/">
+        3.7.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.6.0/" title="3.6.0" class="dd-item active">
+        <a href="/hue/latest/releases/release-notes-3.6.0/">
+        3.6.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.5.0/" title="3.5.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.5.0/">
+        3.5.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.0.0/" title="3.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.0.0/">
+        3.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.5.0/" title="2.5.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.5.0/">
+        2.5.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.4.0/" title="2.4.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.4.0/">
+        2.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.3.0/" title="2.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.3.0/">
+        2.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.2.0/" title="2.2.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.2.0/">
+        2.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.1.0/" title="2.1.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.1.0/">
+        2.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.0.1/" title="2.0.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.0.1/">
+        2.0.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.0.0-beta/" title="2.0.0-beta" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.0.0-beta/">
+        2.0.0-beta
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.2.0/" title="1.2.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.2.0/">
+        1.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.1.0/" title="1.1.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.1.0/">
+        1.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.0.1/" title="1.0.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.0.1/">
+        1.0.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.0.0/" title="1.0.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.0.0/">
+        1.0.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.9.1/" title="0.9.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.9.1/">
+        0.9.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.9.0/" title="0.9.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.9.0/">
+        0.9.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.4.2/" title="0.4.2" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.4.2/">
+        0.4.2
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.4.1/" title="0.4.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.4.1/">
+        0.4.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.4.0/" title="0.4.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.4.0/">
+        0.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.3.0/" title="0.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.3.0/">
+        0.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+         
+    </ul>
+
+    
+    
+      <section id="shortcuts">
+        <h3>More</h3>
+        <ul>
+          
+              <li> 
+                  <a class="padding" href="https://github.com/cloudera/hue"><i class='fab fa-fw fa-github'></i> GitHub</a>
+              </li>
+          
+              <li> 
+                  <a class="padding" href="http://demo.gethue.com"><i class='fas fa-fw fa-play'></i> Demo</a>
+              </li>
+          
+              <li> 
+                  <a class="padding" href="http://gethue.com"><i class='fas fa-fw fa-bookmark'></i> gethue.com</a>
+              </li>
+          
+        </ul>
+      </section>
+    
+
+    
+    <section id="footer">
+      <p>Built with <a href="https://github.com/matcornic/hugo-theme-learn">Learn</a> and <a href="http://gohugo.io/">Hugo</a></p>
+
+    </section>
+  </div>
+</nav>
+
+
+
+
+
+        <section id="body">
+        <div id="overlay"></div>
+        <div class="padding highlightable">
+              
+              <div>
+                <div id="top-bar">
+                
+                  
+                  
+                  
+                  <div id="top-github-link">
+                    <a class="github-link" title='Edit this page' href="https://github.com/cloudera/hue/blob/master/docs/docs-site/content/releases/release-notes-3.6.0.md" target="blank">
+                      <i class="fas fa-code-branch"></i>
+                      <span id="top-github-link-text">Edit this page</span>
+                    </a>
+                  </div>
+                  
+                
+                <div id="breadcrumbs" itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb">
+                    <span id="sidebar-toggle-span">
+                        <a href="#" id="sidebar-toggle" data-sidebar-toggle="">
+                          <i class="fas fa-bars"></i>
+                        </a>
+                    </span>
+                  <span class="links">
+                 
+                 
+                    
+            
+            
+              
+              
+            
+            
+              
+              
+            
+            
+              <a href='/hue/latest/'>Hue Guide</a> > <a href='/hue/latest/releases/'>Releases</a> > 3.6.0
+            
+          
+            
+          
+            
+          
+                 
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+
+        
+        <div class="body-outer">
+          
+          
+              <aside class="toc">
+  <div class="wrapper">
+    <header>
+    <h4>What's on this Page</h4>
+    </header>
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#hue-v3-6-0-released-thursday-29th-may-2014">Hue v3.6.0, released Thursday 29th, May 2014</a></li>
+</ul></li>
+<li><a href="#latest-notable-features">Latest Notable Features</a></li>
+<li><a href="#compatibility">Compatibility</a></li>
+<li><a href="#list-of-784-commits">List of 784 Commits</a></li>
+<li><a href="#contributors">Contributors</a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</aside>
+          
+          <div id="body-inner">
+
+            
+              <h1>3.6.0</h1>
+            
+
+          
+
+
+
+
+<h3 id="hue-v3-6-0-released-thursday-29th-may-2014">Hue v3.6.0, released Thursday 29th, May 2014</h3>
+
+<p>Hue, <a href="http://gethue.com">http://gethue.com</a>, is an open source UI for doing big data analysis with Hadoop.</p>
+
+<p>It features:</p>
+
+<ul>
+<li>File Browser for accessing HDFS</li>
+<li>Hive Editor for developing and running Hive queries</li>
+<li>Search App for querying, exploring, visualizing data and dashboards with Solr</li>
+<li>Impala App for executing interactive SQL queries</li>
+<li>Spark Editor and Dashboard</li>
+<li>Pig Editor for submitting Pig scripts</li>
+<li>Oozie Editor and Dashboard for submitting and monitoring workflows, coordinators and bundles</li>
+<li>HBase Browser for visualizing, querying and modifying HBase tables</li>
+<li>Metastore Browser for accessing Hive metadata and HCatalog</li>
+<li>Job Browser for accessing MapReduce jobs (MR1/MR2-YARN)</li>
+<li>Job Designer for creating MapReduce/Streaming/Java jobs</li>
+<li>A Sqoop 2 Editor and Dashboard</li>
+<li>A ZooKeeper Browser and Editor</li>
+<li>A DB Query Editor for MySql, PostgreSQL, SQLite and Oracle</li>
+</ul>
+
+<p>On top of that, a SDK is available for creating new apps integrated with Hadoop.</p>
+
+<p>More user and developer documentation is available at <a href="http://gethue.com">http://gethue.com</a>.</p>
+
+<h2 id="latest-notable-features">Latest Notable Features</h2>
+
+<ul>
+<li><a href="http://gethue.com/hadoop-search-dynamic-search-dashboards-with-solr">Search App v2: Dynamic search dashboards with Solr</a></li>
+<li>100% Dynamic dashboard</li>
+<li>Drag &amp; Drop dashboard builder</li>
+<li>Text, Timeline, Pie, Line, Bar, Map, Filters, Grid and HTML widgets</li>
+
+<li><p>Solr Index creation wizard from a file</p></li>
+
+<li><p><a href="http://gethue.com/visualize-snappy-compressed-avro-files/">View Snappy compressed Avro</a>/Parquet files</p></li>
+
+<li><p><a href="http://gethue.com/hadoop-tutorial-how-to-distribute-impala-query-load/">Impala HA</a></p></li>
+</ul>
+
+<h2 id="compatibility">Compatibility</h2>
+
+<p>Runs on CentOS versions 5 to 6, Red Hat Enterprise Linux (RHEL), and Ubuntu 10.04 to 12.10.
+CentOS 5 and RHEL 5 requires EPEL python 2.6 package.</p>
+
+<p>Tested with CDH5. Specifically:</p>
+
+<ul>
+<li>Hadoop 0.20 / 2.3.0</li>
+<li>Hive 0.13.0</li>
+<li>Oozie 4.0</li>
+<li>HBase 0.98</li>
+<li>Pig 0.12</li>
+<li>Impala 1.3</li>
+<li>Solr 4.4</li>
+<li>Sqoop2 1.99.3</li>
+</ul>
+
+<p>These minimum versions should work (not tested):</p>
+
+<ul>
+<li>Hadoop 0.20 / 1.2.0 / 2.0.0</li>
+<li>Hive 0.12.0</li>
+<li>Oozie 3.2</li>
+<li>HBase 0.92</li>
+<li>Pig 0.8</li>
+<li>Impala 1.0</li>
+<li>Solr 3.6</li>
+<li>Sqoop2 1.99.3</li>
+</ul>
+
+<p>Supported Browsers:</p>
+
+<ul>
+<li>Windows: Chrome, Firefox 3.6+, Internet Explorer 9+, Safari 5+</li>
+<li>Linux : Chrome, Firefox 3.6+</li>
+<li>Mac: Chrome, Firefox 3.6+, Safari 5+</li>
+</ul>
+
+<p>Runs with Python 2.6+</p>
+
+<h2 id="list-of-784-commits">List of 784 Commits</h2>
+
+<ul>
+<li>907ec26 [doc] Hue 3.6 release notes</li>
+<li>16ac841 [indexer] Fix quoting and python version</li>
+<li>55261f5 [metastore] UnicodeDecodeError when viewing schema of table</li>
+<li>1e8ea71 [search] Add correct start date in twitter example</li>
+<li>de0b82f [search] Better animate to column</li>
+<li>caaf31e HUE-2124 [oozie] HDFS Deployment directory is missing &ldquo;slash&rdquo; symbol</li>
+<li>7ce38bb [search] Trailing whitespaces and tabs cleanup</li>
+<li>bae6007 [search] Disable is editing</li>
+<li>335d623 [search] Changed date picker</li>
+<li>4b8faae [search] Editable widget popup should open on the right</li>
+<li>84df243 [search] Scroll to field</li>
+<li>66fe2b1 [search] Added spinedit for limit</li>
+<li>e368eee [search] Added daterangepicker</li>
+<li>0d507fb [search] Support moving map widgets</li>
+<li>ddddcf6 [search] Cleaner gridlayout headers when no fields are selected</li>
+<li>606c39f [search] Koify getdocument in result grid layout</li>
+<li>8132720 [search] Zooming out does not reset filter</li>
+<li>354f17e [search] Make sure min or max properties of range facet are restricted</li>
+<li>043230b [search] Added formatters and reverse formatters for slider</li>
+<li>1973d6f [search] Reduced a bit the slider size</li>
+<li>782c6da [search] Styled a bit the settings panel</li>
+<li>af93938 [search] Minor CSS fix</li>
+<li>40870c3 [search] Added Indexes menu link</li>
+<li>1ba0fba [search] Added visual hint for updating charts for slower collections</li>
+<li>899b800 [search] Fix range select color</li>
+<li>e66a598 [search] Set max width for slider to 250px</li>
+<li>64944e2 [search] Fixed slider z-index problem</li>
+<li>0963a18 [search] Fixed clearable click event</li>
+<li>0087d49 [search] Add min and max field properties to range facets</li>
+<li>e620b8c [search] Truncate milliseconds in dates for better timelines</li>
+<li>2df9942 [search] Restyled a bit grid results, added all/current filter</li>
+<li>42a2edf [search] Externalized CSS and streamlined Less addition</li>
+<li>4a6c582 [search] Avoid line wrapping on result row</li>
+<li>8981258 [search] Fix field list size for magic layout</li>
+<li>2884912 [search] Slider binding</li>
+<li>918b31f [indexer] All fields should be stored by default</li>
+<li>d9c9349 [core] Move create collection or core to the new dashboard</li>
+<li>22e5bd4 [search] Import and convert older collections</li>
+<li>b4d174e [indexer] Add modal dialogue for deleting a single collection</li>
+<li>d9cb9fc [indexer] Setup examples in search API</li>
+<li>3fd67ab [indexer] Unique key field must be indexed</li>
+<li>b37afe7 [indexer] Choose field type more intelligently</li>
+<li>f6f9de4 [indexer] Choose unique key field more intelligently</li>
+<li>0b89284 [indexer] Change config defaults</li>
+<li>bcc362a [search] Escape extracode in HTML widget</li>
+<li>b758d4a [indexer] Install examples in admin wizard</li>
+<li>66872a2 [indexer] All fields should be indexed by default</li>
+<li>9bf3501 [indexer] Add confirmation when deleting collections</li>
+<li>8af533f [search] Install search templates</li>
+<li>d6f1692 [search] Partial cleanup of indexer</li>
+<li>ffaea0f [search] First fix for result jump</li>
+<li>b05c914 [search] Use gradient map</li>
+<li>f6e4874 [search] Re-init range facet when deleting its filter</li>
+<li>eba76c4 [search] Add correct closure to support multiple bar charts</li>
+<li>8e627dd [search] Range and field support for bar chart</li>
+<li>e045c3a [search] Clearable fix for Retina displays</li>
+<li>9059baa [search] New binding clearable</li>
+<li>d14f4d2 [indexer] Add install examples view</li>
+<li>517c4e9 [indexer] Add logs example</li>
+<li>8c85408 [indexer] Add jobs example</li>
+<li>50aa919 [indexer] Add yelp example</li>
+<li>ef37713 [search] Adding collection settings tab</li>
+<li>66b5330 [search] Replace log_demo by log_analytics_demo</li>
+<li>c583e90 [search] Restrict edition to admin only</li>
+<li>9b09086 [search] Introduced share dialog</li>
+<li>0b11f78 [search] Current query is URL shareable</li>
+<li>348d966 [search] Added empty dashboard message</li>
+<li>8031706 [search] convert multi queries to new api</li>
+<li>4ba8eed [search] Workaround for fq filter with a space in the value</li>
+<li>8b17c43 [indexer] Fix &lsquo;nodeType&rsquo; of undefined errors</li>
+<li>3625306 [indexer] Improve timestamp type check</li>
+<li>85e7ae5 [indexer] Respect newlines in quotes</li>
+<li>161f60b [indexer] Remove constant redirection</li>
+<li>f9ee757 [search] Adding Apache log demo example</li>
+<li>e50d144 [search] Fix for drag existing widget to new row helper</li>
+<li>536fc1d [search] Fixed line chart selected range values</li>
+<li>90fd4bd [search] Updating the tests</li>
+<li>260e414 [search] Remove deprecated version</li>
+<li>3c025f7 [search] Fixed enable selection</li>
+<li>5de11b8 [search] Fixed selection on line chart</li>
+<li>dabec3e [search] Changed color to selected area</li>
+<li>15691b8 [search] Plugin select events on the line and bar charts</li>
+<li>6764548 [search] Added more evident selected state to maps and fixed modal dialog hide event</li>
+<li>48a351b [search] Smarter line chart</li>
+<li>9b30bdf [search] Smarter date range facets</li>
+<li>7b42475 [search] Smarter range facets for numbers</li>
+<li>5c9d0ff [search] Restyled result pagination</li>
+<li>babb900 [search] Result pagination doesn&rsquo;t scroll anymore</li>
+<li>365c399 [search] Finalized field list UI</li>
+<li>1509d0c [search] Esc on field list modal deletes the widget now</li>
+<li>6a621f1 [core] jHueNotify shouldn&rsquo;t display HTML content</li>
+<li>fbde025 [search] Fix row height problem</li>
+<li>8763e27 [indexer] Remove example dir and use search examples</li>
+<li>1de9afc [indexer] Add indexer examples</li>
+<li>13802d6 [search] Enable selected countries/states on Datamaps</li>
+<li>e339079 [search] Generic URL to browse any collection</li>
+<li>bf519f7 [indexer] Choose between tlong and tint</li>
+<li>c640bf2 [indexer] Use tdate instead of date when choosing types</li>
+<li>6f459ad [indexer] Add labels for field separators</li>
+<li>4ae194a [indexer] Remove log type</li>
+<li>adfb2dd [indexer] Add breadcrums</li>
+<li>89d8298 [indexer] Change to metastore like layout</li>
+<li>64ac825 [indexer] Change defaults of &lsquo;add field&rsquo; screen</li>
+<li>b0a69b6 [indexer] Parse timestamp field for separated files</li>
+<li>677273a [indexer] Use tdate instead of date when groking fields</li>
+<li>a29f562 [indexer] Get rid of internal collection management</li>
+<li>8f4049b [indexer] Improve data upload</li>
+<li>10f2197 [indexer] UI/UX improvements</li>
+<li>f3d65ef [search] Removed spinedit that broke everything.</li>
+<li>a2ffa3d [search] Squeeze some white spaces</li>
+<li>95f5401 [search] Restyled demi modal</li>
+<li>b333451 [search] Added enable selection to line chart</li>
+<li>ee437cc [search] Clickable map creates filters that can be toggled</li>
+<li>f2703e6 [search] Adding some various states in the example</li>
+<li>008e991 [search] Restyled filter bar</li>
+<li>367c8bd [search] Better click even for Datamaps</li>
+<li>68bc031 [search] Select a place on map and create a filter</li>
+<li>eb72327 [search] Adding scope to the map widget</li>
+<li>6acb6f2 [search] Added maxWidth for Pie chart</li>
+<li>3b7b06c [search] Converted barchart to brushBarChart</li>
+<li>2998bad [search] Disabled mouseover jump</li>
+<li>f584a9d [search] Map works with country codes</li>
+<li>5597be0 [search] Default text facet size is 10 even if range facet</li>
+<li>b0b4cdc [search] Added multiline labels after chart update</li>
+<li>18215b9 [search] Removed extra space underneath charts</li>
+<li>e6b56e2 [search] Fixed onClick event of growingMultibarChart</li>
+<li>990b2c4 [search] Added maxWidth to map binding</li>
+<li>217630e [search] Deleted unused files, Maps: added enableGeocoding, onClick event, data tooltip, Widgets: resize event, fixed double markup, updated sortable</li>
+<li>b9e7b0b [search] Added empty row at the beginning of a column too</li>
+<li>d421347 [search] New properties tab in HTML result</li>
+<li>b6f4f97 [search] Enable pick button when field is selected</li>
+<li>8e08088 [search] Highlight HTML results and escape only once</li>
+<li>3c346f7 [search] Add job collection to the examples</li>
+<li>8b6f05f [search] Added step support to slider</li>
+<li>8db7d31 [search] Added bindings for slider</li>
+<li>71557fc [search] Added Bootstrap spinedit binding</li>
+<li>4a87d55 [search] Field list adjust its height to the result panel</li>
+<li>530c833 [search] Restyled fields modal</li>
+<li>6c5f9b0 [indexer] Remove only selected collections</li>
+<li>4384698 [indexer] Remove symlink version</li>
+<li>04255ec [search] Synchronize dynamic fields</li>
+<li>abca560 [search] Synchronize static fields</li>
+<li>62d7b00 [search] Make field list of gridlayout a computed</li>
+<li>5c7feec [indexer] Hook into search app</li>
+<li>6e5e313 [indexer] Fix log upload</li>
+<li>beae907 [indexer] Make indexer lib work with its urls</li>
+<li>21e4b24 [indexer] Remove schema generator</li>
+<li>92bb82a [indexer] Move collection manager to indexer lib</li>
+<li>dbcb249 [collectionmanager] Add other field types</li>
+<li>e667f87 HUE-2037 [search] Index a file or hive table easily</li>
+<li>119da98 [search] Removed unused jQuery files</li>
+<li>529f2bd [search] Added inline document details</li>
+<li>a52f8d5 [search] Add location field to the log example</li>
+<li>1e9b35f [search] Update template of magic layout</li>
+<li>4db6a26 [search] Update gridlayout field list in a new dashboard</li>
+<li>612f200 [search] Restyled field list</li>
+<li>4a34768 [search] Refresh new collection redirects to collection itself</li>
+<li>52ebfb8 [search] Fix hover field titles</li>
+<li>4b95e65 [search] Update template and field list of new collections</li>
+<li>ae5887e [search] Fix hover field titles</li>
+<li>dc49588 [search] Move column chevron icons on hover</li>
+<li>dfe7d63 [search] Added drag to new row</li>
+<li>00223ff [search] Download results in json, csv or xls</li>
+<li>ece2c68 [search] Fixed empty callback for search</li>
+<li>c292bd4 [search] Added field and function selects to html resultset editor</li>
+<li>0731f6b [search] Pagination should use numbers and not strings</li>
+<li>0323612 [search] Fetch new fields when creating a collection dashboard</li>
+<li>9644ea0 [search] Added freshereditor</li>
+<li>01af39a [search] Added scroll back to initial position</li>
+<li>f7c57ee [search] Add field modal preview and cancel functions</li>
+<li>7483e40 [search] Added editable to other widgets too</li>
+<li>a5e7f67 [search] Fixed ko.editable to update enabled/disabled status</li>
+<li>cc49870 [search] Inverted X axis labels and changed icon for timeline</li>
+<li>b975d24 [search] Add see more or less on text facets</li>
+<li>6a9d1dd [search] Added multiline x-axis labels for timeline</li>
+<li>dfc517b [search] Update number of rows and template only after n seconds</li>
+<li>ef54ae3 [search] Widget name is now editable</li>
+<li>e86611a [search] Removed zIndex from Pie draggable</li>
+<li>497ceb2 [search] Next and previous pagination</li>
+<li>b24f682 [search] Adding number of rows pagination</li>
+<li>19fb05a [search] Bump jQuery and jQuery UI versions</li>
+<li>c9d59b7 [search] First version of result inspector</li>
+<li>1b17000 [search] Removed media queries for the toolbar</li>
+<li>73ec3ac [search] Made rows more visible in edit mode</li>
+<li>7b93ba9 [search] Fixed stacked hover effect</li>
+<li>e59ba91 [search] Limited CSS to result pane only</li>
+<li>97d1573 [search] Introduced ko bindings for Codemirror</li>
+<li>dabdab6 [search] Restyled available widgets</li>
+<li>24892af [search] Add move icon to drag widget</li>
+<li>57d487b [search] Autocomplete add a widget field input</li>
+<li>6c3784f [search] Only display available fields in add widget modal</li>
+<li>c3887a1 [search] Enable or disable available widgets</li>
+<li>7094a94 [search] Enforce only one instance of certain types of widgets</li>
+<li>e1f7da7 [search] Split grid and HTML resultset widgets</li>
+<li>36ef323 [search] Filter widget styled</li>
+<li>971655e [search] Set facet label or widget type to the widget title</li>
+<li>6cccf16 [search] Remove widgets inside a row when deleting it</li>
+<li>82a0110 [search] Removed loading from filter widget and added empty message</li>
+<li>8e5abfb [search] Cleaner text facet links</li>
+<li>00dc723 [search] Do not show field picker on Filter Bar</li>
+<li>fbc2272 [search] Minify widgets on new widget drag</li>
+<li>5102fe8 [search] Minify widgets on new widget drag</li>
+<li>f806b9b [search] First pass of beautification</li>
+<li>8f53979 [search] Switch facet type icons for widgets</li>
+<li>286f05c [search] Create a new template based on any solr collection</li>
+<li>bc88af6 [search] Fix for delete facet</li>
+<li>200cf51 [search] Introducting enable selection on histogram</li>
+<li>b6cf638 [search] Fix loading spinner on Text facet</li>
+<li>c355f83 [search] Authorize search page without a dashboard</li>
+<li>ffa2807 [search] Optimize range multi facet queries</li>
+<li>9de47ca [search] Multi select range facets</li>
+<li>8609451 [search] Prepare for multi select of range facets</li>
+<li>9297f30 [search] Persist stacked or not property of histogram</li>
+<li>37a9cd3 [search] Split facet range and sort order buttons</li>
+<li>4e37306 [search] Propagate state change</li>
+<li>d48a3e7 [search] More on maps</li>
+<li>871ad00 [search] Added option to set stacked for barcharts and timeline charts</li>
+<li>3e9580c [search] Adding count to facet multiqueries</li>
+<li>6652ad0 [search] Multi queries by search box or field facet logic</li>
+<li>be9a2dd [search] Multi search boxes queries</li>
+<li>039b0de [search] Fix refresh of group by option of histogram</li>
+<li>512c607 [search] Fix zooming back from histogram</li>
+<li>7ee1f8b [search] Range select should also filter the result documents</li>
+<li>880db24 [search] Multi queries for timeline</li>
+<li>3aaa909 [search] First version of Hue Geo</li>
+<li>05d6e92 [search] Fix multibar highlight</li>
+<li>72f1a71 [search] Initial map support</li>
+<li>154c8d7 [search] Add support for bar highlight</li>
+<li>b45da61 [search] Added line chart support</li>
+<li>cdb8763 [search] Do not show field selector for result widget</li>
+<li>8cd81eb [search] Dynamic range of historgram widget</li>
+<li>11ea101 [search] Escape HTML cells in gridlayout</li>
+<li>7c5e323 [search] Fix timeline data transformer</li>
+<li>5799efd [search] Furtherly improved d&amp;d</li>
+<li>e72f67a [search] Improved usability of drag &amp; drop</li>
+<li>996326b [search] Disable scroll to top and auto open field list demi modal</li>
+<li>6c28d96 [search] Visual feedback for drop targets</li>
+<li>c21b3ca [search] Ground work for multi serie bar charts</li>
+<li>542cb5d [search] Added DiscreteBarChart support</li>
+<li>d14fab1 [search] Escape HTML cells in gridlayout</li>
+<li>5791b53 [search] Retrieve single doc by id</li>
+<li>8dae122 [search] Added Pie chart selection and mouseover handling</li>
+<li>f841468 [search] Fix call to onSelectRange</li>
+<li>606c571 [search] Introduced media queries for the top bar</li>
+<li>1a1ede7 [search] Propagate onSelectRange</li>
+<li>251ab34 [search] Converted top bar layout images to css</li>
+<li>7a53776 [search] Re-enable copy/paste in edit mode</li>
+<li>6ddfa77 [search] Move gridlayout columns to left or right</li>
+<li>a64cb32 [search] Removing a widget should remove its filters</li>
+<li>0d23d80 [search] Splitting templates of range/field widgets like text and pie</li>
+<li>d12fd2a [search] Multi filter for range facets</li>
+<li>d3b3c9d [search] Multi fq support for text facet</li>
+<li>a9fb00d [search] Added new field selection modal</li>
+<li>b4a4f51 [search] Added selection management on multiBarChart</li>
+<li>3ae84c6 [search] Ask only for the used fields in the gridlayout</li>
+<li>4333667 [search] Make pie widget work with range facet</li>
+<li>bc7ca8a [search] Smarter number of slots for text range facets</li>
+<li>3f05860 [search] Toggle facet order and type</li>
+<li>df559a9 [search] Skeleton for magic layout</li>
+<li>6da1259 [search] Text, pie and bar facets can also be ranges</li>
+<li>620e231 [search] Added barChart code for handling time data</li>
+<li>1cf0fa2 [search] Adding bar char widget</li>
+<li>37c0837 [search] Add date support fo range facet</li>
+<li>f8c3a4c [search] Extracted charting to external js file</li>
+<li>886b03c [search] Added first version of multiBar</li>
+<li>3f3986d [search] Adding range facets with numbers</li>
+<li>336e3a9 [search] Adding histogram widget</li>
+<li>788b5ac [search] Added first version of Pie and changed drag handler</li>
+<li>041a01c [search] Added nvd3 dependencies</li>
+<li>32cac55 [search] Fix modifying an existing collection template</li>
+<li>142f055 [search] Add Pie widget</li>
+<li>18aaff6 [search] Display all the columns in the grid layout</li>
+<li>64ec801 [search] Add Hit Count facet</li>
+<li>f5bd061 [search] Save a new collection button</li>
+<li>02e5746 [search] Add a new template button</li>
+<li>65022ca [search] Adding support for sorting the grid layout</li>
+<li>5d260ef [search] Adding template for result pagination</li>
+<li>faec4ff [search] Adding empty search result message</li>
+<li>78a092b [search] Adding list of fields with extended metadata like types</li>
+<li>1a325c2 [search] Add id to widgets to map them to a model object</li>
+<li>f5f0201 [search] Edit and remove facet attached to the layout</li>
+<li>7bf0494 [search] Fix toggling of the gridlayout show field list</li>
+<li>5a611dc [search] Do not add dynamic fields more than once</li>
+<li>a661e8f [search] Do not try to convert empty collections</li>
+<li>f78c813 [search] Load back the saved layout</li>
+<li>40d6aa8 [search] Add toggle field list visibility in grid layout</li>
+<li>a6893ec [search] Make grid field selection button toggable</li>
+<li>e9d9d03 [search] Display whole json record when no fields are selected</li>
+<li>49edd09 [search] Fix refresh when switching back to grid layout in edit mode</li>
+<li>fa90c10 [search] Updating WIP</li>
+<li>b3892bb [search] Start to prettify</li>
+<li>eb46c8e [search] Guess id field for result highlighting</li>
+<li>dd2159d [search] Save the template of a collection</li>
+<li>9dc26fc [search] Collection and facet edition integration</li>
+<li>63e409e [search] Merging dashboard and search page</li>
+<li>b75ef6d [search] Refactoring API and KO models</li>
+<li>fe88c7d [search] Simpliying search API</li>
+<li>79b5bbe [search] Dashboard cleanup</li>
+<li>221b11c [search] Prettified dashboard</li>
+<li>36e8051 [search] Added dashboard toolbar</li>
+<li>f884511 [search] Dashboard prettify</li>
+<li>80d73b7 [search] Adding a dashboard</li>
+<li>7a603c6 HUE-2108 [metastore] Error when dropping a table</li>
+<li>9175b87 [useradmin] Remove server selection from ldap functionality when using legacy configuration</li>
+<li>11582cb [core] Invert dependency list and merge migrations</li>
+<li>0520f6c HUE-1957 [core] Configure thrift transport</li>
+<li>d8822ac HUE-2085 [core] Update migration dependencies</li>
+<li>9a3d1b4 HUE-2101 [fb] Copying a file trims the last chunk</li>
+<li>7f74580 HUE-2112 [fb] The &lsquo;New&rsquo; dropdown goes off screen</li>
+<li>b186265 [search] Rename Navigator to Assist</li>
+<li>b05324e HUE-2111 [pig] Enable collapse of navigator items</li>
+<li>6ad3895 HUE-2110 [core] Update FontAwesome to 4.1</li>
+<li>0fd00f1 HUE-2089 [useradmin] Sync ldap users modal form is misaligned</li>
+<li>e988bde HUE-2099 [jobbrowser] Improve metadata tab performances</li>
+<li>c0c1bef HUE-2106 [beeswax] Table list and query caches should be per user</li>
+<li>3e3236f [core] New datanode report format</li>
+<li>03b82fc HUE-2095 [beeswax] Do not fetch statements without a resultset</li>
+<li>9fe2102 HUE-2091 [fb] Configurable tempfile.tempdir for local file upload</li>
+<li>0a895a9 [beeswax] Escape space to HTML spaces in some tests</li>
+<li>403cd90 [liboauth] Add a mapping to shorten domain names in usernames</li>
+<li>deeb9b6 HUE-2109 [core] Use MPL instead of LGPL for certificate bundle</li>
+<li>556d9fd [metastore] Do not concatenate spaces in cells result</li>
+<li>a1fba50 HUE-2104 [beeswax] Don&rsquo;t truncate space characted values from query results</li>
+<li>21938ff HUE-2100 [beeswax] Query with error should not show the cancel button</li>
+<li>e11b285 [sqoop] Not unicode strings in argument expansion</li>
+<li>e436a8a [core] Stream CSV download and limit XLS download</li>
+<li>8c9388c HUE-1897 [oozie] Workflow ids have double trailing slashes</li>
+<li>7316408 [beeswax] Clone copy to a new owner option</li>
+<li>94026fb HUE-2058 [oozie] Incomplete save state in workflow editor</li>
+<li>965f9ca HUE-2039 [beeswax] Remove the need to clone a shared query</li>
+<li>8d72adb HUE-2059 [core] Only display history documents in their home section</li>
+<li>b5148b4 HUE-2096 [core] Error on login page are duplicated</li>
+<li>f9800d5 HUE-2087 [beeswax] Job is submitted twice when the Enter key is used for the Execute button</li>
+<li>72e880d HUE-2074 [core] Update Knockout to 3.1</li>
+<li>4196369 HUE-2070 [metastore] Improve guess of numeric data types</li>
+<li>465d5a0 [core] RemoteUser middleware fixes</li>
+<li>0f86364 [core] Improve memory debug view</li>
+<li>f37ba45 [core] Add BeautifulSoup and have requests use it</li>
+<li>9eac028 HUE-2026 [core] Create a doc model write permission</li>
+<li>144142a HUE-2026 [core] Create a doc model write permission</li>
+<li>28189e9 HUE-2026 [core] Create a doc model write permission</li>
+<li>0394d64 Revert &ldquo;[core] Add python-snappy library&rdquo;</li>
+<li>d09dce2 Revert &ldquo;[core] make snappy a first class citizen&rdquo;</li>
+<li>a106006 HUE-296 [core] Memory profiling config</li>
+<li>7e5ffff [core] Fix LDAP and useradmin group list tests</li>
+<li>f541560 HUE-296 [core] Add memory usage debug view</li>
+<li>dc17a4a HUE-296 [core] Add guppy debugger</li>
+<li>cf3d770 HUE-2080 [core] Update tours URLs</li>
+<li>8af30e0 HUE-2072 [core] Disable SSL proxy header by default</li>
+<li>b293f95 HUE-2072 [core] Updating Proxy SSL support to be optional</li>
+<li>b69811f HUE-2072 [core] Adding support for HTTPS load-balancing</li>
+<li>b3a760d HUE-2012 [core] AD multidomain support</li>
+<li>e4ff348 HUE-2012 [core] upgrade django auth ldap</li>
+<li>b1baed4 [filebrowser] Snappy decompression error should throw PopupException</li>
+<li>810af74 [desktop] A user can share a document to a group he does not belong too</li>
+<li>9f3fb69 [beeswax] Close HiveServer2 and Impala session command</li>
+<li>2321211 [filebrowser] read parquet in filebrowser</li>
+<li>63ba4f1 [core] update parquet-python to use file objects</li>
+<li>75261c1 [core] add parquet-python library</li>
+<li>8d15fcf [core] make snappy a first class citizen</li>
+<li>c8a63af [core] Add python-snappy library</li>
+<li>cc4a896 HUE-2068 [infra] Third-party dependencies manifest is excluded from binary distributions</li>
+<li>c2ec0e6 HUE-2043 [core] database options keys have unicode keys</li>
+<li>5fb9260 [core] Remove python 2.4 and 2.5 from python selection</li>
+<li>182f8da HUE-2069 [jb] The new jobs in ACCEPTED state are not automatically appearing</li>
+<li>9ee9004 [core] Remove some bad links in the documentation</li>
+<li>819ef4d [core] Yarn check config should not depend on test code</li>
+<li>d1e9de8 HUE-2061 [jb] Does not use the node address when task is not running</li>
+<li>8e79c58 HUE-2062 [pig] Editor fails with non ASCII characters</li>
+<li>4897c52 HUE-2065 [core] Make sure log page is proposed only to superusers</li>
+<li>8f82dda HUE-2063 [beeswax] The map chart does not display</li>
+<li>6ff62b5 HUE-2063 [beeswax] The map chart does not display</li>
+<li>4f60306 HUE-2061 [jb] Task logs are not retrieved if containers not on the same host</li>
+<li>7a67dd3 [useradmin] Fix translations in ldap cli commands</li>
+<li>d29a902 [useradmin] LDAP import commands carry incorrect import statements</li>
+<li>0a4eacd [core] Integrate feedback tab when running in demo mode</li>
+<li>4d7628c HUE-577 File viewer should work with snappy-compressed Avro data files</li>
+<li>5ff543d [core] upgrade avro library</li>
+<li>ee5aecc HUE-2047 [oozie] Clicking on workflows only works for first page of Workflow Manager</li>
+<li>0ac366c HUE-2033 [core] Cleanup and tests update</li>
+<li>56e21e2 HUE-2033 [core] Reviews findings</li>
+<li>54ab7ec HUE-2033 [core] Fixed document update after project or sharing changes</li>
+<li>3ab0f02 HUE-2033 Merge back the new home page</li>
+<li>53b07db HUE-2033 [core] Fix counting of shared documents</li>
+<li>5595e06 HUE-2033 [core] Added project move functionality</li>
+<li>ff8f72a HUE-2033 [core] Readded sharing functionality</li>
+<li>1f2061e HUE-2033 [core] Refactored UX for remove project</li>
+<li>80dab73 HUE-2033 [core] Added project management functionality</li>
+<li>1dc4654 HUE-2033 [core] Cleaned style of the documents and tags</li>
+<li>38f1ed3 HUE-2033 [core] Link back backend to homepage 2</li>
+<li>ed85ae4 HUE-2033 [core] Dynamic and robust home page</li>
+<li>a2e65e2 [beeswax] Check for ownership before saving</li>
+<li>cea265d [core] Add third-party dependency references</li>
+<li>5c7ef36 HUE-2040 [useradmin] Synchronize nested ldap groups</li>
+<li>7544de2 [core] make suboordinate subgroups the default</li>
+<li>010066f [core] remove bad import from python util tests</li>
+<li>69b9656 HUE-1177 [jb] Improve MR2 UX with correct percentage progress</li>
+<li>5784e15 HUE-2041 [pig] Improve log polling usage</li>
+<li>d328bd0 [core] Remove unused desktop JS libraries</li>
+<li>592649f HUE-1989 [core] Move the js logic to the home page</li>
+<li>a235e4e [core] Second pass of l10n for 3.5</li>
+<li>912c2f8 HUE-2010 [core] Configure Hue to terminate users who has not logged in X days</li>
+<li>27a5925 [oozie] Migrate examples with mkdirs and touchzs paths</li>
+<li>8cec8cd HUE-1890 [oozie] Longer input fields in workflow editor</li>
+<li>f698a29 HUE-2032 [beeswax] Order by autocomplete should propose columns</li>
+<li>ba5907c [jobsub] Add description to &lsquo;get_design&rsquo; call</li>
+<li>267b227 [oozie] Import workflow imports mkdirs and touchsz as lists of dictionaries</li>
+<li>d62d465 [core] Move welcome tour to home</li>
+<li>33c43c7 HUE-1801 [fb] Introduce pages with scroll when viewing a file</li>
+<li>9a8aeae [core] Add Feedback label for demo</li>
+<li>1380e84 HUE-1989 [core] Welcome tour on the home page</li>
+<li>38ae9d6 HUE-1888 [beeswax] Code mirror placeholder i18n</li>
+<li>4e27324 HUE-2011 [impala] Autocomplete a non existing table hangs</li>
+<li>c7ae876 HUE-2016 [core] Improve the shadows for stateful buttons</li>
+<li>0f151d0 [core] Nested members support</li>
+<li>6cc6604 [core] Fix tag refresh after delete or create</li>
+<li>f502a5e [core] Display all the tags</li>
+<li>5448fb2 [metastore] Hide recent query tab when browsing a table</li>
+<li>0569298 [impala] Fix link to metastore browser table</li>
+<li>fd23026 [core] Installed apps with no webpage on dump_config should not propose links</li>
+<li>f208e4e HUE-1962 [hbase] Support int row key from Hive table</li>
+<li>d6c869c [impala] Replace non utf8 encoded chars from the resultsets</li>
+<li>76064c6 [liboauth] Limit oauth login to specific list of domains</li>
+<li>7307bf6 [liboauth] Show error message after Aouth login failure</li>
+<li>5cee8ea [liboauth] Indentation fix</li>
+<li>49bbfc8 HUE-2020 [hbase] upload an image sometimes produces an error</li>
+<li>cf39ae2 [hbase] Fix new cell upload</li>
+<li>618672d [core] Secure shared tag edition</li>
+<li>4a15302 HUE-1989 [site] Live demo hosting</li>
+<li>0ef4c1f [oozie] Change unsaved workflow message</li>
+<li>d45bd82 [impala] Separate server timeouts</li>
+<li>a5d623a [impala] Disable ssl when using impala</li>
+<li>abbc506 HUE-1868 [dbquery] Query then error moves headers</li>
+<li>02121a4 HUE-2029 [oozie] Prompt to save a workflow before submission if it was modified</li>
+<li>7ebffae [impala] Hide system database from the main editor dropdown</li>
+<li>dcfad9c [core] Adding autofocus on username field on login</li>
+<li>28dc4e6 [oozie] Fix delete button misrepresenting the correct permissions</li>
+<li>4df787b [pig] Enforce write permissions on the shared scripts</li>
+<li>f27cc76 HUE-1298 [impala] Multiple Impalad support</li>
+<li>55865b1 HUE-2022 [core] Add login button to top bar when not authenticated</li>
+<li>2f51c78 HUE-2021 [core] Close tours list by pressing ESC or clicking anywhere else</li>
+<li>d6c53e9 [impala] Align sync table tips</li>
+<li>077faf6 [search] Display errors from Solr instead of a 500</li>
+<li>75691d9 HUE-1804 [core] Serve admin static files</li>
+<li>d18c249 [doc] Update screenshot and app descriptions</li>
+<li>1f0fa51 [search] Add double and tdouble to range facets</li>
+<li>dba67fd HUE-2022 [core] Add login button to top bar when not authenticated</li>
+<li>e7d8d64 [core] Make the tours modal escape-able by escape key</li>
+<li>38eea26 HUE-2018 [metastore] Add column position to table view</li>
+<li>6860085 [core] Fix several broken and hanging tests</li>
+<li>518559e [hbase] A couple of bug fixes</li>
+<li>e3c095a HUE-1884 [core] Split tag view in shared and not shared ones</li>
+<li>1b9b32d HUE-1884 [core] Limit number of history documents</li>
+<li>05774d2 [useradmin] Hide LDAP sync buttons when LDAP is not configured</li>
+<li>4a728d0 [core] Update configuration check path color</li>
+<li>746f481 HUE-2013 [metastore] Write permission instead of read permission</li>
+<li>b43a601 HUE-2008 [pig] Clicking on the stop button should stop on the frontend</li>
+<li>f30cc0d HUE-1918 [core] Login page should accept longer password</li>
+<li>187e8ba HUE-1978 [beeswax] Cancel whole multi query execution</li>
+<li>bac49ac [core] Updating documentation</li>
+<li>739dff7 [pig] Logs can be missing with Yarn</li>
+<li>ecb4383 HUE-2007 [pig] The script is blank when loading from the dashboard section</li>
+<li>4afdbda [hbase] Change initialization to allow for callbacks from clusters</li>
+<li>579543d HUE-1624 [hbase] Configurable write permissions</li>
+<li>ecfcb4c [core] Pluggable auditing logger</li>
+<li>a84eff5 HUE-2005 [core] &ldquo;Did you know?&rdquo; box blocks form on login page</li>
+<li>d88cb9f [core] Fix doc model syncing missing some empty objects</li>
+<li>9585086 [core] Hide the navigation bar on the login page</li>
+<li>97f80a4 [pig] Support HCatalog transparently</li>
+<li>fb0a60a HUE-2006 [hbase] UX bug fixes for HBase 0.98</li>
+<li>ae9bb02 HUE-1985 [beeswax] Better save query to a file UX</li>
+<li>50c99be HUE-1995 [hbase] Column familly filtering is broken</li>
+<li>7bd57f0 [metastore] tests should be aware of database fallback to &lsquo;default&rsquo;</li>
+<li>4a94165 HUE-2002 [search] Do not break the editor when bad field value or name</li>
+<li>df7ee86 [beeswax] Install Hive and Impala sample on a non local host</li>
+<li>4c2d8e1 [hbase] Use absolute root path for pointing to the example data</li>
+<li>4db11f2 HUE-1973 [core] django-openid-auth mysql issue</li>
+<li>cd5295d [metastore] Ensure database exists before creating a table</li>
+<li>42812d9 HUE-1999 [beeswax] Update multi query separation algorithm</li>
+<li>f9f1b93 HUE-1998 [search] Improve demo collection message display</li>
+<li>f85ee14 HUE-1997 [core] Long dropdown menu items go outside the menu area</li>
+<li>0c825d6 HUE-1991 [search] Add more sample data</li>
+<li>53abe91 [jobbrowser] Job counter error with Yarn</li>
+<li>9a36249 [core] First pass of l10n for 3.5</li>
+<li>1470f93 [core] switch to checking for is_first_login_ever existance</li>
+<li>9674519 HUE-1860 [core] sync ldap group memberships upon login</li>
+<li>444d498 HUE-1930 [core] Alert users with older browsers to upgrade instead of showing a blank page</li>
+<li>1581777b2 HUE-1930 [core] Alert users with older browsers to upgrade instead of showing a blank page</li>
+<li>d3cde24 HUE-1996 [core] Prevent ajax caching on IE</li>
+<li>bb66143 HUE-1993 [hbase] Add examples for HBase App</li>
+<li>d94bebe HUE-1994 [impala] Autocomplete UDF arguments with table columns</li>
+<li>8d34bef HUE-1829 [beeswax] Add back MapReduce job list</li>
+<li>a379a37 [core] Fix tests for RemoteDjangoUserBackend</li>
+<li>0e09ed5 [beeswax] Better multi query separation support</li>
+<li>7ce0ef2 [core] Make about page available to anonymous user</li>
+<li>86b2300 [impala] Faster check status until 2s of execution</li>
+<li>14ebbae [search] Integrating icons for demo collections</li>
+<li>b833aca [search] Adding sample icons</li>
+<li>05097ee HUE-1811 [search] Add script for creating the Solr collections</li>
+<li>251ea05 HUE-1811 [search] Install examples button in quick start wizard</li>
+<li>38da4f3 HUE-1811 [search] Alert message when using a demo collection without a valid Solr</li>
+<li>448cbcc HUE-1811 [search] Sample collections</li>
+<li>5c09057 HUE-1992 [core] set username to lowercase when using RemoteUserDjangoBackend</li>
+<li>a1aa5c1 [impala] Fix backward compatibility with no start_over support</li>
+<li>312e56d [impala] Improve result fetching status</li>
+<li>b5e8cad HUE-1983 [beeswax] Download result as CSV is timeouting</li>
+<li>39f6a58 [core] Hide some ini properties</li>
+<li>4271a33 HUE-1990 [impala] Should not be able to download results for explain queries</li>
+<li>70cd8b2 HUE-1904 [core] Friendlier login page</li>
+<li>a4cba30 HUE-1986 [search] Facets including multibyte chars doesn&rsquo;t work</li>
+<li>a29baab HUE-1984 [hbase] url encode requests</li>
+<li>a4c373b [core] add ssl_cipher_list to hue.ini</li>
+<li>af75a60 HUE-1982 [impala] Column scrolling does not support aliases that are similar to the original column name</li>
+<li>e76e95c HUE-1975 [search] Add the dynamic fields from the Solr API</li>
+<li>a622530 HUE-1981 [impala] Smoothen tab jumping</li>
+<li>0caa68f HUE-1979 [impala] Error alert duplicates the result header</li>
+<li>fec34ae HUE-1977 [beeswax] Support alias autocomplete in multi queries</li>
+<li>bc7533e HUE-1981 [impala] Smoothen tab jumping</li>
+<li>2ebc313 HUE-1933 [beeswax] Do not fetch query handle for bad queries</li>
+<li>adcebbc [impala] Export query result</li>
+<li>a1093b8 HUE-1947 [beeswax] History tab integration</li>
+<li>f691b82 HUE-1341 [search] Support for dynamic fields</li>
+<li>a0f1045 HUE-1949 [impala] Friendler query expiration message</li>
+<li>c4d4125 HUE-1933 [impala] Export query result</li>
+<li>fd73459 HUE-1933 [impala] Fixing the SQL and hiding mapreduce button</li>
+<li>8746f4b HUE-1970 [impala] COMPUTE STATS table_name</li>
+<li>299baf3 HUE-1972 [impala] Update built in function autocomplete</li>
+<li>2913fd2 HUE-1971 [beeswax] ANALYZE TABLE command autocompletion</li>
+<li>0a02a89 HUE-1964 [jb] Hide see expired job checkbox</li>
+<li>bb813ff HUE-1734 [oozie] Re-run workflow popup is HTML escaped</li>
+<li>00b1453 HUE-1963 [sqoop] minor bug fixes</li>
+<li>b1e6aad HUE-1969 [beeswax] Beeswax polishing</li>
+<li>f970f38 HUE-1882 [core] Adding some missing file for OAuth support</li>
+<li>299c390 HUE-1968 [pig] Resubmission of a failed script seems to hang</li>
+<li>96a085b HUE-1958 [pig] Do not take $ sign as a parameter in regexps</li>
+<li>07d74af HUE-1966 [core] Integrate a font file with filetype icons</li>
+<li>6750aa0 HUE-1956 [beeswax] A long column name on the navigator doesn&rsquo;t show the sample table</li>
+<li>2e4cef3 HUE-1960 [jb] Cannot access container logs because of encoded url</li>
+<li>5300fba HUE-1231 [oozie] Support global configuration when importing</li>
+<li>ee025b6 [beeswax] Close command should close the queries older than N</li>
+<li>c4ec766 HUE-1948 [beeswax] Autocomplete support for multi queries</li>
+<li>30dd3c4 [core] Fix dump_config tests by testing an app setting instead of desktop</li>
+<li>5d971f8 [impala] Hive metastore app links if no permission to access it</li>
+<li>310eef4 [core] Manage apps to load from hue.ini</li>
+<li>323313e HUE-1955 [beeswax] Save a query with resource fails</li>
+<li>c6ac0c0 HUE-1556 [core] Create the users home directory automatically at login</li>
+<li>051e117 HUE-1858 [oozie] &ldquo;Could not save workflow&rdquo; error message requires substantially more information</li>
+<li>2e89fd8 HUE-1950 [beeswax] Saving a query name or sql does not seem to update it with IE</li>
+<li>26440a3 HUE-1951 [beeswax] Add row numbers</li>
+<li>e59bc5c HUE-1954 [beeswax] The result table header doesn&rsquo;t move on scroll or resize</li>
+<li>964647e HUE-1952 [core] Tutorial panel should be easier to dismiss</li>
+<li>66edb0d HUE-1932 [hbase] Better error message when HBase Thrift server is not there</li>
+<li>ee29798 [beeswax] Explain query is empty</li>
+<li>e4757b6 [zookeeper] Readonly for non superuser</li>
+<li>af4b0f9 [impala] Support Data sample even without metastore app permissions</li>
+<li>678faf6 HUE-1889 [beeswax] Slickier editor layout</li>
+<li>37fb5a2 HUE-1943 [oozie] Convert to descision node can lose all the nodes</li>
+<li>a67aee3 HUE-1686 [beeswax] Fix export result to HDFS test cases</li>
+<li>2b9f3de HUE-1946 [beeswax] Can&rsquo;t select and execute more than one query</li>
+<li>e82e642 [impala] Downloading a result not cached anymore should fail more gracefully</li>
+<li>1a89213 [impala] Specific query configuration can be overriden</li>
+<li>ab21e5b [impala] Some URL refer to neeswax instead of impala</li>
+<li>7cd2b53 HUE-1889 [beeswax] Slickier editor layout</li>
+<li>6481060 HUE-1889 [beeswax] Slickier editor layout</li>
+<li>900f902 HUE-1686 [beeswax] Saving results should not re-execute the query</li>
+<li>a93da78 HUE-1907 [impala] Date result fields are not jsonifiable</li>
+<li>bbeeb68 HUE-1944 [oozie] Generic action is broken</li>
+<li>c53e420 HUE-1945 [core] Navigation bar is cut on some resolutions</li>
+<li>747add1 HUE-1939 [beeswax] CTAS redirects to the default database in the metastore</li>
+<li>98dfa50 [beeswax] Allow saving results to fully-qualified name database</li>
+<li>8dfe698 HUE-1889 [beeswax] Slickier editor UX</li>
+<li>4b5c9af [beeswax] Fix HTML escaping of result table</li>
+<li>7aa96e7 HUE-1708 [search] Allow search results to be exported</li>
+<li>e9d7e47 [beeswax] Prevent recursive looping in tests</li>
+<li>59c54f9 HUE-1324 [fb] Support upload of tar.gz archive</li>
+<li>f984008 HUE-1926 [beeswax] Cached query should not be replaced by a saved one</li>
+<li>e5c5e60 HUE-1937 [beeswax] Clarify behavior of a multi query with error</li>
+<li>5a98108 [core] logging should be timezone aware for all systems</li>
+<li>4af49f7 HUE-1934 [beeswax] Flag for automatic closing the queries</li>
+<li>fadfcd7 HUE-1784 [oozie] False positive variable when submit from HDFS</li>
+<li>1a2de1b HUE-207 [core] upgrade tablib to development version</li>
+<li>fbafcd2 HUE-1927 [beeswax] Loading a query history of a saved query does not load its name</li>
+<li>6bee6a9 HUE-1826 [impala] Download or export query result</li>
+<li>45a17ea HUE-207 [beeswax] Leverage tablib to enable more flexible data export from Beeswax</li>
+<li>80ecf51 HUE-1913 [impala] invalidate metadata breaks the editor</li>
+<li>5d377ac HUE-1928 [beeswax] HiveServer2 supports pass-through LDAP authentication</li>
+<li>83c3c18 [about] Page becomes blank when check config finishes</li>
+<li>5b15f0f HUE-1898 [oozie] SLA graph easier to understand or manipulate</li>
+<li>ff44e5f HUE-1906 [beeswax] Better UX for the goto columns on the result page</li>
+<li>fbf25a6 HUE-1929 [core] Create jHueDelayedInput plugin</li>
+<li>a8c3309 HUE-1925 [oozie] Disable drag action when around the edit button</li>
+<li>0ae3db3 HUE-1893 [beeswax] predictGraph() should use the metadata from the result set</li>
+<li>c814197 HUE-1891 [hbase] Cell edit icons are not aligned</li>
+<li>40501d0 HUE-1877 [beeswax] Smarter scroll to top button</li>
+<li>307815a [beeswax] Update tests to the latest HiveServer2</li>
+<li>2bd7c94 HUE-1920 [impala] Hide database is locked message</li>
+<li>678a2ec HUE-1923 [core] Support User filters to help limit the Users that are able to login to Hue</li>
+<li>52fc692 [core] Adding missing makefile in liboauth</li>
+<li>d13656a HUE-1901 [oozie] Add a test for import subworkflow</li>
+<li>c420eab HUE-1882 [core] OAuth support for Facebook, Twitter, Google+ and Linkedin</li>
+<li>7dd9a0c HUE-1911 [core] banner_top_html is escaped</li>
+<li>5f1233a HUE-1921 [core] Fix IE9 glitches</li>
+<li>73c8f27 [core] Do not show help app if it is not allowed</li>
+<li>190c6d0 [search] Search page 500 when highlighting is null</li>
+<li>d5f14b0 [beeswax] Fix full screen</li>
+<li>1c79799 HUE-1919 [beewsax] Do not jump to result tab</li>
+<li>8c4a8ca HUE-1658 [oozie] Adding backward compatibility flag</li>
+<li>2b852ec HUE-1658 [oozie] Shifting Sunday to first week day</li>
+<li>140dc40 HUE-1658 [oozie] Cron like scheduling</li>
+<li>660b16c [hbase] Invalidate cached cluster configs</li>
+<li>277c5c7 HUE-1908 [beeswax] Database of a saved query is not loaded back when opening it</li>
+<li>2f74427 [core] Improve logging timezone information</li>
+<li>9173a45 HUE-1915 [core] MultipleObjectsReturned for tags or permissions</li>
+<li>8313e81 [beeswax] force scroller to work</li>
+<li>bd786d5 HUE-1909 [impala] No errors are displayed</li>
+<li>bc65a47 [core] Ignore all the mo files except the ones from third parties in ext-py</li>
+<li>7e3431a HUE-218 [beeswax] Add mechanism to kill a Hive query</li>
+<li>8e441d8 HUE-1905 [core] Add security handling for yarn and mr2</li>
+<li>0d496eb [core] fix result monitoring</li>
+<li>a6bcdfa HUE-1857 [oozie] Allow import workflows with subworkflow identified at runtime</li>
+<li>03b05eb HUE-1902 [oozie] Update coordinator dataset action is broken</li>
+<li>ce0c982 [i18n] Removing mo files from the repository</li>
+<li>2617a08 [core] Set en locale not fuzzy</li>
+<li>224c048 HUE-1857 [oozie] Allow import workflows with subworkflow identified at runtime</li>
+<li>7993f4d [beeswax] Only close queries that are not running</li>
+<li>e03ea6a [oozie] Credentials can be combined comma separatedly in one action</li>
+<li>8cb022e [beeswax] Fix execute query button for temporary queries</li>
+<li>bd76ca1 HUE-1887 [oozie] Support dashboard Coordinator and Workflow action SLA</li>
+<li>5d52c3a [i18n] Removing mo file</li>
+<li>81b4c6e HUE-1723 [beeswax] Example SQL text should not be executable</li>
+<li>fb640aa HUE-1894 [beeswax] Some errors are not reseted at query execution</li>
+<li>8e81051 HUE-1892 [oozie] Permission denied for hive-site.xml for Hive action on workflow</li>
+<li>f9351fe HUE-1896 [beeswax] Query logs are queing up</li>
+<li>8cc2884 [beeswax] Send watch status when no error</li>
+<li>1b8b5ee HUE-1883 [beeswax] Query with expired result will break the editor</li>
+<li>a82765c [spark] Locales fail to compile because of some missing placeholders</li>
+<li>54233be [core] Print log time to the same timezone set in hue.ini</li>
+<li>7fff51a HUE-1885 [useradmin] Sanitize user list</li>
+<li>100e22a [core] Doc model API and desktop permissions cleanup</li>
+<li>6648026 [core] Remove old shell logging</li>
+<li>2a8f854 [pig] Use correct autocomplete view</li>
+<li>0fb48e5 HUE-1879 [oozie] Edit a java action twice is broken</li>
+<li>f24d18b HUE-1881 [impala] Close query on unload page</li>
+<li>6da8e0f HUE-1880 [beeswax] Multi query result opened shows twice the data</li>
+<li>0b7150a [impala] Close the correct query history id</li>
+<li>9df9961 HUE-1876 [beeswax] Can&rsquo;t save result into an HDFS directory</li>
+<li>60d165e HUE-1776 [metastore] Support extended Unicode delimiter</li>
+<li>ab09a82 HUE-1302 [oozie] Optimize dashboards API calls for a single coordinator</li>
+<li>1cd4b2d HUE-1875 [beeswax] Friendler UX when missing query property</li>
+<li>4c230b0 HUE-1852 [oozie] Encoding issue in job description included in workflows</li>
+<li>48fe935 HUE-1871 [beeswax] Auto queries should not modify the query cookied</li>
+<li>8b847ec HUE-1878 [rdbms] Query with error break the editor</li>
+<li>968d58c HUE-1873 [beeswax] Result data not HTML encoded</li>
+<li>2b3f8c5 [desktop] Polish permissions based on URL</li>
+<li>c5ec0a2 [beeswax] File browse button missing from saved design file resources</li>
+<li>75a9a98 [beeswax] Convert a series of test to the new json and refresh API</li>
+<li>c66c9d4 HUE-1872 [oozie] convert to decision node broken</li>
+<li>a946620 [beeswax] Execute saved design doesn&rsquo;t show name in history</li>
+<li>b290cc8 [beeswax] Save results to a table redirects incorrectly</li>
+<li>ee64583 HUE-1869 [dbquery] Query with error should not move headers</li>
+<li>f19016d HUE-1863 [dbquery] Explain query doesn&rsquo;t work correctly</li>
+<li>49b6238 HUE-1864 [beeswax] download CSV doesn&rsquo;t work if design was never saved</li>
+<li>6b4ccbf HUE-1848 [metastore] Watch query page with the new API</li>
+<li>dd6ed74 [search] Show other collection caret only if more than one collection</li>
+<li>094205e HUE-1838 [oozie] Add SLA tab on single workflow and coordinator dashboard page</li>
+<li>35d2c3a HUE-1866 [beeswax] Default graph preset on result page</li>
+<li>6d0d7a9 HUE-1862 [impala] Impala only permission requires Beeswax</li>
+<li>045a046 HUE-1861 [oozie] Forks can&rsquo;t be created anymore in a workflow</li>
+<li>95d9066 HUE-1837 [oozie] SLA dashboard it is not pretty</li>
+<li>ff15888 HUE-1841 [core] Add support for OpenId authentication</li>
+<li>594c3a3 [beeswax] Fix explain query</li>
+<li>17c93d5 HUE-1844 [beeswax] Load back from History page</li>
+<li>1826833 HUE-1855 [beeswax] Error reporting is incomplete</li>
+<li>e351f0f [search] Add query autocomplete</li>
+<li>6da9621 HUE-1856 [beeswax] Multi and single query execution UX</li>
+<li>b5fa62a HUE-1859 [core] Add generic middleware support</li>
+<li>27d69fe [beeswax] Replace power UDF by tofloat in the tests</li>
+<li>714f83e [oozie] Always provide JT and FS addresses</li>
+<li>b2f7d6d HUE-1839 [oozie] SLA form is not pretty on edit workflow action popup</li>
+<li>2a6c670 HUE-1817 [beeswax] Disable execute button of parameterized query when blank field</li>
+<li>c6c2426 HUE-1843 [beeswax] Multi query support</li>
+<li>0db17d4 HUE-1768 [oozie] Apply the new minimal style of the graph to the editor</li>
+<li>320c88e [sqoop] Show error message when a starting job fails</li>
+<li>63558b1 HUE-1842 [beeswax] Error info above query box instead of the popup</li>
+<li>c83d579 [beeswax] Save the query name in the tests</li>
+<li>a24bfbd [doc] Cleanup how to run the tests</li>
+<li>3da5445 HUE-1830 [beeswax] Infinite scroll is broken</li>
+<li>df1b70d [oozie] Shared coordinators can not be run by non ower users</li>
+<li>c5e2440 [oozie] Fix Coordinator SLA edition</li>
+<li>0c6b56f HUE-1845 [impala] Automatic query closing</li>
+<li>20e1ecc [jobsub] Limit number of designs</li>
+<li>2498d03 HUE-1817 [beeswax] Migrate several tests to the new API</li>
+<li>17cb57b HUE-1574 [beeswax] ASCII error on query page</li>
+<li>5dc2eed HUE-1753 [beeswax] Setting and files inputs in the editor are not user friendly</li>
+<li>6730c7f HUE-1847 [metastore] Dropping loads of dbs or tables makes the script to timeout</li>
+<li>b6ad0cc HUE-1820 [jb] Finishing jobs are red and stuck</li>
+<li>1741851 HUE-1817 [beeswax] Add testing helper for the new API</li>
+<li>66f767b HUE-1840 [beeswax] Query with no result set error the editor</li>
+<li>18e75e1 HUE-1836 [oozie] Cloning a new action fails</li>
+<li>0787bf2 HUE-1828 [beeswax] Add back download and save results</li>
+<li>99eb7b70c [doc] Adding logos on github main page</li>
+<li>eb61cbb HUE-1835 [metastore] Improve database dropdown</li>
+<li>8827c6a HUE-1827 [beeswax] Automatic log scrolling is broken</li>
+<li>2d53ca4 HUE-1799 [beeswax] GetOperationStatus() now returns operational states</li>
+<li>49058c6 HUE-1832 [beeswax] Save query does not update url</li>
+<li>7ee1725 HUE-1821 [beeswax] Re-integrate graphs</li>
+<li>ef4908b HUE-1548 [sqoop2] Connection management refactored</li>
+<li>452bab5 [doc] Add Spark app to the list of apps</li>
+<li>95a0e14 HUE-1452 [oozie] Credentials by action for Oozie workflows</li>
+<li>343481f HUE-1803 [oozie] Support global configuration</li>
+<li>eb47ec3 HUE-1803 [oozie] Global configuration mapping</li>
+<li>23d63af [oozie] Front end for SLA</li>
+<li>1db86d3 HUE-1803 [oozie] Support global configuration</li>
+<li>6f672a2 HUE-1656 [oozie] Make data fully integrated in the API part 2</li>
+<li>b3d1abc [oozie] Front end for SLA</li>
+<li>71d3631 HUE-1656 [oozie] Make data fully integrated in the API part 1</li>
+<li>bb0b460 HUE-1657 [oozie] Basic SLA parsing for workflows</li>
+<li>fc728ca HUE-1656 [oozie] Adding parameters to SLA</li>
+<li>dd09000 HUE-1656 [oozie] Add 2 new SLA fields</li>
+<li>edf3af6 HUE-1656 [oozie] Create Coordinator SLA</li>
+<li>6e99fe4 HUE-1656 [oozie] Create empty SLA on new nodes</li>
+<li>b238f59 HUE-1657 [oozie] Dynamic SLA search page</li>
+<li>e3bc37b HUE-1656 [oozie] SLA edition by Workflow action</li>
+<li>b1de2fa HUE-1657 [oozie] SLA search page</li>
+<li>f72bb4a HUE-1656 [oozie] SLA edition</li>
+<li>ac64189 HUE-1657 [oozie] SLA search/lookup</li>
+<li>ab1f09e HUE-1822 [beeswax] Re-integrate columns in result tab</li>
+<li>24cf3bf HUE-1833 [spark] Gracefully fail when the server is not up</li>
+<li>645b872 HUE-1825 [beeswax] Re-add filebrowser to file resources</li>
+<li>1c50cab HUE-1823 [beeswax] Re-integrate resource lists in the editor</li>
+<li>0e1a003 [beeswax] Fix explain query test API and test_explain_query_i18n test</li>
+<li>a7e4781 HUE-1831 [beeswax] Switch view sample and open table in navigator</li>
+<li>34fc418 HUE-1798 [impala] Improve database dropdown</li>
+<li>6e87954 HUE-1790 [dbquery] Explicit db restriction property</li>
+<li>2e5e8b7 [core] Provide ini parameter for browser-length cookies</li>
+<li>7d84893 HUE-1812 [spark] UX improvements</li>
+<li>d076823 HUE-1812 [spark] Make it awesomer</li>
+<li>3fceec4 HUE-1818 [core] Remove required markup for jHueHdfsAutocomplete</li>
+<li>3df42de HUE-1817 [beeswax] Add watch_wait template to have at least the tests running</li>
+<li>06bac19 HUE-1813 [sqoop] autocomplete output directory</li>
+<li>dc9841d HUE-1809 [sqoop] autocomplete jdbc class and string</li>
+<li>282d218 HUE-1810 [sqoop] autocomplete tables and fields</li>
+<li>5551575 HUE-1808 [dbquery] Pull out rdbms config to librdbms app</li>
+<li>9393b02 HUE-1806 [beeswax] One query page editor UX cleanup</li>
+<li>357b1a1 [spark] Add submitted jobId in url hash</li>
+<li>73fc860 [docs] Fixed code style</li>
+<li>857e483 HUE-1800 [fb] Autocomplete edited path</li>
+<li>43f04d8 [spark] Add check config</li>
+<li>2ac1772 [spark] Support plain result</li>
+<li>b9eeb26 [spark] Add download result data</li>
+<li>23a83b1 [spark] Dynamic parameter list</li>
+<li>bf982df [spark] Save script in the editor</li>
+<li>be12dcc [spark] Save and load a script</li>
+<li>718c3bb [spark] Add link on jobs page to open them with their result</li>
+<li>632716a HUE-1219 [impala] One page app</li>
+<li>fd376b3 [core] Add switch for collection in the admin wizard</li>
+<li>1a4262b HUE-1800 [fb] Autocomplete edited path</li>
+<li>244f310 [spark] Adding locales</li>
+<li>07f87d8 HUE-1805 [spark] Second version with REST Job Server</li>
+<li>d3f66b4 HUE-1792 [search] Error when combining a field and grahpical facets</li>
+<li>bb77b4b HUE-1783 [beeswax] Result graphing</li>
+<li>e947a69 HUE-1795 [core] Update window title on every page with a progress bar</li>
+<li>d1b62c8 HUE-1796 [dbquery] Interactive feedback when sumitting queries</li>
+<li>d6c0f35 [impala] Fix change of Editor name</li>
+<li>d2f147d HUE-1348 [search] Improve collection dropdown</li>
+<li>9cb6857 HUE-1793 [hbase] Api Error: &lsquo;NoneType&rsquo; object has no attribute &lsquo;group&rsquo;</li>
+<li>f58c0e2 [core] Rename Beeswax to Hive Editor</li>
+<li>89e92a6 [beeswax] Remove dbquery app dependency</li>
+<li>4f5db8f HUE-1789 [fb] The dropdown icon on Chown/chmod is not aligned</li>
+<li>41bad76 HUE-1706 [beeswax] Sort numerical columns numerically not lexicographically</li>
+<li>6128c3b [beeswax] Fix query result medatadata type</li>
+<li>59eca94 HUE-1788 [hbase] Cannot upload image to cell</li>
+<li>dbbe283 HUE-1779 [core] Correct offset of notifications on close</li>
+<li>ac5bd4f HUE-1786 [hbase] Upload button in a cell broken</li>
+<li>d8d8273 HUE-1787 [sqoop2] python 2.4 json encoding issues</li>
+<li>773c595 HUE-1722 [impala] Scrolling below initial 100 records shows NULLs as blank values</li>
+<li>88ae146 [proxy] Proxy app doesn&rsquo;t work if blacklist is empty</li>
+<li>420006c HUE-1785 [oozie] New graph CSS messes up menu labels</li>
+<li>6a1e98b [fb] Fix error when editing new file</li>
+<li>d797404 HUE-1736 [fb] Editor windown is not high enough</li>
+<li>e129263 [oozie] Upload test sharelib with the Oozie command</li>
+<li>96976bb [core] Fix description of LDAP force_username_lowercase in ini</li>
+</ul>
+
+<h2 id="contributors">Contributors</h2>
+
+<p>This Hue release is made possible thanks to the contribution from:</p>
+
+<ul>
+<li>Aaron Newton</li>
+<li>Aaron T. Myers</li>
+<li>Abraham Elmahrek</li>
+<li>Aditya Acharya</li>
+<li>Alex Newman</li>
+<li>Andrew Bayer</li>
+<li>Andrew Yao</li>
+<li>Ann McCown</li>
+<li>bc Wong</li>
+<li>Ben Bishop</li>
+<li>Bruce Mitchener</li>
+<li>Bruno Mahé</li>
+<li>Eli Collins</li>
+<li>Enrico Berti</li>
+<li>Eric Wong</li>
+<li>Harsh J</li>
+<li>Henry Robinson</li>
+<li>Jon Natkins</li>
+<li>Kevin Wang</li>
+<li>Lars Francke</li>
+<li>Loren Siebert</li>
+<li>Marcus McLaughlin</li>
+<li>Mike Cotton</li>
+<li>Paul Battaglia</li>
+<li>Philip Zeyliger</li>
+<li>Romain Rigaux</li>
+<li>Roman Shaposhnik</li>
+<li>Shawn Van Ittersum</li>
+<li>Shrijeet Paliwal</li>
+<li>Thomas Aylott</li>
+<li>Todd Lipcon</li>
+<li>Vinithra Varadharajan</li>
+</ul>
+
+
+<footer class=" footline" >
+	
+</footer>
+
+
+        
+        </div> 
+        
+
+      </div>
+
+    <div id="navigation">
+        
+        
+        
+        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+            
+        
+        
+        
+
+
+	 
+	 
+    </div>
+
+    </section>
+    
+    <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
+      <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
+    </div>
+    <script src="/hue/latest/js/clipboard.min.js"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.min.js"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js"></script>
+    <script src="/hue/latest/js/jquery.sticky.js"></script>
+    <script src="/hue/latest/js/featherlight.min.js"></script>
+    <script src="/hue/latest/js/html5shiv-printshiv.min.js"></script>
+    <script src="/hue/latest/js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="/hue/latest/js/modernizr.custom.71422.js"></script>
+    <script src="/hue/latest/js/learn.js"></script>
+    <script src="/hue/latest/js/hugo-learn.js"></script>
+
+    <link href="/hue/latest/mermaid/mermaid.css" type="text/css" rel="stylesheet" />
+    <script src="/hue/latest/mermaid/mermaid.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-37637545-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-37637545-1');
+</script>
+  </body>
+</html>
+

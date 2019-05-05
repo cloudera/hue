@@ -1,0 +1,2759 @@
+<!DOCTYPE html>
+<html lang="en" class="js csstransforms3d">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="Hugo 0.55.5" />
+    <meta name="description" content="">
+
+
+    <link rel="shortcut icon" href="http://cloudera.github.io/hue/latest/images/favicon.png" type="image/x-icon" />
+
+    <title>Reference Architecture :: Hue Documentation</title>
+
+    
+    <link href="/hue/latest/css/nucleus.css" rel="stylesheet">
+    <link href="/hue/latest/css/fontawesome-all.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/hybrid.css" rel="stylesheet">
+    <link href="/hue/latest/css/featherlight.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/perfect-scrollbar.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/auto-complete.css" rel="stylesheet">
+    <link href="/hue/latest/css/theme.css" rel="stylesheet">
+    <link href="/hue/latest/css/hugo-theme.css" rel="stylesheet">
+    
+      <link href="/hue/latest/css/theme-hue.css" rel="stylesheet">
+    
+
+    <script src="/hue/latest/js/jquery-2.x.min.js"></script>
+
+    <style type="text/css">
+      :root #header + #content > #left > #rlblock_left{
+          display:none !important;
+      }
+      
+    </style>
+    
+  </head>
+  <body class="" data-url="/hue/latest/administrator/administration/reference/">
+    <nav id="sidebar" class="">
+
+
+
+  <div id="header-wrapper">
+    <div id="header">
+      <a href="http://gethue.com">
+  <img src="http://cloudera.github.io/hue/latest/images/hue_logo.png" alt="alt text" title="Hue Logo">
+</a>
+
+    </div>
+    
+        <div class="searchbox">
+    <label for="search-by"><i class="fas fa-search"></i></label>
+    <input data-search-input id="search-by" type="search" placeholder="Search...">
+    <span data-search-clear=""><i class="fas fa-times"></i></span>
+</div>
+
+<script type="text/javascript" src="/hue/latest/js/lunr.min.js"></script>
+<script type="text/javascript" src="/hue/latest/js/auto-complete.js"></script>
+<script type="text/javascript">
+    
+        var baseurl = "http:\/\/cloudera.github.io\/hue\/latest\/";
+    
+    var fileSearchBlacklist = "";
+</script>
+<script type="text/javascript" src="/hue/latest/js/search.js"></script>
+
+    
+  </div>
+
+    <div class="highlightable">
+    <ul class="topics">
+
+        
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/" title="Administrator" class="dd-item 
+        parent
+        
+        
+        ">
+      <a href="/hue/latest/administrator/">
+          <b>1. </b>Administrator
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/installation/" title="Installation" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/installation/">
+          Installation
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/installation/dependencies/" title="Dependencies" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/installation/dependencies/">
+          Dependencies
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/installation/install/" title="Install" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/install/">
+        Install
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/installation/containers/" title="Containers" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/containers/">
+        Containers
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/installation/starting/" title="Running" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/starting/">
+        Running
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/" title="Configuration" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/">
+          Configuration
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/server/" title="Server" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/server/">
+          Server
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/editor/" title="Editor" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/editor/">
+          Editor
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/dashboard/" title="Dashboard" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/dashboard/">
+          Dashboard
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/files/" title="Files and Stores" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/files/">
+          Files and Stores
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/external/" title="Other services" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/external/">
+          Other services
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/administration/" title="Administration" class="dd-item 
+        parent
+        
+        
+        ">
+      <a href="/hue/latest/administrator/administration/">
+          Administration
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/reference/" title="Reference Architecture" class="dd-item active">
+        <a href="/hue/latest/administrator/administration/reference/">
+        Reference Architecture
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/operations/" title="Operations" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/operations/">
+        Operations
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/user-management/" title="User Management" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/user-management/">
+        User Management
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/database/" title="Database" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/database/">
+        Database
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/" title="User" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/">
+          <b>2. </b>User
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/concept/" title="Concepts" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/concept/">
+          Concepts
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/editor/" title="SQL Editor / Notebook" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/editor/">
+          SQL Editor / Notebook
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/dashboards/" title="Dashboard" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/dashboards/">
+          Dashboard
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/browsers/" title="Data Catalog" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/browsers/">
+          Data Catalog
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/scheduler/" title="Scheduler" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/scheduler/">
+          Scheduler
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/contrib/" title="Contrib" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/contrib/">
+          Contrib
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/" title="Developer" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/">
+          <b>3. </b>Developer
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/development/" title="Development" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/development/">
+          Development
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/editor/" title="Editor / Notebook" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/editor/">
+          Editor / Notebook
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/api/" title="APIs" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/api/">
+          APIs
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/browsers/" title="Browsers" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/browsers/">
+          Browsers
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/application/" title="Applications" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/application/">
+          Applications
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/releases/" title="Releases" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/releases/">
+          <b>4. </b>Releases
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.4.0/" title="4.4.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.4.0/">
+        4.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.3.0/" title="4.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.3.0/">
+        4.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.2.0/" title="4.2.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.2.0/">
+        4.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.1.0/" title="4.1.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.1.0/">
+        4.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.0.0/" title="4.0.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.0.0/">
+        4.0.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.12.0/" title="3.12.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.12.0/">
+        3.12.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.11.0/" title="3.11.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.11.0/">
+        3.11.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.10.0/" title="3.10.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.10.0/">
+        3.10.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.9.0/" title="3.9.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.9.0/">
+        3.9.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.8.0/" title="3.8.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.8.0/">
+        3.8.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.7.0/" title="3.7.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.7.0/">
+        3.7.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.6.0/" title="3.6.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.6.0/">
+        3.6.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.5.0/" title="3.5.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.5.0/">
+        3.5.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.0.0/" title="3.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.0.0/">
+        3.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.5.0/" title="2.5.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.5.0/">
+        2.5.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.4.0/" title="2.4.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.4.0/">
+        2.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.3.0/" title="2.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.3.0/">
+        2.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.2.0/" title="2.2.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.2.0/">
+        2.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.1.0/" title="2.1.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.1.0/">
+        2.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.0.1/" title="2.0.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.0.1/">
+        2.0.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.0.0-beta/" title="2.0.0-beta" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.0.0-beta/">
+        2.0.0-beta
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.2.0/" title="1.2.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.2.0/">
+        1.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.1.0/" title="1.1.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.1.0/">
+        1.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.0.1/" title="1.0.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.0.1/">
+        1.0.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.0.0/" title="1.0.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.0.0/">
+        1.0.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.9.1/" title="0.9.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.9.1/">
+        0.9.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.9.0/" title="0.9.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.9.0/">
+        0.9.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.4.2/" title="0.4.2" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.4.2/">
+        0.4.2
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.4.1/" title="0.4.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.4.1/">
+        0.4.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.4.0/" title="0.4.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.4.0/">
+        0.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.3.0/" title="0.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.3.0/">
+        0.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+         
+    </ul>
+
+    
+    
+      <section id="shortcuts">
+        <h3>More</h3>
+        <ul>
+          
+              <li> 
+                  <a class="padding" href="https://github.com/cloudera/hue"><i class='fab fa-fw fa-github'></i> GitHub</a>
+              </li>
+          
+              <li> 
+                  <a class="padding" href="http://demo.gethue.com"><i class='fas fa-fw fa-play'></i> Demo</a>
+              </li>
+          
+              <li> 
+                  <a class="padding" href="http://gethue.com"><i class='fas fa-fw fa-bookmark'></i> gethue.com</a>
+              </li>
+          
+        </ul>
+      </section>
+    
+
+    
+    <section id="footer">
+      <p>Built with <a href="https://github.com/matcornic/hugo-theme-learn">Learn</a> and <a href="http://gohugo.io/">Hugo</a></p>
+
+    </section>
+  </div>
+</nav>
+
+
+
+
+
+        <section id="body">
+        <div id="overlay"></div>
+        <div class="padding highlightable">
+              
+              <div>
+                <div id="top-bar">
+                
+                  
+                  
+                  
+                  <div id="top-github-link">
+                    <a class="github-link" title='Edit this page' href="https://github.com/cloudera/hue/blob/master/docs/docs-site/content/administrator/administration/reference.md" target="blank">
+                      <i class="fas fa-code-branch"></i>
+                      <span id="top-github-link-text">Edit this page</span>
+                    </a>
+                  </div>
+                  
+                
+                <div id="breadcrumbs" itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb">
+                    <span id="sidebar-toggle-span">
+                        <a href="#" id="sidebar-toggle" data-sidebar-toggle="">
+                          <i class="fas fa-bars"></i>
+                        </a>
+                    </span>
+                  <span class="links">
+                 
+                 
+                    
+            
+            
+              
+              
+            
+            
+              
+              
+            
+            
+              
+              
+            
+            
+              <a href='/hue/latest/'>Hue Guide</a> > <a href='/hue/latest/administrator/'>Administrator</a> > <a href='/hue/latest/administrator/administration/'>Administration</a> > Reference Architecture
+            
+          
+            
+          
+            
+          
+            
+          
+                 
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+
+        
+        <div class="body-outer">
+          
+          
+              <aside class="toc">
+  <div class="wrapper">
+    <header>
+    <h4>What's on this Page</h4>
+    </header>
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#load-balancers">Load Balancers</a></li>
+<li><a href="#task-server">Task Server</a>
+<ul>
+<li><a href="#query-task">Query Task</a></li>
+</ul></li>
+<li><a href="#task-scheduler">Task Scheduler</a></li>
+<li><a href="#monitoring">Monitoring</a></li>
+<li><a href="#proxy">Proxy</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</aside>
+          
+          <div id="body-inner">
+
+            
+              <h1>Reference Architecture</h1>
+            
+
+          
+
+
+
+
+<p>A recommended setup consists in:</p>
+
+<ul>
+<li>2 Hues and 1 Load Balancer</li>
+<li>Databases: MySQL InnoDB, PostgreSQL, Oracle</li>
+<li>Authentication: <a href="../user-management/">LDAP or Username/Password</a></li>
+</ul>
+
+<h3 id="load-balancers">Load Balancers</h3>
+
+<p>Hue is often run with:</p>
+
+<ul>
+<li>Cherrypy with <a href="http://gethue.com/using-nginx-to-speed-up-hue-3-8-0/">NGINX</a> (recommended)</li>
+<li>Cherrypy with HTTPD (built-in when using Cloudera Manager)</li>
+<li>Gunicorn is coming with <a href="https://issues.cloudera.org/browse/HUE-8739">HUE-8739</a></li>
+<li><a href="http://gethue.com/how-to-run-hue-with-the-apache-server/">Apache mod Python</a></li>
+</ul>
+
+<h3 id="task-server">Task Server</h3>
+
+<p>** Not fully supported yet**</p>
+
+<p>The task server is currently a work in progress to outsource all the blocking or resource intensive operations
+outside of the API server. Follow <a href="https://issues.cloudera.org/browse/HUE-8738">HUE-8738</a> for more information
+on when first usable task will be released.</p>
+
+<p>Until then, here is how to try the task server service.</p>
+
+<p>Make sure you have Rabbit MQ installed and running.</p>
+
+<pre><code>sudo apt-get install rabbitmq-server -y
+</code></pre>
+
+<p>In hue.ini, telling the API server that the Task Server is available:</p>
+
+<pre><code>[desktop]
+[[task_server]]
+enabled=true
+</code></pre>
+
+<p>Starting the Task server:</p>
+
+<pre><code>./build/env/bin/celery worker -l info -A desktop
+</code></pre>
+
+<p>Available tasks</p>
+
+<h4 id="query-task">Query Task</h4>
+
+<p>When the task server is enabled, SQL queries are going to be submitted outside of the Hue servers.</p>
+
+<p>To configure the storage to use to persist those, edit the <code>result_file_storage</code> setting:</p>
+
+<pre><code>[desktop]
+[[task_server]]
+result_file_storage='{&quot;backend&quot;: &quot;django.core.files.storage.FileSystemStorage&quot;, &quot;properties&quot;: {&quot;location&quot;: &quot;/var/lib/hue/query-results&quot;}}'
+</code></pre>
+
+<h3 id="task-scheduler">Task Scheduler</h3>
+
+<p>For schedules configured statically in Python:</p>
+
+<pre><code>./build/env/bin/celery -A desktop beat -l info
+</code></pre>
+
+<p>For schedules configured dynamically via a table with Django Celery Beat:</p>
+
+<pre><code>[desktop]
+[[task_server]]
+beat_enabled=false
+</code></pre>
+
+<p>Then:</p>
+
+<pre><code>./build/env/bin/celery -A desktop beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+</code></pre>
+
+<p>Note: the first time the tables need to be created with:</p>
+
+<pre><code>./build/env/bin/hue migrate
+</code></pre>
+
+<h3 id="monitoring">Monitoring</h3>
+
+<p>Performing a <code>GET /desktop/debug/is_alive</code> will return a 200 response if running.</p>
+
+<h3 id="proxy">Proxy</h3>
+
+<p>A Web proxy lets you centralize all the access to a certain URL and prettify the address (e.g. ec2-54-247-321-151.compute-1.amazonaws.com &ndash;&gt; demo.gethue.com).</p>
+
+<p>Here is one way to do it with <a href="http://gethue.com/using-nginx-to-speed-up-hue-3-8-0/">NGINX</a> or <a href="http://gethue.com/i-put-a-proxy-on-hue/">Apache</a>.</p>
+
+
+<footer class=" footline" >
+	
+</footer>
+
+
+        
+        </div> 
+        
+
+      </div>
+
+    <div id="navigation">
+        
+        
+        
+        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+            
+        
+        
+        
+
+
+	 
+	 
+    </div>
+
+    </section>
+    
+    <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
+      <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
+    </div>
+    <script src="/hue/latest/js/clipboard.min.js"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.min.js"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js"></script>
+    <script src="/hue/latest/js/jquery.sticky.js"></script>
+    <script src="/hue/latest/js/featherlight.min.js"></script>
+    <script src="/hue/latest/js/html5shiv-printshiv.min.js"></script>
+    <script src="/hue/latest/js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="/hue/latest/js/modernizr.custom.71422.js"></script>
+    <script src="/hue/latest/js/learn.js"></script>
+    <script src="/hue/latest/js/hugo-learn.js"></script>
+
+    <link href="/hue/latest/mermaid/mermaid.css" type="text/css" rel="stylesheet" />
+    <script src="/hue/latest/mermaid/mermaid.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-37637545-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-37637545-1');
+</script>
+  </body>
+</html>
+

@@ -1,0 +1,3430 @@
+<!DOCTYPE html>
+<html lang="en" class="js csstransforms3d">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="Hugo 0.55.5" />
+    <meta name="description" content="">
+
+
+    <link rel="shortcut icon" href="http://cloudera.github.io/hue/latest/images/favicon.png" type="image/x-icon" />
+
+    <title>Server :: Hue Documentation</title>
+
+    
+    <link href="/hue/latest/css/nucleus.css" rel="stylesheet">
+    <link href="/hue/latest/css/fontawesome-all.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/hybrid.css" rel="stylesheet">
+    <link href="/hue/latest/css/featherlight.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/perfect-scrollbar.min.css" rel="stylesheet">
+    <link href="/hue/latest/css/auto-complete.css" rel="stylesheet">
+    <link href="/hue/latest/css/theme.css" rel="stylesheet">
+    <link href="/hue/latest/css/hugo-theme.css" rel="stylesheet">
+    
+      <link href="/hue/latest/css/theme-hue.css" rel="stylesheet">
+    
+
+    <script src="/hue/latest/js/jquery-2.x.min.js"></script>
+
+    <style type="text/css">
+      :root #header + #content > #left > #rlblock_left{
+          display:none !important;
+      }
+      
+    </style>
+    
+  </head>
+  <body class="" data-url="/hue/latest/administrator/configuration/server/">
+    <nav id="sidebar" class="">
+
+
+
+  <div id="header-wrapper">
+    <div id="header">
+      <a href="http://gethue.com">
+  <img src="http://cloudera.github.io/hue/latest/images/hue_logo.png" alt="alt text" title="Hue Logo">
+</a>
+
+    </div>
+    
+        <div class="searchbox">
+    <label for="search-by"><i class="fas fa-search"></i></label>
+    <input data-search-input id="search-by" type="search" placeholder="Search...">
+    <span data-search-clear=""><i class="fas fa-times"></i></span>
+</div>
+
+<script type="text/javascript" src="/hue/latest/js/lunr.min.js"></script>
+<script type="text/javascript" src="/hue/latest/js/auto-complete.js"></script>
+<script type="text/javascript">
+    
+        var baseurl = "http:\/\/cloudera.github.io\/hue\/latest\/";
+    
+    var fileSearchBlacklist = "";
+</script>
+<script type="text/javascript" src="/hue/latest/js/search.js"></script>
+
+    
+  </div>
+
+    <div class="highlightable">
+    <ul class="topics">
+
+        
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/" title="Administrator" class="dd-item 
+        parent
+        
+        
+        ">
+      <a href="/hue/latest/administrator/">
+          <b>1. </b>Administrator
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/installation/" title="Installation" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/installation/">
+          Installation
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/installation/dependencies/" title="Dependencies" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/installation/dependencies/">
+          Dependencies
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/installation/install/" title="Install" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/install/">
+        Install
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/installation/containers/" title="Containers" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/containers/">
+        Containers
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/installation/starting/" title="Running" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/starting/">
+        Running
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/" title="Configuration" class="dd-item 
+        parent
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/">
+          Configuration
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/server/" title="Server" class="dd-item 
+        parent
+        active
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/server/">
+          Server
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/editor/" title="Editor" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/editor/">
+          Editor
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/dashboard/" title="Dashboard" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/dashboard/">
+          Dashboard
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/files/" title="Files and Stores" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/files/">
+          Files and Stores
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/configuration/external/" title="Other services" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/configuration/external/">
+          Other services
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/administrator/administration/" title="Administration" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/administrator/administration/">
+          Administration
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/reference/" title="Reference Architecture" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/reference/">
+        Reference Architecture
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/operations/" title="Operations" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/operations/">
+        Operations
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/user-management/" title="User Management" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/user-management/">
+        User Management
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/administrator/administration/database/" title="Database" class="dd-item ">
+        <a href="/hue/latest/administrator/administration/database/">
+        Database
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/" title="User" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/">
+          <b>2. </b>User
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/concept/" title="Concepts" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/concept/">
+          Concepts
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/editor/" title="SQL Editor / Notebook" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/editor/">
+          SQL Editor / Notebook
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/dashboards/" title="Dashboard" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/dashboards/">
+          Dashboard
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/browsers/" title="Data Catalog" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/browsers/">
+          Data Catalog
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/scheduler/" title="Scheduler" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/scheduler/">
+          Scheduler
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/user/contrib/" title="Contrib" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/user/contrib/">
+          Contrib
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/" title="Developer" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/">
+          <b>3. </b>Developer
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+            
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/development/" title="Development" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/development/">
+          Development
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/editor/" title="Editor / Notebook" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/editor/">
+          Editor / Notebook
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/api/" title="APIs" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/api/">
+          APIs
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/browsers/" title="Browsers" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/browsers/">
+          Browsers
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/application/" title="Applications" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/application/">
+          Applications
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/releases/" title="Releases" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/releases/">
+          <b>4. </b>Releases
+          
+      </a>
+      
+      
+        <ul>
+          
+          
+          
+          
+        
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.4.0/" title="4.4.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.4.0/">
+        4.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.3.0/" title="4.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.3.0/">
+        4.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.2.0/" title="4.2.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.2.0/">
+        4.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.1.0/" title="4.1.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.1.0/">
+        4.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-4.0.0/" title="4.0.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-4.0.0/">
+        4.0.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.12.0/" title="3.12.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.12.0/">
+        3.12.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.11.0/" title="3.11.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.11.0/">
+        3.11.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.10.0/" title="3.10.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.10.0/">
+        3.10.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.9.0/" title="3.9.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.9.0/">
+        3.9.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.8.0/" title="3.8.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.8.0/">
+        3.8.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.7.0/" title="3.7.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.7.0/">
+        3.7.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.6.0/" title="3.6.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.6.0/">
+        3.6.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.5.0/" title="3.5.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.5.0/">
+        3.5.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-3.0.0/" title="3.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-3.0.0/">
+        3.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.5.0/" title="2.5.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.5.0/">
+        2.5.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.4.0/" title="2.4.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.4.0/">
+        2.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.3.0/" title="2.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.3.0/">
+        2.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.2.0/" title="2.2.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.2.0/">
+        2.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.1.0/" title="2.1.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.1.0/">
+        2.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.0.1/" title="2.0.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.0.1/">
+        2.0.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-2.0.0-beta/" title="2.0.0-beta" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-2.0.0-beta/">
+        2.0.0-beta
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.2.0/" title="1.2.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.2.0/">
+        1.2.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.1.0/" title="1.1.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.1.0/">
+        1.1.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.0.1/" title="1.0.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.0.1/">
+        1.0.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-1.0.0/" title="1.0.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-1.0.0/">
+        1.0.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.9.1/" title="0.9.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.9.1/">
+        0.9.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.9.0/" title="0.9.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.9.0/">
+        0.9.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.4.2/" title="0.4.2" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.4.2/">
+        0.4.2
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.4.1/" title="0.4.1" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.4.1/">
+        0.4.1
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.4.0/" title="0.4.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.4.0/">
+        0.4.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+      <li data-nav-id="/hue/latest/releases/release-notes-0.3.0/" title="0.3.0" class="dd-item ">
+        <a href="/hue/latest/releases/release-notes-0.3.0/">
+        0.3.0
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+        
+        </ul>
+              
+    </li>
+  
+ 
+
+          
+         
+    </ul>
+
+    
+    
+      <section id="shortcuts">
+        <h3>More</h3>
+        <ul>
+          
+              <li> 
+                  <a class="padding" href="https://github.com/cloudera/hue"><i class='fab fa-fw fa-github'></i> GitHub</a>
+              </li>
+          
+              <li> 
+                  <a class="padding" href="http://demo.gethue.com"><i class='fas fa-fw fa-play'></i> Demo</a>
+              </li>
+          
+              <li> 
+                  <a class="padding" href="http://gethue.com"><i class='fas fa-fw fa-bookmark'></i> gethue.com</a>
+              </li>
+          
+        </ul>
+      </section>
+    
+
+    
+    <section id="footer">
+      <p>Built with <a href="https://github.com/matcornic/hugo-theme-learn">Learn</a> and <a href="http://gohugo.io/">Hugo</a></p>
+
+    </section>
+  </div>
+</nav>
+
+
+
+
+
+        <section id="body">
+        <div id="overlay"></div>
+        <div class="padding highlightable">
+              
+              <div>
+                <div id="top-bar">
+                
+                  
+                  
+                  
+                  <div id="top-github-link">
+                    <a class="github-link" title='Edit this page' href="https://github.com/cloudera/hue/blob/master/docs/docs-site/content/administrator/configuration/server/_index.md" target="blank">
+                      <i class="fas fa-code-branch"></i>
+                      <span id="top-github-link-text">Edit this page</span>
+                    </a>
+                  </div>
+                  
+                
+                <div id="breadcrumbs" itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb">
+                    <span id="sidebar-toggle-span">
+                        <a href="#" id="sidebar-toggle" data-sidebar-toggle="">
+                          <i class="fas fa-bars"></i>
+                        </a>
+                    </span>
+                  <span class="links">
+                 
+                 
+                    
+            
+            
+              
+              
+            
+            
+              
+              
+            
+            
+              
+              
+            
+            
+              <a href='/hue/latest/'>Hue Guide</a> > <a href='/hue/latest/administrator/'>Administrator</a> > <a href='/hue/latest/administrator/configuration/'>Configuration</a> > Server
+            
+          
+            
+          
+            
+          
+            
+          
+                 
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+
+        
+        <div class="body-outer">
+          
+          
+              <aside class="toc">
+  <div class="wrapper">
+    <header>
+    <h4>What's on this Page</h4>
+    </header>
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#basics">Basics</a>
+<ul>
+<li><a href="#point-to-mysql-or-postgres">Point to MySQL or Postgres</a></li>
+<li><a href="#specifying-the-http-port">Specifying the HTTP port</a></li>
+<li><a href="#specifying-the-secret-key">Specifying the Secret Key</a></li>
+<li><a href="#disabling-some-apps">Disabling some apps</a></li>
+</ul></li>
+<li><a href="#authentication">Authentication</a>
+<ul>
+<li><a href="#username-password">Username / Password</a></li>
+<li><a href="#allow-all">Allow All</a></li>
+<li><a href="#ldap">LDAP</a>
+<ul>
+<li><a href="#search-bind">Search Bind</a></li>
+<li><a href="#direct-bind">Direct Bind</a></li>
+</ul></li>
+<li><a href="#saml">SAML</a></li>
+<li><a href="#spnego">Spnego</a></li>
+<li><a href="#pam">PAM</a></li>
+<li><a href="#oauth-connect">OAuth Connect</a></li>
+<li><a href="#multiple-authentication-backends">Multiple Authentication Backends</a></li>
+</ul></li>
+<li><a href="#security">Security</a>
+<ul>
+<li><a href="#configure-a-proxy">Configure a Proxy</a></li>
+<li><a href="#configuring-ssl">Configuring SSL</a></li>
+<li><a href="#sasl">SASL</a></li>
+<li><a href="#storing-passwords-in-file-script">Storing passwords in file script</a></li>
+<li><a href="#idle-session-timeout">Idle session timeout</a></li>
+<li><a href="#auditing">Auditing</a></li>
+<li><a href="#concurrent-user-session-limit">Concurrent User Session Limit</a></li>
+</ul></li>
+<li><a href="#customize-the-ui">Customize the UI</a>
+<ul>
+<li><a href="#maps-look-and-feel">Maps look and feel</a></li>
+<li><a href="#banner">Banner</a></li>
+<li><a href="#splash-screen">Splash Screen</a></li>
+<li><a href="#custom-logo">Custom Logo</a></li>
+</ul></li>
+<li><a href="#source-version-control">Source Version Control</a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</aside>
+          
+          <div id="body-inner">
+
+            
+              <h1>Server</h1>
+            
+
+          
+
+
+
+
+<p>This section is about configuring the Hue server itself.
+These configuration variables are under the <code>[desktop]</code> section in
+the <code>conf/hue.ini</code> configuration file.</p>
+
+<h2 id="basics">Basics</h2>
+
+<h3 id="point-to-mysql-or-postgres">Point to MySQL or Postgres</h3>
+
+<p>Directly below the <code>[[database]]</code> line, add the following options (and modify accordingly for
+your MySQL setup):</p>
+
+<pre><code>host=localhost
+port=3306
+engine=mysql
+user=hue
+password=secretpassword
+name=hue
+</code></pre>
+
+<p>And run the table creation one time:</p>
+
+<pre><code>./build/env/bin/hue migrate
+</code></pre>
+
+<h3 id="specifying-the-http-port">Specifying the HTTP port</h3>
+
+<p>Hue uses CherryPy web server.  You can use the following options to
+change the IP address and port that the web server listens on.
+The default setting is port 8888 on all configured IP addresses.</p>
+
+<pre><code># Webserver listens on this address and port
+http_host=0.0.0.0
+http_port=8888
+</code></pre>
+
+<p><a href="https://gunicorn.org/">Gunicorn</a> support is planned to come in via <a href="https://issues.cloudera.org/browse/HUE-8739">HUE-8739</a>.</p>
+
+<h3 id="specifying-the-secret-key">Specifying the Secret Key</h3>
+
+<p>For security, you should also specify the secret key that is used for secure
+hashing in the session store. Enter a long series of random characters
+(30 to 60 characters is recommended).</p>
+
+<pre><code>secret_key=jFE93j;2[290-eiw.KEiwN2s3['d;/.q[eIW^y#e=+Iei*@Mn&lt;qW5o
+</code></pre>
+
+<p>NOTE: If you don&rsquo;t specify a secret key, your session cookies will not be
+secure. Hue will run but it will also display error messages telling you to
+set the secret key.</p>
+
+<h3 id="disabling-some-apps">Disabling some apps</h3>
+
+<p>In the Hue ini configuration file, in the [desktop] section, you can enter the names of the app to hide:</p>
+
+<pre><code>[desktop]
+# Comma separated list of apps to not load at server startup.
+app_blacklist=beeswax,impala,security,filebrowser,jobbrowser,rdbms,jobsub,pig,hbase,sqoop,zookeeper,metastore,spark,oozie,indexer
+</code></pre>
+
+<p><a href="http://gethue.com/mini-how-to-disabling-some-apps-from-showing-up/">Read more about it here</a>.</p>
+
+<h2 id="authentication">Authentication</h2>
+
+<p>By default (<code>AllowFirstUserDjangoBackend</code>), the first user who logs in to Hue can choose any
+username and password and becomes an administrator automatically. This
+user can create other user and administrator accounts. User information is
+stored in the Django database in the Django backend.</p>
+
+<p>The authentication system is pluggable. Here is a list of some of the possible authentications:</p>
+
+<h3 id="username-password">Username / Password</h3>
+
+<p>This is the default Hue backend. It creates the first user that logs in as the super user. After this, it relies on Django and the user manager to authenticate users.</p>
+
+<pre><code>desktop.auth.backend.AllowFirstUserDjangoBackend
+</code></pre>
+
+<h3 id="allow-all">Allow All</h3>
+
+<p>This backend does not require a password for users to log in. All users are automatically authenticated and the username is set to what is provided.</p>
+
+<pre><code>desktop.auth.backend.AllowAllBackend
+</code></pre>
+
+<h3 id="ldap">LDAP</h3>
+
+<p>Authenticates users against an LDAP service.</p>
+
+<pre><code>desktop.auth.backend.LdapBackend
+</code></pre>
+
+<p>There are two ways to bind Hue with an LDAP directory service:</p>
+
+<ul>
+<li>Search Bind: Hue searches for user credentials with search base (and attribute and filter).</li>
+<li>Direct Bind: Hue authenticates (without searching) in one of two ways:
+
+<ul>
+<li>NT Domain: Bind to Microsoft Active Directory with username@domain (the UPN)or</li>
+<li>Username Pattern: Bind to open standard LDAP with full path of directory information tree (DIT).</li>
+</ul></li>
+</ul>
+
+<p>Note: Username pattern does not work with AD because AD inserts spaces into the UID which Hue cannot process.</p>
+
+<p>Encryption: To prevent credentials from transmitting in the clear, encrypt with LDAP over SSL, using the LDAPS protocol on the LDAPS port (636 by default); or encrypt with the StartTLS extension using the standard LDAP protocol and port (389 by default). Cloudera recommends LDAPS. You must have a CA Certificate in either case.</p>
+
+<p>Hue Supported LDAP Authentication and Encryption Methods</p>
+
+<pre><code>LDAP Auth Action    Encrypted (LDAPS)   Encrypted (LDAP+TLS)    Not Encrypted (LDAP)
+Search Bind AD, LDAP    AD, LDAP    AD, LDAP
+Direct Bind - NT Domain AD  AD  AD
+Direct Bind - User Pattern  LDAP    LDAP    LDAP
+</code></pre>
+
+<p>Example of a Search Bind configuration encrypted with LDAPS:</p>
+
+<pre><code>[[custom]]
+[[auth]]
+backend=desktop.auth.backend.LdapBackend
+
+[[ldap]]
+ldap_url=ldaps://w2k8-1.ad.sec.cloudera.com:636
+search_bind_authentication=true
+ldap_cert=/&lt;path_to_cacert&gt;/w2k8-1-root.pem
+use_start_tls=false
+create_users_on_login=true
+base_dn=&quot;DC=ad,DC=sec,DC=cloudera,DC=com&quot;
+bind_dn=&quot;&lt;username&gt;@ad.sec.cloudera.com&quot;
+bind_password_script=&lt;path_to_password_script&gt;/&lt;script.sh&gt;
+test_ldap_user=&quot;testuser1&quot;
+test_ldap_group=&quot;testgroup1&quot;
+
+[[[users]]]
+user_filter=&quot;objectclass=user&quot;
+user_name_attr=&quot;sAMAccountName&quot;
+
+[[[groups]]]
+group_filter=&quot;objectclass=group&quot;
+group_name_attr=&quot;cn&quot;
+group_member_attr=&quot;member&quot;
+</code></pre>
+
+<p>Example of a Direct Bind configuration for Active Directory encrypted with LDAPS:</p>
+
+<pre><code>[[ldap]]
+ldap_url=ldaps://w2k8-1.ad.sec.cloudera.com:636
+search_bind_authentication=false
+nt_domain=ad.sec.cloudera.com
+ldap_cert=/&lt;path_to_cacert&gt;/w2k8-1-root.pem
+use_start_tls=false
+create_users_on_login=true
+base_dn=&quot;DC=ad,DC=sec,DC=cloudera,DC=com&quot;
+bind_dn=&quot;&lt;username&gt;&quot;
+bind_password_script=&lt;path_to_password_script&gt;/&lt;script.sh&gt;
+...
+</code></pre>
+
+<p>Example of a Direct Bind configuration for Active Directory encrypted with StartTLS:</p>
+
+<pre><code>[[ldap]]
+ldap_url=ldap://w2k8-1.ad.sec.cloudera.com:389
+search_bind_authentication=false
+nt_domain=ad.sec.cloudera.com
+ldap_cert=/opt/cloudera/security/cacerts/w2k8-1-root.pem
+use_start_tls=true
+create_users_on_login=true
+base_dn=&quot;DC=ad,DC=sec,DC=cloudera,DC=com&quot;
+bind_dn=&quot;cconner&quot;
+bind_password_script=&lt;path_to_password_script&gt;/&lt;script.sh&gt;
+...
+</code></pre>
+
+<h4 id="search-bind">Search Bind</h4>
+
+<p>Search bind authentication does an ldapsearch against one or more directory services and binds with the found distinguished name (DN) and password. Hue searches the subtree from the base distinguished name. If LDAP Username Attribute is set, Hue looks for an entry whose attribute has the same value as the short name given at login.</p>
+
+<p>Important: Search binding works with all directory service types. It is also the only method that allows synchronizing groups at login (set with sync_groups_on_login in a safety-valve).</p>
+
+<p>Set the following required properties:</p>
+
+<p>Authentication Backend  desktop.auth.backend.LdapBackend</p>
+
+<pre><code>LDAP URL    ldaps://&lt;ldap_server&gt;:636 (or ldap://&lt;ldap_server&gt;:389)
+LDAP Server CA Certificate  /path_to_certificate/cert.pem
+LDAP Search Base    DC=mycompany,DC=com
+LDAP Bind User Distinguished Name   username@domain
+LDAP Bind Password  bind_user_password
+Use Search Bind Authentication  TRUE
+Enable LDAP TLS FALSE if using LDAPS or not encrypting
+Create LDAP users on login  TRUE
+</code></pre>
+
+<p>Note: To encrypt with TLS, set LDAP URL to ldap://<ldap_server>:389 and check Enable LDAP TLS. For a proof of concept without encryption, use ldap://<ldap_server>:389, remove the value for LDAP Server CA Certificate, and uncheck Enable LDAP TLS.</p>
+
+<p>You can optionally improve search performance with attributes and filters.</p>
+
+<pre><code>LDAP User Filter    objectclass=user (default = *)
+LDAP Username Attribute sAMAccountName (AD default), uid (LDAP default)
+LDAP Group Filter   objectclass=group (default = *)
+LDAP Group Name Attribute   cn (default)
+LDAP Group Membership Attribute member (default)
+</code></pre>
+
+<p>Note: With the user settings in the table above, the LDAP search filter has the form: (&amp;(objectClass=user)(sAMAccountName=<user entered username>)).</p>
+
+<p>Add any valid user and/or valid group to quickly test your LDAP configuration.</p>
+
+<pre><code>LDAP Username for Test LDAP Configuration   Any valid user
+LDAP Group Name for Test LDAP Configuration Any valid group
+</code></pre>
+
+<p>Note: The syntax of Bind Distinguished Name differs per bind method:</p>
+
+<pre><code>Search Bind: username@domain
+Direct Bind with NT Domain: username
+Direct Bind with Username Pattern: DN string (full DIT path)
+</code></pre>
+
+<p>Do not use if anonymous binding is supported.</p>
+
+<pre><code>## You can test ldapsearch at the command line as follows:
+LDAPTLS_CACERT=/&lt;path_to_cert&gt;/&lt;ca_certificate&gt; ldapsearch -H ldaps://&lt;ldap_server&gt;:636 \
+-D &quot;&lt;bind_dn&gt;&quot; -w &lt;bind_password&gt; -b &lt;base_dn&gt; &quot;samaccountname=&lt;user&gt;&quot;
+</code></pre>
+
+<p>Note: To run ldapsearch with a CA certificate, you may need to install ldap_utils on Debian/Ubuntu and openldap-clients on RHEL/CentOS.</p>
+
+<h4 id="direct-bind">Direct Bind</h4>
+
+<p>To authenticate with direct binding, Hue needs either the User Principal Name (UPN) for Active Directory, or the full path to the LDAP user in the Directory Information Tree (DIT) for open standard LDAP.</p>
+
+<p>Important: Direct binding only works with one domain. For multiple directories, use Search Bind.</p>
+
+<p>To directly bind to an Active Directory/LDAP server with NT domain:</p>
+
+<p>Click the Configuration tab and filter by scope=Service-wide and category=Security.</p>
+
+<p>Set LDAP properties exactly like Search Bind with these exceptions:
+    Active Directory Domain <your NT domain>
+    LDAP Bind User Distinguished Name   <username only> (not username@domain)
+    Use Search Bind Authentication  FALSE</p>
+
+<p>Test your LDAP configuration, and when successful, Restart Hue.
+To directly bind to an open standard LDAP server with a username pattern:</p>
+
+<p>Remove the value for Active Directory Domain.</p>
+
+<p>Set both LDAP Username Pattern and LDAP Bind User Distinguished Name to a DN string that represents the full path of the directory information tree, from UID to top level domain.</p>
+
+<p>Note: When using direct bind, set LDAP Search Base, not for authentication (you can log on to Hue without it), but to Synchronize Hue with LDAP Server.</p>
+
+<h3 id="saml">SAML</h3>
+
+<p>Secure Assertion Markup Language (SAML) single sign-on (SSO) backend. Delegates authentication to the configured Identity Provider. See Configuring Hue for SAML for more details.</p>
+
+<pre><code>libsaml.backend.SAML2Backend
+</code></pre>
+
+<p>Authenticate Hue Users with SAML</p>
+
+<p>Hue supports SAML (Security Assertion Markup Language) for Single Sign-on (SSO) authentication.</p>
+
+<p>The SAML 2.0 Web Browser SSO profile has three components:</p>
+
+<ul>
+<li>User Agent - Browser that represents you, the user, seeking resources.</li>
+<li>Service Provider (SP) - Service (Hue) that sends authentication requests to SAML.</li>
+<li>Identity Provider (IdP) - SAML service that authenticates users.</li>
+</ul>
+
+<p>When a user requests access to an application, the Service Provider (Hue) sends an authentication request from the User Agent (browser) to the Identity Provider. The Identity Provider authenticates the user, sends a response, and redirects the browser back to Hue.
+This page explains how to configure Hue, the Service Provider, and gives guidance on how to configure the Identity Provider, which differs per product.</p>
+
+<p>Configure Hue for SAML Authentication</p>
+
+<p>The Service Provider (Hue) and the Identity Provider use a metadata file to confirm each other&rsquo;s identity. Hue stores metadata from the SAML server, and the IdP stores metadata from Hue server.</p>
+
+<p>In Configure Hue at the Command Line, you must copy the metadata from your IdP&rsquo;s SAML server and store it in an XML file on every ost with a Hue server.
+Important: Read the documentation of your Identity Provider for details on how to procure the XML of the SAML server metadata.</p>
+
+<p>Configure Hue at the Command Line
+Important: You may need to disable cipher algorithms. See SAML SSL Error in Troubleshooting below.</p>
+
+<p>Install the following libraries on all hosts in your cluster:</p>
+
+<pre><code>## RHEL/CentOS
+yum install git gcc python-devel swig openssl
+## Ubuntu/Debian
+apt-get install git gcc python-dev swig openssl
+## SLES
+zypper install git gcc python-devel swig openssl make libxslt-devel libltdl-devel
+</code></pre>
+
+<p>Install xmlsec1 and xmlsec1-openssl on all hosts in the cluster:</p>
+
+<p>Important: Ensure that the xmlsec1 package is executable by the user, hue.</p>
+
+<pre><code>## RHEL/CentOS
+yum install xmlsec1 xmlsec1-openssl
+Note: If xmlsec libraries are not available, use the appropriate epel repository:
+## For RHEL/CentOS 7
+wget http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-6.noarch.rpm
+rpm -ivh epel-release-7-6.noarch.rpm
+## Ubuntu/Debian
+apt-get install xmlsec1 libxmlsec1-openssl
+## SLES (get latest version)
+wget http://www.aleksey.com/xmlsec/download/xmlsec1-1.2.24.tar.gz
+tar -xvzf xmlsec1-1.2.24.tar.gz
+cd xmlsec1-1.2.24
+./configure &amp;&amp; make
+make install
+</code></pre>
+
+<p>Copy metadata from your IdP&rsquo;s SAML server and save it as an XML file on every host with a Hue server.
+For example, if your Identity Provider is Shibboleth, visit https://<idp_host>:8443/idp/shibboleth, copy the metadata content, and paste it into an .xml file.</p>
+
+<p>Note: You may have to edit the copied metadata; for example, the IdP&rsquo;s port number (8443) may be missing from its URL.</p>
+
+<pre><code>mkdir -pm 755 /opt/cloudera/security/saml/
+cd /opt/cloudera/security/saml/
+vim idp-&lt;your idp provider&gt;-metadata.xml
+</code></pre>
+
+<p>Add key_file and cert_file for encrypted assertions–see Table of SAML Parameters.</p>
+
+<p>Warning: Add key and cert files even if not encrypting assertions. Hue checks for the existence and validity of these files even if they are not needed! They cannot be empty files. This is a known issue.</p>
+
+<p>If necessary, create &ldquo;valid&rdquo; dummy files:</p>
+
+<pre><code>openssl genrsa -des3 -out dummy.key 2048
+openssl rsa -inform PEM -outform PEM -in dummy.key -pubout -out dummy-nopass.pem
+</code></pre>
+
+<p>Configure Hue</p>
+
+<p>Currently, all hue.ini properties for SAML must be added to Hue Service safety-valve in Cloudera Manager.
+Log on to Cloudera Manager and go to Hue &gt; Configuration.</p>
+
+<pre><code>## Example Settings using Open AM:
+[desktop]
+redirect_whitelist=&quot;^\/.*$,^http:\/\/clr.sec.cloudera.com:8080\/.*$&quot;
+[[auth]]
+backend=libsaml.backend.SAML2Backend
+[libsaml]
+xmlsec_binary=/usr/bin/xmlsec1
+metadata_file=/opt/cloudera/security/saml/idp-openam-metadata.xml
+key_file=/opt/cloudera/security/saml/host.key
+cert_file=/opt/cloudera/security/saml/host.pem
+username_source=nameid
+name_id_format=&quot;urn:oasis:names:tc:SAML:2.0:nameid-format:transient&quot;
+entity_id=&lt;host base name&gt;
+logout_enabled=false
+</code></pre>
+
+<p>Note: For SLES distributions, the xmlsec binary may be in /usr/local/bin/. If so:</p>
+
+<ul>
+<li>Set Hue Service Advanced Configuration Snippet: xmlsec_binary=/usr/local/bin/xmlsec1</li>
+<li>Set Hue Service Environment Advanced Configuration Snippet: LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/</li>
+</ul>
+
+<p>Integrate IdP SAML Server with Hue</p>
+
+<p>After Hue is configured and restarted, copy the metadata generated by Hue server and send it to your Identity Provider so they can configure the SAML server.</p>
+
+<p>Ensure Hue is configured, restarted, and running.
+Go to http://<hue_fqdn>:8889/saml2/metadata.</p>
+
+<p>Copy the metadata and send it to your Identity Provider.</p>
+
+<p>Ensure that your Identity Provider configures the SAML server with the Hue metadata (just as you configured the Hue server with SAML metadata).</p>
+
+<p>SAML Properties in hue.ini</p>
+
+<p>Table of SAML Parameters</p>
+
+<p>SAML Parameter  Description
+    authn_requests_signed   Boolean, that when True, signs Hue-initiated authentication requests with X.509 certificate.
+    backend Hard-coded value set to SAML backend library packaged with Hue (libsaml.backend.SAML2Backend).
+    base_url    URL that SAML Identity Provider uses for responses. Typically used in Load balanced Hue environments.
+    cert_file   Path to X.509 certificate sent with encrypted metadata. File format must be .PEM.
+    create_users_on_login   Boolean, that when True, creates users from OpenId, upon successful login.
+    entity_id   Service provider ID. Can also accept pattern where &lsquo;<base_url>&rsquo; is replaced with server URL base.
+    key_file    Path to private key used to encrypt metadata. File format must be .PEM.
+    key_file_password   Password used to decrypt the X.509 certificate in memory.
+    logout_enabled  Boolean, that when True, enables single logout.
+    logout_requests_signed  Boolean, that when True, signs Hue-initiated logout requests with an X.509 certificate.
+    metadata_file   Path to readable metadata XML file copied from Identity Provider.
+    name_id_format  Format of NameID that Hue requests from SAML server.
+    optional_attributes Comma-separated list of optional attributes that Hue requests from Identity Provider.
+    required_attributes Comma-separated list of required attributes that Hue requests from Identity Provider. For example, uid and email.
+    redirect_whitelist  Fully qualified domain name of SAML server: &ldquo;^\/.<em>$,^https:\/\/<SAML_server_FQDN>\/.</em>$&ldquo;.
+    user_attribute_mapping  Map of Identity Provider attributes to Hue django user attributes. For example, {&lsquo;uid&rsquo;:&lsquo;username&rsquo;, &lsquo;email&rsquo;:&lsquo;email&rsquo;}.
+    username_source Declares source of username as nameid or attributes.
+    xmlsec_binary   Path to xmlsec_binary that signs, verifies, encrypts/decrypts SAML requests and assertions. Must be executable by user, hue.
+    Description of some properties to be set in hue.ini (via Cloudera Manager):
+    redirect_whitelist [desktop]</p>
+
+<p>Set to the fully qualified domain name of the SAML server so that Hue can redirect to the SAML server for authentication.</p>
+
+<pre><code>[desktop]
+redirect_whitelist=^\/.$,^https:\/\/&lt;SAML_server_fully_qualified_domain_name&gt;\/.$
+Note: Hue uses redirect_whitelist to protect itself from redirecting to unapproved URLs.
+backend [desktop]&gt;[[auth]]
+Point to the SAML backend (packaged with Hue):
+backend=libsaml.backend.SAML2Backend
+xmlsec_binary [libsaml]
+Point to the xmlsec1 library path:
+xmlsec_binary=/usr/bin/xmlsec1
+Note: To find the path, run: which xmlsec1
+metadata_file [libsaml]
+Point to the path of the XML file you created from the IdP's metadata:
+metadata_file=/path/to/&lt;your_idp_metadata_file&gt;.xml
+key_file and cert_file [libsaml]
+</code></pre>
+
+<p>To encrypt communication between Hue and the Identity Provider, you need a private key and certificate. The private key signs requests sent to the Identity Provider and the certificate file encrypts and decrypts messages from the Identity Provider.</p>
+
+<p>Copy these files from the Identity Provider and set key_file and cert_file to their respective paths. Both files are in PEM format and must be named with the .PEM extension.</p>
+
+<p>Note: The key and certificate files specified by the key_file and cert_file parameters in hue.ini must be .PEM files.
+Users with password-protected certificates can set the property, key_file_password in hue.ini. Hue uses the password to decrypt the SAML certificate in memory and passes it to xmlsec1 through a named pipe. The decrypted certificate never touches the disk. This only works for POSIX-compatible platforms.</p>
+
+<p>Troubleshooting</p>
+
+<p>Remember to Enable DEBUG for logging.</p>
+
+<p>SAML SSL Error</p>
+
+<p>OpenSSL might fail in CDH 5.5.x and higher with this message:</p>
+
+<pre><code>SSLError: [Errno bad handshake] [('SSL routines', 'SSL3_CHECK_CERT_AND_ALGORITHM', 'dh key too small')]
+</code></pre>
+
+<p>To resolve, append the following code to the file, /usr/java/<your_jdk_version>-cloudera/jre/lib/security/java.security:</p>
+
+<pre><code>jdk.tls.disabledAlgorithms=MD5, RC4, DH
+</code></pre>
+
+<p>SAML Decrypt Error</p>
+
+<p>The following error is an indication that you are using a slightly different SAML protocol from what Hue expects:</p>
+
+<pre><code>Error: ('failed to decrypt', -1)
+</code></pre>
+
+<p>To resolve:</p>
+
+<p>Download and rename Python script, fix-xmlsec1.txt.</p>
+
+<pre><code>wget http://www.cloudera.com/documentation/other/shared/fix-xmlsec1.txt -O fix-xmlsec1.py
+</code></pre>
+
+<p>Change permissions as appropriate, for example:</p>
+
+<pre><code>chmod 755 fix-xmlsec1.py
+</code></pre>
+
+<p>In hue.ini, set xmlsec_binary=<path_to_script>/fix-xmlsec1.py.
+Run fix-xmlsec1.py.</p>
+
+<p>This script repairs the known issue whereby xmlsec1 is not compiled with RetrievalMethod and cannot find the location of the encrypted key. SAML2 responses would sometimes place EncryptedKey outside of the EncryptedData tree. This script moves EncryptedKey under EncryptedData.</p>
+
+<h3 id="spnego">Spnego</h3>
+
+<p>SPNEGO is an authentication mechanism negotiation protocol. Authentication can be delegated to an authentication server, such as a Kerberos KDC, depending on the mechanism negotiated.</p>
+
+<pre><code>desktop.auth.backend.SpnegoDjangoBackend
+</code></pre>
+
+<h3 id="pam">PAM</h3>
+
+<p>Authenticates users with PAM (pluggable authentication module). The authentication mode depends on the PAM module used.</p>
+
+<pre><code>desktop.auth.backend.PamBackend
+</code></pre>
+
+<h3 id="oauth-connect">OAuth Connect</h3>
+
+<p>Delegates authentication to a third-party OAuth server.</p>
+
+<pre><code>desktop.auth.backend.OAuthBackend
+</code></pre>
+
+<h3 id="multiple-authentication-backends">Multiple Authentication Backends</h3>
+
+<p>For example, to enable Hue to first attempt LDAP directory lookup before falling back to the database-backed user model, we can update the hue.ini configuration file or Hue safety valve in Cloudera Manager with a list containing first the LdapBackend followed by either the ModelBackend or custom AllowFirstUserDjangoBackend (permits first login and relies on user model for all subsequent authentication):</p>
+
+<pre><code>[desktop]
+  [[auth]]
+  backend=desktop.auth.backend.LdapBackend,desktop.auth.backend.AllowFirstUserDjangoBackend
+</code></pre>
+
+<p>This tells Hue to first check against the configured LDAP directory service, and if the username is not found in the directory, then attempt to authenticate the user with the Django user manager.</p>
+
+<p><a href="http://gethue.com/configuring-hue-multiple-authentication-backends-and-ldap/">Read more about it here</a>.</p>
+
+<h2 id="security">Security</h2>
+
+<h3 id="configure-a-proxy">Configure a Proxy</h3>
+
+<p>We explained how to run Hue with NGINX serving the static files or under Apache. If you use another proxy, you might need to set these options:</p>
+
+<pre>
+  [desktop]
+  # Enable X-Forwarded-Host header if the load balancer requires it.
+  use_x_forwarded_host=false
+
+  # Support for HTTPS termination at the load-balancer level with SECURE_PROXY_SSL_HEADER.
+  secure_proxy_ssl_header=false
+</pre>
+
+<h3 id="configuring-ssl">Configuring SSL</h3>
+
+<p>You can configure Hue to serve over HTTPS.</p>
+
+<ol>
+<li><p>Configure Hue to use your private key by adding the following
+options to the <code>hue.ini</code> configuration file:</p>
+
+<p>ssl_certificate=/path/to/certificate
+ssl_private_key=/path/to/key</p></li>
+
+<li><p>Ideally, you would have an appropriate key signed by a Certificate Authority.
+If you&rsquo;re just testing, you can create a self-signed key using the <code>openssl</code>
+command that may be installed on your system:</p></li>
+</ol>
+
+<p>Create a key:</p>
+
+<pre><code>openssl genrsa 1024 &gt; host.key
+</code></pre>
+
+<p>Create a self-signed certificate:</p>
+
+<pre><code>openssl req -new -x509 -nodes -sha1 -key host.key &gt; host.cert
+</code></pre>
+
+<div class="note">
+Self-signed Certificates and File Uploads
+
+To upload files using the Hue File Browser over HTTPS requires
+using a proper SSL Certificate.  Self-signed certificates don't
+work.
+</div>
+
+<p>Note: The security vulnerability SWEET32 is also called Birthday attacks against TLS ciphers with 64bit block size and it is assigned CVE-2016-2183. This is due to legacy block ciphers
+having block size of 64 bits are vulnerable to a practical collision attack when used in CBC mode.</p>
+
+<p>DES/3DES are the only ciphers has block size of 64-bit. One way to config Hue not to use them:</p>
+
+<pre><code>[desktop]
+ssl_cipher_list=DEFAULT:!DES:!3DES
+</code></pre>
+
+<h3 id="sasl">SASL</h3>
+
+<p>When getting a bigger result set from Hive/Impala or bigger files like images from HBase, the response requires to increase
+the buffer size of SASL lib for thrift sasl communication.</p>
+
+<pre>
+  [desktop]
+  # This property specifies the maximum size of the receive buffer in bytes in thrift sasl communication,
+  # default value is 2097152 (2 MB), which equals to (2 * 1024 * 1024)
+  sasl_max_buffer=2097152
+</pre>
+
+<h3 id="storing-passwords-in-file-script">Storing passwords in file script</h3>
+
+<p>Hue lets you secure passwords in one consolidated script, or multiple individual scripts. Hue runs each password script at startup and extracts passwords from stdout.</p>
+
+<p>Store scripts in a directory that only Hue can read, write, and execute. You can choose password script names but you cannot change hue.ini property names to which you assign those scripts.</p>
+
+<p>At the command line, create one or more password scripts. For example, create a consolidated script named <code>my_passwords_script.sh</code>:</p>
+
+<pre><code>#!/bin/bash
+
+SERVICE=$1
+
+if [[ ${SERVICE} == &quot;ldap_password&quot; ]]
+then
+echo &quot;your_ldap_password&quot;
+fi
+
+if [[ ${SERVICE} == &quot;ssl_password&quot; ]]
+then
+echo &quot;your_ssl_password&quot;
+fi
+
+if [[ ${SERVICE} == &quot;bind_password&quot; ]]
+then
+echo &quot;your_bind_password&quot;
+fi
+
+if [[ ${SERVICE} == &quot;db_password&quot; ]]
+then
+echo &quot;your_database_password&quot;
+fi
+</code></pre>
+
+<p>Add script properties, for example:</p>
+
+<pre><code>[desktop]
+ldap_username=hueservice
+ldap_password_script=&quot;/var/lib/hue/password_script.sh ldap_password&quot;
+ssl_password_script=&quot;/var/lib/hue/password_script.sh ssl_password&quot;
+
+[[ldap]]
+bind_password_script=&quot;/var/lib/hue/password_script.sh bind_password&quot;
+
+[[database]]
+db_password_script=&quot;/var/lib/hue/password_script.sh db_password&quot;
+</code></pre>
+
+<h3 id="idle-session-timeout">Idle session timeout</h3>
+
+<p>Hue now offers a new property, idle_session_timeout, that can be configured in the hue.ini file:</p>
+
+<pre><code>[desktop]
+[[auth]]
+idle_session_timeout=600
+</code></pre>
+
+<p>When idle_session_timeout is set, users will automatically be logged out after N (e.g. – 600) seconds of inactivity and be prompted to login again:</p>
+
+<p><a href="http://gethue.com/introducing-the-new-login-modal-and-idle-session-timeout/">Read more about it here</a>.</p>
+
+<h3 id="auditing">Auditing</h3>
+
+<p>Read more about <a href="http://gethue.com/auditing-user-administration-operations-with-hue-and-cloudera-navigator-2/">Auditing User Administration Operations with Hue and Cloudera Navigator</a>.</p>
+
+<h3 id="concurrent-user-session-limit">Concurrent User Session Limit</h3>
+
+<p>If set, limits the number of concurrent user sessions. 1 represents 1 browser session per user. Default: 0 (unlimited sessions per user)</p>
+
+<pre><code>[desktop]
+[[session]]
+concurrent_user_session_limit=0
+</code></pre>
+
+<p><a href="http://gethue.com/restrict-number-of-concurrent-sessions-per-user/">Read more about it here</a>.</p>
+
+<h2 id="customize-the-ui">Customize the UI</h2>
+
+<h3 id="maps-look-and-feel">Maps look and feel</h3>
+
+<p>The properties we need to tweak are leaflet_tile_layer and leaflet_tile_layer_attribution, that can be configured in the hue.ini file:</p>
+
+<pre><code>[desktop]
+leaflet_tile_layer=https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}
+leaflet_tile_layer_attribution='Tiles &amp;copy; Esri &amp;mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+</code></pre>
+
+<p><a href="http://gethue.com/change-your-maps-look-and-feel/">Read more about it here</a>.</p>
+
+<h3 id="banner">Banner</h3>
+
+<p>You can add a custom banner to the Hue Web UI by applying HTML directly to the property, banner_top_html. For example:</p>
+
+<pre><code>banner_top_html=&lt;H4&gt;My company's custom Hue Web UI banner&lt;/H4&gt;
+</code></pre>
+
+<h3 id="splash-screen">Splash Screen</h3>
+
+<p>You can customize a splash screen on the login page by applying HTML directly to the property, login_splash_html. For example:</p>
+
+<pre><code>[desktop]
+[[custom]]
+login_splash_html=WARNING: You are required to have authorization before you proceed.
+</code></pre>
+
+<h3 id="custom-logo">Custom Logo</h3>
+
+<p>There is also the possibility to change the logo for further personalization.</p>
+
+<pre><code>[desktop]
+[[custom]]
+# SVG code to replace the default Hue logo in the top bar and sign in screen
+# e.g. &lt;image xlink:href=&quot;/static/desktop/art/hue-logo-mini-white.png&quot; x=&quot;0&quot; y=&quot;0&quot; height=&quot;40&quot; width=&quot;160&quot; /&gt;
+logo_svg=
+</code></pre>
+
+<p>You can go crazy and write there any SVG code you want. Please keep in mind your SVG should be designed to fit in a 160×40 pixels space. To have the same ‘hearts logo&rsquo; you can see above, you can type this code</p>
+
+<pre><code>[desktop]
+[[custom]]
+logo_svg='&lt;g&gt;&lt;path stroke=&quot;null&quot; id=&quot;svg_1&quot; d=&quot;m44.41215,11.43463c-4.05017,-10.71473 -17.19753,-5.90773 -18.41353,-0.5567c-1.672,-5.70253 -14.497,-9.95663 -18.411,0.5643c-4.35797,11.71793 16.891,22.23443 18.41163,23.95773c1.5181,-1.36927 22.7696,-12.43803 18.4129,-23.96533z&quot; fill=&quot;#ffffff&quot;/&gt; &lt;path stroke=&quot;null&quot; id=&quot;svg_2&quot; d=&quot;m98.41246,10.43463c-4.05016,-10.71473 -17.19753,-5.90773 -18.41353,-0.5567c-1.672,-5.70253 -14.497,-9.95663 -18.411,0.5643c-4.35796,11.71793 16.891,22.23443 18.41164,23.95773c1.5181,-1.36927 22.76959,-12.43803 18.41289,-23.96533z&quot; fill=&quot;#FF5A79&quot;/&gt; &lt;path stroke=&quot;null&quot; id=&quot;svg_3&quot; d=&quot;m154.41215,11.43463c-4.05016,-10.71473 -17.19753,-5.90773 -18.41353,-0.5567c-1.672,-5.70253 -14.497,-9.95663 -18.411,0.5643c-4.35796,11.71793 16.891,22.23443 18.41164,23.95773c1.5181,-1.36927 22.76959,-12.43803 18.41289,-23.96533z&quot; fill=&quot;#ffffff&quot;/&gt; &lt;/g&gt;'
+</code></pre>
+
+<p>Read more about it in <a href="http://gethue.com/hue-with-a-custom-logo/">Hue with a custom logo</a> post.</p>
+
+<h2 id="source-version-control">Source Version Control</h2>
+
+<p>By default Hue stores the <a href="http://cloudera.github.io/hue/latest/user/concept/#documents">saved documents</a> in its database. This features aims at pointing to any source versioning systems like GitHub, BitBucket&hellip; to open and save queries.</p>
+
+<p><strong>Note</strong> This feature is experiemental and tracked in <a href="https://issues.cloudera.org/browse/HUE-951">HUE-951</a>.</p>
+
+<pre><code>[desktop]
+
+[[vcs]]
+
+## [[[git-read-only]]]
+    ## Base URL to Remote Server
+    # remote_url=https://github.com/cloudera/hue/tree/master
+
+    ## Base URL to Version Control API
+    # api_url=https://api.github.com
+## [[[github]]]
+
+    ## Base URL to Remote Server
+    # remote_url=https://github.com/cloudera/hue/tree/master
+
+    ## Base URL to Version Control API
+    # api_url=https://api.github.com
+
+    # These will be necessary when you want to write back to the repository.
+    ## Client ID for Authorized Application
+    # client_id=
+
+    ## Client Secret for Authorized Application
+    # client_secret=
+## [[[svn]]
+    ## Base URL to Remote Server
+    # remote_url=https://github.com/cloudera/hue/tree/master
+
+    ## Base URL to Version Control API
+    # api_url=https://api.github.com
+
+    # These will be necessary when you want to write back to the repository.
+    ## Client ID for Authorized Application
+    # client_id=
+
+    ## Client Secret for Authorized Application
+    # client_secret=
+</code></pre>
+
+
+<footer class=" footline" >
+	
+</footer>
+
+        
+        </div> 
+        
+
+      </div>
+
+    <div id="navigation">
+        
+        
+        
+        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+            
+        
+        
+        
+
+
+	 
+	 
+    </div>
+
+    </section>
+    
+    <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
+      <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
+    </div>
+    <script src="/hue/latest/js/clipboard.min.js"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.min.js"></script>
+    <script src="/hue/latest/js/perfect-scrollbar.jquery.min.js"></script>
+    <script src="/hue/latest/js/jquery.sticky.js"></script>
+    <script src="/hue/latest/js/featherlight.min.js"></script>
+    <script src="/hue/latest/js/html5shiv-printshiv.min.js"></script>
+    <script src="/hue/latest/js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="/hue/latest/js/modernizr.custom.71422.js"></script>
+    <script src="/hue/latest/js/learn.js"></script>
+    <script src="/hue/latest/js/hugo-learn.js"></script>
+
+    <link href="/hue/latest/mermaid/mermaid.css" type="text/css" rel="stylesheet" />
+    <script src="/hue/latest/mermaid/mermaid.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-37637545-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-37637545-1');
+</script>
+  </body>
+</html>
