@@ -151,11 +151,7 @@ desktop: virtual-env
 # Build apps
 ###################################
 .PHONY: apps
-apps: desktop
-	npm install
-	npm run webpack
-	npm run webpack-login
-	npm run webpack-workers
+apps: npm-install desktop
 	@$(MAKE) -C $(APPS_DIR) env-install
 
 ###################################
@@ -171,7 +167,7 @@ INSTALL_CORE_FILES = \
 	VERS* LICENSE* README* webpack-stats*.json
 
 .PHONY: install
-install: virtual-env install-check install-core-structure install-desktop install-apps install-env
+install: virtual-env install-check install-core-structure install-desktop install-apps install-env npm-install
 
 .PHONY: install-check
 install-check:
@@ -210,6 +206,16 @@ install-env:
 	$(MAKE) -C $(INSTALL_DIR)/desktop env-install
 	@echo --- Setting up Applications
 	$(MAKE) -C $(INSTALL_DIR)/apps env-install
+
+# <<<< DEV ONLY
+.PHONY: npm-install
+npm-install:
+	npm install
+	npm run webpack
+	npm run webpack-login
+	npm run webpack-workers
+# END DEV ONLY >>>>
+
 
 ###################################
 # Internationalization
