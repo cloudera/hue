@@ -3437,6 +3437,8 @@ from desktop.views import _ko
         self.disposals = [];
         self.isSolr = ko.observable(true);
 
+        self.showRisks = ko.observable(false);
+
         self.filter = {
           querySpec: ko.observable({
             query: '',
