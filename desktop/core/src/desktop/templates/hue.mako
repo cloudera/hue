@@ -169,8 +169,8 @@
 % endif
 
 <div id="jHueNotify" class="alert hide">
-    <button class="close">&times;</button>
-    <div class="message"></div>
+  <button class="close">&times;</button>
+  <div class="message"></div>
 </div>
 
 
@@ -186,21 +186,21 @@ ${ hueIcons.symbols() }
       ${ banner_message or conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
     </div>
   % endif
+
   % if not IS_EMBEDDED.get():
   <nav class="navbar navbar-default">
     <div class="navbar-inner top-nav">
       <div class="top-nav-left">
         % if not IS_EMBEDDED.get():
-        % if not (IS_MULTICLUSTER_ONLY.get() and has_multi_cluster()):
-        <a class="hamburger hamburger-hue pull-left" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
-          <span class="hamburger-box"><span class="hamburger-inner"></span></span>
-        </a>
+          % if not (IS_MULTICLUSTER_ONLY.get() and has_multi_cluster()):
+          <a class="hamburger hamburger-hue pull-left" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
+            <span class="hamburger-box"><span class="hamburger-inner"></span></span>
+          </a>
 
-        <a class="brand" data-bind="hueLink: '/home/'" href="javascript: void(0);" title="${_('Documents')}">
-            <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
-        </a>
-        % endif
-
+          <a class="brand" data-bind="hueLink: '/home/'" href="javascript: void(0);" title="${_('Documents')}">
+              <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
+          </a>
+          % endif
         % endif
 
         % if not IS_MULTICLUSTER_ONLY.get():
@@ -253,7 +253,6 @@ ${ hueIcons.symbols() }
       </div>
 
       <div class="top-nav-right">
-
         % if user.is_authenticated() and section != 'login' and (cluster != ANALYTIC_DB or IS_MULTICLUSTER_ONLY.get()):
         <div class="dropdown navbar-dropdown pull-right">
           % if IS_MULTICLUSTER_ONLY.get():
@@ -302,7 +301,6 @@ ${ hueIcons.symbols() }
     </div>
     <div id="mini_jobbrowser"></div>
   </div>
-
   % endif
 
   <div class="content-wrapper">

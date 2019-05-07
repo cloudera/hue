@@ -7,6 +7,7 @@ Just pull the latest from the Internet or build it yourself from the Hue reposit
 
 
 ### Pull the image from Docker Hub
+
 ```
 sudo docker pull gethue/hue:latest
 ```
@@ -32,8 +33,8 @@ Feel free to replace `-t hue` in all the commands by your own docker repository 
 **Tag and push the image to the container registry**
 
 ```
-docker build . -t docker-registry.gethue.com/gethue/hue:v4.4
-docker push docker-registry.gethue.com/gethue/hue:v4.4
+docker build . -t docker-registry.gethue.com/gethue/hue:4.4.0
+docker push docker-registry.gethue.com/gethue/hue:4.4.0
 ```
 
 
@@ -53,11 +54,11 @@ Hue should then be up and running on your default Docker IP on the port 8888, so
 #### Configuration
 
 By default the Hue container is using
-[``tools/docker/hue/conf/z-defaults.ini``](/tools/docker/hue/conf/z-defaults.ini) on top of [``desktop/conf/hue.ini``](/desktop/conf/hue.ini) which assumes localhost for all the data services and uses and embedded sqlite database that often errors.
+[``tools/docker/hue/conf/z-defaults.ini``](/tools/docker/hue/conf/z-defaults.ini) on top of [``desktop/conf/hue.ini``](/desktop/conf/hue.ini) which assumes localhost for all the data services and uses and embedded sqlite database that will error out.
 
 The default ini is used for configuration at the image build time (e.g. which apps to always disable or certain settings like [banner customization](http://gethue.com/add-a-top-banner-to-hue/)).
 
-In order to configure Hue at runtime and for example point to external services, use the simplified ini [``hue.ini``](/tools/docker/hue/hue.ini), edit the values before starting it via:
+In order to be useful, configure Hue at runtime to point to external services. The simplified ini [``hue.ini``](/tools/docker/hue/hue.ini) can be edited before starting Hue via:
 
 ```
 docker run -it -p 8888:8888 -v $PWD/tools/docker/hue/hue.ini:/usr/share/hue/desktop/conf/z-hue.ini gethue/hue
@@ -73,9 +74,9 @@ docker run -it -p 8888:8888 -v $PWD/hue.ini:/usr/share/hue/desktop/conf/z-hue.in
 
 *Note*
 
-If for example the database is pointing to your localhost, if using Docker on Linux just add the '--network="host"' parameter and the container will correctly point to it.
+If for example the database is pointing to your localhost, if using Docker on Linux just add the `--network="host"` parameter and the container will correctly point to it.
 
-    sudo docker run -it -p 8888:8888 -v $PWD/desktop/conf/pseudo-distributed.ini:/usr/share/hue/desktop/conf/z-hue.ini --network="host" hue
+    sudo docker run -it -p 8888:8888 -v $PWD/desktop/conf/pseudo-distributed.ini:/usr/share/hue/desktop/conf/z-hue.ini --network="host" gethue/hue
 
 
 #### Docker Compose
