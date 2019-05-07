@@ -294,9 +294,15 @@ class SparkApi(Api):
           images = [data['image/png']]
         except KeyError:
           images = []
-        data = [[data['text/plain']]]
-        meta = [{'name': 'Header', 'type': 'STRING_TYPE', 'comment': ''}]
-        type = 'text'
+        if 'application/json' in data:
+          result = data['application/json']
+          data = result['data']
+          meta = [{'name': field['name'], 'type': field['type'], 'comment': ''} for field in result['schema']['fields']]
+          type = 'table'
+        else:
+          data = [[data['text/plain']]]
+          meta = [{'name': 'Header', 'type': 'STRING_TYPE', 'comment': ''}]
+          type = 'text'
       else:
         data = table['data']
         headers = table['headers']
