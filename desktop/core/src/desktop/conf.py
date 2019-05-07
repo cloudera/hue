@@ -1780,6 +1780,9 @@ def get_clusters(user):
 def has_multi_cluster():
   return bool(CLUSTERS.get())
 
+def has_multi_clusters():
+  return len(CLUSTERS.get()) > 1
+
 
 CLUSTERS = UnspecifiedConfigSection(
   "clusters",
