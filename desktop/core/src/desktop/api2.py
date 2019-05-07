@@ -71,6 +71,7 @@ def api_error_handler(func):
 @api_error_handler
 def get_config(request):
   config = get_cluster_config(request.user)
+  config['clusters'] = get_clusters(request.user).values()
   config['status'] = 0
 
   return JsonResponse(config)
@@ -185,6 +186,7 @@ def get_context_computes(request, interface):
   return JsonResponse(response)
 
 
+# Deprecated
 @api_error_handler
 def get_context_clusters(request, interface):
   response = {}
