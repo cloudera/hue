@@ -1225,7 +1225,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <a class="btn dropdown-toggle" data-toggle="dropdown" href="javascript: void(0)">
       <span class="caret"></span>
     </a>
-    <ul class="dropdown-menu pull-right">
+    <ul class="dropdown-menu">
       <li>
         <a class="pointer" rel="tooltip" data-placement="bottom" data-bind="click: function() { $root.selectedNotebook().isHidingCode(! $root.isHidingCode()); }, attr: { 'title': $root.isHidingCode() ? '${ _ko('Show the logic') }' : '${ _ko('Hide the logic') }' }">
           <i class="fa fa-fw" data-bind="css: { 'fa-expand': $root.isHidingCode(), 'fa-compress': ! $root.isHidingCode() }"></i>
