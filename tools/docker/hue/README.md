@@ -85,7 +85,6 @@ Assuming we have a local ``hue.ini`` as shown in the previous section:
 
 ```
 cd tools/docker/hue
-cp docker-compose.yml.sample docker-compose.yml
 ```
 
 Then:
