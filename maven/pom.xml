@@ -28,7 +28,7 @@
 
   <groupId>com.cloudera.hue</groupId>
   <artifactId>hue-parent</artifactId>
-  <version>4.3.0-cdh6.2.0</version>
+  <version>4.3.0.6.0.99.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Hue Maven Parent POM</name>
