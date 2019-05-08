@@ -18,6 +18,7 @@ services:
           - "33061:3306"
       command: --init-file /data/application/init.sql
       volumes:
+          - data:/var/lib/mysql
           - ./init.sql:/data/application/init.sql
       environment:
           MYSQL_ROOT_USER: root
@@ -25,3 +26,5 @@ services:
           MYSQL_DATABASE: hue
           MYSQL_USER: root
           MYSQL_PASSWORD: secret
+volumes:
+  data:
