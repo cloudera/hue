@@ -578,7 +578,7 @@ In the `[[interpreters]]` section:
             name=PySpark
             interface=livy
 
-      [[[sparksql]]]
+      [[[sql]]]
             name=SparkSql
             interface=livy
 
@@ -596,6 +596,13 @@ In the `[spark]` section:
       # The Livy Server URL.
       livy_server_url=http://localhost:8998
 
+And if using Cloudera distribution, make sure you have notebooks enabled:
+
+    [desktop]
+      app_blacklist=
+
+    [notebook]
+      show_notebooks=true
 
 **CSRF**
 
