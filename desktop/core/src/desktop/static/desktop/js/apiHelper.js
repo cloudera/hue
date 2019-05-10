@@ -954,7 +954,7 @@ var ApiHelper = (function () {
       queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // Memory percentage
       queryMetric('round((go_memstats_alloc_bytes / go_memstats_sys_bytes) * 100)'), // IO percentage
       queryMetric('impala_queries_count{datawarehouse="' + options.clusterName + '"}'), // Sum of all queries in flight (currently total query executed for testing purpose)
-      queryMetric('impala_queries{datawarehouse="' + options.clusterName + '"}'), // Queued queries
+      queryMetric('impala_queries{datawarehouse="' + options.clusterName + '"}') // Queued queries
     ).done(function () {
       var timestampIndex = {};
       for (var j = 0; j < arguments.length; j++) {
