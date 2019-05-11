@@ -51,7 +51,7 @@ from desktop.lib.django_util import render, render_json
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.log import get_audit_logger
-from desktop.log.access import access_log, log_page_hit
+from desktop.log.access import access_log, log_page_hit, access_warn
 from desktop import appmanager
 from desktop import metrics
 from hadoop import cluster
@@ -332,7 +332,9 @@ class LoginAndPermissionMiddleware(object):
 
     logging.info("Redirecting to login page: %s", request.get_full_path())
     access_log(request, 'login redirection', level=access_log_level)
-    no_idle_backends = ("libsaml.backend.SAML2Backend", "desktop.auth.backend.SpnegoDjangoBackend")
+    no_idle_backends = ("libsaml.backend.SAML2Backend",
+                        "desktop.auth.backend.SpnegoDjangoBackend",
+                        "desktop.auth.backend.KnoxSpnegoDjangoBackend")
     if request.ajax and all(no_idle_backend not in desktop.conf.AUTH.BACKEND.get() for no_idle_backend in no_idle_backends):
       # Send back a magic header which causes Hue.Request to interpose itself
       # in the ajax request and make the user login before resubmitting the
@@ -532,7 +534,9 @@ class SpnegoMiddleware(object):
   """
 
   def __init__(self):
-    if not 'desktop.auth.backend.SpnegoDjangoBackend' in desktop.conf.AUTH.BACKEND.get():
+    if not set(desktop.conf.AUTH.BACKEND.get()).intersection(
+            set(['desktop.auth.backend.SpnegoDjangoBackend', 'desktop.auth.backend.KnoxSpnegoDjangoBackend'])
+            ):
       LOG.info('Unloading SpnegoMiddleware')
       raise exceptions.MiddlewareNotUsed
 
@@ -600,11 +604,28 @@ class SpnegoMiddleware(object):
           username = kerberos.authGSSServerUserName(context)
           kerberos.authGSSServerClean(context)
 
+          # In Trusted knox proxy, Hue must expect following:
+          #   Trusted knox user: KNOX_PRINCIPAL
+          #   Trusted knox proxy host: KNOX_PROXYHOSTS
+          if 'desktop.auth.backend.KnoxSpnegoDjangoBackend' in \
+                desktop.conf.AUTH.BACKEND.get():
+            knox_verification = False
+            if desktop.conf.KNOX.KNOX_PRINCIPAL.get() in username:
+              # This may contain chain of reverse proxies, e.g. knox proxy, hue load balancer
+              req_hosts = self.clean_host(request.META['HTTP_X_FORWARDED_HOST'])
+              knox_proxy = self.clean_host(desktop.conf.KNOX.KNOX_PROXYHOSTS.get())
+              if req_hosts.intersection(knox_proxy):
+                knox_verification = True
+            # If knox authentication failed then generate 401 (Unauthorized error)
+            if not knox_verification:
+              request.META['Return-401'] = ''
+              return
+
           if request.user.is_authenticated():
             if request.user.username == self.clean_username(username, request):
               return
 
-          user = authenticate(username=username)
+          user = authenticate(username=username, request=request)
           if user:
             request.user = user
             login(request, user)
@@ -629,6 +650,11 @@ class SpnegoMiddleware(object):
         request.META['Return-401'] = ''
       return
 
+  def clean_host(self, pattern):
+    if pattern:
+      return set([hostport.split(':')[0] for hostport in pattern.split(',')])
+    return set([])
+
   def clean_username(self, username, request):
     """
     Allows the backend to clean the username, if the backend defines a
@@ -637,7 +663,7 @@ class SpnegoMiddleware(object):
     backend_str = request.session[BACKEND_SESSION_KEY]
     backend = load_backend(backend_str)
     try:
-      username = backend.clean_username(username)
+      username = backend.clean_username(username, request)
     except AttributeError:
       pass
     return username
