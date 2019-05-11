@@ -829,6 +829,24 @@ SESSION = ConfigSection(
   )
 )
 
+KNOX = ConfigSection(
+  key="knox",
+  help=_("""Configuration options for specifying Hue's KNOX integration for secured Hadoop clusters."""),
+  members=dict(
+    KNOX_PRINCIPAL=Config(
+      key='knox_principal',
+      help=_("Kerberos principal name for Hue. Typically 'knox/hostname.foo.com'."),
+      type=str,
+      default="knox/%s" % socket.getfqdn()),
+    KNOX_PROXYHOSTS = Config(
+      key='knox_proxyhosts',
+      default="%s" % socket.getfqdn(),
+      type=str,
+      help=_('Comma separated list of strings representing the host names that the Hue server can trust as knox hosts.')
+    ),
+  )
+)
+
 KERBEROS = ConfigSection(
   key="kerberos",
   help=_("""Configuration options for specifying Hue's Kerberos integration for
