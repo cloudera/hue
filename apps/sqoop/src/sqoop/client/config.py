@@ -66,11 +66,10 @@ class Input(object):
       'type': self.type,
       'name': self.name,
       'sensitive': self.sensitive,
+      'size': self.size,
     }
     if self.value:
       d['value'] = self.value
-    if self.size != -1:
-      d['size'] = self.size
     if self.values:
       d['values'] = ','.join(self.values)
     return d
