@@ -23,7 +23,7 @@ from django.utils.translation import ugettext_lazy as _t
 from desktop import appmanager
 from desktop.conf import is_oozie_enabled, CONNECTORS
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_json_dict, coerce_bool, coerce_csv
-
+from spark.conf import get_livy_default_queue, get_livy_driver_memory, get_livy_driver_cores, get_livy_executor_memory, get_livy_executor_cores
 
 SHOW_NOTEBOOKS = Config(
     key="show_notebooks",
@@ -207,6 +207,40 @@ ENABLE_QUERY_ANALYSIS = Config(
   default=False
 )
 
+NOTEBOOK_LIVY_DEFAULT_QUEUE = Config(
+  key="notebook_livy_default_queue",
+  help=_t("Default Queue for Spark Livy Sessions"),
+  type=str,
+  dynamic_default=get_livy_default_queue
+)
+
+NOTEBOOK_LIVY_DRIVER_MEMORY = Config(
+  key="notebook_livy_driver_memory",
+  help=_t("Default Driver Memory for Spark Livy Sessions"),
+  type=str,
+  dynamic_default=get_livy_driver_memory
+)
+
+NOTEBOOK_LIVY_DRIVER_CORES = Config(
+  key="notebook_livy_driver_cores",
+  help=_t("Default Driver Cores for Spark Livy Sessions"),
+  type=int,
+  dynamic_default=get_livy_driver_cores
+)
+
+NOTEBOOK_LIVY_EXECUTOR_MEMORY = Config(
+  key="notebook_livy_executor_memory",
+  help=_t("Default Executor Memory for Spark Livy Sessions"),
+  type=str,
+  dynamic_default=get_livy_executor_memory
+)
+
+NOTEBOOK_LIVY_EXECUTOR_CORES = Config(
+  key="notebook_livy_executor_cores",
+  help=_t("Default Executor Cores for Spark Livy Sessions"),
+  type=int,
+  dynamic_default=get_livy_executor_cores
+)
 
 def _default_interpreters(user):
   interpreters = []
