@@ -52,6 +52,59 @@ LIVY_SERVER_SESSION_KIND = Config( # Note: this one is ignored by Livy, this sho
    help=_t("Configure livy to start in local 'process' mode, or 'yarn' workers."),
    default="yarn")
 
+LIVY_DEFAULT_QUEUE = Config(
+  key="livy_default_queue",
+  help=_t("Default Queue for Spark Livy Sessions"),
+  type=str,
+  default="default"
+)
+def get_livy_default_queue():
+  """Get from top level default from desktop"""
+  return LIVY_DEFAULT_QUEUE.get()
+
+LIVY_DRIVER_MEMORY = Config(
+  key="livy_driver_memory",
+  help=_t("Default Driver Memory for Spark Livy Sessions"),
+  type=str,
+  default="2G"
+)
+def get_livy_driver_memory():
+  """Get from top level default from desktop"""
+  return LIVY_DRIVER_MEMORY.get()
+
+LIVY_DRIVER_CORES = Config(
+  key="livy_driver_cores",
+  help=_t("Default Driver Cores for Spark Livy Sessions"),
+  type=int,
+  default=1
+)
+
+def get_livy_driver_cores():
+  """Get from top level default from desktop"""
+  return LIVY_DRIVER_CORES.get()
+
+LIVY_EXECUTOR_MEMORY = Config(
+  key="livy_executor_memory",
+  help=_t("Default Executor Memory for Spark Livy Sessions"),
+  type=str,
+  default="1G"
+)
+
+def get_livy_executor_memory():
+  """Get from top level default from desktop"""
+  return LIVY_EXECUTOR_MEMORY.get()
+
+LIVY_EXECUTOR_CORES = Config(
+  key="livy_executor_cores",
+  help=_t("Default Executor Cores for Spark Livy Sessions"),
+  type=int,
+  default=1
+)
+
+def get_livy_executor_cores():
+  """Get from top level default from desktop"""
+  return LIVY_EXECUTOR_CORES.get()
+
 SECURITY_ENABLED = Config(
   key="security_enabled",
   help=_t("Whether Livy requires client to perform Kerberos authentication."),
