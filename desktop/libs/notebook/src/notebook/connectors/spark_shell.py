@@ -42,7 +42,8 @@ except ImportError, e:
 
 
 class SparkConfiguration(object):
-
+  from spark.conf import LIVY_DEFAULT_QUEUE, LIVY_DRIVER_MEMORY, LIVY_DRIVER_CORES, LIVY_EXECUTOR_MEMORY, LIVY_EXECUTOR_CORES
+  from notebook.conf import NOTEBOOK_LIVY_DEFAULT_QUEUE, NOTEBOOK_LIVY_DRIVER_MEMORY, NOTEBOOK_LIVY_DRIVER_CORES, NOTEBOOK_LIVY_EXECUTOR_MEMORY, NOTEBOOK_LIVY_EXECUTOR_CORES
   APP_NAME = 'spark'
 
   PROPERTIES = [
@@ -90,8 +91,8 @@ class SparkConfiguration(object):
       "type": "jvm",
       "is_yarn": False,
       "multiple": False,
-      "defaultValue": '1G',
-      "value": '1G',
+      "defaultValue": LIVY_DRIVER_MEMORY.get(),
+      "value": NOTEBOOK_LIVY_DRIVER_MEMORY.get(),
     },
     # YARN-only properties
     {
@@ -101,8 +102,8 @@ class SparkConfiguration(object):
       "type": "number",
       "is_yarn": True,
       "multiple": False,
-      "defaultValue": 1,
-      "value": 1,
+      "defaultValue": LIVY_DRIVER_CORES.get(),
+      "value": NOTEBOOK_LIVY_DRIVER_CORES.get(),
     }, {
       "name": "executorMemory",
       "nice_name": _("Executor Memory"),
@@ -110,8 +111,8 @@ class SparkConfiguration(object):
       "type": "jvm",
       "is_yarn": True,
       "multiple": False,
-      "defaultValue": '1G',
-      "value": '1G',
+      "defaultValue": LIVY_EXECUTOR_MEMORY.get(),
+      "value": NOTEBOOK_LIVY_EXECUTOR_MEMORY.get(),
     }, {
       "name": "executorCores",
       "nice_name": _("Executor Cores"),
@@ -119,8 +120,8 @@ class SparkConfiguration(object):
       "type": "number",
       "is_yarn": True,
       "multiple": False,
-      "defaultValue": 1,
-      "value": 1,
+      "defaultValue": LIVY_EXECUTOR_CORES.get(),
+      "value": NOTEBOOK_LIVY_EXECUTOR_CORES.get(),
     }, {
       "name": "queue",
       "nice_name": _("Queue"),
@@ -128,8 +129,8 @@ class SparkConfiguration(object):
       "type": "string",
       "is_yarn": True,
       "multiple": False,
-      "defaultValue": 'default',
-      "value": 'default',
+      "defaultValue": LIVY_DEFAULT_QUEUE.get(),
+      "value": NOTEBOOK_LIVY_DEFAULT_QUEUE.get(),
     }, {
       "name": "archives",
       "nice_name": _("Archives"),
