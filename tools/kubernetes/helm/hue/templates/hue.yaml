@@ -4,6 +4,15 @@ metadata:
   name: hue-config
 data:
   hue-ini: |
+    [desktop]
+    [[database]]
+    engine=postgresql_psycopg2
+    host=hue-postgres
+    port=5432
+    user=hue
+    password=hue
+    name=hue
+
     [impala]
     server_host={{ .Values.impala.server_host }}
 
