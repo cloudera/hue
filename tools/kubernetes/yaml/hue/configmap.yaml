@@ -6,7 +6,7 @@ data:
   hue-ini: |
     [desktop]
       [[task_server]]
-        enabled=true
+        enabled=false
 
     [impala]
       server_host=hostname.com
