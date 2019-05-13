@@ -10,9 +10,9 @@ data:
     [aws]
     [[aws_accounts]]
     [[[default]]]
-    access_key_id={{ .Values.hue.awsAccessKeyId }}
-    secret_access_key={{ .Values.hue.awsSecretAccessKey }}
-    region={{ .Values.hue.awsRegion }}
+    access_key_id={{ .Values.aws.awsAccessKeyId }}
+    secret_access_key={{ .Values.aws.awsSecretAccessKey }}
+    region={{ .Values.aws.awsRegion }}
 ---
 apiVersion: v1
 kind: ReplicationController
@@ -27,7 +27,7 @@ spec:
     spec:
       containers:
         - name: hue
-          image: {{ .Values.registry }}/hue:{{ .Values.tag }}
+          image: {{ .Values.registry }}:{{ .Values.tag }}
           imagePullPolicy: Always
           ports:
             - containerPort: 8888

@@ -1,5 +1,7 @@
-registry: "docker.io/gethue/hue"
+registry: "gethue/hue"
 tag: "latest"
+impala:
+  server_host: "localhost"
 aws:
   accessKeyId: ""
   secretAccessKey: ""
