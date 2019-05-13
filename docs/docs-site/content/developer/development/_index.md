@@ -101,9 +101,8 @@ Build the doc website:
 Add it to the github page and push:
 
     git checkout gh-pages
-    cp ~/docs/docs-site/public docs-4.4.0 -r
-    rm latest
-    ln -s docs-4.4.0 latest
+    rm -r latest
+    cp ~/docs/docs-site/public latest -r
 
     git push origin HEAD:gh-pages
 
@@ -750,5 +749,13 @@ Instructions:
     docker login
     docker push gethue/hue
     docker push gethue/hue:4.4.0
+
+Documentation
+
+Refresh the latest and then fork it:
+
+    cp -r latest docs-4.4.0
+    git add docs-4.4.0
+
 
 Then send release notes to hue-user, https://twitter.com/gethue!
