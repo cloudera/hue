@@ -208,12 +208,12 @@
   </url>
   
   <url>
-    <loc>http://cloudera.github.io/hue/latest/administrator/administration/operations/</loc>
+    <loc>http://cloudera.github.io/hue/latest/user/editor/</loc>
     <lastmod>2019-03-13T18:28:09-07:00</lastmod>
   </url>
   
   <url>
-    <loc>http://cloudera.github.io/hue/latest/user/editor/</loc>
+    <loc>http://cloudera.github.io/hue/latest/administrator/administration/operations/</loc>
     <lastmod>2019-03-13T18:28:09-07:00</lastmod>
   </url>
   
@@ -223,13 +223,13 @@
   </url>
   
   <url>
-    <loc>http://cloudera.github.io/hue/latest/user/</loc>
-    <lastmod>2019-03-13T18:27:26-07:00</lastmod>
+    <loc>http://cloudera.github.io/hue/latest/administrator/installation/quickstart/</loc>
+    <lastmod>2019-03-13T18:28:08-07:00</lastmod>
   </url>
   
   <url>
-    <loc>http://cloudera.github.io/hue/latest/developer/api/</loc>
-    <lastmod>2019-03-13T18:28:09-07:00</lastmod>
+    <loc>http://cloudera.github.io/hue/latest/user/</loc>
+    <lastmod>2019-03-13T18:27:26-07:00</lastmod>
   </url>
   
   <url>
@@ -273,6 +273,11 @@
   </url>
   
   <url>
+    <loc>http://cloudera.github.io/hue/latest/developer/application/</loc>
+    <lastmod>2019-03-13T18:28:09-07:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://cloudera.github.io/hue/latest/user/browsers/</loc>
     <lastmod>2019-03-13T18:28:09-07:00</lastmod>
   </url>
@@ -298,7 +303,7 @@
   </url>
   
   <url>
-    <loc>http://cloudera.github.io/hue/latest/developer/application/</loc>
+    <loc>http://cloudera.github.io/hue/latest/developer/api/</loc>
     <lastmod>2019-03-13T18:28:09-07:00</lastmod>
   </url>
   
@@ -309,11 +314,6 @@
   
   <url>
     <loc>http://cloudera.github.io/hue/latest/user/scheduler/</loc>
-    <lastmod>2019-03-13T18:28:09-07:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://cloudera.github.io/hue/latest/user/contrib/</loc>
     <lastmod>2019-03-13T18:28:09-07:00</lastmod>
   </url>
   

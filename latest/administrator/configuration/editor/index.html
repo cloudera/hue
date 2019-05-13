@@ -174,6 +174,25 @@
  
   
     
+      <li data-nav-id="/hue/latest/administrator/installation/quickstart/" title="Quick Start" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/quickstart/">
+        Quick Start
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
       <li data-nav-id="/hue/latest/administrator/installation/containers/" title="Containers" class="dd-item ">
         <a href="/hue/latest/administrator/installation/containers/">
         Containers
@@ -545,13 +564,13 @@
  
   
     
-    <li data-nav-id="/hue/latest/user/editor/" title="SQL Editor / Notebook" class="dd-item 
+    <li data-nav-id="/hue/latest/user/editor/" title="Editor" class="dd-item 
         
         
         
         ">
       <a href="/hue/latest/user/editor/">
-          SQL Editor / Notebook
+          Editor
           
       </a>
       
@@ -634,30 +653,6 @@
 
             
           
-            
-            
-
-
- 
-  
-    
-    <li data-nav-id="/hue/latest/user/contrib/" title="Contrib" class="dd-item 
-        
-        
-        
-        ">
-      <a href="/hue/latest/user/contrib/">
-          Contrib
-          
-      </a>
-      
-              
-    </li>
-  
- 
-
-            
-          
         
         </ul>
               
@@ -723,37 +718,13 @@
  
   
     
-    <li data-nav-id="/hue/latest/developer/editor/" title="Editor / Notebook" class="dd-item 
+    <li data-nav-id="/hue/latest/developer/editor/" title="Editor" class="dd-item 
         
         
         
         ">
       <a href="/hue/latest/developer/editor/">
-          Editor / Notebook
-          
-      </a>
-      
-              
-    </li>
-  
- 
-
-            
-          
-            
-            
-
-
- 
-  
-    
-    <li data-nav-id="/hue/latest/developer/api/" title="APIs" class="dd-item 
-        
-        
-        
-        ">
-      <a href="/hue/latest/developer/api/">
-          APIs
+          Editor
           
       </a>
       
@@ -802,6 +773,30 @@
         ">
       <a href="/hue/latest/developer/application/">
           Applications
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/api/" title="APIs" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/api/">
+          APIs
           
       </a>
       
@@ -2252,7 +2247,7 @@ options='{&quot;url&quot;: &quot;jdbc:phoenix:localhost:2181/hbase&quot;, &quot;
         name=PySpark
         interface=livy
 
-  [[[sparksql]]]
+  [[[sql]]]
         name=SparkSql
         interface=livy
 
@@ -2270,6 +2265,15 @@ options='{&quot;url&quot;: &quot;jdbc:phoenix:localhost:2181/hbase&quot;, &quot;
 <pre><code>[spark]
   # The Livy Server URL.
   livy_server_url=http://localhost:8998
+</code></pre>
+
+<p>And if using Cloudera distribution, make sure you have notebooks enabled:</p>
+
+<pre><code>[desktop]
+  app_blacklist=
+
+[notebook]
+  show_notebooks=true
 </code></pre>
 
 <p><strong>CSRF</strong></p>
@@ -2607,6 +2611,22 @@ You can leave out the username and password in the JDBC options, and Hue will in
             
         
                     
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
             
         
                     
@@ -2625,42 +2645,6 @@ You can leave out the username and password in the JDBC options, and Hue will in
                     
                     
 
-                    
-                        
-            
-            
-                
-                    
-                        
-                        
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
-                    
-                        
-            
-            
-                
-                    
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
                     
                         
             
@@ -2686,53 +2670,6 @@ You can leave out the username and password in the JDBC options, and Hue will in
             
                 
                     
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
-                    
-                        
-            
-            
-                
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
-                    
-            
-        
-                    
-                        
-            
-            
-                
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-                        
-            
-            
-                
                     
                 
                 
@@ -2749,6 +2686,9 @@ You can leave out the username and password in the JDBC options, and Hue will in
             
             
                 
+                    
+                        
+                        
                     
                 
                 
@@ -2796,6 +2736,86 @@ You can leave out the username and password in the JDBC options, and Hue will in
             
         
                     
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
             
         
                     
@@ -2813,22 +2833,6 @@ You can leave out the username and password in the JDBC options, and Hue will in
                     
                     
 
-                    
-                        
-            
-            
-                
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
                     
                         
             

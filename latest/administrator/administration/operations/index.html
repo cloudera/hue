@@ -174,6 +174,25 @@
  
   
     
+      <li data-nav-id="/hue/latest/administrator/installation/quickstart/" title="Quick Start" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/quickstart/">
+        Quick Start
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
       <li data-nav-id="/hue/latest/administrator/installation/containers/" title="Containers" class="dd-item ">
         <a href="/hue/latest/administrator/installation/containers/">
         Containers
@@ -545,13 +564,13 @@
  
   
     
-    <li data-nav-id="/hue/latest/user/editor/" title="SQL Editor / Notebook" class="dd-item 
+    <li data-nav-id="/hue/latest/user/editor/" title="Editor" class="dd-item 
         
         
         
         ">
       <a href="/hue/latest/user/editor/">
-          SQL Editor / Notebook
+          Editor
           
       </a>
       
@@ -634,30 +653,6 @@
 
             
           
-            
-            
-
-
- 
-  
-    
-    <li data-nav-id="/hue/latest/user/contrib/" title="Contrib" class="dd-item 
-        
-        
-        
-        ">
-      <a href="/hue/latest/user/contrib/">
-          Contrib
-          
-      </a>
-      
-              
-    </li>
-  
- 
-
-            
-          
         
         </ul>
               
@@ -723,37 +718,13 @@
  
   
     
-    <li data-nav-id="/hue/latest/developer/editor/" title="Editor / Notebook" class="dd-item 
+    <li data-nav-id="/hue/latest/developer/editor/" title="Editor" class="dd-item 
         
         
         
         ">
       <a href="/hue/latest/developer/editor/">
-          Editor / Notebook
-          
-      </a>
-      
-              
-    </li>
-  
- 
-
-            
-          
-            
-            
-
-
- 
-  
-    
-    <li data-nav-id="/hue/latest/developer/api/" title="APIs" class="dd-item 
-        
-        
-        
-        ">
-      <a href="/hue/latest/developer/api/">
-          APIs
+          Editor
           
       </a>
       
@@ -802,6 +773,30 @@
         ">
       <a href="/hue/latest/developer/application/">
           Applications
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/api/" title="APIs" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/api/">
+          APIs
           
       </a>
       
@@ -1549,19 +1544,16 @@
 <ul>
 <li>
 <ul>
-<li><a href="#quick-start-wizard">Quick Start Wizard</a></li>
-<li><a href="#configuration">Configuration</a></li>
-</ul></li>
-<li><a href="#administration">Administration</a>
+<li><a href="#admin-wizard">Admin Wizard</a>
 <ul>
+<li><a href="#configuration">Configuration</a></li>
 <li><a href="#configuration-validation">Configuration Validation</a></li>
 <li><a href="#server-logs">Server Logs</a></li>
 <li><a href="#threads">Threads</a></li>
 <li><a href="#metrics">Metrics</a></li>
-<li><a href="#logging">Logging</a>
-<ul>
-<li><a href="#viewing-recent-log-messages">Viewing Recent Log Messages</a></li>
+<li><a href="#logging">Logging</a></li>
 </ul></li>
+<li><a href="#commands">Commands</a></li>
 <li><a href="#troubleshooting">Troubleshooting</a>
 <ul>
 <li><a href="#instrumentation-enabled">Instrumentation enabled</a></li>
@@ -1585,7 +1577,7 @@
 
 
 
-<h2 id="quick-start-wizard">Quick Start Wizard</h2>
+<h2 id="admin-wizard">Admin Wizard</h2>
 
 <p>The Quick Start wizard allows you to perform the following Hue setup
 operations by clicking the tab of each step or sequentially by clicking
@@ -1604,7 +1596,7 @@ import users and a checkbox to enable and disable collection of
 usage information.</li>
 </ol>
 
-<h2 id="configuration">Configuration</h2>
+<h3 id="configuration">Configuration</h3>
 
 <p>Displays a list of the installed Hue applications and their
 configuration. The location of the folder containing the Hue
@@ -1642,13 +1634,7 @@ located in the `/etc/hue` directory.  Files that are alphabetically later
 take precedence.
 </div>
 
-<h1 id="administration">Administration</h1>
-
-<p>Now that you&rsquo;ve installed and started Hue, you can feel free to skip ahead
-to the &lt;<usage,Using Hue>&gt; section. Administrators may want to refer to this
-section for more details about managing and operating a Hue installation.</p>
-
-<h2 id="configuration-validation">Configuration Validation</h2>
+<h3 id="configuration-validation">Configuration Validation</h3>
 
 <p>Hue can detect certain invalid configuration.</p>
 
@@ -1656,19 +1642,19 @@ section for more details about managing and operating a Hue installation.</p>
 <code>http://myserver:8888/hue/dump_config</code>, also accessible through the About
 application.</p>
 
-<h2 id="server-logs">Server Logs</h2>
+<h3 id="server-logs">Server Logs</h3>
 
 <p>Displays the Hue Server log and allows you to download the log to your
 local system in a zip file.</p>
 
-<h2 id="threads">Threads</h2>
+<h3 id="threads">Threads</h3>
 
 <p>Read more on the <a href="http://gethue.com/easier-administration-of-hue-with-the-new-threads-and-metrics-pages/">Threads and Metrics pages
  blog post</a></p>
 
 <p>Threads page can be very helpful in debugging purposes. It includes a daemonic thread and the thread objects serving concurrent requests. The host name, thread name identifier and current stack frame of each are displayed. Those are useful when Hue “hangs”, sometimes in case of a request too CPU intensive. There is also a REST API to get the dump of Threads using &lsquo;desktop/debug/threads&rsquo;</p>
 
-<h2 id="metrics">Metrics</h2>
+<h3 id="metrics">Metrics</h3>
 
 <p>Read more on the <a href="http://gethue.com/easier-administration-of-hue-with-the-new-threads-and-metrics-pages/">Threads and Metrics pages
  blog post</a></p>
@@ -1690,7 +1676,7 @@ local system in a zip file.</p>
 <p>One of the most useful ones are the percentiles of response time of requests and the count of active users.
 Admins can either filter a particular property in all the metrics or select a particular metric for all properties</p>
 
-<h2 id="logging">Logging</h2>
+<h3 id="logging">Logging</h3>
 
 <p>The Hue logs are found in <code>/var/log/hue</code>, or in a <code>logs</code> directory under your
 Hue installation root. Inside the log directory you can find:</p>
@@ -1712,12 +1698,23 @@ the stdout and stderr for that process.</li>
 messages in these log files. If you are unable to start Hue from the init
 script, the <code>supervisor.log</code> log file can often contain clues.</p>
 
-<h3 id="viewing-recent-log-messages">Viewing Recent Log Messages</h3>
-
 <p>In addition to logging <code>INFO</code> level messages to the <code>logs</code> directory, the Hue
 web server keeps a small buffer of log messages at all levels in memory. You can
 view these logs by visiting <code>http://myserver:8888/hue/logs</code>. The <code>DEBUG</code> level
 messages shown can sometimes be helpful in troubleshooting issues.</p>
+
+<h2 id="commands">Commands</h2>
+
+<p>Type the following command from the Hue installation root.</p>
+
+<pre><code>cd /usr/lib/hue (or /opt/cloudera/parcels/CDH-XXXXX/share/hue if using parcels and CM)
+build/env/bin/hue shell
+</code></pre>
+
+<p>To list all the available commands:</p>
+
+<pre><code>build/env/bin/hue
+</code></pre>
 
 <h2 id="troubleshooting">Troubleshooting</h2>
 
@@ -1875,6 +1872,22 @@ instrumentation=true
             
         
                     
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
             
         
                     
@@ -1892,38 +1905,6 @@ instrumentation=true
                     
                     
 
-                    
-                        
-            
-            
-                
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
-                    
-                        
-            
-            
-                
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
                     
                         
             
@@ -1973,66 +1954,10 @@ instrumentation=true
             
         
                     
-            
-        
-                    
                         
             
             
                 
-                    
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-                        
-            
-            
-                
-                    
-                        
-                        
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
-                    
-                        
-            
-            
-                
-                    
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
-                    
-                        
-            
-            
-                
-                    
-                        
-                        
                     
                 
                 
@@ -2064,6 +1989,94 @@ instrumentation=true
             
         
                     
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
             
         
                     
@@ -2081,22 +2094,6 @@ instrumentation=true
                     
                     
 
-                    
-                        
-            
-            
-                
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
                     
                         
             

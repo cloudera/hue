@@ -24,6 +24,19 @@ It is a good practice to create a new user for Hue and either install Hue in tha
     </item>
     
     <item>
+      <title>Quick Start</title>
+      <link>http://cloudera.github.io/hue/latest/administrator/installation/quickstart/</link>
+      <pubDate>Wed, 13 Mar 2019 18:28:08 -0700</pubDate>
+      
+      <guid>http://cloudera.github.io/hue/latest/administrator/installation/quickstart/</guid>
+      <description>MySQL docker Configure DB Configure SQL engine Query and Dash
+Start from a release tarball or building the project yourself.
+Then configure $PREFIX with the path where you want to install Hue by running:
+PREFIX=/usr/share make install cd /usr/share/hue  You can install Hue anywhere on your system, and run Hue as a non-root user.
+It is a good practice to create a new user for Hue and either install Hue in that user&amp;rsquo;s home directory, or in a directory within /usr/share.</description>
+    </item>
+    
+    <item>
       <title>Containers</title>
       <link>http://cloudera.github.io/hue/latest/administrator/installation/containers/</link>
       <pubDate>Wed, 13 Mar 2019 18:28:08 -0700</pubDate>

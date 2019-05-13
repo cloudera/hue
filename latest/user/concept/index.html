@@ -174,6 +174,25 @@
  
   
     
+      <li data-nav-id="/hue/latest/administrator/installation/quickstart/" title="Quick Start" class="dd-item ">
+        <a href="/hue/latest/administrator/installation/quickstart/">
+        Quick Start
+        
+        </a>
+    </li>
+     
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
       <li data-nav-id="/hue/latest/administrator/installation/containers/" title="Containers" class="dd-item ">
         <a href="/hue/latest/administrator/installation/containers/">
         Containers
@@ -545,13 +564,13 @@
  
   
     
-    <li data-nav-id="/hue/latest/user/editor/" title="SQL Editor / Notebook" class="dd-item 
+    <li data-nav-id="/hue/latest/user/editor/" title="Editor" class="dd-item 
         
         
         
         ">
       <a href="/hue/latest/user/editor/">
-          SQL Editor / Notebook
+          Editor
           
       </a>
       
@@ -634,30 +653,6 @@
 
             
           
-            
-            
-
-
- 
-  
-    
-    <li data-nav-id="/hue/latest/user/contrib/" title="Contrib" class="dd-item 
-        
-        
-        
-        ">
-      <a href="/hue/latest/user/contrib/">
-          Contrib
-          
-      </a>
-      
-              
-    </li>
-  
- 
-
-            
-          
         
         </ul>
               
@@ -723,37 +718,13 @@
  
   
     
-    <li data-nav-id="/hue/latest/developer/editor/" title="Editor / Notebook" class="dd-item 
+    <li data-nav-id="/hue/latest/developer/editor/" title="Editor" class="dd-item 
         
         
         
         ">
       <a href="/hue/latest/developer/editor/">
-          Editor / Notebook
-          
-      </a>
-      
-              
-    </li>
-  
- 
-
-            
-          
-            
-            
-
-
- 
-  
-    
-    <li data-nav-id="/hue/latest/developer/api/" title="APIs" class="dd-item 
-        
-        
-        
-        ">
-      <a href="/hue/latest/developer/api/">
-          APIs
+          Editor
           
       </a>
       
@@ -802,6 +773,30 @@
         ">
       <a href="/hue/latest/developer/application/">
           Applications
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+            
+          
+            
+            
+
+
+ 
+  
+    
+    <li data-nav-id="/hue/latest/developer/api/" title="APIs" class="dd-item 
+        
+        
+        
+        ">
+      <a href="/hue/latest/developer/api/">
+          APIs
           
       </a>
       
@@ -1543,18 +1538,23 @@
 <ul>
 <li>
 <ul>
-<li><a href="#interface">Interface</a></li>
+<li><a href="#interface">Interface</a>
+<ul>
 <li><a href="#top-search">Top search</a></li>
 <li><a href="#tagging">Tagging</a></li>
 <li><a href="#left-assist">Left assist</a></li>
 <li><a href="#right-assist">Right assist</a></li>
 <li><a href="#sample-popup">Sample popup</a></li>
+</ul></li>
 <li><a href="#documents">Documents</a>
 <ul>
 <li><a href="#sharing">Sharing</a></li>
 <li><a href="#import-export">Import / Export</a></li>
 </ul></li>
+<li><a href="#settings">Settings</a>
+<ul>
 <li><a href="#changing-the-language">Changing the language</a></li>
+</ul></li>
 </ul></li>
 </ul>
 </nav>
@@ -1613,7 +1613,7 @@ so that 80% of the user can find, explore and query data and become more data dr
 
 <p>Learn more on the <a href="http://gethue.com/the-hue-4-user-interface-in-detail/">The Hue 4 user interface in detail</a>.</p>
 
-<h2 id="top-search">Top search</h2>
+<h3 id="top-search">Top search</h3>
 
 <p>Have you ever struggled to remember table names related to your project? Does it take much too long to find those columns or views? Hue now lets you easily search for any table, view, or column across all databases in the cluster. With the ability to search across tens of thousands of tables, you&rsquo;re able to quickly find the tables that are relevant for your needs for faster data discovery.</p>
 
@@ -1634,21 +1634,21 @@ so that 80% of the user can find, explore and query data and become more data dr
 
 <p>Learn more on the <a href="https://blog.cloudera.com/blog/2017/05/new-in-cloudera-enterprise-5-11-hue-data-search-and-tagging/">Tagging</a>.</p>
 
-<h2 id="tagging">Tagging</h2>
+<h3 id="tagging">Tagging</h3>
 
 <p>In addition, you can also now tag objects with names to better categorize them and group them to different projects. These tags are searchable, expediting the exploration process through easier, more intuitive discovery.</p>
 
-<h2 id="left-assist">Left assist</h2>
+<h3 id="left-assist">Left assist</h3>
 
 <p>Data where you need it when you need it.</p>
 
 <p>Find your documents, HDFS and S3 files and more in the left assist panel, right-clicking items will show a list of actions, you can also drag-and-drop a file to get the path in your editor and more.</p>
 
-<h2 id="right-assist">Right assist</h2>
+<h3 id="right-assist">Right assist</h3>
 
 <p>This assistant content depends on the context of the application selected and will display the current tables or available UDFs.</p>
 
-<h2 id="sample-popup">Sample popup</h2>
+<h3 id="sample-popup">Sample popup</h3>
 
 <p>This popup offers a quick way to see sample of the data and other statistics on databases, tables, and columns. You can open the popup from the SQL Assist or with a right-click on any SQL object (table, column, function…). In this release, it also opens faster and caches the data.</p>
 
@@ -1673,7 +1673,9 @@ so that 80% of the user can find, explore and query data and become more data dr
 
 <p>Via the Home page, saved documents can be exported for backups or transferring to another Hue.</p>
 
-<h2 id="changing-the-language">Changing the language</h2>
+<h2 id="settings">Settings</h2>
+
+<h3 id="changing-the-language">Changing the language</h3>
 
 <p>The language is automatically detected from the Browser or OS. English, Spanish, French, German, Korean, Japanese and Chinese are supported.</p>
 
@@ -1807,88 +1809,6 @@ so that 80% of the user can find, explore and query data and become more data dr
             
         
                     
-            
-        
-                    
-                        
-            
-            
-                
-                    
-                
-                
-
-                    
-                    
-                        
-                    
-                    
-
-                    
-                        
-            
-            
-                
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
-                    
-                        
-            
-            
-                
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
-                    
-                        
-            
-            
-                
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
-                    
-                        
-            
-            
-                
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
-                    
                         
             
             
@@ -1917,6 +1837,8 @@ so that 80% of the user can find, explore and query data and become more data dr
                 
 
                     
+                    
+                        
                     
                     
 
@@ -1985,33 +1907,10 @@ so that 80% of the user can find, explore and query data and become more data dr
             
         
                     
-            
-        
-                    
-            
-        
-                    
                         
             
             
                 
-                    
-                    
-                
-                
-
-                    
-                    
-                        
-                    
-                    
-
-                    
-                        
-            
-            
-                
-                    
                     
                 
                 
@@ -2024,13 +1923,26 @@ so that 80% of the user can find, explore and query data and become more data dr
             
         
                     
+            
+        
+                    
                         
             
             
                 
                     
+                
+                
+
+                    
+                    
+                    
+
+                    
                         
-                        
+            
+            
+                
                     
                 
                 
@@ -2047,6 +1959,96 @@ so that 80% of the user can find, explore and query data and become more data dr
             
             
                 
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
                     
                 
                 
