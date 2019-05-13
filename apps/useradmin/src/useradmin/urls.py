@@ -31,7 +31,7 @@ urlpatterns = [
   url(r'^users/?$', useradmin_views.list_users, name="useradmin.views.list_users"),
   url(r'^groups/?$', useradmin_views.list_groups, name="useradmin.views.list_groups"),
   url(r'^permissions/?$', useradmin_views.list_permissions, name="useradmin.views.list_permissions"),
-  url(r'^configurations/?$', useradmin_views.list_configurations),
+  url(r'^configurations/?$', useradmin_views.list_configurations, name="useradmin.views.list_configurations"),
   url(r'^users/edit/(?P<username>%s)$' % (username_re,), useradmin_views.edit_user, name="useradmin.views.edit_user"),
   url(r'^users/add_ldap_users$', useradmin_views.add_ldap_users, name="useradmin.views.add_ldap_users"),
   url(r'^users/add_ldap_groups$', useradmin_views.add_ldap_groups, name="useradmin.views.add_ldap_groups"),
