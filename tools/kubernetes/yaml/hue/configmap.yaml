@@ -4,9 +4,9 @@ metadata:
   name: hue-config
 data:
   hue-ini: |
-  [desktop]
-    [[task_server]]
-      enabled=true
+    [desktop]
+      [[task_server]]
+        enabled=true
 
-  [impala]
-    server_host=hostname.com
+    [impala]
+      server_host=hostname.com
