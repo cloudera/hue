@@ -16,6 +16,16 @@ data:
     [impala]
     server_host={{ .Values.impala.server_host }}
 
+    [notebook]
+    [[interpreters]]
+    [[[impala]]]
+      name=Impala
+      interface=hiveserver2
+    [[[postgresql]]]
+      name = postgresql
+      interface=sqlalchemy
+      options='{"url": "postgresql://hue:hue@hue-database:5432/hue"}'
+
     [aws]
     [[aws_accounts]]
     [[[default]]]
