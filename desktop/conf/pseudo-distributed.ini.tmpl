@@ -851,117 +851,111 @@
   ## order in which the interpreter entries appear. Only the first 5 interpreters will appear on the wheel.
   # interpreters_shown_on_wheel=
 
+[notebook]
+
   # One entry for each type of snippet.
   [[interpreters]]
     # Define the name and how to connect and execute the language.
-
-    [[[hive]]]
-      # The name of the snippet.
-      name=Hive
-      # The backend connection to use to communicate with the server.
-      interface=hiveserver2
-
-    [[[impala]]]
-      name=Impala
-      interface=hiveserver2
+    # http://cloudera.github.io/hue/latest/administrator/configuration/editor/
 
     [[[mysql]]]
       name = MySQL
       interface=sqlalchemy
       ## https://docs.sqlalchemy.org/en/latest/dialects/mysql.html
-      ## options='{"url": "mysql://root:root@localhost:3306/hue"}'
+      options='{"url": "mysql://root:secret@database:3306/hue"}'
       ## options='{"url": "mysql://${USER}:${PASSWORD}@localhost:3306/hue"}'
 
-    # [[[sparksql]]]
-    #   name=SparkSql
+    # [[[hive]]]
+    #   name=Hive
     #   interface=hiveserver2
 
-    [[[sql]]]
-      name=SparkSql
-      interface=livy
+    # [[[impala]]]
+    #   name=Impala
+    #   interface=hiveserver2
 
-    [[[spark]]]
-      name=Scala
-      interface=livy
+    # [[[postgresql]]]
+    #   name = postgresql
+    #   interface=sqlalchemy
+    #   options='{"url": "postgresql://hue:hue@host:5432/hue"}'
 
-    [[[pyspark]]]
-      name=PySpark
-      interface=livy
+    # [[[druid]]]
+    #   name = Druid
+    #   interface=sqlalchemy
+    #   options='{"url": "druid://host:8082/druid/v2/sql/"}'
 
-    [[[r]]]
-      name=R
-      interface=livy
+    # [[[sql]]]
+    #   name=SparkSql
+    #   interface=livy
 
-    [[[jar]]]
-      name=Spark Submit Jar
-      interface=livy-batch
+    # [[[spark]]]
+    #   name=Scala
+    #   interface=livy
 
-    [[[py]]]
-      name=Spark Submit Python
-      interface=livy-batch
+    # [[[pyspark]]]
+    #   name=PySpark
+    #   interface=livy
 
-    [[[text]]]
-      name=Text
-      interface=text
+    # [[[r]]]
+    #   name=R
+    #   interface=livy
 
-    [[[markdown]]]
-      name=Markdown
-      interface=text
+    # [[jar]]]
+    #   name=Spark Submit Jar
+    #   interface=livy-batch
 
-    [[[sqlite]]]
-      name = SQLite
-      interface=rdbms
+    # [[[py]]]
+    #   name=Spark Submit Python
+    #   interface=livy-batch
 
-    [[[postgresql]]]
-      name = PostgreSQL
-      interface=rdbms
+    # [[[text]]]
+    #   name=Text
+    #   interface=text
 
-    [[[oracle]]]
-      name = Oracle
-      interface=rdbms
+    # [[[markdown]]]
+    #   name=Markdown
+    #   interface=text
 
-    [[[solr]]]
-      name = Solr SQL
-      interface=solr
-      ## Name of the collection handler
-      # options='{"collection": "default"}'
+    # [[[sqlite]]]
+    #   name = SQLite
+    #   interface=rdbms
 
-    [[[pig]]]
-      name=Pig
-      interface=oozie
+    # [[[oracle]]]
+    #   name = Oracle
+    #   interface=rdbms
 
-    [[[java]]]
-      name=Java
-      interface=oozie
+    # [[[solr]]]
+    #   name = Solr SQL
+    #   interface=solr
+    #   ## Name of the collection handler
+    #   options='{"collection": "default"}'
 
-    [[[spark2]]]
-      name=Spark
-      interface=oozie
+    # [[[pig]]]
+    #   name=Pig
+    #   interface=oozie
 
-    [[[mapreduce]]]
-      name=MapReduce
-      interface=oozie
+    # [[[java]]]
+    #   name=Java
+    #   interface=oozie
 
-    [[[sqoop1]]]
-      name=Sqoop1
-      interface=oozie
+    # [[[spark2]]]
+    #   name=Spark
+    #   interface=oozie
 
-    [[[distcp]]]
-      name=Distcp
-      interface=oozie
+    # [[[mapreduce]]]
+    #   name=MapReduce
+    #   interface=oozie
 
-    [[[shell]]]
-      name=Shell
-      interface=oozie
+    # [[[sqoop1]]]
+    #   name=Sqoop1
+    #   interface=oozie
 
-    # [[[mysql]]]
-    #   name=MySql JDBC
-    #   interface=jdbc
-    #   ## Specific options for connecting to the server.
-    #   ## The JDBC connectors, e.g. mysql.jar, need to be in the CLASSPATH environment variable.
-    #   ## If 'user' and 'password' are omitted, they will be prompted in the UI.
-    #   ## Option 'impersonation_property' used to configure outbound impersonation, e.g. "impersonation_property": "hive.server2.proxy.user".
-    #   options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver", "user": "root", "password": "root", "impersonation_property": ""}'
+    # [[[distcp]]]
+    #   name=Distcp
+    #   interface=oozie
+
+    # [[[shell]]]
+    #   name=Shell
+    #   interface=oozie
 
     # [[[presto]]]
     #   name=Presto SQL
