@@ -6,6 +6,7 @@ spec:
   ports:
   - name: pgql
     port: 5432
+  type: NodePort
   selector:
     app: hue-postgres
 ---

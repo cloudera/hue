@@ -237,6 +237,8 @@ Then give Hue the information about the database source:
 The dialect should be added to the Python system or Hue Python virtual environment:
 
       ./build/env/bin/pip install psycopg2
+      or
+      ./build/env/bin/pip install psycopg2-binary
 
 Then give Hue the information about the database source:
 
