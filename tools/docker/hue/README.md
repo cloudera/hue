@@ -93,7 +93,7 @@ MySql
     name=hue
 ```
 
-If you want to be able to query a database out of the box, update the connector accordingly or remove it all:
+If you want to be able to query a database out of the box, update the connector interpreters accordingly, e.g.:
 
 ```
 [notebook]
