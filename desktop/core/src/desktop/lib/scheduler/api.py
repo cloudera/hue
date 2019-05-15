@@ -17,17 +17,19 @@
 
 import logging
 
-from oozie.decorators import check_document_access_permission
-from oozie.forms import ParameterForm
-from oozie.views.editor2 import edit_coordinator, new_coordinator
-
 from desktop.auth.backend import is_admin
 from desktop.conf import TASK_SERVER
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.scheduler.lib.api import get_api
 
-
 LOG = logging.getLogger(__name__)
+
+try:
+  from oozie.decorators import check_document_access_permission
+  from oozie.forms import ParameterForm
+  from oozie.views.editor2 import edit_coordinator, new_coordinator
+except Exception as e:
+  LOG.exception('Oozie application is not enabled: %s' % e)
 
 
 def new_schedule(request):
@@ -37,8 +39,8 @@ def new_schedule(request):
 def get_schedule(request):
   return edit_coordinator(request)
 
-
-@check_document_access_permission()
+# To move to lib in case oozie is blacklisted
+#@check_document_access_permission()
 def submit_schedule(request, doc_id):
   interface = request.GET.get('interface', request.POST.get('interface'), 'oozie')
   if doc_id.isdigit():
