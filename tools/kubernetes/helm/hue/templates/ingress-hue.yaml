@@ -2,16 +2,16 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: traefik-admin-ui
+  name: hue
   annotations:
     kubernetes.io/ingress.class: traefik
 spec:
   rules:
-  - host: traefik.{{ .Values.ingress.domain }}
+  - host: {{ .Values.domain }}
     http:
       paths:
       - path: /
         backend:
-          serviceName: traefik-ingress-service
-          servicePort: admin
+          serviceName: hue
+          servicePort: hue
 {{- end -}}
