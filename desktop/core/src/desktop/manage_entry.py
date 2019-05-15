@@ -191,7 +191,7 @@ def entry():
   from desktop.conf import DATABASE as desktop_database
 
   print "Using the following config make sure it looks correct"
-  print "HUE_CONF_DIR: %s" % os.environ['HUE_CONF_DIR']
+  print "HUE_CONF_DIR: %s" % os.environ.get('HUE_CONF_DIR')
   print "DB Engine: %s" % desktop_database.ENGINE.get()
   print "DB Name: %s" % desktop_database.NAME.get()
   print "DB User: %s" % desktop_database.USER.get()
