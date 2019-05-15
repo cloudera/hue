@@ -6,25 +6,12 @@ data:
   hue-ini: |
     [desktop]
     [[database]]
-    engine=postgresql_psycopg2
-    host=hue-postgres
-    port=5432
-    user=hue
-    password=hue
-    name=hue
-
-    [impala]
-    server_host={{ .Values.impala.server_host }}
-
-    [notebook]
-    [[interpreters]]
-    [[[impala]]]
-      name=Impala
-      interface=hiveserver2
-    [[[postgresql]]]
-      name = postgresql
-      interface=sqlalchemy
-      options='{"url": "postgresql://hue:hue@hue-database:5432/hue"}'
+    engine={{ .Values.hue.database.engine }}
+    host={{ .Values.hue.database.host }}
+    port={{ .Values.hue.database.port }}
+    user={{ .Values.hue.database.user }}
+    password={{ .Values.hue.database.password }}
+    name={{ .Values.hue.database.name }}
 
     [aws]
     [[aws_accounts]]
@@ -32,6 +19,10 @@ data:
     access_key_id={{ .Values.aws.awsAccessKeyId }}
     secret_access_key={{ .Values.aws.awsSecretAccessKey }}
     region={{ .Values.aws.awsRegion }}
+
+    [notebook]
+    [[interpreters]]
+    {{ .Values.hue.interpreters | indent 4 }}
 ---
 apiVersion: v1
 kind: ReplicationController
@@ -71,6 +62,7 @@ spec:
     port: 8888
   type: NodePort
 ---
+{{- if .Values.ingress.create -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -86,3 +78,4 @@ spec:
         backend:
           serviceName: hue
           servicePort: hue
+{{- end -}}

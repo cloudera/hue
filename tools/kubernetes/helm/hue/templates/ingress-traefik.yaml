@@ -1,3 +1,4 @@
+{{- if .Values.ingress.create -}}
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -86,7 +87,7 @@ spec:
     - name: admin
       port: 8080
   type: LoadBalancer
-  #loadBalancerIp: {{ .Values.loadBalancerIp }} 
+  #loadBalancerIp: {{ .Values.loadBalancerIp }}
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -96,10 +97,11 @@ metadata:
     kubernetes.io/ingress.class: traefik
 spec:
   rules:
-  - host: traefik.{{ .Values.domain }}
+  - host: traefik.{{ .Values.ingress.domain }}
     http:
       paths:
       - path: /
         backend:
           serviceName: traefik-ingress-service
           servicePort: admin
+{{- end -}}
