@@ -18,13 +18,11 @@ Assuming you have a Kubernetes cluster configured with Helm installed and images
 * [Container Images](/tools/docker)
    * [Hue](/tools/docker/hue)
 
-## Hue
+## Quick Start
 
-Update the Hue pods:
+    cd tools/kubernetes/helm/hue
 
-```
-kubectl delete pods `kubectl get pods | grep hue | grep -v postgres | cut -d" " -f1`
-```
+    helm install hue -n hue
 
 ## K8s Cluster
 

@@ -1,8 +1,0 @@
-registry: "gethue/hue"
-tag: "latest"
-impala:
-  server_host: "localhost"
-aws:
-  accessKeyId: ""
-  secretAccessKey: ""
-  region: "us-east-1"
