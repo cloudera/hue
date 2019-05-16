@@ -7,7 +7,7 @@ This is an Helm chart to easily start a Hue service.
 
     cd tools/kubernetes/helm/hue
 
-View the configuration [hue/values.yaml](hue/values.yaml), edit if needed and run:
+View the configuration [values.yaml](values.yaml), edit if needed and run:
 
     helm install hue -n hue
 
