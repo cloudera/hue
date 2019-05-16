@@ -226,6 +226,7 @@ npm-install:
 	npm run webpack
 	npm run webpack-login
 	npm run webpack-workers
+	# Redundancy but needs to happen
 	./build/env/bin/hue collectstatic --noinput
 # END DEV ONLY >>>>
 

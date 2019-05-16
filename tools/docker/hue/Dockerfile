@@ -51,15 +51,6 @@ RUN useradd -ms /bin/bash hue && chown -R hue /usr/share/hue
 
 WORKDIR  /usr/share/hue
 
-# Temp fix until npm-install target can use PREFIX in make install
-RUN cp /hue/package.json .
-RUN cp /hue/webpack.config*.js ./
-RUN npm install
-RUN npm run webpack
-RUN npm run webpack-login
-RUN npm run webpack-workers
-RUN ./build/env/bin/hue collectstatic --noinput
-
 RUN rm -rf /hue
 
 RUN ./build/env/bin/pip install psycopg2-binary
