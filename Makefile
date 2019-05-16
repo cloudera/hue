@@ -147,16 +147,15 @@ desktop: parent-pom
 desktop: virtual-env
 	@$(MAKE) -C desktop
 
+
 ###################################
 # Build apps
 ###################################
 .PHONY: apps
 apps: desktop
-	npm install
-	npm run webpack
-	npm run webpack-login
-	npm run webpack-workers
+	@$(MAKE) npm-install
 	@$(MAKE) -C $(APPS_DIR) env-install
+
 
 ###################################
 # Install binary dist
@@ -210,6 +209,26 @@ install-env:
 	$(MAKE) -C $(INSTALL_DIR)/desktop env-install
 	@echo --- Setting up Applications
 	$(MAKE) -C $(INSTALL_DIR)/apps env-install
+	@echo --- Setting up Frontend assets
+	cp package.json $(INSTALL_DIR)
+	cp webpack.config*.js $(INSTALL_DIR)
+	$(MAKE) -C $(INSTALL_DIR) npm-install
+
+
+###################################
+# Frontend and static assets
+###################################
+
+# <<<< DEV ONLY
+.PHONY: npm-install
+npm-install:
+	npm install
+	npm run webpack
+	npm run webpack-login
+	npm run webpack-workers
+	./build/env/bin/hue collectstatic --noinput
+# END DEV ONLY >>>>
+
 
 ###################################
 # Internationalization
