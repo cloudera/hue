@@ -37,10 +37,13 @@ def reload_with_cm_env(cm_managed):
   try:
     from django.db.backends.oracle.base import Oracle_datetime
   except:
-    os.environ["SKIP_RELOAD"] = "True"
     if 'LD_LIBRARY_PATH' in os.environ:
-      print "We need to reload the process to include any LD_LIBRARY_PATH changes"
+      print "We need to reload the process to include LD_LIBRARY_PATH for Oracle backend"
       try:
+        if cm_managed:
+          sys.argv.append("--cm-managed")
+ 
+        sys.argv.append("--skip-reload")
         os.execv(sys.argv[0], sys.argv)
       except Exception, exc:
         print 'Failed re-exec: %s' % exc
@@ -55,19 +58,24 @@ def entry():
   from django.core.management.base import BaseCommand
 
   os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'desktop.settings')
+  cm_config_file = '/etc/cloudera-scm-agent/config.ini'
+  ld_path_orig = None
+  if "LD_LIBRARY_PATH" in os.environ.keys():
+    ld_path_orig = os.environ["LD_LIBRARY_PATH"]
 
   # What's the subcommand being run?
   # This code uses the same logic from django.core.management to handle command args
   subcommand = None
+  if "--skip-reload" in sys.argv:
+    skip_reload = True
+    sys.argv.remove("--skip-reload")
+  else:
+    skip_reload = False
 
-  # Check if legacy --cm-managed flag is set and strip it out
+  # Check if --cm-managed flag is set and strip it out
+  # to prevent from sending to subcommands
   if "--cm-managed" in sys.argv:
     sys.argv.remove("--cm-managed")
-
-  # Legit check for cm managed so we don't need flags
-  cm_agent_process = subprocess.Popen('ps -ef | grep "[c]m agent\|[c]mf-agent" | awk \'{print $2}\'', shell=True, stdout=subprocess.PIPE)
-  cm_agent_pid = cm_agent_process.communicate()[0].split('\n')[0]
-  if cm_agent_pid != '':
     cm_managed = True
   else:
     cm_managed = False
@@ -79,22 +87,28 @@ def entry():
 
   if len(sys.argv) > 1:
     prof_id = subcommand = sys.argv[1]
+    #Check if this is a CM managed cluster
+    if os.path.isfile(cm_config_file) and not cm_managed and not skip_reload:
+        print "ALERT: This appears to be a CM Managed environment"
+        print "ALERT: HUE_CONF_DIR must be set when running hue commands in CM Managed environment"
+        print "ALERT: Please run 'hue <command> --cm-managed'"
   else:
     prof_id = str(os.getpid())
 
   # CM managed configure env vars
-  # Only run if CM isn't running the command
-  if cm_managed and not "HADOOP_CREDSTORE_PASSWORD" in os.environ.keys():
+  if cm_managed:
+    import ConfigParser
+    from ConfigParser import NoOptionError
+    config = ConfigParser.RawConfigParser()
+    config.read(cm_config_file)
     try:
-      supervisor_process = subprocess.Popen('ps -ef | grep [s]upervisord | awk \'{print $2}\'', shell=True, stdout=subprocess.PIPE)
-      supervisor_pid = supervisor_process.communicate()[0].split('\n')[0]
-      cm_supervisor_dir = os.path.realpath('/proc/%s/cwd' % supervisor_pid)
-    except Exception, e:
-      LOG.exception("Unable to get valid supervisord, make sure you are running as root and make sure the CM supervisor is running")
+      cm_agent_run_dir = config.get('General', 'agent_wide_credential_cache_location')
+    except NoOptionError:
+      cm_agent_run_dir = '/var/run/cloudera-scm-agent'
+      pass
 
     #Parse CM supervisor include file for Hue and set env vars
-    print "cm_supervisor_dir: %s" % cm_supervisor_dir
-    cm_agent_run_dir = os.path.dirname(cm_supervisor_dir)
+    cm_supervisor_dir = cm_agent_run_dir + '/supervisor/include'
     cm_process_dir = cm_agent_run_dir + '/process'
     hue_env_conf = None
     envline = None
@@ -104,6 +118,13 @@ def entry():
       if cm_hue_string in file:
         hue_env_conf = file
         hue_env_conf = cm_supervisor_dir + "/" + hue_env_conf
+
+    if hue_env_conf == None:
+      process_dirs = fnmatch.filter(os.listdir(cm_process_dir), '*%s*' % cm_hue_string)
+      process_dirs.sort()
+      hue_process_dir = cm_process_dir + "/" + process_dirs[-1]
+      hue_env_conf = fnmatch.filter(os.listdir(hue_process_dir), 'supervisor.conf')[0]
+      hue_env_conf = hue_process_dir + "/" + hue_env_conf
 
     if not hue_env_conf == None:
       if os.path.isfile(hue_env_conf):
@@ -115,14 +136,13 @@ def entry():
             empty, hue_conf_dir = line.split("directory=")
             os.environ["HUE_CONF_DIR"] = hue_conf_dir.rstrip()
     else:
-      os.environ["HUE_CONF_DIR"] = "/etc/hue/conf"
       print "This appears to be a CM managed cluster, but the"
       print "supervisor/include file for Hue could not be found"
       print "in order to successfully run commands that access"
       print "the database you need to set the following env vars:"
       print ""
       print "  export JAVA_HOME=<java_home>"
-      print "  export HUE_CONF_DIR=/path/to/cloudera-scm-agent/process/<id>-hue-HUE_SERVER"
+      print "  export HUE_CONF_DIR=\"%s/`ls -1 %s | grep %s | sort -n | tail -1 `\"" % (cm_processs_dir, cm_process_dir, cm_hue_string)
       print "  export HUE_IGNORE_PASSWORD_SCRIPT_ERRORS=1"
       print "  export HUE_DATABASE_PASSWORD=<hueDBpassword>"
       print "If using Oracle as your database:"
@@ -139,64 +159,57 @@ def entry():
           envval = envval.replace("'", "").rstrip()
           os.environ[envkey] = envval
 
-    cloudera_config_script = None
-    if os.path.isfile('/usr/lib64/cmf/service/common/cloudera-config.sh'):
-      cloudera_config_script = '/usr/lib64/cmf/service/common/cloudera-config.sh'
-    elif os.path.isfile('/opt/cloudera/cm-agent/service/common/cloudera-config.sh'):
-      cloudera_config_script = '/opt/cloudera/cm-agent/service/common/cloudera-config.sh'
+    #Set JAVA_HOME
+    if "JAVA_HOME" not in os.environ.keys():
+      if os.path.isfile('/usr/lib64/cmf/service/common/cloudera-config.sh'):
+        locate_java = subprocess.Popen(
+          ['bash', '-c', '. /usr/lib64/cmf/service/common/cloudera-config.sh; locate_java_home'], stdout=subprocess.PIPE,
+          stderr=subprocess.PIPE)
+      elif os.path.isfile('/opt/cloudera/cm-agent/service/common/cloudera-config.sh'):
+        locate_java = subprocess.Popen(
+          ['bash', '-c', '. /opt/cloudera/cm-agent/service/common/cloudera-config.sh; locate_java_home'],
+          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+      else:
+        locate_java = None
 
-    JAVA_HOME = None
-    if cloudera_config_script is not None:
-      locate_java = subprocess.Popen(['bash', '-c', '. %s; locate_java_home' % cloudera_config_script], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-      for line in iter(locate_java.stdout.readline,''):
-        if 'JAVA_HOME' in line:
-          JAVA_HOME = line.rstrip().split('=')[1]
+      JAVA_HOME = "UNKNOWN"
 
-    if JAVA_HOME is not None:
-      os.environ["JAVA_HOME"] = JAVA_HOME
-    else:
-      print "JAVA_HOME must be set and can't be found, please set JAVA_HOME environment variable"
-      sys.exit(1)
+      if locate_java is not None:
+        for line in iter(locate_java.stdout.readline, ''):
+          if 'JAVA_HOME' in line:
+            JAVA_HOME = line.rstrip().split('=')[1]
 
-    oracle_check_process = subprocess.Popen('grep -i oracle %s/hue*ini' % os.environ["HUE_CONF_DIR"], shell=True, stdout=subprocess.PIPE)
-    oracle_check = oracle_check_process.communicate()[0]
-    if not oracle_check == '':
-      #Make sure we set Oracle Client if configured
-      if "LD_LIBRARY_PATH" not in os.environ.keys():
-        if "SCM_DEFINES_SCRIPTS" in os.environ.keys():
-          for scm_script in os.environ["SCM_DEFINES_SCRIPTS"].split(":"):
-            if "ORACLE" in scm_script:
-              if os.path.isfile(scm_script):
-                oracle_source = subprocess.Popen(". %s; env" % scm_script, stdout=subprocess.PIPE, shell=True, executable="/bin/bash")
-                for line in oracle_source.communicate()[0].splitlines():
-                  if "LD_LIBRARY_PATH" in line:
-                    var, oracle_ld_path = line.split("=")
-                    os.environ["LD_LIBRARY_PATH"] = oracle_ld_path
+      if JAVA_HOME != "UNKNOWN":
+        os.environ["JAVA_HOME"] = JAVA_HOME
 
-      if "LD_LIBRARY_PATH" not in os.environ.keys():
-        print "LD_LIBRARY_PATH can't be found, if you are using ORACLE for your Hue database"
-        print "then it must be set, if not, you can ignore"
-        print "  export LD_LIBRARY_PATH=/path/to/instantclient"
+      if "JAVA_HOME" not in os.environ.keys():
+        print "JAVA_HOME must be set and can't be found, please set JAVA_HOME environment variable"
+        print "  export JAVA_HOME=<java_home>"
+        sys.exit(1)
 
-  if not "SKIP_RELOAD" in os.environ.keys():
+    #Make sure we set Oracle Client if configured
+    if "LD_LIBRARY_PATH" not in os.environ.keys():
+      if "SCM_DEFINES_SCRIPTS" in os.environ.keys():
+        for scm_script in os.environ["SCM_DEFINES_SCRIPTS"].split(":"):
+          if "ORACLE" in scm_script:
+            if os.path.isfile(scm_script):
+              oracle_source = subprocess.Popen(". %s; env" % scm_script, stdout=subprocess.PIPE, shell=True, executable="/bin/bash")
+              for line in oracle_source.communicate()[0].splitlines():
+                if "LD_LIBRARY_PATH" in line:
+                  var, oracle_ld_path = line.split("=")
+                  os.environ["LD_LIBRARY_PATH"] = oracle_ld_path
+
+    if "LD_LIBRARY_PATH" not in os.environ.keys():
+      print "LD_LIBRARY_PATH can't be found, if you are using ORACLE for your Hue database"
+      print "then it must be set, if not, you can ignore"
+      print "  export LD_LIBRARY_PATH=/path/to/instantclient"
+
+  if "LD_LIBRARY_PATH" in os.environ.keys():
+    if ld_path_orig is not None and ld_path_orig == os.environ["LD_LIBRARY_PATH"]:
+      skip_reload = True
+
+  if not skip_reload:
     reload_with_cm_env(cm_managed)
-
-  #Get desktop settings so we can give guidance
-  from django.conf import settings
-  from django.core.exceptions import ImproperlyConfigured
-  try:
-    settings.INSTALLED_APPS
-  except ImproperlyConfigured as exc:
-    self.settings_exception = exc
-  from desktop.conf import DATABASE as desktop_database
-
-  print "Using the following config make sure it looks correct"
-  print "HUE_CONF_DIR: %s" % os.environ['HUE_CONF_DIR']
-  print "DB Engine: %s" % desktop_database.ENGINE.get()
-  print "DB Name: %s" % desktop_database.NAME.get()
-  print "DB User: %s" % desktop_database.USER.get()
-  print "DB Host: %s" % desktop_database.HOST.get()
-  print "DB Port: %s" % str(desktop_database.PORT.get())
 
   try:
     # Let django handle the normal execution
@@ -213,6 +226,7 @@ def entry():
   except subprocess.CalledProcessError, e:
     if "altscript.sh" in str(e).lower():
       print "%s" % e
+      print "HUE_CONF_DIR seems to be set to CM location and '--cm-managed' flag not used"
 
 def _profile(prof_id, func):
   """
