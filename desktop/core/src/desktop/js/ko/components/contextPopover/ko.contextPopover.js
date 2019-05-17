@@ -404,7 +404,7 @@ const SUPPORT_TEMPLATES = `
           <!-- /ko -->
   
           <!-- ko ifnot: $parent.commentExpanded -->
-              <!-- ko if: window.HAS_NAVIGATOR && !isTemporary && (getSourceType() === 'hive' || getSourceType() === 'impala') -->
+              <!-- ko if: window.HAS_CATALOG && !isTemporary && (getSourceType() === 'hive' || getSourceType() === 'impala') -->
               <div data-bind="component: { name: 'nav-tags', params: { catalogEntry: $data, overflowEllipsis: true } }"></div>
               <!-- /ko -->
   

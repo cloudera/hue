@@ -1059,7 +1059,7 @@ ${ components.menubar(is_embeddable) }
       var options = {
         user: '${ user.username }',
         optimizerEnabled: '${ is_optimizer_enabled }' === 'True',
-        navigatorEnabled: '${ is_navigator_enabled }' === 'True',
+        navigatorEnabled: window.HAS_CATALOG,
         optimizerUrl: '${ optimizer_url }',
         navigatorUrl: '${ navigator_url }',
         sourceType: '${ source_type }'

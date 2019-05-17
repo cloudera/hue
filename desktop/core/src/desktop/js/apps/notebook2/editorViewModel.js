@@ -436,7 +436,10 @@ class EditorViewModel {
 
   newNotebook(editorType, callback, queryTab) {
     const self = this;
-    huePubSub.publish('active.snippet.type.changed', { type: editorType, isSqlDialect: editorType ? self.getSnippetViewSettings(editorType).sqlDialect : undefined });
+    huePubSub.publish('active.snippet.type.changed', {
+      type: editorType,
+      isSqlDialect: editorType ? self.getSnippetViewSettings(editorType).sqlDialect : undefined
+    });
     $.post(
       '/notebook/api/create_notebook',
       {
@@ -457,7 +460,12 @@ class EditorViewModel {
           if (window.location.getParameter('type') === '') {
             hueUtils.changeURLParameter('type', self.editorType());
           }
-          huePubSub.publish('active.snippet.type.changed', { type: editorType, isSqlDialect: editorType ? self.getSnippetViewSettings(editorType).sqlDialect : undefined });
+          huePubSub.publish('active.snippet.type.changed', {
+            type: editorType,
+            isSqlDialect: editorType
+              ? self.getSnippetViewSettings(editorType).sqlDialect
+              : undefined
+          });
         }
 
         if (typeof callback !== 'undefined' && callback !== null) {
@@ -486,7 +494,10 @@ class EditorViewModel {
           if (typeof skipUrlChange === 'undefined' && !self.isNotificationManager()) {
             if (self.editorMode()) {
               self.editorType(data.document.type.substring('query-'.length));
-              huePubSub.publish('active.snippet.type.changed', { type: self.editorType(), isSqlDialect: self.getSnippetViewSettings(self.editorType()).sqlDialect });
+              huePubSub.publish('active.snippet.type.changed', {
+                type: self.editorType(),
+                isSqlDialect: self.getSnippetViewSettings(self.editorType()).sqlDialect
+              });
               self.changeURL(
                 self.URLS.editor + '?editor=' + data.document.id + '&type=' + self.editorType()
               );
