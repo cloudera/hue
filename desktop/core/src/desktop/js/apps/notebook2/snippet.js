@@ -1265,7 +1265,7 @@ class Snippet {
                   }
                 }
                 if (!self.result.handle().has_more_statements && self.parentVm.successUrl()) {
-                  window.location.href = self.parentVm.successUrl(); // Not used anymore in Hue 4
+                  huePubSub.publish('open.link', self.parentVm.successUrl()); // Not used anymore in Hue 4
                 }
               } else if (self.status() === STATUS.success) {
                 self.progress(99);

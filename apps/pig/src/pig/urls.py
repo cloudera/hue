@@ -21,16 +21,16 @@ from pig import views as pig_views
 urlpatterns = [
   url(r'^$', pig_views.app, name='index'),
 
-  url(r'^app/$', pig_views.app, name='app'),
+  url(r'^app/?$', pig_views.app, name='app'),
 
   # Ajax
-  url(r'^scripts/$', pig_views.scripts, name='scripts'),
-  url(r'^dashboard/$', pig_views.dashboard, name='dashboard'),
-  url(r'^save/$', pig_views.save, name='save'),
-  url(r'^run/$', pig_views.run, name='run'),
-  url(r'^copy/$', pig_views.copy, name='copy'),
-  url(r'^delete/$', pig_views.delete, name='delete'),
+  url(r'^scripts/?$', pig_views.scripts, name='scripts'),
+  url(r'^dashboard/?$', pig_views.dashboard, name='dashboard'),
+  url(r'^save/?$', pig_views.save, name='save'),
+  url(r'^run/?$', pig_views.run, name='run'),
+  url(r'^copy/?$', pig_views.copy, name='copy'),
+  url(r'^delete/?$', pig_views.delete, name='delete'),
   url(r'^watch/(?P<job_id>[-\w]+)$', pig_views.watch, name='watch'),
-  url(r'^stop/$', pig_views.stop, name='stop'),
+  url(r'^stop/?$', pig_views.stop, name='stop'),
   url(r'^install_examples$', pig_views.install_examples, name='install_examples'),
 ]

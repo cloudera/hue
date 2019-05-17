@@ -50,6 +50,13 @@
     window.CSRF_TOKEN = '';
   %endif
 
+  window.KNOX_BASE_PATH_HUE = '/KNOX_BASE_PATH_HUE';
+  window._KNOX_BASE_PATH = '/KNOX_BASE_PATH_KNOX';
+  window._KNOX_BASE_URL = '/KNOX_BASE_URL';
+  window.HUE_BASE_URL = window.KNOX_BASE_PATH_HUE.indexOf('KNOX_BASE_PATH_HUE') < 0 ? window.KNOX_BASE_PATH_HUE : '';
+  window.KNOX_BASE_PATH = window._KNOX_BASE_PATH.indexOf('KNOX_BASE_PATH_KNOX') < 0 ? window._KNOX_BASE_PATH_KNOX : '';
+  window.KNOX_BASE_URL = window._KNOX_BASE_URL.indexOf('KNOX_BASE_URL') < 0 ? window._KNOX_BASE_URL : '';
+
   window.HAS_MULTI_CLUSTER = '${ conf.has_multi_cluster() }' === 'True';
 
   window.HAS_SQL_DASHBOARD = '${ HAS_SQL_ENABLED.get() }' === 'True';

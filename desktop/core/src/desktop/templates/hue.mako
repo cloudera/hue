@@ -134,8 +134,10 @@
   </script>
 
   ${ commonHeaderFooterComponents.header_i18n_redirection() }
-
-  <script src="/desktop/globalJsConstants.js?v=${ hue_version() }"></script>
+  <%
+    global_constants_url = '/desktop/globalJsConstants.js?v=' + hue_version()
+  %>
+  <script src="${global_constants_url}"></script>
 
   % if not conf.DEV.get():
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
@@ -273,12 +275,12 @@ ${ hueIcons.symbols() }
             <li data-bind="hueLink: '/useradmin/users/'"><a href="javascript: void(0);"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
             % endif
             % if is_admin(user):
-            <li><a href="/about/"><span class="dropdown-no-icon">${_('Administration')}</span></a></li>
+            <li><a data-bind="hueLink: '/about/'" href="javascript: void(0);"><span class="dropdown-no-icon">${_('Administration')}</span></a></li>
             % endif
             <li><a href="javascript:void(0)" onclick="huePubSub.publish('show.welcome.tour')"><span class="dropdown-no-icon">${_('Welcome Tour')}</span></a></li>
             <li><a href="http://gethue.com" target="_blank"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
             <li class="divider"></li>
-            <li><a title="${_('Sign out')}" href="/accounts/logout/"><i class="fa fa-fw fa-sign-out"></i> ${ _('Sign out') }</a></li>
+            <li><a title="${_('Sign out')}" data-bind="hueLink: '/accounts/logout'" href="javascript: void(0);"><i class="fa fa-fw fa-sign-out"></i> ${ _('Sign out') }</a></li>
           </ul>
         </div>
         % endif
@@ -479,7 +481,7 @@ ${ render_bundle('hue') | n,unicode }
 <script src="${ static('desktop/js/ace/mode-hive.js') }"></script>
 <script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
 <script src="${ static('desktop/js/ace.extended.js') }"></script>
-<script>ace.config.set("basePath", "/static/desktop/js/ace");</script>
+<script>ace.config.set("basePath", "${ static('desktop/js/ace') }");</script>
 
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
 <script src="${ static('metastore/js/metastore.model.js') }"></script>

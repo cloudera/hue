@@ -82,7 +82,7 @@ ${layout.menubar(section='log_view')}
               <input id="wrapLogs" id="wrap" type="checkbox" checked="checked">
               ${_('Wrap logs')}
             </label>
-            <a href="javascript:void(0)" onclick="window.location.href = '/desktop/download_logs'" class="btn"><i class="fa fa-download"></i> ${_('Download entire log as zip')}</a>
+            <a href="javascript:void(0)" onclick="huePubSub.publish('open.link', '/desktop/download_logs');" class="btn"><i class="fa fa-download"></i> ${_('Download entire log as zip')}</a>
         </form>
       </%def>
     </%actionbar:render>

@@ -2828,13 +2828,13 @@ ${ assist.assistPanel() }
                         var db = match[1];
                         dataCatalog.getEntry({ sourceType: snippet.type(), namespace: self.namespace(), compute: self.compute(), path: [ db ]}).done(function (dbEntry) {
                           dbEntry.clearCache({ invalidate: 'invalidate', silenceErrors: true }).done(function () {
-                            window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
+                            huePubSub.publish('open.link', self.editorVM.selectedNotebook().onSuccessUrl());
                           })
                         });
                       } else {
                         dataCatalog.getEntry({ sourceType: snippet.type(), namespace: self.namespace(), compute: self.compute(), path: []}).done(function (sourceEntry) {
                           sourceEntry.clearCache({ silenceErrors: true }).done(function () {
-                            window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
+                            huePubSub.publish('open.link', self.editorVM.selectedNotebook().onSuccessUrl());
                           })
                         });
                       }

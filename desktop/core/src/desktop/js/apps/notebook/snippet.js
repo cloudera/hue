@@ -2290,7 +2290,7 @@ class Snippet {
                     }
                   }
                   if (!self.result.handle().has_more_statements && vm.successUrl()) {
-                    window.location.href = vm.successUrl(); // Not used anymore in Hue 4
+                    huePubSub.publish('open.link', vm.successUrl()); // Not used anymore in Hue 4
                   }
                 }
               } else if (data.status === -3) {

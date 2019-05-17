@@ -135,7 +135,7 @@ $(document).ready(function(){
 
 
   % if is_embeddable:
-  $editUserComponents.find('#editForm').attr('action', window.location.pathname.substr(4).replace(/\/$/, ''));
+  $editUserComponents.find('#editForm').attr('action', window.location.pathname.substr((window.HUE_BASE_URL + '/hue').length).replace(/\/$/, ''));
   $editUserComponents.find('#editForm').ajaxForm({
     dataType:  'json',
     success: function(data) {
