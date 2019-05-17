@@ -24,7 +24,7 @@
   from beeswax.conf import LIST_PARTITIONS_LIMIT
   from dashboard.conf import HAS_SQL_ENABLED
   from indexer.conf import ENABLE_NEW_INDEXER
-  from metadata.conf import has_catalog, has_optimizer, has_workload_analytics, OPTIMIZER
+  from metadata.conf import has_catalog, has_catalog_tags, has_readonly_catalog, has_optimizer, has_workload_analytics, OPTIMIZER
   from notebook.conf import ENABLE_NOTEBOOK_2, ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_SCHEDULING
 %>
 
@@ -63,6 +63,8 @@
   window.ENABLE_SQL_SYNTAX_CHECK = '${ conf.ENABLE_SQL_SYNTAX_CHECK.get() }' === 'True';
 
   window.HAS_CATALOG = '${ has_catalog(request.user) }' === 'True';
+  window.HAS_CATALOG_TAGS = '${ has_catalog_tags(request.user) }' === 'True';
+  window.HAS_READ_ONLY_CATALOG = '${ has_readonly_catalog(request.user) }' === 'True';
 
   window.HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
 

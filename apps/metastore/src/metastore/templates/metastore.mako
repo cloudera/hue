@@ -452,7 +452,7 @@ ${ components.menubar(is_embeddable) }
 </script>
 
 <script type="text/html" id="metastore-nav-tags">
-  <!-- ko if: $root.navigatorEnabled()  -->
+  <!-- ko if: window.HAS_CATALOG_TAGS && $root.navigatorEnabled()  -->
   <div class="metastore-nav-tags" data-bind="component: { name: 'nav-tags', params: { catalogEntry: catalogEntry }}"></div>
   <!-- /ko -->
 </script>
