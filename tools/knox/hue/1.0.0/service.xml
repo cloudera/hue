@@ -1,0 +1,37 @@
+<service role="HUE" name="hue" version="1.0.0">
+  <routes>
+    <!-- Since we don't have to rewrite URLs for all javascript, we single out these 2 exceptions: 1 for workers & the other for the base URL -->
+    <route path="/hue/desktop/workers/{**}?{**}">
+      <rewrite apply="HUE/hue/inbound/huerule" to="request.url"/>
+      <rewrite apply="HUE/hue/outbound/headers" to="response.headers"/>
+      <rewrite apply="HUE/hue/outbound/workers" to="response.body"/>
+    </route>
+    <route path="/hue/desktop/globalJsConstants.js?{**}">
+      <rewrite apply="HUE/hue/inbound/huerule" to="request.url"/>
+      <rewrite apply="HUE/hue/outbound/headers" to="response.headers"/>
+      <rewrite apply="HUE/hue/outbound/global" to="response.body"/>
+    </route>
+    <!-- All URLs except above exceptions -->
+    <route path="/hue/**">
+      <rewrite apply="HUE/hue/inbound/huerule" to="request.url"/>
+      <rewrite apply="HUE/hue/outbound/headers" to="response.headers"/>
+      <rewrite apply="HUE/hue/outbound/huerooturl" to="response.body"/>
+    </route>
+    <route path="/hue/">
+      <rewrite apply="HUE/hue/inbound/huerule" to="request.url"/>
+      <rewrite apply="HUE/hue/outbound/headers" to="response.headers"/>
+      <rewrite apply="HUE/hue/outbound/huerooturl" to="response.body"/>
+    </route>
+    <route path="/hue/**?**">
+      <rewrite apply="HUE/hue/inbound/huerule" to="request.url"/>
+      <rewrite apply="HUE/hue/outbound/headers" to="response.headers"/>
+      <rewrite apply="HUE/hue/outbound/huerooturl" to="response.body"/>
+    </route>
+    <route path="/hue/?**">
+      <rewrite apply="HUE/hue/inbound/huerule" to="request.url"/>
+      <rewrite apply="HUE/hue/outbound/headers" to="response.headers"/>
+      <rewrite apply="HUE/hue/outbound/huerooturl" to="response.body"/>
+    </route>
+  </routes>
+  <dispatch classname="org.apache.knox.gateway.dispatch.PassAllHeadersDispatch" />
+</service>

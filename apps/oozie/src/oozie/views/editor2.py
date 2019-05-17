@@ -427,7 +427,7 @@ def _submit_workflow_helper(request, workflow, submit_action):
     params_form = ParametersFormSet(initial=initial_params)
 
 
-    popup = render('editor2/submit_job_popup.mako', request, {
+    return render('editor2/submit_job_popup.mako', request, {
                      'params_form': params_form,
                      'name': workflow.name,
                      'action': submit_action,
@@ -436,8 +436,7 @@ def _submit_workflow_helper(request, workflow, submit_action):
                      'is_oozie_mail_enabled': _is_oozie_mail_enabled(request.user),
                      'return_json': request.GET.get('format') == 'json',
                      'cluster_json': cluster_json
-                   }, force_template=True).content
-    return JsonResponse(popup, safe=False)
+                   }, force_template=True)
 
 
 def _is_oozie_mail_enabled(user):
@@ -708,14 +707,13 @@ def submit_coordinator(request, doc_id):
     initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
     params_form = ParametersFormSet(initial=initial_params)
 
-  popup = render('editor2/submit_job_popup.mako', request, {
+    return render('editor2/submit_job_popup.mako', request, {
                  'params_form': params_form,
                  'name': coordinator.name,
                  'action': reverse('oozie:editor_submit_coordinator',  kwargs={'doc_id': coordinator.id}),
                  'show_dryrun': True,
                  'return_json': request.GET.get('format') == 'json'
-                }, force_template=True).content
-  return JsonResponse(popup, safe=False)
+                }, force_template=True)
 
 
 def _submit_coordinator(request, coordinator, mapping):
@@ -938,14 +936,13 @@ def submit_bundle(request, doc_id):
     initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
     params_form = ParametersFormSet(initial=initial_params)
 
-  popup = render('editor2/submit_job_popup.mako', request, {
+    return render('editor2/submit_job_popup.mako', request, {
                  'params_form': params_form,
                  'name': bundle.name,
                  'action': reverse('oozie:editor_submit_bundle',  kwargs={'doc_id': bundle.id}),
                  'return_json': request.GET.get('format') == 'json',
                  'show_dryrun': False
-                }, force_template=True).content
-  return JsonResponse(popup, safe=False)
+                }, force_template=True)
 
 
 def _submit_bundle(request, bundle, properties):

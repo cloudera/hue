@@ -16,6 +16,8 @@
 ## limitations under the License.
 
 <%!
+  import urllib
+  from desktop.lib.paths import SAFE_CHARACTERS_URI_COMPONENTS
   from desktop.views import commonheader, commonfooter, _ko
   from django.utils.translation import ugettext as _
   
@@ -197,7 +199,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                          % if oozie_coordinator.is_running() or oozie_coordinator.status in ('KILLED', 'FAILED'):
                            disabled="disabled"
                          % endif
-                        data-rerun-url="${ url('oozie:rerun_oozie_coord', job_id=oozie_coordinator.id, app_path=oozie_coordinator.coordJobPath) }">
+                        data-rerun-url="${ url('oozie:rerun_oozie_coord', job_id=oozie_coordinator.id, app_path=urllib.quote(oozie_coordinator.coordJobPath.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)) }">
                         <i class="fa fa-refresh"></i> ${ _('Rerun') }
                       </button>
                       <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown"

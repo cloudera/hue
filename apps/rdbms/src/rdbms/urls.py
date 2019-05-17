@@ -35,9 +35,9 @@ urlpatterns += [
   url(r'^api/servers/(?P<server>\w+)/databases/?$', rdbms_api.databases, name='api_databases'),
   url(r'^api/servers/(?P<server>\w+)/databases/(?P<database>.+?)/tables/?$', rdbms_api.tables, name='api_tables'),
   url(r'^api/servers/(?P<server>\w+)/databases/(?P<database>.+?)/tables/(?P<table>\w+)/columns/?$', rdbms_api.columns, name='api_columns'),
-  url(r'^api/query/((?P<design_id>\d+)/?)?$', rdbms_api.save_query, name='api_save_query'),
+  url(r'^api/query(?:/(?P<design_id>\d+))?/?$', rdbms_api.save_query, name='api_save_query'),
   url(r'^api/query/(?P<design_id>\d+)/get$', rdbms_api.fetch_saved_query, name='api_fetch_saved_query'),
-  url(r'^api/execute/(?P<design_id>\d+)?$', rdbms_api.execute_query, name='api_execute_query'),
+  url(r'^api/execute(?:/(?P<design_id>\d+))?/?$', rdbms_api.execute_query, name='api_execute_query'),
   url(r'^api/explain/?$', rdbms_api.explain_query, name='api_explain_query'),
   url(r'^api/results/(?P<id>\d+)/(?P<first_row>\d+)$', rdbms_api.fetch_results, name='api_fetch_results')
 ]
