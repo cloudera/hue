@@ -1524,7 +1524,7 @@ class ApiHelper {
       source_type: options.sourceType
     };
     if (options.path.length === 1) {
-      url = '/metastore/databases/' + options.path[1] + '/alter';
+      url = '/metastore/databases/' + options.path[0] + '/alter';
       data.properties = ko.mapping.toJSON(options.properties);
     } else if (options.path.length === 2) {
       url = '/metastore/table/' + options.path[0] + '/' + options.path[1] + '/alter';
