@@ -53,7 +53,7 @@ const TEMPLATE = `
       facetDropDownVisible: facetDropDownVisible,
       spin: loading,
       placeHolder: '${I18n(
-        window.HAS_NAVIGATOR ? 'Search data and saved documents...' : 'Search saved documents...'
+        window.HAS_CATALOG ? 'Search data and saved documents...' : 'Search saved documents...'
       )}',
       querySpec: querySpec,
       onClear: function () { selectedIndex(null); searchResultVisible(false); },
@@ -519,7 +519,7 @@ class GlobalSearch {
         })
     );
 
-    if (!docOnly && HAS_NAVIGATOR) {
+    if (!docOnly && window.HAS_CATALOG) {
       const clearNavTimeout = window.setTimeout(() => {
         self.updateCategories(NAV_CATEGORY, []);
       }, 300);
