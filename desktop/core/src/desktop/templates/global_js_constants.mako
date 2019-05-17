@@ -62,7 +62,7 @@
 
   window.ENABLE_SQL_SYNTAX_CHECK = '${ conf.ENABLE_SQL_SYNTAX_CHECK.get() }' === 'True';
 
-  window.HAS_NAVIGATOR = '${ has_catalog(request.user) }' === 'True';
+  window.HAS_CATALOG = '${ has_catalog(request.user) }' === 'True';
 
   window.HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
 
