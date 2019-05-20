@@ -201,7 +201,7 @@ class SQLIndexer(object):
 
     editor_type = 'impala' if table_format == 'kudu' else destination['sourceType']
 
-    on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': final_table_name})
+    on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': final_table_name}) + '?source_type=' + source_type
 
     return make_notebook(
         name=_('Creating table %(database)s.%(table)s') % {'database': database, 'table': final_table_name},
