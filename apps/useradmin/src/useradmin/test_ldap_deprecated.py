@@ -587,6 +587,7 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
 
 class TestUserAdminLdapDeprecatedWithHadoop(BaseUserAdminTests):
   requires_hadoop = True
+  integration = True
 
   def test_ensure_home_directory_add_ldap_users(self):
     try:

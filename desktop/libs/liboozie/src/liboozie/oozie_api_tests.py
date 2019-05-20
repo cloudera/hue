@@ -53,6 +53,7 @@ class OozieServerProvider(object):
   OOZIE_HOME = get_run_root('ext/oozie/oozie')
 
   requires_hadoop = True
+  integration = True
   is_oozie_running = False
 
   @classmethod
@@ -258,8 +259,10 @@ class TestMiniOozie(OozieServerProvider):
     else:
       assert_true(self.cluster.fs.exists('/user/%(user)s/share/lib' % {'user': user}))
 
+
 class TestOozieWorkspace(object):
   requires_hadoop = True
+  integration = True
 
   def setUp(self):
     self.cluster = pseudo_hdfs4.shared_cluster()

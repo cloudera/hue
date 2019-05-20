@@ -881,8 +881,8 @@ class TestUserAdmin(BaseUserAdminTests):
 
 
 class TestUserAdminWithHadoop(BaseUserAdminTests):
-
   requires_hadoop = True
+  integration = True
 
   def test_ensure_home_directory(self):
     if not is_live_cluster():
