@@ -238,13 +238,14 @@ def test_dump_config():
   response = client_not_me.get(reverse('desktop.views.dump_config'))
   assert_true("You must be a superuser" in response.content, response.content)
 
-  prev_env_conf = os.environ["HUE_CONF_DIR"]
+  prev_env_conf = os.environ.get("HUE_CONF_DIR")
   try:
     os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
     resp = c.get(reverse('desktop.views.dump_config'))
     assert_true('/tmp/test_hue_conf_dir' in resp.content, resp)
   finally:
-    os.environ["HUE_CONF_DIR"] = prev_env_conf
+    if prev_env_conf is not None:
+      os.environ["HUE_CONF_DIR"] = prev_env_conf
 
 def hue_version():
   global HUE_VERSION

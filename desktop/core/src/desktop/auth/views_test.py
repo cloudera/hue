@@ -498,7 +498,7 @@ class TestRemoteUserLogin(PseudoHdfsTestBase):
 
 
 class TestMultipleBackendLogin(PseudoHdfsTestBase):
-
+  integration = True
   reset = []
   test_username = "test_multiple_login"
 
