@@ -65,6 +65,7 @@ def cleanup_file(cluster, path):
 
 class TestFileBrowserWithHadoop(object):
   requires_hadoop = True
+  integration = True
 
   def setUp(self):
     self.c = make_logged_in_client(username='test', is_superuser=False)

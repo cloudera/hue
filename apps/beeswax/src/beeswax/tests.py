@@ -123,6 +123,7 @@ def get_csv(client, result_response):
 
 class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
   requires_hadoop = True
+  integration = True
 
   def setUp(self):
     self.user = User.objects.get(username='test')

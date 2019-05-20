@@ -386,6 +386,7 @@ class OozieMockBase(object):
 
 class OozieBase(OozieServerProvider):
   requires_hadoop = True
+  integration = True
 
   def setUp(self):
     OozieServerProvider.setup_class()
