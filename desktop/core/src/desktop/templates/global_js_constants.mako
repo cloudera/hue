@@ -26,6 +26,8 @@
   from indexer.conf import ENABLE_NEW_INDEXER
   from metadata.conf import has_catalog, has_catalog_tags, has_readonly_catalog, has_optimizer, has_workload_analytics, OPTIMIZER
   from notebook.conf import ENABLE_NOTEBOOK_2, ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_SCHEDULING
+
+  from metastore.views import has_write_access
 %>
 
 <%namespace name="impalaDocIndex" file="/impala_doc_index.mako" />
@@ -64,7 +66,7 @@
 
   window.HAS_CATALOG = '${ has_catalog(request.user) }' === 'True';
   window.HAS_CATALOG_TAGS = '${ has_catalog_tags(request.user) }' === 'True';
-  window.HAS_READ_ONLY_CATALOG = '${ has_readonly_catalog(request.user) }' === 'True';
+  window.HAS_READ_ONLY_CATALOG = '${ has_readonly_catalog(request.user) }' === 'True' || '${ has_write_access(request.user) }' === 'False';
 
   window.HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
 
