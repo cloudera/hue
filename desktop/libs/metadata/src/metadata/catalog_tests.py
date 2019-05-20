@@ -40,6 +40,7 @@ LOG = logging.getLogger(__name__)
 
 
 class TestNavigator(object):
+  integration = True
 
   @classmethod
   def setup_class(cls):

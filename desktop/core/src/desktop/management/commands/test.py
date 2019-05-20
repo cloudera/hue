@@ -145,6 +145,8 @@ class Command(BaseCommand):
       nose_args = args + all_apps
     elif args[0] == "fast":
       nose_args = args + all_apps + ["-a", "!requires_hadoop"]
+    elif args[0] == "unit":
+      nose_args = args + all_apps + ["-a", "!integration"]
     elif args[0] == "windmill":
       args = args[1:]
       ret = test_windmill.Command().handle(*args)

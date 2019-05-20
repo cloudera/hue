@@ -106,6 +106,7 @@ class TestMockedImpala:
 
 
 class TestImpalaIntegration:
+  integration = True
 
   @classmethod
   def setup_class(cls):
