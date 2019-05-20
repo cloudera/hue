@@ -232,8 +232,9 @@ class TestIndexer():
 
     self._test_generate_field_operation_morphline(find_replace_dict)
 
+  @attr('integration')
   def test_end_to_end(self):
-    if not is_live_cluster() or True: # Skipping as requires morplines libs to be setup
+    if not is_live_cluster(): # Skipping as requires morplines libs to be setup
       raise SkipTest()
 
     cluster = shared_cluster()
