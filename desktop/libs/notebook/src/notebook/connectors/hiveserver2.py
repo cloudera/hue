@@ -435,6 +435,109 @@ class HS2Api(Api):
 
     return jobs
 
+  def _get_fetch_result_spk(self, _statement, snippet):
+    """HUE-8843"""
+    db = self._get_db(snippet, cluster=self.cluster)
+    statement = {
+      'statements_count': 1,
+      'statement': _statement,
+      'has_more_statements': False,
+    }
+    session = None
+    snippet['properties'] = {}
+    query = self._prepare_hql_query(snippet, statement['statement'], session)
+
+    try:
+      db.use(query.database)
+      handle = db.client.query(query, with_multiple_session=True)
+    except QueryServerException as ex:
+      raise QueryError(ex.message, handle=statement)
+
+    server_id, server_guid = handle.get()
+    spk_handle = {
+      'secret': server_id,
+      'guid': server_guid,
+      'operation_type': handle.operation_type,
+      'has_result_set': handle.has_result_set,
+      'modified_row_count': handle.modified_row_count,
+      'log_context': handle.log_context,
+      'session_guid': handle.session_guid
+    }
+    spk_handle.update(statement)
+    spk_snippet = {
+      "type": "sparksql",
+      'result': {
+        'handle': spk_handle,
+      }
+    }
+
+    import time
+    retry_times = 0
+    while True:
+      try:
+        check_res = self.check_status(notebook=None, snippet=spk_snippet)
+        check_query_status = check_res.get('status')
+        if check_query_status == 'available':
+          break
+        else:
+          retry_times += 1
+          if retry_times >= 30:
+            raise QueryError
+          time.sleep(1)
+      except Exception as why:
+        raise why
+
+    return self.fetch_result(notebook=None, snippet=spk_snippet, start_over=True, rows=1000)
+
+  def _autocomplete_spk(self, snippet, database=None, table=None, column=None, nested=None):
+    """HUE-8843"""
+    if database is None:
+      _statement = u'show databases'
+      _spk_fetch_result = self._get_fetch_result_spk(_statement, snippet)
+      database_list = []
+      for dbname_list in _spk_fetch_result['data']:
+        for dbname in dbname_list:
+          database_list.append(dbname)
+      spk_response = {
+        'databases': database_list,
+      }
+      return spk_response
+
+    elif table is None:
+      _statement = u'show tables'
+      _spk_fetch_result = self._get_fetch_result_spk(_statement, snippet)
+      table_info_list = []
+      for table_list in _spk_fetch_result['data']:
+        table_info = {
+          'comment': None,
+          'type': 'Table',
+          'name': table_list[1]
+        }
+        table_info_list.append(table_info)
+      spk_response = {
+        'tables_meta': table_info_list,
+      }
+      return spk_response
+
+    elif column is None:
+      _statement = u'desc `{database}`.`{table}`'.format(database=database, table=table),
+      _spk_fetch_result = self._get_fetch_result_spk(_statement, snippet)
+      columns_list = []
+      extended_columns_list = []
+      for column_info_list in _spk_fetch_result['data']:
+        column_info = {
+          'comment': '' if column_info_list[2] == 'NULL' or not column_info_list[2] else column_info_list[2],
+          'type': column_info_list[1],
+          'name': column_info_list[0]
+        }
+        extended_columns_list.append(column_info)
+        columns_list.append(column_info_list[0])
+      spk_response = {
+        'columns': columns_list,
+        'extended_columns': extended_columns_list
+      }
+      return spk_response
+
 
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
@@ -450,6 +553,10 @@ class HS2Api(Api):
       snippet = notebook['snippets'][0]
       query = self._get_current_statement(notebook, snippet)['statement']
       database, table = '', ''
+
+    # Show metastore in SparkSQL
+    if snippet.get('type') == 'sparksql':
+      return self._autocomplete_spk(snippet, database, table, column)
 
     return _autocomplete(db, database, table, column, nested, query=query, cluster=self.cluster)
 
