@@ -31,9 +31,11 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install -r requirements.txt
+            # python -m venv venv
+            # . venv/bin/activate
+            # pip install -r requirements.txt
+            # TODO: here should copy from repo to the local Hue
+            echo 'ok'
 
       - save_cache:
           paths:
@@ -48,7 +50,9 @@ jobs:
       - run:
           name: run tests
           command: |
-            . venv/bin/activate
+            #. venv/bin/activate
+            cd /usr/share/hue
+            ./build/env/bin/hue
             #python manage.py test
 
       - store_artifacts:
