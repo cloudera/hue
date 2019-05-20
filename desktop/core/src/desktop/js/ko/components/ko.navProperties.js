@@ -45,7 +45,7 @@ const TEMPLATE = `
   <!-- /ko -->
   <!-- ko ifnot: loading -->
   <!-- ko ifnot: editMode -->
- 
+
   <!-- ko ifnot: window.HAS_READ_ONLY_CATALOG -->
   <div class="hue-nav-properties" data-bind="click: startEdit, visibleOnHover: { selector: '.editable-inline-action' }">
     <!-- ko if: !properties().length -->
@@ -54,10 +54,12 @@ const TEMPLATE = `
     <!-- ko foreach: properties -->
     <div class="hue-nav-property"><div class="hue-nav-property-key" data-bind="text: key, attr: { 'title': key }"></div><div class="hue-nav-property-value" data-bind="text: value, attr: { 'title': value }"></div></div>
     <!-- /ko -->
-    <div class="editable-inline-action" title="${I18n('Edit')}"><a href="javascript: void(0);" data-bind="click: startEdit"><i class="fa fa-pencil"></i></a></div>
+    <div class="editable-inline-action" title="${I18n(
+      'Edit'
+    )}"><a href="javascript: void(0);" data-bind="click: startEdit"><i class="fa fa-pencil"></i></a></div>
   </div>
   <!-- /ko -->
-  
+
   <!-- ko if: window.HAS_READ_ONLY_CATALOG && properties().length -->
   <div class="hue-nav-properties">
     <!-- ko foreach: properties -->
@@ -65,7 +67,7 @@ const TEMPLATE = `
     <!-- /ko -->
   </div>
   <!-- /ko -->
-  
+
   <!-- /ko -->
   <!-- ko if: editMode -->
   <div class="hue-nav-properties hue-nav-properties-edit">
