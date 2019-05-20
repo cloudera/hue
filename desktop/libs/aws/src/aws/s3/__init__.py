@@ -131,9 +131,9 @@ def s3datetime_to_timestamp(datetime):
   # `'z' is a bad directive in format ...` error (see https://bugs.python.org/issue6641),
   # but S3 always returns time in GMT, so `GMT` and `.000Z` can be pruned.
   try:
-    stripped = time.strptime(datetime[:-4], '%a, %d %b %Y %H:%M:%S')
     assert datetime[-4:] == ' GMT', 'Time [%s] is not in GMT.' % datetime
-  except ValueError:
+    stripped = time.strptime(datetime[:-4], '%a, %d %b %Y %H:%M:%S')
+  except AssertionError:
+    assert datetime[-5:] == re.findall('(?i)\.\d{3}Z$', datetime)[0], 'Time [%s] is not in GMT.' % datetime
     stripped = time.strptime(datetime[:-5], '%Y-%m-%dT%H:%M:%S')
-    assert datetime[-5:] == '.000Z', 'Time [%s] is not in GMT.' % datetime
   return int(calendar.timegm(stripped))
