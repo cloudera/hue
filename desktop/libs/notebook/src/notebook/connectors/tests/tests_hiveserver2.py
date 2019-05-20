@@ -477,6 +477,7 @@ def MockDb():
 
 
 class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
+  integration = True
 
   @classmethod
   def setup_class(cls):
