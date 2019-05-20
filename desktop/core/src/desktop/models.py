@@ -1315,7 +1315,7 @@ class Document2(models.Model):
     if self.can_read(user):
       return True
     else:
-      raise PopupException(_("Document does not exist or you don't have the permission to access it."))
+      raise PopupException(_("Document does not exist or you don't have the permission to access it."), error_code=401)
 
   def can_write(self, user):
     perm = self.get_permission('write')

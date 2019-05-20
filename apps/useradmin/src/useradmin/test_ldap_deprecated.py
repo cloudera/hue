@@ -412,6 +412,7 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
         finish()
 
 
+  @attr('integration')
   def test_useradmin_ldap_case_sensitivity(self):
     if is_live_cluster():
       raise SkipTest('HUE-2897: Cannot yet guarantee database is case sensitive')
@@ -490,6 +491,7 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
         finish()
 
 
+  @attr('integration')
   def test_add_ldap_users_case_sensitivity(self):
     if is_live_cluster():
       raise SkipTest('HUE-2897: Cannot yet guarantee database is case sensitive')

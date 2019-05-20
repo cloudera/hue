@@ -400,6 +400,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
         finish()
 
 
+  @attr('integration')
   def test_useradmin_ldap_user_integration(self):
     if is_live_cluster():
       raise SkipTest('HUE-2897: Skipping because the DB may not be case sensitive')
@@ -506,6 +507,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
         finish()
 
 
+  @attr('integration')
   def test_add_ldap_users(self):
     if is_live_cluster():
       raise SkipTest('HUE-2897: Skipping because the DB may not be case sensitive')
