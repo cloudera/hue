@@ -3,7 +3,3 @@
 
 FROM gethue/hue:latest
 LABEL description="Hue Image for CI"
-
-LABEL com.circleci.preserve-entrypoint=true
-
-ENTRYPOINT contacts
