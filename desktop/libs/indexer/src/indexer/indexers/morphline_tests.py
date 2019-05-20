@@ -20,6 +20,7 @@ import StringIO
 import logging
 
 from nose.tools import assert_equal, assert_true
+from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 
 from django.contrib.auth.models import User

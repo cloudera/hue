@@ -19,6 +19,7 @@
 import json
 
 from collections import OrderedDict
+from nose.plugins.attrib import attr
 from nose.tools import assert_equal, assert_true, assert_false
 
 from django.contrib.auth.models import User
@@ -382,6 +383,7 @@ class TestNotebookApiMocked(object):
     originalCluster.FS_CACHE["default"] = self.original_fs
 
 
+  @attr('integration')
   def test_export_result(self):
     notebook_json = """
       {
@@ -429,17 +431,17 @@ class TestNotebookApiMocked(object):
     assert_equal('/user/hue/path.csv', data['watch_url']['destination'], data)
 
     if is_adls_enabled():
-        response = self.client.post(reverse('notebook:export_result'), {
-            'notebook': notebook_json,
-            'snippet': json.dumps(json.loads(notebook_json)['snippets'][0]),
-            'format': json.dumps('hdfs-file'),
-            'destination': json.dumps('adl:/user/hue/path.csv'),
-            'overwrite': json.dumps(False)
-        })
+      response = self.client.post(reverse('notebook:export_result'), {
+          'notebook': notebook_json,
+          'snippet': json.dumps(json.loads(notebook_json)['snippets'][0]),
+          'format': json.dumps('hdfs-file'),
+          'destination': json.dumps('adl:/user/hue/path.csv'),
+          'overwrite': json.dumps(False)
+      })
 
-        data = json.loads(response.content)
-        assert_equal(0, data['status'], data)
-        assert_equal('adl:/user/hue/path.csv', data['watch_url']['destination'], data)
+      data = json.loads(response.content)
+      assert_equal(0, data['status'], data)
+      assert_equal('adl:/user/hue/path.csv', data['watch_url']['destination'], data)
 
   def test_download_result(self):
     notebook_json = """
