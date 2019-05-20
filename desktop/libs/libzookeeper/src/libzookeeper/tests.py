@@ -56,6 +56,7 @@ class UnitTests():
 
 class TestWithZooKeeper:
   requires_hadoop = True
+  integration = True
 
   @classmethod
   def setup_class(cls):

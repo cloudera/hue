@@ -741,6 +741,8 @@ def test_validate_path():
   finally:
     reset()
 
+
+@attr('integration')
 @attr('requires_hadoop')
 def test_config_check():
   with tempfile.NamedTemporaryFile() as cert_file:
@@ -824,6 +826,7 @@ def test_ui_customizations():
       old_conf()
 
 
+@attr('integration')
 @attr('requires_hadoop')
 def test_check_config_ajax():
   c = make_logged_in_client()

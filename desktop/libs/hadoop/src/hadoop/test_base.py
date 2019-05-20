@@ -21,6 +21,7 @@ from hadoop import pseudo_hdfs4
 
 class PseudoHdfsTestBase(object):
   requires_hadoop = True
+  integration = True
 
   @classmethod
   def setup_class(cls):
