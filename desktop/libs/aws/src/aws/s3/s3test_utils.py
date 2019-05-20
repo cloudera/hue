@@ -39,6 +39,7 @@ def generate_id(size=6, chars=string.ascii_uppercase + string.digits):
 
 
 class S3TestBase(unittest.TestCase):
+  integration = True
 
   @classmethod
   def setUpClass(cls):
@@ -97,4 +98,3 @@ class S3TestBase(unittest.TestCase):
       yield paths
     finally:
       cls.clean_up(*paths)
-

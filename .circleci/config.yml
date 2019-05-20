@@ -35,6 +35,7 @@ jobs:
             # . venv/bin/activate
             # pip install -r requirements.txt
             # TODO: here should copy from repo to the local Hue
+            # Then do 'make npm-install'
             echo 'ok'
 
       - save_cache:
