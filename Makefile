@@ -327,9 +327,6 @@ ext-clean:
 # Misc (some used by automated test scripts)
 ###############################################
 
-js-test:
-	$(ROOT)/tools/jasmine/phantomjs.runner.sh $(ROOT)/desktop/core/src/desktop/templates/jasmineRunner.html
-
 test:
 	DESKTOP_DEBUG=1 $(ENV_PYTHON) $(BLD_DIR_BIN)/hue test fast --with-xunit
 
