@@ -95,7 +95,7 @@ default:
 	@echo '  clean       : Remove desktop build products'
 	@echo '  distclean   : Remove desktop and thirdparty build products'
 # <<<< DEV ONLY
-	@echo '  docs        : Build documentation'
+	@echo '  doc 	       : Build documentation'
 	@echo '  prod        : Generate a tar file for production distribution'
 	@echo '  locales     : Extract strings and update dictionary of each locale'
 	@echo '  ace         : Builds the Ace Editor tool'
@@ -108,7 +108,7 @@ all: default
 include Makefile.tarball
 
 ###################################
-# Build docs
+# Build docs (unused)
 ###################################
 .PHONY: docs
 docs:
@@ -228,6 +228,10 @@ npm-install:
 	npm run webpack-workers
 	# Redundancy but needs to happen
 	./build/env/bin/hue collectstatic --noinput
+
+.PHONY: doc
+doc:
+	hugo --source docs/docs-site
 # END DEV ONLY >>>>
 
 
