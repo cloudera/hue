@@ -50,7 +50,7 @@ jobs:
             cp -r docs /usr/share/hue/docs
             make npm-install
 
-      # Run tests!
+      # Run tests
       - run:
           name: run python API tests
           command: |
@@ -62,6 +62,13 @@ jobs:
           command: |
             cd /usr/share/hue
             run npm test
+
+      # Code analyses
+      - run:
+          name: run js tests
+          command: |
+            cd /usr/share/hue
+            npm run lint-fix
 
       - store_artifacts:
           path: test-reports
