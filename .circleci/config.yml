@@ -49,6 +49,7 @@ jobs:
             cp -r apps /usr/share/hue/apps
             cp -r docs /usr/share/hue/docs
             make npm-install
+            make doc
 
       # Run tests
       - run:

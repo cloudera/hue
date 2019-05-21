@@ -38,7 +38,7 @@ RUN apt-get update -y && apt-get install -y \
 ADD . /hue
 WORKDIR /hue
 
-# Not doing a `make prod` equivalent, so manually getting production ini
+# Not doing a `make prod`, so manually getting production ini
 RUN rm desktop/conf/*
 COPY desktop/conf.dist desktop/conf
 
@@ -49,10 +49,15 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | sudo bash - \
 RUN PREFIX=/usr/share make install
 RUN useradd -ms /bin/bash hue && chown -R hue /usr/share/hue
 
+# Only keep install dir
 WORKDIR  /usr/share/hue
-
 RUN rm -rf /hue
 
+# Build the docs (not in Makefile yet)
+RUN snap install hugo
+RUN hugo --source docs/docs-site
+
+# Install DB connectors
 RUN ./build/env/bin/pip install psycopg2-binary
 
 COPY tools/docker/hue/conf desktop/conf
