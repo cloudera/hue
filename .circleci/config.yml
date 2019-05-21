@@ -9,7 +9,7 @@ jobs:
       # specify the version you desire here
       # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
       # - image: circleci/python:3.6.1
-      - image: gethue/hue-cci:1.0.0
+      - image: gethue/hue:latest
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -44,12 +44,34 @@ jobs:
       - run:
           name: refresh sources
           command: |
-            cp -r desktop/core/src /usr/share/hue/desktop/core/src
-            cp -r desktop/libs /usr/share/hue/desktop/libs
-            cp -r apps /usr/share/hue/apps
-            cp -r docs /usr/share/hue/docs
-            make npm-install
-            make doc
+            rm -r /usr/share/hue/desktop/core/src/desktop
+            cp -r desktop/core/src/desktop /usr/share/hue/desktop/core/src/desktop
+
+            for lib in `ls desktop/libs`
+            do
+              rm -r /usr/share/hue/desktop/libs/$lib/src/$lib
+              cp -r desktop/libs/$lib/src/$lib /usr/share/hue/desktop/libs/$lib/src/$lib
+            done
+            for lib in `ls apps | grep -v Makefile`
+            do
+              rm -r /usr/share/hue/apps/$lib/src/$lib
+              cp -r apps/$lib/src/$lib /usr/share/hue/apps/$lib/src/$lib
+            done
+            # cp -r docs /usr/share/hue/docs
+
+            rm /usr/share/hue/desktop/conf/*.ini
+            cp desktop/conf/pseudo-distributed.ini.tmpl /usr/share/hue/desktop/conf/pseudo-distributed.ini
+
+            cd /usr/share/hue
+            # make npm-install # Not available
+            npm install
+            npm run webpack
+            npm run webpack-login
+            npm run webpack-workers
+            ./build/env/bin/hue collectstatic --noinput
+            
+            # make doc
+            # hugo --source docs/docs-site
 
       # Run tests
       - run:
