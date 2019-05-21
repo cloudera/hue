@@ -155,7 +155,7 @@ desktop: virtual-env
 apps: desktop
 	@$(MAKE) npm-install
 	@$(MAKE) -C $(APPS_DIR) env-install
-
+	@$(MAKE) create-static
 
 ###################################
 # Install binary dist
@@ -226,7 +226,9 @@ npm-install:
 	npm run webpack
 	npm run webpack-login
 	npm run webpack-workers
-	# Redundancy but needs to happen
+
+.PHONY: create-static
+create-static:
 	./build/env/bin/hue collectstatic --noinput
 
 .PHONY: doc
