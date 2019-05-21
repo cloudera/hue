@@ -28,13 +28,13 @@ sudo docker build . -t hue -f tools/docker/hue/Dockerfile
 
 **Note**
 
-Feel free to replace `-t hue` in all the commands by your own docker repository and image tag, e.g. `gethue/hue:latest`
+Feel free to replace `-t hue` in all the commands by your own docker repository and image tag, e.g. `gethue/hue:latest`, `docker-account/hue:4.5.0`
 
 **Tag and push the image to the container registry**
 
 ```
-docker build . -t docker-registry.gethue.com/gethue/hue:4.4.0
-docker push docker-registry.gethue.com/gethue/hue:4.4.0
+docker build . -t gethue/hue:latest
+docker push docker.io/gethue/hue:latest
 ```
 
 
@@ -123,7 +123,7 @@ If for example the database is pointing to your localhost, if using Docker on Li
     sudo docker run -it -p 8888:8888 -v $PWD/desktop/conf/pseudo-distributed.ini:/usr/share/hue/desktop/conf/z-hue.ini --network="host" gethue/hue
 
 
-#### Docker Compose
+### Docker Compose
 
 Docker compose allows to start all the required services in one command line.
 
