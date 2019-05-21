@@ -33,6 +33,7 @@ RUN apt-get update -y && apt-get install -y \
   openssl \
   xmlsec1 \
   libxmlsec1-openssl \
+  hugo \
    && rm -rf /var/lib/apt/lists/*
 
 ADD . /hue
@@ -49,13 +50,12 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | sudo bash - \
 RUN PREFIX=/usr/share make install
 RUN useradd -ms /bin/bash hue && chown -R hue /usr/share/hue
 
-# Only keep install dir
-WORKDIR  /usr/share/hue
-RUN rm -rf /hue
-
 # Build the docs (not in Makefile yet)
-RUN snap install hugo
-RUN hugo --source docs/docs-site
+# RUN hugo --source docs/docs-site
+
+# Only keep install dir
+WORKDIR /usr/share/hue
+RUN rm -rf /hue
 
 # Install DB connectors
 RUN ./build/env/bin/pip install psycopg2-binary

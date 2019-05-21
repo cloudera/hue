@@ -78,38 +78,20 @@ and possibly fix any issues it might report.
 
 ### Documentation
 
-New website:
-
-Install https://gohugo.io/getting-started/quick-start/.
+Install [Hugo](https://gohugo.io/getting-started/quick-start/).
 
 Develop:
 
     hugo serve
 
-Release:
-
-Make sure the base URL is correct:
-
-    cd docs/docs-site
-    vim config.toml
-    baseURL='http://cloudera.github.io/hue/docs-4.4.0/'
-
 Build the doc website:
 
     hugo
 
-Add it to the github page and push:
+Release:
 
-    git checkout gh-pages
-    rm -r latest
-    cp ~/docs/docs-site/public latest -r
+    scp -r docs/docs-site/public/* root@docs.gethue.com:/var/www/docs.gethue.com
 
-    git push origin HEAD:gh-pages
-
-
-Old documentation:
-
-    make docs
 
 ### CSS / LESS
 
