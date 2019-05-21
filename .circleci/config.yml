@@ -22,39 +22,46 @@ jobs:
       - checkout
 
       # Download and cache dependencies
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "requirements.txt" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+      # - restore_cache:
+      #     keys:
+      #       - v1-dependencies-{{ checksum "requirements.txt" }}
+      #       # fallback to using the latest cache if no exact match is found
+      #       - v1-dependencies-
 
+      # - run:
+      #     name: install dependencies
+      #     command: |
+      #       python -m venv venv
+      #       . venv/bin/activate
+      #       pip install -r requirements.txt
+
+      # - save_cache:
+      #     paths:
+      #       - ./venv
+      #     key: v1-dependencies-{{ checksum "requirements.txt" }}
+
+      # Revert to traditional pip install when build refactored, in the meantime:
       - run:
-          name: install dependencies
+          name: refresh sources
           command: |
-            # python -m venv venv
-            # . venv/bin/activate
-            # pip install -r requirements.txt
-            # TODO: here should copy from repo to the local Hue
-            # Then do 'make npm-install'
-            echo 'ok'
+            cp -r desktop/core/src /usr/share/hue/desktop/core/src
+            cp -r desktop/libs /usr/share/hue/desktop/libs
+            cp -r apps /usr/share/hue/apps
+            cp -r docs /usr/share/hue/docs
+            make npm-install
 
-      - save_cache:
-          paths:
-            - ./venv
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
-
-      # run tests!
-      # this example uses Django's built-in test-runner
-      # other common Python testing frameworks include pytest and nose
-      # https://pytest.org
-      # https://nose.readthedocs.io
+      # Run tests!
       - run:
-          name: run tests
+          name: run python API tests
           command: |
-            #. venv/bin/activate
             cd /usr/share/hue
-            ./build/env/bin/hue
-            #python manage.py test
+            ./build/env/bin/hue test unit --with-xunit --with-cover
+
+      - run:
+          name: run js tests
+          command: |
+            cd /usr/share/hue
+            run npm test
 
       - store_artifacts:
           path: test-reports
