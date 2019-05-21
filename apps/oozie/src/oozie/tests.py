@@ -29,6 +29,7 @@ from datetime import datetime
 from itertools import chain
 
 from nose.plugins.skip import SkipTest
+from nose.plugins.attrib import attr
 from nose.tools import raises, assert_true, assert_false, assert_equal, assert_not_equal
 from django.contrib.auth.models import User
 from django.urls import reverse
@@ -465,6 +466,7 @@ class TestAPI(OozieMockBase):
 
     self.wf = Workflow.objects.get(name='wf-name-1', managed=True)
 
+  @attr('integration')
   def test_workflow_save(self):
     if is_live_cluster():
       raise SkipTest('HUE-2897: Skipping because DB may not support unicode')
