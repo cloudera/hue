@@ -43,7 +43,7 @@ def get_mocked_config():
   }}
 
 class TestLoginWithHadoop(PseudoHdfsTestBase):
-
+  integration = True
   reset = []
   test_username = 'test_login_with_hadoop'
 
