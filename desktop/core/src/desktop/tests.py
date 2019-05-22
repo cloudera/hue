@@ -244,8 +244,11 @@ def test_dump_config():
     resp = c.get(reverse('desktop.views.dump_config'))
     assert_true('/tmp/test_hue_conf_dir' in resp.content, resp)
   finally:
-    if prev_env_conf is not None:
+    if prev_env_conf is None:
+      os.environ.pop("HUE_CONF_DIR", None)
+    else:
       os.environ["HUE_CONF_DIR"] = prev_env_conf
+
 
 def hue_version():
   global HUE_VERSION
@@ -766,7 +769,7 @@ def test_config_check():
         for old_conf in reset:
           old_conf()
 
-      prev_env_conf = os.environ["HUE_CONF_DIR"]
+      prev_env_conf = os.environ.get("HUE_CONF_DIR")
       try:
         # Set HUE_CONF_DIR and make sure check_config returns appropriate conf
         os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
@@ -781,7 +784,10 @@ def test_config_check():
         resp = cli.get('/desktop/debug/check_config')
         assert_true('/tmp/test_hue_conf_dir' in resp.content, resp)
       finally:
-        os.environ["HUE_CONF_DIR"] = prev_env_conf
+        if prev_env_conf is None:
+          os.environ.pop("HUE_CONF_DIR", None)
+        else:
+          os.environ["HUE_CONF_DIR"] = prev_env_conf
         desktop.views.validate_by_spec = desktop.views.real_validate_by_spec
 
 def test_last_access_time():
