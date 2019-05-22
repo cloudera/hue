@@ -565,6 +565,7 @@ class TestMultipleBackendLogin(PseudoHdfsTestBase):
 
 
 class TestMultipleBackendLoginNoHadoop(object):
+  integration = True
   reset = []
   test_username = "test_mlogin_no_hadoop"
 
