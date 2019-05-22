@@ -69,7 +69,7 @@ jobs:
             npm run webpack-login
             npm run webpack-workers
             ./build/env/bin/hue collectstatic --noinput
-            
+
             # make doc
             # hugo --source docs/docs-site
 
@@ -80,18 +80,18 @@ jobs:
             cd /usr/share/hue
             ./build/env/bin/hue test unit --with-xunit --with-cover
 
-      - run:
-          name: run js tests
-          command: |
-            cd /usr/share/hue
-            run npm test
+      # - run:
+      #     name: run js tests
+      #     command: |
+      #       cd /usr/share/hue
+      #       npm run test
 
-      # Code analyses
-      - run:
-          name: run js tests
-          command: |
-            cd /usr/share/hue
-            npm run lint-fix
+      # # Code analyses
+      # - run:
+      #     name: run js tests
+      #     command: |
+      #       cd /usr/share/hue
+      #       npm run lint
 
       - store_artifacts:
           path: test-reports
