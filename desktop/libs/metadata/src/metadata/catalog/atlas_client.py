@@ -76,170 +76,40 @@ class AtlasApi(Api):
 
     return default_entity_types, entity_types
 
+  def adapt_atlas_entity_to_navigator(self, atlas_entity):
+    nav_entity = {
+      "type": atlas_entity['typeName'].lower().replace("hive_", "").replace("column", "field").upper(),
+      "name": atlas_entity['attributes']['name'],
+      "originalName": atlas_entity['attributes']['name'],
+      "original_name": atlas_entity['attributes']['name'],
+      "identity": atlas_entity['guid'],
+      "description": '',
+      "properties": [],
+      "tags": [],
+      "parentPath": ''
+    }
+
+    for atlas_classification in atlas_entity['classifications']:
+      for key, value in atlas_classification['attributes'].iteritems():
+        nav_entity['properties'].append({key: value})
+
+    return nav_entity
 
   def search_entities_interactive(self, query_s=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None, sources=None):
     try:
-      query_data = {
-        "excludeDeletedEntities": True,
-        "includeSubClassifications": True,
-        "includeSubTypes": True,
-        "includeClassificationAttributes": True,
-        "entityFilters": None,
-        "tagFilters": None,
-        "attributes": None,
-        "query": "*",
-        "limit": CATALOG.FETCH_SIZE_SEARCH_INTERACTIVE.get(),
-        "offset": offset,
-        "typeName": None,
-        "classification": None,
-        "termName": None
-      }
-
-      f = {
-          "outputFormat" : {
-            "type" : "dynamic"
-          },
-          "name" : {
-            "type" : "dynamic"
-          },
-          "lastModified" : {
-            "type" : "date"
-          },
-          "sourceType" : {
-            "type" : "dynamic"
-          },
-          "parentPath" : {
-            "type" : "dynamic"
-          },
-          "lastAccessed" : {
-            "type" : "date"
-          },
-          "type" : {
-            "type" : "dynamic"
-          },
-          "sourceId" : {
-            "type" : "dynamic"
-          },
-          "partitionColNames" : {
-            "type" : "dynamic"
-          },
-          "serDeName" : {
-            "type" : "dynamic"
-          },
-          "created" : {
-            "type" : "date"
-          },
-          "fileSystemPath" : {
-            "type" : "dynamic"
-          },
-          "compressed" : {
-            "type" : "bool"
-          },
-          "clusteredByColNames" : {
-            "type" : "dynamic"
-          },
-          "originalName" : {
-            "type" : "dynamic"
-          },
-          "owner" : {
-            "type" : "dynamic"
-          },
-          "extractorRunId" : {
-            "type" : "dynamic"
-          },
-          "userEntity" : {
-            "type" : "bool"
-          },
-          "sortByColNames" : {
-            "type" : "dynamic"
-          },
-          "inputFormat" : {
-            "type" : "dynamic"
-          },
-          "serDeLibName" : {
-            "type" : "dynamic"
-          },
-          "originalDescription" : {
-            "type" : "dynamic"
-          },
-          "lastModifiedBy" : {
-            "type" : "dynamic"
-          }
-        }
-
-      auto_field_facets = ["tags", "type"] + f.keys()
       query_s = (query_s.strip() if query_s else '') + '*'
 
-      last_query_term = [term for term in query_s.split()][-1]
+      dsl_query = 'from Asset where name like \'' + query_s + '\''
 
-      if last_query_term and last_query_term != '*':
-        last_query_term = last_query_term.rstrip('*')
-        (fname, fval) = last_query_term.split(':') if ':' in last_query_term else (last_query_term, '')
-        auto_field_facets = [f for f in auto_field_facets if f.startswith(fname)]
+      atlas_response = self._root.get('/v2/search/dsl?query=' + dsl_query)
 
-      facetFields = facetFields or auto_field_facets[:5]
+      response = {
+        "status": 0,
+        "results": []
+      }
 
-      entity_types = []
-      fq_type = []
-      if filterQueries is None:
-        filterQueries = []
-
-      if sources:
-        default_entity_types, entity_types = self._get_types_from_sources(sources)
-
-        if 'sql' in sources or 'hive' in sources or 'impala' in sources:
-          fq_type = default_entity_types
-          filterQueries.append('sourceType:HIVE OR sourceType:IMPALA')
-        elif 'hdfs' in sources:
-          fq_type = entity_types
-        elif 's3' in sources:
-          fq_type = default_entity_types
-          filterQueries.append('sourceType:s3')
-
-        if query_s.strip().endswith('type:*'): # To list all available types
-          fq_type = entity_types
-
-      search_terms = [term for term in query_s.strip().split()] if query_s else []
-      query = []
-      for term in search_terms:
-        query.append(term)
-        # if ':' not in term:
-        #   query.append(self._get_boosted_term(term))
-        # else:
-        #   name, val = term.split(':')
-        #   if val: # Allow to type non default types, e.g for SQL: type:FIEL*
-        #     if name == 'type': # Make sure type value still makes sense for the source
-        #       term = '%s:%s' % (name, val.upper())
-        #       fq_type = entity_types
-        #     if name.lower() not in ['type', 'tags', 'owner', 'originalname', 'originaldescription', 'lastmodifiedby']:
-        #       # User Defined Properties are prefixed with 'up_', i.e. "department:sales" -> "up_department:sales"
-        #       query.append('up_' + term)
-        #     else:
-        #       filterQueries.append(term)
-
-      # filterQueries.append('deleted:false')
-
-      query_data['query'] = ' '.join(query) or '*'
-
-      body = {}
-      # if fq_type:
-      #   filterQueries += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
-
-      # body['facetFields'] = facetFields or [] # Currently mandatory in API
-      # if facetPrefix:
-      #   body['facetPrefix'] = facetPrefix
-      # if facetRanges:
-      #   body['facetRanges'] = facetRanges
-      # if filterQueries:
-      #   body['filterQueries'] = filterQueries
-      # if firstClassEntitiesOnly:
-      #   body['firstClassEntitiesOnly'] = firstClassEntitiesOnly
-
-      data = json.dumps(query_data)
-      LOG.info(data)
-
-      response = self._root.post('/search/basic', data=data, contenttype=_JSON_CONTENT_TYPE)
-      response['results'] = [self._massage_entity(entity) for entity in response.pop('entities', [])]
+      for atlas_entity in atlas_response['entities']:
+        response['results'].append(self.adapt_atlas_entity_to_navigator(atlas_entity))
 
       return response
     except RestException, e:
