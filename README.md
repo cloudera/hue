@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/cloudera/hue/tree/master.svg?style=svg)](https://circleci.com/gh/cloudera/hue/tree/master)
+
 ![alt text](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/hue_logo.png "Hue Logo")
 
 
