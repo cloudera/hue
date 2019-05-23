@@ -471,7 +471,7 @@ def _create_database(request, source, destination, start_time):
   )
 
   editor_type = destination['apiHelperType']
-  on_success_url = reverse('metastore:show_tables', kwargs={'database': database})
+  on_success_url = reverse('metastore:show_tables', kwargs={'database': database}) + "?source_type=" + source.get('sourceType', 'hive')
 
   notebook = make_notebook(
       name=_('Creating database %(name)s') % destination,
