@@ -115,8 +115,15 @@ class AtlasApi(Api):
     try:
       response = {
         "status": 0,
-        "results": []
+        "results": [],
+        "facets": {
+          "tags": {}
+        }
       }
+
+      # list_tags should return empty response for Atlas
+      if (not query_s and facetFields and 'tags' in facetFields):
+        return response
 
       query_s = (query_s.strip() if query_s else '') + '*'
       atlas_dsl_query = 'from %s where name like \'%s\' limit %s' % ('hive_table', query_s, limit)
