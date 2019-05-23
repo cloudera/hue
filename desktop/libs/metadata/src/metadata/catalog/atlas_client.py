@@ -121,8 +121,13 @@ class AtlasApi(Api):
         }
       }
 
-      # list_tags should return empty response for Atlas
       if (not query_s and facetFields and 'tags' in facetFields):
+        # Classification names from Atlas can contain spaces which doesn't work with the top search at the moment
+        # so for now we return an empty list
+
+        # classification_response = self._root.get('/v2/types/typedefs?type=classification')
+        # for classification_def in classification_response['classificationDefs']:
+        #   response['facets']['tags'][classification_def['name']] = 0
         return response
 
       query_s = (query_s.strip() if query_s else '') + '*'
