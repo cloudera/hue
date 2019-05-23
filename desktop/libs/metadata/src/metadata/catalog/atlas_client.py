@@ -43,6 +43,18 @@ class AtlasApi(Api):
   DEFAULT_SEARCH_FIELDS = (('originalName', 3), ('originalDescription', 1), ('name', 10), ('description', 3), ('tags', 5))
   CATALOG_NAMESPACE = '__cloudera_internal_catalog_hue'
 
+  NAV_TO_ATLAS_TYPE = {
+    'table': 'hive_table',
+    'database': 'hive_db',
+    'field': 'hive_column'
+  }
+
+  ATLAS_TO_NAV_TYPE = {
+    'hive_table': 'TABLE',
+    'hive_db': 'DATABASE',
+    'hive_column': 'FIELD'
+  }
+
   def __init__(self, user=None):
     super(AtlasApi, self).__init__(user)
 
@@ -94,13 +106,14 @@ class AtlasApi(Api):
       "properties": {}, # Set below
       "sourceType": '', # Set below
       "tags": atlas_entity['classificationNames'],
-      "type": atlas_entity['typeName'].lower().replace("hive_", "").replace("column", "field").upper()
+      "type": self.ATLAS_TO_NAV_TYPE.get(atlas_entity['typeName'].lower()) or atlas_entity['typeName']
     }
 
+    # Convert Atlas qualified name of form db.tbl.col@cluster to parentPath of form /db/tbl
     if atlas_entity['typeName'].lower().startswith('hive_'):
       nav_entity['sourceType'] = 'HIVE'
       qualified_path_parts = re.sub(r'@.*$', '', atlas_entity['attributes'].get('qualifiedName')).split('.')
-      qualified_path_parts.pop()
+      qualified_path_parts.pop()  # it's just the parent path we want so remove the entity name
       nav_entity['parentPath'] = '/' + '/'.join(qualified_path_parts)
 
     if 'classifications' in atlas_entity:
@@ -121,6 +134,7 @@ class AtlasApi(Api):
         }
       }
 
+      # This takes care of the list_tags endpoint
       if (not query_s and facetFields and 'tags' in facetFields):
         # Classification names from Atlas can contain spaces which doesn't work with the top search at the moment
         # so for now we return an empty list
@@ -131,10 +145,25 @@ class AtlasApi(Api):
         return response
 
       query_s = (query_s.strip() if query_s else '') + '*'
-      atlas_dsl_query = 'from %s where name like \'%s\' limit %s' % ('hive_table', query_s, limit)
+
+      search_terms = [term for term in query_s.strip().split()] if query_s else []
+      query = []
+
+      atlas_type = 'hive_table'
+
+      for term in search_terms:
+        if ':' not in term:
+          query.append(term)
+        else:
+          name, val = term.rstrip('*').split(':')
+          if val and name.lower() == 'type' and self.NAV_TO_ATLAS_TYPE.get(val.lower()):
+            atlas_type = self.NAV_TO_ATLAS_TYPE.get(val.lower())
+
+      atlas_dsl_query = 'from %s where name like \'%s\' limit %s' % (atlas_type, ' '.join(query) or '*', limit)
 
       atlas_response = self._root.get('/v2/search/dsl?query=%s' % atlas_dsl_query)
 
+      # Adapt Atlas entities to Navigator structure in the results
       if 'entities' in atlas_response:
         for atlas_entity in atlas_response['entities']:
           response['results'].append(self.adapt_atlas_entity_to_navigator(atlas_entity))
