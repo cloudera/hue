@@ -418,7 +418,7 @@ class ApiHelper {
     const request = $.post({
       url: url,
       data: data,
-      dataType: options.dataType
+      dataType: options && options.dataType
     })
       .done(data => {
         if (self.successResponseIsError(data)) {
