@@ -78,95 +78,63 @@ class AtlasApi(Api):
 
   def adapt_atlas_entity_to_navigator(self, atlas_entity):
     nav_entity = {
-      "type": atlas_entity['typeName'].lower().replace("hive_", "").replace("column", "field").upper(),
-      "name": atlas_entity['attributes']['name'],
-      "originalName": atlas_entity['attributes']['name'],
-      "original_name": atlas_entity['attributes']['name'],
+      "created": 'createTime' in atlas_entity['attributes'] and atlas_entity['attributes']['createTime'],
+      "customProperties": None,
+      "description": atlas_entity['attributes'].get('description'),
       "identity": atlas_entity['guid'],
-      "description": '',
-      "properties": [],
-      "tags": [],
-      "parentPath": ''
+      "internalType": atlas_entity['typeName'],
+      "meaningNames": atlas_entity['meaningNames'], # Atlas specific
+      "meanings": atlas_entity['meanings'], # Atlas specific
+      "name": atlas_entity['attributes'].get('name'),
+      "original_name": atlas_entity['attributes'].get('name'),
+      "originalDescription": None,
+      "originalName": atlas_entity['attributes'].get('name'),
+      "owner": atlas_entity.get('owner'),
+      "parentPath": '', # Set below
+      "properties": {}, # Set below
+      "sourceType": '', # Set below
+      "tags": atlas_entity['classificationNames'],
+      "type": atlas_entity['typeName'].lower().replace("hive_", "").replace("column", "field").upper()
     }
 
-    for atlas_classification in atlas_entity['classifications']:
-      for key, value in atlas_classification['attributes'].iteritems():
-        nav_entity['properties'].append({key: value})
+    if atlas_entity['typeName'].lower().startswith('hive_'):
+      nav_entity['sourceType'] = 'HIVE'
+      qualified_path_parts = re.sub(r'@.*$', '', atlas_entity['attributes'].get('qualifiedName')).split('.')
+      qualified_path_parts.pop()
+      nav_entity['parentPath'] = '/' + '/'.join(qualified_path_parts)
+
+    if 'classifications' in atlas_entity:
+      for atlas_classification in atlas_entity['classifications']:
+        if 'attributes' in atlas_classification:
+          for key, value in atlas_classification['attributes'].iteritems():
+            nav_entity['properties'][key] = value
 
     return nav_entity
 
   def search_entities_interactive(self, query_s=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None, sources=None):
     try:
-      query_s = (query_s.strip() if query_s else '') + '*'
-
-      dsl_query = 'from Asset where name like \'' + query_s + '\''
-
-      atlas_response = self._root.get('/v2/search/dsl?query=' + dsl_query)
-
       response = {
         "status": 0,
         "results": []
       }
 
-      for atlas_entity in atlas_response['entities']:
-        response['results'].append(self.adapt_atlas_entity_to_navigator(atlas_entity))
+      query_s = (query_s.strip() if query_s else '') + '*'
+      atlas_dsl_query = 'from %s where name like \'%s\' limit %s' % ('hive_table', query_s, limit)
+
+      atlas_response = self._root.get('/v2/search/dsl?query=%s' % atlas_dsl_query)
+
+      if 'entities' in atlas_response:
+        for atlas_entity in atlas_response['entities']:
+          response['results'].append(self.adapt_atlas_entity_to_navigator(atlas_entity))
 
       return response
     except RestException, e:
       print(e)
-      LOG.error('Failed to search for entities with search query: %s' % json.dumps(body))
+      LOG.error('Failed to search for entities with search query: %s' % atlas_dsl_query)
       if e.code == 401:
         raise CatalogAuthException(_('Failed to authenticate.'))
       else:
         raise CatalogApiException(e.message)
-
-  def _massage_entity(self, entity):
-    return {
-        "name": entity['attributes'].get('name', entity['attributes'].get('qualifiedName')),
-        "description": entity['attributes'].get('description'),
-        "owner": entity.get('owner'),
-        "sourceType": entity['typeName'],
-        "partColNames":[
-            # "date"
-         ],
-         "type": "TABLE", # TODO
-         "internalType": entity['typeName'],
-         "status": entity['status'], # Specific to Atlas
-         "tags": entity['classificationNames'],
-         "classificationNames": entity['classificationNames'], # Specific to Atlas
-         "meaningNames": entity['meaningNames'], # Specific to Atlas
-         "meanings": entity['meanings'], # [{"displayText":"Stock","confidence":0, "termGuid":"32892437-931b-43d3-9aad-400f7f8d2a73","relationGuid":"e8856c09-a3a1-4a85-b841-709b30f93923"}] # Specific to Atlas
-         "originalDescription": None,
-         "customProperties": None,
-         "properties":{
-         },
-         "identity": entity['guid'],
-         "created": 'createTime' in entity['attributes'] and entity['attributes']['createTime'], #"2019-03-28T19:30:30.000Z",
-         "parentPath": "/default",
-         "originalName": entity['attributes'].get('qualifiedName'),
-        #  "lastAccessed":"1970-01-01T00:00:00.000Z"
-        #  "clusteredByColNames":null,
-        #  "outputFormat":"org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat",
-        #  "firstClassParentId":null,
-        #  "extractorRunId":"7##1",
-        #  "sourceId":"7",
-        #  "lastModified":null,
-        #  "packageName":"nav",
-        #  "compressed":false,
-        #  "metaClassName":"hv_table"
-        #  "deleted":false,
-        #  "technicalProperties":null,
-        #  "userEntity":false,
-        #  "serdeProps":null,
-        #  "serdeLibName":"org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
-        #  "lastModifiedBy":null,
-        #  "selectionName":"web_logs",
-        #  "sortByColNames":null,
-        #  "inputFormat":"org.apache.hadoop.mapred.TextInputFormat",
-        #  "serdeName":null,
-        #  "deleteTime":null,
-        #  "fileSystemPath":"hdfs://self-service-dw-1.gce.cloudera.com:8020/user/hive/warehouse/web_logs",
-      }
 
   def search_entities(self, query_s, limit=100, offset=0, raw_query=False, **filters):
     pass
