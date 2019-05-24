@@ -124,6 +124,91 @@ class AtlasApi(Api):
 
     return nav_entity
 
+  def parse_atlas_response(self, atlas_response):
+    '''
+    REQUEST: hue:8889/metadata/api/navigator/find_entity?type=database&name=default
+    SAMPLE response for Navigator find_entity response
+    {"status": 0, "entity": {
+    "customProperties": null,
+    "deleteTime": null,
+     "fileSystemPath": "hdfs://nightly6x-1.vpc.cloudera.com:8020/user/hive/warehouse",
+     "description": null,
+     "params": null,
+      "type": "DATABASE",
+      "internalType": "hv_database",
+      "sourceType": "HIVE",
+      "tags": [],
+      "deleted": false, "technicalProperties": null,
+      "userEntity": false,
+      "originalDescription": "Default Hive database",
+      "metaClassName": "hv_database",
+      "properties": {"__cloudera_internal__hueLink": "https://nightly6x-1.vpc.cloudera.com:8889/hue/metastore/tables/default"},
+      "identity": "23",
+      "firstClassParentId": null,
+      "name": null,
+      "extractorRunId": "7##1",
+      "sourceId": "7",
+       "packageName": "nav",
+       "parentPath": null, "originalName": "default"}}
+    '''
+    response = {
+      "status": 0,
+      "entity": []
+    }
+    if not atlas_response['entities']:
+      LOG.error('No entities in atlas response to parse: %s' % json.dumps(atlas_response))
+    for atlas_entity in atlas_response['entities']:
+      response['entity'].append(self.adapt_atlas_entity_to_navigator(atlas_entity))
+    return response['entity'][0]
+
+  def get_database(self, name):
+    # Search with Atlas API for hive database with specific name
+    try:
+      dsl_query = '+'.join(['hive_db', 'where', 'name=%s']) % name
+      atlas_response = self._root.get('/v2/search/dsl?query=%s' % dsl_query, headers=self.__headers,
+                                      params=self.__params)
+      return self.parse_atlas_response(atlas_response)
+    except RestException, e:
+      LOG.error('Failed to search for entities with search query: %s' % dsl_query)
+      if e.code == 401:
+        raise CatalogAuthException(_('Failed to authenticate.'))
+      else:
+        raise CatalogApiException(e.message)
+
+  def get_table(self, database_name, table_name, is_view=False):
+    # Search with Atlas API for hive tables with specific name
+    # TODO: Need figure out way how to identify the cluster info for exact qualifiedName or use startsWith 'db.table.column'
+    try:
+      qualifiedName = '%s.%s@cl1' % (database_name, table_name)
+      dsl_query = '+'.join(['hive_table', 'where', 'qualifiedName=\"%s\"']) % qualifiedName
+      atlas_response = self._root.get('/v2/search/dsl?query=%s' % dsl_query, headers=self.__headers,
+                                      params=self.__params)
+      return self.parse_atlas_response(atlas_response)
+
+    except RestException, e:
+      LOG.error('Failed to search for entities with search query: %s' % dsl_query)
+      if e.code == 401:
+        raise CatalogAuthException(_('Failed to authenticate.'))
+      else:
+        raise CatalogApiException(e.message)
+
+  def get_field(self, database_name, table_name, field_name):
+    # Search with Atlas API for hive tables with specific qualified name
+    # TODO: Figure out how to identify the cluster info for exact qualifiedName
+    # TODO: query string for search with qualifiedName startsWith sys.test5.id
+    try:
+      qualifiedName = '%s.%s.%s@cl1' % (database_name, table_name, field_name)
+      dsl_query = '+'.join(['hive_column', 'where', 'qualifiedName=\"%s\"']) % qualifiedName
+      atlas_response = self._root.get('/v2/search/dsl?query=%s' % dsl_query, headers=self.__headers,
+                                      params=self.__params)
+      return self.parse_atlas_response(atlas_response)
+    except RestException, e:
+      LOG.error('Failed to search for entities with search query: %s' % dsl_query)
+      if e.code == 401:
+        raise CatalogAuthException(_('Failed to authenticate.'))
+      else:
+        raise CatalogApiException(e.message)
+
   def search_entities_interactive(self, query_s=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None, sources=None):
     try:
       response = {
@@ -164,13 +249,9 @@ class AtlasApi(Api):
       atlas_response = self._root.get('/v2/search/dsl?query=%s' % atlas_dsl_query)
 
       # Adapt Atlas entities to Navigator structure in the results
-      if 'entities' in atlas_response:
-        for atlas_entity in atlas_response['entities']:
-          response['results'].append(self.adapt_atlas_entity_to_navigator(atlas_entity))
+      return self.parse_atlas_response(atlas_response)
 
-      return response
     except RestException, e:
-      print(e)
       LOG.error('Failed to search for entities with search query: %s' % atlas_dsl_query)
       if e.code == 401:
         raise CatalogAuthException(_('Failed to authenticate.'))
@@ -189,58 +270,10 @@ class AtlasApi(Api):
       LOG.error(msg)
       raise CatalogApiException(e.message)
 
-
-  def find_entity(self, source_type, type, name, **filters):
-    """
-    GET /api/v3/entities?query=((sourceType:<source_type>)AND(type:<type>)AND(originalName:<name>))
-    http://cloudera.github.io/navigator/apidocs/v3/path__v3_entities.html
-    """
-    try:
-      params = self.__params
-
-      query_filters = {
-        'sourceType': source_type,
-        'originalName': name,
-        'deleted': 'false'
-      }
-
-      for key, value in filters.items():
-        query_filters[key] = value
-
-      filter_query = 'AND'.join('(%s:%s)' % (key, value) for key, value in query_filters.items())
-      filter_query = '%(type)s AND %(filter_query)s' % {
-        'type': '(type:%s)' % 'TABLE OR type:VIEW' if type == 'TABLE' else type, # Impala does not always say that a table is actually a view
-        'filter_query': filter_query
-      }
-
-      source_ids = self.get_cluster_source_ids()
-      if source_ids:
-        filter_query = source_ids + '(' + filter_query + ')'
-
-      params += (
-        ('query', filter_query),
-        ('offset', 0),
-        ('limit', 2),  # We are looking for single entity, so limit to 2 to check for multiple results
-      )
-
-      response = self._root.get('entities', headers=self.__headers, params=params)
-
-      if not response:
-        raise CatalogEntityDoesNotExistException('Could not find entity with query filters: %s' % str(query_filters))
-      elif len(response) > 1:
-        raise CatalogApiException('Found more than 1 entity with query filters: %s' % str(query_filters))
-
-      return response[0]
-    except RestException, e:
-      msg = 'Failed to find entity: %s' % str(e)
-      LOG.error(msg)
-      raise CatalogApiException(e.message)
-
-
   def get_entity(self, entity_id):
     """
-    GET /api/v3/entities/:id
-    http://cloudera.github.io/navigator/apidocs/v3/path__v3_entities_-id-.html
+    # TODO: get entity by Atlas __guid or qualifiedName
+    GET /v2/search/dsl?query=?
     """
     try:
       return self._root.get('entities/%s' % entity_id, headers=self.__headers, params=self.__params)
