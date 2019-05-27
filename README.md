@@ -1,4 +1,5 @@
 [![CircleCI](https://circleci.com/gh/cloudera/hue/tree/master.svg?style=svg)](https://circleci.com/gh/cloudera/hue/tree/master)
+![Stack Exchange monthly questions](https://img.shields.io/stackexchange/stackoverflow/qm/hue.svg?link=https://stackoverflow.com/questions/tagged/hue)
 
 ![alt text](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/hue_logo.png "Hue Logo")
 
