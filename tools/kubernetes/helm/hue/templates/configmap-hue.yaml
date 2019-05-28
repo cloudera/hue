@@ -5,6 +5,7 @@ metadata:
 data:
   hue-ini: |
     [desktop]
+
     [[database]]
     engine={{ .Values.hue.database.engine }}
     host={{ .Values.hue.database.host }}
