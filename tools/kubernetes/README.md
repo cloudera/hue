@@ -20,7 +20,7 @@ Assuming you have a Kubernetes cluster configured with Helm installed and images
 
 ## Quick Start
 
-    cd tools/kubernetes/helm/hue
+    cd tools/kubernetes/helm
 
     helm install hue -n hue
 
