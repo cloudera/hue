@@ -67,8 +67,10 @@ except ImportError, e:
 try:
   from jobbrowser.views import get_job
   from jobbrowser.conf import ENABLE_QUERY_BROWSER
+  has_query_browser = ENABLE_QUERY_BROWSER.get()
 except (AttributeError, ImportError), e:
   LOG.warn("Job Browser app is not enabled")
+  has_query_browser = False
 
 
 DEFAULT_HIVE_ENGINE = 'mr'
@@ -421,7 +423,7 @@ class HS2Api(Api):
         'started': job.get('started', False),
         'finished': job.get('finished', False)
       } for job in jobs_with_state]
-    elif snippet['type'] == 'impala' and ENABLE_QUERY_BROWSER.get():
+    elif snippet['type'] == 'impala' and has_query_browser:
       query_id = unpack_guid_base64(snippet['result']['handle']['guid'])
       progress = min(self.progress(notebook, snippet, logs), 99) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
       jobs = [{
