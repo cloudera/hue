@@ -1,5 +1,6 @@
-[![CircleCI](https://circleci.com/gh/cloudera/hue/tree/master.svg?style=svg)](https://circleci.com/gh/cloudera/hue/tree/master)
-![Stack Exchange monthly questions](https://img.shields.io/stackexchange/stackoverflow/qm/hue.svg?link=https://stackoverflow.com/questions/tagged/hue)
+[![CircleCI](https://img.shields.io/circleci/build/github/cloudera/hue/master.svg)](https://circleci.com/gh/cloudera/hue/tree/master)
+[![DockerPulls](https://img.shields.io/docker/pulls/gethue/hue.svg)](https://registry.hub.docker.com/u/gethue/hue/)
+![GitHub contributors](https://img.shields.io/github/contributors-anon/cloudera/hue.svg)
 
 ![alt text](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/hue_logo.png "Hue Logo")
 
