@@ -168,7 +168,7 @@ class AtlasApi(Api):
       atlas_response = self._root.get('/v2/search/dsl?query=%s' % dsl_query, headers=self.__headers,
                                       params=self.__params)
       return self.parse_atlas_response(atlas_response)
-    except RestException, e:
+    except RestException as e:
       LOG.error('Failed to search for entities with search query: %s' % dsl_query)
       if e.code == 401:
         raise CatalogAuthException(_('Failed to authenticate.'))
@@ -185,7 +185,7 @@ class AtlasApi(Api):
                                       params=self.__params)
       return self.parse_atlas_response(atlas_response)
 
-    except RestException, e:
+    except RestException as e:
       LOG.error('Failed to search for entities with search query: %s' % dsl_query)
       if e.code == 401:
         raise CatalogAuthException(_('Failed to authenticate.'))
@@ -202,7 +202,7 @@ class AtlasApi(Api):
       atlas_response = self._root.get('/v2/search/dsl?query=%s' % dsl_query, headers=self.__headers,
                                       params=self.__params)
       return self.parse_atlas_response(atlas_response)
-    except RestException, e:
+    except RestException as e:
       LOG.error('Failed to search for entities with search query: %s' % dsl_query)
       if e.code == 401:
         raise CatalogAuthException(_('Failed to authenticate.'))
@@ -244,9 +244,23 @@ class AtlasApi(Api):
           if val and name.lower() == 'type' and self.NAV_TO_ATLAS_TYPE.get(val.lower()):
             atlas_type = self.NAV_TO_ATLAS_TYPE.get(val.lower())
 
-      atlas_dsl_query = 'from %s where name like \'%s\' limit %s' % (atlas_type, ' '.join(query) or '*', limit)
+      data = json.dumps({
+        "attributes": None,
+        "classification": None,
+        "entityFilters": None,
+        "excludeDeletedEntities": True,
+        "includeClassificationAttributes": True,
+        "includeSubClassifications": True,
+        "includeSubTypes": True,
+        "limit": limit,
+        "offset": 0,
+        "query": ' '.join(query),
+        "tagFilters": None,
+        "termName": None,
+        "typeName": atlas_type
+      })
 
-      atlas_response = self._root.get('/v2/search/dsl?query=%s' % atlas_dsl_query)
+      atlas_response = self._root.post('/v2/search/basic', data=data, contenttype=_JSON_CONTENT_TYPE)
 
       # Adapt Atlas entities to Navigator structure in the results
       if 'entities' in atlas_response:
@@ -254,9 +268,8 @@ class AtlasApi(Api):
           response['results'].append(self.adapt_atlas_entity_to_navigator(atlas_entity))
 
       return response
-    except RestException, e:
-      print(e)
-      LOG.error('Failed to search for entities with search query: %s' % atlas_dsl_query)
+    except RestException as e:
+      LOG.error('Failed to search for entities with search query: %s' % data)
       if e.code == 401:
         raise CatalogAuthException(_('Failed to authenticate.'))
       else:
@@ -291,8 +304,7 @@ class AtlasApi(Api):
           found_entities.append(self.adapt_atlas_entity_to_navigator(atlas_entity))
 
       return found_entities
-    except RestException, e:
-      print(e)
+    except RestException as e:
       LOG.error('Failed to search for entities with search query: %s' % atlas_dsl_query)
       if e.code == 401:
         raise CatalogAuthException(_('Failed to authenticate.'))
@@ -302,7 +314,7 @@ class AtlasApi(Api):
   def suggest(self, prefix=None):
     try:
       return self._root.get('interactive/suggestions?query=%s' % (prefix or '*'))
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to search for entities with search query: %s' % prefix
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -314,7 +326,7 @@ class AtlasApi(Api):
     """
     try:
       return self._root.get('entities/%s' % entity_id, headers=self.__headers, params=self.__params)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to get entity %s: %s' % (entity_id, str(e))
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -337,7 +349,7 @@ class AtlasApi(Api):
       data = json.dumps(properties)
 
       return self._root.put('entities/%(identity)s' % entity, params=self.__params, data=data, contenttype=_JSON_CONTENT_TYPE, allow_redirects=True, clear_cookies=True)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to update entity %s: %s' % (entity['identity'], e)
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -406,7 +418,7 @@ class AtlasApi(Api):
       )
 
       return self._root.get('lineage', headers=self.__headers, params=params)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to get lineage for entity ID %s: %s' % (entity_id, str(e))
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -416,7 +428,7 @@ class AtlasApi(Api):
     try:
       data = json.dumps({'name': namespace, 'description': description})
       return self._root.post('models/namespaces/', data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to create namespace: %s' % namespace
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -425,7 +437,7 @@ class AtlasApi(Api):
   def get_namespace(self, namespace):
     try:
       return self._root.get('models/namespaces/%(namespace)s' % {'namespace': namespace})
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to get namespace: %s' % namespace
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -435,7 +447,7 @@ class AtlasApi(Api):
     try:
       data = json.dumps(properties)
       return self._root.post('models/namespaces/%(namespace)s/properties' % {'namespace': namespace}, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to create namespace %s property' % namespace
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -444,7 +456,7 @@ class AtlasApi(Api):
   def get_namespace_properties(self, namespace):
     try:
       return self._root.get('models/namespaces/%(namespace)s/properties' % {'namespace': namespace})
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to create namespace %s property' % namespace
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -454,7 +466,7 @@ class AtlasApi(Api):
     try:
       data = json.dumps(properties)
       return self._root.post('models/packages/nav/classes/%(class)s/properties' % {'class': clazz}, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to map class %s property' % clazz
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -463,7 +475,7 @@ class AtlasApi(Api):
   def get_model_properties_mapping(self):
     try:
       return self._root.get('models/properties/mappings')
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to get models properties mappings'
       LOG.error(msg)
       raise CatalogApiException(e.message)
