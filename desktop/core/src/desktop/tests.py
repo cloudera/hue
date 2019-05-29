@@ -809,6 +809,7 @@ def test_ui_customizations():
 
   try:
     c = make_logged_in_client()
+    c.logout()
     resp = c.get('/hue/accounts/login/', follow=False)
     assert_true(custom_message in resp.content, resp)
     resp = c.get('/hue/about', follow=True)
