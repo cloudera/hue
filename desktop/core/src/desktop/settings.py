@@ -21,6 +21,7 @@
 # as local_settings.py.
 
 import gc
+import json
 import logging
 import os
 import pkg_resources
@@ -383,6 +384,9 @@ CACHES = {
         'LOCATION': 'unique-hue'
     }
 }
+CACHES_CELERY_KEY = 'celery'
+if desktop.conf.TASK_SERVER.ENABLED.get():
+  CACHES[CACHES_CELERY_KEY] = json.loads(desktop.conf.TASK_SERVER.EXECUTION_STORAGE.get())
 
 # Configure sessions
 SESSION_COOKIE_NAME = desktop.conf.SESSION.COOKIE_NAME.get()
@@ -659,7 +663,7 @@ if desktop.conf.TASK_SERVER.ENABLED.get():
   CELERY_BROKER_URL = desktop.conf.TASK_SERVER.BROKER_URL.get()
 
   CELERY_ACCEPT_CONTENT = ['json']
-  CELERY_RESULT_BACKEND = desktop.conf.TASK_SERVER.RESULT_BACKEND.get()
+  CELERY_RESULT_BACKEND = desktop.conf.TASK_SERVER.CELERY_RESULT_BACKEND.get()
   CELERY_TASK_SERIALIZER = 'json'
 
   CELERYD_OPTS = desktop.conf.TASK_SERVER.RESULT_CELERYD_OPTS.get()

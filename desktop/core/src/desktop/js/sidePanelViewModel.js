@@ -69,10 +69,8 @@ class SidePanelViewModel {
       }
     });
 
-    huePubSub.subscribe('active.snippet.type.changed', snippetType => {
-      self.rightAssistAvailable(
-        snippetType === 'impala' || snippetType === 'hive' || snippetType === 'pig'
-      );
+    huePubSub.subscribe('active.snippet.type.changed', details => {
+      self.rightAssistAvailable(details.isSqlDialect || details.type === 'pig');
     });
 
     huePubSub.publish('get.current.app.name');

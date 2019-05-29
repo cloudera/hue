@@ -986,7 +986,7 @@ var MetastoreTable = (function () {
   MetastoreTable.prototype.showImportData = function () {
     var self = this;
     $("#import-data-modal").empty().html('<div class="modal-header"><button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button><h2 class="modal-title"></h2></div><div class="modal-body"><i class="fa fa-spinner fa-spin fa-2x muted"></i></div>').modal("show");
-    $.get('/metastore/table/' + self.catalogEntry.path.join('/') + '/load', function (data) {
+    $.get('/metastore/table/' + self.catalogEntry.path.join('/') + '/load?source_type=' + self.catalogEntry.getSourceType(), function (data) {
       $("#import-data-modal").html(data['data']);
     }).fail(function (xhr) {
       $(document).trigger("error", xhr.responseText);

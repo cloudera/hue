@@ -37,6 +37,7 @@ LOG = logging.getLogger(__name__)
 
 class WebhdfsTests(unittest.TestCase):
   requires_hadoop = True
+  integration = True
 
   @classmethod
   def setUpClass(cls):

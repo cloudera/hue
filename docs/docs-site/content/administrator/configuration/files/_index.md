@@ -143,8 +143,34 @@ Alternatively (but not recommended for production or secure environments), you c
 
 ## HBase
 
-In the `[hbase]` section of the configuration file, you should
-specify:
+Specify the comma-separated list of HBase Thrift servers for clusters in the format of "(name|host:port)":
 
-    hbase_clusters:
-      Comma-separated list of HBase Thrift servers for clusters in the format of "(name|host:port)".
+    [hbase]
+    hbase_clusters=(Cluster|localhost:9090)
+
+HBase Impersonation:
+
+Enable impersonation for the Thrift server by adding the following properties to hbase-site.xml on each Thrift gateway:
+
+    <property>
+      <name>hbase.regionserver.thrift.http</name>
+      <value>true</value>
+    </property>
+    <property>
+      <name>hbase.thrift.support.proxyuser</name>
+      <value>true/value>
+    </property>
+
+Note: If you use framed transport, you cannot use doAs impersonation, because SASL does not work with Thrift framed transport.
+
+doAs Impersonation provides a flexible way to use the same client to impersonate multiple principals. doAs is supported only in Thrift 1.
+Enable doAs support by adding the following properties to hbase-site.xml on each Thrift gateway:
+
+    <property>
+      <name>hbase.regionserver.thrift.http</name>
+      <value>true</value>
+    </property>
+    <property>
+      <name>hbase.thrift.support.proxyuser</name>
+      <value>true/value>
+    </property>

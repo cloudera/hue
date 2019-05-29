@@ -43,7 +43,7 @@ def get_mocked_config():
   }}
 
 class TestLoginWithHadoop(PseudoHdfsTestBase):
-
+  integration = True
   reset = []
   test_username = 'test_login_with_hadoop'
 
@@ -64,6 +64,7 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
     self.c = Client()
 
     self.reset.append( conf.AUTH.BACKEND.set_for_testing(['desktop.auth.backend.AllowFirstUserDjangoBackend']) )
+    self.reset.append(conf.LDAP.SYNC_GROUPS_ON_LOGIN.set_for_testing(False))
 
   def tearDown(self):
     User.objects.all().delete()
@@ -117,7 +118,7 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
       }, follow=True)
 
     assert_equal(200, response.status_code, "Expected ok status.")
-    assert_true('/beeswax' in response.content, response.content)
+    assert_true('/about' in response.content, response.content)
     # Custom login process should not do 'http-equiv="refresh"' but call the correct view
     # 'Could not create home directory.' won't show up because the messages are consumed before
 
@@ -183,6 +184,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
     self.c = Client()
     self.reset.append( conf.AUTH.BACKEND.set_for_testing(['desktop.auth.backend.LdapBackend']) )
     self.reset.append(conf.LDAP.LDAP_URL.set_for_testing('does not matter'))
+    self.reset.append(conf.LDAP.SYNC_GROUPS_ON_LOGIN.set_for_testing(False))
 
   def tearDown(self):
     User.objects.all().delete()
@@ -206,6 +208,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
         'password': "ldap1",
         'server': "LDAP"
     })
+
     assert_equal(302, response.status_code, "Expected ok redirect status.")
     assert_true(self.cluster.fs.do_as_user(self.test_username, self.fs.exists, "/user/%s" % self.test_username))
 
@@ -281,7 +284,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
         'server': "LDAP"
     }, follow=True)
     assert_equal(200, response.status_code, "Expected ok status.")
-    assert_true('/beeswax' in response.content, response.content)
+    assert_true('/about' in response.content, response.content)
     # Custom login process should not do 'http-equiv="refresh"' but call the correct view
     # 'Could not create home directory.' won't show up because the messages are consumed before
 
@@ -495,7 +498,7 @@ class TestRemoteUserLogin(PseudoHdfsTestBase):
 
 
 class TestMultipleBackendLogin(PseudoHdfsTestBase):
-
+  integration = True
   reset = []
   test_username = "test_multiple_login"
 
@@ -562,6 +565,7 @@ class TestMultipleBackendLogin(PseudoHdfsTestBase):
 
 
 class TestMultipleBackendLoginNoHadoop(object):
+  integration = True
   reset = []
   test_username = "test_mlogin_no_hadoop"
 

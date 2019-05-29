@@ -33,6 +33,6 @@ class Command(BaseCommand):
     stats = Analytics.admin_stats()
     msg = '\n'.join(['%s\t=\t%s' % stat for stat in stats])
 
-    mail.mail_admins(subject='Query Stats', message=msg, fail_silently=True)
+    mail.mail_admins(subject='Query Stats', message=msg, fail_silently=False)
 
     print('Done.')

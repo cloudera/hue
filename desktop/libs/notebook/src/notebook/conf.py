@@ -35,15 +35,15 @@ SHOW_NOTEBOOKS = Config(
 def _remove_duplications(a_list):
   return list(OrderedDict.fromkeys(a_list))
 
-def check_permissions(user, interpreter):
-  user_apps = appmanager.get_apps_dict(user)
+def check_permissions(user, interpreter, user_apps=None):
+  if user_apps is None:
+    user_apps = appmanager.get_apps_dict(user) # Expensive method
   return (interpreter == 'hive' and 'hive' not in user_apps) or \
          (interpreter == 'impala' and 'impala' not in user_apps) or \
          (interpreter == 'pig' and 'pig' not in user_apps) or \
          (interpreter == 'solr' and 'search' not in user_apps) or \
          (interpreter in ('spark', 'pyspark', 'r', 'jar', 'py', 'sparksql') and 'spark' not in user_apps) or \
          (interpreter in ('java', 'spark2', 'mapreduce', 'shell', 'sqoop1', 'distcp') and 'oozie' not in user_apps)
-
 
 
 def get_ordered_interpreters(user=None):
@@ -56,9 +56,10 @@ def get_ordered_interpreters(user=None):
   interpreters = INTERPRETERS.get()
   interpreters_shown_on_wheel = _remove_duplications(INTERPRETERS_SHOWN_ON_WHEEL.get())
 
+  user_apps = appmanager.get_apps_dict(user)
   user_interpreters = []
   for interpreter in interpreters:
-    if check_permissions(user, interpreter):
+    if check_permissions(user, interpreter, user_apps=user_apps):
       pass # Not allowed
     else:
       user_interpreters.append(interpreter)
@@ -90,7 +91,8 @@ def get_ordered_interpreters(user=None):
       "type": i['type'],
       "interface": i['interface'],
       "options": i['options'],
-      "is_sql": i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy", "hms"],
+      "is_sql": i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy"],
+      "is_catalog": i['interface'] in ["hms",],
     }
     for i in reordered_interpreters
   ]

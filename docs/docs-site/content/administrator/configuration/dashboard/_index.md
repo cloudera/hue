@@ -1,5 +1,5 @@
 ---
-title: "Dashboard & Query Builder"
+title: "Dashboard"
 date: 2019-03-13T18:28:09-07:00
 draft: false
 weight: 3
@@ -13,8 +13,18 @@ They consist in 3 types:
 * Query Builder (alpha)
 * Multi-widget reporting (alpha)
 
-This application is getting improved via SQL Dashboards and Query Builder [HUE-3228](https://issues.cloudera.org/browse/HUE-3228).
+## Solr Search
 
+In the `[search]` section of the configuration file, you should
+specify:
+
+    [search]
+      # URL of the Solr Server
+      solr_url=http://solr-server.com:8983/solr/
+
+## SQL
+
+This application is getting improved via SQL Dashboards and Query Builder [HUE-3228](https://issues.cloudera.org/browse/HUE-3228).
 
       [dashboard]
 
