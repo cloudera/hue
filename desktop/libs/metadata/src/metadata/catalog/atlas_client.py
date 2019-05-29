@@ -220,13 +220,10 @@ class AtlasApi(Api):
       }
 
       # This takes care of the list_tags endpoint
-      if (not query_s and facetFields and 'tags' in facetFields):
-        # Classification names from Atlas can contain spaces which doesn't work with the top search at the moment
-        # so for now we return an empty list
-
-        # classification_response = self._root.get('/v2/types/typedefs?type=classification')
-        # for classification_def in classification_response['classificationDefs']:
-        #   response['facets']['tags'][classification_def['name']] = 0
+      if not query_s and facetFields and 'tags' in facetFields:
+        classification_response = self._root.get('/v2/types/typedefs?type=classification')
+        for classification_def in classification_response['classificationDefs']:
+          response['facets']['tags'][classification_def['name']] = -1
         return response
 
       query_s = (query_s.strip() if query_s else '') + '*'
@@ -234,7 +231,7 @@ class AtlasApi(Api):
       search_terms = [term for term in query_s.strip().split()] if query_s else []
       query = []
 
-      atlas_type = 'hive_table'
+      atlas_type = None
 
       for term in search_terms:
         if ':' not in term:
@@ -243,6 +240,11 @@ class AtlasApi(Api):
           name, val = term.rstrip('*').split(':')
           if val and name.lower() == 'type' and self.NAV_TO_ATLAS_TYPE.get(val.lower()):
             atlas_type = self.NAV_TO_ATLAS_TYPE.get(val.lower())
+          if val and name.lower() in ['tag', 'tags','classification']:
+            if not atlas_type:
+              atlas_type = 'Asset' # 'Asset' contains all types of entities so we need to filter below
+            # Atlas filters by classification name on default
+            query.append(val + '*')
 
       data = json.dumps({
         "attributes": None,
@@ -257,7 +259,7 @@ class AtlasApi(Api):
         "query": ' '.join(query),
         "tagFilters": None,
         "termName": None,
-        "typeName": atlas_type
+        "typeName": atlas_type or 'hive_table'
       })
 
       atlas_response = self._root.post('/v2/search/basic', data=data, contenttype=_JSON_CONTENT_TYPE)
@@ -265,7 +267,8 @@ class AtlasApi(Api):
       # Adapt Atlas entities to Navigator structure in the results
       if 'entities' in atlas_response:
         for atlas_entity in atlas_response['entities']:
-          response['results'].append(self.adapt_atlas_entity_to_navigator(atlas_entity))
+          if atlas_type != 'Asset' or atlas_entity['typeName'].lower() in ['hive_db', 'hive_table', 'hive_column']:
+            response['results'].append(self.adapt_atlas_entity_to_navigator(atlas_entity))
 
       return response
     except RestException as e:
