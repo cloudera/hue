@@ -42,7 +42,7 @@ def check_permissions(user, interpreter, user_apps=None):
          (interpreter == 'impala' and 'impala' not in user_apps) or \
          (interpreter == 'pig' and 'pig' not in user_apps) or \
          (interpreter == 'solr' and 'search' not in user_apps) or \
-         (interpreter in ('spark', 'pyspark', 'r', 'jar', 'py') and 'spark' not in user_apps) or \
+         (interpreter in ('spark', 'pyspark', 'r', 'jar', 'py', 'sparksql') and 'spark' not in user_apps) or \
          (interpreter in ('java', 'spark2', 'mapreduce', 'shell', 'sqoop1', 'distcp') and 'oozie' not in user_apps)
 
 
