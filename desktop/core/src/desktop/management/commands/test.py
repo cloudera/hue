@@ -34,7 +34,6 @@ import logging
 
 from desktop import appmanager
 from desktop.lib import django_mako
-from desktop.management.commands import test_windmill
 
 if six.PY3:
     from types import SimpleNamespace
@@ -145,7 +144,10 @@ class Command(BaseCommand):
       nose_args = args + all_apps
     elif args[0] == "fast":
       nose_args = args + all_apps + ["-a", "!requires_hadoop"]
+    elif args[0] == "unit":
+      nose_args = args + all_apps + ["-a", "!integration"]
     elif args[0] == "windmill":
+      from desktop.management.commands import test_windmill
       args = args[1:]
       ret = test_windmill.Command().handle(*args)
     elif args[0] in ("specific", "nose"):

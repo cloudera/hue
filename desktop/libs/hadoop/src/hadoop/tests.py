@@ -105,6 +105,7 @@ def test_config_validator_basic():
     restore_sys_caches(old_caches)
 
 
+@attr('integration')
 @attr('requires_hadoop')
 def test_config_validator_more():
   # TODO: Setup DN to not load the plugin, which is a common user error.

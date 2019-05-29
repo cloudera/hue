@@ -27,6 +27,7 @@ from django.utils.translation import ugettext as _
     </div>
     <div class="modal-body">
         <input id="load_data_is_embeddable" type="hidden" name="is_embeddable" value="false">
+        <input id="load_data_source_type" type="hidden" name="source_type" value="${ source_type }">
         <input type="hidden" name="start_time" value=""/>
 
         <div class="control-group">

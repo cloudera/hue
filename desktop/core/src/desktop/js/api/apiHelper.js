@@ -1524,7 +1524,7 @@ class ApiHelper {
       source_type: options.sourceType
     };
     if (options.path.length === 1) {
-      url = '/metastore/databases/' + options.path[1] + '/alter';
+      url = '/metastore/databases/' + options.path[0] + '/alter';
       data.properties = ko.mapping.toJSON(options.properties);
     } else if (options.path.length === 2) {
       url = '/metastore/table/' + options.path[0] + '/' + options.path[1] + '/alter';
@@ -1573,20 +1573,14 @@ class ApiHelper {
     const self = this;
     const deferred = $.Deferred();
 
-    let url;
+    let url = '/notebook/api/describe/' + options.path[0];
 
-    if (options.path.length === 1) {
-      url = '/metastore/databases/' + options.path[0] + '/metadata';
-    } else {
-      url = '/notebook/api/describe/' + options.path[0];
+    if (options.path.length > 1) {
+      url += '/' + options.path[1] + '/';
+    }
 
-      if (options.path.length > 1) {
-        url += '/' + options.path[1] + '/';
-      }
-
-      if (options.path.length > 2) {
-        url += 'stats/' + options.path.slice(2).join('/');
-      }
+    if (options.path.length > 2) {
+      url += 'stats/' + options.path.slice(2).join('/');
     }
 
     const data = {

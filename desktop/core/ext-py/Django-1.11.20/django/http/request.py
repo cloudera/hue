@@ -82,6 +82,9 @@ class HttpRequest(object):
         if settings.USE_X_FORWARDED_HOST and (
                 'HTTP_X_FORWARDED_HOST' in self.META):
             host = self.META['HTTP_X_FORWARDED_HOST']
+            # Django 1.11 does not handle case where HTTP_X_FORWARDED_HOST contains multiple hosts
+            if host.find(','):
+                host = host.split(',')[-1].strip()
         elif 'HTTP_HOST' in self.META:
             host = self.META['HTTP_HOST']
         else:

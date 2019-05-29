@@ -475,11 +475,17 @@ class Analytics():
   @classmethod
   def admin_stats(cls):
     stats = []
+    one_day = datetime.date.today() - timedelta(days=1)
     one_week = datetime.date.today() - timedelta(weeks=1)
     one_month = datetime.date.today() - timedelta(days=30)
     three_months = datetime.date.today() - timedelta(days=90)
 
-    stats.append(('Last modified', '1 week'))
+    stats.append(('Last modified', '1 day'))
+    stats.append(('Users', User.objects.filter(last_login__gte=one_day).count()))
+    stats.append(('Sessions', Session.objects.filter(expire_date__gte=one_day).count()))
+    stats.append(('Executed queries', Document2.objects.filter(last_modified__gte=one_day, is_history=True, type__startswith='query-').count()))
+
+    stats.append(('\nLast modified', '1 week'))
     stats.append(('Users', User.objects.filter(last_login__gte=one_week).count()))
     stats.append(('Sessions', Session.objects.filter(expire_date__gte=one_week).count()))
     stats.append(('Executed queries', Document2.objects.filter(last_modified__gte=one_week, is_history=True, type__startswith='query-').count()))
@@ -488,6 +494,7 @@ class Analytics():
     stats.append(('\nAll', ''))
     stats.append(('Active users 30 days', User.objects.filter(last_login__gte=one_month).count()))
     stats.append(('Sessions 30 days', Session.objects.filter(expire_date__gte=one_month).count()))
+    stats.append(('Executed queries 30 days', Document2.objects.filter(last_modified__gte=one_month, is_history=True, type__startswith='query-').count()))
     stats.append(('Active users 90 days', User.objects.filter(last_login__gte=three_months).count()))
 
     return stats

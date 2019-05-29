@@ -5,32 +5,10 @@ draft: false
 weight: 5
 ---
 
+
 ## Data Catalog
 
 In the `[metadata]` section, Hue is supporting Cloudera Navigator and soon Apache Atlas ([HUE-8749](https://issues.cloudera.org/browse/HUE-8749)) in order to enrich the [data catalog]({{% param baseURL %}}user/browsers/).
-
-
-## Query Optimization
-
-In the `[metadata]` section, Hue is supporting Cloudera Navigator Optimiser and soon other services. The goal is to provide recommendation on how to write better queries and get risk alerts on dangerous operations directly within the [editor]({{% param baseURL %}}user/editor/).
-
-## YARN Cluster
-
-Hue supports one or two Yarn clusters (two for HA). These clusters should be defined
-under the `[[[default]]]` and `[[[ha]]]` sub-sections.
-
-    # Configuration for YARN (MR2)
-    # ------------------------------------------------------------------------
-    [[yarn_clusters]]
-
-      [[[default]]]
-
-        resourcemanager_host=yarn-rm.com
-        resourcemanager_api_url=http://yarn-rm.com:8088/
-        proxy_api_url=http://yarn-proxy.com:8088/
-        resourcemanager_port=8032
-        history_server_api_url=http://yarn-rhs-com:19888/
-
 
 ## Spark
 
@@ -48,19 +26,9 @@ The `[spark]` section details how to point to [Livy](https://livy.incubator.apac
 The configuration is in `[kafka]` but the service is still experiemental.
 
 
-## Solr Search
-
-In the `[search]` section of the configuration file, you should
-specify:
-
-    [search]
-      # URL of the Solr Server
-      solr_url=http://solr-server.com:8983/solr/
-
 ## Oozie
 
-In the `[liboozie]` section of the configuration file, you should
-specify:
+In oder to schedule workflows, the `[liboozie]` section of the configuration file:
 
     [liboozie]
       oozie_url=http://oozie-server.com:11000/oozie
@@ -79,36 +47,19 @@ To configure Hue as a default proxy user, add the following properties to /etc/o
         <value>*</value>
     </property>
 
-## HBase
+## YARN Cluster
 
-Specify the HBase Thrift Server1 in Hue:
+Hue supports one or two Yarn clusters (two for HA). These clusters should be defined
+under the `[[[default]]]` and `[[[ha]]]` sub-sections.
 
-    [hbase]
-    hbase_clusters=(Cluster|localhost:9090)
+    # Configuration for YARN (MR2)
+    # ------------------------------------------------------------------------
+    [[yarn_clusters]]
 
-HBase Impersonation:
+      [[[default]]]
 
-Enable impersonation for the Thrift server by adding the following properties to hbase-site.xml on each Thrift gateway:
-
-    <property>
-      <name>hbase.regionserver.thrift.http</name>
-      <value>true</value>
-    </property>
-    <property>
-      <name>hbase.thrift.support.proxyuser</name>
-      <value>true/value>
-    </property>
-
-Note: If you use framed transport, you cannot use doAs impersonation, because SASL does not work with Thrift framed transport.
-
-doAs Impersonation provides a flexible way to use the same client to impersonate multiple principals. doAs is supported only in Thrift 1.
-Enable doAs support by adding the following properties to hbase-site.xml on each Thrift gateway:
-
-    <property>
-      <name>hbase.regionserver.thrift.http</name>
-      <value>true</value>
-    </property>
-    <property>
-      <name>hbase.thrift.support.proxyuser</name>
-      <value>true/value>
-    </property>
+        resourcemanager_host=yarn-rm.com
+        resourcemanager_api_url=http://yarn-rm.com:8088/
+        proxy_api_url=http://yarn-proxy.com:8088/
+        resourcemanager_port=8032
+        history_server_api_url=http://yarn-rhs-com:19888/

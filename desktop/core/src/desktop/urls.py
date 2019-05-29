@@ -36,7 +36,7 @@ from django.contrib import admin
 from django.views.static import serve
 
 from desktop import appmanager
-from desktop.conf import METRICS, USE_NEW_EDITOR, ENABLE_DJANGO_DEBUG_TOOL, CONNECTORS
+from desktop.conf import METRICS, USE_NEW_EDITOR, ENABLE_DJANGO_DEBUG_TOOL, CONNECTORS, ANALYTICS
 
 from desktop.auth import views as desktop_auth_views
 from desktop.settings import is_oidc_configured
@@ -196,6 +196,11 @@ if METRICS.ENABLE_WEB_METRICS.get():
 if CONNECTORS.IS_ENABLED.get():
   dynamic_patterns += [
     url(r'^desktop/connectors/', include('desktop.lib.connectors.urls'))
+  ]
+
+if ANALYTICS.IS_ENABLED.get():
+  dynamic_patterns += [
+    url(r'^desktop/analytics/', include('desktop.lib.analytics.urls'))
   ]
 
 dynamic_patterns += [

@@ -324,7 +324,7 @@ def get_logs(request):
   response['logs'] = logs.strip()
   response['progress'] = min(db.progress(notebook, snippet, logs=full_log), 99) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
   response['jobs'] = jobs
-  response['isFullLogs'] = isinstance(db, (OozieApi, DataEngApi))
+  response['isFullLogs'] = db.get_log_is_full_log(notebook, snippet)
   response['status'] = 0
 
   return JsonResponse(response)
@@ -836,7 +836,7 @@ def _get_statement_from_file(user, fs, snippet):
 
 @require_POST
 @api_error_handler
-def describe(request, database, table, column=None):
+def describe(request, database, table=None, column=None):
   response = {'status': -1, 'message': ''}
   notebook = json.loads(request.POST.get('notebook', '{}'))
   source_type = request.POST.get('source_type', '')
