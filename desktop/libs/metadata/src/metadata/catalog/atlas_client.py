@@ -249,18 +249,55 @@ class AtlasApi(Api):
       atlas_response = self._root.get('/v2/search/dsl?query=%s' % atlas_dsl_query)
 
       # Adapt Atlas entities to Navigator structure in the results
-      return self.parse_atlas_response(atlas_response)
+      if 'entities' in atlas_response:
+        for atlas_entity in atlas_response['entities']:
+          response['results'].append(self.adapt_atlas_entity_to_navigator(atlas_entity))
 
+      return response
     except RestException, e:
+      print(e)
       LOG.error('Failed to search for entities with search query: %s' % atlas_dsl_query)
       if e.code == 401:
         raise CatalogAuthException(_('Failed to authenticate.'))
       else:
         raise CatalogApiException(e.message)
 
+  # search_enties is only used by the table browser to fetch child entities of a given table or database.
   def search_entities(self, query_s, limit=100, offset=0, raw_query=False, **filters):
-    pass
+    try:
+      found_entities = []
 
+      search_terms = [term for term in query_s.strip().split()] if query_s else []
+      parentPath = None
+      for term in search_terms:
+        if 'parentPath:' in term:
+          name, val = term.split(':')
+          parentPath = val.strip('"').lstrip('/').replace('/', '.')
+
+      # currently we only support queries with type:database or with a parentPath attribute
+      if query_s == 'type:database':
+        atlas_dsl_query = 'from hive_db limit %s' % limit
+      elif not parentPath:
+        return found_entities
+      else:
+        atlas_type = 'hive_table' if parentPath.count('.') == 0 else 'hive_column'
+        atlas_dsl_query = 'from %s where qualifiedName like \'%s*\' limit %s' % (atlas_type, parentPath, limit)
+
+      atlas_response = self._root.get('/v2/search/dsl?query=%s' % atlas_dsl_query)
+
+      # Adapt Atlas entities to Navigator structure in the results
+      if 'entities' in atlas_response:
+        for atlas_entity in atlas_response['entities']:
+          found_entities.append(self.adapt_atlas_entity_to_navigator(atlas_entity))
+
+      return found_entities
+    except RestException, e:
+      print(e)
+      LOG.error('Failed to search for entities with search query: %s' % atlas_dsl_query)
+      if e.code == 401:
+        raise CatalogAuthException(_('Failed to authenticate.'))
+      else:
+        raise CatalogApiException(e.message)
 
   def suggest(self, prefix=None):
     try:

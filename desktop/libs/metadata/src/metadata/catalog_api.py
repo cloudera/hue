@@ -124,7 +124,7 @@ def search_entities_interactive(request):
   return JsonResponse(response)
 
 
-#  Not used currently.
+#  Only used by table browser to fetch multiple child entries for a give table or database
 @error_handler
 def search_entities(request):
   """
