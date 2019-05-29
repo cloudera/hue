@@ -82,7 +82,6 @@ def get(user, query_server=None, cluster=None):
 def get_query_server_config(name='beeswax', server=None, cluster=None):
   LOG.debug("Query cluster %s: %s" % (name, cluster))
 
-
   cluster_config = get_cluster_config(cluster)
 
   if name == 'impala':
@@ -90,7 +89,6 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
     query_server = impala_query_server_config(cluster_config=cluster_config)
   elif name == 'hms':
     kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
-
     query_server = {
         'server_name': 'hms',
         'server_host': HIVE_METASTORE_HOST.get() if not cluster_config else cluster_config.get('server_host'),
@@ -102,7 +100,6 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
     }
   else:
     kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
-
     query_server = {
         'server_name': 'beeswax',
         'server_host': HIVE_SERVER_HOST.get() if not cluster_config else cluster_config.get('server_host'),

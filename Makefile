@@ -95,7 +95,7 @@ default:
 	@echo '  clean       : Remove desktop build products'
 	@echo '  distclean   : Remove desktop and thirdparty build products'
 # <<<< DEV ONLY
-	@echo '  docs        : Build documentation'
+	@echo '  doc 	       : Build documentation'
 	@echo '  prod        : Generate a tar file for production distribution'
 	@echo '  locales     : Extract strings and update dictionary of each locale'
 	@echo '  ace         : Builds the Ace Editor tool'
@@ -108,7 +108,7 @@ all: default
 include Makefile.tarball
 
 ###################################
-# Build docs
+# Build docs (unused)
 ###################################
 .PHONY: docs
 docs:
@@ -147,16 +147,15 @@ desktop: parent-pom
 desktop: virtual-env
 	@$(MAKE) -C desktop
 
+
 ###################################
 # Build apps
 ###################################
 .PHONY: apps
 apps: desktop
-	npm install
-	npm run webpack
-	npm run webpack-login
-	npm run webpack-workers
+	@$(MAKE) npm-install
 	@$(MAKE) -C $(APPS_DIR) env-install
+	@$(MAKE) create-static
 
 ###################################
 # Install binary dist
@@ -210,6 +209,33 @@ install-env:
 	$(MAKE) -C $(INSTALL_DIR)/desktop env-install
 	@echo --- Setting up Applications
 	$(MAKE) -C $(INSTALL_DIR)/apps env-install
+	@echo --- Setting up Frontend assets
+	cp package.json $(INSTALL_DIR)
+	cp webpack.config*.js $(INSTALL_DIR)
+	$(MAKE) -C $(INSTALL_DIR) npm-install
+
+
+###################################
+# Frontend and static assets
+###################################
+
+# <<<< DEV ONLY
+.PHONY: npm-install
+npm-install:
+	npm install
+	npm run webpack
+	npm run webpack-login
+	npm run webpack-workers
+
+.PHONY: create-static
+create-static:
+	./build/env/bin/hue collectstatic --noinput
+
+.PHONY: doc
+doc:
+	hugo --source docs/docs-site
+# END DEV ONLY >>>>
+
 
 ###################################
 # Internationalization
@@ -306,9 +332,6 @@ ext-clean:
 ###############################################
 # Misc (some used by automated test scripts)
 ###############################################
-
-js-test:
-	$(ROOT)/tools/jasmine/phantomjs.runner.sh $(ROOT)/desktop/core/src/desktop/templates/jasmineRunner.html
 
 test:
 	DESKTOP_DEBUG=1 $(ENV_PYTHON) $(BLD_DIR_BIN)/hue test fast --with-xunit

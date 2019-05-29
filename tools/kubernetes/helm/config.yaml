@@ -1,6 +1,0 @@
-registry: "docker-registry.infra.cloudera.com/cloudera/datawarehouse"
-tag: "v2"
-aws:
-  accessKeyId: ""
-  secretAccessKey: ""
-  region: "us-east-1"

@@ -46,6 +46,7 @@ class MockedRoot():
 
 
 class NavigatorClientTest:
+  integration = True
 
   @classmethod
   def setup_class(cls):

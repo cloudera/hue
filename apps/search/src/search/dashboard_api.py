@@ -17,12 +17,12 @@
 
 import logging
 
-from dashboard.dashboard_api import DashboardApi
-from dashboard.models import augment_solr_response
 from libsolr.api import SolrApi
 from indexer.solr_client import SolrClient
-
 from search.conf import SOLR_URL
+
+from dashboard.dashboard_api import DashboardApi
+from dashboard.models import augment_solr_response
 
 
 LOG = logging.getLogger(__name__)

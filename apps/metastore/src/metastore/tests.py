@@ -63,6 +63,7 @@ def _make_query(client, query, submission_type="Execute",
 
 class TestMetastoreWithHadoop(BeeswaxSampleProvider):
   requires_hadoop = True
+  integration = True
 
   def setUp(self):
     user = User.objects.get(username='test')

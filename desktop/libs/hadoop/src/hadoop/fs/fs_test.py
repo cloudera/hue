@@ -97,6 +97,7 @@ class LocalSubFileSystemTest(unittest.TestCase):
     self.assertRaises(TypeError, self.fs.open, name="/foo", mode="w")
 
 
+@attr('integration')
 @attr('requires_hadoop')
 def test_hdfs_copy():
   minicluster = pseudo_hdfs4.shared_cluster()
@@ -120,6 +121,7 @@ def test_hdfs_copy():
     minifs.do_as_superuser(minifs.rmtree, copy_test_dst)
 
 
+@attr('integration')
 @attr('requires_hadoop')
 def test_hdfs_full_copy():
   minicluster = pseudo_hdfs4.shared_cluster()
@@ -154,6 +156,8 @@ def test_hdfs_full_copy():
   finally:
     minifs.do_as_superuser(minifs.rmtree, prefix)
 
+
+@attr('integration')
 @attr('requires_hadoop')
 def test_hdfs_copy_from_local():
   minicluster = pseudo_hdfs4.shared_cluster()

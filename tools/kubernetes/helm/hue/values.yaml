@@ -1,11 +1,25 @@
-registry: "gethue"
-loadBalancerIp: "127.0.0.1"
-domain: "127.0.0.1.nip.io"
+registry: "gethue/hue"
+tag: "latest"
 hue:
-  replicas: 1
-  awsAccessKeyId: ""
-  awsSecretAccessKey: ""
-  awsRegion: "us-east-1"
-  prometheusHost: "prometheus-server.prometheus"
-impala:
-  server_host: "impala-coordinator.com"
+  database:
+    create: true
+    engine: "postgresql_psycopg2"
+    host: "hue-postgres"
+    port: 5432
+    user: "hue"
+    password: "hue"
+    name: "hue"
+  interpreters: |
+    [[[postgresql]]]
+      name = postgresql
+      interface=sqlalchemy
+      options='{"url": "postgresql://hue:hue@hue-database:5432/hue"}'
+aws:
+  accessKeyId: ""
+  secretAccessKey: ""
+  region: "us-east-1"
+ingress:
+  create: false
+  type: "traefik"
+  loadBalancerIp: "127.0.0.1"
+  domain: "127.0.0.1.nip.io"

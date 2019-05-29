@@ -35,6 +35,7 @@ from liboozie.submittion import Submission
 LOG = logging.getLogger(__name__)
 
 
+@attr('integration')
 @attr('requires_hadoop')
 def test_copy_files():
   cluster = pseudo_hdfs4.shared_cluster()

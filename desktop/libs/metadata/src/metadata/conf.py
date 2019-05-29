@@ -232,6 +232,12 @@ def has_catalog(user):
   return ((bool(get_catalog_url() and get_catalog_auth_password())) or has_navigator(user)) \
       and (is_admin(user) or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
 
+def has_catalog_tags(user):
+  return has_catalog(user) and has_navigator(user)
+
+def has_readonly_catalog(user):
+  return has_catalog(user) and not has_navigator(user)
+
 def get_catalog_auth_password():
   '''Get the password to authenticate with.'''
   global CATALOG_AUTH_PASSWORD

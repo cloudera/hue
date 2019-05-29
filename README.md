@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/cloudera/hue/tree/master.svg?style=svg)](https://circleci.com/gh/cloudera/hue/tree/master)
+
 ![alt text](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/hue_logo.png "Hue Logo")
 
 
@@ -61,5 +63,4 @@ Community
 
 License
 -----------
-Apache License, Version 2.0
-http://www.apache.org/licenses/LICENSE-2.0
+[Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
