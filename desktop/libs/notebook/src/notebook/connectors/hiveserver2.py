@@ -520,7 +520,7 @@ class HS2Api(Api):
       return spk_response
 
     elif column is None:
-      _statement = u'desc `{database}`.`{table}`'.format(database=database, table=table),
+      _statement = u'desc `{database}`.`{table}`'.format(database=database, table=table)
       _spk_fetch_result = self._get_fetch_result_spk(_statement, snippet)
       columns_list = []
       extended_columns_list = []
