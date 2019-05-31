@@ -101,7 +101,7 @@ class AtlasApi(Api):
       "original_name": atlas_entity['attributes'].get('name'),
       "originalDescription": None,
       "originalName": atlas_entity['attributes'].get('name'),
-      "owner": atlas_entity.get('owner'),
+      "owner": atlas_entity['attributes'].get('owner'),
       "parentPath": '', # Set below
       "properties": {}, # Set below
       "sourceType": '', # Set below
