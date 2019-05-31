@@ -124,7 +124,7 @@ class AtlasApi(Api):
 
     return nav_entity
 
-  def parse_atlas_response(self, atlas_response):
+  def fetch_single_entity(self, dsl_query):
     '''
     REQUEST: hue:8889/metadata/api/navigator/find_entity?type=database&name=default
     SAMPLE response for Navigator find_entity response
@@ -155,59 +155,43 @@ class AtlasApi(Api):
       "status": 0,
       "entity": []
     }
-    if not atlas_response['entities']:
-      LOG.error('No entities in atlas response to parse: %s' % json.dumps(atlas_response))
-    for atlas_entity in atlas_response['entities']:
-      response['entity'].append(self.adapt_atlas_entity_to_navigator(atlas_entity))
-    return response['entity'][0]
 
-  def get_database(self, name):
-    # Search with Atlas API for hive database with specific name
-    try:
-      dsl_query = '+'.join(['hive_db', 'where', 'name=%s']) % name
+    try :
       atlas_response = self._root.get('/v2/search/dsl?query=%s' % dsl_query, headers=self.__headers,
                                       params=self.__params)
-      return self.parse_atlas_response(atlas_response)
+      if not 'entities' in atlas_response or len(atlas_response['entities']) < 1:
+        raise CatalogEntityDoesNotExistException('Could not find entity with query: %s' % dsl_query)
+
+      for atlas_entity in atlas_response['entities']:
+        response['entity'].append(self.adapt_atlas_entity_to_navigator(atlas_entity))
+
+      return response['entity'][0]
     except RestException as e:
       LOG.error('Failed to search for entities with search query: %s' % dsl_query)
       if e.code == 401:
         raise CatalogAuthException(_('Failed to authenticate.'))
       else:
         raise CatalogApiException(e.message)
+
+  def get_database(self, name):
+    # Search with Atlas API for hive database with specific name
+    dsl_query = '+'.join(['hive_db', 'where', 'name=%s']) % name
+    return self.fetch_single_entity(dsl_query)
 
   def get_table(self, database_name, table_name, is_view=False):
     # Search with Atlas API for hive tables with specific name
     # TODO: Need figure out way how to identify the cluster info for exact qualifiedName or use startsWith 'db.table.column'
-    try:
-      qualifiedName = '%s.%s@cl1' % (database_name, table_name)
-      dsl_query = '+'.join(['hive_table', 'where', 'qualifiedName=\"%s\"']) % qualifiedName
-      atlas_response = self._root.get('/v2/search/dsl?query=%s' % dsl_query, headers=self.__headers,
-                                      params=self.__params)
-      return self.parse_atlas_response(atlas_response)
-
-    except RestException as e:
-      LOG.error('Failed to search for entities with search query: %s' % dsl_query)
-      if e.code == 401:
-        raise CatalogAuthException(_('Failed to authenticate.'))
-      else:
-        raise CatalogApiException(e.message)
+    qualifiedName = '%s.%s@cl1' % (database_name, table_name)
+    dsl_query = '+'.join(['hive_table', 'where', 'qualifiedName=\"%s\"']) % qualifiedName
+    return self.fetch_single_entity(dsl_query)
 
   def get_field(self, database_name, table_name, field_name):
     # Search with Atlas API for hive tables with specific qualified name
     # TODO: Figure out how to identify the cluster info for exact qualifiedName
     # TODO: query string for search with qualifiedName startsWith sys.test5.id
-    try:
-      qualifiedName = '%s.%s.%s@cl1' % (database_name, table_name, field_name)
-      dsl_query = '+'.join(['hive_column', 'where', 'qualifiedName=\"%s\"']) % qualifiedName
-      atlas_response = self._root.get('/v2/search/dsl?query=%s' % dsl_query, headers=self.__headers,
-                                      params=self.__params)
-      return self.parse_atlas_response(atlas_response)
-    except RestException as e:
-      LOG.error('Failed to search for entities with search query: %s' % dsl_query)
-      if e.code == 401:
-        raise CatalogAuthException(_('Failed to authenticate.'))
-      else:
-        raise CatalogApiException(e.message)
+    qualifiedName = '%s.%s.%s@cl1' % (database_name, table_name, field_name)
+    dsl_query = '+'.join(['hive_column', 'where', 'qualifiedName=\"%s\"']) % qualifiedName
+    return self.fetch_single_entity(dsl_query)
 
   def search_entities_interactive(self, query_s=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None, sources=None):
     try:
