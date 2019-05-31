@@ -16,22 +16,18 @@
 
 DataDefinition
  : DropStatement
- | HiveAbortStatement
  ;
 
 DataDefinition_EDIT
  : DropStatement_EDIT
- | HiveAbortStatement_EDIT
  ;
 
 DataManipulation
- : HiveDeleteStatement
- | ImpalaDeleteStatement
+ : DeleteStatement
  ;
 
 DataManipulation_EDIT
- : HiveDeleteStatement_EDIT
- | ImpalaDeleteStatement_EDIT
+ : DeleteStatement_EDIT
  ;
 
 DropStatement
@@ -40,8 +36,6 @@ DropStatement
  | DropRoleStatement
  | DropStatsStatement
  | DropTableStatement
- | DropIndexStatement
- | DropMacroStatement
  | DropViewStatement
  | TruncateTableStatement
  ;
@@ -51,19 +45,11 @@ DropStatement_EDIT
  | DropFunctionStatement_EDIT
  | DropStatsStatement_EDIT
  | DropTableStatement_EDIT
- | DropIndexStatement_EDIT
- | DropMacroStatement_EDIT
  | DropViewStatement_EDIT
  | TruncateTableStatement_EDIT
  | 'DROP' 'CURSOR'
    {
-     if (parser.isHive()) {
-       parser.suggestKeywords(['DATABASE', 'FUNCTION', 'INDEX', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'VIEW']);
-     } else if (parser.isImpala()) {
-       parser.suggestKeywords(['AGGREGATE FUNCTION', 'DATABASE', 'FUNCTION', 'INCREMENTAL STATS', 'ROLE', 'SCHEMA', 'STATS', 'TABLE', 'VIEW']);
-     } else {
-       parser.suggestKeywords(['ROLE', 'SCHEMA', 'TABLE', 'VIEW']);
-     }
+     parser.suggestKeywords(['AGGREGATE FUNCTION', 'DATABASE', 'FUNCTION', 'INCREMENTAL STATS', 'ROLE', 'SCHEMA', 'STATS', 'TABLE', 'VIEW']);
    }
  ;
 
@@ -83,9 +69,7 @@ DropDatabaseStatement_EDIT
    }
  | 'DROP' DatabaseOrSchema OptionalIfExists RegularOrBacktickedIdentifier 'CURSOR'
    {
-     if (parser.isHive() || parser.isImpala()) {
-       parser.suggestKeywords(['CASCADE', 'RESTRICT']);
-     }
+     parser.suggestKeywords(['CASCADE', 'RESTRICT']);
    }
  | 'DROP' DatabaseOrSchema OptionalIfExists_EDIT RegularOrBacktickedIdentifier OptionalCascadeOrRestrict
  | 'DROP' DatabaseOrSchema OptionalIfExists 'CURSOR' RegularOrBacktickedIdentifier OptionalCascadeOrRestrict
@@ -96,93 +80,53 @@ DropDatabaseStatement_EDIT
    }
  ;
 
+// OptionalAggregate is no go for look ahead reasons
 DropFunctionStatement
- : DropImpalaFunction
- | DropHiveFunction
+ : 'DROP' 'FUNCTION' OptionalIfExists SchemaQualifiedIdentifier ParenthesizedArgumentList
+ | 'DROP' 'AGGREGATE' 'FUNCTION' OptionalIfExists SchemaQualifiedIdentifier ParenthesizedArgumentList
  ;
 
 DropFunctionStatement_EDIT
- : DropImpalaFunction_EDIT
- | DropHiveFunction_EDIT
- ;
-
-// OptionalAggregate is no go for look ahead reasons
-DropImpalaFunction
- : 'DROP' '<impala>FUNCTION' OptionalIfExists SchemaQualifiedIdentifier ParenthesizedArgumentList
- | 'DROP' '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfExists SchemaQualifiedIdentifier ParenthesizedArgumentList
- ;
-
-DropImpalaFunction_EDIT
- : 'DROP' '<impala>FUNCTION' OptionalIfExists 'CURSOR'
+ : 'DROP' 'FUNCTION' OptionalIfExists 'CURSOR'
    {
      if (!$3) {
        parser.suggestKeywords(['IF EXISTS']);
      }
      parser.suggestDatabases({ appendDot: true });
    }
- | 'DROP' '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfExists 'CURSOR'
+ | 'DROP' 'AGGREGATE' 'FUNCTION' OptionalIfExists 'CURSOR'
    {
      if (!$4) {
        parser.suggestKeywords(['IF EXISTS']);
      }
      parser.suggestDatabases({ appendDot: true });
    }
- | 'DROP' '<impala>FUNCTION' OptionalIfExists 'CURSOR' SchemaQualifiedIdentifier ParenthesizedArgumentList
+ | 'DROP' 'FUNCTION' OptionalIfExists 'CURSOR' SchemaQualifiedIdentifier ParenthesizedArgumentList
    {
      if (!$3) {
        parser.suggestKeywords(['IF EXISTS']);
      }
    }
- | 'DROP' '<impala>FUNCTION' OptionalIfExists_EDIT
- | 'DROP' 'CURSOR' '<impala>FUNCTION' OptionalIfExists SchemaQualifiedIdentifier ParenthesizedArgumentList
+ | 'DROP' 'FUNCTION' OptionalIfExists_EDIT
+ | 'DROP' 'CURSOR' 'FUNCTION' OptionalIfExists SchemaQualifiedIdentifier ParenthesizedArgumentList
    {
      parser.suggestKeywords(['AGGREGATE']);
    }
- | 'DROP' '<impala>FUNCTION' OptionalIfExists SchemaQualifiedIdentifier ParenthesizedArgumentList_EDIT
- | 'DROP' '<impala>AGGREGATE' 'CURSOR'
+ | 'DROP' 'FUNCTION' OptionalIfExists SchemaQualifiedIdentifier ParenthesizedArgumentList_EDIT
+ | 'DROP' 'AGGREGATE' 'CURSOR'
    {
      parser.suggestKeywords(['FUNCTION']);
    }
- | 'DROP' '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfExists 'CURSOR' SchemaQualifiedIdentifier ParenthesizedArgumentList
+ | 'DROP' 'AGGREGATE' 'FUNCTION' OptionalIfExists 'CURSOR' SchemaQualifiedIdentifier ParenthesizedArgumentList
    {
      if (!$4) {
        parser.suggestKeywords(['IF EXISTS']);
      }
    }
- | 'DROP' '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfExists_EDIT
- | 'DROP' '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfExists SchemaQualifiedIdentifier ParenthesizedArgumentList_EDIT
- | 'DROP' '<impala>FUNCTION' OptionalIfExists SchemaQualifiedIdentifier_EDIT ParenthesizedArgumentList
- | 'DROP' '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfExists SchemaQualifiedIdentifier_EDIT ParenthesizedArgumentList
- ;
-
-DropHiveFunction
- : 'DROP' '<hive>FUNCTION' OptionalIfExists SchemaQualifiedIdentifier
- | 'DROP' '<hive>TEMPORARY' '<hive>FUNCTION' OptionalIfExists RegularIdentifier
- ;
-
-DropHiveFunction_EDIT
- : 'DROP' '<hive>FUNCTION' OptionalIfExists 'CURSOR'
-   {
-     if (!$3) {
-       parser.suggestKeywords(['IF EXISTS']);
-     }
-   }
- | 'DROP' '<hive>FUNCTION' OptionalIfExists 'CURSOR' SchemaQualifiedIdentifier
-   {
-     if (!$3) {
-       parser.suggestKeywords(['IF EXISTS']);
-     }
-   }
- | 'DROP' '<hive>FUNCTION' OptionalIfExists_EDIT
- | 'DROP' '<hive>FUNCTION' OptionalIfExists_EDIT SchemaQualifiedIdentifier
- | 'DROP' '<hive>FUNCTION' OptionalIfExists SchemaQualifiedIdentifier_EDIT
- | 'DROP' '<hive>TEMPORARY' '<hive>FUNCTION' OptionalIfExists 'CURSOR'
-   {
-     if (!$4) {
-       parser.suggestKeywords(['IF EXISTS']);
-     }
-   }
- | 'DROP' '<hive>TEMPORARY' '<hive>FUNCTION' OptionalIfExists_EDIT
+ | 'DROP' 'AGGREGATE' 'FUNCTION' OptionalIfExists_EDIT
+ | 'DROP' 'AGGREGATE' 'FUNCTION' OptionalIfExists SchemaQualifiedIdentifier ParenthesizedArgumentList_EDIT
+ | 'DROP' 'FUNCTION' OptionalIfExists SchemaQualifiedIdentifier_EDIT ParenthesizedArgumentList
+ | 'DROP' 'AGGREGATE' 'FUNCTION' OptionalIfExists SchemaQualifiedIdentifier_EDIT ParenthesizedArgumentList
  ;
 
 DropRoleStatement
@@ -190,50 +134,50 @@ DropRoleStatement
  ;
 
 DropStatsStatement
- : 'DROP' '<impala>STATS' SchemaQualifiedTableIdentifier
+ : 'DROP' 'STATS' SchemaQualifiedTableIdentifier
    {
      parser.addTablePrimary($3);
    }
- | 'DROP' '<impala>INCREMENTAL' '<impala>STATS' SchemaQualifiedTableIdentifier PartitionSpec
+ | 'DROP' 'INCREMENTAL' 'STATS' SchemaQualifiedTableIdentifier PartitionSpec
    {
      parser.addTablePrimary($4);
    }
  ;
 
 DropStatsStatement_EDIT
- : 'DROP' '<impala>STATS' 'CURSOR'
+ : 'DROP' 'STATS' 'CURSOR'
    {
      parser.suggestTables();
      parser.suggestDatabases({ appendDot: true });
    }
- | 'DROP' '<impala>STATS' SchemaQualifiedTableIdentifier_EDIT
- | 'DROP' 'CURSOR' '<impala>STATS' SchemaQualifiedTableIdentifier
+ | 'DROP' 'STATS' SchemaQualifiedTableIdentifier_EDIT
+ | 'DROP' 'CURSOR' 'STATS' SchemaQualifiedTableIdentifier
    {
      parser.addTablePrimary($4);
      parser.suggestKeywords(['INCREMENTAL']);
    }
- | 'DROP' 'CURSOR' '<impala>STATS' SchemaQualifiedTableIdentifier PartitionSpec
+ | 'DROP' 'CURSOR' 'STATS' SchemaQualifiedTableIdentifier PartitionSpec
    {
      parser.addTablePrimary($4);
      parser.suggestKeywords(['INCREMENTAL']);
    }
- | 'DROP' '<impala>INCREMENTAL' 'CURSOR'
+ | 'DROP' 'INCREMENTAL' 'CURSOR'
    {
      parser.suggestKeywords(['STATS']);
    }
- | 'DROP' '<impala>INCREMENTAL' '<impala>STATS' 'CURSOR'
+ | 'DROP' 'INCREMENTAL' 'STATS' 'CURSOR'
    {
      parser.suggestTables();
      parser.suggestDatabases({ appendDot: true });
    }
- | 'DROP' '<impala>INCREMENTAL' '<impala>STATS' SchemaQualifiedTableIdentifier_EDIT
- | 'DROP' '<impala>INCREMENTAL' '<impala>STATS' SchemaQualifiedTableIdentifier_EDIT PartitionSpec
- | 'DROP' '<impala>INCREMENTAL' '<impala>STATS' SchemaQualifiedTableIdentifier 'CURSOR'
+ | 'DROP' 'INCREMENTAL' 'STATS' SchemaQualifiedTableIdentifier_EDIT
+ | 'DROP' 'INCREMENTAL' 'STATS' SchemaQualifiedTableIdentifier_EDIT PartitionSpec
+ | 'DROP' 'INCREMENTAL' 'STATS' SchemaQualifiedTableIdentifier 'CURSOR'
    {
      parser.addTablePrimary($4);
      parser.suggestKeywords(['PARTITION']);
    }
- | 'DROP' '<impala>INCREMENTAL' '<impala>STATS' SchemaQualifiedTableIdentifier PartitionSpec_EDIT
+ | 'DROP' 'INCREMENTAL' 'STATS' SchemaQualifiedTableIdentifier PartitionSpec_EDIT
    {
      parser.addTablePrimary($4);
    }
@@ -277,51 +221,6 @@ DropTableStatement_EDIT
 OptionalPurge
  :
  | 'PURGE'
- | '<hive>PURGE'
- ;
-
-
-DropIndexStatement
- : 'DROP' '<hive>INDEX' OptionalIfExists RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier
-   {
-     parser.addTablePrimary($6);
-   }
- ;
-
-DropIndexStatement_EDIT
- : 'DROP' '<hive>INDEX' OptionalIfExists 'CURSOR'
-   {
-     parser.suggestKeywords(['IF EXISTS']);
-   }
- | 'DROP' '<hive>INDEX' OptionalIfExists_EDIT
- | 'DROP' '<hive>INDEX' OptionalIfExists RegularOrBacktickedIdentifier 'CURSOR'
-   {
-     parser.suggestKeywords(['ON']);
-   }
- | 'DROP' '<hive>INDEX' OptionalIfExists RegularOrBacktickedIdentifier 'ON' 'CURSOR'
-   {
-     parser.suggestTables();
-     parser.suggestDatabases({ appendDot: true });
-   }
- | 'DROP' '<hive>INDEX' OptionalIfExists RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier_EDIT
- ;
-
-DropMacroStatement
- : 'DROP' '<hive>TEMPORARY' '<hive>MACRO' OptionalIfExists RegularIdentifier
- ;
-
-DropMacroStatement_EDIT
- : 'DROP' '<hive>TEMPORARY' 'CURSOR'
-   {
-     parser.suggestKeywords(['FUNCTION', 'MACRO']);
-   }
- | 'DROP' '<hive>TEMPORARY' '<hive>MACRO' OptionalIfExists 'CURSOR'
-   {
-     if (!$4) {
-       parser.suggestKeywords(['IF EXISTS']);
-     }
-   }
- | 'DROP' '<hive>TEMPORARY' '<hive>MACRO' OptionalIfExists_EDIT
  ;
 
 DropViewStatement
@@ -376,84 +275,46 @@ TruncateTableStatement_EDIT
    {
      parser.suggestTables();
      parser.suggestDatabases({ appendDot: true });
-     if (parser.isImpala() && !$3) {
+     if (!$3) {
        parser.suggestKeywords(['IF EXISTS']);
      }
    }
  | 'TRUNCATE' AnyTable OptionalIfExists_EDIT OptionalPartitionSpec
- | 'TRUNCATE' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
- | 'TRUNCATE' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'
-   {
-     parser.addTablePrimary($4);
-     if (parser.isHive() && !$5) {
-       parser.suggestKeywords(['PARTITION']);
-     }
-   }
- | 'TRUNCATE' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
+ | 'TRUNCATE' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier_EDIT
+ | 'TRUNCATE' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier 'CURSOR'
    {
      parser.addTablePrimary($4);
    }
- | 'TRUNCATE' AnyTable OptionalIfExists 'CURSOR' SchemaQualifiedTableIdentifier OptionalPartitionSpec
+ | 'TRUNCATE' AnyTable OptionalIfExists 'CURSOR' SchemaQualifiedTableIdentifier
    {
      parser.addTablePrimary($4);
-     if (parser.isImpala() && !$3) {
+     if (!$3) {
        parser.suggestKeywords(['IF EXISTS']);
      }
    }
- | 'TRUNCATE' AnyTable OptionalIfExists_EDIT SchemaQualifiedTableIdentifier OptionalPartitionSpec
+ | 'TRUNCATE' AnyTable OptionalIfExists_EDIT SchemaQualifiedTableIdentifier
  ;
 
-HiveDeleteStatement
- : '<hive>DELETE' 'FROM' SchemaQualifiedTableIdentifier OptionalWhereClause
-   {
-     parser.addTablePrimary($3);
-   }
+DeleteStatement
+ : 'DELETE' OptionalDeleteTableRef 'FROM' TableReference OptionalWhereClause
  ;
 
-HiveDeleteStatement_EDIT
- : '<hive>DELETE' 'CURSOR'
+DeleteStatement_EDIT
+ : 'DELETE' OptionalDeleteTableRef 'CURSOR'
    {
      parser.suggestKeywords(['FROM']);
-   }
- | '<hive>DELETE' 'FROM' 'CURSOR'
-   {
-     parser.suggestTables();
-     parser.suggestDatabases({ appendDot: true });
-   }
- | '<hive>DELETE' 'FROM' SchemaQualifiedTableIdentifier 'CURSOR' OptionalWhereClause
-   {
-     parser.addTablePrimary($3);
-     if (!$5) {
-       parser.suggestKeywords(['WHERE']);
-     }
-   }
- | '<hive>DELETE' 'FROM' SchemaQualifiedTableIdentifier_EDIT OptionalWhereClause
- | '<hive>DELETE' 'FROM' SchemaQualifiedTableIdentifier WhereClause_EDIT
-   {
-     parser.addTablePrimary($3);
-   }
- ;
-
-ImpalaDeleteStatement
- : '<impala>DELETE' OptionalImpalaDeleteTableRef 'FROM' TableReference OptionalWhereClause
- ;
-
-ImpalaDeleteStatement_EDIT
- : '<impala>DELETE' OptionalImpalaDeleteTableRef 'CURSOR'
-   {
-     parser.suggestKeywords(['FROM']);
-     if (parser.isImpala() && !$2) {
+     if (!$2) {
        parser.suggestTables();
        parser.suggestDatabases({ appendDot: true });
      }
    }
- | '<impala>DELETE' ImpalaDeleteTableRef_EDIT
- | '<impala>DELETE' OptionalImpalaDeleteTableRef 'FROM' 'CURSOR'
+ | 'DELETE' DeleteTableRef_EDIT
+ | 'DELETE' OptionalDeleteTableRef 'FROM' 'CURSOR'
    {
      parser.suggestTables();
      parser.suggestDatabases({ appendDot: true });
    }
- | '<impala>DELETE' OptionalImpalaDeleteTableRef 'FROM' TableReference 'CURSOR' OptionalWhereClause
+ | 'DELETE' OptionalDeleteTableRef 'FROM' TableReference 'CURSOR' OptionalWhereClause
    {
      var keywords = [{ value: 'FULL JOIN', weight: 1 }, { value: 'FULL OUTER JOIN', weight: 1 }, { value: 'JOIN', weight: 1 }, { value: 'LEFT JOIN', weight: 1 }, { value: 'LEFT OUTER JOIN', weight: 1 }, { value: 'RIGHT JOIN', weight: 1 }, { value: 'RIGHT OUTER JOIN', weight: 1 }, { value: 'INNER JOIN', weight: 1 },  { value: 'LEFT ANTI JOIN', weight: 1 }, { value: 'LEFT SEMI JOIN', weight: 1 }, { value: 'RIGHT ANTI JOIN', weight: 1 }, { value: 'RIGHT SEMI JOIN', weight: 1 }];
      if (!$6) {
@@ -472,30 +333,19 @@ ImpalaDeleteStatement_EDIT
        parser.suggestKeywords(keywords);
      }
    }
- | '<impala>DELETE' ImpalaDeleteTableRef_EDIT 'FROM'
- | '<impala>DELETE' ImpalaDeleteTableRef_EDIT 'FROM' TableReference OptionalWhereClause
- | '<impala>DELETE' OptionalImpalaDeleteTableRef 'FROM' TableReference_EDIT OptionalWhereClause
- | '<impala>DELETE' OptionalImpalaDeleteTableRef 'FROM' TableReference WhereClause_EDIT
+ | 'DELETE' DeleteTableRef_EDIT 'FROM'
+ | 'DELETE' DeleteTableRef_EDIT 'FROM' TableReference OptionalWhereClause
+ | 'DELETE' OptionalDeleteTableRef 'FROM' TableReference_EDIT OptionalWhereClause
+ | 'DELETE' OptionalDeleteTableRef 'FROM' TableReference WhereClause_EDIT
  ;
 
-OptionalImpalaDeleteTableRef
+OptionalDeleteTableRef
  :
  | TableReference
  ;
 
-ImpalaDeleteTableRef_EDIT
+DeleteTableRef_EDIT
  : TableReference_EDIT
- ;
-
-HiveAbortStatement
- : '<hive>ABORT' '<hive>TRANSACTIONS' TransactionIdList
- ;
-
-HiveAbortStatement_EDIT
- : '<hive>ABORT' 'CURSOR'
-   {
-     parser.suggestKeywords(['TRANSACTIONS']);
-   }
  ;
 
 TransactionIdList
