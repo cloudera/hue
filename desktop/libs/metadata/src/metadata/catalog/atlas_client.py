@@ -20,14 +20,13 @@ import json
 import logging
 import re
 
-from django.core.cache import cache
 from django.utils.translation import ugettext as _
 
 from desktop.lib.rest import resource
 from desktop.lib.rest.unsecure_http_client import UnsecureHttpClient
 from desktop.lib.rest.http_client import RestException
 
-from metadata.conf import CATALOG, get_catalog_auth_password
+from metadata.conf import CATALOG, get_catalog_auth_password, get_catalog_search_cluster
 from metadata.catalog.base import CatalogAuthException, CatalogApiException, CatalogEntityDoesNotExistException, Api
 
 LOG = logging.getLogger(__name__)
@@ -175,23 +174,31 @@ class AtlasApi(Api):
 
   def get_database(self, name):
     # Search with Atlas API for hive database with specific name
-    dsl_query = '+'.join(['hive_db', 'where', 'name=%s']) % name
-    return self.fetch_single_entity(dsl_query)
+    if get_catalog_search_cluster():
+      qualifiedNameCriteria = 'qualifiedName=\'%s@%s\'' % (name, get_catalog_search_cluster())
+    else:
+      qualifiedNameCriteria = 'qualifiedName like \'%s@*\'' % name
+
+    return self.fetch_single_entity('hive_db where %s' % qualifiedNameCriteria)
 
   def get_table(self, database_name, table_name, is_view=False):
     # Search with Atlas API for hive tables with specific name
-    # TODO: Need figure out way how to identify the cluster info for exact qualifiedName or use startsWith 'db.table.column'
-    qualifiedName = '%s.%s@cl1' % (database_name, table_name)
-    dsl_query = '+'.join(['hive_table', 'where', 'qualifiedName=\"%s\"']) % qualifiedName
-    return self.fetch_single_entity(dsl_query)
+    if get_catalog_search_cluster():
+      qualifiedNameCriteria = 'qualifiedName=\'%s.%s@%s\'' % (database_name, table_name, get_catalog_search_cluster())
+    else:
+      qualifiedNameCriteria = 'qualifiedName like \'%s.%s@*\'' % (database_name, table_name)
+
+    return self.fetch_single_entity('hive_table where %s' % qualifiedNameCriteria)
 
   def get_field(self, database_name, table_name, field_name):
     # Search with Atlas API for hive tables with specific qualified name
-    # TODO: Figure out how to identify the cluster info for exact qualifiedName
-    # TODO: query string for search with qualifiedName startsWith sys.test5.id
-    qualifiedName = '%s.%s.%s@cl1' % (database_name, table_name, field_name)
-    dsl_query = '+'.join(['hive_column', 'where', 'qualifiedName=\"%s\"']) % qualifiedName
-    return self.fetch_single_entity(dsl_query)
+    if get_catalog_search_cluster():
+      qualifiedNameCriteria = 'qualifiedName=\'%s.%s.%s@%s\'' % (database_name, table_name, field_name,
+                                                                 get_catalog_search_cluster())
+    else:
+      qualifiedNameCriteria = 'qualifiedName like \'%s.%s.%s@*\'' % (database_name, table_name, field_name)
+
+    return self.fetch_single_entity('hive_column where %s' % qualifiedNameCriteria)
 
   def search_entities_interactive(self, query_s=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None, sources=None):
     try:
@@ -230,23 +237,33 @@ class AtlasApi(Api):
             # Atlas filters by classification name on default
             query.append(val + '*')
 
-      data = json.dumps({
-        "attributes": None,
-        "classification": None,
-        "entityFilters": None,
-        "excludeDeletedEntities": True,
-        "includeClassificationAttributes": True,
-        "includeSubClassifications": True,
-        "includeSubTypes": True,
-        "limit": limit,
-        "offset": 0,
-        "query": ' '.join(query),
-        "tagFilters": None,
-        "termName": None,
-        "typeName": atlas_type or 'hive_table'
-      })
+      data = {
+        'attributes': None,
+        'classification': None,
+        'entityFilters': None,
+        'excludeDeletedEntities': True,
+        'includeClassificationAttributes': True,
+        'includeSubClassifications': True,
+        'includeSubTypes': True,
+        'limit': limit,
+        'offset': 0,
+        'query': ' '.join(query),
+        'tagFilters': None,
+        'termName': None,
+        'typeName': atlas_type or 'hive_table'
+      }
 
-      atlas_response = self._root.post('/v2/search/basic', data=data, contenttype=_JSON_CONTENT_TYPE)
+      if get_catalog_search_cluster():
+        data['entityFilters'] = {
+          'condition': 'AND',
+          'criterion': [{
+            'attributeName': 'qualifiedName',
+            'operator': 'contains',
+            'attributeValue': '@' + get_catalog_search_cluster()
+          }]
+        }
+
+      atlas_response = self._root.post('/v2/search/basic', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
 
       # Adapt Atlas entities to Navigator structure in the results
       if 'entities' in atlas_response:
@@ -274,14 +291,27 @@ class AtlasApi(Api):
           name, val = term.split(':')
           parentPath = val.strip('"').lstrip('/').replace('/', '.')
 
-      # currently we only support queries with type:database or with a parentPath attribute
       if query_s == 'type:database':
-        atlas_dsl_query = 'from hive_db limit %s' % limit
+        if get_catalog_search_cluster():
+          atlas_dsl_query = 'from hive_db where qualifiedName like \'*@%s\' limit %s' % (
+            get_catalog_search_cluster(),
+            limit
+          )
+        else:
+          atlas_dsl_query = 'from hive_db limit %s' % limit
       elif not parentPath:
         return found_entities
       else:
         atlas_type = 'hive_table' if parentPath.count('.') == 0 else 'hive_column'
-        atlas_dsl_query = 'from %s where qualifiedName like \'%s*\' limit %s' % (atlas_type, parentPath, limit)
+        if get_catalog_search_cluster():
+          atlas_dsl_query = 'from %s where qualifiedName like \'%s*@%s\' limit %s' % (
+            atlas_type,
+            parentPath,
+            get_catalog_search_cluster(),
+            limit
+          )
+        else:
+          atlas_dsl_query = 'from %s where qualifiedName like \'%s*\' limit %s' % (atlas_type, parentPath, limit)
 
       atlas_response = self._root.get('/v2/search/dsl?query=%s' % atlas_dsl_query)
 
