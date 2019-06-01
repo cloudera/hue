@@ -31,7 +31,8 @@ PROD_INCLUDES := \
 	tools/relocatable.sh \
 	tools/enable-python27.sh \
 	tools/load-balancer \
-	VERSION
+	VERSION \
+	webpack-stats*.json
 
 # Check for things in BDIST_EXCLUDES in various apps
 PROD_EXCLUDES := \
