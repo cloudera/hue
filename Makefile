@@ -206,6 +206,7 @@ install-env:
 	$(MAKE) -C $(INSTALL_DIR)/desktop env-install
 	@echo --- Setting up Applications
 	$(MAKE) -C $(INSTALL_DIR)/apps env-install
+	cp $(ROOT)/webpack-stats*.json $(INSTALL_DIR)
 
 ###################################
 # Internationalization
