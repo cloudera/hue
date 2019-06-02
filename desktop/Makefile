@@ -102,6 +102,7 @@ $(DESKTOP_DB): $(BLD_DIR_BIN)/hue
 
 # Targets that simply recurse into all of the applications
 ENV_INSTALL_TARGETS := $(APPS:%=.recursive-env-install/%)
+$(error "----------------> ENV_INSTALL_TARGETS: $(ENV_INSTALL_TARGETS)")
 .recursive-env-install/%: %
 	$(MAKE) -C $< env-install
 

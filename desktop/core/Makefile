@@ -20,6 +20,16 @@ ifeq ($(ROOT),)
   $(error "Error: Expect the environment variable $$ROOT to point to the Desktop installation")
 endif
 
+
+ifneq ($(PYTHON_VER),python2.7)
+  # MAKEFILE_SDK = $(shell echo "")
+  COMPILE = $(shell echo "")
+  EXT_ENV_INSTALL = $(shell echo "")
+else
+  COMPILE = compile
+  EXT_ENV_INSTALL = ext-env-install
+endif
+
 # The default RSYNC_OPT copies unsafe links. We don't want that because
 # the symlink targets are always installed (separately). See HUE-565.
 RSYNC_OPT := -a
@@ -33,6 +43,14 @@ default::
 # 	Install app into the virtual environment.
 #
 .PHONY: env-install
-env-install: compile ext-env-install
-	@echo '--- Installing $(APP_NAME) into virtual-env'
-	@$(ENV_PYTHON) setup.py develop -N -q
+env-install: $(COMPILE) $(EXT_ENV_INSTALL)
+	@echo ">>>-----> env-install: $(APP_NAME)"
+	@if [ "${PYTHON_VER}" != "python2.7" ]; then \
+	    echo '--- Installing requirement.txt into virtual-env' via $(ENV_PIP) command. \
+	    $(ENV_PIP) install -r requirements_py3.txt ;\
+	    echo '--- Finished requirement.txt into virtual-env' \
+	else \
+	    echo '--- Installing $(APP_NAME) into virtual-env' \
+	    $(ENV_PYTHON) setup.py develop -N -q ; \
+	fi
+
