@@ -40,6 +40,8 @@ class TestSolrClient:
     global _IS_SOLR_WITH_HDFS
     global _ZOOKEEPER_HOST
 
+    SolrClient._reset_properties()
+
 
   def test_get_ensemble_cdh_solr(self):
     try:
@@ -50,7 +52,7 @@ class TestSolrClient:
       assert_true(client.is_solr_with_hdfs())
       assert_equal('hue.com:2181/solr', client.get_zookeeper_host())
     finally:
-      client._reset_properties()
+      SolrClient._reset_properties()
 
 
   def test_get_ensemble_upstream_solr(self):
@@ -62,8 +64,7 @@ class TestSolrClient:
       assert_false(client.is_solr_with_hdfs())
       assert_equal('localhost:9983', client.get_zookeeper_host())
     finally:
-      client._reset_properties()
-
+      SolrClient._reset_properties()
 
 
 class MockSolrCdhCloudHdfsApi():
