@@ -145,6 +145,7 @@ $(BLD_DIR_ENV)/stamp:
 desktop: parent-pom
 # END DEV ONLY >>>>
 desktop: virtual-env
+	@echo ">>>-----> desktop: "
 	@$(MAKE) -C desktop
 
 ###################################
