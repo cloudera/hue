@@ -35,7 +35,7 @@ CreateStatement_EDIT
  | TableDefinition_EDIT
  | ViewDefinition_EDIT
  | FunctionDefinition_EDIT
- | AnyCreate OptionalExternal 'CURSOR'
+ | 'CREATE' 'EXTERNAL' 'CURSOR'
    {
      if ($2) {
        parser.suggestKeywords(['TABLE']);
@@ -46,33 +46,33 @@ CreateStatement_EDIT
  ;
 
 DatabaseDefinition
- : AnyCreate DatabaseOrSchema OptionalIfNotExists
- | AnyCreate DatabaseOrSchema OptionalIfNotExists RegularIdentifier DatabaseDefinitionOptionals
+ : 'CREATE' DatabaseOrSchema OptionalIfNotExists
+ | 'CREATE' DatabaseOrSchema OptionalIfNotExists RegularIdentifier DatabaseDefinitionOptionals
    {
      parser.addNewDatabaseLocation(@4, [{ name: $4 }]);
    }
  ;
 
 DatabaseDefinition_EDIT
- : AnyCreate DatabaseOrSchema OptionalIfNotExists 'CURSOR'
+ : 'CREATE' DatabaseOrSchema OptionalIfNotExists 'CURSOR'
    {
      if (!$3) {
        parser.suggestKeywords(['IF NOT EXISTS']);
      }
    }
- | AnyCreate DatabaseOrSchema OptionalIfNotExists_EDIT
- | AnyCreate DatabaseOrSchema OptionalIfNotExists 'CURSOR' RegularIdentifier
+ | 'CREATE' DatabaseOrSchema OptionalIfNotExists_EDIT
+ | 'CREATE' DatabaseOrSchema OptionalIfNotExists 'CURSOR' RegularIdentifier
    {
      if (!$3) {
        parser.suggestKeywords(['IF NOT EXISTS']);
      }
      parser.addNewDatabaseLocation(@5, [{ name: $5 }]);
    }
- | AnyCreate DatabaseOrSchema OptionalIfNotExists_EDIT RegularIdentifier
+ | 'CREATE' DatabaseOrSchema OptionalIfNotExists_EDIT RegularIdentifier
    {
      parser.addNewDatabaseLocation(@4, [{ name: $4 }]);
    }
- | AnyCreate DatabaseOrSchema OptionalIfNotExists RegularIdentifier DatabaseDefinitionOptionals 'CURSOR'
+ | 'CREATE' DatabaseOrSchema OptionalIfNotExists RegularIdentifier DatabaseDefinitionOptionals 'CURSOR'
    {
      parser.addNewDatabaseLocation(@4, [{ name: $4 }]);
    }
@@ -133,18 +133,18 @@ PropertyAssignment
  ;
 
 TableDefinition
- : AnyCreate OptionalExternal AnyTable OptionalIfNotExists TableDefinitionRightPart
+ : 'CREATE' 'EXTERNAL' 'TABLE' OptionalIfNotExists TableDefinitionRightPart
  ;
 
 TableDefinition_EDIT
- : AnyCreate OptionalExternal AnyTable OptionalIfNotExists TableDefinitionRightPart_EDIT
- | AnyCreate OptionalExternal AnyTable OptionalIfNotExists 'CURSOR'
+ : 'CREATE' 'EXTERNAL' 'TABLE' OptionalIfNotExists TableDefinitionRightPart_EDIT
+ | 'CREATE' 'EXTERNAL' 'TABLE' OptionalIfNotExists 'CURSOR'
    {
      if (!$4) {
        parser.suggestKeywords(['IF NOT EXISTS']);
      }
    }
- | AnyCreate OptionalExternal AnyTable OptionalIfNotExists_EDIT
+ | 'CREATE' 'EXTERNAL' 'TABLE' OptionalIfNotExists_EDIT
  ;
 
 TableDefinitionRightPart
@@ -248,7 +248,7 @@ TableIdentifierAndOptionalColumnSpecification_EDIT
 OptionalColumnSpecificationsOrLike
  :
  | ParenthesizedColumnSpecificationList
- | 'LIKE_PARQUET' HdfsPath          -> []
+ | 'LIKE_PARQUET' HdfsPath                  -> []
  | 'LIKE' SchemaQualifiedTableIdentifier    -> []
  ;
 
@@ -617,15 +617,15 @@ HashClause_EDIT
  ;
 
 RangeClause
- : AnyRange ParenthesizedColumnList ParenthesizedPartitionValuesList
+ : 'RANGE' ParenthesizedColumnList ParenthesizedPartitionValuesList
  ;
 
 RangeClause_EDIT
- : AnyRange 'CURSOR'
- | AnyRange ParenthesizedColumnList_EDIT
- | AnyRange ParenthesizedColumnList 'CURSOR'
- | AnyRange ParenthesizedColumnList ParenthesizedPartitionValuesList_EDIT
- | AnyRange ParenthesizedColumnList_EDIT ParenthesizedPartitionValuesList
+ : 'RANGE' 'CURSOR'
+ | 'RANGE' ParenthesizedColumnList_EDIT
+ | 'RANGE' ParenthesizedColumnList 'CURSOR'
+ | 'RANGE' ParenthesizedColumnList ParenthesizedPartitionValuesList_EDIT
+ | 'RANGE' ParenthesizedColumnList_EDIT ParenthesizedPartitionValuesList
  ;
 
 OptionalSortBy
@@ -931,26 +931,26 @@ CommitLocations
  ;
 
 ViewDefinition
- : AnyCreate 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment 'AS' QuerySpecification
+ : 'CREATE' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment 'AS' QuerySpecification
  ;
 
 ViewDefinition_EDIT
- : AnyCreate 'VIEW' OptionalIfNotExists 'CURSOR'
+ : 'CREATE' 'VIEW' OptionalIfNotExists 'CURSOR'
    {
      if (!$3) {
        parser.suggestKeywords(['IF NOT EXISTS']);
      }
      parser.suggestDatabases({ appendDot: true });
    }
- | AnyCreate 'VIEW' OptionalIfNotExists 'CURSOR' SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment 'AS' QuerySpecification
+ | 'CREATE' 'VIEW' OptionalIfNotExists 'CURSOR' SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment 'AS' QuerySpecification
    {
      if (!$3) {
        parser.suggestKeywords(['IF NOT EXISTS']);
      }
    }
- | AnyCreate 'VIEW' OptionalIfNotExists_EDIT
- | AnyCreate 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedViewColumnList_EDIT OptionalComment
- | AnyCreate 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment 'CURSOR'
+ | 'CREATE' 'VIEW' OptionalIfNotExists_EDIT
+ | 'CREATE' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedViewColumnList_EDIT OptionalComment
+ | 'CREATE' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment 'CURSOR'
    {
      var keywords = [{value: 'AS', weight: 1 }];
      if (!$6) {
@@ -958,12 +958,12 @@ ViewDefinition_EDIT
      }
      parser.suggestKeywords(keywords);
    }
- | AnyCreate 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment 'AS' 'CURSOR'
+ | 'CREATE' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment 'AS' 'CURSOR'
    {
      parser.suggestKeywords(['SELECT']);
    }
- | AnyCreate 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment 'AS' QuerySpecification_EDIT
- | AnyCreate 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier_EDIT OptionalParenthesizedViewColumnList OptionalComment 'AS' QuerySpecification
+ | 'CREATE' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment 'AS' QuerySpecification_EDIT
+ | 'CREATE' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier_EDIT OptionalParenthesizedViewColumnList OptionalComment 'AS' QuerySpecification
  ;
 
 FunctionDefinition
@@ -977,85 +977,85 @@ FunctionDefinition_EDIT
  ;
 
 GenericFunctionDefinition
- : AnyCreate 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType HdfsLocation SymbolDefinition
+ : 'CREATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType HdfsLocation SymbolDefinition
  ;
 
 GenericFunctionDefinition_EDIT
- : AnyCreate 'FUNCTION' OptionalIfNotExists 'CURSOR'
+ : 'CREATE' 'FUNCTION' OptionalIfNotExists 'CURSOR'
    {
      if (!$3) {
        parser.suggestKeywords(['IF NOT EXISTS']);
      }
      parser.suggestDatabases({ appendDot: true });
    }
- | AnyCreate 'FUNCTION' OptionalIfNotExists 'CURSOR' SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType HdfsLocation SymbolDefinition
+ | 'CREATE' 'FUNCTION' OptionalIfNotExists 'CURSOR' SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType HdfsLocation SymbolDefinition
    {
      if (!$3) {
        parser.suggestKeywords(['IF NOT EXISTS']);
      }
    }
- | AnyCreate 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList 'CURSOR'
+ | 'CREATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList 'CURSOR'
    {
      parser.suggestKeywords(['RETURNS']);
    }
- | AnyCreate 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType 'CURSOR'
+ | 'CREATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType 'CURSOR'
    {
      parser.suggestKeywords(['LOCATION']);
    }
- | AnyCreate 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType HdfsLocation 'CURSOR'
+ | 'CREATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType HdfsLocation 'CURSOR'
    {
      parser.suggestKeywords(['SYMBOL']);
    }
- | AnyCreate 'FUNCTION' OptionalIfNotExists_EDIT
- | AnyCreate 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList_EDIT
- | AnyCreate 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType_EDIT
- | AnyCreate 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType HdfsLocation_EDIT
- | AnyCreate 'FUNCTION' OptionalIfNotExists_EDIT SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType HdfsLocation SymbolDefinition
- | AnyCreate 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList_EDIT ReturnType HdfsLocation SymbolDefinition
- | AnyCreate 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType_EDIT HdfsLocation SymbolDefinition
- | AnyCreate 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType HdfsLocation_EDIT SymbolDefinition
+ | 'CREATE' 'FUNCTION' OptionalIfNotExists_EDIT
+ | 'CREATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList_EDIT
+ | 'CREATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType_EDIT
+ | 'CREATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType HdfsLocation_EDIT
+ | 'CREATE' 'FUNCTION' OptionalIfNotExists_EDIT SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType HdfsLocation SymbolDefinition
+ | 'CREATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList_EDIT ReturnType HdfsLocation SymbolDefinition
+ | 'CREATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType_EDIT HdfsLocation SymbolDefinition
+ | 'CREATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType HdfsLocation_EDIT SymbolDefinition
  ;
 
 AggregateFunctionDefinition
- : AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
+ : 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
    HdfsLocation OptionalInitFn UpdateFn MergeFn OptionalPrepareFn OptionalCloseFn OptionalSerializeFn OptionalFinalizeFn OptionalIntermediate
  ;
 
 AggregateFunctionDefinition_EDIT
- : AnyCreate 'AGGREGATE' 'CURSOR'
+ : 'CREATE' 'AGGREGATE' 'CURSOR'
    {
      parser.suggestKeywords(['FUNCTION']);
    }
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists 'CURSOR' SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists 'CURSOR' SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
    HdfsLocation OptionalInitFn UpdateFn MergeFn OptionalPrepareFn OptionalCloseFn OptionalSerializeFn OptionalFinalizeFn OptionalIntermediate
    {
      if (!$4) {
        parser.suggestKeywords(['IF NOT EXISTS']);
      }
    }
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists 'CURSOR'
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists 'CURSOR'
    {
      if (!$4) {
        parser.suggestKeywords(['IF NOT EXISTS']);
      }
      parser.suggestDatabases({ appendDot: true });
    }
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists_EDIT
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists_EDIT SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists_EDIT
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists_EDIT SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
    HdfsLocation OptionalInitFn UpdateFn MergeFn OptionalPrepareFn OptionalCloseFn OptionalSerializeFn OptionalFinalizeFn OptionalIntermediate
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList_EDIT
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList_EDIT ReturnType
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList_EDIT
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList_EDIT ReturnType
    HdfsLocation OptionalInitFn UpdateFn MergeFn OptionalPrepareFn OptionalCloseFn OptionalSerializeFn OptionalFinalizeFn OptionalIntermediate
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList 'CURSOR'
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList 'CURSOR'
    {
      parser.suggestKeywords(['RETURNS']);
    }
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
    'CURSOR'
    {
      parser.suggestKeywords(['LOCATION']);
    }
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
    HdfsLocation OptionalInitFn 'CURSOR'
    {
      if (!$9) {
@@ -1064,12 +1064,12 @@ AggregateFunctionDefinition_EDIT
        parser.suggestKeywords([{value: 'UPDATE_FN', weight: 1 }]);
      }
    }
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
    HdfsLocation OptionalInitFn UpdateFn 'CURSOR'
    {
      parser.suggestKeywords(['MERGE_FN']);
    }
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
    HdfsLocation OptionalInitFn UpdateFn MergeFn OptionalPrepareFn OptionalCloseFn OptionalSerializeFn OptionalFinalizeFn OptionalIntermediate 'CURSOR'
    {
      if (!$12 && !$13 && !$14 && !$15 && !$16) {
@@ -1084,34 +1084,34 @@ AggregateFunctionDefinition_EDIT
        parser.suggestKeywords([{value: 'INTERMEDIATE', weight: 1 }]);
      }
    }
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType_EDIT
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType_EDIT
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
    HdfsLocation_EDIT OptionalInitFn
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
    HdfsLocation OptionalInitFn_EDIT
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
    HdfsLocation OptionalInitFn UpdateFn_EDIT
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
    HdfsLocation OptionalInitFn UpdateFn
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
    HdfsLocation OptionalInitFn UpdateFn MergeFn_EDIT OptionalPrepareFn OptionalCloseFn OptionalSerializeFn OptionalFinalizeFn OptionalIntermediate
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
    HdfsLocation OptionalInitFn UpdateFn MergeFn OptionalPrepareFn_EDIT OptionalCloseFn OptionalSerializeFn OptionalFinalizeFn OptionalIntermediate
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
    HdfsLocation OptionalInitFn UpdateFn MergeFn OptionalPrepareFn OptionalCloseFn_EDIT  OptionalSerializeFn OptionalFinalizeFn OptionalIntermediate
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
    HdfsLocation OptionalInitFn UpdateFn MergeFn OptionalPrepareFn OptionalCloseFn OptionalSerializeFn_EDIT OptionalFinalizeFn OptionalIntermediate
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
    HdfsLocation OptionalInitFn UpdateFn MergeFn OptionalPrepareFn OptionalCloseFn OptionalSerializeFn OptionalFinalizeFn_EDIT OptionalIntermediate
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
    HdfsLocation OptionalInitFn UpdateFn MergeFn OptionalPrepareFn OptionalCloseFn OptionalSerializeFn OptionalFinalizeFn Intermediate_EDIT
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType_EDIT
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType_EDIT
    HdfsLocation OptionalInitFn UpdateFn MergeFn OptionalPrepareFn OptionalCloseFn OptionalSerializeFn OptionalFinalizeFn OptionalIntermediate
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
    HdfsLocation_EDIT OptionalInitFn UpdateFn MergeFn OptionalPrepareFn OptionalCloseFn OptionalSerializeFn OptionalFinalizeFn OptionalIntermediate
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
    HdfsLocation OptionalInitFn_EDIT UpdateFn MergeFn OptionalPrepareFn OptionalCloseFn OptionalSerializeFn OptionalFinalizeFn OptionalIntermediate
- | AnyCreate 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
+ | 'CREATE' 'AGGREGATE' 'FUNCTION' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedArgumentList ReturnType
    HdfsLocation OptionalInitFn UpdateFn_EDIT MergeFn OptionalPrepareFn OptionalCloseFn OptionalSerializeFn OptionalFinalizeFn OptionalIntermediate
  ;
 
@@ -1273,12 +1273,12 @@ ViewColumnList
  ;
 
 ViewColumnList_EDIT
- : ColumnReference OptionalComment 'CURSOR'                                        --> $2
- | ColumnReference OptionalComment 'CURSOR' ',' ViewColumnList                     --> $2
- | ViewColumnList ',' ColumnReference OptionalComment 'CURSOR'                     --> $4
- | ViewColumnList ',' ColumnReference OptionalComment 'CURSOR' ',' ViewColumnList  --> $4
+ : ColumnReference OptionalComment 'CURSOR'                                        -> $2
+ | ColumnReference OptionalComment 'CURSOR' ',' ViewColumnList                     -> $2
+ | ViewColumnList ',' ColumnReference OptionalComment 'CURSOR'                     -> $4
+ | ViewColumnList ',' ColumnReference OptionalComment 'CURSOR' ',' ViewColumnList  -> $4
  ;
 
 RoleDefinition
- : AnyCreate 'ROLE' RegularIdentifier
+ : 'CREATE' 'ROLE' RegularIdentifier
  ;

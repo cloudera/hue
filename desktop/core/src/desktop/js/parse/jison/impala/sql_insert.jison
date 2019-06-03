@@ -283,7 +283,7 @@ ParenthesizedValueExpressionList_EDIT
  ;
 
 UpdateDeleteOrInsert
- : 'UPDATE' 'SET' SetClauseList              --> { isUpdate: true }
+ : 'UPDATE' 'SET' SetClauseList              -> { isUpdate: true }
  ;
 
 UpdateDeleteOrInsert_EDIT
