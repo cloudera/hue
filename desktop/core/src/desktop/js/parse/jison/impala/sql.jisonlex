@@ -64,6 +64,7 @@
 'CASE'                             { return 'CASE'; }
 'CHANGE'                           { return 'CHANGE'; }
 'CHAR'                             { return 'CHAR'; }
+LIKE\s+PARQUET                     { this.begin('hdfs'); return 'LIKE_PARQUET'; }
 'CHARACTER'                        { return 'CHARACTER'; }
 'CLOB'                             { return 'CLOB'; }
 'CLOSE_FN'                         { return 'CLOSE_FN'; }
@@ -86,10 +87,8 @@
 'COVAR_POP'                        { return 'COVAR_POP'; }
 'COVAR_SAMP'                       { return 'COVAR_SAMP'; }
 'CREATE'                           { parser.determineCase(yytext); parser.addStatementTypeLocation('CREATE', yylloc, yy.lexer.upcomingInput()); return 'CREATE'; }
-'CREATE'                           { parser.determineCase(yytext); return 'CREATE'; }
 'CROSS'                            { return 'CROSS'; }
 'CUBE'                             { return 'CUBE'; }
-'CURRENT'                          { return 'CURRENT'; }
 'CURRENT'                          { return 'CURRENT'; }
 'CURRENT_DATE'                     { return 'CURRENT_DATE'; }
 'CURRENT_DEFAULT_TRANSFORM_GROUP'  { return 'CURRENT_DEFAULT_TRANSFORM_GROUP'; }
@@ -166,7 +165,6 @@
 'GLOBAL'                           { return 'GLOBAL'; }
 'GRANT'                            { parser.determineCase(yytext); parser.addStatementTypeLocation('GRANT', yylloc); return 'GRANT'; }
 'GROUP'                            { return 'GROUP'; }
-'GROUP'                            { return 'GROUP'; }
 'GROUPING'                         { return 'GROUPING'; }
 'GROUPS'                           { return 'GROUPS'; }
 'HASH'                             { return 'HASH'; }
@@ -185,7 +183,6 @@
 'INPATH'                           { this.begin('hdfs'); return 'INPATH'; }
 'INSENSITIVE'                      { return 'INSENSITIVE'; }
 'INSERT'                           { parser.determineCase(yytext); parser.addStatementTypeLocation('INSERT', yylloc); return 'INSERT'; }
-'INSERT'                           { return 'INSERT'; }
 'INT'                              { return 'INT'; }
 'INTERMEDIATE'                     { return 'INTERMEDIATE'; }
 'INTERSECT'                        { return 'INTERSECT'; }
@@ -214,7 +211,6 @@
 'LEFT'                             { return 'LEFT'; }
 'LIKE'                             { return 'LIKE'; }
 'LIKE_REGEX'                       { return 'LIKE_REGEX'; }
-'LIMIT'                            { return 'LIMIT'; }
 'LIMIT'                            { return 'LIMIT'; }
 'LINES'                            { return 'LINES'; }
 'LISTAGG'                          { return 'LISTAGG'; }
@@ -264,6 +260,7 @@
 'OVERWRITE'                        { return 'OVERWRITE'; }
 'PARQUET'                          { return 'PARQUET'; }
 'PARTITION'                        { return 'PARTITION'; }
+PARTITION\s+VALUE\s                { return 'PARTITION_VALUE'; }
 'PARTITIONED'                      { return 'PARTITIONED'; }
 'PARTITIONS'                       { return 'PARTITIONS'; }
 'PATTERN'                          { return 'PATTERN'; }
@@ -359,7 +356,6 @@
 'SYSTEM_TIME'                      { return 'SYSTEM_TIME'; }
 'SYSTEM_USER'                      { return 'SYSTEM_USER'; }
 'TABLE'                            { return 'TABLE'; }
-'TABLE'                            { return 'TABLE'; }
 'TABLES'                           { return 'TABLES'; }
 'TABLESAMPLE'                      { return 'TABLESAMPLE'; }
 'TBLPROPERTIES'                    { return 'TBLPROPERTIES'; }
@@ -410,8 +406,6 @@
 'WITH'                             { parser.determineCase(yytext); parser.addStatementTypeLocation('WITH', yylloc); return 'WITH'; }
 'WITHIN'                           { return 'WITHIN'; }
 'WITHOUT'                          { return 'WITHOUT'; }
-LIKE\s+PARQUET                     { this.begin('hdfs'); return 'LIKE_PARQUET'; }
-PARTITION\s+VALUE\s                { return 'PARTITION_VALUE'; }
 
 // Non-reserved Keywords
 'ARRAY'                            { return 'ARRAY'; }
@@ -470,50 +464,49 @@ RANK\s*\(                          { yy.lexer.unput('('); yytext = 'rank'; parse
 ROW_NUMBER\s*\(                    { yy.lexer.unput('('); yytext = 'row_number'; parser.addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
 SYSTEM\s*\(                        { yy.lexer.unput('('); yytext = 'system'; return 'SYSTEM'; }
 
-[0-9]+                                     { return 'UNSIGNED_INTEGER'; }
-[0-9]+(?:[YSL]|BD)?                        { return 'UNSIGNED_INTEGER'; }
-[0-9]+E                                    { return 'UNSIGNED_INTEGER_E'; }
-[A-Za-z0-9_]+                              { return 'REGULAR_IDENTIFIER'; }
+[0-9]+                             { return 'UNSIGNED_INTEGER'; }
+[0-9]+(?:[YSL]|BD)?                { return 'UNSIGNED_INTEGER'; }
+[0-9]+E                            { return 'UNSIGNED_INTEGER_E'; }
+[A-Za-z0-9_]+                      { return 'REGULAR_IDENTIFIER'; }
 
-<hdfs>'\u2020'                             { parser.yy.cursorFound = true; return 'CURSOR'; }
-<hdfs>'\u2021'                             { parser.yy.cursorFound = true; return 'PARTIAL_CURSOR'; }
-<hdfs>\s+[']                               { return 'HDFS_START_QUOTE'; }
-<hdfs>[^'\u2020\u2021]+                    { parser.addFileLocation(yylloc, yytext); return 'HDFS_PATH'; }
-<hdfs>[']                                  { this.popState(); return 'HDFS_END_QUOTE'; }
-<hdfs><<EOF>>                              { return 'EOF'; }
+<hdfs>'\u2020'                     { parser.yy.cursorFound = true; return 'CURSOR'; }
+<hdfs>'\u2021'                     { parser.yy.cursorFound = true; return 'PARTIAL_CURSOR'; }
+<hdfs>\s+[']                       { return 'HDFS_START_QUOTE'; }
+<hdfs>[^'\u2020\u2021]+            { parser.addFileLocation(yylloc, yytext); return 'HDFS_PATH'; }
+<hdfs>[']                          { this.popState(); return 'HDFS_END_QUOTE'; }
+<hdfs><<EOF>>                      { return 'EOF'; }
 
-'&&'                                       { return 'AND'; }
-'||'                                       { return 'OR'; }
+'&&'                               { return 'AND'; }
+'||'                               { return 'OR'; }
+'='                                { return '='; }
+'<'                                { return '<'; }
+'>'                                { return '>'; }
+'!='                               { return 'COMPARISON_OPERATOR'; }
+'<='                               { return 'COMPARISON_OPERATOR'; }
+'>='                               { return 'COMPARISON_OPERATOR'; }
+'<>'                               { return 'COMPARISON_OPERATOR'; }
+'<=>'                              { return 'COMPARISON_OPERATOR'; }
 
-'='                                        { return '='; }
-'<'                                        { return '<'; }
-'>'                                        { return '>'; }
-'!='                                       { return 'COMPARISON_OPERATOR'; }
-'<='                                       { return 'COMPARISON_OPERATOR'; }
-'>='                                       { return 'COMPARISON_OPERATOR'; }
-'<>'                                       { return 'COMPARISON_OPERATOR'; }
-'<=>'                                      { return 'COMPARISON_OPERATOR'; }
+'-'                                { return '-'; }
+'*'                                { return '*'; }
+'+'                                { return 'ARITHMETIC_OPERATOR'; }
+'/'                                { return 'ARITHMETIC_OPERATOR'; }
+'%'                                { return 'ARITHMETIC_OPERATOR'; }
+'|'                                { return 'ARITHMETIC_OPERATOR'; }
+'^'                                { return 'ARITHMETIC_OPERATOR'; }
+'&'                                { return 'ARITHMETIC_OPERATOR'; }
 
-'-'                                        { return '-'; }
-'*'                                        { return '*'; }
-'+'                                        { return 'ARITHMETIC_OPERATOR'; }
-'/'                                        { return 'ARITHMETIC_OPERATOR'; }
-'%'                                        { return 'ARITHMETIC_OPERATOR'; }
-'|'                                        { return 'ARITHMETIC_OPERATOR'; }
-'^'                                        { return 'ARITHMETIC_OPERATOR'; }
-'&'                                        { return 'ARITHMETIC_OPERATOR'; }
+','                                { return ','; }
+'.'                                { return '.'; }
+':'                                { return ':'; }
+';'                                { return ';'; }
+'~'                                { return '~'; }
+'!'                                { return '!'; }
 
-','                                        { return ','; }
-'.'                                        { return '.'; }
-':'                                        { return ':'; }
-';'                                        { return ';'; }
-'~'                                        { return '~'; }
-'!'                                        { return '!'; }
-
-'('                                        { return '('; }
-')'                                        { return ')'; }
-'['                                        { return '['; }
-']'                                        { return ']'; }
+'('                                { return '('; }
+')'                                { return ')'; }
+'['                                { return '['; }
+']'                                { return ']'; }
 
 \$\{[^}]*\}                                { return 'VARIABLE_REFERENCE'; }
 

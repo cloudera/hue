@@ -35,7 +35,7 @@ CreateStatement_EDIT
  | TableDefinition_EDIT
  | ViewDefinition_EDIT
  | FunctionDefinition_EDIT
- | 'CREATE' 'EXTERNAL' 'CURSOR'
+ | 'CREATE' OptionalExternal 'CURSOR'
    {
      if ($2) {
        parser.suggestKeywords(['TABLE']);
@@ -133,18 +133,23 @@ PropertyAssignment
  ;
 
 TableDefinition
- : 'CREATE' 'EXTERNAL' 'TABLE' OptionalIfNotExists TableDefinitionRightPart
+ : 'CREATE' OptionalExternal 'TABLE' OptionalIfNotExists TableDefinitionRightPart
  ;
 
 TableDefinition_EDIT
- : 'CREATE' 'EXTERNAL' 'TABLE' OptionalIfNotExists TableDefinitionRightPart_EDIT
- | 'CREATE' 'EXTERNAL' 'TABLE' OptionalIfNotExists 'CURSOR'
+ : 'CREATE' OptionalExternal 'TABLE' OptionalIfNotExists TableDefinitionRightPart_EDIT
+ | 'CREATE' OptionalExternal 'TABLE' OptionalIfNotExists 'CURSOR'
    {
      if (!$4) {
        parser.suggestKeywords(['IF NOT EXISTS']);
      }
    }
- | 'CREATE' 'EXTERNAL' 'TABLE' OptionalIfNotExists_EDIT
+ | 'CREATE' OptionalExternal 'TABLE' OptionalIfNotExists_EDIT
+ ;
+
+OptionalExternal
+ :
+ | 'EXTERNAL'
  ;
 
 TableDefinitionRightPart
