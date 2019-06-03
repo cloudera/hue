@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: demo-hue-ingress
+  annotations:
+     kubernetes.io/ingress.class: nginx # helm install stable/nginx-ingress -n nginx-ingress
+spec:
+  rules:
+  - host: demo2.gethue.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: hue
+          servicePort: 80

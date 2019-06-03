@@ -16,6 +16,7 @@ Assuming you have a Kubernetes cluster configured with Helm installed and images
    * Daphne (TBD)
 * [Container Images](/tools/docker)
    * [Hue](/tools/docker/hue)
+   * [Nginx](/tools/docker/nginx)
 
 ## Quick Start
 
