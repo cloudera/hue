@@ -210,8 +210,8 @@ install-env:
 	@echo --- Setting up Applications
 	$(MAKE) -C $(INSTALL_DIR)/apps env-install
 	@echo --- Setting up Frontend assets
-	cp package.json $(INSTALL_DIR)
-	cp webpack.config*.js $(INSTALL_DIR)
+	cp $(ROOT)/package.json $(INSTALL_DIR)
+	cp $(ROOT)/webpack.config*.js $(INSTALL_DIR)
 	$(MAKE) -C $(INSTALL_DIR) npm-install
 
 
@@ -219,18 +219,20 @@ install-env:
 # Frontend and static assets
 ###################################
 
-# <<<< DEV ONLY
 .PHONY: npm-install
 npm-install:
 	npm install
 	npm run webpack
 	npm run webpack-login
 	npm run webpack-workers
+	node_modules/.bin/removeNPMAbsolutePaths .
+	rm -rf node_modules
 
 .PHONY: create-static
 create-static:
 	./build/env/bin/hue collectstatic --noinput
 
+# <<<< DEV ONLY
 .PHONY: doc
 doc:
 	hugo --source docs/docs-site
