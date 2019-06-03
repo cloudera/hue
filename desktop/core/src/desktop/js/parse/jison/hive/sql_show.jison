@@ -215,7 +215,7 @@ ShowCreateTableStatement_EDIT
  ;
 
 AnyTableOrView
- : AnyTable
+ : 'TABLE'
  | 'VIEW'   --> { isView: true }
  ;
 
@@ -332,7 +332,7 @@ ShowGrantStatement
  : AnyShow '<hive>GRANT' OptionalPrincipalName
  | AnyShow '<hive>GRANT' OptionalPrincipalName 'ON' '<hive>ALL'
  | AnyShow '<hive>GRANT' OptionalPrincipalName 'ON' SchemaQualifiedTableIdentifier
- | AnyShow '<hive>GRANT' OptionalPrincipalName 'ON' AnyTable SchemaQualifiedTableIdentifier
+ | AnyShow '<hive>GRANT' OptionalPrincipalName 'ON' 'TABLE' SchemaQualifiedTableIdentifier
  | AnyShow '<impala>GRANT' ImpalaRoleOrUser RegularOrBacktickedIdentifier
  | AnyShow '<impala>GRANT' ImpalaRoleOrUser RegularOrBacktickedIdentifier 'ON' 'DATABASE' RegularOrBacktickedIdentifier
    {
@@ -355,7 +355,7 @@ ShowGrantStatement_EDIT
      parser.suggestTables();
    }
  | AnyShow '<hive>GRANT' OptionalPrincipalName 'ON' SchemaQualifiedTableIdentifier_EDIT
- | AnyShow  '<hive>GRANT' OptionalPrincipalName 'ON' AnyTable 'CURSOR'
+ | AnyShow  '<hive>GRANT' OptionalPrincipalName 'ON' 'TABLE' 'CURSOR'
    {
      parser.suggestTables();
    }

@@ -27,31 +27,27 @@ DataManipulation_EDIT
  ;
 
 LoadStatement
- : AnyLoad AnyData OptionalHiveLocal AnyInpath HdfsPath OptionalOverwrite 'INTO' AnyTable SchemaQualifiedTableIdentifier OptionalPartitionSpec
+ : 'LOAD' 'DATA' OptionalLocal 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec
    {
      parser.addTablePrimary($9);
    }
  ;
 
 LoadStatement_EDIT
- : AnyLoad 'CURSOR'
+ : 'LOAD' 'CURSOR'
    {
-     if (parser.isHive()) {
-       parser.suggestKeywords(['DATA LOCAL INPATH', 'DATA INPATH']);
-     } else if (parser.isImpala()) {
-       parser.suggestKeywords(['DATA INPATH']);
-     }
+     parser.suggestKeywords(['DATA LOCAL INPATH', 'DATA INPATH']);
    }
- | AnyLoad AnyData OptionalHiveLocal 'CURSOR'
+ | 'LOAD' 'DATA' OptionalLocal 'CURSOR'
    {
-     if (parser.isHive() && !$3) {
+     if (!$3) {
        parser.suggestKeywords(['INPATH', 'LOCAL INPATH']);
      } else {
        parser.suggestKeywords(['INPATH']);
      }
    }
- | AnyLoad AnyData OptionalHiveLocal AnyInpath HdfsPath_EDIT OptionalOverwrite
- | AnyLoad AnyData OptionalHiveLocal AnyInpath HdfsPath OptionalOverwrite 'CURSOR'
+ | 'LOAD' 'DATA' OptionalLocal 'INPATH' HdfsPath_EDIT OptionalOverwrite
+ | 'LOAD' 'DATA' OptionalLocal 'INPATH' HdfsPath OptionalOverwrite 'CURSOR'
    {
      if (!$6) {
        parser.suggestKeywords(['OVERWRITE INTO TABLE', 'INTO TABLE']);
@@ -59,28 +55,28 @@ LoadStatement_EDIT
        parser.suggestKeywords(['INTO TABLE']);
      }
    }
- | AnyLoad AnyData OptionalHiveLocal AnyInpath HdfsPath OptionalOverwrite 'INTO' 'CURSOR'
+ | 'LOAD' 'DATA' OptionalLocal 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'CURSOR'
    {
      parser.suggestKeywords([ 'TABLE' ]);
    }
- | AnyLoad AnyData OptionalHiveLocal AnyInpath HdfsPath OptionalOverwrite 'INTO' AnyTable 'CURSOR'
+ | 'LOAD' 'DATA' OptionalLocal 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'TABLE' 'CURSOR'
    {
      parser.suggestTables();
      parser.suggestDatabases({ appendDot: true });
    }
- | AnyLoad AnyData OptionalHiveLocal AnyInpath HdfsPath OptionalOverwrite 'INTO' AnyTable SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
- | AnyLoad AnyData OptionalHiveLocal AnyInpath HdfsPath OptionalOverwrite 'INTO' AnyTable SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'
+ | 'LOAD' 'DATA' OptionalLocal 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
+ | 'LOAD' 'DATA' OptionalLocal 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'
    {
      parser.addTablePrimary($9);
      if (!$10) {
        parser.suggestKeywords(['PARTITION']);
      }
    }
- | AnyLoad AnyData OptionalHiveLocal AnyInpath HdfsPath OptionalOverwrite 'INTO' AnyTable SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
+ | 'LOAD' 'DATA' OptionalLocal 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
    {
      parser.addTablePrimary($9);
    }
- | AnyLoad AnyData OptionalHiveLocal AnyInpath HdfsPath_EDIT OptionalOverwrite 'INTO' AnyTable SchemaQualifiedTableIdentifier OptionalPartitionSpec
+ | 'LOAD' 'DATA' OptionalLocal 'INPATH' HdfsPath_EDIT OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec
    {
      parser.addTablePrimary($9);
    }
@@ -88,36 +84,20 @@ LoadStatement_EDIT
 
 OptionalOverwrite
  :
- | '<hive>OVERWRITE'
- | '<impala>OVERWRITE'
+ | 'OVERWRITE'
  ;
 
-OptionalHiveLocal
+OptionalLocal
  :
- | '<hive>LOCAL'
- ;
-
-AnyLoad
- : '<hive>LOAD'
- | '<impala>LOAD'
- ;
-
-AnyData
- : '<hive>DATA'
- | '<impala>DATA'
- ;
-
-AnyInpath
- : '<hive>INPATH'
- | '<impala>INPATH'
+ | 'LOCAL'
  ;
 
 ImportStatement
- : '<hive>IMPORT' OptionalTableWithPartition PushHdfsLexerState 'FROM' HdfsPath OptionalHdfsLocation
+ : 'IMPORT' OptionalTableWithPartition PushHdfsLexerState 'FROM' HdfsPath OptionalHdfsLocation
  ;
 
 ImportStatement_EDIT
- : '<hive>IMPORT' 'CURSOR' OptionalTableWithPartition
+ : 'IMPORT' 'CURSOR' OptionalTableWithPartition
    {
      if (!$3) {
        parser.suggestKeywords(['EXTERNAL TABLE', 'FROM', 'TABLE']);
@@ -125,7 +105,7 @@ ImportStatement_EDIT
        parser.suggestKeywords(['EXTERNAL']);
      }
    }
- | '<hive>IMPORT' TableWithPartition 'CURSOR'
+ | 'IMPORT' TableWithPartition 'CURSOR'
    {
      if ($2.suggestKeywords) {
         parser.suggestKeywords(parser.createWeightedKeywords($2.suggestKeywords, 2).concat(['FROM']));
@@ -133,16 +113,16 @@ ImportStatement_EDIT
         parser.suggestKeywords(['FROM']);
       }
    }
- | '<hive>IMPORT' TableWithPartition_EDIT
- | '<hive>IMPORT' OptionalTableWithPartition PushHdfsLexerState 'FROM' HdfsPath_EDIT OptionalHdfsLocation
- | '<hive>IMPORT' OptionalTableWithPartition PushHdfsLexerState 'FROM' HdfsPath HdfsLocation_EDIT
- | '<hive>IMPORT' OptionalTableWithPartition PushHdfsLexerState 'FROM' HdfsPath OptionalHdfsLocation 'CURSOR'
+ | 'IMPORT' TableWithPartition_EDIT
+ | 'IMPORT' OptionalTableWithPartition PushHdfsLexerState 'FROM' HdfsPath_EDIT OptionalHdfsLocation
+ | 'IMPORT' OptionalTableWithPartition PushHdfsLexerState 'FROM' HdfsPath HdfsLocation_EDIT
+ | 'IMPORT' OptionalTableWithPartition PushHdfsLexerState 'FROM' HdfsPath OptionalHdfsLocation 'CURSOR'
    {
      if (!$6) {
        parser.suggestKeywords(['LOCATION']);
      }
    }
- | '<hive>IMPORT' 'CURSOR' OptionalTableWithPartition PushHdfsLexerState 'FROM' HdfsPath OptionalHdfsLocation
+ | 'IMPORT' 'CURSOR' OptionalTableWithPartition PushHdfsLexerState 'FROM' HdfsPath OptionalHdfsLocation
    {
      if (!$3) {
        parser.suggestKeywords(['EXTERNAL TABLE', 'TABLE']);
@@ -150,8 +130,8 @@ ImportStatement_EDIT
        parser.suggestKeywords(['EXTERNAL']);
      }
    }
-| '<hive>IMPORT' TableWithPartition_EDIT PushHdfsLexerState 'FROM' HdfsPath OptionalHdfsLocation
- | '<hive>IMPORT' TableWithPartition 'CURSOR' PushHdfsLexerState 'FROM' HdfsPath OptionalHdfsLocation
+| 'IMPORT' TableWithPartition_EDIT PushHdfsLexerState 'FROM' HdfsPath OptionalHdfsLocation
+ | 'IMPORT' TableWithPartition 'CURSOR' PushHdfsLexerState 'FROM' HdfsPath OptionalHdfsLocation
     {
       if ($2.suggestKeywords) {
         parser.suggestKeywords(parser.createWeightedKeywords($2.suggestKeywords, 2).concat(['FROM']));
@@ -165,7 +145,7 @@ OptionalTableWithPartition
  ;
 
 TableWithPartition
- : '<hive>EXTERNAL' '<hive>TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec
+ : 'EXTERNAL' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec
    {
      parser.addTablePrimary($3);
      if (!$4) {
@@ -174,7 +154,7 @@ TableWithPartition
        $$ = { hasExternal: true }
      }
    }
- | '<hive>TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec
+ | 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec
    {
      parser.addTablePrimary($2);
      if (!$3) {
@@ -184,56 +164,56 @@ TableWithPartition
  ;
 
 TableWithPartition_EDIT
- : '<hive>EXTERNAL' 'CURSOR'
+ : 'EXTERNAL' 'CURSOR'
    {
      parser.suggestKeywords(['TABLE']);
    }
- | '<hive>EXTERNAL' '<hive>TABLE' 'CURSOR'
+ | 'EXTERNAL' 'TABLE' 'CURSOR'
    {
      parser.suggestTables();
      parser.suggestDatabases({ appendDot: true });
    }
- | '<hive>EXTERNAL' '<hive>TABLE' SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
- | '<hive>EXTERNAL' '<hive>TABLE' SchemaQualifiedTableIdentifier PartitionSpec_EDIT
+ | 'EXTERNAL' 'TABLE' SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
+ | 'EXTERNAL' 'TABLE' SchemaQualifiedTableIdentifier PartitionSpec_EDIT
    {
      parser.addTablePrimary($3);
    }
- | '<hive>TABLE' 'CURSOR'
+ | 'TABLE' 'CURSOR'
    {
      parser.suggestTables();
      parser.suggestDatabases({ appendDot: true });
    }
 
- | '<hive>TABLE' SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
- | '<hive>TABLE' SchemaQualifiedTableIdentifier PartitionSpec_EDIT
+ | 'TABLE' SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
+ | 'TABLE' SchemaQualifiedTableIdentifier PartitionSpec_EDIT
    {
      parser.addTablePrimary($3);
    }
  ;
 
 ExportStatement
- : '<hive>EXPORT' '<hive>TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec PushHdfsLexerState 'TO' HdfsPath
+ : 'EXPORT' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec PushHdfsLexerState 'TO' HdfsPath
    {
      parser.addTablePrimary($3);
    }
- | '<hive>EXPORT' '<hive>TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec PushHdfsLexerState 'TO' HdfsPath '<hive>FOR' '<hive>REPLICATION' '(' QuotedValue ')'
+ | 'EXPORT' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec PushHdfsLexerState 'TO' HdfsPath 'FOR' 'REPLICATION' '(' QuotedValue ')'
    {
      parser.addTablePrimary($3);
    }
  ;
 
 ExportStatement_EDIT
- : '<hive>EXPORT' 'CURSOR'
+ : 'EXPORT' 'CURSOR'
    {
      parser.suggestKeywords(['TABLE']);
    }
- | '<hive>EXPORT' '<hive>TABLE' 'CURSOR'
+ | 'EXPORT' 'TABLE' 'CURSOR'
    {
      parser.suggestTables();
      parser.suggestDatabases({ appendDot: true });
    }
- | '<hive>EXPORT' '<hive>TABLE' SchemaQualifiedTableIdentifier_EDIT
- | '<hive>EXPORT' '<hive>TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'
+ | 'EXPORT' 'TABLE' SchemaQualifiedTableIdentifier_EDIT
+ | 'EXPORT' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'
    {
      parser.addTablePrimary($3);
      if (!$4) {
@@ -242,49 +222,49 @@ ExportStatement_EDIT
        parser.suggestKeywords([ 'TO' ]);
      }
    }
- | '<hive>EXPORT' '<hive>TABLE' SchemaQualifiedTableIdentifier PartitionSpec_EDIT
+ | 'EXPORT' 'TABLE' SchemaQualifiedTableIdentifier PartitionSpec_EDIT
    {
      parser.addTablePrimary($3);
    }
- | '<hive>EXPORT' '<hive>TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec PushHdfsLexerState 'TO' HdfsPath_EDIT
+ | 'EXPORT' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec PushHdfsLexerState 'TO' HdfsPath_EDIT
    {
      parser.addTablePrimary($3);
    }
- | '<hive>EXPORT' '<hive>TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec PushHdfsLexerState 'TO' HdfsPath 'CURSOR'
+ | 'EXPORT' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec PushHdfsLexerState 'TO' HdfsPath 'CURSOR'
    {
      parser.addTablePrimary($3);
      parser.suggestKeywords(['FOR replication()']);
    }
- | '<hive>EXPORT' '<hive>TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec PushHdfsLexerState 'TO' HdfsPath '<hive>FOR' 'CURSOR'
+ | 'EXPORT' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec PushHdfsLexerState 'TO' HdfsPath 'FOR' 'CURSOR'
    {
      parser.addTablePrimary($3);
      parser.suggestKeywords(['replication()']);
    }
- | '<hive>EXPORT' '<hive>TABLE' SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec PushHdfsLexerState 'TO' HdfsPath
- | '<hive>EXPORT' '<hive>TABLE' SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec PushHdfsLexerState 'TO' HdfsPath '<hive>FOR' '<hive>REPLICATION' '(' QuotedValue ')'
- | '<hive>EXPORT' '<hive>TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR' PushHdfsLexerState 'TO' HdfsPath
+ | 'EXPORT' 'TABLE' SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec PushHdfsLexerState 'TO' HdfsPath
+ | 'EXPORT' 'TABLE' SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec PushHdfsLexerState 'TO' HdfsPath 'FOR' 'REPLICATION' '(' QuotedValue ')'
+ | 'EXPORT' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR' PushHdfsLexerState 'TO' HdfsPath
    {
      parser.addTablePrimary($3);
      if (!$4) {
        parser.suggestKeywords(['PARTITION']);
      }
    }
- | '<hive>EXPORT' '<hive>TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR' PushHdfsLexerState 'TO' HdfsPath '<hive>FOR' '<hive>REPLICATION' '(' QuotedValue ')'
+ | 'EXPORT' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR' PushHdfsLexerState 'TO' HdfsPath 'FOR' 'REPLICATION' '(' QuotedValue ')'
    {
      parser.addTablePrimary($3);
      if (!$4) {
        parser.suggestKeywords(['PARTITION']);
      }
    }
- | '<hive>EXPORT' '<hive>TABLE' SchemaQualifiedTableIdentifier PartitionSpec_EDIT PushHdfsLexerState 'TO' HdfsPath
+ | 'EXPORT' 'TABLE' SchemaQualifiedTableIdentifier PartitionSpec_EDIT PushHdfsLexerState 'TO' HdfsPath
    {
      parser.addTablePrimary($3);
    }
- | '<hive>EXPORT' '<hive>TABLE' SchemaQualifiedTableIdentifier PartitionSpec_EDIT PushHdfsLexerState 'TO' HdfsPath '<hive>FOR' '<hive>REPLICATION' '(' QuotedValue ')'
+ | 'EXPORT' 'TABLE' SchemaQualifiedTableIdentifier PartitionSpec_EDIT PushHdfsLexerState 'TO' HdfsPath 'FOR' 'REPLICATION' '(' QuotedValue ')'
    {
      parser.addTablePrimary($3);
    }
- | '<hive>EXPORT' '<hive>TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec PushHdfsLexerState 'TO' HdfsPath_EDIT '<hive>FOR' '<hive>REPLICATION' '(' QuotedValue ')'
+ | 'EXPORT' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec PushHdfsLexerState 'TO' HdfsPath_EDIT 'FOR' 'REPLICATION' '(' QuotedValue ')'
    {
      parser.addTablePrimary($3);
    }
