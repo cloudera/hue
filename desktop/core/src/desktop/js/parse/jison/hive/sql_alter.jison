@@ -123,7 +123,7 @@ AlterIndex_EDIT
  ;
 
 AlterTable
- : AlterTableLeftSide 'ADD' OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs OptionalImpalaCachedInOrUncached
+ : AlterTableLeftSide 'ADD' OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs
  | AlterTableLeftSide 'ADD' 'CONSTRAINT' RegularOrBacktickedIdentifier PrimaryKeySpecification
  | AlterTableLeftSide 'ADD' 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification
  | AlterTableLeftSide 'RENAME' 'TO' RegularOrBackTickedSchemaQualifiedName
@@ -146,7 +146,7 @@ AlterTable
 
 AlterTable_EDIT
  : AlterTableLeftSide_EDIT
- | AlterTableLeftSide_EDIT 'ADD' OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs OptionalImpalaCachedInOrUncached
+ | AlterTableLeftSide_EDIT 'ADD' OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs
  | AlterTableLeftSide_EDIT 'RENAME' 'TO' RegularOrBackTickedSchemaQualifiedName
  | AlterTableLeftSide_EDIT ClusteredBy
  | AlterTableLeftSide_EDIT 'SKEWED' 'BY' ParenthesizedColumnList 'ON' ParenthesizedSkewedValueList OptionalStoredAsDirectories
@@ -172,12 +172,11 @@ AlterTable_EDIT
      parser.suggestKeywords(['COLUMNS']);
    }
  | AlterTableLeftSide 'ADD' OptionalIfNotExists_EDIT
- | AlterTableLeftSide 'ADD' OptionalIfNotExists PartitionSpec HdfsLocation_EDIT OptionalPartitionSpecs OptionalImpalaCachedInOrUncached
- | AlterTableLeftSide 'ADD' OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs_EDIT OptionalImpalaCachedInOrUncached
- | AlterTableLeftSide 'ADD' OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs CachedIn_EDIT
- | AlterTableLeftSide 'ADD' OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs OptionalImpalaCachedInOrUncached 'CURSOR'
+ | AlterTableLeftSide 'ADD' OptionalIfNotExists PartitionSpec HdfsLocation_EDIT OptionalPartitionSpecs
+ | AlterTableLeftSide 'ADD' OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs_EDIT
+ | AlterTableLeftSide 'ADD' OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs 'CURSOR'
    {
-     if (!$5 && !$6 && !$7) {
+     if (!$5 && !$6) {
        parser.suggestKeywords(['LOCATION', 'PARTITION']);
      } else if ($6 && $6.suggestKeywords) {
        var keywords = parser.createWeightedKeywords($6.suggestKeywords, 2);
@@ -187,7 +186,7 @@ AlterTable_EDIT
        parser.suggestKeywords(['PARTITION']);
      }
    }
- | AlterTableLeftSide 'ADD' OptionalIfNotExists PartitionSpec_EDIT OptionalHdfsLocation OptionalPartitionSpecs OptionalCachedIn
+ | AlterTableLeftSide 'ADD' OptionalIfNotExists PartitionSpec_EDIT OptionalHdfsLocation OptionalPartitionSpecs
  | AlterTableLeftSide 'ADD' 'CONSTRAINT' 'CURSOR'
  | AlterTableLeftSide 'ADD' 'CONSTRAINT' RegularOrBacktickedIdentifier 'CURSOR'
    {
@@ -334,7 +333,6 @@ OptionalPartitionOperations
  | 'SET' 'TBLPROPERTIES' ParenthesizedPropertyAssignmentList
  | 'SET' 'SERDE' QuotedValue OptionalWithSerdeproperties
  | 'SET' 'SERDEPROPERTIES' ParenthesizedPropertyAssignmentList
- | 'SET' CachedIn OptionalWithReplication
  | AddReplaceColumns
  | 'CONCATENATE'
  | 'COMPACT' QuotedValue OptionalAndWait OptionalWithOverwriteTblProperties
@@ -397,14 +395,6 @@ OptionalPartitionOperations_EDIT
      parser.suggestFileFormats();
    }
  | 'SET' HdfsLocation_EDIT
- | 'SET' CachedIn_EDIT
- | 'SET' CachedIn OptionalWithReplication 'CURSOR'
-   {
-     if (!$3) {
-       parser.suggestKeywords(['WITH REPLICATION =']);
-     }
-   }
- | 'SET' CachedIn WithReplication_EDIT
  | 'SET' 'SERDE' QuotedValue OptionalWithSerdeproperties 'CURSOR'
    {
      if (!$4) {
@@ -432,7 +422,7 @@ OptionalWithOverwriteTblProperties
  ;
 
 WithOverwriteTblProperties_EDIT
- : AnyWith 'CURSOR'
+ : 'WITH' 'CURSOR'
    {
      parser.suggestKeywords(['OVERWRITE TBLPROPERTIES']);
    }

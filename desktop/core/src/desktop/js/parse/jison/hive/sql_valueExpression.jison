@@ -35,7 +35,6 @@ ValueExpression
  | ValueExpression 'IS' OptionalNot 'NULL'                             -> { types: [ 'BOOLEAN' ] }
  | ValueExpression 'IS' OptionalNot 'TRUE'                             -> { types: [ 'BOOLEAN' ] }
  | ValueExpression 'IS' OptionalNot 'FALSE'                            -> { types: [ 'BOOLEAN' ] }
- | ValueExpression 'IS' OptionalNot '<impala>UNKNOWN'                  -> { types: [ 'BOOLEAN' ] }
  | ValueExpression 'IS' OptionalNot 'DISTINCT' 'FROM' ValueExpression  -> { types: [ 'BOOLEAN' ] }
  ;
 
@@ -77,27 +76,16 @@ ValueExpression_EDIT
    }
  | ValueExpression 'IS' 'CURSOR'
    {
-     var keywords = ['FALSE', 'NOT NULL', 'NOT TRUE', 'NOT FALSE', 'NULL', 'TRUE'];
-     if (parser.isImpala()) {
-       keywords = keywords.concat(['DISTINCT FROM', 'NOT DISTINCT FROM', 'NOT UNKNOWN', 'UNKNOWN']);
-     }
-     parser.suggestKeywords(keywords);
+     parser.suggestKeywords(['FALSE', 'NOT NULL', 'NOT TRUE', 'NOT FALSE', 'NULL', 'TRUE']);
      $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'IS' 'NOT' 'CURSOR'
    {
-     var keywords = ['FALSE', 'NULL', 'TRUE'];
-     if (parser.isImpala()) {
-       keywords = keywords.concat(['DISTINCT FROM', 'UNKNOWN']);
-     }
-     parser.suggestKeywords(keywords);
+     parser.suggestKeywords(['FALSE', 'NULL', 'TRUE']);
      $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'IS' OptionalNot 'DISTINCT' 'CURSOR'
    {
-     if (parser.isImpala()) {
-       parser.suggestKeywords(['FROM']);
-     }
      $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'IS' 'CURSOR' 'NULL'
@@ -592,31 +580,15 @@ ValueExpression
 
 LikeRightPart
  : 'LIKE' ValueExpression             -> { suggestKeywords: ['NOT'] }
- | '<impala>ILIKE' ValueExpression    -> { suggestKeywords: ['NOT'] }
- | '<impala>IREGEXP' ValueExpression  -> { suggestKeywords: ['NOT'] }
  | 'RLIKE' ValueExpression            -> { suggestKeywords: ['NOT'] }
  | 'REGEXP' ValueExpression           -> { suggestKeywords: ['NOT'] }
  ;
 
 LikeRightPart_EDIT
  : 'LIKE' ValueExpression_EDIT
- | '<impala>ILIKE' ValueExpression_EDIT
- | '<impala>IREGEXP' ValueExpression_EDIT
  | 'RLIKE' ValueExpression_EDIT
  | 'REGEXP' ValueExpression_EDIT
  | 'LIKE' PartialBacktickedOrCursor
-   {
-     parser.suggestFunctions({ types: [ 'STRING' ] });
-     parser.suggestColumns({ types: [ 'STRING' ] });
-     $$ = { types: ['BOOLEAN'] }
-   }
- | '<impala>ILIKE' PartialBacktickedOrCursor
-   {
-     parser.suggestFunctions({ types: [ 'STRING' ] });
-     parser.suggestColumns({ types: [ 'STRING' ] });
-     $$ = { types: ['BOOLEAN'] }
-   }
- | '<impala>IREGEXP' PartialBacktickedOrCursor
    {
      parser.suggestFunctions({ types: [ 'STRING' ] });
      parser.suggestColumns({ types: [ 'STRING' ] });

@@ -321,27 +321,27 @@ OptionalInsertRowFormat_EDIT
  ;
 
 SelectWithoutTableExpression
- : 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList  -> { selectList: $4 }
+ : 'SELECT' OptionalAllOrDistinct SelectList  -> { selectList: $3 }
  ;
 
 SelectWithoutTableExpression_EDIT
- : 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList 'CURSOR'
+ : 'SELECT' OptionalAllOrDistinct SelectList 'CURSOR'
    {
-     $$ = $4;
+     $$ = $3;
      $$.cursorAtEnd = true;
    }
- | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList_EDIT
+ | 'SELECT' OptionalAllOrDistinct SelectList_EDIT
    {
-     parser.selectListNoTableSuggest($4, $2);
+     parser.selectListNoTableSuggest($3, $2);
    }
- | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin 'CURSOR'
+ | 'SELECT' OptionalAllOrDistinct 'CURSOR'
    {
      var keywords = parser.getSelectListKeywords();
      if (!$2 || $2 === 'ALL') {
        parser.suggestAggregateFunctions();
        parser.suggestAnalyticFunctions();
      }
-     if (!$3 && !$2) {
+     if (!$2) {
        keywords.push({ value: 'ALL', weight: 2 });
        keywords.push({ value: 'DISTINCT', weight: 2 });
      }
