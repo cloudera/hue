@@ -24,12 +24,7 @@ DataDefinition_EDIT
  | 'SET' 'CURSOR'
    {
      parser.suggestSetOptions();
-     if (parser.isHive()) {
-       parser.suggestKeywords(['ROLE']);
-     }
-     if (parser.isImpala()) {
-       parser.suggestKeywords(['ALL']);
-     }
+     parser.suggestKeywords(['ROLE']);
    }
  ;
 
@@ -40,7 +35,7 @@ SetSpecification
 
 SetOption
  : RegularIdentifier
- | SetOption AnyDot RegularIdentifier
+ | SetOption '.' RegularIdentifier
  ;
 
 SetValue
@@ -54,13 +49,13 @@ SetValue
  ;
 
 SetRoleStatement
- : 'SET' '<hive>ROLE' RegularIdentifier
- | 'SET' '<hive>ROLE' '<hive>ALL'
- | 'SET' '<hive>ROLE' '<hive>NONE'
+ : 'SET' 'ROLE' RegularIdentifier
+ | 'SET' 'ROLE' 'ALL'
+ | 'SET' 'ROLE' 'NONE'
  ;
 
 SetRoleStatement_EDIT
- : 'SET' '<hive>ROLE' 'CURSOR'
+ : 'SET' 'ROLE' 'CURSOR'
    {
      parser.suggestKeywords(['ALL', 'NONE']);
    }

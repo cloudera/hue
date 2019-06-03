@@ -222,7 +222,7 @@ OptionalWithGrantOption
  ;
 
 WithGrantOption_EDIT
- : AnyWith 'CURSOR'
+ : 'WITH' 'CURSOR'
    {
      parser.suggestKeywords(['GRANT OPTION']);
    }

@@ -22,13 +22,8 @@ DataDefinition_EDIT
  : UseStatement_EDIT
  ;
 
-AnyUse
- : 'USE'
- | '<hive>USE'
- ;
-
 UseStatement
- : AnyUse RegularIdentifier
+ : 'USE' RegularIdentifier
    {
      if (! parser.yy.cursorFound) {
        parser.yy.result.useDatabase = $2;
@@ -37,7 +32,7 @@ UseStatement
  ;
 
 UseStatement_EDIT
- : AnyUse 'CURSOR'
+ : 'USE' 'CURSOR'
    {
      parser.suggestDatabases();
    }

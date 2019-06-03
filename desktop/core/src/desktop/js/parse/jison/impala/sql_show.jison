@@ -87,7 +87,7 @@ ShowColumnStatsStatement_EDIT
  ;
 
 ShowCreateTableStatement
- : 'SHOW' 'CREATE' AnyTableOrView RegularOrBackTickedSchemaQualifiedName
+ : 'SHOW' 'CREATE' TableOrView RegularOrBackTickedSchemaQualifiedName
    {
      parser.addTablePrimary($4);
    }
@@ -98,7 +98,7 @@ ShowCreateTableStatement_EDIT
    {
      parser.suggestKeywords(['TABLE', 'VIEW']);
    }
- | 'SHOW' 'CREATE' AnyTableOrView 'CURSOR'
+ | 'SHOW' 'CREATE' TableOrView 'CURSOR'
    {
      if ($3.isView) {
        parser.suggestTables({ onlyViews: true });
@@ -109,7 +109,7 @@ ShowCreateTableStatement_EDIT
        appendDot: true
      });
    }
- | 'SHOW' 'CREATE' AnyTableOrView RegularOrBackTickedSchemaQualifiedName_EDIT
+ | 'SHOW' 'CREATE' TableOrView RegularOrBackTickedSchemaQualifiedName_EDIT
    {
      if (parser.yy.result.suggestTables && $3.isView) {
        parser.yy.result.suggestTables.onlyViews = true;
@@ -122,7 +122,7 @@ ShowCreateTableStatement_EDIT
    }
  ;
 
-AnyTableOrView
+TableOrView
  : 'TABLE'
  | 'VIEW'   --> { isView: true }
  ;

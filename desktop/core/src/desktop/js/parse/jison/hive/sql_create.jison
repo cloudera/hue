@@ -833,11 +833,11 @@ OptionalStoredAs
  ;
 
 StoredAs
- : 'STORED' AnyAs FileFormat
+ : 'STORED' 'AS' FileFormat
  ;
 
 StoredAs_EDIT
- : 'STORED' AnyAs 'CURSOR'
+ : 'STORED' 'AS' 'CURSOR'
    {
      parser.suggestFileFormats();
    }
@@ -1020,15 +1020,15 @@ TblProperties
 
 OptionalAsSelectStatement
  :
- | AnyAs CommitLocations QuerySpecification
+ | 'AS' CommitLocations QuerySpecification
  ;
 
 OptionalAsSelectStatement_EDIT
- : AnyAs CommitLocations 'CURSOR'
+ : 'AS' CommitLocations 'CURSOR'
    {
      parser.suggestKeywords(['SELECT']);
    }
- | AnyAs CommitLocations QuerySpecification_EDIT
+ | 'AS' CommitLocations QuerySpecification_EDIT
  ;
 
 CommitLocations
@@ -1039,26 +1039,26 @@ CommitLocations
  ;
 
 ViewDefinition
- : 'CREATE' AnyView OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalTblproperties AnyAs QuerySpecification
+ : 'CREATE' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalTblproperties 'AS' QuerySpecification
  ;
 
 ViewDefinition_EDIT
- : 'CREATE' AnyView OptionalIfNotExists 'CURSOR'
+ : 'CREATE' 'VIEW' OptionalIfNotExists 'CURSOR'
    {
      if (!$3) {
        parser.suggestKeywords(['IF NOT EXISTS']);
      }
      parser.suggestDatabases({ appendDot: true });
    }
- | 'CREATE' AnyView OptionalIfNotExists 'CURSOR' SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalTblproperties AnyAs QuerySpecification
+ | 'CREATE' 'VIEW' OptionalIfNotExists 'CURSOR' SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalTblproperties 'AS' QuerySpecification
    {
      if (!$3) {
        parser.suggestKeywords(['IF NOT EXISTS']);
      }
    }
- | 'CREATE' AnyView OptionalIfNotExists_EDIT
- | 'CREATE' AnyView OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedViewColumnList_EDIT OptionalComment OptionalTblproperties
- | 'CREATE' AnyView OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalTblproperties 'CURSOR'
+ | 'CREATE' 'VIEW' OptionalIfNotExists_EDIT
+ | 'CREATE' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier ParenthesizedViewColumnList_EDIT OptionalComment OptionalTblproperties
+ | 'CREATE' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalTblproperties 'CURSOR'
    {
      var keywords = [{value: 'AS', weight: 1 }];
      if (!$7) {
@@ -1069,12 +1069,12 @@ ViewDefinition_EDIT
      }
      parser.suggestKeywords(keywords);
    }
- | 'CREATE' AnyView OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalTblproperties AnyAs 'CURSOR'
+ | 'CREATE' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalTblproperties 'AS' 'CURSOR'
    {
      parser.suggestKeywords(['SELECT']);
    }
- | 'CREATE' AnyView OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalTblproperties AnyAs QuerySpecification_EDIT
- | 'CREATE' AnyView OptionalIfNotExists SchemaQualifiedIdentifier_EDIT OptionalParenthesizedViewColumnList OptionalComment OptionalTblproperties AnyAs QuerySpecification
+ | 'CREATE' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalParenthesizedViewColumnList OptionalComment OptionalTblproperties 'AS' QuerySpecification_EDIT
+ | 'CREATE' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier_EDIT OptionalParenthesizedViewColumnList OptionalComment OptionalTblproperties 'AS' QuerySpecification
  ;
 
 FunctionDefinition
@@ -1156,11 +1156,6 @@ FunctionResourceType
  : 'ARCHIVE'
  | 'FILE'
  | 'JAR'
- ;
-
-AnyView
- : 'VIEW'
- | 'VIEW'
  ;
 
 OptionalParenthesizedViewColumnList
