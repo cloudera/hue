@@ -114,7 +114,7 @@ ObjectSpecification_EDIT
 PrivilegeType
  : 'ALL'
  | 'ALTER'
- | 'CREATE'  --> { isCreate: true }
+ | 'CREATE'  -> { isCreate: true }
  | 'DROP'
  | 'INSERT'
  | 'REFRESH'
@@ -164,7 +164,7 @@ OptionalWithGrantOption
  ;
 
 WithGrantOption_EDIT
- : AnyWith 'CURSOR'
+ : 'WITH' 'CURSOR'
    {
      parser.suggestKeywords(['GRANT OPTION']);
    }

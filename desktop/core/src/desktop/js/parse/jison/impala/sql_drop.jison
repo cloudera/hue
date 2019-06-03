@@ -184,15 +184,15 @@ DropStatsStatement_EDIT
  ;
 
 DropTableStatement
- : 'DROP' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier OptionalPurge
+ : 'DROP' 'TABLE' OptionalIfExists SchemaQualifiedTableIdentifier OptionalPurge
    {
      parser.addTablePrimary($4);
    }
  ;
 
 DropTableStatement_EDIT
- : 'DROP' AnyTable OptionalIfExists_EDIT
- | 'DROP' AnyTable OptionalIfExists 'CURSOR'
+ : 'DROP' 'TABLE' OptionalIfExists_EDIT
+ | 'DROP' 'TABLE' OptionalIfExists 'CURSOR'
    {
      if (!$3) {
        parser.suggestKeywords(['IF EXISTS']);
@@ -202,14 +202,14 @@ DropTableStatement_EDIT
        appendDot: true
      });
    }
- | 'DROP' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier_EDIT OptionalPurge
+ | 'DROP' 'TABLE' OptionalIfExists SchemaQualifiedTableIdentifier_EDIT OptionalPurge
    {
      if (parser.yy.result.suggestTables) {
        parser.yy.result.suggestTables.onlyTables = true;
      }
    }
- | 'DROP' AnyTable OptionalIfExists_EDIT SchemaQualifiedTableIdentifier OptionalPurge
- | 'DROP' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier OptionalPurge 'CURSOR'
+ | 'DROP' 'TABLE' OptionalIfExists_EDIT SchemaQualifiedTableIdentifier OptionalPurge
+ | 'DROP' 'TABLE' OptionalIfExists SchemaQualifiedTableIdentifier OptionalPurge 'CURSOR'
    {
      parser.addTablePrimary($4);
      if (!$5) {
@@ -260,7 +260,7 @@ DropViewStatement_EDIT
  ;
 
 TruncateTableStatement
- : 'TRUNCATE' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier OptionalPartitionSpec
+ : 'TRUNCATE' 'TABLE' OptionalIfExists SchemaQualifiedTableIdentifier OptionalPartitionSpec
    {
      parser.addTablePrimary($4);
    }
@@ -271,7 +271,7 @@ TruncateTableStatement_EDIT
    {
      parser.suggestKeywords(['TABLE']);
    }
- | 'TRUNCATE' AnyTable OptionalIfExists 'CURSOR' OptionalPartitionSpec
+ | 'TRUNCATE' 'TABLE' OptionalIfExists 'CURSOR' OptionalPartitionSpec
    {
      parser.suggestTables();
      parser.suggestDatabases({ appendDot: true });
@@ -279,20 +279,20 @@ TruncateTableStatement_EDIT
        parser.suggestKeywords(['IF EXISTS']);
      }
    }
- | 'TRUNCATE' AnyTable OptionalIfExists_EDIT OptionalPartitionSpec
- | 'TRUNCATE' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier_EDIT
- | 'TRUNCATE' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier 'CURSOR'
+ | 'TRUNCATE' 'TABLE' OptionalIfExists_EDIT OptionalPartitionSpec
+ | 'TRUNCATE' 'TABLE' OptionalIfExists SchemaQualifiedTableIdentifier_EDIT
+ | 'TRUNCATE' 'TABLE' OptionalIfExists SchemaQualifiedTableIdentifier 'CURSOR'
    {
      parser.addTablePrimary($4);
    }
- | 'TRUNCATE' AnyTable OptionalIfExists 'CURSOR' SchemaQualifiedTableIdentifier
+ | 'TRUNCATE' 'TABLE' OptionalIfExists 'CURSOR' SchemaQualifiedTableIdentifier
    {
      parser.addTablePrimary($4);
      if (!$3) {
        parser.suggestKeywords(['IF EXISTS']);
      }
    }
- | 'TRUNCATE' AnyTable OptionalIfExists_EDIT SchemaQualifiedTableIdentifier
+ | 'TRUNCATE' 'TABLE' OptionalIfExists_EDIT SchemaQualifiedTableIdentifier
  ;
 
 DeleteStatement

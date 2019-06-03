@@ -23,7 +23,7 @@ DataManipulation_EDIT
  ;
 
 LoadStatement
- : 'LOAD' 'DATA' 'INPATH' HdfsPath OptionalOverwrite 'INTO' AnyTable SchemaQualifiedTableIdentifier OptionalPartitionSpec
+ : 'LOAD' 'DATA' 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec
    {
      parser.addTablePrimary($8);
    }
@@ -51,24 +51,24 @@ LoadStatement_EDIT
    {
      parser.suggestKeywords([ 'TABLE' ]);
    }
- | 'LOAD' 'DATA' 'INPATH' HdfsPath OptionalOverwrite 'INTO' AnyTable 'CURSOR'
+ | 'LOAD' 'DATA' 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'TABLE' 'CURSOR'
    {
      parser.suggestTables();
      parser.suggestDatabases({ appendDot: true });
    }
- | 'LOAD' 'DATA' 'INPATH' HdfsPath OptionalOverwrite 'INTO' AnyTable SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
- | 'LOAD' 'DATA' 'INPATH' HdfsPath OptionalOverwrite 'INTO' AnyTable SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'
+ | 'LOAD' 'DATA' 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
+ | 'LOAD' 'DATA' 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'
    {
      parser.addTablePrimary($8);
      if (!$9) {
        parser.suggestKeywords(['PARTITION']);
      }
    }
- | 'LOAD' 'DATA' 'INPATH' HdfsPath OptionalOverwrite 'INTO' AnyTable SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
+ | 'LOAD' 'DATA' 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
    {
      parser.addTablePrimary($8);
    }
- | 'LOAD' 'DATA' 'INPATH' HdfsPath_EDIT OptionalOverwrite 'INTO' AnyTable SchemaQualifiedTableIdentifier OptionalPartitionSpec
+ | 'LOAD' 'DATA' 'INPATH' HdfsPath_EDIT OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec
    {
      parser.addTablePrimary($8);
    }

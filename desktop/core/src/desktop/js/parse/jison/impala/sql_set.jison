@@ -15,21 +15,14 @@
 // limitations under the License.
 
 DataDefinition
- : SetRoleStatement
- | SetSpecification
+ : SetSpecification
  ;
 
 DataDefinition_EDIT
- : SetRoleStatement_EDIT
- | 'SET' 'CURSOR'
+ : 'SET' 'CURSOR'
    {
      parser.suggestSetOptions();
-     if (parser.isHive()) {
-       parser.suggestKeywords(['ROLE']);
-     }
-     if (parser.isImpala()) {
-       parser.suggestKeywords(['ALL']);
-     }
+     parser.suggestKeywords(['ALL']);
    }
  ;
 
@@ -40,7 +33,7 @@ SetSpecification
 
 SetOption
  : RegularIdentifier
- | SetOption AnyDot RegularIdentifier
+ | SetOption '.' RegularIdentifier
  ;
 
 SetValue
@@ -51,17 +44,4 @@ SetValue
  | 'TRUE'
  | 'FALSE'
  | 'NULL'
- ;
-
-SetRoleStatement
- : 'SET' '<hive>ROLE' RegularIdentifier
- | 'SET' '<hive>ROLE' '<hive>ALL'
- | 'SET' '<hive>ROLE' '<hive>NONE'
- ;
-
-SetRoleStatement_EDIT
- : 'SET' '<hive>ROLE' 'CURSOR'
-   {
-     parser.suggestKeywords(['ALL', 'NONE']);
-   }
  ;

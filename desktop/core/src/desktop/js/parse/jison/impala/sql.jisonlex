@@ -397,7 +397,7 @@
 'VALUES'                           { return 'VALUES'; }
 'VARBINARY'                        { return 'VARBINARY'; }
 'VARCHAR'                          { return 'VARCHAR'; }
-'VARCHAR'                          { return 'VARCHAR'; } // Not in Impala
+'VARCHAR'                          { return 'VARCHAR'; }
 'VARYING'                          { return 'VARYING'; }
 'VERSIONING'                       { return 'VERSIONING'; }
 'VIEW'                             { return 'VIEW'; }
