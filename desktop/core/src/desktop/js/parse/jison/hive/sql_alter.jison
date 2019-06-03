@@ -530,20 +530,20 @@ DropOperations_EDIT
  ;
 
 AlterTableLeftSide
- : 'ALTER' AnyTable SchemaQualifiedTableIdentifier
+ : 'ALTER' 'TABLE' SchemaQualifiedTableIdentifier
    {
      parser.addTablePrimary($3);
    }
  ;
 
 AlterTableLeftSide_EDIT
- : 'ALTER' AnyTable SchemaQualifiedTableIdentifier_EDIT
+ : 'ALTER' 'TABLE' SchemaQualifiedTableIdentifier_EDIT
    {
      if (parser.yy.result.suggestTables) {
        parser.yy.result.suggestTables.onlyTables = true;
      }
    }
- | 'ALTER' AnyTable 'CURSOR'
+ | 'ALTER' 'TABLE' 'CURSOR'
    {
      parser.suggestTables({ onlyTables: true });
      parser.suggestDatabases({ appendDot: true });

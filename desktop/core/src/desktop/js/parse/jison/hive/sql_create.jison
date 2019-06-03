@@ -161,18 +161,18 @@ PropertyAssignment
  ;
 
 TableDefinition
- : 'CREATE' OptionalTemporary OptionalTransactional OptionalExternal AnyTable OptionalIfNotExists TableDefinitionRightPart
+ : 'CREATE' OptionalTemporary OptionalTransactional OptionalExternal 'TABLE' OptionalIfNotExists TableDefinitionRightPart
  ;
 
 TableDefinition_EDIT
- : 'CREATE' OptionalTemporary OptionalTransactional OptionalExternal AnyTable OptionalIfNotExists TableDefinitionRightPart_EDIT
- | 'CREATE' OptionalTemporary OptionalTransactional OptionalExternal AnyTable OptionalIfNotExists 'CURSOR'
+ : 'CREATE' OptionalTemporary OptionalTransactional OptionalExternal 'TABLE' OptionalIfNotExists TableDefinitionRightPart_EDIT
+ | 'CREATE' OptionalTemporary OptionalTransactional OptionalExternal 'TABLE' OptionalIfNotExists 'CURSOR'
    {
      if (!$6) {
        parser.suggestKeywords(['IF NOT EXISTS']);
      }
    }
- | 'CREATE' OptionalTemporary OptionalTransactional OptionalExternal AnyTable OptionalIfNotExists_EDIT
+ | 'CREATE' OptionalTemporary OptionalTransactional OptionalExternal 'TABLE' OptionalIfNotExists_EDIT
  ;
 
 TableDefinitionRightPart

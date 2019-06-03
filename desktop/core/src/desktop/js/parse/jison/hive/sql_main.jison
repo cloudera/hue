@@ -876,12 +876,6 @@ AnyPartition
  | '<hive>PARTITION'
  ;
 
-AnyTable
- : 'TABLE'
- | '<hive>TABLE'
- | '<impala>TABLE'
- ;
-
 AnyWith
  : 'WITH'
  | '<hive>WITH'
