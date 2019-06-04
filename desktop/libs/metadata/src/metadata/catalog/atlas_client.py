@@ -54,6 +54,9 @@ class AtlasApi(Api):
     'hive_column': 'FIELD'
   }
 
+  CLASSIFICATION_RE = re.compile('(?:tag|tags|classification)\s*\:\s*(?:(?:\"([^"]+)\")|([^ ]+))\s*', re.IGNORECASE)
+  TYPE_RE = re.compile('type\s*\:\s*([^ ]+)\s*', re.IGNORECASE)
+
   def __init__(self, user=None):
     super(AtlasApi, self).__init__(user)
 
@@ -220,28 +223,24 @@ class AtlasApi(Api):
             response['facets']['tags'][classification_def['name']] = -1
         return response
 
-      query_s = query_s.strip() if query_s else ''
-
-      search_terms = [term for term in query_s.strip().split()] if query_s else []
-      query = []
+      query_s = (query_s.strip() if query_s else '').replace('*', '')
 
       atlas_type = None
       classification = None
 
-      for term in search_terms:
-        if ':' not in term:
-          query.append(term.strip('*'))
-        else:
-          name, val = term.rstrip('*').split(':')
-          if val and name.lower() == 'type' and self.NAV_TO_ATLAS_TYPE.get(val.lower()):
-            atlas_type = self.NAV_TO_ATLAS_TYPE.get(val.lower())
-          if val and name.lower() in ['tag', 'tags','classification']:
-            if not atlas_type:
-              atlas_type = 'Asset' # 'Asset' contains all types of entities so we need to filter below
-            # Atlas filters by classification name on default
-            classification = val.strip('*')
+      # Take the first classification and type facets and ignore other as we can't search multiple in Atlas.
+      classification_facets = self.CLASSIFICATION_RE.findall(query_s)
+      if len(classification_facets) > 0:
+        classification = classification_facets[0][0] or classification_facets[0][1]
+        print self.CLASSIFICATION_RE.sub('', query_s)
+        query_s = self.CLASSIFICATION_RE.sub('', query_s).strip()
+        atlas_type = 'Asset'  # Filtered below to just contain hive_db, hive_table or hive_column
 
-      freeTextQuery = ' '.join(query)
+      type_facets = self.TYPE_RE.findall(query_s)
+      if len(type_facets) > 0:
+        atlas_type = self.NAV_TO_ATLAS_TYPE[type_facets[0].lower()] or type_facets[0]
+        query_s = self.TYPE_RE.sub('', query_s).strip()
+
       data = {
         'attributes': None,
         'classification': classification,
@@ -251,11 +250,11 @@ class AtlasApi(Api):
             'condition': 'OR',
             'criterion': [{
               'attributeName': 'name',
-              'attributeValue': freeTextQuery,
+              'attributeValue': query_s,
               'operator': 'contains'
             }, {
               'attributeName': 'description',
-              'attributeValue': freeTextQuery,
+              'attributeValue': query_s,
               'operator': 'contains'
             }]
           }]
