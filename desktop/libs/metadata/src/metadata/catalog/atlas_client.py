@@ -56,6 +56,7 @@ class AtlasApi(Api):
 
   CLASSIFICATION_RE = re.compile('(?:tag|tags|classification)\s*\:\s*(?:(?:\"([^"]+)\")|([^ ]+))\s*', re.IGNORECASE)
   TYPE_RE = re.compile('type\s*\:\s*([^ ]+)\s*', re.IGNORECASE)
+  OWNER_RE = re.compile('owner\s*\:\s*([^ ]+)\s*', re.IGNORECASE)
 
   def __init__(self, user=None):
     super(AtlasApi, self).__init__(user)
@@ -227,17 +228,23 @@ class AtlasApi(Api):
 
       atlas_type = None
       classification = None
+      owner = None
 
       # Take the first classification and type facets and ignore other as we can't search multiple in Atlas.
       classification_facets = self.CLASSIFICATION_RE.findall(query_s)
-      if len(classification_facets) > 0:
+      if classification_facets:
         classification = classification_facets[0][0] or classification_facets[0][1]
-        print self.CLASSIFICATION_RE.sub('', query_s)
         query_s = self.CLASSIFICATION_RE.sub('', query_s).strip()
         atlas_type = 'Asset'  # Filtered below to just contain hive_db, hive_table or hive_column
 
+      owner_facets = self.OWNER_RE.findall(query_s)
+      if owner_facets:
+        owner = owner_facets[0]
+        query_s = self.OWNER_RE.sub('', query_s).strip()
+        atlas_type = 'Asset'
+
       type_facets = self.TYPE_RE.findall(query_s)
-      if len(type_facets) > 0:
+      if type_facets:
         atlas_type = self.NAV_TO_ATLAS_TYPE[type_facets[0].lower()] or type_facets[0]
         query_s = self.TYPE_RE.sub('', query_s).strip()
 
@@ -275,6 +282,13 @@ class AtlasApi(Api):
           'attributeName': 'qualifiedName',
           'operator': 'contains',
           'attributeValue': '@' + get_catalog_search_cluster()
+        })
+
+      if owner:
+        data['entityFilters']['criterion'].append({
+          'attributeName': 'owner',
+          'operator': 'startsWith',
+          'attributeValue': owner
         })
 
       atlas_response = self._root.post('/v2/search/basic', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
