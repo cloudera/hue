@@ -214,19 +214,23 @@ class AtlasApi(Api):
       if not query_s and facetFields and 'tags' in facetFields:
         classification_response = self._root.get('/v2/types/typedefs?type=classification')
         for classification_def in classification_response['classificationDefs']:
-          response['facets']['tags'][classification_def['name']] = -1
+          if ' ' in classification_def['name']:
+            response['facets']['tags']['"' + classification_def['name'] + '"'] = -1
+          else:
+            response['facets']['tags'][classification_def['name']] = -1
         return response
 
-      query_s = (query_s.strip() if query_s else '') + '*'
+      query_s = query_s.strip() if query_s else ''
 
       search_terms = [term for term in query_s.strip().split()] if query_s else []
       query = []
 
       atlas_type = None
+      classification = None
 
       for term in search_terms:
         if ':' not in term:
-          query.append(term)
+          query.append(term.strip('*'))
         else:
           name, val = term.rstrip('*').split(':')
           if val and name.lower() == 'type' and self.NAV_TO_ATLAS_TYPE.get(val.lower()):
@@ -235,33 +239,44 @@ class AtlasApi(Api):
             if not atlas_type:
               atlas_type = 'Asset' # 'Asset' contains all types of entities so we need to filter below
             # Atlas filters by classification name on default
-            query.append(val + '*')
+            classification = val.strip('*')
 
+      freeTextQuery = ' '.join(query)
       data = {
         'attributes': None,
-        'classification': None,
-        'entityFilters': None,
+        'classification': classification,
+        'entityFilters': {
+          'condition': 'AND',
+          'criterion': [{
+            'condition': 'OR',
+            'criterion': [{
+              'attributeName': 'name',
+              'attributeValue': freeTextQuery,
+              'operator': 'contains'
+            }, {
+              'attributeName': 'description',
+              'attributeValue': freeTextQuery,
+              'operator': 'contains'
+            }]
+          }]
+        },
         'excludeDeletedEntities': True,
         'includeClassificationAttributes': True,
         'includeSubClassifications': True,
         'includeSubTypes': True,
         'limit': limit,
         'offset': 0,
-        'query': ' '.join(query),
         'tagFilters': None,
         'termName': None,
         'typeName': atlas_type or 'hive_table'
       }
 
       if get_catalog_search_cluster():
-        data['entityFilters'] = {
-          'condition': 'AND',
-          'criterion': [{
-            'attributeName': 'qualifiedName',
-            'operator': 'contains',
-            'attributeValue': '@' + get_catalog_search_cluster()
-          }]
-        }
+        data['entityFilters']['criterion'].append({
+          'attributeName': 'qualifiedName',
+          'operator': 'contains',
+          'attributeValue': '@' + get_catalog_search_cluster()
+        })
 
       atlas_response = self._root.post('/v2/search/basic', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
 
