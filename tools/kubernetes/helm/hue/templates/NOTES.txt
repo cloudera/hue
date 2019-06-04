@@ -7,7 +7,7 @@ To check the status of your installation run:
 
 You should be able to execute queries by typing:
 
-  kubectl port-forward svc/hue 8888:8888 &
+  kubectl port-forward svc/hue 8888:8888 --address 0.0.0.0 &
 
 Then opening-up:
 

@@ -41,7 +41,7 @@ or
 ```
 sudo snap install microk8s --classic
 
-snap alias microk8s.kubectl kubectl
+sudo snap alias microk8s.kubectl kubectl
 
 microk8s.enable metrics-server dns
 ```
@@ -53,27 +53,6 @@ sudo snap install helm --classic
 
 helm init
 ```
-
-If in Dev, for having the provisioner run properly:
-
-```
-kubectl create clusterrolebinding serviceaccounts-cluster-admin --clusterrole=cluster-admin --group=system:serviceaccounts
-```
-
-### GKE
-
-Install Helm onto GKE cluster requires creating a service account with the correct
-permissions:
-
-```
-kubectl create serviceaccount --namespace kube-system tiller
-kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
-kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
-helm init --service-account tiller --upgrade
-```
-
-On GKE, this chart uses a LoadBalancer to route to Traefik rather than using the GKE
-HTTP LoadBalancer. This avoids creating global static ips.
 
 ## Images
 
