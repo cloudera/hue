@@ -497,7 +497,7 @@ def get_banner_message(request):
 
   message = None
   path_info = request.environ.get("PATH_INFO")
-  if path_info.find("/hue/") < 0 and path_info.find("accounts/login") < 0:
+  if path_info.find("/hue") < 0 and path_info.find("accounts/login") < 0:
     url = request.build_absolute_uri("/hue")
     link = '<a href="%s" style="color: #FFF; font-weight: bold">%s</a>' % (url, url)
     message = _('You are accessing an older version of Hue, please switch to the latest version: %s.') % link
