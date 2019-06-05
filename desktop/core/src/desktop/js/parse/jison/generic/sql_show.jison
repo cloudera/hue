@@ -39,7 +39,6 @@ ShowStatement
  | ShowRoleStatement
  | ShowRolesStatement
  | ShowTableStatement
- | ShowTablesStatement
  | ShowTblPropertiesStatement
  | ShowTransactionsStatement
  | ShowViewsStatement
@@ -95,7 +94,6 @@ ShowStatement_EDIT
  | ShowPartitionsStatement_EDIT
  | ShowRoleStatement_EDIT
  | ShowTableStatement_EDIT
- | ShowTablesStatement_EDIT
  | ShowTblPropertiesStatement_EDIT
  | ShowViewsStatement_EDIT
  ;
@@ -123,8 +121,8 @@ ShowColumnStatsStatement_EDIT
  ;
 
 ShowColumnsStatement
- : AnyShow '<hive>COLUMNS' AnyFromOrIn RegularOrBacktickedIdentifier
- | AnyShow '<hive>COLUMNS' AnyFromOrIn RegularOrBacktickedIdentifier AnyFromOrIn RegularOrBacktickedIdentifier
+ : AnyShow '<hive>COLUMNS' FromOrIn RegularOrBacktickedIdentifier
+ | AnyShow '<hive>COLUMNS' FromOrIn RegularOrBacktickedIdentifier FromOrIn RegularOrBacktickedIdentifier
  ;
 
 ShowColumnsStatement_EDIT
@@ -136,27 +134,27 @@ ShowColumnsStatement_EDIT
    {
      parser.suggestKeywords(['FROM', 'IN']);
    }
- | AnyShow '<hive>COLUMNS' AnyFromOrIn 'CURSOR'
+ | AnyShow '<hive>COLUMNS' FromOrIn 'CURSOR'
    {
      parser.suggestTables();
    }
- | AnyShow '<hive>COLUMNS' AnyFromOrIn 'CURSOR' AnyFromOrIn
+ | AnyShow '<hive>COLUMNS' FromOrIn 'CURSOR' FromOrIn
    {
      parser.suggestTables();
    }
- | AnyShow '<hive>COLUMNS' AnyFromOrIn 'CURSOR' AnyFromOrIn RegularOrBacktickedIdentifier
+ | AnyShow '<hive>COLUMNS' FromOrIn 'CURSOR' FromOrIn RegularOrBacktickedIdentifier
    {
      parser.suggestTables();
    }
- | AnyShow '<hive>COLUMNS' AnyFromOrIn RegularOrBacktickedIdentifier 'CURSOR'
+ | AnyShow '<hive>COLUMNS' FromOrIn RegularOrBacktickedIdentifier 'CURSOR'
    {
      parser.suggestKeywords(['FROM', 'IN']);
    }
- | AnyShow '<hive>COLUMNS' AnyFromOrIn RegularOrBacktickedIdentifier 'CURSOR' RegularOrBacktickedIdentifier
+ | AnyShow '<hive>COLUMNS' FromOrIn RegularOrBacktickedIdentifier 'CURSOR' RegularOrBacktickedIdentifier
    {
      parser.suggestKeywords(['FROM', 'IN']);
    }
- | AnyShow '<hive>COLUMNS' AnyFromOrIn RegularOrBacktickedIdentifier AnyFromOrIn 'CURSOR'
+ | AnyShow '<hive>COLUMNS' FromOrIn RegularOrBacktickedIdentifier FromOrIn 'CURSOR'
    {
      parser.suggestDatabases();
    }
@@ -171,47 +169,9 @@ ShowConfStatement
  ;
 
 ShowCreateTableStatement
- : AnyShow HiveOrImpalaCreate AnyTableOrView RegularOrBackTickedSchemaQualifiedName
-   {
-     parser.addTablePrimary($4);
-   }
  ;
 
 ShowCreateTableStatement_EDIT
- : AnyShow HiveOrImpalaCreate 'CURSOR'
-   {
-     if (parser.isImpala()) {
-       parser.suggestKeywords(['TABLE', 'VIEW']);
-     } else {
-       parser.suggestKeywords(['TABLE']);
-     }
-   }
- | AnyShow HiveOrImpalaCreate AnyTableOrView 'CURSOR'
-   {
-     if ($3.isView && parser.isImpala()) {
-       parser.suggestTables({ onlyViews: true });
-     } else {
-       parser.suggestTables();
-     }
-     parser.suggestDatabases({
-       appendDot: true
-     });
-   }
- | AnyShow HiveOrImpalaCreate AnyTableOrView RegularOrBackTickedSchemaQualifiedName_EDIT
-   {
-     if (parser.yy.result.suggestTables && $3.isView) {
-       parser.yy.result.suggestTables.onlyViews = true;
-     }
-   }
- | AnyShow HiveOrImpalaCreate 'CURSOR' RegularOrBackTickedSchemaQualifiedName
-   {
-     parser.addTablePrimary($4);
-     if (parser.isImpala()) {
-       parser.suggestKeywords(['TABLE', 'VIEW']);
-     } else {
-       parser.suggestKeywords(['TABLE']);
-     }
-   }
  ;
 
 AnyTableOrView
@@ -240,15 +200,9 @@ ShowCurrentRolesStatement_EDIT
  ;
 
 ShowDatabasesStatement
- : AnyShow HiveOrImpalaDatabasesOrSchemas 'LIKE' SingleQuotedValue
- | AnyShow '<impala>DATABASES' SingleQuotedValue
  ;
 
 ShowDatabasesStatement_EDIT
- : AnyShow HiveOrImpalaDatabasesOrSchemas 'CURSOR'
-   {
-     parser.suggestKeywords(['LIKE']);
-   }
  ;
 
 ShowFilesStatement
@@ -294,10 +248,6 @@ ShowFunctionsStatement
  ;
 
 ShowFunctionsStatement_EDIT
- : AnyShow AggregateOrAnalytic 'CURSOR'
-   {
-     parser.suggestKeywords(['FUNCTIONS']);
-   }
  | AnyShow 'CURSOR' '<impala>FUNCTIONS' OptionalInDatabase
    {
      parser.suggestKeywords(['AGGREGATE', 'ANALYTICAL']);
@@ -309,10 +259,6 @@ ShowFunctionsStatement_EDIT
      } else {
        parser.suggestKeywords(['LIKE']);
      }
-   }
- | AnyShow AggregateOrAnalytic 'CURSOR' OptionalInDatabase 'LIKE' QuotedValue
-   {
-     parser.suggestKeywords(['FUNCTIONS']);
    }
  | AnyShow 'CURSOR' '<impala>FUNCTIONS' OptionalInDatabase 'LIKE' QuotedValue
    {
@@ -333,14 +279,6 @@ ShowGrantStatement
  | AnyShow '<hive>GRANT' OptionalPrincipalName 'ON' '<hive>ALL'
  | AnyShow '<hive>GRANT' OptionalPrincipalName 'ON' SchemaQualifiedTableIdentifier
  | AnyShow '<hive>GRANT' OptionalPrincipalName 'ON' 'TABLE' SchemaQualifiedTableIdentifier
- | AnyShow '<impala>GRANT' ImpalaRoleOrUser RegularOrBacktickedIdentifier
- | AnyShow '<impala>GRANT' ImpalaRoleOrUser RegularOrBacktickedIdentifier 'ON' 'DATABASE' RegularOrBacktickedIdentifier
-   {
-     parser.addDatabaseLocation(@7, [ { name: $7 } ]);
-   }
- | AnyShow '<impala>GRANT' ImpalaRoleOrUser RegularOrBacktickedIdentifier 'ON' '<impala>SERVER'
- | AnyShow '<impala>GRANT' ImpalaRoleOrUser RegularOrBacktickedIdentifier 'ON' '<impala>TABLE' SchemaQualifiedTableIdentifier
- | AnyShow '<impala>GRANT' ImpalaRoleOrUser RegularOrBacktickedIdentifier 'ON' '<impala>URI' RegularOrBacktickedIdentifier
  ;
 
 ShowGrantStatement_EDIT
@@ -368,28 +306,6 @@ ShowGrantStatement_EDIT
    {
      parser.suggestKeywords(['ROLE', 'USER']);
    }
- | AnyShow '<impala>GRANT' ImpalaRoleOrUser 'CURSOR'
- | AnyShow '<impala>GRANT' ImpalaRoleOrUser RegularOrBacktickedIdentifier 'CURSOR'
-   {
-     parser.suggestKeywords(['ON DATABASE', 'ON SERVER', 'ON TABLE', 'ON URI']);
-   }
- | AnyShow '<impala>GRANT' ImpalaRoleOrUser RegularOrBacktickedIdentifier 'ON' 'CURSOR'
-   {
-     parser.suggestKeywords(['DATABASE', 'SERVER', 'TABLE', 'URI']);
-   }
- | AnyShow '<impala>GRANT' ImpalaRoleOrUser RegularOrBacktickedIdentifier 'ON' 'DATABASE' 'CURSOR'
-   {
-     parser.suggestDatabases();
-   }
- | AnyShow '<impala>GRANT' ImpalaRoleOrUser RegularOrBacktickedIdentifier 'ON' '<impala>TABLE' 'CURSOR'
-   {
-     parser.suggestDatabases({
-       appendDot: true
-     });
-     parser.suggestTables();
-   }
- | AnyShow '<impala>GRANT' ImpalaRoleOrUser RegularOrBacktickedIdentifier 'ON' '<impala>TABLE' SchemaQualifiedTableIdentifier_EDIT
- | AnyShow '<impala>GRANT' ImpalaRoleOrUser RegularOrBacktickedIdentifier 'ON' '<impala>URI' 'CURSOR'
  ;
 
 OptionalPrincipalName
@@ -404,14 +320,14 @@ OptionalPrincipalName_EDIT
 
 ShowIndexStatement
  : AnyShow OptionallyFormattedIndex 'ON' RegularOrBacktickedIdentifier
- | AnyShow OptionallyFormattedIndex 'ON' RegularOrBacktickedIdentifier AnyFromOrIn RegularOrBacktickedIdentifier
+ | AnyShow OptionallyFormattedIndex 'ON' RegularOrBacktickedIdentifier FromOrIn RegularOrBacktickedIdentifier
  ;
 
 ShowIndexStatement_EDIT
  : AnyShow OptionallyFormattedIndex
  | AnyShow OptionallyFormattedIndex_EDIT
  | AnyShow OptionallyFormattedIndex_EDIT 'ON' RegularOrBacktickedIdentifier
- | AnyShow OptionallyFormattedIndex_EDIT 'ON' RegularOrBacktickedIdentifier AnyFromOrIn RegularOrBacktickedIdentifier
+ | AnyShow OptionallyFormattedIndex_EDIT 'ON' RegularOrBacktickedIdentifier FromOrIn RegularOrBacktickedIdentifier
  | AnyShow OptionallyFormattedIndex 'CURSOR'
    {
      parser.suggestKeywords(['ON']);
@@ -432,11 +348,11 @@ ShowIndexStatement_EDIT
    {
      parser.suggestKeywords(['FROM', 'IN']);
    }
- | AnyShow OptionallyFormattedIndex 'ON' RegularOrBacktickedIdentifier AnyFromOrIn 'CURSOR'
+ | AnyShow OptionallyFormattedIndex 'ON' RegularOrBacktickedIdentifier FromOrIn 'CURSOR'
    {
      parser.suggestDatabases();
    }
- | AnyShow OptionallyFormattedIndex 'ON' 'CURSOR' AnyFromOrIn RegularOrBacktickedIdentifier
+ | AnyShow OptionallyFormattedIndex 'ON' 'CURSOR' FromOrIn RegularOrBacktickedIdentifier
    {
      parser.suggestTables({identifierChain: [{name: $6}]});
    }
@@ -544,39 +460,9 @@ ShowPartitionsStatement_EDIT
  ;
 
 ShowRoleStatement
- : AnyShow '<hive>ROLE' '<hive>GRANT' HiveRoleOrUser RegularIdentifier
- | AnyShow '<impala>ROLE' '<impala>GRANT' '<impala>GROUP' RegularIdentifier
  ;
 
 ShowRoleStatement_EDIT
- : AnyShow '<hive>ROLE' 'CURSOR'
-   {
-     parser.suggestKeywords(['GRANT']);
-   }
- | AnyShow '<impala>ROLE' 'CURSOR'
-   {
-     parser.suggestKeywords(['GRANT']);
-   }
- | AnyShow '<hive>ROLE' 'CURSOR' HiveRoleOrUser RegularIdentifier
-   {
-     parser.suggestKeywords(['GRANT']);
-   }
- | AnyShow '<hive>ROLE' '<hive>GRANT' 'CURSOR'
-   {
-     parser.suggestKeywords(['ROLE', 'USER']);
-   }
- | AnyShow '<hive>ROLE' '<hive>GRANT' 'CURSOR' RegularIdentifier
-   {
-     parser.suggestKeywords(['ROLE', 'USER']);
-   }
- | AnyShow '<impala>ROLE' '<impala>GRANT' 'CURSOR'
-   {
-     parser.suggestKeywords(['GROUP']);
-   }
- | AnyShow '<impala>ROLE' '<impala>GRANT' 'CURSOR' RegularIdentifier
-   {
-     parser.suggestKeywords(['GROUP']);
-   }
  ;
 
 ShowRolesStatement
@@ -648,23 +534,6 @@ ShowTableStatement_EDIT
       parser.addTablePrimary($4);
     }
  | AnyShow '<impala>TABLE' '<impala>STATS' RegularOrBackTickedSchemaQualifiedName_EDIT
- ;
-
-ShowTablesStatement
- : AnyShow HiveOrImpalaTables OptionalInDatabase
- | AnyShow HiveOrImpalaTables OptionalInDatabase SingleQuotedValue
- | AnyShow HiveOrImpalaTables OptionalInDatabase 'LIKE' SingleQuotedValue
- ;
-
-ShowTablesStatement_EDIT
- : AnyShow HiveOrImpalaTables OptionalInDatabase 'CURSOR'
-   {
-     if (!$3) {
-       parser.suggestKeywords(['IN', 'LIKE']);
-     } else {
-       parser.suggestKeywords(['LIKE']);
-     }
-   }
  ;
 
 ShowTblPropertiesStatement

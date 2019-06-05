@@ -94,7 +94,6 @@ DatabaseDefinitionOptionals
 
 DatabaseDefinitionOptionals_EDIT
  : OptionalComment_INVALID OptionalHdfsLocation
- | OptionalComment HdfsLocation_EDIT
  ;
 
 OptionalComment
@@ -139,7 +138,6 @@ TableDefinitionRightPart
 TableDefinitionRightPart_EDIT
  : TableIdentifierAndOptionalColumnSpecification_EDIT OptionalPartitionedBy OptionalHdfsLocation OptionalAsSelectStatement
  | TableIdentifierAndOptionalColumnSpecification PartitionedBy_EDIT OptionalHdfsLocation OptionalAsSelectStatement
- | TableIdentifierAndOptionalColumnSpecification OptionalPartitionedBy HdfsLocation_EDIT OptionalAsSelectStatement
  | TableIdentifierAndOptionalColumnSpecification OptionalPartitionedBy OptionalHdfsLocation OptionalAsSelectStatement_EDIT
  | TableIdentifierAndOptionalColumnSpecification OptionalPartitionedBy OptionalHdfsLocation 'CURSOR'
    {
