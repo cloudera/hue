@@ -80,11 +80,12 @@ jobs:
             cd /usr/share/hue
             ./build/env/bin/hue test unit --with-xunit --with-cover
 
-      # - run:
-      #     name: run js tests
-      #     command: |
-      #       cd /usr/share/hue
-      #       npm run test
+      - run:
+          name: run js tests
+          command: |
+            cd /usr/share/hue
+            cp ~/repo/.babelrc .
+            npm run test
 
       # # Code analyses
       # - run:
