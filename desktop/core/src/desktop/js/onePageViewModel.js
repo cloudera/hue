@@ -497,7 +497,7 @@ class OnePageViewModel {
           page('/home/?type=search-dashboard');
         }
       },
-      { url: '/dashboard*', app: 'dashboard' },
+      { url: '/dashboard/*', app: 'dashboard' },
       { url: '/desktop/api/desktop/api2/doc/export*', app: function() {
           var documents = getUrlParameter('documents');
           location.href = window.HUE_BASE_URL + '/desktop/api2/doc/export?documents=' + documents;
