@@ -39,26 +39,9 @@ AlterStatement_EDIT
  ;
 
 AlterDatabase
- : 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' HdfsLocation
-    {
-      parser.addDatabaseLocation(@3, [ { name: $3 } ]);
-    }
  ;
 
 AlterDatabase_EDIT
- : 'ALTER' DatabaseOrSchema 'CURSOR'
- | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'CURSOR'
-   {
-     parser.addDatabaseLocation(@3, [ { name: $3 } ]);
-   }
- | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' 'CURSOR'
-    {
-      parser.addDatabaseLocation(@3, [ { name: $3 } ]);
-    }
- | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' HdfsLocation_EDIT
-   {
-     parser.addDatabaseLocation(@3, [ { name: $3 } ]);
-   }
  ;
 
 AlterTable
@@ -76,24 +59,6 @@ AlterTable_EDIT
  | AlterTableLeftSide PartitionSpec 'SET' 'CURSOR'
  | AlterTableLeftSide 'SET' 'CURSOR'
  | AlterTableLeftSide PartitionSpec OptionalPartitionOperations_EDIT
- ;
-
-OptionalPartitionOperations
- : 'SET' HdfsLocation
- | 'SET' CachedIn OptionalWithReplication
- ;
-
-OptionalPartitionOperations_EDIT
- : 'SET' HdfsLocation_EDIT
- | 'SET' CachedIn_EDIT
- | 'SET' CachedIn OptionalWithReplication 'CURSOR'
-   {
-     if (!$3) {
-       parser.suggestKeywords(['WITH REPLICATION =']);
-     }
-   }
- | 'SET' CachedIn WithReplication_EDIT
- | 'SET' 'ROW' 'CURSOR'
  ;
 
 AlterTableLeftSide

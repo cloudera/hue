@@ -22,13 +22,7 @@ SqlStatements
 SqlStatement_EDIT
  : AnyCursor error
    {
-     if (parser.isHive()) {
-       parser.suggestDdlAndDmlKeywords(['EXPLAIN', 'FROM']);
-     } else if (parser.isImpala()) {
-       parser.suggestDdlAndDmlKeywords(['EXPLAIN']);
-     } else {
-       parser.suggestDdlAndDmlKeywords();
-     }
+     parser.suggestDdlAndDmlKeywords();
    }
  ;
 
@@ -80,13 +74,6 @@ ErrorList
  | Errors ',' error
  ;
 
-LateralView
- : '<hive>LATERAL' '<hive>VIEW' OptionalOuter ArbitraryFunction RegularOrBacktickedIdentifier '<hive>AS' error  -> { }
- | '<hive>LATERAL' '<hive>VIEW' OptionalOuter ArbitraryFunction error                                           -> { }
- | '<hive>LATERAL' '<hive>VIEW' OptionalOuter error                                                               -> { }
- | '<hive>LATERAL' error                                                                                          -> { }
- ;
-
 JoinType_EDIT
  : 'FULL' 'CURSOR' error
    {
@@ -94,21 +81,11 @@ JoinType_EDIT
    }
  | 'LEFT' 'CURSOR' error
    {
-     if (parser.isHive()) {
-       parser.suggestKeywords(['JOIN', 'OUTER JOIN', 'SEMI JOIN']);
-     } else if (parser.isImpala()) {
-       parser.suggestKeywords(['ANTI JOIN', 'INNER JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']);
-     } else {
-       parser.suggestKeywords(['JOIN', 'OUTER JOIN']);
-     }
+     parser.suggestKeywords(['JOIN', 'OUTER JOIN']);
    }
  | 'RIGHT' 'CURSOR' error
    {
-     if (parser.isImpala()) {
-       parser.suggestKeywords(['ANTI JOIN', 'INNER JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']);
-     } else {
-       parser.suggestKeywords(['JOIN', 'OUTER JOIN']);
-     }
+     parser.suggestKeywords(['JOIN', 'OUTER JOIN']);
    }
  ;
 
@@ -127,25 +104,11 @@ OptionalSelectConditions_EDIT
        cursorAtEnd: !$6 && !$7 && !$8 && !$9 && !$10
      }
    }
- | OptionalWhereClause OptionalGroupByClause OptionalHavingClause WindowClause error 'CURSOR' OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
-   {
-     $$ = {
-       suggestKeywords: parser.getKeywordsForOptionalsLR([$7, $8, $9, $10], [{ value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, parser.isHive(), true, parser.isImpala()]),
-       cursorAtEnd: !$7 && !$8 && !$9 && !$10
-     }
-   }
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OrderByClause error 'CURSOR' OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
    {
      $$ = {
        suggestKeywords: parser.getKeywordsForOptionalsLR([$8, $9, $10], [[{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [parser.isHive(), true, parser.isImpala()]),
        cursorAtEnd: !$8 && !$9 && !$10
-     }
-   }
- | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause ClusterOrDistributeBy error 'CURSOR' OptionalLimitClause OptionalOffsetClause
-   {
-     $$ = {
-       suggestKeywords: parser.getKeywordsForOptionalsLR([$9, $10], [{ value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, parser.isImpala()]),
-       cursorAtEnd: !$9 && !$10
      }
    }
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy LimitClause error 'CURSOR' OptionalOffsetClause
@@ -160,29 +123,14 @@ OptionalSelectConditions_EDIT
 OptionalSelectConditions_EDIT
  : WhereClause error GroupByClause_EDIT OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
  | WhereClause error OptionalGroupByClause HavingClause_EDIT OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
- | WhereClause error OptionalGroupByClause OptionalHavingClause WindowClause_EDIT OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
  | WhereClause error OptionalGroupByClause OptionalHavingClause OptionalWindowClause OrderByClause_EDIT OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
- | WhereClause error OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause ClusterOrDistributeBy_EDIT OptionalLimitClause OptionalOffsetClause
  | WhereClause error OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy LimitClause_EDIT OptionalOffsetClause
- | WhereClause error OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OffsetClause_EDIT
  | OptionalWhereClause GroupByClause error HavingClause_EDIT OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
- | OptionalWhereClause GroupByClause error OptionalHavingClause WindowClause_EDIT OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
  | OptionalWhereClause GroupByClause error OptionalHavingClause OptionalWindowClause OrderByClause_EDIT OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
- | OptionalWhereClause GroupByClause error OptionalHavingClause OptionalWindowClause OptionalOrderByClause ClusterOrDistributeBy_EDIT OptionalLimitClause OptionalOffsetClause
  | OptionalWhereClause GroupByClause error OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy LimitClause_EDIT OptionalOffsetClause
- | OptionalWhereClause GroupByClause error OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OffsetClause_EDIT
- | OptionalWhereClause OptionalGroupByClause HavingClause error WindowClause_EDIT OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
  | OptionalWhereClause OptionalGroupByClause HavingClause error OptionalWindowClause OrderByClause_EDIT OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
- | OptionalWhereClause OptionalGroupByClause HavingClause error OptionalWindowClause OptionalOrderByClause ClusterOrDistributeBy_EDIT OptionalLimitClause OptionalOffsetClause
  | OptionalWhereClause OptionalGroupByClause HavingClause error OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy LimitClause_EDIT OptionalOffsetClause
- | OptionalWhereClause OptionalGroupByClause HavingClause error OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OffsetClause_EDIT
- | OptionalWhereClause OptionalGroupByClause OptionalHavingClause WindowClause error OrderByClause_EDIT OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
- | OptionalWhereClause OptionalGroupByClause OptionalHavingClause WindowClause error OptionalOrderByClause ClusterOrDistributeBy_EDIT OptionalLimitClause OptionalOffsetClause
- | OptionalWhereClause OptionalGroupByClause OptionalHavingClause WindowClause error OptionalOrderByClause OptionalClusterOrDistributeBy LimitClause_EDIT OptionalOffsetClause
- | OptionalWhereClause OptionalGroupByClause OptionalHavingClause WindowClause error OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OffsetClause_EDIT
- | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OrderByClause error ClusterOrDistributeBy_EDIT OptionalLimitClause OptionalOffsetClause
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OrderByClause error OptionalClusterOrDistributeBy LimitClause_EDIT OptionalOffsetClause
- | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OrderByClause error OptionalClusterOrDistributeBy OptionalLimitClause OffsetClause_EDIT
  ;
 
 DatabaseDefinition_EDIT

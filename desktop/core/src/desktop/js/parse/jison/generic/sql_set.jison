@@ -40,7 +40,7 @@ SetSpecification
 
 SetOption
  : RegularIdentifier
- | SetOption AnyDot RegularIdentifier
+ | SetOption '.' RegularIdentifier
  ;
 
 SetValue
