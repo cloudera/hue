@@ -4117,7 +4117,7 @@ function loadSearch(collection, query, initial) {
 
   searchViewModel.init(function(){
     $(".chosen-select").trigger("chosen:updated");
-    if (searchViewModel.collection.engine() === 'report') {
+    if (searchViewModel.collection.engine() === 'report' || searchViewModel.collection.engine() === 'solr') {
       if (!searchViewModel.collectionJson.layout.length && (!searchViewModel.collectionJson.gridItems || !searchViewModel.collectionJson.gridItems.length)) {
         magicSearchLayout(searchViewModel);
       }
