@@ -23,42 +23,28 @@ DataDefinition_EDIT
  ;
 
 AlterStatement
- : AlterDatabase
- | AlterTable
+ : AlterTable
  | AlterView
  ;
 
 AlterStatement_EDIT
- : AlterDatabase_EDIT
- | AlterTable_EDIT
+ : AlterTable_EDIT
  | AlterView_EDIT
  | 'ALTER' 'CURSOR'
    {
-     parser.suggestKeywords(['DATABASE', 'SCHEMA', 'TABLE', 'VIEW']);
+     parser.suggestKeywords(['TABLE', 'VIEW']);
    }
  ;
 
-AlterDatabase
- ;
-
-AlterDatabase_EDIT
- ;
-
 AlterTable
- : AlterTableLeftSide OptionalPartitionOperations
- | AlterTableLeftSide PartitionSpec OptionalPartitionOperations
+ : AlterTableLeftSide PartitionSpec
  ;
 
 AlterTable_EDIT
  : AlterTableLeftSide_EDIT
- | AlterTableLeftSide_EDIT OptionalPartitionOperations
- | AlterTableLeftSide_EDIT PartitionSpec OptionalPartitionOperations
- | AlterTableLeftSide OptionalPartitionOperations_EDIT
+ | AlterTableLeftSide_EDIT PartitionSpec
  | AlterTableLeftSide 'CURSOR'
  | AlterTableLeftSide PartitionSpec 'CURSOR'
- | AlterTableLeftSide PartitionSpec 'SET' 'CURSOR'
- | AlterTableLeftSide 'SET' 'CURSOR'
- | AlterTableLeftSide PartitionSpec OptionalPartitionOperations_EDIT
  ;
 
 AlterTableLeftSide
@@ -83,7 +69,7 @@ AlterTableLeftSide_EDIT
  ;
 
 AlterView
- | AlterViewLeftSide 'AS' QuerySpecification
+ : AlterViewLeftSide 'AS' QuerySpecification
  ;
 
 AlterView_EDIT

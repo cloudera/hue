@@ -33,23 +33,7 @@ UpdateStatement_EDIT
  | 'UPDATE' TargetTable 'SET' SetClauseList OptionalFromJoinedTable WhereClause_EDIT
  | 'UPDATE' TargetTable 'SET' SetClauseList OptionalFromJoinedTable OptionalWhereClause 'CURSOR'
    {
-     if (parser.isImpala() && !$6 && !$5) {
-       parser.suggestKeywords([{ value: 'FROM', weight: 2 }, { value: 'WHERE', weight: 1 }]);
-     } else if (parser.isImpala() && !$6 && $5) {
-       var keywords = [{ value: 'FULL JOIN', weight: 2 }, { value: 'FULL OUTER JOIN', weight: 2 }, { value: 'JOIN', weight: 2 }, { value: 'LEFT JOIN', weight: 2 }, { value: 'LEFT OUTER JOIN', weight: 2 }, { value: 'RIGHT JOIN', weight: 2 }, { value: 'RIGHT OUTER JOIN', weight: 2 }, { value: 'INNER JOIN', weight: 2 },  { value: 'LEFT ANTI JOIN', weight: 2 }, { value: 'LEFT SEMI JOIN', weight: 2 }, { value: 'RIGHT ANTI JOIN', weight: 2 }, { value: 'RIGHT SEMI JOIN', weight: 2 }, { value: 'WHERE', weight: 1 }];
-       if ($5.suggestJoinConditions) {
-         parser.suggestJoinConditions($5.suggestJoinConditions);
-       }
-       if ($5.suggestJoins) {
-         parser.suggestJoins($5.suggestJoins);
-       }
-       if ($5.suggestKeywords) {
-         keywords = keywords.concat(parser.createWeightedKeywords($5.suggestKeywords, 3));
-       }
-       parser.suggestKeywords(keywords);
-     } else if (!$6) {
-       parser.suggestKeywords([ 'WHERE' ]);
-     }
+     parser.suggestKeywords([ 'WHERE' ]);
    }
  | 'UPDATE' TargetTable 'CURSOR'
    {
