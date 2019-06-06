@@ -33,13 +33,9 @@ CreateStatement_EDIT
  : DatabaseDefinition_EDIT
  | TableDefinition_EDIT
  | ViewDefinition_EDIT
- | 'CREATE' OptionalExternal 'CURSOR'
+ | 'CREATE' 'CURSOR'
    {
-     if ($2) {
-       parser.suggestKeywords(['TABLE']);
-     } else {
-       parser.suggestKeywords(['DATABASE', 'ROLE', 'SCHEMA', 'TABLE', 'VIEW']);
-     }
+     parser.suggestKeywords(['DATABASE', 'SCHEMA', 'TABLE', 'VIEW']);
    }
  ;
 
@@ -77,23 +73,16 @@ DatabaseDefinition_EDIT
  ;
 
 DatabaseDefinitionOptionals
- : OptionalComment OptionalHdfsLocation
+ : OptionalComment
    {
-     var keywords = [];
-     if (!$2) {
-       keywords.push('LOCATION');
-     }
-     if (!$1 && !$2) {
-       keywords.push('COMMENT');
-     }
-     if (keywords.length > 0) {
-       parser.suggestKeywords(keywords);
+     if (!$1) {
+       parser.suggestKeywords(['COMMENT');
      }
    }
  ;
 
 DatabaseDefinitionOptionals_EDIT
- : OptionalComment_INVALID OptionalHdfsLocation
+ : OptionalComment_INVALID
  ;
 
 OptionalComment
@@ -117,39 +106,36 @@ Comment_INVALID
  ;
 
 TableDefinition
- : 'CREATE' OptionalExternal 'TABLE' OptionalIfNotExists TableDefinitionRightPart
+ : 'CREATE' 'TABLE' OptionalIfNotExists TableDefinitionRightPart
  ;
 
 TableDefinition_EDIT
- : 'CREATE' OptionalExternal 'TABLE' OptionalIfNotExists TableDefinitionRightPart_EDIT
- | 'CREATE' OptionalExternal 'TABLE' OptionalIfNotExists 'CURSOR'
+ : 'CREATE' 'TABLE' OptionalIfNotExists TableDefinitionRightPart_EDIT
+ | 'CREATE' 'TABLE' OptionalIfNotExists 'CURSOR'
    {
-     if (!$4) {
+     if (!$3) {
        parser.suggestKeywords(['IF NOT EXISTS']);
      }
    }
- | 'CREATE' OptionalExternal 'TABLE' OptionalIfNotExists_EDIT
+ | 'CREATE' 'TABLE' OptionalIfNotExists_EDIT
  ;
 
 TableDefinitionRightPart
- : TableIdentifierAndOptionalColumnSpecification OptionalPartitionedBy OptionalHdfsLocation OptionalAsSelectStatement
+ : TableIdentifierAndOptionalColumnSpecification OptionalPartitionedBy OptionalAsSelectStatement
  ;
 
 TableDefinitionRightPart_EDIT
- : TableIdentifierAndOptionalColumnSpecification_EDIT OptionalPartitionedBy OptionalHdfsLocation OptionalAsSelectStatement
- | TableIdentifierAndOptionalColumnSpecification PartitionedBy_EDIT OptionalHdfsLocation OptionalAsSelectStatement
- | TableIdentifierAndOptionalColumnSpecification OptionalPartitionedBy OptionalHdfsLocation OptionalAsSelectStatement_EDIT
- | TableIdentifierAndOptionalColumnSpecification OptionalPartitionedBy OptionalHdfsLocation 'CURSOR'
+ : TableIdentifierAndOptionalColumnSpecification_EDIT OptionalPartitionedBy OptionalAsSelectStatement
+ | TableIdentifierAndOptionalColumnSpecification PartitionedBy_EDIT OptionalAsSelectStatement
+ | TableIdentifierAndOptionalColumnSpecification OptionalPartitionedBy OptionalAsSelectStatement_EDIT
+ | TableIdentifierAndOptionalColumnSpecification OptionalPartitionedBy 'CURSOR'
    {
      var keywords = [];
-     if (!$1 && !$2 && !$3) {
+     if (!$1 && !$2) {
        keywords.push({ value: 'LIKE', weight: 1 });
      } else {
-       if (!$2 && !$3) {
+       if (!$2) {
          keywords.push({ value: 'PARTITIONED BY', weight: 12 });
-       }
-       if (!$3) {
-         keywords.push({ value: 'LOCATION', weight: 4 });
        }
        keywords.push({ value: 'AS', weight: 1 });
      }

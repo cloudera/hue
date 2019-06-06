@@ -73,21 +73,11 @@ SqlStatement
 SqlStatement_EDIT
  : AnyCursor
    {
-     if (parser.isHive()) {
-       parser.suggestDdlAndDmlKeywords(['EXPLAIN', 'FROM']);
-     } else if (parser.isImpala()) {
-       parser.suggestDdlAndDmlKeywords(['EXPLAIN']);
-     } else {
-       parser.suggestDdlAndDmlKeywords();
-     }
+     parser.suggestDdlAndDmlKeywords();
    }
  | CommonTableExpression 'CURSOR'
    {
-     if (parser.isHive() || parser.isImpala()) {
-       parser.suggestKeywords(['INSERT', 'SELECT']);
-     } else {
-       parser.suggestKeywords(['SELECT']);
-     }
+     parser.suggestKeywords(['SELECT']);
    }
  | DataDefinition_EDIT
  | DataManipulation_EDIT
@@ -268,27 +258,6 @@ QuotedValue
 QuotedValue_EDIT
  : SingleQuotedValue_EDIT
  | DoubleQuotedValue_EDIT
- ;
-
-OptionalAggregateOrAnalytic
- ;
-
-OptionalHiveExtended
- ;
-
-OptionalHiveExtendedOrFormatted
- ;
-
-OptionalExternal
- ;
-
-OptionalImpalaExtendedOrFormatted
- ;
-
-OptionallyFormattedIndex
- ;
-
-OptionallyFormattedIndex_EDIT
  ;
 
 OptionalFromDatabase
@@ -506,7 +475,6 @@ SchemaQualifiedTableIdentifier_EDIT
    }
  | RegularOrBacktickedIdentifier '.' PartialBacktickedOrPartialCursor
    {
-     // In Impala you can have statements like 'SELECT ... FROM testTable t, t.|'
      parser.suggestTablesOrColumns($1);
    }
  ;
@@ -554,7 +522,6 @@ PartitionSpecList_EDIT
 
 PartitionExpression
  : ColumnIdentifier '=' ValueExpression
- | ColumnIdentifier // Hive allows partial partition specs in some cases
  ;
 
 PartitionExpression_EDIT
@@ -756,7 +723,6 @@ PartialBacktickedIdentifierOrPartialCursor
  | 'PARTIAL_CURSOR'
  ;
 
-
 PrimitiveType
  : 'BIGINT'
  | 'BOOLEAN'
@@ -812,15 +778,15 @@ QuerySpecification_EDIT
  ;
 
 SelectStatement
- : 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList
+ : 'SELECT' OptionalAllOrDistinct SelectList
    {
-     parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4);
-     $$ = { selectList: $4 };
+     parser.addClauseLocation('selectList', parser.firstDefined($2, @2, $1, @1), @3);
+     $$ = { selectList: $3 };
    }
- | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList TableExpression
+ | 'SELECT' OptionalAllOrDistinct SelectList TableExpression
    {
-     parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4);
-     $$ = { selectList: $4, tableExpression: $5 }
+     parser.addClauseLocation('selectList', parser.firstDefined($2, @2, $1, @1), @3);
+     $$ = { selectList: $3, tableExpression: $4 }
    }
  ;
 
@@ -862,53 +828,47 @@ UnionClause_EDIT
  ;
 
 SelectStatement_EDIT
- : 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList_EDIT
+ : 'SELECT' OptionalAllOrDistinct SelectList_EDIT
    {
-     parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4);
-     if ($4.cursorAtStart) {
+     parser.addClauseLocation('selectList', parser.firstDefined($2, @2, $1, @1), @3);
+     if ($3.cursorAtStart) {
        var keywords = parser.getSelectListKeywords();
-       if (!$3 && !$2) {
+       if (!$2) {
          keywords.push({ value: 'ALL', weight: 2 });
          keywords.push({ value: 'DISTINCT', weight: 2 });
-       }
-       if (parser.isImpala() && !$3) {
-         keywords.push({ value: 'STRAIGHT_JOIN', weight: 1 });
        }
        parser.suggestKeywords(keywords);
      } else {
        parser.checkForSelectListKeywords($4);
      }
-     if ($4.suggestFunctions) {
+     if ($3.suggestFunctions) {
        parser.suggestFunctions();
      }
-     if ($4.suggestColumns) {
+     if ($3.suggestColumns) {
        parser.suggestColumns({ identifierChain: [], source: 'select' });
      }
-     if ($4.suggestTables) {
+     if ($3.suggestTables) {
        parser.suggestTables({ prependQuestionMark: true, prependFrom: true });
      }
-     if ($4.suggestDatabases) {
+     if ($3.suggestDatabases) {
        parser.suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
      }
-     if ($4.suggestAggregateFunctions && (!$2 || $2 === 'ALL')) {
+     if ($3.suggestAggregateFunctions && (!$2 || $2 === 'ALL')) {
        parser.suggestAggregateFunctions();
        parser.suggestAnalyticFunctions();
      }
    }
- | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin 'CURSOR'
+ | 'SELECT' OptionalAllOrDistinct 'CURSOR'
    {
-     parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4, true);
+     parser.addClauseLocation('selectList', parser.firstDefined($2, @2, $1, @1), @3, true);
      var keywords = parser.getSelectListKeywords();
      if (!$2 || $2 === 'ALL') {
        parser.suggestAggregateFunctions();
        parser.suggestAnalyticFunctions();
      }
-     if (!$3 && !$2) {
+     if (!$2) {
        keywords.push({ value: 'ALL', weight: 2 });
        keywords.push({ value: 'DISTINCT', weight: 2 });
-     }
-     if (parser.isImpala() && !$3) {
-       keywords.push({ value: 'STRAIGHT_JOIN', weight: 1 });
      }
      parser.suggestKeywords(keywords);
      parser.suggestFunctions();
@@ -916,32 +876,29 @@ SelectStatement_EDIT
      parser.suggestTables({ prependQuestionMark: true, prependFrom: true });
      parser.suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    }
- | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList TableExpression_EDIT
+ | 'SELECT' OptionalAllOrDistinct SelectList TableExpression_EDIT
    {
-     parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4);
+     parser.addClauseLocation('selectList', parser.firstDefined($2, @2, $1, @1), @3);
    }
- | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList_EDIT TableExpression
+ | 'SELECT' OptionalAllOrDistinct SelectList_EDIT TableExpression
    {
-     parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4);
-     parser.selectListNoTableSuggest($4, $2);
+     parser.addClauseLocation('selectList', parser.firstDefined($2, @2, $1, @1), @3);
+     parser.selectListNoTableSuggest($3, $2);
      if (parser.yy.result.suggestColumns) {
        parser.yy.result.suggestColumns.source = 'select';
      }
    }
- | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin 'CURSOR' TableExpression
+ | 'SELECT' OptionalAllOrDistinct 'CURSOR' TableExpression
    {
-     parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4, true);
+     parser.addClauseLocation('selectList', parser.firstDefined($2, @2, $1, @1), @3, true);
      var keywords = parser.getSelectListKeywords();
      if (!$2 || $2 === 'ALL') {
        parser.suggestAggregateFunctions();
        parser.suggestAnalyticFunctions();
      }
-     if (!$3 && !$2) {
+     if (!$2) {
        keywords.push({ value: 'ALL', weight: 2 });
        keywords.push({ value: 'DISTINCT', weight: 2 });
-     }
-     if (parser.isImpala() && !$3) {
-       keywords.push({ value: 'STRAIGHT_JOIN', weight: 1 });
      }
      parser.suggestKeywords(keywords);
      parser.suggestFunctions();
@@ -949,20 +906,20 @@ SelectStatement_EDIT
      parser.suggestTables({ prependQuestionMark: true, prependFrom: true });
      parser.suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    }
- | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList 'CURSOR' TableExpression
+ | 'SELECT' OptionalAllOrDistinct SelectList 'CURSOR' TableExpression
    {
-     parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4);
-     parser.checkForSelectListKeywords($4);
+     parser.addClauseLocation('selectList', parser.firstDefined($2, @2, $1, @1), @3);
+     parser.checkForSelectListKeywords($3);
    }
- | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList 'CURSOR' ',' TableExpression
+ | 'SELECT' OptionalAllOrDistinct SelectList 'CURSOR' ',' TableExpression
    {
-     parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4);
-     parser.checkForSelectListKeywords($4);
+     parser.addClauseLocation('selectList', parser.firstDefined($2, @2, $1, @1), @3);
+     parser.checkForSelectListKeywords($3);
    }
- | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList 'CURSOR'
+ | 'SELECT' OptionalAllOrDistinct SelectList 'CURSOR'
    {
-     parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4);
-     parser.checkForSelectListKeywords($4);
+     parser.addClauseLocation('selectList', parser.firstDefined($2, @2, $1, @1), @3);
+     parser.checkForSelectListKeywords($3);
      var keywords = ['FROM'];
      if (parser.yy.result.suggestKeywords) {
        keywords = parser.yy.result.suggestKeywords.concat(keywords);
@@ -1050,9 +1007,6 @@ TableExpression_EDIT
      if ($1) {
        if (!$1.hasLateralViews && typeof $1.tableReferenceList.hasJoinCondition !== 'undefined' && !$1.tableReferenceList.hasJoinCondition) {
          keywords.push({ value: 'ON', weight: 3 });
-         if (parser.isImpala()) {
-           keywords.push({ value: 'USING', weight: 3 });
-         }
        }
        if ($1.suggestKeywords) {
          keywords = parser.createWeightedKeywords($1.suggestKeywords, 3);
@@ -1085,14 +1039,7 @@ TableExpression_EDIT
      }
 
      if ($3.empty && $4 && $4.joinType.toUpperCase() === 'JOIN') {
-       keywords = keywords.concat(['FULL', 'FULL OUTER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER']);
-       if (parser.isHive()) {
-         keywords = keywords.concat(['CROSS', 'INNER', 'LEFT SEMI']);
-       } else if (parser.isImpala()) {
-         keywords = keywords.concat(['ANTI', 'CROSS', 'INNER', 'LEFT ANTI', 'LEFT INNER', 'LEFT SEMI', 'OUTER', 'RIGHT ANTI', 'RIGHT INNER', 'RIGHT SEMI', 'SEMI']);
-       } else {
-         keywords.push('INNER');
-       }
+       keywords = keywords.concat(['FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER']);
        parser.suggestKeywords(keywords);
        return;
      }
@@ -1118,34 +1065,13 @@ TableExpression_EDIT
      keywords = keywords.concat([
        { value: 'FULL JOIN', weight: 1 },
        { value: 'FULL OUTER JOIN', weight: 1 },
+       { value: 'INNER JOIN', weight: 1 },
        { value: 'JOIN', weight: 1 },
        { value: 'LEFT JOIN', weight: 1 },
        { value: 'LEFT OUTER JOIN', weight: 1 },
        { value: 'RIGHT JOIN', weight: 1 },
        { value: 'RIGHT OUTER JOIN', weight: 1 }
      ]);
-     if (parser.isHive()) {
-       keywords = keywords.concat([
-         { value: 'CROSS JOIN', weight: 1 },
-         { value: 'INNER JOIN', weight: 1 },
-         { value: 'LEFT SEMI JOIN', weight: 1 }
-       ]);
-     } else if (parser.isImpala()) {
-       keywords = keywords.concat([
-         { value: 'ANTI JOIN', weight: 1 },
-         { value: 'INNER JOIN', weight: 1 },
-         { value: 'LEFT ANTI JOIN', weight: 1 },
-         { value: 'LEFT INNER JOIN', weight: 1 },
-         { value: 'LEFT SEMI JOIN', weight: 1 },
-         { value: 'OUTER JOIN', weight: 1 },
-         { value: 'RIGHT ANTI JOIN', weight: 1 },
-         { value: 'RIGHT INNER JOIN', weight: 1 },
-         { value: 'RIGHT SEMI JOIN', weight: 1 },
-         { value: 'SEMI JOIN', weight: 1 }
-       ]);
-     } else {
-       keywords.push({ value: 'INNER JOIN', weight: 1 });
-     }
      parser.suggestKeywords(keywords);
   }
  | FromClause OptionalSelectConditions_EDIT OptionalJoins
@@ -1205,89 +1131,89 @@ FromClause_EDIT
  ;
 
 OptionalSelectConditions
- : OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
+ : OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalOrderByClause OptionalLimitClause
    {
      var keywords = parser.getKeywordsForOptionalsLR(
-       [$1, $2, $3, $4, $5, $6, $6, $7, $8],
-       [{ value: 'WHERE', weight: 9 }, { value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }], { value: 'SORT BY', weight: 4 }, { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }],
-       [true, true, true, parser.isHive(), true, parser.isHive(), parser.isHive() && !$5, true, parser.isImpala()]);
+       [$1, $2, $3, $4, $5],
+       [{ value: 'WHERE', weight: 7 }, { value: 'GROUP BY', weight: 6 }, { value: 'HAVING', weight: 5 }, { value: 'ORDER BY', weight: 4 }, { value: 'LIMIT', weight: 3 }],
+       [true, true, true, true, true]);
 
      if (keywords.length > 0) {
-       $$ = { suggestKeywords: keywords, empty: !$1 && !$2 && !$3 && !$4 && !$5 && !$6 && !$7 && !$8 };
+       $$ = { suggestKeywords: keywords, empty: !$1 && !$2 && !$3 && !$4 && !$5 };
      } else {
        $$ = {};
      }
 
      $$.whereClauseLocation = $1 ? @1 : undefined;
-     $$.limitClausePreceding = parser.firstDefined($6, @6, $5, @5, $4, @4, $3, @3, $2, @2, $1, @1);
-     $$.limitClauseLocation = $7 ? @7 : undefined;
+     $$.limitClausePreceding = parser.firstDefined($4, @4, $3, @3, $2, @2, $1, @1);
+     $$.limitClauseLocation = $5 ? @5 : undefined;
 
-     if (!$1 && !$2 && !$3 && !$4 && !$5 && !$6 && !$7 && !$8) {
+     if (!$1 && !$2 && !$3 && !$4 && !$5) {
        $$.suggestFilters = { prefix: 'WHERE', tablePrimaries: parser.yy.latestTablePrimaries.concat() };
      }
-     if (!$2 && !$3 && !$4 && !$5 && !$6 && !$7 && !$8) {
+     if (!$2 && !$3 && !$4 && !$5) {
        $$.suggestGroupBys = { prefix: 'GROUP BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() };
      }
-     if (!$5 && !$6 && !$7 && !$8) {
+     if (!$4 && !$5) {
        $$.suggestOrderBys = { prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() };
      }
    }
  ;
 
 OptionalSelectConditions_EDIT
- : WhereClause_EDIT OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
+ : WhereClause_EDIT OptionalGroupByClause OptionalHavingClause OptionalOrderByClause OptionalLimitClause
    {
      if (parser.yy.result.suggestColumns) {
        parser.yy.result.suggestColumns.source = 'where';
      }
    }
- | OptionalWhereClause GroupByClause_EDIT OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
+ | OptionalWhereClause GroupByClause_EDIT OptionalHavingClause OptionalOrderByClause OptionalLimitClause
    {
      if (parser.yy.result.suggestColumns) {
        parser.yy.result.suggestColumns.source = 'group by';
      }
    }
- | OptionalWhereClause OptionalGroupByClause HavingClause_EDIT OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
- | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OrderByClause_EDIT OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
+ | OptionalWhereClause OptionalGroupByClause HavingClause_EDIT OptionalOrderByClause OptionalLimitClause
+ | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OrderByClause_EDIT OptionalLimitClause
    {
      if (parser.yy.result.suggestColumns) {
        parser.yy.result.suggestColumns.source = 'order by';
      }
    }
- | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy LimitClause_EDIT OptionalOffsetClause
+ | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalOrderByClause LimitClause_EDIT
  ;
 
 OptionalSelectConditions_EDIT
- : WhereClause 'CURSOR' OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
+ : WhereClause 'CURSOR' OptionalGroupByClause OptionalHavingClause OptionalOrderByClause OptionalLimitClause
    {
      var keywords = parser.getKeywordsForOptionalsLR(
-       [$3, $4, $5, $6, $7, $7, $8, $9],
-       [{ value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }], { value: 'SORT BY', weight: 4 }, { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }],
-       [true, true, parser.isHive(), true, parser.isHive(), parser.isHive() && !$6, true, parser.isImpala()]);
+       [$3, $4, $5, $6],
+       [{ value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'ORDER BY', weight: 5 }, { value: 'LIMIT', weight: 3 }],
+       [true, true, true, true]);
      if ($1.suggestKeywords) {
        keywords = keywords.concat(parser.createWeightedKeywords($1.suggestKeywords, 1));
      }
      $$ = parser.getValueExpressionKeywords($1, keywords);
-     $$.cursorAtEnd = !$3 && !$4 && !$5 && !$6 && !$7 && !$8 && !$9;
+     $$.cursorAtEnd = !$3 && !$4 && !$5 && !$6;
      if ($1.columnReference) {
        $$.columnReference = $1.columnReference;
      }
      if (!$3) {
        parser.suggestGroupBys({ prefix: 'GROUP BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
-     if (!$3 && !$4 && !$5 && !$6) {
+     if (!$3 && !$4 && !$5) {
        parser.suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
      $$.whereClauseLocation = $1 ? @1 : undefined;
-     $$.limitClausePreceding = parser.firstDefined($7, @7, $6, @6, $5, @5, $4, @4, $3, @3, $1, @1);
-     $$.limitClauseLocation = $8 ? @8 : undefined;
+     $$.limitClausePreceding = parser.firstDefined($5, @5, $4, @4, $3, @3, $1, @1);
+     $$.limitClauseLocation = $6 ? @6 : undefined;
    }
- | OptionalWhereClause GroupByClause 'CURSOR' OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
+ | OptionalWhereClause GroupByClause 'CURSOR' OptionalHavingClause OptionalOrderByClause OptionalLimitClause
    {
      var keywords = parser.getKeywordsForOptionalsLR(
-       [$4, $5, $6, $7, $7, $8, $9],
-       [{ value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }], { value: 'SORT BY', weight: 4 }, { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }],
-       [true, parser.isHive(), true, parser.isHive(), parser.isHive() && !$6, true, parser.isImpala()]);
+       [$4, $5, $6],
+       [{ value: 'HAVING', weight: 7 }, { value: 'ORDER BY', weight: 5 }, { value: 'LIMIT', weight: 3 }],
+       [true, true, true]);
      if ($2.suggestKeywords) {
        keywords = keywords.concat(parser.createWeightedKeywords($2.suggestKeywords, 8));
      }
@@ -1299,46 +1225,48 @@ OptionalSelectConditions_EDIT
      } else {
        $$ = { suggestKeywords: keywords };
      }
-     $$.cursorAtEnd = !$4 && !$5 && !$6 && !$7 && !$8 && !$9;
-     if (!$4 && !$5 && !$6) {
+     $$.cursorAtEnd = !$4 && !$5 && !$6;
+     if (!$4 && !$5) {
        parser.suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
      $$.whereClauseLocation = $1 ? @1 : undefined;
-     $$.limitClausePreceding = parser.firstDefined($7, @7, $6, @6, $5, @5, $4, @4, $2, @2);
-     $$.limitClauseLocation = $8 ? @8 : undefined;
+     $$.limitClausePreceding = parser.firstDefined($5, @5, $4, @4, $2, @2);
+     $$.limitClauseLocation = $6 ? @6 : undefined;
    }
- | OptionalWhereClause OptionalGroupByClause HavingClause 'CURSOR' OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
+ | OptionalWhereClause OptionalGroupByClause HavingClause 'CURSOR' OptionalOrderByClause OptionalLimitClause
    {
      var keywords = parser.getKeywordsForOptionalsLR(
-       [$5, $6, $7, $7, $8, $9],
-       [{ value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }], { value: 'SORT BY', weight: 4 }, { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }],
-       [parser.isHive(), true, parser.isHive(), parser.isHive() && !$6, true, parser.isImpala()]);
-     $$ = { suggestKeywords: keywords, cursorAtEnd: !$5 && !$6 && !$7 && !$8 && !$9 };
-     if (!$5 && !$6) {
+       [$5, $6],
+       [{ value: 'ORDER BY', weight: 5 }, { value: 'LIMIT', weight: 3 }],
+       [true, true]);
+     $$ = { suggestKeywords: keywords, cursorAtEnd: !$5 && !$6 };
+     if (!$5) {
        parser.suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
      $$.whereClauseLocation = $1 ? @1 : undefined;
-     $$.limitClausePreceding = parser.firstDefined($7, @7, $6, @6, $5, @5, $3, @3);
-     $$.limitClauseLocation = $8 ? @8 : undefined;
+     $$.limitClausePreceding = parser.firstDefined($5, @5, $3, @3);
+     $$.limitClauseLocation = $6 ? @6 : undefined;
    }
- | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OrderByClause 'CURSOR' OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
+ | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OrderByClause 'CURSOR' OptionalLimitClause
    {
-     var keywords = parser.getKeywordsForOptionalsLR([$7, $8, $9], [[{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [parser.isHive(), true, parser.isImpala()]);
-     if ($5.suggestKeywords) {
-       keywords = keywords.concat(parser.createWeightedKeywords($5.suggestKeywords, 5));
+     var keywords = parser.getKeywordsForOptionalsLR(
+       [$6],
+       [{ value: 'LIMIT', weight: 3 }],
+       [true]);
+     if ($4.suggestKeywords) {
+       keywords = keywords.concat(parser.createWeightedKeywords($4.suggestKeywords, 4));
      }
-     $$ = { suggestKeywords: keywords, cursorAtEnd: !$7 && !$8 && !$9 };
+     $$ = { suggestKeywords: keywords, cursorAtEnd: !$6 };
      $$.whereClauseLocation = $1 ? @1 : undefined;
-     $$.limitClausePreceding = parser.firstDefined($7, @7, $5, @5);
-     $$.limitClauseLocation = $8 ? @8 : undefined;
+     $$.limitClausePreceding = parser.firstDefined($4, @4);
+     $$.limitClauseLocation = $6 ? @6 : undefined;
    }
- | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy LimitClause 'CURSOR' OptionalOffsetClause
+ | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalOrderByClause LimitClause 'CURSOR'
    {
-     var keywords = parser.getKeywordsForOptionalsLR([$9], [{ value: 'OFFSET', weight: 2 }], [parser.isImpala()]);
-     $$ = { suggestKeywords: keywords, cursorAtEnd: !$9 };
+     $$ = { suggestKeywords: [], true };
      $$.whereClauseLocation = $1 ? @1 : undefined;
-     $$.limitClausePreceding = parser.firstDefined($6, @6, $5, @5, $4, @4, $3, @3, $2, @2, $1, @1);
-     $$.limitClauseLocation = $7 ? @7 : undefined;
+     $$.limitClausePreceding = parser.firstDefined($4, @4, $3, @3, $2, @2, $1, @1);
+     $$.limitClauseLocation = @5;
    }
  ;
 
@@ -1557,11 +1485,7 @@ ValueExpression_EDIT
 ValueExpression_EDIT
  : ValueExpression 'NOT' 'CURSOR'
    {
-     if (parser.isImpala()) {
-       parser.suggestKeywords(['BETWEEN', 'EXISTS', 'IN', 'ILIKE', 'IREGEXP', 'LIKE', 'REGEXP', 'RLIKE']);
-     } else {
-       parser.suggestKeywords(['BETWEEN', 'EXISTS', 'IN', 'LIKE', 'REGEXP', 'RLIKE']);
-     }
+     parser.suggestKeywords(['BETWEEN', 'EXISTS', 'IN', 'LIKE', 'REGEXP', 'RLIKE']);
      $$ = { types: [ 'BOOLEAN' ] };
    }
  ;
@@ -1980,7 +1904,25 @@ JoinedTable_EDIT
  ;
 
 Joins
- : JoinType OptionalImpalaBroadcastOrShuffle TablePrimary OptionalJoinCondition
+ : JoinType TablePrimary OptionalJoinCondition
+   {
+     if ($3 && $3.valueExpression) {
+       $$ = $3.valueExpression;
+     } else {
+       $$ = {};
+     }
+     $$.joinType = $1;
+     if ($3.noJoinCondition) {
+       $$.suggestJoinConditions = { prependOn: true, tablePrimaries: parser.yy.latestTablePrimaries.concat() }
+     }
+     if ($3.suggestKeywords) {
+       $$.suggestKeywords = $4.suggestKeywords;
+     }
+     if (parser.yy.latestTablePrimaries.length > 0) {
+        parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1].join = true;
+     }
+   }
+ | Joins JoinType TablePrimary OptionalJoinCondition
    {
      if ($4 && $4.valueExpression) {
        $$ = $4.valueExpression;
@@ -1992,24 +1934,6 @@ Joins
        $$.suggestJoinConditions = { prependOn: true, tablePrimaries: parser.yy.latestTablePrimaries.concat() }
      }
      if ($4.suggestKeywords) {
-       $$.suggestKeywords = $4.suggestKeywords;
-     }
-     if (parser.yy.latestTablePrimaries.length > 0) {
-        parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1].join = true;
-     }
-   }
- | Joins JoinType OptionalImpalaBroadcastOrShuffle TablePrimary OptionalJoinCondition
-   {
-     if ($5 && $5.valueExpression) {
-       $$ = $5.valueExpression;
-     } else {
-       $$ = {};
-     }
-     $$.joinType = $1;
-     if ($5.noJoinCondition) {
-       $$.suggestJoinConditions = { prependOn: true, tablePrimaries: parser.yy.latestTablePrimaries.concat() }
-     }
-     if ($5.suggestKeywords) {
        $$.suggestKeywords = $5.suggestKeywords;
      }
      if (parser.yy.latestTablePrimaries.length > 0) {
@@ -2019,31 +1943,28 @@ Joins
  ;
 
 Joins_INVALID
- : JoinType OptionalImpalaBroadcastOrShuffle                                           -> { joinType: $1 }
- | JoinType OptionalImpalaBroadcastOrShuffle Joins                                     -> { joinType: $1 }
+ : JoinType                                           -> { joinType: $1 }
+ | JoinType Joins                                     -> { joinType: $1 }
  ;
 
 Join_EDIT
- : JoinType_EDIT OptionalImpalaBroadcastOrShuffle TablePrimary OptionalJoinCondition
+ : JoinType_EDIT TablePrimary OptionalJoinCondition
    {
      if ($1.suggestKeywords) {
        parser.suggestKeywords($1.suggestKeywords);
      }
    }
- | JoinType_EDIT OptionalImpalaBroadcastOrShuffle
+ | JoinType_EDIT
    {
      if ($1.suggestKeywords) {
        parser.suggestKeywords($1.suggestKeywords);
      }
    }
- | JoinType OptionalImpalaBroadcastOrShuffle TablePrimary_EDIT OptionalJoinCondition
- | JoinType OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition_EDIT
- | JoinType OptionalImpalaBroadcastOrShuffle 'CURSOR' OptionalJoinCondition
+ | JoinType TablePrimary_EDIT OptionalJoinCondition
+ | JoinType TablePrimary JoinCondition_EDIT
+ | JoinType 'CURSOR' OptionalJoinCondition
    {
-     if (!$2 && parser.isImpala()) {
-       parser.suggestKeywords(['[BROADCAST]', '[SHUFFLE]']);
-     }
-     if (!$2 && parser.yy.latestTablePrimaries.length > 0) {
+     if (parser.yy.latestTablePrimaries.length > 0) {
        var idx = parser.yy.latestTablePrimaries.length - 1;
        var tables = [];
        do {
@@ -2099,12 +2020,12 @@ JoinType_EDIT
  | 'FULL' 'CURSOR' 'JOIN'           -> { suggestKeywords: ['OUTER'] }
  | 'FULL' 'OUTER' 'CURSOR'          -> { suggestKeywords: ['JOIN'] }
  | 'INNER' 'CURSOR'                 -> { suggestKeywords: ['JOIN'] }
- | 'LEFT' 'CURSOR' 'JOIN'           -> { suggestKeywords: parser.isImpala() ? ['ANTI', 'INNER', 'OUTER', 'SEMI'] : parser.isHive() ? ['OUTER', 'SEMI'] : ['OUTER'] }
+ | 'LEFT' 'CURSOR' 'JOIN'           -> { suggestKeywords: ['OUTER'] }
  | 'LEFT' 'INNER' 'CURSOR'          -> { suggestKeywords: ['JOIN'] }
  | 'LEFT' 'OUTER' 'CURSOR'          -> { suggestKeywords: ['JOIN'] }
  | 'LEFT' 'SEMI' 'CURSOR'           -> { suggestKeywords: ['JOIN'] }
  | 'OUTER' 'CURSOR'                 -> { suggestKeywords: ['JOIN'] }
- | 'RIGHT' 'CURSOR' 'JOIN'          -> { suggestKeywords: parser.isImpala() ? ['ANTI', 'INNER', 'OUTER', 'SEMI'] : ['OUTER'] }
+ | 'RIGHT' 'CURSOR' 'JOIN'          -> { suggestKeywords: ['OUTER'] }
  | 'RIGHT' 'INNER' 'CURSOR'         -> { suggestKeywords: ['JOIN'] }
  | 'RIGHT' 'OUTER' 'CURSOR'         -> { suggestKeywords: ['JOIN'] }
  | 'RIGHT' 'SEMI' 'CURSOR'          -> { suggestKeywords: ['JOIN'] }
@@ -2112,7 +2033,7 @@ JoinType_EDIT
  ;
 
 OptionalJoinCondition
- :                                       -> { noJoinCondition: true, suggestKeywords: parser.isImpala() ? ['ON', 'USING'] : ['ON'] }
+ :                                       -> { noJoinCondition: true, ['ON'] }
  | 'ON' ValueExpression                  -> { valueExpression: $2 }
  ;
 
@@ -2583,7 +2504,7 @@ WindowSpec
 WindowSpec_EDIT
  : RowsOrRange 'CURSOR'
    {
-     parser.suggestKeywords(parser.isHive() ? ['BETWEEN', 'UNBOUNDED'] : ['BETWEEN']);
+     parser.suggestKeywords(['BETWEEN']);
    }
  | RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding OptionalAndFollowing 'CURSOR'
    {
@@ -2596,11 +2517,6 @@ WindowSpec_EDIT
  | RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding_EDIT OptionalAndFollowing
  | RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding OptionalAndFollowing_EDIT
  | RowsOrRange 'UNBOUNDED' PopLexerState OptionalCurrentOrPreceding 'CURSOR'
-   {
-     if (!$4 && parser.isHive()) {
-       parser.suggestKeywords(['PRECEDING']);
-     }
-   }
  | RowsOrRange 'UNBOUNDED' PopLexerState OptionalCurrentOrPreceding_EDIT
  ;
 
@@ -2775,9 +2691,6 @@ CountFunction_EDIT
      var keywords = parser.getSelectListKeywords();
      if (!$3) {
        keywords.push('DISTINCT');
-       if (parser.isImpala()) {
-         keywords.push('ALL');
-       }
        if (parser.yy.result.suggestKeywords) {
          keywords = parser.yy.result.suggestKeywords.concat(keywords);
        }
@@ -2796,9 +2709,6 @@ CountFunction_EDIT
        var keywords = parser.getSelectListKeywords();
        if (!$3) {
          keywords.push('DISTINCT');
-         if (parser.isImpala()) {
-           keywords.push('ALL');
-         }
        }
        parser.suggestKeywords(keywords);
      }
@@ -2819,9 +2729,6 @@ OtherAggregateFunction_EDIT
      if (!$3) {
        if ($1.toLowerCase() === 'group_concat') {
          keywords.push('ALL');
-       } else if (parser.isImpala()) {
-         keywords.push('ALL');
-         keywords.push('DISTINCT');
        } else {
          keywords.push('DISTINCT');
        }
@@ -2845,9 +2752,6 @@ OtherAggregateFunction_EDIT
        if (!$3) {
          if ($1.toLowerCase() === 'group_concat') {
            keywords.push('ALL');
-         } else if (parser.isImpala()) {
-           keywords.push('ALL');
-           keywords.push('DISTINCT');
          } else {
            keywords.push('DISTINCT');
          }
@@ -2893,9 +2797,6 @@ SumFunction_EDIT
      var keywords = parser.getSelectListKeywords(true);
      if (!$3) {
        keywords.push('DISTINCT');
-       if (parser.isImpala()) {
-         keywords.push('ALL');
-       }
      }
      if (parser.yy.result.suggestKeywords) {
        keywords = parser.yy.result.suggestKeywords.concat(keywords);
@@ -2915,33 +2816,4 @@ SumFunction_EDIT
      }
      $$ = { types: parser.findReturnTypes($1) };
    }
- ;
-
-OptionalOuter
- :
- | 'OUTER'
- ;
-
-OptionalWindowClause
- ;
-
-OptionalImpalaBroadcastOrShuffle
- ;
-
-OptionalOffsetClause
- ;
-
-OptionalClusterOrDistributeBy
- ;
-
-OptionalStraightJoin
- ;
-
-OptionalHdfsLocation
- ;
-
-OptionalPartitionOperations
- ;
-
-OptionalPartitionOperations_EDIT
  ;
