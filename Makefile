@@ -213,6 +213,9 @@ install-env:
 	cp $(ROOT)/package.json $(INSTALL_DIR)
 	cp $(ROOT)/webpack.config*.js $(INSTALL_DIR)
 	$(MAKE) -C $(INSTALL_DIR) npm-install
+	@if [ "$(MAKECMDGOALS)" = "install" ]; then \
+	  $(MAKE) -C $(INSTALL_DIR) create-static; \
+	fi
 
 
 ###################################
@@ -226,7 +229,9 @@ npm-install:
 	npm run webpack-login
 	npm run webpack-workers
 	node_modules/.bin/removeNPMAbsolutePaths .
-	rm -rf node_modules
+	@if [ "$(MAKECMDGOALS)" = "install" ]; then \
+	  rm -rf node_modules; \
+	fi
 
 .PHONY: create-static
 create-static:
