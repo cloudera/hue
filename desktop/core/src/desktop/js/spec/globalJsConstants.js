@@ -19,7 +19,8 @@ const globalVars = {
   CACHEABLE_TTL: 1,
   HAS_OPTIMIZER: false,
   AUTOCOMPLETE_TIMEOUT: 1,
-  HUE_I18n: {}
+  HUE_I18n: {},
+  HUE_BASE_URL: ''
 };
 
 Object.keys(globalVars).forEach(key => {

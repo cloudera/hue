@@ -125,7 +125,7 @@ describe('hdfsAutocompleter.js', () => {
   it("should return suggestions for root with '", () => {
     assertAutoComplete({
       serverResponses: {
-        '/filebrowser/view=/': {
+        '/filebrowser/view=%2F': {
           files: [
             { name: '.', type: 'dir' },
             { name: '..', type: 'dir' },
@@ -143,7 +143,7 @@ describe('hdfsAutocompleter.js', () => {
   it('should return suggestions for root with "', () => {
     assertAutoComplete({
       serverResponses: {
-        '/filebrowser/view=/': {
+        '/filebrowser/view=%2F': {
           files: [
             { name: '.', type: 'dir' },
             { name: '..', type: 'dir' },
@@ -161,7 +161,7 @@ describe('hdfsAutocompleter.js', () => {
   it('should return suggestions for non-root', () => {
     assertAutoComplete({
       serverResponses: {
-        '/filebrowser/view=/foo/bar': {
+        '/filebrowser/view=%2Ffoo/bar': {
           files: [
             { name: '.', type: 'dir' },
             { name: '..', type: 'dir' },
