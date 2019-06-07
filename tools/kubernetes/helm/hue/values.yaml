@@ -17,6 +17,11 @@ hue:
     [desktop]
     app_blacklist=filebrowser,oozie,search,hbase,security,jobbrowser,metastore
 
+    [[task_server]]
+    enabled=true
+    ## broker_url=amqp://guest:guest@127.0.0.1//
+    broker_url=redis://redis:6379/0'
+
     [impala]
     server_host=172.31.114.171
 
