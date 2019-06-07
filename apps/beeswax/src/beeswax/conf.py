@@ -20,17 +20,12 @@ from builtins import str
 from past.utils import old_div
 import logging
 import os.path
-import sys
-import beeswax.hive_site
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 from desktop.conf import default_ssl_cacerts, default_ssl_validate, AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD,\
   AUTH_USERNAME as DEFAULT_AUTH_USERNAME
 from desktop.lib.conf import ConfigSection, Config, coerce_bool, coerce_csv, coerce_password_from_script
-from desktop.lib.exceptions import StructuredThriftTransportException
-
-from beeswax.settings import NICE_NAME
 
 
 LOG = logging.getLogger(__name__)
@@ -298,46 +293,3 @@ AUTH_PASSWORD_SCRIPT = Config(
   private=True,
   type=coerce_password_from_script,
   default=None)
-
-
-def config_validator(user):
-  # dbms is dependent on beeswax.conf (this file)
-  # import in method to avoid circular dependency
-  from beeswax.design import hql_query
-  from beeswax.server import dbms
-
-  res = []
-  try:
-    try:
-      if not 'test' in sys.argv: # Avoid tests hanging
-        server = dbms.get(user)
-        query = hql_query("SELECT 'Hello World!';")
-        handle = server.execute_and_wait(query, timeout_sec=10.0)
-
-        if handle:
-          server.fetch(handle, rows=100)
-          server.close(handle)
-    except StructuredThriftTransportException as e:
-      if 'Error validating the login' in str(e):
-        msg = 'Failed to authenticate to HiveServer2, check authentication configurations.'
-        LOG.exception(msg)
-        res.append((NICE_NAME, _(msg)))
-      else:
-        raise e
-  except Exception as e:
-    msg = "The application won't work without a running HiveServer2."
-    LOG.exception(msg)
-    res.append((NICE_NAME, _(msg)))
-
-  try:
-    from desktop.lib.fsmanager import get_filesystem
-    warehouse = beeswax.hive_site.get_metastore_warehouse_dir()
-    fs = get_filesystem()
-    fs.stats(warehouse)
-  except Exception:
-    msg = 'Failed to access Hive warehouse: %s'
-    LOG.exception(msg % warehouse)
-
-    return [(NICE_NAME, _(msg) % warehouse)]
-
-  return res
