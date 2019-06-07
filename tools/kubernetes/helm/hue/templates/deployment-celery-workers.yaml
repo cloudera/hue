@@ -1,20 +1,25 @@
-apiVersion: v1
-kind: ReplicationController
+{{- if .Values.workers.enabled -}}
+apiVersion: apps/v1beta2
+kind: Deployment
 metadata:
-  name: hue
+  name: celery-worker
+  labels:
+    deployment: celery-worker
 spec:
-  replicas: {{ .Values.hue.replicas }}
+  replicas: {{ .Values.workers.replicas }}
+  selector:
+    matchLabels:
+      pod: celery-worker
   template:
     metadata:
       labels:
-        app: hue
+        pod: celery-worker
     spec:
       containers:
-        - name: hue
+        - name: celery-worker
           image: {{ .Values.registry }}/hue:{{ .Values.tag }}
           imagePullPolicy: Always
-          ports:
-            - containerPort: 8888
+          command: ['./build/env/bin/celery', 'worker', '-A', 'desktop', '-l', 'info']
           volumeMounts:
           - name: config-volume
             mountPath: /usr/share/hue/desktop/conf/z-hue.ini
@@ -29,3 +34,4 @@ spec:
         - name: config-volume-extra
           configMap:
             name: hue-config-extra
+{{- end -}}

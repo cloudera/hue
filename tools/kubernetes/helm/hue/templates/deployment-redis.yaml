@@ -1,0 +1,23 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: redis
+spec:
+  selector:
+    matchLabels:
+      pod: redis
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        pod: redis
+    spec:
+      containers:
+      - name: master
+        image: redis
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 6379

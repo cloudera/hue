@@ -1,3 +1,4 @@
+{{- if .Values.balancer.enable -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -54,7 +55,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: gethue/nginx:latest
+        image: {{ .Values.registry }}/nginx:{{ .Values.tag }}
         ports:
         - containerPort: 80
         volumeMounts:
@@ -79,3 +80,4 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
+{{- end -}}
