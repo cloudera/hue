@@ -178,24 +178,20 @@ def view(request, path):
     decoded_path = urllib.unquote(path)
     if path != decoded_path:
       path = decoded_path
-    if request.GET.get('format') == 'json':
-      prefix = '' 
-    else:
-      prefix = '/hue'
     # default_to_home is set in bootstrap.js
     if 'default_to_home' in request.GET:
         home_dir_path = request.user.get_home_directory()
         if request.fs.isdir(home_dir_path):
-            return format_preserving_redirect(request, prefix + '/filebrowser/view=' + urllib.quote(home_dir_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS))
+            return format_preserving_redirect(request, '/filebrowser/view=' + urllib.quote(home_dir_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS))
 
     # default_to_home is set in bootstrap.js
     if 'default_to_trash' in request.GET:
         home_trash_path = _home_trash_path(request.fs, request.user, path)
         if request.fs.isdir(home_trash_path):
-            return format_preserving_redirect(request, prefix + '/filebrowser/view=' + urllib.quote(home_trash_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS))
+            return format_preserving_redirect(request, '/filebrowser/view=' + urllib.quote(home_trash_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS))
         trash_path = request.fs.trash_path(path)
         if request.fs.isdir(trash_path):
-            return format_preserving_redirect(request, prefix + '/filebrowser/view=' + urllib.quote(trash_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS))
+            return format_preserving_redirect(request, '/filebrowser/view=' + urllib.quote(trash_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS))
 
     try:
         stats = request.fs.stats(path)
