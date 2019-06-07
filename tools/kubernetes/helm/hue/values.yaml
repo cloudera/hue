@@ -1,4 +1,4 @@
-registry: "gethue/hue"
+registry: "gethue"
 tag: "latest"
 hue:
   database:
@@ -33,6 +33,11 @@ hue:
     show_notebooks=false
 
     [hadoop]
+balancer:
+  enabled: true
+workers:
+  enabled: true
+  replicas: 1
 aws:
   accessKeyId: ""
   secretAccessKey: ""
