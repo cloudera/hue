@@ -1,0 +1,15 @@
+# redis transport
+redis
+
+# MongoDB transport
+pymongo
+
+# Zookeeper transport
+kazoo
+
+# SQS transport
+boto3
+
+# Qpid transport
+qpid-python>=0.26
+qpid-tools>=0.26

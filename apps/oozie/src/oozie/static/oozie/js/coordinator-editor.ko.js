@@ -26,7 +26,7 @@ var CoordinatorEditorViewModel = (function () {
     var self = this;
 
     self.id = ko.observable(typeof coordinator.id != "undefined" && coordinator.id != null ? coordinator.id : null);
-    self.uuid = ko.observable(typeof coordinator.uuid != "undefined" && coordinator.uuid != null ? coordinator.uuid : UUID());
+    self.uuid = ko.observable(typeof coordinator.uuid != "undefined" && coordinator.uuid != null ? coordinator.uuid : hueUtils.UUID());
     self.name = ko.observable(typeof coordinator.name != "undefined" && coordinator.name != null ? coordinator.name : "").extend({ trackChange: true });
     self.isManaged = ko.observable(typeof coordinator.isManaged != "undefined" && coordinator.isManaged != null ? coordinator.isManaged : false);
 
@@ -147,7 +147,7 @@ var CoordinatorEditorViewModel = (function () {
 
         'dataset_type': 'parameter',
 
-        'uuid': UUID(), // Dataset
+        'uuid': hueUtils.UUID(), // Dataset
         'dataset_variable': '', // Aka property or URI
         'show_advanced': false,
         'use_done_flag': false,
@@ -246,13 +246,10 @@ var CoordinatorEditorViewModel = (function () {
             self.coordinator.tracker().markCurrentStateAsClean();
             if (typeof cb === 'function') {
               cb(data);
-            }
-            else {
+            } else {
               $(document).trigger("info", data.message);
             }
-            if (window.location.search.indexOf("coordinator") == -1 && !IS_HUE_4) {
-              window.location.hash = '#coordinator=' + data.id;
-            } else if (IS_HUE_4 && ! cb) { // cb from integrated scheduler
+            if (!cb) { // cb from integrated scheduler
               hueUtils.changeURL('/hue/oozie/editor/coordinator/edit/?coordinator=' + data.id);
             }
           }
@@ -291,7 +288,7 @@ var CoordinatorEditorViewModel = (function () {
       if (!self.coordinator.isDirty()) {
         hueAnalytics.log('oozie/editor/coordinator', 'submit');
         $.get("/oozie/editor/coordinator/submit/" + self.coordinator.id(), {
-          format: IS_HUE_4 ? 'json' : 'html'
+          format: 'json'
         }, function (data) {
           $(document).trigger("showSubmitPopup", data);
         }).fail(function (xhr, textStatus, errorThrown) {

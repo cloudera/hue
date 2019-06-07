@@ -109,10 +109,8 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
 
 
 <script type="text/javascript">
-  if (window.location.hash != "") {
-    if (window.location.hash.indexOf("workflow") > -1) {
-      location.href = (IS_HUE_4 ? '/hue' : '') + "/oozie/editor/workflow/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
-    }
+  if (window.location.hash && window.location.hash.indexOf('workflow') !== -1) {
+    location.href = '/hue/oozie/editor/workflow/edit/?' + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, '');
   }
 </script>
 
@@ -586,9 +584,6 @@ ${ workflow.render() }
 </div>
 
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-filetypes.css') }">
-<link rel="stylesheet" href="${ static('desktop/ext/css/hue-charts.css') }">
-<link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
-<link rel="stylesheet" href="${ static('desktop/ext/css/select2.min.css') }">
 <link rel="stylesheet" href="${ static('oozie/css/common-editor.css') }">
 <link rel="stylesheet" href="${ static('oozie/css/workflow-editor.css') }">
 
@@ -599,10 +594,6 @@ ${ dashboard.import_layout() }
 ${ commonshare() | n,unicode }
 %endif
 
-<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/hue.utils.js') }"></script>
-<script src="${ static('desktop/js/ko.editable.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/select2.full.patched.js') }" type="text/javascript" charset="utf-8"></script>
 % if not is_embeddable:
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
@@ -629,7 +620,7 @@ ${ utils.submit_popup_event() }
 <script type="text/javascript">
   ${ utils.slaGlobal() }
 
-  var apiHelper = ApiHelper.getInstance();
+  var apiHelper = window.apiHelper;
 
   var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode });
   ko.applyBindings(viewModel, $("#oozie_workflowComponents")[0]);

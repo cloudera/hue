@@ -114,15 +114,15 @@ def get_engines(user):
       'nesting': settings.get('solr') and settings['solr'].get('nesting'),
     })
 
-  if HAS_SQL_ENABLED.get() and ('beeswax' in apps or 'rdbms' in apps):
+  if HAS_SQL_ENABLED.get():
     engines += [{
-          'name': _('Table (%s)') % interpreter['name'],
-          'type': interpreter['type'],
-          'async': interpreter['interface'] == 'hiveserver2',
-          'analytics': settings.get('sql') and settings['sql'].get('analytics'),
-          'nesting': settings.get('sql') and settings['sql'].get('nesting'),
+        'name': _('Table (%s)') % interpreter['name'],
+        'type': interpreter['type'],
+        'async': interpreter['interface'] == 'hiveserver2',
+        'analytics': settings.get('sql') and settings['sql'].get('analytics'),
+        'nesting': settings.get('sql') and settings['sql'].get('nesting'),
       }
-      for interpreter in get_ordered_interpreters(user) if interpreter['interface'] in ('hiveserver2', 'jdbc', 'rdbms')
+      for interpreter in get_ordered_interpreters(user) if interpreter['interface'] in ('hiveserver2', 'jdbc', 'rdbms', 'sqlalchemy')
     ]
 
   return engines

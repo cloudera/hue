@@ -22,7 +22,6 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.conf import DISABLE_HUE_3
 from hadoop.fs.hadoopfs import Hdfs
 from notebook.models import make_notebook
 
@@ -72,37 +71,24 @@ class EnvelopeIndexer(object):
       last_executed=start_time
     )
 
-    if not DISABLE_HUE_3.config.default_value or True: # CDH5
-      shell_command_name = "pipeline.sh"
-      shell_command = """#!/bin/bash
+    shell_command_name = "pipeline.sh"
+    shell_command = """#!/bin/bash
 
 export SPARK_DIST_CLASSPATH=`hadoop classpath`
 export SPARK_DIST_CLASSPATH=/etc/hive/conf:`hadoop classpath`
 export JAVA_HOME=/usr/java/jdk1.8.0_162
 
 SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
-      hdfs_shell_cmd_path = os.path.join(workspace_path, shell_command_name)
-      self.fs.do_as_user(self.username, self.fs.create, hdfs_shell_cmd_path, data=shell_command)
-      task.add_shell_snippet(
-        shell_command=shell_command_name,
-        files=[
-            {u'value': u'%s/envelope.conf' % workspace_path},
-            {u'value': hdfs_shell_cmd_path},
-            {u'value': lib_path}
-        ]
-      )
-    else:
-      task.add_spark_snippet(
-        clazz='com.cloudera.labs.envelope.EnvelopeMain',
-        jars=Hdfs.basename(lib_path),
-        arguments=[
-            u'envelope.conf'
-        ],
-        files=[
-            {u'path': u'%s/envelope.conf' % workspace_path, u'type': u'file'},
-            {u'path': lib_path, u'type': u'file'},
-        ]
-      )
+    hdfs_shell_cmd_path = os.path.join(workspace_path, shell_command_name)
+    self.fs.do_as_user(self.username, self.fs.create, hdfs_shell_cmd_path, data=shell_command)
+    task.add_shell_snippet(
+      shell_command=shell_command_name,
+      files=[
+          {u'value': u'%s/envelope.conf' % workspace_path},
+          {u'value': hdfs_shell_cmd_path},
+          {u'value': lib_path}
+      ]
+    )
 
     return task.execute(request, batch=True)
 

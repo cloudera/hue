@@ -2138,7 +2138,14 @@ class SparkAction(Action):
           'help_text': _('Path to file to put in the running directory.'),
           'type': ''
      },
-    'class': {
+     'archives': {
+          'name': 'archives',
+          'label': _('Archives'),
+          'value': [],
+          'help_text': _('zip, tar and tgz/tar.gz uncompressed into the running directory.'),
+          'type': ''
+     },
+     'class': {
           'name': 'class',
           'label': _('Main class'),
           'value': '',
@@ -4207,11 +4214,20 @@ class WorkflowBuilder():
     }
 
   def get_pig_document_node(self, document, user):
-    node = self._get_pig_node(document.uuid, is_document_node=True)
+    statement = json.loads(document.data)['snippets'][0]['statement']
+    credentials = []
+    if self._use_hcatalog(statement) and SECURITY_ENABLED.get():
+      credentials.append('hcat')
+
+    node = self._get_pig_node(document.uuid, credentials=credentials, is_document_node=True)
 
     node['properties']['uuid'] = document.uuid
 
     return node
+
+  def _use_hcatalog(self, statement):
+    return ('org.apache.hcatalog.pig.HCatStorer' in statement or 'org.apache.hcatalog.pig.HCatLoader' in statement) or \
+           ('org.apache.hive.hcatalog.pig.HCatLoader' in statement or 'org.apache.hive.hcatalog.pig.HCatStorer' in statement)
 
   def _get_pig_node(self, node_id, credentials=None, is_document_node=False):
     if credentials is None:

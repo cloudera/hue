@@ -83,7 +83,7 @@ from desktop.views import _ko
           ${ _('There was an error loading the document.')}
         </div>
         <div style="margin-top: 20px" data-bind="visible: fileEntry.canModify() && ! hasErrors() && ! loading()">
-          <div class="input-append">
+          <div class="input-append" style="font-size: inherit">
              <div id="menu"></div>
               <input id="userSearchAutocomp" placeholder="${_('Type a username or a group name')}" type="text" data-bind="autocomplete: { source: shareAutocompleteUserSource.bind($data), itemTemplate: 'user-search-autocomp-item', noMatchTemplate: 'user-search-autocomp-no-match', valueObservable: searchInput, showSpinner: true, classPrefix: 'hue-', onEnter: onShareAutocompleteUserEnter.bind($data), appendTo: $('#menu') }, clearable: { value: searchInput, textInput: searchInput }" class="ui-autocomplete-input" autocomplete="off" style="width: 420px">
             <div class="btn-group" style="overflow:visible">
@@ -387,7 +387,7 @@ from desktop.views import _ko
                 <li class="app-header">
                   <a href="/hue/useradmin">
                     <svg class="hi"><use xlink:href="#hi-documents"></use></svg>
-                    <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: 'home' }} --><!-- /ko -->
+                    <!-- ko component: { name: 'hue-favorite-app', params: { app: 'home' }} --><!-- /ko -->
                   </a>
                 </li>
                <!-- ko with: activeEntry -->
@@ -472,7 +472,7 @@ from desktop.views import _ko
               <div class="doc-browser-attr-group">
                 <!-- ko with: definition -->
                 <div class="doc-browser-attr-col doc-browser-description" data-bind="text: description, attr: { 'title': description }"></div>
-                <div class="doc-browser-attr-col doc-browser-type" data-bind="text: HUE_I18n.documentType[type] || type"></div>
+                <div class="doc-browser-attr-col doc-browser-type" data-bind="text: window.DOCUMENT_TYPE_I18n[type] || type"></div>
                 <div class="doc-browser-attr-col doc-browser-owner" data-bind="text: owner, attr: { 'title': owner }"></div>
                 <div class="doc-browser-attr-col doc-browser-modified" data-bind="text: localeFormat(last_modified)"></div>
                 <!-- /ko -->
@@ -607,7 +607,7 @@ from desktop.views import _ko
               }
 
               if (! dragToSelect) {
-                var $helper = $('.doc-browser-drag-helper').clone().show();
+                var $helper = $('.doc-browser-drag-helper').clone().appendTo($container).show();
                 var sharedCount = selectedEntries.filter(function (entry) {
                   return entry.isSharedWithMe();
                 }).length;
@@ -624,7 +624,6 @@ from desktop.views import _ko
                   $helper.find('i').removeClass().addClass($element.find('.doc-browser-primary-col i').attr('class'));
                 }
 
-                $helper.appendTo($container);
               } else {
                 $('<div>').addClass('doc-browser-drag-select').appendTo(HUE_CONTAINER);
               }

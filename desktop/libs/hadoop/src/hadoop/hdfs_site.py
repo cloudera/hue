@@ -21,7 +21,7 @@ import os.path
 
 import conf
 import confparse
-
+from hadoop.conf import DEFAULT_NN_HTTP_PORT
 
 LOG = logging.getLogger(__name__)
 
@@ -31,7 +31,8 @@ _CNF_NN_PERMISSIONS_UMASK_MODE = 'fs.permissions.umask-mode'
 _CNF_NN_SENTRY_PREFIXES = 'sentry.authorization-provider.hdfs-path-prefixes' # Deprecated
 _CNF_NN_SENTRY_PATH_PREFIXES = 'sentry.hdfs.integration.path.prefixes'
 _CNF_NN_PERMISSIONS_SUPERGROUP = 'dfs.permissions.superusergroup'
-
+_CNF_HTTP_POLICY = 'dfs.http.policy'
+_CNF_WEBHDFS_HTTPS_PORT = 'dfs.https.port'
 
 def reset():
   global _HDFS_SITE_DICT
@@ -51,6 +52,12 @@ def get_umask_mode():
 
   return int(umask, 8)
 
+def get_webhdfs_ssl():
+  settings = {"protocol": "http", "port": DEFAULT_NN_HTTP_PORT}
+  if get_conf().get(_CNF_HTTP_POLICY, 'http') == "HTTPS_ONLY":
+    settings["protocol"] = 'https'
+    settings["port"] = get_conf().get(_CNF_WEBHDFS_HTTPS_PORT, DEFAULT_NN_HTTP_PORT)
+  return settings
 
 def get_nn_sentry_prefixes():
   prefixes = set()

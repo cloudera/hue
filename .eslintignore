@@ -1,0 +1,9 @@
+/desktop/core/src/desktop/js/ext/**
+/desktop/core/src/desktop/js/ko/bindings/charts/mapchart/topo/**
+/desktop/core/src/desktop/js/parse/globalSearchParser.js
+/desktop/core/src/desktop/js/parse/solrFormulaParser.js
+/desktop/core/src/desktop/js/parse/solrQueryParser.js
+/desktop/core/src/desktop/js/parse/sqlAutocompleteParser.js
+/desktop/core/src/desktop/js/parse/sqlStatementsParser.js
+/desktop/core/src/desktop/js/parse/sqlSyntaxParser.js
+/desktop/core/src/desktop/js/utils/json.bigDataParse.js

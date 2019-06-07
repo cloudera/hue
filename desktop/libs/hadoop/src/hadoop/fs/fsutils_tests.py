@@ -31,6 +31,7 @@ LOG = logging.getLogger(__name__)
 
 class FsUtilsTests(unittest.TestCase):
   requires_hadoop = True
+  integration = True
 
   @classmethod
   def setUpClass(cls):

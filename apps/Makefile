@@ -106,10 +106,10 @@ I18N_APPS := about \
   sqoop \
   zookeeper \
   rdbms \
-  spark
+  spark \
+  hive
 
 COMPILE_LOCALE_TARGETS := $(I18N_APPS:%=.recursive-compile-locales/%)
 compile-locales: $(COMPILE_LOCALE_TARGETS)
 .recursive-compile-locales/%:
 	@$(MAKE) -C $* compile-locale
-

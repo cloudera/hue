@@ -30,7 +30,6 @@ MAIN_SCROLLABLE = is_embeddable and ".page-content" or ".content-panel"
 
 %if not is_embeddable:
 ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode }
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
 
 ${ assist.assistJSModels() }
@@ -51,7 +50,6 @@ ${ assist.assistPanel() }
 
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }" type="text/css">
 <link rel="stylesheet" href="${ static('indexer/css/indexes.css') }" type="text/css">
-<script src="${ static('desktop/js/hue.json.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('dashboard/js/search.ko.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/html" id="indexes-breadcrumbs">
@@ -140,7 +138,7 @@ ${ assist.assistPanel() }
 
 
           <div class="indexer-main">
-            <!-- ko template: { name: 'indexes-breadcrumbs' }--><!-- /ko -->
+            <!-- ko template: { name: 'indexes-breadcrumbs' } --><!-- /ko -->
 
             <!-- ko if: section() === 'list-indexes' -->
             <%actionbar:render>
@@ -190,7 +188,7 @@ ${ assist.assistPanel() }
                 </ul>
               </div>
               <div class="modal-footer">
-                <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+                <a href="javascript: void(0)" class="btn" data-dismiss="modal">${ _('No') }</a>
                 <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
               </div>
             </form>
@@ -209,7 +207,7 @@ ${ assist.assistPanel() }
                 <!-- /ko -->
               </div>
               <div class="modal-footer">
-                <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+                <a href="javascript: void(0)" class="btn" data-dismiss="modal">${ _('No') }</a>
                 <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
               </div>
             </form>
@@ -245,7 +243,7 @@ ${ assist.assistPanel() }
               </table>
             </div>
             <div class="modal-footer">
-              <a href="#" class="btn" data-dismiss="modal">${ _('Cancel') }</a>
+              <a href="javascript: void(0)" class="btn" data-dismiss="modal">${ _('Cancel') }</a>
               <button class="btn btn-primary disable-feedback" data-bind="click: alias.create, enable: alias.chosenCollections().length > 0 && alias.name() !== ''">
                  ${ _('Create') }
               </button>
@@ -645,20 +643,19 @@ ${ assist.assistPanel() }
     var IndexesViewModel = function (options) {
       var self = this;
 
-      self.baseURL = (IS_HUE_4 ? '/hue' : '') + '/indexer/indexes/';
+      self.baseURL = '/hue/indexer/indexes/';
 
       self.activeNamespace = ko.observable();
       self.activeCompute = ko.observable();
 
-      ContextCatalog.getNamespaces({ sourceType: 'solr' }).done(function (context) {
+      contextCatalog.getNamespaces({ sourceType: 'solr' }).done(function (context) {
         // TODO: Namespace selection
         self.activeNamespace(context.namespaces[0]);
         self.activeCompute(context.namespaces[0].computes[0]);
       });
 
       self.assistAvailable = ko.observable(true);
-      self.apiHelper = ApiHelper.getInstance();
-      self.isHue4 = ko.observable(options.hue4);
+      self.apiHelper = window.apiHelper;
       self.isLeftPanelVisible = ko.observable();
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
@@ -887,9 +884,6 @@ ${ assist.assistPanel() }
     $(document).ready(function () {
       var options = {
         user: '${ user.username }',
-        % if is_embeddable:
-          hue4: true,
-        % endif
         index: '${ index }'
       };
       var viewModel = new IndexesViewModel(options);

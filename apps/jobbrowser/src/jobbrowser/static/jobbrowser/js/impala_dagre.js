@@ -7,6 +7,21 @@ data_stream_target attribute.
 Copied from https://github.com/apache/incubator-impala/blob/master/www/query_plan.tmpl
 */
 function impalaDagre(id) {
+
+  var PROFILE_I18n = {
+    timeline: window.I18n('Timeline'),
+    metrics: window.I18n('Metrics'),
+    cpu: window.I18n('CPU'),
+    io: window.I18n('IO'),
+    execution: window.I18n('Execution'),
+    codegen: window.I18n('CodeGen'),
+    overview: window.I18n('Overview'),
+    topnodes: window.I18n('Top Nodes'),
+    compilation: window.I18n('Compilation'),
+    planning: window.I18n('Planning'),
+    risks: window.I18n('Risks')
+  }
+
   var d3 = window.d3v3;
   var dagreD3 = window.dagreD3;
   var g = new dagreD3.graphlib.Graph().setGraph({rankDir: "BT"});
@@ -81,9 +96,24 @@ function impalaDagre(id) {
       });
       return button;
     });
+
+    $parent = $("#"+id);
+    d3.select("#"+id)
+    .append('div')
+      .classed('resizer', true);
     d3.select("#"+id)
     .append('div')
       .classed('details', true);
+
+    $( '#'+id + ' .resizer' ).draggable({
+      axis: 'x',
+      containment: 'parent',
+      scroll: false,
+      cursor: 'col-resize',
+      drag: function(e, ui) {
+        updateDetailsPosition(ui.position.left);
+      }
+    });
   }
 
   // Set up zoom support
@@ -143,7 +173,7 @@ function impalaDagre(id) {
       edges.push({ "start": node["label"],
                    "end": node["data_stream_target"],
                    "content": networkTime,
-                   "style": { label: text,
+                   "style": { label: '',
                               style: "stroke-dasharray: 5, 5;",
                               labelpos: index === 0 && count > 1 ? 'l' : 'r' }});
     }
@@ -362,7 +392,7 @@ function impalaDagre(id) {
   function _timelineAfter(start_time, timeline) {
     var total = 0;
     return timeline.map(function (event, index) {
-      return $.extend({}, event, { start_time: start_time + total, duration: event.value, value: start_time + (total += event.value), name: window.HUE_I18n.profile[event.clazz]});
+      return $.extend({}, event, { start_time: start_time + total, duration: event.value, value: start_time + (total += event.value), name: PROFILE_I18n[event.clazz]});
     });
   }
 
@@ -375,7 +405,7 @@ function impalaDagre(id) {
     if (!initTime) {
       return timeline;
     }
-    return [$.extend({}, initTime, { start_time: 0, duration: initTime.value, name: window.HUE_I18n.profile.codegen, color: colors[2] })].concat(timeline);
+    return [$.extend({}, initTime, { start_time: 0, duration: initTime.value, name: window.I18n('CodeGen'), color: colors[2] })].concat(timeline);
   }
 
   function getHealthData(key, startTime) {
@@ -471,7 +501,7 @@ function impalaDagre(id) {
   function showDetailGlobal() {
     var details = d3.select('#' + id + '.query-plan .details');
     var key = getKey(id);
-    details.html('<header class="metric-title">' + getIcon({ svg: 'hi-sitemap' }) + '<h4>' + window.HUE_I18n.profile.overview + '</h4></div>')
+    details.html('<header class="metric-title">' + getIcon({ svg: 'hi-sitemap' }) + '<h4>' + window.I18n('Overview') + '</h4></div>')
     var detailsContent = details.append('div').classed('details-content', true);
     var topNodes = getTopNodes();
     if (topNodes && topNodes.length) {
@@ -479,22 +509,36 @@ function impalaDagre(id) {
       var cpuTimelineTitle = cpuTimelineSection.append('header');
       cpuTimelineTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-filter');
       var metricsMax = getMetricsMax() ? ' (' + ko.bindingHandlers.numberFormat.human(getMetricsMax(), 5) + ')' : '';
-      cpuTimelineTitle.append('h5').text(window.HUE_I18n.profile.topnodes + metricsMax);
-      var cpuTimelineSectionTable = cpuTimelineSection.append('table').classed('clickable', true);
+      cpuTimelineTitle.append('h5').text(window.I18n('Top Nodes') + metricsMax);
+      var cpuTimelineSectionTable = cpuTimelineSection.append('table').classed('clickable ncolumn', true);
       var cpuTimelineSectionTableRows = cpuTimelineSectionTable.selectAll('tr').data(topNodes).enter().append('tr').on('click', function (node) {
         select(getId(node.key));
         zoomToNode(node.key);
       });
-      cpuTimelineSectionTableRows.append('td').html(function (time) { return '' + getIcon(time.icon) + '<div class="metric-name" title="' + time.name + '">' + time.name + '</div>'; });
+      cpuTimelineSectionTableRows.append('td').html(function (time) { return '' + getIcon(time.icon) + '<span class="metric-name" title="' + time.name + '">' + time.name + '</span>'; });
       cpuTimelineSectionTableRows.append('td').text(function (datum) { return ko.bindingHandlers.numberFormat.human(datum.duration, datum.unit); });
     }
 
-    appendTimelineAndLegend(detailsContent, getTimelineData('summary', 'Query Compilation'), window.HUE_I18n.profile.planning, '#hi-access-time');
-    appendTimelineAndLegend(detailsContent, getTimelineData('summary', 'Query Timeline'), window.HUE_I18n.profile.execution, '#hi-access-time');
+    appendTimelineAndLegend(detailsContent, getTimelineData('summary', 'Query Compilation'), window.I18n('Planning'), '#hi-access-time');
+    appendTimelineAndLegend(detailsContent, getTimelineData('summary', 'Query Timeline'), window.I18n('Execution' ), '#hi-access-time');
 
     d3.select('#' + id + '.query-plan .details .metric-title').on('click', function () {
       toggleDetails();
     });
+    updateDetailsPosition();
+  }
+
+  function updateDetailsPosition(resizerX) {
+    if (!d3.select('#' + id + '.query-plan').classed('open')) {
+      return;
+    }
+    if (resizerX == null || resizerX == undefined) {
+      resizerX = $('#'+id + ' .resizer').css('left').slice(0, -2);
+    }
+    var right = $('#'+id).width() - resizerX - 4;
+    $('#'+id + ' .details').css('width', right + 'px')
+    $('#'+id + ' .details table tr:nth-child(1)').css('max-width', (right - 83) + 'px');
+    $('#'+id + ' .buttons').css('left', (resizerX - 4 - 32) + 'px');
   }
 
   function appendTimelineAndLegend(detailsContent, data, title, icon, max) {
@@ -508,7 +552,7 @@ function impalaDagre(id) {
       cpuTimelineSection.node().appendChild($.parseXML(timeline).children[0]);
 
       var cpuTimelineSectionTable = cpuTimelineSection.append('table').classed('column', true);
-      cpuTimelineSectionTable.append('tr').selectAll('td').data(data).enter().append('td').html(function (time, index) { return '<div class="legend-icon ' + (time.clazz ? time.clazz : '') + '" style="' + (!time.clazz && 'background-color: ' + (time.color || colors[index % colors.length])) + '"></div><div class="metric-name" title="' + time.name + (time.message ? ': ' + time.message : '') + '">' + time.name + '</div>'; });
+      cpuTimelineSectionTable.append('tr').selectAll('td').data(data).enter().append('td').html(function (time, index) { return '<div class="legend-icon ' + (time.clazz ? time.clazz : '') + '" style="' + (!time.clazz && 'background-color: ' + (time.color || colors[index % colors.length])) + '"></div><span class="metric-name" title="' + time.name + (time.message ? ': ' + time.message : '') + '">' + time.name + '</span>'; });
       cpuTimelineSectionTable.append('tr').selectAll('td').data(data).enter().append('td').text(function (datum) { return ko.bindingHandlers.numberFormat.human(datum.duration, datum.unit); });
     }
   }
@@ -524,12 +568,12 @@ function impalaDagre(id) {
     d3.select('#' + id + '.query-plan').classed('open', true);
     var details = d3.select('#' + id + '.query-plan .details');
     var key = getKey(key);
-    details.html('<header class="metric-title">' + getIcon(states_by_name[key].icon) + '<h4>' + states_by_name[key].label+ '</h4></div>')
+    details.html('<header class="metric-title">' + getIcon(states_by_name[key].icon) + '<h4>' + states_by_name[key].label+ '</h4></div>');
     var detailsContent = details.append('div').classed('details-content', true);
 
     var cpuTimelineData = getCPUTimelineData(key);
-    appendTimelineAndLegend(detailsContent, getExecutionTimelineData(key), window.HUE_I18n.profile.execution, '#hi-microchip', getMetricsMax());
-    appendTimelineAndLegend(detailsContent, getHealthData(key, cpuTimelineData[0] && cpuTimelineData[0].start_time), window.HUE_I18n.profile.risks, '#hi-heart', getMetricsMax());
+    appendTimelineAndLegend(detailsContent, getExecutionTimelineData(key), window.I18n('Execution'), '#hi-microchip', getMetricsMax());
+    appendTimelineAndLegend(detailsContent, getHealthData(key, cpuTimelineData[0] && cpuTimelineData[0].start_time), window.I18n('Risks'), '#hi-heart', getMetricsMax());
 
     var timelineData = getTimelineData(key);
     var timeline = renderTimeline(timelineData, getMetricsMax());
@@ -538,7 +582,7 @@ function impalaDagre(id) {
       var timelineSection = detailsContent.append('div').classed('details-section', true);
       var timelineTitle = timelineSection.append('header');
       timelineTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-access-time');
-      timelineTitle.append('h5').text(window.HUE_I18n.profile.timeline + ' (' + ko.bindingHandlers.numberFormat.human(timelineSum, 5) + ')');
+      timelineTitle.append('h5').text(window.I18n('Timeline') + ' (' + ko.bindingHandlers.numberFormat.human(timelineSum, 5) + ')');
       timelineSection.node().appendChild($.parseXML(timeline).children[0]);
 
       var timelineSectionTable = timelineSection.append('table').classed('column', true);
@@ -547,7 +591,7 @@ function impalaDagre(id) {
       var timelineHosts = Object.keys(node.timeline.hosts).sort().map(function (host) { return node.timeline.hosts[host]; });
       var timelineSectionTableCols = timelineSectionTableBody.selectAll('tr').data(timelineHosts);
       var timelineSectionTableCol0 = timelineSectionTableBody.selectAll('tr').data(timelineHosts.slice(0,1));
-      timelineSectionTableCol0.enter().append('tr').selectAll('td').data(function (x) { return x['Node Lifecycle Event Timeline']; }).enter().append('td').html(function (time, index) { return '<div class="legend-icon" style="background-color:' + colors[index % colors.length]+' "></div><div class="metric-name" title="' + time.name + '">' + time.name + '</div>'; });
+      timelineSectionTableCol0.enter().append('tr').selectAll('td').data(function (x) { return x['Node Lifecycle Event Timeline']; }).enter().append('td').html(function (time, index) { return '<div class="legend-icon" style="background-color:' + colors[index % colors.length]+' "></div><span class="metric-name" title="' + time.name + '">' + time.name + '</span>'; });
       timelineSectionTableCols.enter().append('tr').selectAll('td').data(function (x) { return x['Node Lifecycle Event Timeline']; }).enter().append('td').text(function (datum) { return ko.bindingHandlers.numberFormat.human(datum.duration, datum.unit); });
     }
 
@@ -556,7 +600,7 @@ function impalaDagre(id) {
 
     var metricsTitle = metricsSection.append('header');
     metricsTitle.append('svg').classed('hi', true).append('use').attr('xlink:href', '#hi-bar-chart');
-    metricsTitle.append('h5').text(window.HUE_I18n.profile.metrics);
+    metricsTitle.append('h5').text(window.I18n('Metrics'));
 
     var metricsContent = metricsSection.append('table').classed('column metrics', true);
     var metricsHosts = Object.keys(data.properties.hosts).sort().map(function (key) { return data.properties.hosts[key]; });
@@ -579,6 +623,8 @@ function impalaDagre(id) {
     d3.select('#' + id + '.query-plan .details .metric-title').on('click', function () {
       toggleDetails();
     });
+
+    updateDetailsPosition();
   }
 
   function hideDetail(id) {
@@ -619,6 +665,9 @@ function impalaDagre(id) {
   function toggleDetails() {
     var queryPlan = d3.select('#' + id + '.query-plan');
     queryPlan.classed('open', !queryPlan.classed('open'));
+    $("#"+id + ' .details').width('200px');
+    $("#"+id + ' .resizer').css({'left': 'auto'});
+    $("#"+id + ' .buttons').css({'left': 'auto'});
   }
 
   function renderGraph() {
@@ -635,6 +684,14 @@ function impalaDagre(id) {
       colour_idx = (colour_idx + 1) % colours.length;
     });
     showDetailGlobal();
+    states.forEach(function (state) {
+      var cpuTimeline = getCPUTimelineData(state.name);
+      var max_time_val = cpuTimeline && sum(cpuTimeline, 'duration') || state.max_time_val;
+      var max_time = ko.bindingHandlers.numberFormat.human(max_time_val, 5);
+      state.max_time_val = max_time_val;
+      state.max_time = max_time;
+      state.cpu_timeline = cpuTimeline;
+    });
     var avgStates = average(states, 'max_time_val');
     var edgesIO = edges.filter(function (edge) {
       return edge.content.unit === 5;
@@ -651,15 +708,15 @@ function impalaDagre(id) {
       // Build the label for the node from the name and the detail
       var html = "<div attr-id='" + state.name + "'>";
       html += getIcon(state.icon);
-      html += "<span style='display: inline-block;'><span class='name'>" + state.label + "</span><br/>";
-      var aboveAverageClass = state.max_time_val > avgCombined ? 'above-average' : '';
-      html += "<span class='metric " + aboveAverageClass + "'>" + state.max_time + "</span>";
+      html += "<span style='display: inline-block;'><span class='name'>" + state.label + "</span>";
+      var aboveAverageClass = state.max_time_val > avgStates ? 'above-average' : '';
+      html += "<span class='metric " + aboveAverageClass + "'>" + state.max_time + "</span><br/>";
       html += "<span class='detail'>" + state.detail + "</span><br/>";
       if (state.predicates) {
         html += "<span class='detail'>" + state.predicates + "</span><br/>";
       }
       html += "<span class='id'>" + state.name + "</span></span>";
-      html += renderTimeline(getCPUTimelineData(state.name), getMetricsMax());
+      html += renderTimeline(state.cpu_timeline, getMetricsMax());
       html += "</div>";
 
       var style = state.style;

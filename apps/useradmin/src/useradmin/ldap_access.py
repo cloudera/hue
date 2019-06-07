@@ -157,6 +157,8 @@ class LdapConnection(object):
       ldap.set_option(ldap.OPT_DEBUG_LEVEL, ldap_config.DEBUG_LEVEL.get())
 
     self.ldap_handle = ldap.initialize(uri=ldap_url, trace_level=ldap_config.TRACE_LEVEL.get())
+    if self.ldap_config.USE_START_TLS.get() and not ldap_url.lower().startswith('ldaps'):
+      self.ldap_handle.start_tls_s()
 
     if bind_user:
       try:
@@ -280,16 +282,16 @@ class LdapConnection(object):
             'name': group_name
           }
 
-          if group_member_attr in data and group_member_attr not in 'memberUid':
+          if group_member_attr in data and group_member_attr.lower() != 'memberuid':
             ldap_info['members'] = data[group_member_attr]
           else:
-            LOG.warn('Skipping import of non-posix users since group_member_attr is memberUid or group did not contain any members')
+            LOG.warn('Skipping import of non-posix users from group %s since group_member_attr is memberUid or group did not contain any members' % group_name)
             ldap_info['members'] = []
 
-          if 'posixGroup' in data['objectClass'] and 'memberUid' in data:
+          if 'posixgroup' in (item.lower() for item in data['objectClass']) and 'memberUid' in data:
             ldap_info['posix_members'] = data['memberUid']
           else:
-            LOG.warn('Skipping import of posix users.  posixGroup not an objectClass or  no memberUids found')
+            LOG.warn('Skipping import of posix users from group %s since posixGroup not an objectClass or no memberUids found' % group_name)
             ldap_info['posix_members'] = []
 
           group_info.append(ldap_info)

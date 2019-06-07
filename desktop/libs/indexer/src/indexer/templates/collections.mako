@@ -26,7 +26,6 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "90px") | n,unico
 %endif
 
 <div id="indexesComponents">
-<link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
 <link rel="stylesheet" href="${ static('indexer/css/admin.css') }">
 
 <style type="text/css">
@@ -479,19 +478,16 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "90px") | n,unico
 
 </div>
 
-<script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
 <script>
   routie.setPathname('/indexer');
 </script>
-<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('indexer/js/lib.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('indexer/js/collections.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
 function afterRender() {
-  $(".fileChooser:not(:has(~ button))").after(getFileBrowseButton($(".fileChooser:not(:has(~ button))")));
+  $(".fileChooser:not(:has(~ button))").after(hueUtils.getFileBrowseButton($(".fileChooser:not(:has(~ button))")));
 }
 
 function validateAndUpdateCollection() {

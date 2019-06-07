@@ -99,6 +99,12 @@ def get_default_region():
 
   return region
 
+def get_key_expiry():
+  if 'default' in AWS_ACCOUNTS:
+    return AWS_ACCOUNTS['default'].KEY_EXPIRY.get()
+  else:
+    return 86400
+
 
 AWS_ACCOUNTS = UnspecifiedConfigSection(
   'aws_accounts',
@@ -185,6 +191,12 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
         key='is_secure',
         default=True,
         type=coerce_bool
+      ),
+      KEY_EXPIRY=Config(
+        help=_('The time in seconds before a delegate key is expired. Used when filebrowser/redirect_download is used. Default to 4 Hours.'),
+        key='key_expiry',
+        default=14400,
+        type=int
       )
     )
   )

@@ -27,6 +27,7 @@ from django.utils.translation import ugettext as _
     </div>
     <div class="modal-body">
         <input id="load_data_is_embeddable" type="hidden" name="is_embeddable" value="false">
+        <input id="load_data_source_type" type="hidden" name="source_type" value="${ source_type }">
         <input type="hidden" name="start_time" value=""/>
 
         <div class="control-group">
@@ -132,10 +133,8 @@ from django.utils.translation import ugettext as _
     }
 
     $("#load-data-submit-btn").click(function (e) {
-      if (IS_HUE_4) {
-        $("#load_data_is_embeddable").val("true");
-        $("#load-data-form").find('input[name=start_time]').val(ko.mapping.toJSON(new Date().getTime()));
-      }
+      $("#load_data_is_embeddable").val("true");
+      $("#load-data-form").find('input[name=start_time]').val(ko.mapping.toJSON(new Date().getTime()));
       $.post("${ url('metastore:load_table', database=database, table=table.name) }",
         $("#load-data-form").serialize(),
         function (response) {
@@ -147,12 +146,8 @@ from django.utils.translation import ugettext as _
               $('#import-data-modal').html(response['data']);
             }
           } else {
-            if (IS_HUE_4) {
-              huePubSub.publish('notebook.task.submitted', response.history_uuid);
-              $("#import-data-modal").modal("hide");
-            } else {
-              window.location.replace(response['data']);
-            }
+            huePubSub.publish('notebook.task.submitted', response.history_uuid);
+            $("#import-data-modal").modal("hide");
           }
         }
       ).always(function () {

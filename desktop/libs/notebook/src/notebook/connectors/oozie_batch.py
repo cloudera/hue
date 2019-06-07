@@ -140,7 +140,7 @@ class OozieApi(Api):
     return logs if logs else oozie_job.log
 
 
-  def progress(self, snippet, logs):
+  def progress(self, notebook, snippet, logs=None):
     job_id = snippet['result']['handle']['id']
 
     oozie_job = check_job_access_permission(self.request, job_id)
@@ -164,7 +164,7 @@ class OozieApi(Api):
     return jobs
 
 
-  def close_statement(self, snippet):
+  def close_statement(self, notebook, snippet):
     pass
 
 
@@ -174,7 +174,7 @@ class OozieApi(Api):
 
   def _get_log_output(self, oozie_workflow):
     log_output = ''
-    q = QueryDict(self.request.GET, mutable=True)
+    q = self.request.GET.copy()
     q['format'] = 'python'  # Hack for triggering the good section in single_task_attempt_logs
     self.request.GET = q
 

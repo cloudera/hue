@@ -62,7 +62,7 @@ ${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
         <i class="fa fa-fw fa-1halfx muted" data-bind="css: {'fa-circle-o': privilegeType() != 'db' , 'fa-check-circle-o': privilegeType() == 'db'}"></i>
       </a>
     </div>
-    <input type="text" data-bind="hivechooser: $data.path, enable: privilegeType() == 'db', apiHelperUser: '${ user }', apiHelperType: 'hive'" placeholder="dbName.tableName <CTRL+SPACE>">
+    <input type="text" data-bind="hiveChooser: $data.path, enable: privilegeType() == 'db', apiHelperUser: '${ user }', apiHelperType: 'hive'" placeholder="dbName.tableName <CTRL+SPACE>">
 
     <div class="inline-block" style="vertical-align: middle">
       <a class="pointer" style="padding-top: 4px" data-bind="click: function(){ privilegeType('uri'); action('ALL'); }">
@@ -551,7 +551,6 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
 
 <script src="${ static('security/js/hive.ko.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/jquery.filechooser.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
   (function () {

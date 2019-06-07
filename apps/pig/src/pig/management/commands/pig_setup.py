@@ -24,7 +24,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils.translation import ugettext as _
 
-from desktop.conf import USE_NEW_EDITOR, IS_HUE_4
+from desktop.conf import USE_NEW_EDITOR
 from desktop.lib import paths
 from desktop.models import Directory, Document, Document2, Document2Permission
 from hadoop import cluster
@@ -122,16 +122,9 @@ STORE upper_case INTO '$output';
     # Initialize doc2, whether editor script or link
     doc2 = None
 
-    if IS_HUE_4.get():
-      # Install editor pig script without doc1 link
-      LOG.info("Using Hue 4, will install pig editor sample.")
-      doc2 = self.install_pig_script(sample_user)
-    else:
-      # Install old pig script fixture
-      LOG.info("Using Hue 3, will install pig script fixture.")
-      with transaction.atomic():
-        management.call_command('loaddata', 'initial_pig_examples.json', verbosity=2, commit=False)
-        Document.objects.sync()
+    # Install editor pig script without doc1 link
+    LOG.info("Using Hue 4, will install pig editor sample.")
+    doc2 = self.install_pig_script(sample_user)
 
     if USE_NEW_EDITOR.get():
       # Get or create sample user directories
@@ -142,28 +135,6 @@ STORE upper_case INTO '$output';
         parent_directory=home_dir,
         owner=sample_user,
         name=Document2.EXAMPLES_DIR)
-
-      if not IS_HUE_4.get():
-        try:
-          # Don't overwrite
-          doc = Document.objects.get(object_id=1100713)
-          doc2 = Document2.objects.get(owner=sample_user, name=doc.name, type='link-pigscript')
-        except Document.DoesNotExist:
-          LOG.warn('Sample pig script document not found.')
-        except Document2.DoesNotExist:
-          if doc.content_object:
-            data = doc.content_object.dict
-            data.update({'content_type': doc.content_type.model, 'object_id': doc.object_id})
-            data = json.dumps(data)
-
-            doc2 = Document2.objects.create(
-              owner=sample_user,
-              parent_directory=examples_dir,
-              name=doc.name,
-              type='link-pigscript',
-              description=doc.description,
-              data=data)
-            LOG.info('Successfully installed sample link to pig script: %s' % (doc2.name,))
 
       # If document exists but has been trashed, recover from Trash
       if doc2 and doc2.parent_directory != examples_dir:

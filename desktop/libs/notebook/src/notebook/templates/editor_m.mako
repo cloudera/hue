@@ -78,7 +78,6 @@ ${ commonheader_m(editor_type, editor_type, user, request, "68px") | n,unicode }
         contextTooltip: '${ _ko("Right-click for details") }',
         expandStar: '${ _ko("Shift + Click to replace with all columns") }',
         highlightedRange: result.statement_range,
-        useNewAutocompleter: $root.useNewAutocompleter,
         aceOptions: {
           showLineNumbers: $root.editorMode(),
           showGutter: $root.editorMode(),
@@ -161,19 +160,6 @@ ${ commonheader_m(editor_type, editor_type, user, request, "68px") | n,unicode }
 
 </div>
 
-
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
-<script src="${ static('desktop/js/ko.switch-case.js') }"></script>
-<script src="${ static('desktop/js/sqlFunctions.js') }"></script>
-<script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>
-<script src="${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }"></script>
-<script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
-<script src="${ static('desktop/js/sqlAutocompleter3.js') }"></script>
-<script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
-<script src="${ static('desktop/js/autocompleter.js') }"></script>
-<script src="${ static('desktop/js/hue.json.js') }"></script>
-<script src="${ static('notebook/js/notebook.ko.js') }"></script>
-
 ${ assist.assistJSModels() }
 
 <script type="text/javascript">
@@ -181,15 +167,12 @@ ${ assist.assistJSModels() }
     ko.options.deferUpdates = true;
   }
 
-  ace.config.set("basePath", "/static/desktop/js/ace");
+  ace.config.set("basePath", "${ static('desktop/js/ace') }");
 
   var VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode }, {
     user: '${ user.username }',
     userId: ${ user.id },
     assistAvailable: true,
-    % if conf.USE_NEW_AUTOCOMPLETER.get():
-      useNewAutocompleter: true,
-    % endif
     autocompleteTimeout: AUTOCOMPLETE_TIMEOUT,
     snippetViewSettings: {
       default: {

@@ -33,7 +33,7 @@ FETCH_SIZE = 1000
 DOWNLOAD_COOKIE_AGE = 1800 # 30 minutes
 
 
-def download(handle, format, db, id=None, file_name='query_result', user_agent=None, callback=None):
+def download(handle, format, db, id=None, file_name='query_result', user_agent=None):
   """
   download(query_model, format) -> HttpResponse
 
@@ -46,7 +46,7 @@ def download(handle, format, db, id=None, file_name='query_result', user_agent=N
   max_rows = conf.DOWNLOAD_ROW_LIMIT.get()
   max_bytes = conf.DOWNLOAD_BYTES_LIMIT.get()
 
-  content_generator = HS2DataAdapter(handle, db, max_rows=max_rows, start_over=True, max_bytes=max_bytes, callback=callback)
+  content_generator = DataAdapter(db, handle=handle, max_rows=max_rows, max_bytes=max_bytes)
   generator = export_csvxls.create_generator(content_generator, format)
 
   resp = export_csvxls.make_response(generator, format, file_name, user_agent=user_agent)
@@ -75,15 +75,15 @@ def upload(path, handle, user, db, fs, max_rows=-1, max_bytes=-1):
   else:
     fs.do_as_user(user.username, fs.create, path)
 
-  content_generator = HS2DataAdapter(handle, db, max_rows=max_rows, start_over=True, max_bytes=max_bytes)
+  content_generator = DataAdapter(db, handle=handle, max_rows=max_rows, start_over=True, max_bytes=max_bytes)
   for header, data in content_generator:
     dataset = export_csvxls.dataset(None, data)
     fs.do_as_user(user.username, fs.append, path, dataset.csv)
 
 
-class HS2DataAdapter:
+class DataAdapter:
 
-  def __init__(self, handle, db, max_rows=-1, start_over=True, max_bytes=-1, callback=None):
+  def __init__(self, db, handle=None, max_rows=-1, start_over=True, max_bytes=-1, store_data_type_in_header=False):
     self.handle = handle
     self.db = db
     self.max_rows = max_rows
@@ -92,15 +92,15 @@ class HS2DataAdapter:
     self.fetch_size = FETCH_SIZE
     self.limit_rows = max_rows > -1
     self.limit_bytes = max_bytes > -1
-    self.callback = callback
 
     self.first_fetched = True
     self.headers = None
     self.num_cols = None
-    self.row_counter = 1
+    self.row_counter = 0
     self.bytes_counter = 0
     self.is_truncated = False
     self.has_more = True
+    self.store_data_type_in_header = store_data_type_in_header
 
   def __iter__(self):
     return self
@@ -135,12 +135,15 @@ class HS2DataAdapter:
 
   def next(self):
     results = self.db.fetch(self.handle, start_over=self.start_over, rows=self.fetch_size)
-
     if self.first_fetched:
       self.first_fetched = False
       self.start_over = False
-      self.headers = results.cols()
-      self.num_cols = len(self.headers)
+      results_headers = results.full_cols()
+      self.num_cols = len(results_headers)
+      if self.store_data_type_in_header:
+        self.headers = [column['name'] + '|' + column['type'] for column in results_headers]
+      else:
+        self.headers = [column['name'] for column in results_headers]
       if self.limit_bytes:
         self.bytes_counter += max(self.num_cols - 1, 0)
         for header in self.headers:
@@ -156,22 +159,20 @@ class HS2DataAdapter:
       data = []
 
       for row in results.rows():
-        self.row_counter += 1
-        if self.limit_bytes:
-          self.bytes_counter += self._getsizeofascii(row)
-
-        if self.limit_rows and self.row_counter > self.max_rows:
+        num_bytes = self._getsizeofascii(row)
+        if self.limit_rows and self.row_counter + 1 > self.max_rows:
           LOG.warn('The query results exceeded the maximum row limit of %d and has been truncated to first %d rows.' % (self.max_rows, self.row_counter))
           self.is_truncated = True
           break
-        if self.limit_bytes and self.bytes_counter > self.max_bytes:
+        if self.limit_bytes and self.bytes_counter + num_bytes > self.max_bytes:
           LOG.warn('The query results exceeded the maximum bytes limit of %d and has been truncated to first %d rows.' % (self.max_bytes, self.row_counter))
           self.is_truncated = True
           break
+        self.row_counter += 1
+        self.bytes_counter += num_bytes
         data.append(row)
 
       return self.headers, data
     else:
-      if self.callback:
-        self.callback()
+      self.db.close(self.handle)
       raise StopIteration

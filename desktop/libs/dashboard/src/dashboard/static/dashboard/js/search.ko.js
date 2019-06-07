@@ -121,7 +121,7 @@ var EmptyGridsterWidget = function (vm) {
 
   self.isAdding = ko.observable(true);
   self.fieldName = ko.observable();
-  self.fieldViz = ko.observable(ko.HUE_CHARTS.TYPES.BARCHART);
+  self.fieldViz = ko.observable(window.HUE_CHARTS.TYPES.BARCHART);
   self.fieldSort = ko.observable('desc');
   self.fieldOperation = ko.observable();
   self.fieldOperations = ko.pureComputed(function () {
@@ -138,7 +138,7 @@ var EmptyGridsterWidget = function (vm) {
 var Query = function (vm, query) {
   var self = this;
 
-  self.uuid = ko.observable(typeof query.uuid != "undefined" && query.uuid != null ? query.uuid : UUID());
+  self.uuid = ko.observable(typeof query.uuid != "undefined" && query.uuid != null ? query.uuid : hueUtils.UUID());
   self.qs = ko.mapping.fromJS(query.qs);
   self.qs.subscribe(function(){
     if (vm.selectedQDefinition() != null){
@@ -270,7 +270,7 @@ var Query = function (vm, query) {
     if (fq) {
       id = fq.id();
     } else {
-      id = UUID();
+      id = hueUtils.UUID();
     }
     self.toggleFacet({'widget_id': id, 'facet': {'cat': data.val.cat, 'value': data.val.value}, 'exclude': exclude});
     vm.search();
@@ -551,7 +551,7 @@ var Collection = function (vm, collection) {
   var self = this;
 
   self.id = ko.mapping.fromJS(collection.id);
-  self.uuid = ko.observable(typeof collection.uuid != "undefined" && collection.uuid != null ? collection.uuid : UUID());
+  self.uuid = ko.observable(typeof collection.uuid != "undefined" && collection.uuid != null ? collection.uuid : hueUtils.UUID());
   self.name = ko.mapping.fromJS(collection.name);
   self.label = ko.mapping.fromJS(collection.label);
   self.description = ko.observable(typeof collection.description != "undefined" && collection.description != null ? collection.description : "");
@@ -559,7 +559,7 @@ var Collection = function (vm, collection) {
   self.activeNamespace = ko.observable();
   self.activeCompute = ko.observable();
 
-  ContextCatalog.getNamespaces({ sourceType: collection.engine || 'solr' }).done(function (context) {
+  contextCatalog.getNamespaces({ sourceType: collection.engine || 'solr' }).done(function (context) {
     // TODO: Namespace selection
     self.activeNamespace(context.namespaces[0]);
     self.activeCompute(context.namespaces[0].computes[0]);
@@ -1106,7 +1106,7 @@ var Collection = function (vm, collection) {
     if ($.trim(self.newQDefinitionName()) != "") {
       var _def = ko.mapping.fromJS({
         'name': $.trim(self.newQDefinitionName()),
-        'id': UUID(),
+        'id': hueUtils.UUID(),
         'data': ko.mapping.toJSON(vm.query)
       });
       self.qdefinitions.push(_def);
@@ -1404,12 +1404,12 @@ var Collection = function (vm, collection) {
   self.template.hasDataForChart = ko.computed(function () {
     var hasData = false;
 
-    if ([ko.HUE_CHARTS.TYPES.BARCHART, ko.HUE_CHARTS.TYPES.LINECHART, ko.HUE_CHARTS.TYPES.TIMELINECHART].indexOf(self.template.chartSettings.chartType()) >= 0) {
+    if ([window.HUE_CHARTS.TYPES.BARCHART, window.HUE_CHARTS.TYPES.LINECHART, window.HUE_CHARTS.TYPES.TIMELINECHART].indexOf(self.template.chartSettings.chartType()) >= 0) {
       hasData = typeof self.template.chartSettings.chartX() != "undefined" && self.template.chartSettings.chartX() != null && self.template.chartSettings.chartYMulti().length > 0;
     }
     else {
       hasData = typeof self.template.chartSettings.chartX() != "undefined" && self.template.chartSettings.chartX() != null && typeof self.template.chartSettings.chartYSingle() != "undefined" && self.template.chartSettings.chartYSingle() != null
-        || self.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.COUNTER;
+        || self.template.chartSettings.chartType() == window.HUE_CHARTS.TYPES.COUNTER;
     }
     if (!hasData && self.template.showChart()){
       self.template.showFieldList(true);
@@ -1957,7 +1957,7 @@ var NewTemplate = function (vm, initial) {
 var QueryResult = function (vm, initial) { // Similar to to Notebook Snippet
   var self = this; // TODO remove 'vm'
 
-  self.id = ko.observable(UUID());
+  self.id = ko.observable(hueUtils.UUID());
   self.type = ko.mapping.fromJS(initial.type);
   self.status = ko.observable(initial.status || 'running');
   self.progress = ko.mapping.fromJS(initial.progress || 0);
@@ -2000,7 +2000,7 @@ var TempDocument = function () {
   self.uuid = ko.observable();
   self.uuid.subscribe(function (val) {
     if (val) {
-      ApiHelper.getInstance().fetchDocument({ uuid: val, silenceErrors: false, fetchContents: true }).done(function (data) {
+      window.apiHelper.fetchDocument({ uuid: val, silenceErrors: false, fetchContents: true }).done(function (data) {
         if (data && data.data && data.data.snippets.length > 0) {
           self.name(data.document.name);
           var snippet = data.data.snippets[0];
@@ -2054,7 +2054,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
 
 
   self.build = function () {
-    self.intervalOptions = ko.observableArray(ko.bindingHandlers.daterangepicker.INTERVAL_OPTIONS);
+    self.intervalOptions = ko.observableArray(ko.bindingHandlers.dateRangePicker.INTERVAL_OPTIONS);
     self.isNested = ko.observable(false);
 
     // Models
@@ -2156,7 +2156,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
       var w = new Widget({
         size: 12,
         gridsterHeight: gridsterHeight,
-        id: UUID(),
+        id: hueUtils.UUID(),
         name: name,
         widgetType: type,
         isEditing: false
@@ -2949,7 +2949,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
           self.collection.id(data.id);
           $(document).trigger("info", data.message);
           if (oldId !== data.id) {
-            hueUtils.changeURL((IS_HUE_4 ? '/hue' : '') + '/dashboard/?collection=' + data.id);
+            hueUtils.changeURL('/hue/dashboard/?collection=' + data.id);
           }
         }
         else {
@@ -2962,7 +2962,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
 
     self.saveAs = function() {
       self.collection.id(null);
-      self.collection.uuid(UUID());
+      self.collection.uuid(hueUtils.UUID());
       self.save();
     };
 
@@ -2981,7 +2981,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
   };
 
   self.reset = function() {
-    self.intervalOptions(ko.bindingHandlers.daterangepicker.INTERVAL_OPTIONS);
+    self.intervalOptions(ko.bindingHandlers.dateRangePicker.INTERVAL_OPTIONS);
     self.isNested(false);
 
     // Models
@@ -2992,7 +2992,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
 
     var c = self.collectionJson.collection;
     ko.mapping.fromJS(c.id, self.collection.id);
-    self.collection.uuid(typeof c.uuid != "undefined" && c.uuid != null ? c.uuid : UUID());
+    self.collection.uuid(typeof c.uuid != "undefined" && c.uuid != null ? c.uuid : hueUtils.UUID());
     ko.mapping.fromJS(c.name, self.collection.name);
     ko.mapping.fromJS(c.label, self.collection.label);
     self.collection.description(typeof c.description != "undefined" && c.description != null ? c.description : '');
@@ -3089,7 +3089,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
     self.collection.template.filteredAttributeFieldsAll(true);
 
     var q = self.queryJson;
-    self.query.uuid(typeof q.uuid != "undefined" && q.uuid != null ? q.uuid : UUID());
+    self.query.uuid(typeof q.uuid != "undefined" && q.uuid != null ? q.uuid : hueUtils.UUID());
     ko.mapping.fromJS(q.qs, self.query.qs);
     ko.mapping.fromJS(q.fqs, self.query.fqs);
     ko.mapping.fromJS(q.start, self.query.start);
@@ -3119,7 +3119,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
     // loadDashboardLayout(self, self.collectionJson.gridItems); // TODO
 
     if (window.location.search.indexOf("collection") > -1) {
-      hueUtils.changeURL((IS_HUE_4 ? '/hue' : '') + '/dashboard/new_search');
+      hueUtils.changeURL('/hue/dashboard/new_search');
     }
   };
 

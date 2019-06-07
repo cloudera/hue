@@ -44,12 +44,10 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
   </div>
 
   <div class="container-fluid">
-    % if is_hue_4:
-      <div class="alert">
-        ${ _('This is the old Pig Editor, it is recommended to instead use the new ') }
-        <a href="${ url('notebook:editor') }?type=pig" target="_blank">${_('Editor')}</a>
-      </div>
-    % endif
+    <div class="alert">
+      ${ _('This is the old Pig Editor, it is recommended to instead use the new ') }
+      <a href="${ url('notebook:editor') }?type=pig" target="_blank">${_('Editor')}</a>
+    </div>
   </div>
 
   <div class="container-fluid">
@@ -1017,12 +1015,10 @@ ${ commonshare() | n,unicode }
     var availableTables = '';
 
     % if autocomplete_base_url != '':
-      var apiHelper = ApiHelper.getInstance({
-        user: '${ user }'
-      });
-      ContextCatalog.getNamespaces({ sourceType: 'hive' }).done(function (context) {
+      var apiHelper = window.apiHelper;
+      contextCatalog.getNamespaces({ sourceType: 'hive' }).done(function (context) {
         // TODO: Namespace and compute selection
-        DataCatalog.getChildren({ namespace: context.namespaces[0], compute: context.namespaces[0].computes[0], sourceType: 'hive', path: ['default'], silenceErrors: true }).done(function (childEntries) {
+        dataCatalog.getChildren({ namespace: context.namespaces[0], compute: context.namespaces[0].computes[0], sourceType: 'hive', path: ['default'], silenceErrors: true }).done(function (childEntries) {
           availableTables = $.map(childEntries, function (entry) { return entry.name }).join(' ');
         });
       });
@@ -1093,8 +1089,8 @@ ${ commonshare() | n,unicode }
     });
 
     $(document).on("updateTooltips", function () {
-      $("a[rel=tooltip]").tooltip("destroy");
-      $("a[rel=tooltip]").tooltip();
+      $("a[rel='tooltip']").tooltip("destroy");
+      $("a[rel='tooltip']").tooltip();
     });
 
     $(document).on("saving", function () {

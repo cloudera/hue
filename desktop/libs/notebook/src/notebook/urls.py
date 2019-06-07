@@ -43,7 +43,7 @@ urlpatterns = [
 
   url(r'^editor/?$', notebook_views.editor, name='editor'),
   url(r'^editor_m/?$', notebook_views.editor_m, name='editor_m'),
-  url(r'^browse/(?P<database>\w+)/(?P<table>\w+)/(?P<partition_spec>.+?)?$', notebook_views.browse, name='browse'),
+  url(r'^browse/(?P<database>\w+)/(?P<table>\w+)(?:/(?P<partition_spec>.+?))?/?$', notebook_views.browse, name='browse'),
   url(r'^execute_and_watch/?$', notebook_views.execute_and_watch, name='execute_and_watch'),
 ]
 
@@ -52,7 +52,7 @@ urlpatterns += [
   url(r'^api/create_notebook/?$', notebook_api.create_notebook, name='create_notebook'),
   url(r'^api/create_session/?$', notebook_api.create_session, name='create_session'),
   url(r'^api/close_session/?$', notebook_api.close_session, name='close_session'),
-  url(r'^api/execute/?(?P<engine>.+)?$', notebook_api.execute, name='execute'),
+  url(r'^api/execute(?:/(?P<engine>.+))?/?$', notebook_api.execute, name='execute'),
   url(r'^api/check_status/?$', notebook_api.check_status, name='check_status'),
   url(r'^api/fetch_result_data/?$', notebook_api.fetch_result_data, name='fetch_result_data'),
   url(r'^api/fetch_result_metadata/?$', notebook_api.fetch_result_metadata, name='fetch_result_metadata'),
@@ -96,4 +96,11 @@ urlpatterns += [
   url(r'^api/autocomplete//?(?P<server>[\w_\-/]+)/(?P<database>[\w._\-0-9]+)/(?P<table>\w+)/(?P<column>\w+)/?$', notebook_api.autocomplete, name='api_autocomplete_column'),
   url(r'^api/sample/(?P<server>[\w_\-/]+)/(?P<database>[\w._\-0-9]+)/(?P<table>\w+)/?$', notebook_api.get_sample_data, name='api_sample_data'),
   url(r'^api/sample/(?P<server>[\w_\-/]+)/(?P<database>[\w._\-0-9]+)/(?P<table>\w+)/(?P<column>\w+)/?$', notebook_api.get_sample_data, name='api_sample_data_column'),
+]
+
+# Table API
+urlpatterns += [
+  url(r'^api/describe/(?P<database>\w+)/?$', notebook_api.describe, name='api_describe_database'),
+  url(r'^api/describe/(?P<database>\w+)/(?P<table>[\w_\-]+)/?$', notebook_api.describe, name='api_describe_table'),
+  url(r'^api/describe/(?P<database>\w+)/(?P<table>\w+)/stats(?:/(?P<column>\w+))?/?$', notebook_api.describe, name='api_describe_column'),
 ]

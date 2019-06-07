@@ -88,8 +88,8 @@ ${ utils.path_chooser_libs(True, True) }
 
 <script>
   $(document).ready(function(){
-    $("input[name='deployment_dir']").after(getFileBrowseButton($("input[name='deployment_dir']"), true));
-    $("input[name='job_xml']").after(getFileBrowseButton($("input[name='job_xml']"), false));
+    $("input[name='deployment_dir']").after(hueUtils.getFileBrowseButton($("input[name='deployment_dir']"), true));
+    $("input[name='job_xml']").after(hueUtils.getFileBrowseButton($("input[name='job_xml']"), false));
   });
 </script>
 

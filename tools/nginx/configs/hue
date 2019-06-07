@@ -1,0 +1,40 @@
+server {
+    server_name demo.gethue.com;
+    charset utf-8;
+
+    listen 80;
+
+    # Or if running hue on https://
+    ## listen 8001 ssl;
+    ## ssl_certificate /path/to/ssl/cert;
+    ## ssl_certificate_key /path/to/ssl/key;
+
+    location / {
+        proxy_pass http://demo.gethue.com:8888;
+
+        # Or if the upstream Hue instances are running behind https://
+        ## proxy_pass https://hue;
+    }
+
+    location /static/ {
+        # Uncomment to expose the static file directories.
+        ## autoindex on;
+
+        # If Hue was installed with packaging install:
+        alias /home/ubuntu/hue/build/static/;
+
+        # Or if on a parcel install:
+        ## /opt/cloudera/parcels/CDH/lib/hue/build/static/;
+
+        expires 30d;
+        add_header Cache-Control public;
+    }
+}
+
+upstream hue {
+    ip_hash;
+
+    # List all the Hue instances here for high availability.
+    server localhost:8888 max_fails=3;
+    #server HUE_HOST2:8888 max_fails=3;
+}

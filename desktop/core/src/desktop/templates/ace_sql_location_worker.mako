@@ -15,23 +15,12 @@
 ## limitations under the License.
 
 <%!
-  from desktop import conf
+  from webpack_loader import utils
 %>
 
-var scriptPrefix = '';
-% if conf.IS_EMBEDDED.get():
-  scriptPrefix = location.href.substring(0, location.href.indexOf('/desktop/workers/'));
-% endif
-
-% if conf.DEV.get():
-importScripts(scriptPrefix + '${ static('desktop/js/autocomplete/sqlParseSupport.js') }' + '?' + Math.random());
-importScripts(scriptPrefix + '${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }' + '?' + Math.random());
-importScripts(scriptPrefix + '${ static('desktop/js/sqlFunctions.js') }' + '?' + Math.random());
-% else:
-importScripts(scriptPrefix + '${ static('desktop/js/autocomplete/sqlParseSupport.js') }');
-importScripts(scriptPrefix + '${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }');
-importScripts(scriptPrefix + '${ static('desktop/js/sqlFunctions.js') }');
-% endif
+% for js_file in utils.get_files('sqlLocationWebWorker', config='WORKERS'):
+  importScripts('${ js_file.get('url') }');
+% endfor
 
 (function () {
 
@@ -41,7 +30,7 @@ importScripts(scriptPrefix + '${ static('desktop/js/sqlFunctions.js') }');
     // Statement locations come in the message to the worker and are generally more accurate
     locations.push(statement);
     try {
-      var sqlParseResult = sqlAutocompleteParser.parseSql(statement.statement + ' ', '', type, false);
+      var sqlParseResult =  WorkerGlobalScope.sqlAutocompleteParser.parseSql(statement.statement + ' ', '', type, false);
       if (sqlParseResult.locations) {
         sqlParseResult.locations.forEach(function (location) {
           location.active = active;

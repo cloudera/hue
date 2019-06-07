@@ -15,55 +15,111 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+'''
+SQL Alchemy offers native connections to databases via dialects https://docs.sqlalchemy.org/en/latest/dialects/.
+
+When the dialect of a paricular datavase is installed on the Hue API server, any of its URL connection strings should work.
+
+e.g.
+mysql://root:root@localhost:3306/hue
+
+To offer more self service capabilities, parts of the URL can be parameterized.
+
+Supported parameters are:
+
+* USER
+* PASSWORD
+
+e.g.
+mysql://${USER}:${PASSWORD}@localhost:3306/hue
+
+Parameters are not saved at any time in the Hue database. The are currently not even cached in the Hue process. The clients serves these parameters
+each time a query is sent.
+
+Note: the SQL Alchemy engine could leverage create_session() and cache the engine object (without its credentials) like in the jdbc.py interpreter.
+Note: this is currently supporting concurrent querying by one users as engine is a new object each time. Could use a thread global SQL Alchemy
+session at some point.
+Note: using the task server would not leverage any caching.
+'''
+
 import datetime
 import json
 import logging
 import uuid
+import sys
+
+from string import Template
+
+from django.utils.translation import ugettext as _
+from sqlalchemy import create_engine, inspect
+from sqlalchemy.exc import OperationalError
 
 from desktop.lib import export_csvxls
 from desktop.lib.i18n import force_unicode
-from django.utils.translation import ugettext as _
-
 from beeswax import data_export
 from librdbms.server import dbms
 
-from notebook.connectors.base import Api, QueryError, QueryExpired, _get_snippet_name
+from notebook.connectors.base import Api, QueryError, QueryExpired, _get_snippet_name, AuthenticationRequired
 from notebook.models import escape_rows
-from sqlalchemy import create_engine, inspect
 
 
-
-LOG = logging.getLogger(__name__)
 CONNECTION_CACHE = {}
+LOG = logging.getLogger(__name__)
+
 
 def query_error_handler(func):
   def decorator(*args, **kwargs):
     try:
       return func(*args, **kwargs)
+    except OperationalError, e:
+      message = str(e)
+      if '1045' in message: # 'Access denied' # MySQL
+        raise AuthenticationRequired(message=message)
+      else:
+        raise e
     except Exception, e:
       message = force_unicode(e)
       if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
         raise QueryExpired(e)
       else:
+        LOG.exception('Query Error')
         raise QueryError(message)
   return decorator
 
 
 class SqlAlchemyApi(Api):
+
   def __init__(self, user, interpreter=None):
+    self.user = user
     self.options = interpreter['options']
-    self.engine = create_engine(self.options['url'])
+
+  def _create_engine(self):
+    if '${' in self.options['url']: # URL parameters substitution
+      vars = {'user': self.user.username}
+      for _prop in self.options['session']['properties']:
+        if _prop['name'] == 'user':
+          vars['USER'] = _prop['value']
+        if _prop['name'] == 'password':
+          vars['PASSWORD'] = _prop['value']
+      raw_url = Template(self.options['url'])
+      url = raw_url.safe_substitute(**vars)
+    else:
+      url = self.options['url']
+    return create_engine(url)
 
   @query_error_handler
   def execute(self, notebook, snippet):
     guid = uuid.uuid4().hex
-    connection = self.engine.connect()
-    result = connection.execute(snippet['statement'])
+
+    engine = self._create_engine()
+    connection = engine.connect()
+    result = connection.execution_options(stream_results=True).execute(snippet['statement'])
+
     cache = {
       'connection': connection,
       'result': result,
       'meta': [{
-          'name': col[0] if type(col) is dict or type(col) is tuple else col,
+          'name': col[0] if (type(col) is tuple or type(col) is dict) else col.name if hasattr(col, 'name') else col,
           'type': 'STRING_TYPE',
           'comment': ''
         } for col in result.cursor.description]
@@ -87,6 +143,7 @@ class SqlAlchemyApi(Api):
   def check_status(self, notebook, snippet):
     guid = snippet['result']['handle']['guid']
     connection = CONNECTION_CACHE.get(guid)
+
     if connection:
       return {'status': 'available'}
     else:
@@ -96,6 +153,7 @@ class SqlAlchemyApi(Api):
   def fetch_result(self, notebook, snippet, rows, start_over):
     guid = snippet['result']['handle']['guid']
     cache = CONNECTION_CACHE.get(guid)
+
     if cache:
       data = cache['result'].fetchmany(rows)
       meta = cache['meta']
@@ -103,6 +161,7 @@ class SqlAlchemyApi(Api):
     else:
       data = []
       meta = []
+
     return {
       'has_more': data and len(data) >= rows,
       'data': data if data else [],
@@ -111,7 +170,7 @@ class SqlAlchemyApi(Api):
     }
 
   def _assign_types(self, results, meta):
-    result = results[0]
+    result = results and results[0]
     if result:
       for index, col in enumerate(result):
         if isinstance(col, int):
@@ -152,27 +211,9 @@ class SqlAlchemyApi(Api):
 
 
   @query_error_handler
-  def download(self, notebook, snippet, format, user_agent=None):
-    file_name = _get_snippet_name(notebook)
-    guid = uuid.uuid4().hex
-    connection = self.engine.connect()
-    result = connection.execute(snippet['statement'])
-    CONNECTION_CACHE[guid] = {
-      'connection': connection,
-      'result': result
-    }
-    db = FixedResult([col[0] if type(col) is dict or type(col) is tuple else col for col in result.cursor.description])
-    def callback():
-      connection = CONNECTION_CACHE.get(guid)
-      if connection:
-        connection['connection'].close()
-        del CONNECTION_CACHE[guid]
-    return data_export.download({'guid': guid}, format, db, id=snippet['id'], file_name=file_name, callback=callback)
-
-
-  @query_error_handler
-  def close_statement(self, snippet):
+  def close_statement(self, notebook, snippet):
     result = {'status': -1}
+
     try:
       guid = snippet['result']['handle']['guid']
       connection = CONNECTION_CACHE.get('guid')
@@ -186,9 +227,10 @@ class SqlAlchemyApi(Api):
 
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
-    inspector = inspect(self.engine)
+    engine = self._create_engine()
+    inspector = inspect(engine)
 
-    assist = Assist(inspector, self.engine)
+    assist = Assist(inspector, engine)
     response = {'status': -1}
 
     if database is None:
@@ -222,9 +264,10 @@ class SqlAlchemyApi(Api):
 
   @query_error_handler
   def get_sample_data(self, snippet, database=None, table=None, column=None, async=False, operation=None):
-    inspector = inspect(self.engine)
+    engine = self._create_engine()
+    inspector = inspect(engine)
 
-    assist = Assist(inspector, self.engine)
+    assist = Assist(inspector, engine)
     response = {'status': -1, 'result': {}}
 
     metadata, sample_data = assist.get_sample_data(database, table, column)
@@ -275,31 +318,7 @@ class Assist():
     statement = "SELECT %s FROM `%s`.`%s` LIMIT %d" % (column, database, table, 100)
     connection = self.engine.connect()
     try:
-      result = connection.execute(statement)
+      result = connection.execution_options(stream_results=True).execute(statement)
       return result.cursor.description, result.fetchall()
     finally:
       connection.close()
-
-class FixedResultSet():
-  def __init__(self, metadata, data, has_more):
-    self.metadata = metadata
-    self.data = data
-    self.has_more = has_more
-
-  def cols(self):
-    return self.metadata
-
-  def rows(self):
-    return self.data if self.data is not None else []
-
-class FixedResult():
-  def __init__(self, metadata):
-    self.metadata = metadata
-
-  def fetch(self, handle=None, start_over=None, rows=None):
-    connection = CONNECTION_CACHE.get(handle['guid'])
-    if connection:
-      data = connection['result'].fetchmany(rows)
-      return FixedResultSet(self.metadata, data, data is not None and len(data) >= rows)
-    else:
-      return FixedResultSet([], [])

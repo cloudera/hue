@@ -20,11 +20,11 @@ import sys
 
 from django.utils.translation import ugettext as _
 
-from desktop.lib.exceptions_renderable import PopupException
+from beeswax import data_export
 from desktop.lib.i18n import force_unicode, smart_str
 from librdbms.jdbc import Jdbc, query_and_fetch
 
-from notebook.connectors.base import Api, QueryError, AuthenticationRequired
+from notebook.connectors.base import Api, QueryError, AuthenticationRequired, _get_snippet_name
 
 
 LOG = logging.getLogger(__name__)
@@ -124,14 +124,8 @@ class JdbcApi(Api):
   def cancel(self, notebook, snippet):
     return {'status': 0}
 
-  def download(self, notebook, snippet, format, user_agent=None):
-    raise PopupException('Downloading is not supported yet')
-
-  def progress(self, snippet, logs):
-    return 50
-
   @query_error_handler
-  def close_statement(self, snippet):
+  def close_statement(self, notebook, snippet):
     return {'status': -1}
 
   @query_error_handler
@@ -219,3 +213,25 @@ class Assist():
     #response['rows'] = data
     #response['columns'] = []
     return query_and_fetch(self.db, 'SELECT %s FROM %s.%s limit 100' % (column, database, table))
+
+class FixedResultSet():
+
+  def __init__(self, data, metadata):
+    self.data = data
+    self.metadata = metadata
+    self.has_more = False
+
+  def cols(self):
+    return [str(col[0]) for col in self.metadata]
+
+  def rows(self):
+    return self.data if self.data is not None else []
+
+class FixedResult():
+
+  def __init__(self, data, metadata):
+    self.data = data
+    self.metadata = metadata
+
+  def fetch(self, handle=None, start_over=None, rows=None):
+    return FixedResultSet(self.data, self.metadata)

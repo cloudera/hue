@@ -16,13 +16,15 @@
 ## limitations under the License.
 <%!
   import datetime
+  import urllib
   from django.template.defaultfilters import urlencode, stringformat, date, filesizeformat, time
   from filebrowser.views import truncate
+  from desktop.lib.paths import SAFE_CHARACTERS_URI_COMPONENTS
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
 %>
 <%
-  path_enc = path
+  path_enc = urllib.quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
   dirname_enc = urlencode(view['dirname'])
   base_url = url('filebrowser.views.view', path=path_enc)
   edit_url = url('filebrowser_views_edit', path=path_enc)
@@ -372,7 +374,7 @@ ${ fb_components.menubar() }
     }
 
     self.downloadFile = function () {
-      location.href = "${url('filebrowser_views_download', path=path_enc)}";
+      huePubSub.publish('open.link', "${url('filebrowser_views_download', path=path_enc)}");
     };
 
     self.pageChanged = function () {

@@ -162,7 +162,7 @@ except ImportError, e:
 
 <%def name="downloadSnippetResults()">
   <script type="text/html" id="download-results-template">
-    <form method="POST" action="${ url('notebook:download') }" class="download-form" style="display: inline">
+    <form method="POST" class="download-form" style="display: inline" data-bind="attr: { action: window.HUE_BASE_URL + '${ url('notebook:download') }' }">
       ${ csrf_token(request) | n,unicode }
       <input type="hidden" name="notebook"/>
       <input type="hidden" name="snippet"/>
@@ -294,7 +294,7 @@ except ImportError, e:
                   &nbsp;${ _('Table') }
                 </label>
                 <div data-bind="visible: saveTarget() == 'hive-table'" class="inline">
-                  <input data-bind="hivechooser: savePath, valueUpdate:'afterkeydown', skipColumns: true, apiHelperUser: '${ user }', apiHelperType: 'hive'" type="text" name="target_table" class="input-xlarge margin-left-10"  pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }" placeholder="${_('Table name or <database>.<table>')}">
+                  <input data-bind="hiveChooser: savePath, valueUpdate:'afterkeydown', skipColumns: true, apiHelperUser: '${ user }', apiHelperType: 'hive'" type="text" name="target_table" class="input-xlarge margin-left-10"  pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }" placeholder="${_('Table name or <database>.<table>')}">
                 </div>
               </div>
             </div>
@@ -413,13 +413,13 @@ except ImportError, e:
               });
               return result;
             } else {
-              return HUE_I18n.copyToClipboard.error;
+              return window.I18n('Error while copying results.');
             }
           }
         });
 
         clipboard.on('success', function (e) {
-          $.jHueNotify.info(self.snippet.result.data().length + ' ' + HUE_I18n.copyToClipboard.success);
+          $.jHueNotify.info(self.snippet.result.data().length + ' ' + window.I18n('result(s) copied to the clipboard'));
           e.clearSelection();
         });
 
@@ -440,30 +440,26 @@ except ImportError, e:
             format: ko.mapping.toJSON(self.saveTarget()),
             destination: ko.mapping.toJSON(self.savePath()),
             overwrite: ko.mapping.toJSON(self.saveOverwrite()),
-            is_embedded: ko.mapping.toJSON(IS_HUE_4),
+            is_embedded: ko.mapping.toJSON(true),
             start_time: ko.mapping.toJSON((new Date()).getTime())
           },
           function(resp) {
             if (resp.status == 0) {
-              if (IS_HUE_4) {
-                $(".modal-backdrop").remove();
-                if (self.saveTarget() == 'hdfs-file') {
-                  $(self.saveResultsModalId).modal('hide');
-                  huePubSub.publish('open.link', resp.watch_url);
-                } else if (self.saveTarget() == 'search-index') {
-                  $(self.saveResultsModalId).modal('hide');
-                  huePubSub.publish('open.importer.query', resp);
-                } else if (self.saveTarget() == 'dashboard') {
-                   $(self.saveResultsModalId).modal('hide');
-                  huePubSub.publish('open.link', resp.watch_url);
-                } else if (resp.history_uuid) {
-                  $(self.saveResultsModalId).modal('hide');
-                  huePubSub.publish('notebook.task.submitted', resp.history_uuid);
-                } else if (resp && resp.message) {
-                  $(document).trigger("error", resp.message);
-                }
-              } else {
-                window.location.href = resp.watch_url;
+              $(".modal-backdrop").remove();
+              if (self.saveTarget() == 'hdfs-file') {
+                $(self.saveResultsModalId).modal('hide');
+                huePubSub.publish('open.link', resp.watch_url);
+              } else if (self.saveTarget() == 'search-index') {
+                $(self.saveResultsModalId).modal('hide');
+                huePubSub.publish('open.importer.query', resp);
+              } else if (self.saveTarget() == 'dashboard') {
+                 $(self.saveResultsModalId).modal('hide');
+                huePubSub.publish('open.link', resp.watch_url);
+              } else if (resp.history_uuid) {
+                $(self.saveResultsModalId).modal('hide');
+                huePubSub.publish('notebook.task.submitted', resp.history_uuid);
+              } else if (resp && resp.message) {
+                $(document).trigger("error", resp.message);
               }
             } else {
               $(document).trigger('error', resp.message);

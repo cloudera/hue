@@ -16,7 +16,7 @@
 <%
 from django.utils.translation import ugettext as _
 
-from desktop.conf import CUSTOM, IS_K8S_ONLY, is_hue4
+from desktop.conf import CUSTOM, IS_K8S_ONLY
 from desktop.views import commonheader, commonfooter, _ko
 from metadata.conf import PROMETHEUS
 
@@ -33,8 +33,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 % endif
 
 <span class="notebook">
-
-<link rel="stylesheet" href="${ static('desktop/ext/css/basictable.css') }">
 
 % if not is_embeddable:
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
@@ -54,14 +52,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <link rel="stylesheet" href="${ static('jobbrowser/css/jobbrowser-embeddable.css') }">
 
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery.basictable.min.js') }"></script>
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
-<script src="${ static('desktop/js/ko.editable.js') }"></script>
-<script src="${ static('desktop/ext/js/d3.v5.js') }"></script>
 
 % if ENABLE_QUERY_BROWSER.get():
-<script src="${ static('desktop/ext/js/d3.v3.js') }"></script>
 <script src="${ static('desktop/ext/js/dagre-d3-min.js') }"></script>
 <script src="${ static('jobbrowser/js/impala_dagre.js') }"></script>
 % endif
@@ -595,12 +587,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div data-bind="template: { name: 'job-yarn-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
 
-  <!-- ko if: type() == 'Oozie Launcher' -->
-    <div data-bind="template: { name: 'job-oozie-page${ SUFFIX }', data: $root.job() }"></div>
+  <!-- ko if: type() == 'YarnV2' -->
+    <div data-bind="template: { name: 'job-yarnv2-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
 
-  <!-- ko if: type() == 'Oozie Launcher_ATTEMPT' -->
-    <div data-bind="template: { name: 'job-oozie-attempt-page${ SUFFIX }', data: $root.job() }"></div>
+  <!-- ko if: type() == 'YarnV2_ATTEMPT' -->
+    <div data-bind="template: { name: 'job-yarnv2-attempt-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
 
   <!-- ko if: type() == 'SPARK' -->
@@ -863,7 +855,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   </div>
 </script>
 
-<script type="text/html" id="job-oozie-page${ SUFFIX }">
+<script type="text/html" id="job-yarnv2-page${ SUFFIX }">
   <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
@@ -871,7 +863,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('Id') }</li>
           <li class="break-word"><span data-bind="text: id"></span></li>
           <li class="nav-header">${ _('Type') }</li>
-          <li><span data-bind="text: type"></span></li>
+          <li><span data-bind="text: applicationType"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
           <li><span data-bind="text: progress"></span>%</li>
           <li>
@@ -898,21 +890,19 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div data-bind="css: {'span10': !$root.isMini(), 'span12': $root.isMini() }">
 
       <ul class="nav nav-pills margin-top-20">
-        <li class="active"><a class="jb-logs-link" href="#job-oozie-page-logs${ SUFFIX }" data-toggle="tab">${ _('Logs') }</a></li>
-        <li><a href="#job-oozie-page-attempts${ SUFFIX }" data-bind="click: function(){ fetchProfile('attempts'); $('a[href=\'#job-oozie-page-attempts${ SUFFIX }\']').tab('show'); }">${ _('Attempts') }</a></li>
+        <li class="active"><a class="jb-logs-link" href="#job-yarnv2-page-logs${ SUFFIX }" data-toggle="tab">${ _('Logs') }</a></li>
+        <li><a href="#job-yarnv2-page-attempts${ SUFFIX }" data-bind="click: function(){ fetchProfile('attempts'); $('a[href=\'#job-yarnv2-page-attempts${ SUFFIX }\']').tab('show'); }">${ _('Attempts') }</a></li>
       </ul>
 
       <div class="tab-content">
-        <div class="tab-pane active" id="job-oozie-page-logs${ SUFFIX }">
-          <ul class="nav nav-tabs">
-          % for name in ['stdout', 'stderr']:
-            <li class="${ name == 'stdout' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); logActive('${ name }'); }, text: '${ name }'"></a></li>
-          % endfor
+        <div class="tab-pane active" id="job-yarnv2-page-logs${ SUFFIX }">
+          <ul class="nav nav-tabs scrollable" data-bind="foreach: logsList">
+            <li data-bind="css: { 'active': $data == $parent.logActive() }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $parent.fetchLogs($data); $parent.logActive($data); }, text: $data"></a></li>
           </ul>
           <pre data-bind="html: logs, logScroller: logs"></pre>
         </div>
 
-        <div class="tab-pane" id="job-oozie-page-attempts${ SUFFIX }">
+        <div class="tab-pane" id="job-yarnv2-page-attempts${ SUFFIX }">
           <table class="table table-condensed">
             <thead>
             <tr>
@@ -923,7 +913,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <th>${_('Finish Time')}</th>
               <th>${_('Node Http Address')}</th>
               <th>${_('Blacklisted Nodes')}</th>
-              <th>${_('Nodes Blacklisted By System')}</th>
             </tr>
             </thead>
             <tbody data-bind="foreach: properties['attempts']()['task_list']">
@@ -935,7 +924,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <td data-bind="moment: {data: finishedTime, format: 'LLL'}"></td>
                 <td data-bind="text: nodeHttpAddress"></td>
                 <td data-bind="text: blacklistedNodes"></td>
-                <td data-bind="text: nodesBlacklistedBySystem"></td>
               </tr>
             </tbody>
           </table>
@@ -947,7 +935,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   </div>
 </script>
 
-<script type="text/html" id="job-oozie-attempt-page${ SUFFIX }">
+<script type="text/html" id="job-yarnv2-attempt-page${ SUFFIX }">
   <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
@@ -1447,7 +1435,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Id') }</li>
           <li>
-            <a data-bind="attr: {href: doc_url}" target="_blank" title="${ _('Open in impalad') }">
+            <a data-bind="attr: { href: doc_url_modified }" target="_blank" title="${ _('Open in impalad') }">
               <span data-bind="text: id"></span>
             </a>
             <!-- ko if: $root.isMini() -->
@@ -2010,7 +1998,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <table id="schedulesTable" class="datatables table table-condensed status-border-container">
             <thead>
             <tr>
-              <th width="1%"><div class="select-all hue-checkbox fa"></div></th>
+              <th width="1%"><div class="select-all hue-checkbox fa" data-bind="hueCheckAll: { allValues: apps, selectedValues: selectedJobs }"></div></th>
               <th>${_('Status')}</th>
               <th>${_('Title')}</th>
               <th>${_('type')}</th>
@@ -2352,14 +2340,38 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
       %endif
       self.doc_url = ko.observableDefault(job.doc_url);
+      self.doc_url_modified = ko.computed(function () {
+        var url = self.doc_url();
+        if (window.KNOX_BASE_URL.length && window.URL && url) { // KNOX
+          try {
+            var parsedDocUrl = new URL(url);
+            var parsedKnoxUrl = new URL(window.KNOX_BASE_URL);
+            parsedDocUrl.hostname = parsedKnoxUrl.hostname;
+            parsedDocUrl.protocol = parsedKnoxUrl.protocol;
+            parsedDocUrl.port = parsedKnoxUrl.port;
+            var service = url.indexOf('livy') >= 0 ? '/livy' : '/impala';
+            parsedDocUrl.pathname = parsedKnoxUrl.pathname + service + parsedDocUrl.pathname;
+            return parsedDocUrl.toString();
+          } catch (e) {
+            return url;
+          }
+        } else if (window.KNOX_BASE_PATH.length && window.URL) { // DWX
+          var parsedDocUrl = new URL(url);
+          var service = url.indexOf('livy') >= 0 ? '/livy' : '/impala';
+          parsedDocUrl.pathname = parsedKnoxUrl.pathname + service + window.KNOX_BASE_PATH;
+        } else {
+          return url;
+        }
+      });
       self.name = ko.observableDefault(job.name || job.id);
       self.type = ko.observableDefault(job.type);
+      self.applicationType = ko.observableDefault(job.applicationType || '');
 
       self.status = ko.observableDefault(job.status);
       self.apiStatus = ko.observableDefault(job.apiStatus);
       self.progress = ko.observableDefault(job.progress);
       self.isRunning = ko.computed(function() {
-        return self.apiStatus() == 'RUNNING' || self.apiStatus() == 'PAUSED' || job.isRunning;
+        return ['RUNNING', 'PAUSED'].indexOf(self.apiStatus()) != -1 || job.isRunning;
       });
 
       self.user = ko.observableDefault(job.user);
@@ -2371,6 +2383,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.logActive = ko.observable('default');
       self.logsByName = ko.observable({});
+      self.logsListDefaults = ko.observable(['default', 'stdout', 'stderr', 'syslog']);
+      self.logsList = ko.observable(self.logsListDefaults());
       self.logs = ko.pureComputed(function() {
         return self.logsByName()[self.logActive()];
       });
@@ -2381,15 +2395,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.coordinatorActions = ko.pureComputed(function() {
         if (self.mainType() == 'schedules' && self.properties['tasks']) {
-          var apps = [];
-          self.properties['tasks']().forEach(function (instance) {
-            var job = new Job(vm, ko.mapping.toJS(instance));
-            job.resumeEnabled = function() { return false };
+          var apps = self.properties['tasks']().map(function (instance) {
+            var job = new CoordinatorAction(vm, ko.mapping.toJS(instance), self);
             job.properties = instance;
-            apps.push(job);
+            return job;
           });
           var instances = new Jobs(vm);
-          instances.apps(apps)
+          instances.apps(apps);
           instances.isCoordinator(true);
           return instances;
         }
@@ -2453,7 +2465,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.rerunModalContent = ko.observable('');
 
       self.hasKill = ko.pureComputed(function() {
-        return self.type() && (['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle', 'QUERY'].indexOf(self.type()) != -1 || self.type().indexOf('Data Warehouse') != -1 || self.type().indexOf('Altus') != -1);
+        return self.type() && (['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle', 'QUERY', 'TEZ', 'YarnV2'].indexOf(self.type()) != -1 || self.type().indexOf('Data Warehouse') != -1 || self.type().indexOf('Altus') != -1);
       });
       self.killEnabled = ko.pureComputed(function() {
         // Impala can kill queries that are finished, but not yet terminated
@@ -2623,6 +2635,16 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               vm.job().fetchProfile('properties');
               $('a[href="#workflow-page-metadata${ SUFFIX }"]').tab('show');
             }
+            $('#rerun-modal${ SUFFIX }').on('shown', function (e) {
+                // Replaces dark modal backdrop from the end of the body tag to the closer scope
+                // in order to activate z-index effect.
+                var rerunModalData = $(this).data('modal');
+                rerunModalData.$backdrop.appendTo("#jobbrowserMiniComponents");
+            });
+            $('#killModal${ SUFFIX }').on('shown', function (e) {
+                 var killModalData = $(this).data('modal');
+                 killModalData.$backdrop.appendTo("#jobbrowserMiniComponents");
+            });
             %endif
 
             vm.job().fetchLogs();
@@ -2675,6 +2697,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             var result = self.logsByName();
             result[name] = data.logs.logs;
             self.logsByName(result);
+            if (data.logs.logsList && data.logs.logsList.length) {
+              var logsListDefaults = self.logsListDefaults();
+              self.logsList(logsListDefaults.concat(data.logs.logsList.filter(function(log) { return logsListDefaults.indexOf(log) < 0; })));
+            }
             if ($('.jb-panel pre:visible').length > 0){
               $('.jb-panel pre:visible').css('overflow-y', 'auto').height(Math.max(200, $(window).height() - $('.jb-panel pre:visible').offset().top - $('.page-content').scrollTop() - 75));
             }
@@ -2728,7 +2754,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.control = function (action) {
         if (action == 'rerun') {
-          $.get('/oozie/rerun_oozie_job/' + self.id() + '/?format=json', function(response) {
+          $.get('/oozie/rerun_oozie_job/' + self.id() + '/?format=json' + '${ "&is_mini=true" if is_mini else "" | n }', function(response) {
             $('#rerun-modal${ SUFFIX }').modal('show');
             self.rerunModalContent(response);
           });
@@ -2833,11 +2859,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
         $('canvas').remove();
 
-        if (!IS_HUE_4) {
-          huePubSub.subscribe('hue4.process.headers', function (opts) {
-            opts.callback(opts.response);
-          });
-        }
         if (vm.job().type() === 'workflow') {
           $('#workflow-page-graph${ SUFFIX }').html('<div class="hue-spinner"><i class="fa fa-spinner fa-spin hue-spinner-center hue-spinner-xlarge"></i></div>');
           $.ajax({
@@ -2866,6 +2887,20 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             }
           });
         }
+      };
+    };
+
+    var CoordinatorAction = function (vm, job, coordinator) {
+      var self = this;
+      Job.apply(self, [vm, job]);
+      self.coordinator = coordinator;
+
+      self.canWrite = ko.computed(function () {
+        return self.coordinator.canWrite();
+      });
+
+      self.resumeEnabled = function () {
+        return false;
       };
     };
 
@@ -2961,11 +2996,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
       self.paginationPage = ko.observable(1);
       self.paginationOffset = ko.observable(1); // Starting index
-      % if is_hue4():
-        self.paginationResultPage = ko.observable(100);
-      % else:
-        self.paginationResultPage = ko.observable(50);
-      % endif
+      self.paginationResultPage = ko.observable(100);
       self.pagination = ko.computed(function() {
         return {
             'page': self.paginationPage(),
@@ -3146,9 +3177,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.control = function (action) {
         if (action === 'rerun') {
-          $.get('/oozie/rerun_oozie_coord/' + vm.job().id() + '/?format=json', function(response) {
+          $.get('/oozie/rerun_oozie_coord/' + vm.job().id() + '/?format=json' + '${ "&is_mini=true" if is_mini else "" | n }', function(response) {
             $('#rerun-modal${ SUFFIX }').modal('show');
             vm.job().rerunModalContent(response);
+            // Force Knockout to handle the update of rerunModalContent before trying to modify its DOM
+            ko.tasks.runEarly();
 
             var frag = document.createDocumentFragment();
             vm.job().coordinatorActions().selectedJobs().forEach(function (item) {
@@ -3158,8 +3191,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               });
               option.appendTo($(frag));
             });
-            $('#id_actions').find('option').remove();
-            $(frag).appendTo('#id_actions');
+            $('#id_actions${ SUFFIX }').find('option').remove();
+            $(frag).appendTo('#id_actions${ SUFFIX }');
           });
         } else if (action === 'ignore') {
           $.post('/oozie/manage_oozie_jobs/' + vm.job().id() + '/ignore', {
@@ -3209,7 +3242,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     var JobBrowserViewModel = function () {
       var self = this;
 
-      self.apiHelper = ApiHelper.getInstance();
+      self.apiHelper = window.apiHelper;
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
@@ -3436,12 +3469,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         return progress;
       };
 
-      var loaded = false;
       self.load = function() {
-        if (loaded) {
-          return;
-        }
-        loaded = true;
         var h = window.location.hash;
         % if not is_mini:
         huePubSub.publish('graph.stop.refresh.view');
@@ -3480,7 +3508,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
     $(document).ready(function () {
       var jobBrowserViewModel = new JobBrowserViewModel();
-      function openJob(id) {
+      var openJob = function(id) {
         if (jobBrowserViewModel.job() == null) {
           jobBrowserViewModel.job(new Job(jobBrowserViewModel, {}));
         }
@@ -3542,13 +3570,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       huePubSub.publish('cluster.config.get.config');
 
-      huePubSub.subscribe('submit.rerun.popup.return', function (data) {
-        $.jHueNotify.info('${_('Rerun submitted.')}');
+      huePubSub.subscribe('submit.rerun.popup.return${ SUFFIX }', function (data) {
+        $.jHueNotify.info('${_("Rerun submitted.")}');
         $('#rerun-modal${ SUFFIX }').modal('hide');
 
         jobBrowserViewModel.job().apiStatus('RUNNING');
         jobBrowserViewModel.monitorJob(jobBrowserViewModel.job());
-      }, 'jobbrowser');
+      }, '${ "jobbrowser" if not is_mini else "" }');
 
       % if is_mini:
         huePubSub.subscribe('mini.jb.navigate', function (options) {

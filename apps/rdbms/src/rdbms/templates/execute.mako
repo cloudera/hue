@@ -357,8 +357,6 @@ ${ commonshare() | n,unicode }
 
 </style>
 
-<script src="${ static('desktop/js/hue.json.js') }"></script>
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('rdbms/js/rdbms.vm.js') }"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
 <script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
@@ -367,12 +365,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/js/codemirror-sql-hint.js') }"></script>
 <script src="${ static('desktop/js/codemirror-show-hint.js') }"></script>
 
-<link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
-<script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
-
 <link href="${ static('desktop/ext/css/bootstrap-editable.css') }" rel="stylesheet">
-<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }"></script>
-<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }"></script>
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-fieldselection.js') }" type="text/javascript"></script>
 <script src="${ static('rdbms/js/autocomplete.utils.js') }" type="text/javascript" charset="utf-8"></script>

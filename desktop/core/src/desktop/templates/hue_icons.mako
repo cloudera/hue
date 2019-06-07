@@ -450,7 +450,7 @@
     <!-- ko case: 'documents' --><svg class="hi hi-fw"><use xlink:href="#hi-documents"></use></svg><!-- /ko -->
     <!-- ko case: 'report' --><i class="fa fa-fw fa-area-chart"></i><!-- /ko -->
     <!-- ko case: 'dist-cp' --><i class="fa fa-fw fa-files-o"></i><!-- /ko -->
-    <!-- ko case: 'editor' --><i class="altus-icon altus-sql-editor"></i><!-- /ko -->
+    <!-- ko case: 'editor' --><i class="altus-icon altus-sql-editor" style="margin: 0 1px 0 3px"></i><!-- /ko -->
     <!-- ko case: 'hbase' --><svg class="hi hi-fw"><use xlink:href="#hi-hbase"></use></svg><!-- /ko -->
     <!-- ko case: 'hdfs' --><i class="fa fa-fw fa-folder-o"></i><!-- /ko -->
     <!-- ko case: 'hive' --><svg class="hi hi-fw"><use xlink:href="#hi-hive"></use></svg><!-- /ko -->
@@ -482,7 +482,7 @@
     <!-- ko case: 'tables' --><i class="fa fa-fw fa-table"></i><!-- /ko -->
     <!-- ko case: 'text' --><i class="fa fa-fw fa-i-cursor"></i><!-- /ko -->
     <!-- ko case: 'yarn' --><svg class="hi hi-fw"><use xlink:href="#hi-job-designer"></use></svg><!-- /ko -->
-    <!-- ko case: 'warehouses' --><i class="altus-icon altus-adb-cluster"></i><!-- /ko -->
+    <!-- ko case: 'warehouses' --><i class="altus-icon altus-adb-cluster" style="margin: 0 1px 0 3px"></i><!-- /ko -->
     <!-- ko case: 'workflows' --><svg class="hi hi-fw"><use xlink:href="#hi-oozie"></use></svg><!-- /ko -->
     <!-- ko case: $else --><i class="fa fa-fw fa-database"></i><!-- /ko -->
     <!-- /ko -->

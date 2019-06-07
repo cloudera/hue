@@ -1,0 +1,119 @@
+---
+title: "0.4.0"
+date: 2019-03-13T18:28:08-07:00
+draft: false
+weight: -40
+tags: ['skipIndexing']
+---
+
+### v0.4.0, released March 31, 2010
+
+Cloudera Desktop 0.4.0 is a significant update from the previous version 0.3.0.
+This release introduces the Cloudera Desktop SDK, a way to plug in your own
+applications that leverage the Cloudera Desktop environment.  Another new
+feature is Beeswax, a front-end application for interacting with Hive.  It also
+represents many bug fixes and a re-working of the "Job Browser" and "File
+Browser" applications.
+
+NEW FEATURES
+
+- Beeswax, a UI for Hive
+
+  Beeswax is an application for managing and using Hive.  It allows users
+  to create tables, load data, and query the warehouse, all from their
+  browser.
+
+- The Cloudera Desktop SDK
+
+  It is now possible to add your own applications into Cloudera Desktop,
+  integrated with the windowing system and the other applications.
+  To get started, see the SDK documentation.
+
+- File Editor
+
+  It is now possible to edit (small, text) files directly from the File Browser.
+  This is particularly handy for editing small configuration files.
+
+- "About" Application
+
+  Reachable by clicking the Cloudera "feather" in the upper lefthand corner, 
+  the about application displays the current configuration.
+
+IMPROVEMENTS
+
+- File Browser
+
+  The File Browser has been re-architected on top of the SDK.
+  Changing permissions and changing file ownership is now possible.
+  Performance on large directories is improved.
+
+- Job Browser
+
+  The Job Browser has been re-architected on top of the SDK.
+  There have been several performance improvements in handling
+  large jobs.
+
+- Job Designer
+
+  You may register for e-mail notifications when jobs you
+  submit have completed.
+
+- Session Restore
+
+  Windows that were open when you last logged out are 
+  opened again automatically when you log back in.
+
+- Support for privileged ports and SSL.
+
+  You can now run Desktop on port 80, and, optionally, with SSL (see the FAQ).
+
+- Cleaner SDK Model for "JFrame"
+
+  Most requests within Cloudera Desktop are now, under the covers,
+  simple GET and POST requests which return HTML.
+
+- SDK-Friendly Build System
+
+  The build system has been adapted to support third-party applications
+  and dependencies gracefully.
+
+- Users can now change their own passwords.
+
+- Keyboard Shortcuts
+
+  A list of available shortcuts is available in the top right corner (click the
+  "command" icon).
+
+- Usage without Hadoop
+
+  Cloudera Desktop will run if Hadoop is unavailable, though
+  some applications will be limited in functionality.
+
+- Frontend Javascript Performance and Compatibility
+
+  Many improvements in windowing performance.
+
+KEY BUG FIXES
+
+- Creating a "home directory" while creating the user in the user manager 
+  no longer produces an error.
+
+- Dates and times are now displayed in a specific timezone, which is configurable.
+
+- Inactive users are not able to login. 
+
+- The Job Designer appropriately configures hadoop.tmp.dir; this fixes
+  some permissions denied errors.
+
+- File upload is more robust.
+
+KNOWN BUGS
+
+- After a successful upload with Linux's flash player (which may warn you about
+  hanging your computer), the upload screen does not clear.  Click the red
+  (x) button to clear it.
+
+- Configuring the web server to listen on port 80 does not work if you are
+  using the RPM or Debian packages. This is due to the init scripts
+  improperly dropping root privileges before calling the supervisor. This
+  has been fixed in release 0.4.1.

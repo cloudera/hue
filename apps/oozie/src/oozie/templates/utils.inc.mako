@@ -346,70 +346,13 @@
         $(".pathChooser").each(function(){
           var self = $(this);
           % if select_folder:
-              self.after(getFileBrowseButton(self, true));
+              self.after(hueUtils.getFileBrowseButton(self, true));
           % else:
-              self.after(getFileBrowseButton(self));
+              self.after(hueUtils.getFileBrowseButton(self));
           % endif
         });
       % endif
     });
-
-    function getFileBrowseButton(inputElement, selectFolder) {
-      return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function (e) {
-        e.preventDefault();
-        // check if it's a relative path
-        var pathAddition = "";
-        if ($.trim(inputElement.val()) != "") {
-          var checkPath = "/filebrowser/view=${ workflow.deployment_dir }" + "/" + inputElement.val();
-          $.getJSON(checkPath, function (data) {
-            pathAddition = "${ workflow.deployment_dir }/";
-            callFileChooser();
-          }).error(function () {
-            callFileChooser();
-          });
-        }
-        else {
-          callFileChooser();
-        }
-
-        function callFileChooser() {
-          $("#fileChooserModal").jHueFileChooser({
-            selectFolder:(selectFolder) ? true : false,
-            onFolderChoose:function (filePath) {
-              handleChoice(filePath);
-              if (selectFolder) {
-                $("#chooseFileModal").modal("hide");
-              }
-            },
-            onFileChoose:function (filePath) {
-              handleChoice(filePath);
-              $("#chooseFileModal").modal("hide");
-            },
-            createFolder:false,
-            uploadFile:true,
-            initialPath:$.trim(inputElement.val()) != "" ? pathAddition + inputElement.val() : "${ workflow.deployment_dir }",
-            errorRedirectPath:"",
-            forceRefresh:true
-          });
-          $("#chooseFileModal").modal("show");
-        }
-
-        function handleChoice(filePath) {
-          var _deployDir = $.trim("${ workflow.deployment_dir }");
-          if (_deployDir != "" && filePath.indexOf(_deployDir) > -1) {
-            filePath = filePath.substring(_deployDir.length + 1);
-            if (filePath == "") {
-              filePath = "./";
-            }
-            if (filePath.indexOf("//") == 0){
-              filePath = filePath.substr(1);
-            }
-          }
-          inputElement.val(filePath);
-          inputElement.change();
-        }
-      });
-    }
   </script>
 </%def>
 

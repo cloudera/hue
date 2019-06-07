@@ -29,8 +29,10 @@ import zipfile
 import validate
 
 from django.conf import settings
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
+from django.http.response import StreamingHttpResponse
 from django.urls import reverse
 from wsgiref.util import FileWrapper
 from django.shortcuts import redirect
@@ -49,7 +51,7 @@ import desktop.log.log_buffer
 from desktop import appmanager
 from desktop.api import massaged_tags_for_json, massaged_documents_for_json, _get_docs
 from desktop.auth.backend import is_admin
-from desktop.conf import USE_NEW_EDITOR, IS_HUE_4, HUE_LOAD_BALANCER, get_clusters, DISABLE_HUE_3
+from desktop.conf import USE_NEW_EDITOR, HUE_LOAD_BALANCER, get_clusters
 from desktop.lib import django_mako
 from desktop.lib.conf import GLOBAL_CONFIG, BoundConfig, _configs_from_dir
 from desktop.lib.config_spec_dump import ConfigSpec
@@ -355,10 +357,6 @@ def memory(request):
       heap = heap[int(command[3])]
   return HttpResponse(str(heap), content_type="text/plain")
 
-@login_notrequired
-def jasmine(request):
-  return render('jasmine.mako', request, None)
-
 
 def global_js_constants(request):
   return HttpResponse(render('global_js_constants.mako', request, {
@@ -385,23 +383,7 @@ def unsupported(request):
   return render('unsupported.mako', request, None)
 
 def index(request):
-  is_hue_4 = IS_HUE_4.get() or DISABLE_HUE_3.get()
-  if is_hue_4:
-    try:
-      user_hue_version = json.loads(UserPreferences.objects.get(user=request.user, key='hue_version').value)
-      is_hue_4 = user_hue_version >= 4 or DISABLE_HUE_3.get()
-    except UserPreferences.DoesNotExist:
-      pass
-
-  if is_admin(request.user) and request.COOKIES.get('hueLandingPage') != 'home' and not IS_HUE_4.get():
-    return redirect(reverse('about:index'))
-  else:
-    if is_hue_4:
-      return redirect('desktop_views_hue')
-    elif USE_NEW_EDITOR.get():
-      return redirect('desktop_views_home2')
-    else:
-      return home(request)
+  return redirect('desktop_views_hue')
 
 def csrf_failure(request, reason=None):
   """Registered handler for CSRF."""
@@ -515,7 +497,7 @@ def get_banner_message(request):
 
   message = None
   path_info = request.environ.get("PATH_INFO")
-  if IS_HUE_4.get() and path_info.find("/hue/") < 0 and path_info.find("accounts/login") < 0:
+  if path_info.find("/hue") < 0 and path_info.find("accounts/login") < 0:
     url = request.build_absolute_uri("/hue")
     link = '<a href="%s" style="color: #FFF; font-weight: bold">%s</a>' % (url, url)
     message = _('You are accessing an older version of Hue, please switch to the latest version: %s.') % link
@@ -776,3 +758,10 @@ def _ko(str=""):
 def antixss(value):
   xss_regex = re.compile(r'<[^>]+>')
   return xss_regex.sub('', value)
+
+
+def topo(request, location='world'):
+  file_path = os.path.join('desktop', 'ext', 'topo', location + '.topo.json')
+  response = StreamingHttpResponse(streaming_content=staticfiles_storage.open(file_path))
+  #//return settings.STATIC_URL + path
+  return response

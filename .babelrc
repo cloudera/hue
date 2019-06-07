@@ -1,0 +1,15 @@
+{
+  "presets": ["@babel/preset-env"],
+  "plugins": [
+    ["module-resolver", {
+      "root": ["./desktop/core/src/desktop/js"]
+    }]
+  ],
+  "overrides": [{
+    "test": "./desktop/core/src/desktop/js/parse/sqlAutocompleteParser.js",
+    "compact": false
+  },{
+    "test": "./desktop/core/src/desktop/js/parse/sqlSyntaxParser.js",
+    "compact": false
+  }]
+}

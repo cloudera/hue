@@ -765,16 +765,11 @@ class HiveServerClient:
     (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=5000, orientation=TFetchOrientation.FETCH_NEXT)
     self.close_operation(operation_handle)
 
-    print '-----'
-    print self.query_server['server_name']
-    print desc_results.results
-    print desc_schema.schema
     if self.query_server['server_name'].startswith('impala'):
       cols = ('name', 'location', 'comment') # Skip owner as on a new line
     else:
       cols = ('db_name', 'comment', 'location', 'owner_name', 'owner_type', 'parameters')
 
-#     print cols
 #     try:
 #       if len(HiveServerTRowSet(desc_results.results, desc_schema.schema).cols(cols)) != 1:
 #         raise ValueError(_("%(query)s returned more than 1 row") % {'query': query})
@@ -782,11 +777,7 @@ class HiveServerClient:
 #       print e
 #       raise e
 
-    
-    a = HiveServerTRowSet(desc_results.results, desc_schema.schema).cols(cols)[0]  # Should only contain one row
-    print a
-    # {'comment': 'Default Hive database', 'name': 'default', 'location': 'hdfs://nightly6x-unsecure-1.vpc.cloudera.com:8020/user/hive/warehouse'}
-    return a
+    return HiveServerTRowSet(desc_results.results, desc_schema.schema).cols(cols)[0]  # Should only contain one row
 
   def get_tables_meta(self, database, table_names, table_types=None):
     if not table_types:

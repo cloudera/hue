@@ -49,7 +49,7 @@ var MetastoreSource = (function () {
 
     huePubSub.subscribe("assist.db.panel.ready", function () {
       self.lastLoadNamespacesDeferred.done(function () {
-        var lastSelectedDb = ApiHelper.getInstance().getFromTotalStorage('assist_' + self.sourceType + '_' + self.namespace.id, 'lastSelectedDb', 'default');
+        var lastSelectedDb = window.apiHelper.getFromTotalStorage('assist_' + self.sourceType + '_' + self.namespace.id, 'lastSelectedDb', 'default');
         huePubSub.publish('assist.set.database', {
           source: self.type,
           namespace: self.namespace().namespace,
@@ -135,7 +135,7 @@ var MetastoreSource = (function () {
           if (database.catalogEntry === refreshedEntry) {
             database.load(function () {
               setState(previousState);
-            }, self.optimizerEnabled(), self.navigatorEnabled());
+            }, self.metastoreViewModel.optimizerEnabled(), self.metastoreViewModel.navigatorEnabled());
             return true;
           }
         })
@@ -158,7 +158,7 @@ var MetastoreSource = (function () {
   MetastoreSource.prototype.loadNamespaces = function () {
     var self = this;
     self.loading(true);
-    ContextCatalog.getNamespaces({ sourceType: self.type }).done(function (context) {
+    contextCatalog.getNamespaces({ sourceType: self.type }).done(function (context) {
       var namespacesWithComputes = context.namespaces.filter(function (namespace) { return namespace.computes.length });
       self.namespaces($.map(namespacesWithComputes, function (namespace) {
         return new MetastoreNamespace({
@@ -203,7 +203,7 @@ var MetastoreNamespace = (function () {
 
   var MetastoreNamespace = function (options) {
     var self = this;
-    self.apiHelper = ApiHelper.getInstance();
+    self.apiHelper = window.apiHelper;
     self.namespace = options.namespace;
 
     // TODO: Compute selection in the metastore?
@@ -240,7 +240,7 @@ var MetastoreNamespace = (function () {
       self.loadingDatabases(false);
     });
 
-    DataCatalog.getEntry({ namespace: self.namespace, compute: self.compute, sourceType: self.sourceType, path: [], definition: { type: 'source' } }).done(function (entry) {
+    dataCatalog.getEntry({ namespace: self.namespace, compute: self.compute, sourceType: self.sourceType, path: [], definition: { type: 'source' } }).done(function (entry) {
       self.catalogEntry(entry);
       entry.getChildren().done(function (databaseEntries) {
         self.databases($.map(databaseEntries, function (databaseEntry) {
@@ -255,8 +255,8 @@ var MetastoreNamespace = (function () {
 
   MetastoreNamespace.prototype.reload = function () {
     var self = this;
-    if (!self.reloading() && self.catalogEntry()) {
-      self.reloading(true);
+    if (!self.loadingDatabases() && self.catalogEntry()) {
+      self.loadingDatabases(true);
       // Clear will publish when done
       self.catalogEntry().clearCache({ invalidate: self.sourceType === 'impala' ? 'invalidate' : 'cache' });
     }
@@ -307,7 +307,7 @@ var MetastoreNamespace = (function () {
       if (foundDatabases.length === 1) {
         self.setDatabase(foundDatabases[0], callback);
       } else if (clearCacheOnMissing) {
-        self.catalogEntry().clearCache({ invalidate: 'invalidate', silenceErrors: true }).done(function () {
+        self.catalogEntry().clearCache({ invalidate: 'invalidate', silenceErrors: true }).then(function () {
           self.loadDatabases().done(function () {
             whenLoaded(false)
           })
@@ -354,7 +354,7 @@ var MetastoreDatabase = (function () {
    */
   function MetastoreDatabase(options) {
     var self = this;
-    self.apiHelper = ApiHelper.getInstance();
+    self.apiHelper = window.apiHelper;
     self.catalogEntry = options.catalogEntry;
     self.metastoreViewModel = options.metastoreViewModel;
 
@@ -554,7 +554,7 @@ var MetastoreTable = (function () {
     });
 
     self.metastoreTable = options.metastoreTable;
-    self.apiHelper = ApiHelper.getInstance();
+    self.apiHelper = window.apiHelper;
 
     self.loaded = ko.observable(false);
     self.loading = ko.observable(false);
@@ -691,7 +691,7 @@ var MetastoreTable = (function () {
     self.navigatorEnabled = options.navigatorEnabled;
     self.catalogEntry = options.catalogEntry;
 
-    self.apiHelper = ApiHelper.getInstance();
+    self.apiHelper = window.apiHelper;
 
     // TODO: Check if enough or if we need to fetch additional details
     self.isView = ko.observable(self.catalogEntry.isView());
@@ -773,7 +773,7 @@ var MetastoreTable = (function () {
         self.fetchDetails();
       }).fail(function () {
         self.refreshingTableStats(false);
-        $.jHueNotify.error(HUE_I18n.metastore.errorRefreshingTableStats);
+        $.jHueNotify.error(window.I18n('An error occurred refreshing the table stats. Please try again.'));
         console.error('apiHelper.refreshTableStats error');
         console.error(data);
       });
@@ -920,7 +920,7 @@ var MetastoreTable = (function () {
 
         var found = analysis.properties && analysis.properties.some(function (property) {
           if (property.col_name.toLowerCase() === 'view original text:') {
-            ApiHelper.getInstance().formatSql({ statements: property.data_type }).done(function (formatResponse) {
+            window.apiHelper.formatSql({ statements: property.data_type }).done(function (formatResponse) {
               self.viewSql(formatResponse.status === 0 ? formatResponse.formatted_statements : property.data_type)
             }).fail(function () {
               self.viewSql(property.data_type)
@@ -986,7 +986,7 @@ var MetastoreTable = (function () {
   MetastoreTable.prototype.showImportData = function () {
     var self = this;
     $("#import-data-modal").empty().html('<div class="modal-header"><button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button><h2 class="modal-title"></h2></div><div class="modal-body"><i class="fa fa-spinner fa-spin fa-2x muted"></i></div>').modal("show");
-    $.get('/metastore/table/' + self.catalogEntry.path.join('/') + '/load', function (data) {
+    $.get('/metastore/table/' + self.catalogEntry.path.join('/') + '/load?source_type=' + self.catalogEntry.getSourceType(), function (data) {
       $("#import-data-modal").html(data['data']);
     }).fail(function (xhr) {
       $(document).trigger("error", xhr.responseText);

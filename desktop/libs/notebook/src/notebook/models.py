@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import json
 import logging
 import math
@@ -22,9 +23,18 @@ import numbers
 import urllib
 import uuid
 
+from datetime import timedelta
+
+from django.contrib.auth.models import User
+from django.contrib.sessions.models import Session
+from django.db.models import Count
+from django.db.models.functions import Trunc
+from desktop.lib.paths import SAFE_CHARACTERS_URI_COMPONENTS
 from django.utils.html import escape
+from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import smart_unicode
+from desktop.models import Document2
 
 from notebook.connectors.base import Notebook
 
@@ -108,7 +118,7 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
     'type': 'notebook' if is_notebook else 'query-%s' % editor_type,
     'showHistory': True,
     'isSaved': is_saved,
-    'onSuccessUrl': urllib.quote(on_success_url.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\'') if on_success_url else None,
+    'onSuccessUrl': urllib.quote(on_success_url.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) if on_success_url else None,
     'pubSubUrl': pub_sub_url,
     'skipHistorify': skip_historify,
     'isManaged': is_task,
@@ -459,3 +469,102 @@ def _update_property_value(properties, key, value):
   for prop in properties:
     if prop['key'] == key:
       prop.update({'value': value})
+
+
+class Analytics():
+
+  @classmethod
+  def admin_stats(cls):
+    stats = []
+    one_day = datetime.date.today() - timedelta(days=1)
+    one_week = datetime.date.today() - timedelta(weeks=1)
+    one_month = datetime.date.today() - timedelta(days=30)
+    three_months = datetime.date.today() - timedelta(days=90)
+
+    stats.append(('Last modified', '1 day'))
+    stats.append(('Users', User.objects.filter(last_login__gte=one_day).count()))
+    stats.append(('Sessions', Session.objects.filter(expire_date__gte=one_day).count()))
+    stats.append(('Executed queries', Document2.objects.filter(last_modified__gte=one_day, is_history=True, type__startswith='query-').count()))
+
+    stats.append(('\nLast modified', '1 week'))
+    stats.append(('Users', User.objects.filter(last_login__gte=one_week).count()))
+    stats.append(('Sessions', Session.objects.filter(expire_date__gte=one_week).count()))
+    stats.append(('Executed queries', Document2.objects.filter(last_modified__gte=one_week, is_history=True, type__startswith='query-').count()))
+    stats.append(('Saved queries', Document2.objects.filter(last_modified__gte=one_week, is_history=False, type__startswith='query-').count()))
+
+    stats.append(('\nAll', ''))
+    stats.append(('Active users 30 days', User.objects.filter(last_login__gte=one_month).count()))
+    stats.append(('Sessions 30 days', Session.objects.filter(expire_date__gte=one_month).count()))
+    stats.append(('Executed queries 30 days', Document2.objects.filter(last_modified__gte=one_month, is_history=True, type__startswith='query-').count()))
+    stats.append(('Active users 90 days', User.objects.filter(last_login__gte=three_months).count()))
+
+    return stats
+
+  @classmethod
+  def user_stats(cls, user_id=None, user=None):
+    stats = []
+    one_month = datetime.date.today() - timedelta(days=30)
+
+    user = User.objects.get(id=user_id) if user is None else user
+    queries = Document2.objects.filter(owner__id=user_id, type__startswith='query-', is_trashed=False, is_managed=False)
+
+    stats.append({
+      'name': 'user',
+      'value': '%s - %s' % (user_id, user.username),'description': _('User info')
+    })
+    query_executions = queries.filter(is_history=True, type__startswith='query-')
+    stats.append({
+      'name': 'query_executions',
+      'values': query_executions.count(),
+      'description': _('Query executions count')
+    })
+    stats.append({
+      'name': 'saved_queries_count',
+      'value': queries.filter(is_history=False, type__startswith='query-').count(),
+      'description': _('Saved queries count')
+    })
+    stats.append({
+      'name': 'query_executions_30_days_count',
+      'value': query_executions.filter(last_modified__gte=one_month).count(),
+      'description': _('Query executions 30 days total')
+    })
+    last_month_daily = queries.filter(last_modified__gte=one_month).annotate(day=Trunc('last_modified', 'day')).values('day').annotate(c=Count('day')).values('day', 'c').order_by('day')
+    stats.append({
+      'name': 'query_executions_30_days_histogram',
+      'value': last_month_daily,
+      'description': _('Daily executions 30 days')
+    })
+
+    return stats
+
+  @classmethod
+  def query_stats(cls, query_id=None, query=None):
+    stats = []
+    one_month = datetime.date.today() - timedelta(days=30)
+
+    query = Document2.objects.get(id=query_id) if query is None else query
+    stats.append({
+      'name': 'query',
+      'value': '%s - %s' % (query_id, query.name),
+      'description': _('Query info')
+    })
+    executions = query.dependents.filter(is_history=True, type__startswith='query-')
+    stats.append({
+      'name': 'execution_count',
+      'value': executions.count(),
+      'description': _('How many times executed')
+    })
+    stats.append({
+      'name': 'execution_count_shared',
+      'value': executions.exclude(owner=query.owner).count(),
+      'description': _('Executions by others')
+    })
+    last_month_daily = executions.filter(last_modified__gte=one_month).annotate(day=Trunc('last_modified', 'day')).values('day').annotate(c=Count('day')).values('day', 'c').order_by('day')
+    stats.append({
+      'name': 'executions_30_days_histogram',
+      'value': last_month_daily,
+      'description': _('Daily executions 30 days')
+    })
+    # Could count number of "forks" (but would need to start tracking parent of Saved As query cf. saveAsNotebook)
+
+    return stats

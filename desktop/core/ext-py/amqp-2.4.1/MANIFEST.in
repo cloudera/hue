@@ -1,0 +1,11 @@
+include README.rst Changelog LICENSE
+recursive-include docs *
+recursive-include demo *.py
+recursive-include extra README *.py
+recursive-include requirements *.txt
+recursive-include t *.py
+
+recursive-exclude docs/_build *
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+recursive-exclude * .*.sw*

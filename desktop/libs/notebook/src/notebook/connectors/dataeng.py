@@ -117,10 +117,6 @@ class DataEngApi(Api):
     return ''
 
 
-  def progress(self, snippet, logs):
-    return 50
-
-
   def get_jobs(self, notebook, snippet, logs):
     ## 50cf0e00-746b-4d86-b8e3-f2722296df71
     job_id = snippet['result']['handle']['id']
@@ -133,7 +129,7 @@ class DataEngApi(Api):
     ]
 
 
-  def close_statement(self, snippet):
+  def close_statement(self, notebook, snippet):
     pass
 
 

@@ -22,7 +22,6 @@ import json
 from nose.tools import assert_equal, assert_false, assert_true
 from django.contrib.auth.models import User
 
-from desktop.conf import IS_HUE_4
 from desktop.converters import DocumentConverter
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
@@ -328,32 +327,18 @@ class TestDocumentConverter(object):
     doc = Document.objects.get(id=doc.id)
 
     try:
-      if IS_HUE_4.get():
-        # Test that corresponding doc2 is created after convert
-        assert_false(Document2.objects.filter(owner=self.user, type='query-mapreduce').exists())
+      # Test that corresponding doc2 is created after convert
+      assert_false(Document2.objects.filter(owner=self.user, type='query-mapreduce').exists())
 
-        converter = DocumentConverter(self.user)
-        converter.convert()
+      converter = DocumentConverter(self.user)
+      converter.convert()
 
-        doc2 = Document2.objects.get(owner=self.user, type='query-mapreduce')
+      doc2 = Document2.objects.get(owner=self.user, type='query-mapreduce')
 
-        # Verify snippet values
-        assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
-        assert_equal('/user/hue/oozie/examples/lib/hadoop-examples.jar', doc2.data_dict['snippets'][0]['properties']['app_jar'])
-        assert_equal(['sleep.job.map.sleep.time=5', 'sleep.job.reduce.sleep.time=10'], doc2.data_dict['snippets'][0]['properties']['hadoopProperties'])
-      else:
-        # Test that corresponding doc2 is created after convert
-        assert_false(Document2.objects.filter(owner=self.user, type='link-workflow').exists())
-
-        converter = DocumentConverter(self.user)
-        converter.convert()
-
-        doc2 = Document2.objects.get(owner=self.user, type='link-workflow')
-
-        # Verify absolute_url
-        response = self.client.get(doc2.get_absolute_url())
-        assert_equal(200, response.status_code)
-        assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
+      # Verify snippet values
+      assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
+      assert_equal('/user/hue/oozie/examples/lib/hadoop-examples.jar', doc2.data_dict['snippets'][0]['properties']['app_jar'])
+      assert_equal(['sleep.job.map.sleep.time=5', 'sleep.job.reduce.sleep.time=10'], doc2.data_dict['snippets'][0]['properties']['hadoopProperties'])
     finally:
       wf.delete()
 
@@ -383,37 +368,23 @@ class TestDocumentConverter(object):
     doc = Document.objects.get(id=doc.id)
 
     try:
-      if IS_HUE_4.get():
-        # Test that corresponding doc2 is created after convert
-        assert_false(Document2.objects.filter(owner=self.user, type='query-shell').exists())
+      # Test that corresponding doc2 is created after convert
+      assert_false(Document2.objects.filter(owner=self.user, type='query-shell').exists())
 
-        converter = DocumentConverter(self.user)
-        converter.convert()
+      converter = DocumentConverter(self.user)
+      converter.convert()
 
-        doc2 = Document2.objects.get(owner=self.user, type='query-shell')
+      doc2 = Document2.objects.get(owner=self.user, type='query-shell')
 
-        # Verify snippet values
-        assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
-        assert_equal('hello.py', doc2.data_dict['snippets'][0]['properties']['command_path'])
-        assert_equal(['baz'], doc2.data_dict['snippets'][0]['properties']['arguments'])
-        assert_equal(['foo=bar'], doc2.data_dict['snippets'][0]['properties']['env_var'])
-        assert_equal(['mapred.job.queue.name=test'], doc2.data_dict['snippets'][0]['properties']['hadoopProperties'])
-        assert_equal(['test.zip'], doc2.data_dict['snippets'][0]['properties']['archives'])
-        assert_equal([{'type': 'file', 'path': 'hello.py'}], doc2.data_dict['snippets'][0]['properties']['files'])
-        assert_equal(True, doc2.data_dict['snippets'][0]['properties']['capture_output'])
-      else:
-        # Test that corresponding doc2 is created after convert
-        assert_false(Document2.objects.filter(owner=self.user, type='link-workflow').exists())
-
-        converter = DocumentConverter(self.user)
-        converter.convert()
-
-        doc2 = Document2.objects.get(owner=self.user, type='link-workflow')
-
-        # Verify absolute_url
-        response = self.client.get(doc2.get_absolute_url())
-        assert_equal(200, response.status_code)
-        assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
+      # Verify snippet values
+      assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
+      assert_equal('hello.py', doc2.data_dict['snippets'][0]['properties']['command_path'])
+      assert_equal(['baz'], doc2.data_dict['snippets'][0]['properties']['arguments'])
+      assert_equal(['foo=bar'], doc2.data_dict['snippets'][0]['properties']['env_var'])
+      assert_equal(['mapred.job.queue.name=test'], doc2.data_dict['snippets'][0]['properties']['hadoopProperties'])
+      assert_equal(['test.zip'], doc2.data_dict['snippets'][0]['properties']['archives'])
+      assert_equal([{'type': 'file', 'path': 'hello.py'}], doc2.data_dict['snippets'][0]['properties']['files'])
+      assert_equal(True, doc2.data_dict['snippets'][0]['properties']['capture_output'])
     finally:
       wf.delete()
 
@@ -446,38 +417,24 @@ class TestDocumentConverter(object):
     doc = Document.objects.get(id=doc.id)
 
     try:
-      if IS_HUE_4.get():
-        # Test that corresponding doc2 is created after convert
-        assert_false(Document2.objects.filter(owner=self.user, type='query-java').exists())
+      # Test that corresponding doc2 is created after convert
+      assert_false(Document2.objects.filter(owner=self.user, type='query-java').exists())
 
-        converter = DocumentConverter(self.user)
-        converter.convert()
+      converter = DocumentConverter(self.user)
+      converter.convert()
 
-        doc2 = Document2.objects.get(owner=self.user, type='query-java')
+      doc2 = Document2.objects.get(owner=self.user, type='query-java')
 
-        # Verify snippet values
-        assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
-        assert_equal('/user/hue/oozie/workspaces/lib/hadoop-examples.jar', doc2.data_dict['snippets'][0]['properties']['app_jar'])
-        assert_equal('org.apache.hadoop.examples.terasort.TeraGen', doc2.data_dict['snippets'][0]['properties']['class'])
-        assert_equal('1000 ${output_dir}/teragen', doc2.data_dict['snippets'][0]['properties']['args'])
-        assert_equal('-Dexample-property=natty', doc2.data_dict['snippets'][0]['properties']['java_opts'])
-        assert_equal(['mapred.job.queue.name=test'], doc2.data_dict['snippets'][0]['properties']['hadoopProperties'])
-        assert_equal(['my_archive', 'my_archive2'], doc2.data_dict['snippets'][0]['properties']['archives'])
-        assert_equal([{'type': 'file', 'path': 'my_file'}, {'type': 'file', 'path': 'my_file2'}], doc2.data_dict['snippets'][0]['properties']['files'])
-        assert_equal(True, doc2.data_dict['snippets'][0]['properties']['capture_output'])
-      else:
-        # Test that corresponding doc2 is created after convert
-        assert_false(Document2.objects.filter(owner=self.user, type='link-workflow').exists())
-
-        converter = DocumentConverter(self.user)
-        converter.convert()
-
-        doc2 = Document2.objects.get(owner=self.user, type='link-workflow')
-
-        # Verify absolute_url
-        response = self.client.get(doc2.get_absolute_url())
-        assert_equal(200, response.status_code)
-        assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
+      # Verify snippet values
+      assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
+      assert_equal('/user/hue/oozie/workspaces/lib/hadoop-examples.jar', doc2.data_dict['snippets'][0]['properties']['app_jar'])
+      assert_equal('org.apache.hadoop.examples.terasort.TeraGen', doc2.data_dict['snippets'][0]['properties']['class'])
+      assert_equal('1000 ${output_dir}/teragen', doc2.data_dict['snippets'][0]['properties']['args'])
+      assert_equal('-Dexample-property=natty', doc2.data_dict['snippets'][0]['properties']['java_opts'])
+      assert_equal(['mapred.job.queue.name=test'], doc2.data_dict['snippets'][0]['properties']['hadoopProperties'])
+      assert_equal(['my_archive', 'my_archive2'], doc2.data_dict['snippets'][0]['properties']['archives'])
+      assert_equal([{'type': 'file', 'path': 'my_file'}, {'type': 'file', 'path': 'my_file2'}], doc2.data_dict['snippets'][0]['properties']['files'])
+      assert_equal(True, doc2.data_dict['snippets'][0]['properties']['capture_output'])
     finally:
       wf.delete()
 
@@ -510,35 +467,21 @@ class TestDocumentConverter(object):
     doc = Document.objects.get(id=doc.id)
 
     try:
-      if IS_HUE_4.get():
-        # Test that corresponding doc2 is created after convert
-        assert_false(Document2.objects.filter(owner=self.user, type='query-pig').exists())
+      # Test that corresponding doc2 is created after convert
+      assert_false(Document2.objects.filter(owner=self.user, type='query-pig').exists())
 
-        converter = DocumentConverter(self.user)
-        converter.convert()
+      converter = DocumentConverter(self.user)
+      converter.convert()
 
-        doc2 = Document2.objects.get(owner=self.user, type='query-pig')
+      doc2 = Document2.objects.get(owner=self.user, type='query-pig')
 
-        # Verify snippet values
-        assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
-        assert_equal(attrs['script'], doc2.data_dict['snippets'][0]['statement'], doc2.data_dict)
-        assert_equal(attrs['script'], doc2.data_dict['snippets'][0]['statement_raw'])
-        assert_equal(['mapred.job.queue.name=pig', 'mapreduce.task.profile=true'], doc2.data_dict['snippets'][0]['properties']['hadoopProperties'])
-        assert_equal(['input=/user/test/data', 'verbose=true'], doc2.data_dict['snippets'][0]['properties']['parameters'])
-        assert_equal(['/user/test/test.txt', '/user/test/test.jar'], doc2.data_dict['snippets'][0]['properties']['resources'])
-      else:
-        # Test that corresponding doc2 is created after convert
-        assert_false(Document2.objects.filter(owner=self.user, type='link-pigscript').exists())
-
-        converter = DocumentConverter(self.user)
-        converter.convert()
-
-        doc2 = Document2.objects.get(owner=self.user, type='link-pigscript')
-
-        # Verify absolute_url
-        response = self.client.get(doc2.get_absolute_url())
-        assert_equal(200, response.status_code)
-        assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
+      # Verify snippet values
+      assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
+      assert_equal(attrs['script'], doc2.data_dict['snippets'][0]['statement'], doc2.data_dict)
+      assert_equal(attrs['script'], doc2.data_dict['snippets'][0]['statement_raw'])
+      assert_equal(['mapred.job.queue.name=pig', 'mapreduce.task.profile=true'], doc2.data_dict['snippets'][0]['properties']['hadoopProperties'])
+      assert_equal(['input=/user/test/data', 'verbose=true'], doc2.data_dict['snippets'][0]['properties']['parameters'])
+      assert_equal(['/user/test/test.txt', '/user/test/test.jar'], doc2.data_dict['snippets'][0]['properties']['resources'])
     finally:
       pig_script.delete()
 

@@ -241,6 +241,7 @@ class SparkApi(Api):
       return {
           'id': response['id'],
           'has_result_set': True,
+          'sync': False
       }
     except Exception, e:
       message = force_unicode(str(e)).lower()
@@ -293,9 +294,15 @@ class SparkApi(Api):
           images = [data['image/png']]
         except KeyError:
           images = []
-        data = [[data['text/plain']]]
-        meta = [{'name': 'Header', 'type': 'STRING_TYPE', 'comment': ''}]
-        type = 'text'
+        if 'application/json' in data:
+          result = data['application/json']
+          data = result['data']
+          meta = [{'name': field['name'], 'type': field['type'], 'comment': ''} for field in result['schema']['fields']]
+          type = 'table'
+        else:
+          data = [[data['text/plain']]]
+          meta = [{'name': 'Header', 'type': 'STRING_TYPE', 'comment': ''}]
+          type = 'text'
       else:
         data = table['data']
         headers = table['headers']
@@ -326,16 +333,6 @@ class SparkApi(Api):
 
       raise QueryError(msg)
 
-  def download(self, notebook, snippet, format, user_agent=None):
-    try:
-      api = get_spark_api(self.user)
-      session = _get_snippet_session(notebook, snippet)
-      cell = snippet['result']['handle']['id']
-
-      return spark_download(api, session['id'], cell, format, user_agent=None)
-    except Exception, e:
-      raise PopupException(e)
-
   def cancel(self, notebook, snippet):
     api = get_spark_api(self.user)
     session = _get_snippet_session(notebook, snippet)
@@ -349,10 +346,7 @@ class SparkApi(Api):
 
     return api.get_log(session['id'], startFrom=startFrom, size=size)
 
-  def progress(self, snippet, logs):
-    return 50
-
-  def close_statement(self, snippet): # Individual statements cannot be closed
+  def close_statement(self, notebook, snippet): # Individual statements cannot be closed
     pass
 
   def close_session(self, session):

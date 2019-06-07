@@ -32,8 +32,6 @@
 <%def name="import_layout(with_deferred=False)">
   <link rel="stylesheet" href="${ static('dashboard/css/common_dashboard.css') }">
   <script src="${ static('desktop/js/ko.common-dashboard.js') }" type="text/javascript" charset="utf-8"></script>
-  <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }" type="text/javascript" charset="utf-8"></script>
-  <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/js/ko.droppable.fix.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/clipboard.min.js') }"></script>
 
@@ -241,55 +239,55 @@
                   <div class="dropdown inline-block">
                     <a class="dropdown-toggle" href="javascript: void(0)" data-toggle="dropdown" title="${ _('Change widget visualization') }">
                       <!-- ko switch: fieldViz -->
-                        <!-- ko case: ko.HUE_CHARTS.TYPES.COUNTER --><i class="fa fa-superscript fa-fw"></i> ${_('Counter')}<!-- /ko -->
-                        <!-- ko case: ko.HUE_CHARTS.TYPES.TEXTSELECT --><i class="fa fa-sort-amount-asc fa-fw"></i> ${_('Text select')}<!-- /ko -->
-                        <!-- ko case: ko.HUE_CHARTS.TYPES.BARCHART --><i class="hcha hcha-bar-chart fa-fw"></i> ${_('Bars')}<!-- /ko -->
-                        <!-- ko case: ko.HUE_CHARTS.TYPES.PIECHART --><i class="hcha hcha-pie-chart fa-fw"></i> ${_('Pie')}<!-- /ko -->
-                        <!-- ko case: ko.HUE_CHARTS.TYPES.TIMELINECHART --><i class="fa fa-fw fa-line-chart"></i> ${_('Timeline')}<!-- /ko -->
-                        <!-- ko case: ko.HUE_CHARTS.TYPES.GRADIENTMAP --><i class="hcha fa-fw hcha-map-chart chart-icon"></i> ${_('Gradient Map')}<!-- /ko -->
-                        <!-- ko case: ko.HUE_CHARTS.TYPES.MAP --><i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}<!-- /ko -->
+                        <!-- ko case: window.HUE_CHARTS.TYPES.COUNTER --><i class="fa fa-superscript fa-fw"></i> ${_('Counter')}<!-- /ko -->
+                        <!-- ko case: window.HUE_CHARTS.TYPES.TEXTSELECT --><i class="fa fa-sort-amount-asc fa-fw"></i> ${_('Text select')}<!-- /ko -->
+                        <!-- ko case: window.HUE_CHARTS.TYPES.BARCHART --><i class="hcha hcha-bar-chart fa-fw"></i> ${_('Bars')}<!-- /ko -->
+                        <!-- ko case: window.HUE_CHARTS.TYPES.PIECHART --><i class="hcha hcha-pie-chart fa-fw"></i> ${_('Pie')}<!-- /ko -->
+                        <!-- ko case: window.HUE_CHARTS.TYPES.TIMELINECHART --><i class="fa fa-fw fa-line-chart"></i> ${_('Timeline')}<!-- /ko -->
+                        <!-- ko case: window.HUE_CHARTS.TYPES.GRADIENTMAP --><i class="hcha fa-fw hcha-map-chart chart-icon"></i> ${_('Gradient Map')}<!-- /ko -->
+                        <!-- ko case: window.HUE_CHARTS.TYPES.MAP --><i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}<!-- /ko -->
                       <!-- /ko -->
                     </a>
                     <ul class="dropdown-menu">
                       <li>
                         <a href="javascript:void(0)"
-                           data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.COUNTER); }">
+                           data-bind="click: function(){ fieldViz(window.HUE_CHARTS.TYPES.COUNTER); }">
                           <i class="fa fa-superscript fa-fw"></i> ${_('Counter')}
                         </a>
                       </li>
                       <li>
                         <a href="javascript:void(0)"
-                           data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.TEXTSELECT); }">
+                           data-bind="click: function(){ fieldViz(window.HUE_CHARTS.TYPES.TEXTSELECT); }">
                           <i class="fa fa-sort-amount-asc fa-fw"></i> ${_('Text select')}
                         </a>
                       </li>
                       <li>
                         <a href="javascript:void(0)"
-                           data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.BARCHART); }">
+                           data-bind="click: function(){ fieldViz(window.HUE_CHARTS.TYPES.BARCHART); }">
                           <i class="hcha hcha-bar-chart fa-fw"></i> ${_('Bars')}
                         </a>
                       </li>
                       <li>
                         <a href="javascript:void(0)"
-                           data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.PIECHART); }">
+                           data-bind="click: function(){ fieldViz(window.HUE_CHARTS.TYPES.PIECHART); }">
                           <i class="hcha hcha-pie-chart fa-fw"></i> ${_('Pie')}
                         </a>
                       </li>
                       <li>
                         <a href="javascript:void(0)"
-                           data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.TIMELINECHART); }">
+                           data-bind="click: function(){ fieldViz(window.HUE_CHARTS.TYPES.TIMELINECHART); }">
                           <i class="fa fa-fw fa-line-chart"></i> ${_('Timeline')}
                         </a>
                       </li>
                       <li>
                         <a href="javascript:void(0)"
-                           data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.GRADIENTMAP); }">
+                           data-bind="click: function(){ fieldViz(window.HUE_CHARTS.TYPES.GRADIENTMAP); }">
                           <i class="hcha fa-fw hcha-map-chart chart-icon"></i> ${_('Gradient Map')}
                         </a>
                       </li>
                       <li>
                         <a href="javascript:void(0)"
-                           data-bind="click: function(){ fieldViz(ko.HUE_CHARTS.TYPES.MAP); }">
+                           data-bind="click: function(){ fieldViz(window.HUE_CHARTS.TYPES.MAP); }">
                           <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
                         </a>
                       </li>
@@ -388,7 +386,23 @@
 </script>
 
 <script type="text/html" id="widget-template${ suffix }">
-  <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass, draggable: { data: $data, isEnabled: $root.isGridster(), options: getDraggableOptions({ data: $data, parent: $parent }) }, droppable: { data: function() { $root.collection.dropOnWidget(id()) }, options:{ greedy:true, drop: function(event, ui) { huePubSub.publish('dashboard.drop.on.page', { event: event, ui: ui } } }}">
+  <div data-bind="attr: { 'id': 'wdg_'+ id() }, css: klass,
+      draggable: {
+         data: $data,
+         isEnabled: $root.isGridster(),
+         options: getDraggableOptions({ data: $data, parent: $parent })
+      },
+      droppable: {
+        data: function() {
+          $root.collection.dropOnWidget(id())
+        },
+        options: {
+          greedy:true,
+          drop: function(event, ui) {
+            huePubSub.publish('dashboard.drop.on.page', { event: event, ui: ui })
+          }
+        }
+      }">
     <h2 class="card-heading simple" data-bind="attr: { title: $root.isGridster() ? '${ _ko('Drag to move') }' : '' }">
       <!-- ko ifnot: $root.isGridster -->
       <span data-bind="visible: $root.isEditing">

@@ -77,7 +77,7 @@ class Api(object):
 
   def apps(self, filters): return {'apps': [], 'total': 0}
 
-  def app(self, appid): return {} # Also contains progress (0-100) and status [RUNNING, FINISHED, PAUSED]
+  def app(self, appid): return {} # Also contains progress (0-100) and status [RUNNING, SUCCEEDED, PAUSED, FAILED]
 
   def action(self, app_ids, operation): return {}
 

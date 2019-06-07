@@ -1,7 +1,0 @@
-var config = {};
-
-config.helmRepo = "http://dataware-1.vpc.cloudera.com:8879"
-config.registry = "docker-registry.infra.cloudera.com/cloudera/datawarehouse";
-config.registryImpalaTag = "v2";
-
-module.exports = config;

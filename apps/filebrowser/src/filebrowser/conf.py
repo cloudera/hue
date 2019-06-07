@@ -58,3 +58,10 @@ ENABLE_EXTRACT_UPLOADED_ARCHIVE = Config(
   type=bool,
   dynamic_default=is_oozie_enabled
 )
+
+REDIRECT_DOWNLOAD = Config(
+  key="redirect_download",
+  help=_(
+    'Redirect client to WebHdfs or S3 for file download. Note: Turning this on will override notebook/redirect_whitelist for user selected file downloads on WebHdfs & S3.'),
+  type=coerce_bool,
+  default=False)

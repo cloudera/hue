@@ -336,7 +336,7 @@ class Job(object):
       self._job_attempts = self.api.job_attempts(self.id)['jobAttempts']
     return self._job_attempts
 
-class OozieYarnJob(Job):
+class YarnV2Job(Job):
   def __init__(self, api, attrs):
     self.api = api
     for attr in attrs.keys():
@@ -355,6 +355,8 @@ class OozieYarnJob(Job):
       setattr(self, 'status', self.finalStatus)
     else:
       setattr(self, 'status', self.state)
+    setattr(self, 'type', self.applicationType)
+    setattr(self, 'applicationType', 'YarnV2')
     setattr(self, 'jobName', self.name)
     setattr(self, 'jobId', jobid)
     setattr(self, 'jobId_short', self.jobId.replace('job_', ''))
@@ -416,7 +418,7 @@ class YarnTask:
 
   def get_attempt(self, attempt_id):
     json = self.job.api.appattempts_attempt(self.job.id, attempt_id)
-    return YarnOozieAttempt(self, json)
+    return YarnV2Attempt(self, json)
 
 class KilledJob(Job):
 
@@ -539,10 +541,11 @@ class Attempt:
       self._counters = self.task.job.api.task_attempt_counters(self.task.jobId, self.task.id, self.id)['jobTaskAttemptCounters']
     return self._counters
 
-  def get_task_log(self, offset=0):
-    logs = []
+  def get_log_link(self):
     attempt = self.task.job.job_attempts['jobAttempt'][-1]
     log_link = attempt['logsLink']
+    if not log_link:
+      return log_link, None
 
     # Generate actual task log link from logsLink url
     if self.task.job.status in ('NEW', 'SUBMITTED', 'RUNNING'):
@@ -594,6 +597,29 @@ class Attempt:
         'user': user
       }
 
+    return log_link, user
+
+  def get_log_list(self):
+    log_link, user = self.get_log_link()
+    if not log_link:
+      return []
+    params = {
+      'doAs': user
+    }
+    log_link = re.sub('job_[^/]+', str(self.id), log_link)
+    root = Resource(get_log_client(log_link), urlparse.urlsplit(log_link)[2], urlencode=False)
+    response = root.get('/', params=params)
+    links = html.fromstring(response, parser=html.HTMLParser()).xpath('/html/body/table/tbody/tr/td[2]//a/@href')
+    parsed_links = map(lambda x: urlparse.urlsplit(x), links)
+    return map(lambda x: x and len(x) >= 2 and x[2].split('/')[-2] or '', parsed_links)
+
+  def get_task_log(self, offset=0):
+    logs = []
+
+    log_link, user = self.get_log_link()
+    if not log_link:
+      return ['', '', '']
+
     for name in ('stdout', 'stderr', 'syslog'):
       link = '/%s/' % name
       if self.type == 'Oozie Launcher' and not self.task.job.status == 'FINISHED': # Yarn currently dumps with 500 error with doas in running state
@@ -628,7 +654,7 @@ class Attempt:
 
     return logs + [''] * (3 - len(logs))
 
-class YarnOozieAttempt(Attempt):
+class YarnV2Attempt(Attempt):
   def __init__(self, task, attrs):
     self.task = task
     if attrs:
@@ -640,7 +666,23 @@ class YarnOozieAttempt(Attempt):
   def _fixup(self):
     if not hasattr(self, 'diagnostics'):
       self.diagnostics = ''
-    setattr(self, 'type', 'Oozie Launcher')
+    setattr(self, 'type', 'YarnV2')
+    if self.finishedTime == 0:
+      finishTime = int(time.time() * 1000)
+    else:
+      finishTime = self.finishedTime
+    if self.startTime == 0:
+      durationInMillis = None
+    else:
+      durationInMillis = finishTime - self.startTime
+
+    setattr(self, 'duration', durationInMillis)
+    setattr(self, 'durationInMillis', durationInMillis)
+    setattr(self, 'durationFormatted', self.duration and format_duration_in_millis(self.duration))
+    setattr(self, 'finishTimeFormatted', format_unixtime_ms(finishTime))
+    setattr(self, 'startTimeFormatted', format_unixtime_ms(self.startTime))
+    setattr(self, 'status', 'RUNNING' if self.finishedTime == 0 else 'SUCCEEDED')
+    setattr(self, 'properties', {})
 
 class Container:
 

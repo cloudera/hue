@@ -23,7 +23,7 @@ import threading
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 
-from spark.conf import get_livy_server_url, SECURITY_ENABLED, SSL_CERT_CA_VERIFY
+from spark.conf import get_livy_server_url, SECURITY_ENABLED, SSL_CERT_CA_VERIFY, CSRF_ENABLED
 
 
 LOG = logging.getLogger(__name__)
@@ -58,10 +58,14 @@ class JobServerApi(object):
     self._client = HttpClient(self._url, logger=LOG)
     self._root = Resource(self._client)
     self._security_enabled = SECURITY_ENABLED.get()
+    self._csrf_enabled = CSRF_ENABLED.get()
     self._thread_local = threading.local()
 
     if self.security_enabled:
       self._client.set_kerberos_auth()
+
+    if self.csrf_enabled:
+      self._client.set_headers({'X-Requested-By' : 'hue'})
 
     self._client.set_verify(SSL_CERT_CA_VERIFY.get())
 
@@ -75,6 +79,10 @@ class JobServerApi(object):
   @property
   def security_enabled(self):
     return self._security_enabled
+
+  @property
+  def csrf_enabled(self):
+    return self._csrf_enabled
 
   @property
   def user(self):

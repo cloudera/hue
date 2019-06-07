@@ -28,7 +28,7 @@ var HomeViewModel = (function () {
 
     self.user = options.user;
     self.superuser = options.superuser;
-    self.apiHelper = ApiHelper.getInstance(options);
+    self.apiHelper = window.apiHelper;
     self.isLeftPanelVisible = ko.observable(false);
     // Uncomment to enable the assist panel
     // self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);

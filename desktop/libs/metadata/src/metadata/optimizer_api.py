@@ -311,7 +311,7 @@ def _convert_queries(queries_data):
     try:
       snippet = query_data['snippets'][0]
       if 'guid' in snippet['result']['handle']: # Not failed query
-        original_query_id = '%s:%s' % struct.unpack(b"QQ", base64.decodestring(snippet['result']['handle']['guid']))
+        original_query_id = '%s:%s' % struct.unpack(b"QQ", base64.decodestring(snippet['result']['handle']['guid'])) # unpack_guid uses '%016x:%016x' while optmizer api uses '%s:%s'.
         execution_time = snippet['result']['executionTime'] * 100 if snippet['status'] in ('available', 'expired') else -1
         statement = _clean_query(_get_statement(query_data))
         queries.append((original_query_id, execution_time, statement, snippet.get('database', 'default').strip()))

@@ -428,7 +428,7 @@ def _submit_workflow_helper(request, workflow, submit_action):
     params_form = ParametersFormSet(initial=initial_params)
 
 
-    popup = render('editor2/submit_job_popup.mako', request, {
+    return render('editor2/submit_job_popup.mako', request, {
                      'params_form': params_form,
                      'name': workflow.name,
                      'action': submit_action,
@@ -437,8 +437,7 @@ def _submit_workflow_helper(request, workflow, submit_action):
                      'is_oozie_mail_enabled': _is_oozie_mail_enabled(request.user),
                      'return_json': request.GET.get('format') == 'json',
                      'cluster_json': cluster_json
-                   }, force_template=True).content
-    return JsonResponse(popup, safe=False)
+                   }, force_template=True)
 
 
 def _is_oozie_mail_enabled(user):
@@ -630,7 +629,7 @@ def save_coordinator(request):
     scheduled_doc.can_read_or_exception(request.user)
     coordinator_doc.dependencies = [scheduled_doc]
 
-  coordinator_doc1 = coordinator_doc.doc.get()
+  coordinator_doc1 = coordinator_doc._get_doc1(doc2_type='coordinator2')
   coordinator_doc.update_data(coordinator_data)
   coordinator_doc.name = coordinator_doc1.name = coordinator_data['name']
   coordinator_doc.description = coordinator_doc1.description = coordinator_data['properties']['description']
@@ -709,14 +708,13 @@ def submit_coordinator(request, doc_id):
     initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
     params_form = ParametersFormSet(initial=initial_params)
 
-  popup = render('editor2/submit_job_popup.mako', request, {
+    return render('editor2/submit_job_popup.mako', request, {
                  'params_form': params_form,
                  'name': coordinator.name,
                  'action': reverse('oozie:editor_submit_coordinator',  kwargs={'doc_id': coordinator.id}),
                  'show_dryrun': True,
                  'return_json': request.GET.get('format') == 'json'
-                }, force_template=True).content
-  return JsonResponse(popup, safe=False)
+                }, force_template=True)
 
 
 def _submit_coordinator(request, coordinator, mapping):
@@ -939,14 +937,13 @@ def submit_bundle(request, doc_id):
     initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
     params_form = ParametersFormSet(initial=initial_params)
 
-  popup = render('editor2/submit_job_popup.mako', request, {
+    return render('editor2/submit_job_popup.mako', request, {
                  'params_form': params_form,
                  'name': bundle.name,
                  'action': reverse('oozie:editor_submit_bundle',  kwargs={'doc_id': bundle.id}),
                  'return_json': request.GET.get('format') == 'json',
                  'show_dryrun': False
-                }, force_template=True).content
-  return JsonResponse(popup, safe=False)
+                }, force_template=True)
 
 
 def _submit_bundle(request, bundle, properties):

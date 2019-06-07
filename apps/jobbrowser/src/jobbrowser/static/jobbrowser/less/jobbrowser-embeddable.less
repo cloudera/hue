@@ -19,7 +19,7 @@
 
 .jobbrowser-mini {
   .span12.no-margin {
-    margin-left: 0!important;
+    margin-left: 0 !important;
   }
 }
 
@@ -36,7 +36,6 @@
     padding-right: 10px;
   }
 }
-
 .jobbrowser-components {
   .hue-uncheck::before {
     padding-left: 2px;
@@ -99,9 +98,7 @@
       font-weight: normal;
     }
     .metric {
-      position: absolute;
-      top: 0px;
-      right: 0px;
+      float: right;
     }
     .name {
       text-transform: capitalize;
@@ -174,7 +171,8 @@
     .buttons {
       position: absolute;
       background-color: white;
-      box-shadow: 0px 0px 5px 0px;
+      box-shadow: 0 0 5px 0;
+      width:32px;
       right: 45px;
       bottom: 5px;
       color: @cui-gray-600;
@@ -213,9 +211,6 @@
       fill: @cui-gray-800;
       font-size: inherit;
     }
-    foreignObject > div {
-      position: relative;
-    }
     .above-average {
       font-weight: bold;
     }
@@ -234,41 +229,49 @@
       fill: @cui-blue-400 !important;
       background-color: @cui-blue-400;
     }
+    .resizer {
+      top: 0px;
+      right: 200px;
+      visibility: hidden;
+    }
     .details {
       background-color: @cui-white;
-      box-shadow: 0px 0px 10px 0px;
+      box-shadow: 0 0 10px 0;
       color: @cui-gray-600;
       position: absolute;
-      top: 0px;
+      top: 0;
       right: -164px;
       width: 200px;
       height: 100%;
       flex-direction: column;
+      header {
+        white-space: nowrap;
+      }
       .divider {
         background-color: @cui-gray-300;
         width: calc(~"100% - 10px");
         margin-left: 5px;
-        padding: 0px;
+        padding: 0;
         height: 1px;
       }
       h3 {
         display: inline-block;
-        margin: 0px;
+        margin: 0;
       }
       h4 {
-        margin: 0px;
+        margin: 0;
         display: inline-block;
       }
       h5 {
-        margin: 0px;
+        margin: 0;
         display: inline-block;
       }
       ol {
         list-style-type: none;
-        margin: 0px;
+        margin: 0;
       }
       ul {
-        margin: 0px;
+        margin: 0;
       }
       .details-content {
         overflow: scroll;
@@ -285,7 +288,7 @@
         cursor: pointer;
         padding: 4px;
         .fa {
-          padding-top: 0px;
+          padding-top: 0;
           line-height: 40px;
           padding-right: 2px;
         }
@@ -311,7 +314,6 @@
         display: inline-block;
       }
       .metric-name {
-        display: inline-block;
         padding-left: 2px;
       }
       .details-section .timeline {
@@ -321,11 +323,13 @@
         cursor: pointer;
       }
       table.clickable tr:hover {
-        background-color: @cui-purple-gray-050;
+        background-color: @cui-purple-gray-050 !important;
+      }
+      table tr:nth-child(1) {
+        max-width: 107px;
       }
       table tr td {
         color: @cui-gray-800;
-        max-width: 107px;
         overflow: hidden;
         white-space: nowrap;
         padding-right: 5px;
@@ -334,7 +338,7 @@
       table thead tr:nth-child(odd) {
         background-color:@cui-white;
       }
-      table tr:nth-child(odd) {
+      table.ncolumn tr:nth-child(odd) {
         background-color: @cui-gray-050;
       }
       table.column {
@@ -363,8 +367,11 @@
     }
   }
   .query-plan.open {
+    .resizer {
+      visibility: visible;
+    }
     .details {
-      right: 0px;
+      right: 0;
       display: flex;
       .details-content {
         visibility: visible;
@@ -377,5 +384,15 @@
   div[data-jobType="queries"] pre {
     overflow-x: auto;
     white-space: pre;
+  }
+  .nav.nav-tabs.scrollable {
+    height: 50px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+  }
+  .nav.nav-tabs > li {
+    display: inline-block;
+    float: initial;
   }
 }

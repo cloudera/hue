@@ -77,7 +77,7 @@ var Node = function (node, vm) {
 
   var type = typeof node.widgetType != "undefined" ? node.widgetType : node.type;
 
-  self.id = ko.observable(typeof node.id != "undefined" && node.id != null ? node.id : UUID());
+  self.id = ko.observable(typeof node.id != "undefined" && node.id != null ? node.id : hueUtils.UUID());
   self.name = ko.observable(typeof node.name != "undefined" && node.name != null ? node.name : "");
   self.type = ko.observable(typeof type != "undefined" && type != null ? type : "");
 
@@ -188,7 +188,7 @@ var Workflow = function (vm, workflow) {
   var self = this;
 
   self.id = ko.observable(typeof workflow.id != "undefined" && workflow.id != null ? workflow.id : null);
-  self.uuid = ko.observable(typeof workflow.uuid != "undefined" && workflow.uuid != null ? workflow.uuid : UUID());
+  self.uuid = ko.observable(typeof workflow.uuid != "undefined" && workflow.uuid != null ? workflow.uuid : hueUtils.UUID());
   self.name = ko.observable(typeof workflow.name != "undefined" && workflow.name != null ? workflow.name : "");
 
   self.tracker = new ChangeTracker(self, ko, {
@@ -531,8 +531,8 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.availableComputes = ko.observableArray();
   self.compute = ko.observable();
 
-  ContextCatalog.getNamespaces({ sourceType: 'oozie' }).done(function (context) { self.availableNamespaces(context.namespaces) });
-  ContextCatalog.getComputes({ sourceType: 'oozie' }).done(self.availableComputes);
+  contextCatalog.getNamespaces({ sourceType: 'oozie' }).done(function (context) { self.availableNamespaces(context.namespaces) });
+  contextCatalog.getComputes({ sourceType: 'oozie' }).done(self.availableComputes);
 
 
   self.previewColumns = ko.observable("");
@@ -693,7 +693,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
       var _w = new ExtendedWidget({
         size: self.currentlyDraggedWidget().size(),
-        id: UUID(),
+        id: hueUtils.UUID(),
         name: self.currentlyDraggedWidget().name(),
         widgetType: self.currentlyDraggedWidget().widgetType(),
         properties: self.currentlyDraggedWidget().properties(),
@@ -727,7 +727,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
       if (_addForkAndJoin) {
         var _forkRow = _parentCol.addEmptyRow(false, _rowIdx);
-        var _id = UUID();
+        var _id = hueUtils.UUID();
         var _fork = new ExtendedWidget({
           size: 12,
           id: _id,
@@ -744,7 +744,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
       var _w = new ExtendedWidget({
         size: self.currentlyDraggedWidget().size(),
-        id: UUID(),
+        id: hueUtils.UUID(),
         name: self.currentlyDraggedWidget().name(),
         widgetType: self.currentlyDraggedWidget().widgetType(),
         properties: self.currentlyDraggedWidget().properties(),
@@ -783,7 +783,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
       if (_addForkAndJoin) {
         var _joinRow = _parentCol.addEmptyRow(false, _rowIdx + 2);
-        var _id = UUID();
+        var _id = hueUtils.UUID();
         var _join = new ExtendedWidget({
           size: 12,
           id: _id,
@@ -1204,13 +1204,8 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
           $(document).trigger("info", data.message);
           self.workflow.tracker().markCurrentStateAsClean();
           huePubSub.publish('assist.document.refresh');
-          if (window.location.search.indexOf("workflow") == -1 && !IS_HUE_4) {
-            window.location.hash = '#workflow=' + data.id;
-          } else if (IS_HUE_4) {
-            hueUtils.changeURL('/hue/oozie/editor/workflow/edit/?workflow=' + data.id);
-          }
-        }
-        else {
+          hueUtils.changeURL('/hue/oozie/editor/workflow/edit/?workflow=' + data.id);
+        } else {
           $(document).trigger("error", data.message);
         }
       }).fail(function (xhr, textStatus, errorThrown) {
@@ -1241,7 +1236,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.showSubmitPopup = function () {
     $(".jHueNotify").remove();
     $.get("/oozie/editor/workflow/submit/" + self.workflow.id(), {
-      format: IS_HUE_4 ? 'json' : 'html',
+      format: 'json',
       cluster: self.compute() ? ko.mapping.toJSON(self.compute()) : '{}'
     }, function (data) {
       $(document).trigger("showSubmitPopup", data);
@@ -1253,7 +1248,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.showSubmitActionPopup = function (w) {
     $(".jHueNotify").remove();
     $.get("/oozie/editor/workflow/submit_single_action/" + self.workflow.id() + "/" + self.workflow.getNodeById(w.id()).id(), {
-      format: IS_HUE_4 ? 'json' : 'html'
+      format: 'json'
     }, function (data) {
       $(document).trigger("showSubmitPopup", data);
     }).fail(function (xhr, textStatus, errorThrown) {
@@ -1263,12 +1258,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
   self.schedule = function () {
     hueAnalytics.log('oozie/editor/workflow', 'schedule');
-    if (IS_HUE_4) {
-      huePubSub.publish('open.link', '/oozie/editor/coordinator/new/?workflow=' + self.workflow.uuid());
-    }
-    else {
-      window.location.replace('/oozie/editor/coordinator/new/?workflow=' + self.workflow.uuid());
-    }
+    huePubSub.publish('open.link', '/oozie/editor/coordinator/new/?workflow=' + self.workflow.uuid());
   };
 
 

@@ -155,7 +155,7 @@ function RdbmsViewModel() {
   var error_fn = function(jqXHR, status, errorThrown) {
     self.isExecuting(false);
     try {
-      $(document).trigger('server.error', $.parseJSON(jqXHR.responseText));
+      $(document).trigger('server.error', JSON.parse(jqXHR.responseText));
     } catch(e) {
       $(document).trigger('server.unmanageable_error', jqXHR.responseText);
     }

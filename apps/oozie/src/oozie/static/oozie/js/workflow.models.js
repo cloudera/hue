@@ -50,7 +50,7 @@ function normalize_model_fields(node_model) {
 // Parse JSON if it is JSON and appropriately map.
 // Apply subscriber to each mapping.
 var map_params = function(options, subscribe) {
-  options.data = ($.type(options.data) == "string") ? $.parseJSON(options.data) : options.data;
+  options.data = ($.type(options.data) == "string") ? JSON.parse(options.data) : options.data;
   if ($.isArray(options.data)) {
     var mapping =  ko.mapping.fromJS(options.data);
     $.each(mapping(), function(index, value) {
@@ -72,7 +72,7 @@ var map_params = function(options, subscribe) {
 // Literals will notify their containing arrays when they've changed.
 var map_data = function(options) {
   var data = {};
-  options.data = ($.type(options.data) == "string") ? $.parseJSON(options.data) : options.data;
+  options.data = ($.type(options.data) == "string") ? JSON.parse(options.data) : options.data;
   $.each(options.data, function(member, value) {
     // @TODO: Should we support unstructureed data as children?
     if ($.isArray(value)) {
@@ -391,7 +391,7 @@ var ModelModule = function($) {
 function initializeWorkflowData() {
   var self = this;
 
-  self.data = ($.type(self.data) == "string") ? $.parseJSON(self.data) : self.data;
+  self.data = ($.type(self.data) == "string") ? JSON.parse(self.data) : self.data;
 
   if (! ('sla' in self.data)) {
     self.data['sla'] = DEFAULT_SLA.slice(0);
@@ -401,7 +401,7 @@ function initializeWorkflowData() {
 function initializeNodeData() {
   var self = this;
 
-  self.data = ($.type(self.data) == "string") ? $.parseJSON(self.data) : self.data;
+  self.data = ($.type(self.data) == "string") ? JSON.parse(self.data) : self.data;
 
   if (! ('sla' in self.data)) {
     self.data['sla'] = DEFAULT_SLA.slice(0);

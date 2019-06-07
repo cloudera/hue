@@ -89,7 +89,10 @@ def dt_login_old(request, from_modal=False):
 @login_notrequired
 @watch_login
 def dt_login(request, from_modal=False):
-  redirect_to = request.GET.get('next', '/')
+  if request.method == 'GET':
+    redirect_to = request.GET.get('next', '/')
+  else:
+    redirect_to = request.POST.get('next', '/')
   is_first_login_ever = first_login_ever()
   backend_names = auth_forms.get_backend_names()
   is_active_directory = auth_forms.is_active_directory()
@@ -168,6 +171,8 @@ def dt_login(request, from_modal=False):
         ensure_home_directory(request.fs, request.user)
       except (IOError, WebHdfsException), e:
         LOG.error('Could not create home directory for %s user %s.' % ('OIDC' if 'OIDCBackend' in backend_names else 'SAML', request.user))
+    if request.user.is_authenticated():
+      return HttpResponseRedirect(redirect_to)
 
   if is_active_directory and not is_ldap_option_selected and \
                   request.method == 'POST' and request.user.username != request.POST.get('username'):
@@ -188,7 +193,8 @@ def dt_login(request, from_modal=False):
     'first_login_ever': is_first_login_ever,
     'login_errors': request.method == 'POST',
     'backend_names': backend_names,
-    'active_directory': is_active_directory
+    'active_directory': is_active_directory,
+    'user': request.user
   })
 
   if not request.user.is_authenticated():

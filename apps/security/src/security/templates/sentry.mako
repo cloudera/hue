@@ -65,7 +65,7 @@ ${ layout.menubar(section=component, is_embeddable=is_embeddable) }
           <i class="fa fa-fw fa-1halfx muted" data-bind="css: {'fa-circle-o': privilegeType() != 'DATABASE', 'fa-check-circle-o': privilegeType() == 'DATABASE'}"></i>
         </a>
       </div>
-      <input type="text" data-bind="hivechooser: $data.path, enable: privilegeType() == 'DATABASE', apiHelperUser: '${ user }', apiHelperType: 'hive'" placeholder="dbName.tableName <CTRL+SPACE>">
+      <input type="text" data-bind="hiveChooser: $data.path, enable: privilegeType() == 'DATABASE', apiHelperUser: '${ user }', apiHelperType: 'hive'" placeholder="dbName.tableName <CTRL+SPACE>">
 
       <div class="inline-block" style="vertical-align: middle">
         <a class="pointer" style="padding-top: 4px" data-bind="click: function(){ privilegeType('URI'); action('ALL'); }">
@@ -79,7 +79,7 @@ ${ layout.menubar(section=component, is_embeddable=is_embeddable) }
     <!-- /ko -->
 
     <!-- ko if: $root.component() == 'solr' -->
-      <input type="text" class="input-xxlarge" data-bind="solrchooser: $data.path" placeholder="collection or config name <CTRL+SPACE>">
+      <input type="text" class="input-xxlarge" data-bind="solrChooser: $data.path" placeholder="collection or config name <CTRL+SPACE>">
       <select data-bind="options: privilegeType() == 'CONFIG' ? $root.availableSolrConfigActions : $root.availableActions(authorizables()), value: $data.action, enable: privilegeType() != 'CONFIG'" style="width: 100px; margin-bottom: 0"></select>
     <!-- /ko -->
 
@@ -606,7 +606,6 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
 
 <script src="${ static('security/js/sentry.ko.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/jquery.filechooser.js') }" type="text/javascript" charset="utf-8"></script>
 
 
 <script type="text/javascript">

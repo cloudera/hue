@@ -33,7 +33,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 
-from metadata.conf import has_navigator
+from metadata.conf import has_catalog
 from metadata.catalog_api import search_entities as metadata_search_entities, _highlight, search_entities_interactive as metadata_search_entities_interactive
 from notebook.connectors.altus import SdxApi, AnalyticDbApi, DataEngApi, DataWarehouse2Api
 from notebook.connectors.base import Notebook
@@ -140,15 +140,14 @@ def get_context_computes(request, interface):
   clusters = get_clusters(request.user).values()
   has_altus_clusters = [cluster for cluster in clusters if 'altus' in cluster['type']]
 
-  if interface == 'hive' or interface == 'impala' or interface == 'oozie' or interface == 'report':
-    computes.extend([{
-        'id': cluster['id'],
-        'name': cluster['name'],
-        'namespace': cluster['id'],
-        'interface': interface,
-        'type': cluster['type']
-      } for cluster in clusters if cluster.get('type') == 'direct' and cluster['interface'] in (interface, 'all')
-    ])
+  computes.extend([{
+      'id': cluster['id'],
+      'name': cluster['name'],
+      'namespace': cluster['id'],
+      'interface': interface,
+      'type': cluster['type']
+    } for cluster in clusters if cluster.get('type') == 'direct' and cluster['interface'] in (interface, 'all')
+  ])
 
   if has_altus_clusters:
     if interface == 'impala' or interface == 'report':
@@ -837,7 +836,7 @@ def search_entities(request):
 
     return JsonResponse(response)
   else:
-    if has_navigator(request.user):
+    if has_catalog(request.user):
       return metadata_search_entities(request)
     else:
       return JsonResponse({'status': 1, 'message': _('Navigator not enabled')})
@@ -868,7 +867,7 @@ def search_entities_interactive(request):
 
     return JsonResponse(response)
   else:
-    if has_navigator(request.user):
+    if has_catalog(request.user):
       return metadata_search_entities_interactive(request)
     else:
       return JsonResponse({'status': 1, 'message': _('Navigator not enabled')})

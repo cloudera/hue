@@ -51,6 +51,7 @@ class TestHiveserver2Api(object):
 
     add_to_group('test')
     grant_access("test", "test", "notebook")
+    grant_access("test", "test", "hive")
 
     self.db = dbms.get(self.user, get_query_server_config())
     self.api = HS2Api(self.user)
@@ -281,7 +282,7 @@ class TestHiveserver2Api(object):
         INFO  : The url to track the job: http://jennykim-1.vpc.cloudera.com:8088/proxy/application_1466104358744_0003/
     """
 
-    assert_equal(self.api.progress(snippet, logs), 5)
+    assert_equal(self.api.progress({}, snippet, logs=logs), 5)
 
     logs += """INFO  : Starting Job = job_1466104358744_0003, Tracking URL = http://jennykim-1.vpc.cloudera.com:8088/proxy/application_1466104358744_0003/
         INFO  : Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1466104358744_0003
@@ -293,7 +294,7 @@ class TestHiveserver2Api(object):
         INFO  : Ended Job = job_1466104358744_0003
     """
 
-    assert_equal(self.api.progress(snippet, logs), 50)
+    assert_equal(self.api.progress({}, snippet, logs=logs), 50)
 
     snippet = json.loads("""
         {
@@ -322,7 +323,7 @@ class TestHiveserver2Api(object):
 
     logs = "Query 734a81444c85be66:d05f3bb1a6c2d0a5: 0% Complete (1 out of 4693)"
 
-    assert_equal(self.api.progress(snippet, logs), 0)
+    assert_equal(self.api.progress({}, snippet, logs=logs), 0)
 
     logs += """Query 734a81444c85be66:d05f3bb1a6c2d0a5: 20% Complete (4 out of 4693)
 
@@ -333,7 +334,7 @@ class TestHiveserver2Api(object):
     Query 734a81444c85be66:d05f3bb1a6c2d0a5: 50% Complete (234 out of 4693)
     """
 
-    assert_equal(self.api.progress(snippet, logs), 50)
+    assert_equal(self.api.progress({}, snippet, logs=logs), 50)
 
 
   def test_get_jobs(self):
@@ -476,6 +477,7 @@ def MockDb():
 
 
 class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
+  integration = True
 
   @classmethod
   def setup_class(cls):
@@ -878,10 +880,10 @@ IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE_PLAN = """Query (id=e147228183f1f0b3:6f086c
     Impala Version: impalad version 2.11.0-SNAPSHOT RELEASE (build e9a30f67655a8da5b8526507fbe853adbd184932)
     User: romain
     Connected User: romain
-    Delegated User: 
+    Delegated User:
     Network Address: 172.21.3.229:60523
     Default Db: default
-    Sql Statement: 
+    Sql Statement:
 
 
 
@@ -898,7 +900,7 @@ FROM
     Coordinator: self-service-analytics-2.gce.cloudera.com:22000
     Query Options (set by configuration): QUERY_TIMEOUT_S=600
     Query Options (set by configuration and planner): QUERY_TIMEOUT_S=600,MT_DOP=0
-    Plan: 
+    Plan:
 ----------------
 Max Per-Host Resource Reservation: Memory=0B
 Per-Host Resource Estimates: Memory=42.00MB
@@ -972,24 +974,24 @@ Per-Host Resources: mem-estimate=42.00MB mem-reservation=0B
     Estimated Per-Host Mem: 44040259
     Tables Missing Stats: default.customers
     Tables With Corrupt Table Stats: default.customers
-    Per Host Min Reservation: self-service-analytics-2.gce.cloudera.com:22000(0) 
+    Per Host Min Reservation: self-service-analytics-2.gce.cloudera.com:22000(0)
     Request Pool: root.romain
     Admission result: Admitted immediately
-    ExecSummary: 
-Operator                       #Hosts  Avg Time  Max Time  #Rows  Est. #Rows   Peak Mem  Est. Peak Mem  Detail              
+    ExecSummary:
+Operator                       #Hosts  Avg Time  Max Time  #Rows  Est. #Rows   Peak Mem  Est. Peak Mem  Detail
 ----------------------------------------------------------------------------------------------------------------------------
-10:EXCHANGE                         1  62.005ms  62.005ms    106           0          0              0  UNPARTITIONED       
-01:SUBPLAN                          1   0.000ns   0.000ns      0           0  140.00 KB              0                      
-|--09:NESTED LOOP JOIN              1   0.000ns   0.000ns  5.67K          10   32.00 KB        35.00 B  CROSS JOIN          
-|  |--02:SINGULAR ROW SRC           1   0.000ns   0.000ns      0           1          0              0                      
-|  04:SUBPLAN                       1   0.000ns   0.000ns      0          10    8.00 KB              0                      
-|  |--08:NESTED LOOP JOIN           1   0.000ns   0.000ns    160           1   24.00 KB        32.00 B  CROSS JOIN          
-|  |  |--05:SINGULAR ROW SRC        1   0.000ns   0.000ns      0           1          0              0                      
-|  |  07:AGGREGATE                  1   0.000ns   0.000ns      1           1   16.00 KB       10.00 MB  FINALIZE            
-|  |  06:UNNEST                     1   0.000ns   0.000ns      2          10          0              0  o.items             
-|  03:UNNEST                        1   0.000ns   0.000ns      2          10          0              0  c.orders o          
-00:SCAN HDFS                        1  39.003ms  39.003ms     53           0  417.04 KB       32.00 MB  default.customers c 
-    Errors: 
+10:EXCHANGE                         1  62.005ms  62.005ms    106           0          0              0  UNPARTITIONED
+01:SUBPLAN                          1   0.000ns   0.000ns      0           0  140.00 KB              0
+|--09:NESTED LOOP JOIN              1   0.000ns   0.000ns  5.67K          10   32.00 KB        35.00 B  CROSS JOIN
+|  |--02:SINGULAR ROW SRC           1   0.000ns   0.000ns      0           1          0              0
+|  04:SUBPLAN                       1   0.000ns   0.000ns      0          10    8.00 KB              0
+|  |--08:NESTED LOOP JOIN           1   0.000ns   0.000ns    160           1   24.00 KB        32.00 B  CROSS JOIN
+|  |  |--05:SINGULAR ROW SRC        1   0.000ns   0.000ns      0           1          0              0
+|  |  07:AGGREGATE                  1   0.000ns   0.000ns      1           1   16.00 KB       10.00 MB  FINALIZE
+|  |  06:UNNEST                     1   0.000ns   0.000ns      2          10          0              0  o.items
+|  03:UNNEST                        1   0.000ns   0.000ns      2          10          0              0  c.orders o
+00:SCAN HDFS                        1  39.003ms  39.003ms     53           0  417.04 KB       32.00 MB  default.customers c
+    Errors:
     Planner Timeline: 36.379ms
        - Analysis finished: 13.156ms (13.156ms)
        - Equivalence classes computed: 13.775ms (619.949us)
@@ -1017,12 +1019,12 @@ Operator                       #Hosts  Avg Time  Max Time  #Rows  Est. #Rows   P
 IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE = IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE_PLAN + \
   """:(Total: 79.006ms, non-child: 0.000ns, % non-child: 0.00%)
     Number of filters: 0
-    Filter routing table: 
+    Filter routing table:
  ID  Src. Node  Tgt. Node(s)  Target type  Partition filter  Pending (Expected)  First arrived  Completed   Enabled
 -------------------------------------------------------------------------------------------------------------------
 
     Backend startup latencies: Count: 1, min / max: 1ms / 1ms, 25th %-ile: 1ms, 50th %-ile: 1ms, 75th %-ile: 1ms, 90th %-ile: 1ms, 95th %-ile: 1ms, 99.9th %-ile: 1ms
-    Per Node Peak Memory Usage: self-service-analytics-2.gce.cloudera.com:22000(530.52 KB) 
+    Per Node Peak Memory Usage: self-service-analytics-2.gce.cloudera.com:22000(530.52 KB)
      - FiltersReceived: 0 (0)
      - FinalizationTimer: 0.000ns
     Averaged Fragment F01:(Total: 76.006ms, non-child: 1.000ms, % non-child: 1.32%)
@@ -1030,7 +1032,7 @@ IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE = IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE_PLAN
       completion times: min:2m59s  max:2m59s  mean: 2m59s  stddev:0.000ns
       execution rates: min:0.00 /sec  max:0.00 /sec  mean:0.00 /sec  stddev:0.00 /sec
       num instances: 1
-       - AverageThreadTokens: 0.00 
+       - AverageThreadTokens: 0.00
        - BloomFilterBytes: 0
        - PeakMemoryUsage: 34.12 KB (34939)
        - PeakReservation: 0
@@ -1079,7 +1081,7 @@ IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE = IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE_PLAN
     Coordinator Fragment F01:
       Instance e147228183f1f0b3:6f086cc600000000 (host=self-service-analytics-2.gce.cloudera.com:22000):(Total: 76.006ms, non-child: 1.000ms, % non-child: 1.32%)
         MemoryUsage(4s000ms): 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB, 31.64 KB
-         - AverageThreadTokens: 0.00 
+         - AverageThreadTokens: 0.00
          - BloomFilterBytes: 0
          - PeakMemoryUsage: 34.12 KB (34939)
          - PeakReservation: 0
@@ -1131,7 +1133,7 @@ IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE = IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE_PLAN
       completion times: min:78.006ms  max:78.006ms  mean: 78.006ms  stddev:0.000ns
       execution rates: min:197.95 KB/sec  max:197.95 KB/sec  mean:197.95 KB/sec  stddev:0.00 /sec
       num instances: 1
-       - AverageThreadTokens: 0.00 
+       - AverageThreadTokens: 0.00
        - BloomFilterBytes: 0
        - PeakMemoryUsage: 506.52 KB (518677)
        - PeakReservation: 0
@@ -1223,7 +1225,7 @@ IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE = IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE_PLAN
              - RowsReturnedRate: 0
              - SpilledPartitions: 0 (0)
           UNNEST_NODE (id=6):
-             - AvgCollectionSize: 1.50 
+             - AvgCollectionSize: 1.50
              - MaxCollectionSize: 3 (3)
              - MinCollectionSize: 1 (1)
              - NumCollections: 106 (106)
@@ -1231,7 +1233,7 @@ IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE = IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE_PLAN
              - RowsReturned: 2 (2)
              - RowsReturnedRate: 0
         UNNEST_NODE (id=3):
-           - AvgCollectionSize: 2.00 
+           - AvgCollectionSize: 2.00
            - MaxCollectionSize: 3 (3)
            - MinCollectionSize: 1 (1)
            - NumCollections: 53 (53)
@@ -1239,8 +1241,8 @@ IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE = IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE_PLAN
            - RowsReturned: 2 (2)
            - RowsReturnedRate: 0
       HDFS_SCAN_NODE (id=0):(Total: 39.003ms, non-child: 39.003ms, % non-child: 100.00%)
-         - AverageHdfsReadThreadConcurrency: 0.00 
-         - AverageScannerThreadConcurrency: 0.00 
+         - AverageHdfsReadThreadConcurrency: 0.00
+         - AverageScannerThreadConcurrency: 0.00
          - BytesRead: 19.30 KB (19766)
          - BytesReadDataNodeCache: 0
          - BytesReadLocal: 19.30 KB (19766)
@@ -1277,8 +1279,8 @@ IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE = IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE_PLAN
          - TotalReadThroughput: 0.00 /sec
     Fragment F00:
       Instance e147228183f1f0b3:6f086cc600000001 (host=self-service-analytics-2.gce.cloudera.com:22000):(Total: 76.006ms, non-child: 1.000ms, % non-child: 1.32%)
-        Hdfs split stats (<volume id>:<# splits>/<split lengths>): 0:1/15.44 KB 
-         - AverageThreadTokens: 0.00 
+        Hdfs split stats (<volume id>:<# splits>/<split lengths>): 0:1/15.44 KB
+         - AverageThreadTokens: 0.00
          - BloomFilterBytes: 0
          - PeakMemoryUsage: 506.52 KB (518677)
          - PeakReservation: 0
@@ -1371,7 +1373,7 @@ IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE = IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE_PLAN
                - RowsReturnedRate: 0
                - SpilledPartitions: 0 (0)
             UNNEST_NODE (id=6):
-               - AvgCollectionSize: 1.50 
+               - AvgCollectionSize: 1.50
                - MaxCollectionSize: 3 (3)
                - MinCollectionSize: 1 (1)
                - NumCollections: 106 (106)
@@ -1379,7 +1381,7 @@ IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE = IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE_PLAN
                - RowsReturned: 2 (2)
                - RowsReturnedRate: 0
           UNNEST_NODE (id=3):
-             - AvgCollectionSize: 2.00 
+             - AvgCollectionSize: 2.00
              - MaxCollectionSize: 3 (3)
              - MinCollectionSize: 1 (1)
              - NumCollections: 53 (53)
@@ -1387,13 +1389,13 @@ IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE = IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE_PLAN
              - RowsReturned: 2 (2)
              - RowsReturnedRate: 0
         HDFS_SCAN_NODE (id=0):(Total: 39.003ms, non-child: 39.003ms, % non-child: 100.00%)
-          Hdfs split stats (<volume id>:<# splits>/<split lengths>): 0:1/15.44 KB 
+          Hdfs split stats (<volume id>:<# splits>/<split lengths>): 0:1/15.44 KB
           ExecOption: PARQUET Codegen Enabled, Codegen enabled: 1 out of 1
-          Hdfs Read Thread Concurrency Bucket: 0:0% 1:0% 2:0% 3:0% 4:0% 
-          File Formats: PARQUET/NONE:5 
+          Hdfs Read Thread Concurrency Bucket: 0:0% 1:0% 2:0% 3:0% 4:0%
+          File Formats: PARQUET/NONE:5
            - FooterProcessingTime: (Avg: 38.003ms ; Min: 38.003ms ; Max: 38.003ms ; Number of samples: 1)
-           - AverageHdfsReadThreadConcurrency: 0.00 
-           - AverageScannerThreadConcurrency: 0.00 
+           - AverageHdfsReadThreadConcurrency: 0.00
+           - AverageScannerThreadConcurrency: 0.00
            - BytesRead: 19.30 KB (19766)
            - BytesReadDataNodeCache: 0
            - BytesReadLocal: 19.30 KB (19766)
