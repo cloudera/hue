@@ -16,7 +16,11 @@ hue:
     [[[mysql]]]
       name = MySQL
       interface=sqlalchemy
-      options='{"url": "mysql://hue:datasshue@10.1.1.1:3306/hue"}'
+      options='{"url": "mysql://hue:datasshue@romain:3306/hue"}'
+    [[[postgresql]]]
+      name = postgresql
+      interface=sqlalchemy
+      options='{"url": "postgresql://hue:hue@hue-postgres:30445/hue"}'
   ini: |
     [desktop]
     app_blacklist=filebrowser,search,hbase,security,jobbrowser,metastore
@@ -42,6 +46,8 @@ balancer:
 workers:
   enabled: true
   replicas: 1
+scheduler:
+  enabled: true
 aws:
   accessKeyId: ""
   secretAccessKey: ""
