@@ -17,8 +17,8 @@ spec:
     spec:
       containers:
         - name: celery-beat
-          image: {{ .Values.registry }}/hue:{{ .Values.tag }}
-          imagePullPolicy: Always
+          image: {{ .Values.image.registry }}/hue:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ['./build/env/bin/celery', 'beat', '-A', 'desktop', '-l', 'info']
           volumeMounts:
           - name: config-volume

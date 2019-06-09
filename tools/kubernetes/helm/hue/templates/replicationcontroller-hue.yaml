@@ -11,8 +11,8 @@ spec:
     spec:
       containers:
         - name: hue
-          image: {{ .Values.registry }}/hue:{{ .Values.tag }}
-          imagePullPolicy: Always
+          image: {{ .Values.image.registry }}/hue:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: 8888
           volumeMounts:
