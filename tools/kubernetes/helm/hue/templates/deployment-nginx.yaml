@@ -55,7 +55,8 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: {{ .Values.registry }}/nginx:{{ .Values.tag }}
+        image: {{ .Values.image.registry }}/nginx:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: 80
         volumeMounts:
