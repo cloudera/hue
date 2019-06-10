@@ -16,12 +16,16 @@
 # limitations under the License.
 """Utilities for views (text and number formatting, etc)"""
 
-import math
 import datetime
+import logging
+import math
 
 from django.urls import reverse
 
 from hadoop.fs.hadoopfs import Hdfs
+
+
+LOG = logging.getLogger(__name__)
 
 
 def big_filesizeformat(bytes):
@@ -103,7 +107,13 @@ def location_to_url(location, strict=True, is_embeddable=False):
     if split_path[0] == 'hdfs':
       path = split_path[2]
 
-    filebrowser_path = reverse("filebrowser.views.view", kwargs=dict(path=path))
+    try:
+      filebrowser_path = reverse("filebrowser.views.view", kwargs=dict(path=path))
+    except Exception as e:
+      LOG.warn('No table filesystem link: %s' % e)
+      return None
+
     if is_embeddable and not filebrowser_path.startswith('/hue'):
         filebrowser_path = '/hue' + filebrowser_path
+
     return filebrowser_path

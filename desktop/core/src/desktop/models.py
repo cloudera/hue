@@ -49,7 +49,7 @@ from desktop import appmanager
 from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_EMBEDDED, IS_K8S_ONLY
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.paths import get_run_root
+from desktop.lib.paths import get_run_root, SAFE_CHARACTERS_URI_COMPONENTS
 from desktop.redaction import global_redaction_engine
 from desktop.settings import DOCUMENT2_SEARCH_MAX_LENGTH
 from desktop.auth.backend import is_admin
@@ -1768,7 +1768,7 @@ class ClusterConfig():
         'displayName': _('Files'),
         'buttonName': _('Browse'),
         'tooltip': _('Files'),
-        'page': '/filebrowser/' + (not self.user.is_anonymous() and 'view=' + self.user.get_home_directory() or '')
+        'page': '/filebrowser/' + (not self.user.is_anonymous() and 'view=' + urllib.quote(self.user.get_home_directory().encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) or '')
       })
 
     if is_s3_enabled() and 'filebrowser' in self.apps and has_s3_access(self.user) and not IS_EMBEDDED.get():
@@ -1777,7 +1777,7 @@ class ClusterConfig():
         'displayName': _('S3'),
         'buttonName': _('Browse'),
         'tooltip': _('S3'),
-        'page': '/filebrowser/view=S3A://'
+        'page': '/filebrowser/view=' + urllib.quote('S3A://'.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
       })
 
     if is_adls_enabled() and 'filebrowser' in self.apps and has_adls_access(self.user) and ANALYTIC_DB not in self.cluster_type:
@@ -1786,7 +1786,7 @@ class ClusterConfig():
         'displayName': _('ADLS'),
         'buttonName': _('Browse'),
         'tooltip': _('ADLS'),
-        'page': '/filebrowser/view=adl:/'
+        'page': '/filebrowser/view=' + urllib.quote('adl:/'.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
       })
 
     if 'metastore' in self.apps:

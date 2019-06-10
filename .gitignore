@@ -112,3 +112,6 @@ junitresults*
 
 # Generated js bundles
 desktop/core/src/desktop/static/desktop/js/bundles/
+
+# Hugo generated files
+docs/docs-site/public/

@@ -124,7 +124,6 @@ def search_entities_interactive(request):
   return JsonResponse(response)
 
 
-#  Not used currently.
 @error_handler
 def search_entities(request):
   """

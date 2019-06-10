@@ -275,7 +275,7 @@ Plugin.prototype.navigateTo = function(path) {
   if (path.indexOf('?') > -1) {
     pageSize = pageSize.replace(/\?/, '&');
   }
-  $.getJSON('/filebrowser/view=' + path + pageSize, data => {
+  $.getJSON('/filebrowser/view=' + encodeURIComponent(path) + pageSize, data => {
     $(_parent.element)
       .find('.filechooser-tree')
       .empty();

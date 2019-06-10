@@ -16,6 +16,8 @@
 ## limitations under the License.
 
 <%!
+  import urllib
+  from desktop.lib.paths import SAFE_CHARACTERS_URI_COMPONENTS
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
 
@@ -108,7 +110,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
                % endif
             "
               id="rerun-btn"
-              data-rerun-url="${ url('oozie:rerun_oozie_bundle', job_id=oozie_bundle.id, app_path=oozie_bundle.bundleJobPath) }"
+              data-rerun-url="${ url('oozie:rerun_oozie_bundle', job_id=oozie_bundle.id, app_path=urllib.quote(oozie_bundle.bundleJobPath.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)) }"
             style="margin-bottom: 5px">
               ${ _('Rerun') }
             </button>

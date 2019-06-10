@@ -162,7 +162,7 @@ except ImportError, e:
 
 <%def name="downloadSnippetResults()">
   <script type="text/html" id="download-results-template">
-    <form method="POST" action="${ url('notebook:download') }" class="download-form" style="display: inline">
+    <form method="POST" class="download-form" style="display: inline" data-bind="attr: { action: window.HUE_BASE_URL + '${ url('notebook:download') }' }">
       ${ csrf_token(request) | n,unicode }
       <input type="hidden" name="notebook"/>
       <input type="hidden" name="snippet"/>

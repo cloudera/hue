@@ -69,7 +69,7 @@ def search(request):
         response = get_engine(request.user, collection, facet, cluster=cluster).query(collection, query, facet)
     except RestException, e:
       response.update(extract_solr_exception_message(e))
-    except Exception, e:
+    except Exception as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
       response['error'] = force_unicode(e)
@@ -99,7 +99,7 @@ def query_suggest(request):
     response = SolrApi(SOLR_URL.get(), request.user).suggest(collection['name'], solr_query)
     result['response'] = response
     result['status'] = 0
-  except Exception, e:
+  except Exception as e:
     result['message'] = force_unicode(e)
 
   return JsonResponse(result)
@@ -125,14 +125,14 @@ def index_fields_dynamic(request):
         for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties
     ]
     result['status'] = 0
-  except Exception, e:
+  except Exception as e:
     result['message'] = force_unicode(e)
 
   return JsonResponse(result)
 
 
 def nested_documents(request):
-  result = {'status': -1, 'message': 'Error'}
+  result = {'status': -1, 'message': 'Ok'}
 
   response = {}
 
@@ -143,7 +143,7 @@ def nested_documents(request):
     response = get_engine(request.user, collection).query(collection, query)
     result['has_nested_documents'] = response['response']['numFound'] > 0
     result['status'] = 0
-  except Exception, e:
+  except Exception as e:
     LOG.exception('Failed to list nested documents')
     result['message'] = force_unicode(e)
     result['has_nested_documents'] = False
@@ -171,7 +171,7 @@ def get_document(request):
       result['message'] = _('This document does not have any index id.')
       result['status'] = 1
 
-  except Exception, e:
+  except Exception as e:
     result['message'] = force_unicode(e)
 
   return JsonResponse(result)
@@ -208,13 +208,13 @@ def update_document(request):
     else:
       result['status'] = 0
       result['message'] = _('Document has no modifications to change.')
-  except RestException, e:
+  except RestException as e:
     try:
       result['message'] = json.loads(e.message)['error']['msg']
     except:
       LOG.exception('Failed to parse json response')
       result['message'] = force_unicode(e)
-  except Exception, e:
+  except Exception as e:
     result['message'] = force_unicode(e)
 
   return JsonResponse(result)
@@ -236,7 +236,7 @@ def get_stats(request):
     result['status'] = 0
     result['message'] = ''
 
-  except Exception, e:
+  except Exception as e:
     LOG.exception('Failed to get stats for field')
     result['message'] = force_unicode(e)
     if 'not currently supported' in result['message']:
@@ -275,7 +275,7 @@ def get_terms(request):
     result['status'] = 0
     result['message'] = ''
 
-  except Exception, e:
+  except Exception as e:
     result['message'] = force_unicode(e)
     if 'not currently supported' in result['message']:
       result['status'] = 1
@@ -311,7 +311,7 @@ def download(request):
       return resp
     else:
       return export_download(response, file_format, collection, user_agent=request.META.get('HTTP_USER_AGENT'))
-  except Exception, e:
+  except Exception as e:
     raise PopupException(_("Could not download search results: %s") % e)
 
 
@@ -356,7 +356,7 @@ def get_timeline(request):
     result['series'] = {'label': label, 'counts': response['normalized_facets'][0]['counts']}
     result['status'] = 0
     result['message'] = ''
-  except Exception, e:
+  except Exception as e:
     result['message'] = force_unicode(e)
 
   return JsonResponse(result)
@@ -379,7 +379,7 @@ def new_facet(request):
     result['message'] = ''
     result['facet'] = _create_facet(collection, request.user, facet_id, facet_label, facet_field, widget_type, window_size)
     result['status'] = 0
-  except Exception, e:
+  except Exception as e:
     result['message'] = force_unicode(e)
 
   return JsonResponse(result)
@@ -564,7 +564,7 @@ def get_range_facet(request):
     result['properties'] = properties
     result['status'] = 0
 
-  except Exception, e:
+  except Exception as e:
     result['message'] = force_unicode(e)
 
   return JsonResponse(result)
@@ -584,7 +584,7 @@ def get_collection(request):
     result['collection'] = json.loads(collection_json)
     result['status'] = 0
 
-  except Exception, e:
+  except Exception as e:
     result['message'] = force_unicode(e)
 
   return JsonResponse(result)
@@ -600,7 +600,7 @@ def get_collections(request):
     result['collection'] = get_engine(request.user, collection).datasets(show_all=show_all)
     result['status'] = 0
 
-  except Exception, e:
+  except Exception as e:
     if 'does not have privileges' in str(e):
       result['status'] = 0
       result['collection'] = [json.loads(request.POST.get('collection'))['name']]

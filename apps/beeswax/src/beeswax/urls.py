@@ -67,12 +67,12 @@ urlpatterns += [
   url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)/(?P<column>\w+)/?$', beeswax_api.autocomplete, name='api_autocomplete_column'),
   url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)/(?P<column>\w+)/(?P<nested>.+)/?$', beeswax_api.autocomplete, name='api_autocomplete_nested'),
 
-  url(r'^api/design/(?P<design_id>\d+)?$', beeswax_api.save_query_design, name='api_save_design'),
+  url(r'^api/design(?:/(?P<design_id>\d+))?/?$', beeswax_api.save_query_design, name='api_save_design'),
   url(r'^api/design/(?P<design_id>\d+)/get$', beeswax_api.fetch_saved_design, name='api_fetch_saved_design'),
 
   url(r'^api/query/(?P<query_history_id>\d+)/get$', beeswax_api.fetch_query_history, name='api_fetch_query_history'),
   url(r'^api/query/parameters$', beeswax_api.parameters, name='api_parameters'),
-  url(r'^api/query/execute/(?P<design_id>\d+)?$', beeswax_api.execute, name='api_execute'),
+  url(r'^api/query/execute(?:/(?P<design_id>\d+))?/?$', beeswax_api.execute, name='api_execute'),
   url(r'^api/query/(?P<query_history_id>\d+)/cancel/?$', beeswax_api.cancel_query, name='api_cancel_query'),
   url(r'^api/query/(?P<query_history_id>\d+)/close/?$', beeswax_api.close_operation, name='api_close_operation'),
   url(r'^api/query/(?P<query_history_id>\d+)/results/save/hive/table/?$', beeswax_api.save_results_hive_table, name='api_save_results_hive_table'),
@@ -86,8 +86,8 @@ urlpatterns += [
   url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/indexes/?$', beeswax_api.get_indexes, name='get_indexes'),
   url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/sample/?$', beeswax_api.get_sample_data, name='get_sample_data'),
   url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/(?P<column>\w+)/sample/?$', beeswax_api.get_sample_data, name='get_sample_data_column'),
-  url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/stats/(?P<column>\w+)?$', beeswax_api.get_table_stats, name='get_table_stats'),
-  url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/terms/(?P<column>\w+)/(?P<prefix>\w+)?$', beeswax_api.get_top_terms, name='get_top_terms'),
+  url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/stats(?:/(?P<column>\w+))?/?$', beeswax_api.get_table_stats, name='get_table_stats'),
+  url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/terms/(?P<column>\w+)(?:/(?P<prefix>\w+))?/?$', beeswax_api.get_top_terms, name='get_top_terms'),
 
-  url(r'^api/analyze/(?P<database>\w+)/(?P<table>\w+)/(?P<columns>\w+)?$', beeswax_api.analyze_table, name='analyze_table'),
+  url(r'^api/analyze/(?P<database>\w+)/(?P<table>\w+)(?:/(?P<columns>\w+))?/?$', beeswax_api.analyze_table, name='analyze_table'),
 ]

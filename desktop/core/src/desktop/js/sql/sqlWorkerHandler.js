@@ -77,7 +77,7 @@ export default {
 
       // For syntax checking
       const aceSqlSyntaxWorker = new Worker(
-        '/desktop/workers/aceSqlSyntaxWorker.js?v=' + window.HUE_VERSION
+        window.HUE_BASE_URL + '/desktop/workers/aceSqlSyntaxWorker.js?v=' + window.HUE_VERSION
       );
       aceSqlSyntaxWorker.onmessage = function(e) {
         if (e.data.ping) {
@@ -93,7 +93,7 @@ export default {
 
       // For location marking
       const aceSqlLocationWorker = new Worker(
-        '/desktop/workers/aceSqlLocationWorker.js?v=' + window.HUE_VERSION
+          window.HUE_BASE_URL + '/desktop/workers/aceSqlLocationWorker.js?v=' + window.HUE_VERSION
       );
       aceSqlLocationWorker.onmessage = function(e) {
         if (e.data.ping) {

@@ -20,14 +20,13 @@ import json
 import logging
 import re
 
-from django.core.cache import cache
 from django.utils.translation import ugettext as _
 
 from desktop.lib.rest import resource
 from desktop.lib.rest.unsecure_http_client import UnsecureHttpClient
 from desktop.lib.rest.http_client import RestException
 
-from metadata.conf import CATALOG, get_catalog_auth_password
+from metadata.conf import CATALOG, get_catalog_auth_password, get_catalog_search_cluster
 from metadata.catalog.base import CatalogAuthException, CatalogApiException, CatalogEntityDoesNotExistException, Api
 
 LOG = logging.getLogger(__name__)
@@ -54,6 +53,10 @@ class AtlasApi(Api):
     'hive_db': 'DATABASE',
     'hive_column': 'FIELD'
   }
+
+  CLASSIFICATION_RE = re.compile('(?:tag|tags|classification)\s*\:\s*(?:(?:\"([^"]+)\")|([^ ]+))\s*', re.IGNORECASE)
+  TYPE_RE = re.compile('type\s*\:\s*([^ ]+)\s*', re.IGNORECASE)
+  OWNER_RE = re.compile('owner\s*\:\s*([^ ]+)\s*', re.IGNORECASE)
 
   def __init__(self, user=None):
     super(AtlasApi, self).__init__(user)
@@ -101,7 +104,7 @@ class AtlasApi(Api):
       "original_name": atlas_entity['attributes'].get('name'),
       "originalDescription": None,
       "originalName": atlas_entity['attributes'].get('name'),
-      "owner": atlas_entity.get('owner'),
+      "owner": atlas_entity['attributes'].get('owner'),
       "parentPath": '', # Set below
       "properties": {}, # Set below
       "sourceType": '', # Set below
@@ -124,7 +127,7 @@ class AtlasApi(Api):
 
     return nav_entity
 
-  def parse_atlas_response(self, atlas_response):
+  def fetch_single_entity(self, dsl_query):
     '''
     REQUEST: hue:8889/metadata/api/navigator/find_entity?type=database&name=default
     SAMPLE response for Navigator find_entity response
@@ -155,59 +158,51 @@ class AtlasApi(Api):
       "status": 0,
       "entity": []
     }
-    if not atlas_response['entities']:
-      LOG.error('No entities in atlas response to parse: %s' % json.dumps(atlas_response))
-    for atlas_entity in atlas_response['entities']:
-      response['entity'].append(self.adapt_atlas_entity_to_navigator(atlas_entity))
-    return response['entity'][0]
+
+    try :
+      atlas_response = self._root.get('/v2/search/dsl?query=%s' % dsl_query, headers=self.__headers,
+                                      params=self.__params)
+      if not 'entities' in atlas_response or len(atlas_response['entities']) < 1:
+        raise CatalogEntityDoesNotExistException('Could not find entity with query: %s' % dsl_query)
+
+      for atlas_entity in atlas_response['entities']:
+        response['entity'].append(self.adapt_atlas_entity_to_navigator(atlas_entity))
+
+      return response['entity'][0]
+    except RestException as e:
+      LOG.error('Failed to search for entities with search query: %s' % dsl_query)
+      if e.code == 401:
+        raise CatalogAuthException(_('Failed to authenticate.'))
+      else:
+        raise CatalogApiException(e.message)
 
   def get_database(self, name):
     # Search with Atlas API for hive database with specific name
-    try:
-      dsl_query = '+'.join(['hive_db', 'where', 'name=%s']) % name
-      atlas_response = self._root.get('/v2/search/dsl?query=%s' % dsl_query, headers=self.__headers,
-                                      params=self.__params)
-      return self.parse_atlas_response(atlas_response)
-    except RestException, e:
-      LOG.error('Failed to search for entities with search query: %s' % dsl_query)
-      if e.code == 401:
-        raise CatalogAuthException(_('Failed to authenticate.'))
-      else:
-        raise CatalogApiException(e.message)
+    if get_catalog_search_cluster():
+      qualifiedNameCriteria = 'qualifiedName=\'%s@%s\'' % (name, get_catalog_search_cluster())
+    else:
+      qualifiedNameCriteria = 'qualifiedName like \'%s@*\'' % name
+
+    return self.fetch_single_entity('hive_db where %s' % qualifiedNameCriteria)
 
   def get_table(self, database_name, table_name, is_view=False):
     # Search with Atlas API for hive tables with specific name
-    # TODO: Need figure out way how to identify the cluster info for exact qualifiedName or use startsWith 'db.table.column'
-    try:
-      qualifiedName = '%s.%s@cl1' % (database_name, table_name)
-      dsl_query = '+'.join(['hive_table', 'where', 'qualifiedName=\"%s\"']) % qualifiedName
-      atlas_response = self._root.get('/v2/search/dsl?query=%s' % dsl_query, headers=self.__headers,
-                                      params=self.__params)
-      return self.parse_atlas_response(atlas_response)
+    if get_catalog_search_cluster():
+      qualifiedNameCriteria = 'qualifiedName=\'%s.%s@%s\'' % (database_name, table_name, get_catalog_search_cluster())
+    else:
+      qualifiedNameCriteria = 'qualifiedName like \'%s.%s@*\'' % (database_name, table_name)
 
-    except RestException, e:
-      LOG.error('Failed to search for entities with search query: %s' % dsl_query)
-      if e.code == 401:
-        raise CatalogAuthException(_('Failed to authenticate.'))
-      else:
-        raise CatalogApiException(e.message)
+    return self.fetch_single_entity('hive_table where %s' % qualifiedNameCriteria)
 
   def get_field(self, database_name, table_name, field_name):
     # Search with Atlas API for hive tables with specific qualified name
-    # TODO: Figure out how to identify the cluster info for exact qualifiedName
-    # TODO: query string for search with qualifiedName startsWith sys.test5.id
-    try:
-      qualifiedName = '%s.%s.%s@cl1' % (database_name, table_name, field_name)
-      dsl_query = '+'.join(['hive_column', 'where', 'qualifiedName=\"%s\"']) % qualifiedName
-      atlas_response = self._root.get('/v2/search/dsl?query=%s' % dsl_query, headers=self.__headers,
-                                      params=self.__params)
-      return self.parse_atlas_response(atlas_response)
-    except RestException, e:
-      LOG.error('Failed to search for entities with search query: %s' % dsl_query)
-      if e.code == 401:
-        raise CatalogAuthException(_('Failed to authenticate.'))
-      else:
-        raise CatalogApiException(e.message)
+    if get_catalog_search_cluster():
+      qualifiedNameCriteria = 'qualifiedName=\'%s.%s.%s@%s\'' % (database_name, table_name, field_name,
+                                                                 get_catalog_search_cluster())
+    else:
+      qualifiedNameCriteria = 'qualifiedName like \'%s.%s.%s@*\'' % (database_name, table_name, field_name)
+
+    return self.fetch_single_entity('hive_column where %s' % qualifiedNameCriteria)
 
   def search_entities_interactive(self, query_s=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None, sources=None):
     try:
@@ -220,52 +215,150 @@ class AtlasApi(Api):
       }
 
       # This takes care of the list_tags endpoint
-      if (not query_s and facetFields and 'tags' in facetFields):
-        # Classification names from Atlas can contain spaces which doesn't work with the top search at the moment
-        # so for now we return an empty list
-
-        # classification_response = self._root.get('/v2/types/typedefs?type=classification')
-        # for classification_def in classification_response['classificationDefs']:
-        #   response['facets']['tags'][classification_def['name']] = 0
+      if not query_s and facetFields and 'tags' in facetFields:
+        classification_response = self._root.get('/v2/types/typedefs?type=classification')
+        for classification_def in classification_response['classificationDefs']:
+          if ' ' in classification_def['name']:
+            response['facets']['tags']['"' + classification_def['name'] + '"'] = -1
+          else:
+            response['facets']['tags'][classification_def['name']] = -1
         return response
 
-      query_s = (query_s.strip() if query_s else '') + '*'
+      query_s = (query_s.strip() if query_s else '').replace('*', '')
+
+      atlas_type = None
+      classification = None
+      owner = None
+
+      # Take the first classification and type facets and ignore other as we can't search multiple in Atlas.
+      classification_facets = self.CLASSIFICATION_RE.findall(query_s)
+      if classification_facets:
+        classification = classification_facets[0][0] or classification_facets[0][1]
+        query_s = self.CLASSIFICATION_RE.sub('', query_s).strip()
+        atlas_type = 'Asset'  # Filtered below to just contain hive_db, hive_table or hive_column
+
+      owner_facets = self.OWNER_RE.findall(query_s)
+      if owner_facets:
+        owner = owner_facets[0]
+        query_s = self.OWNER_RE.sub('', query_s).strip()
+
+      type_facets = self.TYPE_RE.findall(query_s)
+      if type_facets:
+        atlas_type = self.NAV_TO_ATLAS_TYPE[type_facets[0].lower()] or type_facets[0]
+        query_s = self.TYPE_RE.sub('', query_s).strip()
+
+      data = {
+        'attributes': None,
+        'classification': classification,
+        'entityFilters': {
+          'condition': 'AND',
+          'criterion': [{
+            'condition': 'OR',
+            'criterion': [{
+              'attributeName': 'name',
+              'attributeValue': query_s,
+              'operator': 'contains'
+            }, {
+              'attributeName': 'description',
+              'attributeValue': query_s,
+              'operator': 'contains'
+            }]
+          }]
+        },
+        'excludeDeletedEntities': True,
+        'includeClassificationAttributes': True,
+        'includeSubClassifications': True,
+        'includeSubTypes': True,
+        'limit': limit,
+        'offset': 0,
+        'tagFilters': None,
+        'termName': None,
+        'typeName': atlas_type or 'hive_table'
+      }
+
+      if get_catalog_search_cluster():
+        data['entityFilters']['criterion'].append({
+          'attributeName': 'qualifiedName',
+          'operator': 'contains',
+          'attributeValue': '@' + get_catalog_search_cluster()
+        })
+
+      if owner:
+        data['entityFilters']['criterion'].append({
+          'attributeName': 'owner',
+          'operator': 'startsWith',
+          'attributeValue': owner
+        })
+
+      atlas_response = self._root.post('/v2/search/basic', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
+
+      # Adapt Atlas entities to Navigator structure in the results
+      if 'entities' in atlas_response:
+        for atlas_entity in atlas_response['entities']:
+          if atlas_type != 'Asset' or atlas_entity['typeName'].lower() in ['hive_db', 'hive_table', 'hive_column']:
+            response['results'].append(self.adapt_atlas_entity_to_navigator(atlas_entity))
+
+      return response
+    except RestException as e:
+      LOG.error('Failed to search for entities with search query: %s' % data)
+      if e.code == 401:
+        raise CatalogAuthException(_('Failed to authenticate.'))
+      else:
+        raise CatalogApiException(e.message)
+
+  # search_enties is only used by the table browser to fetch child entities of a given table or database.
+  def search_entities(self, query_s, limit=100, offset=0, raw_query=False, **filters):
+    try:
+      found_entities = []
 
       search_terms = [term for term in query_s.strip().split()] if query_s else []
-      query = []
-
-      atlas_type = 'hive_table'
-
+      parentPath = None
       for term in search_terms:
-        if ':' not in term:
-          query.append(term)
-        else:
-          name, val = term.rstrip('*').split(':')
-          if val and name.lower() == 'type' and self.NAV_TO_ATLAS_TYPE.get(val.lower()):
-            atlas_type = self.NAV_TO_ATLAS_TYPE.get(val.lower())
+        if 'parentPath:' in term:
+          name, val = term.split(':')
+          parentPath = val.strip('"').lstrip('/').replace('/', '.')
 
-      atlas_dsl_query = 'from %s where name like \'%s\' limit %s' % (atlas_type, ' '.join(query) or '*', limit)
+      if query_s == 'type:database':
+        if get_catalog_search_cluster():
+          atlas_dsl_query = 'from hive_db where qualifiedName like \'*@%s\' limit %s' % (
+            get_catalog_search_cluster(),
+            limit
+          )
+        else:
+          atlas_dsl_query = 'from hive_db limit %s' % limit
+      elif not parentPath:
+        return found_entities
+      else:
+        atlas_type = 'hive_table' if parentPath.count('.') == 0 else 'hive_column'
+        if get_catalog_search_cluster():
+          atlas_dsl_query = 'from %s where qualifiedName like \'%s*@%s\' limit %s' % (
+            atlas_type,
+            parentPath,
+            get_catalog_search_cluster(),
+            limit
+          )
+        else:
+          atlas_dsl_query = 'from %s where qualifiedName like \'%s*\' limit %s' % (atlas_type, parentPath, limit)
 
       atlas_response = self._root.get('/v2/search/dsl?query=%s' % atlas_dsl_query)
 
       # Adapt Atlas entities to Navigator structure in the results
-      return self.parse_atlas_response(atlas_response)
+      if 'entities' in atlas_response:
+        for atlas_entity in atlas_response['entities']:
+          found_entities.append(self.adapt_atlas_entity_to_navigator(atlas_entity))
 
-    except RestException, e:
+      return found_entities
+    except RestException as e:
       LOG.error('Failed to search for entities with search query: %s' % atlas_dsl_query)
       if e.code == 401:
         raise CatalogAuthException(_('Failed to authenticate.'))
       else:
         raise CatalogApiException(e.message)
 
-  def search_entities(self, query_s, limit=100, offset=0, raw_query=False, **filters):
-    pass
-
-
   def suggest(self, prefix=None):
     try:
       return self._root.get('interactive/suggestions?query=%s' % (prefix or '*'))
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to search for entities with search query: %s' % prefix
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -277,7 +370,7 @@ class AtlasApi(Api):
     """
     try:
       return self._root.get('entities/%s' % entity_id, headers=self.__headers, params=self.__params)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to get entity %s: %s' % (entity_id, str(e))
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -300,7 +393,7 @@ class AtlasApi(Api):
       data = json.dumps(properties)
 
       return self._root.put('entities/%(identity)s' % entity, params=self.__params, data=data, contenttype=_JSON_CONTENT_TYPE, allow_redirects=True, clear_cookies=True)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to update entity %s: %s' % (entity['identity'], e)
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -369,7 +462,7 @@ class AtlasApi(Api):
       )
 
       return self._root.get('lineage', headers=self.__headers, params=params)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to get lineage for entity ID %s: %s' % (entity_id, str(e))
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -379,7 +472,7 @@ class AtlasApi(Api):
     try:
       data = json.dumps({'name': namespace, 'description': description})
       return self._root.post('models/namespaces/', data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to create namespace: %s' % namespace
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -388,7 +481,7 @@ class AtlasApi(Api):
   def get_namespace(self, namespace):
     try:
       return self._root.get('models/namespaces/%(namespace)s' % {'namespace': namespace})
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to get namespace: %s' % namespace
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -398,7 +491,7 @@ class AtlasApi(Api):
     try:
       data = json.dumps(properties)
       return self._root.post('models/namespaces/%(namespace)s/properties' % {'namespace': namespace}, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to create namespace %s property' % namespace
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -407,7 +500,7 @@ class AtlasApi(Api):
   def get_namespace_properties(self, namespace):
     try:
       return self._root.get('models/namespaces/%(namespace)s/properties' % {'namespace': namespace})
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to create namespace %s property' % namespace
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -417,7 +510,7 @@ class AtlasApi(Api):
     try:
       data = json.dumps(properties)
       return self._root.post('models/packages/nav/classes/%(class)s/properties' % {'class': clazz}, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to map class %s property' % clazz
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -426,7 +519,7 @@ class AtlasApi(Api):
   def get_model_properties_mapping(self):
     try:
       return self._root.get('models/properties/mappings')
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to get models properties mappings'
       LOG.error(msg)
       raise CatalogApiException(e.message)

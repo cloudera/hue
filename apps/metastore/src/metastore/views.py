@@ -46,8 +46,8 @@ from metastore.settings import DJANGO_APPS
 
 from desktop.auth.backend import is_admin
 
-LOG = logging.getLogger(__name__)
 
+LOG = logging.getLogger(__name__)
 SAVE_RESULTS_CTAS_TIMEOUT = 300         # seconds
 
 

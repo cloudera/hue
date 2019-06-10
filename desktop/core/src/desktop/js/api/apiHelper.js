@@ -29,10 +29,10 @@ const EXECUTE_API_PREFIX = '/notebook/api/execute/';
 const DOCUMENTS_API = '/desktop/api2/doc/';
 const DOCUMENTS_SEARCH_API = '/desktop/api2/docs/';
 const FETCH_CONFIG = '/desktop/api2/get_config/';
-const HDFS_API_PREFIX = '/filebrowser/view=/';
-const ADLS_API_PREFIX = '/filebrowser/view=adl:/';
+const HDFS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('/');
+const ADLS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('adl:/');
 const GIT_API_PREFIX = '/desktop/api/vcs/contents/';
-const S3_API_PREFIX = '/filebrowser/view=S3A://';
+const S3_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('S3A://');
 const IMPALA_INVALIDATE_API = '/impala/api/invalidate';
 const CONFIG_SAVE_API = '/desktop/api/configurations/save/';
 const CONFIG_APPS_API = '/desktop/api/configurations';
@@ -418,7 +418,7 @@ class ApiHelper {
     const request = $.post({
       url: url,
       data: data,
-      dataType: options.dataType
+      dataType: options && options.dataType
     })
       .done(data => {
         if (self.successResponseIsError(data)) {
