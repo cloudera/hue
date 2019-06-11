@@ -126,7 +126,11 @@ def cancel_async(notebook, snippet, **kwargs):
 @app.task(ignore_result=True)
 def close_statement_async(notebook, snippet, **kwargs):
   request = _get_request(**kwargs)
-  get_api(request, snippet).close_statement(notebook, snippet)
+
+  try:
+    get_api(request, snippet).close_statement(notebook, snippet)
+  except QueryExpired:
+    pass
 
 
 @app.task(ignore_result=True)
