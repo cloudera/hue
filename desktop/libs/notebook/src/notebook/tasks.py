@@ -39,7 +39,7 @@ from desktop.celery import app
 from desktop.conf import TASK_SERVER
 from desktop.lib import export_csvxls
 from desktop.lib import fsmanager
-from desktop.settings import CACHES_CELERY_KEY
+from desktop.settings import CACHES_CELERY_KEY, CACHES_CELERY_QUERY_RESULT_KEY
 
 from notebook.connectors.base import get_api, QueryExpired, ExecutionWrapper
 from notebook.sql_utils import get_current_statement
@@ -101,7 +101,7 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
 
   with storage.open(_log_key(notebook), 'wb') as f_log:
     result_wrapper = ExecutionWrapper(api, notebook, snippet, ExecutionWrapperCallback(notebook['uuid'], meta, f_log))
-    content_generator = data_export.DataAdapter(result_wrapper, max_rows=max_rows, store_data_type_in_header=True) #TODO: Move FETCH_RESULT_LIMIT to front end
+    content_generator = data_export.DataAdapter(result_wrapper, max_rows=max_rows, store_data_type_in_header=True) # TODO: Move FETCH_RESULT_LIMIT to front end
     response = export_csvxls.create_generator(content_generator, file_format)
 
     with storage.open(_result_key(notebook), 'wb') as f:
@@ -110,6 +110,11 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
         meta['row_counter'] = content_generator.row_counter
         meta['truncated'] = content_generator.is_truncated
         download_to_file.update_state(task_id=notebook['uuid'], state='AVAILABLE', meta=meta)
+
+    if TASK_SERVER.RESULT_CACHE.get():
+      with storage.open(_result_key(notebook)) as f:
+        csv_reader = csv.reader(f, delimiter=','.encode('utf-8'))
+        caches[CACHES_CELERY_QUERY_RESULT_KEY].set(_result_key(notebook), [row for row in csv_reader], 60 * 5)
 
   return meta
 
@@ -307,20 +312,25 @@ def fetch_result(notebook, snippet, rows, start_over, **kwargs):
     csv.field_size_limit(sys.maxsize)
     count = 0
     with storage.open(_result_key(notebook)) as f:
-      csv_reader = csv.reader(f, delimiter=','.encode('utf-8'))
-      first = next(csv_reader, None)
-      if first: # else no data to read
-        for col in first:
-          split = col.split('|')
-          split_type = split[1] if len(split) > 1 else 'STRING_TYPE'
-          cols.append({'name': split[0], 'type': split_type, 'comment': None})
-        for row in csv_reader:
-          count += 1
-          if count <= skip:
-            continue
-          data.append(row)
-          if count >= target:
-            break
+      if TASK_SERVER.RESULT_CACHE.get():
+        csv_reader = caches[CACHES_CELERY_QUERY_RESULT_KEY].get(_result_key(notebook)) # TODO check if expired
+        headers = csv_reader[0] # TODO check size
+        csv_reader = csv_reader[1:]
+      else:
+        csv_reader = csv.reader(f, delimiter=','.encode('utf-8'))
+        headers = next(csv_reader, [])
+
+      for col in headers:
+        split = col.split('|')
+        split_type = split[1] if len(split) > 1 else 'STRING_TYPE'
+        cols.append({'name': split[0], 'type': split_type, 'comment': None})
+      for row in csv_reader:
+        count += 1
+        if count <= skip: # TODO: seek(skip) or [skip:]
+          continue
+        data.append(row)
+        if count >= target:
+          break
 
     caches[CACHES_CELERY_KEY].set(_fetch_progress_key(notebook), count, timeout=None)
 

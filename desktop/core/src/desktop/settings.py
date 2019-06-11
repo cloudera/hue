@@ -382,7 +382,7 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache', # TODO: Parameterize here for all the caches
         'LOCATION': 'unique-hue'
-    }
+    },
 }
 CACHES_HIVE_DISCOVERY_KEY = 'hive_discovery'
 CACHES[CACHES_HIVE_DISCOVERY_KEY] = {
@@ -391,8 +391,11 @@ CACHES[CACHES_HIVE_DISCOVERY_KEY] = {
 }
 
 CACHES_CELERY_KEY = 'celery'
+CACHES_CELERY_QUERY_RESULT_KEY = 'celery_query_results'
 if desktop.conf.TASK_SERVER.ENABLED.get():
   CACHES[CACHES_CELERY_KEY] = json.loads(desktop.conf.TASK_SERVER.EXECUTION_STORAGE.get())
+  if desktop.conf.TASK_SERVER.RESULT_CACHE.get():
+    CACHES[CACHES_CELERY_QUERY_RESULT_KEY] = json.loads(desktop.conf.TASK_SERVER.RESULT_CACHE.get())
 
 # Configure sessions
 SESSION_COOKIE_NAME = desktop.conf.SESSION.COOKIE_NAME.get()
