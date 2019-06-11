@@ -148,11 +148,18 @@ class GlobalSearch {
         disableNavigation: true,
         showMagnify: true,
         facetDropDownVisible: self.facetDropDownVisible,
-        spin: loading,
-        placeHolder: I18n(window.HAS_CATALOG ? 'Search data and saved documents...' : 'Search saved documents...'),
+        spin: self.loading,
+        placeHolder: I18n(
+          window.HAS_CATALOG ? 'Search data and saved documents...' : 'Search saved documents...'
+        ),
         querySpec: self.querySpec,
-        onClear: function () { self.selectedIndex(null); self.searchResultVisible(false); },
-        facets: window.HAS_READ_ONLY_CATALOG ? ['classification', 'tag', 'tags', 'type'] : ['originalName', 'parentPath', 'tag', 'tags', 'type'],
+        onClear: function() {
+          self.selectedIndex(null);
+          self.searchResultVisible(false);
+        },
+        facets: window.HAS_READ_ONLY_CATALOG
+          ? ['classification', 'tag', 'tags', 'type']
+          : ['originalName', 'parentPath', 'tag', 'tags', 'type'],
         knownFacetValues: self.knownFacetValues,
         autocompleteFromEntries: self.autocompleteFromEntries,
         triggerObservable: self.searchResultCategories
@@ -344,7 +351,6 @@ class GlobalSearch {
       if (window.HAS_READ_ONLY_CATALOG) {
         facetValues['classification'] = facets;
       }
-
     });
   }
 

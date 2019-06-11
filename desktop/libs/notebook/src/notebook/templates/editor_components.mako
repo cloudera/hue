@@ -1444,8 +1444,8 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <input class="all-meta-checked no-margin-top" type="checkbox" data-bind="enable: !result.isMetaFilterVisible() && result.filteredMeta().length > 0, event: { change: function(){ toggleAllResultColumns($element); result.clickFilteredMetaCheck() } }, checked: result.filteredMetaChecked" />
           </th>
           <th colspan="2" class="nav-header-like">
-            <span class="meta-title pointer" data-bind="click: function(){ result.isMetaFilterVisible(true); }, attr: {title: result.filteredMeta().length }">${_('columns')}</span>
-            (<span class="meta-title pointer" data-bind="click: function(){ result.isMetaFilterVisible(true); }, text: result.filteredMeta().length"></span>)
+            <span class="meta-title pointer" data-bind="click: function() { result.isMetaFilterVisible(true); }, attr: { title: result.filteredColumnCount() }">${_('columns')}</span>
+            (<span class="meta-title pointer" data-bind="click: function() { result.isMetaFilterVisible(true); }, text: result.filteredColumnCount()"></span>)
             <span class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ result.isMetaFilterVisible(true); }, css: { 'blue' : result.isMetaFilterVisible }"><i class="pointer fa fa-search" title="${ _('Search') }"></i></span>
           </th>
         </tr>
