@@ -60,6 +60,7 @@ RUN rm -rf /hue
 # Install DB connectors
 RUN ./build/env/bin/pip install psycopg2-binary
 RUN ./build/env/bin/pip install redis==2.10.6
+RUN ./build/env/bin/pip install django_redis
 
 COPY tools/docker/hue/conf desktop/conf
 COPY tools/docker/hue/startup.sh .
