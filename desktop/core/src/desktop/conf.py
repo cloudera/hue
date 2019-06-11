@@ -1711,10 +1711,16 @@ TASK_SERVER = ConfigSection(
       type=coerce_positive_integer,
       help=_('Number of query results rows to fetch into the result storage.')
     ),
+    RESULT_CACHE = Config(
+      key='result_cache',
+      type=str,
+      help=_('Django file cache class to use to temporarily store query results'),
+      default='{"BACKEND": "django_redis.cache.RedisCache", "LOCATION": "redis://localhost:6379/0", "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},"KEY_PREFIX": "queries"}'
+    ),
     RESULT_STORAGE = Config(
       key='result_storage',
       type=str,
-      help=_('Django file storage class to use to temporarily store query results'),
+      help=_('Django file storage class to use to persist query results'),
       default='{"backend": "django.core.files.storage.FileSystemStorage", "properties": {"location": "./logs"}}'
     ),
     EXECUTION_STORAGE = Config(
