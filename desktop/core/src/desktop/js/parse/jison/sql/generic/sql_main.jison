@@ -1206,7 +1206,7 @@ OptionalSelectConditions_EDIT
    }
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalOrderByClause LimitClause 'CURSOR'
    {
-     $$ = { suggestKeywords: [], true };
+     $$ = { suggestKeywords: [], cursorAtEnd: true };
      $$.whereClauseLocation = $1 ? @1 : undefined;
      $$.limitClausePreceding = parser.firstDefined($4, @4, $3, @3, $2, @2, $1, @1);
      $$.limitClauseLocation = @5;
@@ -1859,7 +1859,7 @@ Joins
        $$.suggestJoinConditions = { prependOn: true, tablePrimaries: parser.yy.latestTablePrimaries.concat() }
      }
      if ($3.suggestKeywords) {
-       $$.suggestKeywords = $4.suggestKeywords;
+       $$.suggestKeywords = $3.suggestKeywords;
      }
      if (parser.yy.latestTablePrimaries.length > 0) {
         parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1].join = true;
@@ -1877,7 +1877,7 @@ Joins
        $$.suggestJoinConditions = { prependOn: true, tablePrimaries: parser.yy.latestTablePrimaries.concat() }
      }
      if ($4.suggestKeywords) {
-       $$.suggestKeywords = $5.suggestKeywords;
+       $$.suggestKeywords = $4.suggestKeywords;
      }
      if (parser.yy.latestTablePrimaries.length > 0) {
        parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1].join = true;
@@ -1976,7 +1976,7 @@ JoinType_EDIT
  ;
 
 OptionalJoinCondition
- :                                       -> { noJoinCondition: true, ['ON'] }
+ :                                       -> { noJoinCondition: true, suggestKeywords: ['ON'] }
  | 'ON' ValueExpression                  -> { valueExpression: $2 }
  ;
 

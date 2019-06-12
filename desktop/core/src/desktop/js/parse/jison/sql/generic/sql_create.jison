@@ -35,7 +35,7 @@ CreateStatement_EDIT
  | ViewDefinition_EDIT
  | 'CREATE' 'CURSOR'
    {
-     parser.suggestKeywords(['DATABASE', 'SCHEMA', 'TABLE', 'VIEW']);
+     parser.suggestKeywords(['DATABASE', 'ROLE', 'SCHEMA', 'TABLE', 'VIEW']);
    }
  ;
 
@@ -76,7 +76,7 @@ DatabaseDefinitionOptionals
  : OptionalComment
    {
      if (!$1) {
-       parser.suggestKeywords(['COMMENT');
+       parser.suggestKeywords(['COMMENT']);
      }
    }
  ;

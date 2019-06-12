@@ -88,6 +88,7 @@
 'RIGHT'                                    { return 'RIGHT'; }
 'RLIKE'                                    { return 'RLIKE'; }
 'ROW'                                      { return 'ROW'; }
+'ROLE'                                     { return 'ROLE'; }
 'ROWS'                                     { return 'ROWS'; }
 'SCHEMA'                                   { return 'SCHEMA'; }
 'SELECT'                                   { parser.determineCase(yytext); parser.addStatementTypeLocation('SELECT', yylloc); return 'SELECT'; }
