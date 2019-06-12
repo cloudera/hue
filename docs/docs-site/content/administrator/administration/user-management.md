@@ -63,11 +63,7 @@ superusers and users.
 <table>
 <tr><td>First name and Last name</td><td> The user's first and last name.
 </td></tr>
-<tr><td>E-mail address</td><td>The user's e-mail address. The e-mail address is used by the Job
-    Designer and Beeswax applications to send users an e-mail message
-    after certain actions have occurred. The Job Designer sends an
-    e-mail message after a job has completed. Beeswax sends a message
-    after a query has completed. If an e-mail address is not specified,
+<tr><td>E-mail address</td><td>The user's e-mail address. The e-mail address is used by the Editor to send users an e-mail message after a query has completed. If an e-mail address is not specified,
     the application will not attempt to email the user.</td></tr>
 <tr><td>Groups</td><td> The groups to which the user belongs. By default, a user is assigned
     to the **default** group, which allows access to all applications.
