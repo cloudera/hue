@@ -63,7 +63,8 @@ var MetastoreViewModel = (function () {
 
     huePubSub.publish('cluster.config.get.config', function (clusterConfig) {
       var initialSourceType = options.sourceType || 'hive';
-      if (clusterConfig && clusterConfig.app_config && clusterConfig.app_config.editor && clusterConfig.app_config.editor.interpreters) {
+      if (clusterConfig && clusterConfig.app_config && (
+          (clusterConfig.app_config.editor && clusterConfig.app_config.editor.interpreters) || clusterConfig.app_config.catalogs)) {
         var sources = [];
         clusterConfig.app_config.editor.interpreters.forEach(function (interpreter) {
           if (interpreter.is_sql) {
@@ -74,6 +75,15 @@ var MetastoreViewModel = (function () {
             }))
           }
         });
+        if (clusterConfig.app_config.catalogs) {
+          clusterConfig.app_config.catalogs.forEach(function (interpreter) {
+            sources.push(new MetastoreSource({
+              metastoreViewModel: self,
+              name: interpreter.name,
+              type: interpreter.type
+            }))
+          });
+        }
         if (!sources.length) {
           sources.push(new MetastoreSource({
             metastoreViewModel: self,
@@ -145,7 +155,7 @@ var MetastoreViewModel = (function () {
       var prefix = '/hue/metastore/';
       if (self.source() && self.source().namespace()) {
         var params = {
-          source: self.source().type
+          source_type: self.source().type
         };
         if (window.HAS_MULTI_CLUSTER) {
           params.namespace = self.source().namespace().id
@@ -277,8 +287,8 @@ var MetastoreViewModel = (function () {
           if (param.indexOf('namespace=') === 0) {
             namespaceId = param.replace('namespace=', '');
           }
-          if (param.indexOf('source=') === 0) {
-            sourceType = param.replace('source=', '');
+          if (param.indexOf('source_type=') === 0) {
+            sourceType = param.replace('source_type=', '');
           }
         });
       }

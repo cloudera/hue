@@ -17,27 +17,27 @@
 
 import binascii
 import copy
-import logging
 import json
+import logging
 import re
 import urllib
 
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
+from desktop.auth.backend import is_admin
 from desktop.conf import USE_DEFAULT_CONFIGURATION
 from desktop.lib.conf import BoundConfig
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
+from desktop.lib.paths import SAFE_CHARACTERS_URI_COMPONENTS
 from desktop.lib.rest.http_client import RestException
 from desktop.lib.thrift_util import unpack_guid, unpack_guid_base64
 from desktop.models import DefaultConfiguration, Document2
 from metadata.optimizer_client import OptimizerApi
 
 from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported, _get_snippet_name, Notebook
-
-from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
@@ -68,8 +68,10 @@ except ImportError, e:
 try:
   from jobbrowser.views import get_job
   from jobbrowser.conf import ENABLE_QUERY_BROWSER
+  has_query_browser = ENABLE_QUERY_BROWSER.get()
 except (AttributeError, ImportError), e:
   LOG.warn("Job Browser app is not enabled")
+  has_query_browser = False
 
 
 DEFAULT_HIVE_ENGINE = 'mr'
@@ -422,7 +424,7 @@ class HS2Api(Api):
         'started': job.get('started', False),
         'finished': job.get('finished', False)
       } for job in jobs_with_state]
-    elif snippet['type'] == 'impala' and ENABLE_QUERY_BROWSER.get():
+    elif snippet['type'] == 'impala' and has_query_browser:
       query_id = unpack_guid_base64(snippet['result']['handle']['guid'])
       progress = min(self.progress(notebook, snippet, logs), 99) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
       jobs = [{
@@ -495,7 +497,7 @@ class HS2Api(Api):
 
     upload(target_file, handle, self.request.user, db, self.request.fs, max_rows=max_rows, max_bytes=max_bytes)
 
-    return '/filebrowser/view=%s' % urllib.quote(urllib.quote(target_file.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\'')) # Quote twice, because of issue in the routing on client
+    return '/filebrowser/view=%s' % urllib.quote(urllib.quote(target_file.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)) # Quote twice, because of issue in the routing on client
 
 
   def export_data_as_table(self, notebook, snippet, destination, is_temporary=False, location=None):
@@ -549,7 +551,7 @@ DROP TABLE IF EXISTS `%(table)s`;
       'location': self.request.fs.netnormpath(destination),
       'hql': query.hql_query
     }
-    success_url = '/filebrowser/view=%s' % urllib.quote(destination.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\'')
+    success_url = '/filebrowser/view=%s' % urllib.quote(destination.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
 
     return hql, success_url
 
@@ -698,8 +700,12 @@ DROP TABLE IF EXISTS `%(table)s`;
       name = 'hive'
     elif snippet['type'] == 'impala':
       name = 'impala'
+    elif self.interface == 'hms':
+      name = 'hms'
+    elif self.interface.startswith('hiveserver2-'):
+      name = self.interface.replace('hiveserver2-', '')
     else:
-      name = 'sparksql'
+      name = 'sparksql' # Backward compatibility until HUE-8758
 
     return dbms.get(self.user, query_server=get_query_server_config(name=name, cluster=cluster))
 

@@ -52,8 +52,9 @@ software components.
 ## Feedback
 
 Your feedback is welcome. The best way to send feedback is to join the
-[mailing list](https://groups.google.com/a/cloudera.org/group/hue-user), and
-send e-mail, to mailto:hue-user@cloudera.org[hue-user@cloudera.org].
+[mailing list](https://groups.google.com/a/cloudera.org/group/hue-user) and
+send e-mail to [hue-user@cloudera.org](mailto:hue-user@cloudera.org).
+[@gethue](https://twitter.com/gethue) is also a good
 
 ## Reporting Bugs
 

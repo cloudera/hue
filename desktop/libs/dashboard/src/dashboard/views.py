@@ -82,11 +82,17 @@ TEXT_SEARCH_LAYOUT = [
 
 
 def index(request, is_mobile=False):
-  hue_collections = DashboardController(request.user).get_search_collections()
+  engine = request.GET.get('engine', 'solr')
+  cluster = request.POST.get('cluster','""')
   collection_id = request.GET.get('collection')
 
-  if not hue_collections or not collection_id:
-    return admin_collections(request, True, is_mobile)
+  collections = get_engine(request.user, engine, cluster=cluster).datasets() if engine != 'report' else ['default']
+
+  if not collections:
+    if engine == 'solr':
+      return no_collections(request)
+    else:
+      return importer(request)
 
   try:
     collection_doc = Document2.objects.get(id=collection_id)
@@ -110,11 +116,12 @@ def index(request, is_mobile=False):
   if is_mobile:
     template = 'search_m.mako'
   engine = collection.data['collection']['engine']
+
   return render(template, request, {
     'collection': collection,
     'query': json.dumps(query),
     'initial': json.dumps({
-        'collections': [],
+        'collections': collections,
         'layout': DEFAULT_LAYOUT,
         'qb_layout': QUERY_BUILDER_LAYOUT,
         'text_search_layout': TEXT_SEARCH_LAYOUT,
@@ -134,7 +141,9 @@ def index_m(request):
 def new_search(request):
   engine = request.GET.get('engine', 'solr')
   cluster = request.POST.get('cluster','""')
+
   collections = get_engine(request.user, engine, cluster=cluster).datasets() if engine != 'report' else ['default']
+
   if not collections:
     if engine == 'solr':
       return no_collections(request)

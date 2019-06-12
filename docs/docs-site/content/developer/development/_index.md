@@ -21,6 +21,33 @@ This section goes into greater detail on how to build and reuse the components o
 * [Bootstrap](http://twitter.github.com/bootstrap/)
 * [Knockout js](http://knockoutjs.com/)
 
+### Quick Start
+
+Build once:
+
+    make apps
+
+Then start the dev server (which will auto reload):
+
+    ./build/env/bin/hue runserver
+
+If you are changing Javascript or CSS files, also start:
+
+    npm run dev
+
+Then it is recommended to use MySQL or PostGres as the [database](({{% param baseURL %}}).
+
+Open the `hue.ini` file in a text editor. Directly below the
+`[[database]]` line, add the following options (and modify accordingly for
+your MySQL setup):
+
+    host=localhost
+    port=3306
+    engine=mysql
+    user=hue
+    password=secretpassword
+    name=hue
+
 ### Javascript
 
 The javascript files are currently being migrated to webpack bundles, during this process some files will live under src/desktop/static/ and some will live under src/dekstop/js
@@ -51,39 +78,20 @@ and possibly fix any issues it might report.
 
 ### Documentation
 
-New website:
-
-Install https://gohugo.io/getting-started/quick-start/.
+Install [Hugo](https://gohugo.io/getting-started/quick-start/).
 
 Develop:
 
     hugo serve
 
-Release:
-
-Make sure the base URL is correct:
-
-    cd docs/docs-site
-    vim config.toml
-    baseURL='http://cloudera.github.io/hue/docs-4.4.0/'
-
 Build the doc website:
 
     hugo
 
-Add it to the github page and push:
+Release:
 
-    git checkout gh-pages
-    cp ~/docs/docs-site/public docs-4.4.0 -r
-    rm latest
-    ln -s docs-4.4.0 latest
+    scp -r docs/docs-site/public/* root@docs.gethue.com:/var/www/docs.gethue.com
 
-    git push origin HEAD:gh-pages
-
-
-Old documentation:
-
-    make docs
 
 ### CSS / LESS
 
@@ -723,5 +731,13 @@ Instructions:
     docker login
     docker push gethue/hue
     docker push gethue/hue:4.4.0
+
+Documentation
+
+Refresh the latest and then fork it:
+
+    cp -r latest docs-4.4.0
+    git add docs-4.4.0
+
 
 Then send release notes to hue-user, https://twitter.com/gethue!

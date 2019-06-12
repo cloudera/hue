@@ -280,7 +280,10 @@ def get_api(request, snippet):
   if snippet['type'] == 'report':
     snippet['type'] = 'impala'
 
-  interpreter = [interpreter for interpreter in get_ordered_interpreters(request.user) if interpreter['type'] == snippet['type']]
+  interpreter = [
+    interpreter
+    for interpreter in get_ordered_interpreters(request.user) if snippet['type'] in (interpreter['type'], interpreter['interface'])
+  ]
   if not interpreter:
     if snippet['type'] == 'hbase':
       interpreter = [{
@@ -328,7 +331,6 @@ def get_api(request, snippet):
     }
     snippet['type'] = snippet['type'].split('-', 2)[0]
     cluster.update(interpreter['options'])
-    print cluster
   # Multi cluster
   elif has_multi_cluster():
     cluster = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API or Notebook create sessions
@@ -351,9 +353,9 @@ def get_api(request, snippet):
   LOG.info('Selected cluster %s %s interface %s' % (cluster_name, cluster, interface))
   snippet['interface'] = interface
 
-  if interface == 'hiveserver2':
+  if interface.startswith('hiveserver2') or interface == 'hms':
     from notebook.connectors.hiveserver2 import HS2Api
-    return HS2Api(user=request.user, request=request, cluster=cluster)
+    return HS2Api(user=request.user, request=request, cluster=cluster, interface=interface)
   elif interface == 'oozie':
     return OozieApi(user=request.user, request=request)
   elif interface == 'livy':
@@ -378,6 +380,9 @@ def get_api(request, snippet):
     if interpreter['options'] and interpreter['options'].get('url', '').find('teradata') >= 0:
       from notebook.connectors.jdbc_teradata import JdbcApiTeradata
       return JdbcApiTeradata(request.user, interpreter=interpreter)
+    if interpreter['options'] and interpreter['options'].get('url', '').find('awsathena') >= 0:
+      from notebook.connectors.jdbc_athena import JdbcApiAthena
+      return JdbcApiAthena(request.user, interpreter=interpreter)
     elif interpreter['options'] and interpreter['options'].get('url', '').find('presto') >= 0:
       from notebook.connectors.jdbc_presto import JdbcApiPresto
       return JdbcApiPresto(request.user, interpreter=interpreter)
@@ -390,6 +395,9 @@ def get_api(request, snippet):
   elif interface == 'teradata':
     from notebook.connectors.jdbc import JdbcApiTeradata
     return JdbcApiTeradata(request.user, interpreter=interpreter)
+  elif interface == 'athena':
+    from notebook.connectors.jdbc import JdbcApiAthena
+    return JdbcApiAthena(request.user, interpreter=interpreter)
   elif interface == 'presto':
     from notebook.connectors.jdbc_presto import JdbcApiPresto
     return JdbcApiPresto(request.user, interpreter=interpreter)
@@ -423,12 +431,13 @@ def _get_snippet_session(notebook, snippet):
 
 class Api(object):
 
-  def __init__(self, user, interpreter=None, request=None, cluster=None, query_server=None):
+  def __init__(self, user, interpreter=None, request=None, cluster=None, query_server=None, interface=None):
     self.user = user
     self.interpreter = interpreter
     self.request = request
     self.cluster = cluster
     self.query_server = query_server
+    self.interface = interface
 
   def create_session(self, lang, properties=None):
     return {
@@ -453,7 +462,7 @@ class Api(object):
     from beeswax import data_export #TODO: Move to notebook?
     from beeswax import conf
 
-    result_wrapper = ResultWrapper(self, notebook, snippet)
+    result_wrapper = ExecutionWrapper(self, notebook, snippet)
 
     max_rows = conf.DOWNLOAD_ROW_LIMIT.get()
     max_bytes = conf.DOWNLOAD_BYTES_LIMIT.get()
@@ -544,13 +553,15 @@ class Api(object):
   def get_log_is_full_log(self, notebook, snippet):
     return True
 
+
 def _get_snippet_name(notebook, unique=False, table_format=False):
   name = (('%(name)s' + ('-%(id)s' if unique else '') if notebook.get('name') else '%(type)s-%(id)s') % notebook)
   if table_format:
     name = re.sub('[-|\s:]', '_', name)
   return name
 
-class ResultWrapper():
+
+class ExecutionWrapper():
   def __init__(self, api, notebook, snippet, callback=None):
     self.api = api
     self.notebook = notebook
@@ -558,7 +569,7 @@ class ResultWrapper():
     self.callback = callback
     self.should_close = False
 
-  def fetch(self, start_over=None, rows=None):
+  def fetch(self, handle, start_over=None, rows=None):
     if start_over:
       if not self.snippet['result'].get('handle') or not self.snippet['result']['handle'].get('guid') or not self.api.can_start_over(self.notebook, self.snippet):
         start_over = False
@@ -569,10 +580,10 @@ class ResultWrapper():
         self.should_close = True
         self._until_available()
     if self.snippet['result']['handle'].get('sync', False):
-      return self.snippet['result']['handle']['result']
+      result = self.snippet['result']['handle']['result']
     else:
       result = self.api.fetch_result(self.notebook, self.snippet, rows, start_over)
-    return result
+    return ResultWrapper(result.get('meta'), result.get('data'), result.get('has_more'))
 
   def _until_available(self):
     if self.snippet['result']['handle'].get('sync', False):
@@ -602,7 +613,19 @@ class ResultWrapper():
         sleep_seconds = 10
       time.sleep(sleep_seconds)
 
-  def close(self):
+  def close(self, handle):
     if self.should_close:
       self.should_close = False
       self.api.close_statement(self.notebook, self.snippet)
+
+class ResultWrapper():
+  def __init__(self, cols, rows, has_more):
+    self._cols = cols
+    self._rows = rows
+    self.has_more = has_more
+
+  def full_cols(self):
+    return self._cols
+
+  def rows(self):
+    return self._rows

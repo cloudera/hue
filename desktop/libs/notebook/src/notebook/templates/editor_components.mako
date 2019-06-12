@@ -623,7 +623,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 </script>
 
 <script type="text/html" id="snippet-log${ suffix }">
-  <div class="snippet-log-container margin-bottom-10">
+  <div class="snippet-log-container margin-bottom-10" data-bind="visible: showLogs">
     <div data-bind="delayedOverflow: 'slow', css: resultsKlass" style="margin-top: 5px; position: relative;">
       <a href="javascript: void(0)" class="inactive-action close-logs-overlay" data-bind="click: function(){ showLogs(false) }">&times;</a>
       % if not IS_EMBEDDED.get():
@@ -1225,7 +1225,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <a class="btn dropdown-toggle" data-toggle="dropdown" href="javascript: void(0)">
       <span class="caret"></span>
     </a>
-    <ul class="dropdown-menu pull-right">
+    <ul class="dropdown-menu">
       <li>
         <a class="pointer" rel="tooltip" data-placement="bottom" data-bind="click: function() { $root.selectedNotebook().isHidingCode(! $root.isHidingCode()); }, attr: { 'title': $root.isHidingCode() ? '${ _ko('Show the logic') }' : '${ _ko('Hide the logic') }' }">
           <i class="fa fa-fw" data-bind="css: { 'fa-expand': $root.isHidingCode(), 'fa-compress': ! $root.isHidingCode() }"></i>
@@ -1444,8 +1444,8 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <input class="all-meta-checked no-margin-top" type="checkbox" data-bind="enable: !result.isMetaFilterVisible() && result.filteredMeta().length > 0, event: { change: function(){ toggleAllResultColumns($element); result.clickFilteredMetaCheck() } }, checked: result.filteredMetaChecked" />
           </th>
           <th colspan="2" class="nav-header-like">
-            <span class="meta-title pointer" data-bind="click: function(){ result.isMetaFilterVisible(true); }, attr: {title: result.filteredMeta().length }">${_('columns')}</span>
-            (<span class="meta-title pointer" data-bind="click: function(){ result.isMetaFilterVisible(true); }, text: result.filteredMeta().length"></span>)
+            <span class="meta-title pointer" data-bind="click: function() { result.isMetaFilterVisible(true); }, attr: { title: result.filteredColumnCount() }">${_('columns')}</span>
+            (<span class="meta-title pointer" data-bind="click: function() { result.isMetaFilterVisible(true); }, text: result.filteredColumnCount()"></span>)
             <span class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ result.isMetaFilterVisible(true); }, css: { 'blue' : result.isMetaFilterVisible }"><i class="pointer fa fa-search" title="${ _('Search') }"></i></span>
           </th>
         </tr>

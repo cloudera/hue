@@ -35,6 +35,8 @@ The project directory structure:
             thirdparty/...
 """
 
+SAFE_CHARACTERS_URI = '~@#$&()*!+=:;,.?/\''
+SAFE_CHARACTERS_URI_COMPONENTS = '~@#$&()*!+=;,.\'' # Removing characters : / ? from safe list for KNOX
 
 def __get_root(*append):
   """

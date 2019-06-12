@@ -59,11 +59,17 @@ CONNECTOR_TYPES += [
   {'name': "SQL Database", 'type': 'sql-alchemy', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
   {'name': "SQL Database (JDBC)", 'type': 'sql-jdbc', 'settings': {}, 'id': None, 'category': 'engines', 'description': 'Deprecated: older way to connect to any database.'},
 
+  {'name': "PySpark", 'type': 'pyspark', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "Spark", 'type': 'spark', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "Pig", 'type': 'pig', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "Java", 'type': 'java', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
+
   {'name': "HDFS", 'type': 'hdfs', 'settings': {}, 'id': None, 'category': 'browsers', 'description': ''},
   {'name': "YARN", 'type': 'yarn', 'settings': {}, 'id': None, 'category': 'browsers', 'description': ''},
   {'name': "S3", 'type': 's3', 'settings': {}, 'id': None, 'category': 'browsers', 'description': ''},
   {'name': "ADLS", 'type': 'adls-v1', 'settings': {}, 'id': None, 'category': 'browsers', 'description': ''},
 
+  {'name': "Hive Metastore", 'type': 'hms', 'settings': {}, 'id': None, 'category': 'catalogs', 'description': ''},
   {'name': "Atlas", 'type': 'atlas', 'settings': {}, 'id': None, 'category': 'catalogs', 'description': ''},
   {'name': "Navigator", 'type': 'navigator', 'settings': {}, 'id': None, 'category': 'catalogs', 'description': ''},
 
@@ -74,7 +80,7 @@ CONNECTOR_TYPES += [
 ]
 
 CATEGORIES = [
-  {"name": "Query Engines", 'type': 'engines', 'description': ''},
+  {"name": "Editor", 'type': 'engines', 'description': ''},
   {"name": "Browsers", 'type': 'browsers', 'description': ''},
   {"name": "Catalogs", 'type': 'catalogs', 'description': ''},
   {"name": "Optimizers", 'type': 'optimizers', 'description': ''},

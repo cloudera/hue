@@ -10,7 +10,7 @@ Availalable on [Docker Hub](https://hub.docker.com/u/gethue/) as well.
 ## Services
 
 * [Hue](hue)
-
+* [Nginx](nginx)
 
 ## Kubernetes
 

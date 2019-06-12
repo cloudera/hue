@@ -1,0 +1,33 @@
+{{- if .Values.ingress.create -}}
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: traefik-ingress-controller
+  labels:
+    app: traefik-ingress-lb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traefik-ingress-lb
+  template:
+    metadata:
+      labels:
+        app: traefik-ingress-lb
+        name: traefik-ingress-lb
+    spec:
+      serviceAccountName: traefik-ingress-controller
+      terminationGracePeriodSeconds: 60
+      containers:
+      - image: traefik:v1.6.6
+        name: traefik-ingress-lb
+        ports:
+        - name: http
+          containerPort: 80
+        - name: admin
+          containerPort: 8080
+        args:
+        - --api
+        - --kubernetes
+        - --logLevel=INFO
+{{- end -}}

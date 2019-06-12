@@ -24,8 +24,10 @@
   from beeswax.conf import LIST_PARTITIONS_LIMIT
   from dashboard.conf import HAS_SQL_ENABLED
   from indexer.conf import ENABLE_NEW_INDEXER
-  from metadata.conf import has_catalog, has_optimizer, has_workload_analytics, OPTIMIZER
+  from metadata.conf import has_catalog, has_readonly_catalog, has_optimizer, has_workload_analytics, OPTIMIZER
   from notebook.conf import ENABLE_NOTEBOOK_2, ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_SCHEDULING
+
+  from metastore.views import has_write_access
 %>
 
 <%namespace name="impalaDocIndex" file="/impala_doc_index.mako" />
@@ -48,6 +50,13 @@
     window.CSRF_TOKEN = '';
   %endif
 
+  window.KNOX_BASE_PATH_HUE = '/KNOX_BASE_PATH_HUE';
+  window._KNOX_BASE_PATH = '/KNOX_BASE_PATH_KNOX';
+  window._KNOX_BASE_URL = '/KNOX_BASE_URL';
+  window.HUE_BASE_URL = window.KNOX_BASE_PATH_HUE.indexOf('KNOX_BASE_PATH_HUE') < 0 ? window.KNOX_BASE_PATH_HUE : '';
+  window.KNOX_BASE_PATH = window._KNOX_BASE_PATH.indexOf('KNOX_BASE_PATH_KNOX') < 0 ? window._KNOX_BASE_PATH_KNOX : '';
+  window.KNOX_BASE_URL = window._KNOX_BASE_URL.indexOf('KNOX_BASE_URL') < 0 ? window._KNOX_BASE_URL : '';
+
   window.HAS_MULTI_CLUSTER = '${ conf.has_multi_cluster() }' === 'True';
 
   window.HAS_SQL_DASHBOARD = '${ HAS_SQL_ENABLED.get() }' === 'True';
@@ -62,7 +71,8 @@
 
   window.ENABLE_SQL_SYNTAX_CHECK = '${ conf.ENABLE_SQL_SYNTAX_CHECK.get() }' === 'True';
 
-  window.HAS_NAVIGATOR = '${ has_catalog(request.user) }' === 'True';
+  window.HAS_CATALOG = '${ has_catalog(request.user) }' === 'True';
+  window.HAS_READ_ONLY_CATALOG = '${ has_readonly_catalog(request.user) }' === 'True' || '${ has_write_access(request.user) }' === 'False';
 
   window.HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
 

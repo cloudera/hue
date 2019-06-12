@@ -63,7 +63,8 @@ class NavTags {
 
     self.catalogEntry = params.catalogEntry;
     self.overflowEllipsis = params.overflowEllipsis;
-    self.readOnly = !window.USER_HAS_METADATA_WRITE_PERM || !!params.readOnly;
+    self.readOnly =
+      !window.USER_HAS_METADATA_WRITE_PERM || !!params.readOnly || window.HAS_READ_ONLY_CATALOG;
 
     self.getSelectizeTags = function(query, callback) {
       callback(

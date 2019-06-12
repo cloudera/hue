@@ -44,25 +44,7 @@ const TEMPLATE = `
     </div>
   </script>
   
-  <!-- ko component: {
-    name: 'inline-autocomplete',
-    params: {
-      hasFocus: searchHasFocus,
-      disableNavigation: true,
-      showMagnify: true,
-      facetDropDownVisible: facetDropDownVisible,
-      spin: loading,
-      placeHolder: '${I18n(
-        window.HAS_NAVIGATOR ? 'Search data and saved documents...' : 'Search saved documents...'
-      )}',
-      querySpec: querySpec,
-      onClear: function () { selectedIndex(null); searchResultVisible(false); },
-      facets: ['type', 'tags', 'parentPath', 'originalName'],
-      knownFacetValues: knownFacetValues,
-      autocompleteFromEntries: autocompleteFromEntries,
-      triggerObservable: searchResultCategories
-    }
-  } --><!-- /ko -->
+  <!-- ko component: inlineAutocompleteComponent --><!-- /ko -->
   <!-- ko if: searchResultVisible()  -->
   <!-- ko if: !loading() && searchResultCategories().length === 0 && hasLoadedOnce() -->
   <div class="global-search-results global-search-empty" data-bind="onClickOutside: onResultClickOutside">
@@ -132,7 +114,7 @@ class GlobalSearch {
   constructor() {
     const self = this;
     self.knownFacetValues = ko.observable({
-      type: { field: 1, table: 1, view: 1, database: 1, partition: 1, document: 1 }
+      type: { field: -1, table: -1, view: -1, database: -1, partition: -1, document: -1 }
     });
     self.cancellablePromises = [];
 
@@ -158,6 +140,31 @@ class GlobalSearch {
     self.hasLoadedOnce = ko.observable(false);
 
     self.initializeFacetValues();
+
+    self.inlineAutocompleteComponent = {
+      name: 'inline-autocomplete',
+      params: {
+        hasFocus: self.searchHasFocus,
+        disableNavigation: true,
+        showMagnify: true,
+        facetDropDownVisible: self.facetDropDownVisible,
+        spin: self.loading,
+        placeHolder: I18n(
+          window.HAS_CATALOG ? 'Search data and saved documents...' : 'Search saved documents...'
+        ),
+        querySpec: self.querySpec,
+        onClear: function() {
+          self.selectedIndex(null);
+          self.searchResultVisible(false);
+        },
+        facets: window.HAS_READ_ONLY_CATALOG
+          ? ['classification', 'tag', 'tags', 'type']
+          : ['originalName', 'parentPath', 'tag', 'tags', 'type'],
+        knownFacetValues: self.knownFacetValues,
+        autocompleteFromEntries: self.autocompleteFromEntries,
+        triggerObservable: self.searchResultCategories
+      }
+    };
 
     self.selectedResult = ko
       .pureComputed(() => {
@@ -340,6 +347,10 @@ class GlobalSearch {
     dataCatalog.getAllNavigatorTags({ silenceErrors: true }).done(facets => {
       const facetValues = self.knownFacetValues();
       facetValues['tags'] = facets;
+      facetValues['tag'] = facets;
+      if (window.HAS_READ_ONLY_CATALOG) {
+        facetValues['classification'] = facets;
+      }
     });
   }
 
@@ -519,7 +530,7 @@ class GlobalSearch {
         })
     );
 
-    if (!docOnly && HAS_NAVIGATOR) {
+    if (!docOnly && window.HAS_CATALOG) {
       const clearNavTimeout = window.setTimeout(() => {
         self.updateCategories(NAV_CATEGORY, []);
       }, 300);

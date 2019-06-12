@@ -1,9 +1,0 @@
-cloudera:
-    image: gethue/hue:latest
-    hostname: hue
-    container_name: hue
-    dns: 8.8.8.8
-    ports:
-     - "8888:8888"
-    volumes:
-      - ./hue.ini:/hue/desktop/conf/hue.ini

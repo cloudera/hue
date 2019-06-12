@@ -83,7 +83,7 @@ from desktop.views import _ko
           ${ _('There was an error loading the document.')}
         </div>
         <div style="margin-top: 20px" data-bind="visible: fileEntry.canModify() && ! hasErrors() && ! loading()">
-          <div class="input-append">
+          <div class="input-append" style="font-size: inherit">
              <div id="menu"></div>
               <input id="userSearchAutocomp" placeholder="${_('Type a username or a group name')}" type="text" data-bind="autocomplete: { source: shareAutocompleteUserSource.bind($data), itemTemplate: 'user-search-autocomp-item', noMatchTemplate: 'user-search-autocomp-no-match', valueObservable: searchInput, showSpinner: true, classPrefix: 'hue-', onEnter: onShareAutocompleteUserEnter.bind($data), appendTo: $('#menu') }, clearable: { value: searchInput, textInput: searchInput }" class="ui-autocomplete-input" autocomplete="off" style="width: 420px">
             <div class="btn-group" style="overflow:visible">

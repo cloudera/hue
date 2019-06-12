@@ -20,14 +20,13 @@ import json
 import logging
 import re
 
-from django.core.cache import cache
 from django.utils.translation import ugettext as _
 
 from desktop.lib.rest import resource
 from desktop.lib.rest.unsecure_http_client import UnsecureHttpClient
 from desktop.lib.rest.http_client import RestException
 
-from metadata.conf import CATALOG, get_catalog_auth_password
+from metadata.conf import CATALOG, get_catalog_auth_password, get_catalog_search_cluster
 from metadata.catalog.base import CatalogAuthException, CatalogApiException, CatalogEntityDoesNotExistException, Api
 
 LOG = logging.getLogger(__name__)
@@ -42,6 +41,22 @@ class AtlasApi(Api):
   """
   DEFAULT_SEARCH_FIELDS = (('originalName', 3), ('originalDescription', 1), ('name', 10), ('description', 3), ('tags', 5))
   CATALOG_NAMESPACE = '__cloudera_internal_catalog_hue'
+
+  NAV_TO_ATLAS_TYPE = {
+    'table': 'hive_table',
+    'database': 'hive_db',
+    'field': 'hive_column'
+  }
+
+  ATLAS_TO_NAV_TYPE = {
+    'hive_table': 'TABLE',
+    'hive_db': 'DATABASE',
+    'hive_column': 'FIELD'
+  }
+
+  CLASSIFICATION_RE = re.compile('(?:tag|tags|classification)\s*\:\s*(?:(?:\"([^"]+)\")|([^ ]+))\s*', re.IGNORECASE)
+  TYPE_RE = re.compile('type\s*\:\s*([^ ]+)\s*', re.IGNORECASE)
+  OWNER_RE = re.compile('owner\s*\:\s*([^ ]+)\s*', re.IGNORECASE)
 
   def __init__(self, user=None):
     super(AtlasApi, self).__init__(user)
@@ -76,296 +91,286 @@ class AtlasApi(Api):
 
     return default_entity_types, entity_types
 
+  def adapt_atlas_entity_to_navigator(self, atlas_entity):
+    nav_entity = {
+      "created": 'createTime' in atlas_entity['attributes'] and atlas_entity['attributes']['createTime'],
+      "customProperties": None,
+      "description": atlas_entity['attributes'].get('description'),
+      "identity": atlas_entity['guid'],
+      "internalType": atlas_entity['typeName'],
+      "meaningNames": atlas_entity['meaningNames'], # Atlas specific
+      "meanings": atlas_entity['meanings'], # Atlas specific
+      "name": atlas_entity['attributes'].get('name'),
+      "original_name": atlas_entity['attributes'].get('name'),
+      "originalDescription": None,
+      "originalName": atlas_entity['attributes'].get('name'),
+      "owner": atlas_entity['attributes'].get('owner'),
+      "parentPath": '', # Set below
+      "properties": {}, # Set below
+      "sourceType": '', # Set below
+      "tags": atlas_entity['classificationNames'],
+      "type": self.ATLAS_TO_NAV_TYPE.get(atlas_entity['typeName'].lower()) or atlas_entity['typeName']
+    }
 
-  def search_entities_interactive(self, query_s=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None, sources=None):
-    try:
-      query_data = {
-        "excludeDeletedEntities": True,
-        "includeSubClassifications": True,
-        "includeSubTypes": True,
-        "includeClassificationAttributes": True,
-        "entityFilters": None,
-        "tagFilters": None,
-        "attributes": None,
-        "query": "*",
-        "limit": CATALOG.FETCH_SIZE_SEARCH_INTERACTIVE.get(),
-        "offset": offset,
-        "typeName": None,
-        "classification": None,
-        "termName": None
-      }
+    # Convert Atlas qualified name of form db.tbl.col@cluster to parentPath of form /db/tbl
+    if atlas_entity['typeName'].lower().startswith('hive_'):
+      nav_entity['sourceType'] = 'HIVE'
+      qualified_path_parts = re.sub(r'@.*$', '', atlas_entity['attributes'].get('qualifiedName')).split('.')
+      qualified_path_parts.pop()  # it's just the parent path we want so remove the entity name
+      nav_entity['parentPath'] = '/' + '/'.join(qualified_path_parts)
 
-      f = {
-          "outputFormat" : {
-            "type" : "dynamic"
-          },
-          "name" : {
-            "type" : "dynamic"
-          },
-          "lastModified" : {
-            "type" : "date"
-          },
-          "sourceType" : {
-            "type" : "dynamic"
-          },
-          "parentPath" : {
-            "type" : "dynamic"
-          },
-          "lastAccessed" : {
-            "type" : "date"
-          },
-          "type" : {
-            "type" : "dynamic"
-          },
-          "sourceId" : {
-            "type" : "dynamic"
-          },
-          "partitionColNames" : {
-            "type" : "dynamic"
-          },
-          "serDeName" : {
-            "type" : "dynamic"
-          },
-          "created" : {
-            "type" : "date"
-          },
-          "fileSystemPath" : {
-            "type" : "dynamic"
-          },
-          "compressed" : {
-            "type" : "bool"
-          },
-          "clusteredByColNames" : {
-            "type" : "dynamic"
-          },
-          "originalName" : {
-            "type" : "dynamic"
-          },
-          "owner" : {
-            "type" : "dynamic"
-          },
-          "extractorRunId" : {
-            "type" : "dynamic"
-          },
-          "userEntity" : {
-            "type" : "bool"
-          },
-          "sortByColNames" : {
-            "type" : "dynamic"
-          },
-          "inputFormat" : {
-            "type" : "dynamic"
-          },
-          "serDeLibName" : {
-            "type" : "dynamic"
-          },
-          "originalDescription" : {
-            "type" : "dynamic"
-          },
-          "lastModifiedBy" : {
-            "type" : "dynamic"
-          }
-        }
+    if 'classifications' in atlas_entity:
+      for atlas_classification in atlas_entity['classifications']:
+        if 'attributes' in atlas_classification:
+          for key, value in atlas_classification['attributes'].iteritems():
+            nav_entity['properties'][key] = value
 
-      auto_field_facets = ["tags", "type"] + f.keys()
-      query_s = (query_s.strip() if query_s else '') + '*'
+    return nav_entity
 
-      last_query_term = [term for term in query_s.split()][-1]
+  def fetch_single_entity(self, dsl_query):
+    '''
+    REQUEST: hue:8889/metadata/api/navigator/find_entity?type=database&name=default
+    SAMPLE response for Navigator find_entity response
+    {"status": 0, "entity": {
+    "customProperties": null,
+    "deleteTime": null,
+     "fileSystemPath": "hdfs://nightly6x-1.vpc.cloudera.com:8020/user/hive/warehouse",
+     "description": null,
+     "params": null,
+      "type": "DATABASE",
+      "internalType": "hv_database",
+      "sourceType": "HIVE",
+      "tags": [],
+      "deleted": false, "technicalProperties": null,
+      "userEntity": false,
+      "originalDescription": "Default Hive database",
+      "metaClassName": "hv_database",
+      "properties": {"__cloudera_internal__hueLink": "https://nightly6x-1.vpc.cloudera.com:8889/hue/metastore/tables/default"},
+      "identity": "23",
+      "firstClassParentId": null,
+      "name": null,
+      "extractorRunId": "7##1",
+      "sourceId": "7",
+       "packageName": "nav",
+       "parentPath": null, "originalName": "default"}}
+    '''
+    response = {
+      "status": 0,
+      "entity": []
+    }
 
-      if last_query_term and last_query_term != '*':
-        last_query_term = last_query_term.rstrip('*')
-        (fname, fval) = last_query_term.split(':') if ':' in last_query_term else (last_query_term, '')
-        auto_field_facets = [f for f in auto_field_facets if f.startswith(fname)]
+    try :
+      atlas_response = self._root.get('/v2/search/dsl?query=%s' % dsl_query, headers=self.__headers,
+                                      params=self.__params)
+      if not 'entities' in atlas_response or len(atlas_response['entities']) < 1:
+        raise CatalogEntityDoesNotExistException('Could not find entity with query: %s' % dsl_query)
 
-      facetFields = facetFields or auto_field_facets[:5]
+      for atlas_entity in atlas_response['entities']:
+        response['entity'].append(self.adapt_atlas_entity_to_navigator(atlas_entity))
 
-      entity_types = []
-      fq_type = []
-      if filterQueries is None:
-        filterQueries = []
-
-      if sources:
-        default_entity_types, entity_types = self._get_types_from_sources(sources)
-
-        if 'sql' in sources or 'hive' in sources or 'impala' in sources:
-          fq_type = default_entity_types
-          filterQueries.append('sourceType:HIVE OR sourceType:IMPALA')
-        elif 'hdfs' in sources:
-          fq_type = entity_types
-        elif 's3' in sources:
-          fq_type = default_entity_types
-          filterQueries.append('sourceType:s3')
-
-        if query_s.strip().endswith('type:*'): # To list all available types
-          fq_type = entity_types
-
-      search_terms = [term for term in query_s.strip().split()] if query_s else []
-      query = []
-      for term in search_terms:
-        query.append(term)
-        # if ':' not in term:
-        #   query.append(self._get_boosted_term(term))
-        # else:
-        #   name, val = term.split(':')
-        #   if val: # Allow to type non default types, e.g for SQL: type:FIEL*
-        #     if name == 'type': # Make sure type value still makes sense for the source
-        #       term = '%s:%s' % (name, val.upper())
-        #       fq_type = entity_types
-        #     if name.lower() not in ['type', 'tags', 'owner', 'originalname', 'originaldescription', 'lastmodifiedby']:
-        #       # User Defined Properties are prefixed with 'up_', i.e. "department:sales" -> "up_department:sales"
-        #       query.append('up_' + term)
-        #     else:
-        #       filterQueries.append(term)
-
-      # filterQueries.append('deleted:false')
-
-      query_data['query'] = ' '.join(query) or '*'
-
-      body = {}
-      # if fq_type:
-      #   filterQueries += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
-
-      # body['facetFields'] = facetFields or [] # Currently mandatory in API
-      # if facetPrefix:
-      #   body['facetPrefix'] = facetPrefix
-      # if facetRanges:
-      #   body['facetRanges'] = facetRanges
-      # if filterQueries:
-      #   body['filterQueries'] = filterQueries
-      # if firstClassEntitiesOnly:
-      #   body['firstClassEntitiesOnly'] = firstClassEntitiesOnly
-
-      data = json.dumps(query_data)
-      LOG.info(data)
-
-      response = self._root.post('/search/basic', data=data, contenttype=_JSON_CONTENT_TYPE)
-      response['results'] = [self._massage_entity(entity) for entity in response.pop('entities', [])]
-
-      return response
-    except RestException, e:
-      print(e)
-      LOG.error('Failed to search for entities with search query: %s' % json.dumps(body))
+      return response['entity'][0]
+    except RestException as e:
+      LOG.error('Failed to search for entities with search query: %s' % dsl_query)
       if e.code == 401:
         raise CatalogAuthException(_('Failed to authenticate.'))
       else:
         raise CatalogApiException(e.message)
 
-  def _massage_entity(self, entity):
-    return {
-        "name": entity['attributes'].get('name', entity['attributes'].get('qualifiedName')),
-        "description": entity['attributes'].get('description'),
-        "owner": entity.get('owner'),
-        "sourceType": entity['typeName'],
-        "partColNames":[
-            # "date"
-         ],
-         "type": "TABLE", # TODO
-         "internalType": entity['typeName'],
-         "status": entity['status'], # Specific to Atlas
-         "tags": entity['classificationNames'],
-         "classificationNames": entity['classificationNames'], # Specific to Atlas
-         "meaningNames": entity['meaningNames'], # Specific to Atlas
-         "meanings": entity['meanings'], # [{"displayText":"Stock","confidence":0, "termGuid":"32892437-931b-43d3-9aad-400f7f8d2a73","relationGuid":"e8856c09-a3a1-4a85-b841-709b30f93923"}] # Specific to Atlas
-         "originalDescription": None,
-         "customProperties": None,
-         "properties":{
-         },
-         "identity": entity['guid'],
-         "created": 'createTime' in entity['attributes'] and entity['attributes']['createTime'], #"2019-03-28T19:30:30.000Z",
-         "parentPath": "/default",
-         "originalName": entity['attributes'].get('qualifiedName'),
-        #  "lastAccessed":"1970-01-01T00:00:00.000Z"
-        #  "clusteredByColNames":null,
-        #  "outputFormat":"org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat",
-        #  "firstClassParentId":null,
-        #  "extractorRunId":"7##1",
-        #  "sourceId":"7",
-        #  "lastModified":null,
-        #  "packageName":"nav",
-        #  "compressed":false,
-        #  "metaClassName":"hv_table"
-        #  "deleted":false,
-        #  "technicalProperties":null,
-        #  "userEntity":false,
-        #  "serdeProps":null,
-        #  "serdeLibName":"org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
-        #  "lastModifiedBy":null,
-        #  "selectionName":"web_logs",
-        #  "sortByColNames":null,
-        #  "inputFormat":"org.apache.hadoop.mapred.TextInputFormat",
-        #  "serdeName":null,
-        #  "deleteTime":null,
-        #  "fileSystemPath":"hdfs://self-service-dw-1.gce.cloudera.com:8020/user/hive/warehouse/web_logs",
+  def get_database(self, name):
+    # Search with Atlas API for hive database with specific name
+    if get_catalog_search_cluster():
+      qualifiedNameCriteria = 'qualifiedName=\'%s@%s\'' % (name, get_catalog_search_cluster())
+    else:
+      qualifiedNameCriteria = 'qualifiedName like \'%s@*\'' % name
+
+    return self.fetch_single_entity('hive_db where %s' % qualifiedNameCriteria)
+
+  def get_table(self, database_name, table_name, is_view=False):
+    # Search with Atlas API for hive tables with specific name
+    if get_catalog_search_cluster():
+      qualifiedNameCriteria = 'qualifiedName=\'%s.%s@%s\'' % (database_name, table_name, get_catalog_search_cluster())
+    else:
+      qualifiedNameCriteria = 'qualifiedName like \'%s.%s@*\'' % (database_name, table_name)
+
+    return self.fetch_single_entity('hive_table where %s' % qualifiedNameCriteria)
+
+  def get_field(self, database_name, table_name, field_name):
+    # Search with Atlas API for hive tables with specific qualified name
+    if get_catalog_search_cluster():
+      qualifiedNameCriteria = 'qualifiedName=\'%s.%s.%s@%s\'' % (database_name, table_name, field_name,
+                                                                 get_catalog_search_cluster())
+    else:
+      qualifiedNameCriteria = 'qualifiedName like \'%s.%s.%s@*\'' % (database_name, table_name, field_name)
+
+    return self.fetch_single_entity('hive_column where %s' % qualifiedNameCriteria)
+
+  def search_entities_interactive(self, query_s=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None, sources=None):
+    try:
+      response = {
+        "status": 0,
+        "results": [],
+        "facets": {
+          "tags": {}
+        }
       }
 
-  def search_entities(self, query_s, limit=100, offset=0, raw_query=False, **filters):
-    pass
+      # This takes care of the list_tags endpoint
+      if not query_s and facetFields and 'tags' in facetFields:
+        classification_response = self._root.get('/v2/types/typedefs?type=classification')
+        for classification_def in classification_response['classificationDefs']:
+          if ' ' in classification_def['name']:
+            response['facets']['tags']['"' + classification_def['name'] + '"'] = -1
+          else:
+            response['facets']['tags'][classification_def['name']] = -1
+        return response
 
+      query_s = (query_s.strip() if query_s else '').replace('*', '')
+
+      atlas_type = None
+      classification = None
+      owner = None
+
+      # Take the first classification and type facets and ignore other as we can't search multiple in Atlas.
+      classification_facets = self.CLASSIFICATION_RE.findall(query_s)
+      if classification_facets:
+        classification = classification_facets[0][0] or classification_facets[0][1]
+        query_s = self.CLASSIFICATION_RE.sub('', query_s).strip()
+        atlas_type = 'Asset'  # Filtered below to just contain hive_db, hive_table or hive_column
+
+      owner_facets = self.OWNER_RE.findall(query_s)
+      if owner_facets:
+        owner = owner_facets[0]
+        query_s = self.OWNER_RE.sub('', query_s).strip()
+
+      type_facets = self.TYPE_RE.findall(query_s)
+      if type_facets:
+        atlas_type = self.NAV_TO_ATLAS_TYPE[type_facets[0].lower()] or type_facets[0]
+        query_s = self.TYPE_RE.sub('', query_s).strip()
+
+      data = {
+        'attributes': None,
+        'classification': classification,
+        'entityFilters': {
+          'condition': 'AND',
+          'criterion': [{
+            'condition': 'OR',
+            'criterion': [{
+              'attributeName': 'name',
+              'attributeValue': query_s,
+              'operator': 'contains'
+            }, {
+              'attributeName': 'description',
+              'attributeValue': query_s,
+              'operator': 'contains'
+            }]
+          }]
+        },
+        'excludeDeletedEntities': True,
+        'includeClassificationAttributes': True,
+        'includeSubClassifications': True,
+        'includeSubTypes': True,
+        'limit': limit,
+        'offset': 0,
+        'tagFilters': None,
+        'termName': None,
+        'typeName': atlas_type or 'hive_table'
+      }
+
+      if get_catalog_search_cluster():
+        data['entityFilters']['criterion'].append({
+          'attributeName': 'qualifiedName',
+          'operator': 'contains',
+          'attributeValue': '@' + get_catalog_search_cluster()
+        })
+
+      if owner:
+        data['entityFilters']['criterion'].append({
+          'attributeName': 'owner',
+          'operator': 'startsWith',
+          'attributeValue': owner
+        })
+
+      atlas_response = self._root.post('/v2/search/basic', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
+
+      # Adapt Atlas entities to Navigator structure in the results
+      if 'entities' in atlas_response:
+        for atlas_entity in atlas_response['entities']:
+          if atlas_type != 'Asset' or atlas_entity['typeName'].lower() in ['hive_db', 'hive_table', 'hive_column']:
+            response['results'].append(self.adapt_atlas_entity_to_navigator(atlas_entity))
+
+      return response
+    except RestException as e:
+      LOG.error('Failed to search for entities with search query: %s' % data)
+      if e.code == 401:
+        raise CatalogAuthException(_('Failed to authenticate.'))
+      else:
+        raise CatalogApiException(e.message)
+
+  # search_enties is only used by the table browser to fetch child entities of a given table or database.
+  def search_entities(self, query_s, limit=100, offset=0, raw_query=False, **filters):
+    try:
+      found_entities = []
+
+      search_terms = [term for term in query_s.strip().split()] if query_s else []
+      parentPath = None
+      for term in search_terms:
+        if 'parentPath:' in term:
+          name, val = term.split(':')
+          parentPath = val.strip('"').lstrip('/').replace('/', '.')
+
+      if query_s == 'type:database':
+        if get_catalog_search_cluster():
+          atlas_dsl_query = 'from hive_db where qualifiedName like \'*@%s\' limit %s' % (
+            get_catalog_search_cluster(),
+            limit
+          )
+        else:
+          atlas_dsl_query = 'from hive_db limit %s' % limit
+      elif not parentPath:
+        return found_entities
+      else:
+        atlas_type = 'hive_table' if parentPath.count('.') == 0 else 'hive_column'
+        if get_catalog_search_cluster():
+          atlas_dsl_query = 'from %s where qualifiedName like \'%s*@%s\' limit %s' % (
+            atlas_type,
+            parentPath,
+            get_catalog_search_cluster(),
+            limit
+          )
+        else:
+          atlas_dsl_query = 'from %s where qualifiedName like \'%s*\' limit %s' % (atlas_type, parentPath, limit)
+
+      atlas_response = self._root.get('/v2/search/dsl?query=%s' % atlas_dsl_query)
+
+      # Adapt Atlas entities to Navigator structure in the results
+      if 'entities' in atlas_response:
+        for atlas_entity in atlas_response['entities']:
+          found_entities.append(self.adapt_atlas_entity_to_navigator(atlas_entity))
+
+      return found_entities
+    except RestException as e:
+      LOG.error('Failed to search for entities with search query: %s' % atlas_dsl_query)
+      if e.code == 401:
+        raise CatalogAuthException(_('Failed to authenticate.'))
+      else:
+        raise CatalogApiException(e.message)
 
   def suggest(self, prefix=None):
     try:
       return self._root.get('interactive/suggestions?query=%s' % (prefix or '*'))
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to search for entities with search query: %s' % prefix
       LOG.error(msg)
       raise CatalogApiException(e.message)
 
-
-  def find_entity(self, source_type, type, name, **filters):
-    """
-    GET /api/v3/entities?query=((sourceType:<source_type>)AND(type:<type>)AND(originalName:<name>))
-    http://cloudera.github.io/navigator/apidocs/v3/path__v3_entities.html
-    """
-    try:
-      params = self.__params
-
-      query_filters = {
-        'sourceType': source_type,
-        'originalName': name,
-        'deleted': 'false'
-      }
-
-      for key, value in filters.items():
-        query_filters[key] = value
-
-      filter_query = 'AND'.join('(%s:%s)' % (key, value) for key, value in query_filters.items())
-      filter_query = '%(type)s AND %(filter_query)s' % {
-        'type': '(type:%s)' % 'TABLE OR type:VIEW' if type == 'TABLE' else type, # Impala does not always say that a table is actually a view
-        'filter_query': filter_query
-      }
-
-      source_ids = self.get_cluster_source_ids()
-      if source_ids:
-        filter_query = source_ids + '(' + filter_query + ')'
-
-      params += (
-        ('query', filter_query),
-        ('offset', 0),
-        ('limit', 2),  # We are looking for single entity, so limit to 2 to check for multiple results
-      )
-
-      response = self._root.get('entities', headers=self.__headers, params=params)
-
-      if not response:
-        raise CatalogEntityDoesNotExistException('Could not find entity with query filters: %s' % str(query_filters))
-      elif len(response) > 1:
-        raise CatalogApiException('Found more than 1 entity with query filters: %s' % str(query_filters))
-
-      return response[0]
-    except RestException, e:
-      msg = 'Failed to find entity: %s' % str(e)
-      LOG.error(msg)
-      raise CatalogApiException(e.message)
-
-
   def get_entity(self, entity_id):
     """
-    GET /api/v3/entities/:id
-    http://cloudera.github.io/navigator/apidocs/v3/path__v3_entities_-id-.html
+    # TODO: get entity by Atlas __guid or qualifiedName
+    GET /v2/search/dsl?query=?
     """
     try:
       return self._root.get('entities/%s' % entity_id, headers=self.__headers, params=self.__params)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to get entity %s: %s' % (entity_id, str(e))
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -388,7 +393,7 @@ class AtlasApi(Api):
       data = json.dumps(properties)
 
       return self._root.put('entities/%(identity)s' % entity, params=self.__params, data=data, contenttype=_JSON_CONTENT_TYPE, allow_redirects=True, clear_cookies=True)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to update entity %s: %s' % (entity['identity'], e)
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -457,7 +462,7 @@ class AtlasApi(Api):
       )
 
       return self._root.get('lineage', headers=self.__headers, params=params)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to get lineage for entity ID %s: %s' % (entity_id, str(e))
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -467,7 +472,7 @@ class AtlasApi(Api):
     try:
       data = json.dumps({'name': namespace, 'description': description})
       return self._root.post('models/namespaces/', data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to create namespace: %s' % namespace
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -476,7 +481,7 @@ class AtlasApi(Api):
   def get_namespace(self, namespace):
     try:
       return self._root.get('models/namespaces/%(namespace)s' % {'namespace': namespace})
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to get namespace: %s' % namespace
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -486,7 +491,7 @@ class AtlasApi(Api):
     try:
       data = json.dumps(properties)
       return self._root.post('models/namespaces/%(namespace)s/properties' % {'namespace': namespace}, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to create namespace %s property' % namespace
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -495,7 +500,7 @@ class AtlasApi(Api):
   def get_namespace_properties(self, namespace):
     try:
       return self._root.get('models/namespaces/%(namespace)s/properties' % {'namespace': namespace})
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to create namespace %s property' % namespace
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -505,7 +510,7 @@ class AtlasApi(Api):
     try:
       data = json.dumps(properties)
       return self._root.post('models/packages/nav/classes/%(class)s/properties' % {'class': clazz}, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to map class %s property' % clazz
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -514,7 +519,7 @@ class AtlasApi(Api):
   def get_model_properties_mapping(self):
     try:
       return self._root.get('models/properties/mappings')
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to get models properties mappings'
       LOG.error(msg)
       raise CatalogApiException(e.message)

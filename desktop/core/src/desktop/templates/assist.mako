@@ -17,12 +17,11 @@
 <%!
 from django.utils.translation import ugettext as _
 
+from dashboard.conf import HAS_SQL_ENABLED
 from filebrowser.conf import SHOW_UPLOAD_BUTTON
-from metadata.conf import has_catalog, OPTIMIZER
+from metadata.conf import OPTIMIZER
 from metastore.conf import ENABLE_NEW_CREATE_TABLE
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ordered_interpreters
-
-from dashboard.conf import HAS_SQL_ENABLED
 
 from desktop import appmanager
 from desktop import conf
@@ -3437,6 +3436,8 @@ from desktop.views import _ko
 
         self.disposals = [];
         self.isSolr = ko.observable(true);
+
+        self.showRisks = ko.observable(false);
 
         self.filter = {
           querySpec: ko.observable({

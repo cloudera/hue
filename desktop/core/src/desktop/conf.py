@@ -829,6 +829,24 @@ SESSION = ConfigSection(
   )
 )
 
+KNOX = ConfigSection(
+  key="knox",
+  help=_("""Configuration options for specifying Hue's KNOX integration for secured Hadoop clusters."""),
+  members=dict(
+    KNOX_PRINCIPAL=Config(
+      key='knox_principal',
+      help=_("Kerberos principal name for Hue. Typically 'knox/hostname.foo.com'."),
+      type=str,
+      default="knox/%s" % socket.getfqdn()),
+    KNOX_PROXYHOSTS = Config(
+      key='knox_proxyhosts',
+      default="%s" % socket.getfqdn(),
+      type=str,
+      help=_('Comma separated list of strings representing the host names that the Hue server can trust as knox hosts.')
+    ),
+  )
+)
+
 KERBEROS = ConfigSection(
   key="kerberos",
   help=_("""Configuration options for specifying Hue's Kerberos integration for
@@ -1665,10 +1683,10 @@ TASK_SERVER = ConfigSection(
       default='amqp://guest:guest@localhost//',
       help=_('How the task server and tasks communicate.')
     ),
-    RESULT_BACKEND = Config(
-      key='result_backend',
+    CELERY_RESULT_BACKEND = Config(
+      key='celery_result_backend',
       dynamic_default=task_server_default_result_directory,
-      help=_('Local file system path used to store task results when using the file result backend.')
+      help=_('Where to store task results. Defaults to local file system path. Celery comes with a several other backends.')
     ),
     RESULT_CELERYD_OPTS = Config(
       key='celeryd_opts',
@@ -1681,17 +1699,17 @@ TASK_SERVER = ConfigSection(
       type=coerce_bool,
       help=_('Switch on the integration with the Task Scheduler.')
     ),
-    PREFETCH_RESULT_COUNT = Config(
-      key='prefetch_result_count',
+    FETCH_RESULT_LIMIT = Config(
+      key='fetch_result_limit',
       default=2000,
       type=coerce_positive_integer,
-      help=_('Number of rows to prefetch to Hue storage')
+      help=_('Number of query results rows to fetch into the result storage.')
     ),
-    RESULT_FILE_STORAGE = Config(
-      key='result_file_storage',
+    RESULT_STORAGE = Config(
+      key='result_storage',
       type=str,
       help=_('Django file storage class to use to temporarily store query results'),
-      default='{}'
+      default='{"backend": "django.core.files.storage.FileSystemStorage", "properties": {"location": "./logs"}}'
     ),
     EXECUTION_STORAGE = Config(
       key='execution_storage',

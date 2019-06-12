@@ -41,6 +41,7 @@ from settings import HUE_DESKTOP_VERSION
 from aws.conf import is_enabled as is_s3_enabled, has_s3_access
 from azure.conf import is_adls_enabled, has_adls_access
 from dashboard.conf import get_engines, HAS_REPORT_ENABLED
+from hadoop.conf import has_hdfs_enabled
 from kafka.conf import has_kafka
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 
@@ -48,7 +49,7 @@ from desktop import appmanager
 from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_EMBEDDED, IS_K8S_ONLY
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.paths import get_run_root
+from desktop.lib.paths import get_run_root, SAFE_CHARACTERS_URI_COMPONENTS
 from desktop.redaction import global_redaction_engine
 from desktop.settings import DOCUMENT2_SEARCH_MAX_LENGTH
 from desktop.auth.backend import is_admin
@@ -1314,7 +1315,7 @@ class Document2(models.Model):
     if self.can_read(user):
       return True
     else:
-      raise PopupException(_("Document does not exist or you don't have the permission to access it."))
+      raise PopupException(_("Document does not exist or you don't have the permission to access it."), error_code=401)
 
   def can_write(self, user):
     perm = self.get_permission('write')
@@ -1608,6 +1609,7 @@ class ClusterConfig():
     apps = OrderedDict([app for app in [
       ('editor', self._get_editor()),
       ('dashboard', self._get_dashboard()),
+      ('catalogs', self._get_catalogs()),
       ('browser', self._get_browser()),
       ('scheduler', self._get_scheduler()),
       ('sdkapps', self._get_sdk_apps()),
@@ -1663,15 +1665,16 @@ class ClusterConfig():
       _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] in ('impala')] #, 'hive', 'spark2', 'pyspark', 'mapreduce')]
 
     for interpreter in _interpreters:
-      interpreters.append({
-        'name': interpreter['name'],
-        'type': interpreter['type'],
-        'displayName': interpreter['name'],
-        'buttonName': _('Query'),
-        'tooltip': _('%s Query') % interpreter['type'].title(),
-        'page': '/editor/?type=%(type)s' % interpreter,
-        'is_sql': interpreter['is_sql'],
-      })
+      if interpreter['interface'] != 'hms':
+        interpreters.append({
+          'name': interpreter['name'],
+          'type': interpreter['type'],
+          'displayName': interpreter['name'],
+          'buttonName': _('Query'),
+          'tooltip': _('%s Query') % interpreter['type'].title(),
+          'page': '/editor/?type=%(type)s' % interpreter,
+          'is_sql': interpreter['is_sql'],
+        })
 
     if SHOW_NOTEBOOKS.get() and ANALYTIC_DB not in self.cluster_type:
       try:
@@ -1700,6 +1703,26 @@ class ClusterConfig():
       }
     else:
       return None
+
+  def _get_catalogs(self):
+    interpreters = []
+
+    _interpreters = get_ordered_interpreters(self.user)
+
+    for interpreter in _interpreters:
+      if interpreter['interface'] == 'hms':
+        interpreters.append({
+          'name': interpreter['name'],
+          'type': interpreter['type'],
+          'displayName': interpreter['name'],
+          'buttonName': _('Query'),
+          'tooltip': _('%s Query') % interpreter['type'].title(),
+          'page': '/editor/?type=%(type)s' % interpreter,
+          'is_sql': interpreter['is_sql'],
+          'is_catalog': interpreter['is_catalog'],
+        })
+
+    return interpreters if interpreters else None
 
   def _get_dashboard(self):
     interpreters = get_engines(self.user)
@@ -1739,31 +1762,31 @@ class ClusterConfig():
   def _get_browser(self):
     interpreters = []
 
-    if 'filebrowser' in self.apps and ANALYTIC_DB not in self.cluster_type:
+    if has_hdfs_enabled() and 'filebrowser' in self.apps and ANALYTIC_DB not in self.cluster_type:
       interpreters.append({
         'type': 'hdfs',
         'displayName': _('Files'),
         'buttonName': _('Browse'),
         'tooltip': _('Files'),
-        'page': '/filebrowser/' + (not self.user.is_anonymous() and 'view=' + self.user.get_home_directory() or '')
+        'page': '/filebrowser/' + (not self.user.is_anonymous() and 'view=' + urllib.quote(self.user.get_home_directory().encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) or '')
       })
 
-    if is_s3_enabled() and has_s3_access(self.user) and not IS_EMBEDDED.get():
+    if is_s3_enabled() and 'filebrowser' in self.apps and has_s3_access(self.user) and not IS_EMBEDDED.get():
       interpreters.append({
         'type': 's3',
         'displayName': _('S3'),
         'buttonName': _('Browse'),
         'tooltip': _('S3'),
-        'page': '/filebrowser/view=S3A://'
+        'page': '/filebrowser/view=' + urllib.quote('S3A://'.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
       })
 
-    if is_adls_enabled() and has_adls_access(self.user) and ANALYTIC_DB not in self.cluster_type:
+    if is_adls_enabled() and 'filebrowser' in self.apps and has_adls_access(self.user) and ANALYTIC_DB not in self.cluster_type:
       interpreters.append({
         'type': 'adls',
         'displayName': _('ADLS'),
         'buttonName': _('Browse'),
         'tooltip': _('ADLS'),
-        'page': '/filebrowser/view=adl:/'
+        'page': '/filebrowser/view=' + urllib.quote('adl:/'.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
       })
 
     if 'metastore' in self.apps:

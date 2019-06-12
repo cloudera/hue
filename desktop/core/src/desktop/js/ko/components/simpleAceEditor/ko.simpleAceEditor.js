@@ -79,10 +79,6 @@ class SimpleAceEditor {
     self.ace(editor);
 
     if (params.autocomplete) {
-      if (!AVAILABLE_AUTOCOMPLETERS[params.autocomplete.type]) {
-        throw new Error('Could not find autocompleter for "' + params.autocomplete.type + '"');
-      }
-
       const sourceType =
         params.autocomplete.type.indexOf('Query') !== -1
           ? params.autocomplete.type.replace('Query', '')
@@ -158,7 +154,9 @@ class SimpleAceEditor {
         support: params.autocomplete.support
       };
 
-      self.autocompleter = new AVAILABLE_AUTOCOMPLETERS[params.autocomplete.type](autocompleteArgs);
+      const AutocompleterClass =
+        AVAILABLE_AUTOCOMPLETERS[params.autocomplete.type] || SqlAutocompleter;
+      self.autocompleter = new AutocompleterClass(autocompleteArgs);
     } else {
       self.autocompleter = null;
     }

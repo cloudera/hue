@@ -20,6 +20,7 @@ import logging
 import os
 import re
 import time
+import urllib
 
 from django.forms.formsets import formset_factory
 from django.http import HttpResponse
@@ -34,6 +35,7 @@ from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str, smart_unicode
+from desktop.lib.paths import SAFE_CHARACTERS_URI_COMPONENTS
 from desktop.lib.rest.http_client import RestException
 from desktop.lib.view_util import format_duration_in_millis
 from desktop.log.access import access_warn
@@ -759,6 +761,8 @@ def rerun_oozie_job(request, job_id, app_path=None):
   check_job_edition_permission(oozie_workflow, request.user)
   if app_path is None:
     app_path = oozie_workflow.appPath
+  else:
+    app_path = urllib.unquote(app_path)
   return_json = request.GET.get('format') == 'json'
 
   if request.method == 'POST':
@@ -790,15 +794,13 @@ def rerun_oozie_job(request, job_id, app_path=None):
     initial_params = ParameterForm.get_initial_params(oozie_workflow.conf_dict)
     params_form = ParametersFormSet(initial=initial_params)
 
-  popup = render('dashboard/rerun_workflow_popup.mako', request, {
+    return render('dashboard/rerun_workflow_popup.mako', request, {
                    'rerun_form': rerun_form,
                    'params_form': params_form,
-                   'action': reverse('oozie:rerun_oozie_job', kwargs={'job_id': job_id, 'app_path': app_path}),
+                   'action': reverse('oozie:rerun_oozie_job', kwargs={'job_id': job_id, 'app_path': urllib.quote(app_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) }), 
                    'return_json': return_json,
                    'is_mini': request.GET.get('is_mini', False),
-                 }, force_template=True).content
-
-  return JsonResponse(popup, safe=False)
+                 }, force_template=True)
 
 
 def _rerun_workflow(request, oozie_id, run_args, mapping):
@@ -820,6 +822,8 @@ def rerun_oozie_coordinator(request, job_id, app_path=None):
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
   if app_path is None:
     app_path = oozie_coordinator.coordJobPath
+  else:
+    app_path = urllib.unquote(app_path)
   return_json = request.GET.get('format') == 'json'
 
   if request.method == 'POST':
@@ -854,15 +858,13 @@ def rerun_oozie_coordinator(request, job_id, app_path=None):
     initial_params = ParameterForm.get_initial_params(oozie_coordinator.conf_dict)
     params_form = ParametersFormSet(initial=initial_params)
 
-  popup = render('dashboard/rerun_coord_popup.mako', request, {
+    return render('dashboard/rerun_coord_popup.mako', request, {
                    'rerun_form': rerun_form,
                    'params_form': params_form,
-                   'action': reverse('oozie:rerun_oozie_coord', kwargs={'job_id': job_id, 'app_path': app_path}),
+                   'action': reverse('oozie:rerun_oozie_coord', kwargs={'job_id': job_id, 'app_path': urllib.quote(app_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)}),
                    'return_json': return_json,
                    'is_mini': request.GET.get('is_mini', False),
-                 }, force_template=True).content
-
-  return JsonResponse(popup, safe=False)
+                 }, force_template=True)
 
 
 def _rerun_coordinator(request, oozie_id, args, params, properties):
@@ -882,7 +884,7 @@ def rerun_oozie_bundle(request, job_id, app_path):
   oozie_bundle = check_job_access_permission(request, job_id)
   check_job_edition_permission(oozie_bundle, request.user)
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
-
+  app_path = urllib.unquote(app_path)
   if request.method == 'POST':
     params_form = ParametersFormSet(request.POST)
     rerun_form = RerunBundleForm(request.POST, oozie_bundle=oozie_bundle)
@@ -921,13 +923,11 @@ def rerun_oozie_bundle(request, job_id, app_path):
     initial_params = ParameterForm.get_initial_params(oozie_bundle.conf_dict)
     params_form = ParametersFormSet(initial=initial_params)
 
-  popup = render('dashboard/rerun_bundle_popup.mako', request, {
+    return render('dashboard/rerun_bundle_popup.mako', request, {
                    'rerun_form': rerun_form,
                    'params_form': params_form,
-                   'action': reverse('oozie:rerun_oozie_bundle', kwargs={'job_id': job_id, 'app_path': app_path}),
-                 }, force_template=True).content
-
-  return JsonResponse(popup, safe=False)
+                   'action': reverse('oozie:rerun_oozie_bundle', kwargs={'job_id': job_id, 'app_path': urllib.quote(app_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)}),
+                 }, force_template=True)
 
 
 def _rerun_bundle(request, oozie_id, args, params, properties):

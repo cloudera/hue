@@ -46,8 +46,8 @@ from metastore.settings import DJANGO_APPS
 
 from desktop.auth.backend import is_admin
 
-LOG = logging.getLogger(__name__)
 
+LOG = logging.getLogger(__name__)
 SAVE_RESULTS_CTAS_TIMEOUT = 300         # seconds
 
 
@@ -97,7 +97,7 @@ def databases(request):
 
 @check_has_write_access_permission
 def drop_database(request):
-  source_type = request.POST.get('source_type', 'hive')
+  source_type = request.POST.get('source_type', request.GET.get('source_type', 'hive'))
   cluster = json.loads(request.POST.get('cluster', '{}'))
 
   db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
@@ -297,7 +297,7 @@ def get_table_metadata(request, database, table):
 def describe_table(request, database, table):
   app_name = get_app_name(request)
   cluster = json.loads(request.POST.get('cluster', '{}'))
-  source_type = request.POST.get('source_type')
+  source_type = request.POST.get('source_type', request.GET.get('source_type', 'hive'))
   db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
 
   try:
@@ -431,7 +431,7 @@ def alter_column(request, database, table):
 
 @check_has_write_access_permission
 def drop_table(request, database):
-  source_type = request.POST.get('source_type', 'hive')
+  source_type = request.POST.get('source_type', request.GET.get('source_type', 'hive'))
   cluster = json.loads(request.POST.get('cluster', '{}'))
 
   db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
@@ -493,7 +493,7 @@ def read_table(request, database, table):
 def load_table(request, database, table):
   response = {'status': -1, 'data': 'None'}
 
-  source_type = request.POST.get('source_type', 'hive')
+  source_type = request.POST.get('source_type', request.GET.get('source_type', 'hive'))
   cluster = json.loads(request.POST.get('cluster', '{}'))
 
   db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
@@ -545,6 +545,7 @@ def load_table(request, database, table):
     popup = render('popups/load_data.mako', request, {
            'table': table,
            'load_form': load_form,
+           'source_type': source_type,
            'database': database,
            'app_name': 'beeswax'
        }, force_template=True).content

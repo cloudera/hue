@@ -1469,7 +1469,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <!-- /ko -->
 
         <!-- ko if: $root.collection.engine() == 'solr' -->
-        <form method="POST" action="${ url('dashboard:download') }" style="display:inline">
+        <form method="POST" style="display:inline" data-bind="attr: { action: window.HUE_BASE_URL + '${ url("dashboard:download") }' }">
           ${ csrf_token(request) | n,unicode }
           <input type="hidden" name="collection" data-bind="value: ko.mapping.toJSON($root.collection)"/>
           <input type="hidden" name="query" data-bind="value: ko.mapping.toJSON($root.query)"/>
@@ -3139,7 +3139,6 @@ var ALPHA_HIT_OPTIONS = [
 var HIT_OPTIONS = NUMERIC_HIT_OPTIONS
 ;
 
-
 function prepareShareModal() {
   shareViewModel.setDocUuid(this.collection.uuid());
   openShareModal();
@@ -4118,7 +4117,7 @@ function loadSearch(collection, query, initial) {
 
   searchViewModel.init(function(){
     $(".chosen-select").trigger("chosen:updated");
-    if (searchViewModel.collection.engine() === 'report') {
+    if (searchViewModel.collection.engine() === 'report' || searchViewModel.collection.engine() === 'solr') {
       if (!searchViewModel.collectionJson.layout.length && (!searchViewModel.collectionJson.gridItems || !searchViewModel.collectionJson.gridItems.length)) {
         magicSearchLayout(searchViewModel);
       }

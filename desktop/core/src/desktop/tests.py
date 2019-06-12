@@ -238,13 +238,17 @@ def test_dump_config():
   response = client_not_me.get(reverse('desktop.views.dump_config'))
   assert_true("You must be a superuser" in response.content, response.content)
 
-  prev_env_conf = os.environ["HUE_CONF_DIR"]
+  prev_env_conf = os.environ.get("HUE_CONF_DIR")
   try:
     os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
     resp = c.get(reverse('desktop.views.dump_config'))
     assert_true('/tmp/test_hue_conf_dir' in resp.content, resp)
   finally:
-    os.environ["HUE_CONF_DIR"] = prev_env_conf
+    if prev_env_conf is None:
+      os.environ.pop("HUE_CONF_DIR", None)
+    else:
+      os.environ["HUE_CONF_DIR"] = prev_env_conf
+
 
 def hue_version():
   global HUE_VERSION
@@ -741,6 +745,8 @@ def test_validate_path():
   finally:
     reset()
 
+
+@attr('integration')
 @attr('requires_hadoop')
 def test_config_check():
   with tempfile.NamedTemporaryFile() as cert_file:
@@ -763,7 +769,7 @@ def test_config_check():
         for old_conf in reset:
           old_conf()
 
-      prev_env_conf = os.environ["HUE_CONF_DIR"]
+      prev_env_conf = os.environ.get("HUE_CONF_DIR")
       try:
         # Set HUE_CONF_DIR and make sure check_config returns appropriate conf
         os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
@@ -778,7 +784,10 @@ def test_config_check():
         resp = cli.get('/desktop/debug/check_config')
         assert_true('/tmp/test_hue_conf_dir' in resp.content, resp)
       finally:
-        os.environ["HUE_CONF_DIR"] = prev_env_conf
+        if prev_env_conf is None:
+          os.environ.pop("HUE_CONF_DIR", None)
+        else:
+          os.environ["HUE_CONF_DIR"] = prev_env_conf
         desktop.views.validate_by_spec = desktop.views.real_validate_by_spec
 
 def test_last_access_time():
@@ -815,6 +824,7 @@ def test_ui_customizations():
 
   try:
     c = make_logged_in_client()
+    c.logout()
     resp = c.get('/hue/accounts/login/', follow=False)
     assert_true(custom_message in resp.content, resp)
     resp = c.get('/hue/about', follow=True)
@@ -824,6 +834,7 @@ def test_ui_customizations():
       old_conf()
 
 
+@attr('integration')
 @attr('requires_hadoop')
 def test_check_config_ajax():
   c = make_logged_in_client()

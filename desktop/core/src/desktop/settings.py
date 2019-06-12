@@ -146,6 +146,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'desktop.middleware.ProxyMiddleware',
     'desktop.middleware.SpnegoMiddleware',
     'desktop.middleware.HueRemoteUserMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -400,6 +401,9 @@ SESSION_COOKIE_HTTPONLY = desktop.conf.SESSION.HTTP_ONLY.get()
 CSRF_COOKIE_SECURE = desktop.conf.SESSION.SECURE.get()
 CSRF_COOKIE_HTTPONLY = desktop.conf.SESSION.HTTP_ONLY.get()
 CSRF_COOKIE_NAME='csrftoken'
+# This is required for knox
+if desktop.conf.KNOX.KNOX_PROXYHOSTS.get(): # The hosts provided here don't have port. Add default knox port
+  CSRF_TRUSTED_ORIGINS=[host.split(':')[0] + ':' + (host.split(':')[1] if len(host.split(':')) > 1 else '8443') for host in desktop.conf.KNOX.KNOX_PROXYHOSTS.get().split(',')]
 
 SECURE_HSTS_SECONDS = desktop.conf.SECURE_HSTS_SECONDS.get()
 SECURE_HSTS_INCLUDE_SUBDOMAINS = desktop.conf.SECURE_HSTS_INCLUDE_SUBDOMAINS.get()
@@ -663,7 +667,7 @@ if desktop.conf.TASK_SERVER.ENABLED.get():
   CELERY_BROKER_URL = desktop.conf.TASK_SERVER.BROKER_URL.get()
 
   CELERY_ACCEPT_CONTENT = ['json']
-  CELERY_RESULT_BACKEND = desktop.conf.TASK_SERVER.RESULT_BACKEND.get()
+  CELERY_RESULT_BACKEND = desktop.conf.TASK_SERVER.CELERY_RESULT_BACKEND.get()
   CELERY_TASK_SERIALIZER = 'json'
 
   CELERYD_OPTS = desktop.conf.TASK_SERVER.RESULT_CELERYD_OPTS.get()

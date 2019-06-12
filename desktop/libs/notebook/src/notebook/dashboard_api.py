@@ -211,10 +211,15 @@ class SQLDashboardApi(DashboardApi):
   # This method currently behaves more like a static method
   def datasets(self, show_all=False):
     snippet = {'type': self.engine}
+
     # Ideally from left assist at some point instead
     databases = get_api(MockRequest(self.user, self.cluster), snippet).autocomplete(snippet)['databases']
-    database = databases and 'default' not in databases and databases[0] or 'default'
-    return [database + '.' + table['name'] for table in get_api(MockRequest(self.user, self.cluster), snippet).autocomplete(snippet, database=database)['tables_meta']]
+    database = databases and 'default' not in databases and sorted(databases)[0] or 'default'
+
+    return [
+      database + '.' + table['name']
+      for table in get_api(MockRequest(self.user, self.cluster), snippet).autocomplete(snippet, database=database)['tables_meta']
+    ]
 
 
   # This method currently behaves more like a static method

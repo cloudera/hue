@@ -931,7 +931,7 @@ function BeeswaxViewModel(server, apiHelper) {
             self.design.results.save.errors(null);
 
             var redirect_fn = function() {
-              window.location.href = data.success_url + (data.success_url.indexOf("?") > -1 ? "&" : "?") + "refresh=true";
+              huePubSub.publish('open.link', data.success_url + (data.success_url.indexOf("?") > -1 ? "&" : "?") + "refresh=true");
               self.design.isRunning(false);
             };
             if (data.id) {

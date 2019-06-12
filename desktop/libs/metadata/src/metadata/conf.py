@@ -26,7 +26,6 @@ from desktop.lib.conf import Config, ConfigSection, coerce_bool, coerce_password
 from desktop.lib.paths import get_config_root
 
 from metadata.settings import DJANGO_APPS
-from notebook.conf import ENABLE_QUERY_ANALYSIS
 
 
 OPTIMIZER_AUTH_PASSWORD = None
@@ -232,6 +231,12 @@ def has_catalog(user):
   return ((bool(get_catalog_url() and get_catalog_auth_password())) or has_navigator(user)) \
       and (is_admin(user) or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
 
+def has_readonly_catalog(user):
+  return has_catalog(user) and not has_navigator(user)
+
+def get_catalog_search_cluster():
+  return CATALOG.SEARCH_CLUSTER.get()
+
 def get_catalog_auth_password():
   '''Get the password to authenticate with.'''
   global CATALOG_AUTH_PASSWORD
@@ -252,12 +257,10 @@ CATALOG = ConfigSection(
       key='interface',
       help=_t('Type of Catalog to connect to, e.g. Apache Atlas, Navigator...'),
       dynamic_default=default_catalog_interface),
-
     API_URL=Config(
       key='api_url',
       help=_t('Base URL to Catalog API.'),
       dynamic_default=default_catalog_url),
-
     SERVER_USER=Config(
       key="server_user",
       help=_t("Username of the CM user used for authentication."),
@@ -267,7 +270,10 @@ CATALOG = ConfigSection(
       help=_t("Password of the user used for authentication."),
       private=True,
       default=None),
-
+    SEARCH_CLUSTER=Config(
+      key="search_cluster",
+      help=_t("Limits found entities to a specific cluster."),
+      default=None),
     FETCH_SIZE_SEARCH_INTERACTIVE = Config(
       key="fetch_size_search_interactive",
       help=_t("Max number of items to fetch in one call in object search autocomplete."),

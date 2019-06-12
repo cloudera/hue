@@ -20,6 +20,8 @@ import logging
 from desktop.auth.backend import is_admin
 from desktop.lib.django_util import render
 
+from notebook.models import Analytics
+
 
 LOG = logging.getLogger(__name__)
 

@@ -56,6 +56,7 @@ from desktop.lib.export_csvxls import file_reader
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fs import splitpath
 from desktop.lib.i18n import smart_str
+from desktop.lib.paths import SAFE_CHARACTERS_URI, SAFE_CHARACTERS_URI_COMPONENTS
 from desktop.lib.tasks.compress_files.compress_utils import compress_files_in_hdfs
 from desktop.lib.tasks.extract_archive.extract_utils import extract_archive_in_hdfs
 from desktop.views import serve_403_error
@@ -125,6 +126,9 @@ def download(request, path):
     This is inspired by django.views.static.serve.
     ?disposition={attachment, inline}
     """
+    decoded_path = urllib.unquote(path)
+    if path != decoded_path:
+      path = decoded_path
     if not SHOW_DOWNLOAD_BUTTON.get():
         return serve_403_error(request)
     if not request.fs.exists(path):
@@ -158,7 +162,7 @@ def download(request, path):
       response = StreamingHttpResponse(file_reader(fh), content_type=content_type)
       response["Last-Modified"] = http_date(stats['mtime'])
       response["Content-Length"] = stats['size']
-      response['Content-Disposition'] = request.GET.get('disposition', 'attachment') if _can_inline_display(path) else 'attachment'
+      response['Content-Disposition'] = request.GET.get('disposition', 'attachment; filename="' + stats['name'] + '"') if _can_inline_display(path) else 'attachment'
 
     request.audit = {
         'operation': 'DOWNLOAD',
@@ -171,24 +175,25 @@ def download(request, path):
 
 def view(request, path):
     """Dispatches viewing of a path to either index() or fileview(), depending on type."""
-
+    decoded_path = urllib.unquote(path)
+    if path != decoded_path:
+      path = decoded_path
     # default_to_home is set in bootstrap.js
     if 'default_to_home' in request.GET:
         home_dir_path = request.user.get_home_directory()
         if request.fs.isdir(home_dir_path):
-            return format_preserving_redirect(request, reverse(view, kwargs=dict(path=home_dir_path)))
+            return format_preserving_redirect(request, '/filebrowser/view=' + urllib.quote(home_dir_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS))
 
     # default_to_home is set in bootstrap.js
     if 'default_to_trash' in request.GET:
-        if request.fs.isdir(_home_trash_path(request.fs, request.user, path)):
-            return format_preserving_redirect(request, reverse(view, kwargs=dict(path=_home_trash_path(request.fs, request.user, path))))
-        if request.fs.isdir(request.fs.trash_path(path)):
-            return format_preserving_redirect(request, reverse(view, kwargs=dict(path=request.fs.trash_path(path))))
+        home_trash_path = _home_trash_path(request.fs, request.user, path)
+        if request.fs.isdir(home_trash_path):
+            return format_preserving_redirect(request, '/filebrowser/view=' + urllib.quote(home_trash_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS))
+        trash_path = request.fs.trash_path(path)
+        if request.fs.isdir(trash_path):
+            return format_preserving_redirect(request, '/filebrowser/view=' + urllib.quote(trash_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS))
 
     try:
-        decoded_path = urllib.unquote(path)
-        if path != decoded_path:
-          path = decoded_path
         stats = request.fs.stats(path)
         if stats.isDir:
             return listdir_paged(request, path)
@@ -227,6 +232,9 @@ def _home_trash_path(fs, user, path):
 
 
 def home_relative_view(request, path):
+  decoded_path = urllib.unquote(path)
+  if path != decoded_path:
+    path = decoded_path
   home_dir_path = request.user.get_home_directory()
   if request.fs.exists(home_dir_path):
     path = '%s%s' % (home_dir_path, path)
@@ -236,7 +244,9 @@ def home_relative_view(request, path):
 
 def edit(request, path, form=None):
     """Shows an edit form for the given path. Path does not necessarily have to exist."""
-
+    decoded_path = urllib.unquote(path)
+    if path != decoded_path:
+      path = decoded_path
     try:
         stats = request.fs.stats(path)
     except IOError, ioe:
@@ -292,6 +302,9 @@ def save_file(request):
     form = EditorForm(request.POST)
     is_valid = form.is_valid()
     path = form.cleaned_data.get('path')
+    decoded_path = urllib.unquote(path)
+    if path != decoded_path:
+      path = decoded_path
 
     if request.POST.get('save') == "Save As":
         if not is_valid:
@@ -328,7 +341,7 @@ def parse_breadcrumbs(path):
       if url and not url.endswith('/'):
         url += '/'
       url += part
-      breadcrumbs.append({'url': urllib.quote(url.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''), 'label': part})
+      breadcrumbs.append({'url': urllib.quote(url.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS), 'label': part})
     return breadcrumbs
 
 
@@ -338,6 +351,9 @@ def listdir(request, path):
 
     Intended to be called via view().
     """
+    decoded_path = urllib.unquote(path)
+    if path != decoded_path:
+      path = decoded_path
     if not request.fs.isdir(path):
         raise PopupException(_("Not a directory: %(path)s") % {'path': path})
 
@@ -353,8 +369,8 @@ def listdir(request, path):
         'path': path,
         'file_filter': file_filter,
         'breadcrumbs': breadcrumbs,
-        'current_dir_path': urllib.quote(path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
-        'current_request_path': urllib.quote(request.path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
+        'current_dir_path': urllib.quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI),
+        'current_request_path': '/filebrowser/view=' + urllib.quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS),
         'home_directory': home_dir_path if home_dir_path and request.fs.isdir(home_dir_path) else None,
         'cwd_set': True,
         'is_superuser': request.user.username == request.fs.superuser,
@@ -417,6 +433,9 @@ def listdir_paged(request, path):
       filter=?          - Specify a substring filter to search for in
                           the filename field.
     """
+    decoded_path = urllib.unquote(path)
+    if path != decoded_path:
+      path = decoded_path
     if not request.fs.isdir(path):
         raise PopupException("Not a directory: %s" % (path,))
 
@@ -497,7 +516,7 @@ def listdir_paged(request, path):
     data = {
         'path': path,
         'breadcrumbs': breadcrumbs,
-        'current_request_path': urllib.quote(request.path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
+        'current_request_path': '/filebrowser/view=' + urllib.quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS),
         'is_trash_enabled': is_trash_enabled,
         'files': page.object_list if page else [],
         'page': _massage_page(page, paginator) if page else {},
@@ -507,7 +526,7 @@ def listdir_paged(request, path):
         # The following should probably be deprecated
         'cwd_set': True,
         'file_filter': 'any',
-        'current_dir_path': urllib.quote(path.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\''),
+        'current_dir_path': urllib.quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI),
         'is_fs_superuser': is_fs_superuser,
         'groups': is_fs_superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
         'users': is_fs_superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
@@ -540,7 +559,7 @@ def _massage_stats(request, stats):
     path = stats['path']
     normalized = request.fs.normpath(path)
     return {
-        'path': normalized,
+        'path': normalized, # Normally this should be quoted, but we only use this in POST request so we're ok. Changing this to quoted causes many issues.
         'name': stats['name'],
         'stats': stats.to_json_dict(),
         'mtime': datetime.fromtimestamp(stats['mtime']).strftime('%B %d, %Y %I:%M %p') if stats['mtime'] else '',
@@ -548,7 +567,7 @@ def _massage_stats(request, stats):
         'type': filetype(stats['mode']),
         'rwx': rwx(stats['mode'], stats['aclBit']),
         'mode': stringformat(stats['mode'], "o"),
-        'url': reverse('filebrowser.views.view', kwargs=dict(path=normalized)),
+        'url': '/filebrowser/view=' + urllib.quote(normalized.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS),
         'is_sentry_managed': request.fs.is_sentry_managed(path)
     }
 
@@ -560,6 +579,9 @@ def stat(request, path):
     Intended for use via AJAX (and hence doesn't provide
     an HTML view).
     """
+    decoded_path = urllib.unquote(path)
+    if path != decoded_path:
+      path = decoded_path
     if not request.fs.exists(path):
         raise Http404(_("File not found: %(path)s") % {'path': escape(path)})
     stats = request.fs.stats(path)
@@ -567,6 +589,9 @@ def stat(request, path):
 
 
 def content_summary(request, path):
+    decoded_path = urllib.unquote(path)
+    if path != decoded_path:
+      path = decoded_path
     if not request.fs.exists(path):
         raise Http404(_("File not found: %(path)s") % {'path': escape(path)})
     response = {'status': -1, 'message': '', 'summary': None}
@@ -596,6 +621,9 @@ def display(request, path):
     sequence files, decompress gzipped text files, etc.).
     There exists a python-magic package to interface with libmagic.
     """
+    decoded_path = urllib.unquote(path)
+    if path != decoded_path:
+      path = decoded_path
     if not request.fs.isfile(path):
         raise PopupException(_("Not a file: '%(path)s'") % {'path': path})
 
@@ -715,7 +743,9 @@ def read_contents(codec_type, path, fs, offset, length):
     """
     contents = ''
     fhandle = None
-
+    decoded_path = urllib.unquote(path)
+    if path != decoded_path:
+      path = decoded_path
     try:
         fhandle = fs.open(path)
         stats = fs.stats(path)
@@ -1102,7 +1132,7 @@ def rename(request):
           raise PopupException(_("Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in filenames." % (src_path, dest_path)))
         if "/" not in dest_path:
             src_dir = os.path.dirname(src_path)
-            dest_path = request.fs.join(src_dir, dest_path)
+            dest_path = request.fs.join(urllib.unquote(src_dir), urllib.unquote(dest_path))
         if request.fs.exists(dest_path):
           raise PopupException(_('The destination path "%s" already exists.') % dest_path)
         request.fs.rename(src_path, dest_path)
@@ -1111,7 +1141,7 @@ def rename(request):
 
 def set_replication(request):
     def smart_set_replication(src_path, replication_factor):
-        result = request.fs.set_replication(src_path, replication_factor)
+        result = request.fs.set_replication(urllib.unquote(src_path), replication_factor)
         if not result:
             raise PopupException(_("Setting of replication factor failed"))
 
@@ -1124,7 +1154,7 @@ def mkdir(request):
         # No absolute directory specification allowed.
         if posixpath.sep in name or "#" in name:
             raise PopupException(_("Could not name folder \"%s\": Slashes or hashes are not allowed in filenames." % name))
-        request.fs.mkdir(request.fs.join(path, name))
+        request.fs.mkdir(request.fs.join(urllib.unquote(path), urllib.unquote(name)))
 
     return generic_op(MkDirForm, request, smart_mkdir, ["path", "name"], "path")
 
@@ -1144,7 +1174,7 @@ def rmtree(request):
     params = ["path"]
     def bulk_rmtree(*args, **kwargs):
         for arg in args:
-            request.fs.do_as_user(request.user, request.fs.rmtree, arg['path'], 'skip_trash' in request.GET)
+            request.fs.do_as_user(request.user, request.fs.rmtree, urllib.unquote(arg['path']), 'skip_trash' in request.GET)
     return generic_op(RmTreeFormSet, request, bulk_rmtree, ["path"], None,
                       data_extractor=formset_data_extractor(recurring, params),
                       arg_extractor=formset_arg_extractor,
@@ -1174,7 +1204,7 @@ def copy(request):
         for arg in args:
             if arg['src_path'] == arg['dest_path']:
                 raise PopupException(_('Source path and destination path cannot be same'))
-            request.fs.copy(arg['src_path'], arg['dest_path'], recursive=True, owner=request.user)
+            request.fs.copy(urllib.unquote(arg['src_path']), urllib.unquote(arg['dest_path']), recursive=True, owner=request.user)
     return generic_op(CopyFormSet, request, bulk_copy, ["src_path", "dest_path"], None,
                       data_extractor=formset_data_extractor(recurring, params),
                       arg_extractor=formset_arg_extractor,
@@ -1188,7 +1218,7 @@ def chmod(request):
     def bulk_chmod(*args, **kwargs):
         op = curry(request.fs.chmod, recursive=request.POST.get('recursive', False))
         for arg in args:
-            op(arg['path'], arg['mode'])
+            op(urllib.unquote(arg['path']), arg['mode'])
     # mode here is abused: on input, it's a string, but when retrieved,
     # it's an int.
     return generic_op(ChmodFormSet, request, bulk_chmod, ['path', 'mode'], "path",
@@ -1213,7 +1243,7 @@ def chown(request):
     def bulk_chown(*args, **kwargs):
         op = curry(request.fs.chown, recursive=request.POST.get('recursive', False))
         for arg in args:
-            varg = [arg[param] for param in param_names]
+            varg = [urllib.unquote(arg[param]) for param in param_names]
             op(*varg)
 
     return generic_op(ChownFormSet, request, bulk_chown, param_names, "path",
@@ -1228,7 +1258,7 @@ def trash_restore(request):
     params = ["path"]
     def bulk_restore(*args, **kwargs):
         for arg in args:
-            request.fs.do_as_user(request.user, request.fs.restore, arg['path'])
+            request.fs.do_as_user(request.user, request.fs.restore, urllib.unquote(arg['path']))
     return generic_op(RestoreFormSet, request, bulk_restore, ["path"], None,
                       data_extractor=formset_data_extractor(recurring, params),
                       arg_extractor=formset_arg_extractor,
@@ -1277,7 +1307,7 @@ def _upload_file(request):
 
     if form.is_valid():
         uploaded_file = request.FILES['hdfs_file']
-        dest = scheme_absolute_path(request.GET['dest'], form.cleaned_data['dest'])
+        dest = scheme_absolute_path(urllib.unquote(request.GET['dest']), urllib.unquote(form.cleaned_data['dest']))
         filepath = request.fs.join(dest, uploaded_file.name)
 
         if request.fs.isdir(dest) and posixpath.sep in uploaded_file.name:

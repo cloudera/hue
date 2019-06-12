@@ -769,7 +769,7 @@ class DataCatalogEntry {
   canHaveNavigatorMetadata() {
     const self = this;
     return (
-      window.HAS_NAVIGATOR &&
+      window.HAS_CATALOG &&
       (self.getSourceType() === 'hive' || self.getSourceType() === 'impala') &&
       (self.isDatabase() || self.isTableOrView() || self.isColumn())
     );

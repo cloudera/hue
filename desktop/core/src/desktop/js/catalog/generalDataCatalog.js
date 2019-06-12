@@ -47,7 +47,7 @@ class GeneralDataCatalog {
 
     const deferred = $.Deferred();
 
-    if (!window.HAS_NAVIGATOR) {
+    if (!window.HAS_CATALOG) {
       return deferred.reject().promise();
     }
 

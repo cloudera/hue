@@ -305,12 +305,12 @@ Direct interface:
       ## If 'user' and 'password' are omitted, they will be prompted in the UI.
       options='{"url": "jdbc:presto://localhost:8080/catalog/schema", "driver": "io.prestosql.jdbc.PrestoDriver", "user": "root", "password": "root"}'
 
-The Presto JDBC client driver is maintained by the Presto Team and can be downloaded here: https://prestodb.io/docs/current/installation/jdbc.html
+The Presto JDBC client driver is maintained by the Presto Team and can be downloaded here: https://prestosql.io/docs/current/installation/jdbc.html
 
     [[[presto]]]
     name=Presto JDBC
     interface=jdbc
-    options='{"url": "jdbc:presto://localhost:8080/", "driver": "com.facebook.presto.jdbc.PrestoDriver"}'
+    options='{"url": "jdbc:presto://localhost:8080/", "driver": "io.prestosql.jdbc.PrestoDriver"}'
 
 ### Oracle
 
@@ -917,9 +917,13 @@ In hue.ini, telling the API server that the Task Server is available:
     [[task_server]]
     enabled=true
 
-Starting the  Task server:
+Starting the Task server:
 
-    ./build/env/bin/celery worker -l info -A desktop
+    ./build/env/bin/hue runcelery worker --concurrency=1
+
+Starting the Task server in a Cloudera Manager environment:
+
+    ./build/env/bin/hue runcelery worker --concurrency=1 --cm-managed
 
 Running a test tasks:
 

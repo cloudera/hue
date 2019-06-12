@@ -29,6 +29,7 @@ from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.db.models import Count
 from django.db.models.functions import Trunc
+from desktop.lib.paths import SAFE_CHARACTERS_URI_COMPONENTS
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
@@ -117,7 +118,7 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
     'type': 'notebook' if is_notebook else 'query-%s' % editor_type,
     'showHistory': True,
     'isSaved': is_saved,
-    'onSuccessUrl': urllib.quote(on_success_url.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\'') if on_success_url else None,
+    'onSuccessUrl': urllib.quote(on_success_url.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) if on_success_url else None,
     'pubSubUrl': pub_sub_url,
     'skipHistorify': skip_historify,
     'isManaged': is_task,
@@ -494,6 +495,7 @@ class Analytics():
     stats.append(('\nAll', ''))
     stats.append(('Active users 30 days', User.objects.filter(last_login__gte=one_month).count()))
     stats.append(('Sessions 30 days', Session.objects.filter(expire_date__gte=one_month).count()))
+    stats.append(('Executed queries 30 days', Document2.objects.filter(last_modified__gte=one_month, is_history=True, type__startswith='query-').count()))
     stats.append(('Active users 90 days', User.objects.filter(last_login__gte=three_months).count()))
 
     return stats

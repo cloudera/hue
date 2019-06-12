@@ -24,7 +24,7 @@ import I18n from 'utils/i18n';
 const TEMPLATE = `
   <script type="text/html" id="entries-table-td-description">
     <td data-bind="attr: { 'title': comment }">
-    <!-- ko if: $parent.editableDescriptions -->
+    <!-- ko if: $parent.editableDescriptions && !window.HAS_READ_ONLY_CATALOG -->
       <div class="hue-catalog-entries-table-desc" data-bind="visibleOnHover: { selector: '.editable-inline-action' }">
         <div data-bind="editable: comment, editableOptions: {
           mode: 'inline',
@@ -44,12 +44,12 @@ const TEMPLATE = `
         }">${I18n('Add a description...')}</div>
       </div>
     <!-- /ko -->
-    <!-- ko ifnot: $parent.editableDescriptions -->
+    <!-- ko if: !$parent.editableDescriptions || window.HAS_READ_ONLY_CATALOG -->
       <div class="entries-table-description" data-bind="text: comment, multiLineEllipsis"></div>
     <!-- /ko -->
     </td>
   </script>
-  
+
   <script type="text/html" id="entries-table-tbody-no-entries">
     <tbody>
       <tr>
@@ -64,7 +64,7 @@ const TEMPLATE = `
       </tr>
     </tbody>
   </script>
-  
+
   <script type="text/html" id="entries-table-shared-headers">
     <!-- ko if: typeof selectedEntries !== 'undefined' -->
     <th width="1%" class="select-column"><div class="hue-checkbox fa" data-bind="hueCheckAll: { allValues: filteredEntries, selectedValues: selectedEntries }"></div></th>
@@ -73,7 +73,7 @@ const TEMPLATE = `
     <th width="1%">&nbsp;</th>
     <!-- /ko -->
   </script>
-  
+
   <script type="text/html" id="entries-table-shared-columns">
     <!-- ko if: typeof $parent.selectedEntries !== 'undefined' -->
     <td width="1%" class="select-column"><div class="hue-checkbox fa" data-bind="multiCheck: '#entryTable', value: $data, hueChecked: $parent.selectedEntries"></div></td>
@@ -82,7 +82,7 @@ const TEMPLATE = `
     <td width="1%"><a href="javascript: void(0);" data-bind="click: showContextPopover"><i class="fa fa-info"></i></a></td>
     <!-- /ko -->
   </script>
-  
+
   <!-- ko if: !loading() && (!catalogEntry().isField() || catalogEntry().isComplex())-->
   <div class="context-popover-inline-autocomplete">
     <div class="context-popover-sample-filter">
@@ -98,7 +98,7 @@ const TEMPLATE = `
     </div>
   </div>
   <!-- /ko -->
-  
+
   <div class="catalog-entries-list-container">
     <!-- ko hueSpinner: { spin: loading, center: true, size: 'xlarge' } --><!-- /ko -->
     <!-- ko if: !loading() && catalogEntry().isSource() -->
@@ -126,7 +126,7 @@ const TEMPLATE = `
       <!-- /ko -->
     </table>
     <!-- /ko -->
-  
+
     <!-- ko if: !loading() && catalogEntry().isDatabase() -->
     <table id="entryTable" class="table table-condensed table-nowrap">
       <thead>
@@ -154,7 +154,7 @@ const TEMPLATE = `
       <!-- /ko -->
     </table>
     <!-- /ko -->
-  
+
     <!-- ko if: !loading() && (catalogEntry().isTableOrView() || catalogEntry().isComplex()) -->
     <table class="table table-condensed table-nowrap">
       <thead>
@@ -205,7 +205,7 @@ const TEMPLATE = `
       <!-- /ko -->
     </table>
     <!-- /ko -->
-  
+
     <!-- ko if: !loading() && catalogEntry().isField() && !catalogEntry().isComplex() -->
     <!-- ko component: { name: 'field-samples', params: {
         catalogEntry: catalogEntry,

@@ -1,6 +1,0 @@
-registry: "docker.io/gethue/hue"
-tag: "latest"
-aws:
-  accessKeyId: ""
-  secretAccessKey: ""
-  region: "us-east-1"

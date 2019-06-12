@@ -9,20 +9,20 @@ Assuming you have a Kubernetes cluster configured with Helm installed and images
 
 * [Helm](helm)
    * [Hue](helm/hue)
-* YAML
-   * [Hue](yaml/hue.yaml)
+* [YAML](yaml)
+   * [Hue](yaml/hue)
+   * Postgres (TBD)
    * NGINX (TBD)
-   * Task Server (TBD)
+   * Celery (TBD)
+   * Daphne (TBD)
 * [Container Images](/tools/docker)
    * [Hue](/tools/docker/hue)
 
-## Hue
+## Quick Start
 
-Update the Hue pods:
+    cd tools/kubernetes/helm
 
-```
-kubectl delete pods `kubectl get pods | grep hue | grep -v postgres | cut -d" " -f1`
-```
+    helm install hue -n hue
 
 ## K8s Cluster
 
@@ -72,4 +72,4 @@ HTTP LoadBalancer. This avoids creating global static ips.
 
 ## Images
 
-All the images are on Docker Hub or can be built via Docker at [/tools/docker](/tools/docker).
+All the images are on Docker Hub or can be built via Docker at [tools/docker](/tools/docker).

@@ -199,7 +199,7 @@ class DataCatalogContext {
       '/metastore/table' +
         (self.catalogEntry().isTableOrView() ? '/' : 's/') +
         self.catalogEntry().path.join('/') +
-        '?source=' +
+        '?source_type=' +
         self.catalogEntry().getSourceType() +
         '&namespace=' +
         self.catalogEntry().namespace.id

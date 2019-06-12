@@ -836,7 +836,7 @@ def _get_statement_from_file(user, fs, snippet):
 
 @require_POST
 @api_error_handler
-def describe(request, database, table, column=None):
+def describe(request, database, table=None, column=None):
   response = {'status': -1, 'message': ''}
   notebook = json.loads(request.POST.get('notebook', '{}'))
   source_type = request.POST.get('source_type', '')

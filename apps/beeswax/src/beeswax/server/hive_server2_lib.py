@@ -140,7 +140,11 @@ class HiveServerTable(Table):
   def properties(self):
     rows = self.describe
     col_row_index = 2
-    end_cols_index = map(itemgetter('col_name'), rows[col_row_index:]).index('')
+    try:
+      end_cols_index = map(itemgetter('col_name'), rows[col_row_index:]).index('')
+    except ValueError as e:
+      end_cols_index = 5000
+      LOG.warn('Could not guess end column index, so defaulting to %s: %s' (end_cols_index, e))
     return [{
           'col_name': prop['col_name'].strip() if prop['col_name'] else prop['col_name'],
           'data_type': prop['data_type'].strip() if prop['data_type'] else prop['data_type'],
@@ -773,16 +777,11 @@ class HiveServerClient:
     (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=5000, orientation=TFetchOrientation.FETCH_NEXT)
     self.close_operation(operation_handle)
 
-    print '-----'
-    print self.query_server['server_name']
-    print desc_results.results
-    print desc_schema.schema
     if self.query_server['server_name'].startswith('impala'):
       cols = ('name', 'location', 'comment') # Skip owner as on a new line
     else:
       cols = ('db_name', 'comment', 'location', 'owner_name', 'owner_type', 'parameters')
 
-#     print cols
 #     try:
 #       if len(HiveServerTRowSet(desc_results.results, desc_schema.schema).cols(cols)) != 1:
 #         raise ValueError(_("%(query)s returned more than 1 row") % {'query': query})
@@ -790,11 +789,7 @@ class HiveServerClient:
 #       print e
 #       raise e
 
-    
-    a = HiveServerTRowSet(desc_results.results, desc_schema.schema).cols(cols)[0]  # Should only contain one row
-    print a
-    # {'comment': 'Default Hive database', 'name': 'default', 'location': 'hdfs://nightly6x-unsecure-1.vpc.cloudera.com:8020/user/hive/warehouse'}
-    return a
+    return HiveServerTRowSet(desc_results.results, desc_schema.schema).cols(cols)[0]  # Should only contain one row
 
   def get_tables_meta(self, database, table_names, table_types=None):
     if not table_types:
@@ -1098,7 +1093,11 @@ class HiveServerTableCompatible(HiveServerTable):
 
     self.describe = HiveServerTTableSchema(self.desc_results, self.desc_schema).cols()
     self._details = None
-    self.is_impala_only = 'org.apache.kudu.mapreduce.KuduTableOutputFormat' in str(hive_table.properties)
+    try:
+      self.is_impala_only = 'org.apache.kudu.mapreduce.KuduTableOutputFormat' in str(hive_table.properties)
+    except Exception as e:
+      LOG.warn('Autocomplete data fetching error: %s' % e)
+      self.is_impala_only = False
 
   @property
   def cols(self):

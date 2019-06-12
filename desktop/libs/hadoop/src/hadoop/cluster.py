@@ -15,8 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import logging
+import os
 
 from django.utils.functional import wraps
 
@@ -29,13 +29,11 @@ from desktop.lib.paths import get_build_dir
 
 LOG = logging.getLogger(__name__)
 
-
 FS_CACHE = None
 FS_DEFAULT_NAME = 'default'
 MR_CACHE = None # MR now means YARN
 MR_NAME_CACHE = 'default'
 DEFAULT_USER = DEFAULT_USER.get()
-
 
 
 def rm_ha(funct):

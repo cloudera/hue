@@ -5,7 +5,9 @@ draft: false
 weight: 2
 ---
 
-Configure `$PREFIX` with the path where you want to install Hue by running:
+Start from a [release]({{% param baseURL %}}releases/) tarball or [building](https://github.com/cloudera/hue#getting-started) the project yourself.
+
+Then configure `$PREFIX` with the path where you want to install Hue by running:
 
     PREFIX=/usr/share make install
     cd /usr/share/hue

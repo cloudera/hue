@@ -117,6 +117,14 @@ class Result {
 
     self.isMetaFilterVisible = ko.observable(false);
     self.filteredMetaChecked = ko.observable(true);
+
+    self.filteredColumnCount = ko.pureComputed(() => {
+      if (!self.metaFilter() || self.metaFilter().query === '') {
+        return self.meta().length - 1;
+      }
+      return self.filteredMeta().length;
+    });
+
     self.filteredMeta = ko.pureComputed(() => {
       if (!self.metaFilter() || self.metaFilter().query === '') {
         return self.meta();

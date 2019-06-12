@@ -376,7 +376,7 @@ $(document).ready(function(){
   });
 
   $("#doneBtn").click(function () {
-    location.href = "${ is_embeddable and '/' or url('desktop_views_home2') }";
+    huePubSub.publish('open.link', "${ is_embeddable and '/' or url('desktop_views_home2') }");
   });
 
   $(".updatePreferences").click(function () {

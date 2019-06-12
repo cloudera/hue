@@ -395,7 +395,7 @@ ${ components.menubar(is_embeddable) }
 </script>
 
 <script type="text/html" id="metastore-td-description">
-% if has_write_access:
+  <!-- ko ifnot: window.HAS_READ_ONLY_CATALOG -->
   <div data-bind="visibleOnHover: { selector: '.editable-inline-action' }">
     <div data-bind="editable: comment, editableOptions: {
         mode: 'inline',
@@ -414,14 +414,14 @@ ${ components.menubar(is_embeddable) }
       }">
       ${ _('Add a description...') }</div>
   </div>
-% else:
+  <!-- /ko -->
+  <!-- ko if: window.HAS_READ_ONLY_CATALOG -->
   <span style="white-space: pre;" data-bind="text: comment"></span>
-% endif
+  <!-- /ko -->
 </script>
 
 <script type="text/html" id="metastore-main-description">
-% if has_write_access:
-  <!-- ko if: $root.navigatorEnabled() -->
+  <!-- ko if: $root.navigatorEnabled() && !window.HAS_READ_ONLY_CATALOG -->
   <div class="hue-table-browser-desc-container" data-bind="visibleOnHover: { selector: '.editable-inline-action' }">
     <div class="hue-table-browser-desc">
       <div data-bind="editable: comment, editableOptions: {
@@ -443,12 +443,9 @@ ${ components.menubar(is_embeddable) }
     </div>
   </div>
   <!-- /ko -->
-  <!-- ko ifnot: $root.navigatorEnabled() -->
+  <!-- ko if: !$root.navigatorEnabled() || window.HAS_READ_ONLY_CATALOG -->
   <div data-bind="text: comment, attr: { title: comment }" class="table-description"></div>
   <!-- /ko -->
-% else:
-  <div data-bind="text: comment, attr: { title: comment }" class="table-description"></div>
-%endif
 </script>
 
 <script type="text/html" id="metastore-nav-tags">
@@ -1059,7 +1056,7 @@ ${ components.menubar(is_embeddable) }
       var options = {
         user: '${ user.username }',
         optimizerEnabled: '${ is_optimizer_enabled }' === 'True',
-        navigatorEnabled: '${ is_navigator_enabled }' === 'True',
+        navigatorEnabled: window.HAS_CATALOG,
         optimizerUrl: '${ optimizer_url }',
         navigatorUrl: '${ navigator_url }',
         sourceType: '${ source_type }'

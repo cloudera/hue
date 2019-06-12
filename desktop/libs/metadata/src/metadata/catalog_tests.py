@@ -34,12 +34,131 @@ from metadata import conf
 from metadata.conf import has_catalog, NAVIGATOR, get_navigator_auth_password, get_navigator_auth_username
 from metadata.catalog_api import _augment_highlighting
 from metadata.catalog.navigator_client import NavigatorApi
+from metadata.catalog.atlas_client import AtlasApi
+
 
 
 LOG = logging.getLogger(__name__)
 
 
+class TestAtlas(object):
+  integration = True
+
+  @classmethod
+  def setup_class(cls):
+    cls.client = make_logged_in_client(username='test', is_superuser=False)
+    cls.user = User.objects.get(username='test')
+    cls.user = rewrite_user(cls.user)
+    add_to_group('test')
+    grant_access("test", "test", "metadata")
+
+    if not is_live_cluster() or not has_catalog(cls.user):
+      raise SkipTest
+
+    cls.api = AtlasApi(cls.user)
+
+
+  @classmethod
+  def teardown_class(cls):
+    cls.user.is_superuser = False
+    cls.user.save()
+
+  def test_api_find_entity_with_type_hive_db(self, type='database', db_name='default'):
+    # find_entity(source_type='HIVE', type='DATABASE', name='default')
+    '''
+    # query = "hive_db+where+name=sys+select+name,__guid"
+    {"queryType":"DSL","queryText":"hive_db where name=sys select name,__guid","attributes":{"name":["name","__guid"],
+    "values":[["sys","16cab673-e4b1-4ee6-83cf-c0017ed855ca"]]}}
+    '''
+    query = "hive_db+where+name=sys"
+    resp = self.client.get(reverse('metadata:catalog_find_entity'), {'type': type, 'name': db_name})
+    json_resp = json.loads(resp.content)
+    LOG.info("Hue response for find_entity with query: %s" % query)
+    LOG.info(json_resp)
+    assert_equal(0, json_resp['status'], json_resp)
+    assert_equal(json_resp['entity']['name'], db_name)
+
+  def test_api_find_entity_with_type_hive_table(self, type='table', table_name='customers', db_name="default"):
+    '''
+    qualifiedName = '.'.join([database_name, name]) + "@cl1"
+    query = hive_column where qualifiedName='qualifiedName'
+    '''
+    qualifiedName = '.'.join([db_name, table_name]) + "@cl1"
+    query = "hive_column where qualifiedName = '%s'" % qualifiedName
+    resp = self.client.get(reverse('metadata:catalog_find_entity'),
+                           {'type': type, 'name': table_name, 'database': db_name})
+    json_resp = json.loads(resp.content)
+    LOG.info("Hue response for find_entity with query: %s" % query)
+    LOG.info(json_resp)
+    assert_equal(0, json_resp['status'], json_resp)
+    assert_equal(json_resp['entity']['name'], table_name)
+
+  def test_api_find_entity_with_type_hive_column(self, db_name='default', table_name='customers', field_name='id',
+                                                 type='field'):
+    '''
+    qualifiedName = '.'.join([database_name, table_name, field_name]) + "@cl1"
+    query = hive_column where qualifiedName=''
+    '''
+    qualifiedName = '.'.join([db_name, table_name, field_name]) + "@cl1"
+    query = "hive_column where qualifiedName = '%s'" % qualifiedName
+    resp = self.client.get(reverse('metadata:catalog_find_entity'),
+                           {'type': type, 'name': field_name, 'database': db_name, 'table': table_name})
+    json_resp = json.loads(resp.content)
+    LOG.info("Hue response for find_entity with query: %s" % query)
+    LOG.info(json_resp)
+    assert_equal(0, json_resp['status'], json_resp)
+    assert_equal(json_resp['entity']['name'], field_name)
+
+  def test_api_search_entities_interactive_with_owner(self, query='owner:admin'):
+    '''
+    query = hive_table where owner='admin'
+    '''
+    resp = self.client.post(reverse('metadata:catalog_search_entities_interactive'), {"query_s": json.dumps(query)})
+    json_resp = json.loads(resp.content)
+    LOG.info("Hue response for entities_interactive with query: %s" % query)
+    LOG.info(json_resp)
+    assert_equal(0, json_resp['status'], json_resp)
+    owner = query.split(':')[-1]
+    assert_equal(json_resp['results'][0]['owner'], owner)
+
+  def test_api_search_entities_interactive_with_classification(self, query='classification:class2_test'):
+    '''
+    query = asset where classification='class2_test'
+    '''
+    resp = self.client.post(reverse('metadata:catalog_search_entities_interactive'), {"query_s": json.dumps(query)})
+    json_resp = json.loads(resp.content)
+    LOG.info("Hue response for entities_interactive with query: %s" % query)
+    LOG.info(json_resp)
+    assert_equal(0, json_resp['status'], json_resp)
+    classification = query.split(':')[-1]
+    assert_equal(json_resp['results'][0]['tags'][0], classification)
+
+  def test_api_search_entities_interactive_with_type_db(self, query='type:database'):
+    '''
+    query = asset where classification='class2_test'
+    '''
+    resp = self.client.post(reverse('metadata:catalog_search_entities_interactive'), {"query_s": json.dumps(query)})
+    json_resp = json.loads(resp.content)
+    LOG.info("Hue response for entities_interactive with query: %s" % query)
+    LOG.info(json_resp)
+    assert_equal(0, json_resp['status'], json_resp)
+    entity_type = query.split(':')[-1].upper()
+    assert_equal(json_resp['results'][0]['type'], entity_type)
+
+  def test_api_search_entities_interactive_with_type_table(self, query='type:table'):
+    '''
+
+    '''
+    resp = self.client.post(reverse('metadata:catalog_search_entities_interactive'), {"query_s": json.dumps(query)})
+    json_resp = json.loads(resp.content)
+    LOG.info("Hue response for entities_interactive with query: %s" % query)
+    LOG.info(json_resp)
+    assert_equal(0, json_resp['status'], json_resp)
+    entity_type = query.split(':')[-1].upper()
+    assert_equal(json_resp['results'][0]['type'], entity_type)
+
 class TestNavigator(object):
+  integration = True
 
   @classmethod
   def setup_class(cls):

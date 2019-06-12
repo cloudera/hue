@@ -33,15 +33,17 @@ const TEMPLATE = `
         <i class="inline-autocomp-magnify-icon fa fa-fw fa-spinner fa-spin"></i>
         <!-- /ko -->
       <!-- /ko-->
-      <input class="inline-autocomp-input" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" data-bind="
-        attr: { 'placeHolder' : hasFocus() ? '' : placeHolder },
-        textInput: searchInput,
-        hasFocus: hasFocus,
-        clearable: { value: searchInput, onClear: onClear },
-        css: { 'inline-autocomp-magnify-input': showMagnify }">
-      <input class="inline-autocomp-autocomp" disabled type="text" data-bind="
-        value: inlineAutocomplete,
-        css: { 'inline-autocomp-magnify-input': showMagnify }">
+      <form autocomplete="off">
+        <input class="inline-autocomp-input" autocorrect="off" autocomplete="do-not-autocomplete" autocapitalize="off" spellcheck="false" type="text" data-bind="
+          attr: { 'placeHolder' : hasFocus() ? '' : placeHolder },
+          textInput: searchInput,
+          hasFocus: hasFocus,
+          clearable: { value: searchInput, onClear: onClear },
+          css: { 'inline-autocomp-magnify-input': showMagnify }">
+        <input class="inline-autocomp-autocomp" disabled type="text" autocomplete="do-not-autocomplete" data-bind="
+          value: inlineAutocomplete,
+          css: { 'inline-autocomp-magnify-input': showMagnify }">
+      </form>
     </div>
   </div>
 

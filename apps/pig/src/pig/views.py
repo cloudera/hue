@@ -17,6 +17,7 @@
 
 import json
 import logging
+import urllib
 
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -25,6 +26,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import RestException
+from desktop.lib.paths import SAFE_CHARACTERS_URI_COMPONENTS
 from desktop.models import Document
 
 from oozie.views.dashboard import show_oozie_error, check_job_access_permission,\
@@ -223,7 +225,7 @@ def watch(request, job_id):
     'progress': oozie_workflow.get_progress(),
     'isRunning': oozie_workflow.is_running(),
     'killUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id': oozie_workflow.id, 'action': 'kill'}),
-    'rerunUrl': reverse('oozie:rerun_oozie_job', kwargs={'job_id': oozie_workflow.id, 'app_path': oozie_workflow.appPath}),
+    'rerunUrl': reverse('oozie:rerun_oozie_job', kwargs={'job_id': oozie_workflow.id, 'app_path': urllib.quote(oozie_workflow.appPath.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)}),
     'actions': workflow_actions
   }
 

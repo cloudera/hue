@@ -1,33 +1,29 @@
 # Hue Chart
 
-This is a MVP to get an Helm chart for Hue.
+This is an Helm chart to easily start a Hue service.
 
 
 ## Install
 
-```
-cd tools/kubernetes/helm/hue
-```
+    cd tools/kubernetes/helm/hue
 
-If needed, copy [values.yaml](values.yaml) and edit and run:
+View the configuration [values.yaml](values.yaml), edit if needed and run:
 
-```
-helm install hue -f values.yaml
-```
+    helm install hue -n hue
 
-And follow-up the instructions printed on the screen.
+[values.yaml](values.yaml) contains the most important parameters in the `hue` section with for example which database to use. The `ini`
+section let you add any extra [regular parameter](https://docs.gethue.com/latest/administrator/configuration/server/).
 
-E.g. by default it comes with a temporary DB and ingres load balancer:
 
-```
-kubectl get pods
-NAME                                          READY   STATUS    RESTARTS   AGE
-hue-4n2ck                                     1/1       Running   0          3h
-hue-postgres-5jg77                            1/1       Running   0          12d
-traefik-ingress-controller-6fbd76695d-nkxnz   1/1       Running   0          12d
-```
+Then follow-up the instructions printed on the screen for getting the URL to connect to Hue.
 
-## Follow-ups
+By default you should see these running containers:
 
-* Parameterize the Database
-* Productionize DB persistence
+    kubectl get pods
+    NAME                                          READY   STATUS    RESTARTS   AGE
+    hue-4n2ck                                     1/1       Running   0          3h
+    hue-postgres-5jg77                            1/1       Running   0          12d
+
+## Uninstall
+
+    helm delete hue --purge

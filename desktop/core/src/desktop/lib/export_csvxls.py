@@ -137,6 +137,7 @@ def make_response(generator, format, name, encoding=None, user_agent=None): #TOD
     except KeyError:
       pass
   elif format == 'xls':
+    format = 'xlsx'
     resp = HttpResponse(next(generator), content_type=content_type)
   elif format == 'json':
     resp = HttpResponse(generator, content_type=content_type)

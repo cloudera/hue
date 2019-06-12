@@ -787,7 +787,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     }
 
     var updateHash = function (hash) {
-      hash = encodeURI(hash);
+      hash = encodeURI(decodeURIComponent(hash));
       %if not is_embeddable:
       window.location.hash = hash;
       %else:
@@ -826,7 +826,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       return {
         name: file.name,
         path: file.path,
-        url: encodeURI(file.url),
+        url: file.url,
         type: file.type,
         permissions: file.rwx,
         mode: file.mode,
@@ -963,7 +963,6 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           return _ret;
         }
       }
-
       self.files = ko.observableArray(ko.utils.arrayMap(files, function (file) {
         return new File(file);
       }));
@@ -1166,7 +1165,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           }
 
           if (data.type != null && data.type == "file") {
-            window.location.href = data.url;
+            huePubSub.publish('open.link', data.url);
             return false;
           }
 
@@ -1325,7 +1324,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           self.targetPageNum(1);
           self.enableFilterAfterSearch = false;
           self.searchQuery("");
-          self.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(file.path));
+          self.targetPath(file.url);
           updateHash(stripHashes(file.path));
         } else {
           %if is_embeddable:
@@ -1337,11 +1336,11 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       };
 
       self.editFile = function () {
-        window.location.href = "${url('filebrowser_views_edit', path='')}" + encodeURI(self.selectedFile().path);
+        huePubSub.publish('open.link', self.selectedFile().url.replace("${url('filebrowser.views.view', path='')}", "${url('filebrowser_views_edit', path='')}"));
       };
 
       self.downloadFile = function () {
-        window.location.href = "${url('filebrowser_views_download', path='')}" + encodeURI(self.selectedFile().path);
+        huePubSub.publish('open.link', self.selectedFile().url.replace("${url('filebrowser.views.view', path='')}", "${url('filebrowser_views_download', path='')}"));
       };
 
       self.renameFile = function () {
@@ -2398,17 +2397,14 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       var hashchange = function () {
         if (window.location.pathname.indexOf('/filebrowser') > -1) {
           var targetPath = "";
-          var hash = window.location.hash.substring(1);
-          if (hash.search(/(<([^>]+)>)/ig) > -1) {
-            hash = encodeURI(hash);
-          }
+          var hash = decodeURI(window.location.hash.substring(1));
           if (hash != null && hash != "" && hash.indexOf('/') > -1) {
             targetPath = "${url('filebrowser.views.view', path='')}";
             if (hash.indexOf("!!") != 0) {
-              targetPath += stripHashes(hash);
+              targetPath += stripHashes(encodeURIComponent(hash));
             }
             else {
-              targetPath = viewModel.targetPath() + hash;
+              targetPath = viewModel.targetPath() + encodeURI(hash);
             }
             viewModel.targetPageNum(1)
           }
@@ -2452,7 +2448,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
               %if is_embeddable:
               huePubSub.publish('open.link', data.url);
               %else:
-              window.location.href = data.url;
+              huePubSub.publish('open.link', data.url);
               %endif
               return false;
             } else {

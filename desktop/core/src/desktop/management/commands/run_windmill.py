@@ -22,8 +22,9 @@ import sys
 import time
 from optparse import make_option
 
-from django.core.management.base import BaseCommand
 from windmill.authoring import djangotest
+
+from django.core.management.base import BaseCommand
 
 import logging
 
@@ -123,7 +124,7 @@ class Command(BaseCommand):
       sys.exit(0)
     else:
       sys.exit(1)
-  
+
   def find_modules(self):
     """Find modules ending in windmilltests within installed apps."""
     import django.conf

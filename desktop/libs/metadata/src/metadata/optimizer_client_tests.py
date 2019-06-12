@@ -36,6 +36,7 @@ LOG = logging.getLogger(__name__)
 
 
 class BaseTestOptimizerApi(object):
+  integration = True
   UPLOADED = False
   DATABASE = 'db1'
 

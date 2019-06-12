@@ -2398,7 +2398,7 @@ $(document).on('server.unmanageable_error', function (e, responseText) {
 $(document).on('saved.design', function (e, id) {
   $('#saveAs').modal('hide');
   $(document).trigger('info', "${_('Query saved.')}");
-  window.location.href = "/${ app_name }/execute/design/" + id;
+  huePubSub.publish('open.link', "/${ app_name }/execute/design/" + id);
 });
 $(document).on('error_save.design', function (e, message) {
   var _message = "${_('Could not save design')}";
@@ -2867,12 +2867,12 @@ viewModel.design.fileResources.values.subscribe(function() {
     var successUrl = "${request.GET['on_success_url']}";
     if (viewModel.design.watch.errors().length != 0) {
       window.setTimeout(function(){
-        window.location.href = successUrl + (successUrl.indexOf("?") > -1 ? "&" : "?") + "error=" + encodeURIComponent(viewModel.design.watch.errors().join("\n"));
+        huePubSub.publish('open.link', successUrl + (successUrl.indexOf("?") > -1 ? "&" : "?") + "error=" + encodeURIComponent(viewModel.design.watch.errors().join("\n")));
       }, 200);
     }
     else if (viewModel.design.results.errors().length == 0) {
       window.setTimeout(function(){
-        window.location.href = successUrl + (successUrl.indexOf("?") > -1 ? "&" : "?") + "refresh=true";
+        huePubSub.publish('open.link', successUrl + (successUrl.indexOf("?") > -1 ? "&" : "?") + "refresh=true");
       }, 1000);
     }
   });

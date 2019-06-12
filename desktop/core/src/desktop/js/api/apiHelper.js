@@ -29,10 +29,10 @@ const EXECUTE_API_PREFIX = '/notebook/api/execute/';
 const DOCUMENTS_API = '/desktop/api2/doc/';
 const DOCUMENTS_SEARCH_API = '/desktop/api2/docs/';
 const FETCH_CONFIG = '/desktop/api2/get_config/';
-const HDFS_API_PREFIX = '/filebrowser/view=/';
-const ADLS_API_PREFIX = '/filebrowser/view=adl:/';
+const HDFS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('/');
+const ADLS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('adl:/');
 const GIT_API_PREFIX = '/desktop/api/vcs/contents/';
-const S3_API_PREFIX = '/filebrowser/view=S3A://';
+const S3_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('S3A://');
 const IMPALA_INVALIDATE_API = '/impala/api/invalidate';
 const CONFIG_SAVE_API = '/desktop/api/configurations/save/';
 const CONFIG_APPS_API = '/desktop/api/configurations';
@@ -418,7 +418,7 @@ class ApiHelper {
     const request = $.post({
       url: url,
       data: data,
-      dataType: options.dataType
+      dataType: options && options.dataType
     })
       .done(data => {
         if (self.successResponseIsError(data)) {
@@ -1524,7 +1524,7 @@ class ApiHelper {
       source_type: options.sourceType
     };
     if (options.path.length === 1) {
-      url = '/metastore/databases/' + options.path[1] + '/alter';
+      url = '/metastore/databases/' + options.path[0] + '/alter';
       data.properties = ko.mapping.toJSON(options.properties);
     } else if (options.path.length === 2) {
       url = '/metastore/table/' + options.path[0] + '/' + options.path[1] + '/alter';
@@ -1573,20 +1573,14 @@ class ApiHelper {
     const self = this;
     const deferred = $.Deferred();
 
-    let url;
+    let url = '/notebook/api/describe/' + options.path[0];
 
-    if (options.path.length === 1) {
-      url = '/metastore/databases/' + options.path[0] + '/metadata';
-    } else {
-      url = '/notebook/api/describe/' + options.path[0];
+    if (options.path.length > 1) {
+      url += '/' + options.path[1] + '/';
+    }
 
-      if (options.path.length > 1) {
-        url += '/' + options.path[1] + '/';
-      }
-
-      if (options.path.length > 2) {
-        url += 'stats/' + options.path.slice(2).join('/');
-      }
+    if (options.path.length > 2) {
+      url += 'stats/' + options.path.slice(2).join('/');
     }
 
     const data = {

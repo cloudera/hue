@@ -82,7 +82,7 @@ superusers and users.
     the **Add User** wizard.
 
 
-### Importing Users from an LDAP Directory
+### Importing Users
 
 **Note**:
 
@@ -110,7 +110,7 @@ To add a user from an external LDAP directory:
     in User Admin is synced with what is currently in the LDAP
     directory.
 
-### Syncing Users and Groups with an LDAP Directory
+### Syncing Users and Groups
 
 You can sync the Hue user database with the current state of the LDAP
 directory using the **Sync LDAP users/groups** function. This updates
@@ -123,7 +123,7 @@ groups. It does not import any new users or groups.
 3.  In the **Sync LDAP users and groups** dialog, click **Sync** to
     perform the sync.
 
-## Reset a password
+### Reset a password
 
 **Programmatically**
 
@@ -203,13 +203,13 @@ import groups from an LDAP directory.
 3.  Click **Add group**.
 
 
-### Limit users can login only if they are belong to one of listed LDAP groups
+### Limit users can login
 
     [desktop]
     [[ldap]]
     login_groups=ldap_grp1,ldap_grp2,ldap_grp3
 
-### Importing Groups from an LDAP Directory
+### Importing Groups
 
 1.  From the **Groups** tab, click **Add/sync LDAP group**.
 2.  Specify the group properties:

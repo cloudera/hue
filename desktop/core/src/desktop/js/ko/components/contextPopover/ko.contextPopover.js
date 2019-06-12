@@ -68,7 +68,7 @@ const SUPPORT_TEMPLATES = `
       </div>
     </div>
   </script>
-  
+
   <script type="text/html" id="context-popover-collection-stats-details">
     <div class="context-popover-flex-fill">
       <div style="padding: 8px">
@@ -111,7 +111,7 @@ const SUPPORT_TEMPLATES = `
       </div>
     </div>
   </script>
-  
+
   <script type="text/html" id="context-popover-collection-stats-facets">
     <table style="width: 100%">
       <tbody data-bind="foreach: Object.keys($parent.val[Object.keys($parent.val)[0]][$data])">
@@ -124,7 +124,7 @@ const SUPPORT_TEMPLATES = `
       </tbody>
     </table>
   </script>
-  
+
   <script type="text/html" id="context-popover-collection-terms-details">
     <div class="context-popover-flex-fill">
       <input type="text" data-bind="value: terms.prefix, clearable: terms.prefix, valueUpdate:'afterkeydown'" placeholder="${I18n(
@@ -152,13 +152,13 @@ const SUPPORT_TEMPLATES = `
       </div>
     </div>
   </script>
-  
+
   <script type="text/html" id="context-popover-asterisk-details">
     <div class="context-popover-flex-fill">
       <!-- ko component: { name: 'sql-columns-table', params: { columns: columns, scrollToColumns: false } } --><!-- /ko -->
     </div>
   </script>
-  
+
   <script type="text/html" id="context-popover-function-details">
     <!-- ko if: typeof details === 'undefined' -->
     <div class="context-popover-flex-fill">
@@ -176,7 +176,7 @@ const SUPPORT_TEMPLATES = `
     </div>
     <!-- /ko -->
   </script>
-  
+
   <script type="text/html" id="generic-document-context-template">
     <div style="width:100%; text-align: center; margin-top: 40px; font-size: 100px; color: #787878;" data-bind="template: { name: 'document-icon-template', data: { document: { isDirectory: type === 'directory', definition: function() { return $data } } } }"></div>
     <div style="width: 100%; margin-top: 20px; text-align:center">
@@ -193,7 +193,7 @@ const SUPPORT_TEMPLATES = `
       <!-- /ko -->
     </div>
   </script>
-  
+
   <script type="text/html" id="context-hue-app-details">
     <div class="context-popover-flex-fill" style="overflow: auto;" data-bind="with: data">
       <div style="padding: 8px">
@@ -204,7 +204,7 @@ const SUPPORT_TEMPLATES = `
       </div>
     </div>
   </script>
-  
+
   <script type="text/html" id="context-document-details">
     <div class="context-popover-flex-fill" style="overflow: auto;">
       <div class="context-popover-inner-content">
@@ -230,7 +230,7 @@ const SUPPORT_TEMPLATES = `
       </div>
     </div>
   </script>
-  
+
   <script type="text/html" id="context-partition-details">
     <div class="context-popover-flex-fill" style="overflow: auto;">
       <div class="context-popover-inner-content">
@@ -265,7 +265,7 @@ const SUPPORT_TEMPLATES = `
       </div>
     </div>
   </script>
-  
+
   <script type="text/html" id="context-popover-contents">
     <div class="context-popover-content">
       <!-- ko with: contents -->
@@ -318,10 +318,10 @@ const SUPPORT_TEMPLATES = `
       <!-- /ko -->
     </div>
   </script>
-  
+
   <script type="text/html" id="context-catalog-doc-title">
   </script>
-  
+
   <script type="text/html" id="context-lang-ref-title">
     <div class="hue-popover-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 20px;">
       <i class="fa fa-book muted" style="margin-top: 3px"></i> <span class="blue" style="padding-left: 4px;" data-bind="text: title"></span>
@@ -335,7 +335,7 @@ const SUPPORT_TEMPLATES = `
       </div>
     </div>
   </script>
-  
+
   <script type="text/html" id="context-lang-ref-contents">
     <div class="context-popover-content">
       <div class="context-popover-flex-fill context-popover-docs-details" data-bind="html: body"></div>
@@ -350,7 +350,7 @@ const SUPPORT_TEMPLATES = `
       </div>
     </div>
   </script>
-  
+
   <script type="text/html" id="context-catalog-entry-title">
     <div class="hue-popover-title">
       <i class="hue-popover-title-icon fa muted" data-bind="css: catalogEntry() && catalogEntry().isView() ? 'fa-eye' : 'fa-table'"></i>
@@ -387,7 +387,7 @@ const SUPPORT_TEMPLATES = `
       </div>
     </div>
   </script>
-  
+
   <script type="text/html" id="context-catalog-entry-contents">
     <div class="context-popover-content">
       <div class="context-popover-flex-fill" data-bind="visible: loading"><!-- ko hueSpinner: { spin: loading, center: true, size: 'xlarge' } --><!-- /ko --></div>
@@ -402,12 +402,12 @@ const SUPPORT_TEMPLATES = `
           <!-- ko if: $parent.comment() && !isTemporary  -->
           <div class="context-popover-comment" data-bind="attr: { 'title': $parent.comment }, multiLineEllipsis: { expanded: $parent.commentExpanded, expandable: true, expandClass: 'context-popover-comment-expanded' }, text: $parent.comment"></div>
           <!-- /ko -->
-  
+
           <!-- ko ifnot: $parent.commentExpanded -->
-              <!-- ko if: window.HAS_NAVIGATOR && !isTemporary && (getSourceType() === 'hive' || getSourceType() === 'impala') -->
+              <!-- ko if: window.HAS_CATALOG && !isTemporary && (getSourceType() === 'hive' || getSourceType() === 'impala') -->
               <div data-bind="component: { name: 'nav-tags', params: { catalogEntry: $data, overflowEllipsis: true } }"></div>
               <!-- /ko -->
-  
+
             <!-- ko if: isView() && $parent.viewSql() -->
             <a href="javascript:void(0);" style="text-align: right; margin-bottom: 5px;" data-bind="toggle: $parent.viewSqlVisible, text: $parent.viewSqlVisible() ? '${I18n(
               'Show columns'
@@ -423,7 +423,7 @@ const SUPPORT_TEMPLATES = `
           <!-- /ko -->
         </div>
       </div>
-  
+
       <div class="context-popover-flex-bottom-links">
         <div class="context-popover-link-row">
           <!-- ko if: catalogEntry -->
@@ -452,7 +452,7 @@ const SUPPORT_TEMPLATES = `
       <!-- /ko -->
     </div>
   </script>
-  
+
   <script type="text/html" id="context-storage-entry-title">
     <div class="hue-popover-title">
       <i class="hue-popover-title-icon fa muted" data-bind="css: storageEntry() && storageEntry().definition.type === 'dir' ? 'fa-folder-o' : 'fa-file-o'"></i>

@@ -187,6 +187,9 @@ nv.models.multiBarWithBrushChart = function() {
         return Math.floor(availableWidth / minTickWidth);
       };
       chart.update = function() {
+        if (!data) {
+          return;
+        }
         container
           .transition()
           .duration(transitionDuration)

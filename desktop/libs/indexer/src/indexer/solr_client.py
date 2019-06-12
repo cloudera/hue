@@ -343,7 +343,8 @@ class SolrClient(object):
     return field
 
 
-  def _reset_properties(self):
+  @staticmethod
+  def _reset_properties():
     global _IS_SOLR_CLOUD
     global _IS_SOLR_6_OR_MORE
     global _IS_SOLR_WITH_HDFS

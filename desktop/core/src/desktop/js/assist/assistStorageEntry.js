@@ -146,7 +146,7 @@ class AssistStorageEntry {
         const filteredFiles = data.files.filter(file => file.name !== '.' && file.name !== '..');
         self.entries(
           filteredFiles.map(file => {
-            file.url = encodeURI(file.url);
+            file.url = encodeURIComponent(file.url);
             return new AssistStorageEntry({
               type: self.type,
               definition: file,

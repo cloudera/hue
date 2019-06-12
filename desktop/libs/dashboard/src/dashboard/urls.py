@@ -36,7 +36,7 @@ urlpatterns = [
 
 urlpatterns += [
   url(r'^search$', dashboard_api.search, name='search'),
-  url(r'^suggest/$', dashboard_api.query_suggest, name='query_suggest'),
+  url(r'^suggest/?$', dashboard_api.query_suggest, name='query_suggest'),
   url(r'^index/fields/dynamic$', dashboard_api.index_fields_dynamic, name='index_fields_dynamic'),
   url(r'^index/fields/nested_documents', dashboard_api.nested_documents, name='nested_documents'),
   url(r'^template/new_facet$', dashboard_api.new_facet, name='new_facet'),

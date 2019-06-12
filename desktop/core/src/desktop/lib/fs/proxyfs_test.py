@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 
 
+from nose.plugins.attrib import attr
 from nose.tools import assert_raises, assert_false, eq_
 from nose import SkipTest
 
@@ -28,6 +29,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_permission, remove_from_group
 
 
+@attr('integration')
 def test_fs_selection():
   try:
     from mock import MagicMock
@@ -90,6 +92,7 @@ def test__get_fs():
   assert_raises(IOError, f, 'ftp://host')
 
 
+@attr('integration')
 def test_multi_fs_selection():
   try:
     from mock import MagicMock
@@ -163,6 +166,7 @@ class MockFs():
 
   def setuser(self, user):
     self.user = user
+
   def filebrowser_action(self):
     return self._filebrowser_action
 

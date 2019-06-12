@@ -167,7 +167,7 @@ ${ assist.assistJSModels() }
     ko.options.deferUpdates = true;
   }
 
-  ace.config.set("basePath", "/static/desktop/js/ace");
+  ace.config.set("basePath", "${ static('desktop/js/ace') }");
 
   var VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode }, {
     user: '${ user.username }',

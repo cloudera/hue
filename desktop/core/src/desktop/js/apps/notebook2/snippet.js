@@ -212,7 +212,10 @@ class Snippet {
 
     self.inFocus.subscribe(newValue => {
       if (newValue) {
-        huePubSub.publish('active.snippet.type.changed', { type: self.type(), isSqlDialect: self.isSqlDialect() });
+        huePubSub.publish('active.snippet.type.changed', {
+          type: self.type(),
+          isSqlDialect: self.isSqlDialect()
+        });
       }
     });
 
@@ -870,6 +873,7 @@ class Snippet {
     self.saveResultsModalVisible = ko.observable(false);
 
     self.checkStatusTimeout = null;
+    self.getLogsTimeout = null;
 
     self.complexity = ko.observable();
     self.hasComplexity = ko.pureComputed(
@@ -1127,6 +1131,8 @@ class Snippet {
     if (self.checkStatusTimeout != null) {
       clearTimeout(self.checkStatusTimeout);
       self.checkStatusTimeout = null;
+      clearTimeout(self.getLogsTimeout);
+      self.getLogsTimeout = null;
     }
     hueAnalytics.log('notebook', 'cancel');
 
@@ -1199,83 +1205,101 @@ class Snippet {
 
   checkStatus() {
     const self = this;
-    $.post(
-      '/notebook/api/check_status',
-      {
-        notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-        snippet: komapping.toJSON(self.getContext())
-      },
-      data => {
-        if (
-          self.statusForButtons() === STATUS_FOR_BUTTONS.canceling ||
-          self.status() === STATUS.canceled
-        ) {
-          // Query was canceled in the meantime, do nothing
-        } else {
-          self.result.endTime(new Date());
-
-          if (data.status === 0) {
-            self.status(data.query_status.status);
-
-            if (
-              self.status() === STATUS.running ||
-              self.status() === STATUS.starting ||
-              self.status() === STATUS.waiting
-            ) {
-              const delay = self.result.executionTime() > 45000 ? 5000 : 1000; // 5s if more than 45s
-              if (!self.parentNotebook.unloaded()) {
-                self.checkStatusTimeout = setTimeout(self.checkStatus, delay);
-              }
-            } else if (self.status() === STATUS.available) {
-              self.fetchResult(100);
-              self.progress(100);
-              if (self.isSqlDialect()) {
-                if (self.result.handle().has_result_set) {
-                  const _query_id = self.parentNotebook.id();
-                  setTimeout(() => {
-                    // Delay until we get IMPALA-5555
-                    self.fetchResultSize(10, _query_id);
-                  }, 2000);
-                  self.checkDdlNotification(); // DDL CTAS with Impala
-                } else if (self.lastExecutedStatement()) {
-                  self.checkDdlNotification();
-                } else {
-                  self.onDdlExecute();
-                }
-              }
-              if (self.parentNotebook.isExecutingAll()) {
-                self.parentNotebook.executingAllIndex(self.parentNotebook.executingAllIndex() + 1);
-                if (
-                  self.parentNotebook.executingAllIndex() < self.parentNotebook.snippets().length
-                ) {
-                  self.parentNotebook.snippets()[self.parentNotebook.executingAllIndex()].execute();
-                } else {
-                  self.parentNotebook.isExecutingAll(false);
-                }
-              }
-              if (!self.result.handle().has_more_statements && self.parentVm.successUrl()) {
-                window.location.href = self.parentVm.successUrl(); // Not used anymore in Hue 4
-              }
-            } else if (self.status() === STATUS.success) {
-              self.progress(99);
-            }
-          } else if (data.status === -3) {
-            self.status(STATUS.expired);
-            self.parentNotebook.isExecutingAll(false);
+    const _checkStatus = function() {
+      $.post(
+        '/notebook/api/check_status',
+        {
+          notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
+          snippet: komapping.toJSON(self.getContext())
+        },
+        data => {
+          if (
+            self.statusForButtons() === STATUS_FOR_BUTTONS.canceling ||
+            self.status() === STATUS.canceled
+          ) {
+            // Query was canceled in the meantime, do nothing
           } else {
-            self.handleAjaxError(data);
-            self.parentNotebook.isExecutingAll(false);
+            self.result.endTime(new Date());
+
+            if (data.status === 0) {
+              self.status(data.query_status.status);
+
+              if (
+                self.status() === STATUS.running ||
+                self.status() === STATUS.starting ||
+                self.status() === STATUS.waiting
+              ) {
+                const delay = self.result.executionTime() > 45000 ? 5000 : 1000; // 5s if more than 45s
+                if (!self.parentNotebook.unloaded()) {
+                  self.checkStatusTimeout = setTimeout(_checkStatus, delay);
+                }
+              } else if (self.status() === STATUS.available) {
+                self.fetchResult(100);
+                self.progress(100);
+                if (self.isSqlDialect()) {
+                  if (self.result.handle().has_result_set) {
+                    const _query_id = self.parentNotebook.id();
+                    setTimeout(() => {
+                      // Delay until we get IMPALA-5555
+                      self.fetchResultSize(10, _query_id);
+                    }, 2000);
+                    self.checkDdlNotification(); // DDL CTAS with Impala
+                  } else if (self.lastExecutedStatement()) {
+                    self.checkDdlNotification();
+                  } else {
+                    self.onDdlExecute();
+                  }
+                }
+                if (self.parentNotebook.isExecutingAll()) {
+                  self.parentNotebook.executingAllIndex(
+                    self.parentNotebook.executingAllIndex() + 1
+                  );
+                  if (
+                    self.parentNotebook.executingAllIndex() < self.parentNotebook.snippets().length
+                  ) {
+                    self.parentNotebook
+                      .snippets()
+                      [self.parentNotebook.executingAllIndex()].execute();
+                  } else {
+                    self.parentNotebook.isExecutingAll(false);
+                  }
+                }
+                if (!self.result.handle().has_more_statements && self.parentVm.successUrl()) {
+                  huePubSub.publish('open.link', self.parentVm.successUrl()); // Not used anymore in Hue 4
+                }
+              } else if (self.status() === STATUS.success) {
+                self.progress(99);
+              }
+            } else if (data.status === -3) {
+              self.status(STATUS.expired);
+              self.parentNotebook.isExecutingAll(false);
+            } else {
+              self.handleAjaxError(data);
+              self.parentNotebook.isExecutingAll(false);
+            }
           }
-          self.getLogs(); // Need to execute at the end, because updating the status impacts log progress results
         }
-      }
-    ).fail((xhr, textStatus) => {
-      if (xhr.status !== 502) {
-        $(document).trigger('error', xhr.responseText || textStatus);
-      }
-      self.status(STATUS.failed);
-      self.parentNotebook.isExecutingAll(false);
-    });
+      ).fail((xhr, textStatus) => {
+        if (xhr.status !== 502) {
+          $(document).trigger('error', xhr.responseText || textStatus);
+        }
+        self.status(STATUS.failed);
+        self.parentNotebook.isExecutingAll(false);
+      });
+    };
+    const activeStatus = ['running', 'starting', 'waiting'];
+    const _getLogs = function(isLastTime) {
+      self.getLogs().then(() => {
+        const lastTime = activeStatus.indexOf(self.status()) < 0; // We to run getLogs at least one time after status is terminated to make sure we have last logs
+        if (lastTime && isLastTime) {
+          return;
+        }
+        const delay = self.result.executionTime() > 45000 ? 5000 : 1000; // 5s if more than 45s
+        self.getLogsTimeout = setTimeout(_getLogs.bind(self, lastTime), delay);
+      });
+    };
+    _checkStatus();
+    _getLogs(activeStatus.indexOf(self.status()) < 0);
   }
 
   clear() {
@@ -1291,6 +1315,8 @@ class Snippet {
     if (self.checkStatusTimeout != null) {
       clearTimeout(self.checkStatusTimeout);
       self.checkStatusTimeout = null;
+      clearTimeout(self.getLogsTimeout);
+      self.getLogsTimeout = null;
     }
 
     $.post('/notebook/api/close_statement', {
@@ -1621,7 +1647,7 @@ class Snippet {
 
   getLogs() {
     const self = this;
-    $.post(
+    return $.post(
       '/notebook/api/get_logs',
       {
         notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),

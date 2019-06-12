@@ -1,4 +1,12 @@
-Goal: Automate the builds and validation of changes
+# Goal: Automate the builds and validation of changes
+
+Be fast and simple:
+
+* Cloud based
+* 100% automated
+* Below 5 minutes for basic unit tests (API and UI)
+* Prepare the ground for other components
+* Eventually lock master branch
 
 ## What to validate
 
@@ -7,19 +15,19 @@ Goal: Automate the builds and validation of changes
 Similar to the [Docker Hue](/tools/docker/hue). Currently doing only Python 2, but we should test the Python 3 build and run the tests.
 
 * Python 2.7
-* Python 3
+* Python 3.5+
 
 The docker images could be forked for QA and comes with a series of flags.
 
 ### Documentation
 
-By updating the makefile to build the new [Website](/docs/docs-site). Would need to install Hugo and [http://cloudera.github.io/hue/latest/developer/development/#documentation](build it).
+By updating the makefile to build the new [Website](/docs/docs-site). Would need to install Hugo and [build it](http://cloudera.github.io/hue/latest/developer/development/#documentation).
 
-Step 2 would be to setup so that the doc get [published automatically](https://docs.travis-ci.com/user/deployment/pages/).
+Step 2 would be to setup so that the documentation would get published automatically.
 
 ### Release
 
-[`make prod`](make prod) should work, and the tarball release should be automatically installed and checked if boots normally.
+`make prod` should work, and the tarball release should be automatically installed and checked if boots normally.
 
 ### Docker images
 
@@ -49,18 +57,26 @@ Those tests would run on:
 
 Several areas to track:
 
-* js and py lint
-* code coverage
+* js
+* linting (and missing tests, warnings added)
+* Coverage
+* MyPy
 
 # Proposal
 
 Investigate:
 
+* Cloud based: https://circleci.com currently (free for open source, easy to use)
 * Docker based CI (e.g. [CI in Docker](https://itnext.io/shift-your-ci-scripts-to-docker-build-92453bca9f75)...)
+* [Tox](https://tox.readthedocs.io)
+* Build and Makefile refactoring with standard `requirement.txt` and pypy package
+* git clone under 10s
+* Unit tests under 5min
 
 Starting with these basic steps:
 
-* Running an hourly master build if there are changes
-* Report the runs similarly to Jenkins. Pick one of Jenkins, Travis CI, Github Action...
+* Report the runs via UI and github checks
 * Split the tests into several categories
-* Add the unit tests only to the hourly run
+  * unit Python
+  * integrations
+  * js

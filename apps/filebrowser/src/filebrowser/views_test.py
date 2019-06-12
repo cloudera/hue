@@ -21,6 +21,7 @@ import logging
 import os
 import re
 import tempfile
+import urllib
 import urlparse
 from avro import schema, datafile, io
 
@@ -65,6 +66,7 @@ def cleanup_file(cluster, path):
 
 class TestFileBrowserWithHadoop(object):
   requires_hadoop = True
+  integration = True
 
   def setUp(self):
     self.c = make_logged_in_client(username='test', is_superuser=False)
@@ -434,7 +436,7 @@ class TestFileBrowserWithHadoop(object):
     assert_equal(stat_dir, response.context[0]['path'])
 
     response = self.c.get('/filebrowser/view=/test-filebrowser/?default_to_home')
-    assert_true(re.search('%s$' % home, response['Location']))
+    assert_true(re.search('%s$' % home, urllib.unquote(response['Location'])))
 
     # Test path relative to home directory
     self.cluster.fs.do_as_user('test', self.cluster.fs.mkdir, '%s/test_dir' % home)
@@ -770,7 +772,7 @@ class TestFileBrowserWithHadoop(object):
     response = self.c.get('/filebrowser/view=/')
     assert_equal(response.context[0]['path'], '/')
     response = self.c.get('/filebrowser/view=/?default_to_home=1')
-    assert_equal("/filebrowser/view=/user/test", response["location"])
+    assert_equal("/filebrowser/view=/user/test", urllib.unquote(response["location"]))
 
 
   def test_view_access(self):

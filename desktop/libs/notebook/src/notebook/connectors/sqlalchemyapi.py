@@ -114,11 +114,12 @@ class SqlAlchemyApi(Api):
     engine = self._create_engine()
     connection = engine.connect()
     result = connection.execution_options(stream_results=True).execute(snippet['statement'])
+
     cache = {
       'connection': connection,
       'result': result,
       'meta': [{
-          'name': col[0] if type(col) is dict or type(col) is tuple else col,
+          'name': col[0] if (type(col) is tuple or type(col) is dict) else col.name if hasattr(col, 'name') else col,
           'type': 'STRING_TYPE',
           'comment': ''
         } for col in result.cursor.description]
