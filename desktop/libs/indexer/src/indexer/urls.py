@@ -17,7 +17,7 @@
 
 from django.conf.urls import url
 from indexer import views as indexer_views
-from indexer import solr_api as indexer_solr_api 
+from indexer import solr_api as indexer_solr_api
 from indexer import api3 as indexer_api3
 from indexer.indexers import rdbms as indexer_indexers_rdbms
 from indexer import api as indexer_api
