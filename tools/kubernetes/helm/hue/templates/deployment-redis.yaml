@@ -1,3 +1,4 @@
+{{- if .Values.workers.enabled -}}
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
@@ -21,3 +22,4 @@ spec:
             memory: 100Mi
         ports:
         - containerPort: 6379
+{{- end -}}
