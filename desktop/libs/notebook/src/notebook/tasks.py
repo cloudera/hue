@@ -89,6 +89,7 @@ class ExecutionWrapperCallback(object):
     self.meta['status'] = status
     download_to_file.update_state(task_id=self.uuid, state='PROGRESS', meta=self.meta)
 
+
 # TODO: Add periodic cleanup task
 # TODO: UI should be able to close a query that is available, but not expired
 @app.task()
@@ -118,10 +119,12 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
 
   return meta
 
+
 @app.task(ignore_result=True)
 def cancel_async(notebook, snippet, **kwargs):
   request = _get_request(**kwargs)
   get_api(request, snippet).cancel(notebook, snippet)
+
 
 @app.task(ignore_result=True)
 def close_statement_async(notebook, snippet, **kwargs):
@@ -186,12 +189,14 @@ def download(*args, **kwargs):
 
   return export_csvxls.file_reader(storage.open(_result_key(notebook), 'rb'))
 
+
 # Why we need this:
 # 1) There is no way in celery to differentiate between a task that was submitted, but not yet started and a task that has been GCed.
 # 2) The client will keep checking for data until the query is expired. The new definition for expired in this case is a task that has been GCed.
 def _patch_status(notebook):
   result = download_to_file.AsyncResult(notebook['uuid'])
   result.backend.store_result(notebook['uuid'], None, "SUBMITTED")
+
 
 def execute(*args, **kwargs):
   notebook = args[0]
@@ -219,6 +224,7 @@ def execute(*args, **kwargs):
     )
   return resp
 
+
 def check_status(*args, **kwargs):
   notebook = args[0]
   result = download_to_file.AsyncResult(notebook['uuid'])
@@ -229,6 +235,7 @@ def check_status(*args, **kwargs):
     result.maybe_reraise()
 
   return {'status': STATE_MAP[state]}
+
 
 def get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id=None):
   result = download_to_file.AsyncResult(notebook['uuid'])
@@ -254,6 +261,7 @@ def get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id
         output.write(line)
     return output.getvalue()
 
+
 def get_jobs(notebook, snippet, logs, **kwargs): # Re implementation to fetch updated guid in download_to_file from DB
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
@@ -271,6 +279,7 @@ def get_jobs(notebook, snippet, logs, **kwargs): # Re implementation to fetch up
   api = get_api(request, snippet)
   return api.get_jobs(notebook, snippet, logs)
 
+
 def progress(notebook, snippet, logs=None, **kwargs):
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
@@ -286,6 +295,7 @@ def progress(notebook, snippet, logs=None, **kwargs):
   request = _get_request(**kwargs)
   api = get_api(request, snippet)
   return api.progress(notebook, snippet, logs=logs)
+
 
 def fetch_result(notebook, snippet, rows, start_over, **kwargs):
   result = download_to_file.AsyncResult(notebook['uuid'])
