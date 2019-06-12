@@ -327,7 +327,7 @@ impala-shell %(kerberos_option)s %(ssl_option)s -i %(impalad_host)s -f %(query_f
           from notebook.models import Notebook
           if action.data['properties'].get('uuid'):
             notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=action.data['properties']['uuid']))
-            statements = notebook.get_str()
+            statements = notebook.get_str(from_oozie_action=True)
           else:
             statements = action.data['properties'].get('statements')
 
