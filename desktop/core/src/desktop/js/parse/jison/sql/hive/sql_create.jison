@@ -1078,13 +1078,11 @@ ViewDefinition_EDIT
  ;
 
 FunctionDefinition
- : FunctionDefinition
- | TemporaryFunction
+ : TemporaryFunction
  ;
 
 FunctionDefinition_EDIT
- : FunctionDefinition_EDIT
- | TemporaryFunction_EDIT
+ : TemporaryFunction_EDIT
  ;
 
 FunctionDefinition

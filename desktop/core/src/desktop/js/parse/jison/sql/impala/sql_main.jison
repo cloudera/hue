@@ -203,7 +203,6 @@ NonStartingToken
  | 'CROSS'
  | 'CUBE'
  | 'CURRENT'
- | 'CURRENT'
  | 'CURRENT_DATE'
  | 'CURRENT_DEFAULT_TRANSFORM_GROUP'
  | 'CURRENT_PATH'
@@ -3024,13 +3023,10 @@ OptionalOverClause_EDIT
 OverClause
  : 'OVER' RegularOrBacktickedIdentifier
  | 'OVER' WindowExpression
- | 'OVER' RegularOrBacktickedIdentifier
- | 'OVER' WindowExpression
  ;
 
 OverClause_EDIT
  : 'OVER' WindowExpression_EDIT
- | 'OVER' WindowExpression_EDIT
  ;
 
 WindowExpression

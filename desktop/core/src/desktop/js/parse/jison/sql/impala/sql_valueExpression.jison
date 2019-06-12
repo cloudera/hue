@@ -582,8 +582,8 @@ ValueExpression
 
 LikeRightPart
  : 'LIKE' ValueExpression             -> { suggestKeywords: ['NOT'] }
- | 'ILIKE' ValueExpression    -> { suggestKeywords: ['NOT'] }
- | 'IREGEXP' ValueExpression  -> { suggestKeywords: ['NOT'] }
+ | 'ILIKE' ValueExpression            -> { suggestKeywords: ['NOT'] }
+ | 'IREGEXP' ValueExpression          -> { suggestKeywords: ['NOT'] }
  | 'RLIKE' ValueExpression            -> { suggestKeywords: ['NOT'] }
  | 'REGEXP' ValueExpression           -> { suggestKeywords: ['NOT'] }
  ;

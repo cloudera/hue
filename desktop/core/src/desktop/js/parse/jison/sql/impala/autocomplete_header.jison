@@ -22,7 +22,7 @@
 
 %left ';' ','
 %nonassoc 'CURSOR' 'PARTIAL_CURSOR'
-%nonassoc 'IN' 'IS' '<impala>ILIKE' '<impala>IREGEXP' 'LIKE' 'RLIKE' 'REGEXP' 'EXISTS' NEGATION
+%nonassoc 'IN' 'IS' 'ILIKE' 'IREGEXP' 'LIKE' 'RLIKE' 'REGEXP' 'EXISTS' NEGATION
 
 %start SqlAutocomplete
 

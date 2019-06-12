@@ -43,11 +43,6 @@ ShowStatement
  | ShowViewsStatement
  ;
 
-'SHOW'
- : 'SHOW'
- | 'SHOW'
- ;
-
 ShowStatement_EDIT
  : 'SHOW' 'CURSOR'
    {

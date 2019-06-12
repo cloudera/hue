@@ -616,11 +616,6 @@ OneOrMorePartitionSpecs_EDIT
  | OneOrMorePartitionSpecs ',' PartitionSpec_EDIT ',' OneOrMorePartitionSpecs
  ;
 
-OptionalPurge
- :
- | 'PURGE'
- ;
-
 OptionalPartitionSpecs
  :
  | PartitionSpecWithLocationList
