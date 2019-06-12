@@ -1,0 +1,45 @@
+{{- if .Values.workers.enabled -}}
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: celery-flower
+  labels:
+    deployment: celery-flower
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      pod: celery-flower
+  template:
+    metadata:
+      labels:
+        pod: celery-flower
+    spec:
+      containers:
+      - name: celery-flower
+        image: {{ .Values.image.registry }}/hue:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ['./build/env/bin/celery', 'flower', '-A', 'desktop']
+        ports:
+          - containerPort: 5555
+        env:
+          - name: FLOWER_PORT # Workaround for bug in k8s
+            value: "5555"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/share/hue/desktop/conf/z-hue.ini
+          subPath: hue-ini
+        - name: config-volume-extra
+          mountPath: /usr/share/hue/desktop/conf/zz-hue.ini
+          subPath: hue-ini
+        resources:
+          limits:
+            cpu: 100m
+      volumes:
+        - name: config-volume
+          configMap:
+            name: hue-config
+        - name: config-volume-extra
+          configMap:
+            name: hue-config-extra
+{{- end -}}
