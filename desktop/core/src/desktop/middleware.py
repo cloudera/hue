@@ -47,7 +47,7 @@ import desktop.conf
 from desktop.conf import IS_EMBEDDED
 from desktop.context_processors import get_app_name
 from desktop.lib import apputil, i18n, fsmanager
-from desktop.lib.django_util import render, render_json
+from desktop.lib.django_util import JsonResponse, render, render_json
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.log import get_audit_logger
@@ -345,6 +345,8 @@ class LoginAndPermissionMiddleware(object):
     else:
       if IS_EMBEDDED.get():
         return HttpResponseForbidden()
+      elif request.GET.get('is_embeddable'):
+        return JsonResponse({'url': "%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, urlquote('/hue' + request.get_full_path().replace('is_embeddable=true', '').replace('&&','&')))}) # Remove embeddable so redirect from & to login works. Login page is not embeddable
       else:
         return HttpResponseRedirect("%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, urlquote(request.get_full_path())))
 

@@ -389,6 +389,13 @@ class OnePageViewModel {
                 }, 0);
               });
             } else {
+              if (type.indexOf('json') > -1) {
+                var presponse = JSON.parse(response);
+                if (presponse && presponse.url) {
+                  window.location.href = window.HUE_BASE_URL + presponse.url;
+                  return;
+                }
+              }
               window.location.href = window.HUE_BASE_URL + baseURL;
             }
           },
