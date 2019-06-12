@@ -61,6 +61,7 @@ RUN rm -rf /hue
 RUN ./build/env/bin/pip install psycopg2-binary
 RUN ./build/env/bin/pip install redis==2.10.6
 RUN ./build/env/bin/pip install django_redis
+RUN ./build/env/bin/pip install flower
 
 COPY tools/docker/hue/conf desktop/conf
 COPY tools/docker/hue/startup.sh .
