@@ -19,8 +19,7 @@ DataManipulation
  ;
 
 InsertStatement
- : InsertStatement
- | InsertValuesStatement
+ : InsertValuesStatement
  | CommonTableExpression InsertStatement
  | MergeStatement
  ;
@@ -259,11 +258,6 @@ InsertValuesStatement
      $4.owner = 'insert';
      parser.addTablePrimary($4);
    }
- | 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier 'VALUES' InsertValuesList
-   {
-     $4.owner = 'insert';
-     parser.addTablePrimary($4);
-   }
  ;
 
 InsertValuesStatement_EDIT
@@ -280,13 +274,17 @@ InsertValuesStatement_EDIT
      parser.suggestDatabases({ appendDot: true });
    }
  | 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier_EDIT
- | 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier 'CURSOR'
+ | 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'
    {
      $4.owner = 'insert';
      parser.addTablePrimary($4);
-     parser.suggestKeywords(['VALUES']);
+     if (!$5) {
+       parser.suggestKeywords(['PARTITION', 'VALUES']);
+     } else {
+       parser.suggestKeywords(['VALUES']);
+     }
    }
- | 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier_EDIT 'VALUES' InsertValuesList
+ | 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec 'VALUES' InsertValuesList
  ;
 
 InsertValuesList

@@ -184,7 +184,6 @@ NonReservedKeyword
  | 'REPLICATION'
  | 'RESTRICT'
  | 'ROLE'
- | 'ROLE'
  | 'ROLES'
  | 'SCHEMAS'
  | 'SECOND'
@@ -328,7 +327,6 @@ NonStartingToken
  | 'DEFINED'
  | 'DELIMITED'
  | 'DEPENDENCY'
- | 'DESC'
  | 'DESC'
  | 'DIRECTORY'
  | 'DISTINCT'
@@ -532,11 +530,6 @@ DatabaseOrSchema
  | 'SCHEMA'
  ;
 
-FromOrIn
- : 'FROM'
- | 'IN'
- ;
-
 IndexOrIndexes
  : 'INDEX'
  | 'INDEXES'
@@ -624,12 +617,6 @@ OptionalFromDatabase_EDIT
 OptionalCascade
  :
  | 'CASCADE'
- ;
-
-OptionalCascadeOrRestrict
- :
- | 'CASCADE'
- | 'RESTRICT'
  ;
 
 OptionalCascadeOrRestrict
@@ -1471,7 +1458,6 @@ WithQuery_EDIT
 OptionalAllOrDistinct
  :
  | 'ALL'
- | 'ALL'
  | 'DISTINCT'
  ;
 
@@ -2012,8 +1998,6 @@ OptionalAscOrDesc
     $$ = { suggestKeywords: ['ASC', 'DESC'] };
   }
  | 'ASC'
- | 'ASC'
- | 'DESC'
  | 'DESC'
  ;
 
@@ -3205,24 +3189,24 @@ OptionalOrderByAndWindow
  ;
 
 OptionalOrderByAndWindow_EDIT
-  : OrderByClause_EDIT
-    {
-      // Only allowed in last order by
-      delete parser.yy.result.suggestAnalyticFunctions;
-    }
-  | OrderByClause 'CURSOR' OptionalWindowSpec
-    {
-      var keywords = [];
-      if ($1.suggestKeywords) {
-        keywords = parser.createWeightedKeywords($1.suggestKeywords, 2);
-      }
-      if (!$3) {
-        keywords = keywords.concat([{ value: 'RANGE BETWEEN', weight: 1 }, { value: 'ROWS BETWEEN', weight: 1 }]);
-      }
-      parser.suggestKeywords(keywords);
-    }
-  | OrderByClause WindowSpec_EDIT
-  ;
+ : OrderByClause_EDIT
+   {
+     // Only allowed in last order by
+     delete parser.yy.result.suggestAnalyticFunctions;
+   }
+ | OrderByClause 'CURSOR' OptionalWindowSpec
+   {
+     var keywords = [];
+     if ($1.suggestKeywords) {
+       keywords = parser.createWeightedKeywords($1.suggestKeywords, 2);
+     }
+     if (!$3) {
+       keywords = keywords.concat([{ value: 'RANGE BETWEEN', weight: 1 }, { value: 'ROWS BETWEEN', weight: 1 }]);
+     }
+     parser.suggestKeywords(keywords);
+   }
+ | OrderByClause WindowSpec_EDIT
+ ;
 
 OptionalWindowSpec
  :

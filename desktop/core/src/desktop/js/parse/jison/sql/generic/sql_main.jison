@@ -100,7 +100,7 @@ RegularIdentifier
 // This is a work-around for error handling when a statement starts with some token that the parser can understand but
 // it's not a valid statement (see ErrorStatement). It contains everything except valid starting tokens ('SELECT', 'USE' etc.)
 NonStartingToken
- | '!'
+ : '!'
  | '('
  | ')'
  | '*'
@@ -425,14 +425,10 @@ ColumnList
  ;
 
 ColumnList_EDIT
- : ColumnIdentifier_EDIT
- | ColumnList ',' AnyCursor
+ : ColumnList ',' AnyCursor
    {
      parser.suggestColumns();
    }
- | ColumnList ',' ColumnIdentifier_EDIT
- | ColumnIdentifier_EDIT ',' ColumnList
- | ColumnList ',' ColumnIdentifier_EDIT ',' ColumnList
  | ColumnList ',' AnyCursor ',' ColumnList
    {
      parser.suggestColumns();
@@ -618,25 +614,7 @@ BasicIdentifierChain
 
 // TODO: Merge with DerivedColumnChain_EDIT ( issue is starting with PartialBacktickedOrPartialCursor)
 BasicIdentifierChain_EDIT
- : ColumnIdentifier_EDIT
-   {
-     if ($1.insideKey) {
-       parser.suggestKeyValues({ identifierChain: [ $1.identifier ] });
-       parser.suggestColumns();
-       parser.suggestFunctions();
-     }
-   }
- | BasicIdentifierChain '.' ColumnIdentifier_EDIT
-   {
-     if ($3.insideKey) {
-       parser.suggestKeyValues({ identifierChain: $1.concat([ $3.identifier ]) });
-       parser.suggestColumns();
-       parser.suggestFunctions();
-     }
-   }
- | BasicIdentifierChain '.' ColumnIdentifier_EDIT '.' BasicIdentifierChain
- | ColumnIdentifier_EDIT '.' BasicIdentifierChain
- | BasicIdentifierChain '.' PartialBacktickedOrPartialCursor
+ : BasicIdentifierChain '.' PartialBacktickedOrPartialCursor
    {
      parser.suggestColumns({
        identifierChain: $1
@@ -661,39 +639,7 @@ DerivedColumnChain
  ;
 
 DerivedColumnChain_EDIT
- : ColumnIdentifier_EDIT
-   {
-     if ($1.insideKey) {
-       parser.suggestKeyValues({ identifierChain: [ $1.identifier ] });
-       parser.suggestColumns();
-       parser.suggestFunctions();
-     }
-   }
- | DerivedColumnChain '.' ColumnIdentifier_EDIT
-   {
-     if ($3.insideKey) {
-       parser.suggestKeyValues({ identifierChain: $1.concat([ $3.identifier ]) });
-       parser.suggestColumns();
-       parser.suggestFunctions();
-     }
-   }
- | DerivedColumnChain '.' ColumnIdentifier_EDIT '.' DerivedColumnChain
-   {
-     if ($3.insideKey) {
-       parser.suggestKeyValues({ identifierChain: $1.concat([ $3.identifier ]) });
-       parser.suggestColumns();
-       parser.suggestFunctions();
-     }
-   }
- | ColumnIdentifier_EDIT '.' DerivedColumnChain
-   {
-     if ($1.insideKey) {
-       parser.suggestKeyValues({ identifierChain: [ $1.identifier ] });
-       parser.suggestColumns();
-       parser.suggestFunctions();
-     }
-   }
- | PartialBacktickedIdentifierOrPartialCursor
+ : PartialBacktickedIdentifierOrPartialCursor
    {
      parser.suggestColumns();
    }
@@ -713,9 +659,6 @@ DerivedColumnChain_EDIT
 
 ColumnIdentifier
  : RegularOrBacktickedIdentifier                                                                               -> { identifier: { name: $1 }, location: @1 };
- ;
-
-ColumnIdentifier_EDIT
  ;
 
 PartialBacktickedIdentifierOrPartialCursor

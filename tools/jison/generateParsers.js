@@ -121,7 +121,7 @@ const execCmd = cmd =>
   new Promise((resolve, reject) => {
     exec(cmd, (err, stdout, stderr) => {
       if (err) {
-        reject(stderr);
+        reject('stderr:\n' + stderr + '\n\nstdout:\n' + stdout);
       }
       resolve();
     });
@@ -138,7 +138,7 @@ const generateParser = parserName =>
 
         Promise.all(promises)
           .then(contents => {
-            writeFile(JISON_FOLDER + parserConfig.target, contents).then(() => {
+            writeFile(JISON_FOLDER + parserConfig.target, contents.join('')).then(() => {
               resolve(JISON_FOLDER + parserConfig.target);
             });
           })
@@ -199,24 +199,6 @@ const listDir = folder =>
       resolve(files);
     });
   });
-
-/*
-sqlSyntaxParser: {
-    sources: [
-      'syntax_header.jison', 'sql_main.jison', 'sql_valueExpression.jison', 'sql_alter.jison', 'sql_analyze.jison',
-      'sql_create.jison', 'sql_drop.jison', 'sql_grant.jison', 'sql_insert.jison', 'sql_load.jison', 'sql_set.jison',
-      'sql_show.jison', 'sql_update.jison', 'sql_use.jison', 'syntax_footer.jison'
-    ],
-    target: 'sqlSyntaxParser.jison',
-    lexer: 'sql.jisonlex',
-    afterParse: (contents) => new Promise(resolve => {
-      resolve(LICENSE +
-        contents.replace('var sqlSyntaxParser = ', 'import SqlParseSupport from \'parse/sqlParseSupport\';\n\nvar sqlSyntaxParser = ')
-          .replace('loc: yyloc,', 'loc: lexer.yylloc, ruleId: stack.slice(stack.length - 2, stack.length).join(\'\'),') +
-        '\nexport default sqlSyntaxParser;\n');
-    })
-  },
- */
 
 const findParser = (fileIndex, folder, sharedFiles, autocomplete) => {
   const prefix = autocomplete ? 'autocomplete' : 'syntax';
