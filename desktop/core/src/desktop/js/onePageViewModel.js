@@ -620,6 +620,7 @@ class OnePageViewModel {
       { url: '/catalog', app: 'catalog' },
       { url: '/kafka/', app: 'kafka' },
       { url: '/indexer/topics/*', app: 'kafka' },
+      { url: '/indexer/indexes', app: 'indexes' },
       { url: '/indexer/indexes/*', app: 'indexes' },
       { url: '/indexer/', app: 'indexes' },
       { url: '/indexer/importer/', app: 'importer' },
