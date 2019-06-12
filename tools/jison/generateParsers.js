@@ -286,7 +286,16 @@ identifySqlParsers().then(() => {
       } else if (parserDefinitions[arg]) {
         parsersToGenerate.push(arg);
       } else {
-        invalid.push(arg);
+        let prefixFound = false;
+        Object.keys(parserDefinitions).forEach(key => {
+          if (key.indexOf(arg) === 0) {
+            prefixFound = true;
+            parsersToGenerate.push(key);
+          }
+        });
+        if (!prefixFound) {
+          invalid.push(arg);
+        }
       }
     } else if (arg.indexOf('generateParsers.js') !== -1) {
       appFound = true;
