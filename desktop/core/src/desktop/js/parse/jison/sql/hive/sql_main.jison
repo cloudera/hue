@@ -1548,7 +1548,7 @@ TableExpression_EDIT
        { value: 'JOIN', weight: 1 },
        { value: 'LEFT JOIN', weight: 1 },
        { value: 'LEFT OUTER JOIN', weight: 1 },
-       { value: 'LEFT SEMI JOIN', weight: 1 }
+       { value: 'LEFT SEMI JOIN', weight: 1 },
        { value: 'RIGHT JOIN', weight: 1 },
        { value: 'RIGHT OUTER JOIN', weight: 1 }
      ]);
@@ -2588,7 +2588,7 @@ Joins
        $$.suggestJoinConditions = { prependOn: true, tablePrimaries: parser.yy.latestTablePrimaries.concat() }
      }
      if ($4.suggestKeywords) {
-       $$.suggestKeywords = $5.suggestKeywords;
+       $$.suggestKeywords = $4.suggestKeywords;
      }
      if (parser.yy.latestTablePrimaries.length > 0) {
        parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1].join = true;

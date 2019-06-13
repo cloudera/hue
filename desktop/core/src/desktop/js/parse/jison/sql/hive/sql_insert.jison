@@ -16,17 +16,12 @@
 
 DataManipulation
  : InsertStatement
- ;
-
-InsertStatement
- : InsertValuesStatement
  | CommonTableExpression InsertStatement
  | MergeStatement
  ;
 
 DataManipulation_EDIT
  : InsertStatement_EDIT
- | InsertValuesStatement_EDIT
  | CommonTableExpression InsertStatement_EDIT
    {
      parser.addCommonTableExpressions($1);
@@ -36,7 +31,8 @@ DataManipulation_EDIT
  ;
 
 InsertStatement
- : InsertWithoutQuery QuerySpecification
+ : InsertWithoutQuery
+ | InsertWithoutQuery QuerySpecification
  | FromClause Inserts
  | FromClause SelectWithoutTableExpression OptionalSelectConditions
  ;
@@ -98,7 +94,12 @@ InsertStatement_EDIT
  ;
 
 InsertWithoutQuery
- : 'INSERT' 'OVERWRITE' OptionalTable SchemaQualifiedTableIdentifier OptionalPartitionSpec OptionalIfNotExists
+ : 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier OptionalPartitionSpec 'VALUES' InsertValuesList
+   {
+     $4.owner = 'insert';
+     parser.addTablePrimary($4);
+   }
+ | 'INSERT' 'OVERWRITE' OptionalTable SchemaQualifiedTableIdentifier OptionalPartitionSpec OptionalIfNotExists
    {
      $4.owner = 'insert';
      parser.addTablePrimary($4);
@@ -250,41 +251,6 @@ GenericInsert_EDIT
      }
    }
  | InsertWithoutQuery SelectWithoutTableExpression OptionalSelectConditions_EDIT
- ;
-
-InsertValuesStatement
- : 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier OptionalPartitionSpec 'VALUES' InsertValuesList
-   {
-     $4.owner = 'insert';
-     parser.addTablePrimary($4);
-   }
- ;
-
-InsertValuesStatement_EDIT
- : 'INSERT' 'CURSOR'
-   {
-     parser.suggestKeywords(['INTO']);
-   }
- | 'INSERT' 'INTO' OptionalTable 'CURSOR'
-   {
-     if (!$3) {
-       parser.suggestKeywords(['TABLE']);
-     }
-     parser.suggestTables();
-     parser.suggestDatabases({ appendDot: true });
-   }
- | 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier_EDIT
- | 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'
-   {
-     $4.owner = 'insert';
-     parser.addTablePrimary($4);
-     if (!$5) {
-       parser.suggestKeywords(['PARTITION', 'VALUES']);
-     } else {
-       parser.suggestKeywords(['VALUES']);
-     }
-   }
- | 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec 'VALUES' InsertValuesList
  ;
 
 InsertValuesList
@@ -552,7 +518,7 @@ MatchCondition_EDIT
  ;
 
 UpdateDeleteOrInsert
- : 'UPDATE' 'SET' SetClauseList              --> { isUpdate: true }
+ : 'UPDATE' 'SET' SetClauseList        --> { isUpdate: true }
  | 'DELETE'                            --> { isDelete: true }
  | 'INSERT' 'VALUES' InsertValuesList  --> { isInsert: true }
  ;

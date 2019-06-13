@@ -31,7 +31,6 @@ describe('genericAutocompleteParser.js ALTER statements', () => {
       genericAutocompleteParser.parseSql(
         testDefinition.beforeCursor,
         testDefinition.afterCursor,
-        undefined,
         debug
       )
     ).toEqualDefinition(testDefinition);

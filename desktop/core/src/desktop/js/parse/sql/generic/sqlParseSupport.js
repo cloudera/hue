@@ -226,7 +226,7 @@ const initSqlParser = function(parser) {
   };
 
   parser.getSelectListKeywords = function(excludeAsterisk) {
-    let keywords = [{ value: 'CASE', weight: 450 }, 'FALSE', 'TRUE', 'NULL'];
+    const keywords = [{ value: 'CASE', weight: 450 }, 'FALSE', 'TRUE', 'NULL'];
     if (!excludeAsterisk) {
       keywords.push({ value: '*', weight: 10000 });
     }
@@ -368,10 +368,7 @@ const initSqlParser = function(parser) {
       { value: 'NULL', weight: 450 },
       { value: 'TRUE', weight: 450 }
     ];
-    if (
-      typeof oppositeValueExpression === 'undefined' ||
-      typeof operator === 'undefined'
-    ) {
+    if (typeof oppositeValueExpression === 'undefined' || typeof operator === 'undefined') {
       keywords = keywords.concat(['EXISTS', 'NOT']);
     }
     if (oppositeValueExpression && oppositeValueExpression.types[0] === 'NUMBER') {
@@ -437,7 +434,7 @@ const initSqlParser = function(parser) {
       return;
     }
 
-    let tablePrimaries = parser.yy.latestTablePrimaries;
+    const tablePrimaries = parser.yy.latestTablePrimaries;
 
     let i = parser.yy.locations.length;
 
@@ -1857,6 +1854,15 @@ const initSqlParser = function(parser) {
     delete parser.yy.cursorFound;
     delete parser.yy.partialCursor;
 
+    // Fix for parser bug when switching lexer states
+    if (!lexerModified) {
+      const originalSetInput = parser.lexer.setInput;
+      parser.lexer.setInput = function(input, yy) {
+        return originalSetInput.bind(parser.lexer)(input, yy);
+      };
+      lexerModified = true;
+    }
+
     parser.prepareNewStatement();
 
     const REASONABLE_SURROUNDING_LENGTH = 150000; // About 3000 lines before and after
@@ -1968,7 +1974,7 @@ const initSqlParser = function(parser) {
 
     if (typeof result.error !== 'undefined' && typeof result.error.expected !== 'undefined') {
       // Remove the cursor from expected tokens
-      result.error.expected = result.error.expected.filter(token => token.indexOf('CURSOR') === -1)
+      result.error.expected = result.error.expected.filter(token => token.indexOf('CURSOR') === -1);
     }
 
     if (typeof result.error !== 'undefined' && result.error.recoverable) {
@@ -2131,8 +2137,6 @@ const initSyntaxParser = function(parser) {
     }
     return false;
   };
-
-  let lexerModified = false;
 
   parser.yy.parseError = function(str, hash) {
     parser.yy.error = hash;

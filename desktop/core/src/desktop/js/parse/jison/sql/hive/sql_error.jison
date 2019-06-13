@@ -92,7 +92,7 @@ JoinType_EDIT
    }
  | 'RIGHT' 'CURSOR' error
    {
-     parser.suggestKeywords(['ANTI JOIN', 'INNER JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']);
+     parser.suggestKeywords(['JOIN', 'OUTER JOIN']);
    }
  ;
 

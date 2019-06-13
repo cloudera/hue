@@ -15,20 +15,20 @@
 // limitations under the License.
 
 import SqlTestUtils from 'parse/spec/sqlTestUtils';
-import genericAutocompleteParser from '../genericAutocompleteParser';
+import hiveAutocompleteParser from '../hiveAutocompleteParser';
 
-describe('genericAutocompleteParser.js locations', () => {
+describe('hiveAutocompleteParser.js locations', () => {
   beforeAll(() => {
-    genericAutocompleteParser.yy.parseError = function(msg) {
+    hiveAutocompleteParser.yy.parseError = function(msg) {
       throw Error(msg);
     };
     jasmine.addMatchers(SqlTestUtils.testDefinitionMatcher);
   });
 
   const assertAutoComplete = testDefinition => {
-    const debug = true;
+    const debug = false;
     expect(
-      genericAutocompleteParser.parseSql(
+      hiveAutocompleteParser.parseSql(
         testDefinition.beforeCursor,
         testDefinition.afterCursor,
         debug
@@ -93,6 +93,62 @@ describe('genericAutocompleteParser.js locations', () => {
           type: 'limitClause',
           missing: true,
           location: { first_line: 1, last_line: 1, first_column: 49, last_column: 49 }
+        }
+      ]
+    });
+  });
+
+  it('should report locations for "SELECT * FROM tbl WHERE tbl.mp[\'key\'].bla;"', () => {
+    assertLocations({
+      beforeCursor: "SELECT * FROM tbl WHERE tbl.mp['key'].bla; ",
+      expectedLocations: [
+        {
+          type: 'statement',
+          location: { first_line: 1, last_line: 1, first_column: 1, last_column: 42 }
+        },
+        {
+          type: 'selectList',
+          missing: false,
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }
+        },
+        {
+          type: 'asterisk',
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 },
+          tables: [{ identifierChain: [{ name: 'tbl' }] }]
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 15, last_column: 18 },
+          identifierChain: [{ name: 'tbl' }]
+        },
+        {
+          type: 'whereClause',
+          missing: false,
+          location: { first_line: 1, last_line: 1, first_column: 19, last_column: 42 }
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 25, last_column: 28 },
+          identifierChain: [{ name: 'tbl' }]
+        },
+        {
+          type: 'column',
+          location: { first_line: 1, last_line: 1, first_column: 29, last_column: 31 },
+          identifierChain: [{ name: 'mp', keySet: true }],
+          qualified: true,
+          tables: [{ identifierChain: [{ name: 'tbl' }] }]
+        },
+        {
+          type: 'complex',
+          location: { first_line: 1, last_line: 1, first_column: 39, last_column: 42 },
+          identifierChain: [{ name: 'mp', keySet: true }, { name: 'bla' }],
+          qualified: true,
+          tables: [{ identifierChain: [{ name: 'tbl' }] }]
+        },
+        {
+          type: 'limitClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 42, last_column: 42 }
         }
       ]
     });
@@ -1295,6 +1351,966 @@ describe('genericAutocompleteParser.js locations', () => {
           type: 'limitClause',
           missing: true,
           location: { first_line: 1, last_line: 1, first_column: 31, last_column: 31 }
+        }
+      ]
+    });
+  });
+
+  describe('File paths', () => {
+    it('should report locations for "LOAD DATA LOCAL INPATH \'/some/path/file.ble\' OVERWRITE INTO TABLE bla; |"', () => {
+      assertLocations({
+        beforeCursor: "LOAD DATA LOCAL INPATH '/some/path/file.ble' OVERWRITE INTO TABLE bla;",
+        expectedLocations: [
+          {
+            type: 'statement',
+            location: { first_line: 1, last_line: 1, first_column: 1, last_column: 70 }
+          },
+          {
+            type: 'file',
+            location: { first_line: 1, last_line: 1, first_column: 25, last_column: 44 },
+            path: '/some/path/file.ble'
+          },
+          {
+            type: 'table',
+            location: { first_line: 1, last_line: 1, first_column: 67, last_column: 70 },
+            identifierChain: [{ name: 'bla' }]
+          }
+        ]
+      });
+    });
+  });
+
+  it('should report locations for "SELECT * FROM testTable t1 ORDER BY t1.a ASC, t1.b, t1.c DESC, t1.d;\nSELECT t1.bla FROM testTable2 t1;\\nSELECT * FROM testTable3 t3, testTable4 t4; |"', () => {
+    assertLocations({
+      beforeCursor:
+        'SELECT * FROM testTable t1 ORDER BY t1.a ASC, t1.b, t1.c DESC, t1.d;\nSELECT t1.bla FROM testTable2 t1;\nSELECT * FROM testTable3 t3, testTable4 t4; ',
+      expectedLocations: [
+        {
+          type: 'statement',
+          location: { first_line: 1, last_line: 1, first_column: 1, last_column: 68 }
+        },
+        {
+          type: 'selectList',
+          missing: false,
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }
+        },
+        {
+          type: 'asterisk',
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 },
+          tables: [{ alias: 't1', identifierChain: [{ name: 'testTable' }] }]
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 15, last_column: 24 },
+          identifierChain: [{ name: 'testTable' }]
+        },
+        {
+          type: 'alias',
+          source: 'table',
+          alias: 't1',
+          location: { first_line: 1, last_line: 1, first_column: 25, last_column: 27 },
+          identifierChain: [{ name: 'testTable' }]
+        },
+        {
+          type: 'whereClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 27, last_column: 27 }
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 37, last_column: 39 },
+          identifierChain: [{ name: 'testTable' }]
+        },
+        {
+          type: 'column',
+          location: { first_line: 1, last_line: 1, first_column: 40, last_column: 41 },
+          identifierChain: [{ name: 'a' }],
+          tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't1' }],
+          qualified: true
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 47, last_column: 49 },
+          identifierChain: [{ name: 'testTable' }]
+        },
+        {
+          type: 'column',
+          location: { first_line: 1, last_line: 1, first_column: 50, last_column: 51 },
+          identifierChain: [{ name: 'b' }],
+          tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't1' }],
+          qualified: true
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 53, last_column: 55 },
+          identifierChain: [{ name: 'testTable' }]
+        },
+        {
+          type: 'column',
+          location: { first_line: 1, last_line: 1, first_column: 56, last_column: 57 },
+          identifierChain: [{ name: 'c' }],
+          tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't1' }],
+          qualified: true
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 64, last_column: 66 },
+          identifierChain: [{ name: 'testTable' }]
+        },
+        {
+          type: 'column',
+          location: { first_line: 1, last_line: 1, first_column: 67, last_column: 68 },
+          identifierChain: [{ name: 'd' }],
+          tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't1' }],
+          qualified: true
+        },
+        {
+          type: 'limitClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 68, last_column: 68 }
+        },
+        {
+          type: 'statement',
+          location: { first_line: 1, last_line: 2, first_column: 69, last_column: 33 }
+        },
+        {
+          type: 'selectList',
+          missing: false,
+          location: { first_line: 2, last_line: 2, first_column: 8, last_column: 14 }
+        },
+        {
+          type: 'table',
+          location: { first_line: 2, last_line: 2, first_column: 8, last_column: 10 },
+          identifierChain: [{ name: 'testTable2' }]
+        },
+        {
+          type: 'column',
+          location: { first_line: 2, last_line: 2, first_column: 11, last_column: 14 },
+          identifierChain: [{ name: 'bla' }],
+          tables: [{ identifierChain: [{ name: 'testTable2' }], alias: 't1' }],
+          qualified: true
+        },
+        {
+          type: 'table',
+          location: { first_line: 2, last_line: 2, first_column: 20, last_column: 30 },
+          identifierChain: [{ name: 'testTable2' }]
+        },
+        {
+          type: 'alias',
+          source: 'table',
+          alias: 't1',
+          location: { first_line: 2, last_line: 2, first_column: 31, last_column: 33 },
+          identifierChain: [{ name: 'testTable2' }]
+        },
+        {
+          type: 'whereClause',
+          missing: true,
+          location: { first_line: 2, last_line: 2, first_column: 33, last_column: 33 }
+        },
+        {
+          type: 'limitClause',
+          missing: true,
+          location: { first_line: 2, last_line: 2, first_column: 33, last_column: 33 }
+        },
+        {
+          type: 'statement',
+          location: { first_line: 2, last_line: 3, first_column: 34, last_column: 43 }
+        },
+        {
+          type: 'selectList',
+          missing: false,
+          location: { first_line: 3, last_line: 3, first_column: 8, last_column: 9 }
+        },
+        {
+          type: 'asterisk',
+          location: { first_line: 3, last_line: 3, first_column: 8, last_column: 9 },
+          tables: [
+            { alias: 't3', identifierChain: [{ name: 'testTable3' }] },
+            { alias: 't4', identifierChain: [{ name: 'testTable4' }] }
+          ]
+        },
+        {
+          type: 'table',
+          location: { first_line: 3, last_line: 3, first_column: 15, last_column: 25 },
+          identifierChain: [{ name: 'testTable3' }]
+        },
+        {
+          type: 'alias',
+          source: 'table',
+          alias: 't3',
+          location: { first_line: 3, last_line: 3, first_column: 26, last_column: 28 },
+          identifierChain: [{ name: 'testTable3' }]
+        },
+        {
+          type: 'table',
+          location: { first_line: 3, last_line: 3, first_column: 30, last_column: 40 },
+          identifierChain: [{ name: 'testTable4' }]
+        },
+        {
+          type: 'alias',
+          source: 'table',
+          alias: 't4',
+          location: { first_line: 3, last_line: 3, first_column: 41, last_column: 43 },
+          identifierChain: [{ name: 'testTable4' }]
+        },
+        {
+          type: 'whereClause',
+          missing: true,
+          location: { first_line: 3, last_line: 3, first_column: 43, last_column: 43 }
+        },
+        {
+          type: 'limitClause',
+          missing: true,
+          location: { first_line: 3, last_line: 3, first_column: 43, last_column: 43 }
+        }
+      ]
+    });
+  });
+
+  it('should report locations for "SELECT t1.foo FROM table1 t1 CROSS JOIN table2 LEFT OUTER JOIN table3 JOIN table4 t4 ON (t1.c1 = table2.c2); |"', () => {
+    assertLocations({
+      beforeCursor:
+        'SELECT t1.foo FROM table1 t1 CROSS JOIN table2 LEFT OUTER JOIN table3 JOIN table4 t4 ON (t1.c1 = table2.c2); ',
+      expectedLocations: [
+        {
+          type: 'statement',
+          location: { first_line: 1, last_line: 1, first_column: 1, last_column: 108 }
+        },
+        {
+          type: 'selectList',
+          missing: false,
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 14 }
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 },
+          identifierChain: [{ name: 'table1' }]
+        },
+        {
+          type: 'column',
+          location: { first_line: 1, last_line: 1, first_column: 11, last_column: 14 },
+          identifierChain: [{ name: 'foo' }],
+          tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }],
+          qualified: true
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 20, last_column: 26 },
+          identifierChain: [{ name: 'table1' }]
+        },
+        {
+          type: 'alias',
+          source: 'table',
+          alias: 't1',
+          location: { first_line: 1, last_line: 1, first_column: 27, last_column: 29 },
+          identifierChain: [{ name: 'table1' }]
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 41, last_column: 47 },
+          identifierChain: [{ name: 'table2' }]
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 64, last_column: 70 },
+          identifierChain: [{ name: 'table3' }]
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 76, last_column: 82 },
+          identifierChain: [{ name: 'table4' }]
+        },
+        {
+          type: 'alias',
+          source: 'table',
+          alias: 't4',
+          location: { first_line: 1, last_line: 1, first_column: 83, last_column: 85 },
+          identifierChain: [{ name: 'table4' }]
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 90, last_column: 92 },
+          identifierChain: [{ name: 'table1' }]
+        },
+        {
+          type: 'column',
+          location: { first_line: 1, last_line: 1, first_column: 93, last_column: 95 },
+          identifierChain: [{ name: 'c1' }],
+          tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }],
+          qualified: true
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 98, last_column: 104 },
+          identifierChain: [{ name: 'table2' }]
+        },
+        {
+          type: 'column',
+          location: { first_line: 1, last_line: 1, first_column: 105, last_column: 107 },
+          identifierChain: [{ name: 'c2' }],
+          tables: [{ identifierChain: [{ name: 'table2' }] }],
+          qualified: true
+        },
+        {
+          type: 'whereClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 108, last_column: 108 }
+        },
+        {
+          type: 'limitClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 108, last_column: 108 }
+        }
+      ]
+    });
+  });
+
+  it('should report locations for "SELECT * FROM foo WHERE bar IN (SELECT * FROM bla);|"', () => {
+    assertLocations({
+      beforeCursor: 'SELECT * FROM foo WHERE bar IN (SELECT * FROM bla);',
+      expectedLocations: [
+        {
+          type: 'statement',
+          location: { first_line: 1, last_line: 1, first_column: 1, last_column: 51 }
+        },
+        {
+          type: 'selectList',
+          missing: false,
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }
+        },
+        {
+          type: 'asterisk',
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 },
+          tables: [{ identifierChain: [{ name: 'foo' }] }]
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 15, last_column: 18 },
+          identifierChain: [{ name: 'foo' }]
+        },
+        {
+          type: 'whereClause',
+          missing: false,
+          location: { first_line: 1, last_line: 1, first_column: 19, last_column: 51 }
+        },
+        {
+          type: 'column',
+          location: { first_line: 1, last_line: 1, first_column: 25, last_column: 28 },
+          identifierChain: [{ name: 'bar' }],
+          tables: [{ identifierChain: [{ name: 'foo' }] }],
+          qualified: false
+        },
+        {
+          type: 'selectList',
+          missing: false,
+          location: { first_line: 1, last_line: 1, first_column: 40, last_column: 41 },
+          subquery: true
+        },
+        {
+          type: 'asterisk',
+          location: { first_line: 1, last_line: 1, first_column: 40, last_column: 41 },
+          tables: [{ identifierChain: [{ name: 'bla' }] }]
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 47, last_column: 50 },
+          identifierChain: [{ name: 'bla' }]
+        },
+        {
+          type: 'whereClause',
+          subquery: true,
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 50, last_column: 50 }
+        },
+        {
+          type: 'limitClause',
+          subquery: true,
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 50, last_column: 50 }
+        },
+        {
+          type: 'limitClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 51, last_column: 51 }
+        }
+      ]
+    });
+  });
+
+  it('should report locations for "SELECT   |    FROM    testTableA"', () => {
+    assertLocations({
+      beforeCursor: 'SELECT   ',
+      afterCursor: '    FROM    testTableA',
+      expectedLocations: [
+        {
+          type: 'statement',
+          location: { first_line: 1, last_line: 1, first_column: 1, last_column: 32 }
+        },
+        {
+          type: 'selectList',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 7, last_column: 7 }
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 22, last_column: 32 },
+          identifierChain: [{ name: 'testTableA' }]
+        },
+        {
+          type: 'whereClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 32, last_column: 32 }
+        },
+        {
+          type: 'limitClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 32, last_column: 32 }
+        }
+      ]
+    });
+  });
+
+  it('should report locations for "SELECT   a.|    FROM    testTableA"', () => {
+    assertLocations({
+      beforeCursor: 'SELECT   a.',
+      afterCursor: '    FROM    testTableA',
+      expectedLocations: [
+        {
+          type: 'statement',
+          location: { first_line: 1, last_line: 1, first_column: 1, last_column: 34 }
+        },
+        {
+          type: 'selectList',
+          missing: false,
+          location: { first_line: 1, last_line: 1, first_column: 10, last_column: 13 }
+        },
+        {
+          type: 'column',
+          location: { first_line: 1, last_line: 1, first_column: 10, last_column: 11 },
+          identifierChain: [{ name: 'a' }],
+          tables: [{ identifierChain: [{ name: 'testTableA' }] }],
+          qualified: false
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 24, last_column: 34 },
+          identifierChain: [{ name: 'testTableA' }]
+        },
+        {
+          type: 'whereClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 34, last_column: 34 }
+        },
+        {
+          type: 'limitClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 34, last_column: 34 }
+        }
+      ]
+    });
+  });
+
+  it('should report locations for "SELECT aaa| FROM testTableA"', () => {
+    assertLocations({
+      beforeCursor: 'SELECT aaa',
+      afterCursor: ' FROM testTableA',
+      expectedLocations: [
+        {
+          type: 'statement',
+          location: { first_line: 1, last_line: 1, first_column: 1, last_column: 27 }
+        },
+        {
+          type: 'selectList',
+          missing: false,
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11 }
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 17, last_column: 27 },
+          identifierChain: [{ name: 'testTableA' }]
+        },
+        {
+          type: 'whereClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 27, last_column: 27 }
+        },
+        {
+          type: 'limitClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 27, last_column: 27 }
+        }
+      ]
+    });
+  });
+
+  it('should report locations for "SELECT aaa| \\nFROM testTableA"', () => {
+    assertLocations({
+      beforeCursor: 'SELECT aaa',
+      afterCursor: ' \nFROM testTableA',
+      expectedLocations: [
+        {
+          type: 'statement',
+          location: { first_line: 1, last_line: 2, first_column: 1, last_column: 16 }
+        },
+        {
+          type: 'selectList',
+          missing: false,
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11 }
+        },
+        {
+          type: 'table',
+          location: { first_line: 2, last_line: 2, first_column: 6, last_column: 16 },
+          identifierChain: [{ name: 'testTableA' }]
+        },
+        {
+          type: 'whereClause',
+          missing: true,
+          location: { first_line: 2, last_line: 2, first_column: 16, last_column: 16 }
+        },
+        {
+          type: 'limitClause',
+          missing: true,
+          location: { first_line: 2, last_line: 2, first_column: 16, last_column: 16 }
+        }
+      ]
+    });
+  });
+
+  it('should report locations for "SELECT |bbbb FROM testTableA"', () => {
+    assertLocations({
+      beforeCursor: 'SELECT ',
+      afterCursor: 'bbbb FROM testTableA',
+      expectedLocations: [
+        {
+          type: 'statement',
+          location: { first_line: 1, last_line: 1, first_column: 1, last_column: 28 }
+        },
+        {
+          type: 'selectList',
+          missing: false,
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 12 }
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 18, last_column: 28 },
+          identifierChain: [{ name: 'testTableA' }]
+        },
+        {
+          type: 'whereClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 28, last_column: 28 }
+        },
+        {
+          type: 'limitClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 28, last_column: 28 }
+        }
+      ]
+    });
+  });
+
+  it('should report locations for "SELECT aaaaa|bbbb FROM testTableA"', () => {
+    assertLocations({
+      beforeCursor: 'SELECT aaaaa',
+      afterCursor: 'bbbb FROM testTableA',
+      expectedLocations: [
+        {
+          type: 'statement',
+          location: { first_line: 1, last_line: 1, first_column: 1, last_column: 33 }
+        },
+        {
+          type: 'selectList',
+          missing: false,
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 17 }
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 23, last_column: 33 },
+          identifierChain: [{ name: 'testTableA' }]
+        },
+        {
+          type: 'whereClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 33, last_column: 33 }
+        },
+        {
+          type: 'limitClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 33, last_column: 33 }
+        }
+      ]
+    });
+  });
+
+  it('should report locations for "SELECT foo.aaaaa|bbbb FROM testTableA"', () => {
+    assertLocations({
+      beforeCursor: 'SELECT foo.aaaaa',
+      afterCursor: 'bbbb FROM testTableA',
+      expectedLocations: [
+        {
+          type: 'statement',
+          location: { first_line: 1, last_line: 1, first_column: 1, last_column: 37 }
+        },
+        {
+          type: 'selectList',
+          missing: false,
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 13 }
+        },
+        {
+          type: 'column',
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11 },
+          identifierChain: [{ name: 'foo' }],
+          tables: [{ identifierChain: [{ name: 'testTableA' }] }],
+          qualified: false
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 27, last_column: 37 },
+          identifierChain: [{ name: 'testTableA' }]
+        },
+        {
+          type: 'whereClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 37, last_column: 37 }
+        },
+        {
+          type: 'limitClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 37, last_column: 37 }
+        }
+      ]
+    });
+  });
+
+  it('should report locations for "SELECT b, foo.aaaaa|bbbb FROM testTableA"', () => {
+    assertLocations({
+      beforeCursor: 'SELECT b, foo.aaaaa',
+      afterCursor: 'bbbb FROM testTableA',
+      expectedLocations: [
+        {
+          type: 'statement',
+          location: { first_line: 1, last_line: 1, first_column: 1, last_column: 40 }
+        },
+        {
+          type: 'selectList',
+          missing: false,
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 16 }
+        },
+        {
+          type: 'column',
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 },
+          identifierChain: [{ name: 'b' }],
+          tables: [{ identifierChain: [{ name: 'testTableA' }] }],
+          qualified: false
+        },
+        {
+          type: 'column',
+          location: { first_line: 1, last_line: 1, first_column: 11, last_column: 14 },
+          identifierChain: [{ name: 'foo' }],
+          tables: [{ identifierChain: [{ name: 'testTableA' }] }],
+          qualified: false
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 30, last_column: 40 },
+          identifierChain: [{ name: 'testTableA' }]
+        },
+        {
+          type: 'whereClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 40, last_column: 40 }
+        },
+        {
+          type: 'limitClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 40, last_column: 40 }
+        }
+      ]
+    });
+  });
+
+  it('should report locations for "SELECT foo, aaaaa|bbbb FROM testTableA"', () => {
+    assertLocations({
+      beforeCursor: 'SELECT foo, aaaaa',
+      afterCursor: 'bbbb FROM testTableA',
+      expectedLocations: [
+        {
+          type: 'statement',
+          location: { first_line: 1, last_line: 1, first_column: 1, last_column: 38 }
+        },
+        {
+          type: 'selectList',
+          missing: false,
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 15 }
+        },
+        {
+          type: 'column',
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11 },
+          identifierChain: [{ name: 'foo' }],
+          tables: [{ identifierChain: [{ name: 'testTableA' }] }],
+          qualified: false
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 28, last_column: 38 },
+          identifierChain: [{ name: 'testTableA' }]
+        },
+        {
+          type: 'whereClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 38, last_column: 38 }
+        },
+        {
+          type: 'limitClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 38, last_column: 38 }
+        }
+      ]
+    });
+  });
+
+  it('should report locations for "SELECT tbl.col FROM some_tbl tbl;"', () => {
+    assertLocations({
+      beforeCursor: 'SELECT tbl.col FROM some_tbl tbl;',
+      afterCursor: '',
+      expectedLocations: [
+        {
+          type: 'statement',
+          location: { first_line: 1, last_line: 1, first_column: 1, last_column: 33 }
+        },
+        {
+          type: 'selectList',
+          missing: false,
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 15 }
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11 },
+          identifierChain: [{ name: 'some_tbl' }]
+        },
+        {
+          type: 'column',
+          location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15 },
+          identifierChain: [{ name: 'col' }],
+          tables: [{ identifierChain: [{ name: 'some_tbl' }], alias: 'tbl' }],
+          qualified: true
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 21, last_column: 29 },
+          identifierChain: [{ name: 'some_tbl' }]
+        },
+        {
+          type: 'alias',
+          source: 'table',
+          alias: 'tbl',
+          location: { first_line: 1, last_line: 1, first_column: 30, last_column: 33 },
+          identifierChain: [{ name: 'some_tbl' }]
+        },
+        {
+          type: 'whereClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 33, last_column: 33 }
+        },
+        {
+          type: 'limitClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 33, last_column: 33 }
+        }
+      ]
+    });
+  });
+
+  it('should report locations for "SELECT tbl.col.cplx FROM some_tbl tbl;"', () => {
+    assertLocations({
+      beforeCursor: 'SELECT tbl.col.cplx FROM some_tbl tbl;',
+      afterCursor: '',
+      expectedLocations: [
+        {
+          type: 'statement',
+          location: { first_line: 1, last_line: 1, first_column: 1, last_column: 38 }
+        },
+        {
+          type: 'selectList',
+          missing: false,
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 20 }
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11 },
+          identifierChain: [{ name: 'some_tbl' }]
+        },
+        {
+          type: 'column',
+          location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15 },
+          identifierChain: [{ name: 'col' }],
+          tables: [{ identifierChain: [{ name: 'some_tbl' }], alias: 'tbl' }],
+          qualified: true
+        },
+        {
+          type: 'complex',
+          location: { first_line: 1, last_line: 1, first_column: 16, last_column: 20 },
+          identifierChain: [{ name: 'col' }, { name: 'cplx' }],
+          tables: [{ identifierChain: [{ name: 'some_tbl' }], alias: 'tbl' }],
+          qualified: true
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 26, last_column: 34 },
+          identifierChain: [{ name: 'some_tbl' }]
+        },
+        {
+          type: 'alias',
+          source: 'table',
+          alias: 'tbl',
+          location: { first_line: 1, last_line: 1, first_column: 35, last_column: 38 },
+          identifierChain: [{ name: 'some_tbl' }]
+        },
+        {
+          type: 'whereClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 38, last_column: 38 }
+        },
+        {
+          type: 'limitClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 38, last_column: 38 }
+        }
+      ]
+    });
+  });
+
+  it('should report locations for "SELECT some_tbl.col.cplx FROM some_tbl;"', () => {
+    assertLocations({
+      beforeCursor: 'SELECT some_tbl.col.cplx FROM some_tbl;',
+      afterCursor: '',
+      expectedLocations: [
+        {
+          type: 'statement',
+          location: { first_line: 1, last_line: 1, first_column: 1, last_column: 39 }
+        },
+        {
+          type: 'selectList',
+          missing: false,
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 25 }
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 16 },
+          identifierChain: [{ name: 'some_tbl' }]
+        },
+        {
+          type: 'column',
+          location: { first_line: 1, last_line: 1, first_column: 17, last_column: 20 },
+          identifierChain: [{ name: 'col' }],
+          tables: [{ identifierChain: [{ name: 'some_tbl' }] }],
+          qualified: true
+        },
+        {
+          type: 'complex',
+          location: { first_line: 1, last_line: 1, first_column: 21, last_column: 25 },
+          identifierChain: [{ name: 'col' }, { name: 'cplx' }],
+          tables: [{ identifierChain: [{ name: 'some_tbl' }] }],
+          qualified: true
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 31, last_column: 39 },
+          identifierChain: [{ name: 'some_tbl' }]
+        },
+        {
+          type: 'whereClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 39, last_column: 39 }
+        },
+        {
+          type: 'limitClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 39, last_column: 39 }
+        }
+      ]
+    });
+  });
+
+  it('should report locations for "SELECT testTableB.a, cos(1), tta.abcdefg|hijk, tta.bla, cos(1) FROM testTableA tta, testTableB;"', () => {
+    assertLocations({
+      beforeCursor: 'SELECT testTableB.a, cos(1), tta.abcdefg',
+      afterCursor: 'hijk, tta.bla, cos(1) FROM testTableA tta, testTableB;',
+      expectedLocations: [
+        {
+          type: 'statement',
+          location: { first_line: 1, last_line: 1, first_column: 1, last_column: 94 }
+        },
+        {
+          type: 'selectList',
+          missing: false,
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 52 }
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 8, last_column: 18 },
+          identifierChain: [{ name: 'testTableB' }]
+        },
+        {
+          type: 'column',
+          location: { first_line: 1, last_line: 1, first_column: 19, last_column: 20 },
+          identifierChain: [{ name: 'a' }],
+          tables: [{ identifierChain: [{ name: 'testTableB' }] }],
+          qualified: true
+        },
+        {
+          type: 'function',
+          location: { first_line: 1, last_line: 1, first_column: 22, last_column: 24 },
+          function: 'cos'
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 30, last_column: 33 },
+          identifierChain: [{ name: 'testTableA' }]
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 47, last_column: 50 },
+          identifierChain: [{ name: 'testTableA' }]
+        },
+        {
+          type: 'column',
+          location: { first_line: 1, last_line: 1, first_column: 51, last_column: 54 },
+          identifierChain: [{ name: 'bla' }],
+          tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }],
+          qualified: true
+        },
+        {
+          type: 'function',
+          location: { first_line: 1, last_line: 1, first_column: 56, last_column: 58 },
+          function: 'cos'
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 68, last_column: 78 },
+          identifierChain: [{ name: 'testTableA' }]
+        },
+        {
+          type: 'alias',
+          source: 'table',
+          alias: 'tta',
+          location: { first_line: 1, last_line: 1, first_column: 79, last_column: 82 },
+          identifierChain: [{ name: 'testTableA' }]
+        },
+        {
+          type: 'table',
+          location: { first_line: 1, last_line: 1, first_column: 84, last_column: 94 },
+          identifierChain: [{ name: 'testTableB' }]
+        },
+        {
+          type: 'whereClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 94, last_column: 94 }
+        },
+        {
+          type: 'limitClause',
+          missing: true,
+          location: { first_line: 1, last_line: 1, first_column: 94, last_column: 94 }
         }
       ]
     });

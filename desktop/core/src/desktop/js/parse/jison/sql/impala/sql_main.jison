@@ -315,7 +315,6 @@ NonStartingToken
  | 'KUDU'
  | 'LARGE'
  | 'LAST'
- | 'LATERAL'
  | 'LEADING'
  | 'LEFT'
  | 'LIKE'
@@ -1532,9 +1531,9 @@ TableExpression_EDIT
          keywords = keywords.concat(parser.createWeightedKeywords($1.tableReferenceList.suggestKeywords, 3));
        }
 
-       // Lower the weights for 'TABLESAMPLE' and 'LATERAL VIEW'
+       // Lower the weights for 'TABLESAMPLE'
        keywords.forEach(function (keyword) {
-         if (keyword.value === 'TABLESAMPLE' || keyword.value === 'LATERAL VIEW') {
+         if (keyword.value === 'TABLESAMPLE') {
            keyword.weight = 1.1;
          }
        });

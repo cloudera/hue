@@ -7,9 +7,9 @@
 /desktop/core/src/desktop/js/parse/sqlStatementsParser.js
 /desktop/core/src/desktop/js/parse/sqlSyntaxParser.js
 /desktop/core/src/desktop/js/utils/json.bigDataParse.js
-/desktop/core/src/desktop/js/parse/genericAutocompleteParser.js
-/desktop/core/src/desktop/js/parse/genericSyntaxParser.js
-/desktop/core/src/desktop/js/parse/impalaAutocompleteParser.js
-/desktop/core/src/desktop/js/parse/impalaSyntaxParser.js
-/desktop/core/src/desktop/js/parse/hiveAutocompleteParser.js
-/desktop/core/src/desktop/js/parse/hiveSyntaxParser.js
+/desktop/core/src/desktop/js/parse/sql/generic/genericAutocompleteParser.js
+/desktop/core/src/desktop/js/parse/sql/generic/genericSyntaxParser.js
+/desktop/core/src/desktop/js/parse/sql/impala/impalaAutocompleteParser.js
+/desktop/core/src/desktop/js/parse/sql/impala/impalaSyntaxParser.js
+/desktop/core/src/desktop/js/parse/sql/hive/hiveAutocompleteParser.js
+/desktop/core/src/desktop/js/parse/sql/hive/hiveSyntaxParser.js
