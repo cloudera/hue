@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import SqlTestUtils from '../sqlTestUtils';
-import genericAutocompleteParser from '../../genericAutocompleteParser';
+import SqlTestUtils from 'parse/spec/sqlTestUtils';
+import genericAutocompleteParser from '../genericAutocompleteParser';
 
-describe('sqlAutocompleteParser.js locations', () => {
+describe('genericAutocompleteParser.js locations', () => {
   beforeAll(() => {
     genericAutocompleteParser.yy.parseError = function(msg) {
       throw Error(msg);

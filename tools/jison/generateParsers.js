@@ -42,12 +42,12 @@ const SQL_STATEMENTS_PARSER_JSDOC =
   ' */\n';
 
 const JISON_FOLDER = 'desktop/core/src/desktop/js/parse/jison/';
-const TARGET_FOLDER = 'desktop/core/src/desktop/js/parse/';
 
 const parserDefinitions = {
   globalSearchParser: {
     sources: ['globalSearchParser.jison'],
     target: 'globalSearchParser.jison',
+    outputFolder: 'desktop/core/src/desktop/js/parse/',
     afterParse: contents =>
       new Promise(resolve => {
         resolve(
@@ -63,6 +63,7 @@ const parserDefinitions = {
   solrFormulaParser: {
     sources: ['solrFormulaParser.jison'],
     target: 'solrFormulaParser.jison',
+    outputFolder: 'desktop/core/src/desktop/js/parse/',
     afterParse: contents =>
       new Promise(resolve => {
         resolve(LICENSE + contents + 'export default solrFormulaParser;\n');
@@ -71,6 +72,7 @@ const parserDefinitions = {
   solrQueryParser: {
     sources: ['solrQueryParser.jison'],
     target: 'solrQueryParser.jison',
+    outputFolder: 'desktop/core/src/desktop/js/parse/',
     afterParse: contents =>
       new Promise(resolve => {
         resolve(LICENSE + contents + 'export default solrQueryParser;\n');
@@ -79,6 +81,7 @@ const parserDefinitions = {
   sqlStatementsParser: {
     sources: ['sqlStatementsParser.jison'],
     target: 'sqlStatementsParser.jison',
+    outputFolder: 'desktop/core/src/desktop/js/parse/',
     afterParse: contents =>
       new Promise(resolve => {
         resolve(
@@ -170,7 +173,7 @@ const generateParser = parserName =>
                 parserConfig
                   .afterParse(contents)
                   .then(finalContents => {
-                    writeFile(TARGET_FOLDER + generatedJsFileName, finalContents)
+                    writeFile(parserConfig.outputFolder + generatedJsFileName, finalContents)
                       .then(() => {
                         deleteFile(generatedJsFileName);
                         console.log('Done!\n');
@@ -208,6 +211,7 @@ const findParser = (fileIndex, folder, sharedFiles, autocomplete) => {
       sources: ['sql/' + folder + '/' + prefix + '_header.jison'].concat(sharedFiles),
       lexer: 'sql/' + folder + '/sql.jisonlex',
       target: 'sql/' + folder + '/' + parserName + '.jison',
+      outputFolder: 'desktop/core/src/desktop/js/parse/sql/' + folder + '/',
       afterParse: contents =>
         new Promise(resolve => {
           resolve(
@@ -215,7 +219,9 @@ const findParser = (fileIndex, folder, sharedFiles, autocomplete) => {
               contents
                 .replace(
                   'var ' + parserName + ' = ',
-                  "import SqlParseSupport from 'parse/sqlParseSupport';\n\nvar " +
+                  "import SqlParseSupport from 'parse/sql/" +
+                    folder +
+                    "/sqlParseSupport';\n\nvar " +
                     parserName +
                     ' = '
                 )
