@@ -1,0 +1,15 @@
+{{- if .Values.balancer.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: hue-balancer
+spec:
+  type: NodePort
+  # type: LoadBalancer
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+{{- end -}}
