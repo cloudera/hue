@@ -948,7 +948,7 @@ TableExpression_EDIT
      parser.addClauseLocation('limitClause', $2.limitClausePreceding || @1, $2.limitClauseLocation);
 
      if ($1) {
-       if (!$1.hasLateralViews && typeof $1.tableReferenceList.hasJoinCondition !== 'undefined' && !$1.tableReferenceList.hasJoinCondition) {
+       if (typeof $1.tableReferenceList.hasJoinCondition !== 'undefined' && !$1.tableReferenceList.hasJoinCondition) {
          keywords.push({ value: 'ON', weight: 3 });
        }
        if ($1.suggestKeywords) {
@@ -960,18 +960,18 @@ TableExpression_EDIT
        if ($1.tableReferenceList.suggestJoins) {
          parser.suggestJoins($1.tableReferenceList.suggestJoins);
        }
-       if (!$1.hasLateralViews && $1.tableReferenceList.suggestKeywords) {
+       if ($1.tableReferenceList.suggestKeywords) {
          keywords = keywords.concat(parser.createWeightedKeywords($1.tableReferenceList.suggestKeywords, 3));
        }
 
-       // Lower the weights for 'TABLESAMPLE' and 'LATERAL VIEW'
+       // Lower the weights for 'TABLESAMPLE'
        keywords.forEach(function (keyword) {
-         if (keyword.value === 'TABLESAMPLE' || keyword.value === 'LATERAL VIEW') {
+         if (keyword.value === 'TABLESAMPLE') {
            keyword.weight = 1.1;
          }
        });
 
-       if (!$1.hasLateralViews && $1.tableReferenceList.types) {
+       if ($1.tableReferenceList.types) {
          var veKeywords = parser.getValueExpressionKeywords($1.tableReferenceList);
          keywords = keywords.concat(veKeywords.suggestKeywords);
          if (veKeywords.suggestColRefKeywords) {
