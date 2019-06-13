@@ -191,12 +191,12 @@ var Design = (function($, ko, NodeFields) {
           }
         }
       });
-      var data = normalize_model_fields($.parseJSON(JSON.stringify(model_dict)));
+      var data = normalize_model_fields(JSON.parse(JSON.stringify(model_dict)));
       var options = $.extend({
         type: 'POST',
         data: data,
         error: function(xhr) {
-          var response = $.parseJSON(xhr.responseText);
+          var response = JSON.parse(xhr.responseText);
           if (response) {
             var model = ko.mapping.toJS(self);
             $.extend(model.errors, response.data.errors);

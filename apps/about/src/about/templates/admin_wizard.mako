@@ -19,18 +19,18 @@ from django.urls import reverse
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
 
-from desktop.conf import IS_HUE_4
-from desktop.views import commonheader, commonfooter
 from metadata.conf import OPTIMIZER, has_optimizer
 
 from desktop.auth.backend import is_admin
+from desktop.conf import CONNECTORS
+from desktop.views import commonheader, commonfooter
 %>
 
 <%namespace name="layout" file="/about_layout.mako" />
 
-%if not is_embeddable:
+% if not is_embeddable:
 ${ commonheader(_('Quick Start'), "quickstart", user, request, "70px") | n,unicode }
-%endif
+% endif
 
 ${ layout.menubar(section='quick_start') }
 
@@ -45,16 +45,15 @@ ${ layout.menubar(section='quick_start') }
       </h1>
 
      % if is_admin(user):
-
       <div class="margin-bottom-30">
          <div class="row-fluid">
 
            <div class="span2">
             <ul class="nav nav-pills nav-vertical-pills">
               <li class="active"><a href="#step1" class="step">${ _('Step 1:') } <i class="fa fa-cogs"></i> ${ _('Check Configuration') }</a></li>
-              <li><a href="#step2" class="step">${ _('Step 2:') } <i class="fa fa-book"></i> ${ _('Examples') }</a></li>
-              <li><a href="#step3" class="step">${ _('Step 3:') } <i class="fa fa-group"></i> ${ _('Users') }</a></li>
-              <li><a id="lastStep" href="#step4" class="step">${ _('Step 4:') } <i class="fa fa-flag"></i> ${_('Go!') }</a></li>
+              <li><a href="#step2" class="step">${ _('Step 1:') } <i class="fa fa-exchange"></i> ${ _('Connectors') }</a></li>
+              <li><a href="#step3" class="step">${ _('Step 3:') } <i class="fa fa-book"></i> ${ _('Examples') }</a></li>
+              <li><a id="lastStep" href="#step4" class="step">${ _('Step 4:') } <i class="fa fa-group"></i> ${ _('Users') }</a></li>
             </ul>
            </div>
 
@@ -74,6 +73,17 @@ ${ layout.menubar(section='quick_start') }
           </div>
 
           <div id="step2" class="stepDetails hide">
+            <h3>${ _('Connectors to data services') }</h3>
+            % if CONNECTORS.IS_ENABLED.get():
+              <a href="${ url('desktop.lib.connectors.views.index') }"><i class="fa fa-exchange"></i> ${ _('Configure') }</a>
+            % else:
+              <a href="${ url('desktop.views.dump_config') }" target="_blank">${ _('Configuration') }</a>
+              <br>
+              <a href="http://cloudera.github.io/hue/latest/administrator/configuration/" target="_blank">${ _('Documentation') }</a>
+            % endif
+          </div>
+
+          <div id="step3" class="stepDetails hide">
             <div>
               <h3>${ _('Install individual application examples') }</h3>
               <ul class="unstyled samples">
@@ -141,7 +151,7 @@ ${ layout.menubar(section='quick_start') }
                     </a>
                   </li>
               % endif
-              % if IS_HUE_4.get() and 'oozie' in app_names:
+              % if 'oozie' in app_names:
                   <li>
                     <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                        data-sample-url="${ url('oozie:install_examples') }">
@@ -160,7 +170,7 @@ ${ layout.menubar(section='quick_start') }
             </div>
           </div>
 
-          <div id="step3" class="stepDetails hide">
+          <div id="step4" class="stepDetails hide">
             <div>
               <h3>${ _('Create or import users') }</h3>
               <a href="${ url('useradmin.views.list_users') }"
@@ -182,21 +192,6 @@ ${ layout.menubar(section='quick_start') }
                 </a>
               </label>
             </div>
-          </div>
-
-          <div id="step4" class="stepDetails hide">
-            <div>
-              <h3>${ _('Use the applications') }</h3>
-              % if is_embeddable:
-              <a href="/">
-                <i class="fa fa-home"></i> ${ _('Landing page') }
-              </a>
-              % else:
-                <a href="${ url('desktop_views_home2') }">
-                  <i class="fa fa-home"></i> ${ _('Home') }
-                </a>
-              % endif
-            </div>
 
             % if not is_embeddable:
             <div class="margin-top-30">
@@ -213,14 +208,15 @@ ${ layout.menubar(section='quick_start') }
           </div>
           </div>
 
-          </div>
+        </div>
       </div>
-
-      <div class="form-actions">
-        <a id="backBtn" class="btn disabled">${ _('Back') }</a>
-        <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
-        <a id="doneBtn" class="btn btn-primary disable-feedback hide">${ _('Done') }</a>
-        <div class="pull-right muted">${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }</div>
+      <div class="card-body">
+        <div class="form-actions">
+          <a id="backBtn" class="btn disabled">${ _('Back') }</a>
+          <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
+          <a id="doneBtn" class="btn btn-primary disable-feedback hide">${ _('Done') }</a>
+          <span class="pull-right muted" style="padding-right:30px">${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }</span>
+        </div>
       </div>
       % else:
        <div class="card-body">
@@ -357,7 +353,7 @@ $(document).ready(function(){
     }
 
     $("a.step").parent().removeClass("active");
-    $("a.step[href=#" + step + "]").parent().addClass("active");
+    $("a.step[href='#" + step + "']").parent().addClass("active");
     if (step == "step4") {
       $("#lastStep").parent().addClass("active");
     }
@@ -380,7 +376,7 @@ $(document).ready(function(){
   });
 
   $("#doneBtn").click(function () {
-    location.href = "${ is_embeddable and '/' or url('desktop_views_home2') }";
+    huePubSub.publish('open.link', "${ is_embeddable and '/' or url('desktop_views_home2') }");
   });
 
   $(".updatePreferences").click(function () {

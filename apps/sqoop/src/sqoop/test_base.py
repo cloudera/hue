@@ -49,6 +49,8 @@ class SqoopServerProvider(object):
   HOME = get_run_root('ext/sqoop/sqoop')
 
   requires_hadoop = True
+  integration = True
+
   is_running = False
 
   @classmethod

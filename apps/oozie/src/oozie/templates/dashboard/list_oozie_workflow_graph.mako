@@ -29,8 +29,6 @@
 
 ${ dashboard.import_layout() }
 
-<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }"></script>
-<script src="${ static('desktop/js/ko.editable.js') }"></script>
 <script src="${ static('oozie/js/workflow-editor.ko.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('oozie/js/workflow-editor.utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.curvedarrow.js') }" type="text/javascript" charset="utf-8"></script>
@@ -84,13 +82,14 @@ ${ dashboard.import_layout() }
             if (data.actions) {
               % if layout_json != '':
                 ko.utils.arrayForEach(data.actions, function (action) {
-                  var _w, actionId = action.id.substr(action.id.length - 4);
+                  var _w, actionId = action.id.substr(action.id.lastIndexOf('@'));
                   if (actionId === '@End') {
                     _w = viewModel.getWidgetById('33430f0f-ebfa-c3ec-f237-3e77efa03d0a');
                   }
                   else {
-                    if ($("[id^=wdg_" + actionId.toLowerCase() + "]").length > 0) {
-                      _w = viewModel.getWidgetById($("[id^=wdg_" + actionId.toLowerCase() + "]").attr("id").substr(4));
+                    var actionName = actionId.toLowerCase().substr(1)
+                    if ($("[id^=wdg_" + actionName + "]").length > 0) {
+                      _w = viewModel.getWidgetById($("[id^=wdg_" + actionName + "]").attr("id").substr(4));
                     }
                     else {
                       _w = viewModel.getWidgetById('33430f0f-ebfa-c3ec-f237-3e77efa03d0a');

@@ -26,10 +26,10 @@ from desktop.lib.conf import Config, ConfigSection, coerce_bool, coerce_password
 from desktop.lib.paths import get_config_root
 
 from metadata.settings import DJANGO_APPS
-from notebook.conf import ENABLE_QUERY_ANALYSIS
 
 OPTIMIZER_AUTH_PASSWORD = None
 NAVIGATOR_AUTH_PASSWORD = None
+CATALOG_AUTH_PASSWORD = None
 
 LOG = logging.getLogger(__name__)
 
@@ -39,10 +39,21 @@ def get_auth_username():
   return DEFAULT_AUTH_USERNAME.get()
 
 
-def default_navigator_config_dir():
+def default_catalog_url():
+  """Get from main Hue config directory if present"""
+  return None
+
+def default_catalog_config_dir():
   """Get from usual main Hue config directory"""
   return get_config_root()
 
+def default_catalog_interface():
+  """Detect if the configured catalog is Navigator or default to Atlas"""
+  return 'navigator' if default_navigator_url() else 'atlas'
+
+def default_navigator_config_dir():
+  """Get from usual main Hue config directory"""
+  return get_config_root()
 
 def default_navigator_url():
   """Get from usual main Hue config directory"""
@@ -59,15 +70,6 @@ def has_optimizer():
 def has_workload_analytics():
   # Note: unused
   return bool(ALTUS.AUTH_KEY_ID.get()) and ALTUS.HAS_WA.get()
-
-
-def get_navigator_url():
-  return NAVIGATOR.API_URL.get() and NAVIGATOR.API_URL.get().strip('/')[:-3]
-
-def has_navigator(user):
-  from desktop.auth.backend import is_admin
-  return bool(get_navigator_url() and get_navigator_auth_password()) \
-      and (is_admin(user) or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
 
 
 def get_security_default():
@@ -218,10 +220,80 @@ DEFAULT_PUBLIC_KEY = Config(
   default=''
 )
 
+# Data Catalog
+
+def get_catalog_url():
+  return (CATALOG.API_URL.get() and CATALOG.API_URL.get().strip('/')[:-3]) or get_navigator_url()
+
+def has_catalog(user):
+  from desktop.auth.backend import is_admin
+  return ((bool(get_catalog_url() and get_catalog_auth_password())) or has_navigator(user)) \
+      and (is_admin(user) or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
+
+def has_readonly_catalog(user):
+  return has_catalog(user) and not has_navigator(user)
+
+def get_catalog_search_cluster():
+  return CATALOG.SEARCH_CLUSTER.get()
+
+def get_catalog_auth_password():
+  '''Get the password to authenticate with.'''
+  global CATALOG_AUTH_PASSWORD
+
+  if CATALOG_AUTH_PASSWORD is None:
+    try:
+      CATALOG_AUTH_PASSWORD = CATALOG.SERVER_PASSWORD.get()
+    except CalledProcessError:
+      LOG.exception('Could not read Catalog password file, need to restart Hue to re-enable it.')
+
+  return CATALOG_AUTH_PASSWORD
+
+CATALOG = ConfigSection(
+  key='catalog',
+  help=_t("""Configuration options for Catalog API"""),
+  members=dict(
+    INTERFACE=Config(
+      key='interface',
+      help=_t('Type of Catalog to connect to, e.g. Apache Atlas, Navigator...'),
+      dynamic_default=default_catalog_interface),
+    API_URL=Config(
+      key='api_url',
+      help=_t('Base URL to Catalog API.'),
+      dynamic_default=default_catalog_url),
+    SERVER_USER=Config(
+      key="server_user",
+      help=_t("Username of the CM user used for authentication."),
+      dynamic_default=get_auth_username),
+    SERVER_PASSWORD=Config(
+      key="server_password",
+      help=_t("Password of the user used for authentication."),
+      private=True,
+      default=None),
+    SEARCH_CLUSTER=Config(
+      key="search_cluster",
+      help=_t("Limits found entities to a specific cluster."),
+      default=None),
+    FETCH_SIZE_SEARCH_INTERACTIVE = Config(
+      key="fetch_size_search_interactive",
+      help=_t("Max number of items to fetch in one call in object search autocomplete."),
+      default=25,
+      type=int
+    ),
+  )
+)
+
+# Navigator is deprecated over generic Catalog above
+
+def get_navigator_url():
+  return NAVIGATOR.API_URL.get() and NAVIGATOR.API_URL.get().strip('/')[:-3]
+
+def has_navigator(user):
+  from desktop.auth.backend import is_admin
+  return bool(get_navigator_url() and get_navigator_auth_password()) \
+      and (is_admin(user) or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
 
 def get_navigator_auth_type():
   return NAVIGATOR.AUTH_TYPE.get().lower()
-
 
 def get_navigator_auth_username():
   '''Get the username to authenticate with.'''
@@ -262,9 +334,8 @@ def get_navigator_saml_password():
   '''Get default password from secured file'''
   return NAVIGATOR.AUTH_SAML_PASSWORD_SCRIPT.get()
 
-
-def has_navigator_file_search(user):
-  return has_navigator(user) and NAVIGATOR.ENABLE_FILE_SEARCH.get()
+def has_catalog_file_search(user):
+  return has_catalog(user) and NAVIGATOR.ENABLE_FILE_SEARCH.get()
 
 
 NAVIGATOR = ConfigSection(
@@ -361,6 +432,7 @@ NAVIGATOR = ConfigSection(
   )
 )
 
+# Administration configs
 
 MANAGER = ConfigSection(
   key='manager',

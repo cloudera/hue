@@ -1,0 +1,10 @@
+include AUTHORS
+include COPYING
+include README.rst
+include MANIFEST.in
+include ChangeLog
+include setup.py
+include crontab.py
+include cronlog.py
+include tests/*.py
+include tests/data/*

@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: impala-worker-{{ .Values.name }}
+spec:
+  replicas: {{ .Values.worker.replicas }}
+  selector:
+    matchLabels:
+      name: impala-worker-{{ .Values.name }}
+  template:
+    metadata:
+      labels:
+        name: impala-worker-{{ .Values.name }}
+    spec:
+      hostname: impala-worker-{{ .Values.name }}
+      subdomain: impala-worker-{{ .Values.name }}
+      containers:
+        - name: impala-worker-{{ .Values.name }}
+          image: {{ .Values.registry }}/impala-server:{{ .Values.tag }}
+          command: ['bash', '-c', '/opt/hadoop/run-worker.sh']
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "{{ .Values.worker.memoryRequest }}"
+              cpu: "{{ .Values.worker.cpuRequest }}"
+            limits:
+              memory: "{{ .Values.worker.memoryRequest }}"
+              cpu: "{{ .Values.worker.cpuRequest }}"
+          ports:
+            - containerPort: 21000
+              name: im-sr
+              protocol: TCP
+            - containerPort: 22000
+              name: im-sr2
+              protocol: TCP
+            - containerPort: 23000
+              name: im-sr3
+              protocol: TCP
+            - containerPort: 25000
+              name: im-sr-web
+              protocol: TCP
+          env:
+            - name: IMPALA_STATESTORE
+              value: impala-statestore-{{ .Values.name }}
+            - name: IMPALA_CATALOG
+              value: impala-catalog-{{ .Values.name }}
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          lifecycle:
+           preStop:
+             exec:
+               command: ["/opt/hadoop/run-graceful-decommission.sh", "impala-coordinator-{{ .Values.name }}", "$POD_NAME"]
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/alternatives/impala-conf/hdfs-site.xml
+              subPath: hdfs-site.xml
+            - name: config-volume
+              mountPath: /etc/alternatives/impala-conf/core-site.xml
+              subPath: core-site.xml
+      volumes:
+        - name: config-volume
+          configMap:
+            name: impala-config

@@ -22,9 +22,11 @@
 .assist-panel {
   .display-flex;
   .flex-direction(column);
+
   height: 100%;
   overflow: hidden;
   position: relative;
+
   & > .dz-default {
     display: none;
   }
@@ -34,9 +36,10 @@
   .flex(0);
 }
 
-.assist-panel-contents  {
+.assist-panel-contents {
   position: relative;
   .flex(1 1 100%);
+
   overflow: hidden;
   padding-top: 10px;
 }
@@ -130,7 +133,7 @@
   height: 16px;
   -webkit-filter: grayscale(1);
   filter: grayscale(1);
-  opacity: .8;
+  opacity: 0.8;
 }
 
 .assist {
@@ -153,6 +156,7 @@
 
 .assist-header {
   .flex(1);
+
   color: @hue-primary-color-dark;
   background-color: @cui-gray-050;
   border-top: 1px solid @cui-default-border-color;
@@ -178,22 +182,22 @@
 .assist-inner-header {
   width: 100%;
   color: @cui-gray-700;
-  margin-left:3px;
-  margin-bottom:2px;
+  margin-left: 3px;
+  margin-bottom: 2px;
   font-weight: bold;
   font-size: 15px;
-  margin-top: 0
+  margin-top: 0;
 }
 
 .assist-stretchable-list {
-  position:relative;
+  position: relative;
   overflow-y: auto;
   overflow-x: hidden;
   width: 100%;
   border: none;
   padding: 0;
   margin-bottom: 1px;
-  margin-top:3px;
+  margin-top: 3px;
 }
 
 .assist-header-actions {
@@ -209,6 +213,7 @@
 .assist-panel-switches {
   position: relative;
   .flex(0 0 49px);
+
   line-height: 49px;
   padding-left: 12px;
   height: 49px;
@@ -283,7 +288,6 @@
 .assist-tables > li {
   position: relative;
   padding-top: 2px;
-  padding-left-left: 4px;
   margin-left: 0;
   margin-right: 0;
   overflow-x: hidden;
@@ -299,7 +303,8 @@
   .assist-column {
     background-color: @cui-white;
 
-    .assist-actions, .assist-file-actions {
+    .assist-actions,
+    .assist-file-actions {
       background-color: @cui-white;
     }
 
@@ -309,12 +314,14 @@
   }
 
   .assist-column:hover {
-    .assist-actions, .assist-file-actions {
+    .assist-actions,
+    .assist-file-actions {
       background-color: @cui-gray-050;
     }
   }
 
-  .assist-actions, .assist-file-actions {
+  .assist-actions,
+  .assist-file-actions {
     background-color: @cui-gray-050;
   }
 }
@@ -342,7 +349,7 @@
 
 .assist-breadcrumb-back {
   font-size: 15px;
-  margin-right:8px;
+  margin-right: 8px;
 }
 
 .assist-document-link .hi {
@@ -367,7 +374,6 @@
   }
 }
 
-
 .assist-document-link,
 .assist-document-link:focus,
 .assist-table-link,
@@ -387,7 +393,7 @@
 }
 
 .assist-db-header-actions {
-  position:absolute;
+  position: absolute;
   top: 0;
   right: 0;
   padding-left: 4px;
@@ -409,7 +415,7 @@
 }
 
 .assist-actions {
-  position:absolute;
+  position: absolute;
   top: 0;
   right: 0;
   padding-left: 4px;
@@ -428,12 +434,12 @@
   margin-left: 10px;
 }
 
-.assist-file-actions  {
-  position:absolute;
+.assist-file-actions {
+  position: absolute;
   top: 0;
   right: 0;
   padding-right: 15px;
-  padding-left:4px;
+  padding-left: 4px;
   background-color: @cui-white;
   opacity: 0;
 
@@ -443,7 +449,7 @@
 }
 
 .table-actions {
-  padding-top:2px;
+  padding-top: 2px;
 }
 
 .assist-tables > li.selected .assist-actions {
@@ -461,10 +467,10 @@
 }
 
 .highlightable {
-  -webkit-transition: all .6s ease;
-  -moz-transition: all .6s ease;
-  -o-transition: all .6s ease;
-  transition: all .6s ease;
+  -webkit-transition: all 0.6s ease;
+  -moz-transition: all 0.6s ease;
+  -o-transition: all 0.6s ease;
+  transition: all 0.6s ease;
 }
 
 .highlight {
@@ -473,14 +479,15 @@
 }
 
 .assist-db-header-actions .highlightable a > span {
-  -webkit-transition: all .6s ease;
-  -moz-transition: all .6s ease;
-  -o-transition: all .6s ease;
-  transition: all .6s ease;
+  -webkit-transition: all 0.6s ease;
+  -moz-transition: all 0.6s ease;
+  -o-transition: all 0.6s ease;
+  transition: all 0.6s ease;
 }
 
 .assist-db-header-actions .highlight {
   padding-left: 0;
+
   a > span {
     text-shadow: 0 0 0.2em @hue-primary-color-light;
     color: @hue-primary-color-dark !important;
@@ -505,16 +512,19 @@
 
 .assist-flex-panel {
   .display-flex();
+
   position: relative;
   .flex-flow(column nowrap);
   .flex-align-items(stretch);
-  height:100%;
+
+  height: 100%;
 }
 
 .assist-flex-header {
   overflow: hidden;
   position: relative;
   .flex(0 0 25px);
+
   white-space: nowrap;
   font-size: 15px;
 
@@ -528,6 +538,7 @@
   overflow: hidden;
   position: relative;
   .flex(0 0 30px);
+
   white-space: nowrap;
 }
 
@@ -599,7 +610,7 @@
   margin-right: 8px;
 }
 
-.assist-filter .inline-autocomplete-container {
+.assist-filter .inline-autocomp-container {
   height: 25px;
 }
 
@@ -644,6 +655,7 @@
   ul li {
     margin: 8px 0;
   }
+
   .hue-doc-title {
     color: @hue-primary-color-dark;
     font: 15px/normal @font-family-monospace;
@@ -651,6 +663,7 @@
     line-height: 18px;
     margin-bottom: 10px;
   }
+
   .hue-doc-codeblock,
   .hue-doc-codeph {
     font-family: @font-family-monospace;
@@ -659,64 +672,76 @@
     border: 1px solid @cui-gray-100;
     border-radius: 2px;
   }
-  .hue-doc-internal-link {
 
-  }
   .hue-doc-codeph {
     padding: 0 3px;
   }
+
   .hue-doc-codeblock {
     display: block;
     white-space: pre;
     overflow-x: auto;
     margin-bottom: 10px;
     padding: 6px 8px;
+
     .hue-doc-varname {
       color: @cui-steel;
     }
   }
+
   .hue-doc-note {
     border: 1px solid @hue-primary-color-light;
     padding: 4px 5px;
     margin-bottom: 10px;
-    &:before {
+
+    &::before {
       content: 'Note:';
       color: @cui-gray-800;
       font-weight: 500;
     }
   }
+
   .hue-doc-varname {
     font-family: @font-family-monospace;
     font-style: italic;
   }
-  .hue-doc-ph {
 
-  }
+  //.hue-doc-ph {
+  //
+  //}
+
   .hue-doc-filepath {
     font-family: @font-family-monospace;
     color: @cui-gray-800;
   }
-  .hue-doc-external-link {
 
-  }
+  //.hue-doc-external-link {
+  //
+  //}
+
   .hue-doc-cmdname {
     font-family: @font-family-monospace;
     color: @cui-steel;
   }
+
   .hue-doc-term {
     font-family: @font-family-monospace;
   }
+
   .hue-doc-uicontrol {
     display: inline-block;
     font-weight: 500;
   }
+
   .hue-doc-example {
     font-family: @font-family-monospace;
     color: @cui-steel;
   }
-  .hue-doc-sthead {
 
-  }
+  //.hue-doc-sthead {
+  //
+  //}
+
   .hue-doc-pre {
     display: block;
     font-family: @font-family-monospace;
@@ -799,7 +824,6 @@
 
     li {
       padding: 0 10px;
-
       direction: rtl;
       text-align: left;
       .nowrap-ellipsis();
@@ -809,9 +833,11 @@
 
 .assist-preloader-wrapper {
   background: repeat-y @cui-white;
+
   .assist-preloader {
     background-color: @cui-white;
   }
+
   &.assist-preloader-ghost {
     background-image: url(/static/desktop/art/assist-preload.svg);
   }

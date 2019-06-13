@@ -54,6 +54,10 @@ UPLOAD_CHUNK_SIZE = Config(
   default=1024 * 1024 * 64)
 
 
+def has_hdfs_enabled():
+  return HDFS_CLUSTERS.keys()
+
+
 HDFS_CLUSTERS = UnspecifiedConfigSection(
   "hdfs_clusters",
   help="One entry for each HDFS cluster",
@@ -134,6 +138,16 @@ def get_spark_history_server_url():
   url = get_spark_history_server_from_cm()
   return url if url else 'http://localhost:18088'
 
+def get_spark_history_server_security_enabled():
+  """
+    Try to get Spark history server URL from Cloudera Manager API, otherwise give default URL
+  """
+  from metadata.conf import MANAGER
+  from metadata.manager_client import ManagerApi
+  if MANAGER.API_URL.get():
+      return ManagerApi().get_spark_history_server_security_enabled()
+  return False
+
 
 YARN_CLUSTERS = UnspecifiedConfigSection(
   "yarn_clusters",
@@ -170,6 +184,9 @@ YARN_CLUSTERS = UnspecifiedConfigSection(
       SPARK_HISTORY_SERVER_URL=Config("spark_history_server_url",
                   dynamic_default=get_spark_history_server_url,
                   help="URL of the Spark History Server"),
+      SPARK_HISTORY_SERVER_SECURITY_ENABLED=Config("spark_history_server_security_enabled",
+                  dynamic_default=get_spark_history_server_security_enabled,
+                  help="Is Spark History Server running with Kerberos authentication"),
       SSL_CERT_CA_VERIFY=Config("ssl_cert_ca_verify",
                   help="In secure mode (HTTPS), if SSL certificates from YARN Rest APIs have to be verified against certificate authority",
                   dynamic_default=default_ssl_validate,

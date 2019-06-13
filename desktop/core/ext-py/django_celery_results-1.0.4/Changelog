@@ -1,0 +1,67 @@
+.. _changelog:
+
+================
+ Change history
+================
+
+.. _version-1.0.4:
+
+1.0.4
+=====
+:release-date: 2018-11-12 19:00 p.m. UTC+2:00
+:release-by: Omer Katz
+
+1.0.3 is broken. Use 1.0.4
+
+- Revert renaming label as it is a breaking change.
+
+.. _version-1.0.3:
+
+1.0.3
+=====
+:release-date: 2018-11-12 18:00 p.m. UTC+2:00
+:release-by: Omer Katz
+
+- Revert renaming label as it is a breaking change.
+
+.. _version-1.0.2:
+
+1.0.2
+=====
+:release-date: 2018-11-12 18:00 p.m. UTC+2:00
+:release-by: Omer Katz
+
+- Store task name, args, kwargs as part of the task results in database.
+    Contributed by :github_user: `wardal`.
+
+- Admin screen changes - task name filter, search on task_name, task_id, status.
+    Contributed by :github_user: `jaylynch`.
+
+- Added default_app_config.
+- Added missing migration.
+- Fix MySQL max length issue.
+- Drop support for Django<1.11.
+
+.. _version-1.0.1:
+
+1.0.1
+=====
+:release-date: 2016-11-07 02:00 p.m. PST
+:release-by: Ask Solem
+
+- Migrations were not being installed as part of the distribution (Issue #4).
+
+- Now includes simple task result admin interface.
+
+    Contributed by :github_user:`zeezdev`.
+
+- Now depends on Celery 4.0.0.
+
+.. _version-1.0.0:
+
+1.0.0
+=====
+:release-date: 2016-09-08 03:19 p.m. PDT
+:release-by: Ask Solem
+
+- Initial release

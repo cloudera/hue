@@ -1,0 +1,153 @@
+# French translations for Hue.
+# Copyright (C) 2013 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2018-03-07 10:05-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: fr <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/impala/api.py:50
+msgid "Successfully invalidated metadata"
+msgstr "Métadonnées invalidées avec succès"
+
+#: src/impala/api.py:64
+#, python-format
+msgid "Successfully refreshed metadata for `%s`.`%s`"
+msgstr "Métadonnées actualisées avec succès pour '%s'.'%s'"
+
+#: src/impala/api.py:79
+msgid "get_exec_summary requires a valid query_history_id"
+msgstr "get_exec_summary exige un query_history_id valable"
+
+#: src/impala/api.py:101
+msgid "get_runtime_profile requires a valid query_history_id"
+msgstr "get_runtime_profile requiert un query_history_id valable"
+
+#: src/impala/conf.py:39
+msgid "Host of the Impala Server."
+msgstr "Hôte du serveur Impala."
+
+#: src/impala/conf.py:44
+msgid "Port of the Impala Server."
+msgstr "Port du serveur Impala."
+
+#: src/impala/conf.py:50
+msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
+msgstr "Nom Kerberos principal pour Impala. En général 'impala/nomhôte.foo.com'."
+
+#: src/impala/conf.py:56
+msgid "Turn on/off impersonation mechanism when talking to Impala."
+msgstr ""
+"Activez/désactivez le mécanisme d'emprunt d'identité lorsqu'il s'agit "
+"d'Impala."
+
+#: src/impala/conf.py:62
+msgid ""
+"Number of initial rows of a resultset to ask Impala to cache in order to "
+"support re-fetching them for downloading them. Set to 0 for disabling the"
+" option and backward compatibility."
+msgstr ""
+"Nombre de lignes initiales d'un jeu de résultats devant être mises en "
+"cache par Impala pour permettre la prise en charge d'une nouvelle "
+"extraction afin de les télécharger. Définissez-le sur la valeur 0 pour "
+"désactiver l'option et la compatibilité descendante."
+
+#: src/impala/conf.py:72
+msgid "Timeout in seconds for Thrift calls."
+msgstr "Temporisation en secondes pour les appels Thrift."
+
+#: src/impala/conf.py:76
+msgid ""
+"Hue will try to close the Impala query when the user leaves the editor "
+"page. This will free all the query resources in Impala, but also make its"
+" results inaccessible."
+msgstr ""
+"Hue tente de fermer la requête Impala lorsque l'utilisateur quitte la "
+"page de l'éditeur. Toutes les ressources de requête sont ainsi libérées "
+"dans Impala, mais les résultats deviennent inaccessibles."
+
+#: src/impala/conf.py:84
+msgid ""
+"If QUERY_TIMEOUT_S > 0, the query will be timed out (i.e. cancelled) if "
+"Impala does not do any work (compute or send back results) for that query"
+" within QUERY_TIMEOUT_S seconds."
+msgstr ""
+"Si QUERY_TIMEOUT_S > 0, la requête expire (est annulée) lorsqu'Impala "
+"n'effectue aucune tâche (traitement ou renvoi de résultats) pour cette "
+"requête dans un délai de QUERY_TIMEOUT_S secondes."
+
+#: src/impala/conf.py:92
+msgid ""
+"If SESSION_TIMEOUT_S > 0, the session will be timed out (i.e. cancelled) "
+"if Impala does not do any work (compute or send back results) for that "
+"session within SESSION_TIMEOUT_S seconds. Default: 30 min."
+msgstr ""
+"Si SESSION_TIMEOUT_S > 0, la session expire (est annulée) "
+"si Impala n'effectue aucune tâche (calcul ou renvoi de résultats) pour cette"
+"session dans un délai de SESSION_TIMEOUT_S secondes. Valeur par défaut : 30 min"
+
+#: src/impala/conf.py:102
+msgid ""
+"A comma-separated list of white-listed Impala configuration properties "
+"that users are authorized to set."
+msgstr ""
+"Liste de valeurs séparées par des virgules des propriétés de "
+"configuration d'Impala en liste blanche, que les utilisateurs sont "
+"autorisés à définir."
+
+#: src/impala/conf.py:107
+msgid "Impala configuration directory, where impala_flags is located."
+msgstr "Répertoire de configuration Impala incluant impala_flags."
+
+#: src/impala/conf.py:113
+msgid "SSL configuration for the server."
+msgstr "Configuration SSL pour le serveur."
+
+#: src/impala/conf.py:117
+msgid "SSL communication enabled for this server."
+msgstr "Communication SSL activée pour ce serveur."
+
+#: src/impala/conf.py:124
+msgid "Path to Certificate Authority certificates."
+msgstr "Chemin d'accès vers les certificats de l'Autorité de certification."
+
+#: src/impala/conf.py:131
+msgid "Path to the private key file, e.g. /etc/hue/key.pem"
+msgstr "Chemin d'accès au fichier de clé privée, par ex. /etc/hue/key.pem"
+
+#: src/impala/conf.py:138
+msgid "Path to the public certificate file, e.g. /etc/hue/cert.pem"
+msgstr "Chemin d'accès au fichier de certificat public, par ex. /etc/hue/cert.pem"
+
+#: src/impala/conf.py:145
+msgid "Choose whether Hue should validate certificates received from the server."
+msgstr "Indiquez si Hue doit valider les certificats reçus du serveur."
+
+#: src/impala/conf.py:158
+msgid "Auth username of the hue user used for authentications."
+msgstr "Nom de l'utilisateur Hue utilisé pour les authentifications."
+
+#: src/impala/conf.py:172
+msgid "LDAP/PAM/.. password of the hue user used for authentications."
+msgstr ""
+"Mot de passe LDAP/PAM.. de l'utilisateur Hue utilisé pour les "
+"authentifications."
+
+#: src/impala/conf.py:178
+msgid ""
+"Execute this script to produce the auth password. This will be used when "
+"`auth_password` is not set."
+msgstr ""
+"Exécutez ce script pour générer le mot de passe d'authentification. Il "
+"sera utilisé si 'auth_password' n'est pas défini."

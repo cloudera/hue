@@ -95,7 +95,7 @@ default:
 	@echo '  clean       : Remove desktop build products'
 	@echo '  distclean   : Remove desktop and thirdparty build products'
 # <<<< DEV ONLY
-	@echo '  docs        : Build documentation'
+	@echo '  doc 	       : Build documentation'
 	@echo '  prod        : Generate a tar file for production distribution'
 	@echo '  locales     : Extract strings and update dictionary of each locale'
 	@echo '  ace         : Builds the Ace Editor tool'
@@ -108,7 +108,7 @@ all: default
 include Makefile.tarball
 
 ###################################
-# Build docs
+# Build docs (unused)
 ###################################
 .PHONY: docs
 docs:
@@ -147,12 +147,15 @@ desktop: parent-pom
 desktop: virtual-env
 	@$(MAKE) -C desktop
 
+
 ###################################
 # Build apps
 ###################################
 .PHONY: apps
 apps: desktop
+	@$(MAKE) npm-install
 	@$(MAKE) -C $(APPS_DIR) env-install
+	@$(MAKE) create-static
 
 ###################################
 # Install binary dist
@@ -164,7 +167,7 @@ INSTALL_CORE_FILES = \
 	tools/virtual-bootstrap \
 	tools/enable-python27.sh \
 	tools/relocatable.sh \
-	VERS* LICENSE* README*
+	VERS* LICENSE* README* webpack-stats*.json
 
 .PHONY: install
 install: virtual-env install-check install-core-structure install-desktop install-apps install-env
@@ -206,7 +209,35 @@ install-env:
 	$(MAKE) -C $(INSTALL_DIR)/desktop env-install
 	@echo --- Setting up Applications
 	$(MAKE) -C $(INSTALL_DIR)/apps env-install
-	cp $(ROOT)/webpack-stats*.json $(INSTALL_DIR)
+	@echo --- Setting up Frontend assets
+	cp $(ROOT)/package.json $(INSTALL_DIR)
+	cp $(ROOT)/webpack.config*.js $(INSTALL_DIR)
+	$(MAKE) -C $(INSTALL_DIR) npm-install
+
+
+###################################
+# Frontend and static assets
+###################################
+
+.PHONY: npm-install
+npm-install:
+	npm install
+	npm run webpack
+	npm run webpack-login
+	npm run webpack-workers
+	node_modules/.bin/removeNPMAbsolutePaths .
+	rm -rf node_modules
+
+.PHONY: create-static
+create-static:
+	./build/env/bin/hue collectstatic --noinput
+
+# <<<< DEV ONLY
+.PHONY: doc
+doc:
+	hugo --source docs/docs-site
+# END DEV ONLY >>>>
+
 
 ###################################
 # Internationalization
@@ -238,35 +269,35 @@ ace:
 # <<<< DEV ONLY
 .PHONY: global-search-parser
 global-search-parser:
-	@cd tools/jison && ./hue-global-search.sh
+	@node tools/jison/generateParsers.js globalSearchParser
 
 .PHONY: solr-all-parsers
 solr-all-parsers:
-	@cd tools/jison && ./hue-solr-query.sh && ./hue-solr-formula.sh
+	@node tools/jison/generateParsers.js solrQueryParser solrFormulaParser
 
 .PHONY: solr-query-parser
 solr-query-parser:
-	@cd tools/jison && ./hue-solr-query.sh
+	@node tools/jison/generateParsers.js solrQueryParser
 
 .PHONY: solr-formula-parser
 solr-formula-parser:
-	@cd tools/jison && ./hue-solr-formula.sh
+	@node tools/jison/generateParsers.js solrFormulaParser
 
 .PHONY: sql-all-parsers
 sql-all-parsers:
-	@cd tools/jison && ./hue-sql-autocomplete.sh && ./hue-sql-statement.sh && ./hue-sql-syntax.sh
+	@node tools/jison/generateParsers.js sqlAutocompleteParser sqlSyntaxParser sqlStatementsParser
 
 .PHONY: sql-autocomplete-parser
 sql-autocomplete-parser:
-	@cd tools/jison && ./hue-sql-autocomplete.sh
+	@node tools/jison/generateParsers.js sqlAutocompleteParser
 
 .PHONY: sql-statement-parser
 sql-statement-parser:
-	@cd tools/jison && ./hue-sql-statement.sh
+	@node tools/jison/generateParsers.js sqlStatementsParser
 
 .PHONY: sql-syntax-parser
 sql-syntax-parser:
-	@cd tools/jison && ./hue-sql-syntax.sh
+	@node tools/jison/generateParsers.js sqlSyntaxParser
 # END DEV ONLY >>>>
 
 ###################################
@@ -303,9 +334,6 @@ ext-clean:
 ###############################################
 # Misc (some used by automated test scripts)
 ###############################################
-
-js-test:
-	$(ROOT)/tools/jasmine/phantomjs.runner.sh $(ROOT)/desktop/core/src/desktop/templates/jasmineRunner.html
 
 test:
 	DESKTOP_DEBUG=1 $(ENV_PYTHON) $(BLD_DIR_BIN)/hue test fast --with-xunit

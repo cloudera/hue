@@ -573,8 +573,8 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
           };
           if (call === true) {
             callback();
-          } else if (call != null && 'complete' in call) {
-            call.complete(callback);
+          } else if (call != null && 'always' in call) {
+            call.always(callback);
           } else {
             self.isLoading(false);
           }
@@ -984,7 +984,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
         }
         var queryObject = {url: url, method: 'POST', startTime: new Date().getTime(), status: 'running...'};
         var functionName = arguments.length > 0 ? arguments[0] : '';
-        var handler = $.post(url, $_POST).error(function (response) {
+        var handler = $.post(url, $_POST).fail(function (response) {
           if (functionName !== 'getColumnDescriptors') {
             $(document).trigger("error", JSON.parse(response.responseText).message);
           }
@@ -1298,7 +1298,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
           }
         }
 
-        return API.queryTable("getColumnDescriptors").done(descriptorCallback).error(function () {
+        return API.queryTable("getColumnDescriptors").done(descriptorCallback).fail(function () {
           descriptorCallback({});
         });
       };
@@ -1536,7 +1536,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
       self.drop = function (cont) {
         function doDrop() {
           self.isLoading(true);
-          return API.queryTable('deleteAllRow', self.row, "{}").complete(function () {
+          return API.queryTable('deleteAllRow', self.row, "{}").always(function () {
             app.views.tabledata.items.remove(self); //decouple later
             self.isLoading(false);
           });
@@ -1691,18 +1691,18 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
         var action = [i18n('enable'), i18n('disable')][self.enabled() << 0], el = $(event.currentTarget);
         confirm(i18n("Confirm") + " " + action, i18n("Are you sure you want to") + " " + action + " " + i18n("this table?"), function () {
           el.showIndicator();
-          return self[action](el).complete(function () {
+          return self[action](el).always(function () {
             el.hideIndicator();
           });
         });
       };
       self.enable = function (el) {
-        return API.queryCluster('enableTable', self.name).complete(function () {
+        return API.queryCluster('enableTable', self.name).always(function () {
           self.enabled(true);
         });
       };
       self.disable = function (callback) {
-        return API.queryCluster('disableTable', self.name).complete(function () {
+        return API.queryCluster('disableTable', self.name).always(function () {
           self.enabled(false);
           if ($.isFunction(callback)) callback();
         });
@@ -2498,11 +2498,11 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
       if (ui)
         ui.isLoading(true);
 
-      API.queryArray($(this).attr('action'), data).complete(function () {
+      API.queryArray($(this).attr('action'), data).always(function () {
         $(self).find('input[type=submit]').removeClass('disabled').hideIndicator();
         if (ui)
           ui.isLoading(false);
-      }).success(function () {
+      }).done(function () {
         $(self).modal('hide');
         if (ui)
           app.focusModel().reload();

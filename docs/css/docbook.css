@@ -308,6 +308,17 @@ pre {
   border-top: 3px solid #287DBD;
 }
 
+.footer {
+  position: fixed;
+  background-color: #FFF;
+  z-index: 1000;
+  padding-top: 15px;
+  padding-bottom: 10px;
+  padding-left: 20px;
+  bottom: 0;
+  border-top: 1px solid #287DBD;
+}
+
 .article {
   padding: 0 30px;
 }

@@ -75,7 +75,7 @@
   border-right: 0 none;
 }
 
-.selectize-dropdown.plugin-optgroup_columns .optgroup:before {
+.selectize-dropdown.plugin-optgroup_columns .optgroup::before {
   display: none;
 }
 
@@ -90,6 +90,7 @@
 
 .selectize-control.plugin-remove_button [data-value] .remove {
   z-index: 1;
+
   /* fixes ie bug (see #392) */
   position: absolute;
   top: 0;
@@ -241,7 +242,7 @@
   background: @cui-gray-100;
   color: @cui-gray-800;
   border: 0 solid @cui-gray-100;
-  border-radius: 12px
+  border-radius: 12px;
 }
 
 .selectize-read-only.multi .selectize-input > div {
@@ -377,7 +378,7 @@
   cursor: text;
 }
 
-.selectize-control.single .selectize-input:after {
+.selectize-control.single .selectize-input::after {
   content: ' ';
   display: block;
   position: absolute;
@@ -391,13 +392,13 @@
   border-color: @cui-gray-700 transparent transparent transparent;
 }
 
-.selectize-control.single .selectize-input.dropdown-active:after {
+.selectize-control.single .selectize-input.dropdown-active::after {
   margin-top: -4px;
   border-width: 0 5px 5px 5px;
   border-color: transparent transparent @cui-gray-700 transparent;
 }
 
-.selectize-control.rtl.single .selectize-input:after {
+.selectize-control.rtl.single .selectize-input::after {
   left: 15px;
   right: auto;
 }
@@ -421,6 +422,7 @@
 .select-like {
   display: inline-block;
   position: relative;
+
   & input {
     transition: none !important;
     box-shadow: none !important;
@@ -434,7 +436,6 @@
     right: 8px;
     font-size: 15px;
   }
-
 }
 
 .selectize-wrapper {

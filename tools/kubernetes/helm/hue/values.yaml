@@ -1,0 +1,39 @@
+registry: "gethue/hue"
+tag: "latest"
+hue:
+  database:
+    create: true
+    engine: "postgresql_psycopg2"
+    host: "hue-postgres"
+    port: 5432
+    user: "hue"
+    password: "hue"
+    name: "hue"
+  interpreters: |
+    [[[impala]]]
+      name=Impala
+      interface=hiveserver2
+  ini: |
+    [desktop]
+    app_blacklist=filebrowser,oozie,search,hbase,security,jobbrowser,metastore
+
+    [impala]
+    server_host=172.31.114.171
+
+    [dashboard]
+    is_enabled=false
+    has_sql_enabled=false
+
+    [notebook]
+    show_notebooks=false
+
+    [hadoop]
+aws:
+  accessKeyId: ""
+  secretAccessKey: ""
+  region: "us-east-1"
+ingress:
+  create: false
+  type: "traefik"
+  loadBalancerIp: "127.0.0.1"
+  domain: "127.0.0.1.nip.io"

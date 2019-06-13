@@ -24,9 +24,11 @@ from datetime import datetime
 from django.utils.translation import ugettext as _
 
 from jobbrowser.apis.base_api import Api
+from libanalyze import analyze as analyzer, rules
+from notebook.conf import ENABLE_QUERY_ANALYSIS
 
+ANALYZER = rules.TopDownAnalysis() # We need to parse some files so save as global
 LOG = logging.getLogger(__name__)
-
 
 try:
   from beeswax.models import Session
@@ -174,21 +176,41 @@ class QueryApi(Api):
   def _memory(self, appid, app_type, app_property, app_filters):
     return self.api.get_query_memory(query_id=appid);
 
+  def _metrics(self, appid):
+    query_profile = self.api.get_query_profile_encoded(appid)
+    profile = analyzer.analyze(analyzer.parse_data(query_profile))
+    ANALYZER.pre_process(profile)
+    metrics = analyzer.metrics(profile)
+
+    if ENABLE_QUERY_ANALYSIS.get():
+      result = ANALYZER.run(profile)
+      if result and result[0]:
+        for factor in result[0]['result']:
+          if factor['reason'] and factor['result_id'] and metrics['nodes'].get(factor['result_id']):
+            metrics['nodes'][factor['result_id']]['health'] = factor['reason']
+    return metrics
+
   def _query(self, appid):
     query = self.api.get_query(query_id=appid)
     query['summary'] = query.get('summary').strip() if query.get('summary') else ''
     query['plan'] = query.get('plan').strip() if query.get('plan') else ''
+    try:
+      query['metrics'] = self._metrics(appid)
+    except Exception, e:
+      query['metrics'] = {'nodes' : {}}
+      LOG.exception('Could not parse profile: %s' % e)
+
     if query.get('plan_json'):
       def get_exchange_icon (o):
         if re.search(r'broadcast', o['label_detail'], re.IGNORECASE):
           return { 'svg': 'hi-broadcast' }
         elif re.search(r'hash', o['label_detail'], re.IGNORECASE):
-          return { 'font': 'fa-random' }
+          return { 'svg': 'hi-random' }
         else:
-          return { 'font': 'fa-exchange' }
+          return { 'svg': 'hi-exchange' }
       def get_sigma_icon (o):
         if re.search(r'streaming', o['label_detail'], re.IGNORECASE):
-          return { 'svg': 'hi-sigma-stream' }
+          return { 'svg': 'hi-sigma' }
         else:
           return { 'svg': 'hi-sigma' }
       mapping = {
@@ -196,8 +218,8 @@ class QueryApi(Api):
         'SORT': { 'type': 'SORT', 'icon': { 'svg': 'hi-sort' } },
         'MERGING-EXCHANGE': {'type': 'EXCHANGE', 'icon': { 'fn': get_exchange_icon } },
         'EXCHANGE': { 'type': 'EXCHANGE', 'icon': { 'fn': get_exchange_icon } },
-        'SCAN HDFS': { 'type': 'SCAN_HDFS', 'icon': { 'font': 'fa-files-o' } },
-        'SCAN KUDU': { 'type': 'SCAN_KUDU', 'icon': { 'font': 'fa-table' } },
+        'SCAN HDFS': { 'type': 'SCAN_HDFS', 'icon': { 'svg': 'hi-copy' } },
+        'SCAN KUDU': { 'type': 'SCAN_KUDU', 'icon': { 'svg': 'hi-table' } },
         'SCAN HBASE': { 'type': 'SCAN_HBASE', 'icon': { 'font': 'fa-th-large' } },
         'HASH JOIN': { 'type': 'HASH_JOIN', 'icon': { 'svg': 'hi-join' } },
         'AGGREGATE': { 'type': 'AGGREGATE', 'icon': { 'fn': get_sigma_icon } },

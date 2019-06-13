@@ -57,12 +57,10 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
 
 <div class="container-fluid">
   <div class="card card-small">
-  % if is_hue_4:
     <div class="alert">
       ${ _('This is the old Job Editor, it is recommended to instead use the new ') }
         <a href="${ url('notebook:editor') }" target="_blank">${_('Editor')}</a>
     </div>
-  % endif
 
   <h1 class="card-heading simple">${_('Designs')}</h1>
 

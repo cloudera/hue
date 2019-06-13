@@ -442,7 +442,6 @@ ${ layout.menubar(section='workflows') }
 <script src="${ static('desktop/ext/js/codemirror-xml.js') }"></script>
 <script src="${ static('desktop/ext/js/codemirror-closetag.js') }"></script>
 
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 
@@ -948,7 +947,7 @@ $('#importOozieAction').on('click', '.action-row', function(e) {
 ko.bindingHandlers.fileChooser = {
   init: function(element, valueAccessor, allBindings, model) {
     var self = $(element);
-    self.after(getFileBrowseButton(self, true));
+    self.after(hueUtils.getFileBrowseButton(self, true));
   }
 };
 
@@ -1031,7 +1030,7 @@ $(document).ready(function () {
     var _url = $(this).data('clone-url');
     $.post(_url, function (data) {
       window.location = data.url;
-    }).error(function(){
+    }).fail(function(){
       $(document).trigger("error", "${ _('There was a problem copying this workflow.') }");
     });
   });
@@ -1064,7 +1063,7 @@ $(document).ready(function () {
         $('#submit-wf-modal').html(response);
         $('#submit-wf-modal').modal('show');
       }
-    ).error(function(){
+    ).fail(function(){
       $(document).trigger("error", "${ _('There was a problem submitting this workflow.') }");
     });
   }
@@ -1140,7 +1139,7 @@ ${ utils.path_chooser_libs(True) }
 <script>
   $(document).ready(function(){
     $("input[name='job_xml']").next().remove();
-    $("input[name='job_xml']").after(getFileBrowseButton($("input[name='job_xml']"), false));
+    $("input[name='job_xml']").after(hueUtils.getFileBrowseButton($("input[name='job_xml']"), false));
   });
 </script>
 

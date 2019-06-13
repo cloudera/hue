@@ -1,0 +1,263 @@
+Every contribution to Celery is as important to us,
+as every coin in the money bin is to Scrooge McDuck.
+
+The first commit to the Celery codebase was made on
+Fri Apr 24 13:30:00 2009 +0200, and has since
+then been improved by many contributors.
+
+Everyone who have ever contributed to Celery should be in
+this list, but in a recent policy change it has been decided
+that everyone must add themselves here, and not be added
+by others, so it's currently incomplete waiting for everyone
+to add their names.
+
+The list of authors added before the policy change can be found in docs/AUTHORS.txt.
+
+--
+
+Contributor offers to license certain software (a “Contribution” or multiple
+“Contributions”) to Celery, and Celery agrees to accept said Contributions,
+under the terms of the BSD open source license.
+Contributor understands and agrees that Celery shall have the irrevocable and perpetual right to make
+and distribute copies of any Contribution, as well as to create and distribute collective works and
+derivative works of any Contribution, under the BSD License.
+
+Contributors
+------------
+
+Ask Solem, 2012/06/07
+Sean O'Connor, 2012/06/07
+Patrick Altman, 2012/06/07
+Chris St. Pierre, 2012/06/07
+Jeff Terrace, 2012/06/07
+Mark Lavin, 2012/06/07
+Jesper Noehr, 2012/06/07
+Brad Jasper, 2012/06/07
+Juan Catalano, 2012/06/07
+Luke Zapart, 2012/06/07
+Roger Hu, 2012/06/07
+Honza Král, 2012/06/07
+Aaron Elliot Ross, 2012/06/07
+Alec Clowes, 2012/06/07
+Daniel Watkins, 2012/06/07
+Timo Sugliani, 2012/06/07
+Yury V. Zaytsev, 2012/06/7
+Marcin Kuźmiński, 2012/06/07
+Norman Richards, 2012/06/07
+Kevin Tran, 2012/06/07
+David Arthur, 2012/06/07
+Bryan Berg, 2012/06/07
+Mikhail Korobov, 2012/06/07
+Jerzy Kozera, 2012/06/07
+Ben Firshman, 2012/06/07
+Jannis Leidel, 2012/06/07
+Chris Rose, 2012/06/07
+Julien Poissonnier, 2012/06/07
+Łukasz Oleś, 2012/06/07
+David Strauss, 2012/06/07
+Chris Streeter, 2012/06/07
+Thomas Johansson, 2012/06/07
+Ales Zoulek, 2012/06/07
+Clay Gerrard, 2012/06/07
+Matt Williamson, 2012/06/07
+Travis Swicegood, 2012/06/07
+Jeff Balogh, 2012/06/07
+Harm Verhagen, 2012/06/07
+Wes Winham, 2012/06/07
+David Cramer, 2012/06/07
+Steeve Morin, 2012/06/07
+Mher Movsisyan, 2012/06/08
+Chris Peplin, 2012/06/07
+Florian Apolloner, 2012/06/07
+Juarez Bochi, 2012/06/07
+Christopher Angove, 2012/06/07
+Jason Pellerin, 2012/06/07
+Miguel Hernandez Martos, 2012/06/07
+Neil Chintomby, 2012/06/07
+Mauro Rocco, 2012/06/07
+Ionut Turturica, 2012/06/07
+Adriano Petrich, 2012/06/07
+Michael Elsdörfer, 2012/06/07
+Kornelijus Survila, 2012/06/07
+Stefán Kjartansson, 2012/06/07
+Keith Perkins, 2012/06/07
+Flavio Percoco, 2012/06/07
+Wes Turner, 2012/06/07
+Vitaly Babiy, 2012/06/07
+Tayfun Sen, 2012/06/08
+Gert Van Gool, 2012/06/08
+Akira Matsuzaki, 2012/06/08
+Simon Josi, 2012/06/08
+Sam Cooke, 2012/06/08
+Frederic Junod, 2012/06/08
+Roberto Gaiser, 2012/06/08
+Piotr Sikora, 2012/06/08
+Chris Adams, 2012/06/08
+Branko Čibej, 2012/06/08
+Vladimir Kryachko, 2012/06/08
+Remy Noel 2012/06/08
+Jude Nagurney, 2012/06/09
+Jonatan Heyman, 2012/06/10
+David Miller 2012/06/11
+Matthew Morrison, 2012/06/11
+Leo Dirac, 2012/06/11
+Mark Thurman, 2012/06/11
+Dimitrios Kouzis-Loukas, 2012/06/13
+Steven Skoczen, 2012/06/17
+Loren Abrams, 2012/06/19
+Eran Rundstein, 2012/06/24
+John Watson, 2012/06/27
+Matt Long, 2012/07/04
+David Markey, 2012/07/05
+Jared Biel, 2012/07/05
+Jed Smith, 2012/07/08
+Łukasz Langa, 2012/07/10
+Rinat Shigapov, 2012/07/20
+Hynek Schlawack, 2012/07/23
+Paul McMillan, 2012/07/26
+Mitar, 2012/07/28
+Adam DePue, 2012/08/22
+Thomas Meson, 2012/08/28
+Daniel Lundin, 2012/08/30
+Alexey Zatelepin, 2012/09/18
+Sundar Raman, 2012/09/24
+Henri Colas, 2012/11/16
+Thomas Grainger, 2012/11/29
+Marius Gedminas, 2012/11/29
+Christoph Krybus, 2013/01/07
+Jun Sakai, 2013/01/16
+Vlad Frolov, 2013/01/23
+Milen Pavlov, 2013/03/08
+Pär Wieslander, 2013/03/20
+Theo Spears, 2013/03/28
+Romuald Brunet, 2013/03/29
+Aaron Harnly, 2013/04/04
+Peter Brook, 2013/05/09
+Muneyuki Noguchi, 2013/04/24
+Stas Rudakou, 2013/05/29
+Dong Weiming, 2013/06/27
+Oleg Anashkin, 2013/06/27
+Ross Lawley, 2013/07/05
+Alain Masiero, 2013/08/07
+Adrien Guinet, 2013/08/14
+Christopher Lee, 2013/08/29
+Alexander Smirnov, 2013/08/30
+Matt Robenolt, 2013/08/31
+Jameel Al-Aziz, 2013/10/04
+Fazleev Maksim, 2013/10/08
+Ian A Wilson, 2013/10/18
+Daniel M Taub, 2013/10/22
+Matt Wise, 2013/11/06
+Michael Robellard, 2013/11/07
+Vsevolod Kulaga, 2013/11/16
+Ionel Cristian Mărieș, 2013/12/09
+Константин Подшумок, 2013/12/16
+Antoine Legrand, 2014/01/09
+Pepijn de Vos, 2014/01/15
+Dan McGee, 2014/01/27
+Paul Kilgo, 2014/01/28
+Môshe van der Sterre, 2014/01/31
+Martin Davidsson, 2014/02/08
+Chris Clark, 2014/02/20
+Matthew Duggan, 2014/04/10
+Brian Bouterse, 2014/04/10
+Dmitry Malinovsky, 2014/04/28
+Luke Pomfrey, 2014/05/06
+Alexey Kotlyarov, 2014/05/16
+Ross Deane, 2014/07/11
+Tadej Janež, 2014/08/08
+Akexander Koshelev, 2014/08/19
+Davide Quarta, 2014/08/19
+John Whitlock, 2014/08/19
+Konstantinos Koukopoulos, 2014/08/24
+Albert Yee Wang, 2014/08/29
+Andrea Rabbaglietti, 2014/10/02
+Joe Jevnik, 2014/10/22
+Nathan Van Gheem, 2014/10/28
+Gino Ledesma, 2014/10/28
+Thomas French, 2014/11/10
+Michael Permana, 2014/11/6
+William King, 2014/11/21
+Bert Vanderbauwhede, 2014/12/18
+John Anderson, 2014/12/27
+Luke Burden, 2015/01/24
+Mickaël Penhard, 2015/02/15
+Mark Parncutt, 2015/02/16
+Samuel Jaillet, 2015/03/24
+Ilya Georgievsky, 2015/03/31
+Fatih Sucu, 2015/04/17
+James Pulec, 2015/04/19
+Alexander Lebedev, 2015/04/25
+Frantisek Holop, 2015/05/21
+Feanil Patel, 2015/05/21
+Jocelyn Delalande, 2015/06/03
+Justin Patrin, 2015/08/06
+Juan Rossi, 2015/08/10
+Piotr Maślanka, 2015/08/24
+Gerald Manipon, 2015/10/19
+Krzysztof Bujniewicz, 2015/10/21
+Sukrit Khera, 2015/10/26
+Dave Smith, 2015/10/27
+Dennis Brakhane, 2015/10/30
+Chris Harris, 2015/11/27
+Valentyn Klindukh, 2016/01/15
+Wayne Chang, 2016/01/15
+Mike Attwood, 2016/01/22
+David Harrigan, 2016/02/01
+Ahmet Demir, 2016/02/27
+Maxime Verger, 2016/02/29
+Alexander Oblovatniy, 2016/03/10
+Komu Wairagu, 2016/04/03
+Joe Sanford, 2016/04/11
+Takeshi Kanemoto, 2016/04/22
+Arthur Vuillard, 2016/04/22
+Colin McIntosh, 2016/04/26
+Jeremy Zafran, 2016/05/17
+Anand Reddy Pandikunta, 2016/06/18
+Adriano Martins de Jesus, 2016/06/22
+Kevin Richardson, 2016/06/29
+Andrew Stewart, 2016/07/04
+Xin Li, 2016/08/03
+Alli Witheford, 2016/09/29
+Alan Justino da Silva, 2016/10/14
+Marat Sharafutdinov, 2016/11/04
+Viktor Holmqvist, 2016/12/02
+Rick Wargo, 2016/12/02
+zhengxiaowai, 2016/12/07
+Michael Howitz, 2016/12/08
+Andreas Pelme, 2016/12/13
+Mike Chen, 2016/12/20
+Alejandro Pernin, 2016/12/23
+Yuval Shalev, 2016/12/27
+Morgan Doocy, 2017/01/02
+Arcadiy Ivanov, 2017/01/08
+Ryan Hiebert, 2017/01/20
+Jianjian Yu, 2017/04/09
+Brian May, 2017/04/10
+Dmytro Petruk, 2017/04/12
+Joey Wilhelm, 2017/04/12
+Yoichi Nakayama, 2017/04/25
+Simon Schmidt, 2017/05/19
+Anthony Lukach, 2017/05/23
+Samuel Dion-Girardeau, 2017/05/29
+Aydin Sen, 2017/06/14
+Vinod Chandru, 2017/07/11
+Preston Moore, 2017/06/18
+Nicolas Mota, 2017/08/10
+David Davis, 2017/08/11
+Martial Pageau, 2017/08/16
+Sammie S. Taunton, 2017/08/17
+Kxrr, 2017/08/18
+Mads Jensen, 2017/08/20
+Markus Kaiserswerth, 2017/08/30
+Andrew Wong, 2017/09/07
+Arpan Shah, 2017/09/12
+Tobias 'rixx' Kunze, 2017/08/20
+Mikhail Wolfson, 2017/12/11
+Alex Garel, 2018/01/04
+Régis Behmo 2018/01/20
+Igor Kasianov, 2018/01/20
+Derek Harland, 2018/02/15
+Chris Mitchell, 2018/02/27
+Josue Balandrano Coronel, 2018/05/24
+Tom Booth, 2018/07/06

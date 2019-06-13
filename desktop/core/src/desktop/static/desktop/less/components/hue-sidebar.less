@@ -77,7 +77,7 @@
     color: @cui-blue-500;
     background-color: @cui-gray-100;
 
-    .fa:before {
+    .fa::before {
       color: @cui-blue-500;
     }
   }
@@ -85,6 +85,7 @@
   .hue-sidebar-item:hover {
     color: @cui-blue-500;
     background-color: @cui-gray-100;
+
     .sidebar-icon {
       color: @cui-blue-500;
     }
@@ -135,20 +136,23 @@
       padding-top: 15px;
       padding-bottom: 15px;
       text-align: center;
+
       i {
         .hue-ease-transition(color);
       }
     }
 
-    .dz-drag-hover, .dropzone:hover {
-      background-color: @cui-gray-200!important;
+    .dz-drag-hover,
+    .dropzone:hover {
+      background-color: @cui-gray-200 !important;
+
       i {
         color: @cui-blue-500;
       }
     }
 
     a {
-      .pointer
+      .pointer;
     }
   }
 }
@@ -156,7 +160,8 @@
 .hue-sidebar.collapsed {
   width: @collapsed-sidebar-width;
 
-  .hue-sidebar-category-item, .sidebar-item-name {
+  .hue-sidebar-category-item,
+  .sidebar-item-name {
     opacity: 0;
   }
 

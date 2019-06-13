@@ -1,0 +1,16 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: impala-statestore-{{ .Values.name }}
+spec:
+  ports:
+    - port: 24000
+      targetPort: 24000
+      name: im-ss
+      protocol: TCP
+    - port: 25010
+      targetPort: 25010
+      name: im-ss-web
+      protocol: TCP
+  selector:
+    name: impala-statestore-{{ .Values.name }}

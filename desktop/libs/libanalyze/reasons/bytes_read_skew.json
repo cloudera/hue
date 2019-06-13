@@ -8,7 +8,7 @@
     "max",
     "avg"
   ],
-  "unit_id": 0,
+  "unit": 5,
   "rule": {
     "condition": "vars['IOBound']==True",
     "expr": "(vars['max'] - vars['avg']) / 100000000 / 5",

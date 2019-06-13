@@ -116,7 +116,7 @@ var HueFileEntry = (function () {
           var entryType = entry.definition().type;
           return (typeFilter === 'all' || entryType === typeFilter || entryType === 'directory')
             && (!filter || entry.definition().name.toLowerCase().indexOf(filter) !== -1 ||
-            (HUE_I18n.documentType[entryType] && HUE_I18n.documentType[entryType].toLowerCase().indexOf(filter) !== -1) ||
+            (window.DOCUMENT_TYPE_I18n[entryType] && window.DOCUMENT_TYPE_I18n[entryType].toLowerCase().indexOf(filter) !== -1) ||
             entry.definition().description.toLowerCase().indexOf(filter) !== -1);
         })
       }
@@ -560,16 +560,7 @@ var HueFileEntry = (function () {
         self.load();
       }
     } else {
-      if (IS_HUE_4) {
-        huePubSub.publish('open.link', self.definition().absoluteUrl);
-      } else {
-        if (e && ((e.which || e.button) !== 1 || (e.ctrlKey || e.shiftKey || e.metaKey))) {
-          window.open(self.definition().absoluteUrl);
-        }
-        else {
-          window.location.href = self.definition().absoluteUrl;
-        }
-      }
+      huePubSub.publish('open.link', self.definition().absoluteUrl);
     }
   };
 
@@ -799,7 +790,7 @@ var HueFileEntry = (function () {
 
   HueFileEntry.prototype.downloadThis = function () {
     var self = this;
-    window.location.href = '/desktop/api2/doc/export?documents=' + ko.mapping.toJSON([ self.definition().id ]);
+    window.location.href = window.HUE_BASE_URL + '/desktop/api2/doc/export?documents=' + ko.mapping.toJSON([ self.definition().id ]);
   };
 
   HueFileEntry.prototype.download = function () {
@@ -809,7 +800,7 @@ var HueFileEntry = (function () {
         var ids = self.selectedEntries().map(function (entry) {
           return entry.definition().id;
         });
-        window.location.href = '/desktop/api2/doc/export?documents=' + ko.mapping.toJSON(ids);
+        window.location.href = window.HUE_BASE_URL + '/desktop/api2/doc/export?documents=' + ko.mapping.toJSON([ self.definition().id ]);
       } else {
         self.downloadThis();
       }

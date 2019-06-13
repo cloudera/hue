@@ -1,0 +1,21 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: impala-catalog-{{ .Values.name }}
+spec:
+  clusterIP: None
+  ports:
+    - port: 26000
+      targetPort: 26000
+      name: im-ct
+      protocol: TCP
+    - port: 24000
+      targetPort: 24000
+      name: im-ss
+      protocol: TCP
+    - port: 25020
+      targetPort: 25020
+      name: im-ct-web
+      protocol: TCP
+  selector:
+    name: impala-catalog-{{ .Values.name }}

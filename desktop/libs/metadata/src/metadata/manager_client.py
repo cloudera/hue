@@ -82,7 +82,7 @@ class ManagerApi(object):
       raise ManagerApiException(e)
 
 
-  def get_spark_history_server_url(self, cluster_name=None):
+  def get_spark_history_server_configs(self, cluster_name=None):
     service_name = "SPARK_ON_YARN"
     shs_role_type = "SPARK_YARN_HISTORY_SERVER"
 
@@ -115,27 +115,44 @@ class ManagerApi(object):
             'spark_service_display_name': spark_service_display_name,
             'shs_server_name': shs_server_name
           }, params={'view': 'full'})['items']
-
-          shs_ui_port = None
-          shs_ssl_port = None
-          shs_ssl_enabled = None
-          for config in shs_server_configs:
-            if 'relatedName' in config and 'default' in config:
-              if config['relatedName'] == 'spark.history.ui.port':
-                shs_ui_port = config['default']
-              if config['relatedName'] == 'spark.ssl.historyServer.port':
-                shs_ssl_port = config['default']
-              if config['relatedName'] == 'spark.ssl.historyServer.enabled':
-                shs_ssl_enabled = config['default']
-          shs_ui_host = self._root.get('hosts/%(hostId)s' % {'hostId': shs_server_hostId})
-          shs_ui_hostname = shs_ui_host['hostname'] if shs_ui_host else None
-
-          return self.assemble_shs_url(shs_ui_hostname, shs_ui_port, shs_ssl_port, shs_ssl_enabled)
-
+          return shs_server_hostId, shs_server_configs
     except Exception, e:
-      LOG.warn("Check Spark history server via ManangerAPI: %s" % e)
+      LOG.warn("Check Spark History Server via ManagerApi: %s" % e)
+
+    return None, None
+
+  def get_spark_history_server_url(self, cluster_name=None):
+    shs_server_hostId, shs_server_configs = self.get_spark_history_server_configs(cluster_name=cluster_name)
+
+    if shs_server_hostId and shs_server_configs:
+      shs_ui_port = None
+      shs_ssl_port = None
+      shs_ssl_enabled = None
+      for config in shs_server_configs:
+        if 'relatedName' in config and 'default' in config:
+          if config['relatedName'] == 'spark.history.ui.port':
+            shs_ui_port = config['default']
+          if config['relatedName'] == 'spark.ssl.historyServer.port':
+            shs_ssl_port = config['default']
+          if config['relatedName'] == 'spark.ssl.historyServer.enabled':
+            shs_ssl_enabled = config['default']
+      shs_ui_host = self._root.get('hosts/%(hostId)s' % {'hostId': shs_server_hostId})
+      shs_ui_hostname = shs_ui_host['hostname'] if shs_ui_host else None
+
+      return self.assemble_shs_url(shs_ui_hostname, shs_ui_port, shs_ssl_port, shs_ssl_enabled)
 
     return None
+
+  def get_spark_history_server_security_enabled(self, cluster_name=None):
+    shs_server_hostId, shs_server_configs = self.get_spark_history_server_configs(cluster_name=cluster_name)
+
+    if shs_server_configs:
+      for config in shs_server_configs:
+        if 'relatedName' in config and 'default' in config and config['relatedName'] == 'history_server_spnego_enabled':
+          shs_security_enabled = config['default']
+          return shs_security_enabled and shs_security_enabled == 'true'
+
+    return False
 
   def assemble_shs_url(self, shs_ui_hostname, shs_ui_port=None, shs_ssl_port=None, shs_ssl_enabled=None):
     if not shs_ui_hostname or not shs_ui_port or not shs_ssl_port or not shs_ssl_enabled:

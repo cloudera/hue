@@ -1,0 +1,118 @@
+<rules>
+  <rule dir="IN" name="HUE/hue/inbound/huerule" flow="OR">
+    <!-- We have exceptions for dashboard/hbase/notebook, because endpoint that ends at the app/lib level need to terminate with a slash and we remove them in generic case. -->
+    <!-- Other solution would be to accept trailing slash on all endpoints, but there's some issue with the filebrowser -->
+    <match pattern="*://*:*/**/hue/hue/dashboard?{**}">
+      <rewrite template="{$serviceUrl[HUE]}/hue/dashboard/?{**}"/>
+    </match>
+    <match pattern="*://*:*/**/hue/dashboard?{**}">
+      <rewrite template="{$serviceUrl[HUE]}/dashboard/?{**}"/>
+    </match>
+    <match pattern="*://*:*/**/hue/hue/hbase?{**}">
+      <rewrite template="{$serviceUrl[HUE]}/hue/hbase/?{**}"/>
+    </match>
+    <match pattern="*://*:*/**/hue/hbase?{**}">
+      <rewrite template="{$serviceUrl[HUE]}/hbase/?{**}"/>
+    </match>
+    <match pattern="*://*:*/**/hue/hue/jobbrowser?{**}">
+      <rewrite template="{$serviceUrl[HUE]}/hue/jobbrowser/?{**}"/>
+    </match>
+    <match pattern="*://*:*/**/hue/jobbrowser?{**}">
+      <rewrite template="{$serviceUrl[HUE]}/jobbrowser/?{**}"/>
+    </match>
+    <match pattern="*://*:*/**/hue/hue/notebook?{**}">
+      <rewrite template="{$serviceUrl[HUE]}/hue/notebook/?{**}"/>
+    </match>
+    <match pattern="*://*:*/**/hue/notebook?{**}">
+      <rewrite template="{$serviceUrl[HUE]}/notebook/?{**}"/>
+    </match>
+    <!-- We have exceptions for static because it can have hue or static further in the URL and KNOX matches the last one with **, but we want to match the first one. -->
+    <match pattern="*://*:*/**/hue/static/{**}?{**}">
+      <rewrite template="{$serviceUrl[HUE]}/static/{**}?{**}"/>
+    </match>
+    <!-- The rest: Generic case -->
+    <match pattern="*://*:*/**/hue/hue/{**}?{**}">
+      <rewrite template="{$serviceUrl[HUE]}/hue/{**}?{**}"/>
+    </match>
+    <match pattern="*://*:*/**/hue/{**}?{**}">
+      <rewrite template="{$serviceUrl[HUE]}/{**}?{**}"/>
+    </match>
+    <match pattern="*://*:*/**/hue/{**}">
+      <rewrite template="{$serviceUrl[HUE]}/{**}"/>
+    </match>
+    <match pattern="*://*:*/**/hue/">
+      <rewrite template="{$serviceUrl[HUE]}/"/>
+    </match>
+ </rule>
+
+  <rule dir="OUT" name="HUE/hue/outbound/huerooturl/desktop" flow="OR">
+    <match pattern="/desktop/{**}?{**}" >
+       <rewrite template="{$frontend[path]}/hue/desktop/{**}?{**}"/>
+    </match>
+  </rule>
+  <rule dir="OUT" name="HUE/hue/outbound/huerooturl/static" flow="OR">
+    <match pattern="/static/{**}?{**}">
+       <rewrite template="{$frontend[path]}/hue/static/{**}?{**}"/>
+    </match>
+  </rule>
+  <rule dir="OUT" name="HUE/hue/outbound/huerooturl/css" pattern="/static/{*}/{**}?{**}">
+    <rewrite template="{$frontend[path]}/hue/static/{*}/{**}?{**}"/>
+  </rule>
+  <rule dir="OUT" name="HUE/hue/outbound/huerooturl/root" pattern="/boohoo">
+    <rewrite template="{$frontend[path]}/hue/boohoo"/>
+  </rule>
+  <filter name="HUE/hue/outbound/huerooturl">
+    <content type="*/html">
+        <apply path="/desktop/globalJsConstants.*" rule="HUE/hue/outbound/huerooturl/desktop"/>
+        <apply path="/boohoo" rule="HUE/hue/outbound/huerooturl/root"/>
+        <apply path="\/static\/.*\/.*\.(js|css|html|png)" rule="HUE/hue/outbound/huerooturl/static"/>
+        <apply path="\/static\/desktop\/js\/ace" rule="HUE/hue/outbound/huerooturl/static"/>
+    </content>
+    <content type="*/css">
+        <apply path="\/static\/.*\/.*\.(js|css|html|png)" rule="HUE/hue/outbound/huerooturl/static"/>
+    </content>
+  </filter>
+
+  <filter name="HUE/hue/outbound/workers">
+    <content type="*/javascript">
+        <apply path="\/static\/.*\/.*\.(js|css|html|png)" rule="HUE/hue/outbound/huerooturl/static"/>
+    </content>
+  </filter>
+
+  <rule dir="OUT" name="HUE/hue/outbound/global/base/hue" flow="OR">
+    <match pattern="/KNOX_BASE_PATH_HUE" >
+       <rewrite template="{$frontend[path]}/hue"/>
+    </match>
+  </rule>
+  <rule dir="OUT" name="HUE/hue/outbound/global/base/knox" flow="OR">
+    <match pattern="/KNOX_BASE_URL" >
+       <rewrite template="{$frontend[url]}"/>
+    </match>
+  </rule>
+  <filter name="HUE/hue/outbound/global">
+    <content type="*/javascript">
+        <apply path="/KNOX_BASE_PATH_HUE" rule="HUE/hue/outbound/global/base/hue"/>
+        <apply path="/KNOX_BASE_URL" rule="HUE/hue/outbound/global/base/knox"/>
+    </content>
+  </filter>
+
+  <rule dir="OUT" name="HUE/hue/outbound/headers/location" flow="OR">
+    <match pattern="/hue/{**}?{**}">
+      <rewrite template="{$frontend[path]}/hue/hue/{**}?{**}"/>
+    </match>
+    <match pattern="/hue">
+      <rewrite template="{$frontend[path]}/hue/hue"/>
+    </match>
+    <match pattern="/{**}?{**}">
+      <rewrite template="{$frontend[path]}/hue/{**}?{**}"/>
+    </match>
+    <match pattern="/">
+      <rewrite template="{$frontend[path]}/hue/"/>
+    </match>
+  </rule>
+  <filter name="HUE/hue/outbound/headers">
+    <content type="application/x-http-headers">
+       <apply path="Location" rule="HUE/hue/outbound/headers/location"/>
+    </content>
+  </filter>
+</rules>

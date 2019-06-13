@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: impala-catalog-{{ .Values.name }}
+spec:
+  serviceName: impala-catalog-{{ .Values.name }}
+  replicas: 1
+  selector:
+    matchLabels:
+      name: impala-catalog-{{ .Values.name }}
+  template:
+    metadata:
+      labels:
+        name: impala-catalog-{{ .Values.name }}
+    spec:
+      containers:
+        - name: impala-catalog-{{ .Values.name }}
+          image: {{ .Values.registry }}/impala-catalog:{{ .Values.tag }}
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "1024Mi"
+              cpu: "1500m"
+            limits:
+              memory: "1024Mi"
+              cpu: "1500m"
+          ports:
+            - containerPort: 26000
+              name: im-ct
+              protocol: TCP
+            - containerPort: 24000
+              name: im-ss
+              protocol: TCP
+            - containerPort: 25020
+              name: im-ct-web
+              protocol: TCP
+          env:
+          - name: IMPALA_STATESTORE
+            value: impala-statestore-{{ .Values.name }}
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/alternatives/impala-conf/hdfs-site.xml
+              subPath: hdfs-site.xml
+            - name: config-volume
+              mountPath: /etc/alternatives/impala-conf/core-site.xml
+              subPath: core-site.xml
+            - name: config-volume
+              mountPath: /etc/alternatives/impala-conf/hive-site.xml
+              subPath: hive-site.xml
+      volumes:
+        - name: config-volume
+          configMap:
+            name: impala-config

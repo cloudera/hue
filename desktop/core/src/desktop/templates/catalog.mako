@@ -70,7 +70,7 @@
 
     var CatalogViewModel = function () {
       var self = this;
-      self.apiHelper = ApiHelper.getInstance();
+      self.apiHelper = window.apiHelper;
 
       self.query = ko.observable("");
 

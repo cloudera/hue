@@ -106,5 +106,12 @@ dependency-reduced-pom.xml
 
 # Node Modules
 node_modules/
+webpack-stats*.json
 
 junitresults*
+
+# Generated js bundles
+desktop/core/src/desktop/static/desktop/js/bundles/
+
+# Hugo generated files
+docs/docs-site/public/

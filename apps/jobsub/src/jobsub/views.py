@@ -31,7 +31,6 @@ import time as py_time
 from django.utils.translation import ugettext as _
 
 from desktop import appmanager
-from desktop.conf import IS_HUE_4
 from desktop.lib.django_util import render, render_json
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
@@ -107,8 +106,7 @@ def list_designs(request):
       'currentuser': request.user,
       'owner': owner,
       'name': name,
-      'apps': appmanager.get_apps_dict(),
-      'is_hue_4': IS_HUE_4.get()
+      'apps': appmanager.get_apps_dict()
     })
 
 def not_available(request):

@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hue-config
+data:
+  hue-ini: |
+    [impala]
+    server_host=hostname.com
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: hue
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hue
+    spec:
+      containers:
+        - name: hue
+          image: gethue/hue:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8888
+          volumeMounts:
+          - name: config-volume
+            mountPath: /usr/share/hue/desktop/conf/z-hue.ini
+            subPath: hue-ini
+      volumes:
+        - name: config-volume
+          configMap:
+            name: hue-config
+---
+
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: celery-worker
+  labels:
+    deployment: celery-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      pod: celery-worker
+  template:
+    metadata:
+      labels:
+        pod: celery-worker
+    spec:
+      containers:
+        - name: celery-worker
+          image: hue
+          command: ['./build/env/bin/celery', 'worker', '-A', 'desktop', '-l', 'info']
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: user
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: password
+
+            - name: POSTGRES_HOST
+              value: postgres-service
+
+            - name: REDIS_HOST
+              value: redis-service

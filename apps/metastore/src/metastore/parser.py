@@ -24,6 +24,7 @@ import re
 SIMPLE_SCALAR = '[a-z]+'
 DECIMAL_SCALAR = 'decimal\(\d+,\d+\)'
 DOUBLE_SCALAR = 'double\(\d+,\d+\)'
+VARCHAR_SCALAR = 'varchar\(\d+\)'
 
 
 def parse_column(name, type_string, comment=None):
@@ -38,6 +39,7 @@ def parse_column(name, type_string, comment=None):
   }
   simple_type, inner = _parse_type(type_string)
   column['type'] = simple_type
+
   if inner:
     column.update(_parse_complex(simple_type, inner))
   return column
@@ -48,10 +50,14 @@ def is_scalar_type(type_string):
 
 
 def _parse_type(type_string):
-  pattern = re.compile('^(%(simple)s|%(decimal)s|%(double)s)(<(.+)>)?$' % {
+  pattern = re.compile('^(%(simple)s|%(decimal)s|%(double)s|%(varchar)s)(<(.+)>)?$' % {
     'simple': SIMPLE_SCALAR,
     'decimal': DECIMAL_SCALAR,
-    'double': DOUBLE_SCALAR}, re.IGNORECASE)
+    'double': DOUBLE_SCALAR,
+    'varchar': VARCHAR_SCALAR,
+    },
+    re.IGNORECASE
+  )
   match = re.search(pattern, type_string)
   return match.group(1), match.group(3)
 

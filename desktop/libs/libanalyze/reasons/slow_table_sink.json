@@ -6,7 +6,7 @@
     "BytesWritten",
     "LocalTime"
   ],
-  "unit_id": 5,
+  "unit": 5,
   "rule": {
     "condition": "vars['BytesWritten'] > 0",
     "expr": "float(vars['LocalTime']) - 0.01 / float(vars['BytesWritten'])",

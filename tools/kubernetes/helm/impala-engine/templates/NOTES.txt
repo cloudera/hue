@@ -1,0 +1,27 @@
+Congratulations, you've launched one Cloudera Data Warehouse Engine!
+
+To check the status of your installation run:
+
+  helm list {{ .Release.Name }}
+
+Also to double check that all the pods are 'READY':
+
+  kubectl get pods -l 'name in (impala-catalog-{{ .Values.name }},impala-statestore-{{ .Values.name }},impala-coordinator-{{ .Values.name }},impala-worker-{{ .Values.name }})'
+
+You should be able to execute queries via:
+
+  kubectl port-forward svc/impala-coordinator-{{ .Values.name }} 21000:21000 &
+  impala-shell -i localhost
+
+Or directly go into a worker node:
+
+  export WORKER_POD=$(kubectl get pods -l name=impala-worker-{{ .Values.name }} -o jsonpath="{.items[0].metadata.name"})
+  echo kubectl exec -it $WORKER_POD bash
+
+Then launch the shell:
+  
+  impala-shell -i impala-coordinator-{{ .Values.name }}
+
+And type some queries
+
+  SHOW TABLES;

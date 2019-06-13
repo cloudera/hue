@@ -22,7 +22,7 @@ function ClusterConfig(params) {
   self.loading = true;
 
   var refreshConfig = function () {
-    ApiHelper.getInstance().getClusterConfig(params).done(function (data) {
+    window.apiHelper.getClusterConfig(params).done(function (data) {
       if (data.status === 0) {
         self.loading = false;
         self.clusterConfig = data;

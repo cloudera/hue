@@ -131,7 +131,7 @@
 
 <script type="text/javascript">
   $('.submit-form .filechooser-input').each(function(){
-    $(this).after(getFileBrowseButton($(this), true, null, true));
+    $(this).after(hueUtils.getFileBrowseButton($(this), true, null, true));
   });
 
   $(".now-link").on("click", function(){

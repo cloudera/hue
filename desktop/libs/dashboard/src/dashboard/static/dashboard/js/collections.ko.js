@@ -125,7 +125,7 @@ var SearchCollectionsModel = function (props) {
 
   self.editCollection = function (collection) {
     cleanCollections();
-    location.href = (IS_HUE_4 ? '/hue' : '') + collection.absoluteUrl();
+    huePubSub.publish('open.link', '/hue' + collection.absoluteUrl());
   };
 
   self.markManyForDeletion = function (collections) {

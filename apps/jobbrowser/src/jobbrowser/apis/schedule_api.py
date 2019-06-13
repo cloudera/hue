@@ -86,6 +86,8 @@ class ScheduleApi(Api):
         'canWrite': has_job_edition_permission(coordinator, self.user),
     }
     common['properties'] = json.loads(response.content)
+    for action in common['properties']['actions']:
+      action['apiStatus'] = self._task_api_status(action['status'])
     common['properties']['tasks'] = common['properties']['actions']
     common['properties']['xml'] = ''
     common['properties']['properties'] = ''
@@ -123,15 +125,41 @@ class ScheduleApi(Api):
       coordinator = self.app(appid)
       return coordinator['properties']['tasks']
 
+  _API_STATUSES = {
+    'PREP':               'RUNNING',
+    'RUNNING':            'RUNNING',
+    'RUNNINGWITHERROR':   'RUNNING',
+    'PREPSUSPENDED':      'PAUSED',
+    'SUSPENDED':          'PAUSED',
+    'SUSPENDEDWITHERROR': 'PAUSED',
+    'PREPPAUSED':         'PAUSED',
+    'PAUSED':             'PAUSED',
+    'PAUSEDWITHERROR':    'PAUSED',
+    'SUCCEEDED':          'SUCCEEDED',
+    'DONEWITHERROR':      'FAILED',
+    'KILLED':             'FAILED',
+    'FAILED':             'FAILED',
+  }
+
   def _api_status(self, status):
-    if status in ['PREP', 'RUNNING', 'RUNNINGWITHERROR']:
-      return 'RUNNING'
-    elif status in ['PREPSUSPENDED', 'SUSPENDED', 'SUSPENDEDWITHERROR', 'PREPPAUSED', 'PAUSED', 'PAUSEDWITHERROR']:
-      return 'PAUSED'
-    elif status == 'SUCCEEDED':
-      return 'SUCCEEDED'
-    else:
-      return 'FAILED' # DONEWITHERROR, KILLED, FAILED
+    return self._API_STATUSES.get(status, 'FAILED')
+
+  _TASK_API_STATUSES = {
+    'WAITING':   'RUNNING',
+    'READY':     'RUNNING',
+    'SUBMITTED': 'RUNNING',
+    'RUNNING':   'RUNNING',
+    'SUSPENDED': 'PAUSED',
+    'SUCCEEDED': 'SUCCEEDED',
+    'TIMEDOUT':  'FAILED',
+    'KILLED':    'FAILED',
+    'FAILED':    'FAILED',
+    'IGNORED':   'FAILED',
+    'SKIPPED':   'FAILED',
+  }
+
+  def _task_api_status(self, status):
+    return self._TASK_API_STATUSES.get(status, 'FAILED')
 
 
 class MockGet():

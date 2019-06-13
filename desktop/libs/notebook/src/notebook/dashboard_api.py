@@ -211,10 +211,15 @@ class SQLDashboardApi(DashboardApi):
   # This method currently behaves more like a static method
   def datasets(self, show_all=False):
     snippet = {'type': self.engine}
+
     # Ideally from left assist at some point instead
     databases = get_api(MockRequest(self.user, self.cluster), snippet).autocomplete(snippet)['databases']
-    database = databases and 'default' not in databases and databases[0] or 'default'
-    return [database + '.' + table['name'] for table in get_api(MockRequest(self.user, self.cluster), snippet).autocomplete(snippet, database=database)['tables_meta']]
+    database = databases and 'default' not in databases and sorted(databases)[0] or 'default'
+
+    return [
+      database + '.' + table['name']
+      for table in get_api(MockRequest(self.user, self.cluster), snippet).autocomplete(snippet, database=database)['tables_meta']
+    ]
 
 
   # This method currently behaves more like a static method
@@ -351,7 +356,7 @@ class SQLDashboardApi(DashboardApi):
           status = api.check_status(mock_notebook, snippet)
           if status['status'] == 'available':
             result = api.fetch_result(mock_notebook, snippet, rows=10, start_over=True)
-            api.close_statement(snippet)
+            api.close_statement(mock_notebook, snippet)
             break
           time.sleep(sleep_interval)
           curr = time.time()
@@ -361,7 +366,7 @@ class SQLDashboardApi(DashboardApi):
             api.cancel_operation(snippet)
           except Exception, e:
             LOG.warning("Failed to cancel query: %s" % e)
-            api.close_statement(snippet)
+            api.close_statement(mock_notebook, snippet)
           raise OperationTimeout(e)
 
     return result

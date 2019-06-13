@@ -21,5 +21,5 @@ set -o xtrace
 cd $(dirname $0)
 
 
+thrift -I thrift/include -r --gen py:new_style -o ./ thrift/hive_metastore.thrift
 thrift -I thrift/include -r --gen py:new_style -o ./ thrift/TCLIService.thrift
-

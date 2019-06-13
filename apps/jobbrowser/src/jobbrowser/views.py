@@ -139,8 +139,16 @@ def jobs(request):
   if request.POST.get('format') == 'json':
     try:
       # Limit number of jobs to be 1000
-      jobs = get_api(request.user, request.jt).get_jobs(user=request.user, username=user, state=state, text=text,
-                                                        retired=retired, limit=1000, time_value=int(time_value), time_unit=time_unit)
+      jobs = get_api(request.user, request.jt).get_jobs(
+          user=request.user,
+          username=user,
+          state=state,
+          text=text,
+          retired=retired,
+          limit=1000,
+          time_value=int(time_value),
+          time_unit=time_unit
+      )
     except Exception, ex:
       ex_message = str(ex)
       if 'Connection refused' in ex_message or 'standby RM' in ex_message:
@@ -188,6 +196,7 @@ def massage_job_for_json(job, request=None, user=None):
     'desiredMaps': job.desiredMaps,
     'desiredReduces': job.desiredReduces,
     'applicationType': hasattr(job, 'applicationType') and job.applicationType or None,
+    'type': hasattr(job, 'type') and job.type or None,
     'mapsPercentComplete': int(job.maps_percent_complete) if job.maps_percent_complete else '',
     'finishedMaps': job.finishedMaps,
     'finishedReduces': job.finishedReduces,
@@ -349,8 +358,8 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
           log_link = log_link.replace(attempt['nodeHttpAddress'], attempt['nodeId'])
       elif app['state'] == 'RUNNING':
         log_link = app['amContainerLogs']
-    elif app['applicationType'] == 'Oozie Launcher':
-      log_link = app['amContainerLogs']
+    elif app.get('amContainerLogs'):
+      log_link = app.get('amContainerLogs')
   except (KeyError, RestException), e:
     raise KeyError(_("Cannot find job attempt '%(id)s'.") % {'id': job.jobId}, e)
   except Exception, e:
@@ -358,12 +367,10 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
 
   if log_link:
     link = '/%s/' % name
-    if app['applicationType'] == 'Oozie Launcher' and app['state'] != 'FINISHED': # Yarn currently dumps with 500 error with doas in running state
-      params = {}
-    else:
-      params = {
-        'doAs': request.user.username
-      }
+    params = {
+      'doAs': request.user.username
+    }
+      
     if offset != 0:
       params['start'] = offset
 
@@ -393,7 +400,7 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
 @check_job_permission
 def job_single_logs(request, job, offset=LOG_OFFSET_BYTES):
   """
-  Try to smartly detect the most useful task attempt (e.g. Oozie launcher, failed task) and get its MR logs.
+  Try to smartly detect the most useful task attempt (e.g. YarnV2, failed task) and get its MR logs.
   """
   def cmp_exec_time(task1, task2):
     return cmp(task1.execStartTimeMs, task2.execStartTimeMs)
@@ -520,7 +527,9 @@ def single_task_attempt_logs(request, job, taskid, attemptid, offset=LOG_OFFSET_
 
   try:
     # Add a diagnostic log
-    if job_link.is_mr2:
+    if hasattr(task, 'job') and hasattr(task.job, 'diagnostics'):
+      diagnostic_log = task.job.diagnostics
+    elif job_link.is_mr2:
       diagnostic_log = attempt.diagnostics
     else:
       diagnostic_log =  ", ".join(task.diagnosticMap[attempt.attemptId])
@@ -539,6 +548,7 @@ def single_task_attempt_logs(request, job, taskid, attemptid, offset=LOG_OFFSET_
       "joblnk": job_link,
       "task": task,
       "logs": logs,
+      "logs_list": attempt.get_log_list(),
       "first_log_tab": first_log_tab,
   }
 
@@ -550,6 +560,7 @@ def single_task_attempt_logs(request, job, taskid, attemptid, offset=LOG_OFFSET_
   if request.GET.get('format') == 'json':
     response = {
       "logs": context['logs'],
+      "logsList": context['logs_list'],
       "isRunning": job.status.lower() in ('running', 'pending', 'prep')
     }
     return JsonResponse(response)

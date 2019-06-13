@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: impala-statestore-{{ .Values.name }}
+  labels:
+    name: impala-statestore-{{ .Values.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: impala-statestore-{{ .Values.name }}
+  template:
+    metadata:
+      labels:
+        name: impala-statestore-{{ .Values.name }}
+    spec:
+      containers:
+        - name: impala-statestore-{{ .Values.name }}
+          image: {{ .Values.registry }}/impala-statestore:{{ .Values.tag }}
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "1000m"
+            limits:
+              memory: "512Mi"
+              cpu: "1000m"
+          ports:
+            - containerPort: 24000
+              name: im-ss
+              protocol: TCP
+            - containerPort: 25010
+              name: im-ss-web
+              protocol: TCP

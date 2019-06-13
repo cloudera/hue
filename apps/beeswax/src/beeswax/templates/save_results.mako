@@ -76,29 +76,7 @@ ${layout.menubar(section='query')}
 
 <script type="text/javascript">
   $(document).ready(function () {
-    $("input[name='target_dir']").after(getFileBrowseButton($("input[name='target_dir']")));
-
-    function getFileBrowseButton(inputElement) {
-      return $("<a>").addClass("btn").addClass("fileChooserBtn").text("..").click(function (e) {
-        e.preventDefault();
-        $("#fileChooserModal").jHueFileChooser({
-          onFolderChange:function (filePath) {
-            inputElement.val(filePath);
-          },
-          onFolderChoose:function (filePath) {
-            inputElement.val(filePath);
-            $("#fileChooserModal").slideUp();
-          },
-          createFolder:false,
-          uploadFile:false,
-          selectFolder:true,
-          initialPath:$.trim(inputElement.val())
-        });
-        $("#fileChooserModal").slideDown();
-        $("input[name='target_dir']").parents(".control-group").removeClass("error");
-        $("input[name='target_dir']").parents(".control-group").find(".fileChooserBtn").removeClass("btn-danger");
-      });
-    }
+    $("input[name='target_dir']").after(hueUtils.getFileBrowseButton($("input[name='target_dir']")));
 
     var viewModel = {
       toWhere: ko.observable("${ extract_field_data(form['save_target']) }")

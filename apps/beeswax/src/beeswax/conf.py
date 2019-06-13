@@ -45,6 +45,18 @@ HIVE_SERVER_PORT = Config(
   default=10000,
   type=int)
 
+HIVE_METASTORE_HOST = Config(
+  key="hive_metastore_host",
+  help=_t("Host where Hive Metastore Server (HMS) is running. If Kerberos security is enabled, "
+         "the fully-qualified domain name (FQDN) is required"),
+  default="localhost")
+
+HIVE_METASTORE_PORT = Config(
+  key="hive_metastore_port",
+  help=_t("Configure the port the Hive Metastore Server runs on."),
+  default=9083,
+  type=int)
+
 HIVE_CONF_DIR = Config(
   key='hive_conf_dir',
   help=_t('Hive configuration directory, where hive-site.xml is located.'),

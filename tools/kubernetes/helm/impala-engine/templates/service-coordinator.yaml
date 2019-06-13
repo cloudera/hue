@@ -1,0 +1,24 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: impala-coordinator-{{ .Values.name }}
+spec:
+  clusterIP: None
+  ports:
+    - port: 21000
+      name: im-sr
+      protocol: TCP
+    - port: 21050
+      name: thrift
+      protocol: TCP
+    - port: 22000
+      name: state-heartbeat
+      protocol: TCP
+    - port: 23000
+      name: state-heartbeat-topic
+      protocol: TCP
+    - port: 25000
+      name: im-sr-web
+      protocol: TCP
+  selector:
+    name: impala-coordinator-{{ .Values.name }}

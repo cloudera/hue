@@ -16,7 +16,8 @@
  limitations under the License.
 */
 
-.dataTables_wrapper:hover > .hue-scrollbar-x-rail, .hue-scrollbar-x-rail:hover {
+.dataTables_wrapper:hover > .hue-scrollbar-x-rail,
+.hue-scrollbar-x-rail:hover {
   opacity: 1;
 }
 
@@ -25,13 +26,15 @@
   z-index: 1039;
   padding: 0;
   background-color: transparent;
-  &>.hue-scrollbar-x {
+
+  & > .hue-scrollbar-x {
     position: absolute;
     background-color: @cui-gray-300;
     border-radius: 5px;
     border: 1px solid @cui-white;
     height: 7px;
     z-index: 1039;
+
     &:hover {
       background-color: @cui-gray-500;
     }

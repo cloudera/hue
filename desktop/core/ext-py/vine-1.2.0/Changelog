@@ -1,0 +1,148 @@
+Changes
+=======
+
+.. _version-1.2.0:
+:release-date: 2018-01-06 4:30 P.M UTC+2
+:release-by: Omer Katz
+
+1.2.0
+=====
+
+- Added Python 3.7 support.
+
+  Contributed by **Jon Dufresne** & **:github_user:`dequis`**
+
+- Handle bound methods in weak reference promise instances.
+
+  Contributed by **George Psarakis**
+
+Documentation fixes, CI adjustments and cleanups by:
+
+- **Omer Katz**
+- **Jon Dufresne**
+- **Edward Betts**
+- **Jacopo Notarstefano**
+- **Christopher Hoskin**
+- **Fahad Siddiqui**
+
+.. _version-1.1.4:
+
+1.1.4
+=====
+:release-date: 2017-07-16 10:30 P.M UTC+2
+:release-by: Ask Solem
+
+- Added official support for Python 3.5 & 3.6.
+- Improve Python 2/3 compatibility.
+- Don't set mutable default values to keyword arguments.
+
+.. _version-1.1.3:
+
+1.1.3
+=====
+:release-date: 2016-10-13 06:02 P.M PDT
+:release-by: Ask Solem
+
+- New ``promise(fun, weak=True)`` argument, creates weakref to callback.
+
+.. _version-1.1.2:
+
+1.1.2
+=====
+:release-date: 2016-09-07 04:18 P.M PDT
+:release-by: Ask Solem
+
+- barrier: now handles the case where len(promises) returns NotImplemented.
+
+.. _version-1.1.1:
+
+1.1.1
+=====
+:release-date: 2016-06-30 12:05 P.M PDT
+:release-by: Ask Solem
+
+- Requirements: Tests now depends on :pypi:`case` 1.2.2
+
+- Five: python_2_unicode_compatible now ensures `__repr__` returns
+  bytes on Python 2.
+
+.. _version-1.1.0:
+
+1.1.0
+=====
+:release-date: 2016-04-21 01:30 P.M PDT
+:release-by: Ask Solem
+
+- :meth:`promise.throw() <vine.promises.promise.throw>` now passes partial
+  args/kwargs to the errback:
+
+    .. code-block:: pycon
+
+        >>> p = promise(args=(self,), on_error=handle_error)
+        >>> p.throw(exc)  # --> handle_error(self, exc)
+
+- New :class:`vine.abstract.ThenableProxy` can be used to add
+  promise-capabilities to a class by forwarding to a different promise.
+
+    .. code-block:: python
+
+        from vine import promise
+        from vine.abstract import ThenableProxy
+
+        class P(ThenableProxy):
+
+            def __init__(self, on_success=None, on_error=None):
+                self._set_promise_target(promise(
+                    args=(self,), callback=on_success, on_error=on_error,
+                ))
+
+        p = P()
+        p.then(download_file(url)).then(extract_file)
+
+- :meth:`promise.throw() <vine.promises.promise.throw>` now supports a propagate
+  argument that can be set to False to never reraise the exception.
+
+- :meth:`promise.throw() <vine.promises.promise.throw>` now also reraises the
+  current exception from the stack, if the exc argument is passed and that
+  value is the same as the current exception.
+
+- :meth:`Thenable.register() <vine.abstract.Thenable.register>` can now be
+  used as a decorator.
+
+- Argument to :meth:`promise.throw1(exc) <vine.promises.promise.throw1>` can now be
+  :const:`None` to use the current exception.
+
+- ``monotonic()`` now uses ``librt.so.0`` as an alternative if ``librt.so.1``
+  does not exist.
+
+    Contributed by Fahad Siddiqui.
+
+.. _version-1.0.2:
+
+1.0.2
+=====
+:release-date: 2016-04-11 05:30 P.M PDT
+:release-by: Ask Solem
+
+- ``promise.throw()`` now supports second ``traceback`` argument to
+  throw exception with specific traceback.
+
+    Contributed by Ionel Cristian Mărieș.
+
+.. _version-1.0.1:
+
+1.0.1
+=====
+:release-date: 2016-04-11 03:00 P.M PDT
+:release-by: Ask Solem
+
+- Adds vine.five.python_2_unicode_compatible.
+
+.. _version-1.0.0:
+
+1.0.0
+=====
+:release-date: 2016-04-07 06:02 P.M PDT
+:release-by: Ask Solem
+
+- Initial release.

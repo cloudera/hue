@@ -1,0 +1,17 @@
+registry: "docker-registry.infra.cloudera.com/cloudera/datawarehouse"
+tag: "v2"
+name: "datawarehouse"
+worker:
+  cpuRequest: "1000m"
+  memoryRequest: "2048Mi"
+  replicas: 1
+metastore:
+  uris: thrift://hive:9083
+hdfs:
+  namenode:
+    host: "hdfs-namenode"
+    port: 8020
+aws:
+  accessKeyId: ""
+  secretAccessKey: ""
+  region: "us-east-1"

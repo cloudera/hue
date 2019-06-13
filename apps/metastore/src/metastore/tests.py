@@ -63,6 +63,7 @@ def _make_query(client, query, submission_type="Execute",
 
 class TestMetastoreWithHadoop(BeeswaxSampleProvider):
   requires_hadoop = True
+  integration = True
 
   def setUp(self):
     user = User.objects.get(username='test')
@@ -465,6 +466,15 @@ class TestParser(object):
     name = 'simple'
     type = 'string'
     comment = 'test_parse_simple'
+    column = {'name': name, 'type': type, 'comment': comment}
+    parse_tree = parser.parse_column(name, type, comment)
+    assert_equal(parse_tree, column)
+
+
+  def test_parse_varchar(self):
+    name = 'varchar'
+    type = 'varchar(1000)'
+    comment = 'test_parse_varchar'
     column = {'name': name, 'type': type, 'comment': comment}
     parse_tree = parser.parse_column(name, type, comment)
     assert_equal(parse_tree, column)

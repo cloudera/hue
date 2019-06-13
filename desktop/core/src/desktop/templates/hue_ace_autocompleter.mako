@@ -387,7 +387,7 @@ from desktop.views import _ko
         self.snippet = params.snippet || {};
         self.foreachVisible = ko.observable();
 
-        self.autocompleter = params.autocompleter || new SqlAutocompleter3(params);
+        self.autocompleter = params.autocompleter || new SqlAutocompleter(params);
         self.suggestions = self.autocompleter.suggestions;
 
         self.active = ko.observable(false).extend({ rateLimit: 10 }); // to prevent flickering on empty result

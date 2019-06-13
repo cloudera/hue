@@ -24,9 +24,8 @@ import logging
 import django.http
 from django.utils.translation import ugettext as _
 
-from beeswax.design import normalize_form_dict, denormalize_form_dict, strip_trailing_semicolon,\
-                           split_statements
-
+from beeswax.design import normalize_form_dict, denormalize_form_dict, split_statements
+from notebook.sql_utils import strip_trailing_semicolon
 
 LOG = logging.getLogger(__name__)
 

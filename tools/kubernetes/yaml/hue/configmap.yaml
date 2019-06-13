@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hue-config
+data:
+  hue-ini: |
+    [desktop]
+      [[task_server]]
+        enabled=false
+
+    [impala]
+      server_host=hostname.com

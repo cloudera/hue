@@ -28,7 +28,7 @@
 
   <groupId>com.cloudera.hue</groupId>
   <artifactId>hue-parent</artifactId>
-  <version>4.3.0.7.0.0.0-SNAPSHOT</version>
+  <version>4.4.0.7.0.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Hue Maven Parent POM</name>
@@ -44,7 +44,7 @@
 
   <properties>
     <minJavaVersion>1.7</minJavaVersion>
-    <maxJavaVersion>10.0</maxJavaVersion>
+    <maxJavaVersion>12.0</maxJavaVersion>
     <sourceJavaVersion>1.7</sourceJavaVersion>
     <targetJavaVersion>1.7</targetJavaVersion>
   </properties>

@@ -57,7 +57,9 @@
   position: absolute;
 }
 
-.hamburger-inner, .hamburger-inner::before, .hamburger-inner::after {
+.hamburger-inner,
+.hamburger-inner::before,
+.hamburger-inner::after {
   width: 24px;
   height: 3px;
   background-color: @hue-primary-color-dark;
@@ -66,7 +68,8 @@
   .hue-ease-transition(~"transform, -webkit-transform");
 }
 
-.hamburger-inner::before, .hamburger-inner::after {
+.hamburger-inner::before,
+.hamburger-inner::after {
   content: "";
   display: block;
 }

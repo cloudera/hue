@@ -94,6 +94,9 @@ class WebHdfs(HadoopWebHdfs):
       "Authorization": self._auth_provider.get_token(),
     }
 
+  def is_web_accessible(self):
+    return False # Does not support OP=GETDELEGATIONTOKEN HADOOP-14579
+
   def get_upload_chuck_size(self):
     return UPLOAD_CHUCK_SIZE
 

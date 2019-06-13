@@ -23,10 +23,7 @@ import os
 import socket
 import stat
 
-try:
-  from collections import OrderedDict
-except ImportError:
-  from ordereddict import OrderedDict # Python 2.6
+from collections import OrderedDict
 
 from django.db import connection
 from django.utils.translation import ugettext_lazy as _
@@ -40,14 +37,15 @@ from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection,\
                              validate_path, list_of_compiled_res, coerce_str_lowercase, \
                              coerce_password_from_script, coerce_string
 from desktop.lib.i18n import force_unicode
-from desktop.lib.paths import get_desktop_root
+from desktop.lib.paths import get_desktop_root, get_run_root
+
 
 LOG = logging.getLogger(__name__)
 
 
 def is_oozie_enabled():
   """Oozie needs to be available as it is the backend."""
-  return len([app for app in appmanager.DESKTOP_MODULES if app.name == 'oozie']) > 0 and is_hue4()
+  return len([app for app in appmanager.DESKTOP_MODULES if app.name == 'oozie']) > 0
 
 def coerce_database(database):
   if database == 'mysql':
@@ -203,20 +201,49 @@ SSL_CIPHER_LIST = Config(
   # From https://wiki.mozilla.org/Security/Server_Side_TLS v3.7 default
   # recommendation, which should be compatible with Firefox 1, Chrome 1, IE 7,
   # Opera 5 and Safari 1.
-  default=(
-      "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:"
-      "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:"
-      "DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:"
-      "kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:"
-      "ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:"
-      "ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:"
-      "ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:"
-      "DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:"
-      "DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:"
-      "AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:"
-      "!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:"
-      "!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA"
-  ))
+  default=':'.join([
+    'ECDHE-RSA-AES128-GCM-SHA256',
+    'ECDHE-ECDSA-AES128-GCM-SHA256',
+    'ECDHE-RSA-AES256-GCM-SHA384',
+    'ECDHE-ECDSA-AES256-GCM-SHA384',
+    'DHE-RSA-AES128-GCM-SHA256',
+    'DHE-DSS-AES128-GCM-SHA256',
+    'kEDH+AESGCM',
+    'ECDHE-RSA-AES128-SHA256',
+    'ECDHE-ECDSA-AES128-SHA256',
+    'ECDHE-RSA-AES128-SHA',
+    'ECDHE-ECDSA-AES128-SHA',
+    'ECDHE-RSA-AES256-SHA384',
+    'ECDHE-ECDSA-AES256-SHA384',
+    'ECDHE-RSA-AES256-SHA',
+    'ECDHE-ECDSA-AES256-SHA',
+    'DHE-RSA-AES128-SHA256',
+    'DHE-RSA-AES128-SHA',
+    'DHE-DSS-AES128-SHA256',
+    'DHE-RSA-AES256-SHA256',
+    'DHE-DSS-AES256-SHA',
+    'DHE-RSA-AES256-SHA',
+    'AES128-GCM-SHA256',
+    'AES256-GCM-SHA384',
+    'AES128-SHA256',
+    'AES256-SHA256',
+    'AES128-SHA',
+    'AES256-SHA',
+    'AES',
+    'CAMELLIA',
+    'DES-CBC3-SHA',
+    '!aNULL',
+    '!eNULL',
+    '!EXPORT',
+    '!DES',
+    '!RC4',
+    '!MD5',
+    '!PSK',
+    '!aECDH',
+    '!EDH-DSS-DES-CBC3-SHA',
+    '!EDH-RSA-DES-CBC3-SHA',
+    '!KRB5-DES-CBC3-SHA',
+  ]))
 
 SSL_PASSWORD = Config(
   key="ssl_password",
@@ -657,6 +684,36 @@ METRICS = ConfigSection(
   )
 )
 
+
+CONNECTORS = ConfigSection(
+  key='connectors',
+  help=_("""Configuration options for connectors to external services"""),
+  members=dict(
+    IS_ENABLED=Config(
+      key='is_enabled',
+      help=_('Enable connector page'),
+      default=False,
+      type=coerce_bool),
+   LIST=Config(
+      key='list',
+      default=['impala'],
+      type=coerce_csv),
+  )
+)
+
+ANALYTICS = ConfigSection(
+  key='analytics',
+  help=_("""Configuration options for analytics user usage for admins"""),
+  members=dict(
+    IS_ENABLED=Config(
+      key='is_enabled',
+      help=_('Enable analytics page'),
+      default=False,
+      type=coerce_bool),
+  )
+)
+
+
 DATABASE = ConfigSection(
   key='database',
   help=_("""Configuration options for specifying the Desktop Database.
@@ -769,6 +826,24 @@ SESSION = ConfigSection(
       type=int,
       default=0,
     )
+  )
+)
+
+KNOX = ConfigSection(
+  key="knox",
+  help=_("""Configuration options for specifying Hue's KNOX integration for secured Hadoop clusters."""),
+  members=dict(
+    KNOX_PRINCIPAL=Config(
+      key='knox_principal',
+      help=_("Kerberos principal name for Hue. Typically 'knox/hostname.foo.com'."),
+      type=str,
+      default="knox/%s" % socket.getfqdn()),
+    KNOX_PROXYHOSTS = Config(
+      key='knox_proxyhosts',
+      default="%s" % socket.getfqdn(),
+      type=str,
+      help=_('Comma separated list of strings representing the host names that the Hue server can trust as knox hosts.')
+    ),
   )
 )
 
@@ -1369,6 +1444,13 @@ OIDC = ConfigSection(
       default=True
     ),
 
+    OIDC_USERNAME_ATTRIBUTE=Config(
+      key="oidc_username_attribute",
+      help=_("The attribute to be used as username when creating and looking up the user."),
+      type=str,
+      default="preferred_username"
+    ),
+
     SUPERUSER_GROUP=Config(
       key="superuser_group",
       help=_("The group of users will be created and updated as superuser."),
@@ -1511,13 +1593,6 @@ IS_EMBEDDED = Config(
   help=_('Choose whether Hue is embedded or not.')
 )
 
-USE_NEW_AUTOCOMPLETER = Config( # This now refers to the new autocomplete dropdown
-  key='use_new_autocompleter',
-  default=True,
-  type=coerce_bool,
-  help=_('Enable the improved editor autocomplete dropdown.')
-)
-
 EDITOR_AUTOCOMPLETE_TIMEOUT = Config(
   key='editor_autocomplete_timeout',
   type=int,
@@ -1526,7 +1601,7 @@ EDITOR_AUTOCOMPLETE_TIMEOUT = Config(
 )
 
 USE_NEW_EDITOR = Config( # To remove in Hue 4
-  key='use_new_editor',
+  key='',
   default=True,
   type=coerce_bool,
   help=_('Choose whether to show the new SQL editor.')
@@ -1552,14 +1627,9 @@ DJANGO_DEBUG_TOOL_USERS = Config(
   help=_('Comma separated list of users that allow to use django debug tool. If it is empty, all users are allowed.')
 )
 
-def is_hue4():
-  """Hue is configured to show version 4."""
-  return IS_HUE_4.get()
-
-
 USE_NEW_SIDE_PANELS = Config( # To remove in Hue 4
   key='use_new_side_panels',
-  dynamic_default=is_hue4,
+  default=True,
   type=coerce_bool,
   help=_('Choose whether to show extended left and right panels.')
 )
@@ -1578,21 +1648,6 @@ USE_NEW_CHARTS = Config(
   help=_('Choose whether to use new charting library across the whole Hue.')
 )
 
-
-IS_HUE_4 = Config( # To remove in Hue 5
-  key='is_hue_4',
-  default=True,
-  type=coerce_bool,
-  help=_('Choose whether to enable the new Hue 4 interface.')
-)
-
-DISABLE_HUE_3 = Config( # To remove in Hue 5
-  key='disable_hue_3',
-  default=True,
-  type=coerce_bool,
-  help=_('Choose whether to still allow users to enable the old Hue 3 interface.')
-)
-
 IS_MULTICLUSTER_ONLY = Config(
   key='is_multicluster_only',
   default=False,
@@ -1606,6 +1661,63 @@ IS_K8S_ONLY = Config(
   type=coerce_bool,
   help=_('Choose whether to pick configs only from [desktop] [[cluster]]')
 )
+
+
+def task_server_default_result_directory():
+  """Local directory to store task results."""
+  return 'file://%s' % get_run_root('logs')
+
+
+TASK_SERVER = ConfigSection(
+  key="task_server",
+  help=_("Task Server configuration."),
+  members=dict(
+    ENABLED= Config(
+      key='enabled',
+      default=False,
+      type=coerce_bool,
+      help=_('If resource intensive or blocking can be delegated to an already running task server.')
+    ),
+    BROKER_URL = Config(
+      key='broker_url',
+      default='amqp://guest:guest@localhost//',
+      help=_('How the task server and tasks communicate.')
+    ),
+    CELERY_RESULT_BACKEND = Config(
+      key='celery_result_backend',
+      dynamic_default=task_server_default_result_directory,
+      help=_('Where to store task results. Defaults to local file system path. Celery comes with a several other backends.')
+    ),
+    RESULT_CELERYD_OPTS = Config(
+      key='celeryd_opts',
+      default='--time-limit=300',
+      help=_('Default options provided to the task server at startup.')
+    ),
+    BEAT_ENABLED = Config(
+      key='beat_enabled',
+      default=False,
+      type=coerce_bool,
+      help=_('Switch on the integration with the Task Scheduler.')
+    ),
+    FETCH_RESULT_LIMIT = Config(
+      key='fetch_result_limit',
+      default=2000,
+      type=coerce_positive_integer,
+      help=_('Number of query results rows to fetch into the result storage.')
+    ),
+    RESULT_STORAGE = Config(
+      key='result_storage',
+      type=str,
+      help=_('Django file storage class to use to temporarily store query results'),
+      default='{"backend": "django.core.files.storage.FileSystemStorage", "properties": {"location": "./logs"}}'
+    ),
+    EXECUTION_STORAGE = Config(
+      key='execution_storage',
+      type=str,
+      help=_('Django cache to use to store temporarily used data during query execution. This is in addition to result_file_storage and result_backend.'),
+      default='{"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "celery-hue"}'
+    ),
+))
 
 
 def get_clusters(user):
@@ -1790,22 +1902,43 @@ def config_validator(user):
 
   Called by core check_config() view.
   """
-  from beeswax.models import Session
+  from beeswax.models import QueryHistory, SavedQuery, Session
   from desktop.lib import i18n
-  from desktop.models import Document2 # Avoid cyclic loop
+  from desktop.models import Document, Document2 # Avoid cyclic loop
   from desktop.settings import DOCUMENT2_MAX_ENTRIES # Avoid cyclic loop
+  from oozie.models import Job
 
   res = []
 
-  doc2_count = Document2.objects.filter(is_history=True).count()
+  doc_count = Document.objects.count()
+  if doc_count > DOCUMENT2_MAX_ENTRIES:
+    res.append(('DOCUMENT_CLEANUP_WARNING', unicode(_('Desktop Document has more than %d entries: %d, '
+                'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, doc_count)))))
+
+  doc2_count = Document2.objects.count()
   if doc2_count > DOCUMENT2_MAX_ENTRIES:
     res.append(('DOCUMENT2_CLEANUP_WARNING', unicode(_('Desktop Document2 has more than %d entries: %d, '
                 'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, doc2_count)))))
 
-  session_count = Session.objects.filter(status_code__gte=-10000).count()
+  session_count = Session.objects.count()
   if session_count > DOCUMENT2_MAX_ENTRIES:
     res.append(('SESSION_CLEANUP_WARNING', unicode(_('Desktop Session has more than %d entries: %d, '
                 'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, session_count)))))
+
+  qh_count = QueryHistory.objects.count()
+  if qh_count > DOCUMENT2_MAX_ENTRIES:
+    res.append(('QueryHistory_CLEANUP_WARNING', unicode(_('Query History has more than %d entries: %d, '
+                'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, qh_count)))))
+
+  sq_count = SavedQuery.objects.count()
+  if sq_count > DOCUMENT2_MAX_ENTRIES:
+    res.append(('SavedQuery_CLEANUP_WARNING', unicode(_('Saved Query has more than %d entries: %d, '
+                'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, sq_count)))))
+
+  job_count = Job.objects.count()
+  if job_count > DOCUMENT2_MAX_ENTRIES:
+    res.append(('OOZIEJOB_CLEANUP_WARNING', unicode(_('Oozie Job has more than %d entries: %d, '
+                'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, job_count)))))
 
   if not get_secret_key():
     res.append((SECRET_KEY, unicode(_("Secret key should be configured as a random string. All sessions will be lost on restart"))))
@@ -1847,7 +1980,7 @@ def config_validator(user):
   # Validate if oozie email server is active
   try:
     from oozie.views.editor2 import _is_oozie_mail_enabled
-  
+
     if not _is_oozie_mail_enabled(user):
       res.append(('OOZIE_EMAIL_SERVER', unicode(_('Email notifications is disabled for Workflows and Jobs as SMTP server is localhost.'))))
   except Exception, e:
@@ -1865,6 +1998,9 @@ def config_validator(user):
                                                     '<b>NOTE:</b> Configure the database for character set AL32UTF8 and national character set UTF8.'))))
   if notebook_doc:
     notebook_doc.delete()
+
+  if 'use_new_editor' in USE_NEW_EDITOR.bind_to:
+    res.append(('[desktop] use_new_editor', unicode(_('This configuration flag has been deprecated.'))))
 
   return res
 

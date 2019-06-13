@@ -195,7 +195,7 @@ ${ layout.menubar(section='coordinators') }
         $("#backBtn").addClass("disabled");
       }
       $("a.step").parent().removeClass("active");
-      $("a.step[href=#" + step + "]").parent().addClass("active");
+      $("a.step[href='#" + step + "']").parent().addClass("active");
       $(".stepDetails").hide();
       $("#" + step).show();
     }

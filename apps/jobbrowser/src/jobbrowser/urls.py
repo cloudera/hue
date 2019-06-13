@@ -23,7 +23,7 @@ from jobbrowser import api2 as jobbrowser_api2
 urlpatterns = [
   # "Default"
   url(r'^$', jobbrowser_views.jobs),
-  url(r'^jobs/$', jobbrowser_views.jobs, name='jobs'),
+  url(r'^jobs/?$', jobbrowser_views.jobs, name='jobs'),
   url(r'^jobs/(?P<job>\w+)$', jobbrowser_views.single_job, name='jobbrowser.views.single_job'),
   url(r'^jobs/(?P<job>\w+)/counters$', jobbrowser_views.job_counters, name='job_counters'),
   url(r'^jobs/(?P<job>\w+)/kill$', jobbrowser_views.kill_job, name='kill_job'),
@@ -39,7 +39,7 @@ urlpatterns = [
 
   # MR2 specific
   url(r'^jobs/(?P<job>\w+)/job_attempt_logs/(?P<attempt_index>\d+)$', jobbrowser_views.job_attempt_logs, name='job_attempt_logs'),
-  url(r'^jobs/(?P<job>\w+)/job_attempt_logs_json/(?P<attempt_index>\d+)/(?P<name>\w+)?/(?P<offset>[\d-]+)?$', jobbrowser_views.job_attempt_logs_json, name='job_attempt_logs_json'),
+  url(r'^jobs/(?P<job>\w+)/job_attempt_logs_json/(?P<attempt_index>\d+)(?:/(?P<name>\w+))?(?:/(?P<offset>[\d-]+))?/?$', jobbrowser_views.job_attempt_logs_json, name='job_attempt_logs_json'),
   url(r'^jobs/(?P<jobid>\w+)/job_not_assigned/(?P<path>.+)$', jobbrowser_views.job_not_assigned, name='job_not_assigned'),
 
   # Unused
@@ -48,7 +48,7 @@ urlpatterns = [
   url(r'^clusterstatus$', jobbrowser_views.clusterstatus, name='clusterstatus'),
   url(r'^queues$', jobbrowser_views.queues, name='queues'),
   url(r'^jobbrowser$', jobbrowser_views.jobbrowser, name='jobbrowser'),
-  url(r'^dock_jobs/$', jobbrowser_views.dock_jobs, name='dock_jobs'),
+  url(r'^dock_jobs/?$', jobbrowser_views.dock_jobs, name='dock_jobs'),
 ]
 
 # V2
@@ -57,9 +57,9 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-  url(r'api/jobs/?(?P<interface>.+)?', jobbrowser_api2.jobs, name='jobs'),
+  url(r'api/jobs(?:/(?P<interface>.+))?/?', jobbrowser_api2.jobs, name='jobs'),
   url(r'api/job/logs', jobbrowser_api2.logs, name='logs'),
   url(r'api/job/profile', jobbrowser_api2.profile, name='profile'),
-  url(r'api/job/action/?(?P<interface>.+)?/?(?P<action>.+)?', jobbrowser_api2.action, name='action'),
-  url(r'api/job/?(?P<interface>.+)?', jobbrowser_api2.job, name='job'),
+  url(r'api/job/action(?:/(?P<interface>.+))?(?:/(?P<action>.+))?/?', jobbrowser_api2.action, name='action'),
+  url(r'api/job(?:/(?P<interface>.+))?/?', jobbrowser_api2.job, name='job'),
 ]

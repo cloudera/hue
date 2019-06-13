@@ -255,8 +255,8 @@ class TestWithSentry(object):
 
 
 class TestSentryWithHadoop(object):
-
   requires_hadoop = True
+  integration = True
 
   @classmethod
   def setup_class(cls):

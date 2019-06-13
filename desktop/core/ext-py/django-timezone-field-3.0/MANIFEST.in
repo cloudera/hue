@@ -1,0 +1,2 @@
+include LICENSE.txt MANIFEST.in README.rst
+recursive-exclude tests *

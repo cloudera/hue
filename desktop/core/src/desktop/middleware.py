@@ -51,7 +51,7 @@ from desktop.lib.django_util import render, render_json
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.log import get_audit_logger
-from desktop.log.access import access_log, log_page_hit
+from desktop.log.access import access_log, log_page_hit, access_warn
 from desktop import appmanager
 from desktop import metrics
 from hadoop import cluster
@@ -332,7 +332,9 @@ class LoginAndPermissionMiddleware(object):
 
     logging.info("Redirecting to login page: %s", request.get_full_path())
     access_log(request, 'login redirection', level=access_log_level)
-    no_idle_backends = ("libsaml.backend.SAML2Backend", "desktop.auth.backend.SpnegoDjangoBackend")
+    no_idle_backends = ("libsaml.backend.SAML2Backend",
+                        "desktop.auth.backend.SpnegoDjangoBackend",
+                        "desktop.auth.backend.KnoxSpnegoDjangoBackend")
     if request.ajax and all(no_idle_backend not in desktop.conf.AUTH.BACKEND.get() for no_idle_backend in no_idle_backends):
       # Send back a magic header which causes Hue.Request to interpose itself
       # in the ajax request and make the user login before resubmitting the
@@ -525,6 +527,64 @@ class HtmlValidationMiddleware(object):
         200 <= response.status_code < 300
 
 
+class ProxyMiddleware(object):
+
+  def __init__(self):
+    if not 'desktop.auth.backend.AllowAllBackend' in desktop.conf.AUTH.BACKEND.get():
+      LOG.info('Unloading ProxyMiddleware')
+      raise exceptions.MiddlewareNotUsed
+
+  def process_response(self, request, response):
+    return response
+
+  def process_request(self, request):
+    view_func = resolve(request.path)[0]
+    if view_func in DJANGO_VIEW_AUTH_WHITELIST:
+      return
+
+    # AuthenticationMiddleware is required so that request.user exists.
+    if not hasattr(request, 'user'):
+      raise exceptions.ImproperlyConfigured(
+        "The Django remote user auth middleware requires the"
+        " authentication middleware to be installed.  Edit your"
+        " MIDDLEWARE_CLASSES setting to insert"
+        " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
+        " before the SpnegoUserMiddleware class.")
+
+    if request.GET.get('user.name'):
+      try:
+        username = request.GET.get('user.name')
+        user = authenticate(username=username, password='')
+        if user:
+          request.user = user
+          login(request, user)
+          msg = 'Successful login for user: %s' % request.user.username
+        else:
+          msg = 'Failed login for user: %s' % request.user.username
+        request.audit = {
+          'operation': 'USER_LOGIN',
+          'username': request.user.username,
+          'operationText': msg
+        }
+        return
+      except:
+        LOG.exception('Unexpected error when authenticating')
+        return
+
+  def clean_username(self, username, request):
+    """
+    Allows the backend to clean the username, if the backend defines a
+    clean_username method.
+    """
+    backend_str = request.session[BACKEND_SESSION_KEY]
+    backend = load_backend(backend_str)
+    try:
+      username = backend.clean_username(username)
+    except AttributeError:
+      pass
+    return username
+
+
 class SpnegoMiddleware(object):
   """
   Based on the WSGI SPNEGO middlware class posted here:
@@ -532,7 +592,9 @@ class SpnegoMiddleware(object):
   """
 
   def __init__(self):
-    if not 'desktop.auth.backend.SpnegoDjangoBackend' in desktop.conf.AUTH.BACKEND.get():
+    if not set(desktop.conf.AUTH.BACKEND.get()).intersection(
+            set(['desktop.auth.backend.SpnegoDjangoBackend', 'desktop.auth.backend.KnoxSpnegoDjangoBackend'])
+            ):
       LOG.info('Unloading SpnegoMiddleware')
       raise exceptions.MiddlewareNotUsed
 
@@ -600,11 +662,28 @@ class SpnegoMiddleware(object):
           username = kerberos.authGSSServerUserName(context)
           kerberos.authGSSServerClean(context)
 
+          # In Trusted knox proxy, Hue must expect following:
+          #   Trusted knox user: KNOX_PRINCIPAL
+          #   Trusted knox proxy host: KNOX_PROXYHOSTS
+          if 'desktop.auth.backend.KnoxSpnegoDjangoBackend' in \
+                desktop.conf.AUTH.BACKEND.get():
+            knox_verification = False
+            if desktop.conf.KNOX.KNOX_PRINCIPAL.get() in username:
+              # This may contain chain of reverse proxies, e.g. knox proxy, hue load balancer
+              req_hosts = self.clean_host(request.META['HTTP_X_FORWARDED_HOST'])
+              knox_proxy = self.clean_host(desktop.conf.KNOX.KNOX_PROXYHOSTS.get())
+              if req_hosts.intersection(knox_proxy):
+                knox_verification = True
+            # If knox authentication failed then generate 401 (Unauthorized error)
+            if not knox_verification:
+              request.META['Return-401'] = ''
+              return
+
           if request.user.is_authenticated():
             if request.user.username == self.clean_username(username, request):
               return
 
-          user = authenticate(username=username)
+          user = authenticate(username=username, request=request)
           if user:
             request.user = user
             login(request, user)
@@ -629,6 +708,11 @@ class SpnegoMiddleware(object):
         request.META['Return-401'] = ''
       return
 
+  def clean_host(self, pattern):
+    if pattern:
+      return set([hostport.split(':')[0] for hostport in pattern.split(',')])
+    return set([])
+
   def clean_username(self, username, request):
     """
     Allows the backend to clean the username, if the backend defines a
@@ -637,7 +721,7 @@ class SpnegoMiddleware(object):
     backend_str = request.session[BACKEND_SESSION_KEY]
     backend = load_backend(backend_str)
     try:
-      username = backend.clean_username(username)
+      username = backend.clean_username(username, request)
     except AttributeError:
       pass
     return username
@@ -673,7 +757,7 @@ class EnsureSafeRedirectURLMiddleware(object):
   Middleware to white list configured redirect URLs.
   """
   def process_response(self, request, response):
-    if response.status_code in (301, 302, 303, 305, 307, 308) and response.get('Location'):
+    if response.status_code in (301, 302, 303, 305, 307, 308) and response.get('Location') and not hasattr(response, 'redirect_override'):
       redirection_patterns = desktop.conf.REDIRECT_WHITELIST.get()
       location = response['Location']
 

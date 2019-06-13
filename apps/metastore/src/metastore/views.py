@@ -36,7 +36,7 @@ from beeswax.models import SavedQuery
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config
 from desktop.lib.view_util import location_to_url
-from metadata.conf import has_optimizer, has_navigator, get_optimizer_url, get_navigator_url
+from metadata.conf import has_optimizer, has_catalog, get_optimizer_url, get_catalog_url
 from notebook.connectors.base import Notebook, QueryError
 from notebook.models import make_notebook
 
@@ -46,8 +46,8 @@ from metastore.settings import DJANGO_APPS
 
 from desktop.auth.backend import is_admin
 
-LOG = logging.getLogger(__name__)
 
+LOG = logging.getLogger(__name__)
 SAVE_RESULTS_CTAS_TIMEOUT = 300         # seconds
 
 
@@ -87,9 +87,9 @@ def databases(request):
     'partitions': [],
     'has_write_access': has_write_access(request.user),
     'is_optimizer_enabled': has_optimizer(),
-    'is_navigator_enabled': has_navigator(request.user),
+    'is_navigator_enabled': has_catalog(request.user),
     'optimizer_url': get_optimizer_url(),
-    'navigator_url': get_navigator_url(),
+    'navigator_url': get_catalog_url(),
     'is_embeddable': request.GET.get('is_embeddable', False),
     'source_type': _get_servername(db),
   })
@@ -97,7 +97,7 @@ def databases(request):
 
 @check_has_write_access_permission
 def drop_database(request):
-  source_type = request.POST.get('source_type', 'hive')
+  source_type = request.POST.get('source_type', request.GET.get('source_type', 'hive'))
   cluster = json.loads(request.POST.get('cluster', '{}'))
 
   db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
@@ -261,9 +261,9 @@ def show_tables(request, database=None):
     'partitions': [],
     'has_write_access': has_write_access(request.user),
     'is_optimizer_enabled': has_optimizer(),
-    'is_navigator_enabled': has_navigator(request.user),
+    'is_navigator_enabled': has_catalog(request.user),
     'optimizer_url': get_optimizer_url(),
-    'navigator_url': get_navigator_url(),
+    'navigator_url': get_catalog_url(),
     'is_embeddable': request.GET.get('is_embeddable', False),
     'source_type': _get_servername(db),
     })
@@ -297,7 +297,7 @@ def get_table_metadata(request, database, table):
 def describe_table(request, database, table):
   app_name = get_app_name(request)
   cluster = json.loads(request.POST.get('cluster', '{}'))
-  source_type = request.POST.get('source_type')
+  source_type = request.POST.get('source_type', request.GET.get('source_type', 'hive'))
   db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
 
   try:
@@ -346,9 +346,9 @@ def describe_table(request, database, table):
       'database': database,
       'has_write_access': has_write_access(request.user),
       'is_optimizer_enabled': has_optimizer(),
-      'is_navigator_enabled': has_navigator(request.user),
+      'is_navigator_enabled': has_catalog(request.user),
       'optimizer_url': get_optimizer_url(),
-      'navigator_url': get_navigator_url(),
+      'navigator_url': get_catalog_url(),
       'is_embeddable': request.GET.get('is_embeddable', False),
       'source_type': _get_servername(db),
     })
@@ -431,7 +431,7 @@ def alter_column(request, database, table):
 
 @check_has_write_access_permission
 def drop_table(request, database):
-  source_type = request.POST.get('source_type', 'hive')
+  source_type = request.POST.get('source_type', request.GET.get('source_type', 'hive'))
   cluster = json.loads(request.POST.get('cluster', '{}'))
 
   db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
@@ -493,7 +493,7 @@ def read_table(request, database, table):
 def load_table(request, database, table):
   response = {'status': -1, 'data': 'None'}
 
-  source_type = request.POST.get('source_type', 'hive')
+  source_type = request.POST.get('source_type', request.GET.get('source_type', 'hive'))
   cluster = json.loads(request.POST.get('cluster', '{}'))
 
   db = _get_db(user=request.user, source_type=source_type, cluster=cluster)
@@ -545,6 +545,7 @@ def load_table(request, database, table):
     popup = render('popups/load_data.mako', request, {
            'table': table,
            'load_form': load_form,
+           'source_type': source_type,
            'database': database,
            'app_name': 'beeswax'
        }, force_template=True).content
@@ -608,9 +609,9 @@ def describe_partitions(request, database, table):
         'request': request,
         'has_write_access': has_write_access(request.user),
         'is_optimizer_enabled': has_optimizer(),
-        'is_navigator_enabled': has_navigator(request.user),
+        'is_navigator_enabled': has_catalog(request.user),
         'optimizer_url': get_optimizer_url(),
-        'navigator_url': get_navigator_url(),
+        'navigator_url': get_catalog_url(),
         'is_embeddable': request.GET.get('is_embeddable', False),
         'source_type': _get_servername(db),
     })

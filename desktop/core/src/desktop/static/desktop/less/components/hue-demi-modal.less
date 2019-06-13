@@ -27,13 +27,14 @@
   background-color: @cui-white;
   min-height: 210px;
   border: 1px solid @cui-gray-400;
-  -webkit-border-bottom-right-radius: 0px;
-  -webkit-border-bottom-left-radius: 0px;
-  -moz-border-radius-bottomright: 0px;
-  -moz-border-radius-bottomleft: 0px;
-  border-bottom-right-radius: 0px;
-  border-bottom-left-radius: 0px;
+  -webkit-border-bottom-right-radius: 0;
+  -webkit-border-bottom-left-radius: 0;
+  -moz-border-radius-bottomright: 0;
+  -moz-border-radius-bottomleft: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
   outline: none;
+
   &.fade {
     top: -500px;
     .hue-linear-transition(opacity);
@@ -62,7 +63,6 @@
   & .modal-footer {
     padding: 10px;
   }
-
 }
 
 .demi-modal-half {

@@ -24,20 +24,21 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from django.db.models import Q
 
+from nose.plugins.attrib import attr
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises
 
 from desktop.conf import USE_DEFAULT_CONFIGURATION, USE_NEW_EDITOR
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_permission, add_to_group, grant_access, remove_from_group
 from desktop.models import DefaultConfiguration, Document, Document2
+from notebook.models import make_notebook, make_notebook2
+from notebook.api import _save_notebook
 
 from oozie.conf import ENABLE_V2
 from oozie.importlib.workflows import generate_v2_graph_nodes
 from oozie.models2 import Node, Workflow, WorkflowConfiguration, find_dollar_variables, find_dollar_braced_variables, \
     _create_graph_adjaceny_list, _get_hierarchy_from_adj_list, WorkflowBuilder, WorkflowDepthReached
 from oozie.tests import OozieMockBase, save_temp_workflow, MockOozieApi
-from notebook.models import make_notebook, make_notebook2
-from notebook.api import _save_notebook
 
 
 LOG = logging.getLogger(__name__)
@@ -54,6 +55,7 @@ class TestEditor(OozieMockBase):
     self.user_not_me = User.objects.get(username="not_perm_user")
 
 
+  @attr('integration')
   def test_create_new_workflow(self):
     response = self.c.get(reverse('oozie:new_workflow'))
     assert_equal(200, response.status_code)

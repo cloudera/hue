@@ -166,7 +166,7 @@ var CreateCollectionViewModel = function(steps) {
       return $.post("/search/admin/collections/create", {
         collection: ko.toJSON(self.collection),
       })
-      .success(function(data) {
+      .done(function(data) {
         if (data.status == 0) {
           $(document).trigger("info", data.message);
         } else {

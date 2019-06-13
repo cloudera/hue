@@ -1,0 +1,10 @@
+registry: "docker-registry.infra.cloudera.com/cloudera/datawarehouse"
+hdfs:
+  tag: "v2"
+  nametag: "1"
+hive:
+  tag: "v2"
+  metastore_db_name: "metastore"
+  metastore_db_user: "root"
+  metastore_db_password: "hive"
+  metastore_db_root_password: "hive"

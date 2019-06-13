@@ -16,14 +16,19 @@
  limitations under the License.
 */
 
-.shepherd-element-attached-bottom.shepherd-element-attached-right.shepherd-target-attached-top.shepherd-target-attached-left .shepherd-content:before,
-.shepherd-element-attached-bottom.shepherd-element-attached-left.shepherd-target-attached-top.shepherd-target-attached-right .shepherd-content:before,
-.shepherd-element-attached-top.shepherd-element-attached-right.shepherd-target-attached-bottom.shepherd-target-attached-left .shepherd-content:before,
-.shepherd-element-attached-top.shepherd-element-attached-left.shepherd-target-attached-bottom.shepherd-target-attached-right .shepherd-content:before {
+.shepherd-element-attached-bottom.shepherd-element-attached-right.shepherd-target-attached-top.shepherd-target-attached-left .shepherd-content::before,
+.shepherd-element-attached-bottom.shepherd-element-attached-left.shepherd-target-attached-top.shepherd-target-attached-right .shepherd-content::before,
+.shepherd-element-attached-top.shepherd-element-attached-right.shepherd-target-attached-bottom.shepherd-target-attached-left .shepherd-content::before,
+.shepherd-element-attached-top.shepherd-element-attached-left.shepherd-target-attached-bottom.shepherd-target-attached-right .shepherd-content::before {
   display: none;
 }
 
-.shepherd-element, .shepherd-element:after, .shepherd-element:before, .shepherd-element *, .shepherd-element *:after, .shepherd-element *:before {
+.shepherd-element,
+.shepherd-element::after,
+.shepherd-element::before,
+.shepherd-element *,
+.shepherd-element *::after,
+.shepherd-element *::before {
   box-sizing: border-box;
 }
 
@@ -52,7 +57,7 @@
   line-height: 1.5em;
 }
 
-.shepherd-element.shepherd-theme-hue .shepherd-content:before {
+.shepherd-element.shepherd-theme-hue .shepherd-content::before {
   content: "";
   display: block;
   position: absolute;
@@ -68,7 +73,7 @@
   margin-bottom: 16px;
 }
 
-.shepherd-element.shepherd-theme-hue.shepherd-element-attached-bottom.shepherd-element-attached-center .shepherd-content:before {
+.shepherd-element.shepherd-theme-hue.shepherd-element-attached-bottom.shepherd-element-attached-center .shepherd-content::before {
   top: 100%;
   left: 50%;
   margin-left: -16px;
@@ -79,7 +84,7 @@
   margin-top: 16px;
 }
 
-.shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-center .shepherd-content:before {
+.shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-center .shepherd-content::before {
   bottom: 100%;
   left: 50%;
   margin-left: -16px;
@@ -90,7 +95,7 @@
   margin-right: 16px;
 }
 
-.shepherd-element.shepherd-theme-hue.shepherd-element-attached-right.shepherd-element-attached-middle .shepherd-content:before {
+.shepherd-element.shepherd-theme-hue.shepherd-element-attached-right.shepherd-element-attached-middle .shepherd-content::before {
   left: 100%;
   top: 50%;
   margin-top: -16px;
@@ -101,7 +106,7 @@
   margin-left: 16px;
 }
 
-.shepherd-element.shepherd-theme-hue.shepherd-element-attached-left.shepherd-element-attached-middle .shepherd-content:before {
+.shepherd-element.shepherd-theme-hue.shepherd-element-attached-left.shepherd-element-attached-middle .shepherd-content::before {
   right: 100%;
   top: 50%;
   margin-top: -16px;
@@ -120,7 +125,7 @@
   margin-top: 16px;
 }
 
-.shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-left.shepherd-target-attached-middle .shepherd-content:before {
+.shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-left.shepherd-target-attached-middle .shepherd-content::before {
   bottom: 100%;
   left: 16px;
   border-bottom-color: @cui-gray-900;
@@ -130,7 +135,7 @@
   margin-top: 16px;
 }
 
-.shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-right.shepherd-target-attached-middle .shepherd-content:before {
+.shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-right.shepherd-target-attached-middle .shepherd-content::before {
   bottom: 100%;
   right: 16px;
   border-bottom-color: @cui-gray-900;
@@ -140,7 +145,7 @@
   margin-bottom: 16px;
 }
 
-.shepherd-element.shepherd-theme-hue.shepherd-element-attached-bottom.shepherd-element-attached-left.shepherd-target-attached-middle .shepherd-content:before {
+.shepherd-element.shepherd-theme-hue.shepherd-element-attached-bottom.shepherd-element-attached-left.shepherd-target-attached-middle .shepherd-content::before {
   top: 100%;
   left: 16px;
   border-top-color: @cui-gray-900;
@@ -150,7 +155,7 @@
   margin-bottom: 16px;
 }
 
-.shepherd-element.shepherd-theme-hue.shepherd-element-attached-bottom.shepherd-element-attached-right.shepherd-target-attached-middle .shepherd-content:before {
+.shepherd-element.shepherd-theme-hue.shepherd-element-attached-bottom.shepherd-element-attached-right.shepherd-target-attached-middle .shepherd-content::before {
   top: 100%;
   right: 16px;
   border-top-color: @cui-gray-900;
@@ -160,7 +165,7 @@
   margin-top: 16px;
 }
 
-.shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-left.shepherd-target-attached-bottom .shepherd-content:before {
+.shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-left.shepherd-target-attached-bottom .shepherd-content::before {
   bottom: 100%;
   left: 16px;
   border-bottom-color: @cui-gray-900;
@@ -170,7 +175,7 @@
   margin-top: 16px;
 }
 
-.shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-right.shepherd-target-attached-bottom .shepherd-content:before {
+.shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-right.shepherd-target-attached-bottom .shepherd-content::before {
   bottom: 100%;
   right: 16px;
   border-bottom-color: @cui-gray-900;
@@ -180,7 +185,7 @@
   margin-bottom: 16px;
 }
 
-.shepherd-element.shepherd-theme-hue.shepherd-element-attached-bottom.shepherd-element-attached-left.shepherd-target-attached-top .shepherd-content:before {
+.shepherd-element.shepherd-theme-hue.shepherd-element-attached-bottom.shepherd-element-attached-left.shepherd-target-attached-top .shepherd-content::before {
   top: 100%;
   left: 16px;
   border-top-color: @cui-gray-900;
@@ -190,7 +195,7 @@
   margin-bottom: 16px;
 }
 
-.shepherd-element.shepherd-theme-hue.shepherd-element-attached-bottom.shepherd-element-attached-right.shepherd-target-attached-top .shepherd-content:before {
+.shepherd-element.shepherd-theme-hue.shepherd-element-attached-bottom.shepherd-element-attached-right.shepherd-target-attached-top .shepherd-content::before {
   top: 100%;
   right: 16px;
   border-top-color: @cui-gray-900;
@@ -200,7 +205,7 @@
   margin-right: 16px;
 }
 
-.shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-right.shepherd-target-attached-left .shepherd-content:before {
+.shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-right.shepherd-target-attached-left .shepherd-content::before {
   top: 16px;
   left: 100%;
   border-left-color: @cui-gray-900;
@@ -210,7 +215,7 @@
   margin-left: 16px;
 }
 
-.shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-left.shepherd-target-attached-right .shepherd-content:before {
+.shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-left.shepherd-target-attached-right .shepherd-content::before {
   top: 16px;
   right: 100%;
   border-right-color: @cui-gray-900;
@@ -220,7 +225,7 @@
   margin-right: 16px;
 }
 
-.shepherd-element.shepherd-theme-hue.shepherd-element-attached-bottom.shepherd-element-attached-right.shepherd-target-attached-left .shepherd-content:before {
+.shepherd-element.shepherd-theme-hue.shepherd-element-attached-bottom.shepherd-element-attached-right.shepherd-target-attached-left .shepherd-content::before {
   bottom: 16px;
   left: 100%;
   border-left-color: @cui-gray-900;
@@ -230,7 +235,7 @@
   margin-left: 16px;
 }
 
-.shepherd-element.shepherd-theme-hue.shepherd-element-attached-bottom.shepherd-element-attached-left.shepherd-target-attached-right .shepherd-content:before {
+.shepherd-element.shepherd-theme-hue.shepherd-element-attached-bottom.shepherd-element-attached-left.shepherd-target-attached-right .shepherd-content::before {
   bottom: 16px;
   right: 100%;
   border-right-color: @cui-gray-900;
@@ -243,7 +248,9 @@
   font-size: 1em;
 }
 
-.shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-center.shepherd-has-title .shepherd-content:before, .shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-right.shepherd-target-attached-bottom.shepherd-has-title .shepherd-content:before, .shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-left.shepherd-target-attached-bottom.shepherd-has-title .shepherd-content:before {
+.shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-center.shepherd-has-title .shepherd-content::before,
+.shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-right.shepherd-target-attached-bottom.shepherd-has-title .shepherd-content::before,
+.shepherd-element.shepherd-theme-hue.shepherd-element-attached-top.shepherd-element-attached-left.shepherd-target-attached-bottom.shepherd-has-title .shepherd-content::before {
   border-bottom-color: @cui-gray-900;
 }
 
@@ -263,6 +270,7 @@
 
 .shepherd-element.shepherd-theme-hue .shepherd-content {
   .hue-box-shadow-bottom;
+
   border-radius: 4px;
   padding: 0;
 }
@@ -276,7 +284,7 @@
   border-radius: 0;
 }
 
-.shepherd-element.shepherd-theme-hue .shepherd-content header:after {
+.shepherd-element.shepherd-theme-hue .shepherd-content header::after {
   content: "";
   display: table;
   clear: both;
@@ -292,14 +300,14 @@
   float: right;
   text-decoration: none;
   font-size: 1.25em;
-  line-height: .8em;
+  line-height: 0.8em;
   font-weight: normal;
   color: @cui-white;
   opacity: 0.25;
   position: relative;
-  top: .1em;
-  padding: .8em;
-  margin-bottom: -.8em;
+  top: 0.1em;
+  padding: 0.8em;
+  margin-bottom: -0.8em;
 }
 
 .shepherd-element.shepherd-theme-hue .shepherd-content header a.shepherd-cancel-link:hover {
@@ -311,7 +319,7 @@
 }
 
 .shepherd-element.shepherd-theme-hue .shepherd-content .shepherd-text p {
-  margin: 0 0 .5em 0;
+  margin: 0 0 0.5em 0;
   line-height: 1.3em;
 }
 
@@ -345,7 +353,7 @@
   border-radius: 0;
   cursor: pointer;
   border: 0;
-  margin: 0 .5em 0 0;
+  margin: 0 0.5em 0 0;
   font-family: inherit;
   font-size: 14px;
   line-height: 20px;
@@ -374,7 +382,7 @@
   border-radius: 0;
   cursor: pointer;
   border: 0;
-  margin: 0 .5em 0 0;
+  margin: 0 0.5em 0 0;
   font-family: inherit;
   font-size: 14px;
   line-height: 20px;
@@ -405,6 +413,7 @@
     bottom: 0;
     background-color: @cui-white;
     @opacity: 65;
+
     opacity: @opacity / 100;
     filter: alpha(opacity=@opacity);
     z-index: 1010;

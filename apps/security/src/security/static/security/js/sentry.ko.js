@@ -1143,7 +1143,7 @@ var SentryViewModel = (function () {
         'timestamp': privilege.timestamp,
         'grantorPrincipal': privilege.grantorPrincipal,
         'grantOption': privilege.grantOption,
-        'id': UUID()
+        'id': hueUtils.UUID()
       });
       return _privilege;
     }

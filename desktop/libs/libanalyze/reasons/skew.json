@@ -6,7 +6,7 @@
     "max",
     "avg"
   ],
-  "unit_id": 5,
+  "unit": 5,
   "rule": {
     "message": "The skew (max-avg) contributed this amount of time to this SQL operator",
     "expr": "(vars['max'] - vars['avg'])",

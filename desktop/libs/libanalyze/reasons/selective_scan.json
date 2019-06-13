@@ -6,6 +6,7 @@
     "RowsReturned",
     "LocalTime"
   ],
+  "unit": 5,
   "rule": {
     "condition": "vars['RowsRead']>8000000",
     "expr": "float(vars['RowsRead'] - vars['RowsReturned']) / vars['LocalTime']",

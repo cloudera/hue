@@ -32,6 +32,7 @@ LOG = logging.getLogger(__name__)
 
 
 class TestOptimizerApi(object):
+  integration = True
 
   @classmethod
   def setup_class(cls):

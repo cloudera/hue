@@ -380,7 +380,7 @@ function BeeswaxViewModel(server, apiHelper) {
   var error_fn = function(jqXHR, status, errorThrown) {
     self.design.isRunning(false);
     try {
-      $(document).trigger('server.error', $.parseJSON(jqXHR.responseText));
+      $(document).trigger('server.error', JSON.parse(jqXHR.responseText));
     } catch(e) {
       $(document).trigger('server.unmanageable_error', jqXHR.responseText);
     }
@@ -657,7 +657,7 @@ function BeeswaxViewModel(server, apiHelper) {
       error: function(jqXHR, status, errorThrown) {
         self.design.isRunning(false);
         try {
-          var data = $.parseJSON(jqXHR.responseText);
+          var data = JSON.parse(jqXHR.responseText);
           self.design.watch.errors.push(data.error);
         } catch(e) {
           $(document).trigger('server.unmanageable_error', jqXHR.responseText);
@@ -931,7 +931,7 @@ function BeeswaxViewModel(server, apiHelper) {
             self.design.results.save.errors(null);
 
             var redirect_fn = function() {
-              window.location.href = data.success_url + (data.success_url.indexOf("?") > -1 ? "&" : "?") + "refresh=true";
+              huePubSub.publish('open.link', data.success_url + (data.success_url.indexOf("?") > -1 ? "&" : "?") + "refresh=true");
               self.design.isRunning(false);
             };
             if (data.id) {
@@ -977,24 +977,6 @@ function showSection(section) {
   $('#' + section).show();
 }
 
-
-// File browser button
-function getFileBrowseButton(inputElement) {
-  return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function (e) {
-    e.preventDefault();
-    $("#filechooser").jHueFileChooser({
-      initialPath: inputElement.val(),
-      onFileChoose: function (filePath) {
-        inputElement.val(filePath);
-        inputElement.trigger("change");
-        $("#chooseFile").modal("hide");
-      },
-      selectFolder: false,
-      createFolder: false
-    });
-    $("#chooseFile").modal("show");
-  });
-}
 
 function folderChooser(inputElement) {
   $("#folderchooser").jHueFileChooser({

@@ -82,13 +82,13 @@ const saveTopics = (topics, outputPath, makoPath) => {
         Object.keys(index).forEach(key => {
           indexStrings.push('\'' + key + '\':\'${ static(\'desktop/docs/impala/' + index[key] + '\') }\'')
         });
-        contents = contents.replace(/var IMPALA_DOC_INDEX.*\n/, 'var IMPALA_DOC_INDEX = {' + indexStrings.join(',') + '};\n');
+        contents = contents.replace(/window\.IMPALA_DOC_INDEX.*\n/, 'window.IMPALA_DOC_INDEX = {' + indexStrings.join(',') + '};\n');
 
         let createTopicJs = (entry) => {
           return '{title:\'' + entry.title +'\',ref:\'' + entry.ref + '\',children:[' + entry.children.map(createTopicJs).join(',') + ']}';
         };
 
-        contents = contents.replace(/var IMPALA_DOC_TOP_LEVEL.*\n/, 'var IMPALA_DOC_TOP_LEVEL = [' + topLevel.map(createTopicJs).join(',') + '];\n');
+        contents = contents.replace(/window\.IMPALA_DOC_TOP_LEVEL.*\n/, 'window.IMPALA_DOC_TOP_LEVEL = [' + topLevel.map(createTopicJs).join(',') + '];\n');
         fs.writeFile(makoPath.replace('.template', ''), contents, (err) => {
           if (err) {
             reject(err);

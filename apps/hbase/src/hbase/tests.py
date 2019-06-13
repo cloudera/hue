@@ -168,6 +168,7 @@ class MockProtocol():
 
 
 class TestIntegrationWithHBase:
+  integration = True
 
   @classmethod
   def setup_class(cls):

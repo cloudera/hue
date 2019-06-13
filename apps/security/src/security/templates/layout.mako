@@ -48,9 +48,6 @@ def is_selected(section, matcher):
 <%def name="menubar(section='', is_embeddable=False)">
   <link href="${ static('security/css/security.css') }" rel="stylesheet">
 
-  <link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
-  <script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
-
   <div class="navbar hue-title-bar">
       <div class="navbar-inner">
         <div class="container-fluid">

@@ -97,8 +97,8 @@ class DesktopModuleInfo(object):
     # The display name is used by dump_config, and will either be the
     # app name or the config key, if the config key has been defined in the
     # app's settings.  Mostly, it's around for consistency's sake.
-    # The nice name is just a more formal name, i.e. useradmin might 
-    # have a nice name of User Administration Tool, or something 
+    # The nice name is just a more formal name, i.e. useradmin might
+    # have a nice name of User Administration Tool, or something
     # similarly flowery.
     self.module = module
     self.name = module.__name__
@@ -110,7 +110,7 @@ class DesktopModuleInfo(object):
 
     # Load application settings
     self._load_settings_module(module.__name__ + ".settings")
-    
+
     if hasattr(self.settings, "NICE_NAME"):
       self.nice_name = self.settings.NICE_NAME
     else:
@@ -159,7 +159,7 @@ class DesktopModuleInfo(object):
       self.config_key = getattr(s, 'CONFIG_KEY', None)
     else:
       self.django_apps = []
-      self.config_key = None 
+      self.config_key = None
 
   def _resolve_appdir_path(self, path):
     """ Takes a path relative to the application dir and returns an absolute path. """

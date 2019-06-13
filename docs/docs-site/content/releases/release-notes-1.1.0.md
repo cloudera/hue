@@ -1,0 +1,146 @@
+---
+title: "1.1.0"
+date: 2019-03-13T18:28:08-07:00
+draft: false
+weight: -1010
+tags: ['skipIndexing']
+---
+
+### Hue v1.1.0, released Oct 11, 2010
+
+
+Hue is a web interface for Hadoop, and a platform for building custom
+applications with a rich framework. The 1.1.0 is a minor release, largely
+focused on adding security support to Hue, matching the security
+support of Cloudera's Distribution for Hadoop 3, beta 3.
+
+
+Notable Changes and Caveats
+---------------------------
+Kerberos Integration for Secured Hadoop Clusters:
+
+* Authenticated access to Hadoop File System
+* Authenticated job submission
+
+Frontend and SDK:
+
+* Support for tree-view table, in which a row can be expanded to show its
+children rows.
+* Improvement to double-click handling.
+* Improvement to meta-refresh handling.
+* JFrame Filter to load content into a DIV via AJAX.
+* JFrame Filter to update the active url in a JBrowser.
+
+Documentation:
+
+* Fixes to Help application to improve reliability.
+* Updates to Beeswax, File Browser, Job Designer.
+
+Caveats:
+
+* Hue 1.1.0 only works with CDH3b3 or newer. CDH2 and earlier versions of CDH3
+will not work.
+* The default port for the namenode plugins has changed from 9090 to 10090.
+
+
+Application Compatibility
+-------------------------
+The core Hadoop communication layer (to HDFS and JobTracker) now has support
+for passing security credentials. A few low level APIs have changed, but most
+applications should not be affected.
+
+
+List of All Bugs Fixed
+----------------------
+* HUE-139. Changing JFrame to allow Alert and Prompt to use their own Behavior instances
+* HUE-140. Filter Work - Creating DataGroupToggle Behavior filter, and removing NoOverflow and SideBySideSelect JFrame filters
+* HUE-144. Create CollapsingElements Behavior Filter and use throughout Hue
+* HUE-147. Convert FileBrowser private filters
+* HUE-157. Converting Beeswax JFrame filters to Behavior Filters
+* HUE-160. Improving FileChooser and FileSaver
+* HUE-165. Wording Improvements for File Browser
+* HUE-166. Add a "Download Files" button to File Browser main window
+* HUE-167. File Browser: Change "My Home" button to be disabled rather than hidden if the user does not have a home directory.
+* HUE-169. Allow SizeTo to accept percentages
+* HUE-171. Update Hue to Mako 0.3.4
+* HUE-173. Buttons over top of the dropdown
+* HUE-176. Implement fix for Chrome bug when scrollbars are hidden.
+* HUE-177. Implement support for HtmlTable tree view
+* HUE-178. jobbrowser mapred input dir makes no sense.
+* HUE-179. Automatically sync the checked state of the first checkbox of each row in the HtmlTable with it's "selected" state.
+* HUE-182. Wording and UI improvements for Job Designer
+* HUE-186. Add functionality to DataGroupToggle
+* HUE-187. Update Help File for Job Designer
+* HUE-189. Ship with more elaborate desktop/conf/pseudo-distributed.ini (etc.)
+* HUE-191. Build should honour python version set in buildvars
+* HUE-192. Doc build should generate html for release notes
+* HUE-193. Add a way to add "plugins" to registered applications (front end)
+* HUE 194. Wrong dependencies in the manual + minor inconsistency
+* HUE-195. Wording Improvements for Job Browser
+* HUE-197. Improvements for SelectWithOther filter.
+* HUE-198. HtmlTable keyboard instances steal Keyboard chain on startup
+* HUE-199. Add support for SubmitOnChange on inputs, select, and textarea elements in addition to containers of such inputs.
+* HUE-201. Add ability for HtmlTable to restore state on refresh
+* HUE-202. Implementing sample for tree view. A "pstree" jframegallery.
+* HUE-204. Update Content of Help Welcome file
+* HUE-205. Hudson test runs into pylint bug
+* HUE-208. Beeswax should load auxiliary libs specified via hive.aux.jars.path to classpath.
+* HUE-209. Ensure that the selected state of a table row remains even on mouseover
+* HUE-210. Overwrite MooTools methods for query string encoding to not use brackets for arrays
+* HUE-211. Add ability to load content into an app via Ajax without loading the whole screen.
+* HUE-212. Add ability to load a link without scrolling to the top after it loads.
+* HUE-213. Add ability to update the query string of the current path without reloading the window.
+* HUE-214. Add ability to load portions of a tree-view table via ajax.
+* HUE-215. Change default thrift server port
+* HUE-216. Ability to specify Hue configuration directory via environment variable.
+* HUE-219. Make Hue work with CDH3 trunk
+* HUE-220. Broken link in the "Hue Tarball Installation Guide"
+* HUE-222. Add ability to configure visible table columns
+* HUE-225. Make Partial Refresh work when the response has more or fewer items in it than the previous response
+* HUE-229. Request instances are not reusable.
+* HUE-230. Selected rows in filebrowser have hover state colors that are unreadable
+* HUE-231. hue create_desktop_app error
+* HUE-232. FitText is broken in IE8; disable, fix and then re-enable
+* HUE-233. Fixing "chmod" checkbox styling.
+* HUE-234. `make docs` creates the wrong sdk directory
+* HUE-239. Spinner no longer appears when requests run
+* HUE-240. Update Help File for File Browser.
+* HUE-241. Make supervisor launch errors more visible
+* HUE-242. Change HtmlTable TreeView code to deal with Partial Refresh's new feature of removing nodes missing from the response
+* HUE-243. Filebrowser links are being inconsistently urlencoded
+* HUE-244. "Web 1.0" file upload functionality broken
+* HUE-245. Rework configurable columns to have the config icon in the first column on the left and support sortability.
+* HUE-246. Supervisor should handle keyboard interrupt correctly
+* HUE-247. Update Help File for Job Browser.
+* HUE-248. Update Help File for Job Designer
+* HUE-250. Prevent Side-by-side select from allowing you to double click the table header.
+* HUE-252. Revert "No Ticket. Moving depender requirements into a single statement for index.mako."
+* HUE-253. Query Save As dialog appears empty
+* HUE-255. Create ability to refresh the current view with additional get parameters
+* HUE-258. Hue file upload always creates files as hue user when running against insecure cluster
+* HUE-259. Beeswax doesn't work with Hadoop security enabled
+* HUE-267. prod install should not require ant
+* Adding a demo for resizable HtmlTable columns.
+* Adding some images for status display across apps.
+* Auto refresh filter url compare method needed to escape the urls to compare them.
+* Because secret_key may change, capture SuspiciousOperation in listing of active users.
+* Beeswax server should not comment out reading Hue http port.
+* Changing error popup message wrapper from PRE to CODE tag to allow wrapping.
+* Correctly include timezone offset in python log messages.
+* CSS styles for dock icon and tree-view table.
+* Destroying spinner after each request.
+* Hue now only builds against CDH3 trunk. No reason for hudson script to support anything else.
+* JFrameGallery index now shows _ as spaces. Renaming a few JFrame Gallery files and removing a duplicate.
+* Moving depender requirements into a single statement for index.mako.
+* Removing dash selectors as these are now defined in ART.Widgets
+* Renaming some of the ext/thirdparty/js directories, adding Behavior and More-Behaviors.
+* Ship with a better log.conf.
+* Small change for browser specific CSS styling and some whitespace changes.
+* Update across the board to Thrift 0.5.0.
+* Updated manual with the latest release notes.
+* Update documentation to require the latest Hadoop with security.
+
+
+Project Information
+-------------------
+Homepage: http://cloudera.github.com/hue/

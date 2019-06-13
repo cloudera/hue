@@ -33,6 +33,7 @@ class Contributor(object):
 
 class Reason(object):
   def __init__(self, **kwargs):
+    self.name = None
     self.message = None
     self.impact = None
     self.unit = None
@@ -56,10 +57,31 @@ def query_node_by_id(profile, node_id, metric_name, averaged=False):
   result = profile.find_by_id(node_id)
   if not result:
     return result
-  nodes = filter(lambda x: x.fragment.is_averaged() == averaged, result)
+
+  nodes = _filter_averaged(result, averaged)
   metric = reduce(lambda x, y: x + y.find_metric_by_name(metric_name), nodes, [])
 
   return map(lambda x: L(x['value'], x['unit'], 0, x['node'].fragment.id(), x['node'].host(), 0, x['node'].id(), x['node'].name(), value=x['value'], unit=x['unit'], fragment_id=0, fid=x['node'].fragment.id(), host=x['node'].host(), node_id=x['node'].id(), name=x['node'].name(), node=x['node']), metric)
+
+def query_node_by_id_value(profile, node_id, metric_name, averaged=False, default=0):
+  results = query_node_by_id(profile, node_id, metric_name, averaged)
+  return results and results[0][0] or default
+
+def _filter_averaged(result, averaged=False):
+  #nodes = filter(lambda x: x.fragment.is_averaged() == averaged, result)
+  # Averaged results are not always present. If we're looking for averaged results, sort by averaged and get first result (hopefully getting averaged!).
+  # If we're not looking for averaged results, remove them.
+  if averaged:
+    def by_averaged(x, y):
+      if x.fragment.is_averaged():
+        return -1
+      elif y.fragment.is_averaged():
+        return 1
+      else:
+        return 0
+    return sorted(result, cmp=by_averaged)
+  else:
+    return filter(lambda x: x.fragment.is_averaged() == averaged, result)
 
 def query_node_by_metric(profile, node_name, metric_name):
   """Given the query_id, searches for the corresponding query profile and
@@ -91,7 +113,7 @@ def query_element_by_info(profile, node_name, metric_name):
   metric = reduce(lambda x, y: x + y.find_info_by_name(metric_name), nodes, [])
   return map(lambda x: L(x['value'], 0, x['node'].fragment.id() if x['node'].fragment else '', x['node'].host(), 0, x['node'].id(), x['node'].name(), value=x['value'], fragment_id=0, fid=x['node'].fragment.id() if x['node'].fragment else '', host=x['node'].host(), node_id=x['node'].id(), name=x['node'].name(), node=x['node']), metric)
 
-def query_avg_fragment_metric_by_node_nid(profile, node_nid, metric_name):
+def query_avg_fragment_metric_by_node_nid(profile, node_nid, metric_name, default):
   """
   Given the surragate node id (i.e. unique id of the plan node in the database),
   return the value of the fragment level metric.
@@ -102,9 +124,9 @@ def query_avg_fragment_metric_by_node_nid(profile, node_nid, metric_name):
   result = profile.find_by_id(node_nid)
   if not result:
     return result
-  node = map(lambda x: x, filter(lambda x: x.fragment.is_averaged() == True, result))[0]
+  node = _filter_averaged(result, True)[0]
   metric = node.fragment.find_metric_by_name(metric_name)
-  return metric[0]['value']
+  return metric and metric[0]['value'] or default
 
 def query_fragment_metric_by_node_id(node, metric_name):
   """

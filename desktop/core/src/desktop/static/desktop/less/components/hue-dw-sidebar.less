@@ -15,16 +15,39 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-@sidebar-width: 180px;
+@sidebar-width: 250px;
 @collapsed-sidebar-width: 48px;
 @sidebar-animation-duration: 250ms;
-@sidebar-category-font-size: 13px;
-@sidebar-left-spacing: 16px;
+@sidebar-category-font-size: 16px;
+@sidebar-left-spacing: 10px;
+
+.hue-dw-brand {
+  width: 247px;
+  height: 50px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color: #333d52;
+  z-index: 500000;
+  transition: width @sidebar-animation-duration;
+  overflow: hidden;
+
+  &.collapsed {
+    width: 46px;
+  }
+
+  img {
+    min-width: 191px;
+    max-width: 191px;
+    margin: 9px 9px;
+  }
+}
 
 .hue-dw-sidebar-container {
   position: relative;
   .flex(0 0);
-  .flex-basis(@sidebar-width);
+  .flex-basis(250px);
+
   transition: flex-basis @sidebar-animation-duration;
 
   .sidebar {
@@ -34,12 +57,12 @@
     bottom: 0;
     right: 3px;
     overflow: hidden;
-    background-color: @cui-white;
+    background-color: #323543;
     box-shadow: 0 0 3px 0 @cui-gray-600;
 
-    .fa:before {
+    .fa::before {
       font-size: 16px;
-      color: @text-color;
+      color: #b8bec4;
     }
 
     .sidebar-content {
@@ -54,12 +77,19 @@
     .sidebar-item {
       display: block;
       line-height: 36px;
-      color: @text-color;
+      color: #b8bec4;
       white-space: nowrap;
+      font-size: 16px;
+
+      .sidebar-caret {
+        opacity: 0;
+        float: left;
+      }
 
       .sidebar-icon {
         float: left;
-        padding: 0 14px 0 @sidebar-left-spacing;
+        padding: 0 16px 0 14px;
+
         &.with-tooltip {
           display: none;
         }
@@ -75,28 +105,36 @@
     }
 
     .sidebar-item.active {
-      background: @cui-blue-050;
-      color: @cui-blue-500;
+      background: #2d2f3b;
+      color: #5eab41;
 
-      .fa:before {
-        color: @cui-blue-500;
+      .sidebar-caret {
+        opacity: 1;
+      }
+
+      .fa::before {
+        color: #5eab41;
       }
     }
 
-    .sidebar-item:hover {
-      color: @cui-blue-500;
-      .fa:before {
-        color: @cui-blue-500;
+    .sidebar-item:not(.active):hover {
+      background-color: #404350;
+      color: @cui-white;
+
+      .fa::before {
+        background-color: #404350;
+        color: @cui-white;
       }
     }
 
     .sidebar-item:active {
-      background: @cui-blue-050;
+      background: #2d2f3b;
+      color: #5eab41;
     }
 
     .sidebar-category-item {
       margin: 20px 0 4px @sidebar-left-spacing;
-      font-size: @sidebar-category-font-size;
+      font-size: 16px;
       font-weight: bold;
       color: @cui-gray-600;
       transition: opacity @sidebar-animation-duration;
@@ -114,7 +152,7 @@
       line-height: 36px;
       width: 100%;
       text-align: right;
-      color: @text-color;
+      color: #b8bec4;
       box-shadow: 0 0 3px 0 @cui-gray-600;
 
       span {
@@ -122,7 +160,13 @@
       }
 
       &:hover {
-        background: @cui-gray-100;
+        background-color: #404350;
+        color: @cui-white;
+
+        .fa::before {
+          background-color: #404350;
+          color: @cui-white;
+        }
       }
     }
 
@@ -133,9 +177,8 @@
     }
   }
 
-
   &.collapsed {
-    .flex-basis(@collapsed-sidebar-width);
+    .flex-basis(49px);
 
     .sidebar {
       .sidebar-category-item,
@@ -146,12 +189,14 @@
       .sidebar-icon.without-tooltip {
         display: none;
       }
+
       .sidebar-icon.with-tooltip {
         display: initial;
       }
 
       .sidebar-action-button {
         text-align: center;
+
         span {
           padding-right: 0;
         }
@@ -166,7 +211,7 @@
     flex-shrink: 0;
 
     &.collapsed {
-      width: @collapsed-sidebar-width;
+      width: 47px;
     }
   }
 }

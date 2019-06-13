@@ -366,8 +366,7 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
           statements = notebook.get_data()['snippets'][0]['statement_raw']
 
           self._create_file(deployment_dir, action.data['name'] + '.pig', statements)
-        elif action.data['type'] in ('spark', 'spark-document') or (
-              action.data['type'] in ('sqoop', 'sqoop-document') and action.data['properties']['statement'] in '--hive-import'):
+        elif action.data['type'] in ('spark', 'spark-document') or self._check_sqoop_statement(action):
           if not [f for f in action.data.get('properties').get('files', []) if f.get('value').endswith('hive-site.xml')]:
             hive_site_lib = Hdfs.join(deployment_dir + '/lib/', 'hive-site.xml')
             hive_site_content = get_hive_site_content()
@@ -386,6 +385,15 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
 
     return deployment_dir
 
+  def _check_sqoop_statement(self, action):
+    statement = ''
+    if action.data['type'] == 'sqoop' and 'command' in action.data['properties']:         # Sqoop Workflow
+      statement = action.data['properties']['command']
+    elif action.data['type'] == 'sqoop-document' and 'uuid' in action.data['properties']: # Sqoop Editor
+      from notebook.models import Notebook
+      notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=action.data['properties']['uuid']))
+      statement = notebook.get_data()['snippets'][0]['statement_raw']
+    return '--hive-import' in statement
 
   def get_external_parameters(self, application_path):
     """From XML and job.properties HDFS files"""

@@ -958,7 +958,7 @@ def extract_solr_exception_message(e):
     message = json.loads(e.message)
     msg = message['error'].get('msg')
     response['error'] = msg if msg else message['error']['trace']
-  except Exception, e2:
+  except Exception as e2:
     LOG.exception('Failed to extract json message: %s' % force_unicode(e2))
     LOG.exception('Failed to parse json response: %s' % force_unicode(e))
     response['error'] = force_unicode(e)

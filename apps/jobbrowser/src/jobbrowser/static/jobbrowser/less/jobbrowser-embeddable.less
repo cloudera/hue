@@ -19,7 +19,7 @@
 
 .jobbrowser-mini {
   .span12.no-margin {
-    margin-left: 0!important;
+    margin-left: 0 !important;
   }
 }
 
@@ -36,7 +36,6 @@
     padding-right: 10px;
   }
 }
-
 .jobbrowser-components {
   .hue-uncheck::before {
     padding-left: 2px;
@@ -99,13 +98,14 @@
       font-weight: normal;
     }
     .metric {
-      position: absolute;
-      top: 0px;
-      right: 0px;
+      float: right;
     }
     .name {
       text-transform: capitalize;
       font-size: 13px;
+      width: 115px;
+      overflow: hidden;
+      display: inline-block;
     }
     .detail {
       overflow: hidden;
@@ -135,7 +135,53 @@
       width: 2.2em !important;
       height: 2.2em !important;
     }
+    .clickable .hi {
+      width: 1.4em !important;
+      height: 1.4em !important;
+    }
+    .id {
+      display: none;
+    }
+    .node.active {
+      > rect {
+        filter: url(#dropshadow);
+        stroke: @hue-primary-color-dark;
+        fill: @hue-primary-color-light;
+      }
+    }
+    .node {
+      cursor: pointer;
+      rect {
+        fill: @cui-white;
+        stroke-width: 1px;
+      }
+      rect.active {
+        fill: @hue-primary-color-dark;
+      }
+    }
+    .node:hover rect {
+      fill: @cui-purple-gray-050;
+    }
+    .output {
+      path,
+      .node > rect {
+        stroke: @cui-gray-600;
+      }
+    }
     .buttons {
+      position: absolute;
+      background-color: white;
+      box-shadow: 0 0 5px 0;
+      width:32px;
+      right: 45px;
+      bottom: 5px;
+      color: @cui-gray-600;
+      div {
+        line-height: 32px !important;
+        display: block;
+        width: 32px;
+        height: 32px;
+      }
       .hi {
         color: @cui-gray-600 !important;
         width: 2.2em !important;
@@ -149,47 +195,8 @@
         margin-left: 5px;
       }
     }
-    .id {
-      display: none;
-    }
-    .node.active {
-      > rect {
-        filter: url(#dropshadow);
-        stroke: @hue-primary-color-dark;
-        fill: @hue-primary-color-light;
-      }
-    }
-    .node {
-      rect.active {
-        fill: @hue-primary-color-dark;
-      }
-    }
-    .output {
-      path,
-      .node > rect {
-        stroke: @cui-gray-600;
-      }
-    }
-    .buttons {
-      position: absolute;
-      background-color: white;
-      box-shadow: 0px 0px 5px 0px;
-      right: 5px;
-      bottom: 5px;
-      color: @cui-gray-600;
-      div {
-        line-height: 32px !important;
-        display: block;
-        width: 32px;
-        height: 32px;
-      }
-    }
     .buttons div:hover {
       color: @hue-primary-color-dark;
-    }
-    .node rect {
-      fill: @cui-white;
-      stroke-width: 1px
     }
     .edgePath > path {
       fill: none;
@@ -203,9 +210,6 @@
       font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
       fill: @cui-gray-800;
       font-size: inherit;
-    }
-    foreignObject > div {
-      position: relative;
     }
     .above-average {
       font-weight: bold;
@@ -225,45 +229,53 @@
       fill: @cui-blue-400 !important;
       background-color: @cui-blue-400;
     }
+    .resizer {
+      top: 0px;
+      right: 200px;
+      visibility: hidden;
+    }
     .details {
       background-color: @cui-white;
-      box-shadow: 0px 0px 10px 0px;
+      box-shadow: 0 0 10px 0;
       color: @cui-gray-600;
       position: absolute;
-      display: none;
-      top: 0px;
-      right: 0px;
+      top: 0;
+      right: -164px;
       width: 200px;
       height: 100%;
       flex-direction: column;
+      header {
+        white-space: nowrap;
+      }
       .divider {
         background-color: @cui-gray-300;
         width: calc(~"100% - 10px");
         margin-left: 5px;
-        padding: 0px;
+        padding: 0;
         height: 1px;
       }
       h3 {
         display: inline-block;
-        margin: 0px;
+        margin: 0;
       }
       h4 {
-        margin: 0px;
+        margin: 0;
         display: inline-block;
       }
       h5 {
-        margin: 0px;
+        margin: 0;
         display: inline-block;
       }
       ol {
         list-style-type: none;
-        margin: 0px;
+        margin: 0;
       }
       ul {
-        margin: 0px;
+        margin: 0;
       }
       .details-content {
         overflow: scroll;
+        visibility: hidden;
       }
       .details-section {
         padding: 4px;
@@ -273,9 +285,10 @@
       }
       .metric-title {
         background-color: @hue-primary-color-light;
+        cursor: pointer;
         padding: 4px;
         .fa {
-          padding-top: 0px;
+          padding-top: 0;
           line-height: 40px;
           padding-right: 2px;
         }
@@ -284,8 +297,13 @@
           padding-right: 5px;
         }
       }
+      .hi {
+        padding-right: 4px;
+      }
+      .fa {
+        padding-right: 2px;
+      }
       .metrics {
-        overflow-y: scroll;
         max-height: calc(~"100% - 40px");
       }
       .legend-icon {
@@ -296,52 +314,85 @@
         display: inline-block;
       }
       .metric-name {
-        display: inline-block;
         padding-left: 2px;
       }
       .details-section .timeline {
         margin-bottom: 10px;
       }
-      table {
-        display: table;
+      table.clickable tr {
+        cursor: pointer;
       }
-      table tr {
-        display: table-cell;
+      table.clickable tr:hover {
+        background-color: @cui-purple-gray-050 !important;
+      }
+      table tr:nth-child(1) {
+        max-width: 107px;
       }
       table tr td {
         color: @cui-gray-800;
-        max-width: 107px;
         overflow: hidden;
-        display: block;
         white-space: nowrap;
         padding-right: 5px;
         text-overflow: ellipsis;
       }
-      table thead tr td {
+      table thead tr:nth-child(odd) {
+        background-color:@cui-white;
+      }
+      table.ncolumn tr:nth-child(odd) {
+        background-color: @cui-gray-050;
+      }
+      table.column {
+        display: table;
+      }
+      table.column tr {
+        display: table-cell;
+      }
+      table.column tr td {
+        display: block;
+      }
+      table.column tr:nth-child(1) td {
+        border-right: 1px solid @cui-gray-300;
+      }
+      table.column thead tr td:nth-child(odd) {
+        background-color:@cui-white;
+      }
+      table.column tr td:nth-child(odd) {
+        background-color: @cui-gray-050;
+      }
+      table.column thead tr td {
         background-color: #FFFFFF;
         border-bottom: 1px solid @cui-gray-300;
         text-transform: capitalize;
       }
-      table tr:nth-child(1) td {
-        border-right: 1px solid @cui-gray-300;
-      }
-      table thead tr td:nth-child(odd) {
-        background-color:@cui-white;
-      }
-      table tr td:nth-child(odd) {
-        background-color: @cui-gray-050;
-      }
     }
   }
-  .query-plan.open .details {
-    display: flex;
+  .query-plan.open {
+    .resizer {
+      visibility: visible;
+    }
+    .details {
+      right: 0;
+      display: flex;
+      .details-content {
+        visibility: visible;
+      }
+    }
+    .buttons {
+      right: 208px;
+    }
   }
-  .query-plan.open .buttons {
-    right: 208px;
-  }
-
   div[data-jobType="queries"] pre {
     overflow-x: auto;
     white-space: pre;
+  }
+  .nav.nav-tabs.scrollable {
+    height: 50px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+  }
+  .nav.nav-tabs > li {
+    display: inline-block;
+    float: initial;
   }
 }

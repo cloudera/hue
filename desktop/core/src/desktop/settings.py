@@ -21,6 +21,7 @@
 # as local_settings.py.
 
 import gc
+import json
 import logging
 import os
 import pkg_resources
@@ -145,6 +146,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'desktop.middleware.ProxyMiddleware',
     'desktop.middleware.SpnegoMiddleware',
     'desktop.middleware.HueRemoteUserMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -202,7 +204,25 @@ INSTALLED_APPS = [
 
     # App that keeps track of failed logins.
     'axes',
+    'webpack_loader',
+    #'django_celery_results',
 ]
+
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'desktop/js/bundles/hue/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json')
+    },
+    'WORKERS': {
+        'BUNDLE_DIR_NAME': 'desktop/js/bundles/workers/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats-workers.json')
+    },
+    'LOGIN': {
+        'BUNDLE_DIR_NAME': 'desktop/js/bundles/login/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats-login.json')
+    }
+}
 
 LOCALE_PATHS = [
   get_desktop_root('core/src/desktop/locale')
@@ -309,7 +329,7 @@ ALLOWED_HOSTS = desktop.conf.ALLOWED_HOSTS.get()
 
 X_FRAME_OPTIONS = desktop.conf.X_FRAME_OPTIONS.get()
 
-# Configure hue admins
+# Configure admins
 ADMINS = []
 for admin in desktop.conf.DJANGO_ADMINS.get():
   admin_conf = desktop.conf.DJANGO_ADMINS[admin]
@@ -318,11 +338,10 @@ for admin in desktop.conf.DJANGO_ADMINS.get():
 ADMINS = tuple(ADMINS)
 MANAGERS = ADMINS
 
-# Server Email Address
 SERVER_EMAIL = desktop.conf.DJANGO_SERVER_EMAIL.get()
-
-# Email backend
 EMAIL_BACKEND = desktop.conf.DJANGO_EMAIL_BACKEND.get()
+EMAIL_SUBJECT_PREFIX = 'Hue %s - ' % desktop.conf.CLUSTER_ID.get()
+
 
 # Configure database
 if os.getenv('DESKTOP_DB_CONFIG'):
@@ -366,6 +385,9 @@ CACHES = {
         'LOCATION': 'unique-hue'
     }
 }
+CACHES_CELERY_KEY = 'celery'
+if desktop.conf.TASK_SERVER.ENABLED.get():
+  CACHES[CACHES_CELERY_KEY] = json.loads(desktop.conf.TASK_SERVER.EXECUTION_STORAGE.get())
 
 # Configure sessions
 SESSION_COOKIE_NAME = desktop.conf.SESSION.COOKIE_NAME.get()
@@ -379,6 +401,9 @@ SESSION_COOKIE_HTTPONLY = desktop.conf.SESSION.HTTP_ONLY.get()
 CSRF_COOKIE_SECURE = desktop.conf.SESSION.SECURE.get()
 CSRF_COOKIE_HTTPONLY = desktop.conf.SESSION.HTTP_ONLY.get()
 CSRF_COOKIE_NAME='csrftoken'
+# This is required for knox
+if desktop.conf.KNOX.KNOX_PROXYHOSTS.get(): # The hosts provided here don't have port. Add default knox port
+  CSRF_TRUSTED_ORIGINS=[host.split(':')[0] + ':' + (host.split(':')[1] if len(host.split(':')) > 1 else '8443') for host in desktop.conf.KNOX.KNOX_PROXYHOSTS.get().split(',')]
 
 SECURE_HSTS_SECONDS = desktop.conf.SECURE_HSTS_SECONDS.get()
 SECURE_HSTS_INCLUDE_SUBDOMAINS = desktop.conf.SECURE_HSTS_INCLUDE_SUBDOMAINS.get()
@@ -486,6 +511,7 @@ if is_oidc_configured():
   OIDC_STORE_ID_TOKEN = True
   OIDC_STORE_REFRESH_TOKEN = True
   OIDC_CREATE_USER = desktop.conf.OIDC.CREATE_USERS_ON_LOGIN.get()
+  OIDC_USERNAME_ATTRIBUTE = desktop.conf.OIDC.OIDC_USERNAME_ATTRIBUTE.get()
 
 # OAuth
 OAUTH_AUTHENTICATION='liboauth.backend.OAuthBackend' in AUTHENTICATION_BACKENDS
@@ -631,3 +657,28 @@ if DEBUG and desktop.conf.ENABLE_DJANGO_DEBUG_TOOL.get():
           }
       }
   })
+
+
+################################################################
+# Celery settings
+################################################################
+
+if desktop.conf.TASK_SERVER.ENABLED.get():
+  CELERY_BROKER_URL = desktop.conf.TASK_SERVER.BROKER_URL.get()
+
+  CELERY_ACCEPT_CONTENT = ['json']
+  CELERY_RESULT_BACKEND = desktop.conf.TASK_SERVER.CELERY_RESULT_BACKEND.get()
+  CELERY_TASK_SERIALIZER = 'json'
+
+  CELERYD_OPTS = desktop.conf.TASK_SERVER.RESULT_CELERYD_OPTS.get()
+
+# %n will be replaced with the first part of the nodename.
+# CELERYD_LOG_FILE="/var/log/celery/%n%I.log"
+# CELERYD_PID_FILE="/var/run/celery/%n.pid"
+# CELERY_CREATE_DIRS = 1
+# CELERYD_USER = desktop.conf.SERVER_USER.get()
+# CELERYD_GROUP = desktop.conf.SERVER_GROUP.get()
+
+  if desktop.conf.TASK_SERVER.BEAT_ENABLED.get():
+    INSTALLED_APPS.append('django_celery_beat')
+    INSTALLED_APPS.append('timezone_field')

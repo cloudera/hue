@@ -33,7 +33,7 @@ from desktop.models import Cluster
 from indexer.file_format import HiveFormat
 
 from beeswax import hive_site
-from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, LIST_PARTITIONS_LIMIT, SERVER_CONN_TIMEOUT, \
+from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, HIVE_METASTORE_HOST, HIVE_METASTORE_PORT, LIST_PARTITIONS_LIMIT, SERVER_CONN_TIMEOUT, \
   AUTH_USERNAME, AUTH_PASSWORD, APPLY_NATURAL_SORT_MAX, QUERY_PARTITIONS_LIMIT
 from beeswax.common import apply_natural_sort
 from beeswax.design import hql_query
@@ -68,6 +68,9 @@ def get(user, query_server=None, cluster=None):
         from impala.dbms import ImpalaDbms
         from impala.server import ImpalaServerClient
         DBMS_CACHE[user.id][query_server['server_name']] = ImpalaDbms(HiveServerClientCompatible(ImpalaServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
+      elif query_server['server_name'] == 'hms':
+        from beeswax.server.hive_metastore_server import HiveMetastoreClient
+        DBMS_CACHE[user.id][query_server['server_name']] = HiveServer2Dbms(HiveMetastoreClient(query_server, user), QueryHistory.SERVER_TYPE[1][0])
       else:
         from beeswax.server.hive_server2_lib import HiveServerClient
         DBMS_CACHE[user.id][query_server['server_name']] = HiveServer2Dbms(HiveServerClientCompatible(HiveServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
@@ -85,9 +88,19 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
   if name == 'impala':
     from impala.dbms import get_query_server_config as impala_query_server_config
     query_server = impala_query_server_config(cluster_config=cluster_config)
+  elif name == 'hms':
+    kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
+    query_server = {
+        'server_name': 'hms',
+        'server_host': HIVE_METASTORE_HOST.get() if not cluster_config else cluster_config.get('server_host'),
+        'server_port': HIVE_METASTORE_PORT.get(),
+        'principal': kerberos_principal,
+        'transport_mode': 'http' if hive_site.hiveserver2_transport_mode() == 'HTTP' else 'socket',
+        'auth_username': AUTH_USERNAME.get(),
+        'auth_password': AUTH_PASSWORD.get()
+    }
   else:
     kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
-
     query_server = {
         'server_name': 'beeswax',
         'server_host': HIVE_SERVER_HOST.get() if not cluster_config else cluster_config.get('server_host'),
@@ -121,12 +134,14 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
 
 
 def get_cluster_config(cluster=None):
-  if cluster and cluster.get('id') != CLUSTER_ID.get():
+  if cluster and cluster.get('connector'): # Connector interface
+    cluster_config = cluster
+  elif cluster and cluster.get('id') != CLUSTER_ID.get():
     if 'altus:dataware:k8s' in cluster['id']:
       compute_end_point = cluster['compute_end_point'][0] if type(cluster['compute_end_point']) == list else cluster['compute_end_point'] # TODO getting list from left assist
       cluster_config = {'server_host': compute_end_point, 'name': cluster['name']} # TODO get port too
     else:
-      cluster_config = Cluster(user=None).get_config(cluster['id']) # Direct cluster
+      cluster_config = Cluster(user=None).get_config(cluster['id']) # Direct cluster # Deprecated
   else:
     cluster_config = None
 

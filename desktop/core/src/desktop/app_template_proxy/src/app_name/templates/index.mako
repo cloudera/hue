@@ -44,7 +44,7 @@ ${'#'}# Main body
     });
 
     function resizeAppframe() {
-      $("#appframe").height($(window).height() - (IS_HUE_4 ? 48 : 34)); // magic: navigator height + safety pixels
+      $("#appframe").height($(window).height() - 48); // magic: navigator height + safety pixels
     }
 
     resizeAppframe();

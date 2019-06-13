@@ -19,9 +19,7 @@
 
 /*
 
-
   TODO: Replace with CUI equivalents where possible
-
 
 */
 
@@ -61,19 +59,19 @@
 .hue-linear-transition(@attributes) {
   @value: ~`"@{attributes}".replace(/,/g, ' .2s linear,')`;
 
-  -webkit-transition: @value .2s linear;
-  -moz-transition: @value .2s linear;
-  -ms-transition: @value .2s linear;
-  transition: @value .2s linear;
+  -webkit-transition: @value 0.2s linear;
+  -moz-transition: @value 0.2s linear;
+  -ms-transition: @value 0.2s linear;
+  transition: @value 0.2s linear;
 }
 
 .hue-ease-transition(@attributes) {
   @value: ~`"@{attributes}".replace(/,/g, ' .2s ease,')`;
 
-  -webkit-transition: @value .2s ease;
-  -moz-transition: @value .2s ease;
-  -ms-transition: @value .2s ease;
-  transition: @value .2s ease;
+  -webkit-transition: @value 0.2s ease;
+  -moz-transition: @value 0.2s ease;
+  -ms-transition: @value 0.2s ease;
+  transition: @value 0.2s ease;
 }
 
 .hue-box-shadow-top {
@@ -93,26 +91,26 @@
 }
 
 .hue-box-shadow(@left: 2px, @top: 2px) {
-  -webkit-box-shadow: @left @top 8px rgba(0,0,0,.18);
-  -moz-box-shadow: @left @top 8px rgba(0,0,0,.18);
+  -webkit-box-shadow: @left @top 8px rgba(0, 0, 0, 0.18);
+  -moz-box-shadow: @left @top 8px rgba(0, 0, 0, 0.18);
   box-shadow: @left @top 6px 0 rgba(0, 0, 0, 0.18), @left @top 8px 0 rgba(0, 0, 0, 0.13);
 }
 
 .hue-inset-box-shadow {
-  -webkit-box-shadow: inset 1px 0 0 rgba(255,255,255,.125)!important;
-  -moz-box-shadow: inset 1px 0 0 rgba(255,255,255,.125)!important;
-  box-shadow: inset 1px 0 0 rgba(255,255,255,.125)!important;
+  -webkit-box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.125) !important;
+  -moz-box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.125) !important;
+  box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.125) !important;
 }
 
 .hue-no-box-shadow {
-  -webkit-box-shadow: none!important;
-  -moz-box-shadow: none!important;
-  box-shadow: none!important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  box-shadow: none !important;
 }
 
 @keyframes fadein {
   from { opacity: 0; }
-  to   { opacity: 1; }
+  to { opacity: 1; }
 }
 
 .hue-fade-in {

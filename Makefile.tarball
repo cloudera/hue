@@ -32,7 +32,9 @@ PROD_INCLUDES := \
 	tools/enable-python27.sh \
 	tools/load-balancer \
 	VERSION \
-	webpack-stats*.json
+	webpack-stats*.json \
+	package.json \
+	webpack.config*.js
 
 # Check for things in BDIST_EXCLUDES in various apps
 PROD_EXCLUDES := \
@@ -45,7 +47,7 @@ PROD_EXCLUDES := \
 	desktop/devtools.mk \
 	desktop/libs/hadoop/regenerate-thrift.sh \
 	ext/thirdparty/js/manifest.json \
-        Makefile.tarball
+	Makefile.tarball
 
 # Macro to remove things we don't want to package
 define remove_devtree_exclusions

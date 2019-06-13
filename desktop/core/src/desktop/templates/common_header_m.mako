@@ -21,6 +21,9 @@ from metadata.conf import has_optimizer, OPTIMIZER
 
 home_url = url('desktop_views_home')
 from desktop.conf import USE_NEW_EDITOR
+
+from webpack_loader.templatetags.webpack_loader import render_bundle
+
 if USE_NEW_EDITOR.get():
   home_url = url('desktop_views_home2')
 %>
@@ -77,59 +80,6 @@ if USE_NEW_EDITOR.get():
 
     var AUTOCOMPLETE_TIMEOUT = ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() };
 
-    window.HUE_I18n = {
-      documentType: {
-        'all': '${_('All')}',
-        'directory': '${ _('Directory') }',
-        'link-pigscript': '${_('Pig Design')}',
-        'link-workflow': '${_('Job Design')}',
-        'notebook': '${_('Notebook')}',
-        'oozie-bundle2': '${_('Oozie Bundle')}',
-        'oozie-coordinator2': (IS_HUE_4 ? '${_('Oozie Schedule')}' : '${_('Oozie Coordinator')}'),
-        'oozie-workflow2': '${_('Oozie Workflow')}',
-        'query-hive': '${_('Hive Query')}',
-        'query-impala': '${_('Impala Query')}',
-        'search-dashboard': '${_('Search Dashboard')}',
-        'query-mapreduce': '${_('MapReduce Job')}',
-        'query-sqoop1': '${_('Import Job')}',
-        'query-spark2': '${_('Spark Job')}',
-        'query-java': '${_('Java Job')}',
-        'query-pig': '${_('Pig Script')}',
-        'query-shell': '${_('Shell Script')}',
-        'query-distcp': '${_('DistCp Job')}'
-      },
-      jHueHdfsTree: {
-        GO_TO_COLUMN: '${_('Go to column:')}',
-        PLACEHOLDER: '${_('column name...')}',
-        LOCK: '${_('Lock this row')}',
-        UNLOCK: '${_('Unlock this row')}',
-        ROW_DETAILS: '${_('Show row details')}'
-      },
-      jHueFileChooser: {
-        BACK: '${_('Back')}',
-        SELECT_FOLDER: '${_('Select this folder')}',
-        CREATE_FOLDER: '${_('Create folder')}',
-        FOLDER_NAME: '${_('Folder name')}',
-        CANCEL: '${_('Cancel')}',
-        FILE_NOT_FOUND: '${_('The file has not been found')}',
-        UPLOAD_FILE: '${_('Upload a file')}',
-        FAILED: '${_('Failed')}'
-      },
-      jHueTableExtender: {
-        GO_TO_COLUMN: '${_('Go to column:')}',
-        PLACEHOLDER: '${_('column name...')}',
-        LOCK: '${_('Lock this row')}',
-        UNLOCK: '${_('Unlock this row')}',
-        ROW_DETAILS: '${_('Show row details')}'
-      },
-      syntaxChecker: {
-        didYouMean: '${_('Did you mean')}',
-        expectedStatementEnd: '${_('Expected end of statement')}',
-        suppressError: '${_('Ignore this type of error')}',
-        couldNotFind: '${_('Could not find')}'
-      }
-    };
-
     window.LEAFLET_DEFAULTS = {
       layer: '${ leaflet['layer'] |n,unicode }',
       attribution: '${ leaflet['attribution'] |n,unicode }'
@@ -154,42 +104,27 @@ if USE_NEW_EDITOR.get():
     }
 
     // check for IE document modes
-    if (document.documentMode && document.documentMode < 9){
+    if (document.documentMode && document.documentMode < 9) {
       location.href = "${ url('desktop_views_unsupported') }";
     }
   </script>
 
-  <script src="${ static('desktop/js/hue.utils.js') }"></script>
-  <script src="${ static('desktop/ext/js/jquery/jquery-2.2.4.min.js') }"></script>
-  <script src="${ static('desktop/js/jquery.migration.js') }"></script>
-  <script src="${ static('desktop/ext/js/jquery/plugins/jquery.cookie.js') }"></script>
-  <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
+  ${ render_bundle('hue') | n,unicode }
+
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.touchSwipe.min.js') }"></script>
-  <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
   <script src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
   <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
   <script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
-  <script src="${ static('desktop/ext/js/d3.v3.js') }"></script>
-  <script src="${ static('desktop/ext/js/d3.v4.js') }"></script>
-  <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
-  <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
-  <script src="${ static('desktop/ext/js/knockout.validation.min.js') }"></script>
-  <script src="${ static('desktop/js/ko.switch-case.js') }"></script>
-  <script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
-  <script src="${ static('desktop/js/hue.colors.js') }"></script>
   <script src="${ static('desktop/js/ace/ace.js') }"></script>
   <script src="${ static('desktop/js/ace/mode-impala.js') }"></script>
   <script src="${ static('desktop/js/ace/mode-hive.js') }"></script>
   <script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
   <script src="${ static('desktop/js/ace.extended.js') }"></script>
   <script>
-    ace.config.set("basePath", "/static/desktop/js/ace");
+    ace.config.set("basePath", "${ static('desktop/js/ace') }");
   </script>
-
-  <%namespace name="charting" file="/charting.mako" />
-  ${ charting.import_charts() }
 
   <script type="text/javascript">
 
@@ -263,7 +198,6 @@ if USE_NEW_EDITOR.get():
       %endif
 
       % if 'jobbrowser' in apps:
-      var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
       var checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
       var lastJobBrowserRequest = null;
 
@@ -287,7 +221,7 @@ if USE_NEW_EDITOR.get():
                 $("#jobBrowserCount").addClass("hide");
               }
             }
-          checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);
+          checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, window.JB_HEADER_CHECK_INTERVAL_IN_MILLIS);
         }).fail(function () {
           window.clearTimeout(checkJobBrowserStatusIdx);
         });

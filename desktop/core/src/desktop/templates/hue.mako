@@ -29,9 +29,9 @@
   from metadata.conf import has_optimizer, OPTIMIZER
 
   from desktop.auth.backend import is_admin
+  from webpack_loader.templatetags.webpack_loader import render_bundle
 %>
 
-<%namespace name="koComponents" file="/ko_components.mako" />
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="hueIcons" file="/hue_icons.mako" />
 <%namespace name="commonHeaderFooterComponents" file="/common_header_footer_components.mako" />
@@ -89,8 +89,17 @@
   <link href="${ static('desktop/css/jquery-ui.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/home.css') }" rel="stylesheet">
 % endif
+  <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
+  <link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
+
+  <link rel="stylesheet" href="${ static('desktop/ext/css/hue-charts.css') }">
+  <link rel="stylesheet" href="${ static('desktop/ext/css/leaflet.css') }">
+  <link rel="stylesheet" href="${ static('desktop/ext/css/leaflet.markercluster.css') }">
+  <link rel="stylesheet" href="${ static('desktop/ext/css/leaflet.zoombox.css') }">
+  <link rel="stylesheet" href="${ static('desktop/ext/css/nv.d3.min.css') }">
+  <link rel="stylesheet" href="${ static('desktop/css/nv.d3.css') }">
+
   <script type="text/javascript">
-    window.IS_HUE_4 = true;
 % if IS_EMBEDDED.get():
   // Bootstrap 2.3.2 relies on the hide css class presence for modals but doesn't remove it when opened for fade type
   // modals, a parent container might have it set to !important which will prevent the modal from showing. This
@@ -125,14 +134,14 @@
   </script>
 
   ${ commonHeaderFooterComponents.header_i18n_redirection() }
-
-  <script src="/desktop/globalJsConstants.js?v=${ hue_version() }"></script>
+  <%
+    global_constants_url = '/desktop/globalJsConstants.js?v=' + hue_version()
+  %>
+  <script src="${global_constants_url}"></script>
 
   % if not conf.DEV.get():
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
   % endif
-  <script src="${ static('desktop/js/hue4.utils.js') }"></script>
-  <script src="${ static('desktop/js/contextCatalog.js') }"></script>
 </head>
 
 <body>
@@ -162,13 +171,16 @@
 % endif
 
 <div id="jHueNotify" class="alert hide">
-    <button class="close">&times;</button>
-    <div class="message"></div>
+  <button class="close">&times;</button>
+  <div class="message"></div>
 </div>
 
 
 ${ hueIcons.symbols() }
 
+<!-- fake fields are a workaround for chrome autofill getting the wrong fields, readonly needed for 1password -->
+<input style="display:none" readonly autocomplete="false" type="text" name="fakeusernameremembered"/>
+<input style="display:none" readonly autocomplete="false" type="password" name="fakepasswordremembered"/>
 
 <div class="main-page">
   % if banner_message or conf.CUSTOM.BANNER_TOP_HTML.get():
@@ -176,23 +188,21 @@ ${ hueIcons.symbols() }
       ${ banner_message or conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
     </div>
   % endif
+
   % if not IS_EMBEDDED.get():
   <nav class="navbar navbar-default">
     <div class="navbar-inner top-nav">
       <div class="top-nav-left">
         % if not IS_EMBEDDED.get():
-        <a class="hamburger hamburger-hue pull-left" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
-          <span class="hamburger-box"><span class="hamburger-inner"></span></span>
-        </a>
+          % if not (IS_MULTICLUSTER_ONLY.get() and has_multi_cluster()):
+          <a class="hamburger hamburger-hue pull-left" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
+            <span class="hamburger-box"><span class="hamburger-inner"></span></span>
+          </a>
 
-        <a class="brand" data-bind="hueLink: '/home/'" href="javascript: void(0);" title="${_('Documents')}">
-          % if IS_MULTICLUSTER_ONLY.get() and has_multi_cluster():
-            <img src="${ static('desktop/art/cloudera-data-warehouse.svg') }" style="height: 18px; display: none;" data-bind="visible:  pocClusterMode() === 'dw'">
-            <img src="${ static('desktop/art/cloudera-data-engineering.svg') }" style="height: 22px; margin-top:3px; display: none;" data-bind="visible:  pocClusterMode() !== 'dw'">
-          % else:
-            <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
+          <a class="brand" data-bind="hueLink: '/home/'" href="javascript: void(0);" title="${_('Documents')}">
+              <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
+          </a>
           % endif
-        </a>
         % endif
 
         % if not IS_MULTICLUSTER_ONLY.get():
@@ -245,7 +255,6 @@ ${ hueIcons.symbols() }
       </div>
 
       <div class="top-nav-right">
-
         % if user.is_authenticated() and section != 'login' and (cluster != ANALYTIC_DB or IS_MULTICLUSTER_ONLY.get()):
         <div class="dropdown navbar-dropdown pull-right">
           % if IS_MULTICLUSTER_ONLY.get():
@@ -265,16 +274,13 @@ ${ hueIcons.symbols() }
             % if is_admin(user):
             <li data-bind="hueLink: '/useradmin/users/'"><a href="javascript: void(0);"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
             % endif
-            % if not conf.DISABLE_HUE_3.get():
-            <li><a href="javascript:void(0)" onclick="huePubSub.publish('set.hue.version', 3)"><i class="fa fa-fw fa-exchange"></i> ${_('Switch to Hue 3')}</a></li>
-            % endif
-            <li><a href="http://gethue.com" target="_blank"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
-            <li><a href="javascript:void(0)" onclick="huePubSub.publish('show.welcome.tour')"><span class="dropdown-no-icon">${_('Welcome Tour')}</span></a></li>
             % if is_admin(user):
-            <li><a href="/about/"><span class="dropdown-no-icon">${_('Hue Administration')}</span></a></li>
+            <li><a data-bind="hueLink: '/about/'" href="javascript: void(0);"><span class="dropdown-no-icon">${_('Administration')}</span></a></li>
             % endif
+            <li><a href="javascript:void(0)" onclick="huePubSub.publish('show.welcome.tour')"><span class="dropdown-no-icon">${_('Welcome Tour')}</span></a></li>
+            <li><a href="http://gethue.com" target="_blank"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
             <li class="divider"></li>
-            <li><a title="${_('Sign out')}" href="/accounts/logout/"><i class="fa fa-fw fa-sign-out"></i> ${ _('Sign out') }</a></li>
+            <li><a title="${_('Sign out')}" data-bind="hueLink: '/accounts/logout'" href="javascript: void(0);"><i class="fa fa-fw fa-sign-out"></i> ${ _('Sign out') }</a></li>
           </ul>
         </div>
         % endif
@@ -297,7 +303,6 @@ ${ hueIcons.symbols() }
     </div>
     <div id="mini_jobbrowser"></div>
   </div>
-
   % endif
 
   <div class="content-wrapper">
@@ -412,6 +417,8 @@ ${ hueIcons.symbols() }
       <div id="embeddable_dump_config" class="embeddable"></div>
       <div id="embeddable_threads" class="embeddable"></div>
       <div id="embeddable_metrics" class="embeddable"></div>
+      <div id="embeddable_connectors" class="embeddable"></div>
+      <div id="embeddable_analytics" class="embeddable"></div>
       <div id="embeddable_403" class="embeddable"></div>
       <div id="embeddable_404" class="embeddable"></div>
       <div id="embeddable_500" class="embeddable"></div>
@@ -453,120 +460,44 @@ ${ hueIcons.symbols() }
 
 ${ commonshare() | n,unicode }
 
-<script src="${ static('desktop/js/hue-bundle.js') }"></script>
-% if IS_EMBEDDED.get():
-<script src="${ static('desktop/ext/js/page.js') }"></script>
-% endif
+${ render_bundle('vendors~hue~notebook') | n,unicode }
+${ render_bundle('vendors~hue') | n,unicode }
+${ render_bundle('hue~notebook') | n,unicode }
+${ render_bundle('hue') | n,unicode }
 
-<script src="${ static('desktop/js/jquery.migration.js') }"></script>
-<script src="${ static('desktop/js/hue.utils.js') }"></script>
-<script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
+<script src="${ static('desktop/js/polyfills.js') }"></script>
 <script src="${ static('desktop/ext/js/tether.js') }"></script>
 <script src="${ static('desktop/ext/js/shepherd.min.js') }"></script>
-<script src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
-<script src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
-<script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
-<script src="${ static('desktop/ext/js/fileuploader.js') }"></script>
-<script src="${ static('desktop/ext/js/filesize.min.js') }"></script>
 <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
 <script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery.cookie.js') }"></script>
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js') }"></script>
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery.form.js') }"></script>
-<script src="${ static('desktop/js/jquery.datatables.sorting.js') }"></script>
 
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery.basictable.min.js') }"></script>
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
+<script src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
+<script src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
+<script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
 
-<script src="${ static('desktop/js/jquery.hiveautocomplete.js') }"></script>
-<script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }"></script>
-<script src="${ static('desktop/js/jquery.filechooser.js') }"></script>
-<script src="${ static('desktop/js/jquery.selector.js') }"></script>
-<script src="${ static('desktop/js/jquery.delayedinput.js') }"></script>
-<script src="${ static('desktop/js/jquery.rowselector.js') }"></script>
-<script src="${ static('desktop/js/jquery.notify.js') }"></script>
-<script src="${ static('desktop/js/jquery.titleupdater.js') }"></script>
-<script src="${ static('desktop/js/jquery.horizontalscrollbar.js') }"></script>
-<script src="${ static('desktop/js/jquery.tablescroller.js') }"></script>
-<script src="${ static('desktop/js/jquery.tableextender.js') }"></script>
-<script src="${ static('desktop/js/jquery.tableextender2.js') }"></script>
-<script src="${ static('desktop/js/hue.colors.js') }"></script>
-<script src="${ static('desktop/ext/js/localforage.min.js') }"></script>
-<script src="${ static('desktop/js/dataCatalog.js') }"></script>
-<script src="${ static('desktop/js/apiHelper.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout.validation.min.js') }"></script>
-<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }"></script>
-<script src="${ static('desktop/js/ko.editable.js') }"></script>
-<script src="${ static('desktop/js/ko.switch-case.js') }"></script>
-<script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
-<script src="${ static('desktop/js/sqlUtils.js') }"></script>
-<script src="${ static('desktop/js/jquery.scrollleft.js') }"></script>
-<script src="${ static('desktop/js/jquery.scrollup.js') }"></script>
-<script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
-<script src="${ static('desktop/js/sqlFunctions.js') }"></script>
-<script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
-<script src="${ static('desktop/js/ko.selectize.js') }"></script>
 <script src="${ static('desktop/js/ace/ace.js') }"></script>
 <script src="${ static('desktop/js/ace/mode-impala.js') }"></script>
 <script src="${ static('desktop/js/ace/mode-hive.js') }"></script>
 <script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
 <script src="${ static('desktop/js/ace.extended.js') }"></script>
-<script>
-  ace.config.set("basePath", "/static/desktop/js/ace");
-</script>
-
-<script src="${ static('desktop/ext/js/dropzone.min.js') }"></script>
-
-<script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>
-<script src="${ static('desktop/js/autocomplete/sqlStatementsParser.js') }"></script>
-<script src="${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }"></script>
-<script src="${ static('desktop/js/autocomplete/globalSearchParser.js') }"></script>
-<script src="${ static('desktop/js/autocomplete/solrQueryParser.js') }"></script>
-<script src="${ static('desktop/js/autocomplete/solrFormulaParser.js') }"></script>
-<script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
-<script src="${ static('desktop/js/sqlAutocompleter3.js') }"></script>
-<script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
-<script src="${ static('desktop/js/autocompleter.js') }"></script>
-<script src="${ static('desktop/js/hue.json.js') }"></script>
-<script src="${ static('notebook/js/notebook.ko.js') }"></script>
-<script src="${ static('metastore/js/metastore.model.js') }"></script>
+<script>ace.config.set("basePath", "${ static('desktop/js/ace') }");</script>
 
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
+<script src="${ static('metastore/js/metastore.model.js') }"></script>
+
 <script>
   var shareViewModel = initSharing("#documentShareModal");
 </script>
 
-<%namespace name="charting" file="/charting.mako" />
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
 <%namespace name="notebookKoComponents" file="/common_notebook_ko_components.mako" />
 <%namespace name="hueAceAutocompleter" file="/hue_ace_autocompleter.mako" />
 
-${ charting.import_charts() }
 ${ configKoComponents.config() }
 ${ notebookKoComponents.aceKeyboardShortcuts() }
 ${ notebookKoComponents.downloadSnippetResults() }
 ${ hueAceAutocompleter.hueAceAutocompleter() }
-
-
-<script type="text/javascript">
-(function () {
-    var proxiedKoRegister = ko.components.register;
-    var registeredComponents = [];
-    ko.components.register = function () {
-      // This guarantees a ko component is only registered once
-      // Some currently get registered twice when switching between notebook and editor
-      if (registeredComponents.indexOf(arguments[0]) === -1) {
-        registeredComponents.push(arguments[0]);
-        return proxiedKoRegister.apply(this, arguments);
-      }
-    };
-  })();
-</script>
-
-${ koComponents.all() }
 
 ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 
@@ -586,1174 +517,93 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
 <script type="text/javascript">
 
-  $(document).ready(function () {
-
-    var onePageViewModel = (function () {
-
-      var EMBEDDABLE_PAGE_URLS = {
-        403: { url: '/403', title: '403' },
-        404: { url: '/404', title: '404' },
-        500: { url: '/500', title: '500' },
-        editor: { url: '/editor', title: '${_('Editor')}' },
-        notebook: { url: '/notebook', title: '${_('Notebook')}' },
-        metastore: { url: '/metastore/*', title: '${_('Table Browser')}' },
-        dashboard: { url: '/dashboard/*', title: '${_('Dashboard')}' },
-        oozie_workflow: { url: '/oozie/editor/workflow/*', title: '${_('Workflow')}' },
-        oozie_coordinator: { url: '/oozie/editor/coordinator/*', title: '${_('Schedule')}' },
-        oozie_bundle: { url: '/oozie/editor/bundle/*', title: '${_('Bundle')}' },
-        oozie_info: { url: '/oozie/list_oozie_info', title: '${_('Oozie')}' },
-        jobbrowser: { url: '/jobbrowser/apps', title: '${_('Job Browser')}' },
-        filebrowser: { url: '/filebrowser/view=*', title: '${_('File Browser')}' },
-        home: { url: '/home*', title: '${_('Home')}' },
-        catalog: { url: '/catalog', title: '${_('Catalog')}' },
-        indexer: { url: '/indexer/indexer/', title: '${_('Indexer')}' },
-        kafka: { url: '/indexer/topics/', title: '${_('Streams')}' },
-        collections: { url: '/dashboard/admin/collections', title: '${_('Search')}' },
-        % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
+  window.EMBEDDABLE_PAGE_URLS = {
+    403: { url: '/403', title: '403' },
+    404: { url: '/404', title: '404' },
+    500: { url: '/500', title: '500' },
+    editor: { url: '/editor', title: '${_('Editor')}' },
+    notebook: { url: '/notebook', title: '${_('Notebook')}' },
+    metastore: { url: '/metastore/*', title: '${_('Table Browser')}' },
+    dashboard: { url: '/dashboard/*', title: '${_('Dashboard')}' },
+    oozie_workflow: { url: '/oozie/editor/workflow/*', title: '${_('Workflow')}' },
+    oozie_coordinator: { url: '/oozie/editor/coordinator/*', title: '${_('Schedule')}' },
+    oozie_bundle: { url: '/oozie/editor/bundle/*', title: '${_('Bundle')}' },
+    oozie_info: { url: '/oozie/list_oozie_info', title: '${_('Oozie')}' },
+    jobbrowser: { url: '/jobbrowser/apps', title: '${_('Job Browser')}' },
+    filebrowser: { url: '/filebrowser/view=*', title: '${_('File Browser')}' },
+    home: { url: '/home*', title: '${_('Home')}' },
+    catalog: { url: '/catalog', title: '${_('Catalog')}' },
+    indexer: { url: '/indexer/indexer/', title: '${_('Indexer')}' },
+    kafka: { url: '/indexer/topics/', title: '${_('Streams')}' },
+    collections: { url: '/dashboard/admin/collections', title: '${_('Search')}' },
+    % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
         indexes: { url: '/indexer/indexes/*', title: '${_('Indexes')}' },
-        % else:
+    % else:
         indexes: { url: '/indexer/', title: '${_('Indexes')}' },
-        % endif
-        importer: { url: '/indexer/importer/', title: '${_('Importer')}' },
-        useradmin_users: { url: '/useradmin/users', title: '${_('User Admin - Users')}' },
-        useradmin_groups: { url: '/useradmin/groups', title: '${_('User Admin - Groups')}' },
-        useradmin_newgroup: { url: '/useradmin/groups/new', title: '${_('User Admin - New Group')}' },
-        useradmin_editgroup: { url: '/useradmin/groups/edit/:group', title: '${_('User Admin - Edit Group')}' },
-        useradmin_permissions: { url: '/useradmin/permissions', title: '${_('User Admin - Permissions')}' },
-        useradmin_editpermission: { url: '/useradmin/permissions/edit/*', title: '${_('User Admin - Edit Permission')}' },
-        useradmin_configurations: { url: '/useradmin/configurations', title: '${_('User Admin - Configurations')}' },
-        useradmin_newuser: { url: '/useradmin/users/new', title: '${_('User Admin - New User')}' },
-        useradmin_addldapusers: { url: '/useradmin/users/add_ldap_users', title: '${_('User Admin - Add LDAP User')}' },
-        useradmin_edituser: { url: '/useradmin/users/edit/:user', title: '${_('User Admin - Edit User')}' },
-        useradmin_addldapgroups: { url: '/useradmin/users/add_ldap_groups', title: '${_('User Admin - Add LDAP Groups')}' },
-        hbase: { url: '/hbase/', title: '${_('HBase Browser')}' },
-        security_hive: { url: '/security/hive', title: '${_('Security - Hive')}' },
-        security_hdfs: { url: '/security/hdfs', title: '${_('Security - HDFS')}' },
-        security_hive2: { url: '/security/hive2', title: '${_('Security - Hive')}' },
-        security_solr: { url: '/security/solr', title: '${_('Security - SOLR')}' },
-        help: { url: '/help/', title: '${_('Help')}' },
-        admin_wizard: { url: '/about/admin_wizard', title: '${_('Admin Wizard')}' },
-        logs: { url: '/logs', title: '${_('Logs')}' },
-        dump_config: { url: '/desktop/dump_config', title: '${_('Dump Configuration')}' },
-        threads: { url: '/desktop/debug/threads', title: '${_('Threads')}' },
-        metrics: { url: '/desktop/metrics', title: '${_('Metrics')}' },
-        sqoop: { url: '/sqoop', title: '${_('Sqoop')}' },
-        jobsub: { url: '/jobsub/not_available', title: '${_('Job Designer')}' },
-        % if other_apps:
-          % for other in other_apps:
-            ${ other.display_name }: { url: '/${ other.display_name }', title: '${ other.nice_name }' },
-          % endfor
-        % endif
-      };
-
-      var SKIP_CACHE = [
-          'home', 'oozie_workflow', 'oozie_coordinator', 'oozie_bundle', 'dashboard', 'metastore',
-          'filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_newgroup', 'useradmin_editgroup',
-          'useradmin_permissions', 'useradmin_editpermission', 'useradmin_configurations', 'useradmin_newuser',
-          'useradmin_addldapusers', 'useradmin_addldapgroups', 'useradmin_edituser', 'importer',
-          'security_hive', 'security_hdfs', 'security_hive2', 'security_solr', 'logs',
-          % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
-            'indexes',
-          % endif
-          % if other_apps:
-            % for other in other_apps:
-              '${ other.display_name }',
-            % endfor
-          % endif
-      ];
-
-      var OnePageViewModel = function () {
-        var self = this;
-
-        self.embeddable_cache = {};
-        self.currentApp = ko.observable();
-        self.currentContextParams = ko.observable(null);
-        self.currentQueryString = ko.observable(null);
-        self.isLoadingEmbeddable = ko.observable(false);
-        self.extraEmbeddableURLParams = ko.observable('');
-
-        self.getActiveAppViewModel = function (callback) {
-          var checkInterval = window.setInterval(function () {
-            var $koElement = $('#' + self.currentApp() + 'Components');
-            if ($koElement.length > 0 && ko.dataFor($koElement[0])) {
-              window.clearInterval(checkInterval);
-              callback(ko.dataFor($koElement[0]));
-            }
-          }, 25);
-        };
-
-        self.changeEditorType = function (type) {
-          self.getActiveAppViewModel(function (viewModel) {
-            if (viewModel && viewModel.selectedNotebook) {
-              hueUtils.waitForObservable(viewModel.selectedNotebook, function(){
-                if (viewModel.editorType() !== type) {
-                  viewModel.selectedNotebook().selectedSnippet(type);
-                  viewModel.editorType(type);
-                  viewModel.newNotebook(type);
-                }
-              });
-            }
-          })
-        };
-
-        self.currentApp.subscribe(function (newApp) {
-          huePubSub.publish('set.current.app.name', newApp);
-          self.getActiveAppViewModel(function (viewModel) {
-            huePubSub.publish('set.current.app.view.model', viewModel);
-          })
-        });
-
-        huePubSub.subscribe('get.current.app.view.model', function () {
-          self.getActiveAppViewModel(function (viewModel) {
-            huePubSub.publish('set.current.app.view.model', viewModel);
-          })
-        });
-
-        huePubSub.subscribe('get.current.app.name', function () {
-          huePubSub.publish('set.current.app.name', self.currentApp());
-        });
-
-        huePubSub.subscribe('open.editor.query', function (uuid) {
-          self.loadApp('editor');
-          self.getActiveAppViewModel(function (viewModel) {
-            viewModel.openNotebook(uuid);
-          })
-        });
-
-        huePubSub.subscribe('open.importer.query', function (data) {
-          self.loadApp('importer');
-          self.getActiveAppViewModel(function (viewModel) {
-            hueUtils.waitForVariable(viewModel.createWizard, function(){
-              hueUtils.waitForVariable(viewModel.createWizard.prefill, function(){
-                viewModel.createWizard.prefill.source_type(data['source_type']);
-                viewModel.createWizard.prefill.target_type(data['target_type']);
-                viewModel.createWizard.prefill.target_path(data['target_path']);
-                viewModel.createWizard.destination.outputFormat(data['target_type']);
-              });
-              hueUtils.waitForVariable(viewModel.createWizard.source.query, function(){
-                viewModel.createWizard.source.query({"id": data.id, "name": data.name});
-              });
-              hueUtils.waitForVariable(viewModel.createWizard.loadSampleData, function(){
-                viewModel.createWizard.loadSampleData(data);
-              });
-            });
-          })
-        });
-
-        huePubSub.subscribe('resize.form.actions', function () {
-          document.styleSheets[0].addRule('.form-actions','width: ' + $('.page-content').width() + 'px');
-          if ($('.content-panel:visible').length > 0) {
-            document.styleSheets[0].addRule('.form-actions','margin-left: -11px !important');
-          }
-        });
-
-        huePubSub.subscribe('split.panel.resized', function() {
-          huePubSub.publish('resize.form.actions');
-          huePubSub.publish('resize.plotly.chart');
-        });
-
-        huePubSub.publish('resize.form.actions');
-
-
-        huePubSub.subscribe('open.editor.new.query', function (statementOptions) {
-          self.loadApp('editor'); // Should open in Default
-
-          self.getActiveAppViewModel(function (viewModel) {
-            var editorType = statementOptions['type'] || 'hive'; // Next: use file extensions and default type of Editor for SQL
-            viewModel.newNotebook(editorType, function() {
-              self.changeEditorType(editorType);
-
-              if (statementOptions['statementPath']) {
-                viewModel.selectedNotebook().snippets()[0].statementType(statementOptions['statementType']);
-                viewModel.selectedNotebook().snippets()[0].statementPath(statementOptions['statementPath']);
-              }
-              if (statementOptions['directoryUuid']) {
-                viewModel.selectedNotebook().directoryUuid(statementOptions['directoryUuid']);
-              }
-            });
-          })
-        });
-
-        var loadedJs = [];
-        var loadedCss = [];
-        var loadedApps = [];
-        var head = document.getElementsByTagName('head')[0];
-
-        $('script[src]').each(function(){
-          loadedJs.push($(this).attr('src'));
-        });
-
-        $('link[href]').each(function(){
-          loadedCss.push($(this).attr('href'));
-        });
-
-        var loadScript = function (scriptUrl) {
-          var deferred = $.Deferred();
-          $.get(scriptUrl).done(function (contents) {
-            loadedJs.push(scriptUrl);
-            deferred.resolve(contents);
-          }).fail(function () {
-            deferred.resolve('');
-          });
-          return deferred.promise();
-        };
-
-        var loadScripts = function (scriptUrls) {
-          var promises = [];
-          while (scriptUrls.length) {
-            var scriptUrl = typeof adaptHueEmbeddedUrls !== 'undefined' ? adaptHueEmbeddedUrls(scriptUrls.shift()) : scriptUrls.shift();
-            if (loadedJs.indexOf(scriptUrl) !== -1) {
-              continue;
-            }
-            promises.push(loadScript(scriptUrl));
-          }
-          return promises;
-        };
-
-        var addGlobalCss = function ($el) {
-          var cssFile = $el.attr('href').split('?')[0];
-          if (loadedCss.indexOf(cssFile) === -1) {
-            loadedCss.push(cssFile);
-            $.ajaxSetup({ cache: true });
-            if (typeof adaptHueEmbeddedUrls !== 'undefined') {
-              $el.attr('href', adaptHueEmbeddedUrls($el.attr('href')));
-            }
-            % if conf.DEV.get():
-              $el.attr('href', $el.attr('href') + '?dev=' + Math.random());
-            % endif
-            $el.clone().appendTo($('head'));
-            $.ajaxSetup({ cache: false });
-          }
-          $el.remove();
-        };
-
-        // Only load CSS and JS files that are not loaded before
-        self.processHeaders = function (response){
-          var promise = $.Deferred();
-          var $rawHtml = $('<span>').html(response);
-
-          var $allScripts = $rawHtml.find('script[src]');
-          var scriptsToLoad = $allScripts.map(function () {
-            return $(this).attr('src');
-          }).toArray();
-          $allScripts.remove();
-
-          $rawHtml.find('link[href]').each(function () {
-            addGlobalCss($(this)); // Also removes the elements;
-          });
-
-          $rawHtml.find('a[href]').each(function () {
-            var link = $(this).attr('href');
-            if (link.startsWith('/') && !link.startsWith('/hue')){
-              link = '/hue' + link;
-            }
-            $(this).attr('href', link);
-          });
-
-          if (typeof adaptHueEmbeddedUrls !== 'undefined') {
-            $rawHtml.find('img[src]').each(function () {
-              var $img = $(this);
-              $img.attr('src', adaptHueEmbeddedUrls($img.attr('src')));
-            })
-          }
-
-          $rawHtml.unwrap('<span>');
-
-          var scriptPromises = loadScripts(scriptsToLoad);
-
-          var evalScriptSync = function () {
-            if (scriptPromises.length) {
-              // Evaluate the scripts in the order they were defined in the page
-              var nextScriptPromise = scriptPromises.shift();
-              nextScriptPromise.done(function (contents) {
-                if (contents) {
-                  new Function(contents)();
-                }
-                evalScriptSync();
-              });
-            } else {
-              // All evaluated
-              promise.resolve($rawHtml);
-            }
-          };
-
-          evalScriptSync();
-          return promise;
-        };
-
-        huePubSub.subscribe('hue4.process.headers', function(opts){
-          self.processHeaders(opts.response).done(function (rawHtml) {
-            opts.callback(rawHtml);
-          });
-        });
-
-        self.loadApp = function(app, loadDeep) {
-          if (self.currentApp() == 'editor' && $('#editorComponents').length) {
-            var vm = ko.dataFor($('#editorComponents')[0]);
-            if (vm.isPresentationMode()) {
-              vm.selectedNotebook().isPresentationMode(false);
-            }
-          }
-
-          if (self.currentApp() == 'editor' && self.embeddable_cache['editor'] && !$('#editorComponents').length) {
-            self.embeddable_cache['editor'] = undefined;
-          }
-
-          self.currentApp(app);
-          if (!app.startsWith('security')) {
-            self.lastContext = null;
-          }
-          SKIP_CACHE.forEach(function (skipped) {
-            huePubSub.publish('app.dom.unload', skipped);
-            $('#embeddable_' + skipped).html('');
-          });
-          self.isLoadingEmbeddable(true);
-          loadedApps.forEach(function (loadedApp) {
-            window.pauseAppIntervals(loadedApp);
-            huePubSub.pauseAppSubscribers(loadedApp);
-          });
-          $('.tooltip').hide();
-          huePubSub.publish('hue.datatable.search.hide');
-          huePubSub.publish('hue.scrollleft.hide');
-          huePubSub.publish('context.panel.visible', false);
-          huePubSub.publish('context.panel.visible.editor', false);
-          if (app === 'filebrowser') {
-            $(window).unbind('hashchange.fblist');
-          }
-          if (app.startsWith('oozie')) {
-            huePubSub.clearAppSubscribers('oozie');
-          }
-          if (app.startsWith('security')) {
-            $('#embeddable_security_hive').html('');
-            $('#embeddable_security_hdfs').html('');
-            $('#embeddable_security_hive2').html('');
-            $('#embeddable_security_solr').html('');
-          }
-          if (typeof self.embeddable_cache[app] === 'undefined') {
-            if (loadedApps.indexOf(app) == -1){
-              loadedApps.push(app);
-            }
-            var baseURL = EMBEDDABLE_PAGE_URLS[app].url;
-            if (self.currentContextParams() !== null) {
-              if (loadDeep && self.currentContextParams()[0]) {
-                baseURL += self.currentContextParams()[0];
-              } else {
-                var route = new page.Route(baseURL);
-                route.keys.forEach(function (key) {
-                  if (key.name === 0) {
-                    if (typeof self.currentContextParams()[key.name] !== 'undefined') {
-                      if (app === 'filebrowser') {
-                        baseURL = baseURL.replace('*', self.currentContextParams()[key.name]).replace(/#/g, '%23');
-                      } else {
-                        baseURL = baseURL.replace('*', self.currentContextParams()[key.name]);
-                      }
-                    } else {
-                      baseURL = baseURL.replace('*', '');
-                    }
-                  } else {
-                    baseURL = baseURL.replace(':' + key.name, self.currentContextParams()[key.name]);
-                  }
-                });
-              }
-              self.currentContextParams(null);
-            }
-            if (self.currentQueryString() !== null) {
-              baseURL += (baseURL.indexOf('?') > -1 ? '&' : '?') + self.currentQueryString();
-              self.currentQueryString(null);
-            }
-            baseURL = encodeURI(baseURL);
-            $.ajax({
-              url: baseURL + (baseURL.indexOf('?') > -1 ? '&' : '?') +'is_embeddable=true' + self.extraEmbeddableURLParams(),
-              beforeSend: function (xhr) {
-                xhr.setRequestHeader('X-Requested-With', 'Hue');
-              },
-              dataType: 'html',
-              success: function(response, status, xhr){
-                var type = xhr.getResponseHeader('Content-Type');
-                if (type.indexOf('text/') > -1) {
-                  window.clearAppIntervals(app);
-                  huePubSub.clearAppSubscribers(app);
-                  self.extraEmbeddableURLParams('');
-
-                  self.processHeaders(response).done(function ($rawHtml) {
-                    if (SKIP_CACHE.indexOf(app) === -1) {
-                      self.embeddable_cache[app] = $rawHtml;
-                    }
-                    $('#embeddable_' + app).html($rawHtml);
-                    huePubSub.publish('app.dom.loaded', app);
-                    self.isLoadingEmbeddable(false);
-                  });
-                } else {
-                  window.location.href = baseURL;
-                }
-              },
-              error: function (xhr) {
-                console.error('Route loading problem', xhr);
-                if ((xhr.status === 401 || xhr.status === 403) && app !== '403') {
-                  self.loadApp('403');
-                }
-                else if (app !== '500') {
-                  self.loadApp('500');
-                }
-                else {
-                  $.jHueNotify.error("${ _('It looks like you are offline or an unknown error happened. Please refresh the page.') }")
-                }
-              }
-            });
-          } else {
-            self.isLoadingEmbeddable(false);
-          }
-          window.document.title = 'Hue - ' + EMBEDDABLE_PAGE_URLS[app].title;
-          window.resumeAppIntervals(app);
-          huePubSub.resumeAppSubscribers(app);
-          $('.embeddable').hide();
-          $('#embeddable_' + app).show();
-          huePubSub.publish('app.gained.focus', app);
-          huePubSub.publish('resize.form.actions');
-        };
-
-        self.dropzoneError = function (filename) {
-          self.loadApp('importer');
-          self.getActiveAppViewModel(function (vm) {
-            vm.createWizard.source.path(DROPZONE_HOME_DIR + '/' + filename);
-          });
-          $('.dz-drag-hover').removeClass('dz-drag-hover');
-        };
-
-        var openImporter = function (path) {
-          self.loadApp('importer');
-          self.getActiveAppViewModel(function (vm) {
-            vm.createWizard.source.path(path);
-          });
-        };
-
-        self.dropzoneComplete = function (path) {
-          if (path.toLowerCase().endsWith('.csv')){
-            openImporter(path);
-          }
-          else {
-            huePubSub.publish('open.link', '/filebrowser/view=' + path);
-          }
-          $('.dz-drag-hover').removeClass('dz-drag-hover');
-        };
-
-        huePubSub.subscribe('open.in.importer', openImporter);
-
-        huePubSub.subscribe('assist.dropzone.complete', self.dropzoneComplete);
-
-        // prepend /hue to all the link on this page
-        $('${ '.hue-embedded-container a[href]' if IS_EMBEDDED.get() else 'a[href]' }').each(function () {
-          var link = $(this).attr('href');
-          if (link.startsWith('/') && !link.startsWith('/hue')){
-            link = '/hue' + link;
-          }
-          $(this).attr('href', link);
-        });
-
-        % if IS_EMBEDDED.get():
-        page.base(window.location.pathname + window.location.search);
-        page.baseSearch = window.location.search.replace('?', '');
-        if (!window.location.hash) {
-          window.location.hash = '#!/editor?type=impala'
-        }
-        page({ hashbang: true });
-        % else:
-        page.base('/hue');
-        % endif
-
-        var getUrlParameter = function (name) {
-          % if IS_EMBEDDED.get():
-            if (~window.location.hash.indexOf('?')) {
-              var paramString = window.location.hash.substring(window.location.hash.indexOf('?'));
-              var params = paramString.split('&');
-              for (var i = 0; i < params.length; i++) {
-                if (~params[i].indexOf(name + '=')) {
-                  return params[i].substring(name.length + 2);
-                }
-              }
-            }
-            return '';
-          % else:
-          return window.location.getParameter(name) || '';
-          % endif
-        };
-
-        self.lastContext = null;
-
-        var pageMapping = [
-          { url: '/403', app: '403' },
-          { url: '/500', app: '500' },
-          { url: '/about/', app: 'admin_wizard' },
-          { url: '/about/admin_wizard', app: 'admin_wizard' },
-          { url: '/accounts/logout', app: function () {
-            location.href = '/accounts/logout';
-          }},
-          { url: '/dashboard/admin/collections', app: function (ctx) {
-            page('/home/?type=search-dashboard');
-          }},
-          { url: '/dashboard/*', app: 'dashboard' },
-          { url: '/desktop/dump_config', app: 'dump_config' },
-          { url: '/desktop/debug/threads', app: function () {
-            self.loadApp('threads');
-            self.getActiveAppViewModel(function (viewModel) {
-              viewModel.fetchThreads();
-            });
-          }},
-          { url: '/desktop/metrics', app: function () {
-            self.loadApp('metrics');
-            self.getActiveAppViewModel(function (viewModel) {
-              viewModel.fetchMetrics();
-            });
-          }},
-          { url: '/desktop/download_logs', app: function () {
-            location.href = '/desktop/download_logs';
-          }},
-          { url: '/editor', app: function () {
-            // Defer to allow window.location param update
-            _.defer(function () {
-              if (typeof self.embeddable_cache['editor'] === 'undefined'){
-                if (getUrlParameter('editor') !== '') {
-                  self.extraEmbeddableURLParams('&editor=' + getUrlParameter('editor'));
-                } else if (getUrlParameter('type') !== '' && getUrlParameter('type') !== 'notebook') {
-                  self.extraEmbeddableURLParams('&type=' + getUrlParameter('type'));
-                }
-                self.loadApp('editor');
-              } else {
-                self.loadApp('editor');
-                if (getUrlParameter('editor') !== '') {
-                  self.getActiveAppViewModel(function (viewModel) {
-                    self.isLoadingEmbeddable(true);
-                    viewModel.openNotebook(getUrlParameter('editor')).always(function () {
-                      self.isLoadingEmbeddable(false);
-                    });
-                  });
-                } else if (getUrlParameter('type') !== '') {
-                  self.changeEditorType(getUrlParameter('type'));
-                }
-              }
-            });
-          }},
-          { url: '/notebook/editor', app: function (ctx) {
-            page('/editor?' + ctx.querystring);
-          }},
-          { url: '/filebrowser/view=*', app: 'filebrowser' },
-          { url: '/filebrowser/download=*', app: 'filebrowser' },
-          { url: '/filebrowser/*', app: function () {
-            page('/filebrowser/view=' + DROPZONE_HOME_DIR);
-          }},
-          { url: '/hbase/', app: 'hbase' },
-          { url: '/help', app: 'help' },
-          { url: '/home2*', app: function (ctx) {
-            page(ctx.path.replace(/home2/gi, 'home'));
-          }},
-          { url: '/home*', app: 'home' },
-          { url: '/catalog', app: 'catalog' },
-          { url: '/kafka/', app: 'kafka' },
-          { url: '/indexer/topics/*', app: 'kafka' },
-          { url: '/indexer/indexes/*', app: 'indexes' },
-          { url: '/indexer/', app: 'indexes' },
-          { url: '/indexer/importer/', app: 'importer' },
-          { url: '/indexer/importer/prefill/*', app: function (ctx) {
-            self.loadApp('importer');
-            self.getActiveAppViewModel(function (viewModel) {
-              var _params = ctx.path.match(/\/indexer\/importer\/prefill\/?([^/]+)\/?([^/]+)\/?([^/]+)?/);
-              if (! _params) {
-                console.warn('Could not match ' + href);
-              }
-              hueUtils.waitForVariable(viewModel.createWizard, function(){
-                hueUtils.waitForVariable(viewModel.createWizard.prefill, function(){
-                  viewModel.createWizard.prefill.source_type(_params && _params[1] ? _params[1] : '');
-                  viewModel.createWizard.prefill.target_type(_params && _params[2] ? _params[2] : '');
-                  viewModel.createWizard.prefill.target_path(_params && _params[3] ? _params[3] : '');
-                });
-              });
-            })
-          }},
-          { url: '/jobbrowser/jobs/job_*', app: function (ctx) {
-            page.redirect('/jobbrowser#!id=application_' + _.trimRight(ctx.params[0], '/').split('/')[0]);
-          }},
-          { url: '/jobbrowser/jobs/application_*', app: function (ctx) {
-            page.redirect('/jobbrowser#!id=application_' + _.trimRight(ctx.params[0], '/').split('/')[0]);
-          }},
-          { url: '/jobbrowser*', app: 'jobbrowser'},
-          { url: '/logs', app: 'logs' },
-          { url: '/metastore', app: function () {
-            page('/metastore/tables');
-          }},
-          { url: '/metastore/*', app: 'metastore' },
-          { url: '/notebook', app: function (ctx) {
-            self.loadApp('notebook');
-            var notebookId = hueUtils.getSearchParameter('?' + ctx.querystring, 'notebook');
-            if (notebookId !== '') {
-              self.getActiveAppViewModel(function (viewModel) {
-                self.isLoadingEmbeddable(true);
-                viewModel.openNotebook(notebookId).always(function () {
-                  self.isLoadingEmbeddable(false);
-                });
-              });
-            } else {
-              self.getActiveAppViewModel(function (viewModel) {
-                viewModel.newNotebook('notebook');
-              });
-            }
-          }},
-          { url: '/notebook/notebook', app: function (ctx) {
-            page('/notebook?' + ctx.querystring);
-          }},
-          { url: '/notebook/notebooks', app: function (ctx) {
-            page('/home/?' + ctx.querystring);
-          }},
-          { url: '/oozie/editor/bundle/list', app: function (ctx) {
-            page('/home/?type=oozie-bundle');
-          }},
-          { url: '/oozie/editor/bundle/*', app: 'oozie_bundle' },
-          { url: '/oozie/editor/coordinator/list', app: function (ctx) {
-            page('/home/?type=oozie-coordinator');
-          }},
-          { url: '/oozie/editor/coordinator/*', app: 'oozie_coordinator' },
-          { url: '/oozie/editor/workflow/list', app: function (ctx) {
-            page('/home/?type=oozie-workflow');
-          }},
-          { url: '/oozie/editor/workflow/*', app: 'oozie_workflow' },
-          { url: '/oozie/list_oozie_info', app: 'oozie_info' },
-          { url: '/oozie/list_oozie_sla', app: function() {
-            page.redirect('/jobbrowser/#!slas');
-          }},
-          { url: '/pig', app: function () {
-            self.loadApp('editor');
-            self.changeEditorType('pig');
-          }},
-          { url: '/search/*', app: 'dashboard' },
-          { url: '/security/hdfs', app: function (ctx) {
-            if (self.lastContext == null || ctx.path !== self.lastContext.path) {
-              self.loadApp('security_hdfs');
-            }
-            self.lastContext = ctx;
-          }},
-          { url: '/security/hive', app: function (ctx) {
-            if (self.lastContext == null || ctx.path !== self.lastContext.path) {
-              self.loadApp('security_hive');
-            }
-            self.lastContext = ctx;
-          }},
-          { url: '/security/hive2', app: function (ctx) {
-            if (self.lastContext == null || ctx.path !== self.lastContext.path) {
-              self.loadApp('security_hive2');
-            }
-            self.lastContext = ctx;
-          }},
-          { url: '/security/solr', app: function (ctx) {
-            if (self.lastContext == null || ctx.path !== self.lastContext.path) {
-              self.loadApp('security_solr');
-            }
-            self.lastContext = ctx;
-          }},
-          { url: '/security', app: function () {
-            page('/security/hive');
-          }},
-          { url: '/sqoop', app: 'sqoop' },
-          { url: '/jobsub', app: 'jobsub' },
-          { url: '/useradmin/configurations/', app: 'useradmin_configurations' },
-          { url: '/useradmin/groups/', app: 'useradmin_groups' },
-          { url: '/useradmin/groups/new', app: 'useradmin_newgroup' },
-          { url: '/useradmin/groups/edit/:group', app: 'useradmin_editgroup' },
-          { url: '/useradmin/permissions/', app: 'useradmin_permissions' },
-          { url: '/useradmin/permissions/edit/*', app: 'useradmin_editpermission' },
-          { url: '/useradmin/users/', app: 'useradmin_users' },
-          { url: '/useradmin/users/add_ldap_users', app: 'useradmin_addldapusers' },
-          { url: '/useradmin/users/add_ldap_groups', app: 'useradmin_addldapgroups' },
-          { url: '/useradmin/users/edit/:user', app: 'useradmin_edituser' },
-          { url: '/useradmin/users/new', app: 'useradmin_newuser' },
-          { url: '/useradmin/users/', app: 'useradmin_users' },
-          { url: '/useradmin', app: 'useradmin_users' },
-          % if other_apps:
-            % for other in other_apps:
-              { url: '/${ other.display_name }*', app: function (ctx) {
-                self.currentContextParams(ctx.params);
-                self.currentQueryString(ctx.querystring);
-                self.loadApp('${ other.display_name }', true)
-              }},
-            % endfor
-          % endif
-        ];
-
-        if (typeof HUE_EMBEDDED_PAGE_MAPPINGS !== 'undefined') {
-          pageMapping = pageMapping.concat(HUE_EMBEDDED_PAGE_MAPPINGS)
-        }
-
-        pageMapping.forEach(function (mapping) {
-          page(mapping.url, _.isFunction(mapping.app) ? mapping.app : function (ctx) {
-            self.currentContextParams(ctx.params);
-            self.currentQueryString(ctx.querystring);
-            self.loadApp(mapping.app);
-          })
-        });
-
-        huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
-          page('/', function() { page(clusterConfig['main_button_action'].page); });
-          page('*', function (ctx) {
-            console.error('Route not found', ctx);
-            self.loadApp('404');
-          });
-          page();
-        });
-
-        huePubSub.subscribe('open.link', function (href) {
-          if (href) {
-            var prefix = '${ '' if IS_EMBEDDED.get() else '/hue' }';
-            if (href.startsWith('/') && !href.startsWith(prefix)){
-              page(prefix + href);
-            } else {
-              page(href);
-            }
-          } else {
-            console.warn('Received an open.link without href.')
-          }
-        });
-      };
-
-      var onePageViewModel = new OnePageViewModel();
-      ko.applyBindings(onePageViewModel, $('.page-content')[0]);
-      return onePageViewModel;
-    })();
-
-    var sidePanelViewModel = (function () {
-      function SidePanelViewModel () {
-        var self = this;
-        self.apiHelper = ApiHelper.getInstance();
-        self.assistWithoutStorage = ko.observable(false);
-        self.leftAssistVisible = ko.observable(self.apiHelper.getFromTotalStorage('assist', 'left_assist_panel_visible', true));
-        self.leftAssistVisible.subscribe(function (val) {
-          if (!self.assistWithoutStorage()){
-            self.apiHelper.setInTotalStorage('assist', 'left_assist_panel_visible', val);
-          }
-          hueAnalytics.convert('hue', 'leftAssistVisible/' + val);
-          window.setTimeout(function () {
-            huePubSub.publish('split.panel.resized');
-            $(window).trigger('resize');
-          }, 0);
-        });
-
-        self.rightAssistVisible = ko.observable(self.apiHelper.getFromTotalStorage('assist', 'right_assist_panel_visible', true));
-        self.rightAssistVisible.subscribe(function (val) {
-          if (!self.assistWithoutStorage()){
-            self.apiHelper.setInTotalStorage('assist', 'right_assist_panel_visible', val);
-          }
-          hueAnalytics.convert('hue', 'rightAssistVisible/' + val)
-          window.setTimeout(function () {
-            huePubSub.publish('reposition.scroll.anchor.up');
-            huePubSub.publish('split.panel.resized');
-            $(window).trigger('resize');
-          }, 0);
-        });
-        self.rightAssistAvailable = ko.observable(false);
-
-        huePubSub.subscribe('assist.highlight.risk.suggestions', function () {
-          if (self.rightAssistAvailable() && !self.rightAssistVisible()) {
-            self.rightAssistVisible(true);
-          }
-        });
-
-        huePubSub.subscribe('set.current.app.name', function (appName) {
-          if (appName === 'dashboard') {
-            self.rightAssistAvailable(true);
-          } else if (appName !== 'editor' && appName !== 'notebook') {
-            self.rightAssistAvailable(false);
-          }
-        });
-
-        huePubSub.subscribe('active.snippet.type.changed', function (snippetType) {
-          self.rightAssistAvailable(snippetType === 'impala' || snippetType === 'hive' || snippetType ==='pig');
-        });
-
-        huePubSub.publish('get.current.app.name');
-
-        self.activeAppViewModel = ko.observable();
-        self.currentApp = ko.observable('');
-        self.templateApp = ko.pureComputed(function(){
-          if (['editor', 'notebook'].indexOf(self.currentApp()) > -1){
-            return self.currentApp()
-          }
-          else {
-            return '';
-          }
-        });
-
-        self.contextPanelVisible = ko.observable(false);
-        self.contextPanelVisible.subscribe(function () {
-          var $el = $('.snippet .ace-editor:visible');
-          if ($el.length === 0) {
-            $el = $('.content-panel:visible');
-          }
-          $('.context-panel').width($el.width()).css('left', $el.offset().left);
-        });
-
-        self.sessionsAvailable = ko.observable(false);
-
-        self.activeAppViewModel.subscribe(function (viewModel) {
-          self.sessionsAvailable(typeof viewModel.selectedNotebook !== 'undefined');
-        });
-
-        huePubSub.subscribe('context.panel.visible', function (visible) {
-          self.contextPanelVisible(visible);
-        });
-
-        huePubSub.subscribe('set.current.app.view.model', self.activeAppViewModel);
-        huePubSub.subscribe('app.dom.loaded', self.currentApp);
-
-        huePubSub.publish('get.current.app.view.model');
-
-        var previousVisibilityValues = {};
-        huePubSub.subscribe('both.assists.hide', function(withoutStorage){
-          previousVisibilityValues = {
-            left: self.leftAssistVisible(),
-            right: self.rightAssistVisible()
-          };
-          self.assistWithoutStorage(withoutStorage);
-          self.leftAssistVisible(false);
-          self.rightAssistVisible(false);
-          window.setTimeout(function(){
-            self.assistWithoutStorage(false);
-          }, 0);
-        });
-
-        huePubSub.subscribe('both.assists.show', function(withoutStorage){
-          self.assistWithoutStorage(withoutStorage);
-          self.leftAssistVisible(previousVisibilityValues.left);
-          self.rightAssistVisible(previousVisibilityValues.right);
-          window.setTimeout(function(){
-            self.assistWithoutStorage(false);
-          }, 0);
-        });
-
-        huePubSub.subscribe('right.assist.hide', function(withoutStorage){
-          previousVisibilityValues = {
-            left: self.leftAssistVisible(),
-            right: self.rightAssistVisible()
-          };
-          self.assistWithoutStorage(withoutStorage);
-          self.rightAssistVisible(false);
-          window.setTimeout(function(){
-            self.assistWithoutStorage(false);
-          }, 0);
-        });
-
-        huePubSub.subscribe('right.assist.show', function () {
-          if (!self.rightAssistVisible()) {
-            self.rightAssistVisible(true);
-          }
-        });
-
-        huePubSub.subscribe('left.assist.show', function () {
-          if (!self.leftAssistVisible()) {
-            self.leftAssistVisible(true);
-          }
-        });
-
-      }
-
-      var sidePanelViewModel = new SidePanelViewModel();
-      ko.applyBindings(sidePanelViewModel, $('.left-panel')[0]);
-      ko.applyBindings(sidePanelViewModel, $('#leftResizer')[0]);
-      ##  ko.applyBindings(sidePanelViewModel, $('#rightResizer')[0]);
-      ko.applyBindings(sidePanelViewModel, $('.right-panel')[0]);
-      ko.applyBindings(sidePanelViewModel, $('.context-panel')[0]);
-
-      return sidePanelViewModel;
-    })();
-
-
-
-    var topNavViewModel = (function (onePageViewModel) {
-
-      function TopNavViewModel (onePageViewModel) {
-        var self = this;
-        self.onePageViewModel = onePageViewModel;
-        self.leftNavVisible = ko.observable(false);
-        self.leftNavVisible.subscribe(function (val) {
-          huePubSub.publish('left.nav.open.toggle', val);
-          hueAnalytics.convert('hue', 'leftNavVisible/' + val);
-          if (val) {
-            // Defer or it will be triggered by the open click
-            window.setTimeout(function () {
-              $(document).one('click', function () {
-                if (self.leftNavVisible()) {
-                  self.leftNavVisible(false);
-                }
-              })
-            }, 0);
-          }
-        });
-
-        // TODO: Drop. Just for PoC
-        self.pocClusterMode = ko.observable();
-        ApiHelper.getInstance().withTotalStorage('topNav', 'multiCluster', self.pocClusterMode, 'dw')
-        huePubSub.subscribe('set.multi.cluster.mode', self.pocClusterMode);
-
-        self.onePageViewModel.currentApp.subscribe(function () {
-          self.leftNavVisible(false);
-        });
-
-        self.mainQuickCreateAction = ko.observable();
-        self.quickCreateActions = ko.observableArray();
-
-        self.hasJobBrowser = ko.observable(true);
-
-        huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
-          if (clusterConfig && clusterConfig['main_button_action']) {
-            var topApp = clusterConfig['main_button_action'];
-            self.mainQuickCreateAction({
-              displayName: topApp.buttonName,
-              icon: topApp.type,
-              tooltip: topApp.tooltip,
-              url: topApp.page
-            });
-          } else {
-            self.mainQuickCreateAction(undefined);
-          }
-
-          if (clusterConfig && clusterConfig['button_actions']) {
-            var apps = [];
-            var buttonActions = clusterConfig['button_actions'];
-              buttonActions.forEach(function(app) {
-              var interpreters = [];
-              var toAddDivider = false;
-              var dividerAdded = false;
-              var lastInterpreter = null;
-              $.each(app['interpreters'], function(index, interpreter) {
-                // Promote the first catagory of interpreters
-                if (! dividerAdded) {
-                  toAddDivider = (app.name === 'editor' || app.name === 'dashboard') && (lastInterpreter != null && lastInterpreter.is_sql != interpreter.is_sql);
-                }
-                interpreters.push({
-                  displayName: interpreter.displayName,
-                  dividerAbove: toAddDivider,
-                  icon: interpreter.type,
-                  url: interpreter.page
-                });
-                lastInterpreter = interpreter;
-                if (toAddDivider) {
-                  dividerAdded = true;
-                  toAddDivider = false;
-                }
-              });
-
-              % if is_admin(user) and cluster != ANALYTIC_DB:
-                if (app.name === 'editor') {
-                  interpreters.push({
-                    displayName: '${ _('Add more...') }',
-                    dividerAbove: true,
-                    href: 'http://gethue.com/sql-editor/'
-                  });
-                }
-              % endif
-
-              apps.push({
-                displayName: app.displayName,
-                icon: app.name,
-                isCategory: interpreters.length > 0,
-                children: interpreters,
-                url: app.page
-              });
-            });
-
-            self.quickCreateActions(apps);
-          } else {
-            self.quickCreateActions([]);
-          }
-
-          self.hasJobBrowser(clusterConfig && clusterConfig['app_config'] && clusterConfig['app_config']['browser'] && (clusterConfig['app_config']['browser']['interpreter_names'].indexOf('yarn') != -1 || clusterConfig['app_config']['browser']['interpreter_names'].indexOf('dataeng') != -1));
-        });
-
-        huePubSub.subscribe('hue.new.default.app', function () {
-          huePubSub.publish('cluster.config.refresh.config');
-        });
-      }
-
-      var topNavViewModel = new TopNavViewModel(onePageViewModel);
-      % if not IS_EMBEDDED.get():
-      ko.applyBindings(topNavViewModel, $('.top-nav')[0]);
-      % endif
-
-      return topNavViewModel;
-    })(onePageViewModel);
-
-
-    (function (onePageViewModel, topNavViewModel) {
-
-      function SideBarViewModel (onePageViewModel, topNavViewModel) {
-        var self = this;
-
-        self.items = ko.observableArray();
-
-        self.pocClusterMode = topNavViewModel.pocClusterMode;
-
-        huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
-          var items = [];
-
-          if (clusterConfig && clusterConfig['app_config']) {
-            var appsItems = [];
-            var appConfig = clusterConfig['app_config'];
-            if (appConfig['editor']) {
-              var editor = null;
-              if (clusterConfig['main_button_action'] && clusterConfig['main_button_action'].page.indexOf('/editor') === 0) {
-                editor = clusterConfig['main_button_action'];
-              }
-
-              if (!editor) {
-                var defaultEditor = appConfig['editor']['default_sql_interpreter'];
-                if (defaultEditor) {
-                  var foundEditor = appConfig['editor']['interpreters'].filter(function (interpreter) {
-                    return interpreter.type === defaultEditor;
-                  });
-                  if (foundEditor.length === 1) {
-                    editor = foundEditor[0];
-                  }
-                }
-              }
-
-              if (!editor && appConfig['editor']['interpreters'].length > 1) {
-                editor = appConfig['editor']['interpreters'][1];
-              }
-
-              if (editor) {
-                appsItems.push({
-                  displayName: '${ _("Editor") }',
-                  url: editor['page'],
-                  icon: 'editor'
-                });
-              } else {
-                appsItems.push({
-                  displayName: appConfig['editor']['displayName'],
-                  url: appConfig['editor']['page'],
-                  icon: 'editor'
-                });
-              }
-            }
-            ['dashboard', 'scheduler'].forEach(function(appName) {
-              if (appConfig[appName]) {
-                appsItems.push({
-                  displayName: appConfig[appName]['displayName'],
-                  url: appConfig[appName]['page'],
-                  icon: appName
-                });
-              }
-            });
-            if (appsItems.length > 0) {
-              items.push({
-                isCategory: true,
-                displayName: '${ _('Apps') }',
-                children: appsItems
-              })
-            }
-
-            var browserItems = [];
-            browserItems.push({
-              displayName: '${ _('Documents') }',
-              url: '/home/',
-              icon: 'documents'
-            });
-            if (appConfig['browser'] && appConfig['browser']['interpreters']) {
-              appConfig['browser']['interpreters'].forEach(function(browser) {
-                browserItems.push({
-                  displayName: browser.displayName,
-                  url: browser.page,
-                  icon: browser.type
-                });
-              });
-            }
-            if (browserItems.length > 0) {
-              items.push({
-                isCategory: true,
-                displayName: '${ _('Browsers') }',
-                children: browserItems
-              })
-            }
-
-            var sdkItems = [];
-            if (appConfig['sdkapps'] && appConfig['sdkapps']['interpreters']) {
-              appConfig['sdkapps']['interpreters'].forEach(function(browser) {
-                sdkItems.push({
-                  displayName: browser['displayName'],
-                  url: browser['page']
-                });
-              });
-            }
-            if (sdkItems.length > 0) {
-              items.push({
-                isCategory: true,
-                displayName: appConfig['sdkapps']['displayName'],
-                children: sdkItems
-              })
-            }
-          }
-
-          self.items(items);
-        });
-
-        self.leftNavVisible = topNavViewModel.leftNavVisible;
-        self.onePageViewModel = onePageViewModel;
-      }
-
-      var sidebarViewModel = new SideBarViewModel(onePageViewModel, topNavViewModel);
-      ko.applyBindings(sidebarViewModel, $('.hue-sidebar')[0]);
-    % if IS_MULTICLUSTER_ONLY.get():
-      ko.applyBindings(sidebarViewModel, $('.hue-dw-sidebar-container')[0]);
     % endif
+    importer: { url: '/indexer/importer/', title: '${_('Importer')}' },
+    useradmin_users: { url: '/useradmin/users', title: '${_('User Admin - Users')}' },
+    useradmin_groups: { url: '/useradmin/groups', title: '${_('User Admin - Groups')}' },
+    useradmin_newgroup: { url: '/useradmin/groups/new', title: '${_('User Admin - New Group')}' },
+    useradmin_editgroup: { url: '/useradmin/groups/edit/:group', title: '${_('User Admin - Edit Group')}' },
+    useradmin_permissions: { url: '/useradmin/permissions', title: '${_('User Admin - Permissions')}' },
+    useradmin_editpermission: { url: '/useradmin/permissions/edit/*', title: '${_('User Admin - Edit Permission')}' },
+    useradmin_configurations: { url: '/useradmin/configurations', title: '${_('User Admin - Configurations')}' },
+    useradmin_newuser: { url: '/useradmin/users/new', title: '${_('User Admin - New User')}' },
+    useradmin_addldapusers: { url: '/useradmin/users/add_ldap_users', title: '${_('User Admin - Add LDAP User')}' },
+    useradmin_edituser: { url: '/useradmin/users/edit/:user', title: '${_('User Admin - Edit User')}' },
+    useradmin_addldapgroups: { url: '/useradmin/users/add_ldap_groups', title: '${_('User Admin - Add LDAP Groups')}' },
+    hbase: { url: '/hbase/', title: '${_('HBase Browser')}' },
+    security_hive: { url: '/security/hive', title: '${_('Security - Hive')}' },
+    security_hdfs: { url: '/security/hdfs', title: '${_('Security - HDFS')}' },
+    security_hive2: { url: '/security/hive2', title: '${_('Security - Hive')}' },
+    security_solr: { url: '/security/solr', title: '${_('Security - SOLR')}' },
+    help: { url: '/help/', title: '${_('Help')}' },
+    admin_wizard: { url: '/about/admin_wizard', title: '${_('Admin Wizard')}' },
+    logs: { url: '/logs', title: '${_('Logs')}' },
+    dump_config: { url: '/desktop/dump_config', title: '${_('Dump Configuration')}' },
+    threads: { url: '/desktop/debug/threads', title: '${_('Threads')}' },
+    metrics: { url: '/desktop/metrics', title: '${_('Metrics')}' },
+    connectors: { url: '/desktop/connectors', title: '${_('Connectors')}' },
+    analytics: { url: '/desktop/analytics', title: '${_('Analytics')}' },
+    sqoop: { url: '/sqoop', title: '${_('Sqoop')}' },
+    jobsub: { url: '/jobsub/not_available', title: '${_('Job Designer')}' },
+    % if other_apps:
+      % for other in other_apps:
+        ${ other.display_name }: { url: '/${ other.display_name }', title: '${ other.nice_name }' },
+      % endfor
+    % endif
+  }
 
-    })(onePageViewModel, topNavViewModel);
+  window.SKIP_CACHE = [
+    'home', 'oozie_workflow', 'oozie_coordinator', 'oozie_bundle', 'dashboard', 'metastore',
+    'filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_newgroup', 'useradmin_editgroup',
+    'useradmin_permissions', 'useradmin_editpermission', 'useradmin_configurations', 'useradmin_newuser',
+    'useradmin_addldapusers', 'useradmin_addldapgroups', 'useradmin_edituser', 'importer',
+    'security_hive', 'security_hdfs', 'security_hive2', 'security_solr', 'logs',
+    % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
+      'indexes',
+    % endif
+    % if other_apps:
+      % for other in other_apps:
+        '${ other.display_name }',
+      % endfor
+    % endif
+  ];
 
-    huePubSub.publish('cluster.config.get.config');
+  window.OTHER_APPS = [];
+  % if other_apps:
+    % for other in other_apps:
+      window.OTHER_APPS.push('${ other.display_name }');
+    % endfor
+  % endif
 
-    $(document).on('hideHistoryModal', function (e) {
-      $('#clearNotificationHistoryModal').modal('hide');
-    });
+  % if is_admin(user) and cluster != ANALYTIC_DB:
+  window.SHOW_ADD_MORE_EDITORS = true;
+  % endif
 
-    huePubSub.subscribe('query.and.watch', function (query) {
-      $.post(query['url'], {
-        format: "json",
-        sourceType: query['sourceType']
-      },function(resp) {
-        if (resp.history_uuid) {
-          huePubSub.publish('open.editor.query', resp.history_uuid);
-        } else if (resp.message) {
-          $(document).trigger("error", resp.message);
-        }
-      }).fail(function (xhr) {
-        $(document).trigger("error", xhr.responseText);
-      });
-    });
 
-    var hideJobsPanels = function (e) {
-      if ($(e.target).parents('.navbar-default').length > 0 && $(e.target).closest('.history-panel').length === 0 && $(e.target).closest('.btn-toggle-jobs-panel').length === 0 && $(e.target).closest('.hamburger-hue').length === 0 && $('.jobs-panel').is(':visible')) {
-        huePubSub.publish('hide.jobs.panel');
-        huePubSub.publish('hide.history.panel');
-      }
-    };
-
-    var clickThrottle = -1;
-    $(window).click(function (e) {
-      window.clearTimeout(clickThrottle);
-      clickThrottle = window.setTimeout(function () {
-        hideJobsPanels(e);
-      }, 10);
-    });
-
-    $('.page-content').jHueScrollUp();
-
-    if (typeof window.hueDebug === 'undefined') {
-      window.hueDebug = {};
-    }
-
-    window.hueDebug.onePageViewModel = onePageViewModel;
-    window.hueDebug.sidePanelViewModel = sidePanelViewModel;
-    window.hueDebug.topNavViewModel = topNavViewModel;
-    window.hueDebug.viewModel = function (element) {
-      if (typeof element !== 'undefined' && typeof element === 'string') {
-        element = $(element)[0];
-      }
-      return element ? ko.dataFor(element) : window.hueDebug.onePageViewModel;
-    };
+  $(document).ready(function () {
 
     var tour = new Shepherd.Tour({
       defaults: {
@@ -1828,7 +678,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       $(document).on('keyup', closeTourOnEsc);
       tour.start();
     });
-
   });
 </script>
 

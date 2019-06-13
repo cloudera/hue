@@ -71,8 +71,6 @@ ${layout.menubar(section='query')}
     height: 400px;
   }
 </style>
-<link href="${ static('desktop/ext/css/leaflet.css') }" rel="stylesheet">
-<link href="${ static('desktop/ext/css/leaflet.markercluster.css') }" rel="stylesheet">
 
 <div class="container-fluid">
   <div id="expand"><i class="fa fa-chevron-right" style="color: #FFFFFF"></i></div>
@@ -425,27 +423,7 @@ $(document).ready(function () {
   });
 
 
-  $("input[name='target_dir']").after(getFileBrowseButton($("input[name='target_dir']")));
-
-  function getFileBrowseButton(inputElement) {
-    return $("<a>").addClass("btn").addClass("fileChooserBtn").addClass("hide").text("..").click(function (e) {
-      e.preventDefault();
-      $("#fileChooserModal").jHueFileChooser({
-        onFolderChange:function (filePath) {
-          inputElement.val(filePath);
-        },
-        onFolderChoose:function (filePath) {
-          inputElement.val(filePath);
-          $("#fileChooserModal").slideUp();
-        },
-        createFolder:false,
-        uploadFile:false,
-        selectFolder:true,
-        initialPath:$.trim(inputElement.val())
-      });
-      $("#fileChooserModal").slideDown();
-    });
-  }
+  $("input[name='target_dir']").after(hueUtils.getFileBrowseButton($("input[name='target_dir']")));
 
   $("#collapse").click(function () {
     $(".sidebar-nav").parent().css("margin-left", "-31%");

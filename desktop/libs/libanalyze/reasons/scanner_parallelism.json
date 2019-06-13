@@ -5,7 +5,7 @@
     "AverageScannerThreadConcurrency",
     "LocalTime"
   ],
-  "unit_id": 5,
+  "unit": 5,
   "rule": {
     "condition": "vars['IOBound']==False",
     "expr": "float(8 - vars['AverageScannerThreadConcurrency']) / 8.0 * vars['LocalTime']",

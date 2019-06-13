@@ -32,7 +32,7 @@ from libzookeeper.conf import zkensemble
 from indexer.conf import config_morphline_path
 
 from metadata.catalog.navigator_client import CatalogApiException
-from metadata.conf import has_navigator
+from metadata.conf import has_catalog
 from metadata.manager_client import ManagerApi
 
 
@@ -47,7 +47,7 @@ def error_handler(view_fn):
     }
 
     try:
-      if has_navigator(args[0].user): # TODO
+      if has_catalog(args[0].user): # TODO
         return view_fn(*args, **kwargs)
       else:
         raise CatalogApiException('Navigator API is not configured.')

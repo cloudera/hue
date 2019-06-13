@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  cloudera:
+      image: gethue/hue:latest
+      hostname: hue
+      container_name: hue
+      dns: 8.8.8.8
+      ports:
+      - "8888:8888"
+      volumes:
+        - ./hue.ini:/usr/share/hue/desktop/conf/z-hue.ini
+      depends_on:
+      - "database"
+  database:
+      image: mysql:5.7
+      ports:
+          - "33061:3306"
+      command: --init-file /data/application/init.sql
+      volumes:
+          - data:/var/lib/mysql
+          - ./init.sql:/data/application/init.sql
+      environment:
+          MYSQL_ROOT_USER: root
+          MYSQL_ROOT_PASSWORD: secret
+          MYSQL_DATABASE: hue
+          MYSQL_USER: root
+          MYSQL_PASSWORD: secret
+volumes:
+  data:

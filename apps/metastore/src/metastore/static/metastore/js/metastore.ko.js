@@ -26,8 +26,7 @@ var MetastoreViewModel = (function () {
 
     self.partitionsLimit = options.partitionsLimit;
     self.assistAvailable = ko.observable(true);
-    self.apiHelper = ApiHelper.getInstance();
-    self.isHue4 = ko.observable(options.hue4);
+    self.apiHelper = window.apiHelper;
     self.isLeftPanelVisible = ko.observable();
     self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
     self.optimizerEnabled = ko.observable(options.optimizerEnabled || false);
@@ -56,7 +55,7 @@ var MetastoreViewModel = (function () {
       if (!self.source()) {
         return true;
       }
-      if (!self.source().namespace()) {
+      if (self.source().loading()) {
         return true;
       }
       return false;
@@ -64,7 +63,8 @@ var MetastoreViewModel = (function () {
 
     huePubSub.publish('cluster.config.get.config', function (clusterConfig) {
       var initialSourceType = options.sourceType || 'hive';
-      if (clusterConfig && clusterConfig.app_config && clusterConfig.app_config.editor && clusterConfig.app_config.editor.interpreters) {
+      if (clusterConfig && clusterConfig.app_config && (
+          (clusterConfig.app_config.editor && clusterConfig.app_config.editor.interpreters) || clusterConfig.app_config.catalogs)) {
         var sources = [];
         clusterConfig.app_config.editor.interpreters.forEach(function (interpreter) {
           if (interpreter.is_sql) {
@@ -75,6 +75,15 @@ var MetastoreViewModel = (function () {
             }))
           }
         });
+        if (clusterConfig.app_config.catalogs) {
+          clusterConfig.app_config.catalogs.forEach(function (interpreter) {
+            sources.push(new MetastoreSource({
+              metastoreViewModel: self,
+              name: interpreter.name,
+              type: interpreter.type
+            }))
+          });
+        }
         if (!sources.length) {
           sources.push(new MetastoreSource({
             metastoreViewModel: self,
@@ -143,13 +152,10 @@ var MetastoreViewModel = (function () {
     });
 
     huePubSub.subscribe('metastore.url.change', function () {
-      var prefix = '/metastore/';
-      if (self.isHue4()){
-        prefix = '/hue' + prefix;
-      }
+      var prefix = '/hue/metastore/';
       if (self.source() && self.source().namespace()) {
         var params = {
-          source: self.source().type
+          source_type: self.source().type
         };
         if (window.HAS_MULTI_CLUSTER) {
           params.namespace = self.source().namespace().id
@@ -224,7 +230,7 @@ var MetastoreViewModel = (function () {
           if (foundTables.length === 1) {
             self.source().namespace().database().setTable(foundTables[0], callback);
           } else if (clearDbCacheOnMissing) {
-            self.source().namespace().database().catalogEntry.clearCache({ invalidate: 'invalidate', silenceErrors: true }).done(function () {
+            self.source().namespace().database().catalogEntry.clearCache({ invalidate: 'invalidate', silenceErrors: true }).then(function () {
               self.source().namespace().database().load(function () {
                 setTableAfterLoad(false);
               });
@@ -247,7 +253,7 @@ var MetastoreViewModel = (function () {
   MetastoreViewModel.prototype.loadUrl = function () {
     var self = this;
 
-    var path = (IS_HUE_4 ? window.location.pathname.substr(4) : window.location.pathname);
+    var path = window.location.pathname.substr(4);
     if (!path) {
       path = '/metastore/tables';
     }
@@ -281,8 +287,8 @@ var MetastoreViewModel = (function () {
           if (param.indexOf('namespace=') === 0) {
             namespaceId = param.replace('namespace=', '');
           }
-          if (param.indexOf('source=') === 0) {
-            sourceType = param.replace('source=', '');
+          if (param.indexOf('source_type=') === 0) {
+            sourceType = param.replace('source_type=', '');
           }
         });
       }
@@ -300,8 +306,8 @@ var MetastoreViewModel = (function () {
         }
       }
 
-      if (!namespaceId && ApiHelper.getInstance().getFromTotalStorage('contextSelector', 'lastSelectedNamespace')) {
-        namespaceId = ApiHelper.getInstance().getFromTotalStorage('contextSelector', 'lastSelectedNamespace').id;
+      if (!namespaceId && window.apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedNamespace')) {
+        namespaceId = window.apiHelper.getFromTotalStorage('contextSelector', 'lastSelectedNamespace').id;
       }
 
       self.source().lastLoadNamespacesDeferred.done(function () {

@@ -17,7 +17,6 @@
 */
 @import (reference) "cui/colors.less";
 @import (reference) "hue-mixins.less";
-
 @import "components/hue-breadcrumbs.less";
 @import "components/hue-catalog-entries-table.less";
 @import "components/hue-demi-modal.less";
@@ -44,7 +43,6 @@
 @import "components/hue-wizard.less";
 @import "hue-helpers.less";
 @import "hue-c3-overrides.less";
-
 
 ::-webkit-scrollbar {
   width: 9px;
@@ -84,10 +82,12 @@ input[type='password']::-ms-reveal {
   padding-left: 0;
   color: @hue-primary-color-dark;
   cursor: pointer;
+
   .favorite-app {
     opacity: 0;
     .hue-linear-transition(opacity);
   }
+
   &:hover {
     .favorite-app {
       opacity: 1;
@@ -114,10 +114,11 @@ input[type='password']::-ms-reveal {
   color: @hue-primary-color-dark !important;
   padding: 0 !important;
   border: none !important;
-  max-width: none!important;
+  max-width: none !important;
 }
 
-.app-header a:focus, .app-header a:hover {
+.app-header a:focus,
+.app-header a:hover {
   color: @hue-primary-color-dark !important;
 }
 
@@ -134,14 +135,14 @@ input[type='password']::-ms-reveal {
   text-align: center !important;
 }
 
-.nowrap, .no-wrap {
+.nowrap,
+.no-wrap {
   white-space: nowrap;
 }
 
 .no-padding {
   padding: 0;
 }
-
 
 // Hue Checkbox
 
@@ -169,9 +170,8 @@ input[type='password']::-ms-reveal {
   }
 
   &.hide {
-    display: none!important;
+    display: none !important;
   }
-
 }
 
 .hueCheckboxText {
@@ -200,9 +200,11 @@ input[type='password']::-ms-reveal {
   height: 1em !important; //d3 conflict
   fill: currentColor;
   margin-bottom: 0.2em;
+
   &.hi-fw {
     width: 1.28571429em !important;
   }
+
   &.hi-bigger {
     height: 1.1em !important;
   }
@@ -318,6 +320,7 @@ input[type='password']::-ms-reveal {
     margin-left: 15px;
     vertical-align: text-top;
   }
+
   .config-property {
     display: inline !important;
   }
@@ -360,13 +363,13 @@ input[type='password']::-ms-reveal {
 }
 
 .dockable {
-  background-color: #FFF;
+  background-color: #fff;
   z-index: 1000;
   padding-bottom: 2px;
 }
 
 .pointer {
- cursor: pointer!important;
+  cursor: pointer !important;
 }
 
 .actionbar-creation {
@@ -382,12 +385,15 @@ input[type='password']::-ms-reveal {
   width: 8px;
   height: 8px;
   display: inline-block;
+
   &.green {
     background-color: @cui-green;
   }
+
   &.orange {
     background-color: @cui-orange;
   }
+
   &.red {
     background-color: @cui-red;
   }
@@ -401,69 +407,80 @@ input[type='password']::-ms-reveal {
 
 .status-border {
   &.completed {
-    border-color: @cui-green!important;
+    border-color: @cui-green !important;
   }
+
   &.running {
-    border-color: @cui-orange!important;
+    border-color: @cui-orange !important;
   }
+
   &.failed {
-    border-color: @cui-red!important;
+    border-color: @cui-red !important;
   }
+
   &.info {
-    border-color: @hue-primary-color-dark!important;
+    border-color: @hue-primary-color-dark !important;
   }
 }
 
 .status-background {
   &.completed {
-    background-color: @cui-green!important;
+    background-color: @cui-green !important;
   }
+
   &.running {
-    background-color: @cui-orange!important;
+    background-color: @cui-orange !important;
   }
+
   &.failed {
-    background-color: @cui-red!important;
+    background-color: @cui-red !important;
   }
+
   &.info {
-    background-color: @hue-primary-color-dark!important;
+    background-color: @hue-primary-color-dark !important;
   }
 }
 
 .status-content {
   &.completed {
-    color: @cui-green!important;
+    color: @cui-green !important;
   }
+
   &.running {
-    color: @cui-orange!important;
+    color: @cui-orange !important;
   }
+
   &.failed {
-    color: @cui-red!important;
+    color: @cui-red !important;
   }
+
   &.info {
-    color: @hue-primary-color-dark!important;
+    color: @hue-primary-color-dark !important;
   }
 }
-
 
 .blue,
 .card-heading-blue {
-  color: @hue-primary-color-dark!important;
+  color: @hue-primary-color-dark !important;
 }
 
 .red {
-  color: @cui-red-400!important;
+  color: @cui-red-400 !important;
 }
 
 #ace_settingsmenu {
   width: 350px;
+
   label {
     display: inline-block;
     height: 31px;
     line-height: 31px;
   }
+
   input {
     margin-bottom: 0;
   }
+
   input[type='checkbox'] {
     margin-right: 2px;
     margin-top: 10px;
@@ -473,6 +490,7 @@ input[type='password']::-ms-reveal {
 ul.errorlist {
   list-style: none outside none;
   margin: 0;
+
   li {
     color: @cui-red-700;
     padding: 2px;
@@ -483,15 +501,18 @@ ul.errorlist {
 
 .mega-popover {
   max-width: 1200px;
+
   .content {
     height: 300px;
     overflow-y: scroll;
   }
+
   .popover-content {
     min-height: 360px;
     min-width: 440px;
     max-width: 660px;
   }
+
   input[type="text"] {
     border-radius: 20px;
     margin: 0;
@@ -545,7 +566,7 @@ ul.errorlist {
   padding: 1px !important;
   padding-left: 4px !important;
   font-size: 12px !important;
-  border: 1px solid rgba(0,0,0,0.2) !important;
+  border: 1px solid rgba(0, 0, 0, 0.2) !important;
   border-radius: 2px !important;
   box-shadow: none !important;
   margin-left: -1px;
@@ -620,8 +641,10 @@ ul.errorlist {
   white-space: initial !important;
 }
 
-.nav-pills-border, .nav-tabs-border {
+.nav-pills-border,
+.nav-tabs-border {
   border-bottom: 1px solid @cui-default-border-color;
+
   li.active {
     margin-bottom: -1px;
   }
@@ -635,6 +658,7 @@ ul.errorlist {
   margin-top: 50px;
   color: @cui-gray-500;
   line-height: 60px;
+
   i {
     font-size: 100px;
   }
@@ -662,19 +686,19 @@ ul.errorlist {
   .nowrap-ellipsis();
 }
 
-.inline-autocomplete-container {
+.inline-autocomp-container {
   position: relative;
   border-radius: 2px;
   border: 1px solid @cui-gray-300;
   background-color: @cui-white;
 
   > div {
-    position:absolute;
+    position: absolute;
     left: 0;
     right: 0;
     height: 30px;
 
-    .inline-autocomplete-magnify-icon {
+    .inline-autocomp-magnify-icon {
       position: absolute;
       left: 10px;
       top: 7px;
@@ -694,15 +718,15 @@ ul.errorlist {
       line-height: 15px;
       background-color: transparent;
 
-      &.inline-autocomplete-magnify-input {
+      &.inline-autocomp-magnify-input {
         padding-left: 35px;
       }
 
-      &.inline-autocomplete-input {
+      &.inline-autocomp-input {
         z-index: 2;
       }
 
-      &.inline-autocomplete-autocomplete {
+      &.inline-autocomp-autocomp {
         color: @cui-gray-500;
         outline: none;
         z-index: 1;
@@ -711,8 +735,8 @@ ul.errorlist {
   }
 }
 
-.hue-autocomplete-item:hover > a,
-.hue-autocomplete-item:focus > a {
+.hue-autocomp-item:hover > a,
+.hue-autocomp-item:focus > a {
   background-color: @cui-blue-700 !important;
 }
 
@@ -722,7 +746,7 @@ ul.errorlist {
   overflow: auto;
 }
 
-.hue-autocomplete-item {
+.hue-autocomp-item {
   a {
     display: block;
     clear: both;
@@ -732,14 +756,16 @@ ul.errorlist {
     color: @cui-gray-800;
     white-space: nowrap;
     padding: 6px 20px !important;
-    span{
+
+    span {
       font-size: 15px;
     }
   }
+
   div.no-match {
     width: 200px;
     height: 25px;
-    font-size : 15px
+    font-size: 15px;
   }
 }
 

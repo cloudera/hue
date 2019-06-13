@@ -433,13 +433,15 @@ class LdapBackend(object):
         # %(user)s is a special string that will get replaced during the authentication process
         setattr(self._backend.settings, 'USER_DN_TEMPLATE', "%(user)s@" + nt_domain)
 
+    # If Secure ldaps is specified in hue.ini then ldap code automatically use SSL/TLS communication
+    if not ldap_url.lower().startswith('ldaps'):
+      setattr(self._backend.settings, 'START_TLS', ldap_config.USE_START_TLS.get())
+
     # Certificate-related config settings
     if ldap_config.LDAP_CERT.get():
-      setattr(self._backend.settings, 'START_TLS', ldap_config.USE_START_TLS.get())
       ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_DEMAND)
       ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, ldap_config.LDAP_CERT.get())
     else:
-      setattr(self._backend.settings, 'START_TLS', False)
       ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
 
     if ldap_config.FOLLOW_REFERRALS.get():
@@ -600,6 +602,50 @@ class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
     user = rewrite_user(user)
     return user
 
+class KnoxSpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
+  """
+  Knox Trusted proxy passes GET parameter doAs
+  """
+
+  @metrics.spnego_authentication_time
+  def authenticate(self, request=None, username=None):
+    username = self.clean_username(username, request)
+    username = force_username_case(username)
+    is_super = False
+    if User.objects.count() == 0:
+      is_super = True
+
+    try:
+      if desktop.conf.AUTH.IGNORE_USERNAME_CASE.get():
+        user = User.objects.get(username__iexact=username)
+      else:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+      user = find_or_create_user(username, None)
+      if user is not None and user.is_active:
+        profile = get_profile(user)
+        profile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
+        profile.save()
+        user.is_superuser = is_super
+
+        ensure_has_a_group(user)
+
+        user.save()
+
+    if user is not None:
+      user = rewrite_user(user)
+
+    return user
+
+  def clean_username(self, username, request):
+    # Grab doAs parameter here
+    doas_user = request.GET.get("doAs", "")
+    return doas_user
+
+  def get_user(self, user_id):
+    user = super(KnoxSpnegoDjangoBackend, self).get_user(user_id)
+    user = rewrite_user(user)
+    return user
 
 
 class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
@@ -684,7 +730,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
     return None
 
   def filter_users_by_claims(self, claims):
-    username = claims.get('preferred_username')
+    username = claims.get(import_from_settings('OIDC_USERNAME_ATTRIBUTE', 'preferred_username'))
     if not username:
       return self.UserModel.objects.none()
     return self.UserModel.objects.filter(username__iexact=username)
@@ -699,7 +745,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
     """Return object for a newly created user account."""
     # Overriding lib's logic, use preferred_username from oidc as username
 
-    username = claims.get('preferred_username', '')
+    username = claims.get(import_from_settings('OIDC_USERNAME_ATTRIBUTE', 'preferred_username'), '')
     email = claims.get('email', '')
     first_name = claims.get('given_name', '')
     last_name = claims.get('family_name', '')

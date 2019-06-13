@@ -2,12 +2,13 @@
   "type": "SQLOperator",
   "node_name": ["HDFS_SCAN_NODE", "KUDU_SCAN_NODE", "HBASE_SCAN_NODE"],
   "metric_names": [
-    "MissingStats"
+    "MissingStats", "TotalTime"
   ],
   "info_names": ["Table"],
+  "unit": 5,
   "rule": {
     "condition": "vars['MissingStats'] == 1",
-    "expr": "1",
+    "expr": "vars['TotalTime'] * 0.2",
     "message": "The statistics are missing or corrupt which prevent scan optimizations.",
     "label": "Statistics Missing"
   },

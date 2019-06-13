@@ -669,7 +669,6 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     </tr>
   </script>
 
-  <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 
 
@@ -730,9 +729,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       }
     };
 
-    var apiHelper = ApiHelper.getInstance({
-      user: "${ user }"
-    });
+    var apiHelper = window.apiHelper;
 
     // ajax modal windows
     var openChownWindow = function (path, user, group, next) {
@@ -790,7 +787,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     }
 
     var updateHash = function (hash) {
-      hash = encodeURI(hash);
+      hash = encodeURI(decodeURIComponent(hash));
       %if not is_embeddable:
       window.location.hash = hash;
       %else:
@@ -829,7 +826,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       return {
         name: file.name,
         path: file.path,
-        url: encodeURI(file.url),
+        url: file.url,
         type: file.type,
         permissions: file.rwx,
         mode: file.mode,
@@ -966,7 +963,6 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           return _ret;
         }
       }
-
       self.files = ko.observableArray(ko.utils.arrayMap(files, function (file) {
         return new File(file);
       }));
@@ -1169,7 +1165,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           }
 
           if (data.type != null && data.type == "file") {
-            window.location.href = data.url;
+            huePubSub.publish('open.link', data.url);
             return false;
           }
 
@@ -1328,7 +1324,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           self.targetPageNum(1);
           self.enableFilterAfterSearch = false;
           self.searchQuery("");
-          self.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(file.path));
+          self.targetPath(file.url);
           updateHash(stripHashes(file.path));
         } else {
           %if is_embeddable:
@@ -1340,11 +1336,11 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       };
 
       self.editFile = function () {
-        window.location.href = "${url('filebrowser_views_edit', path='')}" + encodeURI(self.selectedFile().path);
+        huePubSub.publish('open.link', self.selectedFile().url.replace("${url('filebrowser.views.view', path='')}", "${url('filebrowser_views_edit', path='')}"));
       };
 
       self.downloadFile = function () {
-        window.location.href = "${url('filebrowser_views_download', path='')}" + encodeURI(self.selectedFile().path);
+        huePubSub.publish('open.link', self.selectedFile().url.replace("${url('filebrowser.views.view', path='')}", "${url('filebrowser_views_download', path='')}"));
       };
 
       self.renameFile = function () {
@@ -1524,20 +1520,20 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
           $("#chownForm").attr("action", "/filebrowser/chown?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
 
-          $("select[name=user]").val(self.selectedFile().stats.user);
+          $("select[name='user']").val(self.selectedFile().stats.user);
 
           $("#chownForm input[name='group_other']").removeClass("fieldError");
           $("#chownForm input[name='user_other']").removeClass("fieldError");
           $("#chownRequired").hide();
 
-          if ($("select[name=group] option:contains('" + self.selectedFile().stats.group + "')").length > 0) {
-            $("select[name=group]").val(self.selectedFile().stats.group);
+          if ($("select[name='group'] option:contains('" + self.selectedFile().stats.group + "')").length > 0) {
+            $("select[name='group']").val(self.selectedFile().stats.group);
           } else {
-            $("select[name=group]").val("__other__");
-            $("input[name=group_other]").val(self.selectedFile().stats.group);
+            $("select[name='group']").val("__other__");
+            $("input[name='group_other']").val(self.selectedFile().stats.group);
           }
 
-          $("select[name=group]").change();
+          $("select[name='group']").change();
 
           $("#changeOwnerModal").modal({
             keyboard: true,
@@ -1602,9 +1598,9 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
           for (var i = 0; i < permissions.length; i++) {
             if (mode & 1) {
-              $("#chmodForm input[name=" + permissions[i] + "]").attr("checked", true);
+              $("#chmodForm input[name='" + permissions[i] + "']").attr("checked", true);
             } else {
-              $("#chmodForm input[name=" + permissions[i] + "]").attr("checked", false);
+              $("#chmodForm input[name='" + permissions[i] + "']").attr("checked", false);
             }
             mode >>>= 1;
           }
@@ -1671,7 +1667,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
       self.submitSelected = function() {
         % if 'oozie' in apps:
-          $.get("${ url('oozie:submit_external_job', application_path='/') }../" + self.selectedFile().path, {'format': IS_HUE_4 ? 'json' : 'html'}, function (response) {
+          $.get("${ url('oozie:submit_external_job', application_path='/') }../" + self.selectedFile().path, { 'format': 'json' }, function (response) {
             $('#submit-wf-modal').html(response);
             $('#submit-wf-modal').modal('show');
           });
@@ -2086,7 +2082,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
                 '<span class="break-word" data-dz-name></span>' +
                 '<div class="pull-right">' +
                 '<span class="muted" data-dz-size></span>&nbsp;&nbsp;' +
-                '<span data-dz-remove><a href="javascript:undefined;" title="' + HUE_I18n.dropzone.cancelUpload + '"><i class="fa fa-fw fa-times"></i></a></span>' +
+                '<span data-dz-remove><a href="javascript:undefined;" title="' + I18n('Cancel upload') + '"><i class="fa fa-fw fa-times"></i></a></span>' +
                 '<span style="display: none" data-dz-uploaded><i class="fa fa-fw fa-check muted"></i></span>' +
                 '</div>' +
                 '<div class="progress-row-bar" data-dz-uploadprogress></div>' +
@@ -2125,7 +2121,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
               $('#progressStatusBar div').width(progress.toFixed() + "%");
             },
             canceled: function () {
-              $.jHueNotify.info(HUE_I18n.dropzone.uploadCanceled);
+              $.jHueNotify.info(I18n('The upload has been canceled'));
             },
             complete: function (data) {
               if (data.xhr.response != '') {
@@ -2134,7 +2130,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
                   if (response.status != 0) {
                     $(document).trigger('error', response.data);
                   } else {
-                    $(document).trigger('info', response.path + ' ' + HUE_I18n.dropzone.uploadSucceeded);
+                    $(document).trigger('info', response.path + ' ' + I18n('uploaded successfully'));
                     viewModel.filesToHighlight.push(response.path);
                   }
                 }
@@ -2401,17 +2397,14 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       var hashchange = function () {
         if (window.location.pathname.indexOf('/filebrowser') > -1) {
           var targetPath = "";
-          var hash = window.location.hash.substring(1);
-          if (hash.search(/(<([^>]+)>)/ig) > -1) {
-            hash = encodeURI(hash);
-          }
+          var hash = decodeURI(window.location.hash.substring(1));
           if (hash != null && hash != "" && hash.indexOf('/') > -1) {
             targetPath = "${url('filebrowser.views.view', path='')}";
             if (hash.indexOf("!!") != 0) {
-              targetPath += stripHashes(hash);
+              targetPath += stripHashes(encodeURIComponent(hash));
             }
             else {
-              targetPath = viewModel.targetPath() + hash;
+              targetPath = viewModel.targetPath() + encodeURI(hash);
             }
             viewModel.targetPageNum(1)
           }
@@ -2455,7 +2448,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
               %if is_embeddable:
               huePubSub.publish('open.link', data.url);
               %else:
-              window.location.href = data.url;
+              huePubSub.publish('open.link', data.url);
               %endif
               return false;
             } else {

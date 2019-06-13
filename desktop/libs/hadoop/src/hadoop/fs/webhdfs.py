@@ -25,6 +25,7 @@ import posixpath
 import stat
 import threading
 import time
+import urllib
 
 from urlparse import urlparse
 from django.utils.encoding import smart_str
@@ -34,7 +35,7 @@ from hadoop.fs import normpath as fs_normpath, SEEK_SET, SEEK_CUR, SEEK_END
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
-from hadoop.hdfs_site import get_nn_sentry_prefixes, get_umask_mode, get_supergroup
+from hadoop.hdfs_site import get_nn_sentry_prefixes, get_umask_mode, get_supergroup, get_webhdfs_ssl
 
 
 import hadoop.conf
@@ -522,6 +523,35 @@ class WebHdfs(Hdfs):
       if key.lower() == "path":
         return self.normpath(value)
 
+  def is_web_accessible(self):
+    return True
+
+  def read_url(self, path, offset=0, length=None, bufsize=None):
+    """
+    read(path, offset, length[, bufsize]) -> data
+
+    Read data from a file.
+    """
+    path = self.strip_normpath(path)
+    params = self._getparams()
+    params['op'] = 'OPEN'
+    params['offset'] = long(offset)
+    if length is not None:
+      params['length'] = long(length)
+    if bufsize is not None:
+      params['bufsize'] = bufsize
+    if self._security_enabled:
+      token = self.get_delegation_token(self.user)
+      if token:
+        params['delegation'] = token
+        # doas should not be present with delegation token as the token includes the username
+        # https://hadoop.apache.org/docs/r1.0.4/webhdfs.html
+        if 'doas' in params:
+          del params['doas']
+        if 'user.name' in params:
+          del params['user.name']
+    quoted_path = urllib.quote(smart_str(path))
+    return self._client._make_url(quoted_path, params)
 
   def read(self, path, offset, length, bufsize=None):
     """
@@ -855,7 +885,7 @@ class WebHdfs(Hdfs):
     params['renewer'] = renewer
     headers = self._getheaders()
     res = self._root.get(params=params, headers=headers)
-    return res['Token']['urlString']
+    return res['Token'] and res['Token']['urlString']
 
 
   def do_as_user(self, username, fn, *args, **kwargs):
@@ -906,6 +936,10 @@ class File(object):
     self._path = fs_normpath(path)
     self._pos = 0
     self._mode = mode
+    if fs.is_web_accessible():
+      def read_url(fs=fs):
+        return fs.read_url(self._path, self._pos)
+      self.read_url = read_url
 
     try:
       self._stat = fs.stats(path)
@@ -978,8 +1012,7 @@ def _get_service_url(hdfs_config):
   fs_defaultfs = hdfs_config.FS_DEFAULTFS.get()
   netloc = Hdfs.urlsplit(fs_defaultfs)[1]
   host = netloc.split(':')[0]
-  port = hadoop.conf.DEFAULT_NN_HTTP_PORT
-  return "http://%s:%s/webhdfs/v1" % (host, port)
+  return "{0}://{1}:{2}/webhdfs/v1".format(get_webhdfs_ssl()["protocol"], host, get_webhdfs_ssl()["port"])
 
 
 def test_fs_configuration(fs_config):

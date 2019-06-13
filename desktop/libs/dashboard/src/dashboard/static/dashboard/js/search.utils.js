@@ -142,7 +142,7 @@ function addTemplateFunctions(item) {
 }
 
 function fixTemplateDotsAndFunctionNames(template) {
-  var _mustacheTmpl = stripHtmlFromFunctions(template);
+  var _mustacheTmpl = hueUtils.stripHtmlFromFunctions(template);
   var _mustacheTags = _mustacheTmpl.match(/{{(.*?)}}/g);
   if (_mustacheTags){
     $.each(_mustacheTags, function (cnt, tag) {
@@ -161,22 +161,4 @@ function fixTemplateDotsAndFunctionNames(template) {
     _mustacheTmpl = _mustacheTmpl.replace(/\{\{\{\/hue_fn(.+?)\}\}\}/g, "{{/hue_fn$1}}")
   }
   return _mustacheTmpl;
-}
-
-function stripHtmlFromFunctions(template) {
-  // strips HTML from inside the functions
-  var _tmpl = template;
-  var _mustacheFunctions = _tmpl.match(/{{#(.[\s\S]*?){{\//g);
-  if (_mustacheFunctions){
-    $.each(_mustacheFunctions, function (cnt, fn) {
-      _tmpl = _tmpl.replace(fn, fn.substr(0, fn.indexOf("}}") + 2) + $.trim(stripHtml(fn.substr(fn.indexOf("}}") + 2).slice(0, -3))) + "{{/");
-    });
-  }
-  return _tmpl;
-}
-
-function stripHtml(html) {
-  var tmp = document.createElement("DIV");
-  tmp.innerHTML = html;
-  return tmp.textContent || tmp.innerText;
 }

@@ -255,7 +255,7 @@ var CreateCollectionViewModel = function() {
           'quote': self.fieldQuoteCharacter()
         }).done(function(data) {
           if (data.status == 0) {
-            window.location.href = (IS_HUE_4 ? '/hue' : '') + '/indexer/'; // Can't open on collection name as no collections refresh yet
+            huePubSub.publish('open.link', '/hue/indexer');// Can't open on collection name as no collections refresh yet
           } else {
             self.isLoading(false);
             $(document).trigger("error", data.message);
@@ -274,7 +274,7 @@ var CreateCollectionViewModel = function() {
           'source': self.source()
         }).done(function(data) {
           if (data.status == 0) {
-            window.location.href = (IS_HUE_4 ? '/hue' : '') + '/indexer/'; // Can't open on collection name as no collections refresh yet
+            huePubSub.publish('open.link', '/hue/indexer');// Can't open on collection name as no collections refresh yet
           } else {
             $(document).trigger("error", data.message);
           }
@@ -383,7 +383,7 @@ var EditCollectionViewModel = function() {
         'quote': self.fieldQuoteCharacter()
       }).done(function(data) {
         if (data.status == 0) {
-          window.location.href = '/indexer';
+          huePubSub.publish('open.link', '/hue/indexer');
         } else {
           self.isLoading(false);
           $(document).trigger("error", data.message);
@@ -587,24 +587,6 @@ var CollectionsViewModel = function(config) {
 
 
 // Utils
-
-function getFileBrowseButton(inputElement) {
-  return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function (e) {
-    e.preventDefault();
-    $("#filechooser").jHueFileChooser({
-      initialPath: inputElement.val(),
-      onFileChoose: function (filePath) {
-        inputElement.val(filePath);
-        inputElement.trigger("change");
-        $("#chooseFile").modal("hide");
-      },
-      selectFolder: false,
-      createFolder: false
-    });
-    $("#chooseFile").modal("show");
-  });
-}
-
 
 function inferFields(field_data, collection) {
   var fields = [];

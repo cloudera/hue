@@ -51,7 +51,7 @@ def get_history_server_api():
         yarn_cluster = cluster.get_cluster_conf_for_job_submission()
         if yarn_cluster is None:
           raise PopupException(_('No Spark History Server is available.'))
-        API_CACHE = SparkHistoryServerApi(yarn_cluster.SPARK_HISTORY_SERVER_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
+        API_CACHE = SparkHistoryServerApi(yarn_cluster.SPARK_HISTORY_SERVER_URL.get(), yarn_cluster.SPARK_HISTORY_SERVER_SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
     finally:
       API_CACHE_LOCK.release()
 

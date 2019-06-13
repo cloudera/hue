@@ -4,7 +4,7 @@
   "metric_names": [
     "LocalTime"
   ],
-  "unit_id": 5,
+  "unit": 5,
   "rule": {
     "expr": "vars['LocalTime'] - float(vars['InputRows']) / 0.01",
     "message": "Excess time (over expected time) spent in the sort; might be caused by too many sorting column",

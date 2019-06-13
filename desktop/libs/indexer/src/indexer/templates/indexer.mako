@@ -27,16 +27,9 @@
 %if not is_embeddable:
 ${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode }
 
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
-<script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
-<script src="${ static('desktop/ext/js/selectize-plugin-clear.js') }"></script>
 <script src="${ static('metastore/js/metastore.ko.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
-<script src="${ static('desktop/js/ko.editable.js') }"></script>
 
 ${ assist.assistJSModels() }
-
-<script src="${ static('notebook/js/notebook.ko.js') }"></script>
 
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
@@ -240,7 +233,7 @@ ${ assist.assistPanel() }
 
             <div class="control-group" data-bind="visible: createWizard.fileFormat().inputFormat() == 'table'">
               <label for="path" class="control-label"><div>${ _('Table') }</div>
-                <input type="text" data-bind="value: createWizard.fileFormat().table, hivechooser: createWizard.fileFormat().table, skipColumns: true, apiHelperUser: '${ user }', apiHelperType: 'hive'">
+                <input type="text" data-bind="value: createWizard.fileFormat().table, hiveChooser: createWizard.fileFormat().table, skipColumns: true, apiHelperUser: '${ user }', apiHelperType: 'hive'">
               </label>
             </div>
 
@@ -934,7 +927,7 @@ ${ assist.assistPanel() }
     var IndexerViewModel = function () {
       var self = this;
 
-      self.apiHelper = ApiHelper.getInstance();
+      self.apiHelper = window.apiHelper;
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);

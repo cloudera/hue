@@ -29,12 +29,8 @@ ${ commonheader(_("Create database"), 'metastore', user, request) | n,unicode }
 
 ${layout.metastore_menubar()}
 
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
 <script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
 <script src="${ static('metastore/js/metastore.ko.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
-<script src="${ static('desktop/js/ko.editable.js') }"></script>
 
 ${ assist.assistJSModels() }
 
@@ -228,7 +224,7 @@ ${ assist.assistPanel() }
 
     function CreateDatabaseViewModel() {
       var self = this;
-      self.apiHelper = ApiHelper.getInstance();
+      self.apiHelper = window.apiHelper;
 
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();

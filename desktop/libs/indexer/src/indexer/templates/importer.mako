@@ -31,28 +31,9 @@
 %if not is_embeddable:
 ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
-## TODO lot of those re-imported
-<script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>
-<script src="${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }"></script>
-<script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
-<script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
-<script src="${ static('desktop/js/autocompleter.js') }"></script>
-<script src="${ static('desktop/js/hue.json.js') }"></script>
-
-
-<script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
-<script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
-<script src="${ static('desktop/ext/js/selectize-plugin-clear.js') }"></script>
 <script src="${ static('metastore/js/metastore.ko.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
-<script src="${ static('desktop/js/ko.editable.js') }"></script>
-<script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
-<script src="${ static('desktop/js/ko.selectize.js') }"></script>
 
 ${ assist.assistJSModels() }
-
-<script src="${ static('notebook/js/notebook.ko.js') }"></script>
 
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
@@ -432,7 +413,7 @@ ${ assist.assistPanel() }
               <div>
                 <label class="control-label">
                   <div><!-- ko if: $index() === 0 -->${ _('Table') }<!-- /ko --></div>
-                  <input type="text" class="input-xlarge" data-bind="hivechooser: name, skipInvalids:true, pathChangeLevel: 'table', skipColumns: true, apiHelperUser: '${ user }', namespace: $root.createWizard.source.namespace, compute: $root.createWizard.source.compute, apiHelperType: $root.createWizard.source.sourceType, mainScrollable: $(MAIN_SCROLLABLE)" placeholder="${ _('Table name or <database>.<table>') }">
+                  <input type="text" class="input-xlarge" data-bind="hiveChooser: name, skipInvalids:true, pathChangeLevel: 'table', skipColumns: true, apiHelperUser: '${ user }', namespace: $root.createWizard.source.namespace, compute: $root.createWizard.source.compute, apiHelperType: $root.createWizard.source.sourceType, mainScrollable: $(MAIN_SCROLLABLE)" placeholder="${ _('Table name or <database>.<table>') }">
                   <a class="pointer pull-right margin-left-5" style="margin-top: 7px" data-bind="click: function() { $root.createWizard.source.tables.remove(this); }, visible: $root.createWizard.source.tables().length > 1"><i class="fa fa-minus"></i></a>
                 </label>
               </div>
@@ -497,7 +478,7 @@ ${ assist.assistPanel() }
         <!-- ko if: ['table', 'rdbms'].indexOf($root.createWizard.source.inputFormat()) >= 0 && $root.createWizard.source.tables().length > 1 -->
         <ul class="nav nav-tabs" style="margin-top: -14px">
           <!-- ko foreach: $root.createWizard.source.tables -->
-          <li data-bind="css: { 'active': $root.createWizard.source.selectedTableIndex() === $index() }"><a href="#" data-bind="text: name, click: function(){ $root.createWizard.source.selectedTableIndex($index()) }"></a></li>
+          <li data-bind="css: { 'active': $root.createWizard.source.selectedTableIndex() === $index() }"><a href="javascript: void(0)" data-bind="text: name, click: function(){ $root.createWizard.source.selectedTableIndex($index()) }"></a></li>
           <!-- /ko -->
         </ul>
         <!-- /ko -->
@@ -559,7 +540,7 @@ ${ assist.assistPanel() }
 
             <!-- ko if: ['table', 'database'].indexOf(outputFormat()) != -1 -->
             <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
-            <input type="text" class="input-xxlarge" data-bind="value: name, hivechooser: name, namespace: namespace, compute: compute, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: sourceType, mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
+            <input type="text" class="input-xxlarge" data-bind="value: name, hiveChooser: name, namespace: namespace, compute: compute, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: sourceType, mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
             <!-- /ko -->
 
             <!-- ko if: outputFormat() == 'altus' -->
@@ -1076,7 +1057,7 @@ ${ assist.assistPanel() }
         <button class="btn btn-primary disable-feedback" data-bind="click: function() { createWizard.indexFile(); }, enable: createWizard.readyToIndex() && !createWizard.indexingStarted()">
           ${ _('Submit') } <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.indexingStarted"></i>
         </button>
-        
+
         % if ENABLE_ENVELOPE.get():
         <button class="btn disable-feedback" data-bind="click: createWizard.showCommands, enable: createWizard.readyToIndex()">
           ${ _('Show Commands') }
@@ -1408,7 +1389,7 @@ ${ assist.assistPanel() }
               <ul class="nav help-list-spacing">
               </ul>
             </div>
-            <div class="tab-pane" id="help-editor-syntax-multiquery">              
+            <div class="tab-pane" id="help-editor-syntax-multiquery">
             </div>
           </div>
         </div>
@@ -1416,7 +1397,7 @@ ${ assist.assistPanel() }
     </div>
   </div>
   <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">${_('Close')}</a>
+    <a href="javascript: void(0)" class="btn" data-dismiss="modal">${_('Close')}</a>
   </div>
 </div>
 
@@ -1581,6 +1562,16 @@ ${ assist.assistPanel() }
           if (args) {
             loadFromObj(args);
           }
+
+          setTimeout(function () {
+            var types = type.args.filter(function(x){ return x && x.type !== 'checkbox'});
+            for (var i = 0; i < types.length; i++) {
+              self[types[i].name].subscribe(function() {
+                // Update the data preview when tweaking Format options on step 1
+                viewModel.createWizard.guessFieldTypes();
+              });
+            }
+          }); // Prevent notification on start
         }
       };
 
@@ -1642,7 +1633,7 @@ ${ assist.assistPanel() }
           var statementCols = [];
           var temporaryColumns = [];
           sampleCols.forEach(function (sampleCol) {
-            statementCols.push(SqlUtils.backTickIfNeeded(self.sourceType, sampleCol.name()));
+            statementCols.push(sqlUtils.backTickIfNeeded(self.sourceType, sampleCol.name()));
             var col = {
               name: sampleCol.name(),
               type: sampleCol.type()
@@ -1662,14 +1653,14 @@ ${ assist.assistPanel() }
 
           var statement = 'SELECT ';
           statement += statementCols.join(',\n    ');
-          statement += '\n FROM ' + SqlUtils.backTickIfNeeded(self.sourceType, tableName) + ';';
+          statement += '\n FROM ' + sqlUtils.backTickIfNeeded(self.sourceType, tableName) + ';';
           if (!wizard.destination.fieldEditorValue() || wizard.destination.fieldEditorValue() === lastStatement) {
             wizard.destination.fieldEditorValue(statement);
           }
           lastStatement = statement;
-          wizard.destination.fieldEditorPlaceHolder('${ _('Example: SELECT') }' + ' * FROM ' + SqlUtils.backTickIfNeeded(self.sourceType, tableName));
+          wizard.destination.fieldEditorPlaceHolder('${ _('Example: SELECT') }' + ' * FROM ' + sqlUtils.backTickIfNeeded(self.sourceType, tableName));
 
-          var handle = DataCatalog.addTemporaryTable({
+          var handle = dataCatalog.addTemporaryTable({
             sourceType: self.sourceType,
             namespace: self.namespace(),
             compute: self.compute(),
@@ -2143,7 +2134,7 @@ ${ assist.assistPanel() }
 
         var checkDbEntryExists = function () {
           wizard.computeSetDeferred.done(function () {
-            DataCatalog.getEntry({
+            dataCatalog.getEntry({
               sourceType: self.sourceType,
               compute: wizard.compute(),
               namespace: wizard.namespace(),
@@ -2272,7 +2263,9 @@ ${ assist.assistPanel() }
         }
       });
       wizard.prefill.target_type.subscribe(function(newValue) {
-        self.outputFormat(newValue || 'table');
+        setTimeout(function() { // target_type gets updated by the router (onePageViewModelModel.js) and delaying allow the notification to go through
+          self.outputFormat(newValue || 'table');
+        },0);
         if (newValue === 'database') {
           vm.currentStep(2);
         } else {
@@ -2504,7 +2497,7 @@ ${ assist.assistPanel() }
 
       self.computeSetDeferred = $.Deferred();
 
-      ContextCatalog.getNamespaces({ sourceType: vm.sourceType }).done(function (context) {
+      contextCatalog.getNamespaces({ sourceType: vm.sourceType }).done(function (context) {
         self.namespaces(context.namespaces);
         if (!vm.namespaceId || !context.namespaces.some(function (namespace) {
           if (namespace.id === vm.namespaceId) {
@@ -2836,15 +2829,15 @@ ${ assist.assistPanel() }
                       var match = snippet.statement_raw().match(/CREATE TABLE `([^`]+)`/i);
                       if (match) {
                         var db = match[1];
-                        DataCatalog.getEntry({ sourceType: snippet.type(), namespace: self.namespace(), compute: self.compute(), path: [ db ]}).done(function (dbEntry) {
+                        dataCatalog.getEntry({ sourceType: snippet.type(), namespace: self.namespace(), compute: self.compute(), path: [ db ]}).done(function (dbEntry) {
                           dbEntry.clearCache({ invalidate: 'invalidate', silenceErrors: true }).done(function () {
-                            window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
+                            huePubSub.publish('open.link', self.editorVM.selectedNotebook().onSuccessUrl());
                           })
                         });
                       } else {
-                        DataCatalog.getEntry({ sourceType: snippet.type(), namespace: self.namespace(), compute: self.compute(), path: []}).done(function (sourceEntry) {
+                        dataCatalog.getEntry({ sourceType: snippet.type(), namespace: self.namespace(), compute: self.compute(), path: []}).done(function (sourceEntry) {
                           sourceEntry.clearCache({ silenceErrors: true }).done(function () {
-                            window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
+                            huePubSub.publish('open.link', self.editorVM.selectedNotebook().onSuccessUrl());
                           })
                         });
                       }
@@ -2976,7 +2969,7 @@ ${ assist.assistPanel() }
     var IndexerViewModel = function () {
       var self = this;
 
-      self.apiHelper = ApiHelper.getInstance();
+      self.apiHelper = window.apiHelper;
       self.sourceType = window.location.getParameter('sourceType', true) || '${ source_type }';
       self.namespaceId = window.location.getParameter('namespace', true);
       self.computeId =  window.location.getParameter('compute', true);

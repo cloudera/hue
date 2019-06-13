@@ -355,6 +355,8 @@ def verify_history(client, fragment, design=None, reverse=False, server_name='be
 
 
 class BeeswaxSampleProvider(object):
+  integration = True
+
   """
   Setup the test db and install sample data
   """

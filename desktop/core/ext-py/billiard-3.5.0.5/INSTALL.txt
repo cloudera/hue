@@ -1,0 +1,90 @@
+.. default-role:: literal
+
+================================
+ Installation of multiprocessing
+================================
+
+Versions earlier than Python 2.4 are not supported.  If you are using
+Python 2.4 then you must install the `ctypes` package (which comes
+automatically with Python 2.5). Users of Python 2.4 on Windows
+also need to install the `pywin32` package.
+
+On Unix It's highly recommended to use Python 2.5.3 (not yet released) or
+apply the ``fork-thread-patch-2`` patch from `Issue 1683
+https://bugs.python.org/issue1683`_.
+
+Windows binary builds for Python 2.4 and Python 2.5 are available at
+
+    https://pypi.org/project/multiprocessing/
+
+Python 2.6 and newer versions already come with multiprocessing. Although
+the stand alone variant of the multiprocessing package is kept compatible
+with 2.6, you mustn't install it with Python 2.6.
+
+Otherwise, if you have the correct C compiler setup then the source
+distribution can be installed the usual way::
+
+   python setup.py install
+
+It should not be necessary to do any editing of `setup.py` if you are
+using Windows, macOS or Linux.  On other unices it may be necessary
+to modify the values of the `macros` dictionary or `libraries` list.
+The section to modify reads ::
+
+    else:
+        macros = dict(
+            HAVE_SEM_OPEN=1,
+            HAVE_SEM_TIMEDWAIT=1,
+            HAVE_FD_TRANSFER=1
+            )
+        libraries = ['rt']
+
+More details can be found in the comments in `setup.py`.
+
+Note that if you use `HAVE_SEM_OPEN=0` then support for posix
+semaphores will not been compiled in, and then many of the functions
+in the `processing` namespace like `Lock()`, `Queue()` or will not be
+available.  However, one can still create a manager using `manager =
+processing.Manager()` and then do `lock = manager.Lock()` etc.
+
+
+Running tests
+-------------
+
+To run the test scripts using Python 2.5 do ::
+
+    python -m multiprocessing.tests
+
+and on Python 2.4 do ::
+
+    python -c "from multiprocessing.tests import main; main()"
+
+The sources also come with a Makefile. To run the unit tests with the
+Makefile using Python 2.5 do ::
+
+    make test
+
+using another version of Python do ::
+
+    make test PYTHON=python2.4
+
+This will run a number of test scripts using both processes and threads.
+
+
+Running examples
+----------------
+
+The make target `examples` runs several example scripts.
+
+
+Building docs
+-------------
+
+To build the standalone documentation you need Sphinx 0.5 and setuptools
+0.6c9 or newer. Both are available at https://pypi.org/. With
+setuptools installed, do ::
+
+    sudo easy_install-2.5 "Sphinx>=0.5"
+    make doc
+
+The docs end up in ``build/sphinx/builder_name``.

@@ -75,8 +75,8 @@ def get_hadoop_job_id(oozie_api, oozie_jobid, action_index=1, timeout=60, step=5
 
 
 class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
-
   requires_hadoop = True
+  integration = True
 
   @classmethod
   def setup_class(cls):

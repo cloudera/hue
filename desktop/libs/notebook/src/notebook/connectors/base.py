@@ -18,15 +18,18 @@
 import json
 import logging
 import re
+import time
 import uuid
 
 from django.utils.translation import ugettext as _
 
 from desktop.conf import has_multi_cluster
+from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 
-from notebook.conf import get_ordered_interpreters
+from notebook.conf import get_ordered_interpreters, CONNECTORS
+from notebook.sql_utils import get_current_statement
 
 
 LOG = logging.getLogger(__name__)
@@ -41,7 +44,9 @@ class QueryExpired(Exception):
     self.message = message
 
 class AuthenticationRequired(Exception):
-  pass
+  def __init__(self, message=None):
+    super(AuthenticationRequired, self).__init__()
+    self.message = message
 
 class OperationTimeout(Exception):
   pass
@@ -52,6 +57,7 @@ class OperationNotSupported(Exception):
 
 class QueryError(Exception):
   def __init__(self, message, handle=None):
+    super(QueryError, self).__init__(message)
     self.message = message or _('No error message, please check the logs.')
     self.handle = handle
     self.extra = {}
@@ -118,11 +124,11 @@ class Notebook(object):
         p1 = match.group(1)
         p2 = match.group(2)
         variable = variables[p2]
-        value = variable['value']
+        value = str(variable['value'])
         return p1 + (value if value is not None else variable['meta'].get('placeholder',''))
 
       return re.sub("([^\\\\])\\$" + ("{(" if hasCurlyBracketParameters else "(") + variablesString + ")(=[^}]*)?" + ("}" if hasCurlyBracketParameters else ""), replace, statement_raw)
-      
+
     return statement_raw
 
   def add_hive_snippet(self, database, sql):
@@ -274,7 +280,10 @@ def get_api(request, snippet):
   if snippet['type'] == 'report':
     snippet['type'] = 'impala'
 
-  interpreter = [interpreter for interpreter in get_ordered_interpreters(request.user) if interpreter['type'] == snippet['type']]
+  interpreter = [
+    interpreter
+    for interpreter in get_ordered_interpreters(request.user) if snippet['type'] in (interpreter['type'], interpreter['interface'])
+  ]
   if not interpreter:
     if snippet['type'] == 'hbase':
       interpreter = [{
@@ -309,13 +318,21 @@ def get_api(request, snippet):
         'is_sql': False
       }]
     else:
-      raise PopupException(_('Snippet type %(type)s is not configured in hue.ini') % snippet)
+      raise PopupException(_('Snippet type %(type)s is not configured.') % snippet)
 
   interpreter = interpreter[0]
   interface = interpreter['interface']
 
+
+  if CONNECTORS.IS_ENABLED.get():
+    cluster = {
+      'connector': snippet['type'],
+      'id': interpreter['type'],
+    }
+    snippet['type'] = snippet['type'].split('-', 2)[0]
+    cluster.update(interpreter['options'])
   # Multi cluster
-  if has_multi_cluster():
+  elif has_multi_cluster():
     cluster = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API or Notebook create sessions
     if cluster == '""' or cluster == 'undefined':
       cluster = None
@@ -336,10 +353,11 @@ def get_api(request, snippet):
     LOG.info('Selected cluster %s' % cluster)
 
   LOG.info('Selected cluster %s %s interface %s' % (cluster_name, cluster, interface))
+  snippet['interface'] = interface
 
-  if interface == 'hiveserver2':
+  if interface.startswith('hiveserver2') or interface == 'hms':
     from notebook.connectors.hiveserver2 import HS2Api
-    return HS2Api(user=request.user, request=request, cluster=cluster)
+    return HS2Api(user=request.user, request=request, cluster=cluster, interface=interface)
   elif interface == 'oozie':
     return OozieApi(user=request.user, request=request)
   elif interface == 'livy':
@@ -361,15 +379,30 @@ def get_api(request, snippet):
     from notebook.connectors.dataeng import DataEngApi
     return DataEngApi(user=request.user, request=request, cluster_name=cluster_name)
   elif interface == 'jdbc':
-    if not interpreter['options'] or interpreter['options'].get('url', '').find('teradata') < 0:
-      from notebook.connectors.jdbc import JdbcApi
-      return JdbcApi(request.user, interpreter=interpreter)
-    else:
+    if interpreter['options'] and interpreter['options'].get('url', '').find('teradata') >= 0:
       from notebook.connectors.jdbc_teradata import JdbcApiTeradata
       return JdbcApiTeradata(request.user, interpreter=interpreter)
+    if interpreter['options'] and interpreter['options'].get('url', '').find('awsathena') >= 0:
+      from notebook.connectors.jdbc_athena import JdbcApiAthena
+      return JdbcApiAthena(request.user, interpreter=interpreter)
+    elif interpreter['options'] and interpreter['options'].get('url', '').find('presto') >= 0:
+      from notebook.connectors.jdbc_presto import JdbcApiPresto
+      return JdbcApiPresto(request.user, interpreter=interpreter)
+    elif interpreter['options'] and interpreter['options'].get('url', '').find('clickhouse') >= 0:
+      from notebook.connectors.jdbc_clickhouse import JdbcApiClickhouse
+      return JdbcApiClickhouse(request.user, interpreter=interpreter)
+    else:
+      from notebook.connectors.jdbc import JdbcApi
+      return JdbcApi(request.user, interpreter=interpreter)
   elif interface == 'teradata':
     from notebook.connectors.jdbc import JdbcApiTeradata
     return JdbcApiTeradata(request.user, interpreter=interpreter)
+  elif interface == 'athena':
+    from notebook.connectors.jdbc import JdbcApiAthena
+    return JdbcApiAthena(request.user, interpreter=interpreter)
+  elif interface == 'presto':
+    from notebook.connectors.jdbc_presto import JdbcApiPresto
+    return JdbcApiPresto(request.user, interpreter=interpreter)
   elif interface == 'sqlalchemy':
     from notebook.connectors.sqlalchemyapi import SqlAlchemyApi
     return SqlAlchemyApi(request.user, interpreter=interpreter)
@@ -400,12 +433,13 @@ def _get_snippet_session(notebook, snippet):
 
 class Api(object):
 
-  def __init__(self, user, interpreter=None, request=None, cluster=None, query_server=None):
+  def __init__(self, user, interpreter=None, request=None, cluster=None, query_server=None, interface=None):
     self.user = user
     self.interpreter = interpreter
     self.request = request
     self.cluster = cluster
     self.query_server = query_server
+    self.interface = interface
 
   def create_session(self, lang, properties=None):
     return {
@@ -420,11 +454,23 @@ class Api(object):
   def fetch_result(self, notebook, snippet, rows, start_over):
     pass
 
+  def can_start_over(self, notebook, snippet):
+    return False
+
   def fetch_result_size(self, notebook, snippet):
     raise OperationNotSupported()
 
-  def download(self, notebook, snippet, format, user_agent=None):
-    pass
+  def download(self, notebook, snippet, file_format='csv'):
+    from beeswax import data_export #TODO: Move to notebook?
+    from beeswax import conf
+
+    result_wrapper = ExecutionWrapper(self, notebook, snippet)
+
+    max_rows = conf.DOWNLOAD_ROW_LIMIT.get()
+    max_bytes = conf.DOWNLOAD_BYTES_LIMIT.get()
+
+    content_generator = data_export.DataAdapter(result_wrapper, max_rows=max_rows, max_bytes=max_bytes)
+    return export_csvxls.create_generator(content_generator, file_format)
 
   def get_log(self, notebook, snippet, startFrom=None, size=None):
     return 'No logs'
@@ -432,7 +478,7 @@ class Api(object):
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
     return {}
 
-  def progress(self, snippet, logs=None):
+  def progress(self, notebook, snippet, logs=None):
     return 50
 
   def get_jobs(self, notebook, snippet, logs):
@@ -452,9 +498,136 @@ class Api(object):
 
   def statement_similarity(self, notebook, snippet, source_platform, target_platform): raise NotImplementedError()
 
+  def describe(self, notebook, snippet, database=None, table=None, column=None):
+    if column:
+      response = self.describe_column(notebook, snippet, database=database, table=table, column=column)
+    elif table:
+      response = {
+          'status': 0,
+          'name': table or '',
+          'partition_keys': [],
+          'cols': [],
+          'path_location': '',
+          'hdfs_link': '',
+          'comment': '',
+          'is_view': False,
+          'properties': [],
+          'details': {'properties': {'table_type': ''}, 'stats': {}},
+          'stats': []
+      }
+      describe_table = self.describe_table(notebook, snippet, database, table)
+      response.update(describe_table)
+    else:
+      response = {
+        'status': 0,
+        'owner_name': '',
+        'owner_type': '',
+        'parameters': '',
+        'hdfs_link': '',
+        'message': ''
+      }
+      describe_database = self.describe_database(notebook, snippet, database)
+      response.update(describe_database)
+    return response
+
+  def describe_column(self, notebook, snippet, database=None, table=None, column=None):
+    return []
+
+  def describe_table(self, notebook, snippet, database=None, table=None):
+    response = {}
+    autocomplete = self.autocomplete(snippet, database=database, table=table)
+    response['cols'] = autocomplete['extended_columns'] if autocomplete and autocomplete.get('extended_columns') else [],
+    return response
+
+  def describe_database(self, notebook, snippet, database=None):
+    return {}
+
+  def _get_current_statement(self, notebook, snippet):
+    should_close, resp = get_current_statement(snippet)
+    if should_close:
+      try:
+        self.close_statement(notebook, snippet)  # Close all the time past multi queries
+      except:
+        LOG.warn('Could not close previous multiquery query')
+
+    return resp
+
+  def get_log_is_full_log(self, notebook, snippet):
+    return True
+
 
 def _get_snippet_name(notebook, unique=False, table_format=False):
   name = (('%(name)s' + ('-%(id)s' if unique else '') if notebook.get('name') else '%(type)s-%(id)s') % notebook)
   if table_format:
     name = re.sub('[-|\s:]', '_', name)
   return name
+
+
+class ExecutionWrapper():
+  def __init__(self, api, notebook, snippet, callback=None):
+    self.api = api
+    self.notebook = notebook
+    self.snippet = snippet
+    self.callback = callback
+    self.should_close = False
+
+  def fetch(self, handle, start_over=None, rows=None):
+    if start_over:
+      if not self.snippet['result'].get('handle') or not self.snippet['result']['handle'].get('guid') or not self.api.can_start_over(self.notebook, self.snippet):
+        start_over = False
+        handle = self.api.execute(self.notebook, self.snippet)
+        self.snippet['result']['handle'] = handle
+        if self.callback and hasattr(self.callback, 'on_execute'):
+          self.callback.on_execute(handle)
+        self.should_close = True
+        self._until_available()
+    if self.snippet['result']['handle'].get('sync', False):
+      result = self.snippet['result']['handle']['result']
+    else:
+      result = self.api.fetch_result(self.notebook, self.snippet, rows, start_over)
+    return ResultWrapper(result.get('meta'), result.get('data'), result.get('has_more'))
+
+  def _until_available(self):
+    if self.snippet['result']['handle'].get('sync', False):
+      return # Request is already completed
+    count = 0
+    sleep_seconds = 1
+    check_status_count = 0
+    get_log_is_full_log = self.api.get_log_is_full_log(self.notebook, self.snippet)
+    while True:
+      response = self.api.check_status(self.notebook, self.snippet)
+      if self.callback and hasattr(self.callback, 'on_status'):
+        self.callback.on_status(response['status'])
+      if self.callback and hasattr(self.callback, 'on_log'):
+        log = self.api.get_log(self.notebook, self.snippet, startFrom=count)
+        if get_log_is_full_log:
+          log = log[count:]
+
+        self.callback.on_log(log)
+        count += len(log)
+
+      if response['status'] not in ['waiting', 'running', 'submitted']:
+        break
+      check_status_count += 1
+      if check_status_count > 5:
+        sleep_seconds = 5
+      elif check_status_count > 10:
+        sleep_seconds = 10
+      time.sleep(sleep_seconds)
+
+  def close(self, handle):
+    if self.should_close:
+      self.should_close = False
+      self.api.close_statement(self.notebook, self.snippet)
+
+class ResultWrapper():
+  def __init__(self, cols, rows, has_more):
+    self._cols = cols
+    self._rows = rows
+    self.has_more = has_more
+
+  def full_cols(self):
+    return self._cols
+
+  def rows(self):
+    return self._rows

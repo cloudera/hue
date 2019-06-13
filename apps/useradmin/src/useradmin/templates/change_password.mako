@@ -97,7 +97,7 @@ $(document).ready(function(){
     }
 
     $("a.step").parent().removeClass("active");
-    $("a.step[href=#" + step + "]").parent().addClass("active");
+    $("a.step[href='#" + step + "']").parent().addClass("active");
     $(".stepDetails").hide();
     $("#" + step).show();
   }

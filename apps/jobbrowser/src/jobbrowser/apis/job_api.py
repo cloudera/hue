@@ -22,6 +22,7 @@ from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 from hadoop.yarn import resource_manager_api
 
+from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions import MessageException
 from desktop.lib.exceptions_renderable import PopupException
 from jobbrowser.conf import MAX_JOB_FETCH, LOG_OFFSET
@@ -68,8 +69,10 @@ class JobApi(Api):
       return self.yarn_api
     elif appid.startswith('task_'):
       return YarnMapReduceTaskApi(self.user, appid)
-    elif appid.startswith('attempt_') or appid.startswith('appattempt_'):
+    elif appid.startswith('attempt_'):
       return YarnMapReduceTaskAttemptApi(self.user, appid)
+    elif appid.startswith('appattempt_'):
+      return YarnAttemptApi(self.user, appid)
     elif appid.find('_executor_') > 0:
       return SparkExecutorApi(self.user, appid)
     else:
@@ -188,12 +191,14 @@ class YarnApi(Api):
       }
       if hasattr(job, 'metrics'):
         common['metrics'] = job.metrics
-    elif app['applicationType'] == 'Oozie Launcher':
+    elif app['applicationType'] == 'YarnV2':
+      common['applicationType'] = app.get('type')
       common['properties'] = {
         'startTime': job.startTime,
         'finishTime': job.finishTime,
         'elapsedTime': job.duration,
-        'attempts': []
+        'attempts': [],
+        'diagnostics': job.diagnostics
       }
 
     return common
@@ -204,7 +209,9 @@ class YarnApi(Api):
       kills = []
       for app_id in app_ids:
         try:
-          kill_job(MockDjangoRequest(self.user), job=app_id)
+          response = kill_job(MockDjangoRequest(self.user), job=app_id)
+          if isinstance(response, JsonResponse) and json.loads(response.content).get('status') == 0:
+             kills.append(app_id)
         except MessageException:
           kills.append(app_id)
       return {'kills': kills, 'status': len(app_ids) - len(kills), 'message': _('Stop signal sent to %s') % kills}
@@ -214,13 +221,19 @@ class YarnApi(Api):
 
   def logs(self, appid, app_type, log_name, is_embeddable=False):
     logs = ''
+    logs_list = []
     try:
-      if app_type == 'MAPREDUCE' or app_type == 'Oozie Launcher':
+      if app_type == 'YarnV2' or app_type == 'MAPREDUCE':
         if log_name == 'default':
           response = job_single_logs(MockDjangoRequest(self.user), job=appid)
-          logs = json.loads(response.content).get('logs')
+          parseResponse = json.loads(response.content)
+          logs = parseResponse.get('logs')
+          logs_list = parseResponse.get('logsList')
           if logs and len(logs) == 4:
-            logs = logs[1]
+            if app_type == 'YarnV2' and logs[0]: #logs[0] is diagnostics
+              logs = logs[0]
+            else:
+              logs = logs[1]
         else:
           response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid, name=log_name, is_embeddable=is_embeddable)
           logs = json.loads(response.content).get('log')
@@ -231,7 +244,7 @@ class YarnApi(Api):
         logs = None
     except PopupException, e:
       LOG.warn('No task attempt found for logs: %s' % smart_str(e))
-    return {'logs': logs}
+    return {'logs': logs, 'logsList': logs_list}
 
 
   def profile(self, appid, app_type, app_property, app_filters):
@@ -251,7 +264,7 @@ class YarnApi(Api):
           'executor_list': NativeYarnApi(self.user).get_job(jobid=appid).get_executors(),
           'filter_text': ''
         }
-    elif app_type == 'Oozie Launcher':
+    elif app_type == 'YarnV2':
       if app_property == 'attempts':
         return {
           'task_list': NativeYarnApi(self.user).get_job(jobid=appid).job_attempts['jobAttempt'],
@@ -267,6 +280,79 @@ class YarnApi(Api):
     else:
       return 'FAILED' # FAILED, KILLED
 
+class YarnAttemptApi(Api):
+
+  def __init__(self, user, app_id):
+    Api.__init__(self, user)
+    start = 'appattempt_' if app_id.startswith('appattempt_') else 'attempt_'
+    self.app_id = '_'.join(app_id.replace('task_', 'application_').replace(start, 'application_').split('_')[:3])
+    self.task_id = '_'.join(app_id.replace(start, 'task_').split('_')[:5])
+    self.attempt_id = app_id.split('_')[3]
+
+
+  def apps(self):
+    attempts = NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).attempts
+
+    return {
+      'apps': [self._massage_task(task) for task in attempts],
+      'total': len(attempts)
+    }
+
+
+  def app(self, appid):
+    task = NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).get_attempt(self.attempt_id)
+
+    common = self._massage_task(task)
+    common['properties'] = {
+        'metadata': [],
+        'counters': []
+    }
+    common['properties'].update(self._massage_task(task))
+
+    return common
+
+
+  def logs(self, appid, app_type, log_name, is_embeddable=False):
+    if log_name == 'default':
+      log_name = 'stdout'
+
+    task = NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).get_attempt(self.attempt_id)
+    stdout, stderr, syslog = task.get_task_log()
+
+    return {'progress': 0, 'logs': syslog if log_name == 'syslog' else stderr if log_name == 'stderr' else stdout}
+
+
+  def profile(self, appid, app_type, app_property, app_filters):
+    if app_property == 'counters':
+      return NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).get_attempt(self.attempt_id).counters
+
+    return {}
+
+
+  def _massage_task(self, task):
+    return {
+        #"elapsedMergeTime" : task.elapsedMergeTime,
+        #"shuffleFinishTime" : task.shuffleFinishTime,
+        'id': task.appAttemptId if hasattr(task, 'appAttemptId') else '',
+        'appAttemptId': task.appAttemptId if hasattr(task, 'appAttemptId') else '',
+        'blacklistedNodes': task.blacklistedNodes if hasattr(task, 'blacklistedNodes') else '',
+        'containerId' : task.containerId if hasattr(task, 'containerId') else '',
+        'diagnostics': task.diagnostics if hasattr(task, 'diagnostics') else '',
+        "startTimeFormatted" : task.startTimeFormatted if hasattr(task, 'startTimeFormatted') else '',
+        "startTime" : long(task.startTime) if hasattr(task, 'startTime') else '',
+        "finishTime" : long(task.finishedTime) if hasattr(task, 'finishedTime') else '',
+        "finishTimeFormatted" : task.finishTimeFormatted if hasattr(task, 'finishTimeFormatted') else '',
+        "type" : task.type + '_ATTEMPT' if hasattr(task, 'type') else '',
+        'nodesBlacklistedBySystem': task.nodesBlacklistedBySystem if hasattr(task, 'nodesBlacklistedBySystem') else '',
+        'nodeId': task.nodeId if hasattr(task, 'nodeId') else '',
+        'nodeHttpAddress': task.nodeHttpAddress if hasattr(task, 'nodeHttpAddress') else '',
+        'logsLink': task.logsLink if hasattr(task, 'logsLink') else '',
+        "app_id": self.app_id,
+        "task_id": self.task_id,
+        'duration' : task.duration if hasattr(task, 'duration') else '',
+        'durationFormatted' : task.duration if hasattr(task, 'durationFormatted') else '',
+        'state': task.status if hasattr(task, 'status') else ''
+    }
 
 class YarnMapReduceTaskApi(Api):
 

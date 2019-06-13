@@ -7,7 +7,7 @@
     "ScannerThreadsSysTime",
     "AverageScannerThreadConcurrency"
   ],
-  "unit_id": 5,
+  "unit": 5,
   "rule": {
     "expr": "(vars['ScannerThreadsUserTime'] + vars['ScannerThreadsSysTime'] - vars['RowsRead'] * 100) / max(1,vars['AverageScannerThreadConcurrency'])",
     "message": "Predicates might be expensive (expectes speed 10m rows per sec per core)",

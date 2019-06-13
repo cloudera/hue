@@ -32,6 +32,7 @@ from beeswax.server.dbms import get_cluster_config
 from beeswax.views import authorized_get_query_history
 
 from desktop.lib.django_util import JsonResponse
+from desktop.lib.thrift_util import unpack_guid
 from desktop.models import Document2
 
 from jobbrowser.apis.query_api import _get_api
@@ -137,10 +138,10 @@ def alanize(request):
     doc = Document2.objects.get(id=query_id)
     snippets = doc.data_dict.get('snippets', [])
     secret = snippets[0]['result']['handle']['secret']
-    impala_query_id = "%x:%x" % struct.unpack(b"QQ", base64.decodestring(secret))
-    api.kill(impala_query_id) # There are many statistics that are not present when the query is open. Close it first.
+    impala_query_id = unpack_guid(base64.decodestring(secret))
     query_profile = api.get_query_profile_encoded(impala_query_id)
     profile = analyzer.analyze(analyzer.parse_data(query_profile))
+    ANALYZER.pre_process(profile)
     result = ANALYZER.run(profile)
 
     heatmap = {}

@@ -43,13 +43,19 @@ class Node(object):
     self.fragment_instance = None
     self.plan_node = None
     self.pos = 0
+    self.node_name = None
+    self.node_id = None
+    self.node_is_fragment = None
+    self.node_is_fragment_instance = None
+    self.node_is_regular = None
+    self.node_is_plan_node = None
 
   def add_child(self, c):
     self.children.append(c)
 
   def find_by_name(self, pattern):
     """Returns the first node whose name matches 'name'."""
-    if re.search(pattern, self.val.name) is not None:
+    if self.val.name.find(pattern) >= 0:
       return self
 
     for x in self.children:
@@ -59,7 +65,7 @@ class Node(object):
 
   def find_all_by_name(self, pattern):
     result = []
-    if re.search(pattern, self.val.name):
+    if self.val.name.find(pattern) >= 0:
       result.append(self)
     for x in self.children:
       result += x.find_all_by_name(pattern)
@@ -74,45 +80,66 @@ class Node(object):
     return result
 
   def is_fragment(self):
-    return re.search(r'(.*?Fragment) (F\d+)', self.val.name) is not None
+    if self.node_is_fragment is not None:
+      return self.node_is_fragment
+    self.node_is_fragment = re.search(r'(.*?Fragment) (F\d+)', self.val.name) is not None
+    return self.node_is_fragment
 
   def is_fragment_instance(self):
-    return re.search(r'Instance\s(.*?)\s\(host=(.*?)\)', self.val.name) is not None
+    if self.node_is_fragment_instance is not None:
+      return self.node_is_fragment_instance
+    self.node_is_fragment_instance = re.search(r'Instance\s(.*?)\s\(host=(.*?)\)', self.val.name) is not None
+    return self.node_is_fragment_instance
 
   def is_regular(self):
+    if self.node_is_regular is not None:
+      return self.node_is_regular
     id = self.id()
     matches = id and re.search(r'^\d*$', id)
-    return id and matches
+    self.node_is_regular = id and matches
+    return self.node_is_regular
 
   def name(self):
+    if self.node_name:
+      return self.node_name
     matches = re.search(r'(.*?)(\s+\(((dst_)?id)=(\d+)\))?$', self.val.name)
     if matches and matches.group(5):
-      return matches.group(1)
+      self.node_name = matches.group(1)
     elif self.is_fragment():
-      return re.search(r'(.*?Fragment) (F\d+)', self.val.name).group(1)
+      self.node_name = re.search(r'(.*?Fragment) (F\d+)', self.val.name).group(1)
     else:
       matches = re.search(r'(.*?)(\s+\(.*?\))?$', self.val.name)
       if matches.group(2):
-        return matches.group(1)
+        self.node_name = matches.group(1)
       else:
-        return self.val.name
+        self.node_name = self.val.name
+    return self.node_name
+
 
   def id(self):
+    if self.node_id:
+      return self.node_id
     matches = re.search(r'(.*?)(\s+\(((dst_)?id)=(\d+)\))?$', self.val.name)
     if matches and matches.group(5) and not matches.group(4):
-      return matches.group(5)
+      self.node_id = matches.group(5)
     elif self.is_fragment():
-      return re.search(r'(.*?Fragment) (F\d+)', self.val.name).group(2)
+      self.node_id = re.search(r'(.*?Fragment) (F\d+)', self.val.name).group(2)
     elif self.is_fragment_instance():
-      return re.search(r'Instance\s(.*?)\s\(host=(.*?)\)', self.val.name).group(1)
+      self.node_id = re.search(r'Instance\s(.*?)\s\(host=(.*?)\)', self.val.name).group(1)
     elif self.fragment:
-      return self.fragment.id() + ' ' + str(self.pos)
+      self.node_id = self.fragment.id() + ' ' + str(self.pos)
+    return self.node_id
 
   def is_plan_node(self):
+    if self.node_is_plan_node is not None:
+      self.node_is_plan_node
     matches = re.search('(.*?)(\s+\(((dst_)?id)=(\d+)\))?$', self.val.name)
-    return matches and not matches.group(4) and matches.group(5)
+    self.node_is_plan_node = matches and not matches.group(4) and matches.group(5)
+    return self.node_is_plan_node
 
   def find_by_id(self, pattern):
+    if self.nodes and self.nodes.get(pattern):
+      return self.nodes[pattern]
     results = []
     if self.id() == pattern:
       results.append(self)
@@ -313,19 +340,22 @@ def metrics(profile):
   plan_json = utils.parse_plan_details(summary.val.info_strings.get('Plan')) if summary.val.info_strings.get('Plan') else {}
   if not execution_profile:
     return {}
-  counter_map = {'nodes': {}, 'max': 0}
+  counter_map = {'nodes': {}, 'max': 0, 'summary': {'timeline': summary.event_list(), 'properties': summary.metric_map()}}
   def flatten(node, counter_map=counter_map):
     is_plan_node = node.is_plan_node()
     is_parent_node = is_plan_node
+    bIncludeInMinMax = True
     if not is_plan_node:
       if node.plan_node:
         nid = node.plan_node.id()
       elif node.is_fragment_instance():
         is_parent_node = True
         nid = node.fragment.id()
+        bIncludeInMinMax = False
       elif node.is_fragment() and node.is_averaged():
         is_parent_node = True
         nid = node.id()
+        bIncludeInMinMax = False
       elif node.fragment:
         nid = node.fragment.id()
       else:
@@ -348,6 +378,7 @@ def metrics(profile):
         counter_map['nodes'][nid]['other'] = plan_json[nid]
       if is_plan_node:
         counter_map['nodes'][nid]['fragment'] = node.fragment.id()
+      counter_map['nodes'][nid]['timeline']['minmax'] = bIncludeInMinMax
     else:
       name = node.name()
       if counter_map['nodes'][nid]['children'].get(name) is None:
@@ -359,6 +390,8 @@ def metrics(profile):
   for nodeid, node in counter_map['nodes'].iteritems():
     host_min = {'value': sys.maxint, 'host' : None}
     host_max = {'value': -(sys.maxint - 1), 'host' : None}
+    if not node['timeline']['minmax']:
+      continue
     for host_name, host_value in node['timeline']['hosts'].iteritems():
       for event_name, event in host_value.iteritems():
         if len(event):
