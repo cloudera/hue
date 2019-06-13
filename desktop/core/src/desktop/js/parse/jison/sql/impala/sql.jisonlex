@@ -206,7 +206,6 @@ LIKE\s+PARQUET                     { this.begin('hdfs'); return 'LIKE_PARQUET'; 
 'KUDU'                             { return 'KUDU'; }
 'LARGE'                            { return 'LARGE'; }
 'LAST'                             { return 'LAST'; }
-'LATERAL'                          { return 'LATERAL'; }
 'LEADING'                          { return 'LEADING'; }
 'LEFT'                             { return 'LEFT'; }
 'LIKE'                             { return 'LIKE'; }

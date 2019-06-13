@@ -17,7 +17,7 @@
 import SqlTestUtils from 'parse/spec/sqlTestUtils';
 import genericAutocompleteParser from '../genericAutocompleteParser';
 
-fdescribe('genericAutocompleteParser.js CREATE statements', () => {
+describe('genericAutocompleteParser.js CREATE statements', () => {
   beforeAll(() => {
     genericAutocompleteParser.yy.parseError = function(msg) {
       throw Error(msg);
@@ -31,7 +31,6 @@ fdescribe('genericAutocompleteParser.js CREATE statements', () => {
       genericAutocompleteParser.parseSql(
         testDefinition.beforeCursor,
         testDefinition.afterCursor,
-        undefined,
         debug
       )
     ).toEqualDefinition(testDefinition);

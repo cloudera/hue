@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import SqlTestUtils from 'parse/spec/sqlTestUtils';
-import genericAutocompleteParser from '../genericAutocompleteParser';
+import hiveAutocompleteParser from '../hiveAutocompleteParser';
+import SqlTestUtils from '../../../spec/sqlTestUtils';
 
-describe('genericAutocompleteParser.js Error statements', () => {
+describe('hiveAutocompleteParser.js Error statements', () => {
   beforeAll(() => {
-    genericAutocompleteParser.yy.parseError = function(msg) {
+    hiveAutocompleteParser.yy.parseError = function(msg) {
       throw Error(msg);
     };
     jasmine.addMatchers(SqlTestUtils.testDefinitionMatcher);
@@ -28,7 +28,7 @@ describe('genericAutocompleteParser.js Error statements', () => {
   const assertAutoComplete = testDefinition => {
     const debug = false;
     expect(
-      genericAutocompleteParser.parseSql(
+      hiveAutocompleteParser.parseSql(
         testDefinition.beforeCursor,
         testDefinition.afterCursor,
         debug

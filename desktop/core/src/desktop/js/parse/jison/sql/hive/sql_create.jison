@@ -234,16 +234,15 @@ TableDefinitionRightPart_EDIT
        if (!$6 && !$7 && !$8 && !$9 && !$10) {
          keywords.push({ value: 'ROW FORMAT', weight: 6 });
        } else if ($6 && $6.suggestKeywords && !$7 && !$8 && !$9 && !$10) {
-         keywords = keywords.concat(parser.createWeightedKeywords($8.suggestKeywords, 6));
+         keywords = keywords.concat(parser.createWeightedKeywords($6.suggestKeywords, 6));
        }
-       if (!$8 && !$9 && !$10) {
+       if (!$7 && !$8 && !$9 && !$10) {
          keywords.push({ value: 'STORED AS', weight: 5 });
          keywords.push({ value: 'STORED BY', weight: 5 });
-       }
-       if ($8 && $8.storedBy && !$9 && !$10) {
+       } else if ($7 && $7.storedBy && !$8 && !$9 && !$10) {
          keywords.push({ value: 'WITH SERDEPROPERTIES', weight: 4 });
        }
-       if (!9 && !$10) {
+       if (!$9 && !$10) {
          keywords.push({ value: 'LOCATION', weight: 3 });
        }
        if (!$10) {
@@ -788,7 +787,7 @@ OptionalRowFormat
  ;
 
 RowFormat
- : 'ROW' 'FORMAT' RowFormat
+ : 'ROW' 'FORMAT' RowFormatSpec
    {
      $$ = $3
    }
@@ -803,7 +802,7 @@ RowFormat_EDIT
    {
      parser.suggestKeywords(['DELIMITED', 'SERDE']);
    }
- | 'ROW' 'FORMAT' RowFormat_EDIT
+ | 'ROW' 'FORMAT' RowFormatSpec_EDIT
  ;
 
 OptionalStoredAsOrBy
@@ -854,18 +853,17 @@ FileFormat
  | 'TEXTFILE'
  ;
 
-RowFormat
+RowFormatSpec
  : DelimitedRowFormat
  | 'SERDE' QuotedValue
  ;
 
-RowFormat_EDIT
+RowFormatSpec_EDIT
  : DelimitedRowFormat_EDIT
  ;
 
 DelimitedRowFormat
- : 'DELIMITED' OptionalFieldsTerminatedBy OptionalCollectionItemsTerminatedBy OptionalMapKeysTerminatedBy
-   OptionalLinesTerminatedBy OptionalNullDefinedAs
+ : 'DELIMITED' OptionalFieldsTerminatedBy OptionalCollectionItemsTerminatedBy OptionalMapKeysTerminatedBy OptionalLinesTerminatedBy OptionalNullDefinedAs
    {
      if (!$2 && !$3 && !$4 && !$5 && !$6) {
        $$ = { suggestKeywords: [{ value: 'FIELDS TERMINATED BY', weight: 5 }, { value: 'COLLECTION ITEMS TERMINATED BY', weight: 4 }, { value: 'MAP KEYS TERMINATED BY', weight: 3 }, { value: 'LINES TERMINATED BY', weight: 2 }, { value: 'NULL DEFINED AS', weight: 1 }]};

@@ -165,7 +165,11 @@ AlterTable_EDIT
  | AlterTableLeftSide_EDIT PartitionSpec OptionalPartitionOperations
  | AlterTableLeftSide 'ADD' OptionalIfNotExists 'CURSOR'
    {
-     parser.suggestKeywords(['PARTITION']);
+     if (!$3) {
+       parser.suggestKeywords([{ value: 'IF NOT EXISTS', weight: 3 }, { value: 'COLUMNS', weight: 2 }, { value: 'CONSTRAINT', weight: 1 }, {  value: 'PARTITION', weight: 1 }]);
+     } else {
+       parser.suggestKeywords(['PARTITION']);
+     }
    }
  | AlterTableLeftSide 'REPLACE' 'CURSOR'
    {
