@@ -390,7 +390,7 @@ class OnePageViewModel {
               });
             } else {
               if (type.indexOf('json') > -1) {
-                var presponse = JSON.parse(response);
+                const presponse = JSON.parse(response);
                 if (presponse && presponse.url) {
                   window.location.href = window.HUE_BASE_URL + presponse.url;
                   return;
