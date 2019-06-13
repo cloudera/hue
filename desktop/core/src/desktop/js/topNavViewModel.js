@@ -126,6 +126,7 @@ class TopNavViewModel {
           clusterConfig['app_config'] &&
           clusterConfig['app_config']['browser'] &&
           (clusterConfig['app_config']['browser']['interpreter_names'].indexOf('yarn') != -1 ||
+            clusterConfig['app_config']['editor']['interpreter_names'].indexOf('impala') ||
             clusterConfig['app_config']['browser']['interpreter_names'].indexOf('dataeng') != -1)
       );
     });
