@@ -61,6 +61,10 @@ aws:
   region: "us-east-1"
 ingress:
   create: false
-  type: "traefik"
+  type: "nginx-ssl"
+  domain: "demo.gethue.com"
+  email: "team@gethue.com"
+  # type: "nginx"
+  # type: "traefik"
   loadBalancerIp: "127.0.0.1"
   domain: "127.0.0.1.nip.io"
