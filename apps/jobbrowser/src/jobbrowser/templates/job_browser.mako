@@ -2666,7 +2666,17 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             var requests = [];
             if (['schedule', 'workflow'].indexOf(vm.job().type()) >= 0) {
               window.hueUtils.deleteAllEmptyStringKey(data.app); // It's preferable for our backend to return empty strings for various values in order to initialize them, but they shouldn't overwrite any values that are currently set.
+              var selectedIDs = vm.job().coordinatorActions().selectedJobs().map(
+                function(coordinatorAction) {
+                    return coordinatorAction.id();
+                }
+              );
               vm.job = ko.mapping.fromJS(data.app, {}, vm.job);
+              vm.job().coordinatorActions().selectedJobs(
+                vm.job().coordinatorActions().apps().filter(function(coordinatorAction){
+                    return selectedIDs.indexOf(coordinatorAction.id()) != -1
+                })
+              )
             } else {
               requests.push(vm.job().fetchStatus());
             }

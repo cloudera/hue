@@ -241,7 +241,6 @@ class AtlasApi(Api):
       if owner_facets:
         owner = owner_facets[0]
         query_s = self.OWNER_RE.sub('', query_s).strip()
-        atlas_type = 'Asset'
 
       type_facets = self.TYPE_RE.findall(query_s)
       if type_facets:

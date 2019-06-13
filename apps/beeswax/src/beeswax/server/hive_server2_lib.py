@@ -136,7 +136,11 @@ class HiveServerTable(Table):
   def properties(self):
     rows = self.describe
     col_row_index = 2
-    end_cols_index = map(itemgetter('col_name'), rows[col_row_index:]).index('')
+    try:
+      end_cols_index = map(itemgetter('col_name'), rows[col_row_index:]).index('')
+    except ValueError as e:
+      end_cols_index = 5000
+      LOG.warn('Could not guess end column index, so defaulting to %s: %s' (end_cols_index, e))
     return [{
           'col_name': prop['col_name'].strip() if prop['col_name'] else prop['col_name'],
           'data_type': prop['data_type'].strip() if prop['data_type'] else prop['data_type'],
@@ -1081,7 +1085,11 @@ class HiveServerTableCompatible(HiveServerTable):
 
     self.describe = HiveServerTTableSchema(self.desc_results, self.desc_schema).cols()
     self._details = None
-    self.is_impala_only = 'org.apache.kudu.mapreduce.KuduTableOutputFormat' in str(hive_table.properties)
+    try:
+      self.is_impala_only = 'org.apache.kudu.mapreduce.KuduTableOutputFormat' in str(hive_table.properties)
+    except Exception as e:
+      LOG.warn('Autocomplete data fetching error: %s' % e)
+      self.is_impala_only = False
 
   @property
   def cols(self):

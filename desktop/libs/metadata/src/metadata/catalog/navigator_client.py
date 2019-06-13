@@ -200,6 +200,8 @@ class NavigatorApi(Api):
       auto_field_facets = ["tags", "type"] + f.keys()
       query_s = (query_s.strip() if query_s else '') + '*'
 
+      query_s = query_s.replace('tag:', 'tags:').replace('classification:', 'tags:')
+
       last_query_term = [term for term in query_s.split()][-1]
 
       if last_query_term and last_query_term != '*':

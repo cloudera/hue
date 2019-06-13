@@ -80,19 +80,58 @@ jobs:
             cd /usr/share/hue
             ./build/env/bin/hue test unit --with-xunit --with-cover
 
-      # - run:
-      #     name: run js tests
-      #     command: |
-      #       cd /usr/share/hue
-      #       npm run test
+      - run:
+          name: run js tests
+          command: |
+            cd /usr/share/hue
+            cp ~/repo/.babelrc .
+            npm run test
 
-      # # Code analyses
-      # - run:
-      #     name: run js tests
-      #     command: |
-      #       cd /usr/share/hue
-      #       npm run lint
+      # Code analyses
+      - run:
+          name: run js lint
+          command: |
+            cd /usr/share/hue
+            cp ~/repo/.eslint* .
+            cp ~/repo/.prettierrc .
+            npm run lint
 
       - store_artifacts:
           path: test-reports
           destination: test-reports
+
+  commit:
+    docker:
+      - image: circleci/python:3.6.1
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - add_ssh_keys:
+          fingerprints:
+            - "8c:68:29:28:04:80:38:31:c0:59:d9:3d:65:3e:b7:8c"
+
+      - run:
+          name: push to master
+          command: |
+            git push origin HEAD:master
+
+
+workflows:
+  version: 2
+  run-tests-and-rebase-master:
+    jobs:
+      - build:
+          filters:
+            branches:
+              ignore:
+                - master
+      - commit:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - /.*ci-commit-master.*/
