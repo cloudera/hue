@@ -24,52 +24,53 @@ By default you should see these running containers:
     hue-4n2ck                                     1/1       Running   0          3h
     hue-postgres-5jg77                            1/1       Running   0          12d
 
+And just copy paste the information printed on the screen or run
+
+    kubectl port-forward svc/hue 8888:8888 --address 0.0.0.0
+
+and open-up http://localhost:8888
+
 ## Uninstall
 
     helm delete hue --purge
 
+## Ingress
 
+Minimal:
 
-helm install stable/nginx-ingress -n nginx-ingress
-kubectl get svc --namespace=ingress-nginx
+    microk8s.enable ingress
+    kubectl edit daemonsets nginx-ingress-microk8s-controller
 
+And can edit `--default-backend-service=$(POD_NAMESPACE)/default-http-backend`.
 
-kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
+## SSL
 
-# Create the namespace for cert-manager
-kubectl create namespace cert-manager
+Based on Jetstack and Let's encrypt and nginx-ingress:
 
-# Label the cert-manager namespace to disable resource validation
-kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true
+    helm install stable/nginx-ingress -n nginx-ingress
 
-# Add the Jetstack Helm repository
-helm repo add jetstack https://charts.jetstack.io
+    kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
+    kubectl label namespace cert-manager certmanager.k8s.io/disable-validation="true"
+    helm repo add jetstack https://charts.io.jetstack
+    helm repo update
+    helm install --name cert-manager --namespace cert-manager jetstack/cert-manager
 
-# Update your local Helm chart repository cache
-helm repo update
+Generate certificates:
 
-# Install the cert-manager Helm chart
-helm install \
-  --name cert-manager \
-  --namespace cert-manager \
-  --version v0.8.0 \
-  jetstack/cert-manager
+    kubectl apply -f tools/kubernetes/yaml/cert-manager/clusterissuer-letsencrypt-prod.yaml
+    kubectl apply -f tools/kubernetes/yaml/cert-manager/ingress-https.yaml
 
-kubectl get pods --namespace cert-manager
+    kubectl get certificate
+    kubectl describe ingress
 
+### Reset certificate
 
-# Check email in config and run
-kubectl create -f tools/kubernetes/yaml/cert-manager/clusterissuer-letsencrypt.yaml
+    kubectl delete certificate letsencrypt-prod
+    kubectl delete secrets letsencrypt-prod
 
-kubectl apply -f ingress-ssl.yaml
+### Debug certificate
 
-
-kubectl create -f prod_issuer.yaml
-
-kubectl describe certificate letsencrypt-prod
-
-
-
-# Quick test
-
-kubectl port-forward svc/hue 8888:8888 --address 0.0.0.0
+    kubectl describe certificate
+    # <events>  Normal  OrderCreated  77m   cert-manager  Created Order resource "example-tls-754518127"
+    kubectl describe  order example-tls-754518127
+    kubectl describe  challenges.certmanager.k8s.io example-tls-754518127
