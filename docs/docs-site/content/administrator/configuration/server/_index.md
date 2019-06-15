@@ -236,6 +236,14 @@ Set both LDAP Username Pattern and LDAP Bind User Distinguished Name to a DN str
 
 Note: When using direct bind, set LDAP Search Base, not for authentication (you can log on to Hue without it), but to Synchronize Hue with LDAP Server.
 
+#### Troubleshooting
+
+##### Issue: 
+Hue is not able to sync the LDAP group in Hue and it reports the following error : Could not get LDAP details for groups in pattern <group_name>
+
+##### Solution: 
+check your configuration if 'subgroups' is set under [[ldap]] and remove it.
+
 
 ### SAML
 
