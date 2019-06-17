@@ -214,7 +214,7 @@ class S3FileSystem(object):
   def parent_path(path):
     parent_dir = S3FileSystem._append_separator(path)
     if not s3.is_root(parent_dir):
-      bucket_name, key_name, basename = s3.parse_uri(path)
+      bucket_name, key_name, basename = s3.parse_uri(normpath(path))
       if not basename:  # bucket is top-level so return root
         parent_dir = S3A_ROOT
       else:
@@ -225,6 +225,7 @@ class S3FileSystem(object):
 
   @translate_s3_error
   def open(self, path, mode='r'):
+    path = normpath(path)
     key = self._get_key(path, validate=True)
     if key is None:
       raise S3FileSystemException("No such file or directory: '%s'" % path)
@@ -238,14 +239,14 @@ class S3FileSystem(object):
 
   @translate_s3_error
   def isfile(self, path):
-    stat = self._stats(path)
+    stat = self._stats(normpath(path))
     if stat is None:
       return False
     return not stat.isDir
 
   @translate_s3_error
   def isdir(self, path):
-    stat = self._stats(path)
+    stat = self._stats(normpath(path))
     if stat is None:
       return False
     return stat.isDir
@@ -277,7 +278,7 @@ class S3FileSystem(object):
       except Exception, e:
         raise S3FileSystemException(_('Failed to retrieve buckets: %s') % e)
 
-    bucket_name, prefix = s3.parse_uri(path)[:2]
+    bucket_name, prefix = s3.parse_uri(normpath(path))[:2]
     bucket = self._get_bucket(bucket_name)
     prefix = self._append_separator(prefix)
     res = []
@@ -414,7 +415,7 @@ class S3FileSystem(object):
         raise S3FileSystemException(_("Invalid key to transform: %s") % key.name)
       dst_name = posixpath.normpath(s3.join(dst_key, key.name[cut:]))
 
-      if self.isdir(normpath(self.join(S3A_ROOT, key.bucket.name, key.name))):
+      if self.isdir(self.join(S3A_ROOT, key.bucket.name, key.name)):
         dst_name = self._append_separator(dst_name)
 
       key.copy(dst_bucket, dst_name)
