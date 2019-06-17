@@ -259,10 +259,6 @@ ${ hueIcons.symbols() }
           % if IS_MULTICLUSTER_ONLY.get():
             ##<!-- ko component: { name: 'hue-app-switcher', params: { onPrem: ko.observable(false) } } --><!-- /ko -->
           % endif
-          % if has_multi_clusters():
-            <select data-bind="options: clusters, optionsText: 'name', value: 'id'" class="input-medium pull-right">
-            </select>
-          % endif
 
           <%
             view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or is_admin(user)
@@ -288,6 +284,10 @@ ${ hueIcons.symbols() }
         </div>
         % endif
 
+        % if has_multi_clusters():
+          <select data-bind="options: clusters, optionsText: 'name', value: 'id'" class="input-small" style="margin-top:8px">
+          </select>
+        % endif
         <!-- ko component: 'hue-history-panel' --><!-- /ko -->
         <!-- ko if: hasJobBrowser -->
           <!-- ko component: { name: 'hue-job-browser-links', params: { onePageViewModel: onePageViewModel }} --><!-- /ko -->
