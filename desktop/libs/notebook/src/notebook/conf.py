@@ -21,7 +21,7 @@ from django.utils.translation import ugettext_lazy as _t
 
 
 from desktop import appmanager
-from desktop.conf import is_oozie_enabled, CONNECTORS
+from desktop.conf import is_oozie_enabled, has_connectors
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_json_dict, coerce_bool, coerce_csv
 
 
@@ -68,7 +68,7 @@ def get_ordered_interpreters(user=None):
   if unknown_interpreters:
     raise ValueError("Interpreters from interpreters_shown_on_wheel is not in the list of Interpreters %s" % unknown_interpreters)
 
-  if CONNECTORS.IS_ENABLED.get():
+  if has_connectors():
     reordered_interpreters = [{
         'name': i['name'],
         'type': i['type'],
