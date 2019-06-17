@@ -112,6 +112,20 @@ CONFIGURED_CONNECTORS = [
   {'name': 'Hive c5', 'type': Hive().TYPE + '-3', 'connector_name': Hive().TYPE, 'interface': Hive().INTERFACE, 'settings': Hive().PROPERTIES, 'id': 3, 'category': 'engines', 'description': ''},
 ]
 
+CONFIGURED_CONNECTORS[0]['settings'] = [
+  {'name': 'server_host', 'value': 'self-service-dw-2.gce.cloudera.com'},
+  {'name': 'server_port', 'value': '21050'},
+]
+CONFIGURED_CONNECTORS[1]['settings'] = [
+  {'name': 'server_host', 'value': 'self-service-dw-1.gce.cloudera.com'},
+  {'name': 'server_port', 'value': '10000'},
+]
+CONFIGURED_CONNECTORS[2]['settings'] = [
+  {'name': 'server_host', 'value': 'nightly6x-unsecure-1.vpc.cloudera.com '},
+  {'name': 'server_port', 'value': '10000'},
+]
+
+
 
 def get_connector_classes(request):
   global AVAILABLE_CONNECTORS
