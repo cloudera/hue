@@ -265,7 +265,6 @@ describe('impalaAutocompleteParser.js', () => {
   });
 
   describe('SET', () => {
-
     it('should handle "set bla.bla="ble";|"', () => {
       assertAutoComplete({
         beforeCursor: 'set bla.bla="ble";',
@@ -439,7 +438,10 @@ describe('impalaAutocompleteParser.js', () => {
         left: 4,
         right: 0
       });
-      expect(impalaAutocompleteParser.identifyPartials('foo', 'bar')).toEqual({ left: 3, right: 3 });
+      expect(impalaAutocompleteParser.identifyPartials('foo', 'bar')).toEqual({
+        left: 3,
+        right: 3
+      });
       expect(impalaAutocompleteParser.identifyPartials('fo', 'o()')).toEqual({ left: 2, right: 3 });
       expect(impalaAutocompleteParser.identifyPartials('fo', 'o(')).toEqual({ left: 2, right: 2 });
       expect(impalaAutocompleteParser.identifyPartials('fo', 'o(bla bla)')).toEqual({
@@ -447,8 +449,14 @@ describe('impalaAutocompleteParser.js', () => {
         right: 10
       });
       expect(impalaAutocompleteParser.identifyPartials('foo ', '')).toEqual({ left: 0, right: 0 });
-      expect(impalaAutocompleteParser.identifyPartials("foo '", "'")).toEqual({ left: 0, right: 0 });
-      expect(impalaAutocompleteParser.identifyPartials('foo "', '"')).toEqual({ left: 0, right: 0 });
+      expect(impalaAutocompleteParser.identifyPartials("foo '", "'")).toEqual({
+        left: 0,
+        right: 0
+      });
+      expect(impalaAutocompleteParser.identifyPartials('foo "', '"')).toEqual({
+        left: 0,
+        right: 0
+      });
       limitChars.forEach(char => {
         expect(impalaAutocompleteParser.identifyPartials('bar foo' + char, '')).toEqual({
           left: 0,
@@ -458,10 +466,12 @@ describe('impalaAutocompleteParser.js', () => {
           left: 6,
           right: 0
         });
-        expect(impalaAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo ', '')).toEqual({
-          left: 0,
-          right: 0
-        });
+        expect(impalaAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo ', '')).toEqual(
+          {
+            left: 0,
+            right: 0
+          }
+        );
         expect(impalaAutocompleteParser.identifyPartials('', char + 'foo bar')).toEqual({
           left: 0,
           right: 0

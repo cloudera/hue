@@ -217,8 +217,7 @@ describe('impalaAutocompleteParser.js ALTER statements', () => {
 
     it('should handle "alter table sales_data add partition (zipcode = cast(9021 * 10 as string));|"', () => {
       assertAutoComplete({
-        beforeCursor:
-          'alter table sales_data add partition (zipcode = cast(9021 * 10 as string));',
+        beforeCursor: 'alter table sales_data add partition (zipcode = cast(9021 * 10 as string));',
         afterCursor: '',
         containsKeywords: ['SELECT'],
         expectedResult: {

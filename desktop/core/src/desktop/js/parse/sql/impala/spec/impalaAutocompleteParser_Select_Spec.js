@@ -5328,15 +5328,7 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: [
-            'ASC',
-            'DESC',
-            'NULLS FIRST',
-            'NULLS LAST',
-            'LIMIT',
-            'OFFSET',
-            'UNION'
-          ]
+          suggestKeywords: ['ASC', 'DESC', 'NULLS FIRST', 'NULLS LAST', 'LIMIT', 'OFFSET', 'UNION']
         }
       });
     });
@@ -5347,15 +5339,7 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: [
-            'ASC',
-            'DESC',
-            'NULLS FIRST',
-            'NULLS LAST',
-            'LIMIT',
-            'OFFSET',
-            'UNION'
-          ]
+          suggestKeywords: ['ASC', 'DESC', 'NULLS FIRST', 'NULLS LAST', 'LIMIT', 'OFFSET', 'UNION']
         }
       });
     });
@@ -5377,15 +5361,7 @@ describe('impalaAutocompleteParser.js SELECT statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: [
-            'ASC',
-            'DESC',
-            'NULLS FIRST',
-            'NULLS LAST',
-            'LIMIT',
-            'OFFSET',
-            'UNION'
-          ]
+          suggestKeywords: ['ASC', 'DESC', 'NULLS FIRST', 'NULLS LAST', 'LIMIT', 'OFFSET', 'UNION']
         }
       });
     });

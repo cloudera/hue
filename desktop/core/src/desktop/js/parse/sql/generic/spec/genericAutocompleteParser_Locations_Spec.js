@@ -17,6 +17,7 @@
 import SqlTestUtils from 'parse/spec/sqlTestUtils';
 import genericAutocompleteParser from '../genericAutocompleteParser';
 
+// prettier-ignore-start
 describe('genericAutocompleteParser.js locations', () => {
   beforeAll(() => {
     genericAutocompleteParser.yy.parseError = function(msg) {
@@ -419,3 +420,4 @@ describe('genericAutocompleteParser.js locations', () => {
     });
   });
 });
+// prettier-ignore-end
