@@ -2318,7 +2318,7 @@ case 1713:
    
 break;
 case 1715:
-this.$ = { identifier: { name: $$[$0] }, location: _$[$0] };;
+this.$ = { identifier: { name: $$[$0] }, location: _$[$0] };
 break;
 case 1716:
 this.$ = { identifier: { name: $$[$0-3], keySet: true }, location: _$[$0-3] };
@@ -2330,7 +2330,7 @@ case 1718:
 this.$ = { identifier: { name: $$[$0-3] }, insideKey: true };
 break;
 case 1719:
-this.$ = { identifier: { name: $$[$0-3] }};;
+this.$ = { identifier: { name: $$[$0-3] }};
 break;
 case 1744:
 
@@ -2420,7 +2420,7 @@ case 1783:
    
 break;
 case 1788:
-this.$ = $$[$0-2].concat([$$[$0]]);;
+this.$ = $$[$0-2].concat([$$[$0]]);
 break;
 case 1792:
 

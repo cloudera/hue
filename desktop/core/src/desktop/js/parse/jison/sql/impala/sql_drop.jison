@@ -260,7 +260,7 @@ DropViewStatement_EDIT
  ;
 
 TruncateTableStatement
- : 'TRUNCATE' 'TABLE' OptionalIfExists SchemaQualifiedTableIdentifier OptionalPartitionSpec
+ : 'TRUNCATE' 'TABLE' OptionalIfExists SchemaQualifiedTableIdentifier
    {
      parser.addTablePrimary($4);
    }
@@ -271,7 +271,7 @@ TruncateTableStatement_EDIT
    {
      parser.suggestKeywords(['TABLE']);
    }
- | 'TRUNCATE' 'TABLE' OptionalIfExists 'CURSOR' OptionalPartitionSpec
+ | 'TRUNCATE' 'TABLE' OptionalIfExists 'CURSOR'
    {
      parser.suggestTables();
      parser.suggestDatabases({ appendDot: true });
@@ -279,7 +279,7 @@ TruncateTableStatement_EDIT
        parser.suggestKeywords(['IF EXISTS']);
      }
    }
- | 'TRUNCATE' 'TABLE' OptionalIfExists_EDIT OptionalPartitionSpec
+ | 'TRUNCATE' 'TABLE' OptionalIfExists_EDIT
  | 'TRUNCATE' 'TABLE' OptionalIfExists SchemaQualifiedTableIdentifier_EDIT
  | 'TRUNCATE' 'TABLE' OptionalIfExists SchemaQualifiedTableIdentifier 'CURSOR'
    {

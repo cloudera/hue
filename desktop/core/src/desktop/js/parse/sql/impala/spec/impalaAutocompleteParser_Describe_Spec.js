@@ -14,20 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import SqlTestUtils from './sqlTestUtils';
-import sqlAutocompleteParser from '../sqlAutocompleteParser';
+import SqlTestUtils from 'parse/spec/sqlTestUtils';
+import impalaAutocompleteParser from '../impalaAutocompleteParser';
 
-describe('sqlAutocompleteParser.js Impala DESCRIBE statements', () => {
+describe('impalaAutocompleteParser.js DESCRIBE statements', () => {
   beforeAll(() => {
-    sqlAutocompleteParser.yy.parseError = function(msg) {
+    impalaAutocompleteParser.yy.parseError = function(msg) {
       throw Error(msg);
     };
     jasmine.addMatchers(SqlTestUtils.testDefinitionMatcher);
   });
 
-  const assertAutoComplete = function(spec) {
-    spec.dialect = 'impala';
-    return SqlTestUtils.assertAutocomplete(spec);
+  const assertAutoComplete = testDefinition => {
+    const debug = false;
+    expect(
+      impalaAutocompleteParser.parseSql(
+        testDefinition.beforeCursor,
+        testDefinition.afterCursor,
+        debug || testDefinition.debug
+      )
+    ).toEqualDefinition(testDefinition);
   };
 
   it('should handle "DESCRIBE tbl;|"', () => {

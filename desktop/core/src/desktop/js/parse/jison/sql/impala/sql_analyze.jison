@@ -126,7 +126,7 @@ ComputeStatsStatement_EDIT
    {
      parser.addTablePrimary($3);
    }
- | 'COMPUTE' 'STATS' SchemaQualifiedTableIdentifier OptionalParenthesizedColumnList OptionalTableSample_EDIT
+ | 'COMPUTE' 'STATS' SchemaQualifiedTableIdentifier OptionalParenthesizedColumnList TableSample_EDIT
    {
      parser.addTablePrimary($3);
    }

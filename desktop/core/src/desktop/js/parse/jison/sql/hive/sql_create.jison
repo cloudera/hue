@@ -1178,10 +1178,10 @@ ViewColumnList
  ;
 
 ViewColumnList_EDIT
- : ColumnReference OptionalComment 'CURSOR'                                        --> $2
- | ColumnReference OptionalComment 'CURSOR' ',' ViewColumnList                     --> $2
- | ViewColumnList ',' ColumnReference OptionalComment 'CURSOR'                     --> $4
- | ViewColumnList ',' ColumnReference OptionalComment 'CURSOR' ',' ViewColumnList  --> $4
+ : ColumnReference OptionalComment 'CURSOR'                                        -> $2
+ | ColumnReference OptionalComment 'CURSOR' ',' ViewColumnList                     -> $2
+ | ViewColumnList ',' ColumnReference OptionalComment 'CURSOR'                     -> $4
+ | ViewColumnList ',' ColumnReference OptionalComment 'CURSOR' ',' ViewColumnList  -> $4
  ;
 
 RoleDefinition

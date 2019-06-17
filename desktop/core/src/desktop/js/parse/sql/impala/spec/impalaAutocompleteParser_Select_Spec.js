@@ -14,18 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import SqlTestUtils from './sqlTestUtils';
-import sqlAutocompleteParser from '../sqlAutocompleteParser';
+import SqlTestUtils from 'parse/spec/sqlTestUtils';
+import impalaAutocompleteParser from '../impalaAutocompleteParser';
 
-describe('sqlAutocompleteParser.js SELECT statements', () => {
+describe('impalaAutocompleteParser.js SELECT statements', () => {
   beforeAll(() => {
-    sqlAutocompleteParser.yy.parseError = function(msg) {
+    impalaAutocompleteParser.yy.parseError = function(msg) {
       throw Error(msg);
     };
     jasmine.addMatchers(SqlTestUtils.testDefinitionMatcher);
   });
 
-  const assertAutoComplete = SqlTestUtils.assertAutocomplete;
+  const assertAutoComplete = testDefinition => {
+    const debug = false;
+    expect(
+      impalaAutocompleteParser.parseSql(
+        testDefinition.beforeCursor,
+        testDefinition.afterCursor,
+        debug || testDefinition.debug
+      )
+    ).toEqualDefinition(testDefinition);
+  };
 
   it('should suggest keywords for "|"', () => {
     assertAutoComplete({
@@ -116,59 +125,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
           prependFrom: true,
           appendDot: true
         }
-      }
-    });
-  });
-
-  it('should suggest keywords for "SELECT * FROM testTableA tta, testTableB |"', () => {
-    assertAutoComplete({
-      beforeCursor: 'SELECT * FROM testTableA tta, testTableB ',
-      afterCursor: '',
-      dialect: 'generic',
-      expectedResult: {
-        suggestJoins: {
-          prependJoin: true,
-          tables: [{ identifierChain: [{ name: 'testTableB' }] }]
-        },
-        suggestFilters: {
-          prefix: 'WHERE',
-          tables: [
-            { identifierChain: [{ name: 'testTableA' }], alias: 'tta' },
-            { identifierChain: [{ name: 'testTableB' }] }
-          ]
-        },
-        suggestGroupBys: {
-          prefix: 'GROUP BY',
-          tables: [
-            { identifierChain: [{ name: 'testTableA' }], alias: 'tta' },
-            { identifierChain: [{ name: 'testTableB' }] }
-          ]
-        },
-        suggestOrderBys: {
-          prefix: 'ORDER BY',
-          tables: [
-            { identifierChain: [{ name: 'testTableA' }], alias: 'tta' },
-            { identifierChain: [{ name: 'testTableB' }] }
-          ]
-        },
-        suggestKeywords: [
-          'AS',
-          'WHERE',
-          'GROUP BY',
-          'HAVING',
-          'ORDER BY',
-          'LIMIT',
-          'UNION',
-          'FULL JOIN',
-          'FULL OUTER JOIN',
-          'INNER JOIN',
-          'JOIN',
-          'LEFT JOIN',
-          'LEFT OUTER JOIN',
-          'RIGHT JOIN',
-          'RIGHT OUTER JOIN'
-        ],
-        lowerCase: false
       }
     });
   });
@@ -281,7 +237,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
     assertAutoComplete({
       beforeCursor: 'SELECT * FROM database_two.bla.',
       afterCursor: '',
-      dialect: 'impala',
       expectedResult: {
         lowerCase: false,
         suggestTables: { identifierChain: [{ name: 'database_two' }, { name: 'bla' }] }
@@ -293,7 +248,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
     assertAutoComplete({
       beforeCursor: 'SELECT * FROM database_two.boo.bee.boo.bl',
       afterCursor: '',
-      dialect: 'impala',
       expectedResult: {
         lowerCase: false,
         suggestTables: {
@@ -338,7 +292,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
         beforeCursor: "SELECT * FROM foo WHERE bar ILIKE 'bla'; ",
         afterCursor: '',
         noErrors: true,
-        dialect: 'impala',
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false
@@ -351,7 +304,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
         beforeCursor: "SELECT replace(foo, 'd', 'c') as rep, truncate(foo, 1) as tru FROM tbl; ",
         afterCursor: '',
         noErrors: true,
-        dialect: 'impala',
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false
@@ -364,7 +316,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
         beforeCursor: "SELECT * FROM foo WHERE bar IREGEXP 'bla'; ",
         afterCursor: '',
         noErrors: true,
-        dialect: 'impala',
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false
@@ -401,7 +352,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
         beforeCursor: 'SELECT a as \'a\', b "b", c as `c` from d \'d\', e as "e", f as `f`; ',
         afterCursor: '',
         noErrors: true,
-        dialect: 'impala',
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false
@@ -441,26 +391,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
             source: 'select',
             tables: [{ identifierChain: [{ name: 'testTable' }] }]
           }
-        }
-      });
-    });
-
-    // Enable to check performance
-    xit('should handle 100k rows before and after "SELECT * FROM foo WHERE (bar = \'bla\') AND (ble = 1);|"', () => {
-      let beforeCursor = '';
-      let afterCursor = ';\n';
-      for (let i = 0; i < 100000; i++) {
-        beforeCursor += "SELECT * FROM foo WHERE (bar = 'bla') AND (ble = 1);\n";
-        afterCursor += "SELECT * FROM foo WHERE (bar = 'bla') AND (ble = 1);\n";
-      }
-      assertAutoComplete({
-        beforeCursor: beforeCursor,
-        afterCursor: afterCursor,
-        dialect: 'hive',
-        noErrors: true,
-        containsKeywords: ['SELECT'],
-        expectedResult: {
-          lowerCase: false
         }
       });
     });
@@ -714,7 +644,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT STRAIGHT_JOIN ',
         afterCursor: '',
-        dialect: 'impala',
         containsKeywords: ['*', 'CASE'],
         doesNotContainKeywords: ['ALL', 'DISTINCT'],
         expectedResult: {
@@ -1040,39 +969,10 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       });
     });
 
-    it('should suggest columns for "SELECT | FROM db.tbl1, db.tbl2"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT ',
-        afterCursor: ' FROM db.tbl1, db.tbl2',
-        dialect: 'generic',
-        containsKeywords: ['*', 'ALL', 'DISTINCT'],
-        expectedResult: {
-          lowerCase: false,
-          suggestAggregateFunctions: {
-            tables: [
-              { identifierChain: [{ name: 'db' }, { name: 'tbl1' }] },
-              { identifierChain: [{ name: 'db' }, { name: 'tbl2' }] }
-            ]
-          },
-          suggestAnalyticFunctions: true,
-          suggestFunctions: {},
-          suggestColumns: {
-            source: 'select',
-            tables: [
-              { identifierChain: [{ name: 'db' }, { name: 'tbl1' }] },
-              { identifierChain: [{ name: 'db' }, { name: 'tbl2' }] }
-            ]
-          },
-          suggestIdentifiers: [{ name: 'tbl1.', type: 'table' }, { name: 'tbl2.', type: 'table' }]
-        }
-      });
-    });
-
     it('should suggest columns for "SELECT | FROM db.tbl1.col, db.tbl2"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT ',
         afterCursor: ' FROM db.tbl1.col, db.tbl2',
-        dialect: 'impala',
         containsKeywords: ['*', 'ALL', 'DISTINCT'],
         expectedResult: {
           lowerCase: false,
@@ -1163,47 +1063,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
               location: { first_line: 1, last_line: 1, first_column: 41, last_column: 41 }
             }
           ]
-        }
-      });
-    });
-
-    it('should suggest aliases for "SELECT | FROM testTableA tta, (SELECT SUM(A*B) total FROM tta.arr) ttaSum, testTableB ttb"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT ',
-        afterCursor:
-          ' FROM testTableA tta, (SELECT SUM(A*B) total FROM tta.arr) ttaSum, testTableB ttb',
-        ignoreErrors: true,
-        dialect: 'hive',
-        containsKeywords: ['*', 'ALL', 'DISTINCT'],
-        expectedResult: {
-          suggestAggregateFunctions: {
-            tables: [
-              { identifierChain: [{ name: 'testTableA' }], alias: 'tta' },
-              { identifierChain: [{ name: 'testTableB' }], alias: 'ttb' }
-            ]
-          },
-          suggestAnalyticFunctions: true,
-          suggestFunctions: {},
-          suggestColumns: {
-            source: 'select',
-            tables: [
-              { identifierChain: [{ name: 'testTableA' }], alias: 'tta' },
-              { identifierChain: [{ subQuery: 'ttaSum' }] },
-              { identifierChain: [{ name: 'testTableB' }], alias: 'ttb' }
-            ]
-          },
-          subQueries: [
-            {
-              alias: 'ttaSum',
-              columns: [{ alias: 'total', type: 'DOUBLE' }]
-            }
-          ],
-          suggestIdentifiers: [
-            { name: 'tta.', type: 'alias' },
-            { name: 'ttaSum.', type: 'sub-query' },
-            { name: 'ttb.', type: 'alias' }
-          ],
-          lowerCase: false
         }
       });
     });
@@ -1416,43 +1275,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
               location: { first_line: 1, last_line: 1, first_column: 79, last_column: 87 }
             }
           ]
-        }
-      });
-    });
-
-    it('should suggest columns for "SELECT col.cplx.| from tbl1"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT col.cplx.',
-        afterCursor: ' from tbl1',
-        dialect: 'hive',
-        containsKeywords: ['*'],
-        expectedResult: {
-          lowerCase: false,
-          suggestColumns: {
-            source: 'select',
-            identifierChain: [{ name: 'col' }, { name: 'cplx' }],
-            tables: [{ identifierChain: [{ name: 'tbl1' }] }]
-          }
-        }
-      });
-    });
-
-    it('should suggest columns for "SELECT col.cplx.| from tbl1, tbl2 t2"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT col.cplx.',
-        afterCursor: ' from tbl1, tbl2 t2',
-        dialect: 'hive',
-        containsKeywords: ['*'],
-        expectedResult: {
-          lowerCase: false,
-          suggestColumns: {
-            source: 'select',
-            identifierChain: [{ name: 'col' }, { name: 'cplx' }],
-            tables: [
-              { identifierChain: [{ name: 'tbl1' }] },
-              { identifierChain: [{ name: 'tbl2' }], alias: 't2' }
-            ]
-          }
         }
       });
     });
@@ -1754,7 +1576,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS ',
         afterCursor: '',
-        dialect: 'impala',
         expectedResult: {
           lowerCase: false,
           suggestKeywords: ['BETWEEN']
@@ -1911,84 +1732,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
           lowerCase: false,
           suggestKeywords: ['FOLLOWING']
         }
-      });
-    });
-
-    describe('Hive specific', () => {
-      it('should suggest keywords for "SELECT count(id) OVER w FROM customers |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT count(id) OVER w FROM customers ',
-          afterCursor: '',
-          dialect: 'hive',
-          containsKeywords: ['WINDOW'],
-          expectedResult: {
-            lowerCase: false,
-            suggestJoins: {
-              prependJoin: true,
-              tables: [{ identifierChain: [{ name: 'customers' }] }]
-            },
-            suggestFilters: {
-              prefix: 'WHERE',
-              tables: [{ identifierChain: [{ name: 'customers' }] }]
-            },
-            suggestGroupBys: {
-              prefix: 'GROUP BY',
-              tables: [{ identifierChain: [{ name: 'customers' }] }]
-            },
-            suggestOrderBys: {
-              prefix: 'ORDER BY',
-              tables: [{ identifierChain: [{ name: 'customers' }] }]
-            }
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT count(id) OVER w FROM customers WINDOW w |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT count(id) OVER w FROM customers WINDOW w ',
-          afterCursor: '',
-          dialect: 'hive',
-          containsKeywords: ['AS'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT count(id) OVER w FROM customers WINDOW w AS (|"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT count(id) OVER w FROM customers WINDOW w AS (',
-          afterCursor: '',
-          dialect: 'hive',
-          containsKeywords: ['ORDER BY', 'PARTITION BY'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS ',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['BETWEEN', 'UNBOUNDED']
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS UNBOUNDED |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS UNBOUNDED ',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['PRECEDING']
-          }
-        });
       });
     });
   });
@@ -2571,81 +2314,10 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       });
     });
 
-    it('should suggest keywords for "SELECT extract(| FROM bar;"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT extract( ',
-        afterCursor: ' FROM bar;',
-        dialect: 'hive',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: [
-            'DAY',
-            'DAYOFWEEK',
-            'HOUR',
-            'MINUTE',
-            'MONTH',
-            'QUARTER',
-            'SECOND',
-            'WEEK',
-            'YEAR'
-          ]
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT extract(month | FROM bar"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT extract(month ',
-        afterCursor: ' FROM bar;',
-        dialect: 'hive',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['FROM']
-        }
-      });
-    });
-
-    it('should suggest columns for "SELECT extract(month FROM | FROM bar;"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT extract(month FROM ',
-        afterCursor: ' FROM bar;',
-        dialect: 'hive',
-        containsKeywords: ['CASE'],
-        expectedResult: {
-          lowerCase: false,
-          suggestFunctions: {},
-          suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'bar' }] }] }
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT extract(| FROM boo) FROM bar;"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT extract( ',
-        afterCursor: ' FROM boo) FROM bar;',
-        dialect: 'hive',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: [
-            'DAY',
-            'DAYOFWEEK',
-            'HOUR',
-            'MINUTE',
-            'MONTH',
-            'QUARTER',
-            'SECOND',
-            'WEEK',
-            'YEAR'
-          ]
-        }
-      });
-    });
-
     it('should suggest columns for "SELECT extract(bla ,|  FROM bar;"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT extract(bla ,',
         afterCursor: ' FROM bar;',
-        dialect: 'impala',
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
@@ -2663,7 +2335,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT a, extract(bla FROM ',
         afterCursor: ') FROM bar;',
-        dialect: 'impala',
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
@@ -2681,7 +2352,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT extract(bla ,',
         afterCursor: ') FROM bar;',
-        dialect: 'impala',
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
@@ -2697,53 +2367,27 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
 
     it('should suggest columns for "SELECT <GeneralSetFunction>(|) FROM testTable"', () => {
       const aggregateFunctions = [
-        { name: 'APPX_MEDIAN', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
-        { name: 'AVG', dialect: 'generic', containsKeywords: ['DISTINCT'] },
-        { name: 'AVG', dialect: 'hive', containsKeywords: ['DISTINCT'] },
-        {
-          name: 'AVG',
-          dialect: 'impala',
-          types: ['NUMBER'],
-          containsKeywords: ['ALL', 'DISTINCT']
-        },
-        { name: 'collect_set', dialect: 'hive', containsKeywords: ['DISTINCT'] },
-        { name: 'COLLECT_LIST', dialect: 'hive', containsKeywords: ['DISTINCT'] },
-        { name: 'COUNT', dialect: 'generic', containsKeywords: ['*', 'DISTINCT'] },
-        { name: 'COUNT', dialect: 'hive', containsKeywords: ['*', 'DISTINCT'] },
-        { name: 'COUNT', dialect: 'impala', containsKeywords: ['*', 'ALL', 'DISTINCT'] },
-        { name: 'GROUP_CONCAT', dialect: 'impala', containsKeywords: ['ALL'], types: ['STRING'] },
-        { name: 'stddev', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
-        { name: 'STDDEV_POP', dialect: 'generic', containsKeywords: ['DISTINCT'] },
-        { name: 'STDDEV_POP', dialect: 'hive', containsKeywords: ['DISTINCT'] },
-        { name: 'STDDEV_POP', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
-        { name: 'STDDEV_SAMP', dialect: 'generic', containsKeywords: ['DISTINCT'] },
-        { name: 'STDDEV_SAMP', dialect: 'hive', containsKeywords: ['DISTINCT'] },
-        { name: 'STDDEV_SAMP', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
-        { name: 'SUM', dialect: 'generic', containsKeywords: ['DISTINCT'] },
-        { name: 'sum', dialect: 'hive', containsKeywords: ['DISTINCT'] },
-        { name: 'SUM', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
-        { name: 'MAX', dialect: 'generic', containsKeywords: ['DISTINCT'] },
-        { name: 'MAX', dialect: 'hive', containsKeywords: ['DISTINCT'] },
-        { name: 'max', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
-        { name: 'MIN', dialect: 'generic', containsKeywords: ['DISTINCT'] },
-        { name: 'MIN', dialect: 'hive', containsKeywords: ['DISTINCT'] },
-        { name: 'MIN', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
-        { name: 'VARIANCE', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
-        { name: 'variance_pop', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
-        { name: 'VARIANCE_SAMP', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
-        { name: 'VAR_POP', dialect: 'generic', containsKeywords: ['DISTINCT'] },
-        { name: 'VAR_POP', dialect: 'hive', containsKeywords: ['DISTINCT'] },
-        { name: 'VAR_POP', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
-        { name: 'var_samp', dialect: 'generic', containsKeywords: ['DISTINCT'] },
-        { name: 'VAR_SAMP', dialect: 'hive', containsKeywords: ['DISTINCT'] },
-        { name: 'VAR_SAMP', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] }
+        { name: 'APPX_MEDIAN', containsKeywords: ['ALL', 'DISTINCT'] },
+        { name: 'AVG', types: ['NUMBER'], containsKeywords: ['ALL', 'DISTINCT'] },
+        { name: 'COUNT', containsKeywords: ['*', 'ALL', 'DISTINCT'] },
+        { name: 'GROUP_CONCAT', containsKeywords: ['ALL'], types: ['STRING'] },
+        { name: 'stddev', containsKeywords: ['ALL', 'DISTINCT'] },
+        { name: 'STDDEV_POP', containsKeywords: ['ALL', 'DISTINCT'] },
+        { name: 'STDDEV_SAMP', containsKeywords: ['ALL', 'DISTINCT'] },
+        { name: 'SUM', containsKeywords: ['ALL', 'DISTINCT'] },
+        { name: 'max', containsKeywords: ['ALL', 'DISTINCT'] },
+        { name: 'MIN', containsKeywords: ['ALL', 'DISTINCT'] },
+        { name: 'VARIANCE', containsKeywords: ['ALL', 'DISTINCT'] },
+        { name: 'variance_pop', containsKeywords: ['ALL', 'DISTINCT'] },
+        { name: 'VARIANCE_SAMP', containsKeywords: ['ALL', 'DISTINCT'] },
+        { name: 'VAR_POP', containsKeywords: ['ALL', 'DISTINCT'] },
+        { name: 'VAR_SAMP', containsKeywords: ['ALL', 'DISTINCT'] }
       ];
       aggregateFunctions.forEach(aggregateFunction => {
         if (aggregateFunction.name === 'COUNT') {
           assertAutoComplete({
             beforeCursor: 'SELECT ' + aggregateFunction.name + '(',
             afterCursor: ') FROM testTable',
-            dialect: aggregateFunction.dialect,
             containsKeywords: aggregateFunction.containsKeywords.concat(['*', 'CASE']),
             expectedResult: {
               lowerCase: false,
@@ -2767,91 +2411,10 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
           assertAutoComplete({
             beforeCursor: 'SELECT ' + aggregateFunction.name + '(',
             afterCursor: ') FROM testTable',
-            dialect: aggregateFunction.dialect,
             containsKeywords: aggregateFunction.containsKeywords.concat(['CASE']),
             expectedResult: expectedResult
           });
         }
-      });
-    });
-
-    it('should suggest columns for "SELECT <BinarySetFunction>(|,col) FROM testTable"', () => {
-      const binaryFunctions = [
-        { name: 'CORR', dialect: 'hive' },
-        { name: 'COVAR_POP', dialect: 'hive' },
-        { name: 'COVAR_SAMP', dialect: 'hive' }
-      ];
-
-      binaryFunctions.forEach(binaryFunction => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT ' + binaryFunction.name + '(',
-          afterCursor: ',col) FROM testTable',
-          dialect: binaryFunction.dialect,
-          containsKeywords: ['DISTINCT', 'CASE'],
-          doesNotContainKeywords: ['ALL'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: { types: ['T'] },
-            suggestColumns: {
-              source: 'select',
-              types: ['T'],
-              tables: [{ identifierChain: [{ name: 'testTable' }] }]
-            }
-          }
-        });
-      });
-    });
-
-    it('should suggest columns for "SELECT <BinarySetFunction>(,|) FROM testTable"', () => {
-      const binaryFunctions = [
-        { name: 'CORR', dialect: 'hive' },
-        { name: 'COVAR_POP', dialect: 'hive' },
-        { name: 'COVAR_SAMP', dialect: 'hive' }
-      ];
-
-      binaryFunctions.forEach(binaryFunction => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT ' + binaryFunction.name + '(,',
-          afterCursor: ') FROM testTable',
-          dialect: binaryFunction.dialect,
-          containsKeywords: ['CASE'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: { types: ['T'] },
-            suggestColumns: {
-              source: 'select',
-              types: ['T'],
-              tables: [{ identifierChain: [{ name: 'testTable' }] }]
-            }
-          }
-        });
-      });
-    });
-
-    it('should suggest columns for "SELECT <BinarySetFunction>(| FROM testTable"', () => {
-      const binaryFunctions = [
-        { name: 'CORR', dialect: 'hive' },
-        { name: 'COVAR_POP', dialect: 'hive' },
-        { name: 'COVAR_SAMP', dialect: 'hive' }
-      ];
-
-      binaryFunctions.forEach(binaryFunction => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT ' + binaryFunction.name + '(',
-          afterCursor: ' FROM testTable',
-          dialect: binaryFunction.dialect,
-          containsKeywords: ['CASE', 'DISTINCT'],
-          doesNotContainKeywords: ['ALL'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: { types: ['T'] },
-            suggestColumns: {
-              source: 'select',
-              types: ['T'],
-              tables: [{ identifierChain: [{ name: 'testTable' }] }]
-            }
-          }
-        });
       });
     });
 
@@ -3499,1177 +3062,303 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
     });
   });
 
-  describe('Hive Specific', () => {
-    it('should suggest keywords for "SELECT bar FROM foo |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT bar FROM foo ',
-        afterCursor: '',
-        dialect: 'hive',
-        expectedResult: {
-          suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'foo' }] }] },
-          suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'foo' }] }] },
-          suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
-          suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
-          suggestKeywords: [
-            'AS',
-            'WHERE',
-            'GROUP BY',
-            'HAVING',
-            'WINDOW',
-            'ORDER BY',
-            'CLUSTER BY',
-            'DISTRIBUTE BY',
-            'SORT BY',
-            'LIMIT',
-            'UNION',
-            'LATERAL VIEW',
-            'TABLESAMPLE',
-            'CROSS JOIN',
-            'FULL JOIN',
-            'FULL OUTER JOIN',
-            'INNER JOIN',
-            'JOIN',
-            'LEFT JOIN',
-            'LEFT OUTER JOIN',
-            'LEFT SEMI JOIN',
-            'RIGHT JOIN',
-            'RIGHT OUTER JOIN'
-          ],
-          lowerCase: false
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT bar FROM db.foo f |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT bar FROM db.foo f ',
-        afterCursor: '',
-        dialect: 'hive',
-        expectedResult: {
-          suggestJoins: {
-            prependJoin: true,
-            tables: [{ identifierChain: [{ name: 'db' }, { name: 'foo' }], alias: 'f' }]
-          },
-          suggestFilters: {
-            prefix: 'WHERE',
-            tables: [{ identifierChain: [{ name: 'db' }, { name: 'foo' }], alias: 'f' }]
-          },
-          suggestGroupBys: {
-            prefix: 'GROUP BY',
-            tables: [{ identifierChain: [{ name: 'db' }, { name: 'foo' }], alias: 'f' }]
-          },
-          suggestOrderBys: {
-            prefix: 'ORDER BY',
-            tables: [{ identifierChain: [{ name: 'db' }, { name: 'foo' }], alias: 'f' }]
-          },
-          suggestKeywords: [
-            'WHERE',
-            'GROUP BY',
-            'HAVING',
-            'WINDOW',
-            'ORDER BY',
-            'CLUSTER BY',
-            'DISTRIBUTE BY',
-            'SORT BY',
-            'LIMIT',
-            'UNION',
-            'LATERAL VIEW',
-            'CROSS JOIN',
-            'FULL JOIN',
-            'FULL OUTER JOIN',
-            'INNER JOIN',
-            'JOIN',
-            'LEFT JOIN',
-            'LEFT OUTER JOIN',
-            'LEFT SEMI JOIN',
-            'RIGHT JOIN',
-            'RIGHT OUTER JOIN'
-          ],
-          lowerCase: false
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT bar FROM foo JOIN baz |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT bar FROM foo JOIN baz ',
-        afterCursor: '',
-        dialect: 'hive',
-        containsKeywords: ['ON'],
-        expectedResult: {
-          lowerCase: false,
-          suggestFilters: {
-            prefix: 'WHERE',
-            tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'baz' }] }]
-          },
-          suggestGroupBys: {
-            prefix: 'GROUP BY',
-            tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'baz' }] }]
-          },
-          suggestOrderBys: {
-            prefix: 'ORDER BY',
-            tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'baz' }] }]
-          },
-          suggestJoinConditions: {
-            prependOn: true,
-            tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'baz' }] }]
-          }
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT bar FROM foo JOIN baz | JOIN bla"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT bar FROM foo JOIN baz ',
-        afterCursor: ' JOIN bla',
-        dialect: 'hive',
-        containsKeywords: ['ON'],
-        expectedResult: {
-          lowerCase: false,
-          suggestJoinConditions: {
-            prependOn: true,
-            tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'baz' }] }]
-          }
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT bar\\nFROM foo\\n|"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT bar\nFROM foo\n',
-        afterCursor: '',
-        dialect: 'hive',
-        containsKeywords: ['WHERE', 'HAVING'],
-        expectedResult: {
-          lowerCase: false,
-          suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'foo' }] }] },
-          suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'foo' }] }] },
-          suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
-          suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'foo' }] }] }
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT bar FROM foo LATERAL |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT bar FROM foo LATERAL ',
-        afterCursor: '',
-        dialect: 'hive',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['VIEW']
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT bar FROM db.foo f LATERAL |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT bar FROM db.foo f LATERAL ',
-        afterCursor: '',
-        dialect: 'hive',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['VIEW']
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT bar FROM db.foo AS f LATERAL |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT bar FROM db.foo AS f LATERAL ',
-        afterCursor: '',
-        dialect: 'hive',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['VIEW']
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT bar FROM foo LATERAL VIEW |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT bar FROM foo LATERAL VIEW ',
-        afterCursor: '',
-        dialect: 'hive',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['OUTER', 'explode', 'posexplode']
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT bar FROM foo LATERAL VIEW explode(bar) b |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT bar FROM foo LATERAL VIEW explode(bar) b ',
-        afterCursor: '',
-        dialect: 'hive',
-        containsKeywords: ['AS', 'WHERE'],
-        expectedResult: {
-          lowerCase: false,
-          suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'foo' }] }] },
-          suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'foo' }] }] },
-          suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
-          suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'foo' }] }] }
-        }
-      });
-    });
-
-    it('should suggest columns for "SELECT testMap[].| FROM testTable"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT testMap[].',
-        afterCursor: ' FROM testTable',
-        dialect: 'hive',
-        expectedResult: {
-          lowerCase: false,
-          suggestColumns: {
-            source: 'select',
-            identifierChain: [{ name: 'testMap', keySet: true }],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          },
-          suggestKeywords: ['*']
-        }
-      });
-    });
-
-    it('should suggest values for "SELECT testMap[|] FROM testTable"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT testMap[',
-        afterCursor: '] FROM testTable',
-        dialect: 'hive',
-        expectedResult: {
-          lowerCase: false,
-          suggestFunctions: {}, // TODO: types: ['COLREF_KEY']
-          suggestColumns: {
-            source: 'select',
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          },
-          suggestKeyValues: { identifierChain: [{ name: 'testTable' }, { name: 'testMap' }] }
-        }
-      });
-    });
-
-    it('should suggest columns for "SELECT testMap[\'anyKey\'].| FROM testTable"', () => {
-      assertAutoComplete({
-        beforeCursor: "SELECT testMap['anyKey'].",
-        afterCursor: ' FROM testTable',
-        dialect: 'hive',
-        expectedResult: {
-          lowerCase: false,
-          suggestColumns: {
-            source: 'select',
-            identifierChain: [{ name: 'testMap', keySet: true }],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          },
-          suggestKeywords: ['*']
-        }
-      });
-    });
-
-    it('should suggest columns for "SELECT testMap[substr(\'bla\', 1)].| FROM testTable"', () => {
-      assertAutoComplete({
-        beforeCursor: "SELECT testMap[substr('bla', 1)].",
-        afterCursor: ' FROM testTable',
-        dialect: 'hive',
-        expectedResult: {
-          lowerCase: false,
-          suggestColumns: {
-            source: 'select',
-            identifierChain: [{ name: 'testMap', keySet: true }],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          },
-          suggestKeywords: ['*']
-        }
-      });
-    });
-
-    it('should suggest columns for "SELECT testMap["anyKey"].fieldC.| FROM testTable"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT testMap["anyKey"].fieldC.',
-        afterCursor: ' FROM testTable',
-        dialect: 'hive',
-        expectedResult: {
-          lowerCase: false,
-          suggestColumns: {
-            source: 'select',
-            identifierChain: [{ name: 'testMap', keySet: true }, { name: 'fieldC' }],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          },
-          suggestKeywords: ['*']
-        }
-      });
-    });
-
-    it('should suggest columns for "SELECT testArray[1].fieldC.| FROM testTable"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT testArray[1].fieldC.',
-        afterCursor: ' FROM testTable',
-        dialect: 'hive',
-        expectedResult: {
-          lowerCase: false,
-          suggestColumns: {
-            source: 'select',
-            identifierChain: [{ name: 'testArray', keySet: true }, { name: 'fieldC' }],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          },
-          suggestKeywords: ['*']
-        }
-      });
-    });
-
-    it('should suggest columns for "SELECT testFoo[1].testBar["key"].| FROM testTable"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT testFoo[1].testBar["key"].',
-        afterCursor: ' FROM testTable',
-        dialect: 'hive',
-        expectedResult: {
-          lowerCase: false,
-          suggestColumns: {
-            source: 'select',
-            identifierChain: [{ name: 'testFoo', keySet: true }, { name: 'testBar', keySet: true }],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          },
-          suggestKeywords: ['*']
-        }
-      });
-    });
-
-    it('should suggest columns for "SELECT * FROM testTable WHERE testMap[].|"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM testTable WHERE testMap[].',
-        afterCursor: '',
-        dialect: 'hive',
-        expectedResult: {
-          lowerCase: false,
-          suggestColumns: {
-            source: 'where',
-            identifierChain: [{ name: 'testMap', keySet: true }],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          }
-        }
-      });
-    });
-
-    // Lateral view === only hive?
-    describe('lateral views', () => {
-      it('should suggest aliases for "SELECT | FROM testTable LATERAL VIEW explode(testArray) explodedTable AS testItem"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT ',
-          afterCursor: ' FROM testTable LATERAL VIEW explode(testArray) explodedTable AS testItem',
-          dialect: 'hive',
-          containsKeywords: ['*', 'ALL', 'DISTINCT'],
-          expectedResult: {
-            locations: [
-              {
-                type: 'statement',
-                location: { first_line: 1, last_line: 1, first_column: 1, last_column: 81 }
-              },
-              {
-                type: 'selectList',
-                missing: true,
-                location: { first_line: 1, last_line: 1, first_column: 7, last_column: 7 }
-              },
-              {
-                type: 'table',
-                location: { first_line: 1, last_line: 1, first_column: 14, last_column: 23 },
-                identifierChain: [{ name: 'testTable' }]
-              },
-              {
-                type: 'function',
-                location: { first_line: 1, last_line: 1, first_column: 37, last_column: 43 },
-                function: 'explode'
-              },
-              {
-                type: 'column',
-                location: { first_line: 1, last_line: 1, first_column: 45, last_column: 54 },
-                identifierChain: [{ name: 'testArray' }],
-                tables: [{ identifierChain: [{ name: 'testTable' }] }],
-                qualified: false
-              },
-              {
-                type: 'whereClause',
-                missing: true,
-                location: { first_line: 1, last_line: 1, first_column: 81, last_column: 81 }
-              },
-              {
-                type: 'limitClause',
-                missing: true,
-                location: { first_line: 1, last_line: 1, first_column: 81, last_column: 81 }
-              }
-            ],
-            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestAnalyticFunctions: true,
-            suggestFunctions: {},
-            suggestColumns: {
-              source: 'select',
-              tables: [{ identifierChain: [{ name: 'testTable' }] }]
-            },
-            suggestIdentifiers: [
-              { name: 'explodedTable.', type: 'alias' },
-              { name: 'testItem', type: 'alias' }
-            ],
-            lowerCase: false
-          }
-        });
-      });
-
-      it('should suggest aliases for "SELECT | FROM testTable LATERAL VIEW EXPLODE(testTable.arr) a AS arr_exp LATERAL VIEW EXPLODE(arr_exp.items) i AS arr_items;"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT ',
-          afterCursor:
-            ' FROM testTable LATERAL VIEW EXPLODE(testTable.arr) a AS arr_exp LATERAL VIEW EXPLODE(arr_exp.items) i AS arr_items;',
-          dialect: 'hive',
-          noErrors: true,
-          containsKeywords: ['*', 'ALL', 'DISTINCT'],
-          expectedResult: {
-            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestAnalyticFunctions: true,
-            suggestFunctions: {},
-            suggestColumns: {
-              source: 'select',
-              tables: [{ identifierChain: [{ name: 'testTable' }] }]
-            },
-            suggestIdentifiers: [
-              { name: 'a.', type: 'alias' },
-              { name: 'arr_exp', type: 'alias' },
-              { name: 'i.', type: 'alias' },
-              { name: 'arr_items', type: 'alias' }
-            ],
-            lowerCase: false
-          }
-        });
-      });
-
-      it('should suggest aliases for "SELECT | FROM testTable t LATERAL VIEW EXPLODE(t.arr) a AS arr_exp LATERAL VIEW EXPLODE(arr_exp.items) i AS arr_items;"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT ',
-          afterCursor:
-            ' FROM testTable t LATERAL VIEW EXPLODE(t.arr) a AS arr_exp LATERAL VIEW EXPLODE(arr_exp.items) i AS arr_items;',
-          dialect: 'hive',
-          noErrors: true,
-          containsKeywords: ['*', 'ALL', 'DISTINCT'],
-          expectedResult: {
-            suggestAggregateFunctions: {
-              tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }]
-            },
-            suggestAnalyticFunctions: true,
-            suggestFunctions: {},
-            suggestColumns: {
-              source: 'select',
-              tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }]
-            },
-            suggestIdentifiers: [
-              { name: 't.', type: 'alias' },
-              { name: 'a.', type: 'alias' },
-              { name: 'arr_exp', type: 'alias' },
-              { name: 'i.', type: 'alias' },
-              { name: 'arr_items', type: 'alias' }
-            ],
-            lowerCase: false
-          }
-        });
-      });
-
-      it('should suggest columns for "SELECT | FROM testTable LATERAL VIEW explode("', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT ',
-          afterCursor: ' FROM testTable LATERAL VIEW explode(',
-          dialect: 'hive',
-          containsKeywords: ['*', 'ALL', 'DISTINCT'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: {},
-            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestAnalyticFunctions: true,
-            suggestColumns: {
-              source: 'select',
-              tables: [{ identifierChain: [{ name: 'testTable' }] }]
-            }
-          }
-        });
-      });
-
-      it('should suggest columns for "SELECT * FROM testTable LATERAL VIEW explode(|"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM testTable LATERAL VIEW explode(',
-          afterCursor: '',
-          dialect: 'hive',
-          containsKeywords: ['CASE'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: { types: ['ARRAY', 'MAP'] },
-            suggestColumns: {
-              types: ['ARRAY', 'MAP'],
-              tables: [{ identifierChain: [{ name: 'testTable' }] }]
-            }
-          }
-        });
-      });
-
-      it('should suggest columns for "SELECT * FROM testTable LATERAL VIEW explode(a.b.|"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM testTable LATERAL VIEW explode(a.b.',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestColumns: {
-              types: ['ARRAY', 'MAP'],
-              identifierChain: [{ name: 'a' }, { name: 'b' }],
-              tables: [{ identifierChain: [{ name: 'testTable' }] }]
-            }
-          }
-        });
-      });
-
-      it('should suggest columns for "SELECT * FROM testTable LATERAL VIEW posexplode(|"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM testTable LATERAL VIEW posexplode(',
-          afterCursor: '',
-          dialect: 'hive',
-          containsKeywords: ['CASE'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: { types: ['ARRAY'] },
-            suggestColumns: {
-              types: ['ARRAY'],
-              tables: [{ identifierChain: [{ name: 'testTable' }] }]
-            }
-          }
-        });
-      });
-
-      it('should suggest aliases for "SELECT | FROM testTable LATERAL VIEW explode(testMap) explodedTable AS testKey, testValue"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT ',
-          afterCursor:
-            ' FROM testTable LATERAL VIEW explode(testMap) explodedTable AS testKey, testValue',
-          dialect: 'hive',
-          containsKeywords: ['*', 'ALL', 'DISTINCT'],
-          expectedResult: {
-            lowerCase: false,
-            suggestColumns: {
-              source: 'select',
-              tables: [{ identifierChain: [{ name: 'testTable' }] }]
-            },
-            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestAnalyticFunctions: true,
-            suggestFunctions: {},
-            suggestIdentifiers: [
-              { name: 'explodedTable.', type: 'alias' },
-              { name: 'testKey', type: 'alias' },
-              { name: 'testValue', type: 'alias' }
-            ]
-          }
-        });
-      });
-
-      it('should suggest columns for "SELECT testItem.| FROM testTable LATERAL VIEW explode(testArray) explodedTable AS testItem"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT testItem.',
-          afterCursor: ' FROM testTable LATERAL VIEW explode(testArray) explodedTable AS testItem',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestColumns: {
-              source: 'select',
-              identifierChain: [{ name: 'testArray' }, { name: 'item' }],
-              tables: [{ identifierChain: [{ name: 'testTable' }] }]
-            }
-          }
-        });
-      });
-
-      it('should suggest columns for "SELECT testItemA.| FROM testTable LATERAL VIEW explode(testArrayA) explodedTableA AS testItemA LATERAL VIEW explode(testArrayB) explodedTableB AS testItemB"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT testItemA.',
-          afterCursor:
-            ' FROM testTable' +
-            ' LATERAL VIEW explode(testArrayA) explodedTableA AS testItemA' +
-            ' LATERAL VIEW explode(testArrayB) explodedTableB AS testItemB',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestColumns: {
-              source: 'select',
-              identifierChain: [{ name: 'testArrayA' }, { name: 'item' }],
-              tables: [{ identifierChain: [{ name: 'testTable' }] }]
-            }
-          }
-        });
-      });
-
-      it('should suggest columns for "SELECT\\n testItemA,\\n testItemB.|\\n\\tFROM\\n\\t testTable2 tt2\\n\\t LATERAL VIEW EXPLODE(tt2.testArrayA) explodedTableA AS testItemA\\n\\t LATERAL VIEW EXPLODE(tt2.testArrayB) explodedTableB AS testItemB"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT\n testItemA,\n testItemB.',
-          afterCursor:
-            '\n\tFROM\n\t testTable2 tt2\n' +
-            '\t LATERAL VIEW EXPLODE(tt2.testArrayA) explodedTableA AS testItemA\n' +
-            '\t LATERAL VIEW EXPLODE(tt2.testArrayB) explodedTableB AS testItemB',
-          dialect: 'hive',
-          expectedResult: {
-            locations: [
-              {
-                type: 'statement',
-                location: { first_line: 1, last_line: 7, first_column: 1, last_column: 67 }
-              },
-              {
-                type: 'selectList',
-                missing: false,
-                location: { first_line: 2, last_line: 3, first_column: 2, last_column: 13 }
-              },
-              {
-                type: 'complex',
-                location: { first_line: 2, last_line: 2, first_column: 2, last_column: 11 },
-                identifierChain: [{ name: 'testArrayA' }, { name: 'item' }],
-                tables: [{ identifierChain: [{ name: 'testTable2' }], alias: 'tt2' }],
-                qualified: false
-              },
-              {
-                type: 'complex',
-                location: { first_line: 3, last_line: 3, first_column: 2, last_column: 11 },
-                identifierChain: [{ name: 'testArrayB' }, { name: 'item' }],
-                tables: [{ identifierChain: [{ name: 'testTable2' }], alias: 'tt2' }],
-                qualified: false
-              },
-              {
-                type: 'table',
-                location: { first_line: 5, last_line: 5, first_column: 3, last_column: 13 },
-                identifierChain: [{ name: 'testTable2' }]
-              },
-              {
-                type: 'alias',
-                source: 'table',
-                alias: 'tt2',
-                location: { first_line: 5, last_line: 5, first_column: 14, last_column: 17 },
-                identifierChain: [{ name: 'testTable2' }]
-              },
-              {
-                type: 'function',
-                location: { first_line: 6, last_line: 6, first_column: 16, last_column: 22 },
-                function: 'explode'
-              },
-              {
-                type: 'table',
-                location: { first_line: 6, last_line: 6, first_column: 24, last_column: 27 },
-                identifierChain: [{ name: 'testTable2' }]
-              },
-              {
-                type: 'column',
-                location: { first_line: 6, last_line: 6, first_column: 28, last_column: 38 },
-                identifierChain: [{ name: 'testArrayA' }],
-                tables: [{ identifierChain: [{ name: 'testTable2' }], alias: 'tt2' }],
-                qualified: true
-              },
-              {
-                type: 'function',
-                location: { first_line: 7, last_line: 7, first_column: 16, last_column: 22 },
-                function: 'explode'
-              },
-              {
-                type: 'table',
-                location: { first_line: 7, last_line: 7, first_column: 24, last_column: 27 },
-                identifierChain: [{ name: 'testTable2' }]
-              },
-              {
-                type: 'column',
-                location: { first_line: 7, last_line: 7, first_column: 28, last_column: 38 },
-                identifierChain: [{ name: 'testArrayB' }],
-                tables: [{ identifierChain: [{ name: 'testTable2' }], alias: 'tt2' }],
-                qualified: true
-              },
-              {
-                type: 'whereClause',
-                missing: true,
-                location: { first_line: 7, last_line: 7, first_column: 67, last_column: 67 }
-              },
-              {
-                type: 'limitClause',
-                missing: true,
-                location: { first_line: 7, last_line: 7, first_column: 67, last_column: 67 }
-              }
-            ],
-            suggestColumns: {
-              source: 'select',
-              identifierChain: [{ name: 'testArrayB' }, { name: 'item' }],
-              tables: [{ identifierChain: [{ name: 'testTable2' }] }]
-            },
-            lowerCase: false
-          }
-        });
-      });
-
-      it('should suggest columns for "SELECT ta2_exp.| FROM    testTable tt LATERAL VIEW explode(tt.testArray1) ta1 AS ta1_exp\\n   LATERAL VIEW explode(ta1_exp.testArray2)    ta2   AS  ta2_exp"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT ta2_exp.',
-          afterCursor:
-            ' FROM ' +
-            '   testTable tt' +
-            ' LATERAL VIEW explode(tt.testArray1) ta1 AS ta1_exp\n' +
-            '   LATERAL VIEW explode(ta1_exp.testArray2)    ta2   AS  ta2_exp',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestColumns: {
-              source: 'select',
-              identifierChain: [
-                { name: 'testArray1' },
-                { name: 'item' },
-                { name: 'testArray2' },
-                { name: 'item' }
-              ],
-              tables: [{ identifierChain: [{ name: 'testTable' }] }]
-            }
-          }
-        });
-      });
-
-      it('should suggest columns for "SELECT explodedTable.testItem.| FROM testTable LATERAL VIEW explode(testArray) explodedTable AS testItem"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT explodedTable.testItem.',
-          afterCursor: ' FROM testTable LATERAL VIEW explode(testArray) explodedTable AS testItem',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestColumns: {
-              source: 'select',
-              identifierChain: [{ name: 'testArray' }, { name: 'item' }],
-              tables: [{ identifierChain: [{ name: 'testTable' }] }]
-            }
-          }
-        });
-      });
-
-      it('should suggest identifiers for "SELECT testValue.| FROM testTable LATERAL VIEW posexplode(testArray) explodedTable AS testIndex, testValue"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT testValue.',
-          afterCursor:
-            ' FROM testTable LATERAL VIEW posexplode(testArray) explodedTable AS testIndex, testValue',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestColumns: {
-              source: 'select',
-              identifierChain: [{ name: 'testArray' }, { name: 'item' }],
-              tables: [{ identifierChain: [{ name: 'testTable' }] }]
-            }
-          }
-        });
-      });
-
-      it('should suggest columns for "SELECT boo.| FROM customers LATERAL VIEW explode(baa) boo;"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT boo.',
-          afterCursor: ' FROM customers LATERAL VIEW explode(baa) boo;',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestIdentifiers: [{ name: 'key', type: 'alias' }, { name: 'value', type: 'alias' }]
-          }
-        });
-      });
-
-      it('should suggest columns for "SELECT boo.| FROM customers LATERAL VIEW posexplode(baa) boo;"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT boo.',
-          afterCursor: ' FROM customers LATERAL VIEW posexplode(baa) boo;',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestIdentifiers: [{ name: 'pos', type: 'alias' }, { name: 'val', type: 'alias' }]
-          }
-        });
-      });
-
-      it('should suggest columns for "SELECT testMapValue.| FROM testTable LATERAL VIEW explode(testMap) bla AS testMapKey, testMapValue"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT testMapValue.',
-          afterCursor: ' FROM testTable LATERAL VIEW explode(testMap) AS testMapKey, testMapValue',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestColumns: {
-              source: 'select',
-              identifierChain: [{ name: 'testMap' }, { name: 'value' }],
-              tables: [{ identifierChain: [{ name: 'testTable' }] }]
-            }
-          }
-        });
-      });
-
-      it('should suggest columns for "SELECT explodedMap.testMapValue.| FROM testTable LATERAL VIEW explode(testMap) explodedMap AS testMapKey, testMapValue"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT explodedMap.testMapValue.',
-          afterCursor:
-            ' FROM testTable LATERAL VIEW explode(testMap) explodedMap AS testMapKey, testMapValue',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestColumns: {
-              source: 'select',
-              identifierChain: [{ name: 'testMap' }, { name: 'value' }],
-              tables: [{ identifierChain: [{ name: 'testTable' }] }]
-            }
-          }
-        });
-      });
-
-      it('should suggest identifier for "SELECT explodedMap.| FROM testTable LATERAL VIEW explode(testMap) explodedMap AS testMapKey, testMapValue"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT explodedMap.',
-          afterCursor:
-            ' FROM testTable LATERAL VIEW explode(testMap) explodedMap AS testMapKey, testMapValue',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestIdentifiers: [
-              { name: 'testMapKey', type: 'alias' },
-              { name: 'testMapValue', type: 'alias' }
-            ]
-          }
-        });
-      });
-
-      it('should suggest identifiers for "SELECT | FROM testTable LATERAL VIEW explode(testMap) explodedMap AS testMapKey, testMapValue"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT ',
-          afterCursor:
-            ' FROM testTable LATERAL VIEW explode(testMap) explodedMap AS testMapKey, testMapValue',
-          dialect: 'hive',
-          containsKeywords: ['*', 'ALL', 'DISTINCT'],
-          expectedResult: {
-            lowerCase: false,
-            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestAnalyticFunctions: true,
-            suggestFunctions: {},
-            suggestIdentifiers: [
-              { name: 'explodedMap.', type: 'alias' },
-              { name: 'testMapKey', type: 'alias' },
-              { name: 'testMapValue', type: 'alias' }
-            ],
-            suggestColumns: {
-              source: 'select',
-              tables: [{ identifierChain: [{ name: 'testTable' }] }]
-            }
-          }
-        });
-      });
+  it('should suggest keywords for "SELECT * FROM testTableA tta, testTableB |"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SELECT * FROM testTableA tta, testTableB ',
+      afterCursor: '',
+      expectedResult: {
+        lowerCase: false,
+        suggestJoins: {
+          prependJoin: true,
+          tables: [{ identifierChain: [{ name: 'testTableB' }] }]
+        },
+        suggestFilters: {
+          prefix: 'WHERE',
+          tables: [
+            { identifierChain: [{ name: 'testTableA' }], alias: 'tta' },
+            { identifierChain: [{ name: 'testTableB' }] }
+          ]
+        },
+        suggestGroupBys: {
+          prefix: 'GROUP BY',
+          tables: [
+            { identifierChain: [{ name: 'testTableA' }], alias: 'tta' },
+            { identifierChain: [{ name: 'testTableB' }] }
+          ]
+        },
+        suggestOrderBys: {
+          prefix: 'ORDER BY',
+          tables: [
+            { identifierChain: [{ name: 'testTableA' }], alias: 'tta' },
+            { identifierChain: [{ name: 'testTableB' }] }
+          ]
+        },
+        suggestKeywords: [
+          'AS',
+          'WHERE',
+          'GROUP BY',
+          'HAVING',
+          'ORDER BY',
+          'LIMIT',
+          'OFFSET',
+          'UNION',
+          'TABLESAMPLE',
+          'ANTI JOIN',
+          'FULL JOIN',
+          'FULL OUTER JOIN',
+          'INNER JOIN',
+          'JOIN',
+          'LEFT ANTI JOIN',
+          'LEFT INNER JOIN',
+          'LEFT JOIN',
+          'LEFT OUTER JOIN',
+          'LEFT SEMI JOIN',
+          'OUTER JOIN',
+          'RIGHT ANTI JOIN',
+          'RIGHT INNER JOIN',
+          'RIGHT JOIN',
+          'RIGHT OUTER JOIN',
+          'RIGHT SEMI JOIN',
+          'SEMI JOIN'
+        ]
+      }
     });
   });
 
-  describe('Impala Specific', () => {
-    it('should suggest keywords for "SELECT * FROM testTableA tta, testTableB |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM testTableA tta, testTableB ',
-        afterCursor: '',
-        dialect: 'impala',
-        expectedResult: {
-          lowerCase: false,
-          suggestJoins: {
-            prependJoin: true,
-            tables: [{ identifierChain: [{ name: 'testTableB' }] }]
-          },
-          suggestFilters: {
-            prefix: 'WHERE',
-            tables: [
-              { identifierChain: [{ name: 'testTableA' }], alias: 'tta' },
-              { identifierChain: [{ name: 'testTableB' }] }
-            ]
-          },
-          suggestGroupBys: {
-            prefix: 'GROUP BY',
-            tables: [
-              { identifierChain: [{ name: 'testTableA' }], alias: 'tta' },
-              { identifierChain: [{ name: 'testTableB' }] }
-            ]
-          },
-          suggestOrderBys: {
-            prefix: 'ORDER BY',
-            tables: [
-              { identifierChain: [{ name: 'testTableA' }], alias: 'tta' },
-              { identifierChain: [{ name: 'testTableB' }] }
-            ]
-          },
-          suggestKeywords: [
-            'AS',
-            'WHERE',
-            'GROUP BY',
-            'HAVING',
-            'ORDER BY',
-            'LIMIT',
-            'OFFSET',
-            'UNION',
-            'TABLESAMPLE',
-            'ANTI JOIN',
-            'FULL JOIN',
-            'FULL OUTER JOIN',
-            'INNER JOIN',
-            'JOIN',
-            'LEFT ANTI JOIN',
-            'LEFT INNER JOIN',
-            'LEFT JOIN',
-            'LEFT OUTER JOIN',
-            'LEFT SEMI JOIN',
-            'OUTER JOIN',
-            'RIGHT ANTI JOIN',
-            'RIGHT INNER JOIN',
-            'RIGHT JOIN',
-            'RIGHT OUTER JOIN',
-            'RIGHT SEMI JOIN',
-            'SEMI JOIN'
-          ]
-        }
-      });
+  it('should suggest columns for "SELECT testMap["anyKey"].| FROM testTable"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SELECT testMap["anyKey"].',
+      afterCursor: ' FROM testTable',
+      expectedResult: {
+        lowerCase: false,
+        suggestColumns: {
+          source: 'select',
+          identifierChain: [{ name: 'testMap', keySet: true }],
+          tables: [{ identifierChain: [{ name: 'testTable' }] }]
+        },
+        suggestKeywords: ['*'] // TODO: Verify that this is true
+      }
     });
+  });
 
-    it('should suggest columns for "SELECT testMap["anyKey"].| FROM testTable"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT testMap["anyKey"].',
-        afterCursor: ' FROM testTable',
-        dialect: 'impala',
-        expectedResult: {
-          lowerCase: false,
-          suggestColumns: {
-            source: 'select',
-            identifierChain: [{ name: 'testMap', keySet: true }],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          },
-          suggestKeywords: ['*'] // TODO: Verify that this is true
-        }
-      });
+  it('should suggest columns for "SELECT columnA.fieldC.| FROM testTable"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SELECT columnA.fieldC.',
+      afterCursor: ' FROM testTable',
+      expectedResult: {
+        lowerCase: false,
+        suggestColumns: {
+          source: 'select',
+          identifierChain: [{ name: 'columnA' }, { name: 'fieldC' }],
+          tables: [{ identifierChain: [{ name: 'testTable' }] }]
+        },
+        suggestKeywords: ['*'] // TODO: Verify that this is true
+      }
     });
+  });
 
-    it('should suggest columns for "SELECT columnA.fieldC.| FROM testTable"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT columnA.fieldC.',
-        afterCursor: ' FROM testTable',
-        dialect: 'impala',
-        expectedResult: {
-          lowerCase: false,
-          suggestColumns: {
-            source: 'select',
-            identifierChain: [{ name: 'columnA' }, { name: 'fieldC' }],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          },
-          suggestKeywords: ['*'] // TODO: Verify that this is true
-        }
-      });
+  it('should suggest columns for "SELECT tt.columnA.fieldC.| FROM testTable tt"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SELECT tt.columnA.fieldC.',
+      afterCursor: ' FROM testTable tt',
+      expectedResult: {
+        lowerCase: false,
+        suggestColumns: {
+          source: 'select',
+          identifierChain: [{ name: 'columnA' }, { name: 'fieldC' }],
+          tables: [{ identifierChain: [{ name: 'testTable' }] }]
+        },
+        suggestKeywords: ['*'] // TODO: Verify that this is true
+      }
     });
+  });
 
-    it('should suggest columns for "SELECT tt.columnA.fieldC.| FROM testTable tt"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT tt.columnA.fieldC.',
-        afterCursor: ' FROM testTable tt',
-        dialect: 'impala',
-        expectedResult: {
-          lowerCase: false,
-          suggestColumns: {
-            source: 'select',
-            identifierChain: [{ name: 'columnA' }, { name: 'fieldC' }],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          },
-          suggestKeywords: ['*'] // TODO: Verify that this is true
-        }
-      });
+  it('should suggest columns for "SELECT tt.columnA.fieldC.| FROM testTable tt"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SELECT tt.columnA.fieldC.',
+      afterCursor: ' FROM testTable tt',
+      expectedResult: {
+        lowerCase: false,
+        suggestColumns: {
+          source: 'select',
+          identifierChain: [{ name: 'columnA' }, { name: 'fieldC' }],
+          tables: [{ identifierChain: [{ name: 'testTable' }] }]
+        },
+        suggestKeywords: ['*'] // TODO: Verify that this is true
+      }
     });
+  });
 
-    it('should suggest columns for "SELECT tt.columnA.fieldC.| FROM testTable tt"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT tt.columnA.fieldC.',
-        afterCursor: ' FROM testTable tt',
-        dialect: 'impala',
-        expectedResult: {
-          lowerCase: false,
-          suggestColumns: {
-            source: 'select',
-            identifierChain: [{ name: 'columnA' }, { name: 'fieldC' }],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          },
-          suggestKeywords: ['*'] // TODO: Verify that this is true
+  // TODO: Result should have 'key', 'key' is only possible after call to see column type but as it's
+  //       after FROM perhaps only maps are allowed there?
+  //       If the map has a scalar value type (int etc.) it should also suggest 'value'
+  //       For arrays it should suggest 'items' for scalar values
+  it('should suggest columns for "SELECT tm.| FROM testTable t, t.testMap tm;"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SELECT tm.',
+      afterCursor: ' FROM testTable t, t.testMap tm;',
+      expectedResult: {
+        suggestKeywords: ['*'],
+        lowerCase: false,
+        suggestColumns: {
+          source: 'select',
+          identifierChain: [{ name: 'testMap' }],
+          tables: [{ identifierChain: [{ name: 'testTable' }] }]
         }
-      });
+      }
     });
+  });
 
-    // TODO: Result should have 'key', 'key' is only possible after call to see column type but as it's
-    //       after FROM perhaps only maps are allowed there?
-    //       If the map has a scalar value type (int etc.) it should also suggest 'value'
-    //       For arrays it should suggest 'items' for scalar values
-    it('should suggest columns for "SELECT tm.| FROM testTable t, t.testMap tm;"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT tm.',
-        afterCursor: ' FROM testTable t, t.testMap tm;',
-        dialect: 'impala',
-        expectedResult: {
-          suggestKeywords: ['*'],
-          lowerCase: false,
-          suggestColumns: {
-            source: 'select',
-            identifierChain: [{ name: 'testMap' }],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          }
+  it('should suggest columns for "SELECT testMap.| FROM testTable t, t.testMap;"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SELECT testMap.',
+      afterCursor: ' FROM testTable t, t.testMap;',
+      expectedResult: {
+        suggestKeywords: ['*'],
+        lowerCase: false,
+        suggestColumns: {
+          source: 'select',
+          identifierChain: [{ name: 'testMap' }],
+          tables: [{ identifierChain: [{ name: 'testTable' }] }]
         }
-      });
+      }
     });
+  });
 
-    it('should suggest columns for "SELECT testMap.| FROM testTable t, t.testMap;"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT testMap.',
-        afterCursor: ' FROM testTable t, t.testMap;',
-        dialect: 'impala',
-        expectedResult: {
-          suggestKeywords: ['*'],
-          lowerCase: false,
-          suggestColumns: {
-            source: 'select',
-            identifierChain: [{ name: 'testMap' }],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          }
+  it('should suggest columns for "SELECT tm.a| FROM testTable t, t.testMap tm;"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SELECT tm.a',
+      afterCursor: ' FROM testTable t, t.testMap tm;',
+      expectedResult: {
+        lowerCase: false,
+        suggestKeywords: ['*'],
+        suggestColumns: {
+          source: 'select',
+          identifierChain: [{ name: 'testMap' }],
+          tables: [{ identifierChain: [{ name: 'testTable' }] }]
         }
-      });
+      }
     });
+  });
 
-    it('should suggest columns for "SELECT tm.a| FROM testTable t, t.testMap tm;"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT tm.a',
-        afterCursor: ' FROM testTable t, t.testMap tm;',
-        dialect: 'impala',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['*'],
-          suggestColumns: {
-            source: 'select',
-            identifierChain: [{ name: 'testMap' }],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          }
-        }
-      });
+  // Same as above, 'items' or 'value' for scalar
+  it('should suggest columns for "SELECT ta.* FROM testTable t, t.testArray ta WHERE ta.|"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SELECT ta.* FROM testTable t, t.testArray ta WHERE ta.',
+      afterCursor: '',
+      expectedResult: {
+        suggestColumns: {
+          source: 'where',
+          identifierChain: [{ name: 'testArray' }],
+          tables: [{ identifierChain: [{ name: 'testTable' }] }]
+        },
+        lowerCase: false
+      }
     });
+  });
 
-    // Same as above, 'items' or 'value' for scalar
-    it('should suggest columns for "SELECT ta.* FROM testTable t, t.testArray ta WHERE ta.|"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT ta.* FROM testTable t, t.testArray ta WHERE ta.',
-        afterCursor: '',
-        dialect: 'impala',
-        expectedResult: {
-          suggestColumns: {
-            source: 'where',
-            identifierChain: [{ name: 'testArray' }],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          },
-          lowerCase: false
-        }
-      });
+  it('should suggest columns for "SELECT t.*  FROM testTable t, t.|"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SELECT t.*  FROM testTable t, t.',
+      afterCursor: '',
+      expectedResult: {
+        lowerCase: false,
+        suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
+      }
     });
+  });
 
-    it('should suggest columns for "SELECT t.*  FROM testTable t, t.|"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT t.*  FROM testTable t, t.',
-        afterCursor: '',
-        dialect: 'impala',
-        expectedResult: {
-          lowerCase: false,
-          suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
-        }
-      });
+  it('should suggest identifier for "SELECT | FROM testTable t, t.testMap tm;"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SELECT ',
+      afterCursor: ' FROM testTable t, t.testMap tm;',
+      containsKeywords: ['*', 'ALL', 'DISTINCT', 'STRAIGHT_JOIN'],
+      expectedResult: {
+        lowerCase: false,
+        suggestAggregateFunctions: {
+          tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }]
+        },
+        suggestAnalyticFunctions: true,
+        suggestFunctions: {},
+        suggestColumns: {
+          source: 'select',
+          tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }]
+        },
+        suggestIdentifiers: [{ name: 't.', type: 'alias' }, { name: 'tm.', type: 'alias' }]
+      }
     });
+  });
 
-    it('should suggest identifier for "SELECT | FROM testTable t, t.testMap tm;"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT ',
-        afterCursor: ' FROM testTable t, t.testMap tm;',
-        dialect: 'impala',
-        containsKeywords: ['*', 'ALL', 'DISTINCT', 'STRAIGHT_JOIN'],
-        expectedResult: {
-          lowerCase: false,
-          suggestAggregateFunctions: {
-            tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }]
-          },
-          suggestAnalyticFunctions: true,
-          suggestFunctions: {},
-          suggestColumns: {
-            source: 'select',
-            tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }]
-          },
-          suggestIdentifiers: [{ name: 't.', type: 'alias' }, { name: 'tm.', type: 'alias' }]
+  // TODO: Should add Key and Value once we know it's a map
+  it('should suggest columns for "SELECT tm.* FROM testTable t, t.testMap tm WHERE tm.|"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SELECT tm.* FROM testTable t, t.testMap tm WHERE tm.',
+      afterCursor: '',
+      expectedResult: {
+        lowerCase: false,
+        suggestColumns: {
+          source: 'where',
+          identifierChain: [{ name: 'testMap' }],
+          tables: [{ identifierChain: [{ name: 'testTable' }] }]
         }
-      });
+      }
     });
+  });
 
-    // TODO: Should add Key and Value once we know it's a map
-    it('should suggest columns for "SELECT tm.* FROM testTable t, t.testMap tm WHERE tm.|"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT tm.* FROM testTable t, t.testMap tm WHERE tm.',
-        afterCursor: '',
-        dialect: 'impala',
-        expectedResult: {
-          lowerCase: false,
-          suggestColumns: {
-            source: 'where',
-            identifierChain: [{ name: 'testMap' }],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          }
+  it('should suggest columns for "SELECT tm.* FROM testTable t, t.testMap tm WHERE tm.value.|"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SELECT tm.* FROM testTable t, t.testMap tm WHERE tm.value.',
+      afterCursor: '',
+      expectedResult: {
+        lowerCase: false,
+        suggestColumns: {
+          source: 'where',
+          identifierChain: [{ name: 'testMap' }, { name: 'value' }],
+          tables: [{ identifierChain: [{ name: 'testTable' }] }]
         }
-      });
+      }
     });
+  });
 
-    it('should suggest columns for "SELECT tm.* FROM testTable t, t.testMap tm WHERE tm.value.|"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT tm.* FROM testTable t, t.testMap tm WHERE tm.value.',
-        afterCursor: '',
-        dialect: 'impala',
-        expectedResult: {
-          lowerCase: false,
-          suggestColumns: {
-            source: 'where',
-            identifierChain: [{ name: 'testMap' }, { name: 'value' }],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          }
-        }
-      });
+  it('should suggest values for "SELECT * FROM testTable t, t.testMap tm WHERE tm.key =|"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SELECT * FROM testTable t, t.testMap tm WHERE tm.key =',
+      afterCursor: '',
+      containsKeywords: ['CASE'],
+      expectedResult: {
+        lowerCase: false,
+        suggestFunctions: { types: ['COLREF'] },
+        suggestValues: {},
+        suggestColumns: {
+          source: 'where',
+          types: ['COLREF'],
+          tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }]
+        },
+        suggestIdentifiers: [{ name: 't.', type: 'alias' }, { name: 'tm.', type: 'alias' }],
+        colRef: { identifierChain: [{ name: 'testTable' }, { name: 'testMap' }, { name: 'key' }] }
+      }
     });
+  });
 
-    it('should suggest values for "SELECT * FROM testTable t, t.testMap tm WHERE tm.key =|"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM testTable t, t.testMap tm WHERE tm.key =',
-        afterCursor: '',
-        dialect: 'impala',
-        containsKeywords: ['CASE'],
-        expectedResult: {
-          lowerCase: false,
-          suggestFunctions: { types: ['COLREF'] },
-          suggestValues: {},
-          suggestColumns: {
-            source: 'where',
-            types: ['COLREF'],
-            tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }]
-          },
-          suggestIdentifiers: [{ name: 't.', type: 'alias' }, { name: 'tm.', type: 'alias' }],
-          colRef: { identifierChain: [{ name: 'testTable' }, { name: 'testMap' }, { name: 'key' }] }
+  it('should suggest values for "SELECT * FROM testTable t, t.testMap m WHERE m.field = |"', () => {
+    assertAutoComplete({
+      beforeCursor: 'SELECT * FROM testTable t, t.testMap m WHERE m.field = ',
+      afterCursor: '',
+      containsKeywords: ['CASE'],
+      expectedResult: {
+        lowerCase: false,
+        suggestFunctions: { types: ['COLREF'] },
+        suggestValues: {},
+        suggestColumns: {
+          source: 'where',
+          types: ['COLREF'],
+          tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }]
+        },
+        suggestIdentifiers: [{ name: 't.', type: 'alias' }, { name: 'm.', type: 'alias' }],
+        colRef: {
+          identifierChain: [{ name: 'testTable' }, { name: 'testMap' }, { name: 'field' }]
         }
-      });
-    });
-
-    it('should suggest values for "SELECT * FROM testTable t, t.testMap m WHERE m.field = |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM testTable t, t.testMap m WHERE m.field = ',
-        afterCursor: '',
-        dialect: 'impala',
-        containsKeywords: ['CASE'],
-        expectedResult: {
-          lowerCase: false,
-          suggestFunctions: { types: ['COLREF'] },
-          suggestValues: {},
-          suggestColumns: {
-            source: 'where',
-            types: ['COLREF'],
-            tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }]
-          },
-          suggestIdentifiers: [{ name: 't.', type: 'alias' }, { name: 'm.', type: 'alias' }],
-          colRef: {
-            identifierChain: [{ name: 'testTable' }, { name: 'testMap' }, { name: 'field' }]
-          }
-        }
-      });
+      }
     });
   });
 
@@ -4678,7 +3367,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT columnA.',
         afterCursor: ' FROM testTable',
-        dialect: 'impala',
         expectedResult: {
           lowerCase: false,
           suggestKeywords: ['*'], // TODO: Verify that this is true
@@ -4695,7 +3383,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT columnA.fieldC.',
         afterCursor: ' FROM testTable',
-        dialect: 'impala',
         expectedResult: {
           lowerCase: false,
           suggestColumns: {
@@ -4707,164 +3394,135 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
         }
       });
     });
-
-    it('should suggest columns for "SELECT columnA.fieldC.| FROM database_two.testTable"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT columnA.fieldC.',
-        afterCursor: ' FROM database_two.testTable',
-        dialect: 'hive',
-        expectedResult: {
-          lowerCase: false,
-          suggestColumns: {
-            source: 'select',
-            identifierChain: [{ name: 'columnA' }, { name: 'fieldC' }],
-            tables: [{ identifierChain: [{ name: 'database_two' }, { name: 'testTable' }] }]
-          },
-          suggestKeywords: ['*'] // TODO: Verify that this is true
-        }
-      });
-    });
   });
 
   describe('Dates', () => {
-    describe('Impala specific', () => {
-      it('should suggest keywords for "SELECT now() +|"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT now() +',
-          afterCursor: '',
-          dialect: 'impala',
-          containsKeywords: ['INTERVAL'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: { types: ['NUMBER'] }
-          }
-        });
+    it('should suggest keywords for "SELECT now() +|"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT now() +',
+        afterCursor: '',
+        containsKeywords: ['INTERVAL'],
+        expectedResult: {
+          lowerCase: false,
+          suggestFunctions: { types: ['NUMBER'] }
+        }
       });
+    });
 
-      it('should suggest keywords for "SELECT now() -|"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT now() -',
-          afterCursor: '',
-          dialect: 'impala',
-          containsKeywords: ['INTERVAL'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: { types: ['NUMBER'] }
-          }
-        });
+    it('should suggest keywords for "SELECT now() -|"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT now() -',
+        afterCursor: '',
+        containsKeywords: ['INTERVAL'],
+        expectedResult: {
+          lowerCase: false,
+          suggestFunctions: { types: ['NUMBER'] }
+        }
       });
+    });
 
-      it('should suggest keywords for "SELECT now() *|"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT now() *',
-          afterCursor: '',
-          dialect: 'impala',
-          doesNotContainKeywords: ['INTERVAL'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: { types: ['NUMBER'] }
-          }
-        });
+    it('should suggest keywords for "SELECT now() *|"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT now() *',
+        afterCursor: '',
+        doesNotContainKeywords: ['INTERVAL'],
+        expectedResult: {
+          lowerCase: false,
+          suggestFunctions: { types: ['NUMBER'] }
+        }
       });
+    });
 
-      it('should suggest keywords for "SELECT \'1980-07-03\' +|"', () => {
-        assertAutoComplete({
-          beforeCursor: "SELECT  '1980-07-03' +",
-          afterCursor: '',
-          dialect: 'impala',
-          containsKeywords: ['INTERVAL'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: { types: ['NUMBER'] }
-          }
-        });
+    it('should suggest keywords for "SELECT \'1980-07-03\' +|"', () => {
+      assertAutoComplete({
+        beforeCursor: "SELECT  '1980-07-03' +",
+        afterCursor: '',
+        containsKeywords: ['INTERVAL'],
+        expectedResult: {
+          lowerCase: false,
+          suggestFunctions: { types: ['NUMBER'] }
+        }
       });
+    });
 
-      it('should suggest keywords for "SELECT now() + INTERVAL 1 |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT now() + INTERVAL 1 ',
-          afterCursor: '',
-          dialect: 'impala',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: [
-              'DAYS',
-              'HOURS',
-              'MICROSECONDS',
-              'MILLISECONDS',
-              'MINUTES',
-              'MONTHS',
-              'NANOSECONDS',
-              'SECONDS',
-              'WEEKS',
-              'YEARS'
-            ]
-          }
-        });
+    it('should suggest keywords for "SELECT now() + INTERVAL 1 |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT now() + INTERVAL 1 ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: [
+            'DAYS',
+            'HOURS',
+            'MICROSECONDS',
+            'MILLISECONDS',
+            'MINUTES',
+            'MONTHS',
+            'NANOSECONDS',
+            'SECONDS',
+            'WEEKS',
+            'YEARS'
+          ]
+        }
       });
+    });
 
-      it('should suggest keywords for "SELECT \'1999-01-01\' + INTERVAL 1 MONTH - |"', () => {
-        assertAutoComplete({
-          beforeCursor: "SELECT '1999-01-01' + INTERVAL 1 MONTH - ",
-          afterCursor: '',
-          dialect: 'impala',
-          containsKeywords: ['INTERVAL'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: { types: ['NUMBER'] }
-          }
-        });
+    it('should suggest keywords for "SELECT \'1999-01-01\' + INTERVAL 1 MONTH - |"', () => {
+      assertAutoComplete({
+        beforeCursor: "SELECT '1999-01-01' + INTERVAL 1 MONTH - ",
+        afterCursor: '',
+        containsKeywords: ['INTERVAL'],
+        expectedResult: {
+          lowerCase: false,
+          suggestFunctions: { types: ['NUMBER'] }
+        }
       });
+    });
 
-      it('should suggest keywords for "SELECT to_utc_timestamp(now() + |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT to_utc_timestamp(now() + ',
-          afterCursor: '',
-          dialect: 'impala',
-          containsKeywords: ['INTERVAL'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: { types: ['NUMBER'] } // TODO: Don't suggest functions for arithmetic expressions involving dates
-          }
-        });
+    it('should suggest keywords for "SELECT to_utc_timestamp(now() + |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT to_utc_timestamp(now() + ',
+        afterCursor: '',
+        containsKeywords: ['INTERVAL'],
+        expectedResult: {
+          lowerCase: false,
+          suggestFunctions: { types: ['NUMBER'] } // TODO: Don't suggest functions for arithmetic expressions involving dates
+        }
       });
+    });
 
-      it('should suggest keywords for "SELECT date_sub(now(), |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT date_sub(now(), ',
-          afterCursor: '',
-          dialect: 'impala',
-          containsKeywords: ['INTERVAL'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: { types: ['INT'] }
-          }
-        });
+    it('should suggest keywords for "SELECT date_sub(now(), |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT date_sub(now(), ',
+        afterCursor: '',
+        containsKeywords: ['INTERVAL'],
+        expectedResult: {
+          lowerCase: false,
+          suggestFunctions: { types: ['INT'] }
+        }
       });
+    });
 
-      it('should suggest keywords for "SELECT date_add(now(), |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT date_add(now(), ',
-          afterCursor: '',
-          dialect: 'impala',
-          containsKeywords: ['INTERVAL'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: { types: ['INT'] }
-          }
-        });
+    it('should suggest keywords for "SELECT date_add(now(), |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT date_add(now(), ',
+        afterCursor: '',
+        containsKeywords: ['INTERVAL'],
+        expectedResult: {
+          lowerCase: false,
+          suggestFunctions: { types: ['INT'] }
+        }
       });
+    });
 
-      it('should suggest keywords for "SELECT date_add(now(), INTERVAL 100 |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT date_add(now(), INTERVAL 100 ',
-          afterCursor: '',
-          dialect: 'impala',
-          containsKeywords: ['DAYS'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
+    it('should suggest keywords for "SELECT date_add(now(), INTERVAL 100 |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT date_add(now(), INTERVAL 100 ',
+        afterCursor: '',
+        containsKeywords: ['DAYS'],
+        expectedResult: {
+          lowerCase: false
+        }
       });
     });
   });
@@ -4939,23 +3597,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
           suggestColumns: {
             source: 'where',
             types: ['T'],
-            tables: [{ identifierChain: [{ name: 'tbl2' }] }]
-          }
-        }
-      });
-    });
-
-    it('should suggest columns for "SELECT * FROM tbl1, tbl2 atbl2, tbl3 WHERE cos(1) = atbl2.bla.|"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM tbl1, tbl2 atbl2, tbl3 WHERE cos(1) = atbl2.bla.',
-        afterCursor: '',
-        dialect: 'hive',
-        expectedResult: {
-          lowerCase: false,
-          suggestColumns: {
-            source: 'where',
-            types: ['DOUBLE'],
-            identifierChain: [{ name: 'bla' }],
             tables: [{ identifierChain: [{ name: 'tbl2' }] }]
           }
         }
@@ -5066,29 +3707,10 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       });
     });
 
-    it('should suggest values for "SELECT * FROM testTable WHERE \'foo\' = |"', () => {
-      assertAutoComplete({
-        beforeCursor: "SELECT * FROM testTable WHERE 'foo' = ",
-        afterCursor: '',
-        dialect: 'hive',
-        containsKeywords: ['CASE'],
-        expectedResult: {
-          lowerCase: false,
-          suggestFunctions: { types: ['STRING'] },
-          suggestColumns: {
-            source: 'where',
-            types: ['STRING'],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          }
-        }
-      });
-    });
-
     it('should suggest typed values for "SELECT * FROM testTable WHERE \'foo\' = |"', () => {
       assertAutoComplete({
         beforeCursor: "SELECT * FROM testTable WHERE 'foo' = ",
         afterCursor: '',
-        dialect: 'impala',
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
@@ -5106,20 +3728,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: "SELECT cast('1' AS ",
         afterCursor: '',
-        dialect: 'hive',
-        containsKeywords: ['BIGINT', 'DATE'],
-        doesNotContainKeywords: ['REAL'],
-        expectedResult: {
-          lowerCase: false
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT cast(\'1\' AS |"', () => {
-      assertAutoComplete({
-        beforeCursor: "SELECT cast('1' AS ",
-        afterCursor: '',
-        dialect: 'impala',
         containsKeywords: ['BIGINT', 'REAL'],
         doesNotContainKeywords: ['DATE'],
         expectedResult: {
@@ -5132,7 +3740,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: "SELECT cast('1' AS ",
         afterCursor: ' b, c bla, d',
-        dialect: 'impala',
         containsKeywords: ['BIGINT', 'REAL'],
         doesNotContainKeywords: ['DATE'],
         expectedResult: {
@@ -5141,47 +3748,10 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       });
     });
 
-    it('should suggest columns for "SELECT cos(| FROM testTable"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT cos(',
-        afterCursor: ' FROM testTable',
-        dialect: 'hive',
-        containsKeywords: ['CASE'],
-        expectedResult: {
-          lowerCase: false,
-          suggestFunctions: { types: ['DECIMAL', 'DOUBLE'] },
-          suggestColumns: {
-            source: 'select',
-            types: ['DECIMAL', 'DOUBLE'],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          }
-        }
-      });
-    });
-
     it('should suggest typed columns for "SELECT cos(| FROM testTable"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT cos(',
         afterCursor: ' FROM testTable',
-        dialect: 'impala',
-        containsKeywords: ['CASE'],
-        expectedResult: {
-          lowerCase: false,
-          suggestFunctions: { types: ['DOUBLE'] },
-          suggestColumns: {
-            source: 'select',
-            types: ['DOUBLE'],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          }
-        }
-      });
-    });
-
-    it('should suggest columns for "SELECT ceiling(| FROM testTable"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT ceiling(',
-        afterCursor: ' FROM testTable',
-        dialect: 'hive',
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
@@ -5199,7 +3769,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT ceiling(',
         afterCursor: ' FROM testTable',
-        dialect: 'impala',
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
@@ -5217,7 +3786,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT ceiling(',
         afterCursor: ' b, c AS bla, d FROM testTable',
-        dialect: 'impala',
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
@@ -5235,18 +3803,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT cos(1, ',
         afterCursor: ' FROM testTable',
-        dialect: 'hive',
-        expectedResult: {
-          lowerCase: false
-        }
-      });
-    });
-
-    it('should not suggest columns for "SELECT cos(1, | FROM testTable"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT cos(1, ',
-        afterCursor: ' FROM testTable',
-        dialect: 'impala',
         expectedResult: {
           lowerCase: false
         }
@@ -5291,25 +3847,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT log(a, ',
         afterCursor: ') FROM testTable',
-        dialect: 'hive',
-        containsKeywords: ['CASE'],
-        expectedResult: {
-          lowerCase: false,
-          suggestFunctions: { types: ['DECIMAL', 'DOUBLE'] },
-          suggestColumns: {
-            source: 'select',
-            types: ['DECIMAL', 'DOUBLE'],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          }
-        }
-      });
-    });
-
-    it('should suggest columns for "SELECT log(a, |) FROM testTable"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT log(a, ',
-        afterCursor: ') FROM testTable',
-        dialect: 'impala',
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
@@ -5327,18 +3864,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT log(a, b, ',
         afterCursor: ' FROM testTable',
-        dialect: 'hive',
-        expectedResult: {
-          lowerCase: false
-        }
-      });
-    });
-
-    it('should not suggest columns for "SELECT log(a, b, | FROM testTable"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT log(a, b, ',
-        afterCursor: ' FROM testTable',
-        dialect: 'impala',
         expectedResult: {
           lowerCase: false
         }
@@ -5349,7 +3874,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: "SELECT substr('foo', ",
         afterCursor: ') FROM testTable',
-        dialect: 'impala',
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
@@ -5367,7 +3891,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT substr(',
         afterCursor: ', 1, 2) FROM testTable',
-        dialect: 'impala',
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
@@ -5386,7 +3909,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT substr(,,',
         afterCursor: ' FROM testTable',
-        dialect: 'impala',
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
@@ -5400,11 +3922,10 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       });
     });
 
-    it('should suggest columns for "SELECT cast(a AS BIGINT) = | FROM testTable"', () => {
+    it('should suggest typed columns for "SELECT cast(a AS BIGINT) = | FROM testTable"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT cast(a AS BIGINT) = ',
         afterCursor: ' FROM testTable',
-        dialect: 'hive',
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
@@ -5422,43 +3943,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT cast(a AS BIGINT) = ',
         afterCursor: ' FROM testTable',
-        dialect: 'impala',
-        containsKeywords: ['CASE'],
-        expectedResult: {
-          lowerCase: false,
-          suggestFunctions: { types: ['BIGINT'] },
-          suggestColumns: {
-            source: 'select',
-            types: ['BIGINT'],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          }
-        }
-      });
-    });
-
-    it('should suggest typed columns for "SELECT CAST(18446744073709001000BD AS DECIMAL(38,0)) = | FROM testTable"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT CAST(18446744073709001000BD AS DECIMAL(38,0)) = ',
-        afterCursor: ' FROM testTable',
-        dialect: 'hive',
-        containsKeywords: ['CASE'],
-        expectedResult: {
-          lowerCase: false,
-          suggestFunctions: { types: ['DECIMAL'] },
-          suggestColumns: {
-            source: 'select',
-            types: ['DECIMAL'],
-            tables: [{ identifierChain: [{ name: 'testTable' }] }]
-          }
-        }
-      });
-    });
-
-    it('should suggest typed columns for "SELECT cast(a AS BIGINT) = | FROM testTable"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT cast(a AS BIGINT) = ',
-        afterCursor: ' FROM testTable',
-        dialect: 'impala',
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
@@ -5476,7 +3960,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT years_add(a , 10) = ',
         afterCursor: ' FROM testTable',
-        dialect: 'impala',
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
@@ -5494,7 +3977,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT ',
         afterCursor: ' > cast(years_add(a , 10) AS INT) FROM testTable',
-        dialect: 'impala',
         containsKeywords: ['CASE'],
         expectedResult: {
           lowerCase: false,
@@ -5512,7 +3994,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT bloo.partial',
         afterCursor: ' > cast(years_add(a , 10) AS INT) FROM testTable',
-        dialect: 'impala',
         expectedResult: {
           lowerCase: false,
           suggestColumns: {
@@ -5938,84 +4419,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       });
     });
 
-    it('should suggest keywords for "SELECT bar FROM foo WHERE id = 1 |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT bar FROM foo WHERE id = 1 ',
-        afterCursor: '',
-        dialect: 'generic',
-        expectedResult: {
-          lowerCase: false,
-          suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
-          suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
-          suggestKeywords: [
-            'GROUP BY',
-            'HAVING',
-            'ORDER BY',
-            'LIMIT',
-            'UNION',
-            '<',
-            '<=',
-            '<=>',
-            '<>',
-            '=',
-            '>',
-            '>=',
-            'AND',
-            'BETWEEN',
-            'IN',
-            'IS FALSE',
-            'IS NOT FALSE',
-            'IS NOT NULL',
-            'IS NOT TRUE',
-            'IS NULL',
-            'IS TRUE',
-            'NOT BETWEEN',
-            'NOT IN',
-            'OR'
-          ]
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT * FROM foo WHERE id <=> 1 |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM foo WHERE id <=> 1 ',
-        afterCursor: '',
-        dialect: 'generic',
-        expectedResult: {
-          lowerCase: false,
-          suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
-          suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
-          suggestKeywords: [
-            'GROUP BY',
-            'HAVING',
-            'ORDER BY',
-            'LIMIT',
-            'UNION',
-            '<',
-            '<=',
-            '<=>',
-            '<>',
-            '=',
-            '>',
-            '>=',
-            'AND',
-            'BETWEEN',
-            'IN',
-            'IS FALSE',
-            'IS NOT FALSE',
-            'IS NOT NULL',
-            'IS NOT TRUE',
-            'IS NULL',
-            'IS TRUE',
-            'NOT BETWEEN',
-            'NOT IN',
-            'OR'
-          ]
-        }
-      });
-    });
-
     it('should suggest keywords for "SELECT * FROM foo WHERE id IS |"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT * FROM foo WHERE id IS ',
@@ -6240,181 +4643,95 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       });
     });
 
-    describe('Impala specific', () => {
-      it('should handle functions for "SELECT 1 IS DISTINCT FROM 2; |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT 1 IS DISTINCT FROM 2; ',
-          afterCursor: '',
-          dialect: 'impala',
-          noErrors: true,
-          containsKeywords: ['SELECT'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
-      });
-
-      it('should handle functions for "SELECT 1 IS NOT DISTINCT FROM 2; |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT 1 IS NOT DISTINCT FROM 2; ',
-          afterCursor: '',
-          dialect: 'impala',
-          noErrors: true,
-          containsKeywords: ['SELECT'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT 1 |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT 1 ',
-          afterCursor: '',
-          dialect: 'impala',
-          noErrors: true,
-          containsKeywords: ['IS DISTINCT FROM'],
-          expectedResult: {
-            lowerCase: false,
-            suggestTables: { prependFrom: true },
-            suggestDatabases: { prependFrom: true, appendDot: true }
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT 1 IS |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT 1 IS ',
-          afterCursor: '',
-          dialect: 'impala',
-          noErrors: true,
-          containsKeywords: ['DISTINCT FROM', 'NOT DISTINCT FROM', 'NOT UNKNOWN', 'UNKNOWN'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT 1 IS NOT |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT 1 IS NOT ',
-          afterCursor: '',
-          dialect: 'impala',
-          noErrors: true,
-          containsKeywords: ['DISTINCT FROM', 'UNKNOWN'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT 1 IS DISTINCT |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT 1 IS DISTINCT ',
-          afterCursor: '',
-          dialect: 'impala',
-          noErrors: true,
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['FROM']
-          }
-        });
-      });
-
-      it('should suggest columns for "SELECT 1 IS DISTINCT FROM | FROM tbl"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT 1 IS DISTINCT FROM ',
-          afterCursor: ' FROM tbl',
-          dialect: 'impala',
-          noErrors: true,
-          containsKeywords: ['CASE', 'NULL'],
-          expectedResult: {
-            lowerCase: false,
-            suggestColumns: {
-              types: ['NUMBER'],
-              source: 'select',
-              tables: [{ identifierChain: [{ name: 'tbl' }] }]
-            },
-            suggestFunctions: { types: ['NUMBER'] }
-          }
-        });
+    it('should handle functions for "SELECT 1 IS DISTINCT FROM 2; |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT 1 IS DISTINCT FROM 2; ',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
       });
     });
 
-    describe('Hive specific', () => {
-      it('should suggest functions for "SELECT 100Y = |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT 100Y = ',
-          afterCursor: '',
-          dialect: 'hive',
-          containsKeywords: ['CASE'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: { types: ['NUMBER'] }
-          }
-        });
+    it('should handle functions for "SELECT 1 IS NOT DISTINCT FROM 2; |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT 1 IS NOT DISTINCT FROM 2; ',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
       });
+    });
 
-      it('should suggest functions for "SELECT 100BD = |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT 100BD = ',
-          afterCursor: '',
-          dialect: 'hive',
-          containsKeywords: ['CASE'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: { types: ['NUMBER'] }
-          }
-        });
+    it('should suggest keywords for "SELECT 1 |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT 1 ',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['IS DISTINCT FROM'],
+        expectedResult: {
+          lowerCase: false,
+          suggestTables: { prependFrom: true },
+          suggestDatabases: { prependFrom: true, appendDot: true }
+        }
       });
+    });
 
-      it('should suggest keywords for "SELECT bar FROM foo WHERE id = 1 |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT bar FROM foo WHERE id = 1 ',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestGroupBys: {
-              prefix: 'GROUP BY',
-              tables: [{ identifierChain: [{ name: 'foo' }] }]
-            },
-            suggestOrderBys: {
-              prefix: 'ORDER BY',
-              tables: [{ identifierChain: [{ name: 'foo' }] }]
-            },
-            suggestKeywords: [
-              'GROUP BY',
-              'HAVING',
-              'WINDOW',
-              'ORDER BY',
-              'CLUSTER BY',
-              'DISTRIBUTE BY',
-              'SORT BY',
-              'LIMIT',
-              'UNION',
-              '<',
-              '<=',
-              '<=>',
-              '<>',
-              '=',
-              '>',
-              '>=',
-              'AND',
-              'BETWEEN',
-              'IN',
-              'IS FALSE',
-              'IS NOT FALSE',
-              'IS NOT NULL',
-              'IS NOT TRUE',
-              'IS NULL',
-              'IS TRUE',
-              'NOT BETWEEN',
-              'NOT IN',
-              'OR'
-            ]
-          }
-        });
+    it('should suggest keywords for "SELECT 1 IS |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT 1 IS ',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['DISTINCT FROM', 'NOT DISTINCT FROM', 'NOT UNKNOWN', 'UNKNOWN'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT 1 IS NOT |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT 1 IS NOT ',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['DISTINCT FROM', 'UNKNOWN'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT 1 IS DISTINCT |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT 1 IS DISTINCT ',
+        afterCursor: '',
+        noErrors: true,
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['FROM']
+        }
+      });
+    });
+
+    it('should suggest columns for "SELECT 1 IS DISTINCT FROM | FROM tbl"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT 1 IS DISTINCT FROM ',
+        afterCursor: ' FROM tbl',
+        noErrors: true,
+        containsKeywords: ['CASE', 'NULL'],
+        expectedResult: {
+          lowerCase: false,
+          suggestColumns: {
+            types: ['NUMBER'],
+            source: 'select',
+            tables: [{ identifierChain: [{ name: 'tbl' }] }]
+          },
+          suggestFunctions: { types: ['NUMBER'] }
+        }
       });
     });
   });
@@ -6755,7 +5072,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT b.',
         afterCursor: ' FROM dbOne.foo f JOIN dbOne.bar b',
-        dialect: 'impala',
         expectedResult: {
           lowerCase: false,
           suggestKeywords: ['*'],
@@ -6923,36 +5239,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       });
     });
 
-    it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo ',
-        afterCursor: '',
-        dialect: 'generic',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['ASC', 'DESC', 'LIMIT', 'UNION']
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo + |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo + ',
-        afterCursor: '',
-        dialect: 'generic',
-        containsKeywords: ['CASE'],
-        expectedResult: {
-          lowerCase: false,
-          suggestFunctions: { types: ['NUMBER'] },
-          suggestColumns: {
-            source: 'order by',
-            types: ['NUMBER'],
-            tables: [{ identifierChain: [{ name: 'database_two' }, { name: 'testTable' }] }]
-          }
-        }
-      });
-    });
-
     it('should suggest columns for "SELECT * FROM database_two.testTable ORDER BY foo, |"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo, ',
@@ -7004,18 +5290,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       });
     });
 
-    it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo DESC, bar |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ',
-        afterCursor: '',
-        dialect: 'generic',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['ASC', 'DESC', 'LIMIT', 'UNION']
-        }
-      });
-    });
-
     it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo DESC, bar |, bla"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ',
@@ -7027,191 +5301,114 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       });
     });
 
-    it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo LIMIT 10 |"', () => {
+    it('should suggest keywords for "SELECT * FROM testTable WHERE a |"', () => {
       assertAutoComplete({
-        beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo LIMIT 10 ',
+        beforeCursor: 'SELECT * FROM testTable WHERE a ',
         afterCursor: '',
-        dialect: 'generic',
+        containsKeywords: ['HAVING'],
+        containsColRefKeywords: ['ILIKE', 'LIKE', 'REGEXP', 'IREGEXP'],
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['UNION']
+          suggestGroupBys: {
+            prefix: 'GROUP BY',
+            tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          suggestOrderBys: {
+            prefix: 'ORDER BY',
+            tables: [{ identifierChain: [{ name: 'testTable' }] }]
+          },
+          colRef: { identifierChain: [{ name: 'testTable' }, { name: 'a' }] }
         }
       });
     });
 
-    describe('Impala specific', () => {
-      it('should suggest keywords for "SELECT * FROM testTable WHERE a |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM testTable WHERE a ',
-          afterCursor: '',
-          dialect: 'impala',
-          containsKeywords: ['HAVING'],
-          containsColRefKeywords: ['ILIKE', 'LIKE', 'REGEXP', 'IREGEXP'],
-          expectedResult: {
-            lowerCase: false,
-            suggestGroupBys: {
-              prefix: 'GROUP BY',
-              tables: [{ identifierChain: [{ name: 'testTable' }] }]
-            },
-            suggestOrderBys: {
-              prefix: 'ORDER BY',
-              tables: [{ identifierChain: [{ name: 'testTable' }] }]
-            },
-            colRef: { identifierChain: [{ name: 'testTable' }, { name: 'a' }] }
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo ',
-          afterCursor: '',
-          dialect: 'impala',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: [
-              'ASC',
-              'DESC',
-              'NULLS FIRST',
-              'NULLS LAST',
-              'LIMIT',
-              'OFFSET',
-              'UNION'
-            ]
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY 1 |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY 1 ',
-          afterCursor: '',
-          dialect: 'impala',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: [
-              'ASC',
-              'DESC',
-              'NULLS FIRST',
-              'NULLS LAST',
-              'LIMIT',
-              'OFFSET',
-              'UNION'
-            ]
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo NULLS |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo NULLS ',
-          afterCursor: '',
-          dialect: 'impala',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['FIRST', 'LAST']
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo DESC, bar |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ',
-          afterCursor: '',
-          dialect: 'impala',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: [
-              'ASC',
-              'DESC',
-              'NULLS FIRST',
-              'NULLS LAST',
-              'LIMIT',
-              'OFFSET',
-              'UNION'
-            ]
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo DESC, bar |, bla"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ',
-          afterCursor: ', bla',
-          dialect: 'impala',
-          containsKeywords: ['ASC', 'DESC', 'NULLS FIRST', 'NULLS LAST'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ASC NULLS |, bla"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ASC NULLS ',
-          afterCursor: ', bla',
-          dialect: 'impala',
-          containsKeywords: ['FIRST', 'LAST'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
+    it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: [
+            'ASC',
+            'DESC',
+            'NULLS FIRST',
+            'NULLS LAST',
+            'LIMIT',
+            'OFFSET',
+            'UNION'
+          ]
+        }
       });
     });
-  });
 
-  describe('CLUSTER BY, DISTRIBUTE BY and SORT BY', () => {
-    describe('Hive specific', () => {
-      it('should suggest keywords for "SELECT * FROM t1 ORDER BY foo ASC |', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM t1 ORDER BY foo ASC ',
-          afterCursor: '',
-          dialect: 'hive',
-          containsKeywords: ['CLUSTER BY', 'DISTRIBUTE BY', 'LIMIT'],
-          doesNotContainKeywords: ['SORT BY'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
+    it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY 1 |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY 1 ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: [
+            'ASC',
+            'DESC',
+            'NULLS FIRST',
+            'NULLS LAST',
+            'LIMIT',
+            'OFFSET',
+            'UNION'
+          ]
+        }
       });
+    });
 
-      it('should suggest keywords for "SELECT * FROM t1 ORDER BY foo ASC CLUSTER BY a |', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM t1 ORDER BY foo ASC CLUSTER BY a ',
-          afterCursor: '',
-          dialect: 'hive',
-          containsKeywords: ['LIMIT'],
-          doesNotContainKeywords: ['DISTRIBUTE BY', 'SORT BY'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
+    it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo NULLS |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo NULLS ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['FIRST', 'LAST']
+        }
       });
+    });
 
-      it('should suggest keywords for "SELECT * FROM t1 ORDER BY foo ASC DISTRIBUTE BY a |', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM t1 ORDER BY foo ASC DISTRIBUTE BY a ',
-          afterCursor: '',
-          dialect: 'hive',
-          containsKeywords: ['SORT BY', 'LIMIT'],
-          doesNotContainKeywords: ['CLUSTER BY', 'DISTRIBUTE BY'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
+    it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo DESC, bar |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: [
+            'ASC',
+            'DESC',
+            'NULLS FIRST',
+            'NULLS LAST',
+            'LIMIT',
+            'OFFSET',
+            'UNION'
+          ]
+        }
       });
+    });
 
-      it('should suggest keywords for "SELECT * FROM t1 ORDER BY foo ASC SORT BY a DESC |', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM t1 ORDER BY foo ASC SORT BY a DESC ',
-          afterCursor: '',
-          dialect: 'hive',
-          containsKeywords: ['LIMIT'],
-          doesNotContainKeywords: ['CLUSTER BY', 'DISTRIBUTE BY', 'NULLS FIRST', 'SORT BY'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
+    it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo DESC, bar |, bla"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ',
+        afterCursor: ', bla',
+        containsKeywords: ['ASC', 'DESC', 'NULLS FIRST', 'NULLS LAST'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ASC NULLS |, bla"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ASC NULLS ',
+        afterCursor: ', bla',
+        containsKeywords: ['FIRST', 'LAST'],
+        expectedResult: {
+          lowerCase: false
+        }
       });
     });
   });
@@ -7225,109 +5422,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
           lowerCase: false,
           suggestKeywords: ['BY'],
           suggestGroupBys: { prefix: 'BY', tables: [{ identifierChain: [{ name: 'testTable' }] }] }
-        }
-      });
-    });
-
-    it('should suggest identifiers for "SELECT * FROM testTableA tta, testTableB GROUP BY |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM testTableA tta, testTableB GROUP BY ',
-        afterCursor: '',
-        dialect: 'generic',
-        containsKeywords: ['CASE'],
-        expectedResult: {
-          lowerCase: false,
-          suggestFunctions: {},
-          suggestColumns: {
-            source: 'group by',
-            tables: [
-              { identifierChain: [{ name: 'testTableA' }], alias: 'tta' },
-              { identifierChain: [{ name: 'testTableB' }] }
-            ]
-          },
-          suggestIdentifiers: [
-            { name: 'tta.', type: 'alias' },
-            { name: 'testTableB.', type: 'table' }
-          ],
-          suggestGroupBys: {
-            tables: [
-              { identifierChain: [{ name: 'testTableA' }], alias: 'tta' },
-              { identifierChain: [{ name: 'testTableB' }] }
-            ]
-          }
-        }
-      });
-    });
-
-    it('should suggest identifier for "SELECT * FROM testTableA tta, testTableB GROUP BY bla, |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM testTableA tta, testTableB GROUP BY bla, ',
-        afterCursor: '',
-        dialect: 'generic',
-        containsKeywords: ['CASE'],
-        expectedResult: {
-          lowerCase: false,
-          suggestFunctions: {},
-          suggestColumns: {
-            source: 'group by',
-            tables: [
-              { identifierChain: [{ name: 'testTableA' }], alias: 'tta' },
-              { identifierChain: [{ name: 'testTableB' }] }
-            ]
-          },
-          suggestIdentifiers: [
-            { name: 'tta.', type: 'alias' },
-            { name: 'testTableB.', type: 'table' }
-          ]
-        }
-      });
-    });
-
-    it('should suggest identifier for "SELECT * FROM testTableA tta, testTableB GROUP BY bla+|"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM testTableA tta, testTableB GROUP BY bla+',
-        afterCursor: '',
-        dialect: 'generic',
-        containsKeywords: ['CASE'],
-        expectedResult: {
-          lowerCase: false,
-          suggestFunctions: { types: ['NUMBER'] },
-          suggestColumns: {
-            source: 'group by',
-            types: ['NUMBER'],
-            tables: [
-              { identifierChain: [{ name: 'testTableA' }], alias: 'tta' },
-              { identifierChain: [{ name: 'testTableB' }] }
-            ]
-          },
-          suggestIdentifiers: [
-            { name: 'tta.', type: 'alias' },
-            { name: 'testTableB.', type: 'table' }
-          ]
-        }
-      });
-    });
-
-    it('should suggest identifier for "SELECT * FROM testTableA tta, testTableB GROUP BY bla+foo, |, foo"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM testTableA tta, testTableB GROUP BY bla, ',
-        afterCursor: ', foo',
-        dialect: 'generic',
-        containsKeywords: ['CASE'],
-        expectedResult: {
-          lowerCase: false,
-          suggestFunctions: {},
-          suggestColumns: {
-            source: 'group by',
-            tables: [
-              { identifierChain: [{ name: 'testTableA' }], alias: 'tta' },
-              { identifierChain: [{ name: 'testTableB' }] }
-            ]
-          },
-          suggestIdentifiers: [
-            { name: 'tta.', type: 'alias' },
-            { name: 'testTableB.', type: 'table' }
-          ]
         }
       });
     });
@@ -7367,573 +5461,180 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
         }
       });
     });
-
-    describe('GROUPING SETS', () => {
-      it('should handle "SELECT a, b, SUM( c ) FROM tab1 GROUP BY a, b WITH CUBE;"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT a, b, SUM( c ) FROM tab1 GROUP BY a, b WITH CUBE;',
-          afterCursor: '',
-          dialect: 'hive',
-          noErrors: true,
-          containsKeywords: ['SELECT'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
-      });
-
-      it('should handle "SELECT a, b, SUM( c ) FROM tab1 GROUP BY a, b WITH ROLLUP;"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT a, b, SUM( c ) FROM tab1 GROUP BY a, b WITH ROLLUP;',
-          afterCursor: '',
-          dialect: 'hive',
-          noErrors: true,
-          containsKeywords: ['SELECT'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
-      });
-
-      it('should handle "SELECT a, b, SUM( c ) FROM tab1 GROUP BY a, b GROUPING SETS ( (a, b), a, b, ( ) );"', () => {
-        assertAutoComplete({
-          beforeCursor:
-            'SELECT a, b, SUM( c ) FROM tab1 GROUP BY a, b GROUPING SETS ( (a, b), a, b, ( ) );',
-          afterCursor: '',
-          dialect: 'hive',
-          noErrors: true,
-          containsKeywords: ['SELECT'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM database_two.testTable GROUP BY a, b |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM database_two.testTable GROUP BY a, b ',
-          afterCursor: '',
-          dialect: 'hive',
-          containsKeywords: ['GROUPING SETS', 'WITH CUBE', 'WITH ROLLUP', '<'],
-          containsColRefKeywords: true,
-          expectedResult: {
-            lowerCase: false,
-            suggestOrderBys: {
-              prefix: 'ORDER BY',
-              tables: [{ identifierChain: [{ name: 'database_two' }, { name: 'testTable' }] }]
-            },
-            colRef: {
-              identifierChain: [{ name: 'database_two' }, { name: 'testTable' }, { name: 'b' }]
-            }
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM database_two.testTable GROUP BY a, b WITH |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM database_two.testTable GROUP BY a, b WITH ',
-          afterCursor: '',
-          dialect: 'hive',
-          containsKeywords: ['CUBE', 'ROLLUP'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM database_two.testTable GROUP BY a, b GROUPING |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM database_two.testTable GROUP BY a, b GROUPING ',
-          afterCursor: '',
-          dialect: 'hive',
-          containsKeywords: ['SETS'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
-      });
-
-      it('should suggest columns for "SELECT * FROM database_two.testTable GROUP BY a, b GROUPING SETS (|"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM database_two.testTable GROUP BY a, b GROUPING SETS (',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestColumns: {
-              source: 'group by',
-              tables: [{ identifierChain: [{ name: 'database_two' }, { name: 'testTable' }] }]
-            }
-          }
-        });
-      });
-
-      it('should suggest columns for "SELECT * FROM database_two.testTable GROUP BY a, b GROUPING SETS ((a, b), |"', () => {
-        assertAutoComplete({
-          beforeCursor:
-            'SELECT * FROM database_two.testTable GROUP BY a, b GROUPING SETS ((a, b), ',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestColumns: {
-              source: 'group by',
-              tables: [{ identifierChain: [{ name: 'database_two' }, { name: 'testTable' }] }]
-            }
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT a, b, SUM(c) FROM tab1 GROUP BY a, b GROUPING SETS (a,b) |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT a, b, SUM(c) FROM tab1 GROUP BY a, b GROUPING SETS (a,b) ',
-          afterCursor: '',
-          dialect: 'hive',
-          containsKeywords: ['LIMIT'],
-          expectedResult: {
-            lowerCase: false,
-            suggestOrderBys: {
-              prefix: 'ORDER BY',
-              tables: [{ identifierChain: [{ name: 'tab1' }] }]
-            }
-          }
-        });
-      });
-    });
   });
 
   describe('HAVING clause', () => {
-    describe('Hive specific', () => {
-      it('should suggest identifiers for "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa HAVING |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable GROUP BY baa HAVING ',
-          afterCursor: '',
-          dialect: 'hive',
-          containsKeywords: ['CASE'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: {},
-            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestColumnAliases: [{ name: 'boo', types: ['BIGINT'] }]
-          }
-        });
-      });
-    });
-
-    describe('Impala specific', () => {
-      it('should suggest identifiers for "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa HAVING |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable GROUP BY baa HAVING ',
-          afterCursor: '',
-          dialect: 'impala',
-          containsKeywords: ['CASE'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: {},
-            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestColumnAliases: [{ name: 'boo', types: ['BIGINT'] }]
-          }
-        });
+    it('should suggest identifiers for "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa HAVING |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable GROUP BY baa HAVING ',
+        afterCursor: '',
+        containsKeywords: ['CASE'],
+        expectedResult: {
+          lowerCase: false,
+          suggestFunctions: {},
+          suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
+          suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
+          suggestColumnAliases: [{ name: 'boo', types: ['BIGINT'] }]
+        }
       });
     });
   });
 
   describe('LIMIT clause', () => {
-    it('should not suggest anything for "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT |"', () => {
+    it('should not suggest columns for "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT |"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT ',
         afterCursor: '',
-        dialect: 'generic',
         noErrors: true,
+        expectedResult: {
+          lowerCase: false,
+          suggestFunctions: { types: ['BIGINT'] }
+        }
+      });
+    });
+  });
+
+  describe('OFFSET clause', () => {
+    it('should handle "SELECT COUNT(*) AS boo FROM testTable ORDER BY baa OFFSET 1;|"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable ORDER BY baa OFFSET 1; ',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false
         }
       });
     });
 
-    describe('Hive specific', () => {
-      it('should handle "SELECT * FROM testTable LIMIT 5,6; |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM testTable LIMIT 5,6; ',
-          afterCursor: '',
-          dialect: 'hive',
-          noErrors: true,
-          containsKeywords: ['SELECT'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
-      });
-
-      it('should not suggest anything for "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT ',
-          afterCursor: '',
-          dialect: 'hive',
-          noErrors: true,
-          expectedResult: {
-            lowerCase: false
-          }
-        });
+    it('should not suggest columns for "SELECT COUNT(*) AS boo FROM testTable ORDER BY baa OFFSET |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable ORDER BY baa OFFSET ',
+        afterCursor: '',
+        noErrors: true,
+        expectedResult: {
+          lowerCase: false,
+          suggestFunctions: { types: ['BIGINT'] }
+        }
       });
     });
 
-    describe('Impala specific', () => {
-      it('should not suggest columns for "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT ',
-          afterCursor: '',
-          dialect: 'impala',
-          noErrors: true,
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: { types: ['BIGINT'] }
-          }
-        });
-      });
-    });
-  });
-
-  describe('OFFSET clause', () => {
-    describe('Impala specific', () => {
-      it('should handle "SELECT COUNT(*) AS boo FROM testTable ORDER BY baa OFFSET 1;|"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable ORDER BY baa OFFSET 1; ',
-          afterCursor: '',
-          dialect: 'impala',
-          noErrors: true,
-          containsKeywords: ['SELECT'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
-      });
-
-      it('should not suggest columns for "SELECT COUNT(*) AS boo FROM testTable ORDER BY baa OFFSET |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable ORDER BY baa OFFSET ',
-          afterCursor: '',
-          dialect: 'impala',
-          noErrors: true,
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: { types: ['BIGINT'] }
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT COUNT(*) AS boo FROM testTable ORDER BY baa LIMIT 10 |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable ORDER BY baa LIMIT 10 ',
-          afterCursor: '',
-          dialect: 'impala',
-          containsKeywords: ['OFFSET'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
+    it('should suggest keywords for "SELECT COUNT(*) AS boo FROM testTable ORDER BY baa LIMIT 10 |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable ORDER BY baa LIMIT 10 ',
+        afterCursor: '',
+        containsKeywords: ['OFFSET'],
+        expectedResult: {
+          lowerCase: false
+        }
       });
     });
   });
 
   describe('TABLESAMPLE', () => {
-    describe('Impala specific', () => {
-      it('should handle "select distinct x from sample_demo tablesample system(50);|"', () => {
-        assertAutoComplete({
-          beforeCursor: 'select distinct x from sample_demo tablesample system(50);',
-          afterCursor: '',
-          dialect: 'impala',
-          noErrors: true,
-          containsKeywords: ['SELECT'],
-          expectedResult: {
-            lowerCase: true
-          }
-        });
-      });
-
-      it('should handle "select distinct sd.x from sample_demo as sd tablesample system(50) repeatable (12345);|"', () => {
-        assertAutoComplete({
-          beforeCursor:
-            'select distinct sd.x from sample_demo as sd tablesample system(50) repeatable (12345);',
-          afterCursor: '',
-          dialect: 'impala',
-          noErrors: true,
-          containsKeywords: ['SELECT'],
-          expectedResult: {
-            lowerCase: true
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM boo |', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo ',
-          afterCursor: '',
-          dialect: 'impala',
-          noErrors: true,
-          containsKeywords: ['TABLESAMPLE', 'AS'],
-          doesNotContainKeywords: ['REPEATABLE()'],
-          expectedResult: {
-            lowerCase: false,
-            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'boo' }] }] },
-            suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'boo' }] }] },
-            suggestGroupBys: {
-              prefix: 'GROUP BY',
-              tables: [{ identifierChain: [{ name: 'boo' }] }]
-            },
-            suggestOrderBys: {
-              prefix: 'ORDER BY',
-              tables: [{ identifierChain: [{ name: 'boo' }] }]
-            }
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM boo as b |', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo as b ',
-          afterCursor: '',
-          dialect: 'impala',
-          noErrors: true,
-          containsKeywords: ['TABLESAMPLE'],
-          doesNotContainKeywords: ['AS'],
-          expectedResult: {
-            lowerCase: false,
-            suggestJoins: {
-              prependJoin: true,
-              tables: [{ identifierChain: [{ name: 'boo' }], alias: 'b' }]
-            },
-            suggestFilters: {
-              prefix: 'WHERE',
-              tables: [{ identifierChain: [{ name: 'boo' }], alias: 'b' }]
-            },
-            suggestGroupBys: {
-              prefix: 'GROUP BY',
-              tables: [{ identifierChain: [{ name: 'boo' }], alias: 'b' }]
-            },
-            suggestOrderBys: {
-              prefix: 'ORDER BY',
-              tables: [{ identifierChain: [{ name: 'boo' }], alias: 'b' }]
-            }
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM boo as b TABLESAMPLE SYSTEM(50) |', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo as b TABLESAMPLE SYSTEM(50) ',
-          afterCursor: '',
-          dialect: 'impala',
-          noErrors: true,
-          containsKeywords: ['REPEATABLE()'],
-          doesNotContainKeywords: ['TABLESAMPLE'],
-          expectedResult: {
-            lowerCase: false,
-            suggestJoins: {
-              prependJoin: true,
-              tables: [{ identifierChain: [{ name: 'boo' }], alias: 'b' }]
-            },
-            suggestFilters: {
-              prefix: 'WHERE',
-              tables: [{ identifierChain: [{ name: 'boo' }], alias: 'b' }]
-            },
-            suggestGroupBys: {
-              prefix: 'GROUP BY',
-              tables: [{ identifierChain: [{ name: 'boo' }], alias: 'b' }]
-            },
-            suggestOrderBys: {
-              prefix: 'ORDER BY',
-              tables: [{ identifierChain: [{ name: 'boo' }], alias: 'b' }]
-            }
-          }
-        });
+    it('should handle "select distinct x from sample_demo tablesample system(50);|"', () => {
+      assertAutoComplete({
+        beforeCursor: 'select distinct x from sample_demo tablesample system(50);',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: true
+        }
       });
     });
 
-    describe('Hive specific', () => {
-      it('should handle "SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 32 ON baa) baa JOIN bla;|"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 32 ON baa) baa JOIN bla;',
-          afterCursor: '',
-          dialect: 'hive',
-          noErrors: true,
-          containsKeywords: ['SELECT'],
-          expectedResult: {
-            lowerCase: false
-          }
-        });
+    it('should handle "select distinct sd.x from sample_demo as sd tablesample system(50) repeatable (12345);|"', () => {
+      assertAutoComplete({
+        beforeCursor:
+          'select distinct sd.x from sample_demo as sd tablesample system(50) repeatable (12345);',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: true
+        }
       });
+    });
 
-      it('should handle "SELECT * FROM boo TABLESAMPLE (0.1 PERCENT) baa;|"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (0.1 PERCENT) baa;',
-          afterCursor: '',
-          dialect: 'hive',
-          noErrors: true,
-          containsKeywords: ['SELECT'],
-          expectedResult: {
-            lowerCase: false
+    it('should suggest keywords for "SELECT * FROM boo |', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM boo ',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['TABLESAMPLE', 'AS'],
+        doesNotContainKeywords: ['REPEATABLE()'],
+        expectedResult: {
+          lowerCase: false,
+          suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'boo' }] }] },
+          suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'boo' }] }] },
+          suggestGroupBys: {
+            prefix: 'GROUP BY',
+            tables: [{ identifierChain: [{ name: 'boo' }] }]
+          },
+          suggestOrderBys: {
+            prefix: 'ORDER BY',
+            tables: [{ identifierChain: [{ name: 'boo' }] }]
           }
-        });
+        }
       });
+    });
 
-      it('should handle "SELECT * FROM boo TABLESAMPLE (5 ROWS) baa;|"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (5 ROWS) baa;',
-          afterCursor: '',
-          dialect: 'hive',
-          noErrors: true,
-          containsKeywords: ['SELECT'],
-          expectedResult: {
-            lowerCase: false
+    it('should suggest keywords for "SELECT * FROM boo as b |', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM boo as b ',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['TABLESAMPLE'],
+        doesNotContainKeywords: ['AS'],
+        expectedResult: {
+          lowerCase: false,
+          suggestJoins: {
+            prependJoin: true,
+            tables: [{ identifierChain: [{ name: 'boo' }], alias: 'b' }]
+          },
+          suggestFilters: {
+            prefix: 'WHERE',
+            tables: [{ identifierChain: [{ name: 'boo' }], alias: 'b' }]
+          },
+          suggestGroupBys: {
+            prefix: 'GROUP BY',
+            tables: [{ identifierChain: [{ name: 'boo' }], alias: 'b' }]
+          },
+          suggestOrderBys: {
+            prefix: 'ORDER BY',
+            tables: [{ identifierChain: [{ name: 'boo' }], alias: 'b' }]
           }
-        });
+        }
       });
+    });
 
-      it('should handle "SELECT * FROM boo TABLESAMPLE (205B) baa;|"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (205B) baa;',
-          afterCursor: '',
-          dialect: 'hive',
-          noErrors: true,
-          containsKeywords: ['SELECT'],
-          expectedResult: {
-            lowerCase: false
+    it('should suggest keywords for "SELECT * FROM boo as b TABLESAMPLE SYSTEM(50) |', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM boo as b TABLESAMPLE SYSTEM(50) ',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['REPEATABLE()'],
+        doesNotContainKeywords: ['TABLESAMPLE'],
+        expectedResult: {
+          lowerCase: false,
+          suggestJoins: {
+            prependJoin: true,
+            tables: [{ identifierChain: [{ name: 'boo' }], alias: 'b' }]
+          },
+          suggestFilters: {
+            prefix: 'WHERE',
+            tables: [{ identifierChain: [{ name: 'boo' }], alias: 'b' }]
+          },
+          suggestGroupBys: {
+            prefix: 'GROUP BY',
+            tables: [{ identifierChain: [{ name: 'boo' }], alias: 'b' }]
+          },
+          suggestOrderBys: {
+            prefix: 'ORDER BY',
+            tables: [{ identifierChain: [{ name: 'boo' }], alias: 'b' }]
           }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM boo |', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo ',
-          afterCursor: '',
-          dialect: 'hive',
-          noErrors: true,
-          containsKeywords: ['TABLESAMPLE', 'AS'],
-          expectedResult: {
-            lowerCase: false,
-            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'boo' }] }] },
-            suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'boo' }] }] },
-            suggestGroupBys: {
-              prefix: 'GROUP BY',
-              tables: [{ identifierChain: [{ name: 'boo' }] }]
-            },
-            suggestOrderBys: {
-              prefix: 'ORDER BY',
-              tables: [{ identifierChain: [{ name: 'boo' }] }]
-            }
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM boo |, baa', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo ',
-          afterCursor: ', baa',
-          dialect: 'hive',
-          containsKeywords: ['TABLESAMPLE', 'AS'],
-          expectedResult: {
-            lowerCase: false,
-            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'boo' }] }] },
-            suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'boo' }] }] },
-            suggestGroupBys: {
-              prefix: 'GROUP BY',
-              tables: [{ identifierChain: [{ name: 'boo' }] }]
-            },
-            suggestOrderBys: {
-              prefix: 'ORDER BY',
-              tables: [{ identifierChain: [{ name: 'boo' }] }]
-            }
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM boo TABLESAMPLE (|', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['BUCKET']
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM boo TABLESAMPLE (0.1 |', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (0.1 ',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['PERCENT']
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM boo TABLESAMPLE (1 |', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (1 ',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['PERCENT', 'ROWS']
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM boo TABLESAMPLE (BUCKET 1 |', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (BUCKET 1 ',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['OUT OF']
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT |', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT ',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['OF']
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 16 |', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 16 ',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['ON']
-          }
-        });
-      });
-
-      it('should suggest columns for "SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 16 ON |', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 16 ON ',
-          afterCursor: '',
-          dialect: 'hive',
-          containsKeywords: ['CASE'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: {},
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'boo' }] }] }
-          }
-        });
+        }
       });
     });
   });
@@ -8144,29 +5845,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       });
     });
 
-    it('should suggest identifiers for "WITH t1 AS (SELECT id FROM foo), t2 AS (SELECT | FROM t1)', () => {
-      assertAutoComplete({
-        beforeCursor: 'WITH t1 AS (SELECT id FROM foo), t2 AS (SELECT ',
-        afterCursor: ' FROM t1)',
-        dialect: 'hive',
-        noErrors: true,
-        containsKeywords: ['*', 'ALL', 'DISTINCT'],
-        expectedResult: {
-          suggestAggregateFunctions: { tables: [] },
-          suggestAnalyticFunctions: true,
-          suggestFunctions: {},
-          suggestColumns: { source: 'select', tables: [{ identifierChain: [{ cte: 't1' }] }] },
-          commonTableExpressions: [
-            {
-              alias: 't1',
-              columns: [{ identifierChain: [{ name: 'foo' }, { name: 'id' }], type: 'COLREF' }]
-            }
-          ],
-          lowerCase: false
-        }
-      });
-    });
-
     it('should suggest identifiers for "WITH t1 AS (SELECT * FROM FOO) SELECT * FROM |', () => {
       assertAutoComplete({
         beforeCursor: 'WITH t1 AS (SELECT * FROM FOO) SELECT * FROM ',
@@ -8238,121 +5916,10 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
   });
 
   describe('Joins', () => {
-    it('should suggest tables for "SELECT * FROM testTable1 JOIN |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM testTable1 JOIN ',
-        afterCursor: '',
-        dialect: 'generic',
-        expectedResult: {
-          lowerCase: false,
-          suggestJoins: {
-            prependJoin: false,
-            joinType: 'JOIN',
-            tables: [{ identifierChain: [{ name: 'testTable1' }] }]
-          },
-          suggestTables: {},
-          suggestDatabases: { appendDot: true }
-        }
-      });
-    });
-
-    it('should suggest joins for "SELECT * FROM testTable1 JOIN testTable2 JOIN |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM testTable1 JOIN testTable2 JOIN ',
-        afterCursor: '',
-        dialect: 'generic',
-        expectedResult: {
-          lowerCase: false,
-          suggestJoins: {
-            prependJoin: false,
-            joinType: 'JOIN',
-            tables: [
-              { identifierChain: [{ name: 'testTable1' }] },
-              { identifierChain: [{ name: 'testTable2' }] }
-            ]
-          },
-          suggestTables: {},
-          suggestDatabases: { appendDot: true }
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT * FROM testTable1 INNER |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM testTable1 INNER ',
-        afterCursor: '',
-        dialect: 'generic',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['JOIN']
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT * FROM testTable1 FULL |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM testTable1 FULL ',
-        afterCursor: '',
-        dialect: 'generic',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['JOIN', 'OUTER JOIN']
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT * FROM testTable1 FULL OUTER |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM testTable1 FULL OUTER ',
-        afterCursor: '',
-        dialect: 'generic',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['JOIN']
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT * FROM testTable1 LEFT |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM testTable1 LEFT ',
-        afterCursor: '',
-        dialect: 'generic',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['JOIN', 'OUTER JOIN']
-        }
-      });
-    });
-
     it('should suggest keywords for "SELECT * FROM testTable1 LEFT OUTER |"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT * FROM testTable1 LEFT OUTER ',
         afterCursor: '',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['JOIN']
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT * FROM testTable1 RIGHT |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM testTable1 RIGHT ',
-        afterCursor: '',
-        dialect: 'generic',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['JOIN', 'OUTER JOIN']
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT * FROM testTable1 RIGHT OUTER |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM testTable1 RIGHT OUTER ',
-        afterCursor: '',
-        dialect: 'generic',
         expectedResult: {
           lowerCase: false,
           suggestKeywords: ['JOIN']
@@ -8582,30 +6149,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       });
     });
 
-    it('should suggest columns for "SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (testTable2.|"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (testTable2.',
-        afterCursor: '',
-        dialect: 'hive',
-        expectedResult: {
-          lowerCase: false,
-          suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable2' }] }] }
-        }
-      });
-    });
-
-    it('should suggest columns for "select * from testTable1 cross join testTable2 on testTable1.|"', () => {
-      assertAutoComplete({
-        beforeCursor: 'select * from testTable1 cross join testTable2 on testTable1.',
-        afterCursor: '',
-        dialect: 'hive',
-        expectedResult: {
-          lowerCase: true,
-          suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable1' }] }] }
-        }
-      });
-    });
-
     it('should suggest identifiers for "select * from testTable1 join db.testTable2 on |"', () => {
       assertAutoComplete({
         beforeCursor: 'select * from testTable1 join db.testTable2 on ',
@@ -8690,150 +6233,13 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       });
     });
 
-    it('should suggest keywords for "SELECT t1.* FROM table1 t1 | JOIN"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT t1.* FROM table1 t1 ',
-        afterCursor: ' JOIN',
-        dialect: 'generic',
-        expectedResult: {
-          lowerCase: false,
-          suggestJoins: {
-            prependJoin: true,
-            tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }]
-          },
-          suggestKeywords: [
-            'FULL',
-            'FULL OUTER',
-            'INNER',
-            'LEFT',
-            'LEFT OUTER',
-            'RIGHT',
-            'RIGHT OUTER'
-          ]
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT t1.* FROM table1 t1 | JOIN table2 t2 ON t1.bla = t2.bla"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT t1.* FROM table1 t1 ',
-        afterCursor: ' JOIN table2 t2 ON t1.bla = t2.bla',
-        dialect: 'generic',
-        expectedResult: {
-          lowerCase: false,
-          suggestJoins: {
-            prependJoin: true,
-            tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }]
-          },
-          suggestKeywords: [
-            'FULL',
-            'FULL OUTER',
-            'INNER',
-            'LEFT',
-            'LEFT OUTER',
-            'RIGHT',
-            'RIGHT OUTER'
-          ]
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT t1.* FROM table1 t1 JOIN table2 t2 | JOIN table3"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT t1.* FROM table1 t1 JOIN table2 t2 ',
-        afterCursor: ' JOIN table3',
-        dialect: 'generic',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: [
-            'ON',
-            'FULL',
-            'FULL OUTER',
-            'INNER',
-            'LEFT',
-            'LEFT OUTER',
-            'RIGHT',
-            'RIGHT OUTER'
-          ],
-          suggestJoinConditions: {
-            prependOn: true,
-            tables: [
-              { identifierChain: [{ name: 'table1' }], alias: 't1' },
-              { identifierChain: [{ name: 'table2' }], alias: 't2' }
-            ]
-          }
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT t1.* FROM table1 t1 JOIN table2 t2 ON t1.bla = t2.bla | JOIN table3"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT t1.* FROM table1 t1 JOIN table2 t2 ON t1.bla = t2.bla ',
-        afterCursor: ' JOIN table3',
-        dialect: 'hive',
-        containsKeywords: [
-          'AND',
-          '=',
-          'IN',
-          'FULL',
-          'FULL OUTER',
-          'LEFT',
-          'LEFT OUTER',
-          'RIGHT',
-          'RIGHT OUTER'
-        ],
-        expectedResult: {
-          lowerCase: false
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT t1.* FROM table1 t1 JOIN table2 t2 ON t1.bla | JOIN table3"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT t1.* FROM table1 t1 JOIN table2 t2 ON t1.bla ',
-        afterCursor: ' JOIN table3',
-        dialect: 'hive',
-        containsKeywords: ['=', 'LEFT OUTER'],
-        containsColRefKeywords: true,
-        expectedResult: {
-          lowerCase: false,
-          colRef: { identifierChain: [{ name: 'table1' }, { name: 'bla' }] }
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT t1.* FROM table1 t1 FULL | JOIN"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT t1.* FROM table1 t1 FULL ',
-        afterCursor: ' JOIN',
-        dialect: 'generic',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['OUTER']
-        }
-      });
-    });
-
     it('should suggest keywords for "SELECT t1.* FROM table1 t1 LEFT | JOIN"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT t1.* FROM table1 t1 LEFT ',
         afterCursor: ' JOIN',
-        dialect: 'impala',
         expectedResult: {
           lowerCase: false,
           suggestKeywords: ['ANTI', 'INNER', 'OUTER', 'SEMI']
-        }
-      });
-    });
-
-    it('should suggest keywords for "SELECT t1.* FROM table1 t1 RIGHT | JOIN"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT t1.* FROM table1 t1 RIGHT ',
-        afterCursor: ' JOIN',
-        dialect: 'generic',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['OUTER']
         }
       });
     });
@@ -8865,522 +6271,290 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       });
     });
 
-    describe('Hive specific', () => {
-      it('should suggest keywords for "SELECT t1.* FROM table1 t1 |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT t1.* FROM table1 t1 ',
-          afterCursor: '',
-          dialect: 'hive',
-          containsKeywords: ['LEFT SEMI JOIN', 'CROSS JOIN'], // Tested in full above
-          expectedResult: {
-            lowerCase: false,
-            suggestJoins: {
-              prependJoin: true,
-              tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }]
-            },
-            suggestFilters: {
-              prefix: 'WHERE',
-              tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }]
-            },
-            suggestGroupBys: {
-              prefix: 'GROUP BY',
-              tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }]
-            },
-            suggestOrderBys: {
-              prefix: 'ORDER BY',
-              tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }]
-            }
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM testTable1 INNER |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM testTable1 INNER ',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['JOIN']
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM testTable1 FULL |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM testTable1 FULL ',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['JOIN', 'OUTER JOIN']
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM testTable1 LEFT |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM testTable1 LEFT ',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['JOIN', 'OUTER JOIN', 'SEMI JOIN']
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM testTable1 RIGHT |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM testTable1 RIGHT ',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['JOIN', 'OUTER JOIN']
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM testTable1 CROSS |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM testTable1 CROSS ',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['JOIN']
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT t1.* FROM table1 t1 | JOIN"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT t1.* FROM table1 t1 ',
-          afterCursor: ' JOIN',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestJoins: {
-              prependJoin: true,
-              tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }]
-            },
-            suggestKeywords: [
-              'LATERAL VIEW',
-              'CROSS',
-              'FULL',
-              'FULL OUTER',
-              'INNER',
-              'LEFT',
-              'LEFT OUTER',
-              'LEFT SEMI',
-              'RIGHT',
-              'RIGHT OUTER'
+    it('should suggest identifiers for "SELECT t1.* FROM table1 t1 JOIN table2 t2 USING (foo, bar) WHERE "', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT t1.* FROM table1 t1 JOIN table2 t2 USING (foo, bar) WHERE ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestFunctions: {},
+          suggestKeywords: ['EXISTS', 'NOT EXISTS'],
+          suggestColumns: {
+            source: 'where',
+            tables: [
+              { identifierChain: [{ name: 'table1' }], alias: 't1' },
+              { identifierChain: [{ name: 'table2' }], alias: 't2' }
             ]
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT t1.* FROM table1 t1 FULL | JOIN"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT t1.* FROM table1 t1 FULL ',
-          afterCursor: ' JOIN',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['OUTER']
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT t1.* FROM table1 t1 LEFT | JOIN"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT t1.* FROM table1 t1 LEFT ',
-          afterCursor: ' JOIN',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['OUTER', 'SEMI']
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT t1.* FROM table1 t1 RIGHT | JOIN"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT t1.* FROM table1 t1 RIGHT ',
-          afterCursor: ' JOIN',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['OUTER']
-          }
-        });
-      });
-
-      it('should suggest identifiers for "SELECT t1.* FROM table1 t1 CROSS JOIN table2 LEFT OUTER JOIN table3 JOIN table4 t4 ON (| AND t1.c1 = t2.c2"', () => {
-        assertAutoComplete({
-          beforeCursor:
-            'SELECT t1.* FROM table1 t1 CROSS JOIN table2 LEFT OUTER JOIN table3 JOIN table4 t4 ON (',
-          afterCursor: ' AND t1.c1 = t2.c2',
-          dialect: 'hive',
-          containsKeywords: ['CASE'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: {},
-            suggestColumns: {
-              tables: [
-                { identifierChain: [{ name: 'table1' }], alias: 't1' },
-                { identifierChain: [{ name: 'table2' }] },
-                { identifierChain: [{ name: 'table3' }] },
-                { identifierChain: [{ name: 'table4' }], alias: 't4' }
-              ]
-            },
-            suggestIdentifiers: [
-              { name: 't1.', type: 'alias' },
-              { name: 'table2.', type: 'table' },
-              { name: 'table3.', type: 'table' },
-              { name: 't4.', type: 'alias' }
+          },
+          suggestFilters: {
+            tables: [
+              { identifierChain: [{ name: 'table1' }], alias: 't1' },
+              { identifierChain: [{ name: 'table2' }], alias: 't2' }
             ]
-          }
-        });
-      });
-
-      it('should suggest tables for "SELECT t1.* FROM table1 t1 LEFT OUTER JOIN tab| CROSS JOIN table3 JOIN table4 t4 ON (t1.c1 = t2.c2"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT t1.* FROM table1 t1 LEFT OUTER JOIN tab',
-          afterCursor: ' CROSS JOIN table3 JOIN table4 t4 ON (t1.c1 = t2.c2',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestJoins: {
-              prependJoin: false,
-              joinType: 'LEFT OUTER JOIN',
-              tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }]
-            },
-            suggestTables: {},
-            suggestDatabases: { appendDot: true }
-          }
-        });
+          },
+          suggestIdentifiers: [{ name: 't1.', type: 'alias' }, { name: 't2.', type: 'alias' }]
+        }
       });
     });
 
-    describe('Impala specific', () => {
-      it('should suggest identifiers for "SELECT t1.* FROM table1 t1 JOIN table2 t2 USING (foo, bar) WHERE "', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT t1.* FROM table1 t1 JOIN table2 t2 USING (foo, bar) WHERE ',
-          afterCursor: '',
-          dialect: 'impala',
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: {},
-            suggestKeywords: ['EXISTS', 'NOT EXISTS'],
-            suggestColumns: {
-              source: 'where',
-              tables: [
-                { identifierChain: [{ name: 'table1' }], alias: 't1' },
-                { identifierChain: [{ name: 'table2' }], alias: 't2' }
-              ]
-            },
-            suggestFilters: {
-              tables: [
-                { identifierChain: [{ name: 'table1' }], alias: 't1' },
-                { identifierChain: [{ name: 'table2' }], alias: 't2' }
-              ]
-            },
-            suggestIdentifiers: [{ name: 't1.', type: 'alias' }, { name: 't2.', type: 'alias' }]
+    it('should suggest keywords for "SELECT t1.* FROM table1 t1 |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT t1.* FROM table1 t1 ',
+        afterCursor: '',
+        containsKeywords: ['LEFT ANTI JOIN', 'RIGHT ANTI JOIN'], // Tested in full above
+        expectedResult: {
+          lowerCase: false,
+          suggestJoins: {
+            prependJoin: true,
+            tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }]
+          },
+          suggestFilters: {
+            prefix: 'WHERE',
+            tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }]
+          },
+          suggestGroupBys: {
+            prefix: 'GROUP BY',
+            tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }]
+          },
+          suggestOrderBys: {
+            prefix: 'ORDER BY',
+            tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }]
           }
-        });
+        }
       });
+    });
 
-      it('should suggest keywords for "SELECT t1.* FROM table1 t1 |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT t1.* FROM table1 t1 ',
-          afterCursor: '',
-          dialect: 'impala',
-          containsKeywords: ['LEFT ANTI JOIN', 'RIGHT ANTI JOIN'], // Tested in full above
-          expectedResult: {
-            lowerCase: false,
-            suggestJoins: {
-              prependJoin: true,
-              tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }]
-            },
-            suggestFilters: {
-              prefix: 'WHERE',
-              tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }]
-            },
-            suggestGroupBys: {
-              prefix: 'GROUP BY',
-              tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }]
-            },
-            suggestOrderBys: {
-              prefix: 'ORDER BY',
-              tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }]
-            }
+    it('should suggest keywords for "SELECT * FROM testTable1 INNER |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM testTable1 INNER ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['JOIN']
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT * FROM testTable1 FULL |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM testTable1 FULL ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['JOIN', 'OUTER JOIN']
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT * FROM testTable1 LEFT |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM testTable1 LEFT ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['ANTI JOIN', 'INNER JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT * FROM testTable1 RIGHT |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM testTable1 LEFT ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['ANTI JOIN', 'INNER JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']
+        }
+      });
+    });
+
+    it('should suggest tables for "SELECT * FROM testTable1 JOIN |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM testTable1 JOIN ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestTables: {},
+          suggestDatabases: { appendDot: true },
+          suggestJoins: {
+            prependJoin: false,
+            joinType: 'JOIN',
+            tables: [{ identifierChain: [{ name: 'testTable1' }] }]
+          },
+          suggestKeywords: ['[BROADCAST]', '[SHUFFLE]']
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT t1.* FROM table1 t1 JOIN table2 t2 | JOIN table3"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT t1.* FROM table1 t1 JOIN table2 t2 ',
+        afterCursor: ' JOIN table3',
+        containsKeywords: [
+          'FULL',
+          'FULL OUTER',
+          'INNER',
+          'LEFT',
+          'LEFT OUTER',
+          'ON',
+          'RIGHT',
+          'RIGHT OUTER',
+          'USING'
+        ],
+        expectedResult: {
+          lowerCase: false,
+          suggestJoinConditions: {
+            prependOn: true,
+            tables: [
+              { identifierChain: [{ name: 'table1' }], alias: 't1' },
+              { identifierChain: [{ name: 'table2' }], alias: 't2' }
+            ]
           }
-        });
+        }
       });
+    });
 
-      it('should suggest keywords for "SELECT * FROM testTable1 INNER |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM testTable1 INNER ',
-          afterCursor: '',
-          dialect: 'impala',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['JOIN']
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM testTable1 FULL |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM testTable1 FULL ',
-          afterCursor: '',
-          dialect: 'impala',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['JOIN', 'OUTER JOIN']
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM testTable1 LEFT |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM testTable1 LEFT ',
-          afterCursor: '',
-          dialect: 'impala',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['ANTI JOIN', 'INNER JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT * FROM testTable1 RIGHT |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM testTable1 LEFT ',
-          afterCursor: '',
-          dialect: 'impala',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['ANTI JOIN', 'INNER JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']
-          }
-        });
-      });
-
-      it('should suggest tables for "SELECT * FROM testTable1 JOIN |"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM testTable1 JOIN ',
-          afterCursor: '',
-          dialect: 'impala',
-          expectedResult: {
-            lowerCase: false,
-            suggestTables: {},
-            suggestDatabases: { appendDot: true },
-            suggestJoins: {
-              prependJoin: false,
-              joinType: 'JOIN',
-              tables: [{ identifierChain: [{ name: 'testTable1' }] }]
-            },
-            suggestKeywords: ['[BROADCAST]', '[SHUFFLE]']
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT t1.* FROM table1 t1 JOIN table2 t2 | JOIN table3"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT t1.* FROM table1 t1 JOIN table2 t2 ',
-          afterCursor: ' JOIN table3',
-          dialect: 'impala',
-          containsKeywords: [
+    it('should suggest keywords for "SELECT t1.* FROM table1 t1 | JOIN"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT t1.* FROM table1 t1 ',
+        afterCursor: ' JOIN',
+        expectedResult: {
+          lowerCase: false,
+          suggestJoins: {
+            prependJoin: true,
+            tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }]
+          },
+          suggestKeywords: [
+            'TABLESAMPLE',
+            'ANTI',
+            'CROSS',
             'FULL',
             'FULL OUTER',
             'INNER',
             'LEFT',
+            'LEFT ANTI',
+            'LEFT INNER',
             'LEFT OUTER',
-            'ON',
+            'LEFT SEMI',
+            'OUTER',
             'RIGHT',
+            'RIGHT ANTI',
+            'RIGHT INNER',
             'RIGHT OUTER',
-            'USING'
-          ],
-          expectedResult: {
-            lowerCase: false,
-            suggestJoinConditions: {
-              prependOn: true,
-              tables: [
-                { identifierChain: [{ name: 'table1' }], alias: 't1' },
-                { identifierChain: [{ name: 'table2' }], alias: 't2' }
-              ]
-            }
-          }
-        });
+            'RIGHT SEMI',
+            'SEMI'
+          ]
+        }
       });
+    });
 
-      it('should suggest keywords for "SELECT t1.* FROM table1 t1 | JOIN"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT t1.* FROM table1 t1 ',
-          afterCursor: ' JOIN',
-          dialect: 'impala',
-          expectedResult: {
-            lowerCase: false,
-            suggestJoins: {
-              prependJoin: true,
-              tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }]
-            },
-            suggestKeywords: [
-              'TABLESAMPLE',
-              'ANTI',
-              'CROSS',
-              'FULL',
-              'FULL OUTER',
-              'INNER',
-              'LEFT',
-              'LEFT ANTI',
-              'LEFT INNER',
-              'LEFT OUTER',
-              'LEFT SEMI',
-              'OUTER',
-              'RIGHT',
-              'RIGHT ANTI',
-              'RIGHT INNER',
-              'RIGHT OUTER',
-              'RIGHT SEMI',
-              'SEMI'
+    it('should suggest keywords for "SELECT t1.* FROM table1 t1 FULL | JOIN"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT t1.* FROM table1 t1 FULL ',
+        afterCursor: ' JOIN',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['OUTER']
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT t1.* FROM table1 t1 LEFT | JOIN"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT t1.* FROM table1 t1 LEFT ',
+        afterCursor: ' JOIN',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['ANTI', 'INNER', 'OUTER', 'SEMI']
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT t1.* FROM table1 t1 RIGHT | JOIN"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT t1.* FROM table1 t1 RIGHT ',
+        afterCursor: ' JOIN',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['ANTI', 'INNER', 'OUTER', 'SEMI']
+        }
+      });
+    });
+
+    it('should suggest tables for "SELECT t1.* FROM table1 t1 LEFT OUTER JOIN table2 INNER JOIN table3 JOIN table4 t4 ON (| AND t1.c1 = t2.c2"', () => {
+      assertAutoComplete({
+        beforeCursor:
+          'SELECT t1.* FROM table1 t1 LEFT OUTER JOIN table2 INNER JOIN table3 JOIN table4 t4 ON (',
+        afterCursor: ' AND t1.c1 = t2.c2',
+        containsKeywords: ['CASE'],
+        expectedResult: {
+          lowerCase: false,
+          suggestFunctions: {},
+          suggestColumns: {
+            tables: [
+              { identifierChain: [{ name: 'table1' }], alias: 't1' },
+              { identifierChain: [{ name: 'table2' }] },
+              { identifierChain: [{ name: 'table3' }] },
+              { identifierChain: [{ name: 'table4' }], alias: 't4' }
             ]
-          }
-        });
+          },
+          suggestIdentifiers: [
+            { name: 't1.', type: 'alias' },
+            { name: 'table2.', type: 'table' },
+            { name: 'table3.', type: 'table' },
+            { name: 't4.', type: 'alias' }
+          ]
+        }
       });
+    });
 
-      it('should suggest keywords for "SELECT t1.* FROM table1 t1 FULL | JOIN"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT t1.* FROM table1 t1 FULL ',
-          afterCursor: ' JOIN',
-          dialect: 'impala',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['OUTER']
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT t1.* FROM table1 t1 LEFT | JOIN"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT t1.* FROM table1 t1 LEFT ',
-          afterCursor: ' JOIN',
-          dialect: 'impala',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['ANTI', 'INNER', 'OUTER', 'SEMI']
-          }
-        });
-      });
-
-      it('should suggest keywords for "SELECT t1.* FROM table1 t1 RIGHT | JOIN"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT t1.* FROM table1 t1 RIGHT ',
-          afterCursor: ' JOIN',
-          dialect: 'impala',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['ANTI', 'INNER', 'OUTER', 'SEMI']
-          }
-        });
-      });
-
-      it('should suggest tables for "SELECT t1.* FROM table1 t1 LEFT OUTER JOIN table2 INNER JOIN table3 JOIN table4 t4 ON (| AND t1.c1 = t2.c2"', () => {
-        assertAutoComplete({
-          beforeCursor:
-            'SELECT t1.* FROM table1 t1 LEFT OUTER JOIN table2 INNER JOIN table3 JOIN table4 t4 ON (',
-          afterCursor: ' AND t1.c1 = t2.c2',
-          dialect: 'impala',
-          containsKeywords: ['CASE'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: {},
-            suggestColumns: {
-              tables: [
-                { identifierChain: [{ name: 'table1' }], alias: 't1' },
-                { identifierChain: [{ name: 'table2' }] },
-                { identifierChain: [{ name: 'table3' }] },
-                { identifierChain: [{ name: 'table4' }], alias: 't4' }
-              ]
-            },
-            suggestIdentifiers: [
-              { name: 't1.', type: 'alias' },
-              { name: 'table2.', type: 'table' },
-              { name: 'table3.', type: 'table' },
-              { name: 't4.', type: 'alias' }
+    it('should suggest tables for "SELECT t1.* FROM table1 t1 LEFT INNER JOIN table2 CROSS JOIN table3 SEMI JOIN table4 t4 ON (| AND t1.c1 = t2.c2"', () => {
+      assertAutoComplete({
+        beforeCursor:
+          'SELECT t1.* FROM table1 t1 LEFT INNER JOIN table2 CROSS JOIN table3 SEMI JOIN table4 t4 ON (',
+        afterCursor: ' AND t1.c1 = t2.c2',
+        containsKeywords: ['CASE'],
+        expectedResult: {
+          lowerCase: false,
+          suggestFunctions: {},
+          suggestColumns: {
+            tables: [
+              { identifierChain: [{ name: 'table1' }], alias: 't1' },
+              { identifierChain: [{ name: 'table2' }] },
+              { identifierChain: [{ name: 'table3' }] },
+              { identifierChain: [{ name: 'table4' }], alias: 't4' }
             ]
-          }
-        });
+          },
+          suggestIdentifiers: [
+            { name: 't1.', type: 'alias' },
+            { name: 'table2.', type: 'table' },
+            { name: 'table3.', type: 'table' },
+            { name: 't4.', type: 'alias' }
+          ]
+        }
       });
+    });
 
-      it('should suggest tables for "SELECT t1.* FROM table1 t1 LEFT INNER JOIN table2 CROSS JOIN table3 SEMI JOIN table4 t4 ON (| AND t1.c1 = t2.c2"', () => {
-        assertAutoComplete({
-          beforeCursor:
-            'SELECT t1.* FROM table1 t1 LEFT INNER JOIN table2 CROSS JOIN table3 SEMI JOIN table4 t4 ON (',
-          afterCursor: ' AND t1.c1 = t2.c2',
-          dialect: 'impala',
-          containsKeywords: ['CASE'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: {},
-            suggestColumns: {
-              tables: [
-                { identifierChain: [{ name: 'table1' }], alias: 't1' },
-                { identifierChain: [{ name: 'table2' }] },
-                { identifierChain: [{ name: 'table3' }] },
-                { identifierChain: [{ name: 'table4' }], alias: 't4' }
-              ]
-            },
-            suggestIdentifiers: [
-              { name: 't1.', type: 'alias' },
-              { name: 'table2.', type: 'table' },
-              { name: 'table3.', type: 'table' },
-              { name: 't4.', type: 'alias' }
-            ]
-          }
-        });
-      });
-
-      it('should suggest tables for "SELECT t1.* FROM table1 t1 LEFT OUTER JOIN tab| INNER JOIN table3 JOIN table4 t4 ON (t1.c1 = t2.c2"', () => {
-        assertAutoComplete({
-          beforeCursor: 'SELECT t1.* FROM table1 t1 LEFT OUTER JOIN tab',
-          afterCursor: ' INNER JOIN table3 JOIN table4 t4 ON (t1.c1 = t2.c2',
-          dialect: 'impala',
-          expectedResult: {
-            lowerCase: false,
-            suggestJoins: {
-              prependJoin: false,
-              joinType: 'LEFT OUTER JOIN',
-              tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }]
-            },
-            suggestTables: {},
-            suggestDatabases: { appendDot: true },
-            suggestKeywords: ['[BROADCAST]', '[SHUFFLE]']
-          }
-        });
+    it('should suggest tables for "SELECT t1.* FROM table1 t1 LEFT OUTER JOIN tab| INNER JOIN table3 JOIN table4 t4 ON (t1.c1 = t2.c2"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT t1.* FROM table1 t1 LEFT OUTER JOIN tab',
+        afterCursor: ' INNER JOIN table3 JOIN table4 t4 ON (t1.c1 = t2.c2',
+        expectedResult: {
+          lowerCase: false,
+          suggestJoins: {
+            prependJoin: false,
+            joinType: 'LEFT OUTER JOIN',
+            tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }]
+          },
+          suggestTables: {},
+          suggestDatabases: { appendDot: true },
+          suggestKeywords: ['[BROADCAST]', '[SHUFFLE]']
+        }
       });
     });
   });
 
   describe('SubQueries in WHERE Clause', () => {
-    it('should suggest keywords for "SELECT * FROM foo WHERE bar |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT * FROM foo WHERE bar ',
-        afterCursor: '',
-        dialect: 'generic',
-        containsKeywords: ['IN', 'NOT IN'],
-        containsColRefKeywords: true,
-        expectedResult: {
-          lowerCase: false,
-          colRef: { identifierChain: [{ name: 'foo' }, { name: 'bar' }] },
-          suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
-          suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'foo' }] }] }
-        }
-      });
-    });
-
     it('should suggest keywords for "SELECT * FROM foo WHERE bar NOT |"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT * FROM foo WHERE bar NOT ',
@@ -9845,41 +7019,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
       });
     });
 
-    it('should suggest identifiers for "SELECT cos(| FROM (SELECT b FROM foo) boo, (SELECT a FROM bla) bar"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT cos(',
-        afterCursor: ' FROM (SELECT b FROM foo) boo, (SELECT a FROM bla) bar',
-        dialect: 'generic',
-        containsKeywords: ['CASE'],
-        expectedResult: {
-          suggestColumns: {
-            source: 'select',
-            types: ['T'],
-            tables: [
-              { identifierChain: [{ subQuery: 'boo' }] },
-              { identifierChain: [{ subQuery: 'bar' }] }
-            ]
-          },
-          suggestIdentifiers: [
-            { name: 'boo.', type: 'sub-query' },
-            { name: 'bar.', type: 'sub-query' }
-          ],
-          suggestFunctions: { types: ['T'] },
-          subQueries: [
-            {
-              alias: 'boo',
-              columns: [{ identifierChain: [{ name: 'foo' }, { name: 'b' }], type: 'COLREF' }]
-            },
-            {
-              alias: 'bar',
-              columns: [{ identifierChain: [{ name: 'bla' }, { name: 'a' }], type: 'COLREF' }]
-            }
-          ],
-          lowerCase: false
-        }
-      });
-    });
-
     it('should suggest tables for "SELECT * FROM (SELECT |)"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT * FROM (SELECT ',
@@ -9899,59 +7038,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
             prependFrom: true,
             appendDot: true
           }
-        }
-      });
-    });
-
-    it('should suggest identifiers for "SELECT | FROM (SELECT * FROM tableOne) AS subQueryOne, someDb.tableTwo tAlias, tableThree, (SELECT * FROM t3 JOIN table4 t4 ON t3.id = t4.id) subQueryTwo;"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT ',
-        afterCursor:
-          ' FROM (SELECT * FROM tableOne) AS subQueryOne, someDb.tableTwo tAlias, tableThree, (SELECT * FROM t3 JOIN table4 t4 ON t3.id = t4.id) subQueryTwo;',
-        containsKeywords: ['*', 'ALL', 'DISTINCT'],
-        dialect: 'hive',
-        expectedResult: {
-          suggestAggregateFunctions: {
-            tables: [
-              { identifierChain: [{ name: 'someDb' }, { name: 'tableTwo' }], alias: 'tAlias' },
-              { identifierChain: [{ name: 'tableThree' }] }
-            ]
-          },
-          suggestAnalyticFunctions: true,
-          suggestFunctions: {},
-          suggestColumns: {
-            source: 'select',
-            tables: [
-              { identifierChain: [{ subQuery: 'subQueryOne' }] },
-              { identifierChain: [{ name: 'someDb' }, { name: 'tableTwo' }], alias: 'tAlias' },
-              { identifierChain: [{ name: 'tableThree' }] },
-              { identifierChain: [{ subQuery: 'subQueryTwo' }] }
-            ]
-          },
-          subQueries: [
-            {
-              columns: [{ tables: [{ identifierChain: [{ name: 'tableOne' }] }] }],
-              alias: 'subQueryOne'
-            },
-            {
-              columns: [
-                {
-                  tables: [
-                    { identifierChain: [{ name: 't3' }] },
-                    { alias: 't4', identifierChain: [{ name: 'table4' }] }
-                  ]
-                }
-              ],
-              alias: 'subQueryTwo'
-            }
-          ],
-          suggestIdentifiers: [
-            { name: 'subQueryOne.', type: 'sub-query' },
-            { name: 'tAlias.', type: 'alias' },
-            { name: 'tableThree.', type: 'table' },
-            { name: 'subQueryTwo.', type: 'sub-query' }
-          ],
-          lowerCase: false
         }
       });
     });
@@ -10095,72 +7181,6 @@ describe('sqlAutocompleteParser.js SELECT statements', () => {
             {
               alias: 'subQueryOne',
               columns: [{ tables: [{ identifierChain: [{ name: 'tableOne' }] }] }]
-            }
-          ]
-        }
-      });
-    });
-
-    it('should suggest columns for "SELECT s2.| FROM (SELECT a, bla FROM (SELECT a, b, abs(1) as bla FROM testTable) s1) s2;"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT s2.',
-        afterCursor:
-          ' FROM (SELECT a, bla FROM (SELECT a, b, abs(1) as bla FROM testTable) s1) s2;',
-        dialect: 'generic',
-        expectedResult: {
-          suggestColumns: { source: 'select', tables: [{ identifierChain: [{ subQuery: 's2' }] }] },
-          suggestKeywords: ['*'],
-          subQueries: [
-            {
-              alias: 's2',
-              columns: [
-                { identifierChain: [{ subQuery: 's1' }, { name: 'a' }], type: 'COLREF' },
-                { identifierChain: [{ subQuery: 's1' }, { name: 'bla' }], type: 'COLREF' }
-              ],
-              subQueries: [
-                {
-                  alias: 's1',
-                  columns: [
-                    { identifierChain: [{ name: 'testTable' }, { name: 'a' }], type: 'COLREF' },
-                    { identifierChain: [{ name: 'testTable' }, { name: 'b' }], type: 'COLREF' },
-                    { alias: 'bla', type: 'T' }
-                  ]
-                }
-              ]
-            }
-          ],
-          lowerCase: false
-        }
-      });
-    });
-
-    it('should suggest columns for "SELECT s2.| FROM (SELECT a, bla FROM (SELECT a, b, abs(1) as bla FROM testTable) s1) s2;"', () => {
-      assertAutoComplete({
-        beforeCursor: 'SELECT s2.',
-        afterCursor:
-          ' FROM (SELECT a, bla FROM (SELECT a, b, abs(1) as bla FROM testTable) s1) s2;',
-        dialect: 'hive',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['*'],
-          suggestColumns: { source: 'select', tables: [{ identifierChain: [{ subQuery: 's2' }] }] },
-          subQueries: [
-            {
-              alias: 's2',
-              columns: [
-                { identifierChain: [{ subQuery: 's1' }, { name: 'a' }], type: 'COLREF' },
-                { identifierChain: [{ subQuery: 's1' }, { name: 'bla' }], type: 'COLREF' }
-              ],
-              subQueries: [
-                {
-                  alias: 's1',
-                  columns: [
-                    { identifierChain: [{ name: 'testTable' }, { name: 'a' }], type: 'COLREF' },
-                    { identifierChain: [{ name: 'testTable' }, { name: 'b' }], type: 'COLREF' },
-                    { alias: 'bla', type: 'DOUBLE' }
-                  ]
-                }
-              ]
             }
           ]
         }

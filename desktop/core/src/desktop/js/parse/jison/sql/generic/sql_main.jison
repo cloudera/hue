@@ -658,7 +658,7 @@ DerivedColumnChain_EDIT
  ;
 
 ColumnIdentifier
- : RegularOrBacktickedIdentifier                                                                               -> { identifier: { name: $1 }, location: @1 };
+ : RegularOrBacktickedIdentifier                                                                               -> { identifier: { name: $1 }, location: @1 }
  ;
 
 PartialBacktickedIdentifierOrPartialCursor
@@ -883,7 +883,7 @@ CommonTableExpression_EDIT
 
 WithQueries
  : WithQuery                   -> [$1]
- | WithQueries ',' WithQuery   -> $1.concat([$3]);
+ | WithQueries ',' WithQuery   -> $1.concat([$3])
  ;
 
 WithQueries_EDIT
