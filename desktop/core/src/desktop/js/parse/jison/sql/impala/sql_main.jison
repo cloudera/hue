@@ -68,9 +68,9 @@ SqlStatement
  : DataDefinition
  | DataManipulation
  | QuerySpecification
- | 'EXPLAIN' DataDefinition
- | 'EXPLAIN' DataManipulation
- | 'EXPLAIN' QuerySpecification
+ | ExplainClause DataDefinition
+ | ExplainClause DataManipulation
+ | ExplainClause QuerySpecification
  ;
 
 SqlStatement_EDIT
@@ -82,29 +82,17 @@ SqlStatement_EDIT
    {
      parser.suggestKeywords(['INSERT', 'SELECT']);
    }
- | 'EXPLAIN' 'CURSOR'
-   {
-     parser.suggestDdlAndDmlKeywords();
-   }
+ | ExplainClause_EDIT
  | DataDefinition_EDIT
  | DataManipulation_EDIT
  | QuerySpecification_EDIT
  | SetSpecification_EDIT
- | 'EXPLAIN' DataDefinition_EDIT
- | 'EXPLAIN' DataManipulation_EDIT
- | 'EXPLAIN' QuerySpecification_EDIT
- | 'EXPLAIN' 'CURSOR' DataDefinition
-   {
-     parser.suggestDdlAndDmlKeywords();
-   }
- | 'EXPLAIN' 'CURSOR'  DataManipulation
-   {
-     parser.suggestDdlAndDmlKeywords();
-   }
- | 'EXPLAIN' 'CURSOR'  QuerySpecification
-   {
-     parser.suggestDdlAndDmlKeywords();
-   }
+ | ExplainClause DataDefinition_EDIT
+ | ExplainClause DataManipulation_EDIT
+ | ExplainClause QuerySpecification_EDIT
+ | ExplainClause_EDIT DataDefinition
+ | ExplainClause_EDIT DataManipulation
+ | ExplainClause_EDIT QuerySpecification
  ;
 
 NonReservedKeyword
@@ -122,6 +110,17 @@ RegularIdentifier
  : 'REGULAR_IDENTIFIER'
  | 'VARIABLE_REFERENCE'
  | NonReservedKeyword
+ ;
+
+ExplainClause
+ : 'EXPLAIN'
+ ;
+
+ExplainClause_EDIT
+ : 'EXPLAIN' 'CURSOR'
+   {
+     parser.suggestDdlAndDmlKeywords();
+   }
  ;
 
 // This is a work-around for error handling when a statement starts with some token that the parser can understand but
@@ -211,7 +210,6 @@ NonStartingToken
  | 'CURRENT_SCHEMA'
  | 'CURRENT_TIME'
  | 'CURRENT_TRANSFORM_GROUP_FOR_TYPE'
- | 'CURSOR'
  | 'CYCLE'
  | 'DATA'
  | 'DATABASE'
@@ -315,6 +313,7 @@ NonStartingToken
  | 'KUDU'
  | 'LARGE'
  | 'LAST'
+ | 'LATERAL'
  | 'LEADING'
  | 'LEFT'
  | 'LIKE'
@@ -387,6 +386,7 @@ NonStartingToken
  | 'PROCEDURE'
  | 'PTF'
  | 'PURGE'
+ | 'RANGE'
  | 'RCFILE'
  | 'READS'
  | 'REAL'
@@ -543,14 +543,14 @@ DatabaseOrSchema
  | 'SCHEMA'
  ;
 
-DatabasesOrSchemas
- : 'DATABASES'
- | 'SCHEMAS'
- ;
-
 FromOrIn
  : 'FROM'
  | 'IN'
+ ;
+
+DatabasesOrSchemas
+ : 'DATABASES'
+ | 'SCHEMAS'
  ;
 
 RoleOrUser
@@ -589,6 +589,11 @@ QuotedValue_EDIT
 OptionalAggregateOrAnalytic
  :
  | AggregateOrAnalytic
+ ;
+
+OptionalExternal
+ :
+ | 'EXTERNAL'
  ;
 
 OptionalExtendedOrFormatted
@@ -818,19 +823,20 @@ SchemaQualifiedTableIdentifier_EDIT
    }
  | RegularOrBacktickedIdentifier '.' PartialBacktickedOrPartialCursor
    {
+     // You can have statements like 'SELECT ... FROM testTable t, t.|'
      parser.suggestTablesOrColumns($1);
    }
  | RegularOrBacktickedIdentifier '.' RegularOrBacktickedIdentifier FieldsList_EDIT
    {
      // TODO: switch to suggestColumns, it's currently handled in sqlAutocompleter2.js
      // Issue is that suggestColumns is deleted if no tables are defined and this is
-     // Only cases like "SELECT | FROM db.table.col"
+     // only cases like "SELECT | FROM db.table.col"
      parser.suggestTables({ identifierChain: [{ name: $1 }, { name: $3 }].concat($4) });
    }
  ;
 
 FieldsList
- : Field                              -> [$1]
+ : Field               -> [$1]
  | FieldsList Field
    {
      $1.push($2);
@@ -838,10 +844,10 @@ FieldsList
  ;
 
 FieldsList_EDIT
- : Field_EDIT                         -> []
- | FieldsList Field_EDIT              -> $1
- | FieldsList Field_EDIT FieldsList   -> $1
- | Field_EDIT FieldsList              -> []
+ : Field_EDIT                            -> []
+ | FieldsList Field_EDIT               -> $1
+ | FieldsList Field_EDIT FieldsList  -> $1
+ | Field_EDIT FieldsList               -> []
  ;
 
 Field
@@ -853,7 +859,7 @@ Field_EDIT
  ;
 
 SchemaQualifiedIdentifier
- : RegularOrBacktickedIdentifier                                    -> [{ name: $1 }]
+ : RegularOrBacktickedIdentifier                                       -> [{ name: $1 }]
  | RegularOrBacktickedIdentifier '.' RegularOrBacktickedIdentifier  -> [{ name: $1 }, { name: $2 }]
  ;
 
@@ -1151,14 +1157,14 @@ DerivedColumnChain_EDIT
  ;
 
 ColumnIdentifier
- : RegularOrBacktickedIdentifier                          -> { identifier: { name: $1 }, location: @1 };
+ : RegularOrBacktickedIdentifier                                                                               -> { identifier: { name: $1 }, location: @1 }
  | RegularOrBacktickedIdentifier '[' ValueExpression ']'  -> { identifier: { name: $1, keySet: true }, location: @1 }
  | RegularOrBacktickedIdentifier '[' ']'                  -> { identifier: { name: $1, keySet: true }, location: @1 }
  ;
 
 ColumnIdentifier_EDIT
  : RegularOrBacktickedIdentifier '[' AnyCursor RightSquareBracketOrError             -> { identifier: { name: $1 }, insideKey: true }
- | RegularOrBacktickedIdentifier '[' ValueExpression_EDIT RightSquareBracketOrError  -> { identifier: { name: $1 }};
+ | RegularOrBacktickedIdentifier '[' ValueExpression_EDIT RightSquareBracketOrError  -> { identifier: { name: $1 }}
  ;
 
 PartialBacktickedIdentifierOrPartialCursor
@@ -1449,7 +1455,7 @@ CommonTableExpression_EDIT
 
 WithQueries
  : WithQuery                   -> [$1]
- | WithQueries ',' WithQuery   -> $1.concat([$3]);
+ | WithQueries ',' WithQuery   -> $1.concat([$3])
  ;
 
 WithQueries_EDIT
@@ -1531,9 +1537,9 @@ TableExpression_EDIT
          keywords = keywords.concat(parser.createWeightedKeywords($1.tableReferenceList.suggestKeywords, 3));
        }
 
-       // Lower the weights for 'TABLESAMPLE'
+       // Lower the weights for 'TABLESAMPLE' and 'LATERAL VIEW'
        keywords.forEach(function (keyword) {
-         if (keyword.value === 'TABLESAMPLE') {
+         if (keyword.value === 'TABLESAMPLE' || keyword.value === 'LATERAL VIEW') {
            keyword.weight = 1.1;
          }
        });
@@ -1588,7 +1594,7 @@ TableExpression_EDIT
        { value: 'RIGHT ANTI JOIN', weight: 1 },
        { value: 'RIGHT INNER JOIN', weight: 1 },
        { value: 'RIGHT JOIN', weight: 1 },
-       { value: 'RIGHT OUTER JOIN', weight: 1 }
+       { value: 'RIGHT OUTER JOIN', weight: 1 },
        { value: 'RIGHT SEMI JOIN', weight: 1 },
        { value: 'SEMI JOIN', weight: 1 }
      ]);
@@ -1655,8 +1661,13 @@ OptionalSelectConditions
    {
      var keywords = parser.getKeywordsForOptionalsLR(
        [$1, $2, $3, $4, $5, $6],
-       [{ value: 'WHERE', weight: 7 }, { value: 'GROUP BY', weight: 6 }, { value: 'HAVING', weight: 5 }, { value: 'ORDER BY', weight: 4 }, { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }],
-       [true, true, true, true, true, true);
+       [{ value: 'WHERE', weight: 9 },
+        { value: 'GROUP BY', weight: 8 },
+        { value: 'HAVING', weight: 7 },
+        { value: 'ORDER BY', weight: 5 },
+        { value: 'LIMIT', weight: 3 },
+        { value: 'OFFSET', weight: 2 }],
+       [true, true, true, true, true, true]);
 
      if (keywords.length > 0) {
        $$ = { suggestKeywords: keywords, empty: !$1 && !$2 && !$3 && !$4 && !$5 && !$6 };
@@ -1674,7 +1685,7 @@ OptionalSelectConditions
      if (!$2 && !$3 && !$4 && !$5 && !$6) {
        $$.suggestGroupBys = { prefix: 'GROUP BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() };
      }
-     if (!$5 && !$6) {
+     if (!$4 && !$5 && !$6) {
        $$.suggestOrderBys = { prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() };
      }
    }
@@ -1709,13 +1720,13 @@ OptionalSelectConditions_EDIT
    {
      var keywords = parser.getKeywordsForOptionalsLR(
        [$3, $4, $5, $6, $7],
-       [{ value: 'GROUP BY', weight: 6 }, { value: 'HAVING', weight: 5 }, { value: 'ORDER BY', weight: 4 }, { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }],
+       [{ value: 'GROUP BY', weight: 6 }, { value: 'HAVING', weight: 5 }, { value: 'ORDER BY', weight: 4 },  { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }],
        [true, true, true, true, true]);
      if ($1.suggestKeywords) {
        keywords = keywords.concat(parser.createWeightedKeywords($1.suggestKeywords, 1));
      }
      $$ = parser.getValueExpressionKeywords($1, keywords);
-     $$.cursorAtEnd = !$3 && !$4 && !$5 && !$6 && !$7
+     $$.cursorAtEnd = !$3 && !$4 && !$5 && !$6 && !$7;
      if ($1.columnReference) {
        $$.columnReference = $1.columnReference;
      }
@@ -1736,7 +1747,7 @@ OptionalSelectConditions_EDIT
        [{ value: 'HAVING', weight: 5 }, { value: 'ORDER BY', weight: 4 }, { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }],
        [true, true, true, true]);
      if ($2.suggestKeywords) {
-       keywords = keywords.concat(parser.createWeightedKeywords($2.suggestKeywords, 8));
+       keywords = keywords.concat(parser.createWeightedKeywords($2.suggestKeywords, 6));
      }
      if ($2.valueExpression) {
        $$ = parser.getValueExpressionKeywords($2.valueExpression, keywords);
@@ -1776,7 +1787,7 @@ OptionalSelectConditions_EDIT
      }
      $$ = { suggestKeywords: keywords, cursorAtEnd: !$6 && !$7 };
      $$.whereClauseLocation = $1 ? @1 : undefined;
-     $$.limitClausePreceding = @4;
+     $$.limitClausePreceding = parser.firstDefined($4, @4);
      $$.limitClauseLocation = $6 ? @6 : undefined;
    }
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalOrderByClause LimitClause 'CURSOR' OptionalOffsetClause
@@ -1785,7 +1796,7 @@ OptionalSelectConditions_EDIT
      $$ = { suggestKeywords: keywords, cursorAtEnd: !$7 };
      $$.whereClauseLocation = $1 ? @1 : undefined;
      $$.limitClausePreceding = parser.firstDefined($4, @4, $3, @3, $2, @2, $1, @1);
-     $$.limitClauseLocation = $5 ? @5 : undefined;
+     $$.limitClauseLocation = @5;
    }
  ;
 
@@ -1820,7 +1831,10 @@ OptionalGroupByClause
  ;
 
 GroupByClause
- : 'GROUP' 'BY' GroupByColumnList  -> { valueExpression: $3 }
+ : 'GROUP' 'BY' GroupByColumnList
+   {
+     $$ = { valueExpression: $3 };
+   }
  ;
 
 GroupByClause_EDIT
@@ -1948,7 +1962,7 @@ OrderByIdentifier_EDIT
    {
      parser.suggestSelectListAliases();
    }
- | ValueExpression OptionalAscOrDesc OptionalNullsFirstOrLast_EDIT
+ | ValueExpression OptionalAscOrDesc NullsFirstOrLast_EDIT
  | AnyCursor OptionalAscOrDesc OptionalNullsFirstOrLast
    {
      $$ = { emptyOrderBy: true }
@@ -1976,10 +1990,40 @@ OptionalNullsFirstOrLast
  | 'NULLS' 'LAST'
  ;
 
-OptionalNullsFirstOrLast_EDIT
+NullsFirstOrLast_EDIT
  : 'NULLS' 'CURSOR'
    {
      parser.suggestKeywords(['FIRST', 'LAST']);
+   }
+ ;
+
+
+
+SortByList
+ : SortByIdentifier
+ | SortByList ',' SortByIdentifier  -> $3
+ ;
+
+SortByList_EDIT
+ : SortByIdentifier_EDIT
+ | SortByIdentifier_EDIT ',' SortByList
+ | SortByList ',' SortByIdentifier_EDIT
+ | SortByList ',' SortByIdentifier_EDIT ',' SortByList
+ ;
+
+SortByIdentifier
+ : ColumnIdentifier OptionalAscOrDesc
+   {
+     parser.addColumnLocation($1.location, [ $1.identifier ]);
+     $$ = $2;
+   }
+ ;
+
+SortByIdentifier_EDIT
+ : ColumnIdentifier_EDIT OptionalAscOrDesc
+ | AnyCursor OptionalAscOrDesc
+   {
+     parser.suggestColumns();
    }
  ;
 
@@ -1989,16 +2033,11 @@ OptionalLimitClause
  ;
 
 LimitClause
- : 'LIMIT' UnsignedNumericLiteral
- | 'LIMIT' UnsignedNumericLiteral ',' UnsignedNumericLiteral
- | 'LIMIT' 'VARIABLE_REFERENCE'
- | 'LIMIT' 'VARIABLE_REFERENCE' ',' 'VARIABLE_REFERENCE'
- | 'LIMIT' ValueExpression
+ : 'LIMIT' ValueExpression
  ;
 
 LimitClause_EDIT
  : 'LIMIT' 'CURSOR'
- | 'LIMIT' 'CURSOR'
    {
      parser.suggestFunctions({ types: ['BIGINT'] });
    }
@@ -2518,8 +2557,8 @@ Joins
  ;
 
 Joins_INVALID
- : JoinType OptionalBroadcastOrShuffle        -> { joinType: $1 }
- | JoinType OptionalBroadcastOrShuffle Joins  -> { joinType: $1 }
+ : JoinType OptionalBroadcastOrShuffle                                           -> { joinType: $1 }
+ | JoinType OptionalBroadcastOrShuffle Joins                                     -> { joinType: $1 }
  ;
 
 OptionalBroadcastOrShuffle
@@ -2583,7 +2622,7 @@ Joins_EDIT
 
 JoinType
  : 'JOIN'                         -> 'JOIN'
- | 'ANTI' 'JOIN'                  -> 'ANTI JOIN'
+ | 'ANTI' 'JOIN'          -> 'ANTI JOIN'
  | 'CROSS' 'JOIN'                 -> 'CROSS JOIN'
  | 'INNER' 'JOIN'                 -> 'INNER JOIN'
  | 'OUTER' 'JOIN'                 -> 'OUTER JOIN'
@@ -2591,41 +2630,41 @@ JoinType
  | 'FULL' 'JOIN'                  -> 'FULL JOIN'
  | 'FULL' 'OUTER' 'JOIN'          -> 'FULL OUTER JOIN'
  | 'LEFT' 'JOIN'                  -> 'LEFT JOIN'
- | 'LEFT' 'ANTI' 'JOIN'           -> 'LEFT ANTI JOIN'
+ | 'LEFT' 'ANTI' 'JOIN'   -> 'LEFT ANTI JOIN'
  | 'LEFT' 'INNER' 'JOIN'          -> 'LEFT INNER JOIN'
  | 'LEFT' 'OUTER' 'JOIN'          -> 'LEFT OUTER JOIN'
  | 'LEFT' 'SEMI' 'JOIN'           -> 'LEFT SEMI JOIN'
  | 'RIGHT' 'JOIN'                 -> 'RIGHT JOIN'
- | 'RIGHT' 'ANTI' 'JOIN'          -> 'RIGHT ANTI JOIN'
+ | 'RIGHT' 'ANTI' 'JOIN'  -> 'RIGHT ANTI JOIN'
  | 'RIGHT' 'INNER' 'JOIN'         -> 'RIGHT OUTER JOIN'
  | 'RIGHT' 'OUTER' 'JOIN'         -> 'RIGHT OUTER JOIN'
  | 'RIGHT' 'SEMI' 'JOIN'          -> 'RIGHT SEMI JOIN'
  ;
 
 JoinType_EDIT
- : 'ANTI' 'CURSOR'                -> { suggestKeywords: ['JOIN'] }
- | 'CROSS' 'CURSOR'               -> { suggestKeywords: ['JOIN'] }
- | 'INNER' 'CURSOR'               -> { suggestKeywords: ['JOIN'] }
- | 'OUTER' 'CURSOR'               -> { suggestKeywords: ['JOIN'] }
- | 'SEMI' 'CURSOR'                -> { suggestKeywords: ['JOIN'] }
- | 'FULL' 'OUTER' 'CURSOR'        -> { suggestKeywords: ['JOIN'] }
- | 'FULL' 'CURSOR' 'JOIN'         -> { suggestKeywords: ['OUTER'] }
- | 'LEFT' 'ANTI' 'CURSOR'         -> { suggestKeywords: ['JOIN'] }
- | 'LEFT' 'INNER' 'CURSOR'        -> { suggestKeywords: ['JOIN'] }
- | 'LEFT' 'OUTER' 'CURSOR'        -> { suggestKeywords: ['JOIN'] }
- | 'LEFT' 'SEMI' 'CURSOR'         -> { suggestKeywords: ['JOIN'] }
- | 'LEFT' 'CURSOR' 'JOIN'         -> { suggestKeywords: ['ANTI', 'INNER', 'OUTER', 'SEMI'] }
- | 'RIGHT' 'ANTI' 'CURSOR'        -> { suggestKeywords: ['JOIN'] }
- | 'RIGHT' 'INNER' 'CURSOR'       -> { suggestKeywords: ['JOIN'] }
- | 'RIGHT' 'OUTER' 'CURSOR'       -> { suggestKeywords: ['JOIN'] }
- | 'RIGHT' 'SEMI' 'CURSOR'        -> { suggestKeywords: ['JOIN'] }
- | 'RIGHT' 'CURSOR' 'JOIN'        -> { suggestKeywords: ['ANTI', 'INNER', 'OUTER', 'SEMI'] }
+ : 'ANTI' 'CURSOR'          -> { suggestKeywords: ['JOIN'] }
+ | 'CROSS' 'CURSOR'                 -> { suggestKeywords: ['JOIN'] }
+ | 'INNER' 'CURSOR'                 -> { suggestKeywords: ['JOIN'] }
+ | 'OUTER' 'CURSOR'                 -> { suggestKeywords: ['JOIN'] }
+ | 'SEMI' 'CURSOR'                  -> { suggestKeywords: ['JOIN'] }
+ | 'FULL' 'OUTER' 'CURSOR'          -> { suggestKeywords: ['JOIN'] }
+ | 'FULL' 'CURSOR' 'JOIN'           -> { suggestKeywords: ['OUTER'] }
+ | 'LEFT' 'ANTI' 'CURSOR'   -> { suggestKeywords: ['JOIN'] }
+ | 'LEFT' 'INNER' 'CURSOR'          -> { suggestKeywords: ['JOIN'] }
+ | 'LEFT' 'OUTER' 'CURSOR'          -> { suggestKeywords: ['JOIN'] }
+ | 'LEFT' 'SEMI' 'CURSOR'           -> { suggestKeywords: ['JOIN'] }
+ | 'LEFT' 'CURSOR' 'JOIN'           -> { suggestKeywords: ['ANTI', 'INNER', 'OUTER', 'SEMI'] }
+ | 'RIGHT' 'ANTI' 'CURSOR'          -> { suggestKeywords: ['JOIN'] }
+ | 'RIGHT' 'INNER' 'CURSOR'         -> { suggestKeywords: ['JOIN'] }
+ | 'RIGHT' 'OUTER' 'CURSOR'         -> { suggestKeywords: ['JOIN'] }
+ | 'RIGHT' 'SEMI' 'CURSOR'          -> { suggestKeywords: ['JOIN'] }
+ | 'RIGHT' 'CURSOR' 'JOIN'          -> { suggestKeywords: ['ANTI', 'INNER', 'OUTER', 'SEMI'] }
  ;
 
 OptionalJoinCondition
- :                                -> { noJoinCondition: true, suggestKeywords: ['ON', 'USING'] }
- | 'ON' ValueExpression           -> { valueExpression: $2 }
- | 'USING' '(' UsingColList ')'   -> {}
+ :                                       -> { noJoinCondition: true, suggestKeywords: ['ON', 'USING'] }
+ | 'ON' ValueExpression                  -> { valueExpression: $2 }
+ | 'USING' '(' UsingColList ')'          -> {}
  ;
 
 UsingColList
@@ -2650,7 +2689,7 @@ TablePrimary
      }
      if ($1.identifierChain) {
        if ($2) {
-         $1.alias = $2.alias
+         $1.alias = $2.alias;
          parser.addTableAliasLocation($2.location, $2.alias, $1.identifierChain);
        }
        parser.addTablePrimary($1);
@@ -2658,9 +2697,10 @@ TablePrimary
      var keywords = [];
      if ($3 && $3.suggestKeywords) {
        keywords = $3.suggestKeywords;
-     } else {
-       // Right-to-left for cursor after TablePrimary
-       keywords = parser.getKeywordsForOptionalsLR([$3, $2], [{ value: 'TABLESAMPLE', weight: 1 }, { value: 'AS', weight: 2 }], [true, true]);
+     } else if (!$2 && !$3) {
+       keywords = [{ value: 'AS', weight: 2 }, { value: 'TABLESAMPLE', weight: 3 }];
+     } else if (!$3) {
+       keywords = [{ value: 'TABLESAMPLE', weight: 3 }];
      }
      if (keywords.length > 0) {
        $$.suggestKeywords = keywords;
@@ -2697,7 +2737,7 @@ TablePrimary_EDIT
        parser.addTableAliasLocation($2.location, $2.alias, $1.identifierChain);
      }
    }
- | TableOrQueryName OptionalCorrelationName OptionalTableSample_EDIT
+ | TableOrQueryName OptionalCorrelationName TableSample_EDIT
    {
      if ($2) {
        $1.alias = $2.alias;
@@ -2733,11 +2773,11 @@ DerivedTable_EDIT
 
 OptionalTableSample
  :
- | 'TABLESAMPLE' 'SYSTEM' '(' 'UNSIGNED_INTEGER' ')'  -> { suggestKeywords: ['REPEATABLE()'] }
+ | 'TABLESAMPLE' 'SYSTEM' '(' 'UNSIGNED_INTEGER' ')'                                                  -> { suggestKeywords: ['REPEATABLE()'] }
  | 'TABLESAMPLE' 'SYSTEM' '(' 'UNSIGNED_INTEGER' ')' 'REPEATABLE' '(' 'UNSIGNED_INTEGER' ')'
  ;
 
-OptionalTableSample_EDIT
+TableSample_EDIT
  : 'TABLESAMPLE' 'CURSOR'
    {
      parser.suggestKeywords(['SYSTEM()']);
@@ -2867,8 +2907,8 @@ SimpleTable_EDIT
 
 OptionalCorrelationName
  :
- | RegularOrBacktickedIdentifier       -> { alias: $1, location: @1 }
- | QuotedValue                         -> { alias: $1, location: @1 }
+ | RegularOrBacktickedIdentifier        -> { alias: $1, location: @1 }
+ | QuotedValue                          -> { alias: $1, location: @1 }
  | 'AS' RegularOrBacktickedIdentifier  -> { alias: $2, location: @2 }
  | 'AS' QuotedValue                    -> { alias: $2, location: @2 }
  ;
@@ -3115,8 +3155,8 @@ OptionalWindowSpec
  ;
 
 WindowSpec
- : RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding OptionalAndFollowing
- | RowsOrRange 'UNBOUNDED' PopLexerState OptionalCurrentOrPreceding OptionalAndFollowing
+ : RowsOrRange 'BETWEEN' OptionalCurrentOrPreceding OptionalAndFollowing
+ | RowsOrRange 'UNBOUNDED' OptionalCurrentOrPreceding OptionalAndFollowing
  ;
 
 WindowSpec_EDIT
@@ -3124,18 +3164,18 @@ WindowSpec_EDIT
    {
      parser.suggestKeywords(['BETWEEN']);
    }
- | RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding OptionalAndFollowing 'CURSOR'
+ | RowsOrRange 'BETWEEN' OptionalCurrentOrPreceding OptionalAndFollowing 'CURSOR'
    {
-     if (!$4 && !$5) {
+     if (!$3 && !$4) {
        parser.suggestKeywords(['CURRENT ROW', 'UNBOUNDED PRECEDING']);
-     } else if (!$5) {
+     } else if (!$4) {
        parser.suggestKeywords(['AND']);
      }
    }
- | RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding_EDIT OptionalAndFollowing
- | RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding OptionalAndFollowing_EDIT
- | RowsOrRange 'UNBOUNDED' PopLexerState OptionalCurrentOrPreceding 'CURSOR'
- | RowsOrRange 'UNBOUNDED' PopLexerState OptionalCurrentOrPreceding_EDIT
+ | RowsOrRange 'BETWEEN' OptionalCurrentOrPreceding_EDIT OptionalAndFollowing
+ | RowsOrRange 'BETWEEN' OptionalCurrentOrPreceding OptionalAndFollowing_EDIT
+ | RowsOrRange 'UNBOUNDED' OptionalCurrentOrPreceding 'CURSOR'
+ | RowsOrRange 'UNBOUNDED' OptionalCurrentOrPreceding_EDIT
  ;
 
 PopLexerState
@@ -3201,7 +3241,6 @@ OptionalCurrentOrPreceding_EDIT
    }
  ;
 
-
 OptionalAndFollowing
  :
  | 'AND' 'CURRENT' 'ROW'
@@ -3253,7 +3292,7 @@ HavingClause_EDIT
 
 CastFunction
  : 'CAST' '(' ValueExpression 'AS' PrimitiveType ')'  -> { types: [ $5.toUpperCase() ] }
- | 'CAST' '(' ')'                                     -> { types: [ 'T' ] }
+ | 'CAST' '(' ')'                                      -> { types: [ 'T' ] }
  ;
 
 CastFunction_EDIT
@@ -3274,7 +3313,7 @@ CastFunction_EDIT
    }
  | 'CAST' '(' ValueExpression_EDIT 'AS' PrimitiveType RightParenthesisOrError  -> { types: [ $5.toUpperCase() ] }
  | 'CAST' '(' ValueExpression_EDIT 'AS' RightParenthesisOrError                -> { types: [ 'T' ] }
- | 'CAST' '(' ValueExpression_EDIT RightParenthesisOrError                     -> { types: [ 'T' ] }
+ | 'CAST' '(' ValueExpression_EDIT RightParenthesisOrError                      -> { types: [ 'T' ] }
  | 'CAST' '(' ValueExpression 'CURSOR' PrimitiveType RightParenthesisOrError
    {
      parser.suggestValueExpressionKeywords($3, [{ value: 'AS', weight: 2 }]);

@@ -153,7 +153,7 @@ AlterTable_EDIT
      parser.suggestKeywords(['=']);
    }
  | AlterTableLeftSide 'ADD' OptionalIfNotExists 'RANGE' 'PARTITION' RangePartitionSpec_EDIT
-| AlterTableLeftSide 'ALTER' OptionalColumn 'CURSOR'
+ | AlterTableLeftSide 'ALTER' OptionalColumn 'CURSOR'
    {
      if (!$3) {
        parser.suggestKeywords(['COLUMN']);
@@ -292,7 +292,7 @@ OptionalPartitionOperations
  | 'SET' 'TBLPROPERTIES' ParenthesizedPropertyAssignmentList
  | 'SET' 'SERDEPROPERTIES' ParenthesizedPropertyAssignmentList
  | 'SET' CachedIn OptionalWithReplication
- | 'SET' 'ROW' 'FORMAT' RowFormat
+ | 'SET' 'ROW' 'FORMAT' DelimitedRowFormat
  | 'SET' 'UNCACHED'
  | AddReplaceColumns
  | 'CHANGE' ColumnIdentifier ColumnSpecification
@@ -336,13 +336,13 @@ OptionalPartitionOperations_EDIT
    {
      parser.suggestKeywords(['DELIMITED']);
    }
- | 'SET' 'ROW' 'FORMAT' RowFormat 'CURSOR'
+ | 'SET' 'ROW' 'FORMAT' DelimitedRowFormat 'CURSOR'
    {
      if ($4.suggestKeywords) {
        parser.suggestKeywords($4.suggestKeywords);
      }
    }
- | 'SET' 'ROW' 'FORMAT' RowFormat_EDIT
+ | 'SET' 'ROW' 'FORMAT' DelimitedRowFormat_EDIT
  ;
 
 AddReplaceColumns

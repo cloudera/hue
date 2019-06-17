@@ -89,12 +89,12 @@ const testUtils = {
             }
           }
 
-          if (testDefinition.dialect !== 'impala' && actualResponse.locations) {
-            actualResponse.locations = actualResponse.locations.filter(location => {
-              if (location.type !== 'statementType') {
-                return location;
-              }
-            });
+          if (((testDefinition.expectedResult && testDefinition.expectedResult.locations) || testDefinition.expectedLocations) && actualResponse.locations) {
+            let expectedLoc =  testDefinition.expectedLocations || testDefinition.expectedResult.locations;
+            let expectsType = expectedLoc.some(location => location.type === 'statementType');
+            if (!expectsType) {
+              actualResponse.locations = actualResponse.locations.filter(location => location.type !== 'statementType');
+            }
           }
 
           if (testDefinition.expectedDefinitions) {
@@ -106,9 +106,6 @@ const testUtils = {
                   testDefinition.beforeCursor +
                   '|' +
                   testDefinition.afterCursor +
-                  '\n' +
-                  '          Dialect: ' +
-                  testDefinition.dialect +
                   '\n' +
                   'Expected definitions: ' +
                   jsonStringToJsString(JSON.stringify(testDefinition.expectedDefinitions)) +
@@ -130,9 +127,6 @@ const testUtils = {
                 testDefinition.beforeCursor +
                 '|' +
                 testDefinition.afterCursor +
-                '\n' +
-                '          Dialect: ' +
-                testDefinition.dialect +
                 '\n' +
                 'Expected locations: ' +
                 jsonStringToJsString(JSON.stringify(testDefinition.expectedLocations)) +
@@ -161,9 +155,6 @@ const testUtils = {
                   '|' +
                   testDefinition.afterCursor +
                   '\n' +
-                  '  Dialect: ' +
-                  testDefinition.dialect +
-                  '\n' +
                   '           Expected no locations, found ' +
                   actualResponse.locations.length
               };
@@ -182,9 +173,6 @@ const testUtils = {
                   testDefinition.beforeCursor +
                   '|' +
                   testDefinition.afterCursor +
-                  '\n' +
-                  '  Dialect: ' +
-                  testDefinition.dialect +
                   '\n' +
                   '           No colRef keywords found'
               };
@@ -205,9 +193,6 @@ const testUtils = {
                     testDefinition.beforeCursor +
                     '|' +
                     testDefinition.afterCursor +
-                    '\n' +
-                    '  Dialect: ' +
-                    testDefinition.dialect +
                     '\n' +
                     '           Expected colRef keywords not found ' +
                     'Expected keywords: ' +
@@ -240,9 +225,6 @@ const testUtils = {
                   '|' +
                   testDefinition.afterCursor +
                   '\n' +
-                  '          Dialect: ' +
-                  testDefinition.dialect +
-                  '\n' +
                   'Expected keywords: ' +
                   JSON.stringify(testDefinition.containsKeywords) +
                   '\n' +
@@ -271,9 +253,6 @@ const testUtils = {
                   '|' +
                   testDefinition.afterCursor +
                   '\n' +
-                  '              Dialect: ' +
-                  testDefinition.dialect +
-                  '\n' +
                   'Not expected keywords: ' +
                   JSON.stringify(testDefinition.doesNotContainKeywords) +
                   '\n' +
@@ -295,9 +274,6 @@ const testUtils = {
               testDefinition.beforeCursor +
               '|' +
               testDefinition.afterCursor +
-              '\n' +
-              '          Dialect: ' +
-              testDefinition.dialect +
               '\n' +
               'Expected response: ' +
               jsonStringToJsString(JSON.stringify(testDefinition.expectedResult) + '\n') +

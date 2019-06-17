@@ -14,263 +14,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import SqlTestUtils from './sqlTestUtils';
-import sqlAutocompleteParser from '../sqlAutocompleteParser';
+import SqlTestUtils from 'parse/spec/sqlTestUtils';
+import impalaAutocompleteParser from '../impalaAutocompleteParser';
 
-describe('sqlAutocompleteParser.js ANALYZE statements', () => {
+describe('impalaAutocompleteParser.js ANALYZE statements', () => {
   beforeAll(() => {
-    sqlAutocompleteParser.yy.parseError = function(msg) {
+    impalaAutocompleteParser.yy.parseError = function(msg) {
       throw Error(msg);
     };
     jasmine.addMatchers(SqlTestUtils.testDefinitionMatcher);
   });
 
-  const assertAutoComplete = SqlTestUtils.assertAutocomplete;
-
-  describe('ANALYZE TABLE', () => {
-    it('should handle "ANALYZE TABLE boo.baa PARTITION (bla=1, boo=\'baa\') COMPUTE STATISTICS FOR COLUMNS CACHE METADATA NOSCAN;|"', () => {
-      assertAutoComplete({
-        beforeCursor:
-          "ANALYZE TABLE boo.baa PARTITION (bla=1, boo='baa') COMPUTE STATISTICS FOR COLUMNS CACHE METADATA NOSCAN;",
-        afterCursor: '',
-        dialect: 'hive',
-        noErrors: true,
-        containsKeywords: ['SELECT'],
-        expectedResult: {
-          lowerCase: false
-        }
-      });
-    });
-
-    it('should suggest keywords for "|"', () => {
-      assertAutoComplete({
-        beforeCursor: '',
-        afterCursor: '',
-        dialect: 'hive',
-        noErrors: true,
-        containsKeywords: ['ANALYZE TABLE'],
-        expectedResult: {
-          lowerCase: false
-        }
-      });
-    });
-
-    it('should suggest keywords for "analyze |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'analyze ',
-        afterCursor: '',
-        dialect: 'hive',
-        noErrors: true,
-        expectedResult: {
-          lowerCase: true,
-          suggestKeywords: ['TABLE']
-        }
-      });
-    });
-
-    it('should suggest keywords for "analyze | tbl"', () => {
-      assertAutoComplete({
-        beforeCursor: 'analyze ',
-        afterCursor: ' tbl',
-        dialect: 'hive',
-        noErrors: true,
-        expectedResult: {
-          lowerCase: true,
-          suggestKeywords: ['TABLE']
-        }
-      });
-    });
-
-    it('should suggest keywords for "analyze tab| tbl"', () => {
-      assertAutoComplete({
-        beforeCursor: 'analyze tab',
-        afterCursor: ' tbl',
-        dialect: 'hive',
-        noErrors: true,
-        expectedResult: {
-          lowerCase: true,
-          suggestKeywords: ['TABLE']
-        }
-      });
-    });
-
-    it('should suggest tables for "ANALYZE TABLE |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'ANALYZE TABLE ',
-        afterCursor: '',
-        dialect: 'hive',
-        noErrors: true,
-        expectedResult: {
-          lowerCase: false,
-          suggestTables: { onlyTables: true },
-          suggestDatabases: { appendDot: true }
-        }
-      });
-    });
-
-    it('should suggest tables for "ANALYZE TABLE boo.|"', () => {
-      assertAutoComplete({
-        beforeCursor: 'ANALYZE TABLE boo.',
-        afterCursor: '',
-        dialect: 'hive',
-        noErrors: true,
-        expectedResult: {
-          lowerCase: false,
-          suggestTables: { identifierChain: [{ name: 'boo' }], onlyTables: true }
-        }
-      });
-    });
-
-    it('should suggest keywords for "ANALYZE TABLE boo |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'ANALYZE TABLE boo ',
-        afterCursor: '',
-        dialect: 'hive',
-        noErrors: true,
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['PARTITION', 'COMPUTE STATISTICS']
-        }
-      });
-    });
-
-    it('should suggest keywords for "ANALYZE TABLE boo PARTITION (baa = 1) |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'ANALYZE TABLE boo PARTITION (baa = 1) ',
-        afterCursor: '',
-        dialect: 'hive',
-        noErrors: true,
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['COMPUTE STATISTICS']
-        }
-      });
-    });
-
-    it('should suggest keywords for "ANALYZE TABLE boo PARTITION (baa = 1) COMPUTE |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'ANALYZE TABLE boo PARTITION (baa = 1) COMPUTE ',
-        afterCursor: '',
-        dialect: 'hive',
-        noErrors: true,
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['STATISTICS']
-        }
-      });
-    });
-
-    it('should suggest keywords for "ANALYZE TABLE baa.boo COMPUTE STATISTICS |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'ANALYZE TABLE baa.boo COMPUTE STATISTICS ',
-        afterCursor: '',
-        dialect: 'hive',
-        noErrors: true,
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['FOR COLUMNS', 'CACHE METADATA', 'NOSCAN']
-        }
-      });
-    });
-
-    it('should suggest keywords for "ANALYZE TABLE baa.boo COMPUTE STATISTICS FOR |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'ANALYZE TABLE baa.boo COMPUTE STATISTICS FOR ',
-        afterCursor: '',
-        dialect: 'hive',
-        noErrors: true,
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['COLUMNS']
-        }
-      });
-    });
-
-    it('should suggest keywords for "ANALYZE TABLE baa.boo COMPUTE STATISTICS FOR COLUMNS |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'ANALYZE TABLE baa.boo COMPUTE STATISTICS FOR COLUMNS ',
-        afterCursor: '',
-        dialect: 'hive',
-        noErrors: true,
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['CACHE METADATA', 'NOSCAN']
-        }
-      });
-    });
-
-    it('should suggest keywords for "ANALYZE TABLE baa.boo COMPUTE STATISTICS FOR COLUMNS CACHE |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'ANALYZE TABLE baa.boo COMPUTE STATISTICS FOR COLUMNS CACHE ',
-        afterCursor: '',
-        dialect: 'hive',
-        noErrors: true,
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['METADATA']
-        }
-      });
-    });
-
-    it('should suggest keywords for "ANALYZE TABLE baa.boo COMPUTE STATISTICS FOR COLUMNS CACHE METADATA |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'ANALYZE TABLE baa.boo COMPUTE STATISTICS FOR COLUMNS CACHE METADATA ',
-        afterCursor: '',
-        dialect: 'hive',
-        noErrors: true,
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['NOSCAN']
-        }
-      });
-    });
-
-    it('should suggest keywords for "ANALYZE TABLE baa.boo COMPUTE STATISTICS | NOSCAN"', () => {
-      assertAutoComplete({
-        beforeCursor: 'ANALYZE TABLE baa.boo COMPUTE STATISTICS ',
-        afterCursor: ' NOSCAN',
-        dialect: 'hive',
-        noErrors: true,
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['FOR COLUMNS', 'CACHE METADATA']
-        }
-      });
-    });
-
-    it('should suggest keywords for "ANALYZE TABLE baa.boo COMPUTE STATISTICS CACHE | NOSCAN"', () => {
-      assertAutoComplete({
-        beforeCursor: 'ANALYZE TABLE baa.boo COMPUTE STATISTICS CACHE ',
-        afterCursor: ' NOSCAN',
-        dialect: 'hive',
-        noErrors: true,
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['METADATA']
-        }
-      });
-    });
-
-    it('should suggest keywords for "ANALYZE TABLE baa.boo COMPUTE STATISTICS FOR COLUMNS | NOSCAN"', () => {
-      assertAutoComplete({
-        beforeCursor: 'ANALYZE TABLE baa.boo COMPUTE STATISTICS FOR COLUMNS ',
-        afterCursor: ' NOSCAN',
-        dialect: 'hive',
-        noErrors: true,
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['CACHE METADATA']
-        }
-      });
-    });
-  });
+  const assertAutoComplete = testDefinition => {
+    const debug = false;
+    expect(
+      impalaAutocompleteParser.parseSql(
+        testDefinition.beforeCursor,
+        testDefinition.afterCursor,
+        debug || testDefinition.debug
+      )
+    ).toEqualDefinition(testDefinition);
+  };
 
   describe('COMPUTE STATS', () => {
     it('should handle "COMPUTE STATS bla.boo;|"', () => {
       assertAutoComplete({
         beforeCursor: 'COMPUTE STATS bla.boo;',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
@@ -283,7 +53,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'COMPUTE STATS bla.boo (foo, bar) TABLESAMPLE SYSTEM(10) REPEATABLE(10);',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
@@ -296,7 +65,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'COMPUTE INCREMENTAL STATS bla.boo;',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
@@ -309,7 +77,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'COMPUTE INCREMENTAL STATS bla.boo PARTITION (a=1, b = 2);',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
@@ -322,7 +89,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: '',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         containsKeywords: ['COMPUTE'],
         expectedResult: {
@@ -335,7 +101,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'COMPUTE ',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         expectedResult: {
           lowerCase: false,
@@ -348,7 +113,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'COMPUTE ',
         afterCursor: ' tbl',
-        dialect: 'impala',
         noErrors: true,
         expectedResult: {
           lowerCase: false,
@@ -361,7 +125,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'COMPUTE foo',
         afterCursor: ' tbl',
-        dialect: 'impala',
         noErrors: true,
         expectedResult: {
           lowerCase: false,
@@ -374,7 +137,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'COMPUTE INCREMENTAL ',
         afterCursor: ' tbl',
-        dialect: 'impala',
         noErrors: true,
         expectedResult: {
           lowerCase: false,
@@ -387,7 +149,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'COMPUTE STATS ',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         expectedResult: {
           lowerCase: false,
@@ -401,7 +162,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'COMPUTE STATS tbl ',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         expectedResult: {
           lowerCase: false,
@@ -414,7 +174,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'COMPUTE STATS db.tbl (',
         afterCursor: '',
-        dialect: 'impala',
         expectedResult: {
           lowerCase: false,
           suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }] }] }
@@ -426,7 +185,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'COMPUTE STATS tbl TABLESAMPLE ',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         expectedResult: {
           lowerCase: false,
@@ -439,7 +197,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'COMPUTE STATS tbl TABLESAMPLE SYSTEM(1) ',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         expectedResult: {
           lowerCase: false,
@@ -452,7 +209,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'COMPUTE STATS db.',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         expectedResult: {
           lowerCase: false,
@@ -465,7 +221,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'COMPUTE INCREMENTAL ',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         expectedResult: {
           lowerCase: false,
@@ -478,7 +233,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'COMPUTE INCREMENTAL STATS ',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         expectedResult: {
           lowerCase: false,
@@ -492,7 +246,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'COMPUTE STATS db.',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         expectedResult: {
           lowerCase: false,
@@ -505,7 +258,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'COMPUTE INCREMENTAL STATS db.tbl ',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         expectedResult: {
           lowerCase: false,
@@ -518,7 +270,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'COMPUTE INCREMENTAL STATS db.tbl PARTITION (',
         afterCursor: '',
-        dialect: 'impala',
         expectedResult: {
           lowerCase: false,
           suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }] }] }
@@ -530,7 +281,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'COMPUTE INCREMENTAL STATS db.tbl PARTITION (bla = 1, ',
         afterCursor: '',
-        dialect: 'impala',
         expectedResult: {
           lowerCase: false,
           suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }] }] }
@@ -544,7 +294,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'INVALIDATE METADATA;',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
@@ -557,7 +306,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'INVALIDATE METADATA db.tbl;',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
@@ -570,7 +318,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: '',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         containsKeywords: ['INVALIDATE METADATA'],
         expectedResult: {
@@ -583,7 +330,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'INVALIDATE ',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         expectedResult: {
           lowerCase: false,
@@ -596,7 +342,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'INVALIDATE ',
         afterCursor: ' tbl',
-        dialect: 'impala',
         noErrors: true,
         expectedResult: {
           lowerCase: false,
@@ -609,7 +354,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'INVALIDATE meta',
         afterCursor: ' tbl',
-        dialect: 'impala',
         noErrors: true,
         expectedResult: {
           lowerCase: false,
@@ -622,7 +366,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'INVALIDATE METADATA ',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         expectedResult: {
           lowerCase: false,
@@ -636,7 +379,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'INVALIDATE METADATA db.',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         expectedResult: {
           lowerCase: false,
@@ -651,7 +393,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'REFRESH db.tbl PARTITION (id = 1);',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
@@ -664,7 +405,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'REFRESH FUNCTIONS db;',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
@@ -677,7 +417,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'REFRESH db.tbl;',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
@@ -690,7 +429,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: '',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         containsKeywords: ['REFRESH'],
         expectedResult: {
@@ -703,7 +441,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'REFRESH ',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         expectedResult: {
           lowerCase: false,
@@ -718,7 +455,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'REFRESH FUNCTIONS ',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         expectedResult: {
           lowerCase: false,
@@ -731,7 +467,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'REFRESH db.',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         expectedResult: {
           lowerCase: false,
@@ -744,7 +479,6 @@ describe('sqlAutocompleteParser.js ANALYZE statements', () => {
       assertAutoComplete({
         beforeCursor: 'REFRESH db.tbl ',
         afterCursor: '',
-        dialect: 'impala',
         noErrors: true,
         expectedResult: {
           lowerCase: false,

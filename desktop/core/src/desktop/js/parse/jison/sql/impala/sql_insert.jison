@@ -19,59 +19,17 @@ DataManipulation
  ;
 
 InsertStatement
- : InsertValuesStatement
- | InsertOrUpsertStatement
+ : InsertOrUpsertStatement
  | CommonTableExpression InsertOrUpsertStatement
  ;
 
 DataManipulation_EDIT
- : InsertValuesStatement_EDIT
- | InsertOrUpsertStatement_EDIT
+ : InsertOrUpsertStatement_EDIT
  | CommonTableExpression InsertOrUpsertStatement_EDIT
    {
      parser.addCommonTableExpressions($1);
    }
  | CommonTableExpression_EDIT InsertOrUpsertStatement
- ;
-
-InsertValuesStatement
- : 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier 'VALUES' InsertValuesList
-   {
-     $4.owner = 'insert';
-     parser.addTablePrimary($4);
-   }
- ;
-
-InsertValuesStatement_EDIT
- : 'INSERT' 'CURSOR'
-   {
-     parser.suggestKeywords(['INTO']);
-   }
- | 'INSERT' 'INTO' OptionalTable 'CURSOR'
-   {
-     if (!$3) {
-       parser.suggestKeywords(['TABLE']);
-     }
-     parser.suggestTables();
-     parser.suggestDatabases({ appendDot: true });
-   }
- | 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier_EDIT
- | 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier 'CURSOR'
-   {
-     $4.owner = 'insert';
-     parser.addTablePrimary($4);
-     parser.suggestKeywords(['VALUES']);
-   }
- | 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier_EDIT 'VALUES' InsertValuesList
- ;
-
-InsertValuesList
- : ParenthesizedRowValuesList
- | RowValuesList ',' ParenthesizedRowValuesList
- ;
-
-ParenthesizedRowValuesList
- : '(' InValueList ')'
  ;
 
 OptionalTable
@@ -282,14 +240,3 @@ ParenthesizedValueExpressionList_EDIT
  | '(' ValueExpressionList_EDIT RightParenthesisOrError
  ;
 
-UpdateDeleteOrInsert
- : 'UPDATE' 'SET' SetClauseList              -> { isUpdate: true }
- ;
-
-UpdateDeleteOrInsert_EDIT
- : 'UPDATE' 'CURSOR'
-   {
-     parser.suggestKeywords(['SET']);
-   }
- | 'UPDATE' 'SET' SetClauseList_EDIT
- ;

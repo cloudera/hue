@@ -14,18 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import SqlTestUtils from './sqlTestUtils';
-import sqlAutocompleteParser from '../sqlAutocompleteParser';
+import SqlTestUtils from 'parse/spec/sqlTestUtils';
+import impalaAutocompleteParser from '../impalaAutocompleteParser';
 
-describe('sqlAutocompleteParser.js UPDATE statements', () => {
+describe('impalaAutocompleteParser.js UPDATE statements', () => {
   beforeAll(() => {
-    sqlAutocompleteParser.yy.parseError = function(msg) {
+    impalaAutocompleteParser.yy.parseError = function(msg) {
       throw Error(msg);
     };
     jasmine.addMatchers(SqlTestUtils.testDefinitionMatcher);
   });
 
-  const assertAutoComplete = SqlTestUtils.assertAutocomplete;
+  const assertAutoComplete = testDefinition => {
+    const debug = false;
+    expect(
+      impalaAutocompleteParser.parseSql(
+        testDefinition.beforeCursor,
+        testDefinition.afterCursor,
+        debug || testDefinition.debug
+      )
+    ).toEqualDefinition(testDefinition);
+  };
 
   it('should suggest keywords for "|"', () => {
     assertAutoComplete({
@@ -372,84 +381,77 @@ describe('sqlAutocompleteParser.js UPDATE statements', () => {
     });
   });
 
-  describe('Impala specific', () => {
-    it('should suggest keywords for "UPDATE bar.foo SET bla = \'foo\' |"', () => {
-      assertAutoComplete({
-        beforeCursor: "UPDATE bar.foo SET bla = 'foo' ",
-        afterCursor: '',
-        dialect: 'impala',
-        containsKeywords: ['FROM', 'WHERE'],
-        expectedResult: {
-          lowerCase: false
-        }
-      });
+  it('should suggest keywords for "UPDATE bar.foo SET bla = \'foo\' |"', () => {
+    assertAutoComplete({
+      beforeCursor: "UPDATE bar.foo SET bla = 'foo' ",
+      afterCursor: '',
+      containsKeywords: ['FROM', 'WHERE'],
+      expectedResult: {
+        lowerCase: false
+      }
     });
+  });
 
-    it('should suggest tables for "UPDATE bar.foo SET bla = \'foo\' FROM |"', () => {
-      assertAutoComplete({
-        beforeCursor: "UPDATE bar.foo SET bla = 'foo' FROM ",
-        afterCursor: '',
-        dialect: 'impala',
-        expectedResult: {
-          lowerCase: false,
-          suggestTables: {},
-          suggestDatabases: {
-            appendDot: true
-          }
+  it('should suggest tables for "UPDATE bar.foo SET bla = \'foo\' FROM |"', () => {
+    assertAutoComplete({
+      beforeCursor: "UPDATE bar.foo SET bla = 'foo' FROM ",
+      afterCursor: '',
+      expectedResult: {
+        lowerCase: false,
+        suggestTables: {},
+        suggestDatabases: {
+          appendDot: true
         }
-      });
+      }
     });
+  });
 
-    it('should suggest keywords for "UPDATE bar.foo SET bla = \'foo\' FROM boo |"', () => {
-      assertAutoComplete({
-        beforeCursor: "UPDATE bar.foo SET bla = 'foo' FROM boo ",
-        afterCursor: '',
-        dialect: 'impala',
-        containsKeywords: ['JOIN'],
-        expectedResult: {
-          lowerCase: false,
-          suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'boo' }] }] }
-        }
-      });
+  it('should suggest keywords for "UPDATE bar.foo SET bla = \'foo\' FROM boo |"', () => {
+    assertAutoComplete({
+      beforeCursor: "UPDATE bar.foo SET bla = 'foo' FROM boo ",
+      afterCursor: '',
+      containsKeywords: ['JOIN'],
+      expectedResult: {
+        lowerCase: false,
+        suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'boo' }] }] }
+      }
     });
+  });
 
-    it('should suggest keywords for "UPDATE bar.foo SET bla = \'foo\' FROM boo JOIN |"', () => {
-      assertAutoComplete({
-        beforeCursor: "UPDATE bar.foo SET bla = 'foo' FROM boo JOIN ",
-        afterCursor: '',
-        dialect: 'impala',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['[BROADCAST]', '[SHUFFLE]'],
-          suggestJoins: {
-            prependJoin: false,
-            joinType: 'JOIN',
-            tables: [{ identifierChain: [{ name: 'boo' }] }]
-          },
-          suggestTables: {},
-          suggestDatabases: { appendDot: true }
-        }
-      });
+  it('should suggest keywords for "UPDATE bar.foo SET bla = \'foo\' FROM boo JOIN |"', () => {
+    assertAutoComplete({
+      beforeCursor: "UPDATE bar.foo SET bla = 'foo' FROM boo JOIN ",
+      afterCursor: '',
+      expectedResult: {
+        lowerCase: false,
+        suggestKeywords: ['[BROADCAST]', '[SHUFFLE]'],
+        suggestJoins: {
+          prependJoin: false,
+          joinType: 'JOIN',
+          tables: [{ identifierChain: [{ name: 'boo' }] }]
+        },
+        suggestTables: {},
+        suggestDatabases: { appendDot: true }
+      }
     });
+  });
 
-    it('should suggest keywords for "UPDATE bar.foo SET bla = \'foo\' FROM boo JOIN blaa |"', () => {
-      assertAutoComplete({
-        beforeCursor: "UPDATE bar.foo SET bla = 'foo' FROM boo JOIN blaa ",
-        afterCursor: '',
-        dialect: 'impala',
-        containsKeywords: ['ON', 'JOIN'],
-        expectedResult: {
-          lowerCase: false,
-          suggestJoinConditions: {
-            prependOn: true,
-            tables: [
-              { identifierChain: [{ name: 'bar' }, { name: 'foo' }] },
-              { identifierChain: [{ name: 'boo' }] },
-              { identifierChain: [{ name: 'blaa' }] }
-            ]
-          }
+  it('should suggest keywords for "UPDATE bar.foo SET bla = \'foo\' FROM boo JOIN blaa |"', () => {
+    assertAutoComplete({
+      beforeCursor: "UPDATE bar.foo SET bla = 'foo' FROM boo JOIN blaa ",
+      afterCursor: '',
+      containsKeywords: ['ON', 'JOIN'],
+      expectedResult: {
+        lowerCase: false,
+        suggestJoinConditions: {
+          prependOn: true,
+          tables: [
+            { identifierChain: [{ name: 'bar' }, { name: 'foo' }] },
+            { identifierChain: [{ name: 'boo' }] },
+            { identifierChain: [{ name: 'blaa' }] }
+          ]
         }
-      });
+      }
     });
   });
 });

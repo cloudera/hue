@@ -147,11 +147,6 @@ TableDefinition_EDIT
  | 'CREATE' OptionalExternal 'TABLE' OptionalIfNotExists_EDIT
  ;
 
-OptionalExternal
- :
- | 'EXTERNAL'
- ;
-
 TableDefinitionRightPart
  : TableIdentifierAndOptionalColumnSpecification OptionalPartitionedBy OptionalSortBy OptionalComment
    OptionalRowFormat OptionalWithSerdeproperties OptionalStoredAs
@@ -210,7 +205,7 @@ TableDefinitionRightPart_EDIT
        }
        if (!$5 && !$6 && !$7 && !$8 && !$9 && !$10) {
          keywords.push({ value: 'ROW FORMAT', weight: 7 });
-       } else if ($5 && $5.suggestKeywords && !$6 && !$7 && !$8 && !$9 && !$10 && !$10) {
+       } else if ($5 && $5.suggestKeywords && !$6 && !$7 && !$8 && !$9 && !$10) {
          keywords = keywords.concat(parser.createWeightedKeywords($5.suggestKeywords, 7));
        }
        if (!$6 && !$7 && !$8 && !$9 && !$10) {
@@ -783,10 +778,7 @@ OptionalRowFormat
  ;
 
 RowFormat
- : 'ROW' 'FORMAT' RowFormat
-   {
-     $$ = $3
-   }
+ : 'ROW' 'FORMAT' DelimitedRowFormat  -> $3
  ;
 
 RowFormat_EDIT
@@ -798,11 +790,11 @@ RowFormat_EDIT
    {
      parser.suggestKeywords(['DELIMITED']);
    }
- | 'ROW' 'FORMAT' RowFormat_EDIT
+ | 'ROW' 'FORMAT' DelimitedRowFormat_EDIT
  ;
 
 OptionalStoredAs
- :           -> { suggestKeywords: ['STORED AS'] }
+ :
  | StoredAs
  ;
 
@@ -831,7 +823,7 @@ FileFormat
  | 'TEXTFILE'
  ;
 
-RowFormat
+DelimitedRowFormat
  : 'DELIMITED' OptionalFieldsTerminatedBy OptionalLinesTerminatedBy
    {
      if (!$2 && !$3) {
@@ -844,7 +836,7 @@ RowFormat
    }
  ;
 
-RowFormat_EDIT
+DelimitedRowFormat_EDIT
  : 'DELIMITED' OptionalFieldsTerminatedBy_EDIT OptionalLinesTerminatedBy
  | 'DELIMITED' OptionalFieldsTerminatedBy OptionalLinesTerminatedBy_EDIT
  ;

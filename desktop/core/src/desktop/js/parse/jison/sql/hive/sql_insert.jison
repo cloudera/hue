@@ -404,7 +404,7 @@ MergeStatementLeftPart_EDIT
  ;
 
 MergeSource
- : '(' TableSubQueryInner ')'  --> $2
+ : '(' TableSubQueryInner ')'  -> $2
  | SchemaQualifiedTableIdentifier
    {
      parser.addTablePrimary($1);
@@ -480,7 +480,7 @@ WhenList_EDIT
  ;
 
 WhenClause
- : 'WHEN' OptionalNot 'MATCHED' OptionalMatchCondition 'THEN' UpdateDeleteOrInsert  --> { notPresent: !!$2, isDelete: $6.isDelete, isInsert: $6.isInsert, isUpdate: $6.isUpdate }
+ : 'WHEN' OptionalNot 'MATCHED' OptionalMatchCondition 'THEN' UpdateDeleteOrInsert  -> { notPresent: !!$2, isDelete: $6.isDelete, isInsert: $6.isInsert, isUpdate: $6.isUpdate }
  ;
 
 WhenClause_EDIT
@@ -501,13 +501,13 @@ WhenClause_EDIT
      }
    }
  | 'WHEN' OptionalNot 'MATCHED' MatchCondition_EDIT
- | 'WHEN' OptionalNot 'MATCHED' OptionalMatchCondition 'THEN' 'CURSOR' --> { suggestThenKeywords: true }
+ | 'WHEN' OptionalNot 'MATCHED' OptionalMatchCondition 'THEN' 'CURSOR' -> { suggestThenKeywords: true }
  | 'WHEN' OptionalNot 'MATCHED' OptionalMatchCondition 'THEN' UpdateDeleteOrInsert_EDIT
  ;
 
 OptionalMatchCondition
  :
- | 'AND' ValueExpression --> $2
+ | 'AND' ValueExpression -> $2
  ;
 
 MatchCondition_EDIT
@@ -518,9 +518,9 @@ MatchCondition_EDIT
  ;
 
 UpdateDeleteOrInsert
- : 'UPDATE' 'SET' SetClauseList        --> { isUpdate: true }
- | 'DELETE'                            --> { isDelete: true }
- | 'INSERT' 'VALUES' InsertValuesList  --> { isInsert: true }
+ : 'UPDATE' 'SET' SetClauseList        -> { isUpdate: true }
+ | 'DELETE'                            -> { isDelete: true }
+ | 'INSERT' 'VALUES' InsertValuesList  -> { isInsert: true }
  ;
 
 UpdateDeleteOrInsert_EDIT

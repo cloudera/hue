@@ -159,7 +159,7 @@ ShowCreateTableStatement_EDIT
 
 TableOrView
  : 'TABLE'
- | 'VIEW'   --> { isView: true }
+ | 'VIEW'   -> { isView: true }
  ;
 
 ShowCurrentRolesStatement

@@ -939,7 +939,7 @@ case 600:
    
 break;
 case 602:
-this.$ = { identifier: { name: $$[$0] }, location: _$[$0] };;
+this.$ = { identifier: { name: $$[$0] }, location: _$[$0] };
 break;
 case 624: case 924:
 this.$ = $$[$0-2];
@@ -965,7 +965,7 @@ case 644:
    
 break;
 case 649:
-this.$ = $$[$0-2].concat([$$[$0]]);;
+this.$ = $$[$0-2].concat([$$[$0]]);
 break;
 case 653:
 

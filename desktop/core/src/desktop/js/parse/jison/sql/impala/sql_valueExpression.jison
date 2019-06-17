@@ -35,7 +35,7 @@ ValueExpression
  | ValueExpression 'IS' OptionalNot 'NULL'                             -> { types: [ 'BOOLEAN' ] }
  | ValueExpression 'IS' OptionalNot 'TRUE'                             -> { types: [ 'BOOLEAN' ] }
  | ValueExpression 'IS' OptionalNot 'FALSE'                            -> { types: [ 'BOOLEAN' ] }
- | ValueExpression 'IS' OptionalNot 'UNKNOWN'                  -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression 'IS' OptionalNot 'UNKNOWN'                          -> { types: [ 'BOOLEAN' ] }
  | ValueExpression 'IS' OptionalNot 'DISTINCT' 'FROM' ValueExpression  -> { types: [ 'BOOLEAN' ] }
  ;
 
@@ -77,12 +77,14 @@ ValueExpression_EDIT
    }
  | ValueExpression 'IS' 'CURSOR'
    {
-     parser.suggestKeywords(['FALSE', 'NOT NULL', 'NOT TRUE', 'NOT FALSE', 'NULL', 'TRUE', 'DISTINCT FROM', 'NOT DISTINCT FROM', 'NOT UNKNOWN', 'UNKNOWN']);
+     var keywords = ['FALSE', 'NOT NULL', 'NOT TRUE', 'NOT FALSE', 'NULL', 'TRUE', 'DISTINCT FROM', 'NOT DISTINCT FROM', 'NOT UNKNOWN', 'UNKNOWN'];
+     parser.suggestKeywords(keywords);
      $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'IS' 'NOT' 'CURSOR'
    {
-     parser.suggestKeywords(['FALSE', 'NULL', 'TRUE', 'DISTINCT FROM', 'UNKNOWN']);
+     var keywords = ['FALSE', 'NULL', 'TRUE', 'DISTINCT FROM', 'UNKNOWN'];
+     parser.suggestKeywords(keywords);
      $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'IS' OptionalNot 'DISTINCT' 'CURSOR'
@@ -328,36 +330,18 @@ ValueExpressionInSecondPart_EDIT
 // ------------------  BETWEEN ------------------
 
 ValueExpression
- : ValueExpression 'NOT' 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression  -> { types: [ 'BOOLEAN' ] }
- | ValueExpression 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression        -> { types: [ 'BOOLEAN' ] }
+ : ValueExpression 'NOT' 'BETWEEN' ValueExpression  -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression 'BETWEEN' ValueExpression        -> { types: [ 'BOOLEAN' ] }
  ;
 
 ValueExpression_EDIT
- : ValueExpression_EDIT 'NOT' 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression
+ : ValueExpression_EDIT 'NOT' 'BETWEEN' ValueExpression
    {
-     if ($4.types[0] === $6.types[0] && !$1.typeSet) {
-       parser.applyTypeToSuggestions($4.types);
-     }
      $$ = { types: [ 'BOOLEAN' ], suggestFilters: $1.suggestFilters };
    }
- | ValueExpression 'NOT' 'BETWEEN' ValueExpression_EDIT 'BETWEEN_AND' ValueExpression
+ | ValueExpression 'NOT' 'BETWEEN' ValueExpression_EDIT
    {
-     if ($1.types[0] === $6.types[0] && !$4.typeSet) {
-       parser.applyTypeToSuggestions($1.types);
-     }
      $$ = { types: [ 'BOOLEAN' ], suggestFilters: $4.suggestFilters };
-   }
- | ValueExpression 'NOT' 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression_EDIT
-   {
-     if ($1.types[0] === $4.types[0] && !$6.typeSet) {
-       parser.applyTypeToSuggestions($1.types);
-     }
-     $$ = { types: [ 'BOOLEAN' ], suggestFilters: $6.suggestFilters };
-   }
- | ValueExpression 'NOT' 'BETWEEN' ValueExpression 'BETWEEN_AND' 'CURSOR'
-   {
-     parser.valueExpressionSuggest($1, $5);
-     $$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    }
  | ValueExpression 'NOT' 'BETWEEN' ValueExpression 'CURSOR'
    {
@@ -369,32 +353,19 @@ ValueExpression_EDIT
      parser.valueExpressionSuggest($1, $2 + ' ' + $3);
      $$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    }
- | ValueExpression_EDIT 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression
+ | ValueExpression_EDIT 'BETWEEN' ValueExpression
    {
      if ($1.types[0] === $3.types[0] && !$1.typeSet) {
        parser.applyTypeToSuggestions($1.types)
      }
      $$ = { types: [ 'BOOLEAN' ], suggestFilters: $1.suggestFilters };
    }
- | ValueExpression 'BETWEEN' ValueExpression_EDIT 'BETWEEN_AND' ValueExpression
+ | ValueExpression 'BETWEEN' ValueExpression_EDIT
    {
      if ($1.types[0] === $3.types[0] && !$3.typeSet) {
        parser.applyTypeToSuggestions($1.types)
      }
      $$ = { types: [ 'BOOLEAN' ], suggestFilters: $3.suggestFilters };
-   }
- | ValueExpression 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression_EDIT
-   {
-     if ($1.types[0] === $3.types[0] && !$5.typeSet) {
-       parser.applyTypeToSuggestions($1.types)
-     }
-     $$ = { types: [ 'BOOLEAN' ], suggestFilters: $5.suggestFilters };
-   }
- | ValueExpression 'BETWEEN' ValueExpression 'BETWEEN_AND' 'CURSOR'
-   {
-     parser.valueExpressionSuggest($1, $4);
-     parser.applyTypeToSuggestions($1.types);
-     $$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    }
  | ValueExpression 'BETWEEN' ValueExpression 'CURSOR'
    {

@@ -125,34 +125,6 @@ PrivilegeType_EDIT
  : 'SELECT' ParenthesizedColumnList_EDIT
  ;
 
-PrincipalSpecificationList
- : PrincipalSpecification
- | PrincipalSpecificationList ',' PrincipalSpecification
- ;
-
-PrincipalSpecificationList_EDIT
- : PrincipalSpecificationList ',' 'CURSOR'
-   {
-     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
-   }
- | 'CURSOR' ',' PrincipalSpecificationList
-   {
-     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
-   }
- | PrincipalSpecificationList ',' 'CURSOR' ',' PrincipalSpecificationList
-   {
-     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
-   }
- ;
-
-PrincipalSpecification
- : 'GROUP' RegularOrBacktickedIdentifier
- ;
-
-PrincipalSpecification_EDIT
- : 'GROUP' 'CURSOR'
- ;
-
 UserOrRoleList
  : RegularOrBacktickedIdentifier
  | UserOrRoleList ',' RegularOrBacktickedIdentifier
