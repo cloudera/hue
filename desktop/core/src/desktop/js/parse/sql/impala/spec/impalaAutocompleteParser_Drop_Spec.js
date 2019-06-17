@@ -96,8 +96,7 @@ describe('impalaAutocompleteParser.js DROP statements', () => {
 
     it('should handle "DELETE t1 FROM t1 JOIN t2 ON t1.x = t2.x WHERE t1.y = FALSE and t2.z > 100;|"', () => {
       assertAutoComplete({
-        beforeCursor:
-          'DELETE t1 FROM t1 JOIN t2 ON t1.x = t2.x WHERE t1.y = FALSE and t2.z > 100;',
+        beforeCursor: 'DELETE t1 FROM t1 JOIN t2 ON t1.x = t2.x WHERE t1.y = FALSE and t2.z > 100;',
         afterCursor: '',
         noErrors: true,
         containsKeywords: ['SELECT'],

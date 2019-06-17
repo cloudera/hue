@@ -56,16 +56,7 @@ describe('impalaAutocompleteParser.js GRANT statements', () => {
         noErrors: true,
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: [
-            'ALL',
-            'ALTER',
-            'CREATE',
-            'DROP',
-            'INSERT',
-            'REFRESH',
-            'ROLE',
-            'SELECT'
-          ]
+          suggestKeywords: ['ALL', 'ALTER', 'CREATE', 'DROP', 'INSERT', 'REFRESH', 'ROLE', 'SELECT']
         }
       });
     });
@@ -285,16 +276,7 @@ describe('impalaAutocompleteParser.js GRANT statements', () => {
         noErrors: true,
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: [
-            'ALL',
-            'ALTER',
-            'CREATE',
-            'DROP',
-            'INSERT',
-            'REFRESH',
-            'ROLE',
-            'SELECT'
-          ]
+          suggestKeywords: ['ALL', 'ALTER', 'CREATE', 'DROP', 'INSERT', 'REFRESH', 'ROLE', 'SELECT']
         }
       });
     });

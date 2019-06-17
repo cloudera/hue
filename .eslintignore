@@ -13,3 +13,6 @@
 /desktop/core/src/desktop/js/parse/sql/impala/impalaSyntaxParser.js
 /desktop/core/src/desktop/js/parse/sql/hive/hiveAutocompleteParser.js
 /desktop/core/src/desktop/js/parse/sql/hive/hiveSyntaxParser.js
+/desktop/core/src/desktop/js/parse/sql/generic/spec/genericAutocompleteParser_Locations_Spec.js
+/desktop/core/src/desktop/js/parse/sql/hive/spec/hiveAutocompleteParser_Locations_Spec.js
+/desktop/core/src/desktop/js/parse/sql/impala/spec/impalaAutocompleteParser_Locations_Spec.js

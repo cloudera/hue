@@ -152,7 +152,7 @@ describe('impalaAutocompleteParser.js CREATE statements', () => {
 
     it(
       "should handle \"CREATE AGGREGATE FUNCTION baa.boo(INT, DOUBLE) RETURNS INT LOCATION '/boo' INIT_FN='cos' UPDATE_FN='sin' " +
-      "MERGE_FN='cos' PREPARE_FN='cos' CLOSE_FN='cos' SERIALIZE_FN='cos' FINALIZE_FN='cos'; |\"",
+        "MERGE_FN='cos' PREPARE_FN='cos' CLOSE_FN='cos' SERIALIZE_FN='cos' FINALIZE_FN='cos'; |\"",
       () => {
         assertAutoComplete({
           beforeCursor:
@@ -169,7 +169,7 @@ describe('impalaAutocompleteParser.js CREATE statements', () => {
 
     it(
       "should handle \"CREATE AGGREGATE FUNCTION baa.boo(INT, DOUBLE) RETURNS INT LOCATION '/boo' INIT_FN='cos' UPDATE_FN='sin' " +
-      "MERGE_FN='cos' PREPARE_FN='cos' CLOSE_FN='cos' SERIALIZE_FN='cos' FINALIZE_FN='cos' INTERMEDIATE bigint; |\"",
+        "MERGE_FN='cos' PREPARE_FN='cos' CLOSE_FN='cos' SERIALIZE_FN='cos' FINALIZE_FN='cos' INTERMEDIATE bigint; |\"",
       () => {
         assertAutoComplete({
           beforeCursor:
@@ -299,8 +299,7 @@ describe('impalaAutocompleteParser.js CREATE statements', () => {
 
     it("should suggest keywords for \"CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION '/boo' INIT_FN='cos' |\"", () => {
       assertAutoComplete({
-        beforeCursor:
-          "CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION '/boo' INIT_FN='cos' ",
+        beforeCursor: "CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION '/boo' INIT_FN='cos' ",
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
@@ -337,7 +336,7 @@ describe('impalaAutocompleteParser.js CREATE statements', () => {
 
     it(
       "should suggest keywords for \"CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION '/boo' INIT_FN='cos' UPDATE_FN='sin' MERGE_FN='tan' " +
-      "PREPARE_FN='boo' SERIALIZE_FN='baa' |\"",
+        "PREPARE_FN='boo' SERIALIZE_FN='baa' |\"",
       () => {
         assertAutoComplete({
           beforeCursor:
@@ -927,15 +926,7 @@ describe('impalaAutocompleteParser.js CREATE statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: [
-            'AVRO',
-            'KUDU',
-            'ORC',
-            'PARQUET',
-            'RCFILE',
-            'SEQUENCEFILE',
-            'TEXTFILE'
-          ]
+          suggestKeywords: ['AVRO', 'KUDU', 'ORC', 'PARQUET', 'RCFILE', 'SEQUENCEFILE', 'TEXTFILE']
         }
       });
     });
@@ -1200,7 +1191,7 @@ describe('impalaAutocompleteParser.js CREATE statements', () => {
 
     it(
       'should handle "CREATE TABLE IF NOT EXISTS tbl (i INT PRIMARY KEY, b INT ENCODING bla COMPRESSION zip DEFAULT 10 BLOCK_SIZE 4 NOT NULL,' +
-      ' PRIMARY KEY (b)) STORED AS KUDU;|"',
+        ' PRIMARY KEY (b)) STORED AS KUDU;|"',
       () => {
         assertAutoComplete({
           beforeCursor:
@@ -1218,7 +1209,7 @@ describe('impalaAutocompleteParser.js CREATE statements', () => {
 
     it(
       'should handle "CREATE TABLE IF NOT EXISTS tbl (i INT PRIMARY KEY, b INT ENCODING bla COMPRESSION zip DEFAULT 10 BLOCK_SIZE 4 NOT NULL,' +
-      ' PRIMARY KEY (b)) PARTITION BY RANGE (a, b) (PARTITION 1 <= VALUES < 2) STORED AS KUDU;|"',
+        ' PRIMARY KEY (b)) PARTITION BY RANGE (a, b) (PARTITION 1 <= VALUES < 2) STORED AS KUDU;|"',
       () => {
         assertAutoComplete({
           beforeCursor:
@@ -1236,7 +1227,7 @@ describe('impalaAutocompleteParser.js CREATE statements', () => {
 
     it(
       'should handle "CREATE TABLE IF NOT EXISTS tbl (i INT PRIMARY KEY, b INT ENCODING bla COMPRESSION zip DEFAULT 10 BLOCK_SIZE 4 NOT NULL,' +
-      ' PRIMARY KEY (b)) PARTITION BY RANGE (a) (PARTITION VALUE = 50, PARTITION 50 < VALUES <= 100) STORED AS KUDU;|"',
+        ' PRIMARY KEY (b)) PARTITION BY RANGE (a) (PARTITION VALUE = 50, PARTITION 50 < VALUES <= 100) STORED AS KUDU;|"',
       () => {
         assertAutoComplete({
           beforeCursor:
@@ -1254,7 +1245,7 @@ describe('impalaAutocompleteParser.js CREATE statements', () => {
 
     it(
       'should handle "CREATE TABLE IF NOT EXISTS tbl (i INT ENCODING bla COMPRESSION zip DEFAULT 10 BLOCK_SIZE 4 NOT NULL,' +
-      ' PRIMARY KEY (b)) PARTITION BY HASH (a, b) PARTITIONS 10 STORED AS KUDU;|"',
+        ' PRIMARY KEY (b)) PARTITION BY HASH (a, b) PARTITIONS 10 STORED AS KUDU;|"',
       () => {
         assertAutoComplete({
           beforeCursor:

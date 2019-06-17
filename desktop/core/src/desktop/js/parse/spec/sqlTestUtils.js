@@ -89,11 +89,18 @@ const testUtils = {
             }
           }
 
-          if (((testDefinition.expectedResult && testDefinition.expectedResult.locations) || testDefinition.expectedLocations) && actualResponse.locations) {
-            let expectedLoc =  testDefinition.expectedLocations || testDefinition.expectedResult.locations;
-            let expectsType = expectedLoc.some(location => location.type === 'statementType');
+          if (
+            ((testDefinition.expectedResult && testDefinition.expectedResult.locations) ||
+              testDefinition.expectedLocations) &&
+            actualResponse.locations
+          ) {
+            const expectedLoc =
+              testDefinition.expectedLocations || testDefinition.expectedResult.locations;
+            const expectsType = expectedLoc.some(location => location.type === 'statementType');
             if (!expectsType) {
-              actualResponse.locations = actualResponse.locations.filter(location => location.type !== 'statementType');
+              actualResponse.locations = actualResponse.locations.filter(
+                location => location.type !== 'statementType'
+              );
             }
           }
 
