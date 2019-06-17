@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 from metadata.conf import OPTIMIZER, has_optimizer
 
 from desktop.auth.backend import is_admin
-from desktop.conf import CONNECTORS
+from desktop.conf import has_connectors
 from desktop.views import commonheader, commonfooter
 %>
 
@@ -74,7 +74,7 @@ ${ layout.menubar(section='quick_start') }
 
           <div id="step2" class="stepDetails hide">
             <h3>${ _('Connectors to data services') }</h3>
-            % if CONNECTORS.IS_ENABLED.get():
+            % if has_connectors():
               <a href="${ url('desktop.lib.connectors.views.index') }"><i class="fa fa-exchange"></i> ${ _('Configure') }</a>
             % else:
               <a href="${ url('desktop.views.dump_config') }" target="_blank">${ _('Configuration') }</a>

@@ -685,22 +685,6 @@ METRICS = ConfigSection(
 )
 
 
-CONNECTORS = ConfigSection(
-  key='connectors',
-  help=_("""Configuration options for connectors to external services"""),
-  members=dict(
-    IS_ENABLED=Config(
-      key='is_enabled',
-      help=_('Enable connector page'),
-      default=False,
-      type=coerce_bool),
-   LIST=Config(
-      key='list',
-      default=['impala'],
-      type=coerce_csv),
-  )
-)
-
 ANALYTICS = ConfigSection(
   key='analytics',
   help=_("""Configuration options for analytics user usage for admins"""),
@@ -1777,11 +1761,15 @@ def get_clusters(user):
   return OrderedDict(clusters)
 
 
+# Deprecated
 def has_multi_cluster():
   return bool(CLUSTERS.get())
 
 def has_multi_clusters():
   return len(CLUSTERS.get()) > 1
+
+def has_connectors():
+  return len(CONNECTORS.get()) > 1
 
 
 CLUSTERS = UnspecifiedConfigSection(
@@ -1815,6 +1803,23 @@ CLUSTERS = UnspecifiedConfigSection(
           type=str,
       ),
     )
+  )
+)
+
+
+CONNECTORS = ConfigSection(
+  key='connectors',
+  help=_("""Configuration options for connectors to external services"""),
+  members=dict(
+    # IS_ENABLED=Config(
+    #   key='is_enabled',
+    #   help=_('Enable connector page'),
+    #   default=False,
+    #   type=coerce_bool),
+   LIST=Config(
+      key='list',
+      default=['impala'],
+      type=coerce_csv),
   )
 )
 

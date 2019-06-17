@@ -23,12 +23,12 @@ import uuid
 
 from django.utils.translation import ugettext as _
 
-from desktop.conf import has_multi_cluster, TASK_SERVER
+from desktop.conf import has_multi_cluster, TASK_SERVER, has_connectors
 from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 
-from notebook.conf import get_ordered_interpreters, CONNECTORS
+from notebook.conf import get_ordered_interpreters
 from notebook.sql_utils import get_current_statement
 
 
@@ -325,7 +325,7 @@ def get_api(request, snippet):
   interface = interpreter['interface']
 
 
-  if CONNECTORS.IS_ENABLED.get():
+  if has_connectors():
     cluster = {
       'connector': snippet['type'],
       'id': interpreter['type'],
