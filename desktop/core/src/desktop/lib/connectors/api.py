@@ -48,35 +48,36 @@ CONNECTOR_TYPES = [{
 CONNECTOR_TYPES += [
   {'name': "Hive Tez", 'type': 'hive-tez', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'id': None, 'category': 'engines', 'description': ''},
   {'name': "Hive LLAP", 'type': 'hive-llap', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Druid", 'type': 'druid', 'settings': [{'name': 'connection_url', 'value': 'druid://druid-host.com:8082/druid/v2/sql/'}], 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Kafka SQL", 'type': 'kafka-sql', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "SparkSQL", 'type': 'spark-sql', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Presto", 'type': 'presto', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Athena", 'type': 'athena', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Redshift", 'type': 'redshift', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Big Query", 'type': 'bigquery', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Oracle", 'type': 'oracle', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "SQL Database", 'type': 'sql-alchemy', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "SQL Database (JDBC)", 'type': 'sql-jdbc', 'settings': {}, 'id': None, 'category': 'engines', 'description': 'Deprecated: older way to connect to any database.'},
+  {'name': "Druid", 'type': 'sql-druid', 'settings': [{'name': 'connection_url', 'value': 'druid://druid-host.com:8082/druid/v2/sql/'}], 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "Kafka SQL", 'type': 'kafka-sql', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "SparkSQL", 'type': 'spark-sql', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "MySQL", 'type': 'sql-mysql', 'settings': [{'name': 'connection_url', 'value': 'mysql://username:password@mysq-host:3306/hue'}], 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "Presto", 'type': 'presto', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "Athena", 'type': 'athena', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "Redshift", 'type': 'redshift', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "Big Query", 'type': 'bigquery', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "Oracle", 'type': 'oracle', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "SQL Database", 'type': 'sql-alchemy', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "SQL Database (JDBC)", 'type': 'sql-jdbc', 'settings': [], 'id': None, 'category': 'engines', 'description': 'Deprecated: older way to connect to any database.'},
 
-  {'name': "PySpark", 'type': 'pyspark', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Spark", 'type': 'spark', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Pig", 'type': 'pig', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Java", 'type': 'java', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "PySpark", 'type': 'pyspark', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "Spark", 'type': 'spark', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "Pig", 'type': 'pig', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "Java", 'type': 'java', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
 
-  {'name': "HDFS", 'type': 'hdfs', 'settings': {}, 'id': None, 'category': 'browsers', 'description': ''},
-  {'name': "YARN", 'type': 'yarn', 'settings': {}, 'id': None, 'category': 'browsers', 'description': ''},
-  {'name': "S3", 'type': 's3', 'settings': {}, 'id': None, 'category': 'browsers', 'description': ''},
-  {'name': "ADLS", 'type': 'adls-v1', 'settings': {}, 'id': None, 'category': 'browsers', 'description': ''},
+  {'name': "HDFS", 'type': 'hdfs', 'settings': [], 'id': None, 'category': 'browsers', 'description': ''},
+  {'name': "YARN", 'type': 'yarn', 'settings': [], 'id': None, 'category': 'browsers', 'description': ''},
+  {'name': "S3", 'type': 's3', 'settings': [], 'id': None, 'category': 'browsers', 'description': ''},
+  {'name': "ADLS", 'type': 'adls-v1', 'settings': [], 'id': None, 'category': 'browsers', 'description': ''},
 
-  {'name': "Hive Metastore", 'type': 'hms', 'settings': {}, 'id': None, 'category': 'catalogs', 'description': ''},
-  {'name': "Atlas", 'type': 'atlas', 'settings': {}, 'id': None, 'category': 'catalogs', 'description': ''},
-  {'name': "Navigator", 'type': 'navigator', 'settings': {}, 'id': None, 'category': 'catalogs', 'description': ''},
+  {'name': "Hive Metastore", 'type': 'hms', 'settings': [], 'id': None, 'category': 'catalogs', 'description': ''},
+  {'name': "Atlas", 'type': 'atlas', 'settings': [], 'id': None, 'category': 'catalogs', 'description': ''},
+  {'name': "Navigator", 'type': 'navigator', 'settings': [], 'id': None, 'category': 'catalogs', 'description': ''},
 
-  {'name': "Optimizer", 'type': 'optimizer', 'settings': {}, 'id': None, 'category': 'optimizers', 'description': ''},
+  {'name': "Optimizer", 'type': 'optimizer', 'settings': [], 'id': None, 'category': 'optimizers', 'description': ''},
 
-  {'name': "Oozie", 'type': 'oozie', 'settings': {}, 'id': None, 'category': 'schedulers', 'description': ''},
-  {'name': "Celery", 'type': 'celery', 'settings': {}, 'id': None, 'category': 'schedulers', 'description': '' },
+  {'name': "Oozie", 'type': 'oozie', 'settings': [], 'id': None, 'category': 'schedulers', 'description': ''},
+  {'name': "Celery", 'type': 'celery', 'settings': [], 'id': None, 'category': 'schedulers', 'description': '' },
 ]
 
 CATEGORIES = [
@@ -106,23 +107,28 @@ AVAILABLE_CONNECTORS = _group_category_connectors(CONNECTOR_TYPES)
 # TODO: remove installed connectors that don't have a connector or are blacklisted
 # TODO: load back from DB and apply Category properties, e.g. defaults, interface, category, category_name...
 # TODO: connector groups: if we want one type (e.g. Hive) to show-up with multiple computes and the same saved query.
-CONFIGURED_CONNECTORS = [
+CONNECTOR_INSTANCES = [
   {'name': 'Impala', 'type': Impala().TYPE + '-1', 'connector_name': Impala().TYPE, 'interface': Impala().INTERFACE, 'settings': Impala().PROPERTIES, 'id': 1, 'category': 'engines', 'description': ''},
   {'name': 'Hive', 'type': Hive().TYPE + '-2', 'connector_name': Hive().TYPE, 'interface': Hive().INTERFACE, 'settings': Hive().PROPERTIES, 'id': 2, 'category': 'engines', 'description': ''},
   {'name': 'Hive c5', 'type': Hive().TYPE + '-3', 'connector_name': Hive().TYPE, 'interface': Hive().INTERFACE, 'settings': Hive().PROPERTIES, 'id': 3, 'category': 'engines', 'description': ''},
+  {'name': 'MySQL', 'type': 'mysql-4', 'connector_name': 'sql-alchemy', 'interface': 'sqlalchemy', 'settings': [], 'id': 4, 'category': 'engines', 'description': ''},
 ]
 
-CONFIGURED_CONNECTORS[0]['settings'] = [
+
+CONNECTOR_INSTANCES[0]['settings'] = [
   {'name': 'server_host', 'value': 'self-service-dw-2.gce.cloudera.com'},
   {'name': 'server_port', 'value': '21050'},
 ]
-CONFIGURED_CONNECTORS[1]['settings'] = [
+CONNECTOR_INSTANCES[1]['settings'] = [
   {'name': 'server_host', 'value': 'self-service-dw-1.gce.cloudera.com'},
   {'name': 'server_port', 'value': '10000'},
 ]
-CONFIGURED_CONNECTORS[2]['settings'] = [
-  {'name': 'server_host', 'value': 'nightly6x-unsecure-1.vpc.cloudera.com '},
+CONNECTOR_INSTANCES[2]['settings'] = [
+  {'name': 'server_host', 'value': 'nightly6x-unsecure-1.vpc.cloudera.com'},
   {'name': 'server_port', 'value': '10000'},
+]
+CONNECTOR_INSTANCES[3]['settings'] = [
+  {'name': 'url', 'value': 'mysql://hue:datasshue@romain2:3306/hue'},
 ]
 
 
@@ -139,7 +145,7 @@ def get_connector_classes(request):
 
 def get_installed_connectors(request):
   return JsonResponse({
-    'connectors': _group_category_connectors(CONFIGURED_CONNECTORS),
+    'connectors': _group_category_connectors(CONNECTOR_INSTANCES),
   })
 
 
@@ -174,7 +180,7 @@ def update_connector(request):
     instance['connector_name'] = instance['type']
     instance['type'] = '%s-%s' % (instance['type'], CONNECTOR_IDS)
     CONNECTOR_IDS += 1
-    CONFIGURED_CONNECTORS.append(instance)
+    CONNECTOR_INSTANCES.append(instance)
 
   return JsonResponse({'connector': instance, 'saved_as': saved_as})
 
@@ -191,13 +197,13 @@ def _get_connector_by_type(type):
 
 
 def delete_connector(request):
-  global CONFIGURED_CONNECTORS
+  global CONNECTOR_INSTANCES
 
   connector = json.loads(request.POST.get('connector'), '{}')
 
-  size_before = len(CONFIGURED_CONNECTORS)
-  CONFIGURED_CONNECTORS = filter(lambda _connector: _connector['name'] != connector['name'], CONFIGURED_CONNECTORS)
-  size_after = len(CONFIGURED_CONNECTORS)
+  size_before = len(CONNECTOR_INSTANCES)
+  CONNECTOR_INSTANCES = filter(lambda _connector: _connector['name'] != connector['name'], CONNECTOR_INSTANCES)
+  size_after = len(CONNECTOR_INSTANCES)
 
   if size_before == size_after + 1:
     return JsonResponse({})
@@ -206,9 +212,9 @@ def delete_connector(request):
 
 
 def _get_connector_by_id(id):
-  global CONFIGURED_CONNECTORS
+  global CONNECTOR_INSTANCES
 
-  instance = filter(lambda connector: connector['id'] == id, CONFIGURED_CONNECTORS)
+  instance = filter(lambda connector: connector['id'] == id, CONNECTOR_INSTANCES)
 
   if instance:
     return instance[0]

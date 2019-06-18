@@ -47,8 +47,8 @@ def check_permissions(user, interpreter, user_apps=None):
 
 
 def get_ordered_interpreters(user=None):
-  from desktop.lib.connectors.api import CONFIGURED_CONNECTORS
-  global CONFIGURED_CONNECTORS
+  from desktop.lib.connectors.api import CONNECTOR_INSTANCES
+  global CONNECTOR_INSTANCES
 
   if not INTERPRETERS.get():
     _default_interpreters(user)
@@ -74,7 +74,7 @@ def get_ordered_interpreters(user=None):
         'type': i['type'],
         'interface': i['interface'],
         'options': {setting['name']: setting['value'] for setting in i['settings']}
-      } for i in CONFIGURED_CONNECTORS
+      } for i in CONNECTOR_INSTANCES
     ]
   else:
     reordered_interpreters = interpreters_shown_on_wheel + [i for i in user_interpreters if i not in interpreters_shown_on_wheel]
