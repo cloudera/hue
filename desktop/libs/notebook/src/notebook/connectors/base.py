@@ -324,15 +324,13 @@ def get_api(request, snippet):
   interpreter = interpreter[0]
   interface = interpreter['interface']
 
-
+  # TODO: Multi cluster --> multi computes of a connector
   if has_connectors():
     cluster = {
       'connector': snippet['type'],
       'id': interpreter['type'],
     }
-    snippet['type'] = snippet['type'].split('-', 2)[0]
     cluster.update(interpreter['options'])
-  # Multi cluster
   elif has_multi_cluster():
     cluster = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API or Notebook create sessions
     if cluster == '""' or cluster == 'undefined':

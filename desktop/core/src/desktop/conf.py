@@ -1807,19 +1807,37 @@ CLUSTERS = UnspecifiedConfigSection(
 )
 
 
-CONNECTORS = ConfigSection(
+CONNECTORS = UnspecifiedConfigSection(
   key='connectors',
   help=_("""Configuration options for connectors to external services"""),
-  members=dict(
-    # IS_ENABLED=Config(
-    #   key='is_enabled',
-    #   help=_('Enable connector page'),
-    #   default=False,
-    #   type=coerce_bool),
-   LIST=Config(
-      key='list',
-      default=['impala'],
-      type=coerce_csv),
+  each=ConfigSection(
+    help=_("Id of the connector."),
+    members=dict(
+      NAME=Config(
+          "name",
+          help=_("Nice name of the connector to show to the user. Same as id if not specified."),
+          default=None,
+          type=str,
+      ),
+      TYPE=Config(
+          "type",
+          help=_("Type of cluster, e.g. single, direct, local ini, CM API, Dataeng, Arcus, BigQuery, Presto."),
+          default='direct',
+          type=str,
+      ),
+      INTERFACE=Config(
+          "interface",
+          help=_("Type of cluster interface"),
+          default='hive',
+          type=str,
+      ),
+      OPTIONS=Config(
+        key='options',
+        help=_('Specific options for connecting to the server.'),
+        type=coerce_json_dict,
+        default='{}'
+      )
+    )
   )
 )
 

@@ -114,7 +114,6 @@ CONNECTOR_INSTANCES = [
   {'name': 'MySQL', 'type': 'mysql-4', 'connector_name': 'sql-alchemy', 'interface': 'sqlalchemy', 'settings': [], 'id': 4, 'category': 'engines', 'description': ''},
 ]
 
-
 CONNECTOR_INSTANCES[0]['settings'] = [
   {'name': 'server_host', 'value': 'self-service-dw-2.gce.cloudera.com'},
   {'name': 'server_port', 'value': '21050'},
@@ -130,7 +129,6 @@ CONNECTOR_INSTANCES[2]['settings'] = [
 CONNECTOR_INSTANCES[3]['settings'] = [
   {'name': 'url', 'value': 'mysql://hue:datasshue@romain2:3306/hue'},
 ]
-
 
 
 def get_connector_classes(request):
