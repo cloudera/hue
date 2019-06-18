@@ -60,15 +60,15 @@
   start="${ coord.start_server_tz }" end="${ coord.end_server_tz }" timezone="${ coord.data['properties']['timezone'] }"
   xmlns="${ 'uri:oozie:coordinator:0.4' if coord.sla_enabled else coord.data['properties']['schema_version'] | n,unicode }"
   ${ 'xmlns:sla="uri:oozie:sla:0.2"' if coord.sla_enabled else '' | n,unicode }>
-  % if coord.data['properties']['timeout'] or coord.data['properties'].get('concurrency') or coord.data['properties']['execution'] or coord.data['properties'].get('throttle'):
+  % if coord.data['properties'].get('timeout') or coord.data['properties'].get('concurrency') or coord.data['properties'].get('execution') or coord.data['properties'].get('throttle'):
   <controls>
-    % if coord.data['properties']['timeout']:
+    % if coord.data['properties'].get('timeout'):
     <timeout>${ coord.data['properties']['timeout'] }</timeout>
     % endif
     % if coord.data['properties'].get('concurrency'):
     <concurrency>${ coord.data['properties']['concurrency'] }</concurrency>
     % endif
-    % if coord.data['properties']['execution']:
+    % if coord.data['properties'].get('execution'):
     <execution>${ coord.data['properties']['execution'] }</execution>
     % endif
     % if coord.data['properties'].get('throttle'):
