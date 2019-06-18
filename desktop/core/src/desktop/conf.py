@@ -1769,7 +1769,7 @@ def has_multi_clusters():
   return len(CLUSTERS.get()) > 1
 
 def has_connectors():
-  return len(CONNECTORS.get()) > 1
+  return len(CONNECTORS.get()) >= 1
 
 
 CLUSTERS = UnspecifiedConfigSection(
