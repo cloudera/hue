@@ -1,0 +1,17 @@
+{{- if .Values.hue.database.create -}}
+{{- if .Values.hue.database.persist -}}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: postgres-pvc
+  labels:
+    type: local
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  volumeName: postgres-pv
+{{- end -}}
+{{- end -}}

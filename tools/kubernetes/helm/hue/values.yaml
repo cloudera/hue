@@ -6,6 +6,7 @@ hue:
   replicas: 1
   database:
     create: true
+    persist: true
     engine: "postgresql_psycopg2"
     host: "hue-postgres"
     port: 5432

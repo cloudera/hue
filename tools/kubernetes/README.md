@@ -43,7 +43,7 @@ sudo snap install microk8s --classic
 
 sudo snap alias microk8s.kubectl kubectl
 
-microk8s.enable metrics-server dns
+microk8s.enable dns ingress storage
 ```
 
 And
@@ -52,6 +52,12 @@ And
 sudo snap install helm --classic
 
 helm init
+```
+
+Optional (for more complete Kubernetes environment):
+
+```
+microk8s.enable metrics-server registry prometheus fluentd dashboard
 ```
 
 ## Images
