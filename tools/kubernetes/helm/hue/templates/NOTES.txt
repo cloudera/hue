@@ -16,17 +16,29 @@ Then opening-up:
 
 Or running below commands to get the recommended URL:
 
-{{- if .Values.balancer.enabled -}}
+  export WEB_HOST=$(kubectl get node -o jsonpath="{.items[0].metadata.name}")
+
+{{ if and .Values.ingress.create (eq .Values.ingress.type "nginx") }}
+
+  echo http://$WEB_HOST
+
+{{ else if and .Values.ingress.create (eq .Values.ingress.type "nginx-ssl") }}
+
+  echo https://$WEB_HOST
+
+{{ else if .Values.balancer.enabled }}
 
   export WEB_PORT=$(kubectl get service hue-balancer -o jsonpath="{.spec.ports[*].nodePort}" --namespace {{ .Release.Namespace }})
 
-{{- else -}}
+  echo http://$WEB_HOST:$WEB_PORT
+
+{{ else }}
 
   export WEB_PORT=$(kubectl get service hue -o jsonpath="{.spec.ports[*].nodePort}" --namespace {{ .Release.Namespace }})
 
-{{- end }}
-
   echo http://$WEB_HOST:$WEB_PORT
+
+{{ end }}
 
 
 Happy Querying!
