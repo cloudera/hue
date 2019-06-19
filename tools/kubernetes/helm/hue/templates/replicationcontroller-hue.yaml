@@ -22,6 +22,13 @@ spec:
           - name: config-volume-extra
             mountPath: /usr/share/hue/desktop/conf/zz-hue.ini
             subPath: hue-ini
+          readinessProbe:
+            httpGet:
+              path: /desktop/debug/is_alive
+              port: 8888
+            initialDelaySeconds: 3
+            periodSeconds: 3
+            failureThreshold: 30
       volumes:
         - name: config-volume
           configMap:
