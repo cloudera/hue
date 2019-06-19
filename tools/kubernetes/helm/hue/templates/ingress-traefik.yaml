@@ -1,4 +1,4 @@
-{{- if and .Values.ingress.create (eq .Values.ingress.create "traefik") -}}
+{{- if and (.Values.ingress.create) (eq .Values.ingress.type "traefik") -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:

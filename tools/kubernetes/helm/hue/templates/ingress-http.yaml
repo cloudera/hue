@@ -1,4 +1,4 @@
-{{- if and .Values.ingress.create (eq .Values.ingress.create "nginx") -}}
+{{- if and .Values.ingress.create (eq .Values.ingress.type "nginx") -}}
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:

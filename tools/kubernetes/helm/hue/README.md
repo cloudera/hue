@@ -36,24 +36,32 @@ and open-up http://localhost:8888
 
 ## Ingress
 
-Minimal:
+### Minimal
 
     microk8s.enable ingress
     kubectl edit daemonsets nginx-ingress-microk8s-controller
 
 And can edit `--default-backend-service=$(POD_NAMESPACE)/default-http-backend`.
 
-## SSL
-
-Based on Jetstack and Let's encrypt and nginx-ingress:
+### NGINX
 
     helm install stable/nginx-ingress -n nginx-ingress
+
+And set `ingress.create=true` and `ingress.type=nginx` in [values.yaml](values.yaml).
+
+### SSL
+
+Requires NGINX previous step first.
+
+Then based on Jetstack and Let's encrypt and nginx-ingress:
 
     kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
     kubectl label namespace cert-manager certmanager.k8s.io/disable-validation="true"
     helm repo add jetstack https://charts.io.jetstack
     helm repo update
     helm install --name cert-manager --namespace cert-manager jetstack/cert-manager
+
+#### Manual troubleshooting
 
 Generate certificates:
 
@@ -63,12 +71,12 @@ Generate certificates:
     kubectl get certificate
     kubectl describe ingress
 
-### Reset certificate
+Reset certificate:
 
     kubectl delete certificate letsencrypt-prod
     kubectl delete secrets letsencrypt-prod
 
-### Debug certificate
+Debug certificate:
 
     kubectl describe certificate
     # <events>  Normal  OrderCreated  77m   cert-manager  Created Order resource "example-tls-754518127"

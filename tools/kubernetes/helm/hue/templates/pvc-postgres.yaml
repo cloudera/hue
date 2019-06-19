@@ -1,5 +1,4 @@
-{{- if .Values.hue.database.create -}}
-{{- if .Values.hue.database.persist -}}
+{{- if and .Values.hue.database.persist .Values.hue.database.create -}}
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
@@ -13,5 +12,4 @@ spec:
     requests:
       storage: 2Gi
   volumeName: postgres-pv
-{{- end -}}
 {{- end -}}
