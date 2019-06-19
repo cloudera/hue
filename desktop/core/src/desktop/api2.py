@@ -135,50 +135,28 @@ def get_context_namespaces(request, interface):
 
 @api_error_handler
 def get_context_computes(request, interface):
+  '''
+  Some clusters like Snowball can have multiple computes for a certain languages (Hive, Impala...).
+  '''
   response = {}
   computes = []
 
   clusters = get_clusters(request.user).values()
-  has_altus_clusters = [cluster for cluster in clusters if 'altus' in cluster['type']]
-
-  computes.extend([{
-      'id': cluster['id'],
-      'name': cluster['name'],
-      'namespace': cluster['id'],
-      'interface': interface,
-      'type': cluster['type']
-    } for cluster in clusters if cluster.get('type') == 'direct' and cluster['interface'] in (interface, 'all')
-  ])
+  has_altus_clusters = [cluster for cluster in clusters if 'altus' in cluster['type'] or 'snowball' in cluster['type']]
 
   if has_altus_clusters:
     if interface == 'impala' or interface == 'report':
       if IS_K8S_ONLY.get():
         dw_clusters = DataWarehouse2Api(request.user).list_clusters()['clusters']
-      else:
-        dw_clusters = AnalyticDbApi(request.user).list_clusters()['clusters']
-
-      computes.extend([{
-          'id': cluster.get('crn'),
-          'name': cluster.get('clusterName'),
-          'status': cluster.get('status'),
-          'namespace': cluster.get('namespaceCrn', cluster.get('crn')),
-          'compute_end_point': IS_K8S_ONLY.get() and '%(publicHost)s' % cluster['coordinatorEndpoint'] or '',
-          'type': 'altus-dw'
-        } for cluster in dw_clusters if (cluster.get('status') == 'CREATED' and cluster.get('cdhVersion') >= 'CDH515') or (IS_K8S_ONLY.get() and 'TERMINAT' not in cluster['status'])]
-      )
-
-    if interface == 'oozie' or interface == 'spark2':
-      computes.extend([{
-          'id': cluster.get('crn'),
-          'name': cluster.get('clusterName'),
-          'status': cluster.get('status'),
-          'environmentType': cluster.get('environmentType'),
-          'serviceType': cluster.get('serviceType'),
-          'namespace': cluster.get('namespaceCrn'),
-          'type': 'altus-de'
-        } for cluster in DataEngApi(request.user).list_clusters()['clusters']]
-      )
-      # TODO if interface == 'spark2' keep only SPARK type
+        computes.extend([{
+            'id': cluster.get('crn'),
+            'name': cluster.get('clusterName'),
+            'status': cluster.get('status'),
+            'namespace': cluster.get('namespaceCrn', cluster.get('crn')),
+            'compute_end_point': IS_K8S_ONLY.get() and '%(publicHost)s' % cluster['coordinatorEndpoint'] or '',
+            'type': 'altus-dw'
+          } for cluster in dw_clusters]
+        )
 
   response[interface] = computes
   response['status'] = 0
@@ -186,7 +164,7 @@ def get_context_computes(request, interface):
   return JsonResponse(response)
 
 
-# Deprecated
+# Deprecated, not used.
 @api_error_handler
 def get_context_clusters(request, interface):
   response = {}

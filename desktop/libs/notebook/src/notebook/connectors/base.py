@@ -349,7 +349,7 @@ def get_api(request, snippet):
   elif cluster and 'crn:altus:dataeng:' in cluster_name:
     interface = 'dataeng'
 
-  LOG.info('Selected cluster %s %s interface %s' % (cluster_name, cluster, interface))
+  LOG.debug('Selected connector %s %s interface=%s compute=%s' % (cluster_name, cluster, interface, snippet.get('compute')))
   snippet['interface'] = interface
 
   if interface.startswith('hiveserver2') or interface == 'hms':
