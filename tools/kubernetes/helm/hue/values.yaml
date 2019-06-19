@@ -31,7 +31,7 @@ hue:
     app_blacklist=filebrowser,search,hbase,security,jobbrowser,metastore
     django_debug_mode=true
 
-    use_cherrypy_server=false
+    use_cherrypy_server=true
     gunicorn_work_class=gevent
 
     [[task_server]]
