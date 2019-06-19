@@ -88,11 +88,7 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
   LOG.debug("Query cluster %s: %s" % (name, cluster))
 
   cluster_config = get_cluster_config(cluster)
-
-  if name == 'impala':
-    from impala.dbms import get_query_server_config as impala_query_server_config
-    query_server = impala_query_server_config(cluster_config=cluster_config)
-  elif name == "llap":
+  if name == "llap":
     activeEndpoint = cache.get('llap')
     if activeEndpoint is None:
       if HIVE_DISCOVERY_LLAP.get() == True:
@@ -124,7 +120,7 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
         LOG.debut("Zookeeper Discovery not enabled, reverting to config values")
         cache.set("llap", json.dumps({"host": LLAP_SERVER_HOST.get(), "port": LLAP_SERVER_PORT.get()}), CACHE_TIMEOUT.get())
     activeEndpoint = json.loads(cache.get("llap"))
-  elif name != 'hms':
+  elif name != 'hms' and name != 'impala':
     activeEndpoint = cache.get("hiveserver2")
     if activeEndpoint is None:
       if HIVE_DISCOVERY_HS2.get() == True:
@@ -143,7 +139,10 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
       else:
         cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": hive_site.hiveserver2_thrift_http_port()}))
     activeEndpoint = json.loads(cache.get("hiveserver2"))
-  if name == 'hms':
+  if name == 'impala':
+    from impala.dbms import get_query_server_config as impala_query_server_config
+    query_server = impala_query_server_config(cluster_config=cluster_config)
+  elif name == 'hms':
     kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
     query_server = {
         'server_name': 'hms',
