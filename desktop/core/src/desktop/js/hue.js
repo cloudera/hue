@@ -72,6 +72,8 @@ import sqlStatementsParser from 'parse/sqlStatementsParser'; // In search.ko and
 import HueFileEntry from 'doc/hueFileEntry';
 import HueDocument from 'doc/hueDocument';
 
+import sqlParserRepository from 'parse/sql/sqlParserRepository';
+
 // TODO: Migrate away
 window._ = _;
 window.apiHelper = apiHelper;
@@ -111,6 +113,7 @@ window.sqlAutocompleteParser = sqlAutocompleteParser;
 window.SqlAutocompleter = SqlAutocompleter;
 window.SqlFunctions = SqlFunctions;
 window.SqlSetOptions = SqlSetOptions;
+window.sqlParserRepository = sqlParserRepository;
 window.sqlStatementsParser = sqlStatementsParser;
 window.sqlUtils = sqlUtils;
 window.sqlWorkerHandler = sqlWorkerHandler;

@@ -3,7 +3,8 @@
   "plugins": [
     ["module-resolver", {
       "root": ["./desktop/core/src/desktop/js"]
-    }]
+    }],
+    "@babel/plugin-syntax-dynamic-import"
   ],
   "overrides": [{
     "test": "./desktop/core/src/desktop/js/parse/sqlAutocompleteParser.js",
