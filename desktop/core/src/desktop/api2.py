@@ -79,18 +79,13 @@ def get_config(request):
 
 @api_error_handler
 def get_context_namespaces(request, interface):
+  '''
+  Namespaces are node cluster contexts (e.g. Hive + Ranger) that can be queried by computes.
+  '''
   response = {}
   namespaces = []
 
   clusters = get_clusters(request.user).values()
-
-  namespaces.extend([{
-      'id': cluster['id'],
-      'name': cluster['name'],
-      'status': 'CREATED',
-      'computes': [cluster]
-    } for cluster in clusters if cluster.get('type') == 'direct' and cluster['interface'] in (interface, 'all')
-  ])
 
   if interface == 'hive' or interface == 'impala' or interface == 'report':
     # From Altus SDX
