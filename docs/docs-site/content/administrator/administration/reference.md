@@ -17,7 +17,7 @@ Hue is often run with:
 
 * Cherrypy with [NGINX](http://gethue.com/using-nginx-to-speed-up-hue-3-8-0/) (recommended)
 * Cherrypy with HTTPD (built-in when using Cloudera Manager)
-* Gunicorn is coming soon with [HUE-8739](https://issues.cloudera.org/browse/HUE-8739)
+* Gunicorn is coming with [HUE-8739](https://issues.cloudera.org/browse/HUE-8739)
 * [Apache mod Python](http://gethue.com/how-to-run-hue-with-the-apache-server/)
 
 ### Task Server
