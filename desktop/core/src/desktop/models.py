@@ -1677,7 +1677,7 @@ class ClusterConfig():
       try:
         first_non_sql_index = [interpreter['is_sql'] for interpreter in interpreters].index(False)
       except ValueError:
-        first_non_sql_index = 0
+        first_non_sql_index = len(interpreters) if all([interpreter['is_sql'] for interpreter in interpreters]) else 0
       interpreters.insert(first_non_sql_index, {
         'name': 'notebook',
         'type': 'notebook',
