@@ -35,7 +35,7 @@ hue:
     gunicorn_work_class=gevent
 
     [[task_server]]
-    enabled=true
+    enabled=false
     broker_url=redis://redis:6379/0
     result_cache='{"BACKEND": "django_redis.cache.RedisCache", "LOCATION": "redis://redis:6379/0", "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},"KEY_PREFIX": "queries"}'
     celery_result_backend=redis://redis:6379/0
@@ -54,10 +54,10 @@ hue:
 balancer:
   enabled: true
 workers:
-  enabled: true
+  enabled: false
   replicas: 1
 scheduler:
-  enabled: true
+  enabled: false
 aws:
   accessKeyId: ""
   secretAccessKey: ""
