@@ -57,7 +57,8 @@ module.exports = {
   },
   output: {
     path:  __dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/hue',
-    filename: '[name]-bundle-[hash].js'
+    filename: '[name]-bundle-[hash].js',
+    chunkFilename: '[name]-bundle-[hash].js',
   },
   module: {
     rules: [
