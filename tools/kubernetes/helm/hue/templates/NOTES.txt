@@ -15,8 +15,9 @@ Then opening-up:
 
 
 Or running below commands to get the recommended URL:
-
+{{ if true }}
   export WEB_HOST=$(kubectl get node -o jsonpath="{.items[0].metadata.name}")
+{{- end -}}
 
 {{ if and .Values.ingress.create (eq .Values.ingress.type "nginx") }}
 
@@ -39,6 +40,4 @@ Or running below commands to get the recommended URL:
   echo http://$WEB_HOST:$WEB_PORT
 
 {{ end }}
-
-
 Happy Querying!
