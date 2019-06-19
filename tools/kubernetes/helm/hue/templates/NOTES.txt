@@ -13,11 +13,20 @@ Then opening-up:
 
   http://localhost:8888
 
-Or directly running below to get the URL:
 
-  export WEB_HOST=$(kubectl get node -o jsonpath="{.items[0].metadata.name}")
+Or running below commands to get the recommended URL:
+
+{{- if .Values.balancer.enabled -}}
+
+  export WEB_PORT=$(kubectl get service hue-balancer -o jsonpath="{.spec.ports[*].nodePort}" --namespace {{ .Release.Namespace }})
+
+{{- else -}}
+
   export WEB_PORT=$(kubectl get service hue -o jsonpath="{.spec.ports[*].nodePort}" --namespace {{ .Release.Namespace }})
 
+{{- end }}
+
   echo http://$WEB_HOST:$WEB_PORT
+
 
 Happy Querying!
