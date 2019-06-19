@@ -351,7 +351,7 @@ def get_api(request, snippet):
   if cluster:
     LOG.info('Selected cluster %s' % cluster)
 
-  LOG.info('Selected cluster %s %s interface %s' % (cluster_name, cluster, interface))
+  LOG.debug('Selected connector %s %s interface=%s compute=%s' % (cluster_name, cluster, interface, snippet.get('compute')))
   snippet['interface'] = interface
 
   if interface.startswith('hiveserver2') or interface == 'hms':

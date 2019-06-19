@@ -107,6 +107,7 @@ AVAILABLE_CONNECTORS = _group_category_connectors(CONNECTOR_TYPES)
 # TODO: remove installed connectors that don't have a connector or are blacklisted
 # TODO: load back from DB and apply Category properties, e.g. defaults, interface, category, category_name...
 # TODO: connector groups: if we want one type (e.g. Hive) to show-up with multiple computes and the same saved query.
+# TODO: type --> name, type --> SQL language, e.g. mysql
 CONNECTOR_INSTANCES = [
   {'name': 'Impala', 'type': Impala().TYPE + '-1', 'connector_name': Impala().TYPE, 'interface': Impala().INTERFACE, 'settings': Impala().PROPERTIES, 'id': 1, 'category': 'engines', 'description': ''},
   {'name': 'Hive', 'type': Hive().TYPE + '-2', 'connector_name': Hive().TYPE, 'interface': Hive().INTERFACE, 'settings': Hive().PROPERTIES, 'id': 2, 'category': 'engines', 'description': ''},
