@@ -26,8 +26,13 @@ spec:
             - containerPort: 5432
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
-              name: pg-data
+              name: postgres-data
       volumes:
-        - name: pg-data
+        - name: postgres-data
+          {{ if .Values.hue.database.persist }}
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+          {{ else }}
           emptyDir: {}
+          {{ end }}
 {{- end -}}
