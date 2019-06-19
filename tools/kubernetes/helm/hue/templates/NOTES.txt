@@ -25,7 +25,7 @@ Or running below commands to get the recommended URL:
 
 {{ else if and .Values.ingress.create (eq .Values.ingress.type "nginx-ssl") }}
 
-  echo https://$WEB_HOST
+  echo https://{{ .Values.ingress.domain }}
 
 {{ else if .Values.balancer.enabled }}
 
