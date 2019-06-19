@@ -383,6 +383,11 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'unique-hue'
+    },
+    'hive_discovery': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/tmp/hive_discovery_cache',
+        'TIMEOUT': 60,
     }
 }
 CACHES_CELERY_KEY = 'celery'
