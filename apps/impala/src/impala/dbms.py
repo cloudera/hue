@@ -17,7 +17,7 @@
 
 import logging
 
-from desktop.lib.i18n import smart_str
+from django.utils.translation import ugettext as _
 
 from beeswax.design import hql_query
 from beeswax.models import QUERY_TYPES
@@ -26,7 +26,12 @@ from beeswax.server.dbms import HiveServer2Dbms, QueryServerException, QueryServ
   get_query_server_config as beeswax_query_server_config
 
 from desktop.conf import CLUSTER_ID
+from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.i18n import smart_str
+from desktop.models import Cluster, ClusterConfig
+
 from impala import conf
+from notebook.conf import get_ordered_interpreters
 
 
 LOG = logging.getLogger(__name__)
@@ -101,19 +106,26 @@ class ImpalaDbms(HiveServer2Dbms):
         query = hql_query(hql, query_type=QUERY_TYPES[1])
         handle = self.execute_and_wait(query, timeout_sec=10.0)
       elif table is None:
+        if not Cluster(self.client.user).get_app_config().get_hive_metastore_interpreters():
+          raise PopupException(_("Hive and HMS not configured. Please do a full refresh"))
         diff_tables = self._get_different_tables(database)
-        for table in diff_tables:
-          hql = "INVALIDATE METADATA `%s`.`%s`" % (database, table)
-          query = hql_query(hql, query_type=QUERY_TYPES[1])
-          handle = self.execute_and_wait(query, timeout_sec=10.0)
+        if len(diff_tables) > 10:
+          raise PopupException(_("Too many tables (%s) to invalidate. Please do a full refresh") % str(len(diff_tables)))
+        else:
+          for table in diff_tables:
+            hql = "INVALIDATE METADATA `%s`.`%s`" % (database, table)
+            query = hql_query(hql, query_type=QUERY_TYPES[1])
+            handle = self.execute_and_wait(query, timeout_sec=10.0)
       else:
         hql = "INVALIDATE METADATA `%s`.`%s`" % (database, table)
         query = hql_query(hql, query_type=QUERY_TYPES[1])
         handle = self.execute_and_wait(query, timeout_sec=10.0)
-    except QueryServerTimeoutException, e:
+    except QueryServerTimeoutException as e:
       # Allow timeout exceptions to propagate
       raise e
-    except Exception, e:
+    except PopupException as e:
+      raise e
+    except Exception as e:
       msg = 'Failed to invalidate `%s`: %s' % (database or 'databases', e)
       raise QueryServerException(msg)
     finally:
@@ -170,7 +182,8 @@ class ImpalaDbms(HiveServer2Dbms):
 
 
   def _get_beeswax_tables(self, database):
-    beeswax_query_server = dbms.get(user=self.client.user, query_server=beeswax_query_server_config(name='beeswax'))
+    interpreters = ['beeswax' if interpreter == 'hive' else interpreter for interpreter in Cluster(self.client.user).get_app_config().get_hive_metastore_interpreters()]
+    beeswax_query_server = dbms.get(user=self.client.user, query_server=beeswax_query_server_config(name=interpreters[0]))
     return beeswax_query_server.get_tables(database=database)
 
 

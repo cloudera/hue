@@ -1551,10 +1551,7 @@ class Document2Permission(models.Model):
 
 
 def get_cluster_config(user):
-  cluster_type = Cluster(user).get_type()
-  cluster_config = ClusterConfig(user, cluster_type=cluster_type)
-
-  return cluster_config.get_config()
+  return Cluster(user).get_app_config().get_config()
 
 
 # Aka 'Atus'
@@ -1929,6 +1926,8 @@ class ClusterConfig():
     else:
       return None
 
+  def get_hive_metastore_interpreters(self):
+    return list(filter(lambda interpreter: interpreter == 'hive' or interpreter == 'hms', [interpreter['type'] for interpreter in get_ordered_interpreters(self.user)]))
 
 class Cluster():
 
@@ -1951,6 +1950,9 @@ class Cluster():
 
   def get_config(self, name):
     return self.clusters[name]
+
+  def get_app_config(self):
+    return ClusterConfig(self.user, cluster_type=self.get_type())
 
 
 def _get_apps(user, section=None):
