@@ -115,7 +115,7 @@ def index(request, is_mobile=False):
   template = 'search.mako'
   if is_mobile:
     template = 'search_m.mako'
-  engine = collection.data['collection']['engine']
+  engine = collection.data['collection'].get('engine', 'solr')
 
   return render(template, request, {
     'collection': collection,
