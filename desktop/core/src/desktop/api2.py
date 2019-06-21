@@ -87,6 +87,15 @@ def get_context_namespaces(request, interface):
 
   clusters = get_clusters(request.user).values()
 
+  # Currently broken if not sent
+  namespaces.extend([{
+      'id': cluster['id'],
+      'name': cluster['name'],
+      'status': 'CREATED',
+      'computes': [cluster]
+    } for cluster in clusters if cluster.get('type') == 'direct' and cluster['interface'] in (interface, 'all')
+  ])
+
   if interface == 'hive' or interface == 'impala' or interface == 'report':
     # From Altus SDX
     if [cluster for cluster in clusters if 'altus' in cluster['type']]:
@@ -138,6 +147,16 @@ def get_context_computes(request, interface):
 
   clusters = get_clusters(request.user).values()
   has_altus_clusters = [cluster for cluster in clusters if 'altus' in cluster['type'] or 'snowball' in cluster['type']]
+
+  # Currently broken if not sent
+  computes.extend([{
+      'id': cluster['id'],
+      'name': cluster['name'],
+      'namespace': cluster['id'],
+      'interface': interface,
+      'type': cluster['type']
+    } for cluster in clusters if cluster.get('type') == 'direct' and cluster['interface'] in (interface, 'all')
+  ])
 
   if has_altus_clusters:
     if interface == 'impala' or interface == 'report':

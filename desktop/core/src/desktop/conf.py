@@ -1763,7 +1763,7 @@ def get_clusters(user):
 
 # Deprecated
 def has_multi_cluster():
-  return bool(CLUSTERS.get())
+  return bool(CLUSTERS.get()) and False
 
 def has_multi_clusters():
   return len(CLUSTERS.get()) > 1
