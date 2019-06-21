@@ -251,7 +251,7 @@ class HS2Api(Api):
       if statement.get('statement_id') == 0:
         if query.database and not statement['statement'].lower().startswith('set'):
           db.use(query.database)
-      handle = db.client.query(query, with_multiple_session=True)
+      handle = db.client.query(query, with_multiple_session=True) # Note: with_multiple_session currently ignored
     except QueryServerException, ex:
       raise QueryError(ex.message, handle=statement)
 
