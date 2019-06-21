@@ -16,6 +16,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pickle
+
 from django.contrib.auth.models import User
 from nose.tools import assert_equal, assert_false, assert_true
 
@@ -26,7 +28,6 @@ from libsentry.privilege_checker import PrivilegeChecker
 
 
 class MockSentryApiV1(object):
-
 
   def __init__(self, *args, **kwargs):
     pass
@@ -63,7 +64,6 @@ class MockSentryApiV1(object):
 
 class MockSentryApiV2(object):
 
-
   def __init__(self, *args, **kwargs):
     pass
 
@@ -91,7 +91,6 @@ class MockSentryApiV2(object):
 
 class TestPrivilegeChecker(object):
 
-
   def setUp(self):
     self.client = make_logged_in_client(username="test", groupname="test", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
@@ -100,6 +99,12 @@ class TestPrivilegeChecker(object):
     self.api_v1 = MockSentryApiV1()
     self.api_v2 = MockSentryApiV2()
     self.checker = PrivilegeChecker(user=self.user, api_v1=self.api_v1, api_v2=self.api_v2)
+
+
+  def test_pickling(self):
+    # Used when caching the serialized
+    serialized_checker = pickle.dumps(self.checker)
+    pickle.loads(serialized_checker)
 
 
   def test_to_sentry_authorizables(self):

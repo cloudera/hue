@@ -232,7 +232,7 @@ class OnePageViewModel {
       $rawHtml.find('a[href]').each(function() {
         let link = $(this).attr('href');
         if (link.startsWith('/') && !link.startsWith('/hue')) {
-          link =  window.HUE_BASE_URL + '/hue' + link;
+          link = window.HUE_BASE_URL + '/hue' + link;
         }
         $(this).attr('href', link);
       });
@@ -338,13 +338,19 @@ class OnePageViewModel {
                       .replace('*', encodeURIComponent(self.currentContextParams()[key.name]))
                       .replace(/#/g, '%23');
                   } else {
-                    baseURL = baseURL.replace('*', encodeURI(self.currentContextParams()[key.name])); // We have some really funky stuff in here, this should be encodeURIComponent
+                    baseURL = baseURL.replace(
+                      '*',
+                      encodeURI(self.currentContextParams()[key.name])
+                    ); // We have some really funky stuff in here, this should be encodeURIComponent
                   }
                 } else {
                   baseURL = baseURL.replace('*', '');
                 }
               } else {
-                baseURL = baseURL.replace(':' + key.name, encodeURI(self.currentContextParams()[key.name])); // We have some really funky stuff in here, this should be encodeURIComponent
+                baseURL = baseURL.replace(
+                  ':' + key.name,
+                  encodeURI(self.currentContextParams()[key.name])
+                ); // We have some really funky stuff in here, this should be encodeURIComponent
               }
             });
           }
@@ -383,6 +389,13 @@ class OnePageViewModel {
                 }, 0);
               });
             } else {
+              if (type.indexOf('json') > -1) {
+                const presponse = JSON.parse(response);
+                if (presponse && presponse.url) {
+                  window.location.href = window.HUE_BASE_URL + presponse.url;
+                  return;
+                }
+              }
               window.location.href = window.HUE_BASE_URL + baseURL;
             }
           },
@@ -498,8 +511,10 @@ class OnePageViewModel {
         }
       },
       { url: '/dashboard/*', app: 'dashboard' },
-      { url: '/desktop/api/desktop/api2/doc/export*', app: function() {
-          var documents = getUrlParameter('documents');
+      {
+        url: '/desktop/api/desktop/api2/doc/export*',
+        app: function() {
+          const documents = getUrlParameter('documents');
           location.href = window.HUE_BASE_URL + '/desktop/api2/doc/export?documents=' + documents;
         }
       },
@@ -581,8 +596,10 @@ class OnePageViewModel {
         }
       },
       { url: '/filebrowser/view=*', app: 'filebrowser' },
-      { url: '/filebrowser/download=*', app: function(ctx) {
-        location.href = window.HUE_BASE_URL + '/filebrowser/download=' + ctx.params[0];
+      {
+        url: '/filebrowser/download=*',
+        app: function(ctx) {
+          location.href = window.HUE_BASE_URL + '/filebrowser/download=' + ctx.params[0];
         }
       },
       {
@@ -603,6 +620,7 @@ class OnePageViewModel {
       { url: '/catalog', app: 'catalog' },
       { url: '/kafka/', app: 'kafka' },
       { url: '/indexer/topics/*', app: 'kafka' },
+      { url: '/indexer/indexes', app: 'indexes' },
       { url: '/indexer/indexes/*', app: 'indexes' },
       { url: '/indexer/', app: 'indexes' },
       { url: '/indexer/importer/', app: 'importer' },
@@ -821,7 +839,8 @@ class OnePageViewModel {
         const prefix = window.IS_EMBEDDED ? '' : '/hue';
         if (href.startsWith('/') && !href.startsWith(prefix)) {
           page(window.HUE_BASE_URL + prefix + href);
-        } else if (href.indexOf('#') == 0) { // Only place that seem to use this is hbase onclick row
+        } else if (href.indexOf('#') == 0) {
+          // Only place that seem to use this is hbase onclick row
           window.location.hash = href;
         } else {
           page(href);

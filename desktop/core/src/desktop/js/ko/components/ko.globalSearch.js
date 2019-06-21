@@ -148,11 +148,18 @@ class GlobalSearch {
         disableNavigation: true,
         showMagnify: true,
         facetDropDownVisible: self.facetDropDownVisible,
-        spin: loading,
-        placeHolder: I18n(window.HAS_CATALOG ? 'Search data and saved documents...' : 'Search saved documents...'),
+        spin: self.loading,
+        placeHolder: I18n(
+          window.HAS_CATALOG ? 'Search data and saved documents...' : 'Search saved documents...'
+        ),
         querySpec: self.querySpec,
-        onClear: function () { self.selectedIndex(null); self.searchResultVisible(false); },
-        facets: window.HAS_READ_ONLY_CATALOG ? ['type', 'tag', 'classification'] : ['type', 'tag', 'parentPath', 'originalName'],
+        onClear: function() {
+          self.selectedIndex(null);
+          self.searchResultVisible(false);
+        },
+        facets: window.HAS_READ_ONLY_CATALOG
+          ? ['classification', 'tag', 'tags', 'type']
+          : ['originalName', 'parentPath', 'tag', 'tags', 'type'],
         knownFacetValues: self.knownFacetValues,
         autocompleteFromEntries: self.autocompleteFromEntries,
         triggerObservable: self.searchResultCategories
@@ -339,9 +346,11 @@ class GlobalSearch {
     const self = this;
     dataCatalog.getAllNavigatorTags({ silenceErrors: true }).done(facets => {
       const facetValues = self.knownFacetValues();
-      facetValues['tag'] = facets;
       facetValues['tags'] = facets;
-      facetValues['classification'] = facets;
+      facetValues['tag'] = facets;
+      if (window.HAS_READ_ONLY_CATALOG) {
+        facetValues['classification'] = facets;
+      }
     });
   }
 

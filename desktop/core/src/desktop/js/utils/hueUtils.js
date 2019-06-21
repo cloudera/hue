@@ -160,7 +160,10 @@ const changeURL = (newURL, params) => {
   }
 
   const hashSplit = newURL.split('#');
-  var base = hashSplit[0].length && hashSplit[0].indexOf(window.HUE_BASE_URL) !== 0 ? window.HUE_BASE_URL : '';
+  const base =
+    hashSplit[0].length && hashSplit[0].indexOf(window.HUE_BASE_URL) !== 0
+      ? window.HUE_BASE_URL
+      : '';
   let url = base + hashSplit[0];
   if (extraSearch) {
     url += (url.indexOf('?') === -1 ? '?' : '&') + extraSearch;

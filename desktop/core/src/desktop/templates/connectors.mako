@@ -294,6 +294,9 @@ ${ layout.menubar(section='connectors') }
         <a href="javascript:void(0)" data-bind="click: $root.updateConnector">
           ${ _('Save') }
         </a>
+        <a href="javascript:void(0)" data-bind="click: function() { $root.section('add-connector-page'); }">
+          ${ _('Cancel') }
+        </a>
       <!-- /ko -->
     <!-- /ko -->
     <a href="javascript:void(0)">
