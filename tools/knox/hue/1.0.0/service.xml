@@ -33,5 +33,10 @@
       <rewrite apply="HUE/hue/outbound/huerooturl" to="response.body"/>
     </route>
   </routes>
-  <dispatch classname="org.apache.knox.gateway.dispatch.PassAllHeadersDispatch" />
+  <dispatch classname="org.apache.knox.gateway.dispatch.ConfigurableDispatch" ha-classname="org.apache.knox.gateway.dispatch.ConfigurableDispatch">
+    <param>
+      <name>responseExcludeHeaders</name>
+      <value>WWW-AUTHENTICATE</value>
+    </param>
+  </dispatch>
 </service>
