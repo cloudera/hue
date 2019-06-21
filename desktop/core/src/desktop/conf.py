@@ -1761,14 +1761,12 @@ def get_clusters(user):
   return OrderedDict(clusters)
 
 
-# Deprecated
-def has_multi_cluster():
-  return bool(CLUSTERS.get()) and False
-
 def has_multi_clusters():
+  '''If Hue is configured to talk to more than one completely independent clusters'''
   return len(CLUSTERS.get()) > 1
 
 def has_connectors():
+  '''When the connector feature is turned on'''
   return len(CONNECTORS.get()) >= 1
 
 

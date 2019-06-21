@@ -24,14 +24,14 @@ from django.forms.formsets import formset_factory
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
-from desktop.conf import USE_NEW_EDITOR, IS_MULTICLUSTER_ONLY, has_multi_cluster
+from desktop.conf import USE_NEW_EDITOR, IS_MULTICLUSTER_ONLY
 from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str, force_unicode
 from desktop.lib.rest.http_client import RestException
 from desktop.lib.json_utils import JSONEncoderForHTML
-from desktop.models import Document, Document2
+from desktop.models import Document, Document2, get_cluster_config
 
 from liboozie.credentials import Credentials
 from liboozie.oozie_api import get_oozie
@@ -722,7 +722,7 @@ def submit_coordinator(request, doc_id):
 def _submit_coordinator(request, coordinator, mapping):
   try:
     wf = coordinator.workflow
-    if IS_MULTICLUSTER_ONLY.get() and has_multi_cluster():
+    if IS_MULTICLUSTER_ONLY.get() and get_cluster_config(request.user)['has_computes']:
       mapping['auto-cluster'] = {
         u'additionalClusterResourceTags': [],
         u'automaticTerminationCondition': u'EMPTY_JOB_QUEUE', #'u'NONE',
