@@ -56,11 +56,10 @@ configuration is available in the template directory.
 
 Community
 -----------
-   * How to [contribute](docs/CONTRIBUTING.md)
+   * Help Forum: https://discourse.gethue.com/ ([previous mailing list](http://groups.google.com/a/cloudera.org/group/hue-user))
    * High level [roadmap](docs/ROADMAP.md)
-   * User group: http://groups.google.com/a/cloudera.org/group/hue-user
+   * How to [contribute](docs/CONTRIBUTING.md)
    * Jira: https://issues.cloudera.org/browse/HUE
-   * Reviews: https://review.cloudera.org/dashboard/?view=to-group&group=hue (repo 'hue-rw')
 
 
 License

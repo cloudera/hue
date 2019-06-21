@@ -1564,7 +1564,9 @@ ${ assist.assistPanel() }
           }
 
           setTimeout(function () {
-            var types = type.args.filter(function(x){ return x && x.type !== 'checkbox'});
+            var types = type.args.filter(function (x){
+              return x && (x.type !== 'checkbox' || x.name === 'hasHeader');
+            });
             for (var i = 0; i < types.length; i++) {
               self[types[i].name].subscribe(function() {
                 // Update the data preview when tweaking Format options on step 1
