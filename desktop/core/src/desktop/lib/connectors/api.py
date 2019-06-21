@@ -45,6 +45,7 @@ CONNECTOR_TYPES = [{
   ]
 ]
 
+
 CONNECTOR_TYPES += [
   {'name': "Hive Tez", 'type': 'hive-tez', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'id': None, 'category': 'engines', 'description': ''},
   {'name': "Hive LLAP", 'type': 'hive-llap', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'id': None, 'category': 'engines', 'description': ''},
@@ -59,6 +60,9 @@ CONNECTOR_TYPES += [
   {'name': "Oracle", 'type': 'oracle', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
   {'name': "SQL Database", 'type': 'sql-alchemy', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
   {'name': "SQL Database (JDBC)", 'type': 'sql-jdbc', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'engines', 'description': 'Deprecated: older way to connect to any database.'},
+  # solr
+  # hbase
+  # kafka
 
   {'name': "PySpark", 'type': 'pyspark', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
   {'name': "Spark", 'type': 'spark', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
@@ -108,6 +112,8 @@ AVAILABLE_CONNECTORS = _group_category_connectors(CONNECTOR_TYPES)
 # TODO: load back from DB and apply Category properties, e.g. defaults, interface, category, category_name...
 # TODO: connector groups: if we want one type (e.g. Hive) to show-up with multiple computes and the same saved query.
 # TODO: type --> name, type --> SQL language, e.g. mysql
+
+# connector_type: engine, engine_type: sql, language: hive, hive tez, hiveserver2 + endpoint
 CONNECTOR_INSTANCES = [
   {'name': 'Impala', 'type': Impala().TYPE + '-1', 'connector_name': Impala().TYPE, 'interface': Impala().INTERFACE, 'settings': Impala().PROPERTIES, 'id': 1, 'category': 'engines', 'description': ''},
   {'name': 'Hive', 'type': Hive().TYPE + '-2', 'connector_name': Hive().TYPE, 'interface': Hive().INTERFACE, 'settings': Hive().PROPERTIES, 'id': 2, 'category': 'engines', 'description': ''},
