@@ -23,10 +23,11 @@ import uuid
 
 from django.utils.translation import ugettext as _
 
-from desktop.conf import has_multi_cluster, TASK_SERVER, has_connectors
+from desktop.conf import TASK_SERVER, has_connectors
 from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
+from desktop.models import get_cluster_config
 
 from notebook.conf import get_ordered_interpreters
 from notebook.sql_utils import get_current_statement
@@ -324,14 +325,13 @@ def get_api(request, snippet):
   interpreter = interpreter[0]
   interface = interpreter['interface']
 
-  # TODO: Multi cluster --> multi computes of a connector
   if has_connectors():
     cluster = {
       'connector': snippet['type'],
       'id': interpreter['type'],
     }
     cluster.update(interpreter['options'])
-  elif has_multi_cluster():
+  elif get_cluster_config(request.user)['has_computes']:
     cluster = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API or Notebook create sessions
     if cluster == '""' or cluster == 'undefined':
       cluster = None

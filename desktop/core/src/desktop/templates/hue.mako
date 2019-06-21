@@ -18,10 +18,10 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
-  from desktop.conf import IS_EMBEDDED, DEV_EMBEDDED, IS_MULTICLUSTER_ONLY, has_multi_cluster, has_multi_clusters
+  from desktop.conf import IS_EMBEDDED, DEV_EMBEDDED, IS_MULTICLUSTER_ONLY, has_multi_clusters
   from desktop.views import _ko, commonshare, login_modal
   from desktop.lib.i18n import smart_unicode
-  from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, ANALYTIC_DB, hue_version
+  from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, ANALYTIC_DB, hue_version, get_cluster_config
 
   from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
   from filebrowser.conf import SHOW_UPLOAD_BUTTON
@@ -193,7 +193,7 @@ ${ hueIcons.symbols() }
     <div class="navbar-inner top-nav">
       <div class="top-nav-left">
         % if not IS_EMBEDDED.get():
-          % if not (IS_MULTICLUSTER_ONLY.get() and has_multi_cluster()):
+          % if not (IS_MULTICLUSTER_ONLY.get() and get_cluster_config(user)['has_computes']):
           <a class="hamburger hamburger-hue pull-left" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
             <span class="hamburger-box"><span class="hamburger-inner"></span></span>
           </a>
