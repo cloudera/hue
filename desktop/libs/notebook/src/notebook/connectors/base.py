@@ -283,11 +283,10 @@ def get_api(request, snippet):
     snippet['type'] = 'impala'
 
   interpreter = [
-    interpreter
-    for interpreter in get_ordered_interpreters(request.user) if snippet['type'] in (interpreter['type'], interpreter['interface'])
+    interpreter for interpreter in get_ordered_interpreters(request.user) if snippet['type'] == interpreter['type']
   ]
   if not interpreter:
-    if snippet['type'] == 'hbase':
+    if snippet['type'] == 'hbase': # TODO move to connectors
       interpreter = [{
         'name': 'hbase',
         'type': 'hbase',
@@ -325,36 +324,21 @@ def get_api(request, snippet):
   interpreter = interpreter[0]
   interface = interpreter['interface']
 
-  if has_connectors():
-    cluster = {
-      'connector': snippet['type'],
-      'id': interpreter['type'],
-    }
-    cluster.update(interpreter['options'])
-  elif get_cluster_config(request.user)['has_computes']:
-    cluster = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API or Notebook create sessions
-    if cluster == '""' or cluster == 'undefined':
-      cluster = None
-    if not cluster and snippet.get('compute'): # Via notebook.ko.js
-      cluster = snippet['compute']
+  if get_cluster_config(request.user)['has_computes']:
+    compute = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API or Notebook create sessions.
+    if compute == '""' or compute == 'undefined':
+      compute = None
+    if not compute and snippet.get('compute'): # Via notebook.ko.js
+      compute = snippet['compute']
   else:
-    cluster = None
+    compute = None
 
-  cluster_name = cluster.get('id') if cluster else None
+  LOG.debug('Selected interpreter %s interface=%s compute=%s' % (interpreter, interface, compute))
+  # snippet['interface'] = interface
 
-  if cluster and 'altus:dataware:k8s' in cluster_name:
-    interface = 'hiveserver2'
-  elif cluster and 'crn:altus:dataware:' in cluster_name:
-    interface = 'altus-adb'
-  elif cluster and 'crn:altus:dataeng:' in cluster_name:
-    interface = 'dataeng'
-
-  LOG.debug('Selected connector %s %s interface=%s compute=%s' % (cluster_name, cluster, interface, snippet.get('compute')))
-  snippet['interface'] = interface
-
-  if interface.startswith('hiveserver2') or interface == 'hms':
+  if interface == 'hiveserver2':
     from notebook.connectors.hiveserver2 import HS2Api
-    return HS2Api(user=request.user, request=request, cluster=cluster, interface=interface)
+    return HS2Api(user=request.user, request=request, interpreter=interpreter)
   elif interface == 'oozie':
     return OozieApi(user=request.user, request=request)
   elif interface == 'livy':
@@ -369,12 +353,6 @@ def get_api(request, snippet):
   elif interface == 'rdbms':
     from notebook.connectors.rdbms import RdbmsApi
     return RdbmsApi(request.user, interpreter=snippet['type'], query_server=snippet.get('query_server'))
-  elif interface == 'altus-adb':
-    from notebook.connectors.altus_adb import AltusAdbApi
-    return AltusAdbApi(user=request.user, cluster_name=cluster_name, request=request)
-  elif interface == 'dataeng':
-    from notebook.connectors.dataeng import DataEngApi
-    return DataEngApi(user=request.user, request=request, cluster_name=cluster_name)
   elif interface == 'jdbc':
     if interpreter['options'] and interpreter['options'].get('url', '').find('teradata') >= 0:
       from notebook.connectors.jdbc_teradata import JdbcApiTeradata
@@ -433,13 +411,11 @@ def _get_snippet_session(notebook, snippet):
 
 class Api(object):
 
-  def __init__(self, user, interpreter=None, request=None, cluster=None, query_server=None, interface=None):
+  def __init__(self, user, interpreter=None, request=None, query_server=None):
     self.user = user
     self.interpreter = interpreter
     self.request = request
-    self.cluster = cluster
     self.query_server = query_server
-    self.interface = interface
 
   def create_session(self, lang, properties=None):
     return {
