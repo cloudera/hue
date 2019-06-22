@@ -243,12 +243,6 @@ urlpatterns.extend(dynamic_patterns)
 urlpatterns.extend(app_urls_patterns)
 urlpatterns.extend(static_patterns)
 
-for x in dynamic_patterns:
-  logging.debug("Dynamic pattern: %s" % (x,))
-for x in app_urls_patterns:
-  logging.debug("Dynamic pattern: %s" % (x,))
-for x in static_patterns:
-  logging.debug("Static pattern: %s" % (x,))
 
 if settings.DEBUG and ENABLE_DJANGO_DEBUG_TOOL.get():
   urlpatterns += [
