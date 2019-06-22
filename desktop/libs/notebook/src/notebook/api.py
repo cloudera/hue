@@ -148,7 +148,7 @@ def _execute_notebook(request, notebook, snippet):
         else:
           _snippet['status'] = 'failed'
 
-        if history:  # If _historify failed, history will be None
+        if history: # If _historify failed, history will be None. If we get Atomic block exception, something underneath interpreter.execute() crashed and is not handled.
           history.update_data(notebook)
           history.save()
 

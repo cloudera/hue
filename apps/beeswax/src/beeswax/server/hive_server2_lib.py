@@ -576,7 +576,7 @@ class HiveServerClient(object):
         use_sasl = True
         mechanism = HiveServerClient.HS2_MECHANISMS['NONE']
       else:
-        cluster_conf = cluster.get_cluster_conf_for_job_submission()
+        cluster_conf = cluster.get_cluster_conf_for_job_submission() # Note: Create YARN HttpClient while validate config, should directly read Impala property instead
         use_sasl = cluster_conf is not None and cluster_conf.SECURITY_ENABLED.get()
         mechanism = HiveServerClient.HS2_MECHANISMS['KERBEROS']
       impersonation_enabled = self.query_server['impersonation_enabled']
