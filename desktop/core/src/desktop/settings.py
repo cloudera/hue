@@ -383,12 +383,13 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'unique-hue'
-    },
-    CACHES_HIVE_DISCOVERY_KEY.get(): {
-        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': get_cache_hive_discovery_key_path(),
     }
 }
+CACHES[CACHES_HIVE_DISCOVERY_KEY.get()] = {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': "{0}".format(get_cache_hive_discovery_key_path()),
+    }
+
 CACHES_CELERY_KEY = 'celery'
 if desktop.conf.TASK_SERVER.ENABLED.get():
   CACHES[CACHES_CELERY_KEY] = json.loads(desktop.conf.TASK_SERVER.EXECUTION_STORAGE.get())
