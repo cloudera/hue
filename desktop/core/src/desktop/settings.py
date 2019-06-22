@@ -36,7 +36,7 @@ from desktop.lib.paths import get_desktop_root
 from desktop.lib.python_util import force_dict_to_strings
 
 from aws.conf import is_enabled as is_s3_enabled
-from beeswax.conf import CACHES_HIVE_DISCOVERY_KEY, get_cache_hive_discovery_key_path
+from beeswax.conf import CACHES_HIVE_DISCOVERY_KEY
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', '..', '..'))
@@ -387,7 +387,7 @@ CACHES = {
 }
 CACHES[CACHES_HIVE_DISCOVERY_KEY.get()] = {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': "{0}".format(get_cache_hive_discovery_key_path()),
+        'LOCATION': '/tmp/hive_discovery_cache',
     }
 
 CACHES_CELERY_KEY = 'celery'
