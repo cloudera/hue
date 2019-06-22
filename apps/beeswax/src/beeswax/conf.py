@@ -71,16 +71,6 @@ CACHES_HIVE_DISCOVERY_KEY = Config(
   default="hive_discovery"
 )
 
-CACHES_HIVE_DISCOVERY_KEY_PATH = Config(
-  key="caches_hive_discovery_key_path",
-  help=_t("Filesystem path for hive discovery cache"),
-  default="/tmp/hive_discovery_cache"
-)
-
-def get_cache_hive_discovery_key_path():
-  """Get from top level default from desktop"""
-  return CACHES_HIVE_DISCOVERY_KEY_PATH.get()
-
 CACHE_TIMEOUT = Config(
   key="cache_timeout",
   help=_t("How long to pause before reaching back out to zookeeper to get the current Active HSI endpoint"),
