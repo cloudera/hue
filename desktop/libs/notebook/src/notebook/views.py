@@ -59,8 +59,10 @@ class ApiWrapper(object):
     else:
       return object.__getattribute__(self.api, name)
 
+
 def get_api(request, snippet):
   return ApiWrapper(request, snippet)
+
 
 def notebooks(request):
   editor_type = request.GET.get('type', 'notebook')
@@ -328,6 +330,7 @@ def copy(request):
       response['message'] = _('Copied %d notebook(s)') % ctr
 
   return JsonResponse(response)
+
 
 @check_document_access_permission()
 def download(request):
