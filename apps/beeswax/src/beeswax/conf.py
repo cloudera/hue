@@ -64,7 +64,11 @@ HIVE_DISCOVERY_HIVESERVER2_ZNODE = Config(
   help=_t("If Hive is using zookeeper service discovery mode, this is the znode of the hiveserver2(s)"),
   default="/hiveserver2"
 )
-
+CACHES_HIVE_DISCOVERY_KEY = Config(
+  key="caches_hive_discovery_key",
+  help=_t("Hive Discovery caches keys for a period of time to reduce strain on zookeeper.  This is the name of the cache"),
+  default="hive_discovery"
+)
 CACHE_TIMEOUT = Config(
   key="cache_timeout",
   help=_t("How long to pause before reaching back out to zookeeper to get the current Active HSI endpoint"),
