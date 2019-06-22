@@ -32,6 +32,59 @@ from beeswax.settings import NICE_NAME
 
 LOG = logging.getLogger(__name__)
 
+HIVE_DISCOVERY_LLAP = Config(
+  key="hive_discovery_llap",
+  help=_t("Have Hue determine Hive Server Interactive endpoint from zookeeper"),
+  default="false",
+  type=coerce_bool
+)
+
+HIVE_DISCOVERY_HS2 = Config(
+  key="hive_discovery_hs2",
+  help=_t("Determines whether we pull a random HiveServer2 from the list in zookeeper.  This HS2 instance is cached until hue is restarted."),
+  default="false",
+  type=coerce_bool
+)
+
+HIVE_DISCOVERY_LLAP_HA = Config(
+  key="hive_discovery_llap_ha",
+  help=_t("If you have more than one HSI server, it has a different znode setup.  This will trigger the code to check for the Active HSI Server"),
+  default="false",
+  type=coerce_bool
+)
+
+HIVE_DISCOVERY_LLAP_ZNODE = Config(
+  key="hive_discovery_llap_znode",
+  help=_t("If LLAP is enabled, you should be using zookeeper service discovery mode, this is the znode of the LLAP Master(s)"),
+  default="/hiveserver2-hive2"
+)
+
+HIVE_DISCOVERY_HIVESERVER2_ZNODE = Config(
+  key="hive_discovery_hiveserver2_znode",
+  help=_t("If Hive is using zookeeper service discovery mode, this is the znode of the hiveserver2(s)"),
+  default="/hiveserver2"
+)
+
+CACHE_TIMEOUT = Config(
+  key="cache_timeout",
+  help=_t("How long to pause before reaching back out to zookeeper to get the current Active HSI endpoint"),
+  default=60,
+  type=int
+)
+
+LLAP_SERVER_PORT = Config(
+  key="llap_server_port",
+  help=_t("Host where Hive Server Interactive is running. If Kerberos security is enabled, "
+         "the fully-qualified domain name (FQDN) is required"),
+  default="localhost"
+)
+
+LLAP_SERVER_HOST = Config(
+  key="llap_server_host",
+  help=_t("Configure the port the Hive Server Interactive runs on."),
+  default=10501,
+  type=int
+)
 
 HIVE_SERVER_HOST = Config(
   key="hive_server_host",
