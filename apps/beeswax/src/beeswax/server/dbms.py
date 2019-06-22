@@ -91,12 +91,12 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
   if name == "llap":
     activeEndpoint = cache.get('llap')
     if activeEndpoint is None:
-      if HIVE_DISCOVERY_LLAP.get() == True:
+      if HIVE_DISCOVERY_LLAP.get():
         LOG.debug("Checking zookeeper for Hive Server Interactive endpoint")
         from kazoo.client import KazooClient
         zk = KazooClient(hosts=libzookeeper_conf.ENSEMBLE.get(), read_only=True)
         zk.start()
-        if HIVE_DISCOVERY_LLAP_HA.get() == True:
+        if HIVE_DISCOVERY_LLAP_HA.get():
           znode = "{0}/instances".format(HIVE_DISCOVERY_LLAP_ZNODE.get())
           LOG.debug("Setting up LLAP with the following node {0}".format(znode))
           if zk.exists(znode):
