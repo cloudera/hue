@@ -38,7 +38,7 @@ from beeswax import hive_site
 from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, HIVE_METASTORE_HOST, HIVE_METASTORE_PORT, LIST_PARTITIONS_LIMIT, SERVER_CONN_TIMEOUT, \
   AUTH_USERNAME, AUTH_PASSWORD, APPLY_NATURAL_SORT_MAX, QUERY_PARTITIONS_LIMIT, HIVE_DISCOVERY_HIVESERVER2_ZNODE, \
   HIVE_DISCOVERY_HS2, HIVE_DISCOVERY_LLAP, HIVE_DISCOVERY_LLAP_HA, HIVE_DISCOVERY_LLAP_ZNODE, CACHE_TIMEOUT, \
-  LLAP_SERVER_HOST, LLAP_SERVER_PORT
+  LLAP_SERVER_HOST, LLAP_SERVER_PORT, CACHES_HIVE_DISCOVERY_KEY
 from beeswax.common import apply_natural_sort
 from beeswax.design import hql_query
 from beeswax.hive_site import hiveserver2_use_ssl
@@ -51,7 +51,7 @@ LOG = logging.getLogger(__name__)
 
 DBMS_CACHE = {}
 DBMS_CACHE_LOCK = threading.Lock()
-cache = caches['hive_discovery']
+cache = caches[CACHES_HIVE_DISCOVERY_KEY.get()]
 #using file cache to make sure eventlet threads are uniform, this cache is persistent on startup
 #so we clear it to make sure the server resets hiveserver2 host
 cache.clear()
