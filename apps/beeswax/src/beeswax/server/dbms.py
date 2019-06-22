@@ -44,6 +44,7 @@ from beeswax.design import hql_query
 from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.models import QueryHistory, QUERY_TYPES
 from libzookeeper import conf as libzookeeper_conf
+from kazoo.client import KazooClient
 
 LOG = logging.getLogger(__name__)
 
@@ -96,7 +97,6 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
     if activeEndpoint is None:
       if HIVE_DISCOVERY_LLAP.get():
         LOG.debug("Checking zookeeper for Hive Server Interactive endpoint")
-        from kazoo.client import KazooClient
         zk = KazooClient(hosts=libzookeeper_conf.ENSEMBLE.get(), read_only=True)
         zk.start()
         if HIVE_DISCOVERY_LLAP_HA.get():
@@ -126,8 +126,7 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
   elif name != 'hms' and name != 'impala':
     activeEndpoint = cache.get("hiveserver2")
     if activeEndpoint is None:
-      if HIVE_DISCOVERY_HS2.get() == True:
-        from kazoo.client import KazooClient
+      if HIVE_DISCOVERY_HS2.get():
         zk = KazooClient(hosts=libzookeeper_conf.ENSEMBLE.get(), read_only=True)
         zk.start()
         znode = HIVE_DISCOVERY_HIVESERVER2_ZNODE.get()
