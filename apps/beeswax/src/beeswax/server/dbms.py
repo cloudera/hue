@@ -51,7 +51,10 @@ LOG = logging.getLogger(__name__)
 DBMS_CACHE = {}
 DBMS_CACHE_LOCK = threading.Lock()
 cache = caches['hive_discovery']
+#using file cache to make sure eventlet threads are uniform, this cache is persistent on startup
+#so we clear it to make sure the server resets hiveserver2 host
 cache.clear()
+
 
 def get(user, query_server=None, cluster=None):
   global DBMS_CACHE
