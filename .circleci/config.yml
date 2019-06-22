@@ -87,12 +87,14 @@ jobs:
             cp ~/repo/.babelrc .
             npm run test
 
-      # # Code analyses
-      # - run:
-      #     name: run js tests
-      #     command: |
-      #       cd /usr/share/hue
-      #       npm run lint
+      # Code analyses
+      - run:
+          name: run js lint
+          command: |
+            cd /usr/share/hue
+            cp ~/repo/.eslint* .
+            cp ~/repo/.prettierrc .
+            npm run lint
 
       - store_artifacts:
           path: test-reports

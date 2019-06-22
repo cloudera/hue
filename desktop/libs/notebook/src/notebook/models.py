@@ -29,7 +29,7 @@ from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.db.models import Count
 from django.db.models.functions import Trunc
-from desktop.lib.paths import SAFE_CHARACTERS_URI_COMPONENTS
+from desktop.lib.paths import SAFE_CHARACTERS_URI
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
@@ -118,7 +118,7 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
     'type': 'notebook' if is_notebook else 'query-%s' % editor_type,
     'showHistory': True,
     'isSaved': is_saved,
-    'onSuccessUrl': urllib.quote(on_success_url.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) if on_success_url else None,
+    'onSuccessUrl': urllib.quote(on_success_url.encode('utf-8'), safe=SAFE_CHARACTERS_URI) if on_success_url else None,
     'pubSubUrl': pub_sub_url,
     'skipHistorify': skip_historify,
     'isManaged': is_task,

@@ -272,7 +272,7 @@ Plugin.prototype.navigateTo = function(path) {
     .find('.filechooser-tree')
     .html('<i style="font-size: 24px; color: #DDD" class="fa fa-spinner fa-spin"></i>');
   let pageSize = '?pagesize=1000';
-  var index = path.indexOf('?');
+  const index = path.indexOf('?');
   if (index > -1) {
     pageSize = path.substring(index) + pageSize.replace(/\?/, '&');
     path = path.substring(0, index);

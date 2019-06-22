@@ -231,7 +231,7 @@ class Command(BaseCommand):
         LOG.warn("Could not find user_name_attr in hue.ini")
         return err_code
 
-      if user_filter=='' or ' ' in user_filter:
+      if user_filter=='':
         LOG.info(_(user_filter_msg))
         LOG.warn("Could not find user_filter in hue.ini required for authentication")
         return err_code

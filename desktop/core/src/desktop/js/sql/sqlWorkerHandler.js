@@ -93,7 +93,7 @@ export default {
 
       // For location marking
       const aceSqlLocationWorker = new Worker(
-          window.HUE_BASE_URL + '/desktop/workers/aceSqlLocationWorker.js?v=' + window.HUE_VERSION
+        window.HUE_BASE_URL + '/desktop/workers/aceSqlLocationWorker.js?v=' + window.HUE_VERSION
       );
       aceSqlLocationWorker.onmessage = function(e) {
         if (e.data.ping) {

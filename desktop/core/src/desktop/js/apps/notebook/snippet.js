@@ -1674,6 +1674,8 @@ class Snippet {
     self.lastExecutedSelectionRange = undefined;
 
     self.execute = function(automaticallyTriggered) {
+      self.clearActiveExecuteRequests();
+
       if (!automaticallyTriggered && self.ace()) {
         const selectionRange = self.ace().getSelectionRange();
 
@@ -2238,7 +2240,7 @@ class Snippet {
 
     self.checkStatus = function() {
       const _checkStatus = function() {
-        $.post(
+        self.lastCheckStatusRequest = $.post(
           '/notebook/api/check_status',
           {
             notebook: komapping.toJSON(notebook.getContext()),
@@ -2303,15 +2305,18 @@ class Snippet {
             }
           }
         ).fail((xhr, textStatus, errorThrown) => {
-          if (xhr.status !== 502) {
-            $(document).trigger('error', xhr.responseText || textStatus);
+          if (xhr.stausText !== 'abort') {
+            if (xhr.status !== 502) {
+              $(document).trigger('error', xhr.responseText || textStatus);
+            }
+            self.status('failed');
+            notebook.isExecutingAll(false);
           }
-          self.status('failed');
-          notebook.isExecutingAll(false);
         });
       };
       const activeStatus = ['running', 'starting', 'waiting'];
       const _getLogs = function(isLastTime) {
+        window.clearTimeout(self.getLogsTimeout);
         self.getLogs().then(() => {
           const lastTime = activeStatus.indexOf(self.status()) < 0; // We to run getLogs at least one time after status is terminated to make sure we have last logs
           if (lastTime && isLastTime) {
@@ -2343,12 +2348,7 @@ class Snippet {
     self.cancel = function() {
       window.clearTimeout(self.executeNextTimeout);
       self.isCanceling(true);
-      if (self.checkStatusTimeout != null) {
-        clearTimeout(self.checkStatusTimeout);
-        self.checkStatusTimeout = null;
-        clearTimeout(self.getLogsTimeout);
-        self.getLogsTimeout = null;
-      }
+      self.clearActiveExecuteRequests();
       hueAnalytics.log('notebook', 'cancel');
 
       if (self.executingBlockingOperation != null) {
@@ -2395,12 +2395,7 @@ class Snippet {
     };
 
     self.close = function() {
-      if (self.checkStatusTimeout != null) {
-        clearTimeout(self.checkStatusTimeout);
-        self.checkStatusTimeout = null;
-        clearTimeout(self.getLogsTimeout);
-        self.getLogsTimeout = null;
-      }
+      self.clearActiveExecuteRequests();
 
       $.post(
         '/notebook/api/close_statement',
@@ -2423,8 +2418,24 @@ class Snippet {
       });
     };
 
+    self.clearActiveExecuteRequests = function() {
+      apiHelper.cancelActiveRequest(self.lastGetLogsRequest);
+      if (self.getLogsTimeout !== null) {
+        window.clearTimeout(self.getLogsTimeout);
+        self.getLogsTimeout = null;
+      }
+
+      apiHelper.cancelActiveRequest(self.lastCheckStatusRequest);
+      if (self.checkStatusTimeout !== null) {
+        window.clearTimeout(self.checkStatusTimeout);
+        self.checkStatusTimeout = null;
+      }
+    };
+
     self.getLogs = function() {
-      return $.post(
+      apiHelper.cancelActiveRequest(self.lastGetLogsRequest);
+
+      self.lastGetLogsRequest = $.post(
         '/notebook/api/get_logs',
         {
           notebook: komapping.toJSON(notebook.getContext()),
@@ -2498,11 +2509,15 @@ class Snippet {
           }
         }
       ).fail((xhr, textStatus, errorThrown) => {
-        if (xhr.status !== 502) {
-          $(document).trigger('error', xhr.responseText || textStatus);
+        if (xhr.statusText !== 'abort') {
+          if (xhr.status !== 502) {
+            $(document).trigger('error', xhr.responseText || textStatus);
+          }
+          self.status('failed');
         }
-        self.status('failed');
       });
+
+      return self.lastGetLogsRequest;
     };
 
     self.uploadQueryHistory = function(n) {
