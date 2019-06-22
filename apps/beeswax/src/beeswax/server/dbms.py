@@ -120,7 +120,7 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
               cache.set("llap", json.dumps({"host": server.split(';')[0].split('=')[1].split(":")[0], "port": server.split(';')[0].split('=')[1].split(":")[1]}))
         zk.stop()
       else:
-        LOG.debut("Zookeeper Discovery not enabled, reverting to config values")
+        LOG.debug("Zookeeper Discovery not enabled, reverting to config values")
         cache.set("llap", json.dumps({"host": LLAP_SERVER_HOST.get(), "port": LLAP_SERVER_PORT.get()}), CACHE_TIMEOUT.get())
     activeEndpoint = json.loads(cache.get("llap"))
   elif name != 'hms' and name != 'impala':
