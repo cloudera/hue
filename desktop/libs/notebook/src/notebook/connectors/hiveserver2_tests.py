@@ -21,11 +21,13 @@ import logging
 import re
 import time
 
+from mock import patch, Mock
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true
 
 from django.contrib.auth.models import User
 from django.urls import reverse
+from TCLIService.ttypes import TStatusCode, TProtocolVersion, TOperationType
 
 from desktop.lib.i18n import smart_str
 from desktop.lib.django_test_util import make_logged_in_client
@@ -41,6 +43,117 @@ from beeswax.test_base import BeeswaxSampleProvider, get_query_server_config, is
 
 
 LOG = logging.getLogger(__name__)
+
+
+class TestConnectors():
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+
+    self.user = User.objects.get(username="test")
+    grant_access("test", "default", "notebook")
+
+
+  def test_hiveserver2_impala(self):
+    notebook_json = """
+      {
+        "selectedSnippet": "impala",
+        "showHistory": false,
+        "description": "Test Impala Query",
+        "name": "Test Impala Query",
+        "sessions": [
+            {
+                "type": "impala",
+                "properties": [],
+                "id": null
+            }
+        ],
+        "type": "query-impala",
+        "id": null,
+        "snippets": [{
+          "id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"impala-xx","status":"running",
+          "statement_raw":"select * from web_logs",
+          "statement":"select * from web_logs",
+          "variables":[],
+          "properties":{"settings":[],"variables":[],"files":[],"functions":[]},
+          "result":{
+              "id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table",
+              "handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,
+                  "start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,
+                  "statement":"select * from web_logs","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}
+              },
+          "lastExecuted": 1462554843817,"database":"default"
+        }],
+        "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a",
+        "isSaved":false
+    }
+    """
+
+    connector = [{
+      'name': 'Impala', 'type': 'impala-xx', 'connector_name': 'impala', 'interface': 'hiveserver2',
+      'settings': [
+          {'name': 'server_host', 'value': 'gethue.com'},
+          {'name': 'server_port', 'value': '21050'},
+        ],
+        'id': 1, 'category': 'engines', 'description': ''
+      },
+    ]
+
+    with patch('desktop.lib.connectors.api.CONNECTOR_INSTANCES', connector):
+      with patch('desktop.lib.thrift_util.get_client') as get_client:
+        tclient = Mock()
+        successfullCall = Mock(
+          return_value=Mock(
+            status=Mock(
+              statusCode=TStatusCode.SUCCESS_STATUS
+            ),
+            sessionHandle=Mock(
+              sessionId=Mock(
+                secret='\x7f\x98\x97s\xe1\xa8G\xf4\x8a\x8a\\r\x0e6\xc2\xee\xf0',
+                guid='\xfa\xb0/\x04 \xfeDX\x99\xfcq\xff2\x07\x02\xfe',
+              )
+            ),
+            configuration={},
+            serverProtocolVersion=TProtocolVersion.HIVE_CLI_SERVICE_PROTOCOL_V7,
+            # TFetchResultsResp
+            results=Mock(
+              startRowOffset=0,
+              rows=[],
+              columns=[]
+            ),
+            # ExecuteStatement
+            operationHandle=Mock(
+              operationId=Mock(
+                secret='\x7f\x98\x97s\xe1\xa8G\xf4\x8a\x8a\\r\x0e6\xc2\xee\xf0',
+                guid='\xfa\xb0/\x04 \xfeDX\x99\xfcq\xff2\x07\x02\xfe',
+              ),
+              hasResultSet=True,
+              operationType=TOperationType.EXECUTE_STATEMENT,
+              modifiedRowCount=0
+            ),
+          )
+        )
+
+        tclient.OpenSession = successfullCall
+        tclient.ExecuteStatement = successfullCall
+        tclient.FetchResults = successfullCall
+        tclient.GetResultSetMetadata = successfullCall
+        tclient.CloseOperation = successfullCall
+
+        get_client.return_value = tclient
+        tclient.get_coordinator_host = Mock(return_value={})
+
+
+        response = self.client.post(reverse('notebook:execute'), {
+            'notebook': notebook_json,
+            'snippet': json.dumps(json.loads(notebook_json)['snippets'][0]),
+        })
+
+      get_client.assert_called()
+
+    assert_equal(response.status_code, 200)
+    data = json.loads(response.content)
+    assert_equal(data['status'], 0)
 
 
 class TestHiveserver2Api(object):
