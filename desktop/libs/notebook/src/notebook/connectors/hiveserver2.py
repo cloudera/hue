@@ -454,14 +454,14 @@ class HS2Api(Api):
       query = self._get_current_statement(notebook, snippet)['statement']
       database, table = '', ''
 
-    return _autocomplete(db, database, table, column, nested, query=query, interpreter=self.interpreter)
+    return _autocomplete(db, database, table, column, nested, query=query, cluster=self.interpreter)
 
 
   @query_error_handler
   def get_sample_data(self, snippet, database=None, table=None, column=None, async=False, operation=None):
     try:
       db = self._get_db(snippet, async, interpreter=self.interpreter)
-      return _get_sample_data(db, database, table, column, async, operation=operation, interpreter=self.interpreter)
+      return _get_sample_data(db, database, table, column, async, operation=operation, cluster=self.interpreter)
     except QueryServerException, ex:
       raise QueryError(ex.message)
 

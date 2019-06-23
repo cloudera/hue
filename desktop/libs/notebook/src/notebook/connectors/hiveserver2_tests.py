@@ -45,51 +45,43 @@ from beeswax.test_base import BeeswaxSampleProvider, get_query_server_config, is
 LOG = logging.getLogger(__name__)
 
 
-class TestConnectors():
+class TestApi():
 
-  def setUp(self):
-    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+  NOTEBOOK_JSON = """
+    {
+      "selectedSnippet": "impala",
+      "showHistory": false,
+      "description": "Test Impala Query",
+      "name": "Test Impala Query",
+      "sessions": [
+          {
+              "type": "impala",
+              "properties": [],
+              "id": null
+          }
+      ],
+      "type": "query-impala",
+      "id": null,
+      "snippets": [{
+        "id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"impala-xx","status":"running",
+        "statement_raw":"select * from web_logs",
+        "statement":"select * from web_logs",
+        "variables":[],
+        "properties":{"settings":[],"variables":[],"files":[],"functions":[]},
+        "result":{
+            "id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table",
+            "handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,
+                "start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,
+                "statement":"select * from web_logs","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}
+            },
+        "lastExecuted": 1462554843817,"database":"default"
+      }],
+      "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a",
+      "isSaved":false
+  }
+  """
 
-    self.user = User.objects.get(username="test")
-    grant_access("test", "default", "notebook")
-
-
-  def test_hiveserver2_impala(self):
-    notebook_json = """
-      {
-        "selectedSnippet": "impala",
-        "showHistory": false,
-        "description": "Test Impala Query",
-        "name": "Test Impala Query",
-        "sessions": [
-            {
-                "type": "impala",
-                "properties": [],
-                "id": null
-            }
-        ],
-        "type": "query-impala",
-        "id": null,
-        "snippets": [{
-          "id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"impala-xx","status":"running",
-          "statement_raw":"select * from web_logs",
-          "statement":"select * from web_logs",
-          "variables":[],
-          "properties":{"settings":[],"variables":[],"files":[],"functions":[]},
-          "result":{
-              "id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table",
-              "handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,
-                  "start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,
-                  "statement":"select * from web_logs","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}
-              },
-          "lastExecuted": 1462554843817,"database":"default"
-        }],
-        "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a",
-        "isSaved":false
-    }
-    """
-
-    connector = [{
+  CONNECTOR = [{
       'name': 'Impala', 'type': 'impala-xx', 'connector_name': 'impala', 'interface': 'hiveserver2',
       'settings': [
           {'name': 'server_host', 'value': 'gethue.com'},
@@ -99,7 +91,16 @@ class TestConnectors():
       },
     ]
 
-    with patch('desktop.lib.connectors.api.CONNECTOR_INSTANCES', connector):
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+
+    self.user = User.objects.get(username="test")
+    grant_access("test", "default", "notebook")
+
+
+  def test_execute_impala(self):
+
+    with patch('desktop.lib.connectors.api.CONNECTOR_INSTANCES', TestApi.CONNECTOR):
       with patch('desktop.lib.thrift_util.get_client') as get_client:
         tclient = Mock()
         successfullCall = Mock(
@@ -145,8 +146,8 @@ class TestConnectors():
 
 
         response = self.client.post(reverse('notebook:execute'), {
-            'notebook': notebook_json,
-            'snippet': json.dumps(json.loads(notebook_json)['snippets'][0]),
+            'notebook': TestApi.NOTEBOOK_JSON,
+            'snippet': json.dumps(json.loads(TestApi.NOTEBOOK_JSON)['snippets'][0]),
         })
 
       get_client.assert_called()
@@ -154,6 +155,29 @@ class TestConnectors():
     assert_equal(response.status_code, 200)
     data = json.loads(response.content)
     assert_equal(data['status'], 0)
+
+
+  def test_autocomplete_database_impala(self):
+
+    with patch('desktop.lib.connectors.api.CONNECTOR_INSTANCES', TestApi.CONNECTOR):
+      with patch('beeswax.server.dbms.get') as get:
+        get.return_value = Mock(
+          get_databases=Mock(
+            return_value=[{'comment': '', 'hdfs_link': 'hdfs://table'}]
+          )
+        )
+
+        response = self.client.post(reverse('notebook:api_autocomplete_databases'), {
+            'notebook': TestApi.NOTEBOOK_JSON,
+            'snippet': json.dumps(json.loads(TestApi.NOTEBOOK_JSON)['snippets'][0]),
+        })
+
+      get.assert_called()
+
+    assert_equal(response.status_code, 200)
+    data = json.loads(response.content)
+    assert_equal(data['status'], 0)
+    assert_equal(data['databases'], [{u'comment': u'', u'hdfs_link': u'hdfs://table'}])
 
 
 class TestHiveserver2Api(object):
