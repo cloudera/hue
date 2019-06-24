@@ -728,7 +728,7 @@ def _get_db(user, source_type=None, cluster=None):
 
   name = source_type if source_type != 'hive' else 'beeswax'
 
-  query_server = get_query_server_config(name=name, cluster=cluster)
+  query_server = get_query_server_config(name=name, connector=cluster)
   return dbms.get(user, query_server)
 
 

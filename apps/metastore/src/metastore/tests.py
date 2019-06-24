@@ -23,6 +23,7 @@ import json
 import logging
 import urllib.request, urllib.parse, urllib.error
 
+from mock import patch, Mock
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false
 
@@ -62,6 +63,40 @@ def _make_query(client, query, submission_type="Execute",
     verify_history(client, fragment=fragment)
 
   return res
+
+
+class TestApi():
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+
+    self.user = User.objects.get(username="test")
+
+
+  def test_show_tables(self):
+    with patch('beeswax.server.dbms.get') as get:
+      get.return_value=Mock(
+        get_databases=Mock(
+          return_value=['sfdc']
+        ),
+        get_database=Mock(
+          return_value={}
+        ),
+        get_tables_meta=Mock(
+          return_value=[{'name': 'customer'}, {'name': 'opportunities'}]
+        ),
+        server_name='hive'
+      )
+
+      response = self.client.post('/metastore/tables/sfdc?format=json')
+
+      get.assert_called()
+
+    assert_equal(response.status_code, 200)
+    data = json.loads(response.content)
+    assert_equal(data['status'], 0)
+    assert_equal(data['table_names'], ['customer', 'opportunities'])
+    assert_equal(data['tables'], [{'name': 'customer'}, {'name': 'opportunities'}])
 
 
 class TestMetastoreWithHadoop(BeeswaxSampleProvider):
