@@ -20,14 +20,13 @@ const libxml = require('libxmljs');
  * Class representing a doc topic
  */
 class Topic {
-
   /**
    * Create a topic
    *
    * @param {string} docRootPath - The start path
    * @param {string} ref - The relative path of the topic
    */
-  constructor (docRootPath, ref) {
+  constructor(docRootPath, ref) {
     this.docRootPath = docRootPath;
     this.ref = ref;
     this.children = [];
@@ -40,7 +39,10 @@ class Topic {
   toJson() {
     return JSON.stringify({
       body: this.domXml.toString(),
-      title: this.fragment.title.text().replace(/[\n\r]/g, ' ').trim()
+      title: this.fragment.title
+        .text()
+        .replace(/[\n\r]/g, ' ')
+        .trim()
     });
   }
 }

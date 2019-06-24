@@ -15,7 +15,6 @@
 // limitations under the License.
 
 const fs = require('fs');
-const util = require('util');
 
 const LOG_NAME = 'extractorUtils.js';
 
@@ -25,17 +24,18 @@ const LOG_NAME = 'extractorUtils.js';
  * @param {string} path
  * @return {Promise} - A promise, fulfilled with the file contents or rejected
  */
-const readFile = path => new Promise((resolve, reject) => {
-  fs.readFile(path, 'utf8', (err, contents) => {
-    if (err) {
-      console.log('%s: Could not read file \'%s\'', LOG_NAME, path);
-      console.log(err);
-      reject(err)
-    } else {
-      resolve(contents);
-    }
-  })
-});
+const readFile = path =>
+  new Promise((resolve, reject) => {
+    fs.readFile(path, 'utf8', (err, contents) => {
+      if (err) {
+        console.log("%s: Could not read file '%s'", LOG_NAME, path);
+        console.log(err);
+        reject(err);
+      } else {
+        resolve(contents);
+      }
+    });
+  });
 
 /**
  * Returns the parent folder of a file path
@@ -78,7 +78,14 @@ const hasAttributes = (node, attributes) => {
   if (typeof attributes === 'string') {
     attributes = [attributes];
   }
-  return attributes.every(attribute => node.attr(attribute) && node.attr(attribute).value().trim())
+  return attributes.every(
+    attribute =>
+      node.attr(attribute) &&
+      node
+        .attr(attribute)
+        .value()
+        .trim()
+  );
 };
 
 /**
@@ -89,7 +96,7 @@ const hasAttributes = (node, attributes) => {
 const removeAllAttributes = node => {
   node.attrs().forEach(attr => {
     attr.remove();
-  })
+  });
 };
 
 /**
@@ -104,9 +111,9 @@ const findFragmentInTopic = (topic, anchorId) => {
   if (!anchorId) {
     return topic.fragment;
   }
-  let splitIds = anchorId.split('/');
+  const splitIds = anchorId.split('/');
 
-  let findDeep = (fragments, id) => {
+  const findDeep = (fragments, id) => {
     let foundFragment = undefined;
     fragments.some(fragment => {
       if (fragment.id === id) {
@@ -119,7 +126,7 @@ const findFragmentInTopic = (topic, anchorId) => {
     return foundFragment;
   };
 
-  let fragmentsToSearch = [ topic.fragment ];
+  let fragmentsToSearch = [topic.fragment];
 
   let result = undefined;
   while (splitIds.length) {
@@ -130,7 +137,7 @@ const findFragmentInTopic = (topic, anchorId) => {
     fragmentsToSearch = result.children;
   }
   if (!result) {
-    console.log('%s: Could not find id \'%s\' in ref \'%s\'', LOG_NAME, anchorId, topic.ref);
+    console.log("%s: Could not find id '%s' in ref '%s'", LOG_NAME, anchorId, topic.ref);
     return topic.fragment;
   }
   return result;
@@ -150,9 +157,9 @@ const findFragmentInTopic = (topic, anchorId) => {
  * @return {FragmentSearchResult}
  */
 const findFragment = (parseResults, ref, anchorId) => {
-  let result = { partOfTree: true, fragment: undefined };
+  const result = { partOfTree: true, fragment: undefined };
   parseResults.some(parseResult => {
-    let topic = parseResult.topicIndex[ref];
+    const topic = parseResult.topicIndex[ref];
     if (topic) {
       result.fragment = findFragmentInTopic(topic, anchorId);
     } else {
