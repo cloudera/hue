@@ -109,7 +109,7 @@
     "less": "./node_modules/.bin/grunt less",
     "less-dev": "./node_modules/.bin/grunt watch",
     "less-lint": "stylelint \"desktop/core/src/desktop/static/desktop/less/**/*.less\" --fix",
-    "lint": "eslint desktop/core/src/desktop/js",
+    "lint": "eslint desktop/core/src/desktop/js tools/sql-docs tools/jison",
     "lint-debug": "npm run lint -- --debug",
     "lint-fix": "npm run lint -- --fix",
     "test": "babel-node desktop/core/src/desktop/js/spec/run.js",

@@ -19,7 +19,7 @@
  * to specific sections of a topic.
  */
 class DocFragment {
-  constructor (id, domElement) {
+  constructor(id, domElement) {
     this.id = id;
     this.domElement = domElement;
 

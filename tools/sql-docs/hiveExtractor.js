@@ -14,9 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const fs = require('fs');
-const mkdirp = require('mkdirp');
-const path = require('path');
 const program = require('commander');
 
 const EPub = require('epub');
@@ -52,7 +49,13 @@ const convertToPre = (element, fragments) => {
       }
       break;
     case 'code':
-      if (element.attr('class') && element.attr('class').value().indexOf('value') !== -1) {
+      if (
+        element.attr('class') &&
+        element
+          .attr('class')
+          .value()
+          .indexOf('value') !== -1
+      ) {
         fragments.push('<span class="hue-doc-varname">');
         element.childNodes().forEach(node => {
           convertToPre(node, fragments);
@@ -67,14 +70,20 @@ const convertToPre = (element, fragments) => {
   }
 };
 
-const adaptElement = (element) => {
-  if (element.attr('class') && element.attr('class').value().indexOf('syntaxhighlighter') !== -1) {
-    let fragments = ['<div class="hue-doc-codeblock">'];
+const adaptElement = element => {
+  if (
+    element.attr('class') &&
+    element
+      .attr('class')
+      .value()
+      .indexOf('syntaxhighlighter') !== -1
+  ) {
+    const fragments = ['<div class="hue-doc-codeblock">'];
     element.childNodes().forEach(childNode => {
       convertToPre(childNode, fragments);
     });
     fragments.push('</div>');
-    let replacement = fragments.join('');
+    const replacement = fragments.join('');
     element.replace(libxml.parseHtmlFragment(replacement).root());
   } else if (element.attr('class')) {
     element.attr('class').remove();
@@ -82,54 +91,59 @@ const adaptElement = (element) => {
   element.childNodes().forEach(adaptElement);
 };
 
-epub.on("end", function(){
-  let savePromises = [];
+epub.on('end', () => {
+  const rootTopics = [];
 
-  let rootTopics = [];
-  let topicStack = [];
+  const lastTopicPerLevel = {};
 
-  let lastTopicPerLevel = {};
-
-  let promises = [];
+  const promises = [];
 
   epub.flow.forEach(chapter => {
-    promises.push(new Promise((resolve, reject) => {
-      let topic = new Topic('/', chapter.id);
-      topic.fragment = {
-        title : {
-          text: () => chapter.title.replace(/LanguageManual\s(.+)/, '$1')
+    promises.push(
+      new Promise((resolve, reject) => {
+        const topic = new Topic('/', chapter.id);
+        topic.fragment = {
+          title: {
+            text: () => chapter.title.replace(/LanguageManual\s(.+)/, '$1')
+          }
+        };
+
+        epub.getChapter(chapter.id, (error, text) => {
+          try {
+            const contents = libxml.parseHtmlFragment('<div>' + text + '</div>');
+            topic.domXml = contents.root();
+            adaptElement(topic.domXml);
+            resolve();
+          } catch (error) {
+            reject();
+          }
+        });
+
+        if (lastTopicPerLevel[chapter.level - 1]) {
+          lastTopicPerLevel[chapter.level - 1].children.push(topic);
         }
-      };
 
-      epub.getChapter(chapter.id, (error, text) => {
-        try {
-          let contents = libxml.parseHtmlFragment('<div>' + text + '</div>');
-          topic.domXml = contents.root();
-          adaptElement(topic.domXml);
-          resolve();
-        } catch (error) {
-          reject();
+        if (chapter.level === 0) {
+          rootTopics.push(topic);
         }
-      });
 
-      if (lastTopicPerLevel[chapter.level - 1]) {
-        lastTopicPerLevel[chapter.level - 1].children.push(topic);
-      }
-
-      if (chapter.level === 0) {
-        rootTopics.push(topic);
-      }
-
-      lastTopicPerLevel[chapter.level] = topic;
-    }));
+        lastTopicPerLevel[chapter.level] = topic;
+      })
+    );
   });
 
   Promise.all(promises).then(() => {
-    jsonHandler.saveTopics(rootTopics, outputPath, mako, false).then(() => {
-      console.log('Done.');
-    }).catch(() => {
-      console.log('Fail.');
-    });
+    const rootTopic = rootTopics[0];
+    rootTopic.children.forEach(childTopic => {});
+
+    jsonHandler
+      .saveTopics(rootTopics, outputPath, mako, false)
+      .then(() => {
+        console.log('Done.');
+      })
+      .catch(() => {
+        console.log('Fail.');
+      });
   });
 });
 
