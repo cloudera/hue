@@ -134,7 +134,10 @@ epub.on('end', () => {
 
   Promise.all(promises).then(() => {
     const rootTopic = rootTopics[0];
-    rootTopic.children.forEach(childTopic => {});
+    rootTopic.children.forEach(childTopic => {
+      rootTopics.push(childTopic);
+    });
+    rootTopic.children = [];
 
     jsonHandler
       .saveTopics(rootTopics, outputPath, mako, false)
