@@ -75,7 +75,7 @@ ko.bindingHandlers.highlight = {
               } catch (e) {
                 console.warn(
                   value,
-                  "Failed to get screen column due to some parsing errors, skip rendering."
+                  'Failed to get screen column due to some parsing errors, skip rendering.'
                 );
               }
             }
