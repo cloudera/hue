@@ -79,6 +79,9 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
   # impala can have compute name appended to the editor_type (impala/dbms.py - get_query_server_config)
   if editor_type.startswith('impala'):
     editor_type = 'impala'
+    editor_connector = 'impala-xx'
+  else:
+    editor_connector = editor_type
 
   editor = Notebook()
   if snippet_properties is None:
@@ -109,12 +112,12 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
     'description': description,
     'sessions': [
       {
-         'type': editor_type,
+         'type': editor_connector,
          'properties': sessions_properties,
          'id': None
       }
     ],
-    'selectedSnippet': editor_type,
+    'selectedSnippet': editor_connector, # TODO: might need update in notebook.ko.js
     'type': 'notebook' if is_notebook else 'query-%s' % editor_type,
     'showHistory': True,
     'isSaved': is_saved,
@@ -128,7 +131,7 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
          'id': str(uuid.uuid4()),
          'statement_raw': statement,
          'statement': statement,
-         'type': editor_type,
+         'type': editor_connector,
          'wasBatchExecuted': batch_submit,
          'lastExecuted': last_executed,
          'properties': {
