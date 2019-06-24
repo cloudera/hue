@@ -1,0 +1,15 @@
+{
+  "name": "sql-docs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "DocFragment.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "libxmljs": "0.18.8",
+    "epub": "^1.1.0"
+  }
+}

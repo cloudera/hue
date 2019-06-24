@@ -30,7 +30,7 @@ from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
 %>
 
-<%namespace name="impalaDocIndex" file="/impala_doc_index.mako" />
+<%namespace name="sqlDocIndex" file="/sql_doc_index.mako" />
 
 <%def name="assistJSModels()">
 <script src="${ static('desktop/js/document/hueDocument.js') }"></script>
@@ -2263,6 +2263,11 @@ from desktop.views import _ko
   <script type="text/html" id="language-reference-panel-template">
     <div class="assist-inner-panel">
       <div class="assist-flex-panel">
+        <div class="assist-flex-header">
+          <div class="assist-inner-header">
+            <div class="function-dialect-dropdown" data-bind="component: { name: 'hue-drop-down', params: { fixedPosition: true, value: sourceType, entries: availableTypes, linkTitle: '${ _ko('Selected dialect') }' } }" style="display: inline-block"></div>
+          </div>
+        </div>
         <div class="assist-flex-search">
           <div class="assist-filter">
             <input class="clearable" type="text" placeholder="Filter..." data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
@@ -2354,17 +2359,18 @@ from desktop.views import _ko
   <script type="text/javascript">
     (function () {
 
-      ${ impalaDocIndex.impalaDocIndex() }
-      ${ impalaDocIndex.impalaDocTopLevel() }
+      ${ sqlDocIndex.sqlDocIndex() }
+      ${ sqlDocIndex.sqlDocTopLevel() }
 
-      var LanguageReferenceTopic = function (entry) {
+      var LanguageReferenceTopic = function (entry, index) {
         var self = this;
         self.ref = entry.ref;
         self.title = entry.title;
+        self.index = index;
         self.weight = 1;
         self.children = [];
         entry.children.forEach(function (child) {
-          self.children.push(new LanguageReferenceTopic(child));
+          self.children.push(new LanguageReferenceTopic(child, self.index));
         });
         self.loadDeferred = $.Deferred();
         self.loading = ko.observable(false);
@@ -2380,7 +2386,7 @@ from desktop.views import _ko
           return self.loadDeferred.promise();
         }
         self.loading(true);
-        window.apiHelper.simpleGet(window.IMPALA_DOC_INDEX[self.ref]).done(function (doc) {
+        window.apiHelper.simpleGet(self.index[self.ref]).done(function (doc) {
           self.body(doc.body);
         }).always(function () {
           self.loading(false);
@@ -2392,9 +2398,24 @@ from desktop.views import _ko
       function LanguageReferencePanel (params, element) {
         var self = this;
         self.disposals = [];
-        self.topics = [];
+
+        self.availableTypes = ['impala', 'hive'];
+
+        self.sourceType = ko.observable('hive');
+
+        self.allTopics = {
+          impala: [],
+          hive: []
+        };
         window.IMPALA_DOC_TOP_LEVEL.forEach(function (topLevelItem) {
-          self.topics.push(new LanguageReferenceTopic(topLevelItem));
+          self.allTopics.impala.push(new LanguageReferenceTopic(topLevelItem, window.IMPALA_DOC_INDEX));
+        });
+        window.HIVE_DOC_TOP_LEVEL.forEach(function (topLevelItem) {
+          self.allTopics.hive.push(new LanguageReferenceTopic(topLevelItem, window.HIVE_DOC_INDEX));
+        });
+
+        self.topics = ko.pureComputed(function () {
+          return self.allTopics[self.sourceType()];
         });
 
         self.selectedTopic = ko.observable();
@@ -3719,7 +3740,7 @@ from desktop.views import _ko
         var updateContentsForType = function (type, isSqlDialect) {
           self.sourceType(type);
           self.functionsTabAvailable(type === 'hive' || type === 'impala' || type === 'pig');
-          self.langRefTabAvailable(type === 'impala');
+          self.langRefTabAvailable(type === 'hive' || type === 'impala');
           self.editorAssistantTabAvailable((!window.IS_EMBEDDED || window.EMBEDDED_ASSISTANT_ENABLED) && isSqlDialect);
           self.dashboardAssistantTabAvailable(type === 'dashboard');
           self.schedulesTabAvailable(false);
