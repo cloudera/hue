@@ -180,6 +180,40 @@ class TestApi():
     assert_equal(data['databases'], [{u'comment': u'', u'hdfs_link': u'hdfs://table'}])
 
 
+  def test_sample_data_table_sync_impala(self):
+
+    with patch('desktop.lib.connectors.api.CONNECTOR_INSTANCES', TestApi.CONNECTOR):
+      with patch('beeswax.server.dbms.get') as get:
+        get.return_value = Mock(
+          get_table=Mock(
+            return_value=Mock(is_impala_only=False)
+          ),
+          get_sample=Mock(
+            return_value=Mock(
+              rows=Mock(return_value=[[1], [2]]),
+              cols=Mock(return_value=['name']),
+              full_cols=Mock(return_value=[{'name': 'name'}])
+            )
+          )
+        )
+
+        response = self.client.post(
+          reverse('notebook:api_sample_data', kwargs={'database': 'sfdc', 'table': 'customers'}), {
+            'notebook': TestApi.NOTEBOOK_JSON,
+            'snippet': json.dumps(json.loads(TestApi.NOTEBOOK_JSON)['snippets'][0]),
+          }
+        )
+
+      get.assert_called()
+
+    assert_equal(response.status_code, 200)
+    data = json.loads(response.content)
+    assert_equal(data['status'], 0)
+    assert_equal(data['headers'], ['name'])
+    assert_equal(data['full_headers'], [{'name': 'name'}])
+    assert_equal(data['rows'], [[1], [2]])
+
+
 class TestHiveserver2Api(object):
 
   def setUp(self):
