@@ -76,6 +76,7 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
   '''
   from notebook.connectors.hiveserver2 import HS2Api
 
+  # TODO: remove
   # impala can have compute name appended to the editor_type (impala/dbms.py - get_query_server_config)
   if editor_type.startswith('impala'):
     editor_type = 'impala'

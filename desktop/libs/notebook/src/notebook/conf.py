@@ -70,8 +70,11 @@ def get_ordered_interpreters(user=None):
 
   if has_connectors():
     reordered_interpreters = [{
-        'name': i['name'],
-        'type': i['type'],
+        'name': i['nice_name'],
+        'type': i['name'],
+        'dialect': i['dialect'],
+        'category': i['category'],
+        'is_sql': i['is_sql'],
         'interface': i['interface'],
         'options': {setting['name']: setting['value'] for setting in i['settings']}
       } for i in CONNECTOR_INSTANCES
@@ -91,7 +94,7 @@ def get_ordered_interpreters(user=None):
       "type": i['type'],
       "interface": i['interface'],
       "options": i['options'],
-      "is_sql": i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy"],
+      "is_sql": i.get('is_sql') or i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy"],
       "is_catalog": i['interface'] in ["hms",],
     }
     for i in reordered_interpreters

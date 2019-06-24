@@ -83,12 +83,12 @@ class TestApi():
   """
 
   CONNECTOR = [{
-      'name': 'Impala', 'type': 'impala-xx', 'connector_name': 'impala', 'interface': 'hiveserver2',
+      'nice_name': 'Impala', 'name': 'impala-xx', 'dialect': 'impala', 'interface': 'hiveserver2',
       'settings': [
           {'name': 'server_host', 'value': 'gethue.com'},
           {'name': 'server_port', 'value': '21050'},
         ],
-        'id': 1, 'category': 'engines', 'description': ''
+        'id': 1, 'category': 'editor', 'description': '', 'is_sql': True
       },
     ]
 
