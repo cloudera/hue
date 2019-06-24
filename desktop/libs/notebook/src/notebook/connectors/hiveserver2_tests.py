@@ -29,6 +29,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from TCLIService.ttypes import TStatusCode, TProtocolVersion, TOperationType
 
+from desktop.auth.backend import rewrite_user
 from desktop.lib.i18n import smart_str
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
@@ -94,7 +95,7 @@ class TestApi():
   def setUp(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
 
-    self.user = User.objects.get(username="test")
+    self.user = rewrite_user(User.objects.get(username="test"))
     grant_access("test", "default", "notebook")
 
 
@@ -212,6 +213,52 @@ class TestApi():
     assert_equal(data['headers'], ['name'])
     assert_equal(data['full_headers'], [{'name': 'name'}])
     assert_equal(data['rows'], [[1], [2]])
+
+
+  def test_sample_data_table_async_impala(self):
+
+    with patch('desktop.lib.connectors.api.CONNECTOR_INSTANCES', TestApi.CONNECTOR):
+      with patch('beeswax.server.dbms.get') as get:
+        get.return_value = Mock(
+          get_table=Mock(
+            return_value=Mock(is_impala_only=False)
+          ),
+          server_name='impala-xx',
+          get_sample=Mock(
+            return_value='SELECT * from customers'
+          ),
+          client=Mock(
+            user=self.user,
+            query=Mock(
+              return_value=Mock(
+                get=Mock(
+                  return_value=('server_id', 'server_guid')
+                ),
+                log_context='log_context',
+                has_result_set=True,
+                session_guid='session_guid',
+                modified_row_count=0,
+                operation_type=1
+              ),
+            )
+          )
+        )
+
+        response = self.client.post(
+          reverse('notebook:api_sample_data', kwargs={'database': 'sfdc', 'table': 'customers'}), {
+            'notebook': TestApi.NOTEBOOK_JSON,
+            'snippet': json.dumps(json.loads(TestApi.NOTEBOOK_JSON)['snippets'][0]),
+            'async': '"true"'
+          }
+        )
+
+      get.assert_called()
+
+    assert_equal(response.status_code, 200)
+    data = json.loads(response.content)
+    assert_equal(data['status'], 0)
+    assert_equal(data['result']['handle']['secret'], 'server_id')
+    assert_equal(data['result']['handle']['statement'], 'SELECT * from customers')
 
 
 class TestHiveserver2Api(object):
