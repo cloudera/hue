@@ -387,7 +387,7 @@ CACHES = {
 CACHES_HIVE_DISCOVERY_KEY = 'hive_discovery'
 CACHES[CACHES_HIVE_DISCOVERY_KEY] = {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '/tmp/hive_discovery_cache',
+        'LOCATION': '/{0}/hive_discovery_cache'.format(_config_dir),
     }
 
 CACHES_CELERY_KEY = 'celery'
