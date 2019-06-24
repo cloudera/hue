@@ -37,7 +37,7 @@ CONNECTOR_TYPES = [{
     'interface': connector.INTERFACE,
     'settings': connector.PROPERTIES,
     'id': None,
-    'category': 'engines',
+    'category': 'editor',
     'description': ''
     }
   for connector in [
@@ -47,27 +47,27 @@ CONNECTOR_TYPES = [{
 
 
 CONNECTOR_TYPES += [
-  {'name': "Hive Tez", 'type': 'hive-tez', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Hive LLAP", 'type': 'hive-llap', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Druid", 'type': 'sql-druid', 'interface': 'sqlalchemy', 'settings': [{'name': 'connection_url', 'value': 'druid://druid-host.com:8082/druid/v2/sql/'}], 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Kafka SQL", 'type': 'kafka-sql', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "SparkSQL", 'type': 'spark-sql', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "MySQL", 'type': 'sql-mysql', 'interface': 'sqlalchemy', 'settings': [{'name': 'connection_url', 'value': 'mysql://username:password@mysq-host:3306/hue'}], 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Presto", 'type': 'presto', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Athena", 'type': 'athena', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Redshift", 'type': 'redshift', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Big Query", 'type': 'bigquery', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Oracle", 'type': 'oracle', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "SQL Database", 'type': 'sql-alchemy', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "SQL Database (JDBC)", 'type': 'sql-jdbc', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'engines', 'description': 'Deprecated: older way to connect to any database.'},
+  {'name': "Hive Tez", 'type': 'hive-tez', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'id': None, 'category': 'editor', 'description': ''},
+  {'name': "Hive LLAP", 'type': 'hive-llap', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'id': None, 'category': 'editor', 'description': ''},
+  {'name': "Druid", 'type': 'sql-druid', 'interface': 'sqlalchemy', 'settings': [{'name': 'connection_url', 'value': 'druid://druid-host.com:8082/druid/v2/sql/'}], 'id': None, 'category': 'editor', 'description': ''},
+  {'name': "Kafka SQL", 'type': 'kafka-sql', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'name': "SparkSQL", 'type': 'spark-sql', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'name': "MySQL", 'type': 'sql-mysql', 'interface': 'sqlalchemy', 'settings': [{'name': 'connection_url', 'value': 'mysql://username:password@mysq-host:3306/hue'}], 'id': None, 'category': 'editor', 'description': ''},
+  {'name': "Presto", 'type': 'presto', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'name': "Athena", 'type': 'athena', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'name': "Redshift", 'type': 'redshift', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'name': "Big Query", 'type': 'bigquery', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'name': "Oracle", 'type': 'oracle', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'name': "SQL Database", 'type': 'sql-alchemy', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'name': "SQL Database (JDBC)", 'type': 'sql-jdbc', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': 'Deprecated: older way to connect to any database.'},
   # solr
   # hbase
   # kafka
 
-  {'name': "PySpark", 'type': 'pyspark', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Spark", 'type': 'spark', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Pig", 'type': 'pig', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Java", 'type': 'java', 'settings': [], 'id': None, 'category': 'engines', 'description': ''},
+  {'name': "PySpark", 'type': 'pyspark', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'name': "Spark", 'type': 'spark', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'name': "Pig", 'type': 'pig', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'name': "Java", 'type': 'java', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
 
   {'name': "HDFS", 'type': 'hdfs', 'settings': [], 'id': None, 'category': 'browsers', 'description': ''},
   {'name': "YARN", 'type': 'yarn', 'settings': [], 'id': None, 'category': 'browsers', 'description': ''},
@@ -114,11 +114,19 @@ AVAILABLE_CONNECTORS = _group_category_connectors(CONNECTOR_TYPES)
 # TODO: type --> name, type --> SQL language, e.g. mysql
 
 # connector_type: engine, engine_type: sql, language: hive, hive tez, hiveserver2 + endpoint
-CONNECTOR_INSTANCES = [
-  {'name': 'Impala', 'type': Impala().TYPE + '-1', 'connector_name': Impala().TYPE, 'interface': Impala().INTERFACE, 'settings': Impala().PROPERTIES, 'id': 1, 'category': 'engines', 'description': ''},
-  {'name': 'Hive', 'type': Hive().TYPE + '-2', 'connector_name': Hive().TYPE, 'interface': Hive().INTERFACE, 'settings': Hive().PROPERTIES, 'id': 2, 'category': 'engines', 'description': ''},
-  {'name': 'Hive c5', 'type': Hive().TYPE + '-3', 'connector_name': Hive().TYPE, 'interface': Hive().INTERFACE, 'settings': Hive().PROPERTIES, 'id': 3, 'category': 'engines', 'description': ''},
-  {'name': 'MySQL', 'type': 'mysql-4', 'connector_name': 'sql-alchemy', 'interface': 'sqlalchemy', 'settings': [], 'id': 4, 'category': 'engines', 'description': ''},
+CONNECTOR_INSTANCES = [{
+    'nice_name': 'Impala', 'name': 'impala-1',
+    'dialect': Impala().TYPE, 'interface': Impala().INTERFACE, 'settings': Impala().PROPERTIES, 'is_sql': True, 'id': 1, 'category': 'editor', 'description': ''
+  }, {
+    'nice_name': 'Hive', 'name': 'hive-1',
+    'dialect': Hive().TYPE, 'interface': Hive().INTERFACE, 'settings': Hive().PROPERTIES, 'is_sql': True, 'id': 2, 'category': 'editor', 'description': ''
+  }, {
+    'nice_name': 'Hive c5', 'name': 'hive-2',
+    'dialect': Hive().TYPE, 'interface': Hive().INTERFACE, 'settings': Hive().PROPERTIES, 'is_sql': True, 'id': 3, 'category': 'editor', 'description': ''
+  }, {
+    'nice_name': 'MySQL', 'name': 'mysql-1',
+    'dialect': 'sql-alchemy', 'interface': 'sqlalchemy', 'settings': [], 'is_sql': True, 'id': 4, 'category': 'editor', 'description': ''
+  },
 ]
 
 CONNECTOR_INSTANCES[0]['settings'] = [
