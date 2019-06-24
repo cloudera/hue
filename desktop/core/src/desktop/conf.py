@@ -1699,6 +1699,12 @@ TASK_SERVER = ConfigSection(
       type=coerce_bool,
       help=_('Switch on the integration with the Task Scheduler.')
     ),
+    BEAT_SCHEDULES_FILE = Config(
+      key='beat_schedules_file',
+      default='',
+      type=str,
+      help=_('Path to a file containing a list of beat schedules.')
+    ),
     FETCH_RESULT_LIMIT = Config(
       key='fetch_result_limit',
       default=2000,

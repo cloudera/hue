@@ -17,11 +17,13 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import imp
 import os
 
 from celery import Celery
 from celery.schedules import crontab
 
+from desktop.conf import TASK_SERVER
 from desktop.settings import TIME_ZONE, INSTALLED_APPS
 
 
@@ -50,18 +52,8 @@ def debug_task(self):
 if 'django_celery_beat' in INSTALLED_APPS:
   app.conf.beat_schedule = {}
 
-  if True:
-    app.conf.beat_schedule.update({
-      'add-every-monday-morning': {
-        'task': 'desktop.celery.debug_task',
-        'schedule': crontab(minute='*'),
-        #'args': (16, 16),
-      },
-    })
-    app.conf.beat_schedule.update({
-      'customer_count_query': {
-        'task': 'notebook.tasks.run_sync_query',
-        'schedule': crontab(minute='*'),
-        'args': (None, None),
-      },
-    })
+  if TASK_SERVER.BEAT_SCHEDULES_FILE.get():
+    schedules = imp.load_source('schedules', TASK_SERVER.BEAT_SCHEDULES_FILE.get())
+
+    for schedule in schedules.periodic_tasks:
+      app.conf.beat_schedule.update(schedule)
