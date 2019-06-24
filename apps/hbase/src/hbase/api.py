@@ -218,6 +218,8 @@ class HbaseApi(object):
     client = self.connectCluster(cluster)
     aggregate_data = []
     limit = conf.TRUNCATE_LIMIT.get()
+    if not isinstance(queries, list):
+      queries=json.loads(queries)
     queries = sorted(queries, key=lambda query: query['scan_length']) #sort by scan length
     for query in queries:
       scan_length = int(query['scan_length'])
