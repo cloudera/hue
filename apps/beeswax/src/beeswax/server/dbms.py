@@ -109,7 +109,6 @@ def get_query_server_config(name='beeswax', connector=None):
         'QUERY_TIMEOUT_S': 15 * 60,
     }
   else:
-    cluster_config = get_cluster_config(cluster)
     if name == "llap":
       activeEndpoint = cache.get('llap')
       if activeEndpoint is None:
@@ -162,7 +161,7 @@ def get_query_server_config(name='beeswax', connector=None):
 
     if name == 'impala':
       from impala.dbms import get_query_server_config as impala_query_server_config
-      query_server = impala_query_server_config(cluster_config=cluster_config)
+      query_server = impala_query_server_config()
     elif name == 'hms':
       kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
       query_server = {
@@ -191,7 +190,8 @@ def get_query_server_config(name='beeswax', connector=None):
           'auth_username': AUTH_USERNAME.get(),
           'auth_password': AUTH_PASSWORD.get()
         }
-    if name == 'sparksql': # Spark SQL is almost the same as Hive
+
+    if name == 'sparksql': # Extends Hive as very similar
       from spark.conf import SQL_SERVER_HOST as SPARK_SERVER_HOST, SQL_SERVER_PORT as SPARK_SERVER_PORT
 
       query_server.update({
