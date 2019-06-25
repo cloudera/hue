@@ -273,17 +273,9 @@ class Notebook(object):
     return _execute_notebook(request, notebook_data, snippet)
 
 
-def get_api(request, snippet):
-  from notebook.connectors.oozie_batch import OozieApi
-
-  if snippet.get('wasBatchExecuted') and not TASK_SERVER.ENABLED.get():
-    return OozieApi(user=request.user, request=request)
-
-  if snippet['type'] == 'report':
-    snippet['type'] = 'impala'
-
+def get_interpreter(connector_type, user=None):
   interpreter = [
-    interpreter for interpreter in get_ordered_interpreters(request.user) if snippet['type'] == interpreter['type']
+    interpreter for interpreter in get_ordered_interpreters(user) if connector_type == interpreter['type']
   ]
   if not interpreter:
     if snippet['type'] == 'hbase': # TODO move to connectors
@@ -320,10 +312,26 @@ def get_api(request, snippet):
       }]
     else:
       raise PopupException(_('Snippet type %(type)s is not configured.') % snippet)
+  elif len(interpreter) > 1:
+    raise PopupException(_('Snippet type %(type)s matching more than one interpreter: %s') % (snippet, len(interpreter)))
 
-  interpreter = interpreter[0]
+  return interpreter[0]
+
+
+def get_api(request, snippet):
+  from notebook.connectors.oozie_batch import OozieApi
+
+  if snippet.get('wasBatchExecuted') and not TASK_SERVER.ENABLED.get():
+    return OozieApi(user=request.user, request=request)
+
+  if snippet['type'] == 'report':
+    snippet['type'] = 'impala'
+
+  interpreter = get_interpreter(connector_type=snippet['type'], user=request.user)
+
   interface = interpreter['interface']
 
+  # TODO: clean computes
   if get_cluster_config(request.user)['has_computes']:
     compute = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API or Notebook create sessions.
     if compute == '""' or compute == 'undefined':
