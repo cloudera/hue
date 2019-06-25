@@ -87,17 +87,24 @@ else
 fi
 
 set +x
+echo "file_count $temp_output_dir/*"
 extracted_file_count=$(($(find $temp_output_dir/* -type d -maxdepth 0 | wc -l) + $(find $temp_output_dir/* -type f -maxdepth 0 | wc -l)))
 if [ $extracted_file_count != 0 ] && [ $exit_status == 0 ]
 then
-    if ! $(hadoop fs -test -d $OUTPUT_PATH)
+    echo "test $OUTPUT_PATH"
+    if ! $(hadoop fs -test -d "$OUTPUT_PATH")
     then
         echo "Creating output directory '$OUTPUT_PATH' in HDFS"
-        hadoop fs -mkdir $OUTPUT_PATH
+        hadoop fs -mkdir "$OUTPUT_PATH"
     fi
-	echo "Copying extracted files to '$OUTPUT_PATH' in HDFS"
-	hadoop fs -put $temp_output_dir/* "$OUTPUT_PATH"
-	exit_status=$(echo $?)
+  readarray -t files <<<"$(ls $temp_output_dir)"
+  for file in "${files[@]}"
+  do
+    encoded_output_dir=`python -c "import urllib;print urllib.quote(raw_input())" <<< "$file"`
+    echo "$temp_output_dir/$encoded_output_dir '$OUTPUT_PATH'"
+    hadoop fs -put $temp_output_dir/$encoded_output_dir "$OUTPUT_PATH"
+  done
+  exit_status=$(echo $?)
 	if [ $exit_status != 0 ]
 	then
 	    echo "Failed to copy files to HDFS directory '$OUTPUT_PATH'."
