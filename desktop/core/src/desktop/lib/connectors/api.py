@@ -32,8 +32,8 @@ LOG = logging.getLogger(__name__)
 # TODO: automatically load modules from lib module
 # TODO: offer to white/black list available connector classes
 CONNECTOR_TYPES = [{
-    'name': connector.NAME,
-    'type': connector.TYPE,
+    'nice_name': connector.NAME,
+    'dialect': connector.TYPE,
     'interface': connector.INTERFACE,
     'settings': connector.PROPERTIES,
     'id': None,
@@ -44,48 +44,46 @@ CONNECTOR_TYPES = [{
     Impala(), Hive()
   ]
 ]
-
-
 CONNECTOR_TYPES += [
-  {'name': "Hive Tez", 'type': 'hive-tez', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'id': None, 'category': 'editor', 'description': ''},
-  {'name': "Hive LLAP", 'type': 'hive-llap', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'id': None, 'category': 'editor', 'description': ''},
-  {'name': "Druid", 'type': 'sql-druid', 'interface': 'sqlalchemy', 'settings': [{'name': 'connection_url', 'value': 'druid://druid-host.com:8082/druid/v2/sql/'}], 'id': None, 'category': 'editor', 'description': ''},
-  {'name': "Kafka SQL", 'type': 'kafka-sql', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
-  {'name': "SparkSQL", 'type': 'spark-sql', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
-  {'name': "MySQL", 'type': 'sql-mysql', 'interface': 'sqlalchemy', 'settings': [{'name': 'connection_url', 'value': 'mysql://username:password@mysq-host:3306/hue'}], 'id': None, 'category': 'editor', 'description': ''},
-  {'name': "Presto", 'type': 'presto', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
-  {'name': "Athena", 'type': 'athena', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
-  {'name': "Redshift", 'type': 'redshift', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
-  {'name': "Big Query", 'type': 'bigquery', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
-  {'name': "Oracle", 'type': 'oracle', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
-  {'name': "SQL Database", 'type': 'sql-alchemy', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
-  {'name': "SQL Database (JDBC)", 'type': 'sql-jdbc', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': 'Deprecated: older way to connect to any database.'},
+  {'nice_name': "Hive Tez", 'dialect': 'hive-tez', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "Hive LLAP", 'dialect': 'hive-llap', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "Druid", 'dialect': 'sql-druid', 'interface': 'sqlalchemy', 'settings': [{'name': 'connection_url', 'value': 'druid://druid-host.com:8082/druid/v2/sql/'}], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "Kafka SQL", 'dialect': 'kafka-sql', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "SparkSQL", 'dialect': 'spark-sql', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "MySQL", 'dialect': 'sql-mysql', 'interface': 'sqlalchemy', 'settings': [{'name': 'connection_url', 'value': 'mysql://username:password@mysq-host:3306/hue'}], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "Presto", 'dialect': 'presto', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "Athena", 'dialect': 'athena', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "Redshift", 'dialect': 'redshift', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "Big Query", 'dialect': 'bigquery', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "Oracle", 'dialect': 'oracle', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "SQL Database", 'dialect': 'sql-alchemy', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "SQL Database (JDBC)", 'dialect': 'sql-jdbc', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': 'Deprecated: older way to connect to any database.'},
   # solr
   # hbase
   # kafka
 
-  {'name': "PySpark", 'type': 'pyspark', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
-  {'name': "Spark", 'type': 'spark', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
-  {'name': "Pig", 'type': 'pig', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
-  {'name': "Java", 'type': 'java', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "PySpark", 'dialect': 'pyspark', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "Spark", 'dialect': 'spark', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "Pig", 'dialect': 'pig', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "Java", 'dialect': 'java', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
 
-  {'name': "HDFS", 'type': 'hdfs', 'settings': [], 'id': None, 'category': 'browsers', 'description': ''},
-  {'name': "YARN", 'type': 'yarn', 'settings': [], 'id': None, 'category': 'browsers', 'description': ''},
-  {'name': "S3", 'type': 's3', 'settings': [], 'id': None, 'category': 'browsers', 'description': ''},
-  {'name': "ADLS", 'type': 'adls-v1', 'settings': [], 'id': None, 'category': 'browsers', 'description': ''},
+  {'nice_name': "HDFS", 'dialect': 'hdfs', 'settings': [], 'id': None, 'category': 'browsers', 'description': ''},
+  {'nice_name': "YARN", 'dialect': 'yarn', 'settings': [], 'id': None, 'category': 'browsers', 'description': ''},
+  {'nice_name': "S3", 'dialect': 's3', 'settings': [], 'id': None, 'category': 'browsers', 'description': ''},
+  {'nice_name': "ADLS", 'dialect': 'adls-v1', 'settings': [], 'id': None, 'category': 'browsers', 'description': ''},
 
-  {'name': "Hive Metastore", 'type': 'hms', 'settings': [], 'id': None, 'category': 'catalogs', 'description': ''},
-  {'name': "Atlas", 'type': 'atlas', 'settings': [], 'id': None, 'category': 'catalogs', 'description': ''},
-  {'name': "Navigator", 'type': 'navigator', 'settings': [], 'id': None, 'category': 'catalogs', 'description': ''},
+  {'nice_name': "Hive Metastore", 'dialect': 'hms', 'settings': [], 'id': None, 'category': 'catalogs', 'description': ''},
+  {'nice_name': "Atlas", 'dialect': 'atlas', 'settings': [], 'id': None, 'category': 'catalogs', 'description': ''},
+  {'nice_name': "Navigator", 'dialect': 'navigator', 'settings': [], 'id': None, 'category': 'catalogs', 'description': ''},
 
-  {'name': "Optimizer", 'type': 'optimizer', 'settings': [], 'id': None, 'category': 'optimizers', 'description': ''},
+  {'nice_name': "Optimizer", 'dialect': 'optimizer', 'settings': [], 'id': None, 'category': 'optimizers', 'description': ''},
 
-  {'name': "Oozie", 'type': 'oozie', 'settings': [], 'id': None, 'category': 'schedulers', 'description': ''},
-  {'name': "Celery", 'type': 'celery', 'settings': [], 'id': None, 'category': 'schedulers', 'description': '' },
+  {'nice_name': "Oozie", 'dialect': 'oozie', 'settings': [], 'id': None, 'category': 'schedulers', 'description': ''},
+  {'nice_name': "Celery", 'dialect': 'celery', 'settings': [], 'id': None, 'category': 'schedulers', 'description': '' },
 ]
 
 CATEGORIES = [
-  {"name": "Editor", 'type': 'engines', 'description': ''},
+  {"name": "Editor", 'type': 'editor', 'description': ''},
   {"name": "Browsers", 'type': 'browsers', 'description': ''},
   {"name": "Catalogs", 'type': 'catalogs', 'description': ''},
   {"name": "Optimizers", 'type': 'optimizers', 'description': ''},
@@ -162,10 +160,10 @@ def get_installed_connectors(request):
   })
 
 
-def new_connector(request, type):
-  instance = _get_connector_by_type(type)
+def new_connector(request, dialect):
+  instance = _get_connector_by_type(dialect)
 
-  instance['connector_name'] = ''
+  instance['nice_name'] = ''
 
   return JsonResponse({'connector': instance})
 
@@ -190,7 +188,7 @@ def update_connector(request):
     saved_as = True
     instance = connector
     instance['id'] = CONNECTOR_IDS
-    instance['connector_name'] = instance['type']
+    instance['nice_name'] = instance['nice_name']
     instance['type'] = '%s-%s' % (instance['type'], CONNECTOR_IDS)
     CONNECTOR_IDS += 1
     CONNECTOR_INSTANCES.append(instance)
@@ -198,10 +196,10 @@ def update_connector(request):
   return JsonResponse({'connector': instance, 'saved_as': saved_as})
 
 
-def _get_connector_by_type(type):
+def _get_connector_by_type(dialect):
   global CONNECTOR_TYPES
 
-  instance = filter(lambda connector: connector['type'] == type, CONNECTOR_TYPES)
+  instance = filter(lambda connector: connector['dialect'] == dialect, CONNECTOR_TYPES)
 
   if instance:
     return instance[0]
