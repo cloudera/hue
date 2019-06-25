@@ -78,7 +78,6 @@ def make_notebook(
   '''
   from notebook.connectors.hiveserver2 import HS2Api
 
-  # impala can have compute name appended to the editor_type (impala/dbms.py - get_query_server_config) # TODO: remove
   if has_connectors():
     interpreter = get_interpreter(connector_type=editor_type)
     editor_connector = editor_type

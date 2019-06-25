@@ -58,7 +58,6 @@ except ImportError, e:
 
 try:
   from impala import api   # Force checking if Impala is enabled
-  from impala.dbms import _get_server_name
   from impala.conf import CONFIG_WHITELIST as impala_settings
   from impala.server import get_api as get_impalad_api, ImpalaDaemonApiException, _get_impala_server_url
 except ImportError, e:
@@ -68,6 +67,7 @@ except ImportError, e:
 try:
   from jobbrowser.views import get_job
   from jobbrowser.conf import ENABLE_QUERY_BROWSER
+  from jobbrowser.apis.query_api import _get_api
   has_query_browser = ENABLE_QUERY_BROWSER.get()
 except (AttributeError, ImportError), e:
   LOG.warn("Job Browser app is not enabled")
@@ -768,10 +768,8 @@ DROP TABLE IF EXISTS `%(table)s`;
     total_records, total_size, msg = None, None, None
 
     query_id = self._get_impala_query_id(snippet)
-    application = _get_server_name(snippet.get('compute', {}))
-    session = Session.objects.get_session(self.user, application=application)
+    server_url = _get_api(self.user, snippet)._url
 
-    server_url = _get_impala_server_url(session)
     if query_id:
       LOG.debug("Attempting to get Impala query profile at server_url %s for query ID: %s" % (server_url, query_id))
 
