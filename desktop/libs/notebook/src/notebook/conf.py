@@ -90,7 +90,7 @@ def get_ordered_interpreters(user=None):
     ]
 
   return [{
-      "name": i['name'],
+      "name": i.get('nice_name', i['name']),
       "type": i['type'],
       "interface": i['interface'],
       "options": i['options'],
