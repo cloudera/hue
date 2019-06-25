@@ -87,7 +87,16 @@ const adaptElement = element => {
     const replacement = fragments.join('');
     element.replace(libxml.parseHtmlFragment(replacement).root());
   } else if (element.attr('class')) {
-    element.attr('class').remove();
+    if (
+      element
+        .attr('class')
+        .value()
+        .indexOf('admonition') !== -1
+    ) {
+      element.attr({ class: 'hue-doc-note-hive' });
+    } else {
+      element.attr('class').remove();
+    }
   }
 
   switch (element.name()) {
@@ -126,7 +135,13 @@ const adaptElement = element => {
       break;
     case 'h1':
       element.text(element.text().replace(/LanguageManual\s(.+)/, '$1'));
+      element.attr({ class: 'hue-doc-title-hive' });
       break;
+    case 'table':
+    case 'td':
+    case 'th':
+    case 'tr':
+      element.attr({ class: 'hue-doc-' + element.name() + '-hive' });
     default:
   }
 

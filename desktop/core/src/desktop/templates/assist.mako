@@ -3739,6 +3739,8 @@ from desktop.views import _ko
 
         var updateContentsForType = function (type, isSqlDialect) {
           self.sourceType(type);
+
+          // TODO: Get these dynamically from langref and functions modules when moved to webpack
           self.functionsTabAvailable(type === 'hive' || type === 'impala' || type === 'pig');
           self.langRefTabAvailable(type === 'hive' || type === 'impala');
           self.editorAssistantTabAvailable((!window.IS_EMBEDDED || window.EMBEDDED_ASSISTANT_ENABLED) && isSqlDialect);
