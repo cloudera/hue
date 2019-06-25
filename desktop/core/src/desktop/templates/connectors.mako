@@ -106,7 +106,7 @@ else:
       self.newConnector = function (dialect) {
         self.apiHelper.simpleGet('/desktop/connectors/api/instance/new/' + dialect, {}, {
           successCallback: function (data) {
-          self.instance(ko.mapping.fromJS(data.connector));
+            self.instance(ko.mapping.fromJS(data.connector));
           }
         });
       };
@@ -118,7 +118,9 @@ else:
         });
       };
       self.deleteConnector = function (connector) {
-        self.apiHelper.simplePost('/desktop/connectors/api/instance/delete', {'connector': ko.mapping.toJSON(connector)}, {
+        self.apiHelper.simplePost('/desktop/connectors/api/instance/delete', {
+            'connector': ko.mapping.toJSON(connector)
+          }, {
           successCallback: function (data) {
             self.section('installed-connectors-page');
             self.fetchConnectors();
@@ -127,7 +129,9 @@ else:
         });
       };
       self.updateConnector = function (connector) {
-        self.apiHelper.simplePost('/desktop/connectors/api/instance/update', {'connector': ko.mapping.toJSON(connector)}, {
+        self.apiHelper.simplePost('/desktop/connectors/api/instance/update', {
+            'connector': ko.mapping.toJSON(connector)
+          }, {
           successCallback: function (data) {
             connector.id = data.connector.id;
             self.section('installed-connectors-page');
