@@ -29,14 +29,15 @@ from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.db.models import Count
 from django.db.models.functions import Trunc
-from desktop.lib.paths import SAFE_CHARACTERS_URI
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
+from desktop.conf import has_connectors
 from desktop.lib.i18n import smart_unicode
+from desktop.lib.paths import SAFE_CHARACTERS_URI
 from desktop.models import Document2
 
-from notebook.connectors.base import Notebook
+from notebook.connectors.base import Notebook, get_interpreter
 
 
 LOG = logging.getLogger(__name__)
@@ -66,21 +67,22 @@ def escape_rows(rows, nulls_only=False, encoding=None):
   return data
 
 
-def make_notebook(name='Browse', description='', editor_type='hive', statement='', status='ready',
-                  files=None, functions=None, settings=None, is_saved=False, database='default', snippet_properties=None, batch_submit=False,
-                  on_success_url=None, skip_historify=False, is_task=False, last_executed=-1, is_notebook=False, pub_sub_url=None, result_properties={},
-                  namespace=None, compute=None):
+def make_notebook(
+    name='Browse', description='', editor_type='hive', statement='', status='ready',
+    files=None, functions=None, settings=None, is_saved=False, database='default', snippet_properties=None, batch_submit=False,
+    on_success_url=None, skip_historify=False, is_task=False, last_executed=-1, is_notebook=False, pub_sub_url=None, result_properties={},
+    namespace=None, compute=None):
   '''
   skip_historify: do not add the task to the query history. e.g. SQL Dashboard
   is_task / isManaged: true when being a managed by Hue operation (include_managed=True in document), e.g. exporting query result, dropping some tables
   '''
   from notebook.connectors.hiveserver2 import HS2Api
 
-  # TODO: remove
-  # impala can have compute name appended to the editor_type (impala/dbms.py - get_query_server_config)
-  if editor_type.startswith('impala'):
-    editor_type = 'impala'
-    editor_connector = 'impala-xx'
+  # impala can have compute name appended to the editor_type (impala/dbms.py - get_query_server_config) # TODO: remove
+  if has_connectors():
+    interpreter = get_interpreter(connector_type=editor_type)
+    editor_connector = editor_type
+    editor_type = interpreter['dialect']
   else:
     editor_connector = editor_type
 
