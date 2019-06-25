@@ -92,9 +92,18 @@ const adaptElement = element => {
 
   switch (element.name()) {
     case 'a':
-      if (element.attr('href') && element.attr('href').value().indexOf('/links') == 0) {
+      if (
+        element.attr('href') &&
+        element
+          .attr('href')
+          .value()
+          .indexOf('/links') == 0
+      ) {
         // Internal link
-        let ref = element.attr('href').value().replace(/\/links\/_[0-9]+\//, '');
+        let ref = element
+          .attr('href')
+          .value()
+          .replace(/\/links\/_[0-9]+\//, '');
         extractorUtils.removeAllAttributes(element);
 
         const anchorMatch = ref.match(/.html#(.+)$/);
@@ -112,8 +121,11 @@ const adaptElement = element => {
         // External link
         const href = element.attr('href').value();
         extractorUtils.removeAllAttributes(element);
-        element.attr({class: 'hue-doc-external-link', href: href, target: '_blank'});
+        element.attr({ class: 'hue-doc-external-link', href: href, target: '_blank' });
       }
+      break;
+    case 'h1':
+      element.text(element.text().replace(/LanguageManual\s(.+)/, '$1'));
       break;
     default:
   }
