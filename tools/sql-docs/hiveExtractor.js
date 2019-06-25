@@ -20,6 +20,7 @@ const EPub = require('epub');
 
 const Topic = require('./Topic');
 const libxml = require('libxmljs');
+const extractorUtils = require('./extractorUtils');
 
 const outputPath = './desktop/core/src/desktop/static/desktop/docs/hive/';
 const mako = './desktop/core/src/desktop/templates/sql_doc_index.mako';
@@ -88,6 +89,35 @@ const adaptElement = element => {
   } else if (element.attr('class')) {
     element.attr('class').remove();
   }
+
+  switch (element.name()) {
+    case 'a':
+      if (element.attr('href') && element.attr('href').value().indexOf('/links') == 0) {
+        // Internal link
+        let ref = element.attr('href').value().replace(/\/links\/_[0-9]+\//, '');
+        extractorUtils.removeAllAttributes(element);
+
+        const anchorMatch = ref.match(/.html#(.+)$/);
+        if (anchorMatch) {
+          element.attr('data-doc-anchor-id', anchorMatch[1]);
+          ref = ref.replace('#' + anchorMatch[1], '');
+        }
+        ref = '_' + ref.replace('.html', '');
+        element.attr({
+          class: 'hue-doc-internal-link',
+          href: 'javascript:void(0);',
+          'data-doc-ref': ref
+        });
+      } else if (element.attr('href')) {
+        // External link
+        const href = element.attr('href').value();
+        extractorUtils.removeAllAttributes(element);
+        element.attr({class: 'hue-doc-external-link', href: href, target: '_blank'});
+      }
+      break;
+    default:
+  }
+
   element.childNodes().forEach(adaptElement);
 };
 

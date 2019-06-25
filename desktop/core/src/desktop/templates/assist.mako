@@ -2543,7 +2543,7 @@ from desktop.views import _ko
               topicStack.pop();
             })
           };
-          findTopic(self.topics);
+          findTopic(self.topics());
         });
 
         $(element).on('click.langref', function (event) {
