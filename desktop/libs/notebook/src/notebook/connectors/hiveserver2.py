@@ -26,7 +26,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.auth.backend import is_admin
-from desktop.conf import USE_DEFAULT_CONFIGURATION
+from desktop.conf import USE_DEFAULT_CONFIGURATION, has_connectors
 from desktop.lib.conf import BoundConfig
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
@@ -37,7 +37,8 @@ from desktop.lib.thrift_util import unpack_guid, unpack_guid_base64
 from desktop.models import DefaultConfiguration, Document2
 from metadata.optimizer_client import OptimizerApi
 
-from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported, _get_snippet_name, Notebook
+from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported, _get_snippet_name, Notebook, get_interpreter
+
 
 LOG = logging.getLogger(__name__)
 
@@ -331,10 +332,17 @@ class HS2Api(Api):
     if snippet.get('status') != 'available':
       raise QueryError(_('Result status is not available'))
 
-    if snippet['type'] not in ('hive', 'impala'):
-      raise OperationNotSupported(_('Cannot fetch result metadata for snippet type: %s') % snippet['type'])
+    if has_connectors():
+      # TODO: Add dialect to snippet and update fetchResultSize() in notebook.ko
+      interpreter = get_interpreter(connector_type=snippet['type'])
+      snippet_dialect = interpreter['dialect']
+    else:
+      snippet_dialect = snippet['type']
 
-    if snippet['type'] == 'hive':
+    if snippet_dialect not in ('hive', 'impala'):
+      raise OperationNotSupported(_('Cannot fetch result metadata for snippet type: %s') % snippet_dialect)
+
+    if snippet_dialect == 'hive':
       resp['rows'], resp['size'], resp['message'] = self._get_hive_result_size(notebook, snippet)
     else:
       resp['rows'], resp['size'], resp['message'] = self._get_impala_result_size(notebook, snippet)
