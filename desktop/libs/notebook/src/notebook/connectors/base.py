@@ -328,7 +328,6 @@ def get_api(request, snippet):
     snippet['type'] = 'impala'
 
   interpreter = get_interpreter(connector_type=snippet['type'], user=request.user)
-
   interface = interpreter['interface']
 
   # TODO: clean computes
