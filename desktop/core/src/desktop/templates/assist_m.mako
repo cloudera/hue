@@ -25,8 +25,6 @@ ${ commonheader_m(_('Assist'), 'assist', user, request) | n,unicode }
 
 <script src="${ static('metastore/js/metastore.ko.js') }"></script>
 
-${ assist.assistJSModels() }
-
 ${ assist.assistPanel() }
 
 <style type="text/css">

@@ -793,9 +793,6 @@ ${ commonshare() | n,unicode }
 </script>
 
 <script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
-
-${ assist.assistJSModels() }
-
 <script src="${ static('beeswax/js/beeswax.vm.js') }"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
 %if ENABLE_QUERY_BUILDER.get():

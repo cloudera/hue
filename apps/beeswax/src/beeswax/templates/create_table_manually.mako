@@ -30,8 +30,6 @@ ${ layout.metastore_menubar() }
 
 <script src="${ static('metastore/js/metastore.ko.js') }"></script>
 
-${ assist.assistJSModels() }
-
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">

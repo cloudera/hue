@@ -43,8 +43,6 @@ ${ commonheader(_("Metastore"), app_name, user, request) | n,unicode }
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
 
-${ assist.assistJSModels() }
-
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():

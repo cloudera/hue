@@ -25,7 +25,6 @@
 
 %if not is_embeddable:
 ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
-${ assist.assistJSModels() }
 ${ assist.assistPanel() }
 %endif
 

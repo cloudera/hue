@@ -38,7 +38,6 @@ ${ editorComponents.commonHTML(is_embeddable=is_embeddable, suffix='editor') }
 
 %if not is_embeddable:
 ${ assist.assistPanel() }
-${ assist.assistJSModels() }
 ${ configKoComponents.config() }
 ${ notebookKoComponents.aceKeyboardShortcuts() }
 ${ notebookKoComponents.downloadSnippetResults() }

@@ -32,7 +32,6 @@ MAIN_SCROLLABLE = is_embeddable and ".page-content" or ".content-panel"
 ${ commonheader(_("Streams Browser"), "search", user, request, "60px") | n,unicode }
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
 
-${ assist.assistJSModels() }
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():

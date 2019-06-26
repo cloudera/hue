@@ -32,11 +32,6 @@ from desktop.views import _ko
 
 <%namespace name="sqlDocIndex" file="/sql_doc_index.mako" />
 
-<%def name="assistJSModels()">
-<script src="${ static('desktop/js/document/hueDocument.js') }"></script>
-<script src="${ static('desktop/js/document/hueFileEntry.js') }"></script>
-</%def>
-
 <%def name="assistPanel(is_s3_enabled=False)">
   <%
     # TODO remove

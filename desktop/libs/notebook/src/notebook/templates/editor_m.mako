@@ -160,8 +160,6 @@ ${ commonheader_m(editor_type, editor_type, user, request, "68px") | n,unicode }
 
 </div>
 
-${ assist.assistJSModels() }
-
 <script type="text/javascript">
   if (ko.options) {
     ko.options.deferUpdates = true;

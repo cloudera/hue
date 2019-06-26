@@ -54,7 +54,6 @@ ${ editorComponents.topBar(suffix='notebook') }
 
 %if not is_embeddable:
 ${ assist.assistPanel() }
-${ assist.assistJSModels() }
 ${ configKoComponents.config() }
 ${ notebookKoComponents.aceKeyboardShortcuts() }
 ${ notebookKoComponents.downloadSnippetResults() }
