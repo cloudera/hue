@@ -1729,8 +1729,7 @@ def get_clusters(user):
           'id': i,
           'name': cluster_config[i].NAME.get() or i,
           'type': cluster_config[i].TYPE.get(),
-          'interface': cluster_config[i].INTERFACE.get() or 'hive',
-          'server_host': cluster_config[i].SERVER_HOST.get()
+          'credentials': cluster_config[i].CREDENTIALS.get(),
         }
       )
     )
@@ -1741,21 +1740,8 @@ def get_clusters(user):
       (CLUSTER_ID.get(), {
         'id': CLUSTER_ID.get(),
         'name': CLUSTER_ID.get(),
-        'type': 'direct',
-        'interface': 'all',
-        'server_host': 'all'
-        }
-      )
-    )
-
-  if IS_K8S_ONLY.get():
-    clusters.append(
-      ('impala', {
-          'id': 'impala',
-          'name': 'impala',
-          'type': 'impala',
-          'interface': 'impala',
-          'server_host': 'impala'
+        'type': 'plain',
+        'credentials': {},
         }
       )
     )
@@ -1786,22 +1772,16 @@ CLUSTERS = UnspecifiedConfigSection(
       ),
       TYPE=Config(
           "type",
-          help=_("Type of cluster, e.g. single, direct, local ini, CM API, Dataeng, Arcus, BigQuery, Presto."),
+          help=_("Type of cluster, e.g. plain, CM, Snowball..."),
           default='direct',
           type=str,
       ),
-      INTERFACE=Config(
-          "interface",
-          help=_("Type of cluster interface"),
-          default='hive',
-          type=str,
-      ),
-      SERVER_HOST=Config(
-          "server_host",
-          help=_("The host service to contact."),
-          default=None,
-          type=str,
-      ),
+      CREDENTIALS=Config(
+          "credentials",
+          help=_("How to connect to the of remote cluster management system."),
+          default='{}',
+          type=coerce_json_dict,
+      )
     )
   )
 )
