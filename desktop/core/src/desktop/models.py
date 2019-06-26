@@ -1598,7 +1598,7 @@ class ClusterConfig():
       ],
       'default_sql_interpreter': default_sql_interpreter,
       'cluster_type': self.cluster_type,
-      'has_computes': self.cluster_type in ['altus', 'snowball'] # or any grouped engine connectors
+      'has_computes': self.cluster_type in ('altus', 'snowball') # or any grouped engine connectors
     }
 
 
