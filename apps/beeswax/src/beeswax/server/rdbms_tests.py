@@ -41,3 +41,17 @@ class TestGetQueryServerConfig():
         assert_equal(query_server['server_name'], 'beeswax')
         assert_equal(query_server['server_host'], 'hive.gethue.com')
         assert_equal(query_server['server_port'], 10002)
+
+
+  def test_get_impala(self):
+
+    with patch('impala.conf.SERVER_HOST.get') as SERVER_HOST:
+      with patch('impala.conf.SERVER_PORT.get') as SERVER_PORT:
+        SERVER_HOST.return_value = 'impala.gethue.com'
+        SERVER_PORT.return_value=10002
+
+        query_server = get_query_server_config(name='impala')
+
+        assert_equal(query_server['server_name'], 'impala')
+        assert_equal(query_server['server_host'], 'impala.gethue.com')
+        assert_equal(query_server['server_port'], 10002)
