@@ -97,7 +97,7 @@ class TestGetQueryServerConfig():
             assert_equal(query_server['server_name'], 'beeswax')
             assert_equal(query_server['server_host'], 'hive-llap-1.gethue.com')
             # assert_equal(query_server['server_port'], 20000) # Bug Always set to LLAP_SERVER_PORT?
-            assert_equal(query_server['server_port'], 25000) # Bug Always set to LLAP_SERVER_PORT?
+            assert_equal(query_server['server_port'], 25000) # To remove this line and comment above when fixed.
 
     # TODO: all the combinations in new test methods, e.g.:
     # HIVE_DISCOVERY_LLAP_HA.get() --> True
