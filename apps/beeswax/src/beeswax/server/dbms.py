@@ -159,7 +159,7 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
     query_server = {
         'server_name': 'beeswax',
         'server_host': activeEndpoint["host"],
-        'server_port': LLAP_SERVER_PORT.get() if name = 'llap' else HIVE_SERVER_PORT.get(),
+        'server_port': LLAP_SERVER_PORT.get() if name == 'llap' else HIVE_SERVER_PORT.get(),
         'principal': kerberos_principal,
         'http_url': '%(protocol)s://%(host)s:%(port)s/%(end_point)s' % {
             'protocol': 'https' if hiveserver2_use_ssl() else 'http',
