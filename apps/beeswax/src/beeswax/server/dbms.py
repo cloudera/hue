@@ -25,6 +25,7 @@ from django.core.cache import caches
 from django.urls import reverse
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
+from kazoo.client import KazooClient
 
 from desktop.conf import CLUSTER_ID
 from desktop.lib.django_util import format_preserving_redirect
@@ -32,7 +33,9 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.parameterization import substitute_variables
 from desktop.lib.view_util import location_to_url
 from desktop.models import Cluster
+from desktop.settings import CACHES_HIVE_DISCOVERY_KEY
 from indexer.file_format import HiveFormat
+from libzookeeper import conf as libzookeeper_conf
 
 from beeswax import hive_site
 from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, HIVE_METASTORE_HOST, HIVE_METASTORE_PORT, LIST_PARTITIONS_LIMIT, SERVER_CONN_TIMEOUT, \
@@ -43,17 +46,16 @@ from beeswax.common import apply_natural_sort
 from beeswax.design import hql_query
 from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.models import QueryHistory, QUERY_TYPES
-from libzookeeper import conf as libzookeeper_conf
-from kazoo.client import KazooClient
+
 
 LOG = logging.getLogger(__name__)
 
 
 DBMS_CACHE = {}
 DBMS_CACHE_LOCK = threading.Lock()
-cache = caches['hive_discovery']
-#using file cache to make sure eventlet threads are uniform, this cache is persistent on startup
-#so we clear it to make sure the server resets hiveserver2 host
+cache = caches[CACHES_HIVE_DISCOVERY_KEY]
+# Using file cache to make sure eventlet threads are uniform, this cache is persistent on startup
+# So we clear it to make sure the server resets hiveserver2 host.
 cache.clear()
 
 def get(user, query_server=None, cluster=None):
@@ -140,6 +142,7 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
       else:
         cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": hive_site.hiveserver2_thrift_http_port()}))
     activeEndpoint = json.loads(cache.get("hiveserver2"))
+
   if name == 'impala':
     from impala.dbms import get_query_server_config as impala_query_server_config
     query_server = impala_query_server_config(cluster_config=cluster_config)
