@@ -436,7 +436,7 @@ $.fn.hueDataTable = function(oInit) {
         const appendable = $t.children('tbody').length > 0 ? $t.children('tbody') : $t;
         let startCol = -1;
         let endCol = -1;
-        $t.find('thead>tr th').each(function(i) {
+        $t.find('tbody>tr td').each(function(i) {
           if ($(this).position().left > 0 && startCol == -1) {
             startCol = i;
           }
