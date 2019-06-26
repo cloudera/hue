@@ -175,7 +175,7 @@ ${ layout.menubar(section='connectors') }
     <div data-bind="template: { name: 'add-connector-page' }"></div>
   <!-- /ko -->
 
-  <!-- ko if: section() == 'connector-page' -->
+  <!-- ko if: section() == 'connector-page' && $root.instance() -->
     <div data-bind="template: { name: 'connector-page', data: $root.instance() }"></div>
   <!-- /ko -->
 </div>

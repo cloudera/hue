@@ -1632,6 +1632,7 @@ USE_NEW_CHARTS = Config(
   help=_('Choose whether to use new charting library across the whole Hue.')
 )
 
+# Deprecated
 IS_MULTICLUSTER_ONLY = Config(
   key='is_multicluster_only',
   default=False,
@@ -1639,6 +1640,7 @@ IS_MULTICLUSTER_ONLY = Config(
   help=_('Choose whether to pick configs only from [desktop] [[cluster]]')
 )
 
+# Deprecated
 IS_K8S_ONLY = Config(
   key='is_k8s_only',
   default=False,

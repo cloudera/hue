@@ -163,7 +163,7 @@ def get_installed_connectors(request):
 def new_connector(request, dialect):
   instance = _get_connector_by_type(dialect)
 
-  instance['nice_name'] = ''
+  instance['nice_name'] = dialect.title()
 
   return JsonResponse({'connector': instance})
 
