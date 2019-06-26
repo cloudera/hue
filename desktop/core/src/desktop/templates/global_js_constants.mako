@@ -25,7 +25,7 @@
   from dashboard.conf import HAS_SQL_ENABLED
   from indexer.conf import ENABLE_NEW_INDEXER
   from metadata.conf import has_catalog, has_readonly_catalog, has_optimizer, has_workload_analytics, OPTIMIZER
-  from notebook.conf import ENABLE_NOTEBOOK_2, ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_SCHEDULING
+  from notebook.conf import ENABLE_NOTEBOOK_2, ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_SCHEDULING, get_ordered_interpreters
 
   from metastore.views import has_write_access
 %>
@@ -376,7 +376,29 @@
   window.LOGGED_USERNAME = '${ user.username }';
   window.LOGGED_USER_ID = ${ user.id };
 
-  window.USER_HOME_DIR = '${ user.get_home_directory() }';
+  <%
+    # TODO remove
+    # Code moved from assist.mako
+    try:
+      home_dir = user.get_home_directory()
+      if not request.fs.isdir(home_dir):
+        home_dir = '/'
+    except:
+      home_dir = '/'
+  %>
+
+  window.USER_HOME_DIR = '${ home_dir }';
+
+  // TODO: Refactor assist to fetch from config.
+  window.ASSIST_SQL_INTERPRETERS = [];
+  % for interpreter in get_ordered_interpreters(request.user):
+    % if interpreter["is_sql"]:
+      ASSIST_SQL_INTERPRETERS.push({
+        type: '${ interpreter["type"] }',
+        name: '${ interpreter["name"] }'
+      });
+    % endif
+  % endfor
 
   var userGroups = [];
   % for group in user.groups.all():

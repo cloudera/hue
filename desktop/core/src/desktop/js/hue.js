@@ -72,6 +72,15 @@ import sqlStatementsParser from 'parse/sqlStatementsParser'; // In search.ko and
 import HueFileEntry from 'doc/hueFileEntry';
 import HueDocument from 'doc/hueDocument';
 
+// TODO: Temporary
+import 'assist/ko/ko.assistFileDraggable';
+import 'assist/ko/ko.assistFileDroppable';
+import AssistDbPanel from 'assist/assistDbPanel';
+import AssistInnerPanel from 'assist/assistInnerPanel';
+
+window.AssistDbPanel = AssistDbPanel;
+window.AssistInnerPanel = AssistInnerPanel;
+
 // TODO: Migrate away
 window._ = _;
 window.apiHelper = apiHelper;

@@ -21,7 +21,7 @@ from dashboard.conf import HAS_SQL_ENABLED
 from filebrowser.conf import SHOW_UPLOAD_BUTTON
 from metadata.conf import OPTIMIZER
 from metastore.conf import ENABLE_NEW_CREATE_TABLE
-from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ordered_interpreters
+from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING
 
 from desktop import appmanager
 from desktop import conf
@@ -33,16 +33,6 @@ from desktop.views import _ko
 <%namespace name="sqlDocIndex" file="/sql_doc_index.mako" />
 
 <%def name="assistPanel(is_s3_enabled=False)">
-  <%
-    # TODO remove
-    try:
-      home_dir = user.get_home_directory()
-      if not request.fs.isdir(home_dir):
-        home_dir = '/'
-    except:
-      home_dir = '/'
-  %>
-
   <script type="text/html" id="assist-no-database-entries">
     <ul class="assist-tables">
       <li>
@@ -453,7 +443,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-hdfs-header-actions">
     <div class="assist-db-header-actions">
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: goHome" title="Go to ${ home_dir }"><i class="pointer fa fa-home"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: goHome, attr: { title: I18n('Go to ' + window.USER_HOME_DIR) }"><i class="pointer fa fa-home"></i></a>
       % if hasattr(SHOW_UPLOAD_BUTTON, 'get') and SHOW_UPLOAD_BUTTON.get():
       <a class="inactive-action" data-bind="dropzone: {
             url: '/filebrowser/upload/file?dest=' + path,
@@ -470,7 +460,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-adls-header-actions">
     <div class="assist-db-header-actions">
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: goHome" title="Go to ${ home_dir }"><i class="pointer fa fa-home"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: goHome, attr: { title: I18n('Go to ' + window.USER_HOME_DIR) }"><i class="pointer fa fa-home"></i></a>
       % if hasattr(SHOW_UPLOAD_BUTTON, 'get') and SHOW_UPLOAD_BUTTON.get():
       <a class="inactive-action" data-bind="dropzone: {
             url: '/filebrowser/upload/file?dest=adl:' + path,
@@ -1078,431 +1068,14 @@ from desktop.views import _ko
 
     (function () {
 
-      ko.bindingHandlers.assistFileDroppable = {
-        init: function(element, valueAccessor, allBindings, boundEntry) {
-          var dragData;
-          var dragSub = huePubSub.subscribe('doc.browser.dragging', function (data) {
-            dragData = data;
-          });
-          ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-            dragSub.remove();
-          });
-
-          var $element = $(element);
-          if (boundEntry.isDirectory) {
-            $element.droppable({
-              drop: function () {
-                if (dragData && !dragData.dragToSelect && boundEntry.isDirectory()) {
-                  boundEntry.moveHere(dragData.selectedEntries);
-                  dragData.originEntry.load();
-                }
-                $element.removeClass('assist-file-entry-drop');
-              },
-              over: function () {
-                if (!$element.hasClass('assist-file-entry-drop') && dragData && !dragData.dragToSelect && boundEntry.isDirectory()) {
-                  $element.addClass('assist-file-entry-drop');
-                }
-              },
-              out: function () {
-                $element.removeClass('assist-file-entry-drop');
-              }
-            })
-          }
-        }
-      };
-
-      ko.bindingHandlers.assistFileDraggable = {
-        init: function(element, valueAccessor, allBindings, boundEntry, bindingContext) {
-          var $element = $(element);
-
-          var dragStartY = -1;
-          var dragStartX = -1;
-          $element.draggable({
-            start: function (event, ui) {
-              var $container = $('.doc-browser-drag-container');
-              boundEntry.selected(true);
-              huePubSub.publish('doc.browser.dragging', {
-                selectedEntries: [ boundEntry ],
-                originEntry: boundEntry,
-                dragToSelect: false
-              });
-              huePubSub.publish('doc.drag.to.select', false);
-
-              dragStartX = event.clientX;
-              dragStartY = event.clientY;
-
-              var $helper = $('.assist-file-entry-drag').clone().appendTo($container);
-              $helper.find('.drag-text').text(boundEntry.definition().name);
-              $helper.find('i').removeClass().addClass($element.find('.doc-browser-primary-col i').attr('class'));
-              $helper.show();
-            },
-            drag: function (event) {
-            },
-            stop: function (event) {
-              var elementAtStart = document.elementFromPoint(dragStartX, dragStartY);
-              var elementAtStop = document.elementFromPoint(event.clientX, event.clientY);
-              if (elementAtStart.nodeName === "A" && elementAtStop.nodeName === "A" && Math.sqrt((dragStartX-event.clientX)*(dragStartX-event.clientX) + (dragStartY-event.clientY)*(dragStartY-event.clientY)) < 8) {
-                $(elementAtStop).trigger('click');
-              }
-              boundEntry.selected(false);
-            },
-            helper: function (event) {
-              return $('<div>').addClass('doc-browser-drag-container');
-            },
-            appendTo: "body",
-            cursorAt: {
-              top: 0,
-              left: 0
-            }
-          });
-        }
-      };
 
       /**
        * @param {Object} options
-       * @param {ApiHelper} options.apiHelper
-       * @param {string} options.type
-       * @param {number} options.minHeight
-       * @param {string} options.icon
-       * @param {boolean} [options.rightAlignIcon] - Default false
-       * @param {boolean} options.visible
-       * @param {(AssistDbPanel|AssistHdfsPanel|AssistGitPanel|AssistDocumentsPanel|AssistS3Panel)} panelData
-       * @constructor
-       */
-      function AssistInnerPanel (options) {
-        var self = this;
-        self.minHeight = options.minHeight;
-        self.icon = options.icon;
-        self.type = options.type;
-        self.name = options.name;
-        self.panelData = options.panelData;
-        self.rightAlignIcon = !!options.rightAlignIcon;
-        self.iconSvg = options.iconSvg;
-
-        self.visible = ko.observable(options.visible || true);
-        options.apiHelper.withTotalStorage('assist', 'showingPanel_' + self.type, self.visible, false, options.visible);
-
-        self.templateName = 'assist-' + (['solr', 'kafka'].indexOf(self.type) !== -1 ? 'sql' : self.type) + '-inner-panel';
-
-        var loadWhenVisible = function () {
-          if (! self.visible()) {
-            return;
-          }
-          if (self.type === 'documents' && !self.panelData.activeEntry().loaded()) {
-            self.panelData.activeEntry().load();
-          }
-        };
-
-        self.visible.subscribe(loadWhenVisible);
-        loadWhenVisible();
-      }
-
-      /**
-       * @param {Object} options
-       * @param {ApiHelper} options.apiHelper
-       * @param {Object} options.i18n
-       * @param {Object[]} options.sourceTypes - All the available SQL source types
-       * @param {string} options.sourceTypes[].name - Example: Hive SQL
-       * @param {string} options.sourceTypes[].type - Example: hive
-       * @param {string} [options.activeSourceType] - Example: hive
-       * @param {Object} options.navigationSettings - enable/disable the links
-       * @param {boolean} options.navigationSettings.openItem
-       * @param {boolean} options.navigationSettings.showStats
-       * @param {boolean} options.navigationSettings.pinEnabled
-       * @param {boolean} [options.isSolr] - Detfault false;
-       * @param {boolean} [options.isStreams] - Detfault false;
-       * @constructor
-       **/
-      function AssistDbPanel(options) {
-        var self = this;
-        self.options = options;
-        self.apiHelper = options.apiHelper;
-        self.i18n = options.i18n;
-        self.initialized = false;
-        self.initalizing = false;
-
-        self.isStreams = options.isStreams;
-        self.isSolr = options.isSolr;
-        self.nonSqlType = self.isSolr || self.isStreams;
-
-        if (typeof options.sourceTypes === 'undefined') {
-          options.sourceTypes = [];
-
-          if (self.isSolr) {
-            options.sourceTypes = [{
-              type: 'solr',
-              name: 'solr'
-            }];
-          } else if (self.isStreams) {
-            options.sourceTypes = [{
-              type: 'kafka',
-              name: 'kafka'
-            }];
-          } else {
-            % for interpreter in get_ordered_interpreters(request.user):
-              % if interpreter["is_sql"]:
-                options.sourceTypes.push({
-                  type: '${ interpreter["type"] }',
-                  name: '${ interpreter["name"] }'
-                });
-              % endif
-            % endfor
-          }
-        }
-
-        self.sources = ko.observableArray();
-        self.sourceIndex = {};
-        self.selectedSource = ko.observable(null);
-
-        self.setDatabaseWhenLoaded = function (namespace, databaseName) {
-          self.selectedSource().whenLoaded(function () {
-            if (self.selectedSource().selectedNamespace() && self.selectedSource().selectedNamespace().namespace.id !== namespace.id) {
-              self.selectedSource().namespaces().some(function (otherNamespace) {
-                if (otherNamespace.namespace.id === namespace.id) {
-                  self.selectedSource().selectedNamespace(otherNamespace);
-                  return true;
-                }
-              })
-            }
-
-            if (self.selectedSource().selectedNamespace()) {
-              self.selectedSource().selectedNamespace().whenLoaded(function () {
-                self.selectedSource().selectedNamespace().setDatabase(databaseName);
-              })
-            }
-          });
-        };
-
-        options.sourceTypes.forEach(function (sourceType) {
-          self.sourceIndex[sourceType.type] = new AssistDbSource({
-            apiHelper: self.apiHelper,
-            i18n: self.i18n,
-            type: sourceType.type,
-            name: sourceType.name,
-            nonSqlType: sourceType.type === 'solr' || sourceType.type === 'kafka',
-            navigationSettings: options.navigationSettings
-          });
-          self.sources.push(self.sourceIndex[sourceType.type]);
-        });
-
-        if (self.sources().length === 1) {
-          self.selectedSource(self.sources()[0]);
-        }
-
-        if (self.sourceIndex['solr']) {
-          huePubSub.subscribe('assist.collections.refresh', function() {
-            var solrSource = self.sourceIndex['solr'];
-            var doRefresh = function () {
-              if (solrSource.selectedNamespace()) {
-                var assistDbNamespace = solrSource.selectedNamespace();
-                dataCatalog.getEntry({ sourceType: 'solr', namespace: assistDbNamespace.namespace, compute: assistDbNamespace.compute(), path: [] }).done(function (entry) {
-                  entry.clearCache({ cascade: true });
-                });
-              }
-            };
-            if (!solrSource.hasNamespaces()) {
-              solrSource.loadNamespaces(true).done(doRefresh);
-            } else {
-              doRefresh();
-            }
-          });
-        }
-
-        huePubSub.subscribe('assist.db.highlight', function (catalogEntry) {
-          huePubSub.publish('left.assist.show');
-          if (catalogEntry.getSourceType() === 'solr') {
-            huePubSub.publish('assist.show.solr');
-          } else {
-            huePubSub.publish('assist.show.sql');
-          }
-          huePubSub.publish('context.popover.hide');
-          window.setTimeout(function () {
-            var foundSource;
-            $.each(self.sources(), function (idx, source) {
-              if (source.sourceType === catalogEntry.getSourceType()) {
-                foundSource = source;
-                return false;
-              }
-            });
-            if (foundSource) {
-              if (self.selectedSource() !== foundSource) {
-                self.selectedSource(foundSource);
-              }
-              foundSource.highlightInside(catalogEntry);
-            }
-          }, 0);
-        });
-
-        if (!self.isSolr && !self.isStreams) {
-          huePubSub.subscribe('assist.set.database', function (databaseDef) {
-            if (!databaseDef.source || !self.sourceIndex[databaseDef.source]) {
-              return;
-            }
-            self.selectedSource(self.sourceIndex[databaseDef.source]);
-            self.setDatabaseWhenLoaded(databaseDef.namespace, databaseDef.name);
-          });
-
-          var getSelectedDatabase  = function (source) {
-            var deferred = $.Deferred();
-            var assistDbSource = self.sourceIndex[source];
-            if (assistDbSource) {
-              assistDbSource.loadedDeferred.done(function () {
-                if (assistDbSource.selectedNamespace()) {
-                  assistDbSource.selectedNamespace().loadedDeferred.done(function () {
-                    if (assistDbSource.selectedNamespace().selectedDatabase()) {
-                      deferred.resolve({
-                        sourceType: source,
-                        namespace: assistDbSource.selectedNamespace().namespace,
-                        name: assistDbSource.selectedNamespace().selectedDatabase().name
-                      })
-                    } else {
-                      var lastSelectedDb = window.apiHelper.getFromTotalStorage('assist_' + source + '_' + assistDbSource.selectedNamespace().namespace.id, 'lastSelectedDb', 'default');
-                      deferred.resolve({
-                        sourceType: source,
-                        namespace: assistDbSource.selectedNamespace().namespace,
-                        name: lastSelectedDb
-                      })
-                    }
-                  });
-                } else {
-                  deferred.resolve({
-                    sourceType: source,
-                    namespace: { id: 'default' },
-                    name: 'default'
-                  });
-                }
-              })
-            } else {
-              deferred.reject()
-            }
-
-            return deferred;
-          };
-
-          huePubSub.subscribe('assist.get.database', function (source) {
-            getSelectedDatabase(source).done(function (databaseDef) {
-              huePubSub.publish('assist.database.set', databaseDef);
-            })
-          });
-
-          huePubSub.subscribe('assist.get.database.callback',  function (options) {
-            getSelectedDatabase(options.source).done(options.callback);
-          });
-
-          huePubSub.subscribe('assist.get.source', function () {
-            huePubSub.publish('assist.source.set', self.selectedSource() ? self.selectedSource().sourceType : undefined);
-          });
-
-          huePubSub.subscribe('assist.set.source', function (source) {
-            if (self.sourceIndex[source]) {
-              self.selectedSource(self.sourceIndex[source]);
-            }
-          });
-
-          huePubSub.publish('assist.db.panel.ready');
-
-          huePubSub.subscribe('assist.is.db.panel.ready', function () {
-            huePubSub.publish('assist.db.panel.ready');
-          });
-
-          self.selectedSource.subscribe(function (newSource) {
-            if (newSource) {
-              if (newSource.namespaces().length === 0) {
-                newSource.loadNamespaces();
-              }
-              self.apiHelper.setInTotalStorage('assist', 'lastSelectedSource', newSource.sourceType);
-            } else {
-              self.apiHelper.setInTotalStorage('assist', 'lastSelectedSource');
-            }
-          });
-        }
-
-        if (self.isSolr || self.isStreams) {
-          if (self.sources().length === 1) {
-            self.selectedSource(self.sources()[0]);
-            self.selectedSource().loadNamespaces().done(function () {
-              var solrNamespace = self.selectedSource().selectedNamespace();
-              if (solrNamespace) {
-                solrNamespace.initDatabases();
-                solrNamespace.whenLoaded(function () {
-                  solrNamespace.setDatabase('default');
-                })
-              }
-            })
-          }
-        }
-
-        self.breadcrumb = ko.computed(function () {
-          if (self.isStreams && self.selectedSource()) {
-            return self.selectedSource().name;
-          }
-          if (!self.isSolr && self.selectedSource()) {
-            if (self.selectedSource().selectedNamespace()) {
-              if (self.selectedSource().selectedNamespace().selectedDatabase()) {
-                return self.selectedSource().selectedNamespace().selectedDatabase().catalogEntry.name
-              }
-              if (window.HAS_MULTI_CLUSTER) {
-                return self.selectedSource().selectedNamespace().name
-              }
-            }
-            return self.selectedSource().name;
-          }
-          return null;
-        });
-      }
-
-      AssistDbPanel.prototype.back = function () {
-        var self = this;
-        if (self.isStreams) {
-          self.selectedSource(null);
-          return;
-        }
-        if (self.selectedSource()) {
-          if (self.selectedSource() && self.selectedSource().selectedNamespace()) {
-            if (self.selectedSource().selectedNamespace().selectedDatabase()) {
-              self.selectedSource().selectedNamespace().selectedDatabase(null);
-            } else if (window.HAS_MULTI_CLUSTER) {
-              self.selectedSource().selectedNamespace(null)
-            } else {
-              self.selectedSource(null);
-            }
-          } else {
-            self.selectedSource(null);
-          }
-        }
-      };
-
-      AssistDbPanel.prototype.init = function () {
-        var self = this;
-        if (self.initialized) {
-          return;
-        }
-        if (self.isSolr) {
-          self.selectedSource(self.sourceIndex['solr']);
-        } else if (self.isStreams) {
-            self.selectedSource(self.sourceIndex['kafka']);
-        } else {
-          var storageSourceType = self.apiHelper.getFromTotalStorage('assist', 'lastSelectedSource');
-          if (!self.selectedSource()) {
-            if (self.options.activeSourceType) {
-              self.selectedSource(self.sourceIndex[self.options.activeSourceType]);
-            } else if (storageSourceType && self.sourceIndex[storageSourceType]) {
-              self.selectedSource(self.sourceIndex[storageSourceType]);
-            }
-          }
-        }
-        self.initialized = true;
-      };
-
-      /**
-       * @param {Object} options
-       * @param {ApiHelper} options.apiHelper
        * @param {string} options.user
        * @constructor
        **/
       function AssistDocumentsPanel (options) {
         var self = this;
-        self.apiHelper = options.apiHelper;
         self.user = options.user;
 
         self.activeEntry = ko.observable();
@@ -1511,13 +1084,12 @@ from desktop.views import _ko
 
         self.highlightTypeFilter = ko.observable(false);
 
-        var lastOpenedUuid = self.apiHelper.getFromTotalStorage('assist', 'last.opened.assist.doc.uuid');
+        var lastOpenedUuid = window.apiHelper.getFromTotalStorage('assist', 'last.opened.assist.doc.uuid');
 
         if (lastOpenedUuid) {
           self.activeEntry(new HueFileEntry({
             activeEntry: self.activeEntry,
             trashEntry: ko.observable(),
-            apiHelper: self.apiHelper,
             app: 'documents',
             user: self.user,
             activeSort: self.activeSort,
@@ -1535,12 +1107,12 @@ from desktop.views import _ko
           if (!newEntry.loaded()) {
             var loadedSub = newEntry.loaded.subscribe(function (loaded) {
               if (loaded && !newEntry.hasErrors() && newEntry.definition() && newEntry.definition().uuid) {
-                self.apiHelper.setInTotalStorage('assist', 'last.opened.assist.doc.uuid', newEntry.definition().uuid);
+                window.apiHelper.setInTotalStorage('assist', 'last.opened.assist.doc.uuid', newEntry.definition().uuid);
               }
               loadedSub.dispose();
             })
           } else if (!newEntry.hasErrors() && newEntry.definition() && newEntry.definition().uuid) {
-            self.apiHelper.setInTotalStorage('assist', 'last.opened.assist.doc.uuid', newEntry.definition().uuid);
+            window.apiHelper.setInTotalStorage('assist', 'last.opened.assist.doc.uuid', newEntry.definition().uuid);
           }
         });
 
@@ -1580,7 +1152,6 @@ from desktop.views import _ko
             self.activeEntry(new HueFileEntry({
               activeEntry: self.activeEntry,
               trashEntry: ko.observable(),
-              apiHelper: self.apiHelper,
               app: 'documents',
               user: self.user,
               activeSort: self.activeSort,
@@ -1617,11 +1188,10 @@ from desktop.views import _ko
       AssistDocumentsPanel.prototype.fallbackToRoot = function () {
         var self = this;
         if (!self.activeEntry() || self.activeEntry().definition() && (self.activeEntry().definition().path !== '/' || self.activeEntry().definition().uuid)) {
-          self.apiHelper.setInTotalStorage('assist', 'last.opened.assist.doc.uuid', null);
+          window.apiHelper.setInTotalStorage('assist', 'last.opened.assist.doc.uuid', null);
           self.activeEntry(new HueFileEntry({
             activeEntry: self.activeEntry,
             trashEntry: ko.observable(),
-            apiHelper: self.apiHelper,
             app: 'documents',
             user: self.user,
             activeSort: self.activeSort,
@@ -1646,12 +1216,10 @@ from desktop.views import _ko
 
       /**
        * @param {Object} options
-       * @param {ApiHelper} options.apiHelper
        * @constructor
        **/
       function AssistHdfsPanel (options) {
         var self = this;
-        self.apiHelper = options.apiHelper;
         self.selectedHdfsEntry = ko.observable();
         self.loading = ko.observable();
         self.initialized = false;
@@ -1667,8 +1235,7 @@ from desktop.views import _ko
               name: '/',
               type: 'dir'
             },
-            parent: null,
-            apiHelper: self.apiHelper
+            parent: null
           });
 
           currentEntry.loadDeep(parts, function (entry) {
@@ -1679,17 +1246,17 @@ from desktop.views import _ko
         };
 
         self.reload = function () {
-          loadPath(self.apiHelper.getFromTotalStorage('assist', 'currentHdfsPath', '${ home_dir }'));
+          loadPath(window.apiHelper.getFromTotalStorage('assist', 'currentHdfsPath', window.USER_HOME_DIR));
         };
 
         huePubSub.subscribe('assist.hdfs.go.home', function () {
-          loadPath('${ home_dir }');
-          self.apiHelper.setInTotalStorage('assist', 'currentHdfsPath', '${ home_dir }');
+          loadPath(window.USER_HOME_DIR);
+          window.apiHelper.setInTotalStorage('assist', 'currentHdfsPath', window.USER_HOME_DIR);
         });
 
         huePubSub.subscribe('assist.selectHdfsEntry', function (entry) {
           self.selectedHdfsEntry(entry);
-          self.apiHelper.setInTotalStorage('assist', 'currentHdfsPath', entry.path);
+          window.apiHelper.setInTotalStorage('assist', 'currentHdfsPath', entry.path);
         });
 
         huePubSub.subscribe('assist.hdfs.refresh', function () {
@@ -1709,7 +1276,6 @@ from desktop.views import _ko
 
       function AssistAdlsPanel (options) {
         var self = this;
-        self.apiHelper = options.apiHelper;
         self.selectedAdlsEntry = ko.observable();
         self.loading = ko.observable();
         self.initialized = false;
@@ -1725,8 +1291,7 @@ from desktop.views import _ko
               name: '/',
               type: 'dir'
             },
-            parent: null,
-            apiHelper: self.apiHelper
+            parent: null
           });
 
           currentEntry.loadDeep(parts, function (entry) {
@@ -1737,17 +1302,17 @@ from desktop.views import _ko
         };
 
         self.reload = function () {
-          loadPath(self.apiHelper.getFromTotalStorage('assist', 'currentAdlsPath', '/'));
+          loadPath(window.apiHelper.getFromTotalStorage('assist', 'currentAdlsPath', '/'));
         };
 
         huePubSub.subscribe('assist.adls.go.home', function () {
-          loadPath('${ home_dir }');
-          self.apiHelper.setInTotalStorage('assist', 'currentAdlsPath', '${ home_dir }');
+          loadPath(window.USER_HOME_DIR);
+          window.apiHelper.setInTotalStorage('assist', 'currentAdlsPath', window.USER_HOME_DIR);
         });
 
         huePubSub.subscribe('assist.selectAdlsEntry', function (entry) {
           self.selectedAdlsEntry(entry);
-          self.apiHelper.setInTotalStorage('assist', 'currentAdlsPath', entry.path);
+          window.apiHelper.setInTotalStorage('assist', 'currentAdlsPath', entry.path);
         });
 
         huePubSub.subscribe('assist.adls.refresh', function () {
@@ -1767,16 +1332,14 @@ from desktop.views import _ko
 
       /**
        * @param {Object} options
-       * @param {ApiHelper} options.apiHelper
        * @constructor
        **/
       function AssistGitPanel (options) {
         var self = this;
-        self.apiHelper = window.apiHelper;
 
         self.selectedGitEntry = ko.observable();
         self.reload = function () {
-          var lastKnownPath = self.apiHelper.getFromTotalStorage('assist', 'currentGitPath', '${ home_dir }');
+          var lastKnownPath = window.apiHelper.getFromTotalStorage('assist', 'currentGitPath', window.USER_HOME_DIR);
           var parts = lastKnownPath.split('/');
           parts.shift();
 
@@ -1785,8 +1348,7 @@ from desktop.views import _ko
               name: '/',
               type: 'dir'
             },
-            parent: null,
-            apiHelper: self.apiHelper
+            parent: null
           });
 
           currentEntry.loadDeep(parts, function (entry) {
@@ -1797,7 +1359,7 @@ from desktop.views import _ko
 
         huePubSub.subscribe('assist.selectGitEntry', function (entry) {
           self.selectedGitEntry(entry);
-          self.apiHelper.setInTotalStorage('assist', 'currentGitPath', entry.path);
+          window.apiHelper.setInTotalStorage('assist', 'currentGitPath', entry.path);
         });
 
         huePubSub.subscribe('assist.git.refresh', function () {
@@ -1812,12 +1374,10 @@ from desktop.views import _ko
 
       /**
        * @param {Object} options
-       * @param {ApiHelper} options.apiHelper
        * @constructor
        **/
       function AssistS3Panel (options) {
         var self = this;
-        self.apiHelper = options.apiHelper;
 
         self.selectedS3Entry = ko.observable();
         self.loading = ko.observable();
@@ -1825,7 +1385,7 @@ from desktop.views import _ko
 
         self.reload = function () {
           self.loading(true);
-          var lastKnownPath = self.apiHelper.getFromTotalStorage('assist', 'currentS3Path', '/');
+          var lastKnownPath = window.apiHelper.getFromTotalStorage('assist', 'currentS3Path', '/');
           var parts = lastKnownPath.split('/');
           parts.shift();
 
@@ -1835,8 +1395,7 @@ from desktop.views import _ko
               name: '/',
               type: 'dir'
             },
-            parent: null,
-            apiHelper: self.apiHelper
+            parent: null
           });
 
           currentEntry.loadDeep(parts, function (entry) {
@@ -1848,7 +1407,7 @@ from desktop.views import _ko
 
         huePubSub.subscribe('assist.selectS3Entry', function (entry) {
           self.selectedS3Entry(entry);
-          self.apiHelper.setInTotalStorage('assist', 'currentS3Path', entry.path);
+          window.apiHelper.setInTotalStorage('assist', 'currentS3Path', entry.path);
         });
 
         huePubSub.subscribe('assist.s3.refresh', function () {
@@ -1868,12 +1427,10 @@ from desktop.views import _ko
 
       /**
        * @param {Object} options
-       * @param {ApiHelper} options.apiHelper
        * @constructor
        **/
       function AssistHBasePanel(options) {
         var self = this;
-        self.apiHelper = options.apiHelper;
         self.initialized = false;
 
         var root = new AssistHBaseEntry({
@@ -1881,15 +1438,14 @@ from desktop.views import _ko
             host: '',
             name: '',
             port: 0
-          },
-          apiHelper: self.apiHelper
+          }
         });
 
         self.selectedHBaseEntry = ko.observable();
         self.reload = function () {
           self.selectedHBaseEntry(root);
           root.loadEntries(function () {
-            var lastOpenendPath = self.apiHelper.getFromTotalStorage('assist', 'last.opened.hbase.entry', null);
+            var lastOpenendPath = window.apiHelper.getFromTotalStorage('assist', 'last.opened.hbase.entry', null);
             if (lastOpenendPath) {
               root.entries().every(function (entry) {
                 if (entry.path === lastOpenendPath) {
@@ -1904,7 +1460,7 @@ from desktop.views import _ko
 
         self.selectedHBaseEntry.subscribe(function (newEntry) {
           if (newEntry !== root || (newEntry === root && newEntry.loaded)) {
-            self.apiHelper.setInTotalStorage('assist', 'last.opened.hbase.entry', newEntry.path);
+            window.apiHelper.setInTotalStorage('assist', 'last.opened.hbase.entry', newEntry.path);
           }
         });
 
@@ -2013,15 +1569,13 @@ from desktop.views import _ko
           errorLoadingTablePreview: "${ _('There was a problem loading the index preview') }"
         };
 
-        self.apiHelper = window.apiHelper;
-
         self.tabsEnabled = '${ USE_NEW_SIDE_PANELS.get() }' === 'True';
 
         self.availablePanels = ko.observableArray();
         self.visiblePanel = ko.observable();
 
         self.lastOpenPanelType = ko.observable();
-        self.apiHelper.withTotalStorage('assist', 'last.open.panel', self.lastOpenPanelType);
+        window.apiHelper.withTotalStorage('assist', 'last.open.panel', self.lastOpenPanelType);
 
         huePubSub.subscribeOnce('cluster.config.set.config', function (clusterConfig) {
           if (clusterConfig && clusterConfig['app_config']) {
@@ -2031,10 +1585,8 @@ from desktop.views import _ko
             if (appConfig['editor']) {
               var sqlPanel = new AssistInnerPanel({
                 panelData: new AssistDbPanel($.extend({
-                  apiHelper: self.apiHelper,
                   i18n: i18n
                 }, params.sql)),
-                apiHelper: self.apiHelper,
                 name: '${ _("SQL") }',
                 type: 'sql',
                 icon: 'fa-database',
@@ -2053,10 +1605,7 @@ from desktop.views import _ko
 
               if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('hdfs') != -1) {
                 panels.push(new AssistInnerPanel({
-                  panelData: new AssistHdfsPanel({
-                    apiHelper: self.apiHelper
-                  }),
-                  apiHelper: self.apiHelper,
+                  panelData: new AssistHdfsPanel({}),
                   name: '${ _("HDFS") }',
                   type: 'hdfs',
                   icon: 'fa-files-o',
@@ -2066,10 +1615,7 @@ from desktop.views import _ko
 
               if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('s3') != -1) {
                 panels.push(new AssistInnerPanel({
-                  panelData: new AssistS3Panel({
-                    apiHelper: self.apiHelper
-                  }),
-                  apiHelper: self.apiHelper,
+                  panelData: new AssistS3Panel({}),
                   name: '${ _("S3") }',
                   type: 's3',
                   icon: 'fa-cubes',
@@ -2079,10 +1625,7 @@ from desktop.views import _ko
 
               if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('adls') != -1) {
                 panels.push(new AssistInnerPanel({
-                  panelData: new AssistAdlsPanel({
-                    apiHelper: self.apiHelper
-                  }),
-                  apiHelper: self.apiHelper,
+                  panelData: new AssistAdlsPanel({}),
                   name: '${ _("ADLS") }',
                   type: 'adls',
                   icon: 'fa-windows',
@@ -2094,11 +1637,9 @@ from desktop.views import _ko
               if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('indexes') != -1) {
                 var solrPanel = new AssistInnerPanel({
                   panelData: new AssistDbPanel($.extend({
-                    apiHelper: self.apiHelper,
                     i18n: i18nCollections,
                     isSolr: true
                   }, params.sql)),
-                  apiHelper: self.apiHelper,
                   name: '${ _("Indexes") }',
                   type: 'solr',
                   icon: 'fa-search-plus',
@@ -2115,11 +1656,9 @@ from desktop.views import _ko
               if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('kafka') != -1) {
                 var streamsPanel = new AssistInnerPanel({
                   panelData: new AssistDbPanel($.extend({
-                    apiHelper: self.apiHelper,
                     i18n: i18nCollections,
                     isStreams: true
                   }, params.sql)),
-                  apiHelper: self.apiHelper,
                   name: '${ _("Streams") }',
                   type: 'kafka',
                   icon: 'fa-sitemap',
@@ -2130,10 +1669,7 @@ from desktop.views import _ko
 
               if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('hbase') != -1) {
                 panels.push(new AssistInnerPanel({
-                  panelData: new AssistHBasePanel({
-                    apiHelper: self.apiHelper
-                  }),
-                  apiHelper: self.apiHelper,
+                  panelData: new AssistHBasePanel({}),
                   name: '${ _("HBase") }',
                   type: 'hbase',
                   icon: 'fa-th-large',
@@ -2144,10 +1680,8 @@ from desktop.views import _ko
               % if not IS_EMBEDDED.get():
               var documentsPanel = new AssistInnerPanel({
                 panelData: new AssistDocumentsPanel({
-                  user: params.user,
-                  apiHelper: self.apiHelper
+                  user: params.user
                 }),
-                apiHelper: self.apiHelper,
                 name: '${ _("Documents") }',
                 type: 'documents',
                 icon: 'fa-files-o',
@@ -2173,10 +1707,7 @@ from desktop.views import _ko
               var vcsKeysLength = ${ len(VCS.keys()) };
               if (vcsKeysLength > 0) {
                 panels.push(new AssistInnerPanel({
-                  panelData: new AssistGitPanel({
-                    apiHelper: self.apiHelper
-                  }),
-                  apiHelper: self.apiHelper,
+                  panelData: new AssistGitPanel({}),
                   name: '${ _("Git") }',
                   type: 'git',
                   icon: 'fa-github',
@@ -2191,10 +1722,8 @@ from desktop.views import _ko
           } else {
             self.availablePanels([new AssistInnerPanel({
               panelData: new AssistDbPanel($.extend({
-                apiHelper: self.apiHelper,
                 i18n: i18n
               }, params.sql)),
-              apiHelper: self.apiHelper,
               name: '${ _("SQL") }',
               type: 'sql',
               icon: 'fa-database',
@@ -2655,15 +2184,13 @@ from desktop.views import _ko
           return result;
         });
 
-        var apiHelper = window.apiHelper;
-
         self.activeType.subscribe(function (newType) {
           self.selectedFunction(selectedFunctionPerType[newType]);
           self.activeCategories(self.categories[newType]);
-          apiHelper.setInTotalStorage('assist', 'function.panel.active.type', newType);
+          window.apiHelper.setInTotalStorage('assist', 'function.panel.active.type', newType);
         });
 
-        var lastActiveType = apiHelper.getFromTotalStorage('assist', 'function.panel.active.type', self.availableTypes()[0]);
+        var lastActiveType = window.apiHelper.getFromTotalStorage('assist', 'function.panel.active.type', self.availableTypes()[0]);
         self.activeType(lastActiveType);
 
         var updateType = function (type) {
@@ -3645,9 +3172,8 @@ from desktop.views import _ko
         self.langRefTabAvailable = ko.observable(false);
         self.schedulesTabAvailable = ko.observable(false);
 
-        var apiHelper = window.apiHelper;
-        self.lastActiveTabEditor = apiHelper.withTotalStorage('assist', 'last.open.right.panel', ko.observable(), EDITOR_ASSISTANT_TAB);
-        self.lastActiveTabDashboard = apiHelper.withTotalStorage('assist', 'last.open.right.panel.dashboard', ko.observable(), DASHBOARD_ASSISTANT_TAB);
+        self.lastActiveTabEditor = window.apiHelper.withTotalStorage('assist', 'last.open.right.panel', ko.observable(), EDITOR_ASSISTANT_TAB);
+        self.lastActiveTabDashboard = window.apiHelper.withTotalStorage('assist', 'last.open.right.panel.dashboard', ko.observable(), DASHBOARD_ASSISTANT_TAB);
 
         huePubSub.subscribe('assist.highlight.risk.suggestions', function () {
           if (self.editorAssistantTabAvailable() && self.activeTab() !== EDITOR_ASSISTANT_TAB) {
