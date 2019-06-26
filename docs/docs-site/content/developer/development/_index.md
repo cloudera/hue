@@ -118,6 +118,28 @@ After modifying files under tools/ace-editor run the following to build ace.js
     npm install
     make ace
 
+### SQL Embedded Language Reference manuals
+
+The tools for generating the embedded language reference can be found under hue/tools/sql-docs/
+
+## Hive
+The Hive documentation is generated directly from the Hive wiki by using an exported epub file.
+
+1. Goto https://cwiki.apache.org/confluence/display/Hive/LanguageManual
+2. Click the three dots '...' in the upper right corner
+3. Click 'Export to EPUB'
+4. In the Hue folder run:
+
+        node tools/sql-docs/hiveExtractor.js --epub /path/to/epub/file
+
+## Impala
+The Impala documentation is generated from the ditamap files in the Impala GitHub repo.
+
+1. Clone the Impala repo next to hue from https://github.com/apache/impala
+2. In the Hue folder run:
+
+        node tools/sql-docs/docExtractor.js -c hue -f ../impala/docs/ -d impala_langref.ditamap,impala_keydefs.ditamap,impala.ditamap -o desktop/core/src/desktop/static/desktop/docs/impala/ -m desktop/core/src/desktop/templates/impala_doc_index.mako
+
 ### Internationalization
 
 How to update all the messages and compile them:
