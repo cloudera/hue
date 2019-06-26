@@ -2414,6 +2414,21 @@ from desktop.views import _ko
           self.allTopics.hive.push(new LanguageReferenceTopic(topLevelItem, window.HIVE_DOC_INDEX));
         });
 
+        var updateType = function (type) {
+          if (self.availableTypes.indexOf(type) !== -1) {
+            self.sourceType(type);
+          }
+        };
+
+        var activeSnippetTypeSub = huePubSub.subscribe('active.snippet.type.changed', function (details) { updateType(details.type) });
+
+        self.disposals.push(function () {
+          activeSnippetTypeSub.remove();
+        });
+
+        huePubSub.subscribeOnce('set.active.snippet.type', updateType);
+        huePubSub.publish('get.active.snippet.type');
+
         self.topics = ko.pureComputed(function () {
           return self.allTopics[self.sourceType()];
         });
