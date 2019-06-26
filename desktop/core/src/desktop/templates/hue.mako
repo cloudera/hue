@@ -504,7 +504,6 @@ ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 ## clusterConfig makes an Ajax call so it needs to be after commonHeaderFooterComponents
 <script src="${ static('desktop/js/clusterConfig.js') }"></script>
 
-${ assist.assistJSModels() }
 ${ assist.assistPanel() }
 
 % if request is not None:

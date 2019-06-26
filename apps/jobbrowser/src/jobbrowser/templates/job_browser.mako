@@ -65,7 +65,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 % endif
 
 % if not is_embeddable:
-  ${ assist.assistJSModels() }
   ${ assist.assistPanel() }
 
   <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">

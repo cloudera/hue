@@ -69,6 +69,8 @@ import HdfsAutocompleter from 'utils/hdfsAutocompleter';
 import SqlAutocompleter from 'sql/sqlAutocompleter';
 import sqlAutocompleteParser from 'parse/sqlAutocompleteParser'; // Notebook and used throughout via hue-simple-ace-editor ko component
 import sqlStatementsParser from 'parse/sqlStatementsParser'; // In search.ko and notebook.ko
+import HueFileEntry from 'doc/hueFileEntry';
+import HueDocument from 'doc/hueDocument';
 
 // TODO: Migrate away
 window._ = _;
@@ -91,7 +93,9 @@ window.HdfsAutocompleter = HdfsAutocompleter;
 window.hueAnalytics = hueAnalytics;
 window.HueColors = HueColors;
 window.hueDebug = hueDebug;
+window.HueDocument = HueDocument;
 window.hueDrop = hueDrop;
+window.HueFileEntry = HueFileEntry;
 window.HueGeo = HueGeo;
 window.huePubSub = huePubSub;
 window.hueUtils = hueUtils;
