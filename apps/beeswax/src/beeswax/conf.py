@@ -74,14 +74,14 @@ CACHE_TIMEOUT = Config(
 
 LLAP_SERVER_PORT = Config(
   key="llap_server_port",
-  help=_t("Configure the port the Hive Server Interactive runs on."),
+  help=_t("Configure the base port the Hive Server Interactive runs on (10500 default)."),
   default=10500,
   type=int
 )
 
 LLAP_SERVER_THRIFT_PORT = Config(
   key="llap_server_thrift_port",
-  help=_t(""),
+  help=_t("Configure the thrift port the Hive Server Interactive runs on (10501 default)"),
   default=10501,
   type=int
 )
