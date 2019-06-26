@@ -55,3 +55,24 @@ class TestGetQueryServerConfig():
         assert_equal(query_server['server_name'], 'impala')
         assert_equal(query_server['server_host'], 'impala.gethue.com')
         assert_equal(query_server['server_port'], 10002)
+
+
+  def test_get_llap(self):
+
+    # Basic
+    with patch('beeswax.conf.LLAP_SERVER_HOST.get') as LLAP_SERVER_HOST:
+      with patch('beeswax.conf.LLAP_SERVER_PORT.get') as LLAP_SERVER_PORT:
+        LLAP_SERVER_HOST.return_value = 'hive-llap.gethue.com'
+        LLAP_SERVER_PORT.return_value=10002
+
+        query_server = get_query_server_config(name='llap')
+
+        assert_equal(query_server['server_name'], 'beeswax')
+        assert_equal(query_server['server_host'], 'hive-llap.gethue.com')
+        assert_equal(query_server['server_port'], 10002)
+
+      # TODO
+
+      # HIVE_DISCOVERY_LLAP.get() -- True
+
+      # HIVE_DISCOVERY_LLAP_HA.get() --> True
