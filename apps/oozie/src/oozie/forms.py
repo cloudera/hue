@@ -34,7 +34,6 @@ from oozie.models import Workflow, Node, Java, Mapreduce, Streaming, Coordinator
   Email, SubWorkflow, Generic, Bundle, BundledCoordinator
 
 
-
 LOG = logging.getLogger(__name__)
 
 

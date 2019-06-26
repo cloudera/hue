@@ -23,7 +23,7 @@ import uuid
 
 from django.utils.translation import ugettext as _
 
-from desktop.conf import has_multi_cluster
+from desktop.conf import has_multi_cluster, TASK_SERVER
 from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
@@ -275,7 +275,7 @@ class Notebook(object):
 def get_api(request, snippet):
   from notebook.connectors.oozie_batch import OozieApi
 
-  if snippet.get('wasBatchExecuted'):
+  if snippet.get('wasBatchExecuted') and not TASK_SERVER.ENABLED.get():
     return OozieApi(user=request.user, request=request)
 
   if snippet['type'] == 'report':
@@ -580,19 +580,23 @@ class ExecutionWrapper():
           self.callback.on_execute(handle)
         self.should_close = True
         self._until_available()
+
     if self.snippet['result']['handle'].get('sync', False):
       result = self.snippet['result']['handle']['result']
     else:
       result = self.api.fetch_result(self.notebook, self.snippet, rows, start_over)
+
     return ResultWrapper(result.get('meta'), result.get('data'), result.get('has_more'))
 
   def _until_available(self):
     if self.snippet['result']['handle'].get('sync', False):
       return # Request is already completed
+
     count = 0
     sleep_seconds = 1
     check_status_count = 0
     get_log_is_full_log = self.api.get_log_is_full_log(self.notebook, self.snippet)
+
     while True:
       response = self.api.check_status(self.notebook, self.snippet)
       if self.callback and hasattr(self.callback, 'on_status'):
@@ -618,6 +622,7 @@ class ExecutionWrapper():
     if self.should_close:
       self.should_close = False
       self.api.close_statement(self.notebook, self.snippet)
+
 
 class ResultWrapper():
   def __init__(self, cols, rows, has_more):

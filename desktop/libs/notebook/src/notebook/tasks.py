@@ -17,10 +17,12 @@
 from __future__ import absolute_import, unicode_literals
 
 import csv
+import datetime
 import json
 import logging
 import StringIO
 import sys
+import time
 
 from celery.utils.log import get_task_logger
 from celery import states
@@ -31,6 +33,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import FileResponse, HttpRequest
 
+from beeswax import data_export
 from desktop.auth.backend import rewrite_user
 from desktop.celery import app
 from desktop.conf import TASK_SERVER
@@ -40,6 +43,7 @@ from desktop.settings import CACHES_CELERY_KEY
 
 from notebook.connectors.base import get_api, QueryExpired, ExecutionWrapper
 from notebook.sql_utils import get_current_statement
+
 
 LOG_TASK = get_task_logger(__name__)
 LOG = logging.getLogger(__name__)
@@ -59,6 +63,7 @@ STATE_MAP = {
 }
 storage_info = json.loads(TASK_SERVER.RESULT_STORAGE.get())
 storage = get_storage_class(storage_info.get('backend'))(**storage_info.get('properties', {}))
+
 
 class ExecutionWrapperCallback(object):
   def __init__(self, uuid, meta, f_log):
@@ -84,11 +89,10 @@ class ExecutionWrapperCallback(object):
     self.meta['status'] = status
     download_to_file.update_state(task_id=self.uuid, state='PROGRESS', meta=self.meta)
 
-#TODO: Add periodic cleanup task
-#TODO: UI should be able to close a query that is available, but not expired
+# TODO: Add periodic cleanup task
+# TODO: UI should be able to close a query that is available, but not expired
 @app.task()
 def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs):
-  from beeswax import data_export
   download_to_file.update_state(task_id=notebook['uuid'], state='STARTED', meta={})
   request = _get_request(**kwargs)
   api = get_api(request, snippet)
@@ -119,7 +123,47 @@ def close_statement_async(notebook, snippet, **kwargs):
   request = _get_request(**kwargs)
   get_api(request, snippet).close_statement(notebook, snippet)
 
-#TODO: Convert csv to excel if needed
+
+@app.task(ignore_result=True)
+def run_sync_query(doc_id, user):
+  '''Independently run a query as a user and insert the result into another table.'''
+  # get SQL
+  # Add INSERT INTO table
+  # Add variables?
+  # execute query
+  # return when done. send email notification. get taskid.
+  # see in Flower API for listing runs?
+  from django.contrib.auth.models import User
+  from notebook.models import make_notebook, MockedDjangoRequest
+
+  from desktop.auth.backend import rewrite_user
+
+  editor_type = 'impala'
+  sql = 'INSERT into customer_scheduled SELECT * FROM default.customers LIMIT 100;'
+  request = MockedDjangoRequest(user=rewrite_user(User.objects.get(username='romain')))
+
+  notebook = make_notebook(
+      name='Scheduler query N',
+      editor_type=editor_type,
+      statement=sql,
+      status='ready',
+      #on_success_url=on_success_url,
+      last_executed=time.mktime(datetime.datetime.now().timetuple()) * 1000,
+      is_task=True
+  )
+
+  task = notebook.execute(request, batch=True)
+
+  task['uuid'] = task['history_uuid']
+  status = check_status(task)
+
+  while status['status'] in ('waiting', 'running'):
+    status = check_status(task)
+    time.sleep(3)
+
+  return task
+
+# TODO: Convert csv to excel if needed
 def download(*args, **kwargs):
   notebook = args[0]
   result = download_to_file.AsyncResult(args[0]['uuid'])
@@ -145,12 +189,15 @@ def execute(*args, **kwargs):
   snippet = args[1]
   kwargs['max_rows'] = TASK_SERVER.FETCH_RESULT_LIMIT.get()
   _patch_status(notebook)
-  download_to_file.apply_async(args=args, kwargs=kwargs, task_id=notebook['uuid'])
+
+  task = download_to_file.apply_async(args=args, kwargs=kwargs, task_id=notebook['uuid'])
 
   should_close, resp = get_current_statement(snippet) # This redoes some of the work in api.execute. Other option is to pass statement, but then we'd have to modify notebook.api.
-  #if should_close: #front end already calls close_statement for multi statement execution no need to do here. In addition, we'd have to figure out what was the previous guid.
+  # if should_close: #front end already calls close_statement for multi statement execution no need to do here.
+  # In addition, we'd have to figure out what was the previous guid.
 
-  resp.update({'sync': False,
+  resp.update({
+      'sync': False,
       'has_result_set': True,
       'modified_row_count': 0,
       'guid': '',
@@ -159,7 +206,8 @@ def execute(*args, **kwargs):
         'data': [],
         'meta': [],
         'type': 'table'
-      }})
+      }}
+    )
   return resp
 
 def check_status(*args, **kwargs):
@@ -197,7 +245,7 @@ def get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id
         output.write(line)
     return output.getvalue()
 
-def get_jobs(notebook, snippet, logs, **kwargs): #Re implement to fetch updated guid in download_to_file from DB
+def get_jobs(notebook, snippet, logs, **kwargs): # Re implementation to fetch updated guid in download_to_file from DB
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
   if state == states.PENDING:

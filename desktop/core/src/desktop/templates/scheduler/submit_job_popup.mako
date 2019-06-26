@@ -18,7 +18,7 @@
   from django.utils.translation import ugettext as _
 %>
 
-<%namespace name="utils" file="../utils.inc.mako" />
+## <%namespace name="utils" file="../utils.inc.mako" />
 
 <link rel="stylesheet" href="${ static('oozie/css/common-editor.css') }">
 
@@ -32,8 +32,8 @@
       <h2 class="modal-title">${ _('Submit %(job)s?') % {'job': name} }</h2>
     % endif
   </div>
-  <div class="modal-body">
 
+  <div class="modal-body">
       <div id="param-container">
 
        ${ params_form.management_form | n,unicode }
@@ -50,7 +50,7 @@
           >
             <label class="control-label">${ form['name'].form.initial.get('name') }</label>
             <div class="controls">
-              ${ utils.render_field(form['value'], show_label=False, extra_attrs={'class': 'filechooser-input input-xlarge'}) }
+              ${ render_field(form['value'], show_label=False, extra_attrs={'class': 'filechooser-input input-xlarge'}) }
               <div class="btn-group">
                 <a class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                   <i class="fa fa-calendar"></i>
@@ -96,7 +96,7 @@
           <input type="hidden" name="cluster" value="${ cluster_json }"></input>
         % endif
         </label>
-        %endif       
+        %endif
       % if return_json:
         <input type="hidden" name="format" value="json">
       % endif
@@ -189,3 +189,26 @@
   % endif
 
 </script>
+
+<%def name="render_field(field, show_label=True, extra_attrs={}, control_extra='')">
+  % if not field.is_hidden:
+    <% group_class = field.errors and "error" or "" %>
+    <div class="control-group ${group_class}"
+      rel="popover" data-original-title="${ field.label }" data-content="${ field.help_text }" ${control_extra}>
+      % if show_label:
+        <label class="control-label">${ field.label }</label>
+      % endif
+      <div class="controls"
+      % if not show_label:
+        style="margin-left: 0"
+      % endif
+              >
+        <% field.field.widget.attrs.update(extra_attrs) %>
+        ${ field | n,unicode }
+        % if field.errors:
+          <span class="help-inline">${ field.errors | n,unicode }</span>
+        % endif
+      </div>
+    </div>
+  %endif
+</%def>

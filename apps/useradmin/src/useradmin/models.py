@@ -285,12 +285,13 @@ def update_app_permissions(**kwargs):
           GroupPermission.objects.create(group=default_group, hue_permission=new_dp)
 
     available = HuePermission.objects.count()
+    stale = available - len(added) - updated - uptodate
 
-    LOG.info("HuePermissions: %d added, %d updated, %d up to date, %d stale" %
-           (len(added),
-            updated,
-            uptodate,
-            available - len(added) - updated - uptodate))
+    if len(added) or updated or stale:
+      LOG.info("HuePermissions: %d added, %d updated, %d up to date, %d stale" % (
+          len(added), updated, uptodate, stale
+        )
+      )
 
 models.signals.post_migrate.connect(update_app_permissions)
 models.signals.post_migrate.connect(get_default_user_group)

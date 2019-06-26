@@ -746,7 +746,7 @@ def sync_coord_workflow(request, job_id):
     initial_params = ParameterForm.get_initial_params(new_params)
     params_form = ParametersFormSet(initial=initial_params)
 
-  popup = render('editor2/submit_job_popup.mako', request, {
+  popup = render('/scheduler/submit_job_popup.mako', request, {
              'params_form': params_form,
              'name': _('Job'),
              'header': _('Sync Workflow definition?'),
@@ -797,7 +797,7 @@ def rerun_oozie_job(request, job_id, app_path=None):
     return render('dashboard/rerun_workflow_popup.mako', request, {
                    'rerun_form': rerun_form,
                    'params_form': params_form,
-                   'action': reverse('oozie:rerun_oozie_job', kwargs={'job_id': job_id, 'app_path': urllib.quote(app_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) }), 
+                   'action': reverse('oozie:rerun_oozie_job', kwargs={'job_id': job_id, 'app_path': urllib.quote(app_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) }),
                    'return_json': return_json,
                    'is_mini': request.GET.get('is_mini', False),
                  }, force_template=True)

@@ -427,7 +427,7 @@ def _submit_workflow_helper(request, workflow, submit_action):
     params_form = ParametersFormSet(initial=initial_params)
 
 
-    return render('editor2/submit_job_popup.mako', request, {
+    return render('/scheduler/submit_job_popup.mako', request, {
                      'params_form': params_form,
                      'name': workflow.name,
                      'action': submit_action,
@@ -676,6 +676,7 @@ def coordinator_parameters(request):
 @check_editor_access_permission
 @check_document_access_permission()
 def submit_coordinator(request, doc_id):
+  # TODO: Replace URL by desktop/scheduler API
   if doc_id.isdigit():
     coordinator = Coordinator(document=Document2.objects.get(id=doc_id))
   else:
@@ -707,7 +708,7 @@ def submit_coordinator(request, doc_id):
     initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
     params_form = ParametersFormSet(initial=initial_params)
 
-    return render('editor2/submit_job_popup.mako', request, {
+    return render('/scheduler/submit_job_popup.mako', request, {
                  'params_form': params_form,
                  'name': coordinator.name,
                  'action': reverse('oozie:editor_submit_coordinator',  kwargs={'doc_id': coordinator.id}),
@@ -936,7 +937,7 @@ def submit_bundle(request, doc_id):
     initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
     params_form = ParametersFormSet(initial=initial_params)
 
-    return render('editor2/submit_job_popup.mako', request, {
+    return render('/scheduler/submit_job_popup.mako', request, {
                  'params_form': params_form,
                  'name': bundle.name,
                  'action': reverse('oozie:editor_submit_bundle',  kwargs={'doc_id': bundle.id}),
