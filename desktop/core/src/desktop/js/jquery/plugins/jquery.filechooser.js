@@ -337,15 +337,18 @@ Plugin.prototype.navigateTo = function(path) {
               return path;
             }
             const indexFirst = path.indexOf('/');
-            const indexLast = path.lastIndexOf('/');
+            let indexLast = path.lastIndexOf('/');
+            if (indexLast - indexFirst > 1 && indexLast == path.length - 1) {
+              indexLast = path.substring(0, path.length - 1).lastIndexOf('/');
+            }
             return indexLast - indexFirst > 1 && indexLast > 0
               ? path.substring(0, indexLast + 1)
               : path;
           }
           const next =
             path !== _parent.previousPath && getScheme(path) === getScheme(_parent.previousPath)
-              ? _parent.previousPath
-              : getParentPath(path);
+              ? _parent.previousPath || '/'
+              : getParentPath(path) || '/';
           _parent.options.onFolderChange(next);
           _parent.navigateTo(next);
         });

@@ -103,7 +103,7 @@ for more details, refer to this link: [https://docs.oracle.com/cd/E37670_01/E590
 
 Install Dependencies via Homebrew
 
-    brew install mysql@5.7 maven gmp openssl libffi && brew cask install java8
+    brew install mysql@5.7 maven gmp openssl libffi && brew cask install adoptopenjdk
 
 Install Xcode command line tools
 

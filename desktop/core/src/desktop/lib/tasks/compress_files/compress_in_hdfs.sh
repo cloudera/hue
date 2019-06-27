@@ -42,7 +42,7 @@ while [ "$1" != "" ]; do
             UPLOAD_PATH=$VALUE
             ;;
         -f | --file-names)
-            FILE_NAMES=$VALUE
+            FILE_NAMES="$VALUE"
             ;;
         -n | --archive-name)
             ARCHIVE_NAME=$VALUE
@@ -63,21 +63,22 @@ then
 	exit 1
 fi
 
-FILE_NAMES=(${FILE_NAMES//,/ })
+FILE_NAMES=("${FILE_NAMES//,/ }")
 exit_status=0
 
 temp_output_dir=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
 echo 'Created temporary output directory: '$temp_output_dir
 
 set -x
-zip -r $temp_output_dir/$ARCHIVE_NAME ${FILE_NAMES[@]}
+zip -r "$temp_output_dir/$ARCHIVE_NAME" "${FILE_NAMES[@]}"
 exit_status=$(echo $?)
 
 set +x
 if [ $exit_status == 0 ]
 then
-	echo "Copying hue_compressed.zip to '$UPLOAD_PATH' in HDFS"
-	hadoop fs -put -f $temp_output_dir/$ARCHIVE_NAME $UPLOAD_PATH
+	encoded_output_dir=`python -c "import urllib;print urllib.quote(raw_input())" <<< "$temp_output_dir/$ARCHIVE_NAME"`
+	echo "Copying $encoded_output_dir to '$UPLOAD_PATH' in HDFS"
+	hadoop fs -put -f $encoded_output_dir "$UPLOAD_PATH"
 	exit_status=$(echo $?)
 	if [ $exit_status == 0 ]
 	then
