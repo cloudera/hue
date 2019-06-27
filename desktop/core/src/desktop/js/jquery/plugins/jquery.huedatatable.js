@@ -440,7 +440,10 @@ $.fn.hueDataTable = function(oInit) {
           if ($(this).position().left > 0 && startCol == -1) {
             startCol = i;
           }
-          if ($(this).position().left < $t.parent().width() + $t.parent().position().left) {
+          if (
+            $(this).position().left + $t.position().left <
+            $t.parent().width() + $t.parent().position().left
+          ) {
             endCol = i;
           }
         });
