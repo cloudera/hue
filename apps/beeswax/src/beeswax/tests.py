@@ -16,7 +16,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import cStringIO
+from future import standard_library
+standard_library.install_aliases()
+from builtins import next
+from builtins import map
+from builtins import str
+from builtins import chr
+from builtins import range
+from builtins import object
 import gzip
 import json
 import logging
@@ -26,6 +33,7 @@ import re
 import shutil
 import socket
 import string
+import sys
 import tempfile
 import threading
 
@@ -85,6 +93,10 @@ from beeswax.server.hive_server2_lib import HiveServerClient,\
 from beeswax.test_base import BeeswaxSampleProvider, is_hive_on_spark, get_available_execution_engines
 from beeswax.hive_site import get_metastore, hiveserver2_jdbc_url
 
+if sys.version_info[0] > 2:
+  from io import StringIO as string_io
+else:
+  from cStringIO import StringIO as string_io
 
 LOG = logging.getLogger(__name__)
 
@@ -444,25 +456,25 @@ for x in sys.stdin:
     query = hql_query(hql)
     try:
       self.db.execute_and_wait(query)
-    except QueryServerException, bex:
+    except QueryServerException as bex:
       assert_equal(bex.errorCode, 40000)
       assert_equal(bex.SQLState, "42000")
 
 
   def test_fetch_configuration(self):
-    class MockClient:
+    class MockClient(object):
       """Check if sent fetch correctly supports start_over."""
       def __init__(self, support_start_over):
         self.support_start_over = support_start_over
 
       def fetch(self, query_id, start_over, fetch_size):
         assert_equal(self.support_start_over, start_over)
-        class Result: pass
+        class Result(object): pass
         res = Result()
         res.ready = False
         return res
 
-    class ConfigVariable:
+    class ConfigVariable(object):
       def __init__(self, **entries):
         self.__dict__.update(entries)
 
@@ -557,7 +569,7 @@ for x in sys.stdin:
     if is_live_cluster():
       raise SkipTest('HUE-2884: Skipping test because we cannot guarantee live cluster supports utf8')
 
-    query = u"SELECT foo FROM `%(db)s`.`test_utf8` WHERE bar='%(val)s'" % {'val': unichr(200), 'db': self.db_name}
+    query = u"SELECT foo FROM `%(db)s`.`test_utf8` WHERE bar='%(val)s'" % {'val': chr(200), 'db': self.db_name}
     response = _make_query(self.client, query, settings=[('hive.explain.user', 'false')], submission_type="Explain")
     explanation = json.loads(response.content)['explanation']
     assert_true('STAGE DEPENDENCIES:' in explanation, explanation)
@@ -570,15 +582,15 @@ for x in sys.stdin:
     raise SkipTest
 
     # Selecting from utf-8 table should get correct result
-    query = u"SELECT * FROM `%(db)s`.`test_utf8` WHERE bar='%(val)s'" % {'val': unichr(200), 'db': self.db_name}
+    query = u"SELECT * FROM `%(db)s`.`test_utf8` WHERE bar='%(val)s'" % {'val': chr(200), 'db': self.db_name}
     response = _make_query(self.client, query, wait=True, database=self.db_name)
-    assert_equal(["200", unichr(200)], response.context[0]["results"][0], "selecting from utf-8 table should get correct result")
+    assert_equal(["200", chr(200)], response.context[0]["results"][0], "selecting from utf-8 table should get correct result")
 
     csv = get_csv(self.client, response)
-    assert_equal('"200","%s"' % (unichr(200).encode('utf-8'),), csv.split()[1])
+    assert_equal('"200","%s"' % (chr(200).encode('utf-8'),), csv.split()[1])
 
     # Selecting from latin1 table should not blow up
-    query = u"SELECT * FROM `%(db)s`.`test_latin1` WHERE bar='%(val)s'" % {'val': unichr(200), 'db': self.db_name}
+    query = u"SELECT * FROM `%(db)s`.`test_latin1` WHERE bar='%(val)s'" % {'val': chr(200), 'db': self.db_name}
     response = _make_query(self.client, query, wait=True, database=self.db_name)
     assert_true('results' in response.context, "selecting from latin1 table should not blow up")
 
@@ -598,7 +610,7 @@ for x in sys.stdin:
       result_holder[i] = response
       lock.release()
       LOG.info("Finished: " + str(i))
-    except Exception, e:
+    except Exception as e:
       LOG.exception("Saw exception in child thread: %s" % e)
 
 
@@ -953,7 +965,7 @@ for x in sys.stdin:
     assert_equal(resp.status_code, 302)
 
     # Delete designs
-    design_ids = map(str, designs.values_list('id', flat=True))
+    design_ids = list(map(str, designs.values_list('id', flat=True)))
     resp = cli.get('/beeswax/delete_designs', {u'designs_selection': design_ids})
     assert_true('Delete design(s)' in resp.content, resp.content)
     #@TODO@: Prakash fix this test
@@ -1212,7 +1224,7 @@ for x in sys.stdin:
       # Check that data is right. The SELECT may not give us the whole table.
       resp = _make_query(self.client, 'SELECT * FROM %s' % target_tbl, wait=True, local=False, database=self.db_name)
       content = fetch_query_result_data(self.client, resp)
-      for i in xrange(90):
+      for i in range(90):
         assert_equal([i, '0x%x' % (i,)], content['results'][i])
 
     TARGET_TBL_ROOT = 'test_copy'
@@ -1444,7 +1456,7 @@ for x in sys.stdin:
       lines = [ delim.join(row) for row in raw_fields ]
       data = '\n'.join(lines)
       if do_gzip:
-        sio = cStringIO.StringIO()
+        sio = string_io()
         gzdat = gzip.GzipFile(fileobj=sio, mode='wb')
         gzdat.write(data)
         gzdat.close()
@@ -1569,7 +1581,7 @@ for x in sys.stdin:
     content = json.loads(resp.content)
     watch_url = content['query_history']['watch_url']
 
-    class MockResponse():
+    class MockResponse(object):
       def __init__(self, content):
         self.content = json.dumps(content)
 
@@ -2036,7 +2048,7 @@ for x in sys.stdin:
       resp = self.client.get(reverse("beeswax:get_settings"))
       json_resp = json.loads(resp.content)
       assert_equal(0, json_resp['status'])
-      assert_equal(2, len(json_resp['settings'].items()), json_resp)
+      assert_equal(2, len(list(json_resp['settings'].items())), json_resp)
       assert_true('hive.execution.engine' in json_resp['settings'])
       assert_true('mapreduce.job.queuename' in json_resp['settings'])
     finally:
@@ -2093,7 +2105,7 @@ def test_import_gzip_reader():
   """Test the gzip reader in create table"""
   # Make gzipped data
   data = file(__file__).read()
-  data_gz_sio = cStringIO.StringIO()
+  data_gz_sio = string_io()
   gz = gzip.GzipFile(fileobj=data_gz_sio, mode='wb')
   gz.write(data)
   gz.close()
@@ -2494,7 +2506,7 @@ class MockHiveServerTableForPartitions(HiveServerTable):
 
 
 
-class TestHiveServer2API():
+class TestHiveServer2API(object):
 
   def test_parsing_partition_values(self):
     table = MockHiveServerTable()
@@ -2661,7 +2673,7 @@ class TestHiveServer2API():
     assert_false(data is HiveServerTColumnValue2.set_nulls(data, nulls))
 
 
-class MockDbms:
+class MockDbms(object):
 
   def __init__(self, client, server_type):
     pass
@@ -2891,7 +2903,7 @@ class TestWithMockedServer(object):
   def test_search_designs(self):
     # Create 20 (DEFAULT_PAGE_SIZE) queries to fill page 1, plus a target query for page 2
     page_1 = []
-    for i in xrange(1, 21):
+    for i in range(1, 21):
       response = _make_query(self.client, 'SELECT', submission_type='Save', name='My Name %d' % i, desc='My Description')
       content = json.loads(response.content)
       query_id = content['design_id']
@@ -2960,7 +2972,7 @@ class TestWithMockedServer(object):
     assert_false(design_id in design_ids, json_resp)
 
 
-class TestDesign():
+class TestDesign(object):
 
   def test_hql_resource(self):
     design = hql_query('SELECT')
@@ -3040,7 +3052,7 @@ def test_hiveserver2_get_security():
       hive_site._HIVE_SITE_DICT.pop(hive_site._CNF_HIVESERVER2_AUTHENTICATION, None)
 
 
-class MockClient():
+class MockClient(object):
 
   def __init__(self):
     self.open_session_args = None
@@ -3470,9 +3482,9 @@ def test_sasl_auth_in_large_download():
   table_info = {'db': 'default', 'table_name': 'dummy_'+random_generator().lower()}
   drop_sql = "DROP TABLE IF EXISTS %(db)s.%(table_name)s" % table_info
   create_sql = "CREATE TABLE IF NOT EXISTS %(db)s.%(table_name)s (w0 CHAR(8),w1 CHAR(8),w2 CHAR(8),w3 CHAR(8),w4 CHAR(8),w5 CHAR(8),w6 CHAR(8),w7 CHAR(8),w8 CHAR(8),w9 CHAR(8))" % table_info
-  hql = cStringIO.StringIO()
+  hql = string_io()
   hql.write("INSERT INTO %(db)s.%(table_name)s VALUES " % (table_info))
-  for i in xrange(max_rows-1):
+  for i in range(max_rows-1):
     w = random_generator(size=7)
     hql.write("('%s0','%s1','%s2','%s3','%s4','%s5','%s6','%s7','%s8','%s9')," % (w,w,w,w,w,w,w,w,w,w))
   w = random_generator(size=7)
@@ -3488,7 +3500,7 @@ def test_sasl_auth_in_large_download():
     query = hql_query(hql.getvalue())
     handle = db.execute_and_wait(query, timeout_sec=300)
     hql.close()
-  except Exception, ex:
+  except Exception as ex:
     failed = True
 
   # Big table creation (data upload) is successful
@@ -3504,7 +3516,7 @@ def test_sasl_auth_in_large_download():
     query = hql_query(hql)
     handle = db.execute_and_wait(query)
     results = db.fetch(handle, True, max_rows-20)
-  except QueryServerException, ex:
+  except QueryServerException as ex:
     if 'Invalid OperationHandle' in ex.message and 'EXECUTE_STATEMENT' in ex.message:
       failed = True
   except:
@@ -3518,7 +3530,7 @@ def test_sasl_auth_in_large_download():
     query = hql_query(hql)
     handle = db.execute_and_wait(query)
     results = db.fetch(handle, True, max_rows)
-  except QueryServerException, ex:
+  except QueryServerException as ex:
     if 'Invalid OperationHandle' in ex.message and 'EXECUTE_STATEMENT' in ex.message:
       failed = True
   except:
@@ -3536,7 +3548,7 @@ def test_sasl_auth_in_large_download():
   try:
     query = hql_query(hql)
     handle = db.execute_and_wait(query)
-  except QueryServerException, ex:
+  except QueryServerException as ex:
     if 'Invalid OperationHandle' in ex.message and 'EXECUTE_STATEMENT' in ex.message:
       failed = True
   except:

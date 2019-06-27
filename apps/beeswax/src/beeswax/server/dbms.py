@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
+from builtins import object
 import logging
 import re
 import threading
@@ -254,7 +256,7 @@ class HiveServer2Dbms(object):
 
   def alter_database(self, database, properties):
     hql = 'ALTER database `%s` SET DBPROPERTIES (' % database
-    hql += ', '.join(["'%s'='%s'" % (k, v) for k, v in properties.items()])
+    hql += ', '.join(["'%s'='%s'" % (k, v) for k, v in list(properties.items())])
     hql += ');'
 
     timeout = SERVER_CONN_TIMEOUT.get()
@@ -299,7 +301,7 @@ class HiveServer2Dbms(object):
   def get_table(self, database, table_name):
     try:
       return self.client.get_table(database, table_name)
-    except QueryServerException, e:
+    except QueryServerException as e:
       LOG.debug("Seems like %s.%s could be a Kudu table" % (database, table_name))
       if 'java.lang.ClassNotFoundException' in e.message and [prop for prop in self.get_table_properties(database, table_name, property_name='storage_handler').rows() if 'KuduStorageHandler' in prop[0]]:
         query_server = get_query_server_config('impala')
@@ -327,7 +329,7 @@ class HiveServer2Dbms(object):
     elif comment is not None:
       hql += " SET TBLPROPERTIES ('comment' = '%s')" % comment
     elif tblproperties:
-      hql += " SET TBLPROPERTIES (%s)" % ' ,'.join("'%s' = '%s'" % (k, v) for k, v in tblproperties.items())
+      hql += " SET TBLPROPERTIES (%s)" % ' ,'.join("'%s' = '%s'" % (k, v) for k, v in list(tblproperties.items()))
 
     timeout = SERVER_CONN_TIMEOUT.get()
     query = hql_query(hql)
@@ -798,11 +800,11 @@ class HiveServer2Dbms(object):
         LOG.debug("Moved results from %s to %s" % (result_meta.table_dir, table_loc))
         request.info(request, _('Saved query results as new table %(table)s.') % {'table': target_table})
         query_history.save_state(QueryHistory.STATE.expired)
-      except Exception, ex:
+      except Exception as ex:
         query = hql_query('DROP TABLE `%s`' % target_table)
         try:
           self.execute_and_wait(query)
-        except Exception, double_trouble:
+        except Exception as double_trouble:
           LOG.exception('Failed to drop table "%s" as well: %s' % (target_table, double_trouble))
         raise ex
       url = format_preserving_redirect(request, reverse('metastore:index'))
@@ -849,7 +851,7 @@ class HiveServer2Dbms(object):
     LOG.warning(msg)
     try:
       self.cancel_operation(handle)
-    except Exception, e:
+    except Exception as e:
       msg = "Failed to cancel query."
       LOG.warning(msg)
       self.close_operation(handle)
@@ -906,7 +908,7 @@ class HiveServer2Dbms(object):
       if not handle.is_valid():
         msg = _("Server returning invalid handle for query id %(id)d [%(query)s]...") % {'id': query_history.id, 'query': query[:40]}
         raise QueryServerException(msg)
-    except QueryServerException, ex:
+    except QueryServerException as ex:
       LOG.exception(ex)
       # Kind of expected (hql compile/syntax error, etc.)
       if hasattr(ex, 'handle') and ex.handle:
@@ -1044,7 +1046,7 @@ class HiveServer2Dbms(object):
     return self.client.get_default_configuration(include_hadoop)
 
 
-class Table:
+class Table(object):
   """
   Represents the metadata of a Hive Table.
   """
@@ -1053,7 +1055,7 @@ class Table:
     return location_to_url(self.path_location)
 
 
-class DataTable:
+class DataTable(object):
   """
   Represents the data of a Hive Table.
 
@@ -1062,7 +1064,7 @@ class DataTable:
   pass
 
 
-class SubQueryTable:
+class SubQueryTable(object):
 
   def __init__(self, db, query):
     self.query = query
@@ -1090,7 +1092,7 @@ def expand_exception(exc, db, handle=None):
       log = db.get_log(exc)
     else:
       log = ''
-  except Exception, e:
+  except Exception as e:
     # Always show something, even if server has died on the job.
     log = _("Could not retrieve logs: %s." % e)
 

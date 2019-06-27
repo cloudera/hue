@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import chr
 from django import forms
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -351,7 +352,7 @@ class CreateByImportDelimForm(forms.Form):
     delimiter = self.cleaned_data.get('delimiter')
     if delimiter.isdigit():
       try:
-        unichr(int(delimiter))
+        chr(int(delimiter))
         return int(delimiter)
       except ValueError:
         raise forms.ValidationError(_('Delimiter value must be smaller than 65533.'))

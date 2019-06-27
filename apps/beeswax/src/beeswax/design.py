@@ -19,11 +19,14 @@
 The HQLdesign class can (de)serialize a design to/from a QueryDict.
 """
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import json
 import logging
 import os
 import re
-import urlparse
+import urllib.parse
 
 import django.http
 from django import forms
@@ -150,7 +153,7 @@ class HQLdesign(object):
   def loads(data):
     """Returns an HQLdesign from the serialized form"""
     dic = json.loads(data)
-    dic = dict(map(lambda k: (str(k), dic.get(k)), dic.keys()))
+    dic = dict([(str(k), dic.get(k)) for k in list(dic.keys())])
     if dic['VERSION'] != SERIALIZATION_VERSION:
       LOG.error('Design version mismatch. Found %s; expect %s' % (dic['VERSION'], SERIALIZATION_VERSION))
 
@@ -190,7 +193,7 @@ class HQLdesign(object):
     configuration = []
 
     for f in self.file_resources:
-      if not urlparse.urlsplit(f['path']).scheme:
+      if not urllib.parse.urlsplit(f['path']).scheme:
         scheme = get_hdfs().fs_defaultfs
       else:
         scheme = ''

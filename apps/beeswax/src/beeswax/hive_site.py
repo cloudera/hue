@@ -19,6 +19,7 @@
 Helper for reading hive-site.xml
 """
 
+from builtins import str
 import errno
 import logging
 import os.path
@@ -177,7 +178,7 @@ def _parse_hive_site():
   _HIVE_SITE_PATH = os.path.join(beeswax.conf.HIVE_CONF_DIR.get(), 'hive-site.xml')
   try:
     data = file(_HIVE_SITE_PATH, 'r').read()
-  except IOError, err:
+  except IOError as err:
     if err.errno != errno.ENOENT:
       LOG.error('Cannot read from "%s": %s' % (_HIVE_SITE_PATH, err))
       return
