@@ -89,7 +89,7 @@ def query_error_handler(func):
 
 class SqlAlchemyApi(Api):
 
-  def __init__(self, user, interpreter=None):
+  def __init__(self, user, interpreter):
     self.user = user
     self.options = interpreter['options']
 
@@ -163,7 +163,7 @@ class SqlAlchemyApi(Api):
       meta = []
 
     return {
-      'has_more': data and len(data) >= rows,
+      'has_more': data and len(data) >= rows or False,
       'data': data if data else [],
       'meta': meta if meta else [],
       'type': 'table'
