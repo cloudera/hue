@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
 import json
 import logging
 
@@ -55,7 +56,7 @@ def update_preferences(request):
       settings.save()
       response['status'] = 0
       response['collect_usage'] = settings.collect_usage
-    except Exception, e:
+    except Exception as e:
       response['data'] = str(e)
   else:
     response['data'] = _('POST request required.')
