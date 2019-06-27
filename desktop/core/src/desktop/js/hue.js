@@ -77,9 +77,21 @@ import 'assist/ko/ko.assistFileDraggable';
 import 'assist/ko/ko.assistFileDroppable';
 import AssistDbPanel from 'assist/assistDbPanel';
 import AssistInnerPanel from 'assist/assistInnerPanel';
+import AssistDocumentsPanel from 'assist/assistDocumentsPanel';
+import AssistHdfsPanel from 'assist/assistHdfsPanel';
+import AssistAdlsPanel from 'assist/assistAdlsPanel';
+import AssistGitPanel from 'assist/assistGitPanel';
+import AssistS3Panel from 'assist/assistS3Panel';
+import AssistHBasePanel from 'assist/assistHBasePanel';
 
 window.AssistDbPanel = AssistDbPanel;
 window.AssistInnerPanel = AssistInnerPanel;
+window.AssistDocumentsPanel = AssistDocumentsPanel;
+window.AssistHdfsPanel = AssistHdfsPanel;
+window.AssistAdlsPanel = AssistAdlsPanel;
+window.AssistGitPanel = AssistGitPanel;
+window.AssistS3Panel = AssistS3Panel;
+window.AssistHBasePanel = AssistHBasePanel;
 
 // TODO: Migrate away
 window._ = _;
