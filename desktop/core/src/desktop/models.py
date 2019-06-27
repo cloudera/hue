@@ -1935,15 +1935,10 @@ class Cluster():
     self.user = user
     self.clusters = get_clusters(user)
 
-    if len(self.clusters) == 1:
-      self.data = self.clusters.values()[0]
-    elif IS_K8S_ONLY.get():
-      self.data = self.clusters['AltusV2']
-      self.data['type'] = 'altus' # To show simplified UI
-    elif IS_MULTICLUSTER_ONLY.get():
-      self.data = self.clusters['Altus']
+    if IS_MULTICLUSTER_ONLY.get():
+      self.data = self.clusters['Altus'] # Backward compatibility
     else:
-      self.data = self.clusters[CLUSTER_ID.get()]
+      self.data = self.clusters.values()[0] # Next: CLUSTER_ID.get() or user persisted
 
   def get_type(self):
     return self.data['type']
