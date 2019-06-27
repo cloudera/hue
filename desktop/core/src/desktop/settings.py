@@ -380,15 +380,15 @@ DATABASES = {
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache', # TODO: Parameterize here for all the caches
         'LOCATION': 'unique-hue'
     }
 }
 CACHES_HIVE_DISCOVERY_KEY = 'hive_discovery'
 CACHES[CACHES_HIVE_DISCOVERY_KEY] = {
-        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '/{0}/hive_discovery_cache'.format(_config_dir),
-    }
+    'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    'LOCATION': CACHES_HIVE_DISCOVERY_KEY
+}
 
 CACHES_CELERY_KEY = 'celery'
 if desktop.conf.TASK_SERVER.ENABLED.get():
