@@ -15,12 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import next
+from builtins import filter
+from builtins import map
+from builtins import str
+from builtins import object
 import logging
 import itertools
 import json
 import re
 
-from itertools import imap, izip
+
 from operator import itemgetter
 
 from django.utils.translation import ugettext as _
@@ -110,7 +115,7 @@ class HiveServerTable(Table):
     rows = self.describe
     col_row_index = 1
     try:
-      cols = map(itemgetter('col_name'), rows[col_row_index:])
+      cols = list(map(itemgetter('col_name'), rows[col_row_index:]))
       if cols.index('') == 0: # TEZ starts at 1 vs Hive, Impala starts at 2
         col_row_index = col_row_index + 1
         cols.pop(0)
@@ -125,8 +130,8 @@ class HiveServerTable(Table):
   def _get_partition_column(self):
     rows = self.describe
     try:
-      col_row_index = map(itemgetter('col_name'), rows).index('# Partition Information') + 3
-      end_cols_index = map(itemgetter('col_name'), rows[col_row_index:]).index('')
+      col_row_index = list(map(itemgetter('col_name'), rows)).index('# Partition Information') + 3
+      end_cols_index = list(map(itemgetter('col_name'), rows[col_row_index:])).index('')
       return rows[col_row_index:][:end_cols_index]
     except:
       # Impala does not have it
@@ -141,7 +146,7 @@ class HiveServerTable(Table):
     rows = self.describe
     col_row_index = 2
     try:
-      end_cols_index = map(itemgetter('col_name'), rows[col_row_index:]).index('')
+      end_cols_index = list(map(itemgetter('col_name'), rows[col_row_index:])).index('')
     except ValueError as e:
       end_cols_index = 5000
       LOG.warn('Could not guess end column index, so defaulting to %s: %s' (end_cols_index, e))
@@ -156,8 +161,8 @@ class HiveServerTable(Table):
   def stats(self):
     try:
       rows = self.properties
-      col_row_index = map(itemgetter('col_name'), rows).index('Table Parameters:') + 1
-      end_cols_index = map(itemgetter('data_type'), rows[col_row_index:]).index(None)
+      col_row_index = list(map(itemgetter('col_name'), rows)).index('Table Parameters:') + 1
+      end_cols_index = list(map(itemgetter('data_type'), rows[col_row_index:])).index(None)
       return rows[col_row_index:][:end_cols_index]
     except:
       LOG.exception('Table stats could not be retrieved')
@@ -166,7 +171,7 @@ class HiveServerTable(Table):
   @property
   def storage_details(self):
     rows = self.properties
-    col_row_index = map(itemgetter('col_name'), rows).index('Storage Desc Params:') + 1
+    col_row_index = list(map(itemgetter('col_name'), rows)).index('Storage Desc Params:') + 1
     return rows[col_row_index:][:col_row_index + 2]
 
   @property
@@ -205,7 +210,7 @@ class HiveServerTable(Table):
     return self._details
 
 
-class HiveServerTRowSet2:
+class HiveServerTRowSet2(object):
   def __init__(self, row_set, schema):
     self.row_set = row_set
     self.rows = row_set.rows
@@ -221,22 +226,22 @@ class HiveServerTRowSet2:
     rs = HiveServerTRow2(self.row_set.columns, self.schema)
     cols = [rs.full_col(name) for name in col_names]
 
-    for cols_row in itertools.izip(*cols):
-      cols_rows.append(dict(itertools.izip(col_names, cols_row)))
+    for cols_row in zip(*cols):
+      cols_rows.append(dict(zip(col_names, cols_row)))
 
     return cols_rows
 
   def __iter__(self):
     return self
 
-  def next(self):
+  def __next__(self):
     if self.row_set.columns:
       return HiveServerTRow2(self.row_set.columns, self.schema)
     else:
       raise StopIteration
 
 
-class HiveServerTRow2:
+class HiveServerTRow2(object):
   def __init__(self, cols, schema):
     self.cols = cols
     self.schema = schema
@@ -250,7 +255,7 @@ class HiveServerTRow2:
     return HiveServerTColumnValue2(self.cols[pos]).val # Return the full column and its values
 
   def _get_col_position(self, column_name):
-    return filter(lambda (i, col): col.columnName == column_name, enumerate(self.schema.columns))[0][0]
+    return filter(lambda i_col1: i_col1[1].columnName == column_name, enumerate(self.schema.columns))[0][0]
 
   def fields(self):
     try:
@@ -259,7 +264,7 @@ class HiveServerTRow2:
       raise StopIteration
 
 
-class HiveServerTColumnValue2:
+class HiveServerTColumnValue2(object):
   def __init__(self, tcolumn_value):
     self.column_value = tcolumn_value
 
@@ -309,7 +314,7 @@ class HiveServerTColumnValue2:
     if bytestring == '' or re.match('^(\x00)+$', bytestring): # HS2 has just \x00 or '', Impala can have \x00\x00...
       return values
     else:
-      _values = [None if is_null else value for value, is_null in itertools.izip(values, cls.mark_nulls(values, bytestring))]
+      _values = [None if is_null else value for value, is_null in zip(values, cls.mark_nulls(values, bytestring))]
       if len(values) != len(_values): # HS2 can have just \x00\x01 instead of \x00\x01\x00...
         _values.extend(values[len(_values):])
       return _values
@@ -342,7 +347,7 @@ class HiveServerDataTable(DataTable):
 
 
 
-class HiveServerTTableSchema:
+class HiveServerTTableSchema(object):
   def __init__(self, columns, schema):
     self.columns = columns
     self.schema = schema
@@ -363,7 +368,7 @@ class HiveServerTTableSchema:
     return HiveServerTColumnDesc(self.columns[pos]).val
 
   def _get_col_position(self, column_name):
-    return filter(lambda (i, col): col.columnName == column_name, enumerate(self.schema.columns))[0][0]
+    return filter(lambda i_col2: i_col2[1].columnName == column_name, enumerate(self.schema.columns))[0][0]
 
 
 if hasattr(beeswax_conf.THRIFT_VERSION, 'get') and beeswax_conf.THRIFT_VERSION.get() >= 7:
@@ -371,7 +376,7 @@ if hasattr(beeswax_conf.THRIFT_VERSION, 'get') and beeswax_conf.THRIFT_VERSION.g
   HiveServerTRowSet = HiveServerTRowSet2
 else:
   # Deprecated. To remove in Hue 4.
-  class HiveServerTRow:
+  class HiveServerTRow(object):
     def __init__(self, row, schema):
       self.row = row
       self.schema = schema
@@ -381,12 +386,12 @@ else:
       return HiveServerTColumnValue(self.row.colVals[pos]).val
 
     def _get_col_position(self, column_name):
-      return filter(lambda (i, col): col.columnName == column_name, enumerate(self.schema.columns))[0][0]
+      return filter(lambda i_col: i_col[1].columnName == column_name, enumerate(self.schema.columns))[0][0]
 
     def fields(self):
       return [HiveServerTColumnValue(field).val for field in self.row.colVals]
 
-  class HiveServerTRowSet:
+  class HiveServerTRowSet(object):
     def __init__(self, row_set, schema):
       self.row_set = row_set
       self.rows = row_set.rows
@@ -409,14 +414,14 @@ else:
     def __iter__(self):
       return self
 
-    def next(self):
+    def __next__(self):
       if self.rows:
         return HiveServerTRow(self.rows.pop(0), self.schema)
       else:
         raise StopIteration
 
 
-class HiveServerTColumnValue:
+class HiveServerTColumnValue(object):
   def __init__(self, tcolumn_value):
     self.column_value = tcolumn_value
 
@@ -438,7 +443,7 @@ class HiveServerTColumnValue:
       return self.column_value.stringVal.value
 
 
-class HiveServerTColumnDesc:
+class HiveServerTColumnDesc(object):
   def __init__(self, column):
     self.column = column
 
@@ -471,7 +476,7 @@ class HiveServerTColumnDesc:
         return ttype.userDefinedTypeEntry
 
 
-class HiveServerClient:
+class HiveServerClient(object):
   HS2_MECHANISMS = {
       'KERBEROS': 'GSSAPI',
       'NONE': 'PLAIN',
@@ -578,7 +583,7 @@ class HiveServerClient:
     else:
       hive_mechanism = hive_site.get_hiveserver2_authentication()
       if hive_mechanism not in HiveServerClient.HS2_MECHANISMS:
-        raise Exception(_('%s server authentication not supported. Valid are %s.') % (hive_mechanism, HiveServerClient.HS2_MECHANISMS.keys()))
+        raise Exception(_('%s server authentication not supported. Valid are %s.') % (hive_mechanism, list(HiveServerClient.HS2_MECHANISMS.keys())))
       use_sasl = hive_mechanism in ('KERBEROS', 'NONE', 'LDAP', 'PAM')
       mechanism = HiveServerClient.HS2_MECHANISMS[hive_mechanism]
       impersonation_enabled = hive_site.hiveserver2_impersonation_enabled()
@@ -834,7 +839,7 @@ class HiveServerClient:
     try:
       (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT)
       self.close_operation(operation_handle)
-    except Exception, e:
+    except Exception as e:
       ex_string = str(e)
       if 'cannot find field' in ex_string: # Workaround until Hive 2.0 and HUE-3751
         (desc_results, desc_schema), operation_handle = self.execute_statement('USE `%s`' % database)
@@ -986,7 +991,7 @@ class HiveServerClient:
     if beeswax_conf.THRIFT_VERSION.get() >= 7:
       lines = res.results.columns[0].stringVal.values
     else:
-      lines = imap(lambda r: r.colVals[0].stringVal.value, res.results.rows)
+      lines = list(map(lambda r: r.colVals[0].stringVal.value, res.results.rows))
 
     return '\n'.join(lines)
 
@@ -1006,7 +1011,7 @@ class HiveServerClient:
       req = TGetLogReq(operationHandle=operation_handle)
       res = self.call(self._client.GetLog, req)
       return res.log
-    except Exception, e:
+    except Exception as e:
       if 'Invalid query handle' in str(e):
         message = 'Invalid query handle'
         LOG.error('%s: %s' % (message, e))
@@ -1046,7 +1051,7 @@ class HiveServerClient:
 
         # Format partition key and values into Hive format: [key1=val1/key2=value2]
         for values in partition_values:
-          zipped_parts = izip(partition_keys, values)
+          zipped_parts = zip(partition_keys, values)
           partitions_formatted.append(['/'.join(['%s=%s' % (str(part[0]), str(part[1])) for part in zipped_parts if all(part)])])
 
         partitions = [PartitionValueCompatible(partition, table) for partition in partitions_formatted]
@@ -1113,7 +1118,7 @@ class HiveServerTableCompatible(HiveServerTable):
   ]
 
 
-class ResultCompatible:
+class ResultCompatible(object):
 
   def __init__(self, data_table):
     self.data_table = data_table
@@ -1133,7 +1138,7 @@ class ResultCompatible:
     return [{'name': col.name, 'type': col.type, 'comment': col.comment} for col in self.data_table.cols()]
 
 
-class PartitionKeyCompatible:
+class PartitionKeyCompatible(object):
 
   def __init__(self, name, type, comment):
     self.name = name
@@ -1150,7 +1155,7 @@ class PartitionKeyCompatible:
     return 'PartitionKey(name:%s, type:%s, comment:%s)' % (self.name, self.type, self.comment)
 
 
-class PartitionValueCompatible:
+class PartitionValueCompatible(object):
 
   def __init__(self, partition_row, table, properties=None):
     self.partition_keys = table.partition_keys
@@ -1176,13 +1181,13 @@ class PartitionValueCompatible:
     return partition_spec
 
 
-class ExplainCompatible:
+class ExplainCompatible(object):
 
   def __init__(self, data_table):
     self.textual = '\n'.join([line[0] for line in data_table.rows()])
 
 
-class ResultMetaCompatible:
+class ResultMetaCompatible(object):
 
   def __init__(self):
     self.in_tablename = True

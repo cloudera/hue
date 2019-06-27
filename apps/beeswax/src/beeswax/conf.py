@@ -15,6 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import division
+from builtins import str
+from past.utils import old_div
 import logging
 import os.path
 import sys
@@ -180,7 +183,7 @@ DOWNLOAD_CELL_LIMIT = Config(
 
 def get_deprecated_download_cell_limit():
   """Get the old default"""
-  return DOWNLOAD_CELL_LIMIT.get() / 100 if DOWNLOAD_CELL_LIMIT.get() > 0 else DOWNLOAD_CELL_LIMIT.get()
+  return old_div(DOWNLOAD_CELL_LIMIT.get(), 100) if DOWNLOAD_CELL_LIMIT.get() > 0 else DOWNLOAD_CELL_LIMIT.get()
 
 DOWNLOAD_ROW_LIMIT = Config(
   key='download_row_limit',
@@ -314,14 +317,14 @@ def config_validator(user):
         if handle:
           server.fetch(handle, rows=100)
           server.close(handle)
-    except StructuredThriftTransportException, e:
+    except StructuredThriftTransportException as e:
       if 'Error validating the login' in str(e):
         msg = 'Failed to authenticate to HiveServer2, check authentication configurations.'
         LOG.exception(msg)
         res.append((NICE_NAME, _(msg)))
       else:
         raise e
-  except Exception, e:
+  except Exception as e:
     msg = "The application won't work without a running HiveServer2."
     LOG.exception(msg)
     res.append((NICE_NAME, _(msg)))
