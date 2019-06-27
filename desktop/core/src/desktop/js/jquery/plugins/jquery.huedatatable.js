@@ -442,8 +442,8 @@ $.fn.hueDataTable = function(oInit) {
           }
           if (
             $(this).position().left + $t.position().left <
-             $t.parent().width() + $t.parent().position().left
-           ) {
+            $t.parent().width() + $t.parent().position().left
+          ) {
             endCol = i;
           }
         });
