@@ -1722,6 +1722,18 @@ def get_clusters(user):
   clusters = []
   cluster_config = CLUSTERS.get()
 
+  # Backward compatibility when not using clusters
+  if not cluster_config:
+    clusters.append(
+      (CLUSTER_ID.get(), {
+        'id': CLUSTER_ID.get(),
+        'name': CLUSTER_ID.get(),
+        'type': 'direct',
+        'credentials': {},
+        }
+      )
+    )
+
   for i in cluster_config:
     # Get additional remote multi clusters
     clusters.append(
@@ -1730,18 +1742,6 @@ def get_clusters(user):
           'name': cluster_config[i].NAME.get() or i,
           'type': cluster_config[i].TYPE.get(),
           'credentials': cluster_config[i].CREDENTIALS.get(),
-        }
-      )
-    )
-
-  # Get traditional services in regular ini too
-  if not IS_MULTICLUSTER_ONLY.get():
-    clusters.append(
-      (CLUSTER_ID.get(), {
-        'id': CLUSTER_ID.get(),
-        'name': CLUSTER_ID.get(),
-        'type': 'plain',
-        'credentials': {},
         }
       )
     )
