@@ -278,7 +278,7 @@ def get_interpreter(connector_type, user=None):
     interpreter for interpreter in get_ordered_interpreters(user) if connector_type == interpreter['type']
   ]
   if not interpreter:
-    if snippet['type'] == 'hbase': # TODO move to connectors
+    if connector_type == 'hbase': # TODO move to connectors
       interpreter = [{
         'name': 'hbase',
         'type': 'hbase',
@@ -286,7 +286,7 @@ def get_interpreter(connector_type, user=None):
         'options': {},
         'is_sql': False
       }]
-    elif snippet['type'] == 'kafka':
+    elif connector_type == 'kafka':
       interpreter = [{
         'name': 'kafka',
         'type': 'kafka',
@@ -294,20 +294,12 @@ def get_interpreter(connector_type, user=None):
         'options': {},
         'is_sql': False
       }]
-    elif snippet['type'] == 'solr':
+    elif connector_type == 'solr':
       interpreter = [{
         'name': 'solr',
         'type': 'solr',
         'interface': 'solr',
         'options': {},
-        'is_sql': False
-      }]
-    elif snippet['type'] == 'custom':
-      interpreter = [{
-        'name': snippet['name'],
-        'type': snippet['type'],
-        'interface': snippet['interface'],
-        'options': snippet.get('options', {}),
         'is_sql': False
       }]
     else:
