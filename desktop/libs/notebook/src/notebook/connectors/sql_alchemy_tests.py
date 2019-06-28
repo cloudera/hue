@@ -27,7 +27,7 @@ from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 
-from notebook.connectors.sqlalchemyapi import SqlAlchemyApi
+from notebook.connectors.sql_alchemy import SqlAlchemyApi
 
 
 LOG = logging.getLogger(__name__)
@@ -52,7 +52,7 @@ class TestApi():
     rows = 10
     start_over = True
 
-    with patch('notebook.connectors.sqlalchemyapi.CONNECTION_CACHE') as CONNECTION_CACHE:
+    with patch('notebook.connectors.sql_alchemy.CONNECTION_CACHE') as CONNECTION_CACHE:
       CONNECTION_CACHE.get = Mock(
         return_value={
           'result': Mock(
@@ -85,7 +85,7 @@ class TestApi():
     rows = 10
     start_over = True
 
-    with patch('notebook.connectors.sqlalchemyapi.CONNECTION_CACHE') as CONNECTION_CACHE:
+    with patch('notebook.connectors.sql_alchemy.CONNECTION_CACHE') as CONNECTION_CACHE:
       CONNECTION_CACHE.get = Mock(
         return_value={
           'result': Mock(
