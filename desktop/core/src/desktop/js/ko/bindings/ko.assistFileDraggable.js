@@ -39,6 +39,12 @@ ko.bindingHandlers.assistFileDraggable = {
         dragStartX = event.clientX;
         dragStartY = event.clientY;
 
+        if ($('.assist-file-entry-drag').length === 0) {
+          $('<div class="assist-file-entry-drag"><span class="drag-text"></span></div>').appendTo(
+            'body'
+          );
+        }
+
         const $helper = $('.assist-file-entry-drag')
           .clone()
           .appendTo($container);

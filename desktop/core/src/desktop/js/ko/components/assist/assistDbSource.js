@@ -18,7 +18,7 @@ import $ from 'jquery';
 import ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
-import AssistDbNamespace from 'assist/assistDbNamespace';
+import AssistDbNamespace from 'ko/components/assist/assistDbNamespace';
 import contextCatalog from 'catalog/contextCatalog';
 import huePubSub from 'utils/huePubSub';
 

@@ -16,7 +16,7 @@
 
 import $ from 'jquery';
 
-import AssistStorageEntry from 'assist/assistStorageEntry';
+import AssistStorageEntry from 'ko/components/assist/assistStorageEntry';
 import dataCatalog from 'catalog/dataCatalog';
 import hueDebug from 'utils/hueDebug';
 import huePubSub from 'utils/huePubSub';

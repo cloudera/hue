@@ -17,7 +17,7 @@
 import $ from 'jquery';
 import ko from 'knockout';
 
-import AssistDbEntry from 'assist/assistDbEntry';
+import AssistDbEntry from 'ko/components/assist/assistDbEntry';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 
