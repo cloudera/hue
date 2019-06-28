@@ -403,7 +403,7 @@ def get_api(request, snippet):
     from notebook.connectors.jdbc_presto import JdbcApiPresto
     return JdbcApiPresto(request.user, interpreter=interpreter)
   elif interface == 'sqlalchemy':
-    from notebook.connectors.sqlalchemyapi import SqlAlchemyApi
+    from notebook.connectors.sql_alchemy import SqlAlchemyApi
     return SqlAlchemyApi(request.user, interpreter=interpreter)
   elif interface == 'solr':
     from notebook.connectors.solr import SolrApi
