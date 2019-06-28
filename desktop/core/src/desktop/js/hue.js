@@ -56,7 +56,7 @@ import sqlUtils from 'sql/sqlUtils';
 import { PigFunctions, SqlSetOptions, SqlFunctions } from 'sql/sqlFunctions';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 
-import 'assist/assistViewModel';
+import 'ko/components/assist/assistViewModel';
 import OnePageViewModel from 'onePageViewModel';
 import SideBarViewModel from 'sideBarViewModel';
 import SidePanelViewModel from 'sidePanelViewModel';
@@ -71,27 +71,6 @@ import sqlAutocompleteParser from 'parse/sqlAutocompleteParser'; // Notebook and
 import sqlStatementsParser from 'parse/sqlStatementsParser'; // In search.ko and notebook.ko
 import HueFileEntry from 'doc/hueFileEntry';
 import HueDocument from 'doc/hueDocument';
-
-// TODO: Temporary
-import 'assist/ko/ko.assistFileDraggable';
-import 'assist/ko/ko.assistFileDroppable';
-import AssistDbPanel from 'assist/assistDbPanel';
-import AssistInnerPanel from 'assist/assistInnerPanel';
-import AssistDocumentsPanel from 'assist/assistDocumentsPanel';
-import AssistHdfsPanel from 'assist/assistHdfsPanel';
-import AssistAdlsPanel from 'assist/assistAdlsPanel';
-import AssistGitPanel from 'assist/assistGitPanel';
-import AssistS3Panel from 'assist/assistS3Panel';
-import AssistHBasePanel from 'assist/assistHBasePanel';
-
-window.AssistDbPanel = AssistDbPanel;
-window.AssistInnerPanel = AssistInnerPanel;
-window.AssistDocumentsPanel = AssistDocumentsPanel;
-window.AssistHdfsPanel = AssistHdfsPanel;
-window.AssistAdlsPanel = AssistAdlsPanel;
-window.AssistGitPanel = AssistGitPanel;
-window.AssistS3Panel = AssistS3Panel;
-window.AssistHBasePanel = AssistHBasePanel;
 
 // TODO: Migrate away
 window._ = _;

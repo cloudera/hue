@@ -26,7 +26,7 @@ class AssistInnerPanel {
    * @param {string} options.icon
    * @param {boolean} [options.rightAlignIcon] - Default false
    * @param {boolean} options.visible
-   * @param {(AssistDbPanel|AssistHdfsPanel|AssistGitPanel|AssistDocumentsPanel|AssistS3Panel)} panelData
+   * @param {Object} panelData - component data
    * @constructor
    */
   constructor(options) {
