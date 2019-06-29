@@ -15,25 +15,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import rwx
+from __future__ import absolute_import
+from builtins import range
+from . import rwx
 
 import unittest
 
 class RwxTest(unittest.TestCase):
 
   def test_file_type(self):
-    self.assertEquals("dir", rwx.filetype(040330))
-    self.assertEquals("file", rwx.filetype(0100770))
-    self.assertEquals("link", rwx.filetype(0120000))
+    self.assertEquals("dir", rwx.filetype(0o40330))
+    self.assertEquals("file", rwx.filetype(0o100770))
+    self.assertEquals("link", rwx.filetype(0o120000))
     self.assertEquals("unknown", rwx.filetype(0))
 
   def test_expand_mode(self):
-    self.assertEquals( [True, True, False, True, True, False, False, False, True, False], rwx.expand_mode(0661))
-    self.assertEquals( [True, True, False, True, True, False, False, False, True, True], rwx.expand_mode(01661))
+    self.assertEquals( [True, True, False, True, True, False, False, False, True, False], rwx.expand_mode(0o661))
+    self.assertEquals( [True, True, False, True, True, False, False, False, True, True], rwx.expand_mode(0o1661))
 
   def test_compress_mode(self):
-    self.assertEquals(0661, rwx.compress_mode( (True, True, False, True, True, False, False, False, True, False) ))
-    self.assertEquals(01661, rwx.compress_mode( (True, True, False, True, True, False, False, False, True, True) ))
+    self.assertEquals(0o661, rwx.compress_mode( (True, True, False, True, True, False, False, False, True, False) ))
+    self.assertEquals(0o1661, rwx.compress_mode( (True, True, False, True, True, False, False, False, True, True) ))
 
   def check_inverseness_and_uniqueness(self):
     all = set()
@@ -44,8 +46,8 @@ class RwxTest(unittest.TestCase):
     self.assertEquals(2*8*8*8, len(all))
 
   def test_aclbit(self):
-    self.assertEquals('?rw-rw---x', rwx.rwx(0661))
-    self.assertEquals('?rw-rw---x+', rwx.rwx(0661, True))
+    self.assertEquals('?rw-rw---x', rwx.rwx(0o661))
+    self.assertEquals('?rw-rw---x+', rwx.rwx(0o661, True))
 
     self.assertEquals('?-wx-wx-wxt', rwx.rwx(1755))
     self.assertEquals('?-wx-wx-wxt+', rwx.rwx(1755, True))

@@ -17,6 +17,8 @@
 #
 # Utilities for dealing with file modes.
 
+from past.builtins import basestring
+from builtins import object
 import bz2
 import os
 import posixpath

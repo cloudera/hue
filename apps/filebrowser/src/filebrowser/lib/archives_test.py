@@ -15,11 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import archives
+from __future__ import absolute_import
+from . import archives
 import unittest
 import os
 
-from archives import IllegalPathException
+from filebrowser.lib.archives import IllegalPathException
 from nose.tools import assert_true, assert_equal
 
 class ArchiveTest(unittest.TestCase):
