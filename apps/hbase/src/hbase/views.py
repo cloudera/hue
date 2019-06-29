@@ -15,12 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
 import base64
 import json
 import logging
 import re
-import StringIO
-import urllib
+import sys
+import urllib.request, urllib.parse, urllib.error
 
 from avro import datafile, io
 
@@ -36,6 +38,11 @@ from hbase.management.commands import hbase_setup
 from hbase.server.hbase_lib import get_thrift_type
 
 from desktop.auth.backend import is_admin
+
+if sys.version_info[0] > 2:
+  from io import StringIO as string_io
+else:
+  from cStringIO import StringIO as string_io
 
 LOG = logging.getLogger(__name__)
 
@@ -70,7 +77,7 @@ def api_router(request, url): # On split, deserialize anything
         data[i] = deserialize(item) # Sets local binding, needs to set in data
     return data
 
-  decoded_url_params = [urllib.unquote(arg) for arg in re.split(r'(?<!\\)/', url.strip('/'))]
+  decoded_url_params = [urllib.parse.unquote(arg) for arg in re.split(r'(?<!\\)/', url.strip('/'))]
   url_params = [safe_json_load((arg, request.POST.get(arg[0:16], arg))[arg[0:15] == 'hbase-post-key-'])
                 for arg in decoded_url_params] # Deserialize later
 
@@ -95,7 +102,7 @@ def api_dump(response):
         #detect if avro file
         if(data[:3] == '\x4F\x62\x6A'):
           #write data to file in memory
-          output = StringIO.StringIO()
+          output = io.StringIO()
           output.write(data)
 
           #read and parse avro
@@ -139,7 +146,7 @@ def install_examples(request):
     try:
       hbase_setup.Command().handle(user=request.user)
       result['status'] = 0
-    except Exception, e:
+    except Exception as e:
       LOG.exception(e)
       result['message'] = str(e)
 
