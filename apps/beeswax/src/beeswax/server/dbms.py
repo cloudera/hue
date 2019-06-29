@@ -97,7 +97,7 @@ def get_query_server_config(name='beeswax', connector=None):
     query_server = {
         'server_name': connector['type'],
         'server_host': connector['options']['server_host'],
-        'server_port': connector['options']['server_port'],
+        'server_port': int(connector['options']['server_port']),
         'principal': 'TODO',
         'auth_username': AUTH_USERNAME.get(),
         'auth_password': AUTH_PASSWORD.get(),
