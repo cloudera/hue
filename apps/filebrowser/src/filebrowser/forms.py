@@ -15,8 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import range
 import logging
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django import forms
 from django.contrib.auth.models import User, Group
@@ -75,7 +79,7 @@ class EditorForm(forms.Form):
   encoding = CharField(label=_('Encoding'), required=False)
 
   def clean_path(self):
-    return urllib.unquote(self.cleaned_data.get('path', ''))
+    return urllib.parse.unquote(self.cleaned_data.get('path', ''))
 
   def clean_contents(self):
     return self.cleaned_data.get('contents', '').replace('\r\n', '\n')
@@ -224,7 +228,7 @@ class ChmodForm(forms.Form):
   def full_clean(self):
     forms.Form.full_clean(self)
     if hasattr(self, "cleaned_data"):
-      self.cleaned_data["mode"] = rwx.compress_mode(map(lambda name: self.cleaned_data[name], self.names))
+      self.cleaned_data["mode"] = rwx.compress_mode([self.cleaned_data[name] for name in self.names])
 
 class BaseChmodFormSet(FormSet):
   op = "chmod"

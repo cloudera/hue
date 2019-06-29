@@ -16,13 +16,19 @@
 # limitations under the License.
 #!/usr/bin/env python
 
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import range
+from builtins import object
 import json
 import logging
 import os
 import re
 import tempfile
-import urllib
-import urlparse
+import urllib.request, urllib.parse, urllib.error
+import urllib.parse
 from avro import schema, datafile, io
 
 from aws.s3.s3fs import S3FileSystemException
@@ -36,14 +42,12 @@ from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group, add_permission, remove_from_group
+from desktop.lib.view_util import location_to_url
 from hadoop import pseudo_hdfs4
 from hadoop.conf import UPLOAD_CHUNK_SIZE
-from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
-from desktop.lib.view_util import location_to_url
-
-from conf import MAX_SNAPPY_DECOMPRESSION_SIZE
-from lib.rwx import expand_mode
-from views import snappy_installed
+from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE
+from filebrowser.lib.rwx import expand_mode
+from filebrowser.views import snappy_installed
 
 
 LOG = logging.getLogger(__name__)
@@ -256,22 +260,22 @@ class TestFileBrowserWithHadoop(object):
 
     # Get current mode, change mode, check mode
     # Start with checking current mode
-    assert_not_equal(041777, int(self.cluster.fs.stats(PATH)["mode"]))
+    assert_not_equal(0o41777, int(self.cluster.fs.stats(PATH)["mode"]))
 
     # Setup post data
-    permissions_dict = dict( zip(permissions, [True]*len(permissions)) )
+    permissions_dict = dict( list(zip(permissions, [True]*len(permissions))) )
     kwargs = {'path': [PATH]}
     kwargs.update(permissions_dict)
 
     # Set 1777, then check permissions of dirs
     response = self.c.post("/filebrowser/chmod", kwargs)
-    assert_equal(041777, int(self.cluster.fs.stats(PATH)["mode"]))
+    assert_equal(0o41777, int(self.cluster.fs.stats(PATH)["mode"]))
 
     # Now do the above recursively
-    assert_not_equal(041777, int(self.cluster.fs.stats(SUBPATH)["mode"]))
+    assert_not_equal(0o41777, int(self.cluster.fs.stats(SUBPATH)["mode"]))
     kwargs['recursive'] = True
     response = self.c.post("/filebrowser/chmod", kwargs)
-    assert_equal(041777, int(self.cluster.fs.stats(SUBPATH)["mode"]))
+    assert_equal(0o41777, int(self.cluster.fs.stats(SUBPATH)["mode"]))
 
     # Test bulk chmod
     PATH_2 = "%s/test-chmod2" % prefix
@@ -279,11 +283,11 @@ class TestFileBrowserWithHadoop(object):
     self.cluster.fs.mkdir(PATH_2)
     self.cluster.fs.mkdir(PATH_3)
     kwargs['path'] = [PATH_2, PATH_3]
-    assert_not_equal(041777, int(self.cluster.fs.stats(PATH_2)["mode"]))
-    assert_not_equal(041777, int(self.cluster.fs.stats(PATH_3)["mode"]))
+    assert_not_equal(0o41777, int(self.cluster.fs.stats(PATH_2)["mode"]))
+    assert_not_equal(0o41777, int(self.cluster.fs.stats(PATH_3)["mode"]))
     self.c.post("/filebrowser/chmod", kwargs)
-    assert_equal(041777, int(self.cluster.fs.stats(PATH_2)["mode"]))
-    assert_equal(041777, int(self.cluster.fs.stats(PATH_3)["mode"]))
+    assert_equal(0o41777, int(self.cluster.fs.stats(PATH_2)["mode"]))
+    assert_equal(0o41777, int(self.cluster.fs.stats(PATH_3)["mode"]))
 
 
   def test_chmod_sticky(self):
@@ -301,7 +305,7 @@ class TestFileBrowserWithHadoop(object):
         'group_read', 'group_write', 'group_execute',
         'other_read', 'other_write', 'other_execute',
         'sticky') # Order matters!
-    permissions_dict = dict(filter(lambda x: x[1], zip(permissions, mode)))
+    permissions_dict = dict([x for x in zip(permissions, mode) if x[1]])
     permissions_dict['sticky'] = True
     kwargs = {'path': [PATH]}
     kwargs.update(permissions_dict)
@@ -418,7 +422,7 @@ class TestFileBrowserWithHadoop(object):
       assert_true(path in orig_paths)
 
       # Drill down into the subdirectory
-      url = urlparse.urlsplit(dirent['url'])[2]
+      url = urllib.parse.urlsplit(dirent['url'])[2]
       resp = self.c.get(url)
 
       # We are actually reading a directory
@@ -436,7 +440,7 @@ class TestFileBrowserWithHadoop(object):
     assert_equal(stat_dir, response.context[0]['path'])
 
     response = self.c.get('/filebrowser/view=/test-filebrowser/?default_to_home')
-    assert_true(re.search('%s$' % home, urllib.unquote(response['Location'])))
+    assert_true(re.search('%s$' % home, urllib.parse.unquote(response['Location'])))
 
     # Test path relative to home directory
     self.cluster.fs.do_as_user('test', self.cluster.fs.mkdir, '%s/test_dir' % home)
@@ -772,7 +776,7 @@ class TestFileBrowserWithHadoop(object):
     response = self.c.get('/filebrowser/view=/')
     assert_equal(response.context[0]['path'], '/')
     response = self.c.get('/filebrowser/view=/?default_to_home=1')
-    assert_equal("/filebrowser/view=/user/test", urllib.unquote(response["location"]))
+    assert_equal("/filebrowser/view=/user/test", urllib.parse.unquote(response["location"]))
 
 
   def test_view_access(self):
@@ -835,7 +839,7 @@ alert("XSS")
       assert_equal('attachment', response['Content-Disposition'])
 
     # Download fails and displays exception because of missing permissions
-    self.cluster.fs.chmod(prefix + '/xss', 0700)
+    self.cluster.fs.chmod(prefix + '/xss', 0o700)
 
     not_me = make_logged_in_client("not_me", is_superuser=False)
     grant_access("not_me", "not_me", "filebrowser")
@@ -886,7 +890,7 @@ alert("XSS")
 
       self.cluster.fs.do_as_superuser(self.cluster.fs.mkdir, HDFS_DEST_DIR)
       self.cluster.fs.do_as_superuser(self.cluster.fs.chown, HDFS_DEST_DIR, USER_NAME, USER_NAME)
-      self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, HDFS_DEST_DIR, 0700)
+      self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, HDFS_DEST_DIR, 0o700)
 
       stats = self.cluster.fs.stats(HDFS_DEST_DIR)
       assert_equal(stats['user'], USER_NAME)
@@ -940,7 +944,7 @@ alert("XSS")
     try:
       self.cluster.fs.mkdir(HDFS_DEST_DIR)
       self.cluster.fs.chown(HDFS_DEST_DIR, USER_NAME)
-      self.cluster.fs.chmod(HDFS_DEST_DIR, 0700)
+      self.cluster.fs.chmod(HDFS_DEST_DIR, 0o700)
 
       # Upload archive
       resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
@@ -966,12 +970,12 @@ alert("XSS")
     test_dir1 = prefix + '/test_dir1'
     self.cluster.fs.mkdir(test_dir1)
     self.cluster.fs.chown(test_dir1, 'test')
-    self.cluster.fs.chmod(test_dir1, 0700)
+    self.cluster.fs.chmod(test_dir1, 0o700)
 
     test_dir2 = prefix + '/test_dir2'
     self.cluster.fs.mkdir(test_dir2)
     self.cluster.fs.chown(test_dir2, 'test')
-    self.cluster.fs.chmod(test_dir2, 0700)
+    self.cluster.fs.chmod(test_dir2, 0o700)
 
     try:
       resp = self.c.post('/filebrowser/compress_files', {'upload_path': prefix, 'files[]': ['test_dir1','test_dir2'], 'archive_name': 'test_compress.zip'})
@@ -995,7 +999,7 @@ alert("XSS")
 
     self.cluster.fs.mkdir(HDFS_DEST_DIR)
     self.cluster.fs.chown(HDFS_DEST_DIR, USER_NAME)
-    self.cluster.fs.chmod(HDFS_DEST_DIR, 0700)
+    self.cluster.fs.chmod(HDFS_DEST_DIR, 0o700)
 
     try:
       # Upload archive
@@ -1092,7 +1096,7 @@ def view_i18n_helper(c, cluster, encoding, content):
 
     response = c.get('/filebrowser/view=%s?encoding=%s&end=8&begin=1' % (filename, encoding))
     assert_equal(response.context[0]['view']['contents'],
-                 unicode(bytestring[0:8], encoding, errors='replace'))
+                 str(bytestring[0:8], encoding, errors='replace'))
   finally:
     cleanup_file(cluster, filename)
 
