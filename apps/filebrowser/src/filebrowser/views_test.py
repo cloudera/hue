@@ -46,9 +46,12 @@ from desktop.lib.test_utils import grant_access, add_to_group, add_permission, r
 from desktop.lib.view_util import location_to_url
 from hadoop import pseudo_hdfs4
 from hadoop.conf import UPLOAD_CHUNK_SIZE
+
 from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE
 from filebrowser.lib.rwx import expand_mode
 from filebrowser.views import snappy_installed
+from desktop.conf import is_oozie_enabled
+
 
 if sys.version_info[0] > 2:
   from urllib.parse import unquote as urllib_unquote
@@ -968,6 +971,9 @@ alert("XSS")
       cleanup_file(self.cluster, HDFS_ZIP_FILE)
 
   def test_compress_hdfs_files(self):
+    if not is_oozie_enabled() :
+        raise SkipTest
+        
     ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(True)
     prefix = self.cluster.fs_prefix + '/test_compress_files'
     self.cluster.fs.mkdir(prefix)
@@ -975,18 +981,41 @@ alert("XSS")
     test_dir1 = prefix + '/test_dir1'
     self.cluster.fs.mkdir(test_dir1)
     self.cluster.fs.chown(test_dir1, 'test')
-    self.cluster.fs.chmod(test_dir1, 0o700)
 
+    self.cluster.fs.chmod(test_dir1, 0700)
+    """
     test_dir2 = prefix + '/test_dir2'
     self.cluster.fs.mkdir(test_dir2)
     self.cluster.fs.chown(test_dir2, 'test')
-    self.cluster.fs.chmod(test_dir2, 0o700)
+    self.cluster.fs.chmod(test_dir2, 0700)
+    """
 
     try:
-      resp = self.c.post('/filebrowser/compress_files', {'upload_path': prefix, 'files[]': ['test_dir1','test_dir2'], 'archive_name': 'test_compress.zip'})
+      resp = self.c.post('/filebrowser/compress_files', {'upload_path': prefix, 'files[]': ['test_dir1'], 'archive_name': 'test_compress.zip'})
       response = json.loads(resp.content)
       assert_equal(0, response['status'], response)
       assert_true('handle' in response and response['handle']['id'], response)
+      responseid = "\"" + response['handle']['id'] + "\"" 
+      while True:
+        """
+        resp2 = self.c.post('/jobbrowser/api/jobs/workflows', {"interface": ["workflows"], "filters": [{"text":""},{"time":{"time_value":7,"time_unit":"days"}},{"states":[]},{"pagination":{"page":1,"offset":1,"limit":100}}]}) #error here
+        response2 = json.loads(resp2.content)
+        #assert_equal(0, response2['status'], response2)
+        for resp_app in response2['apps'] :
+            if resp_app["id"] == response2['handle']['id'] :
+                if resp_app['status'] == "RUNNING":
+                    break
+                assert_true(['status'] == "SUCCEEDED" , response2)
+                isnotrunning = False
+                break
+        
+        """
+        
+        resp2 = self.c.post('/jobbrowser/api/job/workflows', {"interface": '"workflows"', "app_id": responseid}) #error here
+        response2 = json.loads(resp2.content)
+        if response2["app"]['status'] != "RUNNING" :
+            assert_true(response2["app"]["status"] == "SUCCEEDED" ,resp2)
+            break 
     finally:
       ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(False)
       cleanup_tree(self.cluster, prefix)
