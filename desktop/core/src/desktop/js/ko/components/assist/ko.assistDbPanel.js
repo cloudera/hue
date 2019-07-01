@@ -809,6 +809,8 @@ class AssistDbPanel {
       }
       return null;
     });
+
+    self.init();
   }
 
   setDatabaseWhenLoaded(namespace, databaseName) {
@@ -891,4 +893,16 @@ class AssistDbPanel {
   }
 }
 
-componentUtils.registerComponent('hue-assist-db-panel', AssistDbPanel, TEMPLATE);
+const instances = {};
+
+const viewModelFactory = {
+  createViewModel: params => {
+    const name = params.isStreams ? 'streams' : params.isSolr ? 'solr' : 'sql';
+    if (!instances[name]) {
+      instances[name] = new AssistDbPanel(params);
+    }
+    return instances[name];
+  }
+};
+
+componentUtils.registerComponent('hue-assist-db-panel', viewModelFactory, TEMPLATE);

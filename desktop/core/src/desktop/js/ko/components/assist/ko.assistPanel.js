@@ -209,13 +209,16 @@ class AssistPanel {
             appConfig['browser']['interpreter_names'].indexOf('kafka') !== -1
           ) {
             const streamsPanel = new AssistInnerPanel({
-              panelData: $.extend(
-                {
-                  i18n: i18nCollections,
-                  isStreams: true
-                },
-                params.sql
-              ),
+              panelData: {
+                name: 'hue-assist-db-panel',
+                params: $.extend(
+                  {
+                    i18n: i18nCollections,
+                    isStreams: true
+                  },
+                  params.sql
+                )
+              },
               name: I18n('Streams'),
               type: 'kafka',
               icon: 'fa-sitemap',
@@ -319,19 +322,8 @@ class AssistPanel {
         return panel.type === self.lastOpenPanelType();
       });
 
-      // always forces the db panel to load
-      const dbPanel = self.availablePanels().filter(panel => {
-        return panel.type === 'sql';
-      });
-      if (dbPanel.length > 0) {
-        dbPanel[0].panelData.init();
-      }
-
       self.visiblePanel.subscribe(newValue => {
         self.lastOpenPanelType(newValue.type);
-        if (newValue.type !== 'sql' && !newValue.panelData.initialized) {
-          newValue.panelData.init();
-        }
       });
 
       self.visiblePanel(

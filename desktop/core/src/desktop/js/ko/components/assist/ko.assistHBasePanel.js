@@ -69,7 +69,7 @@ const TEMPLATE = `
             <!-- ko ifnot: definition.host -->
             <i class="fa fa-fw fa-th muted valign-middle"></i>
             <!-- /ko -->
-            <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\\\\'' + definition.name + '\\\\'', meta: {'type': 'collection', 'definition': definition} }"></span>
+            <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\\'' + definition.name + '\\'', meta: {'type': 'collection', 'definition': definition} }"></span>
           </a>
         </li>
       </ul>
@@ -192,6 +192,8 @@ class AssistHBasePanel {
       huePubSub.publish('assist.clear.hbase.cache');
       self.reload();
     });
+
+    self.init();
   }
 
   init() {
@@ -204,4 +206,15 @@ class AssistHBasePanel {
   }
 }
 
-componentUtils.registerComponent('hue-assist-hbase-panel', AssistHBasePanel, TEMPLATE);
+let instance;
+
+const viewModelFactory = {
+  createViewModel: params => {
+    if (!instance) {
+      instance = new AssistHBasePanel(params);
+    }
+    return instance;
+  }
+};
+
+componentUtils.registerComponent('hue-assist-hbase-panel', viewModelFactory, TEMPLATE);

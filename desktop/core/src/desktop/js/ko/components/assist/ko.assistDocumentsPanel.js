@@ -341,6 +341,8 @@ class AssistDocumentsPanel {
         );
       }
     });
+
+    self.init();
   }
 
   setTypeFilter(newType) {
@@ -397,4 +399,15 @@ class AssistDocumentsPanel {
   }
 }
 
-componentUtils.registerComponent('hue-assist-documents-panel', AssistDocumentsPanel, TEMPLATE);
+let instance;
+
+const viewModelFactory = {
+  createViewModel: params => {
+    if (!instance) {
+      instance = new AssistDocumentsPanel(params);
+    }
+    return instance;
+  }
+};
+
+componentUtils.registerComponent('hue-assist-documents-panel', viewModelFactory, TEMPLATE);

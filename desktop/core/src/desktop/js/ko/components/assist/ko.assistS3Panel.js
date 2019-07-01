@@ -75,7 +75,7 @@ const TEMPLATE =
             <!-- ko if: definition.type === 'file' -->
             <i class="fa fa-fw fa-file-o muted valign-middle"></i>
             <!-- /ko -->
-            <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\\\\'' + path + '\\\\'', meta: {'type': 's3', 'definition': definition} }"></span>
+            <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\\'' + path + '\\'', meta: {'type': 's3', 'definition': definition} }"></span>
           </a>
         </li>
       </ul>
@@ -138,6 +138,8 @@ class AssistS3Panel {
       huePubSub.publish('assist.clear.s3.cache');
       self.reload();
     });
+
+    self.init();
   }
 
   init() {
@@ -150,4 +152,15 @@ class AssistS3Panel {
   }
 }
 
-componentUtils.registerComponent('hue-assist-s3-panel', AssistS3Panel, TEMPLATE);
+let instance;
+
+const viewModelFactory = {
+  createViewModel: params => {
+    if (!instance) {
+      instance = new AssistS3Panel(params);
+    }
+    return instance;
+  }
+};
+
+componentUtils.registerComponent('hue-assist-s3-panel', viewModelFactory, TEMPLATE);
