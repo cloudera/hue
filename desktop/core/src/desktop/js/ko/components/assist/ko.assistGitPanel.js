@@ -65,7 +65,7 @@ const TEMPLATE = `
             <!-- ko ifnot: definition.type === 'dir' -->
             <i class="fa fa-fw fa-file-o muted valign-middle"></i>
             <!-- /ko -->
-            <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\\\\'' + path + '\\\\'', meta: {'type': 'git', 'definition': definition} }"></span>
+            <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\\'' + path + '\\'', meta: {'type': 'git', 'definition': definition} }"></span>
           </a>
         </li>
       </ul>
@@ -126,6 +126,8 @@ class AssistGitPanel {
       huePubSub.publish('assist.clear.git.cache');
       self.reload();
     });
+
+    self.init();
   }
 
   init() {
@@ -133,4 +135,15 @@ class AssistGitPanel {
   }
 }
 
-componentUtils.registerComponent('hue-assist-git-panel', AssistGitPanel, TEMPLATE);
+let instance;
+
+const viewModelFactory = {
+  createViewModel: params => {
+    if (!instance) {
+      instance = new AssistGitPanel(params);
+    }
+    return instance;
+  }
+};
+
+componentUtils.registerComponent('hue-assist-git-panel', viewModelFactory, TEMPLATE);

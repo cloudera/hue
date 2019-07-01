@@ -110,7 +110,7 @@ const TEMPLATE =
             <!-- ko if: definition.type === 'file' -->
             <i class="fa fa-fw fa-file-o muted valign-middle"></i>
             <!-- /ko -->
-            <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\\\\'' + path + '\\\\'', meta: {'type': 'hdfs', 'definition': definition} }"></span>
+            <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\\'' + path + '\\'', meta: {'type': 'hdfs', 'definition': definition} }"></span>
           </a>
         </li>
       </ul>
@@ -180,6 +180,8 @@ class AssistHdfsPanel {
       huePubSub.publish('assist.clear.hdfs.cache');
       self.reload();
     });
+
+    self.init();
   }
 
   init() {
@@ -192,6 +194,17 @@ class AssistHdfsPanel {
   }
 }
 
-componentUtils.registerComponent('hue-assist-hdfs-panel', AssistHdfsPanel, TEMPLATE);
+let instance;
+
+const viewModelFactory = {
+  createViewModel: params => {
+    if (!instance) {
+      instance = new AssistHdfsPanel(params);
+    }
+    return instance;
+  }
+};
+
+componentUtils.registerComponent('hue-assist-hdfs-panel', viewModelFactory, TEMPLATE);
 
 export default HDFS_CONTEXT_ITEMS_TEMPLATE;

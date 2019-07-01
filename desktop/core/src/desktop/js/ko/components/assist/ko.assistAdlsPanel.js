@@ -90,7 +90,7 @@ const TEMPLATE =
             <!-- ko if: definition.type === 'file' -->
             <i class="fa fa-fw fa-file-o muted valign-middle"></i>
             <!-- /ko -->
-            <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\\\\\\\\'' + path + '\\\\\\\\'', meta: {'type': 'adls', 'definition': definition} }"></span>
+            <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\\'' + path + '\\'', meta: {'type': 'adls', 'definition': definition} }"></span>
           </a>
         </li>
       </ul>
@@ -156,6 +156,8 @@ class AssistAdlsPanel {
       huePubSub.publish('assist.clear.adls.cache');
       self.reload();
     });
+
+    self.init();
   }
 
   init() {
@@ -168,4 +170,15 @@ class AssistAdlsPanel {
   }
 }
 
-componentUtils.registerComponent('hue-assist-adls-panel', AssistAdlsPanel, TEMPLATE);
+let instance;
+
+const viewModelFactory = {
+  createViewModel: params => {
+    if (!instance) {
+      instance = new AssistAdlsPanel(params);
+    }
+    return instance;
+  }
+};
+
+componentUtils.registerComponent('hue-assist-adls-panel', viewModelFactory, TEMPLATE);
