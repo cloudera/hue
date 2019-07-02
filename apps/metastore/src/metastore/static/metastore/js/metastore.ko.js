@@ -230,10 +230,19 @@ var MetastoreViewModel = (function () {
           if (foundTables.length === 1) {
             self.source().namespace().database().setTable(foundTables[0], callback);
           } else if (clearDbCacheOnMissing) {
-            self.source().namespace().database().catalogEntry.clearCache({ invalidate: 'invalidate', silenceErrors: true }).then(function () {
-              self.source().namespace().database().load(function () {
-                setTableAfterLoad(false);
-              });
+            var dbEntry = self.source().namespace().database().catalogEntry;
+            dbEntry.getChildren({ refreshCache: true, silenceErrors: true }).then(function (childEntries) {
+              if (childEntries.some(function (childEntry) { return childEntry.name === tableDef.name })) {
+                self.source().namespace().database().load(function () {
+                  setTableAfterLoad(false);
+                });
+              } else {
+                dbEntry.clearCache({ invalidate: 'invalidate', silenceErrors: true, targetChild: tableDef.name }).then(function () {
+                  self.source().namespace().database().load(function () {
+                    setTableAfterLoad(false);
+                  });
+                });
+              }
             });
           }
         };
