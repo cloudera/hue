@@ -300,6 +300,7 @@ class DataCatalogEntry {
    * @param {string} [options.invalidate] - 'cache', 'invalidate' or 'invalidateAndFlush', default 'cache', only used for Impala
    * @param {boolean} [options.cascade] - Default false, only used when the entry is for the source
    * @param {boolean} [options.silenceErrors] - Default false
+   * @param {string} [options.targetChild] - Optional specific child to invalidate
    * @return {CancellablePromise}
    */
   clearCache(options) {
@@ -323,7 +324,7 @@ class DataCatalogEntry {
           sourceType: self.getSourceType(),
           compute: self.compute,
           invalidate: invalidate,
-          path: self.path,
+          path: options.targetChild ? self.path.concat(options.targetChild) : self.path,
           silenceErrors: options.silenceErrors
         });
         self.dataCatalog.invalidatePromise = invalidatePromise;
@@ -408,7 +409,7 @@ class DataCatalogEntry {
       .getSourceMeta(options)
       .done(sourceMeta => {
         if (!sourceMeta || sourceMeta.notFound) {
-          deferred.reject();
+          deferred.reject('No source meta found');
           return;
         }
         const promises = [];
