@@ -220,24 +220,24 @@ var MetastoreNamespace = (function () {
     self.database = ko.observable();
     self.databases = ko.observableArray();
     self.selectedDatabases = ko.observableArray();
-    self.loadingDatabases = ko.observable(false);
+    self.loading = ko.observable(false);
     self.lastLoadDatabasesPromise = undefined;
   };
 
   MetastoreNamespace.prototype.loadDatabases = function () {
     var self = this;
-    if (self.loadingDatabases() && self.lastLoadDatabasesPromise) {
+    if (self.loading() && self.lastLoadDatabasesPromise) {
       return self.lastLoadDatabasesPromise;
     }
 
-    self.loadingDatabases(true);
+    self.loading(true);
     var deferred = $.Deferred();
     self.lastLoadDatabasesPromise = deferred.promise();
 
     deferred.fail(function () {
       self.databases([]);
     }).always(function () {
-      self.loadingDatabases(false);
+      self.loading(false);
     });
 
     dataCatalog.getEntry({ namespace: self.namespace, compute: self.compute, sourceType: self.sourceType, path: [], definition: { type: 'source' } }).done(function (entry) {
@@ -255,8 +255,8 @@ var MetastoreNamespace = (function () {
 
   MetastoreNamespace.prototype.reload = function () {
     var self = this;
-    if (!self.loadingDatabases() && self.catalogEntry()) {
-      self.loadingDatabases(true);
+    if (!self.loading() && self.catalogEntry()) {
+      self.loading(true);
       // Clear will publish when done
       self.catalogEntry().clearCache({ invalidate: self.sourceType === 'impala' ? 'invalidate' : 'cache' });
     }
@@ -325,7 +325,7 @@ var MetastoreNamespace = (function () {
     };
 
     window.setTimeout(function () {
-      if (self.loadingDatabases() && self.lastLoadDatabasesPromise !== null) {
+      if (self.loading() && self.lastLoadDatabasesPromise !== null) {
         self.lastLoadDatabasesPromise.done(function () {
           whenLoaded(true);
         });
