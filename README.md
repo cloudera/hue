@@ -12,7 +12,7 @@ Hue is an open source SQL Workbench for browsing, querying and visualizing data 
 
 It features:
 
-   * [Editors](http://gethue.com/sql-editor/) to query with SQL [any database](http://cloudera.github.io/hue/latest/admin-manual/manual.html#connectors) and submit jobs
+   * [Editors](http://gethue.com/sql-editor/) to query with SQL [any database](https://docs.gethue.com/latest/administrator/configuration/editor/#connectors) and submit jobs
    * [Dashboards](http://gethue.com/search-dashboards/) to dynamically interact and visualize data
    * [Scheduler](http://gethue.com/scheduling/) of jobs and workflows
    * [Browsers](http://gethue.com/browsers/) for data and a Data Catalog
