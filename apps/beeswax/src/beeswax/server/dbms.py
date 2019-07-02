@@ -121,7 +121,7 @@ def get_query_server_config(name='beeswax', server=None, cluster=None):
         zk.stop()
       else:
         LOG.debug("Zookeeper Discovery not enabled, reverting to config values")
-        cache.set("llap", json.dumps({"host": LLAP_SERVER_HOST.get(), "port": LLAP_SERVER_PORT.get()}), CACHE_TIMEOUT.get())
+        cache.set("llap", json.dumps({"host": LLAP_SERVER_HOST.get(), "port": LLAP_SERVER_THRIFT_PORT.get()}), CACHE_TIMEOUT.get())
     activeEndpoint = json.loads(cache.get("llap"))
   elif name != 'hms' and name != 'impala':
     activeEndpoint = cache.get("hiveserver2")
