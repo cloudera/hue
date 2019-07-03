@@ -139,7 +139,8 @@ def hiveserver2_impersonation_enabled():
   return get_conf().get(_CNF_HIVESERVER2_IMPERSONATION, 'TRUE').upper() == 'TRUE'
 
 def hiveserver2_jdbc_url():
-  urlbase = 'jdbc:hive2://%s:%s/default' % (beeswax.conf.HIVE_SERVER_HOST.get(), beeswax.conf.HIVE_SERVER_PORT.get())
+  is_transport_mode_http = hiveserver2_transport_mode() == 'HTTP'
+  urlbase = 'jdbc:hive2://%s:%s/default' % (beeswax.conf.HIVE_SERVER_HOST.get(), hiveserver2_thrift_http_port() if is_transport_mode_http else beeswax.conf.HIVE_SERVER_PORT.get())
 
   if get_conf().get(_CNF_HIVESERVER2_USE_SSL, 'FALSE').upper() == 'TRUE':
     urlbase += ';ssl=true'
@@ -151,6 +152,10 @@ def hiveserver2_jdbc_url():
 
     if get_conf().get(_CNF_HIVESERVER2_TRUSTSTORE_PASSWORD):
       urlbase += ';trustStorePassword=%s' % get_conf().get(_CNF_HIVESERVER2_TRUSTSTORE_PASSWORD)
+
+  if is_transport_mode_http:
+    urlbase += ';transportMode=http'
+    urlbase += ';httpPath=%s' % hiveserver2_thrift_http_path()
 
   return urlbase
 
