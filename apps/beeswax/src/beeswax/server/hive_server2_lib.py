@@ -255,7 +255,7 @@ class HiveServerTRow2(object):
     return HiveServerTColumnValue2(self.cols[pos]).val # Return the full column and its values
 
   def _get_col_position(self, column_name):
-    return filter(lambda i_col1: i_col1[1].columnName == column_name, enumerate(self.schema.columns))[0][0]
+    return list(filter(lambda i_col1: i_col1[1].columnName == column_name, enumerate(self.schema.columns)))[0][0]
 
   def fields(self):
     try:
@@ -368,7 +368,7 @@ class HiveServerTTableSchema(object):
     return HiveServerTColumnDesc(self.columns[pos]).val
 
   def _get_col_position(self, column_name):
-    return filter(lambda i_col2: i_col2[1].columnName == column_name, enumerate(self.schema.columns))[0][0]
+    return list(filter(lambda i_col2: i_col2[1].columnName == column_name, enumerate(self.schema.columns)))[0][0]
 
 
 if hasattr(beeswax_conf.THRIFT_VERSION, 'get') and beeswax_conf.THRIFT_VERSION.get() >= 7:
@@ -386,7 +386,7 @@ else:
       return HiveServerTColumnValue(self.row.colVals[pos]).val
 
     def _get_col_position(self, column_name):
-      return filter(lambda i_col: i_col[1].columnName == column_name, enumerate(self.schema.columns))[0][0]
+      return list(filter(lambda i_col: i_col[1].columnName == column_name, enumerate(self.schema.columns)))[0][0]
 
     def fields(self):
       return [HiveServerTColumnValue(field).val for field in self.row.colVals]
