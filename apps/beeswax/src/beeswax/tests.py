@@ -3456,6 +3456,10 @@ def test_hiveserver2_jdbc_url():
     beeswax.hive_site.get_conf()[hive_site._CNF_HIVESERVER2_USE_SSL] = 'FALSE'
     url = hiveserver2_jdbc_url()
     assert_equal(url, 'jdbc:hive2://server-with-ssl-enabled.com:10000/default')
+
+    beeswax.hive_site.get_conf()[hive_site._CNF_HIVESERVER2_TRANSPORT_MODE] = 'HTTP'
+    url = hiveserver2_jdbc_url()
+    assert_equal(url, 'jdbc:hive2://server-with-ssl-enabled.com:10001/default;transportMode=http;httpPath=cliservice')
   finally:
     beeswax.hive_site.reset()
     hadoop.ssl_client_site.reset()
