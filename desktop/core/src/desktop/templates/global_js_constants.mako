@@ -359,6 +359,7 @@
     'Search data and saved documents...': '${ _('Search data and saved documents...') }',
     'Search saved documents...': '${_('Search saved documents...')}',
     'Select this folder': '${_('Select this folder')}',
+    'Selected dialect': '${_('Selected dialect')}',
     'Selected entry': '${_('Selected entry')}',
     'Sentry will recursively delete the SERVER or DATABASE privileges you marked for deletion.': '${ _('Sentry will recursively delete the SERVER or DATABASE privileges you marked for deletion.') }',
     'Server': '${ _('Server') }',
@@ -504,4 +505,5 @@
   };
 
   ${ sqlDocIndex.sqlDocIndex() }
+  ${ sqlDocIndex.sqlDocTopLevel() }
 })();
