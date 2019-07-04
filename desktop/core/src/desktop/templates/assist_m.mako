@@ -19,13 +19,9 @@ from desktop.views import commonheader_m, commonfooter_m
 from django.utils.translation import ugettext as _
 %>
 
-<%namespace name="assist" file="assist.mako" />
-
 ${ commonheader_m(_('Assist'), 'assist', user, request) | n,unicode }
 
 <script src="${ static('metastore/js/metastore.ko.js') }"></script>
-
-${ assist.assistPanel() }
 
 <style type="text/css">
   .assist {

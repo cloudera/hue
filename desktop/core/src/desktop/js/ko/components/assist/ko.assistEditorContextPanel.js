@@ -750,3 +750,5 @@ const viewModelFactory = {
 };
 
 componentUtils.registerComponent('assist-editor-context-panel', viewModelFactory, TEMPLATE);
+
+export { TEMPLATE, AssistantUtils };

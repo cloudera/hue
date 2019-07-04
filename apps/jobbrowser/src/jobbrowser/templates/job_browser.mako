@@ -29,7 +29,6 @@ SUFFIX = is_mini and "-mini" or ""
 
 % if not is_embeddable:
 ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
-<%namespace name="assist" file="/assist.mako" />
 % endif
 
 <span class="notebook">
@@ -65,8 +64,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 % endif
 
 % if not is_embeddable:
-  ${ assist.assistPanel() }
-
   <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">
     <i class="fa fa-chevron-right"></i>
   </a>

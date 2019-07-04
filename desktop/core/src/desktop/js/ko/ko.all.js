@@ -127,6 +127,7 @@ import 'ko/bindings/ko.verticalSlide';
 import 'ko/bindings/ko.visibleOnHover';
 
 import 'ko/components/assist/ko.assistAdlsPanel';
+import 'ko/components/assist/ko.assistDashboardPanel';
 import 'ko/components/assist/ko.assistDbPanel';
 import 'ko/components/assist/ko.assistDocumentsPanel';
 import 'ko/components/assist/ko.assistEditorContextPanel';
@@ -137,6 +138,8 @@ import 'ko/components/assist/ko.assistHdfsPanel';
 import 'ko/components/assist/ko.assistLangRefPanel';
 import 'ko/components/assist/ko.assistPanel';
 import 'ko/components/assist/ko.assistS3Panel';
+import 'ko/components/assist/ko.assistSchedulePanel';
+import 'ko/components/assist/ko.rightAssistPanel';
 import 'ko/components/contextPopover/ko.contextPopover';
 import 'ko/components/simpleAceEditor/ko.simpleAceEditor';
 import 'ko/components/ko.appSwitcher';

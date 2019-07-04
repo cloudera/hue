@@ -32,7 +32,6 @@
   from webpack_loader.templatetags.webpack_loader import render_bundle
 %>
 
-<%namespace name="assist" file="/assist.mako" />
 <%namespace name="hueIcons" file="/hue_icons.mako" />
 <%namespace name="commonHeaderFooterComponents" file="/common_header_footer_components.mako" />
 
@@ -503,8 +502,6 @@ ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 
 ## clusterConfig makes an Ajax call so it needs to be after commonHeaderFooterComponents
 <script src="${ static('desktop/js/clusterConfig.js') }"></script>
-
-${ assist.assistPanel() }
 
 % if request is not None:
 ${ smart_unicode(login_modal(request).content) | n,unicode }
