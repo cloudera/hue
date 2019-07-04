@@ -194,17 +194,6 @@ class AssistHdfsPanel {
   }
 }
 
-let instance;
-
-const viewModelFactory = {
-  createViewModel: params => {
-    if (!instance) {
-      instance = new AssistHdfsPanel(params);
-    }
-    return instance;
-  }
-};
-
-componentUtils.registerComponent('hue-assist-hdfs-panel', viewModelFactory, TEMPLATE);
+componentUtils.registerStaticComponent('hue-assist-hdfs-panel', AssistHdfsPanel, TEMPLATE);
 
 export default HDFS_CONTEXT_ITEMS_TEMPLATE;

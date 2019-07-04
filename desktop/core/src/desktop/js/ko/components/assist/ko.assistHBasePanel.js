@@ -206,15 +206,4 @@ class AssistHBasePanel {
   }
 }
 
-let instance;
-
-const viewModelFactory = {
-  createViewModel: params => {
-    if (!instance) {
-      instance = new AssistHBasePanel(params);
-    }
-    return instance;
-  }
-};
-
-componentUtils.registerComponent('hue-assist-hbase-panel', viewModelFactory, TEMPLATE);
+componentUtils.registerStaticComponent('hue-assist-hbase-panel', AssistHBasePanel, TEMPLATE);

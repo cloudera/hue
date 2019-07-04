@@ -175,15 +175,4 @@ class AssistDashboardPanel {
   }
 }
 
-let instance;
-
-const viewModelFactory = {
-  createViewModel: () => {
-    if (!instance) {
-      instance = new AssistDashboardPanel();
-    }
-    return instance;
-  }
-};
-
-componentUtils.registerComponent('assist-dashboard-panel', viewModelFactory, TEMPLATE);
+componentUtils.registerStaticComponent('assist-dashboard-panel', AssistDashboardPanel, TEMPLATE);

@@ -399,15 +399,8 @@ class AssistDocumentsPanel {
   }
 }
 
-let instance;
-
-const viewModelFactory = {
-  createViewModel: params => {
-    if (!instance) {
-      instance = new AssistDocumentsPanel(params);
-    }
-    return instance;
-  }
-};
-
-componentUtils.registerComponent('hue-assist-documents-panel', viewModelFactory, TEMPLATE);
+componentUtils.registerStaticComponent(
+  'hue-assist-documents-panel',
+  AssistDocumentsPanel,
+  TEMPLATE
+);

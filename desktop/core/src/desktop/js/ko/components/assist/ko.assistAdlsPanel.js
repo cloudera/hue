@@ -170,15 +170,4 @@ class AssistAdlsPanel {
   }
 }
 
-let instance;
-
-const viewModelFactory = {
-  createViewModel: params => {
-    if (!instance) {
-      instance = new AssistAdlsPanel(params);
-    }
-    return instance;
-  }
-};
-
-componentUtils.registerComponent('hue-assist-adls-panel', viewModelFactory, TEMPLATE);
+componentUtils.registerStaticComponent('hue-assist-adls-panel', AssistAdlsPanel, TEMPLATE);

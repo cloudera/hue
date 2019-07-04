@@ -320,15 +320,11 @@ class AssistLangRefPanel {
   }
 }
 
-let instance;
-
-const viewModelFactory = {
-  createViewModel: (params, componentInfo) => {
-    if (!instance) {
-      instance = new AssistLangRefPanel(params, componentInfo.element);
-    }
-    return instance;
-  }
-};
-
-componentUtils.registerComponent('assist-language-reference-panel', viewModelFactory, TEMPLATE);
+componentUtils.registerStaticComponent(
+  'assist-language-reference-panel',
+  {
+    createViewModel: (params, componentInfo) =>
+      new AssistLangRefPanel(params, componentInfo.element)
+  },
+  TEMPLATE
+);

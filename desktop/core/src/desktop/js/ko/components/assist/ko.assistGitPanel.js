@@ -135,15 +135,4 @@ class AssistGitPanel {
   }
 }
 
-let instance;
-
-const viewModelFactory = {
-  createViewModel: params => {
-    if (!instance) {
-      instance = new AssistGitPanel(params);
-    }
-    return instance;
-  }
-};
-
-componentUtils.registerComponent('hue-assist-git-panel', viewModelFactory, TEMPLATE);
+componentUtils.registerStaticComponent('hue-assist-git-panel', AssistGitPanel, TEMPLATE);

@@ -222,15 +222,4 @@ class AssistFunctionsPanel {
   }
 }
 
-let instance;
-
-const viewModelFactory = {
-  createViewModel: () => {
-    if (!instance) {
-      instance = new AssistFunctionsPanel();
-    }
-    return instance;
-  }
-};
-
-componentUtils.registerComponent('assist-functions-panel', viewModelFactory, TEMPLATE);
+componentUtils.registerStaticComponent('assist-functions-panel', AssistFunctionsPanel, TEMPLATE);
