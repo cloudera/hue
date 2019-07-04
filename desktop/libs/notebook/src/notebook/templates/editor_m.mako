@@ -19,7 +19,6 @@
   from django.utils.translation import ugettext as _
   from desktop.views import _ko
 %>
-<%namespace name="assist" file="/assist.mako" />
 
 ${ commonheader_m(editor_type, editor_type, user, request, "68px") | n,unicode }
 

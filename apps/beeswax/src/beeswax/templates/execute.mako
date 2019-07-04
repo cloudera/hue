@@ -23,7 +23,6 @@
   from notebook.conf import ENABLE_QUERY_BUILDER
 %>
 
-<%namespace name="assist" file="/assist.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 
@@ -847,8 +846,6 @@ ${ commonshare() | n,unicode }
 <link href="${ static('desktop/ext/css/bootstrap-editable.css') }" rel="stylesheet">
 
 <script src="${ static('beeswax/js/stats.utils.js') }"></script>
-
-${ assist.assistPanel() }
 
 <style type="text/css">
   h1 {

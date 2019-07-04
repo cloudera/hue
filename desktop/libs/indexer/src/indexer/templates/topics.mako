@@ -21,7 +21,6 @@
   from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
 %>
 
-<%namespace name="assist" file="/assist.mako" />
 <%namespace name="actionbar" file="actionbar.mako" />
 
 <%
@@ -43,8 +42,6 @@ ${ commonheader(_("Streams Browser"), "search", user, request, "60px") | n,unico
   }
 % endif
 </style>
-
-${ assist.assistPanel() }
 %endif
 
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }" type="text/css">

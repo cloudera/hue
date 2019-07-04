@@ -27,7 +27,6 @@ from metastore.conf import ENABLE_NEW_CREATE_TABLE
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
-<%namespace name="assist" file="/assist.mako" />
 <%namespace name="components" file="components.mako" />
 
 <%
@@ -54,8 +53,6 @@ ${ commonheader(_("Metastore"), app_name, user, request) | n,unicode }
   }
 % endif
 </style>
-
-${ assist.assistPanel() }
 % endif
 
 <script src="${ static('desktop/ext/js/wysihtml5-0.3.0.min.js') }"></script>
