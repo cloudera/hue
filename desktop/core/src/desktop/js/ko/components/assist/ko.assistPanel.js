@@ -17,10 +17,11 @@
 import $ from 'jquery';
 import ko from 'knockout';
 
+import apiHelper from 'api/apiHelper';
+import AssistInnerPanel from 'ko/components/assist/assistInnerPanel';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import AssistInnerPanel from 'ko/components/assist/assistInnerPanel';
 
 const TEMPLATE = `
   <script type="text/html" id="assist-panel-inner-header">
@@ -88,7 +89,7 @@ class AssistPanel {
     self.visiblePanel = ko.observable();
 
     self.lastOpenPanelType = ko.observable();
-    window.apiHelper.withTotalStorage('assist', 'last.open.panel', self.lastOpenPanelType);
+    apiHelper.withTotalStorage('assist', 'last.open.panel', self.lastOpenPanelType);
 
     huePubSub.subscribeOnce('cluster.config.set.config', clusterConfig => {
       if (clusterConfig && clusterConfig['app_config']) {

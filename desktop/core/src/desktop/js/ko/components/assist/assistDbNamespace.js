@@ -17,6 +17,7 @@
 import $ from 'jquery';
 import ko from 'knockout';
 
+import apiHelper from 'api/apiHelper';
 import AssistDbEntry from 'ko/components/assist/assistDbEntry';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
@@ -144,7 +145,7 @@ class AssistDbNamespace {
           self.selectedDatabase().loadEntries();
         }
         if (!self.navigationSettings.rightAssist) {
-          window.apiHelper.setInTotalStorage(
+          apiHelper.setInTotalStorage(
             'assist_' + self.sourceType + '_' + self.namespace.id,
             'lastSelectedDb',
             self.selectedDatabase().catalogEntry.name
@@ -175,7 +176,7 @@ class AssistDbNamespace {
         self.selectedDatabaseChanged();
         return;
       }
-      const lastSelectedDb = window.apiHelper.getFromTotalStorage(
+      const lastSelectedDb = apiHelper.getFromTotalStorage(
         'assist_' + self.sourceType + '_' + self.namespace.id,
         'lastSelectedDb',
         'default'

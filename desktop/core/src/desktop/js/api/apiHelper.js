@@ -470,8 +470,8 @@ class ApiHelper {
 
   /**
    * @param {string} url
-   * @param {Object} data
-   * @param {Object} options
+   * @param {Object} [data]
+   * @param {Object} [options]
    * @param {function} [options.successCallback]
    * @param {function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
