@@ -90,7 +90,7 @@ class LanguageReferenceTopic {
     this.weight = 1;
     this.children = [];
     entry.children.forEach(child => {
-      this.children.push(new LanguageReferenceTopic(child, self.index));
+      this.children.push(new LanguageReferenceTopic(child, this.index));
     });
     this.loadDeferred = $.Deferred();
     this.loading = ko.observable(false);
@@ -223,7 +223,7 @@ class AssistLangRefPanel {
         topic.children.forEach(findInside);
       };
 
-      this.topics.forEach(findInside);
+      this.topics().forEach(findInside);
 
       window.setTimeout(() => {
         // Initial sort deferred for promises to complete
