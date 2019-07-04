@@ -738,17 +738,10 @@ class AssistEditorContextPanel {
   }
 }
 
-let instance;
-
-const viewModelFactory = {
-  createViewModel: params => {
-    if (!instance) {
-      instance = new AssistEditorContextPanel(params);
-    }
-    return instance;
-  }
-};
-
-componentUtils.registerComponent('assist-editor-context-panel', viewModelFactory, TEMPLATE);
+componentUtils.registerStaticComponent(
+  'assist-editor-context-panel',
+  AssistEditorContextPanel,
+  TEMPLATE
+);
 
 export { TEMPLATE, AssistantUtils };

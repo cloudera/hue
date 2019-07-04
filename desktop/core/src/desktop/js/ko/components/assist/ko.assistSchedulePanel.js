@@ -132,15 +132,4 @@ class AssistSchedulePanel {
   }
 }
 
-let instance;
-
-const viewModelFactory = {
-  createViewModel: () => {
-    if (!instance) {
-      instance = new AssistSchedulePanel();
-    }
-    return instance;
-  }
-};
-
-componentUtils.registerComponent('assist-schedule-panel', viewModelFactory, TEMPLATE);
+componentUtils.registerStaticComponent('assist-schedule-panel', AssistSchedulePanel, TEMPLATE);

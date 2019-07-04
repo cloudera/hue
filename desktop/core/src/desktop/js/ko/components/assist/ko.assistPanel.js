@@ -341,4 +341,4 @@ class AssistPanel {
   }
 }
 
-componentUtils.registerComponent('assist-panel', AssistPanel, TEMPLATE);
+componentUtils.registerStaticComponent('assist-panel', AssistPanel, TEMPLATE);

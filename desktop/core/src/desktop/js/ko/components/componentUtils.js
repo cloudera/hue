@@ -17,8 +17,10 @@
 import $ from 'jquery';
 import ko from 'knockout';
 
-export default {
-  registerComponent: (name, model, template) => {
+const instances = {};
+
+class componentUtils {
+  static registerComponent(name, model, template) {
     const deferred = $.Deferred();
     if (!ko.components.isRegistered(name)) {
       const componentInfo = {
@@ -32,4 +34,25 @@ export default {
     }
     return deferred.reject().promise();
   }
-};
+
+  static registerStaticComponent(name, model, template) {
+    componentUtils.registerComponent(
+      name,
+      {
+        createViewModel: (params, componentInfo) => {
+          if (!instances[name]) {
+            if (model && model.createViewModel) {
+              instances[name] = model.createViewModel(params, componentInfo);
+            } else if (model) {
+              instances[name] = new model(params);
+            }
+          }
+          return instances[name];
+        }
+      },
+      template
+    );
+  }
+}
+
+export default componentUtils;

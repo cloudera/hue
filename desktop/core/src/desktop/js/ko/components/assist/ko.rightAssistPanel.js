@@ -224,15 +224,4 @@ class RightAssistPanel {
   }
 }
 
-let instance;
-
-const viewModelFactory = {
-  createViewModel: params => {
-    if (!instance) {
-      instance = new RightAssistPanel(params);
-    }
-    return instance;
-  }
-};
-
-componentUtils.registerComponent('right-assist-panel', viewModelFactory, TEMPLATE);
+componentUtils.registerStaticComponent('right-assist-panel', RightAssistPanel, TEMPLATE);

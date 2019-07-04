@@ -152,15 +152,4 @@ class AssistS3Panel {
   }
 }
 
-let instance;
-
-const viewModelFactory = {
-  createViewModel: params => {
-    if (!instance) {
-      instance = new AssistS3Panel(params);
-    }
-    return instance;
-  }
-};
-
-componentUtils.registerComponent('hue-assist-s3-panel', viewModelFactory, TEMPLATE);
+componentUtils.registerStaticComponent('hue-assist-s3-panel', AssistS3Panel, TEMPLATE);
