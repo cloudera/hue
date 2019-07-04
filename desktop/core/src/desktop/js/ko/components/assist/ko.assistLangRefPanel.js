@@ -118,7 +118,7 @@ class LanguageReferenceTopic {
   }
 }
 
-class LanguageReferencePanel {
+class AssistLangRefPanel {
   constructor(params, element) {
     this.disposals = [];
     this.availableTypes = ['impala', 'hive'];
@@ -325,10 +325,10 @@ let instance;
 const viewModelFactory = {
   createViewModel: (params, componentInfo) => {
     if (!instance) {
-      instance = new LanguageReferencePanel(params, componentInfo.element);
+      instance = new AssistLangRefPanel(params, componentInfo.element);
     }
     return instance;
   }
 };
 
-componentUtils.registerComponent('language-reference-panel', viewModelFactory, TEMPLATE);
+componentUtils.registerComponent('assist-language-reference-panel', viewModelFactory, TEMPLATE);

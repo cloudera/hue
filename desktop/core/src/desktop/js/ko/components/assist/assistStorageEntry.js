@@ -110,7 +110,7 @@ class AssistStorageEntry {
   loadPreview() {
     const self = this;
     self.loading(true);
-    window.apiHelper
+    apiHelper
       .fetchStoragePreview({
         path: self.getHierarchy(),
         type: self.type,
@@ -343,7 +343,7 @@ class AssistStorageEntry {
         type: 'dir'
       },
       parent: null,
-      apiHelper: window.apiHelper
+      apiHelper: apiHelper
     });
 
     path = (typeMatch ? typeMatch[2] : path).replace(/(?:^\/)|(?:\/$)/g, '').split('/');
