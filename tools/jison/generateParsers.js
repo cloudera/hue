@@ -119,9 +119,9 @@ const readFile = path =>
   new Promise((resolve, reject) => {
     fs.readFile(path, (err, buf) => {
       if (err) {
-        reject();
+        reject(err);
       }
-      resolve(buf.toString());
+      resolve(buf ? buf.toString() : '');
     });
   });
 
@@ -201,7 +201,7 @@ const generateParser = parserName =>
               deleteFile(targetPath); // Remove concatenated file
             }
             console.log('Adjusting JS...');
-            const generatedJsFileName = parserConfig.target.replace('.jison', '.js');
+            const generatedJsFileName = parserConfig.target.replace('.jison', '.js').replace(/^.*\/([^/]+)$/, '$1');
             readFile(generatedJsFileName)
               .then(contents => {
                 parserConfig
@@ -522,11 +522,11 @@ identifySqlParsers().then(() => {
         readFile(SQL_PARSER_REPOSITORY_PATH).then(contents => {
           contents = contents.replace(
             /const SYNTAX_MODULES = [^}]+}/,
-            'const SYNTAX_MODULES = {\n' + syntaxParsers.join(',\n') + '\n}'
+            'const SYNTAX_MODULES = {\n' + syntaxParsers.sort().join(',\n') + '\n}'
           );
           contents = contents.replace(
             /const AUTOCOMPLETE_MODULES = [^}]+}/,
-            'const AUTOCOMPLETE_MODULES = {\n' + autocompParsers.join(',\n') + '\n}'
+            'const AUTOCOMPLETE_MODULES = {\n' + autocompParsers.sort().join(',\n') + '\n}'
           );
           writeFile(SQL_PARSER_REPOSITORY_PATH, contents).then(() => {
             console.log('Done!\n');
