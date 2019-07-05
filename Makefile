@@ -285,11 +285,11 @@ solr-formula-parser:
 
 .PHONY: sql-all-parsers
 sql-all-parsers:
-	@node tools/jison/generateParsers.js sqlAutocompleteParser sqlSyntaxParser sqlStatementsParser
+	@node tools/jison/generateParsers.js generic hive impala
 
 .PHONY: sql-autocomplete-parser
 sql-autocomplete-parser:
-	@node tools/jison/generateParsers.js sqlAutocompleteParser
+	@node tools/jison/generateParsers.js genericAutocomp hiveAutocomp impalaAutocomp
 
 .PHONY: sql-statement-parser
 sql-statement-parser:
@@ -297,7 +297,7 @@ sql-statement-parser:
 
 .PHONY: sql-syntax-parser
 sql-syntax-parser:
-	@node tools/jison/generateParsers.js sqlSyntaxParser
+	@node tools/jison/generateParsers.js genericSyntax hiveSyntax impalaSyntax
 # END DEV ONLY >>>>
 
 ###################################
