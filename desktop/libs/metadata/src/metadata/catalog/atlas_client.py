@@ -108,6 +108,7 @@ class AtlasApi(Api):
       "parentPath": '', # Set below
       "properties": {}, # Set below
       "sourceType": '', # Set below
+      "classifications": [],
       "tags": atlas_entity['classificationNames'],
       "type": self.ATLAS_TO_NAV_TYPE.get(atlas_entity['typeName'].lower()) or atlas_entity['typeName']
     }
@@ -120,6 +121,7 @@ class AtlasApi(Api):
       nav_entity['parentPath'] = '/' + '/'.join(qualified_path_parts)
 
     if 'classifications' in atlas_entity:
+      nav_entity['classifications'] = atlas_entity['classifications']
       for atlas_classification in atlas_entity['classifications']:
         if 'attributes' in atlas_classification:
           for key, value in atlas_classification['attributes'].iteritems():

@@ -63,7 +63,7 @@ const TEMPLATE = `
   <!-- ko if: window.HAS_READ_ONLY_CATALOG && properties().length -->
   <div class="hue-nav-properties">
     <!-- ko foreach: properties -->
-    <div class="hue-nav-property"><div class="hue-nav-property-key" data-bind="text: key, attr: { 'title': key }"></div><div class="hue-nav-property-value" data-bind="text: value, attr: { 'title': value }"></div></div>
+    <div class="hue-nav-property" data-bind="tooltip: { placement: 'bottom' }, attr: { title: title }"><div class="hue-nav-property-key" data-bind="text: key"></div><div class="hue-nav-property-value" data-bind="text: value"></div></div>
     <!-- /ko -->
   </div>
   <!-- /ko -->
@@ -106,6 +106,8 @@ class NavProperty {
 
     self.editPropertyVisible = ko.observable(isNew);
 
+    self.title = ko.observable();
+
     const keySub = self.key.subscribe(() => {
       keySub.dispose();
       self.keyEdited(true);
@@ -139,6 +141,10 @@ class NavProperty {
         (!self.editPropertyVisible() && !self.key() && !self.value())
       );
     });
+  }
+
+  setTitle(title) {
+    this.title(title);
   }
 }
 
@@ -278,7 +284,19 @@ class NavProperties {
       .getNavigatorMeta()
       .done(navigatorMeta => {
         const newProps = [];
-        if (navigatorMeta.properties) {
+
+        if (navigatorMeta.classifications) {
+          navigatorMeta.classifications.forEach(classification => {
+            Object.keys(classification.attributes).forEach(attributeKey => {
+              const property = new NavProperty(
+                attributeKey,
+                classification.attributes[attributeKey]
+              );
+              property.setTitle(classification.typeName);
+              newProps.push(property);
+            });
+          });
+        } else if (navigatorMeta.properties) {
           Object.keys(navigatorMeta.properties).forEach(key => {
             if (!key.startsWith('__cloudera_internal')) {
               newProps.push(new NavProperty(key, navigatorMeta.properties[key]));
