@@ -101,6 +101,20 @@ const parserDefinitions = {
   }
 };
 
+const mkdir = path =>
+  new Promise((resolve, reject) => {
+    if (fs.existsSync(path)) {
+      resolve();
+    } else {
+      fs.mkdir(path, err => {
+        if (err) {
+          reject(err);
+        }
+        resolve();
+      });
+    }
+  });
+
 const readFile = path =>
   new Promise((resolve, reject) => {
     fs.readFile(path, (err, buf) => {
@@ -119,6 +133,17 @@ const writeFile = (path, contents) =>
       }
       resolve();
     });
+  });
+
+const copyFile = (source, destination) =>
+  new Promise((resolve, reject) => {
+    readFile(source)
+      .then(contents => {
+        writeFile(destination, contents)
+          .then(resolve)
+          .catch(reject);
+      })
+      .catch(reject);
   });
 
 const deleteFile = path => {
@@ -202,7 +227,6 @@ let parsersToGenerate = [];
 const invalid = [];
 
 let all = false;
-let appFound = false;
 
 const listDir = folder =>
   new Promise(resolve => {
@@ -293,9 +317,140 @@ const identifySqlParsers = () =>
     });
   });
 
+const prepareForNewParser = () =>
+  new Promise((resolve, reject) => {
+    if (process.argv.length === 3 && process.argv[0] === '-new') {
+      process.argv.shift();
+      const source = process.argv.shift();
+      const target = process.argv.shift();
+      console.log("Generating new parser '" + target + "' based on '" + source + "'...");
+      process.argv.push(target);
+
+      if (
+        !Object.keys(parserDefinitions).some(key => {
+          if (key.indexOf(source) === 0) {
+            mkdir(JISON_FOLDER + 'sql/' + target)
+              .then(() => {
+                listDir(JISON_FOLDER + 'sql/' + source).then(files => {
+                  const copyPromises = [];
+                  files.forEach(file => {
+                    copyPromises.push(
+                      copyFile(
+                        JISON_FOLDER + 'sql/' + source + '/' + file,
+                        JISON_FOLDER + 'sql/' + target + '/' + file
+                      )
+                    );
+                  });
+                  Promise.all(copyPromises).then(() => {
+                    const autocompleteSources = ['sql/' + target + '/autocomplete_header.jison'];
+                    const syntaxSources = ['sql/' + target + '/syntax_header.jison'];
+                    const lexer = 'sql/' + target + '/sql.jisonlex';
+
+                    files.forEach(file => {
+                      if (file.indexOf('sql_') === 0) {
+                        autocompleteSources.push('sql/' + target + '/' + file);
+                        syntaxSources.push('sql/' + target + '/' + file);
+                      }
+                    });
+                    autocompleteSources.push('sql/' + target + '/autocomplete_footer.jison');
+                    syntaxSources.push('sql/' + target + '/syntax_footer.jison');
+                    mkdir('desktop/core/src/desktop/js/parse/sql/' + target).then(() => {
+                      readFile(
+                        'desktop/core/src/desktop/js/parse/sql/' + source + '/sqlParseSupport.js'
+                      ).then(parseSupportContents => {
+                        parseSupportContents = parseSupportContents.replace(
+                          /parser\.yy\.activeDialect = '[^']+';'/g,
+                          "parser.yy.activeDialect = '" + target + "';"
+                        );
+                        writeFile(
+                          'desktop/core/src/desktop/js/parse/sql/' + target + '/sqlParseSupport.js',
+                          parseSupportContents
+                        ).then(() => {
+                          parserDefinitions[target + 'AutocompleteParser'] = {
+                            sources: autocompleteSources,
+                            lexer: lexer,
+                            target: 'sql/' + target + '/' + target + 'AutocompleteParser.jison',
+                            sqlParser: 'AUTOCOMPLETE',
+                            outputFolder: 'desktop/core/src/desktop/js/parse/sql/' + target + '/',
+                            afterParse: contents =>
+                              new Promise(resolveAfterParse => {
+                                resolveAfterParse(
+                                  LICENSE +
+                                    contents
+                                      .replace(
+                                        'var ' + target + 'AutocompleteParser = ',
+                                        "import SqlParseSupport from 'parse/sql/" +
+                                          target +
+                                          "/sqlParseSupport';\n\nvar " +
+                                          target +
+                                          'AutocompleteParser = '
+                                      )
+                                      .replace(
+                                        'loc: yyloc,',
+                                        "loc: lexer.yylloc, ruleId: stack.slice(stack.length - 2, stack.length).join(''),"
+                                      ) +
+                                    '\nexport default ' +
+                                    target +
+                                    'AutocompleteParser;\n'
+                                );
+                              })
+                          };
+                          parserDefinitions[target + 'SyntaxParser'] = {
+                            sources: syntaxSources,
+                            lexer: lexer,
+                            target: 'sql/' + target + '/' + target + 'SyntaxParser.jison',
+                            sqlParser: 'SYNTAX',
+                            outputFolder: 'desktop/core/src/desktop/js/parse/sql/' + target + '/',
+                            afterParse: contents =>
+                              new Promise(resolveAfterParse => {
+                                resolveAfterParse(
+                                  LICENSE +
+                                    contents
+                                      .replace(
+                                        'var ' + target + 'SyntaxParser = ',
+                                        "import SqlParseSupport from 'parse/sql/" +
+                                          target +
+                                          "/sqlParseSupport';\n\nvar " +
+                                          target +
+                                          'SyntaxParser = '
+                                      )
+                                      .replace(
+                                        'loc: yyloc,',
+                                        "loc: lexer.yylloc, ruleId: stack.slice(stack.length - 2, stack.length).join(''),"
+                                      ) +
+                                    '\nexport default ' +
+                                    target +
+                                    'SyntaxParser;\n'
+                                );
+                              })
+                          };
+                          console.log(parserDefinitions);
+                          resolve();
+                        });
+                      });
+                    });
+                  });
+                });
+              })
+              .catch(err => {
+                console.log(err);
+              });
+            return true;
+          }
+        })
+      ) {
+        reject("No existing parser found for '" + source + "'");
+      }
+    } else {
+      resolve();
+    }
+  });
+
 identifySqlParsers().then(() => {
-  process.argv.forEach(arg => {
-    if (appFound) {
+  process.argv.shift();
+  process.argv.shift();
+  prepareForNewParser().then(() => {
+    process.argv.forEach(arg => {
       if (arg === 'all') {
         all = true;
       } else if (parserDefinitions[arg]) {
@@ -312,76 +467,73 @@ identifySqlParsers().then(() => {
           invalid.push(arg);
         }
       }
-    } else if (arg.indexOf('generateParsers.js') !== -1) {
-      appFound = true;
+    });
+
+    if (all) {
+      parsersToGenerate = Object.keys(parserDefinitions);
     }
-  });
 
-  if (all) {
-    parsersToGenerate = Object.keys(parserDefinitions);
-  }
+    if (invalid.length) {
+      console.log("No parser config found for: '" + invalid.join("', '") + "'");
+      console.log(
+        '\nPossible options are:\n  ' +
+          ['all'].concat(Object.keys(parserDefinitions)).join('\n  ') +
+          '\n'
+      );
+      return;
+    }
 
-  if (invalid.length) {
-    console.log("No parser config found for: '" + invalid.join("', '") + "'");
-    console.log(
-      '\nPossible options are:\n  ' +
-        ['all'].concat(Object.keys(parserDefinitions)).join('\n  ') +
-        '\n'
-    );
-    return;
-  }
+    const parserCount = parsersToGenerate.length;
+    let idx = 0;
 
-  const parserCount = parsersToGenerate.length;
-  let idx = 0;
-
-  const generateRecursive = () => {
-    idx++;
-    if (parsersToGenerate.length) {
-      const parserName = parsersToGenerate.pop();
-      if (parserCount > 1) {
-        console.log("Generating '" + parserName + "' (" + idx + '/' + parserCount + ')...');
-      } else {
-        console.log("Generating '" + parserName + "'...");
-      }
-      generateParser(parserName)
-        .then(generateRecursive)
-        .catch(error => {
-          console.log(error);
-          console.log('FAIL!');
-        });
-    } else {
-      const autocompParsers = [];
-      const syntaxParsers = [];
-      console.log('Updating sqlParserRepository.js...');
-      Object.keys(parserDefinitions).forEach(key => {
-        if (parserDefinitions[key].sqlParser === 'AUTOCOMPLETE') {
-          autocompParsers.push(
-            AUTOCOMPLETE_PARSER_IMPORT_TEMPLATE.replace(
-              /KEY/g,
-              key.replace('AutocompleteParser', '')
-            )
-          );
-        } else if (parserDefinitions[key].sqlParser === 'SYNTAX') {
-          syntaxParsers.push(
-            SYNTAX_PARSER_IMPORT_TEMPLATE.replace(/KEY/g, key.replace('SyntaxParser', ''))
-          );
+    const generateRecursive = () => {
+      idx++;
+      if (parsersToGenerate.length) {
+        const parserName = parsersToGenerate.pop();
+        if (parserCount > 1) {
+          console.log("Generating '" + parserName + "' (" + idx + '/' + parserCount + ')...');
+        } else {
+          console.log("Generating '" + parserName + "'...");
         }
-      });
-      readFile(SQL_PARSER_REPOSITORY_PATH).then(contents => {
-        contents = contents.replace(
-          /const SYNTAX_MODULES = [^}]+}/,
-          'const SYNTAX_MODULES = {\n' + syntaxParsers.join(',\n') + '\n}'
-        );
-        contents = contents.replace(
-          /const AUTOCOMPLETE_MODULES = [^}]+}/,
-          'const AUTOCOMPLETE_MODULES = {\n' + autocompParsers.join(',\n') + '\n}'
-        );
-        writeFile(SQL_PARSER_REPOSITORY_PATH, contents).then(() => {
-          console.log('Done!\n');
+        generateParser(parserName)
+          .then(generateRecursive)
+          .catch(error => {
+            console.log(error);
+            console.log('FAIL!');
+          });
+      } else {
+        const autocompParsers = [];
+        const syntaxParsers = [];
+        console.log('Updating sqlParserRepository.js...');
+        Object.keys(parserDefinitions).forEach(key => {
+          if (parserDefinitions[key].sqlParser === 'AUTOCOMPLETE') {
+            autocompParsers.push(
+              AUTOCOMPLETE_PARSER_IMPORT_TEMPLATE.replace(
+                /KEY/g,
+                key.replace('AutocompleteParser', '')
+              )
+            );
+          } else if (parserDefinitions[key].sqlParser === 'SYNTAX') {
+            syntaxParsers.push(
+              SYNTAX_PARSER_IMPORT_TEMPLATE.replace(/KEY/g, key.replace('SyntaxParser', ''))
+            );
+          }
         });
-      });
-    }
-  };
-
-  generateRecursive();
+        readFile(SQL_PARSER_REPOSITORY_PATH).then(contents => {
+          contents = contents.replace(
+            /const SYNTAX_MODULES = [^}]+}/,
+            'const SYNTAX_MODULES = {\n' + syntaxParsers.join(',\n') + '\n}'
+          );
+          contents = contents.replace(
+            /const AUTOCOMPLETE_MODULES = [^}]+}/,
+            'const AUTOCOMPLETE_MODULES = {\n' + autocompParsers.join(',\n') + '\n}'
+          );
+          writeFile(SQL_PARSER_REPOSITORY_PATH, contents).then(() => {
+            console.log('Done!\n');
+          });
+        });
+      }
+    };
+    generateRecursive();
+  });
 });
