@@ -303,9 +303,9 @@ def get_interpreter(connector_type, user=None):
         'is_sql': False
       }]
     else:
-      raise PopupException(_('Snippet type %(type)s is not configured.') % snippet)
+      raise PopupException(_('Snippet type %s is not configured.') % connector_type)
   elif len(interpreter) > 1:
-    raise PopupException(_('Snippet type %(type)s matching more than one interpreter: %s') % (snippet, len(interpreter)))
+    raise PopupException(_('Snippet type %s matching more than one interpreter: %s') % (connector_type, len(interpreter)))
 
   return interpreter[0]
 

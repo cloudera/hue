@@ -36,7 +36,7 @@ from django.views.decorators.http import require_POST
 from metadata.conf import has_catalog
 from metadata.catalog_api import search_entities as metadata_search_entities, _highlight, search_entities_interactive as metadata_search_entities_interactive
 from notebook.connectors.altus import SdxApi, AnalyticDbApi, DataEngApi, DataWarehouse2Api
-from notebook.connectors.base import Notebook
+from notebook.connectors.base import Notebook, get_interpreter
 from notebook.views import upgrade_session_properties
 
 from desktop.lib.django_util import JsonResponse
@@ -156,19 +156,23 @@ def get_context_computes(request, interface):
     } for cluster in clusters if cluster.get('type') == 'direct'
   ])
 
-  if get_cluster_config(request.user)['has_computes']:
-    if interface == 'impala' or interface == 'report':
-      if IS_K8S_ONLY.get():
-        dw_clusters = DataWarehouse2Api(request.user).list_clusters()['clusters']
-        computes.extend([{
-            'id': cluster.get('crn'),
-            'name': cluster.get('clusterName'),
-            'status': cluster.get('status'),
-            'namespace': cluster.get('namespaceCrn', cluster.get('crn')),
-            'compute_end_point': IS_K8S_ONLY.get() and '%(publicHost)s' % cluster['coordinatorEndpoint'] or '',
-            'type': 'altus-dw'
-          } for cluster in dw_clusters]
-        )
+  if get_cluster_config(request.user)['has_computes']: # TODO: only based on interface selected?
+    interpreter = get_interpreter(connector_type=interface, user=request.user)
+    if interpreter['dialect'] == 'impala':
+      # dw_clusters = DataWarehouse2Api(request.user).list_clusters()['clusters']
+      dw_clusters = [
+        {'crn': 'c1', 'clusterName': 'c1', 'status': 'created', 'endpoint': 'c1.gethue.com:10000'},
+        {'crn': 'c2', 'clusterName': 'c2', 'status': 'created', 'endpoint': 'c2.gethue.com:10000'},
+      ]
+      computes.extend([{
+          'id': cluster.get('crn'),
+          'name': cluster.get('clusterName'),
+          'status': cluster.get('status'),
+          'namespace': cluster.get('namespaceCrn', cluster.get('crn')),
+          'compute_end_point': IS_K8S_ONLY.get() and '%(publicHost)s' % cluster['coordinatorEndpoint'] or '',
+          'type': 'altus-dw'
+        } for cluster in dw_clusters]
+      )
 
   response[interface] = computes
   response['status'] = 0
