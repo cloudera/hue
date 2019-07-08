@@ -201,7 +201,9 @@ const generateParser = parserName =>
               deleteFile(targetPath); // Remove concatenated file
             }
             console.log('Adjusting JS...');
-            const generatedJsFileName = parserConfig.target.replace('.jison', '.js').replace(/^.*\/([^/]+)$/, '$1');
+            const generatedJsFileName = parserConfig.target
+              .replace('.jison', '.js')
+              .replace(/^.*\/([^/]+)$/, '$1');
             readFile(generatedJsFileName)
               .then(contents => {
                 parserConfig

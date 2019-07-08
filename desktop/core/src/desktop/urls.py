@@ -121,6 +121,8 @@ dynamic_patterns += [
   url(r'^desktop/workers/aceSqlLocationWorker.js', desktop_views.ace_sql_location_worker),
   url(r'^desktop/workers/aceSqlSyntaxWorker.js', desktop_views.ace_sql_syntax_worker),
 
+  url(r'^dynamic_bundle/(?P<bundle_path>.+)', desktop_views.dynamic_bundle),
+
   # Unsupported browsers
   url(r'^boohoo$', desktop_views.unsupported, name='desktop_views_unsupported'),
 
