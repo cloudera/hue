@@ -28,6 +28,7 @@ import traceback
 import zipfile
 import validate
 
+from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.shortcuts import render_to_response
@@ -64,6 +65,7 @@ from desktop.log.access import access_log_level, access_warn, AccessInfo
 from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _reset_all_debug, get_all_debug as _get_all_debug
 from desktop.models import Settings, hue_version, _get_apps, UserPreferences
 
+from webpack_loader.utils import get_files
 
 LOG = logging.getLogger(__name__)
 
@@ -374,6 +376,13 @@ def ace_sql_location_worker(request):
 
 def ace_sql_syntax_worker(request):
   return HttpResponse(render('ace_sql_syntax_worker.mako', request, None), content_type="application/javascript")
+
+def dynamic_bundle(request, bundle_path):
+  bundle_name = re.sub(r'-(bundle|chunk).*', '', bundle_path)
+  files = get_files(bundle_name)
+  if len(files) == 1:
+    return HttpResponseRedirect(files[0]['url'])
+  return render("404.mako", request, dict(uri=request.build_absolute_uri()), status=404)
 
 def assist_m(request):
   return render('assist_m.mako', request, None)
