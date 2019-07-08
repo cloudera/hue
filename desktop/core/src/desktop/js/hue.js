@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'utils/publicPath';
 import '@babel/polyfill';
 import _ from 'lodash';
 import $ from 'jquery/jquery.common';

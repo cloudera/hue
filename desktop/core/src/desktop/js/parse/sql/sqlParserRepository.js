@@ -35,18 +35,28 @@ class SqlParserRepository {
     this.modulePromises = {};
   }
 
-  async getAutocompleter(sourceType) {
-    if (!this.modulePromises[sourceType + 'Autocomplete']) {
-      this.modulePromises[sourceType + 'Autocomplete'] = AUTOCOMPLETE_MODULES[sourceType]();
+  async getParser(sourceType, parserType) {
+    if (!this.modulePromises[sourceType + parserType]) {
+      const modules = parserType === 'Autocomplete' ? AUTOCOMPLETE_MODULES : SYNTAX_MODULES;
+      this.modulePromises[sourceType + parserType] = new Promise((resolve, reject) => {
+        if (modules[sourceType]) {
+          modules[sourceType]()
+            .then(module => resolve(module.default))
+            .catch(reject);
+        } else {
+          reject('No ' + parserType.toLowerCase() + ' parser found for "' + sourceType + '"');
+        }
+      });
     }
     return this.modulePromises[sourceType + 'Autocomplete'];
   }
 
+  async getAutocompleter(sourceType) {
+    return this.getParser(sourceType, 'Autocomplete');
+  }
+
   async getSyntaxParser(sourceType) {
-    if (!this.modulePromises[sourceType + 'Syntax']) {
-      this.modulePromises[sourceType + 'Syntax'] = AUTOCOMPLETE_MODULES[sourceType]();
-    }
-    return this.modulePromises[sourceType + 'Syntax'];
+    return this.getParser(sourceType, 'Syntax');
   }
 }
 
