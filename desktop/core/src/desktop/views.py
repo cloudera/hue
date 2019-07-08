@@ -377,9 +377,9 @@ def ace_sql_location_worker(request):
 def ace_sql_syntax_worker(request):
   return HttpResponse(render('ace_sql_syntax_worker.mako', request, None), content_type="application/javascript")
 
-def dynamic_bundle(request, bundle_path):
-  bundle_name = re.sub(r'-(bundle|chunk).*', '', bundle_path)
-  files = get_files(bundle_name)
+def dynamic_bundle(request, config, bundle_name):
+  bundle_name = re.sub(r'-(bundle|chunk).*', '', bundle_name)
+  files = get_files(bundle_name, None, config.upper())
   if len(files) == 1:
     return HttpResponseRedirect(files[0]['url'])
   return render("404.mako", request, dict(uri=request.build_absolute_uri()), status=404)
