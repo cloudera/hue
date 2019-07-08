@@ -984,7 +984,7 @@ alert("XSS")
     prefix = self.cluster.fs_prefix + '/test_compress_files'
     self.cluster.fs.mkdir(prefix)
     
-    test_directories = ["test_dir1", "test dir2",  "test\tdir3", "testdir4" ]
+    test_directories = ["testdir", "test dir1", "test\tdir2",  "test\ndir3", "test\rdir4"]
     for temp_directories in test_directories:
         test_dir1 = prefix + "/" + temp_directories
         test_file = test_dir1 + '/test.txt'
@@ -994,16 +994,6 @@ alert("XSS")
         for i in range(3) :
             f = self.cluster.fs.open(test_file + "%s" %i, "w")
             f.close()
-    """
-    test_dir2 = prefix + '/test_dir2'
-    test_file = test_dir2 + '/test.txt'
-    self.cluster.fs.mkdir(test_dir2)
-    self.cluster.fs.chown(test_dir2, 'test')
-    self.cluster.fs.chmod(test_dir2, 0700)
-    for i in range(5) :
-        f = self.cluster.fs.open(test_file + "%s" %i, "w")
-        f.close()
-    """
 
     try:
       for temp_directories in test_directories :
