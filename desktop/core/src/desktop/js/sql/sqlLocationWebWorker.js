@@ -22,7 +22,7 @@ const handleStatement = (statement, locations, autocompleteParser, active) => {
   // Statement locations come in the message to the worker and are generally more accurate
   locations.push(statement);
   try {
-    const sqlParseResult = autocompleteParser.parse(statement.statement + ' ', '');
+    const sqlParseResult = autocompleteParser.parseSql(statement.statement + ' ', '');
     if (sqlParseResult.locations) {
       sqlParseResult.locations.forEach(location => {
         location.active = active;
