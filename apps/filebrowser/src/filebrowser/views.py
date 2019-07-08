@@ -88,7 +88,7 @@ BYTES_PER_SENTENCE = 2
 # The maximum size the file editor will allow you to edit
 MAX_FILEEDITOR_SIZE = 256 * 1024
 
-INLINE_DISPLAY_MIMETYPE = re.compile('video/|image/|audio/|application/pdf|application/msword|application/excel|'
+INLINE_DISPLAY_MIMETYPE = re.compile('video/|image/|audio/|application/pdf|application/msword|application/excel|text/html'
                                      'application/vnd\.ms|'
                                      'application/vnd\.openxmlformats')
 
