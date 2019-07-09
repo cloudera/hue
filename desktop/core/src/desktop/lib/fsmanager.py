@@ -24,7 +24,7 @@ import aws
 import azure.client
 
 from aws.conf import is_enabled as is_s3_enabled
-from azure.conf import is_adls_enabled
+from azure.conf import is_adls_enabled, is_abfs_enabled
 from hadoop.cluster import get_hdfs
 from hadoop.conf import has_hdfs_enabled
 
@@ -49,6 +49,10 @@ if is_adls_enabled():
   FS_GETTERS['adl'] = azure.client.get_client
   if DEFAULT_SCHEMA is None:
       DEFAULT_SCHEMA = 'adl'
+if is_abfs_enabled():
+  FS_GETTERS['abfs'] = azure.client.get_client_abfs
+  if DEFAULT_SCHEMA is None:
+      DEFAULT_SCHEMA = 'abfs'
 
 
 def get_filesystem(name='default'):
