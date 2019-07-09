@@ -306,7 +306,12 @@ const identifySqlParsers = () =>
 
             if (fileIndex['sql.jisonlex']) {
               findParser(fileIndex, folder, sharedFiles, true);
-              findParser(fileIndex, folder, sharedFiles, false);
+              findParser(
+                fileIndex,
+                folder,
+                sharedFiles.filter(path => path.indexOf('_error.jison') === -1),
+                false
+              );
             } else {
               console.log(
                 "Warn: Could not find 'sql.jisonlex' in " + JISON_FOLDER + 'sql/' + folder + '/'

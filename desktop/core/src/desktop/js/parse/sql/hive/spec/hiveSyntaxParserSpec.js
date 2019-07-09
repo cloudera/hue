@@ -14,65 +14,65 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import sqlSyntaxParser from '../sqlSyntaxParser';
+import hiveSyntaxParser from '../hiveSyntaxParser';
 
-describe('sqlSyntaxParser.js', () => {
+describe('hiveSyntaxParser.js', () => {
   const expectedToStrings = function(expected) {
     return expected.map(ex => ex.text);
   };
 
   it('should not find errors for ""', () => {
-    const result = sqlSyntaxParser.parseSyntax('', '');
+    const result = hiveSyntaxParser.parseSyntax('', '');
     expect(result).toBeFalsy();
   });
 
   it('should report incomplete statement for "SEL"', () => {
-    const result = sqlSyntaxParser.parseSyntax('SEL', '');
+    const result = hiveSyntaxParser.parseSyntax('SEL', '');
     expect(result.incompleteStatement).toBeTruthy();
   });
 
   it('should report incomplete statement for "SELECT"', () => {
-    const result = sqlSyntaxParser.parseSyntax('SELECT', '');
+    const result = hiveSyntaxParser.parseSyntax('SELECT', '');
     expect(result.incompleteStatement).toBeTruthy();
   });
 
   it('should report incomplete statement for "SELECT "', () => {
-    const result = sqlSyntaxParser.parseSyntax('SELECT ', '');
+    const result = hiveSyntaxParser.parseSyntax('SELECT ', '');
     expect(result.incompleteStatement).toBeTruthy();
   });
 
   it('should not report incomplete statement for "SELECT * FROM tbl"', () => {
-    const result = sqlSyntaxParser.parseSyntax('SELECT * FROM tbl', '');
+    const result = hiveSyntaxParser.parseSyntax('SELECT * FROM tbl', '');
     expect(result.incompleteStatement).toBeFalsy();
   });
 
   it('should not report incomplete statement for "SELECT * FROM tbl LIMIT 1"', () => {
-    const result = sqlSyntaxParser.parseSyntax('SELECT * FROM tbl LIMIT 1', '');
+    const result = hiveSyntaxParser.parseSyntax('SELECT * FROM tbl LIMIT 1', '');
     expect(result.incompleteStatement).toBeFalsy();
   });
 
   it('should report incomplete statement for "SELECT * FROM tbl LIMIT "', () => {
-    const result = sqlSyntaxParser.parseSyntax('SELECT * FROM tbl LIMIT ', '');
+    const result = hiveSyntaxParser.parseSyntax('SELECT * FROM tbl LIMIT ', '');
     expect(result.incompleteStatement).toBeTruthy();
   });
 
   it('should report incomplete statement for "SELECT * FROM tbl GROUP"', () => {
-    const result = sqlSyntaxParser.parseSyntax('SELECT * FROM tbl GROUP', '');
+    const result = hiveSyntaxParser.parseSyntax('SELECT * FROM tbl GROUP', '');
     expect(result.incompleteStatement).toBeTruthy();
   });
 
   it('should not find errors for "SELECT *"', () => {
-    const result = sqlSyntaxParser.parseSyntax('SELECT *', '');
+    const result = hiveSyntaxParser.parseSyntax('SELECT *', '');
     expect(result).toBeFalsy();
   });
 
   it('should not report incomplete statement for "SELECT * FR"', () => {
-    const result = sqlSyntaxParser.parseSyntax('SELECT * FR', '');
+    const result = hiveSyntaxParser.parseSyntax('SELECT * FR', '');
     expect(result.incompleteStatement).toBeTruthy();
   });
 
   it('should find errors for "SLELECT "', () => {
-    const result = sqlSyntaxParser.parseSyntax('SLELECT ', '');
+    const result = hiveSyntaxParser.parseSyntax('SLELECT ', '');
     expect(result).toBeTruthy();
     expect(result.text).toEqual('SLELECT');
     expect(result.expected.length).toBeGreaterThan(0);
@@ -81,7 +81,7 @@ describe('sqlSyntaxParser.js', () => {
   });
 
   it('should find errors for "alter tabel "', () => {
-    const result = sqlSyntaxParser.parseSyntax('alter tabel ', '');
+    const result = hiveSyntaxParser.parseSyntax('alter tabel ', '');
     expect(result).toBeTruthy();
     expect(result.text).toEqual('tabel');
     expect(result.expected.length).toBeGreaterThan(0);
@@ -90,23 +90,28 @@ describe('sqlSyntaxParser.js', () => {
   });
 
   it('should find errors for "select *  form "', () => {
-    const result = sqlSyntaxParser.parseSyntax('select *  form ', '');
+    const result = hiveSyntaxParser.parseSyntax('select *  form ', '');
     expect(result).toBeTruthy();
     expect(result.loc.first_column).toEqual(10);
     expect(result.loc.last_column).toEqual(14);
     expect(expectedToStrings(result.expected)).toEqual([
       'from',
+      'sort',
       'group',
       'order',
       'where',
+      'insert',
       'limit',
       'union',
-      'having'
+      'having',
+      'window',
+      'cluster',
+      'distribute'
     ]);
   });
 
   it('should find errors for "select * from customers c cultster by awasd asd afd;"', () => {
-    const result = sqlSyntaxParser.parseSyntax(
+    const result = hiveSyntaxParser.parseSyntax(
       'select * from customers c cultster by awasd asd afd;',
       ''
     );
@@ -114,99 +119,100 @@ describe('sqlSyntaxParser.js', () => {
   });
 
   it('should find errors for "select asdf wer qwer qewr   qwer"', () => {
-    const result = sqlSyntaxParser.parseSyntax('select asdf wer qwer qewr   qwer', '');
+    const result = hiveSyntaxParser.parseSyntax('select asdf wer qwer qewr   qwer', '');
     expect(result).toBeTruthy();
-  });
-
-  it('should find errors for "select * from foo where method = 1;"', () => {
-    const result = sqlSyntaxParser.parseSyntax('select * from foo where method = 1;', '', 'impala');
-    expect(result).toBeTruthy();
-    expect(
-      result.expected.some(expected => {
-        return expected.text === '`method`';
-      })
-    ).toBeTruthy();
-    expect(result.expectedIdentifier).toBeTruthy();
-    expect(result.possibleReserved).toBeTruthy();
-  });
-
-  it('should find errors for "select * from using where a = 1;"', () => {
-    const result = sqlSyntaxParser.parseSyntax('select * from using where a = 1;', '', 'hive');
-    expect(result).toBeTruthy();
-    expect(
-      result.expected.some(expected => {
-        return expected.text === '`using`';
-      })
-    ).toBeTruthy();
-    expect(result.expectedIdentifier).toBeTruthy();
-    expect(result.possibleReserved).toBeTruthy();
   });
 
   it('should suggest expected words for "SLELECT "', () => {
-    const result = sqlSyntaxParser.parseSyntax('SLELECT ', '');
+    const result = hiveSyntaxParser.parseSyntax('SLELECT ', '');
     expect(result).toBeTruthy();
     expect(expectedToStrings(result.expected)).toEqual([
       'SELECT',
+      'DELETE',
       'SET',
       'ALTER',
       'INSERT',
+      'RELOAD',
+      'ABORT',
+      'ANALYZE',
       'CREATE',
+      'EXPLAIN',
+      'EXPORT',
+      'GRANT',
+      'IMPORT',
+      'LOAD',
+      'MERGE',
+      'MSCK',
+      'REVOKE',
       'SHOW',
       'USE',
       'DROP',
       'FROM',
       'TRUNCATE',
       'UPDATE',
-      'WITH'
+      'WITH',
+      'DESCRIBE'
     ]);
   });
 
   it('should suggest expected words for "slelect "', () => {
-    const result = sqlSyntaxParser.parseSyntax('slelect ', '');
+    const result = hiveSyntaxParser.parseSyntax('slelect ', '');
     expect(result).toBeTruthy();
     expect(expectedToStrings(result.expected)).toEqual([
       'select',
+      'delete',
       'set',
       'alter',
       'insert',
+      'reload',
+      'abort',
+      'analyze',
       'create',
+      'explain',
+      'export',
+      'grant',
+      'import',
+      'load',
+      'merge',
+      'msck',
+      'revoke',
       'show',
       'use',
       'drop',
       'from',
       'truncate',
       'update',
-      'with'
+      'with',
+      'describe'
     ]);
   });
 
   it('should suggest expected that the statement should end for "use somedb extrastuff "', () => {
-    const result = sqlSyntaxParser.parseSyntax('use somedb extrastuff  ', '');
+    const result = hiveSyntaxParser.parseSyntax('use somedb extrastuff  ', '');
     expect(result).toBeTruthy();
     expect(result.expectedStatementEnd).toBeTruthy();
   });
 
   it('should find errors for "select * from sample_07 where and\\n\\nselect unknownCol from sample_07;"', () => {
-    const result = sqlSyntaxParser.parseSyntax(
+    const result = hiveSyntaxParser.parseSyntax(
       'select * from sample_07 where and\n\nselect unknownCol from sample_07;',
       '',
-      'hive',
       false
     );
     expect(result).toBeTruthy();
   });
 
   const expectEqualIds = function(beforeA, afterA, beforeB, afterB) {
-    const resultA = sqlSyntaxParser.parseSyntax(beforeA, afterA);
-    const resultB = sqlSyntaxParser.parseSyntax(beforeB, afterB);
+    const resultA = hiveSyntaxParser.parseSyntax(beforeA, afterA);
+    const resultB = hiveSyntaxParser.parseSyntax(beforeB, afterB);
     expect(resultA).toBeTruthy('"' + beforeA + '|' + afterA + '" was not reported as an error');
     expect(resultB).toBeTruthy('"' + beforeB + '|' + afterB + '" was not reported as an error');
     expect(resultA.ruleId).toEqual(resultB.ruleId);
   };
 
   const expectNonEqualIds = function(beforeA, afterA, beforeB, afterB) {
-    const resultA = sqlSyntaxParser.parseSyntax(beforeA, afterA);
-    const resultB = sqlSyntaxParser.parseSyntax(beforeB, afterB);
+    const resultA = hiveSyntaxParser.parseSyntax(beforeA, afterA);
+    const resultB = hiveSyntaxParser.parseSyntax(beforeB, afterB);
     expect(resultA).toBeTruthy('"' + beforeA + '|' + afterA + '" was not reported as an error');
     expect(resultB).toBeTruthy('"' + beforeB + '|' + afterB + '" was not reported as an error');
     expect(resultA.ruleId).not.toEqual(resultB.ruleId);
@@ -232,69 +238,35 @@ describe('sqlSyntaxParser.js', () => {
     expectNonEqualIds('slelect ', '', 'select * form ', '');
   });
 
-  describe('Hive specific', () => {
-    it('should suggest expected words for "SLELECT "', () => {
-      const result = sqlSyntaxParser.parseSyntax('SLELECT ', '', 'hive');
-      expect(result).toBeTruthy();
-      expect(expectedToStrings(result.expected)).toEqual([
-        'SELECT',
-        'DELETE',
-        'SET',
-        'ALTER',
-        'INSERT',
-        'RELOAD',
-        'ABORT',
-        'ANALYZE',
-        'CREATE',
-        'EXPLAIN',
-        'EXPORT',
-        'GRANT',
-        'IMPORT',
-        'LOAD',
-        'MERGE',
-        'MSCK',
-        'REVOKE',
-        'SHOW',
-        'USE',
-        'DROP',
-        'FROM',
-        'TRUNCATE',
-        'UPDATE',
-        'WITH',
-        'DESCRIBE'
-      ]);
-    });
-  });
-
-  describe('Impala specific', () => {
-    it('should suggest expected words for "SLELECT "', () => {
-      const result = sqlSyntaxParser.parseSyntax('SLELECT ', '', 'impala');
-      expect(result).toBeTruthy();
-      expect(expectedToStrings(result.expected)).toEqual([
-        'SELECT',
-        'DELETE',
-        'SET',
-        'ALTER',
-        'COMMENT',
-        'INSERT',
-        'UPSERT',
-        'CREATE',
-        'EXPLAIN',
-        'GRANT',
-        'LOAD',
-        'REFRESH',
-        'REVOKE',
-        'SHOW',
-        'USE',
-        'COMPUTE',
-        'DROP',
-        'FROM',
-        'TRUNCATE',
-        'UPDATE',
-        'WITH',
-        'DESCRIBE',
-        'INVALIDATE'
-      ]);
-    });
+  it('should suggest expected words for "SLELECT "', () => {
+    const result = hiveSyntaxParser.parseSyntax('SLELECT ', '');
+    expect(result).toBeTruthy();
+    expect(expectedToStrings(result.expected)).toEqual([
+      'SELECT',
+      'DELETE',
+      'SET',
+      'ALTER',
+      'INSERT',
+      'RELOAD',
+      'ABORT',
+      'ANALYZE',
+      'CREATE',
+      'EXPLAIN',
+      'EXPORT',
+      'GRANT',
+      'IMPORT',
+      'LOAD',
+      'MERGE',
+      'MSCK',
+      'REVOKE',
+      'SHOW',
+      'USE',
+      'DROP',
+      'FROM',
+      'TRUNCATE',
+      'UPDATE',
+      'WITH',
+      'DESCRIBE'
+    ]);
   });
 });

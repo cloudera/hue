@@ -45,7 +45,7 @@ class SqlParserRepository {
           .catch(reject);
       });
     }
-    return this.modulePromises[sourceType + 'Autocomplete'];
+    return this.modulePromises[sourceType + parserType];
   }
 
   async getAutocompleter(sourceType) {
