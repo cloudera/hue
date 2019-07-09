@@ -15,6 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
+from builtins import range
+from past.builtins import basestring
 import json
 import logging
 import re
@@ -50,13 +53,13 @@ def error_handler(view_fn):
   def decorator(request, *args, **kwargs):
     try:
       return view_fn(request, *args, **kwargs)
-    except Http404, e:
+    except Http404 as e:
       raise e
-    except StructuredException, e:
+    except StructuredException as e:
       error_code = e.error_code
       message = e.message
       details = e.data or {}
-    except Exception, e:
+    except Exception as e:
       LOG.exception('error in %s' % view_fn)
 
       error_code = 500
@@ -219,7 +222,7 @@ def _validate_nodes_json(json_nodes, errors, user, workflow):
       node_result = True
     link_result = _validate_node_links_json(node['node_type'], node_dict['child_links'], _errors)
     result = result and node_result and link_result
-    if not node.has_key('name') and ( not node.has_key('node_type') or not node.has_key('id') ):
+    if 'name' not in node and ( 'node_type' not in node or 'id' not in node ):
       raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving workflow'), data={'errors': 'Node is missing a name.'}, error_code=400)
     errors[node.get('name', '%s-%s' % ( node.get('node_type'), node.get('id')))] = _errors
 
@@ -266,7 +269,7 @@ def _update_workflow_nodes_json(workflow, json_nodes, id_map, user):
     nodes.append(node)
 
   # Delete unused nodes from workflow
-  old_nodes = Node.objects.filter(workflow=workflow).exclude(id__in=map(lambda x: x.id, nodes))
+  old_nodes = Node.objects.filter(workflow=workflow).exclude(id__in=[x.id for x in nodes])
   for node in old_nodes:
     node.get_full_node().delete()
 

@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
 import json
 import logging
 
@@ -78,7 +79,7 @@ def open_old_workflow(request):
   try:
     _workflow = import_workflow_from_hue_3_7(workflow)
     return _edit_workflow(request, None, _workflow)
-  except Exception, e:
+  except Exception as e:
     LOG.warn('Could not open old worklow: %s' % smart_str(e))
     return old_edit_workflow(request, workflow=workflow.id)
 
@@ -107,7 +108,7 @@ def _edit_workflow(request, doc, workflow):
 
   try:
     credentials.fetch(api)
-  except Exception, e:
+  except Exception as e:
     LOG.error(smart_str(e))
 
   can_edit_json = doc is None or (doc.can_write(request.user) if USE_NEW_EDITOR.get() else doc.doc.get().is_editable(request.user))
@@ -115,7 +116,7 @@ def _edit_workflow(request, doc, workflow):
   return render('editor2/workflow_editor.mako', request, {
       'layout_json': json.dumps(workflow_data['layout'], cls=JSONEncoderForHTML),
       'workflow_json': json.dumps(workflow_data['workflow'], cls=JSONEncoderForHTML),
-      'credentials_json': json.dumps(credentials.credentials.keys(), cls=JSONEncoderForHTML),
+      'credentials_json': json.dumps(list(credentials.credentials.keys()), cls=JSONEncoderForHTML),
       'workflow_properties_json': json.dumps(WORKFLOW_NODE_PROPERTIES, cls=JSONEncoderForHTML),
       'doc_uuid': doc.uuid if doc else '',
       'subworkflows_json': json.dumps(_get_workflows(request.user), cls=JSONEncoderForHTML),
@@ -315,7 +316,7 @@ def action_parameters(request):
 
     response['status'] = 0
     response['parameters'] = list(parameters)
-  except Exception, e:
+  except Exception as e:
     response['message'] = str(e)
 
   return JsonResponse(response)
@@ -338,7 +339,7 @@ def workflow_parameters(request):
 
     response['status'] = 0
     response['parameters'] = workflow.find_all_parameters(with_lib_path=False)
-  except Exception, e:
+  except Exception as e:
     response['message'] = str(e)
 
   return JsonResponse(response)
@@ -355,7 +356,7 @@ def gen_xml_workflow(request):
 
     response['status'] = 0
     response['xml'] = workflow.to_xml()
-  except Exception, e:
+  except Exception as e:
     response['message'] = str(e)
 
   return JsonResponse(response)
@@ -411,7 +412,7 @@ def _submit_workflow_helper(request, workflow, submit_action):
 
       try:
         job_id = _submit_workflow(request.user, request.fs, request.jt, workflow, mapping)
-      except Exception, e:
+      except Exception as e:
         raise PopupException(_('Workflow submission failed'), detail=smart_str(e), error_code=200)
       jsonify = request.POST.get('format') == 'json'
       if jsonify:
@@ -454,7 +455,7 @@ def _submit_workflow(user, fs, jt, workflow, mapping):
     workflow.document.add_to_history(submission.user, {'properties': submission.properties, 'oozie_id': submission.oozie_id})
 
     return job_id
-  except RestException, ex:
+  except RestException as ex:
     detail = ex._headers.get('oozie-error-message', ex)
     if 'Max retries exceeded with url' in str(detail):
       detail = '%s: %s' % (_('The Oozie server is not running'), detail)
@@ -509,7 +510,7 @@ def edit_coordinator(request):
 
   try:
     credentials.fetch(api)
-  except Exception, e:
+  except Exception as e:
     LOG.error(smart_str(e))
 
   if USE_NEW_EDITOR.get():
@@ -531,7 +532,7 @@ def edit_coordinator(request):
     workflows = [dict([('uuid', d.content_object.uuid), ('name', d.content_object.name)])
                       for d in Document.objects.available_docs(Document2, request.user).filter(extra='workflow2')]
 
-    if coordinator_id and not filter(lambda a: a['uuid'] == coordinator.data['properties']['workflow'], workflows):
+    if coordinator_id and not [a for a in workflows if a['uuid'] == coordinator.data['properties']['workflow']]:
       raise PopupException(_('You don\'t have access to the workflow of this coordinator.'))
 
   if USE_NEW_EDITOR.get(): # In Hue 4, merge with above
@@ -542,7 +543,7 @@ def edit_coordinator(request):
   if request.GET.get('format') == 'json': # For Editor
     return JsonResponse({
       'coordinator': coordinator.get_data_for_json(),
-      'credentials': credentials.credentials.keys(),
+      'credentials': list(credentials.credentials.keys()),
       'workflows': workflows,
       'doc_uuid': doc.uuid if doc else '',
       'is_embeddable': request.GET.get('is_embeddable', False),
@@ -552,7 +553,7 @@ def edit_coordinator(request):
   else:
     return render('editor2/coordinator_editor.mako', request, {
       'coordinator_json': coordinator.to_json_for_html(),
-      'credentials_json': json.dumps(credentials.credentials.keys(), cls=JSONEncoderForHTML),
+      'credentials_json': json.dumps(list(credentials.credentials.keys()), cls=JSONEncoderForHTML),
       'workflows_json': json.dumps(workflows, cls=JSONEncoderForHTML),
       'doc_uuid': doc.uuid if doc else '',
       'is_embeddable': request.GET.get('is_embeddable', False),
@@ -668,7 +669,7 @@ def coordinator_parameters(request):
 
     response['status'] = 0
     response['parameters'] = coordinator.find_all_parameters(with_lib_path=False)
-  except Exception, e:
+  except Exception as e:
     response['message'] = str(e)
 
   return JsonResponse(response)
@@ -694,7 +695,7 @@ def submit_coordinator(request, doc_id):
       jsonify = request.POST.get('format') == 'json'
       try:
         job_id = _submit_coordinator(request, coordinator, mapping)
-      except Exception, e:
+      except Exception as e:
         message = force_unicode(str(e))
         return JsonResponse({'status': -1, 'message': message}, safe=False)
       if jsonify:
@@ -782,7 +783,7 @@ def _submit_coordinator(request, coordinator, mapping):
     job_id = submission.run()
 
     return job_id
-  except RestException, ex:
+  except RestException as ex:
     LOG.exception('Error submitting coordinator')
     raise PopupException(_("Error submitting coordinator %s") % (coordinator,), detail=ex._headers.get('oozie-error-message', ex), error_code=200)
 
@@ -974,6 +975,6 @@ def _submit_bundle(request, bundle, properties):
     job_id = submission.run()
 
     return job_id
-  except RestException, ex:
+  except RestException as ex:
     LOG.exception('Error submitting bundle')
     raise PopupException(_("Error submitting bundle %s") % (bundle,), detail=ex._headers.get('oozie-error-message', ex), error_code=200)
