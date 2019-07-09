@@ -17,7 +17,7 @@
 import AutocompleteResults from 'sql/autocompleteResults';
 import hueDebug from 'utils/hueDebug';
 import huePubSub from 'utils/huePubSub';
-import sqlAutocompleteParser from 'parse/sqlAutocompleteParser';
+import sqlParserRepository from 'parse/sql/sqlParserRepository';
 
 class SqlAutocompleter {
   /**
@@ -28,65 +28,87 @@ class SqlAutocompleter {
    * @constructor
    */
   constructor(options) {
-    const self = this;
-    self.snippet = options.snippet;
-    self.editor = options.editor;
-    self.fixedPrefix =
+    this.snippet = options.snippet;
+    this.editor = options.editor;
+    this.fixedPrefix =
       options.fixedPrefix ||
       function() {
         return '';
       };
-    self.fixedPostfix =
+    this.fixedPostfix =
       options.fixedPostfix ||
       function() {
         return '';
       };
-    self.suggestions = new AutocompleteResults(options);
+    this.suggestions = new AutocompleteResults(options);
   }
 
-  parseActiveStatement() {
-    const self = this;
-    if (self.snippet.positionStatement() && self.snippet.positionStatement().location) {
-      const activeStatementLocation = self.snippet.positionStatement().location;
-      const cursorPosition = self.editor().getCursorPosition();
+  async parseActiveStatement() {
+    return new Promise((resolve, reject) => {
+      if (this.snippet.positionStatement() && this.snippet.positionStatement().location) {
+        const activeStatementLocation = this.snippet.positionStatement().location;
+        const cursorPosition = this.editor().getCursorPosition();
 
-      if (
-        (activeStatementLocation.first_line - 1 < cursorPosition.row ||
-          (activeStatementLocation.first_line - 1 === cursorPosition.row &&
-            activeStatementLocation.first_column <= cursorPosition.column)) &&
-        (activeStatementLocation.last_line - 1 > cursorPosition.row ||
-          (activeStatementLocation.last_line - 1 === cursorPosition.row &&
-            activeStatementLocation.last_column >= cursorPosition.column))
-      ) {
-        const beforeCursor =
-          self.fixedPrefix() +
-          self.editor().session.getTextRange({
-            start: {
-              row: activeStatementLocation.first_line - 1,
-              column: activeStatementLocation.first_column
-            },
-            end: cursorPosition
-          });
-        const afterCursor =
-          self.editor().session.getTextRange({
-            start: cursorPosition,
-            end: {
-              row: activeStatementLocation.last_line - 1,
-              column: activeStatementLocation.last_column
-            }
-          }) + self.fixedPostfix();
-        return sqlAutocompleteParser.parseSql(
-          beforeCursor,
-          afterCursor,
-          self.snippet.type(),
-          false
-        );
+        if (
+          (activeStatementLocation.first_line - 1 < cursorPosition.row ||
+            (activeStatementLocation.first_line - 1 === cursorPosition.row &&
+              activeStatementLocation.first_column <= cursorPosition.column)) &&
+          (activeStatementLocation.last_line - 1 > cursorPosition.row ||
+            (activeStatementLocation.last_line - 1 === cursorPosition.row &&
+              activeStatementLocation.last_column >= cursorPosition.column))
+        ) {
+          const beforeCursor =
+            this.fixedPrefix() +
+            this.editor().session.getTextRange({
+              start: {
+                row: activeStatementLocation.first_line - 1,
+                column: activeStatementLocation.first_column
+              },
+              end: cursorPosition
+            });
+          const afterCursor =
+            this.editor().session.getTextRange({
+              start: cursorPosition,
+              end: {
+                row: activeStatementLocation.last_line - 1,
+                column: activeStatementLocation.last_column
+              }
+            }) + this.fixedPostfix();
+          sqlParserRepository
+            .getAutocompleter(this.snippet.type())
+            .then(autocompleteParser => {
+              resolve(autocompleteParser.parseSql(beforeCursor, afterCursor));
+            })
+            .catch(err => {
+              console.log(err);
+              reject(err);
+            });
+        } else {
+          resolve();
+        }
+      } else {
+        resolve();
       }
-    }
+    });
   }
 
-  autocomplete() {
-    const self = this;
+  async parseAll() {
+    return new Promise((resolve, reject) => {
+      sqlParserRepository
+        .getAutocompleter(this.snippet.type())
+        .then(autocompleteParser => {
+          resolve(
+            autocompleteParser.parseSql(
+              this.editor().getTextBeforeCursor(),
+              this.editor().getTextAfterCursor()
+            )
+          );
+        })
+        .catch(reject);
+    });
+  }
+
+  async autocomplete() {
     let parseResult;
     try {
       huePubSub.publish(
@@ -95,23 +117,24 @@ class SqlAutocompleter {
           // This could happen in case the user is editing at the borders of the statement and the locations haven't
           // been updated yet, in that case we have to force a location update before parsing
           if (
-            self.snippet.ace &&
-            self.snippet.ace() &&
+            this.snippet.ace &&
+            this.snippet.ace() &&
             locations &&
-            self.snippet.ace().lastChangeTime !== locations.editorChangeTime
+            this.snippet.ace().lastChangeTime !== locations.editorChangeTime
           ) {
-            huePubSub.publish('editor.refresh.statement.locations', self.snippet);
+            huePubSub.publish('editor.refresh.statement.locations', this.snippet);
           }
         },
-        self.snippet
+        this.snippet
       );
 
-      parseResult = self.parseActiveStatement();
+      parseResult = await this.parseActiveStatement();
 
       if (typeof hueDebug !== 'undefined' && hueDebug.showParseResult) {
         console.log(parseResult);
       }
     } catch (e) {
+      console.log(e);
       if (typeof console.warn !== 'undefined') {
         console.warn(e);
       }
@@ -120,12 +143,7 @@ class SqlAutocompleter {
     // In the unlikely case the statement parser fails we fall back to parsing all of it
     if (!parseResult) {
       try {
-        parseResult = sqlAutocompleteParser.parseSql(
-          self.editor().getTextBeforeCursor(),
-          self.editor().getTextAfterCursor(),
-          self.snippet.type(),
-          false
-        );
+        parseResult = await this.parseAll();
       } catch (e) {
         if (typeof console.warn !== 'undefined') {
           console.warn(e);
@@ -138,13 +156,13 @@ class SqlAutocompleter {
       huePubSub.publish('hue.ace.autocompleter.done');
     } else {
       try {
-        if (self.lastContextRequest) {
-          self.lastContextRequest.dispose();
+        if (this.lastContextRequest) {
+          this.lastContextRequest.dispose();
         }
-        self.lastContextRequest = self.snippet
+        this.lastContextRequest = this.snippet
           .whenContextSet()
           .done(() => {
-            self.suggestions.update(parseResult);
+            this.suggestions.update(parseResult);
           })
           .fail(() => {
             huePubSub.publish('hue.ace.autocompleter.done');

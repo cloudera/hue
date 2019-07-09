@@ -588,13 +588,15 @@ class SolrFormulaAutocompleter {
     self.suggestions = new SolrFormulaSuggestions(options.support.fields);
   }
 
-  autocomplete() {
-    const self = this;
-    const parseResult = solrFormulaParser.autocompleteSolrFormula(
-      self.editor.getTextBeforeCursor(),
-      self.editor.getTextAfterCursor()
-    );
-    self.suggestions.update(parseResult);
+  async autocomplete() {
+    return new Promise(resolve => {
+      const parseResult = solrFormulaParser.autocompleteSolrFormula(
+        this.editor.getTextBeforeCursor(),
+        this.editor.getTextAfterCursor()
+      );
+      this.suggestions.update(parseResult);
+      resolve(parseResult);
+    });
   }
 
   parse(value) {
