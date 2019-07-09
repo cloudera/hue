@@ -117,15 +117,18 @@ class TestMockedImpala:
 
         get_hive_metastore_interpreters.return_value = ['hive']
         ddms.invalidate('default')
+        ddms.client.query.assert_called_once_with(ddms.client.query.call_args[0][0])
         assert_true('customers' in ddms.client.query.call_args[0][0].hql_query) # diff of 1 table
 
         get_different_tables.return_value = ['customers','','','','','','','','','','']
         assert_raises(PopupException, ddms.invalidate, 'default') # diff of 11 tables. Limit is 10.
 
         ddms.invalidate('default', 'customers')
+        assert_true(ddms.client.query.call_count == 2) # Second call
         assert_true('customers' in ddms.client.query.call_args[0][0].hql_query) # invalidate 1 table
 
         ddms.invalidate()
+        assert_true(ddms.client.query.call_count == 3) # Third call
         assert_true('customers' not in ddms.client.query.call_args[0][0].hql_query) # Full invalidate
 
 class TestImpalaIntegration:
