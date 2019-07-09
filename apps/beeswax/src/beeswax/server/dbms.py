@@ -92,7 +92,7 @@ def get(user, query_server=None, cluster=None):
 
 
 def get_query_server_config(name='beeswax', connector=None):
-  LOG.debug("Query cluster %s: %s" % (name, connector))
+  LOG.debug("Query cluster %s: %s" % ('' if connector else name, connector))
 
   if connector:
     query_server = {

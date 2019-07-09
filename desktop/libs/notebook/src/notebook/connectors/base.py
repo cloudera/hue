@@ -332,12 +332,11 @@ def get_api(request, snippet):
   else:
     compute = None
 
-  LOG.debug('Selected interpreter %s interface=%s compute=%s' % (interpreter, interface, compute))
-  # snippet['interface'] = interface
+  LOG.debug('Selected interpreter %s interface=%s compute=%s' % (interpreter['type'], interface, compute and compute['name']))
 
   if interface == 'hiveserver2':
     from notebook.connectors.hiveserver2 import HS2Api
-    return HS2Api(user=request.user, request=request, interpreter=interpreter)
+    return HS2Api(user=request.user, request=request, interpreter=compute if compute else interpreter)
   elif interface == 'oozie':
     return OozieApi(user=request.user, request=request)
   elif interface == 'livy':
