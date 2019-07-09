@@ -16,6 +16,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
+from builtins import object
 import json
 import logging
 import re
@@ -354,7 +356,7 @@ LIMIT $limit"""))
     try:
       response = self.c.get(reverse('oozie:submit_single_action', args=[wf_doc.id, '3f107997-04cc-8733-60a9-a4bb62cebabc']))
       assert_equal([{'name':'Dryrun', 'value': False}, {'name':'ls_arg', 'value': '-l'}], response.context[0]._data['params_form'].initial)
-    except Exception, ex:
+    except Exception as ex:
       logging.exception(ex)
     finally:
       reset()
@@ -615,7 +617,7 @@ class TestExternalWorkflowGraph(object):
     adj_list = _create_graph_adjaceny_list(self.node_list)
 
     assert_true(len(adj_list) == 7)
-    assert_true('subworkflow-a13f' in adj_list.keys())
+    assert_true('subworkflow-a13f' in list(adj_list.keys()))
     assert_true(adj_list['shell-0f44']['shell']['command'] == 'ls')
     assert_equal(adj_list['fork-68d4'], {u'path2': u'shell-0f44', u'node_type': u'fork', u'ok_to': u'', u'name': u'fork-68d4', u'path1': u'subworkflow-a13f'})
 

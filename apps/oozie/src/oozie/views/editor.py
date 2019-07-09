@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
 import json
 import logging
 import shutil
@@ -178,7 +179,7 @@ def import_workflow(request):
         _import_workflow(fs=request.fs, workflow=workflow, workflow_definition=workflow_definition)
         request.info(_('Workflow imported'))
         return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': workflow.id}))
-      except Exception, e:
+      except Exception as e:
         request.error(_('Could not import workflow: %s' % e))
         Workflow.objects.destroy(workflow, request.fs)
         raise PopupException(_('Could not import workflow.'), detail=e)
@@ -209,7 +210,7 @@ def import_coordinator(request):
         coordinator.managed = True
         coordinator.name = coordinator_form.cleaned_data.get('name')
         coordinator.save()
-      except Exception, e:
+      except Exception as e:
         request.error(_('Could not import coordinator: %s' % e))
         raise PopupException(_('Could not import coordinator.'), detail=e)
 
@@ -281,8 +282,8 @@ def edit_workflow(request, workflow):
     'default_link_form': DefaultLinkForm(action=workflow.start),
     'node_form': NodeForm(),
     'action_forms': [(node_type, design_form_by_type(node_type, request.user, workflow)())
-                     for node_type in ACTION_TYPES.iterkeys()],
-    'credentials': json.dumps(credentials.credentials.keys())
+                     for node_type in ACTION_TYPES.keys()],
+    'credentials': json.dumps(list(credentials.credentials.keys()))
   })
 
 
@@ -373,7 +374,7 @@ def _submit_workflow(user, fs, jt, workflow, mapping):
     job_id = submission.run()
     History.objects.create_from_submission(submission)
     return job_id
-  except RestException, ex:
+  except RestException as ex:
     detail = ex._headers.get('oozie-error-message', ex)
     if 'Max retries exceeded with url' in str(detail):
       detail = '%s: %s' % (_('The Oozie server is not running'), detail)
@@ -678,7 +679,7 @@ def _submit_coordinator(request, coordinator, mapping):
     History.objects.create_from_submission(submission)
 
     return job_id
-  except RestException, ex:
+  except RestException as ex:
     raise PopupException(_("Error submitting coordinator %s") % (coordinator,),
                          detail=ex._headers.get('oozie-error-message', ex))
 
@@ -891,7 +892,7 @@ def _submit_bundle(request, bundle, properties):
     History.objects.create_from_submission(submission)
 
     return job_id
-  except RestException, ex:
+  except RestException as ex:
     raise PopupException(_("Error submitting bundle %s") % (bundle,),
                          detail=ex._headers.get('oozie-error-message', ex))
 
@@ -938,7 +939,7 @@ def install_examples(request):
       oozie_setup.Command().handle()
       activate_translation(request.LANGUAGE_CODE)
       result['status'] = 0
-    except Exception, e:
+    except Exception as e:
       LOG.exception(e)
       result['message'] = str(e)
 
