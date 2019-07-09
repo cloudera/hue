@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 
 from django import forms
@@ -31,7 +32,7 @@ _OOZIE_WORKFLOW_NAME_REGEX = '^([a-zA-Z_]([\-_a-zA-Z0-9])*){1,39}$'
 
 class WorkflowDesignForm(forms.ModelForm):
   """Used for specifying a design"""
-  class Meta:
+  class Meta(object):
     model = models.OozieDesign
     exclude = ('root_action', 'owner')
 
@@ -46,7 +47,7 @@ class WorkflowDesignForm(forms.ModelForm):
 
 class JavaActionForm(forms.ModelForm):
   """Used for specifying a java action"""
-  class Meta:
+  class Meta(object):
     model = models.OozieJavaAction
     exclude = ('action_type',)
     widgets = {
@@ -65,7 +66,7 @@ class JavaActionForm(forms.ModelForm):
 
 class MapreduceActionForm(forms.ModelForm):
   """Used for specifying a mapreduce action"""
-  class Meta:
+  class Meta(object):
     model = models.OozieMapreduceAction
     exclude = ('action_type',)
     widgets = {
@@ -83,7 +84,7 @@ class MapreduceActionForm(forms.ModelForm):
 
 class StreamingActionForm(forms.ModelForm):
   """Used for specifying a streaming action"""
-  class Meta:
+  class Meta(object):
     model = models.OozieStreamingAction
     exclude = ('action_type',)
     widgets = {

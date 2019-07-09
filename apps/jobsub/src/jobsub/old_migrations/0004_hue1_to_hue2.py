@@ -215,7 +215,7 @@ def job_design_migration_for_streaming(jd):
   add_property('mapred.reduce.tasks', data['num_reduce_tasks'])
 
   property_list = [ ]
-  for k, v in properties.iteritems():
+  for k, v in properties.items():
     property_list.append(dict(name=k, value=v))
 
   action = OozieStreamingAction(action_type=OozieStreamingAction.ACTION_TYPE,
