@@ -25,6 +25,7 @@ from builtins import object
 import json
 import logging
 import os
+
 import re
 import sys
 import tempfile
@@ -63,6 +64,7 @@ if sys.version_info[0] > 2:
   from urllib.parse import unquote as urllib_unquote
 else:
   from urllib import unquote as urllib_unquote
+
 
 LOG = logging.getLogger(__name__)
 
@@ -977,8 +979,8 @@ alert("XSS")
       cleanup_file(self.cluster, HDFS_ZIP_FILE)
 
   def test_compress_hdfs_files(self):
-    if not is_oozie_enabled() :
-        raise SkipTest
+    if not is_oozie_enabled():
+      raise SkipTest
         
     ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(True)
     prefix = self.cluster.fs_prefix + '/test_compress_files'
@@ -986,29 +988,29 @@ alert("XSS")
     
     test_directories = ["testdir", "test dir1", "test\tdir2",  "test\ndir3", "test\rdir4"]
     for temp_directories in test_directories:
-        test_dir1 = prefix + "/" + temp_directories
-        test_file = test_dir1 + '/test.txt'
-        self.cluster.fs.mkdir(test_dir1)
-        self.cluster.fs.chown(test_dir1, 'test')
-        self.cluster.fs.chmod(test_dir1, 0700)
-        for i in range(3) :
-            f = self.cluster.fs.open(test_file + "%s" %i, "w")
-            f.close()
-
+      test_dir1 = prefix + "/" + temp_directories
+      test_file = test_dir1 + '/test.txt'
+      self.cluster.fs.mkdir(test_dir1)
+      self.cluster.fs.chown(test_dir1, 'test')
+      self.cluster.fs.chmod(test_dir1, 0700)
+      for i in range(3):
+        f = self.cluster.fs.open(test_file + "%s" %i, "w")
+        f.close()
+    
     try:
       for temp_directories in test_directories :
-          resp = self.c.post('/filebrowser/compress_files', {'upload_path': prefix, 'files[]': [temp_directories], 'archive_name': 'test_compress.zip'})
-          response = json.loads(resp.content)
-          assert_equal(0, response['status'], response)
-          assert_true('handle' in response and response['handle']['id'], response)
-          responseid = "\"" + response['handle']['id'] + "\"" 
-          while True:
-            resp2 = self.c.post('/jobbrowser/api/job/workflows', {"interface": '"workflows"', "app_id": responseid}) #error here
-            response2 = json.loads(resp2.content)
-            if response2["app"]['status'] != "RUNNING" :
-                assert_equal(response2["app"]["status"] , "SUCCEEDED", response2)
-                break 
-            sleep(3)
+        resp = self.c.post('/filebrowser/compress_files', {'upload_path': prefix, 'files[]': [temp_directories], 'archive_name': 'test_compress.zip'})
+        response = json.loads(resp.content)
+        assert_equal(0, response['status'], response)
+        assert_true('handle' in response and response['handle']['id'], response)
+        responseid = '"' + response['handle']['id'] + '"' 
+        while True:
+          resp2 = self.c.post('/jobbrowser/api/job/workflows', {'interface': '"workflows"', 'app_id': responseid}) #error here
+          response2 = json.loads(resp2.content)
+          if response2['app']['status'] != 'RUNNING':
+            assert_equal(response2['app']['status'] , 'SUCCEEDED', response2)
+            break 
+          sleep(3)
     finally:
       ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(False)
       cleanup_tree(self.cluster, prefix)
