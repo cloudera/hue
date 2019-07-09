@@ -20,6 +20,7 @@ import os
 
 from azure import conf
 from azure.adls.webhdfs import WebHdfs
+from azure.abfs.abfs import ABFS
 from azure.active_directory import ActiveDirectory
 
 LOG = logging.getLogger(__name__)
@@ -33,6 +34,13 @@ def get_client(identifier='default'):
     raise ValueError('Unknown azure client: %s, check your configuration' % identifier)
   return CLIENT_CACHE["adls"][identifier]
 
+def get_client_abfs(identifier='default'):
+  global CLIENT_CACHE
+  _init_clients()
+  if identifier not in CLIENT_CACHE["abfs"]:
+    raise ValueError('Unknown azure client: %s, check your configuration' % identifier)
+  return CLIENT_CACHE["abfs"][identifier]
+
 def _init_clients():
   global CLIENT_CACHE
   if CLIENT_CACHE is not None:
@@ -40,16 +48,25 @@ def _init_clients():
   CLIENT_CACHE = {}
   CLIENT_CACHE["azure"] = {}
   CLIENT_CACHE["adls"] = {}
+  CLIENT_CACHE["abfs"] = {}
   for identifier in conf.AZURE_ACCOUNTS.keys():
     CLIENT_CACHE["azure"][identifier] = _make_azure_client(identifier)
 
   for identifier in conf.ADLS_CLUSTERS.keys():
     CLIENT_CACHE["adls"][identifier] = _make_adls_client(identifier)
 
+  for identifier in conf.ABFS_CLUSTERS.keys():
+    CLIENT_CACHE["abfs"][identifier] = _make_abfs_client(identifier)
+
 def _make_adls_client(identifier):
   client_conf = conf.ADLS_CLUSTERS[identifier]
   azure_client = CLIENT_CACHE["azure"][identifier]
   return WebHdfs.from_config(client_conf, azure_client)
+
+def _make_abfs_client(identifier):
+  client_conf = conf.ABFS_CLUSTERS[identifier]
+  azure_client = CLIENT_CACHE["azure"][identifier]
+  return ABFS.from_config(client_conf, azure_client)
 
 def _make_azure_client(identifier):
   client_conf = conf.AZURE_ACCOUNTS[identifier]
