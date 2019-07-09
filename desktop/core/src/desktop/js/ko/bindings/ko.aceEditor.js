@@ -838,12 +838,7 @@ ko.bindingHandlers.aceEditor = {
         window.clearTimeout(autocompleteThrottle);
         autocompleteThrottle = window.setTimeout(() => {
           const textBeforeCursor = editor.getTextBeforeCursor();
-          let questionMarkMatch;
-          if ($('.hue-ace-autocompleter').length > 0) {
-            questionMarkMatch = textBeforeCursor.match(/select\s+(\? from \S+[^.]\s$)/i);
-          } else {
-            questionMarkMatch = textBeforeCursor.match(/select\s+(\? from \S+[^.]$)/i);
-          }
+          const questionMarkMatch = textBeforeCursor.match(/select\s+(\? from \S+[^.]\s*$)/i);
           if (questionMarkMatch && $('.ace_autocomplete:visible').length === 0) {
             editor.moveCursorTo(
               editor.getCursorPosition().row,

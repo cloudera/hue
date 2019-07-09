@@ -68,7 +68,6 @@ import EditorViewModel from 'apps/notebook/editorViewModel'; // In history, inde
 import EditorViewModel2 from 'apps/notebook2/editorViewModel'; // In history, indexer, importer, editor etc.
 import HdfsAutocompleter from 'utils/hdfsAutocompleter';
 import SqlAutocompleter from 'sql/sqlAutocompleter';
-import sqlAutocompleteParser from 'parse/sqlAutocompleteParser'; // Notebook and used throughout via hue-simple-ace-editor ko component
 import sqlStatementsParser from 'parse/sqlStatementsParser'; // In search.ko and notebook.ko
 import HueFileEntry from 'doc/hueFileEntry';
 import HueDocument from 'doc/hueDocument';
@@ -110,7 +109,6 @@ window.page = page;
 window.PigFunctions = PigFunctions;
 window.qq = qq;
 window.sprintf = sprintf;
-window.sqlAutocompleteParser = sqlAutocompleteParser;
 window.SqlAutocompleter = SqlAutocompleter;
 window.SqlFunctions = SqlFunctions;
 window.SqlSetOptions = SqlSetOptions;

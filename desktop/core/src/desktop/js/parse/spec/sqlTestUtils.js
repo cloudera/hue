@@ -14,8 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import sqlAutocompleteParser from 'parse/sqlAutocompleteParser';
-
 // Needed to compare by val without taking attr order into account
 const resultEquals = function(a, b) {
   if (typeof a !== typeof b) {
@@ -289,45 +287,6 @@ const testUtils = {
           };
         }
       };
-    }
-  },
-
-  assertAutocomplete: function(testDefinition) {
-    const debug = false;
-    if (typeof testDefinition.dialect === 'undefined') {
-      expect(
-        sqlAutocompleteParser.parseSql(
-          testDefinition.beforeCursor,
-          testDefinition.afterCursor,
-          undefined,
-          debug
-        )
-      ).toEqualDefinition(testDefinition);
-      expect(
-        sqlAutocompleteParser.parseSql(
-          testDefinition.beforeCursor,
-          testDefinition.afterCursor,
-          'hive',
-          debug
-        )
-      ).toEqualDefinition(testDefinition);
-      expect(
-        sqlAutocompleteParser.parseSql(
-          testDefinition.beforeCursor,
-          testDefinition.afterCursor,
-          'impala',
-          debug
-        )
-      ).toEqualDefinition(testDefinition);
-    } else {
-      expect(
-        sqlAutocompleteParser.parseSql(
-          testDefinition.beforeCursor,
-          testDefinition.afterCursor,
-          testDefinition.dialect,
-          debug
-        )
-      ).toEqualDefinition(testDefinition);
     }
   }
 };
