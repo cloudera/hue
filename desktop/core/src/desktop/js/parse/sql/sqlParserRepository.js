@@ -39,13 +39,10 @@ class SqlParserRepository {
     if (!this.modulePromises[sourceType + parserType]) {
       const modules = parserType === 'Autocomplete' ? AUTOCOMPLETE_MODULES : SYNTAX_MODULES;
       this.modulePromises[sourceType + parserType] = new Promise((resolve, reject) => {
-        if (modules[sourceType]) {
-          modules[sourceType]()
-            .then(module => resolve(module.default))
-            .catch(reject);
-        } else {
-          reject('No ' + parserType.toLowerCase() + ' parser found for "' + sourceType + '"');
-        }
+        const targetModule = modules[sourceType] || modules.generic;
+        targetModule()
+          .then(module => resolve(module.default))
+          .catch(reject);
       });
     }
     return this.modulePromises[sourceType + 'Autocomplete'];
