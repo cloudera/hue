@@ -148,6 +148,9 @@ Support is native via a dedicated section.
 
 Read more about [LDAP or PAM pass-through authentication](http://gethue.com/ldap-or-pam-pass-through-authentication-with-hive-or-impala/) and [High Availability](../external/).
 
+
+**Note** For historical reason, the name of the configuration section is `[beeswax]`.
+
 **Tez**
 
 Requires support for sending multiple queries when using Tez (instead of a maximum of just one at the time). You can turn it on with this setting:
@@ -155,8 +158,43 @@ Requires support for sending multiple queries when using Tez (instead of a maxim
     [beeswax]
     max_number_of_sessions=10
 
-**Note** For historical reason, the name of the configuration section is `[beeswax]`.
+**LLAP**
 
+When the LLAP interpreter is added, there are 2 ways to enable connectivity (direct configuration or service discovery). LLAP is added by enabling the following settings:
+
+    [notebook]
+        [[interpreters]]
+            [[[llap]]]
+               name=LLAP
+               interface=hiveserver2
+
+    [beeswax]
+        # Direct Configuration
+        llap_server_host = localhost
+        llap_server_port = 10500
+        llap_server_thrift_port = 10501
+
+        # or Service Discovery
+        ## hive_discovery_llap = true
+        ## hive_discovery_llap_ha = false
+        # Shortcuts to finding LLAP znode Key
+        # Non-HA - hiveserver-interactive-site - hive.server2.zookeeper.namespace ex hive2 = /hive2
+        # HA-NonKerberized - <llap_app_name>_llap ex app name llap0 = /llap0_llap
+        # HA-Kerberized - <llap_app_name>_llap-sasl ex app name llap0 = /llap0_llap-sasl
+        ## hive_discovery_llap_znode = /hiveserver2-hive2
+
+**Service Discovery**
+
+When setup, Hue will query zookeeper to find an enabled hiveserver2 or LLAP endpoint.
+
+        [beeswax]
+            hive_discovery_llap = true
+            hive_discovery_hs2 = true
+
+In order to prevent spamming zookeeper, HiveServer2 is cached for the life of the process and llap is cached based on the following setting:
+
+        [beeswax]
+            cache_timeout = 60
 
 ### MySQL
 
