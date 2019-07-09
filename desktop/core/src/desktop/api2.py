@@ -152,7 +152,8 @@ def get_context_computes(request, interface):
       'name': cluster['name'],
       'namespace': cluster['id'],
       'interface': interface,
-      'type': cluster['type']
+      'type': cluster['type'],
+      'options': {}
     } for cluster in clusters if cluster.get('type') == 'direct'
   ])
 
@@ -161,16 +162,16 @@ def get_context_computes(request, interface):
     if interpreter['dialect'] == 'impala':
       # dw_clusters = DataWarehouse2Api(request.user).list_clusters()['clusters']
       dw_clusters = [
-        {'crn': 'c1', 'clusterName': 'c1', 'status': 'created', 'endpoint': 'c1.gethue.com:10000'},
-        {'crn': 'c2', 'clusterName': 'c2', 'status': 'created', 'endpoint': 'c2.gethue.com:10000'},
+        {'crn': 'c1', 'clusterName': 'c1', 'status': 'created', 'options': {'server_host': 'c1.gethue.com', 'server_port': 10000}},
+        {'crn': 'c2', 'clusterName': 'c2', 'status': 'created', 'options': {'server_host': 'c2.gethue.com', 'server_port': 10000}},
       ]
       computes.extend([{
           'id': cluster.get('crn'),
           'name': cluster.get('clusterName'),
           'status': cluster.get('status'),
           'namespace': cluster.get('namespaceCrn', cluster.get('crn')),
-          'compute_end_point': IS_K8S_ONLY.get() and '%(publicHost)s' % cluster['coordinatorEndpoint'] or '',
-          'type': 'altus-dw'
+          'type': interpreter['dialect'],
+          'options': cluster['options'],
         } for cluster in dw_clusters]
       )
 
