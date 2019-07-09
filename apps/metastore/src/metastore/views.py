@@ -15,9 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 import json
 import logging
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django.db.models import Q
 from django.urls import reverse
@@ -130,7 +133,7 @@ def drop_database(request):
         query_history = db.drop_databases(databases, design)
         url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + '?on_success_url=' + reverse('metastore:databases')
         return redirect(url)
-    except Exception, ex:
+    except Exception as ex:
       error_message, log = dbms.expand_exception(ex, db)
       error = _("Failed to remove %(databases)s.  Error: %(error)s") % {'databases': ','.join(databases), 'error': error_message}
       raise PopupException(error, title=_("DB Error"), detail=log)
@@ -162,7 +165,7 @@ def alter_database(request, database):
     db_metadata['hdfs_link'] = location_to_url(db_metadata['location'])
     response['status'] = 0
     response['data'] = db_metadata
-  except Exception, ex:
+  except Exception as ex:
     response['status'] = 1
     response['data'] = _("Failed to alter database `%s`: %s") % (database, ex)
 
@@ -188,7 +191,7 @@ def get_database_metadata(request, database):
       db_metadata['parameters'] = ''
     db_metadata['hdfs_link'] = location_to_url(db_metadata['location'])
     response['data'] = db_metadata
-  except Exception, ex:
+  except Exception as ex:
     response['status'] = 1
     response['data'] = _("Cannot get metadata for database %s: %s") % (database, ex)
 
@@ -206,7 +209,7 @@ def table_queries(request, database, table):
     ]
     response['status'] = 0
     response['queries'] = queries
-  except Exception, ex:
+  except Exception as ex:
     response['status'] = 1
     response['data'] = _("Cannot get queries related to table %s.%s: %s") % (database, table, ex)
 
@@ -242,7 +245,7 @@ def show_tables(request, database=None):
 
       tables = db.get_tables_meta(database=database, table_names=search_filter) # SparkSql returns []
       table_names = [table['name'] for table in tables]
-    except Exception, e:
+    except Exception as e:
       raise PopupException(_('Failed to retrieve tables for database: %s' % database), detail=e)
 
     resp = JsonResponse({
@@ -302,7 +305,7 @@ def describe_table(request, database, table):
 
   try:
     table = db.get_table(database, table)
-  except Exception, e:
+  except Exception as e:
     LOG.exception("Describe table error")
     raise PopupException(_("DB Error"), detail=e.message if hasattr(e, 'message') and e.message else e)
 
@@ -382,7 +385,7 @@ def alter_table(request, database, table):
       'location': table_obj.path_location,
       'properties': table_obj.properties
     }
-  except Exception, ex:
+  except Exception as ex:
     response['status'] = 1
     response['data'] = _("Failed to alter table `%s`.`%s`: %s") % (database, table, str(ex))
 
@@ -422,7 +425,7 @@ def alter_column(request, database, table):
       }
     else:
       raise PopupException(_('Column `%s`.`%s` `%s` not found') % (database, table, column))
-  except Exception, ex:
+  except Exception as ex:
     response['status'] = 1
     response['message'] = _("Failed to alter column `%s`.`%s` `%s`: %s") % (database, table, column, str(ex))
 
@@ -466,7 +469,7 @@ def drop_table(request, database):
         query_history = db.drop_tables(database, tables_objects, design, skip_trash=skip_trash)
         url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + '?on_success_url=' + reverse('metastore:show_tables', kwargs={'database': database})
         return redirect(url)
-    except Exception, ex:
+    except Exception as ex:
       error_message, log = dbms.expand_exception(ex, db)
       error = _("Failed to remove %(tables)s.  Error: %(error)s") % {'tables': ','.join(tables), 'error': error_message}
       raise PopupException(error, title=_("DB Error"), detail=log)
@@ -486,7 +489,7 @@ def read_table(request, database, table):
     query_history = db.select_star_from(database, table)
     url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + '?on_success_url=&context=table:%s:%s' % (table.name, database)
     return redirect(url)
-  except Exception, e:
+  except Exception as e:
     raise PopupException(_('Cannot read table'), detail=e)
 
 @check_has_write_access_permission
@@ -511,7 +514,7 @@ def load_table(request, database, table):
         form_data = {
           'path': load_form.cleaned_data['path'],
           'overwrite': load_form.cleaned_data['overwrite'],
-          'partition_columns': [(column_name, load_form.cleaned_data[key]) for key, column_name in load_form.partition_columns.iteritems()],
+          'partition_columns': [(column_name, load_form.cleaned_data[key]) for key, column_name in load_form.partition_columns.items()],
         }
         query_history = db.load_data(database, table.name, form_data, design, generate_ddl_only=generate_ddl_only)
         if generate_ddl_only:
@@ -532,10 +535,10 @@ def load_table(request, database, table):
           response['status'] = 0
           response['data'] = url
           response['query_history_id'] = query_history.id
-      except QueryError, ex:
+      except QueryError as ex:
         response['status'] = 1
         response['data'] = _("Can't load the data: ") + ex.message
-      except Exception, e:
+      except Exception as e:
         response['status'] = 1
         response['data'] = _("Can't load the data: ") + str(e)
   else:
@@ -570,7 +573,7 @@ def describe_partitions(request, database, table):
     for part in table_obj.partition_keys:
       if request.GET.get(part.name):
         partition_filters[part.name] = request.GET.get(part.name)
-    partition_spec = ','.join(["%s='%s'" % (k, v) for k, v in partition_filters.items()])
+    partition_spec = ','.join(["%s='%s'" % (k, v) for k, v in list(partition_filters.items())])
   else:
     partition_spec = ''
 
@@ -624,17 +627,17 @@ def _massage_partition(database, table, partition):
     'readUrl': reverse('metastore:read_partition', kwargs={
         'database': database,
         'table': table.name,
-        'partition_spec': urllib.quote(partition.partition_spec)
+        'partition_spec': urllib.parse.quote(partition.partition_spec)
     }),
     'browseUrl': reverse('metastore:browse_partition', kwargs={
         'database': database,
         'table': table.name,
-        'partition_spec': urllib.quote(partition.partition_spec)
+        'partition_spec': urllib.parse.quote(partition.partition_spec)
     }),
    'notebookUrl': reverse('notebook:browse', kwargs={
         'database': database,
         'table': table.name,
-        'partition_spec': urllib.quote(partition.partition_spec)
+        'partition_spec': urllib.parse.quote(partition.partition_spec)
     })
   }
 
@@ -644,14 +647,14 @@ def browse_partition(request, database, table, partition_spec):
 
   db = _get_db(user=request.user, cluster=cluster)
   try:
-    decoded_spec = urllib.unquote(partition_spec)
+    decoded_spec = urllib.parse.unquote(partition_spec)
     partition_table = db.describe_partition(database, table, decoded_spec)
     uri_path = location_to_url(partition_table.path_location)
     if request.GET.get("format", "html") == "json":
       return JsonResponse({'uri_path': uri_path})
     else:
       return redirect(uri_path)
-  except Exception, e:
+  except Exception as e:
     raise PopupException(_('Cannot browse partition'), detail=e.message)
 
 
@@ -661,11 +664,11 @@ def read_partition(request, database, table, partition_spec):
 
   db = dbms.get(request.user, cluster=cluster)
   try:
-    decoded_spec = urllib.unquote(partition_spec)
+    decoded_spec = urllib.parse.unquote(partition_spec)
     query = db.get_partition(database, table, decoded_spec)
     url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query.id}) + '?on_success_url=&context=table:%s:%s' % (table, database)
     return redirect(url)
-  except Exception, e:
+  except Exception as e:
     raise PopupException(_('Cannot read partition'), detail=e.message)
 
 
@@ -701,7 +704,7 @@ def drop_partition(request, database, table):
         url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + '?on_success_url=' + \
               reverse('metastore:describe_partitions', kwargs={'database': database, 'table': table})
         return redirect(url)
-    except Exception, ex:
+    except Exception as ex:
       error_message, log = dbms.expand_exception(ex, db)
       error = _("Failed to remove %(partition)s.  Error: %(error)s") % {'partition': '\n'.join(partition_specs), 'error': error_message}
       raise PopupException(error, title=_("DB Error"), detail=log)
