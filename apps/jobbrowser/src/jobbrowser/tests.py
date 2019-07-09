@@ -16,6 +16,8 @@
 # limitations under the License.
 
 
+from builtins import range
+from builtins import object
 import json
 import logging
 import re
@@ -51,7 +53,7 @@ LOG = logging.getLogger(__name__)
 _INITIALIZED = False
 
 
-class TestBrowser():
+class TestBrowser(object):
 
   def test_format_counter_name(self):
     assert_equal("Foo Bar", views.format_counter_name("fooBar"))
@@ -154,7 +156,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
 
     cls.client.post(reverse('oozie:install_examples'))
     cls.cluster.fs.do_as_user(cls.username, cls.cluster.fs.create_home_dir, cls.home_dir)
-    cls.cluster.fs.do_as_superuser(cls.cluster.fs.chmod, cls.home_dir, 0777, True)
+    cls.cluster.fs.do_as_superuser(cls.cluster.fs.chmod, cls.home_dir, 0o777, True)
 
     _INITIALIZED = True
 
@@ -358,7 +360,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     assert_true(log_length > 0, 'Log Length is 0, expected content in syslog.')
 
 
-class TestMapReduce2NoHadoop:
+class TestMapReduce2NoHadoop(object):
 
   def setUp(self):
     # Beware: Monkey patching
@@ -491,7 +493,7 @@ class TestMapReduce2NoHadoop:
 
 
 
-class TestResourceManagerHaNoHadoop:
+class TestResourceManagerHaNoHadoop(object):
 
   def setUp(self):
     # Beware: Monkey patching
@@ -605,14 +607,14 @@ class TestImpalaApi(object):
     response = self.api.apps({})
     target = [{'status': u'FINISHED', 'rows_fetched': 28, 'user': u'admin', 'canWrite': False, 'duration': 3355000.0, 'id': u'8a46a8865624698f:b80b211500000000', 'apiStatus': 'SUCCEEDED', 'name': u'SELECT sample_07.description, sample_07.salary FROM   sample...', 'submitted': u'2017-10-25 15:38:26.637010000', 'queue': u'root.admin', 'waiting': True, 'progress': u'1 / 1 ( 100%)', 'type': u'QUERY', 'waiting_time': u'52m8s'}, {'status': u'FINISHED', 'rows_fetched': 53, 'user': u'admin', 'canWrite': False, 'duration': 3369000.0, 'id': u'4d497267f34ff17d:817bdfb500000000', 'apiStatus': 'SUCCEEDED', 'name': u'select * from customers', 'submitted': u'2017-10-25 15:38:12.872825000', 'queue': u'root.admin', 'waiting': True, 'progress': u'2 / 3 (66.6667%)', 'type': u'QUERY', 'waiting_time': u'52m8s'}]
     for i in range(0,len(target)):
-      for key, value in target[i].iteritems():
+      for key, value in target[i].items():
         assert_equal(response.get('apps')[i].get(key), value)
 
   def test_app(self):
     response = self.api.app('4d497267f34ff17d:817bdfb500000000')
     for key, value in {'status': u'FINISHED', 'name': u'select * from customers',
       'duration': 3369000.0, 'progress': 66.6667, 'user': u'admin', 'type': 'queries',
-      'id': '4d497267f34ff17d:817bdfb500000000', 'submitted': u'2017-10-25 15:38:12.872825000', 'apiStatus': 'SUCCEEDED', 'doc_url': 'http://url.com/query_plan?query_id=4d497267f34ff17d:817bdfb500000000'}.iteritems():
+      'id': '4d497267f34ff17d:817bdfb500000000', 'submitted': u'2017-10-25 15:38:12.872825000', 'apiStatus': 'SUCCEEDED', 'doc_url': 'http://url.com/query_plan?query_id=4d497267f34ff17d:817bdfb500000000'}.items():
       assert_equal(response.get(key), value)
 
     response = self.api.app('8a46a8865624698f:b80b211500000000')
@@ -620,7 +622,7 @@ class TestImpalaApi(object):
     for key, value in {'status': u'FINISHED',
       'name': u'SELECT sample_07.description, sample_07.salary FROM   sample...', 'duration': 3355000.0, 'progress': 100.0, 'user': u'admin',
       'type': 'queries', 'id': '8a46a8865624698f:b80b211500000000', 'submitted': u'2017-10-25 15:38:26.637010000',
-      'apiStatus': 'SUCCEEDED', 'doc_url': 'http://url.com/query_plan?query_id=8a46a8865624698f:b80b211500000000'}.iteritems():
+      'apiStatus': 'SUCCEEDED', 'doc_url': 'http://url.com/query_plan?query_id=8a46a8865624698f:b80b211500000000'}.items():
       assert_equal(response.get(key), value)
 
 
@@ -671,7 +673,7 @@ class TestSparkNoHadoop(object):
     assert_equal(response_log['logs']['logs'], 'dummy_logs')
 
 
-class MockYarnApi:
+class MockYarnApi(object):
   def __init__(self, user, jt=None):
     self.user = user
 
@@ -742,7 +744,7 @@ class HistoryServerHaApi(object):
   def __init__(self, username): pass
 
 
-class MockResourceManagerApi:
+class MockResourceManagerApi(object):
   APPS = {
     'application_1356251510842_0054': {
         u'finishedTime': 1356961070119,
@@ -866,7 +868,7 @@ class MockResourceManagerApi:
       u'app': MockResourceManagerApi.APPS[job_id]
     }
 
-class MockImpalaQueryApi:
+class MockImpalaQueryApi(object):
   APPS = {
     '8a46a8865624698f:b80b211500000000': {u'stmt_type': u'QUERY', u'resource_pool': u'root.admin', u'waiting': True, u'last_event': u'Unregister query', u'start_time': u'2017-10-25 15:38:26.637010000', u'rows_fetched': 28, u'stmt': u'SELECT sample_07.description, sample_07.salary\r\nFROM\r\n  sample_07\r\nWHERE\r\n( sample_07.salary > 100000)\r\nORDER BY sample_07.salary DESC\r\nLIMIT 1000', u'executing': False, u'state': u'FINISHED', u'query_id': u'8a46a8865624698f:b80b211500000000', u'end_time': u'2017-10-25 16:34:22.592036000', u'duration': u'55m55s', u'progress': u'1 / 1 ( 100%)', u'effective_user': u'admin', u'default_db': u'default', u'waiting_time': u'52m8s'},
     '4d497267f34ff17d:817bdfb500000000': {u'stmt_type': u'QUERY', u'resource_pool': u'root.admin', u'waiting': True, u'last_event': u'Unregister query', u'start_time': u'2017-10-25 15:38:12.872825000', u'rows_fetched': 53, u'stmt': u'select * from customers', u'executing': False, u'state': u'FINISHED', u'query_id': u'4d497267f34ff17d:817bdfb500000000', u'end_time': u'2017-10-25 16:34:22.589811000', u'duration': u'56m9s', u'progress': u'2 / 3 (66.6667%)', u'effective_user': u'admin', u'default_db': u'default', u'waiting_time': u'52m8s'}
