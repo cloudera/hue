@@ -110,7 +110,7 @@ class ImpalaDbms(HiveServer2Dbms):
           raise PopupException(_("Hive and HMS not configured. Please do a full refresh"))
         diff_tables = self._get_different_tables(database)
         if len(diff_tables) > 10:
-          raise PopupException(_("Too many tables (%s) to invalidate. Please do a full refresh") % str(len(diff_tables)))
+          raise PopupException(_("Too many tables (%d) to invalidate. Please do a full refresh") % len(diff_tables))
         else:
           for table in diff_tables:
             hql = "INVALIDATE METADATA `%s`.`%s`" % (database, table)
@@ -182,8 +182,7 @@ class ImpalaDbms(HiveServer2Dbms):
 
 
   def _get_beeswax_tables(self, database):
-    interpreters = ['beeswax' if interpreter == 'hive' else interpreter for interpreter in Cluster(self.client.user).get_app_config().get_hive_metastore_interpreters()]
-    beeswax_query_server = dbms.get(user=self.client.user, query_server=beeswax_query_server_config(name=interpreters[0]))
+    beeswax_query_server = dbms.get(user=self.client.user, query_server=beeswax_query_server_config(name=Cluster(self.client.user).get_app_config().get_hive_metastore_interpreters()[0]))
     return beeswax_query_server.get_tables(database=database)
 
 

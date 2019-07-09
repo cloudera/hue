@@ -1927,7 +1927,7 @@ class ClusterConfig():
       return None
 
   def get_hive_metastore_interpreters(self):
-    return list(filter(lambda interpreter: interpreter == 'hive' or interpreter == 'hms', [interpreter['type'] for interpreter in get_ordered_interpreters(self.user)]))
+    return [interpreter['type'] for interpreter in get_ordered_interpreters(self.user) if interpreter == 'hive' or interpreter == 'hms']
 
 class Cluster():
 
