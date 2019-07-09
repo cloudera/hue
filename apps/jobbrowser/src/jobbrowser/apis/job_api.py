@@ -38,7 +38,7 @@ try:
   from jobbrowser.apis.base_api import Api, MockDjangoRequest, _extract_query_params
   from jobbrowser.views import job_attempt_logs_json, kill_job, massage_job_for_json
   from jobbrowser.yarn_models import Application
-except Exception, e:
+except Exception as e:
   LOG.exception('Some application are not enabled: %s' % e)
 
 
@@ -130,15 +130,15 @@ class YarnApi(Api):
   def app(self, appid):
     try:
       job = NativeYarnApi(self.user).get_job(jobid=appid)
-    except ApplicationNotRunning, e:
+    except ApplicationNotRunning as e:
       if e.job.get('state', '').lower() == 'accepted':
         rm_api = resource_manager_api.get_resource_manager(self.user)
         job = Application(e.job, rm_api)
       else:
         raise e  # Job has not yet been accepted by RM
-    except JobExpired, e:
+    except JobExpired as e:
       raise PopupException(_('Job %s has expired.') % appid, detail=_('Cannot be found on the History Server.'))
-    except Exception, e:
+    except Exception as e:
       msg = 'Could not find job %s.'
       LOG.exception(msg % appid)
       raise PopupException(_(msg) % appid, detail=e)
@@ -186,7 +186,7 @@ class YarnApi(Api):
       app['trackingUrl'] = job.trackingUrl if hasattr(job, 'trackingUrl') else ''
       common['type'] = 'SPARK'
       common['properties'] = {
-        'metadata': [{'name': name, 'value': value} for name, value in app.iteritems() if name != "url" and name != "killUrl"],
+        'metadata': [{'name': name, 'value': value} for name, value in app.items() if name != "url" and name != "killUrl"],
         'executors': []
       }
       if hasattr(job, 'metrics'):
@@ -242,7 +242,7 @@ class YarnApi(Api):
         logs = json.loads(response.content).get('log')
       else:
         logs = None
-    except PopupException, e:
+    except PopupException as e:
       LOG.warn('No task attempt found for logs: %s' % smart_str(e))
     return {'logs': logs, 'logsList': logs_list}
 
@@ -339,8 +339,8 @@ class YarnAttemptApi(Api):
         'containerId' : task.containerId if hasattr(task, 'containerId') else '',
         'diagnostics': task.diagnostics if hasattr(task, 'diagnostics') else '',
         "startTimeFormatted" : task.startTimeFormatted if hasattr(task, 'startTimeFormatted') else '',
-        "startTime" : long(task.startTime) if hasattr(task, 'startTime') else '',
-        "finishTime" : long(task.finishedTime) if hasattr(task, 'finishedTime') else '',
+        "startTime" : int(task.startTime) if hasattr(task, 'startTime') else '',
+        "finishTime" : int(task.finishedTime) if hasattr(task, 'finishedTime') else '',
         "finishTimeFormatted" : task.finishTimeFormatted if hasattr(task, 'finishTimeFormatted') else '',
         "type" : task.type + '_ATTEMPT' if hasattr(task, 'type') else '',
         'nodesBlacklistedBySystem': task.nodesBlacklistedBySystem if hasattr(task, 'nodesBlacklistedBySystem') else '',
@@ -417,7 +417,7 @@ class YarnMapReduceTaskApi(Api):
     try:
       response = job_attempt_logs_json(MockDjangoRequest(self.user), job=self.app_id, name=log_name, is_embeddable=is_embeddable)
       logs = json.loads(response.content)['log']
-    except PopupException, e:
+    except PopupException as e:
       LOG.warn('No task attempt found for default logs: %s' % e)
       logs = ''
     return {'progress': 0, 'logs': logs}
@@ -530,7 +530,7 @@ class YarnMapReduceTaskAttemptApi(Api):
         "type" : task.type + '_ATTEMPT' if hasattr(task, 'type') else '',
         "startTime" : task.startTime if hasattr(task, 'startTime') else '',
         "id" : task.id if hasattr(task, 'id') else task.appAttemptId if hasattr(task, 'appAttemptId') else '',
-        "finishTime" : task.finishTime if hasattr(task, 'finishTime') else long(task.finishedTime) if hasattr(task, 'finishedTime') else '',
+        "finishTime" : task.finishTime if hasattr(task, 'finishTime') else int(task.finishedTime) if hasattr(task, 'finishedTime') else '',
         "app_id": self.app_id,
         "task_id": self.task_id,
         'apiStatus': self._api_status(task.state) if hasattr(task, 'state') else self._api_status(task.appAttemptState) if hasattr(task, 'appAttemptState') else '',

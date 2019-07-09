@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 import json
 
@@ -33,7 +34,7 @@ LOG = logging.getLogger(__name__)
 try:
   from oozie.conf import OOZIE_JOBS_COUNT
   from oozie.views.dashboard import list_oozie_coordinator, get_oozie_job_log, massaged_oozie_jobs_for_json, has_job_edition_permission
-except Exception, e:
+except Exception as e:
   LOG.warn('Some application are not enabled: %s' % e)
 
 
@@ -162,7 +163,7 @@ class ScheduleApi(Api):
     return self._TASK_API_STATUSES.get(status, 'FAILED')
 
 
-class MockGet():
+class MockGet(object):
   def __ini__(self, statuses):
     self.statuses = []
 
