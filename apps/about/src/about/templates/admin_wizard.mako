@@ -51,7 +51,7 @@ ${ layout.menubar(section='quick_start') }
            <div class="span2">
             <ul class="nav nav-pills nav-vertical-pills">
               <li class="active"><a href="#step1" class="step">${ _('Step 1:') } <i class="fa fa-cogs"></i> ${ _('Check Configuration') }</a></li>
-              <li><a href="#step2" class="step">${ _('Step 1:') } <i class="fa fa-exchange"></i> ${ _('Connectors') }</a></li>
+              <li><a href="#step2" class="step">${ _('Step 2:') } <i class="fa fa-exchange"></i> ${ _('Connectors') }</a></li>
               <li><a href="#step3" class="step">${ _('Step 3:') } <i class="fa fa-book"></i> ${ _('Examples') }</a></li>
               <li><a id="lastStep" href="#step4" class="step">${ _('Step 4:') } <i class="fa fa-group"></i> ${ _('Users') }</a></li>
             </ul>
