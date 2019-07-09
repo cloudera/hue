@@ -36,6 +36,7 @@ import urllib.parse
 from time import sleep, time
 
 from avro import schema, datafile, io
+from time import sleep
 
 from aws.s3.s3fs import S3FileSystemException
 from aws.s3.s3test_utils import get_test_bucket
@@ -1031,29 +1032,46 @@ alert("XSS")
 
     USER_NAME = 'test'
     HDFS_DEST_DIR = prefix + "/fb-upload-test"
-    TGZ_FILE = os.path.realpath('apps/filebrowser/src/filebrowser/test_data/test.tar.gz')
-    HDFS_TGZ_FILE = HDFS_DEST_DIR + '/test.tar.gz'
-
+    FILE_NAMES = ['test.tar.gz', 'test2.tar.gz','test3.tar.gz','test4.tar.gz',]
+    TGZ_FILES = [os.path.realpath('apps/filebrowser/src/filebrowser/test_data/' + file_name) for file_name in FILE_NAMES ]
+    HDFS_TGZ_FILES = [HDFS_DEST_DIR + '/' + file_name for file_name in FILE_NAMES]
+      
     self.cluster.fs.mkdir(HDFS_DEST_DIR)
     self.cluster.fs.chown(HDFS_DEST_DIR, USER_NAME)
-    self.cluster.fs.chmod(HDFS_DEST_DIR, 0o700)
+
+    self.cluster.fs.chmod(HDFS_DEST_DIR, 0733)# last number is either 5,3, or 1
+
 
     try:
       # Upload archive
-      resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=file(TGZ_FILE)))
-      response = json.loads(resp.content)
-      assert_equal(0, response['status'], response)
-      assert_true(self.cluster.fs.exists(HDFS_TGZ_FILE))
+      responseid = ['', '', '' , '']
+      for i in range(0,4):
+        resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
+                           dict(dest=HDFS_DEST_DIR, hdfs_file=file(TGZ_FILES[i])))
+        response = json.loads(resp.content)
+        assert_equal(0, response['status'], response)
+        assert_true(self.cluster.fs.exists(HDFS_TGZ_FILES[i]))
 
-      resp = self.c.post('/filebrowser/extract_archive',
-                         dict(upload_path=HDFS_DEST_DIR, archive_name='test.tar.gz'))
-      response = json.loads(resp.content)
-      assert_equal(0, response['status'], response)
-      assert_true('handle' in response and response['handle']['id'], response)
-
+        resp = self.c.post('/filebrowser/extract_archive',
+                           dict(upload_path=HDFS_DEST_DIR, archive_name=FILE_NAMES[i]))
+        response = json.loads(resp.content)
+        assert_equal(0, response['status'], response)
+        assert_true('handle' in response and response['handle']['id'], response)
+        responseid[i] = '"' + response['handle']['id'] + '"' 
+      
+      for r in responseid:
+        while True:
+          resp2 = self.c.post('/jobbrowser/api/job/workflows', {'interface': '"workflows"', 'app_id': r})
+          response2 = json.loads(resp2.content)
+          if response2['app']['status'] != 'RUNNING':
+            assert_equal(response2['app']['status'] , 'SUCCEEDED', response2)
+            break 
+          sleep(2)
     finally:
-      cleanup_file(self.cluster, HDFS_TGZ_FILE)
+      ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(False)
+      for f in HDFS_TGZ_FILES:
+        cleanup_file(self.cluster, f)
+      cleanup_tree(self.cluster, prefix)
 
 
   def test_extract_bz2(self):
