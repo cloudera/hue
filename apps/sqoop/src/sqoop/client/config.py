@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from past.builtins import basestring
+from builtins import object
 import logging
 
 from desktop.lib.python_util import force_dict_to_strings

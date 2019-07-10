@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
 import json
 import logging
 
@@ -24,12 +25,12 @@ from django.views.decorators.cache import never_cache
 
 from sqoop import client, conf
 from sqoop.client.exception import SqoopException
-from decorators import get_job_or_exception
+from sqoop.api.decorators import get_job_or_exception
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
-from exception import handle_rest_exception
-from utils import list_to_dict
+from sqoop.api.exception import handle_rest_exception
+from sqoop.api.utils import list_to_dict
 
 
 __all__ = ['get_jobs', 'create_job', 'update_job', 'job', 'jobs', 'job_clone', 'job_delete', 'job_start', 'job_stop', 'job_status']
@@ -48,7 +49,7 @@ def get_jobs(request):
     c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
     jobs = c.get_jobs()
     response['jobs'] = list_to_dict(jobs)
-  except RestException, e:
+  except RestException as e:
     response.update(handle_rest_exception(e, _('Could not get jobs.')))
   return JsonResponse(response)
 
@@ -72,9 +73,9 @@ def create_job(request):
   try:
     c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
     response['job'] = c.create_job(job).to_dict()
-  except RestException, e:
+  except RestException as e:
     response.update(handle_rest_exception(e, _('Could not create job.')))
-  except SqoopException, e:
+  except SqoopException as e:
     response['status'] = 100
     response['errors'] = e.to_dict()
   return JsonResponse(response)
@@ -98,9 +99,9 @@ def update_job(request, job):
   try:
     c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
     response['job'] = c.update_job(job).to_dict()
-  except RestException, e:
+  except RestException as e:
     response.update(handle_rest_exception(e, _('Could not update job.')))
-  except SqoopException, e:
+  except SqoopException as e:
     response['status'] = 100
     response['errors'] = e.to_dict()
   return JsonResponse(response)
@@ -147,9 +148,9 @@ def job_clone(request, job):
   try:
     c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
     response['job'] = c.create_job(job).to_dict()
-  except RestException, e:
+  except RestException as e:
     response.update(handle_rest_exception(e, _('Could not clone job.')))
-  except SqoopException, e:
+  except SqoopException as e:
     response['status'] = 100
     response['errors'] = e.to_dict()
   return JsonResponse(response)
@@ -169,9 +170,9 @@ def job_delete(request, job):
   try:
     c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
     c.delete_job(job)
-  except RestException, e:
+  except RestException as e:
     response.update(handle_rest_exception(e, _('Could not delete job.')))
-  except SqoopException, e:
+  except SqoopException as e:
     response['status'] = 100
     response['errors'] = e.to_dict()
   return JsonResponse(response)
@@ -191,9 +192,9 @@ def job_start(request, job):
   try:
     c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
     response['submission'] = c.start_job(job).to_dict()
-  except RestException, e:
+  except RestException as e:
     response.update(handle_rest_exception(e, _('Could not start job.')))
-  except SqoopException, e:
+  except SqoopException as e:
     response['status'] = 100
     response['errors'] = [e.to_dict()]
   return JsonResponse(response)
@@ -213,9 +214,9 @@ def job_stop(request, job):
   try:
     c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
     response['submission'] = c.stop_job(job).to_dict()
-  except RestException, e:
+  except RestException as e:
     response.update(handle_rest_exception(e, _('Could not stop job.')))
-  except SqoopException, e:
+  except SqoopException as e:
     response['status'] = 100
     response['errors'] = e.to_dict()
   return JsonResponse(response)
@@ -235,9 +236,9 @@ def job_status(request, job):
   try:
     c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
     response['submission'] = c.get_job_status(job).to_dict()
-  except RestException, e:
+  except RestException as e:
     response.update(handle_rest_exception(e, _('Could not get job status.')))
-  except SqoopException, e:
+  except SqoopException as e:
     response['status'] = 100
     response['errors'] = e.to_dict()
   return JsonResponse(response)

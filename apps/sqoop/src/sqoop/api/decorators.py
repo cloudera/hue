@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
 import json
 import logging
 
@@ -24,7 +25,7 @@ from django.utils.functional import wraps
 from desktop.lib.django_util import render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import RestException
-from exception import handle_rest_exception
+from sqoop.api.exception import handle_rest_exception
 from sqoop import client, conf
 
 
@@ -39,7 +40,7 @@ def get_connector_or_exception(exception_class=PopupException):
       try:
         c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
         connector = c.get_connector(int(connector_id))
-      except RestException, e:
+      except RestException as e:
         handle_rest_exception(e, _('Could not get connector.'))
       return view_func(request, connector=connector, *args, **kwargs)
     return wraps(view_func)(decorate)
@@ -52,7 +53,7 @@ def get_link_or_exception(exception_class=PopupException):
       try:
         c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
         link = c.get_link(int(link_id))
-      except RestException, e:
+      except RestException as e:
         handle_rest_exception(e, _('Could not get link.'))
       return view_func(request, link=link, *args, **kwargs)
     return wraps(view_func)(decorate)
@@ -65,7 +66,7 @@ def get_job_or_exception(exception_class=PopupException):
       try:
         c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
         job = c.get_job(int(job_id))
-      except RestException, e:
+      except RestException as e:
         handle_rest_exception(e, _('Could not get job.'))
       return view_func(request, job=job, *args, **kwargs)
     return wraps(view_func)(decorate)
@@ -78,7 +79,7 @@ def get_submission_or_exception(exception_class=PopupException):
       try:
         c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
         submission = c.get_submission(int(submission_id))
-      except RestException, e:
+      except RestException as e:
         handle_rest_exception(e, _('Could not get submission.'))
       return view_func(request, submission=submission, *args, **kwargs)
     return wraps(view_func)(decorate)

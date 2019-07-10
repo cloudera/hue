@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
 import json
 import logging
 import socket
@@ -24,12 +25,12 @@ from django.utils.translation import ugettext as _
 
 from sqoop import client, conf
 from sqoop.client.exception import SqoopException
-from decorators import get_link_or_exception
+from sqoop.api.decorators import get_link_or_exception
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
-from exception import handle_rest_exception
-from utils import list_to_dict
+from sqoop.api.exception import handle_rest_exception
+from sqoop.api.utils import list_to_dict
 from django.views.decorators.cache import never_cache
 
 __all__ = ['get_links', 'create_link', 'update_link', 'link', 'links', 'link_clone', 'link_delete']
@@ -47,7 +48,7 @@ def get_links(request):
   try:
     c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
     response['links'] = list_to_dict(c.get_links())
-  except RestException, e:
+  except RestException as e:
     response.update(handle_rest_exception(e, _('Could not get links.')))
   return JsonResponse(response)
 
@@ -68,9 +69,9 @@ def create_link(request):
   try:
     c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
     response['link'] = c.create_link(link).to_dict()
-  except RestException, e:
+  except RestException as e:
     response.update(handle_rest_exception(e, _('Could not create link.')))
-  except SqoopException, e:
+  except SqoopException as e:
     response['status'] = 100
     response['errors'] = e.to_dict()
   return JsonResponse(response)
@@ -91,9 +92,9 @@ def update_link(request, link):
   try:
     c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
     response['link'] = c.update_link(link).to_dict()
-  except RestException, e:
+  except RestException as e:
     response.update(handle_rest_exception(e, _('Could not update link.')))
-  except SqoopException, e:
+  except SqoopException as e:
     response['status'] = 100
     response['errors'] = e.to_dict()
   return JsonResponse(response)
@@ -140,9 +141,9 @@ def link_clone(request, link):
   try:
     c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
     response['link'] = c.create_link(link).to_dict()
-  except RestException, e:
+  except RestException as e:
     response.update(handle_rest_exception(e, _('Could not clone link.')))
-  except SqoopException, e:
+  except SqoopException as e:
     response['status'] = 100
     response['errors'] = e.to_dict()
   return JsonResponse(response)
@@ -161,9 +162,9 @@ def link_delete(request, link):
   try:
     c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
     c.delete_link(link)
-  except RestException, e:
+  except RestException as e:
     response.update(handle_rest_exception(e, _('Could not delete link.')))
-  except SqoopException, e:
+  except SqoopException as e:
     response['status'] = 100
     response['errors'] = e.to_dict()
   return JsonResponse(response)
