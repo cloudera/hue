@@ -7,6 +7,7 @@ HUE_SRC=$(realpath $WORK_DIR/../..)
 BUILD_DIR=$(realpath $HUE_SRC/../containerbuild$GBN)
 HUE_DIR=$WORK_DIR/hue
 APACHE_DIR=$WORK_DIR/huelb
+REGISTRY=${REGISTRY:-"docker.io/hortonworks"}
 
 compile_hue() {
   mkdir -p $BUILD_DIR
@@ -21,13 +22,13 @@ compile_hue() {
 docker_hue_build() {
   cd $HUE_DIR
   cp -a $BUILD_DIR/hue $HUE_DIR
-  docker build -f $HUE_DIR/Dockerfile -t hue:$GBN .
+  docker build -f $HUE_DIR/Dockerfile -t ${REGISTRY}/hue:$GBN .
 }
 
 docker_huelb_build() {
   cd $APACHE_DIR
   cp -a $BUILD_DIR/hue/build/static $APACHE_DIR
-  docker build -f $APACHE_DIR/Dockerfile -t huelb:$GBN .
+  docker build -f $APACHE_DIR/Dockerfile -t ${REGISTRY}/huelb:$GBN .
 }
 
 compile_hue

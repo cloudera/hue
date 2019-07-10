@@ -1,0 +1,3 @@
+docker_images:
+    hue: __REGISTRY__/hue
+    huelb: __REGISTRY__/huelb
