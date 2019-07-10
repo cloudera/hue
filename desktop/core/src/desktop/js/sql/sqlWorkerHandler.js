@@ -64,9 +64,10 @@ export default {
     if (!window.IS_EMBEDDED && !registered && window.Worker) {
       // It can take a while before the worker is active
       const whenWorkerIsReady = function(worker, message) {
+        message.hueBaseUrl = window.HUE_BASE_URL;
         if (!worker.isReady) {
           window.clearTimeout(worker.pingTimeout);
-          worker.postMessage({ ping: true });
+          worker.postMessage({ ping: true, hueBaseUrl: message.hueBaseUrl });
           worker.pingTimeout = window.setTimeout(() => {
             whenWorkerIsReady(worker, message);
           }, 500);

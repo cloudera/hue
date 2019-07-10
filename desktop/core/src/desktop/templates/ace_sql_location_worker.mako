@@ -18,9 +18,6 @@
   from webpack_loader import utils
 %>
 
-WorkerGlobalScope.KNOX_BASE_PATH_HUE = '/KNOX_BASE_PATH_HUE';
-WorkerGlobalScope.HUE_BASE_URL = WorkerGlobalScope.KNOX_BASE_PATH_HUE.indexOf('KNOX_BASE_PATH_HUE') < 0 ? WorkerGlobalScope.KNOX_BASE_PATH_HUE : '';
-
 % for js_file in utils.get_files('sqlLocationWebWorker', config='WORKERS'):
   importScripts('${ js_file.get('url') }');
 % endfor

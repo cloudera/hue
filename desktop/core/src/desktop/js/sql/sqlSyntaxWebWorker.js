@@ -14,7 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'utils/workerPublicPath';
 import '@babel/polyfill';
 import sqlParserRepository from 'parse/sql/sqlParserRepository';
 
@@ -37,8 +36,13 @@ const toAbsoluteLocation = (statementLocation, nestedLocation) => {
 };
 
 let throttle = -1;
+let baseUrlSet = false;
 
 const onMessage = msg => {
+  if (!baseUrlSet) {
+    __webpack_public_path__ = (msg.data.hueBaseUrl || '') + '/dynamic_bundle/workers/';
+    baseUrlSet = true;
+  }
   if (msg.data.ping) {
     postMessage({ ping: true });
     return;
