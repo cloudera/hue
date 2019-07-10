@@ -145,7 +145,7 @@ def get_profile(user):
     # Lazily create profile.
     try:
       profile = UserProfile.objects.get(user=user)
-    except UserProfile.DoesNotExist, e:
+    except UserProfile.DoesNotExist as e:
       profile = create_profile_for_user(user)
     user._cached_userman_profile = profile
     return profile
@@ -330,7 +330,7 @@ def install_sample_user():
         user = auth_models.User.objects.get(id=SAMPLE_USER_ID)
         user.username = SAMPLE_USER_INSTALL
         user.save()
-  except Exception, ex:
+  except Exception as ex:
     LOG.exception('Failed to get or create sample user')
 
   # If sample user doesn't belong to default group, add to default group
@@ -347,7 +347,7 @@ def install_sample_user():
       LOG.info('Created home directory for user: %s' % SAMPLE_USER_INSTALL)
     else:
       LOG.info('Home directory already exists for user: %s' % SAMPLE_USER_INSTALL)
-  except Exception, ex:
+  except Exception as ex:
     LOG.exception('Failed to create home directory for user %s: %s' % (SAMPLE_USER_INSTALL, str(ex)))
 
   return user

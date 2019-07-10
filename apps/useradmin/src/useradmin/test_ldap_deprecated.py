@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
 import ldap
 
 from nose.plugins.attrib import attr
@@ -33,11 +34,11 @@ from useradmin.models import LdapGroup, UserProfile, get_profile
 
 from hadoop import pseudo_hdfs4
 from hadoop.pseudo_hdfs4 import is_live_cluster
-from views import sync_ldap_users, sync_ldap_groups, import_ldap_users, import_ldap_groups, \
+from useradmin.views import sync_ldap_users, sync_ldap_groups, import_ldap_users, import_ldap_groups, \
                   add_ldap_users, add_ldap_groups, sync_ldap_users_groups
 
-import ldap_access
-from tests import BaseUserAdminTests, LdapTestConnection, reset_all_groups, reset_all_users
+from useradmin import ldap_access
+from useradmin.tests import BaseUserAdminTests, LdapTestConnection, reset_all_groups, reset_all_users
 
 class TestUserAdminLdapDeprecated(BaseUserAdminTests):
   def test_useradmin_ldap_user_group_membership_sync(self):

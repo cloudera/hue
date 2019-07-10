@@ -16,6 +16,7 @@
 # limitations under the License.
 
 
+from builtins import object
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from useradmin.conf import PASSWORD_POLICY
