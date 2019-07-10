@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import zip
 import datetime
 import decimal
 import json
@@ -57,9 +58,9 @@ def error_handler(view_fn):
   def decorator(*args, **kwargs):
     try:
       return view_fn(*args, **kwargs)
-    except Http404, e:
+    except Http404 as e:
       raise e
-    except Exception, e:
+    except Exception as e:
       LOG.exception('error in %s' % view_fn)
 
       response = {
@@ -163,14 +164,14 @@ def execute_query(request, design_id=None):
         response['status'] = 0
         response['results'] = results_to_dict(results)
         response['design'] = design.id
-      except Exception, e:
+      except Exception as e:
         response['status'] = -1
         response['message'] = str(e)
 
     else:
       response['message'] = _('There was an error with your query.')
       response['errors'] = form.errors
-  except RuntimeError, e:
+  except RuntimeError as e:
     response['message']= str(e)
 
   return JsonResponse(response, encoder=ResultEncoder)
@@ -201,14 +202,14 @@ def explain_query(request):
 
         response['status'] = 0
         response['results'] = results_to_dict(results)
-      except Exception, e:
+      except Exception as e:
         response['status'] = -1
         response['message'] = str(e)
 
     else:
       response['message'] = _('There was an error with your query.')
       response['errors'] = form.errors
-  except RuntimeError, e:
+  except RuntimeError as e:
     response['message']= str(e)
 
   return JsonResponse(response)
@@ -225,7 +226,7 @@ def fetch_results(request, id, first_row=0):
   spits out a warning if first_row doesn't match the servers conception.
   Multiple readers will produce a confusing interaction here, and that's known.
   """
-  first_row = long(first_row)
+  first_row = int(first_row)
   results = type('Result', (object,), {
                 'rows': 0,
                 'columns': [],
@@ -246,7 +247,7 @@ def fetch_results(request, id, first_row=0):
     datatable = db.execute_and_wait(design)
     results = db.client.create_result(datatable)
     status = 0
-  except Exception, e:
+  except Exception as e:
     fetch_error = True
     error_message = str(e)
     status = -1
@@ -280,7 +281,7 @@ def save_query(request, design_id=None):
       response['status'] = 0
     else:
       response['errors'] = query_form.errors
-  except RuntimeError, e:
+  except RuntimeError as e:
     response['message'] = str(e)
 
   return JsonResponse(response)
@@ -305,7 +306,7 @@ def results_to_dict(results):
   data = {}
   rows = []
   for row in results.rows():
-    rows.append(dict(zip(results.columns, [escape(r) if isinstance(r, (str, unicode)) else r for r in row])))
+    rows.append(dict(list(zip(results.columns, [escape(r) if isinstance(r, str) else r for r in row]))))
   data['rows'] = rows
   data['start_row'] = results.start_row
   data['has_more'] = results.has_more
