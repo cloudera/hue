@@ -62,6 +62,7 @@
   "devDependencies": {
     "@babel/core": "7.2.2",
     "@babel/node": "7.2.2",
+    "@babel/plugin-syntax-dynamic-import": "7.2.0",
     "@babel/preset-env": "7.3.1",
     "@types/jasmine": "^3.3.9",
     "architect-build": "0.1.1",
@@ -94,11 +95,11 @@
     "prettier": "1.16.1",
     "stylelint": "^9.10.1",
     "stylelint-config-standard": "^18.2.0",
-    "webpack": "4.29.0",
-    "webpack-bundle-analyzer": "^3.0.4",
+    "webpack": "4.35.2",
+    "webpack-bundle-analyzer": "^3.3.2",
     "webpack-bundle-tracker": "0.4.2-beta",
     "webpack-clean-obsolete-chunks": "^0.4.0",
-    "webpack-cli": "^3.2.1"
+    "webpack-cli": "^3.3.5"
   },
   "scripts": {
     "devinstall": "npm cache clean && npm install && npm prune",
@@ -106,6 +107,7 @@
     "webpack-login": "webpack --config webpack.config.login.js",
     "webpack-workers": "webpack --config webpack.config.workers.js",
     "dev": "webpack --watch -d",
+    "dev-workers": "webpack --config webpack.config.workers.js --watch -d",
     "less": "./node_modules/.bin/grunt less",
     "less-dev": "./node_modules/.bin/grunt watch",
     "less-lint": "stylelint \"desktop/core/src/desktop/static/desktop/less/**/*.less\" --fix",
