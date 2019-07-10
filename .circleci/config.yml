@@ -94,6 +94,7 @@ jobs:
             cd /usr/share/hue
             cp ~/repo/.eslint* .
             cp ~/repo/.prettierrc .
+            cp ~/repo/tools . -r
             npm run lint
 
       - store_artifacts:
