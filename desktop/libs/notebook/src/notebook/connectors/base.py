@@ -322,21 +322,22 @@ def get_api(request, snippet):
   interpreter = get_interpreter(connector_type=snippet['type'], user=request.user)
   interface = interpreter['interface']
 
-  # TODO: clean computes
   if get_cluster_config(request.user)['has_computes']:
     compute = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API or Notebook create sessions.
     if compute == '""' or compute == 'undefined':
       compute = None
     if not compute and snippet.get('compute'): # Via notebook.ko.js
-      compute = snippet['compute']
-  else:
-    compute = None
+      interpreter['compute'] =  snippet['compute']
 
-  LOG.debug('Selected interpreter %s interface=%s compute=%s' % (interpreter['type'], interface, compute and compute['name']))
+  LOG.debug('Selected interpreter %s interface=%s compute=%s' % (
+    interpreter['type'],
+    interface,
+    interpreter.get('compute') and interpreter['compute']['name'])
+  )
 
   if interface == 'hiveserver2':
     from notebook.connectors.hiveserver2 import HS2Api
-    return HS2Api(user=request.user, request=request, interpreter=compute if compute else interpreter)
+    return HS2Api(user=request.user, request=request, interpreter=interpreter)
   elif interface == 'oozie':
     return OozieApi(user=request.user, request=request)
   elif interface == 'livy':
