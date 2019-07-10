@@ -58,6 +58,8 @@ workers:
   replicas: 1
 scheduler:
   enabled: false
+cron:
+  emailStats: "0 13 * * WED,SUN"
 aws:
   accessKeyId: ""
   secretAccessKey: ""
