@@ -17,10 +17,14 @@
 #
 # Tests for proxy app.
 
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 import threading
 import logging
-import BaseHTTPServer
-import StringIO
+import http.server
+import sys
 
 from nose.tools import assert_true, assert_false
 from django.test.client import Client
@@ -29,8 +33,13 @@ from desktop.lib.django_test_util import make_logged_in_client
 from proxy.views import _rewrite_links
 import proxy.conf
 
+if sys.version_info[0] > 2:
+  from io import StringIO as string_io
+else:
+  from StringIO import StringIO as string_io
 
-class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
+
+class Handler(http.server.BaseHTTPRequestHandler):
   """
   To avoid mocking out urllib, we setup a web server
   that does very little, and test proxying against it.
@@ -66,7 +75,7 @@ def run_test_server():
   Returns the server, and a method to close it out.
   """
   # We need to proxy a server, so we go ahead and create one.
-  httpd = BaseHTTPServer.HTTPServer(("127.0.0.1", 0), Handler)
+  httpd = http.server.HTTPServer(("127.0.0.1", 0), Handler)
   # Spawn a thread that serves exactly one request.
   thread = threading.Thread(target=httpd.handle_request)
   thread.daemon = True
@@ -74,7 +83,7 @@ def run_test_server():
 
   def finish():
     # Make sure the server thread is done.
-    print "Closing thread " + str(thread)
+    print("Closing thread " + str(thread))
     thread.join(10.0) # Wait at most 10 seconds
     assert_false(thread.isAlive())
 
@@ -148,12 +157,12 @@ def test_blacklist():
       fin()
 
 
-class UrlLibFileWrapper(StringIO.StringIO):
+class UrlLibFileWrapper(string_io):
   """
   urllib2.urlopen returns a file-like object; we fake it here.
   """
   def __init__(self, buf, url):
-    StringIO.StringIO.__init__(self, buf)
+    string_io.__init__(self, buf)
     self.url = url
 
   def geturl(self):
