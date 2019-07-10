@@ -85,9 +85,9 @@ const initGlobalSearchParser = function(parser) {
       result = parser.parse(beforeCursor + '\u2020' + afterCursor);
     } catch (err) {
       if (debug) {
-        console.log(err);
-        console.error(err.stack);
-        console.log(parser.yy.error);
+        console.warn(err);
+        console.warn(err.stack);
+        console.warn(parser.yy.error);
       }
       return {
         facets: {},

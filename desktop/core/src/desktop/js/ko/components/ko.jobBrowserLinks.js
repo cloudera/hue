@@ -117,7 +117,7 @@ class JobBrowserPanel {
           }
         })
         .fail(response => {
-          console.log(response);
+          console.warn(response);
         });
     };
     let lastScheduleBrowserRequest = undefined;

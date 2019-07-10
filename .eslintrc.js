@@ -44,6 +44,13 @@ module.exports = {
   rules: {
     'new-cap': 0,
     'no-console': 0,
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "CallExpression[callee.object.name='console'][callee.property.name!=/^(warn|error|info|trace)$/]",
+        "message": "Unexpected property on console object was called"
+      }
+    ],
     'no-extra-boolean-cast': 0,
     'no-invalid-this': 0,
     'no-lonely-if': 2,

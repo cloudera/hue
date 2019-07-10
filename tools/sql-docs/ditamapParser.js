@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable no-restricted-syntax */
+
 const libxml = require('libxmljs');
 
 const Topic = require('./Topic');
@@ -171,3 +173,5 @@ const extractFromMapNode = (mapNode, ditamapFile, docRootPath, parseResult) => {
 module.exports = {
   parseDitamap: parseDitamap
 };
+
+/* eslint-enable no-restricted-syntax */

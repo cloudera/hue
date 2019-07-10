@@ -288,6 +288,7 @@ class InlineAutocomplete {
     // TODO: Get cursor position and split to before and after
     self.lastParseResult = globalSearchParser.parseGlobalSearch(self.searchInput(), '');
     if (hueDebug && hueDebug.showGlobalSearchParseResults) {
+      // eslint-disable-next-line no-restricted-syntax
       console.log(self.lastParseResult);
     }
     const querySpec = { query: self.searchInput() };

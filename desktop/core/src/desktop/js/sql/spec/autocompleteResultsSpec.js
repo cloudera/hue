@@ -327,6 +327,7 @@ describe('AutocompleteResults.js', () => {
         }
         if (subject.loading()) {
           for (let i = 0; i < jasmine.Ajax.requests.count(); i++) {
+            // eslint-disable-next-line no-restricted-syntax
             console.log(jasmine.Ajax.requests.at(i));
           }
           fail('Still loading, missing ajax spec?');

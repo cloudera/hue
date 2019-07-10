@@ -591,6 +591,7 @@ class AceLocationHandler {
           lastKnownStatements.editorChangeTime = lastChangeTime;
 
           if (typeof hueDebug !== 'undefined' && hueDebug.logStatementLocations) {
+            // eslint-disable-next-line no-restricted-syntax
             console.log(lastKnownStatements);
           }
         } catch (error) {
@@ -787,6 +788,7 @@ class AceLocationHandler {
           self.snippet.positionStatement().syntaxError = true;
         }
         if (hueDebug && hueDebug.showSyntaxParseResult) {
+          // eslint-disable-next-line no-restricted-syntax
           console.log(e.data.syntaxError);
         }
 

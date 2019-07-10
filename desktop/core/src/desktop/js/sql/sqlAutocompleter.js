@@ -80,7 +80,7 @@ class SqlAutocompleter {
               resolve(autocompleteParser.parseSql(beforeCursor, afterCursor));
             })
             .catch(err => {
-              console.log(err);
+              console.warn(err);
               reject(err);
             });
         } else {
@@ -131,10 +131,10 @@ class SqlAutocompleter {
       parseResult = await this.parseActiveStatement();
 
       if (typeof hueDebug !== 'undefined' && hueDebug.showParseResult) {
+        // eslint-disable-next-line no-restricted-syntax
         console.log(parseResult);
       }
     } catch (e) {
-      console.log(e);
       if (typeof console.warn !== 'undefined') {
         console.warn(e);
       }

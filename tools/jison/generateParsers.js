@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable no-restricted-syntax */
+
 const fs = require('fs');
 const exec = require('child_process').exec;
 
@@ -544,3 +546,5 @@ identifySqlParsers().then(() => {
     generateRecursive();
   });
 });
+
+/* eslint-enable no-restricted-syntax */

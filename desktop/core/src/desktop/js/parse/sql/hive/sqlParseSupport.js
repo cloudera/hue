@@ -2056,15 +2056,15 @@ const initSqlParser = function(parser) {
         throw err;
       }
       if (debug) {
-        console.log(err);
-        console.error(err.stack);
+        console.warn(err);
+        console.warn(err.stack);
       }
       result = parser.yy.result;
     }
     if (parser.yy.errors.length > 0) {
       parser.yy.result.errors = parser.yy.errors;
       if (debug) {
-        console.log(parser.yy.errors);
+        console.warn(parser.yy.errors);
       }
     }
     try {
@@ -2074,8 +2074,8 @@ const initSqlParser = function(parser) {
       prioritizeSuggestions();
     } catch (err) {
       if (debug) {
-        console.log(err);
-        console.error(err.stack);
+        console.warn(err);
+        console.warn(err.stack);
       }
     }
 
@@ -2346,9 +2346,9 @@ const initSyntaxParser = function(parser) {
       parser.parse(beforeCursor + afterCursor);
     } catch (err) {
       if (debug) {
-        console.log(err);
-        console.error(err.stack);
-        console.log(parser.yy.error);
+        console.warn(err);
+        console.warn(err.stack);
+        console.warn(parser.yy.error);
       }
     }
 
@@ -2502,9 +2502,9 @@ const initGlobalSearchParser = function(parser) {
       result = parser.parse(beforeCursor + '\u2020' + afterCursor);
     } catch (err) {
       if (debug) {
-        console.log(err);
-        console.error(err.stack);
-        console.log(parser.yy.error);
+        console.warn(err);
+        console.warn(err.stack);
+        console.warn(parser.yy.error);
       }
       return {
         facets: {},
