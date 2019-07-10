@@ -139,7 +139,7 @@ class ImpalaDbms(HiveServer2Dbms):
       hql = "REFRESH `%s`.`%s`" % (database, table)
       query = hql_query(hql, database, query_type=QUERY_TYPES[1])
       handle = self.execute_and_wait(query, timeout_sec=10.0)
-    except Exception, e:
+    except Exception as e:
       msg = 'Failed to refresh `%s`.`%s`' % (database, table)
       raise QueryServerException(msg)
     finally:
@@ -165,7 +165,7 @@ class ImpalaDbms(HiveServer2Dbms):
         histogram = list(result.rows())[0][0]  # actual histogram results is in first-and-only result row
         unique_values = set(histogram.split(', '))
         results = list(unique_values)
-      except IndexError, e:
+      except IndexError as e:
         LOG.warn('Failed to get histogram results, result set has unexpected format: %s' % smart_str(e))
       finally:
         self.close(handle)

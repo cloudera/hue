@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import json
 import logging
 
@@ -25,7 +26,7 @@ from beeswax.server import dbms
 LOG = logging.getLogger(__name__)
 
 
-class Dashboard():
+class Dashboard(object):
 
   def __init__(self, data=None, document=None):
     self.document = document
@@ -65,7 +66,7 @@ class Dashboard():
     return json.loads(self.data)
 
 
-class Controller():
+class Controller(object):
 
   def __init__(self, user):
     query_server = get_query_server_config(name='impala')
@@ -76,6 +77,6 @@ class Controller():
     try:
       _table = self.db.get_table(database, table)
       return [dict([('name', col.name), ('type', col.type), ('comment', col.comment)]) for col in _table.cols]
-    except QueryServerException, e:
+    except QueryServerException as e:
       LOG.exception('Error fetching %s.%s' % (database, table))
       return []

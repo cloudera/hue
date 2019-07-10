@@ -151,7 +151,7 @@ def alanize(request):
       metrics = analyzer.heatmap_by_host(profile, key)
       if metrics['data']:
         heatmap[key] = metrics
-    response['data'] = { 'query': { 'healthChecks' : result[0]['result'], 'summary': summary, 'heatmap': heatmap, 'heatmapMetrics': sorted(list(heatmap.iterkeys())) } }
+    response['data'] = { 'query': { 'healthChecks' : result[0]['result'], 'summary': summary, 'heatmap': heatmap, 'heatmapMetrics': sorted(list(heatmap.keys())) } }
     response['status'] = 0
   return JsonResponse(response)
 
