@@ -23,10 +23,13 @@
 # to create links (within the application) to trusted
 # URLs, by appending an HMAC to the parameters.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 import logging
 import re
-from urllib2 import urlopen
-from urlparse import urlparse, urlunparse
+from urllib.request import Request, urlopen
+from urllib.parse import urlencode, urlparse, urlunparse
 
 from django.core import urlresolvers
 from django.http import HttpResponse
@@ -89,17 +92,18 @@ def proxy(request, host, port, path):
 
   # The tuple here is: (scheme, netloc, path, params, query, fragment).
   # We don't support params or fragment.
-  url = urlunparse(("http", "%s:%d" % (host,port), 
+  url = urlunparse((u'http', "%s:%d" % (host,port),
                     path, 
                     None, 
-                    request.META.get("QUERY_STRING"), 
+                    str(request.META.get("QUERY_STRING")),
                     None))
   LOGGER.info("Retrieving %s." % url)
   if request.method == 'POST':
-    post_data = request.POST.urlencode()
+    post_data = urlencode(dict(zip(request.POST.keys(), request.POST.values()))).encode('ascii')
   else:
     post_data = None
-  data = urlopen(url, data=post_data)
+  req = Request(url, data=post_data)
+  data = urlopen(req)
   content_type = data.headers.get("content-type", "text/plain")
   if not re.match(r'^text/html\s*(?:;.*)?$', content_type):
     resp_text = data.read(1024*1024) # read 1MB
@@ -127,7 +131,7 @@ def _rewrite_url(url):
   try:
     # We may hit invalid urls. Return None to strip out the link entirely.
     out = _reverse(host, port, path)
-  except urlresolvers.NoReverseMatch, ex:
+  except urlresolvers.NoReverseMatch as ex:
     LOGGER.error("Encountered malformed URL '%s' when rewriting proxied page." % (url,))
     return None
 
