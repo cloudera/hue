@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import json
 
 from django.contrib.auth.models import User
@@ -44,7 +45,7 @@ def test_ranges():
   assert_equal((8000000, 9000000), _round_number_range(9045352))
 
 
-class MockResource():
+class MockResource(object):
   RESPONSE = None
 
   def __init__(self, client):
