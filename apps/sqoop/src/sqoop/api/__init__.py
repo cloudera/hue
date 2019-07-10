@@ -15,12 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from autocomplete import autocomplete
-from link import get_links, create_link, update_link,\
+from __future__ import absolute_import
+from sqoop.api.autocomplete import autocomplete
+from sqoop.api.link import get_links, create_link, update_link,\
                        link, links, link_clone, link_delete
-from connector import get_connectors, connectors, connector
-from driver import driver
-from job import get_jobs, create_job, update_job,\
+from sqoop.api.connector import get_connectors, connectors, connector
+from sqoop.api.driver import driver
+from sqoop.api.job import get_jobs, create_job, update_job,\
                 job, jobs, job_clone, job_delete,\
                 job_start, job_stop, job_status
-from submission import get_submissions, submissions
+from sqoop.api.submission import get_submissions, submissions

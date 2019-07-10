@@ -14,11 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from builtins import object
 import logging
 
 from desktop.lib.python_util import force_dict_to_strings
 
-from config import Config
+from sqoop.client.config import Config
 
 
 class Connector(object):

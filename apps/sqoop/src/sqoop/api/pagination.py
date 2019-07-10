@@ -16,6 +16,7 @@
 # limitations under the License.
 
 
+from builtins import object
 class ContinuationToken(object):
   def __init__(self, page, page_size, **kwargs):
     """ Page starting at 1 """
