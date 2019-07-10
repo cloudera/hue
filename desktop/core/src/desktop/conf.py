@@ -616,21 +616,18 @@ SMTP = ConfigSection(
       type=str,
       default="localhost"
     ),
-
     PORT = Config(
       key="port",
       help=_("The SMTP server port."),
       type=int,
       default=25
     ),
-
     USER = Config(
       key="user",
       help=_("The username for the SMTP host."),
       type=str,
       default=""
     ),
-
     PASSWORD = Config(
       key="password",
       help=_("The password for the SMTP user."),
@@ -638,7 +635,6 @@ SMTP = ConfigSection(
       private=True,
       default="",
     ),
-
     PASSWORD_SCRIPT = Config(
       key="password_script",
       help=_("Execute this script to produce the SMTP user password. This will be used when the SMTP `password` is not set."),
@@ -646,14 +642,12 @@ SMTP = ConfigSection(
       private=True,
       default="",
     ),
-
     USE_TLS = Config(
       key="tls",
       help=_("Whether to use a TLS (secure) connection when talking to the SMTP server."),
       type=coerce_bool,
       default=False
     ),
-
     DEFAULT_FROM= Config(
       key="default_from_email",
       help=_("Default email address to use for various automated notifications from Hue."),

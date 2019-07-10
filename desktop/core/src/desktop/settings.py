@@ -449,6 +449,11 @@ EMAIL_HOST_PASSWORD = desktop.conf.get_smtp_password()
 EMAIL_USE_TLS = desktop.conf.SMTP.USE_TLS.get()
 DEFAULT_FROM_EMAIL = desktop.conf.SMTP.DEFAULT_FROM.get()
 
+if EMAIL_BACKEND == 'sendgrid_backend.SendgridBackend':
+  SENDGRID_API_KEY = desktop.conf.get_smtp_password()
+  SENDGRID_SANDBOX_MODE_IN_DEBUG = DEBUG
+
+
 # Used for securely creating sessions. Should be unique and not shared with anybody. Changing auth backends will invalidate all open sessions.
 SECRET_KEY = desktop.conf.get_secret_key()
 if SECRET_KEY:
