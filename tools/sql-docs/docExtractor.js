@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable no-restricted-syntax */
+
 const program = require('commander');
 
 const extractorUtils = require('./extractorUtils');
@@ -81,3 +83,5 @@ Promise.all(ditamapParsePromises).then(parseResults => {
       });
   });
 });
+
+/* eslint-enable no-restricted-syntax */

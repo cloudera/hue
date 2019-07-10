@@ -29,6 +29,7 @@ const hueDebug = {
     clearInstance('HueDataCatalog_impala_');
     clearInstance('HueDataCatalog_impala_multiTable_');
     Promise.all(promises).then(() => {
+      // eslint-disable-next-line no-restricted-syntax
       console.log('Done! Refresh the browser.');
     });
   }

@@ -30,6 +30,7 @@ class EditorViewModel {
   constructor(editorId, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
     const self = this;
 
+    // eslint-disable-next-line no-restricted-syntax
     console.log('Notebook 2 enabled.');
 
     self.editorId = editorId;

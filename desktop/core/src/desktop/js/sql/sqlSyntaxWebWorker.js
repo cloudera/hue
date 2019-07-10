@@ -47,7 +47,6 @@ const onMessage = msg => {
   throttle = setTimeout(() => {
     sqlParserRepository.getSyntaxParser(msg.data.type).then(parser => {
       const syntaxError = parser.parseSyntax(msg.data.beforeCursor, msg.data.afterCursor);
-      console.log(syntaxError);
 
       if (syntaxError) {
         toAbsoluteLocation(msg.data.statementLocation, syntaxError.loc);

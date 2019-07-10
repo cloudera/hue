@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable no-restricted-syntax */
+
 const fs = require('fs');
 const mkdirp = require('mkdirp');
 const path = require('path');
@@ -149,3 +151,5 @@ const saveTopics = (topics, outputPath, makoPath, isImpala) => {
 module.exports = {
   saveTopics: saveTopics
 };
+
+/* eslint-enable no-restricted-syntax */

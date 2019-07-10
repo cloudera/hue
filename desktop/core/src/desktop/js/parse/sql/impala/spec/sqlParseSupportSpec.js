@@ -107,6 +107,7 @@ describe('sqlParseSupport.js', () => {
     durations.forEach(duration => {
       sum += duration;
     });
+    // eslint-disable-next-line no-restricted-syntax
     console.log('it took ' + sum / durations.length + ' ms on average.');
     // ~ 0.037 ms on average
     expect(true).toBeTruthy();

@@ -2641,6 +2641,7 @@ class Snippet {
         },
         data => {
           if (data.status == 0) {
+            // eslint-disable-next-line no-restricted-syntax
             console.log(data.statement_similarity);
           } else {
             $(document).trigger('error', data.message);

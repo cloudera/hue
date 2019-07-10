@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable no-restricted-syntax */
+
 const extractorUtils = require('./extractorUtils');
 const EXTERNAL_DOC_URL_PREFIX = 'https://www.cloudera.com/documentation/enterprise/latest/';
 
@@ -296,3 +298,5 @@ const linkTopics = (parseResults, cssClassPrefix) => {
 module.exports = {
   linkTopics: linkTopics
 };
+
+/* eslint-enable no-restricted-syntax */

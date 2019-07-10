@@ -57,7 +57,7 @@ describe('sqlStatementsParser.js', () => {
       expect(result).toEqual(expectedOutput, because);
     } catch (error) {
       console.error(error);
-      console.log(error.message);
+      console.warn(error.message);
 
       fail('Got error');
     }
