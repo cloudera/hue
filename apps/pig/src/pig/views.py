@@ -15,9 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 import json
 import logging
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -106,7 +109,7 @@ def stop(request):
 
   try:
     api.get(request.fs, request.jt, request.user).stop(job_id)
-  except RestException, e:
+  except RestException as e:
     raise PopupException(_("Error stopping Pig script.") % e.message)
 
   return watch(request, job_id)
@@ -153,7 +156,7 @@ def copy(request):
 
   try:
     doc.can_read_or_exception(request.user)
-  except Exception, e:
+  except Exception as e:
     raise PopupException(e)
 
   existing_script_data = pig_script.dict
@@ -225,7 +228,7 @@ def watch(request, job_id):
     'progress': oozie_workflow.get_progress(),
     'isRunning': oozie_workflow.is_running(),
     'killUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id': oozie_workflow.id, 'action': 'kill'}),
-    'rerunUrl': reverse('oozie:rerun_oozie_job', kwargs={'job_id': oozie_workflow.id, 'app_path': urllib.quote(oozie_workflow.appPath.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)}),
+    'rerunUrl': reverse('oozie:rerun_oozie_job', kwargs={'job_id': oozie_workflow.id, 'app_path': urllib.parse.quote(oozie_workflow.appPath.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)}),
     'actions': workflow_actions
   }
 
@@ -248,7 +251,7 @@ def install_examples(request):
     try:
       pig_setup.Command().handle()
       result['status'] = 0
-    except Exception, e:
+    except Exception as e:
       LOG.exception(e)
       result['message'] = str(e)
 
