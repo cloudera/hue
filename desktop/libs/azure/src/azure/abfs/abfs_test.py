@@ -42,5 +42,6 @@ class ABFSTestBase(unittest.TestCase):
     pass
 
   def test_list(self):
-    self.client.listdir('abfs://')
+    self.client.listdir('abfss://test')
+    
     pass

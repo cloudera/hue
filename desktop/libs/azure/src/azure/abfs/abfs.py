@@ -31,6 +31,7 @@ from hadoop.hdfs_site import get_umask_mode
 from hadoop.fs.exceptions import WebHdfsException
 
 from desktop.lib.rest import http_client, resource
+import azure.abfs.__init__
 
 
 LOG = logging.getLogger(__name__)
@@ -103,9 +104,19 @@ class ABFS(object):
     raise NotImplementedError("")
 
   def listdir_stats(self, path, **kwargs):
+    #if kwargs is not None:
+      #raise NotImplementedError("Option `glob` is not implemented")
+    if azure.abfs.__init__.is_root(path):
+      raise NotImplementedError("")
+    container_name, account_name, file_system = azure.abfs.__init__.parse_uri(path)
+    if (accout_name == '') or (filesystem == ''):
+      raise NotImplementedError("")
+    res = []
+    
     raise NotImplementedError("")
 
   def listdir(self, path, glob=None):
+    return [azure.abfs.__init__.parse_uri(x.path)[2] for x in self.listdir_stats(path) ]
     raise NotImplementedError("") # e.g. self._root.get('/', {'resource': 'account'}, self._getheaders())
 
   def normpath(self, path):
