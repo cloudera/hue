@@ -64,6 +64,7 @@ jobs:
 
             cd /usr/share/hue
             # make npm-install # Not available
+            cp ~/repo/.babelrc .
             npm install
             npm run webpack
             npm run webpack-login
@@ -84,7 +85,6 @@ jobs:
           name: run js tests
           command: |
             cd /usr/share/hue
-            cp ~/repo/.babelrc .
             npm run test
 
       # Code analyses
