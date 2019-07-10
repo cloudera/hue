@@ -91,13 +91,18 @@ def get(user, query_server=None, cluster=None):
 
 
 def get_query_server_config(name='beeswax', connector=None):
-  LOG.debug("Query cluster %s: %s" % ('' if connector else name, connector))
-
   if connector:
+    connector_name = full_connector_name = connector['type']
+    compute_name = None
+    if connector.get('compute'):
+      compute_name = connector['compute']['name']
+      full_connector_name = '%s-%s' % (connector_name, compute_name)
+    LOG.debug("Query cluster connector %s compute %s" % (connector_name, compute_name))
+
     query_server = {
-        'server_name': connector['type'],
-        'server_host': connector['options']['server_host'],
-        'server_port': int(connector['options']['server_port']),
+        'server_name': full_connector_name,
+        'server_host': (connector['compute']['options'] if 'compute' in connector else connector['options'])['server_host'],
+        'server_port': int((connector['compute']['options'] if 'compute' in connector else connector['options'])['server_port']),
         'principal': 'TODO',
         'auth_username': AUTH_USERNAME.get(),
         'auth_password': AUTH_PASSWORD.get(),
@@ -108,6 +113,7 @@ def get_query_server_config(name='beeswax', connector=None):
         'QUERY_TIMEOUT_S': 15 * 60,
     }
   else:
+    LOG.debug("Query cluster %s" % name)
     if name == "llap":
       activeEndpoint = cache.get('llap')
       if activeEndpoint is None:

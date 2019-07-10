@@ -146,17 +146,6 @@ def get_context_computes(request, interface):
 
   clusters = get_clusters(request.user).values()
 
-  # Currently broken if not sent
-  computes.extend([{
-      'id': cluster['id'],
-      'name': cluster['name'],
-      'namespace': cluster['id'],
-      'interface': interface,
-      'type': cluster['type'],
-      'options': {}
-    } for cluster in clusters if cluster.get('type') == 'direct'
-  ])
-
   if get_cluster_config(request.user)['has_computes']: # TODO: only based on interface selected?
     interpreter = get_interpreter(connector_type=interface, user=request.user)
     if interpreter['dialect'] == 'impala':
@@ -174,6 +163,17 @@ def get_context_computes(request, interface):
           'options': cluster['options'],
         } for cluster in dw_clusters]
       )
+  else:
+    # Currently broken if not sent
+    computes.extend([{
+        'id': cluster['id'],
+        'name': cluster['name'],
+        'namespace': cluster['id'],
+        'interface': interface,
+        'type': cluster['type'],
+        'options': {}
+      } for cluster in clusters if cluster.get('type') == 'direct'
+    ])
 
   response[interface] = computes
   response['status'] = 0
