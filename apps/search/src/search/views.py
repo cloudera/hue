@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
 import logging
 
 from django.utils.translation import ugettext as _
@@ -45,7 +46,7 @@ def install_examples(request):
       if 'log_analytics_demo' == data: # Hue documents installed only one time
         search_setup.Command().handle()
       result['status'] = 0
-    except Exception, e:
+    except Exception as e:
       LOG.exception(e)
       result['message'] = str(e)
 
