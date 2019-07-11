@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from _Res import Resource
 
 """
 Interfaces for ABFS
@@ -106,17 +107,22 @@ class ABFS(object):
   def listdir_stats(self, path, **kwargs):
     #if kwargs is not None:
       #raise NotImplementedError("Option `glob` is not implemented")
-    if azure.abfs.__init__.is_root(path):
-      raise NotImplementedError("")
-    container_name, account_name, file_system = azure.abfs.__init__.parse_uri(path)
-    if (accout_name == '') or (filesystem == ''):
-      raise NotImplementedError("")
-    res = []
+    LOG.debug("%s" %self._netloc)
     
+    if azure.abfs.__init__.is_root(path):
+      return self._root.get('',{'resource': 'account'}, headers= self._getheaders())
+      #return self._client.execute('GET', '/', headers =  self._getheaders())
+    file_system, directory_name = azure.abfs.__init__.parse_uri(path)[:2]
+    if directory_name == "":
+      res = self._client.execute('GET', self._fs_defaultfs + '/' + file_system +'/', {'recursive':'true', 'resource': file_system}, None, self._getheaders()["Authorization"])
+    else:
+      res = self._client.execute('GET', self._fs_defaultfs + '/' + file_system + '/', {'directory': directory_name, 'recursive':'true', 'resource': file_system}, None, self._getheaders())
+    return res
     raise NotImplementedError("")
 
   def listdir(self, path, glob=None):
-    return [azure.abfs.__init__.parse_uri(x.path)[2] for x in self.listdir_stats(path) ]
+    resp = self.listdir_stats(path)
+    return [x['name'] for x in resp['filesystems']]
     raise NotImplementedError("") # e.g. self._root.get('/', {'resource': 'account'}, self._getheaders())
 
   def normpath(self, path):
