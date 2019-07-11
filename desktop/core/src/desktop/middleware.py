@@ -23,6 +23,7 @@ import logging
 import mimetypes
 import os.path
 import re
+import socket
 import tempfile
 import time
 
@@ -672,10 +673,15 @@ class SpnegoMiddleware(object):
             knox_verification = False
             if desktop.conf.KNOX.KNOX_PRINCIPAL.get() in username:
               # This may contain chain of reverse proxies, e.g. knox proxy, hue load balancer
+              # Compare hostname on both HTTP_X_FORWARDED_HOST & KNOX_PROXYHOSTS. Both of these can be configured to use either hostname or IPs and we have to normalize to one or the other
               req_hosts = self.clean_host(request.META['HTTP_X_FORWARDED_HOST'])
               knox_proxy = self.clean_host(desktop.conf.KNOX.KNOX_PROXYHOSTS.get())
               if req_hosts.intersection(knox_proxy):
                 knox_verification = True
+              else:
+                access_warn(request, 'Failed to verify provided host %s with %s ' % (req_hosts, knox_proxy))
+            else:
+              access_warn(request, 'Failed to verify provided username %s with %s ' % (username, desktop.conf.KNOX.KNOX_PRINCIPAL.get()))
             # If knox authentication failed then generate 401 (Unauthorized error)
             if not knox_verification:
               request.META['Return-401'] = ''
@@ -712,7 +718,7 @@ class SpnegoMiddleware(object):
 
   def clean_host(self, pattern):
     if pattern:
-      return set([hostport.split(':')[0] for hostport in pattern.split(',')])
+      return set([socket.gethostbyaddr(hostport.split(':')[0])[0] for hostport in pattern.split(',')])
     return set([])
 
   def clean_username(self, username, request):
