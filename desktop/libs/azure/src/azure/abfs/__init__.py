@@ -34,21 +34,31 @@ ERRNO_MAP = {
 }
 DEFAULT_ERRNO = errno.EINVAL
 
-ABFS_PATH_RE = re.compile('^/*[aA][bB][fF][sS]{2}://([^/@]+)(@([^/.]+)[.]dfs.core[.]windows[.]net/([^/]+)?)?$')
-#ABFS_PATH_RE = re.compile('^/*[aA][bB][fF][sS]{2}://([^/@]+)$')
-ABFS_ROOT = 'abfs://'
+#ABFS_PATH_RE = re.compile('^/*[aA][bB][fF][sS]{2}://([^/@]+)(@([^/.]+)[.]dfs.core[.]windows[.]net/(([^?]+)[?](directory=([^&]+))?)?)?$')
+ABFS_PATH_RE = re.compile('^/*[aA][bB][fF][sS]{2}://([^/]+)(/(.*?([^/]+)?/?))?$')
+ABFS_ROOT = 'abfss://'
+ABFS_FS_DEFAULT = re.compile('^/*[aA][bB][fF][sS]{2}://([^/]+)@([^.]+)[.]([^/]+)(/([^?]*))?$')
 
 def parse_uri(uri):
   """
-  Returns container_name, Account_name and filesystem_name
+  Returns filesystem_name, direct_name, base_direct_name
   Raises ValueError if invalid ABFS URI is passed.
   """
   match = ABFS_PATH_RE.match(uri)
   if not match:
     raise ValueError("Invalid ABFS URI: %s" % uri)
-  filesystem_name = match.group(4) or ''
-  account_name = match.group(3) or ''
-  return match.group(1), account_name, filesystem_name
+  direct_name = match.group(3) or ''
+  base_direct_name = match.group(4) or ''
+  return match.group(1), direct_name, base_direct_name
 
 def is_root(uri):
   return uri.lower() == ABFS_ROOT
+
+def parse_defaultfs(fs_default):
+  match = ABFS_FS_DEFAULT.match(fs_default)
+  if not match:
+    raise ValueError("Invalid fs_default: %s" % fs_default)
+  account_name = match.group(2) or ''
+  dns_sufix = match.group(3) or ''
+  file_system = match.group(5) or ''
+  return account_name, dns_sufix, file_system
