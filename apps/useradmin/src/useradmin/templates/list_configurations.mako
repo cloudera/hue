@@ -29,8 +29,6 @@ ${commonheader(_('Configurations'), "useradmin", user, request) | n,unicode}
 %endif
 ${layout.menubar(section='configurations')}
 
-<script src="${ static('metastore/js/metastore.ko.js') }"></script>
-
 <script id="app-list" type="text/html">
   <div class="card card-small">
     <h1 class="card-heading simple">${ _('Configurations') }</h1>

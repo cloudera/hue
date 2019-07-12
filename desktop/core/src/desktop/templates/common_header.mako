@@ -162,8 +162,6 @@ if USE_NEW_EDITOR.get():
     ace.config.set("basePath", "${ static('desktop/js/ace') }");
   </script>
 
-  <script src="${ static('metastore/js/metastore.model.js') }"></script>
-
   ${ hueAceAutocompleter.hueAceAutocompleter() }
 %endif
 

@@ -27,8 +27,6 @@ ${ commonheader(_('Create table from file'), 'metastore', user, request) | n,uni
 <span class="notebook">
 ${ layout.metastore_menubar() }
 
-<script src="${ static('metastore/js/metastore.ko.js') }"></script>
-
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
