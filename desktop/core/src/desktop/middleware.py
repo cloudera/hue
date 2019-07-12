@@ -718,7 +718,7 @@ class SpnegoMiddleware(object):
 
   def clean_host(self, pattern):
     if pattern:
-      return set([socket.gethostbyaddr(hostport.split(':')[0])[0] for hostport in pattern.split(',')])
+      return set([socket.gethostbyaddr(hostport.split(':')[0].strip())[0] for hostport in pattern.split(',')])
     return set([])
 
   def clean_username(self, username, request):
