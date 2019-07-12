@@ -1655,6 +1655,13 @@ IS_K8S_ONLY = Config(
   help=_('Choose whether to pick configs only from [desktop] [[cluster]]')
 )
 
+ENABLE_ORGANIZATIONS = Config(
+  key='enable_organizations',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether to allow multi tenancy or not.')
+)
+
 
 ENABLE_PROMETHEUS = Config(
   key='enable_prometheus',
