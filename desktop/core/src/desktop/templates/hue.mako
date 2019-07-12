@@ -459,9 +459,12 @@ ${ hueIcons.symbols() }
 
 ${ commonshare() | n,unicode }
 
-${ render_bundle('vendors~hue~notebook') | n,unicode }
+${ render_bundle('vendors~hue~notebook~tableBrowser') | n,unicode }
+${ render_bundle('vendors~hue~tableBrowser') | n,unicode }
 ${ render_bundle('vendors~hue') | n,unicode }
 ${ render_bundle('hue~notebook') | n,unicode }
+${ render_bundle('hue~notebook~tableBrowser') | n,unicode }
+${ render_bundle('hue~tableBrowser') | n,unicode }
 ${ render_bundle('hue') | n,unicode }
 
 <script src="${ static('desktop/js/polyfills.js') }"></script>
@@ -483,7 +486,6 @@ ${ render_bundle('hue') | n,unicode }
 <script>ace.config.set("basePath", "${ static('desktop/js/ace') }");</script>
 
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
-<script src="${ static('metastore/js/metastore.model.js') }"></script>
 
 <script>
   var shareViewModel = initSharing("#documentShareModal");

@@ -21,8 +21,6 @@ from django.utils.translation import ugettext as _
 
 ${ commonheader_m(_('Assist'), 'assist', user, request) | n,unicode }
 
-<script src="${ static('metastore/js/metastore.ko.js') }"></script>
-
 <style type="text/css">
   .assist {
     margin-left: -10px;

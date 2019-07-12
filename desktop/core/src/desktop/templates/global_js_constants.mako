@@ -25,7 +25,7 @@
   from dashboard.conf import HAS_SQL_ENABLED
   from filebrowser.conf import SHOW_UPLOAD_BUTTON
   from indexer.conf import ENABLE_NEW_INDEXER
-  from metadata.conf import has_catalog, has_readonly_catalog, has_optimizer, has_workload_analytics, OPTIMIZER
+  from metadata.conf import has_catalog, has_readonly_catalog, has_optimizer, has_workload_analytics, OPTIMIZER, get_optimizer_url, get_catalog_url
   from metastore.conf import ENABLE_NEW_CREATE_TABLE
   from metastore.views import has_write_access
   from notebook.conf import ENABLE_NOTEBOOK_2, ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ordered_interpreters, SHOW_NOTEBOOKS
@@ -74,9 +74,11 @@
   window.ENABLE_SQL_SYNTAX_CHECK = '${ conf.ENABLE_SQL_SYNTAX_CHECK.get() }' === 'True';
 
   window.HAS_CATALOG = '${ has_catalog(request.user) }' === 'True';
+  window.CATALOG_URL = '${ get_catalog_url() }'
   window.HAS_READ_ONLY_CATALOG = '${ has_readonly_catalog(request.user) }' === 'True' || '${ has_write_access(request.user) }' === 'False';
 
   window.HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
+  window.OPTIMIZER_URL = '${ get_optimizer_url() }'
   window.AUTO_UPLOAD_OPTIMIZER_STATS = '${ OPTIMIZER.AUTO_UPLOAD_STATS.get() }' === 'True';
 
   ## In the past was has_workload_analytics()
@@ -295,6 +297,7 @@
     'No clusters found': '${ _('No clusters found') }',
     'No columns found': '${ _('No columns found') }',
     'No computes found': '${ _('No computes found') }',
+    'No data available': '${ _('No data available') }',
     'No Data Available.': '${ _('No Data Available.') }',
     'No databases found': '${ _('No databases found') }',
     'No databases found.': '${ _('No databases found.') }',
@@ -303,6 +306,7 @@
     'No indexes selected.': '${ _('No indexes selected.') }',
     'No logs available at this moment.': '${ _('No logs available at this moment.') }',
     'No match found': '${ _('No match found') }',
+    'No matching records': '${ _('No matching records') }',
     'No namespaces found': '${ _('No namespaces found') }',
     'No namespaces found.': '${ _('No namespaces found.') }',
     'No optimizations identified.': '${ _('No optimizations identified.') }',
