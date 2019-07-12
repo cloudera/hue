@@ -66,7 +66,73 @@ from hadoop import cluster
 
 import useradmin.conf
 
+
 LOG = logging.getLogger(__name__)
+
+
+
+class OrganizationManager(models.Manager):
+  use_in_migrations = True
+
+  def get_by_natural_key(self, name):
+    return self.get(name=name)
+
+
+class Organization(models.Model):
+  name = models.CharField(max_length=200, help_text=_t("The name of the organization"))
+  is_active = models.BooleanField(default=True)
+
+  objects = OrganizationManager()
+
+
+class OrganizationGroupManager(models.Manager):
+
+  def natural_key(self):
+    return (self.organization, self.name,)
+
+
+class OrganizationGroup(models.Model):
+  name = models.CharField(_t('name'), max_length=80, unique=False)
+  organization = models.ForeignKey(Organization)
+
+  permissions = models.ManyToManyField(
+      'HuePermission',
+      verbose_name=_t('permissions'),
+      blank=True,
+  )
+
+  objects = OrganizationGroupManager()
+
+  class Meta:
+    verbose_name = _t('organization group')
+    verbose_name_plural = _t('organization groups')
+    unique_together = ('name', 'organization',)
+
+  def __str__(self):
+    return '%s %s' % (self.organization, self.name)
+
+
+# class OrganizationGroupPermission(models.Model):
+#   """
+#   Represents the permissions a group has.
+#   """
+#   group = models.ForeignKey(OrganizationGroup)
+#   hue_permission = models.ForeignKey("HuePermission")
+
+
+# In class UserProfile
+#
+#   def get_groups(self):
+#     return self.user.groups.all()
+# to update
+
+# User
+# --> switch to email as PK
+# AUTH_USER_MODEL = 'auth.User'
+
+# Enabled when:
+# desktop.conf.ENABLE_ORGANIZATIONS.get()
+
 
 class UserProfile(models.Model):
   """
@@ -134,7 +200,8 @@ class UserProfile(models.Model):
     if self.has_hue_permission(perm):
       return
     else:
-      raise PopupException(_t("You do not have permissions to %(description)s.") % dict(description=perm.description))
+      raise PopupException(_t("You do not have permissions to %(description)s.") % {'description': perm.description})
+
 
 def get_profile(user):
   """
@@ -170,12 +237,14 @@ def create_profile_for_user(user):
     LOG.exception("Failed to automatically create user profile.")
     return None
 
+
 class LdapGroup(models.Model):
   """
   Groups that come from LDAP originally will have an LdapGroup
   record generated at creation time.
   """
   group = models.ForeignKey(auth_models.Group, related_name="group")
+
 
 class GroupPermission(models.Model):
   """
@@ -185,7 +254,6 @@ class GroupPermission(models.Model):
   hue_permission = models.ForeignKey("HuePermission")
 
 
-# Permission Management
 class HuePermission(models.Model):
   """
   Set of non-object specific permissions that an app supports.
@@ -197,6 +265,7 @@ class HuePermission(models.Model):
   description = models.CharField(max_length=255)
 
   groups = models.ManyToManyField(auth_models.Group, through=GroupPermission)
+  organization_groups = models.ManyToManyField(OrganizationGroup)
 
   def __str__(self):
     return "%s.%s:%s(%d)" % (self.app, self.action, self.description, self.pk)
@@ -204,6 +273,7 @@ class HuePermission(models.Model):
   @classmethod
   def get_app_permission(cls, hue_app, action):
     return HuePermission.objects.get(app=hue_app, action=action)
+
 
 def get_default_user_group(**kwargs):
   default_user_group = useradmin.conf.DEFAULT_USER_GROUP.get()
