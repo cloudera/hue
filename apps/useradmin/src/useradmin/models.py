@@ -66,46 +66,50 @@ LOG = logging.getLogger(__name__)
 #  Organizations
 # -----------------------------------------------------------------------
 
-class OrganizationManager(models.Manager):
-  use_in_migrations = True
+# TODO models2.py
 
-  def get_by_natural_key(self, name):
-    return self.get(name=name)
+if ENABLE_ORGANIZATIONS.get():
 
-class Organization(models.Model):
-  name = models.CharField(max_length=200, help_text=_t("The name of the organization"))
-  is_active = models.BooleanField(default=True)
+  class OrganizationManager(models.Manager):
+    use_in_migrations = True
 
-  objects = OrganizationManager()
+    def get_by_natural_key(self, name):
+      return self.get(name=name)
 
+  class Organization(models.Model):
+    name = models.CharField(max_length=200, help_text=_t("The name of the organization"))
+    is_active = models.BooleanField(default=True)
 
-class OrganizationGroupManager(models.Manager):
-
-  def natural_key(self):
-    return (self.organization, self.name,)
-
-class OrganizationGroup(models.Model):
-  name = models.CharField(_t('name'), max_length=80, unique=False)
-  organization = models.ForeignKey(Organization)
-
-  permissions = models.ManyToManyField(
-      'HuePermission',
-      verbose_name=_t('permissions'),
-      blank=True,
-  )
-
-  objects = OrganizationGroupManager()
-
-  class Meta:
-    verbose_name = _t('organization group')
-    verbose_name_plural = _t('organization groups')
-    unique_together = ('name', 'organization',)
-
-  def __str__(self):
-    return '%s %s' % (self.organization, self.name)
+    objects = OrganizationManager()
 
 
-class UserManager(BaseUserManager):
+  class OrganizationGroupManager(models.Manager):
+
+    def natural_key(self):
+      return (self.organization, self.name,)
+
+  class OrganizationGroup(models.Model):
+    name = models.CharField(_t('name'), max_length=80, unique=False)
+    organization = models.ForeignKey(Organization)
+
+    permissions = models.ManyToManyField(
+        'HuePermission',
+        verbose_name=_t('permissions'),
+        blank=True,
+    )
+
+    objects = OrganizationGroupManager()
+
+    class Meta:
+      verbose_name = _t('organization group')
+      verbose_name_plural = _t('organization groups')
+      unique_together = ('name', 'organization',)
+
+    def __str__(self):
+      return '%s %s' % (self.organization, self.name)
+
+
+  class UserManager(BaseUserManager):
     """Define a model manager for User model with no username field."""
 
     use_in_migrations = True
@@ -138,23 +142,23 @@ class UserManager(BaseUserManager):
 
         return self._create_user(email, password, **extra_fields)
 
-def default_organization():
-  default_organization, created = Organization.objects.get_or_create(name='default')
-  return default_organization
+  def default_organization():
+    default_organization, created = Organization.objects.get_or_create(name='default')
+    return default_organization
 
-class OrganizationUser(AbstractUser):
-    """User model."""
+  class OrganizationUser(AbstractUser):
+      """User model."""
 
-    username = None
-    email = models.EmailField(_t('email address'), unique=True)
-    token = models.CharField(_t('token'), max_length=128, default=None, null=True)
-    customer_id = models.CharField(_t('Customer id'), max_length=128, default=None, null=True)
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, default=None)
+      username = None
+      email = models.EmailField(_t('email address'), unique=True)
+      token = models.CharField(_t('token'), max_length=128, default=None, null=True)
+      customer_id = models.CharField(_t('Customer id'), max_length=128, default=None, null=True)
+      organization = models.ForeignKey(Organization, on_delete=models.CASCADE, default=None)
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+      USERNAME_FIELD = 'email'
+      REQUIRED_FIELDS = []
 
-    objects = UserManager()
+      objects = UserManager()
 
 
 if ENABLE_ORGANIZATIONS.get():
@@ -289,7 +293,8 @@ class HuePermission(models.Model):
   """
   Set of non-object specific permissions that an app supports.
 
-  For now, we only assign permissions to groups, though that may change.
+  Currently only assign permissions to groups (not users or roles).
+  Could be move to support Apache Ranger permissions, AWS IAM... for Hue and connector access.
   """
   app = models.CharField(max_length=30)
   action = models.CharField(max_length=100)
