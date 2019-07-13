@@ -5,27 +5,35 @@ from __future__ import unicode_literals
 import django.contrib.auth.models
 from django.db import migrations, models
 
+from desktop.conf import ENABLE_ORGANIZATIONS
 
-class Migration(migrations.Migration):
 
-    initial = True
+if ENABLE_ORGANIZATIONS.get():
+  class Migration(migrations.Migration):
+      dependencies = [
+          ('desktop', '0003_initial'),
+      ]
+else:
+  class Migration(migrations.Migration):
 
-    dependencies = [
-        ('desktop', '0003_initial'),
-    ]
+      initial = True
 
-    operations = [
-        migrations.CreateModel(
-            name='HueUser',
-            fields=[
-            ],
-            options={
-                'proxy': True,
-                'indexes': [],
-            },
-            bases=('auth.user',),
-            managers=[
-                ('objects', django.contrib.auth.models.UserManager()),
-            ],
-        ),
-    ]
+      dependencies = [
+          ('desktop', '0003_initial'),
+      ]
+
+      operations = [
+          migrations.CreateModel(
+              name='HueUser',
+              fields=[
+              ],
+              options={
+                  'proxy': True,
+                  'indexes': [],
+              },
+              bases=('auth.user',),
+              managers=[
+                  ('objects', django.contrib.auth.models.UserManager()),
+              ],
+          ),
+      ]
