@@ -93,7 +93,7 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
   username = forms.RegexField(
       label=_t("Username"),
       max_length=30,
-      regex='^%s$' % (get_username_re_rule(),),
+      regex='^%s$' % (get_username_re_rule(),), # Could use UnicodeUsernameValidator()
       help_text = _t("Required. 30 characters or fewer. No whitespaces or colons."),
       error_messages = {'invalid': _t("Whitespaces and ':' not allowed") })
 
