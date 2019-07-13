@@ -30,39 +30,42 @@ import uuid
 from collections import OrderedDict
 from itertools import chain
 
-from django.contrib.auth import models as auth_models
+from django.db import connection, models, transaction
+from django.db.models import Q
+from django.db.models.query import QuerySet
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse, NoReverseMatch
-from django.db import connection, models, transaction
-from django.db.models import Q
-from django.db.models.query import QuerySet
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
-from desktop.settings import HUE_DESKTOP_VERSION
-
 from dashboard.conf import get_engines, HAS_REPORT_ENABLED
+from desktop.settings import HUE_DESKTOP_VERSION
 from kafka.conf import has_kafka
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
+from settings import HUE_DESKTOP_VERSION
 
 from desktop import appmanager
-from desktop.auth.backend import is_admin
-from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_K8S_ONLY
+from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_K8S_ONLY, ENABLE_ORGANIZATIONS
 from desktop.lib import fsmanager
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paths import get_run_root, SAFE_CHARACTERS_URI_COMPONENTS
 from desktop.redaction import global_redaction_engine
 from desktop.settings import DOCUMENT2_SEARCH_MAX_LENGTH
-from desktop.auth.backend import is_admin
 
 if sys.version_info[0] > 2:
   import urllib.request, urllib.error
   from urllib.parse import quote as urllib_quote
 else:
   from urllib import quote as urllib_quote
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models import OrganizationUser as User, OrganizationGroup as Group
+else:
+  from django.contrib.auth.models import User, Group
+
 
 LOG = logging.getLogger(__name__)
 
@@ -101,7 +104,8 @@ def _version_from_properties(f):
 
 PREFERENCE_IS_WELCOME_TOUR_SEEN = 'is_welcome_tour_seen'
 
-class HueUser(auth_models.User):
+
+class HueUser(User):
   class Meta(object):
     proxy = True
 
@@ -109,12 +113,12 @@ class HueUser(auth_models.User):
     self._meta.get_field(
       'username'
     ).validators[0] = UnicodeUsernameValidator()
-    super(auth_models.User, self).__init__(*args, **kwargs)
+    super(User, self).__init__(*args, **kwargs)
 
 
 class UserPreferences(models.Model):
   """Holds arbitrary key/value strings."""
-  user = models.ForeignKey(auth_models.User)
+  user = models.ForeignKey(User)
   key = models.CharField(max_length=20)
   value = models.TextField(max_length=4096)
 
@@ -165,8 +169,8 @@ class DefaultConfiguration(models.Model):
   properties = models.TextField(default='[]', help_text=_t('JSON-formatted default properties values.'))
 
   is_default = models.BooleanField(default=False, db_index=True)
-  groups = models.ManyToManyField(auth_models.Group, db_index=True, db_table='defaultconfiguration_groups')
-  user = models.ForeignKey(auth_models.User, blank=True, null=True, db_index=True)
+  groups = models.ManyToManyField(Group, db_index=True, db_table='defaultconfiguration_groups')
+  user = models.ForeignKey(User, blank=True, null=True, db_index=True)
 
   objects = DefaultConfigurationManager()
 
@@ -290,7 +294,7 @@ class DocumentTag(models.Model):
   """
   Reserved tags can't be manually removed by the user.
   """
-  owner = models.ForeignKey(auth_models.User, db_index=True)
+  owner = models.ForeignKey(User, db_index=True)
   tag = models.SlugField()
 
   DEFAULT = 'default' # Always there
@@ -618,7 +622,7 @@ class DocumentManager(models.Manager):
 
 class Document(models.Model):
 
-  owner = models.ForeignKey(auth_models.User, db_index=True, verbose_name=_t('Owner'), help_text=_t('User who can own the job.'), related_name='doc_owner')
+  owner = models.ForeignKey(User, db_index=True, verbose_name=_t('Owner'), help_text=_t('User who can own the job.'), related_name='doc_owner')
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
 
@@ -781,12 +785,12 @@ class Document(models.Model):
     for name, perm in perms_dict.items():
       users = groups = None
       if perm.get('user_ids'):
-        users = auth_models.User.objects.in_bulk(perm.get('user_ids'))
+        users = User.objects.in_bulk(perm.get('user_ids'))
       else:
         users = []
 
       if perm.get('group_ids'):
-        groups = auth_models.Group.objects.in_bulk(perm.get('group_ids'))
+        groups = Group.objects.in_bulk(perm.get('group_ids'))
       else:
         groups = []
 
@@ -883,8 +887,8 @@ class DocumentPermission(models.Model):
 
   doc = models.ForeignKey(Document)
 
-  users = models.ManyToManyField(auth_models.User, db_index=True, db_table='documentpermission_users')
-  groups = models.ManyToManyField(auth_models.Group, db_index=True, db_table='documentpermission_groups')
+  users = models.ManyToManyField(User, db_index=True, db_table='documentpermission_users')
+  groups = models.ManyToManyField(Group, db_index=True, db_table='documentpermission_groups')
   perms = models.CharField(default=READ_PERM, max_length=10, choices=( # one perm
     (READ_PERM, 'read'),
     (WRITE_PERM, 'write'),
@@ -1077,7 +1081,7 @@ class Document2(models.Model):
   TRASH_DIR = '.Trash'
   EXAMPLES_DIR = 'examples'
 
-  owner = models.ForeignKey(auth_models.User, db_index=True, verbose_name=_t('Owner'), help_text=_t('Creator.'), related_name='doc2_owner')
+  owner = models.ForeignKey(User, db_index=True, verbose_name=_t('Owner'), help_text=_t('Creator.'), related_name='doc2_owner')
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
   uuid = models.CharField(default=uuid_default, max_length=36, db_index=True)
@@ -1532,8 +1536,8 @@ class Document2Permission(models.Model):
 
   doc = models.ForeignKey(Document2)
 
-  users = models.ManyToManyField(auth_models.User, db_index=True, db_table='documentpermission2_users')
-  groups = models.ManyToManyField(auth_models.Group, db_index=True, db_table='documentpermission2_groups')
+  users = models.ManyToManyField(User, db_index=True, db_table='documentpermission2_users')
+  groups = models.ManyToManyField(Group, db_index=True, db_table='documentpermission2_groups')
 
   perms = models.CharField(default=READ_PERM, max_length=10, db_index=True, choices=( # one perm
     (READ_PERM, 'read'),

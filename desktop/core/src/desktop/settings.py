@@ -212,7 +212,6 @@ INSTALLED_APPS = [
     #'django_celery_results',
 ]
 
-
 WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'desktop/js/bundles/hue/',
@@ -327,6 +326,9 @@ if DEBUG: # For simplification, force all DEBUG when django_debug_mode is True a
 # Part 4a: Django configuration that requires bound Desktop
 # configs.
 ############################################################
+
+if desktop.conf.ENABLE_ORGANIZATIONS.get():
+  AUTH_USER_MODEL = 'useradmin.OrganizationUser'
 
 # Configure allowed hosts
 ALLOWED_HOSTS = desktop.conf.ALLOWED_HOSTS.get()

@@ -17,12 +17,9 @@
 """
 The core of this module adds permissions functionality to Hue applications.
 
-A "Hue Permission" (colloquially, appname.action, but stored in the
-HuePermission model) is a way to specify some action whose
-control may be restricted.  Every Hue application, by default,
-has an "access" action.  To specify extra actions, applications
-can specify them in appname.settings.PERMISSION_ACTIONS, as
-pairs of (action_name, description).
+A "Hue Permission" (colloquially, appname.action, but stored in the HuePermission model) is a way to specify some action whose
+control may be restricted.  Every Hue application, by default, has an "access" action. To specify extra actions, applications
+can specify them in appname.settings.PERMISSION_ACTIONS, as pairs of (action_name, description).
 
 Several mechanisms enforce permission.  First of all, the "access" permission
 is controlled by LoginAndPermissionMiddleware.  For eligible views
@@ -35,19 +32,12 @@ Thirdly, you may wish to do so manually, by using something akin to:
   dp = HuePermission.objects.get(app=pp, action=action)
   request.user.has_hue_permission(dp)
 
-[Design note: it is questionable that a Hue permission is
-a model, instead of just being a string.  Could go either way.]
-
-Permissions may be granted to groups, but not, currently, to users.
-A user's abilities is the union of all permissions the group
+Permissions may be granted to groups, but not, currently, to users. A user's abilities is the union of all permissions the group
 has access to.
 
-Note that Django itself has a notion of users, groups, and permissions.
-We re-use Django's notion of users and groups, but ignore its notion of
-permissions.  The permissions notion in Django is strongly tied to
-what models you may or may not edit, and there are elaborations (especially
-in Django 1.2) to manipulate this row by row.  This does not map nicely
-onto actions which may not relate to database models.
+Note that Django itself has a notion of users, groups, and permissions. We re-use Django's notion of users and groups, but ignore its notion of
+permissions.  The permissions notion in Django is strongly tied to what models you may or may not edit, and there are elaborations (especially
+in Django 1.2) to manipulate this row by row. This does not map nicely onto actions which may not relate to database models.
 """
 import logging
 from datetime import datetime
@@ -55,11 +45,13 @@ from enum import Enum
 
 from django.db import connection, models, transaction
 from django.contrib.auth import models as auth_models
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _t
 import django.utils.timezone as dtz
 
 from desktop import appmanager
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.idbroker.conf import is_idbroker_enabled
 from hadoop import cluster
@@ -70,13 +62,15 @@ import useradmin.conf
 LOG = logging.getLogger(__name__)
 
 
+# -----------------------------------------------------------------------
+#  Organizations
+# -----------------------------------------------------------------------
 
 class OrganizationManager(models.Manager):
   use_in_migrations = True
 
   def get_by_natural_key(self, name):
     return self.get(name=name)
-
 
 class Organization(models.Model):
   name = models.CharField(max_length=200, help_text=_t("The name of the organization"))
@@ -89,7 +83,6 @@ class OrganizationGroupManager(models.Manager):
 
   def natural_key(self):
     return (self.organization, self.name,)
-
 
 class OrganizationGroup(models.Model):
   name = models.CharField(_t('name'), max_length=80, unique=False)
@@ -112,26 +105,64 @@ class OrganizationGroup(models.Model):
     return '%s %s' % (self.organization, self.name)
 
 
-# class OrganizationGroupPermission(models.Model):
-#   """
-#   Represents the permissions a group has.
-#   """
-#   group = models.ForeignKey(OrganizationGroup)
-#   hue_permission = models.ForeignKey("HuePermission")
+class UserManager(BaseUserManager):
+    """Define a model manager for User model with no username field."""
+
+    use_in_migrations = True
+
+    def _create_user(self, email, password, **extra_fields):
+        """Create and save a User with the given email and password."""
+        if not email:
+            raise ValueError('The given email must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_user(self, email, password=None, **extra_fields):
+        """Create and save a regular User with the given email and password."""
+        extra_fields.setdefault('is_staff', False)
+        extra_fields.setdefault('is_superuser', False)
+        return self._create_user(email, password, **extra_fields)
+
+    def create_superuser(self, email, password, **extra_fields):
+        """Create and save a SuperUser with the given email and password."""
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+
+        return self._create_user(email, password, **extra_fields)
+
+def default_organization():
+  default_organization, created = Organization.objects.get_or_create(name='default')
+  return default_organization
+
+class OrganizationUser(AbstractUser):
+    """User model."""
+
+    username = None
+    email = models.EmailField(_t('email address'), unique=True)
+    token = models.CharField(_t('token'), max_length=128, default=None, null=True)
+    customer_id = models.CharField(_t('Customer id'), max_length=128, default=None, null=True)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, default=default_organization)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    objects = UserManager()
 
 
-# In class UserProfile
-#
-#   def get_groups(self):
-#     return self.user.groups.all()
-# to update
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models import OrganizationUser as User, OrganizationGroup as Group
+else:
+  from django.contrib.auth.models import User, Group
 
-# User
-# --> switch to email as PK
-# AUTH_USER_MODEL = 'auth.User'
-
-# Enabled when:
-# desktop.conf.ENABLE_ORGANIZATIONS.get()
+# -----------------------------------------------------------------------
 
 
 class UserProfile(models.Model):
@@ -158,7 +189,7 @@ class UserProfile(models.Model):
     HUE = 1
     EXTERNAL = 2
 
-  user = models.OneToOneField(auth_models.User, unique=True)
+  user = models.OneToOneField(User, unique=True)
   home_directory = models.CharField(editable=True, max_length=1024, null=True)
   creation_method = models.CharField(editable=True, null=False, max_length=64, default=CreationMethod.HUE.name)
   first_login = models.BooleanField(default=True, verbose_name=_t('First Login'),
@@ -243,14 +274,14 @@ class LdapGroup(models.Model):
   Groups that come from LDAP originally will have an LdapGroup
   record generated at creation time.
   """
-  group = models.ForeignKey(auth_models.Group, related_name="group")
+  group = models.ForeignKey(Group, related_name="group")
 
 
 class GroupPermission(models.Model):
   """
   Represents the permissions a group has.
   """
-  group = models.ForeignKey(auth_models.Group)
+  group = models.ForeignKey(Group)
   hue_permission = models.ForeignKey("HuePermission")
 
 
@@ -264,7 +295,7 @@ class HuePermission(models.Model):
   action = models.CharField(max_length=100)
   description = models.CharField(max_length=255)
 
-  groups = models.ManyToManyField(auth_models.Group, through=GroupPermission)
+  groups = models.ManyToManyField(Group, through=GroupPermission)
   organization_groups = models.ManyToManyField(OrganizationGroup)
 
   def __str__(self):
@@ -280,7 +311,7 @@ def get_default_user_group(**kwargs):
   if default_user_group is None:
     return None
 
-  group, created = auth_models.Group.objects.get_or_create(name=default_user_group)
+  group, created = Group.objects.get_or_create(name=default_user_group)
   if created:
     group.save()
 
@@ -379,14 +410,14 @@ def install_sample_user():
   user = None
 
   try:
-    if auth_models.User.objects.filter(id=SAMPLE_USER_ID).exists():
-      user = auth_models.User.objects.get(id=SAMPLE_USER_ID)
+    if User.objects.filter(id=SAMPLE_USER_ID).exists():
+      user = User.objects.get(id=SAMPLE_USER_ID)
       LOG.info('Sample user found with username "%s" and User ID: %s' % (user.username, user.id))
-    elif auth_models.User.objects.filter(username=SAMPLE_USER_INSTALL).exists():
-      user = auth_models.User.objects.get(username=SAMPLE_USER_INSTALL)
+    elif User.objects.filter(username=SAMPLE_USER_INSTALL).exists():
+      user = User.objects.get(username=SAMPLE_USER_INSTALL)
       LOG.info('Sample user found: %s' % user.username)
     else:
-      user, created = auth_models.User.objects.get_or_create(
+      user, created = User.objects.get_or_create(
         username=SAMPLE_USER_INSTALL,
         password='!',
         is_active=False,
@@ -400,7 +431,7 @@ def install_sample_user():
     if user.username != SAMPLE_USER_INSTALL:
       LOG.warn('Sample user does not have username "%s", will attempt to modify the username.' % SAMPLE_USER_INSTALL)
       with transaction.atomic():
-        user = auth_models.User.objects.get(id=SAMPLE_USER_ID)
+        user = User.objects.get(id=SAMPLE_USER_ID)
         user.username = SAMPLE_USER_INSTALL
         user.save()
   except Exception as ex:
