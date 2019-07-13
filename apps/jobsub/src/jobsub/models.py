@@ -21,12 +21,18 @@ import logging
 from django.db import models
 from django.core import urlresolvers
 from django.contrib.auth.models import User
-from desktop.lib.parameterization import find_parameters, bind_parameters
-
 from django.utils.translation import ugettext_lazy as _
+
+from desktop.conf import ENABLE_ORGANIZATIONS
+from desktop.lib.parameterization import find_parameters, bind_parameters
 
 
 LOG = logging.getLogger(__name__)
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 class JobDesign(models.Model):

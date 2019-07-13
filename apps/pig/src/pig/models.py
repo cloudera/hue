@@ -21,15 +21,21 @@ import json
 import posixpath
 
 from django.db import models
-from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
 from django.urls import reverse
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
+from desktop.auth.backend import is_admin
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document as Doc, SAMPLE_USER_ID
 from hadoop.fs.hadoopfs import Hdfs
-from desktop.auth.backend import is_admin
+
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 class Document(models.Model):

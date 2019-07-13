@@ -149,7 +149,7 @@ class OrganizationUser(AbstractUser):
     email = models.EmailField(_t('email address'), unique=True)
     token = models.CharField(_t('token'), max_length=128, default=None, null=True)
     customer_id = models.CharField(_t('Customer id'), max_length=128, default=None, null=True)
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, default=default_organization)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, default=None)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -296,7 +296,6 @@ class HuePermission(models.Model):
   description = models.CharField(max_length=255)
 
   groups = models.ManyToManyField(Group, through=GroupPermission)
-  organization_groups = models.ManyToManyField(OrganizationGroup)
 
   def __str__(self):
     return "%s.%s:%s(%d)" % (self.app, self.action, self.description, self.pk)
