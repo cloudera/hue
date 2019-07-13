@@ -47,7 +47,7 @@ from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 from settings import HUE_DESKTOP_VERSION
 
 from desktop import appmanager
-from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_K8S_ONLY, ENABLE_ORGANIZATIONS
+from desktop.auth.backend import is_admin
 from desktop.lib import fsmanager
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
@@ -105,15 +105,16 @@ def _version_from_properties(f):
 PREFERENCE_IS_WELCOME_TOUR_SEEN = 'is_welcome_tour_seen'
 
 
-class HueUser(User):
-  class Meta(object):
-    proxy = True
+if not ENABLE_ORGANIZATIONS.get():
+  class HueUser(User):
+    class Meta(object):
+      proxy = True
 
-  def __init__(self, *args, **kwargs):
-    self._meta.get_field(
-      'username'
-    ).validators[0] = UnicodeUsernameValidator()
-    super(User, self).__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+      self._meta.get_field(
+        'username'
+      ).validators[0] = UnicodeUsernameValidator()
+      super(User, self).__init__(*args, **kwargs)
 
 
 class UserPreferences(models.Model):
@@ -121,8 +122,6 @@ class UserPreferences(models.Model):
   user = models.ForeignKey(User)
   key = models.CharField(max_length=20)
   value = models.TextField(max_length=4096)
-
-
 
 
 class Settings(models.Model):

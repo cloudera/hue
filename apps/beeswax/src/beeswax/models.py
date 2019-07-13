@@ -23,7 +23,6 @@ import json
 import logging
 
 from django.db import models
-from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
 from django.urls import reverse
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
@@ -31,12 +30,18 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 from enum import Enum
 from TCLIService.ttypes import TSessionHandle, THandleIdentifier, TOperationState, TOperationHandle, TOperationType
 
-from desktop.redaction import global_redaction_engine
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document
+from desktop.redaction import global_redaction_engine
 from librdbms.server import dbms as librdbms_dbms
 
 from beeswax.design import HQLdesign
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

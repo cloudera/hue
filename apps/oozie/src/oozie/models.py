@@ -36,7 +36,6 @@ from django.db import models, transaction
 from django.db.models import Q
 from django.urls import reverse
 from django.core.validators import RegexValidator
-from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.forms.models import inlineformset_factory
@@ -44,13 +43,14 @@ from django.utils.encoding import force_unicode, smart_str
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 import django.utils.timezone as dtz
 
+from desktop.auth.backend import is_admin
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.log.access import access_warn
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document
 from hadoop.fs.exceptions import WebHdfsException
-
 from hadoop.fs.hadoopfs import Hdfs
 from liboozie.submittion import Submission
 from liboozie.submittion import create_directories
@@ -59,16 +59,18 @@ from oozie.conf import REMOTE_SAMPLE_DIR
 from oozie.utils import utc_datetime_format
 from oozie.timezones import TIMEZONES
 
-from desktop.auth.backend import is_admin
-
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
 else:
   from cStringIO import StringIO as string_io
 
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
+
 
 LOG = logging.getLogger(__name__)
-
 
 PATH_MAX = 512
 name_validator = RegexValidator(regex='^[a-zA-Z_][\-_a-zA-Z0-9]{1,39}$',
