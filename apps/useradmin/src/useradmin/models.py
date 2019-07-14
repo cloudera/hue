@@ -155,6 +155,18 @@ if ENABLE_ORGANIZATIONS.get():
       customer_id = models.CharField(_t('Customer id'), max_length=128, default=None, null=True)
       organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
 
+      groups = models.ManyToManyField(
+          OrganizationGroup,
+          verbose_name=_t('groups'),
+          blank=True,
+          help_text=_t(
+              'The groups this user belongs to. A user will get all permissions '
+              'granted to each of their groups.'
+          ),
+          related_name="user_set",
+          related_query_name="user",
+      )
+
       USERNAME_FIELD = 'email'
       REQUIRED_FIELDS = []
 
