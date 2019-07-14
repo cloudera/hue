@@ -172,6 +172,15 @@ if ENABLE_ORGANIZATIONS.get():
 
       objects = UserManager()
 
+      @property
+      def username(self):
+        return self.email
+
+      @username.setter
+      def username(self, value):
+        pass
+
+
 
 if ENABLE_ORGANIZATIONS.get():
   from useradmin.models import OrganizationUser as User, OrganizationGroup as Group
