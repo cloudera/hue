@@ -34,28 +34,28 @@ import logging
 import pam
 import requests
 
+from importlib import import_module
 import django.contrib.auth.backends
 from django.contrib import auth
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import HttpResponseRedirect
 from django.forms import ValidationError
-from importlib import import_module
 from django_auth_ldap.backend import LDAPBackend
 from django_auth_ldap.config import LDAPSearch
 from liboauth.metrics import oauth_authentication_time
 from mozilla_django_oidc.auth import OIDCAuthenticationBackend, default_username_algo
 from mozilla_django_oidc.utils import absolutify, import_from_settings
 
-import desktop.conf
 from desktop import metrics
+from desktop.conf import ENABLE_ORGANIZATIONS, AUTH, LDAP, OIDC
 from desktop.settings import LOAD_BALANCER_COOKIE
 
 from useradmin import ldap_access
 from useradmin.models import get_profile, get_default_user_group, UserProfile
 
-if desktop.conf.ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import OrganizationUser as User
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models import OrganizationUser as User, Organization
 else:
   from django.contrib.auth.models import User
 
@@ -69,7 +69,7 @@ def load_augmentation_class():
   Similar in spirit to django.contrib.auth.load_backend
   """
   try:
-    class_name = desktop.conf.AUTH.USER_AUGMENTOR.get()
+    class_name = AUTH.USER_AUGMENTOR.get()
     i = class_name.rfind('.')
     module, attr = class_name[:i], class_name[i+1:]
     mod = import_module(module)
@@ -132,22 +132,34 @@ class DefaultUserAugmentor(object):
     return self._get_profile().has_hue_permission(action=action, app=app)
 
 def find_user(username):
+  lookup = {'email': username} if ENABLE_ORGANIZATIONS.get() else {'username': username}
+
   try:
-    user = User.objects.get(username=username)
+    user = User.objects.get(**lookup)
     LOG.debug("Found user %s in the db" % username)
   except User.DoesNotExist:
     user = None
   return user
 
 def create_user(username, password, is_superuser=True):
-  LOG.info("Materializing user %s in the database" % username)
-  user = User(username=username)
+  if ENABLE_ORGANIZATIONS.get():
+    domain = username.split('@')[1]
+    organization, created = Organization.objects.get_or_create(name=domain)
+    lookup = {'email': username, 'organization': organization}
+  else:
+    lookup = {'username': username}
+
+  LOG.info("Materializing user %s in the database" % lookup)
+
+  user = User(**lookup)
+
   if password is None:
     user.set_unusable_password()
   else:
     user.set_password(password)
   user.is_superuser = is_superuser
   user.save()
+
   return user
 
 def find_or_create_user(username, password=None, is_superuser=True):
@@ -164,11 +176,12 @@ def ensure_has_a_group(user):
     user.save()
 
 def force_username_case(username):
-  if desktop.conf.AUTH.FORCE_USERNAME_LOWERCASE.get():
+  if AUTH.FORCE_USERNAME_LOWERCASE.get():
     username = username.lower()
-  elif desktop.conf.AUTH.FORCE_USERNAME_UPPERCASE.get():
+  elif AUTH.FORCE_USERNAME_UPPERCASE.get():
     username = username.upper()
   return username
+
 
 class DesktopBackendBase(object):
   """
@@ -205,7 +218,8 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
   Allows the first user in, but otherwise delegates to Django's
   ModelBackend.
   """
-  def authenticate(self, username=None, password=None):
+  def authenticate(self, username=None, email=None, password=None):
+    username = email
     username = force_username_case(username)
     request = None
     user = super(AllowFirstUserDjangoBackend, self).authenticate(request, username=username, password=password)
@@ -330,13 +344,13 @@ class PamBackend(DesktopBackendBase):
   def authenticate(self, request=None, username=None, password=None):
     username = force_username_case(username)
 
-    if pam.authenticate(username, password, desktop.conf.AUTH.PAM_SERVICE.get()):
+    if pam.authenticate(username, password, AUTH.PAM_SERVICE.get()):
       is_super = False
       if User.objects.count() == 0:
         is_super = True
 
       try:
-        if desktop.conf.AUTH.IGNORE_USERNAME_CASE.get():
+        if AUTH.IGNORE_USERNAME_CASE.get():
           user = User.objects.get(username__iexact=username)
         else:
           user = User.objects.get(username=username)
@@ -378,7 +392,7 @@ class LdapBackend(object):
           from useradmin.forms import validate_username
           validate_username(username)
 
-          if desktop.conf.LDAP.IGNORE_USERNAME_CASE.get():
+          if LDAP.IGNORE_USERNAME_CASE.get():
             try:
               return User.objects.get(username__iexact=username), False
             except User.DoesNotExist:
@@ -454,12 +468,12 @@ class LdapBackend(object):
       ldap.set_option(ldap.OPT_REFERRALS, 0)
 
   def add_ldap_config_for_server(self, server):
-    if desktop.conf.LDAP.LDAP_SERVERS.get():
+    if LDAP.LDAP_SERVERS.get():
       # Choose from multiple server configs
-      if server in desktop.conf.LDAP.LDAP_SERVERS.get():
-        self.add_ldap_config(desktop.conf.LDAP.LDAP_SERVERS.get()[server])
+      if server in LDAP.LDAP_SERVERS.get():
+        self.add_ldap_config(LDAP.LDAP_SERVERS.get()[server])
     else:
-      self.add_ldap_config(desktop.conf.LDAP)
+      self.add_ldap_config(LDAP)
 
   @metrics.ldap_authentication_time
   def authenticate(self, request=None, username=None, password=None, server=None):
@@ -481,7 +495,7 @@ class LdapBackend(object):
       existing_profile = get_profile(existing_user)
       if existing_profile.creation_method == UserProfile.CreationMethod.EXTERNAL.name:
         is_super = User.objects.get(**username_filter_kwargs).is_superuser
-    elif not desktop.conf.LDAP.CREATE_USERS_ON_LOGIN.get():
+    elif not LDAP.CREATE_USERS_ON_LOGIN.get():
       LOG.warn("Create users when they login with their LDAP credentials is turned off")
       return None
 
@@ -505,7 +519,7 @@ class LdapBackend(object):
 
       ensure_has_a_group(user)
 
-      if desktop.conf.LDAP.SYNC_GROUPS_ON_LOGIN.get():
+      if LDAP.SYNC_GROUPS_ON_LOGIN.get():
         self.import_groups(server, user)
 
     return user
@@ -520,8 +534,8 @@ class LdapBackend(object):
     from useradmin.views import get_find_groups_filter
     allowed_group = False
 
-    if desktop.conf.LDAP.LOGIN_GROUPS.get() and desktop.conf.LDAP.LOGIN_GROUPS.get() != ['']:
-      login_groups = desktop.conf.LDAP.LOGIN_GROUPS.get()
+    if LDAP.LOGIN_GROUPS.get() and LDAP.LOGIN_GROUPS.get() != ['']:
+      login_groups = LDAP.LOGIN_GROUPS.get()
       connection = ldap_access.get_connection_from_server(server)
       try:
         user_info = connection.find_users(username, find_by_dn=False)
@@ -575,7 +589,7 @@ class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
       is_super = True
 
     try:
-      if desktop.conf.AUTH.IGNORE_USERNAME_CASE.get():
+      if AUTH.IGNORE_USERNAME_CASE.get():
         user = User.objects.get(username__iexact=username)
       else:
         user = User.objects.get(username=username)
@@ -620,7 +634,7 @@ class KnoxSpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
       is_super = True
 
     try:
-      if desktop.conf.AUTH.IGNORE_USERNAME_CASE.get():
+      if AUTH.IGNORE_USERNAME_CASE.get():
         user = User.objects.get(username__iexact=username)
       else:
         user = User.objects.get(username=username)
@@ -664,7 +678,7 @@ class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
       is_super = True
 
     try:
-      if desktop.conf.AUTH.IGNORE_USERNAME_CASE.get():
+      if AUTH.IGNORE_USERNAME_CASE.get():
         user = User.objects.get(username__iexact=username)
       else:
         user = User.objects.get(username=username)
@@ -790,7 +804,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
            Mapper Type: Group Membership (this is predefined mapper type)
            Token Claim Name: group_membership (required exact string)
     """
-    sueruser_group = '/' + desktop.conf.OIDC.SUPERUSER_GROUP.get()
+    sueruser_group = '/' + OIDC.SUPERUSER_GROUP.get()
     if sueruser_group:
       return sueruser_group in claims.get('group_membership', [])
     return False
@@ -805,7 +819,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
     refresh_token = session.get('oidc_refresh_token', '')
 
     if access_token and refresh_token:
-      oidc_logout_url = desktop.conf.OIDC.LOGOUT_REDIRECT_URL.get()
+      oidc_logout_url = OIDC.LOGOUT_REDIRECT_URL.get()
       client_id = import_from_settings('OIDC_RP_CLIENT_ID')
       client_secret = import_from_settings('OIDC_RP_CLIENT_SECRET')
       oidc_verify_ssl = import_from_settings('OIDC_VERIFY_SSL')
