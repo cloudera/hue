@@ -143,8 +143,7 @@ def find_user(username):
 
 def create_user(username, password, is_superuser=True):
   if ENABLE_ORGANIZATIONS.get():
-    domain = username.split('@')[1]
-    organization, created = Organization.objects.get_or_create(name=domain)
+    organization = get_organization(email=username)
     lookup = {'email': username, 'organization': organization}
   else:
     lookup = {'username': username}
@@ -181,6 +180,11 @@ def force_username_case(username):
   elif AUTH.FORCE_USERNAME_UPPERCASE.get():
     username = username.upper()
   return username
+
+def get_organization(email):
+  domain = email.split('@')[1]
+  organization, created = Organization.objects.get_or_create(name=domain)
+  return organization
 
 
 class DesktopBackendBase(object):
@@ -250,7 +254,7 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
     return user
 
   def is_first_login_ever(self):
-    """ Return true if no one has ever logged in to Desktop yet. """
+    """ Return true if no one has ever logged in."""
     return User.objects.count() == 0
 
 
@@ -775,9 +779,13 @@ class OIDCBackend(OIDCAuthenticationBackend):
         return None
       username = default_username_algo(email)
 
-    return self.UserModel.objects.create_user(username=username, email=email,
-                                              first_name=first_name, last_name=last_name,
-                                              is_superuser=self.is_hue_superuser(claims))
+    return self.UserModel.objects.create_user(
+        username=username,
+        email=email,
+        first_name=first_name,
+        last_name=last_name,
+        is_superuser=self.is_hue_superuser(claims)
+    )
 
   def get_or_create_user(self, access_token, id_token, verified_id):
     user = super(OIDCBackend, self).get_or_create_user(access_token, id_token, verified_id)
