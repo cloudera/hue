@@ -37,20 +37,21 @@ from django.contrib.sessions.models import Session
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 
+from hadoop.fs.exceptions import WebHdfsException
+from notebook.connectors.base import get_api
+from useradmin.models import get_profile, UserProfile
+from useradmin.views import ensure_home_directory, require_change_password
+
 from desktop.auth import forms as auth_forms
 from desktop.auth.backend import OIDCBackend
-from desktop.auth.forms import ImpersonationAuthenticationForm
+from desktop.auth.forms import ImpersonationAuthenticationForm, OrganizationUserCreationForm, OrganizationAuthenticationForm
+from desktop.conf import OAUTH, ENABLE_ORGANIZATIONS
 from desktop.lib.django_util import render
 from desktop.lib.django_util import login_notrequired
 from desktop.lib.django_util import JsonResponse
 from desktop.log.access import access_log, access_warn, last_access_map
-from desktop.conf import OAUTH
 from desktop.settings import LOAD_BALANCER_COOKIE
 
-from hadoop.fs.exceptions import WebHdfsException
-from useradmin.models import get_profile, UserProfile
-from useradmin.views import ensure_home_directory, require_change_password
-from notebook.connectors.base import get_api
 
 if sys.version_info[0] > 2:
   import urllib.request, urllib.error
@@ -116,11 +117,14 @@ def dt_login(request, from_modal=False):
       AuthenticationForm = ImpersonationAuthenticationForm
     else:
       AuthenticationForm = auth_forms.AuthenticationForm
+    if ENABLE_ORGANIZATIONS.get():
+      UserCreationForm = OrganizationUserCreationForm
+      AuthenticationForm = OrganizationAuthenticationForm
 
   if request.method == 'POST':
     request.audit = {
       'operation': 'USER_LOGIN',
-      'username': request.POST.get('username')
+      'username': request.POST.get('username', request.POST.get('email'))
     }
 
     # For first login, need to validate user info!
@@ -309,4 +313,3 @@ def oidc_failed(request):
     return HttpResponseRedirect('/')
   access_warn(request, "401 Unauthorized by oidc")
   return render("oidc_failed.mako", request, dict(uri=request.build_absolute_uri()), status=401)
-

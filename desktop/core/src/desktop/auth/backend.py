@@ -36,25 +36,28 @@ import requests
 
 import django.contrib.auth.backends
 from django.contrib import auth
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import HttpResponseRedirect
 from django.forms import ValidationError
 from importlib import import_module
-
 from django_auth_ldap.backend import LDAPBackend
 from django_auth_ldap.config import LDAPSearch
-
-import desktop.conf
-from desktop import metrics
-from desktop.settings import LOAD_BALANCER_COOKIE
 from liboauth.metrics import oauth_authentication_time
 from mozilla_django_oidc.auth import OIDCAuthenticationBackend, default_username_algo
 from mozilla_django_oidc.utils import absolutify, import_from_settings
 
+import desktop.conf
+from desktop import metrics
+from desktop.settings import LOAD_BALANCER_COOKIE
+
 from useradmin import ldap_access
 from useradmin.models import get_profile, get_default_user_group, UserProfile
+
+if desktop.conf.ENABLE_ORGANIZATIONS.get():
+  from useradmin.models import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)
