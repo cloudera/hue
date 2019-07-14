@@ -219,7 +219,8 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
   ModelBackend.
   """
   def authenticate(self, username=None, email=None, password=None):
-    username = email
+    if email is not None:
+      username = email
     username = force_username_case(username)
     request = None
     user = super(AllowFirstUserDjangoBackend, self).authenticate(request, username=username, password=password)
