@@ -36,7 +36,7 @@ import urllib.parse
 from time import sleep, time
 
 from avro import schema, datafile, io
-from time import sleep
+from time import sleep, time
 
 from aws.s3.s3fs import S3FileSystemException
 from aws.s3.s3test_utils import get_test_bucket
@@ -1032,7 +1032,7 @@ alert("XSS")
 
     USER_NAME = 'test'
     HDFS_DEST_DIR = prefix + "/fb-upload-test"
-    FILE_NAMES = ['test.tar.gz', 'test2.tar.gz','test3.tar.gz','test4.tar.gz',]
+    FILE_NAMES = ['test.tar.gz', 'test2.tar.gz','te st.tar.gz', 'test3.tar.gz']
     TGZ_FILES = [os.path.realpath('apps/filebrowser/src/filebrowser/test_data/' + file_name) for file_name in FILE_NAMES ]
     HDFS_TGZ_FILES = [HDFS_DEST_DIR + '/' + file_name for file_name in FILE_NAMES]
       
@@ -1044,8 +1044,8 @@ alert("XSS")
 
     try:
       # Upload archive
-      responseid = ['', '', '' , '']
-      for i in range(0,4):
+      responseid = ['' for i in FILE_NAMES]
+      for i in range(0,len(FILE_NAMES)):
         resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
                            dict(dest=HDFS_DEST_DIR, hdfs_file=file(TGZ_FILES[i])))
         response = json.loads(resp.content)
@@ -1060,13 +1060,16 @@ alert("XSS")
         responseid[i] = '"' + response['handle']['id'] + '"' 
       
       for r in responseid:
-        while True:
+        timeout_time = time() + 30
+        end_time = time()
+        while timeout_time > end_time:
           resp2 = self.c.post('/jobbrowser/api/job/workflows', {'interface': '"workflows"', 'app_id': r})
           response2 = json.loads(resp2.content)
           if response2['app']['status'] != 'RUNNING':
             assert_equal(response2['app']['status'] , 'SUCCEEDED', response2)
             break 
           sleep(2)
+        assert_greater(timeout_time, end_time, r)
     finally:
       ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(False)
       for f in HDFS_TGZ_FILES:
