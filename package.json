@@ -48,7 +48,7 @@
     "less": "3.9.0",
     "libxmljs": "^0.19.5",
     "localforage": "1.7.3",
-    "lodash": "4.17.11",
+    "lodash": "4.17.13",
     "medium-editor": "5.23.3",
     "minimist": "^1.2.0",
     "page": "1.8.6",
