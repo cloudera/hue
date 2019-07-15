@@ -17,7 +17,6 @@
 
 import json
 import urllib
-import re
 
 from django.urls import reverse
 from django.utils.translation import ugettext as _
