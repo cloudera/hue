@@ -17,6 +17,7 @@
 #
 # Handling of data export
 
+from past.builtins import basestring, long
 import logging
 
 from django.utils.encoding import smart_str

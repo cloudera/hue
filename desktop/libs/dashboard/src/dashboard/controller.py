@@ -16,6 +16,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
+from builtins import object
 import logging
 
 from django.db.models import Q
@@ -82,9 +84,9 @@ class DashboardController(object):
           doc.delete()
           doc2.delete()
       result['status'] = 0
-    except Exception, e:
+    except Exception as e:
       LOG.warn('Error deleting collection: %s' % e)
-      result['message'] = unicode(str(e), "utf8")
+      result['message'] = str(e)
 
     return result
 
@@ -107,9 +109,9 @@ class DashboardController(object):
           doc2.update_data({'collection': collection.data['collection']})
           doc2.save()
       result['status'] = 0
-    except Exception, e:
+    except Exception as e:
       LOG.exception('Error copying collection')
-      result['message'] = unicode(str(e), "utf8")
+      result['message'] = str(e)
 
     return result
 
