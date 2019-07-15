@@ -80,3 +80,16 @@ Starting with these basic steps:
   * unit Python
   * integrations
   * js
+
+# Items
+
+## Browser Testing CI
+
+Goal: detect JavaScript changes completely breaking pages (e.g. lib upgrades, component change side effects...).
+
+* Basic page load of Editor
+* Integration to CI https://circleci.com/docs/2.0/browser-testing/
+* Basic page load of Dashboard, Oozie Wokflow Editor
+* Load of Hive, Impala, Dashboad, Oozie Wokflow examples
+* Add Table Browser, Job Browser, File Browser...
+* Add FF, IE as Browsers
