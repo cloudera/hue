@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import object
 def expr_min(data):
     result = (data[0], 0)
     for i, v in enumerate(data):
@@ -38,7 +39,7 @@ def expr_sum(data):
     return (sum(data), None)
 
 
-class Expr:
+class Expr(object):
 
     @classmethod
     def evaluate(self, expr, vars):
