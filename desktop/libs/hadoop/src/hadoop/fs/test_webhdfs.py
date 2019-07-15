@@ -16,6 +16,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import map
+from builtins import zip
+from builtins import range
+from builtins import object
 import logging
 import os
 import random
@@ -30,6 +34,7 @@ from hadoop import pseudo_hdfs4
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.pseudo_hdfs4 import is_live_cluster
+from functools import reduce
 
 
 LOG = logging.getLogger(__name__)
@@ -46,7 +51,7 @@ class WebhdfsTests(unittest.TestCase):
 
     cls.cluster.fs.setuser('test')
     cls.cluster.fs.mkdir(cls.prefix)
-    cls.cluster.fs.chmod(cls.prefix, 01777)
+    cls.cluster.fs.chmod(cls.prefix, 0o1777)
 
   def setUp(self):
     self.cluster.fs.setuser('test')
@@ -117,10 +122,10 @@ class WebhdfsTests(unittest.TestCase):
       f.write(data)
       f.close()
 
-      for i in xrange(1, 10):
+      for i in range(1, 10):
         f = fs.open(test_file, "r")
 
-        for j in xrange(1, 100):
+        for j in range(1, 100):
           offset = random.randint(0, len(data) - 1)
           f.seek(offset, os.SEEK_SET)
           assert_equals(data[offset:offset+50], f.read(50))
@@ -138,7 +143,7 @@ class WebhdfsTests(unittest.TestCase):
     f = fs.open(test_file, "w")
     f.write("foo")
     f.close()
-    fs.chmod(test_file, 0400)
+    fs.chmod(test_file, 0o400)
     fs.setuser("notsuperuser")
     f = fs.open(test_file)
 
@@ -149,7 +154,7 @@ class WebhdfsTests(unittest.TestCase):
 
     prefix = self.prefix + '/test_umask'
     fs_umask = fs._umask
-    fs._umask = 01022
+    fs._umask = 0o1022
 
     try:
       test_dir = prefix + '/umask_test_dir'
@@ -167,7 +172,7 @@ class WebhdfsTests(unittest.TestCase):
       fs._umask = fs_umask
 
     fs_umask = fs._umask
-    fs._umask = 0077
+    fs._umask = 0o077
     prefix += '/2'
 
     try:
@@ -189,14 +194,14 @@ class WebhdfsTests(unittest.TestCase):
 
     prefix = self.prefix + '/test_umask_overriden'
     fs_umask = fs._umask
-    fs._umask = 01022
+    fs._umask = 0o1022
 
     try:
       test_dir = prefix + '/umask_test_dir'
-      fs.mkdir(test_dir, 0333)
+      fs.mkdir(test_dir, 0o333)
 
       test_file = prefix + '/umask_test.txt'
-      fs.create(test_file, permission=0333)
+      fs.create(test_file, permission=0o333)
 
       assert_equals('40333', '%o' % fs.stats(test_dir).mode)
       assert_equals('100333', '%o' % fs.stats(test_file).mode)
@@ -209,7 +214,7 @@ class WebhdfsTests(unittest.TestCase):
 
     prefix = self.prefix + '/test_umask_without_sticky'
     fs_umask = fs._umask
-    fs._umask = 022
+    fs._umask = 0o22
 
     try:
       test_dir = prefix + '/umask_test_dir'
@@ -239,7 +244,7 @@ class WebhdfsTests(unittest.TestCase):
     new_owner = 'testcopy'
     new_owner_dir = self.prefix  + '/' + new_owner + '/test-copy'
 
-    fs.copy_remote_dir(src_dir, new_owner_dir, dir_mode=0755, owner=new_owner)
+    fs.copy_remote_dir(src_dir, new_owner_dir, dir_mode=0o755, owner=new_owner)
 
     dir_stat = fs.stats(new_owner_dir)
     assert_equals(new_owner, dir_stat.user)
@@ -332,12 +337,12 @@ class WebhdfsTests(unittest.TestCase):
       # Test exception can handle non-ascii characters
       try:
         self.cluster.fs.rmtree(dir_path)
-      except IOError, ex:
+      except IOError as ex:
         LOG.info('Successfully caught error: %s' % ex)
     finally:
       try:
         self.cluster.fs.rmtree(prefix)
-      except Exception, ex:
+      except Exception as ex:
         LOG.error('Failed to cleanup %s: %s' % (prefix, ex))
 
       # Reset encoding
@@ -360,22 +365,22 @@ class WebhdfsTests(unittest.TestCase):
       f.close()
 
       # Check currrent permissions are not 777 (666 for file)
-      fs.chmod(dir1, 01000, recursive=True)
-      assert_equals(041000, fs.stats(dir1).mode)
-      assert_equals(041000, fs.stats(subdir1).mode)
-      assert_equals(0101000, fs.stats(file1).mode)
+      fs.chmod(dir1, 0o1000, recursive=True)
+      assert_equals(0o41000, fs.stats(dir1).mode)
+      assert_equals(0o41000, fs.stats(subdir1).mode)
+      assert_equals(0o101000, fs.stats(file1).mode)
 
       # Chmod non-recursive
-      fs.chmod(dir1, 01222, recursive=False)
-      assert_equals(041222, fs.stats(dir1).mode)
-      assert_equals(041000, fs.stats(subdir1).mode)
-      assert_equals(0101000, fs.stats(file1).mode)
+      fs.chmod(dir1, 0o1222, recursive=False)
+      assert_equals(0o41222, fs.stats(dir1).mode)
+      assert_equals(0o41000, fs.stats(subdir1).mode)
+      assert_equals(0o101000, fs.stats(file1).mode)
 
       # Chmod recursive
-      fs.chmod(dir1, 01444, recursive=True)
-      assert_equals(041444, fs.stats(dir1).mode)
-      assert_equals(041444, fs.stats(subdir1).mode)
-      assert_equals(0101444, fs.stats(file1).mode)
+      fs.chmod(dir1, 0o1444, recursive=True)
+      assert_equals(0o41444, fs.stats(dir1).mode)
+      assert_equals(0o41444, fs.stats(subdir1).mode)
+      assert_equals(0o101444, fs.stats(file1).mode)
     finally:
       fs.rmtree(dir1, skip_trash=True)
       fs.setuser('test')
@@ -429,9 +434,9 @@ class WebhdfsTests(unittest.TestCase):
       assert_true(self.cluster.fs.exists(self.cluster.fs.trash_path(PATH)))
       trash_dirs = self.cluster.fs.listdir(self.cluster.fs.trash_path(PATH))
       trash_paths = [self.cluster.fs.join(self.cluster.fs.trash_path(PATH), trash_dir, PATH[1:]) for trash_dir in trash_dirs]
-      exists = map(self.cluster.fs.exists, trash_paths)
+      exists = list(map(self.cluster.fs.exists, trash_paths))
       assert_true(reduce(lambda a, b: a or b, exists), trash_paths)
-      trash_path = reduce(lambda a, b: a[0] and a or b, zip(exists, trash_paths))[1]
+      trash_path = reduce(lambda a, b: a[0] and a or b, list(zip(exists, trash_paths)))[1]
 
       # Restore
       self.cluster.fs.restore(trash_path)
@@ -440,7 +445,7 @@ class WebhdfsTests(unittest.TestCase):
     finally:
       try:
         self.cluster.fs.rmtree(PATH)
-      except Exception, ex:
+      except Exception as ex:
         LOG.error('Failed to cleanup %s: %s' % (PATH, ex))
 
   def test_trash_and_purge(self):
@@ -455,9 +460,9 @@ class WebhdfsTests(unittest.TestCase):
       assert_true(self.cluster.fs.exists(self.cluster.fs.trash_path(PATH)))
       trash_dirs = self.cluster.fs.listdir(self.cluster.fs.trash_path(PATH))
       trash_paths = [self.cluster.fs.join(self.cluster.fs.trash_path(PATH), trash_dir, PATH[1:]) for trash_dir in trash_dirs]
-      exists = map(self.cluster.fs.exists, trash_paths)
+      exists = list(map(self.cluster.fs.exists, trash_paths))
       assert_true(reduce(lambda a, b: a or b, exists), trash_paths)
-      trash_path = reduce(lambda a, b: a[0] and a or b, zip(exists, trash_paths))[1]
+      trash_path = reduce(lambda a, b: a[0] and a or b, list(zip(exists, trash_paths)))[1]
 
       # Purge
       self.cluster.fs.purge_trash()
@@ -466,7 +471,7 @@ class WebhdfsTests(unittest.TestCase):
     finally:
       try:
         self.cluster.fs.rmtree(PATH)
-      except Exception, ex:
+      except Exception as ex:
         LOG.error('Failed to cleanup %s: %s' % (PATH, ex))
 
   def test_restore_error(self):
@@ -481,9 +486,9 @@ class WebhdfsTests(unittest.TestCase):
       assert_true(self.cluster.fs.exists(self.cluster.fs.trash_path(PATH)))
       trash_dirs = self.cluster.fs.listdir(self.cluster.fs.trash_path(PATH))
       trash_paths = [self.cluster.fs.join(self.cluster.fs.trash_path(PATH), trash_dir, PATH[1:]) for trash_dir in trash_dirs]
-      exists = map(self.cluster.fs.exists, trash_paths)
+      exists = list(map(self.cluster.fs.exists, trash_paths))
       assert_true(reduce(lambda a, b: a or b, exists), trash_paths)
-      trash_path = reduce(lambda a, b: a[0] and a or b, zip(exists, trash_paths))[1]
+      trash_path = reduce(lambda a, b: a[0] and a or b, list(zip(exists, trash_paths)))[1]
 
       # Purge
       self.cluster.fs.purge_trash()
@@ -495,7 +500,7 @@ class WebhdfsTests(unittest.TestCase):
     finally:
       try:
         self.cluster.fs.rmtree(PATH)
-      except Exception, ex:
+      except Exception as ex:
         LOG.error('Failed to cleanup %s: %s' % (PATH, ex))
 
   def test_trash_permissions(self):
@@ -510,16 +515,16 @@ class WebhdfsTests(unittest.TestCase):
       assert_true(self.cluster.fs.exists(self.cluster.fs.trash_path(PATH)))
       trash_dirs = self.cluster.fs.listdir(self.cluster.fs.trash_path(PATH))
       trash_paths = [self.cluster.fs.join(self.cluster.fs.trash_path(PATH), trash_dir, PATH[1:]) for trash_dir in trash_dirs]
-      exists = map(self.cluster.fs.exists, trash_paths)
+      exists = list(map(self.cluster.fs.exists, trash_paths))
       assert_true(reduce(lambda a, b: a or b, exists), trash_paths)
-      trash_path = reduce(lambda a, b: a[0] and a or b, zip(exists, trash_paths))[1]
+      trash_path = reduce(lambda a, b: a[0] and a or b, list(zip(exists, trash_paths)))[1]
 
       # Restore
       assert_raises(IOError, self.cluster.fs.do_as_user, 'nouser', self.cluster.fs.restore, trash_path)
     finally:
       try:
         self.cluster.fs.rmtree(PATH)
-      except Exception, ex:
+      except Exception as ex:
         LOG.error('Failed to cleanup %s: %s' % (PATH, ex))
 
   def test_trash_users(self):
@@ -560,7 +565,7 @@ class WebhdfsTests(unittest.TestCase):
       for directory in CLEANUP:
         try:
           self.cluster.fs.rmtree(dir)
-        except Exception, ex:
+        except Exception as ex:
           LOG.error('Failed to cleanup %s: %s' % (directory, ex))
 
   def test_check_access(self):

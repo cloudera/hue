@@ -15,8 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import cStringIO
+from future import standard_library
+standard_library.install_aliases()
 import os
+import sys
 
 from nose.tools import assert_true, assert_equal, assert_false
 from nose.plugins.attrib import attr
@@ -32,6 +34,10 @@ from hadoop import conf
 from hadoop import confparse
 from hadoop import pseudo_hdfs4
 
+if sys.version_info[0] > 2:
+  from io import StringIO as string_io
+else:
+  from cStringIO import StringIO as string_io
 
 def test_confparse():
   data = """
@@ -57,7 +63,7 @@ def test_confparse():
   """
 
   cp_data = confparse.ConfParse(data)
-  cp_file = confparse.ConfParse(cStringIO.StringIO(data))
+  cp_file = confparse.ConfParse(string_io(data))
 
   for cp in (cp_data, cp_file):
     assert_equal(cp['fs.default.name'], 'hdfs://localhost:8020')
@@ -70,7 +76,7 @@ def test_confparse():
     try:
       cp['bogus']
       assert_true(False, 'Should not get here')
-    except KeyError, kerr:
+    except KeyError as kerr:
       ex = kerr
 
   cp_empty = confparse.ConfParse("")
