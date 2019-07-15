@@ -14,6 +14,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import print_function
+from builtins import range
+from builtins import object
 import base64
 import json
 import os
@@ -387,13 +390,13 @@ def metrics(profile):
 
   execution_profile.foreach_lambda(flatten)
 
-  for nodeid, node in counter_map['nodes'].iteritems():
-    host_min = {'value': sys.maxint, 'host' : None}
-    host_max = {'value': -(sys.maxint - 1), 'host' : None}
+  for nodeid, node in counter_map['nodes'].items():
+    host_min = {'value': sys.maxsize, 'host' : None}
+    host_max = {'value': -(sys.maxsize - 1), 'host' : None}
     if not node['timeline']['minmax']:
       continue
-    for host_name, host_value in node['timeline']['hosts'].iteritems():
-      for event_name, event in host_value.iteritems():
+    for host_name, host_value in node['timeline']['hosts'].items():
+      for event_name, event in host_value.items():
         if len(event):
           value = event[len(event) - 1]['value']
           if value < host_min['value']:
@@ -486,7 +489,7 @@ def to_json(profile):
 def print_tree(node, level, indent):
   if level == 0:
       return
-  print node.repr(indent)
+  print(node.repr(indent))
   for c in node.children:
       print_tree(c, level - 1, indent + "  ")
 
