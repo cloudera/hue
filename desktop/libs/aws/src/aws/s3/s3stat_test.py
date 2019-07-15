@@ -15,6 +15,7 @@
 # limitations under the License.
 from __future__ import absolute_import
 
+from builtins import object
 import stat
 
 from nose.tools import eq_
@@ -25,7 +26,7 @@ from aws.s3.s3stat import S3Stat
 def test_derivable_properties():
   s = S3Stat('foo', 's3a://bar/foo', False, 40, 1424983327)
   eq_('FILE', s.type)
-  eq_(0666 | stat.S_IFREG, s.mode)
+  eq_(0o666 | stat.S_IFREG, s.mode)
   eq_('', s.user)
   eq_('', s.group)
   eq_(1424983327, s.atime)
@@ -33,7 +34,7 @@ def test_derivable_properties():
 
   s = S3Stat('bar', 's3a://bar', True, 0, 1424983327)
   eq_('DIRECTORY', s.type)
-  eq_(0777 | stat.S_IFDIR, s.mode)
+  eq_(0o777 | stat.S_IFDIR, s.mode)
 
 
 def test_from_bucket():

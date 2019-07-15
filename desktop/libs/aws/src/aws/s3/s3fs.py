@@ -16,6 +16,8 @@
 
 from __future__ import absolute_import
 
+from builtins import str
+from builtins import object
 import itertools
 import logging
 import os
@@ -53,7 +55,7 @@ def auth_error_handler(view_fn):
   def decorator(*args, **kwargs):
     try:
       return view_fn(*args, **kwargs)
-    except (S3ResponseError, IOError), e:
+    except (S3ResponseError, IOError) as e:
       if 'Forbidden' in str(e) or (hasattr(e, 'status') and e.status == 403):
         path = kwargs.get('path')
         if not path and len(args) > 1:
@@ -67,7 +69,7 @@ def auth_error_handler(view_fn):
         if isinstance(e, S3ResponseError):
           msg = e.message or e.reason
         raise S3FileSystemException(msg)
-    except Exception, e:
+    except Exception as e:
       raise e
   return decorator
 
@@ -87,9 +89,9 @@ class S3FileSystem(object):
   def _get_or_create_bucket(self, name):
     try:
       bucket = self._get_bucket(name)
-    except BotoClientError, e:
+    except BotoClientError as e:
       raise S3FileSystemException(_('Failed to create bucket named "%s": %s') % (name, e.reason))
-    except S3ResponseError, e:
+    except S3ResponseError as e:
       if e.status == 403 or e.status == 301:
         raise S3FileSystemException(_('User is not authorized to access bucket named "%s". '
           'If you are attempting to create a bucket, this bucket name is already reserved.') % name)
@@ -124,7 +126,7 @@ class S3FileSystem(object):
         key.delete()
       self._s3_connection.delete_bucket(name)
       LOG.info('Successfully deleted bucket name "%s" and all its contents.' % name)
-    except S3ResponseError, e:
+    except S3ResponseError as e:
       if e.status == 403:
         raise S3FileSystemException(_('User is not authorized to access bucket named "%s". '
           'If you are attempting to create a bucket, this bucket name is already reserved.') % name)
@@ -136,9 +138,9 @@ class S3FileSystem(object):
     bucket = self._get_bucket(bucket_name)
     try:
       return bucket.get_key(key_name, validate=validate)
-    except BotoClientError, e:
+    except BotoClientError as e:
       raise S3FileSystemException(_('Failed to access path at "%s": %s') % (path, e.reason))
-    except S3ResponseError, e:
+    except S3ResponseError as e:
       if e.status in (301, 400):
         raise S3FileSystemException(_('Failed to access path: "%s" '
           'Check that you have access to read this bucket and that the region is correct: %s') % (path, e.message or e.reason))
@@ -159,7 +161,7 @@ class S3FileSystem(object):
 
     try:
       key = self._get_key(path, validate=True)
-    except BotoClientError, e:
+    except BotoClientError as e:
       raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, e.reason))
     except S3ResponseError as e:
       if e.status == 404:
@@ -270,11 +272,11 @@ class S3FileSystem(object):
     if s3.is_root(path):
       try:
         return sorted([S3Stat.from_bucket(b) for b in self._s3_connection.get_all_buckets()], key=lambda x: x.name)
-      except S3FileSystemException, e:
+      except S3FileSystemException as e:
         raise e
-      except S3ResponseError, e:
+      except S3ResponseError as e:
         raise S3FileSystemException(_('Failed to retrieve buckets: %s') % e.reason)
-      except Exception, e:
+      except Exception as e:
         raise S3FileSystemException(_('Failed to retrieve buckets: %s') % e)
 
     bucket_name, prefix = s3.parse_uri(path)[:2]
@@ -350,11 +352,11 @@ class S3FileSystem(object):
 
     try:
       self._get_or_create_bucket(bucket_name)
-    except S3FileSystemException, e:
+    except S3FileSystemException as e:
       raise e
-    except S3ResponseError, e:
+    except S3ResponseError as e:
       raise S3FileSystemException(_('Failed to create S3 bucket "%s": %s: %s') % (bucket_name, e.reason, e.body))
-    except Exception, e:
+    except Exception as e:
       raise S3FileSystemException(_('Failed to create S3 bucket "%s": %s') % (bucket_name, e))
 
     stats = self._stats(path)
@@ -494,7 +496,7 @@ class S3FileSystem(object):
         self.remove(path=tmp_path)
       else:
         self.open(path)
-    except Exception, e:
+    except Exception as e:
       LOG.warn('S3 check_access encountered error verifying %s permission at path "%s": %s' % (permission, path, str(e)))
       return False
     return True
