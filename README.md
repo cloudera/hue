@@ -56,9 +56,9 @@ configuration is available in the template directory.
 
 Community
 -----------
+   * Contributing [guidelines](CONTRIBUTING.md)
    * Help Forum: https://discourse.gethue.com/ ([previous mailing list](http://groups.google.com/a/cloudera.org/group/hue-user))
    * High level [roadmap](docs/ROADMAP.md)
-   * How to [contribute](docs/CONTRIBUTING.md)
    * Jira: https://issues.cloudera.org/browse/HUE
 
 
