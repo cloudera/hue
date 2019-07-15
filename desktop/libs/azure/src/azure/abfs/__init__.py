@@ -15,29 +15,11 @@
 # limitations under the License.
 from __future__ import absolute_import
 
-import calendar
 import errno
-import logging
-import posixpath
 import re
-import sys
-import time
 
-from functools import wraps
-
-from hadoop.fs import normpath as fs_normpath
-
-
-ERRNO_MAP = {
-  403: errno.EACCES,
-  404: errno.ENOENT
-}
-DEFAULT_ERRNO = errno.EINVAL
-
-#ABFS_PATH_RE = re.compile('^/*[aA][bB][fF][sS]{2}://([^/@]+)(@([^/.]+)[.]dfs.core[.]windows[.]net/(([^?]+)[?](directory=([^&]+))?)?)?$')
-ABFS_PATH_RE = re.compile('^/*[aA][bB][fF][sS]{2}://([^/]+)(/(.*?([^/]+)?/?))?$')
+ABFS_PATH_RE = re.compile('^/*[aA][bB][fF][sS]{2}://([^/]+)(/(.*?(([^/]+/)*/?))?)?$')
 ABFS_ROOT = 'abfss://'
-ABFS_FS_DEFAULT = re.compile('^/*[aA][bB][fF][sS]{2}://([^/]+)@([^.]+)[.]([^/]+)(/([^?]*))?$')
 
 def parse_uri(uri):
   """
@@ -54,11 +36,3 @@ def parse_uri(uri):
 def is_root(uri):
   return uri.lower() == ABFS_ROOT
 
-def parse_defaultfs(fs_default):
-  match = ABFS_FS_DEFAULT.match(fs_default)
-  if not match:
-    raise ValueError("Invalid fs_default: %s" % fs_default)
-  account_name = match.group(2) or ''
-  dns_sufix = match.group(3) or ''
-  file_system = match.group(5) or ''
-  return account_name, dns_sufix, file_system
