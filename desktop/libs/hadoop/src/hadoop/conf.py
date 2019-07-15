@@ -55,7 +55,7 @@ UPLOAD_CHUNK_SIZE = Config(
 
 
 def has_hdfs_enabled():
-  return HDFS_CLUSTERS.keys()
+  return list(HDFS_CLUSTERS.keys())
 
 def get_hadoop_conf_dir_default():
   """ get from environment variable HADOOP_CONF_DIR or "/etc/hadoop/conf" """
@@ -213,7 +213,7 @@ def config_validator(user):
 
   # HDFS_CLUSTERS
   has_default = False
-  for name in HDFS_CLUSTERS.keys():
+  for name in list(HDFS_CLUSTERS.keys()):
     cluster = HDFS_CLUSTERS[name]
     res.extend(webhdfs.test_fs_configuration(cluster))
     if name == 'default':
@@ -222,7 +222,7 @@ def config_validator(user):
     res.append(("hadoop.hdfs_clusters", "You should have an HDFS called 'default'."))
 
   # YARN_CLUSTERS
-  for name in YARN_CLUSTERS.keys():
+  for name in list(YARN_CLUSTERS.keys()):
     cluster = YARN_CLUSTERS[name]
     if cluster.SUBMIT_TO.get():
       submit_to.append('yarn_clusters.' + name)
@@ -259,13 +259,13 @@ def test_yarn_configurations(user):
 
   try:
     from jobbrowser.api import get_api # Required for cluster HA testing
-  except Exception, e:
+  except Exception as e:
     LOG.warn('Jobbrowser is disabled, skipping test_yarn_configurations')
     return result
 
   try:
     get_api(user, None).get_jobs(user, username=user.username, state='all', text='')
-  except Exception, e:
+  except Exception as e:
     msg = 'Failed to contact an active Resource Manager: %s' % e
     LOG.exception(msg)
     result.append(('Resource Manager', msg))

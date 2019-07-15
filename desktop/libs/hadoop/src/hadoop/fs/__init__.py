@@ -29,8 +29,14 @@ We maintain this usage of paths as arguments.
 When possible, the interfaces here have fidelity to the
 native python interfaces.
 """
-
-import __builtin__
+from __future__ import division
+from future import standard_library
+from functools import reduce
+standard_library.install_aliases()
+from builtins import map
+from builtins import range
+from past.utils import old_div
+from builtins import object
 import errno
 import grp
 import logging
@@ -41,6 +47,11 @@ import re
 import shutil
 import stat
 import sys
+
+if sys.version_info[0] > 2:
+  from builtins import open as builtins_open
+else:
+  from __builtin__ import open as builtins_open
 
 SEEK_SET, SEEK_CUR, SEEK_END = os.SEEK_SET, os.SEEK_CUR, os.SEEK_END
 
@@ -150,7 +161,7 @@ class LocalSubFileSystem(object):
     if paths is None and 0 not in users and 0 not in groups:
       paths = [0]
     # complicated way of taking the intersection of three lists.
-    assert not reduce(set.intersection, map(set, [paths, users, groups]))
+    assert not reduce(set.intersection, list(map(set, [paths, users, groups])))
     def wrapped(*args):
       self = args[0]
       newargs = list(args[1:])
@@ -166,7 +177,7 @@ class LocalSubFileSystem(object):
     return wrapped
 
   # These follow their namesakes.
-  open = _wrap(__builtin__.open)
+  open = _wrap(builtins_open)
   remove = _wrap(os.remove)
   mkdir = _wrap(os.mkdir)
   rmdir = _wrap(os.rmdir)
@@ -189,7 +200,7 @@ class LocalSubFileSystem(object):
     path = self._resolve_path(path)
     try:
       statobj = os.stat(path)
-    except OSError, ose:
+    except OSError as ose:
       if ose.errno == errno.ENOENT and not raise_on_fnf:
         return None
       raise
@@ -240,9 +251,9 @@ class FakeStatus(object):
     o = dict()
     GB = 1024*1024*1024
     o["bytesTotal"] = 5*GB
-    o["bytesUsed"] = 5*GB/2
+    o["bytesUsed"] = old_div(5*GB,2)
     o["bytesRemaining"] = 2*GB
-    o["bytesNonDfs"] = GB/2
+    o["bytesNonDfs"] = old_div(GB,2)
     o["liveDataNodes"] = 13
     o["deadDataNodes"] = 2
     o["upgradeStatus"] = dict(version=13, percentComplete=100, finalized=True)

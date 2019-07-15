@@ -37,6 +37,10 @@
 #   echo "GET /" | nc -w 1 localhost $p
 # done
 
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import atexit
 import subprocess
 import os
@@ -49,12 +53,20 @@ import time
 import tempfile
 import json
 import lxml.etree
-import urllib2
 
 from desktop.lib import python_util
 from desktop.lib.test_utils import clear_sys_caches, restore_sys_caches
 
 import hadoop.cluster
+
+if sys.version_info[0] > 2:
+  from urllib.request import Request as lib_Request
+  from urllib.error import URLError as lib_URLError
+  from urllib.request import urlopen as lib_urlopen
+else:
+  from urllib2 import Request as lib_Request
+  from urllib2 import URLError as lib_URLError
+  from urllib2 import urlopen as lib_urlopen
 
 # Starts mini cluster suspended until a debugger attaches to it.
 DEBUG_HADOOP=False
@@ -179,7 +191,7 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
         "-D", "hadoop.policy.file=%s/hadoop-policy.xml" % in_conf_dir,
       ]
 
-      for key,value in extra_configs.iteritems():
+      for key,value in extra_configs.items():
         args.append("-D")
         args.append(key + "=" + value)
 
@@ -248,7 +260,7 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
     LOGGER.debug("Successfully started minicluster")
 
     # Place all the details as attributes on self.
-    for k, v in details.iteritems():
+    for k, v in details.items():
       setattr(self, k, v)
 
     # Parse the configuration using XPath and place into self.config.
@@ -291,9 +303,9 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
 
     while True:
       try:
-        response = urllib2.urlopen(urllib2.Request('http://' +
+        response = lib_urlopen(lib_Request('http://' +
           self.config['dfs.secondary.http.address']))
-      except urllib2.URLError:
+      except lib_URLError:
         # If we should abort startup.
         if self.secondary_proc.poll() is not None or (not DEBUG_HADOOP and (time.time() - start) > MAX_CLUSTER_STARTUP_TIME):
           LOGGER.debug("stdout:" + file(tmppath("stdout")).read())
@@ -374,13 +386,13 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
 
     @param fd: a file-like writable object
     """
-    print >>fd, "[hadoop]"
-    print >>fd, "[[hdfs_clusters]]"
-    print >>fd, "[[[default]]]"
-    print >>fd, "thrift_port=%d" % self.namenode_thrift_port
-    print >>fd, "[[mapred_clusters]]"
-    print >>fd, "[[[default]]]"
-    print >>fd, "thrift_port=%d" % self.jobtracker_thrift_port
+    print("[hadoop]", file=fd)
+    print("[[hdfs_clusters]]", file=fd)
+    print("[[[default]]]", file=fd)
+    print("thrift_port=%d" % self.namenode_thrift_port, file=fd)
+    print("[[mapred_clusters]]", file=fd)
+    print("[[[default]]]", file=fd)
+    print("thrift_port=%d" % self.jobtracker_thrift_port, file=fd)
 
 
 # Shared global cluster returned by shared_cluster context manager.
@@ -436,7 +448,7 @@ def write_config(config, path, variables=None):
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 <configuration>
 """)
-    keys = (variables and (variables,) or (config.keys(),))[0]
+    keys = (variables and (variables,) or (list(config.keys()),))[0]
     for name in keys:
       value = config[name]
       f.write("  <property>\n")
@@ -454,7 +466,7 @@ def _write_static_group_mapping(user_group_mapping, path):
   """
   f = file(path, 'w')
   try:
-    for user, groups in user_group_mapping.iteritems():
+    for user, groups in user_group_mapping.items():
       f.write('%s = %s\n' % (user, ','.join(groups)))
   finally:
     f.close()
@@ -482,9 +494,9 @@ if __name__ == '__main__':
   if True:
     cluster = MiniHadoopCluster(num_datanodes=5, num_tasktrackers=5)
     cluster.start()
-    print cluster.namenode_port
-    print cluster.jobtracker_port
-    print cluster.config.get("dfs.thrift.address")
+    print(cluster.namenode_port)
+    print(cluster.jobtracker_port)
+    print(cluster.config.get("dfs.thrift.address"))
     cluster.dump_ini(sys.stdout)
 
     from IPython.Shell import IPShellEmbed
