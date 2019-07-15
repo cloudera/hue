@@ -133,7 +133,7 @@ def install_examples(request, is_redirect=False):
       data = request.POST.get('data')
       indexer_setup.Command().handle(data=data)
       result['status'] = 0
-    except Exception, e:
+    except Exception as e:
       LOG.exception(e)
       result['message'] = str(e)
 

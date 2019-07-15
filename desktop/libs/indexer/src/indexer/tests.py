@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import json
 
 from nose.plugins.skip import SkipTest
@@ -54,7 +55,7 @@ def test_get_ensemble():
       clear()
 
 
-class TestIndexerWithSolr:
+class TestIndexerWithSolr(object):
 
   @classmethod
   def setup_class(cls):

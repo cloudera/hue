@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 from django.contrib.auth.models import User
 
 from nose.plugins.skip import SkipTest
@@ -24,7 +25,7 @@ from nose.tools import assert_equal, assert_true
 from indexer.indexers.envelope import EnvelopeIndexer
 
 
-class TestEnvelope():
+class TestEnvelope(object):
 
   def setUp(self):
     raise SkipTest

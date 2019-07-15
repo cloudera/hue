@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 
 from django.contrib.auth.models import User
@@ -33,7 +34,7 @@ from librdbms.server import dbms as rdbms
 
 LOG = logging.getLogger(__name__)
 
-class TestRdbmsIndexer():
+class TestRdbmsIndexer(object):
 
   @classmethod
   def setup_class(cls):
