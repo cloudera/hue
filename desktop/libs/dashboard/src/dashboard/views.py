@@ -101,7 +101,7 @@ def index(request, is_mobile=False):
     else:
       collection_doc.doc.get().can_read_or_exception(request.user)
     collection = Collection2(request.user, document=collection_doc)
-  except Exception, e:
+  except Exception as e:
     raise PopupException(e, title=_("Dashboard does not exist or you don't have the permission to access it."))
 
   query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}

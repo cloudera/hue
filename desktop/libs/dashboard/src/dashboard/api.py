@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import filter
 import hashlib
 import json
 import logging
@@ -67,7 +68,7 @@ def search(request):
         response = get_engine(request.user, collection, facet, cluster=cluster).fetch_result(collection, query, facet)
       else:
         response = get_engine(request.user, collection, facet, cluster=cluster).query(collection, query, facet)
-    except RestException, e:
+    except RestException as e:
       response.update(extract_solr_exception_message(e))
     except Exception as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
@@ -118,11 +119,11 @@ def index_fields_dynamic(request):
     result['message'] = ''
     result['fields'] = [
         Collection2._make_field(name, properties)
-        for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties
+        for name, properties in dynamic_fields['fields'].items() if 'dynamicBase' in properties
     ]
     result['gridlayout_header_fields'] = [
         Collection2._make_gridlayout_header_field({'name': name, 'type': properties.get('type')}, True)
-        for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties
+        for name, properties in dynamic_fields['fields'].items() if 'dynamicBase' in properties
     ]
     result['status'] = 0
   except Exception as e:
@@ -346,7 +347,7 @@ def get_timeline(request):
           fq['filter'] = [{'value': qdata, 'exclude': False}]
 
     # Remove other facets from collection for speed
-    collection['facets'] = filter(lambda f: f['widgetType'] == 'histogram-widget', collection['facets'])
+    collection['facets'] = [f for f in collection['facets'] if f['widgetType'] == 'histogram-widget']
 
     response = SolrApi(SOLR_URL.get(), request.user).query(collection, query)
     response = augment_solr_response(response, collection, query)
