@@ -99,7 +99,7 @@ class TopNavViewModel {
             }
           });
 
-          if (window.SHOW_ADD_MORE_EDITORS && app.name === 'editor') {
+          if (window.SHOW_ADD_MORE_EDITORS && app.name === 'editor' && interpreters.length > 1) {
             interpreters.push({
               displayName: I18n('Add more...'),
               dividerAbove: true,
