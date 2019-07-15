@@ -15,6 +15,8 @@
 # limitations under the License.
 from __future__ import absolute_import
 
+from builtins import str
+from builtins import object
 import logging
 import os
 
@@ -115,7 +117,7 @@ class Client(object):
       else:
         kwargs.update({'host': 's3.amazonaws.com'})
         connection = boto.s3.connection.S3Connection(**kwargs)
-    except Exception, e:
+    except Exception as e:
       LOG.exception(e)
       raise S3FileSystemException('Failed to construct S3 Connection, check configurations for aws.')
 

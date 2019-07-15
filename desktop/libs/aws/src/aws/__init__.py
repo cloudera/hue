@@ -35,7 +35,7 @@ def _init_clients():
   if CLIENT_CACHE is not None:
     return
   CLIENT_CACHE = {}
-  for identifier in conf.AWS_ACCOUNTS.keys():
+  for identifier in list(conf.AWS_ACCOUNTS.keys()):
     CLIENT_CACHE[identifier] = _make_client(identifier)
   # If default configuration not initialized, initialize client connection with IAM metadata
   if 'default' not in CLIENT_CACHE and conf.has_iam_metadata():
