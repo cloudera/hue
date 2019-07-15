@@ -24,6 +24,7 @@ from azure.active_directory import ActiveDirectory
 from azure.conf import ABFS_CLUSTERS, is_abfs_enabled
 
 from nose.plugins.skip import SkipTest
+from nose.tools import assert_true
 
 LOG = logging.getLogger(__name__)
 
@@ -42,6 +43,14 @@ class ABFSTestBase(unittest.TestCase):
     pass
 
   def test_list(self):
-    self.client.listdir('abfss://')
+    filesystems = self.client.listdir('abfss://')
+    LOG.debug("%s" %filesystems)
+    assert_true(None not in filesystems, filesystems)
     
-    pass
+    pathing = self.client.listdir('abfss://' + filesystems[0])
+    LOG.debug("%s" %pathing)
+    assert_true(None not in pathing, pathing)
+    
+    directory = self.client.listdir('abfss://' + filesystems[0] + '/' + pathing[0])
+    LOG.debug("%s" %directory)
+    assert_true(None not in directory, directory)

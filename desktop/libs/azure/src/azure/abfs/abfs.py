@@ -14,7 +14,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from _Res import Resource
 
 """
 Interfaces for ABFS
@@ -105,25 +104,30 @@ class ABFS(object):
     raise NotImplementedError("")
 
   def listdir_stats(self, path, **kwargs):
-    #if kwargs is not None:
-      #raise NotImplementedError("Option `glob` is not implemented")
-    LOG.debug("%s" %self._netloc)
-    
+    """
+    Lists the stats for directories
+    """
     if azure.abfs.__init__.is_root(path):
       return self._root.get('',{'resource': 'account'}, headers= self._getheaders())
       #return self._client.execute('GET', '/', headers =  self._getheaders())
+    LOG.debug("%s" %path)
     file_system, directory_name = azure.abfs.__init__.parse_uri(path)[:2]
+    LOG.debug("%s, %s" %(file_system, directory_name))
     if directory_name == "":
-      res = self._client.execute('GET', self._fs_defaultfs + '/' + file_system +'/', {'recursive':'true', 'resource': file_system}, None, self._getheaders()["Authorization"])
+      res = self._root.get(file_system,{'resource': 'filesystem', 'recursive':'true'}, headers= self._getheaders())
     else:
-      res = self._client.execute('GET', self._fs_defaultfs + '/' + file_system + '/', {'directory': directory_name, 'recursive':'true', 'resource': file_system}, None, self._getheaders())
+      res = self._root.get(file_system,{'resource': 'filesystem', 'recursive':'true', 'directory' : directory_name}, headers= self._getheaders())
     return res
-    raise NotImplementedError("")
 
   def listdir(self, path, glob=None):
+    """
+    Lists the names for directories 
+    """
     resp = self.listdir_stats(path)
-    return [x['name'] for x in resp['filesystems']]
-    raise NotImplementedError("") # e.g. self._root.get('/', {'resource': 'account'}, self._getheaders())
+    if azure.abfs.__init__.is_root(path):
+      return [x['name'] for x in resp['filesystems']]
+    else:
+      return [x['name'] for x in resp['paths']]
 
   def normpath(self, path):
     raise NotImplementedError("")
