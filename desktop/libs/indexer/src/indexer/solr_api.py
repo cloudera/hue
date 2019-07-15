@@ -37,7 +37,7 @@ def api_error_handler(func):
 
     try:
       return func(*args, **kwargs)
-    except Exception, e:
+    except Exception as e:
       LOG.exception('Error running %s' % func.__name__)
       response['status'] = -1
       response['message'] = smart_unicode(e)

@@ -14,8 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import logging
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django.contrib.auth.models import User
 from django.urls import reverse
@@ -30,7 +33,7 @@ LOG = logging.getLogger(__name__)
 
 try:
   from beeswax.server import dbms
-except ImportError, e:
+except ImportError as e:
   LOG.warn('Hive and HiveServer2 interfaces are not enabled')
 
 
@@ -56,9 +59,9 @@ class SQLIndexer(object):
     kudu_partition_columns = destination['kuduPartitionColumns']
     comment = destination['description']
 
-    source_path = urllib.unquote(source['path'])
+    source_path = urllib.parse.unquote(source['path'])
     external = not destination['useDefaultLocation']
-    external_path = urllib.unquote(destination['nonDefaultLocation'])
+    external_path = urllib.parse.unquote(destination['nonDefaultLocation'])
 
     load_data = destination['importData']
     skip_header = destination['hasHeader']

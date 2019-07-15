@@ -15,13 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import oct
+from builtins import str
+from builtins import zip
+from past.builtins import basestring
 import chardet
 import json
 import logging
-import urllib
-import StringIO
+import urllib.request, urllib.parse, urllib.error
+import io
 
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -57,17 +64,17 @@ LOG = logging.getLogger(__name__)
 
 try:
   from beeswax.server import dbms
-except ImportError, e:
+except ImportError as e:
   LOG.warn('Hive and HiveServer2 interfaces are not enabled')
 
 try:
   from filebrowser.views import detect_parquet
-except ImportError, e:
+except ImportError as e:
   LOG.warn('File Browser interface is not enabled')
 
 try:
   from search.conf import SOLR_URL
-except ImportError, e:
+except ImportError as e:
   LOG.warn('Solr Search interface is not enabled')
 
 
@@ -82,7 +89,7 @@ def _escape_white_space_characters(s, inverse = False):
   to = 1 if inverse else 0
   from_ = 0 if inverse else 1
 
-  for pair in MAPPINGS.iteritems():
+  for pair in MAPPINGS.items():
     s = s.replace(pair[to], pair[from_]).encode('utf-8')
 
   return s
@@ -99,7 +106,7 @@ def guess_format(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
 
   if file_format['inputFormat'] == 'file':
-    path = urllib.unquote(file_format["path"])
+    path = urllib.parse.unquote(file_format["path"])
     indexer = MorphlineIndexer(request.user, request.fs)
     if not request.fs.isfile(path):
       raise PopupException(_('Path %(path)s is not a file') % file_format)
@@ -116,7 +123,7 @@ def guess_format(request):
     db = dbms.get(request.user)
     try:
       table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])
-    except Exception, e:
+    except Exception as e:
       raise PopupException(e.message if hasattr(e, 'message') and e.message else e)
     storage = {}
     for delim in table_metadata.storage_details:
@@ -163,7 +170,7 @@ def guess_field_types(request):
 
   if file_format['inputFormat'] == 'file':
     indexer = MorphlineIndexer(request.user, request.fs)
-    path = urllib.unquote(file_format["path"])
+    path = urllib.parse.unquote(file_format["path"])
     stream = request.fs.open(path)
     encoding = chardet.detect(stream.read(10000)).get('encoding')
     stream.seek(0)
@@ -209,7 +216,7 @@ def guess_field_types(request):
       snippet['query'] = snippet['statement']
       try:
         sample = db.fetch_result(notebook, snippet, 4, start_over=True)['rows'][:4]
-      except Exception, e:
+      except Exception as e:
         LOG.warn('Skipping sample data as query handle might be expired: %s' % e)
         sample = [[], [], [], [], []]
       columns = db.autocomplete(snippet=snippet, database='', table='')
@@ -261,7 +268,7 @@ def guess_field_types(request):
         'kafkaFieldNames': ','.join(kafkaFieldNames),
         'data': '\n'.join([','.join(['...'] * len(kafkaFieldTypes))] * 5)
       }
-      stream = StringIO.StringIO()
+      stream = io.StringIO()
       stream.write(data)
 
       _convert_format(file_format["format"], inverse=True)
@@ -274,7 +281,7 @@ def guess_field_types(request):
         },
         "format": file_format['format']
       })
-      type_mapping = dict(zip(kafkaFieldNames, kafkaFieldTypes))
+      type_mapping = dict(list(zip(kafkaFieldNames, kafkaFieldTypes)))
 
       for col in format_['columns']:
         col['keyType'] = type_mapping[col['name']]
@@ -317,15 +324,15 @@ def guess_field_types(request):
         } for column in sf.restful('sobjects/%(streamObject)s/describe/' % file_format)['fields']
       ]
       query = 'SELECT %s FROM %s LIMIT 4' % (', '.join([col['name'] for col in table_metadata]), file_format['streamObject'])
-      print query
+      print(query)
 
       try:
         records = sf.query_all(query)
-      except SalesforceRefusedRequest, e:
+      except SalesforceRefusedRequest as e:
         raise PopupException(message=str(e))
 
       format_ = {
-        "sample": [row.values()[1:] for row in records['records']],
+        "sample": [list(row.values())[1:] for row in records['records']],
         "columns": [
             Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
             for col in table_metadata
@@ -349,7 +356,7 @@ def importer_submit(request):
 
   if source['inputFormat'] == 'file':
     if source['path']:
-      path = urllib.unquote(source['path'])
+      path = urllib.parse.unquote(source['path'])
       source['path'] = request.fs.netnormpath(path)
       parent_path = request.fs.parent_path(path)
       stats = request.fs.stats(parent_path)
@@ -357,7 +364,7 @@ def importer_submit(request):
       # Only for HDFS, import data and non-external table
       if split.scheme in ('', 'hdfs') and destination['importData'] and destination['useDefaultLocation'] and oct(stats["mode"])[-1] != '7' and not request.POST.get('show_command'):
         user_scratch_dir = request.fs.get_home_dir() + '/.scratchdir'
-        request.fs.do_as_user(request.user, request.fs.mkdir, user_scratch_dir, 00777)
+        request.fs.do_as_user(request.user, request.fs.mkdir, user_scratch_dir, 0o0777)
         request.fs.do_as_user(request.user, request.fs.rename, source['path'], user_scratch_dir)
         source['path'] = user_scratch_dir + '/' + source['path'].split('/')[-1]
 
@@ -406,7 +413,7 @@ def _small_indexing(user, fs, client, source, destination, index_name):
   errors = []
 
   if source['inputFormat'] not in ('manual', 'table', 'query_handle'):
-    path = urllib.unquote(source["path"])
+    path = urllib.parse.unquote(source["path"])
     stats = fs.stats(path)
     if stats.size > MAX_UPLOAD_SIZE:
       raise PopupException(_('File size is too large to handle!'))
@@ -417,7 +424,7 @@ def _small_indexing(user, fs, client, source, destination, index_name):
   _create_solr_collection(user, fs, client, destination, index_name, kwargs)
 
   if source['inputFormat'] == 'file':
-    path = urllib.unquote(source["path"])
+    path = urllib.parse.unquote(source["path"])
     data = fs.read(path, 0, MAX_UPLOAD_SIZE)
 
   if client.is_solr_six_or_more():
@@ -442,10 +449,10 @@ def _small_indexing(user, fs, client, source, destination, index_name):
     else:
       response = client.index(name=index_name, data=data, **kwargs)
       errors = [error.get('message', '') for error in response['responseHeader'].get('errors', [])]
-  except Exception, e:
+  except Exception as e:
     try:
       client.delete_index(index_name, keep_config=False)
-    except Exception, e2:
+    except Exception as e2:
       LOG.warn('Error while cleaning-up config of failed collection creation %s: %s' % (index_name, e2))
     raise e
 
@@ -531,7 +538,7 @@ def _large_indexing(request, file_format, collection_name, query=None, start_tim
   elif file_format['inputFormat'] == 'stream':
     return _envelope_job(request, file_format, destination, start_time=start_time, lib_path=lib_path)
   elif file_format['inputFormat'] == 'file':
-    input_path = '${nameNode}%s' % urllib.unquote(file_format["path"])
+    input_path = '${nameNode}%s' % urllib.parse.unquote(file_format["path"])
   else:
     input_path = None
 

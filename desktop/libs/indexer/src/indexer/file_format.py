@@ -13,12 +13,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from past.builtins import basestring
+from builtins import object
 import csv
 import gzip
 import operator
 import itertools
 import logging
-import StringIO
+import io
 
 from django.utils.translation import ugettext as _
 
@@ -347,9 +352,9 @@ class CSVFormat(FileFormat):
     # ******Changed from********
     # rdr = reader(StringIO(sample), self.sniff(sample))
     from _csv import reader
-    rdr = reader(StringIO.StringIO(sample), dialect)
+    rdr = reader(io.StringIO(sample), dialect)
 
-    header = rdr.next()  # assume first row is header
+    header = next(rdr)  # assume first row is header
 
     columns = len(header)
     columnTypes = {}
@@ -365,9 +370,9 @@ class CSVFormat(FileFormat):
       if len(row) != columns:
         continue  # skip rows that have irregular number of columns
 
-      for col in columnTypes.keys():
+      for col in list(columnTypes.keys()):
 
-        for thisType in [int, long, float, complex]:
+        for thisType in [int, int, float, complex]:
           try:
             thisType(row[col])
             break
@@ -378,7 +383,7 @@ class CSVFormat(FileFormat):
           thisType = len(row[col])
 
         # treat longs as ints
-        if thisType == long:
+        if thisType == int:
           thisType = int
 
         if thisType != columnTypes[col]:
@@ -392,7 +397,7 @@ class CSVFormat(FileFormat):
     # finally, compare results against first row and "vote"
     # on whether it's a header
     hasHeader = 0
-    for col, colType in columnTypes.items():
+    for col, colType in list(columnTypes.items()):
       if type(colType) == type(0):  # it's a length
         if len(header[col]) != colType:
           hasHeader += 1
@@ -434,7 +439,7 @@ class CSVFormat(FileFormat):
   def _guess_from_file_stream(cls, file_stream):
     for sample_data, sample_lines in cls._get_sample(file_stream):
       try:
-        lines = itertools.islice(StringIO.StringIO(sample_data), IMPORT_PEEK_NLINES)
+        lines = itertools.islice(io.StringIO(sample_data), IMPORT_PEEK_NLINES)
         sample_data_lines = ''
         for line in lines:
           sample_data_lines += line
@@ -525,7 +530,7 @@ class CSVFormat(FileFormat):
       counts[num_columns] += 1
 
     if counts:
-      num_columns_guess = max(counts.iteritems(), key=operator.itemgetter(1))[0]
+      num_columns_guess = max(iter(counts.items()), key=operator.itemgetter(1))[0]
     else:
       num_columns_guess = 0
     return num_columns_guess
@@ -548,12 +553,12 @@ class CSVFormat(FileFormat):
       sample = sample.replace('\n', '\\n')
       return csv.reader(sample.split(self.line_terminator), delimiter=self.delimiter, quotechar=self.quote_char)
     else:
-      return csv.reader(StringIO.StringIO(sample), delimiter=self.delimiter, quotechar=self.quote_char)
+      return csv.reader(io.StringIO(sample), delimiter=self.delimiter, quotechar=self.quote_char)
 
   def _guess_field_names(self, sample):
     reader = self._get_sample_reader(sample)
 
-    first_row = reader.next()
+    first_row = next(reader)
 
     if self._has_header:
       header = []
@@ -599,7 +604,7 @@ class GzipFileReader(object):
     except IOError:
       return None, None
     try:
-      return data, itertools.islice(csv.reader(StringIO.StringIO(data)), IMPORT_PEEK_NLINES)
+      return data, itertools.islice(csv.reader(io.StringIO(data)), IMPORT_PEEK_NLINES)
     except UnicodeError:
       return None, None
 
@@ -611,7 +616,7 @@ class TextFileReader(object):
   def readlines(fileobj, encoding):
     try:
       data = fileobj.read(IMPORT_PEEK_SIZE)
-      return data, itertools.islice(csv.reader(StringIO.StringIO(data)), IMPORT_PEEK_NLINES)
+      return data, itertools.islice(csv.reader(io.StringIO(data)), IMPORT_PEEK_NLINES)
     except UnicodeError:
       return None, None
 

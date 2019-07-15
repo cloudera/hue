@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
 import logging
 import json
 
@@ -133,7 +134,7 @@ def install_examples(request, is_redirect=False):
       data = request.POST.get('data')
       indexer_setup.Command().handle(data=data)
       result['status'] = 0
-    except Exception, e:
+    except Exception as e:
       LOG.exception(e)
       result['message'] = str(e)
 
