@@ -27,13 +27,11 @@
   from indexer.conf import ENABLE_NEW_INDEXER
   from metadata.conf import has_catalog, has_readonly_catalog, has_optimizer, has_workload_analytics, OPTIMIZER
   from metastore.conf import ENABLE_NEW_CREATE_TABLE
-  from notebook.conf import ENABLE_NOTEBOOK_2, ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ordered_interpreters, SHOW_NOTEBOOKS
-
   from metastore.views import has_write_access
+  from notebook.conf import ENABLE_NOTEBOOK_2, ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ordered_interpreters, SHOW_NOTEBOOKS
 %>
 
 <%namespace name="sqlDocIndex" file="/sql_doc_index.mako" />
-
 (function () {
   window.AUTOCOMPLETE_TIMEOUT = ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() };
 
@@ -96,16 +94,24 @@
   window.JB_SINGLE_CHECK_INTERVAL_IN_MILLIS = 5000;
   window.JB_MULTI_CHECK_INTERVAL_IN_MILLIS = 20000;
 
-
+  <%
+    apps = _get_apps(user)
+  %>
   window.HUE_URLS = {
     IMPORTER_CREATE_TABLE: '${url('indexer:importer_prefill', source_type = 'all', target_type = 'table')}',
     IMPORTER_CREATE_DATABASE: '${url('indexer:importer_prefill', source_type = 'manual', target_type = 'database')}',
     NOTEBOOK_INDEX: '${url('notebook:index')}',
+    % if 'pig' in apps:
     PIG_INDEX: '${url('pig:index')}',
+    % endif
+    % if 'oozie' in apps:
     OOZIE_NEW_WORKFLOW: '${url('oozie:new_workflow')}',
     OOZIE_NEW_COORDINATOR: '${url('oozie:new_coordinator')}',
     OOZIE_NEW_BUNDLE: '${url('oozie:new_bundle')}',
+    % endif
+    % if 'search' in apps:
     SEARCH_NEW_SEARCH: '${url('search:new_search')}',
+    % endif
   }
 
   // TODO: Replace with json import
@@ -503,7 +509,7 @@
   window.LOGGED_USERGROUPS = userGroups;
 
   var hueApps = [];
-  % for app in _get_apps(request.user, ''):
+  % for app in apps:
     hueApps.push('${ app }')
   % endfor
   window.HUE_APPS = hueApps;
