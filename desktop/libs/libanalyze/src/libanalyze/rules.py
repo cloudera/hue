@@ -14,6 +14,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import division
+from builtins import str
+from builtins import zip
+from builtins import range
+from builtins import object
+from past.utils import old_div
 import copy
 import glob
 import json
@@ -31,13 +37,14 @@ from libanalyze.utils import Timer
 from libanalyze import models
 from libanalyze import exprs
 from libanalyze import utils
+from functools import reduce
 
 LOG = logging.getLogger(__name__)
 
 def to_double(metric_value):
     return struct.unpack('d', struct.pack('q', metric_value))[0]
 
-class ProfileContext:
+class ProfileContext(object):
     """This is the main wrapper around the runtime profile tree. Main accessor
     methods are implemented here."""
 
@@ -50,14 +57,14 @@ class ProfileContext:
                 dtparse(node.info_strings["Start Time"])).total_seconds()
 
     def percentage_of_total(self, compare):
-        return compare / self.query_duration()
+        return old_div(compare, self.query_duration())
 
 
-class SQLOperatorReason:
+class SQLOperatorReason(object):
     def __init__(self, node_name, metric_names,
                  rule, exprs=[], to_json=True, **kwargs):
         self.node_name = node_name
-        if isinstance(metric_names, types.StringTypes):
+        if isinstance(metric_names, str):
             self.metric_names = [metric_names]
         else:
             self.metric_names = metric_names
@@ -131,8 +138,8 @@ class SQLOperatorReason:
                 # max / min like exprs
                 converted_exprs = self.check_exprs(grouped)
                 expr_vars = {
-                    "vars": dict(zip(self.exprs, map(lambda x: x[0], converted_exprs))),
-                    "idxs": dict(zip(self.exprs, map(lambda x: x[1], converted_exprs))),
+                    "vars": dict(list(zip(self.exprs, [x[0] for x in converted_exprs]))),
+                    "idxs": dict(list(zip(self.exprs, [x[1] for x in converted_exprs]))),
                 }
 
                 expr_val = exprs.Expr.evaluate(self.rule["expr"], expr_vars)
@@ -144,14 +151,14 @@ class SQLOperatorReason:
                 # Get the metric values from the db grouped by metric name
                 db_result = [models.query_node_by_id(profile, plan_node_id, m) for m in self.metric_names]
                 # Assuming that for all metric names the same number of rows have been returned transpose the array
-                all_metrics = zip(*db_result)
+                all_metrics = list(zip(*db_result))
 
             for row in all_metrics:
                 # Convert to double values if unit is 6(double)
-                metric_values = map(lambda x: x.value if x.unit != 6 else to_double(x.value), row)
+                metric_values = [x.value if x.unit != 6 else to_double(x.value) for x in row]
 
                 surrogate_node = row[0].node
-                local_vars = {"vars": dict(zip(self.metric_names, metric_values))}
+                local_vars = {"vars": dict(list(zip(self.metric_names, metric_values)))}
                 local_vars["vars"]["IOBound"] = self.isStorageBound(surrogate_node)
                 local_vars["vars"]['InputRows'] = self.getNumInputRows(surrogate_node)
                 condition = True
@@ -164,10 +171,10 @@ class SQLOperatorReason:
 
             if self.kwargs.get('info_names'):
               db_result = [models.query_element_by_info(profile, plan_node_id, m) for m in self.kwargs['info_names']]
-              all_metrics = zip(*db_result)
+              all_metrics = list(zip(*db_result))
               for row in all_metrics:
-                metric_values = map(lambda x: x.value, row)
-                local_vars['vars'].update(dict(zip(self.kwargs['info_names'], metric_values)))
+                metric_values = [x.value for x in row]
+                local_vars['vars'].update(dict(list(zip(self.kwargs['info_names'], metric_values))))
                 expr_data = exprs.Expr.evaluate(self.kwargs['fix']['data'], local_vars)
 
         return {
@@ -210,8 +217,8 @@ class SummaryReason(SQLOperatorReason):
                 # max / min like exprs
                 converted_exprs = self.check_exprs(grouped)
                 expr_vars = {
-                    "vars": dict(zip(self.exprs, map(lambda x: x[0], converted_exprs))),
-                    "idxs": dict(zip(self.exprs, map(lambda x: x[1], converted_exprs))),
+                    "vars": dict(list(zip(self.exprs, [x[0] for x in converted_exprs]))),
+                    "idxs": dict(list(zip(self.exprs, [x[1] for x in converted_exprs]))),
                 }
 
                 expr_val = exprs.Expr.evaluate(self.rule["expr"], expr_vars)
@@ -223,13 +230,13 @@ class SummaryReason(SQLOperatorReason):
                 # Get the metric values from the db grouped by metric name
                 db_result = [models.query_element_by_metric(profile, 'Summary', m) for m in self.metric_names]
                 # Assuming that for all metric names the same number of rows have been returned transpose the array
-                all_metrics = zip(*db_result)
+                all_metrics = list(zip(*db_result))
 
             for row in all_metrics:
                 # Convert to double values if unit is 6(double)
-                metric_values = map(lambda x: x.value if x.unit != 6 else to_double(x.value), row)
+                metric_values = [x.value if x.unit != 6 else to_double(x.value) for x in row]
 
-                local_vars = {"vars": dict(zip(self.metric_names, metric_values))}
+                local_vars = {"vars": dict(list(zip(self.metric_names, metric_values)))}
                 condition = True
                 if ("condition" in self.rule):
                     condition = exprs.Expr.evaluate(self.rule["condition"], local_vars)
@@ -278,7 +285,7 @@ class JoinOrderStrategyCheck(SQLOperatorReason):
             rhsRows = buildRows * hosts
             lhsRows = probeRows * hosts
 
-        impact = (rhsRows - lhsRows * 1.5) / hosts / 0.01
+        impact = old_div((rhsRows - lhsRows * 1.5), hosts / 0.01)
         if (impact > 0):
             return {
                 "impact": impact,
@@ -288,7 +295,7 @@ class JoinOrderStrategyCheck(SQLOperatorReason):
 
         bcost = rhsRows * hosts
         scost = lhsRows + rhsRows
-        impact = (networkcost - min(bcost, scost) - 1) / hosts / 0.01
+        impact = old_div((networkcost - min(bcost, scost) - 1), hosts / 0.01)
         return {
             "impact": impact,
             "message": "RHS %d; LHS %d" % (rhsRows, lhsRows),
@@ -318,7 +325,7 @@ class ExplodingJoinCheck(SQLOperatorReason):
 
         impact = 0
         if (rowsReturned > 0):
-            impact = probeTime * (rowsReturned - probeRows) / rowsReturned
+            impact = old_div(probeTime * (rowsReturned - probeRows), rowsReturned)
         return {
             "impact": impact,
             "message": "%d input rows are exploded to %d output rows" % (probeRows, rowsReturned),
@@ -343,14 +350,14 @@ class NNRpcCheck(SQLOperatorReason):
         hdfsRawReadTime = models.query_node_by_id_value(profile, plan_node_id, "TotalRawHdfsReadTime(*)", True)
         avgReadThreads = models.query_node_by_id_value(profile, plan_node_id, "AverageHdfsReadThreadConcurrency", True)
         avgReadThreads = max(1, to_double(avgReadThreads))
-        impact = max(0, (totalStorageTime - hdfsRawReadTime) / avgReadThreads)
+        impact = max(0, old_div((totalStorageTime - hdfsRawReadTime), avgReadThreads))
         return {
             "impact": impact,
             "message": "This is the time waiting for HDFS NN RPC.",
             "label": "HDFS NN RPC"
         }
 
-class TopDownAnalysis:
+class TopDownAnalysis(object):
 
     def __init__(self):
         self.base_dir = os.path.join(os.path.dirname(__file__), "../..", "reasons")
@@ -364,7 +371,7 @@ class TopDownAnalysis:
                 type = json_object["type"]
                 node_names = json_object["node_name"]
                 nodes = node_names
-                if not isinstance(node_names, types.ListType):
+                if not isinstance(node_names, list):
                     nodes = [node_names]
                 if type == 'SQLOperator':
                   for node in nodes:
@@ -455,13 +462,13 @@ class TopDownAnalysis:
         # Get the plan node execution time
         # Note: ignore DataStreamSender because its metrics is useless
         nodes = execution_profile.find_all_non_fragment_nodes()
-        nodes = filter(lambda x: x.fragment and x.fragment.is_averaged() == False, nodes)
-        nodes = filter(lambda x: x.name() != 'DataStreamSender', nodes)
+        nodes = [x for x in nodes if x.fragment and x.fragment.is_averaged() == False]
+        nodes = [x for x in nodes if x.name() != 'DataStreamSender']
         metrics = reduce(lambda x,y: x + y.find_metric_by_name('LocalTime'), nodes, [])
         metrics = sorted(metrics, key=lambda x: (x['node'].id(), x['node'].name()))
         for k, g in groupby(metrics, lambda x: (x['node'].id(), x['node'].name())):
             grouped = list(g)
-            metric_values = map(lambda x: x['value'], grouped)
+            metric_values = [x['value'] for x in grouped]
             metric = max(metric_values)
             contributor = models.Contributor(type="SQLOperator",
                                  wall_clock_time=metric,
@@ -569,7 +576,7 @@ class TopDownAnalysis:
                   summary.val.counters.append(models.TCounter(name=sequence.get(event_name), value=event_duration, unit=5))
                   sequence.pop(event_name)
                 else:
-                  for key, value in sequence.iteritems():
+                  for key, value in sequence.items():
                     if re.search(key, event_name, re.IGNORECASE):
                       summary.val.counters.append(models.TCounter(name=value, value=event_duration, unit=5))
                       sequence.pop(key)
@@ -577,9 +584,9 @@ class TopDownAnalysis:
 
                 duration = s.timestamps[i]
 
-          for key, value in stats_mapping.get('Query Compilation').iteritems():
+          for key, value in stats_mapping.get('Query Compilation').items():
             summary.val.counters.append(models.TCounter(name=value, value=0, unit=5))
-          for key, value in stats_mapping.get('Query Timeline').iteritems():
+          for key, value in stats_mapping.get('Query Timeline').items():
             summary.val.counters.append(models.TCounter(name=value, value=0, unit=5))
 
           missing_stats = {}

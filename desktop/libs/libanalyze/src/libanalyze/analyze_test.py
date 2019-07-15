@@ -14,7 +14,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import cProfile, logging, os, pstats, time, StringIO
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
+import cProfile, logging, os, pstats, time, io
 from libanalyze import analyze as a
 from libanalyze import rules
 from nose.tools import assert_true
@@ -23,7 +26,7 @@ LOG = logging.getLogger(__name__)
 
 def ordered(obj):
   if isinstance(obj, dict):
-    return sorted((k, ordered(v)) for k, v in obj.items())
+    return sorted((k, ordered(v)) for k, v in list(obj.items()))
   elif isinstance(obj, list):
     return sorted(ordered(x) for x in obj)
   else:
@@ -56,7 +59,7 @@ class AnalyzeTest(object):
     ts2 = time.time()*1000.0
     dts = ts2 - ts1
     pr.disable()
-    s = StringIO.StringIO()
+    s = io.StringIO()
     sortby = 'cumulative'
     ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
     ps.print_stats()
