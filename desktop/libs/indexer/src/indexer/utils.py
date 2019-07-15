@@ -16,13 +16,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import next
+from builtins import range
+from builtins import object
 import csv
 import logging
 import os
 import pytz
 import re
 import shutil
-import StringIO
+import sys
 import tempfile
 import uuid
 
@@ -36,6 +41,10 @@ from desktop.lib.i18n import force_unicode, smart_str
 from indexer import conf
 from indexer.models import DATE_FIELD_TYPES, TEXT_FIELD_TYPES, INTEGER_FIELD_TYPES, DECIMAL_FIELD_TYPES, BOOLEAN_FIELD_TYPES
 
+if sys.version_info[0] > 2:
+  from io import StringIO as string_io
+else:
+  from StringIO import StringIO as string_io
 
 LOG = logging.getLogger(__name__)
 TIMESTAMP_PATTERN = '\[([\w\d\s\-\/\:\+]*?)\]'
@@ -255,15 +264,15 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
         continue
       else:
         if headers is None:
-          csvfile = StringIO.StringIO(content[:last_newline])
+          csvfile = string_io(content[:last_newline])
         else:
-          csvfile = StringIO.StringIO('\n' + content[:last_newline])
+          csvfile = string_io('\n' + content[:last_newline])
         content = content[last_newline + 1:] + next_chunk
     else:
       if headers is None:
-        csvfile = StringIO.StringIO(content)
+        csvfile = string_io(content)
       else:
-        csvfile = StringIO.StringIO('\n' + content)
+        csvfile = string_io('\n' + content)
       content = fh.read()
 
     # First line is headers
@@ -276,7 +285,7 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
 
     remove_keys = None
     for row in reader:
-      row = dict([(force_unicode(k), force_unicode(v, errors='ignore')) for k, v in row.iteritems()]) # Get rid of invalid binary chars and convert to unicode from DictReader
+      row = dict([(force_unicode(k), force_unicode(v, errors='ignore')) for k, v in row.items()]) # Get rid of invalid binary chars and convert to unicode from DictReader
 
       # Remove keys that aren't in collection
       if remove_keys is None:
@@ -334,12 +343,12 @@ def field_values_from_log(fh, fields=[ {'name': 'message', 'type': 'text_general
     message_key = 'message'
   else:
     try:
-      timestamp_key = next(iter(filter(lambda field: field['type'] in DATE_FIELD_TYPES, fields)))['name']
+      timestamp_key = next(iter([field for field in fields if field['type'] in DATE_FIELD_TYPES]))['name']
     except:
       LOG.exception('failed to get timestamp key')
       timestamp_key = None
     try:
-      message_key = next(iter(filter(lambda field: field['type'] in TEXT_FIELD_TYPES, fields)))['name']
+      message_key = next(iter([field for field in fields if field['type'] in TEXT_FIELD_TYPES]))['name']
     except:
       LOG.exception('failed to get message key')
       message_key = None

@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 import json
 import os
@@ -84,7 +85,7 @@ class SolrClient(object):
         for name in solr_cores:
           indexes.append({'name': name, 'type': 'core', 'collections': []})
 
-    except Exception, e:
+    except Exception as e:
       msg = _('Solr server could not be contacted properly: %s') % e
       LOG.warn(msg)
       raise PopupException(msg, detail=smart_str(e))
@@ -162,7 +163,7 @@ class SolrClient(object):
     try:
       self.api.get_schema(name)
       return True
-    except Exception, e:
+    except Exception as e:
       LOG.info('Check if index %s existed failed: %s' % (name, e))
       return False
 
@@ -183,7 +184,7 @@ class SolrClient(object):
             root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
             with ZookeeperClient(hosts=self.get_zookeeper_host(), read_only=False) as zc:
               zc.delete_path(root_node)
-          except Exception, e:
+          except Exception as e:
             # Re-create collection so that we don't have an orphan config
             self.api.add_collection(name)
             raise PopupException(_('Error in deleting Solr configurations.'), detail=e)
@@ -281,7 +282,7 @@ class SolrClient(object):
           zc.copy_path(root_node, config_root_path)
         else:
           LOG.warn('Config %s already existing.' % name)
-      except Exception, e:
+      except Exception as e:
         if zc.path_exists(root_node):
           zc.delete_path(root_node)
         raise PopupException(_('Could not create index: %s') % e)
@@ -306,7 +307,7 @@ class SolrClient(object):
 
       if not self.api.create_core(name, instancedir):
         raise Exception('Failed to create core: %s' % name)
-    except Exception, e:
+    except Exception as e:
       raise PopupException(_('Could not create index. Check error logs for more info.'), detail=e)
     finally:
       shutil.rmtree(instancedir)
@@ -361,6 +362,6 @@ class SolrClient(object):
       fields = self._format_flags(field_data['schema']['fields'])
       uniquekey = self.api.uniquekey(index_name)
       return uniquekey, fields
-    except Exception, e:
+    except Exception as e:
       LOG.exception(e.message)
       raise SolrClientException(_("Error in getting schema information for index '%s'" % index_name))

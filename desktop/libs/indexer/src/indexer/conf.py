@@ -15,9 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
 import logging
 import os
-from urlparse import urlparse
+import sys
 
 from django.utils.translation import ugettext_lazy as _t
 
@@ -25,6 +27,10 @@ from desktop.lib.conf import Config
 from libsolr import conf as libsolr_conf
 from libzookeeper import conf as libzookeeper_conf
 
+if sys.version_info[0] > 2:
+  from urllib.parse import urlparse
+else:
+  from urlparse import urlparse
 
 LOG = logging.getLogger(__name__)
 
