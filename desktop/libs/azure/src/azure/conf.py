@@ -142,10 +142,10 @@ ABFS_CLUSTERS = UnspecifiedConfigSection(
 )
 
 def is_adls_enabled():
-  return ('default' in AZURE_ACCOUNTS.keys() and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() is not None and 'default' in ADLS_CLUSTERS.keys() and ADLS_CLUSTERS['default'].get_raw())
+  return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() is not None and 'default' in list(ADLS_CLUSTERS.keys()) and ADLS_CLUSTERS['default'].get_raw())
 
 def is_abfs_enabled():
-  return ('default' in AZURE_ACCOUNTS.keys() and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() is not None and 'default' in ABFS_CLUSTERS.keys() and ABFS_CLUSTERS['default'].get_raw())
+  return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() is not None and 'default' in list(ABFS_CLUSTERS.keys()) and ABFS_CLUSTERS['default'].get_raw())
 
 def has_adls_access(user):
   from desktop.auth.backend import is_admin
@@ -165,7 +165,7 @@ def config_validator(user):
       headers = azure.client.get_client('default')._getheaders()
       if not headers.get('Authorization'):
         raise ValueError('Failed to obtain Azure authorization token')
-    except Exception, e:
+    except Exception as e:
       LOG.exception('Failed to obtain Azure authorization token.')
       res.append(('azure', _t('Failed to obtain Azure authorization token, check your azure configuration.')))
 

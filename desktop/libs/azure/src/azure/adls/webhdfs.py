@@ -18,10 +18,12 @@
 """
 Interfaces for ADLS via HttpFs/WebHDFS
 """
+from future import standard_library
+standard_library.install_aliases()
 import logging
 import threading
 
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from hadoop.fs.webhdfs import WebHdfs as HadoopWebHdfs
 from hadoop.fs.exceptions import WebHdfsException
@@ -47,7 +49,7 @@ class WebHdfs(HadoopWebHdfs):
                security_enabled=False,
                ssl_cert_ca_verify=True,
                temp_dir="/tmp",
-               umask=01022,
+               umask=0o1022,
                hdfs_supergroup=None,
                auth_provider=None):
     self._url = url
