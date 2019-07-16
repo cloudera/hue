@@ -59,7 +59,7 @@ from hadoop import cluster
 import useradmin.conf
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group
+  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group, default_organization
 else:
   from django.contrib.auth.models import User, Group
 
@@ -242,7 +242,8 @@ def update_app_permissions(**kwargs):
   # is to check if Useradmin has been installed.
   # It is okay to follow appmanager.DESKTOP_APPS before they've been sync'd
   # because apps are referenced by app name in Hue permission and not by model ID.
-  if u'useradmin_huepermission' in connection.introspection.table_names():
+  created_tables = connection.introspection.table_names()
+  if u'useradmin_huepermission' in created_tables:
     current = {}
 
     try:
@@ -304,7 +305,7 @@ def update_app_permissions(**kwargs):
       )
 
 models.signals.post_migrate.connect(update_app_permissions)
-models.signals.post_migrate.connect(get_default_user_group)
+# models.signals.post_migrate.connect(get_default_user_group)
 
 
 def install_sample_user():
