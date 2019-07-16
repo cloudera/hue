@@ -57,3 +57,21 @@ class ABFSTestBase(unittest.TestCase):
     
     ok2 = self.client.stats('abfss://' + filesystems[0] + '/' + pathing[0])
     LOG.debug("%s" %ok2)
+    
+    ok2 = self.client.listdir_stats('abfss://' + filesystems[0])
+    LOG.debug("%s" %ok2)
+    
+  def test_mkdir(self):
+    filesystems = self.client.listdir('abfss://')
+    LOG.debug("%s" %filesystems)
+    assert_true(None not in filesystems, filesystems)
+    
+    self.client.mkdir('abfss://' + filesystems[1] + "/test1")
+    
+    pathing = self.client.listdir('abfss://' + filesystems[1])
+    LOG.debug("%s" %pathing)
+    assert_true(None not in pathing, pathing)
+    self.client.remove('abfss://' + filesystems[1] + "/test")
+    
+    pathing = self.client.listdir('abfss://' + filesystems[1])
+    LOG.debug("%s" %pathing)
