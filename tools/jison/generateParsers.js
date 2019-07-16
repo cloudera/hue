@@ -388,7 +388,6 @@ const prepareForNewParser = () =>
                           'sql/' + target + '/autocomplete_header.jison'
                         ];
                         const syntaxSources = ['sql/' + target + '/syntax_header.jison'];
-                        const lexer = 'sql/' + target + '/sql.jisonlex';
 
                         files.forEach(file => {
                           if (file.indexOf('sql_') === 0) {
@@ -412,65 +411,9 @@ const prepareForNewParser = () =>
                                 "parser.yy.activeDialect = '" + target + "';"
                               )
                           ).then(() => {
-                            parserDefinitions[target + 'AutocompleteParser'] = {
-                              sources: autocompleteSources,
-                              lexer: lexer,
-                              target: 'sql/' + target + '/' + target + 'AutocompleteParser.jison',
-                              sqlParser: 'AUTOCOMPLETE',
-                              outputFolder: 'desktop/core/src/desktop/js/parse/sql/' + target + '/',
-                              afterParse: contents =>
-                                new Promise(resolveAfterParse => {
-                                  resolveAfterParse(
-                                    LICENSE +
-                                      contents
-                                        .replace(
-                                          'var ' + target + 'AutocompleteParser = ',
-                                          "import SqlParseSupport from 'parse/sql/" +
-                                            target +
-                                            "/sqlParseSupport';\n\nvar " +
-                                            target +
-                                            'AutocompleteParser = '
-                                        )
-                                        .replace(
-                                          'loc: yyloc,',
-                                          "loc: lexer.yylloc, ruleId: stack.slice(stack.length - 2, stack.length).join(''),"
-                                        ) +
-                                      '\nexport default ' +
-                                      target +
-                                      'AutocompleteParser;\n'
-                                  );
-                                })
-                            };
-                            parserDefinitions[target + 'SyntaxParser'] = {
-                              sources: syntaxSources,
-                              lexer: lexer,
-                              target: 'sql/' + target + '/' + target + 'SyntaxParser.jison',
-                              sqlParser: 'SYNTAX',
-                              outputFolder: 'desktop/core/src/desktop/js/parse/sql/' + target + '/',
-                              afterParse: contents =>
-                                new Promise(resolveAfterParse => {
-                                  resolveAfterParse(
-                                    LICENSE +
-                                      contents
-                                        .replace(
-                                          'var ' + target + 'SyntaxParser = ',
-                                          "import SqlParseSupport from 'parse/sql/" +
-                                            target +
-                                            "/sqlParseSupport';\n\nvar " +
-                                            target +
-                                            'SyntaxParser = '
-                                        )
-                                        .replace(
-                                          'loc: yyloc,',
-                                          "loc: lexer.yylloc, ruleId: stack.slice(stack.length - 2, stack.length).join(''),"
-                                        ) +
-                                      '\nexport default ' +
-                                      target +
-                                      'SyntaxParser;\n'
-                                  );
-                                })
-                            };
-                            resolve();
+                            identifySqlParsers()
+                              .then(resolve)
+                              .catch(reject);
                           });
                         });
                       });
