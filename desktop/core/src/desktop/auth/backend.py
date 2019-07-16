@@ -55,7 +55,7 @@ from useradmin import ldap_access
 from useradmin.models import get_profile, get_default_user_group, UserProfile
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import OrganizationUser as User, Organization
+  from useradmin.models2 import OrganizationUser as User, Organization
 else:
   from django.contrib.auth.models import User
 

@@ -30,12 +30,12 @@ from desktop import conf as desktop_conf
 from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule
 from desktop.settings import LANGUAGES
 
+from useradmin.hue_password_policy import hue_get_password_validators
 from useradmin.models import GroupPermission, HuePermission
 from useradmin.models import get_default_user_group
-from useradmin.hue_password_policy import hue_get_password_validators
 
 if desktop_conf.ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import OrganizationUser as HueUser
+  from useradmin.models2 import OrganizationUser as HueUser
 else:
   from desktop.models import HueUser
 

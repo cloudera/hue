@@ -30,9 +30,8 @@ from libsolr.api import SolrApi
 
 from search.conf import SOLR_URL
 
-
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import OrganizationUser as User
+  from useradmin.models2 import OrganizationUser as User
 else:
   from django.contrib.auth.models import User
 
