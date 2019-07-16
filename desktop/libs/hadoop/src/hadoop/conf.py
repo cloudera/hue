@@ -214,7 +214,7 @@ def config_validator(user):
     res.extend(webhdfs.test_fs_configuration(cluster))
     if name == 'default':
       has_default = True
-  if not has_default:
+  if HDFS_CLUSTERS.keys() and not has_default:
     res.append(("hadoop.hdfs_clusters", "You should have an HDFS called 'default'."))
 
   # YARN_CLUSTERS
