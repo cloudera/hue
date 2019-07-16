@@ -223,17 +223,15 @@ def config_validator(user):
     if cluster.SUBMIT_TO.get():
       submit_to.append('yarn_clusters.' + name)
 
-  if not submit_to:
-    res.append(("hadoop", "Please designate one of the MapReduce or "
-                "Yarn clusters with `submit_to=true' in order to run jobs."))
+  if YARN_CLUSTERS.keys() and not submit_to:
+    res.append(("hadoop", "Please designate one of the MapReduce or Yarn clusters with `submit_to=true' in order to run jobs."))
   else:
     res.extend(test_yarn_configurations(user))
 
   if get_spark_history_server_from_cm():
     status = test_spark_configuration(user)
     if status != 'OK':
-      res.append(("Spark_history_server", "Spark job can't retrieve logs of driver and executors without "
-                  "a running Spark history server"))
+      res.append(("Spark_history_server", "Spark job can't retrieve logs of driver and executors without a running Spark history server"))
 
   return res
 
