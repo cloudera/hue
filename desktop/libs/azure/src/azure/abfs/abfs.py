@@ -98,48 +98,60 @@ class ABFS(object):
     }
 
   def isdir(self, path):
-    raise NotImplementedError("")
+    resp = self.stats(path)
+    return (resp is not None) and (resp['x-ms-resource-type'] == 'directory') 
 
   def isfile(self, path):
     raise NotImplementedError("")
 
   def stats(self, path):
+    """
+    List the stat of the actual name
+    """
     file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
     norm_path = file_system + '/' + dir_name
     LOG.debug('%s' %self._getheaders())
     res = self._root._invoke('HEAD', norm_path, { 'action' : 'getStatus', 'upn' : 'true'}, headers = self._getheaders())
+    if res is None:
+      return None
     return res.headers
   
   def listdir_stats(self,path, **kwargs):
-    pass
+    """
+    List the stats for the directories
+    """
+    dir_stats = []
+    file_system, dir_name= azure.abfs.__init__.parse_uri(path)[:2]
+    assert_true(dir_name == '')
+    for direct in self.listdir(path):
+      res = self._root._invoke('HEAD', file_system + '/' + direct, { 'action' : 'getStatus', 'upn' : 'true'}, headers = self._getheaders())
+      dir_stats.append(res.headers)  
+    return dir_stats
   
   def listdir(self, path, glob=None):
     """
-    Lists the names for directories 
-    """
-    resp = self._listdir(path)
-    if azure.abfs.__init__.is_root(path):
-      return [x['name'] for x in resp['filesystems']]
-    else:
-      return [x['name'] for x in resp['paths']]
-    
-  def _listdir(self, path, **kwargs):
-    """
-    Lists direct with more info
+    Lists the names inside the current directories 
     """
     if azure.abfs.__init__.is_root(path):
-      return self._root.get('',{'resource': 'account'}, headers= self._getheaders())
-      #return self._client.execute('GET', '/', headers =  self._getheaders())
-    LOG.debug("%s" %path)
+      return self.listfilesystems()
     file_system, directory_name = azure.abfs.__init__.parse_uri(path)[:2]
-    LOG.debug("%s, %s" %(file_system, directory_name))
     if directory_name == "":
-      res = self._root.get(file_system,{'resource': 'filesystem', 'recursive':'false'}, headers= self._getheaders())
+      resp = self._root.get(file_system,{'resource': 'filesystem', 'recursive':'false'}, headers= self._getheaders())
     else:
-      res = self._root.get(file_system,{'resource': 'filesystem', 'recursive':'false', 'directory' : directory_name}, headers= self._getheaders())
-    LOG.debug("%s" %res)
-    return res
-
+      resp = self._root.get(file_system,{'resource': 'filesystem', 'recursive':'false', 'directory' : directory_name}, headers= self._getheaders())
+    return [x['name'] for x in resp['paths']]
+  
+  def listfilesystems_stats(self):
+    stats = []
+    for file_system in self.listfilesystems():
+      resp = self._root._invoke('HEAD', file_system, {'resource': 'filesystem'}, headers = self._getheaders())
+      stats.append(resp.headers)
+    return stats
+  
+  def listfilesystems(self):
+    resp = self._root.get('',{'resource': 'account'}, headers= self._getheaders())
+    return [x['name'] for x in resp['filesystems']]
+    
   def normpath(self, path):
     raise NotImplementedError("")
 
@@ -150,7 +162,7 @@ class ABFS(object):
     raise NotImplementedError("")
 
   def exists(self, path):
-    raise NotImplementedError("")
+    return self.stats(path) is not None
 
   def isroot(self, path):
     raise NotImplementedError("")
@@ -162,13 +174,15 @@ class ABFS(object):
     raise NotImplementedError("")
 
   def mkdir(self, path, *args, **kwargs):
-    res = self.listdir(path)
-    other_path = azure.abfs.__init__.strip_scheme(path)
-    assert_true((other_path not in res) or self.isfile(path))
+    file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
+    if dir_name == '':
+      return self.create_home_dir(path)
+    no_scheme = file_system + '/' + dir_name
+    additional_header = self._getheaders()
+    additional_header['If-None-Match'] = '*'
+    res = self._root.put(no_scheme,{'resource': 'directory'}, headers= additional_header)
     
     
-    raise NotImplementedError("")
-
   def read(self, path, *args, **kwargs):
     raise NotImplementedError("")
 
@@ -179,7 +193,15 @@ class ABFS(object):
     raise NotImplementedError("")
 
   def remove(self, path, skip_trash=False):
-    raise NotImplementedError("")
+    if azure.abfs.__init__.is_root(path):
+      raise NotImplementedError("")
+    new_path = azure.abfs.__init__.strip_scheme(path)
+    if self.isdir(path):
+      self._root.delete(new_path,{'recursive':'false'}, headers= self._getheaders())
+    elif self.isfile(path):
+      self._root.delete(new_path, headers= self._getheaders())
+    else:
+      raise NotImplementedError
 
   def restore(self, path):
     raise NotImplementedError("")

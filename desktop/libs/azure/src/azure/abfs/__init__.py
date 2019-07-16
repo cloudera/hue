@@ -38,6 +38,6 @@ def is_root(uri):
   return uri.lower() == ABFS_ROOT or uri.lower() == ABFS_ROOT_S
 
 def strip_scheme(path):
-    filesystem, file_path = azure.abfs.__init__.parse_uri(path)[:2]
+    filesystem, file_path = parse_uri(path)[:2]
     path = filesystem + '/' + file_path
     return path
