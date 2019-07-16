@@ -18,9 +18,7 @@ It features:
    * [Browsers](http://gethue.com/browsers/) for data and a Data Catalog
 
 
-![alt text](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/sql-editor.png "Hue Editor")
-
-![alt text](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/dashboard.png "Hue Dashboard")
+![alt text](docs/images/hue-screens-demo.gif "Hue Editor and Dashboard")
 
 
 Who is using Hue
