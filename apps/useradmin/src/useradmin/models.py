@@ -312,7 +312,7 @@ def update_app_permissions(**kwargs):
       )
 
 models.signals.post_migrate.connect(update_app_permissions)
-models.signals.post_migrate.connect(get_default_user_group)
+# models.signals.post_migrate.connect(get_default_user_group)
 
 
 def install_sample_user():
