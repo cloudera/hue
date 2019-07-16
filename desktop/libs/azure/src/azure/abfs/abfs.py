@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from nose.tools import assert_true
 
 """
 Interfaces for ABFS
@@ -26,12 +27,14 @@ import threading
 
 from urllib.parse import urlparse
 from azure.conf import PERMISSION_ACTION_ABFS
+import azure.abfs.__init__
+
 from hadoop.hdfs_site import get_umask_mode
 
 from hadoop.fs.exceptions import WebHdfsException
 
 from desktop.lib.rest import http_client, resource
-import azure.abfs.__init__
+from nose.tools import assert_true
 
 
 LOG = logging.getLogger(__name__)
@@ -101,11 +104,28 @@ class ABFS(object):
     raise NotImplementedError("")
 
   def stats(self, path):
-    raise NotImplementedError("")
-
-  def listdir_stats(self, path, **kwargs):
+    file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
+    norm_path = file_system + '/' + dir_name
+    LOG.debug('%s' %self._getheaders())
+    res = self._root._invoke('HEAD', norm_path, { 'action' : 'getStatus', 'upn' : 'true'}, headers = self._getheaders())
+    return res.headers
+  
+  def listdir_stats(self,path, **kwargs):
+    pass
+  
+  def listdir(self, path, glob=None):
     """
-    Lists the stats for directories
+    Lists the names for directories 
+    """
+    resp = self._listdir(path)
+    if azure.abfs.__init__.is_root(path):
+      return [x['name'] for x in resp['filesystems']]
+    else:
+      return [x['name'] for x in resp['paths']]
+    
+  def _listdir(self, path, **kwargs):
+    """
+    Lists direct with more info
     """
     if azure.abfs.__init__.is_root(path):
       return self._root.get('',{'resource': 'account'}, headers= self._getheaders())
@@ -114,20 +134,11 @@ class ABFS(object):
     file_system, directory_name = azure.abfs.__init__.parse_uri(path)[:2]
     LOG.debug("%s, %s" %(file_system, directory_name))
     if directory_name == "":
-      res = self._root.get(file_system,{'resource': 'filesystem', 'recursive':'true'}, headers= self._getheaders())
+      res = self._root.get(file_system,{'resource': 'filesystem', 'recursive':'false'}, headers= self._getheaders())
     else:
-      res = self._root.get(file_system,{'resource': 'filesystem', 'recursive':'true', 'directory' : directory_name}, headers= self._getheaders())
+      res = self._root.get(file_system,{'resource': 'filesystem', 'recursive':'false', 'directory' : directory_name}, headers= self._getheaders())
+    LOG.debug("%s" %res)
     return res
-
-  def listdir(self, path, glob=None):
-    """
-    Lists the names for directories 
-    """
-    resp = self.listdir_stats(path)
-    if azure.abfs.__init__.is_root(path):
-      return [x['name'] for x in resp['filesystems']]
-    else:
-      return [x['name'] for x in resp['paths']]
 
   def normpath(self, path):
     raise NotImplementedError("")
@@ -151,6 +162,11 @@ class ABFS(object):
     raise NotImplementedError("")
 
   def mkdir(self, path, *args, **kwargs):
+    res = self.listdir(path)
+    other_path = azure.abfs.__init__.strip_scheme(path)
+    assert_true((other_path not in res) or self.isfile(path))
+    
+    
     raise NotImplementedError("")
 
   def read(self, path, *args, **kwargs):

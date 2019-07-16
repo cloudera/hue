@@ -54,3 +54,6 @@ class ABFSTestBase(unittest.TestCase):
     directory = self.client.listdir('abfss://' + filesystems[0] + '/' + pathing[0])
     LOG.debug("%s" %directory)
     assert_true(None not in directory, directory)
+    
+    ok2 = self.client.stats('abfss://' + filesystems[0] + '/' + pathing[0])
+    LOG.debug("%s" %ok2)

@@ -18,8 +18,9 @@ from __future__ import absolute_import
 import errno
 import re
 
-ABFS_PATH_RE = re.compile('^/*[aA][bB][fF][sS]{2}://([^/]+)(/(.*?(([^/]+/)*/?))?)?$')
-ABFS_ROOT = 'abfss://'
+ABFS_PATH_RE = re.compile('^/*[aA][bB][fF][sS]{1,2}://([^/]+)(/(.*?(([^/]+/)*/?))?)?$') # bug here
+ABFS_ROOT_S = 'abfss://'
+ABFS_ROOT = 'abfs://'
 
 def parse_uri(uri):
   """
@@ -34,5 +35,9 @@ def parse_uri(uri):
   return match.group(1), direct_name, base_direct_name
 
 def is_root(uri):
-  return uri.lower() == ABFS_ROOT
+  return uri.lower() == ABFS_ROOT or uri.lower() == ABFS_ROOT_S
 
+def strip_scheme(path):
+    filesystem, file_path = azure.abfs.__init__.parse_uri(path)[:2]
+    path = filesystem + '/' + file_path
+    return path
