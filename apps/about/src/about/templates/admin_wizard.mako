@@ -87,7 +87,7 @@ ${ layout.menubar(section='quick_start') }
             <div>
               <h3>${ _('Install individual application examples') }</h3>
               <ul class="unstyled samples">
-              % if 'beeswax' in app_names:
+              % if 'hive' in app_names:
                   <li>
                     <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                        data-sample-url="${ url('beeswax:install_examples') }">
