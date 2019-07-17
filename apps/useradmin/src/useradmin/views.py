@@ -25,7 +25,6 @@ import subprocess
 import sys
 import json
 
-
 from axes.decorators import FAILURE_LIMIT, LOCK_OUT_AT_FAILURE
 from axes.models import AccessAttempt
 from axes.utils import reset
@@ -62,6 +61,7 @@ if ENABLE_ORGANIZATIONS.get():
   from useradmin.forms import OrganizationUserChangeForm as UserChangeForm, OrganizationSuperUserChangeForm as SuperUserChangeForm
 else:
   from useradmin.forms import UserChangeForm, SuperUserChangeForm
+
 
 
 LOG = logging.getLogger(__name__)
@@ -295,9 +295,9 @@ def edit_user(request, username=None):
   if require_change_password(userprofile):
     form_class = PasswordChangeForm
   elif is_admin(request.user):
-    form_class = SuperUserChangeForm
+    form_class = OrganizationSuperUserChangeForm if ENABLE_ORGANIZATIONS.get() else SuperUserChangeForm
   else:
-    form_class = UserChangeForm
+    form_class = OrganizationUserChangeForm if ENABLE_ORGANIZATIONS.get() else UserChangeForm
 
   if request.method == 'POST':
     form = form_class(request.POST, instance=instance)

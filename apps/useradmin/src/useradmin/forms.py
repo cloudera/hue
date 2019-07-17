@@ -274,6 +274,23 @@ class SuperUserChangeForm(UserChangeForm):
       else:
         self.initial['groups'] = []
 
+class OrganizationSuperUserChangeForm(OrganizationUserChangeForm):
+  class Meta(UserChangeForm.Meta):
+    fields = ["email", "is_active"] + OrganizationUserChangeForm.Meta.fields + ["is_superuser", "unlock_account", "groups"]
+
+  def __init__(self, *args, **kwargs):
+    super(OrganizationSuperUserChangeForm, self).__init__(*args, **kwargs)
+    if self.instance.id:
+      # If the user exists already, we'll use its current group memberships
+      self.initial['groups'] = set(self.instance.groups.all())
+    else:
+      # If his is a new user, suggest the default group
+      default_group = get_default_user_group()
+      if default_group is not None:
+        self.initial['groups'] = set([default_group])
+      else:
+        self.initial['groups'] = []
+
 
 class AddLdapUsersForm(forms.Form):
   username_pattern = forms.CharField(
