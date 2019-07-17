@@ -35,7 +35,6 @@ from bz2 import decompress
 from datetime import datetime
 from gzip import GzipFile
 
-from django.contrib.auth.models import User, Group
 from django.core.paginator import EmptyPage, Paginator, Page, InvalidPage
 from django.urls import reverse
 from django.template.defaultfilters import stringformat, filesizeformat
@@ -51,6 +50,7 @@ from django.utils.translation import ugettext as _
 from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException
 from desktop import appmanager
 from desktop.auth.backend import is_admin
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib import i18n
 from desktop.lib.conf import coerce_bool
 from desktop.lib.django_util import render, format_preserving_redirect
@@ -74,9 +74,14 @@ from filebrowser.lib.archives import archive_factory
 from filebrowser.lib.rwx import filetype, rwx
 from filebrowser.lib import xxd
 from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkDirForm, EditorForm, TouchForm,\
-                              RenameFormSet, RmTreeFormSet, ChmodFormSet, ChownFormSet, CopyFormSet, RestoreFormSet,\
-                              TrashPurgeForm, SetReplicationFactorForm
+    RenameFormSet, RmTreeFormSet, ChmodFormSet, ChownFormSet, CopyFormSet, RestoreFormSet,\
+    TrashPurgeForm, SetReplicationFactorForm
 
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group
+else:
+  from django.contrib.auth.models import User, Group
 
 if sys.version_info[0] > 2:
   import io

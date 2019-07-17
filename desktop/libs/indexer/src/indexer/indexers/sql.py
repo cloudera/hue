@@ -22,10 +22,10 @@ import sys
 import urllib.request, urllib.error
 import uuid
 
-from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
 
@@ -37,6 +37,12 @@ if sys.version_info[0] > 2:
 else:
   from urllib import unquote as urllib_unquote
   from urlparse import urlparse
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
+
 
 LOG = logging.getLogger(__name__)
 

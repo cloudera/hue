@@ -27,12 +27,11 @@ from mock import patch, Mock
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true
 
-from django.contrib.auth.models import User
 from django.urls import reverse
 from TCLIService.ttypes import TStatusCode, TProtocolVersion, TOperationType
 
 from desktop.auth.backend import rewrite_user
-from desktop.conf import has_connectors
+from desktop.conf import has_connectors, ENABLE_ORGANIZATIONS
 from desktop.lib.i18n import smart_str
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
@@ -44,6 +43,11 @@ from notebook.models import make_notebook, Notebook
 
 from beeswax.server import dbms
 from beeswax.test_base import BeeswaxSampleProvider, get_query_server_config, is_hive_on_spark
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

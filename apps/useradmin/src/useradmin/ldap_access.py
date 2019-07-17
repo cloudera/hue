@@ -25,10 +25,14 @@ import ldap.filter
 import logging
 import re
 
-from django.contrib.auth.models import User
-
 import desktop.conf
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.python_util import CaseInsensitiveDict
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)
@@ -52,7 +56,7 @@ def get_connection_from_server(server=None):
     ldap_config = ldap_servers[server]
   else:
     ldap_config = desktop.conf.LDAP
-     
+
   return get_connection(ldap_config)
 
 def get_connection(ldap_config):
@@ -211,7 +215,7 @@ class LdapConnection(object):
     """
     :param result_data: List of dictionaries that have ldap attributes and their associated values. Generally the result list from an ldapsearch request.
     :param user_name_attr: The ldap attribute that is returned by the server to map to ``username`` in the return dictionary.
-    
+
     :returns list of dictionaries that take on the following form: {
       'dn': <distinguished name of entry>,
       'username': <ldap attribute associated with user_name_attr>
@@ -310,7 +314,7 @@ class LdapConnection(object):
     :param user_name_attr: The ldap attribute that is returned by the server to map to ``username`` in the return dictionary.
     :param find_by_dn: Search by distinguished name.
     :param scope: ldapsearch scope.
-    
+
     :returns: List of dictionaries that take on the following form: {
       'dn': <distinguished name of entry>,
       'username': <ldap attribute associated with user_name_attr>
@@ -372,7 +376,7 @@ class LdapConnection(object):
     :param group_name_attr: The ldap attribute that is returned by the server to map to ``name`` in the return dictionary.
     :param find_by_dn: Search by distinguished name.
     :param scope: ldapsearch scope.
-    
+
     :returns: List of dictionaries that take on the following form: {
       'dn': <distinguished name of entry>,
       'name': <ldap attribute associated with group_name_attr>

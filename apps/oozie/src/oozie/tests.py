@@ -37,11 +37,11 @@ from itertools import chain
 from nose.plugins.skip import SkipTest
 from nose.plugins.attrib import attr
 from nose.tools import raises, assert_true, assert_false, assert_equal, assert_not_equal
-from django.contrib.auth.models import User
 from django.urls import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_permission, add_to_group, reformat_json, reformat_xml
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.models import Document, Document2
 import desktop.views as views
 
@@ -67,6 +67,12 @@ if sys.version_info[0] > 2:
   from io import StringIO as string_io
 else:
   from cStringIO import StringIO as string_io
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
+
 
 LOG = logging.getLogger(__name__)
 

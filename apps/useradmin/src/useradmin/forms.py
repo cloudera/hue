@@ -21,23 +21,22 @@ import re
 
 import django.contrib.auth.forms
 from django import forms
-from django.contrib.auth.models import User, Group
 from django.forms import ValidationError
 from django.forms.utils import ErrorList
 from django.utils.translation import get_language, ugettext as _, ugettext_lazy as _t
 
 from desktop import conf as desktop_conf
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule
 from desktop.settings import LANGUAGES
 
 from useradmin.hue_password_policy import hue_get_password_validators
-from useradmin.models import GroupPermission, HuePermission
-from useradmin.models import get_default_user_group
+from useradmin.models import GroupPermission, HuePermission, get_default_user_group
 
-if desktop_conf.ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as HueUser
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group
 else:
-  from desktop.models import HueUser
+  from django.contrib.auth.models import User, Group
 
 
 LOG = logging.getLogger(__name__)
@@ -120,7 +119,7 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
                                       required=False)
 
   class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
-    model =  HueUser
+    model =  User
     fields = ["username", "first_name", "last_name", "email", "ensure_home_directory"]
 
   def __init__(self, *args, **kwargs):

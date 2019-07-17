@@ -24,9 +24,13 @@ import logging
 import multiprocessing
 import threading
 
-from django.contrib.auth.models import User
-
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.metrics import global_registry
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

@@ -20,13 +20,14 @@ import logging
 import json
 import re
 
-from django.contrib.auth.models import User
 from django.urls import reverse
 from django.http import Http404
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
 from thrift.transport.TTransport import TTransportException
+from desktop.auth.backend import is_admin
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.context_processors import get_app_name
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions import StructuredThriftTransportException
@@ -37,7 +38,6 @@ from metastore import parser
 from notebook.models import escape_rows, MockedDjangoRequest, make_notebook
 
 import beeswax.models
-
 from beeswax.data_export import upload
 from beeswax.design import HQLdesign
 from beeswax.conf import USE_GET_LOG_API
@@ -45,14 +45,17 @@ from beeswax.forms import QueryForm
 from beeswax.models import Session, QueryHistory
 from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException, QueryServerTimeoutException,\
-  SubQueryTable
+    SubQueryTable
 from beeswax.views import authorized_get_design, authorized_get_query_history, make_parameterization_form,\
-                          safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state, \
-                          parse_out_jobs
+    safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state, parse_out_jobs
 from metastore.conf import FORCE_HS2_METADATA
 from metastore.views import _get_db, _get_servername
 
-from desktop.auth.backend import is_admin
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
+
 
 LOG = logging.getLogger(__name__)
 

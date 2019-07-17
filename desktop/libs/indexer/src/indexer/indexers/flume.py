@@ -18,15 +18,20 @@ from builtins import object
 import logging
 import os
 
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.exceptions_renderable import PopupException
 from libzookeeper.conf import zkensemble
 from metadata.manager_client import ManagerApi
 
 from indexer.conf import config_morphline_path
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

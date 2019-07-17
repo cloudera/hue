@@ -19,15 +19,20 @@
 from builtins import object
 from nose.tools import assert_true, assert_equal, assert_false
 
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 
-from django.contrib.auth.models import User, Group
 from django.urls import reverse
 
 from useradmin.models import HuePermission, GroupPermission
 
 from security.api.hive import _to_sentry_privilege
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group
+else:
+  from django.contrib.auth.models import User, Group
 
 
 class TestSecurity(object):

@@ -22,19 +22,25 @@ from builtins import object
 import logging
 import sys
 
-from django.contrib.auth.models import User
+from urlparse import urlparse
 
 from desktop.auth.backend import is_admin
-from desktop.conf import DEFAULT_USER
+from desktop.conf import DEFAULT_USER, ENABLE_ORGANIZATIONS
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 if sys.version_info[0] > 2:
   from urllib.parse import urlparse as lib_urlparse
 else:
   from urlparse import urlparse as lib_urlparse
 
-LOG = logging.getLogger(__name__)
 
+LOG = logging.getLogger(__name__)
 DEFAULT_USER = DEFAULT_USER.get()
+
 
 class ProxyFS(object):
 

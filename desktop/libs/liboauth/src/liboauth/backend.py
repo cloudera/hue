@@ -26,15 +26,19 @@ import cgi
 import logging
 import sys
 
-from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
 from desktop.auth.backend import force_username_case, DesktopBackendBase
-from desktop.conf import AUTH
+from desktop.conf import AUTH, ENABLE_ORGANIZATIONS
 from useradmin.models import get_profile, get_default_user_group, UserProfile
 
 import liboauth.conf
 import liboauth.metrics
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 try:
   import oauth2 as oauth
@@ -69,7 +73,7 @@ class OAuthBackend(DesktopBackendBase):
         is_super = True
       else:
         is_super = False
-    
+
       # Could save oauth_token detail in the user profile here
       user = find_or_create_user(username, password)
 
@@ -86,21 +90,21 @@ class OAuthBackend(DesktopBackendBase):
 
     return user
 
-    
+
   @classmethod
   def manages_passwords_externally(cls):
-    return True 
+    return True
 
   @classmethod
   def is_first_login_ever(cls):
     """ Return true if no external user has ever logged in to Desktop yet. """
     return not UserProfile.objects.filter(creation_method=UserProfile.CreationMethod.EXTERNAL.name).exists()
-  
+
 
   @classmethod
   def handleAuthenticationRequest(cls, request):
     assert oauth is not None
- 
+
     if 'oauth_verifier' in request.GET:
         social = 'twitter'
         consumer_key=liboauth.conf.CONSUMER_KEY_TWITTER.get()
@@ -135,14 +139,14 @@ class OAuthBackend(DesktopBackendBase):
             consumer_key=liboauth.conf.CONSUMER_KEY_GOOGLE.get()
             consumer_secret=liboauth.conf.CONSUMER_SECRET_GOOGLE.get()
             access_token_uri=liboauth.conf.ACCESS_TOKEN_URL_GOOGLE.get()
-            authentication_token_uri=liboauth.conf.AUTHORIZE_URL_GOOGLE.get()        
+            authentication_token_uri=liboauth.conf.AUTHORIZE_URL_GOOGLE.get()
 
         elif social == 'facebook':
             consumer_key=liboauth.conf.CONSUMER_KEY_FACEBOOK.get()
             consumer_secret=liboauth.conf.CONSUMER_SECRET_FACEBOOK.get()
             access_token_uri=liboauth.conf.ACCESS_TOKEN_URL_FACEBOOK.get()
             authentication_token_uri=liboauth.conf.AUTHORIZE_URL_FACEBOOK.get()
-        
+
         elif social == 'linkedin':
             consumer_key=liboauth.conf.CONSUMER_KEY_LINKEDIN.get()
             consumer_secret=liboauth.conf.CONSUMER_SECRET_LINKEDIN.get()
@@ -192,7 +196,7 @@ class OAuthBackend(DesktopBackendBase):
                 raise Exception(_("Invalid response from OAuth provider: %s") % resp)
             username = (json.loads(content))['emailAddress']
             access_token = dict(screen_name=map_username(username), oauth_token_secret=access_tok)
-  
+
 
     return access_token, nexturl
 
@@ -203,7 +207,7 @@ class OAuthBackend(DesktopBackendBase):
 
     redirect_uri = get_redirect_uri(request)
     response_type = "code"
- 
+
     social = request.GET['social']
     state = social + "," + request.GET.get('next', '/')
 

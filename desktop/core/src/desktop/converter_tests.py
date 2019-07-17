@@ -21,20 +21,25 @@ from datetime import datetime
 import json
 
 from nose.tools import assert_equal, assert_false, assert_true
-from django.contrib.auth.models import User
-
-from desktop.converters import DocumentConverter
-from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import grant_access
-from desktop.models import Directory, Document, Document2, DocumentPermission, DocumentTag
-from librdbms.design import SQLdesign
 
 from beeswax.models import SavedQuery
 from beeswax.design import hql_query
+from librdbms.design import SQLdesign
 from oozie.models import Link, Workflow
 from oozie.tests import add_node
 from pig.models import create_or_update_script
 from useradmin.models import get_default_user_group
+
+from desktop.conf import ENABLE_ORGANIZATIONS
+from desktop.converters import DocumentConverter
+from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.test_utils import grant_access
+from desktop.models import Directory, Document, Document2, DocumentPermission, DocumentTag
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 class TestDocumentConverter(object):

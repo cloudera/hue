@@ -23,10 +23,10 @@ from datetime import datetime
 
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_false, assert_true, assert_not_equal, assert_raises
-from django.contrib.auth.models import User
 from django.core import management
 from django.db.utils import OperationalError
 
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.converters import DocumentConverter
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.fs import ProxyFS
@@ -38,6 +38,11 @@ from beeswax.models import SavedQuery
 from beeswax.design import hql_query
 from useradmin.models import get_default_user_group
 from oozie.models2 import Workflow
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 class MockFs(object):
