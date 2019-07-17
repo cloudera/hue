@@ -39,7 +39,7 @@ from librdbms.server import dbms as librdbms_dbms
 from beeswax.design import HQLdesign
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

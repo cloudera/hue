@@ -36,7 +36,7 @@ from indexer.indexers.morphline_operations import get_checked_args
 from indexer.solr_client import SolrClient
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

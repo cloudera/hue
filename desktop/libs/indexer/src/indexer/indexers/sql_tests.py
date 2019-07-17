@@ -28,7 +28,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from indexer.indexers.sql import SQLIndexer
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

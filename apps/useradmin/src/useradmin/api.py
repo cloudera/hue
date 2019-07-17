@@ -23,7 +23,7 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import smart_unicode
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group
+  from useradmin.models import User, Group
 else:
   from django.contrib.auth.models import User, Group
 

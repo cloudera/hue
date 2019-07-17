@@ -45,7 +45,7 @@ from beeswax.server import dbms
 from beeswax.test_base import BeeswaxSampleProvider
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group
+  from useradmin.models import User, Group
 else:
   from django.contrib.auth.models import User, Group
 

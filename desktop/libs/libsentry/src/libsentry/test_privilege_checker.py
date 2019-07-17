@@ -28,7 +28,7 @@ from desktop.lib.test_utils import grant_access
 from libsentry.privilege_checker import PrivilegeChecker
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

@@ -29,7 +29,7 @@ from desktop.models import DefaultConfiguration
 from useradmin.models import get_default_user_group
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

@@ -37,7 +37,7 @@ from desktop.lib.test_utils import grant_access
 from desktop.models import Directory, Document, Document2, DocumentPermission, DocumentTag
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 
