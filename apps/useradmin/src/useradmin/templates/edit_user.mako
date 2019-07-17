@@ -16,18 +16,19 @@
 <%!
 from django.utils.translation import ugettext as _
 
+from desktop.auth.backend import is_admin
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.views import commonheader, commonfooter
 
 from useradmin.hue_password_policy import is_password_policy_enabled, get_password_hint
 from useradmin.views import is_user_locked_out
-from desktop.auth.backend import is_admin
 %>
 
 <%namespace name="layout" file="layout.mako" />
 
-%if not is_embeddable:
+% if not is_embeddable:
 ${ commonheader(_('Hue Users'), "useradmin", user, request) | n,unicode }
-%endif
+% endif
 
 ${ layout.menubar(section='users') }
 
@@ -56,21 +57,26 @@ ${ layout.menubar(section='users') }
         <li><a href="javascript:void(0)" class="step" data-step="step2">${ is_admin(user) and _('Step 2: Profile and Groups') or _('Step 2: Profile') }</a>
         </li>
         % if is_admin(user):
-            <li><a href="javascript:void(0)" class="step" data-step="step3">${ _('Step 3: Advanced') }</a></li>
+          <li><a href="javascript:void(0)" class="step" data-step="step3">${ _('Step 3: Advanced') }</a></li>
         % endif
       </ul>
 
     <div class="steps">
       <div id="step1" class="stepDetails">
-        ${layout.render_field(form["username"], extra_attrs={'validate':'true'})}
+        % if ENABLE_ORGANIZATIONS.get():
+          ${ layout.render_field(form["email"], extra_attrs={'validate':'true'}) }
+        % else:
+          ${ layout.render_field(form["username"], extra_attrs={'validate':'true'}) }
+        % endif
+
         % if "password1" in form.fields:
           % if username and "password_old" in form.fields:
-            ${layout.render_field(form["password_old"], extra_attrs=username is None and {'validate':'true'} or {})}
+            ${ layout.render_field(form["password_old"], extra_attrs=username is None and {'validate':'true'} or {}) }
           % endif
-          ${layout.render_field(form["password1"], extra_attrs=username is None and {'validate':'true'} or {})}
+          ${ layout.render_field(form["password1"], extra_attrs=username is None and {'validate':'true'} or {}) }
           % if is_password_policy_enabled():
             <div class="password_rule" style="margin-left:180px; width:500px;">
-              <p>${get_password_hint()}</p>
+              <p>${ get_password_hint() }</p>
             </div>
           % endif
           ${layout.render_field(form["password2"], extra_attrs=username is None and {'validate':'true'} or {})}
@@ -83,7 +89,9 @@ ${ layout.menubar(section='users') }
             ${layout.render_field(form["last_name"])}
           % endif
 
-          ${layout.render_field(form["email"])}
+          % if not ENABLE_ORGANIZATIONS.get():
+            ${layout.render_field(form["email"])}
+          % endif
 
           %if request.user.username == username:
             ${layout.render_field(form["language"])}
