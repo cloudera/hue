@@ -32,7 +32,6 @@ import django.contrib.auth.views
 from django.core import urlresolvers
 from django.core.exceptions import SuspiciousOperation
 from django.contrib.auth import login, get_backends, authenticate
-from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
@@ -51,6 +50,11 @@ from desktop.lib.django_util import login_notrequired
 from desktop.lib.django_util import JsonResponse
 from desktop.log.access import access_log, access_warn, last_access_map
 from desktop.settings import LOAD_BALANCER_COOKIE
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group
+else:
+  from django.contrib.auth.models import User, Group
 
 
 if sys.version_info[0] > 2:

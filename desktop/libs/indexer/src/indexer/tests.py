@@ -21,9 +21,9 @@ import json
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_false
 
-from django.contrib.auth.models import User
 from django.urls import reverse
 
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 from hadoop.pseudo_hdfs4 import is_live_cluster, get_db_prefix
@@ -32,6 +32,11 @@ from libzookeeper import conf as libzookeeper_conf
 
 from indexer.conf import get_solr_ensemble
 from indexer.controller import CollectionManagerController
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 def test_get_ensemble():

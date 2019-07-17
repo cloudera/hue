@@ -20,11 +20,17 @@ import logging
 import sys
 import time
 
-from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.converters import DocumentConverter
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
+
 
 class Command(BaseCommand):
 

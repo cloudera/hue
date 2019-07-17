@@ -25,15 +25,12 @@ import subprocess
 import sys
 import json
 
+
 from axes.decorators import FAILURE_LIMIT, LOCK_OUT_AT_FAILURE
 from axes.models import AccessAttempt
 from axes.utils import reset
-
 import ldap
-from useradmin import ldap_access
-from useradmin.ldap_access import LdapBindException, LdapSearchException
 
-from django.contrib.auth.models import User, Group
 from django.urls import reverse
 from django.forms import ValidationError
 from django.forms.utils import ErrorList
@@ -43,23 +40,30 @@ from django.utils.encoding import smart_str
 from django.utils.translation import get_language, ugettext as _
 
 import desktop.conf
-from desktop.conf import LDAP
+from desktop.auth.backend import is_admin
+from desktop.conf import LDAP, ENABLE_ORGANIZATIONS
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import _get_apps
 from desktop.views import antixss
-
 from hadoop.fs.exceptions import WebHdfsException
+
+from useradmin import ldap_access
+from useradmin.ldap_access import LdapBindException, LdapSearchException
 from useradmin.models import HuePermission, UserProfile, LdapGroup
 from useradmin.models import get_profile, get_default_user_group
 from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm, AddLdapUsersForm,\
   PermissionsEditForm, GroupEditForm, SuperUserChangeForm, UserChangeForm, validate_username, validate_first_name, \
   validate_last_name, PasswordChangeForm
 
-from desktop.auth.backend import is_admin
-
 if sys.version_info[0] > 2:
   unicode = str
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group
+else:
+  from django.contrib.auth.models import User, Group
+
 
 LOG = logging.getLogger(__name__)
 

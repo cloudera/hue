@@ -24,8 +24,7 @@ import tempfile
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_false, assert_not_equal, assert_raises
 
-from django.contrib.auth.models import User
-
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.exceptions import StructuredThriftTransportException
 from desktop.lib.exceptions_renderable import PopupException
@@ -40,6 +39,11 @@ from libsentry.conf import is_enabled, HOSTNAME, PORT, SENTRY_CONF_DIR
 from libsentry.client import SentryClient
 from libsentry.sentry_ha import get_next_available_server
 from libsentry.sentry_site import get_sentry_server
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 def create_mock_client_fn(client_class, username, server, component=None):

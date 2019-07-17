@@ -31,8 +31,8 @@ import time
 
 from nose.tools import assert_true, assert_false
 from django.urls import reverse
-from django.contrib.auth.models import User
 
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.paths import get_run_root
 from desktop.lib.python_util import find_unused_port
@@ -43,9 +43,13 @@ from hadoop import cluster, pseudo_hdfs4
 from hadoop.pseudo_hdfs4 import is_live_cluster, get_db_prefix
 
 import beeswax.conf
-
 from beeswax.server.dbms import get_query_server_config
 from beeswax.server import dbms
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 HIVE_SERVER_TEST_PORT = find_unused_port()

@@ -23,9 +23,14 @@ import re
 import json
 
 import django.test.client
-from django.contrib.auth.models import User, Group
-
 import nose.tools
+
+from desktop.conf import ENABLE_ORGANIZATIONS
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group, default_organization
+else:
+  from django.contrib.auth.models import User, Group
 
 
 class Client(django.test.client.Client):

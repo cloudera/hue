@@ -24,19 +24,23 @@ import logging
 from datetime import datetime
 
 from django.contrib import messages
-from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.db import DatabaseError
 from django.db.models import Q
 from django.utils.translation import ugettext as _
 
 from desktop.auth.views import dt_logout
-from desktop.conf import AUTH, LDAP, SESSION
+from desktop.conf import AUTH, LDAP, SESSION, ENABLE_ORGANIZATIONS
 
 from useradmin.models import UserProfile, get_profile
 from useradmin.views import import_ldap_users
 
 from useradmin import ldap_access
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

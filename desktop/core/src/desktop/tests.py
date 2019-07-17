@@ -37,7 +37,6 @@ from django.db.models import query, CharField, SmallIntegerField
 from django.core.management import call_command
 from django.core.paginator import Paginator
 from django.conf.urls import url
-from django.contrib.auth.models import User
 from django.db import connection
 from django.urls import reverse
 from django.test.client import Client
@@ -60,7 +59,7 @@ import desktop.views as views
 
 from desktop.auth.backend import rewrite_user
 from desktop.appmanager import DESKTOP_APPS
-from desktop.middleware import DJANGO_VIEW_AUTH_WHITELIST
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.conf import validate_path
 from desktop.lib.django_util import TruncatingModel
@@ -69,6 +68,7 @@ from desktop.lib.conf import _configs_from_dir
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.python_util import force_dict_to_strings
 from desktop.lib.test_utils import grant_access
+from desktop.middleware import DJANGO_VIEW_AUTH_WHITELIST
 from desktop.models import Directory, Document, Document2, get_data_link, _version_from_properties, ClusterConfig, HUE_VERSION
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
@@ -80,7 +80,14 @@ if sys.version_info[0] > 2:
 else:
   from cStringIO import StringIO as string_io
 
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
+
+
 LOG = logging.getLogger(__name__)
+
 
 def test_home():
   c = make_logged_in_client(username="test_home", groupname="test_home", recreate=True, is_superuser=False)

@@ -19,13 +19,18 @@
 from builtins import object
 import json
 
-from django.contrib.auth.models import User
 from mock import patch, Mock, MagicMock
 from nose.tools import assert_equal, assert_true
 
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 
 from indexer.indexers.sql import SQLIndexer
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 class MockRequest(object):
