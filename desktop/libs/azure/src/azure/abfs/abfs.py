@@ -14,7 +14,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from nose.tools import assert_true
 
 """
 Interfaces for ABFS
@@ -108,25 +107,29 @@ class ABFS(object):
     """
     List the stat of the actual name
     """
-    file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
-    norm_path = file_system + '/' + dir_name
-    LOG.debug('%s' %self._getheaders())
-    res = self._root._invoke('HEAD', norm_path, { 'action' : 'getStatus', 'upn' : 'true'}, headers = self._getheaders())
-    if res is None:
-      return None
-    return res.headers
+    return self._stats(azure.abfs.__init__.strip_scheme(path) )
   
   def listdir_stats(self,path, **kwargs):
     """
     List the stats for the directories
     """
+    if azure.abfs.__init__.is_root(path):
+      return self.listfilesystems_stats()
     dir_stats = []
-    file_system, dir_name= azure.abfs.__init__.parse_uri(path)[:2]
-    assert_true(dir_name == '')
+    file_system = azure.abfs.__init__.parse_uri(path)[0]
     for direct in self.listdir(path):
-      res = self._root._invoke('HEAD', file_system + '/' + direct, { 'action' : 'getStatus', 'upn' : 'true'}, headers = self._getheaders())
-      dir_stats.append(res.headers)  
+      res = self._stats(file_system + '/' + direct)
+      dir_stats.append(res)  
     return dir_stats
+  
+  def _stats(self, schemeless_path):
+    """
+    Container function for both stats
+    """
+    res = self._root._invoke('HEAD', schemeless_path, { 'action' : 'getStatus', 'upn' : 'true'}, headers = self._getheaders())
+    if res is None:
+      return None
+    return res.headers
   
   def listdir(self, path, glob=None):
     """
@@ -135,13 +138,16 @@ class ABFS(object):
     if azure.abfs.__init__.is_root(path):
       return self.listfilesystems()
     file_system, directory_name = azure.abfs.__init__.parse_uri(path)[:2]
-    if directory_name == "":
-      resp = self._root.get(file_system,{'resource': 'filesystem', 'recursive':'false'}, headers= self._getheaders())
-    else:
-      resp = self._root.get(file_system,{'resource': 'filesystem', 'recursive':'false', 'directory' : directory_name}, headers= self._getheaders())
+    params = {'resource': 'filesystem', 'recursive':'false'}
+    if directory_name != "":
+      params['directory'] = directory_name
+    resp = self._root.get(file_system, params, headers= self._getheaders())
     return [x['name'] for x in resp['paths']]
   
   def listfilesystems_stats(self):
+    """
+    Lists the stats inside the File Systems  
+    """
     stats = []
     for file_system in self.listfilesystems():
       resp = self._root._invoke('HEAD', file_system, {'resource': 'filesystem'}, headers = self._getheaders())
@@ -174,6 +180,7 @@ class ABFS(object):
     raise NotImplementedError("")
 
   def mkdir(self, path, *args, **kwargs):
+    """
     file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
     if dir_name == '':
       return self.create_home_dir(path)
@@ -181,7 +188,8 @@ class ABFS(object):
     additional_header = self._getheaders()
     additional_header['If-None-Match'] = '*'
     res = self._root.put(no_scheme,{'resource': 'directory'}, headers= additional_header)
-    
+    """
+    self._create_path(path, 'directory')
     
   def read(self, path, *args, **kwargs):
     raise NotImplementedError("")
@@ -226,7 +234,23 @@ class ABFS(object):
 
   def purge_trash(self):
     raise NotImplementedError("")
-
+  
+  def _create_path(self,path, resource = None, recursive = None, create = True):
+    file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
+    LOG.debug("%s,%s" %(file_system, dir_name))
+    if dir_name == '':
+      return self.create_home_dir(path)
+    no_scheme = file_system + '/' + dir_name
+    params = {}
+    additional_header = self._getheaders()
+    if create:
+      additional_header['If-None-Match'] = '*'
+    if resource is not None:
+      params['resource'] = resource
+    if recursive is not None:
+      params['recursive'] = recursive
+    res = self._root.put(no_scheme,params, headers= additional_header)
+  
   # Handle file systems interactions
   # --------------------------------
   def copy(self, src, dst, *args, **kwargs):

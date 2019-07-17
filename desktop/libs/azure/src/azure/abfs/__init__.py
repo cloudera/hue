@@ -17,6 +17,7 @@ from __future__ import absolute_import
 
 import errno
 import re
+from nose.tools import assert_not_equal
 
 ABFS_PATH_RE = re.compile('^/*[aA][bB][fF][sS]{1,2}://([^/]+)(/(.*?(([^/]+/)*/?))?)?$') # bug here
 ABFS_ROOT_S = 'abfss://'
@@ -39,5 +40,6 @@ def is_root(uri):
 
 def strip_scheme(path):
     filesystem, file_path = parse_uri(path)[:2]
+    assert_not_equal(filesystem, '', 'File System must be Filled')
     path = filesystem + '/' + file_path
     return path
