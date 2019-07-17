@@ -65,6 +65,7 @@ jobs:
             cd /usr/share/hue
             # make npm-install # Not available
             cp ~/repo/.babelrc .
+            cp ~/repo/webpack.config*.js .
             npm install
             npm run webpack
             npm run webpack-login
