@@ -1649,6 +1649,14 @@ IS_K8S_ONLY = Config(
 )
 
 
+ENABLE_PROMETHEUS = Config(
+  key='enable_prometheus',
+  default=False,
+  type=coerce_bool,
+  help=_('Turn on Prometheus metrics end point /metrics.')
+)
+
+
 def task_server_default_result_directory():
   """Local directory to store task results."""
   return 'file://%s' % get_run_root('logs')

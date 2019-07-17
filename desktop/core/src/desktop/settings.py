@@ -690,3 +690,13 @@ if desktop.conf.TASK_SERVER.ENABLED.get():
   if desktop.conf.TASK_SERVER.BEAT_ENABLED.get():
     INSTALLED_APPS.append('django_celery_beat')
     INSTALLED_APPS.append('timezone_field')
+
+
+if desktop.conf.ENABLE_PROMETHEUS.get():
+  INSTALLED_APPS.append('django_prometheus')
+  MIDDLEWARE_CLASSES.insert(0, 'django_prometheus.middleware.PrometheusBeforeMiddleware')
+  MIDDLEWARE_CLASSES.append('django_prometheus.middleware.PrometheusAfterMiddleware')
+
+  DATABASES['default']['ENGINE'] = DATABASES['default']['ENGINE'].replace('django.db.backends', 'django_prometheus.db.backends')
+  for name, val in CACHES.items():
+    val['BACKEND'] = val['BACKEND'].replace('django.core.cache.backends', 'django_prometheus.cache.backends')
