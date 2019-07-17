@@ -40,6 +40,9 @@ class Organization(models.Model):
 
   objects = OrganizationManager()
 
+  def __str__(self):
+    return self.name
+
 
 class OrganizationGroupManager(models.Manager):
 

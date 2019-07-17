@@ -299,7 +299,8 @@ def edit_user(request, username=None):
     form = form_class(request.POST, instance=instance)
     if is_admin(request.user) and request.user.username != username:
       form.fields.pop("password_old")
-    if form.is_valid(): # All validation rules pass
+
+    if form.is_valid():
       if instance is None:
         instance = form.save()
         get_profile(instance)
@@ -328,10 +329,8 @@ def edit_user(request, username=None):
             if form.instance.is_superuser and not is_admin(request.user):
               raise PopupException(_("You cannot make yourself a superuser."), error_code=401)
 
-          # All ok
           form.save()
 
-          # Unlock account if selected
           if form.cleaned_data.get('unlock_account'):
             if not is_admin(request.user):
               raise PopupException(_('You must be a superuser to reset users.'), error_code=401)
@@ -900,9 +899,9 @@ def _check_remove_last_super(user_obj):
     return
 
   # Is there any other active superuser left?
-  all_active_su = User.objects.filter(is_superuser__exact = True,
-                                      is_active__exact = True)
+  all_active_su = User.objects.filter(is_superuser__exact = True, is_active__exact = True)
   num_active_su = all_active_su.count()
+
   if num_active_su < 1:
     raise PopupException(_("No active superuser configured."))
   if num_active_su == 1:

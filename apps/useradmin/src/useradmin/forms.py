@@ -34,7 +34,7 @@ from useradmin.hue_password_policy import hue_get_password_validators
 from useradmin.models import GroupPermission, HuePermission, get_default_user_group
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group
+  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group, default_organization, Organization
 else:
   from django.contrib.auth.models import User, Group
 
@@ -96,27 +96,37 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
       help_text = _t("Required. 30 characters or fewer. No whitespaces or colons."),
       error_messages = {'invalid': _t("Whitespaces and ':' not allowed") })
 
-  password1 = forms.CharField(label=_t("New Password"),
-                              widget=forms.
-                              PasswordInput,
-                              required=False,
-                              validators=hue_get_password_validators())
-  password2 = forms.CharField(label=_t("Password confirmation"),
-                              widget=forms.PasswordInput,
-                              required=False,
-                              validators=hue_get_password_validators())
+  password1 = forms.CharField(
+      label=_t("New Password"),
+      widget=forms.
+      PasswordInput,
+      required=False,
+      validators=hue_get_password_validators()
+  )
+  password2 = forms.CharField(
+      label=_t("Password confirmation"),
+      widget=forms.PasswordInput,
+      required=False,
+      validators=hue_get_password_validators()
+  )
   password_old = forms.CharField(label=_t("Current password"), widget=forms.PasswordInput, required=False)
-  ensure_home_directory = forms.BooleanField(label=_t("Create home directory"),
-                                            help_text=_t("Create home directory if one doesn't already exist."),
-                                            initial=True,
-                                            required=False)
-  language = forms.ChoiceField(label=_t("Language Preference"),
-                               choices=LANGUAGES,
-                               required=False)
-  unlock_account = forms.BooleanField(label=_t("Unlock Account"),
-                                      help_text=_t("Unlock user's account for login."),
-                                      initial=False,
-                                      required=False)
+  ensure_home_directory = forms.BooleanField(
+      label=_t("Create home directory"),
+      help_text=_t("Create home directory if one doesn't already exist."),
+      initial=True,
+      required=False
+  )
+  language = forms.ChoiceField(
+      label=_t("Language Preference"),
+      choices=LANGUAGES,
+      required=False
+  )
+  unlock_account = forms.BooleanField(
+      label=_t("Unlock Account"),
+      help_text=_t("Unlock user's account for login."),
+      initial=False,
+      required=False
+  )
 
   class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
     model =  User
@@ -209,6 +219,15 @@ class OrganizationUserChangeForm(UserChangeForm):
     if self.instance.id:
       self.fields['email'].widget.attrs['readonly'] = True
 
+    self.fields['organization'] = forms.ChoiceField(choices=((default_organization().id, default_organization()),), initial=default_organization())
+
+  def clean_organization(self):
+    try:
+      return Organization.objects.get(id=int(self.cleaned_data.get('organization')))
+    except:
+      LOG.exception('The organization does not exist.')
+      return None
+
 
 class PasswordChangeForm(UserChangeForm):
   """
@@ -239,6 +258,7 @@ class SuperUserChangeForm(UserChangeForm):
       else:
         self.initial['groups'] = []
 
+# Mixin __init__ method?
 class OrganizationSuperUserChangeForm(OrganizationUserChangeForm):
   class Meta(UserChangeForm.Meta):
     fields = ["email", "is_active"] + OrganizationUserChangeForm.Meta.fields + ["is_superuser", "unlock_account", "groups"]
@@ -261,16 +281,20 @@ class AddLdapUsersForm(forms.Form):
   username_pattern = forms.CharField(
       label=_t("Username"),
       help_text=_t("Required. 30 characters or fewer with username. 64 characters or fewer with DN. No whitespaces or colons."),
-      error_messages={'invalid': _t("Whitespaces and ':' not allowed")})
-  dn = forms.BooleanField(label=_t("Distinguished name"),
-                          help_text=_t("Whether or not the user should be imported by "
-                                    "distinguished name."),
-                          initial=False,
-                          required=False)
-  ensure_home_directory = forms.BooleanField(label=_t("Create home directory"),
-                                            help_text=_t("Create home directory for user if one doesn't already exist."),
-                                            initial=True,
-                                            required=False)
+      error_messages={'invalid': _t("Whitespaces and ':' not allowed")}
+  )
+  dn = forms.BooleanField(
+      label=_t("Distinguished name"),
+      help_text=_t("Whether or not the user should be imported by distinguished name."),
+      initial=False,
+      required=False
+  )
+  ensure_home_directory = forms.BooleanField(
+      label=_t("Create home directory"),
+      help_text=_t("Create home directory for user if one doesn't already exist."),
+      initial=True,
+      required=False
+  )
 
   def __init__(self, *args, **kwargs):
     super(AddLdapUsersForm, self).__init__(*args, **kwargs)
@@ -300,24 +324,33 @@ class AddLdapGroupsForm(forms.Form):
       label=_t("Name"),
       max_length=256,
       help_text=_t("Required. 256 characters or fewer."),
-      error_messages={'invalid': _t("256 characters or fewer.") })
-  dn = forms.BooleanField(label=_t("Distinguished name"),
-                          help_text=_t("Whether or not the group should be imported by "
-                                    "distinguished name."),
-                          initial=False,
-                          required=False)
-  import_members = forms.BooleanField(label=_t('Import new members'),
-                                      help_text=_t('Import unimported or new users from the group.'),
-                                      initial=False,
-                                      required=False)
-  ensure_home_directories = forms.BooleanField(label=_t('Create home directories'),
-                                                help_text=_t('Create home directories for every member imported, if members are being imported.'),
-                                                initial=True,
-                                                required=False)
-  import_members_recursive = forms.BooleanField(label=_t('Import new members from all subgroups'),
-                                                help_text=_t('Import unimported or new users from the all subgroups.'),
-                                                initial=False,
-                                                required=False)
+      error_messages={'invalid': _t("256 characters or fewer.")}
+  )
+  dn = forms.BooleanField(
+      label=_t("Distinguished name"),
+      help_text=_t("Whether or not the group should be imported by "
+                "distinguished name."),
+      initial=False,
+      required=False
+  )
+  import_members = forms.BooleanField(
+      label=_t('Import new members'),
+      help_text=_t('Import unimported or new users from the group.'),
+      initial=False,
+      required=False
+  )
+  ensure_home_directories = forms.BooleanField(
+      label=_t('Create home directories'),
+      help_text=_t('Create home directories for every member imported, if members are being imported.'),
+      initial=True,
+      required=False
+  )
+  import_members_recursive = forms.BooleanField(
+      label=_t('Import new members from all subgroups'),
+      help_text=_t('Import unimported or new users from the all subgroups.'),
+      initial=False,
+      required=False
+  )
 
   def __init__(self, *args, **kwargs):
     super(AddLdapGroupsForm, self).__init__(*args, **kwargs)
@@ -356,8 +389,7 @@ class GroupEditForm(forms.ModelForm):
     # Note that the superclass doesn't have a clean_name method.
     data = self.cleaned_data["name"]
     if not self.GROUPNAME.match(data):
-      raise forms.ValidationError(_("Group name may only contain letters, " +
-                                  "numbers, hyphens or underscores."))
+      raise forms.ValidationError(_("Group name may only contain letters, numbers, hyphens or underscores."))
     return data
 
   def __init__(self, *args, **kwargs):
