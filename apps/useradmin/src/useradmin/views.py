@@ -455,19 +455,23 @@ def edit_group(request, name=None):
 
   if request.method == 'POST':
     form = GroupEditForm(request.POST, instance=instance)
+
     if form.is_valid():
       form.save()
 
-      # Audit log
+      value_field = 'email' if ENABLE_ORGANIZATIONS.get() else 'username'
+
       if name is not None:
-        usernames = instance.user_set.all().values_list('username', flat=True)
+        usernames = instance.user_set.all().values_list(value_field, flat=True)
         request.audit = {
           'operation': 'EDIT_GROUP',
-          'operationText': 'Edited Group: %s, with member(s): %s' % (name, ', '.join([user.username for diffs in form._compute_diff("members") for user in diffs]) )
+          'operationText': 'Edited Group: %s, with member(s): %s' % (
+            name, ', '.join([user.username for diffs in form._compute_diff("members") for user in diffs])
+          )
         }
       else:
         user_ids = request.POST.getlist('members', [])
-        usernames = User.objects.filter(pk__in=user_ids).values_list('username', flat=True)
+        usernames = User.objects.filter(pk__in=user_ids).values_list(value_field, flat=True)
         request.audit = {
           'operation': 'CREATE_GROUP',
           'operationText': 'Created Group: %s, with member(s): %s' % (request.POST.get('name', ''), ', '.join(usernames))
@@ -482,8 +486,10 @@ def edit_group(request, name=None):
     form = GroupEditForm(instance=instance)
 
   if request.method == 'POST' and is_embeddable:
-    return JsonResponse(
-      {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
+    return JsonResponse({
+      'status': -1,
+      'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]
+    })
   else:
     return render('edit_group.mako', request, {
       'form': form,

@@ -328,8 +328,7 @@ class AddLdapGroupsForm(forms.Form):
   )
   dn = forms.BooleanField(
       label=_t("Distinguished name"),
-      help_text=_t("Whether or not the group should be imported by "
-                "distinguished name."),
+      help_text=_t("Whether or not the group should be imported by distinguished name."),
       initial=False,
       required=False
   )
@@ -383,14 +382,9 @@ class GroupEditForm(forms.ModelForm):
 
   class Meta(object):
     model = Group
-    fields = ("name",)
-
-  def clean_name(self):
-    # Note that the superclass doesn't have a clean_name method.
-    data = self.cleaned_data["name"]
-    if not self.GROUPNAME.match(data):
-      raise forms.ValidationError(_("Group name may only contain letters, numbers, hyphens or underscores."))
-    return data
+    fields = ["name"]
+    if ENABLE_ORGANIZATIONS.get():
+      fields.append("organization")
 
   def __init__(self, *args, **kwargs):
     super(GroupEditForm, self).__init__(*args, **kwargs)
@@ -400,13 +394,15 @@ class GroupEditForm(forms.ModelForm):
     if self.instance.id:
       self.fields['name'].widget.attrs['readonly'] = True
       initial_members = User.objects.filter(groups=self.instance).order_by(ordering_field)
-      initial_perms = HuePermission.objects.filter(grouppermission__group=self.instance).order_by('app','description')
+      initial_perms = HuePermission.objects.filter(grouppermission__group=self.instance).order_by('app', 'description')
     else:
       initial_members = []
       initial_perms = []
 
     self.fields["members"] = _make_model_field(_("members"), initial_members, User.objects.order_by(ordering_field))
-    self.fields["permissions"] = _make_model_field(_("permissions"), initial_perms, HuePermission.objects.order_by('app','description'))
+    self.fields["permissions"] = _make_model_field(_("permissions"), initial_perms, HuePermission.objects.order_by('app', 'description'))
+    if 'organization' in self.fields:
+      self.fields['organization'] = forms.ChoiceField(choices=((default_organization().id, default_organization()),), initial=default_organization())
 
   def _compute_diff(self, field_name):
     current = set(self.fields[field_name].initial_objs)
@@ -419,6 +415,20 @@ class GroupEditForm(forms.ModelForm):
     super(GroupEditForm, self).save()
     self._save_members()
     self._save_permissions()
+
+  def clean_name(self):
+    # Note that the superclass doesn't have a clean_name method.
+    data = self.cleaned_data["name"]
+    if not self.GROUPNAME.match(data):
+      raise forms.ValidationError(_("Group name may only contain letters, numbers, hyphens or underscores."))
+    return data
+
+  def clean_organization(self):
+    try:
+      return Organization.objects.get(id=int(self.cleaned_data.get('organization')))
+    except:
+      LOG.exception('The organization does not exist.')
+      return None
 
   def _save_members(self):
     delete_membership, add_membership = self._compute_diff("members")
@@ -488,11 +498,15 @@ def _make_model_field(label, initial, choices, multi=True):
       field.initial = initial.pk
   return field
 
+
 class SyncLdapUsersGroupsForm(forms.Form):
-  ensure_home_directory = forms.BooleanField(label=_t("Create Home Directories"),
-                                            help_text=_t("Create home directory for every user, if one doesn't already exist."),
-                                            initial=True,
-                                            required=False)
+  ensure_home_directory = forms.BooleanField(
+      label=_t("Create Home Directories"),
+      help_text=_t("Create home directory for every user, if one doesn't already exist."),
+      initial=True,
+      required=False
+  )
+
   def __init__(self, *args, **kwargs):
     super(SyncLdapUsersGroupsForm, self).__init__(*args, **kwargs)
     if get_server_choices():
