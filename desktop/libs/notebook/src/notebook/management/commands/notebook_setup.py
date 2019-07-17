@@ -19,13 +19,18 @@ import logging
 import os
 import pwd
 
-from django.contrib.auth.models import User
 from django.core import management
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.models import Directory, Document, Document2, Document2Permission, SAMPLE_USER_OWNERS
 from useradmin.models import get_default_user_group, install_sample_user
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

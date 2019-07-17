@@ -19,10 +19,10 @@ import json
 import logging
 import uuid
 
-from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import smart_str
 from librdbms.conf import DATABASES, get_database_password, get_server_choices, get_connector_name
@@ -31,6 +31,11 @@ from librdbms.server import dbms as rdbms
 from notebook.conf import get_ordered_interpreters
 from notebook.connectors.base import get_api
 from notebook.models import make_notebook
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

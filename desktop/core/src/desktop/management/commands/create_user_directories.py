@@ -18,11 +18,16 @@
 
 import logging
 
-from django.contrib.auth.models import User
 from django.core.management.base import CommandError, BaseCommand
 from django.utils.translation import ugettext_lazy as _
 
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.models import Document2
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

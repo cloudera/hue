@@ -23,17 +23,22 @@ from __future__ import absolute_import
 import logging
 
 from django.contrib.auth import logout as auth_logout
-from django.contrib.auth.models import User
 from djangosaml2.backends import Saml2Backend as _Saml2Backend
 from djangosaml2.views import logout as saml_logout
 
 from desktop.auth.backend import force_username_case, rewrite_user
-from desktop.conf import AUTH
+from desktop.conf import AUTH, ENABLE_ORGANIZATIONS
 
 from libsaml import conf
 from libsaml import metrics
 
 from useradmin.models import get_profile, get_default_user_group, UserProfile
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
+
 
 LOG = logging.getLogger(__name__)
 

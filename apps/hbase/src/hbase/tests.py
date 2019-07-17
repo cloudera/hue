@@ -23,8 +23,7 @@ import tempfile
 
 from nose.tools import assert_true, assert_equal
 
-from django.contrib.auth.models import User
-
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group
 
@@ -34,6 +33,11 @@ from hbase.hbase_site import get_server_authentication, get_server_principal, ge
 from hadoop.pseudo_hdfs4 import is_live_cluster
 from nose.plugins.skip import SkipTest
 from django.urls import reverse
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 def test_security_plain():

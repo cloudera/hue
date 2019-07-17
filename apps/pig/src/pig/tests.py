@@ -20,12 +20,12 @@ from builtins import object
 import json
 import time
 
-from django.contrib.auth.models import User
 from django.urls import reverse
 
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false
 
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from desktop.models import SAMPLE_USER_ID
@@ -38,6 +38,11 @@ from oozie.tests import OozieBase
 
 from pig.models import create_or_update_script, PigScript
 from pig.api import OozieApi, get
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 class TestPigBase(object):

@@ -17,17 +17,22 @@
 import logging
 import json
 
-from django.contrib.auth.models import User
 from nose.tools import assert_true, assert_equal
 from nose.plugins.skip import SkipTest
-
 from django.urls import reverse
+
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 
 from sqoop.client.link import Link
 from sqoop.client.job import Job
 from sqoop.test_base import SqoopServerProvider
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

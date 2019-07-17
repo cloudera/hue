@@ -44,7 +44,6 @@ from nose.plugins.skip import SkipTest
 
 from django.utils.encoding import smart_str
 from django.utils.html import escape
-from django.contrib.auth.models import User
 from django.urls import reverse
 from django.db import transaction
 
@@ -55,7 +54,7 @@ from desktop.conf import \
     AUTH_PASSWORD_SCRIPT as DEFAULT_AUTH_PASSWORD_SCRIPT, \
     LDAP_USERNAME, \
     LDAP_PASSWORD, \
-    USE_NEW_EDITOR
+    USE_NEW_EDITOR, ENABLE_ORGANIZATIONS
 from desktop import redaction
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
@@ -98,7 +97,14 @@ if sys.version_info[0] > 2:
 else:
   from cStringIO import StringIO as string_io
 
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
+
+
 LOG = logging.getLogger(__name__)
+
 
 def _list_dir_without_temp_files(fs, target_dir):
   return [f for f in fs.listdir(target_dir) if not f.startswith('.')]

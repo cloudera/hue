@@ -22,12 +22,16 @@ from nose.plugins.attrib import attr
 from nose.tools import assert_raises, assert_false, eq_
 from nose import SkipTest
 
-from django.contrib.auth.models import User
 from desktop.auth.backend import rewrite_user
-
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.fs import ProxyFS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_permission, remove_from_group
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 def test_fs_selection():

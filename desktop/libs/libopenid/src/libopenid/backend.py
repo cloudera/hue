@@ -23,13 +23,18 @@ import logging
 import sys
 
 from django.contrib.auth import logout as auth_logout
-from django.contrib.auth.models import User
 from django_openid_auth.auth import OpenIDBackend as _OpenIDBackend
 
 from desktop.auth.backend import rewrite_user
+from desktop.conf import ENABLE_ORGANIZATIONS
 from useradmin.models import get_profile, get_default_user_group, UserProfile
 
 from libopenid import metrics
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

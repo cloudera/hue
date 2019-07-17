@@ -20,9 +20,9 @@ import os
 import tempfile
 import string
 
-from django.contrib.auth.models import User
 from nose.tools import assert_equal, assert_false, assert_true, assert_raises, eq_
 
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group
 from desktop.lib.test_utils import grant_access, add_to_group, add_permission, remove_from_group
@@ -31,6 +31,11 @@ from aws.s3 import join, parse_uri
 from aws.s3.s3fs import S3FileSystem, S3FileSystemException
 from aws.s3.s3test_utils import S3TestBase, generate_id
 from aws.s3.upload import DEFAULT_WRITE_SIZE
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 class S3FSTest(S3TestBase):
@@ -288,7 +293,7 @@ class S3FSTest(S3TestBase):
   def test_mkdir(self):
     dir_path = self.get_test_path('test_mkdir')
     assert_false(self.fs.exists(dir_path))
-    
+
     self.fs.mkdir(dir_path)
     assert_true(self.fs.exists(dir_path))
 

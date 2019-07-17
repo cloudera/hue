@@ -17,12 +17,18 @@
 # limitations under the License.
 
 from builtins import object
-from django.contrib.auth.models import User
 
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true
 
+from desktop.conf import ENABLE_ORGANIZATIONS
+
 from indexer.indexers.envelope import EnvelopeIndexer
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 class TestEnvelope(object):
@@ -34,7 +40,7 @@ class TestEnvelope(object):
   def test_generate_from_kafka_to_file_csv(self):
     properties = {
       'app_name': 'Ingest',
-  
+
       'inputFormat': 'stream',
       'streamSelection': 'kafka',
       'brokers': 'broker:9092',
@@ -43,14 +49,14 @@ class TestEnvelope(object):
       'kafkaFieldDelimiter': ',',
       'kafkaFieldNames': 'id,name',
       'kafkaFieldTypes': 'int,string',
-  
+
       'ouputFormat': 'file',
       'input_path': '/tmp/output',
       'format': 'csv'
     }
-  
+
     config = EnvelopeIndexer(username='test').generate_config(properties)
-  
+
     assert_true('''steps {
       inputdata {
           input {
@@ -68,18 +74,18 @@ class TestEnvelope(object):
                       enabled = true
                       milliseconds = 60000
                   }
-  
+
           }
       }
-  
+
       outputdata {
           dependencies = [inputdata]
-  
+
           deriver {
             type = sql
             query.literal = """SELECT * from inputdata"""
           }
-  
+
           planner = {
             type = overwrite
           }
@@ -97,22 +103,22 @@ class TestEnvelope(object):
   def test_generate_from_stream_sfdc_to_hive_table(self):
     properties = {
       'app_name': 'Ingest',
-  
-      'inputFormat': 'stream',    
+
+      'inputFormat': 'stream',
       'streamSelection': 'sfdc',
       'streamUsername': 'test',
       'streamPassword': 'test',
       'streamToken': 'token',
       'streamEndpointUrl': 'http://sfdc/api',
       'streamObject': 'Opportunities',
-  
+
       'ouputFormat': 'table',
       'output_table': 'sfdc',
       'format': 'text'
     }
-  
+
     config = EnvelopeIndexer(username='test').generate_config(properties)
-  
+
     assert_true('''steps {
       inputdata {
           input {
@@ -127,18 +133,18 @@ class TestEnvelope(object):
                   auth-endpoint = "http://sfdc/api"
                 }
               }
-    
+
           }
       }
-  
+
       outputdata {
           dependencies = [inputdata]
-  
+
           deriver {
             type = sql
             query.literal = """SELECT * from inputdata"""
           }
-  
+
             planner {
                 type = append
             }
@@ -148,12 +154,12 @@ class TestEnvelope(object):
             }
       }
   }''' in  config, config)
-  
+
 
   def test_generate_from_stream_kafka_to_solr_index(self):
     properties = {
       'app_name': 'Ingest',
-  
+
       'inputFormat': 'stream',
       'streamSelection': 'kafka',
       'brokers': 'broker:9092',
@@ -162,14 +168,14 @@ class TestEnvelope(object):
       'kafkaFieldDelimiter': ',',
       'kafkaFieldNames': 'id,name',
       'kafkaFieldTypes': 'int,string',
-  
+
       'ouputFormat': 'index',
       'connection': 'http://hue.com:8983/solr/',
       'collectionName': 'traffic'
     }
-  
+
     config = EnvelopeIndexer(username='test').generate_config(properties)
-  
+
     assert_true('''steps {
       inputdata {
           input {
@@ -187,18 +193,18 @@ class TestEnvelope(object):
                       enabled = true
                       milliseconds = 60000
                   }
-  
+
           }
       }
-  
+
       outputdata {
           dependencies = [inputdata]
-  
+
           deriver {
             type = sql
             query.literal = """SELECT * from inputdata"""
           }
-  
+
           planner {
               type = upstert
           }
@@ -214,39 +220,39 @@ class TestEnvelope(object):
   def test_generate_from_file_to_kafka(self):
     properties = {
       'app_name': 'Ingest',
-  
+
       'inputFormat': 'file',
       'input_path': '/tmp/output',
       'format': 'csv',
-  
+
       'ouputFormat': 'stream',
       'streamSelection': 'kafka',
       'brokers': 'broker:9092',
       'topics': 'kafkaTopic',
       'kafkaFieldType': 'delimited',
     }
-  
+
     config = EnvelopeIndexer(username='test').generate_config(properties)
-  
+
     assert_true('''steps {
       inputdata {
           input {
               type = filesystem
           path = /tmp/output
           format = csv
-        
+
           }
       }
-  
+
       outputdata {
           dependencies = [inputdata]
-  
+
           deriver {
             type = sql
             query.literal = """SELECT * from inputdata"""
           }
-  
-          
+
+
           planner {
               type = append
           }

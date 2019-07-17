@@ -37,7 +37,6 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME, BACKEND_SESSION_KEY, authenticate, load_backend, login
 from django.contrib.auth.middleware import RemoteUserMiddleware
-from django.contrib.auth.models import User
 from django.core import exceptions, urlresolvers
 from django.http import HttpResponseNotAllowed, HttpResponseForbidden
 from django.urls import resolve
@@ -50,6 +49,7 @@ from hadoop import cluster
 import desktop.views
 import desktop.conf
 from desktop.auth.backend import is_admin
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.context_processors import get_app_name
 from desktop.lib import apputil, i18n, fsmanager
 from desktop.lib.django_util import JsonResponse, render, render_json
@@ -59,7 +59,11 @@ from desktop.log import get_audit_logger
 from desktop.log.access import access_log, log_page_hit, access_warn
 from desktop import appmanager
 from desktop import metrics
-from desktop.auth.backend import is_admin
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)
