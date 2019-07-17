@@ -33,7 +33,7 @@ from hadoop.pseudo_hdfs4 import is_live_cluster
 from libsolr.api import SolrApi
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

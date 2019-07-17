@@ -52,7 +52,7 @@ from metastore.conf import FORCE_HS2_METADATA
 from metastore.views import _get_db, _get_servername
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

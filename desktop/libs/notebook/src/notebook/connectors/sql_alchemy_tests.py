@@ -30,7 +30,7 @@ from desktop.lib.test_utils import add_to_group, grant_access
 from notebook.connectors.sql_alchemy import SqlAlchemyApi
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

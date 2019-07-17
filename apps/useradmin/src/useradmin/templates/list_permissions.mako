@@ -23,7 +23,7 @@ from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.views import commonheader, commonfooter
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationGroup as Group
+  from useradmin.models import Group
 else:
   from django.contrib.auth.models import Group
 %>

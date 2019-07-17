@@ -29,7 +29,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_permission, remove_from_group
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

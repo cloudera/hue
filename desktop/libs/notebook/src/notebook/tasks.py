@@ -53,7 +53,7 @@ else:
   from StringIO import StringIO as string_io
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

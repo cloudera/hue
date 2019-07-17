@@ -40,7 +40,7 @@ from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config, QueryServerException
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

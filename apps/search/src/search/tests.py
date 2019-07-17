@@ -34,7 +34,7 @@ from dashboard.models import Collection2
 from dashboard.controller import DashboardController
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

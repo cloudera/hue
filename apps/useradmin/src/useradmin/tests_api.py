@@ -25,7 +25,7 @@ from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group
+  from useradmin.models import User, Group
 else:
   from django.contrib.auth.models import User, Group
 

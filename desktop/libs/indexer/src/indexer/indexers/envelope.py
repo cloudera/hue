@@ -30,7 +30,7 @@ from indexer.conf import CONFIG_JARS_LIBS_PATH, config_morphline_path
 from libzookeeper.conf import zkensemble
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

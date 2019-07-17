@@ -24,7 +24,7 @@ from desktop.conf import ENABLE_ORGANIZATIONS
 from indexer.indexers.flume import FlumeIndexer
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

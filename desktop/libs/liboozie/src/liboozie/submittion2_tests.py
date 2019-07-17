@@ -41,7 +41,7 @@ from liboozie.credentials_tests import TestCredentials
 from liboozie.submission2 import Submission
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

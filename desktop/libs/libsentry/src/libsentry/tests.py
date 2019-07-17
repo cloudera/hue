@@ -41,7 +41,7 @@ from libsentry.sentry_ha import get_next_available_server
 from libsentry.sentry_site import get_sentry_server
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

@@ -52,7 +52,7 @@ from desktop.log.access import access_log, access_warn, last_access_map
 from desktop.settings import LOAD_BALANCER_COOKIE
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group
+  from useradmin.models import User, Group
 else:
   from django.contrib.auth.models import User, Group
 

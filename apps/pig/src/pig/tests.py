@@ -40,7 +40,7 @@ from pig.models import create_or_update_script, PigScript
 from pig.api import OozieApi, get
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

@@ -30,7 +30,7 @@ from sqoop.client.job import Job
 from sqoop.test_base import SqoopServerProvider
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

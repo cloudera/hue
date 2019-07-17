@@ -34,7 +34,7 @@ from metadata.metadata_sites import get_navigator_hue_server_name
 from metadata.catalog.navigator_client import NavigatorApi
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 
