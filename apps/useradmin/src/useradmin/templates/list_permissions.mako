@@ -14,19 +14,27 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
+
 from useradmin.models import group_permissions
+
 from desktop.auth.backend import is_admin
-from django.contrib.auth.models import Group
+from desktop.conf import ENABLE_ORGANIZATIONS
+from desktop.views import commonheader, commonfooter
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationGroup as Group
+else:
+  from django.contrib.auth.models import Group
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
-%if not is_embeddable:
+
+% if not is_embeddable:
 ${ commonheader(_('Hue Permissions'), "useradmin", user, request) | n,unicode }
-%endif
-${layout.menubar(section='permissions')}
+% endif
+${ layout.menubar(section='permissions') }
 
 <div id="permissionsComponents" class="useradmin container-fluid">
   <div class="card card-small">
@@ -51,14 +59,17 @@ ${layout.menubar(section='permissions')}
               data-search="${perm.app}${perm.description}${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')])}">
           <td>
             %if is_admin(user):
-              <strong><a title="${_('Edit permission')}"
-                         href="${ url('useradmin.views.edit_permission', app=perm.app, priv=perm.action) }"
-                         data-name="${perm.app}" data-row-selector="true">${perm.app}</a></strong>
+              <strong>
+                <a title="${_('Edit permission')}"
+                    href="${ url('useradmin.views.edit_permission', app=perm.app, priv=perm.action) }"
+                    data-name="${perm.app}" data-row-selector="true">${perm.app}
+                </a>
+              </strong>
             %else:
               <strong>${perm.app}</strong>
             %endif
           </td>
-            <td>${perm.description}</td>
+            <td>${ perm.description }</td>
             <td>${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')])}</td>
           </tr>
           % endfor
