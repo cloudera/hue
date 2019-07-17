@@ -395,15 +395,17 @@ class GroupEditForm(forms.ModelForm):
   def __init__(self, *args, **kwargs):
     super(GroupEditForm, self).__init__(*args, **kwargs)
 
+    ordering_field = 'email' if ENABLE_ORGANIZATIONS.get() else 'username'
+
     if self.instance.id:
       self.fields['name'].widget.attrs['readonly'] = True
-      initial_members = User.objects.filter(groups=self.instance).order_by('username')
+      initial_members = User.objects.filter(groups=self.instance).order_by(ordering_field)
       initial_perms = HuePermission.objects.filter(grouppermission__group=self.instance).order_by('app','description')
     else:
       initial_members = []
       initial_perms = []
 
-    self.fields["members"] = _make_model_field(_("members"), initial_members, User.objects.order_by('username'))
+    self.fields["members"] = _make_model_field(_("members"), initial_members, User.objects.order_by(ordering_field))
     self.fields["permissions"] = _make_model_field(_("permissions"), initial_perms, HuePermission.objects.order_by('app','description'))
 
   def _compute_diff(self, field_name):
