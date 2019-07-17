@@ -125,7 +125,7 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
   def __init__(self, *args, **kwargs):
     super(UserChangeForm, self).__init__(*args, **kwargs)
 
-    if self.instance.id:
+    if self.instance.id and 'username' in self.fields:
       self.fields['username'].widget.attrs['readonly'] = True
 
     if 'desktop.auth.backend.LdapBackend' in desktop_conf.AUTH.BACKEND.get():
@@ -148,7 +148,6 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
     username = self.cleaned_data["username"]
     if self.instance.username == username:
       return username
-
     try:
       User._default_manager.get(username=username)
     except User.DoesNotExist:
@@ -193,6 +192,24 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
     return user
 
 
+class OrganizationUserChangeForm(UserChangeForm):
+  username = None
+  email = forms.CharField(
+      label=_t("Email"),
+      widget=forms.TextInput(attrs={'maxlength': 150, 'placeholder': _t("Email"), 'autocomplete': 'off', 'autofocus': 'autofocus'})
+  )
+
+  class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
+    model =  User
+    fields = ["first_name", "last_name", "email", "ensure_home_directory"]
+
+  def __init__(self, *args, **kwargs):
+    super(OrganizationUserChangeForm, self).__init__(*args, **kwargs)
+
+    if self.instance.id:
+      self.fields['email'].widget.attrs['readonly'] = True
+
+
 class PasswordChangeForm(UserChangeForm):
   """
   This inherits from UserChangeForm to allow for forced password change on first login
@@ -211,6 +228,23 @@ class SuperUserChangeForm(UserChangeForm):
 
   def __init__(self, *args, **kwargs):
     super(SuperUserChangeForm, self).__init__(*args, **kwargs)
+    if self.instance.id:
+      # If the user exists already, we'll use its current group memberships
+      self.initial['groups'] = set(self.instance.groups.all())
+    else:
+      # If his is a new user, suggest the default group
+      default_group = get_default_user_group()
+      if default_group is not None:
+        self.initial['groups'] = set([default_group])
+      else:
+        self.initial['groups'] = []
+
+class OrganizationSuperUserChangeForm(OrganizationUserChangeForm):
+  class Meta(UserChangeForm.Meta):
+    fields = ["email", "is_active"] + OrganizationUserChangeForm.Meta.fields + ["is_superuser", "unlock_account", "groups"]
+
+  def __init__(self, *args, **kwargs):
+    super(OrganizationSuperUserChangeForm, self).__init__(*args, **kwargs)
     if self.instance.id:
       # If the user exists already, we'll use its current group memberships
       self.initial['groups'] = set(self.instance.groups.all())

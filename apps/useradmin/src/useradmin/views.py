@@ -24,7 +24,6 @@ import threading
 import subprocess
 import json
 
-
 from axes.decorators import FAILURE_LIMIT, LOCK_OUT_AT_FAILURE
 from axes.models import AccessAttempt
 from axes.utils import reset
@@ -48,17 +47,18 @@ from desktop.views import antixss
 from hadoop.fs.exceptions import WebHdfsException
 
 from useradmin import ldap_access
+from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm, AddLdapUsersForm,\
+  PermissionsEditForm, GroupEditForm, SuperUserChangeForm, UserChangeForm, validate_username, validate_first_name, \
+  validate_last_name, PasswordChangeForm, OrganizationUserChangeForm, OrganizationSuperUserChangeForm
 from useradmin.ldap_access import LdapBindException, LdapSearchException
 from useradmin.models import HuePermission, UserProfile, LdapGroup
 from useradmin.models import get_profile, get_default_user_group
-from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm, AddLdapUsersForm,\
-  PermissionsEditForm, GroupEditForm, SuperUserChangeForm, UserChangeForm, validate_username, validate_first_name, \
-  validate_last_name, PasswordChangeForm
 
 if ENABLE_ORGANIZATIONS.get():
   from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group
 else:
   from django.contrib.auth.models import User, Group
+
 
 LOG = logging.getLogger(__name__)
 
@@ -69,8 +69,8 @@ __groups_lock = threading.Lock()
 def is_ldap_setup():
   return bool(LDAP.LDAP_SERVERS.get()) or LDAP.LDAP_URL.get() is not None
 
-def list_users(request):
 
+def list_users(request):
   return render("list_users.mako", request, {
       'users': User.objects.all(),
       'users_json': json.dumps(list(User.objects.values_list('id', flat=True))),
@@ -81,7 +81,6 @@ def list_users(request):
 
 
 def list_groups(request):
-
   return render("list_groups.mako", request, {
       'groups': Group.objects.all(),
       'groups_json': json.dumps(list(Group.objects.values_list('name', flat=True))),
@@ -134,6 +133,7 @@ def list_for_autocomplete(request):
   }
   return JsonResponse(response)
 
+
 def get_users_by_id(request):
   userids = json.loads(request.GET.get('userids', "[]"))
   userids = userids[:100]
@@ -142,6 +142,7 @@ def get_users_by_id(request):
     'users': massage_users_for_json(users)
   }
   return JsonResponse(response)
+
 
 def massage_users_for_json(users, extended=False):
   simple_users = []
@@ -215,7 +216,6 @@ def delete_user(request):
     return redirect(reverse(list_users))
 
 
-
 def delete_group(request):
   if not is_admin(request.user):
     request.audit = {
@@ -283,16 +283,17 @@ def edit_user(request, username=None):
   is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
 
   if username is not None:
-    instance = User.objects.get(username=username)
+    lookup = {'email': username} if ENABLE_ORGANIZATIONS.get() else {'username': username}
+    instance = User.objects.get(**lookup)
   else:
     instance = None
 
   if require_change_password(userprofile):
     form_class = PasswordChangeForm
   elif is_admin(request.user):
-    form_class = SuperUserChangeForm
+    form_class = OrganizationSuperUserChangeForm if ENABLE_ORGANIZATIONS.get() else SuperUserChangeForm
   else:
-    form_class = UserChangeForm
+    form_class = OrganizationUserChangeForm if ENABLE_ORGANIZATIONS.get() else UserChangeForm
 
   if request.method == 'POST':
     form = form_class(request.POST, instance=instance)
@@ -308,14 +309,18 @@ def edit_user(request, username=None):
         if request.user.username == username and not form.instance.is_active:
           raise PopupException(_("You cannot make yourself inactive."), error_code=401)
 
-        # user changing his own information, form.changed_data=['ensure_home_directory', 'language'] or changing information about another user, form.changed_data=['ensure_home_directory']
-        updated = (request.user.username == username and len(form.changed_data) > 2) or (request.user.username != username and len(form.changed_data) > 1)
+        # user changing his own information, form.changed_data=['ensure_home_directory', 'language']
+        # or changing information about another user, form.changed_data=['ensure_home_directory']
+        updated = (
+          request.user.username == username and len(form.changed_data) > 2) or (
+          request.user.username != username and len(form.changed_data) > 1
+        )
 
         global __users_lock
         __users_lock.acquire()
         try:
           # form.instance (and instance) now carry the new data
-          orig = User.objects.get(username=username)
+          orig = User.objects.get(**lookup)
           if orig.is_superuser:
             if not form.instance.is_superuser or not form.instance.is_active:
               _check_remove_last_super(orig)
