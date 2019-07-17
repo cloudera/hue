@@ -44,8 +44,9 @@ def get_backend_names():
   return get_backends and [backend.__class__.__name__ for backend in get_backends()]
 
 def is_active_directory():
-  return 'LdapBackend' in get_backend_names() and \
-                          (bool(conf.LDAP.NT_DOMAIN.get()) or bool(conf.LDAP.LDAP_SERVERS.get()) or conf.LDAP.LDAP_URL.get() is not None)
+  return 'LdapBackend' in get_backend_names() and (
+    bool(conf.LDAP.NT_DOMAIN.get()) or bool(conf.LDAP.LDAP_SERVERS.get()) or conf.LDAP.LDAP_URL.get() is not None
+  )
 
 def get_ldap_server_keys():
   return [(ldap_server_record_key) for ldap_server_record_key in conf.LDAP.LDAP_SERVERS.get()]
@@ -143,9 +144,6 @@ class OrganizationAuthenticationForm(Form):
 
     return self.cleaned_data
 
-  # def authenticate(self):
-  #   return super(OrganizationAuthenticationForm, self).clean()
-
   def confirm_login_allowed(self, user):
         """
         Controls whether the given User may log in. This is a policy setting,
@@ -172,7 +170,6 @@ class OrganizationAuthenticationForm(Form):
           code='invalid_login',
           params={'email': 'Email'},
       )
-
 
   # def clean(self):
   #   # TODO: checks for inactivity

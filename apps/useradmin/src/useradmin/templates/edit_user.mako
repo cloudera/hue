@@ -89,11 +89,13 @@ ${ layout.menubar(section='users') }
             ${layout.render_field(form["last_name"])}
           % endif
 
-          % if not ENABLE_ORGANIZATIONS.get():
+          % if ENABLE_ORGANIZATIONS.get():
+            ${layout.render_field(form["organization"])}
+          % else:
             ${layout.render_field(form["email"])}
           % endif
 
-          %if request.user.username == username:
+          % if request.user.username == username:
             ${layout.render_field(form["language"])}
           % endif
 
@@ -103,10 +105,10 @@ ${ layout.menubar(section='users') }
         </div>
       % if is_admin(user):
         <div id="step3" class="stepDetails hide">
-          ${layout.render_field(form["is_active"])}
+          ${ layout.render_field(form["is_active"]) }
           ${'is_superuser' in form.fields and layout.render_field(form["is_superuser"])}
           % if is_user_locked_out(username):
-            ${layout.render_field(form["unlock_account"])}
+            ${ layout.render_field(form["unlock_account"]) }
           % endif
         </div>
       % endif
