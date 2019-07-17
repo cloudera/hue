@@ -39,6 +39,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse, NoReverseMatch
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
+from django_prometheus.models import ExportModelOperationsMixin
 
 from dashboard.conf import get_engines, HAS_REPORT_ENABLED
 from kafka.conf import has_kafka
@@ -1123,7 +1124,7 @@ class Document2Manager(models.Manager, Document2QueryMixin):
     return home_dir
 
 
-class Document2(models.Model):
+class Document2(models.Model, ExportModelOperationsMixin('documents')):
 
   HOME_DIR = ''
   GIST_DIR = 'Gist'
