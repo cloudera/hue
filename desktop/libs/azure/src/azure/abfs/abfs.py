@@ -97,17 +97,28 @@ class ABFS(object):
     }
 
   def isdir(self, path):
+    """
+    Checks if the path is a directory
+    """
     resp = self.stats(path)
     return (resp is not None) and (resp['x-ms-resource-type'] == 'directory') 
 
   def isfile(self, path):
-    raise NotImplementedError("")
+    """
+    Checks if the path is a file
+    """
+    resp = self.stats(path)
+    return (resp is not None) and (resp['x-ms-resource-type'] == 'file') 
 
   def stats(self, path):
     """
     List the stat of the actual name
     """
-    return self._stats(azure.abfs.__init__.strip_scheme(path) )
+    file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
+    if dir_name == '':
+      res = self._root._invoke('HEAD', file_system, { 'resource' : 'filesystem'}, headers = self._getheaders())
+      return res.headers
+    return self._stats(file_system + '/' +dir_name)
   
   def listdir_stats(self,path, **kwargs):
     """
@@ -155,6 +166,9 @@ class ABFS(object):
     return stats
   
   def listfilesystems(self):
+    """
+    Lists the names of the File Systems  
+    """
     resp = self._root.get('',{'resource': 'account'}, headers= self._getheaders())
     return [x['name'] for x in resp['filesystems']]
     
@@ -168,10 +182,13 @@ class ABFS(object):
     raise NotImplementedError("")
 
   def exists(self, path):
+    """
+    Test if a path exists
+    """
     return self.stats(path) is not None
 
   def isroot(self, path):
-    raise NotImplementedError("")
+    return azure.abfs.__init__.is_root(path)
 
   def parent_path(self, path):
     raise NotImplementedError("")
@@ -181,43 +198,58 @@ class ABFS(object):
 
   def mkdir(self, path, *args, **kwargs):
     """
-    file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
-    if dir_name == '':
-      return self.create_home_dir(path)
-    no_scheme = file_system + '/' + dir_name
-    additional_header = self._getheaders()
-    additional_header['If-None-Match'] = '*'
-    res = self._root.put(no_scheme,{'resource': 'directory'}, headers= additional_header)
+    Makes a directory
     """
     self._create_path(path, 'directory')
     
   def read(self, path, *args, **kwargs):
-    raise NotImplementedError("")
+    path = azure.abfs.__init__.strip_scheme(path)
+    return self._root.get(path, headers = self._getheaders())
 
   def append(self, path, *args, **kwargs):
     raise NotImplementedError("")
 
   def rmtree(self, path, *args, **kwargs):
-    raise NotImplementedError("")
+    """
+    Remoce everything in a given directory
+    """
+    self._delete(path, 'true')
 
   def remove(self, path, skip_trash=False):
+    """
+    Removes an item indicated in the path
+    Also includes empty directories
+    """
+    self._delete(path, 'false', skip_trash)
+    
+  def _delete(self, path, recursive, skip_trash=False):
     if azure.abfs.__init__.is_root(path):
-      raise NotImplementedError("")
-    new_path = azure.abfs.__init__.strip_scheme(path)
+      raise RuntimeError("Cannot Remove Root")
+    file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
+    if dir_name == '':
+      return self._remove_fs(file_system)
+    new_path = file_system + '/' + dir_name
+    param = None
     if self.isdir(path):
-      self._root.delete(new_path,{'recursive':'false'}, headers= self._getheaders())
-    elif self.isfile(path):
-      self._root.delete(new_path, headers= self._getheaders())
-    else:
-      raise NotImplementedError
-
+      param = {'recursive' : recursive}
+    self._root.delete(new_path,param , headers= self._getheaders())
+   
+  def _remove_fs(self, file_system):
+    self._root.delete(file_system,{'resource': 'filesystem'}, headers= self._getheaders())
+    
   def restore(self, path):
     raise NotImplementedError("")
 
   def create(self, path, *args, **kwargs):
-    raise NotImplementedError("")
+    """
+    Makes a File
+    """
+    self._create_path(path, 'file')
 
   def create_home_dir(self, home_path=None):
+    """
+    Make a home directory (i.e File system)
+    """
     raise NotImplementedError("")
 
   def chown(self, path, *args, **kwargs):
@@ -235,21 +267,29 @@ class ABFS(object):
   def purge_trash(self):
     raise NotImplementedError("")
   
-  def _create_path(self,path, resource = None, recursive = None, create = True):
+  def _create_path(self,path, resource = None, source = None, create = True):
+    """
+    Conatiner method for Create
+    """
     file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
-    LOG.debug("%s,%s" %(file_system, dir_name))
     if dir_name == '':
-      return self.create_home_dir(path)
+      return self._create_fs(file_system)
     no_scheme = file_system + '/' + dir_name
     params = {}
     additional_header = self._getheaders()
     if create:
       additional_header['If-None-Match'] = '*'
-    if resource is not None:
+      assert_true(resource is not None)
       params['resource'] = resource
-    if recursive is not None:
-      params['recursive'] = recursive
-    res = self._root.put(no_scheme,params, headers= additional_header)
+    else:
+      source = '/' + azure.abfs.__init__.strip_scheme(source)
+      additional_header['x-ms-rename-source'] = source
+      if resource is not None:
+        params['resource'] = resource
+    self._root.put(no_scheme,params, headers= additional_header)
+    
+  def _create_fs(self, file_system):
+    self._root.put(file_system,{'resource': 'filesystem'}, headers= self._getheaders())
   
   # Handle file systems interactions
   # --------------------------------
@@ -262,8 +302,11 @@ class ABFS(object):
   def copy_remote_dir(self, src, dst, *args, **kwargs):
     raise NotImplementedError("")
 
-  def rename(self, old, new):
-    raise NotImplementedError("")
+  def rename(self, old, new): 
+    """
+    Renames a file
+    """
+    self._create_path(new, source = old, create= False)
 
   def rename_star(self, old_dir, new_dir):
     raise NotImplementedError("")

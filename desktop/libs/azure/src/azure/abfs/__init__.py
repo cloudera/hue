@@ -17,7 +17,10 @@ from __future__ import absolute_import
 
 import errno
 import re
+import logging
 from nose.tools import assert_not_equal
+
+LOG = logging.getLogger(__name__)
 
 ABFS_PATH_RE = re.compile('^/*[aA][bB][fF][sS]{1,2}://([^/]+)(/(.*?(([^/]+/)*/?))?)?$') # bug here
 ABFS_ROOT_S = 'abfss://'
@@ -33,10 +36,12 @@ def parse_uri(uri):
     raise ValueError("Invalid ABFS URI: %s" % uri)
   direct_name = match.group(3) or ''
   base_direct_name = match.group(4) or ''
+  LOG.debug("File System: %s,Directory Name: %s" %(match.group(1), direct_name) )
   return match.group(1), direct_name, base_direct_name
 
 def is_root(uri):
   return uri.lower() == ABFS_ROOT or uri.lower() == ABFS_ROOT_S
+
 
 def strip_scheme(path):
     filesystem, file_path = parse_uri(path)[:2]
