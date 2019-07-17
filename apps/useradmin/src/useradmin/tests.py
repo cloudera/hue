@@ -40,7 +40,7 @@ import desktop.conf
 
 from desktop import appmanager
 from desktop.auth.backend import is_admin
-from desktop.conf import APP_BLACKLIST
+from desktop.conf import APP_BLACKLIST ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from desktop.views import home
@@ -53,6 +53,11 @@ from useradmin.forms import UserChangeForm
 from useradmin.middleware import ConcurrentUserSessionMiddleware
 from useradmin.models import HuePermission, GroupPermission, UserProfile, get_profile, get_default_user_group, User, Group
 from useradmin.hue_password_policy import reset_password_policy
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group
+else:
+  from django.contrib.auth.models import User, Group
 
 
 def reset_all_users():

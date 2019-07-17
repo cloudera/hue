@@ -25,12 +25,18 @@ from nose.tools import assert_true, assert_false, assert_equal, assert_raises
 from django.urls import reverse
 from nose.plugins.skip import SkipTest
 
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group
 from desktop.models import Document
 from liboozie.oozie_api_tests import OozieServerProvider
 from oozie.models import Workflow, Node, Start, Kill, End, Link
 from useradmin.models import User
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

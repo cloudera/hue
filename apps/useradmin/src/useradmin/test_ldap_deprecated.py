@@ -28,6 +28,7 @@ from nose.tools import assert_true, assert_equal, assert_false
 import desktop.conf
 from desktop.lib.test_utils import grant_access
 from desktop.lib.django_test_util import make_logged_in_client
+
 from hadoop import pseudo_hdfs4
 from hadoop.pseudo_hdfs4 import is_live_cluster
 from useradmin.models import LdapGroup, UserProfile, get_profile, User, Group

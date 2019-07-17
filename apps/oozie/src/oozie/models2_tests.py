@@ -28,7 +28,7 @@ from django.db.models import Q
 from nose.plugins.attrib import attr
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises
 
-from desktop.conf import USE_DEFAULT_CONFIGURATION, USE_NEW_EDITOR
+from desktop.conf import USE_DEFAULT_CONFIGURATION, USE_NEW_EDITOR, ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_permission, add_to_group, grant_access, remove_from_group
 from desktop.models import DefaultConfiguration, Document, Document2
@@ -41,6 +41,11 @@ from oozie.importlib.workflows import generate_v2_graph_nodes
 from oozie.models2 import Node, Workflow, WorkflowConfiguration, find_dollar_variables, find_dollar_braced_variables, \
     _create_graph_adjaceny_list, _get_hierarchy_from_adj_list, WorkflowBuilder, WorkflowDepthReached
 from oozie.tests import OozieMockBase, save_temp_workflow, MockOozieApi
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

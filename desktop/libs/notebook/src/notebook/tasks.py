@@ -37,6 +37,7 @@ from django.http import FileResponse, HttpRequest
 
 from beeswax import data_export
 from desktop.auth.backend import rewrite_user
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.celery import app
 from desktop.conf import TASK_SERVER
 from desktop.lib import export_csvxls

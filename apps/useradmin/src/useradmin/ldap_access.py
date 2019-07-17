@@ -26,8 +26,14 @@ import logging
 import re
 
 import desktop.conf
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.python_util import CaseInsensitiveDict
 from useradmin.models import User
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

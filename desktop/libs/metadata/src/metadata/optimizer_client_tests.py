@@ -22,6 +22,7 @@ from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_false
 
 from desktop.auth.backend import rewrite_user
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 from desktop.models import uuid_default
@@ -29,6 +30,11 @@ from useradmin.models import User
 
 from metadata.conf import OPTIMIZER, has_optimizer
 from metadata.optimizer_client import OptimizerApi
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

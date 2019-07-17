@@ -20,6 +20,7 @@ import re
 from django.core.validators import RegexValidator
 
 from useradmin.models import User
+
 from desktop.lib.django_util import get_username_re_rule
 
 

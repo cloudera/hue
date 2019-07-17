@@ -51,7 +51,6 @@ from metastore.conf import FORCE_HS2_METADATA
 from metastore.views import _get_db, _get_servername
 from useradmin.models import User
 
-
 LOG = logging.getLogger(__name__)
 
 

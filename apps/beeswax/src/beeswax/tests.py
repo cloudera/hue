@@ -54,7 +54,7 @@ from desktop.conf import \
     AUTH_PASSWORD_SCRIPT as DEFAULT_AUTH_PASSWORD_SCRIPT, \
     LDAP_USERNAME, \
     LDAP_PASSWORD, \
-    USE_NEW_EDITOR
+    USE_NEW_EDITOR, ENABLE_ORGANIZATIONS
 from desktop import redaction
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule

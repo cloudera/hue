@@ -24,6 +24,7 @@ from nose.tools import assert_equal, assert_true, assert_not_equal
 from hadoop import cluster, pseudo_hdfs4
 from hadoop.conf import HDFS_CLUSTERS, MR_CLUSTERS, YARN_CLUSTERS
 
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.test_utils import clear_sys_caches
 from desktop.lib.django_test_util import make_logged_in_client
 from oozie.tests import OozieMockBase
@@ -31,6 +32,11 @@ from useradmin.models import User
 from useradmin.views import ensure_home_directory
 
 from liboozie.submittion import Submission
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.models2 import OrganizationUser as User
+else:
+  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)
