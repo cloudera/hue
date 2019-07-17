@@ -57,7 +57,9 @@ jobs:
               rm -r /usr/share/hue/apps/$lib/src/$lib
               cp -r apps/$lib/src/$lib /usr/share/hue/apps/$lib/src/$lib
             done
-            # cp -r docs /usr/share/hue/docs
+
+            rm -r /usr/share/hue/tools
+            cp -r tools /usr/share/hue
 
             rm /usr/share/hue/desktop/conf/*.ini
             cp desktop/conf/pseudo-distributed.ini.tmpl /usr/share/hue/desktop/conf/pseudo-distributed.ini
@@ -72,6 +74,7 @@ jobs:
             npm run webpack-workers
             ./build/env/bin/hue collectstatic --noinput
 
+            # cp -r ~/repo/docs .
             # make doc
             # hugo --source docs/docs-site
 
