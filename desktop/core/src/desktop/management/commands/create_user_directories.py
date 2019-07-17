@@ -25,7 +25,7 @@ from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.models import Document2
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

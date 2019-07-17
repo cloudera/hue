@@ -30,7 +30,7 @@ from useradmin.models import HuePermission, GroupPermission
 from security.api.hive import _to_sentry_privilege
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group
+  from useradmin.models import User, Group
 else:
   from django.contrib.auth.models import User, Group
 

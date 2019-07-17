@@ -32,7 +32,7 @@ from useradmin.hue_password_policy import hue_get_password_validators
 from desktop.auth.backend import is_admin
 
 if conf.ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

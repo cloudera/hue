@@ -27,7 +27,7 @@ from desktop.lib.test_utils import add_to_group, grant_access
 from indexer.solr_client import SolrClient
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

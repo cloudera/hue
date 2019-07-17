@@ -35,7 +35,7 @@ from libsaml import metrics
 from useradmin.models import get_profile, get_default_user_group, UserProfile
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

@@ -28,7 +28,7 @@ import nose.tools
 from desktop.conf import ENABLE_ORGANIZATIONS
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group, default_organization
+  from useradmin.models import User, Group, default_organization
 else:
   from django.contrib.auth.models import User, Group
 

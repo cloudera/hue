@@ -29,7 +29,7 @@ from metadata.manager_client import ManagerApi
 from indexer.conf import config_morphline_path
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

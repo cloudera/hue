@@ -34,7 +34,7 @@ from indexer.conf import get_solr_ensemble
 from indexer.controller import CollectionManagerController
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

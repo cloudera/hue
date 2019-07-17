@@ -31,7 +31,7 @@ from metadata.conf import OPTIMIZER, has_optimizer
 from desktop.models import uuid_default
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

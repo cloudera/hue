@@ -42,7 +42,7 @@ from oozie.models2 import Node, Workflow, WorkflowConfiguration, find_dollar_var
 from oozie.tests import OozieMockBase, save_temp_workflow, MockOozieApi
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

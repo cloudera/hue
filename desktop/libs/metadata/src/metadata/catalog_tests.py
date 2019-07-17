@@ -37,7 +37,7 @@ from metadata.catalog.navigator_client import NavigatorApi
 from metadata.catalog.atlas_client import AtlasApi
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

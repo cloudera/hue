@@ -43,7 +43,7 @@ from notebook.conf import get_ordered_interpreters, INTERPRETERS_SHOWN_ON_WHEEL,
 from notebook.models import Analytics
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
+  from useradmin.models import User
 else:
   from django.contrib.auth.models import User
 

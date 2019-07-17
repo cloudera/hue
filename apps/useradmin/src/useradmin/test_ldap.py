@@ -42,7 +42,7 @@ from useradmin import ldap_access
 from useradmin.tests import BaseUserAdminTests, LdapTestConnection, reset_all_groups, reset_all_users
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group
+  from useradmin.models import User, Group
 else:
   from django.contrib.auth.models import User, Group
 
