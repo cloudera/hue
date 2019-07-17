@@ -287,14 +287,16 @@ class NavProperties {
 
         if (navigatorMeta.classifications) {
           navigatorMeta.classifications.forEach(classification => {
-            Object.keys(classification.attributes).forEach(attributeKey => {
-              const property = new NavProperty(
-                attributeKey,
-                classification.attributes[attributeKey]
-              );
-              property.setTitle(classification.typeName);
-              newProps.push(property);
-            });
+            if (classification.attributes) {
+              Object.keys(classification.attributes).forEach(attributeKey => {
+                const property = new NavProperty(
+                  attributeKey,
+                  classification.attributes[attributeKey]
+                );
+                property.setTitle(classification.typeName);
+                newProps.push(property);
+              });
+            }
           });
         } else if (navigatorMeta.properties) {
           Object.keys(navigatorMeta.properties).forEach(key => {
