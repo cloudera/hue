@@ -46,7 +46,7 @@ from desktop import views as desktop_views
 from desktop import api as desktop_api
 from desktop import api2 as desktop_api2
 from desktop.auth import views as desktop_auth_views
-from desktop.conf import METRICS, USE_NEW_EDITOR, ENABLE_DJANGO_DEBUG_TOOL, ANALYTICS, has_connectors
+from desktop.conf import METRICS, USE_NEW_EDITOR, ENABLE_DJANGO_DEBUG_TOOL, ANALYTICS, has_connectors, ENABLE_PROMETHEUS
 from desktop.configuration import api as desktop_configuration_api
 from desktop.lib.vcs import api as desktop_lib_vcs_api
 from desktop.settings import is_oidc_configured
@@ -215,6 +215,12 @@ dynamic_patterns += [
 dynamic_patterns += [
   url(r'^admin/?', include(admin.site.urls)),
 ]
+
+if ENABLE_PROMETHEUS.get():
+  dynamic_patterns += [
+    url('', include('django_prometheus.urls')),
+  ]
+
 
 static_patterns = []
 
