@@ -66,7 +66,7 @@ class ABFSTestBase(unittest.TestCase):
     LOG.debug("%s" %filesystems)
     assert_true(None not in filesystems, filesystems)
     
-    self.client.mkdir('abfss://' + filesystems[1] + "/test1")
+    self.client.mkdir('abfss://' + filesystems[1] + "/test")
     
     pathing = self.client.listdir('abfss://' + filesystems[1])
     LOG.debug("%s" %pathing)
