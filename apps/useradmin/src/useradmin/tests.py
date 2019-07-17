@@ -171,63 +171,65 @@ class LdapTestConnection(object):
 
   class Data(object):
     def __init__(self):
-      self.users = {'moe': {'dn': 'uid=moe,ou=People,dc=example,dc=com', 'username':'moe', 'first':'Moe', 'email':'moe@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com']},
-                    'lårry': {'dn': 'uid=lårry,ou=People,dc=example,dc=com', 'username':'lårry', 'first':'Larry', 'last':'Stooge', 'email':'larry@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com', 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
-                    'curly': {'dn': 'uid=curly,ou=People,dc=example,dc=com', 'username':'curly', 'first':'Curly', 'last':'Stooge', 'email':'curly@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com', 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
-                    'Rock': {'dn': 'uid=Rock,ou=People,dc=example,dc=com', 'username':'Rock', 'first':'rock', 'last':'man', 'email':'rockman@stooges.com', 'groups': ['cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
-                    'nestedguy': {'dn': 'uid=nestedguy,ou=People,dc=example,dc=com', 'username':'nestedguy', 'first':'nested', 'last':'guy', 'email':'nestedguy@stooges.com', 'groups': ['cn=NestedGroup,ou=Groups,dc=example,dc=com']},
-                    'otherguy': {'dn': 'uid=otherguy,ou=People,dc=example,dc=com', 'username':'otherguy', 'first':'Other', 'last':'Guy', 'email':'other@guy.com'},
-                    'posix_person': {'dn': 'uid=posix_person,ou=People,dc=example,dc=com', 'username': 'posix_person', 'first': 'pos', 'last': 'ix', 'email': 'pos@ix.com'},
-                    'posix_person2': {'dn': 'uid=posix_person2,ou=People,dc=example,dc=com', 'username': 'posix_person2', 'first': 'pos', 'last': 'ix', 'email': 'pos@ix.com'},
-                    'user with space': {'dn': 'uid=user with space,ou=People,dc=example,dc=com', 'username': 'user with space', 'first': 'user', 'last': 'space', 'email': 'user@space.com'},
-                    'spaceless': {'dn': 'uid=user without space,ou=People,dc=example,dc=com', 'username': 'spaceless', 'first': 'user', 'last': 'space', 'email': 'user@space.com'},
-                    'test_toolongusernametoolongusername': {'dn': 'uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com', 'username': 'test_toolongusernametoolongusername', 'first': 'toolong', 'last': 'username', 'email': 'toolong@username.com'},
-                    'test_longfirstname': {'dn': 'uid=test_longfirstname,ou=People,dc=example,dc=com', 'username': 'test_longfirstname', 'first': 'test_longfirstname_test_longfirstname', 'last': 'username', 'email': 'toolong@username.com'},}
+      self.users = {
+        'moe': {'dn': 'uid=moe,ou=People,dc=example,dc=com', 'username':'moe', 'first':'Moe', 'email':'moe@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com']},
+        'lårry': {'dn': 'uid=lårry,ou=People,dc=example,dc=com', 'username':'lårry', 'first':'Larry', 'last':'Stooge', 'email':'larry@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com', 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
+        'curly': {'dn': 'uid=curly,ou=People,dc=example,dc=com', 'username':'curly', 'first':'Curly', 'last':'Stooge', 'email':'curly@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com', 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
+        'Rock': {'dn': 'uid=Rock,ou=People,dc=example,dc=com', 'username':'Rock', 'first':'rock', 'last':'man', 'email':'rockman@stooges.com', 'groups': ['cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
+        'nestedguy': {'dn': 'uid=nestedguy,ou=People,dc=example,dc=com', 'username':'nestedguy', 'first':'nested', 'last':'guy', 'email':'nestedguy@stooges.com', 'groups': ['cn=NestedGroup,ou=Groups,dc=example,dc=com']},
+        'otherguy': {'dn': 'uid=otherguy,ou=People,dc=example,dc=com', 'username':'otherguy', 'first':'Other', 'last':'Guy', 'email':'other@guy.com'},
+        'posix_person': {'dn': 'uid=posix_person,ou=People,dc=example,dc=com', 'username': 'posix_person', 'first': 'pos', 'last': 'ix', 'email': 'pos@ix.com'},
+        'posix_person2': {'dn': 'uid=posix_person2,ou=People,dc=example,dc=com', 'username': 'posix_person2', 'first': 'pos', 'last': 'ix', 'email': 'pos@ix.com'},
+        'user with space': {'dn': 'uid=user with space,ou=People,dc=example,dc=com', 'username': 'user with space', 'first': 'user', 'last': 'space', 'email': 'user@space.com'},
+        'spaceless': {'dn': 'uid=user without space,ou=People,dc=example,dc=com', 'username': 'spaceless', 'first': 'user', 'last': 'space', 'email': 'user@space.com'},
+        'test_toolongusernametoolongusername': {'dn': 'uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com', 'username': 'test_toolongusernametoolongusername', 'first': 'toolong', 'last': 'username', 'email': 'toolong@username.com'},
+        'test_longfirstname': {'dn': 'uid=test_longfirstname,ou=People,dc=example,dc=com', 'username': 'test_longfirstname', 'first': 'test_longfirstname_test_longfirstname', 'last': 'username', 'email': 'toolong@username.com'},}
 
-      self.groups = {'TestUsers': {
-                        'dn': 'cn=TestUsers,ou=Groups,dc=example,dc=com',
-                        'name':'TestUsers',
-                        'members':['uid=moe,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com','uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com'],
-                        'posix_members':[]},
-                      'Test Administrators': {
-                        'dn': 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com',
-                        'name':'Test Administrators',
-                        'members':['uid=Rock,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com','uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com'],
-                        'posix_members':[]},
-                      'OtherGroup': {
-                        'dn': 'cn=OtherGroup,cn=TestUsers,ou=Groups,dc=example,dc=com',
-                        'name':'OtherGroup',
-                        'members':[],
-                        'posix_members':[]},
-                      'NestedGroups': {
-                        'dn': 'cn=NestedGroups,ou=Groups,dc=example,dc=com',
-                        'name':'NestedGroups',
-                        'members':['cn=NestedGroup,ou=Groups,dc=example,dc=com'],
-                        'posix_members':[]
-                      },
-                      'NestedGroup': {
-                        'dn': 'cn=NestedGroup,ou=Groups,dc=example,dc=com',
-                        'name':'NestedGroup',
-                        'members':['uid=nestedguy,ou=People,dc=example,dc=com'],
-                        'posix_members':[]
-                      },
-                      'NestedPosixGroups': {
-                        'dn': 'cn=NestedPosixGroups,ou=Groups,dc=example,dc=com',
-                        'name':'NestedPosixGroups',
-                        'members':['cn=PosixGroup,ou=Groups,dc=example,dc=com'],
-                        'posix_members':[]
-                      },
-                      'PosixGroup': {
-                        'dn': 'cn=PosixGroup,ou=Groups,dc=example,dc=com',
-                        'name':'PosixGroup',
-                        'members':[],
-                        'posix_members':['posix_person','lårry']},
-                      'PosixGroup1': {
-                        'dn': 'cn=PosixGroup1,cn=PosixGroup,ou=Groups,dc=example,dc=com',
-                        'name':'PosixGroup1',
-                        'members':[],
-                        'posix_members':['posix_person2']},
-                     }
+      self.groups = {
+        'TestUsers': {
+          'dn': 'cn=TestUsers,ou=Groups,dc=example,dc=com',
+          'name':'TestUsers',
+          'members':['uid=moe,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com','uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com'],
+          'posix_members':[]},
+        'Test Administrators': {
+          'dn': 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com',
+          'name':'Test Administrators',
+          'members':['uid=Rock,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com','uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com'],
+          'posix_members':[]},
+        'OtherGroup': {
+          'dn': 'cn=OtherGroup,cn=TestUsers,ou=Groups,dc=example,dc=com',
+          'name':'OtherGroup',
+          'members':[],
+          'posix_members':[]},
+        'NestedGroups': {
+          'dn': 'cn=NestedGroups,ou=Groups,dc=example,dc=com',
+          'name':'NestedGroups',
+          'members':['cn=NestedGroup,ou=Groups,dc=example,dc=com'],
+          'posix_members':[]
+        },
+        'NestedGroup': {
+          'dn': 'cn=NestedGroup,ou=Groups,dc=example,dc=com',
+          'name':'NestedGroup',
+          'members':['uid=nestedguy,ou=People,dc=example,dc=com'],
+          'posix_members':[]
+        },
+        'NestedPosixGroups': {
+          'dn': 'cn=NestedPosixGroups,ou=Groups,dc=example,dc=com',
+          'name':'NestedPosixGroups',
+          'members':['cn=PosixGroup,ou=Groups,dc=example,dc=com'],
+          'posix_members':[]
+        },
+        'PosixGroup': {
+          'dn': 'cn=PosixGroup,ou=Groups,dc=example,dc=com',
+          'name':'PosixGroup',
+          'members':[],
+          'posix_members':['posix_person','lårry']},
+        'PosixGroup1': {
+          'dn': 'cn=PosixGroup1,cn=PosixGroup,ou=Groups,dc=example,dc=com',
+          'name':'PosixGroup1',
+          'members':[],
+          'posix_members':['posix_person2']},
+        }
 
 
 def test_invalid_username():
@@ -287,11 +289,14 @@ class TestUserAdmin(BaseUserAdminTests):
     # Get ourselves set up with a user and a group with superuser group priv
     cadmin = make_logged_in_client(username="supertest", is_superuser=True)
     Group.objects.create(name="super-test-group")
-    cadmin.post('/useradmin/groups/edit/super-test-group',
-                dict(name="super-test-group",
-                     members=[User.objects.get(username="supertest").pk],
-                     permissions=[HuePermission.objects.get(app='useradmin', action='superuser').pk],
-                     save="Save"), follow=True)
+    cadmin.post('/useradmin/groups/edit/super-test-group', {
+        'name': "super-test-group",
+        'members': [User.objects.get(username="supertest").pk],
+        'permissions': [HuePermission.objects.get(app='useradmin', action='superuser').pk],
+        "save": "Save"
+      },
+      follow=True
+    )
     assert_equal(len(GroupPermission.objects.all()), 2)
 
     supertest = User.objects.get(username="supertest")
