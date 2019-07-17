@@ -100,7 +100,7 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
 
   meta = {'row_counter': 0, 'handle': {}, 'status': '', 'truncated': False}
 
-  with storage.open(_log_key(notebook), 'wb') as f_log:
+  with storage.open(_log_key(notebook), 'wb') as f_log: # TODO: use cache for editor 1000 rows and storage for result export
     result_wrapper = ExecutionWrapper(api, notebook, snippet, ExecutionWrapperCallback(notebook['uuid'], meta, f_log))
     content_generator = data_export.DataAdapter(result_wrapper, max_rows=max_rows, store_data_type_in_header=True) # TODO: Move FETCH_RESULT_LIMIT to front end
     response = export_csvxls.create_generator(content_generator, file_format)
@@ -247,19 +247,22 @@ def get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id
   elif state in states.EXCEPTION_STATES:
     return ''
 
-  if not startFrom:
-    with storage.open(_log_key(notebook), 'r') as f:
-      return f.read()
+  if TASK_SERVER.RESULT_CACHE.get():
+    return ''
   else:
-    count = 0
-    output = StringIO.StringIO()
-    with storage.open(_log_key(notebook), 'r') as f:
-      for line in f:
-        count += 1
-        if count <= startFrom:
-          continue
-        output.write(line)
-    return output.getvalue()
+    if not startFrom:
+      with storage.open(_log_key(notebook), 'r') as f:
+        return f.read()
+    else:
+      count = 0
+      output = StringIO.StringIO()
+      with storage.open(_log_key(notebook), 'r') as f:
+        for line in f:
+          count += 1
+          if count <= startFrom:
+            continue
+          output.write(line)
+      return output.getvalue()
 
 
 def get_jobs(notebook, snippet, logs, **kwargs): # Re implementation to fetch updated guid in download_to_file from DB
@@ -277,6 +280,7 @@ def get_jobs(notebook, snippet, logs, **kwargs): # Re implementation to fetch up
 
   request = _get_request(**kwargs)
   api = get_api(request, snippet)
+
   return api.get_jobs(notebook, snippet, logs)
 
 
@@ -294,6 +298,7 @@ def progress(notebook, snippet, logs=None, **kwargs):
   snippet['result']['handle'] = info.get('handle', {}).copy()
   request = _get_request(**kwargs)
   api = get_api(request, snippet)
+
   return api.progress(notebook, snippet, logs=logs)
 
 
@@ -325,32 +330,39 @@ def fetch_result(notebook, snippet, rows, start_over, **kwargs):
   if info.get('handle', {}).get('has_result_set', False):
     csv.field_size_limit(sys.maxsize)
     count = 0
-    with storage.open(_result_key(notebook)) as f:
-      if TASK_SERVER.RESULT_CACHE.get():
-        csv_reader = caches[CACHES_CELERY_QUERY_RESULT_KEY].get(_result_key(notebook)) # TODO check if expired
-        headers = csv_reader[0] # TODO check size
-        csv_reader = csv_reader[1:]
-      else:
-        csv_reader = csv.reader(f, delimiter=','.encode('utf-8'))
-        headers = next(csv_reader, [])
 
-      for col in headers:
-        split = col.split('|')
-        split_type = split[1] if len(split) > 1 else 'STRING_TYPE'
-        cols.append({'name': split[0], 'type': split_type, 'comment': None})
-      for row in csv_reader:
-        count += 1
-        if count <= skip: # TODO: seek(skip) or [skip:]
-          continue
-        data.append(row)
-        if count >= target:
-          break
+    headers, csv_reader = _get_data(notebook)
+
+    for col in headers:
+      split = col.split('|')
+      split_type = split[1] if len(split) > 1 else 'STRING_TYPE'
+      cols.append({'name': split[0], 'type': split_type, 'comment': None})
+    for row in csv_reader:
+      count += 1
+      if count <= skip: # TODO: seek(skip) or [skip:]
+        continue
+      data.append(row)
+      if count >= target:
+        break
 
     caches[CACHES_CELERY_KEY].set(_fetch_progress_key(notebook), count, timeout=None)
 
     results['has_more'] = count < info.get('row_counter') or state == states.state('PROGRESS')
 
   return results
+
+
+def _get_data(notebook):
+  if TASK_SERVER.RESULT_CACHE.get():
+    csv_reader = caches[CACHES_CELERY_QUERY_RESULT_KEY].get(_result_key(notebook)) # TODO check if expired
+    headers = csv_reader[0] # TODO check size
+    csv_reader = csv_reader[1:]
+  else:
+    f = storage.open(_result_key(notebook))
+    csv_reader = csv.reader(f, delimiter=','.encode('utf-8'))
+    headers = next(csv_reader, [])
+  return headers, csv_reader
+
 
 def fetch_result_size(*args, **kwargs):
   notebook = args[0]
@@ -412,7 +424,7 @@ def close_statement(*args, **kwargs):
   return {'status': status}
 
 def _cleanup(notebook):
-  storage.delete(_result_key(notebook))
+  storage.delete(_result_key(notebook)) # TODO: abstract storage + caches
   storage.delete(_log_key(notebook))
   caches[CACHES_CELERY_KEY].delete(_fetch_progress_key(notebook))
 
