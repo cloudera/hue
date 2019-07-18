@@ -17,42 +17,68 @@
 
 from __future__ import absolute_import
 
-import sys
 import logging
 
-import aws
+import aws.client
 import azure.client
 
-from aws.conf import is_enabled as is_s3_enabled
-from azure.conf import is_adls_enabled, is_abfs_enabled
+from aws.conf import is_enabled as is_s3_enabled, has_s3_access
+from azure.conf import is_adls_enabled, is_abfs_enabled, has_adls_access, has_abfs_access
 from hadoop.cluster import get_hdfs
 from hadoop.conf import has_hdfs_enabled
+from desktop.lib.fs.proxyfs import ProxyFS
 
-from desktop.lib.fs import ProxyFS
+SUPPORTED_FS = ['hdfs', 's3a', 'adl', 'abfs']
 
 
-FS_CACHE = {}
+def has_access(fs=None, user=None):
+  if fs == 'hdfs':
+    return True
+  elif fs == 'adl':
+    return has_adls_access(user)
+  elif fs == 's3a':
+    return has_s3_access(user)
+  elif fs == 'abfs':
+    return has_abfs_access(user)
 
-DEFAULT_SCHEMA = None
 
-FS_GETTERS = {
-}
+def is_enabled(fs=None):
+  if fs == 'hdfs':
+    return has_hdfs_enabled()
+  elif fs == 'adl':
+    return is_adls_enabled()
+  elif fs == 's3a':
+    return is_s3_enabled()
+  elif fs == 'abfs':
+    return is_abfs_enabled()
 
-if has_hdfs_enabled():
-  FS_GETTERS['hdfs'] = get_hdfs
-  DEFAULT_SCHEMA = 'hdfs'
-if is_s3_enabled():
-  FS_GETTERS['s3a'] = aws.get_s3fs
-  if DEFAULT_SCHEMA is None:
-    DEFAULT_SCHEMA = 's3a'
-if is_adls_enabled():
-  FS_GETTERS['adl'] = azure.client.get_client
-  if DEFAULT_SCHEMA is None:
-      DEFAULT_SCHEMA = 'adl'
-if is_abfs_enabled():
-  FS_GETTERS['abfs'] = azure.client.get_client_abfs
-  if DEFAULT_SCHEMA is None:
-      DEFAULT_SCHEMA = 'abfs'
+def is_enabled_and_has_access(fs=None, user=None):
+  return is_enabled(fs) and has_access(fs, user)
+
+def _get_client(fs=None):
+  if fs == 'hdfs':
+    return get_hdfs
+  elif fs == 's3a':
+    return aws.client.get_client
+  elif fs == 'adl':
+    return azure.client.get_client
+  elif fs == 'abfs':
+    return azure.client.get_client_abfs
+  return None
+
+
+def get_client(name='default', fs=None, user=None):
+  fs_getter = _get_client(fs)
+  if fs_getter:
+    return fs_getter(name, user)
+  else:
+    logging.warn('Can not get filesystem called "%s" for "%s" schema' % (name, fs))
+    return None
+
+
+def get_default_schema():
+  fs = [fs for fs in SUPPORTED_FS if is_enabled(fs)]
+  return fs[0] if fs else None
 
 
 def get_filesystem(name='default'):
@@ -60,51 +86,18 @@ def get_filesystem(name='default'):
   Return the filesystem with the given name.
   If the filesystem is not defined, raises KeyError
   """
-  if name not in FS_CACHE:
-    FS_CACHE[name] = _make_fs(name)
-  return FS_CACHE[name]
+  # Instead of taking a list of cached client, ProxyFS will now resolve the client based on scheme
+  # The method to resolve clients returns a cached results if possible.
+  pdict = {}
+  for fs in SUPPORTED_FS:
+    if is_enabled(fs):
+      pdict[fs] = _get_client(fs)
+  return ProxyFS(pdict, get_default_schema(), name)
 
 
-def _make_fs(name):
-  fs_dict = {}
-
-  for schema, getter in FS_GETTERS.iteritems():
-    try:
-      if getter is not None:
-        fs = getter(name)
-        fs_dict[schema] = fs
-      else:
-        raise Exception('Filesystem not configured for %s' % schema)
-    except KeyError:
-      if DEFAULT_SCHEMA == schema:
-        logging.error('Can not get filesystem called "%s" for default schema "%s"' % (name, schema))
-        exc_class, exc, tb = sys.exc_info()
-        raise exc_class, exc, tb
-      else:
-        logging.warn('Can not get filesystem called "%s" for "%s" schema' % (name, schema))
-    except Exception, e:
-      logging.error('Failed to get filesystem called "%s" for "%s" schema: %s' % (name, schema, e))
-
-  if fs_dict:
-    return ProxyFS(fs_dict, DEFAULT_SCHEMA)
-  else:
-    return None
+def get_filesystems(user):
+  return [fs for fs in SUPPORTED_FS if is_enabled(fs) and has_access(fs, user)]
 
 
-def clear_cache():
-  """
-  Clears internal cache.  Returns
-  something that can be given back to restore_cache.
-  """
-  global FS_CACHE
-  old = FS_CACHE
-  FS_CACHE = {}
-  return old
 
 
-def restore_cache(old_cache):
-  """
-  Restores cache from the result of a previous clear_cache call.
-  """
-  global FS_CACHE
-  FS_CACHE = old_cache

@@ -30,14 +30,13 @@ from hadoop.fs.exceptions import WebHdfsException
 from hadoop.hdfs_site import get_umask_mode
 
 from desktop.lib.rest import http_client, resource
-from azure.conf import get_default_adls_url, get_default_adls_fs
+from azure.conf import get_default_adls_url, get_default_adls_fs, PERMISSION_ACTION_ADLS
 
 
 LOG = logging.getLogger(__name__)
 
 #Azure has a 30MB block limit on upload.
 UPLOAD_CHUCK_SIZE = 30 * 1000 * 1000
-PERMISSION_ACTION_ADLS = "adls_access"
 
 
 class WebHdfs(HadoopWebHdfs):

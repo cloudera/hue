@@ -33,13 +33,12 @@ from boto.s3.prefix import Prefix
 from django.utils.translation import ugettext as _
 
 from aws import s3
-from aws.conf import get_default_region, get_locations
+from aws.conf import get_default_region, get_locations, PERMISSION_ACTION_S3
 from aws.s3 import normpath, s3file, translate_s3_error, S3A_ROOT
 from aws.s3.s3stat import S3Stat
 
 
 DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
-PERMISSION_ACTION_S3 = "s3_access"
 BUCKET_NAME_PATTERN = re.compile("^((?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9_\-]*[A-Za-z0-9]))$")
 
 LOG = logging.getLogger(__name__)
@@ -75,13 +74,14 @@ def auth_error_handler(view_fn):
 
 
 class S3FileSystem(object):
-  def __init__(self, s3_connection):
+  def __init__(self, s3_connection, expiration=None):
     self._s3_connection = s3_connection
     self._filebrowser_action = PERMISSION_ACTION_S3
     self.user = None
     self.is_sentry_managed = lambda path: False
     self.superuser = None
     self.supergroup = None
+    self.expiration = expiration
 
   def _get_bucket(self, name):
     return self._s3_connection.get_bucket(name)

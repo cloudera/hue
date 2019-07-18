@@ -27,14 +27,14 @@ LOG = logging.getLogger(__name__)
 
 CLIENT_CACHE = None
 
-def get_client(identifier='default'):
+def get_client(identifier='default', user=None):
   global CLIENT_CACHE
   _init_clients()
   if identifier not in CLIENT_CACHE["adls"]:
     raise ValueError('Unknown azure client: %s, check your configuration' % identifier)
   return CLIENT_CACHE["adls"][identifier]
 
-def get_client_abfs(identifier='default'):
+def get_client_abfs(identifier='default', user=None):
   global CLIENT_CACHE
   _init_clients()
   if identifier not in CLIENT_CACHE["abfs"]:

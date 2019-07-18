@@ -58,7 +58,7 @@ def rm_ha(funct):
   return wraps(funct)(decorate)
 
 
-def get_hdfs(identifier="default"):
+def get_hdfs(identifier="default", user=None):
   global FS_CACHE
   get_all_hdfs()
   return FS_CACHE[identifier]

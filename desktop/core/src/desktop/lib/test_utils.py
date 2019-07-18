@@ -88,9 +88,8 @@ def reformat_xml(xml_obj):
 
 
 def clear_sys_caches():
-  return cluster.clear_caches(), fsmanager.clear_cache()
+  return [cluster.clear_caches()]
 
 
 def restore_sys_caches(old_caches):
   cluster.restore_caches(old_caches[0])
-  fsmanager.restore_cache(old_caches[1])
