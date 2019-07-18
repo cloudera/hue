@@ -25,11 +25,16 @@ from builtins import object
 import json
 import logging
 import os
+
 import re
 import sys
 import tempfile
+
 import urllib.request, urllib.error
 import urllib.parse
+
+from time import sleep, time
+
 from avro import schema, datafile, io
 
 from aws.s3.s3fs import S3FileSystemException
@@ -39,21 +44,27 @@ from django.urls import reverse
 from django.utils.encoding import smart_str
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
-from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises
+from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises,\
+  assert_greater
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group, add_permission, remove_from_group
 from desktop.lib.view_util import location_to_url
 from hadoop import pseudo_hdfs4
 from hadoop.conf import UPLOAD_CHUNK_SIZE
+
 from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE
 from filebrowser.lib.rwx import expand_mode
 from filebrowser.views import snappy_installed
+from desktop.conf import is_oozie_enabled
+
+
 
 if sys.version_info[0] > 2:
   from urllib.parse import unquote as urllib_unquote
 else:
   from urllib import unquote as urllib_unquote
+
 
 LOG = logging.getLogger(__name__)
 
@@ -968,29 +979,50 @@ alert("XSS")
       cleanup_file(self.cluster, HDFS_ZIP_FILE)
 
   def test_compress_hdfs_files(self):
-    ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(True)
-    prefix = self.cluster.fs_prefix + '/test_compress_files'
-    self.cluster.fs.mkdir(prefix)
-
-    test_dir1 = prefix + '/test_dir1'
-    self.cluster.fs.mkdir(test_dir1)
-    self.cluster.fs.chown(test_dir1, 'test')
-    self.cluster.fs.chmod(test_dir1, 0o700)
-
-    test_dir2 = prefix + '/test_dir2'
-    self.cluster.fs.mkdir(test_dir2)
-    self.cluster.fs.chown(test_dir2, 'test')
-    self.cluster.fs.chmod(test_dir2, 0o700)
-
-    try:
-      resp = self.c.post('/filebrowser/compress_files', {'upload_path': prefix, 'files[]': ['test_dir1','test_dir2'], 'archive_name': 'test_compress.zip'})
+    if not is_oozie_enabled():
+      raise SkipTest
+    
+    def make_and_test_dir(pre, test_direct):
+      test_dir = pre + "/" + test_direct
+      test_file = test_dir + '/test.txt'
+      self.cluster.fs.mkdir(test_dir)
+      self.cluster.fs.chown(test_dir, 'test')
+      self.cluster.fs.chmod(test_dir, 0700)
+      for i in range(3):
+        f = self.cluster.fs.open(test_file + "%s" %i, "w")
+        f.close()
+        
+      resp = self.c.post('/filebrowser/compress_files', {'upload_path': pre, 'files[]': [test_direct], 'archive_name': 'test_compress.zip'})
       response = json.loads(resp.content)
       assert_equal(0, response['status'], response)
       assert_true('handle' in response and response['handle']['id'], response)
+      responseid = '"' + response['handle']['id'] + '"' 
+      timeout_time = time() + 25
+      end_time = time()
+      while timeout_time > end_time:
+        resp2 = self.c.post('/jobbrowser/api/job/workflows', {'interface': '"workflows"', 'app_id': responseid}) #error here
+        response2 = json.loads(resp2.content)
+        if response2['app']['status'] != 'RUNNING':
+          assert_equal(response2['app']['status'] , 'SUCCEEDED', response2)
+          break 
+        sleep(3)
+        end_time = time()
+      assert_greater(timeout_time, end_time, response)
+        
+        
+    ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(True)
+    prefix = self.cluster.fs_prefix + '/test_compress_files'
+    self.cluster.fs.mkdir(prefix)
+    
+    try:
+      make_and_test_dir(prefix, 'testdir')
+      make_and_test_dir(prefix, 'test dir1')
+      #make_and_test_dir(prefix, 'test\ndir2')
+      #make_and_test_dir(prefix, 'test\tdir3')
     finally:
       ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(False)
       cleanup_tree(self.cluster, prefix)
-
+      
 
   def test_extract_tgz(self):
     ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(True)
