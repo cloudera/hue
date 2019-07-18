@@ -122,128 +122,88 @@ class AssistPanel {
         }
 
         if (self.tabsEnabled) {
-          if (
-            appConfig['browser'] &&
-            appConfig['browser']['interpreter_names'].indexOf('hdfs') !== -1
-          ) {
-            panels.push(
-              new AssistInnerPanel({
-                panelData: {
-                  name: 'hue-assist-hdfs-panel',
-                  params: {}
-                },
-                name: I18n('HDFS'),
-                type: 'hdfs',
-                icon: 'fa-files-o',
-                minHeight: 50
-              })
+          if (appConfig.browser && appConfig.browser.interpreter_names) {
+            const storageBrowsers = appConfig.browser.interpreter_names.filter(
+              interpreter =>
+                interpreter === 'adls' || interpreter === 'hdfs' || interpreter === 's3'
             );
-          }
 
-          if (
-            appConfig['browser'] &&
-            appConfig['browser']['interpreter_names'].indexOf('s3') !== -1
-          ) {
-            panels.push(
-              new AssistInnerPanel({
-                panelData: {
-                  name: 'hue-assist-s3-panel',
-                  params: {}
-                },
-                name: I18n('S3'),
-                type: 's3',
-                icon: 'fa-cubes',
-                minHeight: 50
-              })
-            );
-          }
-
-          if (
-            appConfig['browser'] &&
-            appConfig['browser']['interpreter_names'].indexOf('adls') !== -1
-          ) {
-            panels.push(
-              new AssistInnerPanel({
-                panelData: {
-                  name: 'hue-assist-adls-panel',
-                  params: {}
-                },
-                name: I18n('ADLS'),
-                type: 'adls',
-                icon: 'fa-windows',
-                iconSvg: '#hi-adls',
-                minHeight: 50
-              })
-            );
-          }
-
-          if (
-            appConfig['browser'] &&
-            appConfig['browser']['interpreter_names'].indexOf('indexes') !== -1
-          ) {
-            const solrPanel = new AssistInnerPanel({
-              panelData: {
-                name: 'hue-assist-db-panel',
-                params: $.extend(
-                  {
-                    i18n: i18nCollections,
-                    isSolr: true
+            if (storageBrowsers.length) {
+              panels.push(
+                new AssistInnerPanel({
+                  panelData: {
+                    name: 'hue-assist-storage-panel',
+                    params: {
+                      sources: storageBrowsers
+                    }
                   },
-                  params.sql
-                )
-              },
-              name: I18n('Indexes'),
-              type: 'solr',
-              icon: 'fa-search-plus',
-              minHeight: 75
-            });
-            panels.push(solrPanel);
-            huePubSub.subscribe('assist.show.solr', () => {
-              if (self.visiblePanel() !== solrPanel) {
-                self.visiblePanel(solrPanel);
-              }
-            });
-          }
+                  name: I18n('Files'),
+                  type: 'files',
+                  icon: 'fa-files-o',
+                  minHeight: 50
+                })
+              );
+            }
 
-          if (
-            appConfig['browser'] &&
-            appConfig['browser']['interpreter_names'].indexOf('kafka') !== -1
-          ) {
-            const streamsPanel = new AssistInnerPanel({
-              panelData: {
-                name: 'hue-assist-db-panel',
-                params: $.extend(
-                  {
-                    i18n: i18nCollections,
-                    isStreams: true
-                  },
-                  params.sql
-                )
-              },
-              name: I18n('Streams'),
-              type: 'kafka',
-              icon: 'fa-sitemap',
-              minHeight: 75
-            });
-            panels.push(streamsPanel);
-          }
-
-          if (
-            appConfig['browser'] &&
-            appConfig['browser']['interpreter_names'].indexOf('hbase') !== -1
-          ) {
-            panels.push(
-              new AssistInnerPanel({
+            if (appConfig.browser.interpreter_names.indexOf('indexes') !== -1) {
+              const solrPanel = new AssistInnerPanel({
                 panelData: {
-                  name: 'hue-assist-hbase-panel',
-                  params: {}
+                  name: 'hue-assist-db-panel',
+                  params: $.extend(
+                    {
+                      i18n: i18nCollections,
+                      isSolr: true
+                    },
+                    params.sql
+                  )
                 },
-                name: I18n('HBase'),
-                type: 'hbase',
-                icon: 'fa-th-large',
-                minHeight: 50
-              })
-            );
+                name: I18n('Indexes'),
+                type: 'solr',
+                icon: 'fa-search-plus',
+                minHeight: 75
+              });
+              panels.push(solrPanel);
+              huePubSub.subscribe('assist.show.solr', () => {
+                if (self.visiblePanel() !== solrPanel) {
+                  self.visiblePanel(solrPanel);
+                }
+              });
+            }
+
+            if (appConfig.browser.interpreter_names.indexOf('kafka') !== -1) {
+              const streamsPanel = new AssistInnerPanel({
+                panelData: {
+                  name: 'hue-assist-db-panel',
+                  params: $.extend(
+                    {
+                      i18n: i18nCollections,
+                      isStreams: true
+                    },
+                    params.sql
+                  )
+                },
+                name: I18n('Streams'),
+                type: 'kafka',
+                icon: 'fa-sitemap',
+                minHeight: 75
+              });
+              panels.push(streamsPanel);
+            }
+
+            if (appConfig.browser.interpreter_names.indexOf('hbase') !== -1) {
+              panels.push(
+                new AssistInnerPanel({
+                  panelData: {
+                    name: 'hue-assist-hbase-panel',
+                    params: {}
+                  },
+                  name: I18n('HBase'),
+                  type: 'hbase',
+                  icon: 'fa-th-large',
+                  minHeight: 50
+                })
+              );
+            }
           }
 
           if (!window.IS_EMBEDDED) {

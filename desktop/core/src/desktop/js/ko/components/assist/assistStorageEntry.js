@@ -25,21 +25,15 @@ const PAGE_SIZE = 100;
 const TYPE_SPECIFICS = {
   adls: {
     apiHelperFetchFunction: 'fetchAdlsPath',
-    dblClickPubSubId: 'assist.dblClickAdlsItem',
-    goHomePubSubId: 'assist.adls.go.home',
-    selectEntryPubSubId: 'assist.selectAdlsEntry'
+    dblClickPubSubId: 'assist.dblClickAdlsItem'
   },
   hdfs: {
     apiHelperFetchFunction: 'fetchHdfsPath',
-    dblClickPubSubId: 'assist.dblClickHdfsItem',
-    goHomePubSubId: 'assist.hdfs.go.home',
-    selectEntryPubSubId: 'assist.selectHdfsEntry'
+    dblClickPubSubId: 'assist.dblClickHdfsItem'
   },
   s3: {
     apiHelperFetchFunction: 'fetchS3Path',
-    dblClickPubSubId: 'assist.dblClickS3Item',
-    goHomePubSubId: 'assist.s3.go.home',
-    selectEntryPubSubId: 'assist.selectS3Entry'
+    dblClickPubSubId: 'assist.dblClickS3Item'
   }
 };
 
@@ -171,7 +165,7 @@ class AssistStorageEntry {
   }
 
   goHome() {
-    huePubSub.publish(TYPE_SPECIFICS[this.type].goHomePubSubId);
+    huePubSub.publish('assist.storage.go.home');
   }
 
   loadDeep(folders, callback) {
@@ -235,10 +229,10 @@ class AssistStorageEntry {
     self.open(!self.open());
     if (self.definition.name === '..') {
       if (self.parent.parent) {
-        huePubSub.publish(TYPE_SPECIFICS[self.type].selectEntryPubSubId, self.parent.parent);
+        huePubSub.publish('assist.selectStorageEntry', self.parent.parent);
       }
     } else {
-      huePubSub.publish(TYPE_SPECIFICS[self.type].selectEntryPubSubId, self);
+      huePubSub.publish('assist.selectStorageEntry', self);
     }
   }
 
