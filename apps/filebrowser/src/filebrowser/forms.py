@@ -20,7 +20,8 @@ standard_library.install_aliases()
 from builtins import zip
 from builtins import range
 import logging
-import urllib.request, urllib.parse, urllib.error
+import sys
+import urllib.request, urllib.error
 
 from django import forms
 from django.contrib.auth.models import User, Group
@@ -34,6 +35,10 @@ from filebrowser.lib import rwx
 
 from django.utils.translation import ugettext_lazy as _
 
+if sys.version_info[0] > 2:
+  from urllib.parse import unquote as urllib_unquote
+else:
+  from urllib import unquote as urllib_unquote
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +84,7 @@ class EditorForm(forms.Form):
   encoding = CharField(label=_('Encoding'), required=False)
 
   def clean_path(self):
-    return urllib.parse.unquote(self.cleaned_data.get('path', ''))
+    return urllib_unquote(self.cleaned_data.get('path', ''))
 
   def clean_contents(self):
     return self.cleaned_data.get('contents', '').replace('\r\n', '\n')

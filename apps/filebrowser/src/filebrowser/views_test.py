@@ -26,8 +26,9 @@ import json
 import logging
 import os
 import re
+import sys
 import tempfile
-import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error
 import urllib.parse
 from avro import schema, datafile, io
 
@@ -49,6 +50,10 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPR
 from filebrowser.lib.rwx import expand_mode
 from filebrowser.views import snappy_installed
 
+if sys.version_info[0] > 2:
+  from urllib.parse import unquote as urllib_unquote
+else:
+  from urllib import unquote as urllib_unquote
 
 LOG = logging.getLogger(__name__)
 
@@ -440,7 +445,7 @@ class TestFileBrowserWithHadoop(object):
     assert_equal(stat_dir, response.context[0]['path'])
 
     response = self.c.get('/filebrowser/view=/test-filebrowser/?default_to_home')
-    assert_true(re.search('%s$' % home, urllib.parse.unquote(response['Location'])))
+    assert_true(re.search('%s$' % home, urllib_unquote(response['Location'])))
 
     # Test path relative to home directory
     self.cluster.fs.do_as_user('test', self.cluster.fs.mkdir, '%s/test_dir' % home)
@@ -776,7 +781,7 @@ class TestFileBrowserWithHadoop(object):
     response = self.c.get('/filebrowser/view=/')
     assert_equal(response.context[0]['path'], '/')
     response = self.c.get('/filebrowser/view=/?default_to_home=1')
-    assert_equal("/filebrowser/view=/user/test", urllib.parse.unquote(response["location"]))
+    assert_equal("/filebrowser/view=/user/test", urllib_unquote(response["location"]))
 
 
   def test_view_access(self):
