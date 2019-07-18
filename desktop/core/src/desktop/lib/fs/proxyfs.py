@@ -28,15 +28,16 @@ LOG = logging.getLogger(__name__)
 
 class ProxyFS(object):
 
-  def __init__(self, filesystems_dict, default_scheme):
+  def __init__(self, filesystems_dict, default_scheme, name='default'):
     if default_scheme not in filesystems_dict:
       raise ValueError(
         'Default scheme "%s" is not a member of provided schemes: %s' % (default_scheme, filesystems_dict.keys()))
 
+    self._name = name
     self._fs_dict = filesystems_dict
-    self._fs_set = set(self._fs_dict.values())
+    self._user = {'user': None} # wrapping in an object to avoid triggering __getattr__ / __setattr__
     self._default_scheme = default_scheme
-    self._default_fs = self._fs_dict[self._default_scheme]
+    self._default_fs = filesystems_dict[self._default_scheme](name, default_scheme)
 
   def __getattr__(self, item):
     return getattr(object.__getattribute__(self, "_default_fs"), item)
@@ -48,8 +49,11 @@ class ProxyFS(object):
       object.__setattr__(self, key, value)
 
   def _get_scheme(self, path):
-    split = urlparse(path)
-    return split.scheme if split.scheme else self._default_scheme
+    scheme = None
+    if path:
+      split = urlparse(path)
+      scheme = split.scheme if split.scheme else None
+    return scheme or self._default_scheme
 
   def _has_access(self, fs):
     from desktop.auth.backend import rewrite_user  # Avoid cyclic loop
@@ -58,7 +62,7 @@ class ProxyFS(object):
       #if not filebrowser_action (hdfs) then handle permission via doas else check permission in hue
       if not filebrowser_action:
         return True
-      user = rewrite_user(User.objects.get(username=self.user))
+      user = rewrite_user(User.objects.get(username=self.getuser()))
       return user.is_authenticated() and user.is_active and (is_admin(user) or not filebrowser_action or user.has_hue_permission(action=filebrowser_action, app="filebrowser"))
     except User.DoesNotExist:
       LOG.exception('proxyfs.has_access()')
@@ -69,11 +73,12 @@ class ProxyFS(object):
     if not scheme:
       raise IOError('Can not figure out scheme for path "%s"' % path)
     try:
-      fs = self._fs_dict[scheme]
-      if (self._has_access(fs)):
+      fs = self._fs_dict[scheme](self._name, self.getuser())
+      if self._has_access(fs):
+        fs.setuser(self.getuser())
         return fs
       else:
-        raise IOError("Missing permissions for %s on %s" % (self.user, path))
+        raise IOError("Missing permissions for %s on %s" % (self.getuser(), path))
     except KeyError:
       raise IOError('Unknown scheme %s, available schemes: %s' % (scheme, self._fs_dict.keys()))
 
@@ -91,13 +96,18 @@ class ProxyFS(object):
 
   def setuser(self, user):
     """Set a new user. Return the past current user."""
-    curr = self.user
-    for fs in self._fs_set:
-      fs.setuser(user)
+    curr = self.getuser()
+    if hasattr(user, 'username'):
+      self._user['user'] = user.username
+    else:
+      self._user['user'] = user
     return curr
 
+  def getuser(self):
+    return self._user['user']
+
   def do_as_user(self, username, fn, *args, **kwargs):
-    prev = self.user
+    prev = self.getuser()
     try:
       self.setuser(username)
       return fn(*args, **kwargs)
@@ -185,9 +195,9 @@ class ProxyFS(object):
     return fs.mktemp(subdir=subdir, prefix=prefix, basedir=basedir)
 
   def purge_trash(self):
-    for fs in self._fs_set:
-      if hasattr(fs, 'purge_trash'):
-        fs.purge_trash()
+    fs = self._get_fs() # Only webhdfs supports trash.
+    if fs and hasattr(fs, 'purge_trash'):
+      fs.purge_trash()
 
   # Handle file systems interactions
   # --------------------------------

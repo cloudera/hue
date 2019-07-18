@@ -18,7 +18,7 @@
 import logging
 
 from desktop.lib.django_util import JsonResponse
-from desktop.lib.fsmanager import FS_GETTERS
+from desktop.lib import fsmanager
 from desktop.lib.i18n import smart_unicode
 
 from aws.conf import has_s3_access
@@ -45,9 +45,8 @@ def get_filesystems(request):
   response = {}
 
   filesystems = {}
-  for k, v in list(FS_GETTERS.items()):
-    if not k.startswith('s3') or has_s3_access(request.user):
-      filesystems[k] = v is not None
+  for k in fsmanager.get_filesystems(request.user):
+    filesystems[k] = True
 
   response['status'] = 0
   response['filesystems'] = filesystems

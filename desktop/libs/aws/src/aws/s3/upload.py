@@ -35,7 +35,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFutureHandlers, StopUpload, UploadFileException
 from django.utils.translation import ugettext as _
 
-from aws import get_s3fs
+from desktop.lib.fsmanager import get_client
 from aws.s3 import parse_uri
 from aws.s3.s3fs import S3FileSystemException
 
@@ -62,7 +62,7 @@ class S3FileUploadHandler(FileUploadHandler):
     self.target_path = None
     self.file = None
     self._request = request
-    self._fs = self._get_s3fs(request)
+    self._fs = get_client(fs='s3a', user=request.user.username)
     self._mp = None
     self._part_num = 1
 
@@ -122,7 +122,7 @@ class S3FileUploadHandler(FileUploadHandler):
 
 
   def _get_s3fs(self, request):
-    fs = get_s3fs() # Pre 6.0 request.fs did not exist, now it does. The logic for assigning request.fs is not correct for FileUploadHandler.
+    fs = get_client(user=request.user.username) # Pre 6.0 request.fs did not exist, now it does. The logic for assigning request.fs is not correct for FileUploadHandler.
 
     if not fs:
       raise S3FileUploadError(_("No S3 filesystem found."))

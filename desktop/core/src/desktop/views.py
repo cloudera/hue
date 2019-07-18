@@ -43,9 +43,6 @@ from configobj import ConfigObj, get_extra_values, ConfigObjError
 
 import django.views.debug
 
-from aws.conf import is_enabled as is_s3_enabled, has_s3_access
-from azure.conf import is_adls_enabled, has_adls_access
-
 import desktop.conf
 import desktop.log.log_buffer
 
@@ -53,7 +50,7 @@ from desktop import appmanager
 from desktop.api import massaged_tags_for_json, massaged_documents_for_json, _get_docs
 from desktop.auth.backend import is_admin
 from desktop.conf import USE_NEW_EDITOR, HUE_LOAD_BALANCER, get_clusters
-from desktop.lib import django_mako
+from desktop.lib import django_mako, fsmanager
 from desktop.lib.conf import GLOBAL_CONFIG, BoundConfig, _configs_from_dir
 from desktop.lib.config_spec_dump import ConfigSpec
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
@@ -86,8 +83,8 @@ def hue(request):
   return render('hue.mako', request, {
     'apps': apps_list,
     'other_apps': other_apps,
-    'is_s3_enabled': is_s3_enabled() and has_s3_access(request.user),
-    'is_adls_enabled': is_adls_enabled() and has_adls_access(request.user),
+    'is_s3_enabled': fsmanager.is_enabled('s3a') and fsmanager.has_access('s3a', request.user),
+    'is_adls_enabled': fsmanager.is_enabled('adl') and fsmanager.has_access('adl', request.user),
     'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get(),
     'leaflet': {
       'layer': desktop.conf.LEAFLET_TILE_LAYER.get(),
@@ -362,7 +359,7 @@ def memory(request):
 
 def global_js_constants(request):
   return HttpResponse(render('global_js_constants.mako', request, {
-    'is_s3_enabled': is_s3_enabled() and has_s3_access(request.user),
+    'is_s3_enabled': fsmanager.is_enabled('s3a') and fsmanager.has_access('s3a', request.user),
     'leaflet': {
       'layer': desktop.conf.LEAFLET_TILE_LAYER.get(),
       'attribution': desktop.conf.LEAFLET_TILE_LAYER_ATTRIBUTION.get(),
@@ -495,8 +492,8 @@ def commonheader(title, section, user, request=None, padding="90px", skip_topbar
     },
     'is_demo': desktop.conf.DEMO_ENABLED.get(),
     'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get(),
-    'is_s3_enabled': is_s3_enabled() and has_s3_access(user),
-    'is_adls_enabled': is_adls_enabled() and has_adls_access(request.user),
+    'is_s3_enabled': fsmanager.is_enabled('s3a') and fsmanager.has_access('s3a', request.user),
+    'is_adls_enabled': fsmanager.is_enabled('adl') and fsmanager.has_access('adl', request.user),
     'banner_message': get_banner_message(request)
   })
 

@@ -19,6 +19,7 @@ import posixpath
 import requests
 import threading
 import urllib
+
 from urlparse import urlparse
 
 from django.utils.encoding import iri_to_uri, smart_str
@@ -27,7 +28,7 @@ from django.utils.http import urlencode
 from desktop import conf
 
 from requests import exceptions
-from requests.auth import HTTPBasicAuth, HTTPDigestAuth
+from requests.auth import AuthBase ,HTTPBasicAuth, HTTPDigestAuth
 from requests_kerberos import HTTPKerberosAuth, REQUIRED, OPTIONAL, DISABLED
 from urllib3.contrib import pyopenssl
 
@@ -133,6 +134,9 @@ class HttpClient(object):
     self._session.auth = HTTPDigestAuth(username, password)
     return self
 
+  def set_bearer_auth(self, token):
+    self._session.auth = HTTPBearerAuth(token)
+
   def set_headers(self, headers):
     """
     Add headers to the request
@@ -222,3 +226,19 @@ class HttpClient(object):
       param_str = urlencode(params)
       res += '?' + param_str
     return iri_to_uri(res)
+
+class HTTPBearerAuth(AuthBase):
+    """Attaches HTTP Basic Authentication to the given Request object."""
+
+    def __init__(self, token):
+        self.token = token
+
+    def __eq__(self, other):
+        return self.token == getattr(other, 'token', None)
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __call__(self, r):
+        r.headers['Authorization'] = 'Bearer %s' % self.token
+        return r

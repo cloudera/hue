@@ -25,6 +25,7 @@ import logging
 import threading
 
 from urllib.parse import urlparse
+from azure.conf import PERMISSION_ACTION_ABFS
 from hadoop.hdfs_site import get_umask_mode
 
 from hadoop.fs.exceptions import WebHdfsException
@@ -36,7 +37,6 @@ LOG = logging.getLogger(__name__)
 
 #Azure has a 30MB block limit on upload.
 UPLOAD_CHUCK_SIZE = 30 * 1000 * 1000
-PERMISSION_ACTION_ABFS = "abfs_access"
 
 
 class ABFS(object):

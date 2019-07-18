@@ -38,15 +38,13 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from settings import HUE_DESKTOP_VERSION
 
-from aws.conf import is_enabled as is_s3_enabled, has_s3_access
-from azure.conf import is_adls_enabled, has_adls_access
 from dashboard.conf import get_engines, HAS_REPORT_ENABLED
-from hadoop.conf import has_hdfs_enabled
 from kafka.conf import has_kafka
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 
 from desktop import appmanager
 from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_EMBEDDED, IS_K8S_ONLY
+from desktop.lib import fsmanager
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paths import get_run_root, SAFE_CHARACTERS_URI_COMPONENTS
@@ -1761,7 +1759,7 @@ class ClusterConfig():
   def _get_browser(self):
     interpreters = []
 
-    if has_hdfs_enabled() and 'filebrowser' in self.apps and ANALYTIC_DB not in self.cluster_type:
+    if 'filebrowser' in self.apps and ANALYTIC_DB not in self.cluster_type and fsmanager.is_enabled_and_has_access('hdfs', self.user):
       interpreters.append({
         'type': 'hdfs',
         'displayName': _('Files'),
@@ -1770,7 +1768,7 @@ class ClusterConfig():
         'page': '/filebrowser/' + (not self.user.is_anonymous() and 'view=' + urllib.quote(self.user.get_home_directory().encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) or '')
       })
 
-    if is_s3_enabled() and 'filebrowser' in self.apps and has_s3_access(self.user) and not IS_EMBEDDED.get():
+    if 'filebrowser' in self.apps and not IS_EMBEDDED.get() and fsmanager.is_enabled_and_has_access('s3a', self.user):
       interpreters.append({
         'type': 's3',
         'displayName': _('S3'),
@@ -1779,7 +1777,7 @@ class ClusterConfig():
         'page': '/filebrowser/view=' + urllib.quote('S3A://'.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
       })
 
-    if is_adls_enabled() and 'filebrowser' in self.apps and has_adls_access(self.user) and ANALYTIC_DB not in self.cluster_type:
+    if 'filebrowser' in self.apps and ANALYTIC_DB not in self.cluster_type and fsmanager.is_enabled_and_has_access('adl', self.user):
       interpreters.append({
         'type': 'adls',
         'displayName': _('ADLS'),
