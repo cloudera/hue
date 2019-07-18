@@ -24,16 +24,17 @@ from builtins import object
 import logging
 import threading
 
-from urllib.parse import urlparse
+
 from azure.conf import PERMISSION_ACTION_ABFS
 import azure.abfs.__init__
+from urllib.parse import urlparse
 
 from hadoop.hdfs_site import get_umask_mode
 
 from hadoop.fs.exceptions import WebHdfsException
 
 from desktop.lib.rest import http_client, resource
-from nose.tools import assert_true
+from nose.tools import assert_true, assert_equal, assert_false
 
 
 LOG = logging.getLogger(__name__)
@@ -95,7 +96,7 @@ class ABFS(object):
     return {
       "Authorization": self._auth_provider.get_token(),
     }
-
+  
   def isdir(self, path):
     """
     Checks if the path is a directory
@@ -112,7 +113,7 @@ class ABFS(object):
 
   def stats(self, path):
     """
-    List the stat of the actual name
+    List the stat of the actual file/directory
     """
     file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
     if dir_name == '':
@@ -185,12 +186,20 @@ class ABFS(object):
     """
     Test if a path exists
     """
-    return self.stats(path) is not None
+    try:
+      self.stats(path)
+    except WebHdfsException as e:
+      if e.code == 404:
+        return False
+      raise WebHdfsException
+    return True
 
   def isroot(self, path):
     return azure.abfs.__init__.is_root(path)
 
   def parent_path(self, path):
+    assert_false(self.isroot(path))
+    
     raise NotImplementedError("")
 
   def join(self, first, *comp_list):
@@ -206,12 +215,33 @@ class ABFS(object):
     path = azure.abfs.__init__.strip_scheme(path)
     return self._root.get(path, headers = self._getheaders())
 
-  def append(self, path, *args, **kwargs):
+  def append(self, path, data = None, *args, **kwargs):
+    """
+    Appends the Data
+    """
+    path = azure.abfs.__init__.strip_scheme(path)
+    resp = self_stats(path)
+    params = {'position' : resp['Content-Length'], 'action' : 'append'}
+    headers= {'Content-Length' : '0'}
+    self._patching_sl( path, params, data, headers,  **kwargs)
     raise NotImplementedError("")
+  
+  def flush(self, path, params, headers = None, *args, **kwargs):
+    """
+    Flushes the data
+    """
+    path = azure.abfs.__init__.strip_scheme(path)
+    if params is None:
+      params = {}
+    params['action'] = 'flush'
+    if headers is None:
+      headers = {}
+    headers['Content-Length'] = '0'
+    self._patching_sl( path, params, header = headers,  **kwargs)
 
   def rmtree(self, path, *args, **kwargs):
     """
-    Remoce everything in a given directory
+    Remove everything in a given directory
     """
     self._delete(path, 'true')
 
@@ -223,19 +253,19 @@ class ABFS(object):
     self._delete(path, 'false', skip_trash)
     
   def _delete(self, path, recursive, skip_trash=False):
+    """
+    Wrapper function for calling delete
+    """
     if azure.abfs.__init__.is_root(path):
       raise RuntimeError("Cannot Remove Root")
     file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
     if dir_name == '':
-      return self._remove_fs(file_system)
+      return self._root.delete(file_system,{'resource': 'filesystem'}, headers= self._getheaders())
     new_path = file_system + '/' + dir_name
     param = None
     if self.isdir(path):
       param = {'recursive' : recursive}
     self._root.delete(new_path,param , headers= self._getheaders())
-   
-  def _remove_fs(self, file_system):
-    self._root.delete(file_system,{'resource': 'filesystem'}, headers= self._getheaders())
     
   def restore(self, path):
     raise NotImplementedError("")
@@ -252,11 +282,34 @@ class ABFS(object):
     """
     raise NotImplementedError("")
 
-  def chown(self, path, *args, **kwargs):
+  def chown(self, path, user = None, group = None, *args, **kwargs):
+    """
+    Changes ownership
+    """
+    header = {}
+    if user is not None:
+      header['x-ms-owner'] = user
+    if group is not None:
+      header['x-,ms-group'] = group
+    self.setAccessControl(path, headers, **kwargs)
     raise NotImplementedError("")
-
-  def chmod(self, path, *args, **kwargs):
-    raise NotImplementedError("")
+  
+  def chmod(self, path, permissionNumber = None, *args, **kwargs):
+    """
+    Set File Permissions
+    """
+    header = {}
+    if permissionNumber is not None:
+      header['x-ms-permissions'] = permissionNumber
+    self.setAccessControl(path, headers, **kwargs)
+  
+  def setAccessControl(self, path, headers, **kwargs):
+    """
+    Set Access Controls (Can do both chmod and chown)
+    """
+    path = azure.abfs.__init__.strip_scheme(path)
+    params= {'action': 'setAccessControl'}
+    self._patching_sl( path, params, header = headers,  **kwargs)
 
   def copyFromLocal(self, local_src, remote_dst, *args, **kwargs):
     raise NotImplementedError("")
@@ -309,7 +362,10 @@ class ABFS(object):
     self._create_path(new, source = old, create= False)
 
   def rename_star(self, old_dir, new_dir):
-    raise NotImplementedError("")
+    """
+    Renames a directory
+    """
+    self._create_path(new_dir, source = old_dir, create= False)
 
   def upload(self, file, path, *args, **kwargs):
     raise NotImplementedError("")
@@ -325,3 +381,19 @@ class ABFS(object):
 
   def get_upload_chuck_size(self, path):
     raise NotImplementedError("")
+  
+  #Methods to condense stuff
+  #----------------------------
+  def _patching_sl(self, schemeless_path, param, data = None, header = None, **kwargs):
+    """
+    A wraper function for patch
+    Kwargs would be the parameters to add
+    """
+    if header is None:
+      header = {}
+    header.update(self._getheaders())
+    res = self._root.invoke('PATCH', schemeless_path, param, data, headers = header)
+    
+      
+      
+      

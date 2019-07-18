@@ -20,6 +20,7 @@ import logging
 import unittest
 
 import time
+
 from azure.abfs.abfs import ABFS
 from azure.active_directory import ActiveDirectory
 from azure.conf import ABFS_CLUSTERS, is_abfs_enabled
@@ -63,6 +64,9 @@ class ABFSTestBase(unittest.TestCase):
     directory = self.client.listdir(self.test_fs)
     LOG.debug("%s" %directory)
     assert_true(directory is not None, directory)
+    
+    ok = self.client.exists('abfss://oeigfnjiorsdjngioj')
+    LOG.debug("%s" %ok)
   
     
   def test_stats(self):
