@@ -207,9 +207,13 @@ class EditorViewModel {
 
     huePubSub.subscribe(
       'get.active.snippet.type',
-      () => {
+      callback => {
         withActiveSnippet(activeSnippet => {
-          huePubSub.publish('set.active.snippet.type', activeSnippet.type());
+          if (callback) {
+            callback(activeSnippet.type());
+          } else {
+            huePubSub.publish('set.active.snippet.type', activeSnippet.type());
+          }
         });
       },
       self.huePubSubId
