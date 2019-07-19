@@ -186,7 +186,7 @@ class AssistFunctionsPanel {
             typesIndex[interpreter.type] = true;
           }
         });
-        this.availableTypes(Object.keys(typesIndex));
+        this.availableTypes(Object.keys(typesIndex).sort());
 
         this.availableTypes().forEach(type => {
           this.initFunctions(type);
@@ -195,7 +195,7 @@ class AssistFunctionsPanel {
         if (lastActiveType && typesIndex[lastActiveType]) {
           this.activeType(lastActiveType);
         } else {
-          this.activeType(this.availableTypes().length ? this.availableTypes[0] : undefined);
+          this.activeType(this.availableTypes().length ? this.availableTypes()[0] : undefined);
         }
       } else {
         this.availableTypes([]);
@@ -249,3 +249,5 @@ class AssistFunctionsPanel {
 }
 
 componentUtils.registerStaticComponent('assist-functions-panel', AssistFunctionsPanel, TEMPLATE);
+
+export default AssistFunctionsPanel;

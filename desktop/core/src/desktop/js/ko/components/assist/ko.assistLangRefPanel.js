@@ -121,8 +121,9 @@ class LanguageReferenceTopic {
 class AssistLangRefPanel {
   constructor(params, element) {
     this.disposals = [];
-    this.availableTypes = ['impala', 'hive'];
-    this.sourceType = ko.observable('hive');
+    this.availableTypes = ko.observableArray();
+    this.sourceType = ko.observable();
+
     this.allTopics = {
       impala: [],
       hive: []
@@ -136,7 +137,7 @@ class AssistLangRefPanel {
     });
 
     const updateType = type => {
-      if (this.availableTypes.indexOf(type) !== -1) {
+      if (this.availableTypes().indexOf(type) !== -1) {
         this.sourceType(type);
       }
     };
@@ -144,14 +145,44 @@ class AssistLangRefPanel {
     const activeSnippetTypeSub = huePubSub.subscribe('active.snippet.type.changed', details => {
       updateType(details.type);
     });
+
+    const configSub = huePubSub.subscribe('cluster.config.set.config', clusterConfig => {
+      const lastActiveType = this.sourceType();
+      if (
+        clusterConfig.app_config &&
+        clusterConfig.app_config.editor &&
+        clusterConfig.app_config.editor.interpreters
+      ) {
+        const typesIndex = {};
+        clusterConfig.app_config.editor.interpreters.forEach(interpreter => {
+          if (interpreter.type === 'hive' || interpreter.type === 'impala') {
+            typesIndex[interpreter.type] = true;
+          }
+        });
+        this.availableTypes(Object.keys(typesIndex).sort());
+
+        if (lastActiveType && typesIndex[lastActiveType]) {
+          this.sourceType(lastActiveType);
+        } else {
+          this.sourceType(this.availableTypes().length ? this.availableTypes()[0] : undefined);
+        }
+      } else {
+        this.availableTypes([]);
+      }
+    });
+
+    huePubSub.publish('cluster.config.get.config');
+
     this.disposals.push(() => {
+      configSub.remove();
       activeSnippetTypeSub.remove();
     });
 
-    huePubSub.subscribeOnce('set.active.snippet.type', updateType);
-    huePubSub.publish('get.active.snippet.type');
+    huePubSub.publish('get.active.snippet.type', updateType);
 
-    this.topics = ko.pureComputed(() => this.allTopics[this.sourceType()]);
+    this.topics = ko.pureComputed(() => {
+      return this.sourceType() ? this.allTopics[this.sourceType()] : [];
+    });
 
     this.selectedTopic = ko.observable();
 
@@ -328,3 +359,5 @@ componentUtils.registerStaticComponent(
   },
   TEMPLATE
 );
+
+export default AssistLangRefPanel;
