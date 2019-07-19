@@ -27,6 +27,7 @@ describe('impalaAutocompleteParser.js LOAD statements', () => {
 
   const assertAutoComplete = testDefinition => {
     const debug = false;
+
     expect(
       impalaAutocompleteParser.parseSql(
         testDefinition.beforeCursor,

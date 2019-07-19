@@ -49,6 +49,7 @@ describe('hue.utils.js', () => {
 
   it('should change completely the URL', () => {
     hueUtils.changeURL('/banana');
+
     expect(window.location.pathname).toEqual('/banana');
     hueUtils.changeURL('/jasmine');
   });
@@ -56,6 +57,7 @@ describe('hue.utils.js', () => {
   it('should change just a parameter in the URL', () => {
     hueUtils.changeURL('/banana?peeled=no');
     hueUtils.changeURLParameter('peeled', 'yes');
+
     expect(window.location.search).toEqual('?peeled=yes');
     hueUtils.changeURL('/jasmine');
   });
@@ -63,6 +65,7 @@ describe('hue.utils.js', () => {
   it('should remove a parameter in the URL', () => {
     hueUtils.changeURL('/banana?peeled=no');
     hueUtils.removeURLParameter('peeled');
+
     expect(window.location.search).toEqual('');
     hueUtils.changeURL('/jasmine');
   });

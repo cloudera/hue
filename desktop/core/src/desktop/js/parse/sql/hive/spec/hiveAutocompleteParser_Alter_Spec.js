@@ -27,6 +27,7 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
 
   const assertAutoComplete = testDefinition => {
     const debug = false;
+
     expect(
       hiveAutocompleteParser.parseSql(
         testDefinition.beforeCursor,
@@ -255,6 +256,7 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
         }
       });
     });
+
     it('should handle "ALTER TABLE foo PARTITION (ds=\'2008-04-08\', hr) CHANGE COLUMN dec_column_name dec_column_name DECIMAL;|"', () => {
       assertAutoComplete({
         beforeCursor:

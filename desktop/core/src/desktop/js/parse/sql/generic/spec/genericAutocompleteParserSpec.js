@@ -27,6 +27,7 @@ describe('genericAutocompleteParser.js', () => {
 
   const assertAutoComplete = testDefinition => {
     const debug = false;
+
     expect(
       genericAutocompleteParser.parseSql(
         testDefinition.beforeCursor,
@@ -300,6 +301,7 @@ describe('genericAutocompleteParser.js', () => {
         ']',
         ';'
       ];
+
       expect(genericAutocompleteParser.identifyPartials('', '')).toEqual({ left: 0, right: 0 });
       expect(genericAutocompleteParser.identifyPartials('foo', '')).toEqual({ left: 3, right: 0 });
       expect(genericAutocompleteParser.identifyPartials(' foo', '')).toEqual({ left: 3, right: 0 });
@@ -307,24 +309,29 @@ describe('genericAutocompleteParser.js', () => {
         left: 4,
         right: 0
       });
+
       expect(genericAutocompleteParser.identifyPartials('foo', 'bar')).toEqual({
         left: 3,
         right: 3
       });
+
       expect(genericAutocompleteParser.identifyPartials('fo', 'o()')).toEqual({
         left: 2,
         right: 3
       });
+
       expect(genericAutocompleteParser.identifyPartials('fo', 'o(')).toEqual({ left: 2, right: 2 });
       expect(genericAutocompleteParser.identifyPartials('fo', 'o(bla bla)')).toEqual({
         left: 2,
         right: 10
       });
+
       expect(genericAutocompleteParser.identifyPartials('foo ', '')).toEqual({ left: 0, right: 0 });
       expect(genericAutocompleteParser.identifyPartials("foo '", "'")).toEqual({
         left: 0,
         right: 0
       });
+
       expect(genericAutocompleteParser.identifyPartials('foo "', '"')).toEqual({
         left: 0,
         right: 0
@@ -334,26 +341,31 @@ describe('genericAutocompleteParser.js', () => {
           left: 0,
           right: 0
         });
+
         expect(genericAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo', '')).toEqual(
           {
             left: 6,
             right: 0
           }
         );
+
         expect(
           genericAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo ', '')
         ).toEqual({
           left: 0,
           right: 0
         });
+
         expect(genericAutocompleteParser.identifyPartials('', char + 'foo bar')).toEqual({
           left: 0,
           right: 0
         });
+
         expect(genericAutocompleteParser.identifyPartials('', 'foofoo' + char)).toEqual({
           left: 0,
           right: 6
         });
+
         expect(genericAutocompleteParser.identifyPartials('', ' foofoo' + char)).toEqual({
           left: 0,
           right: 0

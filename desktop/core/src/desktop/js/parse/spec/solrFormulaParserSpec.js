@@ -23,6 +23,7 @@ describe('solrFormulaParser.js', () => {
       if (!expectedResult.locations) {
         delete result.locations;
       }
+
       expect(result).toEqual(expectedResult);
     };
 
@@ -109,6 +110,7 @@ describe('solrFormulaParser.js', () => {
   describe('parse', () => {
     const testParse = function(expression, expectedResult) {
       const result = solrFormulaParser.parseSolrFormula(expression);
+
       expect(result).toBeTruthy();
       expect(result).toEqual(expectedResult);
     };
@@ -121,6 +123,7 @@ describe('solrFormulaParser.js', () => {
 
     it('should fail parsing "min(boo"', () => {
       const result = solrFormulaParser.parseSolrFormula('min(boo');
+
       expect(result).toBeFalsy();
     });
 
