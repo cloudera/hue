@@ -57,6 +57,7 @@ class TopNavViewModel {
     self.quickCreateActions = ko.observableArray();
 
     self.hasJobBrowser = ko.observable(true);
+    self.clusters = ko.observableArray();
 
     huePubSub.subscribe('cluster.config.set.config', clusterConfig => {
       if (clusterConfig && clusterConfig['main_button_action']) {
@@ -119,6 +120,10 @@ class TopNavViewModel {
         self.quickCreateActions(apps);
       } else {
         self.quickCreateActions([]);
+      }
+
+      if (clusterConfig && clusterConfig['clusters']) {
+        self.clusters(clusterConfig['clusters']);
       }
 
       self.hasJobBrowser(

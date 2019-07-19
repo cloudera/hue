@@ -18,7 +18,7 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
-  from desktop.conf import IS_EMBEDDED, DEV_EMBEDDED, IS_MULTICLUSTER_ONLY, has_multi_cluster
+  from desktop.conf import IS_EMBEDDED, DEV_EMBEDDED, IS_MULTICLUSTER_ONLY, has_multi_cluster, has_multi_clusters
   from desktop.views import _ko, commonshare, login_modal
   from desktop.lib.i18n import smart_unicode
   from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, ANALYTIC_DB, hue_version
@@ -199,7 +199,7 @@ ${ hueIcons.symbols() }
           </a>
 
           <a class="brand" data-bind="hueLink: '/home/'" href="javascript: void(0);" title="${_('Documents')}">
-              <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
+            <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
           </a>
           % endif
         % endif
@@ -284,6 +284,10 @@ ${ hueIcons.symbols() }
         </div>
         % endif
 
+        % if has_multi_clusters():
+          <select data-bind="options: clusters, optionsText: 'name', value: 'id'" class="input-small" style="margin-top:8px">
+          </select>
+        % endif
         <!-- ko component: 'hue-history-panel' --><!-- /ko -->
         <!-- ko if: hasJobBrowser -->
           <!-- ko component: { name: 'hue-job-browser-links', params: { onePageViewModel: onePageViewModel }} --><!-- /ko -->

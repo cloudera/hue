@@ -19,13 +19,15 @@ from __future__ import absolute_import
 
 import logging
 import re
-import debug_toolbar
+
 
 # FIXME: This could be replaced with hooking into the `AppConfig.ready()`
 # signal in Django 1.7:
 #
 # https://docs.djangoproject.com/en/1.7/ref/applications/#django.apps.AppConfig.ready
 #
+
+import debug_toolbar
 
 import desktop.lib.metrics.file_reporter
 desktop.lib.metrics.file_reporter.start_file_reporter()
@@ -35,18 +37,19 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.static import serve
 
-from desktop import appmanager
-from desktop.conf import METRICS, USE_NEW_EDITOR, ENABLE_DJANGO_DEBUG_TOOL, CONNECTORS, ANALYTICS
+from notebook import views as notebook_views
+from useradmin import views as useradmin_views
 
-from desktop.auth import views as desktop_auth_views
-from desktop.settings import is_oidc_configured
+from desktop import appmanager
+
 from desktop import views as desktop_views
 from desktop import api as desktop_api
 from desktop import api2 as desktop_api2
-from notebook import views as notebook_views
+from desktop.auth import views as desktop_auth_views
+from desktop.conf import METRICS, USE_NEW_EDITOR, ENABLE_DJANGO_DEBUG_TOOL, ANALYTICS, has_connectors
 from desktop.configuration import api as desktop_configuration_api
 from desktop.lib.vcs import api as desktop_lib_vcs_api
-from useradmin import views as useradmin_views
+from desktop.settings import is_oidc_configured
 
 # Django expects handler404 and handler500 to be defined.
 # django.conf.urls provides them. But we want to override them.
@@ -195,7 +198,7 @@ if METRICS.ENABLE_WEB_METRICS.get():
     url(r'^desktop/metrics/?', include('desktop.lib.metrics.urls'))
   ]
 
-if CONNECTORS.IS_ENABLED.get():
+if has_connectors():
   dynamic_patterns += [
     url(r'^desktop/connectors/?', include('desktop.lib.connectors.urls'))
   ]

@@ -21,7 +21,7 @@ from django.utils.translation import ugettext_lazy as _t
 
 
 from desktop import appmanager
-from desktop.conf import is_oozie_enabled, CONNECTORS
+from desktop.conf import is_oozie_enabled, has_connectors
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_json_dict, coerce_bool, coerce_csv
 
 
@@ -47,8 +47,8 @@ def check_permissions(user, interpreter, user_apps=None):
 
 
 def get_ordered_interpreters(user=None):
-  from desktop.lib.connectors.api import CONFIGURED_CONNECTORS
-  global CONFIGURED_CONNECTORS
+  from desktop.lib.connectors.api import CONNECTOR_INSTANCES
+  global CONNECTOR_INSTANCES
 
   if not INTERPRETERS.get():
     _default_interpreters(user)
@@ -68,13 +68,13 @@ def get_ordered_interpreters(user=None):
   if unknown_interpreters:
     raise ValueError("Interpreters from interpreters_shown_on_wheel is not in the list of Interpreters %s" % unknown_interpreters)
 
-  if CONNECTORS.IS_ENABLED.get():
+  if has_connectors():
     reordered_interpreters = [{
         'name': i['name'],
         'type': i['type'],
         'interface': i['interface'],
         'options': {setting['name']: setting['value'] for setting in i['settings']}
-      } for i in CONFIGURED_CONNECTORS
+      } for i in CONNECTOR_INSTANCES
     ]
   else:
     reordered_interpreters = interpreters_shown_on_wheel + [i for i in user_interpreters if i not in interpreters_shown_on_wheel]

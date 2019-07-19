@@ -28,7 +28,7 @@ const TEMPLATE = `
   <!-- ko if: loadingContext -->
   <i class="fa fa-spinner fa-spin muted"></i>
   <!-- /ko -->
-  
+
   <div class="inline-block" style="display: none;" data-bind="visible: !loadingContext()">
     <!-- ko if: window.HAS_MULTI_CLUSTER -->
     <!-- ko if: availableClusters().length > 0 && !hideClusters -->
@@ -44,7 +44,7 @@ const TEMPLATE = `
       'No clusters found'
     )}</span>
     <!-- /ko -->
-  
+
     <!-- ko if: availableComputes().length > 0 && !hideComputes -->
     <!-- ko ifnot: hideLabels --><span class="editor-header-title">${I18n(
       'Compute'
@@ -58,7 +58,7 @@ const TEMPLATE = `
       'No computes found'
     )}</span>
     <!-- /ko -->
-  
+
     <!-- ko if: availableNamespaces().length > 0 && !hideNamespaces -->
     <!-- ko ifnot: hideLabels --><span class="editor-header-title">${I18n(
       'Namespace'
@@ -73,7 +73,7 @@ const TEMPLATE = `
     )}</span>
     <!-- /ko -->
     <!-- /ko -->
-  
+
     <!-- ko if: availableDatabases().length > 0 && !hideDatabases-->
     <!-- ko ifnot: hideLabels --><span class="editor-header-title">${I18n(
       'Database'

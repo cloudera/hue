@@ -23,12 +23,12 @@ import uuid
 
 from django.utils.translation import ugettext as _
 
-from desktop.conf import has_multi_cluster, TASK_SERVER
+from desktop.conf import has_multi_cluster, TASK_SERVER, has_connectors
 from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 
-from notebook.conf import get_ordered_interpreters, CONNECTORS
+from notebook.conf import get_ordered_interpreters
 from notebook.sql_utils import get_current_statement
 
 
@@ -324,15 +324,13 @@ def get_api(request, snippet):
   interpreter = interpreter[0]
   interface = interpreter['interface']
 
-
-  if CONNECTORS.IS_ENABLED.get():
+  # TODO: Multi cluster --> multi computes of a connector
+  if has_connectors():
     cluster = {
       'connector': snippet['type'],
       'id': interpreter['type'],
     }
-    snippet['type'] = snippet['type'].split('-', 2)[0]
     cluster.update(interpreter['options'])
-  # Multi cluster
   elif has_multi_cluster():
     cluster = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API or Notebook create sessions
     if cluster == '""' or cluster == 'undefined':
@@ -351,7 +349,7 @@ def get_api(request, snippet):
   elif cluster and 'crn:altus:dataeng:' in cluster_name:
     interface = 'dataeng'
 
-  LOG.info('Selected cluster %s %s interface %s' % (cluster_name, cluster, interface))
+  LOG.debug('Selected connector %s %s interface=%s compute=%s' % (cluster_name, cluster, interface, snippet.get('compute')))
   snippet['interface'] = interface
 
   if interface.startswith('hiveserver2') or interface == 'hms':
