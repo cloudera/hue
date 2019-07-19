@@ -57,7 +57,7 @@ class ABFSTestBase(unittest.TestCase):
     LOG.debug("%s" %pathing)
     assert_true(pathing is not None, pathing)
     
-    directory = self.client.listdir('abfss://' + filesystems[0] + '/' + pathing[0])
+    directory = self.client.listdir('abfss://' + filesystems[0] + '/' + pathing[0], 'true')
     LOG.debug("%s" %directory)
     assert_true(directory is not None, directory)
     
@@ -96,7 +96,19 @@ class ABFSTestBase(unittest.TestCase):
     test_fs = self.test_fs
     test_file = test_fs + '/test.txt'
     self.client.create(test_file)
-    self.client.read(test_file)
+    
+    test_string = "This is a test. Do Not Panic"
+    test_len = len(test_string)
+    resp = self.client.append(test_file, test_string, test_len) #oly works with strings
+    try:
+      resp = self.client.read(test_file, length = test_len)
+      LOG.debug("%s" %resp)
+    except:
+      LOG.debug("Not written yet")
+    
+    self.client.flush(test_file, {"position" : test_len} )
+    resp = self.client.read(test_file, length = test_len)
+    LOG.debug("%s" %resp)
     self.client.remove(test_file)
   
   def test_rename(self):

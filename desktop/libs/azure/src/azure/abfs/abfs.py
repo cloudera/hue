@@ -258,36 +258,41 @@ class ABFS(object):
   # Read Files
   # --------------------------------
   def read(self, path, offset = 0, length = 0, *args, **kwargs):
+    """
+    Read data from a file
+    """
     path = azure.abfs.__init__.strip_scheme(path)
-    headers = self._get_headers()
+    headers = self._getheaders()
     if length != 0:
       headers['range']= 'bytes=%s-%s' %(offset, offset + length)
     return self._root.get(path, headers = headers)
   
   # Alter Files
   # --------------------------------
-  def append(self, path, data = None, size = None, offset = None, *args, **kwargs):
+  def append(self, path, data = None, size = None, offset =0 , *args, **kwargs):
     """
     Appends the Data
     """
     path = azure.abfs.__init__.strip_scheme(path)
-    resp = self_stats(path)
-    params = {'position' : str(int(resp['Content-Length']) + offset), 'action' : 'append'}
+    #resp = self._stats(path)
+    params = {'position' : int(resp['Content-Length']) + offset, 'action' : 'append'}
+    LOG.debug("%s" %params)
     headers = {}
     if size is None:
-      raise NotImplementedError("")
+      headers['Content-Length'] = str(len(data))
     else:
-      headers['Content-Length'] = len(data)
-    self._patching_sl( path, params, data, headers,  **kwargs)
-    raise NotImplementedError("")
+      headers['Content-Length'] = str(size)
+    LOG.debug("%s" %headers['Content-Length'])
+    return self._patching_sl( path, params, data, headers,  **kwargs)
   
-  def flush(self, path, params, headers = None, *args, **kwargs):
+  def flush(self, path, params = None, headers = None, *args, **kwargs):
     """
-    Flushes the data
+    Flushes the data(i.e. writes appended data to File)
     """
     path = azure.abfs.__init__.strip_scheme(path)
+    resp = self._stats(path)
     if params is None:
-      params = {}
+      params = {'position' : int(resp['Content-Length'])}
     params['action'] = 'flush'
     if headers is None:
       headers = {}
@@ -445,7 +450,7 @@ class ABFS(object):
     if header is None:
       header = {}
     header.update(self._getheaders())
-    res = self._root.invoke('PATCH', schemeless_path, param, data, headers = header)
+    return self._root.invoke('PATCH', schemeless_path, param, data, headers = header, **kwargs)
     
       
       
