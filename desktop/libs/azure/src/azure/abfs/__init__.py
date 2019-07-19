@@ -48,3 +48,10 @@ def strip_scheme(path):
     assert_not_equal(filesystem, '', 'File System must be Filled')
     path = filesystem + '/' + file_path
     return path
+  
+def strip_path(path):
+  match = ABFS_PATH_RE.match(uri)
+  if not match:
+    raise ValueError("Invalid ABFS URI: %s" % uri)
+  split_path = path.split('/')
+  return split_path[len(split_path) - 1]
