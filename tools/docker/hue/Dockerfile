@@ -30,11 +30,11 @@ RUN apt-get update -y && apt-get install -y \
   maven \
   gcc \
   swig \
-  openssl \
+  # openssl \ # Breaks build
   xmlsec1 \
   libxmlsec1-openssl \
   hugo \
-   && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/*
 
 ADD . /hue
 WORKDIR /hue
