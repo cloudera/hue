@@ -27,6 +27,7 @@ describe('genericAutocompleteParser.js SET statements', () => {
 
   const assertAutoComplete = testDefinition => {
     const debug = false;
+
     expect(
       genericAutocompleteParser.parseSql(
         testDefinition.beforeCursor,

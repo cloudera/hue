@@ -92,6 +92,7 @@ describe('hdfsAutocompleter.js', () => {
     ajaxHelper.responseForUrls = testDefinition.serverResponses;
     const callback = createCallbackSpyForValues(testDefinition.expectedSuggestions);
     subject.autocomplete(testDefinition.beforeCursor, testDefinition.afterCursor, callback);
+
     expect(callback).toHaveBeenCalled();
   };
 

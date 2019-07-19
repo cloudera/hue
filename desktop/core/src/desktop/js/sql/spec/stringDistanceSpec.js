@@ -20,6 +20,7 @@ describe('stringDistance.js', () => {
   const expectDistance = function(strA, strB, distance, ignoreCase) {
     const lr = stringDistance(strA, strB, ignoreCase);
     const rl = stringDistance(strB, strA, ignoreCase);
+
     expect(lr).toEqual(rl);
     expect(lr).toEqual(distance);
   };
