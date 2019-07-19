@@ -84,17 +84,12 @@ class AssistFunctionsPanel {
     this.disposals = [];
 
     this.activeType = ko.observable();
-    this.availableTypes = ko.observableArray(
-      window.IS_EMBEDDED ? ['Impala'] : ['Hive', 'Impala', 'Pig']
-    );
+    this.availableTypes = ko.observableArray();
+
     this.query = ko.observable().extend({ rateLimit: 400 });
     this.selectedFunction = ko.observable();
 
-    this.availableTypes().forEach(type => {
-      this.initFunctions(type);
-    });
-
-    const selectedFunctionPerType = { Hive: null, Impala: null, Pig: null };
+    const selectedFunctionPerType = {};
     this.selectedFunction.subscribe(newFunction => {
       if (newFunction) {
         selectedFunctionPerType[this.activeType()] = newFunction;
@@ -150,17 +145,12 @@ class AssistFunctionsPanel {
     });
 
     this.activeType.subscribe(newType => {
-      this.selectedFunction(selectedFunctionPerType[newType]);
-      this.activeCategories(this.categories[newType]);
-      apiHelper.setInTotalStorage('assist', 'function.panel.active.type', newType);
+      if (newType) {
+        this.selectedFunction(selectedFunctionPerType[newType]);
+        this.activeCategories(this.categories[newType]);
+        apiHelper.setInTotalStorage('assist', 'function.panel.active.type', newType);
+      }
     });
-
-    const lastActiveType = apiHelper.getFromTotalStorage(
-      'assist',
-      'function.panel.active.type',
-      this.availableTypes()[0]
-    );
-    this.activeType(lastActiveType);
 
     const updateType = type => {
       this.availableTypes().every(availableType => {
@@ -178,12 +168,48 @@ class AssistFunctionsPanel {
       updateType(details.type);
     });
 
-    this.disposals.push(() => {
-      activeSnippetTypeSub.remove();
+    const configSub = huePubSub.subscribe('cluster.config.set.config', clusterConfig => {
+      const lastActiveType =
+        this.activeType() || apiHelper.getFromTotalStorage('assist', 'function.panel.active.type');
+      if (
+        clusterConfig.app_config &&
+        clusterConfig.app_config.editor &&
+        clusterConfig.app_config.editor.interpreters
+      ) {
+        const typesIndex = {};
+        clusterConfig.app_config.editor.interpreters.forEach(interpreter => {
+          if (
+            interpreter.type === 'hive' ||
+            interpreter.type === 'impala' ||
+            interpreter.type === 'pig'
+          ) {
+            typesIndex[interpreter.type] = true;
+          }
+        });
+        this.availableTypes(Object.keys(typesIndex));
+
+        this.availableTypes().forEach(type => {
+          this.initFunctions(type);
+        });
+
+        if (lastActiveType && typesIndex[lastActiveType]) {
+          this.activeType(lastActiveType);
+        } else {
+          this.activeType(this.availableTypes().length ? this.availableTypes[0] : undefined);
+        }
+      } else {
+        this.availableTypes([]);
+      }
     });
 
-    huePubSub.subscribeOnce('set.active.snippet.type', updateType);
-    huePubSub.publish('get.active.snippet.type');
+    huePubSub.publish('cluster.config.get.config');
+
+    this.disposals.push(() => {
+      activeSnippetTypeSub.remove();
+      configSub.remove();
+    });
+
+    huePubSub.publish('get.active.snippet.type', updateType);
   }
 
   dispose() {
@@ -195,7 +221,7 @@ class AssistFunctionsPanel {
   initFunctions(dialect) {
     this.categories[dialect] = [];
     const functions =
-      dialect === 'Pig'
+      dialect === 'pig'
         ? PigFunctions.CATEGORIZED_FUNCTIONS
         : SqlFunctions.CATEGORIZED_FUNCTIONS[dialect.toLowerCase()];
 
