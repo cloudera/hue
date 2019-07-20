@@ -2,12 +2,19 @@ FROM centos:7
 
 LABEL description="Hue Project https://github.com/cloudera/hue"
 
+ARG GBN
+ARG GSHA
+ARG GBRANCH
+ARG VERSION
+
 # Set the environment variable
 ENV NAME="hue" \
-    HUE_VERSION="4.0.0" \
-    HUE_BUILDNO="1" \
     HUE_HOME="/opt/hue" \
     HUE_CONF="/etc/hue" \
+    HUE_BUILDNO=${GBN:"1"} \
+    HUE_SHAURL=${GSHA:""} \
+    HUE_BRANCHURL=${GBRANCH:""} \
+    HUE_VERSION=${VERSION:""} \
     HUE_BIN="/opt/hue/build/env/bin" \
     PATH=$PATH:$HUE_BIN
 
@@ -68,4 +75,4 @@ COPY startup.sh ${HUE_HOME}/startup.sh
 EXPOSE 8888
 
 WORKDIR /opt/hue
-ENTRYPOINT ["/opt/hue/startup.sh"]
+CMD ["/opt/hue/startup.sh"]
