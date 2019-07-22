@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import SqlParseSupport from '../sqlParseSupport';
+import stringDistance from '../stringDistance';
 
-describe('sqlParseSupport.js', () => {
+describe('stringDistance.js', () => {
   const expectDistance = function(strA, strB, distance, ignoreCase) {
-    const lr = SqlParseSupport.stringDistance(strA, strB, ignoreCase);
-    const rl = SqlParseSupport.stringDistance(strB, strA, ignoreCase);
+    const lr = stringDistance(strA, strB, ignoreCase);
+    const rl = stringDistance(strB, strA, ignoreCase);
     expect(lr).toEqual(rl);
     expect(lr).toEqual(distance);
   };
@@ -97,7 +97,7 @@ describe('sqlParseSupport.js', () => {
       if (i > 1000) {
         start = performance.now();
       }
-      SqlParseSupport.stringDistance(strA, strB, true);
+      stringDistance(strA, strB, true);
       if (i > 1000) {
         end = performance.now();
         durations.push(end - start);
