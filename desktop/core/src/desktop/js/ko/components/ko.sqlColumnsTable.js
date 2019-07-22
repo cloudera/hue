@@ -26,15 +26,17 @@ const TEMPLATE = `
           'Columns'
         )} (<span data-bind="text: filteredColumns().length"></span>)</div>
         <div class="context-popover-inline-autocomplete">
-          <!-- ko component: {
-            name: 'inline-autocomplete',
-            params: {
-              querySpec: querySpec,
-              facets: Object.keys(SQL_COLUMNS_KNOWN_FACET_VALUES),
-              knownFacetValues: SQL_COLUMNS_KNOWN_FACET_VALUES,
-              autocompleteFromEntries: autocompleteFromEntries
-            }
-          } --><!-- /ko -->
+          <div class="context-popover-asterisk-filter">
+            <!-- ko component: {
+              name: 'inline-autocomplete',
+              params: {
+                querySpec: querySpec,
+                facets: Object.keys(SQL_COLUMNS_KNOWN_FACET_VALUES),
+                knownFacetValues: SQL_COLUMNS_KNOWN_FACET_VALUES,
+                autocompleteFromEntries: autocompleteFromEntries
+              }
+            } --><!-- /ko -->
+          </div>
         </div>
       </div>
       <div class="context-popover-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
