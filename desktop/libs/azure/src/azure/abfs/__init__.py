@@ -18,7 +18,9 @@ from __future__ import absolute_import
 import errno
 import re
 import logging
+import tempfile
 from nose.tools import assert_not_equal
+from hadoop.fs import normpath as fs_normpath
 
 LOG = logging.getLogger(__name__)
 
@@ -36,7 +38,7 @@ def parse_uri(uri):
     raise ValueError("Invalid ABFS URI: %s" % uri)
   direct_name = match.group(3) or ''
   base_direct_name = match.group(4) or ''
-  LOG.debug("File System: %s,Directory Name: %s" %(match.group(1), direct_name) )
+  #LOG.debug("File System: %s,Directory Name: %s" %(match.group(1), direct_name) )
   return match.group(1), direct_name, base_direct_name
 
 def is_root(uri):
@@ -45,7 +47,7 @@ def is_root(uri):
 
 def strip_scheme(path):
     filesystem, file_path = parse_uri(path)[:2]
-    assert_not_equal(filesystem, '', 'File System must be Filled')
+    assert_not_equal(filesystem, '', 'File System must be Specified')
     path = filesystem + '/' + file_path
     return path
   
@@ -55,3 +57,32 @@ def strip_path(path):
     raise ValueError("Invalid ABFS URI: %s" % uri)
   split_path = path.split('/')
   return split_path[len(split_path) - 1]
+
+def normpath(path):
+  """
+  Return the normlized path, but ignore leading prefix if it exists (used s3fs as a guidline for this)
+  """
+  if is_root(path):
+    return path
+  elif path.lower().startswith(ABFS_ROOT):
+    normalized = '%s%s' % (S3A_ROOT, fs_normpath(path[len(ABFS_ROOT):]))
+  elif path.lower().startswith(ABFS_ROOT_S):
+    normalized = '%s%s' % (S3A_ROOT_S, fs_normpath(path[len(ABFS_ROOT_S):]))
+  else:
+    normalized = fs_normpath(path)
+  return normalized
+
+def parent_path(path):
+  """
+  Returns the parent of the specified folder ( not normalized
+  """
+  if isroot(path):
+    return path
+  filesystem, directory_name, other = parse_uri(path)
+  if filesytem is None:
+    if path.lower() == ABFS_ROOT_S:
+      return ABFS_ROOT_S
+    return ABFS_ROOT
+  else:
+    parent = '/'.join(directory_name.split('/')[:-1])
+  return filesystem + '/' + parent

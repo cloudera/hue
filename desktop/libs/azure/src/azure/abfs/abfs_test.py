@@ -26,7 +26,7 @@ from azure.active_directory import ActiveDirectory
 from azure.conf import ABFS_CLUSTERS, is_abfs_enabled
 
 from nose.plugins.skip import SkipTest
-from nose.tools import assert_true
+from nose.tools import assert_true, assert_false
 
 LOG = logging.getLogger(__name__)
 
@@ -47,7 +47,6 @@ class ABFSTestBase(unittest.TestCase):
   def tearDown(self):
     self.client.rmtree(self.test_fs)
     
-
   def test_list(self):
     filesystems = self.client.listdir('abfss://')
     LOG.debug("%s" %filesystems)
@@ -65,41 +64,58 @@ class ABFSTestBase(unittest.TestCase):
     LOG.debug("%s" %directory)
     assert_true(directory is not None, directory)
     
-    ok = self.client.exists('abfss://oeigfnjiorsdjngioj')
-    LOG.debug("%s" %ok)
-  
+  def test_existence(self):
+    test_fs = self.test_fs
+    test_dir = test_fs + '/test_existence'
+    test_file = test_dir + '/test.txt'
+    self.client.mkdir(test_dir)
+    self.client.create(test_file)
     
-  def test_stats(self):
-    ok2 = self.client.stats(self.test_fs)
-    LOG.debug("%s" %ok2)
+    #Testing root and filesystems
+    assert_true(self.client.exists('abfss://'))
+    assert_true(self.client.exists(test_fs))
     
-    ok2 = self.client.listdir_stats(self.test_fs)
-    LOG.debug("%s" %ok2)
+    #testing created directories and files
+    assert_true(self.client.exists(test_dir))
+    assert_true(self.client.exists(test_file))
+    assert_false(self.client.exists(test_dir + 'a'))
+     
+  def test_stat_output(self):
+    """
+    Only tests if the stat outputs something
+    """
+    test_fs = self.test_fs
+    test_dir = test_fs + '/test_stats'
+    self.client.mkdir(test_dir)
     
+    #testing filesystems
+    result = self.client.stats(test_fs)
+    LOG.debug("%s" %result)
+    assert_true(result is not None, result)
+    result = self.client.listdir_stats(test_fs)
+    LOG.debug("%s" %result)
+    
+    #testing directories
+    result = self.client.stats(test_dir)
+    LOG.debug("%s" %result)
+    result = self.client.listdir_stats(test_dir)
+    LOG.debug("%s" %result)
     
   def test_mkdir(self):
-    filesystems = self.client.listdir('abfss://')
-    LOG.debug("%s" %filesystems)
-    assert_true(None not in filesystems, filesystems)
+    test_dir = self.test_fs + '/test_mkdir'
+    assert_false(self.client.exists(test_dir))
     
-    self.client.mkdir('abfss://' + filesystems[1] + "/test")
+    self.client.mkdir(test_dir)
+    assert_true(self.client.exists(test_dir))
     
-    pathing = self.client.listdir('abfss://' + filesystems[1])
-    LOG.debug("%s" %pathing)
-    assert_true(None not in pathing, pathing)
-    self.client.remove('abfss://' + filesystems[1] + "/test")
-    
-    pathing = self.client.listdir('abfss://' + filesystems[1])
-    LOG.debug("%s" %pathing)
-    
-  def test_createandread(self):
+  def test_append_and_flush(self):
     test_fs = self.test_fs
     test_file = test_fs + '/test.txt'
     self.client.create(test_file)
     
     test_string = "This is a test. Do Not Panic"
     test_len = len(test_string)
-    resp = self.client.append(test_file, test_string, test_len) #oly works with strings
+    resp = self.client.append(test_file, test_string) #oly works with strings
     try:
       resp = self.client.read(test_file, length = test_len)
       LOG.debug("%s" %resp)
@@ -107,26 +123,65 @@ class ABFSTestBase(unittest.TestCase):
       LOG.debug("Not written yet")
     
     self.client.flush(test_file, {"position" : test_len} )
-    resp = self.client.read(test_file, length = test_len)
-    LOG.debug("%s" %resp)
+    resp = self.client.read(test_file)
     self.client.remove(test_file)
   
   def test_rename(self):
     test_fs = self.test_fs
     test_dir = test_fs + '/test'
+    test_dir2 = test_fs + '/test2'
     test_file = test_fs + '/test.txt'
-    self.client.mkdir(test_dir)
-    ok2 = self.client.listdir_stats(self.test_fs)
-    LOG.debug("%s" %ok2)
+    test_file2 = test_fs + '/test2.txt'
     
-    self.client.rename(test_dir, test_fs + '/' + 'help')
-    ok2 = self.client.listdir_stats(self.test_fs)
-    LOG.debug("%s" %ok2)
+    self.client.mkdir(test_dir)
+    assert_true(self.client.exists(test_dir))
+    assert_false(self.client.exists(test_dir2))
+    
+    self.client.rename(test_dir, test_dir2)
+    assert_false(self.client.exists(test_dir))
+    assert_true(self.client.exists(test_dir2))
     
     self.client.create(test_file)
-    ok2 = self.client.listdir_stats(self.test_fs)
-    LOG.debug("%s" %ok2)
+    assert_true(self.client.exists(test_file))
+    assert_false(self.client.exists(test_file2))
     
-    self.client.rename(test_file, test_fs + '/' + 'help.txt')
-    ok2 = self.client.listdir_stats(self.test_fs)
-    LOG.debug("%s" %ok2)
+    self.client.rename(test_file, test_file2)
+    assert_false(self.client.exists(test_file))
+    assert_true(self.client.exists(test_file2))
+    
+  def test_chmod(self):
+    test_dir = self.test_fs + '/test_chmod'
+    self.client.mkdir(test_dir)
+    test_dir_permission = test_dir +'/test'
+    test_file_permission = test_dir +'/test.txt'
+    
+    self.client.create(test_file_permission)
+    self.client.chmod(test_file_permission)
+    self.client.stats(test_file_permission)
+    
+    self.client.mkdir(test_dir_permission)
+    self.client.chmod(test_dir_permission)
+    self.client.stats(test_dir_permission)
+    
+  def test_chown(self):
+    test_dir = self.test_fs + '/test_chown'
+    self.client.mkdir(test_dir)
+    test_dir_permission = test_dir +'/test'
+    test_file_permission = test_dir +'/test.txt'
+    
+    self.client.create(test_file_permission)
+    self.client.chown(test_file_permission, 'temp')
+    self.client.stats(test_file_permission)
+    
+    self.client.mkdir(test_dir_permission)
+    self.client.chown(test_dir_permission, 'temp')
+    self.client.stats(test_dir_permission)
+    
+  def test_create_with_file_perm(self):
+    test_dir = self.test_fs + '/test_chown'
+    test_file = test_dir + '/test.txt'
+    self.client.mkdir(test_dir)
+    self.client.create(test_file, headers = {'x-ms-permissions' : '0777'})
+    
+
+    
