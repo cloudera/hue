@@ -94,7 +94,7 @@ def get_ordered_interpreters(user=None):
       "type": i['type'],
       "interface": i['interface'],
       "options": i['options'],
-      'dialect': i.get('dialect', i['name']),
+      'dialect': i.get('dialect', i['name']).lower(),
       'category': i.get('category', 'editor'),
       "is_sql": i.get('is_sql') or i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy"],
       "is_catalog": i['interface'] in ["hms",],

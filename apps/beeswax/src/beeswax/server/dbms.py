@@ -65,7 +65,7 @@ def get(user, query_server=None, cluster=None):
   global DBMS_CACHE_LOCK
 
   if query_server is None:
-    query_server = get_query_server_config(cluster=cluster)
+    query_server = get_query_server_config(connector=cluster)
 
   DBMS_CACHE_LOCK.acquire()
   try:
