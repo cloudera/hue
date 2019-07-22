@@ -806,7 +806,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("Error loading my queries") }</div>
           <!-- /ko -->
           <!-- ko if: !queriesHasErrors() && !loadingQueries() && queries().length === 0 && queriesFilter() === '' -->
-          <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("You don't have any saved query.") }</div>
+          <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("You don't have any saved queries.") }</div>
           <!-- /ko -->
           <!-- ko if: !queriesHasErrors() && !loadingQueries() && queries().length === 0 && queriesFilter() !== '' -->
           <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _('No queries found for') } <strong data-bind="text: queriesFilter"></strong>.</div>
