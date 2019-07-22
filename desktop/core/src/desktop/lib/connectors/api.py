@@ -128,11 +128,11 @@ CONNECTOR_INSTANCES = [{
 ]
 
 CONNECTOR_INSTANCES[0]['settings'] = [
-  {'name': 'server_host', 'value': 'self-service-dw-2.gce.cloudera.com'},
+  {'name': 'server_host', 'value': 'self-service-dw2-2.gce.cloudera.com'},
   {'name': 'server_port', 'value': '21050'},
 ]
 CONNECTOR_INSTANCES[1]['settings'] = [
-  {'name': 'server_host', 'value': 'self-service-dw-1.gce.cloudera.com'},
+  {'name': 'server_host', 'value': 'self-service-dw2-1.gce.cloudera.com'},
   {'name': 'server_port', 'value': '10000'},
 ]
 CONNECTOR_INSTANCES[2]['settings'] = [
