@@ -119,6 +119,8 @@ class ABFS(object):
     Test if a path exists
     """
     try:
+      if ABFS.isroot(path):
+        return True
       self.stats(path)
     except WebHdfsException as e:
       if e.code == 404:
@@ -126,65 +128,80 @@ class ABFS(object):
       raise WebHdfsException
     return True
 
-  def stats(self, path):
+  def stats(self, path, **kwargs):
     """
     List the stat of the actual file/directory
+    kwargs is used for parameters
     """
     file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
     if dir_name == '':
-      res = self._root._invoke('HEAD', file_system, { 'resource' : 'filesystem'}, headers = self._getheaders())
-      return res.headers
-    return self._stats(file_system + '/' +dir_name)
+      LOG.debug("Path being called is a Filesystem")
+      return self._statsf(file_system, **kwargs)
+    return self._stats(file_system + '/' +dir_name, **kwargs)
   
   def listdir_stats(self,path, **kwargs):
     """
-    List the stats for the directories
+    List the stats for the directories inside the specified path
+    
     """
     if ABFS.isroot(path):
-      return self.listfilesystems_stats()
+      LOG.warn("Path being called is a Filesystem")
+      return self.listfilesystems_stats(**kwargs)
     dir_stats = []
     file_system = azure.abfs.__init__.parse_uri(path)[0]
     for direct in self.listdir(path):
-      res = self._stats(file_system + '/' + direct)
-      dir_stats.append(res)  
+      dir_stats.append(self._stats(file_system + '/' + direct, **kwargs) )  
     return dir_stats
   
-  def listfilesystems_stats(self):
+  def listfilesystems_stats(self, **kwargs):
     """
     Lists the stats inside the File Systems  
     """
     stats = []
     for file_system in self.listfilesystems():
-      resp = self._root._invoke('HEAD', file_system, {'resource': 'filesystem'}, headers = self._getheaders())
-      stats.append(resp.headers)
+      stats.append(self._statsf(file_system,**kwargs))
     return stats
   
-  def _stats(self, schemeless_path):
+  def _stats(self, schemeless_path, **kwargs):
     """
     Container function for both stats
+    Kwargs is used for parameters
     """
-    res = self._root._invoke('HEAD', schemeless_path, { 'action' : 'getStatus', 'upn' : 'true'}, headers = self._getheaders())
+    kwargs['action'] = 'getStatus'
+    res = self._root._invoke('HEAD', schemeless_path, kwargs, headers = self._getheaders())
     return res.headers
   
-  def listdir(self, path, recursive = 'false', glob=None):
+  def _statsf(self, schemeless_path, **kwargs):
+    """
+    Continer function for both stats but if it's a file system
+    Kwargs is used for parameters
+    """
+    kwargs['resource'] = 'filesystem'
+    res = self._root._invoke('HEAD', schemeless_path, kwargs, headers = self._getheaders())
+    return res.headers
+    
+  def listdir(self, path, recursive = 'false', **kwargs):
     """
     Lists the names inside the current directories 
     """
     if ABFS.isroot(path):
-      return self.listfilesystems()
+      LOG.warn("Path being called is a Filesystem")
+      return self.listfilesystems(**kwargs)
     file_system, directory_name = azure.abfs.__init__.parse_uri(path)[:2]
-    params = {'resource': 'filesystem', 'recursive': recursive}
+    kwargs['resource'] = 'filesystem'
+    kwargs['recursive'] = recursive
     if directory_name != "":
-      params['directory'] = directory_name
-    resp = self._root.get(file_system, params, headers= self._getheaders())
+      kwargs['directory'] = directory_name
+    resp = self._root.get(file_system, kwargs, headers= self._getheaders())
     return [x['name'] for x in resp['paths']]
   
   
-  def listfilesystems(self):
+  def listfilesystems(self, **kwargs):
     """
     Lists the names of the File Systems  
     """
-    resp = self._root.get('',{'resource': 'account'}, headers= self._getheaders())
+    kwargs['resource'] = 'account'
+    resp = self._root.get('',kwargs, headers= self._getheaders())
     return [x['name'] for x in resp['filesystems']]
   
   # Find or alter information about the URI path
@@ -193,19 +210,25 @@ class ABFS(object):
   def isroot(path):
     return azure.abfs.__init__.is_root(path)  
   
-  def normpath(self, path):
-    raise NotImplementedError("")
+  @staticmethod
+  def normpath(path):
+    return azure.abfs.__init__.normpath(path)
 
-  def netnormpath(self, path):
-    raise NotImplementedError("")
+  @staticmethod
+  def netnormpath(path):
+    return azure.abfs.__init__.normpath(path)
 
-  def open(self, path, *args, **kwargs):
+  def open(self, path, option = 'r', *args, **kwargs):
+    if option == 'r':
+      return self.read(path)
+    elif option == 'w':
+      if self.exists(path):
+        raise NotImplementedError("")
     raise NotImplementedError("")
-
-  def parent_path(self, path):
-    assert_false(ABFS.isroot(path))
-    
-    raise NotImplementedError("")
+  
+  @staticmethod
+  def parent_path(path):
+    return azure.abfs.__init__.parent_path(path)
 
   @staticmethod
   def join(first, *comp_list):
@@ -213,43 +236,45 @@ class ABFS(object):
 
   # Create Files,directories, or File Systems
   # --------------------------------
-  def mkdir(self, path, *args, **kwargs):
+  def mkdir(self, path, params = None, headers = None, *args, **kwargs):
     """
     Makes a directory
     """
-    self._create_path(path, 'directory')
+    if params is None:
+      params = {}
+    params['resource'] = 'directory'
+    self._create_path(path, params = params, headers = params, create = 'true')
   
-  def create(self, path, *args, **kwargs):
+  def create(self, path, params = None, headers = None, *args, **kwargs):
     """
     Makes a File
     """
-    self._create_path(path, 'file')
+    if params is None:
+      params = {}
+    params['resource'] = 'file'
+    self._create_path(path, params = params, headers =headers, create = 'true')
 
   def create_home_dir(self, home_path=None):
     """
     Make a home directory (i.e File system)
     """
-    raise NotImplementedError("")
+    if home_path is None:
+      raise NotImplementedError("File System not named")
+    self._create_fs(home_path)
   
-  def _create_path(self,path, resource = None, source = None, create = True):
+  def _create_path(self,path, params = None, headers = None, create = True):
     """
-    Conatiner method for Create
+    Container method for Create
     """
     file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
     if dir_name == '':
       return self._create_fs(file_system)
     no_scheme = file_system + '/' + dir_name
-    params = {}
     additional_header = self._getheaders()
+    if headers is not None:
+      additional_header.update(headers)
     if create:
       additional_header['If-None-Match'] = '*'
-      assert_true(resource is not None)
-      params['resource'] = resource
-    else:
-      source = '/' + azure.abfs.__init__.strip_scheme(source)
-      additional_header['x-ms-rename-source'] = source
-      if resource is not None:
-        params['resource'] = resource
     self._root.put(no_scheme,params, headers= additional_header)
     
   def _create_fs(self, file_system):
@@ -274,12 +299,12 @@ class ABFS(object):
     Appends the Data
     """
     path = azure.abfs.__init__.strip_scheme(path)
-    #resp = self._stats(path)
+    resp = self._stats(path)
     params = {'position' : int(resp['Content-Length']) + offset, 'action' : 'append'}
     LOG.debug("%s" %params)
     headers = {}
     if size is None:
-      headers['Content-Length'] = str(len(data))
+      headers['Content-Length'] = self._getsizeofdata(data)
     else:
       headers['Content-Length'] = str(size)
     LOG.debug("%s" %headers['Content-Length'])
@@ -338,12 +363,12 @@ class ABFS(object):
     """
     Changes ownership
     """
-    header = {}
+    headers = {}
     if user is not None:
-      header['x-ms-owner'] = user
+      headers['x-ms-owner'] = user
     if group is not None:
-      header['x-,ms-group'] = group
-    self.setAccessControl(path, headers, **kwargs)
+      headers['x-,ms-group'] = group
+    self.setAccessControl(path, headers = headers, **kwargs)
     raise NotImplementedError("")
   
   def chmod(self, path, permissionNumber = None, *args, **kwargs):
@@ -352,8 +377,8 @@ class ABFS(object):
     """
     header = {}
     if permissionNumber is not None:
-      header['x-ms-permissions'] = permissionNumber
-    self.setAccessControl(path, headers, **kwargs)
+      header['x-ms-permissions'] = str(permissionNumber)
+    self.setAccessControl(path, headers = header, **kwargs)
   
   def setAccessControl(self, path, headers, **kwargs):
     """
@@ -382,6 +407,9 @@ class ABFS(object):
           
 
   def copyfile(self, src, dst, *args, **kwargs):
+    """
+    Copies a File to another location
+    """
     new_path = dst + '/' + azure.abfs.__init__.strip_path(src)
     self.create(new_path)
     
@@ -396,6 +424,9 @@ class ABFS(object):
     self.flush(new_path, {'position' : str(size) })
 
   def copy_remote_dir(self, src, dst, *args, **kwargs):
+    """
+    Copies the entire contents of a directory to another location
+    """
     dst = dst + '/' + azure.abfs.__init__.strip_path(src)
     self.mkdir(dst)
     other_files = self.listdir(src)
@@ -405,14 +436,15 @@ class ABFS(object):
   def rename(self, old, new): 
     """
     Renames a file
-    """
-    self._create_path(new, source = old, create= False)
+    """ 
+    headers = {'x-ms-rename-source' : '/' + azure.abfs.__init__.strip_scheme(old) }
+    self._create_path(new, headers = headers, create= False)
 
   def rename_star(self, old_dir, new_dir):
     """
     Renames a directory
     """
-    self._create_path(new_dir, source = old_dir, create= False)
+    self.rename(old_dir, new_dir)
 
   def upload(self, file, path, *args, **kwargs):
     raise NotImplementedError("")
@@ -452,6 +484,11 @@ class ABFS(object):
     header.update(self._getheaders())
     return self._root.invoke('PATCH', schemeless_path, param, data, headers = header, **kwargs)
     
-      
-      
+  def _getsizeofdata(self,data):
+    """
+    A function for determing the size of some sort of type
+    """
+    if isinstance(data, basestring):
+      return str(len(data))
+    return str(0)
       
