@@ -9,7 +9,7 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   rules:
-  - host: demo2.gethue.com
+  - host: demo.gethue.com
     http:
       paths:
       - backend:
@@ -18,5 +18,5 @@ spec:
         path: /
   tls:
   - hosts:
-    - demo2.gethue.com
+    - demo.gethue.com
     secretName: letsencrypt-pro

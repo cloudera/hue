@@ -55,9 +55,10 @@ Requires NGINX previous step first.
 
 Then based on Jetstack and Let's encrypt and nginx-ingress:
 
+    kubectl create namespace cert-manager
     kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
     kubectl label namespace cert-manager certmanager.k8s.io/disable-validation="true"
-    helm repo add jetstack https://charts.io.jetstack
+    helm repo add jetstack https://charts.jetstack.io
     helm repo update
     helm install --name cert-manager --namespace cert-manager jetstack/cert-manager
 
