@@ -1216,6 +1216,11 @@ class AceLocationHandler {
       const tokensToVerify = [];
 
       e.data.locations.forEach(location => {
+        if (location.type === 'statementType' && self.snippet.type() !== 'impala') {
+          // We currently only have a good mapping from statement types to impala topics.
+          // TODO: Extract links between Hive topic IDs and statement types
+          return;
+        }
         if (
           ['statement', 'selectList', 'whereClause', 'limitClause'].indexOf(location.type) !== -1 ||
           ((location.type === 'table' || location.type === 'column') &&
