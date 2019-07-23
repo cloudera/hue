@@ -17,16 +17,24 @@
 from __future__ import absolute_import
 
 import logging
+import json
+import os
 import unittest
-
+import tempfile
 import time
+
+from django.contrib.auth.models import User
+from nose.plugins.skip import SkipTest
+from nose.tools import assert_true, assert_false, assert_equal
+
+from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.test_utils import grant_access, add_to_group, add_permission, remove_from_group
 
 from azure.abfs.abfs import ABFS
 from azure.active_directory import ActiveDirectory
 from azure.conf import ABFS_CLUSTERS, is_abfs_enabled
 
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_true, assert_false
+from azure.abfs.upload import DEFAULT_WRITE_SIZE
 
 LOG = logging.getLogger(__name__)
 
@@ -40,7 +48,12 @@ class ABFSTestBase(unittest.TestCase):
     if not is_abfs_enabled():
       raise SkipTest
     self.client = ABFS.from_config(ABFS_CLUSTERS['default'], ActiveDirectory.from_config(None, version='v2.0'))
-    self.test_fs = 'abfss://testfs' + (str(int(time.time()) ))
+    self.c = make_logged_in_client(username='test', is_superuser=False)
+    grant_access('test', 'test', 'filebrowser')
+    add_to_group('test')
+    self.user = User.objects.get(username="test")
+      
+    self.test_fs = 'abfs://testfs' + (str(int(time.time()) ))
     LOG.debug("%s" %self.test_fs)
     self.client.mkdir(self.test_fs)
 
@@ -48,19 +61,19 @@ class ABFSTestBase(unittest.TestCase):
     self.client.rmtree(self.test_fs)
     
   def test_list(self):
-    filesystems = self.client.listdir('abfss://')
+    filesystems = self.client.listdir('abfs://')
     LOG.debug("%s" %filesystems)
     assert_true(filesystems is not None, filesystems)
     
-    pathing = self.client.listdir('abfss://' + filesystems[0])
+    pathing = self.client.listdir('abfs://' + filesystems[0])
     LOG.debug("%s" %pathing)
     assert_true(pathing is not None, pathing)
     
-    directory = self.client.listdir('abfss://' + filesystems[0] + '/' + pathing[0], {'recursive': 'true'})
+    directory = self.client.listdir('abfs://' + filesystems[0] + '/' + pathing[0], {'recursive': 'true'})
     LOG.debug("%s" %directory)
     assert_true(directory is not None, directory)
     
-    ok = self.client.listdir('abfss://' + filesystems[0] + '/' + directory[0], {'recursive': 'true'})
+    ok = self.client.listdir('abfs://' + filesystems[0] + '/' + directory[0], {'recursive': 'true'})
     LOG.debug("%s" %ok)
     
     directory = self.client.listdir(self.test_fs)
@@ -75,7 +88,7 @@ class ABFSTestBase(unittest.TestCase):
     self.client.create(test_file)
     
     #Testing root and filesystems
-    assert_true(self.client.exists('abfss://'))
+    assert_true(self.client.exists('abfs://'))
     assert_true(self.client.exists(test_fs))
     
     #testing created directories and files
@@ -186,7 +199,27 @@ class ABFSTestBase(unittest.TestCase):
     self.client.mkdir(test_dir)
     self.client.create(test_file, headers = {'x-ms-permissions' : '0777'})
     
-    
+  def test_upload(self):
+    with tempfile.NamedTemporaryFile() as local_file:
+      # Make sure we can upload larger than the UPLOAD chunk size
+      file_size = DEFAULT_WRITE_SIZE * 2
+      local_file.write('0' * file_size)
+      local_file.flush()
+      self.client.mkdir(self.test_fs + '/test_upload')
+      dest_dir = self.test_fs + '/test_upload'
+      local_file = local_file.name
+      dest_path = '%s/%s' % (dest_dir, os.path.basename(local_file))
+      
+      add_permission(self.user.username, 'has_abfs', permname='abfs_access', appname='filebrowser')
+      # Just upload the current python file
+      try:
+        resp = self.c.post('/filebrowser/upload/file?dest=%s' % dest_dir, dict(dest=dest_dir, hdfs_file=file(local_file)))
+        response = json.loads(resp.content)
+      finally:
+        remove_from_group(self.user.username, 'has_abfs')
+      
+      assert_equal(0, response['status'], response)
+      stats = self.client.stats(dest_path)
     
   #Testing static Methods
   #------------------------------------

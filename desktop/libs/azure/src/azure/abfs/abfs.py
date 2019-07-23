@@ -44,6 +44,12 @@ LOG = logging.getLogger(__name__)
 UPLOAD_CHUCK_SIZE = 30 * 1000 * 1000
 
 
+class ABFSFileSystemException(IOError):
+
+  def __init__(self, *args, **kwargs):
+    super(ABFSFileSystemException, self).__init__(*args, **kwargs)
+    
+
 class ABFS(object):
 
   def __init__(self, url,
@@ -503,6 +509,9 @@ class ABFS(object):
     Gets the maximum size allowed to upload
     """
     return UPLOAD_CHUCK_SIZE
+  
+  def filebrowser_action(self):
+    return self._filebrowser_action
   
   #Methods to condense stuff
   #----------------------------
