@@ -56,9 +56,12 @@ class ABFSTestBase(unittest.TestCase):
     LOG.debug("%s" %pathing)
     assert_true(pathing is not None, pathing)
     
-    directory = self.client.listdir('abfss://' + filesystems[0] + '/' + pathing[0], 'true')
+    directory = self.client.listdir('abfss://' + filesystems[0] + '/' + pathing[0], {'recursive': 'true'})
     LOG.debug("%s" %directory)
     assert_true(directory is not None, directory)
+    
+    ok = self.client.listdir('abfss://' + filesystems[0] + '/' + directory[0], {'recursive': 'true'})
+    LOG.debug("%s" %ok)
     
     directory = self.client.listdir(self.test_fs)
     LOG.debug("%s" %directory)
@@ -113,9 +116,9 @@ class ABFSTestBase(unittest.TestCase):
     test_file = test_fs + '/test.txt'
     self.client.create(test_file)
     
-    test_string = "This is a test. Do Not Panic"
+    test_string = "This is a test."
     test_len = len(test_string)
-    resp = self.client.append(test_file, test_string) #oly works with strings
+    resp = self.client.append(test_file, test_string) #only works with strings
     try:
       resp = self.client.read(test_file, length = test_len)
       LOG.debug("%s" %resp)
@@ -177,11 +180,25 @@ class ABFSTestBase(unittest.TestCase):
     self.client.chown(test_dir_permission, 'temp')
     self.client.stats(test_dir_permission)
     
-  def test_create_with_file_perm(self):
+  def test_create_with_file_permissions(self):
     test_dir = self.test_fs + '/test_chown'
     test_file = test_dir + '/test.txt'
     self.client.mkdir(test_dir)
     self.client.create(test_file, headers = {'x-ms-permissions' : '0777'})
     
+    
+    
+  #Testing static Methods
+  #------------------------------------
+  @staticmethod
+  def test_static_methods():
+    test_dir = 'abfss://testfs/test_static/'
+    LOG.debug("%s" %test_dir)
+    norm_path = ABFS.normpath(test_dir)
+    LOG.debug("%s" %norm_path)
+    parent = ABFS.parent_path(test_dir)
+    LOG.debug("%s" %parent)
+    join_path = ABFS.join(test_dir, 'test1')
+    LOG.debug("%s" %join_path)
 
     
