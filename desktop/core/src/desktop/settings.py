@@ -36,6 +36,7 @@ from desktop.lib.paths import get_desktop_root
 from desktop.lib.python_util import force_dict_to_strings
 
 from aws.conf import is_enabled as is_s3_enabled
+from azure.conf import is_abfs_enabled
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', '..', '..'))
@@ -569,6 +570,8 @@ file_upload_handlers = [
 if is_s3_enabled():
   file_upload_handlers.insert(0, 'aws.s3.upload.S3FileUploadHandler')
 
+if is_abfs_enabled():
+  file_upload_handlers.insert(0, 'azure.abfs.upload.ABFSFileUploadHandler')
 FILE_UPLOAD_HANDLERS = tuple(file_upload_handlers)
 
 ############################################################
