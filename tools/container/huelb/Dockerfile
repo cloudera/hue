@@ -11,10 +11,10 @@ ARG VERSION
 ENV NAME="hue" \
     HUE_HOME="/opt/hue" \
     HUE_CONF="/etc/hue" \
-    HUE_BUILDNO=${GBN:"1"} \
-    HUE_SHAURL=${GSHA:""} \
-    HUE_BRANCHURL=${GBRANCH:""} \
-    HUE_VERSION=${VERSION:""} \
+    HUE_BUILDNO=${GBN} \
+    HUE_SHAURL=${GSHA} \
+    HUE_BRANCHURL=${GBRANCH} \
+    HUE_VERSION=${VERSION} \
     HUE_BIN="/opt/hue/build/env/bin" \
     PATH=$PATH:$HUE_BIN
 
