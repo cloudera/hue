@@ -74,6 +74,7 @@
     "dryice": "0.4.11",
     "eslint": "5.12.1",
     "eslint-config-prettier": "4.0.0",
+    "eslint-plugin-jasmine": "^2.10.1",
     "eslint-plugin-prettier": "3.0.1",
     "expose-loader": "0.7.5",
     "grunt": "^1.0.4",
