@@ -24,7 +24,7 @@ import I18n from 'utils/i18n';
 
 const TEMPLATE = `
   <!-- ko if: loading -->
-  <div style="width: 100%; height: 20px; left: 6px; top: 8px; position: relative;" data-bind="hueSpinner: { spin: loading }"></div>
+  <div style="width: 100%; height: 20px; left: 6px; position: relative;" data-bind="hueSpinner: { spin: loading }"></div>
   <!-- /ko -->
   <!-- ko if: !loading() && (!readOnly || readOnly && currentTags().length) -->
   <div class="hue-tags" style="width: 100%" data-bind="ifnot: loading, css: { 'read-only-tags': readOnly }">
