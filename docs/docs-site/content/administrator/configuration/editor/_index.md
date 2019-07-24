@@ -465,7 +465,20 @@ Vertica’s JDBC client drivers can be downloaded here: [Vertica JDBC Client Dri
 
 ### Phoenix
 
-The Phoenix JDBC client driver is bundled with the Phoenix binary and source release artifacts, which can be downloaded here: [Apache Phoenix Downloads](https://phoenix.apache.org/download.html). Be sure to use the Phoenix client driver that is compatible with your Phoenix server version.
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+    ./build/env/bin/pip install pyPhoenix
+
+    [[[phoenix]]]
+    name=HBase Phoenix
+    interface=sqlalchemy
+    options='{"url": "phoenix://sql-phoenix-1.gce.cloudera.com:8765/"}'
+
+**Note**: Check the list of know issues [here](https://github.com/Pirionfr/pyPhoenix#known-issues).
+
+Alternative:
+
+The Phoenix JDBC client driver is bundled with the Phoenix binary and source release artifacts, which can be downloaded here: [Apache Phoenix Downloads](https://phoenix.apache.org/download.html).
 
     [[[phoenix]]]
     name=Phoenix JDBC
