@@ -35,10 +35,9 @@ If you are changing Javascript or CSS files, also start:
 
     npm run dev
 
-Then it is recommended to use MySQL or PostGres as the [database](({{% param baseURL %}}).
+Then it is recommended to use MySQL or PostGres as the database.
 
-Open the `hue.ini` file in a text editor. Directly below the
-`[[database]]` line, add the following options (and modify accordingly for
+Open the `hue.ini` file in a text editor. Directly below the `[[database]]` line, add the following options (and modify accordingly for
 your MySQL setup):
 
     host=localhost
