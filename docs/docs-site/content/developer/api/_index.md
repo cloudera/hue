@@ -2,7 +2,7 @@
 title: "APIs"
 date: 2019-03-13T18:28:09-07:00
 draft: false
-weight: 5
+weight: 6
 ---
 
 Hue can be accessed directly via a Django Python Shell or by its REST API.
