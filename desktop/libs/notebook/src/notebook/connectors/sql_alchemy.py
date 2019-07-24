@@ -234,17 +234,18 @@ class SqlAlchemyApi(Api):
     response = {'status': -1}
 
     if database is None:
-      response['databases'] = assist.get_databases()
+      response['databases'] = [db or 'NULL' for db in assist.get_databases()]
     elif table is None:
       tables_meta = []
+      database = self._fix_phoenix_empty_database(database)
       for t in assist.get_tables(database):
         tables_meta.append({'name': t, 'type': 'Table', 'comment': ''})
       response['tables_meta'] = tables_meta
     elif column is None:
+      database = self._fix_phoenix_empty_database(database)
       columns = assist.get_columns(database, table)
       response['columns'] = [col['name'] for col in columns]
-      response['extended_columns'] = [
-        {
+      response['extended_columns'] = [{
           'autoincrement': col.get('autoincrement'),
           'comment': col.get('comment'),
           'default': col.get('default'),
@@ -296,6 +297,10 @@ class SqlAlchemyApi(Api):
   @query_error_handler
   def get_browse_query(self, snippet, database, table, partition_spec=None):
     return "SELECT * FROM `%s`.`%s` LIMIT 1000" % (database, table)
+
+
+  def _fix_phoenix_empty_database(self, database):
+    return None if self.options['url'].startswith('phoenix://') and database == 'NULL' else database
 
 
 class Assist():
