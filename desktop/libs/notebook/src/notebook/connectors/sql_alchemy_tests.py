@@ -106,3 +106,28 @@ class TestApi():
 
       assert_equal(data['data'], [['row1'], ['row2']])
       assert_equal(data['meta'](), [{'type': 'BIGINT_TYPE'}])
+
+
+class TestAutocomplete():
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+
+    self.user = rewrite_user(User.objects.get(username="test"))
+    grant_access("test", "default", "notebook")
+
+
+  def test_empty_database_names(self):
+    interpreter = {
+      'options': {'url': 'phoenix://'}
+    }
+
+    snippet = Mock()
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      with patch('notebook.connectors.sql_alchemy.inspect') as inspect:
+        with patch('notebook.connectors.sql_alchemy.Assist') as Assist:
+          Assist.return_value=Mock(get_databases=Mock(return_value=['SYSTEM', None]))
+
+          data = SqlAlchemyApi(self.user, interpreter).autocomplete(snippet)
+
+          assert_equal(data['databases'], ['SYSTEM', 'NULL'])
