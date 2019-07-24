@@ -148,6 +148,30 @@
   flex-basis: @basis;
 }
 
+.flex-box-flex(@flex) {
+  -webkit-box-flex: @flex;
+  -moz-box-flex: @flex;
+  box-flex: @flex;
+}
+
+.flex-box-align(@align) {
+  -webkit-box-align: @align;
+  -moz-box-align: @align;
+  box-align: @align;
+}
+
+.flex-box-pack(@pack) {
+  -webkit-box-pack: @pack;
+  -moz-box-pack: @pack;
+  box-pack: @pack;
+}
+
+.flex-shrink(@shrink) {
+  -webkit-flex-shrink: @shrink;
+  -ms-flex-shrink: @shrink;
+  flex-shrink: @shrink;
+}
+
 .flex-direction(@direction: row) {
   -webkit-flex-direction: @direction;
   -ms-flex-direction: @direction;

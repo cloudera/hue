@@ -18,7 +18,20 @@
 @import (reference) "cui/colors.less";
 @import (reference) "hue-mixins.less";
 
+.hue-page {
+  position: relative;
+  .display-flex;
+  .flex-direction(row);
+
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
 .main-page {
+  .flex(1 1 auto);
   position: relative;
   .display-flex;
   .flex-direction(column);
@@ -60,16 +73,18 @@
 
   position: relative;
   z-index: 1009;
+  min-height: 54px;
 }
 
 .top-nav-left {
+  padding-top: 3px;
   .flex(0 0 340px);
 }
 
 .top-nav-middle {
   .flex(1);
 
-  padding: 0 10px;
+  padding: 3px 10px;
   width: 100%;
 }
 

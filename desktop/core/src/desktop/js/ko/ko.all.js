@@ -146,7 +146,6 @@ import 'ko/components/ko.contextSelector';
 import 'ko/components/ko.createDirectoryModal';
 import 'ko/components/ko.deleteDocModal';
 import 'ko/components/ko.dropDown';
-import 'ko/components/ko.dwSidebar';
 import 'ko/components/ko.executionAnalysis';
 import 'ko/components/ko.favoriteApp';
 import 'ko/components/ko.fieldSamples';
@@ -160,6 +159,7 @@ import 'ko/components/ko.navTags';
 import 'ko/components/ko.performanceGraph';
 import 'ko/components/ko.pollingCatalogEntriesList';
 import 'ko/components/ko.sentryPrivileges';
+import 'ko/components/ko.sidebar';
 import 'ko/components/ko.sqlColumnsTable';
 
 import 'ko/extenders/ko.maxLength';

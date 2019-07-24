@@ -132,7 +132,7 @@ $(document).ready(() => {
   const sidebarViewModel = new SideBarViewModel(onePageViewModel, topNavViewModel);
   ko.applyBindings(sidebarViewModel, $('.hue-sidebar')[0]);
   if (window.IS_MULTICLUSTER_ONLY) {
-    ko.applyBindings(sidebarViewModel, $('.hue-dw-sidebar-container')[0]);
+    ko.applyBindings(sidebarViewModel, $('.hue-sidebar-container')[0]);
   }
 
   huePubSub.publish('cluster.config.get.config');

@@ -15,168 +15,231 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
+@sidebar-width: 248px;
+@collapsed-sidebar-width: 56px;
 
-@import (reference) "../cui/extra-variables.less";
-@import (reference) "../hue-mixins.less";
+@gradient-start: rgb(51, 62, 71);
+@gradient-end: rgb(2, 50, 89);
+@header-bg-open: rgb(28, 36, 41);
 
-@sidebar-width: 200px;
-@collapsed-sidebar-width: 48px;
-@sidebar-animation-duration: 250ms;
-@sidebar-category-font-size: 13px;
-@sidebar-left-spacing: 16px;
-@sidebar-left-spacing-item: 30px;
-@sidebar-background-color: @cui-gray-050;
+@item-color: rgb(173, 178, 182);
+@item-active-border: @hue-primary-color-dark;
+
+@header-bg: @hue-primary-color-dark;
 
 .hue-sidebar {
-  position: fixed;
-  top: @navbar-height;
-  left: 0;
-  bottom: 0;
-  background-color: @sidebar-background-color;
-  width: @sidebar-width;
-  transition: width @sidebar-animation-duration;
-  z-index: 5000;
-  overflow: hidden;
-  box-shadow: 0 1px 2px 0;
+  .flex(0 0 @sidebar-width);
+  .display-flex;
+  .flex-direction(column);
+  .flex-shrink(0);
 
-  &.hue-sidebar-below-top-bar {
-    position: absolute;
-    top: 0;
-    padding-top: 10px;
-  }
-
-  .hue-sidebar-content {
-    top: 24px;
-    bottom: 50px;
-    position: absolute;
-    overflow-y: auto;
-    min-width: @sidebar-width;
-  }
-
-  .hue-sidebar-item {
-    display: block;
-    padding-left: @sidebar-left-spacing-item;
-    line-height: 38px;
-    color: @text-color;
-    background-color: @sidebar-background-color;
-
-    .hue-ease-transition(~"background-color, color");
-
-    .hue-sidebar-icon {
-      color: @cui-gray-600;
-      display: inline-block;
-      margin-right: 14px;
-      width: 18px;
-      text-align: center;
-      .hue-ease-transition(color);
-    }
-  }
-
-  .hue-sidebar-item.active {
-    font-weight: bold;
-    color: @cui-blue-500;
-    background-color: @cui-gray-100;
-
-    .fa::before {
-      color: @cui-blue-500;
-    }
-  }
-
-  .hue-sidebar-item:hover {
-    color: @cui-blue-500;
-    background-color: @cui-gray-100;
-
-    .sidebar-icon {
-      color: @cui-blue-500;
-    }
-  }
-
-  .hue-sidebar-category-item {
-    margin: 20px 0 4px @sidebar-left-spacing;
-    font-size: @sidebar-category-font-size * 1.2;
-    color: @cui-blue-700;
-    transition: opacity @sidebar-animation-duration;
-  }
-
-  .hue-sidebar-action-button {
-    background-color: inherit;
-    display: block;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    line-height: 36px;
-    width: 100%;
-    text-align: right;
-    padding-right: 16px;
-    color: @text-color;
-    box-shadow: 0 0 2px 0;
-
-    &:hover {
-      background: @cui-gray-100;
-    }
-  }
-
-  .hue-sidebar-item-name {
-    transition: opacity @sidebar-animation-duration;
-    opacity: 1;
-  }
-
-  .hue-sidebar-footer-panel {
-    background-color: inherit;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    width: 100%;
-    color: @text-color;
-    box-shadow: 0 0 2px 0;
-
-    .dropzone {
-      padding-top: 15px;
-      padding-bottom: 15px;
-      text-align: center;
-
-      i {
-        .hue-ease-transition(color);
-      }
-    }
-
-    .dz-drag-hover,
-    .dropzone:hover {
-      background-color: @cui-gray-200 !important;
-
-      i {
-        color: @cui-blue-500;
-      }
-    }
-
-    a {
-      .pointer;
-    }
-  }
-}
-
-.hue-sidebar.collapsed {
-  width: @collapsed-sidebar-width;
-
-  .hue-sidebar-category-item,
-  .sidebar-item-name {
-    opacity: 0;
-  }
-
-  .hue-sidebar-action-button {
-    text-align: center;
-    padding: 0;
-  }
-}
-
-.hue-sidebar-placeholder {
-  transition: width @sidebar-animation-duration;
-  width: @sidebar-width;
   height: 100%;
+  background-image: linear-gradient(164deg, @gradient-start, @gradient-end);
+  line-height: 1.2;
+  overflow: hidden;
+  transition: all 0.2s ease 0s;
+
+  &:not(.collapsed) .hue-sidebar-header {
+    background-color: @header-bg-open !important;
+  }
 
   &.collapsed {
-    width: @collapsed-sidebar-width;
+    .flex-basis(@collapsed-sidebar-width);
+
+    .hue-sidebar-header {
+      padding: 0 12px;
+    }
+
+    .hue-sidebar-footer a.hue-sidebar-trigger svg {
+      transform: rotate(180deg);
+    }
+
+    .icon {
+      .flex-box-flex(0);
+      .flex(0 0 56px);
+
+      margin: 0;
+      font-size: 24px;
+      height: 24px;
+
+      svg {
+        font-size: 24px;
+        height: 24px;
+      }
+    }
+
+    .item {
+      height: 56px;
+      padding: 0;
+
+      span {
+        opacity: 0;
+      }
+    }
+
+    .item[data-tooltip]:hover::before {
+      display: block;
+    }
+
+    .item[data-tooltip]::before {
+      z-index: 1010;
+      display: none;
+      content: attr(data-tooltip);
+      position: fixed;
+      left: 64px;
+      background-color: @gradient-start;
+      color: @cui-white;
+      font-size: 12px;
+      box-shadow: rgba(0, 0, 0, 0.2) 0 2px 4px 0;
+      white-space: nowrap;
+      border-radius: 3px;
+      padding: 4px 8px;
+    }
+
+    .hue-sidebar-header .hue-app-switcher-trigger svg {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  .item-spacer {
+    height: 15px;
+  }
+
+  .item {
+    .display-flex;
+    .flex-box-align(center);
+
+    height: 32px;
+    position: relative;
+    align-items: center;
+    color: @item-color;
+
+    span {
+      .nowrap-ellipsis;
+    }
+
+    &.active {
+      color: @cui-white;
+      background-color: rgba(255, 255, 255, 0.1);
+      font-weight: 700;
+
+      &::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background-color: @item-active-border;
+      }
+
+    }
+  }
+
+  a.item:hover:not(.active) {
+    color: @cui-white;
+  }
+
+  .icon {
+    .display-flex;
+    .flex-box-flex(0);
+    .flex-box-pack(center);
+    .flex(0 0 36px);
+
+    margin-left: 16px;
+    text-align: center;
+    justify-content: center;
+    font-size: 20px;
+
+    svg {
+      font-size: 20px;
+      height: 20px; // nv d3 conflict
+    }
+  }
+
+  * {
+    -webkit-font-smoothing: antialiased;
+    transition: all 0.2s ease 0s;
+    box-sizing: border-box;
+
+    font-size: 100%;
+    vertical-align: baseline;
+    margin: 0;
+    padding: 0;
+    border-width: 0;
+    border-style: initial;
+    border-color: initial;
+    border-image: initial;
+  }
+
+  a {
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .hue-sidebar-header {
+    .display-flex;
+    .flex-shrink(0);
+    .flex-box-align(center);
+
+    height: 56px;
+    align-items: center;
+    color: @cui-white;
+    font-size: 16px;
+    margin-bottom: 8px;
+    padding: 0 0 0 24px;
+    background-color: @header-bg;
+
+    .hue-app-switcher-trigger {
+      color: @hue-primary-color-dark;
+      margin-right: 6px;
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .logo {
+      height: 24px;
+    }
+
+    > a {
+      .display-flex;
+      .flex-box-align(center);
+      .flex-box-pack(center);
+
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  .hue-sidebar-body {
+    .flex(1 1 auto);
+    .flex-box-flex(1);
+
+    overflow-y: hidden;
+  }
+
+  .hue-sidebar-footer {
+    a.hue-sidebar-trigger {
+      .display-flex;
+      .flex-shrink(0);
+      .flex-box-align(center);
+      .flex-box-pack(end);
+
+      align-items: center;
+      justify-content: flex-end;
+      margin-top: 12px;
+      height: 52px;
+      padding: 0 16px;
+
+      svg {
+        transition-delay: 0.2s;
+        width: 24px;
+        height: 24px;
+      }
+    }
   }
 }
