@@ -26,6 +26,7 @@ from hadoop.fs import normpath as fs_normpath
 LOG = logging.getLogger(__name__)
 
 ABFS_PATH_RE = re.compile('^/*[aA][bB][fF][sS]{1,2}://([$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9])(/(.*?)/?)?$') # bug here
+#also changed becuase some bug in
 ABFS_ROOT_S = 'abfss://'
 ABFS_ROOT = 'abfs://'
 
@@ -53,7 +54,10 @@ def strip_scheme(path):
   """
   returns the path without abfss:// or abfs://
   """
-  filesystem, file_path = parse_uri(path)[:2]
+  try:
+    filesystem, file_path = parse_uri(path)[:2]
+  except:
+    return path
   assert_not_equal(filesystem, '', 'File System must be Specified')
   path = filesystem + '/' + file_path
   return path
@@ -113,8 +117,8 @@ def join(first,*complist):
   listings.extend(complist)
   joined = posixpath.join(*list(map(_prep, listings)))
   if joined and joined[0] == '/':
-    if first.startswith(ABFS_ROOT):
-      joined = 'abfs:/%s' % joined
-    else:
+    if first.startswith(ABFS_ROOT_S):
       joined = 'abfss:/%s' % joined
+    else:
+      joined = 'abfs:/%s' % joined
   return joined

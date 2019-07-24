@@ -66,7 +66,7 @@ def _make_adls_client(identifier):
 def _make_abfs_client(identifier):
   client_conf = conf.ABFS_CLUSTERS[identifier]
   azure_client = CLIENT_CACHE["azure"][identifier]
-  return ABFS.from_config(client_conf, azure_client)
+  return ABFS.from_config(client_conf, ActiveDirectory.from_config(None, version='v2.0'))#temp fix
 
 def _make_azure_client(identifier):
   client_conf = conf.AZURE_ACCOUNTS[identifier]

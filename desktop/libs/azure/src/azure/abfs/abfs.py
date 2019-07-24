@@ -108,8 +108,9 @@ class ABFS(object):
   # --------------------------------
   def isdir(self, path):
     """
-    Checks if the path is a directory
+    Checks if the path is a directory (note diabled because filebrowser/views is bugged)
     """
+    return
     resp = self.stats(path)
     return resp['x-ms-resource-type'] == 'directory' 
 
@@ -468,7 +469,10 @@ class ABFS(object):
     self.rename(old_dir, new_dir)
 
   def upload(self, file, path, *args, **kwargs):
-    raise NotImplementedError("")
+    """
+    Upload is done by the client
+    """
+    pass
   
   def copyFromLocal(self, local_src, remote_dst, *args, **kwargs):
     raise NotImplementedError("")
