@@ -1347,7 +1347,7 @@ def _upload_file(request):
           'result': _massage_stats(request, stat_absolute_path(filepath, request.fs.stats(filepath))),
           'next': request.GET.get("next")
         })
-
+ 
         return response
     else:
         raise PopupException(_("Error in upload form: %s") % (form.errors,))

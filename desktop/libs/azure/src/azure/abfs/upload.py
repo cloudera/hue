@@ -57,9 +57,10 @@ class ABFSFileUploadHandler(FileUploadHandler):
     self._part_size = DEFAULT_WRITE_SIZE
     
     if self._is_abfs_upload():
-      self.filesystem, self.directory = parse_uri(destination)[:2]
+      self.filesystem, self.directory = parse_uri(self.destination)[:2]
        # Verify that the path exists
-      self._fs.stats(self.destination)
+      test = self._fs.stats(self.destination)
+      LOG.debug("%s" %test)
       
     LOG.debug("Chunk size = %d" %DEFAULT_WRITE_SIZE)
 
@@ -68,14 +69,14 @@ class ABFSFileUploadHandler(FileUploadHandler):
     if self._is_abfs_upload():
       super(ABFSFileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
 
-      LOG.info('Using ABFSFileUploadHandler to handle file upload.')
-      self.target_path = self._fs.join(self.filesystem + '/' + self.directory, file_name)
+      LOG.info('Using ABFSFileUploadHandler to handle file upload wit temp file%s.' %file_name)
+      self.target_path = self._fs.join(self.destination, file_name)
       
       try:
         # Check access permissions before attempting upload
         #self._check_access() #implement later
         LOG.debug("Initiating ABFS upload to target path: %s" % self.target_path)
-        self._fs.create(target_path)
+        self._fs.create(self.target_path)
         self.file = SimpleUploadedFile(name=file_name, content='')
         raise StopFutureHandlers()
       except (ABFSFileUploadHandler, ABFSFileSystemException) as e:
@@ -92,21 +93,22 @@ class ABFSFileUploadHandler(FileUploadHandler):
         self._fs.append(self.target_path, raw_data, size = self._part_size, offset = start)
         return None
       except Exception as e:
-        self.remove(self.target_path)
+        self._fs.remove(self.target_path)
         LOG.exception('Failed to upload file to S3 at %s: %s' % (self.target_path, e))
         raise StopUpload()
     else:
       return raw_data
 
   def file_complete(self, file_size):
-    if self._is_abfs_upload(self.target_path):
+    if self._is_abfs_upload():
       #finish the upload
+      self._fs.flush(self.target_path, {'position' : int(file_size)})
       LOG.info("ABFSFileUploadHandler has completed file upload to ABFS, total file size is: %d." % file_size)
-      self._fs.flush()
       self.file.size = file_size
+      LOG.debug("%s" %self._fs.stats(self.target_path))
       return self.file
     else:
-      return raw_data
+      return None
 
   def _get_abfs(self, request):
     fs = get_client_abfs()
@@ -117,7 +119,7 @@ class ABFSFileUploadHandler(FileUploadHandler):
     return fs
   
   def _is_abfs_upload(self):
-    return self._get_scheme() and self._get_scheme().startswith('abfs')
+    return self._get_scheme() and self._get_scheme().startswith('ABFS')
   
   def _get_scheme(self):
     if self.destination:

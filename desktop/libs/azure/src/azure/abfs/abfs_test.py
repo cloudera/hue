@@ -132,9 +132,10 @@ class ABFSTestBase(unittest.TestCase):
     test_string = "This is a test."
     test_len = len(test_string)
     resp = self.client.append(test_file, test_string) #only works with strings
+    LOG.debug("%s" %self.client.stats(test_file))
     try:
-      resp = self.client.read(test_file, length = test_len)
       LOG.debug("%s" %resp)
+      resp = self.client.read(test_file, length = test_len)
     except:
       LOG.debug("Not written yet")
     
