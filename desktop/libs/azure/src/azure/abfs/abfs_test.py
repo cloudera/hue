@@ -123,6 +123,8 @@ class ABFSTestBase(unittest.TestCase):
     
     self.client.mkdir(test_dir)
     assert_true(self.client.exists(test_dir))
+    self.client.isdir(test_dir)
+    
     
   def test_append_and_flush(self):
     test_fs = self.test_fs

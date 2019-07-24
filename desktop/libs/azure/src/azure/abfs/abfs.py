@@ -23,6 +23,8 @@ standard_library.install_aliases()
 from builtins import object
 import logging
 import threading
+import stat
+
 from posixpath import join
 
 
@@ -142,8 +144,10 @@ class ABFS(object):
     file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
     if dir_name == '':
       LOG.debug("Path being called is a Filesystem")
-      return self._statsf(file_system, params, **kwargs)
-    return self._stats(file_system + '/' +dir_name, params, **kwargs)
+      resp = self._statsf(file_system, params, **kwargs)
+    else:
+      resp= self._stats(file_system + '/' +dir_name, params, **kwargs)
+    return self._format_stats(path, resp)
   
   def listdir_stats(self,path, params = None, **kwargs):
     """
@@ -155,7 +159,8 @@ class ABFS(object):
     dir_stats = []
     file_system = azure.abfs.__init__.parse_uri(path)[0]
     for direct in self.listdir(path, params = params):
-      dir_stats.append(self._stats(file_system + '/' + direct, params, **kwargs) )  
+      resp = self._stats(file_system + '/' + direct, params, **kwargs) 
+      dir_stats.append(self._format_stats('abfs://' +file_system + '/' + direct,resp))
     return dir_stats
   
   def listfilesystems_stats(self, params = None, **kwargs):
@@ -186,6 +191,25 @@ class ABFS(object):
     params['resource'] = 'filesystem'
     res = self._root._invoke('HEAD', schemeless_path, params, headers = self._getheaders(), **kwargs)
     return res.headers
+  
+  def _format_stats(self, path, resp):
+    """
+    Another function fo make stats comply with HDFSupload (would probably change later)
+    """
+    resp['path'] = path
+    resp['name'] = azure.abfs.__init__.strip_path(path)
+    resp['mtime'] = resp.pop('Last-Modified')
+    resp['aclBit'] = 'false'
+    resp['mode'] = 0777
+    if self.isdir(path):
+      resp['mode'] |= stat.S_IFDIR
+    else:
+      resp['mode']|= stat.S_IFREG
+    try:
+      resp['size'] = resp.pop('Content-Length')
+    except:
+      resp['size'] = '0'
+    return resp
     
   def listdir(self, path, params = None, **kwargs):
     """
