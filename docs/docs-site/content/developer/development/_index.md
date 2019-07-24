@@ -47,6 +47,32 @@ your MySQL setup):
     password=secretpassword
     name=hue
 
+### Dev Docker
+
+Try basic changes in Hue without compiling it locally:
+
+    git clone https://github.com/cloudera/hue.git
+    cd hue
+    cp desktop/conf/pseudo-distributed.ini.tmpl desktop/conf/pseudo-distributed.ini
+
+Then edit the `[[database]]` section to specify a proper database, here MySql:
+
+    host=127.0.0.1 # Not localhost if Docker
+    engine=mysql
+    user=hue
+    password=hue
+    name=huedb
+
+Then map the local Hue source code into the running container (so that local edits are seen in the running Hue):
+
+    sudo docker run -it -v $PWD/apps:/usr/share/hue/apps -v $PWD/desktop:/usr/share/hue/desktop -v $PWD/desktop/conf/pseudo-distributed.ini:/usr/share/hue/desktop/conf/z-hue.ini --network="host" gethue/hue
+
+Note: code updates won’t be seen after the Docker container runs. For this Hue would need to be started in dev server mode by replacing the [line](https://github.com/cloudera/hue/blob/master/tools/docker/hue/startup.sh#L5) by
+
+    ./build/env/bin/hue runserver 0.0.0.0:8888
+
+and recompiling the Docker image. It will then auto-restart on Python code changes. For JavaScript, those would need to be [compiled]({{% param baseURL %}}/developer/development/#javascript).
+
 ### Javascript
 
 The javascript files are currently being migrated to webpack bundles, during this process some files will live under src/desktop/static/ and some will live under src/dekstop/js
