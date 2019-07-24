@@ -1671,6 +1671,7 @@ class ClusterConfig():
           'tooltip': _('%s Query') % interpreter['type'].title(),
           'page': '/editor/?type=%(type)s' % interpreter,
           'is_sql': interpreter['is_sql'],
+          'dialect': interpreter['dialect'],
         })
 
     if SHOW_NOTEBOOKS.get() and ANALYTIC_DB not in self.cluster_type:
@@ -1686,6 +1687,7 @@ class ClusterConfig():
         'tooltip': _('Notebook'),
         'page': '/notebook',
         'is_sql': False,
+        'dialect': 'notebook'
       })
 
     if interpreters:
