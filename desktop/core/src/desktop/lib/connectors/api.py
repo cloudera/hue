@@ -123,7 +123,7 @@ CONNECTOR_INSTANCES = [{
     'dialect': Hive().TYPE, 'interface': Hive().INTERFACE, 'settings': Hive().PROPERTIES, 'is_sql': True, 'id': 3, 'category': 'editor', 'description': ''
   }, {
     'nice_name': 'MySQL', 'name': 'mysql-1',
-    'dialect': 'sql-alchemy', 'interface': 'sqlalchemy', 'settings': [], 'is_sql': True, 'id': 4, 'category': 'editor', 'description': ''
+    'dialect': 'mysql', 'interface': 'sqlalchemy', 'settings': [], 'is_sql': True, 'id': 4, 'category': 'editor', 'description': ''
   },
 ]
 
