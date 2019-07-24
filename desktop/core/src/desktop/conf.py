@@ -1510,6 +1510,13 @@ DEV_EMBEDDED = Config("dev_embedded",
    help=_("Enable embedded development mode, where the page will be rendered inside a container div element.")
 )
 
+DISPLAY_APP_SWITCHER = Config(
+  key='display_app_switcher',
+  help=_('Enable or disable the upper left app switcher menu.'),
+  type=coerce_bool,
+  default=False
+)
+
 HTTP_500_DEBUG_MODE = Config(
   key='http_500_debug_mode',
   help=_('Enable or disable debugging information in the 500 internal server error response. '
