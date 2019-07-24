@@ -29,7 +29,12 @@ const TEMPLATE = `
     </a></div>
   </script>
 
+  <!-- ko if: window.DISPLAY_APP_SWITCHER -->
+  <!-- ko component: { name: 'hue-app-switcher' } --><!-- /ko -->
+  <!-- /ko -->
+  <!-- ko ifnot: window.DISPLAY_APP_SWITCHER -->
   <div class="hue-sidebar-header"></div>
+  <!-- /ko -->
   <div class="hue-sidebar-body">
     <!-- ko foreach: {data: items, as: 'item'} -->
       <!-- ko if: item.isCategory -->
@@ -207,7 +212,7 @@ class Sidebar {
     const updateActive = () => {
       this.items().forEach(item => {
         item.children.forEach(child => {
-          child.active(location.href.indexOf(child.url) !== -1)
+          child.active(location.href.indexOf(child.url) !== -1);
         });
       });
     };
