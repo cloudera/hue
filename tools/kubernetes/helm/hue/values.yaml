@@ -34,12 +34,14 @@ hue:
     use_cherrypy_server=true
     gunicorn_work_class=gevent
 
+    enable_prometheus=true
+
     [[task_server]]
     enabled=false
     broker_url=redis://redis:6379/0
     result_cache='{"BACKEND": "django_redis.cache.RedisCache", "LOCATION": "redis://redis:6379/0", "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},"KEY_PREFIX": "queries"}'
     celery_result_backend=redis://redis:6379/0
-    
+
     [impala]
     server_host=172.31.114.171
 
@@ -72,3 +74,5 @@ ingress:
   domain: "demo.gethue.com"
   email: "team@gethue.com"
   loadBalancerIp: "127.0.0.1"
+monitoring:
+  enabled: true
