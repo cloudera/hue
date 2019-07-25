@@ -67,11 +67,8 @@ def strip_scheme(path):
   
 def strip_path(path):
   """
-  Return only the end of a path given another path(Work In Progress/Not Ready)
+  Return only the end of a path given another path
   """
-  match = ABFS_PATH_RE.match(path)
-  if not match:
-    raise ValueError("Invalid ABFS URI: %s" % path)
   split_path = path.split('/')
   return split_path[len(split_path) - 1]
 
