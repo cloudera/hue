@@ -3644,7 +3644,7 @@ class Bundle(Job):
               'description': '',
               'deployment_dir': '',
               'schema_version': 'uri:oozie:bundle:0.2',
-              'kickoff': datetime.today(),
+              'kickoff': datetime.utcnow(),
               'parameters': [{'name': 'oozie.use.system.libpath', 'value': 'true'}]
           }
       }
@@ -3660,7 +3660,8 @@ class Bundle(Job):
   def get_data_for_json(self):
     _data = self.data.copy()
 
-    _data['properties']['kickoff'] = _data['properties']['kickoff'].strftime('%Y-%m-%dT%H:%M:%S')
+    if _data['properties']['kickoff'] and type(_data['properties']['kickoff']) is datetime:
+      _data['properties']['kickoff'] = _data['properties']['kickoff'].strftime('%Y-%m-%dT%H:%M:%S')
 
     return _data
 
