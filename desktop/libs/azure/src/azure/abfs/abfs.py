@@ -141,6 +141,8 @@ class ABFS(object):
     List the stat of the actual file/directory
     Returns the ABFFStat object
     """
+    if ABFS.isroot(path):
+      return ABFSStat.for_root()
     file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
     if dir_name == '':
       LOG.debug("Path being called is a Filesystem")
