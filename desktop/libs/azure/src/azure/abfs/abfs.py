@@ -30,8 +30,8 @@ from posixpath import join
 
 from azure.conf import PERMISSION_ACTION_ABFS
 import azure.abfs.__init__
+from azure.abfs.abfsstats import ABFSStat
 from urllib.parse import urlparse
-
 from hadoop.hdfs_site import get_umask_mode
 
 from hadoop.fs.exceptions import WebHdfsException
@@ -112,16 +112,14 @@ class ABFS(object):
     """
     Checks if the path is a directory (note diabled because filebrowser/views is bugged)
     """
-    return
     resp = self.stats(path)
-    return resp['x-ms-resource-type'] == 'directory' 
+    return resp.isDir
 
   def isfile(self, path):
     """
     Checks if the path is a file
     """
-    resp = self.stats(path)
-    return resp['x-ms-resource-type'] == 'file' 
+    return not self.isdir(path) 
   
   def exists(self, path):
     """
@@ -147,7 +145,8 @@ class ABFS(object):
       resp = self._statsf(file_system, params, **kwargs)
     else:
       resp= self._stats(file_system + '/' +dir_name, params, **kwargs)
-    return self._format_stats(path, resp)
+    LOG.debug("%s" %resp)
+    return ABFSStat(resp, path)
   
   def listdir_stats(self,path, params = None, **kwargs):
     """
@@ -160,7 +159,7 @@ class ABFS(object):
     file_system = azure.abfs.__init__.parse_uri(path)[0]
     for direct in self.listdir(path, params = params):
       resp = self._stats(file_system + '/' + direct, params, **kwargs) 
-      dir_stats.append(self._format_stats('abfs://' +file_system + '/' + direct,resp))
+      dir_stats.append(ABFSStat(resp, path))
     return dir_stats
   
   def listfilesystems_stats(self, params = None, **kwargs):
