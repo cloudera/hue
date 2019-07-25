@@ -15,11 +15,14 @@
 # limitations under the License.
 from __future__ import absolute_import
 
+import calendar
 import errno
 import re
 import logging
 import tempfile
 import posixpath
+import time
+
 from nose.tools import assert_not_equal
 from hadoop.fs import normpath as fs_normpath
 
@@ -122,3 +125,18 @@ def join(first,*complist):
     else:
       joined = 'abfs:/%s' % joined
   return joined
+
+
+def abfsdatetime_to_timestamp(datetime):
+  """
+  Returns timestamp (seconds) by datetime string from ABFS API responses.
+  ABFS REST API returns one types of datetime strings:
+  * `Thu, 26 Feb 2015 20:42:07 GMT` for Object HEAD requests
+    (see http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectHEAD.html);
+  """
+  # There is chance (depends on platform) to get
+  # `'z' is a bad directive in format ...` error (see https://bugs.python.org/issue6641),
+  # but S3 always returns time in GMT, so `GMT` and `.000Z` can be pruned.
+  stripped = time.strptime(datetime[:-4], '%a, %d %b %Y %H:%M:%S')
+  assert datetime[-4:] == ' GMT', 'Time [%s] is not in GMT.' % datetime
+  return int(calendar.timegm(stripped))
