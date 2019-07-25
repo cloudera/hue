@@ -27,10 +27,16 @@ e.g.
 * Hue must be behing a load balancer proxying static files. In Cloudera Manager Hue ships with HTTPD.
 * Adding more Hue instances behind the load balancer will increase performances by 50 concurrent users.
 * Database backend should be such as MySql/Postgres/Oracle. Hue does not work on SQLite as it makes concurrent calls to the database.
-* Check the number of documents in the Hue database
+* Check the number of documents in the Hue database. If they are too many (more than 100 000), delete the old records:
+  Stop the Hue service. Log on to the host of your Hue server. Go to Hue directory and run following clean up [command]({{% param baseURL %}}administrator/administration/operations/#commands):
+<pre>
+    cd /opt/cloudera/parcels/CDH/lib/hue # Hue home directory
+    ./build/env/bin/hue desktop_document_cleanup
+</pre>
+
 * There are some memory fragmentation issues in Python that manifest in Hue. Check the memory usage of Hue periodically. Browsing HDFS dir with many files, downloading a query result, copying a HDFS files are costly operations memory wise.
 
-The `Config Check` page of Hue (/hue/about/) in the administrator section will warn about detected risks. Make sure it is at zero.
+The [Config Check]({{% param baseURL %}}administrator/administration/reference/) page of Hue (`/hue/about/`) in the administrator section will warn about detected risks. Make sure it is at zero.
 
 
 ## Query Editor Performance
