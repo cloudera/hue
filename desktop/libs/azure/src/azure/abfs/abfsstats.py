@@ -33,8 +33,12 @@ class ABFSStat(object):
     except:
       self.isDir = True
       self.type = 'DIRECTORY'
-    self.atime = abfsdatetime_to_timestamp(file_stats['Date']) if file_stats['Date'] else None
-    self.mtime = abfsdatetime_to_timestamp(file_stats['Last-Modified']) if file_stats['Last-Modified'] else None
+    try:
+      self.atime = abfsdatetime_to_timestamp(file_stats['Date']) if file_stats['Date'] else None
+      self.mtime = abfsdatetime_to_timestamp(file_stats['Last-Modified']) if file_stats['Last-Modified'] else None
+    except:
+      self.atime = 0
+      self.mtime = 0
     try:
       self.size = file_stats['Content-Length']
     except:
@@ -69,6 +73,11 @@ class ABFSStat(object):
   def aclBit(self):
     return False
   
+  @classmethod
+  def for_root(cls):
+    resp = {'x-ms-resource-type' :'directory'}
+    return cls(resp, 'abfs://')
+    
   def to_json_dict(self):
     """
     Returns a dictionary for easy serialization

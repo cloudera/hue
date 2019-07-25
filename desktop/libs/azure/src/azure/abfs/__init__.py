@@ -69,6 +69,8 @@ def strip_path(path):
   """
   Return only the end of a path given another path
   """
+  if is_root(path):
+    return path
   split_path = path.split('/')
   return split_path[len(split_path) - 1]
 
