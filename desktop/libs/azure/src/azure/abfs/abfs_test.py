@@ -227,6 +227,44 @@ class ABFSTestBase(unittest.TestCase):
       actual = self.client.read(dest_path)
       expected = file(local_file).read()
       assert_equal(actual, expected, 'files do not match: %s != %s' % (len(actual), len(expected)))
+   
+   
+  def test_copy_file(self):
+    test_fs = self.test_fs
+    testdir1 = test_fs + '/testcpy1'
+    testdir2 = test_fs + '/testcpy2'
+    test_file = testdir1 + '/test.txt'
+    self.client.mkdir(testdir1)
+    self.client.mkdir(testdir2)
+    self.client.create(test_file)
+    
+    test_string = "This is a test."
+    test_len = len(test_string)
+    resp = self.client.append(test_file, test_string)
+    self.client.flush(test_file, {"position" : test_len} )
+    
+    self.client.copy(test_file, testdir2)
+    self.client.stats(testdir2 + '/test.txt')
+    resp = self.client.read(testdir2 + '/test.txt')
+    resp2 = self.client.read(test_file)
+    assert_equal(resp, resp2, "Files %s and %s are not equal" %(test_file, testdir2 + '/test.txt'))
+    
+  
+  def test_copy_dir(self):
+    test_fs = self.test_fs
+    testdir1 = test_fs + '/testcpy1'
+    testdir2 = test_fs + '/testcpy2'
+    test_dir3 = testdir1 + '/test'
+    test_dir4 = test_dir3 + '/test2'
+    self.client.mkdir(testdir1)
+    self.client.mkdir(testdir2)
+    self.client.mkdir(test_dir3)
+    self.client.mkdir(test_dir4)
+    
+    
+    self.client.copy(test_dir3, testdir2)
+    self.client.stats(testdir2 + '/test')
+    self.client.stats(testdir2 + '/test/test2')
     
   #Testing static Methods
   #------------------------------------

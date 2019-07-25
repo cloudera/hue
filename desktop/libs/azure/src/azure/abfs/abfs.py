@@ -25,6 +25,7 @@ import logging
 import threading
 import stat
 
+from math import ceil
 from posixpath import join
 
 
@@ -128,7 +129,7 @@ class ABFS(object):
     try:
       if ABFS.isroot(path):
         return True
-      self._stats(path)
+      self.stats(path)
     except WebHdfsException as e:
       if e.code == 404:
         return False
@@ -433,41 +434,44 @@ class ABFS(object):
   # --------------------------------
   def copy(self, src, dst, *args, **kwargs):
     """
-    General Copying (Work in Progress/Not Ready)
+    General Copying
     """
-    raise NotImplementedError("")
-    if self.isFile(src):
+    if self.isfile(src):
       return self.copyfile(src ,dst)    
     self.copy_remote_dir(src, dst)
           
   
   def copyfile(self, src, dst, *args, **kwargs):
     """
-    Copies a File to another location (Work in Progress/Not Ready)
+    Copies a File to another location
     """
-    raise NotImplementedError("")
     new_path = dst + '/' + azure.abfs.__init__.strip_path(src)
     self.create(new_path)
-    
-    while True:
-      file = self.read(dst)
-      size = len(file)
-      self.append(new_path, file_data, size)
-
-      if size < self.get_upload_chuck_size():
-        break
-    
-    self.flush(new_path, {'position' : str(size) })
+    chunk_size = self.get_upload_chuck_size()
+    file = self.read(src)
+    size = len(file)
+    cycles = ceil(float(size) / chunk_size)
+    for i in range(0,cycles):
+      chunk = size % chunk_size
+      if i != cycles or chunk == 0:
+        length = chunk_size
+      else:
+        length = chunk
+      self.append(new_path, file[i*chunk_size:i*chunk_size + length], length)
+    LOG.debug("%s" %size)
+    self.flush(new_path, {'position' : int(size) })
 
   def copy_remote_dir(self, src, dst, *args, **kwargs):
     """
     Copies the entire contents of a directory to another location (Work in Progress/Not Ready)
     """
-    raise NotImplementedError("")
     dst = dst + '/' + azure.abfs.__init__.strip_path(src)
+    LOG.debug("%s" %dst)
     self.mkdir(dst)
     other_files = self.listdir(src)
     for x in other_files:
+      x = src + '/' + azure.abfs.__init__.strip_path(x)
+      LOG.debug("%s" %x)
       self.copy(x, dst)
 
   def rename(self, old, new): 
