@@ -29,7 +29,7 @@ from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 from kazoo.client import KazooClient
 
-from desktop.conf import CLUSTER_ID
+from desktop.conf import CLUSTER_ID, has_connectors
 from desktop.lib.django_util import format_preserving_redirect
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.parameterization import substitute_variables
@@ -92,7 +92,7 @@ def get(user, query_server=None, cluster=None):
 
 
 def get_query_server_config(name='beeswax', connector=None):
-  if connector:
+  if connector and has_connectors(): # FIXME: Currently this doesn't work when has_connectors is False because options is empty
     connector_name = full_connector_name = connector['type']
     compute_name = None
     if connector.get('compute'):
