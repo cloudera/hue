@@ -15,11 +15,9 @@
 # limitations under the License.
 from __future__ import absolute_import
 
-from builtins import object
 import stat
-import posixpath
 
-from azure.abfs.__init__ import strip_path
+from azure.abfs.__init__ import strip_path, abfsdatetime_to_timestamp
 from django.utils.encoding import smart_str
 
 class ABFSStat(object):
@@ -35,8 +33,8 @@ class ABFSStat(object):
     except:
       self.isDir = True
       self.type = 'DIRECTORY'
-    self.atime = file_stats['Date']
-    self.mtime = file_stats['Last-Modified']
+    self.atime = abfsdatetime_to_timestamp(file_stats['Date']) if file_stats['Date'] else None
+    self.mtime = abfsdatetime_to_timestamp(file_stats['Last-Modified']) if file_stats['Last-Modified'] else None
     try:
       self.size = file_stats['Content-Length']
     except:
