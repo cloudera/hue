@@ -35,7 +35,7 @@
   % endif
 
   <controls>
-     <kick-off-time>${ bundle.kick_off_time_utc }</kick-off-time>
+     <kick-off-time>${ bundle.data['properties']['kickoff'] }</kick-off-time>
   </controls>
 
 

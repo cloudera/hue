@@ -19,6 +19,7 @@ from builtins import str
 import json
 import logging
 
+from datetime import datetime
 from django.urls import reverse
 from django.forms.formsets import formset_factory
 from django.shortcuts import redirect
@@ -916,6 +917,7 @@ def copy_bundle(request):
 @check_document_access_permission()
 def submit_bundle(request, doc_id):
   bundle = Bundle(document=Document2.objects.get(id=doc_id))
+  bundle._data['properties']['kickoff'] = datetime.utcnow()
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
 
   if request.method == 'POST':

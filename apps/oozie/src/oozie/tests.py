@@ -51,13 +51,14 @@ from jobsub.models import OozieDesign, OozieMapreduceAction
 from liboozie import oozie_api
 from liboozie.conf import OOZIE_URL
 from liboozie.oozie_api_tests import OozieServerProvider
+from liboozie.submission2 import Submission
 from liboozie.types import WorkflowList, Workflow as OozieWorkflow, Coordinator as OozieCoordinator,\
   Bundle as OozieBundle, CoordinatorList, WorkflowAction, BundleList
 
 from oozie.conf import ENABLE_CRON_SCHEDULING, ENABLE_V2
 from oozie.models import Dataset, Workflow, Node, Kill, Link, Job, Coordinator, History,\
   find_parameters, NODE_TYPES, Bundle
-from oozie.models2 import _get_hiveserver2_url
+from oozie.models2 import _get_hiveserver2_url, Bundle as Bundle2
 from oozie.utils import workflow_to_dict, model_to_dict, smart_path, contains_symlink, convert_to_server_timezone
 from oozie.importlib.workflows import import_workflow
 from oozie.importlib.jobdesigner import convert_jobsub_design
@@ -240,7 +241,8 @@ class MockOozieApi(object):
            hive2=org.apache.oozie.action.hadoop.Hive2Credentials
     """
     return {
-        'oozie.credentials.credentialclasses': oozie_credentialclasses
+        'oozie.credentials.credentialclasses': oozie_credentialclasses,
+        'oozie.processing.timezone': 'GMT-0800'
     }
 
   def get_job_status(self, job_id):
@@ -2115,7 +2117,6 @@ class TestEditorBundle(OozieMockBase):
 
 
   def test_bundle_gen_xml(self):
-    raise SkipTest()
     bundle = create_bundle(self.c, self.user)
 
     assert_true(
@@ -2129,10 +2130,31 @@ class TestEditorBundle(OozieMockBase):
     </property>
   </parameters>
   <controls>
-     <kick-off-time>2012-07-01T00:00Z</kick-off-time>
+     <kick-off-time>%s</kick-off-time>
   </controls>
 </bundle-app>
-""" in bundle.to_xml(), bundle.to_xml())
+""" % bundle.kick_off_time_utc in bundle.to_xml(), bundle.to_xml())
+
+  def test_model2_bundle_gen_xml(self):
+    bundle = Bundle2()
+    converted_kickoff_time = convert_to_server_timezone(bundle.kick_off_time_utc)
+    Submission(self.user, bundle)
+
+    assert_true(
+"""<bundle-app name="My Bundle"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="uri:oozie:bundle:0.2">
+  <parameters>
+    <property>
+        <name>oozie.use.system.libpath</name>
+        <value>true</value>
+    </property>
+  </parameters>
+  <controls>
+     <kick-off-time>%s</kick-off-time>
+  </controls>
+</bundle-app>
+""" % converted_kickoff_time in bundle.to_xml(), bundle.to_xml())
 
 
   def test_create_bundled_coordinator(self):

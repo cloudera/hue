@@ -137,7 +137,9 @@ def contains_symlink(path, mapping):
   return any([var in mapping and '#' in mapping[var] for var in vars]) or '#' in path
 
 def utc_datetime_format(utc_time):
-  return utc_time.strftime(UTC_TIME_FORMAT)
+  if utc_time and type(utc_time) is datetime:
+    return utc_time.strftime(UTC_TIME_FORMAT)
+  return utc_time
 
 
 def oozie_to_django_datetime(dt_string):
