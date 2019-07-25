@@ -223,6 +223,10 @@ class ABFSTestBase(unittest.TestCase):
       
       assert_equal(0, response['status'], response)
       stats = self.client.stats(dest_path)
+
+      actual = self.client.read(dest_path)
+      expected = file(local_file).read()
+      assert_equal(actual, expected, 'files do not match: %s != %s' % (len(actual), len(expected)))
     
   #Testing static Methods
   #------------------------------------

@@ -128,7 +128,7 @@ class ABFS(object):
     try:
       if ABFS.isroot(path):
         return True
-      self.stats(path)
+      self._stats(path)
     except WebHdfsException as e:
       if e.code == 404:
         return False
@@ -138,6 +138,7 @@ class ABFS(object):
   def stats(self, path, params = None, **kwargs):
     """
     List the stat of the actual file/directory
+    Returns the ABFFStat object
     """
     file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
     if dir_name == '':
@@ -151,6 +152,7 @@ class ABFS(object):
   def listdir_stats(self,path, params = None, **kwargs):
     """
     List the stats for the directories inside the specified path
+    Returns the Multiple ABFFStat object
     """
     if ABFS.isroot(path):
       LOG.warn("Path being called is a Filesystem")
@@ -173,7 +175,8 @@ class ABFS(object):
   
   def _stats(self, schemeless_path, params = None, **kwargs):
     """
-    Container function for both stats
+    Container function for both stats,
+    Returns the header of the result
     """
     if params is None:
       params = {}
@@ -184,31 +187,13 @@ class ABFS(object):
   def _statsf(self, schemeless_path, params = None, **kwargs):
     """
     Continer function for both stats but if it's a file system
+    Returns the header of the result
     """
     if params is None:
       params = {}
     params['resource'] = 'filesystem'
     res = self._root._invoke('HEAD', schemeless_path, params, headers = self._getheaders(), **kwargs)
     return res.headers
-  
-  def _format_stats(self, path, resp):
-    """
-    Another function fo make stats comply with HDFSupload (would probably change later)
-    """
-    resp['path'] = path
-    resp['name'] = azure.abfs.__init__.strip_path(path)
-    resp['mtime'] = resp.pop('Last-Modified')
-    resp['aclBit'] = 'false'
-    resp['mode'] = 0777
-    if self.isdir(path):
-      resp['mode'] |= stat.S_IFDIR
-    else:
-      resp['mode']|= stat.S_IFREG
-    try:
-      resp['size'] = resp.pop('Content-Length')
-    except:
-      resp['size'] = '0'
-    return resp
     
   def listdir(self, path, params = None, **kwargs):
     """
@@ -337,17 +322,21 @@ class ABFS(object):
   
   # Alter Files
   # --------------------------------
-  def append(self, path, data , size = None, offset =0 , *args, **kwargs):
+  def append(self, path, data, size = 0, offset =0 ,params = None, *args, **kwargs):
     """
     Appends the data to a file
     """
     path = azure.abfs.__init__.strip_scheme(path)
-    resp = self._stats(path)
-    params = {'position' : int(resp['Content-Length']) + offset, 'action' : 'append'}
-    LOG.debug("%s" %params)
+    if params is None:
+      LOG.warn("Params not specified, Append will take longer")
+      resp = self._stats(path)
+      params = {'position' : int(resp['Content-Length']) + offset, 'action' : 'append'}
+      LOG.debug("%s" %params)
+    else:
+      params['action'] = 'append'
     headers = {}
-    if size is None:
-      headers['Content-Length'] = self._getsizeofdata(data)
+    if size == 0:
+      headers['Content-Length'] = str(len(data))
     else:
       headers['Content-Length'] = str(size)
     LOG.debug("%s" %headers['Content-Length'])
@@ -358,9 +347,12 @@ class ABFS(object):
     Flushes the data(i.e. writes appended data to File)
     """
     path = azure.abfs.__init__.strip_scheme(path)
-    resp = self._stats(path)
     if params is None:
-      params = {'position' : int(resp['Content-Length'])}
+      LOG.warn("Params not specified")
+      params = {'position' : 0}
+    if 'position' not in params.keys():
+      LOG.warn("Position is not specified")
+      params['position'] = 0
     params['action'] = 'flush'
     if headers is None:
       headers = {}
@@ -550,12 +542,4 @@ class ABFS(object):
       header = {}
     header.update(self._getheaders())
     return self._root.invoke('PATCH', schemeless_path, param, data, headers = header, **kwargs)
-    
-  def _getsizeofdata(self,data):
-    """
-    A function for determing the size of some sort of type
-    """
-    if isinstance(data, basestring):
-      return str(len(data))
-    return str(0)
       

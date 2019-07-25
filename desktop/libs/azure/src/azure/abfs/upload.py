@@ -59,8 +59,7 @@ class ABFSFileUploadHandler(FileUploadHandler):
     if self._is_abfs_upload():
       self.filesystem, self.directory = parse_uri(self.destination)[:2]
        # Verify that the path exists
-      test = self._fs.stats(self.destination)
-      LOG.debug("%s" %test)
+      self._fs.stats(self.destination)
       
     LOG.debug("Chunk size = %d" %DEFAULT_WRITE_SIZE)
 
@@ -88,9 +87,8 @@ class ABFSFileUploadHandler(FileUploadHandler):
   def receive_data_chunk(self, raw_data, start):
     if self._is_abfs_upload():
       try:
-        self._part_size = len(raw_data)
         LOG.debug("ABFSFileUploadHandler uploading file part with size: %s" %self._part_size)
-        self._fs.append(self.target_path, raw_data, size = self._part_size, offset = start)
+        self._fs.append(self.target_path, raw_data, params = {'position' : int(start)})
         return None
       except Exception as e:
         self._fs.remove(self.target_path)
