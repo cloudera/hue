@@ -172,8 +172,10 @@ class ABFS(object):
     Lists the stats inside the File Systems  
     """
     stats = []
-    for file_system in self.listfilesystems():
-      stats.append(ABFSStat(self._statsf(file_system, params, **kwargs),"abfs://" + file_system))
+    res = self._root._invoke("GET", params = {"resource" : "account"}, headers = self._getheaders() )
+    resp = res.json()
+    for x in resp['filesystems']:
+      stats.append(ABFSStat.for_filesystems(res.headers, x))
     return stats
   
   def _stats(self, schemeless_path, params = None, **kwargs):

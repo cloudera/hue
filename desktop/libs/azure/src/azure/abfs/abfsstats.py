@@ -77,6 +77,13 @@ class ABFSStat(object):
   def for_root(cls):
     resp = {'x-ms-resource-type' :'directory'}
     return cls(resp, 'abfs://')
+  
+  @classmethod
+  def for_filesystems(cls,headers,resp):
+    resp['Date'] = headers['date']
+    resp['Last-Modified'] = resp.pop('lastModified')
+    resp['x-ms-resource-type'] = 'directory'
+    return cls(resp, 'abfs://' + resp['name'])
     
   def to_json_dict(self):
     """
