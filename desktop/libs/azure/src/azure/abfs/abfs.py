@@ -28,9 +28,9 @@ import stat
 from math import ceil
 from posixpath import join
 
-
 from azure.conf import PERMISSION_ACTION_ABFS
 import azure.abfs.__init__
+from azure.abfs.abfsfile import ABFSFile
 from azure.abfs.abfsstats import ABFSStat
 from urllib.parse import urlparse
 from hadoop.hdfs_site import get_umask_mode
@@ -250,7 +250,7 @@ class ABFS(object):
     return azure.abfs.__init__.normpath(path)
 
   def open(self, path, option = 'r', *args, **kwargs):
-    raise NotImplementedError("")
+    return ABFSFile(self,path, option )
   
   @staticmethod
   def parent_path(path):
