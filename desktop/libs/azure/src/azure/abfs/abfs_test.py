@@ -69,12 +69,9 @@ class ABFSTestBase(unittest.TestCase):
     LOG.debug("%s" %pathing)
     assert_true(pathing is not None, pathing)
     
-    directory = self.client.listdir('abfs://' + filesystems[0] + '/' + pathing[0], {'recursive': 'true'})
+    directory = self.client.listdir('abfs://' + filesystems[0] + '/' + pathing[0] )
     LOG.debug("%s" %directory)
     assert_true(directory is not None, directory)
-    
-    ok = self.client.listdir('abfs://' + filesystems[0] + '/' + directory[0], {'recursive': 'true'})
-    LOG.debug("%s" %ok)
     
     directory = self.client.listdir(self.test_fs)
     LOG.debug("%s" %directory)

@@ -24,25 +24,18 @@ class ABFSStat(object):
   DIR_MODE = 0o777 | stat.S_IFDIR
   FILE_MODE = 0o666 | stat.S_IFREG
 
-  def __init__(self, file_stats, path):
+  def __init__(self, isDir, atime, mtime, size, path):
     self.name = strip_path(path)
     self.path = path
-    try:
-      self.isDir = file_stats['x-ms-resource-type'] == 'directory'
-      self.type = file_stats['x-ms-resource-type'].upper()
-    except:
-      self.isDir = True
-      self.type = 'DIRECTORY'
+    self.isDir = isDir
+    self.type = 'DIRECTOY' if isDir else 'FILE'
     try:
       self.atime = abfsdatetime_to_timestamp(file_stats['Date']) if file_stats['Date'] else None
       self.mtime = abfsdatetime_to_timestamp(file_stats['Last-Modified']) if file_stats['Last-Modified'] else None
     except:
       self.atime = 0
       self.mtime = 0
-    try:
-      self.size = file_stats['Content-Length']
-    except:
-      self.size = '0'
+    self.size = size
     
   def __getitem__(self, key):
     try:
@@ -75,15 +68,35 @@ class ABFSStat(object):
   
   @classmethod
   def for_root(cls):
-    resp = {'x-ms-resource-type' :'directory'}
-    return cls(resp, 'abfs://')
+    return cls(True, 0, 0, 0, 'abfs://')
   
   @classmethod
   def for_filesystems(cls,headers,resp):
-    resp['Date'] = headers['date']
-    resp['Last-Modified'] = resp.pop('lastModified')
-    resp['x-ms-resource-type'] = 'directory'
-    return cls(resp, 'abfs://' + resp['name'])
+    atime = headers['date']
+    mtime = resp['lastModified']
+    return cls(True, atime, mtime, 0, 'abfs://' + resp['name'])
+  
+  @classmethod
+  def for_directory(cls,headers,resp, path):
+    atime = headers['date']
+    mtime = resp['lastModified']
+    try:
+      size = resp['contentLength']
+      isDir = False
+    except:
+      size = 0
+      isDir = True
+    return cls(isDir, atime, mtime, size, path)
+  
+  @classmethod
+  def for_single(cls,resp, path):
+    try:
+      size = resp['Content-Length']
+      isDir = False
+    except:
+      size = 0
+      isDir = True
+    return cls(isDir, resp['date'],resp['Last-Modified'], size, path)
     
   def to_json_dict(self):
     """

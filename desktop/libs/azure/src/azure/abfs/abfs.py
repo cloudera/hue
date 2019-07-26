@@ -150,21 +150,29 @@ class ABFS(object):
     else:
       resp= self._stats(file_system + '/' +dir_name, params, **kwargs)
     LOG.debug("%s" %resp)
-    return ABFSStat(resp, path)
+    return ABFSStat.for_single(resp, path)
   
   def listdir_stats(self,path, params = None, **kwargs):
     """
     List the stats for the directories inside the specified path
-    Returns the Multiple ABFFStat object
+    Returns the Multiple ABFFStat object #note change later for recursive cases
     """
     if ABFS.isroot(path):
       LOG.warn("Path being called is a Filesystem")
       return self.listfilesystems_stats(params = None, **kwargs)
     dir_stats = []
-    file_system = azure.abfs.__init__.parse_uri(path)[0]
-    for direct in self.listdir(path, params = params):
-      resp = self._stats(file_system + '/' + direct, params, **kwargs) 
-      dir_stats.append(ABFSStat(resp, path + '/' + direct))
+    file_system, directory_name = azure.abfs.__init__.parse_uri(path)[:2]
+    if params is None:
+      params = {}
+    if 'recursive' not in params.keys():
+      params['recursive'] = 'false'
+    params['resource'] = 'filesystem'
+    if directory_name != "":
+      params['directory'] = directory_name
+    res = self._root._invoke("GET",file_system, params, headers= self._getheaders(), **kwargs)
+    resp = res.json()
+    for x in resp['paths']:
+      dir_stats.append(ABFSStat.for_directory(res.headers, x, path + "/" + x['name']))
     return dir_stats
   
   def listfilesystems_stats(self, params = None, **kwargs):
@@ -207,27 +215,16 @@ class ABFS(object):
     if ABFS.isroot(path):
       LOG.warn("Path being called is a Filesystem")
       return self.listfilesystems(params, **kwargs)
-    file_system, directory_name = azure.abfs.__init__.parse_uri(path)[:2]
-    if params is None:
-      params = {}
-    if 'recursive' not in params.keys():
-      params['recursive'] = 'false'
-    params['resource'] = 'filesystem'
-    if directory_name != "":
-      params['directory'] = directory_name
-    resp = self._root.get(file_system, params, headers= self._getheaders(), **kwargs)
-    return [x['name'] for x in resp['paths']]
+    listofDir = self.listdir_stats(path, params)
+    return [x.name for x in listofDir]
   
   
   def listfilesystems(self, params=None,**kwargs):
     """
     Lists the names of the File Systems  
     """
-    if params is None:
-      params = {}
-    params['resource'] = 'account'
-    resp = self._root.get('',params, headers= self._getheaders(), **kwargs)
-    return [x['name'] for x in resp['filesystems']]
+    listofFileSystems = self.listfilesystems_stats(params)
+    return [x.name for x in listofFileSystems]
   
   # Find or alter information about the URI path
   # --------------------------------
