@@ -327,7 +327,7 @@ def get_api(request, snippet):
     if compute == '""' or compute == 'undefined':
       compute = None
     if not compute and snippet.get('compute'): # Via notebook.ko.js
-      interpreter['compute'] =  snippet['compute']
+      interpreter['compute'] = snippet['compute']
 
   LOG.debug('Selected interpreter %s interface=%s compute=%s' % (
     interpreter['type'],
