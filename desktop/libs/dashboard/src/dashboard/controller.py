@@ -22,12 +22,12 @@ import logging
 
 from django.db.models import Q
 
-from desktop.conf import USE_NEW_EDITOR
+from desktop.auth.backend import is_admin
+from desktop.conf import USE_NEW_EDITOR, ENABLE_ORGANIZATIONS
 from desktop.models import Document2, Document, SAMPLE_USER_OWNERS
 
 from dashboard.models import Collection2
 
-from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
@@ -46,7 +46,8 @@ class DashboardController(object):
   def get_shared_search_collections(self):
     # Those are the ones appearing in the menu
     if USE_NEW_EDITOR.get():
-      return Document2.objects.filter(Q(owner=self.user) | Q(owner__username__in=SAMPLE_USER_OWNERS), type='search-dashboard').order_by('-id')
+      qattr = {'owner__email__in' if ENABLE_ORGANIZATIONS.get() else 'owner__username__in': SAMPLE_USER_OWNERS}
+      return Document2.objects.filter(Q(owner=self.user) | Q(**qattr), type='search-dashboard').order_by('-id')
     else:
       docs = Document.objects.filter(Q(owner=self.user) | Q(owner__username__in=SAMPLE_USER_OWNERS), extra='search-dashboard')
       return [d.content_object for d in docs.order_by('-id')]
