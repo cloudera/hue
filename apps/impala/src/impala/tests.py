@@ -132,6 +132,7 @@ class TestMockedImpala(object):
         assert_true(ddms.client.query.call_count == 3) # Third call
         assert_true('customers' not in ddms.client.query.call_args[0][0].hql_query) # Full invalidate
 
+
 class TestImpalaIntegration(object):
   integration = True
 

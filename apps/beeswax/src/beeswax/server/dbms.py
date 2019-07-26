@@ -91,27 +91,8 @@ def get(user, query_server=None, cluster=None):
 
 
 def get_query_server_config(name='beeswax', connector=None):
-  if connector and has_connectors(): # FIXME: Currently this doesn't work when has_connectors is False because options is empty
-    connector_name = full_connector_name = connector['type']
-    compute_name = None
-    if connector.get('compute'):
-      compute_name = connector['compute']['name']
-      full_connector_name = '%s-%s' % (connector_name, compute_name)
-    LOG.debug("Query cluster connector %s compute %s" % (connector_name, compute_name))
-
-    query_server = {
-        'server_name': full_connector_name,
-        'server_host': (connector['compute']['options'] if 'compute' in connector else connector['options'])['server_host'],
-        'server_port': int((connector['compute']['options'] if 'compute' in connector else connector['options'])['server_port']),
-        'principal': 'TODO',
-        'auth_username': AUTH_USERNAME.get(),
-        'auth_password': AUTH_PASSWORD.get(),
-
-        'impersonation_enabled': False, # TODO, Impala only, to add to connector class
-        'SESSION_TIMEOUT_S': 15 * 60,
-        'querycache_rows': 1000,
-        'QUERY_TIMEOUT_S': 15 * 60,
-    }
+  if connector and has_connectors(): # TODO: Give empty connector when no connector in use
+    query_server = get_query_server_config_via_connector(connector)
   else:
     LOG.debug("Query cluster %s" % name)
     if name == "llap":
@@ -212,19 +193,27 @@ def get_query_server_config(name='beeswax', connector=None):
   return query_server
 
 
-def get_cluster_config(cluster=None):
-  if cluster and cluster.get('connector'): # Connector interface
-    cluster_config = cluster
-  elif cluster and cluster.get('id') != CLUSTER_ID.get():
-    if 'altus:dataware:k8s' in cluster['id']:
-      compute_end_point = cluster['compute_end_point'][0] if type(cluster['compute_end_point']) == list else cluster['compute_end_point'] # TODO getting list from left assist
-      cluster_config = {'server_host': compute_end_point, 'name': cluster['name']} # TODO get port too
-    else:
-      cluster_config = Cluster(user=None).get_config(cluster['id']) # Direct cluster # Deprecated
-  else:
-    cluster_config = None
+def get_query_server_config_via_connector(connector):
+  connector_name = full_connector_name = connector['type']
+  compute_name = None
+  if connector.get('compute'):
+    compute_name = connector['compute']['name']
+    full_connector_name = '%s-%s' % (connector_name, compute_name)
+  LOG.debug("Query cluster connector %s compute %s" % (connector_name, compute_name))
 
-  return cluster_config
+  return {
+      'server_name': full_connector_name,
+      'server_host': (connector['compute']['options'] if 'compute' in connector else connector['options'])['server_host'],
+      'server_port': int((connector['compute']['options'] if 'compute' in connector else connector['options'])['server_port']),
+      'principal': 'TODO',
+      'auth_username': AUTH_USERNAME.get(),
+      'auth_password': AUTH_PASSWORD.get(),
+
+      'impersonation_enabled': False, # TODO, Impala only, to add to connector class
+      'SESSION_TIMEOUT_S': 15 * 60,
+      'querycache_rows': 1000,
+      'QUERY_TIMEOUT_S': 15 * 60,
+  }
 
 
 class QueryServerException(Exception):
