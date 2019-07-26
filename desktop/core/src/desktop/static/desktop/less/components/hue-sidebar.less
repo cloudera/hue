@@ -19,7 +19,7 @@
 @animation-duration-base: 0.2s;
 @gradient-end: #023259;
 @gradient-start: @cui-gray-800;
-@header-bg-open: rgb(28, 36, 41);
+@header-bg-open: @hue-primary-color-dark;
 @header-bg: @hue-primary-color-dark;
 @help-drawer-width: 400px;
 @item-active-border: @hue-primary-color-dark;
@@ -32,6 +32,10 @@
 @sidebar-header-height: 56px;
 @sidebar-item-height: 32px;
 @sidebar-width: 248px;
+
+.svg-hue-sidebar-logo-main {
+  fill: currentColor !important;
+}
 
 .hue-sidebar {
   .flex(0 0 @sidebar-width);
@@ -72,7 +76,6 @@
   }
 
   .hue-sidebar-header {
-
     .display-flex;
     .flex-shrink(0);
     .flex-box-align(center);
@@ -113,6 +116,18 @@
       .flex-align-items(center);
 
       justify-content: center;
+    }
+
+    .hue-sidebar-logo {
+      margin-left: 49px;
+      height: 32px;
+      overflow-x: hidden;
+      color: @cui-white;
+    }
+
+    .hue-sidebar-logo svg {
+      height: 32px;
+      width: 100px;
     }
   }
 
@@ -220,6 +235,12 @@
 
     .hue-sidebar-header {
       padding: 0 12px;
+
+      .hue-sidebar-logo {
+        margin-left: 0;
+        width: 32px;
+        color: @cui-white;
+      }
 
       .hue-app-switcher-trigger svg {
         width: 32px;

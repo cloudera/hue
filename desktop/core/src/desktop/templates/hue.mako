@@ -200,10 +200,6 @@ ${ hueIcons.symbols() }
             <a class="hamburger hamburger-hue pull-left" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
               <span class="hamburger-box"><span class="hamburger-inner"></span></span>
             </a>
-
-            <a class="brand" data-bind="hueLink: '/home/'" href="javascript: void(0);" title="${_('Documents')}">
-              <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
-            </a>
             % endif
           % endif
 
