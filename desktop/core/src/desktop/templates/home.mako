@@ -121,7 +121,7 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
            <li class="dropdown">
               <a href="#" data-toggle="dropdown"><i class="fa fa-plus-circle"></i> ${_('New document')}</a>
               <ul class="dropdown-menu" role="menu">
-                % if 'beeswax' in apps:
+                % if 'hive' in apps:
                   <li><a href="${ url('beeswax:index') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}</a></li>
                 % endif
                 % if 'impala' in apps:
@@ -394,7 +394,7 @@ ${ commonshare() | n,unicode }
 
     $("#tagsNewBtn").on("click", function () {
       var tag_name = $("#tagsNew").val();
-  
+
     if ($.trim(tag_name) == "") {
       $("#saveProjectAlert span").text("${_('File name is required.')}");
       $("#saveProjectAlert").show();
