@@ -24,7 +24,7 @@ import I18n from 'utils/i18n';
 
 const TEMPLATE = `
   <script type="text/html" id="sidebar-item">
-    <div class="item-wrapper"><a href="javascript: void(0);" data-bind="hueLink: item.url, attr: { 'aria-label': item.displayName, 'data-tooltip': item.displayName }, css: { 'active': item.active }" class="item">
+    <div class="item-wrapper"><a href="javascript: void(0);" data-bind="hueLink: item.url, publish: 'hue.sidebar.update.active', attr: { 'aria-label': item.displayName, 'data-tooltip': item.displayName }, css: { 'active': item.active }" class="item">
       <div class="icon" data-bind="hueAppIcon: item.icon"></div><span data-bind="text: item.displayName"></span>
     </a></div>
   </script>
@@ -63,6 +63,7 @@ class SidebarItem {
     this.icon = options.icon;
     this.children = options.children;
     this.name = options.name;
+    this.type = options.type;
 
     this.active = ko.observable(false);
   }
@@ -85,6 +86,29 @@ class Sidebar {
     apiHelper.withTotalStorage('hue.sidebar', 'collabse', this.collapsed, true);
 
     this.items = ko.observableArray();
+    this.lastAppName = undefined;
+
+    const updateActive = () => {
+      this.items().forEach(item => {
+        item.children.forEach(child => {
+          let active = false;
+          if (this.lastAppName === 'editor') {
+            active = child.type === 'editor';
+          } else if (this.lastAppName === 'filebrowser') {
+            if (location.href.indexOf('=S3A') !== -1) {
+              active = child.type === 's3';
+            } else if (location.href.indexOf('=adl') !== -1) {
+              active = child.type === 'adls';
+            } else {
+              active = child.type === 'hdfs';
+            }
+          } else {
+            active = location.href.indexOf(child.url) !== -1;
+          }
+          child.active(active);
+        });
+      });
+    };
 
     huePubSub.subscribe('cluster.config.set.config', clusterConfig => {
       const items = [];
@@ -121,7 +145,8 @@ class Sidebar {
               new SidebarItem({
                 displayName: I18n('Editor'),
                 url: editor['page'],
-                icon: 'editor'
+                icon: 'editor',
+                type: 'editor'
               })
             );
           } else {
@@ -129,7 +154,8 @@ class Sidebar {
               new SidebarItem({
                 displayName: appConfig['editor']['displayName'],
                 url: appConfig['editor']['page'],
-                icon: 'editor'
+                icon: 'editor',
+                type: 'editor'
               })
             );
           }
@@ -140,7 +166,8 @@ class Sidebar {
               new SidebarItem({
                 displayName: appConfig[appName]['displayName'],
                 url: appConfig[appName]['page'],
-                icon: appName
+                icon: appName,
+                type: appName
               })
             );
           }
@@ -160,7 +187,8 @@ class Sidebar {
           new SidebarItem({
             displayName: I18n('Documents'),
             url: '/home/',
-            icon: 'documents'
+            icon: 'documents',
+            type: 'home'
           })
         );
         if (appConfig['browser'] && appConfig['browser']['interpreters']) {
@@ -169,7 +197,8 @@ class Sidebar {
               new SidebarItem({
                 displayName: browser.displayName,
                 url: browser.page,
-                icon: browser.type
+                icon: browser.type,
+                type: browser.type
               })
             );
           });
@@ -186,11 +215,12 @@ class Sidebar {
 
         const sdkItems = [];
         if (appConfig['sdkapps'] && appConfig['sdkapps']['interpreters']) {
-          appConfig['sdkapps']['interpreters'].forEach(browser => {
+          appConfig['sdkapps']['interpreters'].forEach(sdkInterpreter => {
             sdkItems.push(
               new SidebarItem({
-                displayName: browser['displayName'],
-                url: browser['page']
+                displayName: sdkInterpreter['displayName'],
+                url: sdkInterpreter['page'],
+                type: sdkInterpreter.type
               })
             );
           });
@@ -207,25 +237,21 @@ class Sidebar {
       }
 
       this.items(items);
+      updateActive();
     });
-
-    const updateActive = () => {
-      this.items().forEach(item => {
-        item.children.forEach(child => {
-          child.active(location.href.indexOf(child.url) !== -1);
-        });
-      });
-    };
 
     let throttle = -1;
     huePubSub.subscribe('set.current.app.name', appName => {
-      window.clearTimeout(throttle);
       if (!appName) {
         return;
       }
+      this.lastAppName = appName;
+      window.clearTimeout(throttle);
       throttle = window.setTimeout(updateActive, 20);
     });
     updateActive();
+
+    huePubSub.subscribe('hue.sidebar.update.active', updateActive);
   }
 
   toggleCollapse() {
