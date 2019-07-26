@@ -204,6 +204,7 @@ INSTALLED_APPS = [
     # App that keeps track of failed logins.
     'axes',
     'webpack_loader',
+    'django_prometheus',
     #'django_celery_results',
 ]
 
@@ -693,7 +694,6 @@ if desktop.conf.TASK_SERVER.ENABLED.get():
 
 
 if desktop.conf.ENABLE_PROMETHEUS.get():
-  INSTALLED_APPS.append('django_prometheus')
   MIDDLEWARE_CLASSES.insert(0, 'django_prometheus.middleware.PrometheusBeforeMiddleware')
   MIDDLEWARE_CLASSES.append('django_prometheus.middleware.PrometheusAfterMiddleware')
 
