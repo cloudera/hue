@@ -182,7 +182,7 @@ ${ hueIcons.symbols() }
 <input style="display:none" readonly autocomplete="false" type="password" name="fakepasswordremembered"/>
 
 <div class="hue-page">
-  <div class="hue-sidebar" data-bind="component: { name: 'hue-sidebar', params: {  } }"></div>
+  <div class="hue-sidebar collapsed" data-bind="component: { name: 'hue-sidebar', params: {  } }"></div>
 
   <div class="main-page">
     % if banner_message or conf.CUSTOM.BANNER_TOP_HTML.get():
