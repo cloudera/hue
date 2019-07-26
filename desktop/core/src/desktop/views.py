@@ -35,12 +35,12 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from django.http.response import StreamingHttpResponse
 from django.urls import reverse
-from wsgiref.util import FileWrapper
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 from configobj import ConfigObj, get_extra_values, ConfigObjError
-
+from wsgiref.util import FileWrapper
+from webpack_loader.utils import get_files
 import django.views.debug
 
 import desktop.conf
@@ -62,7 +62,6 @@ from desktop.log.access import access_log_level, access_warn, AccessInfo
 from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _reset_all_debug, get_all_debug as _get_all_debug
 from desktop.models import Settings, hue_version, _get_apps, UserPreferences
 
-from webpack_loader.utils import get_files
 
 LOG = logging.getLogger(__name__)
 

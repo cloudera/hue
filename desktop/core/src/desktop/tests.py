@@ -28,25 +28,25 @@ import uuid
 import proxy.conf
 import tempfile
 
-from nose.plugins.attrib import attr
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises, nottest
+from configobj import ConfigObj
+from django.db.models import query, CharField, SmallIntegerField
 from django.core.management import call_command
 from django.core.paginator import Paginator
 from django.conf.urls import url
 from django.contrib.auth.models import User
 from django.db import connection
 from django.urls import reverse
+from django.test.client import Client
+from django.views.static import serve
 from django.http import HttpResponse
-from django.db.models import query, CharField, SmallIntegerField
-
-from configobj import ConfigObj
-
-from settings import DATABASES
+from nose.plugins.attrib import attr
+from nose.plugins.skip import SkipTest
+from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises, nottest
 
 from beeswax.conf import HIVE_SERVER_HOST
 from pig.models import PigScript
 from useradmin.models import GroupPermission
+from settings import DATABASES
 
 import desktop
 import desktop.conf
@@ -54,7 +54,9 @@ import desktop.urls
 import desktop.redaction as redaction
 import desktop.views as views
 
+from desktop.auth.backend import rewrite_user
 from desktop.appmanager import DESKTOP_APPS
+from desktop.middleware import DJANGO_VIEW_AUTH_WHITELIST
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.conf import validate_path
 from desktop.lib.django_util import TruncatingModel
@@ -67,8 +69,8 @@ from desktop.models import Directory, Document, Document2, get_data_link, _versi
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
 from desktop.views import check_config, home, generate_configspec, load_confs, collect_validation_messages
-from desktop.auth.backend import rewrite_user
 from dashboard.conf import HAS_SQL_ENABLED
+
 
 LOG = logging.getLogger(__name__)
 
@@ -143,6 +145,17 @@ def test_skip_wizard():
   c.cookies['hueLandingPage'] = ''
   response = c.get('/', follow=True)
   assert_true(['home.mako' in _template.filename for _template in response.templates], [_template.filename for _template in response.templates])
+
+def test_public_views():
+  c = Client()
+
+  for view in DJANGO_VIEW_AUTH_WHITELIST:
+    if view is serve:
+      url = reverse(view, kwargs={'path': 'desktop/art/favicon.ico'})
+    else:
+      url = reverse(view)
+    response = c.get(url)
+    assert_equal(200, response.status_code)
 
 def test_log_view():
   c = make_logged_in_client()
