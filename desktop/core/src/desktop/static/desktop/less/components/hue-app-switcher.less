@@ -16,6 +16,7 @@
  limitations under the License.
 */
 
+@animation-duration-base: 0.2s ease 0s;
 @sidebar-width: 248px;
 
 .hue-app-switcher {
@@ -27,12 +28,15 @@
   width: @sidebar-width;
   white-space: nowrap;
   overflow: hidden;
-  transition: all 0.2s ease 0s;
+  transition: all @animation-duration-base;
   background: @cui-white;
+  opacity: 0;
 
   &.open {
     left: 0;
-    box-shadow: rgba(0, 0, 0, 0.28) 0 0 16px;
+    box-shadow: -2px 2px 4px 0 rgba(27, 35, 41, 0.2);
+    box-shadow: 0 0 16px rgba(0, 0, 0, 0.28);
+    opacity: 1;
   }
 
   h3 {
@@ -40,8 +44,8 @@
     font-weight: 300;
     font-style: normal;
     font-stretch: normal;
-    color: rgb(51, 62, 71);
-    padding: 24px 24px 0;
+    color: @cui-gray-800;
+    padding: 24px 24px 0 24px;
     margin: 0;
   }
 
@@ -52,15 +56,15 @@
 
     li a {
       .display-flex;
+      .flex-align-items(center);
 
       height: 48px;
-      .flex-align-items(center);
 
       span {
         display: inline-block;
         margin-left: 16px;
         font-size: 16px;
-        color: rgb(90, 101, 109);
+        color: @cui-gray-700;
       }
     }
   }
