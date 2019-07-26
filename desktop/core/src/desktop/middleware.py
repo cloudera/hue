@@ -70,8 +70,10 @@ MIDDLEWARE_HEADER = "X-Hue-Middleware-Response"
 DJANGO_VIEW_AUTH_WHITELIST = [
   django.views.static.serve,
   desktop.views.is_alive,
-  django_prometheus.exports.ExportToDjangoView
 ]
+
+if desktop.conf.ENABLE_PROMETHEUS.get():
+  DJANGO_VIEW_AUTH_WHITELIST.append(django_prometheus.exports.ExportToDjangoView)
 
 
 class AjaxMiddleware(object):
