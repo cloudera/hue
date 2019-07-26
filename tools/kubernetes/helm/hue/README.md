@@ -22,7 +22,7 @@ By default you should see these running containers:
     kubectl get pods
     NAME                                          READY   STATUS    RESTARTS   AGE
     hue-4n2ck                                     1/1       Running   0          3h
-    hue-postgres-5jg77                            1/1       Running   0          12d
+    postgres-hue-5jg77                            1/1       Running   0          12d
 
 And just copy paste the information printed on the screen or run
 
