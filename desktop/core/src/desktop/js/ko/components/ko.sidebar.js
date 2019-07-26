@@ -25,7 +25,7 @@ import I18n from 'utils/i18n';
 const TEMPLATE = `
   <script type="text/html" id="sidebar-item">
     <div class="item-wrapper"><a href="javascript: void(0);" data-bind="hueLink: item.url, attr: { 'aria-label': item.displayName, 'data-tooltip': item.displayName }, css: { 'active': item.active }" class="item">
-      <div class="icon" data-bind="template: 'app-icon-template'"></div><span data-bind="text: item.displayName"></span>
+      <div class="icon" data-bind="hueAppIcon: item.icon"></div><span data-bind="text: item.displayName"></span>
     </a></div>
   </script>
 

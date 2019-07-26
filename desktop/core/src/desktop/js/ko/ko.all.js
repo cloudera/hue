@@ -77,6 +77,7 @@ import 'ko/bindings/ko.highlight';
 import 'ko/bindings/ko.hiveChooser';
 import 'ko/bindings/ko.html';
 import 'ko/bindings/ko.hueach';
+import 'ko/bindings/ko.hueAppIcon';
 import 'ko/bindings/ko.hueCheckAll';
 import 'ko/bindings/ko.hueCheckbox';
 import 'ko/bindings/ko.hueChecked';
