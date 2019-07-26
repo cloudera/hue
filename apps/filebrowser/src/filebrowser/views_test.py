@@ -1197,7 +1197,6 @@ def test_location_to_url():
   assert_equal(prefix + '/', location_to_url('hdfs://localhost:8020'))
   assert_equal(prefix + 's3a://bucket/key', location_to_url('s3a://bucket/key'))
 
-
 class TestS3AccessPermissions(object):
 
   def setUp(self):
@@ -1243,3 +1242,32 @@ class TestS3AccessPermissions(object):
       assert_equal(200, response.status_code)
     finally:
       remove_from_group(self.user.username, 'has_s3')
+      
+class TestABFSAccessPermissions(object):
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    grant_access('test', 'test', 'filebrowser')
+    add_to_group('test')
+
+    self.user = User.objects.get(username="test")
+
+  def test_no_default_permissions(self):
+    response = self.client.get('/filebrowser/view=ABFS://')
+    assert_equal(500, response.status_code)
+
+    # 500 for real currently
+#     with tempfile.NamedTemporaryFile() as local_file: # Flaky
+#       DEST_DIR = 'S3A://bucket/hue'
+#       LOCAL_FILE = local_file.name
+#       assert_raises(S3FileSystemException, self.client.post, '/filebrowser/upload/file?dest=%s' % DEST_DIR, dict(dest=DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+
+  def test_has_default_permissions(self):
+
+    add_permission(self.user.username, 'has_abfs', permname='abfs_access', appname='filebrowser')
+
+    try:
+      response = self.client.get('/filebrowser/view=ABFS://')
+      assert_equal(200, response.status_code)
+    finally:
+      remove_from_group(self.user.username, 'has_abfs')
