@@ -127,6 +127,7 @@ import 'ko/bindings/ko.typeahead';
 import 'ko/bindings/ko.verticalSlide';
 import 'ko/bindings/ko.visibleOnHover';
 
+import 'ko/components/appSwitcher/ko.appSwitcher';
 import 'ko/components/assist/ko.assistDashboardPanel';
 import 'ko/components/assist/ko.assistDbPanel';
 import 'ko/components/assist/ko.assistDocumentsPanel';
@@ -141,7 +142,6 @@ import 'ko/components/assist/ko.assistStoragePanel';
 import 'ko/components/assist/ko.rightAssistPanel';
 import 'ko/components/contextPopover/ko.contextPopover';
 import 'ko/components/simpleAceEditor/ko.simpleAceEditor';
-import 'ko/components/ko.appSwitcher';
 import 'ko/components/ko.catalogEntriesList';
 import 'ko/components/ko.contextSelector';
 import 'ko/components/ko.createDirectoryModal';
