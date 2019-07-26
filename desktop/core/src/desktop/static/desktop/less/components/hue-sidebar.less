@@ -212,8 +212,13 @@
 
       svg {
         transition-delay: @animation-duration-base;
+        fill: @cui-gray-500;
         width: 24px;
         height: 24px;
+
+        &:hover {
+          fill: @cui-white;
+        }
       }
     }
   }
