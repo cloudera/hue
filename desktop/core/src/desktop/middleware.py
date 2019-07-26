@@ -28,6 +28,9 @@ import tempfile
 import time
 
 import kerberos
+import django.db
+import django.views.static
+import django_prometheus
 
 from django.conf import settings
 from django.contrib import messages
@@ -35,13 +38,13 @@ from django.contrib.auth import REDIRECT_FIELD_NAME, BACKEND_SESSION_KEY, authen
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User
 from django.core import exceptions, urlresolvers
-import django.db
 from django.http import HttpResponseNotAllowed, HttpResponseForbidden
 from django.urls import resolve
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.translation import ugettext as _
 from django.utils.http import urlquote, is_safe_url
-import django.views.static
+
+from hadoop import cluster
 
 import desktop.views
 import desktop.conf
@@ -55,9 +58,8 @@ from desktop.log import get_audit_logger
 from desktop.log.access import access_log, log_page_hit, access_warn
 from desktop import appmanager
 from desktop import metrics
-from hadoop import cluster
-
 from desktop.auth.backend import is_admin
+
 
 LOG = logging.getLogger(__name__)
 
@@ -69,6 +71,9 @@ DJANGO_VIEW_AUTH_WHITELIST = [
   django.views.static.serve,
   desktop.views.is_alive,
 ]
+
+if desktop.conf.ENABLE_PROMETHEUS.get():
+  DJANGO_VIEW_AUTH_WHITELIST.append(django_prometheus.exports.ExportToDjangoView)
 
 
 class AjaxMiddleware(object):

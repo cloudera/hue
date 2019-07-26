@@ -27,6 +27,7 @@ from django.contrib.auth.models import User, Group
 
 import nose.tools
 
+
 class Client(django.test.client.Client):
   """
   Extends client to have a get_json method.
@@ -85,12 +86,12 @@ def compact_whitespace(s):
   Also removes leading and trailing whitespce.
   """
   return _MULTI_WHITESPACE.sub(" ", s).strip()
-  
+
 def assert_equal_mod_whitespace(first, second, msg=None):
   """
   Asserts that two strings are equal, ignoring whitespace.
   """
-  nose.tools.assert_equal(compact_whitespace(first), 
+  nose.tools.assert_equal(compact_whitespace(first),
     compact_whitespace(second), msg)
 
 def assert_similar_pages(first, second, ratio=0.9, msg=None):
