@@ -164,7 +164,7 @@ class ABFS(object):
     file_system = azure.abfs.__init__.parse_uri(path)[0]
     for direct in self.listdir(path, params = params):
       resp = self._stats(file_system + '/' + direct, params, **kwargs) 
-      dir_stats.append(ABFSStat(resp, path))#fix this
+      dir_stats.append(ABFSStat(resp, path + '/' + direct))
     return dir_stats
   
   def listfilesystems_stats(self, params = None, **kwargs):
