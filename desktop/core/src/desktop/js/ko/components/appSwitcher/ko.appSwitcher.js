@@ -27,7 +27,11 @@ const TEMPLATE = `
   </div>
 
   <div class="hue-app-switcher" data-bind="css: { 'open': open }">
-    <h3>Cloudera Data Platform</h3>
+    <div class="app-switcher-header">
+      <svg class="show"><use xlink:href="#hi-cdp-logo"></use></svg>
+      <button class="close" data-bind="toggle: open">&times;</button>
+    </div>
+
     <ul data-bind="foreach: links">
       <li><a data-bind="attr: { href: url }"><i data-bind="html: svg"></i><span data-bind="text: label"></span></a></li>
     </ul>

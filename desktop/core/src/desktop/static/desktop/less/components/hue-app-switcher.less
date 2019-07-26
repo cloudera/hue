@@ -32,6 +32,26 @@
   background: @cui-white;
   opacity: 0;
 
+  .app-switcher-header {
+    height: 55px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid @cui-default-border-color;
+
+    svg {
+      margin-top: 12px;
+      margin-left: 24px;
+      height: 32px;
+      width: 106px;
+    }
+
+    .close {
+      position: absolute;
+      top: 19px;
+      right: 19px;
+    }
+  }
+
   &.open {
     left: 0;
     box-shadow: -2px 2px 4px 0 rgba(27, 35, 41, 0.2);
@@ -51,7 +71,7 @@
 
   ul {
     list-style: none;
-    padding: 24px 0 24px 24px;
+    padding: 16px 0 24px 24px;
     margin: 0;
 
     li a {
