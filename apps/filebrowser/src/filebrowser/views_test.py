@@ -1271,3 +1271,47 @@ class TestABFSAccessPermissions(object):
       assert_equal(200, response.status_code)
     finally:
       remove_from_group(self.user.username, 'has_abfs')
+      
+class TestADLSAccessPermissions(object):
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    grant_access('test', 'test', 'filebrowser')
+    add_to_group('test')
+
+    self.user = User.objects.get(username="test")
+
+  def test_no_default_permissions(self):
+    response = self.client.get('/filebrowser/view=ADL://')
+    assert_equal(500, response.status_code)
+    
+    response = self.client.get('/filebrowser/view=ADL://hue_adls_testing')
+    assert_equal(500, response.status_code)
+
+    response = self.client.get('/filebrowser/view=adl://hue_adls_testing')
+    assert_equal(500, response.status_code)
+
+    response = self.client.get('/filebrowser/view=ADL://hue_adls_testing/ADLS_tables')
+    assert_equal(500, response.status_code)
+
+    response = self.client.post('/filebrowser/rmtree', dict(path=['ADL://hue-test-01']))
+    assert_equal(500, response.status_code)
+
+    # 500 for real currently
+    assert_raises(IOError, self.client.get, '/filebrowser/edit=ADL://hue-test-01')
+
+    # 500 for real currently
+#     with tempfile.NamedTemporaryFile() as local_file: # Flaky
+#       DEST_DIR = 'S3A://bucket/hue'
+#       LOCAL_FILE = local_file.name
+#       assert_raises(S3FileSystemException, self.client.post, '/filebrowser/upload/file?dest=%s' % DEST_DIR, dict(dest=DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+
+  def test_has_default_permissions(self):
+
+    add_permission(self.user.username, 'has_adls', permname='adls_access', appname='filebrowser')
+
+    try:
+      response = self.client.get('/filebrowser/view=ADL://')
+      assert_equal(200, response.status_code)
+    finally:
+      remove_from_group(self.user.username, 'has_adls')
