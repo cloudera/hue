@@ -82,10 +82,15 @@ class ABFSStat(object):
     mtime = resp['lastModified']
     try:
       size = resp['contentLength']
-      isDir = resp['x-ms-resource-type'] == 'directory'
     except:
       size = 0
-      isDir = True
+    try:
+      isDir = resp['isDirectory'] == 'true'
+    except:
+      try:
+        isDir = reps['x-ms-resource-type'] == 'directory'
+      except:
+        isDir = False
     return cls(isDir, atime, mtime, size, path)
   
   @classmethod

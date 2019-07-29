@@ -153,7 +153,9 @@ class ABFS(object):
     else:
       resp= self._stats(file_system + '/' +dir_name, params, **kwargs)
     LOG.debug("%s" %resp)
-    return ABFSStat.for_single(resp, path)
+    res = ABFSStat.for_single(resp, path)
+    LOG.debug("%s" %res.path)
+    return res
   
   def listdir_stats(self,path, params = None, **kwargs):
     """
@@ -174,8 +176,10 @@ class ABFS(object):
       params['directory'] = directory_name
     res = self._root._invoke("GET",file_system, params, headers= self._getheaders(), **kwargs)
     resp = res.json()
+    LOG.debug("%s"%resp)
     for x in resp['paths']:
-      dir_stats.append(ABFSStat.for_directory(res.headers, x, path + "/" + x['name']))
+      dir_stats.append(ABFSStat.for_directory(res.headers, x, azure.abfs.__init__.ABFS_ROOT +file_system + "/" + x['name']))
+    LOG.debug("%s%s" %(dir_stats,[x.isDir for x in dir_stats ]))
     return dir_stats
   
   def listfilesystems_stats(self, params = None, **kwargs):
@@ -218,6 +222,7 @@ class ABFS(object):
     if ABFS.isroot(path):
       LOG.warn("Path being called is a Filesystem")
       return self.listfilesystems(params, **kwargs)
+    LOG.debug("listofdir")
     listofDir = self.listdir_stats(path, params)
     return [x.name for x in listofDir]
   
@@ -252,6 +257,7 @@ class ABFS(object):
     """
     Normalizes a path
     """
+    LOG.debug("ok")
     return azure.abfs.__init__.normpath(path)
 
   def open(self, path, option = 'r', *args, **kwargs):
@@ -262,6 +268,7 @@ class ABFS(object):
     """
     Returns the Parent Path
     """
+    LOG.debug("parent")
     return azure.abfs.__init__.parent_path(path)
 
   @staticmethod
@@ -269,7 +276,6 @@ class ABFS(object):
     """
     Joins two paths together
     """
-    LOG.debug("join")
     return azure.abfs.__init__.join(first,*comp_list)
 
   # Create Files,directories, or File Systems

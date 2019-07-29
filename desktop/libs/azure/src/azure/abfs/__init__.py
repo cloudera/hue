@@ -93,10 +93,10 @@ def parent_path(path):
   Returns the parent of the specified folder
   """
   if is_root(path):
-    return path
+    return "abfs://"
   filesystem, directory_name, other = parse_uri(path)
   parent = None
-  if filesystem is None:
+  if directory_name == "":
     if path.lower() == ABFS_ROOT_S:
       return ABFS_ROOT_S
     return ABFS_ROOT
@@ -115,6 +115,7 @@ def join(first,*complist):
       return '/%s/%s' % parse_uri(uri)[:2]
     except ValueError:
       return '/' if is_root(uri) else uri
+  LOG.debug("join")
   listings = [first]
   listings.extend(complist)
   joined = posixpath.join(*list(map(_prep, listings)))
