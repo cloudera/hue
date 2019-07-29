@@ -83,6 +83,13 @@ SSL_CERT_CA_VERIFY = Config(
   type=coerce_bool
 )
 
+USE_SASL = Config(
+  key="use_sasl",
+  help=_t("Use SASL framework to establish connection to host."),
+  default=False,
+  type=coerce_bool
+)
+
 
 def get_livy_server_url():
   url = LIVY_SERVER_URL.get()

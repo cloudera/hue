@@ -34,7 +34,6 @@ from desktop.lib import thrift_util
 from desktop.conf import DEFAULT_USER
 from desktop.models import Document2
 from beeswax import conf
-from hadoop import cluster
 
 from TCLIService import TCLIService
 from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,\
@@ -571,20 +570,17 @@ class HiveServerClient(object):
     else:
       kerberos_principal_short_name = None
 
+    use_sasl = self.query_server['use_sasl']
     if self.query_server['server_name'].startswith('impala'):
       if auth_password: # Force LDAP/PAM.. auth if auth_password is provided
-        use_sasl = True
         mechanism = HiveServerClient.HS2_MECHANISMS['NONE']
       else:
-        cluster_conf = cluster.get_cluster_conf_for_job_submission() # Note: Create YARN HttpClient while validate config, should directly read Impala property instead
-        use_sasl = cluster_conf is not None and cluster_conf.SECURITY_ENABLED.get()
         mechanism = HiveServerClient.HS2_MECHANISMS['KERBEROS']
       impersonation_enabled = self.query_server['impersonation_enabled']
     else:
       hive_mechanism = hive_site.get_hiveserver2_authentication()
       if hive_mechanism not in HiveServerClient.HS2_MECHANISMS:
         raise Exception(_('%s server authentication not supported. Valid are %s.') % (hive_mechanism, list(HiveServerClient.HS2_MECHANISMS.keys())))
-      use_sasl = hive_mechanism in ('KERBEROS', 'NONE', 'LDAP', 'PAM')
       mechanism = HiveServerClient.HS2_MECHANISMS[hive_mechanism]
       impersonation_enabled = hive_site.hiveserver2_impersonation_enabled()
 

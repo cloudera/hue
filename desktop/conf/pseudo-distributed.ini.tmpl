@@ -1225,6 +1225,9 @@
   ## auth_username=hue
   ## auth_password=
 
+  # Use SASL framework to establish connection to host.
+  ## use_sasl=false
+
   [[ssl]]
     # Path to Certificate Authority certificates.
     ## cacerts=/etc/hue/cacerts.pem
@@ -1300,6 +1303,9 @@
   # Path to the impala configuration dir which has impalad_flags file
   ## impala_conf_dir=${HUE_CONF_DIR}/impala-conf
 
+  # Use SASL framework to establish connection to host.
+  ## use_sasl=true
+
   [[ssl]]
     # SSL communication enabled for this server.
     ## enabled=false
@@ -1337,6 +1343,8 @@
   # Choose whether Hue should validate certificates received from the server.
   ## ssl_cert_ca_verify=true
 
+  # Use SASL framework to establish connection to host.
+  ## use_sasl=false
 
 ###########################################################################
 # Settings to configure the Oozie app

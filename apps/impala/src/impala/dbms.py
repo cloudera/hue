@@ -50,7 +50,8 @@ def get_query_server_config(connector=None):
         'QUERY_TIMEOUT_S': conf.QUERY_TIMEOUT_S.get(),
         'SESSION_TIMEOUT_S': conf.SESSION_TIMEOUT_S.get(),
         'auth_username': conf.AUTH_USERNAME.get(),
-        'auth_password': conf.AUTH_PASSWORD.get()
+        'auth_password': conf.AUTH_PASSWORD.get(),
+        'use_sasl': conf.USE_SASL.get()
     }
 
   debug_query_server = query_server.copy()
