@@ -25,8 +25,8 @@ const Environment = {
 
 /**
  * Returns environment type based on current url.
- * @param ignoreLocalHost If set to true, localhost section of the url is ignored.
  * E.g., PROD is returned for localhost.altus.cloudera.com
+ * Default to PROD
  */
 const getEnvironment = () => {
   const hostName = window.location.hostname;
@@ -42,10 +42,7 @@ const getEnvironment = () => {
   if (hostName.indexOf('-stage.cloudera.com') > -1) {
     return Environment.STAGE;
   }
-  if (hostName.indexOf('.cloudera.com') > -1) {
-    return Environment.PROD;
-  }
-  return Environment.MOCK;
+  return Environment.PROD;
 };
 
 export const getAltusBaseUrl = () => {
