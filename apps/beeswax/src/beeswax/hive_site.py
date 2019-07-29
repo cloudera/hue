@@ -58,6 +58,8 @@ _CNF_HIVESERVER2_THRIFT_HTTP_PATH = 'hive.server2.thrift.http.path'
 
 _CNF_HIVESERVER2_THRIFT_SASL_QOP = 'hive.server2.thrift.sasl.qop'
 
+_CNF_HIVESERVER2_USE_SASL = 'hive.metastore.sasl.enabled'
+
 
 # Host is whatever up to the colon. Allow and ignore a trailing slash.
 _THRIFT_URI_RE = re.compile("^thrift://([^:]+):(\d+)[/]?$")
@@ -198,3 +200,6 @@ def get_hive_site_content():
     return ''
   else:
     return file(hive_site_path, 'r').read()
+
+def get_use_sasl():
+  return get_conf().get(_CNF_HIVESERVER2_USE_SASL)

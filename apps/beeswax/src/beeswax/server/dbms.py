@@ -43,12 +43,11 @@ from beeswax import hive_site
 from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, HIVE_METASTORE_HOST, HIVE_METASTORE_PORT, LIST_PARTITIONS_LIMIT, SERVER_CONN_TIMEOUT, \
   AUTH_USERNAME, AUTH_PASSWORD, APPLY_NATURAL_SORT_MAX, QUERY_PARTITIONS_LIMIT, HIVE_DISCOVERY_HIVESERVER2_ZNODE, \
   HIVE_DISCOVERY_HS2, HIVE_DISCOVERY_LLAP, HIVE_DISCOVERY_LLAP_HA, HIVE_DISCOVERY_LLAP_ZNODE, CACHE_TIMEOUT, \
-  LLAP_SERVER_HOST, LLAP_SERVER_PORT, LLAP_SERVER_THRIFT_PORT
+  LLAP_SERVER_HOST, LLAP_SERVER_PORT, LLAP_SERVER_THRIFT_PORT, USE_SASL as HIVE_USE_SASL
 from beeswax.common import apply_natural_sort
 from beeswax.design import hql_query
 from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.models import QueryHistory, QUERY_TYPES
-
 
 LOG = logging.getLogger(__name__)
 
@@ -158,7 +157,8 @@ def get_query_server_config(name='beeswax', connector=None):
           'principal': kerberos_principal,
           'transport_mode': 'http' if hive_site.hiveserver2_transport_mode() == 'HTTP' else 'socket',
           'auth_username': AUTH_USERNAME.get(),
-          'auth_password': AUTH_PASSWORD.get()
+          'auth_password': AUTH_PASSWORD.get(),
+          'use_sasl': HIVE_USE_SASL.get()
       }
     else:
       kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
@@ -175,16 +175,18 @@ def get_query_server_config(name='beeswax', connector=None):
             },
           'transport_mode': 'http' if hive_site.hiveserver2_transport_mode() == 'HTTP' else 'socket',
           'auth_username': AUTH_USERNAME.get(),
-          'auth_password': AUTH_PASSWORD.get()
+          'auth_password': AUTH_PASSWORD.get(),
+          'use_sasl': HIVE_USE_SASL.get()
         }
 
     if name == 'sparksql': # Extends Hive as very similar
-      from spark.conf import SQL_SERVER_HOST as SPARK_SERVER_HOST, SQL_SERVER_PORT as SPARK_SERVER_PORT
+      from spark.conf import SQL_SERVER_HOST as SPARK_SERVER_HOST, SQL_SERVER_PORT as SPARK_SERVER_PORT, USE_SASL as SPARK_USE_SASL
 
       query_server.update({
           'server_name': 'sparksql',
           'server_host': SPARK_SERVER_HOST.get(),
-          'server_port': SPARK_SERVER_PORT.get()
+          'server_port': SPARK_SERVER_PORT.get(),
+          'use_sasl': SPARK_USE_SASL.get()
       })
 
   debug_query_server = query_server.copy()

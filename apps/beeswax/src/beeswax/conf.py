@@ -293,3 +293,18 @@ AUTH_PASSWORD_SCRIPT = Config(
   private=True,
   type=coerce_password_from_script,
   default=None)
+
+def get_use_sasl_default():
+  """Get from hive_site or backward compatibility"""
+  from hive_site import get_hiveserver2_authentication, get_use_sasl  # Cyclic dependency
+  use_sasl = get_use_sasl()
+  if use_sasl is not None:
+    return use_sasl.upper() == 'TRUE'
+  return get_hiveserver2_authentication() in ('KERBEROS', 'NONE', 'LDAP', 'PAM') # list for backward compatibility
+
+USE_SASL = Config(
+  key="use_sasl",
+  help=_t("Use SASL framework to establish connection to host"),
+  private=False,
+  type=coerce_bool,
+  dynamic_default=get_use_sasl_default)
