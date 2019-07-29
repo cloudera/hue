@@ -114,7 +114,7 @@ class ABFS(object):
     Checks if the path is a directory (note diabled because filebrowser/views is bugged)
     """
     resp = self.stats(path)
-    LOG.debug("checking directoty or not")
+    #LOG.debug("checking directoty or not")
     return resp.isDir
 
   def isfile(self, path):
@@ -128,7 +128,7 @@ class ABFS(object):
     Test if a path exists
     """
     try:
-      LOG.debug("checking existence")
+      #LOG.debug("checking existence")
       if ABFS.isroot(path):
         return True
       self.stats(path)
@@ -143,7 +143,7 @@ class ABFS(object):
     List the stat of the actual file/directory
     Returns the ABFFStat object
     """
-    LOG.debug("%s" %path)
+    #LOG.debug("%s" %path)
     if ABFS.isroot(path):
       return ABFSStat.for_root()
     file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
@@ -152,9 +152,9 @@ class ABFS(object):
       resp = self._statsf(file_system, params, **kwargs)
     else:
       resp= self._stats(file_system + '/' +dir_name, params, **kwargs)
-    LOG.debug("%s" %resp)
+    #LOG.debug("%s" %resp)
     res = ABFSStat.for_single(resp, path)
-    LOG.debug("%s" %res.path)
+    #LOG.debug("%s" %res.path)
     return res
   
   def listdir_stats(self,path, params = None, **kwargs):
@@ -176,10 +176,10 @@ class ABFS(object):
       params['directory'] = directory_name
     res = self._root._invoke("GET",file_system, params, headers= self._getheaders(), **kwargs)
     resp = res.json()
-    LOG.debug("%s"%resp)
+    #LOG.debug("%s"%resp)
     for x in resp['paths']:
       dir_stats.append(ABFSStat.for_directory(res.headers, x, azure.abfs.__init__.ABFS_ROOT +file_system + "/" + x['name']))
-    LOG.debug("%s%s" %(dir_stats,[x.isDir for x in dir_stats ]))
+    #LOG.debug("%s%s" %(dir_stats,[x.isDir for x in dir_stats ]))
     return dir_stats
   
   def listfilesystems_stats(self, params = None, **kwargs):
@@ -324,13 +324,13 @@ class ABFS(object):
     
   # Read Files
   # --------------------------------
-  def read(self, path, offset = 0, length = 0, *args, **kwargs):
+  def read(self, path, offset = '0', length = 0, *args, **kwargs):
     """
     Read data from a file
     """
     path = azure.abfs.__init__.strip_scheme(path)
     headers = self._getheaders()
-    if length != 0:
+    if length != 0 and length != '0':
       headers['range']= 'bytes=%s-%s' %(offset, offset + length)
     return self._root.get(path, headers = headers)
   
@@ -416,7 +416,7 @@ class ABFS(object):
     if user is not None:
       headers['x-ms-owner'] = user
     if group is not None:
-      headers['x-,ms-group'] = group
+      headers['x-ms-group'] = group
     self.setAccessControl(path, headers = headers, **kwargs)
   
   def chmod(self, path, permissionNumber = None, *args, **kwargs):
@@ -434,6 +434,8 @@ class ABFS(object):
     """
     path = azure.abfs.__init__.strip_scheme(path)
     params= {'action': 'setAccessControl'}
+    if headers is None:
+      headers ={}
     self._patching_sl( path, params, header = headers,  **kwargs)
 
   def mktemp(self, subdir='', prefix='tmp', basedir=None):

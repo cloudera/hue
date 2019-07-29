@@ -154,6 +154,7 @@ class ABFSTestBase(unittest.TestCase):
     
     self.client.flush(test_file, {"position" : test_len} )
     resp = self.client.read(test_file)
+    assert_true(resp == test_string)
     self.client.remove(test_file)
   
   def test_rename(self):

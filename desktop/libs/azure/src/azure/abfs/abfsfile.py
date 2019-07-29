@@ -14,9 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
+import logging
 
 from hadoop.fs.hadoopfs import require_open
 from azure.abfs.__init__ import normpath
+
+LOG = logging.getLogger(__name__)
 
 SEEK_SET, SEEK_CUR, SEEK_END = os.SEEK_SET, os.SEEK_CUR, os.SEEK_END
 
@@ -73,11 +76,13 @@ class ABFSFile(object):
 
     @param length the number of bytes wanted
     """
+    resp = ""
     try:
-      resp = self.fs.read(self, self.path, offset = self.pos, length = length)
+      resp = self.fs.read(self.path, length = str(length))
       self.pos += length
     except:
-      return ''
+      resp =''
+    return resp
     
   def close(self):
     self.closed = True
