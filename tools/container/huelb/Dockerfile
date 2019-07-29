@@ -24,8 +24,12 @@ RUN groupadd -g 1123 hue && useradd -g 1123 -d ${HUE_HOME} -s /bin/bash -u 1123 
 
 COPY static ${HUE_HOME}/build/static
 
+COPY run_httpd.sh ${HUE_HOME}
+
 WORKDIR ${HUE_HOME}
 
 COPY hue_httpd.conf /usr/local/apache2/conf/hue_httpd.conf
 
 EXPOSE 80
+
+CMD ["run_httpd.sh"]
