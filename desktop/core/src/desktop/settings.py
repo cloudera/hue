@@ -711,3 +711,41 @@ if desktop.conf.ENABLE_PROMETHEUS.get():
     DATABASES['default']['ENGINE'] = DATABASES['default']['ENGINE'].replace('django.db.backends', 'django_prometheus.db.backends')
   for name, val in list(CACHES.items()):
     val['BACKEND'] = val['BACKEND'].replace('django.core.cache.backends', 'django_prometheus.cache.backends')
+
+
+
+# OpenTracing settings
+
+import django_opentracing
+
+# ./build/env/bin/pip install jaeger-client
+# ./build/env/bin/pip install django_opentracing
+
+# if not included, defaults to True.
+# has to come before OPENTRACING_TRACING setting because python...
+OPENTRACING_TRACE_ALL = True
+
+# Callable that returns an `opentracing.Tracer` implementation.
+# OPENTRACING_TRACER_CALLABLE = 'opentracing.Tracer'
+OPENTRACING_TRACER_CALLABLE = __name__ + '.tracer'
+
+def tracer():
+    from jaeger_client import Config
+    config = Config(
+        config={ # usually read from some yaml config
+            'sampler': {
+                'type': 'const',
+                'param': 1,
+            },
+            'logging': True,
+        },
+        # metrics_factory=PrometheusMetricsFactory(namespace='hue-api'),
+        service_name='hue-api'
+    )
+    return config.initialize_tracer()
+
+# default is []
+# only valid if OPENTRACING_TRACE_ALL == True
+OPENTRACING_TRACED_ATTRIBUTES = ['META']
+
+MIDDLEWARE_CLASSES.insert(0, 'django_opentracing.OpenTracingMiddleware')
