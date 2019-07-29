@@ -44,7 +44,7 @@ def _get_api(user, cluster=None):
     server_url = 'http://impala-coordinator-%(name)s:25000' % cluster
   else:
     # TODO: multi computes if snippet.get('compute') or snippet['type'] has computes
-    application = cluster.get('type', 'impala')
+    application = cluster.get('interface', 'impala')
     session = Session.objects.get_session(user, application=application)
     server_url = _get_impala_server_url(session)
   return get_impalad_api(user=user, url=server_url)
