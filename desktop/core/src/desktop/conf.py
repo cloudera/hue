@@ -1517,6 +1517,20 @@ DISPLAY_APP_SWITCHER = Config(
   default=False
 )
 
+APP_SWITCHER_ALTUS_BASE_URL = Config(
+  key="app_switcher_altus_base_url",
+  help=_("Optional altus base url to use for the app switcher."),
+  type=str,
+  default=''
+)
+
+APP_SWITCHER_MOW_BASE_URL = Config(
+  key="app_switcher_mow_base_url",
+  help=_("Optional mow base url to use for the app switcher."),
+  type=str,
+  default=''
+)
+
 HTTP_500_DEBUG_MODE = Config(
   key='http_500_debug_mode',
   help=_('Enable or disable debugging information in the 500 internal server error response. '

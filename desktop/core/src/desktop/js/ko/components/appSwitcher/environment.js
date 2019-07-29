@@ -27,10 +27,11 @@ const Environment = {
  * Returns environment type based on current url.
  * E.g., PROD is returned for localhost.altus.cloudera.com
  * Default to PROD
+ * @param environmentBaseUrl
  */
-const getEnvironment = () => {
-  const hostName = window.location.hostname;
-  if (!hostName.indexOf('localhost.') > -1) {
+const getEnvironment = environmentBaseUrl => {
+  const hostName = environmentBaseUrl || window.location.hostname;
+  if (hostName.indexOf('localhost.') > -1) {
     return Environment.LOCAL;
   }
   if (hostName.indexOf('-dev.cloudera.com') > -1) {
@@ -46,7 +47,7 @@ const getEnvironment = () => {
 };
 
 export const getAltusBaseUrl = () => {
-  const environment = getEnvironment();
+  const environment = getEnvironment(window.APP_SWITCHER_ALTUS_BASE_URL);
   switch (environment) {
     case Environment.MOCK:
       return '';
@@ -59,12 +60,12 @@ export const getAltusBaseUrl = () => {
     case Environment.STAGE:
       return 'https://console.thunderhead-stage.cloudera.com';
     case Environment.PROD:
-      return 'https://console.altus.cloudera.com';
+      return window.APP_SWITCHER_ALTUS_BASE_URL || 'https://console.altus.cloudera.com';
   }
 };
 
 export const getMowBaseUrl = () => {
-  const environment = getEnvironment();
+  const environment = getEnvironment(window.APP_SWITCHER_MOW_BASE_URL);
   switch (environment) {
     case Environment.MOCK:
     case Environment.LOCAL:
@@ -75,6 +76,6 @@ export const getMowBaseUrl = () => {
     case Environment.STAGE:
       return 'https://cloudera.cdp.mow-stage.cloudera.com';
     case Environment.PROD:
-      return '';
+      return window.APP_SWITCHER_MOW_BASE_URL || '';
   }
 };

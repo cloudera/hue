@@ -18,7 +18,7 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
-  from desktop.conf import DISPLAY_APP_SWITCHER, IS_EMBEDDED, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_NEW_SIDE_PANELS, VCS
+  from desktop.conf import APP_SWITCHER_ALTUS_BASE_URL, APP_SWITCHER_MOW_BASE_URL, DISPLAY_APP_SWITCHER, IS_EMBEDDED, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_NEW_SIDE_PANELS, VCS
   from desktop.models import hue_version, _get_apps, get_cluster_config
 
   from beeswax.conf import LIST_PARTITIONS_LIMIT
@@ -50,6 +50,8 @@
     window.CSRF_TOKEN = '';
   %endif
 
+  window.APP_SWITCHER_ALTUS_BASE_URL = '${ APP_SWITCHER_ALTUS_BASE_URL.get() }';
+  window.APP_SWITCHER_MOW_BASE_URL = '${ APP_SWITCHER_MOW_BASE_URL.get() }';
   window.DISPLAY_APP_SWITCHER = '${ DISPLAY_APP_SWITCHER.get() }' === 'True';
 
   window.KNOX_BASE_PATH_HUE = '/KNOX_BASE_PATH_HUE';
