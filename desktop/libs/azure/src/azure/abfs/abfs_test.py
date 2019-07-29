@@ -99,7 +99,11 @@ class ABFSTestBase(unittest.TestCase):
     """
     test_fs = self.test_fs
     test_dir = test_fs + '/test_stats'
+    test_dir2 = test_dir + '/test2'
+    test_dir3 = test_dir2 + '/test3'
     self.client.mkdir(test_dir)
+    self.client.mkdir(test_dir2)
+    self.client.mkdir(test_dir3)
     
     #testing filesystems
     result = self.client.stats(test_fs)
@@ -112,6 +116,16 @@ class ABFSTestBase(unittest.TestCase):
     result = self.client.stats(test_dir)
     LOG.debug("%s" %result)
     result = self.client.listdir_stats(test_dir)
+    LOG.debug("%s" %result)
+    
+    result = self.client.stats(test_dir2)
+    LOG.debug("%s" %result)
+    result = self.client.listdir_stats(test_dir2)
+    LOG.debug("%s" %result)
+    
+    result = self.client.stats(test_dir3)
+    LOG.debug("%s" %result)
+    result = self.client.listdir_stats(test_dir3)
     LOG.debug("%s" %result)
     
   def test_mkdir(self):

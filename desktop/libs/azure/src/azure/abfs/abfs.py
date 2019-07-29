@@ -114,6 +114,7 @@ class ABFS(object):
     Checks if the path is a directory (note diabled because filebrowser/views is bugged)
     """
     resp = self.stats(path)
+    LOG.debug("checking directoty or not")
     return resp.isDir
 
   def isfile(self, path):
@@ -127,6 +128,7 @@ class ABFS(object):
     Test if a path exists
     """
     try:
+      LOG.debug("checking existence")
       if ABFS.isroot(path):
         return True
       self.stats(path)
@@ -141,6 +143,7 @@ class ABFS(object):
     List the stat of the actual file/directory
     Returns the ABFFStat object
     """
+    LOG.debug("%s" %path)
     if ABFS.isroot(path):
       return ABFSStat.for_root()
     file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
@@ -240,7 +243,9 @@ class ABFS(object):
     """
     Normalizes a path
     """
-    return azure.abfs.__init__.normpath(path)
+    resp = azure.abfs.__init__.normpath(path)
+    LOG.debug("%s" %resp)
+    return resp
 
   @staticmethod
   def netnormpath(path):
@@ -264,6 +269,7 @@ class ABFS(object):
     """
     Joins two paths together
     """
+    LOG.debug("join")
     return azure.abfs.__init__.join(first,*comp_list)
 
   # Create Files,directories, or File Systems

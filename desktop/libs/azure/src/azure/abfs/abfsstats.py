@@ -28,7 +28,7 @@ class ABFSStat(object):
     self.name = strip_path(path)
     self.path = path
     self.isDir = isDir
-    self.type = 'DIRECTOY' if isDir else 'FILE'
+    self.type = 'DIRECTORY' if isDir else 'FILE'
     try:
       self.atime = abfsdatetime_to_timestamp(file_stats['Date']) if file_stats['Date'] else None
       self.mtime = abfsdatetime_to_timestamp(file_stats['Last-Modified']) if file_stats['Last-Modified'] else None
@@ -82,7 +82,7 @@ class ABFSStat(object):
     mtime = resp['lastModified']
     try:
       size = resp['contentLength']
-      isDir = False
+      isDir = resp['x-ms-resource-type'] == 'directory'
     except:
       size = 0
       isDir = True
@@ -92,7 +92,7 @@ class ABFSStat(object):
   def for_single(cls,resp, path):
     try:
       size = resp['Content-Length']
-      isDir = False
+      isDir = resp['x-ms-resource-type'] == 'directory'
     except:
       size = 0
       isDir = True
