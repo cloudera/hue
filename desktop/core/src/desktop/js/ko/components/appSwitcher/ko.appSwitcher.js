@@ -30,7 +30,7 @@ const TEMPLATE = `
   <div class="hue-app-switcher" data-bind="css: { 'open': open }">
     <div class="app-switcher-header">
       <svg class="show"><use xlink:href="#hi-cdp-logo"></use></svg>
-      <button class="close" data-bind="toggle: open">&times;</button>
+      <a href="javascript: void(0);" class="close" data-bind="toggle: open">&times;</a></form>
     </div>
 
     <ul data-bind="foreach: links">
@@ -39,25 +39,23 @@ const TEMPLATE = `
   </div>
 `;
 
-const AppSwitcher = function AppSwitcher(params, element) {
-  this.links = [];
+const getUrl = (baseUrl, path) => {
+  if (baseUrl === 'mow') {
+    return getMowBaseUrl() + path;
+  } else if (baseUrl === 'altus') {
+    return getAltusBaseUrl() + path;
+  }
+  console.warn('Could not find baseUrl for "' + baseUrl + '", using relative link instead.');
+  return path;
+};
 
-  const getUrl = (baseUrl, path) => {
-    if (baseUrl === 'mow') {
-      return getMowBaseUrl() + path;
-    } else if (baseUrl === 'altus') {
-      return getAltusBaseUrl() + path;
-    }
-    console.warn('Could not find baseUrl for "' + baseUrl + '", using relative link instead.');
-    return path;
-  };
-
-  apps.forEach(app => {
-    this.links.push({
+const AppSwitcher = function AppSwitcher() {
+  this.links = apps.map(app => {
+    return {
       label: app.displayName,
       svg: app.logo,
       url: getUrl(app.baseUrl, app.path)
-    });
+    };
   });
 
   this.open = ko.observable(false);
@@ -85,12 +83,4 @@ const AppSwitcher = function AppSwitcher(params, element) {
   });
 };
 
-componentUtils.registerComponent(
-  'hue-app-switcher',
-  {
-    createViewModel: function(params, componentInfo) {
-      return new AppSwitcher(params, componentInfo.element);
-    }
-  },
-  TEMPLATE
-);
+componentUtils.registerComponent('hue-app-switcher', AppSwitcher, TEMPLATE);
