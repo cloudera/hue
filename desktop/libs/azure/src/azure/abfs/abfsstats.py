@@ -75,33 +75,30 @@ class ABFSStat(object):
     atime = headers['date']
     mtime = resp['lastModified']
     return cls(True, atime, mtime, 0, 'abfs://' + resp['name'])
-  
+
   @classmethod
   def for_directory(cls,headers,resp, path):
     atime = headers['date']
     mtime = resp['lastModified']
     try:
-      size = resp['contentLength']
+      size = int(resp['contentLength'])
     except:
       size = 0
     try:
       isDir = resp['isDirectory'] == 'true'
     except:
-      try:
-        isDir = reps['x-ms-resource-type'] == 'directory'
-      except:
-        isDir = False
+      isDir = False
     return cls(isDir, atime, mtime, size, path)
   
   @classmethod
   def for_single(cls,resp, path):
-    try:
-      size = resp['Content-Length']
-      isDir = resp['x-ms-resource-type'] == 'directory'
-    except:
-      size = 0
-      isDir = True
+    size = int(resp['Content-Length'])
+    isDir = resp['x-ms-resource-type'] == 'directory'
     return cls(isDir, resp['date'],resp['Last-Modified'], size, path)
+  
+  @classmethod
+  def for_filesystem(cls, resp, path):
+    return cls(True, resp['date'], resp['Last-Modified'], 0, path)
     
   def to_json_dict(self):
     """

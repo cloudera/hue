@@ -43,7 +43,7 @@ def parse_uri(uri):
     raise ValueError("Invalid ABFS URI: %s" % uri)
   direct_name = match.group(3) or ''
   base_direct_name = match.group(2) or ''
-  LOG.debug("File System: %s,Directory Name: %s, Other: %s" %(match.group(1), direct_name, base_direct_name) )
+  #LOG.debug("File System: %s,Directory Name: %s, Other: %s" %(match.group(1), direct_name, base_direct_name) )
   return match.group(1), direct_name, base_direct_name
 
 def is_root(uri):
@@ -115,7 +115,6 @@ def join(first,*complist):
       return '/%s/%s' % parse_uri(uri)[:2]
     except ValueError:
       return '/' if is_root(uri) else uri
-  LOG.debug("join")
   listings = [first]
   listings.extend(complist)
   joined = posixpath.join(*list(map(_prep, listings)))

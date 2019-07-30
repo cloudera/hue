@@ -24,7 +24,7 @@ LOG = logging.getLogger(__name__)
 SEEK_SET, SEEK_CUR, SEEK_END = os.SEEK_SET, os.SEEK_CUR, os.SEEK_END
 
 class ABFSFile(object):
-  """ Represents an open file on HDFS. """
+  """ Represents an open file on ABFS. """
 
   def __init__(self, fs, path, mode="r"):
     self.fs = fs
@@ -78,7 +78,7 @@ class ABFSFile(object):
     """
     resp = ""
     try:
-      resp = self.fs.read(self.path, length = str(length))
+      resp = self.fs.read(self.path, offset = self.pos, length = str(length))
       self.pos += length
     except:
       resp =''

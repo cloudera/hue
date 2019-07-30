@@ -23,15 +23,15 @@ standard_library.install_aliases()
 from builtins import object
 import logging
 import threading
-import stat
 
 from math import ceil
 from posixpath import join
 
-from azure.conf import PERMISSION_ACTION_ABFS
 import azure.abfs.__init__
+from azure.conf import PERMISSION_ACTION_ABFS
 from azure.abfs.abfsfile import ABFSFile
 from azure.abfs.abfsstats import ABFSStat
+
 from urllib.parse import urlparse
 from hadoop.hdfs_site import get_umask_mode
 
@@ -149,13 +149,10 @@ class ABFS(object):
     file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
     if dir_name == '':
       LOG.debug("Path being called is a Filesystem")
-      resp = self._statsf(file_system, params, **kwargs)
-    else:
-      resp= self._stats(file_system + '/' +dir_name, params, **kwargs)
+      return ABFSStat.for_filesystem(self._statsf(file_system, params, **kwargs), path)
     #LOG.debug("%s" %resp)
-    res = ABFSStat.for_single(resp, path)
     #LOG.debug("%s" %res.path)
-    return res
+    return ABFSStat.for_single(self._stats(file_system + '/' +dir_name, params, **kwargs), path)
   
   def listdir_stats(self,path, params = None, **kwargs):
     """
@@ -163,7 +160,7 @@ class ABFS(object):
     Returns the Multiple ABFFStat object #note change later for recursive cases
     """
     if ABFS.isroot(path):
-      LOG.warn("Path being called is a Filesystem")
+      LOG.warn("Path: %s is a Filesystem" %path)
       return self.listfilesystems_stats(params = None, **kwargs)
     dir_stats = []
     file_system, directory_name = azure.abfs.__init__.parse_uri(path)[:2]
@@ -175,7 +172,7 @@ class ABFS(object):
     if directory_name != "":
       params['directory'] = directory_name
     res = self._root._invoke("GET",file_system, params, headers= self._getheaders(), **kwargs)
-    resp = res.json()
+    resp = self._root._format_response(res)
     #LOG.debug("%s"%resp)
     for x in resp['paths']:
       dir_stats.append(ABFSStat.for_directory(res.headers, x, azure.abfs.__init__.ABFS_ROOT +file_system + "/" + x['name']))
@@ -184,11 +181,11 @@ class ABFS(object):
   
   def listfilesystems_stats(self, params = None, **kwargs):
     """
-    Lists the stats inside the File Systems  
+    Lists the stats inside the File Systems, No functionality for params
     """
     stats = []
     res = self._root._invoke("GET", params = {"resource" : "account"}, headers = self._getheaders() )
-    resp = res.json()
+    resp = self._root._format_response(res)
     for x in resp['filesystems']:
       stats.append(ABFSStat.for_filesystems(res.headers, x))
     return stats
@@ -222,14 +219,13 @@ class ABFS(object):
     if ABFS.isroot(path):
       LOG.warn("Path being called is a Filesystem")
       return self.listfilesystems(params, **kwargs)
-    LOG.debug("listofdir")
     listofDir = self.listdir_stats(path, params)
     return [x.name for x in listofDir]
   
   
   def listfilesystems(self, params=None,**kwargs):
     """
-    Lists the names of the File Systems  
+    Lists the names of the File Systems, limited arguements  
     """
     listofFileSystems = self.listfilesystems_stats(params)
     return [x.name for x in listofFileSystems]
@@ -249,7 +245,7 @@ class ABFS(object):
     Normalizes a path
     """
     resp = azure.abfs.__init__.normpath(path)
-    LOG.debug("%s" %resp)
+    #LOG.debug("%s" %resp)
     return resp
 
   @staticmethod
@@ -257,7 +253,7 @@ class ABFS(object):
     """
     Normalizes a path
     """
-    LOG.debug("ok")
+    #LOG.debug("ok")
     return azure.abfs.__init__.normpath(path)
 
   def open(self, path, option = 'r', *args, **kwargs):
@@ -268,7 +264,7 @@ class ABFS(object):
     """
     Returns the Parent Path
     """
-    LOG.debug("parent")
+    #LOG.debug("parent")
     return azure.abfs.__init__.parent_path(path)
 
   @staticmethod
@@ -331,7 +327,7 @@ class ABFS(object):
     path = azure.abfs.__init__.strip_scheme(path)
     headers = self._getheaders()
     if length != 0 and length != '0':
-      headers['range']= 'bytes=%s-%s' %(offset, offset + length)
+      headers['range']= 'bytes=%s-%s' %(str(offset), str(int(offset) + int(length)))
     return self._root.get(path, headers = headers)
   
   # Alter Files
@@ -390,7 +386,7 @@ class ABFS(object):
     
   def _delete(self, path, recursive = 'false', skip_trash=False):
     """
-    Wrapper function for calling delete
+    Wrapper function for calling delete, no support for trash or 
     """
     if ABFS.isroot(path):
       raise RuntimeError("Cannot Remove Root")
@@ -410,7 +406,7 @@ class ABFS(object):
   # --------------------------------
   def chown(self, path, user = None, group = None, *args, **kwargs):
     """
-    Changes ownership
+    Changes ownership (not implemented)
     """
     headers = {}
     if user is not None:
@@ -421,7 +417,7 @@ class ABFS(object):
   
   def chmod(self, path, permissionNumber = None, *args, **kwargs):
     """
-    Set File Permissions
+    Set File Permissions (not implemented)
     """
     header = {}
     if permissionNumber is not None:
@@ -430,7 +426,7 @@ class ABFS(object):
   
   def setAccessControl(self, path, headers, **kwargs):
     """
-    Set Access Controls (Can do both chmod and chown)
+    Set Access Controls (Can do both chmod and chown) (not implemented)
     """
     path = azure.abfs.__init__.strip_scheme(path)
     params= {'action': 'setAccessControl'}
@@ -478,7 +474,7 @@ class ABFS(object):
 
   def copy_remote_dir(self, src, dst, *args, **kwargs):
     """
-    Copies the entire contents of a directory to another location (Work in Progress/Not Ready)
+    Copies the entire contents of a directory to another location (Bug here possibly)
     """
     dst = dst + '/' + azure.abfs.__init__.strip_path(src)
     LOG.debug("%s" %dst)
@@ -509,6 +505,7 @@ class ABFS(object):
     pass
   
   def copyFromLocal(self, local_src, remote_dst, *args, **kwargs):
+    #Implement Later
     raise NotImplementedError("")
 
   def check_access(self, path, *args, **kwargs):
