@@ -1383,6 +1383,7 @@ class Snippet {
 
     this.executor.executeNext().then(executionResult => {
       this.stopLongOperationTimeout();
+      this.result.clear();
       this.result.update(executionResult).then(() => {
         if (this.result.data().length) {
           this.currentQueryTab('queryResults');
