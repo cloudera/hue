@@ -28,6 +28,7 @@ from django.urls import reverse
 from django.db.models import Q
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
+import opentracing.tracer
 
 from desktop.api2 import __paginate
 from desktop.conf import TASK_SERVER
@@ -179,6 +180,11 @@ def execute(request, engine=None):
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
   response = _execute_notebook(request, notebook, snippet)
+
+  opentracing.tracer.active_span.set_tag(
+    'query-id',
+    response['handle']['guid'] if response.get('handle') and response['handle'].get('guid') else None
+  )
 
   return JsonResponse(response)
 
