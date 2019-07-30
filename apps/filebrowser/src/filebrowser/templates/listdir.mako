@@ -155,9 +155,12 @@ ${ fb_components.menubar() }
           <!-- ko if: isS3 -->
             <a class="btn fileToolbarBtn" title="${_('Upload files')}" data-bind="visible: !inTrash(), css: {'disabled': isS3Root()}, click: function(){ if (!isS3Root()) { uploadFile() }}"><i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}</a>
           <!-- /ko -->
-          <!-- ko ifnot: isS3 -->
+          <!-- ko if: isABFS -->
+            <a class="btn fileToolbarBtn" title="${_('Upload files')}" data-bind="visible: !inTrash(), css: {'disabled': isABFSRoot()}, click: function(){ if (!isABFSRoot()) { uploadFile() }}"><i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}</a>
+          <!-- /ko -->
+          <!-- ko ifnot: isS3() || isABFS() -->
           <div id="upload-dropdown" class="btn-group" style="vertical-align: middle">
-            <a href="javascript: void(0)" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-bind="click: uploadFile, visible: !inTrash(), css: {'disabled': isS3() && isS3Root()}">
+            <a href="javascript: void(0)" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-bind="click: uploadFile, visible: !inTrash(), css: {'disabled': isS3() && isS3Root() || isABFS() && isABFSRoot()}">
               <i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}
             </a>
           </div>

@@ -173,7 +173,6 @@ class ABFS(object):
       params['directory'] = directory_name
     res = self._root._invoke("GET",file_system, params, headers= self._getheaders(), **kwargs)
     resp = self._root._format_response(res)
-    #LOG.debug("%s"%resp)
     for x in resp['paths']:
       dir_stats.append(ABFSStat.for_directory(res.headers, x, azure.abfs.__init__.ABFS_ROOT +file_system + "/" + x['name']))
     #LOG.debug("%s%s" %(dir_stats,[x.isDir for x in dir_stats ]))
@@ -186,6 +185,7 @@ class ABFS(object):
     stats = []
     res = self._root._invoke("GET", params = {"resource" : "account"}, headers = self._getheaders() )
     resp = self._root._format_response(res)
+    LOG.debug("%s" %res)
     for x in resp['filesystems']:
       stats.append(ABFSStat.for_filesystems(res.headers, x))
     return stats
