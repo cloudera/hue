@@ -106,6 +106,23 @@ const pluginName = 'jHueFileChooser',
           home: '',
           name: 'ADLS'
         }
+      },
+	  abfs: {
+        scheme: 'abfs',
+        root: 'abfs://',
+        home: 'abfs://',
+        icon: {
+          svg: {
+            brand: '#hi-adls',
+            home: '#hi-adls'
+          },
+          brand: 'fa-windows',
+          home: 'fa-windows'
+        },
+        label: {
+          home: '',
+          name: 'ABFS'
+        }
       }
     },
     fsSelected: 'hdfs',

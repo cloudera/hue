@@ -426,7 +426,7 @@ class ABFS(object):
     header = {}
     if permissionNumber is not None:
       header['x-ms-permissions'] = str(permissionNumber)
-    self.setAccessControl(path, headers = header, **kwargs)
+    self.setAccessControl(path, headers = header)
   
   def setAccessControl(self, path, headers, **kwargs):
     """
@@ -560,5 +560,6 @@ class ABFS(object):
     if header is None:
       header = {}
     header.update(self._getheaders())
+    LOG.debug("%s" %kwargs)
     return self._root.invoke('PATCH', schemeless_path, param, data, headers = header, **kwargs)
       
