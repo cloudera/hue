@@ -170,7 +170,8 @@ class S3FileSystem(object):
         raise S3FileSystemException(_('User is not authorized to access path: "%s"') % path)
       else:
         raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, e.reason))
-
+    except Exception as e: # SSL errors show up here, because they've been remapped in boto
+      raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, e.message))
     if key is None:
       key = self._get_key(path, validate=False)
     return self._stats_key(key)

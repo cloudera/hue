@@ -17,6 +17,7 @@ from __future__ import absolute_import
 
 import logging
 
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.idbroker import conf
 from desktop.lib.rest import http_client, resource
 from hadoop.core_site import is_kerberos_enabled
@@ -44,6 +45,7 @@ class IDBroker(object):
       security
     )
 
+
   def __init__(self, user=None, address=None, dt_path=None, path=None, security=None):
     self.user=user
     self.address=address
@@ -69,10 +71,16 @@ class IDBroker(object):
       self._client.set_kerberos_auth()
     elif self.security['type'] == 'basic':
       self._client.set_basic_auth(self.security['params']['username'], self.security['params']['password'])
-    res = self._root.invoke("GET", self.dt_path + _KNOX_TOKEN_API, self._knox_token_params(), allow_redirects=True, log_response=False) # Can't log response because returns credentials
-    return res.get('access_token')
+    try:
+      res = self._root.invoke("GET", self.dt_path + _KNOX_TOKEN_API, self._knox_token_params(), allow_redirects=True, log_response=False) # Can't log response because returns credentials
+      return res.get('access_token')
+    except Exception as e:
+      raise PopupException('Failed to authenticate to IDBroker with error: %s' % e.message)
 
 
   def get_cab(self):
     self._client.set_bearer_auth(self.get_auth_token())
-    return self._root.invoke("GET", self.path + _CAB_API_CREDENTIALS_GLOBAL, allow_redirects=True, log_response=False) # Can't log response because returns credentials
+    try:
+      return self._root.invoke("GET", self.path + _CAB_API_CREDENTIALS_GLOBAL, allow_redirects=True, log_response=False) # Can't log response because returns credentials
+    except Exception as e:
+      raise PopupException('Failed to obtain storage credentials from IDBroker with error: %s' % e.message)
