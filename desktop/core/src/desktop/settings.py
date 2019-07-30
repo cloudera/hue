@@ -732,7 +732,7 @@ OPENTRACING_TRACER_CALLABLE = __name__ + '.tracer'
 def tracer():
     from jaeger_client import Config
     config = Config(
-        config={ # usually read from some yaml config
+        config={
             'sampler': {
                 'type': 'const',
                 'param': 1,
@@ -747,5 +747,6 @@ def tracer():
 # default is []
 # only valid if OPENTRACING_TRACE_ALL == True
 OPENTRACING_TRACED_ATTRIBUTES = ['META']
+
 
 MIDDLEWARE_CLASSES.insert(0, 'django_opentracing.OpenTracingMiddleware')
