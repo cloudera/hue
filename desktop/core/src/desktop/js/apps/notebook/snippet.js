@@ -1806,6 +1806,7 @@ class Snippet {
           }
 
           if (data.status === 0) {
+            self.result.clear();
             self.result.handle(data.handle);
             self.result.hasResultset(data.handle.has_result_set);
             self.showLogs(true);
