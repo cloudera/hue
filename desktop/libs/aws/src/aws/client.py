@@ -213,7 +213,8 @@ class Client(object):
         connection = boto.s3.connect_to_region(self._region,
                                              aws_access_key_id=self._access_key_id,
                                              aws_secret_access_key=self._secret_access_key,
-                                             security_token=self._security_token)
+                                             security_token=self._security_token,
+                                             calling_format=self._calling_format)
       else:
         kwargs.update({'host': 's3.amazonaws.com'})
         connection = boto.s3.connection.S3Connection(**kwargs)
