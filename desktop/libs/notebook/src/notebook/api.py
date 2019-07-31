@@ -82,7 +82,7 @@ def create_notebook(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def create_session(request):
   response = {'status': -1}
@@ -99,7 +99,7 @@ def create_session(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def close_session(request):
   response = {'status': -1}
@@ -174,8 +174,8 @@ def _execute_notebook(request, notebook, snippet):
   return response
 
 @require_POST
-@check_document_access_permission()
-@api_error_handler
+@check_document_access_permission
+# @api_error_handler
 def execute(request, engine=None):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
@@ -192,7 +192,7 @@ def execute(request, engine=None):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def check_status(request):
   response = {'status': -1}
@@ -236,7 +236,7 @@ def check_status(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def fetch_result_data(request):
   response = {'status': -1}
@@ -259,7 +259,7 @@ def fetch_result_data(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def fetch_result_metadata(request):
   response = {'status': -1}
@@ -274,7 +274,7 @@ def fetch_result_metadata(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def fetch_result_size(request):
   response = {'status': -1}
@@ -289,7 +289,7 @@ def fetch_result_size(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def cancel_statement(request):
   response = {'status': -1}
@@ -306,7 +306,7 @@ def cancel_statement(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def get_logs(request):
   response = {'status': -1}
@@ -438,7 +438,7 @@ def _get_statement(notebook):
 
 @require_GET
 @api_error_handler
-@check_document_access_permission()
+@check_document_access_permission
 def get_history(request):
   response = {'status': -1}
 
@@ -511,7 +511,7 @@ def clear_history(request):
 
 
 @require_GET
-@check_document_access_permission()
+@check_document_access_permission
 def open_notebook(request):
   response = {'status': -1}
 
@@ -525,7 +525,7 @@ def open_notebook(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 def close_notebook(request):
   response = {'status': -1, 'result': []}
 
@@ -557,7 +557,7 @@ def close_notebook(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 def close_statement(request):
   response = {'status': -1}
 
@@ -579,7 +579,7 @@ def close_statement(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def autocomplete(request, server=None, database=None, table=None, column=None, nested=None):
   response = {'status': -1}
@@ -600,7 +600,7 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def get_sample_data(request, server=None, database=None, table=None, column=None):
   response = {'status': -1}
@@ -620,7 +620,7 @@ def get_sample_data(request, server=None, database=None, table=None, column=None
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def explain(request):
   response = {'status': -1}
@@ -645,7 +645,7 @@ def format(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def export_result(request):
   response = {'status': -1, 'message': _('Success')}
@@ -762,7 +762,7 @@ def export_result(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def statement_risk(request):
   response = {'status': -1, 'message': ''}
@@ -779,7 +779,7 @@ def statement_risk(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def statement_compatibility(request):
   response = {'status': -1, 'message': ''}
@@ -798,7 +798,7 @@ def statement_compatibility(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def statement_similarity(request):
   response = {'status': -1, 'message': ''}
@@ -816,7 +816,7 @@ def statement_similarity(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def get_external_statement(request):
   response = {'status': -1, 'message': ''}
