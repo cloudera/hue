@@ -1,9 +1,12 @@
 image:
-   registry: "gethue"
-   tag: "latest"
-   pullPolicy: "IfNotPresent"
+   registry: "localhost:32000"
+   tag: "registry"
+   pullPolicy: "Always"
+   # registry: "gethue"
+   # tag: "latest"
+   # pullPolicy: "IfNotPresent"
 hue:
-  replicas: 2
+  replicas: 1
   database:
     create: true
     persist: true
@@ -15,6 +18,9 @@ hue:
     name: "hue"
     storageName: "microk8s-hostpath"
   interpreters: |
+    [[[impala]]]
+      name=Impala
+      interface=hiveserver2
     [[[postgresql]]]
       name = postgresql
       interface=sqlalchemy
@@ -22,16 +28,20 @@ hue:
   ini: |
     [desktop]
     secret_key=hue123
-    app_blacklist=filebrowser,search,hbase,security,jobbrowser,oozie
+    app_blacklist=filebrowser,search,hbase,security,oozie
     django_debug_mode=false
     gunicorn_work_class=gevent
     enable_prometheus=true
-
     [[task_server]]
     enabled=false
     broker_url=redis://redis:6379/0
     result_cache='{"BACKEND": "django_redis.cache.RedisCache", "LOCATION": "redis://redis:6379/0", "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},"KEY_PREFIX": "queries"}'
     celery_result_backend=redis://redis:6379/0
+    [[tracing]]
+    enabled=true
+    trace_all=true
+    [impala]
+    server_host=172.31.114.203
 balancer:
   enabled: true
 workers:
