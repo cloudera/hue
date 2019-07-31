@@ -22,6 +22,7 @@ import re
 from django.utils.translation import ugettext_lazy as _, ugettext as _t
 
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool, coerce_password_from_script
+from desktop.lib.idbroker import conf as conf_idbroker
 from hadoop.core_site import get_s3a_access_key, get_s3a_secret_key, get_s3a_session_token
 
 LOG = logging.getLogger(__name__)
@@ -209,7 +210,7 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
 
 
 def is_enabled():
-  return ('default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()) or has_iam_metadata()
+  return ('default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()) or has_iam_metadata() or conf_idbroker.is_idbroker_enabled('s3a')
 
 
 def has_iam_metadata():

@@ -78,6 +78,8 @@ def _init_clients():
   if CLIENT_CACHE is not None:
     return
   CLIENT_CACHE = {} # Can't convert this to django cache, because S3FileSystem is not pickable
+  if conf_idbroker.is_idbroker_enabled('s3a'):
+    return # No default initializations when IDBroker is enabled
   for identifier in list(aws_conf.AWS_ACCOUNTS.keys()):
     CLIENT_CACHE[_get_cache_key(identifier)] = _make_client(identifier)
   # If default configuration not initialized, initialize client connection with IAM metadata
