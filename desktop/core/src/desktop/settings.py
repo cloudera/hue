@@ -29,9 +29,10 @@ import os
 import pkg_resources
 import sys
 
-from guppy import hpy
+import django_opentracing
 
 from django.utils.translation import ugettext_lazy as _
+from guppy import hpy
 
 import desktop.redaction
 from desktop.lib.paths import get_desktop_root
@@ -713,40 +714,28 @@ if desktop.conf.ENABLE_PROMETHEUS.get():
     val['BACKEND'] = val['BACKEND'].replace('django.core.cache.backends', 'django_prometheus.cache.backends')
 
 
-
+################################################################
 # OpenTracing settings
+################################################################
 
-import django_opentracing
+if desktop.conf.TRACING.ENABLED.get():
+  OPENTRACING_TRACE_ALL = desktop.conf.TRACING.TRACE_ALL.get()
+  OPENTRACING_TRACER_CALLABLE = __name__ + '.tracer'
 
-# ./build/env/bin/pip install jaeger-client
-# ./build/env/bin/pip install django_opentracing
+  def tracer():
+      from jaeger_client import Config
+      config = Config(
+          config={
+              'sampler': {
+                  'type': 'const',
+                  'param': 1,
+              },
+              'logging': False,
+          },
+          # metrics_factory=PrometheusMetricsFactory(namespace='hue-api'),
+          service_name='hue-api'
+      )
+      return config.initialize_tracer()
 
-# if not included, defaults to True.
-# has to come before OPENTRACING_TRACING setting because python...
-OPENTRACING_TRACE_ALL = True
-
-# Callable that returns an `opentracing.Tracer` implementation.
-# OPENTRACING_TRACER_CALLABLE = 'opentracing.Tracer'
-OPENTRACING_TRACER_CALLABLE = __name__ + '.tracer'
-
-def tracer():
-    from jaeger_client import Config
-    config = Config(
-        config={
-            'sampler': {
-                'type': 'const',
-                'param': 1,
-            },
-            'logging': False,
-        },
-        # metrics_factory=PrometheusMetricsFactory(namespace='hue-api'),
-        service_name='hue-api'
-    )
-    return config.initialize_tracer()
-
-# default is []
-# only valid if OPENTRACING_TRACE_ALL == True
-OPENTRACING_TRACED_ATTRIBUTES = ['META']
-
-
-MIDDLEWARE_CLASSES.insert(0, 'django_opentracing.OpenTracingMiddleware')
+  OPENTRACING_TRACED_ATTRIBUTES = ['META'] # Only valid if OPENTRACING_TRACE_ALL == True
+  MIDDLEWARE_CLASSES.insert(0, 'django_opentracing.OpenTracingMiddleware')
