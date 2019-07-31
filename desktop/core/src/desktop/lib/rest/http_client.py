@@ -32,6 +32,7 @@ from requests.auth import AuthBase ,HTTPBasicAuth, HTTPDigestAuth
 from requests_kerberos import HTTPKerberosAuth, REQUIRED, OPTIONAL, DISABLED
 from urllib3.contrib import pyopenssl
 
+
 pyopenssl.DEFAULT_SSL_CIPHER_LIST = conf.SSL_CIPHER_LIST.get()
 
 __docformat__ = "epytext"
@@ -40,6 +41,7 @@ LOG = logging.getLogger(__name__)
 
 CACHE_SESSION = {}
 CACHE_SESSION_LOCK = threading.Lock()
+
 
 def get_request_session(url, logger):
   global CACHE_SESSION, CACHE_SESSION_LOCK
@@ -52,6 +54,7 @@ def get_request_session(url, logger):
       logger.debug("Setting session adapter for %s" % url)
 
   return CACHE_SESSION
+
 
 class RestException(Exception):
   """
@@ -146,7 +149,6 @@ class HttpClient(object):
     self._session.headers.update(headers)
     return self
 
-
   @property
   def base_url(self):
     return self._base_url
@@ -158,7 +160,7 @@ class HttpClient(object):
   def set_verify(self, verify=True):
     self._session.verify = verify
     return self
-      
+
   def _get_headers(self, headers):
     if headers:
       self._session.headers.update(headers)
@@ -226,6 +228,7 @@ class HttpClient(object):
       param_str = urlencode(params)
       res += '?' + param_str
     return iri_to_uri(res)
+
 
 class HTTPBearerAuth(AuthBase):
     """Attaches HTTP Basic Authentication to the given Request object."""
