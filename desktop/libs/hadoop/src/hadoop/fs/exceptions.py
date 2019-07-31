@@ -21,15 +21,13 @@ import logging
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
 
+
 LOG = logging.getLogger(__name__)
 
 
 class PermissionDeniedException(StructuredException):
   def __init__(self, msg, orig_exc=None):
-    # TODO(todd) use orig_exc for something fun
-    StructuredException.__init__(self,
-      "PERMISSION_DENIED",
-      msg)
+    StructuredException.__init__(self,  "PERMISSION_DENIED", msg)
 
 
 class WebHdfsException(RestException):
