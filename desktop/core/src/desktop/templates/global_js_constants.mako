@@ -18,6 +18,7 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
+  from desktop.auth.backend import is_admin;
   from desktop.conf import APP_SWITCHER_ALTUS_BASE_URL, APP_SWITCHER_MOW_BASE_URL, DISPLAY_APP_SWITCHER, IS_EMBEDDED, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_NEW_SIDE_PANELS, VCS
   from desktop.models import hue_version, _get_apps, get_cluster_config
 
@@ -140,6 +141,7 @@
     'Add tags...': '${ _('Add tags...') }',
     'Add': '${ _('Add') }',
     'Admin': '${ _('Admin') }',
+    'Administration': '${ _('Administration') }',
     'aggregate': '${ _('aggregate') }',
     'Aggregate': '${ _('Aggregate') }',
     'alias': '${ _('alias') }',
@@ -211,6 +213,7 @@
     'Documents': '${ _('Documents') }',
     'Drop a SQL file here': '${_('Drop a SQL file here')}',
     'Drop iPython/Zeppelin notebooks here': '${_('Drop iPython/Zeppelin notebooks here')}',
+    'Edit Profile': '${ _('Edit Profile') }',
     'Edit tags': '${ _('Edit tags') }',
     'Edit this privilege': '${ _('Edit this privilege') }',
     'Edit': '${ _('Edit') }',
@@ -253,6 +256,7 @@
     'Go to column:': '${_('Go to column:')}',
     'group by': '${ _('group by') }',
     'Heatmap': '${ _('Heatmap') }',
+    'Help': '${ _('Help') }',
     'Hide advanced': '${_('Hide advanced')}',
     'Hive Query': '${_('Hive Query')}',
     'Identifiers': '${ _('Identifiers') }',
@@ -281,6 +285,7 @@
     'Loading metrics...': '${ _('Loading metrics...') }',
     'Lock this row': '${_('Lock this row')}',
     'MapReduce Job': '${_('MapReduce Job')}',
+    'Manage Users': '${ _('Manage Users') }',
     'Manual refresh': '${_('Manual refresh')}',
     'max': '${ _('max') }',
     'Memory': '${ _('Memory') }',
@@ -294,6 +299,7 @@
     'Missing value configuration.': '${ _('Missing value configuration.') }',
     'Missing x axis configuration.': '${ _('Missing x axis configuration.') }',
     'Missing y axis configuration.': '${ _('Missing y axis configuration.') }',
+    'My Profile': '${ _('My Profile') }',
     'Name': '${ _('Name') }',
     'Namespace': '${ _('Namespace') }',
     'Namespaces': '${ _('Namespaces') }',
@@ -406,6 +412,7 @@
     'Show row details': '${_('Show row details')}',
     'Show sample': '${_('Show sample')}',
     'Show view SQL': '${_('Show view SQL')}',
+    'Sign out': '${ _('Sign out') }',
     'Size': '${ _('Size') }',
     'Solr Search': '${ _('Solr Search') }',
     'Sources': '${ _('Sources') }',
@@ -449,11 +456,13 @@
     'Values': '${ _('Values') }',
     'variable': '${ _('variable') }',
     'Variables': '${ _('Variables') }',
+    'View Profile': '${ _('View Profile') }',
     'View': '${ _('View') }',
     'view': '${ _('view') }',
     'Views': '${ _('Views') }',
     'virtual': '${ _('virtual') }',
     'WARNING: This can be both resource and time-intensive.': '${ _('WARNING: This can be both resource and time-intensive.') }',
+    'Welcome Tour': '${ _('Welcome Tour') }',
     'With grant option': '${ _('With grant option') }',
     'With grant': '${ _('With grant') }',
     'Workflow': '${ _('Workflow') }',
@@ -484,6 +493,9 @@
     layerOptions: JSON.parse('${ leaflet['layer_options'] |n,unicode }')
   };
 
+  window.USER_VIEW_EDIT_USER_ENABLED = '${ user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or is_admin(user) }' === 'True';
+  window.USER_IS_ADMIN = '${ is_admin(user) }' === 'True';
+  window.IS_LDAP_SETUP = '${ 'desktop.auth.backend.LdapBackend' in conf.AUTH.BACKEND.get() }' === 'True';
   window.LOGGED_USERNAME = '${ user.username }';
   window.LOGGED_USER_ID = ${ user.id };
 

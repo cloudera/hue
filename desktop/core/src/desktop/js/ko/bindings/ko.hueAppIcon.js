@@ -55,6 +55,7 @@ const APP_ICON_INDEX = {
   spark: `<svg class="hi hi-fw"><use xlink:href="#hi-spark"></use></svg>`,
   sqoop1: `<svg class="hi hi-fw"><use xlink:href="#hi-sqoop"></use></svg>`,
   sqoop: `<svg class="hi hi-fw"><use xlink:href="#hi-sqoop"></use></svg>`,
+  support: `<svg class="hi hi-fw"><use xlink:href="#hi-support"></use></svg>`,
   tables: `<i class="fa fa-fw fa-table"></i>`,
   text: `<i class="fa fa-fw fa-i-cursor"></i>`,
   warehouses: `<i class="altus-icon altus-adb-cluster" style="margin: 0 1px 0 3px"></i>`,

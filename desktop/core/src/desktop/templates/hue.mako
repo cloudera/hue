@@ -253,36 +253,6 @@ ${ hueIcons.symbols() }
         </div>
 
         <div class="top-nav-right">
-          % if user.is_authenticated() and section != 'login' and (cluster != ANALYTIC_DB or IS_MULTICLUSTER_ONLY.get()):
-          <div class="dropdown navbar-dropdown pull-right">
-            % if IS_MULTICLUSTER_ONLY.get():
-              ##<!-- ko component: { name: 'hue-app-switcher', params: { onPrem: ko.observable(false) } } --><!-- /ko -->
-            % endif
-
-            <%
-              view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or is_admin(user)
-            %>
-            <button class="btn btn-flat" data-toggle="dropdown" data-bind="click: function(){ huePubSub.publish('hide.jobs.panel'); huePubSub.publish('hide.history.panel'); }">
-              <i class="fa fa-user"></i> ${ user.username } <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu">
-              % if view_profile:
-              <li><a href="javascript:void(0)" data-bind="hueLink: '/useradmin/users/edit/${ user.username }'" title="${ _('View Profile') if is_ldap_setup else _('Edit Profile') }"><i class="fa fa-fw fa-user"></i> ${_('My Profile')}</a></li>
-              % endif
-              % if is_admin(user):
-              <li data-bind="hueLink: '/useradmin/users/'"><a href="javascript: void(0);"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
-              % endif
-              % if is_admin(user):
-              <li><a data-bind="hueLink: '/about/'" href="javascript: void(0);"><span class="dropdown-no-icon">${_('Administration')}</span></a></li>
-              % endif
-              <li><a href="javascript:void(0)" onclick="huePubSub.publish('show.welcome.tour')"><span class="dropdown-no-icon">${_('Welcome Tour')}</span></a></li>
-              <li><a href="http://gethue.com" target="_blank"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
-              <li class="divider"></li>
-              <li><a title="${_('Sign out')}" data-bind="hueLink: '/accounts/logout'" href="javascript: void(0);"><i class="fa fa-fw fa-sign-out"></i> ${ _('Sign out') }</a></li>
-            </ul>
-          </div>
-          % endif
-
           % if has_multi_clusters():
             <select data-bind="options: clusters, optionsText: 'name', value: 'id'" class="input-small" style="margin-top:8px">
             </select>
@@ -581,8 +551,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
     %if is_admin(user):
       tour.addStep('admin', {
-        text: '${ _ko('As a superuser, you can check system configuration from the username drop down and install sample data and jobs for your users.') }',
-        attachTo: '.top-nav-right .dropdown bottom'
+        text: '${ _ko('As a superuser, you can check system configuration from the user menu and install sample data and jobs for your users.') }',
+        attachTo: '.hue-sidebar .shepherd-user-menu right'
       });
     %endif
 
