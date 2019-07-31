@@ -221,7 +221,7 @@ class Sidebar {
               active = child.type === 's3';
             } else if (location.href.indexOf('=adl') !== -1) {
               active = child.type === 'adls';
-            } else if (location.href.indexOf('=abfs') !== -1){
+            } else if (location.href.indexOf('=abfs') !== -1) {
               active = child.type === 'abfs';
             } else {
               active = child.type === 'hdfs';
