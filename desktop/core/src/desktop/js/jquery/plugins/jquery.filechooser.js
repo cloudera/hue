@@ -107,7 +107,7 @@ const pluginName = 'jHueFileChooser',
           name: 'ADLS'
         }
       },
-	  abfs: {
+      abfs: {
         scheme: 'abfs',
         root: 'abfs://',
         home: 'abfs://',
