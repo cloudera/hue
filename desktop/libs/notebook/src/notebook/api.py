@@ -130,7 +130,8 @@ def _execute_notebook(request, notebook, snippet):
       if snippet.get('interface') == 'sqlalchemy':
         interpreter.options['session'] = session
 
-      response['handle'] = interpreter.execute(notebook, snippet)
+      with opentracing.tracer.start_span('execute') as site_span:
+        response['handle'] = interpreter.execute(notebook, snippet)
 
       # Retrieve and remove the result from the handle
       if response['handle'].get('sync'):
@@ -181,10 +182,11 @@ def execute(request, engine=None):
 
   response = _execute_notebook(request, notebook, snippet)
 
-  opentracing.tracer.active_span.set_tag(
-    'query-id',
-    response['handle']['guid'] if response.get('handle') and response['handle'].get('guid') else None
-  )
+  with opentracing.tracer.start_span('execute') as span:
+    span.set_tag(
+      'query-id',
+      response['handle']['guid'] if response.get('handle') and response['handle'].get('guid') else None
+    )
 
   return JsonResponse(response)
 
