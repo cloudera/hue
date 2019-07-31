@@ -97,12 +97,13 @@ def check_document_modify_permission():
   return inner
 
 
-def api_error_handler(func):
-  def decorator(*args, **kwargs):
+def api_error_handler(f):
+  @wraps(f)
+  def wrapper(*args, **kwargs):
     response = {}
 
     try:
-      return func(*args, **kwargs)
+      return f(*args, **kwargs)
     except SessionExpired as e:
       response['status'] = -2
     except QueryExpired as e:
@@ -154,7 +155,7 @@ def api_error_handler(func):
       if response:
         return JsonResponse(response)
 
-  return decorator
+  return wrapper
 
 def _closest_power_of_2(number):
   return math.pow(2, math.ceil(math.log(number, 2)))
