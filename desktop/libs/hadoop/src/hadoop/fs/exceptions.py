@@ -36,7 +36,11 @@ class WebHdfsException(RestException):
     self.server_exc = None
 
     try:
-      json_body = json.loads(self._message)
+      if self._error and hasattr(self._error, 'response') and hasattr(self._error.response, 'text'): # Pull from urllib2.HTTPError
+        potential_json = self._error.response.text
+      else:
+        potential_json = self._message
+      json_body = json.loads(potential_json)
     except ValueError:
       pass
     else:
