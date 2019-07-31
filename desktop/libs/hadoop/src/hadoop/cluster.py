@@ -75,7 +75,7 @@ def get_defaultfs():
 
 def get_all_hdfs():
   global FS_CACHE
-  if FS_CACHE is not None:
+  if FS_CACHE:
     return FS_CACHE
 
   FS_CACHE = {}
