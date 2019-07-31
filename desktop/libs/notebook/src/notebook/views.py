@@ -85,7 +85,7 @@ def notebooks(request):
   })
 
 
-@check_document_access_permission()
+@check_document_access_permission
 def notebook(request, is_embeddable=False):
   if not SHOW_NOTEBOOKS.get() or not request.user.has_hue_permission(action="access", app='notebook'):
     return serve_403_error(request)
@@ -115,13 +115,13 @@ def notebook(request, is_embeddable=False):
   })
 
 
-@check_document_access_permission()
+@check_document_access_permission
 def notebook_embeddable(request):
   return notebook(request, True)
 
 
 @check_editor_access_permission()
-@check_document_access_permission()
+@check_document_access_permission
 def editor(request, is_mobile=False, is_embeddable=False):
   editor_id = request.GET.get('editor')
   editor_type = request.GET.get('type', 'hive')
@@ -153,12 +153,12 @@ def editor(request, is_mobile=False, is_embeddable=False):
   })
 
 
-@check_document_access_permission()
+@check_document_access_permission
 def editor_embeddable(request):
   return editor(request, False, True)
 
 
-@check_document_access_permission()
+@check_document_access_permission
 def editor_m(request):
   return editor(request, True)
 
@@ -194,7 +194,7 @@ def browse(request, database, table, partition_spec=None):
     })
 
 # Deprecated in Hue 4
-@check_document_access_permission()
+@check_document_access_permission
 def execute_and_watch(request):
   notebook_id = request.GET.get('editor', request.GET.get('notebook'))
   snippet_id = int(request.GET['snippet'])
@@ -299,7 +299,7 @@ def delete(request):
   return JsonResponse(response)
 
 
-@check_document_access_permission()
+@check_document_access_permission
 def copy(request):
   response = {'status': -1}
 
@@ -332,7 +332,7 @@ def copy(request):
   return JsonResponse(response)
 
 
-@check_document_access_permission()
+@check_document_access_permission
 def download(request):
   if not ENABLE_DOWNLOAD.get():
     return serve_403_error(request)

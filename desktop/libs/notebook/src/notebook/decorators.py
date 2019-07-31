@@ -58,26 +58,25 @@ def check_editor_access_permission():
   return inner
 
 
-def check_document_access_permission():
-  def inner(view_func):
-    def decorate(request, *args, **kwargs):
-      notebook_id = request.GET.get('notebook', request.GET.get('editor'))
-      if not notebook_id:
-        notebook_id = json.loads(request.POST.get('notebook', '{}')).get('id')
+def check_document_access_permission(f):
+  @wraps(f)
+  def wrapper(request, *args, **kwargs):
+    notebook_id = request.GET.get('notebook', request.GET.get('editor'))
+    if not notebook_id:
+      notebook_id = json.loads(request.POST.get('notebook', '{}')).get('id')
 
-      try:
-        if notebook_id:
-          if str(notebook_id).isdigit():
-            document = Document2.objects.get(id=notebook_id)
-            document.can_read_or_exception(request.user)
-          else:
-            Document2.objects.get_by_uuid(user=request.user, uuid=notebook_id)
-      except Document2.DoesNotExist:
-        raise PopupException(_('Document %(id)s does not exist') % {'id': notebook_id})
+    try:
+      if notebook_id:
+        if str(notebook_id).isdigit():
+          document = Document2.objects.get(id=notebook_id)
+          document.can_read_or_exception(request.user)
+        else:
+          Document2.objects.get_by_uuid(user=request.user, uuid=notebook_id)
+    except Document2.DoesNotExist:
+      raise PopupException(_('Document %(id)s does not exist') % {'id': notebook_id})
 
-      return view_func(request, *args, **kwargs)
-    return wraps(view_func)(decorate)
-  return inner
+    return f(request, *args, **kwargs)
+  return wrapper
 
 
 def check_document_modify_permission():
