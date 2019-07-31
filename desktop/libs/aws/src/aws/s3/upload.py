@@ -62,11 +62,11 @@ class S3FileUploadHandler(FileUploadHandler):
     self.target_path = None
     self.file = None
     self._request = request
-    self._fs = get_client(fs='s3a', user=request.user.username)
     self._mp = None
     self._part_num = 1
 
     if self._is_s3_upload():
+      self._fs = get_client(fs='s3a', user=request.user.username)
       self.bucket_name, self.key_name = parse_uri(self.destination)[:2]
       # Verify that the path exists
       self._fs._stats(self.destination)
