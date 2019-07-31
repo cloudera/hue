@@ -1664,6 +1664,25 @@ ENABLE_PROMETHEUS = Config(
 )
 
 
+TRACING = ConfigSection(
+  key="tracing",
+  help=_("Tracing configuration."),
+  members=dict(
+    ENABLED= Config(
+      key='enabled',
+      default=False,
+      type=coerce_bool,
+      help=_('If tracing is enabled.')
+    ),
+    TRACE_ALL = Config(
+      key='trace_all',
+      default=False,
+      type=coerce_bool,
+      help=_('Trace all the requests instead of a few specific ones like the SQL Editor. Much noisiers.')
+    ),
+))
+
+
 def task_server_default_result_directory():
   """Local directory to store task results."""
   return 'file://%s' % get_run_root('logs')
