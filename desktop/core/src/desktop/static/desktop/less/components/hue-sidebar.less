@@ -21,11 +21,11 @@
 @gradient-start: @cui-gray-800;
 @header-bg-open: @hue-primary-color-dark;
 @header-bg: @hue-primary-color-dark;
-@help-drawer-width: 400px;
+@default-drawer-width: 400px;
 @item-active-border: @hue-primary-color-dark;
 @item-color: rgb(173, 178, 182);
 @sidebar-background-color: #333e45;
-@sidebar-collapsed-item-height: 42px;
+@sidebar-collapsed-item-height: 35px;
 @sidebar-collapsed-icon-height: 22px;
 @sidebar-icon-height: 20px;
 @sidebar-collapsed-width: 56px;
@@ -49,6 +49,9 @@
   overflow: hidden;
   transition: all @animation-duration-base;
 
+  .hi {
+    margin-bottom: 0;
+  }
 
   * {
     -webkit-font-smoothing: antialiased;
@@ -217,8 +220,7 @@
       .flex-box-pack(end);
 
       justify-content: flex-end;
-      margin-top: 12px;
-      height: 52px;
+      height: 50px;
       padding: 0 16px;
 
       svg {
@@ -243,7 +245,12 @@
     align-items: center;
     justify-content: center;
     color: @sidebar-background-color;
+    background-color: @item-color;
     text-transform: uppercase;
+
+    &:hover {
+      background-color: @cui-white;
+    }
   }
 
   &.collapsed {
@@ -347,77 +354,108 @@
     height: 15px;
   }
 
-  .hue-drawer.help-drawer {
-    left: -@help-drawer-width;
-    width: @help-drawer-width;
-
-    .menu {
-      display: flex;
-      height: 100%;
-      flex-direction: column;
-    }
-
-    .menu-header {
-      height: @sidebar-header-height;
-      border-bottom: 1px solid @cui-gray-100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-      padding: 0 24px;
-
-      img {
-        height: 20px;
-        width: 20px;
-      }
-    }
-
-    .menu-body {
-      padding: 24px;
-      border-bottom: 1px solid @cui-gray-100;
-      flex-grow: 1;
-      min-height: 0;
-      overflow: auto;
-    }
-
-    .menu-footer {
-      flex-shrink: 0;
-
-      h2 {
-        padding: 24px 24px 0 24px;
-      }
-    }
+  &:not(.collapsed) .sidebar-menu {
+    left: @sidebar-width + 8px;
   }
 
-  // User Drawer
-  .hue-drawer.user-drawer {
+  &.collapsed .sidebar-menu {
+    left: @sidebar-collapsed-width + 8px;
+  }
+
+  .sidebar-menu {
+    z-index: 1010;
+    display: none;
+    position: fixed;
+    background-color: @cui-gray-800;
+    color: @cui-white;
+    font-size: 14px;
+    border-radius: 3px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 2px 4px 0;
+    white-space: nowrap;
+    padding: 4px 8px;
     top: auto;
     height: auto;
     bottom: 20px;
     transition: none;
 
-    .menu-header {
+    &.open {
+      display: block;
+    }
+
+    &.support-menu {
+      bottom: 38px;
+    }
+
+    .menu {
       display: flex;
-      flex-direction: row;
-      align-items: center;
-      padding: 10px 16px 20px 16px;
+      height: 100%;
+      flex-direction: column;
 
-      .user-icon {
-        width: 36px;
-        height: 36px;
-        margin-right: 12px;
-        font-size: 22px;
+      .menu-header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 10px 16px 20px 16px;
+
+        .user-icon {
+          width: 36px;
+          height: 36px;
+          margin-right: 12px;
+          font-size: 22px;
+          flex-shrink: 0;
+        }
+
+        > div {
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+        }
+
+        small {
+          font-size: 12px;
+        }
+      }
+
+      ul.sidebar-nav-list {
+        list-style: none;
+        margin: 4px 0;
+        padding: 0;
+
+        li {
+          margin-left: -8px;
+          margin-right: -8px;
+        }
+
+        li a {
+          height: 32px;
+          display: flex;
+          align-items: center;
+          color: @cui-white;
+          padding: 0 24px;
+
+          &:hover {
+            background-color: @hue-primary-color-dark;
+          }
+
+          svg {
+            margin-left: 8px;
+            font-size: 16px;
+          }
+        }
+      }
+
+      .menu-body {
+        flex-grow: 1;
+        min-height: 0;
+        overflow: auto;
+      }
+
+      .menu-footer {
         flex-shrink: 0;
-      }
 
-      > div {
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-      }
-
-      small {
-        font-size: 12px;
+        h2 {
+          padding: 24px 24px 0 24px;
+        }
       }
     }
   }

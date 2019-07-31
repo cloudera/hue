@@ -23,10 +23,77 @@ import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 
 const TEMPLATE = `
+  <script type="text/html" id="sidebar-inner-item">
+    <!-- ko if: iconHtml -->
+    <div class="icon" data-bind="html: iconHtml"></div><span data-bind="text: displayName"></span>
+    <!-- /ko -->
+    <!-- ko ifnot: iconHtml -->
+    <div class="icon" data-bind="hueAppIcon: icon"></div><span data-bind="text: displayName"></span>
+    <!-- /ko -->
+  </script>
+
   <script type="text/html" id="sidebar-item">
-    <div class="item-wrapper"><a href="javascript: void(0);" data-bind="hueLink: item.url, publish: 'hue.sidebar.update.active', attr: { 'aria-label': item.displayName, 'data-tooltip': item.displayName }, css: { 'active': item.active }" class="item">
-      <div class="icon" data-bind="hueAppIcon: item.icon"></div><span data-bind="text: item.displayName"></span>
-    </a></div>
+    <div class="item-wrapper" data-bind="css: itemClass">
+      <!-- ko if: click -->
+      <a href="javascript: void(0);" data-bind="click: click, attr: { 'aria-label': displayName, 'data-tooltip': displayName }, css: { 'active': active }" class="item">
+        <!-- ko template: 'sidebar-inner-item' --><!-- /ko -->
+      </a>
+      <!-- /ko -->
+      <!-- ko ifnot: click -->
+      <a href="javascript: void(0);" data-bind="hueLink: url, publish: 'hue.sidebar.update.active', attr: { 'aria-label': displayName, 'data-tooltip': displayName }, css: { 'active': active }" class="item">
+        <!-- ko template: 'sidebar-inner-item' --><!-- /ko -->
+      </a>
+      <!-- /ko -->
+      <!-- ko if: subMenuTemplate -->
+      <!-- ko template: subMenuTemplate --><!-- /ko -->
+      <!-- /ko -->
+    </div>
+  </script>
+  
+  <script type="text/html" id="user-sub-menu-template">
+    <div class="sidebar-menu user-menu" data-bind="css: { 'open' : $component.userMenuOpen }">
+      <div class="menu">
+        <div class="menu-header">
+          <div class="user-icon" style="background-color: #fff">${window.LOGGED_USERNAME[0].toUpperCase()}</div>
+          <div>
+            <div>${window.LOGGED_USERNAME}</div>
+          </div>
+        </div>
+        <ul class="sidebar-nav-list">
+          <!-- ko if: window.USER_VIEW_EDIT_USER_ENABLED -->
+          <li><a href="javascript:void(0);" data-bind="hueLink: '/useradmin/users/edit/${
+            window.LOGGED_USERNAME
+          }', attr: { 'title': window.IS_LDAP_SETUP ? ${I18n('View Profile')} : ${I18n(
+  'Edit Profile'
+)}">${I18n('My Profile')}</a></li>
+          <!-- /ko -->
+          <!-- ko if: window.USER_IS_ADMIN -->
+          <li><a href="javascript: void(0);" data-bind="hueLink: '/useradmin/users/'">${I18n(
+            'Manage Users'
+          )}</a></li>
+          <li><a href="javascript: void(0);" data-bind="hueLink: '/about/'">${I18n(
+            'Administration'
+          )}</a></li>
+          <!-- /ko -->
+          <li><a href="javascript: void(0);" data-bind="hueLink: '/accounts/logout'" title="${I18n(
+            'Sign out'
+          )}" >${I18n('Sign out')}</a></li>
+        </ul>
+      </div>
+    </div>
+  </script>
+  
+  <script type="text/html" id="support-sub-menu-template">
+    <div class="sidebar-menu support-menu" data-bind="css: { 'open' : $component.supportMenuOpen }">
+      <div class="menu">
+        <ul class="sidebar-nav-list">
+          <li><a href="javascript:void(0)" data-bind="publish: 'show.welcome.tour'">${I18n(
+            'Welcome Tour'
+          )}</a></li>
+          <li><a href="http://gethue.com" target="_blank">${I18n('Help')}</a></li>
+        </ul>
+      </div>
+    </div>
   </script>
 
   <!-- ko if: window.DISPLAY_APP_SWITCHER -->
@@ -40,19 +107,22 @@ const TEMPLATE = `
   </div>
   <!-- /ko -->
   <div class="hue-sidebar-body">
-    <!-- ko foreach: {data: items, as: 'item'} -->
-      <!-- ko if: item.isCategory -->
+    <!-- ko foreach: items -->
+      <!-- ko if: isCategory -->
         <!-- ko ifnot: $index() === 0 -->
         <div class="item-spacer"></div>
         <!-- /ko -->
-        <!-- ko template: {name: 'sidebar-item', foreach: item.children, as: 'item'} --><!-- /ko -->
+        <!-- ko template: {name: 'sidebar-item', foreach: children } --><!-- /ko -->
       <!-- /ko -->
-      <!-- ko ifnot: item.isCategory -->
+      <!-- ko ifnot: isCategory -->
         <!-- ko template: { name: 'sidebar-item' } --><!-- /ko -->
       <!-- /ko -->
     <!-- /ko -->
   </div>
   <div class="hue-sidebar-footer">
+    <!-- ko foreach: footerItems -->
+    <!-- ko template: { name: 'sidebar-item' } --><!-- /ko -->
+    <!-- /ko -->
     <a class="hue-sidebar-trigger" data-bind="toggle: collapsed">
       <svg><use xlink:href="#hi-collapse-nav"></use></svg>
     </a>
@@ -68,8 +138,11 @@ class SidebarItem {
     this.children = options.children;
     this.name = options.name;
     this.type = options.type;
-
     this.active = ko.observable(false);
+    this.click = options.click;
+    this.subMenuTemplate = options.subMenuTemplate;
+    this.iconHtml = options.iconHtml;
+    this.itemClass = options.itemClass;
   }
 }
 
@@ -78,6 +151,34 @@ class Sidebar {
     this.$element = $(element);
 
     this.collapsed = ko.observable();
+    this.userMenuOpen = ko.observable(false);
+    this.supportMenuOpen = ko.observable(false);
+
+    this.userMenuOpen.subscribe(newVal => {
+      if (newVal) {
+        window.setTimeout(() => {
+          $(document).on('click.userMenu', () => {
+            this.userMenuOpen(false);
+          });
+        }, 0);
+        this.supportMenuOpen(false);
+      } else {
+        $(document).off('click.userMenu');
+      }
+    });
+
+    this.supportMenuOpen.subscribe(newVal => {
+      if (newVal) {
+        window.setTimeout(() => {
+          $(document).on('click.supportMenu', () => {
+            this.supportMenuOpen(false);
+          });
+        }, 0);
+        this.userMenuOpen(false);
+      } else {
+        $(document).off('click.supportMenu');
+      }
+    });
 
     this.collapsed.subscribe(newVal => {
       if (newVal) {
@@ -90,9 +191,26 @@ class Sidebar {
     apiHelper.withTotalStorage('hue.sidebar', 'collabse', this.collapsed, true);
 
     this.items = ko.observableArray();
+    this.footerItems = [
+      new SidebarItem({
+        displayName: 'Support',
+        icon: 'support',
+        click: () => this.supportMenuOpen(!this.supportMenuOpen()),
+        subMenuTemplate: 'support-sub-menu-template'
+      }),
+      new SidebarItem({
+        displayName: window.LOGGED_USERNAME,
+        itemClass: 'shepherd-user-menu',
+        iconHtml: '<div class="user-icon">' + window.LOGGED_USERNAME[0].toUpperCase() + '</div>',
+        click: () => this.userMenuOpen(!this.userMenuOpen()),
+        subMenuTemplate: 'user-sub-menu-template'
+      })
+    ];
     this.lastAppName = undefined;
 
     const updateActive = () => {
+      this.userMenuOpen(false);
+      this.supportMenuOpen(false);
       this.items().forEach(item => {
         item.children.forEach(child => {
           let active = false;
