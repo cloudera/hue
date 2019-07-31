@@ -283,7 +283,7 @@ def fetch_result_metadata(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  with opentracing.tracer.start_span('notebook-fetch_result_data') as span:
+  with opentracing.tracer.start_span('notebook-fetch_result_metadata') as span:
     response['result'] = get_api(request, snippet).fetch_result_metadata(notebook, snippet)
 
     span.set_tag('user-id', request.user.username)
@@ -306,7 +306,7 @@ def fetch_result_size(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  with opentracing.tracer.start_span('notebook-fetch_result_data') as span:
+  with opentracing.tracer.start_span('notebook-fetch_result_size') as span:
     response['result'] = get_api(request, snippet).fetch_result_size(notebook, snippet)
 
     span.set_tag('user-id', request.user.username)
@@ -331,7 +331,7 @@ def cancel_statement(request):
   notebook = Notebook(document=nb_doc).get_data()
   snippet = notebook['snippets'][0]
 
-  with opentracing.tracer.start_span('notebook-fetch_result_data') as span:
+  with opentracing.tracer.start_span('notebook-cancel_statement') as span:
     response['result'] = get_api(request, snippet).cancel(notebook, snippet)
 
     span.set_tag('user-id', request.user.username)
@@ -361,7 +361,7 @@ def get_logs(request):
 
   db = get_api(request, snippet)
 
-  with opentracing.tracer.start_span('notebook-fetch_result_data') as span:
+  with opentracing.tracer.start_span('notebook-get_logs') as span:
     logs = smart_str(db.get_log(notebook, snippet, startFrom=startFrom, size=size))
 
     span.set_tag('user-id', request.user.username)
@@ -613,7 +613,14 @@ def close_statement(request):
   snippet = notebook['snippets'][0]
 
   try:
-    response['result'] = get_api(request, snippet).close_statement(notebook, snippet)
+    with opentracing.tracer.start_span('notebook-close_statement') as span:
+      response['result'] = get_api(request, snippet).close_statement(notebook, snippet)
+
+      span.set_tag('user-id', request.user.username)
+      span.set_tag(
+        'query-id',
+        snippet['result']['handle']['guid'] if snippet['result'].get('handle') and snippet['result']['handle'].get('guid') else None
+      )
   except QueryExpired:
     pass
 
