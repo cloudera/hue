@@ -77,6 +77,18 @@ class ABFSTestBase(unittest.TestCase):
     LOG.debug("%s" %directory)
     assert_true(directory is not None, directory)
     
+    pathing = self.client._statsf(filesystems[276])
+    LOG.debug("%s" %pathing)
+    assert_true(pathing is not None, pathing)
+    
+    pathing = self.client._statsf(filesystems[277])
+    LOG.debug("%s" %pathing)
+    assert_true(pathing is not None, pathing)
+    
+    pathing = self.client.listdir('abfs://' + filesystems[276], glob = True)
+    LOG.debug("%s" %pathing)
+    assert_true(pathing is not None, pathing)
+    
   def test_existence(self):
     test_fs = self.test_fs
     test_dir = test_fs + '/test_existence'

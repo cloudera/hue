@@ -185,7 +185,6 @@ class ABFS(object):
     stats = []
     res = self._root._invoke("GET", params = {"resource" : "account"}, headers = self._getheaders() )
     resp = self._root._format_response(res)
-    LOG.debug("%s" %res)
     for x in resp['filesystems']:
       stats.append(ABFSStat.for_filesystems(res.headers, x))
     return stats
@@ -210,9 +209,10 @@ class ABFS(object):
       params = {}
     params['resource'] = 'filesystem'
     res = self._root._invoke('HEAD', schemeless_path, params, headers = self._getheaders(), **kwargs)
+    LOG.debug("%s" %res)
     return res.headers
     
-  def listdir(self, path, params = None, **kwargs):
+  def listdir(self, path, params = None, glob=None, **kwargs):
     """
     Lists the names inside the current directories 
     """
@@ -285,14 +285,16 @@ class ABFS(object):
     params['resource'] = 'directory'
     self._create_path(path, params = params, headers = params, create = 'true')
   
-  def create(self, path, params = None, headers = None, *args, **kwargs):
+  def create(self, path, params = None, data = None, headers = None, *args, **kwargs):
     """
-    Makes a File
+    Makes a File (Put text in data if adding data)
     """
     if params is None:
       params = {}
     params['resource'] = 'file'
     self._create_path(path, params = params, headers =headers, create = 'true')
+    if data:
+      self._writedata(path, data, len(data))
 
   def create_home_dir(self, home_path=None):
     raise NotImplementedError("File System not named")
@@ -317,7 +319,7 @@ class ABFS(object):
     Creates a File System
     """
     self._root.put(file_system,{'resource': 'filesystem'}, headers= self._getheaders())
-    
+
   # Read Files
   # --------------------------------
   def read(self, path, offset = '0', length = 0, *args, **kwargs):
@@ -440,7 +442,6 @@ class ABFS(object):
   def purge_trash(self):
     raise NotImplementedError("")
   
-  
   # Handle file systems interactions
   # --------------------------------
   def copy(self, src, dst, *args, **kwargs):
@@ -451,7 +452,6 @@ class ABFS(object):
       return self.copyfile(src ,dst)    
     self.copy_remote_dir(src, dst)
           
-  
   def copyfile(self, src, dst, *args, **kwargs):
     """
     Copies a File to another location
@@ -461,16 +461,7 @@ class ABFS(object):
     chunk_size = self.get_upload_chuck_size()
     file = self.read(src)
     size = len(file)
-    cycles = ceil(float(size) / chunk_size)
-    for i in range(0,cycles):
-      chunk = size % chunk_size
-      if i != cycles or chunk == 0:
-        length = chunk_size
-      else:
-        length = chunk
-      self.append(new_path, file[i*chunk_size:i*chunk_size + length], length)
-    LOG.debug("%s" %size)
-    self.flush(new_path, {'position' : int(size) })
+    self._writedata(new_path, file, size)
 
   def copy_remote_dir(self, src, dst, *args, **kwargs):
     """
@@ -548,7 +539,27 @@ class ABFS(object):
   def filebrowser_action(self):
     return self._filebrowser_action
   
-  #Methods to condense stuff
+  #Other Methods to condense stuff
+  #----------------------------
+  # Write Files on creation
+  #----------------------------
+  def _writedata(self, path, data, size):
+    """
+    Adds text to a given file
+    """
+    chunk_size = self.get_upload_chuck_size()
+    cycles = ceil(float(size) / chunk_size)
+    for i in range(0,cycles):
+      chunk = size % chunk_size
+      if i != cycles or chunk == 0:
+        length = chunk_size
+      else:
+        length = chunk
+      self.append(path, data[i*chunk_size:i*chunk_size + length], length)
+    LOG.debug("%s" %data)
+    self.flush(path, {'position' : int(size) })
+  
+  # Use Patch HTTP request
   #----------------------------
   def _patching_sl(self, schemeless_path, param, data = None, header = None, **kwargs):
     """
