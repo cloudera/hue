@@ -738,4 +738,5 @@ if desktop.conf.TRACING.ENABLED.get():
       return config.initialize_tracer()
 
   OPENTRACING_TRACED_ATTRIBUTES = ['META'] # Only valid if OPENTRACING_TRACE_ALL == True
-  MIDDLEWARE_CLASSES.insert(0, 'django_opentracing.OpenTracingMiddleware')
+  if desktop.conf.TRACING.TRACE_ALL.get():
+    MIDDLEWARE_CLASSES.insert(0, 'django_opentracing.OpenTracingMiddleware')

@@ -130,7 +130,7 @@ def _execute_notebook(request, notebook, snippet):
       if snippet.get('interface') == 'sqlalchemy':
         interpreter.options['session'] = session
 
-      with opentracing.tracer.start_span('execute') as site_span:
+      with opentracing.tracer.start_span('interpreter') as span:
         response['handle'] = interpreter.execute(notebook, snippet)
 
       # Retrieve and remove the result from the handle
@@ -173,6 +173,7 @@ def _execute_notebook(request, notebook, snippet):
 
   return response
 
+
 @require_POST
 @check_document_access_permission
 @api_error_handler
@@ -180,9 +181,11 @@ def execute(request, engine=None):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  response = _execute_notebook(request, notebook, snippet)
+  with opentracing.tracer.start_span('notebook-execute') as span:
+    span.set_tag('user-id', request.user.username)
 
-  with opentracing.tracer.start_span('execute') as span:
+    response = _execute_notebook(request, notebook, snippet)
+
     span.set_tag(
       'query-id',
       response['handle']['guid'] if response.get('handle') and response['handle'].get('guid') else None
@@ -206,7 +209,13 @@ def check_status(request):
     snippet = notebook['snippets'][0]
 
   try:
-    response['query_status'] = get_api(request, snippet).check_status(notebook, snippet)
+    with opentracing.tracer.start_span('notebook-check_status') as span:
+      span.set_tag('user-id', request.user.username)
+      span.set_tag(
+        'query-id',
+        snippet['result']['handle']['guid'] if snippet['result'].get('handle') and snippet['result']['handle'].get('guid') else None
+      )
+      response['query_status'] = get_api(request, snippet).check_status(notebook, snippet)
 
     response['status'] = 0
   except SessionExpired:
@@ -246,7 +255,14 @@ def fetch_result_data(request):
   rows = json.loads(request.POST.get('rows', '100'))
   start_over = json.loads(request.POST.get('startOver', 'false'))
 
-  response['result'] = get_api(request, snippet).fetch_result(notebook, snippet, rows, start_over)
+  with opentracing.tracer.start_span('notebook-fetch_result_data') as span:
+    response['result'] = get_api(request, snippet).fetch_result(notebook, snippet, rows, start_over)
+
+    span.set_tag('user-id', request.user.username)
+    span.set_tag(
+      'query-id',
+      snippet['result']['handle']['guid'] if snippet['result'].get('handle') and snippet['result']['handle'].get('guid') else None
+    )
 
   # Materialize and HTML escape results
   if response['result'].get('data') and response['result'].get('type') == 'table' and not response['result'].get('isEscaped'):
@@ -267,7 +283,15 @@ def fetch_result_metadata(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  response['result'] = get_api(request, snippet).fetch_result_metadata(notebook, snippet)
+  with opentracing.tracer.start_span('notebook-fetch_result_data') as span:
+    response['result'] = get_api(request, snippet).fetch_result_metadata(notebook, snippet)
+
+    span.set_tag('user-id', request.user.username)
+    span.set_tag(
+      'query-id',
+      snippet['result']['handle']['guid'] if snippet['result'].get('handle') and snippet['result']['handle'].get('guid') else None
+    )
+
   response['status'] = 0
 
   return JsonResponse(response)
@@ -282,7 +306,15 @@ def fetch_result_size(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  response['result'] = get_api(request, snippet).fetch_result_size(notebook, snippet)
+  with opentracing.tracer.start_span('notebook-fetch_result_data') as span:
+    response['result'] = get_api(request, snippet).fetch_result_size(notebook, snippet)
+
+    span.set_tag('user-id', request.user.username)
+    span.set_tag(
+      'query-id',
+      snippet['result']['handle']['guid'] if snippet['result'].get('handle') and snippet['result']['handle'].get('guid') else None
+    )
+
   response['status'] = 0
 
   return JsonResponse(response)
@@ -299,7 +331,15 @@ def cancel_statement(request):
   notebook = Notebook(document=nb_doc).get_data()
   snippet = notebook['snippets'][0]
 
-  response['result'] = get_api(request, snippet).cancel(notebook, snippet)
+  with opentracing.tracer.start_span('notebook-fetch_result_data') as span:
+    response['result'] = get_api(request, snippet).cancel(notebook, snippet)
+
+    span.set_tag('user-id', request.user.username)
+    span.set_tag(
+      'query-id',
+      snippet['result']['handle']['guid'] if snippet['result'].get('handle') and snippet['result']['handle'].get('guid') else None
+    )
+
   response['status'] = 0
 
   return JsonResponse(response)
@@ -313,17 +353,22 @@ def get_logs(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
-
   startFrom = request.POST.get('from')
   startFrom = int(startFrom) if startFrom else None
-
   size = request.POST.get('size')
   size = int(size) if size else None
+  full_log = smart_str(request.POST.get('full_log', ''))
 
   db = get_api(request, snippet)
 
-  full_log = smart_str(request.POST.get('full_log', ''))
-  logs = smart_str(db.get_log(notebook, snippet, startFrom=startFrom, size=size))
+  with opentracing.tracer.start_span('notebook-fetch_result_data') as span:
+    logs = smart_str(db.get_log(notebook, snippet, startFrom=startFrom, size=size))
+
+    span.set_tag('user-id', request.user.username)
+    span.set_tag(
+      'query-id',
+      snippet['result']['handle']['guid'] if snippet['result'].get('handle') and snippet['result']['handle'].get('guid') else None
+    )
   full_log += logs
 
   jobs = db.get_jobs(notebook, snippet, full_log)
