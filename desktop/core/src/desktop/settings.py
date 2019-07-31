@@ -737,7 +737,7 @@ def tracer():
                 'type': 'const',
                 'param': 1,
             },
-            'logging': True,
+            'logging': False,
         },
         # metrics_factory=PrometheusMetricsFactory(namespace='hue-api'),
         service_name='hue-api'
