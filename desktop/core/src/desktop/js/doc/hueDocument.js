@@ -45,6 +45,7 @@ class HueDocument {
   }
 
   onShareAutocompleteUserEnter() {
+    const self = this;
     const searchAutoCompInput = $('#userSearchAutocomp').val();
     const selectedUserOrGroup = self.userMap[searchAutoCompInput]
       ? self.userMap[searchAutoCompInput]
