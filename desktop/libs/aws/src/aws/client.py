@@ -21,15 +21,13 @@ import datetime
 import logging
 import os
 
-import boto
-import boto.s3
 import boto.s3.connection
-import boto.utils
 
 from aws import conf as aws_conf
 from aws.s3.s3fs import S3FileSystemException
 from aws.s3.s3fs import S3FileSystem
 
+from desktop.conf import DEFAULT_USER
 from desktop.lib.idbroker import conf as conf_idbroker
 from desktop.lib.idbroker.client import IDBroker
 
@@ -39,9 +37,10 @@ HTTP_SOCKET_TIMEOUT_S = 60
 
 CLIENT_CACHE = None
 
+_DEFAULT_USER = DEFAULT_USER.get()
 
 # FIXME: Should we check hue principal for the default user?
-def _get_cache_key(identifier='default', user='HUE'): # FIXME: Caching via username has issues when users get deleted. Need to switch to userid, but bigger change
+def _get_cache_key(identifier='default', user=_DEFAULT_USER): # FIXME: Caching via username has issues when users get deleted. Need to switch to userid, but bigger change
   return identifier + ':' + user
 
 
@@ -54,7 +53,7 @@ def current_ms_from_utc():
   return (datetime.datetime.utcnow() - datetime.datetime.utcfromtimestamp(0)).total_seconds() * 1000
 
 
-def get_client(identifier='default', user=None):
+def get_client(identifier='default', user=_DEFAULT_USER):
   global CLIENT_CACHE
   _init_clients()
 
@@ -68,7 +67,7 @@ def get_client(identifier='default', user=None):
     CLIENT_CACHE[cache_key] = client
     return client
 
-def get_credential_provider(identifier='default', user=None):
+def get_credential_provider(identifier='default', user=_DEFAULT_USER):
   client_conf = aws_conf.AWS_ACCOUNTS[identifier] if identifier in aws_conf.AWS_ACCOUNTS else None
   return CredentialProviderIDBroker(IDBroker.from_core_site('s3a', user)) if conf_idbroker.is_idbroker_enabled('s3a') else CredentialProviderConf(client_conf)
 
@@ -87,7 +86,7 @@ def _init_clients():
     CLIENT_CACHE[_get_cache_key()] = _make_client('default')
 
 
-def _make_client(identifier, user=None):
+def _make_client(identifier, user=_DEFAULT_USER):
   client_conf = aws_conf.AWS_ACCOUNTS[identifier] if identifier in aws_conf.AWS_ACCOUNTS else None
 
   client = Client.from_config(client_conf, get_credential_provider(identifier, user))

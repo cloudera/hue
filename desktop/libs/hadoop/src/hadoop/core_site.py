@@ -17,10 +17,10 @@
 
 import errno
 import logging
-import os.path
 
-import conf
 import confparse
+
+from desktop.lib.paths import get_config_root_hadoop
 
 __all = ['get_conf', 'get_trash_interval', 'get_s3a_access_key', 'get_s3a_secret_key']
 
@@ -62,19 +62,15 @@ def _parse_core_site():
   global _CORE_SITE_DICT
   global _CORE_SITE_PATH
 
-  for indentifier in conf.HDFS_CLUSTERS.get():
-    try:
-      _CORE_SITE_PATH = os.path.join(conf.HDFS_CLUSTERS[indentifier].HADOOP_CONF_DIR.get(), 'core-site.xml') # Will KeyError and be empty as HADOOP_CONF_DIR does not exist anymore
-      data = file(_CORE_SITE_PATH, 'r').read()
-      break
-    except KeyError:
-      data = ""
-    except IOError, err:
-      if err.errno != errno.ENOENT:
-        LOG.error('Cannot read from "%s": %s' % (_CORE_SITE_PATH, err))
-        return
-      # Keep going and make an empty ConfParse
-      data = ""
+  try:
+    _CORE_SITE_PATH = get_config_root_hadoop('core-site.xml')
+    data = file(_CORE_SITE_PATH, 'r').read()
+  except IOError, err:
+    if err.errno != errno.ENOENT:
+      LOG.error('Cannot read from "%s": %s' % (_CORE_SITE_PATH, err))
+      return
+    # Keep going and make an empty ConfParse
+    data = ""
 
   _CORE_SITE_DICT = confparse.ConfParse(data)
 

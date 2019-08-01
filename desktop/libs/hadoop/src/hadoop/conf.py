@@ -57,6 +57,10 @@ UPLOAD_CHUNK_SIZE = Config(
 def has_hdfs_enabled():
   return HDFS_CLUSTERS.keys()
 
+def get_hadoop_conf_dir_default():
+  """ get from environment variable HADOOP_CONF_DIR or "/etc/hadoop/conf" """
+  return os.environ.get("HADOOP_CONF_DIR", "/etc/hadoop/conf")
+
 
 HDFS_CLUSTERS = UnspecifiedConfigSection(
   "hdfs_clusters",
@@ -86,7 +90,7 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
                       default='/tmp', type=str),
       HADOOP_CONF_DIR = Config(
         key="hadoop_conf_dir",
-        default=os.environ.get("HADOOP_CONF_DIR", "/etc/hadoop/conf"),
+        dynamic_default=get_hadoop_conf_dir_default,
         help=("Directory of the Hadoop configuration) Defaults to the environment variable " +
               "HADOOP_CONF_DIR when set, or '/etc/hadoop/conf'.")
       )
