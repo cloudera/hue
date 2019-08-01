@@ -1784,7 +1784,7 @@ def has_multi_clusters():
 
 def has_connectors():
   '''When the connector feature is turned on'''
-  return len(CONNECTORS.get()) >= 1
+  return ENABLE_CONNECTORS.get()
 
 
 CLUSTERS = UnspecifiedConfigSection(
@@ -1815,6 +1815,12 @@ CLUSTERS = UnspecifiedConfigSection(
   )
 )
 
+ENABLE_CONNECTORS = Config(
+  key='enable_connectors',
+  default=False,
+  type=coerce_bool,
+  help=_('Turn on the Connector configuration and usage.')
+)
 
 CONNECTORS = UnspecifiedConfigSection(
   key='connectors',
