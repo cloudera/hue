@@ -37,7 +37,7 @@ class ProxyFS(object):
     self._fs_dict = filesystems_dict
     self._user = {'user': None} # wrapping in an object to avoid triggering __getattr__ / __setattr__
     self._default_scheme = default_scheme
-    self._default_fs = filesystems_dict[self._default_scheme](name, default_scheme)
+    self._default_fs = filesystems_dict[self._default_scheme](name)
 
   def __getattr__(self, item):
     return getattr(object.__getattribute__(self, "_default_fs"), item)
