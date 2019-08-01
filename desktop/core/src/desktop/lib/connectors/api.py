@@ -20,6 +20,7 @@ import logging
 
 from django.utils.translation import ugettext as _
 
+from desktop.conf import has_connectors, CONNECTORS
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.connectors.lib.impala import Impala
 from desktop.lib.connectors.lib.hive import Hive
@@ -34,7 +35,7 @@ LOG = logging.getLogger(__name__)
 CONNECTOR_TYPES = [{
     'nice_name': connector.NAME,
     'dialect': connector.TYPE,
-    'interface': connector.INTERFACE,
+    'interface': connector.INTERFACE, # interfaces = ['int1', 'int2'...]
     'settings': connector.PROPERTIES,
     'id': None,
     'category': 'editor',
@@ -44,13 +45,14 @@ CONNECTOR_TYPES = [{
     Impala(), Hive()
   ]
 ]
+
 CONNECTOR_TYPES += [
   {'nice_name': "Hive Tez", 'dialect': 'hive-tez', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'id': None, 'category': 'editor', 'description': ''},
   {'nice_name': "Hive LLAP", 'dialect': 'hive-llap', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'id': None, 'category': 'editor', 'description': ''},
   {'nice_name': "Druid", 'dialect': 'sql-druid', 'interface': 'sqlalchemy', 'settings': [{'name': 'url', 'value': 'druid://druid-host.com:8082/druid/v2/sql/'}], 'id': None, 'category': 'editor', 'description': ''},
   {'nice_name': "Kafka SQL", 'dialect': 'kafka-sql', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
   {'nice_name': "SparkSQL", 'dialect': 'spark-sql', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
-  {'nice_name': "MySQL", 'dialect': 'sql-mysql', 'interface': 'sqlalchemy', 'settings': [{'name': 'url', 'value': 'mysql://username:password@mysq-host:3306/hue'}], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "MySQL", 'dialect': 'mysql', 'interface': 'sqlalchemy', 'settings': [{'name': 'url', 'value': 'mysql://username:password@mysq-host:3306/hue'}], 'id': None, 'category': 'editor', 'description': ''},
   {'nice_name': "Presto", 'dialect': 'presto', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
   {'nice_name': "Athena", 'dialect': 'athena', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
   {'nice_name': "Redshift", 'dialect': 'redshift', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
@@ -111,37 +113,31 @@ AVAILABLE_CONNECTORS = _group_category_connectors(CONNECTOR_TYPES)
 # TODO: connector groups: if we want one type (e.g. Hive) to show-up with multiple computes and the same saved query.
 # TODO: type --> name, type --> SQL language, e.g. mysql
 
-# connector_type: engine, engine_type: sql, language: hive, hive tez, hiveserver2 + endpoint
-CONNECTOR_INSTANCES = [{
-    'nice_name': 'Impala', 'name': 'impala-1',
-    'dialect': Impala().TYPE, 'interface': Impala().INTERFACE, 'settings': Impala().PROPERTIES, 'is_sql': True, 'id': 1, 'category': 'editor', 'description': ''
-  }, {
-    'nice_name': 'Hive', 'name': 'hive-1',
-    'dialect': Hive().TYPE, 'interface': Hive().INTERFACE, 'settings': Hive().PROPERTIES, 'is_sql': True, 'id': 2, 'category': 'editor', 'description': ''
-  }, {
-    'nice_name': 'Hive c5', 'name': 'hive-2',
-    'dialect': Hive().TYPE, 'interface': Hive().INTERFACE, 'settings': Hive().PROPERTIES, 'is_sql': True, 'id': 3, 'category': 'editor', 'description': ''
-  }, {
-    'nice_name': 'MySQL', 'name': 'mysql-1',
-    'dialect': 'mysql', 'interface': 'sqlalchemy', 'settings': [], 'is_sql': True, 'id': 4, 'category': 'editor', 'description': ''
-  },
-]
+# connector_type: category --> engine, is_sql --> engine_type: sql
+CONNECTOR_INSTANCES = []
 
-CONNECTOR_INSTANCES[0]['settings'] = [
-  {'name': 'server_host', 'value': 'self-service-dw2-2.gce.cloudera.com'},
-  {'name': 'server_port', 'value': '21050'},
-]
-CONNECTOR_INSTANCES[1]['settings'] = [
-  {'name': 'server_host', 'value': 'self-service-dw2-1.gce.cloudera.com'},
-  {'name': 'server_port', 'value': '10000'},
-]
-CONNECTOR_INSTANCES[2]['settings'] = [
-  {'name': 'server_host', 'value': 'nightly6x-unsecure-1.vpc.cloudera.com'},
-  {'name': 'server_port', 'value': '10000'},
-]
-CONNECTOR_INSTANCES[3]['settings'] = [
-  {'name': 'url', 'value': 'mysql://hue:datasshue@romain2:3306/hue'},
-]
+if has_connectors():
+  connector_config = CONNECTORS.get()
+
+  for i in connector_config:
+    connector_class = [
+      connector_type
+      for connector_type in CONNECTOR_TYPES
+          if connector_type['dialect'] == connector_config[i].DIALECT.get() and connector_type['interface'] == connector_config[i].INTERFACE.get()
+    ]
+    CONNECTOR_INSTANCES.append({
+        'nice_name': connector_config[i].NICE_NAME.get() or i,
+        'name': i,
+        'dialect': connector_config[i].DIALECT.get(),
+        'interface': connector_config[i].INTERFACE.get(),
+        'settings': connector_config[i].SETTINGS.get(),
+        # From Connector class
+        'is_sql': True,
+        'id': None,
+        'category': connector_class[0]['category'],
+        'description': connector_class[0]['description']
+      }
+    )
 
 
 def get_connector_classes(request):

@@ -1828,30 +1828,30 @@ CONNECTORS = UnspecifiedConfigSection(
   each=ConfigSection(
     help=_("Id of the connector."),
     members=dict(
-      NAME=Config(
-          "name",
+      NICE_NAME=Config(
+          "nice_name",
           help=_("Nice name of the connector to show to the user. Same as id if not specified."),
           default=None,
           type=str,
       ),
-      TYPE=Config(
-          "type",
-          help=_("Type of cluster, e.g. single, direct, local ini, CM API, Dataeng, Arcus, BigQuery, Presto."),
-          default='direct',
+      DIALECT=Config(
+          "dialect",
+          help=_("The language or type of the integrated service. e.g. MySql, Hive, HDFS..."),
+          default=None,
           type=str,
       ),
       INTERFACE=Config(
           "interface",
-          help=_("Type of cluster interface"),
-          default='hive',
+          help=_("The class of connector to use to connect to the service."),
+          default=None,
           type=str,
       ),
-      OPTIONS=Config(
-        key='options',
-        help=_('Specific options for connecting to the server.'),
-        type=coerce_json_dict,
-        default='{}'
-      )
+      SETTINGS=Config(
+          "settings",
+          help=_("Json string of a list of name/value settings to configure the connector. e.g. '{\"name\": \"url\", \"value\": \"mysql://hue:hue@host:3306/hue\"}]'"),
+          default='{}',
+          type=coerce_json_dict,
+      ),
     )
   )
 )
