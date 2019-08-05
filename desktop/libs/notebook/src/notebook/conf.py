@@ -47,9 +47,6 @@ def check_permissions(user, interpreter, user_apps=None):
 
 
 def get_ordered_interpreters(user=None):
-  from desktop.lib.connectors.api import CONNECTOR_INSTANCES
-  global CONNECTOR_INSTANCES
-
   if not INTERPRETERS.get():
     _default_interpreters(user)
 
@@ -69,6 +66,7 @@ def get_ordered_interpreters(user=None):
     raise ValueError("Interpreters from interpreters_shown_on_wheel is not in the list of Interpreters %s" % unknown_interpreters)
 
   if has_connectors():
+    from desktop.lib.connectors.api import _get_installed_connectors
     reordered_interpreters = [{
         'name': i['nice_name'],
         'type': i['name'],
@@ -77,7 +75,7 @@ def get_ordered_interpreters(user=None):
         'is_sql': i['is_sql'],
         'interface': i['interface'],
         'options': {setting['name']: setting['value'] for setting in i['settings']}
-      } for i in CONNECTOR_INSTANCES
+      } for i in _get_installed_connectors()
     ]
   else:
     reordered_interpreters = interpreters_shown_on_wheel + [i for i in user_interpreters if i not in interpreters_shown_on_wheel]

@@ -114,31 +114,8 @@ AVAILABLE_CONNECTORS = _group_category_connectors(CONNECTOR_TYPES)
 # TODO: type --> name, type --> SQL language, e.g. mysql
 
 # connector_type: category --> engine, is_sql --> engine_type: sql
-CONNECTOR_INSTANCES = []
-
-if has_connectors():
-  connector_config = CONNECTORS.get()
-
-  for i in connector_config:
-    connector_class = [
-      connector_type
-      for connector_type in CONNECTOR_TYPES
-          if connector_type['dialect'] == connector_config[i].DIALECT.get() and connector_type['interface'] == connector_config[i].INTERFACE.get()
-    ]
-    CONNECTOR_INSTANCES.append({
-        'nice_name': connector_config[i].NICE_NAME.get() or i,
-        'name': i,
-        'dialect': connector_config[i].DIALECT.get(),
-        'interface': connector_config[i].INTERFACE.get(),
-        'settings': connector_config[i].SETTINGS.get(),
-        # From Connector class
-        'is_sql': True,
-        'id': None,
-        'category': connector_class[0]['category'],
-        'description': connector_class[0]['description']
-      }
-    )
-
+CONNECTOR_INSTANCES = None
+CONNECTOR_IDS = 10
 
 def get_connector_classes(request):
   global AVAILABLE_CONNECTORS
@@ -152,7 +129,9 @@ def get_connector_classes(request):
 
 def get_installed_connectors(request):
   return JsonResponse({
-    'connectors': _group_category_connectors(CONNECTOR_INSTANCES),
+    'connectors': _group_category_connectors(
+      _get_installed_connectors()
+    ),
   })
 
 
@@ -169,7 +148,6 @@ def get_connector(request, id):
 
   return JsonResponse(instance)
 
-CONNECTOR_IDS = 10
 
 def update_connector(request):
   global CONNECTOR_IDS
@@ -217,6 +195,34 @@ def delete_connector(request):
     return JsonResponse({})
   else:
     raise PopupException(_('No connector with the name %(name)s found.') % connector)
+
+
+def _get_installed_connectors():
+  global CONNECTOR_INSTANCES
+  connector_config = CONNECTORS.get()
+
+  if CONNECTOR_INSTANCES is None:
+    CONNECTOR_INSTANCES = []
+    for i in connector_config:
+      connector_class = [
+        connector_type
+        for connector_type in CONNECTOR_TYPES
+            if connector_type['dialect'] == connector_config[i].DIALECT.get() and connector_type['interface'] == connector_config[i].INTERFACE.get()
+      ]
+      CONNECTOR_INSTANCES.append({
+          'nice_name': connector_config[i].NICE_NAME.get() or i,
+          'name': i,
+          'dialect': connector_config[i].DIALECT.get(),
+          'interface': connector_config[i].INTERFACE.get(),
+          'settings': connector_config[i].SETTINGS.get(),
+          # From Connector class
+          'is_sql': True,
+          'id': None,
+          'category': connector_class[0]['category'],
+          'description': connector_class[0]['description']
+        }
+      )
+  return CONNECTOR_INSTANCES
 
 
 def _get_connector_by_id(id):
