@@ -213,6 +213,7 @@ def get_query_server_config_via_connector(connector):
       'auth_password': AUTH_PASSWORD.get(),
 
       'impersonation_enabled': False, # TODO, Impala only, to add to connector class
+      'use_sasl': connector['dialect'] != 'impala',
       'SESSION_TIMEOUT_S': 15 * 60,
       'querycache_rows': 1000,
       'QUERY_TIMEOUT_S': 15 * 60,
