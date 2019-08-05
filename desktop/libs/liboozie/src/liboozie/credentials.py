@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 
 from django.utils.translation import ugettext as _
@@ -45,7 +46,7 @@ class Credentials(object):
 
   @property
   def class_to_name_credentials(self):
-    return dict((v,k) for k, v in self.credentials.iteritems())
+    return dict((v,k) for k, v in self.credentials.items())
 
   def get_properties(self, hive_properties=None):
     credentials = {}

@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import errno
 import logging
 import os
@@ -147,7 +148,7 @@ class Submission(object):
   def deploy(self):
     try:
       deployment_dir = self._create_deployment_dir()
-    except Exception, ex:
+    except Exception as ex:
       msg = _("Failed to create deployment directory: %s" % ex)
       LOG.exception(msg)
       raise PopupException(message=msg, detail=str(ex))
@@ -234,7 +235,7 @@ class Submission(object):
       path = Hdfs.join(REMOTE_DEPLOYMENT_DIR.get(), '_%s_-oozie-%s-%s' % (self.user.username, self.job.id, time.time()))
       # Shared coords or bundles might not have any existing workspaces
       if self.fs.exists(self.job.deployment_dir):
-        self.fs.copy_remote_dir(self.job.deployment_dir, path, owner=self.user, dir_mode=0711)
+        self.fs.copy_remote_dir(self.job.deployment_dir, path, owner=self.user, dir_mode=0o711)
       else:
         self._create_dir(path)
     else:
@@ -242,7 +243,7 @@ class Submission(object):
       self._create_dir(path)
     return path
 
-  def _create_dir(self, path, perms=0711):
+  def _create_dir(self, path, perms=0o711):
     """
     Return the directory in HDFS, creating it if necessary.
     """
@@ -252,7 +253,7 @@ class Submission(object):
         msg = _("Path is not a directory: %s.") % (path,)
         LOG.error(msg)
         raise Exception(msg)
-    except IOError, ex:
+    except IOError as ex:
       if ex.errno != errno.ENOENT:
         msg = _("Error accessing directory '%s': %s.") % (path, ex)
         LOG.exception(msg)
@@ -271,7 +272,7 @@ class Submission(object):
     This should run as the workflow user.
     """
     xml_path = self.fs.join(deployment_dir, self.job.get_application_filename())
-    self.fs.create(xml_path, overwrite=True, permission=0644, data=smart_str(oozie_xml))
+    self.fs.create(xml_path, overwrite=True, permission=0o644, data=smart_str(oozie_xml))
     LOG.debug("Created %s" % (xml_path,))
 
     # List jar files
@@ -309,7 +310,7 @@ class Submission(object):
       path = self.job.deployment_dir
       if self._do_as(self.user.username , self.fs.exists, path):
         self._do_as(self.user.username , self.fs.rmtree, path)
-    except Exception, ex:
+    except Exception as ex:
       LOG.warn("Failed to clean up workflow deployment directory for "
                "%s (owner %s). Caused by: %s",
                self.job.name, self.user, ex)
@@ -334,5 +335,5 @@ def create_directories(fs, directory_list=[]):
         # Home is 755
         fs.do_as_user(fs.DEFAULT_USER, fs.create_home_dir, remote_home_dir)
       # Shared by all the users
-      fs.do_as_user(fs.DEFAULT_USER, fs.mkdir, directory, 01777)
-      fs.do_as_user(fs.DEFAULT_USER, fs.chmod, directory, 01777) # To remove after https://issues.apache.org/jira/browse/HDFS-3491
+      fs.do_as_user(fs.DEFAULT_USER, fs.mkdir, directory, 0o1777)
+      fs.do_as_user(fs.DEFAULT_USER, fs.chmod, directory, 0o1777) # To remove after https://issues.apache.org/jira/browse/HDFS-3491

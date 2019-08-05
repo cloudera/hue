@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import errno
 import logging
 import os
@@ -190,7 +191,7 @@ class Submission(object):
     try:
       if not deployment_dir:
         deployment_dir = self._create_deployment_dir()
-    except Exception, ex:
+    except Exception as ex:
       msg = _("Failed to create deployment directory: %s" % ex)
       LOG.exception(msg)
       raise PopupException(message=msg, detail=str(ex))
@@ -373,7 +374,7 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
             hive_site_lib = Hdfs.join(deployment_dir + '/lib/', 'hive-site.xml')
             hive_site_content = get_hive_site_content()
             if not self.fs.do_as_user(self.user, self.fs.exists, hive_site_lib) and hive_site_content:
-              self.fs.do_as_user(self.user, self.fs.create, hive_site_lib, overwrite=True, permission=0700, data=smart_str(hive_site_content))
+              self.fs.do_as_user(self.user, self.fs.create, hive_site_lib, overwrite=True, permission=0o700, data=smart_str(hive_site_content))
           if action.data['type'] in ('sqoop', 'sqoop-document'):
             if CONFIG_JDBC_LIBS_PATH.get() and CONFIG_JDBC_LIBS_PATH.get() not in self.properties.get('oozie.libpath', ''):
               LOG.debug("Adding to oozie.libpath %s" % CONFIG_JDBC_LIBS_PATH.get())
@@ -472,7 +473,7 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
               ('hive2.jdbc.url', hive_jdbc_url),
               ('hive2.server.principal', updated_hive_principal)
             ]
-          except Exception, ex:
+          except Exception as ex:
             msg = 'Failed to update the Hive JDBC URL from %s action properties: %s' % (action.data['type'], str(ex))
             LOG.error(msg)
             raise PopupException(message=_(msg), detail=str(ex))
@@ -516,7 +517,7 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
         msg = _("Path is not a directory: %s.") % (path,)
         LOG.error(msg)
         raise Exception(msg)
-    except IOError, ex:
+    except IOError as ex:
       if ex.errno != errno.ENOENT:
         msg = _("Error accessing directory '%s': %s.") % (path, ex)
         LOG.exception(msg)
@@ -537,7 +538,7 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
     """
 
     self._create_file(deployment_dir, self.job.XML_FILE_NAME, oozie_xml)
-    self._create_file(deployment_dir, 'job.properties', data='\n'.join(['%s=%s' % (key, val) for key, val in oozie_properties.iteritems()]))
+    self._create_file(deployment_dir, 'job.properties', data='\n'.join(['%s=%s' % (key, val) for key, val in oozie_properties.items()]))
 
     # List jar files
     files = []
@@ -587,7 +588,7 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
       path = self.job.deployment_dir
       if self._do_as(self.user.username , self.fs.exists, path):
         self._do_as(self.user.username , self.fs.rmtree, path)
-    except Exception, ex:
+    except Exception as ex:
       LOG.warn("Failed to clean up workflow deployment directory for %s (owner %s). Caused by: %s", self.job.name, self.user, ex)
 
   def _is_workflow(self):
@@ -601,9 +602,9 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
   def _create_file(self, deployment_dir, file_name, data, do_as=False):
     file_path = self.fs.join(deployment_dir, file_name)
     if do_as:
-      self.fs.do_as_user(self.user, self.fs.create, file_path, overwrite=True, permission=0644, data=smart_str(data))
+      self.fs.do_as_user(self.user, self.fs.create, file_path, overwrite=True, permission=0o644, data=smart_str(data))
     else:
-      self.fs.create(file_path, overwrite=True, permission=0644, data=smart_str(data))
+      self.fs.create(file_path, overwrite=True, permission=0o644, data=smart_str(data))
     LOG.debug("Created/Updated %s" % (file_path,))
 
   def _generate_altus_action_script(self, service, command, arguments, auth_key_id, auth_key_secret):
@@ -819,5 +820,5 @@ def create_directories(fs, directory_list=[]):
         # Home is 755
         fs.do_as_user(fs.DEFAULT_USER, fs.create_home_dir, remote_home_dir)
       # Shared by all the users
-      fs.do_as_user(fs.DEFAULT_USER, fs.mkdir, directory, 01777)
-      fs.do_as_user(fs.DEFAULT_USER, fs.chmod, directory, 01777) # To remove after https://issues.apache.org/jira/browse/HDFS-3491
+      fs.do_as_user(fs.DEFAULT_USER, fs.mkdir, directory, 0o1777)
+      fs.do_as_user(fs.DEFAULT_USER, fs.chmod, directory, 0o1777) # To remove after https://issues.apache.org/jira/browse/HDFS-3491
