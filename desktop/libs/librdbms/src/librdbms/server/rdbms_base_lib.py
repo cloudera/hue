@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 
 from librdbms.design import SQLdesign
@@ -42,9 +43,9 @@ class BaseRDBMSDataTable(object):
 
   @property
   def has_more(self):
-    if not self.next:
+    if not self.__next__:
       self.next = list(self.cursor.fetchmany(self.fetchSize))
-    return bool(self.next)
+    return bool(self.__next__)
 
   def cols(self):
     return self.columns

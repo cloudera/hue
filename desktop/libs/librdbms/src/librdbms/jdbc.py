@@ -15,6 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
+from builtins import range
+from builtins import object
 import logging
 import os
 import sys
@@ -28,7 +31,7 @@ LOG = logging.getLogger(__name__)
 
 try:
   from py4j.java_gateway import JavaGateway, JavaObject
-except ImportError, e:
+except ImportError as e:
   LOG.exception('Failed to import py4j')
 
 
@@ -45,7 +48,7 @@ def query_and_fetch(db, statement, n=None):
       return data, meta
     finally:
       curs.close()
-  except Exception, e:
+  except Exception as e:
     message = force_unicode(smart_str(e))
     if 'Access denied' in message:
       raise AuthenticationRequired()
@@ -54,7 +57,7 @@ def query_and_fetch(db, statement, n=None):
     db.close()
 
 
-class Jdbc():
+class Jdbc(object):
 
   def __init__(self, driver_name, url, username, password, impersonation_property=None, impersonation_user=None):
     if 'py4j' not in sys.modules:
@@ -81,7 +84,7 @@ class Jdbc():
     try:
       self.connect()
       return True
-    except Exception, e:
+    except Exception as e:
       message = force_unicode(smart_str(e))
       if throw_exception:
         if 'Access denied' in message:
@@ -106,7 +109,7 @@ class Jdbc():
       self.conn = None
 
 
-class Cursor():
+class Cursor(object):
   """Similar to DB-API 2.0 Cursor interface"""
 
   def __init__(self, conn):
@@ -130,9 +133,9 @@ class Cursor():
   def fetchmany(self, n=None):
     res = []
 
-    while self.rs.next() and (n is None or n > 0):
+    while next(self.rs) and (n is None or n > 0):
       row = []
-      for c in xrange(self._meta.getColumnCount()):
+      for c in range(self._meta.getColumnCount()):
         cell = self.rs.getObject(c + 1)
 
         if isinstance(cell, JavaObject):
@@ -161,7 +164,7 @@ class Cursor():
         self._meta.getPrecision(i),
         self._meta.getScale(i),
         self._meta.isNullable(i),
-      ] for i in xrange(1, self._meta.getColumnCount() + 1)]
+      ] for i in range(1, self._meta.getColumnCount() + 1)]
 
   def close(self):
     self._meta = None
