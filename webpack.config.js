@@ -45,7 +45,8 @@ module.exports = {
     tableBrowser: ['./desktop/core/src/desktop/js/apps/table_browser/app.js']
   },
   optimization: {
-    minimize: true,
+    //minimize: true,
+    minimize: false,
     splitChunks: {
       chunks: 'all'
     },
