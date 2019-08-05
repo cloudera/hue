@@ -211,7 +211,7 @@ class OrganizationUserChangeForm(UserChangeForm):
 
   class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
     model =  User
-    fields = ["first_name", "last_name", "email", "ensure_home_directory"]
+    fields = ["first_name", "last_name", "email", "ensure_home_directory", "organization"]
 
   def __init__(self, *args, **kwargs):
     super(OrganizationUserChangeForm, self).__init__(*args, **kwargs)
@@ -269,7 +269,7 @@ class OrganizationSuperUserChangeForm(OrganizationUserChangeForm):
       # If the user exists already, we'll use its current group memberships
       self.initial['groups'] = set(self.instance.groups.all())
     else:
-      # If his is a new user, suggest the default group
+      # If this is a new user, suggest the default group
       default_group = get_default_user_group()
       if default_group is not None:
         self.initial['groups'] = set([default_group])
