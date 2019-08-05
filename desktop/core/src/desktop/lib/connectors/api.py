@@ -115,7 +115,7 @@ AVAILABLE_CONNECTORS = _group_category_connectors(CONNECTOR_TYPES)
 
 # connector_type: category --> engine, is_sql --> engine_type: sql
 CONNECTOR_INSTANCES = None
-CONNECTOR_IDS = 10
+CONNECTOR_IDS = 1
 
 def get_connector_classes(request):
   global AVAILABLE_CONNECTORS
@@ -199,6 +199,7 @@ def delete_connector(request):
 
 def _get_installed_connectors():
   global CONNECTOR_INSTANCES
+  global CONNECTOR_IDS
   connector_config = CONNECTORS.get()
 
   if CONNECTOR_INSTANCES is None:
@@ -217,11 +218,12 @@ def _get_installed_connectors():
           'settings': connector_config[i].SETTINGS.get(),
           # From Connector class
           'is_sql': True,
-          'id': None,
+          'id': CONNECTOR_IDS,
           'category': connector_class[0]['category'],
           'description': connector_class[0]['description']
         }
       )
+      CONNECTOR_IDS += 1
   return CONNECTOR_INSTANCES
 
 
