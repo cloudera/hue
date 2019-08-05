@@ -36,7 +36,7 @@ def xmlsec():
   try:
     proc = subprocess.Popen(['which', 'xmlsec1'], stdout=subprocess.PIPE)
     return proc.stdout.read().strip()
-  except subprocess.CalledProcessError:
+  except (subprocess.CalledProcessError, OSError):
     return '/usr/local/bin/xmlsec1'
 
 
@@ -178,6 +178,7 @@ NAME_ID_FORMAT = Config(
   type=str,
   help=_t("Request this NameID format from the server"))
 
+
 def get_key_file_password():
   password = os.environ.get('HUE_SAML_KEY_FILE_PASSWORD')
   if password is not None:
@@ -188,6 +189,7 @@ def get_key_file_password():
     password = KEY_FILE_PASSWORD_SCRIPT.get()
 
   return password
+
 
 def config_validator(user):
   res = []
