@@ -79,7 +79,7 @@ ${ layout.menubar(section='quick_start') }
             % else:
               <a href="${ url('desktop.views.dump_config') }" target="_blank">${ _('Configuration') }</a>
               <br>
-              <a href="http://cloudera.github.io/hue/latest/administrator/configuration/" target="_blank">${ _('Documentation') }</a>
+              <a href="https://docs.gethue.com/latest/administrator/configuration/" target="_blank">${ _('Documentation') }</a>
             % endif
           </div>
 
