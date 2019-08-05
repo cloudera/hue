@@ -18,11 +18,15 @@
 """
 Misc helper functions
 """
+from __future__ import print_function
 
+from future import standard_library
+standard_library.install_aliases()
+from past.builtins import basestring
 try:
-  from cStringIO import StringIO
+  from io import StringIO
 except ImportError:
-  from StringIO import StringIO
+  from io import StringIO
 
 import logging
 import re
@@ -70,13 +74,13 @@ def config_gen(dic):
   config_gen(dic) -> xml for Oozie workflow configuration
   """
   sio = StringIO()
-  print >> sio, '<?xml version="1.0" encoding="UTF-8"?>'
-  print >> sio, "<configuration>"
+  print('<?xml version="1.0" encoding="UTF-8"?>', file=sio)
+  print("<configuration>", file=sio)
   # if dic's key contains <,>,& then it will be escaped and if dic's value contains ']]>' then ']]>' will be stripped
-  for k, v in dic.iteritems():
-    print >> sio, "<property>\n  <name>%s</name>\n  <value><![CDATA[%s]]></value>\n</property>\n" \
-        % (escape(k), v.replace(']]>', '') if isinstance(v, basestring) else v)
-  print >>sio, "</configuration>"
+  for k, v in dic.items():
+    print("<property>\n  <name>%s</name>\n  <value><![CDATA[%s]]></value>\n</property>\n" \
+        % (escape(k), v.replace(']]>', '') if isinstance(v, basestring) else v), file=sio)
+  print("</configuration>", file=sio)
   sio.flush()
   sio.seek(0)
   return sio.read()
@@ -90,7 +94,7 @@ def format_time(time, format='%d %b %Y %H:%M:%S'):
     return ''
 
   fmt_time = None
-  if type(time) == unicode:
+  if type(time) == str:
     return time
   else:
     try:

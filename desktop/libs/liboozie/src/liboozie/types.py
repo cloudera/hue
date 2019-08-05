@@ -21,12 +21,17 @@ Oozie API classes.
 This is mostly just codifying the datastructure of the Oozie REST API.
 http://incubator.apache.org/oozie/docs/3.2.0-incubating/docs/WebServicesAPI.html
 """
+from __future__ import division
 
+from future import standard_library
+standard_library.install_aliases()
+from past.utils import old_div
+from builtins import object
 import logging
 import re
 import time
 
-from cStringIO import StringIO
+from io import StringIO
 from time import mktime
 
 from desktop.lib import i18n
@@ -161,7 +166,7 @@ class WorkflowAction(Action):
       xml = StringIO(i18n.smart_str(self.conf))
       try:
         self.conf_dict = hadoop.confparse.ConfParse(xml)
-      except Exception, e:
+      except Exception as e:
         LOG.error('Failed to parse XML configuration for Workflow action %s: %s' % (self.name, e))
         self.conf_dict = {}
     else:
@@ -297,7 +302,7 @@ class BundleAction(Action):
     end = mktime(parse_timestamp(self.endTime))
 
     if end != start:
-      progress = min(int((1 - (end - next) / (end - start)) * 100), 100)
+      progress = min(int((1 - old_div((end - next), (end - start))) * 100), 100)
     else:
       progress = 100
 
@@ -568,14 +573,14 @@ class Coordinator(Job):
     end = mktime(self.endTime)
 
     if end != start:
-      progress = min(int((1 - (end - next) / (end - start)) * 100), 100)
+      progress = min(int((1 - old_div((end - next), (end - start))) * 100), 100)
     else:
       progress = 100
 
     # Manage case of a rerun
     action_count = float(len(self.actions))
     if action_count != 0 and progress == 100:
-      progress = int(sum([action.is_finished() for action in self.actions]) / action_count * 100)
+      progress = int(old_div(sum([action.is_finished() for action in self.actions]), action_count * 100))
 
     return progress
 
