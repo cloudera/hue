@@ -23,6 +23,7 @@ High Level Roadmap
 * [ ] Generify the risk alert and suggestion optimization API [HUE-8824](https://issues.cloudera.org/browse/HUE-8824)
 * [ ] Git integration [HUE-951](https://issues.cloudera.org/browse/HUE-951)
 * [ ] Modernize CI/CD [HUE-8888](https://issues.cloudera.org/browse/HUE-8888)
+* [ ] SQL queries & Requests tracing [HUE-8936](https://issues.cloudera.org/browse/HUE-8936)
 
 
 Done
