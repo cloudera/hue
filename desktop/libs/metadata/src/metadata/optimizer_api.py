@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import base64
 import json
 import logging
@@ -44,7 +45,7 @@ try:
   from beeswax.design import hql_query
 
   from metastore.views import _get_db
-except ImportError, e:
+except ImportError as e:
   LOG.warn("Hive lib not enabled")
 
 
@@ -52,21 +53,21 @@ def error_handler(view_fn):
   def decorator(*args, **kwargs):
     try:
       return view_fn(*args, **kwargs)
-    except Http404, e:
+    except Http404 as e:
       raise e
-    except NavOptException, e:
+    except NavOptException as e:
       LOG.exception(e)
       response = {
         'status': -1,
         'message': e.message
       }
-    except MissingSentryPrivilegeException, e:
+    except MissingSentryPrivilegeException as e:
       LOG.exception(e)
       response = {
         'status': -1,
         'message': 'Missing privileges for %s' % force_unicode(str(e))
       }
-    except Exception, e:
+    except Exception as e:
       LOG.exception(e)
       response = {
         'status': -1,
@@ -315,7 +316,7 @@ def _convert_queries(queries_data):
         execution_time = snippet['result']['executionTime'] * 100 if snippet['status'] in ('available', 'expired') else -1
         statement = _clean_query(_get_statement(query_data))
         queries.append((original_query_id, execution_time, statement, snippet.get('database', 'default').strip()))
-    except Exception, e:
+    except Exception as e:
       LOG.warning('Skipping upload of %s: %s' % (query_data['uuid'], e))
 
   return queries
@@ -445,7 +446,7 @@ def upload_table_stats(request):
               for col in full_table_stats['columns'][:25]
           ]
 
-        raw_column_stats = [dict([(key, val if val is not None else '') for col_stat in col for key, val in col_stat.iteritems()]) for col in colum_stats]
+        raw_column_stats = [dict([(key, val if val is not None else '') for col_stat in col for key, val in col_stat.items()]) for col in colum_stats]
 
         for col_stats in raw_column_stats:
           column_stats.append({
@@ -461,7 +462,7 @@ def upload_table_stats(request):
             "num_trues": col_stats['num_trues'] if col_stats.get('num_trues', '') != '' else -1,
             "num_falses": col_stats['num_falses'] if col_stats.get('num_falses', '') != '' else -1,
           })
-    except Exception, e:
+    except Exception as e:
       LOG.exception('Skipping upload of %s: %s' % (db_table, e))
 
   api = OptimizerApi(request.user)
@@ -501,7 +502,7 @@ def upload_status(request):
   return JsonResponse(response)
 
 
-class MockRequest():
+class MockRequest(object):
 
   def __init__(self, user, source_platform):
     self.user = user

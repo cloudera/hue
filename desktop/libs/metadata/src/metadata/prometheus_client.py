@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 
 from django.core.cache import cache
@@ -60,7 +61,7 @@ class PrometheusApi(object):
       return self._root.get('query', {
         'query': query,
       })['data']
-    except RestException, e:
+    except RestException as e:
       raise PrometheusApiException(e)
 
   def range_query(self, query, start, end, step):
@@ -72,5 +73,5 @@ class PrometheusApi(object):
         'end': end,
         'step': step
       })['data']
-    except RestException, e:
+    except RestException as e:
       raise PrometheusApiException(e)

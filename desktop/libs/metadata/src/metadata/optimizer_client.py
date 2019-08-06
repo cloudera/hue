@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import json
 import logging
 import os
@@ -177,7 +178,7 @@ class OptimizerApi(object):
       status['count'] = len(data)
       return status
 
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Optimizer'))
     finally:
       os.remove(f_queries_path.name)
