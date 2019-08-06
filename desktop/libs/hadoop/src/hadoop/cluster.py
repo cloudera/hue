@@ -23,7 +23,8 @@ from django.utils.functional import wraps
 from hadoop import conf
 from hadoop.fs import webhdfs, LocalSubFileSystem
 
-from desktop.conf import DEFAULT_USER
+from desktop.conf import DEFAULT_USER, has_connectors
+from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.paths import get_build_dir
 
 
@@ -61,7 +62,7 @@ def rm_ha(funct):
 def get_hdfs(identifier="default", user=None):
   global FS_CACHE
   get_all_hdfs()
-  return FS_CACHE[identifier]
+  return FS_CACHE[FS_CACHE.keys()[0]] if has_connectors() else FS_CACHE[identifier]
 
 
 def get_defaultfs():
@@ -79,8 +80,16 @@ def get_all_hdfs():
     return FS_CACHE
 
   FS_CACHE = {}
-  for identifier in list(conf.HDFS_CLUSTERS.keys()):
-    FS_CACHE[identifier] = _make_filesystem(identifier)
+  if has_connectors():
+    for connector in _get_installed_connectors(category='browsers', dialect='hdfs', interface='rest'):
+      settings = {setting['name']: setting['value'] for setting in connector['settings']}
+      FS_CACHE[connector['name']] = webhdfs.WebHdfs(
+        url=settings['server_url'],
+        fs_defaultfs=settings['default_fs']
+      )
+  else:
+    for identifier in list(conf.HDFS_CLUSTERS.keys()):
+      FS_CACHE[identifier] = _make_filesystem(identifier)
   return FS_CACHE
 
 

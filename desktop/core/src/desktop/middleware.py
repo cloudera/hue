@@ -124,8 +124,7 @@ class ClusterMiddleware(object):
   """
   def process_view(self, request, view_func, view_args, view_kwargs):
     """
-    Sets request.fs and request.jt on every request to point to the
-    configured filesystem.
+    Sets request.fs and request.jt on every request to point to the configured filesystem.
     """
     request.fs_ref = request.GET.get('fs', view_kwargs.get('fs', 'default'))
     if "fs" in view_kwargs:
