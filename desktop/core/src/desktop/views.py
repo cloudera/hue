@@ -50,7 +50,7 @@ import desktop.log.log_buffer
 from desktop import appmanager
 from desktop.api import massaged_tags_for_json, massaged_documents_for_json, _get_docs
 from desktop.auth.backend import is_admin
-from desktop.conf import USE_NEW_EDITOR, HUE_LOAD_BALANCER, get_clusters
+from desktop.conf import USE_NEW_EDITOR, HUE_LOAD_BALANCER, get_clusters, ENABLE_CONNECTORS
 from desktop.lib import django_mako, fsmanager
 from desktop.lib.conf import GLOBAL_CONFIG, BoundConfig, _configs_from_dir
 from desktop.lib.config_spec_dump import ConfigSpec
@@ -284,8 +284,8 @@ def status_bar(request):
       LOG.exception("Failed to execute status_bar view %s" % (view,))
   return HttpResponse(resp)
 
+
 def dump_config(request):
-  # Note that this requires login (as do most apps).
   show_private = False
   conf_dir = os.path.realpath(os.getenv("HUE_CONF_DIR", get_desktop_root("conf")))
 
@@ -295,16 +295,25 @@ def dump_config(request):
   if request.GET.get("private"):
     show_private = True
 
-  apps = sorted(appmanager.DESKTOP_MODULES, key=lambda app: app.name)
+  app_modules = appmanager.DESKTOP_MODULES
+  config_modules = GLOBAL_CONFIG.get().values()
+  if ENABLE_CONNECTORS.get():
+    app_modules = [app_module for app_module in app_modules if app_module.name == 'desktop']
+    config_modules = [config_module for config_module in config_modules if config_module.config.key == 'desktop']
+
+  apps = sorted(app_modules, key=lambda app: app.name)
   apps_names = [app.name for app in apps]
   top_level = sorted(list(GLOBAL_CONFIG.get().values()), key=lambda obj: apps_names.index(obj.config.key))
 
-  return render("dump_config.mako", request, dict(
-    show_private=show_private,
-    top_level=top_level,
-    conf_dir=conf_dir,
-    is_embeddable=request.GET.get('is_embeddable', False),
-    apps=apps))
+  return render("dump_config.mako", request, {
+      'show_private': show_private,
+      'top_level': top_level,
+      'conf_dir': conf_dir,
+      'is_embeddable': request.GET.get('is_embeddable', False),
+      'apps': apps
+    }
+  )
+
 
 @access_log_level(logging.WARN)
 def threads(request):
