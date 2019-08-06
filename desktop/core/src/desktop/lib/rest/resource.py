@@ -1,3 +1,4 @@
+from __future__ import division
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -14,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from past.utils import old_div
+from builtins import object
 import logging
 import posixpath
 import time
@@ -62,7 +65,7 @@ class Resource(object):
           'application/json' in resp.headers.get('content-type'):
       try:
         return resp.json()
-      except Exception, ex:
+      except Exception as ex:
         self._client.logger.exception('JSON decode error: %s' % resp.content)
         raise ex
     else:
@@ -200,9 +203,9 @@ class Resource(object):
 
 # Same in thrift_util.py for not losing the trace class
 def log_if_slow_call(duration, message, logger):
-  if duration >= WARN_LEVEL_CALL_DURATION_MS / 1000:
+  if duration >= old_div(WARN_LEVEL_CALL_DURATION_MS, 1000):
     logger.warn('SLOW: %.2f - %s' % (duration, message))
-  elif duration >= INFO_LEVEL_CALL_DURATION_MS / 1000:
+  elif duration >= old_div(INFO_LEVEL_CALL_DURATION_MS, 1000):
     logger.info('SLOW: %.2f - %s' % (duration, message))
   else:
     logger.debug(message)

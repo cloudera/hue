@@ -16,7 +16,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import datetime
+import sys
 
 from nose.tools import assert_true, assert_equal, assert_not_equal, assert_raises
 from django.http import HttpResponse, HttpResponseRedirect
@@ -28,8 +30,11 @@ configure_django_for_test()
 from desktop.lib import django_util, exceptions
 from django.db import models
 
+if sys.version_info[0] > 2:
+  unichr = chr
+
 class TestModel(models.Model):
-  class Meta:
+  class Meta(object):
     app_label = "TEST_APP"
 
   my_int = models.IntegerField()
@@ -136,7 +141,7 @@ class TestDjangoUtil(object):
     the_file = "foobar"
     try:
       raise exceptions.MessageException(msg, the_file)
-    except Exception, e:
+    except Exception as e:
       assert_equal(msg, e.message)
       assert_equal(the_file, e.data['filename'])
       assert_true(msg in str(e))

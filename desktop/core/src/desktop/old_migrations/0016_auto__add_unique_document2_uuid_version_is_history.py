@@ -58,7 +58,7 @@ class Migration(SchemaMigration):
             # Adding unique constraint on 'Document2', fields ['uuid', 'version', 'is_history']
             db.create_unique(u'desktop_document2', ['uuid', 'version', 'is_history'])
             db.commit_transaction()
-        except Exception, e:
+        except Exception as e:
             db.rollback_transaction()
             raise e
 

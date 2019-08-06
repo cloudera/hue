@@ -15,13 +15,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import configobj
-from cStringIO import StringIO
 import logging
 import re
+import sys
 
 from desktop.lib.conf import *
 from nose.tools import assert_true, assert_false, assert_equals, assert_raises
+
+if sys.version_info[0] > 2:
+  from io import StringIO as string_io
+else:
+  from cStringIO import StringIO as string_io
 
 def my_dynamic_default():
   """
@@ -83,8 +91,8 @@ class TestConfig(object):
                          PORT = Config("port", help="Thrift port for the NN",
                                        type=int, default=10090))))))
     cls.conf = cls.conf.bind(
-      load_confs([configobj.ConfigObj(infile=StringIO(cls.CONF_ONE)),
-                  configobj.ConfigObj(infile=StringIO(cls.CONF_TWO))]),
+      load_confs([configobj.ConfigObj(infile=string_io(cls.CONF_ONE)),
+                  configobj.ConfigObj(infile=string_io(cls.CONF_TWO))]),
       prefix='')
 
   def test_type_safety(self):
@@ -180,7 +188,7 @@ class TestConfig(object):
     assert_raises(Exception, coerce_bool, tuple("foo"))
 
   def test_print_help(self):
-    out = StringIO()
+    out = string_io()
     self.conf.print_help(out=out, skip_header=True)
     out = out.getvalue().strip()
     assert_false("dontseeme" in out)

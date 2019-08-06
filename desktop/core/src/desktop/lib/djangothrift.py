@@ -39,9 +39,11 @@
 # been through this dirtying, and that's bad.
 # So, don't use JSON serialization, and use XML serialization instead.
 
+from __future__ import absolute_import
+from past.builtins import basestring
 import json
 
-import thrift_util
+from . import thrift_util
 
 from django.db import models
 

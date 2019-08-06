@@ -15,6 +15,7 @@
 # limitations under the License.
 from __future__ import absolute_import
 
+from builtins import object
 import logging
 
 from desktop.lib.exceptions_renderable import PopupException

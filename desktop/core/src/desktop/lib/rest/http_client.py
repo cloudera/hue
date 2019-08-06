@@ -14,13 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import logging
 import posixpath
 import requests
 import threading
-import urllib
-
-from urlparse import urlparse
+import sys
 
 from django.utils.encoding import iri_to_uri, smart_str
 from django.utils.http import urlencode
@@ -32,6 +33,12 @@ from requests.auth import AuthBase ,HTTPBasicAuth, HTTPDigestAuth
 from requests_kerberos import HTTPKerberosAuth, REQUIRED, OPTIONAL, DISABLED
 from urllib3.contrib import pyopenssl
 
+if sys.version_info[0] > 2:
+  import urllib.request, urllib.error
+  from urllib.parse import quote as urllib_quote, urlparse as lib_urlparse
+else:
+  from urllib import quote as urllib_quote
+  from urlparse import urlparse as lib_urlparse
 
 pyopenssl.DEFAULT_SSL_CIPHER_LIST = conf.SSL_CIPHER_LIST.get()
 
@@ -112,7 +119,7 @@ class HttpClient(object):
     self._cookies = None
 
   def _extract_netloc(self, base_url):
-    parsed_uri = urlparse(base_url)
+    parsed_uri = lib_urlparse(base_url)
     short_url = '%(scheme)s://%(netloc)s' % {'scheme': parsed_uri.scheme, 'netloc': parsed_uri.netloc}
     return short_url
 
@@ -184,7 +191,7 @@ class HttpClient(object):
     """
     # Prepare URL and params
     if urlencode:
-      path = urllib.quote(smart_str(path))
+      path = urllib_quote(smart_str(path))
     url = self._make_url(path, params)
     if http_method in ("GET", "DELETE"):
       if data is not None:
@@ -217,7 +224,7 @@ class HttpClient(object):
             exceptions.HTTPError,
             exceptions.RequestException,
             exceptions.URLRequired,
-            exceptions.TooManyRedirects), ex:
+            exceptions.TooManyRedirects) as ex:
       raise self._exc_class(ex)
 
   def _make_url(self, path, params):

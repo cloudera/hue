@@ -91,8 +91,8 @@ def get_run_root(*append):
 
 def get_hadoop_conf_dir_default_config():
   from hadoop.conf import HDFS_CLUSTERS, get_hadoop_conf_dir_default
-  if HDFS_CLUSTERS.keys():
-    yarn_site_path = HDFS_CLUSTERS[HDFS_CLUSTERS.keys()[0]].HADOOP_CONF_DIR.get()
+  if list(HDFS_CLUSTERS.keys()):
+    yarn_site_path = HDFS_CLUSTERS[list(HDFS_CLUSTERS.keys())[0]].HADOOP_CONF_DIR.get()
   else:
     yarn_site_path = get_hadoop_conf_dir_default()
   return yarn_site_path

@@ -18,6 +18,7 @@
 All Hue metrics should be defined in the APP/metrics.py file so they are discoverable.
 """
 
+from builtins import object
 import functools
 import pyformance
 
@@ -107,7 +108,7 @@ class MetricsRegistry(object):
     metrics = self._registry.dump_metrics()
 
     # Filter out min and max if there have been no samples.
-    for metric in metrics.itervalues():
+    for metric in metrics.values():
       if metric.get('count') == 0:
         if 'min' in metric:
           metric['min'] = 0.0

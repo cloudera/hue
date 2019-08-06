@@ -59,7 +59,7 @@ def submit_schedule(request, doc_id):
       jsonify = request.POST.get('format') == 'json'
       try:
         job_id = get_api(request, interface).submit_schedule(request, coordinator, mapping)
-      except Exception, e:
+      except Exception as e:
         message = force_unicode(str(e))
         return JsonResponse({'status': -1, 'message': message}, safe=False)
       if jsonify:
