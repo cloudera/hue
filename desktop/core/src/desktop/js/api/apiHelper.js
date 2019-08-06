@@ -31,6 +31,7 @@ const DOCUMENTS_SEARCH_API = '/desktop/api2/docs/';
 const FETCH_CONFIG = '/desktop/api2/get_config/';
 const HDFS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('/');
 const ADLS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('adl:/');
+const ABFS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('ABFS://');
 const GIT_API_PREFIX = '/desktop/api/vcs/contents/';
 const S3_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('S3A://');
 const IMPALA_INVALIDATE_API = '/impala/api/invalidate';
@@ -196,6 +197,7 @@ class ApiHelper {
       });
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'hdfs' }), {});
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'adls' }), {});
+      $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'abfs' }), {});
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'git' }), {});
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 's3' }), {});
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'collections' }), {});
@@ -527,7 +529,7 @@ class ApiHelper {
    *
    * @param {Object} options
    * @param {string[]} options.path
-   * @param {string} options.type - 's3', 'adls' or 'hdfs'
+   * @param {string} options.type - 's3', 'adls', 'abfs' or 'hdfs'
    * @param {number} [options.offset]
    * @param {number} [options.length]
    * @param {boolean} [options.silenceErrors]
@@ -539,6 +541,8 @@ class ApiHelper {
       url = S3_API_PREFIX;
     } else if (options.type === 'adls') {
       url = ADLS_API_PREFIX;
+    } else if (options.type === 'abfs') {
+      url = ABFS_API_PREFIX;
     } else {
       url = HDFS_API_PREFIX;
     }
@@ -703,6 +707,74 @@ class ApiHelper {
     return fetchCached.bind(self)(
       $.extend({}, options, {
         sourceType: 'adls',
+        url: url,
+        fetchFunction: fetchFunction
+      })
+    );
+  }
+
+  /**
+   * @param {Object} options
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   * @param {Number} [options.timeout]
+   * @param {Object} [options.editor] - Ace editor
+   *
+   * @param {string[]} options.pathParts
+   * @param {number} [options.pageSize] - Default 500
+   * @param {number} [options.page] - Default 1
+   * @param {string} [options.filter]
+   */
+  fetchAbfsPath(options) {
+    const self = this;
+    options.pathParts.shift();
+    let url =
+      ABFS_API_PREFIX +
+      encodeURI(options.pathParts.join('/')) +
+      '?format=json&sortby=name&descending=false&pagesize=' +
+      (options.pageSize || 500) +
+      '&pagenum=' +
+      (options.page || 1);
+    if (options.filter) {
+      url += '&filter=' + options.filter;
+    }
+    const fetchFunction = function(storeInCache) {
+      if (options.timeout === 0) {
+        self.assistErrorCallback(options)({ status: -1 });
+        return;
+      }
+      return $.ajax({
+        dataType: 'json',
+        url: url,
+        timeout: options.timeout,
+        success: function(data) {
+          if (
+            !data.error &&
+            !self.successResponseIsError(data) &&
+            typeof data.files !== 'undefined' &&
+            data.files !== null
+          ) {
+            if (data.files.length > 2 && !options.filter) {
+              storeInCache(data);
+            }
+            options.successCallback(data);
+          } else {
+            self.assistErrorCallback(options)(data);
+          }
+        }
+      })
+        .fail(self.assistErrorCallback(options))
+        .always(() => {
+          if (typeof options.editor !== 'undefined' && options.editor !== null) {
+            options.editor.hideSpinner();
+          }
+        });
+    };
+
+    return fetchCached.bind(self)(
+      $.extend({}, options, {
+        sourceType: 'abfs',
         url: url,
         fetchFunction: fetchFunction
       })
