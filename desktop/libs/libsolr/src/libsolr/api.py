@@ -16,10 +16,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import next
+from builtins import str
+from builtins import zip
+from builtins import object
 import json
 import logging
 import re
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from itertools import groupby
 
@@ -41,12 +47,12 @@ LOG = logging.getLogger(__name__)
 
 try:
   from search.conf import EMPTY_QUERY, SECURITY_ENABLED, SOLR_URL
-except ImportError, e:
+except ImportError as e:
   LOG.warn('Solr Search is not enabled')
 
 
 def utf_quoter(what):
-  return urllib.quote(unicode(what).encode('utf-8'), safe='~@#$&()*!+=;,.?/\'')
+  return urllib.parse.quote(str(what).encode('utf-8'), safe='~@#$&()*!+=;,.?/\'')
 
 
 class SolrApi(object):
@@ -165,7 +171,7 @@ class SolrApi(object):
             if sort.get('count') == 'default':
               sort['count'] = 'desc'
 
-            dim_key = [key for key in _f['facet'].keys() if 'dim' in key][0]
+            dim_key = [key for key in list(_f['facet'].keys()) if 'dim' in key][0]
             _f['facet'][dim_key].update({
                   'excludeTags': facet['id'],
                   'offset': 0,
@@ -224,11 +230,11 @@ class SolrApi(object):
 
     params += self._get_fq(collection, query)
 
-    fl = urllib.unquote(utf_quoter(','.join(Collection2.get_field_list(collection))))
+    fl = urllib.parse.unquote(utf_quoter(','.join(Collection2.get_field_list(collection))))
 
     nested_fields = self._get_nested_fields(collection)
     if nested_fields:
-      fl += urllib.unquote(utf_quoter(',[child parentFilter="%s"]' % ' OR '.join(nested_fields)))
+      fl += urllib.parse.unquote(utf_quoter(',[child parentFilter="%s"]' % ' OR '.join(nested_fields)))
 
     if collection['template']['moreLikeThis'] and fl != ['*']: # Potential conflict with nested documents
       id_field = collection.get('idField', 'id')
@@ -260,7 +266,7 @@ class SolrApi(object):
     if collection['template']['fieldsSelected']:
       fields = []
       for field in collection['template']['fieldsSelected']:
-        attribute_field = filter(lambda attribute: field == attribute['name'], collection['template']['fieldsAttributes'])
+        attribute_field = [attribute for attribute in collection['template']['fieldsAttributes'] if field == attribute['name']]
         if attribute_field:
           if attribute_field[0]['sort']['direction']:
             fields.append('%s %s' % (field, attribute_field[0]['sort']['direction']))
@@ -369,7 +375,7 @@ class SolrApi(object):
         )
       response = self._root.get('%s/suggest' % collection, params)
       return self._get_json(response)
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
@@ -381,7 +387,7 @@ class SolrApi(object):
       )
       response = self._root.get('zookeeper', params=params)
       return json.loads(response['znode'].get('data', '{}'))
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
@@ -392,7 +398,7 @@ class SolrApi(object):
           ('wt', 'json'),
       )
       return self._root.get('admin/collections', params=params)['collections']
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
@@ -403,7 +409,7 @@ class SolrApi(object):
       )
       response = self._root.get('%s/config' % name, params=params)
       return self._get_json(response)['config']
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
@@ -414,7 +420,7 @@ class SolrApi(object):
           ('wt', 'json'),
       )
       return self._root.get('admin/configs', params=params)['configSets']
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
@@ -428,7 +434,7 @@ class SolrApi(object):
           ('wt', 'json'),
       )
       return self._root.post('admin/configs', params=params, contenttype='application/json')
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
@@ -447,7 +453,7 @@ class SolrApi(object):
         response['status'] = 0
       else:
         response['message'] = "Could not remove config: %s" % data
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
     return response
 
@@ -459,7 +465,7 @@ class SolrApi(object):
           ('wt', 'json'),
       )
       return self._root.get('admin/collections', params=params)['aliases'] or []
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
@@ -474,7 +480,7 @@ class SolrApi(object):
     try:
       collections = self.collections()
       return collections[name]
-    except Exception, e:
+    except Exception as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
@@ -492,7 +498,7 @@ class SolrApi(object):
           ('collection.configName', config_name),
         )
       if kwargs:
-        params += tuple(((key, val) for key, val in kwargs.iteritems()))
+        params += tuple(((key, val) for key, val in kwargs.items()))
 
       response = self._root.post('admin/collections', params=params, contenttype='application/json')
       response_data = self._get_json(response)
@@ -500,7 +506,7 @@ class SolrApi(object):
         raise PopupException(_('Collection could not be created: %(failure)s') % response_data)
       else:
         return response_data
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
@@ -512,7 +518,7 @@ class SolrApi(object):
 
       response = self._root.post('%(collection)s/config' % {'collection': name}, params=params, data=json.dumps(properties), contenttype='application/json')
       return self._get_json(response)
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
@@ -526,7 +532,7 @@ class SolrApi(object):
 
       response = self._root.post('%(collection)s/schema' % {'collection': name}, params=params, data=json.dumps(data), contenttype='application/json')
       return self._get_json(response)
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
@@ -545,7 +551,7 @@ class SolrApi(object):
       else:
         LOG.error("Could not create core. Check response:\n%s" % json.dumps(response, indent=2))
         return False
-    except RestException, e:
+    except RestException as e:
       if 'already exists' in e.message:
         LOG.warn("Could not create collection.", exc_info=True)
         return False
@@ -567,7 +573,7 @@ class SolrApi(object):
         raise PopupException(_("Could not create or edit alias: %s") % response)
       else:
         return response
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
@@ -584,7 +590,7 @@ class SolrApi(object):
         msg = _("Could not delete alias. Check response:\n%s") % json.dumps(response, indent=2)
         LOG.error(msg)
         raise PopupException(msg)
-    except RestException, e:
+    except RestException as e:
         raise PopupException(e, title=_('Error while accessing Solr'))
 
 
@@ -603,7 +609,7 @@ class SolrApi(object):
         response['status'] = 0
       else:
         response['message'] = "Could not remove collection: %s" % data
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
     return response
 
@@ -623,7 +629,7 @@ class SolrApi(object):
       else:
         LOG.error("Could not remove core. Check response:\n%s" % json.dumps(response, indent=2))
         return False
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
@@ -633,7 +639,7 @@ class SolrApi(object):
           ('wt', 'json'),
       )
       return self._root.get('admin/cores', params=params)['status']
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
   def core(self, core):
@@ -643,7 +649,7 @@ class SolrApi(object):
           ('core', core),
       )
       return self._root.get('admin/cores', params=params)
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
@@ -654,7 +660,7 @@ class SolrApi(object):
       )
       response = self._root.get('%(core)s/schema' % {'core': collection}, params=params)
       return self._get_json(response)['schema']
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
   # Deprecated
@@ -665,7 +671,7 @@ class SolrApi(object):
           ('file', 'schema.xml'),
       )
       return self._root.get('%(core)s/admin/file' % {'core': core}, params=params)
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
   def fields(self, core, dynamic=False):
@@ -678,7 +684,7 @@ class SolrApi(object):
         params += (('show', 'schema'),)
       response = self._root.get('%(core)s/admin/luke' % {'core': core}, params=params)
       return self._get_json(response)
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
   def luke(self, core):
@@ -688,7 +694,7 @@ class SolrApi(object):
       )
       response = self._root.get('%(core)s/admin/luke' % {'core': core}, params=params)
       return self._get_json(response)
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
   def schema_fields(self, core):
@@ -707,7 +713,7 @@ class SolrApi(object):
         'fields': fields,
         'responseHeader': response_json['responseHeader']
       }
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
   def stats(self, core, fields, query=None, facet=''):
@@ -729,7 +735,7 @@ class SolrApi(object):
       response = self._root.get('%(core)s/select' % {'core': core}, params=params)
 
       return self._get_json(response)
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
   def terms(self, core, field, properties=None):
@@ -740,12 +746,12 @@ class SolrApi(object):
           ('terms.fl', field),
       )
       if properties:
-        for key, val in properties.iteritems():
+        for key, val in properties.items():
           params += ((key, val),)
 
       response = self._root.get('%(core)s/terms' % {'core': core}, params=params)
       return self._get_json(response)
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
@@ -757,7 +763,7 @@ class SolrApi(object):
 
       response = self._root.get('admin/info/system', params=params)
       return self._get_json(response)
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
@@ -776,7 +782,7 @@ class SolrApi(object):
 
       response = self._root.get('%(collection)s/sql' % {'collection': collection}, params=params)
       return self._get_json(response)
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
   def get(self, core, doc_id):
@@ -788,7 +794,7 @@ class SolrApi(object):
       )
       response = self._root.get('%(core)s/get' % {'core': collection_name}, params=params)
       return self._get_json(response)
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
@@ -803,7 +809,7 @@ class SolrApi(object):
       )
       response = self._root.get('%(name)s/export' % {'name': name}, params=params)
       return self._get_json(response)
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
@@ -826,7 +832,7 @@ class SolrApi(object):
         ('versions', 'true')
       )
     if kwargs:
-      params += tuple(((key, val) for key, val in kwargs.iteritems()))
+      params += tuple(((key, val) for key, val in kwargs.items()))
 
     response = self._root.post('%s/update' % collection_or_core_name, contenttype=content_type, params=params, data=data)
     return self._get_json(response)
@@ -841,7 +847,7 @@ class SolrApi(object):
       )
       response = self._root.get('zookeeper', params=params)
       return json.loads(response['znode'].get('data', '{}')).get('collection', {})
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
@@ -863,7 +869,7 @@ class SolrApi(object):
       else:
         LOG.error("Could not create collection. Check response:\n%s" % json.dumps(response, indent=2))
         return False
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
@@ -882,7 +888,7 @@ class SolrApi(object):
       else:
         LOG.error("Could not remove collection. Check response:\n%s" % json.dumps(response, indent=2))
         return False
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
@@ -985,7 +991,7 @@ class SolrApi(object):
     if collection:
       timeFilter = self._get_range_borders(collection, query)
     if timeFilter and not timeFilter.get('time_filter_overrides'):
-      params += (('fq', urllib.unquote(utf_quoter('%(field)s:[%(from)s TO %(to)s]' % timeFilter))),)
+      params += (('fq', urllib.parse.unquote(utf_quoter('%(field)s:[%(from)s TO %(to)s]' % timeFilter))),)
 
     # Merge facets queries on same fields
     grouped_fqs = groupby(query['fqs'], lambda x: (x['type'], x['field']))
@@ -1018,23 +1024,23 @@ class SolrApi(object):
                 exclude = '-'
                 f.append('%s%s:%s' % (exclude, field, value))
           _params ='{!tag=%(id)s}' % fq + ' '.join(f)
-          params += (('fq', urllib.unquote(utf_quoter(_params))),)
+          params += (('fq', urllib.parse.unquote(utf_quoter(_params))),)
       elif fq['type'] == 'range':
-        params += (('fq', '{!tag=%(id)s}' % fq + ' '.join([urllib.unquote(
+        params += (('fq', '{!tag=%(id)s}' % fq + ' '.join([urllib.parse.unquote(
                     utf_quoter('%s%s:[%s TO %s}' % ('-' if field['exclude'] else '', fq['field'], f['from'], f['to']))) for field, f in zip(fq['filter'], fq['properties'])])),)
       elif fq['type'] == 'range-up':
-        params += (('fq', '{!tag=%(id)s}' % fq + ' '.join([urllib.unquote(
+        params += (('fq', '{!tag=%(id)s}' % fq + ' '.join([urllib.parse.unquote(
                     utf_quoter('%s%s:[%s TO %s}' % ('-' if field['exclude'] else '', fq['field'], f['from'] if fq['is_up'] else '*', '*' if fq['is_up'] else f['from'])))
                                                           for field, f in zip(fq['filter'], fq['properties'])])),)
       elif fq['type'] == 'map':
         _keys = fq.copy()
         _keys.update(fq['properties'])
-        params += (('fq', '{!tag=%(id)s}' % fq + urllib.unquote(
+        params += (('fq', '{!tag=%(id)s}' % fq + urllib.parse.unquote(
                     utf_quoter('%(lat)s:[%(lat_sw)s TO %(lat_ne)s} AND %(lon)s:[%(lon_sw)s TO %(lon_ne)s}' % _keys))),)
 
     nested_fields = self._get_nested_fields(collection)
     if nested_fields:
-      params += (('fq', urllib.unquote(utf_quoter(' OR '.join(nested_fields)))),)
+      params += (('fq', urllib.parse.unquote(utf_quoter(' OR '.join(nested_fields)))),)
 
     return params
 
@@ -1071,9 +1077,9 @@ class SolrApi(object):
       # Got 'plain/text' mimetype instead of 'application/json'
       try:
         response = json.loads(response)
-      except ValueError, e:
+      except ValueError as e:
         # Got some null bytes in the response
-        LOG.error('%s: %s' % (unicode(e), repr(response)))
+        LOG.error('%s: %s' % (str(e), repr(response)))
         response = json.loads(response.replace('\x00', ''))
     return response
 
@@ -1085,7 +1091,7 @@ class SolrApi(object):
       )
       response = self._root.get('%s/schema/uniquekey' % collection, params=params)
       return self._get_json(response)['uniqueKey']
-    except RestException, e:
+    except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
