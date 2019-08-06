@@ -16,11 +16,12 @@
 # limitations under the License.
 
 
+from future import standard_library
+standard_library.install_aliases()
 import binascii
 import logging
 import re
-import urllib
-import urlparse
+import sys
 
 from django.http import HttpResponseBadRequest
 from django.utils.translation import ugettext as _
@@ -32,6 +33,13 @@ from desktop.lib.rest import resource
 from desktop.conf import VCS
 from desktop.lib.vcs.apis.base_api import Api, GIT_READ_ONLY
 from desktop.lib.vcs.github_client import GithubClientException
+
+if sys.version_info[0] > 2:
+  import urllib.request, urllib.error
+  from urllib.parse import unquote as urllib_unquote, urlsplit as lib_urlsplit, urlunsplit as lib_urlunsplit
+else:
+  from urllib import unquote as urllib_unquote
+  from urlparse import urlsplit as lib_urlsplit, urlunsplit as lib_urlunsplit
 
 LOG = logging.getLogger(__name__)
 
@@ -74,9 +82,9 @@ class GithubReadOnlyApi(Api):
         try:
           response['content'] = blob['content'].decode('base64')
           response['status'] = 0
-        except binascii.Error, e:
+        except binascii.Error as e:
           raise GithubClientException('Failed to decode file contents, check if file content is properly base64-encoded: %s' % e)
-        except KeyError, e:
+        except KeyError as e:
           raise GithubClientException('Failed to find expected content object in blob object: %s' % e)
     else:
       return HttpResponseBadRequest(_('url param is required'))
@@ -102,18 +110,18 @@ class GithubReadOnlyApi(Api):
     return re.compile('%s/%s/%s/tree/%s' % (self._get_base_url(), self.OWNER_RE, self.REPO_RE, self.BRANCH_RE))
 
   def _get_base_url(self):
-    split_url = urlparse.urlsplit(self._remote_url)
-    return urlparse.urlunsplit((split_url.scheme, split_url.netloc, '', "", ""))
+    split_url = lib_urlsplit(self._remote_url)
+    return lib_urlunsplit((split_url.scheme, split_url.netloc, '', "", ""))
 
   def _clean_path(self, filepath):
     cleaned_path = filepath.strip('/')
-    cleaned_path = urllib.unquote(cleaned_path)
+    cleaned_path = urllib_unquote(cleaned_path)
     return cleaned_path
 
   def _get_contents(self, owner, repo, path):
     try:
       return self._root.get('repos/%s/%s/contents/%s' % (owner, repo, path))
-    except RestException, e:
+    except RestException as e:
       raise GithubClientException('Could not find GitHub object, check owner, repo or path: %s' % e)
 
 

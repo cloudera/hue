@@ -42,7 +42,7 @@ class JsonFormField(fields.CharField):
     value = super(JsonFormField, self).clean(value)
     try:
       json.loads(value)
-    except ValueError, e:
+    except ValueError as e:
       raise util.ValidationError(e)
     return value
   

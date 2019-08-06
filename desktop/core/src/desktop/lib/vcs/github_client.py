@@ -16,11 +16,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import binascii
 import json
 import logging
 import re
-import urllib
+import sys
 
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest import resource
@@ -28,6 +31,11 @@ from desktop.lib.rest import resource
 from desktop.conf import VCS
 from desktop.lib.vcs.apis.base_api import GITHUB_OFFICIAL
 
+if sys.version_info[0] > 2:
+  import urllib.request, urllib.error
+  from urllib.parse import unquote as urllib_unquote
+else:
+  from urllib import unquote as urllib_unquote
 
 LOG = logging.getLogger(__name__)
 
@@ -97,7 +105,7 @@ class GithubClient(object):
       response = root.post('login/oauth/access_token', headers=headers, data=json.dumps(data))
       result = cls._get_json(response)
       return result['access_token']
-    except RestException, e:
+    except RestException as e:
       raise GithubClientException('Failed to request access token from GitHub: %s' % e)
     except KeyError:
       raise GithubClientException('Failed to find access_token in GitHub oAuth response')
@@ -136,7 +144,7 @@ class GithubClient(object):
 
   def _clean_path(self, filepath):
     cleaned_path = filepath.strip('/')
-    cleaned_path = urllib.unquote(cleaned_path)
+    cleaned_path = urllib_unquote(cleaned_path)
     return cleaned_path
 
 
@@ -160,9 +168,9 @@ class GithubClient(object):
       blob = self.get_blob(owner, repo, sha)
       content = blob['content'].decode('base64')
       return content
-    except binascii.Error, e:
+    except binascii.Error as e:
       raise GithubClientException('Failed to decode file contents, check if file content is properly base64-encoded: %s' % e)
-    except KeyError, e:
+    except KeyError as e:
       raise GithubClientException('Failed to find expected content object in blob object: %s' % e)
 
 
@@ -199,7 +207,7 @@ class GithubClient(object):
         )
       response = self._root.get('repos/%s/%s/git/trees/%s' % (owner, repo, sha), headers=self.__headers, params=self.__params)
       return self._get_json(response)
-    except RestException, e:
+    except RestException as e:
       raise GithubClientException('Could not find GitHub object, check owner, repo and filepath or permissions: %s' % e)
 
 
@@ -211,5 +219,5 @@ class GithubClient(object):
     try:
       response = self._root.get('repos/%s/%s/git/blobs/%s' % (owner, repo, sha), headers=self.__headers, params=self.__params)
       return self._get_json(response)
-    except RestException, e:
+    except RestException as e:
       raise GithubClientException('Could not find GitHub object, check owner, repo and sha or permissions: %s' % e)

@@ -15,8 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+from __future__ import division
+from future import standard_library
+standard_library.install_aliases()
+from builtins import map
+from builtins import range
+from past.builtins import basestring
+from past.utils import old_div
+from builtins import object
 import base64
-import Queue
+import queue
 import logging
 import socket
 import threading
@@ -44,6 +52,8 @@ from desktop.lib.thrift_.TSSLSocketWithWildcardSAN import TSSLSocketWithWildcard
 from desktop.lib.thrift_sasl import TSaslClientTransport
 from desktop.lib.exceptions import StructuredException, StructuredThriftTransportException
 
+if sys.version_info[0] > 2:
+  from past.builtins import long
 
 LOG = logging.getLogger(__name__)
 
@@ -54,7 +64,7 @@ LOG = logging.getLogger(__name__)
 MAX_RECURSION_DEPTH = 50
 
 
-class LifoQueue(Queue.Queue):
+class LifoQueue(queue.Queue):
     '''
     Variant of Queue that retrieves most recently added entries first.
 
@@ -202,7 +212,7 @@ class ConnectionPooler(object):
       try:
         if _get_pool_key(conf) not in self.pooldict:
           q = LifoQueue(self.poolsize)
-          for i in xrange(self.poolsize):
+          for i in range(self.poolsize):
             client = construct_superclient(conf)
             client.CID = i
             q.put(client, False)
@@ -244,7 +254,7 @@ class ConnectionPooler(object):
           duration = time.time() - start_pool_get_time
           message = "Thrift client %s got connection %s after %.2f seconds" % (self, connection.CID, duration)
           log_if_slow_call(duration=duration, message=message)
-      except Queue.Empty:
+      except queue.Empty:
         has_waited_for = time.time() - start_pool_get_time
         if get_client_timeout is not None and has_waited_for > get_client_timeout:
           raise socket.timeout(
@@ -405,20 +415,20 @@ class PooledClient(object):
 
           superclient.set_timeout(self.conf.timeout_seconds)
           return attr(*args, **kwargs)
-        except TApplicationException, e:
+        except TApplicationException as e:
           # Unknown thrift exception... typically IO errors
           logging.info("Thrift saw an application exception: " + str(e), exc_info=False)
           raise StructuredException('THRIFTAPPLICATION', str(e), data=None, error_code=502)
-        except socket.error, e:
+        except socket.error as e:
           logging.info("Thrift saw a socket error: " + str(e), exc_info=False)
           raise StructuredException('THRIFTSOCKET', str(e), data=None, error_code=502)
-        except TTransportException, e:
+        except TTransportException as e:
           err_msg = str(e)
           logging.info("Thrift saw a transport exception: " + err_msg, exc_info=False)
           if err_msg and 'generic failure: Unable to find a callback: 32775' in err_msg:
             raise StructuredException(_("Increase the sasl_max_buffer value in hue.ini"), err_msg, data=None, error_code=502)
           raise StructuredThriftTransportException(e, error_code=502)
-        except Exception, e:
+        except Exception as e:
           # Stack tends to be only noisy here.
           logging.info("Thrift saw exception: " + str(e), exc_info=False)
           raise
@@ -489,11 +499,11 @@ class SuperClient(object):
           log_if_slow_call(duration=duration, message=logmsg)
 
           return ret
-        except socket.error, e:
+        except socket.error as e:
           pass
-        except TTransportException, e:
+        except TTransportException as e:
           pass
-        except Exception, e:
+        except Exception as e:
           logging.exception("Thrift saw exception (this may be expected).")
           raise
 
@@ -533,7 +543,7 @@ def _unpack_guid_secret_in_handle(str_args):
 
         str_args = str_args.replace(secret.group(1), unpack_guid(encoded_secret))
         str_args = str_args.replace(guid.group(1), unpack_guid(encoded_guid))
-      except Exception, e:
+      except Exception as e:
         logging.warn("Unable to unpack the secret and guid in Thrift Handle: %s" % e)
 
   return str_args
@@ -555,7 +565,7 @@ def simpler_string(thrift_obj):
   TODO(philip): Use this in SuperClient, above.
   """
   L = []
-  for key, value in thrift_obj.__dict__.iteritems():
+  for key, value in thrift_obj.__dict__.items():
     if value is None:
       continue
     if hasattr(value, "thrift_spec"):
@@ -599,11 +609,11 @@ def thrift2json(tft):
   """
   if isinstance(tft,type(None)):
     return None
-  if isinstance(tft,(float,int,long,complex,basestring)):
+  if isinstance(tft,(float,int,complex,basestring)):
     return tft
   if isinstance(tft,dict):
     d = {}
-    for key, val in tft.iteritems():
+    for key, val in tft.items():
       d[key] = thrift2json(val)
     return d
   if isinstance(tft,list):
@@ -713,7 +723,7 @@ def _jsonable2thrift_helper(jsonable, type_enum, spec_args, default, recursion_d
     check_type(jsonable, dict)
     key_type_enum, key_spec_args, val_type_enum, val_spec_args = spec_args
     out = dict()
-    for k_jsonable, v_jsonable in jsonable.iteritems():
+    for k_jsonable, v_jsonable in jsonable.items():
       k = _jsonable2thrift_helper(k_jsonable, key_type_enum, key_spec_args, None, recursion_depth + 1)
       v = _jsonable2thrift_helper(v_jsonable, val_type_enum, val_spec_args, None, recursion_depth + 1)
       out[k] = v
@@ -724,7 +734,7 @@ def _jsonable2thrift_helper(jsonable, type_enum, spec_args, default, recursion_d
     # as a map with values True.
     set_type_enum, set_spec_args = spec_args
     out = set()
-    for k, v in jsonable.iteritems():
+    for k, v in jsonable.items():
       assert v is True, "Expected set value to be True.  Got: %s" % repr(v)
       out.add(_jsonable2thrift_helper(k, set_type_enum, set_spec_args, None, recursion_depth + 1))
     return out
@@ -770,8 +780,8 @@ def enum_as_sequence(enum):
   Arguments:
   - `enum`: The class of a Thrift-generated enum
   """
-  return filter(lambda x: not x.startswith("__")
-                and  x not in ["_VALUES_TO_NAMES", "_NAMES_TO_VALUES"],dir(enum))
+  return [x for x in dir(enum) if not x.startswith("__")
+                and  x not in ["_VALUES_TO_NAMES", "_NAMES_TO_VALUES", "next"]]
 
 def fixup_enums(obj, name_class_map, suffix="AsString"):
   """
@@ -783,7 +793,7 @@ def fixup_enums(obj, name_class_map, suffix="AsString"):
 
   This is destructive - it uses setattr.
   """
-  for n in name_class_map.keys():
+  for n in list(name_class_map.keys()):
     c = name_class_map[n]
     setattr(obj, n + suffix, c._VALUES_TO_NAMES[getattr(obj,n)])
   return obj
@@ -794,9 +804,9 @@ def is_thrift_struct(o):
 
 # Same in resource.py for not losing the trace class
 def log_if_slow_call(duration, message):
-  if duration >= WARN_LEVEL_CALL_DURATION_MS / 1000:
+  if duration >= old_div(WARN_LEVEL_CALL_DURATION_MS, 1000):
     LOG.warn('SLOW: %.2f - %s' % (duration, message))
-  elif duration >= INFO_LEVEL_CALL_DURATION_MS / 1000:
+  elif duration >= old_div(INFO_LEVEL_CALL_DURATION_MS, 1000):
     LOG.info('SLOW: %.2f - %s' % (duration, message))
   else:
     LOG.debug(message)

@@ -22,6 +22,7 @@ import logging
 import os
 import socket
 import stat
+import sys
 
 from collections import OrderedDict
 
@@ -39,6 +40,10 @@ from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection,\
 from desktop.lib.i18n import force_unicode
 from desktop.lib.paths import get_desktop_root, get_run_root
 
+if sys.version_info[0] > 2:
+  from builtins import str as new_str
+else:
+  new_str = unicode
 
 LOG = logging.getLogger(__name__)
 
@@ -1862,28 +1867,28 @@ def validate_ldap(user, config):
       if bool(bind_dn) != bool(bind_password):
         if bind_dn == None:
           res.append((LDAP.BIND_DN,
-                    unicode(_("If you set bind_password, then you must set bind_dn."))))
+                    new_str(_("If you set bind_password, then you must set bind_dn."))))
         else:
           res.append((LDAP.BIND_PASSWORD,
-                      unicode(_("If you set bind_dn, then you must set bind_password."))))
+                      new_str(_("If you set bind_dn, then you must set bind_password."))))
   else:
     if config.NT_DOMAIN.get() is not None or \
         config.LDAP_USERNAME_PATTERN.get() is not None:
       if config.LDAP_URL.get() is None:
         res.append((config.LDAP_URL,
-                    unicode(_("LDAP is only partially configured. An LDAP URL must be provided."))))
+                    new_str(_("LDAP is only partially configured. An LDAP URL must be provided."))))
 
     if config.LDAP_URL.get() is not None:
       if config.NT_DOMAIN.get() is None and \
           config.LDAP_USERNAME_PATTERN.get() is None:
         res.append((config.LDAP_URL,
-                    unicode(_("LDAP is only partially configured. An NT Domain or username "
+                    new_str(_("LDAP is only partially configured. An NT Domain or username "
                     "search pattern must be provided."))))
 
     if config.LDAP_USERNAME_PATTERN.get() is not None and \
         '<username>' not in config.LDAP_USERNAME_PATTERN.get():
         res.append((config.LDAP_USERNAME_PATTERN,
-                   unicode(_("The LDAP username pattern should contain the special"
+                   new_str(_("The LDAP username pattern should contain the special"
                    "<username> replacement string for authentication."))))
 
   return res
@@ -1906,16 +1911,16 @@ def validate_database(user):
 
       # Promote InnoDB storage engine
       if innodb_table_count != total_table_count:
-        res.append(('PREFERRED_STORAGE_ENGINE', unicode(_('''We recommend MySQL InnoDB engine over
+        res.append(('PREFERRED_STORAGE_ENGINE', new_str(_('''We recommend MySQL InnoDB engine over
                                                       MyISAM which does not support transactions.'''))))
 
       if innodb_table_count != 0 and innodb_table_count != total_table_count:
-        res.append(('MYSQL_STORAGE_ENGINE', unicode(_('''All tables in the database must be of the same
+        res.append(('MYSQL_STORAGE_ENGINE', new_str(_('''All tables in the database must be of the same
                                                       storage engine type (preferably InnoDB).'''))))
-    except Exception, ex:
+    except Exception as ex:
       LOG.exception("Error in config validation of MYSQL_STORAGE_ENGINE: %s", ex)
   elif 'sqlite' in connection.vendor:
-    res.append(('SQLITE_NOT_FOR_PRODUCTION_USE', unicode(_('SQLite is only recommended for development environments. '
+    res.append(('SQLITE_NOT_FOR_PRODUCTION_USE', new_str(_('SQLite is only recommended for development environments. '
         'It might cause the "Database is locked" error. Migrating to MySQL, Oracle or PostgreSQL is strongly recommended.'))))
 
   # Check if django_migrations table is up to date
@@ -1936,7 +1941,7 @@ def validate_database(user):
               missing_migration_entries.append((app.name, migration_name))
 
     if missing_migration_entries:
-      res.append(('django_migrations', unicode(_('''django_migrations table seems to be corrupted or incomplete.
+      res.append(('django_migrations', new_str(_('''django_migrations table seems to be corrupted or incomplete.
                                                         %s entries are missing in the table: %s''') % (len(missing_migration_entries), missing_migration_entries))))
   except Exception:
     LOG.exception("Error in config validation of django_migrations")
@@ -1959,55 +1964,55 @@ def config_validator(user):
 
   doc_count = Document.objects.count()
   if doc_count > DOCUMENT2_MAX_ENTRIES:
-    res.append(('DOCUMENT_CLEANUP_WARNING', unicode(_('Desktop Document has more than %d entries: %d, '
+    res.append(('DOCUMENT_CLEANUP_WARNING', new_str(_('Desktop Document has more than %d entries: %d, '
                 'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, doc_count)))))
 
   doc2_count = Document2.objects.count()
   if doc2_count > DOCUMENT2_MAX_ENTRIES:
-    res.append(('DOCUMENT2_CLEANUP_WARNING', unicode(_('Desktop Document2 has more than %d entries: %d, '
+    res.append(('DOCUMENT2_CLEANUP_WARNING', new_str(_('Desktop Document2 has more than %d entries: %d, '
                 'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, doc2_count)))))
 
   session_count = Session.objects.count()
   if session_count > DOCUMENT2_MAX_ENTRIES:
-    res.append(('SESSION_CLEANUP_WARNING', unicode(_('Desktop Session has more than %d entries: %d, '
+    res.append(('SESSION_CLEANUP_WARNING', new_str(_('Desktop Session has more than %d entries: %d, '
                 'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, session_count)))))
 
   qh_count = QueryHistory.objects.count()
   if qh_count > DOCUMENT2_MAX_ENTRIES:
-    res.append(('QueryHistory_CLEANUP_WARNING', unicode(_('Query History has more than %d entries: %d, '
+    res.append(('QueryHistory_CLEANUP_WARNING', new_str(_('Query History has more than %d entries: %d, '
                 'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, qh_count)))))
 
   sq_count = SavedQuery.objects.count()
   if sq_count > DOCUMENT2_MAX_ENTRIES:
-    res.append(('SavedQuery_CLEANUP_WARNING', unicode(_('Saved Query has more than %d entries: %d, '
+    res.append(('SavedQuery_CLEANUP_WARNING', new_str(_('Saved Query has more than %d entries: %d, '
                 'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, sq_count)))))
 
   job_count = Job.objects.count()
   if job_count > DOCUMENT2_MAX_ENTRIES:
-    res.append(('OOZIEJOB_CLEANUP_WARNING', unicode(_('Oozie Job has more than %d entries: %d, '
+    res.append(('OOZIEJOB_CLEANUP_WARNING', new_str(_('Oozie Job has more than %d entries: %d, '
                 'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, job_count)))))
 
   if not get_secret_key():
-    res.append((SECRET_KEY, unicode(_("Secret key should be configured as a random string. All sessions will be lost on restart"))))
+    res.append((SECRET_KEY, new_str(_("Secret key should be configured as a random string. All sessions will be lost on restart"))))
 
   # Validate SSL setup
   if SSL_CERTIFICATE.get():
     res.extend(validate_path(SSL_CERTIFICATE, is_dir=False))
     if not SSL_PRIVATE_KEY.get():
-      res.append((SSL_PRIVATE_KEY, unicode(_("SSL private key file should be set to enable HTTPS."))))
+      res.append((SSL_PRIVATE_KEY, new_str(_("SSL private key file should be set to enable HTTPS."))))
     else:
       res.extend(validate_path(SSL_PRIVATE_KEY, is_dir=False))
 
   # Validate encoding
   if not i18n.validate_encoding(DEFAULT_SITE_ENCODING.get()):
-    res.append((DEFAULT_SITE_ENCODING, unicode(_("Encoding not supported."))))
+    res.append((DEFAULT_SITE_ENCODING, new_str(_("Encoding not supported."))))
 
   # Validate kerberos
   if KERBEROS.HUE_KEYTAB.get() is not None:
     res.extend(validate_path(KERBEROS.HUE_KEYTAB, is_dir=False))
     # Keytab should not be world or group accessible
     kt_stat = os.stat(KERBEROS.HUE_KEYTAB.get())
-    if stat.S_IMODE(kt_stat.st_mode) & 0077:
+    if stat.S_IMODE(kt_stat.st_mode) & 0o077:
       res.append((KERBEROS.HUE_KEYTAB,
                   force_unicode(_("Keytab should have 0600 permissions (has %o).") %
                   stat.S_IMODE(kt_stat.st_mode))))
@@ -2029,8 +2034,8 @@ def config_validator(user):
     from oozie.views.editor2 import _is_oozie_mail_enabled
 
     if not _is_oozie_mail_enabled(user):
-      res.append(('OOZIE_EMAIL_SERVER', unicode(_('Email notifications is disabled for Workflows and Jobs as SMTP server is localhost.'))))
-  except Exception, e:
+      res.append(('OOZIE_EMAIL_SERVER', new_str(_('Email notifications is disabled for Workflows and Jobs as SMTP server is localhost.'))))
+  except Exception as e:
     LOG.warn('Config check failed because Oozie app not installed %s' % e)
 
   from notebook.models import make_notebook
@@ -2041,13 +2046,13 @@ def config_validator(user):
   try:
     notebook_doc, save_as = _save_notebook(notebook.get_data(), user)
   except:
-    res.append(('DATABASE_CHARACTER_SET', unicode(_('Character set of <i>search</i> field in <i>desktop_document2</i> table is not UTF-8. <br>'
+    res.append(('DATABASE_CHARACTER_SET', new_str(_('Character set of <i>search</i> field in <i>desktop_document2</i> table is not UTF-8. <br>'
                                                     '<b>NOTE:</b> Configure the database for character set AL32UTF8 and national character set UTF8.'))))
   if notebook_doc:
     notebook_doc.delete()
 
   if 'use_new_editor' in USE_NEW_EDITOR.bind_to:
-    res.append(('[desktop] use_new_editor', unicode(_('This configuration flag has been deprecated.'))))
+    res.append(('[desktop] use_new_editor', new_str(_('This configuration flag has been deprecated.'))))
 
   return res
 

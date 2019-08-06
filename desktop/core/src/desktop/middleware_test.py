@@ -90,7 +90,7 @@ def test_audit_logging_middleware_enable():
       audit = open(log_path).readlines()
       for line in audit:
         audit_json = json.loads(line)
-        audit_record = audit_json.values()[0]
+        audit_record = list(audit_json.values())[0]
         assert_equal('test_audit_logging', audit_record['user'], audit_record)
         assert_equal('/useradmin/permissions/edit/beeswax/access', audit_record['url'], audit_record)
 

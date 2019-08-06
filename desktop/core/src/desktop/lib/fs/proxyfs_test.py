@@ -16,6 +16,7 @@
 
 from __future__ import absolute_import
 
+from builtins import object
 from mock import MagicMock, patch
 from nose.plugins.attrib import attr
 from nose.tools import assert_raises, assert_false, eq_
@@ -102,7 +103,7 @@ def test_constructor_given_invalid_arguments():
   assert_raises(ValueError, ProxyFS, {'s3a': {}}, 'hdfs')
 
 
-class MockFs():
+class MockFs(object):
   def __init__(self, filebrowser_action=None):
     self.user = None
     self._filebrowser_action = filebrowser_action

@@ -15,7 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import StringIO
+from future import standard_library
+standard_library.install_aliases()
 import json
 import logging
 import os
@@ -62,6 +63,10 @@ from desktop.log.access import access_log_level, access_warn, AccessInfo
 from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _reset_all_debug, get_all_debug as _get_all_debug
 from desktop.models import Settings, hue_version, _get_apps, UserPreferences
 
+if sys.version_info[0] > 2:
+  from io import StringIO as string_io
+else:
+  from StringIO import StringIO as string_io
 
 LOG = logging.getLogger(__name__)
 
@@ -77,7 +82,7 @@ def is_alive(request):
 
 def hue(request):
   current_app, other_apps, apps_list = _get_apps(request.user, '')
-  clusters = get_clusters(request.user).values()
+  clusters = list(get_clusters(request.user).values())
 
   return render('hue.mako', request, {
     'apps': apps_list,
@@ -234,7 +239,7 @@ def download_log_view(request):
         response['Content-Disposition'] = 'attachment; filename=hue-logs-%s.zip' % t
         response['Content-Length'] = length
         return response
-      except Exception, e:
+      except Exception as e:
         LOG.exception("Couldn't construct zip file to write logs")
         return log_view(request)
 
@@ -292,7 +297,7 @@ def dump_config(request):
 
   apps = sorted(appmanager.DESKTOP_MODULES, key=lambda app: app.name)
   apps_names = [app.name for app in apps]
-  top_level = sorted(GLOBAL_CONFIG.get().values(), key=lambda obj: apps_names.index(obj.config.key))
+  top_level = sorted(list(GLOBAL_CONFIG.get().values()), key=lambda obj: apps_names.index(obj.config.key))
 
   return render("dump_config.mako", request, dict(
     show_private=show_private,
@@ -304,7 +309,7 @@ def dump_config(request):
 @access_log_level(logging.WARN)
 def threads(request):
   """Dumps out server threads. Useful for debugging."""
-  out = StringIO.StringIO()
+  out = string_io()
   dump_traceback(file=out)
 
   if not is_admin(request.user):
@@ -605,7 +610,7 @@ def _get_config_errors(request, cache=True):
             error['value'] = confvar.get()
 
           error_list.append(error)
-      except Exception, ex:
+      except Exception as ex:
         LOG.exception("Error in config validation by %s: %s" % (module.nice_name, ex))
 
     validate_by_spec(error_list)
@@ -666,7 +671,7 @@ def collect_validation_messages(conf, error_list):
     'remote_data_dir': [('liboozie', )],
     'shell': [()]
   }
-  whitelist_extras = ((sections, name) for sections, name in get_extra_values(conf) if not (name in desktop.conf.APP_BLACKLIST.get() or (name in cm_extras.keys() and sections in cm_extras[name])))
+  whitelist_extras = ((sections, name) for sections, name in get_extra_values(conf) if not (name in desktop.conf.APP_BLACKLIST.get() or (name in list(cm_extras.keys()) and sections in cm_extras[name])))
 
   for sections, name in whitelist_extras:
     the_section = conf
@@ -677,14 +682,14 @@ def collect_validation_messages(conf, error_list):
         the_section = parent[section]
         hierarchy_sections_string += "[" * the_section.depth + section + "]" * the_section.depth + " "
         parent = the_section
-    except KeyError, ex:
+    except KeyError as ex:
       LOG.warn("Section %s not found: %s" % (section, str(ex)))
 
     the_value = ''
     try:
       # the_value may be a section or a value
       the_value = the_section[name]
-    except KeyError, ex:
+    except KeyError as ex:
       LOG.warn("Error in accessing Section or Value %s: %s" % (name, str(ex)))
 
     section_or_value = 'keyvalue'

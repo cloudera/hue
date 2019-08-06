@@ -34,7 +34,7 @@ from notebook.connectors.spark_shell import SparkConfiguration
 
 try:
   from oozie.models2 import WorkflowConfiguration as OozieWorkflowConfiguration
-except (ImportError, RuntimeError), e:
+except (ImportError, RuntimeError) as e:
   OozieWorkflowConfiguration = None
 
 
@@ -47,7 +47,7 @@ def api_error_handler(func):
 
     try:
       return func(*args, **kwargs)
-    except Exception, e:
+    except Exception as e:
       LOG.exception('Error running %s' % func)
       response['status'] = -1
       response['message'] = force_unicode(str(e))
@@ -111,7 +111,7 @@ def app_configuration_for_user(request):
 
     try:
       user = User.objects.get(id=int(user_id))
-    except User.DoesNotExist, e:
+    except User.DoesNotExist as e:
       raise PopupException(_('Could not find user with ID: %s') % user_id)
 
     config = _save_configuration(app, properties, is_default=False, user=user)
@@ -139,7 +139,7 @@ def delete_default_configuration(request):
     config_id = int(config_id)
     config = DefaultConfiguration.objects.get(id=config_id)
     config.delete()
-  except DefaultConfiguration.DoesNotExist, e:
+  except DefaultConfiguration.DoesNotExist as e:
     raise PopupException(_('Could not find configuration with ID: %d') % config_id)
 
   return JsonResponse({
@@ -204,7 +204,7 @@ def _update_default_and_group_configurations(configurations):
       # delete all previous default and group configurations
       DefaultConfiguration.objects.filter(Q(is_default=True) | Q(groups__isnull=False)).delete()
 
-      for app, configs in configurations.items():
+      for app, configs in list(configurations.items()):
         if 'default' in configs:
           properties = configs['default']
           if properties:
@@ -220,9 +220,9 @@ def _update_default_and_group_configurations(configurations):
               try:
                 groups = Group.objects.filter(id__in=group_ids)
                 _save_configuration(app, properties, is_default=False, groups=groups)
-              except Group.DoesNotExist, e:
+              except Group.DoesNotExist as e:
                 raise PopupException(_('Could not find one or more groups with IDs: %s') % ', '.join(group_ids))
-  except Exception, e:
+  except Exception as e:
     raise PopupException(_('Failed to update configurations: %s') % e)
 
   return _get_default_configurations()

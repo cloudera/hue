@@ -15,9 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import map
+from builtins import str
 import logging
 import json
-import StringIO
+import sys
 import tempfile
 import zipfile
 
@@ -47,6 +51,10 @@ from desktop.lib.i18n import smart_str, force_unicode
 from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, \
   UserPreferences, get_user_preferences, set_user_preferences, get_cluster_config
 
+if sys.version_info[0] > 2:
+  from io import StringIO as string_io
+else:
+  from StringIO import StringIO as string_io
 
 LOG = logging.getLogger(__name__)
 
@@ -57,7 +65,7 @@ def api_error_handler(func):
 
     try:
       return func(*args, **kwargs)
-    except Exception, e:
+    except Exception as e:
       LOG.exception('Error running %s' % func)
       response['status'] = -1
       response['message'] = force_unicode(str(e))
@@ -71,7 +79,7 @@ def api_error_handler(func):
 @api_error_handler
 def get_config(request):
   config = get_cluster_config(request.user)
-  config['clusters'] = get_clusters(request.user).values()
+  config['clusters'] = list(get_clusters(request.user).values())
   config['status'] = 0
 
   return JsonResponse(config)
@@ -85,7 +93,7 @@ def get_context_namespaces(request, interface):
   response = {}
   namespaces = []
 
-  clusters = get_clusters(request.user).values()
+  clusters = list(get_clusters(request.user).values())
 
   # Currently broken if not sent
   namespaces.extend([{
@@ -144,7 +152,7 @@ def get_context_computes(request, interface):
   response = {}
   computes = []
 
-  clusters = get_clusters(request.user).values()
+  clusters = list(get_clusters(request.user).values())
 
   if get_cluster_config(request.user)['has_computes']: # TODO: only based on interface selected?
     interpreter = get_interpreter(connector_type=interface, user=request.user)
@@ -187,7 +195,7 @@ def get_context_clusters(request, interface):
   response = {}
   clusters = []
 
-  cluster_configs = get_clusters(request.user).values()
+  cluster_configs = list(get_clusters(request.user).values())
 
   for cluster in cluster_configs:
     cluster = {
@@ -621,7 +629,7 @@ def share_document(request):
 
   doc = Document2.objects.get_by_uuid(user=request.user, uuid=uuid)
 
-  for name, perm in perms_dict.iteritems():
+  for name, perm in perms_dict.items():
     users = groups = None
     if perm.get('user_ids'):
       users = User.objects.in_bulk(perm.get('user_ids'))
@@ -667,7 +675,7 @@ def export_documents(request):
   else:
     filename = 'hue-documents-%s-(%s)' % (datetime.today().strftime('%Y-%m-%d'), num_docs)
 
-  f = StringIO.StringIO()
+  f = string_io()
 
   if doc_ids:
     doc_ids = ','.join(map(str, doc_ids))
@@ -683,7 +691,7 @@ def export_documents(request):
         try:
           from spark.models import Notebook
           zfile.writestr("notebook-%s-%s.txt" % (doc.name, doc.id), smart_str(Notebook(document=doc).get_str()))
-        except Exception, e:
+        except Exception as e:
           LOG.exception(e)
     zfile.close()
     response = HttpResponse(content_type="application/zip")
@@ -707,7 +715,7 @@ def import_documents(request):
       documents = json.loads(request.POST.get('documents'))
 
     documents = json.loads(documents)
-  except ValueError, e:
+  except ValueError as e:
     raise PopupException(_('Failed to import documents, the file does not contain valid JSON.'))
 
   # Validate documents
@@ -754,7 +762,7 @@ def import_documents(request):
   f.write(json.dumps(docs))
   f.flush()
 
-  stdout = StringIO.StringIO()
+  stdout = string_io()
   try:
     with transaction.atomic(): # We wrap both commands to commit loaddata & sync
       management.call_command('loaddata', f.name, verbosity=3, traceback=True, stdout=stdout, commit=False) # We need to use commit=False because commit=True will close the connection and make Document.objects.sync fail.
@@ -778,14 +786,14 @@ def import_documents(request):
             ('owner', doc['fields']['owner'][0])
           ]) for doc in docs]
       })
-  except Exception, e:
+  except Exception as e:
     LOG.error('Failed to run loaddata command in import_documents:\n %s' % stdout.getvalue())
     return JsonResponse({'status': -1, 'message': smart_str(e)})
   finally:
     stdout.close()
 
 def _update_imported_oozie_document(doc, uuids_map):
-  for key, value in uuids_map.iteritems():
+  for key, value in uuids_map.items():
     if value:
       doc['fields']['data'] = doc['fields']['data'].replace(key, value)
 
@@ -931,7 +939,7 @@ def _copy_document_with_owner(doc, owner, uuids_map):
   if doc['fields'].get('parent_directory'):
     parent_uuid = doc['fields']['parent_directory'][0]
 
-  if parent_uuid is not None and parent_uuid in uuids_map.keys():
+  if parent_uuid is not None and parent_uuid in list(uuids_map.keys()):
     if uuids_map[parent_uuid] is None:
       uuids_map[parent_uuid] = uuid_default()
     doc['fields']['parent_directory'] = [uuids_map[parent_uuid], 1, False]
@@ -944,7 +952,7 @@ def _copy_document_with_owner(doc, owner, uuids_map):
   # Remap dependencies if needed
   idx = 0
   for dep_uuid, dep_version, dep_is_history in doc['fields']['dependencies']:
-    if dep_uuid not in uuids_map.keys():
+    if dep_uuid not in list(uuids_map.keys()):
       LOG.warn('Could not find dependency UUID: %s in JSON import, may cause integrity errors if not found.' % dep_uuid)
     else:
       if uuids_map[dep_uuid] is None:
@@ -966,7 +974,7 @@ def _create_or_update_document_with_owner(doc, owner, uuids_map):
       doc['pk'] = existing_doc.pk
     else:
       create_new = True
-  except FilesystemException, e:
+  except FilesystemException as e:
     create_new = True
 
   if create_new:
@@ -977,7 +985,7 @@ def _create_or_update_document_with_owner(doc, owner, uuids_map):
   # Verify that parent exists, log warning and set parent to user's home directory if not found
   if doc['fields']['parent_directory']:
     uuid, version, is_history = doc['fields']['parent_directory']
-    if uuid not in uuids_map.keys() and \
+    if uuid not in list(uuids_map.keys()) and \
             not Document2.objects.filter(uuid=uuid, version=version, is_history=is_history).exists():
       LOG.warn('Could not find parent document with UUID: %s, will set parent to home directory' % uuid)
       doc['fields']['parent_directory'] = [home_dir.uuid, home_dir.version, home_dir.is_history]
@@ -987,7 +995,7 @@ def _create_or_update_document_with_owner(doc, owner, uuids_map):
   if doc['fields']['dependencies']:
     history_deps_list = []
     for index, (uuid, version, is_history) in enumerate(doc['fields']['dependencies']):
-      if not uuid in uuids_map.keys() and not is_history and \
+      if not uuid in list(uuids_map.keys()) and not is_history and \
               not Document2.objects.filter(uuid=uuid, version=version).exists():
           raise PopupException(_('Cannot import document, dependency with UUID: %s not found.') % uuid)
       elif is_history:
