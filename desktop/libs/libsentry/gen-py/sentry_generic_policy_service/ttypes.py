@@ -6,6 +6,8 @@
 #  options string: py:new_style
 #
 
+from builtins import range
+from builtins import object
 from thrift.Thrift import TType, TMessageType, TException, TApplicationException
 import sentry_common_service.ttypes
 import sentry_policy_service.ttypes
@@ -110,7 +112,7 @@ class TAuthorizable(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -174,7 +176,7 @@ class TSentryPrivilege(object):
         if ftype == TType.LIST:
           self.authorizables = []
           (_etype3, _size0) = iprot.readListBegin()
-          for _i4 in xrange(_size0):
+          for _i4 in range(_size0):
             _elem5 = TAuthorizable()
             _elem5.read(iprot)
             self.authorizables.append(_elem5)
@@ -270,7 +272,7 @@ class TSentryPrivilege(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -382,7 +384,7 @@ class TCreateSentryRoleRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -450,7 +452,7 @@ class TCreateSentryRoleResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -562,7 +564,7 @@ class TDropSentryRoleRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -630,7 +632,7 @@ class TDropSentryRoleResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -698,7 +700,7 @@ class TAlterSentryRoleAddGroupsRequest(object):
         if ftype == TType.SET:
           self.groups = set()
           (_etype10, _size7) = iprot.readSetBegin()
-          for _i11 in xrange(_size7):
+          for _i11 in range(_size7):
             _elem12 = iprot.readString()
             self.groups.add(_elem12)
           iprot.readSetEnd()
@@ -765,7 +767,7 @@ class TAlterSentryRoleAddGroupsRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -833,7 +835,7 @@ class TAlterSentryRoleAddGroupsResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -901,7 +903,7 @@ class TAlterSentryRoleDeleteGroupsRequest(object):
         if ftype == TType.SET:
           self.groups = set()
           (_etype17, _size14) = iprot.readSetBegin()
-          for _i18 in xrange(_size14):
+          for _i18 in range(_size14):
             _elem19 = iprot.readString()
             self.groups.add(_elem19)
           iprot.readSetEnd()
@@ -968,7 +970,7 @@ class TAlterSentryRoleDeleteGroupsRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1036,7 +1038,7 @@ class TAlterSentryRoleDeleteGroupsResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1164,7 +1166,7 @@ class TAlterSentryRoleGrantPrivilegeRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1232,7 +1234,7 @@ class TAlterSentryRoleGrantPrivilegeResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1360,7 +1362,7 @@ class TAlterSentryRoleRevokePrivilegeRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1428,7 +1430,7 @@ class TAlterSentryRoleRevokePrivilegeResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1538,7 +1540,7 @@ class TListSentryRolesRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1582,7 +1584,7 @@ class TSentryRole(object):
         if ftype == TType.SET:
           self.groups = set()
           (_etype24, _size21) = iprot.readSetBegin()
-          for _i25 in xrange(_size21):
+          for _i25 in range(_size21):
             _elem26 = iprot.readString()
             self.groups.add(_elem26)
           iprot.readSetEnd()
@@ -1628,7 +1630,7 @@ class TSentryRole(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1673,7 +1675,7 @@ class TListSentryRolesResponse(object):
         if ftype == TType.SET:
           self.roles = set()
           (_etype31, _size28) = iprot.readSetBegin()
-          for _i32 in xrange(_size28):
+          for _i32 in range(_size28):
             _elem33 = TSentryRole()
             _elem33.read(iprot)
             self.roles.add(_elem33)
@@ -1718,7 +1720,7 @@ class TListSentryRolesResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1794,7 +1796,7 @@ class TListSentryPrivilegesRequest(object):
         if ftype == TType.LIST:
           self.authorizables = []
           (_etype38, _size35) = iprot.readListBegin()
-          for _i39 in xrange(_size35):
+          for _i39 in range(_size35):
             _elem40 = TAuthorizable()
             _elem40.read(iprot)
             self.authorizables.append(_elem40)
@@ -1867,7 +1869,7 @@ class TListSentryPrivilegesRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1912,7 +1914,7 @@ class TListSentryPrivilegesResponse(object):
         if ftype == TType.SET:
           self.privileges = set()
           (_etype45, _size42) = iprot.readSetBegin()
-          for _i46 in xrange(_size42):
+          for _i46 in range(_size42):
             _elem47 = TSentryPrivilege()
             _elem47.read(iprot)
             self.privileges.add(_elem47)
@@ -1957,7 +1959,7 @@ class TListSentryPrivilegesResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2070,7 +2072,7 @@ class TDropPrivilegesRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2138,7 +2140,7 @@ class TDropPrivilegesResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2209,7 +2211,7 @@ class TRenamePrivilegesRequest(object):
         if ftype == TType.LIST:
           self.oldAuthorizables = []
           (_etype52, _size49) = iprot.readListBegin()
-          for _i53 in xrange(_size49):
+          for _i53 in range(_size49):
             _elem54 = TAuthorizable()
             _elem54.read(iprot)
             self.oldAuthorizables.append(_elem54)
@@ -2220,7 +2222,7 @@ class TRenamePrivilegesRequest(object):
         if ftype == TType.LIST:
           self.newAuthorizables = []
           (_etype58, _size55) = iprot.readListBegin()
-          for _i59 in xrange(_size55):
+          for _i59 in range(_size55):
             _elem60 = TAuthorizable()
             _elem60.read(iprot)
             self.newAuthorizables.append(_elem60)
@@ -2298,7 +2300,7 @@ class TRenamePrivilegesRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2366,7 +2368,7 @@ class TRenamePrivilegesResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2410,7 +2412,7 @@ class TSentryActiveRoleSet(object):
         if ftype == TType.SET:
           self.roles = set()
           (_etype66, _size63) = iprot.readSetBegin()
-          for _i67 in xrange(_size63):
+          for _i67 in range(_size63):
             _elem68 = iprot.readString()
             self.roles.add(_elem68)
           iprot.readSetEnd()
@@ -2456,7 +2458,7 @@ class TSentryActiveRoleSet(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2522,7 +2524,7 @@ class TListSentryPrivilegesForProviderRequest(object):
         if ftype == TType.SET:
           self.groups = set()
           (_etype73, _size70) = iprot.readSetBegin()
-          for _i74 in xrange(_size70):
+          for _i74 in range(_size70):
             _elem75 = iprot.readString()
             self.groups.add(_elem75)
           iprot.readSetEnd()
@@ -2538,7 +2540,7 @@ class TListSentryPrivilegesForProviderRequest(object):
         if ftype == TType.LIST:
           self.authorizables = []
           (_etype79, _size76) = iprot.readListBegin()
-          for _i80 in xrange(_size76):
+          for _i80 in range(_size76):
             _elem81 = TAuthorizable()
             _elem81.read(iprot)
             self.authorizables.append(_elem81)
@@ -2614,7 +2616,7 @@ class TListSentryPrivilegesForProviderRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2659,7 +2661,7 @@ class TListSentryPrivilegesForProviderResponse(object):
         if ftype == TType.SET:
           self.privileges = set()
           (_etype87, _size84) = iprot.readSetBegin()
-          for _i88 in xrange(_size84):
+          for _i88 in range(_size84):
             _elem89 = iprot.readString()
             self.privileges.add(_elem89)
           iprot.readSetEnd()
@@ -2705,7 +2707,7 @@ class TListSentryPrivilegesForProviderResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2741,11 +2743,11 @@ class TSentryPrivilegeMap(object):
         if ftype == TType.MAP:
           self.privilegeMap = {}
           (_ktype92, _vtype93, _size91 ) = iprot.readMapBegin()
-          for _i95 in xrange(_size91):
+          for _i95 in range(_size91):
             _key96 = iprot.readString()
             _val97 = set()
             (_etype101, _size98) = iprot.readSetBegin()
-            for _i102 in xrange(_size98):
+            for _i102 in range(_size98):
               _elem103 = TSentryPrivilege()
               _elem103.read(iprot)
               _val97.add(_elem103)
@@ -2767,7 +2769,7 @@ class TSentryPrivilegeMap(object):
     if self.privilegeMap is not None:
       oprot.writeFieldBegin('privilegeMap', TType.MAP, 1)
       oprot.writeMapBegin(TType.STRING, TType.SET, len(self.privilegeMap))
-      for kiter104,viter105 in self.privilegeMap.items():
+      for kiter104,viter105 in list(self.privilegeMap.items()):
         oprot.writeString(kiter104)
         oprot.writeSetBegin(TType.STRUCT, len(viter105))
         for iter106 in viter105:
@@ -2791,7 +2793,7 @@ class TSentryPrivilegeMap(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2865,7 +2867,7 @@ class TListSentryPrivilegesByAuthRequest(object):
         if ftype == TType.SET:
           self.authorizablesSet = set()
           (_etype110, _size107) = iprot.readSetBegin()
-          for _i111 in xrange(_size107):
+          for _i111 in range(_size107):
             _elem112 = iprot.readString()
             self.authorizablesSet.add(_elem112)
           iprot.readSetEnd()
@@ -2875,7 +2877,7 @@ class TListSentryPrivilegesByAuthRequest(object):
         if ftype == TType.SET:
           self.groups = set()
           (_etype116, _size113) = iprot.readSetBegin()
-          for _i117 in xrange(_size113):
+          for _i117 in range(_size113):
             _elem118 = iprot.readString()
             self.groups.add(_elem118)
           iprot.readSetEnd()
@@ -2961,7 +2963,7 @@ class TListSentryPrivilegesByAuthRequest(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -3006,7 +3008,7 @@ class TListSentryPrivilegesByAuthResponse(object):
         if ftype == TType.MAP:
           self.privilegesMapByAuth = {}
           (_ktype122, _vtype123, _size121 ) = iprot.readMapBegin()
-          for _i125 in xrange(_size121):
+          for _i125 in range(_size121):
             _key126 = iprot.readString()
             _val127 = TSentryPrivilegeMap()
             _val127.read(iprot)
@@ -3031,7 +3033,7 @@ class TListSentryPrivilegesByAuthResponse(object):
     if self.privilegesMapByAuth is not None:
       oprot.writeFieldBegin('privilegesMapByAuth', TType.MAP, 2)
       oprot.writeMapBegin(TType.STRING, TType.STRUCT, len(self.privilegesMapByAuth))
-      for kiter128,viter129 in self.privilegesMapByAuth.items():
+      for kiter128,viter129 in list(self.privilegesMapByAuth.items()):
         oprot.writeString(kiter128)
         viter129.write(oprot)
       oprot.writeMapEnd()
@@ -3053,7 +3055,7 @@ class TListSentryPrivilegesByAuthResponse(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
