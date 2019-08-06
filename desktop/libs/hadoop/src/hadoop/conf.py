@@ -21,7 +21,7 @@ import os
 
 from django.utils.translation import ugettext_lazy as _t
 
-from desktop.conf import default_ssl_validate
+from desktop.conf import default_ssl_validate, has_connectors
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool
 
 
@@ -54,7 +54,12 @@ UPLOAD_CHUNK_SIZE = Config(
 
 
 def has_hdfs_enabled():
-  return list(HDFS_CLUSTERS.keys())
+  if has_connectors():
+    from desktop.lib.connectors.api import _get_installed_connectors
+    return any([connector for connector in _get_installed_connectors() if connector['dialect'] == 'hdfs'])
+  else:
+    return list(HDFS_CLUSTERS.keys())
+
 
 def get_hadoop_conf_dir_default():
   """ get from environment variable HADOOP_CONF_DIR or "/etc/hadoop/conf" """

@@ -68,14 +68,14 @@ def get_ordered_interpreters(user=None):
   if has_connectors():
     from desktop.lib.connectors.api import _get_installed_connectors
     reordered_interpreters = [{
-        'name': i['nice_name'],
-        'type': i['name'],
-        'dialect': i['dialect'],
-        'category': i['category'],
-        'is_sql': i['is_sql'],
-        'interface': i['interface'],
-        'options': {setting['name']: setting['value'] for setting in i['settings']}
-      } for i in _get_installed_connectors()
+        'name': connector['nice_name'],
+        'type': connector['name'],
+        'dialect': connector['dialect'],
+        'category': connector['category'],
+        'is_sql': connector['is_sql'],
+        'interface': connector['interface'],
+        'options': {setting['name']: setting['value'] for setting in connector['settings']}
+      } for connector in _get_installed_connectors(category='editor')
     ]
   else:
     reordered_interpreters = interpreters_shown_on_wheel + [i for i in user_interpreters if i not in interpreters_shown_on_wheel]
