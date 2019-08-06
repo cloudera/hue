@@ -812,7 +812,12 @@ ko.bindingHandlers.aceEditor = {
       drop: function(e, ui) {
         const position = editor.renderer.screenToTextCoordinates(e.clientX, e.clientY);
         let text = ui.helper.text();
-        if (lastMeta.type === 's3' || lastMeta.type === 'hdfs' || lastMeta.type === 'adls' || lastMeta.type === 'abfs') {
+        if (
+          lastMeta.type === 's3' ||
+          lastMeta.type === 'hdfs' ||
+          lastMeta.type === 'adls' ||
+          lastMeta.type === 'abfs'
+        ) {
           text = "'" + lastMeta.definition.path + "'";
         }
         editor.moveCursorToPosition(position);
