@@ -44,7 +44,7 @@ const TEMPLATE = `
 
   <script type="text/html" id="assist-storage-header-actions">
     <div class="assist-db-header-actions">
-      <!-- ko if: type !== 's3' -->
+      <!-- ko if: type !== 's3' && type !== 'abfs' -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: goHome, attr: { title: I18n('Go to ' + window.USER_HOME_DIR) }"><i class="pointer fa fa-home"></i></a>
       <!-- ko if: window.SHOW_UPLOAD_BUTTON -->
       <a class="inactive-action" data-bind="dropzone: {
@@ -198,7 +198,8 @@ class AssistStoragePanel {
     });
 
     huePubSub.subscribe('assist.storage.go.home', () => {
-      const path = this.activeSource() === 's3' ? '/' : window.USER_HOME_DIR;
+      const path =
+        this.activeSource() === 's3' || this.activeSource() === 'abfs' ? '/' : window.USER_HOME_DIR;
       this.loadPath(path);
       apiHelper.setInTotalStorage('assist', 'currentStoragePath_' + this.activeSource(), path);
     });
