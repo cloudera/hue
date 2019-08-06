@@ -65,14 +65,14 @@ def get_next_available_server(client_class, username, failed_host=None, componen
       # If above operation succeeds, return client
       LOG.info('Successfully connected to Sentry server %s, after attempting [%s], returning client.' % (client.host, ', '.join(attempted_hosts)))
       return next_server, attempted_hosts
-    except StructuredThriftTransportException, e:
+    except StructuredThriftTransportException as e:
       # If we have come back around to the original failed client, exit
       if client.host == failed_host:
         has_next = False
       else:
         current_host = client.host
         attempted_hosts.append(current_host)
-    except Exception, e:
+    except Exception as e:
       raise PopupException(_('Encountered unexpected error while trying to find available Sentry client: %s' % e))
 
   return None, attempted_hosts
