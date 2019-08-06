@@ -27,7 +27,6 @@ from nose.plugins.skip import SkipTest
 import aws
 
 from contextlib import contextmanager
-
 from aws.s3 import parse_uri, join
 
 
