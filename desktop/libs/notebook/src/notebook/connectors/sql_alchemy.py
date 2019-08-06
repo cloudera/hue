@@ -44,6 +44,8 @@ Note: using the task server would not leverage any caching.
 from future import standard_library
 standard_library.install_aliases()
 
+from builtins import next
+from builtins import object
 import datetime
 import json
 import logging
@@ -53,7 +55,6 @@ import sys
 import textwrap
 
 from string import Template
-from urllib.parse import quote_plus
 
 from django.utils.translation import ugettext as _
 from sqlalchemy import create_engine, inspect
@@ -67,6 +68,12 @@ from librdbms.server import dbms
 from notebook.connectors.base import Api, QueryError, QueryExpired, _get_snippet_name, AuthenticationRequired
 from notebook.models import escape_rows
 
+if sys.version_info[0] > 2:
+  import urllib.request, urllib.error
+  from urllib.parse import quote_plus as urllib_quote_plus
+  from past.builtins import long
+else:
+  from urllib import quote_plus as urllib_quote_plus
 
 CONNECTION_CACHE = {}
 LOG = logging.getLogger(__name__)
@@ -76,13 +83,13 @@ def query_error_handler(func):
   def decorator(*args, **kwargs):
     try:
       return func(*args, **kwargs)
-    except OperationalError, e:
+    except OperationalError as e:
       message = str(e)
       if '1045' in message: # 'Access denied' # MySQL
         raise AuthenticationRequired(message=message)
       else:
         raise e
-    except Exception, e:
+    except Exception as e:
       message = force_unicode(e)
       if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
         raise QueryExpired(e)
@@ -113,10 +120,10 @@ class SqlAlchemyApi(Api):
       url = self.options['url']
 
     if url.startswith('awsathena+rest://'):
-      url = url.replace(url[17:37], quote_plus(url[17:37]))
-      url = url.replace(url[38:50], quote_plus(url[38:50]))
+      url = url.replace(url[17:37], urllib_quote_plus(url[17:37]))
+      url = url.replace(url[38:50], urllib_quote_plus(url[38:50]))
       s3_staging_dir = url.rsplit('s3_staging_dir=', 1)[1]
-      url = url.replace(s3_staging_dir, quote_plus(s3_staging_dir))
+      url = url.replace(s3_staging_dir, urllib_quote_plus(s3_staging_dir))
 
     options = self.options.copy()
     options.pop('session', None)
@@ -335,7 +342,7 @@ class SqlAlchemyApi(Api):
     return table_or_column
 
 
-class Assist():
+class Assist(object):
 
   def __init__(self, db, engine, backticks):
     self.db = db
