@@ -219,12 +219,11 @@ def test_dump_config():
     response1 = c.get(reverse('desktop.views.dump_config'))
     assert_true(CANARY in response1.content, response1.content)
 
-    response2 = c.get(reverse('desktop.views.dump_config'), dict(private="true"))
+    response2 = c.get(reverse('desktop.views.dump_config'), {'private': 'true'})
     assert_true(CANARY in response2.content)
 
     # There are more private variables...
     assert_true(len(response1.content) < len(response2.content))
-
   finally:
     clear()
 
@@ -276,6 +275,14 @@ def test_dump_config():
       os.environ.pop("HUE_CONF_DIR", None)
     else:
       os.environ["HUE_CONF_DIR"] = prev_env_conf
+
+
+  finish = desktop.conf.ENABLE_CONNECTORS.set_for_testing(True)
+  try:
+    response = c.get(reverse('desktop.views.dump_config'))
+    assert_equal(1, len(response.context[0]['apps']), response.context[0])
+  finally:
+    finish()
 
 
 def hue_version():
