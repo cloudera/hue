@@ -69,7 +69,7 @@ CONNECTOR_CLASSES += [
   {'nice_name': "Pig", 'dialect': 'pig', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
   {'nice_name': "Java", 'dialect': 'java', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
 
-  {'nice_name': "HDFS", 'dialect': 'hdfs', 'settings': [{'name': 'server_host', 'value': ''}], 'category': 'browsers', 'description': '', 'properties': {}},
+  {'nice_name': "HDFS", 'dialect': 'hdfs', 'interface': 'rest', 'settings': [{'name': 'server_url', 'value': 'http://localhost:9870/webhdfs/v1'}, {'name': 'default_fs', 'value': 'fs_defaultfs=hdfs://localhost:8020'}], 'category': 'browsers', 'description': '', 'properties': {}},
   {'nice_name': "YARN", 'dialect': 'yarn', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
   {'nice_name': "S3", 'dialect': 's3', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
   {'nice_name': "ADLS", 'dialect': 'adls-v1', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
@@ -195,7 +195,7 @@ def delete_connector(request):
     raise PopupException(_('No connector with the name %(name)s found.') % connector)
 
 
-def _get_installed_connectors(category=None):
+def _get_installed_connectors(category=None, dialect=None, interface=None):
   global CONNECTOR_INSTANCES
   global CONNECTOR_IDS
   config_connectors = CONNECTORS.get()
@@ -222,10 +222,16 @@ def _get_installed_connectors(category=None):
       CONNECTOR_INSTANCES.append(connector)
       CONNECTOR_IDS += 1
 
+  connectors = CONNECTOR_INSTANCES
+
   if category is not None:
-    return [connector for connector in CONNECTOR_INSTANCES if category == connector['category']]
-  else:
-    return CONNECTOR_INSTANCES
+    connectors = [connector for connector in connectors if category == connector['category']]
+  if dialect is not None:
+    connectors = [connector for connector in connectors if dialect == connector['dialect']]
+  if interface is not None:
+    connectors = [connector for connector in connectors if interface == connector['interface']]
+
+  return connectors
 
 
 def _get_connector_by_id(id):
