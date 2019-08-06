@@ -33,7 +33,6 @@ from hadoop.cluster import get_hdfs
 from hadoop.conf import has_hdfs_enabled
 
 
-
 SUPPORTED_FS = ['hdfs', 's3a', 'adl', 'abfs', 'gs']
 
 
@@ -62,8 +61,10 @@ def is_enabled(fs=None):
   elif fs == 'gs':
     return is_gs_enabled()
 
+
 def is_enabled_and_has_access(fs=None, user=None):
   return is_enabled(fs) and has_access(fs, user)
+
 
 def _get_client(fs=None):
   if fs == 'hdfs':
@@ -110,6 +111,13 @@ def get_filesystem(name='default'):
 def get_filesystems(user):
   return [fs for fs in SUPPORTED_FS if is_enabled(fs) and has_access(fs, user)]
 
-
-
-
+def _get_client(fs=None):
+  if fs == 'hdfs':
+    return get_hdfs
+  elif fs == 's3a':
+    return aws.client.get_client
+  elif fs == 'adl':
+    return azure.client.get_client
+  elif fs == 'abfs':
+    return azure.client.get_client_abfs
+  return None

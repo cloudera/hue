@@ -24,7 +24,9 @@ from nose.tools import assert_equal, assert_true, assert_not_equal
 from aws import conf
 from aws.client import clear_cache, Client, get_client, get_credential_provider, current_ms_from_utc
 
+
 LOG = logging.getLogger(__name__)
+
 
 class TestAWS(unittest.TestCase):
   def test_with_credentials(self):

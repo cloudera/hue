@@ -21,8 +21,8 @@ import os
 
 from django.utils.translation import ugettext_lazy as _t
 
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool
 from desktop.conf import default_ssl_validate
+from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool
 
 
 LOG = logging.getLogger(__name__)
@@ -44,7 +44,6 @@ def find_file_recursive(desired_glob, root):
 
   f.__doc__ = "Finds %s/%s" % (root, desired_glob)
   return f
-
 
 
 UPLOAD_CHUNK_SIZE = Config(
@@ -149,7 +148,7 @@ def get_spark_history_server_security_enabled():
   from metadata.conf import MANAGER
   from metadata.manager_client import ManagerApi
   if MANAGER.API_URL.get():
-      return ManagerApi().get_spark_history_server_security_enabled()
+    return ManagerApi().get_spark_history_server_security_enabled()
   return False
 
 
