@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
+from builtins import object
 import json
 import logging
 import re
@@ -538,7 +540,7 @@ def _get_snippet_name(notebook, unique=False, table_format=False):
   return name
 
 
-class ExecutionWrapper():
+class ExecutionWrapper(object):
   def __init__(self, api, notebook, snippet, callback=None):
     self.api = api
     self.notebook = notebook
@@ -600,7 +602,7 @@ class ExecutionWrapper():
       self.api.close_statement(self.notebook, self.snippet)
 
 
-class ResultWrapper():
+class ResultWrapper(object):
   def __init__(self, cols, rows, has_more):
     self._cols = cols
     self._rows = rows

@@ -14,17 +14,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from future import standard_library
+standard_library.install_aliases()
 import hashlib
 import os
 import re
-import StringIO
+import io
 
 from desktop.lib.i18n import smart_str
 
 # Note: Might be replaceable by sqlparse.split
 def get_statements(hql_query):
   hql_query = strip_trailing_semicolon(hql_query)
-  hql_query_sio = StringIO.StringIO(hql_query)
+  hql_query_sio = io.StringIO(hql_query)
 
   statements = []
   for (start_row, start_col), (end_row, end_col), statement in split_statements(hql_query_sio.read()):

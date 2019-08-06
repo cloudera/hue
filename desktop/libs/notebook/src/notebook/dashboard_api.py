@@ -15,6 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import division
+from __future__ import print_function
+from builtins import next
+from builtins import str
+from builtins import zip
+from past.utils import old_div
+from builtins import object
 import logging
 import json
 import numbers
@@ -39,7 +46,7 @@ LOG = logging.getLogger(__name__)
 LIMIT = 100
 
 
-class MockRequest():
+class MockRequest(object):
   def __init__(self, user, cluster):
     self.user = user
     self.POST = {'cluster': cluster}
@@ -254,7 +261,7 @@ class SQLDashboardApi(DashboardApi):
 
   def schema_fields(self, collection):
     return {
-      'fields': [f for f in self.fields(collection)['schema']['fields'].itervalues()]
+      'fields': [f for f in self.fields(collection)['schema']['fields'].values()]
     }
 
 
@@ -364,7 +371,7 @@ class SQLDashboardApi(DashboardApi):
         if curr > end:
           try:
             api.cancel_operation(snippet)
-          except Exception, e:
+          except Exception as e:
             LOG.warning("Failed to cancel query: %s" % e)
             api.close_statement(mock_notebook, snippet)
           raise OperationTimeout(e)
@@ -502,7 +509,7 @@ class SQLDashboardApi(DashboardApi):
     elif value <= 1:
       return value
     else:
-      return value / 100
+      return old_div(value, 100)
 
   @classmethod
   def _supports_cume_dist(self):
@@ -716,7 +723,7 @@ class SQLDashboardApi(DashboardApi):
     if nested_facet['canRange']:
       if nested_facet['isDate']:
         slot = self._gap_to_units(nested_facet['gap'])
-        print augment_date_range_list(rows, nested_facet['start'], nested_facet['end'], slot['timedelta'], len(cols))
+        print(augment_date_range_list(rows, nested_facet['start'], nested_facet['end'], slot['timedelta'], len(cols)))
       else:
         rows = augment_number_range_list(rows, nested_facet['start'], nested_facet['end'], nested_facet['gap'], len(cols))
 

@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 
 from mock import patch, Mock, MagicMock
@@ -33,7 +34,7 @@ from notebook.connectors.sql_alchemy import SqlAlchemyApi
 LOG = logging.getLogger(__name__)
 
 
-class TestApi():
+class TestApi(object):
 
   def setUp(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
@@ -108,7 +109,7 @@ class TestApi():
       assert_equal(data['meta'](), [{'type': 'BIGINT_TYPE'}])
 
 
-class TestAutocomplete():
+class TestAutocomplete(object):
 
   def setUp(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)

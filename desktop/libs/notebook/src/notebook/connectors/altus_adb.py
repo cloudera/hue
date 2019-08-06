@@ -15,9 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import logging
 import json
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -88,7 +91,7 @@ class AltusAdbApi(Api):
     return HueQuery(self.user, cluster_crn=self.cluster_name).do_post(url_path=url_path)
 
 
-class HueQuery():
+class HueQuery(object):
   def __init__(self, user, cluster_crn):
     self.user = user
     self.cluster_crn = cluster_crn
@@ -156,7 +159,7 @@ class HueQuery():
               }
             }'''
 
-    payload = payload.replace('SELECT+*+FROM+web_logs+LIMIT+100', urllib.quote_plus(query.replace('\n', ' ')))
+    payload = payload.replace('SELECT+*+FROM+web_logs+LIMIT+100', urllib.parse.quote_plus(query.replace('\n', ' ')))
 
     resp = self.api.submit_hue_query(self.cluster_crn, payload)
 
@@ -176,8 +179,8 @@ class HueQuery():
 
     snippet['result']['handle'] = handle
 
-    notebook_payload = urllib.quote(json.dumps(notebook))
-    snippet_payload = urllib.quote(json.dumps(snippet))
+    notebook_payload = urllib.parse.quote(json.dumps(notebook))
+    snippet_payload = urllib.parse.quote(json.dumps(snippet))
 
     payload = '''
             {
@@ -243,10 +246,10 @@ class HueQuery():
 
     snippet['result']['handle'] = handle
 
-    notebook_payload = urllib.quote(json.dumps(notebook))
-    snippet_payload = urllib.quote(json.dumps(snippet))
-    rows_payload = urllib.quote(json.dumps(rows))
-    start_over_payload = urllib.quote(json.dumps(start_over))
+    notebook_payload = urllib.parse.quote(json.dumps(notebook))
+    snippet_payload = urllib.parse.quote(json.dumps(snippet))
+    rows_payload = urllib.parse.quote(json.dumps(rows))
+    start_over_payload = urllib.parse.quote(json.dumps(start_over))
 
     payload = '''
             {

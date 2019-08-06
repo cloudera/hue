@@ -16,6 +16,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import next
+from builtins import object
 import json
 import logging
 import re
@@ -47,7 +49,7 @@ from beeswax.test_base import BeeswaxSampleProvider, get_query_server_config, is
 LOG = logging.getLogger(__name__)
 
 
-class TestApi():
+class TestApi(object):
 
   NOTEBOOK_JSON = """
     {

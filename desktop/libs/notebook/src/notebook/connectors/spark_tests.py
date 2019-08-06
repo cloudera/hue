@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 from nose.tools import assert_equal, assert_true, assert_false
 
 from notebook.connectors.spark_shell import SparkApi

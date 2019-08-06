@@ -15,6 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import next
+from builtins import str
+from builtins import object
 import logging
 import sys
 
@@ -33,7 +36,7 @@ def query_error_handler(func):
   def decorator(*args, **kwargs):
     try:
       return func(*args, **kwargs)
-    except Exception, e:
+    except Exception as e:
       message = force_unicode(e)
       if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
         raise QueryExpired(e)
@@ -199,7 +202,7 @@ class RdbmsApi(Api):
       return dbms.get_query_server_config(server=self.interpreter)
 
 
-class Assist():
+class Assist(object):
 
   def __init__(self, db):
     self.db = db
@@ -218,7 +221,7 @@ class Assist():
     return self.db.get_sample_data(database, table, column)
 
 
-class FixedResult():
+class FixedResult(object):
 
   def __init__(self, result):
     self.result = result

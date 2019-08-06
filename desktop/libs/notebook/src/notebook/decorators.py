@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
+from past.builtins import basestring
 import json
 import logging
 import math
@@ -96,26 +98,26 @@ def api_error_handler(func):
 
     try:
       return func(*args, **kwargs)
-    except SessionExpired, e:
+    except SessionExpired as e:
       response['status'] = -2
-    except QueryExpired, e:
+    except QueryExpired as e:
       response['status'] = -3
       if e.message and isinstance(e.message, basestring):
         response['message'] = e.message
-    except AuthenticationRequired, e:
+    except AuthenticationRequired as e:
       response['status'] = 401
       if e.message and isinstance(e.message, basestring):
         response['message'] = e.message
-    except ValidationError, e:
+    except ValidationError as e:
       LOG.exception('Error validation %s' % func)
       response['status'] = -1
       response['message'] = e.message
-    except OperationTimeout, e:
+    except OperationTimeout as e:
       response['status'] = -4
-    except FilesystemException, e:
+    except FilesystemException as e:
       response['status'] = 2
       response['message'] = e.message
-    except QueryError, e:
+    except QueryError as e:
       LOG.exception('Error running %s' % func.__name__)
       response['status'] = 1
       response['message'] = smart_unicode(e)
@@ -132,14 +134,14 @@ def api_error_handler(func):
         response['handle'] = e.handle
       if e.extra:
         response.update(e.extra)
-    except OperationNotSupported, e:
+    except OperationNotSupported as e:
       response['status'] = 5
       response['message'] = e.message
-    except RestException, e:
+    except RestException as e:
       message = extract_solr_exception_message(e)
       response['status'] = 1
       response['message'] = message.get('error')
-    except Exception, e:
+    except Exception as e:
       LOG.exception('Error running %s' % func.__name__)
       response['status'] = -1
       response['message'] = smart_unicode(e)
@@ -170,9 +172,9 @@ def json_error_handler(view_fn):
   def decorator(*args, **kwargs):
     try:
       return view_fn(*args, **kwargs)
-    except Http404, e:
+    except Http404 as e:
       raise e
-    except Exception, e:
+    except Exception as e:
       response = {
         'error': str(e)
       }

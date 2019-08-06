@@ -16,11 +16,15 @@
 # limitations under the License.
 from __future__ import absolute_import, unicode_literals
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import next
+from builtins import object
 import csv
 import datetime
 import json
 import logging
-import StringIO
+import io
 import sys
 import time
 
@@ -75,7 +79,7 @@ class ExecutionWrapperCallback(object):
     if handle.get('sync', False) and handle['result'].get('data'):
       handle_without_data = handle.copy()
       handle_without_data['result'] = {}
-      for key in filter(lambda x: x != 'data', list(handle['result'].keys())):
+      for key in [x for x in list(handle['result'].keys()) if x != 'data']:
         handle_without_data['result'][key] = handle['result'][key]
     else:
       handle_without_data = handle
@@ -255,7 +259,7 @@ def get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id
         return f.read()
     else:
       count = 0
-      output = StringIO.StringIO()
+      output = io.StringIO()
       with storage.open(_log_key(notebook), 'r') as f:
         for line in f:
           count += 1

@@ -15,12 +15,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import division
+from future import standard_library
+standard_library.install_aliases()
+from builtins import next
+from builtins import str
+from past.utils import old_div
+from builtins import object
 import binascii
 import copy
 import json
 import logging
 import re
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -53,7 +60,7 @@ try:
   from beeswax.server import dbms
   from beeswax.server.dbms import get_query_server_config, QueryServerException
   from beeswax.views import parse_out_jobs
-except ImportError, e:
+except ImportError as e:
   LOG.warn('Hive and HiveServer2 interfaces are not enabled: %s' % e)
   hive_settings = None
 
@@ -61,7 +68,7 @@ try:
   from impala import api   # Force checking if Impala is enabled
   from impala.conf import CONFIG_WHITELIST as impala_settings
   from impala.server import get_api as get_impalad_api, ImpalaDaemonApiException, _get_impala_server_url
-except ImportError, e:
+except ImportError as e:
   LOG.warn("Impala app is not enabled")
   impala_settings = None
 
@@ -70,7 +77,7 @@ try:
   from jobbrowser.conf import ENABLE_QUERY_BROWSER
   from jobbrowser.apis.query_api import _get_api
   has_query_browser = ENABLE_QUERY_BROWSER.get()
-except (AttributeError, ImportError), e:
+except (AttributeError, ImportError) as e:
   LOG.warn("Job Browser app is not enabled")
   has_query_browser = False
 
@@ -82,13 +89,13 @@ def query_error_handler(func):
   def decorator(*args, **kwargs):
     try:
       return func(*args, **kwargs)
-    except StructuredException, e:
+    except StructuredException as e:
       message = force_unicode(str(e))
       if 'timed out' in message:
         raise OperationTimeout(e)
       else:
         raise QueryError(message)
-    except QueryServerException, e:
+    except QueryServerException as e:
       message = force_unicode(str(e))
       if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
         raise QueryExpired(e)
@@ -196,7 +203,7 @@ class HS2Api(Api):
     try:
       decoded_guid = session.get_handle().sessionId.guid
       response['session_id'] = unpack_guid(decoded_guid)
-    except Exception, e:
+    except Exception as e:
       LOG.warn('Failed to decode session handle: %s' % e)
 
     if lang == 'impala' and session:
@@ -254,7 +261,7 @@ class HS2Api(Api):
         if query.database and not statement['statement'].lower().startswith('set'):
           db.use(query.database)
       handle = db.client.query(query, with_multiple_session=True) # Note: with_multiple_session currently ignored
-    except QueryServerException, ex:
+    except QueryServerException as ex:
       raise QueryError(ex.message, handle=statement)
 
     # All good
@@ -302,7 +309,7 @@ class HS2Api(Api):
     handle = self._get_handle(snippet)
     try:
       results = db.fetch(handle, start_over=start_over, rows=rows)
-    except QueryServerException, ex:
+    except QueryServerException as ex:
       if re.search('(client inactivity)|(Invalid query handle)', str(ex)) and ex.message:
         raise QueryExpired(message=ex.message)
       else:
@@ -378,7 +385,7 @@ class HS2Api(Api):
       try:
         handle = self._get_handle(snippet)
         db.close_operation(handle)
-      except Exception, e:
+      except Exception as e:
         if 'no valid handle' in str(e):
           return {'status': -1}  # skipped
         else:
@@ -409,7 +416,7 @@ class HS2Api(Api):
       started = logs.count('Starting Job')
       ended = logs.count('Ended Job')
 
-      progress = int((started + ended) * 100 / (total * 2))
+      progress = int(old_div((started + ended) * 100, (total * 2)))
       return max(progress, 5)  # Return 5% progress as a minimum
     elif snippet['type'] == 'impala':
       match = re.findall('(\d+)% Complete', logs, re.MULTILINE)
@@ -470,7 +477,7 @@ class HS2Api(Api):
     try:
       db = self._get_db(snippet, async, interpreter=self.interpreter)
       return _get_sample_data(db, database, table, column, async, operation=operation, cluster=self.interpreter)
-    except QueryServerException, ex:
+    except QueryServerException as ex:
       raise QueryError(ex.message)
 
 
@@ -486,7 +493,7 @@ class HS2Api(Api):
       db.use(query.database)
 
       explanation = db.explain(query)
-    except QueryServerException, ex:
+    except QueryServerException as ex:
       raise QueryError(ex.message)
 
     return {
@@ -506,7 +513,7 @@ class HS2Api(Api):
 
     upload(target_file, handle, self.request.user, db, self.request.fs, max_rows=max_rows, max_bytes=max_bytes)
 
-    return '/filebrowser/view=%s' % urllib.quote(urllib.quote(target_file.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)) # Quote twice, because of issue in the routing on client
+    return '/filebrowser/view=%s' % urllib.parse.quote(urllib.parse.quote(target_file.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)) # Quote twice, because of issue in the routing on client
 
 
   def export_data_as_table(self, notebook, snippet, destination, is_temporary=False, location=None):
@@ -560,7 +567,7 @@ DROP TABLE IF EXISTS `%(table)s`;
       'location': self.request.fs.netnormpath(destination),
       'hql': query.hql_query
     }
-    success_url = '/filebrowser/view=%s' % urllib.quote(destination.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
+    success_url = '/filebrowser/view=%s' % urllib.parse.quote(destination.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
 
     return hql, success_url
 
@@ -680,7 +687,7 @@ DROP TABLE IF EXISTS `%(table)s`;
       db = self._get_db(snippet, interpreter=self.interpreter)
 
     if partition_spec is not None:
-      decoded_spec = urllib.unquote(partition_spec)
+      decoded_spec = urllib.parse.unquote(partition_spec)
       return db.get_partition(database, table.name, decoded_spec, generate_ddl_only=True)
     else:
       return db.get_select_star_query(database, table, limit=100)
@@ -695,7 +702,7 @@ DROP TABLE IF EXISTS `%(table)s`;
     except binascii.Error:
       LOG.warn('Handle already base 64 decoded')
 
-    for key in handle.keys():
+    for key in list(handle.keys()):
       if key not in ('log_context', 'secret', 'has_result_set', 'operation_type', 'modified_row_count', 'guid'):
         handle.pop(key)
 
@@ -801,7 +808,7 @@ DROP TABLE IF EXISTS `%(table)s`;
     if 'result' in snippet and 'handle' in snippet['result'] and 'guid' in snippet['result']['handle']:
       try:
         guid = unpack_guid_base64(snippet['result']['handle']['guid'])
-      except Exception, e:
+      except Exception as e:
         LOG.warn('Failed to decode operation handle guid: %s' % e)
     else:
       LOG.warn('Snippet does not contain a valid result handle, cannot extract Impala query ID.')
@@ -814,7 +821,7 @@ DROP TABLE IF EXISTS `%(table)s`;
     try:
       query_profile = api.get_query_profile(query_id)
       profile = query_profile.get('profile')
-    except (RestException, ImpalaDaemonApiException), e:
+    except (RestException, ImpalaDaemonApiException) as e:
       raise PopupException(_("Failed to get query profile from Impala Daemon server: %s") % e)
 
     if not profile:
