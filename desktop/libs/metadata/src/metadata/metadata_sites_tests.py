@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from builtins import object
 import logging
 import os
 import shutil
@@ -22,14 +24,14 @@ import tempfile
 
 from nose.tools import assert_equal
 
-import metadata_sites
+from . import metadata_sites
 from metadata.conf import NAVIGATOR
 from metadata.metadata_sites import get_navigator_server_url
 
 LOG = logging.getLogger(__name__)
 
 
-class TestReadConfiguration:
+class TestReadConfiguration(object):
 
   def test_navigator_site(self):
     tmpdir = tempfile.mkdtemp()

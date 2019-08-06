@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException

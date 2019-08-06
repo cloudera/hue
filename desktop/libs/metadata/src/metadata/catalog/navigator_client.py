@@ -197,7 +197,7 @@ class NavigatorApi(Api):
           }
         }
 
-      auto_field_facets = ["tags", "type"] + f.keys()
+      auto_field_facets = ["tags", "type"] + list(f.keys())
       query_s = (query_s.strip() if query_s else '') + '*'
 
       query_s = query_s.replace('tag:', 'tags:').replace('classification:', 'tags:')
@@ -275,7 +275,7 @@ class NavigatorApi(Api):
       response['results'] = list(islice(self._secure_results(response['results']), limit)) # Apply Sentry perms
 
       return response
-    except RestException, e:
+    except RestException as e:
       LOG.error('Failed to search for entities with search query: %s' % json.dumps(body))
       if e.code == 401:
         raise CatalogAuthException(_('Failed to authenticate.'))
@@ -355,7 +355,7 @@ class NavigatorApi(Api):
       response = list(islice(self._secure_results(response), limit)) # Apply Sentry perms
 
       return response
-    except RestException, e:
+    except RestException as e:
       LOG.error('Failed to search for entities with search query: %s' % query_s)
       if e.code == 401:
         raise CatalogAuthException(_('Failed to authenticate.'))
@@ -393,7 +393,7 @@ class NavigatorApi(Api):
   def suggest(self, prefix=None):
     try:
       return self._root.get('interactive/suggestions?query=%s' % (prefix or '*'))
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to search for entities with search query: %s' % prefix
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -413,10 +413,10 @@ class NavigatorApi(Api):
         'deleted': 'false'
       }
 
-      for key, value in filters.items():
+      for key, value in list(filters.items()):
         query_filters[key] = value
 
-      filter_query = 'AND'.join('(%s:%s)' % (key, value) for key, value in query_filters.items())
+      filter_query = 'AND'.join('(%s:%s)' % (key, value) for key, value in list(query_filters.items()))
       filter_query = '%(type)s AND %(filter_query)s' % {
         'type': '(type:%s)' % 'TABLE OR type:VIEW' if type == 'TABLE' else type, # Impala does not always say that a table is actually a view
         'filter_query': filter_query
@@ -440,7 +440,7 @@ class NavigatorApi(Api):
         raise CatalogApiException('Found more than 1 entity with query filters: %s' % str(query_filters))
 
       return response[0]
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to find entity: %s' % str(e)
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -453,7 +453,7 @@ class NavigatorApi(Api):
     """
     try:
       return self._root.get('entities/%s' % entity_id, headers=self.__headers, params=self.__params)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to get entity %s: %s' % (entity_id, str(e))
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -476,7 +476,7 @@ class NavigatorApi(Api):
       data = json.dumps(properties)
 
       return self._root.put('entities/%(identity)s' % entity, params=self.__params, data=data, contenttype=_JSON_CONTENT_TYPE, allow_redirects=True, clear_cookies=True)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to update entity %s: %s' % (entity['identity'], e)
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -544,7 +544,7 @@ class NavigatorApi(Api):
       )
 
       return self._root.get('lineage', headers=self.__headers, params=params)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to get lineage for entity ID %s: %s' % (entity_id, str(e))
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -554,7 +554,7 @@ class NavigatorApi(Api):
     try:
       data = json.dumps({'name': namespace, 'description': description})
       return self._root.post('models/namespaces/', data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to create namespace: %s' % namespace
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -563,7 +563,7 @@ class NavigatorApi(Api):
   def get_namespace(self, namespace):
     try:
       return self._root.get('models/namespaces/%(namespace)s' % {'namespace': namespace})
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to get namespace: %s' % namespace
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -573,7 +573,7 @@ class NavigatorApi(Api):
     try:
       data = json.dumps(properties)
       return self._root.post('models/namespaces/%(namespace)s/properties' % {'namespace': namespace}, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to create namespace %s property' % namespace
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -582,7 +582,7 @@ class NavigatorApi(Api):
   def get_namespace_properties(self, namespace):
     try:
       return self._root.get('models/namespaces/%(namespace)s/properties' % {'namespace': namespace})
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to create namespace %s property' % namespace
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -592,7 +592,7 @@ class NavigatorApi(Api):
     try:
       data = json.dumps(properties)
       return self._root.post('models/packages/nav/classes/%(class)s/properties' % {'class': clazz}, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to map class %s property' % clazz
       LOG.error(msg)
       raise CatalogApiException(e.message)
@@ -601,7 +601,7 @@ class NavigatorApi(Api):
   def get_model_properties_mapping(self):
     try:
       return self._root.get('models/properties/mappings')
-    except RestException, e:
+    except RestException as e:
       msg = 'Failed to get models properties mappings'
       LOG.error(msg)
       raise CatalogApiException(e.message)

@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 
 from nose.plugins.skip import SkipTest
@@ -37,7 +38,7 @@ from metadata.catalog.navigator_client import NavigatorApi
 LOG = logging.getLogger(__name__)
 
 
-class MockedRoot():
+class MockedRoot(object):
   def get(self, relpath=None, params=None, headers=None, clear_cookies=False):
     if relpath == 'entities' and params and params[0] and params[0][0] == 'query' and params[0][1] and params[0][1].startswith('clusterName:'):
       return [{'sourceId': 1}, {'identity': 2}]
@@ -45,7 +46,7 @@ class MockedRoot():
       return params
 
 
-class NavigatorClientTest:
+class NavigatorClientTest(object):
   integration = True
 
   @classmethod
