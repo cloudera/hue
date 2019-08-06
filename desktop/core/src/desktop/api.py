@@ -91,7 +91,7 @@ def massaged_tags_for_json(docs, user):
 
   ts['trash'] = massaged_tags(trash_tag, tag_doc_mapping)
   ts['history'] = massaged_tags(history_tag, tag_doc_mapping)
-  tags = list(set(tag_doc_mapping.keys() + [tag for tag in DocumentTag.objects.get_tags(user=user)])) # List of all personal and shared tags
+  tags = list(set(list(tag_doc_mapping.keys()) + [tag for tag in DocumentTag.objects.get_tags(user=user)])) # List of all personal and shared tags
 
   for tag in tags:
     massaged_tag = massaged_tags(tag, tag_doc_mapping)
@@ -104,7 +104,7 @@ def massaged_tags_for_json(docs, user):
     else:
       sharers[tag.owner].append(massaged_tag)
 
-  ts['notmine'] = [{'name': sharer.username, 'projects': projects} for sharer, projects in sharers.iteritems()]
+  ts['notmine'] = [{'name': sharer.username, 'projects': projects} for sharer, projects in sharers.items()]
   # Remove from my tags the trashed and history ones
   mine_filter = set(ts['trash']['docs'] + ts['history']['docs'])
   for tag in ts['mine']:
@@ -253,9 +253,9 @@ def add_tag(request):
       response['status'] = 0
     else:
       response['status'] = -1
-  except KeyError, e:
+  except KeyError as e:
     response['message'] = _('Form is missing %s field') % e.message
-  except Exception, e:
+  except Exception as e:
     response['message'] = force_unicode(e)
 
   return JsonResponse(response)
@@ -270,9 +270,9 @@ def tag(request):
     tag = DocumentTag.objects.tag(request.user, request_json['doc_id'], request_json.get('tag'), request_json.get('tag_id'))
     response['tag_id'] = tag.id
     response['status'] = 0
-  except KeyError, e:
+  except KeyError as e:
     response['message'] = _('Form is missing %s field') % e.message
-  except Exception, e:
+  except Exception as e:
     response['message'] = force_unicode(e)
 
   return JsonResponse(response)
@@ -287,9 +287,9 @@ def update_tags(request):
     doc = DocumentTag.objects.update_tags(request.user, request_json['doc_id'], request_json['tag_ids'])
     response['doc'] = massage_doc_for_json(doc, request.user)
     response['status'] = 0
-  except KeyError, e:
+  except KeyError as e:
     response['message'] = _('Form is missing %s field') % e.message
-  except Exception, e:
+  except Exception as e:
     response['message'] = force_unicode(e)
 
   return JsonResponse(response)
@@ -303,9 +303,9 @@ def remove_tag(request):
     DocumentTag.objects.delete_tag(request.POST.get('tag_id'), request.user)
     response['message'] = _('Project removed!')
     response['status'] = 0
-  except KeyError, e:
+  except KeyError as e:
     response['message'] = _('Form is missing %s field') % e.message
-  except Exception, e:
+  except Exception as e:
     response['message'] = force_unicode(e)
 
   return JsonResponse(response)
@@ -325,9 +325,9 @@ def update_permissions(request):
     response['message'] = _('Permissions updated!')
     response['status'] = 0
     response['doc'] = massage_doc_for_json(doc, request.user)
-  except KeyError, e:
+  except KeyError as e:
     response['message'] = _('Form is missing %s field') % e.message
-  except Exception, e:
+  except Exception as e:
     LOG.exception(e.message)
     response['message'] = force_unicode(e)
 

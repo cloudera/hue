@@ -1,7 +1,8 @@
+from __future__ import absolute_import
 
 from desktop.lib.scheduler.lib.api import Api
 
-from oozie.views.editor2 import _submit_coordinator
+from .oozie.views.editor2 import _submit_coordinator
 
 
 class OozieApi(Api):

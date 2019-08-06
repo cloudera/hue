@@ -1,5 +1,6 @@
 
-class Hive():
+from builtins import object
+class Hive(object):
   NAME = 'Hive'
   TYPE = 'hive'
 

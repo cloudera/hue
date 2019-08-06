@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
 import logging
 import sys
 
@@ -71,10 +72,10 @@ class Command(BaseCommand):
     try:
       db_conn = connections['default']
       db_conn.cursor()
-    except ImproperlyConfigured, e:
+    except ImproperlyConfigured as e:
       self.stderr.write('DB improperly configured: %s' % e)
       sys.exit(10)
-    except OperationalError, e:
+    except OperationalError as e:
       self.stderr.write('Error accessing DB: %s' % e)
       error = str(e)
 
@@ -89,7 +90,7 @@ class Command(BaseCommand):
         sys.exit(8)
       else: # Any connection error that we can't make sense of
         sys.exit(4)
-    except Exception, e:
+    except Exception as e:
       self.stderr.write('Error accessing DB: %s' % e)
       error = str(e)
 

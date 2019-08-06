@@ -15,6 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 try:
   import oauth2 as oauth
 except:
@@ -22,7 +25,7 @@ except:
 
 import cgi
 import logging
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from datetime import datetime
 
 from axes.decorators import watch_login
@@ -134,7 +137,7 @@ def dt_login(request, from_modal=False):
 
         try:
           ensure_home_directory(request.fs, user)
-        except (IOError, WebHdfsException), e:
+        except (IOError, WebHdfsException) as e:
           LOG.error('Could not create home directory at login for %s.' % user, exc_info=e)
 
         if require_change_password(userprofile):
@@ -169,7 +172,7 @@ def dt_login(request, from_modal=False):
     if hasattr(request,'fs') and ('KnoxSpnegoDjangoBackend' in backend_names or 'SpnegoDjangoBackend' in backend_names or 'OIDCBackend' in backend_names or 'SAML2Backend' in backend_names) and request.user.is_authenticated():
       try:
         ensure_home_directory(request.fs, request.user)
-      except (IOError, WebHdfsException), e:
+      except (IOError, WebHdfsException) as e:
         LOG.error('Could not create home directory for %s user %s.' % ('OIDC' if 'OIDCBackend' in backend_names else 'SAML', request.user))
     if request.user.is_authenticated():
       return HttpResponseRedirect(redirect_to)
@@ -218,7 +221,7 @@ def dt_logout(request, next_page=None):
     session = {"type":session_app,"sourceMethod":"dt_logout"}
     try:
       get_api(request, session).close_session(session)
-    except Exception, e:
+    except Exception as e:
       LOG.warn("Error closing Impala session: %s" % e)
 
   backends = get_backends()
@@ -229,10 +232,10 @@ def dt_logout(request, next_page=None):
           response = backend.logout(request, next_page)
           if response:
             return response
-        except Exception, e:
+        except Exception as e:
           LOG.warn('Potential error on logout for user: %s with exception: %s' % (username, e))
 
-  if len(filter(lambda backend: hasattr(backend, 'logout'), backends)) == len(backends):
+  if len([backend for backend in backends if hasattr(backend, 'logout')]) == len(backends):
     LOG.warn("Failed to log out from all backends for user: %s" % (username))
 
   response = django.contrib.auth.views.logout(request, next_page)
@@ -263,7 +266,7 @@ def oauth_login(request):
 
   consumer = oauth.Consumer(OAUTH.CONSUMER_KEY.get(), OAUTH.CONSUMER_SECRET.get())
   client = oauth.Client(consumer)
-  resp, content = client.request(OAUTH.REQUEST_TOKEN_URL.get(), "POST", body=urllib.urlencode({
+  resp, content = client.request(OAUTH.REQUEST_TOKEN_URL.get(), "POST", body=urllib.parse.urlencode({
                       'oauth_callback': 'http://' + request.get_host() + '/login/oauth_authenticated/'
                   }))
 

@@ -16,6 +16,7 @@
 # limitations under the License.
 
 
+from builtins import object
 def get_api(request, interface):
   if interface == 'beat':
     from desktop.lib.scheduler.lib.beat import CeleryBeatApi
@@ -27,7 +28,7 @@ def get_api(request, interface):
     raise PopupException(_('Scheduler connector interface not recognized: %s') % interface)
 
 
-class Api():
+class Api(object):
 
   def __init__(self, interface, user):
     self.interface = interface

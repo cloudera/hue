@@ -14,13 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 import logging
 import posixpath
 import requests
 import threading
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from django.utils.encoding import iri_to_uri, smart_str
 from django.utils.http import urlencode
@@ -184,7 +188,7 @@ class HttpClient(object):
     """
     # Prepare URL and params
     if urlencode:
-      path = urllib.quote(smart_str(path))
+      path = urllib.parse.quote(smart_str(path))
     url = self._make_url(path, params)
     if http_method in ("GET", "DELETE"):
       if data is not None:
@@ -217,7 +221,7 @@ class HttpClient(object):
             exceptions.HTTPError,
             exceptions.RequestException,
             exceptions.URLRequired,
-            exceptions.TooManyRedirects), ex:
+            exceptions.TooManyRedirects) as ex:
       raise self._exc_class(ex)
 
   def _make_url(self, path, params):

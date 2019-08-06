@@ -17,9 +17,15 @@
 #
 # Extra form fields and widgets.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import filter
+from builtins import str
+from builtins import range
+from builtins import object
 import logging
 import json
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django.forms import Widget, Field
 from django import forms
@@ -113,7 +119,7 @@ class MultipleInputWidget(Widget):
     # Sometimes this is a QueryDict, and sometimes ar regular dict,
     # so we adapt:
     non_empty = lambda x: len(x) != 0
-    return filter(non_empty, data.getlist(name))
+    return list(filter(non_empty, data.getlist(name)))
 
 class MultipleInputField(Field):
   widget = MultipleInputWidget
@@ -188,7 +194,7 @@ class KeyValueWidget(Textarea):
   def render(self, name, value, attrs=None):
     # If we have a dictionary, render back into a string.
     if isinstance(value, dict):
-      value = " ".join("=".join([k, v]) for k, v in value.iteritems())
+      value = " ".join("=".join([k, v]) for k, v in value.items())
     return super(KeyValueWidget, self).render(name, value, attrs)
 
 class KeyValueField(CharField):
@@ -273,12 +279,12 @@ class MultiForm(object):
   def get_subforms(self):
     """get_subforms() -> An iterator over (name, subform)"""
     assert self._is_bound
-    return self._forms.iteritems()
+    return iter(self._forms.items())
 
   def has_subform_data(self, subform_name, data):
     """Test if data contains any information bound for the subform"""
     prefix = self.add_prefix(subform_name)
-    return len([ k.startswith(prefix) for k in data.keys() ]) != 0
+    return len([ k.startswith(prefix) for k in list(data.keys()) ]) != 0
 
   def add_subform(self, name, form_cls, data=None):
     """Dynamically extend this MultiForm to include a new subform"""
@@ -288,13 +294,13 @@ class MultiForm(object):
   def remove_subform(self, name):
     """Dynamically remove a subform. Raises KeyError."""
     del self._form_types[name]
-    if self._forms.has_key(name):
+    if name in self._forms:
       del self._forms[name]
 
   def bind(self, data=None, instances=None):
     self._is_bound = True
     self._forms = {}
-    for key, form_cls in self._form_types.iteritems():
+    for key, form_cls in self._form_types.items():
       instance = instances is not None and instances.get(key) or None
       self._bind_one(key, form_cls, data, instance=instance)
 
@@ -318,7 +324,7 @@ class MultiForm(object):
     r = True
     # Explicitly iterate through all of them; we don't want
     # to abort early, since we want each form's is_valid to be run.
-    for f in self._forms.values():
+    for f in list(self._forms.values()):
       if not f.is_valid():
         LOG.error(smart_str(f.errors))
         r = False
@@ -472,7 +478,7 @@ class BaseSimpleFormSet(StrAndUnicode):
       self._errors.append(f.errors)
     try:
       self.clean()
-    except ValidationError, e:
+    except ValidationError as e:
       self._non_form_errors = e.messages
 
   @property
@@ -541,4 +547,4 @@ class DependencyAwareForm(forms.Form):
     return [ data(*x) for x in self.dependencies ]
 
   def render_dep_metadata(self):
-    return urllib.quote_plus(json.dumps(self._calculate_data(), separators=(',', ':')))
+    return urllib.parse.quote_plus(json.dumps(self._calculate_data(), separators=(',', ':')))

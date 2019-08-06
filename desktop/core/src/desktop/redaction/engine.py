@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
+from builtins import object
 import json
 import re
 
@@ -163,7 +165,7 @@ def parse_redaction_policy_from_file(filename):
     rules = [parse_one_rule_from_dict(rule) for rule in rules]
 
     if scheme:
-      raise ValueError('Redaction policy contains unknown field(s): %s' % scheme.keys())
+      raise ValueError('Redaction policy contains unknown field(s): %s' % list(scheme.keys()))
 
     return RedactionPolicy(rules)
 
@@ -204,7 +206,7 @@ def parse_one_rule_from_dict(rule):
     raise ValueError('Redaction rule is missing `replace` field')
 
   if rule:
-    raise ValueError('Redaction rule contains unknown field(s): %s' % rule.keys())
+    raise ValueError('Redaction rule contains unknown field(s): %s' % list(rule.keys()))
 
   return RedactionRule(trigger, search, replace, case_sensitive)
 

@@ -200,7 +200,7 @@ def update_connector(request):
 def _get_connector_by_type(dialect):
   global CONNECTOR_TYPES
 
-  instance = filter(lambda connector: connector['dialect'] == dialect, CONNECTOR_TYPES)
+  instance = [connector for connector in CONNECTOR_TYPES if connector['dialect'] == dialect]
 
   if instance:
     return instance[0]
@@ -214,7 +214,7 @@ def delete_connector(request):
   connector = json.loads(request.POST.get('connector'), '{}')
 
   size_before = len(CONNECTOR_INSTANCES)
-  CONNECTOR_INSTANCES = filter(lambda _connector: _connector['name'] != connector['name'], CONNECTOR_INSTANCES)
+  CONNECTOR_INSTANCES = [_connector for _connector in CONNECTOR_INSTANCES if _connector['name'] != connector['name']]
   size_after = len(CONNECTOR_INSTANCES)
 
   if size_before == size_after + 1:
@@ -226,7 +226,7 @@ def delete_connector(request):
 def _get_connector_by_id(id):
   global CONNECTOR_INSTANCES
 
-  instance = filter(lambda connector: connector['id'] == id, CONNECTOR_INSTANCES)
+  instance = [connector for connector in CONNECTOR_INSTANCES if connector['id'] == id]
 
   if instance:
     return instance[0]

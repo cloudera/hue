@@ -18,13 +18,17 @@
 """
 Common library to export either CSV or XLS.
 """
+from future import standard_library
+standard_library.install_aliases()
+from builtins import next
+from builtins import object
 import gc
 import logging
 import numbers
 import openpyxl
 import re
 import six
-import StringIO
+import io
 import tablib
 
 from django.http import StreamingHttpResponse, HttpResponse
@@ -82,13 +86,13 @@ def dataset(headers, data, encoding=None):
   return dataset
 
 
-class XlsWrapper():
+class XlsWrapper(object):
   def __init__(self, xls):
     self.xls = xls
 
 
 def xls_dataset(workbook):
-  output = StringIO.StringIO()
+  output = io.StringIO()
   workbook.save(output)
   output.seek(0)
   return XlsWrapper(output.read())

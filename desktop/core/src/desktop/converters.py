@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import json
 import logging
 import time
@@ -74,7 +75,7 @@ class DocumentConverter(object):
 
           # save() updates the last_modified to current time. Resetting it using update()
           Document2.objects.filter(id=doc.id).update(last_modified=doc_last_modified)
-      except Exception, e:
+      except Exception as e:
         LOG.exception("Failed to set is_trashed field with exception: %s" % e)
 
 
@@ -99,7 +100,7 @@ class DocumentConverter(object):
             )
 
             self.imported_doc_count += 1
-        except Exception, e:
+        except Exception as e:
           self.failed_doc_ids.append(doc.id)
           LOG.exception('Failed to import SavedQuery document id: %d' % doc.id)
     except ImportError:
@@ -135,10 +136,10 @@ class DocumentConverter(object):
 
               doc.add_tag(self.imported_tag)
               doc.save()
-        except Exception, e:
+        except Exception as e:
           self.failed_doc_ids.append(doc.id)
           LOG.exception('Failed to import history document id: %d' % doc.id)
-    except ImportError, e:
+    except ImportError as e:
       LOG.warn('Cannot convert history documents: beeswax app is not installed')
 
 
@@ -181,10 +182,10 @@ class DocumentConverter(object):
                 data=json.dumps(data)
               )
             self.imported_doc_count += 1
-        except Exception, e:
+        except Exception as e:
           self.failed_doc_ids.append(doc.id)
           LOG.exception('Failed to import Job Designer document id: %d' % doc.id)
-    except ImportError, e:
+    except ImportError as e:
       LOG.warn('Cannot convert Job Designer documents: oozie app is not installed')
 
 
@@ -210,10 +211,10 @@ class DocumentConverter(object):
             )
 
             self.imported_doc_count += 1
-        except Exception, e:
+        except Exception as e:
           self.failed_doc_ids.append(doc.id)
           LOG.exception('Failed to import Pig document id: %d' % doc.id)
-    except ImportError, e:
+    except ImportError as e:
       LOG.warn('Cannot convert Pig documents: pig app is not installed')
 
 
@@ -296,7 +297,7 @@ class DocumentConverter(object):
         document.add_tag(self.imported_tag)
         document.save()
         return document2
-    except Exception, e:
+    except Exception as e:
       # Just to be sure we delete Doc2 object incase of exception.
       # Possible when there are mixed InnoDB and MyISAM tables
       if document2 and Document2.objects.filter(id=document2.id).exists():

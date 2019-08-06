@@ -1,5 +1,6 @@
 
-class Impala():
+from builtins import object
+class Impala(object):
   NAME = 'Impala'
   TYPE = 'impala'
 

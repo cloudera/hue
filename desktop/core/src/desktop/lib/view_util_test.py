@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import division
+from past.utils import old_div
 from nose.tools import *
 
 from desktop.lib.view_util import big_filesizeformat, format_time_diff, format_duration_in_millis
@@ -30,7 +32,7 @@ def test_big_filesizeformat():
   assert_equal("1.0 MB", big_filesizeformat(1024*1024))
   assert_equal("1.1 GB", big_filesizeformat(int(1.1*1024*1024*1024)))
   assert_equal("2.0 TB", big_filesizeformat(2*1024*1024*1024*1024))
-  assert_equal("1.5 PB", big_filesizeformat(3*1024*1024*1024*1024*1024/2))
+  assert_equal("1.5 PB", big_filesizeformat(old_div(3*1024*1024*1024*1024*1024,2)))
 
 def test_format_time_diff():
   assert_equal("1h:0m:0s", format_time_diff(datetime.datetime.fromtimestamp(0), datetime.datetime.fromtimestamp(60*60*1)))
