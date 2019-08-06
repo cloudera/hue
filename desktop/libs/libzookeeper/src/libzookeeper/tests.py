@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import os
 import shutil
 import tempfile
@@ -32,7 +33,7 @@ from libzookeeper.models import ZookeeperClient
 from libzookeeper.conf import zkensemble, ENSEMBLE
 
 
-class UnitTests():
+class UnitTests(object):
 
   def test_get_ensemble(self):
     clear = ENSEMBLE.set_for_testing('zoo:2181')
@@ -54,7 +55,7 @@ class UnitTests():
       clear()
 
 
-class TestWithZooKeeper:
+class TestWithZooKeeper(object):
   requires_hadoop = True
   integration = True
 
@@ -77,7 +78,7 @@ class TestWithZooKeeper:
     # Create subdirectory
     cls.subdir_name = 'subdir'
     subdir_path = '%s/%s' % (cls.local_directory, cls.subdir_name)
-    os.mkdir(subdir_path, 0755)
+    os.mkdir(subdir_path, 0o755)
     # Create file
     cls.filename = 'test.txt'
     file_path = '%s/%s' % (subdir_path, cls.filename)
