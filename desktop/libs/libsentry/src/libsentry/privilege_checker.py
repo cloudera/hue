@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
+from builtins import object
 import logging
 
 from collections import defaultdict
@@ -114,7 +116,7 @@ class PrivilegeChecker(object):
         try:
           if self._is_object_action_authorized_v1(hierarchy=self.privilege_hierarchy_v1, object=authorizable, action=action):
             yield object
-        except KeyError, e:
+        except KeyError as e:
           LOG.warn('Skipping %s: %s' % (authorizable, e))
 
     if v2_authorizables:
@@ -122,7 +124,7 @@ class PrivilegeChecker(object):
         try:
           if self._is_object_action_authorized_v2(hierarchy=self.privilege_hierarchy_v2, object=authorizable, action=action):
             yield object
-        except KeyError, e:
+        except KeyError as e:
           LOG.warn('Skipping %s: %s' % (authorizable, e))
 
 
