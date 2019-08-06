@@ -33,7 +33,7 @@ LOG = logging.getLogger(__name__)
 
 try:
   from hbase.api import HbaseApi
-except ImportError, e:
+except ImportError as e:
   LOG.warn("HBase app is not enabled: %s" % e)
 
 
@@ -41,7 +41,7 @@ def query_error_handler(func):
   def decorator(*args, **kwargs):
     try:
       return func(*args, **kwargs)
-    except Exception, e:
+    except Exception as e:
       message = force_unicode(str(e))
       raise QueryError(message)
   return decorator
@@ -67,7 +67,7 @@ class HBaseApi(Api):
         response['columns'] = []
       else:
         raise PopupException('Could not find column `%s`.`%s`.`%s`' % (database, table, column))
-    except Exception, e:
+    except Exception as e:
       LOG.warn('Autocomplete data fetching error: %s' % e)
       response['code'] = 500
       response['error'] = e.message

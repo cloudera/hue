@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import json
 import logging
 
@@ -284,7 +285,7 @@ def delete(request):
         doc.can_write_or_exception(request.user)
         doc2.trash()
         ctr += 1
-      except FilesystemException, e:
+      except FilesystemException as e:
         failures.append(notebook['uuid'])
         LOG.exception("Failed to delete document with UUID %s that is writable by user %s, skipping." % (notebook['uuid'], request.user.username))
 
@@ -317,7 +318,7 @@ def copy(request):
         doc2 = doc2.copy(name=name, owner=request.user)
 
         doc.copy(content_object=doc2, name=name, owner=request.user)
-      except FilesystemException, e:
+      except FilesystemException as e:
         failures.append(notebook['uuid'])
         LOG.exception("Failed to copy document with UUID %s accessible by user %s, skipping." % (notebook['uuid'], request.user.username))
 
@@ -371,7 +372,7 @@ def install_examples(request):
     try:
       Command().handle(user=request.user)
       response['status'] = 0
-    except Exception, err:
+    except Exception as err:
       LOG.exception(err)
       response['message'] = str(err)
   else:

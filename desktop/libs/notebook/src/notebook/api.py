@@ -15,11 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
 import json
 import logging
 
 import sqlparse
-import urllib
+import sys
+
 
 from django.urls import reverse
 from django.db.models import Q
@@ -42,6 +45,11 @@ from notebook.decorators import api_error_handler, check_document_access_permiss
 from notebook.models import escape_rows, make_notebook
 from notebook.views import upgrade_session_properties, get_api
 
+if sys.version_info[0] > 2:
+  import urllib.request, urllib.error
+  from urllib.parse import unquote as urllib_unquote
+else:
+  from urllib import unquote as urllib_unquote
 
 LOG = logging.getLogger(__name__)
 
@@ -145,7 +153,7 @@ def _execute_notebook(request, notebook, snippet):
           response['history_uuid'] = history.uuid
           if notebook['isSaved']: # Keep track of history of saved queries
             response['history_parent_uuid'] = history.dependencies.filter(type__startswith='query-').latest('last_modified').uuid
-  except QueryError, ex: # We inject the history information from _historify() to the failed queries
+  except QueryError as ex: # We inject the history information from _historify() to the failed queries
     if response.get('history_id'):
       ex.extra['history_id'] = response['history_id']
     if response.get('history_uuid'):
@@ -520,7 +528,7 @@ def close_notebook(request):
       response['result'].append(get_api(request, session).close_session(session))
     except QueryExpired:
       pass
-    except Exception, e:
+    except Exception as e:
       LOG.exception('Error closing session %s' % str(e))
 
   for snippet in [_s for _s in notebook['snippets'] if _s['type'] in ('hive', 'impala')]:
@@ -531,7 +539,7 @@ def close_notebook(request):
         LOG.info('Not closing SQL snippet as still running.')
     except QueryExpired:
       pass
-    except Exception, e:
+    except Exception as e:
       LOG.exception('Error closing statement %s' % str(e))
 
   response['status'] = 0
@@ -638,7 +646,7 @@ def export_result(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
   data_format = json.loads(request.POST.get('format', '"hdfs-file"'))
-  destination = urllib.unquote(json.loads(request.POST.get('destination', '""')))
+  destination = urllib_unquote(json.loads(request.POST.get('destination', '""')))
   overwrite = json.loads(request.POST.get('overwrite', 'false'))
   is_embedded = json.loads(request.POST.get('is_embedded', 'false'))
   start_time = json.loads(request.POST.get('start_time', '-1'))

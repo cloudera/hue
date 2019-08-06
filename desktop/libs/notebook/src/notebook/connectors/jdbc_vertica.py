@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import division
+from past.utils import old_div
 from librdbms.jdbc import query_and_fetch
 
 from notebook.connectors.jdbc import JdbcApi
@@ -63,9 +65,8 @@ class VerticaAssist(Assist):
                     + ", cache is used in "
                     + "%.2f"
                     % (
-                        100
-                        * float(self.cache_use_stat["cache"])
-                        / (self.cache_use_stat["query"] + self.cache_use_stat["cache"])
+                        old_div(100
+                        * float(self.cache_use_stat["cache"]), (self.cache_use_stat["query"] + self.cache_use_stat["cache"]))
                     )
                     + "% cases"
                 )
