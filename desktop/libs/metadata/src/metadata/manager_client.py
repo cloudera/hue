@@ -16,11 +16,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 import base64
 import json
 import logging
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 
 from django.core.cache import cache
 from django.utils.translation import ugettext as _
@@ -78,7 +82,7 @@ class ManagerApi(object):
       })['items']
 
       return service_name in services
-    except RestException, e:
+    except RestException as e:
       raise ManagerApiException(e)
 
 
@@ -116,7 +120,7 @@ class ManagerApi(object):
             'shs_server_name': shs_server_name
           }, params={'view': 'full'})['items']
           return shs_server_hostId, shs_server_configs
-    except Exception, e:
+    except Exception as e:
       LOG.warn("Check Spark History Server via ManagerApi: %s" % e)
 
     return None, None
@@ -176,7 +180,7 @@ class ManagerApi(object):
 
       LOG.info(params)
       return self._root.get('tools/echo', params=params)
-    except RestException, e:
+    except RestException as e:
       raise ManagerApiException(e)
 
 
@@ -188,7 +192,7 @@ class ManagerApi(object):
       brokers_hosts = [host['hostname'] + ':9092' for host in hosts]
 
       return ','.join(brokers_hosts)
-    except RestException, e:
+    except RestException as e:
       raise ManagerApiException(e)
 
 
@@ -203,7 +207,7 @@ class ManagerApi(object):
       master_host = self._root.get('hosts/%(hostId)s' % master['hostRef'])
 
       return master_host['hostname']
-    except RestException, e:
+    except RestException as e:
       raise ManagerApiException(e)
 
 
@@ -213,7 +217,7 @@ class ManagerApi(object):
       root = Resource(client)
 
       return root.get('/api/topics')
-    except RestException, e:
+    except RestException as e:
       raise ManagerApiException(e)
 
 
@@ -223,7 +227,7 @@ class ManagerApi(object):
     roleConfigGroup = [role['roleConfigGroupRef']['roleConfigGroupName'] for role in self._get_roles(cluster['name'], service, 'AGENT')]
     data = {
       u'items': [{
-        u'url': u'/api/v8/clusters/%(cluster_name)s/services/%(service)s/roleConfigGroups/%(roleConfigGroups)s/config?message=Updated%20service%20and%20role%20type%20configurations.'.replace('%(cluster_name)s', urllib.quote(cluster['name'])).replace('%(service)s', service).replace('%(roleConfigGroups)s', roleConfigGroup[0]),
+        u'url': u'/api/v8/clusters/%(cluster_name)s/services/%(service)s/roleConfigGroups/%(roleConfigGroups)s/config?message=Updated%20service%20and%20role%20type%20configurations.'.replace('%(cluster_name)s', urllib.parse.quote(cluster['name'])).replace('%(service)s', service).replace('%(roleConfigGroups)s', roleConfigGroup[0]),
         u'body': {
           u'items': [
             {u'name': config_name, u'value': config_value}
@@ -254,7 +258,7 @@ class ManagerApi(object):
 
       hosts = self._root.get('hosts')['items']
       return [host for host in hosts if host['hostId'] in hosts_ids]
-    except RestException, e:
+    except RestException as e:
       raise ManagerApiException(e)
 
 
@@ -281,7 +285,7 @@ class ManagerApi(object):
             data=json.dumps({"items": roles}),
             contenttype="application/json"
         )
-    except RestException, e:
+    except RestException as e:
       raise ManagerApiException(e)
 
 
@@ -297,14 +301,14 @@ class ManagerApi(object):
             data=json.dumps({"items": roles}),
             contenttype="application/json"
         )
-    except RestException, e:
+    except RestException as e:
       raise ManagerApiException(e)
 
 
   def batch(self, items):
     try:
       return self._root.post('batch', data=json.dumps(items), contenttype='application/json')
-    except RestException, e:
+    except RestException as e:
       raise ManagerApiException(e)
 
 
@@ -367,7 +371,7 @@ class ManagerApi(object):
               if config['relatedName'] == key:
                 return config['value']
 
-    except Exception, e:
+    except Exception as e:
       LOG.warn("Get Impala Daemon API configurations via ManangerAPI: %s" % e)
 
     return None

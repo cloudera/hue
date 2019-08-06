@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 import json
 
@@ -277,7 +278,7 @@ class TestNavigator(object):
 
   def _format_json_body(self, post_dict):
     json_dict = {}
-    for key, value in post_dict.items():
+    for key, value in list(post_dict.items()):
       json_dict[key] = json.dumps(value)
     return json_dict
 

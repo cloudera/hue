@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
 import json
 import logging
 import re
@@ -124,7 +125,7 @@ class AtlasApi(Api):
       nav_entity['classifications'] = atlas_entity['classifications']
       for atlas_classification in atlas_entity['classifications']:
         if 'attributes' in atlas_classification:
-          for key, value in atlas_classification['attributes'].iteritems():
+          for key, value in atlas_classification['attributes'].items():
             nav_entity['properties'][key] = value
 
     return nav_entity
