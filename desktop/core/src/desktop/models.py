@@ -1845,6 +1845,15 @@ class ClusterConfig():
         'page': '/security/hive'
       })
 
+    if 'indexer' in self.apps and self.user.has_hue_permission(action="access:importer", app="indexer") and not IS_EMBEDDED.get():
+      interpreters.append({
+        'type': 'importer',
+        'displayName': _('Importer'),
+        'buttonName': _('Import'),
+        'tooltip': _('Importer'),
+        'page': '/indexer/importer'
+      })
+
     if 'sqoop' in self.apps and ANALYTIC_DB not in self.cluster_type:
       from sqoop.conf import IS_ENABLED
       if IS_ENABLED.get():

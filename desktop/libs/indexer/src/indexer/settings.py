@@ -22,3 +22,7 @@ MENU_INDEX = 43
 ICON = "search/art/icon_search_48.png"
 
 IS_URL_NAMESPACED = True
+
+PERMISSION_ACTIONS = (
+  ("access:importer", "Access to the data importer"),
+)
