@@ -40,6 +40,5 @@ Done
 Links
 
 * [Open Tasks](https://issues.cloudera.org/projects/HUE/issues)
-* [Easy Tasks](https://issues.cloudera.org/browse/HUE-8745?filter=10431)
 * [Designs](/docs/designs)
-* How to [contribute](CONTRIBUTING.md)
+* How to [contribute](/CONTRIBUTING.md)

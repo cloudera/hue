@@ -10,7 +10,7 @@ In any case, feel free to ask here, on [hue-user](http://groups.google.com/a/clo
 # Getting Started
 
 1. Have a look at [how to build Hue](https://github.com/cloudera/hue#getting-started).
-2. High level [Roadmap](/docs/ROADMAP.md) and list of [Easy bugs](https://issues.cloudera.org/secure/IssueNavigator.jspa?mode=hide&requestId=10431). Updating a small piece if [documentation](https://docs.gethue.com) is also a quick way to get familiar.
+2. High level [Roadmap](/docs/ROADMAP.md). Updating a small piece if [documentation](https://docs.gethue.com) is also a quick way to get familiar.
 3. [JIRA](https://issues.cloudera.org/browse/HUE) is the bug tracking system as well as [Github issues](https://github.com/cloudera/hue/issues).
 
 Here are some example of changes:
