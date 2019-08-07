@@ -476,6 +476,11 @@ def _update_property_value(properties, key, value):
       prop.update({'value': value})
 
 
+def _get_editor_type(editor_id):
+  document = Document2.objects.get(id=editor_id)
+  return document.type.rsplit('-', 1)[-1]
+
+
 class Analytics():
 
   @classmethod

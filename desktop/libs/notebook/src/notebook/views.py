@@ -40,7 +40,7 @@ from notebook.connectors.base import Notebook, get_api as _get_api, _get_snippet
 from notebook.connectors.spark_shell import SparkApi
 from notebook.decorators import check_editor_access_permission, check_document_access_permission, check_document_modify_permission
 from notebook.management.commands.notebook_setup import Command
-from notebook.models import make_notebook
+from notebook.models import make_notebook, _get_editor_type
 
 
 LOG = logging.getLogger(__name__)
@@ -129,8 +129,7 @@ def editor(request, is_mobile=False, is_embeddable=False):
     return notebook(request)
 
   if editor_id:  # Open existing saved editor document
-    document = Document2.objects.get(id=editor_id)
-    editor_type = document.type.rsplit('-', 1)[-1]
+    editor_type = _get_editor_type(editor_id)
 
   template = 'editor.mako'
   if is_mobile:
