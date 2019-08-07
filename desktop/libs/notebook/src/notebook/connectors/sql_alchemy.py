@@ -244,6 +244,7 @@ class SqlAlchemyApi(Api):
       tables_meta = []
       database = self._fix_phoenix_empty_database(database)
       for t in assist.get_tables(database):
+        t = self._fix_bigquery_db_prefixes(t)
         tables_meta.append({'name': t, 'type': 'Table', 'comment': ''})
       response['tables_meta'] = tables_meta
     elif column is None:
@@ -306,6 +307,12 @@ class SqlAlchemyApi(Api):
 
   def _fix_phoenix_empty_database(self, database):
     return None if self.options['url'].startswith('phoenix://') and database == 'NULL' else database
+
+  def _fix_bigquery_db_prefixes(self, table_or_column):
+    if self.options['url'].startswith('bigquery://'):
+      table_or_column = table_or_column.rsplit('.', 1)[1]
+    return table_or_column
+
 
 
 class Assist():
