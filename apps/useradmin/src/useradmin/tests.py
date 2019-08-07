@@ -38,6 +38,10 @@ from django.urls import reverse
 from django.test.client import Client
 
 import desktop.conf
+
+from desktop import appmanager
+from desktop.auth.backend import is_admin
+from desktop.conf import APP_BLACKLIST
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from desktop.views import home
@@ -45,14 +49,12 @@ from hadoop import pseudo_hdfs4
 from hadoop.pseudo_hdfs4 import is_live_cluster
 
 import useradmin.conf
-from useradmin.forms import UserChangeForm
 import useradmin.ldap_access
+from useradmin.forms import UserChangeForm
 from useradmin.middleware import ConcurrentUserSessionMiddleware
 from useradmin.models import HuePermission, GroupPermission, UserProfile
 from useradmin.models import get_profile, get_default_user_group
 from useradmin.hue_password_policy import reset_password_policy
-
-from desktop.auth.backend import is_admin
 
 
 def reset_all_users():
@@ -295,8 +297,7 @@ class TestUserAdmin(BaseUserAdminTests):
     # Validate user is not a checked superuser
     assert_false(supertest.is_superuser)
     # Validate user is superuser by group
-    assert_equal(UserProfile.objects.get(user__username='supertest').has_hue_permission(action="superuser",
-                                                                                       app="useradmin"), 1)
+    assert_equal(UserProfile.objects.get(user__username='supertest').has_hue_permission(action="superuser", app="useradmin"), 1)
 
     # Make sure that a user of supergroup can access /useradmin/users
     # Create user to try to edit
@@ -309,11 +310,14 @@ class TestUserAdmin(BaseUserAdminTests):
     assert_true('Hue Permissions - Edit app: useradmin' in response.content)
 
     # Revoke superuser privilege from groups
-    c.post('/useradmin/permissions/edit/useradmin/superuser',
-           dict(app='useradmin',
-           priv='superuser',
-           groups=[],
-           save="Save"), follow=True)
+    c.post('/useradmin/permissions/edit/useradmin/superuser', dict(
+        app='useradmin',
+        priv='superuser',
+        groups=[],
+        save="Save"
+      ),
+      follow=True
+    )
     assert_equal(len(GroupPermission.objects.all()), 1)
 
     # Now test that we have limited access
@@ -343,17 +347,46 @@ class TestUserAdmin(BaseUserAdminTests):
     assert_true('must be a superuser to change permissions' in response.content)
 
     # And revoke access from the group
-    c.post('/useradmin/permissions/edit/useradmin/access',
-           dict(app='useradmin',
-           priv='access',
-           groups=[],
-           save="Save"), follow=True)
+    c.post('/useradmin/permissions/edit/useradmin/access', dict(
+        app='useradmin',
+        priv='access',
+        groups=[],
+        save="Save"
+      ),
+      follow=True
+    )
     assert_true(len(GroupPermission.objects.all()) == 0)
     assert_false(get_profile(test_user).has_hue_permission('access','useradmin'))
 
     # We should no longer have access to the app
     response = c1.get('/useradmin/users')
     assert_true('You do not have permission to access the Useradmin application.' in response.content)
+
+
+  def test_list_permissions(self):
+    c1 = make_logged_in_client(username="nonadmin", is_superuser=False)
+    grant_access('nonadmin', 'nonadmin', 'useradmin')
+    grant_access('nonadmin', 'nonadmin', 'beeswax')
+
+    response = c1.get('/useradmin/permissions/')
+    assert_equal(200, response.status_code)
+
+    perms = response.context[0]['permissions']
+    assert_true(perms.filter(app='beeswax').exists(), perms) # Assumes beeswax is there
+
+    reset = APP_BLACKLIST.set_for_testing('beeswax')
+    appmanager.DESKTOP_MODULES = []
+    appmanager.DESKTOP_APPS = None
+    appmanager.load_apps(APP_BLACKLIST.get())
+    try:
+      response = c1.get('/useradmin/permissions/')
+      perms = response.context[0]['permissions']
+      assert_false(perms.filter(app='beeswax').exists(), perms) # beeswax is not there now
+    finally:
+      reset()
+      appmanager.DESKTOP_MODULES = []
+      appmanager.DESKTOP_APPS = None
+      appmanager.load_apps(APP_BLACKLIST.get())
 
 
   def test_default_group(self):
