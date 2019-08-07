@@ -45,6 +45,7 @@ import desktop.conf
 from desktop.conf import LDAP
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.models import _get_apps
 from desktop.views import antixss
 
 from hadoop.fs.exceptions import WebHdfsException
@@ -87,8 +88,10 @@ def list_groups(request):
 
 
 def list_permissions(request):
+  current_app, other_apps, apps_list = _get_apps(request.user)
+
   return render("list_permissions.mako", request, {
-    'permissions': HuePermission.objects.all(),
+    'permissions': HuePermission.objects.filter(app__in=apps_list),
     'is_embeddable': request.GET.get('is_embeddable', False)
   })
 
