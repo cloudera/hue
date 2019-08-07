@@ -462,7 +462,6 @@
     'view': '${ _('view') }',
     'Views': '${ _('Views') }',
     'virtual': '${ _('virtual') }',
-    'WARNING: This can be both resource and time-intensive.': '${ _('WARNING: This can be both resource and time-intensive.') }',
     'Welcome Tour': '${ _('Welcome Tour') }',
     'With grant option': '${ _('With grant option') }',
     'With grant': '${ _('With grant') }',
