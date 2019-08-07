@@ -1528,7 +1528,7 @@ class ApiHelper {
           data.new_table_name = options.properties.name;
         }
       }
-    } else if (options.path > 2) {
+    } else if (options.path.length > 2) {
       url = '/metastore/table/' + options.path[0] + '/' + options.path[1] + '/alter_column';
       data.column = options.path.slice(2).join('.');
       if (options.properties) {
