@@ -333,13 +333,6 @@ const TEMPLATE =
       ${I18n('Perform incremental metadata update.')}
     </label>
     <div class="assist-invalidate-description">${I18n('This will sync missing tables.')}</div>
-    <label class="radio">
-      <input type="radio" name="refreshImpala" value="invalidateAndFlush" data-bind="checked: invalidateOnRefresh"  />
-      ${I18n('Invalidate all metadata and rebuild index.')}
-    </label>
-    <div class="assist-invalidate-description">${I18n(
-      'WARNING: This can be both resource and time-intensive.'
-    )}</div>
     <div style="width: 100%; display: inline-block; margin-top: 5px;"><button class="pull-right btn btn-primary" data-bind="css: { 'btn-primary': invalidateOnRefresh() !== 'invalidateAndFlush', 'btn-danger': invalidateOnRefresh() === 'invalidateAndFlush' }, click: function (data, event) { huePubSub.publish('close.popover'); triggerRefresh(data, event); }, clickBubble: false">${I18n(
       'Refresh'
     )}</button></div>
