@@ -28,6 +28,7 @@ const APP_ICON_INDEX = {
   hdfs: `<i class="fa fa-fw fa-folder-o"></i>`,
   hive: `<svg class="hi hi-fw"><use xlink:href="#hi-hive"></use></svg>`,
   impala: `<svg class="hi hi-fw"><use xlink:href="#hi-impala"></use></svg>`,
+  importer: `<svg class="hi hi-fw"><use xlink:href="#hi-exchange"></use></svg>`,
   indexes: `<i class="fa fa-fw fa-search-plus"></i>`,
   jar: `<svg class="hi hi-fw"><use xlink:href="#hi-spark"></use></svg>`,
   java: `<i class="fa fa-fw fa-file-code-o"></i>`,
