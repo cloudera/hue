@@ -319,7 +319,13 @@ Then give Hue the information about the database source:
     [[[athena]]]
        name = AWS Athena
        interface=sqlalchemy
-       options='{"url": "awsathena+rest://..."}'
+        options='{"url": "awsathena+rest://${AWS_ACCESS_KEY_ID}:${AWS_SECRET_ACCESS_KEY}@athena.${REGION}.amazonaws.com:443/${SCHEMA}?s3_staging_dir=${S3_BUCKET_DIRECTORY}"}'
+
+e.g.
+
+    options='{"url": "awsathena+rest://XXXXXXXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?s3_staging_dir=s3://gethue-athena/scratch"}'
+
+Note: Keys and S3 buckets need to be URL quoted but Hue does it automatically for you.
 
 ### Apache Druid
 

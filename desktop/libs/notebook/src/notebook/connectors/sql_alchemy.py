@@ -41,6 +41,8 @@ Note: this is currently supporting concurrent querying by one users as engine is
 session at some point.
 Note: using the task server would not leverage any caching.
 '''
+from future import standard_library
+standard_library.install_aliases()
 
 import datetime
 import json
@@ -49,6 +51,7 @@ import uuid
 import sys
 
 from string import Template
+from urllib.parse import quote_plus
 
 from django.utils.translation import ugettext as _
 from sqlalchemy import create_engine, inspect
@@ -105,6 +108,12 @@ class SqlAlchemyApi(Api):
       url = raw_url.safe_substitute(**vars)
     else:
       url = self.options['url']
+
+    if url.startswith('awsathena+rest://'):
+      url = url.replace(url[17:37], quote_plus(url[17:37]))
+      url = url.replace(url[38:50], quote_plus(url[38:50]))
+      s3_staging_dir = url.rsplit('s3_staging_dir=', 1)[1]
+      url = url.replace(s3_staging_dir, quote_plus(s3_staging_dir))
 
     options = self.options.copy()
     options.pop('session', None)
