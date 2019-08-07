@@ -97,8 +97,8 @@ def config_validator(user):
       res.append((status, _('The Oozie server is not available')))
     fs = get_filesystem()
     NICE_NAME = 'Oozie'
-    if fs.exists(REMOTE_SAMPLE_DIR.get()):
-      stats = fs.stats(REMOTE_SAMPLE_DIR.get())
+    if fs.do_as_superuser(fs.exists, REMOTE_SAMPLE_DIR.get()):
+      stats = fs.do_as_superuser(fs.stats, REMOTE_SAMPLE_DIR.get())
       mode = oct(stats.mode)
       # if neither group nor others have write permission
       group_has_write = int(mode[-2]) & 2
