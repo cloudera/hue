@@ -135,7 +135,7 @@ def abfsdatetime_to_timestamp(datetime):
   """
   # There is chance (depends on platform) to get
   # `'z' is a bad directive in format ...` error (see https://bugs.python.org/issue6641),
-  # but S3 always returns time in GMT, so `GMT` and `.000Z` can be pruned.
+  #LOG.debug("%s" %datetime)
   stripped = time.strptime(datetime[:-4], '%a, %d %b %Y %H:%M:%S')
   assert datetime[-4:] == ' GMT', 'Time [%s] is not in GMT.' % datetime
   return int(calendar.timegm(stripped))

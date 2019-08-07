@@ -30,8 +30,8 @@ class ABFSStat(object):
     self.isDir = isDir
     self.type = 'DIRECTORY' if isDir else 'FILE'
     try:
-      self.atime = abfsdatetime_to_timestamp(file_stats['Date']) if file_stats['Date'] else None
-      self.mtime = abfsdatetime_to_timestamp(file_stats['Last-Modified']) if file_stats['Last-Modified'] else None
+      self.atime = abfsdatetime_to_timestamp(atime) if atime else None
+      self.mtime = abfsdatetime_to_timestamp(mtime) if mtime else None
     except:
       self.atime = 0
       self.mtime = 0
