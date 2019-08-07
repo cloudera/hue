@@ -19,7 +19,7 @@
 import json
 
 from collections import OrderedDict
-
+from mock import patch, Mock, MagicMock
 from nose.plugins.attrib import attr
 from nose.tools import assert_equal, assert_true, assert_false
 
@@ -546,5 +546,25 @@ class TestAnalytics():
       Analytics.admin_stats()
       Analytics.user_stats(user=self.user)
       Analytics.query_stats(query=doc)
+    finally:
+      doc.delete()
+
+
+class TestEditor(object):
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="empty", recreate=True, is_superuser=False)
+
+    self.user = User.objects.get(username="test")
+
+    grant_access("test", "empty", "impala")
+
+  def test_open_saved_impala_query_when_no_hive_interepreter(self):
+    try:
+      doc, created = Document2.objects.get_or_create(name='open_saved_query_with_hive_not_present', type='query-impala', owner=self.user, data={})
+
+      with patch('desktop.middleware.fsmanager') as fsmanager:
+        response = self.client.get(reverse('notebook:editor'), {'editor': doc.id, 'is_embeddable': True})
+        assert_equal(200, response.status_code)
     finally:
       doc.delete()
