@@ -24,7 +24,7 @@ const APP_ICON_INDEX = {
   'dist-cp': `<i class="fa fa-fw fa-files-o"></i>`,
   documents: `<svg class="hi hi-fw"><use xlink:href="#hi-documents"></use></svg>`,
   editor: `<svg class="hi hi-fw"><use xlink:href="#hi-editor"></use></svg>`,
-  hbase: `<svg class="hi hi-fw"><use xlink:href="#hi-hbase"></use></svg>`,
+  hbase: `<i class="fa fa-fw fa-th-large"></i>`,
   hdfs: `<i class="fa fa-fw fa-folder-o"></i>`,
   hive: `<svg class="hi hi-fw"><use xlink:href="#hi-hive"></use></svg>`,
   impala: `<svg class="hi hi-fw"><use xlink:href="#hi-impala"></use></svg>`,
@@ -61,7 +61,7 @@ const APP_ICON_INDEX = {
   text: `<i class="fa fa-fw fa-i-cursor"></i>`,
   warehouses: `<i class="altus-icon altus-adb-cluster" style="margin: 0 1px 0 3px"></i>`,
   workflows: `<svg class="hi hi-fw"><use xlink:href="#hi-oozie"></use></svg>`,
-  yarn: `<svg class="hi hi-fw"><use xlink:href="#hi-job-designer"></use></svg>`
+  yarn: `<svg class="hi hi-fw"><use xlink:href="#hi-broadcast"></use></svg>`
 };
 
 ko.bindingHandlers.hueAppIcon = {
