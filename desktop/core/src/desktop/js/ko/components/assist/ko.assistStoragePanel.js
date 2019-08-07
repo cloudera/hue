@@ -194,7 +194,7 @@ class AssistStoragePanel {
 
     huePubSub.subscribe('assist.storage.refresh', () => {
       apiHelper.clearStorageCache(this.activeSource());
-      self.reload();
+      this.reload();
     });
 
     huePubSub.subscribe('assist.storage.go.home', () => {
