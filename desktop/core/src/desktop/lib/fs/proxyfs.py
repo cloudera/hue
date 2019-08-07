@@ -22,9 +22,11 @@ from urlparse import urlparse
 from django.contrib.auth.models import User
 
 from desktop.auth.backend import is_admin
+from desktop.conf import DEFAULT_USER
 
 LOG = logging.getLogger(__name__)
 
+DEFAULT_USER = DEFAULT_USER.get()
 
 class ProxyFS(object):
 
@@ -53,7 +55,10 @@ class ProxyFS(object):
     if path:
       split = urlparse(path)
       scheme = split.scheme if split.scheme else None
-    return scheme or self._default_scheme
+    ret_scheme = scheme or self._default_scheme
+    if not ret_scheme:
+      raise IOError('Can not figure out scheme for path "%s"' % path)
+    return ret_scheme
 
   def _has_access(self, fs):
     from desktop.auth.backend import rewrite_user  # Avoid cyclic loop
@@ -70,8 +75,8 @@ class ProxyFS(object):
 
   def _get_fs(self, path):
     scheme = self._get_scheme(path)
-    if not scheme:
-      raise IOError('Can not figure out scheme for path "%s"' % path)
+    if self.getuser() is None:
+      raise IOError('User not set')
     try:
       fs = self._fs_dict[scheme](self._name, self.getuser())
       if self._has_access(fs):
@@ -115,7 +120,10 @@ class ProxyFS(object):
       self.setuser(prev)
 
   def do_as_superuser(self, fn, *args, **kwargs):
-    return self.do_as_user(self._default_fs.superuser, fn, *args, **kwargs)
+    scheme = self._get_scheme(args[0])
+    fs = self._fs_dict[scheme](self._name)
+    user = fs.superuser if fs.superuser else DEFAULT_USER
+    return self.do_as_user(user, fn, *args, **kwargs)
 
   # Proxy methods to suitable filesystem
   # ------------------------------------
