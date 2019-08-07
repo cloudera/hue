@@ -283,7 +283,7 @@ Then give Hue the information about the database source:
     [[[postgresql]]]
        name = PostgreSql
        interface=sqlalchemy
-       options='{"url": "postgresql+psycopg2://..."}'
+       options='{"url": "postgresql+psycopg2://user:password@host:31335/database"}'
 
 Alternative:
 
@@ -425,7 +425,26 @@ Via native HiveServer2 API:
       name=Kafka SQL
       interface=kafka
 
-### MS SQLServer
+### Azure SQL Database
+
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install pyodbc
+
+Then configure ODBC according to the [documentation](https://github.com/mkleehammer/pyodbc).
+
+Then give Hue the information about the database source:
+
+    [[[azuresql]]]
+       name = Azure SQL Server
+       interface=sqlalchemy
+       options='{"url": "mssql+pyodbc://<user>@<server-host>:<password>@<server-host>.database.windows.net:1433/<database>?driver=ODBC+Driver+13+for+SQL+Server"}'
+
+Note: Properties need to be URL quoted (e.g. with `urllib.quote_plus(...)` in Python).
+
+Read more on the [Azure SQL Database](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-connect-query-python).
+
+### MS SQL Server
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
@@ -720,7 +739,19 @@ Then give Hue the information about the database source:
     [[[snowflake]]]
        name = Snowflake
        interface=sqlalchemy
-       options='{"url": "snowflake://..."}'
+       options='{"url": "snowflake://{user}:{password}@{account}/{database}"}'
+
+Note: account is the name in your URL domain. e.g.
+
+    https://smXXXXXX.snowflakecomputing.com/ --> smXXXXXX
+
+Tables currently need to be prefixed with a schema, e.g. `SELECT * FROM tpch_sf1.customer LIMIT 5`
+
+e.g.
+
+    options='{"url": "snowflake://hue:pwd@smXXXXX/SNOWFLAKE_SAMPLE_DATA"}'
+
+Read more about is on the [snowflake-sqlalchemy page](https://docs.snowflake.net/manuals/user-guide/sqlalchemy.html).
 
 ### Sqlite
 
@@ -729,7 +760,22 @@ Just give Hue the information about the database source:
     [[[sqlite]]]
        name = Sqlite
        interface=sqlalchemy
-       options='{"url": "sqlite://..."}'
+       options='{"url": "sqlite:///path/to/database.db"}'
+
+### Google Sheets
+
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install gsheetsdb
+
+Then give Hue the information about the database source:
+
+    [[[GSheets]]]
+       name = Google Sheets
+       interface=sqlalchemy
+       options='{"url": "gsheets://"}'
+
+Read more on the [gsheetsdb page](https://github.com/betodealmeida/gsheets-db-api#authentication).
 
 ### Greenplum
 
@@ -742,7 +788,7 @@ Then give Hue the information about the database source:
     [[[greenplum]]]
        name = Greenplum
        interface=sqlalchemy
-       options='{"url": "postgresql+psycopg2://..."}'
+       options='{"url": "postgresql+psycopg2://user:password@host:31335/database"}'
 
 
 ## Interfaces
