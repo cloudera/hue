@@ -105,7 +105,12 @@ class SqlAlchemyApi(Api):
       url = raw_url.safe_substitute(**vars)
     else:
       url = self.options['url']
-    return create_engine(url)
+
+    options = self.options.copy()
+    options.pop('session', None)
+    options.pop('url', None)
+
+    return create_engine(url, **options)
 
   @query_error_handler
   def execute(self, notebook, snippet):

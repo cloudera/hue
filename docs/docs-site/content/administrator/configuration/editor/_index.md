@@ -505,6 +505,7 @@ Then give Hue the information about the database source:
 The dialect should be added to the Python system or Hue Python virtual environment:
 
       ./build/env/bin/pip install pybigquery
+      ./build/env/bin/pip install pyasn1==0.4.1
 
 From https://github.com/mxmzdlv/pybigquery.
 
@@ -513,7 +514,16 @@ Then give Hue the information about the database source:
     [[[bigquery]]]
        name = BigQuery
        interface=sqlalchemy
-       options='{"url": "bigquery://project"}'
+       options='{"url": "bigquery://projectName"}'
+
+To restrict to only one dataset:
+
+       options='{"url": "bigquery://projectName/datasetName"}'
+
+Supporting additional [connection parameters](https://github.com/mxmzdlv/pybigquery#connection-string-parameters):
+
+      options='{"url": "bigquery://", "credentials_path": "/etc/conf/hue/demo-4a0e4e08d81a.json"}'
+
 
 ### Apache Drill
 
