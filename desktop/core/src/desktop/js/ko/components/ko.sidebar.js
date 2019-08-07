@@ -49,7 +49,7 @@ const TEMPLATE = `
       <!-- /ko -->
     </div>
   </script>
-  
+
   <script type="text/html" id="user-sub-menu-template">
     <div class="sidebar-menu user-menu" data-bind="css: { 'open' : $component.userMenuOpen }">
       <div class="menu">
@@ -82,7 +82,7 @@ const TEMPLATE = `
       </div>
     </div>
   </script>
-  
+
   <script type="text/html" id="support-sub-menu-template">
     <div class="sidebar-menu support-menu" data-bind="css: { 'open' : $component.supportMenuOpen }">
       <div class="menu">
@@ -225,7 +225,7 @@ class Sidebar {
               active = child.type === 'hdfs';
             }
           } else {
-            active = location.href.indexOf(child.url) !== -1;
+            active = location.pathname == '/hue' + child.url;
           }
           child.active(active);
         });
