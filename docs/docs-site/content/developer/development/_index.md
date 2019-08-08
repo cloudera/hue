@@ -738,13 +738,17 @@ Update the versions to the next release (current release +1):
     :100644 100644 9332f95... 45b28ad... M	desktop/libs/librdbms/java/pom.xml
     :100644 100644 551f62f... 694f021... M	maven/pom.xml
 
-How to count the number of commits since the last release and add them and the authors to the release notes:
+How to count the number of commits since the last release:
 
     git log --oneline --since=2018-01-01 | grep 'release'
     git log --oneline --since=2018-01-01 | grep -n '6df64e3'
-    git log --oneline -449 > scratch.txt
+    git log --oneline -449 > commits.txt
 
-    git log --pretty="%an" | sort | uniq > scratch.txt
+    cat commits.txt | sed 's/\(HUE\-[[:digit:]][[:digit:]][[:digit:]][[:digit:]]\)/\[\1\]\(https:\/\/issues.cloudera.org\/browse\/\1\)/' | sed 's/^\(.*\)/* \1/'
+
+And add them and the authors to the release notes:
+
+    git log --pretty="%an" -449 | sort | uniq > authors.txt
 
 Pushing the release branch:
 
@@ -761,12 +765,15 @@ Building the tarball release:
 
 Source of the release: https://github.com/cloudera/hue/archive/release-4.4.0.zip
 
+Push to the CDN:
+
+    scp hue-4.5.0.tar.gz root@docs.gethue.com:/var/www/cdn.gethue.com/downloads
+
 Other things to update:
 
 * In Jira, setting the [release as shipped](https://issues.cloudera.org/projects/HUE?selectedItem=com.atlassian.jira.jira-projects-plugin%3Arelease-page&status=all) and moving all non finished jiras to another target. Also archiving old releases.
 * Create the after next release tag in Jira and Blog
 * Update http://gethue.com 'Release' menu
-* Update http://demo.gethue.com/
 * Update Docker image https://hub.docker.com/u/gethue/
 * Update release date on https://en.wikipedia.org/wiki/Hue_(Software)
 
