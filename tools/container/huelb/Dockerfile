@@ -18,6 +18,12 @@ ENV NAME="hue" \
     HUE_BIN="/opt/hue/build/env/bin" \
     PATH=$PATH:$HUE_BIN
 
+RUN apt-get update; \
+    apt-get install -y --no-install-recommends \
+      netcat \
+      ; \
+    rm -r /var/lib/apt/lists/*;
+
 RUN echo "Include /usr/local/apache2/conf/hue_httpd.conf" >> /usr/local/apache2/conf/httpd.conf
 
 RUN groupadd -g 1123 hue && useradd -g 1123 -d ${HUE_HOME} -s /bin/bash -u 1123 hue
@@ -25,6 +31,7 @@ RUN groupadd -g 1123 hue && useradd -g 1123 -d ${HUE_HOME} -s /bin/bash -u 1123 
 COPY static ${HUE_HOME}/build/static
 
 COPY run_httpd.sh ${HUE_HOME}
+COPY healthz.sh /
 
 WORKDIR ${HUE_HOME}
 

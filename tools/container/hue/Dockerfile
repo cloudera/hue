@@ -50,6 +50,7 @@ RUN yum install -y \
       libtidy \
       libxml2-devel \
       libxslt-devel \
+      nmap-ncat \
       ncurses-devel \
       openldap-devel \
       openssl-devel \
@@ -72,6 +73,7 @@ RUN mkdir -p ${HUE_CONF}
 ENV HUE_CONF_DIR ${HUE_CONF}/conf
 COPY conf ${HUE_CONF}/conf
 COPY startup.sh ${HUE_HOME}/startup.sh
+COPY healthz.sh /
 EXPOSE 8888
 
 WORKDIR /opt/hue
