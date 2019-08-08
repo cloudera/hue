@@ -105,18 +105,9 @@ and possibly fix any issues it might report.
 
 Install [Hugo](https://gohugo.io/getting-started/quick-start/).
 
-Develop:
+Build it and see live changes:
 
     hugo serve
-
-Build the doc website:
-
-    hugo
-
-Release:
-
-    scp -r docs/docs-site/public/* root@docs.gethue.com:/var/www/docs.gethue.com
-
 
 ### CSS / LESS
 
@@ -740,34 +731,33 @@ Update the versions to the next release (current release +1):
 
 How to count the number of commits since the last release:
 
-    git log --oneline --since=2018-01-01 | grep 'release'
-    git log --oneline --since=2018-01-01 | grep -n '6df64e3'
+    git log --oneline --since=2018-01-01 | grep 'release' -r
     git log --oneline -449 > commits.txt
 
-    cat commits.txt | sed 's/\(HUE\-[[:digit:]][[:digit:]][[:digit:]][[:digit:]]\)/\[\1\]\(https:\/\/issues.cloudera.org\/browse\/\1\)/' | sed 's/^\(.*\)/* \1/'
+    cat commits.txt | sed 's/\(HUE\-[[:digit:]][[:digit:]][[:digit:]][[:digit:]]\)/\[\1\]\(https:\/\/issues.cloudera.org\/browse\/\1\)/' | sed 's/^\(.*\)/* \1/' > commits.md
 
 And add them and the authors to the release notes:
 
-    git log --pretty="%an" -449 | sort | uniq > authors.txt
+    git log --pretty="%an" | sort | uniq | sed 's/^\(.*\)/* \1/' > authors.txt
 
 Pushing the release branch:
 
-    git push origin HEAD:branch-4.4.0
+    git push origin HEAD:branch-4.5.0
 
 Tagging the release:
 
-    git tag -a release-4.4.0 -m "release-4.4.0"
-    git push origin release-4.4.0
+    git tag -a release-4.5.0 -m "release-4.5.0"
+    git push origin release-4.5.0
 
 Building the tarball release:
 
     make prod
 
-Source of the release: https://github.com/cloudera/hue/archive/release-4.4.0.zip
+Source of the release: https://github.com/cloudera/hue/archive/release-4.5.0.zip
 
 Push to the CDN:
 
-    scp hue-4.5.0.tar.gz root@docs.gethue.com:/var/www/cdn.gethue.com/downloads
+    scp hue-4.5.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads
 
 Other things to update:
 
@@ -779,19 +769,29 @@ Other things to update:
 
 Instructions:
 
-    docker build https://github.com/cloudera/hue.git#release-4.4.0 -t gethue/hue:4.4.0 -f tools/docker/hue/Dockerfile
-    docker tag gethue/hue:4.4.0 gethue/latest
+    docker build https://github.com/cloudera/hue.git#release-4.5.0 -t gethue/hue:4.5.0 -f tools/docker/hue/Dockerfile
+    docker tag gethue/hue:4.5.0 gethue/latest
     docker images
     docker login
     docker push gethue/hue
-    docker push gethue/hue:4.4.0
+    docker push gethue/hue:4.5.0
 
 Documentation
 
-Refresh the latest and then fork it:
+[Build it](#Documentation) and push it to the CDN.
 
-    cp -r latest docs-4.4.0
-    git add docs-4.4.0
+Build the doc website:
+
+    hugo
+
+Release:
+
+    ssh root@docs.gethue.com
+    cd /var/www/docs.gethue.com
+    mkdir 4.5.0
+    rm latest; ln -s 4.5.0 latest; cp latest/index.html .
+
+    scp -r docs/docs-site/public/* root@docs.gethue.com:/var/www/docs.gethue.com/4.5.0
 
 
-Then send release notes to hue-user, https://twitter.com/gethue!
+Then send release notes to the [Forum](https://discourse.gethue.com/), [hue-user](https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user), https://twitter.com/gethue!
