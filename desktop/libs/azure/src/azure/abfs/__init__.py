@@ -29,7 +29,6 @@ from hadoop.fs import normpath as fs_normpath
 LOG = logging.getLogger(__name__)
 
 ABFS_PATH_RE = re.compile('^/*[aA][bB][fF][sS]{1,2}://([$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9])(/(.*?)/?)?$') # bug here
-#also changed becuase some bug in
 ABFS_ROOT_S = 'abfss://'
 ABFS_ROOT = 'abfs://'
 

@@ -72,14 +72,10 @@ class ABFSStat(object):
   
   @classmethod
   def for_filesystems(cls,headers,resp):
-    atime = headers['date']
-    mtime = resp['lastModified']
-    return cls(True, atime, mtime, 0, 'abfs://' + resp['name'])
+    return cls(True, headers['date'], resp['lastModified'], 0, 'abfs://' + resp['name'])
 
   @classmethod
   def for_directory(cls,headers,resp, path):
-    atime = headers['date']
-    mtime = resp['lastModified']
     try:
       size = int(resp['contentLength'])
     except:
@@ -88,7 +84,7 @@ class ABFSStat(object):
       isDir = resp['isDirectory'] == 'true'
     except:
       isDir = False
-    return cls(isDir, atime, mtime, size, path)
+    return cls(isDir, headers['date'], resp['lastModified'], size, path)
   
   @classmethod
   def for_single(cls,resp, path):

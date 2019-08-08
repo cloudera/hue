@@ -65,11 +65,11 @@ class ABFSTestBase(unittest.TestCase):
     LOG.debug("%s" %filesystems)
     assert_true(filesystems is not None, filesystems)
     
-    pathing = self.client.listdir('abfs://' + filesystems[0])
+    pathing = self.client.listdir('abfs://' + filesystems[0],  {"recursive" : "true"} )
     LOG.debug("%s" %pathing)
     assert_true(pathing is not None, pathing)
     
-    directory = self.client.listdir('abfs://' + filesystems[0] + '/' + pathing[0] )
+    directory = self.client.listdir('abfs://' + filesystems[0] + '/' + pathing[0])
     LOG.debug("%s" %directory)
     assert_true(directory is not None, directory)
     
@@ -85,9 +85,6 @@ class ABFSTestBase(unittest.TestCase):
     LOG.debug("%s" %pathing)
     assert_true(pathing is not None, pathing)
     
-    pathing = self.client.listdir('abfs://' + filesystems[276], glob = True)
-    LOG.debug("%s" %pathing)
-    assert_true(pathing is not None, pathing)
     
   def test_existence(self):
     test_fs = self.test_fs

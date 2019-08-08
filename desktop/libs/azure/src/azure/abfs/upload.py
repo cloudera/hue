@@ -53,10 +53,10 @@ class ABFSFileUploadHandler(FileUploadHandler):
     self.target_path = None
     self.file = None
     self._request = request
-    self._fs = self._get_abfs(request)
     self._part_size = DEFAULT_WRITE_SIZE
     
     if self._is_abfs_upload():
+      self._fs = self._get_abfs(request)
       self.filesystem, self.directory = parse_uri(self.destination)[:2]
        # Verify that the path exists
       self._fs.stats(self.destination)

@@ -22,23 +22,21 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import object
 import logging
+import os
 import threading
-
 from math import ceil
 from posixpath import join
-
-import azure.abfs.__init__
-from azure.conf import PERMISSION_ACTION_ABFS
-from azure.abfs.abfsfile import ABFSFile
-from azure.abfs.abfsstats import ABFSStat
-
 from urllib.parse import urlparse
-from hadoop.hdfs_site import get_umask_mode
 
+from hadoop.hdfs_site import get_umask_mode
 from hadoop.fs.exceptions import WebHdfsException
 
 from desktop.lib.rest import http_client, resource
-from nose.tools import assert_true, assert_equal, assert_false
+
+import azure.abfs.__init__ as Init_ABFS
+from azure.abfs.abfsfile import ABFSFile
+from azure.abfs.abfsstats import ABFSStat
+from azure.conf import PERMISSION_ACTION_ABFS
 
 
 LOG = logging.getLogger(__name__)
@@ -143,15 +141,12 @@ class ABFS(object):
     List the stat of the actual file/directory
     Returns the ABFFStat object
     """
-    #LOG.debug("%s" %path)
     if ABFS.isroot(path):
       return ABFSStat.for_root()
-    file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
+    file_system, dir_name = Init_ABFS.parse_uri(path)[:2]
     if dir_name == '':
       LOG.debug("Path being called is a Filesystem")
       return ABFSStat.for_filesystem(self._statsf(file_system, params, **kwargs), path)
-    #LOG.debug("%s" %resp)
-    #LOG.debug("%s" %res.path)
     return ABFSStat.for_single(self._stats(file_system + '/' +dir_name, params, **kwargs), path)
   
   def listdir_stats(self,path, params = None, **kwargs):
@@ -163,10 +158,10 @@ class ABFS(object):
       LOG.warn("Path: %s is a Filesystem" %path)
       return self.listfilesystems_stats(params = None, **kwargs)
     dir_stats = []
-    file_system, directory_name = azure.abfs.__init__.parse_uri(path)[:2]
+    file_system, directory_name = Init_ABFS.parse_uri(path)[:2]
     if params is None:
       params = {}
-    if 'recursive' not in params.keys():
+    if 'recursive' not in params:
       params['recursive'] = 'false'
     params['resource'] = 'filesystem'
     if directory_name != "":
@@ -174,8 +169,7 @@ class ABFS(object):
     res = self._root._invoke("GET",file_system, params, headers= self._getheaders(), **kwargs)
     resp = self._root._format_response(res)
     for x in resp['paths']:
-      dir_stats.append(ABFSStat.for_directory(res.headers, x, azure.abfs.__init__.ABFS_ROOT +file_system + "/" + x['name']))
-    #LOG.debug("%s%s" %(dir_stats,[x.isDir for x in dir_stats ]))
+      dir_stats.append(ABFSStat.for_directory(res.headers, x, Init_ABFS.ABFS_ROOT +file_system + "/" + x['name']))
     return dir_stats
   
   def listfilesystems_stats(self, params = None, **kwargs):
@@ -183,7 +177,10 @@ class ABFS(object):
     Lists the stats inside the File Systems, No functionality for params
     """
     stats = []
-    res = self._root._invoke("GET", params = {"resource" : "account"}, headers = self._getheaders() )
+    if params is None:
+      params = {}
+    params["resource"] = "account"
+    res = self._root._invoke("GET", params = params, headers = self._getheaders() )
     resp = self._root._format_response(res)
     for x in resp['filesystems']:
       stats.append(ABFSStat.for_filesystems(res.headers, x))
@@ -237,15 +234,14 @@ class ABFS(object):
     """
     Checks if the path is the root path
     """
-    return azure.abfs.__init__.is_root(path)  
+    return Init_ABFS.is_root(path)  
   
   @staticmethod
   def normpath(path):
     """
     Normalizes a path
     """
-    resp = azure.abfs.__init__.normpath(path)
-    #LOG.debug("%s" %resp)
+    resp = Init_ABFS.normpath(path)
     return resp
 
   @staticmethod
@@ -253,8 +249,7 @@ class ABFS(object):
     """
     Normalizes a path
     """
-    #LOG.debug("ok")
-    return azure.abfs.__init__.normpath(path)
+    return Init_ABFS.normpath(path)
 
   def open(self, path, option = 'r', *args, **kwargs):
     return ABFSFile(self,path, option )
@@ -264,15 +259,14 @@ class ABFS(object):
     """
     Returns the Parent Path
     """
-    #LOG.debug("parent")
-    return azure.abfs.__init__.parent_path(path)
+    return Init_ABFS.parent_path(path)
 
   @staticmethod
   def join(first, *comp_list):
     """
     Joins two paths together
     """
-    return azure.abfs.__init__.join(first,*comp_list)
+    return Init_ABFS.join(first,*comp_list)
 
   # Create Files,directories, or File Systems
   # --------------------------------
@@ -283,34 +277,32 @@ class ABFS(object):
     if params is None:
       params = {}
     params['resource'] = 'directory'
-    self._create_path(path, params = params, headers = params, create = 'true')
+    self._create_path(path, params = params, headers = params, overwrite = False)
   
-  def create(self, path, params = None, data = None, headers = None, *args, **kwargs):
+  def create(self, path, overwrite= False, data = None, headers = None, *args, **kwargs):
     """
     Makes a File (Put text in data if adding data)
     """
-    if params is None:
-      params = {}
-    params['resource'] = 'file'
-    self._create_path(path, params = params, headers =headers, create = 'true')
+    params = {'resource' : 'file'}
+    self._create_path(path, params = params, headers =headers, overwrite = overwrite)
     if data:
       self._writedata(path, data, len(data))
 
   def create_home_dir(self, home_path=None):
     raise NotImplementedError("File System not named")
   
-  def _create_path(self,path, params = None, headers = None, create = True):
+  def _create_path(self,path, params = None, headers = None, overwrite = False):
     """
     Container method for Create
     """
-    file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
+    file_system, dir_name = Init_ABFS.parse_uri(path)[:2]
     if dir_name == '':
       return self._create_fs(file_system)
     no_scheme = file_system + '/' + dir_name
     additional_header = self._getheaders()
     if headers is not None:
       additional_header.update(headers)
-    if create:
+    if not overwrite:
       additional_header['If-None-Match'] = '*'
     self._root.put(no_scheme,params, headers= additional_header)
     
@@ -326,7 +318,7 @@ class ABFS(object):
     """
     Read data from a file
     """
-    path = azure.abfs.__init__.strip_scheme(path)
+    path = Init_ABFS.strip_scheme(path)
     headers = self._getheaders()
     if length != 0 and length != '0':
       headers['range']= 'bytes=%s-%s' %(str(offset), str(int(offset) + int(length)))
@@ -334,11 +326,11 @@ class ABFS(object):
   
   # Alter Files
   # --------------------------------
-  def append(self, path, data, size = 0, offset =0 ,params = None, *args, **kwargs):
+  def append(self, path, data, size = 0, offset =0 ,params = None, **kwargs):
     """
     Appends the data to a file
     """
-    path = azure.abfs.__init__.strip_scheme(path)
+    path = Init_ABFS.strip_scheme(path)
     if params is None:
       LOG.warn("Params not specified, Append will take longer")
       resp = self._stats(path)
@@ -354,15 +346,15 @@ class ABFS(object):
     LOG.debug("%s" %headers['Content-Length'])
     return self._patching_sl( path, params, data, headers,  **kwargs)
   
-  def flush(self, path, params = None, headers = None, *args, **kwargs):
+  def flush(self, path, params = None, headers = None, **kwargs):
     """
     Flushes the data(i.e. writes appended data to File)
     """
-    path = azure.abfs.__init__.strip_scheme(path)
+    path = Init_ABFS.strip_scheme(path)
     if params is None:
       LOG.warn("Params not specified")
       params = {'position' : 0}
-    if 'position' not in params.keys():
+    if 'position' not in params:
       LOG.warn("Position is not specified")
       params['position'] = 0
     params['action'] = 'flush'
@@ -373,26 +365,28 @@ class ABFS(object):
 
   # Remove Filesystems, directories. or Files
   # --------------------------------
-  def remove(self, path, skip_trash=False):
+  def remove(self, path, skip_trash=True):
     """
     Removes an item indicated in the path
     Also removes empty directories
     """
-    self._delete(path, 'false', skip_trash)
+    self._delete(path, recursive = 'false', skip_trash = skip_trash)
     
-  def rmtree(self, path, *args, **kwargs):
+  def rmtree(self, path, skip_trash = True):
     """
     Remove everything in a given directory
     """
-    self._delete(path, 'true')
+    self._delete(path, recursive = 'true', skip_trash = skip_trash)
     
-  def _delete(self, path, recursive = 'false', skip_trash=False):
+  def _delete(self, path, recursive = 'false', skip_trash=True):
     """
     Wrapper function for calling delete, no support for trash or 
     """
+    if not skip_trash:
+      raise NotImplementedError("Trash not implemented for ABFS")
     if ABFS.isroot(path):
       raise RuntimeError("Cannot Remove Root")
-    file_system, dir_name = azure.abfs.__init__.parse_uri(path)[:2]
+    file_system, dir_name = Init_ABFS.parse_uri(path)[:2]
     if dir_name == '':
       return self._root.delete(file_system,{'resource': 'filesystem'}, headers= self._getheaders())
     new_path = file_system + '/' + dir_name
@@ -430,7 +424,7 @@ class ABFS(object):
     """
     Set Access Controls (Can do both chmod and chown) (not implemented)
     """
-    path = azure.abfs.__init__.strip_scheme(path)
+    path = Init_ABFS.strip_scheme(path)
     params= {'action': 'setAccessControl'}
     if headers is None:
       headers ={}
@@ -456,7 +450,7 @@ class ABFS(object):
     """
     Copies a File to another location
     """
-    new_path = dst + '/' + azure.abfs.__init__.strip_path(src)
+    new_path = dst + '/' + Init_ABFS.strip_path(src)
     self.create(new_path)
     chunk_size = self.get_upload_chuck_size()
     file = self.read(src)
@@ -467,12 +461,12 @@ class ABFS(object):
     """
     Copies the entire contents of a directory to another location (Bug here possibly)
     """
-    dst = dst + '/' + azure.abfs.__init__.strip_path(src)
+    dst = dst + '/' + Init_ABFS.strip_path(src)
     LOG.debug("%s" %dst)
     self.mkdir(dst)
     other_files = self.listdir(src)
     for x in other_files:
-      x = src + '/' + azure.abfs.__init__.strip_path(x)
+      x = src + '/' + Init_ABFS.strip_path(x)
       LOG.debug("%s" %x)
       self.copy(x, dst)
 
@@ -480,8 +474,8 @@ class ABFS(object):
     """
     Renames a file
     """ 
-    headers = {'x-ms-rename-source' : '/' + azure.abfs.__init__.strip_scheme(old) }
-    self._create_path(new, headers = headers, create= False)
+    headers = {'x-ms-rename-source' : '/' + Init_ABFS.strip_scheme(old) }
+    self._create_path(new, headers = headers, overwrite= True)
 
   def rename_star(self, old_dir, new_dir):
     """
