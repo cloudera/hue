@@ -29,6 +29,7 @@ find_git_state() {
 docker_hue_build() {
   cd $HUE_DIR
   cp -a $BUILD_DIR/hue $HUE_DIR
+  rm -f $HUE_DIR/hue/desktop/conf/*
   docker build -f $HUE_DIR/Dockerfile -t ${REGISTRY}/hue:$GBN \
     --build-arg GBN=$GBN \
     --build-arg GSHA="$GSHA" \

@@ -72,6 +72,10 @@ RUN $HUE_BIN/pip install psycopg2-binary
 RUN mkdir -p ${HUE_CONF}
 ENV HUE_CONF_DIR ${HUE_CONF}/conf
 COPY conf ${HUE_CONF}/conf
+
+RUN ln -s ${HUE_CONF}/conf/log.conf ${HUE_HOME}/desktop/conf/log.conf; \
+    ln -s ${HUE_CONF}/conf/log4j.properties ${HUE_HOME}/desktop/conf/log4j.properties
+
 COPY startup.sh ${HUE_HOME}/startup.sh
 COPY healthz.sh /
 EXPOSE 8888
