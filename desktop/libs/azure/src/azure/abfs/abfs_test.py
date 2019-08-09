@@ -32,7 +32,7 @@ from desktop.lib.test_utils import grant_access, add_to_group, add_permission, r
 
 from azure.abfs.abfs import ABFS
 from azure.active_directory import ActiveDirectory
-from azure.conf import ABFS_CLUSTERS, is_abfs_enabled
+from azure.conf import ABFS_CLUSTERS,AZURE_ACCOUNTS, is_abfs_enabled
 
 from azure.abfs.upload import DEFAULT_WRITE_SIZE
 
@@ -47,7 +47,7 @@ class ABFSTestBase(unittest.TestCase):
   def setUp(self):
     if not is_abfs_enabled():
       raise SkipTest
-    self.client = ABFS.from_config(ABFS_CLUSTERS['default'], ActiveDirectory.from_config(None, version='v2.0'))
+    self.client = ABFS.from_config(ABFS_CLUSTERS['default'], ActiveDirectory.from_config(AZURE_ACCOUNTS['default'], version='v2.0'))
     self.c = make_logged_in_client(username='test', is_superuser=False)
     grant_access('test', 'test', 'filebrowser')
     add_to_group('test')
@@ -196,11 +196,11 @@ class ABFSTestBase(unittest.TestCase):
     test_file_permission = test_dir +'/test.txt'
     
     self.client.create(test_file_permission)
-    self.client.chmod(test_file_permission)
+    self.client.chmod(test_file_permission, '0777')
     self.client.stats(test_file_permission)
     
     self.client.mkdir(test_dir_permission)
-    self.client.chmod(test_dir_permission)
+    self.client.chmod(test_dir_permission, '0777')
     self.client.stats(test_dir_permission)
     
   def test_chown(self):
@@ -287,8 +287,6 @@ class ABFSTestBase(unittest.TestCase):
     self.client.stats(testdir2 + '/test')
     self.client.stats(testdir2 + '/test/test2')
     
-  #Testing static Methods
-  #------------------------------------
   @staticmethod
   def test_static_methods():
     test_dir = 'abfss://testfs/test_static/'

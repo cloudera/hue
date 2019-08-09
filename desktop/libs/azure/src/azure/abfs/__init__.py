@@ -42,7 +42,6 @@ def parse_uri(uri):
     raise ValueError("Invalid ABFS URI: %s" % uri)
   direct_name = match.group(3) or ''
   base_direct_name = match.group(2) or ''
-  #LOG.debug("File System: %s,Directory Name: %s, Other: %s" %(match.group(1), direct_name, base_direct_name) )
   return match.group(1), direct_name, base_direct_name
 
 def is_root(uri):

@@ -582,7 +582,7 @@ class WebhdfsTests(unittest.TestCase):
     f = self.cluster.fs.open(test_file, "w")
     f.write("ok")
     f.close()
-    #self.cluster.fs.mkdir(self.prefix, 0333)
+    
     resp = self.cluster.fs.listdir(self.prefix)
     LOG.debug("%s" %resp)
     

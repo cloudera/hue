@@ -206,7 +206,6 @@ class ABFS(object):
       params = {}
     params['resource'] = 'filesystem'
     res = self._root._invoke('HEAD', schemeless_path, params, headers = self._getheaders(), **kwargs)
-    LOG.debug("%s" %res)
     return res.headers
     
   def listdir(self, path, params = None, glob=None, **kwargs):
@@ -459,7 +458,7 @@ class ABFS(object):
 
   def copy_remote_dir(self, src, dst, *args, **kwargs):
     """
-    Copies the entire contents of a directory to another location (Bug here possibly)
+    Copies the entire contents of a directory to another location
     """
     dst = dst + '/' + Init_ABFS.strip_path(src)
     LOG.debug("%s" %dst)
@@ -490,8 +489,64 @@ class ABFS(object):
     pass
   
   def copyFromLocal(self, local_src, remote_dst, *args, **kwargs):
-    #Implement Later
-    raise NotImplementedError("")
+    """
+    Copy a directory or file from Local (Testing)
+    """
+    local_src = local_src.endswith('/') and local_src[:-1] or local_src
+    remote_dst = remote_dst.endswith('/') and remote_dst[:-1] or remote_dst
+    
+    if os.path.isdir(local_src):
+      self._local_copy_dir(local_src,remote_dst)
+    else:
+      (basename, filename) = os.path.split(local_src)
+      self._local_copy_file(local_src, self.isdir(remote_dst) and self.join(remote_dst, filename) or remote_dst)
+
+  def _local_copy_dir(self,local_src,remote_dst):
+    """
+    A wraper function for copying local directories
+    """
+    self.mkdir(remote_dir)
+
+    for f in os.listdir(local_dir):
+      local_src = os.path.join(local_dir, f)
+      remote_dst = self.join(remote_dir, f)
+
+      if os.path.isdir(local_src):
+        self._copy_dir(local_src, remote_dst, mode)
+      else:
+        self._copy_file(local_src, remote_dst)
+    
+  def _local_copy_file(self,local_src,remote_dst, chunk_size = UPLOAD_CHUCK_SIZE ):
+    """
+    A wraper function for copying local Files
+    """
+    if os.path.isfile(local_src):
+      if self.exists(remote_dst):
+        LOG.info('%s already exists. Skipping.' %remote_dst)
+        return
+      else:
+        LOG.info('%s does not exist. Trying to copy.' % remote_dst)
+      
+      src = file(local_src)
+      try:
+        try:
+          self.create(remote_dst)
+          chunk = src.read(chunk_size)
+          offset = 0
+          while chunk:
+            size = len(chunk)
+            self.append(remote_dst, chunk, size = size, params = {'position' : offset})
+            offset += size
+            chunk = src.read(chunk_size)
+          self.flush(remote_dst, params = {'position' : offset})
+          LOG.info(_('Copied %s -> %s.') % (local_src, remote_dst))
+        except:
+          LOG.exception(_('Copying %s -> %s failed.') % (local_src, remote_dst))
+          raise
+      finally:
+        src.close()
+    else:
+      LOG.info(_('Skipping %s (not a file).') % local_src)
 
   def check_access(self, path, *args, **kwargs):
     """
