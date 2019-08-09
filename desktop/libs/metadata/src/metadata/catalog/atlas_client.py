@@ -23,10 +23,9 @@ import re
 from django.utils.translation import ugettext as _
 
 from desktop.lib.rest import resource
-from desktop.lib.rest.unsecure_http_client import UnsecureHttpClient
-from desktop.lib.rest.http_client import RestException
+from desktop.lib.rest.http_client import HttpClient, RestException
 
-from metadata.conf import CATALOG, get_catalog_auth_password, get_catalog_search_cluster
+from metadata.conf import CATALOG, get_catalog_search_cluster
 from metadata.catalog.base import CatalogAuthException, CatalogApiException, CatalogEntityDoesNotExistException, Api
 
 LOG = logging.getLogger(__name__)
@@ -63,11 +62,14 @@ class AtlasApi(Api):
 
     self._api_url = CATALOG.API_URL.get().strip('/')
     self._username = CATALOG.SERVER_USER.get()
-    self._password = get_catalog_auth_password()
+    self._password = CATALOG.SERVER_PASSWORD.get()
 
-    # Navigator does not support Kerberos authentication while other components usually requires it
-    self._client = UnsecureHttpClient(self._api_url, logger=LOG)
-    self._client.set_basic_auth(self._username, self._password)
+    self._client = HttpClient(self._api_url, logger=LOG)
+    if CATALOG.KERBEROS_ENABLED.get():
+      self._client.set_kerberos_auth()
+    elif self._password:
+      self._client.set_basic_auth(self._username, self._password)
+
     self._root = resource.Resource(self._client, urlencode=False) # For search_entities_interactive
 
     self.__headers = {}
