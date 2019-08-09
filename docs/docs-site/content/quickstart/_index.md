@@ -5,7 +5,11 @@ draft: false
 weight: 1
 ---
 
-Install Hue then [configure it]({{% param baseURL %}}administrator/configuration/).
+Open-up or install Hue then [configure it]({{% param baseURL %}}administrator/configuration/).
+
+## Demo
+
+One click on [http://demo.gethue.com](http://demo.gethue.com).
 
 ## Kubernetes
 
