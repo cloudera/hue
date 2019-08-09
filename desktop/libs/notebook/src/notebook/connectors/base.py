@@ -336,7 +336,7 @@ def get_api(request, snippet):
     interpreter.get('compute') and interpreter['compute']['name'])
   )
 
-  if interface == 'hiveserver2':
+  if interface == 'hiveserver2' or interface == 'hms':
     from notebook.connectors.hiveserver2 import HS2Api
     return HS2Api(user=request.user, request=request, interpreter=interpreter)
   elif interface == 'oozie':

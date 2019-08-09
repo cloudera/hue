@@ -1581,10 +1581,6 @@ class ClusterConfig(object):
     self.apps = appmanager.get_apps_dict(self.user) if apps is None else apps
     self.cluster_type = cluster_type
 
-  def refreshConfig(self):
-    # TODO: reload "some ini sections"
-    pass
-
 
   def get_config(self):
     app_config = self.get_apps()
@@ -1711,12 +1707,16 @@ class ClusterConfig(object):
       return None
 
   def _get_catalogs(self):
+    '''
+    Any connector implementing Notebook Assist API.
+    Currently SQL connectors, Hive Metastore. Possibly Metadata Catalogs later.
+    '''
     interpreters = []
 
     _interpreters = get_ordered_interpreters(self.user)
 
     for interpreter in _interpreters:
-      if interpreter['interface'] == 'hms':
+      if interpreter['is_sql'] or interpreter['interface'] == 'hms':
         interpreters.append({
           'name': interpreter['name'],
           'type': interpreter['type'],
@@ -1725,7 +1725,7 @@ class ClusterConfig(object):
           'tooltip': _('%s Query') % interpreter['type'].title(),
           'page': '/editor/?type=%(type)s' % interpreter,
           'is_sql': interpreter['is_sql'],
-          'is_catalog': interpreter['is_catalog'],
+          'is_catalog': True,
         })
 
     return interpreters if interpreters else None

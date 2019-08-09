@@ -513,7 +513,8 @@ def create_namespace_property(request):
   "enumValues" : null,
   "type" : "TEXT",
   "createdDate" : "2018-04-02T22:36:19.001Z"
-}"""
+  }
+  """
   interface = request.POST.get('interface', CATALOG.INTERFACE.get())
   namespace = request.POST.get('namespace')
   properties = json.loads(request.POST.get('properties', '{}'))
@@ -531,7 +532,8 @@ def map_namespace_property(request):
   {
   namespace: "huecatalog",
   name: "relatedEntities"
-  }"""
+  }
+  """
   interface = request.POST.get('interface', CATALOG.INTERFACE.get())
   clazz = request.POST.get('class')
   properties = json.loads(request.POST.get('properties', '[]'))
