@@ -1,4 +1,4 @@
-{{- if .Values.cron.emailStats -}}
+{{- if .Values.cron.enabled -}}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
