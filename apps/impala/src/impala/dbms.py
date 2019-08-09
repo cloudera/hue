@@ -181,7 +181,12 @@ class ImpalaDbms(HiveServer2Dbms):
 
 
   def _get_beeswax_tables(self, database):
-    beeswax_query_server = dbms.get(user=self.client.user, query_server=beeswax_query_server_config(name=Cluster(self.client.user).get_app_config().get_hive_metastore_interpreters()[0]))
+    beeswax_query_server = dbms.get(
+      user=self.client.user,
+      query_server=beeswax_query_server_config(
+        name=Cluster(self.client.user).get_app_config().get_hive_metastore_interpreters()[0]
+      )
+    )
     return beeswax_query_server.get_tables(database=database)
 
 

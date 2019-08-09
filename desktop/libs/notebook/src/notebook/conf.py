@@ -71,10 +71,10 @@ def get_ordered_interpreters(user=None):
         'type': connector['name'],
         'dialect': connector['dialect'],
         'category': connector['category'],
-        'is_sql': connector['is_sql'],
+        'is_sql': connector.get('is_sql', False),
         'interface': connector['interface'],
         'options': {setting['name']: setting['value'] for setting in connector['settings']}
-      } for connector in _get_installed_connectors(category='editor')
+      } for connector in _get_installed_connectors(categories=['editor', 'catalogs'])
     ]
   else:
     reordered_interpreters = interpreters_shown_on_wheel + [i for i in user_interpreters if i not in interpreters_shown_on_wheel]

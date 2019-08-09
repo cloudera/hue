@@ -74,9 +74,17 @@ CONNECTOR_CLASSES += [
   {'nice_name': "S3", 'dialect': 's3', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
   {'nice_name': "ADLS", 'dialect': 'adls-v1', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
 
-  {'nice_name': "Hive Metastore", 'dialect': 'hms', 'settings': [], 'category': 'catalogs', 'description': '', 'properties': {}},
-  {'nice_name': "Atlas", 'dialect': 'atlas', 'settings': [], 'category': 'catalogs', 'description': '', 'properties': {}},
-  {'nice_name': "Navigator", 'dialect': 'navigator', 'settings': [], 'category': 'catalogs', 'description': '', 'properties': {}},
+  {
+    'nice_name': "Hive Metastore",
+    'dialect': 'hms',
+    'interface': 'hiveserver2',
+    'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},],
+    'category': 'catalogs',
+    'description': '',
+    'properties': {}
+  },
+  {'nice_name': "Atlas", 'dialect': 'atlas', 'interface': 'rest', 'settings': [], 'category': 'catalogs', 'description': '', 'properties': {}},
+  {'nice_name': "Navigator", 'dialect': 'navigator', 'interface': 'rest', 'settings': [], 'category': 'catalogs', 'description': '', 'properties': {}},
 
   {'nice_name': "Optimizer", 'dialect': 'optimizer', 'settings': [], 'category': 'optimizers', 'description': '', 'properties': {}},
 
@@ -195,7 +203,7 @@ def delete_connector(request):
     raise PopupException(_('No connector with the name %(name)s found.') % connector)
 
 
-def _get_installed_connectors(category=None, dialect=None, interface=None):
+def _get_installed_connectors(category=None, categories=None, dialect=None, interface=None):
   global CONNECTOR_INSTANCES
   global CONNECTOR_IDS
   config_connectors = CONNECTORS.get()
@@ -224,12 +232,14 @@ def _get_installed_connectors(category=None, dialect=None, interface=None):
 
   connectors = CONNECTOR_INSTANCES
 
+  if categories is not None:
+    connectors = [connector for connector in connectors if connector['category'] in categories]
   if category is not None:
-    connectors = [connector for connector in connectors if category == connector['category']]
+    connectors = [connector for connector in connectors if connector['category'] == category]
   if dialect is not None:
-    connectors = [connector for connector in connectors if dialect == connector['dialect']]
+    connectors = [connector for connector in connectors if connector['dialect'] == dialect]
   if interface is not None:
-    connectors = [connector for connector in connectors if interface == connector['interface']]
+    connectors = [connector for connector in connectors if connector['interface'] == interface]
 
   return connectors
 
