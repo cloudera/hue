@@ -38,6 +38,7 @@ workers:
 scheduler:
   enabled: false
 cron:
+  enabled: false
   emailStats: "0 13 * * WED,SUN"
 aws:
   accessKeyId: ""
