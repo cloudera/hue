@@ -46,8 +46,10 @@ from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 
 from desktop import appmanager
 from desktop.auth.backend import is_admin
-from desktop.conf import ENABLE_ORGANIZATIONS, get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY
+from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_K8S_ONLY, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS,\
+    has_connectors
 from desktop.lib import fsmanager
+from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paths import get_run_root, SAFE_CHARACTERS_URI_COMPONENTS
@@ -1768,12 +1770,20 @@ class ClusterConfig(object):
   def _get_browser(self):
     interpreters = []
 
-    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('hdfs', self.user):
+    hdfs_connectors = []
+    if has_connectors():
+      hdfs_connectors = [
+        connector['nice_name'] for connector in _get_installed_connectors(category='browsers', dialect='hdfs', interface='rest')
+      ]
+    elif 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('hdfs', self.user):
+      hdfs_connectors.append(_('Files'))
+
+    for hdfs_connector in hdfs_connectors:
       interpreters.append({
         'type': 'hdfs',
-        'displayName': _('Files'),
+        'displayName': hdfs_connector,
         'buttonName': _('Browse'),
-        'tooltip': _('Files'),
+        'tooltip': hdfs_connector,
         'page': '/filebrowser/' + (not self.user.is_anonymous() and 'view=' + urllib_quote(self.user.get_home_directory().encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) or '')
       })
 
