@@ -14,26 +14,15 @@ hue:
     password: "hue"
     name: "hue"
   interpreters: |
-    [[[impala]]]
-      name=Impala
-      interface=hiveserver2
-    [[[mysql]]]
-      name = MySQL
-      interface=sqlalchemy
-      options='{"url": "mysql://hue:datasshue@romain2:3306/hue"}'
     [[[postgresql]]]
       name = postgresql
       interface=sqlalchemy
       options='{"url": "postgresql://hue:hue@postgres-hue:5432/hue"}'
-
   ini: |
     [desktop]
-    app_blacklist=filebrowser,search,hbase,security,jobbrowser,metastore
-    django_debug_mode=true
-
-    use_cherrypy_server=true
+    app_blacklist=filebrowser,search,hbase,security,jobbrowser,oozie
+    django_debug_mode=false
     gunicorn_work_class=gevent
-
     enable_prometheus=true
 
     [[task_server]]
@@ -41,18 +30,6 @@ hue:
     broker_url=redis://redis:6379/0
     result_cache='{"BACKEND": "django_redis.cache.RedisCache", "LOCATION": "redis://redis:6379/0", "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},"KEY_PREFIX": "queries"}'
     celery_result_backend=redis://redis:6379/0
-
-    [impala]
-    server_host=172.31.114.171
-
-    [dashboard]
-    is_enabled=false
-    has_sql_enabled=false
-
-    [notebook]
-    show_notebooks=false
-
-    [hadoop]
 balancer:
   enabled: true
 workers:
@@ -68,8 +45,8 @@ aws:
   region: "us-east-1"
 ingress:
   create: false
-  # type: "nginx-ssl"
   type: "nginx"
+  # type: "nginx-ssl"
   # type: "traefik"
   domain: "demo.gethue.com"
   email: "team@gethue.com"
