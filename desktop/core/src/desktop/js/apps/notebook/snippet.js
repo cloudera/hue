@@ -1036,7 +1036,7 @@ class Snippet {
                 path: path
               })
               .done(entry => {
-                entry.clearCache({ invalidate: 'invalidate', cascade: true, silenceErrors: true });
+                entry.clearCache({ refreshCache: true, cascade: true, silenceErrors: true });
               });
           }, 5000);
         }
