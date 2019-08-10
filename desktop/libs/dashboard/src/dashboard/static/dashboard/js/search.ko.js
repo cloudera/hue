@@ -571,7 +571,7 @@ var Collection = function (vm, collection) {
   });
   self.source = ko.observable(typeof collection.source != "undefined" && collection.source != null ? collection.source : "data");
   self.async = ko.computed(function() {
-    return ['impala', 'hive', 'report'].indexOf(self.engine()) != -1;
+    return self.engine() != 'solr';
   });
   self.queryResult = ko.observable(new QueryResult(self, {
     type: self.engine(),
@@ -1584,6 +1584,10 @@ var Collection = function (vm, collection) {
 
     if (self.supportNesting()) {
       self.getNestedDocuments();
+    }
+
+    if (self.source() != 'solr') {
+      vm.search();
     }
   };
 
