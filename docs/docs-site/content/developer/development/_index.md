@@ -770,15 +770,20 @@ Other things to update:
 Instructions:
 
     docker build https://github.com/cloudera/hue.git#release-4.5.0 -t gethue/hue:4.5.0 -f tools/docker/hue/Dockerfile
-    docker tag gethue/hue:4.5.0 gethue/latest
+    docker tag gethue/hue:4.5.0 gethue/hue:latest
     docker images
     docker login
     docker push gethue/hue
     docker push gethue/hue:4.5.0
 
+    docker build . -t gethue/nginx:4.5.0 -f tools/docker/nginx/Dockerfile;
+    docker tag gethue/nginx:4.5.0 gethue/nginx:latest
+    docker push gethue/nginx
+    docker push gethue/nginx:4.5.0
+
 Documentation
 
-[Build it](#Documentation) and push it to the CDN.
+[Build it](#Documentation) and push it to the docs host.
 
 Build the doc website:
 
@@ -789,7 +794,7 @@ Release:
     ssh root@docs.gethue.com
     cd /var/www/docs.gethue.com
     mkdir 4.5.0
-    rm latest; ln -s 4.5.0 latest; cp latest/index.html .
+    rm latest; ln -s 4.5.0 latest
 
     scp -r docs/docs-site/public/* root@docs.gethue.com:/var/www/docs.gethue.com/4.5.0
 
