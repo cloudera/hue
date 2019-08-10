@@ -49,6 +49,7 @@ import json
 import logging
 import uuid
 import sys
+import textwrap
 
 from string import Template
 from urllib.parse import quote_plus
@@ -95,6 +96,7 @@ class SqlAlchemyApi(Api):
   def __init__(self, user, interpreter):
     self.user = user
     self.options = interpreter['options']
+    self.backticks = '"' if self.options['url'].startswith('postgresql://') else '`'
 
   def _create_engine(self):
     if '${' in self.options['url']: # URL parameters substitution
@@ -244,7 +246,7 @@ class SqlAlchemyApi(Api):
     engine = self._create_engine()
     inspector = inspect(engine)
 
-    assist = Assist(inspector, engine)
+    assist = Assist(inspector, engine, backticks=self.backticks)
     response = {'status': -1}
 
     if database is None:
@@ -283,7 +285,7 @@ class SqlAlchemyApi(Api):
     engine = self._create_engine()
     inspector = inspect(engine)
 
-    assist = Assist(inspector, engine)
+    assist = Assist(inspector, engine, backticks=self.backticks)
     response = {'status': -1, 'result': {}}
 
     metadata, sample_data = assist.get_sample_data(database, table, column)
@@ -311,11 +313,20 @@ class SqlAlchemyApi(Api):
 
   @query_error_handler
   def get_browse_query(self, snippet, database, table, partition_spec=None):
-    return "SELECT * FROM `%s`.`%s` LIMIT 1000" % (database, table)
+    return '''
+      SELECT *
+      FROM %(backticks)s%(database)s%(backticks)s.%(backticks)s%(table)s%(backticks)s
+      LIMIT 1000
+      ''' % {
+        'database': database,
+        'table': table,
+        'backticks': self.backticks
+    }
 
 
   def _fix_phoenix_empty_database(self, database):
     return None if self.options['url'].startswith('phoenix://') and database == 'NULL' else database
+
 
   def _fix_bigquery_db_prefixes(self, table_or_column):
     if self.options['url'].startswith('bigquery://'):
@@ -323,12 +334,12 @@ class SqlAlchemyApi(Api):
     return table_or_column
 
 
-
 class Assist():
 
-  def __init__(self, db, engine):
+  def __init__(self, db, engine, backticks):
     self.db = db
     self.engine = engine
+    self.backticks = backticks
 
   def get_databases(self):
     return self.db.get_schema_names()
@@ -340,8 +351,18 @@ class Assist():
     return self.db.get_columns(table, database)
 
   def get_sample_data(self, database, table, column=None):
-    column = '`%s`' % column if column else '*'
-    statement = "SELECT %s FROM `%s`.`%s` LIMIT %d" % (column, database, table, 100)
+    column = '%(backticks)s%(column)s%(backticks)s' % {'backticks': self.backticks, 'column': column} if column else '*'
+    statement = textwrap.dedent('''
+      SELECT %(column)s
+      FROM %(backticks)s%(database)s%(backticks)s.%(backticks)s%(table)s%(backticks)s
+      LIMIT %(limit)s
+      ''' % {
+        'database': database,
+        'table': table,
+        'column': column,
+        'limit': 100,
+        'backticks': self.backticks
+    })
     connection = self.engine.connect()
     try:
       result = connection.execution_options(stream_results=True).execute(statement)
