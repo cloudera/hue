@@ -96,7 +96,7 @@ class SqlAlchemyApi(Api):
   def __init__(self, user, interpreter):
     self.user = user
     self.options = interpreter['options']
-    self.backticks = '"' if self.options['url'].startswith('postgresql://') else '`'
+    self.backticks = '"' if self.options['url'].startswith('postgresql://') or self.options['url'].startswith('awsathena') else '`'
 
   def _create_engine(self):
     if '${' in self.options['url']: # URL parameters substitution
