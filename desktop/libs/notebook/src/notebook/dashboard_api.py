@@ -52,7 +52,7 @@ class SQLDashboardApi(DashboardApi):
     self.engine = engine
     self.source = source
     self.async = engine == 'hive' or engine == 'impala'
-    self.backticks = '"' if engine == 'postgresql' else '`'
+    self.backticks = '"' if engine in ['postgresql', 'athena'] else '`'
 
 
   def query(self, dashboard, query, facet=None):
