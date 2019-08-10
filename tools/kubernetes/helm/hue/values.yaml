@@ -20,7 +20,7 @@ hue:
       options='{"url": "postgresql://hue:hue@postgres-hue:5432/hue"}'
   ini: |
     [desktop]
-    app_blacklist=filebrowser,search,hbase,security,jobbrowser,oozie,indexer
+    app_blacklist=filebrowser,search,hbase,security,jobbrowser,oozie
     django_debug_mode=false
     gunicorn_work_class=gevent
     enable_prometheus=true
