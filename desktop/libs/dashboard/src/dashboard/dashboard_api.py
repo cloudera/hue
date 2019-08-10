@@ -53,7 +53,7 @@ class DashboardApi(object):
     self.user = user
     self.cluster = cluster
 
-  def datasets(self, show_all=False): pass
+  def datasets(self, show_all=False, database=None): pass
 
   def query(self, collection, query, facet=None): pass
 
