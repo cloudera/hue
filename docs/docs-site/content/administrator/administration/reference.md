@@ -157,9 +157,9 @@ on when first usable task will be released.
 
 Until then, here is how to try the task server service.
 
-Make sure you have Rabbit MQ installed and running.
+Make sure you have Redis installed and running.
 
-    sudo apt-get install rabbitmq-server -y
+    sudo apt-get install redis-server -y
 
 In hue.ini, telling the API server that the Task Server is available:
 
@@ -171,9 +171,9 @@ Starting the Task server:
 
     ./build/env/bin/celery worker -l info -A desktop
 
-Available tasks
+### Tasks
 
-### Query Task
+#### Query Task
 
 When the task server is enabled, SQL queries are going to be submitted outside of the Hue servers.
 
@@ -183,9 +183,9 @@ To configure the storage to use to persist those, edit the `result_file_storage`
     [[task_server]]
     result_file_storage='{"backend": "django.core.files.storage.FileSystemStorage", "properties": {"location": "/var/lib/hue/query-results"}}'
 
-### Email Task
+#### Email Task
 
-### Task Scheduler
+#### Task Scheduler
 
 For schedules configured statically in Python:
 
@@ -195,7 +195,7 @@ For schedules configured dynamically via a table with Django Celery Beat:
 
     [desktop]
     [[task_server]]
-    beat_enabled=false
+    beat_enabled=true
 
 Then:
 
@@ -204,3 +204,12 @@ Then:
 Note: the first time the tables need to be created with:
 
     ./build/env/bin/hue migrate
+
+### Flower
+
+Web UI to monitor tasks:
+
+    ./build/env/bin/pip install flower
+    ./build/env/bin/celery flower --broker=redis://localhost:6379/0
+
+Then open-up [http://localhost:5555/tasks](http://localhost:5555/tasks)
