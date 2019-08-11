@@ -20,10 +20,10 @@ from builtins import object
 def get_api(request, interface):
   if interface == 'beat':
     from desktop.lib.scheduler.lib.beat import CeleryBeatApi
-    return CeleryBeatApi(user=request.user)
+    return CeleryBeatApi(interface=interface, user=request.user)
   elif interface == 'oozie':
     from desktop.lib.scheduler.lib.oozie import OozieApi
-    return OozieApi(user=request.user)
+    return OozieApi(interface=interface, user=request.user)
   else:
     raise PopupException(_('Scheduler connector interface not recognized: %s') % interface)
 
@@ -34,9 +34,8 @@ class Api(object):
     self.interface = interface
     self.user = user
 
-  def get_schedule():
-    return JsonResponse({
-    })
+  def get_schedule(self):
+    return JsonResponse({})
 
-  def submit_schedule(request, coordinator, mapping):
+  def submit_schedule(self, request, coordinator, mapping):
     pass

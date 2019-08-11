@@ -34,72 +34,73 @@
   </div>
 
   <div class="modal-body">
-      <div id="param-container">
+    <div id="param-container">
 
-       ${ params_form.management_form | n,unicode }
+      ${ params_form.management_form | n,unicode }
 
-       % for form in params_form.forms:
-          % for hidden in form.hidden_fields():
-            ${ hidden | n,unicode }
-          % endfor
+      % for form in params_form.forms:
+        % for hidden in form.hidden_fields():
+          ${ hidden | n,unicode }
+        % endfor
 
-          <div class="control-group"
-            % if form['name'].form.initial.get('name').startswith('oozie.'):
-                style="display: none"
-            % endif
-          >
-            <label class="control-label">${ form['name'].form.initial.get('name') }</label>
-            <div class="controls">
-              ${ render_field(form['value'], show_label=False, extra_attrs={'class': 'filechooser-input input-xlarge'}) }
-              <div class="btn-group">
-                <a class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                  <i class="fa fa-calendar"></i>
-                  <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu pull-right" role="menu">
-                  <li>
-                    <a class="pointer now-link">
-                      ${ _('Now') }
-                    </a>
-                    <a class="pointer calendar-link">
-                      ${ _('Calendar') }
-                    </a>
-                  </li>
-                </ul>
-              </div>
+        <div class="control-group"
+          % if form['name'].form.initial.get('name').startswith('oozie.'):
+            style="display: none"
+          % endif
+        >
+          <label class="control-label">${ form['name'].form.initial.get('name') }</label>
+          <div class="controls">
+            ${ render_field(form['value'], show_label=False, extra_attrs={'class': 'filechooser-input input-xlarge'}) }
+            <div class="btn-group">
+              <a class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                <i class="fa fa-calendar"></i>
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu pull-right" role="menu">
+                <li>
+                  <a class="pointer now-link">
+                    ${ _('Now') }
+                  </a>
+                  <a class="pointer calendar-link">
+                    ${ _('Calendar') }
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
+        </div>
+        % endfor
+    </div>
 
-         % endfor
-      </div>
-      <div class="clearfix"></div>
+    <div class="clearfix"></div>
 
-      % if show_dryrun:
-         <label class="checkbox" style="display: inline-block; margin-top: 5px">
-           <input type="checkbox" name="dryrun_checkbox" /> ${ _('Do a dryrun before submitting the job') }
-         </label>
-      % endif
-      % if is_oozie_mail_enabled:
-        <br/>
-        <label class="checkbox" style="display: inline-block; margin-top: 5px">
-          <input type="checkbox" name="email_checkbox"
-          % if not email_id:
-            disabled
-          % endif
-          />
-        % if email_id:
-          ${_('Send completion email to ')}<a href="/useradmin/users/edit/${user.username}#step2"> ${email_id} </a>
-        % else:
-          ${_('Email not set in ')}<a href="/useradmin/users/edit/${user.username}#step2"> ${_('profile.')} </a>
+    % if show_dryrun:
+      <label class="checkbox" style="display: inline-block; margin-top: 5px">
+        <input type="checkbox" name="dryrun_checkbox" /> ${ _('Do a dryrun before submitting the job') }
+      </label>
+    % endif
+
+    % if is_oozie_mail_enabled:
+      <br/>
+      <label class="checkbox" style="display: inline-block; margin-top: 5px">
+        <input type="checkbox" name="email_checkbox"
+        % if not email_id:
+          disabled
         % endif
-        % if cluster_json:
-          <input type="hidden" name="cluster" value="${ cluster_json }"></input>
-        % endif
-        </label>
-        %endif
-      % if return_json:
-        <input type="hidden" name="format" value="json">
+        />
+      % if email_id:
+        ${_('Send completion email to ')}<a href="/useradmin/users/edit/${user.username}#step2">${ email_id }</a>
+      % else:
+        ${_('Email not set in ')}<a href="/useradmin/users/edit/${user.username}#step2">${ _('profile.') }</a>
       % endif
+      % if cluster_json:
+        <input type="hidden" name="cluster" value="${ cluster_json }"></input>
+      % endif
+      </label>
+      %endif
+    % if return_json:
+      <input type="hidden" name="format" value="json">
+    % endif
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${ _('Cancel') }</a>

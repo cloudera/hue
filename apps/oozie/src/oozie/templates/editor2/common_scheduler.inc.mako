@@ -13,6 +13,7 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+
 <%!
 from desktop.views import _ko
 from django.utils.translation import ugettext as _
@@ -20,13 +21,14 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="utils" file="../utils.inc.mako" />
 
+
 <%def name="import_layout(embedded=False)">
 
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span12 coordinator">
 
-      %if not embedded:
+      % if not embedded:
       <div class="card card-home">
         <h1 class="card-heading simple" style="border-bottom: none"><span data-bind="editable: $root.coordinator.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span></h1>
         <div class="card-body muted" style="margin-top: 2px" data-bind="visible: $root.isEditing() || (! $root.isEditing() && $root.coordinator.properties.description)">
@@ -56,7 +58,7 @@ from django.utils.translation import ugettext as _
           <!-- /ko -->
         </div>
       </div>
-      %endif
+      % endif
 
       <div class="card card-home" data-bind="visible: coordinator.properties.workflow() || coordinator.properties.document()" style="margin-top: 20px">
         <h1 class="card-heading simple">${ _('How often?') }
@@ -97,14 +99,13 @@ from django.utils.translation import ugettext as _
                 </div>
              </form>
             </div>
-
           </div>
 
           <div data-bind="visible: coordinator.showAdvancedFrequencyUI">
             <form class="
-            %if not embedded:
+            % if not embedded:
             form-horizontal
-            %endif
+            % endif
             ">
 
               <div class="control-group">
@@ -159,12 +160,8 @@ from django.utils.translation import ugettext as _
                   <span class="help-inline"></span>
                 </div>
               </div>
-
             </form>
-
           </div>
-
-
         </div>
       </div>
 
@@ -382,11 +379,10 @@ from django.utils.translation import ugettext as _
     </div>
   </div>
 </div>
-
 </%def>
 
-<%def name="import_modals()">
 
+<%def name="import_modals()">
 <div id="chooseWorkflowDemiModal" class="${ is_embeddable and 'modal' or 'demi-modal' } fade" data-backdrop="${ is_embeddable and 'true' or 'false' }">
   %if is_embeddable:
   <div class="modal-header">
@@ -394,6 +390,7 @@ from django.utils.translation import ugettext as _
     <h2 id="myModalLabel" class="modal-title">${_('Choose a workflow')}</h2>
   </div>
   %endif
+
   <div class="modal-body">
     %if not is_embeddable:
     <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
@@ -422,6 +419,7 @@ from django.utils.translation import ugettext as _
   <div><a class="pointer demi-modal-chevron" data-dismiss="modal"><i class="fa fa-chevron-up"></i></a></div>
   %endif
 </div>
+
 
 <div id="settingsModal" class="modal hide fade">
   <div class="modal-header">
@@ -453,9 +451,9 @@ from django.utils.translation import ugettext as _
 
       <h4>${ _('Execution') }</h4>
       <select data-bind="value: coordinator.properties.execution">
-    <option value="FIFO">${ _("FIFO (oldest first)") }</option>
-    <option value="LIFO">${ _("LIFO (newest first)") }</option>
-    <option value="LAST_ONLY">${ _("LAST_ONLY (discards all older materializations)") }</option>
+        <option value="FIFO">${ _("FIFO (oldest first)") }</option>
+        <option value="LIFO">${ _("LIFO (newest first)") }</option>
+        <option value="LAST_ONLY">${ _("LAST_ONLY (discards all older materializations)") }</option>
       </select>
 
       <h4>${ _('Throttle') }</h4>
@@ -495,7 +493,7 @@ from django.utils.translation import ugettext as _
   var datasetTypeaheadSource = ["/data/${'${'}YEAR}/${'${'}MONTH}/${'${'}DAY}", "${'${'}MINUTE}", "${'${'}HOUR}", "${'${'}DAY}", "${'${'}MONTH}", "${'${'}YEAR}", "${'${'}coord:nominalTime()}", "${'${'}coord:formatTime(coord:nominalTime(), 'yyyyMMdd')}"]
 
   function zeroPadding(value) {
-    return (value < 10 ? '0':'') + value;
+    return (value < 10 ? '0' : '') + value;
   }
 
   function convertDatasetVariables(path, hasSameStart, customStart, hasSameFrequency, customFrequencyUnit, startInstance, instanceChoice, vm) {
@@ -508,6 +506,7 @@ from django.utils.translation import ugettext as _
       qty: 0,
       freq: "minutes"
     };
+
     if (startInstance != 0 && instanceChoice == "single") {
       _startDiffObj.qty = startInstance;
       if (hasSameFrequency) {
@@ -602,6 +601,5 @@ from django.utils.translation import ugettext as _
       });
     }
   }
-
   </script>
 </%def>

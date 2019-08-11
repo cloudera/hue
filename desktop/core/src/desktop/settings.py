@@ -687,7 +687,7 @@ if DEBUG and desktop.conf.ENABLE_DJANGO_DEBUG_TOOL.get():
 # Celery settings
 ################################################################
 
-if desktop.conf.TASK_SERVER.ENABLED.get():
+if desktop.conf.TASK_SERVER.ENABLED.get() or desktop.conf.TASK_SERVER.BEAT_ENABLED.get():
   CELERY_BROKER_URL = desktop.conf.TASK_SERVER.BROKER_URL.get()
 
   CELERY_ACCEPT_CONTENT = ['json']
