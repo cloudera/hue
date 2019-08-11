@@ -30,6 +30,9 @@ class CeleryBeatApi(Api):
 
     task, created = PeriodicTask.objects.get_or_create(
       interval=schedule,
-      name='Scheduled query',
+      name='Scheduled query N',
       task='notebook.tasks.run_sync_query',
     )
+
+    task.enabled = True
+    task.save()
