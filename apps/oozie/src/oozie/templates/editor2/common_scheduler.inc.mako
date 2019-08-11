@@ -81,7 +81,7 @@ from django.utils.translation import ugettext as _
                   <div class="controls">
                     <input id="coord-frequency" type="text" data-bind="textInput: coordinator.properties.cron_frequency, enable: $root.isEditing, attachViewModelToElementData, tagsNotAllowed" name="cron_frequency"/>
                     <span class="help-inline">
-                      <a data-bind="visible: coordinator.properties.cron_advanced" href="http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html" target="_blank">
+                      <a data-bind="visible: coordinator.properties.cron_advanced" href="http://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/tutorial-lesson-06.html" target="_blank">
                       <i class="fa fa-question-circle" title="${ _('Check syntax ?') }"></i></a>
                     </span>
                   </div>
