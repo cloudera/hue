@@ -130,7 +130,11 @@ def new_workflow(request):
   doc = None
   workflow = Workflow(user=request.user)
   workflow.set_workspace(request.user)
-  workflow.check_workspace(request.fs, request.user)
+
+  try:
+    workflow.check_workspace(request.fs, request.user)
+  except Exception as e:
+    raise PopupException(_('Could not create workflow workspace'), detail=e)
 
   return _edit_workflow(request, doc, workflow)
 
