@@ -41,7 +41,7 @@ from desktop.lib.paths import SAFE_CHARACTERS_URI
 from desktop.models import Document2
 from useradmin.models import User
 
-from notebook.connectors.base import Notebook, get_interpreter
+from notebook.connectors.base import Notebook, get_api as _get_api, get_interpreter
 
 if sys.version_info[0] > 2:
   import urllib.request, urllib.error
@@ -489,6 +489,39 @@ def _update_property_value(properties, key, value):
 def _get_editor_type(editor_id):
   document = Document2.objects.get(id=editor_id)
   return document.type.rsplit('-', 1)[-1]
+
+
+class ApiWrapper(object):
+  def __init__(self, request, snippet):
+    self.request = request
+    self.api = _get_api(request, snippet)
+  def __getattr__(self, name):
+    from notebook import tasks as ntasks
+    if TASK_SERVER.ENABLED.get() and hasattr(ntasks, name):
+      attr = object.__getattribute__(ntasks, name)
+      def _method(*args, **kwargs):
+        return attr(*args, **dict(kwargs, postdict=self.request.POST, user_id=self.request.user.id))
+      return _method
+    else:
+      return object.__getattribute__(self.api, name)
+
+
+def get_api(request, snippet):
+  return ApiWrapper(request, snippet)
+
+
+def upgrade_session_properties(request, notebook):
+  # Upgrade session data if using old format
+  data = notebook.get_data()
+
+  for session in data.get('sessions', []):
+    api = get_api(request, session)
+    if 'type' in session and hasattr(api, 'upgrade_properties'):
+      properties = session.get('properties', None)
+      session['properties'] = api.upgrade_properties(session['type'], properties)
+
+  notebook.data = json.dumps(data)
+  return notebook
 
 
 class Analytics(object):

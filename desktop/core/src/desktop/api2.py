@@ -41,7 +41,6 @@ from metadata.conf import has_catalog
 from metadata.catalog_api import search_entities as metadata_search_entities, _highlight, search_entities_interactive as metadata_search_entities_interactive
 from notebook.connectors.altus import SdxApi, AnalyticDbApi, DataEngApi, DataWarehouse2Api
 from notebook.connectors.base import Notebook, get_interpreter
-from notebook.views import upgrade_session_properties
 
 from desktop.lib.django_util import JsonResponse
 from desktop.conf import get_clusters, IS_K8S_ONLY
@@ -372,6 +371,7 @@ def _get_document_helper(request, uuid, with_data, with_dependencies, path):
     data = json.loads(document.data)
     # Upgrade session properties for Hive and Impala
     if document.type.startswith('query'):
+      from notebook.models import upgrade_session_properties
       notebook = Notebook(document=document)
       notebook = upgrade_session_properties(request, notebook)
       data = json.loads(notebook.data)
