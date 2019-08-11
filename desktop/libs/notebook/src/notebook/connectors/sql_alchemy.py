@@ -313,7 +313,7 @@ class SqlAlchemyApi(Api):
 
   @query_error_handler
   def get_browse_query(self, snippet, database, table, partition_spec=None):
-    return '''
+    return textwrap.dedent('''\
       SELECT *
       FROM %(backticks)s%(database)s%(backticks)s.%(backticks)s%(table)s%(backticks)s
       LIMIT 1000
@@ -321,7 +321,7 @@ class SqlAlchemyApi(Api):
         'database': database,
         'table': table,
         'backticks': self.backticks
-    }
+    })
 
 
   def _fix_phoenix_empty_database(self, database):
@@ -352,7 +352,7 @@ class Assist():
 
   def get_sample_data(self, database, table, column=None):
     column = '%(backticks)s%(column)s%(backticks)s' % {'backticks': self.backticks, 'column': column} if column else '*'
-    statement = textwrap.dedent('''
+    statement = textwrap.dedent('''\
       SELECT %(column)s
       FROM %(backticks)s%(database)s%(backticks)s.%(backticks)s%(table)s%(backticks)s
       LIMIT %(limit)s
