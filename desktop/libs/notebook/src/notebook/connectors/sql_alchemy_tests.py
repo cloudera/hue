@@ -53,7 +53,8 @@ class TestApi():
 
   def test_fetch_result_empty(self):
     interpreter = {
-      'options': {}
+      'options': {},
+      'url': 'mysql://hue:localhost@hue:3306/hue'
     }
 
     notebook = Mock()
