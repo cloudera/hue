@@ -22,8 +22,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.forms import NumberInput
 
 from aws.s3 import S3_ROOT, S3A_ROOT
-from desktop.lib.django_forms import simple_formset_factory, DependencyAwareForm
-from desktop.lib.django_forms import ChoiceOrOtherField, MultiForm, SubmitButton
+from desktop.lib.django_forms import simple_formset_factory, DependencyAwareForm, ChoiceOrOtherField, MultiForm, SubmitButton
 from filebrowser.forms import PathField
 
 from beeswax import common
