@@ -146,7 +146,7 @@ class SqlAlchemyApi(Api):
           'name': col[0] if (type(col) is tuple or type(col) is dict) else col.name if hasattr(col, 'name') else col,
           'type': 'STRING_TYPE',
           'comment': ''
-        } for col in result.cursor.description]
+        } for col in result.cursor.description] if result.cursor else []
     }
     CONNECTION_CACHE[guid] = cache
 

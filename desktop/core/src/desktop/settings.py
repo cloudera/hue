@@ -706,6 +706,7 @@ if desktop.conf.TASK_SERVER.ENABLED.get() or desktop.conf.TASK_SERVER.BEAT_ENABL
   if desktop.conf.TASK_SERVER.BEAT_ENABLED.get():
     INSTALLED_APPS.append('django_celery_beat')
     INSTALLED_APPS.append('timezone_field')
+    USE_TZ = True
 
 
 PROMETHEUS_EXPORT_MIGRATIONS = False # Needs to be there even when enable_prometheus is not enabled

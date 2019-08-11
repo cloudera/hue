@@ -183,6 +183,7 @@ def run_sync_query(doc_id, user):
 
   return task
 
+
 # TODO: Convert csv to excel if needed
 def download(*args, **kwargs):
   notebook = args[0]

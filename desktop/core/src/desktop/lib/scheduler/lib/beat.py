@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django_celery_beat.models import PeriodicTask, IntervalSchedule
+from django_celery_beat.models import PeriodicTask, CrontabSchedule, IntervalSchedule
 
 from desktop.lib.scheduler.lib.api import Api
 
@@ -23,16 +23,30 @@ from desktop.lib.scheduler.lib.api import Api
 class CeleryBeatApi(Api):
 
   def submit_schedule(self, request, coordinator, mapping):
-    schedule, created = IntervalSchedule.objects.get_or_create(
-      every=10,
-      period=IntervalSchedule.SECONDS,
-    )
+    is_cron = True
 
-    task, created = PeriodicTask.objects.get_or_create(
-      interval=schedule,
-      name='Scheduled query N',
-      task='notebook.tasks.run_sync_query',
-    )
+    if True:
+      schedule, created = CrontabSchedule.objects.get_or_create(
+        minute='*',
+        hour='*',
+        day_of_week='*',
+        day_of_month='*',
+        month_of_year='*'
+      )
 
-    task.enabled = True
-    task.save()
+      task, created = PeriodicTask.objects.get_or_create(
+        crontab=schedule,
+        name='Scheduled query N',
+        task='notebook.tasks.run_sync_query',
+      )
+    else:
+      schedule, created = IntervalSchedule.objects.get_or_create(
+        every=15,
+        period=IntervalSchedule.SECONDS,
+      )
+
+      task, created = PeriodicTask.objects.get_or_create(
+        interval=schedule,
+        name='Scheduled query',
+        task='notebook.tasks.run_sync_query',
+      )
