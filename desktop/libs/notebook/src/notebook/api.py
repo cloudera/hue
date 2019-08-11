@@ -30,6 +30,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
 import opentracing.tracer
 
+from azure.abfs.__init__ import abfspath
 from desktop.api2 import __paginate
 from desktop.conf import TASK_SERVER
 from desktop.lib.i18n import smart_str
@@ -43,15 +44,15 @@ from notebook.connectors.dataeng import DataEngApi
 from notebook.connectors.hiveserver2 import HS2Api
 from notebook.connectors.oozie_batch import OozieApi
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
-from notebook.models import escape_rows, make_notebook
+from notebook.models import escape_rows, make_notebook, upgrade_session_properties, get_api
 from notebook.views import upgrade_session_properties, get_api
-from azure.abfs.__init__ import abfspath
 
 if sys.version_info[0] > 2:
   import urllib.request, urllib.error
   from urllib.parse import unquote as urllib_unquote
 else:
   from urllib import unquote as urllib_unquote
+
 
 LOG = logging.getLogger(__name__)
 

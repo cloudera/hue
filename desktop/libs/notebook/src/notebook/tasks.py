@@ -29,9 +29,9 @@ import time
 
 from celery.utils.log import get_task_logger
 from celery import states
-
 from django.core.cache import caches
 from django.core.files.storage import get_storage_class
+from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import FileResponse, HttpRequest
 
@@ -39,12 +39,14 @@ from beeswax import data_export
 from desktop.auth.backend import rewrite_user
 from desktop.celery import app
 from desktop.conf import TASK_SERVER
-from desktop.lib import export_csvxls
-from desktop.lib import fsmanager
+from desktop.lib import export_csvxls, fsmanager
+from desktop.models import Document2
 from desktop.settings import CACHES_CELERY_KEY, CACHES_CELERY_QUERY_RESULT_KEY
 from useradmin.models import User
 
+from notebook.api import _get_statement
 from notebook.connectors.base import get_api, QueryExpired, ExecutionWrapper
+from notebook.models import make_notebook, MockedDjangoRequest
 from notebook.sql_utils import get_current_statement
 
 if sys.version_info[0] > 2:
@@ -146,28 +148,23 @@ def close_statement_async(notebook, snippet, **kwargs):
 
 @app.task(ignore_result=True)
 def run_sync_query(doc_id, user):
-  '''Independently run a query as a user and insert the result into another table.'''
-  # get SQL
-  # Add INSERT INTO table
-  # Add variables?
-  # execute query
-  # return when done. send email notification. get taskid.
-  # see in Flower API for listing runs?
-  from django.contrib.auth.models import User
-  from notebook.models import make_notebook, MockedDjangoRequest
+  '''Independently run a query as a user.'''
+  # Add INSERT INTO table if persit result
+  # Add variables
+  # Return when done. send email notification. get taskid.
+  query_document = Document2.objects.document(user=user, doc_id=doc_id)
+  notebook = Notebook(document=query_document).get_data()
+  snippet = notebook['snippets'][0]
 
-  from desktop.auth.backend import rewrite_user
-
-  editor_type = 'impala'
-  sql = 'INSERT into customer_scheduled SELECT * FROM default.customers LIMIT 100;'
-  request = MockedDjangoRequest(user=rewrite_user(User.objects.get(username='romain')))
+  editor_type = snippet['type']
+  sql = _get_statement(notebook)
+  request = MockedDjangoRequest(user=user)
 
   notebook = make_notebook(
       name='Scheduler query N',
       editor_type=editor_type,
       statement=sql,
       status='ready',
-      #on_success_url=on_success_url,
       last_executed=time.mktime(datetime.datetime.now().timetuple()) * 1000,
       is_task=True
   )

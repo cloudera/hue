@@ -26,7 +26,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 from beeswax.data_export import DOWNLOAD_COOKIE_AGE
-from desktop.conf import ENABLE_DOWNLOAD, USE_NEW_EDITOR, TASK_SERVER
+from desktop.conf import ENABLE_DOWNLOAD, USE_NEW_EDITOR
 from desktop.lib import export_csvxls
 from desktop.lib.django_util import render, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
@@ -35,34 +35,15 @@ from desktop.models import Document2, Document, FilesystemException
 from desktop.views import serve_403_error
 from metadata.conf import has_optimizer, has_catalog, has_workload_analytics
 
-from notebook import tasks as ntasks
 from notebook.conf import get_ordered_interpreters, SHOW_NOTEBOOKS
-from notebook.connectors.base import Notebook, get_api as _get_api, _get_snippet_name
+from notebook.connectors.base import Notebook, _get_snippet_name
 from notebook.connectors.spark_shell import SparkApi
 from notebook.decorators import check_editor_access_permission, check_document_access_permission, check_document_modify_permission
 from notebook.management.commands.notebook_setup import Command
-from notebook.models import make_notebook, _get_editor_type
+from notebook.models import make_notebook, _get_editor_type, get_api
 
 
 LOG = logging.getLogger(__name__)
-
-
-class ApiWrapper(object):
-  def __init__(self, request, snippet):
-    self.request = request
-    self.api = _get_api(request, snippet)
-  def __getattr__(self, name):
-    if TASK_SERVER.ENABLED.get() and hasattr(ntasks, name):
-      attr = object.__getattribute__(ntasks, name)
-      def _method(*args, **kwargs):
-        return attr(*args, **dict(kwargs, postdict=self.request.POST, user_id=self.request.user.id))
-      return _method
-    else:
-      return object.__getattribute__(self.api, name)
-
-
-def get_api(request, snippet):
-  return ApiWrapper(request, snippet)
 
 
 def notebooks(request):
@@ -379,17 +360,3 @@ def install_examples(request):
     response['message'] = _('A POST request is required.')
 
   return JsonResponse(response)
-
-
-def upgrade_session_properties(request, notebook):
-  # Upgrade session data if using old format
-  data = notebook.get_data()
-
-  for session in data.get('sessions', []):
-    api = get_api(request, session)
-    if 'type' in session and hasattr(api, 'upgrade_properties'):
-      properties = session.get('properties', None)
-      session['properties'] = api.upgrade_properties(session['type'], properties)
-
-  notebook.data = json.dumps(data)
-  return notebook
