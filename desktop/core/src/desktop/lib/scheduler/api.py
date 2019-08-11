@@ -24,6 +24,7 @@ from desktop.auth.backend import is_admin
 from desktop.conf import TASK_SERVER
 from desktop.models import Document2
 from desktop.lib.django_util import JsonResponse, render
+from desktop.lib.i18n import force_unicode
 from desktop.lib.scheduler.lib.api import get_api
 
 LOG = logging.getLogger(__name__)
@@ -46,7 +47,7 @@ def get_schedule(request):
 # To move to lib in case oozie is blacklisted
 #@check_document_access_permission()
 def submit_schedule(request, doc_id):
-  interface = request.GET.get('interface', request.POST.get('interface', 'oozie'))
+  interface = request.GET.get('interface', request.POST.get('interface', 'beat'))
   if doc_id.isdigit():
     coordinator = Coordinator(document=Document2.objects.get(id=doc_id))
   else:
@@ -83,8 +84,8 @@ def submit_schedule(request, doc_id):
       request, {
           'params_form': params_form,
           'name': coordinator.name,
-          'action': reverse('oozie:editor_submit_coordinator',  kwargs={'doc_id': coordinator.id}),
-          'show_dryrun': True,
+          'action': '/scheduler/api/schedule/submit/%s' % coordinator.id,
+          'show_dryrun': False,
           'return_json': request.GET.get('format') == 'json',
           'interface': interface
       },
