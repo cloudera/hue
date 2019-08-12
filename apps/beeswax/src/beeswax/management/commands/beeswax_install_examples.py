@@ -16,6 +16,7 @@
 # limitations under the License.
 
 from builtins import object
+import csv
 import logging
 import os
 import pwd
@@ -35,11 +36,13 @@ from useradmin.models import get_default_user_group, install_sample_user
 import beeswax.conf
 from beeswax.models import SavedQuery, HQL, IMPALA
 from beeswax.design import hql_query
+from beeswax.hive_site import has_concurrency_support
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config, QueryServerException
 
 
 LOG = logging.getLogger(__name__)
+MAX_INSERTED_ROWS = 1000
 
 
 class InstallException(Exception):
@@ -60,7 +63,7 @@ class Command(BaseCommand):
       db_name = options.get('db_name', 'default')
       user = options['user']
 
-    tables = options['tables'] if 'tables' in options else 'tables.json'
+    tables = options['tables'] if 'tables' in options else ('tables_transactional.json' if has_concurrency_support() else 'tables.json')
 
     exception = None
 
@@ -76,7 +79,7 @@ class Command(BaseCommand):
 
     if exception is not None:
       pretty_msg = None
-      
+
       if "AlreadyExistsException" in exception.message:
         pretty_msg = _("SQL table examples already installed.")
       if "Permission denied" in exception.message:
@@ -84,7 +87,7 @@ class Command(BaseCommand):
 
       if pretty_msg is not None:
         raise PopupException(pretty_msg)
-      else: 
+      else:
         raise exception
 
   def _install_tables(self, django_user, app_name, db_name, tables):
@@ -199,25 +202,42 @@ class SampleTable(object):
 
     hql = LOAD_PARTITION_HQL % {'tablename': self.name, 'partition_spec': partition_spec, 'filepath': hdfs_root_destination}
     LOG.info('Running load query: %s' % hql)
-    self._load_data_to_table(django_user, hql, hdfs_file_destination)
+    self._load_data_to_table(django_user, hql)
 
 
   def load(self, django_user):
     """
     Upload data to HDFS home of user then load (aka move) it into the Hive table (in the Hive metastore in HDFS).
     """
-    LOAD_HQL = \
-      """
-      LOAD DATA INPATH
-      '%(filename)s' OVERWRITE INTO TABLE %(tablename)s
-      """
+    if has_concurrency_support():
+      with open(self._contents_file) as f:
+        data = f.read()
+        dialect = csv.Sniffer().sniff(data)
+        reader = csv.reader(data.splitlines(), delimiter=dialect.delimiter)
 
-    hdfs_root_destination = self._get_hdfs_root_destination(django_user)
-    hdfs_file_destination = self._upload_to_hdfs(django_user, self._contents_file, hdfs_root_destination)
+        rows = [', '.join("'%s'" % col.replace("'", "\\'") for col in row) for row in reader][:MAX_INSERTED_ROWS]
+        hql = \
+          """
+          INSERT INTO TABLE %(tablename)s
+          VALUES %(values)s
+          """ % {
+            'tablename': self.name,
+            'values': ', '.join('(%s)' % row for row in rows)
+          }
+    else:
+      hdfs_root_destination = self._get_hdfs_root_destination(django_user)
+      hdfs_file_destination = self._upload_to_hdfs(django_user, self._contents_file, hdfs_root_destination)
+      hql = \
+        """
+        LOAD DATA INPATH
+        '%(filename)s' OVERWRITE INTO TABLE %(tablename)s
+        """ % {
+          'tablename': self.name,
+          'filename': hdfs_file_destination
+        }
 
-    hql = LOAD_HQL % {'tablename': self.name, 'filename': hdfs_file_destination}
     LOG.info('Running load query: %s' % hql)
-    self._load_data_to_table(django_user, hql, hdfs_file_destination)
+    self._load_data_to_table(django_user, hql)
 
 
   def _check_file_contents(self, filepath):
@@ -270,7 +290,7 @@ class SampleTable(object):
     return hdfs_destination
 
 
-  def _load_data_to_table(self, django_user, hql, hdfs_destination):
+  def _load_data_to_table(self, django_user, hql):
     LOG.info('Loading data into table "%s"' % (self.name,))
     query = hql_query(hql)
 
