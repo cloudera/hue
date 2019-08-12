@@ -149,9 +149,9 @@ def close_statement_async(notebook, snippet, **kwargs):
 @app.task(ignore_result=True)
 def run_sync_query(doc_id, user):
   '''Independently run a query as a user.'''
-  # Add INSERT INTO table if persit result
-  # Add variables
-  # Return when done. send email notification. get taskid.
+  # Add INSERT INTO table if persist result
+  # Add variable substitution
+  # Send notifications: done/on failure
   if type(user) is str:
     user = User.objects.get(username=user)
 
@@ -162,13 +162,14 @@ def run_sync_query(doc_id, user):
   editor_type = snippet['type']
   sql = _get_statement(notebook)
   request = MockedDjangoRequest(user=user)
+  last_executed=time.mktime(datetime.datetime.now().timetuple()) * 1000
 
   notebook = make_notebook(
-      name='Scheduler query N',
+      name='Scheduled query %s at %s' % (query_document.name, last_executed),
       editor_type=editor_type,
       statement=sql,
       status='ready',
-      last_executed=time.mktime(datetime.datetime.now().timetuple()) * 1000,
+      last_executed=last_executed,
       is_task=True
   )
 
