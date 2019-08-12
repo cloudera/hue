@@ -152,6 +152,9 @@ def run_sync_query(doc_id, user):
   # Add INSERT INTO table if persit result
   # Add variables
   # Return when done. send email notification. get taskid.
+  if type(user) is str:
+    user = User.objects.get(username=user)
+
   query_document = Document2.objects.document(user=user, doc_id=doc_id)
   notebook = Notebook(document=query_document).get_data()
   snippet = notebook['snippets'][0]
