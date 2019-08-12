@@ -48,6 +48,7 @@ import datetime
 import json
 import logging
 import uuid
+import re
 import sys
 import textwrap
 
@@ -96,7 +97,7 @@ class SqlAlchemyApi(Api):
   def __init__(self, user, interpreter):
     self.user = user
     self.options = interpreter['options']
-    self.backticks = '"' if self.options['url'].startswith('postgresql://') or self.options['url'].startswith('awsathena') else '`'
+    self.backticks = '"' if re.match('^(postgresql://|awsathena)', self.options.get('url', '')) else '`'
 
   def _create_engine(self):
     if '${' in self.options['url']: # URL parameters substitution

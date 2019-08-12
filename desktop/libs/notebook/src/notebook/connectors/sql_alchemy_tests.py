@@ -42,9 +42,27 @@ class TestApi():
     grant_access("test", "default", "notebook")
 
 
+  def test_column_backticks_escaping(self):
+    interpreter = {
+      'options': {
+        'url': 'mysql://'
+      }
+    }
+    assert_equal(SqlAlchemyApi(self.user, interpreter).backticks, '`')
+
+    interpreter = {
+      'options': {
+        'url': 'postgresql://'
+      }
+    }
+    assert_equal(SqlAlchemyApi(self.user, interpreter).backticks, '"')
+
+
   def test_create_athena_engine(self):
     interpreter = {
-      'options': {"url": "awsathena+rest://XXXXXXXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?s3_staging_dir=s3://gethue-athena/scratch"}
+      'options': {
+        'url': 'awsathena+rest://XXXXXXXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?s3_staging_dir=s3://gethue-athena/scratch'
+      }
     }
 
     with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
@@ -53,8 +71,9 @@ class TestApi():
 
   def test_fetch_result_empty(self):
     interpreter = {
-      'options': {},
-      'url': 'mysql://hue:localhost@hue:3306/hue'
+      'options': {
+        'url': 'mysql://hue:localhost@hue:3306/hue'
+      },
     }
 
     notebook = Mock()
@@ -87,7 +106,9 @@ class TestApi():
 
   def test_fetch_result_rows(self):
     interpreter = {
-      'options': {}
+      'options': {
+        'url': 'mysql://hue:localhost@hue:3306/hue'
+      }
     }
 
     notebook = Mock()
