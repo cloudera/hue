@@ -55,10 +55,11 @@ _CNF_HIVESERVER2_TRUSTSTORE_PASSWORD = 'hive.server2.truststore.password'
 _CNF_HIVESERVER2_TRANSPORT_MODE = 'hive.server2.transport.mode'
 _CNF_HIVESERVER2_THRIFT_HTTP_PORT = 'hive.server2.thrift.http.port'
 _CNF_HIVESERVER2_THRIFT_HTTP_PATH = 'hive.server2.thrift.http.path'
-
 _CNF_HIVESERVER2_THRIFT_SASL_QOP = 'hive.server2.thrift.sasl.qop'
 
 _CNF_HIVESERVER2_USE_SASL = 'hive.metastore.sasl.enabled'
+
+_CNF_HIVE_SUPPORT_CONCURRENCY = 'hive.support.concurrency'
 
 
 # Host is whatever up to the colon. Allow and ignore a trailing slash.
@@ -175,6 +176,15 @@ def hiveserver2_thrift_http_path():
   return get_conf().get(_CNF_HIVESERVER2_THRIFT_HTTP_PATH, 'cliservice')
 
 
+def get_use_sasl():
+  return get_conf().get(_CNF_HIVESERVER2_USE_SASL)
+
+
+def has_concurrency_support():
+  '''For SQL transactions like INSERT, DELETE, UPDATE'''
+  return get_conf().get(_CNF_HIVE_SUPPORT_CONCURRENCY, 'FALSE').upper() == 'TRUE'
+
+
 def _parse_hive_site():
   """
   Parse hive-site.xml and store in _HIVE_SITE_DICT
@@ -200,6 +210,3 @@ def get_hive_site_content():
     return ''
   else:
     return file(hive_site_path, 'r').read()
-
-def get_use_sasl():
-  return get_conf().get(_CNF_HIVESERVER2_USE_SASL)
