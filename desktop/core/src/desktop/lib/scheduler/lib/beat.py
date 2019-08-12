@@ -20,12 +20,23 @@ import json
 from django_celery_beat.models import PeriodicTask, CrontabSchedule, IntervalSchedule
 
 from desktop.lib.scheduler.lib.api import Api
+from desktop.models import Document2
 
 
 class CeleryBeatApi(Api):
 
   def submit_schedule(self, request, coordinator, mapping):
+    '''
+    coordinator
+      Document2.objects.get(uuid=coordinator.get_data_for_json()['properties']['document'])
+
+    mapping
+      {u'oozie.use.system.libpath': u'True', 'dryrun': False, u'start_date': u'2019-08-10T17:02', u'end_date': u'2019-08-17T17:02'}
+    '''
     is_cron = True # IntervalSchedule is buggy https://github.com/celery/django-celery-beat/issues/279
+
+    # Assumes SQL queries currently
+    document = Document2.objects.get(uuid=coordinator.get_data_for_json()['properties']['document'])
 
     if is_cron:
       schedule, created = CrontabSchedule.objects.get_or_create(
@@ -38,9 +49,12 @@ class CeleryBeatApi(Api):
 
       task = PeriodicTask.objects.update_or_create(
         crontab=schedule,
-        name='Scheduled query N',
+        name='Scheduled document %(user)s %(uuid)s' % {
+          'user': request.user.username,
+          'uuid': document.uuid
+        },
         task='notebook.tasks.run_sync_query',
-        defaults={"args": json.dumps(['a7428a99-2f77-cf3a-ebbd-460f19ba46cc', request.user.username])},
+        defaults={"args": json.dumps([document.uuid, request.user.username])},
       )
       task.enabled=True
       task.save()
