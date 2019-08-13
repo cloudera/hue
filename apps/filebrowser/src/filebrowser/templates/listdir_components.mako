@@ -486,6 +486,9 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         <div id="directoryNameExistsAlert" class="hide" style="position: absolute; left: 10px;">
           <span class="label label-important"><span class="newName"></span> ${_('already exists.')}</span>
         </div>
+        <div id="smallFileSystemNameAlert" class="hide" style="position: absolute; left: 10px;">
+          <span class="label label-important"><span class="newName"></span> ${_('File system requires namesize to be 3 or more characters')}</span>
+        </div>
         <a class="btn" href="#" data-dismiss="modal">${_('Cancel')}</a>
         <input class="btn btn-primary" type="submit" value="${_('Create')}" />
       </div>
@@ -1803,6 +1806,12 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           resetPrimaryButtonsStatus(); //globally available
           return false;
         }
+        if ($("#newDirectoryNameInput").val().length < 3 && self.isABFSRoot()) {
+          $("#smallFileSystemNameAlert").show();
+          $("#newDirectoryNameInput").addClass("fieldError");
+          resetPrimaryButtonsStatus(); //globally available
+          return false;
+        }
         $(formElement).ajaxSubmit({
           dataType:  'json',
           success: function() {
@@ -2384,6 +2393,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         $("#newDirectoryNameInput").removeClass("fieldError");
         $("#directoryNameRequiredAlert").hide();
         $("#directoryNameExistsAlert").hide();
+        $("#smallFileSystemNameAlert").hide();
       });
 
       $("#newFileNameInput").focus(function () {
