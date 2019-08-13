@@ -61,6 +61,20 @@ const TEMPLATE = `
       </a>
       <!-- /ko -->
       <!-- /ko -->
+      <!-- ko if: type === 'abfs' && path !== '/' && window.SHOW_UPLOAD_BUTTON -->
+      <a class="inactive-action" data-bind="dropzone: {
+            url: '/filebrowser/upload/file?dest=' + 'abfs:/' + path,
+            params: { dest: 'abfs:/' + path },
+            paramName: 'hdfs_file',
+            onError: function(x, e){ $(document).trigger('error', e); },
+            onComplete: function () { huePubSub.publish('assist.storage.refresh'); } }" title="${I18n(
+              'Upload file'
+            )}" href="javascript:void(0)">
+        <div class="dz-message inline" data-dz-message><i class="pointer fa fa-plus" title="${I18n(
+          'Upload file'
+        )}"></i></div>
+      </a>
+      <!-- /ko -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.storage.refresh'); }" title="${I18n(
         'Manual refresh'
       )}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }"></i></a>
