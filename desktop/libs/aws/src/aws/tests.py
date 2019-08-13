@@ -45,7 +45,7 @@ class TestAWS(unittest.TestCase):
 
   def test_with_idbroker(self):
     try:
-      finish = conf.AWS_ACCOUNTS.set_for_testing({'default': {}})
+      finish = conf.AWS_ACCOUNTS.set_for_testing({}) # Set empty to test when no configs are set
       with patch('aws.client.conf_idbroker.get_conf') as get_conf:
         with patch('aws.client.Client.get_s3_connection'):
           with patch('aws.client.IDBroker.get_cab') as get_cab:
