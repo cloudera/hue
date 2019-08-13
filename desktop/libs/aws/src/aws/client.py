@@ -180,7 +180,8 @@ class Client(object):
       return cls(
         aws_access_key_id=credentials.get('AccessKeyId'),
         aws_secret_access_key=credentials.get('SecretAccessKey'),
-        aws_security_token=credentials.get('SessionToken')
+        aws_security_token=credentials.get('SessionToken'),
+        expiration=credentials.get('Expiration')
       )
 
   def get_s3_connection(self):
