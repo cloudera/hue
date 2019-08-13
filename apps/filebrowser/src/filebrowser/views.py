@@ -226,10 +226,6 @@ def view(request, path):
 
         if "Connection refused" in e.message:
             msg += _(" The HDFS REST service is not available. ")
-        elif request.fs._get_scheme(path).lower() == 'hdfs':
-            if is_admin(request.user) and not _is_hdfs_superuser(request):
-                msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
-                        % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
 
         if request.is_ajax():
           exception = {
@@ -1097,14 +1093,10 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
                 op(*args)
             except (IOError, WebHdfsException) as e:
                 msg = _("Cannot perform operation.")
-                # TODO: Only apply this message for HDFS
-                if is_admin(request.user) and not _is_hdfs_superuser(request):
-                    msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
-                           % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
                 raise PopupException(msg, detail=e)
             except S3FileSystemException as e:
-              msg = _("S3 filesystem exception.")
-              raise PopupException(msg, detail=e)
+                msg = _("S3 filesystem exception.")
+                raise PopupException(msg, detail=e)
             except NotImplementedError as e:
                 msg = _("Cannot perform operation.")
                 raise PopupException(msg, detail=e)
