@@ -473,8 +473,16 @@ class ABFS(object):
     """
     Renames a file
     """ 
+    LOG.debug("%s\n%s" %(old, new))
     headers = {'x-ms-rename-source' : '/' + Init_ABFS.strip_scheme(old) }
-    self._create_path(new, headers = headers, overwrite= True)
+    try:
+      self._create_path(new, headers = headers, overwrite= True)
+    except WebHdfsException as e:
+      if e.code == 409:
+        self.copy(old, new)
+        self.rmtree(old)
+      else:
+        raise e
 
   def rename_star(self, old_dir, new_dir):
     """
