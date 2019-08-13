@@ -182,7 +182,7 @@ def get_use_sasl():
 
 def has_concurrency_support():
   '''For SQL transactions like INSERT, DELETE, UPDATE since Hive 3.'''
-  return get_conf().get(_CNF_HIVE_SUPPORT_CONCURRENCY, 'TRUE').upper() == 'TRUE' or True
+  return get_conf().get(_CNF_HIVE_SUPPORT_CONCURRENCY, 'TRUE').upper() == 'TRUE'
 
 
 def _parse_hive_site():
