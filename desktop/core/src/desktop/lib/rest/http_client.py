@@ -19,6 +19,7 @@ import posixpath
 import requests
 import threading
 import urllib
+
 from urlparse import urlparse
 
 from django.utils.encoding import iri_to_uri, smart_str
@@ -27,9 +28,10 @@ from django.utils.http import urlencode
 from desktop import conf
 
 from requests import exceptions
-from requests.auth import HTTPBasicAuth, HTTPDigestAuth
+from requests.auth import AuthBase ,HTTPBasicAuth, HTTPDigestAuth
 from requests_kerberos import HTTPKerberosAuth, REQUIRED, OPTIONAL, DISABLED
 from urllib3.contrib import pyopenssl
+
 
 pyopenssl.DEFAULT_SSL_CIPHER_LIST = conf.SSL_CIPHER_LIST.get()
 
@@ -39,6 +41,7 @@ LOG = logging.getLogger(__name__)
 
 CACHE_SESSION = {}
 CACHE_SESSION_LOCK = threading.Lock()
+
 
 def get_request_session(url, logger):
   global CACHE_SESSION, CACHE_SESSION_LOCK
@@ -51,6 +54,7 @@ def get_request_session(url, logger):
       logger.debug("Setting session adapter for %s" % url)
 
   return CACHE_SESSION
+
 
 class RestException(Exception):
   """
@@ -133,6 +137,9 @@ class HttpClient(object):
     self._session.auth = HTTPDigestAuth(username, password)
     return self
 
+  def set_bearer_auth(self, token):
+    self._session.auth = HTTPBearerAuth(token)
+
   def set_headers(self, headers):
     """
     Add headers to the request
@@ -141,7 +148,6 @@ class HttpClient(object):
     """
     self._session.headers.update(headers)
     return self
-
 
   @property
   def base_url(self):
@@ -154,7 +160,7 @@ class HttpClient(object):
   def set_verify(self, verify=True):
     self._session.verify = verify
     return self
-      
+
   def _get_headers(self, headers):
     if headers:
       self._session.headers.update(headers)
@@ -222,3 +228,20 @@ class HttpClient(object):
       param_str = urlencode(params)
       res += '?' + param_str
     return iri_to_uri(res)
+
+
+class HTTPBearerAuth(AuthBase):
+    """Attaches HTTP Basic Authentication to the given Request object."""
+
+    def __init__(self, token):
+        self.token = token
+
+    def __eq__(self, other):
+        return self.token == getattr(other, 'token', None)
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __call__(self, r):
+        r.headers['Authorization'] = 'Bearer %s' % self.token
+        return r

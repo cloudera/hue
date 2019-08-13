@@ -51,7 +51,7 @@ class Credentials(object):
     credentials = {}
     from beeswax import hive_site, conf
 
-    if not hasattr(conf.HIVE_SERVER_HOST, 'get'):
+    if not hasattr(conf.HIVE_SERVER_HOST, 'get') or not conf.HIVE_SERVER_HOST.get():
       LOG.warn('Could not get all the Oozie credentials: beeswax app is blacklisted.')
     else:
       if hive_properties is None:

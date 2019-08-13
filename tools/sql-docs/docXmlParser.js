@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable no-restricted-syntax */
+
 const DocFragment = require('./DocFragment');
 const Topic = require('./Topic');
 const extractorUtils = require('./extractorUtils');
@@ -21,8 +23,10 @@ const libxml = require('libxmljs');
 
 const LOG_NAME = 'docXmlParser.js';
 
-const isHidden = (docElement) => docElement.attr('audience') &&
-  (docElement.attr('audience').value() === 'hidden' || docElement.attr('audience').value() === 'PDF');
+const isHidden = docElement =>
+  docElement.attr('audience') &&
+  (docElement.attr('audience').value() === 'hidden' ||
+    docElement.attr('audience').value() === 'PDF');
 
 // Turn relative anchor or topic links into absolute
 const makeAbsoluteRef = (href, topic) => {
@@ -45,23 +49,35 @@ const makeAbsoluteRef = (href, topic) => {
 
 const parseTopic = (topic, cssClassPrefix, conrefCallback) => {
   return new Promise((resolve, reject) => {
-    extractorUtils.readFile(topic.docRootPath + (~topic.ref.indexOf('#') ? topic.ref.replace(/#.*$/, '') : topic.ref)).then(contents => {
-      let xmlDoc = libxml.parseXmlString(contents);
-      let docElement = xmlDoc.root();
-      if (~topic.ref.indexOf('#')) {
-        docElement = docElement.get('//*[@id=\'' + topic.ref.replace(/^.*#/, '') + '\']')
-      }
-      parseDocElement(docElement, topic.domXml, cssClassPrefix, topic, undefined, conrefCallback);
+    extractorUtils
+      .readFile(
+        topic.docRootPath + (~topic.ref.indexOf('#') ? topic.ref.replace(/#.*$/, '') : topic.ref)
+      )
+      .then(contents => {
+        const xmlDoc = libxml.parseXmlString(contents);
+        let docElement = xmlDoc.root();
+        if (~topic.ref.indexOf('#')) {
+          docElement = docElement.get("//*[@id='" + topic.ref.replace(/^.*#/, '') + "']");
+        }
+        parseDocElement(docElement, topic.domXml, cssClassPrefix, topic, undefined, conrefCallback);
 
-      resolve();
-    }).catch(reject);
-  })
+        resolve();
+      })
+      .catch(reject);
+  });
 };
 
-const parseDocElement = (docElement, domElement, cssClassPrefix, topic, activeFragment, conrefCallback) => {
+const parseDocElement = (
+  docElement,
+  domElement,
+  cssClassPrefix,
+  topic,
+  activeFragment,
+  conrefCallback
+) => {
   // return in the switch stops the recursion at this node
   if (extractorUtils.hasAttributes(docElement, 'conref')) {
-    let absoluteConRef = makeAbsoluteRef(docElement.attr('conref').value(), topic);
+    const absoluteConRef = makeAbsoluteRef(docElement.attr('conref').value(), topic);
     docElement.attr('conref', absoluteConRef);
     conrefCallback(topic, absoluteConRef.replace(/#.*$/, ''));
   }
@@ -80,11 +96,11 @@ const parseDocElement = (docElement, domElement, cssClassPrefix, topic, activeFr
     case 'colspec':
     case 'dlentry':
       if (extractorUtils.hasAttributes(docElement, 'id')) {
-        let id = docElement.attr('id') && docElement.attr('id').value();
+        const id = docElement.attr('id') && docElement.attr('id').value();
         // Move id attribute to first child element
-        for (let node of docElement.childNodes()) {
+        for (const node of docElement.childNodes()) {
           if (node.type() === 'element') {
-            node.attr({'id': id});
+            node.attr({ id: id });
             break;
           }
         }
@@ -124,7 +140,7 @@ const parseDocElement = (docElement, domElement, cssClassPrefix, topic, activeFr
       break;
     case 'sthead':
       domElement = domElement.node('tr');
-      domElement.attr({ 'class': cssClassPrefix + 'doc-sthead' });
+      domElement.attr({ class: cssClassPrefix + 'doc-sthead' });
       break;
     case 'stentry':
       domElement = domElement.node('td');
@@ -137,15 +153,28 @@ const parseDocElement = (docElement, domElement, cssClassPrefix, topic, activeFr
       domElement = domElement.node('tr');
       break;
     case 'entry':
-      if (docElement.parent().name().toLowerCase() === 'row') {
+      if (
+        docElement
+          .parent()
+          .name()
+          .toLowerCase() === 'row'
+      ) {
         domElement = domElement.node('td');
       } else {
-        console.log('%s: Got "entry" element without a parent "row": %s in ref %s', LOG_NAME, docElement.toString(), topic.ref);
+        console.log(
+          '%s: Got "entry" element without a parent "row": %s in ref %s',
+          LOG_NAME,
+          docElement.toString(),
+          topic.ref
+        );
         return;
       }
       break;
     case 'xref':
-      if (extractorUtils.hasAttributes(docElement, 'href') && (!docElement.attr('scope') || docElement.attr('scope').value() !== 'external')) {
+      if (
+        extractorUtils.hasAttributes(docElement, 'href') &&
+        (!docElement.attr('scope') || docElement.attr('scope').value() !== 'external')
+      ) {
         docElement.attr('href', makeAbsoluteRef(docElement.attr('href').value(), topic));
       }
     case 'image':
@@ -154,21 +183,29 @@ const parseDocElement = (docElement, domElement, cssClassPrefix, topic, activeFr
       // These elements are dealt with later, we don't deep clone as there might be child elements to parse
       domElement = domElement.node(docElement.name());
       docElement.attrs().forEach(attr => {
-        domElement.attr(attr.name(), attr.value())
+        domElement.attr(attr.name(), attr.value());
       });
       break;
     case 'object':
       if (extractorUtils.hasAttributes(docElement, ['data', 'outputclass'])) {
         domElement = domElement.node('iframe');
-        domElement.attr({ 'class': cssClassPrefix + 'doc-iframe', 'src': docElement.attr('data').value() });
+        domElement.attr({
+          class: cssClassPrefix + 'doc-iframe',
+          src: docElement.attr('data').value()
+        });
         if (extractorUtils.hasAttributes(docElement, 'width')) {
-          domElement.attr({ 'width': docElement.attr('width').value() });
+          domElement.attr({ width: docElement.attr('width').value() });
         }
         if (extractorUtils.hasAttributes(docElement, 'height')) {
-          domElement.attr({ 'height': docElement.attr('height').value() });
+          domElement.attr({ height: docElement.attr('height').value() });
         }
       } else {
-        console.log('%s: Got "object" element without data and outputclass: %s in ref %s', LOG_NAME, docElement.toString(), topic.ref);
+        console.log(
+          '%s: Got "object" element without data and outputclass: %s in ref %s',
+          LOG_NAME,
+          docElement.toString(),
+          topic.ref
+        );
         return;
       }
       break;
@@ -189,7 +226,7 @@ const parseDocElement = (docElement, domElement, cssClassPrefix, topic, activeFr
         return;
       }
       domElement = domElement.node('span');
-      domElement.attr({ 'class': cssClassPrefix + 'doc-' + docElement.name() });
+      domElement.attr({ class: cssClassPrefix + 'doc-' + docElement.name() });
       break;
     case 'codeblock':
     case 'conbodydiv':
@@ -206,16 +243,18 @@ const parseDocElement = (docElement, domElement, cssClassPrefix, topic, activeFr
         return;
       }
       domElement = domElement.node('div');
-      domElement.attr({ 'class': cssClassPrefix + 'doc-' + docElement.name() });
+      domElement.attr({ class: cssClassPrefix + 'doc-' + docElement.name() });
       if (docElement.name() === 'title' && activeFragment && !activeFragment.title) {
         activeFragment.title = domElement;
       }
       break;
     case 'text':
       if (docElement.text().trim()) {
-        let firstInDiv = domElement.name() === 'div' && domElement.childNodes().length === 0;
+        const firstInDiv = domElement.name() === 'div' && domElement.childNodes().length === 0;
         domElement = domElement.node('text');
-        domElement.replace(firstInDiv ? docElement.text().replace(/^[\n\r]*/, '') : docElement.text());
+        domElement.replace(
+          firstInDiv ? docElement.text().replace(/^[\n\r]*/, '') : docElement.text()
+        );
       }
       break;
     case 'abstract':
@@ -236,26 +275,28 @@ const parseDocElement = (docElement, domElement, cssClassPrefix, topic, activeFr
     case undefined:
       if (/^<\!\[cdata.*/i.test(docElement.toString())) {
         if (docElement.text().trim()) {
-          let firstInDiv = domElement.name() === 'div' && domElement.childNodes().length === 0;
+          const firstInDiv = domElement.name() === 'div' && domElement.childNodes().length === 0;
           domElement = domElement.node('text');
-          domElement.replace(firstInDiv ? docElement.text().replace(/^[\n\r]*/, '') : docElement.text());
+          domElement.replace(
+            firstInDiv ? docElement.text().replace(/^[\n\r]*/, '') : docElement.text()
+          );
         }
         break;
       }
     default:
-      console.log('%s: Can\'t handle node: %s in ref %s', LOG_NAME, docElement.name(), topic.ref);
+      console.log("%s: Can't handle node: %s in ref %s", LOG_NAME, docElement.name(), topic.ref);
       return;
   }
 
   if (isHidden(docElement)) {
-    domElement.attr({ 'style': 'display:none;' });
+    domElement.attr({ style: 'display:none;' });
   }
 
   if (extractorUtils.hasAttributes(docElement, 'id')) {
-    let fragmentId = docElement.attr('id') && docElement.attr('id').value();
-    let newFragment = new DocFragment(fragmentId, domElement);
+    const fragmentId = docElement.attr('id') && docElement.attr('id').value();
+    const newFragment = new DocFragment(fragmentId, domElement);
     if (!extractorUtils.hasAttributes(domElement, 'id') && domElement.type() === 'element') {
-      domElement.attr({'id': fragmentId});
+      domElement.attr({ id: fragmentId });
     }
     if (!topic.fragment) {
       topic.fragment = newFragment;
@@ -265,10 +306,17 @@ const parseDocElement = (docElement, domElement, cssClassPrefix, topic, activeFr
     activeFragment = newFragment;
   }
 
-  if (extractorUtils.hasAttributes(docElement, 'conref') && !extractorUtils.hasAttributes(domElement, 'conref')) {
+  if (
+    extractorUtils.hasAttributes(docElement, 'conref') &&
+    !extractorUtils.hasAttributes(domElement, 'conref')
+  ) {
     domElement.attr('conref', docElement.attr('conref').value());
   }
-  docElement.childNodes().forEach(childNode => parseDocElement(childNode, domElement, cssClassPrefix, topic, activeFragment, conrefCallback));
+  docElement
+    .childNodes()
+    .forEach(childNode =>
+      parseDocElement(childNode, domElement, cssClassPrefix, topic, activeFragment, conrefCallback)
+    );
 };
 
 /**
@@ -279,51 +327,56 @@ const parseDocElement = (docElement, domElement, cssClassPrefix, topic, activeFr
  * @param cssClassPrefix
  * @return {Promise}
  */
-const parseTopics = (parseResults, cssClassPrefix) => new Promise((resolve, reject) => {
-  let topicIndex = {};
-  let topicsToParse = [];
+const parseTopics = (parseResults, cssClassPrefix) =>
+  new Promise((resolve, reject) => {
+    const topicIndex = {};
+    const topicsToParse = [];
 
-  let populateTopicsFromTree = topics => {
-    topics.forEach(topic => {
-      topicsToParse.push(topic);
-      topicIndex[topic.ref] = true;
-      populateTopicsFromTree(topic.children);
-    })
-  };
+    const populateTopicsFromTree = topics => {
+      topics.forEach(topic => {
+        topicsToParse.push(topic);
+        topicIndex[topic.ref] = true;
+        populateTopicsFromTree(topic.children);
+      });
+    };
 
-  // Topics might be referenced from within .xml files thar are not part of the ditamap, we add them here to make
-  // sure they're parsed
-  let conrefCallback = (sourceTopic, ref) => {
-    if (!topicIndex[ref]) {
-      let topic = new Topic(sourceTopic.docRootPath, ref);
-      topicIndex[ref] = true;
-      topicsToParse.push(topic);
-      if (parseResults.length < 2) {
-        // We add additional topics to any ditamap parseresults except the first one, this prevents
-        // them from being part of the tree.
-        parseResults.push({
-          topics: [],
-          topicIndex: {},
-          keyDefs: {}
-        })
+    // Topics might be referenced from within .xml files thar are not part of the ditamap, we add them here to make
+    // sure they're parsed
+    const conrefCallback = (sourceTopic, ref) => {
+      if (!topicIndex[ref]) {
+        const topic = new Topic(sourceTopic.docRootPath, ref);
+        topicIndex[ref] = true;
+        topicsToParse.push(topic);
+        if (parseResults.length < 2) {
+          // We add additional topics to any ditamap parseresults except the first one, this prevents
+          // them from being part of the tree.
+          parseResults.push({
+            topics: [],
+            topicIndex: {},
+            keyDefs: {}
+          });
+        }
+        parseResults[parseResults.length - 1].topicIndex[ref] = topic;
       }
-      parseResults[parseResults.length - 1].topicIndex[ref] = topic;
-    }
-  };
+    };
 
-  parseResults.forEach(parseResult => populateTopicsFromTree(parseResult.topics));
+    parseResults.forEach(parseResult => populateTopicsFromTree(parseResult.topics));
 
-  let parseNextTopic = () => {
-    if (topicsToParse.length) {
-      parseTopic(topicsToParse.shift(), cssClassPrefix, conrefCallback).then(parseNextTopic).catch(reject);
-    } else {
-      resolve();
-    }
-  };
-  parseNextTopic();
-});
+    const parseNextTopic = () => {
+      if (topicsToParse.length) {
+        parseTopic(topicsToParse.shift(), cssClassPrefix, conrefCallback)
+          .then(parseNextTopic)
+          .catch(reject);
+      } else {
+        resolve();
+      }
+    };
+    parseNextTopic();
+  });
 
 module.exports = {
   parseTopics: parseTopics,
   isHidden: isHidden
 };
+
+/* eslint-enable no-restricted-syntax */

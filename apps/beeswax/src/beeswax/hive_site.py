@@ -19,6 +19,7 @@
 Helper for reading hive-site.xml
 """
 
+from builtins import str
 import errno
 import logging
 import os.path
@@ -56,6 +57,8 @@ _CNF_HIVESERVER2_THRIFT_HTTP_PORT = 'hive.server2.thrift.http.port'
 _CNF_HIVESERVER2_THRIFT_HTTP_PATH = 'hive.server2.thrift.http.path'
 
 _CNF_HIVESERVER2_THRIFT_SASL_QOP = 'hive.server2.thrift.sasl.qop'
+
+_CNF_HIVESERVER2_USE_SASL = 'hive.metastore.sasl.enabled'
 
 
 # Host is whatever up to the colon. Allow and ignore a trailing slash.
@@ -138,7 +141,8 @@ def hiveserver2_impersonation_enabled():
   return get_conf().get(_CNF_HIVESERVER2_IMPERSONATION, 'TRUE').upper() == 'TRUE'
 
 def hiveserver2_jdbc_url():
-  urlbase = 'jdbc:hive2://%s:%s/default' % (beeswax.conf.HIVE_SERVER_HOST.get(), beeswax.conf.HIVE_SERVER_PORT.get())
+  is_transport_mode_http = hiveserver2_transport_mode() == 'HTTP'
+  urlbase = 'jdbc:hive2://%s:%s/default' % (beeswax.conf.HIVE_SERVER_HOST.get(), hiveserver2_thrift_http_port() if is_transport_mode_http else beeswax.conf.HIVE_SERVER_PORT.get())
 
   if get_conf().get(_CNF_HIVESERVER2_USE_SSL, 'FALSE').upper() == 'TRUE':
     urlbase += ';ssl=true'
@@ -150,6 +154,10 @@ def hiveserver2_jdbc_url():
 
     if get_conf().get(_CNF_HIVESERVER2_TRUSTSTORE_PASSWORD):
       urlbase += ';trustStorePassword=%s' % get_conf().get(_CNF_HIVESERVER2_TRUSTSTORE_PASSWORD)
+
+  if is_transport_mode_http:
+    urlbase += ';transportMode=http'
+    urlbase += ';httpPath=%s' % hiveserver2_thrift_http_path()
 
   return urlbase
 
@@ -177,7 +185,7 @@ def _parse_hive_site():
   _HIVE_SITE_PATH = os.path.join(beeswax.conf.HIVE_CONF_DIR.get(), 'hive-site.xml')
   try:
     data = file(_HIVE_SITE_PATH, 'r').read()
-  except IOError, err:
+  except IOError as err:
     if err.errno != errno.ENOENT:
       LOG.error('Cannot read from "%s": %s' % (_HIVE_SITE_PATH, err))
       return
@@ -192,3 +200,6 @@ def get_hive_site_content():
     return ''
   else:
     return file(hive_site_path, 'r').read()
+
+def get_use_sasl():
+  return get_conf().get(_CNF_HIVESERVER2_USE_SASL)

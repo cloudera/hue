@@ -17,10 +17,11 @@
 */
 @import (reference) "cui/colors.less";
 @import (reference) "hue-mixins.less";
+@import "components/hue-app-switcher.less";
 @import "components/hue-breadcrumbs.less";
 @import "components/hue-catalog-entries-table.less";
 @import "components/hue-demi-modal.less";
-@import "components/hue-dw-sidebar.less";
+@import "components/hue-sidebar.less";
 @import "components/hue-execution-analysis.less";
 @import "components/hue-filechooser.less";
 @import "components/hue-gridster.less";
@@ -363,7 +364,7 @@ input[type='password']::-ms-reveal {
 }
 
 .dockable {
-  background-color: #fff;
+  background-color: @cui-white;
   z-index: 1000;
   padding-bottom: 2px;
 }

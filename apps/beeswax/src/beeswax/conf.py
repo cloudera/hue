@@ -15,23 +15,81 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import division
+from builtins import str
+from past.utils import old_div
 import logging
 import os.path
-import sys
-import beeswax.hive_site
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 from desktop.conf import default_ssl_cacerts, default_ssl_validate, AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD,\
   AUTH_USERNAME as DEFAULT_AUTH_USERNAME
 from desktop.lib.conf import ConfigSection, Config, coerce_bool, coerce_csv, coerce_password_from_script
-from desktop.lib.exceptions import StructuredThriftTransportException
-
-from beeswax.settings import NICE_NAME
 
 
 LOG = logging.getLogger(__name__)
 
+HIVE_DISCOVERY_LLAP = Config(
+  key="hive_discovery_llap",
+  help=_t("Have Hue determine Hive Server Interactive endpoint from zookeeper"),
+  default="false",
+  type=coerce_bool
+)
+
+HIVE_DISCOVERY_HS2 = Config(
+  key="hive_discovery_hs2",
+  help=_t("Determines whether we pull a random HiveServer2 from the list in zookeeper.  This HS2 instance is cached until hue is restarted."),
+  default="false",
+  type=coerce_bool
+)
+
+HIVE_DISCOVERY_LLAP_HA = Config(
+  key="hive_discovery_llap_ha",
+  help=_t("If you have more than one HSI server, it has a different znode setup.  This will trigger the code to check for the Active HSI Server"),
+  default="false",
+  type=coerce_bool
+)
+
+HIVE_DISCOVERY_LLAP_ZNODE = Config(
+  key="hive_discovery_llap_znode",
+  help=_t("If LLAP is enabled, you should be using zookeeper service discovery mode, this is the znode of the LLAP Master(s)"),
+  default="/hiveserver2-hive2"
+)
+
+HIVE_DISCOVERY_HIVESERVER2_ZNODE = Config(
+  key="hive_discovery_hiveserver2_znode",
+  help=_t("If Hive is using zookeeper service discovery mode, this is the znode of the hiveserver2(s)"),
+  default="/hiveserver2"
+)
+
+CACHE_TIMEOUT = Config(
+  key="cache_timeout",
+  help=_t("How long to pause before reaching back out to zookeeper to get the current Active HSI endpoint"),
+  default=60,
+  type=int
+)
+
+LLAP_SERVER_PORT = Config(
+  key="llap_server_port",
+  help=_t("Configure the base port the Hive Server Interactive runs on (10500 default)."),
+  default=10500,
+  type=int
+)
+
+LLAP_SERVER_THRIFT_PORT = Config(
+  key="llap_server_thrift_port",
+  help=_t("Configure the thrift port the Hive Server Interactive runs on (10501 default)"),
+  default=10501,
+  type=int
+)
+
+LLAP_SERVER_HOST = Config(
+  key="llap_server_host",
+  help=_t("Host where Hive Server Interactive is running. If Kerberos security is enabled, "
+         "the fully-qualified domain name (FQDN) is required"),
+  default="localhost"
+)
 
 HIVE_SERVER_HOST = Config(
   key="hive_server_host",
@@ -120,7 +178,7 @@ DOWNLOAD_CELL_LIMIT = Config(
 
 def get_deprecated_download_cell_limit():
   """Get the old default"""
-  return DOWNLOAD_CELL_LIMIT.get() / 100 if DOWNLOAD_CELL_LIMIT.get() > 0 else DOWNLOAD_CELL_LIMIT.get()
+  return old_div(DOWNLOAD_CELL_LIMIT.get(), 100) if DOWNLOAD_CELL_LIMIT.get() > 0 else DOWNLOAD_CELL_LIMIT.get()
 
 DOWNLOAD_ROW_LIMIT = Config(
   key='download_row_limit',
@@ -236,45 +294,17 @@ AUTH_PASSWORD_SCRIPT = Config(
   type=coerce_password_from_script,
   default=None)
 
+def get_use_sasl_default():
+  """Get from hive_site or backward compatibility"""
+  from hive_site import get_hiveserver2_authentication, get_use_sasl  # Cyclic dependency
+  use_sasl = get_use_sasl()
+  if use_sasl is not None:
+    return use_sasl.upper() == 'TRUE'
+  return get_hiveserver2_authentication() in ('KERBEROS', 'NONE', 'LDAP', 'PAM') # list for backward compatibility
 
-def config_validator(user):
-  # dbms is dependent on beeswax.conf (this file)
-  # import in method to avoid circular dependency
-  from beeswax.design import hql_query
-  from beeswax.server import dbms
-
-  res = []
-  try:
-    try:
-      if not 'test' in sys.argv: # Avoid tests hanging
-        server = dbms.get(user)
-        query = hql_query("SELECT 'Hello World!';")
-        handle = server.execute_and_wait(query, timeout_sec=10.0)
-
-        if handle:
-          server.fetch(handle, rows=100)
-          server.close(handle)
-    except StructuredThriftTransportException, e:
-      if 'Error validating the login' in str(e):
-        msg = 'Failed to authenticate to HiveServer2, check authentication configurations.'
-        LOG.exception(msg)
-        res.append((NICE_NAME, _(msg)))
-      else:
-        raise e
-  except Exception, e:
-    msg = "The application won't work without a running HiveServer2."
-    LOG.exception(msg)
-    res.append((NICE_NAME, _(msg)))
-
-  try:
-    from desktop.lib.fsmanager import get_filesystem
-    warehouse = beeswax.hive_site.get_metastore_warehouse_dir()
-    fs = get_filesystem()
-    fs.stats(warehouse)
-  except Exception:
-    msg = 'Failed to access Hive warehouse: %s'
-    LOG.exception(msg % warehouse)
-
-    return [(NICE_NAME, _(msg) % warehouse)]
-
-  return res
+USE_SASL = Config(
+  key="use_sasl",
+  help=_t("Use SASL framework to establish connection to host"),
+  private=False,
+  type=coerce_bool,
+  dynamic_default=get_use_sasl_default)

@@ -6,6 +6,8 @@
 #  options string: py:new_style
 #
 
+from builtins import range
+from builtins import object
 from thrift.Thrift import TType, TMessageType, TException, TApplicationException
 
 from thrift.transport import TTransport
@@ -448,7 +450,7 @@ class TTypeQualifierValue(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -484,7 +486,7 @@ class TTypeQualifiers(object):
         if ftype == TType.MAP:
           self.qualifiers = {}
           (_ktype1, _vtype2, _size0 ) = iprot.readMapBegin()
-          for _i4 in xrange(_size0):
+          for _i4 in range(_size0):
             _key5 = iprot.readString()
             _val6 = TTypeQualifierValue()
             _val6.read(iprot)
@@ -505,7 +507,7 @@ class TTypeQualifiers(object):
     if self.qualifiers is not None:
       oprot.writeFieldBegin('qualifiers', TType.MAP, 1)
       oprot.writeMapBegin(TType.STRING, TType.STRUCT, len(self.qualifiers))
-      for kiter7,viter8 in self.qualifiers.items():
+      for kiter7,viter8 in list(self.qualifiers.items()):
         oprot.writeString(kiter7)
         viter8.write(oprot)
       oprot.writeMapEnd()
@@ -526,7 +528,7 @@ class TTypeQualifiers(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -607,7 +609,7 @@ class TPrimitiveTypeEntry(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -674,7 +676,7 @@ class TArrayTypeEntry(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -756,7 +758,7 @@ class TMapTypeEntry(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -792,7 +794,7 @@ class TStructTypeEntry(object):
         if ftype == TType.MAP:
           self.nameToTypePtr = {}
           (_ktype10, _vtype11, _size9 ) = iprot.readMapBegin()
-          for _i13 in xrange(_size9):
+          for _i13 in range(_size9):
             _key14 = iprot.readString()
             _val15 = iprot.readI32()
             self.nameToTypePtr[_key14] = _val15
@@ -812,7 +814,7 @@ class TStructTypeEntry(object):
     if self.nameToTypePtr is not None:
       oprot.writeFieldBegin('nameToTypePtr', TType.MAP, 1)
       oprot.writeMapBegin(TType.STRING, TType.I32, len(self.nameToTypePtr))
-      for kiter16,viter17 in self.nameToTypePtr.items():
+      for kiter16,viter17 in list(self.nameToTypePtr.items()):
         oprot.writeString(kiter16)
         oprot.writeI32(viter17)
       oprot.writeMapEnd()
@@ -833,7 +835,7 @@ class TStructTypeEntry(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -869,7 +871,7 @@ class TUnionTypeEntry(object):
         if ftype == TType.MAP:
           self.nameToTypePtr = {}
           (_ktype19, _vtype20, _size18 ) = iprot.readMapBegin()
-          for _i22 in xrange(_size18):
+          for _i22 in range(_size18):
             _key23 = iprot.readString()
             _val24 = iprot.readI32()
             self.nameToTypePtr[_key23] = _val24
@@ -889,7 +891,7 @@ class TUnionTypeEntry(object):
     if self.nameToTypePtr is not None:
       oprot.writeFieldBegin('nameToTypePtr', TType.MAP, 1)
       oprot.writeMapBegin(TType.STRING, TType.I32, len(self.nameToTypePtr))
-      for kiter25,viter26 in self.nameToTypePtr.items():
+      for kiter25,viter26 in list(self.nameToTypePtr.items()):
         oprot.writeString(kiter25)
         oprot.writeI32(viter26)
       oprot.writeMapEnd()
@@ -910,7 +912,7 @@ class TUnionTypeEntry(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -977,7 +979,7 @@ class TUserDefinedTypeEntry(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1113,7 +1115,7 @@ class TTypeEntry(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1149,7 +1151,7 @@ class TTypeDesc(object):
         if ftype == TType.LIST:
           self.types = []
           (_etype30, _size27) = iprot.readListBegin()
-          for _i31 in xrange(_size27):
+          for _i31 in range(_size27):
             _elem32 = TTypeEntry()
             _elem32.read(iprot)
             self.types.append(_elem32)
@@ -1189,7 +1191,7 @@ class TTypeDesc(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1300,7 +1302,7 @@ class TColumnDesc(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1336,7 +1338,7 @@ class TTableSchema(object):
         if ftype == TType.LIST:
           self.columns = []
           (_etype37, _size34) = iprot.readListBegin()
-          for _i38 in xrange(_size34):
+          for _i38 in range(_size34):
             _elem39 = TColumnDesc()
             _elem39.read(iprot)
             self.columns.append(_elem39)
@@ -1376,7 +1378,7 @@ class TTableSchema(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1441,7 +1443,7 @@ class TBoolValue(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1506,7 +1508,7 @@ class TByteValue(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1571,7 +1573,7 @@ class TI16Value(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1636,7 +1638,7 @@ class TI32Value(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1701,7 +1703,7 @@ class TI64Value(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1766,7 +1768,7 @@ class TDoubleValue(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1831,7 +1833,7 @@ class TStringValue(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -1981,7 +1983,7 @@ class TColumnValue(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2017,7 +2019,7 @@ class TRow(object):
         if ftype == TType.LIST:
           self.colVals = []
           (_etype44, _size41) = iprot.readListBegin()
-          for _i45 in xrange(_size41):
+          for _i45 in range(_size41):
             _elem46 = TColumnValue()
             _elem46.read(iprot)
             self.colVals.append(_elem46)
@@ -2057,7 +2059,7 @@ class TRow(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2096,7 +2098,7 @@ class TBoolColumn(object):
         if ftype == TType.LIST:
           self.values = []
           (_etype51, _size48) = iprot.readListBegin()
-          for _i52 in xrange(_size48):
+          for _i52 in range(_size48):
             _elem53 = iprot.readBool()
             self.values.append(_elem53)
           iprot.readListEnd()
@@ -2147,7 +2149,7 @@ class TBoolColumn(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2186,7 +2188,7 @@ class TByteColumn(object):
         if ftype == TType.LIST:
           self.values = []
           (_etype58, _size55) = iprot.readListBegin()
-          for _i59 in xrange(_size55):
+          for _i59 in range(_size55):
             _elem60 = iprot.readByte()
             self.values.append(_elem60)
           iprot.readListEnd()
@@ -2237,7 +2239,7 @@ class TByteColumn(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2276,7 +2278,7 @@ class TI16Column(object):
         if ftype == TType.LIST:
           self.values = []
           (_etype65, _size62) = iprot.readListBegin()
-          for _i66 in xrange(_size62):
+          for _i66 in range(_size62):
             _elem67 = iprot.readI16()
             self.values.append(_elem67)
           iprot.readListEnd()
@@ -2327,7 +2329,7 @@ class TI16Column(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2366,7 +2368,7 @@ class TI32Column(object):
         if ftype == TType.LIST:
           self.values = []
           (_etype72, _size69) = iprot.readListBegin()
-          for _i73 in xrange(_size69):
+          for _i73 in range(_size69):
             _elem74 = iprot.readI32()
             self.values.append(_elem74)
           iprot.readListEnd()
@@ -2417,7 +2419,7 @@ class TI32Column(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2456,7 +2458,7 @@ class TI64Column(object):
         if ftype == TType.LIST:
           self.values = []
           (_etype79, _size76) = iprot.readListBegin()
-          for _i80 in xrange(_size76):
+          for _i80 in range(_size76):
             _elem81 = iprot.readI64()
             self.values.append(_elem81)
           iprot.readListEnd()
@@ -2507,7 +2509,7 @@ class TI64Column(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2546,7 +2548,7 @@ class TDoubleColumn(object):
         if ftype == TType.LIST:
           self.values = []
           (_etype86, _size83) = iprot.readListBegin()
-          for _i87 in xrange(_size83):
+          for _i87 in range(_size83):
             _elem88 = iprot.readDouble()
             self.values.append(_elem88)
           iprot.readListEnd()
@@ -2597,7 +2599,7 @@ class TDoubleColumn(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2636,7 +2638,7 @@ class TStringColumn(object):
         if ftype == TType.LIST:
           self.values = []
           (_etype93, _size90) = iprot.readListBegin()
-          for _i94 in xrange(_size90):
+          for _i94 in range(_size90):
             _elem95 = iprot.readString()
             self.values.append(_elem95)
           iprot.readListEnd()
@@ -2687,7 +2689,7 @@ class TStringColumn(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2726,7 +2728,7 @@ class TBinaryColumn(object):
         if ftype == TType.LIST:
           self.values = []
           (_etype100, _size97) = iprot.readListBegin()
-          for _i101 in xrange(_size97):
+          for _i101 in range(_size97):
             _elem102 = iprot.readString()
             self.values.append(_elem102)
           iprot.readListEnd()
@@ -2777,7 +2779,7 @@ class TBinaryColumn(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2941,7 +2943,7 @@ class TColumn(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -2988,7 +2990,7 @@ class TRowSet(object):
         if ftype == TType.LIST:
           self.rows = []
           (_etype107, _size104) = iprot.readListBegin()
-          for _i108 in xrange(_size104):
+          for _i108 in range(_size104):
             _elem109 = TRow()
             _elem109.read(iprot)
             self.rows.append(_elem109)
@@ -2999,7 +3001,7 @@ class TRowSet(object):
         if ftype == TType.LIST:
           self.columns = []
           (_etype113, _size110) = iprot.readListBegin()
-          for _i114 in xrange(_size110):
+          for _i114 in range(_size110):
             _elem115 = TColumn()
             _elem115.read(iprot)
             self.columns.append(_elem115)
@@ -3054,7 +3056,7 @@ class TRowSet(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -3107,7 +3109,7 @@ class TStatus(object):
         if ftype == TType.LIST:
           self.infoMessages = []
           (_etype121, _size118) = iprot.readListBegin()
-          for _i122 in xrange(_size118):
+          for _i122 in range(_size118):
             _elem123 = iprot.readString()
             self.infoMessages.append(_elem123)
           iprot.readListEnd()
@@ -3181,7 +3183,7 @@ class TStatus(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -3263,7 +3265,7 @@ class THandleIdentifier(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -3331,7 +3333,7 @@ class TSessionHandle(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -3442,7 +3444,7 @@ class TOperationHandle(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -3502,7 +3504,7 @@ class TOpenSessionReq(object):
         if ftype == TType.MAP:
           self.configuration = {}
           (_ktype126, _vtype127, _size125 ) = iprot.readMapBegin()
-          for _i129 in xrange(_size125):
+          for _i129 in range(_size125):
             _key130 = iprot.readString()
             _val131 = iprot.readString()
             self.configuration[_key130] = _val131
@@ -3534,7 +3536,7 @@ class TOpenSessionReq(object):
     if self.configuration is not None:
       oprot.writeFieldBegin('configuration', TType.MAP, 4)
       oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.configuration))
-      for kiter132,viter133 in self.configuration.items():
+      for kiter132,viter133 in list(self.configuration.items()):
         oprot.writeString(kiter132)
         oprot.writeString(viter133)
       oprot.writeMapEnd()
@@ -3558,7 +3560,7 @@ class TOpenSessionReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -3620,7 +3622,7 @@ class TOpenSessionResp(object):
         if ftype == TType.MAP:
           self.configuration = {}
           (_ktype135, _vtype136, _size134 ) = iprot.readMapBegin()
-          for _i138 in xrange(_size134):
+          for _i138 in range(_size134):
             _key139 = iprot.readString()
             _val140 = iprot.readString()
             self.configuration[_key139] = _val140
@@ -3652,7 +3654,7 @@ class TOpenSessionResp(object):
     if self.configuration is not None:
       oprot.writeFieldBegin('configuration', TType.MAP, 4)
       oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.configuration))
-      for kiter141,viter142 in self.configuration.items():
+      for kiter141,viter142 in list(self.configuration.items()):
         oprot.writeString(kiter141)
         oprot.writeString(viter142)
       oprot.writeMapEnd()
@@ -3678,7 +3680,7 @@ class TOpenSessionResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -3746,7 +3748,7 @@ class TCloseSessionReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -3814,7 +3816,7 @@ class TCloseSessionResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -3944,7 +3946,7 @@ class TGetInfoValue(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -4027,7 +4029,7 @@ class TGetInfoReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -4111,7 +4113,7 @@ class TGetInfoResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -4167,7 +4169,7 @@ class TExecuteStatementReq(object):
         if ftype == TType.MAP:
           self.confOverlay = {}
           (_ktype144, _vtype145, _size143 ) = iprot.readMapBegin()
-          for _i147 in xrange(_size143):
+          for _i147 in range(_size143):
             _key148 = iprot.readString()
             _val149 = iprot.readString()
             self.confOverlay[_key148] = _val149
@@ -4200,7 +4202,7 @@ class TExecuteStatementReq(object):
     if self.confOverlay is not None:
       oprot.writeFieldBegin('confOverlay', TType.MAP, 3)
       oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.confOverlay))
-      for kiter150,viter151 in self.confOverlay.items():
+      for kiter150,viter151 in list(self.confOverlay.items()):
         oprot.writeString(kiter150)
         oprot.writeString(viter151)
       oprot.writeMapEnd()
@@ -4230,7 +4232,7 @@ class TExecuteStatementReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -4312,7 +4314,7 @@ class TExecuteStatementResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -4380,7 +4382,7 @@ class TGetTypeInfoReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -4462,7 +4464,7 @@ class TGetTypeInfoResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -4530,7 +4532,7 @@ class TGetCatalogsReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -4612,7 +4614,7 @@ class TGetCatalogsResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -4706,7 +4708,7 @@ class TGetSchemasReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -4788,7 +4790,7 @@ class TGetSchemasResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -4857,7 +4859,7 @@ class TGetTablesReq(object):
         if ftype == TType.LIST:
           self.tableTypes = []
           (_etype155, _size152) = iprot.readListBegin()
-          for _i156 in xrange(_size152):
+          for _i156 in range(_size152):
             _elem157 = iprot.readString()
             self.tableTypes.append(_elem157)
           iprot.readListEnd()
@@ -4916,7 +4918,7 @@ class TGetTablesReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -4998,7 +5000,7 @@ class TGetTablesResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -5066,7 +5068,7 @@ class TGetTableTypesReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -5148,7 +5150,7 @@ class TGetTableTypesResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -5268,7 +5270,7 @@ class TGetColumnsReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -5350,7 +5352,7 @@ class TGetColumnsResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -5459,7 +5461,7 @@ class TGetFunctionsReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -5541,7 +5543,7 @@ class TGetFunctionsResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -5609,7 +5611,7 @@ class TGetOperationStatusReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -5729,7 +5731,7 @@ class TGetOperationStatusResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -5797,7 +5799,7 @@ class TCancelOperationReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -5865,7 +5867,7 @@ class TCancelOperationResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -5933,7 +5935,7 @@ class TCloseOperationReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -6001,7 +6003,7 @@ class TCloseOperationResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -6069,7 +6071,7 @@ class TGetResultSetMetadataReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -6151,7 +6153,7 @@ class TGetResultSetMetadataResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -6262,7 +6264,7 @@ class TFetchResultsReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -6357,7 +6359,7 @@ class TFetchResultsResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -6455,7 +6457,7 @@ class TGetDelegationTokenReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -6536,7 +6538,7 @@ class TGetDelegationTokenResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -6619,7 +6621,7 @@ class TCancelDelegationTokenReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -6687,7 +6689,7 @@ class TCancelDelegationTokenResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -6770,7 +6772,7 @@ class TRenewDelegationTokenReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -6838,7 +6840,7 @@ class TRenewDelegationTokenResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -6906,7 +6908,7 @@ class TGetLogReq(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -6989,7 +6991,7 @@ class TGetLogResp(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):

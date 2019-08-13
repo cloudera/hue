@@ -25,7 +25,9 @@ from hadoop.core_site import get_adls_client_id, get_adls_authentication_code, g
 
 LOG = logging.getLogger(__name__)
 
-REFRESH_URL = 'https://login.microsoftonline.com/<tenant_id>/oauth2/token'
+PERMISSION_ACTION_ABFS = "abfs_access"
+PERMISSION_ACTION_ADLS = "adls_access"
+REFRESH_URL = 'https://login.microsoftonline.com/<tenant_id>/oauth2/<version>token'
 
 
 def get_default_client_id():
@@ -49,8 +51,8 @@ def get_default_tenant_id():
   tenant_id_script = AZURE_ACCOUNTS['default'].TENANT_ID_SCRIPT.get()
   return tenant_id_script or get_adls_refresh_url()
 
-def get_default_refresh_url():
-  refresh_url = REFRESH_URL.replace('<tenant_id>', AZURE_ACCOUNTS['default'].TENANT_ID.get())
+def get_default_refresh_url(version):
+  refresh_url = REFRESH_URL.replace('<tenant_id>', AZURE_ACCOUNTS['default'].TENANT_ID.get()).replace('<version>', version + '/' if version else '')
   refresh_url = refresh_url if refresh_url else get_adls_refresh_url()
   return refresh_url or get_adls_refresh_url()
 
@@ -62,6 +64,12 @@ def get_default_adls_url():
 
 def get_default_adls_fs():
   return ADLS_CLUSTERS['default'].FS_DEFAULTFS.get()
+
+def get_default_abfs_url():
+  return ABFS_CLUSTERS['default'].WEBHDFS_URL.get()
+
+def get_default_abfs_fs():
+  return ABFS_CLUSTERS['default'].FS_DEFAULTFS.get()
 
 ADLS_CLUSTERS = UnspecifiedConfigSection(
   "adls_clusters",
@@ -121,25 +129,45 @@ AZURE_ACCOUNTS = UnspecifiedConfigSection(
   )
 )
 
+ABFS_CLUSTERS = UnspecifiedConfigSection(
+  "abfs_clusters",
+  help="One entry for each ABFS cluster",
+  each=ConfigSection(
+    help="Information about a single ABFS cluster",
+    members=dict(
+      FS_DEFAULTFS=Config("fs_defaultfs", help="abfss://<container_name>@<account_name>.dfs.core.windows.net", type=str, default=None),
+      WEBHDFS_URL=Config("webhdfs_url",
+                         help="https://<container_name>@<account_name>.dfs.core.windows.net",
+                         type=str, default=None),
+    )
+  )
+)
 
 def is_adls_enabled():
-  return ('default' in AZURE_ACCOUNTS.keys() and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() is not None)
+  return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() is not None and 'default' in list(ADLS_CLUSTERS.keys()) and ADLS_CLUSTERS['default'].get_raw())
+
+def is_abfs_enabled():
+  return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() is not None and 'default' in list(ABFS_CLUSTERS.keys()) and ABFS_CLUSTERS['default'].get_raw())
 
 def has_adls_access(user):
   from desktop.auth.backend import is_admin
   return user.is_authenticated() and user.is_active and (is_admin(user) or user.has_hue_permission(action="adls_access", app="filebrowser"))
+
+def has_abfs_access(user):
+  from desktop.auth.backend import is_admin
+  return user.is_authenticated() and user.is_active and (is_admin(user) or user.has_hue_permission(action="abfs_access", app="filebrowser"))
 
 def config_validator(user):
   res = []
 
   import azure.client # Avoid cyclic loop
 
-  if is_adls_enabled():
+  if is_adls_enabled() or is_abfs_enabled():
     try:
       headers = azure.client.get_client('default')._getheaders()
       if not headers.get('Authorization'):
         raise ValueError('Failed to obtain Azure authorization token')
-    except Exception, e:
+    except Exception as e:
       LOG.exception('Failed to obtain Azure authorization token.')
       res.append(('azure', _t('Failed to obtain Azure authorization token, check your azure configuration.')))
 

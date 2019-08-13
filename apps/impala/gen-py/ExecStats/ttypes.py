@@ -6,6 +6,8 @@
 #  options string: py:new_style
 #
 
+from builtins import range
+from builtins import object
 from thrift.Thrift import TType, TMessageType, TException, TApplicationException
 import Status.ttypes
 import Types.ttypes
@@ -144,7 +146,7 @@ class TExecStats(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -235,7 +237,7 @@ class TPlanNodeExecSummary(object):
         if ftype == TType.LIST:
           self.exec_stats = []
           (_etype3, _size0) = iprot.readListBegin()
-          for _i4 in xrange(_size0):
+          for _i4 in range(_size0):
             _elem5 = TExecStats()
             _elem5.read(iprot)
             self.exec_stats.append(_elem5)
@@ -246,7 +248,7 @@ class TPlanNodeExecSummary(object):
         if ftype == TType.LIST:
           self.is_active = []
           (_etype9, _size6) = iprot.readListBegin()
-          for _i10 in xrange(_size6):
+          for _i10 in range(_size6):
             _elem11 = iprot.readBool()
             self.is_active.append(_elem11)
           iprot.readListEnd()
@@ -339,7 +341,7 @@ class TPlanNodeExecSummary(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -417,7 +419,7 @@ class TExecProgress(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -479,7 +481,7 @@ class TExecSummary(object):
         if ftype == TType.LIST:
           self.nodes = []
           (_etype17, _size14) = iprot.readListBegin()
-          for _i18 in xrange(_size14):
+          for _i18 in range(_size14):
             _elem19 = TPlanNodeExecSummary()
             _elem19.read(iprot)
             self.nodes.append(_elem19)
@@ -490,7 +492,7 @@ class TExecSummary(object):
         if ftype == TType.MAP:
           self.exch_to_sender_map = {}
           (_ktype21, _vtype22, _size20 ) = iprot.readMapBegin()
-          for _i24 in xrange(_size20):
+          for _i24 in range(_size20):
             _key25 = iprot.readI32()
             _val26 = iprot.readI32()
             self.exch_to_sender_map[_key25] = _val26
@@ -501,7 +503,7 @@ class TExecSummary(object):
         if ftype == TType.LIST:
           self.error_logs = []
           (_etype30, _size27) = iprot.readListBegin()
-          for _i31 in xrange(_size27):
+          for _i31 in range(_size27):
             _elem32 = iprot.readString()
             self.error_logs.append(_elem32)
           iprot.readListEnd()
@@ -541,7 +543,7 @@ class TExecSummary(object):
     if self.exch_to_sender_map is not None:
       oprot.writeFieldBegin('exch_to_sender_map', TType.MAP, 4)
       oprot.writeMapBegin(TType.I32, TType.I32, len(self.exch_to_sender_map))
-      for kiter34,viter35 in self.exch_to_sender_map.items():
+      for kiter34,viter35 in list(self.exch_to_sender_map.items()):
         oprot.writeI32(kiter34)
         oprot.writeI32(viter35)
       oprot.writeMapEnd()
@@ -578,7 +580,7 @@ class TExecSummary(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):

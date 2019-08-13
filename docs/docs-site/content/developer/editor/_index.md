@@ -17,8 +17,7 @@ The [Editor Configuration]({{% param baseURL %}}administrator/configuration/edit
 
 Close to 100% of [Hive and Impala grammar](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/static/desktop/js/autocomplete/jison) is supported which makes the autocomplete extremly powerful. Other languages defaults to a generic SQL grammar.
 
-**Coming Soon**
-How to write your own SQL parser.
+See [How to write your own SQL parser]({{% param baseURL %}}developer/parsers/). Integrating [Apache Calcite](https://calcite.apache.org/docs/reference.html), [ZetaSql](https://github.com/google/zetasql)... would make SQL users even happier with a lot more Databases!
 
 ### HiveServer2 API
 Hive, Impala, SparkSQL

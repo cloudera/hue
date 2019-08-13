@@ -151,5 +151,3 @@ class Command(BaseCommand):
         end = time.time()
         elapsed = (end - start)
         LOG.debug("Total time elapsed (seconds): %.2f" % elapsed)
-
-

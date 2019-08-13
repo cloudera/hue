@@ -37,10 +37,8 @@ Usage:
 Optional flags:
     --debug             Turns on debugging output
 """
-from __future__ import print_function
 
 
-from builtins import str
 import getopt
 import logging
 import os
@@ -51,7 +49,6 @@ import build
 import common
 import pth
 import registry
-from functools import reduce
 
 PROG_NAME = sys.argv[0]
 
@@ -70,8 +67,8 @@ def usage(msg=None):
   """Print the usage with an optional message. And exit."""
   global __doc__
   if msg is not None:
-    print(msg, file=sys.stderr)
-  print(__doc__ % dict(PROG_NAME=PROG_NAME), file=sys.stderr)
+    print >>sys.stderr, msg
+  print >>sys.stderr, __doc__ % dict(PROG_NAME=PROG_NAME)
   sys.exit(1)
 
 
@@ -101,7 +98,7 @@ def get_app_info(app_loc):
       LOG.error("Error getting application info from %s:\n%s" % (app_loc, stderr))
       raise OSError(stderr)
     LOG.debug("Command output:\n<<<\n%s\n>>>" % (stdout,))
-    return stdout.decode().split('\n')[:4]
+    return stdout.split('\n')[:4]
   finally:
     os.chdir(save_cwd)
 
@@ -113,7 +110,7 @@ def _do_install_one(reg, app_loc, relative_path):
     # Relative to cwd.
     app_loc = os.path.realpath(app_loc)
     app_name, version, desc, author = get_app_info(app_loc)
-  except (ValueError, OSError) as ex:
+  except (ValueError, OSError), ex:
     LOG.error(ex)
     return False
 
@@ -171,7 +168,7 @@ def do_remove(app_name):
     pthfile.remove(app)
     pthfile.save()
     return True
-  except (OSError, SystemError) as ex:
+  except (OSError, SystemError), ex:
     LOG.error("Failed to update the .pth file. Please fix any problem and run "
               "`%s --sync'\n%s" % (PROG_NAME, ex))
     return False
@@ -190,7 +187,7 @@ def do_sync(reg=None):
 
     build.make_syncdb()
     return True
-  except (OSError, SystemError) as ex:
+  except (OSError, SystemError), ex:
     LOG.error("Failed to update the .pth file. Please fix any problem and run "
               "`%s --sync'\n%s" % (PROG_NAME, ex))
     return False
@@ -201,7 +198,7 @@ def do_collectstatic():
   try:
     build.make_collectstatic()
     return True
-  except (OSError, SystemError) as ex:
+  except (OSError, SystemError), ex:
     LOG.error("Failed to collect the static files. Please fix any problem and run "
               "`%s --collectstatic'\n%s" % (PROG_NAME, ex))
     return False
@@ -216,7 +213,7 @@ def main():
     opts, tail = getopt.getopt(sys.argv[1:],
                                'ir:lds',
                                ('install', 'remove=', 'list', 'debug', 'sync'))
-  except getopt.GetoptError as ex:
+  except getopt.GetoptError, ex:
     usage(str(ex))
 
   def verify_action(current, new_val):
@@ -243,8 +240,8 @@ def main():
   if action == DO_INSTALL:
     # ['..', '--relative-paths', 'a', 'b'] => True
     # ['..', 'a', 'b'] -> False
-    relative_paths = reduce(lambda accum, x: accum or x, [x in ['--relative-paths'] for x in tail])
-    app_loc_list = [x for x in tail if x not in ['--relative-paths']]
+    relative_paths = reduce(lambda accum, x: accum or x, map(lambda x: x in ['--relative-paths'], tail))
+    app_loc_list = filter(lambda x: x not in ['--relative-paths'], tail)
   elif len(tail) != 0:
     usage("Unknown trailing arguments: %s" % ' '.join(tail))
 

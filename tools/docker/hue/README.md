@@ -40,6 +40,8 @@ docker push docker.io/gethue/hue:latest
 
 ## Run the image
 
+Hue can run in one line via the `docker` command (but needs to be configured to point to a real database). To have a zero configuration start use the `docker-compose` section or [kubernetes](tools/kubernetes/) instead.
+
 ### Docker
 
 Directly boot the image:

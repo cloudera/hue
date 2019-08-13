@@ -15,10 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from past.builtins import basestring
 import json
 import logging
 import re
-import urlparse
+import urllib.parse
 from datetime import datetime
 from dateutil import tz
 from dateutil import parser
@@ -74,7 +78,7 @@ def model_to_dict(model):
         dictionary[field.name] = str(attr)
       else:
         dictionary[field.name] = attr
-    except Exception, e:
+    except Exception as e:
       LOG.debug(_("Could not set field %(field)s: %(exception)s") % {'field': field.name, 'exception': str(e)})
   return dictionary
 
@@ -108,7 +112,7 @@ def smart_path(path, mapping=None, is_coordinator=False):
     mapping = {}
 
   path = path.strip()
-  if not path.startswith('$') and not path.startswith('/') and not urlparse.urlsplit(path).scheme:
+  if not path.startswith('$') and not path.startswith('/') and not urllib.parse.urlsplit(path).scheme:
     path = '/user/%(username)s/%(path)s' % {
         'username': '${coord:user()}' if is_coordinator else '${wf:user()}',
         'path': path
@@ -120,10 +124,10 @@ def smart_path(path, mapping=None, is_coordinator=False):
       prefix = '${%s}' % var
       if path.startswith(prefix):
         if var in mapping:
-          if not urlparse.urlsplit(mapping[var]).scheme and not mapping[var].startswith('$'):
+          if not urllib.parse.urlsplit(mapping[var]).scheme and not mapping[var].startswith('$'):
             path = '%(nameNode)s%(path)s' % {'nameNode': '${nameNode}', 'path': path}
   else:
-    if not urlparse.urlsplit(path).scheme:
+    if not urllib.parse.urlsplit(path).scheme:
       path = '%(nameNode)s%(path)s' % {'nameNode': '${nameNode}', 'path': path}
 
   return path
@@ -133,7 +137,9 @@ def contains_symlink(path, mapping):
   return any([var in mapping and '#' in mapping[var] for var in vars]) or '#' in path
 
 def utc_datetime_format(utc_time):
-  return utc_time.strftime(UTC_TIME_FORMAT)
+  if utc_time and type(utc_time) is datetime:
+    return utc_time.strftime(UTC_TIME_FORMAT)
+  return utc_time
 
 
 def oozie_to_django_datetime(dt_string):
@@ -198,6 +204,6 @@ def convert_to_server_timezone(date, local_tz='UTC', server_tz=None, user=DEFAUL
       return date_server_tz.strftime('%Y-%m-%dT%H:%M') + u'Z'
     else:
       return date_server_tz.strftime('%Y-%m-%dT%H:%M') + date_server_tz.strftime('%z')
-  except TypeError, ValueError:
+  except TypeError as ValueError:
     LOG.error("Failed to convert Oozie timestamp: %s" % date)
   return None

@@ -212,6 +212,7 @@ install-env:
 	@echo --- Setting up Frontend assets
 	cp $(ROOT)/package.json $(INSTALL_DIR)
 	cp $(ROOT)/webpack.config*.js $(INSTALL_DIR)
+	cp $(ROOT)/.babelrc $(INSTALL_DIR)
 	$(MAKE) -C $(INSTALL_DIR) npm-install
 	@if [ "$(MAKECMDGOALS)" = "install" ]; then \
 	  $(MAKE) -C $(INSTALL_DIR) create-static; \
@@ -290,11 +291,11 @@ solr-formula-parser:
 
 .PHONY: sql-all-parsers
 sql-all-parsers:
-	@node tools/jison/generateParsers.js sqlAutocompleteParser sqlSyntaxParser sqlStatementsParser
+	@node tools/jison/generateParsers.js generic hive impala
 
 .PHONY: sql-autocomplete-parser
 sql-autocomplete-parser:
-	@node tools/jison/generateParsers.js sqlAutocompleteParser
+	@node tools/jison/generateParsers.js genericAutocomp hiveAutocomp impalaAutocomp
 
 .PHONY: sql-statement-parser
 sql-statement-parser:
@@ -302,7 +303,7 @@ sql-statement-parser:
 
 .PHONY: sql-syntax-parser
 sql-syntax-parser:
-	@node tools/jison/generateParsers.js sqlSyntaxParser
+	@node tools/jison/generateParsers.js genericSyntax hiveSyntax impalaSyntax
 # END DEV ONLY >>>>
 
 ###################################

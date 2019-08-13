@@ -23,10 +23,9 @@ import re
 from django.utils.translation import ugettext as _
 
 from desktop.lib.rest import resource
-from desktop.lib.rest.unsecure_http_client import UnsecureHttpClient
-from desktop.lib.rest.http_client import RestException
+from desktop.lib.rest.http_client import HttpClient, RestException
 
-from metadata.conf import CATALOG, get_catalog_auth_password, get_catalog_search_cluster
+from metadata.conf import CATALOG, get_catalog_search_cluster
 from metadata.catalog.base import CatalogAuthException, CatalogApiException, CatalogEntityDoesNotExistException, Api
 
 LOG = logging.getLogger(__name__)
@@ -63,11 +62,14 @@ class AtlasApi(Api):
 
     self._api_url = CATALOG.API_URL.get().strip('/')
     self._username = CATALOG.SERVER_USER.get()
-    self._password = get_catalog_auth_password()
+    self._password = CATALOG.SERVER_PASSWORD.get()
 
-    # Navigator does not support Kerberos authentication while other components usually requires it
-    self._client = UnsecureHttpClient(self._api_url, logger=LOG)
-    self._client.set_basic_auth(self._username, self._password)
+    self._client = HttpClient(self._api_url, logger=LOG)
+    if CATALOG.KERBEROS_ENABLED.get():
+      self._client.set_kerberos_auth()
+    elif self._password:
+      self._client.set_basic_auth(self._username, self._password)
+
     self._root = resource.Resource(self._client, urlencode=False) # For search_entities_interactive
 
     self.__headers = {}
@@ -108,6 +110,7 @@ class AtlasApi(Api):
       "parentPath": '', # Set below
       "properties": {}, # Set below
       "sourceType": '', # Set below
+      "classifications": [],
       "tags": atlas_entity['classificationNames'],
       "type": self.ATLAS_TO_NAV_TYPE.get(atlas_entity['typeName'].lower()) or atlas_entity['typeName']
     }
@@ -120,6 +123,7 @@ class AtlasApi(Api):
       nav_entity['parentPath'] = '/' + '/'.join(qualified_path_parts)
 
     if 'classifications' in atlas_entity:
+      nav_entity['classifications'] = atlas_entity['classifications']
       for atlas_classification in atlas_entity['classifications']:
         if 'attributes' in atlas_classification:
           for key, value in atlas_classification['attributes'].iteritems():
@@ -205,91 +209,91 @@ class AtlasApi(Api):
     return self.fetch_single_entity('hive_column where %s' % qualifiedNameCriteria)
 
   def search_entities_interactive(self, query_s=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None, sources=None):
-    try:
-      response = {
-        "status": 0,
-        "results": [],
-        "facets": {
-          "tags": {}
-        }
+    response = {
+      "status": 0,
+      "results": [],
+      "facets": {
+        "tags": {}
       }
+    }
 
-      # This takes care of the list_tags endpoint
-      if not query_s and facetFields and 'tags' in facetFields:
-        classification_response = self._root.get('/v2/types/typedefs?type=classification')
-        for classification_def in classification_response['classificationDefs']:
-          if ' ' in classification_def['name']:
-            response['facets']['tags']['"' + classification_def['name'] + '"'] = -1
-          else:
-            response['facets']['tags'][classification_def['name']] = -1
-        return response
+    # This takes care of the list_tags endpoint
+    if not query_s and facetFields and 'tags' in facetFields:
+      classification_response = self._root.get('/v2/types/typedefs?type=classification')
+      for classification_def in classification_response['classificationDefs']:
+        if ' ' in classification_def['name']:
+          response['facets']['tags']['"' + classification_def['name'] + '"'] = -1
+        else:
+          response['facets']['tags'][classification_def['name']] = -1
+      return response
 
-      query_s = (query_s.strip() if query_s else '').replace('*', '')
+    query_s = (query_s.strip() if query_s else '').replace('*', '')
 
-      atlas_type = None
-      classification = None
-      owner = None
+    atlas_type = None
+    classification = None
+    owner = None
 
-      # Take the first classification and type facets and ignore other as we can't search multiple in Atlas.
-      classification_facets = self.CLASSIFICATION_RE.findall(query_s)
-      if classification_facets:
-        classification = classification_facets[0][0] or classification_facets[0][1]
-        query_s = self.CLASSIFICATION_RE.sub('', query_s).strip()
-        atlas_type = 'Asset'  # Filtered below to just contain hive_db, hive_table or hive_column
+    # Take the first classification and type facets and ignore other as we can't search multiple in Atlas.
+    classification_facets = self.CLASSIFICATION_RE.findall(query_s)
+    if classification_facets:
+      classification = classification_facets[0][0] or classification_facets[0][1]
+      query_s = self.CLASSIFICATION_RE.sub('', query_s).strip()
+      atlas_type = 'Asset'  # Filtered below to just contain hive_db, hive_table or hive_column
 
-      owner_facets = self.OWNER_RE.findall(query_s)
-      if owner_facets:
-        owner = owner_facets[0]
-        query_s = self.OWNER_RE.sub('', query_s).strip()
+    owner_facets = self.OWNER_RE.findall(query_s)
+    if owner_facets:
+      owner = owner_facets[0]
+      query_s = self.OWNER_RE.sub('', query_s).strip()
 
-      type_facets = self.TYPE_RE.findall(query_s)
-      if type_facets:
-        atlas_type = self.NAV_TO_ATLAS_TYPE[type_facets[0].lower()] or type_facets[0]
-        query_s = self.TYPE_RE.sub('', query_s).strip()
+    type_facets = self.TYPE_RE.findall(query_s)
+    if type_facets:
+      atlas_type = self.NAV_TO_ATLAS_TYPE[type_facets[0].lower()] or type_facets[0]
+      query_s = self.TYPE_RE.sub('', query_s).strip()
 
-      data = {
-        'attributes': None,
-        'classification': classification,
-        'entityFilters': {
-          'condition': 'AND',
+    data = {
+      'attributes': None,
+      'classification': classification,
+      'entityFilters': {
+        'condition': 'AND',
+        'criterion': [{
+          'condition': 'OR',
           'criterion': [{
-            'condition': 'OR',
-            'criterion': [{
-              'attributeName': 'name',
-              'attributeValue': query_s,
-              'operator': 'contains'
-            }, {
-              'attributeName': 'description',
-              'attributeValue': query_s,
-              'operator': 'contains'
-            }]
+            'attributeName': 'name',
+            'attributeValue': query_s,
+            'operator': 'contains'
+          }, {
+            'attributeName': 'description',
+            'attributeValue': query_s,
+            'operator': 'contains'
           }]
-        },
-        'excludeDeletedEntities': True,
-        'includeClassificationAttributes': True,
-        'includeSubClassifications': True,
-        'includeSubTypes': True,
-        'limit': limit,
-        'offset': 0,
-        'tagFilters': None,
-        'termName': None,
-        'typeName': atlas_type or 'hive_table'
-      }
+        }]
+      },
+      'excludeDeletedEntities': True,
+      'includeClassificationAttributes': True,
+      'includeSubClassifications': True,
+      'includeSubTypes': True,
+      'limit': limit,
+      'offset': 0,
+      'tagFilters': None,
+      'termName': None,
+      'typeName': atlas_type or 'hive_table'
+    }
 
-      if get_catalog_search_cluster():
-        data['entityFilters']['criterion'].append({
-          'attributeName': 'qualifiedName',
-          'operator': 'contains',
-          'attributeValue': '@' + get_catalog_search_cluster()
-        })
+    if get_catalog_search_cluster():
+      data['entityFilters']['criterion'].append({
+        'attributeName': 'qualifiedName',
+        'operator': 'contains',
+        'attributeValue': '@' + get_catalog_search_cluster()
+      })
 
-      if owner:
-        data['entityFilters']['criterion'].append({
-          'attributeName': 'owner',
-          'operator': 'startsWith',
-          'attributeValue': owner
-        })
+    if owner:
+      data['entityFilters']['criterion'].append({
+        'attributeName': 'owner',
+        'operator': 'startsWith',
+        'attributeValue': owner
+      })
 
+    try:
       atlas_response = self._root.post('/v2/search/basic', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
 
       # Adapt Atlas entities to Navigator structure in the results

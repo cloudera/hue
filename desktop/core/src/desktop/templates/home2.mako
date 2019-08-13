@@ -20,13 +20,10 @@
   from desktop import conf
 %>
 
-<%namespace name="assist" file="/assist.mako" />
 <%namespace name="common_home" file="/common_home.mako" />
 
 %if not is_embeddable:
 ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
-${ assist.assistJSModels() }
-${ assist.assistPanel() }
 %endif
 
 ${ common_home.homeJSModels(is_embeddable) }

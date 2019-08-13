@@ -245,13 +245,15 @@ class SolrQueryAutocompleter {
     self.suggestions = new SolrQuerySuggestions(options.support.collection, self.editor);
   }
 
-  autocomplete() {
-    const self = this;
-    const parseResult = solrQueryParser.autocompleteSolrQuery(
-      self.editor.getTextBeforeCursor(),
-      self.editor.getTextAfterCursor()
-    );
-    self.suggestions.update(parseResult);
+  async autocomplete() {
+    return new Promise(resolve => {
+      const parseResult = solrQueryParser.autocompleteSolrQuery(
+        this.editor.getTextBeforeCursor(),
+        this.editor.getTextAfterCursor()
+      );
+      this.suggestions.update(parseResult);
+      resolve(parseResult);
+    });
   }
 
   onPartial(partial) {

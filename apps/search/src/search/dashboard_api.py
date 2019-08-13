@@ -41,7 +41,7 @@ class SearchApi(DashboardApi):
     response = self.api.query(collection, query)
     return augment_solr_response(response, collection, query)
 
-  def datasets(self, show_all=False): # True if non Solr Cloud
+  def datasets(self, show_all=False, database=None): # True if non Solr Cloud
     client = SolrClient(user=self.user)
     show_all = show_all or not client.is_solr_cloud_mode()
     return [index['name'] for index in client.get_indexes(include_cores=show_all)]

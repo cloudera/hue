@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -18,7 +19,7 @@ import logging
 
 from desktop.lib.python_util import force_dict_to_strings
 
-from config import Config
+from sqoop.client.config import Config
 
 
 class SqoopException(Exception):

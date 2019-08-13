@@ -12,15 +12,13 @@ Hue is an open source SQL Workbench for browsing, querying and visualizing data 
 
 It features:
 
-   * [Editors](http://gethue.com/sql-editor/) to query with SQL [any database](http://cloudera.github.io/hue/latest/admin-manual/manual.html#connectors) and submit jobs
+   * [Editors](http://gethue.com/sql-editor/) to query with SQL [any database](https://docs.gethue.com/latest/administrator/configuration/editor/#connectors) and submit jobs
    * [Dashboards](http://gethue.com/search-dashboards/) to dynamically interact and visualize data
    * [Scheduler](http://gethue.com/scheduling/) of jobs and workflows
    * [Browsers](http://gethue.com/browsers/) for data and a Data Catalog
 
 
-![alt text](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/sql-editor.png "Hue Editor")
-
-![alt text](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/dashboard.png "Hue Dashboard")
+![alt text](docs/images/hue-screens-demo.gif "Hue Editor and Dashboard")
 
 
 Who is using Hue
@@ -50,17 +48,20 @@ Start Hue in a single click with the [Docker Guide](https://github.com/cloudera/
 
 Kubernetes
 ----------
-Configurations to start a Hue server are available at [``tools/kubernetes``](tools/kubernetes/). The Kubernetes [hue.yaml](tools/kubernetes/helm/hue/templates/hue.yaml)
-configuration is available in the template directory.
+
+    helm repo add gethue https://helm.gethue.com
+    helm repo update
+    helm install gethue/hue
+
+Read more about configurations at [``tools/kubernetes``](tools/kubernetes/).
 
 
 Community
 -----------
-   * How to [contribute](docs/CONTRIBUTING.md)
+   * Contributing [guidelines](CONTRIBUTING.md)
+   * Help Forum: https://discourse.gethue.com/ ([previous mailing list](http://groups.google.com/a/cloudera.org/group/hue-user))
    * High level [roadmap](docs/ROADMAP.md)
-   * User group: http://groups.google.com/a/cloudera.org/group/hue-user
    * Jira: https://issues.cloudera.org/browse/HUE
-   * Reviews: https://review.cloudera.org/dashboard/?view=to-group&group=hue (repo 'hue-rw')
 
 
 License

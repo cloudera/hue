@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
 import logging
 from datetime import datetime,  timedelta
 
@@ -81,7 +82,7 @@ class Command(BaseCommand):
 
         query.last_state = QueryHistory.STATE.expired.value
         query.save()
-      except Exception, e:
+      except Exception as e:
         if 'None' in str(e) or 'Invalid OperationHandle' in str(e):
           already_closed_queries += 1
           query.last_state = QueryHistory.STATE.expired.value

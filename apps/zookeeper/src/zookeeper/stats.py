@@ -15,11 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import map
+from builtins import object
 import logging
 import socket
 import re
+import sys
 
-from StringIO import StringIO
+if sys.version_info[0] > 2:
+  from io import StringIO as string_io
+else:
+  from cStringIO import StringIO as string_io
+
 LOG = logging.getLogger(__name__)
 
 class Session(object):
@@ -63,7 +72,7 @@ class ZooKeeperStats(object):
       if not stat:
         return clients
 
-      sio = StringIO(stat)
+      sio = string_io(stat)
 
       #skip two lines
       sio.readline()
@@ -92,13 +101,13 @@ class ZooKeeperStats(object):
 	    s.send(cmd)
 	    data = s.recv(2048)
 	    s.close()
-        except Exception, e:
+        except Exception as e:
 	    LOG.error('Problem connecting to host %s, exception raised : %s' % (self._host, e))
         return data
 
     def _parse(self, data):
         """ Parse the output from the 'mntr' 4letter word command """
-        h = StringIO(data)
+        h = string_io(data)
 
         result = {}
         for line in h.readlines():
@@ -116,7 +125,7 @@ class ZooKeeperStats(object):
         result = {}
         if not data:
 	    return result
-        h = StringIO(data)
+        h = string_io(data)
 
         version = h.readline()
         if version:
@@ -162,7 +171,7 @@ class ZooKeeperStats(object):
 
     def _parse_line(self, line):
         try:
-            key, value = map(str.strip, line.split('\t'))
+            key, value = list(map(str.strip, line.split('\t')))
         except ValueError:
             raise ValueError('Found invalid line: %s' % line)
 

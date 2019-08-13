@@ -15,17 +15,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import chr
+from builtins import range
 import unittest
 import logging
 import random
-import StringIO
+import sys
 import subprocess
 
-import xxd
+from filebrowser.lib import xxd
 
 from nose.plugins.skip import SkipTest
 
 from subprocess import Popen, PIPE
+
+if sys.version_info[0] > 2:
+  from io import StringIO as string_io
+else:
+  from cStringIO import StringIO as string_io
 
 LOG = logging.getLogger(__name__)
 
@@ -88,8 +98,8 @@ class XxdTest(unittest.TestCase):
     (stdin, stderr) = p.communicate(random_text)
     self.assertFalse(stderr)
 
-    output = StringIO.StringIO()
-    xxd.main(StringIO.StringIO(random_text), output)
+    output = string_io()
+    xxd.main(string_io(random_text), output)
     self._verify_content(stdin, output.getvalue())
 
 if __name__ == "__main__":

@@ -21,14 +21,21 @@ Classes for a custom upload handler to stream into S3.
 See http://docs.djangoproject.com/en/1.9/topics/http/file-uploads/
 """
 
+from future import standard_library
+standard_library.install_aliases()
 import logging
-import StringIO
+import sys
+
+if sys.version_info[0] > 2:
+  from io import StringIO as string_io
+else:
+  from cStringIO import StringIO as string_io
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFutureHandlers, StopUpload, UploadFileException
 from django.utils.translation import ugettext as _
 
-from aws import get_s3fs
+from desktop.lib.fsmanager import get_client
 from aws.s3 import parse_uri
 from aws.s3.s3fs import S3FileSystemException
 
@@ -55,11 +62,11 @@ class S3FileUploadHandler(FileUploadHandler):
     self.target_path = None
     self.file = None
     self._request = request
-    self._fs = self._get_s3fs(request)
     self._mp = None
     self._part_num = 1
 
     if self._is_s3_upload():
+      self._fs = get_client(fs='s3a', user=request.user.username)
       self.bucket_name, self.key_name = parse_uri(self.destination)[:2]
       # Verify that the path exists
       self._fs._stats(self.destination)
@@ -81,7 +88,7 @@ class S3FileUploadHandler(FileUploadHandler):
         self._mp = self._bucket.initiate_multipart_upload(self.target_path)
         self.file = SimpleUploadedFile(name=file_name, content='')
         raise StopFutureHandlers()
-      except (S3FileUploadError, S3FileSystemException), e:
+      except (S3FileUploadError, S3FileSystemException) as e:
         LOG.error("Encountered error in S3UploadHandler check_access: %s" % e)
         self.request.META['upload_failed'] = e
         raise StopUpload()
@@ -95,7 +102,7 @@ class S3FileUploadHandler(FileUploadHandler):
         self._mp.upload_part_from_file(fp=fp, part_num=self._part_num)
         self._part_num += 1
         return None
-      except Exception, e:
+      except Exception as e:
         self._mp.cancel_upload()
         LOG.exception('Failed to upload file to S3 at %s: %s' % (self.target_path, e))
         raise StopUpload()
@@ -115,7 +122,7 @@ class S3FileUploadHandler(FileUploadHandler):
 
 
   def _get_s3fs(self, request):
-    fs = get_s3fs() # Pre 6.0 request.fs did not exist, now it does. The logic for assigning request.fs is not correct for FileUploadHandler.
+    fs = get_client(user=request.user.username) # Pre 6.0 request.fs did not exist, now it does. The logic for assigning request.fs is not correct for FileUploadHandler.
 
     if not fs:
       raise S3FileUploadError(_("No S3 filesystem found."))
@@ -144,7 +151,7 @@ class S3FileUploadHandler(FileUploadHandler):
 
 
   def _get_file_part(self, raw_data):
-    fp = StringIO.StringIO()
+    fp = string_io()
     fp.write(raw_data)
     fp.seek(0)
     return fp

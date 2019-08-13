@@ -70,7 +70,14 @@ ko.bindingHandlers.highlight = {
             let token = tokens[0];
             let value = token.value;
             if (value) {
-              screenColumn = txt.$renderToken(stringBuilder, screenColumn, token, value);
+              try {
+                screenColumn = txt.$renderToken(stringBuilder, screenColumn, token, value);
+              } catch (e) {
+                console.warn(
+                  value,
+                  'Failed to get screen column due to some parsing errors, skip rendering.'
+                );
+              }
             }
             for (let i = 1; i < tokens.length; i++) {
               token = tokens[i];

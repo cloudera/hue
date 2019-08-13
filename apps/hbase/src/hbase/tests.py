@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import json
 import os
 import shutil
@@ -144,18 +145,18 @@ def test_impersonation():
 
 
 
-class MockHttpClient():
+class MockHttpClient(object):
   def __init__(self):
     self.headers = {}
 
   def setCustomHeaders(self, headers):
     self.headers = headers
 
-class MockTransport():
+class MockTransport(object):
   def __init__(self):
     self._TBufferedTransport__trans = MockHttpClient()
 
-class MockProtocol():
+class MockProtocol(object):
   def __init__(self):
     self.trans = MockTransport()
 
@@ -167,7 +168,7 @@ class MockProtocol():
 
 
 
-class TestIntegrationWithHBase:
+class TestIntegrationWithHBase(object):
   integration = True
 
   @classmethod

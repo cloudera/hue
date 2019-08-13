@@ -21,7 +21,7 @@ from django.utils.translation import ugettext_lazy as _t
 
 
 from desktop import appmanager
-from desktop.conf import is_oozie_enabled, CONNECTORS
+from desktop.conf import is_oozie_enabled, has_connectors
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_json_dict, coerce_bool, coerce_csv
 
 
@@ -47,9 +47,6 @@ def check_permissions(user, interpreter, user_apps=None):
 
 
 def get_ordered_interpreters(user=None):
-  from desktop.lib.connectors.api import CONFIGURED_CONNECTORS
-  global CONFIGURED_CONNECTORS
-
   if not INTERPRETERS.get():
     _default_interpreters(user)
 
@@ -68,13 +65,17 @@ def get_ordered_interpreters(user=None):
   if unknown_interpreters:
     raise ValueError("Interpreters from interpreters_shown_on_wheel is not in the list of Interpreters %s" % unknown_interpreters)
 
-  if CONNECTORS.IS_ENABLED.get():
+  if has_connectors():
+    from desktop.lib.connectors.api import _get_installed_connectors
     reordered_interpreters = [{
-        'name': i['name'],
-        'type': i['type'],
+        'name': i['nice_name'],
+        'type': i['name'],
+        'dialect': i['dialect'],
+        'category': i['category'],
+        'is_sql': i['is_sql'],
         'interface': i['interface'],
         'options': {setting['name']: setting['value'] for setting in i['settings']}
-      } for i in CONFIGURED_CONNECTORS
+      } for i in _get_installed_connectors()
     ]
   else:
     reordered_interpreters = interpreters_shown_on_wheel + [i for i in user_interpreters if i not in interpreters_shown_on_wheel]
@@ -87,11 +88,13 @@ def get_ordered_interpreters(user=None):
     ]
 
   return [{
-      "name": i['name'],
+      "name": i.get('nice_name', i['name']),
       "type": i['type'],
       "interface": i['interface'],
       "options": i['options'],
-      "is_sql": i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy"],
+      'dialect': i.get('dialect', i['name']).lower(),
+      'category': i.get('category', 'editor'),
+      "is_sql": i.get('is_sql') or i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy"],
       "is_catalog": i['interface'] in ["hms",],
     }
     for i in reordered_interpreters

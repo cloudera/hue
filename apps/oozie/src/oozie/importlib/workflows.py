@@ -31,6 +31,8 @@ Action extensions are also versioned.
 Every action extension will have its own version via /xslt/<workflow version>/extensions/<name of extensions>.<version>.xslt
 """
 
+from builtins import str
+from past.builtins import basestring
 import json
 import logging
 from lxml import etree
@@ -217,7 +219,7 @@ def _join_relationships(workflow, parent, child_el):
 
   try:
     child = Node.objects.get(workflow=workflow, name=to)
-  except Node.DoesNotExist, e:
+  except Node.DoesNotExist as e:
     raise RuntimeError(_("Node %s has not been defined.") % to)
 
   obj = Link.objects.create(name='to', parent=parent, child=child)
@@ -245,7 +247,7 @@ def _decision_relationships(workflow, parent, child_el):
       to = case.attrib['to']
       try:
         child = Node.objects.get(workflow=workflow, name=to)
-      except Node.DoesNotExist, e:
+      except Node.DoesNotExist as e:
         raise RuntimeError(_("Node %s has not been defined.") % to)
 
       if etree.QName(case).localname == 'default':
@@ -287,7 +289,7 @@ def _node_relationships(workflow, parent, child_el):
 
       try:
         child = Node.objects.get(workflow=workflow, name=to)
-      except Node.DoesNotExist, e:
+      except Node.DoesNotExist as e:
         if name == 'error':
           child, create = Kill.objects.get_or_create(name='kill', workflow=workflow, node_type=Kill.node_type)
         else:
@@ -509,7 +511,7 @@ def _prepare_nodes(workflow, root):
     else:
       node.node_type = obj.object.node_type
       full_node = obj.object
-      for k, v in vars(node).items():
+      for k, v in list(vars(node).items()):
         if not k.startswith('_') and k not in ('node_type','workflow','node_ptr_id'):
           setattr(full_node, k, v)
       full_node.workflow = workflow
@@ -583,11 +585,11 @@ def _resolve_subworkflow_from_deployment_dir(fs, workflow, app_path):
     return Workflow.objects.get(name=root.attrib['name'], owner=workflow.owner, managed=True)
   except IOError:
     pass
-  except (KeyError, AttributeError), e:
+  except (KeyError, AttributeError) as e:
     raise RuntimeError(_("Could not find workflow name when resolving subworkflow."))
-  except Workflow.DoesNotExist, e:
+  except Workflow.DoesNotExist as e:
     raise RuntimeError(_("Could not find workflow with name %s extracted from subworkflow path %s") % (root.attrib['name'], app_path))
-  except Exception, e:
+  except Exception as e:
     raise RuntimeError(_("Could not find workflow at path %s: %s") % (app_path, e))
 
   for subworkflow in Document.objects.available(Workflow, workflow.owner):

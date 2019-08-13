@@ -360,7 +360,6 @@ class TopDownAnalysis:
         self.sqlOperatorReasons = {}
         for r in glob.glob("{0}/*.json".format(self.base_dir)):
             with open(r, "r") as fid:
-                LOG.debug('Loading file %s' % r)
                 json_object = json.load(fid)
                 type = json_object["type"]
                 node_names = json_object["node_name"]

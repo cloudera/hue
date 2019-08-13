@@ -29,14 +29,15 @@ from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.db.models import Count
 from django.db.models.functions import Trunc
-from desktop.lib.paths import SAFE_CHARACTERS_URI_COMPONENTS
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
+from desktop.conf import has_connectors
 from desktop.lib.i18n import smart_unicode
+from desktop.lib.paths import SAFE_CHARACTERS_URI
 from desktop.models import Document2
 
-from notebook.connectors.base import Notebook
+from notebook.connectors.base import Notebook, get_interpreter
 
 
 LOG = logging.getLogger(__name__)
@@ -66,19 +67,23 @@ def escape_rows(rows, nulls_only=False, encoding=None):
   return data
 
 
-def make_notebook(name='Browse', description='', editor_type='hive', statement='', status='ready',
-                  files=None, functions=None, settings=None, is_saved=False, database='default', snippet_properties=None, batch_submit=False,
-                  on_success_url=None, skip_historify=False, is_task=False, last_executed=-1, is_notebook=False, pub_sub_url=None, result_properties={},
-                  namespace=None, compute=None):
+def make_notebook(
+    name='Browse', description='', editor_type='hive', statement='', status='ready',
+    files=None, functions=None, settings=None, is_saved=False, database='default', snippet_properties=None, batch_submit=False,
+    on_success_url=None, skip_historify=False, is_task=False, last_executed=-1, is_notebook=False, pub_sub_url=None, result_properties={},
+    namespace=None, compute=None):
   '''
   skip_historify: do not add the task to the query history. e.g. SQL Dashboard
-  isManaged: true when being a managed by Hue operation (include_managed=True in document), e.g. exporting query result, dropping some tables
+  is_task / isManaged: true when being a managed by Hue operation (include_managed=True in document), e.g. exporting query result, dropping some tables
   '''
   from notebook.connectors.hiveserver2 import HS2Api
 
-  # impala can have compute name appended to the editor_type (impala/dbms.py - get_query_server_config)
-  if editor_type.startswith('impala'):
-    editor_type = 'impala'
+  if has_connectors():
+    interpreter = get_interpreter(connector_type=editor_type)
+    editor_connector = editor_type
+    editor_type = interpreter['dialect']
+  else:
+    editor_connector = editor_type
 
   editor = Notebook()
   if snippet_properties is None:
@@ -109,16 +114,16 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
     'description': description,
     'sessions': [
       {
-         'type': editor_type,
+         'type': editor_connector,
          'properties': sessions_properties,
          'id': None
       }
     ],
-    'selectedSnippet': editor_type,
+    'selectedSnippet': editor_connector, # TODO: might need update in notebook.ko.js
     'type': 'notebook' if is_notebook else 'query-%s' % editor_type,
     'showHistory': True,
     'isSaved': is_saved,
-    'onSuccessUrl': urllib.quote(on_success_url.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) if on_success_url else None,
+    'onSuccessUrl': urllib.quote(on_success_url.encode('utf-8'), safe=SAFE_CHARACTERS_URI) if on_success_url else None,
     'pubSubUrl': pub_sub_url,
     'skipHistorify': skip_historify,
     'isManaged': is_task,
@@ -128,7 +133,7 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
          'id': str(uuid.uuid4()),
          'statement_raw': statement,
          'statement': statement,
-         'type': editor_type,
+         'type': editor_connector,
          'wasBatchExecuted': batch_submit,
          'lastExecuted': last_executed,
          'properties': {
@@ -469,6 +474,11 @@ def _update_property_value(properties, key, value):
   for prop in properties:
     if prop['key'] == key:
       prop.update({'value': value})
+
+
+def _get_editor_type(editor_id):
+  document = Document2.objects.get(id=editor_id)
+  return document.type.rsplit('-', 1)[-1]
 
 
 class Analytics():

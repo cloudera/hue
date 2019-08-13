@@ -19,13 +19,15 @@ from __future__ import absolute_import
 
 import logging
 import re
-import debug_toolbar
+
 
 # FIXME: This could be replaced with hooking into the `AppConfig.ready()`
 # signal in Django 1.7:
 #
 # https://docs.djangoproject.com/en/1.7/ref/applications/#django.apps.AppConfig.ready
 #
+
+import debug_toolbar
 
 import desktop.lib.metrics.file_reporter
 desktop.lib.metrics.file_reporter.start_file_reporter()
@@ -35,18 +37,19 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.static import serve
 
-from desktop import appmanager
-from desktop.conf import METRICS, USE_NEW_EDITOR, ENABLE_DJANGO_DEBUG_TOOL, CONNECTORS, ANALYTICS
+from notebook import views as notebook_views
+from useradmin import views as useradmin_views
 
-from desktop.auth import views as desktop_auth_views
-from desktop.settings import is_oidc_configured
+from desktop import appmanager
+
 from desktop import views as desktop_views
 from desktop import api as desktop_api
 from desktop import api2 as desktop_api2
-from notebook import views as notebook_views
+from desktop.auth import views as desktop_auth_views
+from desktop.conf import METRICS, USE_NEW_EDITOR, ENABLE_DJANGO_DEBUG_TOOL, ANALYTICS, has_connectors, ENABLE_PROMETHEUS
 from desktop.configuration import api as desktop_configuration_api
-from useradmin import views as useradmin_views
 from desktop.lib.vcs import api as desktop_lib_vcs_api
+from desktop.settings import is_oidc_configured
 
 # Django expects handler404 and handler500 to be defined.
 # django.conf.urls provides them. But we want to override them.
@@ -121,6 +124,8 @@ dynamic_patterns += [
   url(r'^desktop/workers/aceSqlLocationWorker.js', desktop_views.ace_sql_location_worker),
   url(r'^desktop/workers/aceSqlSyntaxWorker.js', desktop_views.ace_sql_syntax_worker),
 
+  url(r'^dynamic_bundle/(?P<config>\w+)/(?P<bundle_name>.+)', desktop_views.dynamic_bundle),
+
   # Unsupported browsers
   url(r'^boohoo$', desktop_views.unsupported, name='desktop_views_unsupported'),
 
@@ -193,7 +198,7 @@ if METRICS.ENABLE_WEB_METRICS.get():
     url(r'^desktop/metrics/?', include('desktop.lib.metrics.urls'))
   ]
 
-if CONNECTORS.IS_ENABLED.get():
+if has_connectors():
   dynamic_patterns += [
     url(r'^desktop/connectors/?', include('desktop.lib.connectors.urls'))
   ]
@@ -204,8 +209,18 @@ if ANALYTICS.IS_ENABLED.get():
   ]
 
 dynamic_patterns += [
+  url(r'^scheduler/', include('desktop.lib.scheduler.urls'))
+]
+
+dynamic_patterns += [
   url(r'^admin/?', include(admin.site.urls)),
 ]
+
+if ENABLE_PROMETHEUS.get():
+  dynamic_patterns += [
+    url('', include('django_prometheus.urls')),
+  ]
+
 
 static_patterns = []
 
@@ -243,12 +258,6 @@ urlpatterns.extend(dynamic_patterns)
 urlpatterns.extend(app_urls_patterns)
 urlpatterns.extend(static_patterns)
 
-for x in dynamic_patterns:
-  logging.debug("Dynamic pattern: %s" % (x,))
-for x in app_urls_patterns:
-  logging.debug("Dynamic pattern: %s" % (x,))
-for x in static_patterns:
-  logging.debug("Static pattern: %s" % (x,))
 
 if settings.DEBUG and ENABLE_DJANGO_DEBUG_TOOL.get():
   urlpatterns += [

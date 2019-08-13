@@ -1,7 +1,7 @@
 +++
 title = "Developer"
 date = 2019-03-13T18:27:26-07:00
-weight = 3
+weight = 4
 chapter = false
 pre = "<b>3. </b>"
 +++

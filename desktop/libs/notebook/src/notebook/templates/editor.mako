@@ -19,7 +19,6 @@
   from django.utils.translation import ugettext as _
 %>
 
-<%namespace name="assist" file="/assist.mako" />
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
 <%namespace name="editorComponents" file="editor_components.mako" />
 <%namespace name="notebookKoComponents" file="/common_notebook_ko_components.mako" />
@@ -37,8 +36,6 @@ ${ editorComponents.topBar(suffix='editor') }
 ${ editorComponents.commonHTML(is_embeddable=is_embeddable, suffix='editor') }
 
 %if not is_embeddable:
-${ assist.assistPanel() }
-${ assist.assistJSModels() }
 ${ configKoComponents.config() }
 ${ notebookKoComponents.aceKeyboardShortcuts() }
 ${ notebookKoComponents.downloadSnippetResults() }

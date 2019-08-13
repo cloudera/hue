@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
 import logging
 from datetime import datetime,  timedelta
 
@@ -74,7 +75,7 @@ class Command(BaseCommand):
       try:
         session = dbms.get(user=session.owner).close_session(session)
         closed += 1
-      except Exception, e:
+      except Exception as e:
         skipped += 1
         self.stdout.write('Session with ID %d could not be closed: %s' % (session.id, str(e)))
 

@@ -14,8 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import sqlAutocompleteParser from 'parse/sqlAutocompleteParser';
-
 // Needed to compare by val without taking attr order into account
 const resultEquals = function(a, b) {
   if (typeof a !== typeof b) {
@@ -89,12 +87,19 @@ const testUtils = {
             }
           }
 
-          if (testDefinition.dialect !== 'impala' && actualResponse.locations) {
-            actualResponse.locations = actualResponse.locations.filter(location => {
-              if (location.type !== 'statementType') {
-                return location;
-              }
-            });
+          if (
+            ((testDefinition.expectedResult && testDefinition.expectedResult.locations) ||
+              testDefinition.expectedLocations) &&
+            actualResponse.locations
+          ) {
+            const expectedLoc =
+              testDefinition.expectedLocations || testDefinition.expectedResult.locations;
+            const expectsType = expectedLoc.some(location => location.type === 'statementType');
+            if (!expectsType) {
+              actualResponse.locations = actualResponse.locations.filter(
+                location => location.type !== 'statementType'
+              );
+            }
           }
 
           if (testDefinition.expectedDefinitions) {
@@ -106,9 +111,6 @@ const testUtils = {
                   testDefinition.beforeCursor +
                   '|' +
                   testDefinition.afterCursor +
-                  '\n' +
-                  '          Dialect: ' +
-                  testDefinition.dialect +
                   '\n' +
                   'Expected definitions: ' +
                   jsonStringToJsString(JSON.stringify(testDefinition.expectedDefinitions)) +
@@ -130,9 +132,6 @@ const testUtils = {
                 testDefinition.beforeCursor +
                 '|' +
                 testDefinition.afterCursor +
-                '\n' +
-                '          Dialect: ' +
-                testDefinition.dialect +
                 '\n' +
                 'Expected locations: ' +
                 jsonStringToJsString(JSON.stringify(testDefinition.expectedLocations)) +
@@ -161,9 +160,6 @@ const testUtils = {
                   '|' +
                   testDefinition.afterCursor +
                   '\n' +
-                  '  Dialect: ' +
-                  testDefinition.dialect +
-                  '\n' +
                   '           Expected no locations, found ' +
                   actualResponse.locations.length
               };
@@ -182,9 +178,6 @@ const testUtils = {
                   testDefinition.beforeCursor +
                   '|' +
                   testDefinition.afterCursor +
-                  '\n' +
-                  '  Dialect: ' +
-                  testDefinition.dialect +
                   '\n' +
                   '           No colRef keywords found'
               };
@@ -205,9 +198,6 @@ const testUtils = {
                     testDefinition.beforeCursor +
                     '|' +
                     testDefinition.afterCursor +
-                    '\n' +
-                    '  Dialect: ' +
-                    testDefinition.dialect +
                     '\n' +
                     '           Expected colRef keywords not found ' +
                     'Expected keywords: ' +
@@ -240,9 +230,6 @@ const testUtils = {
                   '|' +
                   testDefinition.afterCursor +
                   '\n' +
-                  '          Dialect: ' +
-                  testDefinition.dialect +
-                  '\n' +
                   'Expected keywords: ' +
                   JSON.stringify(testDefinition.containsKeywords) +
                   '\n' +
@@ -271,9 +258,6 @@ const testUtils = {
                   '|' +
                   testDefinition.afterCursor +
                   '\n' +
-                  '              Dialect: ' +
-                  testDefinition.dialect +
-                  '\n' +
                   'Not expected keywords: ' +
                   JSON.stringify(testDefinition.doesNotContainKeywords) +
                   '\n' +
@@ -296,9 +280,6 @@ const testUtils = {
               '|' +
               testDefinition.afterCursor +
               '\n' +
-              '          Dialect: ' +
-              testDefinition.dialect +
-              '\n' +
               'Expected response: ' +
               jsonStringToJsString(JSON.stringify(testDefinition.expectedResult) + '\n') +
               '  Parser response: ' +
@@ -306,45 +287,6 @@ const testUtils = {
           };
         }
       };
-    }
-  },
-
-  assertAutocomplete: function(testDefinition) {
-    const debug = false;
-    if (typeof testDefinition.dialect === 'undefined') {
-      expect(
-        sqlAutocompleteParser.parseSql(
-          testDefinition.beforeCursor,
-          testDefinition.afterCursor,
-          undefined,
-          debug
-        )
-      ).toEqualDefinition(testDefinition);
-      expect(
-        sqlAutocompleteParser.parseSql(
-          testDefinition.beforeCursor,
-          testDefinition.afterCursor,
-          'hive',
-          debug
-        )
-      ).toEqualDefinition(testDefinition);
-      expect(
-        sqlAutocompleteParser.parseSql(
-          testDefinition.beforeCursor,
-          testDefinition.afterCursor,
-          'impala',
-          debug
-        )
-      ).toEqualDefinition(testDefinition);
-    } else {
-      expect(
-        sqlAutocompleteParser.parseSql(
-          testDefinition.beforeCursor,
-          testDefinition.afterCursor,
-          testDefinition.dialect,
-          debug
-        )
-      ).toEqualDefinition(testDefinition);
     }
   }
 };

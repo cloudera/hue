@@ -18,10 +18,10 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
-  from desktop.conf import IS_EMBEDDED, DEV_EMBEDDED, IS_MULTICLUSTER_ONLY, has_multi_cluster
+  from desktop.conf import IS_EMBEDDED, DEV_EMBEDDED, IS_MULTICLUSTER_ONLY, has_multi_clusters
   from desktop.views import _ko, commonshare, login_modal
   from desktop.lib.i18n import smart_unicode
-  from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, ANALYTIC_DB, hue_version
+  from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, ANALYTIC_DB, hue_version, get_cluster_config
 
   from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
   from filebrowser.conf import SHOW_UPLOAD_BUTTON
@@ -32,7 +32,6 @@
   from webpack_loader.templatetags.webpack_loader import render_bundle
 %>
 
-<%namespace name="assist" file="/assist.mako" />
 <%namespace name="hueIcons" file="/hue_icons.mako" />
 <%namespace name="commonHeaderFooterComponents" file="/common_header_footer_components.mako" />
 
@@ -182,287 +181,220 @@ ${ hueIcons.symbols() }
 <input style="display:none" readonly autocomplete="false" type="text" name="fakeusernameremembered"/>
 <input style="display:none" readonly autocomplete="false" type="password" name="fakepasswordremembered"/>
 
-<div class="main-page">
-  % if banner_message or conf.CUSTOM.BANNER_TOP_HTML.get():
-    <div class="banner">
-      ${ banner_message or conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
-    </div>
-  % endif
+<div class="hue-page">
+  <div class="hue-sidebar collapsed" data-bind="component: { name: 'hue-sidebar', params: {  } }"></div>
 
-  % if not IS_EMBEDDED.get():
-  <nav class="navbar navbar-default">
-    <div class="navbar-inner top-nav">
-      <div class="top-nav-left">
-        % if not IS_EMBEDDED.get():
-          % if not (IS_MULTICLUSTER_ONLY.get() and has_multi_cluster()):
-          <a class="hamburger hamburger-hue pull-left" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
-            <span class="hamburger-box"><span class="hamburger-inner"></span></span>
-          </a>
-
-          <a class="brand" data-bind="hueLink: '/home/'" href="javascript: void(0);" title="${_('Documents')}">
-              <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
-          </a>
-          % endif
-        % endif
-
-        % if not IS_MULTICLUSTER_ONLY.get():
-        <div class="btn-group" data-bind="visible: true" style="display:none; margin-top: 8px">
-          <!-- ko if: mainQuickCreateAction -->
-          <!-- ko with: mainQuickCreateAction -->
-          <a class="btn btn-primary disable-feedback hue-main-create-btn" data-bind="hueLink: url, attr: {title: tooltip}, style: { borderBottomRightRadius: $parent.quickCreateActions().length > 1 ? '0px' : '4px', borderTopRightRadius: $parent.quickCreateActions().length > 1 ? '0px' : '4px' }">
-            <span data-bind="text: displayName"></span>
-          </a>
-          <!-- /ko -->
-          <!-- /ko -->
-          <button class="btn btn-primary dropdown-toggle hue-main-create-btn-dropdown" data-toggle="dropdown" data-bind="visible: quickCreateActions().length > 1 || (quickCreateActions().length == 1 && quickCreateActions()[0].children && quickCreateActions()[0].children.length > 1)">
-            <!-- ko ifnot: mainQuickCreateAction -->${ _('More') } <!-- /ko -->
-            <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu hue-main-create-dropdown" data-bind="foreach: { data: quickCreateActions, as: 'item' }">
-            <!-- ko template: 'quick-create-item-template' --><!-- /ko -->
-          </ul>
-        </div>
-        % endif
-
-        <script type="text/html" id="quick-create-item-template">
-          <!-- ko if: item.dividerAbove -->
-          <li class="divider"></li>
-          <!-- /ko -->
-          <li data-bind="css: { 'dropdown-submenu': item.isCategory && item.children.length > 1 }">
-            <!-- ko if: item.url -->
-              <a href="javascript: void(0);" data-bind="hueLink: item.url">
-                <!-- ko if: item.icon -->
-                <!-- ko template: { name: 'app-icon-template', data: item } --><!-- /ko -->
-                <!-- /ko -->
-                <span data-bind="css: { 'dropdown-no-icon': !item.icon }, text: item.displayName"></span>
-              </a>
-            <!-- /ko -->
-            <!-- ko if: item.href -->
-              <a data-bind="attr: { href: item.href }, text: item.displayName" target="_blank"></a>
-            <!-- /ko -->
-            <!-- ko if: item.isCategory && item.children.length > 1 -->
-            <ul class="dropdown-menu" data-bind="foreach: { data: item.children, as: 'item' }">
-              <!-- ko template: 'quick-create-item-template' --><!-- /ko -->
-            </ul>
-            <!-- /ko -->
-          </li>
-        </script>
+  <div class="main-page">
+    % if banner_message or conf.CUSTOM.BANNER_TOP_HTML.get():
+      <div class="banner">
+        ${ banner_message or conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
       </div>
-
-
-      <div class="top-nav-middle">
-        <div class="search-container-top" data-bind="component: 'hue-global-search'"></div>
-      </div>
-
-      <div class="top-nav-right">
-        % if user.is_authenticated() and section != 'login' and (cluster != ANALYTIC_DB or IS_MULTICLUSTER_ONLY.get()):
-        <div class="dropdown navbar-dropdown pull-right">
-          % if IS_MULTICLUSTER_ONLY.get():
-            ##<!-- ko component: { name: 'hue-app-switcher', params: { onPrem: ko.observable(false) } } --><!-- /ko -->
-          % endif
-
-          <%
-            view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or is_admin(user)
-          %>
-          <button class="btn btn-flat" data-toggle="dropdown" data-bind="click: function(){ huePubSub.publish('hide.jobs.panel'); huePubSub.publish('hide.history.panel'); }">
-            <i class="fa fa-user"></i> ${ user.username } <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu">
-            % if view_profile:
-            <li><a href="javascript:void(0)" data-bind="hueLink: '/useradmin/users/edit/${ user.username }'" title="${ _('View Profile') if is_ldap_setup else _('Edit Profile') }"><i class="fa fa-fw fa-user"></i> ${_('My Profile')}</a></li>
-            % endif
-            % if is_admin(user):
-            <li data-bind="hueLink: '/useradmin/users/'"><a href="javascript: void(0);"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
-            % endif
-            % if is_admin(user):
-            <li><a data-bind="hueLink: '/about/'" href="javascript: void(0);"><span class="dropdown-no-icon">${_('Administration')}</span></a></li>
-            % endif
-            <li><a href="javascript:void(0)" onclick="huePubSub.publish('show.welcome.tour')"><span class="dropdown-no-icon">${_('Welcome Tour')}</span></a></li>
-            <li><a href="http://gethue.com" target="_blank"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
-            <li class="divider"></li>
-            <li><a title="${_('Sign out')}" data-bind="hueLink: '/accounts/logout'" href="javascript: void(0);"><i class="fa fa-fw fa-sign-out"></i> ${ _('Sign out') }</a></li>
-          </ul>
-        </div>
-        % endif
-
-        <!-- ko component: 'hue-history-panel' --><!-- /ko -->
-        <!-- ko if: hasJobBrowser -->
-          <!-- ko component: { name: 'hue-job-browser-links', params: { onePageViewModel: onePageViewModel }} --><!-- /ko -->
-        <!-- /ko -->
-      </div>
-
-    </div>
-  </nav>
-
-  <div id="jobsPanel" class="jobs-panel" style="display: none;">
-    <div style="position: absolute; right: 0px; padding: 5px 10px;">
-      <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('hide.jobs.panel')"><i class="fa fa-fw fa-times"></i></a>
-      <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('mini.jb.expand'); huePubSub.publish('hide.jobs.panel')" title="${ _('Open in Job Browser') }">
-        <i class="fa fa-fw fa-expand"></i>
-      </a>
-    </div>
-    <div id="mini_jobbrowser"></div>
-  </div>
-  % endif
-
-  <div class="content-wrapper">
-
-    <script type="text/html" id="hue-tmpl-sidebar-link">
-      <a role="button" class="hue-sidebar-item" data-bind="hueLink: item.url, attr: { title: item.displayName }">
-        <span class="hue-sidebar-item-name" data-bind="text: item.displayName"></span>
-      </a>
-    </script>
-
-    <div class="hue-sidebar hue-sidebar-below-top-bar" data-bind="visible: leftNavVisible" style="display:none;">
-      % if IS_MULTICLUSTER_ONLY.get():
-        <!-- ko component: { name: 'hue-multi-cluster-sidebar' } --><!-- /ko -->
-      % else:
-        <div class="hue-sidebar-content">
-          <!-- ko foreach: {data: items, as: 'item'} -->
-          <!-- ko if: item.isCategory -->
-            <h4 class="hue-sidebar-category-item" data-bind="text: item.displayName"></h4>
-            <!-- ko template: {name: 'hue-tmpl-sidebar-link', foreach: item.children, as: 'item'} --><!-- /ko -->
-          <!-- /ko -->
-          <!-- ko ifnot: item.isCategory -->
-            <!-- ko template: { name: 'hue-tmpl-sidebar-link' } --><!-- /ko -->
-          <!-- /ko -->
-          <!-- /ko -->
-        </div>
-        <div class="hue-sidebar-footer-panel">
-          % if hasattr(SHOW_UPLOAD_BUTTON, 'get') and SHOW_UPLOAD_BUTTON.get():
-          <div data-bind="dropzone: {
-            clickable: false,
-            url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR,
-            params: { dest: DROPZONE_HOME_DIR },
-            paramName: 'hdfs_file',
-            onError: onePageViewModel.dropzoneError,
-            onComplete: onePageViewModel.dropzoneComplete },
-            click: function(){ page('/indexer/importer/') }" class="pointer" title="${ _('Import data wizard') }">
-            <div class="dz-message" data-dz-message><i class="fa fa-fw fa-cloud-upload"></i> ${ _('Click or Drop files here') }</div>
-          </div>
-          % endif
-        </div>
-      % endif
-    </div>
-
-    % if IS_MULTICLUSTER_ONLY.get():
-    <div class="hue-dw-sidebar-container collapsed" data-bind="component: { name: 'hue-dw-sidebar', params: { items: items, pocClusterMode: pocClusterMode } }"></div>
     % endif
 
-    <div class="left-panel" data-bind="css: { 'side-panel-closed': !leftAssistVisible() }, visibleOnHover: { selector: '.hide-left-side-panel' }">
-      <a href="javascript:void(0);" style="z-index: 1002; display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-left-side-panel" data-bind="visible: !leftAssistVisible(), toggle: leftAssistVisible"><i class="fa fa-chevron-right"></i></a>
-      <a href="javascript:void(0);" style="display: none; opacity: 0;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-left-side-panel" data-bind="visible: leftAssistVisible, toggle: leftAssistVisible"><i class="fa fa-chevron-left"></i></a>
-      <div class="assist" data-bind="component: {
-          name: 'assist-panel',
-          params: {
-            user: '${user.username}',
-            sql: {
-              navigationSettings: {
-                openItem: false,
-                showStats: true
-              }
-            },
-            visibleAssistPanels: ['sql']
-          }
-        }, visible: leftAssistVisible" style="display:none;"></div>
-    </div>
+    % if not IS_EMBEDDED.get():
+    <nav class="navbar navbar-default">
+      <div class="navbar-inner top-nav">
+        <div class="top-nav-left">
+          % if not IS_EMBEDDED.get():
+            % if not (IS_MULTICLUSTER_ONLY.get() and get_cluster_config(user)['has_computes']):
+            <a class="hamburger hamburger-hue pull-left" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
+              <span class="hamburger-box"><span class="hamburger-inner"></span></span>
+            </a>
+            % endif
+          % endif
 
-    <div id="leftResizer" class="resizer" data-bind="visible: leftAssistVisible(), splitFlexDraggable : {
-      containerSelector: '.content-wrapper',
-      sidePanelSelector: '.left-panel',
-      sidePanelVisible: leftAssistVisible,
-      orientation: 'left',
-      onPosition: function() { huePubSub.publish('split.draggable.position') }
-    }"><div class="resize-bar"></div></div>
-
-
-    <div class="page-content">
-      <!-- ko hueSpinner: { spin: isLoadingEmbeddable, center: true, size: 'xlarge', blackout: true } --><!-- /ko -->
-      <div id="embeddable_editor" class="embeddable"></div>
-      <div id="embeddable_notebook" class="embeddable"></div>
-      <div id="embeddable_metastore" class="embeddable"></div>
-      <div id="embeddable_dashboard" class="embeddable"></div>
-      <div id="embeddable_oozie_workflow" class="embeddable"></div>
-      <div id="embeddable_oozie_coordinator" class="embeddable"></div>
-      <div id="embeddable_oozie_bundle" class="embeddable"></div>
-      <div id="embeddable_oozie_info" class="embeddable"></div>
-      <div id="embeddable_jobbrowser" class="embeddable"></div>
-      <div id="embeddable_filebrowser" class="embeddable"></div>
-      <div id="embeddable_home" class="embeddable"></div>
-      <div id="embeddable_catalog" class="embeddable"></div>
-      <div id="embeddable_indexer" class="embeddable"></div>
-      <div id="embeddable_kafka" class="embeddable"></div>
-      <div id="embeddable_importer" class="embeddable"></div>
-      <div id="embeddable_collections" class="embeddable"></div>
-      <div id="embeddable_indexes" class="embeddable"></div>
-      <div id="embeddable_useradmin_users" class="embeddable"></div>
-      <div id="embeddable_useradmin_groups" class="embeddable"></div>
-      <div id="embeddable_useradmin_newgroup" class="embeddable"></div>
-      <div id="embeddable_useradmin_editgroup" class="embeddable"></div>
-      <div id="embeddable_useradmin_permissions" class="embeddable"></div>
-      <div id="embeddable_useradmin_editpermission" class="embeddable"></div>
-      <div id="embeddable_useradmin_configurations" class="embeddable"></div>
-      <div id="embeddable_useradmin_newuser" class="embeddable"></div>
-      <div id="embeddable_useradmin_addldapusers" class="embeddable"></div>
-      <div id="embeddable_useradmin_addldapgroups" class="embeddable"></div>
-      <div id="embeddable_useradmin_edituser" class="embeddable"></div>
-      <div id="embeddable_hbase" class="embeddable"></div>
-      <div id="embeddable_security_hive" class="embeddable"></div>
-      <div id="embeddable_security_hdfs" class="embeddable"></div>
-      <div id="embeddable_security_hive2" class="embeddable"></div>
-      <div id="embeddable_security_solr" class="embeddable"></div>
-      <div id="embeddable_help" class="embeddable"></div>
-      <div id="embeddable_admin_wizard" class="embeddable"></div>
-      <div id="embeddable_logs" class="embeddable"></div>
-      <div id="embeddable_dump_config" class="embeddable"></div>
-      <div id="embeddable_threads" class="embeddable"></div>
-      <div id="embeddable_metrics" class="embeddable"></div>
-      <div id="embeddable_connectors" class="embeddable"></div>
-      <div id="embeddable_analytics" class="embeddable"></div>
-      <div id="embeddable_403" class="embeddable"></div>
-      <div id="embeddable_404" class="embeddable"></div>
-      <div id="embeddable_500" class="embeddable"></div>
-      <div id="embeddable_sqoop" class="embeddable"></div>
-      <div id="embeddable_jobsub" class="embeddable"></div>
-      % if other_apps:
-        % for other in other_apps:
-          <div id="embeddable_${ other.display_name }" class="embeddable"></div>
-        % endfor
-      % endif
-    </div>
-
-    <div class="right-panel" data-bind="css: { 'right-assist-minimized': !rightAssistVisible() }, visible: rightAssistAvailable, component: {
-        name: 'right-assist-panel',
-        params: {
-          visible: rightAssistVisible
-        }
-      }" style="display: none;"></div>
-
-    <div class="context-panel" data-bind="slideVisible: contextPanelVisible">
-      <div class="margin-top-10 padding-left-10 padding-right-10">
-        <h4 class="margin-bottom-30"><i class="fa fa-cogs"></i> ${_('Session')}</h4>
-        <div class="context-panel-content">
-          <!-- ko if: sessionsAvailable() && templateApp() -->
-          <div class="row-fluid">
-            <div class="span11" data-bind="template: { name: 'notebook-session-config-template' + templateApp(), data: activeAppViewModel }"></div>
+          % if not IS_MULTICLUSTER_ONLY.get():
+          <div class="btn-group" data-bind="visible: true" style="display:none; margin-top: 8px">
+            <!-- ko if: mainQuickCreateAction -->
+            <!-- ko with: mainQuickCreateAction -->
+            <a class="btn btn-primary disable-feedback hue-main-create-btn" data-bind="hueLink: url, attr: {title: tooltip}, style: { borderBottomRightRadius: $parent.quickCreateActions().length > 1 ? '0px' : '4px', borderTopRightRadius: $parent.quickCreateActions().length > 1 ? '0px' : '4px' }">
+              <span data-bind="text: displayName"></span>
+            </a>
+            <!-- /ko -->
+            <!-- /ko -->
+            <button class="btn btn-primary dropdown-toggle hue-main-create-btn-dropdown" data-toggle="dropdown" data-bind="visible: quickCreateActions().length > 1 || (quickCreateActions().length == 1 && quickCreateActions()[0].children && quickCreateActions()[0].children.length > 1)">
+              <!-- ko ifnot: mainQuickCreateAction -->${ _('More') } <!-- /ko -->
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu hue-main-create-dropdown" data-bind="foreach: { data: quickCreateActions, as: 'item' }">
+              <!-- ko template: 'quick-create-item-template' --><!-- /ko -->
+            </ul>
           </div>
-          <!-- /ko -->
+          % endif
 
-          <!-- ko ifnot: sessionsAvailable() && templateApp() -->
-          ${_('There are currently no information about the sessions.')}
+          <script type="text/html" id="quick-create-item-template">
+            <!-- ko if: item.dividerAbove -->
+            <li class="divider"></li>
+            <!-- /ko -->
+            <li data-bind="css: { 'dropdown-submenu': item.isCategory && item.children.length > 1 }">
+              <!-- ko if: item.url -->
+                <a href="javascript: void(0);" data-bind="hueLink: item.url">
+                  <!-- ko if: item.icon -->
+                  <!-- ko template: { name: 'app-icon-template', data: item } --><!-- /ko -->
+                  <!-- /ko -->
+                  <span data-bind="css: { 'dropdown-no-icon': !item.icon }, text: item.displayName"></span>
+                </a>
+              <!-- /ko -->
+              <!-- ko if: item.href -->
+                <a data-bind="attr: { href: item.href }, text: item.displayName" target="_blank"></a>
+              <!-- /ko -->
+              <!-- ko if: item.isCategory && item.children.length > 1 -->
+              <ul class="dropdown-menu" data-bind="foreach: { data: item.children, as: 'item' }">
+                <!-- ko template: 'quick-create-item-template' --><!-- /ko -->
+              </ul>
+              <!-- /ko -->
+            </li>
+          </script>
+        </div>
+
+
+        <div class="top-nav-middle">
+          <div class="search-container-top" data-bind="component: 'hue-global-search'"></div>
+        </div>
+
+        <div class="top-nav-right">
+          % if has_multi_clusters():
+            <select data-bind="options: clusters, optionsText: 'name', value: 'id'" class="input-small" style="margin-top:8px">
+            </select>
+          % endif
+          <!-- ko component: 'hue-history-panel' --><!-- /ko -->
+          <!-- ko if: hasJobBrowser -->
+            <!-- ko component: { name: 'hue-job-browser-links', params: { onePageViewModel: onePageViewModel }} --><!-- /ko -->
           <!-- /ko -->
         </div>
+
       </div>
-      <a class="pointer demi-modal-chevron" style="position: absolute; bottom: 0" data-bind="click: function () { huePubSub.publish('context.panel.visible.editor', false); }"><i class="fa fa-chevron-up"></i></a>
+    </nav>
+
+    <div id="jobsPanel" class="jobs-panel" style="display: none;">
+      <div style="position: absolute; right: 0px; padding: 5px 10px;">
+        <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('hide.jobs.panel')"><i class="fa fa-fw fa-times"></i></a>
+        <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('mini.jb.expand'); huePubSub.publish('hide.jobs.panel')" title="${ _('Open in Job Browser') }">
+          <i class="fa fa-fw fa-expand"></i>
+        </a>
+      </div>
+      <div id="mini_jobbrowser"></div>
+    </div>
+    % endif
+
+    <div class="content-wrapper">
+      <div class="left-panel" data-bind="css: { 'side-panel-closed': !leftAssistVisible() }, visibleOnHover: { selector: '.hide-left-side-panel' }">
+        <a href="javascript:void(0);" style="z-index: 1002; display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-left-side-panel" data-bind="visible: !leftAssistVisible(), toggle: leftAssistVisible"><i class="fa fa-chevron-right"></i></a>
+        <a href="javascript:void(0);" style="display: none; opacity: 0;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-left-side-panel" data-bind="visible: leftAssistVisible, toggle: leftAssistVisible"><i class="fa fa-chevron-left"></i></a>
+        <div class="assist" data-bind="component: {
+            name: 'assist-panel',
+            params: {
+              user: '${user.username}',
+              sql: {
+                navigationSettings: {
+                  openItem: false,
+                  showStats: true
+                }
+              },
+              visibleAssistPanels: ['sql']
+            }
+          }, visible: leftAssistVisible" style="display:none;"></div>
+      </div>
+
+      <div id="leftResizer" class="resizer" data-bind="visible: leftAssistVisible(), splitFlexDraggable : {
+        containerSelector: '.content-wrapper',
+        sidePanelSelector: '.left-panel',
+        sidePanelVisible: leftAssistVisible,
+        orientation: 'left',
+        onPosition: function() { huePubSub.publish('split.draggable.position') }
+      }"><div class="resize-bar"></div></div>
+
+
+      <div class="page-content">
+        <!-- ko hueSpinner: { spin: isLoadingEmbeddable, center: true, size: 'xlarge', blackout: true } --><!-- /ko -->
+        <div id="embeddable_editor" class="embeddable"></div>
+        <div id="embeddable_notebook" class="embeddable"></div>
+        <div id="embeddable_metastore" class="embeddable"></div>
+        <div id="embeddable_dashboard" class="embeddable"></div>
+        <div id="embeddable_oozie_workflow" class="embeddable"></div>
+        <div id="embeddable_oozie_coordinator" class="embeddable"></div>
+        <div id="embeddable_oozie_bundle" class="embeddable"></div>
+        <div id="embeddable_oozie_info" class="embeddable"></div>
+        <div id="embeddable_jobbrowser" class="embeddable"></div>
+        <div id="embeddable_filebrowser" class="embeddable"></div>
+        <div id="embeddable_home" class="embeddable"></div>
+        <div id="embeddable_catalog" class="embeddable"></div>
+        <div id="embeddable_indexer" class="embeddable"></div>
+        <div id="embeddable_kafka" class="embeddable"></div>
+        <div id="embeddable_importer" class="embeddable"></div>
+        <div id="embeddable_collections" class="embeddable"></div>
+        <div id="embeddable_indexes" class="embeddable"></div>
+        <div id="embeddable_useradmin_users" class="embeddable"></div>
+        <div id="embeddable_useradmin_groups" class="embeddable"></div>
+        <div id="embeddable_useradmin_newgroup" class="embeddable"></div>
+        <div id="embeddable_useradmin_editgroup" class="embeddable"></div>
+        <div id="embeddable_useradmin_permissions" class="embeddable"></div>
+        <div id="embeddable_useradmin_editpermission" class="embeddable"></div>
+        <div id="embeddable_useradmin_configurations" class="embeddable"></div>
+        <div id="embeddable_useradmin_newuser" class="embeddable"></div>
+        <div id="embeddable_useradmin_addldapusers" class="embeddable"></div>
+        <div id="embeddable_useradmin_addldapgroups" class="embeddable"></div>
+        <div id="embeddable_useradmin_edituser" class="embeddable"></div>
+        <div id="embeddable_hbase" class="embeddable"></div>
+        <div id="embeddable_security_hive" class="embeddable"></div>
+        <div id="embeddable_security_hdfs" class="embeddable"></div>
+        <div id="embeddable_security_hive2" class="embeddable"></div>
+        <div id="embeddable_security_solr" class="embeddable"></div>
+        <div id="embeddable_help" class="embeddable"></div>
+        <div id="embeddable_admin_wizard" class="embeddable"></div>
+        <div id="embeddable_logs" class="embeddable"></div>
+        <div id="embeddable_dump_config" class="embeddable"></div>
+        <div id="embeddable_threads" class="embeddable"></div>
+        <div id="embeddable_metrics" class="embeddable"></div>
+        <div id="embeddable_connectors" class="embeddable"></div>
+        <div id="embeddable_analytics" class="embeddable"></div>
+        <div id="embeddable_403" class="embeddable"></div>
+        <div id="embeddable_404" class="embeddable"></div>
+        <div id="embeddable_500" class="embeddable"></div>
+        <div id="embeddable_sqoop" class="embeddable"></div>
+        <div id="embeddable_jobsub" class="embeddable"></div>
+        % if other_apps:
+          % for other in other_apps:
+            <div id="embeddable_${ other.display_name }" class="embeddable"></div>
+          % endfor
+        % endif
+      </div>
+
+      <div class="right-panel" data-bind="css: { 'right-assist-minimized': !rightAssistVisible() }, visible: rightAssistAvailable, component: {
+          name: 'right-assist-panel',
+          params: {
+            visible: rightAssistVisible
+          }
+        }" style="display: none;"></div>
+
+      <div class="context-panel" data-bind="slideVisible: contextPanelVisible">
+        <div class="margin-top-10 padding-left-10 padding-right-10">
+          <h4 class="margin-bottom-30"><i class="fa fa-cogs"></i> ${_('Session')}</h4>
+          <div class="context-panel-content">
+            <!-- ko if: sessionsAvailable() && templateApp() -->
+            <div class="row-fluid">
+              <div class="span11" data-bind="template: { name: 'notebook-session-config-template' + templateApp(), data: activeAppViewModel }"></div>
+            </div>
+            <!-- /ko -->
+
+            <!-- ko ifnot: sessionsAvailable() && templateApp() -->
+            ${_('There are currently no information about the sessions.')}
+            <!-- /ko -->
+          </div>
+        </div>
+        <a class="pointer demi-modal-chevron" style="position: absolute; bottom: 0" data-bind="click: function () { huePubSub.publish('context.panel.visible.editor', false); }"><i class="fa fa-chevron-up"></i></a>
+      </div>
     </div>
   </div>
 </div>
-
 ${ commonshare() | n,unicode }
 
-${ render_bundle('vendors~hue~notebook') | n,unicode }
+${ render_bundle('vendors~hue~notebook~tableBrowser') | n,unicode }
+${ render_bundle('vendors~hue~tableBrowser') | n,unicode }
 ${ render_bundle('vendors~hue') | n,unicode }
 ${ render_bundle('hue~notebook') | n,unicode }
+${ render_bundle('hue~notebook~tableBrowser') | n,unicode }
+${ render_bundle('hue~tableBrowser') | n,unicode }
 ${ render_bundle('hue') | n,unicode }
 
 <script src="${ static('desktop/js/polyfills.js') }"></script>
@@ -484,7 +416,6 @@ ${ render_bundle('hue') | n,unicode }
 <script>ace.config.set("basePath", "${ static('desktop/js/ace') }");</script>
 
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
-<script src="${ static('metastore/js/metastore.model.js') }"></script>
 
 <script>
   var shareViewModel = initSharing("#documentShareModal");
@@ -503,9 +434,6 @@ ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 
 ## clusterConfig makes an Ajax call so it needs to be after commonHeaderFooterComponents
 <script src="${ static('desktop/js/clusterConfig.js') }"></script>
-
-${ assist.assistJSModels() }
-${ assist.assistPanel() }
 
 % if request is not None:
 ${ smart_unicode(login_modal(request).content) | n,unicode }
@@ -623,8 +551,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
     %if is_admin(user):
       tour.addStep('admin', {
-        text: '${ _ko('As a superuser, you can check system configuration from the username drop down and install sample data and jobs for your users.') }',
-        attachTo: '.top-nav-right .dropdown bottom'
+        text: '${ _ko('As a superuser, you can check system configuration from the user menu and install sample data and jobs for your users.') }',
+        attachTo: '.hue-sidebar .shepherd-user-menu right'
       });
     %endif
 

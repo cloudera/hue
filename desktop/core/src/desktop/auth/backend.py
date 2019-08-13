@@ -846,4 +846,3 @@ def delete_oidc_session_tokens(session):
       del session['oidc_refresh_token']
     if 'oidc_state' in session:
       del session['oidc_state']
-

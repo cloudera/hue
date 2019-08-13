@@ -10,7 +10,7 @@ const hueGlobals = [
   'USER_HOME_DIR', 'WorkerGlobalScope',
 
   // other misc
-  'ace', 'CodeMirror', 'impalaDagre', 'less', 'MediumEditor', 'moment', 'Role', 'trackOnGA',
+  'ace', 'CodeMirror', 'impalaDagre', 'less', 'MediumEditor', 'moment', 'Role', 'trackOnGA', '__webpack_public_path__',
 
   // jasmine
   'afterAll', 'afterEach', 'beforeAll', 'beforeEach', 'describe', 'expect', 'fail', 'fdescribe', 'fit', 'it', 'jasmine',
@@ -27,7 +27,8 @@ module.exports = {
   env: {
     browser: true,
     node: true,
-    es6: true
+    es6: true,
+    jasmine: true
   },
   extends: [
     'plugin:prettier/recommended'
@@ -40,10 +41,28 @@ module.exports = {
     ecmaFeatures: {
     }
   },
-  plugins: [],
+  plugins: [
+    'jasmine'
+  ],
   rules: {
+    'jasmine/expect-matcher': 1,
+    'jasmine/expect-single-argument': 1,
+    'jasmine/new-line-before-expect': 1,
+    'jasmine/new-line-between-declarations': 1,
+    'jasmine/no-focused-tests': 2,
+    'jasmine/no-global-setup': 2,
+    'jasmine/no-promise-without-done-fail': 1,
+    'jasmine/no-suite-callback-args': 2,
+    'jasmine/no-suite-dupes': 1,
     'new-cap': 0,
     'no-console': 0,
+    'no-restricted-syntax': [
+      'error',
+      {
+        'selector': 'CallExpression[callee.object.name="console"][callee.property.name!=/^(warn|error|info|trace)$/]',
+        'message': 'Unexpected property on console object was called'
+      }
+    ],
     'no-extra-boolean-cast': 0,
     'no-invalid-this': 0,
     'no-lonely-if': 2,

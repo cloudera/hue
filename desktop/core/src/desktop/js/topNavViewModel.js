@@ -57,6 +57,7 @@ class TopNavViewModel {
     self.quickCreateActions = ko.observableArray();
 
     self.hasJobBrowser = ko.observable(true);
+    self.clusters = ko.observableArray();
 
     huePubSub.subscribe('cluster.config.set.config', clusterConfig => {
       if (clusterConfig && clusterConfig['main_button_action']) {
@@ -99,7 +100,7 @@ class TopNavViewModel {
             }
           });
 
-          if (window.SHOW_ADD_MORE_EDITORS && app.name === 'editor') {
+          if (window.SHOW_ADD_MORE_EDITORS && app.name === 'editor' && interpreters.length > 1) {
             interpreters.push({
               displayName: I18n('Add more...'),
               dividerAbove: true,
@@ -121,11 +122,16 @@ class TopNavViewModel {
         self.quickCreateActions([]);
       }
 
+      if (clusterConfig && clusterConfig['clusters']) {
+        self.clusters(clusterConfig['clusters']);
+      }
+
       self.hasJobBrowser(
         clusterConfig &&
           clusterConfig['app_config'] &&
           clusterConfig['app_config']['browser'] &&
           (clusterConfig['app_config']['browser']['interpreter_names'].indexOf('yarn') != -1 ||
+            clusterConfig['app_config']['editor']['interpreter_names'].indexOf('impala') != -1 ||
             clusterConfig['app_config']['browser']['interpreter_names'].indexOf('dataeng') != -1)
       );
     });

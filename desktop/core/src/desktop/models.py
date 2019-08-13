@@ -38,15 +38,13 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from settings import HUE_DESKTOP_VERSION
 
-from aws.conf import is_enabled as is_s3_enabled, has_s3_access
-from azure.conf import is_adls_enabled, has_adls_access
 from dashboard.conf import get_engines, HAS_REPORT_ENABLED
-from hadoop.conf import has_hdfs_enabled
 from kafka.conf import has_kafka
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 
 from desktop import appmanager
 from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_EMBEDDED, IS_K8S_ONLY
+from desktop.lib import fsmanager
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paths import get_run_root, SAFE_CHARACTERS_URI_COMPONENTS
@@ -1553,10 +1551,7 @@ class Document2Permission(models.Model):
 
 
 def get_cluster_config(user):
-  cluster_type = Cluster(user).get_type()
-  cluster_config = ClusterConfig(user, cluster_type=cluster_type)
-
-  return cluster_config.get_config()
+  return Cluster(user).get_app_config().get_config()
 
 
 # Aka 'Atus'
@@ -1575,7 +1570,6 @@ class ClusterConfig():
     self.user = user
     self.apps = appmanager.get_apps_dict(self.user) if apps is None else apps
     self.cluster_type = cluster_type
-
 
   def refreshConfig(self):
     # TODO: reload "some ini sections"
@@ -1603,7 +1597,8 @@ class ClusterConfig():
         ] if app is not None
       ],
       'default_sql_interpreter': default_sql_interpreter,
-      'cluster_type': self.cluster_type
+      'cluster_type': self.cluster_type,
+      'has_computes': self.cluster_type in ('altus', 'snowball') # or any grouped engine connectors
     }
 
 
@@ -1676,13 +1671,14 @@ class ClusterConfig():
           'tooltip': _('%s Query') % interpreter['type'].title(),
           'page': '/editor/?type=%(type)s' % interpreter,
           'is_sql': interpreter['is_sql'],
+          'dialect': interpreter['dialect'],
         })
 
     if SHOW_NOTEBOOKS.get() and ANALYTIC_DB not in self.cluster_type:
       try:
         first_non_sql_index = [interpreter['is_sql'] for interpreter in interpreters].index(False)
       except ValueError:
-        first_non_sql_index = 0
+        first_non_sql_index = len(interpreters) if all([interpreter['is_sql'] for interpreter in interpreters]) else 0
       interpreters.insert(first_non_sql_index, {
         'name': 'notebook',
         'type': 'notebook',
@@ -1691,6 +1687,7 @@ class ClusterConfig():
         'tooltip': _('Notebook'),
         'page': '/notebook',
         'is_sql': False,
+        'dialect': 'notebook'
       })
 
     if interpreters:
@@ -1764,7 +1761,7 @@ class ClusterConfig():
   def _get_browser(self):
     interpreters = []
 
-    if has_hdfs_enabled() and 'filebrowser' in self.apps and ANALYTIC_DB not in self.cluster_type:
+    if 'filebrowser' in self.apps and ANALYTIC_DB not in self.cluster_type and fsmanager.is_enabled_and_has_access('hdfs', self.user):
       interpreters.append({
         'type': 'hdfs',
         'displayName': _('Files'),
@@ -1773,7 +1770,7 @@ class ClusterConfig():
         'page': '/filebrowser/' + (not self.user.is_anonymous() and 'view=' + urllib.quote(self.user.get_home_directory().encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) or '')
       })
 
-    if is_s3_enabled() and 'filebrowser' in self.apps and has_s3_access(self.user) and not IS_EMBEDDED.get():
+    if 'filebrowser' in self.apps and not IS_EMBEDDED.get() and fsmanager.is_enabled_and_has_access('s3a', self.user):
       interpreters.append({
         'type': 's3',
         'displayName': _('S3'),
@@ -1782,7 +1779,7 @@ class ClusterConfig():
         'page': '/filebrowser/view=' + urllib.quote('S3A://'.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
       })
 
-    if is_adls_enabled() and 'filebrowser' in self.apps and has_adls_access(self.user) and ANALYTIC_DB not in self.cluster_type:
+    if 'filebrowser' in self.apps and ANALYTIC_DB not in self.cluster_type and fsmanager.is_enabled_and_has_access('adl', self.user):
       interpreters.append({
         'type': 'adls',
         'displayName': _('ADLS'),
@@ -1848,6 +1845,15 @@ class ClusterConfig():
         'buttonName': _('Browse'),
         'tooltip': _('Security'),
         'page': '/security/hive'
+      })
+
+    if 'indexer' in self.apps and self.user.has_hue_permission(action="access:importer", app="indexer") and not IS_EMBEDDED.get():
+      interpreters.append({
+        'type': 'importer',
+        'displayName': _('Importer'),
+        'buttonName': _('Import'),
+        'tooltip': _('Importer'),
+        'page': '/indexer/importer'
       })
 
     if 'sqoop' in self.apps and ANALYTIC_DB not in self.cluster_type:
@@ -1931,6 +1937,8 @@ class ClusterConfig():
     else:
       return None
 
+  def get_hive_metastore_interpreters(self):
+    return [interpreter['type'] for interpreter in get_ordered_interpreters(self.user) if interpreter == 'hive' or interpreter == 'hms']
 
 class Cluster():
 
@@ -1938,21 +1946,19 @@ class Cluster():
     self.user = user
     self.clusters = get_clusters(user)
 
-    if len(self.clusters) == 1:
-      self.data = self.clusters.values()[0]
-    elif IS_K8S_ONLY.get():
-      self.data = self.clusters['AltusV2']
-      self.data['type'] = 'altus' # To show simplified UI
-    elif IS_MULTICLUSTER_ONLY.get():
-      self.data = self.clusters['Altus']
+    if IS_MULTICLUSTER_ONLY.get():
+      self.data = self.clusters['Altus'] # Backward compatibility
     else:
-      self.data = self.clusters[CLUSTER_ID.get()]
+      self.data = self.clusters.values()[0] # Next: CLUSTER_ID.get() or user persisted
 
   def get_type(self):
     return self.data['type']
 
   def get_config(self, name):
     return self.clusters[name]
+
+  def get_app_config(self):
+    return ClusterConfig(self.user, cluster_type=self.get_type())
 
 
 def _get_apps(user, section=None):

@@ -301,6 +301,9 @@
   # Number of characters in rest api reponse calls to dump to the logs when debug is enabled. Set to -1 for entire response.
   ## rest_response_size=2000
 
+  # Turn on Prometheus metrics end point /metrics.
+  ## enable_prometheus=false
+
   # Administrators
   # ----------------
   [[django_admins]]
@@ -877,6 +880,10 @@
     #   name=Hive
     #   interface=hiveserver2
 
+    # [[[llap]]]
+    #   name=LLAP
+    #   interface=hiveserver2
+
     # [[[impala]]]
     #   name=Impala
     #   interface=hiveserver2
@@ -979,6 +986,14 @@
     #   ## Specific options for connecting to the ClickHouse server.
     #   ## The JDBC driver clickhouse-jdbc.jar and its related jars need to be in the CLASSPATH environment variable.
     #   options='{"url": "jdbc:clickhouse://localhost:8123", "driver": "ru.yandex.clickhouse.ClickHouseDriver", "user": "readonly", "password": ""}'
+
+    # [[[vertica]]]
+    #   name=Vertica
+    #   interface=jdbc
+    #   ## Specific options for connecting to a Vertica server.
+    #   ## The JDBC driver vertica-jdbc-*.jar and its related jars need to be in the CLASSPATH environment variable.
+    #   ## If 'user' and 'password' are omitted, they will be prompted in the UI.
+    #   options='{"url": "jdbc:vertica://localhost:5434", "driver": "com.vertica.jdbc.Driver"}'
 
 
 ###########################################################################
@@ -1121,7 +1136,44 @@
 
   # Port where HiveServer2 Thrift server runs on.
   ## hive_server_port=10000
-
+  
+  # Host where LLAP is running
+  ## llap_server_host = localhost
+  
+  # Main Port where LLAP runs
+  ## llap_server_port = 10500
+  
+  # Port where LLAP Thrift server runs on
+  ## llap_server_thrift_port = 10501
+  
+  # Alternatively, use Service Discovery for LLAP (Hive Server Interactive) and/or Hiveserver2, this will override server and thrift port
+  
+  # Whether to use Service Discovery for LLAP 
+  ## hive_discovery_llap = true
+  
+  # is llap (hive server interactive) running in an HA configuration (more than 1)
+  # important as the zookeeper structure is different
+  ## hive_discovery_llap_ha = false
+  
+  # Shortcuts to finding LLAP znode Key
+  # Non-HA - hiveserver-interactive-site - hive.server2.zookeeper.namespace ex hive2 = /hive2
+  # HA-NonKerberized - <llap_app_name>_llap ex app name llap0 = /llap0_llap
+  # HA-Kerberized - <llap_app_name>_llap-sasl ex app name llap0 = /llap0_llap-sasl
+  ## hive_discovery_llap_znode = /hiveserver2-hive2
+  
+  # Whether to use Service Discovery for HiveServer2
+  ## hive_discovery_hs2 = true
+  
+  # Hiveserver2 is hive-site hive.server2.zookeeper.namespace ex hiveserver2 = /hiverserver2
+  ## hive_discovery_hiveserver2_znode = /hiveserver2
+  
+  # Applicable only for LLAP HA
+  # To keep the load on zookeeper to a minimum
+  # ---- we cache the LLAP activeEndpoint for the cache_timeout period
+  # ---- we cache the hiveserver2 endpoint for the length of session
+  # configurations to set the time between zookeeper checks
+  ## cache_timeout = 60
+  
   # Host where Hive Metastore Server (HMS) is running.
   # If Kerberos security is enabled, the fully-qualified domain name (FQDN) is required.
   ## hive_metastore_host=localhost
@@ -1172,6 +1224,9 @@
   # e.g. Used for LDAP/PAM pass-through authentication.
   ## auth_username=hue
   ## auth_password=
+
+  # Use SASL framework to establish connection to host.
+  ## use_sasl=false
 
   [[ssl]]
     # Path to Certificate Authority certificates.
@@ -1248,6 +1303,9 @@
   # Path to the impala configuration dir which has impalad_flags file
   ## impala_conf_dir=${HUE_CONF_DIR}/impala-conf
 
+  # Use SASL framework to establish connection to host.
+  ## use_sasl=true
+
   [[ssl]]
     # SSL communication enabled for this server.
     ## enabled=false
@@ -1285,6 +1343,8 @@
   # Choose whether Hue should validate certificates received from the server.
   ## ssl_cert_ca_verify=true
 
+  # Use SASL framework to establish connection to host.
+  ## use_sasl=false
 
 ###########################################################################
 # Settings to configure the Oozie app
@@ -1646,6 +1706,12 @@
       ## fs_defaultfs=adl://<account_name>.azuredatalakestore.net
       ## webhdfs_url=https://<account_name>.azuredatalakestore.net/webhdfs/v1
 
+  [[abfs_clusters]]
+    # Default ABFS cluster
+    [[[default]]]
+      ## fs_defaultfs=abfss://<container_name>@<account_name>.dfs.core.windows.net
+      ## webhdfs_url=https://<container_name>@<account_name>.dfs.core.windows.net
+
 ###########################################################################
 # Settings for the Sentry lib
 ###########################################################################
@@ -1956,6 +2022,9 @@
     # Limits found entities to a specific cluster. When empty the entities from all clusters will be included in the
     # search results.
     ## search_cluster=
+
+    # Set to true when authenticating via kerberos instead of username/password
+    ## kerberos_enabled=core_site.is_kerberos_enabled()
 
   # Deprecated by [[catalog]]
   [[navigator]]

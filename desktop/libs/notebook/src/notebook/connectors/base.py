@@ -23,12 +23,13 @@ import uuid
 
 from django.utils.translation import ugettext as _
 
-from desktop.conf import has_multi_cluster
+from desktop.conf import TASK_SERVER, has_connectors
 from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
+from desktop.models import get_cluster_config
 
-from notebook.conf import get_ordered_interpreters, CONNECTORS
+from notebook.conf import get_ordered_interpreters
 from notebook.sql_utils import get_current_statement
 
 
@@ -103,8 +104,9 @@ class Notebook(object):
 
     return _data
 
-  def get_str(self):
-    return '\n\n\n'.join(['USE %s;\n\n%s' % (snippet['database'], Notebook.statement_with_variables(snippet)) for snippet in self.get_data()['snippets']])
+  def get_str(self, from_oozie_action=False):
+    return '\n\n\n'.join(['USE %s;\n\n%s' % (snippet['database'], snippet['statement_raw'] if from_oozie_action else Notebook.statement_with_variables(snippet))
+                          for snippet in self.get_data()['snippets']])
 
   @staticmethod
   def statement_with_variables(snippet):
@@ -271,21 +273,12 @@ class Notebook(object):
     return _execute_notebook(request, notebook_data, snippet)
 
 
-def get_api(request, snippet):
-  from notebook.connectors.oozie_batch import OozieApi
-
-  if snippet.get('wasBatchExecuted'):
-    return OozieApi(user=request.user, request=request)
-
-  if snippet['type'] == 'report':
-    snippet['type'] = 'impala'
-
+def get_interpreter(connector_type, user=None):
   interpreter = [
-    interpreter
-    for interpreter in get_ordered_interpreters(request.user) if snippet['type'] in (interpreter['type'], interpreter['interface'])
+    interpreter for interpreter in get_ordered_interpreters(user) if connector_type == interpreter['type']
   ]
   if not interpreter:
-    if snippet['type'] == 'hbase':
+    if connector_type == 'hbase': # TODO move to connectors
       interpreter = [{
         'name': 'hbase',
         'type': 'hbase',
@@ -293,7 +286,7 @@ def get_api(request, snippet):
         'options': {},
         'is_sql': False
       }]
-    elif snippet['type'] == 'kafka':
+    elif connector_type == 'kafka':
       interpreter = [{
         'name': 'kafka',
         'type': 'kafka',
@@ -301,7 +294,7 @@ def get_api(request, snippet):
         'options': {},
         'is_sql': False
       }]
-    elif snippet['type'] == 'solr':
+    elif connector_type == 'solr':
       interpreter = [{
         'name': 'solr',
         'type': 'solr',
@@ -309,53 +302,42 @@ def get_api(request, snippet):
         'options': {},
         'is_sql': False
       }]
-    elif snippet['type'] == 'custom':
-      interpreter = [{
-        'name': snippet['name'],
-        'type': snippet['type'],
-        'interface': snippet['interface'],
-        'options': snippet.get('options', {}),
-        'is_sql': False
-      }]
     else:
-      raise PopupException(_('Snippet type %(type)s is not configured.') % snippet)
+      raise PopupException(_('Snippet type %s is not configured.') % connector_type)
+  elif len(interpreter) > 1:
+    raise PopupException(_('Snippet type %s matching more than one interpreter: %s') % (connector_type, len(interpreter)))
 
-  interpreter = interpreter[0]
+  return interpreter[0]
+
+
+def get_api(request, snippet):
+  from notebook.connectors.oozie_batch import OozieApi
+
+  if snippet.get('wasBatchExecuted') and not TASK_SERVER.ENABLED.get():
+    return OozieApi(user=request.user, request=request)
+
+  if snippet['type'] == 'report':
+    snippet['type'] = 'impala'
+
+  interpreter = get_interpreter(connector_type=snippet['type'], user=request.user)
   interface = interpreter['interface']
 
+  if get_cluster_config(request.user)['has_computes']:
+    compute = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API or Notebook create sessions.
+    if compute == '""' or compute == 'undefined':
+      compute = None
+    if not compute and snippet.get('compute'): # Via notebook.ko.js
+      interpreter['compute'] = snippet['compute']
 
-  if CONNECTORS.IS_ENABLED.get():
-    cluster = {
-      'connector': snippet['type'],
-      'id': interpreter['type'],
-    }
-    snippet['type'] = snippet['type'].split('-', 2)[0]
-    cluster.update(interpreter['options'])
-  # Multi cluster
-  elif has_multi_cluster():
-    cluster = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API or Notebook create sessions
-    if cluster == '""' or cluster == 'undefined':
-      cluster = None
-    if not cluster and snippet.get('compute'): # Via notebook.ko.js
-      cluster = snippet['compute']
-  else:
-    cluster = None
+  LOG.debug('Selected interpreter %s interface=%s compute=%s' % (
+    interpreter['type'],
+    interface,
+    interpreter.get('compute') and interpreter['compute']['name'])
+  )
 
-  cluster_name = cluster.get('id') if cluster else None
-
-  if cluster and 'altus:dataware:k8s' in cluster_name:
-    interface = 'hiveserver2'
-  elif cluster and 'crn:altus:dataware:' in cluster_name:
-    interface = 'altus-adb'
-  elif cluster and 'crn:altus:dataeng:' in cluster_name:
-    interface = 'dataeng'
-
-  LOG.info('Selected cluster %s %s interface %s' % (cluster_name, cluster, interface))
-  snippet['interface'] = interface
-
-  if interface.startswith('hiveserver2') or interface == 'hms':
+  if interface == 'hiveserver2':
     from notebook.connectors.hiveserver2 import HS2Api
-    return HS2Api(user=request.user, request=request, cluster=cluster, interface=interface)
+    return HS2Api(user=request.user, request=request, interpreter=interpreter)
   elif interface == 'oozie':
     return OozieApi(user=request.user, request=request)
   elif interface == 'livy':
@@ -370,12 +352,6 @@ def get_api(request, snippet):
   elif interface == 'rdbms':
     from notebook.connectors.rdbms import RdbmsApi
     return RdbmsApi(request.user, interpreter=snippet['type'], query_server=snippet.get('query_server'))
-  elif interface == 'altus-adb':
-    from notebook.connectors.altus_adb import AltusAdbApi
-    return AltusAdbApi(user=request.user, cluster_name=cluster_name, request=request)
-  elif interface == 'dataeng':
-    from notebook.connectors.dataeng import DataEngApi
-    return DataEngApi(user=request.user, request=request, cluster_name=cluster_name)
   elif interface == 'jdbc':
     if interpreter['options'] and interpreter['options'].get('url', '').find('teradata') >= 0:
       from notebook.connectors.jdbc_teradata import JdbcApiTeradata
@@ -389,6 +365,9 @@ def get_api(request, snippet):
     elif interpreter['options'] and interpreter['options'].get('url', '').find('clickhouse') >= 0:
       from notebook.connectors.jdbc_clickhouse import JdbcApiClickhouse
       return JdbcApiClickhouse(request.user, interpreter=interpreter)
+    elif interpreter['options'] and interpreter['options'].get('url', '').find('vertica') >= 0:
+      from notebook.connectors.jdbc_vertica import JdbcApiVertica
+      return JdbcApiVertica(request.user, interpreter=interpreter)
     else:
       from notebook.connectors.jdbc import JdbcApi
       return JdbcApi(request.user, interpreter=interpreter)
@@ -402,7 +381,7 @@ def get_api(request, snippet):
     from notebook.connectors.jdbc_presto import JdbcApiPresto
     return JdbcApiPresto(request.user, interpreter=interpreter)
   elif interface == 'sqlalchemy':
-    from notebook.connectors.sqlalchemyapi import SqlAlchemyApi
+    from notebook.connectors.sql_alchemy import SqlAlchemyApi
     return SqlAlchemyApi(request.user, interpreter=interpreter)
   elif interface == 'solr':
     from notebook.connectors.solr import SolrApi
@@ -431,13 +410,11 @@ def _get_snippet_session(notebook, snippet):
 
 class Api(object):
 
-  def __init__(self, user, interpreter=None, request=None, cluster=None, query_server=None, interface=None):
+  def __init__(self, user, interpreter=None, request=None, query_server=None):
     self.user = user
     self.interpreter = interpreter
     self.request = request
-    self.cluster = cluster
     self.query_server = query_server
-    self.interface = interface
 
   def create_session(self, lang, properties=None):
     return {
@@ -579,19 +556,23 @@ class ExecutionWrapper():
           self.callback.on_execute(handle)
         self.should_close = True
         self._until_available()
+
     if self.snippet['result']['handle'].get('sync', False):
       result = self.snippet['result']['handle']['result']
     else:
       result = self.api.fetch_result(self.notebook, self.snippet, rows, start_over)
+
     return ResultWrapper(result.get('meta'), result.get('data'), result.get('has_more'))
 
   def _until_available(self):
     if self.snippet['result']['handle'].get('sync', False):
       return # Request is already completed
+
     count = 0
     sleep_seconds = 1
     check_status_count = 0
     get_log_is_full_log = self.api.get_log_is_full_log(self.notebook, self.snippet)
+
     while True:
       response = self.api.check_status(self.notebook, self.snippet)
       if self.callback and hasattr(self.callback, 'on_status'):
@@ -617,6 +598,7 @@ class ExecutionWrapper():
     if self.should_close:
       self.should_close = False
       self.api.close_statement(self.notebook, self.snippet)
+
 
 class ResultWrapper():
   def __init__(self, cols, rows, has_more):

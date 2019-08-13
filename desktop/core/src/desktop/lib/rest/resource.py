@@ -88,28 +88,30 @@ class Resource(object):
     """
     path = self._join_uri(relpath)
     start_time = time.time()
-    resp = self._client.execute(method,
-                                path,
-                                params=params,
-                                data=data,
-                                headers=headers,
-                                files=files,
-                                allow_redirects=allow_redirects,
-                                urlencode=self._urlencode,
-                                clear_cookies=clear_cookies)
-
-    if log_response:
-      log_length = conf.REST_RESPONSE_SIZE.get() != -1 and conf.REST_RESPONSE_SIZE.get()
+    resp = None
+    try:
+      resp = self._client.execute(method,
+                                  path,
+                                  params=params,
+                                  data=data,
+                                  headers=headers,
+                                  files=files,
+                                  allow_redirects=allow_redirects,
+                                  urlencode=self._urlencode,
+                                  clear_cookies=clear_cookies)
+    finally: # Print the response time even when there's an exception
+      log_length = conf.REST_RESPONSE_SIZE.get() != -1 and conf.REST_RESPONSE_SIZE.get() if log_response else 0 # We want to output duration without content
       duration = time.time() - start_time
       message = "%s %s Got response%s: %s%s" % (
           method,
           smart_unicode(path, errors='ignore'),
           ' in %dms' % (duration * 1000),
-          smart_unicode(resp.content[:log_length or None], errors='replace'),
-          log_length and len(resp.content) > log_length and "..." or ""
+          smart_unicode(resp.content[:log_length], errors='replace') if resp else "",
+          log_length and len(resp.content) > log_length and "..." or "" if resp else ""
       )
       self._client.logger.disabled = 0
       log_if_slow_call(duration=duration, message=message, logger=self._client.logger)
+
 
     return resp
 

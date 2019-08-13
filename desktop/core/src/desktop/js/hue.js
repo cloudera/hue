@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'utils/publicPath';
 import '@babel/polyfill';
 import _ from 'lodash';
 import $ from 'jquery/jquery.common';
@@ -56,7 +57,7 @@ import sqlUtils from 'sql/sqlUtils';
 import { PigFunctions, SqlSetOptions, SqlFunctions } from 'sql/sqlFunctions';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 
-import 'assist/assistViewModel';
+import 'ko/components/assist/assistViewModel';
 import OnePageViewModel from 'onePageViewModel';
 import SideBarViewModel from 'sideBarViewModel';
 import SidePanelViewModel from 'sidePanelViewModel';
@@ -67,8 +68,9 @@ import EditorViewModel from 'apps/notebook/editorViewModel'; // In history, inde
 import EditorViewModel2 from 'apps/notebook2/editorViewModel'; // In history, indexer, importer, editor etc.
 import HdfsAutocompleter from 'utils/hdfsAutocompleter';
 import SqlAutocompleter from 'sql/sqlAutocompleter';
-import sqlAutocompleteParser from 'parse/sqlAutocompleteParser'; // Notebook and used throughout via hue-simple-ace-editor ko component
 import sqlStatementsParser from 'parse/sqlStatementsParser'; // In search.ko and notebook.ko
+import HueFileEntry from 'doc/hueFileEntry';
+import HueDocument from 'doc/hueDocument';
 
 // TODO: Migrate away
 window._ = _;
@@ -91,7 +93,9 @@ window.HdfsAutocompleter = HdfsAutocompleter;
 window.hueAnalytics = hueAnalytics;
 window.HueColors = HueColors;
 window.hueDebug = hueDebug;
+window.HueDocument = HueDocument;
 window.hueDrop = hueDrop;
+window.HueFileEntry = HueFileEntry;
 window.HueGeo = HueGeo;
 window.huePubSub = huePubSub;
 window.hueUtils = hueUtils;
@@ -103,7 +107,6 @@ window.page = page;
 window.PigFunctions = PigFunctions;
 window.qq = qq;
 window.sprintf = sprintf;
-window.sqlAutocompleteParser = sqlAutocompleteParser;
 window.SqlAutocompleter = SqlAutocompleter;
 window.SqlFunctions = SqlFunctions;
 window.SqlSetOptions = SqlSetOptions;
@@ -129,7 +132,7 @@ $(document).ready(() => {
   const sidebarViewModel = new SideBarViewModel(onePageViewModel, topNavViewModel);
   ko.applyBindings(sidebarViewModel, $('.hue-sidebar')[0]);
   if (window.IS_MULTICLUSTER_ONLY) {
-    ko.applyBindings(sidebarViewModel, $('.hue-dw-sidebar-container')[0]);
+    ko.applyBindings(sidebarViewModel, $('.hue-sidebar-container')[0]);
   }
 
   huePubSub.publish('cluster.config.get.config');

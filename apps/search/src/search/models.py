@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
 import json
 import logging
 import re
@@ -255,7 +256,7 @@ class Collection(models.Model):
       if self.cores != '{}': # Convert collections from < Hue 3.6
         try:
           self._import_hue_3_5_collections(props, user)
-        except Exception, e:
+        except Exception as e:
           LOG.error('Could not import collection: %s' % e)
 
     if 'layout' not in props:
@@ -364,7 +365,7 @@ class Collection(models.Model):
     schema_fields = SolrApi(SOLR_URL.get(), user).fields(self.name)
     schema_fields = schema_fields['schema']['fields']
 
-    return sorted([self._make_field(field, attributes) for field, attributes in schema_fields.iteritems()])
+    return sorted([self._make_field(field, attributes) for field, attributes in schema_fields.items()])
 
   @property
   def properties_dict(self):

@@ -136,9 +136,12 @@ if USE_NEW_EDITOR.get():
   % if section == "login":
     ${ render_bundle('login', config='LOGIN') | n,unicode }
   %else:
-    ${ render_bundle('vendors~hue~notebook') | n,unicode }
+    ${ render_bundle('vendors~hue~notebook~tableBrowser') | n,unicode }
+    ${ render_bundle('vendors~hue~tableBrowser') | n,unicode }
     ${ render_bundle('vendors~hue') | n,unicode }
     ${ render_bundle('hue~notebook') | n,unicode }
+    ${ render_bundle('hue~notebook~tableBrowser') | n,unicode }
+    ${ render_bundle('hue~tableBrowser') | n,unicode }
     ${ render_bundle('hue') | n,unicode }
   % endif
 
@@ -161,8 +164,6 @@ if USE_NEW_EDITOR.get():
   <script>
     ace.config.set("basePath", "${ static('desktop/js/ace') }");
   </script>
-
-  <script src="${ static('metastore/js/metastore.model.js') }"></script>
 
   ${ hueAceAutocompleter.hueAceAutocompleter() }
 %endif

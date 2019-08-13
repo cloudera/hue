@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable no-restricted-syntax */
+
 const extractorUtils = require('./extractorUtils');
 const EXTERNAL_DOC_URL_PREFIX = 'https://www.cloudera.com/documentation/enterprise/latest/';
 
@@ -29,7 +31,7 @@ const LOG_NAME = 'topicLinker.js';
 const replaceWithExternalLink = (node, href, cssClassPrefix) => {
   node.name('a');
   extractorUtils.removeAllAttributes(node);
-  node.attr({ 'class': cssClassPrefix + 'doc-external-link', 'href': href, 'target': '_blank' });
+  node.attr({ class: cssClassPrefix + 'doc-external-link', href: href, target: '_blank' });
 };
 
 /**
@@ -42,20 +44,24 @@ const replaceWithExternalLink = (node, href, cssClassPrefix) => {
  * @param {string} cssClassPrefix
  */
 const replaceWithInternalLink = (node, ref, anchorId, parseResults, cssClassPrefix) => {
-  let fullRef = ref + (anchorId ? '#' + anchorId : '');
+  const fullRef = ref + (anchorId ? '#' + anchorId : '');
 
-  let fragmentSearchResult = extractorUtils.findFragment(parseResults, ref, anchorId);
+  const fragmentSearchResult = extractorUtils.findFragment(parseResults, ref, anchorId);
   if (fragmentSearchResult.fragment && fragmentSearchResult.partOfTree) {
     // Here the topic is parsed and it's part of the main topic tree
     node.name('a');
     extractorUtils.removeAllAttributes(node);
-    node.attr({ 'class': cssClassPrefix + 'doc-internal-link', 'href': 'javascript:void(0);', 'data-doc-ref': ref });
+    node.attr({
+      class: cssClassPrefix + 'doc-internal-link',
+      href: 'javascript:void(0);',
+      'data-doc-ref': ref
+    });
     if (anchorId) {
       node.attr('data-doc-anchor-id', anchorId);
     }
   } else {
     // Here the topic is unknown or not part of the main topic tree so we make an external link instead
-    let href = EXTERNAL_DOC_URL_PREFIX + fullRef.replace('.xml', '.html');
+    const href = EXTERNAL_DOC_URL_PREFIX + fullRef.replace('.xml', '.html');
     replaceWithExternalLink(node, href, cssClassPrefix);
   }
 
@@ -83,7 +89,7 @@ const handleKeywordNode = (node, parseResults, cssClassPrefix) => {
     return;
   }
 
-  let keyRef = node.attr('keyref').value();
+  const keyRef = node.attr('keyref').value();
   node.attr('keyref').remove();
 
   let keyDef = undefined;
@@ -122,14 +128,19 @@ const handleKeywordNode = (node, parseResults, cssClassPrefix) => {
       }
     } else {
       if (keyDef.href.indexOf('scalability_file_handle_cache') !== -1) {
-
       }
-      replaceWithInternalLink(node, keyDef.href.replace(/#.*$/, ''), keyRef, parseResults, cssClassPrefix);
+      replaceWithInternalLink(
+        node,
+        keyDef.href.replace(/#.*$/, ''),
+        keyRef,
+        parseResults,
+        cssClassPrefix
+      );
     }
     return;
   }
 
-  throw new Error('Failed handling keyword node.')
+  throw new Error('Failed handling keyword node.');
 };
 
 /**
@@ -139,20 +150,20 @@ const handleKeywordNode = (node, parseResults, cssClassPrefix) => {
  * @param {DitamapParseResult[]} parseResults
  * @param {string} cssClassPrefix
  */
-let handkeXrefNode = (node, parseResults, cssClassPrefix) => {
+const handkeXrefNode = (node, parseResults, cssClassPrefix) => {
   if (extractorUtils.hasAttributes(node, 'href')) {
-    let href = node.attr('href').value();
+    const href = node.attr('href').value();
 
     if (node.attr('scope') && node.attr('scope').value() === 'external') {
       replaceWithExternalLink(node, href, cssClassPrefix);
       if (!node.text()) {
-        node.text(href)
+        node.text(href);
       }
       return;
     }
 
-    let ref = ~href.indexOf('#') ? href.replace(/#.*$/, '') : href;
-    let anchorId = ~href.indexOf('#') && href.replace(/^.*#/, '');
+    const ref = ~href.indexOf('#') ? href.replace(/#.*$/, '') : href;
+    const anchorId = ~href.indexOf('#') && href.replace(/^.*#/, '');
     replaceWithInternalLink(node, ref, anchorId, parseResults, cssClassPrefix);
   }
   if (extractorUtils.hasAttributes(node, 'keyref')) {
@@ -169,14 +180,14 @@ let handkeXrefNode = (node, parseResults, cssClassPrefix) => {
 const handleTocNode = (topic, node) => {
   if (topic.children.length) {
     node.name('div');
-    let header = node.node('div');
+    const header = node.node('div');
     header.text('Continue reading:');
-    let ul = node.node('ul');
+    const ul = node.node('ul');
     topic.children.forEach(childTopic => {
-      let li = ul.node('li');
-      let xrefNode = li.node('xref');
+      const li = ul.node('li');
+      const xrefNode = li.node('xref');
       xrefNode.attr('href', childTopic.ref);
-    })
+    });
   } else {
     node.remove();
   }
@@ -210,7 +221,11 @@ const linkNodesInDomXml = (node, parseResults, cssClassPrefix, foundCssClasses) 
   if (extractorUtils.hasAttributes(node, 'class')) {
     foundCssClasses[node.attr('class').value()] = true;
   }
-  node.childNodes().forEach(childNode => linkNodesInDomXml(childNode, parseResults, cssClassPrefix, foundCssClasses));
+  node
+    .childNodes()
+    .forEach(childNode =>
+      linkNodesInDomXml(childNode, parseResults, cssClassPrefix, foundCssClasses)
+    );
   return foundCssClasses;
 };
 
@@ -226,9 +241,13 @@ const insertConrefsAndToc = (topic, node, parseResults) => {
     handleTocNode(topic, node);
   }
   if (extractorUtils.hasAttributes(node, 'conref')) {
-    let conref = node.attr('conref').value();
-    var splitRef = conref.split('#');
-    let fragmentSearchResult = extractorUtils.findFragment(parseResults, splitRef[0], splitRef[1]);
+    const conref = node.attr('conref').value();
+    const splitRef = conref.split('#');
+    const fragmentSearchResult = extractorUtils.findFragment(
+      parseResults,
+      splitRef[0],
+      splitRef[1]
+    );
     if (!fragmentSearchResult.fragment) {
       console.log(node.toString());
       console.log('%s: Could not find fragment for conref: %s', LOG_NAME, conref);
@@ -250,12 +269,14 @@ const insertConrefsAndToc = (topic, node, parseResults) => {
  * @param {String} cssClassPrefix
  * @param {Object} foundCssClasses
  */
-let linkNodesInTopic = (topic, parseResults, cssClassPrefix, foundCssClasses) => {
+const linkNodesInTopic = (topic, parseResults, cssClassPrefix, foundCssClasses) => {
   // First insert all the conrefs and topics
   insertConrefsAndToc(topic, topic.domXml, parseResults);
   // Then deal with xrefs, keywords etc.
   linkNodesInDomXml(topic.domXml, parseResults, cssClassPrefix, foundCssClasses);
-  topic.children.forEach(childTopic => linkNodesInTopic(childTopic, parseResults, cssClassPrefix, foundCssClasses));
+  topic.children.forEach(childTopic =>
+    linkNodesInTopic(childTopic, parseResults, cssClassPrefix, foundCssClasses)
+  );
 };
 
 /**
@@ -265,13 +286,17 @@ let linkNodesInTopic = (topic, parseResults, cssClassPrefix, foundCssClasses) =>
  * @param cssClassPrefix
  */
 const linkTopics = (parseResults, cssClassPrefix) => {
-  let foundCssClasses = {};
-  parseResults.forEach(parseResult => parseResult.topics.forEach(topic => {
-    linkNodesInTopic(topic, parseResults, cssClassPrefix, foundCssClasses);
-  }));
+  const foundCssClasses = {};
+  parseResults.forEach(parseResult =>
+    parseResult.topics.forEach(topic => {
+      linkNodesInTopic(topic, parseResults, cssClassPrefix, foundCssClasses);
+    })
+  );
   console.log('%s: Found CSS classes: %s', LOG_NAME, Object.keys(foundCssClasses).join(','));
 };
 
 module.exports = {
   linkTopics: linkTopics
 };
+
+/* eslint-enable no-restricted-syntax */

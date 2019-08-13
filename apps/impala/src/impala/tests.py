@@ -15,18 +15,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import json
 import logging
 import re
 
 from nose.plugins.skip import SkipTest
-from nose.tools import assert_true, assert_equal, assert_false
+from nose.tools import assert_true, assert_equal, assert_false, assert_raises
+from mock import patch, Mock
 
 from django.contrib.auth.models import User
 from django.urls import reverse
 
 import desktop.conf as desktop_conf
 from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.test_utils import add_to_group
 from desktop.models import Document
 from hadoop.pseudo_hdfs4 import get_db_prefix, is_live_cluster
@@ -47,7 +50,7 @@ from impala.dbms import ImpalaDbms
 LOG = logging.getLogger(__name__)
 
 
-class MockDbms:
+class MockDbms(object):
 
   def get_databases(self):
     return ['db1', 'db2']
@@ -56,7 +59,7 @@ class MockDbms:
     return ['table1', 'table2']
 
 
-class TestMockedImpala:
+class TestMockedImpala(object):
 
   def setUp(self):
     self.client = make_logged_in_client()
@@ -104,8 +107,33 @@ class TestMockedImpala:
       if impala_query is not None:
         impala_query.delete()
 
+  def test_invalidate(self):
+    with patch('impala.dbms.ImpalaDbms._get_different_tables') as get_different_tables:
+      with patch('desktop.models.ClusterConfig.get_hive_metastore_interpreters') as get_hive_metastore_interpreters:
+        ddms = ImpalaDbms(Mock(query_server={'server_name': ''}), None)
+        get_different_tables.return_value = ['customers']
 
-class TestImpalaIntegration:
+        get_hive_metastore_interpreters.return_value = []
+        assert_raises(PopupException, ddms.invalidate, 'default') # No hive/metastore configured
+
+        get_hive_metastore_interpreters.return_value = ['hive']
+        ddms.invalidate('default')
+        ddms.client.query.assert_called_once_with(ddms.client.query.call_args[0][0])
+        assert_true('customers' in ddms.client.query.call_args[0][0].hql_query) # diff of 1 table
+
+        get_different_tables.return_value = ['customers','','','','','','','','','','']
+        assert_raises(PopupException, ddms.invalidate, 'default') # diff of 11 tables. Limit is 10.
+
+        ddms.invalidate('default', 'customers')
+        assert_true(ddms.client.query.call_count == 2) # Second call
+        assert_true('customers' in ddms.client.query.call_args[0][0].hql_query) # invalidate 1 table
+
+        ddms.invalidate()
+        assert_true(ddms.client.query.call_count == 3) # Third call
+        assert_true('customers' not in ddms.client.query.call_args[0][0].hql_query) # Full invalidate
+
+
+class TestImpalaIntegration(object):
   integration = True
 
   @classmethod
@@ -474,7 +502,7 @@ def test_ssl_validate():
         reset()
 
 
-class TestImpalaDbms():
+class TestImpalaDbms(object):
 
   def test_get_impala_nested_select(self):
     assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'id', None), ('id', '`default`.`customers`'))
@@ -488,3 +516,4 @@ class TestImpalaDbms():
                  ('order_date', '`default`.`customers`.`orders`'))
     assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'orders', 'item/items/item/product_id'),
                  ('product_id', '`default`.`customers`.`orders`.`items`'))
+

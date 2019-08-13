@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import filter
+from builtins import range
 import itertools
 import logging
 import re
@@ -33,8 +35,7 @@ LOG = logging.getLogger(__name__)
 try:
   from beeswax.models import Session
   from impala.server import get_api as get_impalad_api, _get_impala_server_url
-  from impala.dbms import _get_server_name
-except Exception, e:
+except Exception as e:
   LOG.exception('Some application are not enabled: %s' % e)
 
 
@@ -42,7 +43,9 @@ def _get_api(user, cluster=None):
   if cluster and cluster.get('type') == 'altus-dw':
     server_url = 'http://impala-coordinator-%(name)s:25000' % cluster
   else:
-    session = Session.objects.get_session(user, application=_get_server_name(cluster))
+    # TODO: multi computes if snippet.get('compute') or snippet['type'] has computes
+    application = cluster.get('interface', 'impala')
+    session = Session.objects.get_session(user, application=application)
     server_url = _get_impala_server_url(session)
   return get_impalad_api(user=user, url=server_url)
 
@@ -196,7 +199,7 @@ class QueryApi(Api):
     query['plan'] = query.get('plan').strip() if query.get('plan') else ''
     try:
       query['metrics'] = self._metrics(appid)
-    except Exception, e:
+    except Exception as e:
       query['metrics'] = {'nodes' : {}}
       LOG.exception('Could not parse profile: %s' % e)
 
@@ -289,7 +292,7 @@ class QueryApi(Api):
       def make_lambda(name, value):
         return lambda app: app[name] == value
 
-      for key, name in filter_names.items():
+      for key, name in list(filter_names.items()):
           text_filter = re.search(r"\s*("+key+")\s*:([^ ]+)", filters.get("text"))
           if text_filter and text_filter.group(1) == key:
             filter_list.append(make_lambda(name, text_filter.group(2).strip()))
@@ -305,5 +308,5 @@ class QueryApi(Api):
 
   def _n_filter(self, filters, tuples):
     for f in filters:
-      tuples = filter(f, tuples)
+      tuples = list(filter(f, tuples))
     return tuples

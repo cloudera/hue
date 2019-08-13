@@ -17,44 +17,48 @@
 
 import logging
 
-from desktop.lib.i18n import smart_str
+from django.utils.translation import ugettext as _
 
+from desktop.conf import CLUSTER_ID
+from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.i18n import smart_str
+from desktop.models import Cluster, ClusterConfig
 from beeswax.design import hql_query
 from beeswax.models import QUERY_TYPES
 from beeswax.server import dbms
 from beeswax.server.dbms import HiveServer2Dbms, QueryServerException, QueryServerTimeoutException,\
-  get_query_server_config as beeswax_query_server_config
+  get_query_server_config as beeswax_query_server_config, get_query_server_config_via_connector
+from notebook.conf import get_ordered_interpreters
 
-from desktop.conf import CLUSTER_ID
 from impala import conf
 
 
 LOG = logging.getLogger(__name__)
 
 
-def get_query_server_config(cluster_config=None):
-  query_server = {
-      'server_name': _get_server_name(cluster_config),
-      'server_host': conf.SERVER_HOST.get() if not cluster_config else cluster_config.get('server_host'),
-      'server_port': conf.SERVER_PORT.get() if not cluster_config else 21050,
-      'principal': conf.IMPALA_PRINCIPAL.get(),
-      'impersonation_enabled': conf.IMPERSONATION_ENABLED.get(),
-      'querycache_rows': conf.QUERYCACHE_ROWS.get(),
-      'QUERY_TIMEOUT_S': conf.QUERY_TIMEOUT_S.get(),
-      'SESSION_TIMEOUT_S': conf.SESSION_TIMEOUT_S.get(),
-      'auth_username': conf.AUTH_USERNAME.get(),
-      'auth_password': conf.AUTH_PASSWORD.get()
-  }
+def get_query_server_config(connector=None):
+  if connector and has_connectors():
+    query_server = get_query_server_config_via_connector(connector)
+  else:
+    query_server = {
+        'server_name': 'impala',
+        'server_host': conf.SERVER_HOST.get(),
+        'server_port': conf.SERVER_PORT.get(),
+        'principal': conf.IMPALA_PRINCIPAL.get(),
+        'impersonation_enabled': conf.IMPERSONATION_ENABLED.get(),
+        'querycache_rows': conf.QUERYCACHE_ROWS.get(),
+        'QUERY_TIMEOUT_S': conf.QUERY_TIMEOUT_S.get(),
+        'SESSION_TIMEOUT_S': conf.SESSION_TIMEOUT_S.get(),
+        'auth_username': conf.AUTH_USERNAME.get(),
+        'auth_password': conf.AUTH_PASSWORD.get(),
+        'use_sasl': conf.USE_SASL.get()
+    }
 
   debug_query_server = query_server.copy()
   debug_query_server['auth_password_used'] = bool(debug_query_server.pop('auth_password'))
   LOG.debug("Query Server: %s" % debug_query_server)
 
   return query_server
-
-
-def _get_server_name(cluster_config):
-  return 'impala' + ('-' + cluster_config.get('name') if cluster_config and cluster_config.get('name') != CLUSTER_ID.get() else '')
 
 
 class ImpalaDbms(HiveServer2Dbms):
@@ -101,19 +105,26 @@ class ImpalaDbms(HiveServer2Dbms):
         query = hql_query(hql, query_type=QUERY_TYPES[1])
         handle = self.execute_and_wait(query, timeout_sec=10.0)
       elif table is None:
+        if not Cluster(self.client.user).get_app_config().get_hive_metastore_interpreters():
+          raise PopupException(_("Hive and HMS not configured. Please do a full refresh"))
         diff_tables = self._get_different_tables(database)
-        for table in diff_tables:
-          hql = "INVALIDATE METADATA `%s`.`%s`" % (database, table)
-          query = hql_query(hql, query_type=QUERY_TYPES[1])
-          handle = self.execute_and_wait(query, timeout_sec=10.0)
+        if len(diff_tables) > 10:
+          raise PopupException(_("Too many tables (%d) to invalidate. Please do a full refresh") % len(diff_tables))
+        else:
+          for table in diff_tables:
+            hql = "INVALIDATE METADATA `%s`.`%s`" % (database, table)
+            query = hql_query(hql, query_type=QUERY_TYPES[1])
+            handle = self.execute_and_wait(query, timeout_sec=10.0)
       else:
         hql = "INVALIDATE METADATA `%s`.`%s`" % (database, table)
         query = hql_query(hql, query_type=QUERY_TYPES[1])
         handle = self.execute_and_wait(query, timeout_sec=10.0)
-    except QueryServerTimeoutException, e:
+    except QueryServerTimeoutException as e:
       # Allow timeout exceptions to propagate
       raise e
-    except Exception, e:
+    except PopupException as e:
+      raise e
+    except Exception as e:
       msg = 'Failed to invalidate `%s`: %s' % (database or 'databases', e)
       raise QueryServerException(msg)
     finally:
@@ -127,7 +138,7 @@ class ImpalaDbms(HiveServer2Dbms):
       hql = "REFRESH `%s`.`%s`" % (database, table)
       query = hql_query(hql, database, query_type=QUERY_TYPES[1])
       handle = self.execute_and_wait(query, timeout_sec=10.0)
-    except Exception, e:
+    except Exception as e:
       msg = 'Failed to refresh `%s`.`%s`' % (database, table)
       raise QueryServerException(msg)
     finally:
@@ -153,7 +164,7 @@ class ImpalaDbms(HiveServer2Dbms):
         histogram = list(result.rows())[0][0]  # actual histogram results is in first-and-only result row
         unique_values = set(histogram.split(', '))
         results = list(unique_values)
-      except IndexError, e:
+      except IndexError as e:
         LOG.warn('Failed to get histogram results, result set has unexpected format: %s' % smart_str(e))
       finally:
         self.close(handle)
@@ -170,7 +181,7 @@ class ImpalaDbms(HiveServer2Dbms):
 
 
   def _get_beeswax_tables(self, database):
-    beeswax_query_server = dbms.get(user=self.client.user, query_server=beeswax_query_server_config(name='beeswax'))
+    beeswax_query_server = dbms.get(user=self.client.user, query_server=beeswax_query_server_config(name=Cluster(self.client.user).get_app_config().get_hive_metastore_interpreters()[0]))
     return beeswax_query_server.get_tables(database=database)
 
 

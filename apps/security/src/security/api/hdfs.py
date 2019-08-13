@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import print_function
+from builtins import str
 import json
 
 from django.utils.translation import ugettext as _
@@ -36,7 +38,7 @@ def _diff_list_dir(user_listing, hdfs_listing):
 
   # Files visible by hdfs only
   hdfs_only = list(set(hdfs_files) - set(user_files))
-  new_hdfs = filter(lambda f: f['stats']['path'] in hdfs_only, hdfs_listing['files'])
+  new_hdfs = [f for f in hdfs_listing['files'] if f['stats']['path'] in hdfs_only]
 
   for f in new_hdfs:
     f['striked'] = True
@@ -56,7 +58,7 @@ def list_hdfs(request, path):
   except IOError:
     # AccessControlException: Permission denied: user=test, access=READ_EXECUTE, inode="/tmp/dir":romain:supergroup:drwxr-xr-x:group::r-x,group:bob:---,group:test:---,default:user::rwx,default:group::r--,default:mask::r--,default:other::rwx (error 403)
     json_response = JsonResponse({'files': [], 'page': {}, 'error': 'FILE_NOT_FOUND'})
-  except Exception, e:
+  except Exception as e:
     # AccessControlException: Permission denied: user=test, access=READ_EXECUTE, inode="/tmp/dir":romain:supergroup:drwxr-xr-x:group::r-x,group:bob:---,group:test:---,default:user::rwx,default:group::r--,default:mask::r--,default:other::rwx (error 403)
     json_response = JsonResponse({'files': [], 'page': {}, 'error': 'ACCESS_DENIED'})
 
@@ -76,8 +78,8 @@ def list_hdfs(request, path):
 def get_acls(request):
   try:
     acls = request.fs.get_acl_status(request.GET.get('path'))
-  except Exception, e:
-    print e
+  except Exception as e:
+    print(e)
     acls = None
 
   return JsonResponse(acls is not None and acls['AclStatus'] or None, safe=False)
@@ -96,8 +98,8 @@ def update_acls(request):
       _remove_acl_names(request.fs, path, list(renamed_acls))
       _remove_acl_entries(request.fs, path, [acl for acl in acls if acl['status'] == 'deleted'])
       _modify_acl_entries(request.fs, path, [acl for acl in acls if acl['status'] in ('new', 'modified')])
-  except Exception, e:
-    raise PopupException(unicode(str(e.message), "utf8"))
+  except Exception as e:
+    raise PopupException(str(e.message))
 
   return JsonResponse({'status': 0})
 
@@ -113,8 +115,8 @@ def bulk_delete_acls(request):
       request.fs.remove_acl(path)
       if recursive:
         request.fs.do_recursively(request.fs.remove_acl, path)
-  except Exception, e:
-    raise PopupException(unicode(str(e.message), "utf8"))
+  except Exception as e:
+    raise PopupException(str(e.message))
 
   return JsonResponse({'status': 0})
 
@@ -129,8 +131,8 @@ def bulk_add_acls(request):
     checked_paths = [path['path'] for path in checked_paths if path['path'] != path] # Don't touch current path
     for path in checked_paths:
       _modify_acl_entries(request.fs, path, [acl for acl in acls if acl['status'] == ''], recursive) # Only saved ones
-  except Exception, e:
-    raise PopupException(unicode(str(e.message), "utf8"))
+  except Exception as e:
+    raise PopupException(str(e.message))
 
   return JsonResponse({'status': 0})
 

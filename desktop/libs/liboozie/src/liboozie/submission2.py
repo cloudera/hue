@@ -89,12 +89,14 @@ class Submission(object):
       local_tz = self.job.data.get('properties')['timezone']
 
     # Modify start_date & end_date only when it's a coordinator
-    from oozie.models2 import Coordinator
+    from oozie.models2 import Coordinator, Bundle
     if type(self.job) is Coordinator:
       if 'start_date' in self.properties:
         properties['start_date'] = convert_to_server_timezone(self.properties['start_date'], local_tz)
       if 'end_date' in self.properties:
         properties['end_date'] = convert_to_server_timezone(self.properties['end_date'], local_tz)
+    elif type(self.job) is Bundle:
+      self.job.data['properties']['kickoff'] = convert_to_server_timezone(self.job.kick_off_time_utc, local_tz)
 
     if 'nominal_time' in self.properties:
       properties['nominal_time'] = convert_to_server_timezone(self.properties['nominal_time'], local_tz)
@@ -327,7 +329,7 @@ impala-shell %(kerberos_option)s %(ssl_option)s -i %(impalad_host)s -f %(query_f
           from notebook.models import Notebook
           if action.data['properties'].get('uuid'):
             notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=action.data['properties']['uuid']))
-            statements = notebook.get_str()
+            statements = notebook.get_str(from_oozie_action=True)
           else:
             statements = action.data['properties'].get('statements')
 

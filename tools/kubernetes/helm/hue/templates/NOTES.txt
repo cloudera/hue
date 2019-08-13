@@ -7,17 +7,37 @@ To check the status of your installation run:
 
 You should be able to execute queries by typing:
 
-  kubectl port-forward svc/hue 8888:8888 &
+  kubectl port-forward svc/hue 8888:8888 --address 0.0.0.0 &
 
 Then opening-up:
 
   http://localhost:8888
 
-Or directly running below to get the URL:
 
+Or running below commands to get the recommended URL:
+{{ if true }}
   export WEB_HOST=$(kubectl get node -o jsonpath="{.items[0].metadata.name}")
+{{- end -}}
+
+{{ if and .Values.ingress.create (eq .Values.ingress.type "nginx") }}
+
+  echo http://$WEB_HOST
+
+{{ else if and .Values.ingress.create (eq .Values.ingress.type "nginx-ssl") }}
+
+  echo https://{{ .Values.ingress.domain }}
+
+{{ else if .Values.balancer.enabled }}
+
+  export WEB_PORT=$(kubectl get service hue-balancer -o jsonpath="{.spec.ports[*].nodePort}" --namespace {{ .Release.Namespace }})
+
+  echo http://$WEB_HOST:$WEB_PORT
+
+{{ else }}
+
   export WEB_PORT=$(kubectl get service hue -o jsonpath="{.spec.ports[*].nodePort}" --namespace {{ .Release.Namespace }})
 
   echo http://$WEB_HOST:$WEB_PORT
 
+{{ end }}
 Happy Querying!

@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from builtins import map
 import pwd
 import grp
 import logging
@@ -27,8 +29,8 @@ from axes.models import AccessAttempt
 from axes.utils import reset
 
 import ldap
-import ldap_access
-from ldap_access import LdapBindException, LdapSearchException
+from useradmin import ldap_access
+from useradmin.ldap_access import LdapBindException, LdapSearchException
 
 from django.contrib.auth.models import User, Group
 from django.urls import reverse
@@ -43,6 +45,7 @@ import desktop.conf
 from desktop.conf import LDAP
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.models import _get_apps
 from desktop.views import antixss
 
 from hadoop.fs.exceptions import WebHdfsException
@@ -85,8 +88,10 @@ def list_groups(request):
 
 
 def list_permissions(request):
+  current_app, other_apps, apps_list = _get_apps(request.user)
+
   return render("list_permissions.mako", request, {
-    'permissions': HuePermission.objects.all(),
+    'permissions': HuePermission.objects.filter(app__in=apps_list),
     'is_embeddable': request.GET.get('is_embeddable', False)
   })
 
@@ -326,7 +331,7 @@ def edit_user(request, username=None):
             try:
               reset(username=username)
               request.info(_('Successfully unlocked account for user: %s') % username)
-            except Exception, e:
+            except Exception as e:
               raise PopupException(_('Failed to reset login attempts for %s: %s') % (username, str(e)))
         finally:
           __users_lock.release()
@@ -335,7 +340,7 @@ def edit_user(request, username=None):
       if form.cleaned_data.get('ensure_home_directory'):
         try:
           ensure_home_directory(request.fs, instance)
-        except (IOError, WebHdfsException), e:
+        except (IOError, WebHdfsException) as e:
           request.error(_('Cannot make home directory for user %s.') % instance.username)
         else:
           updated = True
@@ -399,7 +404,7 @@ def edit_user(request, username=None):
     })
   else:
     if request.method == 'POST' and is_embeddable:
-      return JsonResponse({'status': -1, 'errors': [{'id': f.id_for_label, 'message': map(antixss, f.errors)} for f in form if f.errors]})
+      return JsonResponse({'status': -1, 'errors': [{'id': f.id_for_label, 'message': list(map(antixss, f.errors))} for f in form if f.errors]})
     else:
       return render('edit_user.mako', request, {
         'form': form,
@@ -559,10 +564,10 @@ def add_ldap_users(request):
         failed_ldap_users = []
         connection = ldap_access.get_connection_from_server(server)
         users = import_ldap_users(connection, username_pattern, False, import_by_dn, failed_users=failed_ldap_users)
-      except (ldap.LDAPError, LdapBindException), e:
+      except (ldap.LDAPError, LdapBindException) as e:
         LOG.error("LDAP Exception: %s" % smart_str(e))
         raise PopupException(smart_str(_('There was an error when communicating with LDAP: %s')) % str(e))
-      except ValidationError, e:
+      except ValidationError as e:
         LOG.error("LDAP Exception: %s" % smart_str(e))
         raise PopupException(smart_str(_('There was a problem with some of the LDAP information: %s')) % str(e))
 
@@ -570,7 +575,7 @@ def add_ldap_users(request):
         for user in users:
           try:
             ensure_home_directory(request.fs, user)
-          except (IOError, WebHdfsException), e:
+          except (IOError, WebHdfsException) as e:
             request.error(_("Cannot make home directory for user %s.") % user.username)
 
       if not users:
@@ -636,10 +641,10 @@ def add_ldap_groups(request):
         groups = import_ldap_groups(connection, groupname_pattern, import_members=import_members,
                                     import_members_recursive=import_members_recursive, sync_users=True,
                                     import_by_dn=import_by_dn, failed_users=failed_ldap_users)
-      except (ldap.LDAPError, LdapBindException), e:
+      except (ldap.LDAPError, LdapBindException) as e:
         LOG.error("LDAP Exception: %s" % smart_str(e))
         raise PopupException(smart_str(_('There was an error when communicating with LDAP: %s')) % str(e))
-      except ValidationError, e:
+      except ValidationError as e:
         LOG.error("LDAP Exception: %s" % smart_str(e))
         raise PopupException(smart_str(_('There was a problem with some of the LDAP information: %s')) % str(e))
 
@@ -651,7 +656,7 @@ def add_ldap_groups(request):
         for user in unique_users:
           try:
             ensure_home_directory(request.fs, user)
-          except (IOError, WebHdfsException), e:
+          except (IOError, WebHdfsException) as e:
             raise PopupException(_("Exception creating home directory for LDAP user %s in group %s.") % (user, group), detail=e)
 
       if groups:
@@ -708,7 +713,7 @@ def sync_ldap_users_groups(request):
       server = form.cleaned_data.get('server')
       try:
         connection = ldap_access.get_connection_from_server(server)
-      except (ldap.LDAPError, LdapBindException), e:
+      except (ldap.LDAPError, LdapBindException) as e:
         LOG.error("LDAP Exception: %s" % smart_str(e))
         raise PopupException(smart_str(_('There was an error when communicating with LDAP: %s')) % str(e))
 
@@ -744,7 +749,7 @@ def sync_ldap_users_and_groups(connection, is_ensuring_home_directory=False, fs=
   try:
     users = sync_ldap_users(connection, failed_users=failed_users)
     groups = sync_ldap_groups(connection, failed_users=failed_users)
-  except (ldap.LDAPError, LdapBindException), e:
+  except (ldap.LDAPError, LdapBindException) as e:
     LOG.error("LDAP Exception: %s" % smart_str(e))
     raise PopupException(smart_str(_('There was an error when communicating with LDAP: %s')) % str(e))
 
@@ -753,7 +758,7 @@ def sync_ldap_users_and_groups(connection, is_ensuring_home_directory=False, fs=
     for user in users:
       try:
         ensure_home_directory(fs, user)
-      except (IOError, WebHdfsException), e:
+      except (IOError, WebHdfsException) as e:
         raise PopupException(_("The import may not be complete, sync again."), detail=e)
 
 
@@ -813,7 +818,7 @@ def ensure_home_directory(fs, user):
     home_directory = userprofile.home_directory.split('@')[0]
 
   if userprofile is not None and userprofile.home_directory:
-    if not isinstance(home_directory, unicode):
+    if not isinstance(home_directory, str):
       home_directory = home_directory.decode("utf-8")
     fs.do_as_user(username, fs.create_home_dir, home_directory)
   else:
@@ -834,7 +839,7 @@ def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
   __users_lock.acquire()
   __groups_lock.acquire()
   # Import groups
-  for name, group in hadoop_groups.iteritems():
+  for name, group in hadoop_groups.items():
     try:
       if len(group.gr_mem) != 0:
         hue_group = Group.objects.get(name=name)
@@ -854,7 +859,7 @@ def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
   # Now let's import the users
   hadoop_users = dict((user.pw_name, user) for user in pwd.getpwall() \
       if (user.pw_uid >= min_uid and user.pw_uid < max_uid) or user.pw_name in grp.getgrnam('hadoop').gr_mem)
-  for username, user in hadoop_users.iteritems():
+  for username, user in hadoop_users.items():
     try:
       if check_shell:
         pw_shell = user.pw_shell
@@ -904,7 +909,7 @@ def _import_ldap_users(connection, username_pattern, sync_groups=False, import_b
   user_info = None
   try:
     user_info = connection.find_users(username_pattern, find_by_dn=import_by_dn)
-  except LdapSearchException, e:
+  except LdapSearchException as e:
     LOG.warn("Failed to find LDAP user: %s" % e)
 
   if not user_info:
@@ -1020,12 +1025,12 @@ def _import_ldap_members(connection, group, ldap_info, count=0, max_count=1, fai
 
   try:
     users_info = connection.find_users_of_group(ldap_info['dn'])
-  except LdapSearchException, e:
+  except LdapSearchException as e:
     LOG.warn("Failed to find LDAP users of group: %s" % e)
 
   try:
     groups_info = connection.find_groups_of_group(ldap_info['dn'])
-  except LdapSearchException, e:
+  except LdapSearchException as e:
     LOG.warn("Failed to find LDAP groups of group: %s" % e)
 
   posix_members = ldap_info['posix_members']
@@ -1051,13 +1056,13 @@ def _import_ldap_members(connection, group, ldap_info, count=0, max_count=1, fai
     user_info = None
     try:
       user_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
-    except LdapSearchException, e:
+    except LdapSearchException as e:
       LOG.warn("Failed to find LDAP users: %s" % e)
 
     if user_info:
       users = _import_ldap_users_info(connection, user_info, failed_users=failed_users)
       if users:
-        LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (str(posix_member), str(users), str(group.name)))
+        LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (smart_str(posix_member), smart_str(users), smart_str(group.name)))
         group.user_set.add(*users)
 
 
@@ -1070,12 +1075,12 @@ def _sync_ldap_members(connection, group, ldap_info, count=0, max_count=1, faile
 
   try:
     users_info = connection.find_users_of_group(ldap_info['dn'])
-  except LdapSearchException, e:
+  except LdapSearchException as e:
     LOG.warn("Failed to find LDAP users of group: %s" % e)
 
   try:
     groups_info = connection.find_groups_of_group(ldap_info['dn'])
-  except LdapSearchException, e:
+  except LdapSearchException as e:
     LOG.warn("Failed to find LDAP groups of group: %s" % e)
 
   posix_members = ldap_info['posix_members']
@@ -1102,7 +1107,7 @@ def _sync_ldap_members(connection, group, ldap_info, count=0, max_count=1, faile
     users_info = []
     try:
       users_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
-    except LdapSearchException, e:
+    except LdapSearchException as e:
       LOG.warn("Failed to find LDAP users: %s" % e)
 
     for user_info in users_info:
@@ -1130,7 +1135,7 @@ def _import_ldap_nested_groups(connection, groupname_pattern, import_members=Fal
   group_info = None
   try:
     group_info = connection.find_groups(groupname_pattern, find_by_dn=import_by_dn, scope=scope)
-  except LdapSearchException, e:
+  except LdapSearchException as e:
     LOG.warn("Failed to find LDAP group: %s" % e)
 
   if not group_info:
@@ -1185,7 +1190,7 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
   group_info = None
   try:
     group_info = connection.find_groups(groupname_pattern, find_by_dn=import_by_dn, scope=scope)
-  except LdapSearchException, e:
+  except LdapSearchException as e:
     LOG.warn("Could not find LDAP group: %s" % e)
 
   if not group_info:
@@ -1216,7 +1221,7 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
         group_info = []
         try:
           group_info = connection.find_groups(ldap_info['dn'], find_by_dn=True)
-        except LdapSearchException, e:
+        except LdapSearchException as e:
           LOG.warn("Failed to find LDAP group: %s" % e)
 
         for sub_ldap_info in group_info:
@@ -1233,7 +1238,7 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
         user_info = []
         try:
           user_info = connection.find_users(member, find_by_dn=True)
-        except LdapSearchException, e:
+        except LdapSearchException as e:
           LOG.warn("Failed to find LDAP user: %s" % e)
 
         if user_info is None:
@@ -1247,7 +1252,7 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
               validate_username(ldap_info['username'])
               user = ldap_access.get_ldap_user(username=ldap_info['username'])
               group.user_set.add(user)
-            except ValidationError, e:
+            except ValidationError as e:
               if failed_users is None:
                 failed_users = []
               failed_users.append(ldap_info['username'])
@@ -1260,19 +1265,19 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
     if posix_members:
       if import_members:
         for posix_member in posix_members:
-          LOG.debug("Importing user %s" % str(posix_member))
+          LOG.debug("Importing user %s" % smart_str(posix_member))
           # posixGroup class defines 'memberUid' to be login names,
           # which are defined by 'uid'.
           user_info = None
           try:
             user_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
-          except LdapSearchException, e:
+          except LdapSearchException as e:
             LOG.warn("Failed to find LDAP user: %s" % e)
 
           if user_info:
             users = _import_ldap_users_info(connection, user_info, import_by_dn=False, failed_users=failed_users)
             if users:
-              LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (str(posix_member), str(users), str(group.name)))
+              LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (smart_str(posix_member), smart_str(users), smart_str(group.name)))
               group.user_set.add(*users)
 
       if sync_users:
@@ -1280,7 +1285,7 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
           user_info = []
           try:
             user_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
-          except LdapSearchException, e:
+          except LdapSearchException as e:
             LOG.warn("Failed to find LDAP user: %s" % e)
 
           if len(user_info) > 1:
@@ -1291,7 +1296,7 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
                 validate_username(ldap_info['username'])
                 user = ldap_access.get_ldap_user(username=ldap_info['username'])
                 group.user_set.add(user)
-              except ValidationError, e:
+              except ValidationError as e:
                 if failed_users is None:
                   failed_users = []
                 failed_users.append(ldap_info['username'])

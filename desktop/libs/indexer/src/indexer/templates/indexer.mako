@@ -22,19 +22,12 @@
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
-<%namespace name="assist" file="/assist.mako" />
 
 %if not is_embeddable:
 ${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode }
 
-<script src="${ static('metastore/js/metastore.ko.js') }"></script>
-
-${ assist.assistJSModels() }
-
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
-
-${ assist.assistPanel() }
 %endif
 
 <style type="text/css">

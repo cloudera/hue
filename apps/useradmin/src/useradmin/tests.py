@@ -16,12 +16,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 import json
 import ldap
 import re
 import sys
 import time
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false, assert_not_equal
@@ -34,6 +38,10 @@ from django.urls import reverse
 from django.test.client import Client
 
 import desktop.conf
+
+from desktop import appmanager
+from desktop.auth.backend import is_admin
+from desktop.conf import APP_BLACKLIST
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from desktop.views import home
@@ -41,14 +49,12 @@ from hadoop import pseudo_hdfs4
 from hadoop.pseudo_hdfs4 import is_live_cluster
 
 import useradmin.conf
-from useradmin.forms import UserChangeForm
 import useradmin.ldap_access
+from useradmin.forms import UserChangeForm
 from useradmin.middleware import ConcurrentUserSessionMiddleware
 from useradmin.models import HuePermission, GroupPermission, UserProfile
 from useradmin.models import get_profile, get_default_user_group
 from useradmin.hue_password_policy import reset_password_policy
-
-from desktop.auth.backend import is_admin
 
 
 def reset_all_users():
@@ -91,25 +97,25 @@ class LdapTestConnection(object):
   def find_users(self, username_pattern, search_attr=None, user_name_attr=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
     """ Returns info for a particular user via a case insensitive search """
     if find_by_dn:
-      data = filter(lambda attrs: attrs['dn'] == username_pattern, self._instance.users.values())
+      data = [attrs for attrs in list(self._instance.users.values()) if attrs['dn'] == username_pattern]
     else:
       username_pattern = "^%s$" % username_pattern.replace('.','\\.').replace('*', '.*')
       username_fsm = re.compile(username_pattern, flags=re.I)
-      usernames = filter(lambda username: username_fsm.match(username), self._instance.users.keys())
+      usernames = [username for username in list(self._instance.users.keys()) if username_fsm.match(username)]
       data = [self._instance.users.get(username) for username in usernames]
     return data
 
   def find_groups(self, groupname_pattern, search_attr=None, group_name_attr=None, group_member_attr=None, group_filter=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
     """ Return all groups in the system with parents and children """
     if find_by_dn:
-      data = filter(lambda attrs: attrs['dn'] == groupname_pattern, self._instance.groups.values())
+      data = [attrs for attrs in list(self._instance.groups.values()) if attrs['dn'] == groupname_pattern]
       # SCOPE_SUBTREE means we return all sub-entries of the desired entry along with the desired entry.
       if data and scope == ldap.SCOPE_SUBTREE:
-        sub_data = filter(lambda attrs: attrs['dn'].endswith(data[0]['dn']), self._instance.groups.values())
+        sub_data = [attrs for attrs in list(self._instance.groups.values()) if attrs['dn'].endswith(data[0]['dn'])]
         data.extend(sub_data)
     else:
       groupname_pattern = "^%s$" % groupname_pattern.replace('.','\\.').replace('*', '.*')
-      groupnames = filter(lambda username: re.match(groupname_pattern, username), self._instance.groups.keys())
+      groupnames = [username for username in list(self._instance.groups.keys()) if re.match(groupname_pattern, username)]
       data = [self._instance.groups.get(groupname) for groupname in groupnames]
     return data
 
@@ -134,13 +140,13 @@ class LdapTestConnection(object):
 
   def find_users_of_group(self, dn):
     members = []
-    for group_info in self._instance.groups.values():
+    for group_info in list(self._instance.groups.values()):
       if group_info['dn'] == dn:
         members.extend(group_info['members'])
 
     members = set(members)
     users = []
-    for user_info in self._instance.users.values():
+    for user_info in list(self._instance.users.values()):
       if user_info['dn'] in members:
         users.append(user_info)
 
@@ -148,18 +154,18 @@ class LdapTestConnection(object):
 
   def find_groups_of_group(self, dn):
     members = []
-    for group_info in self._instance.groups.values():
+    for group_info in list(self._instance.groups.values()):
       if group_info['dn'] == dn:
         members.extend(group_info['members'])
 
     groups = []
-    for group_info in self._instance.groups.values():
+    for group_info in list(self._instance.groups.values()):
       if group_info['dn'] in members:
         groups.append(group_info)
 
     return groups
 
-  class Data:
+  class Data(object):
     def __init__(self):
       self.users = {'moe': {'dn': 'uid=moe,ou=People,dc=example,dc=com', 'username':'moe', 'first':'Moe', 'email':'moe@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com']},
                     'lårry': {'dn': 'uid=lårry,ou=People,dc=example,dc=com', 'username':'lårry', 'first':'Larry', 'last':'Stooge', 'email':'larry@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com', 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
@@ -291,8 +297,7 @@ class TestUserAdmin(BaseUserAdminTests):
     # Validate user is not a checked superuser
     assert_false(supertest.is_superuser)
     # Validate user is superuser by group
-    assert_equal(UserProfile.objects.get(user__username='supertest').has_hue_permission(action="superuser",
-                                                                                       app="useradmin"), 1)
+    assert_equal(UserProfile.objects.get(user__username='supertest').has_hue_permission(action="superuser", app="useradmin"), 1)
 
     # Make sure that a user of supergroup can access /useradmin/users
     # Create user to try to edit
@@ -305,11 +310,14 @@ class TestUserAdmin(BaseUserAdminTests):
     assert_true('Hue Permissions - Edit app: useradmin' in response.content)
 
     # Revoke superuser privilege from groups
-    c.post('/useradmin/permissions/edit/useradmin/superuser',
-           dict(app='useradmin',
-           priv='superuser',
-           groups=[],
-           save="Save"), follow=True)
+    c.post('/useradmin/permissions/edit/useradmin/superuser', dict(
+        app='useradmin',
+        priv='superuser',
+        groups=[],
+        save="Save"
+      ),
+      follow=True
+    )
     assert_equal(len(GroupPermission.objects.all()), 1)
 
     # Now test that we have limited access
@@ -339,17 +347,46 @@ class TestUserAdmin(BaseUserAdminTests):
     assert_true('must be a superuser to change permissions' in response.content)
 
     # And revoke access from the group
-    c.post('/useradmin/permissions/edit/useradmin/access',
-           dict(app='useradmin',
-           priv='access',
-           groups=[],
-           save="Save"), follow=True)
+    c.post('/useradmin/permissions/edit/useradmin/access', dict(
+        app='useradmin',
+        priv='access',
+        groups=[],
+        save="Save"
+      ),
+      follow=True
+    )
     assert_true(len(GroupPermission.objects.all()) == 0)
     assert_false(get_profile(test_user).has_hue_permission('access','useradmin'))
 
     # We should no longer have access to the app
     response = c1.get('/useradmin/users')
     assert_true('You do not have permission to access the Useradmin application.' in response.content)
+
+
+  def test_list_permissions(self):
+    c1 = make_logged_in_client(username="nonadmin", is_superuser=False)
+    grant_access('nonadmin', 'nonadmin', 'useradmin')
+    grant_access('nonadmin', 'nonadmin', 'beeswax')
+
+    response = c1.get('/useradmin/permissions/')
+    assert_equal(200, response.status_code)
+
+    perms = response.context[0]['permissions']
+    assert_true(perms.filter(app='beeswax').exists(), perms) # Assumes beeswax is there
+
+    reset = APP_BLACKLIST.set_for_testing('beeswax')
+    appmanager.DESKTOP_MODULES = []
+    appmanager.DESKTOP_APPS = None
+    appmanager.load_apps(APP_BLACKLIST.get())
+    try:
+      response = c1.get('/useradmin/permissions/')
+      perms = response.context[0]['permissions']
+      assert_false(perms.filter(app='beeswax').exists(), perms) # beeswax is not there now
+    finally:
+      reset()
+      appmanager.DESKTOP_MODULES = []
+      appmanager.DESKTOP_APPS = None
+      appmanager.load_apps(APP_BLACKLIST.get())
 
 
   def test_default_group(self):
@@ -574,7 +611,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
   def test_user_admin(self):
     FUNNY_NAME = 'أحمد@cloudera.com'
-    FUNNY_NAME_QUOTED = urllib.quote(FUNNY_NAME)
+    FUNNY_NAME_QUOTED = urllib.parse.quote(FUNNY_NAME)
 
     resets = [
       useradmin.conf.DEFAULT_USER_GROUP.set_for_testing('test_default'),

@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 import posixpath
 import re
@@ -89,7 +90,7 @@ class Api(object):
     self.request = request
 
 
-class MockDjangoRequest():
+class MockDjangoRequest(object):
 
   def __init__(self, user, get=None, post=None, method='POST'):
     self.user = user
@@ -103,7 +104,7 @@ class MockDjangoRequest():
 def _extract_query_params(filters):
   filter_params = {}
 
-  for name, value in filters.iteritems():
+  for name, value in filters.items():
     if name == 'text':
       filter_params['text'] = value
       user_filter = re.search('((user):([^ ]+))', value)

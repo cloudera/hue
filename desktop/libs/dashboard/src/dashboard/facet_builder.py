@@ -16,9 +16,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import division
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from past.utils import old_div
 import logging
 import numbers
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import re
 
 from datetime import datetime, timedelta
@@ -91,7 +98,7 @@ for interval in TIME_INTERVALS:
   interval['ms'] = TIME_INTERVALS_MS[interval['unit']] * interval['coeff']
 
 def utf_quoter(what):
-  return urllib.quote(unicode(what).encode('utf-8'), safe='~@#$&()*!+=:;,.?/\'')
+  return urllib.parse.quote(str(what).encode('utf-8'), safe='~@#$&()*!+=:;,.?/\'')
 
 
 def _guess_range_facet(widget_type, solr_api, collection, facet_field, properties, start=None, end=None, gap=None, window_size=None, slot = 0):
@@ -100,20 +107,20 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
     stat_facet = stats_json['stats']['stats_fields'][facet_field]
 
     _compute_range_facet(widget_type, stat_facet, properties, start, end, gap, window_size = window_size, SLOTS = slot)
-  except Exception, e:
-    print e
+  except Exception as e:
+    print(e)
     LOG.info('Stats not supported on all the fields, like text: %s' % e)
 
 
 def _get_interval(domain_ms, SLOTS):
   biggest_interval = TIME_INTERVALS[len(TIME_INTERVALS) - 1]
-  biggest_interval_is_too_small = domain_ms / biggest_interval['ms'] > SLOTS
+  biggest_interval_is_too_small = old_div(domain_ms, biggest_interval['ms']) > SLOTS
   if biggest_interval_is_too_small:
-    coeff = min(ceil(domain_ms / SLOTS), 100) # If we go over 100 years, something has gone wrong.
+    coeff = min(ceil(old_div(domain_ms, SLOTS)), 100) # If we go over 100 years, something has gone wrong.
     return {'ms': YEAR_MS * coeff, 'coeff': coeff, 'unit': 'YEARS'}
 
   for i in range(len(TIME_INTERVALS) - 2, 0, -1):
-    slots = domain_ms / TIME_INTERVALS[i]['ms']
+    slots = old_div(domain_ms, TIME_INTERVALS[i]['ms'])
     if slots > SLOTS:
       return TIME_INTERVALS[i + 1]
 
@@ -168,7 +175,7 @@ def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=No
         SLOTS = 5
       elif widget_type == 'facet-widget' or widget_type == 'text-facet-widget' or widget_type == 'histogram-widget' or widget_type == 'bar-widget' or widget_type == 'bucket-widget' or widget_type == 'timeline-widget':
         if window_size:
-          SLOTS = int(window_size) / 75 # Value is determined as the thinnest space required to display a timestamp on x axis
+          SLOTS = old_div(int(window_size), 75) # Value is determined as the thinnest space required to display a timestamp on x axis
         else:
           SLOTS = 10
       else:
@@ -195,7 +202,7 @@ def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=No
         end = int(end)
 
       if gap is None:
-        gap = int((end - start) / SLOTS)
+        gap = int(old_div((end - start), SLOTS))
       if gap < 1:
         gap = 1
 
@@ -212,7 +219,7 @@ def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=No
       try:
         start_ts = datetime.strptime(start, '%Y-%m-%dT%H:%M:%SZ')
         start_ts.strftime('%Y-%m-%dT%H:%M:%SZ') # Check for dates before 1900
-      except Exception, e:
+      except Exception as e:
         LOG.error('Bad date: %s' % e)
         start_ts = datetime.strptime('1970-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
 
@@ -222,7 +229,7 @@ def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=No
       try:
         end_ts = datetime.strptime(end, '%Y-%m-%dT%H:%M:%SZ')
         end_ts.strftime('%Y-%m-%dT%H:%M:%SZ') # Check for dates before 1900
-      except Exception, e:
+      except Exception as e:
         LOG.error('Bad date: %s' % e)
         end_ts = datetime.strptime('2050-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
       end = end_ts.strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -241,7 +248,7 @@ def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=No
       is_date = True
       domain_ms = _get_interval_duration(stat_facet['min'])
       interval = _get_interval(domain_ms, SLOTS)
-      nb_slot = domain_ms / interval['ms']
+      nb_slot = old_div(domain_ms, interval['ms'])
       gap = _format_interval(interval)
       end_ts = datetime.utcnow()
       end_ts_clamped = _clamp_date(interval, end_ts)

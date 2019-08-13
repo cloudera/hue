@@ -1,0 +1,37 @@
+{{- if .Values.scheduler.enabled -}}
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: celery-beat
+  labels:
+    deployment: celery-beat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      pod: celery-beat
+  template:
+    metadata:
+      labels:
+        pod: celery-beat
+    spec:
+      containers:
+        - name: celery-beat
+          image: {{ .Values.image.registry }}/hue:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ['./build/env/bin/celery', 'beat', '-A', 'desktop', '-l', 'info']
+          volumeMounts:
+          - name: config-volume
+            mountPath: /usr/share/hue/desktop/conf/z-hue.ini
+            subPath: hue-ini
+          - name: config-volume-extra
+            mountPath: /usr/share/hue/desktop/conf/zz-hue.ini
+            subPath: hue-ini
+      volumes:
+        - name: config-volume
+          configMap:
+            name: hue-config
+        - name: config-volume-extra
+          configMap:
+            name: hue-config-extra
+{{- end -}}

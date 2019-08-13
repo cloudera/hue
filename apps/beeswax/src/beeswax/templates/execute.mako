@@ -23,7 +23,6 @@
   from notebook.conf import ENABLE_QUERY_BUILDER
 %>
 
-<%namespace name="assist" file="/assist.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 
@@ -793,9 +792,6 @@ ${ commonshare() | n,unicode }
 </script>
 
 <script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
-
-${ assist.assistJSModels() }
-
 <script src="${ static('beeswax/js/beeswax.vm.js') }"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
 %if ENABLE_QUERY_BUILDER.get():
@@ -850,8 +846,6 @@ ${ assist.assistJSModels() }
 <link href="${ static('desktop/ext/css/bootstrap-editable.css') }" rel="stylesheet">
 
 <script src="${ static('beeswax/js/stats.utils.js') }"></script>
-
-${ assist.assistPanel() }
 
 <style type="text/css">
   h1 {

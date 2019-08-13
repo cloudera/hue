@@ -54,10 +54,11 @@ describe('sqlStatementsParser.js', () => {
         stringifySplitResult(result) +
         '\nExpected output: ' +
         stringifySplitResult(expectedOutput);
+
       expect(result).toEqual(expectedOutput, because);
     } catch (error) {
       console.error(error);
-      console.log(error.message);
+      console.warn(error.message);
 
       fail('Got error');
     }

@@ -101,19 +101,21 @@ for more details, refer to this link: [https://docs.oracle.com/cd/E37670_01/E590
 * [Homebrew](https://brew.sh)
 * [Oracle Instant Client](http://www.oracle.com/technetwork/database/database-technologies/instant-client/downloads/index.html)
 
-1. Install Dependencies via Homebrew
+Install Dependencies via Homebrew
 
-    brew install mysql maven gmp openssl libffi && brew cask install java8
+    brew install mysql@5.7 maven gmp openssl libffi && brew cask install adoptopenjdk
 
-2. Install Xcode command line tools
+Install Xcode command line tools
 
     sudo xcode-select --install
 
-3. Fix openssl errors
-
-Required for MacOS 10.11+
+Fix openssl errors (required for MacOS 10.11+)
 
     export LDFLAGS=-L/usr/local/opt/openssl/lib && export CPPFLAGS=-I/usr/local/opt/openssl/include
+
+Fix the possible missing Python headers message by installing the MacOS SDK headers
+
+    open /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg
 
 
 ### Oracle Client lib

@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from past.builtins import basestring
+from builtins import object
 import json
 import logging
 import threading
@@ -55,7 +57,6 @@ def get_api(user, url):
 def _get_impala_server_url(session):
   properties = session.get_properties()
   http_addr = properties.get('coordinator_host', properties.get('http_addr'))
-  # Remove scheme if found
   http_addr = http_addr.replace('http://', '').replace('https://', '')
   return ('https://' if get_webserver_certificate_file() else 'http://') + http_addr
 
@@ -80,7 +81,7 @@ class ImpalaServerClient(HiveServerClient):
     # GetExecSummary() only works for closed queries
     try:
       self.close_operation(operation_handle)
-    except QueryServerException, e:
+    except QueryServerException as e:
       LOG.warn('Failed to close operation for query handle, query may be invalid or already closed.')
 
     resp = self.call(self._client.GetExecSummary, req)
@@ -98,7 +99,7 @@ class ImpalaServerClient(HiveServerClient):
     # TGetRuntimeProfileReq() only works for closed queries
     try:
       self.close_operation(operation_handle)
-    except QueryServerException, e:
+    except QueryServerException as e:
       LOG.warn('Failed to close operation for query handle, query may be invalid or already closed.')
 
     resp = self.call(self._client.GetRuntimeProfile, req)
@@ -136,7 +137,7 @@ class ImpalaServerClient(HiveServerClient):
           summary_dict['nodes'].append(node_dict)
 
       return summary_dict
-    except Exception, e:
+    except Exception as e:
       raise ImpalaServerClientException('Failed to serialize the TExecSummary object: %s' % str(e))
 
 
@@ -191,7 +192,7 @@ class ImpalaDaemonApi(object):
         return json.loads(resp)
       else:
         return resp
-    except ValueError, e:
+    except ValueError as e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi did not return valid JSON: %s' % e)
 
 
@@ -207,7 +208,7 @@ class ImpalaDaemonApi(object):
         return json.loads(resp)
       else:
         return resp
-    except ValueError, e:
+    except ValueError as e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi did not return valid JSON: %s' % e)
 
 
@@ -223,7 +224,7 @@ class ImpalaDaemonApi(object):
         return json.loads(resp)
       else:
         return resp
-    except ValueError, e:
+    except ValueError as e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi query_profile did not return valid JSON: %s' % e)
 
   def get_query_memory(self, query_id):
@@ -238,7 +239,7 @@ class ImpalaDaemonApi(object):
         return json.loads(resp)
       else:
         return resp
-    except ValueError, e:
+    except ValueError as e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi query_memory did not return valid JSON: %s' % e)
 
   def kill(self, query_id):
@@ -252,7 +253,7 @@ class ImpalaDaemonApi(object):
         return json.loads(resp)
       else:
         return resp
-    except ValueError, e:
+    except ValueError as e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi kill did not return valid JSON: %s' % e)
 
   def get_query_backends(self, query_id):
@@ -267,7 +268,7 @@ class ImpalaDaemonApi(object):
         return json.loads(resp)
       else:
         return resp
-    except ValueError, e:
+    except ValueError as e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi query_backends did not return valid JSON: %s' % e)
 
   def get_query_finstances(self, query_id):
@@ -282,7 +283,7 @@ class ImpalaDaemonApi(object):
         return json.loads(resp)
       else:
         return resp
-    except ValueError, e:
+    except ValueError as e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi query_finstances did not return valid JSON: %s' % e)
 
   def get_query_summary(self, query_id):
@@ -297,7 +298,7 @@ class ImpalaDaemonApi(object):
         return json.loads(resp)
       else:
         return resp
-    except ValueError, e:
+    except ValueError as e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi query_summary did not return valid JSON: %s' % e)
 
   def get_query_profile_encoded(self, query_id):

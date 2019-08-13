@@ -148,6 +148,9 @@ Support is native via a dedicated section.
 
 Read more about [LDAP or PAM pass-through authentication](http://gethue.com/ldap-or-pam-pass-through-authentication-with-hive-or-impala/) and [High Availability](../external/).
 
+
+**Note** For historical reason, the name of the configuration section is `[beeswax]`.
+
 **Tez**
 
 Requires support for sending multiple queries when using Tez (instead of a maximum of just one at the time). You can turn it on with this setting:
@@ -155,8 +158,43 @@ Requires support for sending multiple queries when using Tez (instead of a maxim
     [beeswax]
     max_number_of_sessions=10
 
-**Note** For historical reason, the name of the configuration section is `[beeswax]`.
+**LLAP**
 
+When the LLAP interpreter is added, there are 2 ways to enable connectivity (direct configuration or service discovery). LLAP is added by enabling the following settings:
+
+    [notebook]
+        [[interpreters]]
+            [[[llap]]]
+               name=LLAP
+               interface=hiveserver2
+
+    [beeswax]
+        # Direct Configuration
+        llap_server_host = localhost
+        llap_server_port = 10500
+        llap_server_thrift_port = 10501
+
+        # or Service Discovery
+        ## hive_discovery_llap = true
+        ## hive_discovery_llap_ha = false
+        # Shortcuts to finding LLAP znode Key
+        # Non-HA - hiveserver-interactive-site - hive.server2.zookeeper.namespace ex hive2 = /hive2
+        # HA-NonKerberized - <llap_app_name>_llap ex app name llap0 = /llap0_llap
+        # HA-Kerberized - <llap_app_name>_llap-sasl ex app name llap0 = /llap0_llap-sasl
+        ## hive_discovery_llap_znode = /hiveserver2-hive2
+
+**Service Discovery**
+
+When setup, Hue will query zookeeper to find an enabled hiveserver2 or LLAP endpoint.
+
+        [beeswax]
+            hive_discovery_llap = true
+            hive_discovery_hs2 = true
+
+In order to prevent spamming zookeeper, HiveServer2 is cached for the life of the process and llap is cached based on the following setting:
+
+        [beeswax]
+            cache_timeout = 60
 
 ### MySQL
 
@@ -245,7 +283,7 @@ Then give Hue the information about the database source:
     [[[postgresql]]]
        name = PostgreSql
        interface=sqlalchemy
-       options='{"url": "postgresql+psycopg2://..."}'
+       options='{"url": "postgresql+psycopg2://user:password@host:31335/database"}'
 
 Alternative:
 
@@ -281,7 +319,13 @@ Then give Hue the information about the database source:
     [[[athena]]]
        name = AWS Athena
        interface=sqlalchemy
-       options='{"url": "awsathena+rest://..."}'
+        options='{"url": "awsathena+rest://${AWS_ACCESS_KEY_ID}:${AWS_SECRET_ACCESS_KEY}@athena.${REGION}.amazonaws.com:443/${SCHEMA}?s3_staging_dir=${S3_BUCKET_DIRECTORY}"}'
+
+e.g.
+
+    options='{"url": "awsathena+rest://XXXXXXXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?s3_staging_dir=s3://gethue-athena/scratch"}'
+
+Note: Keys and S3 buckets need to be URL quoted but Hue does it automatically for you.
 
 ### Apache Druid
 
@@ -381,7 +425,26 @@ Via native HiveServer2 API:
       name=Kafka SQL
       interface=kafka
 
-### MS SQLServer
+### Azure SQL Database
+
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install pyodbc
+
+Then configure ODBC according to the [documentation](https://github.com/mkleehammer/pyodbc).
+
+Then give Hue the information about the database source:
+
+    [[[azuresql]]]
+       name = Azure SQL Server
+       interface=sqlalchemy
+       options='{"url": "mssql+pyodbc://<user>@<server-host>:<password>@<server-host>.database.windows.net:1433/<database>?driver=ODBC+Driver+13+for+SQL+Server"}'
+
+Note: Properties need to be URL quoted (e.g. with `urllib.quote_plus(...)` in Python).
+
+Read more on the [Azure SQL Database](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-connect-query-python).
+
+### MS SQL Server
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
@@ -427,7 +490,20 @@ Vertica’s JDBC client drivers can be downloaded here: [Vertica JDBC Client Dri
 
 ### Phoenix
 
-The Phoenix JDBC client driver is bundled with the Phoenix binary and source release artifacts, which can be downloaded here: [Apache Phoenix Downloads](https://phoenix.apache.org/download.html). Be sure to use the Phoenix client driver that is compatible with your Phoenix server version.
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+    ./build/env/bin/pip install pyPhoenix
+
+    [[[phoenix]]]
+    name=HBase Phoenix
+    interface=sqlalchemy
+    options='{"url": "phoenix://sql-phoenix-1.gce.cloudera.com:8765/"}'
+
+**Note**: Check the list of know issues [here](https://github.com/Pirionfr/pyPhoenix#known-issues).
+
+Alternative:
+
+The Phoenix JDBC client driver is bundled with the Phoenix binary and source release artifacts, which can be downloaded here: [Apache Phoenix Downloads](https://phoenix.apache.org/download.html).
 
     [[[phoenix]]]
     name=Phoenix JDBC
@@ -454,6 +530,7 @@ Then give Hue the information about the database source:
 The dialect should be added to the Python system or Hue Python virtual environment:
 
       ./build/env/bin/pip install pybigquery
+      ./build/env/bin/pip install pyasn1==0.4.1
 
 From https://github.com/mxmzdlv/pybigquery.
 
@@ -462,7 +539,16 @@ Then give Hue the information about the database source:
     [[[bigquery]]]
        name = BigQuery
        interface=sqlalchemy
-       options='{"url": "bigquery://project"}'
+       options='{"url": "bigquery://projectName"}'
+
+To restrict to only one dataset:
+
+       options='{"url": "bigquery://projectName/datasetName"}'
+
+Supporting additional [connection parameters](https://github.com/mxmzdlv/pybigquery#connection-string-parameters):
+
+      options='{"url": "bigquery://", "credentials_path": "/etc/conf/hue/demo-4a0e4e08d81a.json"}'
+
 
 ### Apache Drill
 
@@ -653,7 +739,19 @@ Then give Hue the information about the database source:
     [[[snowflake]]]
        name = Snowflake
        interface=sqlalchemy
-       options='{"url": "snowflake://..."}'
+       options='{"url": "snowflake://{user}:{password}@{account}/{database}"}'
+
+Note: account is the name in your URL domain. e.g.
+
+    https://smXXXXXX.snowflakecomputing.com/ --> smXXXXXX
+
+Tables currently need to be prefixed with a schema, e.g. `SELECT * FROM tpch_sf1.customer LIMIT 5`
+
+e.g.
+
+    options='{"url": "snowflake://hue:pwd@smXXXXX/SNOWFLAKE_SAMPLE_DATA"}'
+
+Read more about is on the [snowflake-sqlalchemy page](https://docs.snowflake.net/manuals/user-guide/sqlalchemy.html).
 
 ### Sqlite
 
@@ -662,7 +760,22 @@ Just give Hue the information about the database source:
     [[[sqlite]]]
        name = Sqlite
        interface=sqlalchemy
-       options='{"url": "sqlite://..."}'
+       options='{"url": "sqlite:///path/to/database.db"}'
+
+### Google Sheets
+
+The dialect should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install gsheetsdb
+
+Then give Hue the information about the database source:
+
+    [[[GSheets]]]
+       name = Google Sheets
+       interface=sqlalchemy
+       options='{"url": "gsheets://"}'
+
+Read more on the [gsheetsdb page](https://github.com/betodealmeida/gsheets-db-api#authentication).
 
 ### Greenplum
 
@@ -675,7 +788,7 @@ Then give Hue the information about the database source:
     [[[greenplum]]]
        name = Greenplum
        interface=sqlalchemy
-       options='{"url": "postgresql+psycopg2://..."}'
+       options='{"url": "postgresql+psycopg2://user:password@host:31335/database"}'
 
 
 ## Interfaces

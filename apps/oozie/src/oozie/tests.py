@@ -16,11 +16,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+from functools import reduce
+standard_library.install_aliases()
+from builtins import str
+from past.builtins import basestring
+from builtins import object
 import json
 import logging
 import re
+import sys
 import os
-import StringIO
 import shutil
 import tempfile
 import zipfile
@@ -45,17 +51,22 @@ from jobsub.models import OozieDesign, OozieMapreduceAction
 from liboozie import oozie_api
 from liboozie.conf import OOZIE_URL
 from liboozie.oozie_api_tests import OozieServerProvider
+from liboozie.submission2 import Submission
 from liboozie.types import WorkflowList, Workflow as OozieWorkflow, Coordinator as OozieCoordinator,\
   Bundle as OozieBundle, CoordinatorList, WorkflowAction, BundleList
 
 from oozie.conf import ENABLE_CRON_SCHEDULING, ENABLE_V2
 from oozie.models import Dataset, Workflow, Node, Kill, Link, Job, Coordinator, History,\
   find_parameters, NODE_TYPES, Bundle
-from oozie.models2 import _get_hiveserver2_url
+from oozie.models2 import _get_hiveserver2_url, Bundle as Bundle2
 from oozie.utils import workflow_to_dict, model_to_dict, smart_path, contains_symlink, convert_to_server_timezone
 from oozie.importlib.workflows import import_workflow
 from oozie.importlib.jobdesigner import convert_jobsub_design
 
+if sys.version_info[0] > 2:
+  from io import StringIO as string_io
+else:
+  from cStringIO import StringIO as string_io
 
 LOG = logging.getLogger(__name__)
 
@@ -63,7 +74,7 @@ LOG = logging.getLogger(__name__)
 _INITIALIZED = False
 
 
-class MockOozieApi:
+class MockOozieApi(object):
   JSON_WORKFLOW_LIST = [{u'status': u'RUNNING', u'run': 0, u'startTime': u'Mon, 30 Jul 2012 22:35:48 GMT', u'appName': u'WordCount1', u'lastModTime': u'Mon, 30 Jul 2012 22:37:00 GMT', u'actions': [], u'acl': None, u'appPath': None, u'externalId': 'job_201208072118_0044', u'consoleUrl': u'http://runreal:11000/oozie?job=0000012-120725142744176-oozie-oozi-W', u'conf': None, u'parentId': None, u'createdTime': u'Mon, 30 Jul 2012 22:35:48 GMT', u'toString': u'Workflow id[0000012-120725142744176-oozie-oozi-W] status[SUCCEEDED]', u'endTime': u'Mon, 30 Jul 2012 22:37:00 GMT', u'id': u'0000012-120725142744176-oozie-oozi-W', u'group': None, u'user': u'test'},
                         {u'status': u'KILLED', u'run': 0, u'startTime': u'Mon, 30 Jul 2012 22:31:08 GMT', u'appName': u'WordCount2', u'lastModTime': u'Mon, 30 Jul 2012 22:32:20 GMT', u'actions': [], u'acl': None, u'appPath': None, u'externalId': '-', u'consoleUrl': u'http://runreal:11000/oozie?job=0000011-120725142744176-oozie-oozi-W', u'conf': None, u'parentId': None, u'createdTime': u'Mon, 30 Jul 2012 22:31:08 GMT', u'toString': u'Workflow id[0000011-120725142744176-oozie-oozi-W] status[SUCCEEDED]', u'endTime': u'Mon, 30 Jul 2012 22:32:20 GMT', u'id': u'0000011-120725142744176-oozie-oozi-W', u'group': None, u'user': u'test'},
                         {u'status': u'SUCCEEDED', u'run': 0, u'startTime': u'Mon, 30 Jul 2012 22:20:48 GMT', u'appName': u'WordCount3', u'lastModTime': u'Mon, 30 Jul 2012 22:22:00 GMT', u'actions': [], u'acl': None, u'appPath': None, u'externalId': '', u'consoleUrl': u'http://runreal:11000/oozie?job=0000009-120725142744176-oozie-oozi-W', u'conf': None, u'parentId': None, u'createdTime': u'Mon, 30 Jul 2012 22:20:48 GMT', u'toString': u'Workflow id[0000009-120725142744176-oozie-oozi-W] status[SUCCEEDED]', u'endTime': u'Mon, 30 Jul 2012 22:22:00 GMT', u'id': u'0000009-120725142744176-oozie-oozi-W', u'group': None, u'user': u'test'},
@@ -130,7 +141,7 @@ class MockOozieApi:
     workflows = MockOozieApi.JSON_WORKFLOW_LIST
     user_filters = [val for key, val in kwargs['filters'] if key == 'user']
     if user_filters:
-      workflows = filter(lambda wf: wf['user'] == user_filters[0], workflows)
+      workflows = [wf for wf in workflows if wf['user'] == user_filters[0]]
 
     return WorkflowList(self, {'offset': 0, 'total': 5, 'workflows': workflows})
 
@@ -138,7 +149,7 @@ class MockOozieApi:
     coordinatorjobs = MockOozieApi.JSON_COORDINATOR_LIST
     user_filters = [val for key, val in kwargs['filters'] if key == 'user']
     if user_filters:
-      coordinatorjobs = filter(lambda coord: coord['user'] == user_filters[0], coordinatorjobs)
+      coordinatorjobs = [coord for coord in coordinatorjobs if coord['user'] == user_filters[0]]
 
     return CoordinatorList(self, {'offset': 0, 'total': 5, 'coordinatorjobs': coordinatorjobs})
 
@@ -146,7 +157,7 @@ class MockOozieApi:
     bundlejobs = MockOozieApi.JSON_BUNDLE_LIST
     user_filters = [val for key, val in kwargs['filters'] if key == 'user']
     if user_filters:
-      bundlejobs = filter(lambda coord: coord['user'] == user_filters[0], bundlejobs)
+      bundlejobs = [coord for coord in bundlejobs if coord['user'] == user_filters[0]]
 
     return BundleList(self, {'offset': 0, 'total': 4, 'bundlejobs': bundlejobs})
 
@@ -230,14 +241,15 @@ class MockOozieApi:
            hive2=org.apache.oozie.action.hadoop.Hive2Credentials
     """
     return {
-        'oozie.credentials.credentialclasses': oozie_credentialclasses
+        'oozie.credentials.credentialclasses': oozie_credentialclasses,
+        'oozie.processing.timezone': 'GMT-0800'
     }
 
   def get_job_status(self, job_id):
     return {'status': "RUNNING"}
 
 
-class MockFs():
+class MockFs(object):
   def __init__(self, logical_name=None):
 
     self.fs_defaultfs = 'hdfs://curacao:8020'
@@ -1952,7 +1964,7 @@ class TestEditor(OozieMockBase):
 
   def test_workflow_export(self):
     response = self.c.get(reverse('oozie:export_workflow', args=[self.wf.id]))
-    zfile = zipfile.ZipFile(StringIO.StringIO(response.content))
+    zfile = zipfile.ZipFile(string_io(response.content))
     assert_true('workflow.xml' in zfile.namelist(), 'workflow.xml not in response')
     assert_true('workflow-metadata.json' in zfile.namelist(), 'workflow-metadata.json not in response')
     assert_equal(2, len(zfile.namelist()))
@@ -2105,7 +2117,6 @@ class TestEditorBundle(OozieMockBase):
 
 
   def test_bundle_gen_xml(self):
-    raise SkipTest()
     bundle = create_bundle(self.c, self.user)
 
     assert_true(
@@ -2119,10 +2130,31 @@ class TestEditorBundle(OozieMockBase):
     </property>
   </parameters>
   <controls>
-     <kick-off-time>2012-07-01T00:00Z</kick-off-time>
+     <kick-off-time>%s</kick-off-time>
   </controls>
 </bundle-app>
-""" in bundle.to_xml(), bundle.to_xml())
+""" % bundle.kick_off_time_utc in bundle.to_xml(), bundle.to_xml())
+
+  def test_model2_bundle_gen_xml(self):
+    bundle = Bundle2()
+    converted_kickoff_time = convert_to_server_timezone(bundle.kick_off_time_utc)
+    Submission(self.user, bundle)
+
+    assert_true(
+"""<bundle-app name="My Bundle"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="uri:oozie:bundle:0.2">
+  <parameters>
+    <property>
+        <name>oozie.use.system.libpath</name>
+        <value>true</value>
+    </property>
+  </parameters>
+  <controls>
+     <kick-off-time>%s</kick-off-time>
+  </controls>
+</bundle-app>
+""" % converted_kickoff_time in bundle.to_xml(), bundle.to_xml())
 
 
   def test_create_bundled_coordinator(self):
@@ -3269,7 +3301,7 @@ my_prop_not_filtered=10
         u'form-2-value': [u'/path/output'],
     }, follow=True)
 
-    assert_true('oozie_workflow' in response.context[0]._data.keys(), response.content)
+    assert_true('oozie_workflow' in list(response.context[0]._data.keys()), response.content)
     wf_id = response.context[0]._data['oozie_workflow'].id
 
     # Check if response contains log data

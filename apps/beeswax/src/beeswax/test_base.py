@@ -17,6 +17,10 @@
 # limitations under the License.
 #
 
+from builtins import str
+from builtins import chr
+from builtins import range
+from builtins import object
 import atexit
 import json
 import logging
@@ -129,13 +133,13 @@ def get_shared_beeswax_server(db_name='default'):
       while not started and time.time() - start <= 60:
         try:
           db.open_session(user)
-        except StructuredThriftTransportException, e:
+        except StructuredThriftTransportException as e:
           LOG.exception('Failed to open Hive Server session')
 
           # Don't loop if we had an authentication error.
           if 'Bad status: 3' in e.message:
             raise
-        except Exception, e:
+        except Exception as e:
           LOG.exception('Failed to open Hive Server session')
         else:
           started = True
@@ -192,7 +196,7 @@ def _start_mini_hs2(cluster):
   if _SHARED_HIVE_SERVER_PROCESS is None:
     p = _start_server(cluster)
     LOG.info("started")
-    cluster.fs.do_as_superuser(cluster.fs.chmod, '/tmp', 01777)
+    cluster.fs.do_as_superuser(cluster.fs.chmod, '/tmp', 0o1777)
 
     _SHARED_HIVE_SERVER_PROCESS = p
     def kill():
@@ -514,7 +518,7 @@ class BeeswaxSampleProvider(object):
     """
     cls.cluster.fs.setuser(cls.cluster.superuser)
     f = cls.cluster.fs.open(filename, "w")
-    for x in xrange(256):
+    for x in range(256):
       f.write("%d\t0x%x\n" % (x, x))
     f.close()
 
@@ -528,8 +532,8 @@ class BeeswaxSampleProvider(object):
     """
     cls.cluster.fs.setuser(cls.cluster.superuser)
     f = cls.cluster.fs.open(filename, "w")
-    for x in xrange(256):
-      f.write("%d\t%s\n" % (x, unichr(x).encode(encoding)))
+    for x in range(256):
+      f.write("%d\t%s\n" % (x, chr(x).encode(encoding)))
     f.close()
 
   @classmethod

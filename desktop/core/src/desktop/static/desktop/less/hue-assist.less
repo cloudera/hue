@@ -656,6 +656,29 @@
     margin: 8px 0;
   }
 
+  .hue-doc-table-hive {
+    margin: 10px 0 0 0;
+    overflow-x: auto;
+    border-collapse: collapse;
+  }
+
+  .hue-doc-table-hive thead .hue-doc-td-hive {
+    background-color: @cui-gray-050;
+  }
+
+  .hue-doc-td-hive,
+  .hue-doc-th-hive {
+    min-width: 8px;
+    border: 1px solid @cui-default-border-color;
+    padding: 7px 10px;
+    vertical-align: top;
+    text-align: left;
+  }
+
+  .hue-doc-title-hive {
+    color: @hue-primary-color-dark;
+  }
+
   .hue-doc-title {
     color: @hue-primary-color-dark;
     font: 15px/normal @font-family-monospace;
@@ -698,6 +721,18 @@
       content: 'Note:';
       color: @cui-gray-800;
       font-weight: 500;
+    }
+  }
+
+  .hue-doc-note-hive {
+    border: 1px solid @hue-primary-color-light;
+    border-radius: 4px;
+    padding: 0 10px;
+    margin: 10px 0 10px 0;
+
+    div {
+      margin-top: 10px;
+      font-weight: bold;
     }
   }
 
@@ -771,7 +806,7 @@
 }
 
 .popular-color {
-  color: @cui-orange-300;
+  color: @cui-orange-200;
 }
 
 .top-star {

@@ -616,21 +616,18 @@ SMTP = ConfigSection(
       type=str,
       default="localhost"
     ),
-
     PORT = Config(
       key="port",
       help=_("The SMTP server port."),
       type=int,
       default=25
     ),
-
     USER = Config(
       key="user",
       help=_("The username for the SMTP host."),
       type=str,
       default=""
     ),
-
     PASSWORD = Config(
       key="password",
       help=_("The password for the SMTP user."),
@@ -638,7 +635,6 @@ SMTP = ConfigSection(
       private=True,
       default="",
     ),
-
     PASSWORD_SCRIPT = Config(
       key="password_script",
       help=_("Execute this script to produce the SMTP user password. This will be used when the SMTP `password` is not set."),
@@ -646,14 +642,12 @@ SMTP = ConfigSection(
       private=True,
       default="",
     ),
-
     USE_TLS = Config(
       key="tls",
       help=_("Whether to use a TLS (secure) connection when talking to the SMTP server."),
       type=coerce_bool,
       default=False
     ),
-
     DEFAULT_FROM= Config(
       key="default_from_email",
       help=_("Default email address to use for various automated notifications from Hue."),
@@ -684,22 +678,6 @@ METRICS = ConfigSection(
   )
 )
 
-
-CONNECTORS = ConfigSection(
-  key='connectors',
-  help=_("""Configuration options for connectors to external services"""),
-  members=dict(
-    IS_ENABLED=Config(
-      key='is_enabled',
-      help=_('Enable connector page'),
-      default=False,
-      type=coerce_bool),
-   LIST=Config(
-      key='list',
-      default=['impala'],
-      type=coerce_csv),
-  )
-)
 
 ANALYTICS = ConfigSection(
   key='analytics',
@@ -1526,6 +1504,27 @@ DEV_EMBEDDED = Config("dev_embedded",
    help=_("Enable embedded development mode, where the page will be rendered inside a container div element.")
 )
 
+DISPLAY_APP_SWITCHER = Config(
+  key='display_app_switcher',
+  help=_('Enable or disable the upper left app switcher menu.'),
+  type=coerce_bool,
+  default=False
+)
+
+APP_SWITCHER_ALTUS_BASE_URL = Config(
+  key="app_switcher_altus_base_url",
+  help=_("Optional altus base url to use for the app switcher."),
+  type=str,
+  default=''
+)
+
+APP_SWITCHER_MOW_BASE_URL = Config(
+  key="app_switcher_mow_base_url",
+  help=_("Optional mow base url to use for the app switcher."),
+  type=str,
+  default=''
+)
+
 HTTP_500_DEBUG_MODE = Config(
   key='http_500_debug_mode',
   help=_('Enable or disable debugging information in the 500 internal server error response. '
@@ -1648,6 +1647,7 @@ USE_NEW_CHARTS = Config(
   help=_('Choose whether to use new charting library across the whole Hue.')
 )
 
+# Deprecated
 IS_MULTICLUSTER_ONLY = Config(
   key='is_multicluster_only',
   default=False,
@@ -1655,11 +1655,20 @@ IS_MULTICLUSTER_ONLY = Config(
   help=_('Choose whether to pick configs only from [desktop] [[cluster]]')
 )
 
+# Deprecated
 IS_K8S_ONLY = Config(
   key='is_k8s_only',
   default=False,
   type=coerce_bool,
   help=_('Choose whether to pick configs only from [desktop] [[cluster]]')
+)
+
+
+ENABLE_PROMETHEUS = Config(
+  key='enable_prometheus',
+  default=False,
+  type=coerce_bool,
+  help=_('Turn on Prometheus metrics end point /metrics.')
 )
 
 
@@ -1699,16 +1708,28 @@ TASK_SERVER = ConfigSection(
       type=coerce_bool,
       help=_('Switch on the integration with the Task Scheduler.')
     ),
+    BEAT_SCHEDULES_FILE = Config(
+      key='beat_schedules_file',
+      default='',
+      type=str,
+      help=_('Path to a file containing a list of beat schedules.')
+    ),
     FETCH_RESULT_LIMIT = Config(
       key='fetch_result_limit',
       default=2000,
       type=coerce_positive_integer,
       help=_('Number of query results rows to fetch into the result storage.')
     ),
+    RESULT_CACHE = Config(
+      key='result_cache',
+      type=str,
+      help=_('Django file cache class to use to temporarily store query results'),
+      default='{"BACKEND": "django_redis.cache.RedisCache", "LOCATION": "redis://localhost:6379/0", "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},"KEY_PREFIX": "queries"}'
+    ),
     RESULT_STORAGE = Config(
       key='result_storage',
       type=str,
-      help=_('Django file storage class to use to temporarily store query results'),
+      help=_('Django file storage class to use to persist query results'),
       default='{"backend": "django.core.files.storage.FileSystemStorage", "properties": {"location": "./logs"}}'
     ),
     EXECUTION_STORAGE = Config(
@@ -1724,6 +1745,18 @@ def get_clusters(user):
   clusters = []
   cluster_config = CLUSTERS.get()
 
+  # Backward compatibility when not using clusters
+  if not cluster_config:
+    clusters.append(
+      (CLUSTER_ID.get(), {
+        'id': CLUSTER_ID.get(),
+        'name': CLUSTER_ID.get(),
+        'type': 'direct',
+        'credentials': {},
+        }
+      )
+    )
+
   for i in cluster_config:
     # Get additional remote multi clusters
     clusters.append(
@@ -1731,33 +1764,7 @@ def get_clusters(user):
           'id': i,
           'name': cluster_config[i].NAME.get() or i,
           'type': cluster_config[i].TYPE.get(),
-          'interface': cluster_config[i].INTERFACE.get() or 'hive',
-          'server_host': cluster_config[i].SERVER_HOST.get()
-        }
-      )
-    )
-
-  # Get traditional services in regular ini too
-  if not IS_MULTICLUSTER_ONLY.get():
-    clusters.append(
-      (CLUSTER_ID.get(), {
-        'id': CLUSTER_ID.get(),
-        'name': CLUSTER_ID.get(),
-        'type': 'direct',
-        'interface': 'all',
-        'server_host': 'all'
-        }
-      )
-    )
-
-  if IS_K8S_ONLY.get():
-    clusters.append(
-      ('impala', {
-          'id': 'impala',
-          'name': 'impala',
-          'type': 'impala',
-          'interface': 'impala',
-          'server_host': 'impala'
+          'credentials': cluster_config[i].CREDENTIALS.get(),
         }
       )
     )
@@ -1765,8 +1772,13 @@ def get_clusters(user):
   return OrderedDict(clusters)
 
 
-def has_multi_cluster():
-  return bool(CLUSTERS.get())
+def has_multi_clusters():
+  '''If Hue is configured to talk to more than one completely independent clusters'''
+  return len(CLUSTERS.get()) > 1
+
+def has_connectors():
+  '''When the connector feature is turned on'''
+  return ENABLE_CONNECTORS.get()
 
 
 CLUSTERS = UnspecifiedConfigSection(
@@ -1783,21 +1795,56 @@ CLUSTERS = UnspecifiedConfigSection(
       ),
       TYPE=Config(
           "type",
-          help=_("Type of cluster, e.g. single, direct, local ini, CM API, Dataeng, Arcus, BigQuery, Presto."),
+          help=_("Type of cluster, e.g. plain, CM, Snowball..."),
           default='direct',
+          type=str,
+      ),
+      CREDENTIALS=Config(
+          "credentials",
+          help=_("How to connect to the of remote cluster management system."),
+          default='{}',
+          type=coerce_json_dict,
+      )
+    )
+  )
+)
+
+ENABLE_CONNECTORS = Config(
+  key='enable_connectors',
+  default=False,
+  type=coerce_bool,
+  help=_('Turn on the Connector configuration and usage.')
+)
+
+CONNECTORS = UnspecifiedConfigSection(
+  key='connectors',
+  help=_("""Configuration options for connectors to external services"""),
+  each=ConfigSection(
+    help=_("Id of the connector."),
+    members=dict(
+      NICE_NAME=Config(
+          "nice_name",
+          help=_("Nice name of the connector to show to the user. Same as id if not specified."),
+          default=None,
+          type=str,
+      ),
+      DIALECT=Config(
+          "dialect",
+          help=_("The language or type of the integrated service. e.g. MySql, Hive, HDFS..."),
+          default=None,
           type=str,
       ),
       INTERFACE=Config(
           "interface",
-          help=_("Type of cluster interface"),
-          default='hive',
-          type=str,
-      ),
-      SERVER_HOST=Config(
-          "server_host",
-          help=_("The host service to contact."),
+          help=_("The class of connector to use to connect to the service."),
           default=None,
           type=str,
+      ),
+      SETTINGS=Config(
+          "settings",
+          help=_("Json string of a list of name/value settings to configure the connector. e.g. '{\"name\": \"url\", \"value\": \"mysql://hue:hue@host:3306/hue\"}]'"),
+          default='{}',
+          type=coerce_json_dict,
       ),
     )
   )

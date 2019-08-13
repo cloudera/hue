@@ -21,7 +21,6 @@
   from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
 %>
 
-<%namespace name="assist" file="/assist.mako" />
 <%namespace name="actionbar" file="actionbar.mako" />
 
 <%
@@ -32,7 +31,6 @@ MAIN_SCROLLABLE = is_embeddable and ".page-content" or ".content-panel"
 ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode }
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
 
-${ assist.assistJSModels() }
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
@@ -44,8 +42,6 @@ ${ assist.assistJSModels() }
   }
 % endif
 </style>
-
-${ assist.assistPanel() }
 %endif
 
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }" type="text/css">

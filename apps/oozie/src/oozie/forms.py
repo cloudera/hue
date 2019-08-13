@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 from datetime import datetime,  timedelta
 from time import mktime, struct_time
@@ -32,7 +33,6 @@ from oozie.conf import ENABLE_CRON_SCHEDULING
 from oozie.models import Workflow, Node, Java, Mapreduce, Streaming, Coordinator,\
   Dataset, DataInput, DataOutput, Pig, Link, Hive, Sqoop, Ssh, Shell, DistCp, Fs,\
   Email, SubWorkflow, Generic, Bundle, BundledCoordinator
-
 
 
 LOG = logging.getLogger(__name__)
@@ -65,12 +65,12 @@ class ParameterForm(forms.Form):
 
   @staticmethod
   def get_initial_params(conf_dict):
-    params = filter(lambda key: key not in ParameterForm.NON_PARAMETERS, conf_dict.keys())
+    params = [key for key in list(conf_dict.keys()) if key not in ParameterForm.NON_PARAMETERS]
     return [{'name': name, 'value': conf_dict[name]} for name in params]
 
 
 class WorkflowForm(forms.ModelForm):
-  class Meta:
+  class Meta(object):
     model = Workflow
     exclude = ('owner', 'start', 'end', 'data')
     widgets = {
@@ -101,20 +101,20 @@ class ImportJobsubDesignForm(forms.Form):
 
 
 class NodeForm(forms.ModelForm):
-  class Meta:
+  class Meta(object):
     ALWAYS_HIDE = ('workflow', 'children', 'node_type', 'data')
     model = Node
     exclude = ALWAYS_HIDE
 
 
 class NodeMetaForm(forms.ModelForm):
-  class Meta:
+  class Meta(object):
     ALWAYS_HIDE = ('workflow', 'children', 'node_type')
     model = Node
     exclude = ALWAYS_HIDE + ('name', 'description')
 
 class JavaForm(forms.ModelForm):
-  class Meta:
+  class Meta(object):
     model = Java
     exclude = NodeForm.Meta.ALWAYS_HIDE
     widgets = {
@@ -133,7 +133,7 @@ class JavaForm(forms.ModelForm):
 
 class MapreduceForm(forms.ModelForm):
   """Used for specifying a mapreduce action"""
-  class Meta:
+  class Meta(object):
     model = Mapreduce
     exclude = NodeForm.Meta.ALWAYS_HIDE
     widgets = {
@@ -149,7 +149,7 @@ class MapreduceForm(forms.ModelForm):
 
 class StreamingForm(forms.ModelForm):
   """Used for specifying a streaming action"""
-  class Meta:
+  class Meta(object):
     model = Streaming
     exclude = NodeForm.Meta.ALWAYS_HIDE
     widgets = {
@@ -164,7 +164,7 @@ class StreamingForm(forms.ModelForm):
 
 
 class PigForm(forms.ModelForm):
-  class Meta:
+  class Meta(object):
     model = Pig
     exclude = NodeForm.Meta.ALWAYS_HIDE
     widgets = {
@@ -180,7 +180,7 @@ class PigForm(forms.ModelForm):
 
 
 class HiveForm(forms.ModelForm):
-  class Meta:
+  class Meta(object):
     model = Hive
     exclude = NodeForm.Meta.ALWAYS_HIDE
     widgets = {
@@ -196,7 +196,7 @@ class HiveForm(forms.ModelForm):
 
 
 class SqoopForm(forms.ModelForm):
-  class Meta:
+  class Meta(object):
     model = Sqoop
     exclude = NodeForm.Meta.ALWAYS_HIDE
     widgets = {
@@ -212,7 +212,7 @@ class SqoopForm(forms.ModelForm):
 
 
 class SshForm(forms.ModelForm):
-  class Meta:
+  class Meta(object):
     model = Ssh
     exclude = NodeForm.Meta.ALWAYS_HIDE
     widgets = {
@@ -223,7 +223,7 @@ class SshForm(forms.ModelForm):
 
 
 class ShellForm(forms.ModelForm):
-  class Meta:
+  class Meta(object):
     model = Shell
     exclude = NodeForm.Meta.ALWAYS_HIDE
     widgets = {
@@ -239,7 +239,7 @@ class ShellForm(forms.ModelForm):
 
 
 class DistCpForm(forms.ModelForm):
-  class Meta:
+  class Meta(object):
     model = DistCp
     exclude = NodeForm.Meta.ALWAYS_HIDE
     widgets = {
@@ -253,7 +253,7 @@ class DistCpForm(forms.ModelForm):
 
 
 class FsForm(forms.ModelForm):
-  class Meta:
+  class Meta(object):
     model = Fs
     exclude = NodeForm.Meta.ALWAYS_HIDE
     widgets = {
@@ -266,7 +266,7 @@ class FsForm(forms.ModelForm):
 
 
 class EmailForm(forms.ModelForm):
-  class Meta:
+  class Meta(object):
     model = Email
     exclude = NodeForm.Meta.ALWAYS_HIDE
     widgets = {
@@ -285,7 +285,7 @@ class SubWorkflowForm(forms.ModelForm):
     choices=((wf.id, wf) for wf in Document.objects.available(Workflow, user) if workflow.id != id)
     self.fields['sub_workflow'] = forms.ChoiceField(choices=choices, required=False, widget=forms.RadioSelect(attrs={'class':'radio'}))
 
-  class Meta:
+  class Meta(object):
     model = SubWorkflow
     exclude = NodeForm.Meta.ALWAYS_HIDE
     widgets = {
@@ -301,7 +301,7 @@ class SubWorkflowForm(forms.ModelForm):
 
 
 class GenericForm(forms.ModelForm):
-  class Meta:
+  class Meta(object):
     model = Generic
     exclude = NodeForm.Meta.ALWAYS_HIDE
     widgets = {
@@ -312,13 +312,13 @@ class GenericForm(forms.ModelForm):
 class LinkForm(forms.ModelForm):
   comment = forms.CharField(label='if', max_length=1024, required=True, widget=forms.TextInput(attrs={'class': 'span8'}))
 
-  class Meta:
+  class Meta(object):
     model = Link
     exclude = NodeForm.Meta.ALWAYS_HIDE + ('parent', 'child', 'name')
 
 
 class DefaultLinkForm(forms.ModelForm):
-  class Meta:
+  class Meta(object):
     model = Link
     exclude = NodeForm.Meta.ALWAYS_HIDE + ('parent', 'comment', 'name')
 
@@ -345,7 +345,7 @@ class CoordinatorForm(forms.ModelForm):
                                  widget=SplitDateTimeWidget(attrs={'class': 'input-small', 'id': 'coordinator_end'},
                                                             date_format=DATE_FORMAT, time_format=TIME_FORMAT), localize=True)
 
-  class Meta:
+  class Meta(object):
     model = Coordinator
     exclude = ('owner', 'deployment_dir')
     if hasattr(ENABLE_CRON_SCHEDULING, 'get') and ENABLE_CRON_SCHEDULING.get():
@@ -392,7 +392,7 @@ class DatasetForm(forms.ModelForm):
                                    widget=SplitDateTimeWidget(attrs={'class': 'short'},
                                                               date_format=DATE_FORMAT, time_format=TIME_FORMAT))
 
-  class Meta:
+  class Meta(object):
     model = Dataset
     exclude = ('coordinator',)
     widgets = {
@@ -405,7 +405,7 @@ class DatasetForm(forms.ModelForm):
 
 
 class DataInputForm(forms.ModelForm):
-  class Meta:
+  class Meta(object):
     model = DataInput
     exclude = ('coordinator',)
 
@@ -419,7 +419,7 @@ class DataInputForm(forms.ModelForm):
 
 
 class DataOutputForm(forms.ModelForm):
-  class Meta:
+  class Meta(object):
     model = DataOutput
     exclude = ('coordinator',)
 
@@ -458,7 +458,7 @@ class RerunForm(forms.Form):
     return_json = kwargs.pop('return_json', None)
 
     # Build list of skip nodes
-    decisions = filter(lambda node: node.type == 'switch', oozie_workflow.get_control_flow_actions())
+    decisions = [node for node in oozie_workflow.get_control_flow_actions() if node.type == 'switch']
     working_actions = oozie_workflow.get_working_actions()
     skip_nodes = []
 
@@ -520,7 +520,7 @@ class BundledCoordinatorForm(forms.ModelForm):
     super(BundledCoordinatorForm, self).__init__(*args, **kwargs)
     self.fields['coordinator'].empty_label = None
 
-  class Meta:
+  class Meta(object):
     model = BundledCoordinator
     exclude = ('bundle',)
     widgets = {
@@ -533,7 +533,7 @@ class BundleForm(forms.ModelForm):
                                            widget=SplitDateTimeWidget(attrs={'class': 'input-small', 'id': 'bundle_kick_off_time'},
                                                                       date_format=DATE_FORMAT, time_format=TIME_FORMAT))
 
-  class Meta:
+  class Meta(object):
     model = Bundle
     exclude = ('owner', 'coordinators')
     widgets = {

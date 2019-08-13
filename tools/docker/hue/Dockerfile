@@ -30,11 +30,11 @@ RUN apt-get update -y && apt-get install -y \
   maven \
   gcc \
   swig \
-  openssl \
+  # openssl \ # Breaks build
   xmlsec1 \
   libxmlsec1-openssl \
   hugo \
-   && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/*
 
 ADD . /hue
 WORKDIR /hue
@@ -59,6 +59,10 @@ RUN rm -rf /hue
 
 # Install DB connectors
 RUN ./build/env/bin/pip install psycopg2-binary
+RUN ./build/env/bin/pip install redis==2.10.6
+RUN ./build/env/bin/pip install django_redis
+RUN ./build/env/bin/pip install flower
+RUN ./build/env/bin/pip install gevent
 
 COPY tools/docker/hue/conf desktop/conf
 COPY tools/docker/hue/startup.sh .

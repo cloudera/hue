@@ -15,6 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import division
+from __future__ import absolute_import
+from builtins import next
+from past.utils import old_div
+from builtins import object
 import logging
 from datetime import datetime
 
@@ -28,10 +33,10 @@ from django.utils.translation import ugettext as _
 from desktop.auth.views import dt_logout
 from desktop.conf import AUTH, LDAP, SESSION
 
-from models import UserProfile, get_profile
-from views import import_ldap_users
+from useradmin.models import UserProfile, get_profile
+from useradmin.views import import_ldap_users
 
-import ldap_access
+from useradmin import ldap_access
 
 
 LOG = logging.getLogger(__name__)
@@ -111,7 +116,7 @@ class LastActivityMiddleware(object):
     if hasattr(dt, 'total_seconds'):
       return dt.total_seconds()
     else:
-      return (dt.microseconds + (dt.seconds + dt.days * 24 * 3600) * 10**6) / 10**6
+      return old_div((dt.microseconds + (dt.seconds + dt.days * 24 * 3600) * 10**6), 10**6)
 
 class ConcurrentUserSessionMiddleware(object):
   """

@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable no-restricted-syntax */
+
 const program = require('commander');
 
 const extractorUtils = require('./extractorUtils');
@@ -28,29 +30,37 @@ const LOG_NAME = 'docExtractor.js';
 program
   .version('1.0')
   .option('-f, --folder [path]', 'the folder where the ditamap file(s) reside (required)')
-  .option('-d, --ditamap [path]', 'comma-separated ditamap file names, the first will define the topic ' +
-    'tree (at least one file is required). Note that there should be no whitespace around the \',\'')
+  .option(
+    '-d, --ditamap [path]',
+    'comma-separated ditamap file names, the first will define the topic ' +
+      "tree (at least one file is required). Note that there should be no whitespace around the ','"
+  )
   .option('-o, --output [path]', 'output folder where the json files will be written to (required)')
   .option('-c, --cssClassPrefix [prefix]', 'optional css class prefix')
-  .option('-m, --mako [path]', 'optional path to a .mako file where the index is written, ' +
-    'used for django if the output folder is a static resource')
+  .option(
+    '-m, --mako [path]',
+    'optional path to a .mako file where the index is written, ' +
+      'used for django if the output folder is a static resource'
+  )
   .parse(process.argv);
 
 extractorUtils.checkArguments(program);
 
-const ensureTrailingSlash = (path) => {
+const ensureTrailingSlash = path => {
   if (!path.endsWith('/')) {
     return path + '/';
   }
   return path;
 };
 
-let ditamapFiles = program.ditamap.split(',').map(file => file.trim());
+const ditamapFiles = program.ditamap.split(',').map(file => file.trim());
 
 console.log('%s: Parsing ditamap file(s)...', LOG_NAME);
-let ditamapParsePromises = ditamapFiles.map(ditamapFile => ditamapParser.parseDitamap(ditamapFile, ensureTrailingSlash(program.folder)));
+const ditamapParsePromises = ditamapFiles.map(ditamapFile =>
+  ditamapParser.parseDitamap(ditamapFile, ensureTrailingSlash(program.folder))
+);
 
-Promise.all(ditamapParsePromises).then((parseResults) => {
+Promise.all(ditamapParsePromises).then(parseResults => {
   let cssClassPrefix = program.cssClassPrefix || '';
   if (cssClassPrefix && !/-$/.test(cssClassPrefix)) {
     cssClassPrefix += '-';
@@ -62,12 +72,16 @@ Promise.all(ditamapParsePromises).then((parseResults) => {
     topicLinker.linkTopics(parseResults, cssClassPrefix);
 
     console.log('%s: Saving topic tree json files...', LOG_NAME);
-    jsonHandler.saveTopics(parseResults[0].topics, ensureTrailingSlash(program.output), program.mako).then((savedFiles) => {
-      console.log('%s: Done! Saved %d files.', LOG_NAME, savedFiles.length);
-    }).catch(err => {
-      console.log('%s: Failed saving files!', LOG_NAME);
-      console.log(err);
-    });
+    jsonHandler
+      .saveTopics(parseResults[0].topics, ensureTrailingSlash(program.output), program.mako)
+      .then(savedFiles => {
+        console.log('%s: Done! Saved %d files.', LOG_NAME, savedFiles.length);
+      })
+      .catch(err => {
+        console.log('%s: Failed saving files!', LOG_NAME);
+        console.log(err);
+      });
   });
 });
 
+/* eslint-enable no-restricted-syntax */

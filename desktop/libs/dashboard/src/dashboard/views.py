@@ -101,7 +101,7 @@ def index(request, is_mobile=False):
     else:
       collection_doc.doc.get().can_read_or_exception(request.user)
     collection = Collection2(request.user, document=collection_doc)
-  except Exception, e:
+  except Exception as e:
     raise PopupException(e, title=_("Dashboard does not exist or you don't have the permission to access it."))
 
   query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
@@ -115,7 +115,7 @@ def index(request, is_mobile=False):
   template = 'search.mako'
   if is_mobile:
     template = 'search_m.mako'
-  engine = collection.data['collection']['engine']
+  engine = collection.data['collection'].get('engine', 'solr')
 
   return render(template, request, {
     'collection': collection,
@@ -192,7 +192,9 @@ def browse(request, name, is_mobile=False):
   if engine == 'solr':
     name = re.sub('^default\.', '', name)
 
-  collections = get_engine(request.user, engine, source=source).datasets()
+  database = name.split('.', 1)[0]
+  collections = get_engine(request.user, engine, source=source).datasets(database=database)
+
   if not collections and engine == 'solr':
     return no_collections(request)
 

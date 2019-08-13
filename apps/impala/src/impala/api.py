@@ -28,7 +28,6 @@ from django.views.decorators.http import require_POST
 from beeswax.api import error_handler
 from beeswax.models import Session
 from beeswax.server import dbms as beeswax_dbms
-from beeswax.server.dbms import get_cluster_config
 from beeswax.views import authorized_get_query_history
 
 from desktop.lib.django_util import JsonResponse
@@ -43,6 +42,7 @@ from libanalyze import analyze as analyzer, rules
 
 from notebook.models import make_notebook
 
+
 LOG = logging.getLogger(__name__)
 ANALYZER = rules.TopDownAnalysis() # We need to parse some files so save as global
 
@@ -55,8 +55,7 @@ def invalidate(request):
   table = request.POST.get('table', None)
   flush_all = request.POST.get('flush_all', 'false').lower() == 'true'
 
-  cluster_config = get_cluster_config(cluster)
-  query_server = dbms.get_query_server_config(cluster_config=cluster_config)
+  query_server = dbms.get_query_server_config(connector=None) # TODO: connector support
   db = beeswax_dbms.get(request.user, query_server=query_server)
 
   response = {'status': 0, 'message': ''}
@@ -151,7 +150,7 @@ def alanize(request):
       metrics = analyzer.heatmap_by_host(profile, key)
       if metrics['data']:
         heatmap[key] = metrics
-    response['data'] = { 'query': { 'healthChecks' : result[0]['result'], 'summary': summary, 'heatmap': heatmap, 'heatmapMetrics': sorted(list(heatmap.iterkeys())) } }
+    response['data'] = { 'query': { 'healthChecks' : result[0]['result'], 'summary': summary, 'heatmap': heatmap, 'heatmapMetrics': sorted(list(heatmap.keys())) } }
     response['status'] = 0
   return JsonResponse(response)
 

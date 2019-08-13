@@ -17,7 +17,7 @@
 import $ from 'jquery';
 import ko from 'knockout';
 
-import AssistStorageEntry from 'assist/assistStorageEntry';
+import AssistStorageEntry from 'ko/components/assist/assistStorageEntry';
 import huePubSub from 'utils/huePubSub';
 
 /**

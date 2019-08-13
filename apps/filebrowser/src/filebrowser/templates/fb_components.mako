@@ -21,7 +21,7 @@ from desktop.lib.paths import SAFE_CHARACTERS_URI_COMPONENTS
 from django.template.defaultfilters import urlencode, stringformat, date, filesizeformat, time
 from django.utils.translation import ugettext as _
 
-from aws import get_client
+from aws.conf import get_default_region
 %>
 
 <%def name="breadcrumbs(path, breadcrumbs, from_listdir=False)">
@@ -29,8 +29,8 @@ from aws import get_client
       <ul class="nav nav-pills hue-breadcrumbs-bar">
         %if path.lower().find('s3a://') == 0:
           <li style="padding-top: 10px">
-            <span class="breadcrumb-link homeLink" title="${ _('S3 region %s') % get_client()._region }">
-              <i class="fa fa-fw fa-cubes"></i> ${ get_client()._region }
+            <span class="breadcrumb-link homeLink" title="${ _('S3 region %s') % get_default_region() }">
+              <i class="fa fa-fw fa-cubes"></i> ${ get_default_region() }
             </span>
           </li>
         %elif path.lower().find('adl:/') == 0:

@@ -27,6 +27,7 @@ _WEBSERVER_CERTIFICATE_FILE = '-webserver_certificate_file'
 _SSL_SERVER_CERTIFICATE = '-ssl_server_certificate'
 _MAX_RESULT_CACHE_SIZE = '-max_result_cache_size'
 _AUTHORIZED_PROXY_USER_CONFIG = '-authorized_proxy_user_config'
+_PRINCIPAL = '-principal'
 
 
 def reset():
@@ -75,6 +76,9 @@ def is_impersonation_enabled():
   user_config = get_conf().get(_AUTHORIZED_PROXY_USER_CONFIG)
   return True if user_config and 'hue=' in user_config else False
 
+def is_kerberos_enabled():
+  return get_conf().get(_PRINCIPAL) is not None
+
 def _parse_impala_flags():
   from impala import conf # Cyclic dependency
   global _IMPALA_FLAGS
@@ -82,10 +86,10 @@ def _parse_impala_flags():
   try:
     impala_flags_path = os.path.join(conf.IMPALA_CONF_DIR.get(), 'impalad_flags')
     _IMPALA_FLAGS = dict(line.strip().split('=', 1) for line in open(impala_flags_path) if '=' in line)
-  except IOError, err:
+  except IOError as err:
     if err.errno != errno.ENOENT:
       LOG.error('Cannot read from "%s": %s' % (impala_flags_path, err))
     _IMPALA_FLAGS = {}
-  except Exception, ex:
+  except Exception as ex:
     LOG.error('Failed to parse Impala config from "%s": %s' % (impala_flags_path, ex))
     _IMPALA_FLAGS = {}

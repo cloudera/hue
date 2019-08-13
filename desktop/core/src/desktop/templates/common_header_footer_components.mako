@@ -68,7 +68,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
       try {
         mTime = new Date(mTime);
         if (moment(mTime).isValid()) {
-          return moment.utc(mTime).format("L LT");
+          return moment.utc(mTime).local().format("L LT Z"); // [Local Date] [Local Time] [Timezone offset]
         }
       }
       catch (e) {

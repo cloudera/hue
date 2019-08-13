@@ -14,7 +14,7 @@ class Migration(SchemaMigration):
         try:
           from oozie.models import Coordinator
           Coordinator.objects.all().update(job_properties='[]')
-        except Exception, e:
+        except Exception as e:
           import logging
           logging.warn(e)
 

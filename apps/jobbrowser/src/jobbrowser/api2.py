@@ -36,7 +36,7 @@ def api_error_handler(func):
 
     try:
       return func(*args, **kwargs)
-    except Exception, e:
+    except Exception as e:
       LOG.exception('Error running %s' % func)
       response['status'] = -1
       response['message'] = smart_unicode(e)
@@ -53,7 +53,7 @@ def jobs(request, interface=None):
 
   cluster = json.loads(request.POST.get('cluster', '{}'))
   interface = json.loads(request.POST.get('interface'))
-  filters = dict([(key, value) for _filter in json.loads(request.POST.get('filters', '[]')) for key, value in _filter.items() if value])
+  filters = dict([(key, value) for _filter in json.loads(request.POST.get('filters', '[]')) for key, value in list(_filter.items()) if value])
 
   jobs = get_api(request.user, interface, cluster=cluster).apps(filters)
 
@@ -126,7 +126,7 @@ def profile(request):
   app_id = json.loads(request.POST.get('app_id'))
   app_type = json.loads(request.POST.get('app_type'))
   app_property = json.loads(request.POST.get('app_property'))
-  app_filters = dict([(key, value) for _filter in json.loads(request.POST.get('app_filters', '[]')) for key, value in _filter.items() if value])
+  app_filters = dict([(key, value) for _filter in json.loads(request.POST.get('app_filters', '[]')) for key, value in list(_filter.items()) if value])
 
   api = get_api(request.user, interface, cluster=cluster)
   api._set_request(request) # For YARN

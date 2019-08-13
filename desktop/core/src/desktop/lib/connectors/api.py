@@ -20,6 +20,7 @@ import logging
 
 from django.utils.translation import ugettext as _
 
+from desktop.conf import has_connectors, CONNECTORS
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.connectors.lib.impala import Impala
 from desktop.lib.connectors.lib.hive import Hive
@@ -32,12 +33,12 @@ LOG = logging.getLogger(__name__)
 # TODO: automatically load modules from lib module
 # TODO: offer to white/black list available connector classes
 CONNECTOR_TYPES = [{
-    'name': connector.NAME,
-    'type': connector.TYPE,
-    'interface': connector.INTERFACE,
+    'nice_name': connector.NAME,
+    'dialect': connector.TYPE,
+    'interface': connector.INTERFACE, # interfaces = ['int1', 'int2'...]
     'settings': connector.PROPERTIES,
     'id': None,
-    'category': 'engines',
+    'category': 'editor',
     'description': ''
     }
   for connector in [
@@ -46,41 +47,45 @@ CONNECTOR_TYPES = [{
 ]
 
 CONNECTOR_TYPES += [
-  {'name': "Hive Tez", 'type': 'hive-tez', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Hive LLAP", 'type': 'hive-llap', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Druid", 'type': 'druid', 'settings': [{'name': 'connection_url', 'value': 'druid://druid-host.com:8082/druid/v2/sql/'}], 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Kafka SQL", 'type': 'kafka-sql', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "SparkSQL", 'type': 'spark-sql', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Presto", 'type': 'presto', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Athena", 'type': 'athena', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Redshift", 'type': 'redshift', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Big Query", 'type': 'bigquery', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Oracle", 'type': 'oracle', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "SQL Database", 'type': 'sql-alchemy', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "SQL Database (JDBC)", 'type': 'sql-jdbc', 'settings': {}, 'id': None, 'category': 'engines', 'description': 'Deprecated: older way to connect to any database.'},
+  {'nice_name': "Hive Tez", 'dialect': 'hive-tez', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "Hive LLAP", 'dialect': 'hive-llap', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "Druid", 'dialect': 'sql-druid', 'interface': 'sqlalchemy', 'settings': [{'name': 'url', 'value': 'druid://druid-host.com:8082/druid/v2/sql/'}], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "Kafka SQL", 'dialect': 'kafka-sql', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "SparkSQL", 'dialect': 'spark-sql', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "MySQL", 'dialect': 'mysql', 'interface': 'sqlalchemy', 'settings': [{'name': 'url', 'value': 'mysql://username:password@mysq-host:3306/hue'}], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "Presto", 'dialect': 'presto', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "Athena", 'dialect': 'athena', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "Redshift", 'dialect': 'redshift', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "Big Query", 'dialect': 'bigquery', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "Oracle", 'dialect': 'oracle', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "SQL Database", 'dialect': 'sql-alchemy', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "SQL Database (JDBC)", 'dialect': 'sql-jdbc', 'interface': 'sqlalchemy', 'settings': [], 'id': None, 'category': 'editor', 'description': 'Deprecated: older way to connect to any database.'},
+  # solr
+  # hbase
+  # kafka
 
-  {'name': "PySpark", 'type': 'pyspark', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Spark", 'type': 'spark', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Pig", 'type': 'pig', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
-  {'name': "Java", 'type': 'java', 'settings': {}, 'id': None, 'category': 'engines', 'description': ''},
+  {'nice_name': "PySpark", 'dialect': 'pyspark', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "Spark", 'dialect': 'spark', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "Pig", 'dialect': 'pig', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
+  {'nice_name': "Java", 'dialect': 'java', 'settings': [], 'id': None, 'category': 'editor', 'description': ''},
 
-  {'name': "HDFS", 'type': 'hdfs', 'settings': {}, 'id': None, 'category': 'browsers', 'description': ''},
-  {'name': "YARN", 'type': 'yarn', 'settings': {}, 'id': None, 'category': 'browsers', 'description': ''},
-  {'name': "S3", 'type': 's3', 'settings': {}, 'id': None, 'category': 'browsers', 'description': ''},
-  {'name': "ADLS", 'type': 'adls-v1', 'settings': {}, 'id': None, 'category': 'browsers', 'description': ''},
+  {'nice_name': "HDFS", 'dialect': 'hdfs', 'settings': [], 'id': None, 'category': 'browsers', 'description': ''},
+  {'nice_name': "YARN", 'dialect': 'yarn', 'settings': [], 'id': None, 'category': 'browsers', 'description': ''},
+  {'nice_name': "S3", 'dialect': 's3', 'settings': [], 'id': None, 'category': 'browsers', 'description': ''},
+  {'nice_name': "ADLS", 'dialect': 'adls-v1', 'settings': [], 'id': None, 'category': 'browsers', 'description': ''},
 
-  {'name': "Hive Metastore", 'type': 'hms', 'settings': {}, 'id': None, 'category': 'catalogs', 'description': ''},
-  {'name': "Atlas", 'type': 'atlas', 'settings': {}, 'id': None, 'category': 'catalogs', 'description': ''},
-  {'name': "Navigator", 'type': 'navigator', 'settings': {}, 'id': None, 'category': 'catalogs', 'description': ''},
+  {'nice_name': "Hive Metastore", 'dialect': 'hms', 'settings': [], 'id': None, 'category': 'catalogs', 'description': ''},
+  {'nice_name': "Atlas", 'dialect': 'atlas', 'settings': [], 'id': None, 'category': 'catalogs', 'description': ''},
+  {'nice_name': "Navigator", 'dialect': 'navigator', 'settings': [], 'id': None, 'category': 'catalogs', 'description': ''},
 
-  {'name': "Optimizer", 'type': 'optimizer', 'settings': {}, 'id': None, 'category': 'optimizers', 'description': ''},
+  {'nice_name': "Optimizer", 'dialect': 'optimizer', 'settings': [], 'id': None, 'category': 'optimizers', 'description': ''},
 
-  {'name': "Oozie", 'type': 'oozie', 'settings': {}, 'id': None, 'category': 'schedulers', 'description': ''},
-  {'name': "Celery", 'type': 'celery', 'settings': {}, 'id': None, 'category': 'schedulers', 'description': '' },
+  {'nice_name': "Oozie", 'dialect': 'oozie', 'settings': [], 'id': None, 'category': 'schedulers', 'description': ''},
+  {'nice_name': "Celery", 'dialect': 'celery', 'settings': [], 'id': None, 'category': 'schedulers', 'description': '' },
 ]
 
 CATEGORIES = [
-  {"name": "Editor", 'type': 'engines', 'description': ''},
+  {"name": "Editor", 'type': 'editor', 'description': ''},
   {"name": "Browsers", 'type': 'browsers', 'description': ''},
   {"name": "Catalogs", 'type': 'catalogs', 'description': ''},
   {"name": "Optimizers", 'type': 'optimizers', 'description': ''},
@@ -106,12 +111,11 @@ AVAILABLE_CONNECTORS = _group_category_connectors(CONNECTOR_TYPES)
 # TODO: remove installed connectors that don't have a connector or are blacklisted
 # TODO: load back from DB and apply Category properties, e.g. defaults, interface, category, category_name...
 # TODO: connector groups: if we want one type (e.g. Hive) to show-up with multiple computes and the same saved query.
-CONFIGURED_CONNECTORS = [
-  {'name': 'Impala', 'type': Impala().TYPE + '-1', 'connector_name': Impala().TYPE, 'interface': Impala().INTERFACE, 'settings': Impala().PROPERTIES, 'id': 1, 'category': 'engines', 'description': ''},
-  {'name': 'Hive', 'type': Hive().TYPE + '-2', 'connector_name': Hive().TYPE, 'interface': Hive().INTERFACE, 'settings': Hive().PROPERTIES, 'id': 2, 'category': 'engines', 'description': ''},
-  {'name': 'Hive c5', 'type': Hive().TYPE + '-3', 'connector_name': Hive().TYPE, 'interface': Hive().INTERFACE, 'settings': Hive().PROPERTIES, 'id': 3, 'category': 'engines', 'description': ''},
-]
+# TODO: type --> name, type --> SQL language, e.g. mysql
 
+# connector_type: category --> engine, is_sql --> engine_type: sql
+CONNECTOR_INSTANCES = None
+CONNECTOR_IDS = 1
 
 def get_connector_classes(request):
   global AVAILABLE_CONNECTORS
@@ -125,14 +129,16 @@ def get_connector_classes(request):
 
 def get_installed_connectors(request):
   return JsonResponse({
-    'connectors': _group_category_connectors(CONFIGURED_CONNECTORS),
+    'connectors': _group_category_connectors(
+      _get_installed_connectors()
+    ),
   })
 
 
-def new_connector(request, type):
-  instance = _get_connector_by_type(type)
+def new_connector(request, dialect):
+  instance = _get_connector_by_type(dialect)
 
-  instance['connector_name'] = ''
+  instance['nice_name'] = dialect.title()
 
   return JsonResponse({'connector': instance})
 
@@ -142,7 +148,6 @@ def get_connector(request, id):
 
   return JsonResponse(instance)
 
-CONNECTOR_IDS = 10
 
 def update_connector(request):
   global CONNECTOR_IDS
@@ -157,18 +162,19 @@ def update_connector(request):
     saved_as = True
     instance = connector
     instance['id'] = CONNECTOR_IDS
-    instance['connector_name'] = instance['type']
-    instance['type'] = '%s-%s' % (instance['type'], CONNECTOR_IDS)
+    instance['nice_name'] = instance['nice_name']
+    instance['name'] = '%s-%s' % (instance['dialect'], CONNECTOR_IDS)
+    instance['is_sql'] = instance.get('interface') in ("hiveserver2", "sqlalchemy")
     CONNECTOR_IDS += 1
-    CONFIGURED_CONNECTORS.append(instance)
+    CONNECTOR_INSTANCES.append(instance)
 
   return JsonResponse({'connector': instance, 'saved_as': saved_as})
 
 
-def _get_connector_by_type(type):
+def _get_connector_by_type(dialect):
   global CONNECTOR_TYPES
 
-  instance = filter(lambda connector: connector['type'] == type, CONNECTOR_TYPES)
+  instance = filter(lambda connector: connector['dialect'] == dialect, CONNECTOR_TYPES)
 
   if instance:
     return instance[0]
@@ -177,13 +183,13 @@ def _get_connector_by_type(type):
 
 
 def delete_connector(request):
-  global CONFIGURED_CONNECTORS
+  global CONNECTOR_INSTANCES
 
   connector = json.loads(request.POST.get('connector'), '{}')
 
-  size_before = len(CONFIGURED_CONNECTORS)
-  CONFIGURED_CONNECTORS = filter(lambda _connector: _connector['name'] != connector['name'], CONFIGURED_CONNECTORS)
-  size_after = len(CONFIGURED_CONNECTORS)
+  size_before = len(CONNECTOR_INSTANCES)
+  CONNECTOR_INSTANCES = filter(lambda _connector: _connector['name'] != connector['name'], CONNECTOR_INSTANCES)
+  size_after = len(CONNECTOR_INSTANCES)
 
   if size_before == size_after + 1:
     return JsonResponse({})
@@ -191,10 +197,40 @@ def delete_connector(request):
     raise PopupException(_('No connector with the name %(name)s found.') % connector)
 
 
-def _get_connector_by_id(id):
-  global CONFIGURED_CONNECTORS
+def _get_installed_connectors():
+  global CONNECTOR_INSTANCES
+  global CONNECTOR_IDS
+  connector_config = CONNECTORS.get()
 
-  instance = filter(lambda connector: connector['id'] == id, CONFIGURED_CONNECTORS)
+  if CONNECTOR_INSTANCES is None:
+    CONNECTOR_INSTANCES = []
+    for i in connector_config:
+      connector_class = [
+        connector_type
+        for connector_type in CONNECTOR_TYPES
+            if connector_type['dialect'] == connector_config[i].DIALECT.get() and connector_type['interface'] == connector_config[i].INTERFACE.get()
+      ]
+      CONNECTOR_INSTANCES.append({
+          'nice_name': connector_config[i].NICE_NAME.get() or i,
+          'name': i,
+          'dialect': connector_config[i].DIALECT.get(),
+          'interface': connector_config[i].INTERFACE.get(),
+          'settings': connector_config[i].SETTINGS.get(),
+          # From Connector class
+          'is_sql': True,
+          'id': CONNECTOR_IDS,
+          'category': connector_class[0]['category'],
+          'description': connector_class[0]['description']
+        }
+      )
+      CONNECTOR_IDS += 1
+  return CONNECTOR_INSTANCES
+
+
+def _get_connector_by_id(id):
+  global CONNECTOR_INSTANCES
+
+  instance = filter(lambda connector: connector['id'] == id, CONNECTOR_INSTANCES)
 
   if instance:
     return instance[0]

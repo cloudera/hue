@@ -26,7 +26,7 @@
     <div class="controls">
       <div class="row-fluid">
         <div class="span9">
-          <a data-bind="visible: isAdvancedCron" href="http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html" class="pull-right" target="_blank">&nbsp;<i class="fa fa-question-circle" title="${ _('Check syntax ?') }"></i></a>
+          <a data-bind="visible: isAdvancedCron" href="http://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/tutorial-lesson-06.html" class="pull-right" target="_blank">&nbsp;<i class="fa fa-question-circle" title="${ _('Check syntax ?') }"></i></a>
           <input data-bind="visible: isAdvancedCron" id="coord-frequency" name="cron_frequency" class="pull-right"/>
           <span data-bind="visible: isAdvancedCron" class="pull-right" style="padding-right:20px">
             ${ _('Crontab') }

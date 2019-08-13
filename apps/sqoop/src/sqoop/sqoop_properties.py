@@ -56,7 +56,7 @@ def _parse_site(site_path):
   try:
     with open(site_path, 'r') as f:
       data = f.read()
-  except IOError, err:
+  except IOError as err:
     if err.errno != errno.ENOENT:
       LOG.error('Cannot read from "%s": %s' % (site_path, err))
       return

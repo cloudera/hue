@@ -16,12 +16,13 @@
 # limitations under the License.
 
 import json
+import urllib
 
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.conf import DEFAULT_USER
-from desktop.lib.paths import get_desktop_root
+from desktop.lib.paths import get_desktop_root, SAFE_CHARACTERS_URI_COMPONENTS, SAFE_CHARACTERS_URI
 
 from notebook.connectors.base import Notebook
 
@@ -29,16 +30,16 @@ def compress_files_in_hdfs(request, file_names, upload_path, archive_name):
 
   _upload_compress_files_script_to_hdfs(request.fs)
 
-  files = [{"value": upload_path + '/' + file_name} for file_name in file_names]
+  files = [{"value": upload_path + '/' + urllib.quote(file_name.encode('utf-8'), SAFE_CHARACTERS_URI)} for file_name in file_names]
   files.append({'value': '/user/' + DEFAULT_USER.get() + '/common/compress_files_in_hdfs.sh'})
   start_time = json.loads(request.POST.get('start_time', '-1'))
 
   shell_notebook = Notebook(
     name=_('HDFS Compression to %(upload_path)s/hue_compressed.zip') % {'upload_path': upload_path},
     isManaged=True,
-    onSuccessUrl=reverse('filebrowser.views.view', kwargs={'path': upload_path})
+    onSuccessUrl='/filebrowser/view=' + urllib.quote(upload_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
   )
-
+   
   shell_notebook.add_shell_snippet(
       shell_command='compress_files_in_hdfs.sh',
       arguments=[{'value': '-u=' + upload_path}, {'value': '-f=' + ','.join(file_names)}, {'value': '-n=' + archive_name}],

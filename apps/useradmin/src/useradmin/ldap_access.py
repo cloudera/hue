@@ -18,6 +18,8 @@
 This module provides access to LDAP servers, along with some basic functionality required for Hue and
 User Admin to work seamlessly with LDAP.
 """
+from builtins import str
+from builtins import object
 import ldap
 import ldap.filter
 import logging
@@ -163,13 +165,13 @@ class LdapConnection(object):
     if bind_user:
       try:
         self.ldap_handle.simple_bind_s(bind_user, bind_password)
-      except Exception, e:
+      except Exception as e:
         self.handle_bind_exception(e, bind_user)
     else:
       try:
         # Do anonymous bind
         self.ldap_handle.simple_bind_s('','')
-      except Exception, e:
+      except Exception as e:
         self.handle_bind_exception(e)
 
   def handle_bind_exception(self, exception, bind_user=None):
@@ -356,7 +358,7 @@ class LdapConnection(object):
         return self._transform_find_user_results(result_data, user_name_attr)
       else:
         return []
-    except ldap.LDAPError, e:
+    except ldap.LDAPError as e:
        LOG.warn("LDAP Error: %s" % e)
 
     return None

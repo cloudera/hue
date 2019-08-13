@@ -1383,6 +1383,7 @@ class Snippet {
 
     this.executor.executeNext().then(executionResult => {
       this.stopLongOperationTimeout();
+      this.result.clear();
       this.result.update(executionResult).then(() => {
         if (this.result.data().length) {
           this.currentQueryTab('queryResults');
@@ -1575,7 +1576,6 @@ class Snippet {
 
   format() {
     const self = this;
-    console.log(self);
     if (self.isSqlDialect()) {
       apiHelper
         .formatSql({
@@ -1808,6 +1808,7 @@ class Snippet {
       },
       data => {
         if (data.status === 0) {
+          // eslint-disable-next-line no-restricted-syntax
           console.log(data.statement_similarity);
         } else {
           $(document).trigger('error', data.message);
@@ -2032,7 +2033,7 @@ class Snippet {
               path: path
             })
             .done(entry => {
-              entry.clearCache({ invalidate: 'invalidate', cascade: true, silenceErrors: true });
+              entry.clearCache({ refreshCache: true, cascade: true, silenceErrors: true });
             });
         }, 5000);
       }

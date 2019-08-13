@@ -26,19 +26,12 @@
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
-<%namespace name="assist" file="/assist.mako" />
 
 %if not is_embeddable:
 ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
-<script src="${ static('metastore/js/metastore.ko.js') }"></script>
-
-${ assist.assistJSModels() }
-
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
-${ assist.assistPanel() }
-
 %endif
 
 <link rel="stylesheet" href="${ static('indexer/css/importer.css') }" type="text/css">
@@ -54,7 +47,7 @@ ${ assist.assistPanel() }
 % endif
 </style>
 
-<span id="importerComponents" class="notebook importer-main" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR, params: {dest: DROPZONE_HOME_DIR}, paramName: 'hdfs_file', onComplete: function(path){ createWizard.source.path(path); }, disabled: '${ not SHOW_UPLOAD_BUTTON.get() }' === 'True'  }">
+<span id="importerComponents" class="notebook importer-main" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR, params: {dest: DROPZONE_HOME_DIR}, paramName: 'hdfs_file', onComplete: function(path){ createWizard.source.path(path); }, disabled: '${ not hasattr(SHOW_UPLOAD_BUTTON, 'get') or not SHOW_UPLOAD_BUTTON.get() }' === 'True'  }">
 <div class="dz-message" data-dz-message></div>
 <div class="navbar hue-title-bar">
   <div class="navbar-inner">
@@ -1564,7 +1557,9 @@ ${ assist.assistPanel() }
           }
 
           setTimeout(function () {
-            var types = type.args.filter(function(x){ return x && x.type !== 'checkbox'});
+            var types = type.args.filter(function (x){
+              return x && (x.type !== 'checkbox' || x.name === 'hasHeader');
+            });
             for (var i = 0; i < types.length; i++) {
               self[types[i].name].subscribe(function() {
                 // Update the data preview when tweaking Format options on step 1

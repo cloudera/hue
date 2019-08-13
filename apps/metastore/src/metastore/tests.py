@@ -16,10 +16,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import json
 import logging
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
+from mock import patch, Mock
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false
 
@@ -59,6 +63,40 @@ def _make_query(client, query, submission_type="Execute",
     verify_history(client, fragment=fragment)
 
   return res
+
+
+class TestApi():
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+
+    self.user = User.objects.get(username="test")
+
+
+  def test_show_tables(self):
+    with patch('beeswax.server.dbms.get') as get:
+      get.return_value=Mock(
+        get_databases=Mock(
+          return_value=['sfdc']
+        ),
+        get_database=Mock(
+          return_value={}
+        ),
+        get_tables_meta=Mock(
+          return_value=[{'name': 'customer'}, {'name': 'opportunities'}]
+        ),
+        server_name='hive'
+      )
+
+      response = self.client.post('/metastore/tables/sfdc?format=json')
+
+      get.assert_called()
+
+    assert_equal(response.status_code, 200)
+    data = json.loads(response.content)
+    assert_equal(data['status'], 0)
+    assert_equal(data['table_names'], ['customer', 'opportunities'])
+    assert_equal(data['tables'], [{'name': 'customer'}, {'name': 'opportunities'}])
 
 
 class TestMetastoreWithHadoop(BeeswaxSampleProvider):
@@ -214,7 +252,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
       path = '/user/hive/warehouse/%s.db/test_partitions/baz=baz_one/boom=12345' % self.db_name
     else:
       path = '/user/hive/warehouse/test_partitions/baz=baz_one/boom=12345'
-    filebrowser_path = urllib.unquote(reverse("filebrowser.views.view", kwargs={'path': path}))
+    filebrowser_path = urllib.parse.unquote(reverse("filebrowser.views.view", kwargs={'path': path}))
     assert_equal(response.request['PATH_INFO'], filebrowser_path)
 
   def test_drop_partition(self):

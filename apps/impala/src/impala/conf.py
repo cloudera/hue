@@ -27,7 +27,7 @@ from desktop.lib.conf import ConfigSection, Config, coerce_bool, coerce_csv, coe
 from desktop.lib.exceptions import StructuredThriftTransportException
 from desktop.lib.paths import get_desktop_root
 
-from impala.impala_flags import get_max_result_cache_size, is_impersonation_enabled
+from impala.impala_flags import get_max_result_cache_size, is_impersonation_enabled, is_kerberos_enabled
 from impala.settings import NICE_NAME
 
 
@@ -221,6 +221,18 @@ DAEMON_API_USERNAME = Config(
   dynamic_default=get_daemon_api_username
 )
 
+def get_use_sasl_default():
+  """kerberos enabled or password is specified"""
+  return is_kerberos_enabled() or AUTH_PASSWORD.get() is not None # Maps closely to legacy behavior
+
+USE_SASL = Config(
+  key="use_sasl",
+  help=_t("Use SASL framework to establish connection to host."),
+  private=False,
+  type=coerce_bool,
+  dynamic_default=get_use_sasl_default
+)
+
 
 def config_validator(user):
   # dbms is dependent on beeswax.conf (this file)
@@ -241,14 +253,14 @@ def config_validator(user):
         if handle:
           server.fetch(handle, rows=100)
           server.close(handle)
-    except StructuredThriftTransportException, ex:
+    except StructuredThriftTransportException as ex:
       if 'TSocket read 0 bytes' in str(ex):  # this message appears when authentication fails
         msg = "Failed to authenticate to Impalad, check authentication configurations."
         LOG.exception(msg)
         res.append((NICE_NAME, _(msg)))
       else:
         raise ex
-  except Exception, ex:
+  except Exception as ex:
     msg = "No available Impalad to send queries to."
     LOG.exception(msg)
     res.append((NICE_NAME, _(msg)))

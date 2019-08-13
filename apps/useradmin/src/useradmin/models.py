@@ -61,6 +61,7 @@ import django.utils.timezone as dtz
 
 from desktop import appmanager
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.idbroker.conf import is_idbroker_enabled
 from hadoop import cluster
 
 import useradmin.conf
@@ -145,7 +146,7 @@ def get_profile(user):
     # Lazily create profile.
     try:
       profile = UserProfile.objects.get(user=user)
-    except UserProfile.DoesNotExist, e:
+    except UserProfile.DoesNotExist as e:
       profile = create_profile_for_user(user)
     user._cached_userman_profile = profile
     return profile
@@ -279,18 +280,20 @@ def update_app_permissions(**kwargs):
            not (new_dp.app == 'metastore' and new_dp.action == 'write') and \
            not (new_dp.app == 'hbase' and new_dp.action == 'write') and \
            not (new_dp.app == 'security' and new_dp.action == 'impersonate') and \
-           not (new_dp.app == 'filebrowser' and new_dp.action == 's3_access') and \
+           not (new_dp.app == 'filebrowser' and new_dp.action == 's3_access' and not is_idbroker_enabled('s3a')) and \
            not (new_dp.app == 'filebrowser' and new_dp.action == 'adls_access') and \
+           not (new_dp.app == 'filebrowser' and new_dp.action == 'abfs_access') and \
            not (new_dp.app == 'oozie' and new_dp.action == 'disable_editor_access'):
           GroupPermission.objects.create(group=default_group, hue_permission=new_dp)
 
     available = HuePermission.objects.count()
+    stale = available - len(added) - updated - uptodate
 
-    LOG.info("HuePermissions: %d added, %d updated, %d up to date, %d stale" %
-           (len(added),
-            updated,
-            uptodate,
-            available - len(added) - updated - uptodate))
+    if len(added) or updated or stale:
+      LOG.info("HuePermissions: %d added, %d updated, %d up to date, %d stale" % (
+          len(added), updated, uptodate, stale
+        )
+      )
 
 models.signals.post_migrate.connect(update_app_permissions)
 models.signals.post_migrate.connect(get_default_user_group)
@@ -329,7 +332,7 @@ def install_sample_user():
         user = auth_models.User.objects.get(id=SAMPLE_USER_ID)
         user.username = SAMPLE_USER_INSTALL
         user.save()
-  except Exception, ex:
+  except Exception as ex:
     LOG.exception('Failed to get or create sample user')
 
   # If sample user doesn't belong to default group, add to default group
@@ -346,7 +349,7 @@ def install_sample_user():
       LOG.info('Created home directory for user: %s' % SAMPLE_USER_INSTALL)
     else:
       LOG.info('Home directory already exists for user: %s' % SAMPLE_USER_INSTALL)
-  except Exception, ex:
+  except Exception as ex:
     LOG.exception('Failed to create home directory for user %s: %s' % (SAMPLE_USER_INSTALL, str(ex)))
 
   return user

@@ -327,10 +327,12 @@ describe('AutocompleteResults.js', () => {
         }
         if (subject.loading()) {
           for (let i = 0; i < jasmine.Ajax.requests.count(); i++) {
+            // eslint-disable-next-line no-restricted-syntax
             console.log(jasmine.Ajax.requests.at(i));
           }
           fail('Still loading, missing ajax spec?');
         }
+
         expect(subject.loading()).toBeFalsy();
       });
       // }
@@ -339,11 +341,13 @@ describe('AutocompleteResults.js', () => {
 
   it('should handle parse results with keywords', () => {
     subject.entries([]);
+
     expect(subject.filtered().length).toBe(0);
     subject.update({
       lowerCase: true,
       suggestKeywords: [{ value: 'BAR', weight: 1 }, { value: 'FOO', weight: 2 }]
     });
+
     expect(subject.filtered().length).toBe(2);
     // Sorted by weight, case adjusted
     expect(subject.filtered()[0].meta).toBe(I18n('keyword'));
@@ -354,11 +358,13 @@ describe('AutocompleteResults.js', () => {
 
   it('should handle parse results with identifiers', () => {
     subject.entries([]);
+
     expect(subject.filtered().length).toBe(0);
     subject.update({
       lowerCase: false,
       suggestIdentifiers: [{ name: 'foo', type: 'alias' }, { name: 'bar', type: 'table' }]
     });
+
     expect(subject.filtered().length).toBe(2);
     // Sorted by name, no case adjust
     expect(subject.filtered()[0].meta).toBe('table');
@@ -369,11 +375,13 @@ describe('AutocompleteResults.js', () => {
 
   it('should handle parse results with functions', () => {
     subject.entries([]);
+
     expect(subject.filtered().length).toBe(0);
     subject.update({
       lowerCase: false,
       suggestFunctions: {}
     });
+
     expect(subject.filtered().length).toBeGreaterThan(0);
     expect(subject.filtered()[0].details.arguments).toBeDefined();
     expect(subject.filtered()[0].details.signature).toBeDefined();

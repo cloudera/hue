@@ -57,19 +57,26 @@ jobs:
               rm -r /usr/share/hue/apps/$lib/src/$lib
               cp -r apps/$lib/src/$lib /usr/share/hue/apps/$lib/src/$lib
             done
-            # cp -r docs /usr/share/hue/docs
+
+            rm -r /usr/share/hue/tools
+            cp -r tools /usr/share/hue
 
             rm /usr/share/hue/desktop/conf/*.ini
             cp desktop/conf/pseudo-distributed.ini.tmpl /usr/share/hue/desktop/conf/pseudo-distributed.ini
 
             cd /usr/share/hue
             # make npm-install # Not available
+            cp ~/repo/.babelrc .
+
+            cp ~/repo/webpack.config*.js .
             npm install
+            npm i eslint-plugin-jasmine@latest --save-dev # Seems to not be found otherwise
             npm run webpack
             npm run webpack-login
             npm run webpack-workers
             ./build/env/bin/hue collectstatic --noinput
 
+            # cp -r ~/repo/docs .
             # make doc
             # hugo --source docs/docs-site
 
@@ -84,7 +91,6 @@ jobs:
           name: run js tests
           command: |
             cd /usr/share/hue
-            cp ~/repo/.babelrc .
             npm run test
 
       # Code analyses
@@ -92,8 +98,9 @@ jobs:
           name: run js lint
           command: |
             cd /usr/share/hue
-            cp ~/repo/.eslint* .
             cp ~/repo/.prettierrc .
+            cp ~/repo/.eslint* .
+            cp ~/repo/tools . -r
             npm run lint
 
       - store_artifacts:

@@ -47,8 +47,8 @@ def file_reader(fh):
   while True:
     chunk = fh.read(DOWNLOAD_CHUNK_SIZE)
     if chunk == '':
-        fh.close()
-        break
+      fh.close()
+      break
     yield chunk
 
 def encode_row(row, encoding=None, make_excel_links=False):

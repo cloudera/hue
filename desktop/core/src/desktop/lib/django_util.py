@@ -41,6 +41,7 @@ import desktop.lib.thrift_util
 from desktop.lib import django_mako
 from desktop.lib.json_utils import JSONEncoderForHTML
 
+
 LOG = logging.getLogger(__name__)
 
 # Values for template_lib parameter

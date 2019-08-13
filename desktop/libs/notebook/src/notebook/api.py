@@ -27,7 +27,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
 
 from desktop.api2 import __paginate
-from desktop.conf import IS_K8S_ONLY, TASK_SERVER
+from desktop.conf import TASK_SERVER
 from desktop.lib.i18n import smart_str
 from desktop.lib.django_util import JsonResponse
 from desktop.models import Document2, Document
@@ -80,17 +80,6 @@ def create_session(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   session = json.loads(request.POST.get('session', '{}'))
-
-  if IS_K8S_ONLY.get(): # TODO: create session happening asynchronously on cluster selection when opening Notebook
-    return JsonResponse({
-      "status": 0,
-      "session": {
-        "reuse_session": True, "type": session['type'],
-        "properties": [
-          {"nice_name": "Settings", "multiple": True, "key": "settings", "help_text": "Hive and Hadoop configuration properties.", "defaultValue": [], "type": "settings", "options": ["hive.map.aggr", "hive.exec.compress.output", "hive.exec.parallel", "hive.execution.engine", "mapreduce.job.queuename"], "value": []}
-        ]
-      }
-    })
 
   properties = session.get('properties', [])
 
@@ -148,7 +137,7 @@ def _execute_notebook(request, notebook, snippet):
         else:
           _snippet['status'] = 'failed'
 
-        if history:  # If _historify failed, history will be None
+        if history: # If _historify failed, history will be None. If we get Atomic block exception, something underneath interpreter.execute() crashed and is not handled.
           history.update_data(notebook)
           history.save()
 

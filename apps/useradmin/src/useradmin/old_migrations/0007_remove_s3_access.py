@@ -20,7 +20,7 @@ class Migration(SchemaMigration):
           if get_default_user_group():
               revoked = revoke_permission(get_default_user_group(), 'filebrowser', 's3_access')
               LOG.info('Revoked s3 permissions: %s' % revoked)
-        except Exception, e:
+        except Exception as e:
           LOG.error(e)
 
     def backwards(self, orm):

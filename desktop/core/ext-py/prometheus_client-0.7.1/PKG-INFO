@@ -1,0 +1,29 @@
+Metadata-Version: 1.1
+Name: prometheus_client
+Version: 0.7.1
+Summary: Python client for the Prometheus monitoring system.
+Home-page: https://github.com/prometheus/client_python
+Author: Brian Brazil
+Author-email: brian.brazil@robustperception.io
+License: Apache Software License 2.0
+Description-Content-Type: UNKNOWN
+Description: See https://github.com/prometheus/client_python/blob/master/README.md for documentation.
+Keywords: prometheus monitoring instrumentation client
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Information Technology
+Classifier: Intended Audience :: System Administrators
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Topic :: System :: Monitoring
+Classifier: License :: OSI Approved :: Apache Software License

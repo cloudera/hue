@@ -1,0 +1,30 @@
+{{- if .Values.balancer.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-hue
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: {{ .Values.image.registry }}/nginx:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 80
+        volumeMounts:
+          - name: nginx-config
+            mountPath: /etc/nginx/sites-available/hue
+            subPath: hue
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+{{- end -}}

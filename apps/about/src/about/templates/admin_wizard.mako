@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 from metadata.conf import OPTIMIZER, has_optimizer
 
 from desktop.auth.backend import is_admin
-from desktop.conf import CONNECTORS
+from desktop.conf import has_connectors
 from desktop.views import commonheader, commonfooter
 %>
 
@@ -51,7 +51,7 @@ ${ layout.menubar(section='quick_start') }
            <div class="span2">
             <ul class="nav nav-pills nav-vertical-pills">
               <li class="active"><a href="#step1" class="step">${ _('Step 1:') } <i class="fa fa-cogs"></i> ${ _('Check Configuration') }</a></li>
-              <li><a href="#step2" class="step">${ _('Step 1:') } <i class="fa fa-exchange"></i> ${ _('Connectors') }</a></li>
+              <li><a href="#step2" class="step">${ _('Step 2:') } <i class="fa fa-exchange"></i> ${ _('Connectors') }</a></li>
               <li><a href="#step3" class="step">${ _('Step 3:') } <i class="fa fa-book"></i> ${ _('Examples') }</a></li>
               <li><a id="lastStep" href="#step4" class="step">${ _('Step 4:') } <i class="fa fa-group"></i> ${ _('Users') }</a></li>
             </ul>
@@ -74,12 +74,12 @@ ${ layout.menubar(section='quick_start') }
 
           <div id="step2" class="stepDetails hide">
             <h3>${ _('Connectors to data services') }</h3>
-            % if CONNECTORS.IS_ENABLED.get():
+            % if has_connectors():
               <a href="${ url('desktop.lib.connectors.views.index') }"><i class="fa fa-exchange"></i> ${ _('Configure') }</a>
             % else:
               <a href="${ url('desktop.views.dump_config') }" target="_blank">${ _('Configuration') }</a>
               <br>
-              <a href="http://cloudera.github.io/hue/latest/administrator/configuration/" target="_blank">${ _('Documentation') }</a>
+              <a href="https://docs.gethue.com/latest/administrator/configuration/" target="_blank">${ _('Documentation') }</a>
             % endif
           </div>
 
@@ -87,7 +87,7 @@ ${ layout.menubar(section='quick_start') }
             <div>
               <h3>${ _('Install individual application examples') }</h3>
               <ul class="unstyled samples">
-              % if 'beeswax' in app_names:
+              % if 'hive' in app_names:
                   <li>
                     <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                        data-sample-url="${ url('beeswax:install_examples') }">

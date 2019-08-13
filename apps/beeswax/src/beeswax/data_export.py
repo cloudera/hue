@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
+from builtins import object
 import json
 import logging
 import math
@@ -81,7 +83,7 @@ def upload(path, handle, user, db, fs, max_rows=-1, max_bytes=-1):
     fs.do_as_user(user.username, fs.append, path, dataset.csv)
 
 
-class DataAdapter:
+class DataAdapter(object):
 
   def __init__(self, db, handle=None, max_rows=-1, start_over=True, max_bytes=-1, store_data_type_in_header=False):
     self.handle = handle
@@ -113,27 +115,27 @@ class DataAdapter:
     size += 2 # CSV \r\n at the end of row
     for col in row:
       col_type = type(col)
-      if col_type == types.IntType:
+      if col_type == int:
         if col == 0:
           size += 1
         elif col < 0:
           size += int(math.log10(-1 * col)) + 2
         else:
           size += int(math.log10(col)) + 1
-      elif col_type == types.StringType:
+      elif col_type == bytes:
         size += len(col)
-      elif col_type == types.FloatType:
+      elif col_type == float:
         size += len(str(col))
-      elif col_type == types.BooleanType:
+      elif col_type == bool:
         size += 4
-      elif col_type == types.NoneType:
+      elif col_type == type(None):
         size += 4
       else:
         size += len(str(col))
 
     return size
 
-  def next(self):
+  def __next__(self):
     results = self.db.fetch(self.handle, start_over=self.start_over, rows=self.fetch_size)
     if self.first_fetched:
       self.first_fetched = False

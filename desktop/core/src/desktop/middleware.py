@@ -23,10 +23,14 @@ import logging
 import mimetypes
 import os.path
 import re
+import socket
 import tempfile
 import time
 
 import kerberos
+import django.db
+import django.views.static
+import django_prometheus
 
 from django.conf import settings
 from django.contrib import messages
@@ -34,29 +38,28 @@ from django.contrib.auth import REDIRECT_FIELD_NAME, BACKEND_SESSION_KEY, authen
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User
 from django.core import exceptions, urlresolvers
-import django.db
 from django.http import HttpResponseNotAllowed, HttpResponseForbidden
 from django.urls import resolve
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.translation import ugettext as _
 from django.utils.http import urlquote, is_safe_url
-import django.views.static
+
+from hadoop import cluster
 
 import desktop.views
 import desktop.conf
 from desktop.conf import IS_EMBEDDED
 from desktop.context_processors import get_app_name
 from desktop.lib import apputil, i18n, fsmanager
-from desktop.lib.django_util import render, render_json
+from desktop.lib.django_util import JsonResponse, render, render_json
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.log import get_audit_logger
 from desktop.log.access import access_log, log_page_hit, access_warn
 from desktop import appmanager
 from desktop import metrics
-from hadoop import cluster
-
 from desktop.auth.backend import is_admin
+
 
 LOG = logging.getLogger(__name__)
 
@@ -68,6 +71,9 @@ DJANGO_VIEW_AUTH_WHITELIST = [
   django.views.static.serve,
   desktop.views.is_alive,
 ]
+
+if desktop.conf.ENABLE_PROMETHEUS.get():
+  DJANGO_VIEW_AUTH_WHITELIST.append(django_prometheus.exports.ExportToDjangoView)
 
 
 class AjaxMiddleware(object):
@@ -345,6 +351,8 @@ class LoginAndPermissionMiddleware(object):
     else:
       if IS_EMBEDDED.get():
         return HttpResponseForbidden()
+      elif request.GET.get('is_embeddable'):
+        return JsonResponse({'url': "%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, urlquote('/hue' + request.get_full_path().replace('is_embeddable=true', '').replace('&&','&')))}) # Remove embeddable so redirect from & to login works. Login page is not embeddable
       else:
         return HttpResponseRedirect("%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, urlquote(request.get_full_path())))
 
@@ -670,10 +678,15 @@ class SpnegoMiddleware(object):
             knox_verification = False
             if desktop.conf.KNOX.KNOX_PRINCIPAL.get() in username:
               # This may contain chain of reverse proxies, e.g. knox proxy, hue load balancer
+              # Compare hostname on both HTTP_X_FORWARDED_HOST & KNOX_PROXYHOSTS. Both of these can be configured to use either hostname or IPs and we have to normalize to one or the other
               req_hosts = self.clean_host(request.META['HTTP_X_FORWARDED_HOST'])
               knox_proxy = self.clean_host(desktop.conf.KNOX.KNOX_PROXYHOSTS.get())
               if req_hosts.intersection(knox_proxy):
                 knox_verification = True
+              else:
+                access_warn(request, 'Failed to verify provided host %s with %s ' % (req_hosts, knox_proxy))
+            else:
+              access_warn(request, 'Failed to verify provided username %s with %s ' % (username, desktop.conf.KNOX.KNOX_PRINCIPAL.get()))
             # If knox authentication failed then generate 401 (Unauthorized error)
             if not knox_verification:
               request.META['Return-401'] = ''
@@ -710,7 +723,7 @@ class SpnegoMiddleware(object):
 
   def clean_host(self, pattern):
     if pattern:
-      return set([hostport.split(':')[0] for hostport in pattern.split(',')])
+      return set([socket.gethostbyaddr(hostport.split(':')[0].strip())[0] for hostport in pattern.split(',')])
     return set([])
 
   def clean_username(self, username, request):

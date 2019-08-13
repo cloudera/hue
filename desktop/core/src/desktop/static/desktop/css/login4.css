@@ -14,4 +14,4 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
- */.login-container{-webkit-box-shadow:0 2px 8px rgba(0,0,0,0.18);-moz-box-shadow:0 2px 8px rgba(0,0,0,0.18);box-shadow:0 2px 6px 0 rgba(0,0,0,0.18),0 2px 8px 0 rgba(0,0,0,0.13)}.login-container .logo{width:200px;height:70px;text-align:center}.svg-hue-logo-main{fill:#0B7FAD}.svg-hue-logo-trunk{fill:#A37EC6}@-webkit-keyframes autofill{to{background:transparent}}:-webkit-autofill{-webkit-animation-name:autofill;-webkit-animation-fill-mode:both}
+ */.login-container{-webkit-box-shadow:0 2px 8px rgba(0,0,0,0.18);-moz-box-shadow:0 2px 8px rgba(0,0,0,0.18);box-shadow:0 2px 6px 0 rgba(0,0,0,0.18),0 2px 8px 0 rgba(0,0,0,0.13)}.login-container .logo{width:200px;height:70px;text-align:center}.svg-hue-logo-main{fill:#0B7FAD}.svg-hue-logo-trunk{fill:#9678d3}@-webkit-keyframes autofill{to{background:transparent}}:-webkit-autofill{-webkit-animation-name:autofill;-webkit-animation-fill-mode:both}

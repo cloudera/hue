@@ -16,6 +16,8 @@
 
 from __future__ import absolute_import
 
+from builtins import str
+from builtins import object
 import itertools
 import logging
 import os
@@ -31,13 +33,12 @@ from boto.s3.prefix import Prefix
 from django.utils.translation import ugettext as _
 
 from aws import s3
-from aws.conf import get_default_region, get_locations
+from aws.conf import get_default_region, get_locations, PERMISSION_ACTION_S3
 from aws.s3 import normpath, s3file, translate_s3_error, S3A_ROOT
 from aws.s3.s3stat import S3Stat
 
 
 DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
-PERMISSION_ACTION_S3 = "s3_access"
 BUCKET_NAME_PATTERN = re.compile("^((?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9_\-]*[A-Za-z0-9]))$")
 
 LOG = logging.getLogger(__name__)
@@ -53,7 +54,7 @@ def auth_error_handler(view_fn):
   def decorator(*args, **kwargs):
     try:
       return view_fn(*args, **kwargs)
-    except (S3ResponseError, IOError), e:
+    except (S3ResponseError, IOError) as e:
       if 'Forbidden' in str(e) or (hasattr(e, 'status') and e.status == 403):
         path = kwargs.get('path')
         if not path and len(args) > 1:
@@ -67,19 +68,20 @@ def auth_error_handler(view_fn):
         if isinstance(e, S3ResponseError):
           msg = e.message or e.reason
         raise S3FileSystemException(msg)
-    except Exception, e:
+    except Exception as e:
       raise e
   return decorator
 
 
 class S3FileSystem(object):
-  def __init__(self, s3_connection):
+  def __init__(self, s3_connection, expiration=None):
     self._s3_connection = s3_connection
     self._filebrowser_action = PERMISSION_ACTION_S3
     self.user = None
     self.is_sentry_managed = lambda path: False
     self.superuser = None
     self.supergroup = None
+    self.expiration = expiration
 
   def _get_bucket(self, name):
     return self._s3_connection.get_bucket(name)
@@ -87,9 +89,9 @@ class S3FileSystem(object):
   def _get_or_create_bucket(self, name):
     try:
       bucket = self._get_bucket(name)
-    except BotoClientError, e:
+    except BotoClientError as e:
       raise S3FileSystemException(_('Failed to create bucket named "%s": %s') % (name, e.reason))
-    except S3ResponseError, e:
+    except S3ResponseError as e:
       if e.status == 403 or e.status == 301:
         raise S3FileSystemException(_('User is not authorized to access bucket named "%s". '
           'If you are attempting to create a bucket, this bucket name is already reserved.') % name)
@@ -124,7 +126,7 @@ class S3FileSystem(object):
         key.delete()
       self._s3_connection.delete_bucket(name)
       LOG.info('Successfully deleted bucket name "%s" and all its contents.' % name)
-    except S3ResponseError, e:
+    except S3ResponseError as e:
       if e.status == 403:
         raise S3FileSystemException(_('User is not authorized to access bucket named "%s". '
           'If you are attempting to create a bucket, this bucket name is already reserved.') % name)
@@ -136,9 +138,9 @@ class S3FileSystem(object):
     bucket = self._get_bucket(bucket_name)
     try:
       return bucket.get_key(key_name, validate=validate)
-    except BotoClientError, e:
+    except BotoClientError as e:
       raise S3FileSystemException(_('Failed to access path at "%s": %s') % (path, e.reason))
-    except S3ResponseError, e:
+    except S3ResponseError as e:
       if e.status in (301, 400):
         raise S3FileSystemException(_('Failed to access path: "%s" '
           'Check that you have access to read this bucket and that the region is correct: %s') % (path, e.message or e.reason))
@@ -159,7 +161,7 @@ class S3FileSystem(object):
 
     try:
       key = self._get_key(path, validate=True)
-    except BotoClientError, e:
+    except BotoClientError as e:
       raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, e.reason))
     except S3ResponseError as e:
       if e.status == 404:
@@ -168,7 +170,8 @@ class S3FileSystem(object):
         raise S3FileSystemException(_('User is not authorized to access path: "%s"') % path)
       else:
         raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, e.reason))
-
+    except Exception as e: # SSL errors show up here, because they've been remapped in boto
+      raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, e.message))
     if key is None:
       key = self._get_key(path, validate=False)
     return self._stats_key(key)
@@ -270,11 +273,11 @@ class S3FileSystem(object):
     if s3.is_root(path):
       try:
         return sorted([S3Stat.from_bucket(b) for b in self._s3_connection.get_all_buckets()], key=lambda x: x.name)
-      except S3FileSystemException, e:
+      except S3FileSystemException as e:
         raise e
-      except S3ResponseError, e:
+      except S3ResponseError as e:
         raise S3FileSystemException(_('Failed to retrieve buckets: %s') % e.reason)
-      except Exception, e:
+      except Exception as e:
         raise S3FileSystemException(_('Failed to retrieve buckets: %s') % e)
 
     bucket_name, prefix = s3.parse_uri(path)[:2]
@@ -350,11 +353,11 @@ class S3FileSystem(object):
 
     try:
       self._get_or_create_bucket(bucket_name)
-    except S3FileSystemException, e:
+    except S3FileSystemException as e:
       raise e
-    except S3ResponseError, e:
+    except S3ResponseError as e:
       raise S3FileSystemException(_('Failed to create S3 bucket "%s": %s: %s') % (bucket_name, e.reason, e.body))
-    except Exception, e:
+    except Exception as e:
       raise S3FileSystemException(_('Failed to create S3 bucket "%s": %s') % (bucket_name, e))
 
     stats = self._stats(path)
@@ -494,7 +497,7 @@ class S3FileSystem(object):
         self.remove(path=tmp_path)
       else:
         self.open(path)
-    except Exception, e:
+    except Exception as e:
       LOG.warn('S3 check_access encountered error verifying %s permission at path "%s": %s' % (permission, path, str(e)))
       return False
     return True

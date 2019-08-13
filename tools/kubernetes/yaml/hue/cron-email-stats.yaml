@@ -1,0 +1,33 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: email-stats
+spec:
+  schedule: "0 13 * * WED,SUN"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: email-stats
+            image: gethue/hue:latest
+            imagePullPolicy: IfNotPresent
+            args:
+            - /bin/bash
+            - -c
+            - ./build/env/bin/hue send_query_stats
+            volumeMounts:
+            - name: config-volume
+              mountPath: /usr/share/hue/desktop/conf/z-hue.ini
+              subPath: hue-ini
+            - name: config-volume-extra
+              mountPath: /usr/share/hue/desktop/conf/zz-hue.ini
+              subPath: hue-ini
+          restartPolicy: OnFailure
+          volumes:
+            - name: config-volume
+              configMap:
+                name: hue-config
+            - name: config-volume-extra
+              configMap:
+                name: hue-config-extra

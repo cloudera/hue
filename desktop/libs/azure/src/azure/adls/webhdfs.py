@@ -18,24 +18,25 @@
 """
 Interfaces for ADLS via HttpFs/WebHDFS
 """
+from future import standard_library
+standard_library.install_aliases()
 import logging
 import threading
 
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from hadoop.fs.webhdfs import WebHdfs as HadoopWebHdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.hdfs_site import get_umask_mode
 
 from desktop.lib.rest import http_client, resource
-from azure.conf import get_default_adls_url, get_default_adls_fs
+from azure.conf import get_default_adls_url, get_default_adls_fs, PERMISSION_ACTION_ADLS
 
 
 LOG = logging.getLogger(__name__)
 
 #Azure has a 30MB block limit on upload.
 UPLOAD_CHUCK_SIZE = 30 * 1000 * 1000
-PERMISSION_ACTION_ADLS = "adls_access"
 
 
 class WebHdfs(HadoopWebHdfs):
@@ -47,7 +48,7 @@ class WebHdfs(HadoopWebHdfs):
                security_enabled=False,
                ssl_cert_ca_verify=True,
                temp_dir="/tmp",
-               umask=01022,
+               umask=0o1022,
                hdfs_supergroup=None,
                auth_provider=None):
     self._url = url

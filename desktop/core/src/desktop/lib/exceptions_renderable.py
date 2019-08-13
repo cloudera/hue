@@ -33,8 +33,7 @@ LOG = logging.getLogger(__name__)
 
 class PopupException(Exception):
   """
-  Middleware will render this exception; and the template
-  renders it as a pop-up.
+  Middleware will render this exception; and the template renders it as a pop-up.
   """
   def __init__(self, message, title="Error", detail=None, error_code=500):
     Exception.__init__(self, message)
@@ -53,8 +52,14 @@ class PopupException(Exception):
       LOG.error('Potential trace: %s' % self.traceback)
 
   def response(self, request):
-    data = dict(title=force_unicode(self.title), message=force_unicode(self.message), detail=force_unicode(self.detail) if self.detail else None, traceback=self.traceback)
-    data['is_embeddable'] = request.GET.get('is_embeddable', False)
+    data = {
+      'title': force_unicode(self.title),
+      'message': force_unicode(self.message),
+      'detail': force_unicode(self.detail) if self.detail else None,
+      'traceback': self.traceback,
+      'is_embeddable': request.GET.get('is_embeddable', False)
+    }
+
     if not request.ajax:
       data['request'] = request
     response = desktop.lib.django_util.render("popup_error.mako", request, data)
@@ -62,4 +67,5 @@ class PopupException(Exception):
       response.status_code = 200
     else:
       response.status_code = self.error_code
+
     return response

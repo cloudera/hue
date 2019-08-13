@@ -30,6 +30,7 @@ class EditorViewModel {
   constructor(editorId, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
     const self = this;
 
+    // eslint-disable-next-line no-restricted-syntax
     console.log('Notebook 2 enabled.');
 
     self.editorId = editorId;
@@ -206,9 +207,13 @@ class EditorViewModel {
 
     huePubSub.subscribe(
       'get.active.snippet.type',
-      () => {
+      callback => {
         withActiveSnippet(activeSnippet => {
-          huePubSub.publish('set.active.snippet.type', activeSnippet.type());
+          if (callback) {
+            callback(activeSnippet.type());
+          } else {
+            huePubSub.publish('set.active.snippet.type', activeSnippet.type());
+          }
         });
       },
       self.huePubSubId

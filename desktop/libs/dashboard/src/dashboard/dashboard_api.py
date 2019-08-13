@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 
 
@@ -52,7 +53,7 @@ class DashboardApi(object):
     self.user = user
     self.cluster = cluster
 
-  def datasets(self, show_all=False): pass
+  def datasets(self, show_all=False, database=None): pass
 
   def query(self, collection, query, facet=None): pass
 

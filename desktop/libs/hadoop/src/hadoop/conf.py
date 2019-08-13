@@ -57,6 +57,10 @@ UPLOAD_CHUNK_SIZE = Config(
 def has_hdfs_enabled():
   return HDFS_CLUSTERS.keys()
 
+def get_hadoop_conf_dir_default():
+  """ get from environment variable HADOOP_CONF_DIR or "/etc/hadoop/conf" """
+  return os.environ.get("HADOOP_CONF_DIR", "/etc/hadoop/conf")
+
 
 HDFS_CLUSTERS = UnspecifiedConfigSection(
   "hdfs_clusters",
@@ -86,7 +90,7 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
                       default='/tmp', type=str),
       HADOOP_CONF_DIR = Config(
         key="hadoop_conf_dir",
-        default=os.environ.get("HADOOP_CONF_DIR", "/etc/hadoop/conf"),
+        dynamic_default=get_hadoop_conf_dir_default,
         help=("Directory of the Hadoop configuration) Defaults to the environment variable " +
               "HADOOP_CONF_DIR when set, or '/etc/hadoop/conf'.")
       )
@@ -214,7 +218,7 @@ def config_validator(user):
     res.extend(webhdfs.test_fs_configuration(cluster))
     if name == 'default':
       has_default = True
-  if not has_default:
+  if HDFS_CLUSTERS.keys() and not has_default:
     res.append(("hadoop.hdfs_clusters", "You should have an HDFS called 'default'."))
 
   # YARN_CLUSTERS
@@ -223,17 +227,15 @@ def config_validator(user):
     if cluster.SUBMIT_TO.get():
       submit_to.append('yarn_clusters.' + name)
 
-  if not submit_to:
-    res.append(("hadoop", "Please designate one of the MapReduce or "
-                "Yarn clusters with `submit_to=true' in order to run jobs."))
+  if YARN_CLUSTERS.keys() and not submit_to:
+    res.append(("hadoop", "Please designate one of the MapReduce or Yarn clusters with `submit_to=true' in order to run jobs."))
   else:
     res.extend(test_yarn_configurations(user))
 
   if get_spark_history_server_from_cm():
     status = test_spark_configuration(user)
     if status != 'OK':
-      res.append(("Spark_history_server", "Spark job can't retrieve logs of driver and executors without "
-                  "a running Spark history server"))
+      res.append(("Spark_history_server", "Spark job can't retrieve logs of driver and executors without a running Spark history server"))
 
   return res
 

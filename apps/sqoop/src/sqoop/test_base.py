@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import atexit
 import logging
 import os
@@ -159,13 +160,13 @@ class SqoopServerProvider(object):
           LOG.info('Check Sqoop status...')
           try:
             version = client.get_version()
-          except RestException, e:
+          except RestException as e:
             LOG.exception('Exception fetching the Sqoop server version')
 
             # Don't loop if we had an authentication error.
             if e.code == 401:
               raise
-          except Exception, e:
+          except Exception as e:
             LOG.info('Sqoop server not started yet: %s' % e)
           else:
             if version:

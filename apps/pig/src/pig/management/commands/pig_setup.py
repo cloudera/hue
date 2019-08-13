@@ -88,7 +88,7 @@ STORE upper_case INTO '$output';
             description=data['description'],
             data=json.dumps(data)
           )
-      except Exception, e:
+      except Exception as e:
         LOG.exception("Failed to create sample pig script document: %s" % e)
         # Just to be sure we delete Doc2 object incase of exception.
         # Possible when there are mixed InnoDB and MyISAM tables

@@ -18,7 +18,20 @@
 @import (reference) "cui/colors.less";
 @import (reference) "hue-mixins.less";
 
+.hue-page {
+  position: relative;
+  .display-flex;
+  .flex-direction(row);
+
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
 .main-page {
+  .flex(1 1 auto);
   position: relative;
   .display-flex;
   .flex-direction(column);
@@ -60,16 +73,18 @@
 
   position: relative;
   z-index: 1009;
+  min-height: 54px;
 }
 
 .top-nav-left {
+  padding-top: 3px;
   .flex(0 0 340px);
 }
 
 .top-nav-middle {
   .flex(1);
 
-  padding: 0 10px;
+  padding: 3px 10px;
   width: 100%;
 }
 
@@ -78,7 +93,7 @@
 }
 
 .top-nav-left .btn-group {
-  float: right;
+  margin-left: 15px;
 }
 
 .hue-main-create-btn {
@@ -438,8 +453,8 @@
 }
 
 .hue-title-bar {
-  border-bottom: 1px solid #dcdcdc;
-  background-color: #f8f8f8;
+  border-bottom: 1px solid @cui-default-border-color;
+  background-color: @cui-gray-050;
 
   .navbar-inner {
     background-color: transparent !important;
@@ -825,11 +840,11 @@ ul.risk-list {
   margin: 0 0 0 10px;
 
   .risk-list-high {
-    color: @cui-red-700;
+    color: @cui-red-500;
   }
 
   .risk-list-normal {
-    color: @cui-orange-700;
+    color: @cui-orange-300;
   }
 
   .risk-list-title {
@@ -852,7 +867,7 @@ ul.risk-list {
   font-weight: bold;
   padding: 12px;
   background: rgba(0, 0, 0, 0.8);
-  color: #fff;
+  color: @cui-white;
   border-radius: 2px;
 }
 

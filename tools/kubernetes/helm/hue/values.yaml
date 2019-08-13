@@ -1,39 +1,56 @@
-registry: "gethue/hue"
-tag: "latest"
+image:
+   registry: "gethue"
+   tag: "latest"
+   pullPolicy: "IfNotPresent"
 hue:
+  replicas: 1
   database:
     create: true
+    persist: true
     engine: "postgresql_psycopg2"
-    host: "hue-postgres"
+    host: "postgres-hue"
     port: 5432
     user: "hue"
     password: "hue"
     name: "hue"
   interpreters: |
-    [[[impala]]]
-      name=Impala
-      interface=hiveserver2
+    [[[postgresql]]]
+      name = postgresql
+      interface=sqlalchemy
+      options='{"url": "postgresql://hue:hue@postgres-hue:5432/hue"}'
   ini: |
     [desktop]
-    app_blacklist=filebrowser,oozie,search,hbase,security,jobbrowser,metastore
+    app_blacklist=filebrowser,search,hbase,security,jobbrowser,oozie
+    django_debug_mode=false
+    gunicorn_work_class=gevent
+    enable_prometheus=true
 
-    [impala]
-    server_host=172.31.114.171
-
-    [dashboard]
-    is_enabled=false
-    has_sql_enabled=false
-
-    [notebook]
-    show_notebooks=false
-
-    [hadoop]
+    [[task_server]]
+    enabled=false
+    broker_url=redis://redis:6379/0
+    result_cache='{"BACKEND": "django_redis.cache.RedisCache", "LOCATION": "redis://redis:6379/0", "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},"KEY_PREFIX": "queries"}'
+    celery_result_backend=redis://redis:6379/0
+balancer:
+  enabled: true
+workers:
+  enabled: false
+  replicas: 1
+scheduler:
+  enabled: false
+cron:
+  enabled: false
+  emailStats: "0 13 * * WED,SUN"
 aws:
   accessKeyId: ""
   secretAccessKey: ""
   region: "us-east-1"
 ingress:
   create: false
-  type: "traefik"
+  type: "nginx"
+  # type: "nginx-ssl"
+  # type: "traefik"
+  domain: "demo.gethue.com"
+  email: "team@gethue.com"
   loadBalancerIp: "127.0.0.1"
-  domain: "127.0.0.1.nip.io"
+monitoring:
+  enabled: true

@@ -16,14 +16,14 @@
 
 import $ from 'jquery';
 
-import AssistStorageEntry from 'assist/assistStorageEntry';
+import AssistStorageEntry from 'ko/components/assist/assistStorageEntry';
 import dataCatalog from 'catalog/dataCatalog';
 import hueDebug from 'utils/hueDebug';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import SqlParseSupport from 'parse/sqlParseSupport';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
 import sqlUtils from 'sql/sqlUtils';
+import stringDistance from 'sql/stringDistance';
 
 // TODO: depends on Ace, sqlStatementsParser
 
@@ -591,6 +591,7 @@ class AceLocationHandler {
           lastKnownStatements.editorChangeTime = lastChangeTime;
 
           if (typeof hueDebug !== 'undefined' && hueDebug.logStatementLocations) {
+            // eslint-disable-next-line no-restricted-syntax
             console.log(lastKnownStatements);
           }
         } catch (error) {
@@ -787,6 +788,7 @@ class AceLocationHandler {
           self.snippet.positionStatement().syntaxError = true;
         }
         if (hueDebug && hueDebug.showSyntaxParseResult) {
+          // eslint-disable-next-line no-restricted-syntax
           console.log(e.data.syntaxError);
         }
 
@@ -1105,7 +1107,7 @@ class AceLocationHandler {
               const weightedExpected = $.map(possibleValues, val => {
                 return {
                   text: isLowerCase ? val.name.toLowerCase() : val.name,
-                  distance: SqlParseSupport.stringDistance(token.value, val.name)
+                  distance: stringDistance(token.value, val.name)
                 };
               });
               weightedExpected.sort((a, b) => {
@@ -1214,6 +1216,11 @@ class AceLocationHandler {
       const tokensToVerify = [];
 
       e.data.locations.forEach(location => {
+        if (location.type === 'statementType' && self.snippet.type() !== 'impala') {
+          // We currently only have a good mapping from statement types to impala topics.
+          // TODO: Extract links between Hive topic IDs and statement types
+          return;
+        }
         if (
           ['statement', 'selectList', 'whereClause', 'limitClause'].indexOf(location.type) !== -1 ||
           ((location.type === 'table' || location.type === 'column') &&

@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable no-restricted-syntax */
+
 const libxml = require('libxmljs');
 
 const Topic = require('./Topic');
@@ -43,60 +45,95 @@ const LOG_NAME = 'ditamapParser.js: ';
  *
  * @return {Promise<DitamapParseResult>} - A promise of the Topic tree and index
  */
-const parseDitamap = (ditamapFile, docRootPath) => new Promise((resolve, reject) => {
-  let parseResult = {
-    topics: [],
-    topicIndex: {},
-    keyDefs: {}
-  };
-  extractFromDitamapFile(ditamapFile, docRootPath, parseResult).then(() => {
-    resolve(parseResult);
-  }).catch(reject);
-});
+const parseDitamap = (ditamapFile, docRootPath) =>
+  new Promise((resolve, reject) => {
+    const parseResult = {
+      topics: [],
+      topicIndex: {},
+      keyDefs: {}
+    };
+    extractFromDitamapFile(ditamapFile, docRootPath, parseResult)
+      .then(() => {
+        resolve(parseResult);
+      })
+      .catch(reject);
+  });
 
-const extractFromDitamapFile = (ditamapFile, docRootPath, parseResult) => new Promise((resolve, reject) => {
-  extractorUtils.readFile(docRootPath + ditamapFile).then(contents => {
-    let mapNode = libxml.parseXmlString(contents).get('//map');
-    extractFromMapNode(mapNode, ditamapFile, docRootPath, parseResult).then(resolve).catch(reject);
-  }).catch(reject);
-});
+const extractFromDitamapFile = (ditamapFile, docRootPath, parseResult) =>
+  new Promise((resolve, reject) => {
+    extractorUtils
+      .readFile(docRootPath + ditamapFile)
+      .then(contents => {
+        const mapNode = libxml.parseXmlString(contents).get('//map');
+        extractFromMapNode(mapNode, ditamapFile, docRootPath, parseResult)
+          .then(resolve)
+          .catch(reject);
+      })
+      .catch(reject);
+  });
 
 const extractFromMapNode = (mapNode, ditamapFile, docRootPath, parseResult) => {
-  let promises = [];
+  const promises = [];
 
-  let handleMapNodeChildren = (childNodes, currentTopic) => {
+  const handleMapNodeChildren = (childNodes, currentTopic) => {
     childNodes.forEach(node => {
       switch (node.name()) {
         case 'topicref': {
           if (extractorUtils.hasAttributes(node, 'href')) {
-            if (~node.attr('href').value().indexOf('.ditamap')) {
-              promises.push(extractFromDitamapFile(node.attr('href').value(), docRootPath, parseResult));
+            if (
+              ~node
+                .attr('href')
+                .value()
+                .indexOf('.ditamap')
+            ) {
+              promises.push(
+                extractFromDitamapFile(node.attr('href').value(), docRootPath, parseResult)
+              );
               break;
             }
-            let topic = new Topic(docRootPath, node.attr('href').value());
+            const topic = new Topic(docRootPath, node.attr('href').value());
             if (currentTopic) {
               currentTopic.children.push(topic);
             } else {
               parseResult.topics.push(topic);
             }
-            parseResult.topicIndex[node.attr('href').value().replace(/#.*$/, '')] = topic;
+            parseResult.topicIndex[
+              node
+                .attr('href')
+                .value()
+                .replace(/#.*$/, '')
+            ] = topic;
             handleMapNodeChildren(node.childNodes(), topic);
           } else {
-            console.log('%s: Couldn\'t handle "topicref" node: %s in file %s%s', LOG_NAME,  node.toString(), docRootPath, ditamapFile);
+            console.log(
+              '%s: Couldn\'t handle "topicref" node: %s in file %s%s',
+              LOG_NAME,
+              node.toString(),
+              docRootPath,
+              ditamapFile
+            );
           }
           break;
         }
         case 'mapref': {
           if (extractorUtils.hasAttributes(node, 'href')) {
-            promises.push(extractFromDitamapFile(node.attr('href').value(), docRootPath, parseResult));
+            promises.push(
+              extractFromDitamapFile(node.attr('href').value(), docRootPath, parseResult)
+            );
           } else {
-            console.log('%s: Couldn\'t handle "mapref" node: \n%s in file %s%s', LOG_NAME,  node.toString(), docRootPath, ditamapFile);
+            console.log(
+              '%s: Couldn\'t handle "mapref" node: \n%s in file %s%s',
+              LOG_NAME,
+              node.toString(),
+              docRootPath,
+              ditamapFile
+            );
           }
           break;
         }
         case 'keydef':
           if (extractorUtils.hasAttributes(node, 'keys')) {
-            let valNode = node.get('topicmeta/keywords/keyword');
+            const valNode = node.get('topicmeta/keywords/keyword');
             if (valNode) {
               parseResult.keyDefs[node.attr('keys').value()] = { text: valNode.text() };
             } else if (node.attr('href')) {
@@ -106,7 +143,7 @@ const extractFromMapNode = (mapNode, ditamapFile, docRootPath, parseResult) => {
                 parseResult.keyDefs[node.attr('keys').value()] = {
                   href: node.attr('href').value(),
                   external: node.attr('scope') && node.attr('scope').value() === 'external'
-                }
+                };
               }
             }
           }
@@ -117,9 +154,15 @@ const extractFromMapNode = (mapNode, ditamapFile, docRootPath, parseResult) => {
         case 'topicmeta':
           break;
         default:
-          console.log('%s: Couldn\'t handle map node: \n%s in file %s%s', LOG_NAME,  node.toString(), docRootPath, ditamapFile);
+          console.log(
+            "%s: Couldn't handle map node: \n%s in file %s%s",
+            LOG_NAME,
+            node.toString(),
+            docRootPath,
+            ditamapFile
+          );
       }
-    })
+    });
   };
 
   handleMapNodeChildren(mapNode.childNodes());
@@ -130,3 +173,5 @@ const extractFromMapNode = (mapNode, ditamapFile, docRootPath, parseResult) => {
 module.exports = {
   parseDitamap: parseDitamap
 };
+
+/* eslint-enable no-restricted-syntax */

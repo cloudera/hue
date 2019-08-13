@@ -169,20 +169,8 @@ class ApiHelper {
     const self = this;
     self.queueManager = apiQueueManager;
 
-    huePubSub.subscribe('assist.clear.hdfs.cache', () => {
-      $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'hdfs' }), {});
-    });
-
-    huePubSub.subscribe('assist.clear.adls.cache', () => {
-      $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'adls' }), {});
-    });
-
     huePubSub.subscribe('assist.clear.git.cache', () => {
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'git' }), {});
-    });
-
-    huePubSub.subscribe('assist.clear.s3.cache', () => {
-      $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 's3' }), {});
     });
 
     huePubSub.subscribe('assist.clear.collections.cache', () => {
@@ -223,6 +211,10 @@ class ApiHelper {
         clearAllCaches();
       }
     }
+  }
+
+  clearStorageCache(sourceType) {
+    $.totalStorage(this.getAssistCacheIdentifier({ sourceType: sourceType }), {});
   }
 
   hasExpired(timestamp, cacheType) {
@@ -470,8 +462,8 @@ class ApiHelper {
 
   /**
    * @param {string} url
-   * @param {Object} data
-   * @param {Object} options
+   * @param {Object} [data]
+   * @param {Object} [options]
    * @param {function} [options.successCallback]
    * @param {function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
@@ -1536,7 +1528,7 @@ class ApiHelper {
           data.new_table_name = options.properties.name;
         }
       }
-    } else if (options.path > 2) {
+    } else if (options.path.length > 2) {
       url = '/metastore/table/' + options.path[0] + '/' + options.path[1] + '/alter_column';
       data.column = options.path.slice(2).join('.');
       if (options.properties) {

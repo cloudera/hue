@@ -389,6 +389,13 @@ class OnePageViewModel {
                 }, 0);
               });
             } else {
+              if (type.indexOf('json') > -1) {
+                const presponse = JSON.parse(response);
+                if (presponse && presponse.url) {
+                  window.location.href = window.HUE_BASE_URL + presponse.url;
+                  return;
+                }
+              }
               window.location.href = window.HUE_BASE_URL + baseURL;
             }
           },
@@ -613,6 +620,7 @@ class OnePageViewModel {
       { url: '/catalog', app: 'catalog' },
       { url: '/kafka/', app: 'kafka' },
       { url: '/indexer/topics/*', app: 'kafka' },
+      { url: '/indexer/indexes', app: 'indexes' },
       { url: '/indexer/indexes/*', app: 'indexes' },
       { url: '/indexer/', app: 'indexes' },
       { url: '/indexer/importer/', app: 'importer' },
@@ -829,8 +837,14 @@ class OnePageViewModel {
     huePubSub.subscribe('open.link', href => {
       if (href) {
         const prefix = window.IS_EMBEDDED ? '' : '/hue';
-        if (href.startsWith('/') && !href.startsWith(prefix)) {
-          page(window.HUE_BASE_URL + prefix + href);
+        if (href.startsWith('/')) {
+          if (window.HUE_BASE_URL.length && href.startsWith(window.HUE_BASE_URL)) {
+            page(href);
+          } else if (href.startsWith(prefix)) {
+            page(window.HUE_BASE_URL + href);
+          } else {
+            page(window.HUE_BASE_URL + prefix + href);
+          }
         } else if (href.indexOf('#') == 0) {
           // Only place that seem to use this is hbase onclick row
           window.location.hash = href;
