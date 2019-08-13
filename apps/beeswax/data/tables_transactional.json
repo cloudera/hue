@@ -10,11 +10,6 @@
     "table_name": "sample_08"
   },
   {
-    "data_file": "customers.csv",
-    "create_hql": "CREATE TABLE `customers` (\n `id` INT,\n `name` STRING,\n `email_preferences` STRUCT<`email_format`:STRING, `frequency`:STRING, `categories`:STRUCT<`promos`:BOOLEAN, `surveys`:BOOLEAN>>,\n `addresses` MAP<STRING, STRUCT<`street_1`:STRING, `street_2`:STRING, `city`:STRING, `state`:STRING, `zip_code`:STRING>>,\n `orders` ARRAY<STRUCT<`order_id`:STRING, `order_date`:STRING, `items`:ARRAY<STRUCT<`product_id`:INT, `sku`:STRING, `name`:STRING, `price`:DOUBLE, `qty`:INT>>>>)\nSTORED AS parquet\nTBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')",
-    "table_name": "customers"
-  },
-  {
     "partition_files": {
       "`date`='2015-11-18'": "web_logs_1.csv",
       "`date`='2015-11-19'": "web_logs_2.csv",
