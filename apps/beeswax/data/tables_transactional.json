@@ -16,7 +16,8 @@
       "`date`='2015-11-20'": "web_logs_3.csv",
       "`date`='2015-11-21'": "web_logs_4.csv"
     },
-    "create_hql": "CREATE TABLE `web_logs`  (  `_version_` bigint,   `app` string,   `bytes` smallint,   `city` string,   `client_ip` string,   `code` tinyint,   `country_code` string,   `country_code3` string,   `country_name` string,   `device_family` string,   `extension` string,   `latitude` float,   `longitude` float,   `method` string,   `os_family` string,   `os_major` string,   `protocol` string,   `record` string,   `referer` string,   `region_code` bigint,   `request` string,   `subapp` string,   `time` string,   `url` string,   `user_agent` string,   `user_agent_family` string,   `user_agent_major` string,   `id` string)\nPARTITIONED BY (  `date` string  )\nSTORED AS parquet\nTBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')",
-    "table_name": "web_logs"
+    "create_hql": "CREATE TABLE `web_logs`  (  `_version_` bigint,   `app` string,   `bytes` int,   `city` string,   `client_ip` string,   `code` smallint,   `country_code` string,   `country_code3` string,   `country_name` string,   `device_family` string,   `extension` string,   `latitude` float,   `longitude` float,   `method` string,   `os_family` string,   `os_major` string,   `protocol` string,   `record` string,   `referer` string,   `region_code` string,   `request` string,   `subapp` string,   `time` string,   `url` string,   `user_agent` string,   `user_agent_family` string,   `user_agent_major` string,   `id` string)\nPARTITIONED BY (  `date` string  )\nSTORED AS parquet\nTBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')",
+    "table_name": "web_logs",
+    "column_types": ["bigint", "string", "int", "string", "string", "smallint", "string", "string", "string", "string", "string", "float", "float", "string", "string", "string", "string", "string", "string", "string", "string", "string", "string", "string", "string", "string", "string", "string", "string"]
   }
 ]

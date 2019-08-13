@@ -18,9 +18,9 @@
 from builtins import object
 import csv
 import logging
+import json
 import os
 import pwd
-import json
 
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
@@ -42,7 +42,6 @@ from beeswax.server.dbms import get_query_server_config, QueryServerException
 
 
 LOG = logging.getLogger(__name__)
-MAX_INSERTED_ROWS = 1000
 
 
 class InstallException(Exception):
@@ -192,7 +191,7 @@ class SampleTable(object):
         hql = \
           """
           INSERT INTO TABLE %(tablename)s
-          PARTITIONS (%(partition_spec)s)
+          PARTITION (%(partition_spec)s)
           VALUES %(values)s
           """ % {
             'tablename': self.name,
@@ -314,7 +313,11 @@ class SampleTable(object):
     dialect = csv.Sniffer().sniff(data)
     reader = csv.reader(data.splitlines(), delimiter=dialect.delimiter)
 
-    rows = [', '.join("'%s'" % col.replace("'", "\\'") for col in row) for row in reader][:MAX_INSERTED_ROWS]
+    rows = [', '.join(
+        col if col.replace('.', '' , 1).isdigit() or col == 'NULL' else 'NULL' if col == '' else "'%s'" % col.replace("'", "\\'") for col in row
+      ) for row in reader
+    ]
+
     return ', '.join('(%s)' % row for row in rows)
 
 
