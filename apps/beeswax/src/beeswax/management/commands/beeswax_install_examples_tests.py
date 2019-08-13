@@ -53,20 +53,28 @@ class TestTransactionalTables():
       with patch('beeswax.management.commands.beeswax_install_examples.has_concurrency_support') as has_concurrency_support:
         has_concurrency_support.return_value = True
 
-        SampleTable(table_data, 'beeswax', 'default').load(self.user)
+        SampleTable(table_data, 'beeswax', 'default').install(self.user)
 
         get.assert_called()
 
 
-  def test_load_tables_concurrency_support(self):
+  def test_load_web_logs_with_concurrency_support(self):
+    table_data = {
+      "partition_files": {
+        "`date`='2015-11-18'": "web_logs_1.csv",
+        "`date`='2015-11-19'": "web_logs_2.csv",
+        "`date`='2015-11-20'": "web_logs_3.csv",
+        "`date`='2015-11-21'": "web_logs_4.csv"
+      },
+      "create_hql": "CREATE TABLE `web_logs`  (  `_version_` bigint,   `app` string,   `bytes` int,   `city` string,   `client_ip` string,   `code` smallint,   `country_code` string,   `country_code3` string,   `country_name` string,   `device_family` string,   `extension` string,   `latitude` float,   `longitude` float,   `method` string,   `os_family` string,   `os_major` string,   `protocol` string,   `record` string,   `referer` string,   `region_code` string,   `request` string,   `subapp` string,   `time` string,   `url` string,   `user_agent` string,   `user_agent_family` string,   `user_agent_major` string,   `id` string)\nPARTITIONED BY (  `date` string  )\nSTORED AS parquet\nTBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')",
+      "table_name": "web_logs",
+      "columns": [{"name": "_version_", "type": "bigint"}, {"name": "app", "type": "string"}, {"name": "bytes", "type": "int"}, {"name": "city", "type": "string"}, {"name": "client_ip", "type": "string"}, {"name": "code", "type": "smallint"}, {"name": "country_code", "type": "string"}, {"name": "country_code3", "type": "string"}, {"name": "country_name", "type": "string"}, {"name": "device_family", "type": "string"}, {"name": "extension", "type": "string"}, {"name": "latitude", "type": "float"}, {"name": "longitude", "type": "float"}, {"name": "method", "type": "string"}, {"name": "os_family", "type": "string"}, {"name": "os_major", "type": "string"}, {"name": "protocol", "type": "string"}, {"name": "record", "type": "string"}, {"name": "referer", "type": "string"}, {"name": "region_code", "type": "string"}, {"name": "request", "type": "string"}, {"name": "subapp", "type": "string"}, {"name": "time", "type": "string"}, {"name": "url", "type": "string"}, {"name": "user_agent", "type": "string"}, {"name": "user_agent_family", "type": "string"}, {"name": "user_agent_major", "type": "string"}, {"name": "id", "type": "string"}, {"name": "date", "type": "string"}]
+    }
+
     with patch('beeswax.server.dbms.get') as get:
       with patch('beeswax.management.commands.beeswax_install_examples.has_concurrency_support') as has_concurrency_support:
-        get.return_value = Mock(
-          get_table=Exception('Table could not be found')
-        )
         has_concurrency_support.return_value = True
 
-        cmd = Command()
-        cmd._install_tables(self.user, 'beeswax', 'default', 'tables_transactional.json')
+        SampleTable(table_data, 'beeswax', 'default').install(self.user)
 
         get.assert_called()

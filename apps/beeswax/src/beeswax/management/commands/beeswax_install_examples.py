@@ -135,6 +135,7 @@ class SampleTable(object):
     self.query_server = get_query_server_config(app_name)
     self.app_name = app_name
     self.db_name = db_name
+    self.columns = data_dict.get('columns')
 
     # Sanity check
     self._data_dir = beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get()
@@ -152,9 +153,10 @@ class SampleTable(object):
     if self.create(django_user):
       if self.partition_files:
         for partition_spec, filepath in list(self.partition_files.items()):
-          self.load_partition(django_user, partition_spec, filepath)
+          self.load_partition(django_user, partition_spec, filepath, columns=self.columns)
       else:
         self.load(django_user)
+
 
   def create(self, django_user):
     """
@@ -185,7 +187,7 @@ class SampleTable(object):
         LOG.error(msg)
         raise InstallException(msg)
 
-  def load_partition(self, django_user, partition_spec, filepath):
+  def load_partition(self, django_user, partition_spec, filepath, columns):
     if has_concurrency_support():
       with open(filepath) as f:
         hql = \
@@ -196,7 +198,7 @@ class SampleTable(object):
           """ % {
             'tablename': self.name,
             'partition_spec': partition_spec,
-            'values': self._get_sql_insert_values(f)
+            'values': self._get_sql_insert_values(f, columns)
           }
     else:
       # Upload data found at filepath to HDFS home of user, the load intto a specific partition
@@ -308,17 +310,23 @@ class SampleTable(object):
       raise InstallException(msg)
 
 
-  def _get_sql_insert_values(self, f):
+  def _get_sql_insert_values(self, f, columns=None):
     data = f.read()
     dialect = csv.Sniffer().sniff(data)
     reader = csv.reader(data.splitlines(), delimiter=dialect.delimiter)
 
-    rows = [', '.join(
-        col if col.replace('.', '' , 1).isdigit() or col == 'NULL' else 'NULL' if col == '' else "'%s'" % col.replace("'", "\\'") for col in row
+    rows = [
+      ', '.join(
+        col if is_number(col, i, columns) else "'%s'" % col.replace("'", "\\'") for i, col in enumerate(row)
       ) for row in reader
     ]
 
     return ', '.join('(%s)' % row for row in rows)
+
+
+def is_number(col, i, columns):
+  '''Basic check. For proper check, use columns headers like for the web_logs table.'''
+  return columns[i]['type'] != 'string' if columns else col.isdigit() or col == 'NULL'
 
 
 class SampleQuery(object):
