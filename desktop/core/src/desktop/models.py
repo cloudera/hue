@@ -709,6 +709,8 @@ class Document(models.Model):
         content_object.doc.get().delete()
       content_object.doc.add(copy_doc)
 
+      copy_doc.save()
+
       return copy_doc
     else:
       raise PopupException(_("Document copy method requires a content_object argument."))
