@@ -43,7 +43,6 @@ class TestTransactionalTables():
 
 
   def test_load_sample_07_with_concurrency_support(self):
-
     table_data =   {
       "data_file": "sample_07.csv",
       "create_hql": "CREATE TABLE `sample_07` (\n  `code` string ,\n  `description` string ,\n  `total_emp` int ,\n  `salary` int )\nSTORED AS parquet\nTBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')\n",
@@ -58,14 +57,16 @@ class TestTransactionalTables():
 
         get.assert_called()
 
-  def test_load_tables_concurrency_support(self):
 
+  def test_load_tables_concurrency_support(self):
     with patch('beeswax.server.dbms.get') as get:
       with patch('beeswax.management.commands.beeswax_install_examples.has_concurrency_support') as has_concurrency_support:
+        get.return_value = Mock(
+          get_table=Exception('Table could not be found')
+        )
         has_concurrency_support.return_value = True
 
         cmd = Command()
-        # cmd.handle(app_name='beeswax', db_name='default', user=self.user)
         cmd._install_tables(self.user, 'beeswax', 'default', 'tables_transactional.json')
 
         get.assert_called()

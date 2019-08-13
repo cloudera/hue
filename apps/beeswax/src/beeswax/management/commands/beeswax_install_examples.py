@@ -113,7 +113,8 @@ class Command(BaseCommand):
     design_list = [d for d in design_list if int(d['type']) == app_type]
 
     for design_dict in design_list:
-      design = SampleQuery(design_dict)
+      if not has_concurrency_support() or design_dict['name'] != 'Sample: Customers':
+        design = SampleQuery(design_dict)
       try:
         design.install(django_user)
       except Exception as ex:
@@ -164,7 +165,6 @@ class SampleTable(object):
     db = dbms.get(django_user, self.query_server)
 
     try:
-      # Already exists?
       if self.app_name == 'impala':
         db.invalidate(database=self.db_name, flush_all=False)
       db.get_table(self.db_name, self.name)
@@ -187,44 +187,48 @@ class SampleTable(object):
         raise InstallException(msg)
 
   def load_partition(self, django_user, partition_spec, filepath):
-    """
-    Upload data found at filepath to HDFS home of user, the load intto a specific partition
-    """
-    LOAD_PARTITION_HQL = \
-      """
-      ALTER TABLE %(tablename)s ADD PARTITION(%(partition_spec)s) LOCATION '%(filepath)s'
-      """
+    if has_concurrency_support():
+      with open(filepath) as f:
+        hql = \
+          """
+          INSERT INTO TABLE %(tablename)s
+          PARTITIONS (%(partition_spec)s)
+          VALUES %(values)s
+          """ % {
+            'tablename': self.name,
+            'partition_spec': partition_spec,
+            'values': self._get_sql_insert_values(f)
+          }
+    else:
+      # Upload data found at filepath to HDFS home of user, the load intto a specific partition
+      LOAD_PARTITION_HQL = \
+        """
+        ALTER TABLE %(tablename)s ADD PARTITION(%(partition_spec)s) LOCATION '%(filepath)s'
+        """
 
-    partition_dir = self._get_partition_dir(partition_spec)
-    hdfs_root_destination = self._get_hdfs_root_destination(django_user, subdir=partition_dir)
-    filename = filepath.split('/')[-1]
-    hdfs_file_destination = self._upload_to_hdfs(django_user, filepath, hdfs_root_destination, filename)
+      partition_dir = self._get_partition_dir(partition_spec)
+      hdfs_root_destination = self._get_hdfs_root_destination(django_user, subdir=partition_dir)
+      filename = filepath.split('/')[-1]
+      hdfs_file_destination = self._upload_to_hdfs(django_user, filepath, hdfs_root_destination, filename)
 
-    hql = LOAD_PARTITION_HQL % {'tablename': self.name, 'partition_spec': partition_spec, 'filepath': hdfs_root_destination}
-    LOG.info('Running load query: %s' % hql)
+      hql = LOAD_PARTITION_HQL % {'tablename': self.name, 'partition_spec': partition_spec, 'filepath': hdfs_root_destination}
+
     self._load_data_to_table(django_user, hql)
 
 
   def load(self, django_user):
-    """
-    Upload data to HDFS home of user then load (aka move) it into the Hive table (in the Hive metastore in HDFS).
-    """
     if has_concurrency_support():
       with open(self._contents_file) as f:
-        data = f.read()
-        dialect = csv.Sniffer().sniff(data)
-        reader = csv.reader(data.splitlines(), delimiter=dialect.delimiter)
-
-        rows = [', '.join("'%s'" % col.replace("'", "\\'") for col in row) for row in reader][:MAX_INSERTED_ROWS]
         hql = \
           """
           INSERT INTO TABLE %(tablename)s
           VALUES %(values)s
           """ % {
             'tablename': self.name,
-            'values': ', '.join('(%s)' % row for row in rows)
+            'values': self._get_sql_insert_values(f)
           }
     else:
+      # Upload data to HDFS home of user then load (aka move) it into the Hive table (in the Hive metastore in HDFS).
       hdfs_root_destination = self._get_hdfs_root_destination(django_user)
       hdfs_file_destination = self._upload_to_hdfs(django_user, self._contents_file, hdfs_root_destination)
       hql = \
@@ -236,7 +240,6 @@ class SampleTable(object):
           'filename': hdfs_file_destination
         }
 
-    LOG.info('Running load query: %s' % hql)
     self._load_data_to_table(django_user, hql)
 
 
@@ -304,6 +307,15 @@ class SampleTable(object):
       msg = _('Error loading table %(table)s: %(error)s.') % {'table': self.name, 'error': ex}
       LOG.error(msg)
       raise InstallException(msg)
+
+
+  def _get_sql_insert_values(self, f):
+    data = f.read()
+    dialect = csv.Sniffer().sniff(data)
+    reader = csv.reader(data.splitlines(), delimiter=dialect.delimiter)
+
+    rows = [', '.join("'%s'" % col.replace("'", "\\'") for col in row) for row in reader][:MAX_INSERTED_ROWS]
+    return ', '.join('(%s)' % row for row in rows)
 
 
 class SampleQuery(object):
