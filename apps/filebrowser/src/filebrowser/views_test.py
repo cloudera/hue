@@ -39,6 +39,7 @@ from avro import schema, datafile, io
 
 from aws.s3.s3fs import S3FileSystemException
 from aws.s3.s3test_utils import get_test_bucket
+from azure.conf import is_abfs_enabled, is_adls_enabled
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.encoding import smart_str
@@ -1197,7 +1198,6 @@ def test_location_to_url():
   assert_equal(prefix + '/', location_to_url('hdfs://localhost:8020'))
   assert_equal(prefix + 's3a://bucket/key', location_to_url('s3a://bucket/key'))
 
-
 class TestS3AccessPermissions(object):
 
   def setUp(self):
@@ -1243,3 +1243,82 @@ class TestS3AccessPermissions(object):
       assert_equal(200, response.status_code)
     finally:
       remove_from_group(self.user.username, 'has_s3')
+      
+class TestABFSAccessPermissions(object):
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    grant_access('test', 'test', 'filebrowser')
+    add_to_group('test')
+
+    self.user = User.objects.get(username="test")
+
+  def test_no_default_permissions(self):
+    if not is_abfs_enabled():
+      raise SkipTest
+    response = self.client.get('/filebrowser/view=ABFS://')
+    assert_equal(500, response.status_code)
+
+    # 500 for real currently
+#     with tempfile.NamedTemporaryFile() as local_file: # Flaky
+#       DEST_DIR = 'S3A://bucket/hue'
+#       LOCAL_FILE = local_file.name
+#       assert_raises(S3FileSystemException, self.client.post, '/filebrowser/upload/file?dest=%s' % DEST_DIR, dict(dest=DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+
+  def test_has_default_permissions(self):
+    if not is_abfs_enabled():
+      raise SkipTest
+    add_permission(self.user.username, 'has_abfs', permname='abfs_access', appname='filebrowser')
+
+    try:
+      response = self.client.get('/filebrowser/view=ABFS://')
+      assert_equal(200, response.status_code)
+    finally:
+      remove_from_group(self.user.username, 'has_abfs')
+      
+class TestADLSAccessPermissions(object):
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    grant_access('test', 'test', 'filebrowser')
+    add_to_group('test')
+
+    self.user = User.objects.get(username="test")
+
+  def test_no_default_permissions(self):
+    if not is_adls_enabled():
+      raise SkipTest
+    response = self.client.get('/filebrowser/view=ADL://')
+    assert_equal(500, response.status_code)
+    
+    response = self.client.get('/filebrowser/view=ADL://hue_adls_testing')
+    assert_equal(500, response.status_code)
+
+    response = self.client.get('/filebrowser/view=adl://hue_adls_testing')
+    assert_equal(500, response.status_code)
+
+    response = self.client.get('/filebrowser/view=ADL://hue_adls_testing/ADLS_tables')
+    assert_equal(500, response.status_code)
+
+    response = self.client.post('/filebrowser/rmtree', dict(path=['ADL://hue-test-01']))
+    assert_equal(500, response.status_code)
+
+    # 500 for real currently
+    assert_raises(IOError, self.client.get, '/filebrowser/edit=ADL://hue-test-01')
+
+    # 500 for real currently
+#     with tempfile.NamedTemporaryFile() as local_file: # Flaky
+#       DEST_DIR = 'S3A://bucket/hue'
+#       LOCAL_FILE = local_file.name
+#       assert_raises(S3FileSystemException, self.client.post, '/filebrowser/upload/file?dest=%s' % DEST_DIR, dict(dest=DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+
+  def test_has_default_permissions(self):
+    if not is_adls_enabled():
+      raise SkipTest
+    add_permission(self.user.username, 'has_adls', permname='adls_access', appname='filebrowser')
+
+    try:
+      response = self.client.get('/filebrowser/view=ADL://')
+      assert_equal(200, response.status_code)
+    finally:
+      remove_from_group(self.user.username, 'has_adls')

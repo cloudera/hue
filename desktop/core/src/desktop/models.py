@@ -1787,6 +1787,15 @@ class ClusterConfig():
         'tooltip': _('ADLS'),
         'page': '/filebrowser/view=' + urllib.quote('adl:/'.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
       })
+      
+    if 'filebrowser' in self.apps and ANALYTIC_DB not in self.cluster_type and fsmanager.is_enabled_and_has_access('abfs', self.user):
+      interpreters.append({
+        'type': 'abfs',
+        'displayName': _('ABFS'),
+        'buttonName': _('Browse'),
+        'tooltip': _('ABFS'),
+        'page': '/filebrowser/view=' + urllib.quote('abfs://'.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
+      })
 
     if 'metastore' in self.apps:
       interpreters.append({

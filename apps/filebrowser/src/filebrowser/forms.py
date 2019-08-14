@@ -29,6 +29,7 @@ from django.forms import FileField, CharField, BooleanField, Textarea
 from django.forms.formsets import formset_factory, BaseFormSet
 
 from aws.s3 import S3A_ROOT, normpath as s3_normpath
+from azure.abfs.__init__ import ABFS_ROOT, normpath as abfs_normpath
 from desktop.lib import i18n
 from hadoop.fs import normpath
 from filebrowser.lib import rwx
@@ -73,6 +74,8 @@ class PathField(CharField):
     cleaned_path = CharField.clean(self, value)
     if value.lower().startswith(S3A_ROOT):
       cleaned_path = s3_normpath(cleaned_path)
+    elif value.lower().startswith(ABFS_ROOT):
+      cleaned_path = abfs_normpath(cleaned_path)
     else:
       cleaned_path = normpath(cleaned_path)
     return cleaned_path
