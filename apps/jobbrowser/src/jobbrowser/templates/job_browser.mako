@@ -2454,7 +2454,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.rerunModalContent = ko.observable('');
 
       self.hasKill = ko.pureComputed(function() {
-        return self.type() && (['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle', 'QUERY', 'TEZ', 'YarnV2'].indexOf(self.type()) != -1 || self.type().indexOf('Data Warehouse') != -1 || self.type().indexOf('Altus') != -1);
+        return self.type() && (['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle', 'QUERY', 'TEZ', 'YarnV2', 'DDL'].indexOf(self.type()) != -1 || self.type().indexOf('Data Warehouse') != -1 || self.type().indexOf('Altus') != -1);
       });
       self.killEnabled = ko.pureComputed(function() {
         // Impala can kill queries that are finished, but not yet terminated
