@@ -48,7 +48,7 @@ from useradmin.models import User, Group, get_organization
 from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_K8S_ONLY, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS,\
-    has_connectors
+    has_connectors, TASK_SERVER
 from desktop.lib import fsmanager
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.i18n import force_unicode
@@ -1902,26 +1902,7 @@ class ClusterConfig(object):
 
 
   def _get_scheduler(self):
-    interpreters = [{
-        'type': 'oozie-workflow',
-        'displayName': _('Workflow'),
-        'buttonName': _('Schedule'),
-        'tooltip': _('Workflow'),
-        'page': '/oozie/editor/workflow/new/'
-      }, {
-        'type': 'oozie-coordinator',
-        'displayName': _('Schedule'),
-        'buttonName': _('Schedule'),
-        'tooltip': _('Schedule'),
-        'page': '/oozie/editor/coordinator/new/'
-      }, {
-        'type': 'oozie-bundle',
-        'displayName': _('Bundle'),
-        'buttonName': _('Schedule'),
-        'tooltip': _('Bundle'),
-        'page': '/oozie/editor/bundle/new/'
-      }
-    ]
+    interpreters = []
 
     if 'oozie' in self.apps and not (self.user.has_hue_permission(action="disable_editor_access", app="oozie") and not is_admin(self.user)):
       interpreters.extend([{
@@ -1945,11 +1926,23 @@ class ClusterConfig(object):
         }
       ])
 
+    if TASK_SERVER.BEAT_ENABLED.get():
+      interpreters.append({
+          'type': 'celery-beat',
+          'displayName': _('Scheduled Tasks'),
+          'buttonName': _('Scheduled Tasks'),
+          'tooltip': _('Scheduled Tasks'),
+          'page': '/jobbrowser/'
+        }
+      )
+
+    if interpreters:
       return {
           'name': 'oozie',
           'displayName': _('Scheduler'),
           'buttonName': _('Schedule'),
           'interpreters': interpreters,
+          'interpreter_names': [interpreter['type'] for interpreter in interpreters],
           'page': interpreters[0]['page']
         }
     else:
