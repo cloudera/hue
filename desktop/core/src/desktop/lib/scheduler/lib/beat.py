@@ -72,7 +72,7 @@ class CeleryBeatApi(Api):
       )
 
 
-  def list_schedules(self, user):
+  def list_tasks(self, user):
     PeriodicTask.objects.filter(description=user.username)
 
 
