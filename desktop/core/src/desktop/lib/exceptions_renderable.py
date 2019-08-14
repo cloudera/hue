@@ -77,8 +77,12 @@ class PopupException(Exception):
       data['traceback'] = traceback.format_list(data['traceback'])
 
     response = desktop.lib.django_util.render("popup_error.mako", request, data)
-    if self.error_code == 500 and data['is_embeddable']: # Hue 4
-      response.status_code = 200
+
+    if self.error_code == 500:
+      if data['is_embeddable']: # Hue 4
+        response.status_code = 200
+      if request.ajax:
+        response.content = data['message'] + (data.get('detail') or '')
     else:
       response.status_code = self.error_code
 

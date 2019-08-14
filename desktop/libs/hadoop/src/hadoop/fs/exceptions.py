@@ -46,7 +46,7 @@ class WebHdfsException(RestException):
     else:
       remote_exception = json_body.get('RemoteException', {})
       exception = remote_exception.get('exception')
-      message = remote_exception.get('message', '')
+      message = remote_exception.get('message', '').split('\n', 1)[0]
 
       if exception:
         self.server_exc = exception
