@@ -53,6 +53,7 @@ class CeleryBeatApi(Api):
           'user': request.user.username,
           'uuid': document.uuid
         },
+        description=request.user.username, # Owner
         task='notebook.tasks.run_sync_query',
         defaults={"args": json.dumps([document.uuid, request.user.username])},
       )
@@ -69,3 +70,23 @@ class CeleryBeatApi(Api):
         name='Scheduled query',
         task='notebook.tasks.run_sync_query',
       )
+
+
+  def list_schedules(self, user):
+    PeriodicTask.objects.filter(description=user.username)
+
+
+  def action(self, schedule_id, schedule_ids=None, action='pause'):
+    if schedule_ids is None:
+      schedule_ids = [schedule_id]
+
+    task = PeriodicTask.objects.get(id__in=schedule_ids, description=user.username)
+
+    if action == 'pause':
+      task.enabled = False
+      task.saved()
+    elif action == 'resume':
+      task.enabled = False
+      task.saved()
+    elif action == 'delete':
+      task.delete()

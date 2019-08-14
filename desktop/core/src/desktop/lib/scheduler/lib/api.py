@@ -39,3 +39,6 @@ class Api(object):
 
   def submit_schedule(self, request, coordinator, mapping):
     pass
+
+  def list_schedules(self):
+    pass
