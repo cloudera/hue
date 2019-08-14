@@ -641,6 +641,16 @@ ko.bindingHandlers.aceEditor = {
       dblClickAdlsItemSub.remove();
     });
 
+    const dblClickAbfsItemSub = huePubSub.subscribe('assist.dblClickAbfsItem', assistHdfsEntry => {
+      if ($el.data('last-active-editor')) {
+        editor.session.insert(editor.getCursorPosition(), 'abfs://' + assistHdfsEntry.path + "'");
+      }
+    });
+
+    disposeFunctions.push(() => {
+      dblClickAbfsItemSub.remove();
+    });
+
     const dblClickGitItemSub = huePubSub.subscribe('assist.dblClickGitItem', assistGitEntry => {
       if ($el.data('last-active-editor')) {
         editor.session.setValue(assistGitEntry.fileContent());
@@ -802,7 +812,12 @@ ko.bindingHandlers.aceEditor = {
       drop: function(e, ui) {
         const position = editor.renderer.screenToTextCoordinates(e.clientX, e.clientY);
         let text = ui.helper.text();
-        if (lastMeta.type === 's3' || lastMeta.type === 'hdfs' || lastMeta.type === 'adls') {
+        if (
+          lastMeta.type === 's3' ||
+          lastMeta.type === 'hdfs' ||
+          lastMeta.type === 'adls' ||
+          lastMeta.type === 'abfs'
+        ) {
           text = "'" + lastMeta.definition.path + "'";
         }
         editor.moveCursorToPosition(position);

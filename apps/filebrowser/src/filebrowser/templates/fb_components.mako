@@ -39,6 +39,12 @@ from aws.conf import get_default_region
               <svg class="hi"><use xlink:href='#hi-adls'></use></svg>
             </span>
           </li>
+        %elif path.lower().find('abfs://') == 0:
+          <li style="padding-top: 12px">
+            <span class="breadcrumb-link homeLink">
+              <svg class="hi"><use xlink:href='#hi-adls'></use></svg>
+            </span>
+          </li>
         %else:
           <li><a class="pointer breadcrumb-link homeLink" data-bind="click: $root.openHome, attr:{'href': window.HUE_BASE_URL + '/filebrowser/view=${ urllib.quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) }?default_to_home'}">
             <i class="fa fa-home"></i> ${_('Home')}</a>

@@ -125,7 +125,10 @@ class AssistPanel {
           if (appConfig.browser && appConfig.browser.interpreter_names) {
             const storageBrowsers = appConfig.browser.interpreter_names.filter(
               interpreter =>
-                interpreter === 'adls' || interpreter === 'hdfs' || interpreter === 's3'
+                interpreter === 'adls' ||
+                interpreter === 'hdfs' ||
+                interpreter === 's3' ||
+                interpreter === 'abfs'
             );
 
             if (storageBrowsers.length) {

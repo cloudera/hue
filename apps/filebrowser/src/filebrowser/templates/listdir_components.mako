@@ -455,20 +455,26 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     <div id="createDirectoryModal" class="modal hide fade">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-        <!-- ko if: !isS3() || (isS3() && !isS3Root()) -->
+        <!-- ko if: (!isS3() && !isABFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) -->
         <h2 class="modal-title">${_('Create Directory')}</h2>
         <!-- /ko -->
         <!-- ko if: isS3() && isS3Root() -->
         <h2 class="modal-title">${_('Create Bucket')}</h2>
         <!-- /ko -->
+        <!-- ko if: isABFS() && isABFSRoot() -->
+        <h2 class="modal-title">${_('Create File System')}</h2>
+        <!-- /ko -->
       </div>
       <div class="modal-body">
         <label>
-          <!-- ko if: !isS3() || (isS3() && !isS3Root()) -->
+          <!-- ko if: (!isS3() && !isABFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()) -->
           ${_('Directory Name')}
           <!-- /ko -->
           <!-- ko if: isS3() && isS3Root() -->
           ${_('Bucket Name')}
+          <!-- /ko -->
+          <!-- ko if: isABFS() && isABFSRoot() -->
+          ${_('File System Name')}
           <!-- /ko -->
           <input id="newDirectoryNameInput" name="name" value="" type="text" class="input-xlarge"/></label>
           <input type="hidden" name="path" data-bind="value: currentPath"/>
@@ -479,6 +485,9 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         </div>
         <div id="directoryNameExistsAlert" class="hide" style="position: absolute; left: 10px;">
           <span class="label label-important"><span class="newName"></span> ${_('already exists.')}</span>
+        </div>
+        <div id="smallFileSystemNameAlert" class="hide" style="position: absolute; left: 10px;">
+          <span class="label label-important"><span class="newName"></span> ${_('File system requires namesize to be 3 or more characters')}</span>
         </div>
         <a class="btn" href="#" data-dismiss="modal">${_('Cancel')}</a>
         <input class="btn btn-primary" type="submit" value="${_('Create')}" />
@@ -560,12 +569,12 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
   <!-- actions context menu -->
   <ul class="context-menu dropdown-menu">
   <!-- ko ifnot: $root.inTrash -->
-    <li data-bind="visible: !isS3() || (isS3() && !isS3Root()), css: {'disabled': $root.selectedFiles().length != 1 || isCurrentDirSelected().length > 0}">
+    <li data-bind="visible: (!isS3() && !isABFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()), css: {'disabled': $root.selectedFiles().length != 1 || isCurrentDirSelected().length > 0}">
     <a href="javascript: void(0)" title="${_('Rename')}" data-bind="click: ($root.selectedFiles().length == 1 && isCurrentDirSelected().length == 0) ? $root.renameFile: void(0)"><i class="fa fa-fw fa-font"></i>
     ${_('Rename')}</a></li>
-    <li data-bind="visible: !isS3() || (isS3() && !isS3Root()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
+    <li data-bind="visible: (!isS3() && !isABFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
     <a href="javascript: void(0)" title="${_('Move')}" data-bind="click: ( $root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.move: void(0)"><i class="fa fa-fw fa-random"></i> ${_('Move')}</a></li>
-    <li data-bind="visible: !isS3() || (isS3() && !isS3Root()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
+    <li data-bind="visible: (!isS3() && !isABFS()) || (isS3() && !isS3Root()) || (isABFS() && !isABFSRoot()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
     <a href="javascript: void(0)" title="${_('Copy')}" data-bind="click: ($root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.copy: void(0)"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a></li>
     % if show_download_button:
     <li data-bind="css: {'disabled': $root.inTrash() || $root.selectedFiles().length != 1 || selectedFile().type != 'file'}">
@@ -1050,6 +1059,10 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       self.isAdls = ko.pureComputed(function () {
         return self.currentPath().toLowerCase().indexOf('adl:/') === 0;
       });
+      
+      self.isABFS = ko.pureComputed(function () {
+        return self.currentPath().toLowerCase().indexOf('abfs://') === 0;
+      });
 
       self.scheme = ko.pureComputed(function () {
         var path = self.currentPath();
@@ -1075,6 +1088,8 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           return 's3a://';
         } else if (path.indexOf('adl:/') >= 0) {
           return 'adl:/';
+        } else if (path.indexOf('abfs://') >= 0) {
+          return 'abfs://';
         } else {
           return '/';
         }
@@ -1093,13 +1108,13 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         return currentPath.indexOf('/') === 0 || currentPath.indexOf('hdfs') === 0
       });
       self.isCompressEnabled = ko.pureComputed(function () {
-        return !self.isS3() && !self.isAdls();
+        return !self.isS3() && !self.isAdls() && !self.isABFS();
       });
       self.isSummaryEnabled = ko.pureComputed(function () {
         return self.isHdfs();
       });
       self.isPermissionEnabled = ko.pureComputed(function () {
-        return !self.isS3();
+        return !self.isS3() && !self.isABFS();
       });
       self.isReplicationEnabled = ko.pureComputed(function () {
         return self.isHdfs();
@@ -1113,6 +1128,10 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
       self.isS3Root = ko.pureComputed(function () {
         return self.isS3() && self.currentPath().toLowerCase() === 's3a://';
+      });
+      
+      self.isABFSRoot = ko.pureComputed(function () {
+        return self.isABFS() && self.currentPath().toLowerCase() === 'abfs://';
       });
 
       self.inTrash = ko.computed(function() {
@@ -1787,6 +1806,12 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           resetPrimaryButtonsStatus(); //globally available
           return false;
         }
+        if ($("#newDirectoryNameInput").val().length < 3 && self.isABFSRoot()) {
+          $("#smallFileSystemNameAlert").show();
+          $("#newDirectoryNameInput").addClass("fieldError");
+          resetPrimaryButtonsStatus(); //globally available
+          return false;
+        }
         $(formElement).ajaxSubmit({
           dataType:  'json',
           success: function() {
@@ -2368,6 +2393,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         $("#newDirectoryNameInput").removeClass("fieldError");
         $("#directoryNameRequiredAlert").hide();
         $("#directoryNameExistsAlert").hide();
+        $("#smallFileSystemNameAlert").hide();
       });
 
       $("#newFileNameInput").focus(function () {
