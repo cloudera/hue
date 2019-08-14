@@ -279,7 +279,9 @@ def cancel_statement(request):
   response = {'status': -1}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
-  snippet = json.loads(request.POST.get('snippet', '{}'))
+  nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['uuid'])
+  notebook = Notebook(document=nb_doc).get_data()
+  snippet = notebook['snippets'][0]
 
   response['result'] = get_api(request, snippet).cancel(notebook, snippet)
   response['status'] = 0
@@ -545,7 +547,9 @@ def close_statement(request):
 
   # Passed by check_document_access_permission but unused by APIs
   notebook = json.loads(request.POST.get('notebook', '{}'))
-  snippet = json.loads(request.POST.get('snippet', '{}'))
+  nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['uuid'])
+  notebook = Notebook(document=nb_doc).get_data()
+  snippet = notebook['snippets'][0]
 
   try:
     response['result'] = get_api(request, snippet).close_statement(notebook, snippet)
