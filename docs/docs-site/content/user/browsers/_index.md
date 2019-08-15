@@ -100,7 +100,7 @@ Hue can be setup to read and write to a configured S3 account, and users get aut
 
 Learn more about it on the [ADLS integration post](http://gethue.com/browsing-adls-data-querying-it-with-sql-and-exporting-the-results-back-in-hue-4-2/).
 
-**Note** ADLS gen2 is currently not supported.
+**Note** ADLS Gen2 is currently now supported. More info will be provided soon.
 
 ### GFS
 
