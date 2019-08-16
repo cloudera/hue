@@ -23,7 +23,7 @@ from django.utils.translation import ugettext_lazy as _, ugettext as _t
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_password_from_script
 #from hadoop.core_site import get_google_access_key, get_google_secret_key, get_google_authorize_code
 
-PERMISSION_ACTION_GOOGLE = "google_access"
+PERMISSION_ACTION_GOOGLECS = "google_access"
 REDIRECT_URI = ""
 
 def get_default_client_id():
@@ -42,12 +42,11 @@ def get_default_secret_key():
   return secret_access_key_script #or get_google_secret_key()
 
 
-def get_default_authorize_code():
+def get_default_session_token():
   """
   Attempt to set AWS secret key from script, else core-site, else None
   """
-  authorize_code_script = GOOGLE_ACCOUNTS['default'].AUTHORIZE_CODE_SCRIPT.get()
-  return authorize_code_script #or get_google_authorize_code()
+  return "" #or get_google_authorize_code()
 
 
 GOOGLE_ACCOUNTS = UnspecifiedConfigSection(
@@ -79,6 +78,12 @@ GOOGLE_ACCOUNTS = UnspecifiedConfigSection(
         private=True,
         type=coerce_password_from_script,
         help=_("Execute this script to produce the AWS secret access key.")
+      ),
+      SECURITY_TOKEN=Config(
+        key='security_token',
+        type=str,
+        private=True,
+        dynamic_default=get_default_session_token
       )
     )
   )
