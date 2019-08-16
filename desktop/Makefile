@@ -42,6 +42,7 @@ include $(ROOT)/Makefile.vars.priv
 APPS := core \
 	libs/aws \
 	libs/azure \
+	libs/googleCS \
 	libs/hadoop \
 	libs/indexer \
 	libs/libanalyze \

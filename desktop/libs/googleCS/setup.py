@@ -18,12 +18,12 @@ from setuptools import setup, find_packages
 from hueversion import VERSION
 
 setup(
-  name='google',
+  name='googleCS',
   version=VERSION,
   url='http://github.com/cloudera/hue',
   description='Google Cloud Storage Libraries',
   packages=find_packages('src'),
   package_dir={'': 'src'},
   install_requires=['setuptools', 'desktop'],
-  entry_points={'desktop.sdk.lib': 'google=google'}
+  entry_points={'desktop.sdk.lib': 'googleCS=googleCS'}
 )

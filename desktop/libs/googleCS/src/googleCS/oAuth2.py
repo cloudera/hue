@@ -19,7 +19,7 @@ from builtins import object
 import logging
 
 from time import time
-from google.conf import GOOGLE_ACCOUNTS, REDIRECT_URI
+from googleCS.conf import GOOGLE_ACCOUNTS, REDIRECT_URI
 from desktop.lib.rest import http_client, resource
 
 LOG = logging.getLogger(__name__)
@@ -62,7 +62,7 @@ class GoogleOAuth2(object):
 
 
   def _refresh_access_token(self):
-    LOG.debug("Authenticating to Google APIs: %s" % self._url)
+    LOG.debug("Refreshing Token for Google APIs: %s" % self._url)
     data = {
       "grant_type" : "refresh_token",
       "refresh_token" : self._refresh_token,

@@ -21,7 +21,7 @@ import logging
 from django.utils.translation import ugettext_lazy as _, ugettext as _t
 
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_password_from_script
-from hadoop.core_site import get_google_access_key, get_google_secret_key, get_goggle_refresh_token, get_google_access_token
+#from hadoop.core_site import get_google_access_key, get_google_secret_key, get_google_authorize_code
 
 PERMISSION_ACTION_GOOGLE = "google_access"
 REDIRECT_URI = ""
@@ -31,7 +31,7 @@ def get_default_client_id():
   Attempt to set AWS access key ID from script, else core-site, else None
   """
   access_key_id_script = GOOGLE_ACCOUNTS['default'].ACCESS_KEY_ID_SCRIPT.get()
-  return access_key_id_script or get_google_access_key()
+  return access_key_id_script #or get_google_access_key()
 
 
 def get_default_secret_key():
@@ -39,7 +39,7 @@ def get_default_secret_key():
   Attempt to set google secret key from script, else core-site, else None
   """
   secret_access_key_script = GOOGLE_ACCOUNTS['default'].SECRET_KEY_SCRIPT.get()
-  return secret_access_key_script or get_google_secret_key()
+  return secret_access_key_script #or get_google_secret_key()
 
 
 def get_default_authorize_code():
@@ -47,8 +47,7 @@ def get_default_authorize_code():
   Attempt to set AWS secret key from script, else core-site, else None
   """
   authorize_code_script = GOOGLE_ACCOUNTS['default'].AUTHORIZE_CODE_SCRIPT.get()
-  return authorize_code_script or get_google_authorize_code()
-
+  return authorize_code_script #or get_google_authorize_code()
 
 
 GOOGLE_ACCOUNTS = UnspecifiedConfigSection(
@@ -58,12 +57,12 @@ GOOGLE_ACCOUNTS = UnspecifiedConfigSection(
     help=_('Information about single Google account'),
     members=dict(
       CLIENT_ID=Config(
-        key='access_key_id',
+        key='client_id',
         type=str,
-        dynamic_default=get_default_access_key_id
+        dynamic_default=get_default_client_id
       ),
       CLIENT_ID_SCRIPT=Config(
-        key='access_key_id_script',
+        key='client_id_script',
         default=None,
         private=True,
         type=coerce_password_from_script,
