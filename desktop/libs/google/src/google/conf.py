@@ -24,6 +24,7 @@ from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, co
 from hadoop.core_site import get_google_access_key, get_google_secret_key, get_goggle_refresh_token, get_google_access_token
 
 PERMISSION_ACTION_GOOGLE = "google_access"
+REDIRECT_URI = ""
 
 def get_default_client_id():
   """
@@ -41,11 +42,13 @@ def get_default_secret_key():
   return secret_access_key_script or get_google_secret_key()
 
 
-def get_default_session_token():
+def get_default_authorize_code():
   """
   Attempt to set AWS secret key from script, else core-site, else None
   """
-  return get_s3a_session_token()
+  authorize_code_script = GOOGLE_ACCOUNTS['default'].AUTHORIZE_CODE_SCRIPT.get()
+  return authorize_code_script or get_google_authorize_code()
+
 
 
 GOOGLE_ACCOUNTS = UnspecifiedConfigSection(
