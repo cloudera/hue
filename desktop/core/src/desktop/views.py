@@ -373,6 +373,8 @@ def ace_sql_location_worker(request):
 def ace_sql_syntax_worker(request):
   return HttpResponse(render('ace_sql_syntax_worker.mako', request, None), content_type="application/javascript")
 
+#Redirect to static resources no need for auth. Fails with 401 with Knox.
+@login_notrequired
 def dynamic_bundle(request, config, bundle_name):
   bundle_name = re.sub(r'-(bundle|chunk).*', '', bundle_name)
   files = get_files(bundle_name, None, config.upper())
