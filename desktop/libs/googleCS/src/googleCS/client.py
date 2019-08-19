@@ -22,6 +22,7 @@ import boto.gs.connection
 
 from googleCS import conf
 from googleCS.oAuth2 import GoogleOAuth2
+from googleCS.gs.gsfs import GSFileSystem
 
 LOG = logging.getLogger(__name__)
 
@@ -43,11 +44,13 @@ def _init_clients():
   CLIENT_CACHE = {}
   CLIENT_CACHE["google"] = {}
   for identifier in list(conf.GOOGLE_ACCOUNTS.keys()):
-    CLIENT_CACHE["google"][identifier] = _make_azure_client(identifier)
+    CLIENT_CACHE["google"][identifier] = _make_google_client(identifier)
 
 def _make_google_client(identifier):
   client_conf = conf.GOOGLE_ACCOUNTS[identifier]
-  return GoogleOAuth2.from_config(client_conf)
+  
+  client = Client(GoogleOAuth2.from_config(client_conf))
+  return GSFileSystem(client)
 
 class Client(object):
   def __init__(self, authentication_provider = None, timeout = None, proxy_address=None, proxy_port=None, proxy_user=None,
