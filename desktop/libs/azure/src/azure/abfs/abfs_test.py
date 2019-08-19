@@ -153,7 +153,7 @@ class ABFSTestBase(unittest.TestCase):
     
     test_string = "This is a test."
     test_len = len(test_string)
-    resp = self.client.append(test_file, test_string) #only works with strings
+    resp = self.client._append(test_file, test_string) #only works with strings
     LOG.debug("%s" %self.client.stats(test_file))
     try:
       LOG.debug("%s" %resp)
@@ -261,7 +261,7 @@ class ABFSTestBase(unittest.TestCase):
     
     test_string = "This is a test."
     test_len = len(test_string)
-    resp = self.client.append(test_file, test_string)
+    resp = self.client._append(test_file, test_string)
     self.client.flush(test_file, {"position" : test_len} )
     
     self.client.copy(test_file, testdir2)

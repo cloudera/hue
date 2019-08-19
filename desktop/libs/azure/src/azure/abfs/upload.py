@@ -88,7 +88,7 @@ class ABFSFileUploadHandler(FileUploadHandler):
     if self._is_abfs_upload():
       try:
         LOG.debug("ABFSFileUploadHandler uploading file part with size: %s" %self._part_size)
-        self._fs.append(self.target_path, raw_data, params = {'position' : int(start)})
+        self._fs._append(self.target_path, raw_data, params = {'position' : int(start)})
         return None
       except Exception as e:
         self._fs.remove(self.target_path)

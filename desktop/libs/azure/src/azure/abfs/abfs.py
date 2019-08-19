@@ -325,7 +325,14 @@ class ABFS(object):
   
   # Alter Files
   # --------------------------------
-  def append(self, path, data, size = 0, offset =0 ,params = None, **kwargs):
+  def append(self,path,data, offset = 0):
+    if len(data) == 0:
+      LOG.warn("There is no data to append to")
+      return
+    self._append(path,data)
+    return self.flush(path, {'position' : int(len(data)) + int(offset)})
+  
+  def _append(self, path, data, size = 0, offset =0 ,params = None, **kwargs):
     """
     Appends the data to a file
     """
@@ -338,11 +345,13 @@ class ABFS(object):
     else:
       params['action'] = 'append'
     headers = {}
-    if size == 0:
+    if size == 0 or size == '0':
       headers['Content-Length'] = str(len(data))
+      if headers['Content-Length'] == '0':
+        return
     else:
       headers['Content-Length'] = str(size)
-    LOG.debug("%s" %headers['Content-Length'])
+    LOG.debug("%s" %headers)
     return self._patching_sl( path, params, data, headers,  **kwargs)
   
   def flush(self, path, params = None, headers = None, **kwargs):
@@ -543,7 +552,7 @@ class ABFS(object):
           offset = 0
           while chunk:
             size = len(chunk)
-            self.append(remote_dst, chunk, size = size, params = {'position' : offset})
+            self._append(remote_dst, chunk, size = size, params = {'position' : offset})
             offset += size
             chunk = src.read(chunk_size)
           self.flush(remote_dst, params = {'position' : offset})
@@ -612,7 +621,7 @@ class ABFS(object):
         length = chunk_size
       else:
         length = chunk
-      self.append(path, data[i*chunk_size:i*chunk_size + length], length)
+      self._append(path, data[i*chunk_size:i*chunk_size + length], length)
     LOG.debug("%s" %data)
     self.flush(path, {'position' : int(size) })
   
