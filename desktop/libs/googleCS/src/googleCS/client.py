@@ -18,10 +18,14 @@ from __future__ import absolute_import
 import logging
 import os
 
+import boto.gs.connection
+
 from googleCS import conf
 from googleCS.oAuth2 import GoogleOAuth2
 
 LOG = logging.getLogger(__name__)
+
+HTTP_SOCKET_TIMEOUT_S = 60
 
 CLIENT_CACHE = None
 
@@ -44,3 +48,68 @@ def _init_clients():
 def _make_google_client(identifier):
   client_conf = conf.GOOGLE_ACCOUNTS[identifier]
   return GoogleOAuth2.from_config(client_conf)
+
+class Client(object):
+  def __init__(self, authentication_provider = None, timeout = None, proxy_address=None, proxy_port=None, proxy_user=None,
+               proxy_pass=None,  is_secure = True, expiration = None):
+    self._authentication_provider = authentication_provider
+    self._timeout = timeout
+    self._host = host
+    self._proxy_address = proxy_address
+    self._proxy_port = proxy_port
+    self._proxy_user = proxy_user
+    self._proxy_pass = proxy_pass
+    self._proxy_address = proxy_address
+    self._is_secure = is_secure
+    self.expiration = expiration
+
+    if not boto.config.has_section('Boto'):
+      boto.config.add_section('Boto')
+
+    if not boto.config.get('Boto', 'http_socket_timeout'):
+      boto.config.set('Boto', 'http_socket_timeout', str(self._timeout))
+      
+  
+  def get_google_connection(self):
+    if self._authentication_provider._token is None:
+      self._authentication_provider.get_token()
+    
+    kwargs = {
+      'gs_access_key_id': self._authentication_provider._access_key_id,
+      'gs_secret_access_key': self._authentication_provider._secret_access_key,
+      'security_token': self._authentication_provider._token,
+      'is_secure': self._is_secure,
+    }
+      
+    # Add proxy if configured
+    if self._proxy_address is not None:
+      kwargs.update({'proxy': self._proxy_address})
+      if self._proxy_port is not None:
+        kwargs.update({'proxy_port': self._proxy_port})
+      if self._proxy_user is not None:
+        kwargs.update({'proxy_user': self._proxy_user})
+      if self._proxy_pass is not None:
+        kwargs.update({'proxy_pass': self._proxy_pass})
+      
+    # Attempt to create S3 connection based on configured credentials and host or region first, then fallback to IAM
+    try:
+      if self._host is not None:
+        # Use V4 signature support by default
+        kwargs.update({'host': self._host})
+        connection = boto.gs.connection.GSConnection(**kwargs)
+      else:
+        kwargs.update({'host': 'storage.googleapis.com'})
+        connection = boto.gs.connection.GSConnection(**kwargs)
+    except Exception as e:
+      LOG.exception(e)
+      raise e
+
+    if connection is None:
+      # If no connection, attemt to fallback to IAM instance metadata
+      connection = boto.connect_gs()
+
+      if connection is None:
+        raise RuntimeError
+
+    return connection
+    

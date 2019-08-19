@@ -49,7 +49,7 @@ class GoogleOAuth2(object):
     if is_token_expired:
       LOG.debug("Authenticating to Google APIs: %s" % self._url)
       data = {
-        "grant_type" : "client_credentials",
+        "grant_type" : "client_credentials", #temproary until actual autehntication
         "client_id" : self._access_key_id,
         "client_secret" : self._secret_access_key
       }
