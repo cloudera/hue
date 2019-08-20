@@ -1700,10 +1700,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
-          ##<li class="nav-header">${ _('Duration') }</li>
-          ##<li><span data-bind="text: duration().toHHMMSS()"></span></li>
-          ##<li class="nav-header">${ _('Submitted') }</li>
-          ##<li><span data-bind="moment: {data: submitted, format: 'LLL'}"></span></li>
+          <li class="nav-header">${ _('Duration') }</li>
+          <li><span data-bind="text: duration().toHHMMSS()"></span></li>
+          <li class="nav-header">${ _('Submitted') }</li>
+          <li><span data-bind="moment: {data: submitted, format: 'LLL'}"></span></li>
         </ul>
       </div>
     </div>
@@ -1712,8 +1712,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <ul class="nav nav-pills margin-top-20">
         <li>
           <a href="#livy-session-page-statements${ SUFFIX }" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#livy-session-page-statements${ SUFFIX }\']').tab('show'); }">
-            ${ _('Properties') }</a>
+            ${ _('Properties') }
+          </a>
         </li>
+        <li class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></li>
       </ul>
 
       <div class="clearfix"></div>
@@ -2535,7 +2537,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.rerunModalContent = ko.observable('');
 
       self.hasKill = ko.pureComputed(function() {
-        return self.type() && (['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle', 'QUERY', 'TEZ', 'YarnV2', 'DDL'].indexOf(self.type()) != -1 || self.type().indexOf('Data Warehouse') != -1 || self.type().indexOf('Altus') != -1);
+        return self.type() && (
+          ['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle', 'QUERY', 'TEZ', 'YarnV2', 'DDL', 'celery-beat'].indexOf(self.type()) != -1 ||
+          self.type().indexOf('Data Warehouse') != -1 ||
+          self.type().indexOf('Altus') != -1
+        );
       });
       self.killEnabled = ko.pureComputed(function() {
         // Impala can kill queries that are finished, but not yet terminated
@@ -2543,7 +2549,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.hasResume = ko.pureComputed(function() {
-        return ['workflow', 'schedule', 'bundle'].indexOf(self.type()) != -1;
+        return ['workflow', 'schedule', 'bundle', 'celery-beat'].indexOf(self.type()) != -1;
       });
       self.resumeEnabled = ko.pureComputed(function() {
         return self.hasResume() && self.canWrite() && self.apiStatus() == 'PAUSED';
@@ -2557,7 +2563,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.hasPause = ko.pureComputed(function() {
-        return ['workflow', 'schedule', 'bundle'].indexOf(self.type()) != -1;
+        return ['workflow', 'schedule', 'bundle', 'celery-beat'].indexOf(self.type()) != -1;
       });
       self.pauseEnabled = ko.pureComputed(function() {
         return self.hasPause() && self.canWrite() && self.apiStatus() == 'RUNNING';
@@ -2619,6 +2625,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
         else if (/oozie-\w+-B/.test(self.id())) {
           interface = 'bundles';
+        }
+        else if (/celery-beat-\w+/.test(self.id())) {
+          interface = 'celery-beat';
         }
         else if (/altus:dataeng/.test(self.id()) && /:job:/.test(self.id())) {
           interface = 'dataeng-jobs';
@@ -3013,7 +3022,18 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.selectedJobs = ko.observableArray();
 
       self.hasKill = ko.pureComputed(function() {
-        return ['jobs', 'workflows', 'schedules', 'bundles', 'queries', 'dataeng-jobs', 'dataeng-clusters', 'dataware-clusters', 'dataware2-clusters'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
+        return [
+          'jobs',
+          'workflows',
+          'schedules',
+          'bundles',
+          'queries',
+          'dataeng-jobs',
+          'dataeng-clusters',
+          'dataware-clusters',
+          'dataware2-clusters',
+          'celery-beat'
+        ].indexOf(vm.interface()) != -1 && !self.isCoordinator();
       });
       self.killEnabled = ko.pureComputed(function() {
         return self.hasKill() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -3022,7 +3042,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.hasResume = ko.pureComputed(function() {
-        return ['workflows', 'schedules', 'bundles', 'dataware2-clusters'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
+        return ['workflows', 'schedules', 'bundles', 'dataware2-clusters', 'celery-beat'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
       });
       self.resumeEnabled = ko.pureComputed(function() {
         return self.hasResume() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -3040,7 +3060,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.hasPause = ko.pureComputed(function() {
-        return ['workflows', 'schedules', 'bundles', 'dataware2-clusters'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
+        return ['workflows', 'schedules', 'bundles', 'dataware2-clusters', 'celery-beat'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
       });
       self.pauseEnabled = ko.pureComputed(function() {
         return self.hasPause() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
