@@ -977,7 +977,7 @@ class Node(object):
 #             'archives': [],
 #             'capture_output': True
 #             #       <ok to="${ node_mapping[node['children'][0]['to']].name }"/>
-# 
+#
 #             #  Node(dict(AltusAction().get_fields()))
 #           }
 #         }
@@ -3527,12 +3527,12 @@ class Coordinator(Job):
     if self.data['properties']['document']:
       document = Document2.objects.get_by_uuid(user=self.document.owner, uuid=self.data['properties']['document'])
       wf_doc = WorkflowBuilder().create_workflow(document=document, user=self.document.owner, managed=True)
-      wf = Workflow(data=wf_doc.data,user=self.document.owner)
+      wf = Workflow(data=wf_doc.data, user=self.document.owner)
       wf_doc.delete()
       return wf
     else:
       wf_doc = Document2.objects.get_by_uuid(user=self.document.owner, uuid=self.data['properties']['workflow'])
-      return Workflow(document=wf_doc,user=self.document.owner)
+      return Workflow(document=wf_doc, user=self.document.owner)
 
   def get_absolute_url(self):
     return reverse('oozie:edit_coordinator') + '?coordinator=%s' % self.id

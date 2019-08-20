@@ -38,6 +38,16 @@ class CeleryBeatApi(Api):
     # Assumes SQL queries currently
     document = Document2.objects.get(uuid=coordinator.get_data_for_json()['properties']['document'])
 
+    schedule_properties = {
+        'name': 'Scheduled document %(user)s %(uuid)s' % {
+        'user': request.user.username,
+        'uuid': document.uuid
+        },
+        'description': request.user.username, # Owner
+        'task': 'notebook.tasks.run_sync_query',
+        'defaults': {"args": json.dumps([document.uuid, request.user.username])},
+    }
+
     if is_cron:
       schedule, created = CrontabSchedule.objects.get_or_create(
           minute='*',
@@ -46,34 +56,47 @@ class CeleryBeatApi(Api):
           day_of_month='*',
           month_of_year='*'
       )
-
-      task = PeriodicTask.objects.update_or_create(
-        crontab=schedule,
-        name='Scheduled document %(user)s %(uuid)s' % {
-          'user': request.user.username,
-          'uuid': document.uuid
-        },
-        description=request.user.username, # Owner
-        task='notebook.tasks.run_sync_query',
-        defaults={"args": json.dumps([document.uuid, request.user.username])},
-      )
-      task.enabled=True
-      task.save()
+      schedule_properties['crontab'] = schedule
     else:
       schedule, created = IntervalSchedule.objects.get_or_create(
         every=15,
         period=IntervalSchedule.SECONDS,
       )
+      schedule_properties['interval'] = schedule
 
-      task, created = PeriodicTask.objects.update_or_create(
-        interval=schedule,
-        name='Scheduled query',
-        task='notebook.tasks.run_sync_query',
-      )
+    task = PeriodicTask.objects.update_or_create(**schedule_properties)
+    task.enabled=True
+    task.save()
+
+    return task
 
 
   def list_tasks(self, user):
-    PeriodicTask.objects.filter(description=user.username)
+    return [{
+        'id': task.id,
+        'name': task.name,
+        'description': task.description,
+        'task_name': task.name,
+        'task_id': task.id,
+        'args': task.args,
+        'kwargs': task.kwargs,
+        'queue': task.queue,
+        'exchange': task.exchange,
+        'routing_key': task.routing_key,
+        'priority': task.priority,
+        'expires': task.expires,
+        'one_off': task.one_off,
+        'start_time': task.start_time,
+        'enabled': task.enabled,
+        'last_run_at': task.last_run_at,
+        'total_run_count': task.total_run_count,
+        'date_changed': task.date_changed,
+        'interval_name': task.interval,
+        'crontab': task.crontab,
+        'solar': task.solar
+      }
+      for task in PeriodicTask.objects.filter(description=user.username)
+    ]
 
 
   def action(self, schedule_id, schedule_ids=None, action='pause'):
