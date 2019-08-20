@@ -76,6 +76,6 @@ export const getMowBaseUrl = () => {
     case Environment.STAGE:
       return 'https://cloudera.cdp.mow-stage.cloudera.com';
     case Environment.PROD:
-      return window.APP_SWITCHER_MOW_BASE_URL || '';
+      return window.APP_SWITCHER_MOW_BASE_URL || 'https://cloudera.us-west-1.cdp.cloudera.com';
   }
 };
