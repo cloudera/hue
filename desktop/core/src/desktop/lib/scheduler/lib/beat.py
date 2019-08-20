@@ -93,7 +93,7 @@ class CeleryBeatApi(Api):
     elif action == 'resume':
       task.enabled = False
       task.saved()
-    elif action == 'delete':
+    elif action == 'kill':
       task.delete()
 
 
