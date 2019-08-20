@@ -394,8 +394,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                   <div class="jb-panel" data-bind="template: { name: 'queries-page${ SUFFIX }' }"></div>
                 <!-- /ko -->
 
-                <!-- ko if: mainType() == 'beats' -->
-                  <div class="jb-panel" data-bind="template: { name: 'beats-page${ SUFFIX }' }"></div>
+                <!-- ko if: mainType() == 'celery-beat' -->
+                  <div class="jb-panel" data-bind="template: { name: 'celery-beat-page${ SUFFIX }' }"></div>
                 <!-- /ko -->
 
                 <!-- ko if: mainType() == 'workflows' -->
@@ -1670,7 +1670,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 
 
-<script type="text/html" id="beats-page${ SUFFIX }">
+<script type="text/html" id="celery-beat-page${ SUFFIX }">
   <div class="row-fluid">
     <div data-bind="css: {'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
@@ -1700,10 +1700,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
-          <li class="nav-header">${ _('Duration') }</li>
-          <li><span data-bind="text: duration().toHHMMSS()"></span></li>
-          <li class="nav-header">${ _('Submitted') }</li>
-          <li><span data-bind="moment: {data: submitted, format: 'LLL'}"></span></li>
+          ##<li class="nav-header">${ _('Duration') }</li>
+          ##<li><span data-bind="text: duration().toHHMMSS()"></span></li>
+          ##<li class="nav-header">${ _('Submitted') }</li>
+          ##<li><span data-bind="moment: {data: submitted, format: 'LLL'}"></span></li>
         </ul>
       </div>
     </div>
@@ -3389,7 +3389,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           {'interface': 'dataware2-clusters', 'label': '${ _ko('Warehouses') }', 'condition': dataWarehouse2InterfaceCondition},
           {'interface': 'engines', 'label': '${ _ko('') }', 'condition': enginesInterfaceCondition},
           {'interface': 'queries', 'label': '${ _ko('Queries') }', 'condition': queryInterfaceCondition},
-          {'interface': 'celery-beat', 'label': '${ _ko('Beat Schedules') }', 'condition': schedulerBeatInterfaceCondition},
+          {'interface': 'celery-beat', 'label': '${ _ko('Scheduled Tasks') }', 'condition': schedulerBeatInterfaceCondition},
           {'interface': 'workflows', 'label': '${ _ko('Workflows') }', 'condition': schedulerInterfaceCondition},
           {'interface': 'schedules', 'label': '${ _ko('Schedules') }', 'condition': schedulerInterfaceCondition},
           {'interface': 'bundles', 'label': '${ _ko('Bundles') }', 'condition': schedulerExtraInterfaceCondition},
@@ -3578,7 +3578,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           case 'oozie-info':
           case 'jobs':
           case 'queries':
-          case 'beats':
+          case 'celery-beat':
           case 'workflows':
           case 'schedules':
           case 'bundles':
