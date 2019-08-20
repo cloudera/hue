@@ -48,6 +48,7 @@ def get_schedule(request):
 #@check_document_access_permission()
 def submit_schedule(request, doc_id):
   interface = request.GET.get('interface', request.POST.get('interface', 'beat'))
+
   if doc_id.isdigit():
     coordinator = Coordinator(document=Document2.objects.get(id=doc_id))
   else:
@@ -75,7 +76,7 @@ def submit_schedule(request, doc_id):
     else:
       request.error(_('Invalid submission form: %s') % params_form.errors)
   else:
-    parameters = coordinator.find_all_parameters()
+    parameters = coordinator.find_all_parameters() if interface == 'oozie' else []
     initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
     params_form = ParametersFormSet(initial=initial_params)
 
