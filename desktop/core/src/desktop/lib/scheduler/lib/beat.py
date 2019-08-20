@@ -72,7 +72,33 @@ class CeleryBeatApi(Api):
 
 
   def list_tasks(self, user):
-    return [{
+    return [
+      self._get_task(task)
+      for task in PeriodicTask.objects.filter(description=user.username)
+    ]
+
+  def list_task(self, task_id):
+    return self._get_task(PeriodicTask.objects.get(id=task_id))
+
+
+  def action(self, schedule_id, schedule_ids=None, action='pause'):
+    if schedule_ids is None:
+      schedule_ids = [schedule_id]
+
+    task = PeriodicTask.objects.get(id__in=schedule_ids, description=user.username)
+
+    if action == 'pause':
+      task.enabled = False
+      task.saved()
+    elif action == 'resume':
+      task.enabled = False
+      task.saved()
+    elif action == 'delete':
+      task.delete()
+
+
+  def _get_task(self, task):
+    return {
         'id': task.id,
         'name': task.name,
         'description': task.description,
@@ -95,21 +121,3 @@ class CeleryBeatApi(Api):
         'crontab': task.crontab,
         'solar': task.solar
       }
-      for task in PeriodicTask.objects.filter(description=user.username)
-    ]
-
-
-  def action(self, schedule_id, schedule_ids=None, action='pause'):
-    if schedule_ids is None:
-      schedule_ids = [schedule_id]
-
-    task = PeriodicTask.objects.get(id__in=schedule_ids, description=user.username)
-
-    if action == 'pause':
-      task.enabled = False
-      task.saved()
-    elif action == 'resume':
-      task.enabled = False
-      task.saved()
-    elif action == 'delete':
-      task.delete()
