@@ -69,7 +69,8 @@ def submit_schedule(request, doc_id):
         message = force_unicode(str(e))
         return JsonResponse({'status': -1, 'message': message}, safe=False)
       if jsonify:
-        return JsonResponse({'status': 0, 'job_id': job_id, 'type': 'schedule'}, safe=False)
+        schedule_type = 'celery-beat' if interface == 'beat' else 'schedule'
+        return JsonResponse({'status': 0, 'job_id': job_id, 'type': schedule_type}, safe=False)
       else:
         request.info(_('Schedule submitted.'))
         return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
