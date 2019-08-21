@@ -45,7 +45,7 @@ from useradmin.models import User
 
 from notebook.api import _get_statement
 from notebook.connectors.base import get_api, QueryExpired, ExecutionWrapper
-from notebook.models import make_notebook, MockedDjangoRequest
+from notebook.models import make_notebook, MockedDjangoRequest, Notebook
 from notebook.sql_utils import get_current_statement
 
 if sys.version_info[0] > 2:
@@ -152,9 +152,10 @@ def run_sync_query(doc_id, user):
   # Add variable substitution
   # Send notifications: done/on failure
   if type(user) is str:
-    user = User.objects.get(username=user)
+    lookup = {'email' if ENABLE_ORGANIZATIONS.get() else 'username': user}
+    user = User.objects.get(**lookup)
 
-  query_document = Document2.objects.document(user=user, doc_id=doc_id)
+  query_document = Document2.objects.get_by_uuid(user=user, uuid=doc_id)
   notebook = Notebook(document=query_document).get_data()
   snippet = notebook['snippets'][0]
 

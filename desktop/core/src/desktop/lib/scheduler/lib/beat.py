@@ -33,7 +33,8 @@ class CeleryBeatApi(Api):
     mapping
       {u'oozie.use.system.libpath': u'True', 'dryrun': False, u'start_date': u'2019-08-10T17:02', u'end_date': u'2019-08-17T17:02'}
     '''
-    is_cron = True # IntervalSchedule is buggy https://github.com/celery/django-celery-beat/issues/279
+    # IntervalSchedule is buggy https://github.com/celery/django-celery-beat/issues/279
+    is_cron = True
 
     # Assumes SQL queries currently
     document = Document2.objects.get(uuid=coordinator.get_data_for_json()['properties']['document'])
