@@ -106,8 +106,14 @@ class Notebook(object):
     return _data
 
   def get_str(self, from_oozie_action=False):
-    return '\n\n\n'.join(['USE %s;\n\n%s' % (snippet['database'], snippet['statement_raw'] if from_oozie_action else Notebook.statement_with_variables(snippet))
-                          for snippet in self.get_data()['snippets']])
+    return '\n\n\n'.join([
+        'USE %s;\n\n%s' % (
+          snippet['database'],
+          snippet['statement_raw'] if from_oozie_action else Notebook.statement_with_variables(snippet)
+        )
+        for snippet in self.get_data()['snippets']
+      ]
+    )
 
   @staticmethod
   def statement_with_variables(snippet):
