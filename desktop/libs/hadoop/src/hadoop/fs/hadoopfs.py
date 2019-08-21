@@ -22,13 +22,19 @@ Only some utils and Hdfs are still used.
 
 Interfaces for Hadoop filesystem access via the HADOOP-4707 Thrift APIs.
 """
+from __future__ import division
+from past.builtins import cmp
+from future import standard_library
+standard_library.install_aliases()
+from past.utils import old_div
+from builtins import object
 import errno
 import logging
 import os
 import posixpath
 import random
 import subprocess
-import urlparse
+import sys
 
 from django.utils.encoding import smart_str, force_unicode
 from django.utils.translation import ugettext as _
@@ -39,6 +45,10 @@ import hadoop.conf
 from hadoop.fs import normpath, SEEK_SET, SEEK_CUR, SEEK_END
 from hadoop.fs.exceptions import PermissionDeniedException
 
+if sys.version_info[0] > 2:
+  from urllib.parse import urlsplit as lib_urlsplit
+else:
+  from urlparse import urlsplit as lib_urlsplit
 
 LOG = logging.getLogger(__name__)
 
@@ -78,7 +88,7 @@ def _coerce_exceptions(function):
   def wrapper(*args, **kwargs):
     try:
       return function(*args, **kwargs)
-    except Exception, e:
+    except Exception as e:
       e.msg = force_unicode(e.msg, errors='replace')
       e.stack = force_unicode(e.stack, errors='replace')
       LOG.exception("Exception in Hadoop FS call " + function.__name__)
@@ -139,7 +149,7 @@ class Hdfs(object):
     schema = url[:i]
     if schema not in ('hdfs', 'viewfs'):
       # Default to standard for non-hdfs
-      return urlparse.urlsplit(url)
+      return lib_urlsplit(url)
     url = url[i+3:]
     i = url.find('/')
     if i == -1:
@@ -184,7 +194,7 @@ class Hdfs(object):
       finally:
         self.setuser(user)
 
-  def copyFromLocal(self, local_src, remote_dst, mode=0755):
+  def copyFromLocal(self, local_src, remote_dst, mode=0o755):
     remote_dst = remote_dst.endswith(posixpath.sep) and remote_dst[:-1] or remote_dst
     local_src = local_src.endswith(posixpath.sep) and local_src[:-1] or local_src
 
@@ -194,7 +204,7 @@ class Hdfs(object):
       (basename, filename) = os.path.split(local_src)
       self._copy_file(local_src, self.isdir(remote_dst) and self.join(remote_dst, filename) or remote_dst)
 
-  def _copy_dir(self, local_dir, remote_dir, mode=0755):
+  def _copy_dir(self, local_dir, remote_dir, mode=0o755):
     self.mkdir(remote_dir, mode=mode)
 
     for f in os.listdir(local_dir):
@@ -217,7 +227,7 @@ class Hdfs(object):
       src = file(local_src)
       try:
         try:
-          self.create(remote_dst, permission=0755)
+          self.create(remote_dst, permission=0o755)
           chunk = src.read(chunk_size)
           while chunk:
             self.append(remote_dst, chunk)
@@ -435,7 +445,7 @@ class FileUpload(object):
 
     self.subprocess_env = i18n.make_utf8_env()
 
-    if self.subprocess_env.has_key('HADOOP_CLASSPATH'):
+    if 'HADOOP_CLASSPATH' in self.subprocess_env:
       self.subprocess_env['HADOOP_CLASSPATH'] += ':' + hadoop.conf.HADOOP_EXTRA_CLASSPATH_STRING.get()
     else:
       self.subprocess_env['HADOOP_CLASSPATH'] = hadoop.conf.HADOOP_EXTRA_CLASSPATH_STRING.get()
@@ -460,7 +470,7 @@ class FileUpload(object):
   def close(self):
     try:
       (stdout, stderr) = self.putter.communicate()
-    except IOError, ioe:
+    except IOError as ioe:
       logging.debug("Saw IOError writing %r" % self.path, exc_info=1)
       if ioe.errno == errno.EPIPE:
         stdout, stderr = self.putter.communicate()
@@ -509,7 +519,7 @@ class BlockCache(object):
     if _max_idx < _min_idx:
       return None
 
-    pivot_idx = (_max_idx + _min_idx) / 2
+    pivot_idx = old_div((_max_idx + _min_idx), 2)
     pivot_block = self.blocks[pivot_idx]
     if pos < pivot_block.startOffset:
       return self.find_block(pos, _min_idx, pivot_idx - 1)
@@ -536,7 +546,7 @@ class BlockCache(object):
       blocks_dict[nb.blockId] = nb
 
     # Convert back to sorted list
-    block_list = blocks_dict.values()
+    block_list = list(blocks_dict.values())
     block_list.sort(cmp=lambda a,b: cmp(a.startOffset, b.startOffset))
 
     # Update cache with new data

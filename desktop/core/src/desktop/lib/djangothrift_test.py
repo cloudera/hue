@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Tests for ThriftField.
 # Some parts based on http://www.djangosnippets.org/snippets/1044/
 # Licensed to Cloudera, Inc. under one
@@ -16,23 +17,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import os
 import sys
 sys.path.insert(1, os.path.join(os.path.dirname(__file__), "gen-py"))
 from djangothrift_test_gen.ttypes import TestStruct
 import unittest
 
-from django_test_util import configure_django_for_test, create_tables
+from desktop.lib.django_test_util import configure_django_for_test, create_tables
 
 configure_django_for_test()
 
 from django.db import models
-from djangothrift import ThriftField
+from desktop.lib.djangothrift import ThriftField
 
 from desktop.lib import django_util
 
 class ThriftTestModel(models.Model):
-  class Meta:
+  class Meta(object):
     app_label = "TEST_THRIFT_APP"
 
   my_int = models.IntegerField()

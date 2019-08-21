@@ -39,7 +39,7 @@ class Migration(SchemaMigration):
 
                 Document.objects.filter(id__in=docs).delete()
             db.commit_transaction()
-        except Exception, e:
+        except Exception as e:
             db.rollback_transaction()
             raise e
 
@@ -48,7 +48,7 @@ class Migration(SchemaMigration):
             # Adding unique constraint on 'Document', fields ['content_type', 'object_id']
             db.create_unique(u'desktop_document', ['content_type_id', 'object_id'])
             db.commit_transaction()
-        except Exception, e:
+        except Exception as e:
             db.rollback_transaction()
             raise e
 

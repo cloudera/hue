@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import json
 import re
 
@@ -28,7 +29,7 @@ from desktop.lib.test_utils import grant_access
 from desktop.models import Document2
 
 
-class TestApi2():
+class TestApi2(object):
 
   def setUp(self):
     self.client = make_logged_in_client(username="api2_user", groupname="default", recreate=True, is_superuser=False)

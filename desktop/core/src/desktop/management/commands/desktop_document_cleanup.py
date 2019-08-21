@@ -53,7 +53,7 @@ class Command(BaseCommand):
                     default=30),
         )
 
-    except AttributeError, e:
+    except AttributeError as e:
         baseoption_test = 'BaseCommand' in str(e) and 'option_list' in str(e)
         if baseoption_test:
             def add_arguments(self, parser):
@@ -88,7 +88,7 @@ class Command(BaseCommand):
             try:
                 objClass.objects.filter(pk__in=list(deleteObjects)).delete()
                 errorCount = 0
-            except DatabaseError, e:
+            except DatabaseError as e:
                 LOG.info("Non Fatal Exception: %s: %s" % (e.__class__.__name__, e))
                 errorCount += 1
                 if errorCount > 9 and deleteRecords == 1:

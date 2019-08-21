@@ -15,12 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
 import errno
 import logging
 import os.path
 
-import conf
-import confparse
+from hadoop import conf
+from hadoop import confparse
 
 
 _SSL_SITE_PATH = None                  # Path to ssl-client.xml
@@ -53,7 +54,7 @@ def _parse_ssl_client_site():
       break
     except KeyError:
       data = ""
-    except IOError, err:
+    except IOError as err:
       if err.errno != errno.ENOENT:
         LOG.error('Cannot read from "%s": %s' % (_SSL_SITE_PATH, err))
         return

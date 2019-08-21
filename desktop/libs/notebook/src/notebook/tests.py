@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import json
 
 from collections import OrderedDict
@@ -322,7 +323,7 @@ class MockedApi(Api):
     return {'destination': target_file}
 
 
-class MockFs():
+class MockFs(object):
   def __init__(self, logical_name=None):
 
     self.fs_defaultfs = 'hdfs://curacao:8020'
@@ -332,11 +333,11 @@ class MockFs():
     self._filebrowser_action = ''
 
   def setuser(self, user):
-    self.user = user
+    self._user = user
 
   @property
   def user(self):
-    return self.user
+    return self._user
 
   def do_as_user(self, username, fn, *args, **kwargs):
     return ''
@@ -349,6 +350,10 @@ class MockFs():
 
   def filebrowser_action(self):
     return self._filebrowser_action
+
+  @user.setter
+  def user(self, value):
+    self._user = value
 
 
 class TestNotebookApiMocked(object):
@@ -514,17 +519,17 @@ def test_get_interpreters_to_show():
 
     interpreters_shown_on_wheel_unset = get_ordered_interpreters()
     assert_equal(
-      default_interpreters.values(),
+      list(default_interpreters.values()),
       interpreters_shown_on_wheel_unset,
       'get_interpreters_to_show should return the same as get_interpreters when interpreters_shown_on_wheel is unset. expected: %s, actual: %s' % (
-          default_interpreters.values(), interpreters_shown_on_wheel_unset
+          list(default_interpreters.values()), interpreters_shown_on_wheel_unset
       )
     )
 
     resets.append(INTERPRETERS_SHOWN_ON_WHEEL.set_for_testing('java,pig'))
-    assert_equal(expected_interpreters.values(), get_ordered_interpreters(),
+    assert_equal(list(expected_interpreters.values()), get_ordered_interpreters(),
                  'get_interpreters_to_show did not return interpreters in the correct order expected: %s, actual: %s'
-                 % (expected_interpreters.values(), get_ordered_interpreters()))
+                 % (list(expected_interpreters.values()), get_ordered_interpreters()))
   finally:
     for reset in resets:
       reset()
@@ -533,7 +538,7 @@ def test_get_interpreters_to_show():
     appmanager.load_apps(APP_BLACKLIST.get())
 
 
-class TestAnalytics():
+class TestAnalytics(object):
 
   def setUp(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)

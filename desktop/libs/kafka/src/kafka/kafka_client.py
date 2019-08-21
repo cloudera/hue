@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 import json
 
@@ -63,7 +64,7 @@ class KafkaApi(object):
     try:
       response = self._root.get('topics')
       return json.loads(response)
-    except RestException, e:
+    except RestException as e:
       raise KafkaApiException(e)
 
 
@@ -78,5 +79,5 @@ class KafkaApi(object):
            'partitions': partitions,
            'replication_factor': replication_factor
       })
-    except RestException, e:
+    except RestException as e:
       raise KafkaApiException(e)

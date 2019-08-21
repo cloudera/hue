@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 
 from nose.tools import assert_equal, assert_true
@@ -27,7 +28,7 @@ from liboozie.credentials import Credentials
 LOG = logging.getLogger(__name__)
 
 
-class TestCredentials():
+class TestCredentials(object):
   CREDENTIALS = {
     "hcat": "org.apache.oozie.action.hadoop.HCatCredentials",
     "hive2": "org.apache.oozie.action.hadoop.Hive2Credentials",

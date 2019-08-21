@@ -25,6 +25,7 @@ which is triggered by a magic prefix ("HDFS") in the field name.
 See http://docs.djangoproject.com/en/1.2/topics/http/file-uploads/
 """
 
+from builtins import object
 import errno
 import logging
 import time
@@ -74,7 +75,7 @@ class HDFStemporaryUploadedFile(object):
     # Check access permissions before attempting upload
     try:
       self._fs.check_access(destination, 'rw-')
-    except WebHdfsException, e:
+    except WebHdfsException as e:
       LOG.exception(e)
       raise HDFSerror(_('User %s does not have permissions to write to path "%s".') % (request.user.username, destination))
 
@@ -97,7 +98,7 @@ class HDFStemporaryUploadedFile(object):
     try:
       self.size = size
       self.close()
-    except Exception, ex:
+    except Exception as ex:
       LOG.exception('Error uploading file to %s' % (self._path,))
       raise
 
@@ -105,7 +106,7 @@ class HDFStemporaryUploadedFile(object):
     try:
       self._fs.remove(self._path, True)
       self._do_cleanup = False
-    except IOError, ex:
+    except IOError as ex:
       if ex.errno != errno.ENOENT:
         LOG.exception('Failed to remove temporary upload file "%s". '
                       'Please cleanup manually: %s' % (self._path, ex))
@@ -159,7 +160,7 @@ class HDFSfileUploadHandler(FileUploadHandler):
         LOG.debug('Upload attempt to %s' % (self._file.get_temp_path(),))
         self._activated = True
         self._starttime = time.time()
-      except Exception, ex:
+      except Exception as ex:
         LOG.error("Not using HDFS upload handler: %s" % (ex,))
         self.request.META['upload_failed'] = ex
 

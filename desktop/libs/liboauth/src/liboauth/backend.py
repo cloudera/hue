@@ -18,11 +18,13 @@
 See desktop/auth/backend.py
 """
 
+from future import standard_library
+standard_library.install_aliases()
 import httplib2
 import json
-import urllib
 import cgi
 import logging
+import sys
 
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
@@ -39,6 +41,11 @@ try:
 except:
   oauth = None
 
+if sys.version_info[0] > 2:
+  import urllib.request, urllib.parse, urllib.error
+  from urllib.parse import urlencode as lib_urlencode
+else:
+  from urllib import urlencode as lib_urlencode
 
 LOG = logging.getLogger(__name__)
 
@@ -142,7 +149,7 @@ class OAuthBackend(DesktopBackendBase):
             access_token_uri=liboauth.conf.ACCESS_TOKEN_URL_LINKEDIN.get()
             authentication_token_uri=liboauth.conf.AUTHORIZE_URL_LINKEDIN.get()
         
-        params = urllib.urlencode({
+        params = lib_urlencode({
            'code':code,
            'redirect_uri':redirect_uri,
            'client_id': consumer_key,
@@ -254,7 +261,7 @@ class OAuthBackend(DesktopBackendBase):
 
        consumer = oauth.Consumer(consumer_key, consumer_secret)
        client = oauth.Client(consumer)
-       resp, content = client.request(token_request_uri, "POST", body=urllib.urlencode({'oauth_callback': redirect_uri}))
+       resp, content = client.request(token_request_uri, "POST", body=lib_urlencode({'oauth_callback': redirect_uri}))
        if resp['status'] != '200':
            raise Exception(_("Invalid response from OAuth provider: %s") % resp)
        request.session['request_token'] = dict(cgi.parse_qsl(content))
@@ -267,7 +274,7 @@ class OAuthBackend(DesktopBackendBase):
 def map_username(username):
     username_map = liboauth.conf.USERNAME_MAP.get()
     if username_map:
-        for key, value in username_map.iteritems():
+        for key, value in username_map.items():
             username = username.replace(key, value)
     return ''.join([x for x in username if x.isalnum()])
 

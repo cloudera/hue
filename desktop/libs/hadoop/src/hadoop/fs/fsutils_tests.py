@@ -43,7 +43,7 @@ class FsUtilsTests(unittest.TestCase):
   def tearDown(self):
     try:
       self.cluster.fs.purge_trash()
-    except Exception, e:
+    except Exception as e:
       LOG.error('Could not clean up trash: %s', e)
 
   def test_remove_header(self):

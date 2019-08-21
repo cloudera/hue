@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import print_function
+from builtins import object
 import logging
 
 from django.contrib.auth.models import User
@@ -75,7 +77,7 @@ def test_copy_files():
     cluster.fs.create(deployment_dir + '/' + jar_5)
     cluster.fs.create(deployment_dir + '/' + jar_6)
 
-    class MockJob():
+    class MockJob(object):
       XML_FILE_NAME = 'workflow.xml'
 
       def __init__(self):
@@ -116,7 +118,7 @@ def test_copy_files():
       assert_true(jar_2 in submission.properties['oozie.libpath'])
       assert_true(jar_3 in submission.properties['oozie.libpath'])
       assert_true(jar_4 in submission.properties['oozie.libpath'])
-      print deployment_dir + '/' + jar_5
+      print(deployment_dir + '/' + jar_5)
       assert_true((deployment_dir + '/' + jar_5) in submission.properties['oozie.libpath'], submission.properties['oozie.libpath'])
       assert_true((deployment_dir + '/' + jar_6) in submission.properties['oozie.libpath'], submission.properties['oozie.libpath'])
     else:
@@ -165,14 +167,14 @@ def test_copy_files():
       LOG.exception('failed to remove %s' % prefix)
 
 
-class MockFs():
+class MockFs(object):
   def __init__(self, logical_name=None):
 
     self.fs_defaultfs = 'hdfs://curacao:8020'
     self.logical_name = logical_name if logical_name else ''
 
 
-class MockJt():
+class MockJt(object):
   def __init__(self, logical_name=None):
 
     self.logical_name = logical_name if logical_name else ''
@@ -320,7 +322,7 @@ oozie.wf.application.path=${nameNode}/user/${user.name}/${examplesRoot}/apps/pig
 
   def test_update_credentials_from_hive_action(self):
 
-    class TestJob():
+    class TestJob(object):
       XML_FILE_NAME = 'workflow.xml'
 
       def __init__(self):
@@ -371,7 +373,7 @@ oozie.wf.application.path=${nameNode}/user/${user.name}/${examplesRoot}/apps/pig
 
   def test_update_credentials_from_hive_action_when_jdbc_url_is_variable(self):
 
-    class TestJob():
+    class TestJob(object):
       XML_FILE_NAME = 'workflow.xml'
 
       def __init__(self):
@@ -411,7 +413,7 @@ oozie.wf.application.path=${nameNode}/user/${user.name}/${examplesRoot}/apps/pig
 
   def test_generate_altus_action_start_cluster(self):
 
-    class TestJob():
+    class TestJob(object):
       XML_FILE_NAME = 'workflow.xml'
 
       def __init__(self):

@@ -14,6 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from builtins import range
+from builtins import object
 import logging
 import os
 import socket
@@ -31,9 +34,8 @@ if not gen_py_path in sys.path:
 from djangothrift_test_gen.ttypes import TestStruct, TestNesting, TestEnum, TestManyTypes
 from djangothrift_test_gen import TestService
 
-import python_util
-import thrift_util
-from thrift_util import jsonable2thrift, thrift2json, _unpack_guid_secret_in_handle
+from desktop.lib import python_util, thrift_util
+from desktop.lib.thrift_util import jsonable2thrift, thrift2json, _unpack_guid_secret_in_handle
 
 from thrift.protocol.TBinaryProtocol import TBinaryProtocolFactory
 from thrift.server import TServer
@@ -112,7 +114,7 @@ class SimpleThriftServer(object):
     try:
       logging.info("Stopping SimpleThriftServer (pid %s)" % (self.pid,))
       os.kill(self.pid, 15)
-    except Exception, ex:
+    except Exception as ex:
       logging.exception("(Potentially ok) Exception while stopping server")
     os.waitpid(self.pid, 0)
     self.pid = 0

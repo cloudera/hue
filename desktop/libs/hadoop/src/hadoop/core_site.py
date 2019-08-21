@@ -15,10 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
 import errno
 import logging
 
-import confparse
+from hadoop import conf
+from hadoop import confparse
 
 from desktop.lib.paths import get_config_root_hadoop
 
@@ -65,7 +67,7 @@ def _parse_core_site():
   try:
     _CORE_SITE_PATH = get_config_root_hadoop('core-site.xml')
     data = file(_CORE_SITE_PATH, 'r').read()
-  except IOError, err:
+  except IOError as err:
     if err.errno != errno.ENOENT:
       LOG.error('Cannot read from "%s": %s' % (_CORE_SITE_PATH, err))
       return

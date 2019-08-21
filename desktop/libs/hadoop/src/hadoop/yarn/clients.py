@@ -15,16 +15,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import next
 import logging
+import sys
 import threading
 import time
-import urlparse
+import urllib.parse
 import heapq
 
 from desktop.lib.rest.http_client import HttpClient
 
 from hadoop import cluster
 
+if sys.version_info[0] > 2:
+  from urllib.parse import urlsplit as lib_urlsplit
+else:
+  from urlparse import urlsplit as lib_urlsplit
 
 LOG = logging.getLogger(__name__)
 
@@ -41,7 +49,7 @@ def get_log_client(log_link):
   _log_client_lock.acquire()
 
   try:
-    components = urlparse.urlsplit(log_link)
+    components = lib_urlsplit(log_link)
     base_url = '%(scheme)s://%(netloc)s' % {
       'scheme': components[0],
       'netloc': components[1]

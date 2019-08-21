@@ -14,10 +14,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import range
+from builtins import object
 import time
 import re
 
-class Timer:
+class Timer(object):
     def __enter__(self):
         self.start = time.clock()
         return self
@@ -31,14 +33,10 @@ def parse_exec_summary(summary_string):
     """Given an exec summary string parses the rows and organizes it by node id"""
     cleaned = [re.sub(r'^[-|\s]+', "", m)
                for m in summary_string.split("\n")[3:]]
-    cleaned = map(
-        lambda x: map(
-            lambda y: y.strip(),
-            re.split(
+    cleaned = [[y.strip() for y in re.split(
                 '\s\s+',
                 x,
-                maxsplit=8)),
-        cleaned)
+                maxsplit=8)] for x in cleaned]
     result = {}
     for c in cleaned:
         # Key 0 is id and type

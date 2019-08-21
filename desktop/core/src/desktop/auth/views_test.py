@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import datetime
 from nose.tools import assert_true, assert_false, assert_equal
 

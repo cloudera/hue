@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import json
 
 from django.contrib.auth.models import User
@@ -26,7 +27,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from indexer.indexers.sql import SQLIndexer
 
 
-class MockRequest():
+class MockRequest(object):
   def __init__(self, fs=None, user=None):
     self.fs = fs if fs is not None else MockFs()
     if user is None:
@@ -36,7 +37,7 @@ class MockRequest():
       self.user = user
 
 
-class MockFs():
+class MockFs(object):
   def __init__(self, path=None):
     self.path = {'isDir': False, 'split': ('/A', 'a'), 'listdir': ['/A']} if path is None else path
 

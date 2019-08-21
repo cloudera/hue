@@ -6,6 +6,8 @@
 #  options string: py:new_style
 #
 
+from builtins import range
+from builtins import object
 from thrift.Thrift import TType, TMessageType, TException, TApplicationException
 
 from thrift.transport import TTransport
@@ -97,7 +99,7 @@ class TestStruct(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -170,7 +172,7 @@ class TestNesting(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):
@@ -299,7 +301,7 @@ class TestManyTypes(object):
         if ftype == TType.SET:
           self.a_set = set()
           (_etype3, _size0) = iprot.readSetBegin()
-          for _i4 in xrange(_size0):
+          for _i4 in range(_size0):
             _elem5 = iprot.readI32();
             self.a_set.add(_elem5)
           iprot.readSetEnd()
@@ -309,7 +311,7 @@ class TestManyTypes(object):
         if ftype == TType.LIST:
           self.a_list = []
           (_etype9, _size6) = iprot.readListBegin()
-          for _i10 in xrange(_size6):
+          for _i10 in range(_size6):
             _elem11 = TestStruct()
             _elem11.read(iprot)
             self.a_list.append(_elem11)
@@ -320,7 +322,7 @@ class TestManyTypes(object):
         if ftype == TType.MAP:
           self.a_map = {}
           (_ktype13, _vtype14, _size12 ) = iprot.readMapBegin() 
-          for _i16 in xrange(_size12):
+          for _i16 in range(_size12):
             _key17 = iprot.readI32();
             _val18 = TestStruct()
             _val18.read(iprot)
@@ -337,7 +339,7 @@ class TestManyTypes(object):
         if ftype == TType.LIST:
           self.a_string_list = []
           (_etype22, _size19) = iprot.readListBegin()
-          for _i23 in xrange(_size19):
+          for _i23 in range(_size19):
             _elem24 = iprot.readString();
             self.a_string_list.append(_elem24)
           iprot.readListEnd()
@@ -410,7 +412,7 @@ class TestManyTypes(object):
     if self.a_map is not None:
       oprot.writeFieldBegin('a_map', TType.MAP, 13)
       oprot.writeMapBegin(TType.I32, TType.STRUCT, len(self.a_map))
-      for kiter27,viter28 in self.a_map.items():
+      for kiter27,viter28 in list(self.a_map.items()):
         oprot.writeI32(kiter27)
         viter28.write(oprot)
       oprot.writeMapEnd()
@@ -435,7 +437,7 @@ class TestManyTypes(object):
 
   def __repr__(self):
     L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
+      for key, value in self.__dict__.items()]
     return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
 
   def __eq__(self, other):

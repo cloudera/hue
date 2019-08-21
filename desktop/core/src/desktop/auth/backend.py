@@ -28,6 +28,7 @@ Because Django's models are sometimes unfriendly, you'll want
 User to remain a django.contrib.auth.models.User object.
 """
 
+from builtins import object
 import ldap
 import logging
 import pam
@@ -106,7 +107,7 @@ def is_admin(user):
     try:
       user = rewrite_user(user)
       is_admin = user.has_hue_permission(action="superuser", app="useradmin")
-    except Exception, e:
+    except Exception as e:
       LOG.exception("Could not validate if %s is a superuser assuming False." % user)
       is_admin = False
   return is_admin
@@ -381,7 +382,7 @@ class LdapBackend(object):
               return User.objects.get_or_create(username=username)
           else:
             return User.objects.get_or_create(username=username)
-        except ValidationError, e:
+        except ValidationError as e:
           LOG.exception("LDAP username is invalid: %s" % username)
 
     self._backend = _LDAPBackend()
@@ -488,7 +489,7 @@ class LdapBackend(object):
       else:
         LOG.warn("%s not in an allowed login group" % username)
         return None
-    except ImproperlyConfigured, detail:
+    except ImproperlyConfigured as detail:
       LOG.warn("LDAP was not properly configured: %s", detail)
       return None
 
@@ -521,7 +522,7 @@ class LdapBackend(object):
       connection = ldap_access.get_connection_from_server(server)
       try:
         user_info = connection.find_users(username, find_by_dn=False)
-      except Exception, e:
+      except Exception as e:
         LOG.warn("Failed to find LDAP user: %s" % e)
 
       if not user_info:
