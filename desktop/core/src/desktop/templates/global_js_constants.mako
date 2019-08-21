@@ -84,13 +84,13 @@
 
   window.ENABLE_SQL_SYNTAX_CHECK = '${ conf.ENABLE_SQL_SYNTAX_CHECK.get() }' === 'True';
 
-  window.HAS_CATALOG = '${ 'metadata' in apps and has_catalog(request.user) }' === 'True';
-  window.CATALOG_URL = '${ 'metadata' in apps and get_catalog_url() or "" }'
-  window.HAS_READ_ONLY_CATALOG = '${ 'metadata' in apps and has_readonly_catalog(request.user) }' === 'True' || '${ has_write_access(request.user) }' === 'False';
+  window.HAS_CATALOG = '${ has_catalog(request.user) }' === 'True';
+  window.CATALOG_URL = '${ get_catalog_url() or "" }'
+  window.HAS_READ_ONLY_CATALOG = '${ has_readonly_catalog(request.user) }' === 'True' || '${ has_write_access(request.user) }' === 'False';
 
-  window.HAS_OPTIMIZER = '${ 'metadata' in apps and has_optimizer() }' === 'True';
-  window.OPTIMIZER_URL = '${ 'metadata' in apps and get_optimizer_url() }'
-  window.AUTO_UPLOAD_OPTIMIZER_STATS = '${ 'metadata' in apps and OPTIMIZER.AUTO_UPLOAD_STATS.get() }' === 'True';
+  window.HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
+  window.OPTIMIZER_URL = '${ get_optimizer_url() }'
+  window.AUTO_UPLOAD_OPTIMIZER_STATS = '${ OPTIMIZER.AUTO_UPLOAD_STATS.get() }' === 'True';
 
   ## In the past was has_workload_analytics()
   window.HAS_WORKLOAD_ANALYTICS = '${ ENABLE_QUERY_ANALYSIS.get() }' === 'True';
