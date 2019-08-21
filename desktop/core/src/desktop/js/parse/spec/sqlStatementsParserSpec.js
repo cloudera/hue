@@ -36,6 +36,9 @@ describe('sqlStatementsParser.js', () => {
       if (entry.firstToken) {
         s += ",\n  firstToken: '" + entry.firstToken + "'";
       }
+      if (entry.database) {
+        s += ",\n  database: '" + entry.database + "'";
+      }
       s += '\n}';
       first = false;
     });
@@ -371,7 +374,8 @@ describe('sqlStatementsParser.js', () => {
         {
           statement: 'USE `db;`;',
           location: { first_line: 1, first_column: 0, last_line: 1, last_column: 10 },
-          firstToken: 'USE'
+          firstToken: 'USE',
+          database: 'db;'
         },
         {
           statement: '\r\nSELECT " \\" ;; ", \'"\', \' ;\' from bla;',
@@ -384,5 +388,22 @@ describe('sqlStatementsParser.js', () => {
         }
       ]
     );
+  });
+
+  it('should find databases in use statements "-- commented USE statement\\nUSE boo;" correctly', () => {
+    testParser('-- commented USE statement\nUSE boo;/* USE baa; */use `foo`', [
+      {
+        statement: '-- commented USE statement\nUSE boo;',
+        location: { first_line: 1, first_column: 0, last_line: 2, last_column: 8 },
+        firstToken: 'USE',
+        database: 'boo'
+      },
+      {
+        statement: '/* USE baa; */use `foo`',
+        location: { first_line: 2, first_column: 8, last_line: 2, last_column: 31 },
+        firstToken: 'use',
+        database: 'foo'
+      }
+    ]);
   });
 });

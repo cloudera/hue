@@ -41,7 +41,13 @@
 <singleQuote>'\''                                                     { this.popState(); return 'PART_OF_STATEMENT'; }
 
 '`'                                                                   { this.begin("backTick"); return 'PART_OF_STATEMENT'; }
-<backTick>[^`]+                                                       { return 'PART_OF_STATEMENT'; }
+<backTick>[^`]+                                                       {
+                                                                        if (parser.yy.usePreceding) {
+                                                                          parser.yy.useDatabase = yytext;
+                                                                          parser.yy.usePreceding = false;
+                                                                        }
+                                                                        return 'PART_OF_STATEMENT';
+                                                                      }
 <backTick><<EOF>>                                                     { this.popState(); return 'EOF'; }
 <backTick>'`'                                                         { this.popState(); return 'PART_OF_STATEMENT'; }
 
@@ -51,7 +57,17 @@
                                                                           if (firstWordMatch) {
                                                                             parser.yy.firstToken = firstWordMatch[0];
                                                                           }
-                                                                        };
+                                                                          var useDatabaseMatch = yytext.match(/USE\s+(\S+)/i);
+                                                                          if (useDatabaseMatch) {
+                                                                            parser.yy.useDatabase = useDatabaseMatch[1];
+                                                                          } else {
+                                                                            // For backticked
+                                                                            parser.yy.usePreceding = /USE/i.test(yytext);
+                                                                          }
+                                                                        } else if (parser.yy.usePreceding) {
+                                                                          parser.yy.useDatabase = yytext;
+                                                                          parser.yy.usePreceding = false;
+                                                                        }
                                                                         return 'PART_OF_STATEMENT';
                                                                       }
 [-][^;-]?                                                             { return 'PART_OF_STATEMENT'; }
@@ -108,22 +124,13 @@ SqlStatementsParser
 Statements
  : StatementParts
    {
-     if (parser.yy.firstToken) {
-       $$ = [{ type: 'statement', statement: $1, location: @1, firstToken: parser.yy.firstToken }];
-       parser.yy.firstToken = null;
-     } else {
-       $$ = [{ type: 'statement', statement: $1, location: @1 }];
-     }
+     $$ = [];
+     parser.addEntry($$, 'statement', $1, @1);
    }
  | Statements OneOrMoreSeparators StatementParts
    {
      parser.handleTrailingStatements($1, $2);
-     if (parser.yy.firstToken) {
-       $1.push({ type: 'statement', statement: $3, location: @3, firstToken: parser.yy.firstToken });
-       parser.yy.firstToken = null;
-     } else {
-       $1.push({ type: 'statement', statement: $3, location: @3 });
-     }
+     parser.addEntry($1, 'statement', $3, @3);
    }
  ;
 
@@ -141,6 +148,20 @@ OneOrMoreSeparators
  ;
 
 %%
+
+parser.addEntry = function (statements, type, statement, location) {
+  if (parser.yy.firstToken) {
+    if (parser.yy.useDatabase) {
+      statements.push({ type: type, statement: statement, location: location, firstToken: parser.yy.firstToken, database: parser.yy.useDatabase });
+      delete parser.yy.useDatabase;
+    } else {
+      statements.push({ type: type, statement: statement, location: location, firstToken: parser.yy.firstToken });
+    }
+    delete parser.yy.firstToken;
+  } else {
+    statements.push({ type: type, statement: statement, location: location });
+  }
+}
 
 parser.handleLeadingStatements = function (emptyStatements, result) {
   for (var i = emptyStatements.length - 1; i >= 0; i--) {

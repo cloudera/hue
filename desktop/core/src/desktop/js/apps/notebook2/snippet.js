@@ -358,6 +358,20 @@ class Snippet {
       'editor.active.statement.changed',
       statementDetails => {
         if (self.ace() && self.ace().container.id === statementDetails.id) {
+          for (let i = statementDetails.precedingStatements.length - 1; i >= 0; i--) {
+            if (statementDetails.precedingStatements[i].database) {
+              self.availableDatabases().some(availableDatabase => {
+                if (
+                  availableDatabase.toLowerCase() ===
+                  statementDetails.precedingStatements[i].database.toLowerCase()
+                ) {
+                  self.database(availableDatabase);
+                  return true;
+                }
+              });
+              break;
+            }
+          }
           if (statementDetails.activeStatement) {
             self.positionStatement(statementDetails.activeStatement);
           } else {
