@@ -225,25 +225,6 @@ def guess_field_types(request):
     api = _get_api(request)
     sample = api.get_sample_data(None, database=file_format['rdbmsDatabaseName'], table=file_format['tableName'])
 
-    # cf. https://github.com/apache/sqoop/blob/trunk/src/java/org/apache/sqoop/hive/HiveTypes.java#L39
-    for col in table_metadata:
-      col_type = col['type'].upper().split('(')[0]
-      print col_type
-      if col_type in ('INTEGER', 'SMALLINT', 'INT'):
-        col['type'] = 'int'
-      elif col_type in ('VARCHAR', 'CHAR', 'LONGVARCHAR', 'NVARCHAR', 'NCHAR', 'LONGNVARCHAR', 'DATE', 'TIME', 'TIMESTAMP', 'CLOB'):
-        col['type'] = 'string'
-      elif col_type in ('NUMERIC', 'DECIMAL', 'FLOAT', 'DOUBLE', 'REAL'):
-        col['type'] = 'double'
-      elif col_type in ('BIT', 'BOOLEAN'):
-        col['type'] = 'boolean'
-      elif col_type in ('TINYINT',):
-        col['type'] = 'tinyint'
-      elif col_type in ('BIGINT',):
-        col['type'] = 'bigint'
-      else:
-        col['type'] = 'string'
-
     format_ = {
       "sample": list(sample['rows'])[:4],
       "columns": [
