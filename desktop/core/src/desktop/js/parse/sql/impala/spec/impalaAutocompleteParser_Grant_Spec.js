@@ -69,7 +69,7 @@ describe('impalaAutocompleteParser.js GRANT statements', () => {
         noErrors: true,
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['ROLE']
+          suggestKeywords: ['GROUP', 'ROLE', 'USER']
         }
       });
     });
@@ -178,12 +178,12 @@ describe('impalaAutocompleteParser.js GRANT statements', () => {
         noErrors: true,
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['ROLE']
+          suggestKeywords: ['GROUP', 'ROLE', 'USER']
         }
       });
     });
 
-    it('should suggest keywords for "GRANT ALL ON TABLE tbl TO bla |"', () => {
+    it('should suggest keywords for "GRANT ALL ON TABLE tbl TO USER bla |"', () => {
       assertAutoComplete({
         beforeCursor: 'GRANT ALL ON TABLE tbl TO bla ',
         afterCursor: '',
@@ -207,9 +207,9 @@ describe('impalaAutocompleteParser.js GRANT statements', () => {
       });
     });
 
-    it('should suggest keywords for "GRANT ALL ON TABLE tbl TO bla WITH GRANT |"', () => {
+    it('should suggest keywords for "GRANT ALL ON TABLE tbl TO GROUP bla WITH GRANT |"', () => {
       assertAutoComplete({
-        beforeCursor: 'GRANT ALL ON TABLE tbl TO bla WITH GRANT ',
+        beforeCursor: 'GRANT ALL ON TABLE tbl TO GROUP bla WITH GRANT ',
         afterCursor: '',
         noErrors: true,
         expectedResult: {
@@ -374,7 +374,7 @@ describe('impalaAutocompleteParser.js GRANT statements', () => {
         noErrors: true,
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['ROLE']
+          suggestKeywords: ['GROUP', 'ROLE', 'USER']
         }
       });
     });
@@ -386,7 +386,7 @@ describe('impalaAutocompleteParser.js GRANT statements', () => {
         noErrors: true,
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['ROLE']
+          suggestKeywords: ['GROUP', 'ROLE', 'USER']
         }
       });
     });
@@ -430,6 +430,19 @@ describe('impalaAutocompleteParser.js GRANT statements', () => {
     it('should handle "REVOKE SELECT(id) ON SERVER ble FROM ROLE bla;|"', () => {
       assertAutoComplete({
         beforeCursor: 'REVOKE SELECT ON SERVER ble FROM ROLE bla;',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        hasLocations: false,
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should handle "REVOKE SELECT(id) ON SERVER ble FROM USER bla;|"', () => {
+      assertAutoComplete({
+        beforeCursor: 'REVOKE SELECT ON SERVER ble FROM USER bla;',
         afterCursor: '',
         noErrors: true,
         containsKeywords: ['SELECT'],

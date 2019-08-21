@@ -27,7 +27,7 @@ DataDefinition_EDIT
 GrantStatement
  : 'GRANT' 'ROLE' RegularOrBacktickedIdentifier 'TO' 'GROUP' RegularOrBacktickedIdentifier
  | 'GRANT' PrivilegeType 'ON' ObjectSpecification 'TO' RegularOrBacktickedIdentifier OptionalWithGrantOption
- | 'GRANT' PrivilegeType 'ON' ObjectSpecification 'TO' 'ROLE' RegularOrBacktickedIdentifier OptionalWithGrantOption
+ | 'GRANT' PrivilegeType 'ON' ObjectSpecification 'TO' GroupRoleOrUser RegularOrBacktickedIdentifier OptionalWithGrantOption
  ;
 
 GrantStatement_EDIT
@@ -67,7 +67,7 @@ GrantStatement_EDIT
    }
  | 'GRANT' PrivilegeType 'ON' ObjectSpecification 'TO' 'CURSOR'
    {
-     parser.suggestKeywords(['ROLE']);
+     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
    }
  | 'GRANT' PrivilegeType 'ON' ObjectSpecification 'TO' RegularOrBacktickedIdentifier OptionalWithGrantOption 'CURSOR'
    {
@@ -76,13 +76,13 @@ GrantStatement_EDIT
      }
    }
  | 'GRANT' PrivilegeType 'ON' ObjectSpecification 'TO' RegularOrBacktickedIdentifier WithGrantOption_EDIT
- | 'GRANT' PrivilegeType 'ON' ObjectSpecification 'TO' 'ROLE' RegularOrBacktickedIdentifier OptionalWithGrantOption 'CURSOR'
+ | 'GRANT' PrivilegeType 'ON' ObjectSpecification 'TO' GroupRoleOrUser RegularOrBacktickedIdentifier OptionalWithGrantOption 'CURSOR'
    {
      if (!$8) {
        parser.suggestKeywords(['WITH GRANT OPTION']);
      }
    }
- | 'GRANT' PrivilegeType 'ON' ObjectSpecification 'TO' 'ROLE' RegularOrBacktickedIdentifier WithGrantOption_EDIT
+ | 'GRANT' PrivilegeType 'ON' ObjectSpecification 'TO' GroupRoleOrUser RegularOrBacktickedIdentifier WithGrantOption_EDIT
  ;
 
 ObjectSpecification
@@ -149,7 +149,7 @@ WithGrantOption_EDIT
 RevokeStatement
  : 'REVOKE' 'ROLE' RegularOrBacktickedIdentifier 'FROM' 'GROUP' RegularOrBacktickedIdentifier
  | 'REVOKE' PrivilegeType 'ON' ObjectSpecification 'FROM' RegularOrBacktickedIdentifier
- | 'REVOKE' PrivilegeType 'ON' ObjectSpecification 'FROM' 'ROLE' RegularOrBacktickedIdentifier
+ | 'REVOKE' PrivilegeType 'ON' ObjectSpecification 'FROM' GroupRoleOrUser RegularOrBacktickedIdentifier
  ;
 
 RevokeStatement_EDIT
@@ -189,6 +189,6 @@ RevokeStatement_EDIT
    }
  | 'REVOKE' PrivilegeType 'ON' ObjectSpecification 'FROM' 'CURSOR'
    {
-     parser.suggestKeywords(['ROLE']);
+     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
    }
  ;
