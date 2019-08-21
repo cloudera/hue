@@ -68,7 +68,7 @@ class CeleryBeatApi(Api):
     task.enabled=True
     task.save()
 
-    return task
+    return task.id
 
 
   def list_tasks(self, user):
@@ -81,18 +81,15 @@ class CeleryBeatApi(Api):
     return self._get_task(PeriodicTask.objects.get(id=task_id))
 
 
-  def action(self, schedule_id, schedule_ids=None, action='pause'):
-    if schedule_ids is None:
-      schedule_ids = [schedule_id]
-
-    task = PeriodicTask.objects.get(id__in=schedule_ids, description=user.username)
-
-    if action == 'pause':
+  def action(self, schedule_id, action='suspend'):
+    task = PeriodicTask.objects.get(id=schedule_id, description=self.user.username)
+    print schedule_id, action, task
+    if action == 'suspend':
       task.enabled = False
-      task.saved()
+      task.save()
     elif action == 'resume':
-      task.enabled = False
-      task.saved()
+      task.enabled = True
+      task.save()
     elif action == 'kill':
       task.delete()
 
@@ -120,4 +117,4 @@ class CeleryBeatApi(Api):
         'interval_name': task.interval,
         'crontab': task.crontab,
         'solar': task.solar
-      }
+    }

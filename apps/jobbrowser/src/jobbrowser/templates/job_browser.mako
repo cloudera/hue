@@ -1707,11 +1707,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
+    <div data-bind="css: {'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
 
       <ul class="nav nav-pills margin-top-20">
         <li>
-          <a href="#livy-session-page-statements${ SUFFIX }" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#livy-session-page-statements${ SUFFIX }\']').tab('show'); }">
+          <a href="#celery-beat-page-statements${ SUFFIX }" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#celery-beat-page-statements${ SUFFIX }\']').tab('show'); }">
             ${ _('Properties') }
           </a>
         </li>
@@ -1721,7 +1721,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="clearfix"></div>
 
       <div class="tab-content">
-        <div class="tab-pane active" id="livy-session-page-statements${ SUFFIX }">
+        <div class="tab-pane active" id="celery-beat-page-statements${ SUFFIX }">
           <table id="actionsTable" class="datatables table table-condensed">
             <thead>
             <tr>

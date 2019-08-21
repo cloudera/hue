@@ -1234,7 +1234,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
       data => {
         viewModel.selectedNotebook().viewSchedulerId(data.job_id);
         $('.submit-modal-editor').modal('hide');
-        huePubSub.publish('show.jobs.panel', { id: data.job_id, interface: 'workflows' });
+        huePubSub.publish('show.jobs.panel', { id: data.job_id, interface: data.type });
       },
       HUE_PUB_SUB_EDITOR_ID
     );
