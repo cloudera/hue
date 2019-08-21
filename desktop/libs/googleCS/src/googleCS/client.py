@@ -33,7 +33,7 @@ CLIENT_CACHE = None
 def get_client(identifier='default', user=None):
   global CLIENT_CACHE
   _init_clients()
-  if identifier not in CLIENT_CACHE["googlefs"]:
+  if identifier not in CLIENT_CACHE["google"]:
     raise ValueError('Unknown google client: %s, check your configuration' % identifier)
   return CLIENT_CACHE["google"][identifier]
 

@@ -22,7 +22,7 @@ import random
 import string
 import unittest
 
-import googleCS
+import googleCS.client
 
 from nose.plugins.skip import SkipTest
 
@@ -31,7 +31,8 @@ from contextlib import contextmanager
 LOG = logging.getLogger(__name__)
 
 def get_test_bucket():
-  return os.environ.get('TEST_GS_BUCKET', '')
+  LOG.debug("%s" %os.environ)
+  return "TEST_GS_BUCKET" #os.environ.get('TEST_GS_BUCKET', '')
 
 
 def generate_id(size=6, chars=string.ascii_uppercase + string.digits):
@@ -52,7 +53,7 @@ class GSTestBase(unittest.TestCase):
       return
 
     cls.path_prefix = 'test-hue/%s' % generate_id(size=16)
-    cls.gs_connection = googleCS.get_client('default').get_google_connection()
+    cls.gs_connection = googleCS.client.get_client('default').get_google_connection()
     cls.bucket = cls.gs_connection.get_bucket(cls.bucket_name, validate=True)
 
   @classmethod
