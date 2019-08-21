@@ -1867,7 +1867,7 @@ class ClusterConfig(object):
         'page': '/security/hive'
       })
 
-    if 'indexer' in self.apps and self.user.has_hue_permission(action="access:importer", app="indexer") and not IS_EMBEDDED.get():
+    if 'indexer' in self.apps and 'filebrowser' in self.apps and self.user.has_hue_permission(action="access:importer", app="indexer") and not IS_EMBEDDED.get():
       interpreters.append({
         'type': 'importer',
         'displayName': _('Importer'),
@@ -1989,8 +1989,9 @@ def _get_apps(user, section=None):
     apps = list(apps_list.values())
     for app in apps:
       if app.display_name not in [
-          'beeswax', 'hive', 'impala', 'pig', 'jobsub', 'jobbrowser', 'metastore', 'hbase', 'sqoop', 'oozie', 'filebrowser',
-          'useradmin', 'search', 'help', 'about', 'zookeeper', 'proxy', 'rdbms', 'spark', 'indexer', 'security', 'notebook'] and app.menu_index != -1:
+            'beeswax', 'hive', 'impala', 'pig', 'jobsub', 'jobbrowser', 'metastore', 'hbase', 'sqoop', 'oozie', 'filebrowser',
+            'useradmin', 'search', 'help', 'about', 'zookeeper', 'proxy', 'rdbms', 'spark', 'indexer', 'security', 'notebook'
+          ] and app.menu_index != -1:
         other_apps.append(app)
       if section == app.display_name:
         current_app = app
