@@ -101,7 +101,7 @@
     $("<div id='jHueBlueprintTooltip'>" + contents + "</div>").css({
       top: y + 5,
       left: x + 5
-    }).appendTo(HUE_CONTAINER).fadeIn(200);
+    }).appendTo('body').fadeIn(200);
   }
 
 

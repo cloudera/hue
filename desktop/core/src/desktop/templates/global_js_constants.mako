@@ -19,7 +19,7 @@
 
   from desktop import conf
   from desktop.auth.backend import is_admin;
-  from desktop.conf import APP_SWITCHER_ALTUS_BASE_URL, APP_SWITCHER_MOW_BASE_URL, DISPLAY_APP_SWITCHER, IS_EMBEDDED, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_NEW_SIDE_PANELS, VCS
+  from desktop.conf import APP_SWITCHER_ALTUS_BASE_URL, APP_SWITCHER_MOW_BASE_URL, DISPLAY_APP_SWITCHER, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_NEW_SIDE_PANELS, VCS
   from desktop.models import hue_version, _get_apps, get_cluster_config
 
   from beeswax.conf import LIST_PARTITIONS_LIMIT
@@ -95,13 +95,10 @@
   ## In the past was has_workload_analytics()
   window.HAS_WORKLOAD_ANALYTICS = '${ ENABLE_QUERY_ANALYSIS.get() }' === 'True';
 
-  window.HUE_CONTAINER = '${ IS_EMBEDDED.get() }' === 'True' ? '.hue-embedded-container' : 'body';
-
   window.SHOW_NOTEBOOKS = '${ SHOW_NOTEBOOKS.get() }' === 'True'
   window.SHOW_UPLOAD_BUTTON = '${ hasattr(SHOW_UPLOAD_BUTTON, 'get') and SHOW_UPLOAD_BUTTON.get() }' === 'True'
 
   window.IS_MULTICLUSTER_ONLY = '${ IS_MULTICLUSTER_ONLY.get() }' === 'True';
-  window.IS_EMBEDDED = '${ IS_EMBEDDED.get() }' === 'True';
   window.IS_K8S_ONLY = '${ IS_K8S_ONLY.get() }' === 'True';
   window.JB_HEADER_CHECK_INTERVAL_IN_MILLIS = 30000;
   window.JB_SINGLE_CHECK_INTERVAL_IN_MILLIS = 5000;

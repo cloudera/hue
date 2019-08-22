@@ -63,7 +63,7 @@ Plugin.prototype.setupScrollLeft = function() {
       .addClass('hueAnchor hueAnchorScroller')
       .attr('href', 'javascript:void(0)')
       .html("<i class='fa fa-fw fa-chevron-left'></i>")
-      .appendTo(HUE_CONTAINER);
+      .appendTo('body');
   }
 
   $(_this.element).attr('jHueLeftScrollified', 'true');

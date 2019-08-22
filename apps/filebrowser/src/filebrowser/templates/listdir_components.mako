@@ -868,7 +868,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         showContextMenu: function (row, e) {
           var cm = $('.context-menu'),
             actions = $('#ch-dropdown'),
-            rect = document.querySelector(HUE_CONTAINER).getBoundingClientRect();
+            rect = document.querySelector('body').getBoundingClientRect();
 
           e.stopPropagation();
 
@@ -1059,7 +1059,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       self.isAdls = ko.pureComputed(function () {
         return self.currentPath().toLowerCase().indexOf('adl:/') === 0;
       });
-      
+
       self.isABFS = ko.pureComputed(function () {
         return self.currentPath().toLowerCase().indexOf('abfs://') === 0;
       });
@@ -1129,7 +1129,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       self.isS3Root = ko.pureComputed(function () {
         return self.isS3() && self.currentPath().toLowerCase() === 's3a://';
       });
-      
+
       self.isABFSRoot = ko.pureComputed(function () {
         return self.isABFS() && self.currentPath().toLowerCase() === 'abfs://';
       });
@@ -2019,17 +2019,17 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
     $(document).ready(function () {
       // hide context menu
-      $(HUE_CONTAINER).on('click', function (e) {
+      $('body').on('click', function (e) {
         hideContextMenu();
       });
 
-      $(HUE_CONTAINER).on('contextmenu', function (e) {
+      $('body').on('contextmenu', function (e) {
         if ($.inArray(e.toElement, $('.table-huedatatable *')) === -1) {
           hideContextMenu();
         }
       });
 
-      $(HUE_CONTAINER).on('contextmenu', '.context-menu', function (e) {
+      $('body').on('contextmenu', '.context-menu', function (e) {
         hideContextMenu();
       });
 

@@ -149,16 +149,6 @@ const changeURL = (newURL, params) => {
     }
   }
 
-  if (typeof IS_EMBEDDED !== 'undefined' && IS_EMBEDDED) {
-    let search = window.location.search;
-    if (extraSearch) {
-      search += (search ? '&' : '?') + extraSearch;
-    }
-    newURL = window.location.pathname + search + '#!' + newURL.replace('/hue', '');
-    window.history.pushState(null, null, newURL);
-    return;
-  }
-
   const hashSplit = newURL.split('#');
   const base =
     hashSplit[0].length && hashSplit[0].indexOf(window.HUE_BASE_URL) !== 0
@@ -181,57 +171,31 @@ const replaceURL = newURL => {
 };
 
 const changeURLParameter = (param, value) => {
-  if (typeof IS_EMBEDDED !== 'undefined' && IS_EMBEDDED) {
-    const currentUrl = window.location.hash.replace('#!', '');
-    const parts = currentUrl.split('?');
-    const path = parts[0];
-    let search = parts.length > 1 ? parts[1] : '';
-    if (~search.indexOf(param + '=' + value)) {
-      return;
+  let newSearch = '';
+  if (window.location.getParameter(param, true) !== null) {
+    newSearch += '?';
+    window.location.search
+      .replace(/\?/gi, '')
+      .split('&')
+      .forEach(p => {
+        if (p.split('=')[0] !== param) {
+          newSearch += p;
+        }
+      });
+    if (value) {
+      newSearch += (newSearch !== '?' ? '&' : '') + param + '=' + value;
     }
-    if (~search.indexOf(param + '=')) {
-      if (!value) {
-        search = search.replace(new RegExp(param + '=[^&]*&?'), '');
-      } else {
-        search = search.replace(new RegExp(param + '=[^&]*'), param + '=' + value);
-      }
-    } else if (value) {
-      if (search) {
-        search += '&';
-      }
-      search += param + '=' + value;
-    } else {
-      return;
-    }
-
-    changeURL(search ? path + '?' + search : path);
   } else {
-    let newSearch = '';
-    if (window.location.getParameter(param, true) !== null) {
-      newSearch += '?';
-      window.location.search
-        .replace(/\?/gi, '')
-        .split('&')
-        .forEach(p => {
-          if (p.split('=')[0] !== param) {
-            newSearch += p;
-          }
-        });
-      if (value) {
-        newSearch += (newSearch !== '?' ? '&' : '') + param + '=' + value;
-      }
-    } else {
-      newSearch =
-        window.location.search +
-        (value ? (window.location.search.indexOf('?') > -1 ? '&' : '?') + param + '=' + value : '');
-    }
-
-    if (newSearch === '?') {
-      newSearch = '';
-    }
-
-    changeURL(window.location.pathname + newSearch);
+    newSearch =
+      window.location.search +
+      (value ? (window.location.search.indexOf('?') > -1 ? '&' : '?') + param + '=' + value : '');
   }
+
+  if (newSearch === '?') {
+    newSearch = '';
+  }
+
+  changeURL(window.location.pathname + newSearch);
 };
 
 const removeURLParameter = param => {
@@ -298,7 +262,7 @@ const waitForVariable = (variable, callback, timeout) => {
 
 const scrollbarWidth = () => {
   const $parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo(
-    HUE_CONTAINER
+    'body'
   );
   const $children = $parent.children();
   const width = $children.innerWidth() - $children.height(99).innerWidth();
@@ -441,7 +405,7 @@ const getFileBrowseButton = (
   _btn.click(e => {
     e.preventDefault();
     if (!isNestedModal) {
-      $(window.HUE_CONTAINER).addClass('modal-open');
+      $('body').addClass('modal-open');
     }
 
     function callFileChooser() {
@@ -532,7 +496,7 @@ const getFileBrowseButton = (
       }
       if (!isNestedModal) {
         $('#chooseFile').on('hidden', () => {
-          $(window.HUE_CONTAINER).removeClass('modal-open');
+          $('body').removeClass('modal-open');
           $('.modal-backdrop').remove();
         });
       }

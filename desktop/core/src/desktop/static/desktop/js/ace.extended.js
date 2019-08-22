@@ -55,7 +55,7 @@ try {
     editor.showSpinner = function () {
       var _position = this.getCursorScreenPosition();
       if ($(".ace-spinner").length == 0) {
-        $("<i class='fa fa-spinner fa-spin ace-spinner'></i>").appendTo(HUE_CONTAINER);
+        $("<i class='fa fa-spinner fa-spin ace-spinner'></i>").appendTo('body');
       }
       $(".ace-spinner").css("top", _position.pageY + "px").css("left", (_position.pageX - 4) + "px").show();
     }
@@ -67,7 +67,7 @@ try {
     editor.showFileButton = function () {
       var _position = this.getCursorScreenPosition();
       if ($(".ace-inline-button").length == 0) {
-        $("<a class='btn btn-mini ace-inline-button'><i class='fa fa-ellipsis-h'></i></a>").appendTo(HUE_CONTAINER);
+        $("<a class='btn btn-mini ace-inline-button'><i class='fa fa-ellipsis-h'></i></a>").appendTo('body');
       }
       $(".ace-inline-button").css("top", _position.pageY + "px").css("left", (_position.pageX + 4) + "px").show();
       $(".ace-inline-button").off("click");

@@ -61,7 +61,7 @@ let registered = false;
 
 export default {
   registerWorkers: function() {
-    if (!window.IS_EMBEDDED && !registered && window.Worker) {
+    if (!registered && window.Worker) {
       // It can take a while before the worker is active
       const whenWorkerIsReady = function(worker, message) {
         message.hueBaseUrl = window.HUE_BASE_URL;

@@ -143,7 +143,7 @@ Plugin.prototype.init = function() {
       )
       .appendTo(jHueTableExtenderNavigator);
 
-    jHueTableExtenderNavigator.appendTo(HUE_CONTAINER);
+    jHueTableExtenderNavigator.appendTo('body');
 
     $(_this.element)
       .find('tbody')

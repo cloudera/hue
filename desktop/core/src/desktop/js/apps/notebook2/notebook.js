@@ -123,13 +123,7 @@ class Notebook {
         self.historyFilter() === '' &&
         !vm.isNotificationManager()
       ) {
-        self
-          .snippets()[0]
-          .currentQueryTab(
-            typeof window.IS_EMBEDDED !== 'undefined' && window.IS_EMBEDDED
-              ? 'queryHistory'
-              : 'savedQueries'
-          );
+        self.snippets()[0].currentQueryTab('savedQueries');
       }
     });
     self.historyFilter = ko.observable('');

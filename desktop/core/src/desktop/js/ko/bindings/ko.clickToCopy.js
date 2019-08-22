@@ -23,7 +23,7 @@ ko.bindingHandlers.clickToCopy = {
       const $input = $('<textarea>')
         .css({ opacity: 0 })
         .val(ko.unwrap(valueAccessor()))
-        .appendTo(window.HUE_CONTAINER)
+        .appendTo('body')
         .select();
       document.execCommand('copy');
       $input.remove();

@@ -1503,12 +1503,6 @@ DEV = Config("dev",
    help=_("Enable development mode, where notably static files are not cached.")
 )
 
-DEV_EMBEDDED = Config("dev_embedded",
-   type=coerce_bool,
-   default=False,
-   help=_("Enable embedded development mode, where the page will be rendered inside a container div element.")
-)
-
 DISPLAY_APP_SWITCHER = Config(
   key='display_app_switcher',
   help=_('Enable or disable the upper left app switcher menu.'),

@@ -63,7 +63,7 @@ const ASSIST_TABLE_TEMPLATES = `
           'Insert at cursor'
         )}</a></li>
         <!-- /ko -->
-        <!-- ko if: !window.IS_EMBEDDED && catalogEntry.path.length <=2 -->
+        <!-- ko if: catalogEntry.path.length <=2 -->
         <li><a href="javascript:void(0);" data-bind="click: openInMetastore"><i class="fa fa-fw fa-table"></i> ${I18n(
           'Open in Browser'
         )}</a></li>
@@ -358,7 +358,7 @@ const TEMPLATE =
     <div class="assist-db-header-actions">
       <!-- ko ifnot: loading -->
       <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
-      <!-- ko if: window.ENABLE_NEW_CREATE_TABLE && !window.IS_EMBEDDED && (sourceType === 'hive' || sourceType === 'impala') -->
+      <!-- ko if: window.ENABLE_NEW_CREATE_TABLE && (sourceType === 'hive' || sourceType === 'impala') -->
       <!-- ko if: typeof databaseName !== 'undefined' -->
         <a class="inactive-action" data-bind="hueLink: window.HUE_URLS.IMPORTER_CREATE_TABLE + databaseName + '/?sourceType=' + sourceType + '&namespace=' + assistDbNamespace.namespace.id" title="${I18n(
           'Create table'

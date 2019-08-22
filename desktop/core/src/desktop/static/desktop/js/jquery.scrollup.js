@@ -58,7 +58,7 @@
       $(document).off("click", "#jHueScrollUpAnchor");
     }
     else {
-      link = $("<a/>").attr("id", "jHueScrollUpAnchor").addClass("hueAnchor hueAnchorScroller").attr("href", "javascript:void(0)").html("<i class='fa fa-fw fa-chevron-up'></i>").appendTo(HUE_CONTAINER);
+      link = $("<a/>").attr("id", "jHueScrollUpAnchor").addClass("hueAnchor hueAnchorScroller").attr("href", "javascript:void(0)").html("<i class='fa fa-fw fa-chevron-up'></i>").appendTo('body');
     }
 
     $(_this.element).attr("jHueScrollified", "true");

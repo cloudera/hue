@@ -18,7 +18,7 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
-  from desktop.conf import IS_EMBEDDED, DEV_EMBEDDED, IS_MULTICLUSTER_ONLY, has_multi_clusters
+  from desktop.conf import IS_MULTICLUSTER_ONLY, has_multi_clusters
   from desktop.views import _ko, commonshare, login_modal
   from desktop.lib.i18n import smart_unicode
   from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, ANALYTIC_DB, hue_version, get_cluster_config
@@ -46,48 +46,14 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-% if DEV_EMBEDDED.get():
-  <style>
-    html {
-      height: 100%;
-      width: 100%;
-      margin: 0;
-      font-size: 1em;
-    }
-
-    body {
-      position: relative;
-      height: 100%;
-      width: 100%;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background-color: pink;
-    }
-
-    .hue-embedded-container {
-      position: absolute !important;
-      top: 60px !important;
-      left: 0 !important;
-      bottom: 0 !important;
-      right: 0 !important;
-    }
-  </style>
-% endif
-
   <link href="${ static('desktop/css/roboto.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
-% if IS_EMBEDDED.get():
-  <link href="${ static('desktop/css/hue-bootstrap-embedded.css') }" rel="stylesheet">
-  <link href="${ static('desktop/css/hue-embedded.css') }" rel="stylesheet">
-% else:
   <link href="${ static('desktop/ext/css/cui/cui.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/cui/bootstrap2.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/cui/bootstrap-responsive2.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/jquery-ui.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/home.css') }" rel="stylesheet">
-% endif
   <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
   <link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
 
@@ -97,40 +63,6 @@
   <link rel="stylesheet" href="${ static('desktop/ext/css/leaflet.zoombox.css') }">
   <link rel="stylesheet" href="${ static('desktop/ext/css/nv.d3.min.css') }">
   <link rel="stylesheet" href="${ static('desktop/css/nv.d3.css') }">
-
-  <script type="text/javascript">
-% if IS_EMBEDDED.get():
-  // Bootstrap 2.3.2 relies on the hide css class presence for modals but doesn't remove it when opened for fade type
-  // modals, a parent container might have it set to !important which will prevent the modal from showing. This
-  // redefines all .hide definitions to exclude .modal.fade
-  try {
-    for (var i = 0; i < document.styleSheets.length; i++) {
-      if (document.styleSheets[i] && document.styleSheets[i].cssRules) {
-        for (var j = document.styleSheets[i].cssRules.length - 1; j > 0; j--) {
-          if (document.styleSheets[i] && document.styleSheets[i].cssRules[j] && document.styleSheets[i].cssRules[j].selectorText === '.hide') {
-            var originalCssText = document.styleSheets[i].cssRules[j].cssText;
-            if (originalCssText.indexOf('!important') !== -1) {
-              document.styleSheets[i].deleteRule(j);
-              document.styleSheets[i].insertRule(originalCssText.replace('.hide', '.hide:not(.modal):not(.fade)'));
-            }
-          }
-        }
-      }
-    }
-  } catch (e) {
-    console.warn(e);
-  }
-
-  // Add modified URL for .clearable background
-  var originalClearableImgUrl = '${ static('desktop/art/clearField@2x.png') }';
-  var clearableImgUrl = typeof adaptHueEmbeddedUrls !== 'undefined' ? adaptHueEmbeddedUrls(originalClearableImgUrl) : originalClearableImgUrl;
-
-  var style = document.createElement('style');
-  style.type = 'text/css';
-  style.appendChild(document.createTextNode('.clearable { background: url(' + clearableImgUrl + ') no-repeat right -10px center; }'));
-  document.head.appendChild(style);
-% endif
-  </script>
 
   ${ commonHeaderFooterComponents.header_i18n_redirection() }
   <%
@@ -144,10 +76,6 @@
 </head>
 
 <body>
-
-% if IS_EMBEDDED.get():
-<div class="hue-embedded-container">
-% endif
 
 % if is_demo:
   <ul class="side-labels unstyled">
@@ -191,16 +119,13 @@ ${ hueIcons.symbols() }
       </div>
     % endif
 
-    % if not IS_EMBEDDED.get():
     <nav class="navbar navbar-default">
       <div class="navbar-inner top-nav">
         <div class="top-nav-left">
-          % if not IS_EMBEDDED.get():
-            % if not (IS_MULTICLUSTER_ONLY.get() and get_cluster_config(user)['has_computes']):
-            <a class="hamburger hamburger-hue pull-left" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
-              <span class="hamburger-box"><span class="hamburger-inner"></span></span>
-            </a>
-            % endif
+          % if not (IS_MULTICLUSTER_ONLY.get() and get_cluster_config(user)['has_computes']):
+          <a class="hamburger hamburger-hue pull-left" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
+            <span class="hamburger-box"><span class="hamburger-inner"></span></span>
+          </a>
           % endif
 
           % if not IS_MULTICLUSTER_ONLY.get():
@@ -275,7 +200,6 @@ ${ hueIcons.symbols() }
       </div>
       <div id="mini_jobbrowser"></div>
     </div>
-    % endif
 
     <div class="content-wrapper">
       <div class="left-panel" data-bind="css: { 'side-panel-closed': !leftAssistVisible() }, visibleOnHover: { selector: '.hide-left-side-panel' }">
@@ -581,7 +505,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       }
     };
 
-    % if is_demo or (not user_preferences.get(PREFERENCE_IS_WELCOME_TOUR_SEEN) and not IS_EMBEDDED.get()):
+    % if is_demo or not user_preferences.get(PREFERENCE_IS_WELCOME_TOUR_SEEN):
       $(document).on('keyup', closeTourOnEsc);
       $(document).on('click', '.shepherd-backdrop', tour.cancel);
       tour.start();
@@ -610,10 +534,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 </script>
 
 ${ commonHeaderFooterComponents.footer(messages) }
-
-% if IS_EMBEDDED.get():
-</div>
-% endif
 
 <div class="monospace-preload" style="opacity: 0; height: 0; width: 0;">
   ${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }

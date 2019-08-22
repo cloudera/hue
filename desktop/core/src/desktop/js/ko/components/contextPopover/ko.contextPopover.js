@@ -439,7 +439,7 @@ const SUPPORT_TEMPLATES = `
               )}" class="fa fa-external-link"></i> ${I18n('Dashboard')}
             </a>
           <!-- /ko -->
-          <!-- ko if: !window.IS_EMBEDDED && catalogEntry().getSourceType() !== 'solr' && openActionsEnabled() -->
+          <!-- ko if: catalogEntry().getSourceType() !== 'solr' && openActionsEnabled() -->
           <a class="inactive-action pointer" data-bind="click: openInTableBrowser">
             <i style="font-size: 11px;" title="${I18n(
               'Open in Table Browser...'
@@ -930,7 +930,7 @@ huePubSub.subscribe('context.popover.show', details => {
   const $contextPopover = $(
     '<div id="contextPopover" data-bind="component: { name: \'context-popover\', params: $data }" />'
   );
-  $(HUE_CONTAINER).append($contextPopover);
+  $('body').append($contextPopover);
   ko.applyBindings(details, $contextPopover[0]);
   huePubSub.publish('context.popover.shown');
 });

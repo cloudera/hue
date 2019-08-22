@@ -35,8 +35,6 @@ module.exports = function(grunt) {
           javascriptEnabled: true
         },
         files: {
-          'desktop/core/src/desktop/static/desktop/css/hue-bootstrap-embedded.css': 'desktop/core/src/desktop/static/desktop/less/hue-bootstrap-embedded.less',
-          'desktop/core/src/desktop/static/desktop/css/hue-embedded.css': 'desktop/core/src/desktop/static/desktop/less/hue-embedded.less',
           'desktop/core/src/desktop/static/desktop/css/home.css': 'desktop/core/src/desktop/static/desktop/less/home.less',
           'desktop/core/src/desktop/static/desktop/css/hue.css': 'desktop/core/src/desktop/static/desktop/less/hue.less',
           'desktop/core/src/desktop/static/desktop/css/hue3-extra.css': 'desktop/core/src/desktop/static/desktop/less/hue3-extra.less',

@@ -113,7 +113,7 @@
         });
         el.show();
       }
-      el.appendTo(HUE_CONTAINER);
+      el.appendTo('body');
     }
   };
 

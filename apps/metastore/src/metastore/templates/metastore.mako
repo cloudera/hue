@@ -18,7 +18,7 @@ from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
 from desktop import conf
-from desktop.conf import USE_NEW_EDITOR, IS_EMBEDDED
+from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter, _ko
 from beeswax.conf import LIST_PARTITIONS_LIMIT
@@ -258,11 +258,7 @@ ${ components.menubar(is_embeddable) }
         <!-- /ko -->
         <!-- ko if: details.properties.format !== 'kudu' -->
         <div>
-          % if IS_EMBEDDED.get():
-            <span data-bind="attr: {'title': path_location}">${_('location')}</span>
-          % else:
-            <a href="javascript: void(0);" data-bind="storageContextPopover: { path: hdfs_link.replace('/filebrowser/view=', ''), offset: { left: 5 } }"> ${_('location')}</a>
-          % endif
+          <a href="javascript: void(0);" data-bind="storageContextPopover: { path: hdfs_link.replace('/filebrowser/view=', ''), offset: { left: 5 } }"> ${_('location')}</a>
         </div>
       <!-- /ko -->
     </div>
@@ -479,11 +475,7 @@ ${ components.menubar(is_embeddable) }
           <div class="metastore-property">
             <div>${ _('Location') }</div>
             <div>
-              % if IS_EMBEDDED.get():
-                <span data-bind="attr: { 'title': location }"> ${_('Location')}</span>
-              % else:
-                <a href="javascript: void(0);" data-bind="storageContextPopover: { path: hdfs_link.replace('/filebrowser/view=', ''), offset: { left: 5 } }"> ${_('Location')}</a>
-              % endif
+              <a href="javascript: void(0);" data-bind="storageContextPopover: { path: hdfs_link.replace('/filebrowser/view=', ''), offset: { left: 5 } }"> ${_('Location')}</a>
             </div>
           </div>
         </div>
