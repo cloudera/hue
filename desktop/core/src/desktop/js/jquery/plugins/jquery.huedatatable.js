@@ -200,7 +200,7 @@ $.fn.hueDataTable = function(oInit) {
           opacity: 0.85
         })
         .addClass('hueAnchor hue-datatable-search')
-        .appendTo(HUE_CONTAINER);
+        .appendTo('body');
       search.html(
         '<input type="text"> <i class="fa fa-chevron-up pointer muted"></i> <i class="fa fa-chevron-down pointer muted"></i> &nbsp; <span></span> &nbsp; <i class="fa fa-times pointer inactive-action"></i>'
       );

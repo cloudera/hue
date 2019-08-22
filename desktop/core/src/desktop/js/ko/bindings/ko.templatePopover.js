@@ -28,7 +28,7 @@ ko.bindingHandlers.templatePopover = {
     if (!$container.length) {
       $container = $('<div>')
         .attr('id', 'popover-container')
-        .appendTo(window.HUE_CONTAINER);
+        .appendTo('body');
       $('<div>')
         .addClass('temp-content')
         .hide()
@@ -92,15 +92,6 @@ ko.bindingHandlers.templatePopover = {
         $element.attr('title', triggerTitle);
       }
       const $tip = $element.data('popover').$tip;
-      if (window.HUE_CONTAINER !== 'body') {
-        $tip.css({ position: 'fixed', 'z-index': 2000 });
-        $tip.appendTo(window.HUE_CONTAINER);
-
-        $tip.offset({
-          left: $element.offset().left + $element.outerWidth(true) + 10,
-          top: $element.offset().top + $element.outerHeight(true) / 2 - $tip.outerHeight(true) / 2
-        });
-      }
       ko.cleanNode($tip.get(0));
       ko.applyBindings(viewModel, $tip.get(0));
       $tip.find('.close-popover, .close-template-popover').click(event => {

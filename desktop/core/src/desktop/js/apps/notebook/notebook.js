@@ -184,11 +184,7 @@ class Notebook {
         self.historyFilter() === '' &&
         !vm.isNotificationManager()
       ) {
-        self
-          .snippets()[0]
-          .currentQueryTab(
-            typeof IS_EMBEDDED !== 'undefined' && IS_EMBEDDED ? 'queryHistory' : 'savedQueries'
-          );
+        self.snippets()[0].currentQueryTab('savedQueries');
       }
     });
     self.historyFilter = ko.observable('');

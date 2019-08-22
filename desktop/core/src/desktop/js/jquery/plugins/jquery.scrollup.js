@@ -66,7 +66,7 @@ Plugin.prototype.setupScrollUp = function() {
       .addClass('hueAnchor hueAnchorScroller')
       .attr('href', 'javascript:void(0)')
       .html("<i class='fa fa-fw fa-chevron-up'></i>")
-      .appendTo(HUE_CONTAINER);
+      .appendTo('body');
   }
 
   $(_this.element).attr('jHueScrollified', 'true');

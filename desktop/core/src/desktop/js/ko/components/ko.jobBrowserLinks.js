@@ -34,7 +34,7 @@ const TEMPLATE = `
       <a class="btn btn-flat" style="padding-right: 4px" title="${I18n(
         'Job browser'
       )}" data-bind="hueLink: '/jobbrowser#!jobs', click: function() { huePubSub.publish('hide.jobs.panel'); }">
-        <span>${I18n(window.IS_EMBEDDED || window.IS_MULTICLUSTER_ONLY ? 'Queries' : 'Jobs')}</span>
+        <span>${I18n(window.IS_MULTICLUSTER_ONLY ? 'Queries' : 'Jobs')}</span>
       </a>
     <!-- /ko -->
     <button class="btn btn-flat btn-toggle-jobs-panel" title="${I18n(
@@ -52,7 +52,7 @@ class JobBrowserPanel {
   constructor(params) {
     const self = this;
 
-    const $container = $(window.HUE_CONTAINER);
+    const $container = $('body');
     const $jobsPanel = $('#jobsPanel');
     const $toggle = $('.btn-toggle-jobs-panel');
 
@@ -179,7 +179,7 @@ class JobBrowserPanel {
       }
     });
 
-    if (!window.IS_EMBEDDED && !window.IS_K8S_ONLY) {
+    if (!window.IS_K8S_ONLY) {
       checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
 
       huePubSub.subscribe('check.job.browser', checkYarnBrowserStatus);

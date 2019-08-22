@@ -120,7 +120,7 @@ from django.utils.translation import ugettext as _
       huePubSub.subscribe('sql.syntax.dropdown.show', function (details) {
         hideSyntaxDropdown();
         var $sqlSyntaxDropdown = $('<div id="sqlSyntaxDropdown" data-bind="component: { name: \'sql-syntax-dropdown\', params: $data }" />');
-        $(HUE_CONTAINER).append($sqlSyntaxDropdown);
+        $('body').append($sqlSyntaxDropdown);
         ko.applyBindings(details, $sqlSyntaxDropdown[0]);
       });
     })();

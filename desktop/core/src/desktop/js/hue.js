@@ -125,9 +125,7 @@ $(document).ready(() => {
   ko.applyBindings(sidePanelViewModel, $('.context-panel')[0]);
 
   const topNavViewModel = new TopNavViewModel(onePageViewModel);
-  if (!window.IS_EMBEDDED) {
-    ko.applyBindings(topNavViewModel, $('.top-nav')[0]);
-  }
+  ko.applyBindings(topNavViewModel, $('.top-nav')[0]);
 
   const sidebarViewModel = new SideBarViewModel(onePageViewModel, topNavViewModel);
   ko.applyBindings(sidebarViewModel, $('.hue-sidebar')[0]);

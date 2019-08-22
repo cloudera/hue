@@ -625,7 +625,7 @@ from desktop.views import _ko
                 }
 
               } else {
-                $('<div>').addClass('doc-browser-drag-select').appendTo(HUE_CONTAINER);
+                $('<div>').addClass('doc-browser-drag-select').appendTo('body');
               }
             },
             drag: function (event) {
