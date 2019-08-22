@@ -729,7 +729,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
               if (destpath) {
                 $('#moveDestination').val(destpath);
-                viewModel.move('nomodal', _dragged);
+                fileBrowserViewModel.move('nomodal', _dragged);
               }
             }
           };
@@ -764,8 +764,8 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     };
 
     var fileExists = function (newName) {
-      if (viewModel) {
-        var files = viewModel.files();
+      if (fileBrowserViewModel) {
+        var files = fileBrowserViewModel.files();
         for (var i = 0; i < files.length; i++) {
           if (files[i].name == newName) {
             return true;
@@ -850,7 +850,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         isBucket: ko.pureComputed(function(){
           return file.path.toLowerCase().indexOf('s3a://') == 0 && file.path.substr(6).indexOf('/') == -1
         }),
-        selected: ko.observable(file.highlighted && viewModel.isArchive(file.name) || false),
+        selected: ko.observable(file.highlighted && fileBrowserViewModel.isArchive(file.name) || false),
         highlighted: ko.observable(file.highlighted || false),
         deleted: ko.observable(file.deleted || false),
         handleSelect: function (row, e) {
@@ -862,7 +862,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           }
           this.highlighted(false);
           this.deleted(false);
-          viewModel.allSelected(false);
+          fileBrowserViewModel.allSelected(false);
         },
         // display the context menu when an item is right/context clicked
         showContextMenu: function (row, e) {
@@ -912,8 +912,8 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
                 this.url = "/";
               }
 
-              viewModel.targetPageNum(1);
-              viewModel.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(this.url));
+              fileBrowserViewModel.targetPageNum(1);
+              fileBrowserViewModel.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(this.url));
               updateHash(this.url);
             }
             else {
@@ -1317,10 +1317,10 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           if (! (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey)) {
             e.stopPropagation();
             e.preventDefault();
-            viewModel.targetPageNum(1);
-            viewModel.targetPath("${url('filebrowser.views.view', path='')}?" + folderPath);
+            fileBrowserViewModel.targetPageNum(1);
+            fileBrowserViewModel.targetPath("${url('filebrowser.views.view', path='')}?" + folderPath);
             updateHash('');
-            viewModel.retrieveData();
+            fileBrowserViewModel.retrieveData();
           }
           else {
             window.open("${url('filebrowser.views.view', path='')}?" + folderPath);
@@ -1896,7 +1896,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
         hiddenFields($("#purgeTrashForm"), 'path', paths);
 
-        $("#purgeTrashForm").attr("action", "/filebrowser/trash/purge?next=${url('filebrowser.views.view', path='')}" + viewModel.homeDir() + "/.Trash");
+        $("#purgeTrashForm").attr("action", "/filebrowser/trash/purge?next=${url('filebrowser.views.view', path='')}" + fileBrowserViewModel.homeDir() + "/.Trash");
 
         $("#purgeTrashModal").modal({
           keyboard:true,
@@ -2014,8 +2014,8 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       }
     };
 
-    var viewModel = new FileBrowserModel([], null, [], "/");
-    ko.applyBindings(viewModel, $('.filebrowser')[0]);
+    var fileBrowserViewModel = new FileBrowserModel([], null, [], "/");
+    ko.applyBindings(fileBrowserViewModel, $('.filebrowser')[0]);
 
     $(document).ready(function () {
       // hide context menu
@@ -2062,7 +2062,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         $('.filebrowser').on('dragenter', function (e) {
           e.preventDefault();
 
-          if (_isExternalFile && !($("#uploadFileModal").is(":visible")) && (!viewModel.isS3() || (viewModel.isS3() && !viewModel.isS3Root()))) {
+          if (_isExternalFile && !($("#uploadFileModal").is(":visible")) && (!fileBrowserViewModel.isS3() || (fileBrowserViewModel.isS3() && !fileBrowserViewModel.isS3Root()))) {
             showHoverMsg("${_('Drop files here to upload')}");
           }
         });
@@ -2156,7 +2156,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
                     $(document).trigger('error', response.data);
                   } else {
                     $(document).trigger('info', response.path + ' ' + I18n('uploaded successfully'));
-                    viewModel.filesToHighlight.push(response.path);
+                    fileBrowserViewModel.filesToHighlight.push(response.path);
                   }
                 }
               }
@@ -2170,7 +2170,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
                     $('#progressStatus').addClass('hide');
                     $('#progressStatusBar').addClass('hide');
                     $('#progressStatusBar div').css("width", "0");
-                    viewModel.retrieveData(true);
+                    fileBrowserViewModel.retrieveData(true);
                   },
                   2500);
             });
@@ -2282,7 +2282,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           return false;
         }
         var isMoveOnSelf = false;
-        $(viewModel.selectedFiles()).each(function (index, file) {
+        $(fileBrowserViewModel.selectedFiles()).each(function (index, file) {
           if (file.path == $('#moveDestination').val()) {
             isMoveOnSelf = true;
             return false;
@@ -2316,9 +2316,9 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         $("#newRepFactorInput").removeClass("fieldError");
       });
 
-      huePubSub.subscribe('fb.' + viewModel.fs() + '.refresh', function (path) {
-        if (path === viewModel.currentPath()) {
-          viewModel.retrieveData();
+      huePubSub.subscribe('fb.' + fileBrowserViewModel.fs() + '.refresh', function (path) {
+        if (path === fileBrowserViewModel.currentPath()) {
+          fileBrowserViewModel.retrieveData();
         }
       }, 'filebrowser');
 
@@ -2330,8 +2330,8 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           onEnter: function (el) {
             $("#jHueHdfsAutocomplete").hide();
           },
-          isS3: viewModel.isS3(),
-          root: viewModel.rootCurrent()
+          isS3: fileBrowserViewModel.isS3(),
+          root: fileBrowserViewModel.rootCurrent()
         });
         $("#copyDestination").jHueHdfsAutocomplete({
           showOnFocus: true,
@@ -2340,8 +2340,8 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           onEnter: function (el) {
             $("#jHueHdfsAutocomplete").hide();
           },
-          isS3: viewModel.isS3(),
-          root: viewModel.rootCurrent()
+          isS3: fileBrowserViewModel.isS3(),
+          root: fileBrowserViewModel.rootCurrent()
         });
       });
 
@@ -2430,17 +2430,17 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
               targetPath += stripHashes(encodeURIComponent(hash));
             }
             else {
-              targetPath = viewModel.targetPath() + encodeURI(hash);
+              targetPath = fileBrowserViewModel.targetPath() + encodeURI(hash);
             }
-            viewModel.targetPageNum(1)
+            fileBrowserViewModel.targetPageNum(1)
           }
           if (window.location.href.indexOf("#") == -1) {
-            viewModel.targetPageNum(1);
+            fileBrowserViewModel.targetPageNum(1);
             targetPath = "${current_request_path | n,unicode }";
           }
           if (targetPath != "") {
-            viewModel.targetPath(targetPath);
-            viewModel.retrieveData();
+            fileBrowserViewModel.targetPath(targetPath);
+            fileBrowserViewModel.retrieveData();
           }
         }
       }
@@ -2451,7 +2451,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         hashchange();
       }
       else {
-        viewModel.retrieveData();
+        fileBrowserViewModel.retrieveData();
       }
 
 
@@ -2465,11 +2465,11 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
       $("#hueBreadcrumbText").jHueHdfsAutocomplete({
         home: "/user/${ user }/",
-        root: viewModel.rootTarget(),
+        root: fileBrowserViewModel.rootTarget(),
         skipKeydownEvents: true,
         onEnter: function (el) {
-          viewModel.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(el.val()));
-          viewModel.getStats(function (data) {
+          fileBrowserViewModel.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(el.val()));
+          fileBrowserViewModel.getStats(function (data) {
             if (data.type != null && data.type == "file") {
               %if is_embeddable:
               huePubSub.publish('open.link', data.url);
