@@ -329,7 +329,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <li class="divider"></li>
           <!-- ko if: $root.canSave -->
           <li>
-            <a class="share-link" data-bind="click: prepareShareModal,
+            <a class="share-link pointer" data-bind="click: prepareShareModal,
               css: {'isShared': isShared()}">
               <i class="fa fa-fw fa-users"></i> ${ _('Share') }
             </a>
