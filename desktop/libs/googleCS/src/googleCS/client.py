@@ -50,10 +50,10 @@ def _make_google_client(identifier):
   client_conf = conf.GOOGLE_ACCOUNTS[identifier]
   
   client = Client(GoogleOAuth2.from_config(client_conf))
-  return GSFileSystem(client)
+  return GSFileSystem(client.get_google_connection())
 
 class Client(object):
-  def __init__(self, authentication_provider = None, timeout = None, proxy_address=None, proxy_port=None, proxy_user=None,
+  def __init__(self, authentication_provider = None, timeout = None, host = None, proxy_address=None, proxy_port=None, proxy_user=None,
                proxy_pass=None,  is_secure = True, expiration = None):
     self._authentication_provider = authentication_provider
     self._timeout = timeout

@@ -30,7 +30,7 @@ def get_default_client_id():
   """
   Attempt to set AWS access key ID from script, else core-site, else None
   """
-  access_key_id_script = GOOGLE_ACCOUNTS['default'].ACCESS_KEY_ID_SCRIPT.get()
+  access_key_id_script = GOOGLE_ACCOUNTS['default'].CLIENT_ID_SCRIPT.get()
   return access_key_id_script #or get_google_access_key()
 
 
@@ -78,12 +78,6 @@ GOOGLE_ACCOUNTS = UnspecifiedConfigSection(
         private=True,
         type=coerce_password_from_script,
         help=_("Execute this script to produce the AWS secret access key.")
-      ),
-      SECURITY_TOKEN=Config(
-        key='security_token',
-        type=str,
-        private=True,
-        dynamic_default=get_default_session_token
       )
     )
   )

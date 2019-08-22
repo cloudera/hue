@@ -53,8 +53,8 @@ class GSTestBase(unittest.TestCase):
       return
 
     cls.path_prefix = 'test-hue/%s' % generate_id(size=16)
-    cls.gs_connection = googleCS.client.get_client('default').get_google_connection()
-    cls.bucket = cls.gs_connection.get_bucket(cls.bucket_name, validate=True)
+    cls.gs_connection = googleCS.client.get_client('default')
+    cls.bucket = cls.gs_connection.get_bucket(cls.bucket_name)
 
   @classmethod
   def shouldSkip(cls):

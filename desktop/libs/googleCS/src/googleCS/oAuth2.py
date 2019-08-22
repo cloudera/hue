@@ -46,14 +46,17 @@ class GoogleOAuth2(object):
 
   def _get_token(self, params=None):
     is_token_expired = self._token is None or time() >= self._token["expires_on"]
+    #some program to get authorization code here and possibly the redirect website
     if is_token_expired:
       LOG.debug("Authenticating to Google APIs: %s" % self._url)
       data = {
-        "grant_type" : "client_credentials", #temproary until actual autehntication
+        "grant_type" : "authorization_code", #temproary until actual autehntication
         "client_id" : self._access_key_id,
-        "client_secret" : self._secret_access_key
+        "client_secret" : self._secret_access_key,
+        "code" : self._authorize_code
       }
-      data.update(params)
+      if params is not None:
+        data.update(params)
       self._token = self._root.post("/", data=data, log_response=False);
       self._refresh_token = self._token["refresh_token"]
       self._token["expires_on"] = int(self._token.get("expires_on", self._token.get("expires_in")))
@@ -82,8 +85,8 @@ class GoogleOAuth2(object):
   @classmethod
   def from_config(cls, conf='default', version=None):
     access_key_id = GOOGLE_ACCOUNTS['default'].CLIENT_ID.get()
-    secret_access_key = GOOGLE_ACCOUNTS['default'].CLIENT_SECRET.get()
-    authorizecode = GOOGLE_ACCOUNTS['default'].AUTHORIZE_CODE.get()
+    secret_access_key = GOOGLE_ACCOUNTS['default'].SECRET_KEY.get()
+    #authorizecode = GOOGLE_ACCOUNTS['default'].AUTHORIZE_CODE.get()
 
     if None in (access_key_id, secret_access_key):
       raise ValueError('Can\'t create google client, credential is not configured')
@@ -93,6 +96,5 @@ class GoogleOAuth2(object):
     return cls(
       url,
       aws_access_key_id=access_key_id,
-      aws_secret_access_key=secret_access_key,
-      google_au_code=authorizecode
+      aws_secret_access_key=secret_access_key
     )
