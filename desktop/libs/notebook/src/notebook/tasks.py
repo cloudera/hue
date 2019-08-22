@@ -154,6 +154,7 @@ def run_sync_query(doc_id, user):
   if type(user) is str:
     lookup = {'email' if ENABLE_ORGANIZATIONS.get() else 'username': user}
     user = User.objects.get(**lookup)
+    user = rewrite_user(user)
 
   query_document = Document2.objects.get_by_uuid(user=user, uuid=doc_id)
   notebook = Notebook(document=query_document).get_data()
