@@ -47,27 +47,9 @@ def check_permissions(user, interpreter, user_apps=None):
 
 
 def get_ordered_interpreters(user=None):
-  if not INTERPRETERS.get():
-    _default_interpreters(user)
-
-  interpreters = INTERPRETERS.get()
-  interpreters_shown_on_wheel = _remove_duplications(INTERPRETERS_SHOWN_ON_WHEEL.get())
-
-  user_apps = appmanager.get_apps_dict(user)
-  user_interpreters = []
-  for interpreter in interpreters:
-    if check_permissions(user, interpreter, user_apps=user_apps):
-      pass # Not allowed
-    else:
-      user_interpreters.append(interpreter)
-
-  unknown_interpreters = set(interpreters_shown_on_wheel) - set(user_interpreters)
-  if unknown_interpreters:
-    raise ValueError("Interpreters from interpreters_shown_on_wheel is not in the list of Interpreters %s" % unknown_interpreters)
-
   if has_connectors():
     from desktop.lib.connectors.api import _get_installed_connectors
-    reordered_interpreters = [{
+    interpreters = [{
         'name': connector['nice_name'],
         'type': connector['name'],
         'dialect': connector['dialect'],
@@ -77,9 +59,29 @@ def get_ordered_interpreters(user=None):
         'options': {setting['name']: setting['value'] for setting in connector['settings']}
       } for connector in _get_installed_connectors(categories=['editor', 'catalogs'])
     ]
+    # No connector permission currently
   else:
+    if not INTERPRETERS.get():
+      _default_interpreters(user)
+    interpreters = INTERPRETERS.get()
+
+    user_apps = appmanager.get_apps_dict(user)
+    user_interpreters = []
+    for interpreter in interpreters:
+      if check_permissions(user, interpreter, user_apps=user_apps):
+        pass # Not allowed
+      else:
+        user_interpreters.append(interpreter)
+
+    interpreters_shown_on_wheel = _remove_duplications(INTERPRETERS_SHOWN_ON_WHEEL.get())
+    unknown_interpreters = set(interpreters_shown_on_wheel) - set(user_interpreters)
+    if unknown_interpreters:
+      # Just filtering it out might be better than failing for this user
+      raise ValueError("Interpreters from interpreters_shown_on_wheel is not in the list of Interpreters %s" % unknown_interpreters)
+
     reordered_interpreters = interpreters_shown_on_wheel + [i for i in user_interpreters if i not in interpreters_shown_on_wheel]
-    reordered_interpreters = [{
+
+    interpreters = [{
         'name': interpreters[i].NAME.get(),
         'type': i,
         'interface': interpreters[i].INTERFACE.get(),
@@ -97,7 +99,7 @@ def get_ordered_interpreters(user=None):
       "is_sql": i.get('is_sql') or i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy"],
       "is_catalog": i['interface'] in ["hms",],
     }
-    for i in reordered_interpreters
+    for i in interpreters
   ]
 
 # cf. admin wizard too
