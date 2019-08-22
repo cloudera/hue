@@ -244,6 +244,8 @@ Direct interface:
       name=Presto SQL
       interface=presto
       ## Specific options for connecting to the Presto server.
+      ## To connect to Presto over HTTPS/SSL you will need to construct connection string like below:
+      ## "url": "jdbc:presto://localhost:8080/catalog/schema?SSL=true&SSLTrustStorePath=/path/to/key_file&SSLTrustStorePassword=${password}"   
       ## The JDBC driver presto-jdbc.jar need to be in the CLASSPATH environment variable.
       ## If 'user' and 'password' are omitted, they will be prompted in the UI.
       options='{"url": "jdbc:presto://localhost:8080/catalog/schema", "driver": "io.prestosql.jdbc.PrestoDriver", "user": "root", "password": "root"}'
