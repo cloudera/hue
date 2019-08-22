@@ -1799,7 +1799,7 @@ class ClusterConfig(object):
         'displayName': _('ABFS'),
         'buttonName': _('Browse'),
         'tooltip': _('ABFS'),
-        'page': '/filebrowser/view=' + urllib.quote('abfs://'.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
+        'page': '/filebrowser/view=' + urllib_quote('abfs://'.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
       })
 
     if 'metastore' in self.apps:
