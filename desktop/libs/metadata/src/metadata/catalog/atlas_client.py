@@ -22,6 +22,7 @@ import re
 
 from django.utils.translation import ugettext as _
 
+from desktop.lib.exceptions_renderable import raise_popup_exception
 from desktop.lib.rest import resource
 from desktop.lib.rest.http_client import HttpClient, RestException
 
@@ -174,11 +175,10 @@ class AtlasApi(Api):
 
       return response['entity'][0]
     except RestException as e:
-      LOG.error('Failed to search for entities with search query: %s' % dsl_query)
       if e.code == 401:
-        raise CatalogAuthException(_('Failed to authenticate.'))
+        raise raise_popup_exception('Hue could not authenticate to Atlas', detail=e)
       else:
-        raise CatalogApiException(e.message)
+        raise raise_popup_exception('Hue could not query Atlas', detail=e)
 
   def get_database(self, name):
     # Search with Atlas API for hive database with specific name
@@ -304,11 +304,10 @@ class AtlasApi(Api):
 
       return response
     except RestException as e:
-      LOG.error('Failed to search for entities with search query: %s' % data)
       if e.code == 401:
-        raise CatalogAuthException(_('Failed to authenticate.'))
+        raise raise_popup_exception('Hue could not authenticate to Atlas', detail=e)
       else:
-        raise CatalogApiException(e.message)
+        raise raise_popup_exception('Hue could not query Atlas', detail=e)
 
   # search_enties is only used by the table browser to fetch child entities of a given table or database.
   def search_entities(self, query_s, limit=100, offset=0, raw_query=False, **filters):
@@ -353,19 +352,19 @@ class AtlasApi(Api):
 
       return found_entities
     except RestException as e:
-      LOG.error('Failed to search for entities with search query: %s' % atlas_dsl_query)
       if e.code == 401:
-        raise CatalogAuthException(_('Failed to authenticate.'))
+        raise raise_popup_exception('Hue could not authenticate to Atlas', detail=e)
       else:
-        raise CatalogApiException(e.message)
+        raise raise_popup_exception('Hue could not query Atlas', detail=e)
 
   def suggest(self, prefix=None):
     try:
       return self._root.get('interactive/suggestions?query=%s' % (prefix or '*'))
     except RestException as e:
-      msg = 'Failed to search for entities with search query: %s' % prefix
-      LOG.error(msg)
-      raise CatalogApiException(e.message)
+      if e.code == 401:
+        raise raise_popup_exception('Hue could not authenticate to Atlas', detail=e)
+      else:
+        raise raise_popup_exception('Failed to search for entities', detail=e)
 
   def get_entity(self, entity_id):
     """
@@ -398,9 +397,10 @@ class AtlasApi(Api):
 
       return self._root.put('entities/%(identity)s' % entity, params=self.__params, data=data, contenttype=_JSON_CONTENT_TYPE, allow_redirects=True, clear_cookies=True)
     except RestException as e:
-      msg = 'Failed to update entity %s: %s' % (entity['identity'], e)
-      LOG.error(msg)
-      raise CatalogApiException(e.message)
+      if e.code == 401:
+        raise raise_popup_exception('Hue could not authenticate to Atlas', detail=e)
+      else:
+        raise raise_popup_exception('Failed to update entity', detail=e)
 
 
   def get_cluster_source_ids(self):
@@ -467,9 +467,10 @@ class AtlasApi(Api):
 
       return self._root.get('lineage', headers=self.__headers, params=params)
     except RestException as e:
-      msg = 'Failed to get lineage for entity ID %s: %s' % (entity_id, str(e))
-      LOG.error(msg)
-      raise CatalogApiException(e.message)
+      if e.code == 401:
+        raise raise_popup_exception('Hue could not authenticate to Atlas', detail=e)
+      else:
+        raise raise_popup_exception('Failed to get lineage', detail=e)
 
 
   def create_namespace(self, namespace, description=None):
@@ -477,18 +478,20 @@ class AtlasApi(Api):
       data = json.dumps({'name': namespace, 'description': description})
       return self._root.post('models/namespaces/', data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
     except RestException as e:
-      msg = 'Failed to create namespace: %s' % namespace
-      LOG.error(msg)
-      raise CatalogApiException(e.message)
+      if e.code == 401:
+        raise raise_popup_exception('Hue could not authenticate to Atlas', detail=e)
+      else:
+        raise raise_popup_exception('Failed to create namespace', detail=e)
 
 
   def get_namespace(self, namespace):
     try:
       return self._root.get('models/namespaces/%(namespace)s' % {'namespace': namespace})
     except RestException as e:
-      msg = 'Failed to get namespace: %s' % namespace
-      LOG.error(msg)
-      raise CatalogApiException(e.message)
+      if e.code == 401:
+        raise raise_popup_exception('Hue could not authenticate to Atlas', detail=e)
+      else:
+        raise raise_popup_exception('Failed to get namespace', detail=e)
 
 
   def create_namespace_property(self, namespace, properties):
@@ -496,18 +499,20 @@ class AtlasApi(Api):
       data = json.dumps(properties)
       return self._root.post('models/namespaces/%(namespace)s/properties' % {'namespace': namespace}, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
     except RestException as e:
-      msg = 'Failed to create namespace %s property' % namespace
-      LOG.error(msg)
-      raise CatalogApiException(e.message)
+      if e.code == 401:
+        raise raise_popup_exception('Hue could not authenticate to Atlas', detail=e)
+      else:
+        raise raise_popup_exception('Failed to create namespace', detail=e)
 
 
   def get_namespace_properties(self, namespace):
     try:
       return self._root.get('models/namespaces/%(namespace)s/properties' % {'namespace': namespace})
     except RestException as e:
-      msg = 'Failed to create namespace %s property' % namespace
-      LOG.error(msg)
-      raise CatalogApiException(e.message)
+      if e.code == 401:
+        raise raise_popup_exception('Hue could not authenticate to Atlas', detail=e)
+      else:
+        raise raise_popup_exception('Failed to create namespace', detail=e)
 
 
   def map_namespace_property(self, clazz, properties):
@@ -515,18 +520,20 @@ class AtlasApi(Api):
       data = json.dumps(properties)
       return self._root.post('models/packages/nav/classes/%(class)s/properties' % {'class': clazz}, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
     except RestException as e:
-      msg = 'Failed to map class %s property' % clazz
-      LOG.error(msg)
-      raise CatalogApiException(e.message)
+      if e.code == 401:
+        raise raise_popup_exception('Hue could not authenticate to Atlas', detail=e)
+      else:
+        raise raise_popup_exception('Failed to map class', detail=e)
 
 
   def get_model_properties_mapping(self):
     try:
       return self._root.get('models/properties/mappings')
     except RestException as e:
-      msg = 'Failed to get models properties mappings'
-      LOG.error(msg)
-      raise CatalogApiException(e.message)
+      if e.code == 401:
+        raise raise_popup_exception('Hue could not authenticate to Atlas', detail=e)
+      else:
+        raise raise_popup_exception('Failed to get models properties mappings', detail=e)
 
 
   def _fillup_properties(self):
