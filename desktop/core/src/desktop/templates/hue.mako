@@ -21,7 +21,7 @@
   from desktop.conf import IS_MULTICLUSTER_ONLY, has_multi_clusters
   from desktop.views import _ko, commonshare, login_modal
   from desktop.lib.i18n import smart_unicode
-  from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, ANALYTIC_DB, hue_version, get_cluster_config
+  from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, hue_version, get_cluster_config
 
   from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
   from filebrowser.conf import SHOW_UPLOAD_BUTTON
@@ -450,7 +450,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     % endfor
   % endif
 
-  % if is_admin(user) and cluster != ANALYTIC_DB:
+  % if is_admin(user):
   window.SHOW_ADD_MORE_EDITORS = true;
   % endif
 

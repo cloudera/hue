@@ -1565,10 +1565,6 @@ def get_cluster_config(user):
   return Cluster(user).get_app_config().get_config()
 
 
-# Aka 'Atus'
-ANALYTIC_DB = 'altus'
-
-
 class ClusterConfig(object):
   """
   Configuration of the apps and engines that each individual user sees on the core Hue.
@@ -1669,9 +1665,6 @@ class ClusterConfig(object):
 
     _interpreters = get_ordered_interpreters(self.user)
 
-    if ANALYTIC_DB in self.cluster_type:
-      _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] in ('impala')] #, 'hive', 'spark2', 'pyspark', 'mapreduce')]
-
     for interpreter in _interpreters:
       if interpreter['interface'] != 'hms':
         interpreters.append({
@@ -1685,7 +1678,7 @@ class ClusterConfig(object):
           'dialect': interpreter['dialect'],
         })
 
-    if SHOW_NOTEBOOKS.get() and ANALYTIC_DB not in self.cluster_type:
+    if SHOW_NOTEBOOKS.get():
       try:
         first_non_sql_index = [interpreter['is_sql'] for interpreter in interpreters].index(False)
       except ValueError:
@@ -1738,7 +1731,7 @@ class ClusterConfig(object):
     interpreters = get_engines(self.user)
     _interpreters = []
 
-    if interpreters and ANALYTIC_DB not in self.cluster_type:
+    if interpreters:
       if HAS_REPORT_ENABLED.get():
         _interpreters.append({
           'type': 'report',
@@ -1772,7 +1765,7 @@ class ClusterConfig(object):
   def _get_browser(self):
     interpreters = []
 
-    if 'filebrowser' in self.apps and ANALYTIC_DB not in self.cluster_type and fsmanager.is_enabled_and_has_access('hdfs', self.user):
+    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('hdfs', self.user):
       interpreters.append({
         'type': 'hdfs',
         'displayName': _('Files'),
@@ -1790,7 +1783,7 @@ class ClusterConfig(object):
         'page': '/filebrowser/view=' + urllib_quote('S3A://'.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
       })
 
-    if 'filebrowser' in self.apps and ANALYTIC_DB not in self.cluster_type and fsmanager.is_enabled_and_has_access('adl', self.user):
+    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('adl', self.user):
       interpreters.append({
         'type': 'adls',
         'displayName': _('ADLS'),
@@ -1799,7 +1792,7 @@ class ClusterConfig(object):
         'page': '/filebrowser/view=' + urllib_quote('adl:/'.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
       })
       
-    if 'filebrowser' in self.apps and ANALYTIC_DB not in self.cluster_type and fsmanager.is_enabled_and_has_access('abfs', self.user):
+    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('abfs', self.user):
       interpreters.append({
         'type': 'abfs',
         'displayName': _('ABFS'),
@@ -1817,7 +1810,7 @@ class ClusterConfig(object):
         'page': '/metastore/tables'
       })
 
-    if 'search' in self.apps and ANALYTIC_DB not in self.cluster_type:
+    if 'search' in self.apps:
       interpreters.append({
         'type': 'indexes',
         'displayName': _('Indexes'),
@@ -1829,18 +1822,16 @@ class ClusterConfig(object):
     if 'jobbrowser' in self.apps:
       from hadoop.cluster import get_default_yarncluster # Circular loop
 
-      title =  _('Jobs') if ANALYTIC_DB not in self.cluster_type else _('Queries')
-
       if get_default_yarncluster():
         interpreters.append({
           'type': 'yarn',
-          'displayName': title,
-          'buttonName': title,
-          'tooltip': title,
+          'displayName': _('Jobs'),
+          'buttonName': _('Jobs'),
+          'tooltip': _('Jobs'),
           'page': '/jobbrowser/'
         })
 
-    if has_kafka() and ANALYTIC_DB not in self.cluster_type:
+    if has_kafka():
       interpreters.append({
         'type': 'kafka',
         'displayName': _('Streams'),
@@ -1849,7 +1840,7 @@ class ClusterConfig(object):
         'page': '/kafka/'
       })
 
-    if 'hbase' in self.apps and ANALYTIC_DB not in self.cluster_type:
+    if 'hbase' in self.apps:
       interpreters.append({
         'type': 'hbase',
         'displayName': _('HBase'),
@@ -1876,7 +1867,7 @@ class ClusterConfig(object):
         'page': '/indexer/importer'
       })
 
-    if 'sqoop' in self.apps and ANALYTIC_DB not in self.cluster_type:
+    if 'sqoop' in self.apps:
       from sqoop.conf import IS_ENABLED
       if IS_ENABLED.get():
         interpreters.append({
@@ -1921,7 +1912,28 @@ class ClusterConfig(object):
       }
     ]
 
-    if 'oozie' in self.apps and not (self.user.has_hue_permission(action="disable_editor_access", app="oozie") and not is_admin(self.user)) and ANALYTIC_DB not in self.cluster_type:
+    if 'oozie' in self.apps and not (self.user.has_hue_permission(action="disable_editor_access", app="oozie") and not is_admin(self.user)):
+      interpreters.extend([{
+          'type': 'oozie-workflow',
+          'displayName': _('Workflow'),
+          'buttonName': _('Schedule'),
+          'tooltip': _('Workflow'),
+          'page': '/oozie/editor/workflow/new/'
+        }, {
+          'type': 'oozie-coordinator',
+          'displayName': _('Schedule'),
+          'buttonName': _('Schedule'),
+          'tooltip': _('Schedule'),
+          'page': '/oozie/editor/coordinator/new/'
+        }, {
+          'type': 'oozie-bundle',
+          'displayName': _('Bundle'),
+          'buttonName': _('Schedule'),
+          'tooltip': _('Bundle'),
+          'page': '/oozie/editor/bundle/new/'
+        }
+      ])
+
       return {
           'name': 'oozie',
           'displayName': _('Scheduler'),
