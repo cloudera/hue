@@ -282,7 +282,7 @@ class SqlAlchemyApi(Api):
     else:
       columns = assist.get_columns(database, table)
       response['name'] = next((col['name'] for col in columns if column == col['name']), '')
-      response['type'] = next((col['type'] for col in columns if column == col['name']), '')
+      response['type'] = next((str(col['type']) for col in columns if column == col['name']), '')
 
     response['status'] = 0
     return response
