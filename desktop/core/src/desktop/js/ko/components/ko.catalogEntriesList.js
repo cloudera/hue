@@ -166,7 +166,7 @@ const TEMPLATE = `
   'Field'
 )}'"></span> (<span data-bind="text: filteredEntries().length"></span>)</th>
         <th>${I18n('Type')}</th>
-        <th>${I18n(
+        <th with="25%">${I18n(
           'Description'
         )} <!-- ko if: loadingNav --><i class="fa fa-spinner fa-spin"></i><!-- /ko --></th>
         <th colspan="2">${I18n(
