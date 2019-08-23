@@ -487,7 +487,12 @@
     layer: '${ leaflet['layer'] |n,unicode }',
     attribution: '${ leaflet['attribution'] |n,unicode }',
     mapOptions: JSON.parse('${ leaflet['map_options'] |n,unicode }'),
-    layerOptions: JSON.parse('${ leaflet['layer_options'] |n,unicode }')
+    layerOptions: JSON.parse('${ leaflet['layer_options'] |n,unicode }'),
+    images: {
+      'icon': '${ static('desktop/ext/img/leaflet/marker-icon.png') }',
+      'icon-2x': '${ static('desktop/ext/img/leaflet/marker-icon-2x.png') }',
+      'shadow': '${ static('desktop/ext/img/leaflet/marker-shadow.png') }',
+    }
   };
 
   window.USER_VIEW_EDIT_USER_ENABLED = '${ user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or is_admin(user) }' === 'True';
