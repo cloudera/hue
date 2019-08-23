@@ -233,9 +233,7 @@ class AssistPanel {
             if (self.visiblePanel() !== documentsPanel) {
               self.visiblePanel(documentsPanel);
             }
-            if (docType) {
-              documentsPanel.panelData.setTypeFilter(docType);
-            }
+            huePubSub.publish('assist.documents.set.type.filter', docType);
           });
 
           if (window.HAS_GIT) {
