@@ -1766,6 +1766,11 @@ TASK_SERVER = ConfigSection(
       default='amqp://guest:guest@localhost//',
       help=_('How the task server and tasks communicate.')
     ),
+    FLOWER_URL=Config(
+      key='flower_url',
+      default='http://localhost:5555',
+      help=_('Url to Flower task server API.')
+    ),
     CELERY_RESULT_BACKEND=Config(
       key='celery_result_backend',
       dynamic_default=task_server_default_result_directory,
