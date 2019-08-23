@@ -19,7 +19,11 @@ from past.utils import old_div
 from builtins import object
 import logging
 import posixpath
+import urllib
 import time
+
+from django.utils.encoding import iri_to_uri, smart_str
+from django.utils.http import urlencode
 
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.apputil import WARN_LEVEL_CALL_DURATION_MS, INFO_LEVEL_CALL_DURATION_MS
@@ -102,15 +106,22 @@ class Resource(object):
                                   allow_redirects=allow_redirects,
                                   urlencode=self._urlencode,
                                   clear_cookies=clear_cookies)
-    finally: # Print the response time even when there's an exception
+    finally: # Print even when there's an exception
       log_length = conf.REST_RESPONSE_SIZE.get() != -1 and conf.REST_RESPONSE_SIZE.get() if log_response else 0 # We want to output duration without content
       duration = time.time() - start_time
-      message = "%s %s Got response%s: %s%s" % (
-          method,
-          smart_unicode(path, errors='ignore'),
-          ' in %dms' % (duration * 1000),
-          smart_unicode(resp.content[:log_length], errors='replace') if resp else "",
-          log_length and len(resp.content) > log_length and "..." or "" if resp else ""
+      message = '%s %s %s%s%s %s%s returned in %dms %s %s %s%s' % (
+        method,
+        type(self._client._session.auth) if self._client._session and self._client._session.auth else None,
+        self._client._base_url,
+        smart_str(path),
+        iri_to_uri('?' + urlencode(params)) if params else '',
+        smart_unicode(data, errors='replace')[:log_length] if data else "",
+        log_length and len(data) > log_length and "..." or "" if data else "",
+        (duration * 1000),
+        resp.status_code if resp else 0,
+        len(resp.content) if resp else 0,
+        smart_unicode(resp.content[:log_length], errors='replace') if resp else "",
+        log_length and len(resp.content) > log_length and "..." or "" if resp else ""
       )
       self._client.logger.disabled = 0
       log_if_slow_call(duration=duration, message=message, logger=self._client.logger)
