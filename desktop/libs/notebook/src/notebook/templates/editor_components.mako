@@ -299,6 +299,11 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <i class="fa fa-fw fa-cogs"></i> ${ _('Session') }
           </a>
         </li>
+        <li>
+          <a class="pointer" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
+            <i class="fa fa-fw fa-code-fork"></i> ${ _('Versions') }
+          </a>
+        </li>
       </ul>
     </div>
     <!-- /ko -->
@@ -364,6 +369,19 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   </div>
   <div class="modal-body">
     <pre data-bind="oneClickSelect, text: combinedContent"></pre>
+  </div>
+  <div class="modal-footer">
+    <a href="javascript: void(0)" class="btn" data-dismiss="modal">${_('Close')}</a>
+  </div>
+</div>
+
+<div id="helpModal${ suffix }" class="modal transparent-modal hide" data-backdrop="true" style="width:980px;margin-left:-510px!important">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${_('Editor help')}</h2>
+  </div>
+  <div class="modal-body">
+    <!-- ko component: 'aceKeyboardShortcuts' --><!-- /ko -->
   </div>
   <div class="modal-footer">
     <a href="javascript: void(0)" class="btn" data-dismiss="modal">${_('Close')}</a>
