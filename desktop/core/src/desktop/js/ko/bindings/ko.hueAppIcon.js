@@ -61,7 +61,7 @@ const APP_ICON_INDEX = {
   text: `<i class="fa fa-fw fa-i-cursor"></i>`,
   warehouses: `<i class="altus-icon altus-adb-cluster" style="margin: 0 1px 0 3px"></i>`,
   workflows: `<svg class="hi hi-fw"><use xlink:href="#hi-oozie"></use></svg>`,
-  yarn: `<svg class="hi hi-fw"><use xlink:href="#hi-broadcast"></use></svg>`
+  yarn: `<i class="fa fa-fw fa-tasks"></i>`
 };
 
 ko.bindingHandlers.hueAppIcon = {
