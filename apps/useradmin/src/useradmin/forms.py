@@ -196,6 +196,13 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
       self.save_m2m()
     return user
 
+if ENABLE_ORGANIZATIONS.get():
+  class OrganizationUserChangeForm(UserChangeForm):
+    username = None
+    email = forms.CharField(
+        label=_t("Email"),
+        widget=forms.TextInput(attrs={'maxlength': 150, 'placeholder': _t("Email"), 'autocomplete': 'off', 'autofocus': 'autofocus'})
+    )
 
 if ENABLE_ORGANIZATIONS.get():
   class OrganizationUserChangeForm(UserChangeForm):
