@@ -49,8 +49,8 @@ from hadoop.fs.exceptions import WebHdfsException
 
 from useradmin import ldap_access
 from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm, AddLdapUsersForm,\
-  PermissionsEditForm, GroupEditForm, SuperUserChangeForm, UserChangeForm, validate_username, validate_first_name, \
-  validate_last_name, PasswordChangeForm, OrganizationUserChangeForm, OrganizationSuperUserChangeForm
+  PermissionsEditForm, GroupEditForm, SuperUserChangeForm, validate_username, validate_first_name, \
+  validate_last_name, PasswordChangeForm
 from useradmin.ldap_access import LdapBindException, LdapSearchException
 from useradmin.models import HuePermission, UserProfile, LdapGroup
 from useradmin.models import get_profile, get_default_user_group
@@ -60,8 +60,10 @@ if sys.version_info[0] > 2:
 
 if ENABLE_ORGANIZATIONS.get():
   from useradmin.models import User, Group
+  from useradmin.forms import OrganizationUserChangeForm as UserChangeForm, OrganizationSuperUserChangeForm as SuperUserChangeForm
 else:
   from django.contrib.auth.models import User, Group
+  from useradmin.forms import UserChangeForm, SuperUserChangeForm
 
 
 LOG = logging.getLogger(__name__)
@@ -295,9 +297,9 @@ def edit_user(request, username=None):
   if require_change_password(userprofile):
     form_class = PasswordChangeForm
   elif is_admin(request.user):
-    form_class = OrganizationSuperUserChangeForm if ENABLE_ORGANIZATIONS.get() else SuperUserChangeForm
+    form_class = SuperUserChangeForm
   else:
-    form_class = OrganizationUserChangeForm if ENABLE_ORGANIZATIONS.get() else UserChangeForm
+    form_class = UserChangeForm
 
   if request.method == 'POST':
     form = form_class(request.POST, instance=instance)

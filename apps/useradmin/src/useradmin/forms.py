@@ -201,32 +201,50 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
       self.save_m2m()
     return user
 
+if ENABLE_ORGANIZATIONS.get():
+  class OrganizationUserChangeForm(UserChangeForm):
+    username = None
+    email = forms.CharField(
+        label=_t("Email"),
+        widget=forms.TextInput(attrs={'maxlength': 150, 'placeholder': _t("Email"), 'autocomplete': 'off', 'autofocus': 'autofocus'})
+    )
 
-class OrganizationUserChangeForm(UserChangeForm):
-  username = None
-  email = forms.CharField(
-      label=_t("Email"),
-      widget=forms.TextInput(attrs={'maxlength': 150, 'placeholder': _t("Email"), 'autocomplete': 'off', 'autofocus': 'autofocus'})
-  )
+    class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
+      model =  User
+      fields = ["first_name", "last_name", "email", "ensure_home_directory", "organization"]
 
-  class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
-    model =  User
-    fields = ["first_name", "last_name", "email", "ensure_home_directory", "organization"]
+    def __init__(self, *args, **kwargs):
+      super(OrganizationUserChangeForm, self).__init__(*args, **kwargs)
 
-  def __init__(self, *args, **kwargs):
-    super(OrganizationUserChangeForm, self).__init__(*args, **kwargs)
+      if self.instance.id:
+        self.fields['email'].widget.attrs['readonly'] = True
 
-    if self.instance.id:
-      self.fields['email'].widget.attrs['readonly'] = True
+      self.fields['organization'] = forms.ChoiceField(choices=((default_organization().id, default_organization()),), initial=default_organization())
 
-    self.fields['organization'] = forms.ChoiceField(choices=((default_organization().id, default_organization()),), initial=default_organization())
+    def clean_organization(self):
+      try:
+        return Organization.objects.get(id=int(self.cleaned_data.get('organization')))
+      except:
+        LOG.exception('The organization does not exist.')
+        return None
 
-  def clean_organization(self):
-    try:
-      return Organization.objects.get(id=int(self.cleaned_data.get('organization')))
-    except:
-      LOG.exception('The organization does not exist.')
-      return None
+  # Mixin __init__ method?
+  class OrganizationSuperUserChangeForm(OrganizationUserChangeForm):
+    class Meta(UserChangeForm.Meta):
+      fields = ["email", "is_active"] + OrganizationUserChangeForm.Meta.fields + ["is_superuser", "unlock_account", "groups"]
+
+    def __init__(self, *args, **kwargs):
+      super(OrganizationSuperUserChangeForm, self).__init__(*args, **kwargs)
+      if self.instance.id:
+        # If the user exists already, we'll use its current group memberships
+        self.initial['groups'] = set(self.instance.groups.all())
+      else:
+        # If this is a new user, suggest the default group
+        default_group = get_default_user_group()
+        if default_group is not None:
+          self.initial['groups'] = set([default_group])
+        else:
+          self.initial['groups'] = []
 
 
 class PasswordChangeForm(UserChangeForm):
@@ -252,24 +270,6 @@ class SuperUserChangeForm(UserChangeForm):
       self.initial['groups'] = set(self.instance.groups.all())
     else:
       # If his is a new user, suggest the default group
-      default_group = get_default_user_group()
-      if default_group is not None:
-        self.initial['groups'] = set([default_group])
-      else:
-        self.initial['groups'] = []
-
-# Mixin __init__ method?
-class OrganizationSuperUserChangeForm(OrganizationUserChangeForm):
-  class Meta(UserChangeForm.Meta):
-    fields = ["email", "is_active"] + OrganizationUserChangeForm.Meta.fields + ["is_superuser", "unlock_account", "groups"]
-
-  def __init__(self, *args, **kwargs):
-    super(OrganizationSuperUserChangeForm, self).__init__(*args, **kwargs)
-    if self.instance.id:
-      # If the user exists already, we'll use its current group memberships
-      self.initial['groups'] = set(self.instance.groups.all())
-    else:
-      # If this is a new user, suggest the default group
       default_group = get_default_user_group()
       if default_group is not None:
         self.initial['groups'] = set([default_group])
