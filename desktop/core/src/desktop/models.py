@@ -48,7 +48,8 @@ from kafka.conf import has_kafka
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 
 from desktop import appmanager
-from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_EMBEDDED, IS_K8S_ONLY
+from desktop.auth.backend import is_admin
+from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_K8S_ONLY
 from desktop.lib import fsmanager
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
@@ -1774,7 +1775,7 @@ class ClusterConfig(object):
         'page': '/filebrowser/' + (not self.user.is_anonymous() and 'view=' + urllib_quote(self.user.get_home_directory().encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) or '')
       })
 
-    if 'filebrowser' in self.apps and not IS_EMBEDDED.get() and fsmanager.is_enabled_and_has_access('s3a', self.user):
+    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('s3a', self.user):
       interpreters.append({
         'type': 's3',
         'displayName': _('S3'),
@@ -1791,7 +1792,7 @@ class ClusterConfig(object):
         'tooltip': _('ADLS'),
         'page': '/filebrowser/view=' + urllib_quote('adl:/'.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
       })
-      
+
     if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('abfs', self.user):
       interpreters.append({
         'type': 'abfs',
@@ -1849,7 +1850,7 @@ class ClusterConfig(object):
         'page': '/hbase/'
       })
 
-    if 'security' in self.apps and not IS_EMBEDDED.get():
+    if 'security' in self.apps:
       interpreters.append({
         'type': 'security',
         'displayName': _('Security'),
@@ -1858,7 +1859,7 @@ class ClusterConfig(object):
         'page': '/security/hive'
       })
 
-    if 'indexer' in self.apps and 'filebrowser' in self.apps and self.user.has_hue_permission(action="access:importer", app="indexer") and not IS_EMBEDDED.get():
+    if 'indexer' in self.apps and 'filebrowser' in self.apps and self.user.has_hue_permission(action="access:importer", app="indexer"):
       interpreters.append({
         'type': 'importer',
         'displayName': _('Importer'),

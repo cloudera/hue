@@ -49,7 +49,7 @@ from hadoop import cluster
 
 import desktop.views
 import desktop.conf
-from desktop.conf import IS_EMBEDDED
+from desktop.auth.backend import is_admin
 from desktop.context_processors import get_app_name
 from desktop.lib import apputil, i18n, fsmanager
 from desktop.lib.django_util import JsonResponse, render, render_json
@@ -349,9 +349,7 @@ class LoginAndPermissionMiddleware(object):
       response[MIDDLEWARE_HEADER] = 'LOGIN_REQUIRED'
       return response
     else:
-      if IS_EMBEDDED.get():
-        return HttpResponseForbidden()
-      elif request.GET.get('is_embeddable'):
+      if request.GET.get('is_embeddable'):
         return JsonResponse({'url': "%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, urlquote('/hue' + request.get_full_path().replace('is_embeddable=true', '').replace('&&','&')))}) # Remove embeddable so redirect from & to login works. Login page is not embeddable
       else:
         return HttpResponseRedirect("%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, urlquote(request.get_full_path())))

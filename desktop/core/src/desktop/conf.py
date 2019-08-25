@@ -1584,13 +1584,6 @@ ENABLE_SQL_SYNTAX_CHECK = Config(
   help=_('Choose whether to enable SQL syntax check or not.')
 )
 
-IS_EMBEDDED = Config(
-  key='is_embedded',
-  default=False,
-  type=coerce_bool,
-  help=_('Choose whether Hue is embedded or not.')
-)
-
 EDITOR_AUTOCOMPLETE_TIMEOUT = Config(
   key='editor_autocomplete_timeout',
   type=int,
