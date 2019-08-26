@@ -1,0 +1,19 @@
+Metadata-Version: 2.1
+Name: jaeger-client
+Version: 4.0.0
+Summary: Jaeger Python OpenTracing Tracer implementation
+Home-page: https://github.com/jaegertracing/jaeger-client-python
+Author: Yuri Shkuro
+Author-email: ys@uber.com
+License: Apache License 2.0
+Description: UNKNOWN
+Keywords: jaeger,tracing,opentracing
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Provides-Extra: tests
