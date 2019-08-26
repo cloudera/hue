@@ -44,7 +44,8 @@ Notes:
 * Trace DB & more via https://github.com/census-instrumentation/opencensus-python#extensions?
 * Trace HTTP
 * Tracer options for remote Jaeger?
-* pip install dependencies jaeger-client django_opentracing
 * get active spans and set ids earlier
 * Add session ids to tags
 * Jaeger embedded UI with User / Session / Query input boxes
+* Provide Trace ID to Task Worker
+* Provide Trace ID to Impala
