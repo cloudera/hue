@@ -77,7 +77,9 @@ ${ components.menubar(is_embeddable) }
 
 <script type="text/html" id="metastore-breadcrumbs">
   <div style="font-size: 14px; margin: 0 12px; line-height: 27px;">
+    <!-- ko if: sources().length >= 2 -->
     <div data-bind="component: { name: 'hue-drop-down', params: { value: source, entries: sources, onSelect: sourceChanged, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Source') }' } }" style="display: inline-block"></div>
+    <!-- /ko -->
     <!-- ko with: source -->
     <!-- ko if: window.HAS_MULTI_CLUSTER -->
     <!-- ko if: namespaces().length === 0 -->
