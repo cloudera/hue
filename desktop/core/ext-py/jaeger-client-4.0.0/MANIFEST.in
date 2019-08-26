@@ -1,0 +1,10 @@
+recursive-include jaeger_client *.thrift
+include *.md
+include *.rst
+include *.txt
+include *.yaml
+include Makefile
+recursive-include config *.json
+recursive-include config *.yaml
+recursive-include docs *.rst
+recursive-include tests *.py
