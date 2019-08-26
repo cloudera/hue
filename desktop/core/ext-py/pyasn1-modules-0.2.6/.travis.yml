@@ -1,0 +1,47 @@
+language: python
+cache: pip
+matrix:
+  include:
+  - os: linux
+    dist: trusty
+    python: '2.6'
+  - os: linux
+    dist: trusty
+    python: '2.7'
+# unit test runner fails on tests import
+#  - os: linux
+#    dist: trusty
+#    python: '3.2'
+#  - os: linux
+#    dist: trusty
+#    python: '3.3'
+  - os: linux
+    dist: trusty
+    python: '3.4'
+  - os: linux
+    dist: trusty
+    python: '3.5'
+  - os: linux
+    dist: trusty
+    python: '3.6'
+  - os: linux
+    dist: xenial
+    python: '3.7'
+  - os: linux
+    dist: trusty
+    python: 'nightly'
+  - os: linux
+    dist: trusty
+    python: 'pypy'
+  - os: linux
+    dist: trusty
+    python: 'pypy3'
+install:
+  - pip install codecov
+  - pip install -r requirements.txt
+  - pip install -e .
+script:
+  - PYTHONPATH=.:$PYTHONPATH python tests/__main__.py
+after_success:
+  - PYTHONPATH=.:$PYTHONPATH coverage run --omit=*test* tests/__main__.py
+  - codecov
