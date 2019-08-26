@@ -1861,6 +1861,101 @@ class ApiHelper {
     return new CancellablePromise(deferred, undefined, cancellablePromises);
   }
 
+  clearNotebookHistory(options) {
+    const data = {
+      notebook: options.notebookJson,
+      doc_type: options.docType,
+      is_notification_manager: options.isNotificationManager
+    };
+    return this.simplePost('/notebook/api/clear_history', data);
+  }
+
+  closeNotebook(options) {
+    const data = {
+      notebook: options.notebookJson,
+      editorMode: options.editorMode
+    };
+    return this.simplePost('/notebook/api/notebook/close', data);
+  }
+
+  createSession(options) {
+    const data = {
+      notebook: options.notebookJson,
+      session: options.sessionJson,
+      cluster: options.clusterJson
+    };
+    return this.simplePost('/notebook/api/create_session', data);
+  }
+
+  checkStatus(options) {
+    const data = {
+      notebook: options.notebookJson
+    };
+    return this.simplePost('/notebook/api/check_status', data);
+  }
+
+  getExternalStatement(options) {
+    const data = {
+      notebook: options.notebookJson,
+      snippet: options.snippetJson
+    };
+    return this.simplePost('/notebook/api/get_external_statement', data);
+  }
+
+  fetchResultSize(options) {
+    const data = {
+      notebook: options.notebookJson,
+      snippet: options.snippetJson
+    };
+    return this.simplePost('/notebook/api/fetch_result_size', data);
+  }
+
+  statementRisk(options) {
+    const data = {
+      notebook: options.notebookJson,
+      snippet: options.snippetJson
+    };
+    return this.simplePost('/notebook/api/optimizer/statement/risk', data);
+  }
+
+  getLogs(options) {
+    const data = {
+      notebook: options.notebookJson,
+      snippet: options.snippetJson,
+      from: options.from,
+      jobs: options.jobsJson,
+      full_log: options.fullLog
+    };
+    return this.simplePost('/notebook/api/get_logs', data);
+  }
+
+  statementCompatibility(options) {
+    const data = {
+      notebook: options.notebookJson,
+      snippet: options.snippetJson,
+      sourcePlatform: options.sourcePlatform,
+      targetPlatform: options.targetPlatform
+    };
+    return this.simplePost('/notebook/api/optimizer/statement/compatibility', data);
+  }
+
+  statementSimilarity(options) {
+    const data = {
+      notebook: options.notebookJson,
+      snippet: options.snippetJson,
+      sourcePlatform: options.sourcePlatform
+    };
+    return this.simplePost('/notebook/api/optimizer/statement/similarity', data);
+  }
+
+  saveNotebook(options) {
+    const data = {
+      notebook: options.notebookJson,
+      editorMode: options.editorMode
+    };
+    return this.simplePost('/notebook/api/notebook/save', data);
+  }
+
   /**
    *
    * @param {ExecutableStatement} executable
