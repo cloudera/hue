@@ -342,7 +342,7 @@ ${ components.menubar(is_embeddable) }
             <input type="hidden" name="start_time" value=""/>
             <input type="hidden" name="source_type" data-bind="value: $root.source().type"/>
             <!-- ko with: catalogEntry -->
-            <input type="hidden" name="namespace" data-bind="value: namespace.id"/>
+            <input type="hidden" name="namespace" data-bind="value: JSON.stringify(namespace)"/>
             <input type="hidden" name="cluster" data-bind="value: JSON.stringify(compute)"/>
             <!-- /ko -->
         % else:
@@ -525,7 +525,7 @@ ${ components.menubar(is_embeddable) }
         <input type="hidden" name="is_embeddable" value="true"/>
         <input type="hidden" name="start_time" value=""/>
         <input type="hidden" name="source_type" data-bind="value: $root.source().type"/>
-        <input type="hidden" name="namespace" data-bind="value: catalogEntry.namespace.id"/>
+        <input type="hidden" name="namespace" data-bind="value: JSON.stringify(catalogEntry.namespace)"/>
         <input type="hidden" name="cluster" data-bind="value: JSON.stringify(catalogEntry.compute)"/>
     % else:
       <form data-bind="attr: { 'action': '/metastore/tables/drop/' + catalogEntry.name }" method="POST">

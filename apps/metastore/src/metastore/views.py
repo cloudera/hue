@@ -113,7 +113,7 @@ def drop_database(request):
         design = SavedQuery.create_empty(app_name=source_type if source_type != 'hive' else 'beeswax', owner=request.user, data=hql_query('').dumps())
         last_executed = json.loads(request.POST.get('start_time'), '-1')
         cluster = json.loads(request.POST.get('cluster', '{}'))
-        namespace = request.POST.get('namespace')
+        namespace = json.loads(request.POST.get('namespace', '{}'))
         sql = db.drop_databases(databases, design, generate_ddl_only=True)
         job = make_notebook(
             name=_('Drop database %s') % ', '.join(databases)[:100],
@@ -445,7 +445,7 @@ def drop_table(request, database):
       tables_objects = [db.get_table(database, table) for table in tables]
       skip_trash = request.POST.get('skip_trash') == 'on'
       cluster = json.loads(request.POST.get('cluster', '{}'))
-      namespace = request.POST.get('namespace')
+      namespace = json.loads(request.POST.get('namespace', '{}'))
 
       if request.POST.get('is_embeddable'):
         last_executed = json.loads(request.POST.get('start_time'), '-1')
