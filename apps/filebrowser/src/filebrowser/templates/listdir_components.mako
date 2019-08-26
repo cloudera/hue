@@ -1278,11 +1278,15 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       };
 
       self.previousPage = function () {
-        self.goToPage(self.page().previous_page_number)
+      if (self.page().previous_page_number != 0) {
+          self.goToPage(self.page().previous_page_number)
+        }
       };
 
       self.nextPage = function () {
-        self.goToPage(self.page().next_page_number)
+        if (self.page().next_page_number != 0) {
+          self.goToPage(self.page().next_page_number)
+        }
       };
 
       self.lastPage = function () {
