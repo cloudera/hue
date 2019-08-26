@@ -1024,15 +1024,12 @@ class Snippet {
           return true;
         });
         if (unknownResponse) {
-          lastComplexityRequest = $.ajax({
-            type: 'POST',
-            url: '/notebook/api/optimizer/statement/risk',
-            timeout: 30000, // 30 seconds
-            data: {
-              notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-              snippet: komapping.toJSON(self.getContext())
-            },
-            success: data => {
+          lastComplexityRequest = apiHelper
+            .statementRisk({
+              notebookJson: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
+              snippetJson: komapping.toJSON(self.getContext())
+            })
+            .then(data => {
               knownResponses.unshift({
                 hash: hash,
                 data: data
@@ -1041,11 +1038,10 @@ class Snippet {
                 knownResponses.pop();
               }
               handleRiskResponse(data);
-            },
-            always: () => {
+            })
+            .always(() => {
               changeSubscription.dispose();
-            }
-          });
+            });
         }
       };
 
@@ -1163,13 +1159,12 @@ class Snippet {
       self.parentNotebook.isExecutingAll(false);
     } else {
       self.statusForButtons(STATUS_FOR_BUTTONS.canceling);
-      $.post(
-        '/notebook/api/cancel_statement',
-        {
-          notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-          snippet: komapping.toJSON(self.getContext())
-        },
-        data => {
+      apiHelper
+        .cancelNotebookStatement({
+          notebookJson: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
+          snippetJson: komapping.toJSON(self.getContext())
+        })
+        .then(data => {
           self.statusForButtons(STATUS_FOR_BUTTONS.canceled);
           if (data.status === 0) {
             self.status(STATUS.canceled);
@@ -1177,8 +1172,7 @@ class Snippet {
           } else {
             self.handleAjaxError(data);
           }
-        }
-      )
+        })
         .fail(xhr => {
           if (xhr.status !== 502) {
             $(document).trigger('error', xhr.responseText);
@@ -1561,13 +1555,12 @@ class Snippet {
 
   fetchResultSize(n, query_id) {
     const self = this;
-    $.post(
-      '/notebook/api/fetch_result_size',
-      {
-        notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-        snippet: komapping.toJSON(self.getContext())
-      },
-      data => {
+    apiHelper
+      .fetchResultSize({
+        notebookJson: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
+        snippetJson: komapping.toJSON(self.getContext())
+      })
+      .then(data => {
         if (query_id === self.parentNotebook.id()) {
           // If still on the same result
           if (data.status === 0) {
@@ -1584,8 +1577,7 @@ class Snippet {
             //$(document).trigger("error", data.message);
           }
         }
-      }
-    );
+      });
   }
 
   format() {
@@ -1641,13 +1633,12 @@ class Snippet {
   getExternalStatement() {
     const self = this;
     self.externalStatementLoaded(false);
-    $.post(
-      '/notebook/api/get_external_statement',
-      {
-        notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-        snippet: komapping.toJSON(self.getContext())
-      },
-      data => {
+    apiHelper
+      .getExternalStatement({
+        notebookJson: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
+        snippetJson: komapping.toJSON(self.getContext())
+      })
+      .then(data => {
         if (data.status === 0) {
           self.externalStatementLoaded(true);
           self.statement_raw(data.statement);
@@ -1655,22 +1646,20 @@ class Snippet {
         } else {
           self.handleAjaxError(data);
         }
-      }
-    );
+      });
   }
 
   getLogs() {
     const self = this;
-    return $.post(
-      '/notebook/api/get_logs',
-      {
-        notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-        snippet: komapping.toJSON(self.getContext()),
+    apiHelper
+      .getLogs({
+        notebookJson: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
+        snippetJson: komapping.toJSON(self.getContext()),
         from: self.result.logLines,
-        jobs: komapping.toJSON(self.jobs, { ignore: ['percentJob'] }),
-        full_log: self.result.logs
-      },
-      data => {
+        jobsJson: komapping.toJSON(self.jobs, { ignore: ['percentJob'] }),
+        fullLog: self.result.logs
+      })
+      .then(data => {
         if (data.status === 1) {
           // Append errors to the logs
           data.status = 0;
@@ -1733,13 +1722,13 @@ class Snippet {
         } else {
           self.handleAjaxError(data);
         }
-      }
-    ).fail((xhr, textStatus) => {
-      if (xhr.status !== 502) {
-        $(document).trigger('error', xhr.responseText || textStatus);
-      }
-      self.status(STATUS.failed);
-    });
+      })
+      .fail((xhr, textStatus) => {
+        if (xhr.status !== 502) {
+          $(document).trigger('error', xhr.responseText || textStatus);
+        }
+        self.status(STATUS.failed);
+      });
   }
 
   getPigParameters() {
@@ -1813,22 +1802,20 @@ class Snippet {
     const self = this;
     hueAnalytics.log('notebook', 'get_query_similarity');
 
-    $.post(
-      '/notebook/api/optimizer/statement/similarity',
-      {
-        notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-        snippet: komapping.toJSON(self.getContext()),
+    apiHelper
+      .statementSimilarity({
+        notebookJson: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
+        snippetJson: komapping.toJSON(self.getContext()),
         sourcePlatform: self.type()
-      },
-      data => {
+      })
+      .then(data => {
         if (data.status === 0) {
           // eslint-disable-next-line no-restricted-syntax
           console.log(data.statement_similarity);
         } else {
           $(document).trigger('error', data.message);
         }
-      }
-    );
+      });
   }
 
   guessMetaField(field) {
@@ -2157,15 +2144,14 @@ class Snippet {
     self.hasSuggestion(null);
     const positionStatement = self.positionStatement();
 
-    self.lastCompatibilityRequest = $.post(
-      '/notebook/api/optimizer/statement/compatibility',
-      {
-        notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-        snippet: komapping.toJSON(self.getContext()),
+    self.lastCompatibilityRequest = apiHelper
+      .statementCompatibility({
+        notebookJson: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
+        snippetJson: komapping.toJSON(self.getContext()),
         sourcePlatform: self.compatibilitySourcePlatform().value,
         targetPlatform: self.compatibilityTargetPlatform().value
-      },
-      data => {
+      })
+      .then(data => {
         if (data.status === 0) {
           self.aceErrorsHolder([]);
           self.aceWarningsHolder([]);
@@ -2203,8 +2189,7 @@ class Snippet {
         } else {
           $(document).trigger('error', data.message);
         }
-      }
-    )
+      })
       .fail(xhr => {
         if (xhr.status !== 502) {
           $(document).trigger('error', xhr.responseText);

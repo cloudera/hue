@@ -307,14 +307,13 @@ class Notebook {
   clearHistory() {
     const self = this;
     hueAnalytics.log('notebook', 'clearHistory');
-    $.post(
-      '/notebook/api/clear_history',
-      {
-        notebook: komapping.toJSON(self.getContext(), NOTEBOOK_MAPPING),
-        doc_type: self.selectedSnippet(),
-        is_notification_manager: self.parentVm.isNotificationManager()
-      },
-      () => {
+    apiHelper
+      .clearNotebookHistory({
+        notebookJson: komapping.toJSON(self.getContext(), NOTEBOOK_MAPPING),
+        docType: self.selectedSnippet(),
+        isNotificationManager: self.parentVm.isNotificationManager()
+      })
+      .then(() => {
         self.history.removeAll();
         if (self.isHistory()) {
           self.id(null);
@@ -323,12 +322,12 @@ class Notebook {
             self.parentVm.URLS.editor + '?type=' + self.parentVm.editorType()
           );
         }
-      }
-    ).fail(xhr => {
-      if (xhr.status !== 502) {
-        $(document).trigger('error', xhr.responseText);
-      }
-    });
+      })
+      .fail(xhr => {
+        if (xhr.status !== 502) {
+          $(document).trigger('error', xhr.responseText);
+        }
+      });
     $(document).trigger('hideHistoryModal');
   }
 
@@ -343,8 +342,8 @@ class Notebook {
   close() {
     const self = this;
     hueAnalytics.log('notebook', 'close');
-    $.post('/notebook/api/notebook/close', {
-      notebook: komapping.toJSON(self, NOTEBOOK_MAPPING),
+    apiHelper.closeNotebook({
+      notebookJson: komapping.toJSON(self, NOTEBOOK_MAPPING),
       editorMode: self.parentVm.editorMode()
     });
   }
@@ -405,14 +404,13 @@ class Notebook {
       }
     };
 
-    $.post(
-      '/notebook/api/create_session',
-      {
-        notebook: komapping.toJSON(self.getContext(), NOTEBOOK_MAPPING),
-        session: komapping.toJSON(session), // e.g. {'type': 'pyspark', 'properties': [{'name': driverCores', 'value', '2'}]}
-        cluster: komapping.toJSON(compute ? compute : '')
-      },
-      data => {
+    apiHelper
+      .createSession({
+        notebookJson: komapping.toJSON(self.getContext(), NOTEBOOK_MAPPING),
+        sessionJson: komapping.toJSON(session), // e.g. {'type': 'pyspark', 'properties': [{'name': driverCores', 'value', '2'}]}
+        clusterJson: komapping.toJSON(compute ? compute : '')
+      })
+      .then(data => {
         if (data.status === 0) {
           komapping.fromJS(data.session, {}, session);
           if (self.getSession(session.type()) == null) {
@@ -432,8 +430,7 @@ class Notebook {
         } else {
           fail(data.message);
         }
-      }
-    )
+      })
       .fail(xhr => {
         if (xhr.status !== 502) {
           fail(xhr.responseText);
@@ -718,13 +715,12 @@ class Notebook {
       self.parentVm.editorMode() ||
       (self.isPresentationMode() && self.parentVm.editorType() !== 'notebook'); // Editor should not convert to Notebook in presentation mode
 
-    $.post(
-      '/notebook/api/notebook/save',
-      {
-        notebook: komapping.toJSON(cp, NOTEBOOK_MAPPING),
+    apiHelper
+      .saveNotebook({
+        notebookJson: komapping.toJSON(cp, NOTEBOOK_MAPPING),
         editorMode: editorMode
-      },
-      data => {
+      })
+      .then(data => {
         if (data.status === 0) {
           self.id(data.id);
           self.isSaved(true);
@@ -782,12 +778,12 @@ class Notebook {
         } else {
           $(document).trigger('error', data.message);
         }
-      }
-    ).fail(xhr => {
-      if (xhr.status !== 502) {
-        $(document).trigger('error', xhr.responseText);
-      }
-    });
+      })
+      .fail(xhr => {
+        if (xhr.status !== 502) {
+          $(document).trigger('error', xhr.responseText);
+        }
+      });
   }
 
   saveDefaultUserProperties(session) {
@@ -857,10 +853,9 @@ class Notebook {
       .slice(0, 25);
 
     const updateHistoryCall = item => {
-      $.post('/notebook/api/check_status', {
-        notebook: komapping.toJSON({ id: item.uuid() })
-      })
-        .done(data => {
+      apiHelper
+        .checkStatus({ notebookJson: komapping.toJSON({ id: item.uuid() }) })
+        .then(data => {
           const status =
             data.status === -3
               ? 'expired'
