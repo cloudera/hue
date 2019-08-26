@@ -144,13 +144,13 @@ AUTHN_REQUESTS_SIGNED = Config(
 
 WANT_RESPONSE_SIGNED = Config(
   key="want_response_signed",
-  default=True,
+  default=False,
   type=coerce_bool,
   help=_t("Have Hue initiated authn response be signed."))
 
 WANT_ASSERTIONS_SIGNED = Config(
   key="want_assertions_signed",
-  default=True,
+  default=False,
   type=coerce_bool,
   help=_t("Have Hue initiated authn assertions response be signed."))
 
