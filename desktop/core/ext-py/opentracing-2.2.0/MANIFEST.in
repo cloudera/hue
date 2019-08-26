@@ -1,0 +1,9 @@
+recursive-include opentracing *
+recursive-include example *.py
+recursive-include example *.thrift
+recursive-include tests *.py
+prune testbed
+include *
+global-exclude *.pyc
+graft docs
+prune docs/_build
