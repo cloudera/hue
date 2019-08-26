@@ -92,10 +92,21 @@ class MetastoreDatabase {
   }
 
   reload() {
+    if (this.loading()) {
+      return;
+    }
     // Clear will publish when done
-    this.catalogEntry.clearCache({
-      invalidate: this.catalogEntry.getSourceType() === 'impala' ? 'invalidate' : 'cache'
-    });
+    this.catalogEntry
+      .clearCache({
+        invalidate: this.catalogEntry.getSourceType() === 'impala' ? 'invalidate' : 'cache'
+      })
+      .then(() => {
+        this.load(
+          () => {},
+          this.metastoreViewModel.optimizerEnabled,
+          this.metastoreViewModel.navigatorEnabled
+        );
+      });
   }
 
   load(callback, optimizerEnabled, navigatorEnabled) {
