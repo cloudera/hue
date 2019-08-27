@@ -50,6 +50,18 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 <link rel="stylesheet" href="${ static('jobbrowser/css/jobbrowser-embeddable.css') }">
 
+
+<link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-datepicker.min.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-timepicker.min.css') }">
+<link rel="stylesheet" href="${ static('desktop/css/bootstrap-spinedit.css') }">
+<link rel="stylesheet" href="${ static('desktop/css/bootstrap-slider.css') }">
+
+<script src="${ static('desktop/ext/js/bootstrap-datepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/bootstrap-timepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/bootstrap-spinedit.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/bootstrap-slider.js') }" type="text/javascript" charset="utf-8"></script>
+
+
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
 
 % if ENABLE_QUERY_BROWSER.get():
@@ -472,6 +484,75 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <a class="btn" data-dismiss="modal">${_('No')}</a>
         <a id="killJobBtn" class="btn btn-danger disable-feedback" data-dismiss="modal" data-bind="click: function(){ if (job()) { job().control('kill'); } else { jobs.control('kill'); } }">${_('Yes')}</a>
       </div>
+    </div>
+  <!-- /ko -->
+
+  <!-- ko if: $root.job() && $root.job().type() === 'schedule' -->
+    <div id="syncCoordinatorModal${ SUFFIX }" class="modal hide">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+        <h2 class="modal-title confirmation_header">${ _('Update Coordinator Job Properties') }</h2>
+      </div>
+      <div id="update-coord" class="span10">
+        <div class="control-group">
+          <label class="control-label">${ _('End Time') }</label>
+          <div class="controls">
+            <div class="input-prepend input-group">
+              <span class="add-on input-group-addon">
+                <i class="fa fa-calendar"></i>
+              </span>
+              <input id="endTimeDateUI" type="text" class="input-small disable-autofocus" data-bind="value: $root.job().syncCoorEndTimeDateUI, datepicker: {}" />
+            </div>
+            <div class="input-prepend input-group">
+              <span class="add-on input-group-addon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              <input id="endTimeTimeUI" type="text" class="input-mini disable-autofocus" data-bind="value: $root.job().syncCoorEndTimeTimeUI, timepicker: {}" />
+            </div>
+            <span class="help-inline"></span>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">${ _('Pause Time') }</label>
+          <div class="controls">
+            <div class="input-prepend input-group">
+              <span class="add-on input-group-addon">
+                <i class="fa fa-calendar"></i>
+              </span>
+              <input id="pauseTimeDateUI" type="text" class="input-small disable-autofocus" data-bind="value: $root.job().syncCoorPauseTimeDateUI, datepicker: {}" />
+            </div>
+            <div class="input-prepend input-group">
+              <span class="add-on input-group-addon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              <input id="pauseTimeTimeUI" type="text" class="input-mini disable-autofocus" data-bind="value: $root.job().syncCoorPauseTimeTimeUI, timepicker: {}" />
+            </div>
+            <span class="help-inline"></span>
+          </div>
+        </div>
+        <div class="control-group ">
+          <label class="control-label">Clear Pause Time</label>
+          <div class="controls">
+            <input id="id_clearPauseTime" class="disable-autofocus" name="clearPauseTime" type="checkbox">
+          </div>
+        </div>
+        <div class="control-group ">
+          <label class="control-label">Concurrency</label>
+          <div class="controls">
+            <input id="id_concurrency" class="disable-autofocus" name="concurrency" type="number" data-bind="value: $root.job().syncCoorConcurrency">
+          </div>
+        </div>
+      </div>
+      <div class="modal-body">
+          <p class="confirmation_body"></p>
+      </div>
+      <div class="modal-footer update">
+        <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+        <a id="syncCoorBtn" class="btn btn-danger disable-feedback" data-dismiss="modal" data-bind="click: function(){ job().control('sync_coordinator'); }">${_('Update')}</a>
+      </div>
+    </div>
+
+    <div id="syncWorkflowModal${ SUFFIX }" class="modal hide">
     </div>
   <!-- /ko -->
 </div>
@@ -1751,6 +1832,18 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 <script type="text/html" id="job-actions${ SUFFIX }">
   <div class="btn-group">
+    <!-- ko if: $root.job() && $root.job().type() === 'schedule' -->
+    <button class="btn" title="${ _('Sync Coordinator') }" data-bind="click: function() { $root.job().showSyncCoorModal() }, enable: killEnabled">
+      <i class="fa fa-refresh"></i> <!-- ko ifnot: $root.isMini -->${ _('Coordinator') }<!-- /ko -->
+    </button>
+
+    <button class="btn" title="${ _('Sync Workflow') }" data-bind="click: function(){ control('sync_workflow'); }, enable: killEnabled">
+      <i class="fa fa-refresh"></i> <!-- ko ifnot: $root.isMini -->${ _('Workflow') }<!-- /ko -->
+    </button>
+    <!-- /ko -->
+  </div>
+
+  <div class="btn-group">
     <!-- ko if: hasResume -->
     <button class="btn" title="${ _('Resume selected') }" data-bind="click: function() { control('resume'); }, enable: resumeEnabled">
       <i class="fa fa-play"></i> <!-- ko ifnot: $root.isMini -->${ _('Resume') }<!-- /ko -->
@@ -2465,6 +2558,22 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.mainType = ko.observable(vm.interface());
       self.lastEvent = ko.observable(job.lastEvent || '');
 
+      self.syncCoorEndTimeDateUI = ko.observable(null);
+      self.syncCoorEndTimeTimeUI = ko.observable(null);
+      self.syncCoorPauseTimeDateUI = ko.observable(null);
+      self.syncCoorPauseTimeTimeUI = ko.observable(null);
+      self.syncCoorConcurrency = ko.observable(null);
+
+      self.showSyncCoorModal = function () {
+        self.syncCoorEndTimeDateUI(self.properties['endTimeDateUI']());
+        self.syncCoorEndTimeTimeUI(self.properties['endTimeTimeUI']());
+        self.syncCoorPauseTimeDateUI(self.properties['pauseTimeDateUI']());
+        self.syncCoorPauseTimeTimeUI(self.properties['pauseTimeTimeUI']());
+        self.syncCoorConcurrency(self.properties['concurrency']());
+
+        $('#syncCoordinatorModal${ SUFFIX }').modal('show');
+      };
+
       self.coordinatorActions = ko.pureComputed(function() {
         if (self.mainType() == 'schedules' && self.properties['tasks']) {
           var apps = self.properties['tasks']().map(function (instance) {
@@ -2854,6 +2963,49 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           $.get('/oozie/rerun_oozie_job/' + self.id() + '/?format=json' + '${ "&is_mini=true" if is_mini else "" | n }', function(response) {
             $('#rerun-modal${ SUFFIX }').modal('show');
             self.rerunModalContent(response);
+          });
+        } else if (action == 'sync_coordinator') {
+          var $syncCoordinatorModal = $('#syncCoordinatorModal');
+          var endTimeDateUI = $syncCoordinatorModal.find("#endTimeDateUI").val();
+          var endTimeTimeUI = $syncCoordinatorModal.find("#endTimeTimeUI").val();
+          var endTime = '';
+          if (endTimeDateUI != '' && endTimeTimeUI != '') {
+            endTime = endTimeDateUI + 'T' + endTimeTimeUI;
+          }
+          var pauseTimeDateUI = $syncCoordinatorModal.find("#pauseTimeDateUI").val();
+          var pauseTimeTimeUI = $syncCoordinatorModal.find("#pauseTimeTimeUI").val();
+          var pauseTime = '';
+          if (pauseTimeDateUI != '' && pauseTimeTimeUI != '') {
+            pauseTime = pauseTimeDateUI + 'T' + pauseTimeTimeUI;
+          }
+
+          var clear_pause_time = $syncCoordinatorModal.find("#id_clearPauseTime")[0].checked;
+          var concurrency =  $syncCoordinatorModal.find("#id_concurrency").val();
+
+          $.post('/oozie/manage_oozie_jobs/' + self.id() + '/change', {
+            "end_time": endTime,
+            "pause_time": pauseTime,
+            "clear_pause_time": clear_pause_time,
+            "concurrency": concurrency
+          }, function (data) {
+            if (data.status == 0) {
+              $.jHueNotify.info("${ _('Successfully updated Coordinator Job Properties') }");
+            } else {
+              $(document).trigger("error", data.message);
+            }
+          }).fail(function (xhr, textStatus, errorThrown) {
+            $(document).trigger("error", xhr.responseText);
+          });
+
+        } else if (action == 'sync_workflow') {
+          csrfmiddlewaretoken = "${request and request.COOKIES.get('csrftoken', '')}";
+
+          $.get('/oozie/sync_coord_workflow/' + self.id(), {
+            format: 'json'
+          }, function (data) {
+            $(document).trigger("showSubmitPopup", data);
+          }).fail(function (xhr, textStatus, errorThrown) {
+            $(document).trigger("error", xhr.responseText);
           });
         } else {
           vm.jobs._control([self.id()], action, function(data) {
@@ -3720,6 +3872,38 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         if (dest.indexOf('logs') > -1 && $(dest).find('pre:visible').length > 0){
           $(dest).find('pre').css('overflow-y', 'auto').height(Math.max(200, $(window).height() - $(dest).find('pre').offset().top - $('.page-content').scrollTop() - 75));
         }
+      });
+      $(document).off("showSubmitPopup");
+      $(document).on("showSubmitPopup", function(event, data) {
+        $('#syncWorkflowModal').empty();
+        $('#syncWorkflowModal').html(data);
+        $('#syncWorkflowModal').modal('show');
+        $('#syncWorkflowModal').on('hidden', function () {
+          huePubSub.publish('hide.datepicker');
+        });
+
+        $('#syncWorkflowModal').find(".submit-form").on('submit',function(e){
+          e.preventDefault();
+          $.ajax({
+            type: "POST",
+            cache: false,
+            url: $(this).attr('action'),
+            data: $(this).serialize(),
+            success: function(data) {
+              $('#syncWorkflowModal').modal('hide');
+              if (data && data.status === 0) {
+                $.jHueNotify.info(data.message);
+              } else {
+                $.jHueNotify.error(data.message);
+              }
+            },
+            error: function (data) {
+              $('#syncWorkflowModal').modal('hide');
+              $.jHueNotify.error(data.message);
+            }
+          });
+        });
+
       });
     });
   })();
