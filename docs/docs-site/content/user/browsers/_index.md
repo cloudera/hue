@@ -96,15 +96,15 @@ Hue can be setup to read and write to a configured S3 account, and users get aut
 
 [Read more about it](http://gethue.com/introducing-s3-support-in-hue/).
 
-### ADLS
+### ADLS / ABFS
 
 Learn more about it on the [ADLS integration post](http://gethue.com/browsing-adls-data-querying-it-with-sql-and-exporting-the-results-back-in-hue-4-2/).
 
-**Note** ADLS gen2 is currently not supported.
+**Note** ADLS v2 / ABFS is currently a work in progress [HUE-8908](https://issues.cloudera.org/browse/HUE-8908)
 
-### GFS
+### GCS
 
-Google file system is currently not supported.
+Google Cloud Storage is currently a work in progress [HUE-8978](https://issues.cloudera.org/browse/HUE-8978)
 
 ### HBase Browser
 
