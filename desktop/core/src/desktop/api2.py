@@ -61,6 +61,7 @@ if sys.version_info[0] > 2:
 else:
   from StringIO import StringIO as string_io
 
+
 LOG = logging.getLogger(__name__)
 
 
@@ -392,19 +393,23 @@ def get_document(request):
   uuids = request.GET.get('uuids')
   with_data = request.GET.get('data', 'false').lower() == 'true'
   with_dependencies = request.GET.get('dependencies', 'false').lower() == 'true'
+  with_stats = request.GET.get('stats', 'false').lower() == 'true'
 
   if uuids:
     response = {
-      'data_list': [_get_document_helper(request, uuid, with_data, with_dependencies, path) for uuid in uuids.split(',')],
+      'data_list': [
+          _get_document_helper(request, uuid, with_data, with_dependencies, path, with_stats=with_stats)
+          for uuid in uuids.split(',')
+      ],
       'status': 0
     }
   else:
-    response = _get_document_helper(request, uuid, with_data, with_dependencies, path)
+    response = _get_document_helper(request, uuid, with_data, with_dependencies, path, with_stats=with_stats)
 
   return JsonResponse(response)
 
 
-def _get_document_helper(request, uuid, with_data, with_dependencies, path):
+def _get_document_helper(request, uuid, with_data, with_dependencies, path, with_stats=False):
   if uuid:
     if uuid.isdigit():
       document = Document2.objects.document(user=request.user, doc_id=uuid)
@@ -419,6 +424,7 @@ def _get_document_helper(request, uuid, with_data, with_dependencies, path):
     'children': [],
     'dependencies': [],
     'dependents': [],
+    'stats': [],
     'data': '',
     'status': 0
   }
@@ -452,6 +458,10 @@ def _get_document_helper(request, uuid, with_data, with_dependencies, path):
   if with_dependencies:
     response['dependencies'] = [dependency.to_dict() for dependency in document.dependencies.all()]
     response['dependents'] = [dependent.to_dict() for dependent in document.dependents.exclude(is_history=True).all()]
+
+  if with_stats:
+    if document.type.startswith('query'):
+      response['stats'] = Analytics.query_stats(query=document)
 
   # Get children documents if this is a directory
   if document.is_directory:
