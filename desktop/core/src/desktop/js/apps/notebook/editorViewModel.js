@@ -257,6 +257,7 @@ class EditorViewModel {
     self.authSessionCallback = ko.observable();
 
     self.queryStats = ko.observable();
+
     self.getQueryStats = function(uuid) {
       self.queryStats([]);
       const deferredOpen = new $.Deferred();
@@ -269,6 +270,30 @@ class EditorViewModel {
         data => {
           if (data.status == 0) {
             self.queryStats(data.stats);
+            deferredOpen.resolve();
+          } else {
+            $(document).trigger('error', data.message);
+            deferredOpen.reject();
+          }
+        }
+      );
+      return deferredOpen.promise();
+    };
+
+    self.queryVersions = ko.observable();
+
+    self.getQueryVersions = function(uuid) {
+      self.queryVersions([]);
+      const deferredOpen = new $.Deferred();
+      $.get(
+        '/desktop/api2/doc/',
+        {
+          uuid: uuid,
+          versions: true
+        },
+        data => {
+          if (data.status == 0) {
+            self.queryVersions(data.versions);
             deferredOpen.resolve();
           } else {
             $(document).trigger('error', data.message);

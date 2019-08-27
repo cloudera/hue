@@ -304,7 +304,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           </a>
         </li>
         <li>
-          <a class="pointer" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
+          <a class="pointer" data-target="#queryVersionsModal${ suffix }" data-toggle="modal" data-bind="click: function() { $root.getQueryVersions(selectedNotebook().uuid) }">
             <i class="fa fa-fw fa-code-fork"></i> ${ _('Versions') }
           </a>
         </li>
@@ -725,7 +725,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <!-- ko if: $parent.history().length === 0 && $parent.historyFilter() !== '' -->
             <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _('No queries found for') } <strong data-bind="text: $parent.historyFilter"></strong>.</div>
             <!-- /ko -->
-
 
             <!-- ko if: $parent.history().length > 0 -->
             <table class="table table-condensed margin-top-10 history-table">
@@ -2066,6 +2065,25 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <div data-bind="foreach: $root.queryStats" class="row-fluid">
       <span data-bind="text: description"></span>
       <span data-bind="text: value"></span>
+      </br>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <input type="button" class="btn btn-primary disable-feedback" value="${_('Ok')}" data-dismiss="modal"/>
+  </div>
+</div>
+
+
+<div id="queryVersionsModal${ suffix }" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${_('Versions')}</h2>
+  </div>
+
+  <div class="modal-body">
+    <div data-bind="foreach: $root.queryVersions" class="row-fluid">
+      <span data-bind="text: $data"></span>
       </br>
     </div>
   </div>
