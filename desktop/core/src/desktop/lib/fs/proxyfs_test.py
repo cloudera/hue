@@ -36,8 +36,8 @@ def test_fs_selection():
   with patch('desktop.lib.fs.ProxyFS._has_access') as _has_access:
     _has_access.return_value = True
 
-    s3fs, adls, hdfs, abfs = MagicMock(), MagicMock(), MagicMock(), MagicMock()
-    proxy_fs = ProxyFS({'s3a': wrapper(s3fs), 'hdfs': wrapper(hdfs), 'adl': wrapper(adls), 'abfs': wrapper(abfs)}, 'hdfs')
+    s3fs, adls, hdfs, abfs, gs = MagicMock(), MagicMock(), MagicMock(), MagicMock(), MagicMock()
+    proxy_fs = ProxyFS({'s3a': wrapper(s3fs), 'hdfs': wrapper(hdfs), 'adl': wrapper(adls), 'abfs': wrapper(abfs), 'gs': wrapper(gs)}, 'hdfs')
     proxy_fs.setuser(user)
 
     proxy_fs.isdir('s3a://bucket/key')
@@ -56,6 +56,10 @@ def test_fs_selection():
     abfs.isdir.assert_called_once_with('abfs://net/key')
     assert_false(hdfs.isdir.called)
 
+    proxy_fs.isdir('gs://net/key')
+    gs.isdir.assert_called_once_with('gs://net/key')
+    assert_false(hdfs.isdir.called)
+
     assert_raises(IOError, proxy_fs.stats, 'ftp://host')
 
 def wrapper(mock):
@@ -71,8 +75,8 @@ def test_multi_fs_selection():
   with patch('desktop.lib.fs.ProxyFS._has_access') as _has_access:
     _has_access.return_value = True
 
-    s3fs, adls, hdfs, abfs = MagicMock(), MagicMock(), MagicMock(), MagicMock()
-    proxy_fs = ProxyFS({'s3a': wrapper(s3fs), 'hdfs': wrapper(hdfs), 'adl': wrapper(adls), 'abfs': wrapper(abfs)}, 'hdfs')
+    s3fs, adls, hdfs, abfs, gs = MagicMock(), MagicMock(), MagicMock(), MagicMock(), MagicMock()
+    proxy_fs = ProxyFS({'s3a': wrapper(s3fs), 'hdfs': wrapper(hdfs), 'adl': wrapper(adls), 'abfs': wrapper(abfs), 'gs': wrapper(gs)}, 'hdfs')
     proxy_fs.setuser(user)
 
     proxy_fs.copy('s3a://bucket1/key', 's3a://bucket2/key')
@@ -94,6 +98,10 @@ def test_multi_fs_selection():
     proxy_fs.rename('/tmp/file', 'shmile')
     hdfs.rename.assert_called_once_with('/tmp/file', 'shmile')
     assert_false(s3fs.rename.called)
+
+    proxy_fs.copyfile('gs://bucket/key', 'key2')
+    gs.copyfile.assert_called_once_with('gs://bucket/key', 'key2')
+    assert_false(hdfs.copyfile.called)
 
     # Will be addressed in HUE-2934
     assert_raises(NotImplementedError, proxy_fs.copy_remote_dir, 's3a://bucket/key', 'adl://tmp/dir') # Exception can only be thrown if scheme is specified, else default to 1st scheme
@@ -122,8 +130,8 @@ class TestFsPermissions(object):
     user_client = make_logged_in_client(username='test', groupname='default', recreate=True, is_superuser=False)
     user = User.objects.get(username='test')
 
-    s3fs, adls, hdfs, abfs = MockFs("s3_access"), MockFs("adls_access"), MockFs(), MockFs("abfs_access")
-    proxy_fs = ProxyFS({'s3a': wrapper(s3fs), 'hdfs': wrapper(hdfs), 'adl': wrapper(adls), 'abfs': wrapper(abfs)}, 'hdfs')
+    s3fs, adls, hdfs, abfs, gs = MockFs("s3_access"), MockFs("adls_access"), MockFs(), MockFs("abfs_access"), MockFs("gs_access")
+    proxy_fs = ProxyFS({'s3a': wrapper(s3fs), 'hdfs': wrapper(hdfs), 'adl': wrapper(adls), 'abfs': wrapper(abfs), 'gs': wrapper(gs)}, 'hdfs')
     proxy_fs.setuser(user)
 
     f = proxy_fs._get_fs
@@ -131,6 +139,7 @@ class TestFsPermissions(object):
     remove_from_group(user.username, 'has_s3')
     remove_from_group(user.username, 'has_adls')
     remove_from_group(user.username, 'has_abfs')
+    remove_from_group(user.username, 'has_gs')
 
     # No perms by default
     assert_raises(Exception, f, 's3a://bucket')
@@ -138,6 +147,7 @@ class TestFsPermissions(object):
     assert_raises(Exception, f, 'adl://net/key')
     assert_raises(Exception, f, 'adl:/key')
     assert_raises(Exception, f, 'abfs:/key')
+    assert_raises(Exception, f, 'gs://bucket/key')
     f('hdfs://path')
     f('/tmp')
 
@@ -146,6 +156,7 @@ class TestFsPermissions(object):
       add_permission('test', 'has_s3', permname='s3_access', appname='filebrowser')
       add_permission('test', 'has_adls', permname='adls_access', appname='filebrowser')
       add_permission('test', 'has_abfs', permname='abfs_access', appname='filebrowser')
+      add_permission('test', 'has_gs', permname='gs_access', appname='filebrowser')
 
       f('s3a://bucket')
       f('S3A://bucket/key')
@@ -154,17 +165,19 @@ class TestFsPermissions(object):
       f('abfs:/key')
       f('hdfs://path')
       f('/tmp')
+      f('gs://bucket')
     finally:
       remove_from_group(user.username, 'has_s3')
       remove_from_group(user.username, 'has_adls')
       remove_from_group(user.username, 'has_abfs')
+      remove_from_group(user.username, 'has_gs')
 
   def test_fs_permissions_admin_user(self):
     user_client = make_logged_in_client(username='admin', groupname='default', recreate=True, is_superuser=True)
     user = User.objects.get(username='admin')
 
-    s3fs, adls, hdfs, abfs = MockFs("s3_access"), MockFs("adls_access"), MockFs(), MockFs("abfs_access")
-    proxy_fs = ProxyFS({'s3a': wrapper(s3fs), 'hdfs': wrapper(hdfs), 'adl': wrapper(adls), 'abfs': wrapper(abfs)}, 'hdfs')
+    s3fs, adls, hdfs, abfs, gs = MockFs("s3_access"), MockFs("adls_access"), MockFs(), MockFs("abfs_access"), MockFs("gs_access")
+    proxy_fs = ProxyFS({'s3a': wrapper(s3fs), 'hdfs': wrapper(hdfs), 'adl': wrapper(adls), 'abfs': wrapper(abfs), 'gs': wrapper(gs)}, 'hdfs')
     proxy_fs.setuser(user)
 
     f = proxy_fs._get_fs
@@ -176,3 +189,4 @@ class TestFsPermissions(object):
     f('abfs:/key')
     f('hdfs://path')
     f('/tmp')
+    f('gs://bucket/key')

@@ -829,6 +829,12 @@
    # Django cache to use to store temporarily used data during query execution. This is in addition to result_file_storage and result_backend.
    ## execution_storage='{"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "celery-hue"}'
 
+   # Settings for the Google Cloud lib
+   # ------------------------------------------------------------------------
+   [[gc_accounts]]
+      [[[default]]]
+        # The JSON credentials to authenticate to Google Cloud e.g. '{ "type": "service_account", "project_id": .... }'
+        # json_credentials=None
 
 ###########################################################################
 # Settings to configure the snippets available in the Notebook

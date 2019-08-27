@@ -23,6 +23,7 @@ import logging
 import os
 import posixpath
 import re
+from urlparse import urlparse
 import time
 
 from boto.exception import BotoClientError, S3ResponseError
@@ -74,17 +75,19 @@ def auth_error_handler(view_fn):
 
 
 class S3FileSystem(object):
-  def __init__(self, s3_connection, expiration=None):
+  def __init__(self, s3_connection, expiration=None, fs='s3a', headers=None, filebrowser_action=PERMISSION_ACTION_S3):
     self._s3_connection = s3_connection
-    self._filebrowser_action = PERMISSION_ACTION_S3
+    self._filebrowser_action = filebrowser_action
     self.user = None
     self.is_sentry_managed = lambda path: False
     self.superuser = None
     self.supergroup = None
     self.expiration = expiration
+    self.fs = fs
+    self.header_values = headers
 
   def _get_bucket(self, name):
-    return self._s3_connection.get_bucket(name)
+    return self._s3_connection.get_bucket(name, headers=self.header_values)
 
   def _get_or_create_bucket(self, name):
     try:
@@ -174,18 +177,18 @@ class S3FileSystem(object):
       raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, e.message))
     if key is None:
       key = self._get_key(path, validate=False)
-    return self._stats_key(key)
+    return self._stats_key(key, self.fs)
 
   @staticmethod
-  def _stats_key(key):
+  def _stats_key(key, fs='s3a'):
     if key.size is not None:
       is_directory_name = not key.name or key.name[-1] == '/'
-      return S3Stat.from_key(key, is_dir=is_directory_name)
+      return S3Stat.from_key(key, is_dir=is_directory_name, fs=fs)
     else:
       key.name = S3FileSystem._append_separator(key.name)
       ls = key.bucket.get_all_keys(prefix=key.name, max_keys=1)
       if len(ls) > 0:
-        return S3Stat.from_key(key, is_dir=True)
+        return S3Stat.from_key(key, is_dir=True, fs=fs)
     return None
 
   @staticmethod
@@ -200,7 +203,8 @@ class S3FileSystem(object):
 
   @staticmethod
   def isroot(path):
-    return s3.is_root(path)
+    parsed = urlparse(path) 
+    return parsed.path == '/' or parsed.path == ''
 
   @staticmethod
   def join(*comp_list):
@@ -270,9 +274,9 @@ class S3FileSystem(object):
     if glob is not None:
       raise NotImplementedError(_("Option `glob` is not implemented"))
 
-    if s3.is_root(path):
+    if S3FileSystem.isroot(path):
       try:
-        return sorted([S3Stat.from_bucket(b) for b in self._s3_connection.get_all_buckets()], key=lambda x: x.name)
+        return sorted([S3Stat.from_bucket(b, self.fs) for b in self._s3_connection.get_all_buckets(headers=self.header_values)], key=lambda x: x.name)
       except S3FileSystemException as e:
         raise e
       except S3ResponseError as e:
@@ -284,13 +288,13 @@ class S3FileSystem(object):
     bucket = self._get_bucket(bucket_name)
     prefix = self._append_separator(prefix)
     res = []
-    for item in bucket.list(prefix=prefix, delimiter='/'):
+    for item in bucket.list(prefix=prefix, delimiter='/', headers=self.header_values):
       if isinstance(item, Prefix):
-        res.append(S3Stat.from_key(Key(item.bucket, item.name), is_dir=True))
+        res.append(S3Stat.from_key(Key(item.bucket, item.name), is_dir=True, fs=self.fs))
       else:
         if item.name == prefix:
           continue
-        res.append(self._stats_key(item))
+        res.append(self._stats_key(item, self.fs))
     return res
 
   @translate_s3_error

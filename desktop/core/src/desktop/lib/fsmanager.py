@@ -24,11 +24,17 @@ import azure.client
 
 from aws.conf import is_enabled as is_s3_enabled, has_s3_access
 from azure.conf import is_adls_enabled, is_abfs_enabled, has_adls_access, has_abfs_access
+
+from desktop.lib.fs.proxyfs import ProxyFS
+from desktop.conf import is_gs_enabled, has_gs_access
+from desktop.lib.fs.gc.client import get_client as get_client_gs 
+
 from hadoop.cluster import get_hdfs
 from hadoop.conf import has_hdfs_enabled
-from desktop.lib.fs.proxyfs import ProxyFS
 
-SUPPORTED_FS = ['hdfs', 's3a', 'adl', 'abfs']
+
+
+SUPPORTED_FS = ['hdfs', 's3a', 'adl', 'abfs', 'gs']
 
 
 def has_access(fs=None, user=None):
@@ -40,6 +46,8 @@ def has_access(fs=None, user=None):
     return has_s3_access(user)
   elif fs == 'abfs':
     return has_abfs_access(user)
+  elif fs == 'gs':
+    return has_gs_access(user)
 
 
 def is_enabled(fs=None):
@@ -51,6 +59,8 @@ def is_enabled(fs=None):
     return is_s3_enabled()
   elif fs == 'abfs':
     return is_abfs_enabled()
+  elif fs == 'gs':
+    return is_gs_enabled()
 
 def is_enabled_and_has_access(fs=None, user=None):
   return is_enabled(fs) and has_access(fs, user)
@@ -64,6 +74,8 @@ def _get_client(fs=None):
     return azure.client.get_client
   elif fs == 'abfs':
     return azure.client.get_client_abfs
+  elif fs == 'gs':
+    return get_client_gs
   return None
 
 

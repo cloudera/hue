@@ -15,20 +15,3 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-DJANGO_APPS = ['filebrowser']
-NICE_NAME = "File Browser"
-REQUIRES_HADOOP = False
-ICON = "filebrowser/art/icon_filebrowser_48.png"
-MENU_INDEX = 20
-
-from aws.conf import PERMISSION_ACTION_S3
-from azure.conf import PERMISSION_ACTION_ADLS, PERMISSION_ACTION_ABFS
-from desktop.conf import PERMISSION_ACTION_GS
-
-
-PERMISSION_ACTIONS = (
-  (PERMISSION_ACTION_S3, "Access to S3 from filebrowser and filepicker."),
-  (PERMISSION_ACTION_ADLS, "Access to ADLS from filebrowser and filepicker."),
-  (PERMISSION_ACTION_ABFS, "Access to ABFS from filebrowser and filepicker."),
-  (PERMISSION_ACTION_GS,  "Access to GS from filebrowser and filepicker.")
-)
