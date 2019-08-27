@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -14,21 +13,29 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import
 
-DJANGO_APPS = ['filebrowser']
-NICE_NAME = "File Browser"
-REQUIRES_HADOOP = False
-ICON = "filebrowser/art/icon_filebrowser_48.png"
-MENU_INDEX = 20
+import logging
+import unittest
 
-from aws.conf import PERMISSION_ACTION_S3
-from azure.conf import PERMISSION_ACTION_ADLS, PERMISSION_ACTION_ABFS
-from desktop.conf import PERMISSION_ACTION_GS
+from mock import patch, Mock
+from nose.plugins.skip import SkipTest
+from nose.tools import assert_equal, assert_true, assert_not_equal
+
+from desktop.conf import is_gs_enabled
+from desktop.lib.fs.gc.client import get_client
 
 
-PERMISSION_ACTIONS = (
-  (PERMISSION_ACTION_S3, "Access to S3 from filebrowser and filepicker."),
-  (PERMISSION_ACTION_ADLS, "Access to ADLS from filebrowser and filepicker."),
-  (PERMISSION_ACTION_ABFS, "Access to ABFS from filebrowser and filepicker."),
-  (PERMISSION_ACTION_GS,  "Access to GS from filebrowser and filepicker.")
-)
+LOG = logging.getLogger(__name__)
+
+
+class TestGCS(unittest.TestCase):
+  def setUp(self):
+    if not is_gs_enabled():
+      raise SkipTest('gs not enabled')
+
+  def test_with_credentials(self):
+    # Simple test that makes sure no errors are thrown. 
+    client = get_client()
+    buckets = client.listdir_stats('gs://')
+    LOG.info(len(buckets))

@@ -281,6 +281,7 @@ def update_app_permissions(**kwargs):
            not (new_dp.app == 'hbase' and new_dp.action == 'write') and \
            not (new_dp.app == 'security' and new_dp.action == 'impersonate') and \
            not (new_dp.app == 'filebrowser' and new_dp.action == 's3_access' and not is_idbroker_enabled('s3a')) and \
+           not (new_dp.app == 'filebrowser' and new_dp.action == 'gs_access' and not is_idbroker_enabled('gs')) and \
            not (new_dp.app == 'filebrowser' and new_dp.action == 'adls_access') and \
            not (new_dp.app == 'filebrowser' and new_dp.action == 'abfs_access') and \
            not (new_dp.app == 'oozie' and new_dp.action == 'disable_editor_access'):
