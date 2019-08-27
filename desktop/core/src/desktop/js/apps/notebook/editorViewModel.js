@@ -256,6 +256,29 @@ class EditorViewModel {
     self.authSessionType = ko.observable();
     self.authSessionCallback = ko.observable();
 
+    self.queryStats = ko.observable();
+    self.getQueryStats = function(uuid) {
+      self.queryStats([]);
+      const deferredOpen = new $.Deferred();
+      $.get(
+        '/desktop/api2/doc/',
+        {
+          uuid: uuid,
+          stats: true
+        },
+        data => {
+          if (data.status == 0) {
+            self.queryStats(data.stats);
+            deferredOpen.resolve();
+          } else {
+            $(document).trigger('error', data.message);
+            deferredOpen.reject();
+          }
+        }
+      );
+      return deferredOpen.promise();
+    };
+
     self.removeSnippetConfirmation = ko.observable();
 
     self.removeSnippet = function (notebook, snippet) {
