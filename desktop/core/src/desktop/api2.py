@@ -394,22 +394,23 @@ def get_document(request):
   with_data = request.GET.get('data', 'false').lower() == 'true'
   with_dependencies = request.GET.get('dependencies', 'false').lower() == 'true'
   with_stats = request.GET.get('stats', 'false').lower() == 'true'
+  with_versions = request.GET.get('versions', 'false').lower() == 'true'
 
   if uuids:
     response = {
       'data_list': [
-          _get_document_helper(request, uuid, with_data, with_dependencies, path, with_stats=with_stats)
+          _get_document_helper(request, uuid, with_data, with_dependencies, path, with_stats=with_stats, with_versions=with_versions)
           for uuid in uuids.split(',')
       ],
       'status': 0
     }
   else:
-    response = _get_document_helper(request, uuid, with_data, with_dependencies, path, with_stats=with_stats)
+    response = _get_document_helper(request, uuid, with_data, with_dependencies, path, with_stats=with_stats, with_versions=with_versions)
 
   return JsonResponse(response)
 
 
-def _get_document_helper(request, uuid, with_data, with_dependencies, path, with_stats=False):
+def _get_document_helper(request, uuid, with_data, with_dependencies, path, with_stats=False, with_versions=False):
   if uuid:
     if uuid.isdigit():
       document = Document2.objects.document(user=request.user, doc_id=uuid)
@@ -425,6 +426,7 @@ def _get_document_helper(request, uuid, with_data, with_dependencies, path, with
     'dependencies': [],
     'dependents': [],
     'stats': [],
+    'versions': [],
     'data': '',
     'status': 0
   }
@@ -462,6 +464,13 @@ def _get_document_helper(request, uuid, with_data, with_dependencies, path, with
   if with_stats:
     if document.type.startswith('query'):
       response['stats'] = Analytics.query_stats(query=document)
+
+  if with_versions:
+    if document.type.startswith('query'): # Currently only available via history
+      for dependent in document.dependents.filter(is_history=True).order_by('-last_modified'):
+        query = Notebook(document=dependent).get_str()
+        response['versions'].append(query)
+
 
   # Get children documents if this is a directory
   if document.is_directory:
@@ -1117,8 +1126,7 @@ def _copy_document_with_owner(doc, owner, uuids_map):
     doc['fields']['parent_directory'] = [uuids_map[parent_uuid], 1, False]
   else:
     if parent_uuid is not None:
-      LOG.warn('Could not find parent directory with UUID: %s in JSON import, will set parent to home directory' %
-                parent_uuid)
+      LOG.warn('Could not find parent directory with UUID: %s in JSON import, will set parent to home directory' % parent_uuid)
     doc['fields']['parent_directory'] = [home_dir.uuid, home_dir.version, home_dir.is_history]
 
   # Remap dependencies if needed
@@ -1167,8 +1175,7 @@ def _create_or_update_document_with_owner(doc, owner, uuids_map):
   if doc['fields']['dependencies']:
     history_deps_list = []
     for index, (uuid, version, is_history) in enumerate(doc['fields']['dependencies']):
-      if not uuid in list(uuids_map.keys()) and not is_history and \
-              not Document2.objects.filter(uuid=uuid, version=version).exists():
+      if not uuid in list(uuids_map.keys()) and not is_history and not Document2.objects.filter(uuid=uuid, version=version).exists():
           raise PopupException(_('Cannot import document, dependency with UUID: %s not found.') % uuid)
       elif is_history:
         history_deps_list.insert(0, index) # Insert in decreasing order to facilitate delete
