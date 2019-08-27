@@ -295,7 +295,7 @@ class Job(object):
   @property
   def acls(self):
     if not hasattr(self, '_acls'):
-      self._acls = dict([(name, self.conf_keys[name]) for name in self.conf_keys if 'acl' in name])
+      self._acls = dict([(name, self.conf_keys[name]) for name in self.conf_keys if name is not None and 'acl' in name])
     return self._acls
 
   @property
