@@ -574,6 +574,19 @@ Plugin.prototype.navigateTo = function(path) {
         }
       }, 100);
 
+      if (data.s3_listing_not_allowed) {
+        $("<div class='clearfix'>").appendTo($(_parent.element).find('.filechooser-tree'));
+        const _errorMsg = $('<div>')
+          .addClass('alert')
+          .addClass('alert-warn')
+          .text(data.s3_listing_not_allowed);
+        _errorMsg.appendTo($(_parent.element).find('.filechooser-tree'));
+
+        $scrollingBreadcrumbs.hide();
+        $hdfsAutocomplete.show();
+        $hdfsAutocomplete.focus();
+      }
+
       $(data.files).each((cnt, file) => {
         let _addFile = file.name !== '.';
         if (_parent.options.filterExtensions != '' && file.type == 'file') {

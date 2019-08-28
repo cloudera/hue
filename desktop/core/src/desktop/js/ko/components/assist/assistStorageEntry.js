@@ -154,6 +154,8 @@ class AssistStorageEntry {
         );
         self.loaded = true;
         self.loading(false);
+        self.hasErrors(!!data.s3_listing_not_allowed); // Special case where we want errors inline instead of the default popover. We don't want errorCallback handling
+        self.errorText(data.s3_listing_not_allowed);
         if (callback) {
           callback();
         }
