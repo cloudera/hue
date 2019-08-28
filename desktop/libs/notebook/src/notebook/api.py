@@ -88,7 +88,6 @@ def create_notebook(request):
 def create_session(request):
   response = {'status': -1}
 
-  notebook = json.loads(request.POST.get('notebook', '{}'))
   session = json.loads(request.POST.get('session', '{}'))
 
   properties = session.get('properties', [])

@@ -18,7 +18,7 @@ import apiHelper from 'api/apiHelper';
 import { ExecutionResult } from 'apps/notebook2/execution/executionResult';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
-
+import sessionManager from 'apps/notebook2/execution/sessionManager';
 /**
  *
  * @type {{running: string, canceling: string, canceled: string, expired: string, waiting: string, success: string, ready: string, available: string, closed: string, starting: string}}
@@ -58,7 +58,6 @@ class ExecutableStatement {
     this.sourceType = options.sourceType;
     this.parsedStatement = options.parsedStatement;
     this.statement = options.statement;
-    this.sessions = options.sessions;
     this.handle = {
       statement_id: 0 // TODO: Get rid of need for initial handle in the backend
     };
@@ -133,25 +132,29 @@ class ExecutableStatement {
       this.progress = 0;
 
       notifyUpdates(this);
-      this.lastCancellable = apiHelper
-        .executeStatement({
-          executable: this
-        })
-        .done(handle => {
-          this.handle = handle;
 
-          checkStatus()
-            .then(() => {
-              this.result = new ExecutionResult(this);
-              resolve(this.result);
-            })
-            .catch(error => {
-              reject(error);
-            });
-        })
-        .fail(error => {
-          reject(error);
-        });
+      sessionManager.getSession({ type: this.sourceType }).then(session => {
+        this.lastCancellable = apiHelper
+          .executeStatement({
+            executable: this,
+            session: session
+          })
+          .done(handle => {
+            this.handle = handle;
+
+            checkStatus()
+              .then(() => {
+                this.result = new ExecutionResult(this);
+                resolve(this.result);
+              })
+              .catch(error => {
+                reject(error);
+              });
+          })
+          .fail(error => {
+            reject(error);
+          });
+      });
     });
   }
 

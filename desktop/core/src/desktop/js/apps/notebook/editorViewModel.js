@@ -297,13 +297,6 @@ class EditorViewModel {
       }
     });
 
-    self.isContextPanelVisible = ko.observable(false);
-    self.isContextPanelVisible.subscribe(newValue => {
-      huePubSub.publish('context.panel.visible', newValue);
-    });
-
-    huePubSub.subscribe('context.panel.visible.editor', self.isContextPanelVisible);
-
     huePubSub.subscribe(
       'get.active.snippet.type',
       callback => {

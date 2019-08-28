@@ -1887,6 +1887,28 @@ class ApiHelper {
     return this.simplePost('/notebook/api/create_session', data);
   }
 
+  /**
+   * Creates a new session
+   *
+   * @param {Object} options
+   * @param {String} options.type
+   * @param {Array<SessionProperty>} [options.properties] - Default []
+   * @return {Promise}
+   */
+  createSessionV2(options) {
+    const data = {
+      session: JSON.stringify({ type: options.type, properties: options.properties || [] })
+    };
+    return this.simplePost('/notebook/api/create_session', data, options);
+  }
+
+  closeSession(options) {
+    const data = {
+      session: JSON.stringify(options.session)
+    };
+    return this.simplePost('/notebook/api/close_session', data, options);
+  }
+
   checkStatus(options) {
     const data = {
       notebook: options.notebookJson
@@ -1959,10 +1981,11 @@ class ApiHelper {
   /**
    *
    * @param {ExecutableStatement} executable
+   * @param {Session} [session]
    *
    * @return {{snippet: string, notebook: string}}
    */
-  static adaptExecutableToNotebook(executable) {
+  static adaptExecutableToNotebook(executable, session) {
     const statement = executable.getStatement();
     const snippet = {
       type: executable.sourceType,
@@ -1985,7 +2008,7 @@ class ApiHelper {
       id: executable.notebookId,
       name: '',
       isSaved: false,
-      sessions: executable.sessions || []
+      sessions: session ? [session] : []
     };
 
     return {
@@ -2016,6 +2039,7 @@ class ApiHelper {
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
    * @param {ExecutableStatement} options.executable
+   * @param {Session} options.session
    *
    * @return {Promise<ExecutionHandle>}
    */
@@ -2024,7 +2048,7 @@ class ApiHelper {
     const url = EXECUTE_API_PREFIX + executable.sourceType;
     const deferred = $.Deferred();
 
-    this.simplePost(url, ApiHelper.adaptExecutableToNotebook(executable), options)
+    this.simplePost(url, ApiHelper.adaptExecutableToNotebook(executable, options.session), options)
       .done(response => {
         if (response.handle) {
           deferred.resolve(response.handle);

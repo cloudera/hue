@@ -284,15 +284,15 @@
           <li class="divider"></li>
           <!-- ko if: $root.canSave -->
           <li>
-            <a class="share-link pointer" data-bind="click: prepareShareModal,
+            <a href="javascript:void(0)" class="share-link" data-bind="click: prepareShareModal,
               css: {'isShared': isShared()}">
               <i class="fa fa-fw fa-users"></i> ${ _('Share') }
             </a>
           </li>
           <!-- /ko -->
           <li>
-            <a class="pointer" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
-              <i class="fa fa-fw fa-cogs"></i> ${ _('Session') }
+            <a href="javascript:void(0)" data-bind="click: showSessionPanel">
+              <i class="fa fa-fw fa-cogs"></i> ${ _('Sessions') }
             </a>
           </li>
         </ul>
@@ -479,91 +479,6 @@
         % endif
       </div>
     </div>
-
-      % if not is_embeddable:
-        <!-- ko if: isRightPanelAvailable -->
-        <div class="resizer" data-bind="visible: isRightPanelVisible, splitDraggable : { isRightPanel: true, appName: 'notebook', leftPanelVisible: isLeftPanelVisible, rightPanelVisible: isRightPanelVisible, rightPanelAvailable: isRightPanelAvailable, onPosition: function(){ huePubSub.publish('split.draggable.position') } }" style="display: none;"><div class="resize-bar">&nbsp;</div></div>
-        <!-- /ko -->
-        <div class="assist-container right-panel" data-bind="visible: isRightPanelVisible() && isRightPanelAvailable()" style="display:none;">
-          <a title="${_('Toggle Assist')}" class="pointer hide-assist-right" data-bind="click: function() { isRightPanelVisible(false); huePubSub.publish('assist.set.manual.visibility'); }">
-            <i class="fa fa-chevron-right"></i>
-          </a>
-          <div class="assist" data-bind="component: {
-          name: 'right-assist-panel',
-          params: {
-            rightAssistAvailable: isRightPanelAvailable
-          }
-        }" >
-          </div>
-        </div>
-      % endif
-
-
-    <div class="context-panel" data-bind="css: {'visible': isContextPanelVisible}" style="${ 'height: 100%' if not is_embeddable else '' }">
-      <ul class="nav nav-tabs">
-        <li class="active"><a href="#sessionsTab" data-toggle="tab">${_('Sessions')}</a></li>
-      </ul>
-
-      <div class="tab-content" style="border: none">
-        <div class="tab-pane active" id="sessionsTab">
-          <div class="row-fluid">
-            <div class="span12" data-bind="template: { name: 'notebook-session-config-template${ suffix }', data: $root }"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </script>
-
-  <script type="text/html" id="notebook-session-config-template${ suffix }">
-    <!-- ko with: selectedNotebook() -->
-    <form class="form-horizontal session-config">
-      <fieldset>
-        <!-- ko ifnot: sessions().length -->
-        <p>${ _('There are currently no active sessions, please reload the page.') }</p>
-        <!-- /ko -->
-
-        <!-- ko foreach: sessions -->
-        <h4 style="clear:left; display: inline-block">
-          <span data-bind="text: $parents[1].getSnippetName(type())"></span>
-          <!-- ko if: typeof session_id != 'undefined' && session_id -->
-          <span data-bind="text: session_id"></span>
-          <!-- /ko -->
-        </h4>
-        <div class="session-actions">
-          <a class="inactive-action pointer" title="${ _('Recreate session') }" rel="tooltip" data-bind="click: function() { $parent.restartSession($data) }">
-            <i class="fa fa-refresh" data-bind="css: { 'fa-spin': restarting }"></i> ${ _('Recreate') }
-          </a>
-          <a class="inactive-action pointer margin-left-10" title="${ _('Close session') }" rel="tooltip" data-bind="click: function() { $parent.closeAndRemoveSession($data) }">
-            <i class="fa fa-times"></i> ${ _('Close') }
-          </a>
-          % if conf.USE_DEFAULT_CONFIGURATION.get():
-            <a class="inactive-action pointer margin-left-10" title="${ _('Save session settings as default') }" rel="tooltip" data-bind="click: function() { $parent.saveDefaultUserProperties($data) }"><i class="fa fa-save"></i> ${ _('Set as default settings') }</a>
-          % endif
-          <!-- ko if: type() == 'impala' && typeof http_addr != 'undefined' -->
-          <a class="margin-left-10" data-bind="attr: {'href': http_addr()}" target="_blank">
-            <span data-bind="text: http_addr().replace(/^(https?):\/\//, '')"></span> <i class="fa fa-external-link"></i>
-          </a>
-          <!-- /ko -->
-        </div>
-        % if conf.USE_DEFAULT_CONFIGURATION.get():
-          <div style="width:100%;">
-            <!-- ko component: { name: 'property-selector', params: { properties: properties } } --><!-- /ko -->
-          </div>
-        % endif
-        <div style="clear:both; padding-left: 120px;">
-          <!-- ko if: availableNewProperties().length -->
-          <a class="pointer" style="padding:5px;" data-bind="click: selectedSessionProperty() && function() {
-                      properties.push(ko.mapping.fromJS({'name': selectedSessionProperty(), 'value': ''}));
-                      selectedSessionProperty('');
-                     }" style="margin-left:10px;vertical-align: text-top;">
-          </a>
-          <!-- /ko -->
-        </div>
-        <!-- /ko -->
-        <br/>
-      </fieldset>
-    </form>
-    <!-- /ko -->
   </script>
 
   <script type="text/html" id="snippetIcon${ suffix }">
