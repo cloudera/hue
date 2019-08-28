@@ -134,11 +134,11 @@ After modifying files under tools/ace-editor run the following to build ace.js
     npm install
     make ace
 
-### SQL Embedded Language Reference manuals
+### Embedded language references
 
-The tools for generating the embedded language reference can be found under hue/tools/sql-docs/
+The tools for generating the embedded language reference manuals can be found under `hue/tools/sql-docs/`
 
-## Hive
+#### Hive
 The Hive documentation is generated directly from the Hive wiki by using an exported epub file.
 
 1. Goto https://cwiki.apache.org/confluence/display/Hive/LanguageManual
@@ -148,7 +148,7 @@ The Hive documentation is generated directly from the Hive wiki by using an expo
 
         node tools/sql-docs/hiveExtractor.js --epub /path/to/epub/file
 
-## Impala
+#### Impala
 The Impala documentation is generated from the ditamap files in the Impala GitHub repo.
 
 1. Clone the Impala repo next to hue from https://github.com/apache/impala
@@ -221,8 +221,7 @@ daemon processes "on the side". Some examples are the `Celery Task Server`, `Cel
 ![Interacting with Hadoop]({{% param baseURL %}}images/interactingwithhadoop.png)
 
 Hue provides some APIs for interacting with external services like Databases of File storages.
-These APIs work by making REST API or Thrift calls
-the Hadoop daemons.
+These APIs work by making REST or Thrift calls.
 
 ### An Architectural View
 
