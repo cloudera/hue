@@ -46,10 +46,12 @@ LOG = logging.getLogger(__name__)
 
 
 class S3FileSystemException(IOError):
-
   def __init__(self, *args, **kwargs):
     super(S3FileSystemException, self).__init__(*args, **kwargs)
 
+class S3ListAllBucketsException(S3FileSystemException):
+  def __init__(self, *args, **kwargs):
+    super(S3FileSystemException, self).__init__(*args, **kwargs)
 
 def auth_error_handler(view_fn):
   def decorator(*args, **kwargs):
@@ -203,8 +205,8 @@ class S3FileSystem(object):
 
   @staticmethod
   def isroot(path):
-    parsed = urlparse(path) 
-    return parsed.path == '/' or parsed.path == ''
+    parsed = urlparse(path)
+    return (parsed.path == '/' or parsed.path == '') and parsed.netloc == ''
 
   @staticmethod
   def join(*comp_list):
@@ -280,7 +282,10 @@ class S3FileSystem(object):
       except S3FileSystemException as e:
         raise e
       except S3ResponseError as e:
-        raise S3FileSystemException(_('Failed to retrieve buckets: %s') % e.reason)
+        if 'Forbidden' in str(e) or (hasattr(e, 'status') and e.status == 403):
+          raise S3ListAllBucketsException(_('You do not have permissions to list all buckets. Please specify a bucket name you have access to.'))
+        else:
+          raise S3FileSystemException(_('Failed to retrieve buckets: %s') % e.reason)
       except Exception as e:
         raise S3FileSystemException(_('Failed to retrieve buckets: %s') % e)
 

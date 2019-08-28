@@ -206,7 +206,6 @@ var HueFileEntry = (function () {
     self.loaded = ko.observable(false);
     self.loading = ko.observable(false);
     self.hasErrors = ko.observable(false);
-
     self.uploading = ko.observable(false);
     self.uploadComplete = ko.observable(false);
     self.uploadFailed = ko.observable(false);

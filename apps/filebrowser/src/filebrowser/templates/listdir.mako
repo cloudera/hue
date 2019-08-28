@@ -197,6 +197,8 @@ ${ fb_components.menubar() }
       <div class="alert alert-warn" data-bind="visible: ! isCurrentDirSentryManaged() && selectedSentryFiles().length > 0">
         ${ _('The permissions of some of the selected files are managed by the Sentry Namenode plugin.') }
       </div>
+      <div class="alert alert-warn" data-bind="visible: errorMessage(), text: errorMessage">
+      </div>
 
       % if breadcrumbs:
         ${fb_components.breadcrumbs(path, breadcrumbs, True)}

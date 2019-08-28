@@ -340,9 +340,9 @@ Plugin.prototype.navigateTo = function(path) {
       $homeBreadcrumb.appendTo($(_parent.element).find('.filechooser-tree'));
       $("<div class='clearfix'>").appendTo($(_parent.element).find('.filechooser-tree'));
       const _errorMsg = $('<div>')
-        .addClass('alert')
-        .addClass('alert-error')
-        .text(data.message ? data.message : data.error);
+      .addClass('alert')
+      .addClass('alert-error')
+      .text(data.message ? data.message : data.error);
       _errorMsg.appendTo($(_parent.element).find('.filechooser-tree'));
       //TODO: allow user to user breadcrums when there is an error
       const _previousLink = $('<a>')
@@ -573,6 +573,19 @@ Plugin.prototype.navigateTo = function(path) {
           );
         }
       }, 100);
+
+      if (data.s3_listing_not_allowed) {
+        $("<div class='clearfix'>").appendTo($(_parent.element).find('.filechooser-tree'));
+        const _errorMsg = $('<div>')
+        .addClass('alert')
+        .addClass('alert-warn')
+        .text(data.s3_listing_not_allowed);
+        _errorMsg.appendTo($(_parent.element).find('.filechooser-tree'));
+
+        $scrollingBreadcrumbs.hide();
+        $hdfsAutocomplete.show();
+        $hdfsAutocomplete.focus();
+      }
 
       $(data.files).each((cnt, file) => {
         let _addFile = file.name !== '.';

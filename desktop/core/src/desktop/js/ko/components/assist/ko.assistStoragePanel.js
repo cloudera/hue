@@ -164,9 +164,8 @@ const TEMPLATE = `
       <!-- /ko -->
     </div>
     <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
-    <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
-      <span>${I18n('Error loading contents.')}</span>
-    </div>
+    <span class="assist-errors" data-bind="visible: ! loading() && hasErrors(), text: errorText() || '${I18n('Error loading contents.')}'">
+    </span>
   </div>
   <!-- /ko -->
   <!-- /ko -->
