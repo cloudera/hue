@@ -938,6 +938,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       self.skipTrash = ko.observable(false);
       self.enableFilterAfterSearch = true;
       self.isCurrentDirSentryManaged = ko.observable(false);
+      self.errorMessage = ko.observable("");
       self.pendingUploads = ko.observable(0);
       self.pendingUploads.subscribe(function (val) {
         if (val > 0) {
@@ -1188,24 +1189,34 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
             return false;
           }
 
-          self.updateFileList(data.files, data.page, data.breadcrumbs, data.current_dir_path, data.is_sentry_managed);
+          self.updateFileList(data.files, data.page, data.breadcrumbs, data.current_dir_path, data.is_sentry_managed, data.s3_listing_not_allowed);
 
           if (clearAssistCache) {
             huePubSub.publish('assist.'+self.fs()+'.refresh');
           }
-
-          if ($("#hueBreadcrumbText").is(":visible")) {
-            $(".hue-breadcrumbs").show();
-            $("#hueBreadcrumbText").hide();
-            $("#editBreadcrumb").show();
+          if (data.s3_listing_not_allowed) {
+            if (!$("#hueBreadcrumbText").is(":visible")) {
+              $(".hue-breadcrumbs").hide();
+              $("#hueBreadcrumbText").show();
+              $("#editBreadcrumb").hide();
+            }
+            $("#hueBreadcrumbText").focus();
+          } else {
+            if ($("#hueBreadcrumbText").is(":visible")) {
+              $(".hue-breadcrumbs").show();
+              $("#hueBreadcrumbText").hide();
+              $("#editBreadcrumb").show();
+            }
           }
+
         });
       };
 
-      self.updateFileList = function (files, page, breadcrumbs, currentDirPath, isSentryManaged) {
+      self.updateFileList = function (files, page, breadcrumbs, currentDirPath, isSentryManaged, s3_listing_not_allowed) {
         $(".tooltip").hide();
 
         self.isCurrentDirSentryManaged(isSentryManaged);
+        self.errorMessage(s3_listing_not_allowed);
 
         self.page(new Page(page));
         self.files(ko.utils.arrayMap(files, function (file) {

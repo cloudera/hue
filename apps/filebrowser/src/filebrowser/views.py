@@ -49,7 +49,7 @@ from django.utils.http import http_date
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
-from aws.s3.s3fs import S3FileSystemException
+from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException
 from avro import datafile, io
 from desktop import appmanager
 from desktop.lib import i18n
@@ -461,11 +461,16 @@ def listdir_paged(request, path):
     else:
       home_dir_path = None
     breadcrumbs = parse_breadcrumbs(path)
+    s3_listing_not_allowed = ''
 
-    if do_as:
-      all_stats = request.fs.do_as_user(do_as, request.fs.listdir_stats, path)
-    else:
-      all_stats = request.fs.listdir_stats(path)
+    try:
+      if do_as:
+        all_stats = request.fs.do_as_user(do_as, request.fs.listdir_stats, path)
+      else:
+        all_stats = request.fs.listdir_stats(path)
+    except S3ListAllBucketsException as e:
+      s3_listing_not_allowed = e.message
+      all_stats = []
 
 
     # Filter first
@@ -546,6 +551,7 @@ def listdir_paged(request, path):
         'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
         'show_upload_button': SHOW_UPLOAD_BUTTON.get(),
         'is_embeddable': request.GET.get('is_embeddable', False),
+        's3_listing_not_allowed': s3_listing_not_allowed
     }
     return render('listdir.mako', request, data)
 
