@@ -47,7 +47,7 @@ const TEMPLATE = `
   <!-- /ko -->
 `;
 
-componentUtils.registerComponent('create-directory', undefined, TEMPLATE).done(() => {
+componentUtils.registerComponent('create-directory', undefined, TEMPLATE).then(() => {
   huePubSub.subscribe('show.create.directory.modal', docViewModel => {
     let $createDirectoryModal = $('#createDirectoryModal');
     if ($createDirectoryModal.length > 0) {

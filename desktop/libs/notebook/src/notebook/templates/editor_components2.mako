@@ -1892,42 +1892,6 @@
     </div>
   </div>
 
-
-  <div id="authModal${ suffix }" class="modal hide fade">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-      <h2 class="modal-title">${_('Connect to the data source')}</h2>
-    </div>
-    <div class="modal-body">
-      <!-- ko if: $root.authSessionMessage() -->
-      <div class="row-fluid">
-        <div class="alert-warning">
-          <span data-bind="text: authSessionMessage"></span>
-        </div>
-      </div>
-      <!-- /ko -->
-      <div class="row-fluid">
-        <div class="span6">
-          <div class="input-prepend">
-            <span class="add-on muted"><i class="fa fa-user"></i></span>
-            <input name="username" type="text" data-bind="value: $root.authSessionUsername" placeholder="${ _('Username') }"/>
-          </div>
-        </div>
-        <div class="span6">
-          <div class="input-prepend">
-            <span class="add-on muted"><i class="fa fa-lock"></i></span>
-            <input name="password" type="password" data-bind="value: $root.authSessionPassword" placeholder="${ _('Password') }"/>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
-      <a class="btn btn-primary disable-feedback" data-dismiss="modal" data-bind="click: function() { $root.selectedNotebook().authSession(); }">${_('Connect')}</a>
-    </div>
-  </div>
-
-
   <div id="clearHistoryModal${ suffix }" class="modal hide fade">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>

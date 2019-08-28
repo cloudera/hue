@@ -75,7 +75,7 @@ const TEMPLATE = `
   <!-- /ko -->
 `;
 
-componentUtils.registerComponent('delete-entry', undefined, TEMPLATE).done(() => {
+componentUtils.registerComponent('delete-entry', undefined, TEMPLATE).then(() => {
   huePubSub.subscribe('doc.show.delete.modal', docViewModel => {
     let $deleteEntriesModal = $('#deleteEntriesModal');
     if ($deleteEntriesModal.length > 0) {
