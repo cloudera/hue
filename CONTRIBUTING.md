@@ -41,6 +41,6 @@ A general rule is to follow the on-going style of the code context.
 * Python: Follow [Django/PEP8](https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/coding-style/), with the exception of using 2 spaces per indent level.
 * JavaScript: Follow the style in this [file](https://github.com/cloudera/hue/blob/master/apps/oozie/src/oozie/static/oozie/js/bundle-editor.ko.js#L18).
 
-## Tests
+## CI & Tests
 
-See the [Running the tests locally](https://docs.gethue.com/latest/developer/development/#testing) or opening-up a pull request will automatically run them via [CircleCi](https://circleci.com/gh/cloudera/hue).
+See the [Running the tests](https://docs.gethue.com/latest/developer/development/#testing) or opening-up a pull request will automatically run them via [CircleCi](https://circleci.com/gh/cloudera/hue).
