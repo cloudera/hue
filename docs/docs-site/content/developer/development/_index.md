@@ -701,9 +701,29 @@ See ```desktop/core/src/desktop/js/spec/karma.config.js``` for various options
       Point to an Impalad and trigger the Impala tests.
 
 
-#### Writing tests that depend on Hadoop
+#### Continuous Integration (CI)
 
-Use pseudo_hdfs4.py!  You should tag such tests with "requires_hadoop", as follows:
+[CircleCi](https://circleci.com/gh/cloudera/hue) automatically run the unit tests (Python, Javascript, linting) on branch updates and pull requests. Branches containing `ci-commit-master` will tried to be auto pushed to master if the run is green and github permissions match.
+
+The runs happen in an image based on [latest Hue's image](https://hub.docker.com/u/gethue/).
+
+Note: until the `desktop/ext-py` dependencies are moved to a `requirement.txt`, adding new Python modules will require adding them first to the Docker image by building a Hue branch which has them.
+
+#### Integration tests
+
+Those are tagged with `integration` either at the class or method level:
+
+    class BeeswaxSampleProvider(object):
+      integration = True
+
+      @attr('integration')
+      def test_add_ldap_users_case_sensitivity(self):
+        if is_live_cluster():
+          raise SkipTest('HUE-2897: Cannot yet guarantee database is case sensitive')
+
+        ...
+
+Historically, the same thing used to be done with the `requires_hadoop` tag:
 
     from nose.plugins.attrib import attr
 
@@ -711,14 +731,7 @@ Use pseudo_hdfs4.py!  You should tag such tests with "requires_hadoop", as follo
     def your_test():
       ...
 
-
-#### Jenkins Configuration
-
-Because building Hadoop (for the tests that require it) is slow, we've
-separated the Jenkins builds into "fast" and "slow".  Both are run
-via scripts/jenkins.sh, which should be kept updated with the latest
-and greatest in build technologies.
-
+Because running integration tests is slow, the Jenkins builds are separated into "fast" and "slow". Both are ran via `scripts/jenkins.sh`.
 
 ## Release
 
