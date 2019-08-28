@@ -82,6 +82,14 @@ describe('executableStatement.js', () => {
     const subject = createSubject('SELECT * FROM customers');
 
     const simplePostDeferred = $.Deferred();
+
+    spyOn(ApiHelper, 'createSession').and.callFake(
+      () =>
+        new Promise(resolve => {
+          resolve({ type: 'x' });
+        })
+    );
+
     spyOn(ApiHelper, 'simplePost').and.callFake(url => {
       expect(url).toEqual('/notebook/api/execute/impala');
       return simplePostDeferred;

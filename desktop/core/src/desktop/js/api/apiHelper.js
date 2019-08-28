@@ -335,7 +335,7 @@ class ApiHelper {
    * @returns {Function}
    */
   assistErrorCallback(options) {
-    return function(errorResponse) {
+    return errorResponse => {
       let errorMessage = 'Unknown error occurred';
       if (typeof errorResponse !== 'undefined' && errorResponse !== null) {
         if (
@@ -1878,28 +1878,34 @@ class ApiHelper {
     return this.simplePost('/notebook/api/notebook/close', data);
   }
 
-  createSession(options) {
-    const data = {
-      notebook: options.notebookJson,
-      session: options.sessionJson,
-      cluster: options.clusterJson
-    };
-    return this.simplePost('/notebook/api/create_session', data);
-  }
-
   /**
    * Creates a new session
    *
    * @param {Object} options
    * @param {String} options.type
    * @param {Array<SessionProperty>} [options.properties] - Default []
-   * @return {Promise}
+   * @return {Promise<Session>}
    */
-  createSessionV2(options) {
-    const data = {
-      session: JSON.stringify({ type: options.type, properties: options.properties || [] })
-    };
-    return this.simplePost('/notebook/api/create_session', data, options);
+  async createSession(options) {
+    return new Promise((resolve, reject) => {
+      const data = {
+        session: JSON.stringify({ type: options.type, properties: options.properties || [] })
+      };
+      $.post({
+        url: '/notebook/api/create_session',
+        data: data
+      })
+        .done(data => {
+          if (data.status === 401) {
+            resolve({ auth: true, message: data.message });
+          } else if (this.successResponseIsError(data)) {
+            reject(this.assistErrorCallback(options)(data));
+          } else {
+            resolve(data.session);
+          }
+        })
+        .fail(this.assistErrorCallback(options));
+    });
   }
 
   closeSession(options) {

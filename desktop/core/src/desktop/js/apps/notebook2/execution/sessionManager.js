@@ -14,21 +14,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import apiHelper from '../../../api/apiHelper';
+import apiHelper from 'api/apiHelper';
+import huePubSub from 'utils/huePubSub';
 
 class SessionManager {
   constructor() {
-    this.knownSessions = {};
+    this.knownSessionPromises = {};
   }
   /**
    * @typedef SessionProperty
-   * @property {Array<*>} defaultValue
-   * @property {String} help_text
+   * @property {Array<*>} [defaultValue]
+   * @property {String} [help_text]
    * @property {String} key
-   * @property {Boolean} multiple
-   * @property {String} nice_name
-   * @property {Array<*>} options
-   * @property {String} type
+   * @property {Boolean} [multiple]
+   * @property {String} [nice_name]
+   * @property {Array<*>} [options]
+   * @property {String} [type]
    * @property {Array<*>} value
    */
 
@@ -53,29 +54,57 @@ class SessionManager {
    * @return {Promise<Session>}
    */
   async getSession(options) {
-    if (!this.knownSessions[options.type]) {
-      this.knownSessions[options.type] = new Promise((resolve, reject) => {
-        apiHelper
-          .createSessionV2({
-            type: options.type,
-            properties: options.properties
-          })
-          .then(response => {
-            resolve(response.session);
-          })
-          .fail(reject);
-      });
-
+    if (!this.knownSessionPromises[options.type]) {
+      this.knownSessionPromises[options.type] = this.createDetachedSession(options);
       // Sessions that fail
-      this.knownSessions[options.type].catch(() => {
-        delete this.knownSessions[options.type];
+      this.knownSessionPromises[options.type].catch(() => {
+        delete this.knownSessionPromises[options.type];
       });
     }
-    return this.knownSessions[options.type];
+    return this.knownSessionPromises[options.type];
+  }
+
+  /**
+   * Creates a new detached session
+   *
+   * @param {Object} options
+   * @param {String} options.type
+   * @param {boolean} [options.preventAuthModal] - Default false
+   * @param {Array<SessionProperty>} [options.properties] - Default []
+   *
+   * @return {Promise<Session>}
+   */
+  async createDetachedSession(options) {
+    return new Promise((resolve, reject) => {
+      const sessionToCreate = {
+        type: options.type,
+        properties: options.properties || []
+      };
+      apiHelper
+        .createSession(sessionToCreate)
+        .then(resolve)
+        .catch(reason => {
+          if (reason && reason.auth) {
+            // The auth modal will resolve or reject
+            if (!options.preventAuthModal) {
+              huePubSub.publish('show.session.auth.modal', {
+                message: reason.message,
+                session: sessionToCreate,
+                resolve: resolve,
+                reject: reject
+              });
+            }
+          } else {
+            reject(reason);
+          }
+        });
+    });
   }
 
   async getAllSessions() {
-    const promises = Object.keys(this.knownSessions).map(key => this.knownSessions[key]);
+    const promises = Object.keys(this.knownSessionPromises).map(
+      key => this.knownSessionPromises[key]
+    );
     return Promise.all(promises);
   }
 
@@ -85,19 +114,14 @@ class SessionManager {
   }
 
   hasSession(type) {
-    return !!this.knownSessions[type];
+    return !!this.knownSessionPromises[type];
   }
 
   async closeSession(session) {
-    if (!this.hasSession(session.type)) {
-      return;
+    if (this.hasSession(session.type)) {
+      delete this.knownSessionPromises[session.type];
     }
-    delete this.knownSessions[session.type];
-    try {
-      await apiHelper.closeSession({ session: session, silenceErrors: true });
-    } catch (err) {
-      console.warn(err);
-    }
+    await apiHelper.closeSession({ session: session, silenceErrors: true });
   }
 }
 
