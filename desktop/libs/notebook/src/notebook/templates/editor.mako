@@ -16,34 +16,28 @@
 <%!
   from desktop.views import commonheader, commonfooter, commonshare
   from desktop import conf
+  from notebook.conf import ENABLE_NOTEBOOK_2
   from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
 <%namespace name="editorComponents" file="editor_components.mako" />
+<%namespace name="editorComponents2" file="editor_components2.mako" />
 <%namespace name="notebookKoComponents" file="/common_notebook_ko_components.mako" />
 <%namespace name="hueAceAutocompleter" file="/hue_ace_autocompleter.mako" />
 
-%if not is_embeddable:
-${ commonheader(_('Editor'), editor_type, user, request, "68px") | n,unicode }
-${ commonshare() | n,unicode }
-%endif
-
 <span id="editorComponents" class="editorComponents notebook">
+%if ENABLE_NOTEBOOK_2.get():
+${ editorComponents2.includes(is_embeddable=is_embeddable, suffix='editor') }
+${ editorComponents2.topBar(suffix='editor') }
+${ editorComponents2.commonHTML(is_embeddable=is_embeddable, suffix='editor') }
+${ editorComponents2.commonJS(is_embeddable=is_embeddable, suffix='editor') }
+%else:
 ${ editorComponents.includes(is_embeddable=is_embeddable, suffix='editor') }
-
 ${ editorComponents.topBar(suffix='editor') }
 ${ editorComponents.commonHTML(is_embeddable=is_embeddable, suffix='editor') }
-
-%if not is_embeddable:
-${ configKoComponents.config() }
-${ notebookKoComponents.aceKeyboardShortcuts() }
-${ notebookKoComponents.downloadSnippetResults() }
-${ hueAceAutocompleter.hueAceAutocompleter() }
-%endif
-
-
 ${ editorComponents.commonJS(is_embeddable=is_embeddable, suffix='editor') }
+%endif
 </span>
 
 %if not is_embeddable:

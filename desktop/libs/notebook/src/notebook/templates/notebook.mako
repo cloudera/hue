@@ -17,26 +17,25 @@
   from desktop.views import commonheader, commonfooter, commonshare
   from desktop import conf
   from django.utils.translation import ugettext as _
+  from notebook.conf import ENABLE_NOTEBOOK_2
 %>
 
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
+<%namespace name="editorComponents2" file="editor_components2.mako" />
 <%namespace name="editorComponents" file="editor_components.mako" />
 <%namespace name="notebookKoComponents" file="/common_notebook_ko_components.mako" />
 <%namespace name="hueAceAutocompleter" file="/hue_ace_autocompleter.mako" />
 
-%if not is_embeddable:
-${ commonheader(_('Notebook'), app_name, user, request, "68px") | n,unicode }
-${ commonshare() | n,unicode }
-%endif
 
 <span id="notebookComponents" class="notebook">
-${ editorComponents.includes(is_embeddable=is_embeddable, suffix='notebook') }
-${ editorComponents.topBar(suffix='notebook') }
-<%editorComponents:commonHTML is_embeddable="${is_embeddable}" suffix="notebook">
-  <%def name="addSnippetHTML()">
-    <h1 class="empty" data-bind="visible: $root.availableSnippets().length == 0">${ _('There are no snippets configured.') }</h1>
+%if ENABLE_NOTEBOOK_2.get():
+  ${ editorComponents2.includes(is_embeddable=is_embeddable, suffix='notebook') }
+  ${ editorComponents2.topBar(suffix='notebook') }
+  <%editorComponents2:commonHTML is_embeddable="${is_embeddable}" suffix="notebook">
+    <%def name="addSnippetHTML()">
+      <h1 class="empty" data-bind="visible: $root.availableSnippets().length == 0">${ _('There are no snippets configured.') }</h1>
 
-    <!-- ko if: $root.availableSnippets().length > 0 -->
+      <!-- ko if: $root.availableSnippets().length > 0 -->
     <h1 class="empty" data-bind="visible: snippets().length == 0">${ _('Add a snippet to start your new notebook') }</h1>
 
     <div class="add-snippet" data-bind="component: {
@@ -47,22 +46,37 @@ ${ editorComponents.topBar(suffix='notebook') }
       }
     }">
     </div>
-    <!-- /ko -->
-  </%def>
-</%editorComponents:commonHTML>
+      <!-- /ko -->
+    </%def>
+  </%editorComponents2:commonHTML>
 
-%if not is_embeddable:
-${ configKoComponents.config() }
-${ notebookKoComponents.aceKeyboardShortcuts() }
-${ notebookKoComponents.downloadSnippetResults() }
-${ hueAceAutocompleter.hueAceAutocompleter() }
+  ${ notebookKoComponents.addSnippetMenu() }
+
+  ${ editorComponents2.commonJS(is_embeddable=is_embeddable, bindableElement='notebookComponents', suffix='notebook') }
+%else:
+  ${ editorComponents.includes(is_embeddable=is_embeddable, suffix='notebook') }
+  ${ editorComponents.topBar(suffix='notebook') }
+  <%editorComponents:commonHTML is_embeddable="${is_embeddable}" suffix="notebook">
+    <%def name="addSnippetHTML()">
+      <h1 class="empty" data-bind="visible: $root.availableSnippets().length == 0">${ _('There are no snippets configured.') }</h1>
+
+      <!-- ko if: $root.availableSnippets().length > 0 -->
+    <h1 class="empty" data-bind="visible: snippets().length == 0">${ _('Add a snippet to start your new notebook') }</h1>
+
+    <div class="add-snippet" data-bind="component: {
+      name: 'add-snippet-menu',
+      params: {
+        notebook: $data,
+        availableSnippets: $root.availableSnippets
+      }
+    }">
+    </div>
+      <!-- /ko -->
+    </%def>
+  </%editorComponents:commonHTML>
+
+  ${ notebookKoComponents.addSnippetMenu() }
+
+  ${ editorComponents.commonJS(is_embeddable=is_embeddable, bindableElement='notebookComponents', suffix='notebook') }
 %endif
-${ notebookKoComponents.addSnippetMenu() }
-
-${ editorComponents.commonJS(is_embeddable=is_embeddable, bindableElement='notebookComponents', suffix='notebook') }
-
 </span>
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif
