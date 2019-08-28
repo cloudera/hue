@@ -294,7 +294,6 @@ class OnePageViewModel {
       huePubSub.publish('hue.datatable.search.hide');
       huePubSub.publish('hue.scrollleft.hide');
       huePubSub.publish('context.panel.visible', false);
-      huePubSub.publish('context.panel.visible.editor', false);
       if (app === 'filebrowser') {
         $(window).unbind('hashchange.fblist');
       }

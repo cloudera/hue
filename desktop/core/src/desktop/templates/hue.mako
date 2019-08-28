@@ -27,6 +27,7 @@
   from filebrowser.conf import SHOW_UPLOAD_BUTTON
   from indexer.conf import ENABLE_NEW_INDEXER
   from metadata.conf import has_optimizer, OPTIMIZER
+  from notebook.conf import ENABLE_NOTEBOOK_2
 
   from desktop.auth.backend import is_admin
   from webpack_loader.templatetags.webpack_loader import render_bundle
@@ -228,8 +229,10 @@ ${ hueIcons.symbols() }
         onPosition: function() { huePubSub.publish('split.draggable.position') }
       }"><div class="resize-bar"></div></div>
 
-
       <div class="page-content">
+        <!-- ko if: window.ENABLE_NOTEBOOK_2 -->
+        <!-- ko component: 'session-panel' --><!-- /ko -->
+        <!-- /ko -->
         <!-- ko hueSpinner: { spin: isLoadingEmbeddable, center: true, size: 'xlarge', blackout: true } --><!-- /ko -->
         <div id="embeddable_editor" class="embeddable"></div>
         <div id="embeddable_notebook" class="embeddable"></div>
@@ -291,6 +294,7 @@ ${ hueIcons.symbols() }
           }
         }" style="display: none;"></div>
 
+      %if not ENABLE_NOTEBOOK_2.get():
       <div class="context-panel" data-bind="slideVisible: contextPanelVisible">
         <div class="margin-top-10 padding-left-10 padding-right-10">
           <h4 class="margin-bottom-30"><i class="fa fa-cogs"></i> ${_('Session')}</h4>
@@ -302,12 +306,13 @@ ${ hueIcons.symbols() }
             <!-- /ko -->
 
             <!-- ko ifnot: sessionsAvailable() && templateApp() -->
-            ${_('There are currently no information about the sessions.')}
+            ${_('There is currently no information about the sessions.')}
             <!-- /ko -->
           </div>
         </div>
-        <a class="pointer demi-modal-chevron" style="position: absolute; bottom: 0" data-bind="click: function () { huePubSub.publish('context.panel.visible.editor', false); }"><i class="fa fa-chevron-up"></i></a>
+        <a class="pointer demi-modal-chevron" style="position: absolute; bottom: 0" data-bind="click: function () { huePubSub.publish('context.panel.visible', false); }"><i class="fa fa-chevron-up"></i></a>
       </div>
+      %endif
     </div>
   </div>
 </div>

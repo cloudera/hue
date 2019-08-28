@@ -34,7 +34,6 @@ class EditorViewModel {
     console.log('Notebook 2 enabled.');
 
     self.editorId = editorId;
-    self.sessionProperties = options.session_properties || [];
     self.snippetViewSettings = options.snippetViewSettings;
     self.notebooks = notebooks;
 
@@ -171,44 +170,16 @@ class EditorViewModel {
       }
     });
 
-    const withActiveSnippet = function(callback) {
-      const notebook = self.selectedNotebook();
-      let foundSnippet;
-      if (notebook) {
-        if (notebook.snippets().length === 1) {
-          foundSnippet = notebook.snippets()[0];
-        } else {
-          notebook.snippets().every(snippet => {
-            if (snippet.inFocus()) {
-              foundSnippet = snippet;
-              return false;
-            }
-            return true;
-          });
-        }
-      }
-      if (foundSnippet) {
-        callback(foundSnippet);
-      }
-    };
-
     huePubSub.subscribe('assist.highlight.risk.suggestions', () => {
       if (self.isRightPanelAvailable() && !self.isRightPanelVisible()) {
         self.isRightPanelVisible(true);
       }
     });
 
-    self.isContextPanelVisible = ko.observable(false);
-    self.isContextPanelVisible.subscribe(newValue => {
-      huePubSub.publish('context.panel.visible', newValue);
-    });
-
-    huePubSub.subscribe('context.panel.visible.editor', self.isContextPanelVisible);
-
     huePubSub.subscribe(
       'get.active.snippet.type',
       callback => {
-        withActiveSnippet(activeSnippet => {
+        this.withActiveSnippet(activeSnippet => {
           if (callback) {
             callback(activeSnippet.type());
           } else {
@@ -222,7 +193,7 @@ class EditorViewModel {
     huePubSub.subscribe(
       'save.snippet.to.file',
       () => {
-        withActiveSnippet(activeSnippet => {
+        this.withActiveSnippet(activeSnippet => {
           const data = {
             path: activeSnippet.statementPath(),
             contents: activeSnippet.statement()
@@ -245,7 +216,7 @@ class EditorViewModel {
     huePubSub.subscribe(
       'sql.context.pin',
       contextData => {
-        withActiveSnippet(activeSnippet => {
+        this.withActiveSnippet(activeSnippet => {
           contextData.tabId = 'context' + activeSnippet.pinnedContextTabs().length;
           activeSnippet.pinnedContextTabs.push(contextData);
           activeSnippet.currentQueryTab(contextData.tabId);
@@ -257,7 +228,7 @@ class EditorViewModel {
     huePubSub.subscribe(
       'assist.database.set',
       databaseDef => {
-        withActiveSnippet(activeSnippet => {
+        this.withActiveSnippet(activeSnippet => {
           activeSnippet.handleAssistSelection(databaseDef);
         });
       },
@@ -267,7 +238,7 @@ class EditorViewModel {
     huePubSub.subscribe(
       'assist.database.selected',
       databaseDef => {
-        withActiveSnippet(activeSnippet => {
+        this.withActiveSnippet(activeSnippet => {
           activeSnippet.handleAssistSelection(databaseDef);
         });
       },
@@ -277,12 +248,6 @@ class EditorViewModel {
     self.availableSnippets = komapping.fromJS(options.languages);
 
     self.editorMode = ko.observable(options.mode === 'editor');
-
-    // Only Spark
-    // Could filter out the ones already selected + yarn only or not
-    self.availableSessionProperties = ko.pureComputed(() =>
-      self.sessionProperties.filter(item => item.name !== '')
-    );
   }
 
   changeURL(url) {
@@ -332,18 +297,6 @@ class EditorViewModel {
         snippet.chartScatterGroup() || snippet.previousChartOptions.chartScatterGroup,
       chartScatterSize: snippet.chartScatterSize() || snippet.previousChartOptions.chartScatterSize
     };
-  }
-
-  getSessionProperties(name) {
-    const self = this;
-    let result = null;
-    self.sessionProperties.some(prop => {
-      if (prop.name === name) {
-        result = prop;
-        return true;
-      }
-    });
-    return result;
   }
 
   getSnippetName(snippetType) {
@@ -535,7 +488,8 @@ class EditorViewModel {
     const self = this;
     let hasContent = snippet.statement_raw().length > 0;
     if (!hasContent) {
-      snippet.properties().forEach(value => {
+      Object.keys(snippet.properties()).forEach(key => {
+        const value = snippet.properties()[key];
         hasContent = hasContent || (ko.isObservable(value) && value().length > 0);
       });
     }
@@ -590,6 +544,17 @@ class EditorViewModel {
         bottom: offset.top + $source.height() - 3
       }
     });
+  }
+
+  showSessionPanel() {
+    this.withActiveSnippet(
+      snippet => {
+        huePubSub.publish('session.panel.show', snippet.type());
+      },
+      () => {
+        huePubSub.publish('session.panel.show');
+      }
+    );
   }
 
   toggleEditing() {
@@ -666,6 +631,29 @@ class EditorViewModel {
     const self = this;
     if (self.selectedNotebook().initialType !== 'notebook') {
       self.toggleEditorMode();
+    }
+  }
+
+  withActiveSnippet(callback, notFoundCallback) {
+    const notebook = this.selectedNotebook();
+    let foundSnippet;
+    if (notebook) {
+      if (notebook.snippets().length === 1) {
+        foundSnippet = notebook.snippets()[0];
+      } else {
+        notebook.snippets().every(snippet => {
+          if (snippet.inFocus()) {
+            foundSnippet = snippet;
+            return false;
+          }
+          return true;
+        });
+      }
+    }
+    if (foundSnippet) {
+      callback(foundSnippet);
+    } else if (notFoundCallback) {
+      notFoundCallback();
     }
   }
 }

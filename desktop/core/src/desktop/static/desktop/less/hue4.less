@@ -729,6 +729,42 @@ a:visited {
 
 /* context panel */
 
+.session-panel {
+  display: none;
+  position: absolute;
+  top: 50px;
+  width: 90%;
+  margin-left: 5%;
+  background: @cui-white;
+  z-index: 401;
+  outline: none !important;
+  padding: 10px 0;
+  max-height: 80%;
+  .hue-box-shadow-bottom;
+
+  .session-panel-content {
+    overflow-y: auto;
+    margin-bottom: 20px;
+  }
+
+  .nav-tabs {
+    padding-left: 10px;
+  }
+
+  .tab-content {
+    padding: 12px;
+    min-height: calc(100% - 90px);
+  }
+
+  .tab-pane {
+    height: 100%;
+  }
+
+  .demi-modal-chevron {
+    margin-left: -10px;
+  }
+}
+
 /* TODO: Positioning and clean-up */
 .context-panel {
   position: fixed;

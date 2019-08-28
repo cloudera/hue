@@ -122,7 +122,9 @@ $(document).ready(() => {
   ko.applyBindings(sidePanelViewModel, $('.left-panel')[0]);
   ko.applyBindings(sidePanelViewModel, $('#leftResizer')[0]);
   ko.applyBindings(sidePanelViewModel, $('.right-panel')[0]);
-  ko.applyBindings(sidePanelViewModel, $('.context-panel')[0]);
+  if (!window.ENABLE_NOTEBOOK_2) {
+    ko.applyBindings(sidePanelViewModel, $('.context-panel')[0]);
+  }
 
   const topNavViewModel = new TopNavViewModel(onePageViewModel);
   ko.applyBindings(topNavViewModel, $('.top-nav')[0]);

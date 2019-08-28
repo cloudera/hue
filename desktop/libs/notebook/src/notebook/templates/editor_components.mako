@@ -291,7 +291,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         </li>
         <!-- /ko -->
         <li>
-          <a class="pointer" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
+          <a class="pointer" data-bind="publish: {'context.panel.visible': true}">
             <i class="fa fa-fw fa-cogs"></i> ${ _('Session') }
           </a>
         </li>
@@ -497,21 +497,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </div>
     </div>
   % endif
-
-
-  <div class="context-panel" data-bind="css: {'visible': isContextPanelVisible}" style="${ 'height: 100%' if not is_embeddable else '' }">
-    <ul class="nav nav-tabs">
-      <li class="active"><a href="#sessionsTab" data-toggle="tab">${_('Sessions')}</a></li>
-    </ul>
-
-    <div class="tab-content" style="border: none">
-      <div class="tab-pane active" id="sessionsTab">
-        <div class="row-fluid">
-          <div class="span12" data-bind="template: { name: 'notebook-session-config-template${ suffix }', data: $root }"></div>
-        </div>
-      </div>
-    </div>
-  </div>
 </script>
 
 <script type="text/html" id="notebook-session-config-template${ suffix }">

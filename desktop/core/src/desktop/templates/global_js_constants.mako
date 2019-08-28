@@ -19,7 +19,7 @@
 
   from desktop import conf
   from desktop.auth.backend import is_admin;
-  from desktop.conf import APP_SWITCHER_ALTUS_BASE_URL, APP_SWITCHER_MOW_BASE_URL, DISPLAY_APP_SWITCHER, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_NEW_SIDE_PANELS, VCS
+  from desktop.conf import APP_SWITCHER_ALTUS_BASE_URL, APP_SWITCHER_MOW_BASE_URL, DISPLAY_APP_SWITCHER, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_DEFAULT_CONFIGURATION, USE_NEW_SIDE_PANELS, VCS
   from desktop.models import hue_version, _get_apps, get_cluster_config
 
   from beeswax.conf import LIST_PARTITIONS_LIMIT
@@ -66,13 +66,14 @@
   window.KNOX_BASE_PATH = window._KNOX_BASE_PATH.indexOf('KNOX_BASE_PATH_KNOX') < 0 ? window._KNOX_BASE_PATH_KNOX : '';
   window.KNOX_BASE_URL = window._KNOX_BASE_URL.indexOf('KNOX_BASE_URL') < 0 ? window._KNOX_BASE_URL : '';
 
-
   window.HAS_GIT = ${ len(VCS.keys()) } > 0;
   window.HAS_MULTI_CLUSTER = '${ get_cluster_config(user)['has_computes'] }' === 'True';
 
   window.HAS_SQL_DASHBOARD = '${ HAS_SQL_ENABLED.get() }' === 'True';
 
   window.DROPZONE_HOME_DIR = '${ user.get_home_directory() if not user.is_anonymous() else "" }';
+
+  window.USE_DEFAULT_CONFIGURATION = '${ USE_DEFAULT_CONFIGURATION.get() }' === 'True';
 
   window.USER_HAS_METADATA_WRITE_PERM = '${ user.has_hue_permission(action="write", app="metadata") }' === 'True';
 
@@ -164,6 +165,7 @@
     'Clear the query history': '${ _('Clear the query history') }',
     'Click for more details': '${ _('Click for more details') }',
     'Close': '${_('Close')}',
+    'Close session': '${_('Close session')}',
     'Cluster': '${ _('Cluster') }',
     'Clusters': '${ _('Clusters') }',
     'CodeGen': '${ _('CodeGen') }',
@@ -173,9 +175,11 @@
     'Columns': '${ _('Columns') }',
     'Compilation': '${ _('Compilation') }',
     'Compute': '${ _('Compute') }',
+    'Connect': '${ _('Connect') }',
     'condition': '${ _('condition') }',
     'Confirm History Clearing': '${ _('Confirm History Clearing') }',
     'Confirm the deletion?': '${ _('Confirm the deletion?') }',
+    'Connect to the data source': '${ _('Connect to the data source') }',
     'Could not find details for the function': '${_('Could not find details for the function')}',
     'Could not find': '${_('Could not find')}',
     'CPU': '${ _('CPU') }',
@@ -356,6 +360,7 @@
     'Owner': '${ _('Owner') }',
     'Partition key': '${ _('Partition key') }',
     'Partitions': '${ _('Partitions') }',
+    'Password': '${ _('Password') }',
     'Perform incremental metadata update.': '${ _('Perform incremental metadata update.') }',
     'Permissions': '${ _('Permissions') }',
     'Pig Design': '${_('Pig Design')}',
@@ -375,6 +380,8 @@
     'Query requires a select or aggregate.': '${ _('Query requires a select or aggregate.') }',
     'Query running': '${ _('Query running') }',
     'queued': '${ _('queued') }',
+    'Re-create': '${ _('Re-create') }',
+    'Re-create session': '${ _('Re-create session') }',
     'Refresh': '${ _('Refresh') }',
     'Remove': '${ _('Remove') }',
     'Replace the editor content...': '${ _('Replace the editor content...') }',
@@ -389,6 +396,7 @@
     'Samples': '${ _('Samples') }',
     'Save': '${ _('Save') }',
     'Save changes': '${ _('Save changes') }',
+    'Save session settings as default': '${ _('Save session settings as default') }',
     'Schedule': '${ _('Schedule') }',
     'Search Dashboard': '${_('Search Dashboard')}',
     'Search data and saved documents...': '${ _('Search data and saved documents...') }',
@@ -399,7 +407,9 @@
     'Selected entry': '${_('Selected entry')}',
     'Sentry will recursively delete the SERVER or DATABASE privileges you marked for deletion.': '${ _('Sentry will recursively delete the SERVER or DATABASE privileges you marked for deletion.') }',
     'Server': '${ _('Server') }',
+    'Sessions': '${ _('Sessions') }',
     'Set as default application': '${_('Set as default application')}',
+    'Set as default settings': '${_('Set as default settings')}',
     'Shell Script': '${_('Shell Script')}',
     'Show 50 more...': '${_('Show 50 more...')}',
     'Show advanced': '${_('Show advanced')}',
@@ -435,6 +445,7 @@
     'The upload has been canceled': '${ _('The upload has been canceled') }',
     'There are no stats to be shown': '${ _('There are no stats to be shown') }',
     'There are no terms to be shown': '${ _('There are no terms to be shown') }',
+    'There is currently no information about the sessions.': '${ _('There is currently no information about the sessions.') }',
     'This field does not support stats': '${ _('This field does not support stats') }',
     'This will sync missing tables.': '${ _('This will sync missing tables.') }',
     'Timeline': '${ _('Timeline') }',
@@ -450,6 +461,7 @@
     'Upload file': '${_('Upload file')}',
     'uploaded successfully': '${ _('uploaded successfully') }',
     'used by': '${ _('used by') }',
+    'Username': '${ _('Username') }',
     'Value': '${ _('Value') }',
     'Values': '${ _('Values') }',
     'variable': '${ _('variable') }',

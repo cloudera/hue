@@ -29,7 +29,7 @@ import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 import { NOTEBOOK_MAPPING } from 'apps/notebook2/notebook';
 import Result from 'apps/notebook2/result';
-import Session from 'apps/notebook2/session';
+import sessionManager from 'apps/notebook2/execution/sessionManager';
 
 // TODO: Remove. Temporary here for debug
 window.ExecutableStatement = ExecutableStatement;
@@ -172,11 +172,15 @@ class Snippet {
 
     self.id = ko.observable(snippet.id || hueUtils.UUID());
     self.name = ko.observable(snippet.name || '');
-    self.type = ko.observable(snippet.type || TYPE.hive);
-    self.type.subscribe(() => {
-      self.status(STATUS.ready);
+    self.type = ko.observable();
+    self.type.subscribe(newValue => {
+      // TODO: Add session disposal for ENABLE_NOTEBOOK_2
+      // Pre-create a session to speed up execution
+      sessionManager.getSession({ type: newValue }).then(() => {
+        self.status(STATUS.ready);
+      });
     });
-
+    self.type(snippet.type || TYPE.hive);
     self.isBatchable = ko.pureComputed(
       () =>
         self.type() === TYPE.hive ||
@@ -1385,8 +1389,7 @@ class Snippet {
       sourceType: this.type(),
       namespace: this.namespace(),
       statement: this.statement(),
-      isSqlEngine: this.isSqlDialect(),
-      sessions: komapping.toJS(this.parentNotebook.sessions)
+      isSqlEngine: this.isSqlDialect()
     });
 
     this.executor.executeNext().then(executionResult => {
@@ -1853,16 +1856,7 @@ class Snippet {
   handleAjaxError(data, callback) {
     const self = this;
     if (data.status === -2) {
-      // Session expired
-      const existingSession = self.parentNotebook.getSession(self.type());
-      if (existingSession) {
-        self.parentNotebook.restartSession(existingSession, callback);
-      } else {
-        self.parentNotebook.createSession(
-          new Session(self.parentVm, { type: self.type() }),
-          callback
-        );
-      }
+      // TODO: Session expired, check if handleAjaxError is used for ENABLE_NOTEBOOK_2
     } else if (data.status === -3) {
       // Statement expired
       self.status(STATUS.expired);
