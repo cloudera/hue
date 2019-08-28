@@ -54,7 +54,7 @@ class ABFSTestBase(unittest.TestCase):
     self.user = User.objects.get(username="test")
       
     self.test_fs = 'abfs://testfs' + (str(int(time.time()) ))
-    LOG.debug("%s" %self.test_fs)
+    LOG.debug("%s" % self.test_fs)
     self.client.mkdir(self.test_fs)
 
   def tearDown(self):
@@ -62,27 +62,27 @@ class ABFSTestBase(unittest.TestCase):
     
   def test_list(self):
     filesystems = self.client.listdir('abfs://')
-    LOG.debug("%s" %filesystems)
+    LOG.debug("%s" % filesystems)
     assert_true(filesystems is not None, filesystems)
     
     pathing = self.client.listdir('abfs://' + filesystems[0],  {"recursive" : "true"} )
-    LOG.debug("%s" %pathing)
+    LOG.debug("%s" % pathing)
     assert_true(pathing is not None, pathing)
     
     directory = self.client.listdir('abfs://' + filesystems[0] + '/' + pathing[0])
-    LOG.debug("%s" %directory)
+    LOG.debug("%s" % directory)
     assert_true(directory is not None, directory)
     
     directory = self.client.listdir(self.test_fs)
-    LOG.debug("%s" %directory)
+    LOG.debug("%s" % directory)
     assert_true(directory is not None, directory)
     
     pathing = self.client._statsf(filesystems[276])
-    LOG.debug("%s" %pathing)
+    LOG.debug("%s" % pathing)
     assert_true(pathing is not None, pathing)
     
     pathing = self.client._statsf(filesystems[277])
-    LOG.debug("%s" %pathing)
+    LOG.debug("%s" % pathing)
     assert_true(pathing is not None, pathing)
     
     
@@ -116,26 +116,26 @@ class ABFSTestBase(unittest.TestCase):
     
     #testing filesystems
     result = self.client.stats(test_fs)
-    LOG.debug("%s" %result)
+    LOG.debug("%s" % result)
     assert_true(result is not None, result)
     result = self.client.listdir_stats(test_fs)
-    LOG.debug("%s" %result)
+    LOG.debug("%s" % result)
     
     #testing directories
     result = self.client.stats(test_dir)
-    LOG.debug("%s" %result)
+    LOG.debug("%s" % result)
     result = self.client.listdir_stats(test_dir)
-    LOG.debug("%s" %result)
+    LOG.debug("%s" % result)
     
     result = self.client.stats(test_dir2)
-    LOG.debug("%s" %result)
+    LOG.debug("%s" % result)
     result = self.client.listdir_stats(test_dir2)
-    LOG.debug("%s" %result)
+    LOG.debug("%s" % result)
     
     result = self.client.stats(test_dir3)
-    LOG.debug("%s" %result)
+    LOG.debug("%s" % result)
     result = self.client.listdir_stats(test_dir3)
-    LOG.debug("%s" %result)
+    LOG.debug("%s" % result)
     
   def test_mkdir(self):
     test_dir = self.test_fs + '/test_mkdir'
@@ -154,9 +154,9 @@ class ABFSTestBase(unittest.TestCase):
     test_string = "This is a test."
     test_len = len(test_string)
     resp = self.client._append(test_file, test_string) #only works with strings
-    LOG.debug("%s" %self.client.stats(test_file))
+    LOG.debug("%s" % self.client.stats(test_file))
     try:
-      LOG.debug("%s" %resp)
+      LOG.debug("%s" % resp)
       resp = self.client.read(test_file, length = test_len)
     except:
       LOG.debug("Not written yet")
@@ -268,7 +268,7 @@ class ABFSTestBase(unittest.TestCase):
     self.client.stats(testdir2 + '/test.txt')
     resp = self.client.read(testdir2 + '/test.txt')
     resp2 = self.client.read(test_file)
-    assert_equal(resp, resp2, "Files %s and %s are not equal" %(test_file, testdir2 + '/test.txt'))
+    assert_equal(resp, resp2, "Files %s and %s are not equal" % (test_file, testdir2 + '/test.txt'))
     
   
   def test_copy_dir(self):
@@ -290,12 +290,12 @@ class ABFSTestBase(unittest.TestCase):
   @staticmethod
   def test_static_methods():
     test_dir = 'abfss://testfs/test_static/'
-    LOG.debug("%s" %test_dir)
+    LOG.debug("%s" % test_dir)
     norm_path = ABFS.normpath(test_dir)
-    LOG.debug("%s" %norm_path)
+    LOG.debug("%s" % norm_path)
     parent = ABFS.parent_path(test_dir)
-    LOG.debug("%s" %parent)
+    LOG.debug("%s" % parent)
     join_path = ABFS.join(test_dir, 'test1')
-    LOG.debug("%s" %join_path)
+    LOG.debug("%s" % join_path)
 
     

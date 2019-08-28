@@ -155,7 +155,7 @@ class ABFS(object):
     Returns the Multiple ABFFStat object #note change later for recursive cases
     """
     if ABFS.isroot(path):
-      LOG.warn("Path: %s is a Filesystem" %path)
+      LOG.warn("Path: %s is a Filesystem" % path)
       return self.listfilesystems_stats(params=None, **kwargs)
     dir_stats = []
     file_system, directory_name = Init_ABFS.parse_uri(path)[:2]
@@ -320,7 +320,7 @@ class ABFS(object):
     path = Init_ABFS.strip_scheme(path)
     headers = self._getheaders()
     if length != 0 and length != '0':
-      headers['range']= 'bytes=%s-%s' %(str(offset), str(int(offset) + int(length)))
+      headers['range']= 'bytes=%s-%s' % (str(offset), str(int(offset) + int(length)))
     return self._root.get(path, headers = headers)
   
   # Alter Files
@@ -341,7 +341,7 @@ class ABFS(object):
       LOG.warn("Params not specified, Append will take longer")
       resp = self._stats(path)
       params = {'position' : int(resp['Content-Length']) + offset, 'action' : 'append'}
-      LOG.debug("%s" %params)
+      LOG.debug("%s" % params)
     else:
       params['action'] = 'append'
     headers = {}
@@ -351,7 +351,7 @@ class ABFS(object):
         return
     else:
       headers['Content-Length'] = str(size)
-    LOG.debug("%s" %headers)
+    LOG.debug("%s" % headers)
     return self._patching_sl( path, params, data, headers, **kwargs)
   
   def flush(self, path, params=None, headers=None, **kwargs):
@@ -470,19 +470,19 @@ class ABFS(object):
     Copies the entire contents of a directory to another location
     """
     dst = dst + '/' + Init_ABFS.strip_path(src)
-    LOG.debug("%s" %dst)
+    LOG.debug("%s" % dst)
     self.mkdir(dst)
     other_files = self.listdir(src)
     for x in other_files:
       x = src + '/' + Init_ABFS.strip_path(x)
-      LOG.debug("%s" %x)
+      LOG.debug("%s" % x)
       self.copy(x, dst)
 
   def rename(self, old, new): 
     """
     Renames a file
     """ 
-    LOG.debug("%s\n%s" %(old, new))
+    LOG.debug("%s\n%s" % (old, new))
     headers = {'x-ms-rename-source' : '/' + Init_ABFS.strip_scheme(old) }
     try:
       self._create_path(new, headers=headers, overwrite=True)
@@ -539,7 +539,7 @@ class ABFS(object):
     """
     if os.path.isfile(local_src):
       if self.exists(remote_dst):
-        LOG.info('%s already exists. Skipping.' %remote_dst)
+        LOG.info('%s already exists. Skipping.' % remote_dst)
         return
       else:
         LOG.info('%s does not exist. Trying to copy.' % remote_dst)
@@ -622,7 +622,7 @@ class ABFS(object):
       else:
         length = chunk
       self._append(path, data[i*chunk_size:i*chunk_size + length], length)
-    LOG.debug("%s" %data)
+    LOG.debug("%s" % data)
     self.flush(path, {'position' : int(size) })
   
   # Use Patch HTTP request
@@ -634,6 +634,6 @@ class ABFS(object):
     if header is None:
       header = {}
     header.update(self._getheaders())
-    LOG.debug("%s" %kwargs)
+    LOG.debug("%s" % kwargs)
     return self._root.invoke('PATCH', schemeless_path, param, data, headers = header, **kwargs)
       

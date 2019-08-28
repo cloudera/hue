@@ -61,14 +61,14 @@ class ABFSFileUploadHandler(FileUploadHandler):
        # Verify that the path exists
       self._fs.stats(self.destination)
       
-    LOG.debug("Chunk size = %d" %DEFAULT_WRITE_SIZE)
+    LOG.debug("Chunk size = %d" % DEFAULT_WRITE_SIZE)
 
 
   def new_file(self, field_name, file_name, *args, **kwargs):
     if self._is_abfs_upload():
       super(ABFSFileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
 
-      LOG.info('Using ABFSFileUploadHandler to handle file upload wit temp file%s.' %file_name)
+      LOG.info('Using ABFSFileUploadHandler to handle file upload wit temp file%s.' % file_name)
       self.target_path = self._fs.join(self.destination, file_name)
       
       try:
@@ -87,7 +87,7 @@ class ABFSFileUploadHandler(FileUploadHandler):
   def receive_data_chunk(self, raw_data, start):
     if self._is_abfs_upload():
       try:
-        LOG.debug("ABFSFileUploadHandler uploading file part with size: %s" %self._part_size)
+        LOG.debug("ABFSFileUploadHandler uploading file part with size: %s" % self._part_size)
         self._fs._append(self.target_path, raw_data, params = {'position' : int(start)})
         return None
       except Exception as e:
@@ -103,7 +103,7 @@ class ABFSFileUploadHandler(FileUploadHandler):
       self._fs.flush(self.target_path, {'position' : int(file_size)})
       LOG.info("ABFSFileUploadHandler has completed file upload to ABFS, total file size is: %d." % file_size)
       self.file.size = file_size
-      LOG.debug("%s" %self._fs.stats(self.target_path))
+      LOG.debug("%s" % self._fs.stats(self.target_path))
       return self.file
     else:
       return None
