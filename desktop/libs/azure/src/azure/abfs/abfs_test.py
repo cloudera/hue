@@ -53,7 +53,7 @@ class ABFSTestBase(unittest.TestCase):
     add_to_group('test')
     self.user = User.objects.get(username="test")
       
-    self.test_fs = 'abfs://testfs' + (str(int(time.time()) ))
+    self.test_fs = 'abfs://test' + (str(int(time.time()) ))
     LOG.debug("%s" % self.test_fs)
     self.client.mkdir(self.test_fs)
 
@@ -61,15 +61,16 @@ class ABFSTestBase(unittest.TestCase):
     self.client.rmtree(self.test_fs)
     
   def test_list(self):
-    filesystems = self.client.listdir('abfs://')
+    testfile = 'abfs://'
+    filesystems = self.client.listdir(testfile)
     LOG.debug("%s" % filesystems)
     assert_true(filesystems is not None, filesystems)
     
-    pathing = self.client.listdir('abfs://' + filesystems[0],  {"recursive" : "true"} )
+    pathing = self.client.listdir(testfile + filesystems[0],  {"recursive" : "true"} )
     LOG.debug("%s" % pathing)
     assert_true(pathing is not None, pathing)
     
-    directory = self.client.listdir('abfs://' + filesystems[0] + '/' + pathing[0])
+    directory = self.client.listdir(testfile + filesystems[0] + '/' + pathing[0])
     LOG.debug("%s" % directory)
     assert_true(directory is not None, directory)
     
@@ -200,6 +201,7 @@ class ABFSTestBase(unittest.TestCase):
     self.client.stats(test_file_permission)
     
     self.client.mkdir(test_dir_permission)
+    self.client.chmod(test_dir_permission, '0000')
     self.client.chmod(test_dir_permission, '0777')
     self.client.stats(test_dir_permission)
     
@@ -210,11 +212,11 @@ class ABFSTestBase(unittest.TestCase):
     test_file_permission = test_dir +'/test.txt'
     
     self.client.create(test_file_permission)
-    self.client.chown(test_file_permission, 'temp')
+    self.client.chown(test_file_permission, group = '$superuser' )
     self.client.stats(test_file_permission)
     
     self.client.mkdir(test_dir_permission)
-    self.client.chown(test_dir_permission, 'temp')
+    self.client.chown(test_dir_permission, group = '$superuser')
     self.client.stats(test_dir_permission)
     
   def test_create_with_file_permissions(self):

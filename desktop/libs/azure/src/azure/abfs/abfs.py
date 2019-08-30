@@ -103,6 +103,7 @@ class ABFS(object):
   def _getheaders(self):
     return {
       "Authorization": self._auth_provider.get_token(),
+      "x-ms-version" : "2019-02-02" #note this is required for setaccesscontrols
     }
   
   # Parse info about filesystems, directories, and files
@@ -195,6 +196,7 @@ class ABFS(object):
       params = {}
     params['action'] = 'getStatus'
     res = self._root._invoke('HEAD', schemeless_path, params, headers=self._getheaders(), **kwargs)
+    #LOG.debug("%s" % res.headers)
     return res.headers
   
   def _statsf(self, schemeless_path, params=None, **kwargs):
