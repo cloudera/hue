@@ -65,24 +65,32 @@ function initWhenReady(el) {
         scrollbar.draggable('destroy');
       } catch (e) {}
       let throttleScrollTimeout = -1;
+
+      let drag_start_position_offset = null;
       scrollbar.draggable({
         axis: 'x',
         containment: 'parent',
+        start: function(e, ui) {
+          drag_start_position_offset = e.clientX - ui.position.left;
+        },
         drag: function(e, ui) {
-          $(el)
-            .parents('.dataTables_wrapper')
-            .scrollLeft(
-              ($(el).parents('.dataTables_wrapper')[0].scrollWidth -
-                $(el)
-                  .parents('.dataTables_wrapper')
-                  .width()) *
-                (ui.position.left / (scrollbarRail.width() - $(this).width()))
-            );
+          const scrollbarOffsetMin = scrollbarRail.offset().left;
+          const scrollbarOffsetMax = scrollbarOffsetMin + scrollbarRail.width() - $(this).width();
+          let scrollbarPosition = e.clientX - drag_start_position_offset;
+          const scrollbarPositionMax = scrollbarOffsetMax - scrollbarOffsetMin;
+          scrollbarPosition = Math.min(scrollbarPosition, scrollbarPositionMax);
+          scrollbarPosition = Math.max(scrollbarPosition, 0);
+          ui.position.left = scrollbarPosition;
+          const percentage = scrollbarPosition / (scrollbarRail.width() - $(this).width());
+          const dataTables = $(el).parents('.dataTables_wrapper');
+          dataTables.scrollLeft(
+            (dataTables[0].scrollWidth - dataTables[0].clientWidth) * percentage
+          );
           throttleScrollTimeout = window.setTimeout(() => {
             $(el)
               .parents('.dataTables_wrapper')
               .trigger('scroll');
-          }, 50);
+          }, 2);
         }
       });
       $(el)
