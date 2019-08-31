@@ -21,6 +21,10 @@ const hOP = topics.hasOwnProperty;
 
 const huePubSub = {
   subscribe: function(topic, listener, app) {
+    if ('function' === typeof app) {
+      app = app();
+    }
+
     if (!hOP.call(topics, topic)) {
       topics[topic] = [];
     }

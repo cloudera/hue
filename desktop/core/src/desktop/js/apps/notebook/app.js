@@ -29,7 +29,7 @@ import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 
 window.Clipboard = Clipboard;
 
-const HUE_PUB_SUB_EDITOR_ID =
+const HUE_PUB_SUB_EDITOR_ID = () =>
   window.location.pathname.indexOf('notebook') > -1 ? 'notebook' : 'editor';
 
 huePubSub.subscribe('app.dom.loaded', app => {
