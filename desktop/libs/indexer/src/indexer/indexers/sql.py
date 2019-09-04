@@ -27,7 +27,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib import django_mako
 from notebook.models import make_notebook
-from azure.abfs.abfs import ABFS
+from azure.abfs.__init__ import abfspath
 
 if sys.version_info[0] > 2:
   from urllib.parse import unquote as urllib_unquote
@@ -145,7 +145,7 @@ class SQLIndexer(object):
           self.fs.rename(source_path, external_path)
     
     if external_path.lower().startswith("abfs"): #this is to check if its using an ABFS path
-      external_path = ABFS.ABFSpath(external_path) 
+      external_path = abfspath(external_path) 
       
     sql += django_mako.render_to_string("gen/create_table_statement.mako", {
         'table': {
