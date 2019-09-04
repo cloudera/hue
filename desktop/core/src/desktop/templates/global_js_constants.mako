@@ -35,7 +35,7 @@
 <%namespace name="sqlDocIndex" file="/sql_doc_index.mako" />
 (function () {
   <%
-    apps = _get_apps(user)
+    apps = _get_apps(user)[2]
   %>
 
   window.AUTOCOMPLETE_TIMEOUT = ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() };
