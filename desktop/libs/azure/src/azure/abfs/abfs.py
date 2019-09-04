@@ -24,6 +24,8 @@ from builtins import object
 import logging
 import os
 import threading
+import re
+
 from math import ceil
 from posixpath import join
 from urllib.parse import urlparse
@@ -36,10 +38,11 @@ from desktop.lib.rest import http_client, resource
 import azure.abfs.__init__ as Init_ABFS
 from azure.abfs.abfsfile import ABFSFile
 from azure.abfs.abfsstats import ABFSStat
-from azure.conf import PERMISSION_ACTION_ABFS
+from azure.conf import PERMISSION_ACTION_ABFS, get_default_abfs_fs
 
 
 LOG = logging.getLogger(__name__)
+ABFSACCOUNT_NAME = re.compile('^/*[aA][bB][fF][sS]{1,2}://[$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9](@.*?)$')
 
 #Azure has a 30MB block limit on upload.
 UPLOAD_CHUCK_SIZE = 30 * 1000 * 1000
@@ -251,6 +254,22 @@ class ABFS(object):
     Normalizes a path
     """
     return Init_ABFS.normpath(path)
+  
+  @staticmethod
+  def ABFSpath(path, fs_defaultfs = get_default_abfs_fs()):
+    """
+    Converts a path to a path that the ABFS driver can use
+    """
+    filesystem, dir_name = Init_ABFS.parse_uri(path)[:2]
+    account_name = ABFSACCOUNT_NAME.match(fs_defaultfs)
+    LOG.debug("%s" % fs_defaultfs)
+    if account_name:
+      if path.lower().startswith(Init_ABFS.ABFS_ROOT):
+        path = Init_ABFS.ABFS_ROOT + filesystem + account_name.group(1) + '/' + dir_name
+      else:
+        path = Init_ABFS.ABFS_ROOT_S + filesystem + account_name.group(1) + '/' + dir_name
+    LOG.debug("%s" % path)
+    return path
 
   def open(self, path, option='r', *args, **kwargs):
     return ABFSFile(self,path, option )
