@@ -146,7 +146,7 @@ class RightAssistPanel {
       // TODO: Get these dynamically from langref and functions modules when moved to webpack
       this.functionsTabAvailable(type === 'hive' || type === 'impala' || type === 'pig');
       this.langRefTabAvailable(type === 'hive' || type === 'impala');
-      this.editorAssistantTabAvailable(window.EMBEDDED_ASSISTANT_ENABLED && isSqlDialect);
+      this.editorAssistantTabAvailable(isSqlDialect);
       this.dashboardAssistantTabAvailable(type === 'dashboard');
       this.schedulesTabAvailable(false);
       if (type !== 'dashboard') {
