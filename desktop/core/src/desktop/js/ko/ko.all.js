@@ -152,6 +152,7 @@ import 'ko/components/ko.favoriteApp';
 import 'ko/components/ko.fieldSamples';
 import 'ko/components/ko.globalSearch';
 import 'ko/components/ko.historyPanel';
+import 'ko/components/ko.importDocumentsModal';
 import 'ko/components/ko.inlineAutocomplete';
 import 'ko/components/ko.jobBrowserLinks';
 import 'ko/components/ko.multiClusterSidebar';
