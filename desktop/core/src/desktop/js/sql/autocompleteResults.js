@@ -1309,6 +1309,14 @@ class AutocompleteResults {
             details: null
           },
           {
+            value: 'abfs://',
+            meta: META_I18n.keyword,
+            category: CATEGORIES.KEYWORD,
+            weightAdjust: 0,
+            popular: ko.observable(false),
+            details: null
+          },
+          {
             value: '/',
             meta: META_I18n.dir,
             category: CATEGORIES.HDFS,
@@ -1326,6 +1334,9 @@ class AutocompleteResults {
       } else if (/^adl:\/\//i.test(path)) {
         fetchFunction = 'fetchAdlsPath';
         path = path.substring(5);
+      } else if (/^abfs:\/\//i.test(path)) {
+        fetchFunction = 'fetchAbfsPath';
+        path = path.substring(6);
       } else if (/^hdfs:\/\//i.test(path)) {
         path = path.substring(6);
       }

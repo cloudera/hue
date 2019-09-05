@@ -145,6 +145,7 @@ class AssistStorageEntry {
         self.entries(
           filteredFiles.map(file => {
             return new AssistStorageEntry({
+              originalType: self.originalType,
               type: self.type,
               definition: file,
               parent: self
@@ -262,6 +263,7 @@ class AssistStorageEntry {
             filteredFiles.map(
               file =>
                 new AssistStorageEntry({
+                  originalType: self.originalType,
                   type: self.type,
                   definition: file,
                   parent: self
