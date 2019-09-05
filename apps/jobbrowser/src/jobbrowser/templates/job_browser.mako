@@ -2338,7 +2338,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             parsedDocUrl.hostname = parsedKnoxUrl.hostname;
             parsedDocUrl.protocol = parsedKnoxUrl.protocol;
             parsedDocUrl.port = parsedKnoxUrl.port;
-            var service = url.indexOf('livy') >= 0 ? '/livy' : '/impala';
+            var service = url.indexOf('livy') >= 0 ? '/livy' : '/impalaui';
             parsedDocUrl.pathname = parsedKnoxUrl.pathname + service + parsedDocUrl.pathname;
             return parsedDocUrl.toString();
           } catch (e) {
@@ -2346,7 +2346,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           }
         } else if (window.KNOX_BASE_PATH.length && window.URL) { // DWX
           var parsedDocUrl = new URL(url);
-          var service = url.indexOf('livy') >= 0 ? '/livy' : '/impala';
+          var service = url.indexOf('livy') >= 0 ? '/livy' : '/impalaui';
           parsedDocUrl.pathname = parsedKnoxUrl.pathname + service + window.KNOX_BASE_PATH;
         } else {
           return url;
