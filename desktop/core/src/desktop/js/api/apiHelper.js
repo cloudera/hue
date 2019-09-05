@@ -1984,6 +1984,26 @@ class ApiHelper {
     return this.simplePost('/notebook/api/notebook/save', data);
   }
 
+  async getHistory(options) {
+    return new Promise((resolve, reject) => {
+      $.get('/notebook/api/get_history', {
+        doc_type: options.type,
+        limit: options.limit || 50,
+        page: options.page || 1,
+        doc_text: options.docFilter,
+        is_notification_manager: options.isNotificationManager
+      })
+        .done(data => {
+          if (this.successResponseIsError(data)) {
+            reject(self.assistErrorCallback(options)(data));
+            return;
+          }
+          resolve(data);
+        })
+        .fail(reject);
+    });
+  }
+
   /**
    *
    * @param {ExecutableStatement} executable

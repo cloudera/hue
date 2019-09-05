@@ -656,12 +656,14 @@ def export_documents(request):
   else:
     selection = json.loads(request.POST.get('documents'))
 
+  include_history = request.GET.get('history', 'false') == 'true'
+
   # Only export documents the user has permissions to read
   docs = Document2.objects.documents(user=request.user, perms='both', include_history=True, include_trashed=True).\
     filter(id__in=selection).order_by('-id')
 
   # Add any dependencies to the set of exported documents
-  export_doc_set = _get_dependencies(docs)
+  export_doc_set = _get_dependencies(docs, include_history=include_history)
 
   # For directories, add any children docs to the set of exported documents
   export_doc_set.update(_get_dependencies(docs, deps_mode=False))
@@ -890,7 +892,7 @@ def _is_import_valid(documents):
     all(all(k in d['fields'] for k in ('uuid', 'owner')) for d in documents)
 
 
-def _get_dependencies(documents, deps_mode=True):
+def _get_dependencies(documents, deps_mode=True, include_history=False):
   """
   Given a list of Document2 objects, perform a depth-first search and return a set of documents with all
    dependencies (excluding history docs) included
@@ -903,7 +905,7 @@ def _get_dependencies(documents, deps_mode=True):
     stack = [doc]
     while stack:
       curr_doc = stack.pop()
-      if curr_doc not in doc_set and not curr_doc.is_history:
+      if curr_doc not in doc_set and (include_history or not curr_doc.is_history):
         doc_set.add(curr_doc)
         if deps_mode:
           deps_set = set(curr_doc.dependencies.all())

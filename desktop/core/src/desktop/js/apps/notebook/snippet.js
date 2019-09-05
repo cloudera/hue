@@ -2695,12 +2695,26 @@ class Snippet {
       }
       return true;
     };
+
+    self.refreshHistory = notebook.fetchHistory;
   }
 
   renderMarkdown() {
     return this.statement_raw().replace(/([^$]*)([$]+[^$]*[$]+)?/g, (a, textRepl, code) => {
       return markdown.toHTML(textRepl).replace(/^<p>|<\/p>$/g, '') + (code ? code : '');
     });
+  }
+
+  async exportHistory() {
+    const historyResponse = await apiHelper.getHistory({ type: this.type(), limit: 500 });
+
+    if (historyResponse && historyResponse.history) {
+      window.location.href =
+        window.HUE_BASE_URL +
+        '/desktop/api2/doc/export?history=true&documents=[' +
+        historyResponse.history.map(historyDoc => historyDoc.id).join(',') +
+        ']';
+    }
   }
 
   toggleAllResultColumns(linkElement) {
