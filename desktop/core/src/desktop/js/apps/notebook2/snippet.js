@@ -1125,6 +1125,8 @@ class Snippet {
         self.progress(executable.progress);
       }
     });
+
+    self.refreshHistory = notebook.fetchHistory;
   }
 
   ace(newVal) {
@@ -1436,6 +1438,18 @@ class Snippet {
         }
       }
     );
+  }
+
+  async exportHistory() {
+    const historyResponse = await apiHelper.getHistory({ type: this.type(), limit: 500 });
+
+    if (historyResponse && historyResponse.history) {
+      window.location.href =
+        window.HUE_BASE_URL +
+        '/desktop/api2/doc/export?history=true&documents=[' +
+        historyResponse.history.map(historyDoc => historyDoc.id).join(',') +
+        ']';
+    }
   }
 
   fetchExecutionAnalysis() {
