@@ -246,7 +246,7 @@
       <!-- /ko -->
 
       <div class="inline pull-right" data-bind="visible: (typeof $root.isViewer == 'undefined' || ! $root.isViewer()) && !$root.isEditing()" style="margin-right: 4px">
-        <a href="javascript:void(0)" data-bind="click: function(w) { viewModel.showSubmitActionPopup(w); }"><i class="fa fa-play-circle-o"></i></a>
+        <a href="javascript:void(0)" data-bind="click: function(w) { window.workflowEditorViewModel.showSubmitActionPopup(w); }"><i class="fa fa-play-circle-o"></i></a>
       </div>
 
       <!-- ko if: widgetType() == 'decision-widget' -->

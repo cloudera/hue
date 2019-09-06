@@ -622,8 +622,8 @@ ${ utils.submit_popup_event() }
 
   var apiHelper = window.apiHelper;
 
-  var workflowEditorViewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode });
-  ko.applyBindings(workflowEditorViewModel, $("#oozie_workflowComponents")[0]);
+  window.workflowEditorViewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode });
+  ko.applyBindings(window.workflowEditorViewModel, $("#oozie_workflowComponents")[0]);
 
   % if not is_embeddable:
   var shareViewModel = initSharing("#documentShareModal");
@@ -637,10 +637,10 @@ ${ utils.submit_popup_event() }
   var defaultSection = 'actions';
   % endif
 
-  workflowEditorViewModel.currentDraggableSection(defaultSection);
+  window.workflowEditorViewModel.currentDraggableSection(defaultSection);
 
-  workflowEditorViewModel.init();
-  fullLayout(workflowEditorViewModel);
+  window.workflowEditorViewModel.init();
+  fullLayout(window.workflowEditorViewModel);
 
   var globalFilechooserOptions = {
     skipInitialPathIfEmpty: true,
@@ -650,9 +650,9 @@ ${ utils.submit_popup_event() }
     extraHomeProperties: {
       label: '${ _('Workspace') }',
       icon: 'fa-folder-open',
-      path: workflowEditorViewModel.workflow.properties.deployment_dir()
+      path: window.workflowEditorViewModel.workflow.properties.deployment_dir()
     },
-    deploymentDir: workflowEditorViewModel.workflow.properties.deployment_dir()
+    deploymentDir: window.workflowEditorViewModel.workflow.properties.deployment_dir()
   }
 
   function columnDropAdditionalHandler(widget) {
@@ -661,25 +661,25 @@ ${ utils.submit_popup_event() }
 
   function widgetDraggedAdditionalHandler(widget) {
     $("canvas").remove();
-    if (workflowEditorViewModel.currentlyDraggedWidget() && workflowEditorViewModel.currentlyDraggedWidget().id() == ""){
-      workflowEditorViewModel.workflow.newNode(widget, function() {
+    if (window.workflowEditorViewModel.currentlyDraggedWidget() && window.workflowEditorViewModel.currentlyDraggedWidget().id() == ""){
+      window.workflowEditorViewModel.workflow.newNode(widget, function() {
         showAddActionDemiModal(widget);
       });
     }
     else {
-      if (workflowEditorViewModel.currentlyDraggedOp() == "move"){
-        workflowEditorViewModel.workflow.moveNode(widget);
+      if (window.workflowEditorViewModel.currentlyDraggedOp() == "move"){
+        window.workflowEditorViewModel.workflow.moveNode(widget);
       }
       else { // Copy
-        var _sourceNode = workflowEditorViewModel.workflow.getNodeById(workflowEditorViewModel.currentlyDraggedWidget().id());
-        workflowEditorViewModel.workflow.newNode(widget, workflowEditorViewModel.workflow.addNode, _sourceNode);
+        var _sourceNode = window.workflowEditorViewModel.workflow.getNodeById(window.workflowEditorViewModel.currentlyDraggedWidget().id());
+        window.workflowEditorViewModel.workflow.newNode(widget, window.workflowEditorViewModel.workflow.addNode, _sourceNode);
       }
       $(document).trigger("drawArrows");
     }
   }
 
   function showAddActionDemiModal(widget) {
-    workflowEditorViewModel.newAction(widget);
+    window.workflowEditorViewModel.newAction(widget);
     $("#exposeOverlay").fadeIn(300);
     var _el = $("#wdg_" + widget.id());
     _el.css("zIndex", "1032");
@@ -708,25 +708,25 @@ ${ utils.submit_popup_event() }
   }
 
   function addActionDemiModalFieldPreview(field) {
-    if (workflowEditorViewModel.newAction() != null) {
-      var _el = $("#wdg_" + workflowEditorViewModel.newAction().id());
+    if (window.workflowEditorViewModel.newAction() != null) {
+      var _el = $("#wdg_" + window.workflowEditorViewModel.newAction().id());
       _el.css("position", "static");
       _el.css("width", "");
-      workflowEditorViewModel.workflow.addNode(workflowEditorViewModel.newAction());
+      window.workflowEditorViewModel.workflow.addNode(window.workflowEditorViewModel.newAction());
       $("#addActionDemiModal").modal("hide");
-      $("#wdg_" + workflowEditorViewModel.newAction().id()).css("zIndex", "0");
+      $("#wdg_" + window.workflowEditorViewModel.newAction().id()).css("zIndex", "0");
       $("#exposeOverlay").fadeOut(300);
-      workflowEditorViewModel.newAction(null);
+      window.workflowEditorViewModel.newAction(null);
     }
   }
 
   function addActionDemiModalFieldCancel() {
     $("#exposeOverlay").fadeOut(300);
     $("#addActionDemiModal").modal("hide");
-    if (workflowEditorViewModel.newAction()){
-      workflowEditorViewModel.removeWidgetById(workflowEditorViewModel.newAction().id());
+    if (window.workflowEditorViewModel.newAction()){
+      window.workflowEditorViewModel.removeWidgetById(window.workflowEditorViewModel.newAction().id());
     }
-    workflowEditorViewModel.newAction(null);
+    window.workflowEditorViewModel.newAction(null);
   }
 
   function resizeDrops() {
@@ -741,8 +741,8 @@ ${ utils.submit_popup_event() }
 
   function renderChangeables() {
     resizeDrops();
-    if (workflowEditorViewModel.workflow && workflowEditorViewModel.workflow.properties && workflowEditorViewModel.workflow.properties.show_arrows()){
-      workflowEditorViewModel.drawArrows();
+    if (window.workflowEditorViewModel.workflow && window.workflowEditorViewModel.workflow.properties && window.workflowEditorViewModel.workflow.properties.show_arrows()){
+      window.workflowEditorViewModel.drawArrows();
     }
     $("#oozie_workflowComponents .widget-main-section").removeClass("zoom-in");
     $("#oozie_workflowComponents .widget-main-section").each(function(){
@@ -767,7 +767,7 @@ ${ utils.submit_popup_event() }
         _el.css("z-index", "1032");
         lastSeenPosition = _el.position();
         var _width = _el.width();
-        _el.parent().css("height", workflowEditorViewModel.isEditing() ? _el.height() : (_el.height() + 17) + "px");
+        _el.parent().css("height", window.workflowEditorViewModel.isEditing() ? _el.height() : (_el.height() + 17) + "px");
         _el.css("position", "absolute");
         _el.css({
           "width": _width,
@@ -802,11 +802,11 @@ ${ utils.submit_popup_event() }
 
   function validateAndSave() {
     validateFields();
-    if (workflowEditorViewModel.isInvalid() && workflowEditorViewModel.isEditing()) {
+    if (window.workflowEditorViewModel.isInvalid() && window.workflowEditorViewModel.isEditing()) {
       var $firstElWithErrors = $("[validate].with-errors").eq(0);
       if (!$firstElWithErrors.is(":visible")) {
         var widgetId = $firstElWithErrors.parents(".card-widget").attr("id").substr(4);
-        workflowEditorViewModel.getWidgetById(widgetId).ooziePropertiesExpanded(true);
+        window.workflowEditorViewModel.getWidgetById(widgetId).ooziePropertiesExpanded(true);
       }
       window.setTimeout(function () {
         $("html,body").animate({
@@ -815,7 +815,7 @@ ${ utils.submit_popup_event() }
       }, 200);
     }
 
-    workflowEditorViewModel.save();
+    window.workflowEditorViewModel.save();
   }
 
   function validateFields() {
@@ -833,7 +833,7 @@ ${ utils.submit_popup_event() }
         $(this).removeClass("with-errors");
       }
     });
-    workflowEditorViewModel.isInvalid(_hasErrors);
+    window.workflowEditorViewModel.isInvalid(_hasErrors);
   }
 
   $(document).ready(function(){
@@ -843,7 +843,7 @@ ${ utils.submit_popup_event() }
       if (window.location.pathname.indexOf('/oozie/editor/workflow') > -1) {
         $("canvas").remove();
         exposeOverlayClickHandler();
-        if (workflowEditorViewModel.isEditing()) {
+        if (window.workflowEditorViewModel.isEditing()) {
           hueUtils.waitForRendered('#oozie_workflowComponents .card-toolbar-content', function (el) {
             return el.height() > 40 && el.height() < 200
           }, function () {
@@ -918,7 +918,7 @@ ${ utils.submit_popup_event() }
       if (clusterConfig['cluster_type'] != 'dataeng') {
         interpreters = interpreters.concat(['subworkflow', 'fs', 'email', 'ssh', 'streaming', 'generic', 'stop']);
       }
-      workflowEditorViewModel.availableActions(interpreters);
+      window.workflowEditorViewModel.availableActions(interpreters);
     }, 'oozie');
 
     huePubSub.publish('cluster.config.get.config');
