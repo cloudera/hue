@@ -25,12 +25,15 @@ import time
 
 from nose.tools import assert_not_equal
 from hadoop.fs import normpath as fs_normpath
+from azure.conf import get_default_abfs_fs
 
 LOG = logging.getLogger(__name__)
 
-ABFS_PATH_RE = re.compile('^/*[aA][bB][fF][sS]{1,2}://([$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9])(/(.*?)/?)?$') # bug here
+ABFS_PATH_RE = re.compile('^/*[aA][bB][fF][sS]{1,2}://([$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9])(/(.*?)/?)?$')
+ABFS_PATH_FULL = re.compile('^/*[aA][bB][fF][sS]{1,2}://([$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9])@[^.]*?\.dfs\.core\.windows\.net(/(.*?)/?)?$')#bug here
 ABFS_ROOT_S = 'abfss://'
 ABFS_ROOT = 'abfs://'
+ABFSACCOUNT_NAME = re.compile('^/*[aA][bB][fF][sS]{1,2}://[$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9](@.*?)$')
 
 def parse_uri(uri):
   """
@@ -39,7 +42,9 @@ def parse_uri(uri):
   """
   match = ABFS_PATH_RE.match(uri)
   if not match:
-    raise ValueError("Invalid ABFS URI: %s" % uri)
+    match = ABFS_PATH_FULL.match(uri)
+    if not match:
+      raise ValueError("Invalid ABFS URI: %s" % uri)
   direct_name = match.group(3) or ''
   base_direct_name = match.group(2) or ''
   return match.group(1), direct_name, base_direct_name
@@ -123,6 +128,25 @@ def join(first,*complist):
       joined = 'abfs:/%s' % joined
   return joined
 
+
+def abfspath(path, fs_defaultfs = get_default_abfs_fs()):
+  """
+  Converts a path to a path that the ABFS driver can use
+  """
+  filesystem, dir_name = ("","")
+  try:
+    filesystem, dir_name = parse_uri(path)[:2]
+  except:
+    return path
+  account_name = ABFSACCOUNT_NAME.match(fs_defaultfs)
+  LOG.debug("%s" % fs_defaultfs)
+  if account_name:
+    if path.lower().startswith(ABFS_ROOT):
+      path = ABFS_ROOT + filesystem + account_name.group(1) + '/' + dir_name
+    else:
+      path = ABFS_ROOT_S + filesystem + account_name.group(1) + '/' + dir_name
+  LOG.debug("%s" % path)
+  return path
 
 def abfsdatetime_to_timestamp(datetime):
   """
