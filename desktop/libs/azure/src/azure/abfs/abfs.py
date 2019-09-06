@@ -24,6 +24,8 @@ from builtins import object
 import logging
 import os
 import threading
+import re
+
 from math import ceil
 from posixpath import join
 from urllib.parse import urlparse
@@ -43,7 +45,6 @@ LOG = logging.getLogger(__name__)
 
 #Azure has a 30MB block limit on upload.
 UPLOAD_CHUCK_SIZE = 30 * 1000 * 1000
-
 
 class ABFSFileSystemException(IOError):
 
@@ -103,6 +104,7 @@ class ABFS(object):
   def _getheaders(self):
     return {
       "Authorization": self._auth_provider.get_token(),
+      "x-ms-version" : "2019-02-02" #note this is required for setaccesscontrols
     }
   
   # Parse info about filesystems, directories, and files
@@ -136,7 +138,7 @@ class ABFS(object):
       raise WebHdfsException
     return True
 
-  def stats(self, path, params = None, **kwargs):
+  def stats(self, path, params=None, **kwargs):
     """
     List the stat of the actual file/directory
     Returns the ABFFStat object
@@ -149,14 +151,14 @@ class ABFS(object):
       return ABFSStat.for_filesystem(self._statsf(file_system, params, **kwargs), path)
     return ABFSStat.for_single(self._stats(file_system + '/' +dir_name, params, **kwargs), path)
   
-  def listdir_stats(self,path, params = None, **kwargs):
+  def listdir_stats(self,path, params=None, **kwargs):
     """
     List the stats for the directories inside the specified path
     Returns the Multiple ABFFStat object #note change later for recursive cases
     """
     if ABFS.isroot(path):
-      LOG.warn("Path: %s is a Filesystem" %path)
-      return self.listfilesystems_stats(params = None, **kwargs)
+      LOG.warn("Path: %s is a Filesystem" % path)
+      return self.listfilesystems_stats(params=None, **kwargs)
     dir_stats = []
     file_system, directory_name = Init_ABFS.parse_uri(path)[:2]
     if params is None:
@@ -166,13 +168,13 @@ class ABFS(object):
     params['resource'] = 'filesystem'
     if directory_name != "":
       params['directory'] = directory_name
-    res = self._root._invoke("GET",file_system, params, headers= self._getheaders(), **kwargs)
+    res = self._root._invoke("GET", file_system, params, headers=self._getheaders(), **kwargs)
     resp = self._root._format_response(res)
     for x in resp['paths']:
       dir_stats.append(ABFSStat.for_directory(res.headers, x, Init_ABFS.ABFS_ROOT +file_system + "/" + x['name']))
     return dir_stats
   
-  def listfilesystems_stats(self, params = None, **kwargs):
+  def listfilesystems_stats(self, params=None, **kwargs):
     """
     Lists the stats inside the File Systems, No functionality for params
     """
@@ -180,13 +182,13 @@ class ABFS(object):
     if params is None:
       params = {}
     params["resource"] = "account"
-    res = self._root._invoke("GET", params = params, headers = self._getheaders() )
+    res = self._root._invoke("GET", params=params, headers=self._getheaders() )
     resp = self._root._format_response(res)
     for x in resp['filesystems']:
       stats.append(ABFSStat.for_filesystems(res.headers, x))
     return stats
   
-  def _stats(self, schemeless_path, params = None, **kwargs):
+  def _stats(self, schemeless_path, params=None, **kwargs):
     """
     Container function for both stats,
     Returns the header of the result
@@ -194,10 +196,11 @@ class ABFS(object):
     if params is None:
       params = {}
     params['action'] = 'getStatus'
-    res = self._root._invoke('HEAD', schemeless_path, params, headers = self._getheaders(), **kwargs)
+    res = self._root._invoke('HEAD', schemeless_path, params, headers=self._getheaders(), **kwargs)
+    #LOG.debug("%s" % res.headers)
     return res.headers
   
-  def _statsf(self, schemeless_path, params = None, **kwargs):
+  def _statsf(self, schemeless_path, params=None, **kwargs):
     """
     Continer function for both stats but if it's a file system
     Returns the header of the result
@@ -205,10 +208,10 @@ class ABFS(object):
     if params is None:
       params = {}
     params['resource'] = 'filesystem'
-    res = self._root._invoke('HEAD', schemeless_path, params, headers = self._getheaders(), **kwargs)
+    res = self._root._invoke('HEAD', schemeless_path, params, headers=self._getheaders(), **kwargs)
     return res.headers
     
-  def listdir(self, path, params = None, glob=None, **kwargs):
+  def listdir(self, path, params=None, glob=None, **kwargs):
     """
     Lists the names inside the current directories 
     """
@@ -219,7 +222,7 @@ class ABFS(object):
     return [x.name for x in listofDir]
   
   
-  def listfilesystems(self, params=None,**kwargs):
+  def listfilesystems(self, params=None, **kwargs):
     """
     Lists the names of the File Systems, limited arguements  
     """
@@ -250,7 +253,7 @@ class ABFS(object):
     """
     return Init_ABFS.normpath(path)
 
-  def open(self, path, option = 'r', *args, **kwargs):
+  def open(self, path, option='r', *args, **kwargs):
     return ABFSFile(self,path, option )
   
   @staticmethod
@@ -269,16 +272,16 @@ class ABFS(object):
 
   # Create Files,directories, or File Systems
   # --------------------------------
-  def mkdir(self, path, params = None, headers = None, *args, **kwargs):
+  def mkdir(self, path, params=None, headers=None, *args, **kwargs):
     """
     Makes a directory
     """
     if params is None:
       params = {}
     params['resource'] = 'directory'
-    self._create_path(path, params = params, headers = params, overwrite = False)
+    self._create_path(path, params=params, headers=params, overwrite=False)
   
-  def create(self, path, overwrite= False, data = None, headers = None, *args, **kwargs):
+  def create(self, path, overwrite=False, data=None, headers=None, *args, **kwargs):
     """
     Makes a File (Put text in data if adding data)
     """
@@ -290,7 +293,7 @@ class ABFS(object):
   def create_home_dir(self, home_path=None):
     raise NotImplementedError("File System not named")
   
-  def _create_path(self,path, params = None, headers = None, overwrite = False):
+  def _create_path(self,path, params=None, headers=None, overwrite=False):
     """
     Container method for Create
     """
@@ -303,29 +306,36 @@ class ABFS(object):
       additional_header.update(headers)
     if not overwrite:
       additional_header['If-None-Match'] = '*'
-    self._root.put(no_scheme,params, headers= additional_header)
+    self._root.put(no_scheme, params, headers=additional_header)
     
   def _create_fs(self, file_system):
     """
     Creates a File System
     """
-    self._root.put(file_system,{'resource': 'filesystem'}, headers= self._getheaders())
+    self._root.put(file_system, {'resource': 'filesystem'}, headers=self._getheaders())
 
   # Read Files
   # --------------------------------
-  def read(self, path, offset = '0', length = 0, *args, **kwargs):
+  def read(self, path, offset='0', length=0, *args, **kwargs):
     """
     Read data from a file
     """
     path = Init_ABFS.strip_scheme(path)
     headers = self._getheaders()
     if length != 0 and length != '0':
-      headers['range']= 'bytes=%s-%s' %(str(offset), str(int(offset) + int(length)))
+      headers['range']= 'bytes=%s-%s' % (str(offset), str(int(offset) + int(length)))
     return self._root.get(path, headers = headers)
   
   # Alter Files
   # --------------------------------
-  def append(self, path, data, size = 0, offset =0 ,params = None, **kwargs):
+  def append(self, path, data, offset=0):
+    if not data:
+      LOG.warn("There is no data to append to")
+      return
+    self._append(path, data)
+    return self.flush(path, {'position' : int(len(data)) + int(offset)})
+  
+  def _append(self, path, data, size=0, offset=0 ,params=None, **kwargs):
     """
     Appends the data to a file
     """
@@ -334,18 +344,20 @@ class ABFS(object):
       LOG.warn("Params not specified, Append will take longer")
       resp = self._stats(path)
       params = {'position' : int(resp['Content-Length']) + offset, 'action' : 'append'}
-      LOG.debug("%s" %params)
+      LOG.debug("%s" % params)
     else:
       params['action'] = 'append'
     headers = {}
-    if size == 0:
+    if size == 0 or size == '0':
       headers['Content-Length'] = str(len(data))
+      if headers['Content-Length'] == '0':
+        return
     else:
       headers['Content-Length'] = str(size)
-    LOG.debug("%s" %headers['Content-Length'])
-    return self._patching_sl( path, params, data, headers,  **kwargs)
+    LOG.debug("%s" % headers)
+    return self._patching_sl( path, params, data, headers, **kwargs)
   
-  def flush(self, path, params = None, headers = None, **kwargs):
+  def flush(self, path, params=None, headers=None, **kwargs):
     """
     Flushes the data(i.e. writes appended data to File)
     """
@@ -360,7 +372,7 @@ class ABFS(object):
     if headers is None:
       headers = {}
     headers['Content-Length'] = '0'
-    self._patching_sl( path, params, header = headers,  **kwargs)
+    self._patching_sl( path, params, header=headers,  **kwargs)
 
   # Remove Filesystems, directories. or Files
   # --------------------------------
@@ -369,15 +381,15 @@ class ABFS(object):
     Removes an item indicated in the path
     Also removes empty directories
     """
-    self._delete(path, recursive = 'false', skip_trash = skip_trash)
+    self._delete(path, recursive='false', skip_trash=skip_trash)
     
-  def rmtree(self, path, skip_trash = True):
+  def rmtree(self, path, skip_trash=True):
     """
     Remove everything in a given directory
     """
-    self._delete(path, recursive = 'true', skip_trash = skip_trash)
+    self._delete(path, recursive='true', skip_trash=skip_trash)
     
-  def _delete(self, path, recursive = 'false', skip_trash=True):
+  def _delete(self, path, recursive='false', skip_trash=True):
     """
     Wrapper function for calling delete, no support for trash or 
     """
@@ -387,19 +399,19 @@ class ABFS(object):
       raise RuntimeError("Cannot Remove Root")
     file_system, dir_name = Init_ABFS.parse_uri(path)[:2]
     if dir_name == '':
-      return self._root.delete(file_system,{'resource': 'filesystem'}, headers= self._getheaders())
+      return self._root.delete(file_system, {'resource': 'filesystem'}, headers=self._getheaders())
     new_path = file_system + '/' + dir_name
     param = None
     if self.isdir(path):
       param = {'recursive' : recursive}
-    self._root.delete(new_path,param , headers= self._getheaders())
+    self._root.delete(new_path, param, headers=self._getheaders())
     
   def restore(self, path):
     raise NotImplementedError("")
   
   # Edit permissions of Filesystems, directories. or Files
   # --------------------------------
-  def chown(self, path, user = None, group = None, *args, **kwargs):
+  def chown(self, path, user=None, group=None, *args, **kwargs):
     """
     Changes ownership (not implemented)
     """
@@ -417,17 +429,17 @@ class ABFS(object):
     header = {}
     if permissionNumber is not None:
       header['x-ms-permissions'] = str(permissionNumber)
-    self.setAccessControl(path, headers = header)
+    self.setAccessControl(path, headers=header)
   
   def setAccessControl(self, path, headers, **kwargs):
     """
     Set Access Controls (Can do both chmod and chown) (not implemented)
     """
     path = Init_ABFS.strip_scheme(path)
-    params= {'action': 'setAccessControl'}
+    params = {'action': 'setAccessControl'}
     if headers is None:
-      headers ={}
-    self._patching_sl( path, params, header = headers,  **kwargs)
+      headers = {}
+    self._patching_sl( path, params, header=headers,  **kwargs)
 
   def mktemp(self, subdir='', prefix='tmp', basedir=None):
     raise NotImplementedError("")
@@ -461,22 +473,22 @@ class ABFS(object):
     Copies the entire contents of a directory to another location
     """
     dst = dst + '/' + Init_ABFS.strip_path(src)
-    LOG.debug("%s" %dst)
+    LOG.debug("%s" % dst)
     self.mkdir(dst)
     other_files = self.listdir(src)
     for x in other_files:
       x = src + '/' + Init_ABFS.strip_path(x)
-      LOG.debug("%s" %x)
+      LOG.debug("%s" % x)
       self.copy(x, dst)
 
   def rename(self, old, new): 
     """
     Renames a file
     """ 
-    LOG.debug("%s\n%s" %(old, new))
+    LOG.debug("%s\n%s" % (old, new))
     headers = {'x-ms-rename-source' : '/' + Init_ABFS.strip_scheme(old) }
     try:
-      self._create_path(new, headers = headers, overwrite= True)
+      self._create_path(new, headers=headers, overwrite=True)
     except WebHdfsException as e:
       if e.code == 409:
         self.copy(old, new)
@@ -524,13 +536,13 @@ class ABFS(object):
       else:
         self._copy_file(local_src, remote_dst)
     
-  def _local_copy_file(self,local_src,remote_dst, chunk_size = UPLOAD_CHUCK_SIZE ):
+  def _local_copy_file(self,local_src,remote_dst, chunk_size=UPLOAD_CHUCK_SIZE ):
     """
     A wraper function for copying local Files
     """
     if os.path.isfile(local_src):
       if self.exists(remote_dst):
-        LOG.info('%s already exists. Skipping.' %remote_dst)
+        LOG.info('%s already exists. Skipping.' % remote_dst)
         return
       else:
         LOG.info('%s does not exist. Trying to copy.' % remote_dst)
@@ -543,7 +555,7 @@ class ABFS(object):
           offset = 0
           while chunk:
             size = len(chunk)
-            self.append(remote_dst, chunk, size = size, params = {'position' : offset})
+            self._append(remote_dst, chunk, size=size, params={'position' : offset})
             offset += size
             chunk = src.read(chunk_size)
           self.flush(remote_dst, params = {'position' : offset})
@@ -612,19 +624,20 @@ class ABFS(object):
         length = chunk_size
       else:
         length = chunk
-      self.append(path, data[i*chunk_size:i*chunk_size + length], length)
-    LOG.debug("%s" %data)
+      self._append(path, data[i*chunk_size:i*chunk_size + length], length)
+    LOG.debug("%s" % data)
     self.flush(path, {'position' : int(size) })
   
   # Use Patch HTTP request
   #----------------------------
-  def _patching_sl(self, schemeless_path, param, data = None, header = None, **kwargs):
+  def _patching_sl(self, schemeless_path, param, data=None, header=None, **kwargs):
     """
     A wraper function for patch
     """
     if header is None:
       header = {}
     header.update(self._getheaders())
-    LOG.debug("%s" %kwargs)
+    LOG.debug("%s" % kwargs)
     return self._root.invoke('PATCH', schemeless_path, param, data, headers = header, **kwargs)
+  
       

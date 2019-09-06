@@ -49,6 +49,7 @@ class StorageContext {
       do {
         result.unshift({
           name: currentEntry.definition.name,
+          originalType: currentEntry.originalType,
           isActive: currentEntry === self.storageEntry(),
           storageEntry: currentEntry,
           makeActive: function() {

@@ -24,7 +24,7 @@ class ABFSStat(object):
   DIR_MODE = 0o777 | stat.S_IFDIR
   FILE_MODE = 0o666 | stat.S_IFREG
 
-  def __init__(self, isDir, atime, mtime, size, path):
+  def __init__(self, isDir, atime, mtime, size, path, owner = '', group = ''):
     self.name = strip_path(path)
     self.path = path
     self.isDir = isDir
@@ -36,6 +36,8 @@ class ABFSStat(object):
       self.atime = 0
       self.mtime = 0
     self.size = size
+    self.user = owner
+    self.group = group
     
   def __getitem__(self, key):
     try:
@@ -53,14 +55,6 @@ class ABFSStat(object):
   @property
   def mode(self):
     return ABFSStat.DIR_MODE if self.isDir else ABFSStat.FILE_MODE
-  
-  @property
-  def user(self):
-    return ''
-
-  @property
-  def group(self):
-    return ''
   
   @property
   def aclBit(self):
@@ -84,13 +78,13 @@ class ABFSStat(object):
       isDir = resp['isDirectory'] == 'true'
     except:
       isDir = False
-    return cls(isDir, headers['date'], resp['lastModified'], size, path)
+    return cls(isDir, headers['date'], resp['lastModified'], size, path, resp['owner'], resp['group'])
   
   @classmethod
   def for_single(cls,resp, path):
     size = int(resp['Content-Length'])
     isDir = resp['x-ms-resource-type'] == 'directory'
-    return cls(isDir, resp['date'],resp['Last-Modified'], size, path)
+    return cls(isDir, resp['date'],resp['Last-Modified'], size, path, resp['x-ms-owner'], resp['x-ms-group'])
   
   @classmethod
   def for_filesystem(cls, resp, path):

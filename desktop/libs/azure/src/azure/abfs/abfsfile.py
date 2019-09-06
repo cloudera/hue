@@ -78,7 +78,7 @@ class ABFSFile(object):
     """
     resp = ""
     try:
-      resp = self.fs.read(self.path, offset = self.pos, length = str(length))
+      resp = self.fs.read(self.path, offset=self.pos, length=str(length))
       self.pos += length
     except:
       resp =''

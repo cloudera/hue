@@ -45,6 +45,7 @@ from notebook.connectors.oozie_batch import OozieApi
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
 from notebook.models import escape_rows, make_notebook
 from notebook.views import upgrade_session_properties, get_api
+from azure.abfs.__init__ import abfspath
 
 if sys.version_info[0] > 2:
   import urllib.request, urllib.error
@@ -754,6 +755,8 @@ def export_result(request):
       'allowed': True
     }
   elif data_format == 'hdfs-directory':
+    if destination.lower().startswith("abfs"):
+      destination = abfspath(destination)
     if is_embedded:
       sql, success_url = api.export_large_data_to_hdfs(notebook, snippet, destination)
 

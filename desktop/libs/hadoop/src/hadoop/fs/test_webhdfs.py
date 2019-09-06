@@ -589,7 +589,7 @@ class WebhdfsTests(unittest.TestCase):
     f.close()
     
     resp = self.cluster.fs.listdir(self.prefix)
-    LOG.debug("%s" %resp)
+    LOG.debug("%s" % resp)
     
     test_dir = self.prefix + "/temp2"
     self.cluster.fs.mkdir(test_dir, 0333)
@@ -599,8 +599,8 @@ class WebhdfsTests(unittest.TestCase):
     f.close()
     
     resp = self.cluster.fs.listdir(self.prefix)
-    LOG.debug("%s" %resp)
+    LOG.debug("%s" % resp)
     resp = self.cluster.fs.listdir_stats(self.prefix)
-    LOG.debug("%s" %resp)
+    LOG.debug("%s" % resp)
     self.cluster.fs.remove(test_file)
     self.cluster.fs.remove(test_file2)

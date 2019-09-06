@@ -1734,7 +1734,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         resizeElements();
       });
       self.isObjectStore = ko.pureComputed(function() {
-        return self.inputFormat() === 'file' && /^(s3a|adl):\/.*$/.test(self.path());
+        return self.inputFormat() === 'file' && /^(s3a|adl|abfs):\/.*$/.test(self.path());
       });
       self.isObjectStore.subscribe(function(newVal) {
         wizard.destination.useDefaultLocation(!newVal);
