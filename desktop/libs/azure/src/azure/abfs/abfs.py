@@ -144,7 +144,7 @@ class ABFS(object):
     Returns the ABFFStat object
     """
     if ABFS.isroot(path):
-      return ABFSStat.for_root()
+      return ABFSStat.for_root(path)
     file_system, dir_name = Init_ABFS.parse_uri(path)[:2]
     if dir_name == '':
       LOG.debug("Path being called is a Filesystem")
@@ -161,6 +161,9 @@ class ABFS(object):
       return self.listfilesystems_stats(params=None, **kwargs)
     dir_stats = []
     file_system, directory_name = Init_ABFS.parse_uri(path)[:2]
+    root = Init_ABFS.ABFS_ROOT
+    if path.lower().startswith(Init_ABFS.ABFS_ROOT_S):
+      root = Init_ABFS.ABFS_ROOT_S
     if params is None:
       params = {}
     if 'recursive' not in params:
@@ -171,10 +174,10 @@ class ABFS(object):
     res = self._root._invoke("GET", file_system, params, headers=self._getheaders(), **kwargs)
     resp = self._root._format_response(res)
     for x in resp['paths']:
-      dir_stats.append(ABFSStat.for_directory(res.headers, x, Init_ABFS.ABFS_ROOT +file_system + "/" + x['name']))
+      dir_stats.append(ABFSStat.for_directory(res.headers, x, root + file_system + "/" + x['name']))
     return dir_stats
   
-  def listfilesystems_stats(self, params=None, **kwargs):
+  def listfilesystems_stats(self, root = Init_ABFS.ABFS_ROOT, params=None, **kwargs):
     """
     Lists the stats inside the File Systems, No functionality for params
     """
@@ -184,8 +187,9 @@ class ABFS(object):
     params["resource"] = "account"
     res = self._root._invoke("GET", params=params, headers=self._getheaders() )
     resp = self._root._format_response(res)
+    LOG.debug("%s" % root)
     for x in resp['filesystems']:
-      stats.append(ABFSStat.for_filesystems(res.headers, x))
+      stats.append(ABFSStat.for_filesystems(res.headers, x, root))
     return stats
   
   def _stats(self, schemeless_path, params=None, **kwargs):
@@ -217,16 +221,16 @@ class ABFS(object):
     """
     if ABFS.isroot(path):
       LOG.warn("Path being called is a Filesystem")
-      return self.listfilesystems(params, **kwargs)
+      return self.listfilesystems(params = params, **kwargs)
     listofDir = self.listdir_stats(path, params)
     return [x.name for x in listofDir]
   
   
-  def listfilesystems(self, params=None, **kwargs):
+  def listfilesystems(self, root = Init_ABFS.ABFS_ROOT,params=None, **kwargs):
     """
     Lists the names of the File Systems, limited arguements  
     """
-    listofFileSystems = self.listfilesystems_stats(params)
+    listofFileSystems = self.listfilesystems_stats(root = root, params = params)
     return [x.name for x in listofFileSystems]
   
   # Find or alter information about the URI path

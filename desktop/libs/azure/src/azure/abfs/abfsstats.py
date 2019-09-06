@@ -61,12 +61,12 @@ class ABFSStat(object):
     return False
   
   @classmethod
-  def for_root(cls):
-    return cls(True, 0, 0, 0, 'abfs://')
+  def for_root(cls,path):
+    return cls(True, 0, 0, 0, path)
   
   @classmethod
-  def for_filesystems(cls,headers,resp):
-    return cls(True, headers['date'], resp['lastModified'], 0, 'abfs://' + resp['name'])
+  def for_filesystems(cls,headers,resp, scheme):
+    return cls(True, headers['date'], resp['lastModified'], 0, scheme + resp['name'])
 
   @classmethod
   def for_directory(cls,headers,resp, path):

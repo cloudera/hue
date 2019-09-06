@@ -30,7 +30,7 @@ from azure.conf import get_default_abfs_fs
 LOG = logging.getLogger(__name__)
 
 ABFS_PATH_RE = re.compile('^/*[aA][bB][fF][sS]{1,2}://([$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9])(/(.*?)/?)?$')
-ABFS_PATH_FULL = re.compile('^/*[aA][bB][fF][sS]{1,2}://([$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9])@[^.]*?\.dfs\.core\.windows\.net(/(.*?)/?)?$')#bug here
+ABFS_PATH_FULL = re.compile('^/*[aA][bB][fF][sS]{1,2}://(([$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9])@[^.]*?\.dfs\.core\.windows\.net)(/(.*?)/?)?$')#bug here
 ABFS_ROOT_S = 'abfss://'
 ABFS_ROOT = 'abfs://'
 ABFSACCOUNT_NAME = re.compile('^/*[aA][bB][fF][sS]{1,2}://[$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9](@.*?)$')
@@ -41,13 +41,21 @@ def parse_uri(uri):
   Raises ValueError if invalid ABFS URI is passed.
   """
   match = ABFS_PATH_RE.match(uri)
-  if not match:
+  direct_name = ''
+  base_direct_name = ''
+  file_system = ''
+  if match:
+    direct_name = match.group(3) or ''
+    base_direct_name = match.group(2) or ''
+    file_system = match.group(1)
+  else:
     match = ABFS_PATH_FULL.match(uri)
     if not match:
       raise ValueError("Invalid ABFS URI: %s" % uri)
-  direct_name = match.group(3) or ''
-  base_direct_name = match.group(2) or ''
-  return match.group(1), direct_name, base_direct_name
+    direct_name = match.group(4) or ''
+    base_direct_name = match.group(3) or ''
+    file_system = match.group(2)
+  return file_system, direct_name, base_direct_name
 
 def is_root(uri):
   """
@@ -96,7 +104,7 @@ def parent_path(path):
   Returns the parent of the specified folder
   """
   if is_root(path):
-    return "abfs://"
+    return path
   filesystem, directory_name, other = parse_uri(path)
   parent = None
   if directory_name == "":
@@ -129,10 +137,16 @@ def join(first,*complist):
   return joined
 
 
-def abfspath(path, fs_defaultfs = get_default_abfs_fs()):
+def abfspath(path, fs_defaultfs = None):
   """
   Converts a path to a path that the ABFS driver can use
   """
+  if fs_defaultfs is None:
+    try:
+      fs_defaultfs = get_default_abfs_fs()
+    except:
+      LOG.warn("Configuration for ABFS is not set, may run into errors")
+      return path
   filesystem, dir_name = ("","")
   try:
     filesystem, dir_name = parse_uri(path)[:2]
