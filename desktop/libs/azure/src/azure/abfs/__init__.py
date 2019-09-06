@@ -57,6 +57,16 @@ def parse_uri(uri):
     file_system = match.group(2)
   return file_system, direct_name, base_direct_name
 
+def only_filesystem_and_account_name(uri):
+  """
+  Given a path returns only the filesystem and account name,
+  Returns uri if it doesn't match
+  """
+  match = ABFS_PATH_FULL.match(uri)
+  if match:
+    return match.group(1)
+  return uri
+
 def is_root(uri):
   """
   Checks if Uri is the Root Directory
@@ -112,6 +122,9 @@ def parent_path(path):
       return ABFS_ROOT_S
     return ABFS_ROOT
   else:
+    x = only_filesystem_and_account_name(path)
+    if x !=path:
+      filesystem = x
     parent = '/'.join(directory_name.split('/')[:-1])
   if path.lower().startswith(ABFS_ROOT):
     return normpath(ABFS_ROOT + filesystem + '/' + parent)

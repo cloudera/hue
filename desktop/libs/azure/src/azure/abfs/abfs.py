@@ -173,6 +173,9 @@ class ABFS(object):
       params['directory'] = directory_name
     res = self._root._invoke("GET", file_system, params, headers=self._getheaders(), **kwargs)
     resp = self._root._format_response(res)
+    y = Init_ABFS.only_filesystem_and_account_name(path)
+    if y != path:
+      file_system = y
     for x in resp['paths']:
       dir_stats.append(ABFSStat.for_directory(res.headers, x, root + file_system + "/" + x['name']))
     return dir_stats
