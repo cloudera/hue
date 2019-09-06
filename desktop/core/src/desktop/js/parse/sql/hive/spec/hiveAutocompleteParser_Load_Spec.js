@@ -105,6 +105,17 @@ describe('hiveAutocompleteParser.js LOAD statements', () => {
     });
   });
 
+  it('should suggest hdfs paths for "LOAD DATA INPATH "/|""', () => {
+    assertAutoComplete({
+      beforeCursor: 'LOAD DATA INPATH "/',
+      afterCursor: '"',
+      expectedResult: {
+        lowerCase: false,
+        suggestHdfs: { path: '/' }
+      }
+    });
+  });
+
   it('should suggest keywords for "LOAD DATA INPATH \'baa\' |"', () => {
     assertAutoComplete({
       beforeCursor: "LOAD DATA INPATH 'baa' ",
