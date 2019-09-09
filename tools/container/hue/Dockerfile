@@ -16,7 +16,8 @@ ENV NAME="hue" \
     HUE_BRANCHURL=${GBRANCH} \
     HUE_VERSION=${VERSION} \
     HUE_BIN="/opt/hue/build/env/bin" \
-    PATH=$PATH:$HUE_BIN
+    PATH=$PATH:$HUE_BIN \
+    SUPERVISOR_VERSION=4.0.2
 
 # Required for building Hue
 #RUN yum install -y \
@@ -55,30 +56,48 @@ RUN yum install -y \
       openldap-devel \
       openssl-devel \
       python-devel \
+      python-setuptools \
       readline-devel \
       sqlite-devel \
+      sudo \
       xmlsec1 \
       zlib-devel
+
+RUN easy_install supervisor
 
 RUN curl -sL https://rpm.nodesource.com/setup_10.x | bash - \
       && yum install -y nodejs \
       && yum clean all -y
 
-RUN groupadd -g 1123 hue && useradd -g 1123 -d ${HUE_HOME} -s /bin/bash -u 1123 hue
+# kubernetes health check
+COPY healthz.sh /
 
+# create hue user
+RUN groupadd -g 1123 hue && useradd -g 1123 -d ${HUE_HOME} -s /bin/bash -u 1123 hue
+WORKDIR /opt/hue
 COPY hue ${HUE_HOME}
 RUN $HUE_BIN/pip install psycopg2-binary
+RUN chown -R hue:hue ${HUE_HOME} && \
+    mkdir -p /var/log/hue && \
+    chown -R hue:hue /var/log/hue && \
+    mkdir -p ${HUE_CONF} && \
+    chown -R hue:hue ${HUE_CONF}
 
-RUN mkdir -p ${HUE_CONF}
 ENV HUE_CONF_DIR ${HUE_CONF}/conf
-COPY conf ${HUE_CONF}/conf
+COPY hueconf ${HUE_CONF}/conf
 
 RUN ln -s ${HUE_CONF}/conf/log.conf ${HUE_HOME}/desktop/conf/log.conf; \
     ln -s ${HUE_CONF}/conf/log4j.properties ${HUE_HOME}/desktop/conf/log4j.properties
 
-COPY startup.sh ${HUE_HOME}/startup.sh
-COPY healthz.sh /
-EXPOSE 8888
+COPY hue.sh ${HUE_HOME}/hue.sh
 
-WORKDIR /opt/hue
-CMD ["/opt/hue/startup.sh"]
+# supervisor stuff
+ADD supervisor-files/etc/supervisord.conf /etc/supervisord.conf
+RUN mkdir -p /etc/supervisor.d/ && chmod +w /etc/supervisor.d
+ADD supervisor-files/hue_server.conf /etc/supervisor.d/
+ADD supervisor-files/hue_ktrenewer.conf /etc/supervisor.d/
+
+EXPOSE 8888 9111
+
+USER hue
+CMD ["/usr/bin/supervisord","-c","/etc/supervisord.conf"]
