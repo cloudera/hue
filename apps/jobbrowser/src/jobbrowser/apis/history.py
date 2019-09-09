@@ -69,7 +69,7 @@ class HistoryApi(Api):
           'queue': '',
           'canWrite': True,
           'duration': 1,
-          'submitted': 1
+          'submitted': history['data']['lastExecuted']
         })
 
     return {
