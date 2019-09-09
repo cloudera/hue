@@ -96,7 +96,7 @@ class JobBrowserPanel {
       }
     });
 
-    self.jobCounts = ko.observable({ yarn: 0, schedules: 0 });
+    self.jobCounts = ko.observable({ yarn: 0, schedules: 0, history: 0 });
     self.jobCount = ko.pureComputed(() => {
       let total = 0;
       Object.keys(self.jobCounts()).forEach(value => {
@@ -108,11 +108,13 @@ class JobBrowserPanel {
 
     let lastYarnBrowserRequest = null;
     const checkYarnBrowserStatus = function() {
-      return $.post('/jobbrowser/jobs/', {
-        format: 'json',
-        state: 'running',
-        user: window.LOGGED_USERNAME
-      })
+      return $.post(
+        '/jobbrowser/jobs/',
+        {
+          format: 'json',
+          state: 'running',
+          user: window.LOGGED_USERNAME
+        })
         .done(data => {
           if (data != null && data.jobs != null) {
             huePubSub.publish('jobbrowser.data', data.jobs);
@@ -122,7 +124,8 @@ class JobBrowserPanel {
         })
         .fail(response => {
           console.warn(response);
-        });
+        }
+      );
     };
     let lastScheduleBrowserRequest = undefined;
     const checkScheduleBrowserStatus = function() {
@@ -146,6 +149,30 @@ class JobBrowserPanel {
         }
       );
     };
+    let lastHistoryBrowserRequest = null;
+    const checkHistoryBrowserStatus = function() {
+      return $.post(
+        '/jobbrowser/api/jobs/history',
+        {
+          interface: ko.mapping.toJSON('history'),
+          filters: ko.mapping.toJSON([
+            { states: ['running'] },
+            { text: 'user:' + window.LOGGED_USERNAME },
+            { time: { time_value: 7, time_unit: 'days' } },
+            { pagination: { page: 1, offset: 1, limit: 1 } }
+          ])
+        })
+        .done(data => {
+          if (data != null && data.apps != null) {
+            self.jobCounts()['history'] = data.apps.length;
+            self.jobCounts.valueHasMutated();
+          }
+        })
+        .fail(response => {
+          console.warn(response);
+        }
+      );
+    };
 
     let checkJobBrowserStatusIdx = -1;
     const checkJobBrowserStatus = function() {
@@ -153,9 +180,10 @@ class JobBrowserPanel {
       if (window.ENABLE_QUERY_SCHEDULING) {
         lastScheduleBrowserRequest = checkScheduleBrowserStatus();
       }
+      lastHistoryBrowserRequest = checkHistoryBrowserStatus();
 
       $.when
-        .apply($, [lastYarnBrowserRequest, lastScheduleBrowserRequest])
+        .apply($, [lastYarnBrowserRequest, lastScheduleBrowserRequest, lastHistoryBrowserRequest])
         .done(() => {
           window.clearTimeout(checkJobBrowserStatusIdx);
           checkJobBrowserStatusIdx = window.setTimeout(
@@ -188,6 +216,7 @@ class JobBrowserPanel {
 
       huePubSub.subscribe('check.job.browser', checkYarnBrowserStatus);
       huePubSub.subscribe('check.schedules.browser', checkScheduleBrowserStatus);
+      huePubSub.subscribe('check.history.browser', checkHistoryBrowserStatus);
     }
   }
 }
