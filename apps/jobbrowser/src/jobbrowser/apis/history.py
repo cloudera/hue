@@ -27,6 +27,7 @@ from notebook.api import _get_statement
 from notebook.models import Notebook
 
 from jobbrowser.apis.base_api import Api
+from jobbrowser.conf import MAX_JOB_FETCH
 
 
 LOG = logging.getLogger(__name__)
@@ -35,7 +36,7 @@ LOG = logging.getLogger(__name__)
 class HistoryApi(Api):
 
   def apps(self, filters):
-    tasks = Document2.objects.get_history(doc_type='query-hive', user=self.user)
+    tasks = Document2.objects.get_history(user=self.user).order_by('-last_modified')[:MAX_JOB_FETCH.get()]
     apps = []
 
     for app in tasks:
