@@ -136,6 +136,8 @@ class ABFS(object):
       if e.code == 404:
         return False
       raise WebHdfsException
+    except IOError:
+      return False
     return True
 
   def stats(self, path, params=None, **kwargs):
@@ -145,7 +147,10 @@ class ABFS(object):
     """
     if ABFS.isroot(path):
       return ABFSStat.for_root(path)
-    file_system, dir_name = Init_ABFS.parse_uri(path)[:2]
+    try:
+      file_system, dir_name = Init_ABFS.parse_uri(path)[:2]
+    except:
+      raise IOError
     if dir_name == '':
       LOG.debug("Path being called is a Filesystem")
       return ABFSStat.for_filesystem(self._statsf(file_system, params, **kwargs), path)

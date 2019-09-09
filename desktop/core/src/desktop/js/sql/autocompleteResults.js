@@ -1330,13 +1330,13 @@ class AutocompleteResults {
 
       if (/^s3a:\/\//i.test(path)) {
         fetchFunction = 'fetchS3Path';
-        path = path.substring(5);
+        path = path.substring(4);
       } else if (/^adl:\/\//i.test(path)) {
         fetchFunction = 'fetchAdlsPath';
-        path = path.substring(5);
+        path = path.substring(4);
       } else if (/^abfs:\/\//i.test(path)) {
         fetchFunction = 'fetchAbfsPath';
-        path = path.substring(6);
+        path = path.substring(5);
       } else if (/^hdfs:\/\//i.test(path)) {
         path = path.substring(6);
       }
