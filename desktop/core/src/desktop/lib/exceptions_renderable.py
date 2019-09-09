@@ -33,7 +33,7 @@ LOG = logging.getLogger(__name__)
 
 def raise_popup_exception(message, title="Error", detail=None, error_code=500):
   tb = sys.exc_info()
-  raise PopupException(message, title=title, detail=detail, error_code=error_code, traceback=traceback.extract_tb(tb[2]))
+  raise PopupException(message, title=title, detail=detail, error_code=error_code, tb=traceback.extract_tb(tb[2]))
 
 class PopupException(Exception):
   """
