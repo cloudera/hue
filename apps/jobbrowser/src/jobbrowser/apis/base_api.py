@@ -34,6 +34,7 @@ def get_api(user, interface, cluster=None):
   from jobbrowser.apis.data_eng_api import DataEngClusterApi, DataEngJobApi
   from jobbrowser.apis.clusters import ClusterApi
   from jobbrowser.apis.data_warehouse import DataWarehouseClusterApi
+  from jobbrowser.apis.history import HistoryApi
   from jobbrowser.apis.livy_api import LivySessionsApi, LivyJobApi
   from jobbrowser.apis.job_api import JobApi
   from jobbrowser.apis.query_api import QueryApi
@@ -56,6 +57,8 @@ def get_api(user, interface, cluster=None):
   elif interface == 'celery-beat':
     from jobbrowser.apis.beat_api import BeatApi
     return BeatApi(user)
+  elif interface == 'history':
+    return HistoryApi(user)
   elif interface == 'engines':
     return ClusterApi(user)
   elif interface == 'dataeng-clusters':
