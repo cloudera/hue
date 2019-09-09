@@ -59,7 +59,7 @@ class HistoryApi(Api):
           'absoluteUrl': app.get_absolute_url(),
       }
       apps.append({
-          'id': 'history-%(id)s' % history,
+          'id': 'history-%010d' % history['id'],
           'name': history['data']['statement'],
           'status': history['data']['status'],
           'apiStatus': self._api_status(history),
@@ -84,7 +84,7 @@ class HistoryApi(Api):
     app = Document2.objects.document(user=self.user, doc_id=appid)
 
     return {
-      'id': 'history-%s' % app.id,
+      'id': 'history-%010d' % app.id,
       'name': app.name,
       'status': 'ready',
       'apiStatus': 'RUNNING',
