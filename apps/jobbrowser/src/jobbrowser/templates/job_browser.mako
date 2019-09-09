@@ -371,7 +371,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <!-- /ko -->
               </form>
 
-              <div data-bind="visible: jobs.showJobCountBanner" class="pull-center alert alert-warning">${ _("Showing oldest %s jobs. Use days filter to get the recent ones.") % MAX_JOB_FETCH.get() }</div>
+              <div data-bind="visible: jobs.showJobCountBanner" class="pull-center alert alert-warning">
+                ${ _("Showing oldest %s jobs. Use days filter to get the recent ones.") % MAX_JOB_FETCH.get() }
+              </div>
 
               <div class="card card-small">
                 <!-- ko hueSpinner: { spin: jobs.loadingJobs(), center: true, size: 'xlarge' } --><!-- /ko -->

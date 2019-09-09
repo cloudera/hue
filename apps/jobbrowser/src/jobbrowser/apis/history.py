@@ -58,11 +58,16 @@ class HistoryApi(Api):
           } if notebook['snippets'] else {},
           'absoluteUrl': app.get_absolute_url(),
       }
+      api_status = self._api_status(history)
+
+      if filters.get('states') and api_status.lower() not in filters['states']:
+        continue
+
       apps.append({
           'id': 'history-%010d' % history['id'],
           'name': history['data']['statement'],
           'status': history['data']['status'],
-          'apiStatus': self._api_status(history),
+          'apiStatus': api_status,
           'type': 'history-%s' % history['type'],
           'user': self.user.username,
           'progress': 50,
@@ -117,7 +122,7 @@ class HistoryApi(Api):
   def _api_status(self, task):
     if task['data']['status'] in ('expired', 'failed'):
       return 'FAILED'
-    elif task['data']['status'] == 'available':
+    elif task['data']['status'] in ('available', 'canceled'):
       return 'SUCCEEDED'
     else:
       return 'RUNNING'
