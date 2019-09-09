@@ -16,6 +16,7 @@
 
 import JasmineCore from 'jasmine-core';
 import { JSDOM } from 'jsdom';
+import ko from 'knockout';
 
 const jsdom = new JSDOM('<!doctype html><html><body></body></html>', {
   url: 'https://www.gethue.com/hue',
@@ -37,4 +38,46 @@ global.sessionStorage = window.sessionStorage;
 
 global.getJasmineRequireObj = function() {
   return JasmineCore;
+};
+
+export const koSetup = () => {
+  let originalLoadTemplate;
+  let wrapper;
+
+  beforeEach(() => {
+    originalLoadTemplate = ko.components.defaultLoader.loadTemplate;
+    ko.components.defaultLoader.loadTemplate = (name, templateConfig, callback) => {
+      const div = window.document.createElement('div');
+      div.innerHTML = templateConfig;
+      callback(div.children);
+    };
+
+    wrapper = window.document.createElement('div');
+    wrapper.classList.add('component-wrapper');
+    window.document.querySelector('body').appendChild(wrapper);
+  });
+
+  afterEach(() => {
+    ko.components.defaultLoader.loadTemplate = originalLoadTemplate;
+    wrapper.parentNode.removeChild(wrapper);
+  });
+
+  return {
+    renderComponent: async (name, data) =>
+      new Promise(resolve => {
+        const element = window.document.createElement('div');
+        element.setAttribute('data-bind', `component: { name: "${name}", params: $data }`);
+        wrapper.appendChild(element);
+        ko.applyBindings(data, wrapper);
+        window.setTimeout(() => {
+          resolve(wrapper);
+        }, 0);
+      }),
+
+    waitForKoUpdate: async () => {
+      return new Promise(resolve => {
+        window.setTimeout(resolve, 0);
+      });
+    }
+  };
 };

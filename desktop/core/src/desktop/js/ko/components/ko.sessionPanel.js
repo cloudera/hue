@@ -17,11 +17,16 @@
 import ko from 'knockout';
 import komapping from 'knockout.mapping';
 
+import 'ko/bindings/ko.slideVisible';
+import 'ko/bindings/ko.toggle';
+import apiHelper from '../../api/apiHelper';
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
-import apiHelper from '../../api/apiHelper';
+
+export const NAME = 'session-panel';
+export const SHOW_EVENT_NAME = 'session.panel.show';
 
 const TEMPLATE = `
 <div class="session-panel" data-bind="slideVisible: visible">
@@ -124,12 +129,11 @@ class EditableSession {
 }
 
 class SessionPanel {
-  constructor(params) {
+  constructor() {
     this.visible = ko.observable(false);
     this.sessions = ko.observableArray();
     this.activeTypeFilter = undefined;
-
-    huePubSub.subscribe('session.panel.show', type => this.showSessions(type));
+    huePubSub.subscribe(SHOW_EVENT_NAME, type => this.showSessions(type));
   }
 
   /**
@@ -184,4 +188,4 @@ class SessionPanel {
   saveDefaultUserProperties(session) {}
 }
 
-componentUtils.registerComponent('session-panel', SessionPanel, TEMPLATE);
+componentUtils.registerComponent(NAME, SessionPanel, TEMPLATE);
