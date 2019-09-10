@@ -33,7 +33,7 @@ class Command(BaseCommand):
   all unimported users.
   """
   def add_arguments(self, parser):
-    parser.add_argument('group', nargs='+', type=str)
+    parser.add_argument('group', type=str)
 
     parser.add_argument("--dn", help=_t("Whether or not the user should be imported by distinguished name."), action="store_true", default=False)
     parser.add_argument("--import-members", help=_t("Import users from the group."), action="store_true", default=False)
