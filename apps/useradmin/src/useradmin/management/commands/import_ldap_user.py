@@ -31,7 +31,7 @@ class Command(BaseCommand):
   If a user has been previously imported, this will sync their user information.
   """
   def add_arguments(self, parser):
-    parser.add_argument('user', nargs='+', type=str)
+    parser.add_argument('user', type=str)
 
     parser.add_argument("--dn", help=_t("Whether or not the user should be imported by distinguished name."), action="store_true", default=False)
     parser.add_argument("--sync-groups", help=_t("Sync groups of the users."),  action="store_true", default=False)
