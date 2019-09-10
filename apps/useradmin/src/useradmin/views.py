@@ -22,6 +22,7 @@ import grp
 import logging
 import threading
 import subprocess
+import sys
 import json
 
 from axes.decorators import FAILURE_LIMIT, LOCK_OUT_AT_FAILURE
@@ -57,6 +58,8 @@ from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm, AddLdapU
 
 from desktop.auth.backend import is_admin
 
+if sys.version_info[0] > 2:
+  unicode = str
 
 LOG = logging.getLogger(__name__)
 
@@ -819,7 +822,7 @@ def ensure_home_directory(fs, user):
     home_directory = userprofile.home_directory.split('@')[0]
 
   if userprofile is not None and userprofile.home_directory:
-    if not isinstance(home_directory, str):
+    if not isinstance(home_directory, unicode):
       home_directory = home_directory.decode("utf-8")
     fs.do_as_user(username, fs.create_home_dir, home_directory)
   else:
