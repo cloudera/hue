@@ -26,15 +26,26 @@ find_git_state() {
   export VERSION=$(grep "VERSION=" VERSION | cut -d"=" -f2 | cut -d'"' -f2)
 }
 
+generate_random_string() {
+  cd $HUE_DIR
+  thisuser=$(uuidgen | cut -d"-" -f5)
+  thispass=$(uuidgen | cut -d"-" -f5)
+  sed -i -e "s|username=.*|username=${thisuser}|g" supervisor-files/etc/supervisord.conf
+  sed -i -e "s|password=.*|password=${thispass}|g" supervisor-files/etc/supervisord.conf
+}
+
 docker_hue_build() {
   cd $HUE_DIR
+  generate_random_string
   cp -a $BUILD_DIR/hue $HUE_DIR
   rm -f $HUE_DIR/hue/desktop/conf/*
+  export HUEUSER="hive"
   docker build -f $HUE_DIR/Dockerfile -t ${REGISTRY}/hue:$GBN \
     --build-arg GBN=$GBN \
     --build-arg GSHA="$GSHA" \
     --build-arg GBRANCH=$GBRANCH \
     --build-arg VERSION=$VERSION \
+    --build-arg HUEUSER="hive" \
     .
 }
 
