@@ -224,12 +224,15 @@ DEFAULT_PUBLIC_KEY = Config(
 # Data Catalog
 
 def get_catalog_url():
-  return (CATALOG.API_URL.get() and CATALOG.API_URL.get().strip('/')) or get_navigator_url()
+  return (CATALOG.API_URL.get() and CATALOG.API_URL.get().strip('/')) or (CATALOG.INTERFACE.get() == 'navigator' and get_navigator_url())
 
 def has_catalog(user):
   from desktop.auth.backend import is_admin
-  return ((bool(get_catalog_url())) or has_navigator(user)) \
-      and (is_admin(user) or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
+  return (
+      bool(get_catalog_url()) or has_navigator(user)
+    ) and (
+      is_admin(user) or user.has_hue_permission(action="access", app=DJANGO_APPS[0])
+    )
 
 def has_readonly_catalog(user):
   return has_catalog(user) and not has_navigator(user)
