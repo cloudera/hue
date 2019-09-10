@@ -81,7 +81,9 @@ RUN chown -R hue:hue ${HUE_HOME} && \
     mkdir -p /var/log/hue && \
     chown -R hue:hue /var/log/hue && \
     mkdir -p ${HUE_CONF} && \
-    chown -R hue:hue ${HUE_CONF}
+    chown -R hue:hue ${HUE_CONF} && \
+    echo "hue ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/hue && \
+    chmod 0440 /etc/sudoers.d/hue
 
 ENV HUE_CONF_DIR ${HUE_CONF}/conf
 COPY hueconf ${HUE_CONF}/conf
