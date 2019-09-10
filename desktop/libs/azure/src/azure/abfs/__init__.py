@@ -175,6 +175,16 @@ def abfspath(path, fs_defaultfs = None):
   LOG.debug("%s" % path)
   return path
 
+def get_home_dir_for_ABFS():
+  """
+  Attempts to go to the directory set by the user in the configuration file. If not defaults to abfs:// 
+  """
+  try:
+    filesystem = parse_uri(get_default_abfs_fs())[0]
+    return "abfs://" + filesystem
+  except:
+    return 'abfs://'
+
 def abfsdatetime_to_timestamp(datetime):
   """
   Returns timestamp (seconds) by datetime string from ABFS API responses.

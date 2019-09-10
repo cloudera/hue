@@ -241,6 +241,12 @@ class ABFS(object):
     listofFileSystems = self.listfilesystems_stats(root = root, params = params)
     return [x.name for x in listofFileSystems]
   
+  @staticmethod
+  def get_home_dir():
+    """
+    Attempts to go to the directory set by the user in the configuration file. If not defaults to abfs:// 
+    """
+    return Init_ABFS.get_home_dir_for_ABFS()
   # Find or alter information about the URI path
   # --------------------------------
   @staticmethod
