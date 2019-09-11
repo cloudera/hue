@@ -442,11 +442,14 @@ class ABFS(object):
   
   def chmod(self, path, permissionNumber = None, *args, **kwargs):
     """
-    Set File Permissions (not implemented)
+    Set File Permissions (passing as an int converts said integer to octal. Passing as a string assumes the string is in octal)
     """
     header = {}
     if permissionNumber is not None:
-      header['x-ms-permissions'] = str(permissionNumber)
+      if isinstance(permissionNumber, basestring):
+        header['x-ms-permissions'] = str(permissionNumber)
+      else:
+        header['x-ms-permissions'] = oct(permissionNumber)
     self.setAccessControl(path, headers=header)
   
   def setAccessControl(self, path, headers, **kwargs):
