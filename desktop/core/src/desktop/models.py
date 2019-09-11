@@ -94,6 +94,12 @@ def hue_version():
 def _version_from_properties(f):
   return dict(line.strip().split('=') for line in f.readlines() if len(line.strip().split('=')) == 2).get('cloudera.cdh.release')
 
+def get_sample_user_install(user):
+  if ENABLE_ORGANIZATIONS.get():
+   return SAMPLE_USER_INSTALL + '@' + get_organization(user).name + '.com' # TODO: proper default domain
+  else:
+    return SAMPLE_USER_INSTALL
+
 
 ###################################################################################################
 # Custom Settings

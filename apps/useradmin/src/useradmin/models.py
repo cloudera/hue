@@ -62,7 +62,7 @@ from useradmin.conf import DEFAULT_USER_GROUP
 
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group, Organization, default_organization
+  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group, Organization, default_organization, get_organization
 else:
   from django.contrib.auth.models import User, Group
   class Organization(): pass
@@ -335,41 +335,51 @@ models.signals.post_migrate.connect(update_app_permissions)
 # models.signals.post_migrate.connect(get_default_user_group)
 
 
-def install_sample_user():
+def install_sample_user(django_user=None):
   """
   Setup the de-activated sample user with a certain id. Do not create a user profile.
   """
-  #Moved to avoid circular import with is_admin
-  from desktop.models import SAMPLE_USER_ID, SAMPLE_USER_INSTALL
+  from desktop.models import SAMPLE_USER_ID, get_sample_user_install
   from hadoop import cluster
 
   user = None
+  django_username = get_sample_user_install(django_user)
+
+  if ENABLE_ORGANIZATIONS.get():
+    lookup = {'email': django_username}
+    django_username_short = django_user.username_short
+  else:
+    lookup = {'username': django_username}
+    django_username_short = django_username
 
   try:
     if User.objects.filter(id=SAMPLE_USER_ID).exists():
       user = User.objects.get(id=SAMPLE_USER_ID)
       LOG.info('Sample user found with username "%s" and User ID: %s' % (user.username, user.id))
-    elif User.objects.filter(username=SAMPLE_USER_INSTALL).exists():
-      user = User.objects.get(username=SAMPLE_USER_INSTALL)
-      LOG.info('Sample user found: %s' % user.username)
+    elif User.objects.filter(**lookup).exists():
+      user = User.objects.get(**lookup)
+      LOG.info('Sample user found: %s' % lookup)
     else:
-      user, created = User.objects.get_or_create(
-        username=SAMPLE_USER_INSTALL,
-        password='!',
-        is_active=False,
-        is_superuser=False,
-        id=SAMPLE_USER_ID,
-        pk=SAMPLE_USER_ID
-      )
+      user_attributes = lookup.copy()
+      if ENABLE_ORGANIZATIONS.get():
+        user_attributes['organization'] = get_organization(django_user)
+      user_attributes.update({
+        'password': '!',
+        'is_active': False,
+        'is_superuser': False,
+        'id': SAMPLE_USER_ID,
+        'pk': SAMPLE_USER_ID
+      })
+      user, created = User.objects.get_or_create(**user_attributes)
 
       if created:
-        LOG.info('Installed a user called "%s"' % SAMPLE_USER_INSTALL)
+        LOG.info('Installed a user "%s"' % lookup)
 
-    if user.username != SAMPLE_USER_INSTALL:
-      LOG.warn('Sample user does not have username "%s", will attempt to modify the username.' % SAMPLE_USER_INSTALL)
+    if user.username != django_username and not ENABLE_ORGANIZATIONS.get():
+      LOG.warn('Sample user does not have username "%s", will attempt to modify the username.' % django_username)
       with transaction.atomic():
         user = User.objects.get(id=SAMPLE_USER_ID)
-        user.username = SAMPLE_USER_INSTALL
+        user.username = django_username
         user.save()
   except Exception as ex:
     LOG.exception('Failed to get or create sample user')
@@ -383,13 +393,13 @@ def install_sample_user():
   fs = cluster.get_hdfs()
   # If home directory doesn't exist for sample user, create it
   try:
-    if not fs.do_as_user(SAMPLE_USER_INSTALL, fs.get_home_dir):
-      fs.do_as_user(SAMPLE_USER_INSTALL, fs.create_home_dir)
-      LOG.info('Created home directory for user: %s' % SAMPLE_USER_INSTALL)
+    if not fs.do_as_user(django_username_short, fs.get_home_dir):
+      fs.do_as_user(django_username_short, fs.create_home_dir)
+      LOG.info('Created home directory for user: %s' % django_username_short)
     else:
-      LOG.info('Home directory already exists for user: %s' % SAMPLE_USER_INSTALL)
+      LOG.info('Home directory already exists for user: %s' % django_username)
   except Exception as ex:
-    LOG.exception('Failed to create home directory for user %s: %s' % (SAMPLE_USER_INSTALL, str(ex)))
+    LOG.exception('Failed to create home directory for user %s: %s' % (django_username, str(ex)))
 
   return user
 
