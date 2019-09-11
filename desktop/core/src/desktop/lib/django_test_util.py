@@ -14,9 +14,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-Common utilities for testing Desktop django apps.
-"""
 
 import logging
 import re
@@ -38,6 +35,7 @@ class Client(django.test.client.Client):
     response = self.get(*args, **kwargs)
     return json.JSONDecoder().decode(response.content)
 
+
 def assert_ok_response(response):
   """
   Checks that the response returned successfully.
@@ -47,6 +45,7 @@ def assert_ok_response(response):
   nose.tools.assert_true(200, response.status_code)
   return response
 
+
 def make_logged_in_client(username="test", password="test", is_superuser=True, recreate=False, groupname=None):
   """
   Create a client with a user already logged in.
@@ -54,6 +53,9 @@ def make_logged_in_client(username="test", password="test", is_superuser=True, r
   Sometimes we recreate the user, because some tests like to
   mess with is_active and such.
   """
+  if ENABLE_ORGANIZATIONS.get() and username == 'test':
+    username = username + '@gethue.com'
+
   try:
     lookup = {orm_user_lookup(): username}
     user = User.objects.get(**lookup)

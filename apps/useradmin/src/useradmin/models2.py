@@ -120,6 +120,11 @@ def default_organization():
   default_organization, created = Organization.objects.get_or_create(name='default')
   return default_organization
 
+def get_organization(user):
+  # TODO: depends on the logged-in user and its organization
+  return default_organization()
+
+
 class OrganizationUser(AbstractUser):
     """User model in a multi tenant setup."""
 
@@ -149,6 +154,10 @@ class OrganizationUser(AbstractUser):
     @property
     def username(self):
       return self.email
+
+    @property
+    def username_short(self):
+      return self.email.split('@')[0]
 
     @username.setter
     def username(self, value):

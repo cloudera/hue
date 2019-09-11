@@ -67,7 +67,7 @@ class Command(BaseCommand):
 
     # Documents will belong to this user but we run the install as the current user
     try:
-      sample_user = install_sample_user()
+      sample_user = install_sample_user(user)
       self._install_queries(sample_user, app_name)
       self._install_tables(user, app_name, db_name, tables)
     except Exception as ex:
