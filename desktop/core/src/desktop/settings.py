@@ -704,6 +704,7 @@ if desktop.conf.TASK_SERVER.ENABLED.get():
     INSTALLED_APPS.append('timezone_field')
 
 
+PROMETHEUS_EXPORT_MIGRATIONS = False # Needs to be there even when enable_prometheus is not enabled
 if desktop.conf.ENABLE_PROMETHEUS.get():
   MIDDLEWARE_CLASSES.insert(0, 'django_prometheus.middleware.PrometheusBeforeMiddleware')
   MIDDLEWARE_CLASSES.append('django_prometheus.middleware.PrometheusAfterMiddleware')
