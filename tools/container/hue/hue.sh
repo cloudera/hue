@@ -6,7 +6,7 @@ set -x
 # Time marker for both stderr and stdout
 date; date 1>&2
 
-export DESKTOP_LOG_DIR="/var/log/hue"
+export DESKTOP_LOG_DIR="/var/log/hive"
 export PYTHON_EGG_CACHE=$HUE_CONF_DIR/.python-eggs
 export SERVER_SOFTWARE="apache"
 

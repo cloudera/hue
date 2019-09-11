@@ -6,18 +6,20 @@ ARG GBN
 ARG GSHA
 ARG GBRANCH
 ARG VERSION
+ARG HUEUSER
 
 # Set the environment variable
 ENV NAME="hue" \
-    HUE_HOME="/opt/hue" \
+    HUE_HOME="/opt/${HUEUSER}" \
     HUE_CONF="/etc/hue" \
     HUE_BUILDNO=${GBN} \
     HUE_SHAURL=${GSHA} \
     HUE_BRANCHURL=${GBRANCH} \
     HUE_VERSION=${VERSION} \
-    HUE_BIN="/opt/hue/build/env/bin" \
+    HUE_BIN="/opt/${HUEUSER}/build/env/bin" \
     PATH=$PATH:$HUE_BIN \
-    SUPERVISOR_VERSION=4.0.2
+    SUPERVISOR_VERSION=4.0.2 \
+    HUE_USER=${HUEUSER}
 
 # Required for building Hue
 #RUN yum install -y \
@@ -73,25 +75,24 @@ RUN curl -sL https://rpm.nodesource.com/setup_10.x | bash - \
 COPY healthz.sh /
 
 # create hue user
-RUN groupadd -g 1123 hue && useradd -g 1123 -d ${HUE_HOME} -s /bin/bash -u 1123 hue
-WORKDIR /opt/hue
+RUN groupadd -g 1123 ${HUE_USER} && useradd -g 1123 -d ${HUE_HOME} -s /bin/bash -u 1123 ${HUE_USER}
+WORKDIR /opt/${HUE_USER}
 COPY hue ${HUE_HOME}
+COPY hue.sh ${HUE_HOME}/hue.sh
 RUN $HUE_BIN/pip install psycopg2-binary
-RUN chown -R hue:hue ${HUE_HOME} && \
-    mkdir -p /var/log/hue && \
-    chown -R hue:hue /var/log/hue && \
+RUN chown -R ${HUE_USER}:${HUE_USER} ${HUE_HOME} && \
+    mkdir -p /var/log/${HUE_USER} && \
+    chown -R ${HUE_USER}:${HUE_USER} /var/log/${HUE_USER} && \
     mkdir -p ${HUE_CONF} && \
-    chown -R hue:hue ${HUE_CONF} && \
-    echo "hue ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/hue && \
-    chmod 0440 /etc/sudoers.d/hue
+    chown -R ${HUE_USER}:${HUE_USER} ${HUE_CONF} && \
+    echo "${HUE_USER} ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/${HUE_USER} && \
+    chmod 0440 /etc/sudoers.d/${HUE_USER}
 
 ENV HUE_CONF_DIR ${HUE_CONF}/conf
 COPY hueconf ${HUE_CONF}/conf
 
 RUN ln -s ${HUE_CONF}/conf/log.conf ${HUE_HOME}/desktop/conf/log.conf; \
     ln -s ${HUE_CONF}/conf/log4j.properties ${HUE_HOME}/desktop/conf/log4j.properties
-
-COPY hue.sh ${HUE_HOME}/hue.sh
 
 # supervisor stuff
 ADD supervisor-files/etc/supervisord.conf /etc/supervisord.conf
@@ -101,5 +102,5 @@ ADD supervisor-files/hue_ktrenewer.conf /etc/supervisor.d/
 
 EXPOSE 8888 9111
 
-USER hue
+USER ${HUE_USER}
 CMD ["/usr/bin/supervisord","-c","/etc/supervisord.conf"]
