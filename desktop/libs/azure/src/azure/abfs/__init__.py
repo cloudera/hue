@@ -29,8 +29,7 @@ from azure.conf import get_default_abfs_fs
 
 LOG = logging.getLogger(__name__)
 
-ABFS_PATH_RE = re.compile('^/*[aA][bB][fF][sS]{1,2}://([$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9])(/(.*?)/?)?$')
-ABFS_PATH_FULL = re.compile('^/*[aA][bB][fF][sS]{1,2}://(([$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9])@[^.]*?\.dfs\.core\.windows\.net)(/(.*?)/?)?$')#bug here
+ABFS_PATH_RE = re.compile('^/*[aA][bB][fF][sS]{1,2}://([$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9])(@[^.]*?\.dfs\.core\.windows\.net)?(/(.*?)/?)?$') #check this first for problems
 ABFS_ROOT_S = 'abfss://'
 ABFS_ROOT = 'abfs://'
 ABFSACCOUNT_NAME = re.compile('^/*[aA][bB][fF][sS]{1,2}://[$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9](@.*?)$')
@@ -41,30 +40,20 @@ def parse_uri(uri):
   Raises ValueError if invalid ABFS URI is passed.
   """
   match = ABFS_PATH_RE.match(uri)
-  direct_name = ''
-  base_direct_name = ''
-  file_system = ''
-  if match:
-    direct_name = match.group(3) or ''
-    base_direct_name = match.group(2) or ''
-    file_system = match.group(1)
-  else:
-    match = ABFS_PATH_FULL.match(uri)
-    if not match:
-      raise ValueError("Invalid ABFS URI: %s" % uri)
-    direct_name = match.group(4) or ''
-    base_direct_name = match.group(3) or ''
-    file_system = match.group(2)
-  return file_system, direct_name, base_direct_name
+  if not match:
+    raise ValueError("Invalid ABFS URI: %s" % uri)
+  direct_name = match.group(4) or ''
+  account_name_and_path = match.group(2) or ''
+  return match.group(1), direct_name, account_name_and_path
 
 def only_filesystem_and_account_name(uri):
   """
   Given a path returns only the filesystem and account name,
   Returns uri if it doesn't match
   """
-  match = ABFS_PATH_FULL.match(uri)
-  if match:
-    return match.group(1)
+  match = ABFS_PATH_RE.match(uri)
+  if match and match.group(2):
+    return match.group(1) + match.group(2)
   return uri
 
 def is_root(uri):
@@ -115,7 +104,7 @@ def parent_path(path):
   """
   if is_root(path):
     return path
-  filesystem, directory_name, other = parse_uri(path)
+  filesystem, directory_name = parse_uri(path)[:2]
   parent = None
   if directory_name == "":
     if path.lower() == ABFS_ROOT_S:

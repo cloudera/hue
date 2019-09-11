@@ -29,6 +29,7 @@ import re
 from math import ceil
 from posixpath import join
 from urllib.parse import urlparse
+from urllib import quote
 
 from hadoop.hdfs_site import get_umask_mode
 from hadoop.fs.exceptions import WebHdfsException
@@ -165,7 +166,7 @@ class ABFS(object):
       LOG.warn("Path: %s is a Filesystem" % path)
       return self.listfilesystems_stats(params=None, **kwargs)
     dir_stats = []
-    file_system, directory_name = Init_ABFS.parse_uri(path)[:2]
+    file_system, directory_name, account = Init_ABFS.parse_uri(path)
     root = Init_ABFS.ABFS_ROOT
     if path.lower().startswith(Init_ABFS.ABFS_ROOT_S):
       root = Init_ABFS.ABFS_ROOT_S
@@ -178,9 +179,8 @@ class ABFS(object):
       params['directory'] = directory_name
     res = self._root._invoke("GET", file_system, params, headers=self._getheaders(), **kwargs)
     resp = self._root._format_response(res)
-    y = Init_ABFS.only_filesystem_and_account_name(path)
-    if y != path:
-      file_system = y
+    if account != '':
+      file_system = file_system + account
     for x in resp['paths']:
       dir_stats.append(ABFSStat.for_directory(res.headers, x, root + file_system + "/" + x['name']))
     return dir_stats
@@ -507,7 +507,7 @@ class ABFS(object):
     Renames a file
     """ 
     LOG.debug("%s\n%s" % (old, new))
-    headers = {'x-ms-rename-source' : '/' + Init_ABFS.strip_scheme(old) }
+    headers = {'x-ms-rename-source' : '/' + quote(Init_ABFS.strip_scheme(old)) }
     try:
       self._create_path(new, headers=headers, overwrite=True)
     except WebHdfsException as e:
