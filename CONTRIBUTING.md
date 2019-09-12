@@ -5,20 +5,40 @@ The Hue project gladly welcomes [pull requests](https://github.com/cloudera/hue/
 
 This document contains instructions on how to help get involved with Hue.
 
-In any case, feel free to ask here, on [hue-user](http://groups.google.com/a/cloudera.org/group/hue-user) or [@gethue](https://twitter.com/gethue).
+In any case, feel free to ask here, on the [forum](Help Forum: https://discourse.gethue.com/) or [@gethue](https://twitter.com/gethue).
 
-# Getting Started
+# What to improve
 
-1. Have a look at [how to build Hue](https://github.com/cloudera/hue#getting-started).
-2. High level [Roadmap](/docs/ROADMAP.md). Updating a small piece if [documentation](https://docs.gethue.com) is also a quick way to get familiar.
+Here is some inspiration on which areas would love to have some contributions:
+
+1. Updating a small piece of [documentation](https://docs.gethue.com).
+2. High level [Roadmap](/docs/ROADMAP.md).
 3. [JIRA](https://issues.cloudera.org/browse/HUE) is the bug tracking system as well as [Github issues](https://github.com/cloudera/hue/issues).
+4. Generally, improving or creating connectors should be the best projects:
+* SQL (Tip: read (how to write a parser)[link]
+  * Hive LLAP
+  * Parser for Calcite
+  * Parser for PartiQl
+  * Parser for ZetaSql
+  * SqlAlchemy (any improvements to connectors for Druid, Phoenix...)
+  * Kafka Sql
+  * Elastic Search
+* Storage: Google Storage
+* Query Optimization
+* Data Catalog
+* Document Sharing (Slack, email...)
+* Result Sharing (Google Spreadsheet, Slack...)
+
+# Submitting an improvement
 
 Here are some example of changes:
 
 * [Pull request 842](https://github.com/cloudera/hue/pull/842)
 * [HUE-8802 [search] Deleting an index throws a js exception](https://issues.cloudera.org/browse/HUE-8802)
 
-# Submitting an improvement
+## Building
+
+Have a look at [how to build Hue](https://github.com/cloudera/hue#getting-started).
 
 ## Reviews
 
