@@ -5,17 +5,17 @@
 ![alt text](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/hue_logo.png "Hue Logo")
 
 
-Query. Explore. Repeat.
------------------------
+Query. Explore. Share.
+----------------------
 
-Hue is an open source SQL Workbench for browsing, querying and visualizing data in cloud/on-prem Data Warehouses: [gethue.com](http://gethue.com)
+Hue is an open source SQL Assistant for querying, visualizing and sharing data in Databases & Data Warehouses: [gethue.com](http://gethue.com)
 
 It features:
 
    * [Editors](http://gethue.com/sql-editor/) to query with SQL [any database](https://docs.gethue.com/latest/administrator/configuration/editor/#connectors) and submit jobs
    * [Dashboards](http://gethue.com/search-dashboards/) to dynamically interact and visualize data
    * [Scheduler](http://gethue.com/scheduling/) of jobs and workflows
-   * [Browsers](http://gethue.com/browsers/) for data and a Data Catalog
+   * [Catalog](http://gethue.com/browsers/) for browsing data storages and metadata
 
 
 ![alt text](docs/images/sql-editor.png "Hue Editor")
@@ -23,7 +23,7 @@ It features:
 
 Who is using Hue
 ----------------
-Thousands of companies and organizations use Hue to open-up their data and provide self service querying in order to make smarter decisions. Just at Cloudera, Hue is heavily used by thousand of customers executing millions of queries daily. Hue directly ships in Cloudera, Amazon, MapR, BigTop and is compatible with the other distributions.
+Thousands of companies and organizations use Hue to open-up their data and provide self service querying. Just at Cloudera, Hue is heavily used by 1000 customers executing millions of queries daily. Hue also ships in Amazon AWS and its open source version is used by hundred of companies.
 
 
 Getting Started
@@ -58,7 +58,7 @@ Read more about configurations at [``tools/kubernetes``](tools/kubernetes/).
 
 Community
 -----------
-   * Contributing [guidelines](CONTRIBUTING.md)
+   * How to [contribute](CONTRIBUTING.md)
    * Help Forum: https://discourse.gethue.com/ ([previous mailing list](http://groups.google.com/a/cloudera.org/group/hue-user))
    * High level [roadmap](docs/ROADMAP.md)
    * Jira: https://issues.cloudera.org/browse/HUE
