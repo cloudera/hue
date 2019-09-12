@@ -1,0 +1,19 @@
+{{- if .Values.monitoring.enabled -}}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    k8s-app: hue
+  name: hue
+  namespace: monitoring
+spec:
+  endpoints:
+  - interval: 30s
+    port: hue
+  namespaceSelector:
+    matchNames:
+    - default
+  selector:
+    matchLabels:
+      app: hue
+{{- end -}}

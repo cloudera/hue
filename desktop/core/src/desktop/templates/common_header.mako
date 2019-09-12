@@ -67,7 +67,7 @@ if USE_NEW_EDITOR.get():
   <meta name="twitter:card" content="summary">
   <meta property="og:site_name" content="${ _('Hue - SQL Editor') }" />
   <meta property="og:title" content="${ _('Hue - SQL Editor') }" />
-  <meta property="og:description" content="${ _('Let anybody query, write SQL, explore data and share results.') }'">
+  <meta property="og:description" content="${ _('Let anybody query, write SQL, explore data and share results.') }">
   <meta property="og:image" content="${ static('desktop/art/hue-login-logo-ellie.png') }" />
   <meta name="description" content="${ _('Let anybody query, write SQL, explore data and share results.') }">
   <meta name="keywords" content="${ _('query, sql, data warehouse, database, sharing, catalog, scheduler, optimize, dashboard') }" />
