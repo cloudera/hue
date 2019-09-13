@@ -23,7 +23,7 @@ import sessionManager from 'apps/notebook2/execution/sessionManager';
  *
  * @type {{running: string, canceling: string, canceled: string, expired: string, waiting: string, success: string, ready: string, available: string, closed: string, starting: string}}
  */
-const EXECUTION_STATUS = {
+export const EXECUTION_STATUS = {
   available: 'available',
   success: 'success',
   expired: 'expired',
@@ -40,7 +40,7 @@ const notifyUpdates = executable => {
   huePubSub.publish('hue.executable.updated', executable);
 };
 
-class ExecutableStatement {
+export class ExecutableStatement {
   /**
    * @param options
    * @param {string} options.sourceType
@@ -189,5 +189,3 @@ class ExecutableStatement {
     });
   }
 }
-
-export { EXECUTION_STATUS, ExecutableStatement };

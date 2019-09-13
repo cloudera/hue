@@ -31,6 +31,8 @@ import { NOTEBOOK_MAPPING } from 'apps/notebook2/notebook';
 import Result from 'apps/notebook2/result';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 
+import 'apps/notebook2/components/ko.snippetExecuteButtonActions';
+
 // TODO: Remove. Temporary here for debug
 window.ExecutableStatement = ExecutableStatement;
 window.Executor = Executor;
