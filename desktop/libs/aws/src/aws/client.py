@@ -166,7 +166,7 @@ class Client(object):
         aws_access_key_id=credentials.get('AccessKeyId'),
         aws_secret_access_key=credentials.get('SecretAccessKey'),
         aws_security_token=credentials.get('SessionToken'),
-        region=aws_conf.get_default_region(),
+        region=aws_conf.get_region(conf),
         host=conf.HOST.get(),
         proxy_address=conf.PROXY_ADDRESS.get(),
         proxy_port=conf.PROXY_PORT.get(),
