@@ -129,7 +129,6 @@ class ABFS(object):
     Test if a path exists
     """
     try:
-      #LOG.debug("checking existence")
       if ABFS.isroot(path):
         return True
       self.stats(path)
@@ -270,9 +269,6 @@ class ABFS(object):
     Normalizes a path
     """
     return Init_ABFS.normpath(path)
-
-  def open(self, path, option='r', *args, **kwargs):
-    return ABFSFile(self,path, option )
   
   @staticmethod
   def parent_path(path):
@@ -343,6 +339,12 @@ class ABFS(object):
     if length != 0 and length != '0':
       headers['range']= 'bytes=%s-%s' % (str(offset), str(int(offset) + int(length)))
     return self._root.get(path, headers = headers)
+  
+  def open(self, path, option='r', *args, **kwargs):
+    """
+    Returns an ABFSFile object that pretends that a file is open
+    """
+    return ABFSFile(self,path, option )
   
   # Alter Files
   # --------------------------------
