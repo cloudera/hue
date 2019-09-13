@@ -2136,7 +2136,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               path: self.outputFormat() === 'table' ? [self.databaseName(), self.tableName()] : [],
             }).done(function (catalogEntry) {
               catalogEntry.getSourceMeta({ silenceErrors: true }).done(function (sourceMeta) {
-                self.isTargetExisting((sourceMeta.databases || []).indexOf(self.databaseName()) >= 0);
+                self.isTargetExisting(self.outputFormat() === 'table' ? !sourceMeta.notFound : (sourceMeta.databases || []).indexOf(self.databaseName()) >= 0);
                 self.isTargetChecking(false);
               }).fail(function () {
                 self.isTargetExisting(false);
