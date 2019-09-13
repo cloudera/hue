@@ -127,7 +127,7 @@ INPUTFORMAT ${table["input_format_class"] | n} OUTPUTFORMAT ${table["output_form
 % if table.get("external", False):
 LOCATION '${table["path"] | n}'
 % endif
-% if table.get("skip_header", False):
-TBLPROPERTIES("skip.header.line.count" = "1")
+% if table.get("tbl_properties"):
+TBLPROPERTIES(${ ', '.join(['"' + prop + '"' + ' = ' + '"' + table.get("tbl_properties").get(prop) + '"' for prop in table.get("tbl_properties")]) | n })
 % endif
 ;

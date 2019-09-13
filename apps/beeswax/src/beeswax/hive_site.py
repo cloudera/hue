@@ -181,7 +181,7 @@ def get_use_sasl():
 
 
 def has_concurrency_support():
-  '''For SQL transactions like INSERT, DELETE, UPDATE since Hive 3.'''
+  '''For SQL transactions like INSERT, DELETE, UPDATE since Hive 3. Possibly use set -v in future to obtain properties hive.create.as.acid=true & hive.create.as.insert.only=true'''
   return get_conf().get(_CNF_HIVE_SUPPORT_CONCURRENCY, 'TRUE').upper() == 'TRUE'
 
 

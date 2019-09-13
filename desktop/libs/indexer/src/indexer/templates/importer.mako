@@ -20,6 +20,8 @@
   from desktop import conf
   from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
   from filebrowser.conf import SHOW_UPLOAD_BUTTON
+  from beeswax import hive_site
+  from impala import impala_flags
   from notebook.conf import ENABLE_SQL_INDEXER
 
   from indexer.conf import ENABLE_NEW_INDEXER, ENABLE_SQOOP, ENABLE_KAFKA, CONFIG_INDEXER_LIBS_PATH, ENABLE_SCALABLE_INDEXER, ENABLE_ALTUS, ENABLE_ENVELOPE, ENABLE_FIELD_EDITOR
@@ -626,6 +628,14 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               <div class="control-group">
                 <label class="checkbox inline-block" data-bind="visible: tableFormat() != 'kudu'">
                   <input type="checkbox" data-bind="checked: useDefaultLocation"> ${_('Store in Default location')}
+                </label>
+              </div>
+              <div class="control-group" data-bind="visible: isTransactionalVisible">
+                <label class="checkbox inline-block">
+                  <input type="checkbox" data-bind="checked: isTransactional"> ${_('Transactional table')}
+                </label>
+                <label class="checkbox inline-block" title="${_('Full transactional support available in Hive with ORC')}">
+                  <input type="checkbox" data-bind="checked: isInsertOnly, enable: isTransactionalUpdateEnabled"> ${_('Insert only')}
                 </label>
               </div>
 
@@ -2396,11 +2406,21 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       self.tableFormats = ko.pureComputed(function() {
         if (wizard.source.inputFormat() === 'kafka') {
           return [{'value': 'kudu', 'name': 'Kudu'}];
+        } else if (vm.sourceType == 'impala') { // Impala supports Kudu
+          return [
+            {'value': 'text', 'name': 'Text'},
+            {'value': 'parquet', 'name': 'Parquet'},
+            {'value': 'kudu', 'name': 'Kudu'},
+            {'value': 'csv', 'name': 'Csv'},
+            {'value': 'avro', 'name': 'Avro'},
+            {'value': 'json', 'name': 'Json'},
+            {'value': 'regexp', 'name': 'Regexp'},
+            {'value': 'orc', 'name': 'ORC'},
+          ];
         }
         return [
           {'value': 'text', 'name': 'Text'},
           {'value': 'parquet', 'name': 'Parquet'},
-          {'value': 'kudu', 'name': 'Kudu'},
           {'value': 'csv', 'name': 'Csv'},
           {'value': 'avro', 'name': 'Avro'},
           {'value': 'json', 'name': 'Json'},
@@ -2427,6 +2447,21 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       self.importData = ko.observable(true);
       self.useDefaultLocation = ko.observable(true);
       self.nonDefaultLocation = ko.observable('');
+
+      var isTransactionalVisibleImpala = '${ impala_flags.is_transactional() }'.toLowerCase() == 'true';
+      var isTransactionalVisibleHive = '${ hive_site.has_concurrency_support() }'.toLowerCase() == 'true';
+      var transactionalDefaultType = '${ impala_flags.default_transactional_type() }'.toLowerCase();
+
+      self.isTransactionalVisible = ko.observable((vm.sourceType == 'impala' && isTransactionalVisibleImpala) || (vm.sourceType == 'hive' && isTransactionalVisibleHive));
+      self.isTransactional = ko.observable(self.isTransactionalVisible());
+      self.isInsertOnly = ko.observable(true); // Impala doesn't have yet full support.
+      self.isTransactionalUpdateEnabled = ko.pureComputed(function() {
+        var enabled = self.tableFormat() == 'orc' && (vm.sourceType == 'hive' || (vm.sourceType == 'impala' && transactionalDefaultType.length && transactionalDefaultType != 'insert_only'));
+        if (!enabled) {
+          self.isInsertOnly(true);
+        }
+        return enabled;
+      });
 
       self.hasHeader = ko.observable(false);
 
