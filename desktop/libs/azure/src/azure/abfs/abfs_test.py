@@ -30,6 +30,7 @@ from nose.tools import assert_true, assert_false, assert_equal
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group, add_permission, remove_from_group
 
+from azure.abfs.__init__ import abfspath
 from azure.abfs.abfs import ABFS
 from azure.active_directory import ActiveDirectory
 from azure.conf import ABFS_CLUSTERS,AZURE_ACCOUNTS, is_abfs_enabled
@@ -75,6 +76,10 @@ class ABFSTestBase(unittest.TestCase):
     assert_true(directory is not None, directory)
     
     directory = self.client.listdir(self.test_fs)
+    LOG.debug("%s" % directory)
+    assert_true(directory is not None, directory)
+    
+    directory = self.client.listdir(abfspath(self.test_fs))
     LOG.debug("%s" % directory)
     assert_true(directory is not None, directory)
     
@@ -171,8 +176,10 @@ class ABFSTestBase(unittest.TestCase):
     test_fs = self.test_fs
     test_dir = test_fs + '/test'
     test_dir2 = test_fs + '/test2'
+    test_dir3 = test_fs + '/test 3'
     test_file = test_fs + '/test.txt'
     test_file2 = test_fs + '/test2.txt'
+    test_file3 = test_fs + '/test 3.txt'
     
     self.client.mkdir(test_dir)
     assert_true(self.client.exists(test_dir))
@@ -189,6 +196,15 @@ class ABFSTestBase(unittest.TestCase):
     self.client.rename(test_file, test_file2)
     assert_false(self.client.exists(test_file))
     assert_true(self.client.exists(test_file2))
+    
+    self.client.rename(test_dir2, test_dir3)
+    assert_false(self.client.exists(test_dir2))
+    assert_true(self.client.exists(test_dir3))
+    
+    self.client.rename(test_dir3, test_dir2)
+    assert_false(self.client.exists(test_dir3))
+    assert_true(self.client.exists(test_dir2))
+    
     
   def test_chmod(self):
     test_dir = self.test_fs + '/test_chmod'

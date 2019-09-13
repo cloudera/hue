@@ -1115,7 +1115,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         return self.isHdfs();
       });
       self.isPermissionEnabled = ko.pureComputed(function () {
-        return !self.isS3() && !self.isABFS();
+        return !self.isS3() && !self.isABFSRoot();
       });
       self.isReplicationEnabled = ko.pureComputed(function () {
         return self.isHdfs();
