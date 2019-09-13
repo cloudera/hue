@@ -22,7 +22,7 @@ from mock import patch, Mock
 from nose.tools import assert_equal, assert_true, assert_not_equal
 
 from aws import conf
-from aws.client import clear_cache, get_client, get_credential_provider, current_ms_from_utc
+from aws.client import clear_cache, Client, get_client, get_credential_provider, current_ms_from_utc
 
 LOG = logging.getLogger(__name__)
 
@@ -69,6 +69,27 @@ class TestAWS(unittest.TestCase):
             client5 = get_client('default', 'test')
             assert_equal(client3, client4) # Test that with 10 sec expiration, clients equal
             assert_not_equal(client4, client5) # Test different user have different clients
+    finally:
+      finish()
+      clear_cache()
+
+  def test_with_idbroker_and_config(self):
+    try:
+      finish = conf.AWS_ACCOUNTS.set_for_testing({'default': {'region': 'ap-northeast-1'}})
+      with patch('aws.client.conf_idbroker.get_conf') as get_conf:
+        with patch('aws.client.Client.get_s3_connection'):
+          with patch('aws.client.IDBroker.get_cab') as get_cab:
+            get_conf.return_value = {
+              'fs.s3a.ext.cab.address': 'address'
+            }
+            get_cab.return_value = {
+              'Credentials': {'AccessKeyId': 'AccessKeyId', 'Expiration': 0}
+            }
+            provider = get_credential_provider()
+            assert_equal(provider.get_credentials().get('AccessKeyId'), 'AccessKeyId')
+
+            client = Client.from_config(conf.AWS_ACCOUNTS['default'], get_credential_provider('default', 'hue'))
+            assert_equal(client._region, 'ap-northeast-1')
     finally:
       finish()
       clear_cache()

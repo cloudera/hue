@@ -82,20 +82,24 @@ def get_default_session_token():
 
 
 def get_default_region():
+  return get_region(AWS_ACCOUNTS['default']) if 'default' in AWS_ACCOUNTS else ''
+
+
+def get_region(conf):
   region = ''
 
-  if 'default' in AWS_ACCOUNTS:
+  if conf:
     # First check the host/endpoint configuration
-    if AWS_ACCOUNTS['default'].HOST.get():
-      endpoint = AWS_ACCOUNTS['default'].HOST.get()
+    if conf.HOST.get():
+      endpoint = conf.HOST.get()
       if re.search(SUBDOMAIN_ENDPOINT_RE, endpoint, re.IGNORECASE):
         region = re.search(SUBDOMAIN_ENDPOINT_RE, endpoint, re.IGNORECASE).group('region')
       elif re.search(HYPHEN_ENDPOINT_RE, endpoint, re.IGNORECASE):
         region = re.search(HYPHEN_ENDPOINT_RE, endpoint, re.IGNORECASE).group('region')
       elif re.search(DUALSTACK_ENDPOINT_RE, endpoint, re.IGNORECASE):
         region = re.search(DUALSTACK_ENDPOINT_RE, endpoint, re.IGNORECASE).group('region')
-    elif AWS_ACCOUNTS['default'].REGION.get():
-      region = AWS_ACCOUNTS['default'].REGION.get()
+    elif conf.REGION.get():
+      region = conf.REGION.get()
 
     # If the parsed out region is not in the list of supported regions, fallback to the default
     if region not in get_locations():
@@ -103,6 +107,7 @@ def get_default_region():
       region = ''
 
   return region
+
 
 def get_key_expiry():
   if 'default' in AWS_ACCOUNTS:
