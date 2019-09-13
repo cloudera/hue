@@ -1794,12 +1794,14 @@ class ClusterConfig(object):
       })
 
     if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('abfs', self.user):
+      from azure.abfs.__init__ import get_home_dir_for_ABFS
+      
       interpreters.append({
         'type': 'abfs',
         'displayName': _('ABFS'),
         'buttonName': _('Browse'),
         'tooltip': _('ABFS'),
-        'page': '/filebrowser/view=' + urllib_quote('abfs://'.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
+        'page': '/filebrowser/view=' + urllib_quote(get_home_dir_for_ABFS().encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
       })
 
     if 'metastore' in self.apps:

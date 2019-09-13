@@ -16,15 +16,17 @@
 from __future__ import absolute_import
 
 import stat
+import logging
 
 from azure.abfs.__init__ import strip_path, abfsdatetime_to_timestamp
 from django.utils.encoding import smart_str
 
-class ABFSStat(object):
-  DIR_MODE = 0o777 | stat.S_IFDIR
-  FILE_MODE = 0o666 | stat.S_IFREG
+LOG = logging.getLogger(__name__)
+CHAR_TO_OCT = {"---": 0, "--x" : 1, "-w-": 2, "-wx": 3, "r--" : 4, "r-x" : 5, "rw-" : 6,"rwx": 7}
 
-  def __init__(self, isDir, atime, mtime, size, path, owner = '', group = ''):
+class ABFSStat(object):
+
+  def __init__(self, isDir, atime, mtime, size, path, owner = '', group = '', mode = None):
     self.name = strip_path(path)
     self.path = path
     self.isDir = isDir
@@ -38,6 +40,11 @@ class ABFSStat(object):
     self.size = size
     self.user = owner
     self.group = group
+    self.mode = mode or (0o777 if isDir else 0o666)
+    if self.isDir:
+      self.mode |= stat.S_IFDIR
+    else:
+      self.mode |= stat.S_IFREG
     
   def __getitem__(self, key):
     try:
@@ -51,10 +58,6 @@ class ABFSStat(object):
     
   def __repr__(self):
     return smart_str("<abfsStat %s>" % (self.path,))
-    
-  @property
-  def mode(self):
-    return ABFSStat.DIR_MODE if self.isDir else ABFSStat.FILE_MODE
   
   @property
   def aclBit(self):
@@ -78,17 +81,33 @@ class ABFSStat(object):
       isDir = resp['isDirectory'] == 'true'
     except:
       isDir = False
-    return cls(isDir, headers['date'], resp['lastModified'], size, path, resp['owner'], resp['group'])
+    try:
+      permissions = ABFSStat.char_permissions_to_oct_permissions(resp['permissions'])
+    except:
+      permissions = None
+    return cls(isDir, headers['date'], resp['lastModified'], size, path, resp['owner'], resp['group'], mode = permissions)
   
   @classmethod
   def for_single(cls,resp, path):
     size = int(resp['Content-Length'])
     isDir = resp['x-ms-resource-type'] == 'directory'
-    return cls(isDir, resp['date'],resp['Last-Modified'], size, path, resp['x-ms-owner'], resp['x-ms-group'])
+    try:
+      permissions = ABFSStat.char_permissions_to_oct_permissions(resp['x-ms-permissions'])
+    except:
+      permissions = None
+    return cls(isDir, resp['date'],resp['Last-Modified'], size, path, resp['x-ms-owner'], resp['x-ms-group'], mode = permissions)
   
   @classmethod
   def for_filesystem(cls, resp, path):
     return cls(True, resp['date'], resp['Last-Modified'], 0, path)
+  
+  @staticmethod
+  def char_permissions_to_oct_permissions(permissions):
+    try:
+      octal_permissions = CHAR_TO_OCT[permissions[0:3]] * 64 + CHAR_TO_OCT[permissions[3:6]] * 8 + CHAR_TO_OCT[permissions[6:]]
+    except:
+      return None
+    return octal_permissions
     
   def to_json_dict(self):
     """

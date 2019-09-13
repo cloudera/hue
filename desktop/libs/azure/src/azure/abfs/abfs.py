@@ -29,6 +29,7 @@ import re
 from math import ceil
 from posixpath import join
 from urllib.parse import urlparse
+from urllib import quote
 
 from hadoop.hdfs_site import get_umask_mode
 from hadoop.fs.exceptions import WebHdfsException
@@ -128,7 +129,6 @@ class ABFS(object):
     Test if a path exists
     """
     try:
-      #LOG.debug("checking existence")
       if ABFS.isroot(path):
         return True
       self.stats(path)
@@ -136,6 +136,8 @@ class ABFS(object):
       if e.code == 404:
         return False
       raise WebHdfsException
+    except IOError:
+      return False
     return True
 
   def stats(self, path, params=None, **kwargs):
@@ -145,7 +147,10 @@ class ABFS(object):
     """
     if ABFS.isroot(path):
       return ABFSStat.for_root(path)
-    file_system, dir_name = Init_ABFS.parse_uri(path)[:2]
+    try:
+      file_system, dir_name = Init_ABFS.parse_uri(path)[:2]
+    except:
+      raise IOError
     if dir_name == '':
       LOG.debug("Path being called is a Filesystem")
       return ABFSStat.for_filesystem(self._statsf(file_system, params, **kwargs), path)
@@ -160,7 +165,7 @@ class ABFS(object):
       LOG.warn("Path: %s is a Filesystem" % path)
       return self.listfilesystems_stats(params=None, **kwargs)
     dir_stats = []
-    file_system, directory_name = Init_ABFS.parse_uri(path)[:2]
+    file_system, directory_name, account = Init_ABFS.parse_uri(path)
     root = Init_ABFS.ABFS_ROOT
     if path.lower().startswith(Init_ABFS.ABFS_ROOT_S):
       root = Init_ABFS.ABFS_ROOT_S
@@ -173,6 +178,8 @@ class ABFS(object):
       params['directory'] = directory_name
     res = self._root._invoke("GET", file_system, params, headers=self._getheaders(), **kwargs)
     resp = self._root._format_response(res)
+    if account != '':
+      file_system = file_system + account
     for x in resp['paths']:
       dir_stats.append(ABFSStat.for_directory(res.headers, x, root + file_system + "/" + x['name']))
     return dir_stats
@@ -233,6 +240,12 @@ class ABFS(object):
     listofFileSystems = self.listfilesystems_stats(root = root, params = params)
     return [x.name for x in listofFileSystems]
   
+  @staticmethod
+  def get_home_dir():
+    """
+    Attempts to go to the directory set by the user in the configuration file. If not defaults to abfs:// 
+    """
+    return Init_ABFS.get_home_dir_for_ABFS()
   # Find or alter information about the URI path
   # --------------------------------
   @staticmethod
@@ -256,9 +269,6 @@ class ABFS(object):
     Normalizes a path
     """
     return Init_ABFS.normpath(path)
-
-  def open(self, path, option='r', *args, **kwargs):
-    return ABFSFile(self,path, option )
   
   @staticmethod
   def parent_path(path):
@@ -329,6 +339,12 @@ class ABFS(object):
     if length != 0 and length != '0':
       headers['range']= 'bytes=%s-%s' % (str(offset), str(int(offset) + int(length)))
     return self._root.get(path, headers = headers)
+  
+  def open(self, path, option='r', *args, **kwargs):
+    """
+    Returns an ABFSFile object that pretends that a file is open
+    """
+    return ABFSFile(self,path, option )
   
   # Alter Files
   # --------------------------------
@@ -428,11 +444,14 @@ class ABFS(object):
   
   def chmod(self, path, permissionNumber = None, *args, **kwargs):
     """
-    Set File Permissions (not implemented)
+    Set File Permissions (passing as an int converts said integer to octal. Passing as a string assumes the string is in octal)
     """
     header = {}
     if permissionNumber is not None:
-      header['x-ms-permissions'] = str(permissionNumber)
+      if isinstance(permissionNumber, basestring):
+        header['x-ms-permissions'] = str(permissionNumber)
+      else:
+        header['x-ms-permissions'] = oct(permissionNumber)
     self.setAccessControl(path, headers=header)
   
   def setAccessControl(self, path, headers, **kwargs):
@@ -490,7 +509,7 @@ class ABFS(object):
     Renames a file
     """ 
     LOG.debug("%s\n%s" % (old, new))
-    headers = {'x-ms-rename-source' : '/' + Init_ABFS.strip_scheme(old) }
+    headers = {'x-ms-rename-source' : '/' + quote(Init_ABFS.strip_scheme(old)) }
     try:
       self._create_path(new, headers=headers, overwrite=True)
     except WebHdfsException as e:
