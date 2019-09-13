@@ -861,10 +861,6 @@
         <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode(), 'editor-mode': $root.editorMode(), 'active-editor': inFocus, 'snippet-text' : type() == 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
           <div style="position: relative;">
             <div class="snippet-row" style="position: relative;">
-              <div class="snippet-left-bar">
-                <!-- ko template: { if: ! $root.editorMode() && ! $root.isPresentationMode() && ! $root.isResultFullScreenMode(), name: 'notebook-snippet-type-controls${ suffix }' } --><!-- /ko -->
-                <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1 && ! $root.isResultFullScreenMode(), name: 'snippet-execution-controls${ suffix }' } --><!-- /ko -->
-              </div>
               <div class="snippet-body" data-bind="clickForAceFocus: ace, visible: ! $root.isResultFullScreenMode()">
                 <h5 class="card-heading-print" data-bind="text: name, css: {'visible': name() != ''}"></h5>
 
@@ -883,6 +879,10 @@
             </div>
             <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status${ suffix }' } --><!-- /ko -->
             <!-- ko template: { if: $root.editorMode() && ! $root.isResultFullScreenMode() && ['jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce', 'py'].indexOf(type()) == -1, name: 'snippet-code-resizer${ suffix }' } --><!-- /ko -->
+            <div class="snippet-footer-actions">
+              <!-- ko template: { if: ! $root.editorMode() && ! $root.isPresentationMode() && ! $root.isResultFullScreenMode(), name: 'notebook-snippet-type-controls${ suffix }' } --><!-- /ko -->
+              <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1 && ! $root.isResultFullScreenMode(), name: 'snippet-execution-controls${ suffix }' } --><!-- /ko -->
+            </div>
             <!-- ko if: !$root.isResultFullScreenMode() -->
             <!-- ko template: 'snippet-log${ suffix }' --><!-- /ko -->
             <!-- /ko -->
@@ -1655,62 +1655,73 @@
   </script>
 
   <script type ="text/html" id="snippet-execution-controls${ suffix }">
-    <div class="snippet-actions" style="position: absolute; bottom: 0">
-      <!-- ko if: status() == 'loading' -->
-      <a class="snippet-side-btn blue" style="cursor: default;" title="${ _('Creating session') }">
-        <i class="fa fa-fw fa-spinner fa-spin"></i>
-      </a>
-      <!-- /ko -->
-      <a class="snippet-side-btn" data-bind="click: reexecute, visible: $root.editorMode() && result.statements_count() > 1, css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': ! isReady() }" title="${ _('Restart from the first statement') }">
-        <i class="fa fa-fw fa-repeat snippet-side-single"></i>
-      </a>
-      <div class="label label-info" data-bind="attr: {'title':'${ _ko('Showing results of the statement #')}' + (result.statement_id() + 1)}, visible: $root.editorMode() && result.statements_count() > 1">
-        <div class="pull-left" data-bind="text: (result.statement_id() + 1)"></div><div class="pull-left">/</div><div class="pull-left" data-bind="text: result.statements_count()"></div>
-      </div>
-      <!-- ko if: !isCanceling() -->
-      <a class="snippet-side-btn red" data-bind="click: cancel, visible: status() == 'running' || status() == 'starting'" title="${ _('Cancel operation') }">
-        <i class="fa fa-fw fa-stop snippet-side-single"></i>
-      </a>
-      <!-- /ko -->
-      <!-- ko if: isCanceling() -->
-      <a class="snippet-side-btn" style="cursor: default;" title="${ _('Canceling operation...') }">
-        <i class="fa fa-fw fa-spinner snippet-side-single fa-spin"></i>
-      </a>
-      <!-- /ko -->
-      <div class="inactive-action dropdown hover-actions pointer" data-bind="css: {'disabled': ! isReady() || status() === 'running' || status() === 'loading' }">
-        <!-- ko if: isBatchable() && wasBatchExecuted() -->
-        <a class="snippet-side-btn" style="padding-right:0; padding-left: 2px" href="javascript: void(0)" title="${ _('Submit all the queries as a background batch job.') }" data-bind="click: function() { wasBatchExecuted(true); execute(); }, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': ! isReady() }">
-          <i class="fa fa-fw fa-send"></i>
-        </a>
+    <div class="snippet-actions">
+      <!-- ko component: { name: 'snippet-execute-actions', params: { snippet: $data } } --><!-- /ko -->
+
+      <div class="pull-right">
+        <!-- ko if: status() === 'loading' -->
+        <i class="fa fa-fw fa-spinner fa-spin"></i> ${ _('Creating session') }
         <!-- /ko -->
-        <!-- ko if: ! isBatchable() || ! wasBatchExecuted() -->
-        <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="attr: {'title': $root.editorMode() && result.statements_count() > 1 ? '${ _ko('Execute next statement')}' : '${ _ko('Execute or CTRL + ENTER') }'}, click: function() { wasBatchExecuted(false); execute(); }, visible: status() != 'running' && status() != 'loading' && status() != 'starting', css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': ! isReady() }, style: {'padding-left': $parent.isBatchable() ? '2px' : '0' }">
-          <i class="fa fa-fw fa-play" data-bind="css: { 'snippet-side-single' : ! $parent.isBatchable() }"></i>
-        </a>
+        <!-- ko if: status() !== 'loading' && $root.editorMode() && result.statements_count() > 1 -->
+        ${ _('Statement ')} <span data-bind="text: (result.statement_id() + 1) + '/' + result.statements_count()"></span>
+        <div style="display: inline-block"
+             class="label label-info"
+             data-bind="attr: {
+             'title':'${ _ko('Showing results of the statement #')}' + (result.statement_id() + 1)}">
+          <div class="pull-left" data-bind="text: (result.statement_id() + 1)"></div><div class="pull-left">/</div><div class="pull-left" data-bind="text: result.statements_count()"></div>
+        </div>
+
         <!-- /ko -->
-        % if ENABLE_BATCH_EXECUTE.get():
-          <!-- ko if: isBatchable() && status() != 'running' && status() != 'loading' && ! $root.isPresentationMode() -->
-          <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown" href="javascript: void(0)" data-bind="css: {'disabled': ! isReady(), 'blue': currentQueryTab() == 'queryExplain' }">
-            <i class="fa fa-caret-down"></i>
-          </a>
-          <ul class="dropdown-menu less-padding">
-            <li>
-              <a href="javascript:void(0)" data-bind="click: function() { wasBatchExecuted(false); $('.dropdown-toggle').dropdown('toggle'); execute(); }, style: { color: ! isReady() || status() === 'running' || status() === 'loading' ? '#999' : ''}, css: {'disabled': ! isReady() || status() === 'running' || status() === 'loading' }" title="${ _('Execute interactively the current statement') }">
-                <i class="fa fa-fw fa-play"></i> ${_('Execute')}
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0)" data-bind="click: function() { wasBatchExecuted(true); $('.dropdown-toggle').dropdown('toggle'); execute(); }, css: {'disabled': ! isReady() }" title="${ _('Submit all the queries as a background batch job.') }">
-                <i class="fa fa-fw fa-send"></i> ${_('Batch')}
-              </a>
-            </li>
-          </ul>
-          <!-- /ko -->
-        % endif
       </div>
 
+##       TODO: Move to snippet execution-actions
+##       <a class="snippet-side-btn" data-bind="click: reexecute, visible: $root.editorMode() && result.statements_count() > 1, css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': ! isReady() }" title="${ _('Restart from the first statement') }">
+##         <i class="fa fa-fw fa-repeat snippet-side-single"></i>
+##       </a>
+##       <!-- ko if: !isCanceling() -->
+##       <a class="snippet-side-btn red" data-bind="click: cancel, visible: status() == 'running' || status() == 'starting'" title="${ _('Cancel operation') }">
+##         <i class="fa fa-fw fa-stop snippet-side-single"></i>
+##       </a>
+##       <!-- /ko -->
+##       <!-- ko if: isCanceling() -->
+##       <a class="snippet-side-btn" style="cursor: default;" title="${ _('Canceling operation...') }">
+##         <i class="fa fa-fw fa-spinner snippet-side-single fa-spin"></i>
+##       </a>
+##       <!-- /ko -->
+##       <div style="display: inline-block" class="inactive-action dropdown hover-actions pointer" data-bind="css: {'disabled': ! isReady() || status() === 'running' || status() === 'loading' }">
+##         <!-- ko if: isBatchable() && wasBatchExecuted() -->
+##         <a class="snippet-side-btn" style="padding-right:0; padding-left: 2px" href="javascript: void(0)" title="${ _('Submit all the queries as a background batch job.') }" data-bind="click: function() { wasBatchExecuted(true); execute(); }, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': ! isReady() }">
+##           <i class="fa fa-fw fa-send"></i>
+##         </a>
+##         <!-- /ko -->
+##         <!-- ko if: ! isBatchable() || ! wasBatchExecuted() -->
+##         <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="attr: {'title': $root.editorMode() && result.statements_count() > 1 ? '${ _ko('Execute next statement')}' : '${ _ko('Execute or CTRL + ENTER') }'}, click: function() { wasBatchExecuted(false); execute(); }, visible: status() != 'running' && status() != 'loading' && status() != 'starting', css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': ! isReady() }, style: {'padding-left': $parent.isBatchable() ? '2px' : '0' }">
+##           <i class="fa fa-fw fa-play" data-bind="css: { 'snippet-side-single' : ! $parent.isBatchable() }"></i>
+##         </a>
+##         <!-- /ko -->
+##         % if ENABLE_BATCH_EXECUTE.get():
+##           <!-- ko if: isBatchable() && status() != 'running' && status() != 'loading' && ! $root.isPresentationMode() -->
+##           <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown" href="javascript: void(0)" data-bind="css: {'disabled': ! isReady(), 'blue': currentQueryTab() == 'queryExplain' }">
+##             <i class="fa fa-caret-down"></i>
+##           </a>
+##           <ul class="dropdown-menu less-padding">
+##             <li>
+##               <a href="javascript:void(0)" data-bind="click: function() { wasBatchExecuted(false); $('.dropdown-toggle').dropdown('toggle'); execute(); }, style: { color: ! isReady() || status() === 'running' || status() === 'loading' ? '#999' : ''}, css: {'disabled': ! isReady() || status() === 'running' || status() === 'loading' }" title="${ _('Execute interactively the current statement') }">
+##                 <i class="fa fa-fw fa-play"></i> ${_('Execute')}
+##               </a>
+##             </li>
+##             <li>
+##               <a href="javascript:void(0)" data-bind="click: function() { wasBatchExecuted(true); $('.dropdown-toggle').dropdown('toggle'); execute(); }, css: {'disabled': ! isReady() }" title="${ _('Submit all the queries as a background batch job.') }">
+##                 <i class="fa fa-fw fa-send"></i> ${_('Batch')}
+##               </a>
+##             </li>
+##           </ul>
+##           <!-- /ko -->
+##         % endif
+##       </div>
+
       <!-- ko if: isSqlDialect && ! $root.isPresentationMode() -->
-      <div class="inactive-action dropdown hover-actions pointer" data-bind="css: {'disabled': ! isReady() || status() === 'running' || status() === 'loading' }">
+      <div style="display: inline-block" class="inactive-action dropdown hover-actions pointer" data-bind="css: {'disabled': ! isReady() || status() === 'running' || status() === 'loading' }">
         <a class="snippet-side-btn" style="padding-right:0; padding-left: 2px;" href="javascript: void(0)" data-bind="click: explain, css: {'disabled': ! isReady() || status() === 'running' || status() === 'loading', 'blue': currentQueryTab() == 'queryExplain' }" title="${ _('Explain the current SQL query') }">
           <i class="fa fa-fw fa-map-o"></i>
         </a>

@@ -244,9 +244,11 @@ huePubSub.subscribe('app.dom.loaded', app => {
                   marginTop: margin
                 });
               }
-              snippetEl.find('.snippet-actions').css({
-                marginTop: margin + 25
-              });
+              if (!window.ENABLE_NOTEBOOK_2) {
+                snippetEl.find('.snippet-actions').css({
+                  marginTop: margin + 25
+                });
+              }
             }, 100);
           }
         }
