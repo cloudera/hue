@@ -24,10 +24,8 @@ from desktop.views import _ko
 
 <%def name="docBrowser(is_embeddable=False)">
 
-  <script src="${ static('desktop/ext/js/bootstrap-fileupload.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
   <link href="${ static('desktop/css/home.css') }" rel="stylesheet">
-  <link href="${ static('desktop/ext/css/bootstrap-fileupload.css') }" rel="stylesheet">
 
   <script type="text/html" id="doc-browser-template">
     <div class="doc-browser-drag-helper">
@@ -104,93 +102,6 @@ from desktop.views import _ko
       </div>
       <!-- /ko -->
       <!-- /ko -->
-      <!-- /ko -->
-    </div>
-
-    <div id="importDocumentsModal" data-keyboard="true" class="modal hide fade fileupload-modal" tabindex="-1">
-      <!-- ko with: activeEntry -->
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-        <h2 class="modal-title">${_('Import Hue documents')}</h2>
-      </div>
-        <form id="importDocumentsForm" class="form-horizontal" style="display: inline" enctype="multipart/form-data">
-          <div class="modal-body">
-            <div data-bind="visible: uploading() || uploadComplete()">
-              <span data-bind="visible: uploading()">${ _('Importing...') }</span>
-              <span data-bind="visible: !uploadFailed() && uploadComplete()">${ _('Import complete!') }</span>
-              <span data-bind="visible: uploadFailed">${ _('Import failed!') }</span>
-              <progress data-bind="visible: uploading() || uploadComplete()" id="importDocumentsProgress" value="0" max="100" style="width: 560px;"></progress>
-            </div>
-            <div class="pull-right">
-              <!-- ko ifnot: uploading() || uploadComplete() -->
-              <input type="button" class="btn" data-clear="fileupload" data-bind="click: closeUploadModal" value="${ _('Cancel') }" />
-              <input type="submit" class="btn btn-danger" data-clear="fileupload" data-bind="enable: importEnabled, click: upload" value="${ _('Import') }" />
-              <!-- /ko -->
-              <!-- ko if: uploading() || uploadComplete() -->
-              <input type="button" class="btn" data-clear="fileupload" data-bind="click: closeUploadModal" value="${ _('Close') }" />
-              <!-- /ko -->
-            </div>
-
-            <div class="fileupload fileupload-new" data-provides="fileupload" data-bind="visible: !uploading() && !uploadComplete()">
-              <span class="btn btn-file">
-                <span class="fileupload-new">${ _('Select json file') }</span>
-                <span class="fileupload-exists">${ _('Change') }</span>
-                <input id="importDocumentInput" type="file" name="documents" accept=".json" data-bind="value: selectedImportFile" />
-              </span>
-              &nbsp;&nbsp;<span class="fileupload-preview"></span>
-              <a href="#" class="fileupload-exists" data-clear="fileupload"><i class="fa fa-times"></i></a>
-            </div>
-            ${ csrf_token(request) | n,unicode }
-            <input type="hidden" name="path" data-bind="value: definition().path" />
-          </div>
-        </form>
-      <!-- /ko -->
-    </div>
-
-    <div id="importDocumentData" data-keyboard="true" class="modal hide fade" tabindex="-1">
-      <!-- ko with: activeEntry -->
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-        <h2 class="modal-title">${_('Import Hue documents')}</h2>
-      </div>
-      <div class="modal-body">
-        <div class="center" style="display: none;" data-bind="visible: importedDocumentCount() == 0">
-          <i class="fa fa-spinner fa-spin fa-2x"></i>
-        </div>
-        <!-- ko if: importedDocumentCount() > 0 -->
-          <ul>
-            <li> ${_('Imported: ')} <span data-bind="text: importedDocSummary()['count']"></span></li>
-            <li> ${_('Created: ')} <span data-bind="text: importedDocSummary()['created_count']"></span></li>
-            <li> ${_('Updated: ')} <span data-bind="text: importedDocSummary()['updated_count']"></span></li>
-          </ul>
-
-          <!-- ko ifnot: showTable() -->
-          <a href="javascript:void(0)" class="margin-left-10 margin-top-10" data-bind="click: toggleShowTable">${_('Show Details')} <i class="fa fa-caret-down"></i></a>
-          <!-- /ko -->
-          <!-- ko if: showTable() -->
-          <a href="javascript:void(0)" class="margin-left-10 margin-top-10" data-bind="click: toggleShowTable">${_('Hide Details')} <i class="fa fa-caret-up"></i></a>
-            <table class="table table-condensed">
-              <thead>
-                <tr>
-                  <th>${_('Name')}</th>
-                  <th>${_('Type')}</th>
-                  <th>${_('Owner')}</th>
-                </tr>
-              </thead>
-              <tbody data-bind="foreach: importedDocSummary()['documents']">
-                <tr>
-                  <td data-bind="text: $data.name"> </td>
-                  <td data-bind="text: $data.type"> </td>
-                  <td data-bind="text: $data.owner"> </td>
-                </tr>
-              </tbody>
-            </table>
-          <!-- /ko -->
-        <!-- /ko -->
-      </div>
-      <div class="modal-footer">
-        <input data-dismiss="modal" type="button" class="btn" value="${ _('Close') }" data-bind="click: closeUploadModal"/>
-      </div>
       <!-- /ko -->
     </div>
 
