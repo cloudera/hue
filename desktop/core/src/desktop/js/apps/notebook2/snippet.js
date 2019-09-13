@@ -203,6 +203,8 @@ class Snippet {
 
     self.errors = ko.observableArray([]);
 
+    self.executor = ko.observable();
+
     self.aceErrorsHolder = ko.observableArray([]);
     self.aceWarningsHolder = ko.observableArray([]);
 
@@ -1115,12 +1117,10 @@ class Snippet {
       timeout: self.parentVm.autocompleteTimeout
     });
 
-    self.executor = undefined;
-
     huePubSub.subscribe('hue.executor.updated', details => {
       const executable = details.executable;
 
-      if (details.executor === self.executor) {
+      if (details.executor === self.executor()) {
         self.status(executable.status);
         self.progress(executable.progress);
       }
@@ -1339,7 +1339,7 @@ class Snippet {
     });
   }
 
-  execute(automaticallyTriggered) {
+  async execute(automaticallyTriggered) {
     hueAnalytics.log('notebook', 'execute/' + this.type());
 
     const now = new Date().getTime();
@@ -1381,28 +1381,35 @@ class Snippet {
 
     this.currentQueryTab('queryHistory');
 
-    if (this.executor && this.executor.isRunning()) {
-      this.executor.cancel();
+    if (this.executor() && this.executor().isRunning()) {
+      this.executor().cancel();
     }
 
-    this.executor = new Executor({
-      compute: this.compute(),
-      database: this.database(),
-      sourceType: this.type(),
-      namespace: this.namespace(),
-      statement: this.statement(),
-      isSqlEngine: this.isSqlDialect()
-    });
+    this.executor(
+      new Executor({
+        compute: this.compute(),
+        database: this.database(),
+        sourceType: this.type(),
+        namespace: this.namespace(),
+        statement: this.statement(),
+        isSqlEngine: this.isSqlDialect()
+      })
+    );
 
-    this.executor.executeNext().then(executionResult => {
+    try {
+      const result = await this.executor().executeNext();
+
       this.stopLongOperationTimeout();
       this.result.clear();
-      this.result.update(executionResult).then(() => {
-        if (this.result.data().length) {
-          this.currentQueryTab('queryResults');
-        }
-      });
-    });
+
+      await this.result.update(result);
+
+      if (this.result.data().length) {
+        this.currentQueryTab('queryResults');
+      }
+    } catch (error) {
+      this.stopLongOperationTimeout();
+    }
   }
 
   explain() {
