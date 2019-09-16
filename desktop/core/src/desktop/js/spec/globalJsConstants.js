@@ -14,6 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Ensure singletons
+import 'apps/notebook2/execution/sessionManager';
+
 const globalVars = {
   LOGGED_USERNAME: 'foo',
   CACHEABLE_TTL: 1,
