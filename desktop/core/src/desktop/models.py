@@ -41,19 +41,18 @@ from django.urls import reverse, NoReverseMatch
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from dashboard.conf import get_engines, HAS_REPORT_ENABLED
-from desktop.settings import HUE_DESKTOP_VERSION
 from kafka.conf import has_kafka
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
-from settings import HUE_DESKTOP_VERSION
 
 from desktop import appmanager
 from desktop.auth.backend import is_admin
+from desktop.conf import ENABLE_ORGANIZATIONS, get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY
 from desktop.lib import fsmanager
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paths import get_run_root, SAFE_CHARACTERS_URI_COMPONENTS
 from desktop.redaction import global_redaction_engine
-from desktop.settings import DOCUMENT2_SEARCH_MAX_LENGTH
+from desktop.settings import DOCUMENT2_SEARCH_MAX_LENGTH, HUE_DESKTOP_VERSION
 
 if sys.version_info[0] > 2:
   import urllib.request, urllib.error
@@ -1798,7 +1797,7 @@ class ClusterConfig(object):
 
     if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('abfs', self.user):
       from azure.abfs.__init__ import get_home_dir_for_ABFS
-      
+
       interpreters.append({
         'type': 'abfs',
         'displayName': _('ABFS'),
