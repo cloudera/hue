@@ -133,13 +133,13 @@ class CredentialProviderIDBroker(object):
 
 
 class Client(object):
-  def __init__(self, aws_access_key_id=None, aws_secret_access_key=None, aws_security_token=None, region=aws_conf.AWS_ACCOUNT_REGION_DEFAULT,
+  def __init__(self, aws_access_key_id=None, aws_secret_access_key=None, aws_security_token=None, region=None,
                timeout=HTTP_SOCKET_TIMEOUT_S, host=None, proxy_address=None, proxy_port=None, proxy_user=None,
                proxy_pass=None, calling_format=None, is_secure=True, expiration=None):
     self._access_key_id = aws_access_key_id
     self._secret_access_key = aws_secret_access_key
     self._security_token = aws_security_token
-    self._region = region.lower()
+    self._region = region.lower() if region else region
     self._timeout = timeout
     self._host = host
     self._proxy_address = proxy_address
