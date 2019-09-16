@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: hue
   labels:
-    app: hue
+    pod: hue
 spec:
   selector:
-    app: hue
+    pod: hue
   ports:
   - name: hue
     port: 8888
