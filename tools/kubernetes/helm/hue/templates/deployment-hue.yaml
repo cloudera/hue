@@ -34,6 +34,17 @@ spec:
           initialDelaySeconds: 3
           periodSeconds: 3
           failureThreshold: 30
+{{ if .Values.balancer.enabled }}
+      - name: nginx
+        image: {{ .Values.image.registry }}/nginx:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+          - containerPort: 80
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/sites-available/hue
+          subPath: hue
+{{ end }}
       volumes:
         - name: config-volume
           configMap:
@@ -41,3 +52,8 @@ spec:
         - name: config-volume-extra
           configMap:
             name: hue-config-extra
+{{ if .Values.balancer.enabled }}
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+{{ end }}

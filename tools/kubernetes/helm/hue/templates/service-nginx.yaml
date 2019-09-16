@@ -7,7 +7,7 @@ spec:
   type: NodePort
   # type: LoadBalancer
   selector:
-    app: nginx
+    pod: hue
   ports:
     - protocol: TCP
       port: 80
