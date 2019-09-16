@@ -18,7 +18,8 @@
 # A couple of test cases for the log buffer
 #
 
-import log_buffer
+from __future__ import absolute_import
+from desktop.log import log_buffer
 import logging
 import unittest
 

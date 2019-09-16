@@ -75,7 +75,7 @@ const TEMPLATE = `
   <!-- /ko -->
 `;
 
-componentUtils.registerComponent('delete-entry', undefined, TEMPLATE).done(() => {
+componentUtils.registerComponent('delete-entry', undefined, TEMPLATE).then(() => {
   huePubSub.subscribe('doc.show.delete.modal', docViewModel => {
     let $deleteEntriesModal = $('#deleteEntriesModal');
     if ($deleteEntriesModal.length > 0) {
@@ -86,7 +86,7 @@ componentUtils.registerComponent('delete-entry', undefined, TEMPLATE).done(() =>
     $deleteEntriesModal = $(
       '<div id="deleteEntriesModal" data-bind="component: { name: \'delete-entry\', params: $data }" data-keyboard="true" class="modal hide fade" tabindex="-1"/>'
     );
-    $(window.HUE_CONTAINER).append($deleteEntriesModal);
+    $('body').append($deleteEntriesModal);
 
     ko.applyBindings(docViewModel, $deleteEntriesModal[0]);
   });

@@ -36,14 +36,14 @@ def xmlsec():
   try:
     proc = subprocess.Popen(['which', 'xmlsec1'], stdout=subprocess.PIPE)
     return proc.stdout.read().strip()
-  except subprocess.CalledProcessError:
+  except (subprocess.CalledProcessError, OSError):
     return '/usr/local/bin/xmlsec1'
 
 
 def dict_list_map(value):
   if isinstance(value, str):
     d = {}
-    for k, v in json.loads(value).iteritems():
+    for k, v in json.loads(value).items():
       d[k] = (v,)
     return d
   elif isinstance(value, dict):
@@ -144,13 +144,13 @@ AUTHN_REQUESTS_SIGNED = Config(
 
 WANT_RESPONSE_SIGNED = Config(
   key="want_response_signed",
-  default=True,
+  default=False,
   type=coerce_bool,
   help=_t("Have Hue initiated authn response be signed."))
 
 WANT_ASSERTIONS_SIGNED = Config(
   key="want_assertions_signed",
-  default=True,
+  default=False,
   type=coerce_bool,
   help=_t("Have Hue initiated authn assertions response be signed."))
 
@@ -178,6 +178,7 @@ NAME_ID_FORMAT = Config(
   type=str,
   help=_t("Request this NameID format from the server"))
 
+
 def get_key_file_password():
   password = os.environ.get('HUE_SAML_KEY_FILE_PASSWORD')
   if password is not None:
@@ -188,6 +189,7 @@ def get_key_file_password():
     password = KEY_FILE_PASSWORD_SCRIPT.get()
 
   return password
+
 
 def config_validator(user):
   res = []

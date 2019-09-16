@@ -29,7 +29,7 @@ import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 import { NOTEBOOK_MAPPING } from 'apps/notebook2/notebook';
 import Result from 'apps/notebook2/result';
-import Session from 'apps/notebook2/session';
+import sessionManager from 'apps/notebook2/execution/sessionManager';
 
 // TODO: Remove. Temporary here for debug
 window.ExecutableStatement = ExecutableStatement;
@@ -172,11 +172,15 @@ class Snippet {
 
     self.id = ko.observable(snippet.id || hueUtils.UUID());
     self.name = ko.observable(snippet.name || '');
-    self.type = ko.observable(snippet.type || TYPE.hive);
-    self.type.subscribe(() => {
-      self.status(STATUS.ready);
+    self.type = ko.observable();
+    self.type.subscribe(newValue => {
+      // TODO: Add session disposal for ENABLE_NOTEBOOK_2
+      // Pre-create a session to speed up execution
+      sessionManager.getSession({ type: newValue }).then(() => {
+        self.status(STATUS.ready);
+      });
     });
-
+    self.type(snippet.type || TYPE.hive);
     self.isBatchable = ko.pureComputed(
       () =>
         self.type() === TYPE.hive ||
@@ -358,6 +362,20 @@ class Snippet {
       'editor.active.statement.changed',
       statementDetails => {
         if (self.ace() && self.ace().container.id === statementDetails.id) {
+          for (let i = statementDetails.precedingStatements.length - 1; i >= 0; i--) {
+            if (statementDetails.precedingStatements[i].database) {
+              self.availableDatabases().some(availableDatabase => {
+                if (
+                  availableDatabase.toLowerCase() ===
+                  statementDetails.precedingStatements[i].database.toLowerCase()
+                ) {
+                  self.database(availableDatabase);
+                  return true;
+                }
+              });
+              break;
+            }
+          }
           if (statementDetails.activeStatement) {
             self.positionStatement(statementDetails.activeStatement);
           } else {
@@ -1010,15 +1028,12 @@ class Snippet {
           return true;
         });
         if (unknownResponse) {
-          lastComplexityRequest = $.ajax({
-            type: 'POST',
-            url: '/notebook/api/optimizer/statement/risk',
-            timeout: 30000, // 30 seconds
-            data: {
-              notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-              snippet: komapping.toJSON(self.getContext())
-            },
-            success: data => {
+          lastComplexityRequest = apiHelper
+            .statementRisk({
+              notebookJson: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
+              snippetJson: komapping.toJSON(self.getContext())
+            })
+            .then(data => {
               knownResponses.unshift({
                 hash: hash,
                 data: data
@@ -1027,11 +1042,10 @@ class Snippet {
                 knownResponses.pop();
               }
               handleRiskResponse(data);
-            },
-            always: () => {
+            })
+            .always(() => {
               changeSubscription.dispose();
-            }
-          });
+            });
         }
       };
 
@@ -1111,6 +1125,8 @@ class Snippet {
         self.progress(executable.progress);
       }
     });
+
+    self.refreshHistory = notebook.fetchHistory;
   }
 
   ace(newVal) {
@@ -1149,13 +1165,12 @@ class Snippet {
       self.parentNotebook.isExecutingAll(false);
     } else {
       self.statusForButtons(STATUS_FOR_BUTTONS.canceling);
-      $.post(
-        '/notebook/api/cancel_statement',
-        {
-          notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-          snippet: komapping.toJSON(self.getContext())
-        },
-        data => {
+      apiHelper
+        .cancelNotebookStatement({
+          notebookJson: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
+          snippetJson: komapping.toJSON(self.getContext())
+        })
+        .then(data => {
           self.statusForButtons(STATUS_FOR_BUTTONS.canceled);
           if (data.status === 0) {
             self.status(STATUS.canceled);
@@ -1163,8 +1178,7 @@ class Snippet {
           } else {
             self.handleAjaxError(data);
           }
-        }
-      )
+        })
         .fail(xhr => {
           if (xhr.status !== 502) {
             $(document).trigger('error', xhr.responseText);
@@ -1377,12 +1391,12 @@ class Snippet {
       sourceType: this.type(),
       namespace: this.namespace(),
       statement: this.statement(),
-      isSqlEngine: this.isSqlDialect(),
-      sessions: komapping.toJS(this.parentNotebook.sessions)
+      isSqlEngine: this.isSqlDialect()
     });
 
     this.executor.executeNext().then(executionResult => {
       this.stopLongOperationTimeout();
+      this.result.clear();
       this.result.update(executionResult).then(() => {
         if (this.result.data().length) {
           this.currentQueryTab('queryResults');
@@ -1424,6 +1438,18 @@ class Snippet {
         }
       }
     );
+  }
+
+  async exportHistory() {
+    const historyResponse = await apiHelper.getHistory({ type: this.type(), limit: 500 });
+
+    if (historyResponse && historyResponse.history) {
+      window.location.href =
+        window.HUE_BASE_URL +
+        '/desktop/api2/doc/export?history=true&documents=[' +
+        historyResponse.history.map(historyDoc => historyDoc.id).join(',') +
+        ']';
+    }
   }
 
   fetchExecutionAnalysis() {
@@ -1546,13 +1572,12 @@ class Snippet {
 
   fetchResultSize(n, query_id) {
     const self = this;
-    $.post(
-      '/notebook/api/fetch_result_size',
-      {
-        notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-        snippet: komapping.toJSON(self.getContext())
-      },
-      data => {
+    apiHelper
+      .fetchResultSize({
+        notebookJson: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
+        snippetJson: komapping.toJSON(self.getContext())
+      })
+      .then(data => {
         if (query_id === self.parentNotebook.id()) {
           // If still on the same result
           if (data.status === 0) {
@@ -1569,8 +1594,7 @@ class Snippet {
             //$(document).trigger("error", data.message);
           }
         }
-      }
-    );
+      });
   }
 
   format() {
@@ -1626,13 +1650,12 @@ class Snippet {
   getExternalStatement() {
     const self = this;
     self.externalStatementLoaded(false);
-    $.post(
-      '/notebook/api/get_external_statement',
-      {
-        notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-        snippet: komapping.toJSON(self.getContext())
-      },
-      data => {
+    apiHelper
+      .getExternalStatement({
+        notebookJson: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
+        snippetJson: komapping.toJSON(self.getContext())
+      })
+      .then(data => {
         if (data.status === 0) {
           self.externalStatementLoaded(true);
           self.statement_raw(data.statement);
@@ -1640,22 +1663,20 @@ class Snippet {
         } else {
           self.handleAjaxError(data);
         }
-      }
-    );
+      });
   }
 
   getLogs() {
     const self = this;
-    return $.post(
-      '/notebook/api/get_logs',
-      {
-        notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-        snippet: komapping.toJSON(self.getContext()),
+    apiHelper
+      .getLogs({
+        notebookJson: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
+        snippetJson: komapping.toJSON(self.getContext()),
         from: self.result.logLines,
-        jobs: komapping.toJSON(self.jobs, { ignore: ['percentJob'] }),
-        full_log: self.result.logs
-      },
-      data => {
+        jobsJson: komapping.toJSON(self.jobs, { ignore: ['percentJob'] }),
+        fullLog: self.result.logs
+      })
+      .then(data => {
         if (data.status === 1) {
           // Append errors to the logs
           data.status = 0;
@@ -1718,13 +1739,13 @@ class Snippet {
         } else {
           self.handleAjaxError(data);
         }
-      }
-    ).fail((xhr, textStatus) => {
-      if (xhr.status !== 502) {
-        $(document).trigger('error', xhr.responseText || textStatus);
-      }
-      self.status(STATUS.failed);
-    });
+      })
+      .fail((xhr, textStatus) => {
+        if (xhr.status !== 502) {
+          $(document).trigger('error', xhr.responseText || textStatus);
+        }
+        self.status(STATUS.failed);
+      });
   }
 
   getPigParameters() {
@@ -1798,22 +1819,20 @@ class Snippet {
     const self = this;
     hueAnalytics.log('notebook', 'get_query_similarity');
 
-    $.post(
-      '/notebook/api/optimizer/statement/similarity',
-      {
-        notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-        snippet: komapping.toJSON(self.getContext()),
+    apiHelper
+      .statementSimilarity({
+        notebookJson: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
+        snippetJson: komapping.toJSON(self.getContext()),
         sourcePlatform: self.type()
-      },
-      data => {
+      })
+      .then(data => {
         if (data.status === 0) {
           // eslint-disable-next-line no-restricted-syntax
           console.log(data.statement_similarity);
         } else {
           $(document).trigger('error', data.message);
         }
-      }
-    );
+      });
   }
 
   guessMetaField(field) {
@@ -1851,16 +1870,7 @@ class Snippet {
   handleAjaxError(data, callback) {
     const self = this;
     if (data.status === -2) {
-      // Session expired
-      const existingSession = self.parentNotebook.getSession(self.type());
-      if (existingSession) {
-        self.parentNotebook.restartSession(existingSession, callback);
-      } else {
-        self.parentNotebook.createSession(
-          new Session(self.parentVm, { type: self.type() }),
-          callback
-        );
-      }
+      // TODO: Session expired, check if handleAjaxError is used for ENABLE_NOTEBOOK_2
     } else if (data.status === -3) {
       // Statement expired
       self.status(STATUS.expired);
@@ -2032,7 +2042,7 @@ class Snippet {
               path: path
             })
             .done(entry => {
-              entry.clearCache({ invalidate: 'invalidate', cascade: true, silenceErrors: true });
+              entry.clearCache({ refreshCache: true, cascade: true, silenceErrors: true });
             });
         }, 5000);
       }
@@ -2142,15 +2152,14 @@ class Snippet {
     self.hasSuggestion(null);
     const positionStatement = self.positionStatement();
 
-    self.lastCompatibilityRequest = $.post(
-      '/notebook/api/optimizer/statement/compatibility',
-      {
-        notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-        snippet: komapping.toJSON(self.getContext()),
+    self.lastCompatibilityRequest = apiHelper
+      .statementCompatibility({
+        notebookJson: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
+        snippetJson: komapping.toJSON(self.getContext()),
         sourcePlatform: self.compatibilitySourcePlatform().value,
         targetPlatform: self.compatibilityTargetPlatform().value
-      },
-      data => {
+      })
+      .then(data => {
         if (data.status === 0) {
           self.aceErrorsHolder([]);
           self.aceWarningsHolder([]);
@@ -2188,8 +2197,7 @@ class Snippet {
         } else {
           $(document).trigger('error', data.message);
         }
-      }
-    )
+      })
       .fail(xhr => {
         if (xhr.status !== 502) {
           $(document).trigger('error', xhr.responseText);

@@ -42,25 +42,35 @@ if USE_NEW_EDITOR.get():
     class="active"
   %endif
 </%def>
+
 <%def name="get_nice_name(app, section)">
   % if app and section == app.display_name:
     - ${app.nice_name}
   % endif
 </%def>
+
 <%def name="get_title(title)">
   % if title:
     - ${smart_unicode(title)}
   % endif
 </%def>
+
 <html lang="en">
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta charset="utf-8">
-  <title>Hue ${get_nice_name(current_app, section)} ${get_title(title)}</title>
+  <title>Hue ${ get_nice_name(current_app, section) } ${ get_title(title) }</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/x-icon" href="${ static('desktop/art/favicon.ico') }" />
-  <meta name="description" content="">
-  <meta name="author" content="">
+
+  <meta name="twitter:image" content="${ static('desktop/art/hue-login-logo-ellie.png') }">
+  <meta name="twitter:card" content="summary">
+  <meta property="og:site_name" content="${ _('Hue - SQL Editor') }" />
+  <meta property="og:title" content="${ _('Hue - SQL Editor') }" />
+  <meta property="og:description" content="${ _('Let anybody query, write SQL, explore data and share results.') }'">
+  <meta property="og:image" content="${ static('desktop/art/hue-login-logo-ellie.png') }" />
+  <meta name="description" content="${ _('Let anybody query, write SQL, explore data and share results.') }">
+  <meta name="keywords" content="${ _('query, sql, data warehouse, database, sharing, catalog, scheduler, optimize, dashboard') }" />
 
   <link href="${ static('desktop/css/roboto.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/cui/cui.css') }" rel="stylesheet">

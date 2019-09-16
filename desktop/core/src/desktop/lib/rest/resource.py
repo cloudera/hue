@@ -1,3 +1,4 @@
+from __future__ import division
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -14,9 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from past.utils import old_div
+from builtins import object
 import logging
 import posixpath
+import urllib
 import time
+
+from django.utils.encoding import iri_to_uri, smart_str
+from django.utils.http import urlencode
 
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.apputil import WARN_LEVEL_CALL_DURATION_MS, INFO_LEVEL_CALL_DURATION_MS
@@ -62,7 +69,7 @@ class Resource(object):
           'application/json' in resp.headers.get('content-type'):
       try:
         return resp.json()
-      except Exception, ex:
+      except Exception as ex:
         self._client.logger.exception('JSON decode error: %s' % resp.content)
         raise ex
     else:
@@ -88,28 +95,37 @@ class Resource(object):
     """
     path = self._join_uri(relpath)
     start_time = time.time()
-    resp = self._client.execute(method,
-                                path,
-                                params=params,
-                                data=data,
-                                headers=headers,
-                                files=files,
-                                allow_redirects=allow_redirects,
-                                urlencode=self._urlencode,
-                                clear_cookies=clear_cookies)
-
-    if log_response:
-      log_length = conf.REST_RESPONSE_SIZE.get() != -1 and conf.REST_RESPONSE_SIZE.get()
+    resp = None
+    try:
+      resp = self._client.execute(method,
+                                  path,
+                                  params=params,
+                                  data=data,
+                                  headers=headers,
+                                  files=files,
+                                  allow_redirects=allow_redirects,
+                                  urlencode=self._urlencode,
+                                  clear_cookies=clear_cookies)
+    finally: # Print even when there's an exception
+      log_length = conf.REST_RESPONSE_SIZE.get() != -1 and conf.REST_RESPONSE_SIZE.get() if log_response else 0 # We want to output duration without content
       duration = time.time() - start_time
-      message = "%s %s Got response%s: %s%s" % (
-          method,
-          smart_unicode(path, errors='ignore'),
-          ' in %dms' % (duration * 1000),
-          smart_unicode(resp.content[:log_length or None], errors='replace'),
-          log_length and len(resp.content) > log_length and "..." or ""
+      message = '%s %s %s%s%s %s%s returned in %dms %s %s %s%s' % (
+        method,
+        type(self._client._session.auth) if self._client._session and self._client._session.auth else None,
+        self._client._base_url,
+        smart_str(path),
+        iri_to_uri('?' + urlencode(params)) if params else '',
+        smart_unicode(data, errors='replace')[:log_length] if data else "",
+        log_length and len(data) > log_length and "..." or "" if data else "",
+        (duration * 1000),
+        resp.status_code if resp else 0,
+        len(resp.content) if resp else 0,
+        smart_unicode(resp.content[:log_length], errors='replace') if resp else "",
+        log_length and len(resp.content) > log_length and "..." or "" if resp else ""
       )
       self._client.logger.disabled = 0
       log_if_slow_call(duration=duration, message=message, logger=self._client.logger)
+
 
     return resp
 
@@ -198,9 +214,9 @@ class Resource(object):
 
 # Same in thrift_util.py for not losing the trace class
 def log_if_slow_call(duration, message, logger):
-  if duration >= WARN_LEVEL_CALL_DURATION_MS / 1000:
+  if duration >= old_div(WARN_LEVEL_CALL_DURATION_MS, 1000):
     logger.warn('SLOW: %.2f - %s' % (duration, message))
-  elif duration >= INFO_LEVEL_CALL_DURATION_MS / 1000:
+  elif duration >= old_div(INFO_LEVEL_CALL_DURATION_MS, 1000):
     logger.info('SLOW: %.2f - %s' % (duration, message))
   else:
     logger.debug(message)

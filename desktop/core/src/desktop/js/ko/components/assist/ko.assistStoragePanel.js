@@ -44,7 +44,7 @@ const TEMPLATE = `
 
   <script type="text/html" id="assist-storage-header-actions">
     <div class="assist-db-header-actions">
-      <!-- ko if: type !== 's3' -->
+      <!-- ko if: type !== 's3' && type !== 'abfs' -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: goHome, attr: { title: I18n('Go to ' + window.USER_HOME_DIR) }"><i class="pointer fa fa-home"></i></a>
       <!-- ko if: window.SHOW_UPLOAD_BUTTON -->
       <a class="inactive-action" data-bind="dropzone: {
@@ -60,6 +60,20 @@ const TEMPLATE = `
         )}"></i></div>
       </a>
       <!-- /ko -->
+      <!-- /ko -->
+      <!-- ko if: type === 'abfs' && path !== '/' && window.SHOW_UPLOAD_BUTTON -->
+      <a class="inactive-action" data-bind="dropzone: {
+            url: '/filebrowser/upload/file?dest=' + 'abfs:/' + path,
+            params: { dest: 'abfs:/' + path },
+            paramName: 'hdfs_file',
+            onError: function(x, e){ $(document).trigger('error', e); },
+            onComplete: function () { huePubSub.publish('assist.storage.refresh'); } }" title="${I18n(
+              'Upload file'
+            )}" href="javascript:void(0)">
+        <div class="dz-message inline" data-dz-message><i class="pointer fa fa-plus" title="${I18n(
+          'Upload file'
+        )}"></i></div>
+      </a>
       <!-- /ko -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.storage.refresh'); }" title="${I18n(
         'Manual refresh'
@@ -150,9 +164,10 @@ const TEMPLATE = `
       <!-- /ko -->
     </div>
     <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
-    <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
-      <span>${I18n('Error loading contents.')}</span>
-    </div>
+    <span class="assist-errors" data-bind="visible: ! loading() && hasErrors(), text: errorText() || '${I18n(
+      'Error loading contents.'
+    )}'">
+    </span>
   </div>
   <!-- /ko -->
   <!-- /ko -->
@@ -194,11 +209,12 @@ class AssistStoragePanel {
 
     huePubSub.subscribe('assist.storage.refresh', () => {
       apiHelper.clearStorageCache(this.activeSource());
-      self.reload();
+      this.reload();
     });
 
     huePubSub.subscribe('assist.storage.go.home', () => {
-      const path = this.activeSource() === 's3' ? '/' : window.USER_HOME_DIR;
+      const path =
+        this.activeSource() === 's3' || this.activeSource() === 'abfs' ? '/' : window.USER_HOME_DIR;
       this.loadPath(path);
       apiHelper.setInTotalStorage('assist', 'currentStoragePath_' + this.activeSource(), path);
     });

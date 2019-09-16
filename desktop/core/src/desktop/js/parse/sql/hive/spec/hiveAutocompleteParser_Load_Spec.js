@@ -27,6 +27,7 @@ describe('hiveAutocompleteParser.js LOAD statements', () => {
 
   const assertAutoComplete = testDefinition => {
     const debug = false;
+
     expect(
       hiveAutocompleteParser.parseSql(
         testDefinition.beforeCursor,
@@ -97,6 +98,17 @@ describe('hiveAutocompleteParser.js LOAD statements', () => {
     assertAutoComplete({
       beforeCursor: "LOAD DATA INPATH '/",
       afterCursor: "'",
+      expectedResult: {
+        lowerCase: false,
+        suggestHdfs: { path: '/' }
+      }
+    });
+  });
+
+  it('should suggest hdfs paths for "LOAD DATA INPATH "/|""', () => {
+    assertAutoComplete({
+      beforeCursor: 'LOAD DATA INPATH "/',
+      afterCursor: '"',
       expectedResult: {
         lowerCase: false,
         suggestHdfs: { path: '/' }

@@ -1,0 +1,78 @@
+*.py[cod]
+*.orig
+
+# Ignore gen/ directory where we temporarily store thrift classes to help with development
+gen/
+
+# No local dbs
+*.db
+
+# C extensions
+*.so
+
+# Packages
+*.egg
+*.egg-info
+
+.tests
+
+bin
+build
+develop-eggs
+dist
+eggs
+parts
+sdist
+var
+
+.installed.cfg
+lib64
+__pycache__
+.cache/
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.coverage*
+.tox
+.noseids
+
+# Translations
+*.mo
+
+# Ignore python virtual environments
+env*
+thrift_env
+
+# Ignore local logs
+*.log
+logs/*
+!logs/.gitkeep
+
+# Ignore local log
+npm-debug.log
+
+# Ignore docs
+docs/_build/*
+
+# ignore ipython profile stuff
+config/profile_default/
+!config/profile_default/ipython_config.py
+config/README
+protobuf/*.py
+
+.phutil_module_cache
+
+# Ignore coverage output
+*.xml
+coverage/
+
+# Ignore benchmarks output
+perf.log
+perf.svg
+
+# vim
+*.swp
+.idea/

@@ -50,7 +50,12 @@ def can_modify_job(username, job):
 
 def get_acls(job):
   if job.is_mr2:
-    return job.acls
+    try:
+      acls = job.acls
+    except:
+      LOG.exception('failed to get acls')
+      acls = {}
+    return acls
   else:
     return job.full_job_conf
 

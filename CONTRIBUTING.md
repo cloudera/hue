@@ -10,7 +10,7 @@ In any case, feel free to ask here, on [hue-user](http://groups.google.com/a/clo
 # Getting Started
 
 1. Have a look at [how to build Hue](https://github.com/cloudera/hue#getting-started).
-2. High level [Roadmap](/docs/ROADMAP.md) and list of [Easy bugs](https://issues.cloudera.org/secure/IssueNavigator.jspa?mode=hide&requestId=10431). Updating a small piece if [documentation](https://docs.gethue.com) is also a quick way to get familiar.
+2. High level [Roadmap](/docs/ROADMAP.md). Updating a small piece if [documentation](https://docs.gethue.com) is also a quick way to get familiar.
 3. [JIRA](https://issues.cloudera.org/browse/HUE) is the bug tracking system as well as [Github issues](https://github.com/cloudera/hue/issues).
 
 Here are some example of changes:
@@ -41,6 +41,6 @@ A general rule is to follow the on-going style of the code context.
 * Python: Follow [Django/PEP8](https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/coding-style/), with the exception of using 2 spaces per indent level.
 * JavaScript: Follow the style in this [file](https://github.com/cloudera/hue/blob/master/apps/oozie/src/oozie/static/oozie/js/bundle-editor.ko.js#L18).
 
-## Tests
+## CI & Tests
 
-See the [Running the tests locally](https://docs.gethue.com/latest/developer/development/#testing) or opening-up a pull request will automatically run them via [CircleCi](https://circleci.com/gh/cloudera/hue).
+See the [Running the tests](https://docs.gethue.com/latest/developer/development/#testing) or opening-up a pull request will automatically run them via [CircleCi](https://circleci.com/gh/cloudera/hue).

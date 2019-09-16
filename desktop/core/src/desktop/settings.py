@@ -20,6 +20,8 @@
 # Local customizations are done by symlinking a file
 # as local_settings.py.
 
+from builtins import map
+from builtins import zip
 import gc
 import json
 import logging
@@ -27,15 +29,17 @@ import os
 import pkg_resources
 import sys
 
-from guppy import hpy
+import django_opentracing
 
 from django.utils.translation import ugettext_lazy as _
+from guppy import hpy
 
 import desktop.redaction
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.python_util import force_dict_to_strings
 
 from aws.conf import is_enabled as is_s3_enabled
+from azure.conf import is_abfs_enabled
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', '..', '..'))
@@ -204,6 +208,7 @@ INSTALLED_APPS = [
     # App that keeps track of failed logins.
     'axes',
     'webpack_loader',
+    'django_prometheus',
     #'django_celery_results',
 ]
 
@@ -346,9 +351,9 @@ EMAIL_SUBJECT_PREFIX = 'Hue %s - ' % desktop.conf.CLUSTER_ID.get()
 if os.getenv('DESKTOP_DB_CONFIG'):
   conn_string = os.getenv('DESKTOP_DB_CONFIG')
   logging.debug("DESKTOP_DB_CONFIG SET: %s" % (conn_string))
-  default_db = dict(zip(
+  default_db = dict(list(zip(
     ["ENGINE", "NAME", "TEST_NAME", "USER", "PASSWORD", "HOST", "PORT"],
-    conn_string.split(':')))
+    conn_string.split(':'))))
   default_db['NAME'] = default_db['NAME'].replace('#', ':') # For is_db_alive command
 else:
   test_name = os.environ.get('DESKTOP_DB_TEST_NAME', get_desktop_root('desktop-test.db'))
@@ -447,6 +452,11 @@ EMAIL_HOST_USER = desktop.conf.SMTP.USER.get()
 EMAIL_HOST_PASSWORD = desktop.conf.get_smtp_password()
 EMAIL_USE_TLS = desktop.conf.SMTP.USE_TLS.get()
 DEFAULT_FROM_EMAIL = desktop.conf.SMTP.DEFAULT_FROM.get()
+
+if EMAIL_BACKEND == 'sendgrid_backend.SendgridBackend':
+  SENDGRID_API_KEY = desktop.conf.get_smtp_password()
+  SENDGRID_SANDBOX_MODE_IN_DEBUG = DEBUG
+
 
 # Used for securely creating sessions. Should be unique and not shared with anybody. Changing auth backends will invalidate all open sessions.
 SECRET_KEY = desktop.conf.get_secret_key()
@@ -563,6 +573,8 @@ file_upload_handlers = [
 if is_s3_enabled():
   file_upload_handlers.insert(0, 'aws.s3.upload.S3FileUploadHandler')
 
+if is_abfs_enabled():
+  file_upload_handlers.insert(0, 'azure.abfs.upload.ABFSFileUploadHandler')
 FILE_UPLOAD_HANDLERS = tuple(file_upload_handlers)
 
 ############################################################
@@ -690,3 +702,42 @@ if desktop.conf.TASK_SERVER.ENABLED.get():
   if desktop.conf.TASK_SERVER.BEAT_ENABLED.get():
     INSTALLED_APPS.append('django_celery_beat')
     INSTALLED_APPS.append('timezone_field')
+
+
+PROMETHEUS_EXPORT_MIGRATIONS = False # Needs to be there even when enable_prometheus is not enabled
+if desktop.conf.ENABLE_PROMETHEUS.get():
+  MIDDLEWARE_CLASSES.insert(0, 'django_prometheus.middleware.PrometheusBeforeMiddleware')
+  MIDDLEWARE_CLASSES.append('django_prometheus.middleware.PrometheusAfterMiddleware')
+
+  if 'mysql' in DATABASES['default']['ENGINE']:
+    DATABASES['default']['ENGINE'] = DATABASES['default']['ENGINE'].replace('django.db.backends', 'django_prometheus.db.backends')
+  for name, val in list(CACHES.items()):
+    val['BACKEND'] = val['BACKEND'].replace('django.core.cache.backends', 'django_prometheus.cache.backends')
+
+
+################################################################
+# OpenTracing settings
+################################################################
+
+if desktop.conf.TRACING.ENABLED.get():
+  OPENTRACING_TRACE_ALL = desktop.conf.TRACING.TRACE_ALL.get()
+  OPENTRACING_TRACER_CALLABLE = __name__ + '.tracer'
+
+  def tracer():
+      from jaeger_client import Config
+      config = Config(
+          config={
+              'sampler': {
+                  'type': 'const',
+                  'param': 1,
+              },
+              'logging': False,
+          },
+          # metrics_factory=PrometheusMetricsFactory(namespace='hue-api'),
+          service_name='hue-api'
+      )
+      return config.initialize_tracer()
+
+  OPENTRACING_TRACED_ATTRIBUTES = ['META'] # Only valid if OPENTRACING_TRACE_ALL == True
+  if desktop.conf.TRACING.TRACE_ALL.get():
+    MIDDLEWARE_CLASSES.insert(0, 'django_opentracing.OpenTracingMiddleware')

@@ -35,10 +35,9 @@ If you are changing Javascript or CSS files, also start:
 
     npm run dev
 
-Then it is recommended to use MySQL or PostGres as the [database](({{% param baseURL %}}).
+Then it is recommended to use MySQL or PostGres as the database.
 
-Open the `hue.ini` file in a text editor. Directly below the
-`[[database]]` line, add the following options (and modify accordingly for
+Open the `hue.ini` file in a text editor. Directly below the `[[database]]` line, add the following options (and modify accordingly for
 your MySQL setup):
 
     host=localhost
@@ -47,6 +46,32 @@ your MySQL setup):
     user=hue
     password=secretpassword
     name=hue
+
+### Dev Docker
+
+Try basic changes in Hue without compiling it locally:
+
+    git clone https://github.com/cloudera/hue.git
+    cd hue
+    cp desktop/conf/pseudo-distributed.ini.tmpl desktop/conf/pseudo-distributed.ini
+
+Then edit the `[[database]]` section to specify a proper database, here MySql:
+
+    host=127.0.0.1 # Not localhost if Docker
+    engine=mysql
+    user=hue
+    password=hue
+    name=huedb
+
+Then map the local Hue source code into the running container (so that local edits are seen in the running Hue):
+
+    sudo docker run -it -v $PWD/apps:/usr/share/hue/apps -v $PWD/desktop:/usr/share/hue/desktop -v $PWD/desktop/conf/pseudo-distributed.ini:/usr/share/hue/desktop/conf/z-hue.ini --network="host" gethue/hue
+
+Note: code updates won’t be seen after the Docker container runs. For this Hue would need to be started in dev server mode by replacing the [line](https://github.com/cloudera/hue/blob/master/tools/docker/hue/startup.sh#L5) by
+
+    ./build/env/bin/hue runserver 0.0.0.0:8888
+
+and recompiling the Docker image. It will then auto-restart on Python code changes. For JavaScript, those would need to be [compiled]({{% param baseURL %}}/developer/development/#javascript).
 
 ### Javascript
 
@@ -80,18 +105,9 @@ and possibly fix any issues it might report.
 
 Install [Hugo](https://gohugo.io/getting-started/quick-start/).
 
-Develop:
+Build it and see live changes:
 
     hugo serve
-
-Build the doc website:
-
-    hugo
-
-Release:
-
-    scp -r docs/docs-site/public/* root@docs.gethue.com:/var/www/docs.gethue.com
-
 
 ### CSS / LESS
 
@@ -118,11 +134,11 @@ After modifying files under tools/ace-editor run the following to build ace.js
     npm install
     make ace
 
-### SQL Embedded Language Reference manuals
+### Embedded language references
 
-The tools for generating the embedded language reference can be found under hue/tools/sql-docs/
+The tools for generating the embedded language reference manuals can be found under `hue/tools/sql-docs/`
 
-## Hive
+#### Hive
 The Hive documentation is generated directly from the Hive wiki by using an exported epub file.
 
 1. Goto https://cwiki.apache.org/confluence/display/Hive/LanguageManual
@@ -132,7 +148,7 @@ The Hive documentation is generated directly from the Hive wiki by using an expo
 
         node tools/sql-docs/hiveExtractor.js --epub /path/to/epub/file
 
-## Impala
+#### Impala
 The Impala documentation is generated from the ditamap files in the Impala GitHub repo.
 
 1. Clone the Impala repo next to hue from https://github.com/apache/impala
@@ -205,8 +221,7 @@ daemon processes "on the side". Some examples are the `Celery Task Server`, `Cel
 ![Interacting with Hadoop]({{% param baseURL %}}images/interactingwithhadoop.png)
 
 Hue provides some APIs for interacting with external services like Databases of File storages.
-These APIs work by making REST API or Thrift calls
-the Hadoop daemons.
+These APIs work by making REST or Thrift calls.
 
 ### An Architectural View
 
@@ -686,9 +701,29 @@ See ```desktop/core/src/desktop/js/spec/karma.config.js``` for various options
       Point to an Impalad and trigger the Impala tests.
 
 
-#### Writing tests that depend on Hadoop
+#### Continuous Integration (CI)
 
-Use pseudo_hdfs4.py!  You should tag such tests with "requires_hadoop", as follows:
+[CircleCi](https://circleci.com/gh/cloudera/hue) automatically run the unit tests (Python, Javascript, linting) on branch updates and pull requests. Branches containing `ci-commit-master` will tried to be auto pushed to master if the run is green and github permissions match.
+
+The runs happen in an image based on [latest Hue's image](https://hub.docker.com/u/gethue/).
+
+Note: until the `desktop/ext-py` dependencies are moved to a `requirement.txt`, adding new Python modules will require adding them first to the Docker image by building a Hue branch which has them.
+
+#### Integration tests
+
+Those are tagged with `integration` either at the class or method level:
+
+    class BeeswaxSampleProvider(object):
+      integration = True
+
+      @attr('integration')
+      def test_add_ldap_users_case_sensitivity(self):
+        if is_live_cluster():
+          raise SkipTest('HUE-2897: Cannot yet guarantee database is case sensitive')
+
+        ...
+
+Historically, the same thing used to be done with the `requires_hadoop` tag:
 
     from nose.plugins.attrib import attr
 
@@ -696,14 +731,7 @@ Use pseudo_hdfs4.py!  You should tag such tests with "requires_hadoop", as follo
     def your_test():
       ...
 
-
-#### Jenkins Configuration
-
-Because building Hadoop (for the tests that require it) is slow, we've
-separated the Jenkins builds into "fast" and "slow".  Both are run
-via scripts/jenkins.sh, which should be kept updated with the latest
-and greatest in build technologies.
-
+Because running integration tests is slow, the Jenkins builds are separated into "fast" and "slow". Both are ran via `scripts/jenkins.sh`.
 
 ## Release
 
@@ -713,53 +741,74 @@ Update the versions to the next release (current release +1):
     :100644 100644 9332f95... 45b28ad... M	desktop/libs/librdbms/java/pom.xml
     :100644 100644 551f62f... 694f021... M	maven/pom.xml
 
-How to count the number of commits since the last release and add them and the authors to the release notes:
+How to count the number of commits since the last release:
 
-    git log --oneline --since=2018-01-01 | grep 'release'
-    git log --oneline --since=2018-01-01 | grep -n '6df64e3'
-    git log --oneline -449 > scratch.txt
+    git log --oneline --since=2018-01-01 | grep 'release' -r
+    git log --oneline -449 > commits.txt
 
-    git log --pretty="%an" | sort | uniq > scratch.txt
+    cat commits.txt | sed 's/\(HUE\-[[:digit:]][[:digit:]][[:digit:]][[:digit:]]\)/\[\1\]\(https:\/\/issues.cloudera.org\/browse\/\1\)/' | sed 's/^\(.*\)/* \1/' > commits.md
+
+And add them and the authors to the release notes:
+
+    git log --pretty="%an" | sort | uniq | sed 's/^\(.*\)/* \1/' > authors.txt
 
 Pushing the release branch:
 
-    git push origin HEAD:branch-4.4.0
+    git push origin HEAD:branch-4.5.0
 
 Tagging the release:
 
-    git tag -a release-4.4.0 -m "release-4.4.0"
-    git push origin release-4.4.0
+    git tag -a release-4.5.0 -m "release-4.5.0"
+    git push origin release-4.5.0
 
 Building the tarball release:
 
     make prod
 
-Source of the release: https://github.com/cloudera/hue/archive/release-4.4.0.zip
+Source of the release: https://github.com/cloudera/hue/archive/release-4.5.0.zip
+
+Push to the CDN:
+
+    scp hue-4.5.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads
 
 Other things to update:
 
 * In Jira, setting the [release as shipped](https://issues.cloudera.org/projects/HUE?selectedItem=com.atlassian.jira.jira-projects-plugin%3Arelease-page&status=all) and moving all non finished jiras to another target. Also archiving old releases.
 * Create the after next release tag in Jira and Blog
 * Update http://gethue.com 'Release' menu
-* Update http://demo.gethue.com/
 * Update Docker image https://hub.docker.com/u/gethue/
 * Update release date on https://en.wikipedia.org/wiki/Hue_(Software)
 
 Instructions:
 
-    docker build https://github.com/cloudera/hue.git#release-4.4.0 -t gethue/hue:4.4.0 -f tools/docker/hue/Dockerfile
-    docker tag gethue/hue:4.4.0 gethue/latest
+    docker build https://github.com/cloudera/hue.git#release-4.5.0 -t gethue/hue:4.5.0 -f tools/docker/hue/Dockerfile
+    docker tag gethue/hue:4.5.0 gethue/hue:latest
     docker images
     docker login
     docker push gethue/hue
-    docker push gethue/hue:4.4.0
+    docker push gethue/hue:4.5.0
+
+    docker build . -t gethue/nginx:4.5.0 -f tools/docker/nginx/Dockerfile;
+    docker tag gethue/nginx:4.5.0 gethue/nginx:latest
+    docker push gethue/nginx
+    docker push gethue/nginx:4.5.0
 
 Documentation
 
-Refresh the latest and then fork it:
+[Build it](#Documentation) and push it to the docs host.
 
-    cp -r latest docs-4.4.0
-    git add docs-4.4.0
+Build the doc website:
+
+    hugo
+
+Release:
+
+    ssh root@docs.gethue.com
+    cd /var/www/docs.gethue.com
+    mkdir 4.5.0
+    rm latest; ln -s 4.5.0 latest
+
+    scp -r docs/docs-site/public/* root@docs.gethue.com:/var/www/docs.gethue.com/4.5.0
 
 
-Then send release notes to hue-user, https://twitter.com/gethue!
+Then send release notes to the [Forum](https://discourse.gethue.com/), [hue-user](https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user), https://twitter.com/gethue!

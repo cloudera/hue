@@ -27,6 +27,7 @@ describe('hiveAutocompleteParser.js', () => {
 
   const assertAutoComplete = testDefinition => {
     const debug = false;
+
     expect(
       hiveAutocompleteParser.parseSql(
         testDefinition.beforeCursor,
@@ -454,6 +455,7 @@ describe('hiveAutocompleteParser.js', () => {
         ']',
         ';'
       ];
+
       expect(hiveAutocompleteParser.identifyPartials('', '')).toEqual({ left: 0, right: 0 });
       expect(hiveAutocompleteParser.identifyPartials('foo', '')).toEqual({ left: 3, right: 0 });
       expect(hiveAutocompleteParser.identifyPartials(' foo', '')).toEqual({ left: 3, right: 0 });
@@ -461,6 +463,7 @@ describe('hiveAutocompleteParser.js', () => {
         left: 4,
         right: 0
       });
+
       expect(hiveAutocompleteParser.identifyPartials('foo', 'bar')).toEqual({ left: 3, right: 3 });
       expect(hiveAutocompleteParser.identifyPartials('fo', 'o()')).toEqual({ left: 2, right: 3 });
       expect(hiveAutocompleteParser.identifyPartials('fo', 'o(')).toEqual({ left: 2, right: 2 });
@@ -468,6 +471,7 @@ describe('hiveAutocompleteParser.js', () => {
         left: 2,
         right: 10
       });
+
       expect(hiveAutocompleteParser.identifyPartials('foo ', '')).toEqual({ left: 0, right: 0 });
       expect(hiveAutocompleteParser.identifyPartials("foo '", "'")).toEqual({ left: 0, right: 0 });
       expect(hiveAutocompleteParser.identifyPartials('foo "', '"')).toEqual({ left: 0, right: 0 });
@@ -476,22 +480,27 @@ describe('hiveAutocompleteParser.js', () => {
           left: 0,
           right: 0
         });
+
         expect(hiveAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo', '')).toEqual({
           left: 6,
           right: 0
         });
+
         expect(hiveAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo ', '')).toEqual({
           left: 0,
           right: 0
         });
+
         expect(hiveAutocompleteParser.identifyPartials('', char + 'foo bar')).toEqual({
           left: 0,
           right: 0
         });
+
         expect(hiveAutocompleteParser.identifyPartials('', 'foofoo' + char)).toEqual({
           left: 0,
           right: 6
         });
+
         expect(hiveAutocompleteParser.identifyPartials('', ' foofoo' + char)).toEqual({
           left: 0,
           right: 0
@@ -515,6 +524,7 @@ describe('hiveAutocompleteParser.js', () => {
 
       const identifierChain = [{ name: 'testItem' }];
       const result = hiveAutocompleteParser.expandLateralViews(lateralViews, identifierChain);
+
       expect(result).toEqual([{ name: 'testArray' }, { name: 'item' }]);
     });
 
@@ -533,12 +543,14 @@ describe('hiveAutocompleteParser.js', () => {
       const identifierChain = [{ name: 'explodedMap' }, { name: 'testMapValue' }];
 
       const result = hiveAutocompleteParser.expandLateralViews(lateralViews, identifierChain);
+
       expect(result).toEqual([{ name: 'testMap' }, { name: 'value' }]);
     });
 
     it('should expand 03', () => {
       const identifierChain = [{ name: 'testMap', keySet: true }];
       const result = hiveAutocompleteParser.expandLateralViews([], identifierChain);
+
       expect(result).toEqual([{ name: 'testMap', keySet: true }]);
     });
 
@@ -556,6 +568,7 @@ describe('hiveAutocompleteParser.js', () => {
 
       const identifierChain = [{ name: 'testItem' }];
       const result = hiveAutocompleteParser.expandLateralViews(lateralViews, identifierChain);
+
       expect(result).toEqual([{ name: 'testArray' }, { name: 'item' }]);
     });
 
@@ -581,6 +594,7 @@ describe('hiveAutocompleteParser.js', () => {
 
       const identifierChain = [{ name: 'testItemA' }];
       const result = hiveAutocompleteParser.expandLateralViews(lateralViews, identifierChain);
+
       expect(result).toEqual([{ name: 'testArrayA' }, { name: 'item' }]);
     });
 
@@ -605,6 +619,7 @@ describe('hiveAutocompleteParser.js', () => {
       ];
       const identifierChain = [{ name: 'testItemB' }];
       const result = hiveAutocompleteParser.expandLateralViews(lateralViews, identifierChain);
+
       expect(result).toEqual([{ name: 'tt2' }, { name: 'testArrayB' }, { name: 'item' }]);
     });
 
@@ -630,6 +645,7 @@ describe('hiveAutocompleteParser.js', () => {
 
       const identifierChain = [{ name: 'ta2_exp' }];
       const result = hiveAutocompleteParser.expandLateralViews(lateralViews, identifierChain);
+
       expect(result).toEqual([
         { name: 'tt' },
         { name: 'testArray1' },
@@ -653,6 +669,7 @@ describe('hiveAutocompleteParser.js', () => {
 
       const identifierChain = [{ name: 'testValue' }];
       const result = hiveAutocompleteParser.expandLateralViews(lateralViews, identifierChain);
+
       expect(result).toEqual([{ name: 'testArray' }, { name: 'item' }]);
     });
 
@@ -670,6 +687,7 @@ describe('hiveAutocompleteParser.js', () => {
 
       const identifierChain = [{ name: 'testMapValue' }];
       const result = hiveAutocompleteParser.expandLateralViews(lateralViews, identifierChain);
+
       expect(result).toEqual([{ name: 'testMap' }, { name: 'value' }]);
     });
 
@@ -687,6 +705,7 @@ describe('hiveAutocompleteParser.js', () => {
 
       const identifierChain = [{ name: 'testItem' }];
       const result = hiveAutocompleteParser.expandLateralViews(lateralViews, identifierChain);
+
       expect(result).toEqual([{ name: 'testArray' }, { name: 'item' }]);
     });
   });

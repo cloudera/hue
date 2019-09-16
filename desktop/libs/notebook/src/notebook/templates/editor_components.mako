@@ -17,15 +17,15 @@
 <%!
 from django.utils.translation import ugettext as _
 
+from webpack_loader.templatetags.webpack_loader import render_bundle
+
 from desktop import conf
+from desktop.auth.backend import is_admin
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko, antixss
-
-from desktop.conf import IS_EMBEDDED
 from metadata.conf import has_optimizer, OPTIMIZER
+
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE, ENABLE_EXTERNAL_STATEMENT, ENABLE_PRESENTATION
-from desktop.auth.backend import is_admin
-from webpack_loader.templatetags.webpack_loader import render_bundle
 %>
 
 <%def name="includes(is_embeddable=False, suffix='')">
@@ -135,36 +135,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <ul class="nav editor-nav">
           <li class="app-header" style="display:none" data-bind="visible: true">
             <!-- ko if: editorMode -->
-              % if IS_EMBEDDED.get():
-                <span>
-                  <!-- ko template: { name: 'app-icon-template', data: { icon: editorType() } } --><!-- /ko -->
-                  <!-- ko switch: editorType() -->
-                  <!-- ko case: 'impala' -->Impala<!-- /ko -->
-                  <!-- ko case: 'rdbms' -->DB Query<!-- /ko -->
-                  <!-- ko case: 'pig' -->Pig<!-- /ko -->
-                  <!-- ko case: 'java' -->Java<!-- /ko -->
-                  <!-- ko case: 'spark2' -->Spark<!-- /ko -->
-                  <!-- ko case: 'sqoop1' -->Sqoop 1<!-- /ko -->
-                  <!-- ko case: 'distcp' -->DistCp<!-- /ko -->
-                  <!-- ko case: 'shell' -->Shell<!-- /ko -->
-                  <!-- ko case: 'mapreduce' -->MapReduce<!-- /ko -->
-                  <!-- ko case: ['beeswax', 'hive'] -->Hive<!-- /ko -->
-                  <!-- ko case: 'mapreduce' -->MapReduce<!-- /ko -->
-                  <!-- ko case: 'spark' -->Scala<!-- /ko -->
-                  <!-- ko case: 'pyspark' -->PySpark<!-- /ko -->
-                  <!-- ko case: 'r' -->R<!-- /ko -->
-                  <!-- ko case: 'jar' -->Spark Submit Jar<!-- /ko -->
-                  <!-- ko case: 'py' -->Spark Submit Python<!-- /ko -->
-                  <!-- ko case: 'solr' -->Solr SQL<!-- /ko -->
-                  <!-- ko case: 'kafkasql' -->Kafka SQL<!-- /ko -->
-                  <!-- ko case: 'markdown' -->Markdown<!-- /ko -->
-                  <!-- ko case: 'text' -->Text<!-- /ko -->
-                  <!-- ko case: 'clickhouse' -->ClickHouse<!-- /ko -->
-                  <!-- ko case: $default --><span data-bind="text: editorTypeTitle()"></span><!-- /ko -->
-                  <!-- /ko -->
-                </span>
-              % else:
-                <a data-bind="hueLink: '${ url('notebook:editor') }?type=' + editorType(), attr: { 'title': editorTypeTitle() + '${ _(' Editor') }'}" style="cursor: pointer">
+              <a data-bind="hueLink: '${ url('notebook:editor') }?type=' + editorType(), attr: { 'title': editorTypeTitle() + '${ _(' Editor') }'}" style="cursor: pointer">
               <!-- ko template: { name: 'app-icon-template', data: { icon: editorType() } } --><!-- /ko -->
 
               <!-- ko switch: editorType() -->
@@ -193,7 +164,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
               <!-- /ko -->
               <!-- ko component: { name: 'hue-favorite-app', params: { app: 'editor', interpreter: editorType() }} --><!-- /ko -->
               </a>
-              % endif
             <!-- /ko -->
             <!-- ko ifnot: editorMode -->
               <i class="fa fa-file-text-o app-icon" style="vertical-align: middle"></i>
@@ -202,7 +172,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <!-- /ko -->
           </li>
 
-          % if not IS_EMBEDDED.get():
           <!-- ko with: selectedNotebook -->
           <li class="no-horiz-padding">
             <a>&nbsp;</a>
@@ -239,7 +208,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             </a>
           </li>
           <!-- /ko -->
-          % endif
         </ul>
       </div>
     </div>
@@ -249,7 +217,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 <script type="text/html" id="notebook-menu-buttons-${ suffix }">
   <div class="pull-right margin-right-10">
-  % if ENABLE_PRESENTATION.get() and not IS_EMBEDDED.get():
+  % if ENABLE_PRESENTATION.get():
     <!-- ko with: selectedNotebook() -->
       <div class="btn-group">
         <a class="btn" data-bind="click: function() { isPresentationMode(!isPresentationMode()); },
@@ -271,78 +239,65 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <!-- /ko -->
   % endif
 
-    % if IS_EMBEDDED.get():
-      <div class="btn-group">
-        <a class="btn" rel="tooltip" data-bind="click: function() { newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
-          <i class="fa fa-fw fa-file-o"></i>
-        </a>
-      </div>
-      <div class="btn-group">
-        <a class="btn" rel="tooltip" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
-          <i class="fa fa-fw fa-cogs"></i>
-        </a>
-      </div>
-    % else:
-      <div class="btn-group">
-        <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#saveAsModal${ suffix }').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }">
-          <i class="fa fa-save"></i>
-        </a>
+    <div class="btn-group">
+      <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#saveAsModal${ suffix }').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }">
+        <i class="fa fa-save"></i>
+      </a>
 
-        <!-- ko if: $root.canSave -->
-        <a class="btn dropdown-toggle" data-toggle="dropdown" href="javascript: void(0)"><span class="caret"></span></a>
-        <ul class="dropdown-menu pull-right">
-          <li>
-            <a class="pointer" data-bind="click: function() { $('#saveAsModal${ suffix }').modal('show'); }">
-              <i class="fa fa-fw fa-save"></i> ${ _('Save as...') }
-            </a>
-          </li>
-        </ul>
-        <!-- /ko -->
-      </div>
-
-      <!-- ko template: { ifnot: editorMode() || isPresentationMode(), name: 'notebook-actions' }--><!-- /ko -->
-
-      <!-- ko ifnot: isPresentationMode() -->
-      <div class="dropdown pull-right margin-left-10">
-        <a class="btn" data-toggle="dropdown" href="javascript: void(0)">
-          <i class="fa fa-fw fa-ellipsis-v"></i>
-        </a>
-        <ul class="dropdown-menu pull-right">
-          <li>
-          <!-- ko if: editorMode -->
-            <a href="javascript:void(0)" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
-              <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
-            </a>
-          <!-- /ko -->
-          <!-- ko ifnot: editorMode -->
-            <a href="javascript:void(0)" data-bind="click: newNotebook">
-              <i class="fa fa-fw fa-file-o"></i> ${ _('New Notebook') }
-            </a>
-          <!-- /ko -->
-          </li>
-          <li>
-            <a href="javascript:void(0)" data-bind="publish: { 'assist.show.documents': editorMode() ? 'query-' + editorType() : editorType() }">
-              <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> <span data-bind="text: editorMode() ? '${ _ko('Queries') }' : '${ _ko('Notebooks') }'"></span>
-            </a>
-          </li>
-          <li class="divider"></li>
-          <!-- ko if: $root.canSave -->
-          <li>
-            <a class="share-link" data-bind="click: prepareShareModal,
-              css: {'isShared': isShared()}">
-              <i class="fa fa-fw fa-users"></i> ${ _('Share') }
-            </a>
-          </li>
-          <!-- /ko -->
-          <li>
-            <a class="pointer" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
-              <i class="fa fa-fw fa-cogs"></i> ${ _('Session') }
-            </a>
-          </li>
-        </ul>
-      </div>
+      <!-- ko if: $root.canSave -->
+      <a class="btn dropdown-toggle" data-toggle="dropdown" href="javascript: void(0)"><span class="caret"></span></a>
+      <ul class="dropdown-menu pull-right">
+        <li>
+          <a class="pointer" data-bind="click: function() { $('#saveAsModal${ suffix }').modal('show'); }">
+            <i class="fa fa-fw fa-save"></i> ${ _('Save as...') }
+          </a>
+        </li>
+      </ul>
       <!-- /ko -->
-    % endif
+    </div>
+
+    <!-- ko template: { ifnot: editorMode() || isPresentationMode(), name: 'notebook-actions' }--><!-- /ko -->
+
+    <!-- ko ifnot: isPresentationMode() -->
+    <div class="dropdown pull-right margin-left-10">
+      <a class="btn" data-toggle="dropdown" href="javascript: void(0)">
+        <i class="fa fa-fw fa-ellipsis-v"></i>
+      </a>
+      <ul class="dropdown-menu pull-right">
+        <li>
+        <!-- ko if: editorMode -->
+          <a href="javascript:void(0)" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
+            <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
+          </a>
+        <!-- /ko -->
+        <!-- ko ifnot: editorMode -->
+          <a href="javascript:void(0)" data-bind="click: newNotebook">
+            <i class="fa fa-fw fa-file-o"></i> ${ _('New Notebook') }
+          </a>
+        <!-- /ko -->
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="publish: { 'assist.show.documents': editorMode() ? 'query-' + editorType() : editorType() }">
+            <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> <span data-bind="text: editorMode() ? '${ _ko('Queries') }' : '${ _ko('Notebooks') }'"></span>
+          </a>
+        </li>
+        <li class="divider"></li>
+        <!-- ko if: $root.canSave -->
+        <li>
+          <a class="share-link pointer" data-bind="click: prepareShareModal,
+              css: {'isShared': isShared()}">
+            <i class="fa fa-fw fa-users"></i> ${ _('Share') }
+          </a>
+        </li>
+        <!-- /ko -->
+        <li>
+          <a class="pointer" data-bind="publish: {'context.panel.visible': true}">
+            <i class="fa fa-fw fa-cogs"></i> ${ _('Session') }
+          </a>
+        </li>
+      </ul>
+    </div>
+    <!-- /ko -->
   </div>
 </script>
 
@@ -542,21 +497,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </div>
     </div>
   % endif
-
-
-  <div class="context-panel" data-bind="css: {'visible': isContextPanelVisible}" style="${ 'height: 100%' if not is_embeddable else '' }">
-    <ul class="nav nav-tabs">
-      <li class="active"><a href="#sessionsTab" data-toggle="tab">${_('Sessions')}</a></li>
-    </ul>
-
-    <div class="tab-content" style="border: none">
-      <div class="tab-pane active" id="sessionsTab">
-        <div class="row-fluid">
-          <div class="span12" data-bind="template: { name: 'notebook-session-config-template${ suffix }', data: $root }"></div>
-        </div>
-      </div>
-    </div>
-  </div>
 </script>
 
 <script type="text/html" id="notebook-session-config-template${ suffix }">
@@ -584,13 +524,11 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           % if conf.USE_DEFAULT_CONFIGURATION.get():
             <a class="inactive-action pointer margin-left-10" title="${ _('Save session settings as default') }" rel="tooltip" data-bind="click: function() { $parent.saveDefaultUserProperties($data) }"><i class="fa fa-save"></i> ${ _('Set as default settings') }</a>
           % endif
-          % if not IS_EMBEDDED.get():
           <!-- ko if: type() == 'impala' && typeof http_addr != 'undefined' -->
             <a class="margin-left-10" data-bind="attr: {'href': http_addr()}" target="_blank">
               <span data-bind="text: http_addr().replace(/^(https?):\/\//, '')"></span> <i class="fa fa-external-link"></i>
             </a>
           <!-- /ko -->
-          % endif
         </div>
         % if conf.USE_DEFAULT_CONFIGURATION.get():
         <div style="width:100%;">
@@ -626,7 +564,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   <div class="snippet-log-container margin-bottom-10" data-bind="visible: showLogs">
     <div data-bind="delayedOverflow: 'slow', css: resultsKlass" style="margin-top: 5px; position: relative;">
       <a href="javascript: void(0)" class="inactive-action close-logs-overlay" data-bind="click: function(){ showLogs(false) }">&times;</a>
-      % if not IS_EMBEDDED.get():
       <ul data-bind="visible: jobs().length > 0, foreach: jobs" class="unstyled jobs-overlay">
         <li data-bind="attr: {'id': $data.name.substr(4)}">
           % if is_embeddable:
@@ -642,7 +579,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <div class="clearfix"></div>
         </li>
       </ul>
-      % endif
       <span data-bind="visible: !$root.isPresentationMode() || !$root.isHidingCode()">
         <pre data-bind="visible: (!result.logs() || result.logs().length == 0) && jobs().length > 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
         <pre data-bind="visible: result.logs() && result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs" class="logs logs-bigger logs-populated"></pre>
@@ -678,35 +614,47 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <div data-bind="delayedOverflow: 'slow', css: resultsKlass" style="margin-top: 5px; position: relative;">
       <ul class="nav nav-tabs nav-tabs-editor">
         <li data-bind="click: function(){ currentQueryTab('queryHistory'); }, css: {'active': currentQueryTab() == 'queryHistory'}, onClickOutside: function () { if ($parent.historyFilterVisible() && $parent.historyFilter() === '') { $parent.historyFilterVisible(false) } }">
-          <a class="inactive-action" href="#queryHistory" data-toggle="tab">${_('Query History')}
-            <div class="inline-block inactive-action margin-left-10 pointer visible-on-hover" title="${_('Search the query history')}" data-bind="click: function(data, e){ $parent.historyFilterVisible(!$parent.historyFilterVisible()); if ($parent.historyFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { $parent.historyFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
-            <input class="input-small inline-tab-filter" type="text" data-bind="visible: $parent.historyFilterVisible, clearable: $parent.historyFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
-            % if not IS_EMBEDDED.get():
-            <div class="inline-block inactive-action pointer visible-on-hover" title="${_('Clear the query history')}" data-target="#clearHistoryModal${ suffix }" data-toggle="modal" rel="tooltip" data-bind="visible: $parent.history().length > 0"><i class="snippet-icon fa fa-calendar-times-o"></i></div>
-            %endif
-          </a>
+          <a class="inactive-action" style="display:inline-block" href="#queryHistory" data-toggle="tab">${_('Query History')}</a>
+          <div style="margin-left: -15px;" class="inline-block inactive-action pointer visible-on-hover" title="${_('Search the query history')}" data-bind="click: function(data, e){ $parent.historyFilterVisible(!$parent.historyFilterVisible()); if ($parent.historyFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { $parent.historyFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
+          <input class="input-small inline-tab-filter" type="text" data-bind="visible: $parent.historyFilterVisible, clearable: $parent.historyFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
+          <div class="dropdown inline-block inactive-action pointer visible-on-hover">
+            <a class="" data-toggle="dropdown" href="javascript: void(0)">
+              <i class="fa fa-fw fa-ellipsis-v"></i>
+            </a>
+            <ul class="dropdown-menu">
+              <li data-bind="visible: $parent.history().length > 0">
+                <!-- ko if: editorMode -->
+                <a data-target="#clearHistoryModal${ suffix }" data-toggle="modal" rel="tooltip">
+                  <i class="fa fa-fw fa-calendar-times-o"></i> Clear
+                </a>
+                <!-- /ko -->
+                <!-- ko ifnot: editorMode --><!-- /ko -->
+              </li>
+              <li><a href="javascript:void(0);" data-bind="click: exportHistory.bind($data)"><i class="fa fa-fw fa-download"></i> ${_('Export')}</a></li>
+              <li><a href="javascript:void(0);" data-bind="publish: { 'show.import.documents.modal': { importedCallback: refreshHistory.bind($data), isHistory: true }}"><i class="fa fa-fw fa-upload"></i> ${_('Import' )}</a></li>
+            </ul>
+          </div>
         </li>
-        % if not IS_EMBEDDED.get():
-        <li data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: {'active': currentQueryTab() == 'savedQueries'}, onClickOutside: function () { if (queriesFilterVisible() && queriesFilter() === '') { queriesFilterVisible(false) } }">
-          <a class="inactive-action" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}
-            <div class="inline-block inactive-action margin-left-10 pointer visible-on-hover" title="${_('Search the saved queries')}" data-bind="visible: !queriesHasErrors(), click: function(data, e){ queriesFilterVisible(!queriesFilterVisible()); if (queriesFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { queriesFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
-            <input class="input-small inline-tab-filter" type="text" data-bind="visible: queriesFilterVisible, clearable: queriesFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
-          </a>
+        <li class="margin-right-20" data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: {'active': currentQueryTab() == 'savedQueries'}, onClickOutside: function () { if (queriesFilterVisible() && queriesFilter() === '') { queriesFilterVisible(false) } }">
+          <a class="inactive-action" style="display:inline-block" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a>
+          <div style="margin-left: -15px;" class="inline-block inactive-action pointer visible-on-hover" title="${_('Search the saved queries')}" data-bind="visible: !queriesHasErrors(), click: function(data, e){ queriesFilterVisible(!queriesFilterVisible()); if (queriesFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { queriesFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
+          <input class="input-small inline-tab-filter" type="text" data-bind="visible: queriesFilterVisible, clearable: queriesFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
         </li>
-        % endif
         % if ENABLE_QUERY_BUILDER.get():
         <!-- ko if: isSqlDialect -->
-        <li data-bind="click: function(){ currentQueryTab('queryBuilderTab'); }, css: {'active': currentQueryTab() == 'queryBuilderTab'}"><a class="inactive-action" href="#queryBuilderTab" data-toggle="tab">${_('Query Builder')}</a></li>
+        <li style="margin-right: 25px;" data-bind="click: function(){ currentQueryTab('queryBuilderTab'); }, css: {'active': currentQueryTab() == 'queryBuilderTab'}"><a class="inactive-action" href="#queryBuilderTab" data-toggle="tab">${_('Query Builder')}</a></li>
         <!-- /ko -->
         % endif
         <!-- ko if: result.hasSomeResults -->
         <li data-bind="click: function(){ currentQueryTab('queryResults'); }, css: {'active': currentQueryTab() == 'queryResults'}">
-          <a class="inactive-action" href="#queryResults" data-toggle="tab">${_('Results')}
+          <a class="inactive-action" style="display:inline-block" href="#queryResults" data-toggle="tab">${_('Results')}
             <!-- ko if: result.rows() != null  -->
               (<span data-bind="text: result.rows().toLocaleString() + (type() == 'impala' && result.rows() == 1024 ? '+' : '')" title="${ _('Number of rows') }"></span>)
             <!-- /ko -->
+          </a>
+          <div style="margin-left: -15px;" class="inline-block">
             <!-- ko if: showGrid -->
-            <div class="inline-block inactive-action pointer margin-left-10 visible-on-hover" title="${_('Search the results')}" data-bind="click: function(data, e){ $(e.target).parents('.snippet').find('.resultTable').hueDataTable().fnShowSearch() }">
+            <div class="inline-block inactive-action pointer visible-on-hover" title="${_('Search the results')}" data-bind="click: function(data, e){ $(e.target).parents('.snippet').find('.resultTable').hueDataTable().fnShowSearch() }">
               <i class="snippet-icon fa fa-search"></i>
             </div>
             <!-- /ko -->
@@ -716,7 +664,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <div class="inline-block inactive-action pointer visible-on-hover" title="${_('Collapse results')}" rel="tooltip" data-bind="visible: $root.isResultFullScreenMode(), click: function(){ $root.isResultFullScreenMode(false); }">
               <i class="snippet-icon fa fa-compress"></i>
             </div>
-          </a>
+          </div>
         </li>
         <!-- /ko -->
         <!-- ko if: result.explanation().length > 0 -->
@@ -969,7 +917,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 </script>
 
 <script type="text/html" id="snippet-header-statement-type${ suffix }">
-  % if ENABLE_EXTERNAL_STATEMENT.get() and not IS_EMBEDDED.get():
+  % if ENABLE_EXTERNAL_STATEMENT.get():
   <!-- ko if: isSqlDialect() -->
     <span class="editor-header-title">${ _('Type') }</span>
     <div data-bind="component: { name: 'hue-drop-down', params: { value: statementType, entries: statementTypes, linkTitle: '${ _ko('Statement type') }' } }" style="display: inline-block"></div>
@@ -1944,7 +1892,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </a>
     </div>
 
-    % if conf.ENABLE_DOWNLOAD.get() and not IS_EMBEDDED.get():
+    % if conf.ENABLE_DOWNLOAD.get():
     <div data-bind="component: { name: 'downloadSnippetResults', params: { gridSideBtn: false, snippet: $data, notebook: $parent } }" style="display:inline-block;"></div>
     % endif
   </div>

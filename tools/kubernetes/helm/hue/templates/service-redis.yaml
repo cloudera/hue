@@ -1,0 +1,13 @@
+{{- if .Values.workers.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+spec:
+  selector:
+    pod: redis
+  ports:
+  - protocol: TCP
+    port: 6379
+    targetPort: 6379
+{{- end -}}

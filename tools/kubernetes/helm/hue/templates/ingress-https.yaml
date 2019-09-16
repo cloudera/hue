@@ -1,0 +1,24 @@
+{{- if and .Values.ingress.create (eq .Values.ingress.type "nginx-ssl") -}}
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: hue-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    certmanager.k8s.io/acme-challenge-type: http01
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  rules:
+  - host: {{ .Values.ingress.domain }}
+    http:
+      paths:
+      - backend:
+          serviceName: hue-balancer
+          servicePort: 80
+        path: /
+  tls:
+  - hosts:
+    - {{ .Values.ingress.domain }}
+    secretName: letsencrypt-pro
+{{- end -}}

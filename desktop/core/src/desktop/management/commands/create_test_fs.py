@@ -13,6 +13,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from __future__ import print_function
 import os
 
 from django.core.management.base import BaseCommand
@@ -28,4 +30,4 @@ class Command(BaseCommand):
     if not os.path.isdir(fs_dir):
       os.makedirs(fs_dir)
     fs_for_testing.create(fs_dir)
-    print _("Created fs in: %(dir)s") % {'dir': fs_dir}
+    print(_("Created fs in: %(dir)s") % {'dir': fs_dir})

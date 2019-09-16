@@ -15,19 +15,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
 import json
 import logging
 
 import sqlparse
-import urllib
+import sys
+
 
 from django.urls import reverse
 from django.db.models import Q
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
+import opentracing.tracer
 
 from desktop.api2 import __paginate
-from desktop.conf import IS_K8S_ONLY, TASK_SERVER
+from desktop.conf import TASK_SERVER
 from desktop.lib.i18n import smart_str
 from desktop.lib.django_util import JsonResponse
 from desktop.models import Document2, Document
@@ -41,7 +45,13 @@ from notebook.connectors.oozie_batch import OozieApi
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
 from notebook.models import escape_rows, make_notebook
 from notebook.views import upgrade_session_properties, get_api
+from azure.abfs.__init__ import abfspath
 
+if sys.version_info[0] > 2:
+  import urllib.request, urllib.error
+  from urllib.parse import unquote as urllib_unquote
+else:
+  from urllib import unquote as urllib_unquote
 
 LOG = logging.getLogger(__name__)
 
@@ -73,24 +83,12 @@ def create_notebook(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def create_session(request):
   response = {'status': -1}
 
-  notebook = json.loads(request.POST.get('notebook', '{}'))
   session = json.loads(request.POST.get('session', '{}'))
-
-  if IS_K8S_ONLY.get(): # TODO: create session happening asynchronously on cluster selection when opening Notebook
-    return JsonResponse({
-      "status": 0,
-      "session": {
-        "reuse_session": True, "type": session['type'],
-        "properties": [
-          {"nice_name": "Settings", "multiple": True, "key": "settings", "help_text": "Hive and Hadoop configuration properties.", "defaultValue": [], "type": "settings", "options": ["hive.map.aggr", "hive.exec.compress.output", "hive.exec.parallel", "hive.execution.engine", "mapreduce.job.queuename"], "value": []}
-        ]
-      }
-    })
 
   properties = session.get('properties', [])
 
@@ -101,7 +99,7 @@ def create_session(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def close_session(request):
   response = {'status': -1}
@@ -132,7 +130,8 @@ def _execute_notebook(request, notebook, snippet):
       if snippet.get('interface') == 'sqlalchemy':
         interpreter.options['session'] = session
 
-      response['handle'] = interpreter.execute(notebook, snippet)
+      with opentracing.tracer.start_span('interpreter') as span:
+        response['handle'] = interpreter.execute(notebook, snippet)
 
       # Retrieve and remove the result from the handle
       if response['handle'].get('sync'):
@@ -148,7 +147,7 @@ def _execute_notebook(request, notebook, snippet):
         else:
           _snippet['status'] = 'failed'
 
-        if history:  # If _historify failed, history will be None
+        if history: # If _historify failed, history will be None. If we get Atomic block exception, something underneath interpreter.execute() crashed and is not handled.
           history.update_data(notebook)
           history.save()
 
@@ -156,7 +155,7 @@ def _execute_notebook(request, notebook, snippet):
           response['history_uuid'] = history.uuid
           if notebook['isSaved']: # Keep track of history of saved queries
             response['history_parent_uuid'] = history.dependencies.filter(type__startswith='query-').latest('last_modified').uuid
-  except QueryError, ex: # We inject the history information from _historify() to the failed queries
+  except QueryError as ex: # We inject the history information from _historify() to the failed queries
     if response.get('history_id'):
       ex.extra['history_id'] = response['history_id']
     if response.get('history_uuid'):
@@ -174,20 +173,29 @@ def _execute_notebook(request, notebook, snippet):
 
   return response
 
+
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def execute(request, engine=None):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  response = _execute_notebook(request, notebook, snippet)
+  with opentracing.tracer.start_span('notebook-execute') as span:
+    span.set_tag('user-id', request.user.username)
+
+    response = _execute_notebook(request, notebook, snippet)
+
+    span.set_tag(
+      'query-id',
+      response['handle']['guid'] if response.get('handle') and response['handle'].get('guid') else None
+    )
 
   return JsonResponse(response)
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def check_status(request):
   response = {'status': -1}
@@ -201,7 +209,13 @@ def check_status(request):
     snippet = notebook['snippets'][0]
 
   try:
-    response['query_status'] = get_api(request, snippet).check_status(notebook, snippet)
+    with opentracing.tracer.start_span('notebook-check_status') as span:
+      span.set_tag('user-id', request.user.username)
+      span.set_tag(
+        'query-id',
+        snippet['result']['handle']['guid'] if snippet['result'].get('handle') and snippet['result']['handle'].get('guid') else None
+      )
+      response['query_status'] = get_api(request, snippet).check_status(notebook, snippet)
 
     response['status'] = 0
   except SessionExpired:
@@ -231,7 +245,7 @@ def check_status(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def fetch_result_data(request):
   response = {'status': -1}
@@ -241,7 +255,14 @@ def fetch_result_data(request):
   rows = json.loads(request.POST.get('rows', '100'))
   start_over = json.loads(request.POST.get('startOver', 'false'))
 
-  response['result'] = get_api(request, snippet).fetch_result(notebook, snippet, rows, start_over)
+  with opentracing.tracer.start_span('notebook-fetch_result_data') as span:
+    response['result'] = get_api(request, snippet).fetch_result(notebook, snippet, rows, start_over)
+
+    span.set_tag('user-id', request.user.username)
+    span.set_tag(
+      'query-id',
+      snippet['result']['handle']['guid'] if snippet['result'].get('handle') and snippet['result']['handle'].get('guid') else None
+    )
 
   # Materialize and HTML escape results
   if response['result'].get('data') and response['result'].get('type') == 'table' and not response['result'].get('isEscaped'):
@@ -254,7 +275,7 @@ def fetch_result_data(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def fetch_result_metadata(request):
   response = {'status': -1}
@@ -262,14 +283,22 @@ def fetch_result_metadata(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  response['result'] = get_api(request, snippet).fetch_result_metadata(notebook, snippet)
+  with opentracing.tracer.start_span('notebook-fetch_result_metadata') as span:
+    response['result'] = get_api(request, snippet).fetch_result_metadata(notebook, snippet)
+
+    span.set_tag('user-id', request.user.username)
+    span.set_tag(
+      'query-id',
+      snippet['result']['handle']['guid'] if snippet['result'].get('handle') and snippet['result']['handle'].get('guid') else None
+    )
+
   response['status'] = 0
 
   return JsonResponse(response)
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def fetch_result_size(request):
   response = {'status': -1}
@@ -277,46 +306,69 @@ def fetch_result_size(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  response['result'] = get_api(request, snippet).fetch_result_size(notebook, snippet)
+  with opentracing.tracer.start_span('notebook-fetch_result_size') as span:
+    response['result'] = get_api(request, snippet).fetch_result_size(notebook, snippet)
+
+    span.set_tag('user-id', request.user.username)
+    span.set_tag(
+      'query-id',
+      snippet['result']['handle']['guid'] if snippet['result'].get('handle') and snippet['result']['handle'].get('guid') else None
+    )
+
   response['status'] = 0
 
   return JsonResponse(response)
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def cancel_statement(request):
   response = {'status': -1}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
-  snippet = json.loads(request.POST.get('snippet', '{}'))
+  nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['uuid'])
+  notebook = Notebook(document=nb_doc).get_data()
+  snippet = notebook['snippets'][0]
 
-  response['result'] = get_api(request, snippet).cancel(notebook, snippet)
+  with opentracing.tracer.start_span('notebook-cancel_statement') as span:
+    response['result'] = get_api(request, snippet).cancel(notebook, snippet)
+
+    span.set_tag('user-id', request.user.username)
+    span.set_tag(
+      'query-id',
+      snippet['result']['handle']['guid'] if snippet['result'].get('handle') and snippet['result']['handle'].get('guid') else None
+    )
+
   response['status'] = 0
 
   return JsonResponse(response)
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def get_logs(request):
   response = {'status': -1}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
-
   startFrom = request.POST.get('from')
   startFrom = int(startFrom) if startFrom else None
-
   size = request.POST.get('size')
   size = int(size) if size else None
+  full_log = smart_str(request.POST.get('full_log', ''))
 
   db = get_api(request, snippet)
 
-  full_log = smart_str(request.POST.get('full_log', ''))
-  logs = smart_str(db.get_log(notebook, snippet, startFrom=startFrom, size=size))
+  with opentracing.tracer.start_span('notebook-get_logs') as span:
+    logs = smart_str(db.get_log(notebook, snippet, startFrom=startFrom, size=size))
+
+    span.set_tag('user-id', request.user.username)
+    span.set_tag(
+      'query-id',
+      snippet['result']['handle']['guid'] if snippet['result'].get('handle') and snippet['result']['handle'].get('guid') else None
+    )
   full_log += logs
 
   jobs = db.get_jobs(notebook, snippet, full_log)
@@ -431,7 +483,7 @@ def _get_statement(notebook):
 
 @require_GET
 @api_error_handler
-@check_document_access_permission()
+@check_document_access_permission
 def get_history(request):
   response = {'status': -1}
 
@@ -504,7 +556,7 @@ def clear_history(request):
 
 
 @require_GET
-@check_document_access_permission()
+@check_document_access_permission
 def open_notebook(request):
   response = {'status': -1}
 
@@ -518,7 +570,7 @@ def open_notebook(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 def close_notebook(request):
   response = {'status': -1, 'result': []}
 
@@ -529,7 +581,7 @@ def close_notebook(request):
       response['result'].append(get_api(request, session).close_session(session))
     except QueryExpired:
       pass
-    except Exception, e:
+    except Exception as e:
       LOG.exception('Error closing session %s' % str(e))
 
   for snippet in [_s for _s in notebook['snippets'] if _s['type'] in ('hive', 'impala')]:
@@ -540,7 +592,7 @@ def close_notebook(request):
         LOG.info('Not closing SQL snippet as still running.')
     except QueryExpired:
       pass
-    except Exception, e:
+    except Exception as e:
       LOG.exception('Error closing statement %s' % str(e))
 
   response['status'] = 0
@@ -550,16 +602,25 @@ def close_notebook(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 def close_statement(request):
   response = {'status': -1}
 
   # Passed by check_document_access_permission but unused by APIs
   notebook = json.loads(request.POST.get('notebook', '{}'))
-  snippet = json.loads(request.POST.get('snippet', '{}'))
+  nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['uuid'])
+  notebook = Notebook(document=nb_doc).get_data()
+  snippet = notebook['snippets'][0]
 
   try:
-    response['result'] = get_api(request, snippet).close_statement(notebook, snippet)
+    with opentracing.tracer.start_span('notebook-close_statement') as span:
+      response['result'] = get_api(request, snippet).close_statement(notebook, snippet)
+
+      span.set_tag('user-id', request.user.username)
+      span.set_tag(
+        'query-id',
+        snippet['result']['handle']['guid'] if snippet['result'].get('handle') and snippet['result']['handle'].get('guid') else None
+      )
   except QueryExpired:
     pass
 
@@ -570,7 +631,7 @@ def close_statement(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def autocomplete(request, server=None, database=None, table=None, column=None, nested=None):
   response = {'status': -1}
@@ -591,7 +652,7 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def get_sample_data(request, server=None, database=None, table=None, column=None):
   response = {'status': -1}
@@ -611,7 +672,7 @@ def get_sample_data(request, server=None, database=None, table=None, column=None
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def explain(request):
   response = {'status': -1}
@@ -636,7 +697,7 @@ def format(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def export_result(request):
   response = {'status': -1, 'message': _('Success')}
@@ -645,7 +706,7 @@ def export_result(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
   data_format = json.loads(request.POST.get('format', '"hdfs-file"'))
-  destination = urllib.unquote(json.loads(request.POST.get('destination', '""')))
+  destination = urllib_unquote(json.loads(request.POST.get('destination', '""')))
   overwrite = json.loads(request.POST.get('overwrite', 'false'))
   is_embedded = json.loads(request.POST.get('is_embedded', 'false'))
   start_time = json.loads(request.POST.get('start_time', '-1'))
@@ -693,6 +754,8 @@ def export_result(request):
       'allowed': True
     }
   elif data_format == 'hdfs-directory':
+    if destination.lower().startswith("abfs"):
+      destination = abfspath(destination)
     if is_embedded:
       sql, success_url = api.export_large_data_to_hdfs(notebook, snippet, destination)
 
@@ -753,7 +816,7 @@ def export_result(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def statement_risk(request):
   response = {'status': -1, 'message': ''}
@@ -770,7 +833,7 @@ def statement_risk(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def statement_compatibility(request):
   response = {'status': -1, 'message': ''}
@@ -789,7 +852,7 @@ def statement_compatibility(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def statement_similarity(request):
   response = {'status': -1, 'message': ''}
@@ -807,7 +870,7 @@ def statement_similarity(request):
 
 
 @require_POST
-@check_document_access_permission()
+@check_document_access_permission
 @api_error_handler
 def get_external_statement(request):
   response = {'status': -1, 'message': ''}

@@ -17,10 +17,11 @@
 */
 @import (reference) "cui/colors.less";
 @import (reference) "hue-mixins.less";
+@import "components/hue-app-switcher.less";
 @import "components/hue-breadcrumbs.less";
 @import "components/hue-catalog-entries-table.less";
 @import "components/hue-demi-modal.less";
-@import "components/hue-dw-sidebar.less";
+@import "components/hue-sidebar.less";
 @import "components/hue-execution-analysis.less";
 @import "components/hue-filechooser.less";
 @import "components/hue-gridster.less";
@@ -363,7 +364,7 @@ input[type='password']::-ms-reveal {
 }
 
 .dockable {
-  background-color: #fff;
+  background-color: @cui-white;
   z-index: 1000;
   padding-bottom: 2px;
 }
@@ -391,7 +392,7 @@ input[type='password']::-ms-reveal {
   }
 
   &.orange {
-    background-color: @cui-orange;
+    background-color: @cui-orange-200;
   }
 
   &.red {
@@ -401,25 +402,48 @@ input[type='password']::-ms-reveal {
 
 .status-border-container {
   tr {
-    border-left: 3px solid @cui-gray-300;
+    border-left: 4px solid @cui-gray-300;
   }
 }
 
 .status-border {
   &.completed {
+    background-color: @cui-white;
     border-color: @cui-green !important;
+
+    .job-status-label {
+      background-color: @cui-green !important;
+    }
   }
 
   &.running {
-    border-color: @cui-orange !important;
+    background-color: @cui-white;
+    border-color: @cui-orange-200 !important;
+
+    .job-status-label {
+      background-color: @cui-orange-200 !important;
+    }
   }
 
   &.failed {
+    background-color: @cui-white;
     border-color: @cui-red !important;
+
+    .job-status-label {
+      background-color: @cui-red !important;
+    }
   }
 
   &.info {
+    > td {
+      background-color: @cui-white !important;
+    }
+
     border-color: @hue-primary-color-dark !important;
+
+    .job-status-label {
+      background-color: @hue-primary-color-dark !important;
+    }
   }
 }
 
@@ -429,7 +453,7 @@ input[type='password']::-ms-reveal {
   }
 
   &.running {
-    background-color: @cui-orange !important;
+    background-color: @cui-orange-200 !important;
   }
 
   &.failed {
@@ -447,7 +471,7 @@ input[type='password']::-ms-reveal {
   }
 
   &.running {
-    color: @cui-orange !important;
+    color: @cui-orange-200 !important;
   }
 
   &.failed {

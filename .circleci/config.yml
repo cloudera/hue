@@ -67,8 +67,10 @@ jobs:
             cd /usr/share/hue
             # make npm-install # Not available
             cp ~/repo/.babelrc .
+
             cp ~/repo/webpack.config*.js .
             npm install
+            npm i eslint-plugin-jasmine@latest --save-dev # Seems to not be found otherwise
             npm run webpack
             npm run webpack-login
             npm run webpack-workers
@@ -96,8 +98,8 @@ jobs:
           name: run js lint
           command: |
             cd /usr/share/hue
-            cp ~/repo/.eslint* .
             cp ~/repo/.prettierrc .
+            cp ~/repo/.eslint* .
             cp ~/repo/tools . -r
             npm run lint
 

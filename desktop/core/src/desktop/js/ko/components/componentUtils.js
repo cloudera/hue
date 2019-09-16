@@ -14,29 +14,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery';
 import ko from 'knockout';
 
 const instances = {};
 
 class componentUtils {
-  static registerComponent(name, model, template) {
-    const deferred = $.Deferred();
-    if (!ko.components.isRegistered(name)) {
-      const componentInfo = {
-        template: template
-      };
-      if (model) {
-        componentInfo['viewModel'] = model;
+  static async registerComponent(name, model, template) {
+    return new Promise((resolve, reject) => {
+      if (!ko.components.isRegistered(name)) {
+        const componentInfo = {
+          template: template
+        };
+        if (model) {
+          componentInfo['viewModel'] = model;
+        }
+        ko.components.register(name, componentInfo);
+        resolve();
+      } else {
+        reject();
       }
-      ko.components.register(name, componentInfo);
-      return deferred.resolve().promise();
-    }
-    return deferred.reject().promise();
+    });
   }
 
-  static registerStaticComponent(name, model, template) {
-    componentUtils.registerComponent(
+  static async registerStaticComponent(name, model, template) {
+    return componentUtils.registerComponent(
       name,
       {
         createViewModel: (params, componentInfo) => {

@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import json
 import logging
 
@@ -40,7 +41,7 @@ from notebook.connectors.base import Notebook, get_api as _get_api, _get_snippet
 from notebook.connectors.spark_shell import SparkApi
 from notebook.decorators import check_editor_access_permission, check_document_access_permission, check_document_modify_permission
 from notebook.management.commands.notebook_setup import Command
-from notebook.models import make_notebook
+from notebook.models import make_notebook, _get_editor_type
 
 
 LOG = logging.getLogger(__name__)
@@ -59,8 +60,10 @@ class ApiWrapper(object):
     else:
       return object.__getattribute__(self.api, name)
 
+
 def get_api(request, snippet):
   return ApiWrapper(request, snippet)
+
 
 def notebooks(request):
   editor_type = request.GET.get('type', 'notebook')
@@ -82,7 +85,7 @@ def notebooks(request):
   })
 
 
-@check_document_access_permission()
+@check_document_access_permission
 def notebook(request, is_embeddable=False):
   if not SHOW_NOTEBOOKS.get() or not request.user.has_hue_permission(action="access", app='notebook'):
     return serve_403_error(request)
@@ -112,13 +115,13 @@ def notebook(request, is_embeddable=False):
   })
 
 
-@check_document_access_permission()
+@check_document_access_permission
 def notebook_embeddable(request):
   return notebook(request, True)
 
 
 @check_editor_access_permission()
-@check_document_access_permission()
+@check_document_access_permission
 def editor(request, is_mobile=False, is_embeddable=False):
   editor_id = request.GET.get('editor')
   editor_type = request.GET.get('type', 'hive')
@@ -127,8 +130,7 @@ def editor(request, is_mobile=False, is_embeddable=False):
     return notebook(request)
 
   if editor_id:  # Open existing saved editor document
-    document = Document2.objects.get(id=editor_id)
-    editor_type = document.type.rsplit('-', 1)[-1]
+    editor_type = _get_editor_type(editor_id)
 
   template = 'editor.mako'
   if is_mobile:
@@ -151,12 +153,12 @@ def editor(request, is_mobile=False, is_embeddable=False):
   })
 
 
-@check_document_access_permission()
+@check_document_access_permission
 def editor_embeddable(request):
   return editor(request, False, True)
 
 
-@check_document_access_permission()
+@check_document_access_permission
 def editor_m(request):
   return editor(request, True)
 
@@ -192,7 +194,7 @@ def browse(request, database, table, partition_spec=None):
     })
 
 # Deprecated in Hue 4
-@check_document_access_permission()
+@check_document_access_permission
 def execute_and_watch(request):
   notebook_id = request.GET.get('editor', request.GET.get('notebook'))
   snippet_id = int(request.GET['snippet'])
@@ -283,7 +285,7 @@ def delete(request):
         doc.can_write_or_exception(request.user)
         doc2.trash()
         ctr += 1
-      except FilesystemException, e:
+      except FilesystemException as e:
         failures.append(notebook['uuid'])
         LOG.exception("Failed to delete document with UUID %s that is writable by user %s, skipping." % (notebook['uuid'], request.user.username))
 
@@ -297,7 +299,7 @@ def delete(request):
   return JsonResponse(response)
 
 
-@check_document_access_permission()
+@check_document_access_permission
 def copy(request):
   response = {'status': -1}
 
@@ -316,7 +318,7 @@ def copy(request):
         doc2 = doc2.copy(name=name, owner=request.user)
 
         doc.copy(content_object=doc2, name=name, owner=request.user)
-      except FilesystemException, e:
+      except FilesystemException as e:
         failures.append(notebook['uuid'])
         LOG.exception("Failed to copy document with UUID %s accessible by user %s, skipping." % (notebook['uuid'], request.user.username))
 
@@ -329,7 +331,8 @@ def copy(request):
 
   return JsonResponse(response)
 
-@check_document_access_permission()
+
+@check_document_access_permission
 def download(request):
   if not ENABLE_DOWNLOAD.get():
     return serve_403_error(request)
@@ -369,7 +372,7 @@ def install_examples(request):
     try:
       Command().handle(user=request.user)
       response['status'] = 0
-    except Exception, err:
+    except Exception as err:
       LOG.exception(err)
       response['message'] = str(err)
   else:

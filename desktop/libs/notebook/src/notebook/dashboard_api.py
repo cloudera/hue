@@ -15,6 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import division
+from __future__ import print_function
+from builtins import next
+from builtins import zip
+from past.utils import old_div
+from builtins import object
 import logging
 import json
 import numbers
@@ -39,7 +45,7 @@ LOG = logging.getLogger(__name__)
 LIMIT = 100
 
 
-class MockRequest():
+class MockRequest(object):
   def __init__(self, user, cluster):
     self.user = user
     self.POST = {'cluster': cluster}
@@ -52,6 +58,8 @@ class SQLDashboardApi(DashboardApi):
     self.engine = engine
     self.source = source
     self.async = engine == 'hive' or engine == 'impala'
+    self.backticks = '"' if engine in ['postgresql', 'athena'] else '`'
+
 
   def query(self, dashboard, query, facet=None):
     if query['qs'] == [{'q': '_root_:*'}]:
@@ -70,9 +78,10 @@ class SQLDashboardApi(DashboardApi):
       database, table = '', ''
     else:
       database, table = self._get_database_table_names(dashboard['name'])
-      sql_from = '`%(database)s`.`%(table)s`' % {
+      sql_from = '%(backticks)s%(database)s%(backticks)s.%(backticks)s%(table)s%(backticks)s' % {
         'database': database,
-        'table': table
+        'table': table,
+        'backticks': self.backticks
       }
 
     if facet and facet['properties']['facets']:
@@ -158,7 +167,15 @@ class SQLDashboardApi(DashboardApi):
         result_properties = facet['properties']['result']
     else:
       fields = Collection2.get_field_list(dashboard)
-      order_by = ', '.join(['`%s` %s' % (f['name'], f['sort']['direction']) for f in dashboard['template']['fieldsAttributes'] if f['sort']['direction'] and f['name'] in fields])
+      order_by = ', '.join([
+        '%(backticks)s%(name)s%(backticks)s %(direction)s' % {
+            'backticks': self.backticks,
+            'name': f['name'],
+            'direction': f['sort']['direction']
+          }
+          for f in dashboard['template']['fieldsAttributes'] if f['sort']['direction'] and f['name'] in fields
+        ]
+      )
       sql = '''
       SELECT %(fields)s
       FROM %(sql_from)s
@@ -166,7 +183,12 @@ class SQLDashboardApi(DashboardApi):
       %(order_by)s
       %(limit)s''' % {
           'sql_from': sql_from,
-          'fields': ', '.join(['`%s` as `%s`' % (f, f) if f != '*' else '*' for f in fields]),
+          'fields': ', '.join([
+            '%(backticks)s%(column)s%(backticks)s as %(backticks)s%(column)s%(backticks)s' % {
+              'backticks': self.backticks,
+              'column': f
+            } if f != '*' else '*' for f in fields
+          ]),
           'filters': self._convert_filters_to_where(filters) if filters else '',
           'order_by': 'ORDER BY %s' % order_by if order_by else '',
           'limit': 'LIMIT %s' % dashboard['template']['rows'] or LIMIT
@@ -209,12 +231,13 @@ class SQLDashboardApi(DashboardApi):
 
 
   # This method currently behaves more like a static method
-  def datasets(self, show_all=False):
+  def datasets(self, show_all=False, database=None):
     snippet = {'type': self.engine}
 
     # Ideally from left assist at some point instead
-    databases = get_api(MockRequest(self.user, self.cluster), snippet).autocomplete(snippet)['databases']
-    database = databases and 'default' not in databases and sorted(databases)[0] or 'default'
+    if database is None:
+      databases = get_api(MockRequest(self.user, self.cluster), snippet).autocomplete(snippet)['databases']
+      database = databases and 'default' not in databases and sorted(databases)[0] or 'default'
 
     return [
       database + '.' + table['name']
@@ -254,7 +277,7 @@ class SQLDashboardApi(DashboardApi):
 
   def schema_fields(self, collection):
     return {
-      'fields': [f for f in self.fields(collection)['schema']['fields'].itervalues()]
+      'fields': [f for f in self.fields(collection)['schema']['fields'].values()]
     }
 
 
@@ -268,10 +291,16 @@ class SQLDashboardApi(DashboardApi):
 
     # TODO: check column stats to go faster
 
-    sql = "SELECT MIN(`%(field)s`), MAX(`%(field)s`) FROM `%(database)s`.`%(table)s`" % {
-      'field': fields[0],
-      'database': database,
-      'table': table
+    sql = '''
+      SELECT
+        MIN(%(backticks)s%(field)s%(backticks)s),
+        MAX(%(backticks)s%(field)s%(backticks)s)
+      FROM %(backticks)s%(database)s%(backticks)s.%(backticks)s%(table)s%(backticks)s
+    ''' % {
+        'field': fields[0],
+        'database': database,
+        'table': table,
+        'backticks': self.backticks
     }
 
     result = self._sync_execute(sql, database)
@@ -301,12 +330,17 @@ class SQLDashboardApi(DashboardApi):
     field = self._get_field(dashboard, dashboard['idField'])
     quotes = '' if self._is_number(field['type']) else "'"
 
-    sql = "SELECT * FROM `%(database)s`.`%(table)s` WHERE `%(idField)s` = %(quotes)s%(doc_id)s%(quotes)s" % {
-      'database': database,
-      'table': table,
-      'idField': dashboard['idField'], # Only 1 PK currently,
-      'doc_id': doc_id,
-      'quotes': quotes
+    sql = '''
+        SELECT *
+        FROM %(backticks)s%(database)s%(backticks)s.%(backticks)s%(table)s%(backticks)s
+        WHERE %(backticks)s%(idField)s%(backticks)s = %(quotes)s%(doc_id)s%(quotes)s
+    '''  % {
+        'database': database,
+        'table': table,
+        'idField': dashboard['idField'], # Only 1 PK currently,
+        'doc_id': doc_id,
+        'quotes': quotes,
+        'backticks': self.backticks
     }
 
     result = self._sync_execute(sql, database)
@@ -364,7 +398,7 @@ class SQLDashboardApi(DashboardApi):
         if curr > end:
           try:
             api.cancel_operation(snippet)
-          except Exception, e:
+          except Exception as e:
             LOG.warning("Failed to cancel query: %s" % e)
             api.close_statement(mock_notebook, snippet)
           raise OperationTimeout(e)
@@ -431,11 +465,16 @@ class SQLDashboardApi(DashboardApi):
             quote = "'"
           else:
             quote = ''
-          clauses.append("`%(field)s` >= %(quote)s%(from)s%(quote)s AND `%(field)s` < %(quote)s%(to)s%(quote)s" % {
-            'field': fq['field'],
-            'to': fq['properties'][0]['to'],
-            'from': fq['properties'][0]['from'],
-            'quote': quote
+          clauses.append(
+            '''
+              %(backticks)s%(field)s%(backticks)s >= %(quote)s%(from)s%(quote)s AND
+              %(backticks)s%(field)s%(backticks)s < %(quote)s%(to)s%(quote)s
+            ''' % {
+              'field': fq['field'],
+              'to': fq['properties'][0]['to'],
+              'from': fq['properties'][0]['from'],
+              'quote': quote,
+              'backticks': self.backticks
           })
       elif fq['type'] == 'map':
         for direction in ['lat', 'lon']:
@@ -445,20 +484,25 @@ class SQLDashboardApi(DashboardApi):
               quote = ''
             else:
               quote = "'"
-            min_direction = min(fq['properties'][direction+'_sw'], fq['properties'][direction+'_ne'])
-            max_direction = max(fq['properties'][direction+'_sw'], fq['properties'][direction+'_ne'])
-            clauses.append("`%(field)s` >= %(quote)s%(from)s%(quote)s AND `%(field)s` < %(quote)s%(to)s%(quote)s" % {
-              'field': fq[direction],
-              'to': max_direction,
-              'from': min_direction,
-              'quote': quote
+            min_direction = min(fq['properties'][direction+'_sw'], fq['properties'][direction + '_ne'])
+            max_direction = max(fq['properties'][direction+'_sw'], fq['properties'][direction + '_ne'])
+            clauses.append('''
+                %(backticks)s%(field)s%(backticks)s >= %(quote)s%(from)s%(quote)s AND
+                %(backticks)s%(field)s%(backticks)s < %(quote)s%(to)s%(quote)s
+              ''' % {
+                'field': fq[direction],
+                'to': max_direction,
+                'from': min_direction,
+                'quote': quote,
+                'backticks': self.backticks
             })
     return clauses
 
   def _get_field_condition_formatting(self, table, facet, field_name):
     field = self._get_field(table, field_name, facet=facet)
     if field:
-      return "`%s` %s %s" if self._is_number(field['type']) else "`%s` %s '%s'"
+      column = self.backticks + "%s" + self.backticks + ' '
+      return column + ("%s %s" if self._is_number(field['type']) else "%s '%s'")
     else:
       return ''
 
@@ -481,7 +525,8 @@ class SQLDashboardApi(DashboardApi):
         fields.append(facet['field'])
     elif facet['aggregate']['function'] == 'unique':
       facet['aggregate']['function'] = 'COUNT'
-      fields.append('distinct `%(field)s`' % facet)
+      facet['backticks'] = self.backticks
+      fields.append('distinct %(backticks)s%(field)s%(backticks)s' % facet)
     elif facet['aggregate']['function'] == 'percentile':
       if cls._supports_percentile():
         fields.append('%s, %s' % (facet['field'], cls._zero_to_one(float(facet['aggregate']['percentile']))))
@@ -502,7 +547,7 @@ class SQLDashboardApi(DashboardApi):
     elif value <= 1:
       return value
     else:
-      return value / 100
+      return old_div(value, 100)
 
   @classmethod
   def _supports_cume_dist(self):
@@ -527,20 +572,21 @@ class SQLDashboardApi(DashboardApi):
 
     if facet['canRange']:
       field_name = '%(field)s_range' % facet
-      order_by = '`%(field)s_range_%(position)s` %(sort)s' % facet
+      facet['backticks'] = self.backticks
+      order_by = '%(backticks)s%(field)s_range_%(position)s%(backticks)s %(sort)s' % facet
       if facet['isDate']:
-        field = '`%(field)s`' % facet
+        field = '%(backticks)s%(field)s%(backticks)s' % facet
 
         slot = self._gap_to_units(facet['gap'])
 
         if slot['unit'] != 'SECOND':
           select = """
-            trunc(%(field)s, '%(slot)s') AS `%(field_name)s_%(position)s`,
-            trunc(%(field)s, '%(slot)s') + interval %(slot_interval)s AS `%(field_name)s_to_%(position)s`"""
+            trunc(%(field)s, '%(slot)s') AS %(backticks)s%(field_name)s_%(position)s%(backticks)s,
+            trunc(%(field)s, '%(slot)s') + interval %(slot_interval)s AS %(backticks)s%(field_name)s_to_%(position)s%(backticks)s"""
         else:
           select = """
-            %(field)s AS `%(field_name)s_%(position)s`,
-            %(field)s + interval %(slot_interval)s AS `%(field_name)s_to_%(position)s`"""
+            %(field)s AS %(backticks)s%(field_name)s_%(position)s%(backticks)s,
+            %(field)s + interval %(slot_interval)s AS %(backticks)s%(field_name)s_to_%(position)s%(backticks)s"""
         select = select % {
             'field': field,
             'slot': slot['sql_trunc'],
@@ -548,17 +594,19 @@ class SQLDashboardApi(DashboardApi):
             'field_name': field_name,
             'start': facet['start'],
             'end': facet['end'],
-            'position': facet['position']
+            'position': facet['position'],
+            'backticks': self.backticks
         }
       else:
         slot = facet['gap']
         select = """
-        floor(floor((`%(field)s` - %(start)s) / %(slot)s) * %(slot)s) + %(start)s AS `%(field_name)s_%(position)s`""" % { # Beware: start might be not in sync with the UI
+        floor(floor((%(backticks)s%(field)s%(backticks)s - %(start)s) / %(slot)s) * %(slot)s) + %(start)s AS %(backticks)s%(field_name)s_%(position)s%(backticks)s""" % { # Beware: start might be not in sync with the UI
           'field': facet['field'],
           'slot': slot,
           'field_name': field_name,
           'start': facet['start'],
-          'position': facet['position']
+          'position': facet['position'],
+          'backticks': self.backticks
         }
     else:
       field_name = '%(field)s' % facet
@@ -566,7 +614,7 @@ class SQLDashboardApi(DashboardApi):
       order_by = '%(field)s_%(position)s %(sort)s' % facet
 
     return {
-      'name': '`%s`' % field_name,
+      'name': '%(backticks)s%(field)s%(backticks)s' % {'backticks': self.backticks, 'field': field_name},
       'select': select,
       'order_by': order_by
     }
@@ -665,7 +713,8 @@ class SQLDashboardApi(DashboardApi):
     props = self._get_time_filter_range(collection, query)
 
     if props:
-      return "(`%(field)s` >= %(from)s AND `%(field)s` <= %(to)s)" %  props
+      props['backticks'] = self.backticks
+      return "(%(backticks)s%(field)s%(backticks)s >= %(from)s AND %(backticks)s%(field)s%(backticks)s <= %(to)s)" %  props
     else:
       return {}
 
@@ -716,7 +765,7 @@ class SQLDashboardApi(DashboardApi):
     if nested_facet['canRange']:
       if nested_facet['isDate']:
         slot = self._gap_to_units(nested_facet['gap'])
-        print augment_date_range_list(rows, nested_facet['start'], nested_facet['end'], slot['timedelta'], len(cols))
+        print(augment_date_range_list(rows, nested_facet['start'], nested_facet['end'], slot['timedelta'], len(cols)))
       else:
         rows = augment_number_range_list(rows, nested_facet['start'], nested_facet['end'], nested_facet['gap'], len(cols))
 

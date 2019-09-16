@@ -19,14 +19,11 @@ import logging
 import os
 import re
 
-import boto.utils
-from boto.s3.connection import Location
-
 from django.utils.translation import ugettext_lazy as _, ugettext as _t
 
-import aws
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool, coerce_password_from_script
-from hadoop.core_site import get_s3a_access_key, get_s3a_secret_key
+from desktop.lib.idbroker import conf as conf_idbroker
+from hadoop.core_site import get_s3a_access_key, get_s3a_secret_key, get_s3a_session_token
 
 LOG = logging.getLogger(__name__)
 
@@ -36,6 +33,7 @@ SUBDOMAIN_ENDPOINT_RE = 's3.(?P<region>[a-z0-9-]+).amazonaws.com'
 HYPHEN_ENDPOINT_RE = 's3-(?P<region>[a-z0-9-]+).amazonaws.com'
 DUALSTACK_ENDPOINT_RE = 's3.dualstack.(?P<region>[a-z0-9-]+).amazonaws.com'
 AWS_ACCOUNT_REGION_DEFAULT = 'us-east-1' # Location.USEast
+PERMISSION_ACTION_S3 = "s3_access"
 
 
 def get_locations():
@@ -74,6 +72,13 @@ def get_default_secret_key():
   """
   secret_access_key_script = AWS_ACCOUNTS['default'].SECRET_ACCESS_KEY_SCRIPT.get()
   return secret_access_key_script or get_s3a_secret_key()
+
+
+def get_default_session_token():
+  """
+  Attempt to set AWS secret key from script, else core-site, else None
+  """
+  return get_s3a_session_token()
 
 
 def get_default_region():
@@ -140,6 +145,7 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
         key='security_token',
         type=str,
         private=True,
+        dynamic_default=get_default_session_token
       ),
       ALLOW_ENVIRONMENT_CREDENTIALS=Config(
         help=_('Allow to use environment sources of credentials (environment variables, EC2 profile).'),
@@ -204,11 +210,12 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
 
 
 def is_enabled():
-  return ('default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()) or has_iam_metadata()
+  return ('default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()) or has_iam_metadata() or conf_idbroker.is_idbroker_enabled('s3a')
 
 
 def has_iam_metadata():
   try:
+    import boto.utils
     # To avoid unnecessary network call, check if Hue is running on EC2 instance
     # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/identify_ec2_instances.html
     if os.path.exists('/sys/hypervisor/uuid') and open('/sys/hypervisor/uuid', 'read').read()[:3] == 'ec2':
@@ -226,10 +233,10 @@ def has_s3_access(user):
 
 def config_validator(user):
   res = []
-
+  from aws.client import get_client # Circular dependecy
   if is_enabled():
     try:
-      conn = aws.get_client('default').get_s3_connection()
+      conn = get_client('default')._s3_connection
       conn.get_canonical_user_id()
     except Exception as e:
       LOG.exception('AWS failed configuration check.')

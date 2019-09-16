@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 from datetime import datetime
 import json
 

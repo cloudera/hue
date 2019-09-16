@@ -203,7 +203,7 @@ class HistoryPanel {
     self.editorViewModel.newNotebook();
 
     self.$toggleElement;
-    const $container = $(HUE_CONTAINER);
+    const $container = $('body');
 
     self.reposition = function() {
       self.top(self.$toggleElement.offset().top + self.$toggleElement.height() + 15 + 'px');

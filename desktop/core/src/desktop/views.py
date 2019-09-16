@@ -15,7 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import StringIO
+from future import standard_library
+standard_library.install_aliases()
 import json
 import logging
 import os
@@ -35,16 +36,13 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from django.http.response import StreamingHttpResponse
 from django.urls import reverse
-from wsgiref.util import FileWrapper
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 from configobj import ConfigObj, get_extra_values, ConfigObjError
-
+from wsgiref.util import FileWrapper
+from webpack_loader.utils import get_files
 import django.views.debug
-
-from aws.conf import is_enabled as is_s3_enabled, has_s3_access
-from azure.conf import is_adls_enabled, has_adls_access
 
 import desktop.conf
 import desktop.log.log_buffer
@@ -53,7 +51,7 @@ from desktop import appmanager
 from desktop.api import massaged_tags_for_json, massaged_documents_for_json, _get_docs
 from desktop.auth.backend import is_admin
 from desktop.conf import USE_NEW_EDITOR, HUE_LOAD_BALANCER, get_clusters
-from desktop.lib import django_mako
+from desktop.lib import django_mako, fsmanager
 from desktop.lib.conf import GLOBAL_CONFIG, BoundConfig, _configs_from_dir
 from desktop.lib.config_spec_dump import ConfigSpec
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
@@ -65,7 +63,10 @@ from desktop.log.access import access_log_level, access_warn, AccessInfo
 from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _reset_all_debug, get_all_debug as _get_all_debug
 from desktop.models import Settings, hue_version, _get_apps, UserPreferences
 
-from webpack_loader.utils import get_files
+if sys.version_info[0] > 2:
+  from io import StringIO as string_io
+else:
+  from StringIO import StringIO as string_io
 
 LOG = logging.getLogger(__name__)
 
@@ -81,13 +82,13 @@ def is_alive(request):
 
 def hue(request):
   current_app, other_apps, apps_list = _get_apps(request.user, '')
-  clusters = get_clusters(request.user).values()
+  clusters = list(get_clusters(request.user).values())
 
   return render('hue.mako', request, {
     'apps': apps_list,
     'other_apps': other_apps,
-    'is_s3_enabled': is_s3_enabled() and has_s3_access(request.user),
-    'is_adls_enabled': is_adls_enabled() and has_adls_access(request.user),
+    'is_s3_enabled': fsmanager.is_enabled('s3a') and fsmanager.has_access('s3a', request.user),
+    'is_adls_enabled': fsmanager.is_enabled('adl') and fsmanager.has_access('adl', request.user),
     'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get(),
     'leaflet': {
       'layer': desktop.conf.LEAFLET_TILE_LAYER.get(),
@@ -238,7 +239,7 @@ def download_log_view(request):
         response['Content-Disposition'] = 'attachment; filename=hue-logs-%s.zip' % t
         response['Content-Length'] = length
         return response
-      except Exception, e:
+      except Exception as e:
         LOG.exception("Couldn't construct zip file to write logs")
         return log_view(request)
 
@@ -296,7 +297,7 @@ def dump_config(request):
 
   apps = sorted(appmanager.DESKTOP_MODULES, key=lambda app: app.name)
   apps_names = [app.name for app in apps]
-  top_level = sorted(GLOBAL_CONFIG.get().values(), key=lambda obj: apps_names.index(obj.config.key))
+  top_level = sorted(list(GLOBAL_CONFIG.get().values()), key=lambda obj: apps_names.index(obj.config.key))
 
   return render("dump_config.mako", request, dict(
     show_private=show_private,
@@ -308,7 +309,7 @@ def dump_config(request):
 @access_log_level(logging.WARN)
 def threads(request):
   """Dumps out server threads. Useful for debugging."""
-  out = StringIO.StringIO()
+  out = string_io()
   dump_traceback(file=out)
 
   if not is_admin(request.user):
@@ -362,7 +363,7 @@ def memory(request):
 
 def global_js_constants(request):
   return HttpResponse(render('global_js_constants.mako', request, {
-    'is_s3_enabled': is_s3_enabled() and has_s3_access(request.user),
+    'is_s3_enabled': fsmanager.is_enabled('s3a') and fsmanager.has_access('s3a', request.user),
     'leaflet': {
       'layer': desktop.conf.LEAFLET_TILE_LAYER.get(),
       'attribution': desktop.conf.LEAFLET_TILE_LAYER_ATTRIBUTION.get(),
@@ -377,6 +378,8 @@ def ace_sql_location_worker(request):
 def ace_sql_syntax_worker(request):
   return HttpResponse(render('ace_sql_syntax_worker.mako', request, None), content_type="application/javascript")
 
+#Redirect to static resources no need for auth. Fails with 401 with Knox.
+@login_notrequired
 def dynamic_bundle(request, config, bundle_name):
   bundle_name = re.sub(r'-(bundle|chunk).*', '', bundle_name)
   files = get_files(bundle_name, None, config.upper())
@@ -495,8 +498,8 @@ def commonheader(title, section, user, request=None, padding="90px", skip_topbar
     },
     'is_demo': desktop.conf.DEMO_ENABLED.get(),
     'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get(),
-    'is_s3_enabled': is_s3_enabled() and has_s3_access(user),
-    'is_adls_enabled': is_adls_enabled() and has_adls_access(request.user),
+    'is_s3_enabled': fsmanager.is_enabled('s3a') and fsmanager.has_access('s3a', request.user),
+    'is_adls_enabled': fsmanager.is_enabled('adl') and fsmanager.has_access('adl', request.user),
     'banner_message': get_banner_message(request)
   })
 
@@ -607,7 +610,7 @@ def _get_config_errors(request, cache=True):
             error['value'] = confvar.get()
 
           error_list.append(error)
-      except Exception, ex:
+      except Exception as ex:
         LOG.exception("Error in config validation by %s: %s" % (module.nice_name, ex))
 
     validate_by_spec(error_list)
@@ -668,7 +671,7 @@ def collect_validation_messages(conf, error_list):
     'remote_data_dir': [('liboozie', )],
     'shell': [()]
   }
-  whitelist_extras = ((sections, name) for sections, name in get_extra_values(conf) if not (name in desktop.conf.APP_BLACKLIST.get() or (name in cm_extras.keys() and sections in cm_extras[name])))
+  whitelist_extras = ((sections, name) for sections, name in get_extra_values(conf) if not (name in desktop.conf.APP_BLACKLIST.get() or (name in list(cm_extras.keys()) and sections in cm_extras[name])))
 
   for sections, name in whitelist_extras:
     the_section = conf
@@ -679,14 +682,14 @@ def collect_validation_messages(conf, error_list):
         the_section = parent[section]
         hierarchy_sections_string += "[" * the_section.depth + section + "]" * the_section.depth + " "
         parent = the_section
-    except KeyError, ex:
+    except KeyError as ex:
       LOG.warn("Section %s not found: %s" % (section, str(ex)))
 
     the_value = ''
     try:
       # the_value may be a section or a value
       the_value = the_section[name]
-    except KeyError, ex:
+    except KeyError as ex:
       LOG.warn("Error in accessing Section or Value %s: %s" % (name, str(ex)))
 
     section_or_value = 'keyvalue'

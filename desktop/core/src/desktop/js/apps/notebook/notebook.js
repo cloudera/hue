@@ -177,6 +177,9 @@ class Notebook {
         ? vm.selectedNotebook().history()
         : []
     );
+
+    // This is to keep the "Saved Query" tab selected when opening a doc from the left assist
+    // TODO: Refactor code to reflect purpose
     self.history.subscribe(val => {
       if (
         self.id() == null &&
@@ -184,13 +187,10 @@ class Notebook {
         self.historyFilter() === '' &&
         !vm.isNotificationManager()
       ) {
-        self
-          .snippets()[0]
-          .currentQueryTab(
-            typeof IS_EMBEDDED !== 'undefined' && IS_EMBEDDED ? 'queryHistory' : 'savedQueries'
-          );
+        self.snippets()[0].currentQueryTab('savedQueries');
       }
     });
+
     self.historyFilter = ko.observable('');
     self.historyFilterVisible = ko.observable(false);
     self.historyFilter.extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 900 } });

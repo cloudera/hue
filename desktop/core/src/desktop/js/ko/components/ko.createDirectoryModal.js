@@ -47,7 +47,7 @@ const TEMPLATE = `
   <!-- /ko -->
 `;
 
-componentUtils.registerComponent('create-directory', undefined, TEMPLATE).done(() => {
+componentUtils.registerComponent('create-directory', undefined, TEMPLATE).then(() => {
   huePubSub.subscribe('show.create.directory.modal', docViewModel => {
     let $createDirectoryModal = $('#createDirectoryModal');
     if ($createDirectoryModal.length > 0) {
@@ -58,7 +58,7 @@ componentUtils.registerComponent('create-directory', undefined, TEMPLATE).done((
     $createDirectoryModal = $(
       '<div id="createDirectoryModal" data-bind="component: { name: \'create-directory\', params: $data }" data-keyboard="true" class="modal hide fade" tabindex="-1"/>'
     );
-    $(window.HUE_CONTAINER).append($createDirectoryModal);
+    $('body').append($createDirectoryModal);
 
     ko.applyBindings(docViewModel, $createDirectoryModal[0]);
   });

@@ -27,6 +27,7 @@ _WEBSERVER_CERTIFICATE_FILE = '-webserver_certificate_file'
 _SSL_SERVER_CERTIFICATE = '-ssl_server_certificate'
 _MAX_RESULT_CACHE_SIZE = '-max_result_cache_size'
 _AUTHORIZED_PROXY_USER_CONFIG = '-authorized_proxy_user_config'
+_PRINCIPAL = '-principal'
 
 
 def reset():
@@ -74,6 +75,9 @@ def is_impersonation_enabled():
   """
   user_config = get_conf().get(_AUTHORIZED_PROXY_USER_CONFIG)
   return True if user_config and 'hue=' in user_config else False
+
+def is_kerberos_enabled():
+  return get_conf().get(_PRINCIPAL) is not None
 
 def _parse_impala_flags():
   from impala import conf # Cyclic dependency

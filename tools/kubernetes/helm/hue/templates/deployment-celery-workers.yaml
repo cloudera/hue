@@ -1,0 +1,37 @@
+{{- if .Values.workers.enabled -}}
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: celery-worker
+  labels:
+    deployment: celery-worker
+spec:
+  replicas: {{ .Values.workers.replicas }}
+  selector:
+    matchLabels:
+      pod: celery-worker
+  template:
+    metadata:
+      labels:
+        pod: celery-worker
+    spec:
+      containers:
+        - name: celery-worker
+          image: {{ .Values.image.registry }}/hue:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ['./build/env/bin/celery', 'worker', '-A', 'desktop', '-l', 'info']
+          volumeMounts:
+          - name: config-volume
+            mountPath: /usr/share/hue/desktop/conf/z-hue.ini
+            subPath: hue-ini
+          - name: config-volume-extra
+            mountPath: /usr/share/hue/desktop/conf/zz-hue.ini
+            subPath: hue-ini
+      volumes:
+        - name: config-volume
+          configMap:
+            name: hue-config
+        - name: config-volume-extra
+          configMap:
+            name: hue-config-extra
+{{- end -}}

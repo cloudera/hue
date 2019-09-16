@@ -15,12 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
 import errno
 import logging
 import os.path
 
-import conf
-import confparse
+from . import conf
+from . import confparse
 from hadoop.conf import DEFAULT_NN_HTTP_PORT
 
 LOG = logging.getLogger(__name__)
@@ -84,7 +85,7 @@ def _parse_hdfs_site():
     data = file(hdfs_site_path, 'r').read()
   except KeyError:
     data = ""
-  except IOError, err:
+  except IOError as err:
     if err.errno != errno.ENOENT:
       LOG.error('Cannot read from "%s": %s' % (hdfs_site_path, err))
       return

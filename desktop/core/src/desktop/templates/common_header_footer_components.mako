@@ -18,7 +18,6 @@ from django.utils.translation import ugettext as _
 from django.template.defaultfilters import escape, escapejs
 
 from desktop import conf
-from desktop.conf import IS_EMBEDDED
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
 
@@ -68,7 +67,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
       try {
         mTime = new Date(mTime);
         if (moment(mTime).isValid()) {
-          return moment.utc(mTime).format("L LT");
+          return moment.utc(mTime).local().format("L LT Z"); // [Local Date] [Local Time] [Timezone offset]
         }
       }
       catch (e) {
@@ -404,7 +403,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
         if ($('#login-modal').length > 0 && $('#login-modal').is(':hidden')) {
           $('#login-modal .link-message').hide();
           if (isAutoLogout) {
-            $(HUE_CONTAINER).children(':not(#login-modal)').addClass('blurred');
+            $('body').children(':not(#login-modal)').addClass('blurred');
             $('#login-modal .auto-logged-out').show();
             $('#login-modal').modal({
               backdrop: 'static',
@@ -565,7 +564,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
   }
 
 
-  %if collect_usage and not IS_EMBEDDED.get():
+  %if collect_usage:
 
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

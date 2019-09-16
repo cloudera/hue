@@ -15,11 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import next
+from builtins import object
 import calendar
 import json
 import logging
 import os
-import urllib
+import sys
 import uuid
 
 from collections import OrderedDict
@@ -36,23 +41,28 @@ from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
-from settings import HUE_DESKTOP_VERSION
+from desktop.settings import HUE_DESKTOP_VERSION
 
-from aws.conf import is_enabled as is_s3_enabled, has_s3_access
-from azure.conf import is_adls_enabled, has_adls_access
 from dashboard.conf import get_engines, HAS_REPORT_ENABLED
-from hadoop.conf import has_hdfs_enabled
 from kafka.conf import has_kafka
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 
 from desktop import appmanager
-from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_EMBEDDED, IS_K8S_ONLY
+from desktop.auth.backend import is_admin
+from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_K8S_ONLY
+from desktop.lib import fsmanager
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paths import get_run_root, SAFE_CHARACTERS_URI_COMPONENTS
 from desktop.redaction import global_redaction_engine
 from desktop.settings import DOCUMENT2_SEARCH_MAX_LENGTH
 from desktop.auth.backend import is_admin
+
+if sys.version_info[0] > 2:
+  import urllib.request, urllib.error
+  from urllib.parse import quote as urllib_quote
+else:
+  from urllib import quote as urllib_quote
 
 LOG = logging.getLogger(__name__)
 
@@ -92,7 +102,7 @@ def _version_from_properties(f):
 PREFERENCE_IS_WELCOME_TOUR_SEEN = 'is_welcome_tour_seen'
 
 class HueUser(auth_models.User):
-  class Meta:
+  class Meta(object):
     proxy = True
 
   def __init__(self, *args, **kwargs):
@@ -160,7 +170,7 @@ class DefaultConfiguration(models.Model):
 
   objects = DefaultConfigurationManager()
 
-  class Meta:
+  class Meta(object):
     ordering = ["app", "-is_default", "user"]
 
 
@@ -293,7 +303,7 @@ class DocumentTag(models.Model):
 
   objects = DocumentTagManager()
 
-  class Meta:
+  class Meta(object):
     unique_together = ('owner', 'tag')
 
 
@@ -435,7 +445,7 @@ class DocumentManager(models.Manager):
               if not job.managed:
                 doc.extra = 'jobsub'
                 doc.save()
-    except Exception, e:
+    except Exception as e:
       LOG.exception('error syncing oozie')
 
     try:
@@ -447,7 +457,7 @@ class DocumentManager(models.Manager):
             doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.desc, extra=job.type)
             if job.is_trashed:
               doc.send_to_trash()
-    except Exception, e:
+    except Exception as e:
       LOG.exception('error syncing beeswax')
 
     try:
@@ -457,7 +467,7 @@ class DocumentManager(models.Manager):
         with transaction.atomic():
           for job in find_jobs_with_no_doc(PigScript):
             Document.objects.link(job, owner=job.owner, name=job.dict['name'], description='')
-    except Exception, e:
+    except Exception as e:
       LOG.exception('error syncing pig')
 
     try:
@@ -480,7 +490,7 @@ class DocumentManager(models.Manager):
                 dashboard_doc = Document2.objects.create(name=dashboard.label, uuid=_uuid, type='search-dashboard', owner=owner, description=dashboard.label, data=dashboard.properties)
                 Document.objects.link(dashboard_doc, owner=owner, name=dashboard.label, description=dashboard.label, extra='search-dashboard')
                 dashboard.save()
-    except Exception, e:
+    except Exception as e:
       LOG.exception('error syncing search')
 
     try:
@@ -500,7 +510,7 @@ class DocumentManager(models.Manager):
             else:
               extra = ''
             doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description, extra=extra)
-    except Exception, e:
+    except Exception as e:
       LOG.exception('error syncing Document2')
 
 
@@ -510,7 +520,7 @@ class DocumentManager(models.Manager):
         for doc in Document.objects.filter(tags=None):
           default_tag = DocumentTag.objects.get_default_tag(doc.owner)
           doc.tags.add(default_tag)
-      except Exception, e:
+      except Exception as e:
         LOG.exception('error adding at least one tag to docs')
 
       # Make sure all the sample user documents are shared.
@@ -525,7 +535,7 @@ class DocumentManager(models.Manager):
 
             doc.save()
             Document.objects.filter(id=doc.id).update(last_modified=doc_last_modified)
-      except Exception, e:
+      except Exception as e:
         LOG.exception('error sharing sample user documents')
 
       # For now remove the default tag from the examples
@@ -533,7 +543,7 @@ class DocumentManager(models.Manager):
         for doc in Document.objects.filter(tags__tag=DocumentTag.EXAMPLE):
           default_tag = DocumentTag.objects.get_default_tag(doc.owner)
           doc.tags.remove(default_tag)
-      except Exception, e:
+      except Exception as e:
         LOG.exception('error removing default tags')
 
       # ------------------------------------------------------------------------
@@ -602,7 +612,7 @@ class DocumentManager(models.Manager):
           if docs.exists():
             LOG.info('Deleting %s documents' % docs.count())
             docs.delete()
-      except Exception, e:
+      except Exception as e:
         LOG.exception('Error in sync while attempting to delete documents with no object: %s' % e)
 
 
@@ -624,7 +634,7 @@ class Document(models.Model):
 
   objects = DocumentManager()
 
-  class Meta:
+  class Meta(object):
     unique_together = ('content_type', 'object_id')
 
   def __unicode__(self):
@@ -710,6 +720,8 @@ class Document(models.Model):
         content_object.doc.get().delete()
       content_object.doc.add(copy_doc)
 
+      copy_doc.save()
+
       return copy_doc
     else:
       raise PopupException(_("Document copy method requires a content_object argument."))
@@ -750,7 +762,7 @@ class Document(models.Model):
         return staticfiles_storage.url(apps[self.content_type.app_label].icon_path)
       else:
         return staticfiles_storage.url('desktop/art/icon_hue_48.png')
-    except Exception, e:
+    except Exception as e:
       LOG.warn(force_unicode(e))
       return staticfiles_storage.url('desktop/art/icon_hue_48.png')
 
@@ -766,7 +778,7 @@ class Document(models.Model):
 
     Example of input: {'read': {'user_ids': [1, 2, 3], 'group_ids': [1, 2, 3]}}
     """
-    for name, perm in perms_dict.iteritems():
+    for name, perm in perms_dict.items():
       users = groups = None
       if perm.get('user_ids'):
         users = auth_models.User.objects.in_bulk(perm.get('user_ids'))
@@ -880,7 +892,7 @@ class DocumentPermission(models.Model):
 
   objects = DocumentPermissionManager()
 
-  class Meta:
+  class Meta(object):
     unique_together = ('doc', 'perms')
 
 
@@ -1090,7 +1102,7 @@ class Document2(models.Model):
 
   objects = Document2Manager()
 
-  class Meta:
+  class Meta(object):
     unique_together = ('uuid', 'version', 'is_history')
     ordering = ["-last_modified", "name"]
 
@@ -1107,7 +1119,7 @@ class Document2(models.Model):
 
   @property
   def path(self):
-    quoted_name = urllib.quote(self.name.encode('utf-8'))
+    quoted_name = urllib_quote(self.name.encode('utf-8'))
     if self.parent_directory:
       return '%s/%s' % (self.parent_directory.path, quoted_name)
     else:
@@ -1341,7 +1353,7 @@ class Document2(models.Model):
         # For directories, update all children recursively with same permissions
         for child in self.children.all():
           child.share(user, name, users, groups)
-    except Exception, e:
+    except Exception as e:
       raise PopupException(_("Failed to share document: %s") % e)
     return self
 
@@ -1373,7 +1385,7 @@ class Document2(models.Model):
 
     try:
       doc = self.doc.get()
-    except Exception, e:
+    except Exception as e:
       LOG.error('Exception when retrieving document object for saved query: %s' % e)
       doc = Document.objects.link(
         self,
@@ -1465,7 +1477,7 @@ class Directory(Document2):
 
   objects = DirectoryManager()
 
-  class Meta:
+  class Meta(object):
     proxy = True
 
   def get_children_documents(self):
@@ -1532,7 +1544,7 @@ class Document2Permission(models.Model):
   # link = models.CharField(default=uuid_default, max_length=255, unique=True) # Short link like dropbox
   # embed
 
-  class Meta:
+  class Meta(object):
     unique_together = ('doc', 'perms')
 
   def to_dict(self):
@@ -1554,11 +1566,7 @@ def get_cluster_config(user):
   return Cluster(user).get_app_config().get_config()
 
 
-# Aka 'Atus'
-ANALYTIC_DB = 'altus'
-
-
-class ClusterConfig():
+class ClusterConfig(object):
   """
   Configuration of the apps and engines that each individual user sees on the core Hue.
   Fine grained Hue permissions and available apps are leveraged here in order to render the correct UI.
@@ -1570,7 +1578,6 @@ class ClusterConfig():
     self.user = user
     self.apps = appmanager.get_apps_dict(self.user) if apps is None else apps
     self.cluster_type = cluster_type
-
 
   def refreshConfig(self):
     # TODO: reload "some ini sections"
@@ -1598,7 +1605,8 @@ class ClusterConfig():
         ] if app is not None
       ],
       'default_sql_interpreter': default_sql_interpreter,
-      'cluster_type': self.cluster_type
+      'cluster_type': self.cluster_type,
+      'has_computes': self.cluster_type in ('altus', 'snowball') # or any grouped engine connectors
     }
 
 
@@ -1620,7 +1628,7 @@ class ClusterConfig():
     if not apps:
       raise PopupException(_('No permission to any app.'))
 
-    default_app = apps.values()[0]
+    default_app = list(apps.values())[0]
     default_interpreter = default_app.get('interpreters')
 
     try:
@@ -1658,9 +1666,6 @@ class ClusterConfig():
 
     _interpreters = get_ordered_interpreters(self.user)
 
-    if ANALYTIC_DB in self.cluster_type:
-      _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] in ('impala')] #, 'hive', 'spark2', 'pyspark', 'mapreduce')]
-
     for interpreter in _interpreters:
       if interpreter['interface'] != 'hms':
         interpreters.append({
@@ -1671,9 +1676,10 @@ class ClusterConfig():
           'tooltip': _('%s Query') % interpreter['type'].title(),
           'page': '/editor/?type=%(type)s' % interpreter,
           'is_sql': interpreter['is_sql'],
+          'dialect': interpreter['dialect'],
         })
 
-    if SHOW_NOTEBOOKS.get() and ANALYTIC_DB not in self.cluster_type:
+    if SHOW_NOTEBOOKS.get():
       try:
         first_non_sql_index = [interpreter['is_sql'] for interpreter in interpreters].index(False)
       except ValueError:
@@ -1686,6 +1692,7 @@ class ClusterConfig():
         'tooltip': _('Notebook'),
         'page': '/notebook',
         'is_sql': False,
+        'dialect': 'notebook'
       })
 
     if interpreters:
@@ -1725,7 +1732,7 @@ class ClusterConfig():
     interpreters = get_engines(self.user)
     _interpreters = []
 
-    if interpreters and ANALYTIC_DB not in self.cluster_type:
+    if interpreters:
       if HAS_REPORT_ENABLED.get():
         _interpreters.append({
           'type': 'report',
@@ -1759,31 +1766,42 @@ class ClusterConfig():
   def _get_browser(self):
     interpreters = []
 
-    if has_hdfs_enabled() and 'filebrowser' in self.apps and ANALYTIC_DB not in self.cluster_type:
+    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('hdfs', self.user):
       interpreters.append({
         'type': 'hdfs',
         'displayName': _('Files'),
         'buttonName': _('Browse'),
         'tooltip': _('Files'),
-        'page': '/filebrowser/' + (not self.user.is_anonymous() and 'view=' + urllib.quote(self.user.get_home_directory().encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) or '')
+        'page': '/filebrowser/' + (not self.user.is_anonymous() and 'view=' + urllib_quote(self.user.get_home_directory().encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) or '')
       })
 
-    if is_s3_enabled() and 'filebrowser' in self.apps and has_s3_access(self.user) and not IS_EMBEDDED.get():
+    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('s3a', self.user):
       interpreters.append({
         'type': 's3',
         'displayName': _('S3'),
         'buttonName': _('Browse'),
         'tooltip': _('S3'),
-        'page': '/filebrowser/view=' + urllib.quote('S3A://'.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
+        'page': '/filebrowser/view=' + urllib_quote('S3A://'.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
       })
 
-    if is_adls_enabled() and 'filebrowser' in self.apps and has_adls_access(self.user) and ANALYTIC_DB not in self.cluster_type:
+    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('adl', self.user):
       interpreters.append({
         'type': 'adls',
         'displayName': _('ADLS'),
         'buttonName': _('Browse'),
         'tooltip': _('ADLS'),
-        'page': '/filebrowser/view=' + urllib.quote('adl:/'.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
+        'page': '/filebrowser/view=' + urllib_quote('adl:/'.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
+      })
+
+    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('abfs', self.user):
+      from azure.abfs.__init__ import get_home_dir_for_ABFS
+      
+      interpreters.append({
+        'type': 'abfs',
+        'displayName': _('ABFS'),
+        'buttonName': _('Browse'),
+        'tooltip': _('ABFS'),
+        'page': '/filebrowser/view=' + urllib_quote(get_home_dir_for_ABFS().encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
       })
 
     if 'metastore' in self.apps:
@@ -1795,7 +1813,7 @@ class ClusterConfig():
         'page': '/metastore/tables'
       })
 
-    if 'search' in self.apps and ANALYTIC_DB not in self.cluster_type:
+    if 'search' in self.apps:
       interpreters.append({
         'type': 'indexes',
         'displayName': _('Indexes'),
@@ -1807,18 +1825,16 @@ class ClusterConfig():
     if 'jobbrowser' in self.apps:
       from hadoop.cluster import get_default_yarncluster # Circular loop
 
-      title =  _('Jobs') if ANALYTIC_DB not in self.cluster_type else _('Queries')
-
       if get_default_yarncluster():
         interpreters.append({
           'type': 'yarn',
-          'displayName': title,
-          'buttonName': title,
-          'tooltip': title,
+          'displayName': _('Jobs'),
+          'buttonName': _('Jobs'),
+          'tooltip': _('Jobs'),
           'page': '/jobbrowser/'
         })
 
-    if has_kafka() and ANALYTIC_DB not in self.cluster_type:
+    if has_kafka():
       interpreters.append({
         'type': 'kafka',
         'displayName': _('Streams'),
@@ -1827,7 +1843,7 @@ class ClusterConfig():
         'page': '/kafka/'
       })
 
-    if 'hbase' in self.apps and ANALYTIC_DB not in self.cluster_type:
+    if 'hbase' in self.apps:
       interpreters.append({
         'type': 'hbase',
         'displayName': _('HBase'),
@@ -1836,7 +1852,7 @@ class ClusterConfig():
         'page': '/hbase/'
       })
 
-    if 'security' in self.apps and not IS_EMBEDDED.get():
+    if 'security' in self.apps:
       interpreters.append({
         'type': 'security',
         'displayName': _('Security'),
@@ -1845,7 +1861,16 @@ class ClusterConfig():
         'page': '/security/hive'
       })
 
-    if 'sqoop' in self.apps and ANALYTIC_DB not in self.cluster_type:
+    if 'indexer' in self.apps and 'filebrowser' in self.apps and self.user.has_hue_permission(action="access:importer", app="indexer"):
+      interpreters.append({
+        'type': 'importer',
+        'displayName': _('Importer'),
+        'buttonName': _('Import'),
+        'tooltip': _('Importer'),
+        'page': '/indexer/importer'
+      })
+
+    if 'sqoop' in self.apps:
       from sqoop.conf import IS_ENABLED
       if IS_ENABLED.get():
         interpreters.append({
@@ -1890,7 +1915,28 @@ class ClusterConfig():
       }
     ]
 
-    if 'oozie' in self.apps and not (self.user.has_hue_permission(action="disable_editor_access", app="oozie") and not is_admin(self.user)) and ANALYTIC_DB not in self.cluster_type:
+    if 'oozie' in self.apps and not (self.user.has_hue_permission(action="disable_editor_access", app="oozie") and not is_admin(self.user)):
+      interpreters.extend([{
+          'type': 'oozie-workflow',
+          'displayName': _('Workflow'),
+          'buttonName': _('Schedule'),
+          'tooltip': _('Workflow'),
+          'page': '/oozie/editor/workflow/new/'
+        }, {
+          'type': 'oozie-coordinator',
+          'displayName': _('Schedule'),
+          'buttonName': _('Schedule'),
+          'tooltip': _('Schedule'),
+          'page': '/oozie/editor/coordinator/new/'
+        }, {
+          'type': 'oozie-bundle',
+          'displayName': _('Bundle'),
+          'buttonName': _('Schedule'),
+          'tooltip': _('Bundle'),
+          'page': '/oozie/editor/bundle/new/'
+        }
+      ])
+
       return {
           'name': 'oozie',
           'displayName': _('Scheduler'),
@@ -1927,23 +1973,18 @@ class ClusterConfig():
       return None
 
   def get_hive_metastore_interpreters(self):
-    return [interpreter['type'] for interpreter in get_ordered_interpreters(self.user) if interpreter == 'hive' or interpreter == 'hms']
+    return [interpreter['type'] for interpreter in get_ordered_interpreters(self.user) if interpreter['type'] == 'hive' or interpreter['type'] == 'hms']
 
-class Cluster():
+class Cluster(object):
 
   def __init__(self, user):
     self.user = user
     self.clusters = get_clusters(user)
 
-    if len(self.clusters) == 1:
-      self.data = self.clusters.values()[0]
-    elif IS_K8S_ONLY.get():
-      self.data = self.clusters['AltusV2']
-      self.data['type'] = 'altus' # To show simplified UI
-    elif IS_MULTICLUSTER_ONLY.get():
-      self.data = self.clusters['Altus']
+    if IS_MULTICLUSTER_ONLY.get():
+      self.data = self.clusters['Altus'] # Backward compatibility
     else:
-      self.data = self.clusters[CLUSTER_ID.get()]
+      self.data = list(self.clusters.values())[0] # Next: CLUSTER_ID.get() or user persisted
 
   def get_type(self):
     return self.data['type']
@@ -1960,11 +2001,12 @@ def _get_apps(user, section=None):
   other_apps = []
   if user.is_authenticated():
     apps_list = appmanager.get_apps_dict(user)
-    apps = apps_list.values()
+    apps = list(apps_list.values())
     for app in apps:
       if app.display_name not in [
-          'beeswax', 'hive', 'impala', 'pig', 'jobsub', 'jobbrowser', 'metastore', 'hbase', 'sqoop', 'oozie', 'filebrowser',
-          'useradmin', 'search', 'help', 'about', 'zookeeper', 'proxy', 'rdbms', 'spark', 'indexer', 'security', 'notebook'] and app.menu_index != -1:
+            'beeswax', 'hive', 'impala', 'pig', 'jobsub', 'jobbrowser', 'metastore', 'hbase', 'sqoop', 'oozie', 'filebrowser',
+            'useradmin', 'search', 'help', 'about', 'zookeeper', 'proxy', 'rdbms', 'spark', 'indexer', 'security', 'notebook'
+          ] and app.menu_index != -1:
         other_apps.append(app)
       if section == app.display_name:
         current_app = app

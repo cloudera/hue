@@ -29,7 +29,7 @@ from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 from kazoo.client import KazooClient
 
-from desktop.conf import CLUSTER_ID
+from desktop.conf import CLUSTER_ID, has_connectors
 from desktop.lib.django_util import format_preserving_redirect
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.parameterization import substitute_variables
@@ -43,12 +43,11 @@ from beeswax import hive_site
 from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, HIVE_METASTORE_HOST, HIVE_METASTORE_PORT, LIST_PARTITIONS_LIMIT, SERVER_CONN_TIMEOUT, \
   AUTH_USERNAME, AUTH_PASSWORD, APPLY_NATURAL_SORT_MAX, QUERY_PARTITIONS_LIMIT, HIVE_DISCOVERY_HIVESERVER2_ZNODE, \
   HIVE_DISCOVERY_HS2, HIVE_DISCOVERY_LLAP, HIVE_DISCOVERY_LLAP_HA, HIVE_DISCOVERY_LLAP_ZNODE, CACHE_TIMEOUT, \
-  LLAP_SERVER_HOST, LLAP_SERVER_PORT, LLAP_SERVER_THRIFT_PORT
+  LLAP_SERVER_HOST, LLAP_SERVER_PORT, LLAP_SERVER_THRIFT_PORT, USE_SASL as HIVE_USE_SASL
 from beeswax.common import apply_natural_sort
 from beeswax.design import hql_query
 from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.models import QueryHistory, QUERY_TYPES
-
 
 LOG = logging.getLogger(__name__)
 
@@ -65,7 +64,7 @@ def get(user, query_server=None, cluster=None):
   global DBMS_CACHE_LOCK
 
   if query_server is None:
-    query_server = get_query_server_config(cluster=cluster)
+    query_server = get_query_server_config(connector=cluster)
 
   DBMS_CACHE_LOCK.acquire()
   try:
@@ -91,120 +90,133 @@ def get(user, query_server=None, cluster=None):
     DBMS_CACHE_LOCK.release()
 
 
-def get_query_server_config(name='beeswax', server=None, cluster=None):
-  LOG.debug("Query cluster %s: %s" % (name, cluster))
-
-  cluster_config = get_cluster_config(cluster)
-  if name == "llap":
-    activeEndpoint = cache.get('llap')
-    if activeEndpoint is None:
-      if HIVE_DISCOVERY_LLAP.get():
-        LOG.debug("Checking zookeeper for Hive Server Interactive endpoint")
-        zk = KazooClient(hosts=libzookeeper_conf.ENSEMBLE.get(), read_only=True)
-        zk.start()
-        if HIVE_DISCOVERY_LLAP_HA.get():
-          znode = "{0}/instances".format(HIVE_DISCOVERY_LLAP_ZNODE.get())
-          LOG.debug("Setting up LLAP with the following node {0}".format(znode))
-          if zk.exists(znode):
-            hiveservers = zk.get_children(znode)
-            for server in hiveservers:
-              llap_servers= json.loads(zk.get("{0}/{1}".format(znode, server))[0])["internal"][0]
-              if llap_servers["api"] == "activeEndpoint":
-                cache.set("llap", json.dumps({"host": llap_servers["addresses"][0]["host"], "port": llap_servers["addresses"][0]["port"]}), CACHE_TIMEOUT.get())
+def get_query_server_config(name='beeswax', connector=None):
+  if connector and has_connectors(): # TODO: Give empty connector when no connector in use
+    query_server = get_query_server_config_via_connector(connector)
+  else:
+    LOG.debug("Query cluster %s" % name)
+    if name == "llap":
+      activeEndpoint = cache.get('llap')
+      if activeEndpoint is None:
+        if HIVE_DISCOVERY_LLAP.get():
+          LOG.debug("Checking zookeeper for Hive Server Interactive endpoint")
+          zk = KazooClient(hosts=libzookeeper_conf.ENSEMBLE.get(), read_only=True)
+          zk.start()
+          if HIVE_DISCOVERY_LLAP_HA.get():
+            znode = "{0}/instances".format(HIVE_DISCOVERY_LLAP_ZNODE.get())
+            LOG.debug("Setting up LLAP with the following node {0}".format(znode))
+            if zk.exists(znode):
+              hiveservers = zk.get_children(znode)
+              for server in hiveservers:
+                llap_servers= json.loads(zk.get("{0}/{1}".format(znode, server))[0])["internal"][0]
+                if llap_servers["api"] == "activeEndpoint":
+                  cache.set("llap", json.dumps({"host": llap_servers["addresses"][0]["host"], "port": llap_servers["addresses"][0]["port"]}), CACHE_TIMEOUT.get())
+            else:
+              LOG.error("LLAP Endpoint not found, reverting to HiveServer2")
+              cache.set("llap", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": hive_site.hiveserver2_thrift_http_port()}), CACHE_TIMEOUT.get())
           else:
-            LOG.error("LLAP Endpoint not found, reverting to HiveServer2")
-            cache.set("llap", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": hive_site.hiveserver2_thrift_http_port()}), CACHE_TIMEOUT.get())
+            znode = "{0}".format(HIVE_DISCOVERY_LLAP_ZNODE.get())
+            LOG.debug("Setting up LLAP with the following node {0}".format(znode))
+            if zk.exists(znode):
+              hiveservers = zk.get_children(znode)
+              for server in hiveservers:
+                cache.set("llap", json.dumps({"host": server.split(';')[0].split('=')[1].split(":")[0], "port": server.split(';')[0].split('=')[1].split(":")[1]}))
+          zk.stop()
         else:
-          znode = "{0}".format(HIVE_DISCOVERY_LLAP_ZNODE.get())
-          LOG.debug("Setting up LLAP with the following node {0}".format(znode))
+          LOG.debug("Zookeeper Discovery not enabled, reverting to config values")
+          cache.set("llap", json.dumps({"host": LLAP_SERVER_HOST.get(), "port": LLAP_SERVER_THRIFT_PORT.get()}), CACHE_TIMEOUT.get())
+      activeEndpoint = json.loads(cache.get("llap"))
+    elif name != 'hms' and name != 'impala':
+      activeEndpoint = cache.get("hiveserver2")
+      if activeEndpoint is None:
+        if HIVE_DISCOVERY_HS2.get():
+          zk = KazooClient(hosts=libzookeeper_conf.ENSEMBLE.get(), read_only=True)
+          zk.start()
+          znode = HIVE_DISCOVERY_HIVESERVER2_ZNODE.get()
+          LOG.info("Setting up Hive with the following node {0}".format(znode))
           if zk.exists(znode):
             hiveservers = zk.get_children(znode)
-            for server in hiveservers:
-              cache.set("llap", json.dumps({"host": server.split(';')[0].split('=')[1].split(":")[0], "port": server.split(';')[0].split('=')[1].split(":")[1]}))
-        zk.stop()
-      else:
-        LOG.debug("Zookeeper Discovery not enabled, reverting to config values")
-        cache.set("llap", json.dumps({"host": LLAP_SERVER_HOST.get(), "port": LLAP_SERVER_THRIFT_PORT.get()}), CACHE_TIMEOUT.get())
-    activeEndpoint = json.loads(cache.get("llap"))
-  elif name != 'hms' and name != 'impala':
-    activeEndpoint = cache.get("hiveserver2")
-    if activeEndpoint is None:
-      if HIVE_DISCOVERY_HS2.get():
-        zk = KazooClient(hosts=libzookeeper_conf.ENSEMBLE.get(), read_only=True)
-        zk.start()
-        znode = HIVE_DISCOVERY_HIVESERVER2_ZNODE.get()
-        LOG.info("Setting up Hive with the following node {0}".format(znode))
-        if zk.exists(znode):
-          hiveservers = zk.get_children(znode)
-          server_to_use = 0 # if CONF.HIVE_SPREAD.get() randint(0, len(hiveservers)-1) else 0
-          cache.set("hiveserver2", json.dumps({"host": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[0], "port": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[1]}))
+            server_to_use = 0 # if CONF.HIVE_SPREAD.get() randint(0, len(hiveservers)-1) else 0
+            cache.set("hiveserver2", json.dumps({"host": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[0], "port": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[1]}))
+          else:
+            cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": hive_site.hiveserver2_thrift_http_port()}))
+          zk.stop()
         else:
           cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": hive_site.hiveserver2_thrift_http_port()}))
-        zk.stop()
-      else:
-        cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": hive_site.hiveserver2_thrift_http_port()}))
-    activeEndpoint = json.loads(cache.get("hiveserver2"))
+      activeEndpoint = json.loads(cache.get("hiveserver2"))
 
-  if name == 'impala':
-    from impala.dbms import get_query_server_config as impala_query_server_config
-    query_server = impala_query_server_config(cluster_config=cluster_config)
-  elif name == 'hms':
-    kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
-    query_server = {
-        'server_name': 'hms',
-        'server_host': HIVE_METASTORE_HOST.get() if not cluster_config else cluster_config.get('server_host'),
-        'server_port': HIVE_METASTORE_PORT.get(),
-        'principal': kerberos_principal,
-        'transport_mode': 'http' if hive_site.hiveserver2_transport_mode() == 'HTTP' else 'socket',
-        'auth_username': AUTH_USERNAME.get(),
-        'auth_password': AUTH_PASSWORD.get()
-    }
-  else:
-    kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
-    query_server = {
-        'server_name': 'beeswax',
-        'server_host': activeEndpoint["host"],
-        'server_port': LLAP_SERVER_PORT.get() if name == 'llap' else HIVE_SERVER_PORT.get(),
-        'principal': kerberos_principal,
-        'http_url': '%(protocol)s://%(host)s:%(port)s/%(end_point)s' % {
-            'protocol': 'https' if hiveserver2_use_ssl() else 'http',
-            'host': activeEndpoint["host"],
-            'port': activeEndpoint["port"],
-            'end_point': hive_site.hiveserver2_thrift_http_path()
-          },
-        'transport_mode': 'http' if hive_site.hiveserver2_transport_mode() == 'HTTP' else 'socket',
-        'auth_username': AUTH_USERNAME.get(),
-        'auth_password': AUTH_PASSWORD.get()
+    if name == 'impala':
+      from impala.dbms import get_query_server_config as impala_query_server_config
+      query_server = impala_query_server_config()
+    elif name == 'hms':
+      kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
+      query_server = {
+          'server_name': 'hms',
+          'server_host': HIVE_METASTORE_HOST.get() if not cluster_config else cluster_config.get('server_host'),
+          'server_port': HIVE_METASTORE_PORT.get(),
+          'principal': kerberos_principal,
+          'transport_mode': 'http' if hive_site.hiveserver2_transport_mode() == 'HTTP' else 'socket',
+          'auth_username': AUTH_USERNAME.get(),
+          'auth_password': AUTH_PASSWORD.get(),
+          'use_sasl': HIVE_USE_SASL.get()
       }
-  if name == 'sparksql': # Spark SQL is almost the same as Hive
-    from spark.conf import SQL_SERVER_HOST as SPARK_SERVER_HOST, SQL_SERVER_PORT as SPARK_SERVER_PORT
+    else:
+      kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
+      query_server = {
+          'server_name': 'beeswax',
+          'server_host': activeEndpoint["host"],
+          'server_port': LLAP_SERVER_PORT.get() if name == 'llap' else HIVE_SERVER_PORT.get(),
+          'principal': kerberos_principal,
+          'http_url': '%(protocol)s://%(host)s:%(port)s/%(end_point)s' % {
+              'protocol': 'https' if hiveserver2_use_ssl() else 'http',
+              'host': activeEndpoint["host"],
+              'port': activeEndpoint["port"],
+              'end_point': hive_site.hiveserver2_thrift_http_path()
+            },
+          'transport_mode': 'http' if hive_site.hiveserver2_transport_mode() == 'HTTP' else 'socket',
+          'auth_username': AUTH_USERNAME.get(),
+          'auth_password': AUTH_PASSWORD.get(),
+          'use_sasl': HIVE_USE_SASL.get()
+        }
 
-    query_server.update({
-        'server_name': 'sparksql',
-        'server_host': SPARK_SERVER_HOST.get(),
-        'server_port': SPARK_SERVER_PORT.get()
-    })
+    if name == 'sparksql': # Extends Hive as very similar
+      from spark.conf import SQL_SERVER_HOST as SPARK_SERVER_HOST, SQL_SERVER_PORT as SPARK_SERVER_PORT, USE_SASL as SPARK_USE_SASL
+
+      query_server.update({
+          'server_name': 'sparksql',
+          'server_host': SPARK_SERVER_HOST.get(),
+          'server_port': SPARK_SERVER_PORT.get(),
+          'use_sasl': SPARK_USE_SASL.get()
+      })
 
   debug_query_server = query_server.copy()
-  debug_query_server['auth_password_used'] = bool(debug_query_server.pop('auth_password'))
+  debug_query_server['auth_password_used'] = bool(debug_query_server.pop('auth_password', None))
   LOG.debug("Query Server: %s" % debug_query_server)
 
   return query_server
 
 
-def get_cluster_config(cluster=None):
-  if cluster and cluster.get('connector'): # Connector interface
-    cluster_config = cluster
-  elif cluster and cluster.get('id') != CLUSTER_ID.get():
-    if 'altus:dataware:k8s' in cluster['id']:
-      compute_end_point = cluster['compute_end_point'][0] if type(cluster['compute_end_point']) == list else cluster['compute_end_point'] # TODO getting list from left assist
-      cluster_config = {'server_host': compute_end_point, 'name': cluster['name']} # TODO get port too
-    else:
-      cluster_config = Cluster(user=None).get_config(cluster['id']) # Direct cluster # Deprecated
-  else:
-    cluster_config = None
+def get_query_server_config_via_connector(connector):
+  connector_name = full_connector_name = connector['type']
+  compute_name = None
+  if connector.get('compute'):
+    compute_name = connector['compute']['name']
+    full_connector_name = '%s-%s' % (connector_name, compute_name)
+  LOG.debug("Query cluster connector %s compute %s" % (connector_name, compute_name))
 
-  return cluster_config
+  return {
+      'server_name': full_connector_name,
+      'server_host': (connector['compute']['options'] if 'compute' in connector else connector['options'])['server_host'],
+      'server_port': int((connector['compute']['options'] if 'compute' in connector else connector['options'])['server_port']),
+      'principal': 'TODO',
+      'auth_username': AUTH_USERNAME.get(),
+      'auth_password': AUTH_PASSWORD.get(),
+
+      'impersonation_enabled': False, # TODO, Impala only, to add to connector class
+      'SESSION_TIMEOUT_S': 15 * 60,
+      'querycache_rows': 1000,
+      'QUERY_TIMEOUT_S': 15 * 60,
+  }
 
 
 class QueryServerException(Exception):

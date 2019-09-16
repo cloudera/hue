@@ -24,7 +24,7 @@ import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 
-const TEMPLATE = `
+const ASSIST_TABLE_TEMPLATES = `
   <script type="text/html" id="assist-no-database-entries">
     <ul class="assist-tables">
       <li>
@@ -39,25 +39,6 @@ const TEMPLATE = `
         <span class="assist-no-entries">${I18n('The table has no columns')}</span>
       </li>
     </ul>
-  </script>
-
-  <script type="text/html" id="assist-database-actions">
-    <div class="assist-actions database-actions" style="opacity: 0">
-      <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
-      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: function (data, event) { showContextPopover(data, event); }, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
-        'Show details'
-      )}"></i></a>
-      <!-- /ko -->
-      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${I18n(
-        'Open'
-      )}"></i></a>
-    </div>
-  </script>
-  
-  <script type="text/html" id="collection-title-context-items">
-    <li><a href="javascript:void(0);" data-bind="hueLink: '/indexer'"><i class="fa fa-fw fa-table"></i> ${I18n(
-      'Open in Browser'
-    )}</a></li>
   </script>
 
   <script type="text/html" id="sql-context-items">
@@ -82,7 +63,7 @@ const TEMPLATE = `
           'Insert at cursor'
         )}</a></li>
         <!-- /ko -->
-        <!-- ko if: !window.IS_EMBEDDED && catalogEntry.path.length <=2 -->
+        <!-- ko if: catalogEntry.path.length <=2 -->
         <li><a href="javascript:void(0);" data-bind="click: openInMetastore"><i class="fa fa-fw fa-table"></i> ${I18n(
           'Open in Browser'
         )}</a></li>
@@ -152,13 +133,6 @@ const TEMPLATE = `
         <li><a href="javascript:void(0);" data-bind="click: function () { var descendingRule = QueryBuilder.getRule(databaseName, tableName, columnName, 'Descending'); if (descendingRule.length) { descendingRule.attr('rule', 'Ascending'); descendingRule.find('.rule').text('Ascending'); } else { QueryBuilder.addRule(databaseName, tableName, columnName, 'Ascending', 'Order', '{0}.{1} ASC', false, false); } }">Ascending</a></li>
         <li><a href="javascript:void(0);" data-bind="click: function () { var ascendingRule = QueryBuilder.getRule(databaseName, tableName, columnName, 'Ascending'); if (ascendingRule.length) { ascendingRule.attr('rule', 'Descending'); ascendingRule.find('.rule').text('Descending'); } else { QueryBuilder.addRule(databaseName, tableName, columnName, 'Descending', 'Order', '{0}.{1} DESC', false, false); } }">Descending</a></li>
       </ul>
-    </li>
-  </script>
-
-  <script type="text/html" id="assist-database-entry">
-    <li class="assist-table" data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { selector: '.database-actions' }">
-      <!-- ko template: { name: 'assist-database-actions' } --><!-- /ko -->
-      <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedDatabase($data); $parent.selectedDatabaseChanged(); }, attr: {'title': catalogEntry.getTitle(true) }, draggableText: { text: editorText,  meta: {'type': 'sql', 'database': databaseName} }"><i class="fa fa-fw fa-database muted valign-middle"></i> <span class="highlightable" data-bind="text: catalogEntry.name, css: { 'highlight': highlight() }"></span></a>
     </li>
   </script>
 
@@ -261,6 +235,36 @@ const TEMPLATE = `
     </ul>
     <!-- /ko -->
   </script>
+`;
+
+const TEMPLATE =
+  ASSIST_TABLE_TEMPLATES +
+  `
+  <script type="text/html" id="assist-database-actions">
+    <div class="assist-actions database-actions" style="opacity: 0">
+      <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
+      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: function (data, event) { showContextPopover(data, event); }, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
+        'Show details'
+      )}"></i></a>
+      <!-- /ko -->
+      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${I18n(
+        'Open'
+      )}"></i></a>
+    </div>
+  </script>
+
+  <script type="text/html" id="collection-title-context-items">
+    <li><a href="javascript:void(0);" data-bind="hueLink: '/indexer'"><i class="fa fa-fw fa-table"></i> ${I18n(
+      'Open in Browser'
+    )}</a></li>
+  </script>
+
+  <script type="text/html" id="assist-database-entry">
+    <li class="assist-table" data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { selector: '.database-actions' }">
+      <!-- ko template: { name: 'assist-database-actions' } --><!-- /ko -->
+      <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedDatabase($data); $parent.selectedDatabaseChanged(); }, attr: {'title': catalogEntry.getTitle(true) }, draggableText: { text: editorText,  meta: {'type': 'sql', 'database': databaseName} }"><i class="fa fa-fw fa-database muted valign-middle"></i> <span class="highlightable" data-bind="text: catalogEntry.name, css: { 'highlight': highlight() }"></span></a>
+    </li>
+  </script>
 
   <script type="text/html" id="assist-db-breadcrumb">
     <div class="assist-flex-header assist-breadcrumb">
@@ -329,13 +333,6 @@ const TEMPLATE = `
       ${I18n('Perform incremental metadata update.')}
     </label>
     <div class="assist-invalidate-description">${I18n('This will sync missing tables.')}</div>
-    <label class="radio">
-      <input type="radio" name="refreshImpala" value="invalidateAndFlush" data-bind="checked: invalidateOnRefresh"  />
-      ${I18n('Invalidate all metadata and rebuild index.')}
-    </label>
-    <div class="assist-invalidate-description">${I18n(
-      'WARNING: This can be both resource and time-intensive.'
-    )}</div>
     <div style="width: 100%; display: inline-block; margin-top: 5px;"><button class="pull-right btn btn-primary" data-bind="css: { 'btn-primary': invalidateOnRefresh() !== 'invalidateAndFlush', 'btn-danger': invalidateOnRefresh() === 'invalidateAndFlush' }, click: function (data, event) { huePubSub.publish('close.popover'); triggerRefresh(data, event); }, clickBubble: false">${I18n(
       'Refresh'
     )}</button></div>
@@ -361,7 +358,7 @@ const TEMPLATE = `
     <div class="assist-db-header-actions">
       <!-- ko ifnot: loading -->
       <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
-      <!-- ko if: window.ENABLE_NEW_CREATE_TABLE && !window.IS_EMBEDDED && (sourceType === 'hive' || sourceType === 'impala') -->
+      <!-- ko if: window.ENABLE_NEW_CREATE_TABLE && (sourceType === 'hive' || sourceType === 'impala') -->
       <!-- ko if: typeof databaseName !== 'undefined' -->
         <a class="inactive-action" data-bind="hueLink: window.HUE_URLS.IMPORTER_CREATE_TABLE + databaseName + '/?sourceType=' + sourceType + '&namespace=' + assistDbNamespace.namespace.id" title="${I18n(
           'Create table'
@@ -560,7 +557,7 @@ const TEMPLATE = `
       <span class="assist-errors">${I18n('Error loading tables.')}</span>
     </div>
   </script>
-  
+
   <!-- ko template: 'assist-sql-inner-panel' --><!-- /ko -->
 `;
 
@@ -906,3 +903,5 @@ const viewModelFactory = {
 };
 
 componentUtils.registerComponent('hue-assist-db-panel', viewModelFactory, TEMPLATE);
+
+export default ASSIST_TABLE_TEMPLATES;

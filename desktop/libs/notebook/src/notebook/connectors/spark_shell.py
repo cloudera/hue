@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import range
+from builtins import object
 import logging
 import re
 import time
@@ -37,7 +39,7 @@ LOG = logging.getLogger(__name__)
 try:
   from spark.conf import LIVY_SERVER_SESSION_KIND
   from spark.job_server_api import get_api as get_spark_api
-except ImportError, e:
+except ImportError as e:
   LOG.exception('Spark is not enabled')
 
 
@@ -243,7 +245,7 @@ class SparkApi(Api):
           'has_result_set': True,
           'sync': False
       }
-    except Exception, e:
+    except Exception as e:
       message = force_unicode(str(e)).lower()
       if re.search("session ('\d+' )?not found", message) or 'connection refused' in message or 'session is in state busy' in message:
         raise SessionExpired(e)
@@ -260,7 +262,7 @@ class SparkApi(Api):
       return {
           'status': response['state'],
       }
-    except Exception, e:
+    except Exception as e:
       message = force_unicode(str(e)).lower()
       if re.search("session ('\d+' )?not found", message):
         raise SessionExpired(e)
@@ -274,7 +276,7 @@ class SparkApi(Api):
 
     try:
       response = api.fetch_data(session['id'], cell)
-    except Exception, e:
+    except Exception as e:
       message = force_unicode(str(e)).lower()
       if re.search("session ('\d+' )?not found", message):
         raise SessionExpired(e)
@@ -359,7 +361,7 @@ class SparkApi(Api):
           'session': session['id'],
           'status': 0
         }
-      except RestException, e:
+      except RestException as e:
         if e.code == 404 or e.code == 500: # TODO remove the 500
           raise SessionExpired(e)
     else:

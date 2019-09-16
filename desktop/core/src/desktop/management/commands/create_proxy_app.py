@@ -57,7 +57,7 @@ class Command(BaseCommand):
       raise CommandError(_("%(name)r is not a valid application name. Use only numbers, letters and underscores.") % {'name': app_name})
     try:
       os.makedirs(app_dir)
-    except OSError, e:
+    except OSError as e:
       raise CommandError(e)
 
     copy_template(app_template, app_dir, app_name, app_url)

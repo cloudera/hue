@@ -23,7 +23,6 @@ import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 
-import Session from 'apps/notebook2/session';
 import { Snippet, STATUS as SNIPPET_STATUS } from 'apps/notebook2/snippet';
 
 const NOTEBOOK_MAPPING = {
@@ -97,10 +96,6 @@ class Notebook {
 
     self.snippets = ko.observableArray();
     self.selectedSnippet = ko.observable(vm.editorType()); // Aka selectedSnippetType
-    self.creatingSessionLocks = ko.observableArray();
-    self.sessions = komapping.fromJS(notebook.sessions || [], {
-      create: value => new Session(vm, value.data)
-    });
     self.directoryUuid = ko.observable(notebook.directoryUuid);
     self.dependents = komapping.fromJS(notebook.dependents || []);
     self.dependentsCoordinator = ko.pureComputed(() =>
@@ -116,22 +111,20 @@ class Notebook {
         ? vm.selectedNotebook().history()
         : []
     );
+
+    // This is to keep the "Saved Query" tab selected when opening a doc from the left assist
+    // TODO: Refactor code to reflect purpose
     self.history.subscribe(val => {
       if (
         self.id() == null &&
-        val.length === 0 &&
+        val.length == 0 &&
         self.historyFilter() === '' &&
         !vm.isNotificationManager()
       ) {
-        self
-          .snippets()[0]
-          .currentQueryTab(
-            typeof window.IS_EMBEDDED !== 'undefined' && window.IS_EMBEDDED
-              ? 'queryHistory'
-              : 'savedQueries'
-          );
+        self.snippets()[0].currentQueryTab('savedQueries');
       }
     });
+
     self.historyFilter = ko.observable('');
     self.historyFilterVisible = ko.observable(false);
     self.historyFilter.extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 900 } });
@@ -261,45 +254,12 @@ class Notebook {
     huePubSub.publish('assist.is.db.panel.ready');
   }
 
-  addSession(session) {
-    const self = this;
-    const toRemove = self.sessions().filter(s => s.type() === session.type());
-
-    toRemove.forEach(s => {
-      self.sessions.remove(s);
-    });
-
-    self.sessions.push(session);
-  }
-
-  addSnippet(snippet, skipSession) {
+  addSnippet(snippet) {
     const self = this;
     const newSnippet = new Snippet(self.parentVm, self, snippet);
     self.snippets.push(newSnippet);
-
-    if (self.getSession(newSnippet.type()) == null && typeof skipSession == 'undefined') {
-      window.setTimeout(() => {
-        newSnippet.status(SNIPPET_STATUS.loading);
-        self.createSession(new Session(self.parentVm, { type: newSnippet.type() }));
-      }, 200);
-    }
-
     newSnippet.init();
     return newSnippet;
-  }
-
-  authSession() {
-    const self = this;
-    self.createSession(
-      new Session(self.parentVm, {
-        type: self.parentVm.authSessionType(),
-        properties: [
-          { name: 'user', value: self.parentVm.authSessionUsername() },
-          { name: 'password', value: self.parentVm.authSessionPassword() }
-        ]
-      }),
-      self.parentVm.authSessionCallback() // On new session we don't automatically execute the snippet after the aut. On session expiration we do or we refresh assist DB when login-in.
-    );
   }
 
   cancelExecutingAll() {
@@ -313,14 +273,13 @@ class Notebook {
   clearHistory() {
     const self = this;
     hueAnalytics.log('notebook', 'clearHistory');
-    $.post(
-      '/notebook/api/clear_history',
-      {
-        notebook: komapping.toJSON(self.getContext(), NOTEBOOK_MAPPING),
-        doc_type: self.selectedSnippet(),
-        is_notification_manager: self.parentVm.isNotificationManager()
-      },
-      () => {
+    apiHelper
+      .clearNotebookHistory({
+        notebookJson: komapping.toJSON(self.getContext(), NOTEBOOK_MAPPING),
+        docType: self.selectedSnippet(),
+        isNotificationManager: self.parentVm.isNotificationManager()
+      })
+      .then(() => {
         self.history.removeAll();
         if (self.isHistory()) {
           self.id(null);
@@ -329,12 +288,12 @@ class Notebook {
             self.parentVm.URLS.editor + '?type=' + self.parentVm.editorType()
           );
         }
-      }
-    ).fail(xhr => {
-      if (xhr.status !== 502) {
-        $(document).trigger('error', xhr.responseText);
-      }
-    });
+      })
+      .fail(xhr => {
+        if (xhr.status !== 502) {
+          $(document).trigger('error', xhr.responseText);
+        }
+      });
     $(document).trigger('hideHistoryModal');
   }
 
@@ -349,105 +308,10 @@ class Notebook {
   close() {
     const self = this;
     hueAnalytics.log('notebook', 'close');
-    $.post('/notebook/api/notebook/close', {
-      notebook: komapping.toJSON(self, NOTEBOOK_MAPPING),
+    apiHelper.closeNotebook({
+      notebookJson: komapping.toJSON(self, NOTEBOOK_MAPPING),
       editorMode: self.parentVm.editorMode()
     });
-  }
-
-  closeAndRemoveSession(session) {
-    const self = this;
-    self.closeSession(session, false, () => {
-      self.sessions.remove(session);
-    });
-  }
-
-  closeSession(session, silent, callback) {
-    $.post(
-      '/notebook/api/close_session',
-      {
-        session: komapping.toJSON(session)
-      },
-      data => {
-        if (!silent && data && data.status !== 0 && data.status !== -2 && data.message) {
-          $(document).trigger('error', data.message);
-        }
-
-        if (callback) {
-          callback();
-        }
-      }
-    ).fail(xhr => {
-      if (!silent && xhr.status !== 502) {
-        $(document).trigger('error', xhr.responseText);
-      }
-    });
-  }
-
-  createSession(session, callback, failCallback) {
-    const self = this;
-    if (self.creatingSessionLocks().indexOf(session.type()) !== -1) {
-      // Create one type of session max
-      return;
-    } else {
-      self.creatingSessionLocks.push(session.type());
-    }
-
-    let compute = null;
-    self.getSnippets(session.type()).forEach((snippet, index) => {
-      snippet.status(SNIPPET_STATUS.loading);
-      if (index === 0) {
-        compute = snippet.compute();
-      }
-    });
-
-    const fail = function(message) {
-      self.getSnippets(session.type()).forEach(snippet => {
-        snippet.status('failed');
-      });
-      $(document).trigger('error', message);
-      if (failCallback) {
-        failCallback();
-      }
-    };
-
-    $.post(
-      '/notebook/api/create_session',
-      {
-        notebook: komapping.toJSON(self.getContext(), NOTEBOOK_MAPPING),
-        session: komapping.toJSON(session), // e.g. {'type': 'pyspark', 'properties': [{'name': driverCores', 'value', '2'}]}
-        cluster: komapping.toJSON(compute ? compute : '')
-      },
-      data => {
-        if (data.status === 0) {
-          komapping.fromJS(data.session, {}, session);
-          if (self.getSession(session.type()) == null) {
-            self.addSession(session);
-          } else {
-            const _session = self.getSession(session.type());
-            komapping.fromJS(data.session, {}, _session);
-          }
-          self.getSnippets(session.type()).forEach(snippet => {
-            snippet.status('ready');
-          });
-          if (callback) {
-            setTimeout(callback, 500);
-          }
-        } else if (data.status === 401) {
-          $(document).trigger('showAuthModal', { type: session.type(), message: data.message });
-        } else {
-          fail(data.message);
-        }
-      }
-    )
-      .fail(xhr => {
-        if (xhr.status !== 502) {
-          fail(xhr.responseText);
-        }
-      })
-      .always(() => {
-        self.creatingSessionLocks.remove(session.type());
-      });
   }
 
   executeAll() {
@@ -510,23 +374,9 @@ class Notebook {
       uuid: self.uuid,
       parentSavedQueryUuid: self.parentSavedQueryUuid,
       isSaved: self.isSaved,
-      sessions: self.sessions,
       type: self.type,
       name: self.name
     };
-  }
-
-  getSession(session_type) {
-    const self = this;
-    let found = undefined;
-    self.sessions().every(session => {
-      if (session.type() === session_type) {
-        found = session;
-        return false;
-      }
-      return true;
-    });
-    return found;
   }
 
   getSnippets(type) {
@@ -669,37 +519,6 @@ class Notebook {
     }
   }
 
-  restartSession(session, callback) {
-    const self = this;
-    if (session.restarting()) {
-      return;
-    }
-    session.restarting(true);
-    const snippets = self.getSnippets(session.type());
-
-    snippets.forEach(snippet => {
-      snippet.status(SNIPPET_STATUS.loading);
-    });
-
-    self.closeSession(session, true, () => {
-      self.createSession(
-        session,
-        () => {
-          snippets.forEach(snippet => {
-            snippet.status(SNIPPET_STATUS.ready);
-          });
-          session.restarting(false);
-          if (callback) {
-            callback();
-          }
-        },
-        () => {
-          session.restarting(false);
-        }
-      );
-    });
-  }
-
   save(callback) {
     const self = this;
     hueAnalytics.log('notebook', 'save');
@@ -724,13 +543,12 @@ class Notebook {
       self.parentVm.editorMode() ||
       (self.isPresentationMode() && self.parentVm.editorType() !== 'notebook'); // Editor should not convert to Notebook in presentation mode
 
-    $.post(
-      '/notebook/api/notebook/save',
-      {
-        notebook: komapping.toJSON(cp, NOTEBOOK_MAPPING),
+    apiHelper
+      .saveNotebook({
+        notebookJson: komapping.toJSON(cp, NOTEBOOK_MAPPING),
         editorMode: editorMode
-      },
-      data => {
+      })
+      .then(data => {
         if (data.status === 0) {
           self.id(data.id);
           self.isSaved(true);
@@ -788,21 +606,12 @@ class Notebook {
         } else {
           $(document).trigger('error', data.message);
         }
-      }
-    ).fail(xhr => {
-      if (xhr.status !== 502) {
-        $(document).trigger('error', xhr.responseText);
-      }
-    });
-  }
-
-  saveDefaultUserProperties(session) {
-    const self = this;
-    apiHelper.saveConfiguration({
-      app: session.type(),
-      properties: session.properties,
-      userId: self.parentVm.userId
-    });
+      })
+      .fail(xhr => {
+        if (xhr.status !== 502) {
+          $(document).trigger('error', xhr.responseText);
+        }
+      });
   }
 
   saveScheduler() {
@@ -863,10 +672,9 @@ class Notebook {
       .slice(0, 25);
 
     const updateHistoryCall = item => {
-      $.post('/notebook/api/check_status', {
-        notebook: komapping.toJSON({ id: item.uuid() })
-      })
-        .done(data => {
+      apiHelper
+        .checkStatus({ notebookJson: komapping.toJSON({ id: item.uuid() }) })
+        .then(data => {
           const status =
             data.status === -3
               ? 'expired'

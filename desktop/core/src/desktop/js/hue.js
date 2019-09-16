@@ -122,17 +122,17 @@ $(document).ready(() => {
   ko.applyBindings(sidePanelViewModel, $('.left-panel')[0]);
   ko.applyBindings(sidePanelViewModel, $('#leftResizer')[0]);
   ko.applyBindings(sidePanelViewModel, $('.right-panel')[0]);
-  ko.applyBindings(sidePanelViewModel, $('.context-panel')[0]);
+  if (!window.ENABLE_NOTEBOOK_2) {
+    ko.applyBindings(sidePanelViewModel, $('.context-panel')[0]);
+  }
 
   const topNavViewModel = new TopNavViewModel(onePageViewModel);
-  if (!window.IS_EMBEDDED) {
-    ko.applyBindings(topNavViewModel, $('.top-nav')[0]);
-  }
+  ko.applyBindings(topNavViewModel, $('.top-nav')[0]);
 
   const sidebarViewModel = new SideBarViewModel(onePageViewModel, topNavViewModel);
   ko.applyBindings(sidebarViewModel, $('.hue-sidebar')[0]);
   if (window.IS_MULTICLUSTER_ONLY) {
-    ko.applyBindings(sidebarViewModel, $('.hue-dw-sidebar-container')[0]);
+    ko.applyBindings(sidebarViewModel, $('.hue-sidebar-container')[0]);
   }
 
   huePubSub.publish('cluster.config.get.config');

@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import print_function
 import logging
 import sys
 import time
@@ -28,7 +29,7 @@ from desktop.converters import DocumentConverter
 class Command(BaseCommand):
 
   def handle(self, *args, **options):
-    print 'Starting document conversions...\n'
+    print('Starting document conversions...\n')
     try:
       with transaction.atomic():
         users = User.objects.all()
@@ -42,8 +43,8 @@ class Command(BaseCommand):
           logging.info("Document conversions for user:%s took %.3f seconds" % (user.username, time.time() - start_time))
 
           if converter.failed_doc_ids:
-            print >> sys.stderr, 'Failed to import %d document(s) for user: %s - %s' % (len(converter.failed_doc_ids), user.username, converter.failed_doc_ids)
-    except Exception, e:
+            print('Failed to import %d document(s) for user: %s - %s' % (len(converter.failed_doc_ids), user.username, converter.failed_doc_ids), file=sys.stderr)
+    except Exception as e:
       logging.exception("Failed to execute the document conversions.")
 
-    print 'Finished running document conversions.\n'
+    print('Finished running document conversions.\n')

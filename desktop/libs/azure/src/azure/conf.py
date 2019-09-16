@@ -25,6 +25,8 @@ from hadoop.core_site import get_adls_client_id, get_adls_authentication_code, g
 
 LOG = logging.getLogger(__name__)
 
+PERMISSION_ACTION_ABFS = "abfs_access"
+PERMISSION_ACTION_ADLS = "adls_access"
 REFRESH_URL = 'https://login.microsoftonline.com/<tenant_id>/oauth2/<version>token'
 
 

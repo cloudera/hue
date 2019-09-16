@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 
 from django.utils.translation import ugettext as _
@@ -45,13 +46,13 @@ class Credentials(object):
 
   @property
   def class_to_name_credentials(self):
-    return dict((v,k) for k, v in self.credentials.iteritems())
+    return dict((v,k) for k, v in self.credentials.items())
 
   def get_properties(self, hive_properties=None):
     credentials = {}
     from beeswax import hive_site, conf
 
-    if not hasattr(conf.HIVE_SERVER_HOST, 'get'):
+    if not hasattr(conf.HIVE_SERVER_HOST, 'get') or not conf.HIVE_SERVER_HOST.get():
       LOG.warn('Could not get all the Oozie credentials: beeswax app is blacklisted.')
     else:
       if hive_properties is None:

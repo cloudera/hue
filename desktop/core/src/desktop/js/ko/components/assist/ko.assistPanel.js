@@ -125,7 +125,10 @@ class AssistPanel {
           if (appConfig.browser && appConfig.browser.interpreter_names) {
             const storageBrowsers = appConfig.browser.interpreter_names.filter(
               interpreter =>
-                interpreter === 'adls' || interpreter === 'hdfs' || interpreter === 's3'
+                interpreter === 'adls' ||
+                interpreter === 'hdfs' ||
+                interpreter === 's3' ||
+                interpreter === 'abfs'
             );
 
             if (storageBrowsers.length) {
@@ -206,36 +209,32 @@ class AssistPanel {
             }
           }
 
-          if (!window.IS_EMBEDDED) {
-            const documentsPanel = new AssistInnerPanel({
-              panelData: {
-                name: 'hue-assist-documents-panel',
-                params: {
-                  user: params.user
-                }
-              },
-              name: I18n('Documents'),
-              type: 'documents',
-              icon: 'fa-files-o',
-              iconSvg: '#hi-documents',
-              minHeight: 50,
-              rightAlignIcon: true,
-              visible:
-                params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
-            });
-
-            panels.push(documentsPanel);
-
-            huePubSub.subscribe('assist.show.documents', docType => {
-              huePubSub.publish('left.assist.show');
-              if (self.visiblePanel() !== documentsPanel) {
-                self.visiblePanel(documentsPanel);
+          const documentsPanel = new AssistInnerPanel({
+            panelData: {
+              name: 'hue-assist-documents-panel',
+              params: {
+                user: params.user
               }
-              if (docType) {
-                documentsPanel.panelData.setTypeFilter(docType);
-              }
-            });
-          }
+            },
+            name: I18n('Documents'),
+            type: 'documents',
+            icon: 'fa-files-o',
+            iconSvg: '#hi-documents',
+            minHeight: 50,
+            rightAlignIcon: true,
+            visible:
+              params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
+          });
+
+          panels.push(documentsPanel);
+
+          huePubSub.subscribe('assist.show.documents', docType => {
+            huePubSub.publish('left.assist.show');
+            if (self.visiblePanel() !== documentsPanel) {
+              self.visiblePanel(documentsPanel);
+            }
+            huePubSub.publish('assist.documents.set.type.filter', docType);
+          });
 
           if (window.HAS_GIT) {
             panels.push(

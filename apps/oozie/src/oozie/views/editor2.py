@@ -19,19 +19,20 @@ from builtins import str
 import json
 import logging
 
+from datetime import datetime
 from django.urls import reverse
 from django.forms.formsets import formset_factory
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
-from desktop.conf import USE_NEW_EDITOR, IS_MULTICLUSTER_ONLY, has_multi_cluster
+from desktop.conf import USE_NEW_EDITOR, IS_MULTICLUSTER_ONLY
 from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str, force_unicode
 from desktop.lib.rest.http_client import RestException
 from desktop.lib.json_utils import JSONEncoderForHTML
-from desktop.models import Document, Document2
+from desktop.models import Document, Document2, get_cluster_config
 
 from liboozie.credentials import Credentials
 from liboozie.oozie_api import get_oozie
@@ -129,7 +130,11 @@ def new_workflow(request):
   doc = None
   workflow = Workflow(user=request.user)
   workflow.set_workspace(request.user)
-  workflow.check_workspace(request.fs, request.user)
+
+  try:
+    workflow.check_workspace(request.fs, request.user)
+  except Exception as e:
+    raise PopupException(_('Could not create workflow workspace'), detail=e)
 
   return _edit_workflow(request, doc, workflow)
 
@@ -721,7 +726,7 @@ def submit_coordinator(request, doc_id):
 def _submit_coordinator(request, coordinator, mapping):
   try:
     wf = coordinator.workflow
-    if IS_MULTICLUSTER_ONLY.get() and has_multi_cluster():
+    if IS_MULTICLUSTER_ONLY.get() and get_cluster_config(request.user)['has_computes']:
       mapping['auto-cluster'] = {
         u'additionalClusterResourceTags': [],
         u'automaticTerminationCondition': u'EMPTY_JOB_QUEUE', #'u'NONE',
@@ -916,6 +921,7 @@ def copy_bundle(request):
 @check_document_access_permission()
 def submit_bundle(request, doc_id):
   bundle = Bundle(document=Document2.objects.get(id=doc_id))
+  bundle._data['properties']['kickoff'] = datetime.utcnow()
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
 
   if request.method == 'POST':

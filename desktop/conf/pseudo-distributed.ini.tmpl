@@ -32,10 +32,6 @@
   http_host=0.0.0.0
   http_port=8000
 
-  # Choose whether the Hue pages are embedded or not. This will improve the rendering of Hue when added inside a
-  # container element.
-  ## is_embedded=false
-
   # A comma-separated list of available Hue load balancers
   ## hue_load_balancer=
 
@@ -47,9 +43,6 @@
 
   # Enable development mode, where notably static files are not cached.
   dev=true
-
-  # Enable embedded development mode, where the page will be rendered inside a container div element.
-  ## dev_embedded=false
 
   # Enable or disable database debug mode.
   ## database_logging=false
@@ -300,6 +293,9 @@
 
   # Number of characters in rest api reponse calls to dump to the logs when debug is enabled. Set to -1 for entire response.
   ## rest_response_size=2000
+
+  # Turn on Prometheus metrics end point /metrics.
+  ## enable_prometheus=false
 
   # Administrators
   # ----------------
@@ -795,6 +791,16 @@
    ## collection_interval=30000
 
 
+  # Configuration options for the request Tracing
+  # ------------------------------------------------------------------------
+  [[tracing]]
+  ## If tracing is enabled.
+  # enabled=false
+
+  ## Trace all the requests instead of a few specific ones like the SQL Editor. Much noisiers.
+  # trace_all=false
+
+
   # Configuration options for the Task Server
   # ------------------------------------------------------------------------
   [[task_server]]
@@ -823,6 +829,12 @@
    # Django cache to use to store temporarily used data during query execution. This is in addition to result_file_storage and result_backend.
    ## execution_storage='{"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "celery-hue"}'
 
+   # Settings for the Google Cloud lib
+   # ------------------------------------------------------------------------
+   [[gc_accounts]]
+      [[[default]]]
+        # The JSON credentials to authenticate to Google Cloud e.g. '{ "type": "service_account", "project_id": .... }'
+        # json_credentials=None
 
 ###########################################################################
 # Settings to configure the snippets available in the Notebook
@@ -1133,44 +1145,44 @@
 
   # Port where HiveServer2 Thrift server runs on.
   ## hive_server_port=10000
-  
+
   # Host where LLAP is running
   ## llap_server_host = localhost
-  
+
   # Main Port where LLAP runs
   ## llap_server_port = 10500
-  
+
   # Port where LLAP Thrift server runs on
   ## llap_server_thrift_port = 10501
-  
+
   # Alternatively, use Service Discovery for LLAP (Hive Server Interactive) and/or Hiveserver2, this will override server and thrift port
-  
-  # Whether to use Service Discovery for LLAP 
+
+  # Whether to use Service Discovery for LLAP
   ## hive_discovery_llap = true
-  
+
   # is llap (hive server interactive) running in an HA configuration (more than 1)
   # important as the zookeeper structure is different
   ## hive_discovery_llap_ha = false
-  
+
   # Shortcuts to finding LLAP znode Key
   # Non-HA - hiveserver-interactive-site - hive.server2.zookeeper.namespace ex hive2 = /hive2
   # HA-NonKerberized - <llap_app_name>_llap ex app name llap0 = /llap0_llap
   # HA-Kerberized - <llap_app_name>_llap-sasl ex app name llap0 = /llap0_llap-sasl
   ## hive_discovery_llap_znode = /hiveserver2-hive2
-  
+
   # Whether to use Service Discovery for HiveServer2
   ## hive_discovery_hs2 = true
-  
+
   # Hiveserver2 is hive-site hive.server2.zookeeper.namespace ex hiveserver2 = /hiverserver2
   ## hive_discovery_hiveserver2_znode = /hiveserver2
-  
+
   # Applicable only for LLAP HA
   # To keep the load on zookeeper to a minimum
   # ---- we cache the LLAP activeEndpoint for the cache_timeout period
   # ---- we cache the hiveserver2 endpoint for the length of session
   # configurations to set the time between zookeeper checks
   ## cache_timeout = 60
-  
+
   # Host where Hive Metastore Server (HMS) is running.
   # If Kerberos security is enabled, the fully-qualified domain name (FQDN) is required.
   ## hive_metastore_host=localhost
@@ -1221,6 +1233,9 @@
   # e.g. Used for LDAP/PAM pass-through authentication.
   ## auth_username=hue
   ## auth_password=
+
+  # Use SASL framework to establish connection to host.
+  ## use_sasl=false
 
   [[ssl]]
     # Path to Certificate Authority certificates.
@@ -1297,6 +1312,9 @@
   # Path to the impala configuration dir which has impalad_flags file
   ## impala_conf_dir=${HUE_CONF_DIR}/impala-conf
 
+  # Use SASL framework to establish connection to host.
+  ## use_sasl=true
+
   [[ssl]]
     # SSL communication enabled for this server.
     ## enabled=false
@@ -1334,6 +1352,8 @@
   # Choose whether Hue should validate certificates received from the server.
   ## ssl_cert_ca_verify=true
 
+  # Use SASL framework to establish connection to host.
+  ## use_sasl=false
 
 ###########################################################################
 # Settings to configure the Oozie app
@@ -1841,10 +1861,10 @@
   ## authn_requests_signed=false
 
   # Have Hue initiated authn response be signed.
-  ## want_response_signed=true
+  ## want_response_signed=false
 
   # Have Hue initiated authn assertions response be signed.
-  ## want_assertions_signed=true
+  ## want_assertions_signed=false
 
   # Have Hue initiated logout requests be signed and provide a certificate.
   ## logout_requests_signed=false
@@ -2011,6 +2031,12 @@
     # Limits found entities to a specific cluster. When empty the entities from all clusters will be included in the
     # search results.
     ## search_cluster=
+
+    # Set to true when authenticating via kerberos instead of username/password
+    ## kerberos_enabled=core_site.is_kerberos_enabled()
+
+    # Directory of the configurations.
+    ## conf_dir=HUE_CONF_DIR/hive-conf
 
   # Deprecated by [[catalog]]
   [[navigator]]

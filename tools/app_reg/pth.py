@@ -22,8 +22,12 @@ Tools to manipulate the .pth file in the virtualenv.
 import glob
 import logging
 import os
+import sys
 
 import common
+
+if sys.version_info[0] > 2:
+  from builtins import object
 
 LOG = logging.getLogger(__name__)
 PTH_FILE = 'hue.pth'

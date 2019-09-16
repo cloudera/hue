@@ -17,6 +17,10 @@
 import { EXECUTION_STATUS, ExecutableStatement } from './executableStatement';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
 import huePubSub from 'utils/huePubSub';
+import sessionManager from './sessionManager';
+
+// TODO: Remove, debug var
+window.sessionManager = sessionManager;
 
 const EXECUTION_FLOW = {
   step: 'step',
@@ -34,7 +38,6 @@ class Executor {
    * @param {ContextCompute} options.compute
    * @param {ContextNamespace} options.namespace
    * @param {EXECUTION_FLOW} [options.executionFlow] (default EXECUTION_FLOW.batch)
-   * @param {Session[]} [options.sessions]
    * @param {string} options.statement
    * @param {string} [options.database]
    */
@@ -73,7 +76,6 @@ class Executor {
                 compute: options.compute,
                 namespace: options.namespace,
                 database: database,
-                sessions: options.sessions,
                 parsedStatement: parsedStatement
               })
             );
@@ -87,9 +89,7 @@ class Executor {
     huePubSub.subscribe('hue.executable.updated', executable => {
       if (
         executable === this.currentExecutable ||
-        this.executed.some(executed => {
-          executed === executable;
-        })
+        this.executed.some(executed => executed === executable)
       ) {
         huePubSub.publish('hue.executor.updated', {
           executable: executable,

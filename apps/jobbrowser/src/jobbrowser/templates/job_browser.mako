@@ -193,7 +193,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <td data-bind="text: name"></td>
           <td data-bind="text: user"></td>
           <td data-bind="text: type"></td>
-          <td data-bind="text: status"></td>
+          <td><span class="label job-status-label" data-bind="text: status"></span></td>
           <td data-bind="text: $root.formatProgress(progress)"></td>
           <td data-bind="text: queue"></td>
           <td data-bind="moment: {data: submitted, format: 'LLL'}"></td>
@@ -737,7 +737,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <td data-bind="text: id"></td>
                 <td data-bind="text: elapsedTime.toHHMMSS()"></td>
                 <td data-bind="text: progress"></td>
-                <td data-bind="text: state"></td>
+                <td><span class="label job-status-label" data-bind="text: state"></span></td>
                 <td data-bind="moment: {data: startTime, format: 'LLL'}"></td>
                 <td data-bind="text: successfulAttempt"></td>
                 <td data-bind="moment: {data: finishTime, format: 'LLL'}"></td>
@@ -2005,7 +2005,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <td data-bind="click: function() {}, clickBubble: false">
                   <div class="hue-checkbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#schedulesTable', value: $data, hueChecked: $parent.selectedJobs"></div>
                 </td>
-                <td data-bind="text: properties.status"></td>
+                <td><span class="label job-status-label" data-bind="text: properties.status"></span></td>
                 <td data-bind="text: properties.title"></td>
                 <td data-bind="text: properties.type"></td>
                 <td data-bind="text: properties.errorMessage"></td>
@@ -2113,7 +2113,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </thead>
             <tbody data-bind="foreach: properties['actions']">
               <tr class="status-border pointer" data-bind="css: {'completed': status() == 'SUCCEEDED', 'running': ['SUCCEEDED', 'FAILED', 'KILLED'].indexOf(status()) != -1, 'failed': status() == 'FAILED' || status() == 'KILLED'}, click: function() { if (id()) { $root.job().id(id()); $root.job().fetchJob();} }">
-                <td data-bind="text: status"></td>
+                <td><span class="label job-status-label" data-bind="text: status"></span></td>
                 <td data-bind="text: name"></td>
                 <td data-bind="text: type"></td>
                 <td data-bind="text: nextMaterializedTime"></td>
@@ -2338,7 +2338,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             parsedDocUrl.hostname = parsedKnoxUrl.hostname;
             parsedDocUrl.protocol = parsedKnoxUrl.protocol;
             parsedDocUrl.port = parsedKnoxUrl.port;
-            var service = url.indexOf('livy') >= 0 ? '/livy' : '/impala';
+            var service = url.indexOf('livy') >= 0 ? '/livy' : '/impalaui';
             parsedDocUrl.pathname = parsedKnoxUrl.pathname + service + parsedDocUrl.pathname;
             return parsedDocUrl.toString();
           } catch (e) {
@@ -2346,7 +2346,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           }
         } else if (window.KNOX_BASE_PATH.length && window.URL) { // DWX
           var parsedDocUrl = new URL(url);
-          var service = url.indexOf('livy') >= 0 ? '/livy' : '/impala';
+          var service = url.indexOf('livy') >= 0 ? '/livy' : '/impalaui';
           parsedDocUrl.pathname = parsedKnoxUrl.pathname + service + window.KNOX_BASE_PATH;
         } else {
           return url;
@@ -2454,7 +2454,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.rerunModalContent = ko.observable('');
 
       self.hasKill = ko.pureComputed(function() {
-        return self.type() && (['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle', 'QUERY', 'TEZ', 'YarnV2'].indexOf(self.type()) != -1 || self.type().indexOf('Data Warehouse') != -1 || self.type().indexOf('Altus') != -1);
+        return self.type() && (['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle', 'QUERY', 'TEZ', 'YarnV2', 'DDL'].indexOf(self.type()) != -1 || self.type().indexOf('Data Warehouse') != -1 || self.type().indexOf('Altus') != -1);
       });
       self.killEnabled = ko.pureComputed(function() {
         // Impala can kill queries that are finished, but not yet terminated

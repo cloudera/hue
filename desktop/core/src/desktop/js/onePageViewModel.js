@@ -183,10 +183,7 @@ class OnePageViewModel {
     const loadScripts = function(scriptUrls) {
       const promises = [];
       while (scriptUrls.length) {
-        const scriptUrl =
-          typeof window.adaptHueEmbeddedUrls !== 'undefined'
-            ? window.adaptHueEmbeddedUrls(scriptUrls.shift())
-            : scriptUrls.shift();
+        const scriptUrl = scriptUrls.shift();
         if (loadedJs.indexOf(scriptUrl) !== -1) {
           continue;
         }
@@ -200,9 +197,6 @@ class OnePageViewModel {
       if (loadedCss.indexOf(cssFile) === -1) {
         loadedCss.push(cssFile);
         $.ajaxSetup({ cache: true });
-        if (typeof window.adaptHueEmbeddedUrls !== 'undefined') {
-          $el.attr('href', window.adaptHueEmbeddedUrls($el.attr('href')));
-        }
         if (window.DEV) {
           $el.attr('href', $el.attr('href') + '?dev=' + Math.random());
         }
@@ -236,13 +230,6 @@ class OnePageViewModel {
         }
         $(this).attr('href', link);
       });
-
-      if (typeof adaptHueEmbeddedUrls !== 'undefined') {
-        $rawHtml.find('img[src]').each(function() {
-          const $img = $(this);
-          $img.attr('src', window.adaptHueEmbeddedUrls($img.attr('src')));
-        });
-      }
 
       $rawHtml.unwrap('span');
 
@@ -307,7 +294,6 @@ class OnePageViewModel {
       huePubSub.publish('hue.datatable.search.hide');
       huePubSub.publish('hue.scrollleft.hide');
       huePubSub.publish('context.panel.visible', false);
-      huePubSub.publish('context.panel.visible.editor', false);
       if (app === 'filebrowser') {
         $(window).unbind('hashchange.fblist');
       }
@@ -455,7 +441,7 @@ class OnePageViewModel {
     huePubSub.subscribe('assist.dropzone.complete', self.dropzoneComplete);
 
     // prepend /hue to all the link on this page
-    $(window.IS_EMBEDDED ? '.hue-embedded-container a[href]' : 'a[href]').each(function() {
+    $('a[href]').each(function() {
       let link = $(this).attr('href');
       if (link.startsWith('/') && !link.startsWith('/hue')) {
         link = window.HUE_BASE_URL + '/hue' + link;
@@ -463,37 +449,13 @@ class OnePageViewModel {
       $(this).attr('href', link);
     });
 
-    if (window.IS_EMBEDDED) {
-      page.base(window.location.pathname + window.location.search);
-      page.baseSearch = window.location.search.replace('?', '');
-      if (!window.location.hash) {
-        window.location.hash = '#!/editor?type=impala';
-      }
-      page({ hashbang: true });
-    } else {
-      page.base(window.HUE_BASE_URL + '/hue');
-    }
+    page.base(window.HUE_BASE_URL + '/hue');
 
-    const getUrlParameter = function(name) {
-      if (window.IS_EMBEDDED) {
-        if (~window.location.hash.indexOf('?')) {
-          const paramString = window.location.hash.substring(window.location.hash.indexOf('?'));
-          const params = paramString.split('&');
-          for (let i = 0; i < params.length; i++) {
-            if (~params[i].indexOf(name + '=')) {
-              return params[i].substring(name.length + 2);
-            }
-          }
-        }
-        return '';
-      } else {
-        return window.location.getParameter(name) || '';
-      }
-    };
+    const getUrlParameter = name => window.location.getParameter(name) || '';
 
     self.lastContext = null;
 
-    let pageMapping = [
+    const pageMapping = [
       { url: '/403', app: '403' },
       { url: '/500', app: '500' },
       { url: '/about/', app: 'admin_wizard' },
@@ -806,10 +768,6 @@ class OnePageViewModel {
       });
     });
 
-    if (typeof window.HUE_EMBEDDED_PAGE_MAPPINGS !== 'undefined') {
-      pageMapping = pageMapping.concat(window.HUE_EMBEDDED_PAGE_MAPPINGS);
-    }
-
     pageMapping.forEach(mapping => {
       page(
         mapping.url,
@@ -836,9 +794,15 @@ class OnePageViewModel {
 
     huePubSub.subscribe('open.link', href => {
       if (href) {
-        const prefix = window.IS_EMBEDDED ? '' : '/hue';
-        if (href.startsWith('/') && !href.startsWith(prefix)) {
-          page(window.HUE_BASE_URL + prefix + href);
+        const prefix = '/hue';
+        if (href.startsWith('/')) {
+          if (window.HUE_BASE_URL.length && href.startsWith(window.HUE_BASE_URL)) {
+            page(href);
+          } else if (href.startsWith(prefix)) {
+            page(window.HUE_BASE_URL + href);
+          } else {
+            page(window.HUE_BASE_URL + prefix + href);
+          }
         } else if (href.indexOf('#') == 0) {
           // Only place that seem to use this is hbase onclick row
           window.location.hash = href;

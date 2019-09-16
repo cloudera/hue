@@ -23,56 +23,67 @@ describe('impalaSyntaxParser.js', () => {
 
   it('should not find errors for ""', () => {
     const result = impalaSyntaxParser.parseSyntax('', '');
+
     expect(result).toBeFalsy();
   });
 
   it('should report incomplete statement for "SEL"', () => {
     const result = impalaSyntaxParser.parseSyntax('SEL', '');
+
     expect(result.incompleteStatement).toBeTruthy();
   });
 
   it('should report incomplete statement for "SELECT"', () => {
     const result = impalaSyntaxParser.parseSyntax('SELECT', '');
+
     expect(result.incompleteStatement).toBeTruthy();
   });
 
   it('should report incomplete statement for "SELECT "', () => {
     const result = impalaSyntaxParser.parseSyntax('SELECT ', '');
+
     expect(result.incompleteStatement).toBeTruthy();
   });
 
   it('should not report incomplete statement for "SELECT * FROM tbl"', () => {
     const result = impalaSyntaxParser.parseSyntax('SELECT * FROM tbl', '');
+
     expect(result.incompleteStatement).toBeFalsy();
   });
 
   it('should not report incomplete statement for "SELECT * FROM tbl LIMIT 1"', () => {
     const result = impalaSyntaxParser.parseSyntax('SELECT * FROM tbl LIMIT 1', '');
+
     expect(result.incompleteStatement).toBeFalsy();
   });
 
   it('should report incomplete statement for "SELECT * FROM tbl LIMIT "', () => {
     const result = impalaSyntaxParser.parseSyntax('SELECT * FROM tbl LIMIT ', '');
+
     expect(result.incompleteStatement).toBeTruthy();
   });
 
   it('should report incomplete statement for "SELECT * FROM tbl GROUP"', () => {
     const result = impalaSyntaxParser.parseSyntax('SELECT * FROM tbl GROUP', '');
+
     expect(result.incompleteStatement).toBeTruthy();
   });
 
   it('should not find errors for "SELECT *"', () => {
     const result = impalaSyntaxParser.parseSyntax('SELECT *', '');
+
     expect(result).toBeFalsy();
   });
 
   it('should not report incomplete statement for "SELECT * FR"', () => {
     const result = impalaSyntaxParser.parseSyntax('SELECT * FR', '');
+
     expect(result.incompleteStatement).toBeTruthy();
   });
 
   it('should find errors for "SLELECT "', () => {
     const result = impalaSyntaxParser.parseSyntax('SLELECT ', '');
+
     expect(result).toBeTruthy();
     expect(result.text).toEqual('SLELECT');
     expect(result.expected.length).toBeGreaterThan(0);
@@ -82,6 +93,7 @@ describe('impalaSyntaxParser.js', () => {
 
   it('should find errors for "alter tabel "', () => {
     const result = impalaSyntaxParser.parseSyntax('alter tabel ', '');
+
     expect(result).toBeTruthy();
     expect(result.text).toEqual('tabel');
     expect(result.expected.length).toBeGreaterThan(0);
@@ -91,6 +103,7 @@ describe('impalaSyntaxParser.js', () => {
 
   it('should find errors for "select *  form "', () => {
     const result = impalaSyntaxParser.parseSyntax('select *  form ', '');
+
     expect(result).toBeTruthy();
     expect(result.loc.first_column).toEqual(10);
     expect(result.loc.last_column).toEqual(14);
@@ -102,16 +115,19 @@ describe('impalaSyntaxParser.js', () => {
       'select * from customers c cultster by awasd asd afd;',
       ''
     );
+
     expect(result).toBeTruthy();
   });
 
   it('should find errors for "select asdf wer qwer qewr   qwer"', () => {
     const result = impalaSyntaxParser.parseSyntax('select asdf wer qwer qewr   qwer', '');
+
     expect(result).toBeTruthy();
   });
 
   it('should suggest expected words for "SLELECT "', () => {
     const result = impalaSyntaxParser.parseSyntax('SLELECT ', '');
+
     expect(result).toBeTruthy();
     expect(expectedToStrings(result.expected)).toEqual([
       'SELECT',
@@ -141,6 +157,7 @@ describe('impalaSyntaxParser.js', () => {
 
   it('should suggest expected words for "slelect "', () => {
     const result = impalaSyntaxParser.parseSyntax('slelect ', '');
+
     expect(result).toBeTruthy();
     expect(expectedToStrings(result.expected)).toEqual([
       'select',
@@ -170,6 +187,7 @@ describe('impalaSyntaxParser.js', () => {
 
   it('should suggest expected that the statement should end for "use somedb extrastuff "', () => {
     const result = impalaSyntaxParser.parseSyntax('use somedb extrastuff  ', '');
+
     expect(result).toBeTruthy();
     expect(result.expectedStatementEnd).toBeTruthy();
   });
@@ -177,6 +195,7 @@ describe('impalaSyntaxParser.js', () => {
   const expectEqualIds = function(beforeA, afterA, beforeB, afterB) {
     const resultA = impalaSyntaxParser.parseSyntax(beforeA, afterA);
     const resultB = impalaSyntaxParser.parseSyntax(beforeB, afterB);
+
     expect(resultA).toBeTruthy('"' + beforeA + '|' + afterA + '" was not reported as an error');
     expect(resultB).toBeTruthy('"' + beforeB + '|' + afterB + '" was not reported as an error');
     expect(resultA.ruleId).toEqual(resultB.ruleId);
@@ -185,6 +204,7 @@ describe('impalaSyntaxParser.js', () => {
   const expectNonEqualIds = function(beforeA, afterA, beforeB, afterB) {
     const resultA = impalaSyntaxParser.parseSyntax(beforeA, afterA);
     const resultB = impalaSyntaxParser.parseSyntax(beforeB, afterB);
+
     expect(resultA).toBeTruthy('"' + beforeA + '|' + afterA + '" was not reported as an error');
     expect(resultB).toBeTruthy('"' + beforeB + '|' + afterB + '" was not reported as an error');
     expect(resultA.ruleId).not.toEqual(resultB.ruleId);

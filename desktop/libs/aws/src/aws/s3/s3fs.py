@@ -23,6 +23,7 @@ import logging
 import os
 import posixpath
 import re
+from urlparse import urlparse
 import time
 
 from boto.exception import BotoClientError, S3ResponseError
@@ -33,23 +34,24 @@ from boto.s3.prefix import Prefix
 from django.utils.translation import ugettext as _
 
 from aws import s3
-from aws.conf import get_default_region, get_locations
+from aws.conf import get_default_region, get_locations, PERMISSION_ACTION_S3
 from aws.s3 import normpath, s3file, translate_s3_error, S3A_ROOT
 from aws.s3.s3stat import S3Stat
 
 
 DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
-PERMISSION_ACTION_S3 = "s3_access"
 BUCKET_NAME_PATTERN = re.compile("^((?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9_\-]*[A-Za-z0-9]))$")
 
 LOG = logging.getLogger(__name__)
 
 
 class S3FileSystemException(IOError):
-
   def __init__(self, *args, **kwargs):
     super(S3FileSystemException, self).__init__(*args, **kwargs)
 
+class S3ListAllBucketsException(S3FileSystemException):
+  def __init__(self, *args, **kwargs):
+    super(S3FileSystemException, self).__init__(*args, **kwargs)
 
 def auth_error_handler(view_fn):
   def decorator(*args, **kwargs):
@@ -75,16 +77,19 @@ def auth_error_handler(view_fn):
 
 
 class S3FileSystem(object):
-  def __init__(self, s3_connection):
+  def __init__(self, s3_connection, expiration=None, fs='s3a', headers=None, filebrowser_action=PERMISSION_ACTION_S3):
     self._s3_connection = s3_connection
-    self._filebrowser_action = PERMISSION_ACTION_S3
+    self._filebrowser_action = filebrowser_action
     self.user = None
     self.is_sentry_managed = lambda path: False
     self.superuser = None
     self.supergroup = None
+    self.expiration = expiration
+    self.fs = fs
+    self.header_values = headers
 
   def _get_bucket(self, name):
-    return self._s3_connection.get_bucket(name)
+    return self._s3_connection.get_bucket(name, headers=self.header_values)
 
   def _get_or_create_bucket(self, name):
     try:
@@ -170,21 +175,22 @@ class S3FileSystem(object):
         raise S3FileSystemException(_('User is not authorized to access path: "%s"') % path)
       else:
         raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, e.reason))
-
+    except Exception as e: # SSL errors show up here, because they've been remapped in boto
+      raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, e.message))
     if key is None:
       key = self._get_key(path, validate=False)
-    return self._stats_key(key)
+    return self._stats_key(key, self.fs)
 
   @staticmethod
-  def _stats_key(key):
+  def _stats_key(key, fs='s3a'):
     if key.size is not None:
       is_directory_name = not key.name or key.name[-1] == '/'
-      return S3Stat.from_key(key, is_dir=is_directory_name)
+      return S3Stat.from_key(key, is_dir=is_directory_name, fs=fs)
     else:
       key.name = S3FileSystem._append_separator(key.name)
       ls = key.bucket.get_all_keys(prefix=key.name, max_keys=1)
       if len(ls) > 0:
-        return S3Stat.from_key(key, is_dir=True)
+        return S3Stat.from_key(key, is_dir=True, fs=fs)
     return None
 
   @staticmethod
@@ -199,7 +205,8 @@ class S3FileSystem(object):
 
   @staticmethod
   def isroot(path):
-    return s3.is_root(path)
+    parsed = urlparse(path)
+    return (parsed.path == '/' or parsed.path == '') and parsed.netloc == ''
 
   @staticmethod
   def join(*comp_list):
@@ -269,13 +276,16 @@ class S3FileSystem(object):
     if glob is not None:
       raise NotImplementedError(_("Option `glob` is not implemented"))
 
-    if s3.is_root(path):
+    if S3FileSystem.isroot(path):
       try:
-        return sorted([S3Stat.from_bucket(b) for b in self._s3_connection.get_all_buckets()], key=lambda x: x.name)
+        return sorted([S3Stat.from_bucket(b, self.fs) for b in self._s3_connection.get_all_buckets(headers=self.header_values)], key=lambda x: x.name)
       except S3FileSystemException as e:
         raise e
       except S3ResponseError as e:
-        raise S3FileSystemException(_('Failed to retrieve buckets: %s') % e.reason)
+        if 'Forbidden' in str(e) or (hasattr(e, 'status') and e.status == 403):
+          raise S3ListAllBucketsException(_('You do not have permissions to list all buckets. Please specify a bucket name you have access to.'))
+        else:
+          raise S3FileSystemException(_('Failed to retrieve buckets: %s') % e.reason)
       except Exception as e:
         raise S3FileSystemException(_('Failed to retrieve buckets: %s') % e)
 
@@ -283,13 +293,13 @@ class S3FileSystem(object):
     bucket = self._get_bucket(bucket_name)
     prefix = self._append_separator(prefix)
     res = []
-    for item in bucket.list(prefix=prefix, delimiter='/'):
+    for item in bucket.list(prefix=prefix, delimiter='/', headers=self.header_values):
       if isinstance(item, Prefix):
-        res.append(S3Stat.from_key(Key(item.bucket, item.name), is_dir=True))
+        res.append(S3Stat.from_key(Key(item.bucket, item.name), is_dir=True, fs=self.fs))
       else:
         if item.name == prefix:
           continue
-        res.append(self._stats_key(item))
+        res.append(self._stats_key(item, self.fs))
     return res
 
   @translate_s3_error

@@ -14,8 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import logging
-import urllib
+import sys
+import urllib.request, urllib.error
 
 from django.contrib.auth.models import User
 from django.urls import reverse
@@ -23,14 +27,19 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib import django_mako
 from notebook.models import make_notebook
+from azure.abfs.__init__ import abfspath
 
+if sys.version_info[0] > 2:
+  from urllib.parse import unquote as urllib_unquote
+else:
+  from urllib import unquote as urllib_unquote
 
 LOG = logging.getLogger(__name__)
 
 
 try:
   from beeswax.server import dbms
-except ImportError, e:
+except ImportError as e:
   LOG.warn('Hive and HiveServer2 interfaces are not enabled')
 
 
@@ -56,9 +65,9 @@ class SQLIndexer(object):
     kudu_partition_columns = destination['kuduPartitionColumns']
     comment = destination['description']
 
-    source_path = urllib.unquote(source['path'])
+    source_path = urllib_unquote(source['path'])
     external = not destination['useDefaultLocation']
-    external_path = urllib.unquote(destination['nonDefaultLocation'])
+    external_path = urllib_unquote(destination['nonDefaultLocation'])
 
     load_data = destination['importData']
     skip_header = destination['hasHeader']
@@ -134,7 +143,10 @@ class SQLIndexer(object):
           external_path = external_path + '/%s_table' % external_file_name # If dir not just the file, create data dir and move file there.
           self.fs.mkdir(external_path)
           self.fs.rename(source_path, external_path)
-
+    
+    if external_path.lower().startswith("abfs"): #this is to check if its using an ABFS path
+      external_path = abfspath(external_path) 
+      
     sql += django_mako.render_to_string("gen/create_table_statement.mako", {
         'table': {
             'name': table_name,
@@ -164,7 +176,8 @@ class SQLIndexer(object):
         'overwrite': False,
         'partition_columns': [(partition['name'], partition['partitionValue']) for partition in partition_columns],
       }
-      db = dbms.get(self.user)
+      query_server_config = dbms.get_query_server_config(name=source_type)
+      db = dbms.get(self.user, query_server=query_server_config)
       sql += "\n\n%s;" % db.load_data(database, table_name, form_data, None, generate_ddl_only=True)
 
     if load_data and table_format in ('parquet', 'kudu'):

@@ -230,43 +230,43 @@ ShowFunctionsStatement_EDIT
  ;
 
 ShowGrantStatement
- : 'SHOW' 'GRANT' RoleOrUser RegularOrBacktickedIdentifier
- | 'SHOW' 'GRANT' RoleOrUser RegularOrBacktickedIdentifier 'ON' 'DATABASE' RegularOrBacktickedIdentifier
+ : 'SHOW' 'GRANT' GroupRoleOrUser RegularOrBacktickedIdentifier
+ | 'SHOW' 'GRANT' GroupRoleOrUser RegularOrBacktickedIdentifier 'ON' 'DATABASE' RegularOrBacktickedIdentifier
    {
      parser.addDatabaseLocation(@7, [ { name: $7 } ]);
    }
- | 'SHOW' 'GRANT' RoleOrUser RegularOrBacktickedIdentifier 'ON' 'SERVER'
- | 'SHOW' 'GRANT' RoleOrUser RegularOrBacktickedIdentifier 'ON' 'TABLE' SchemaQualifiedTableIdentifier
- | 'SHOW' 'GRANT' RoleOrUser RegularOrBacktickedIdentifier 'ON' 'URI' RegularOrBacktickedIdentifier
+ | 'SHOW' 'GRANT' GroupRoleOrUser RegularOrBacktickedIdentifier 'ON' 'SERVER'
+ | 'SHOW' 'GRANT' GroupRoleOrUser RegularOrBacktickedIdentifier 'ON' 'TABLE' SchemaQualifiedTableIdentifier
+ | 'SHOW' 'GRANT' GroupRoleOrUser RegularOrBacktickedIdentifier 'ON' 'URI' RegularOrBacktickedIdentifier
  ;
 
 ShowGrantStatement_EDIT
  : 'SHOW' 'GRANT' 'CURSOR'
    {
-     parser.suggestKeywords(['ROLE', 'USER']);
+     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
    }
- | 'SHOW' 'GRANT' RoleOrUser 'CURSOR'
- | 'SHOW' 'GRANT' RoleOrUser RegularOrBacktickedIdentifier 'CURSOR'
+ | 'SHOW' 'GRANT' GroupRoleOrUser 'CURSOR'
+ | 'SHOW' 'GRANT' GroupRoleOrUser RegularOrBacktickedIdentifier 'CURSOR'
    {
      parser.suggestKeywords(['ON DATABASE', 'ON SERVER', 'ON TABLE', 'ON URI']);
    }
- | 'SHOW' 'GRANT' RoleOrUser RegularOrBacktickedIdentifier 'ON' 'CURSOR'
+ | 'SHOW' 'GRANT' GroupRoleOrUser RegularOrBacktickedIdentifier 'ON' 'CURSOR'
    {
      parser.suggestKeywords(['DATABASE', 'SERVER', 'TABLE', 'URI']);
    }
- | 'SHOW' 'GRANT' RoleOrUser RegularOrBacktickedIdentifier 'ON' 'DATABASE' 'CURSOR'
+ | 'SHOW' 'GRANT' GroupRoleOrUser RegularOrBacktickedIdentifier 'ON' 'DATABASE' 'CURSOR'
    {
      parser.suggestDatabases();
    }
- | 'SHOW' 'GRANT' RoleOrUser RegularOrBacktickedIdentifier 'ON' 'TABLE' 'CURSOR'
+ | 'SHOW' 'GRANT' GroupRoleOrUser RegularOrBacktickedIdentifier 'ON' 'TABLE' 'CURSOR'
    {
      parser.suggestDatabases({
        appendDot: true
      });
      parser.suggestTables();
    }
- | 'SHOW' 'GRANT' RoleOrUser RegularOrBacktickedIdentifier 'ON' 'TABLE' SchemaQualifiedTableIdentifier_EDIT
- | 'SHOW' 'GRANT' RoleOrUser RegularOrBacktickedIdentifier 'ON' 'URI' 'CURSOR'
+ | 'SHOW' 'GRANT' GroupRoleOrUser RegularOrBacktickedIdentifier 'ON' 'TABLE' SchemaQualifiedTableIdentifier_EDIT
+ | 'SHOW' 'GRANT' GroupRoleOrUser RegularOrBacktickedIdentifier 'ON' 'URI' 'CURSOR'
  ;
 
 OptionalPrincipalName

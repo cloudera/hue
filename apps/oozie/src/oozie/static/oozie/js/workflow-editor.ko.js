@@ -184,7 +184,6 @@ var Node = function (node, vm) {
 
 
 var Workflow = function (vm, workflow) {
-
   var self = this;
 
   self.id = ko.observable(typeof workflow.id != "undefined" && workflow.id != null ? workflow.id : null);
@@ -276,13 +275,13 @@ var Workflow = function (vm, workflow) {
       },
       success: function (data) {
         if (data.status == 0) {
-          viewModel.addActionProperties.removeAll();
+          window.workflowEditorViewModel.addActionProperties.removeAll();
           $.each(data.properties, function (i, prop) {
-            viewModel.addActionProperties.push(ko.mapping.fromJS(prop));
+            window.workflowEditorViewModel.addActionProperties.push(ko.mapping.fromJS(prop));
           });
 
           if (data.workflows.length > 0) {
-            viewModel.subworkflows(getOtherSubworkflows(viewModel, data.workflows));
+            window.workflowEditorViewModel.subworkflows(getOtherSubworkflows(window.workflowEditorViewModel, data.workflows));
           }
 
           if (callback) {
@@ -297,7 +296,7 @@ var Workflow = function (vm, workflow) {
   self.addNode = function (widget, copiedNode) {
     $.post("/oozie/editor/workflow/add_node/", {
       "node": ko.mapping.toJSON(widget),
-      "properties": ko.mapping.toJSON(viewModel.addActionProperties()),
+      "properties": ko.mapping.toJSON(window.workflowEditorViewModel.addActionProperties()),
       "copiedProperties": copiedNode ? ko.mapping.toJSON(copiedNode.properties) : "{}"
     }, function (data) {
       if (data.status == 0) {

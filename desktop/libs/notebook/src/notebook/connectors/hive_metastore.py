@@ -36,7 +36,7 @@ try:
   from beeswax.api import _autocomplete
   from beeswax.server import dbms
   from beeswax.server.dbms import get_query_server_config, QueryServerException
-except ImportError, e:
+except ImportError as e:
   LOG.warn('Hive and HiveMetastoreServer interfaces are not enabled: %s' % e)
   hive_settings = None
 
@@ -45,13 +45,13 @@ def query_error_handler(func):
   def decorator(*args, **kwargs):
     try:
       return func(*args, **kwargs)
-    except StructuredException, e:
+    except StructuredException as e:
       message = force_unicode(str(e))
       if 'timed out' in message:
         raise OperationTimeout(e)
       else:
         raise QueryError(message)
-    except QueryServerException, e:
+    except QueryServerException as e:
       message = force_unicode(str(e))
       if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
         raise QueryExpired(e)

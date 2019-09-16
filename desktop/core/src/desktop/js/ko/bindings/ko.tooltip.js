@@ -24,7 +24,7 @@ ko.bindingHandlers.tooltip = {
   update: function(element, valueAccessor) {
     const local = ko.utils.unwrapObservable(valueAccessor());
     const options = {
-      container: window.HUE_CONTAINER
+      container: 'body'
     };
 
     $(element).tooltip('destroy');

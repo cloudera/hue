@@ -27,6 +27,7 @@ describe('impalaAutocompleteParser.js LOAD statements', () => {
 
   const assertAutoComplete = testDefinition => {
     const debug = false;
+
     expect(
       impalaAutocompleteParser.parseSql(
         testDefinition.beforeCursor,
@@ -73,6 +74,17 @@ describe('impalaAutocompleteParser.js LOAD statements', () => {
     assertAutoComplete({
       beforeCursor: "LOAD DATA INPATH '",
       afterCursor: "'",
+      expectedResult: {
+        lowerCase: false,
+        suggestHdfs: { path: '' }
+      }
+    });
+  });
+
+  it('should suggest hdfs paths for "LOAD DATA INPATH "|"', () => {
+    assertAutoComplete({
+      beforeCursor: 'LOAD DATA INPATH "',
+      afterCursor: '"',
       expectedResult: {
         lowerCase: false,
         suggestHdfs: { path: '' }

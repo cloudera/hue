@@ -21,6 +21,9 @@ import os
 import sys
 from posixpath import curdir, sep, pardir, join
 
+if sys.version_info[0] > 2:
+  from past.builtins import cmp
+
 # The root of the Hue installation
 INSTALL_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..'))
 

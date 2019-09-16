@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import oct
+from builtins import object
 import logging
 import sys
 
@@ -87,7 +89,7 @@ def config_validator(user):
 
   try:
     from oozie.conf import REMOTE_SAMPLE_DIR
-  except Exception, e:
+  except Exception as e:
     LOG.warn('Config check failed because Oozie app not installed: %s' % e)
     return res
 
@@ -97,8 +99,8 @@ def config_validator(user):
       res.append((status, _('The Oozie server is not available')))
     fs = get_filesystem()
     NICE_NAME = 'Oozie'
-    if fs.exists(REMOTE_SAMPLE_DIR.get()):
-      stats = fs.stats(REMOTE_SAMPLE_DIR.get())
+    if fs.do_as_superuser(fs.exists, REMOTE_SAMPLE_DIR.get()):
+      stats = fs.do_as_superuser(fs.stats, REMOTE_SAMPLE_DIR.get())
       mode = oct(stats.mode)
       # if neither group nor others have write permission
       group_has_write = int(mode[-2]) & 2
@@ -123,12 +125,12 @@ def config_validator(user):
     if not sharelib_url:
       res.append((status, _('Oozie Share Lib path is not available')))
 
-    class ConfigMock:
+    class ConfigMock(object):
       def __init__(self, value): self.value = value
       def get(self): return self.value
       def get_fully_qualifying_key(self): return self.value
 
-    for cluster in get_all_hdfs().values():
+    for cluster in list(get_all_hdfs().values()):
       res.extend(validate_path(ConfigMock(sharelib_url), is_dir=True, fs=cluster,
                                message=_('Oozie Share Lib not installed in default location.')))
 

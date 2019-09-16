@@ -1,0 +1,12 @@
+{{- if .Values.workers.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: celery-flower
+spec:
+  selector:
+    pod: celery-flower
+  ports:
+  - port: 5555
+  type: NodePort
+{{- end -}}

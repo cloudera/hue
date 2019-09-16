@@ -518,6 +518,20 @@ class Snippet {
       'editor.active.statement.changed',
       statementDetails => {
         if (self.ace() && self.ace().container.id === statementDetails.id) {
+          for (let i = statementDetails.precedingStatements.length - 1; i >= 0; i--) {
+            if (statementDetails.precedingStatements[i].database) {
+              self.availableDatabases().some(availableDatabase => {
+                if (
+                  availableDatabase.toLowerCase() ===
+                  statementDetails.precedingStatements[i].database.toLowerCase()
+                ) {
+                  self.database(availableDatabase);
+                  return true;
+                }
+              });
+              break;
+            }
+          }
           if (statementDetails.activeStatement) {
             self.positionStatement(statementDetails.activeStatement);
           } else {
@@ -1036,7 +1050,7 @@ class Snippet {
                 path: path
               })
               .done(entry => {
-                entry.clearCache({ invalidate: 'invalidate', cascade: true, silenceErrors: true });
+                entry.clearCache({ refreshCache: true, cascade: true, silenceErrors: true });
               });
           }, 5000);
         }
@@ -1806,6 +1820,7 @@ class Snippet {
           }
 
           if (data.status === 0) {
+            self.result.clear();
             self.result.handle(data.handle);
             self.result.hasResultset(data.handle.has_result_set);
             self.showLogs(true);
@@ -2680,12 +2695,26 @@ class Snippet {
       }
       return true;
     };
+
+    self.refreshHistory = notebook.fetchHistory;
   }
 
   renderMarkdown() {
     return this.statement_raw().replace(/([^$]*)([$]+[^$]*[$]+)?/g, (a, textRepl, code) => {
       return markdown.toHTML(textRepl).replace(/^<p>|<\/p>$/g, '') + (code ? code : '');
     });
+  }
+
+  async exportHistory() {
+    const historyResponse = await apiHelper.getHistory({ type: this.type(), limit: 500 });
+
+    if (historyResponse && historyResponse.history) {
+      window.location.href =
+        window.HUE_BASE_URL +
+        '/desktop/api2/doc/export?history=true&documents=[' +
+        historyResponse.history.map(historyDoc => historyDoc.id).join(',') +
+        ']';
+    }
   }
 
   toggleAllResultColumns(linkElement) {

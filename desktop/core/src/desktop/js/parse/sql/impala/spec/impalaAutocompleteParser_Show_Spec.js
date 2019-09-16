@@ -27,6 +27,7 @@ describe('impalaAutocompleteParser.js SHOW statements', () => {
 
   const assertAutoComplete = testDefinition => {
     const debug = false;
+
     expect(
       impalaAutocompleteParser.parseSql(
         testDefinition.beforeCursor,
@@ -461,7 +462,7 @@ describe('impalaAutocompleteParser.js SHOW statements', () => {
       afterCursor: '',
       expectedResult: {
         lowerCase: false,
-        suggestKeywords: ['ROLE', 'USER']
+        suggestKeywords: ['GROUP', 'ROLE', 'USER']
       }
     });
   });

@@ -20,6 +20,8 @@ Desktop-aware test runner.
 Django's "test" command merely executes the test_runner,
 so we circumvent it entirely and create our own.
 """
+from __future__ import print_function
+from builtins import object
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.test.utils import get_runner
@@ -134,7 +136,7 @@ class Command(BaseCommand):
     #south_logger.setLevel(logging.INFO)
 
     if len(args) == 0:
-      print self.help
+      print(self.help)
       sys.exit(1)
 
     nose_args = None
@@ -153,10 +155,10 @@ class Command(BaseCommand):
     elif args[0] in ("specific", "nose"):
       nose_args = args
     elif args[0] == "list_modules":
-      print '\n'.join(all_apps)
+      print('\n'.join(all_apps))
       sys.exit(0)
     else:
-      print self.help
+      print(self.help)
       sys.exit(1)
 
     if nose_args:

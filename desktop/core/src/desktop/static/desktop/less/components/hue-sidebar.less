@@ -16,167 +16,447 @@
  limitations under the License.
 */
 
-@import (reference) "../cui/extra-variables.less";
-@import (reference) "../hue-mixins.less";
+@animation-duration-base: 0.2s;
+@gradient-end: #023259;
+@gradient-start: @cui-gray-800;
+@header-bg-open: @hue-primary-color-dark;
+@header-bg: @hue-primary-color-dark;
+@default-drawer-width: 400px;
+@item-active-border: @hue-primary-color-dark;
+@item-color: rgb(173, 178, 182);
+@sidebar-background-color: #333e45;
+@sidebar-collapsed-item-height: 35px;
+@sidebar-collapsed-icon-height: 22px;
+@sidebar-icon-height: 20px;
+@sidebar-collapsed-width: 56px;
+@sidebar-header-height: 56px;
+@sidebar-item-height: 32px;
+@sidebar-width: 248px;
 
-@sidebar-width: 200px;
-@collapsed-sidebar-width: 48px;
-@sidebar-animation-duration: 250ms;
-@sidebar-category-font-size: 13px;
-@sidebar-left-spacing: 16px;
-@sidebar-left-spacing-item: 30px;
-@sidebar-background-color: @cui-gray-050;
+.svg-hue-sidebar-logo-main {
+  fill: currentColor !important;
+}
 
 .hue-sidebar {
-  position: fixed;
-  top: @navbar-height;
-  left: 0;
-  bottom: 0;
-  background-color: @sidebar-background-color;
-  width: @sidebar-width;
-  transition: width @sidebar-animation-duration;
-  z-index: 5000;
+  .flex(0 0 @sidebar-width);
+  .display-flex;
+  .flex-direction(column);
+  .flex-shrink(0);
+
+  height: 100%;
+  background-image: linear-gradient(164deg, @gradient-start, @gradient-end);
+  line-height: 1.2;
   overflow: hidden;
-  box-shadow: 0 1px 2px 0;
+  transition: all @animation-duration-base;
 
-  &.hue-sidebar-below-top-bar {
-    position: absolute;
-    top: 0;
-    padding-top: 10px;
+  .hi {
+    margin-bottom: 0;
   }
 
-  .hue-sidebar-content {
-    top: 24px;
-    bottom: 50px;
-    position: absolute;
-    overflow-y: auto;
-    min-width: @sidebar-width;
+  * {
+    -webkit-font-smoothing: antialiased;
+    transition: all @animation-duration-base;
+
+    //box-sizing: border-box;
+    //font-size: 100%;
+    //vertical-align: baseline;
+    //margin: 0;
+    //padding: 0;
+    //border-width: 0;
+    //border-style: initial;
+    //border-color: initial;
+    //border-image: initial;
   }
 
-  .hue-sidebar-item {
-    display: block;
-    padding-left: @sidebar-left-spacing-item;
-    line-height: 38px;
-    color: @text-color;
-    background-color: @sidebar-background-color;
+  a {
+    cursor: pointer;
+    text-decoration: none;
 
-    .hue-ease-transition(~"background-color, color");
-
-    .hue-sidebar-icon {
-      color: @cui-gray-600;
-      display: inline-block;
-      margin-right: 14px;
-      width: 18px;
-      text-align: center;
-      .hue-ease-transition(color);
+    &[target='_blank']:after,
+    &[target='_blank']:before {
+      content: none !important;
     }
   }
 
-  .hue-sidebar-item.active {
-    font-weight: bold;
-    color: @cui-blue-500;
-    background-color: @cui-gray-100;
+  .hue-sidebar-header {
+    .display-flex;
+    .flex-shrink(0);
+    .flex-box-align(center);
+    .flex-align-items(center);
 
-    .fa::before {
-      color: @cui-blue-500;
+    height: @sidebar-header-height;
+    color: @cui-white;
+    font-size: 16px;
+    margin-bottom: 8px;
+    padding: 0 0 0 24px;
+    background-color: @header-bg;
+
+    .hue-app-switcher-trigger {
+      color: @hue-primary-color-dark;
+      margin-right: 6px;
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .hue-app-switcher-logo {
+      margin-left: 30px;
+      overflow-x: hidden;
+      color: @cui-white;
+
+      svg {
+        height: 32px;
+        width: 100px;
+      }
+    }
+
+    .title {
+      margin-left: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .logo {
+      width: 36px;
+      height: 36px;
+    }
+
+    & > a {
+      .display-flex;
+      .flex-box-align(center);
+      .flex-box-pack(center);
+      .flex-align-items(center);
+
+      justify-content: center;
+    }
+
+    .hue-sidebar-logo {
+      margin-left: 49px;
+      height: 32px;
+      overflow-x: hidden;
+      color: @cui-white;
+    }
+
+    .hue-sidebar-logo svg {
+      height: 32px;
+      width: 100px;
     }
   }
 
-  .hue-sidebar-item:hover {
-    color: @cui-blue-500;
-    background-color: @cui-gray-100;
+  .hue-sidebar-body {
+    .flex(1 1 auto);
+    .flex-box-flex(1);
 
-    .sidebar-icon {
-      color: @cui-blue-500;
+    overflow-y: hidden;
+  }
+
+  .item {
+    .display-flex;
+    .flex-align-items(center);
+
+    height: @sidebar-item-height;
+    position: relative;
+    align-items: center;
+    color: @item-color;
+
+    span {
+      .nowrap-ellipsis;
+    }
+
+    &.active {
+      color: @cui-white;
+      background-color: rgba(255, 255, 255, 0.1);
+      font-weight: bold;
+
+      &::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background-color: @item-active-border;
+      }
+
+      .fa::before {
+        color: @cui-white;
+      }
     }
   }
 
-  .hue-sidebar-category-item {
-    margin: 20px 0 4px @sidebar-left-spacing;
-    font-size: @sidebar-category-font-size * 1.2;
-    color: @cui-blue-700;
-    transition: opacity @sidebar-animation-duration;
+  .item-category {
+    margin: 20px 0 0 24px;
+    color: @cui-gray-500;
+    text-transform: uppercase;
   }
 
-  .hue-sidebar-action-button {
-    background-color: inherit;
-    display: block;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    line-height: 36px;
-    width: 100%;
-    text-align: right;
-    padding-right: 16px;
-    color: @text-color;
-    box-shadow: 0 0 2px 0;
+  a.item:hover:not(.active) {
+    color: @cui-white;
+  }
+
+  .icon {
+    .display-flex;
+    .flex(0 0 36px);
+    .flex-box-pack(center);
+
+    margin-left: 16px;
+    text-align: center;
+    justify-content: center;
+    font-size: @sidebar-icon-height;
+
+    i, svg {
+      font-size: @sidebar-icon-height;
+      height: @sidebar-icon-height; // nv d3 conflict
+    }
+  }
+
+  .hue-sidebar-footer {
+    a.hue-sidebar-trigger {
+      .display-flex;
+      .flex-shrink(0);
+      .flex-align-items(center);
+      .flex-box-pack(end);
+
+      justify-content: flex-end;
+      height: 50px;
+      padding: 0 16px;
+
+      svg {
+        transition-delay: @animation-duration-base;
+        fill: @cui-gray-500;
+        width: 24px;
+        height: 24px;
+
+        &:hover {
+          fill: @cui-white;
+        }
+      }
+    }
+  }
+
+  .user-icon {
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: @sidebar-background-color;
+    background-color: @item-color;
+    text-transform: uppercase;
 
     &:hover {
-      background: @cui-gray-100;
+      background-color: @cui-white;
     }
   }
-
-  .hue-sidebar-item-name {
-    transition: opacity @sidebar-animation-duration;
-    opacity: 1;
-  }
-
-  .hue-sidebar-footer-panel {
-    background-color: inherit;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    width: 100%;
-    color: @text-color;
-    box-shadow: 0 0 2px 0;
-
-    .dropzone {
-      padding-top: 15px;
-      padding-bottom: 15px;
-      text-align: center;
-
-      i {
-        .hue-ease-transition(color);
-      }
-    }
-
-    .dz-drag-hover,
-    .dropzone:hover {
-      background-color: @cui-gray-200 !important;
-
-      i {
-        color: @cui-blue-500;
-      }
-    }
-
-    a {
-      .pointer;
-    }
-  }
-}
-
-.hue-sidebar.collapsed {
-  width: @collapsed-sidebar-width;
-
-  .hue-sidebar-category-item,
-  .sidebar-item-name {
-    opacity: 0;
-  }
-
-  .hue-sidebar-action-button {
-    text-align: center;
-    padding: 0;
-  }
-}
-
-.hue-sidebar-placeholder {
-  transition: width @sidebar-animation-duration;
-  width: @sidebar-width;
-  height: 100%;
 
   &.collapsed {
-    width: @collapsed-sidebar-width;
+    .flex-basis(@sidebar-collapsed-width);
+
+    .hue-sidebar-header {
+      padding: 0 12px;
+
+      .hue-sidebar-logo {
+        margin-left: 0;
+        width: 32px;
+        color: @cui-white;
+      }
+
+      .hue-app-switcher-trigger svg {
+        width: 32px;
+        height: 32px;
+      }
+
+      .hue-app-switcher-trigger + a {
+        .logo {
+          opacity: 0;
+        }
+      }
+
+      .logo {
+        margin: 0;
+        margin-left: -2px;
+      }
+
+      .title {
+        opacity: 0;
+      }
+    }
+
+    .item[data-tooltip] {
+      &::before {
+        z-index: 1010;
+        display: none;
+        content: attr(data-tooltip);
+        position: fixed;
+        left: @sidebar-collapsed-width + 8px;
+        background-color: @cui-gray-800;
+        color: @cui-white;
+        font-size: 12px;
+        border-radius: 3px;
+        box-shadow: rgba(0, 0, 0, 0.2) 0 2px 4px 0;
+        white-space: nowrap;
+        padding: 4px 8px;
+      }
+
+      &:hover::before {
+        display: block;
+      }
+    }
+
+    .item-category {
+      height: 0;
+      margin: 0;
+    }
+
+    .item {
+      height: @sidebar-collapsed-item-height;
+      padding: 0;
+
+      span {
+        opacity: 0;
+      }
+    }
+
+    .icon {
+      .flex(0 0 @sidebar-collapsed-width);
+      .flex-box-flex(0);
+
+      margin: 0;
+      font-size: @sidebar-collapsed-icon-height;
+      height: @sidebar-collapsed-icon-height;
+
+      i, svg {
+        font-size: @sidebar-collapsed-icon-height;
+        height: @sidebar-collapsed-icon-height;
+      }
+    }
+
+    .hue-sidebar-footer a.hue-sidebar-trigger svg {
+      transform: rotate(180deg);
+    }
+
+    .user-icon {
+      width: 24px;
+      height: 24px;
+      font-size: 16px;
+    }
+  }
+
+  &:not(.collapsed) .hue-sidebar-header {
+    background-color: @header-bg-open !important;
+  }
+
+  .item-spacer {
+    height: 15px;
+  }
+
+  &:not(.collapsed) .sidebar-menu {
+    left: @sidebar-width + 8px;
+  }
+
+  &.collapsed .sidebar-menu {
+    left: @sidebar-collapsed-width + 8px;
+  }
+
+  .sidebar-menu {
+    z-index: 1010;
+    display: none;
+    position: fixed;
+    background-color: @cui-gray-800;
+    color: @cui-white;
+    font-size: 14px;
+    border-radius: 3px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 2px 4px 0;
+    white-space: nowrap;
+    padding: 4px 8px;
+    top: auto;
+    height: auto;
+    bottom: 20px;
+    transition: none;
+
+    &.open {
+      display: block;
+    }
+
+    &.support-menu {
+      bottom: 38px;
+    }
+
+    .menu {
+      display: flex;
+      height: 100%;
+      flex-direction: column;
+
+      .menu-header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 10px 16px 20px 16px;
+
+        .user-icon {
+          width: 36px;
+          height: 36px;
+          margin-right: 12px;
+          font-size: 22px;
+          flex-shrink: 0;
+        }
+
+        > div {
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+        }
+
+        small {
+          font-size: 12px;
+        }
+      }
+
+      ul.sidebar-nav-list {
+        list-style: none;
+        margin: 4px 0;
+        padding: 0;
+
+        li {
+          margin-left: -8px;
+          margin-right: -8px;
+        }
+
+        li a {
+          height: 32px;
+          display: flex;
+          align-items: center;
+          color: @cui-white;
+          padding: 0 24px;
+
+          &:hover {
+            background-color: @hue-primary-color-dark;
+          }
+
+          svg {
+            margin-left: 8px;
+            font-size: 16px;
+          }
+        }
+      }
+
+      .menu-body {
+        flex-grow: 1;
+        min-height: 0;
+        overflow: auto;
+      }
+
+      .menu-footer {
+        flex-shrink: 0;
+
+        h2 {
+          padding: 24px 24px 0 24px;
+        }
+      }
+    }
   }
 }

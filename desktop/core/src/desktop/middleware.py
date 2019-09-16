@@ -17,6 +17,7 @@
 
 from __future__ import absolute_import
 
+from builtins import object
 import inspect
 import json
 import logging
@@ -28,6 +29,9 @@ import tempfile
 import time
 
 import kerberos
+import django.db
+import django.views.static
+import django_prometheus
 
 from django.conf import settings
 from django.contrib import messages
@@ -35,17 +39,17 @@ from django.contrib.auth import REDIRECT_FIELD_NAME, BACKEND_SESSION_KEY, authen
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User
 from django.core import exceptions, urlresolvers
-import django.db
 from django.http import HttpResponseNotAllowed, HttpResponseForbidden
 from django.urls import resolve
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.translation import ugettext as _
 from django.utils.http import urlquote, is_safe_url
-import django.views.static
+
+from hadoop import cluster
 
 import desktop.views
 import desktop.conf
-from desktop.conf import IS_EMBEDDED
+from desktop.auth.backend import is_admin
 from desktop.context_processors import get_app_name
 from desktop.lib import apputil, i18n, fsmanager
 from desktop.lib.django_util import JsonResponse, render, render_json
@@ -55,9 +59,8 @@ from desktop.log import get_audit_logger
 from desktop.log.access import access_log, log_page_hit, access_warn
 from desktop import appmanager
 from desktop import metrics
-from hadoop import cluster
-
 from desktop.auth.backend import is_admin
+
 
 LOG = logging.getLogger(__name__)
 
@@ -69,6 +72,9 @@ DJANGO_VIEW_AUTH_WHITELIST = [
   django.views.static.serve,
   desktop.views.is_alive,
 ]
+
+if desktop.conf.ENABLE_PROMETHEUS.get():
+  DJANGO_VIEW_AUTH_WHITELIST.append(django_prometheus.exports.ExportToDjangoView)
 
 
 class AjaxMiddleware(object):
@@ -230,16 +236,16 @@ class AppSpecificMiddleware(object):
       try:
           dot = middleware_path.rindex('.')
       except ValueError:
-          raise exceptions.ImproperlyConfigured, _('%(module)s isn\'t a middleware module.') % {'module': middleware_path}
+          raise exceptions.ImproperlyConfigured(_('%(module)s isn\'t a middleware module.') % {'module': middleware_path})
       mw_module, mw_classname = middleware_path[:dot], middleware_path[dot+1:]
       try:
           mod = __import__(mw_module, {}, {}, [''])
-      except ImportError, e:
-          raise exceptions.ImproperlyConfigured, _('Error importing middleware %(module)s: "%(error)s".') % {'module': mw_module, 'error': e}
+      except ImportError as e:
+          raise exceptions.ImproperlyConfigured(_('Error importing middleware %(module)s: "%(error)s".') % {'module': mw_module, 'error': e})
       try:
           mw_class = getattr(mod, mw_classname)
       except AttributeError:
-          raise exceptions.ImproperlyConfigured, _('Middleware module "%(module)s" does not define a "%(class)s" class.') % {'module': mw_module, 'class':mw_classname}
+          raise exceptions.ImproperlyConfigured(_('Middleware module "%(module)s" does not define a "%(class)s" class.') % {'module': mw_module, 'class':mw_classname})
 
       try:
         mw_instance = mw_class()
@@ -250,9 +256,8 @@ class AppSpecificMiddleware(object):
       # We need to make sure we don't have a process_request function because we don't know what
       # application will handle the request at the point process_request is called
       if hasattr(mw_instance, 'process_request'):
-        raise exceptions.ImproperlyConfigured, \
-              _('AppSpecificMiddleware module "%(module)s" has a process_request function' + \
-              ' which is impossible.') % {'module': middleware_path}
+        raise exceptions.ImproperlyConfigured(_('AppSpecificMiddleware module "%(module)s" has a process_request function' + \
+              ' which is impossible.') % {'module': middleware_path})
       if hasattr(mw_instance, 'process_view'):
         result['view'].append(mw_instance.process_view)
       if hasattr(mw_instance, 'process_response'):
@@ -306,7 +311,7 @@ class LoginAndPermissionMiddleware(object):
       # Until we get Django 1.3 and resolve returning the URL name, we just do a match of the name of the view
       try:
         access_view = 'access_view:%s:%s' % (request._desktop_app, resolve(request.path)[0].__name__)
-      except Exception, e:
+      except Exception as e:
         access_log(request, 'error checking view perm: %s' % e, level=access_log_level)
         access_view = ''
 
@@ -344,9 +349,7 @@ class LoginAndPermissionMiddleware(object):
       response[MIDDLEWARE_HEADER] = 'LOGIN_REQUIRED'
       return response
     else:
-      if IS_EMBEDDED.get():
-        return HttpResponseForbidden()
-      elif request.GET.get('is_embeddable'):
+      if request.GET.get('is_embeddable'):
         return JsonResponse({'url': "%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, urlquote('/hue' + request.get_full_path().replace('is_embeddable=true', '').replace('&&','&')))}) # Remove embeddable so redirect from & to login works. Login page is not embeddable
       else:
         return HttpResponseRedirect("%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, urlquote(request.get_full_path())))
@@ -382,7 +385,7 @@ class AuditLoggingMiddleware(object):
       if hasattr(request, 'audit') and request.audit is not None:
         self._log_message(request, response)
         response['audited'] = True
-    except Exception, e:
+    except Exception as e:
       LOG.error('Could not audit the request: %s' % e)
     return response
 
@@ -428,7 +431,7 @@ class AuditLoggingMiddleware(object):
 try:
   import tidylib
   _has_tidylib = True
-except Exception, ex:
+except Exception as ex:
   # The exception type is not ImportError. It's actually an OSError.
   logging.warn("Failed to import tidylib (for debugging). Is libtidy installed?")
   _has_tidylib = False
@@ -457,8 +460,8 @@ class HtmlValidationMiddleware(object):
     try:
       self._outdir = os.path.join(tempfile.gettempdir(), 'hue_html_validation')
       if not os.path.isdir(self._outdir):
-        os.mkdir(self._outdir, 0755)
-    except Exception, ex:
+        os.mkdir(self._outdir, 0o755)
+    except Exception as ex:
       self._logger.exception('Failed to get temp directory: %s', (ex,))
       self._outdir = tempfile.mkdtemp(prefix='hue_html_validation-')
 

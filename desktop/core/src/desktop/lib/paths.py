@@ -89,11 +89,21 @@ def get_run_root(*append):
   return __get_root(*append)
 
 
+def get_hadoop_conf_dir_default_config():
+  from hadoop.conf import HDFS_CLUSTERS, get_hadoop_conf_dir_default
+  if list(HDFS_CLUSTERS.keys()):
+    yarn_site_path = HDFS_CLUSTERS[list(HDFS_CLUSTERS.keys())[0]].HADOOP_CONF_DIR.get()
+  else:
+    yarn_site_path = get_hadoop_conf_dir_default()
+  return yarn_site_path
+
+
 def get_config_root(*append):
   """
   Currently gets it based on the Hadoop configuration location.
   """
-  from hadoop.conf import HDFS_CLUSTERS
+  return os.path.abspath(os.path.join(get_hadoop_conf_dir_default_config(), '..', *append))
 
-  yarn_site_path = HDFS_CLUSTERS['default'].HADOOP_CONF_DIR.get()
-  return os.path.abspath(os.path.join(yarn_site_path, '..', *append))
+
+def get_config_root_hadoop(*append):
+  return os.path.abspath(os.path.join(get_hadoop_conf_dir_default_config(), *append))

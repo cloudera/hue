@@ -16,15 +16,20 @@
 # limitations under the License.
 #
 
+from future import standard_library
+standard_library.install_aliases()
 import logging
-
-from cStringIO import StringIO
+import sys
 
 from thrift.transport.TTransport import *
 
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 
+if sys.version_info[0] > 2:
+  from io import StringIO as string_io
+else:
+  from cStringIO import StringIO as string_io
 
 LOG = logging.getLogger(__name__)
 
@@ -45,7 +50,7 @@ class THttpClient(TTransportBase):
     self._client = HttpClient(self._base_url, logger=LOG)
     self._data = None
     self._headers = None
-    self._wbuf = StringIO()
+    self._wbuf = string_io()
 
   def open(self):
     pass
@@ -80,7 +85,7 @@ class THttpClient(TTransportBase):
 
   def flush(self):
     data = self._wbuf.getvalue()
-    self._wbuf = StringIO()
+    self._wbuf = string_io()
 
     # POST
     self._root = Resource(self._client)

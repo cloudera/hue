@@ -192,7 +192,9 @@ def browse(request, name, is_mobile=False):
   if engine == 'solr':
     name = re.sub('^default\.', '', name)
 
-  collections = get_engine(request.user, engine, source=source).datasets()
+  database = name.split('.', 1)[0]
+  collections = get_engine(request.user, engine, source=source).datasets(database=database)
+
   if not collections and engine == 'solr':
     return no_collections(request)
 

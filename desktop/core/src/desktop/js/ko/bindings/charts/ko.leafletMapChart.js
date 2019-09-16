@@ -16,15 +16,16 @@
 
 import $ from 'jquery';
 import ko from 'knockout';
-import L from 'leaflet';
+import 'ext/leaflet/leaflet';
+import 'ext/leaflet/leaflet.markercluster';
+import 'ext/leaflet/leaflet.heat';
+import 'ext/leaflet/leaflet.zoombox';
 
 import huePubSub from 'utils/huePubSub';
-import 'leaflet.markercluster';
-import 'leaflet.heat';
-import 'leaflet-zoombox';
 
 ko.bindingHandlers.leafletMapChart = {
   update: function(element, valueAccessor) {
+    const L = window.L;
     const _options = valueAccessor();
     const _data = _options.transformer(valueAccessor().datum);
 

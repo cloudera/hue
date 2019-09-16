@@ -38,7 +38,7 @@ class FileReporter(Reporter):
     if not os.path.exists(dirname):
       try:
         os.makedirs(dirname)
-      except OSError, e:
+      except OSError as e:
         LOG.error('failed to make the directory %s: %s' % (dirname, e))
       return
 

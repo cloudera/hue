@@ -14,10 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.from nose.tools import assert_equal
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from past.builtins import basestring
+from builtins import object
 from copy import deepcopy
 
-import StringIO
 import logging
+import sys
 
 from nose.tools import assert_equal, assert_true
 from nose.plugins.attrib import attr
@@ -38,11 +43,15 @@ from indexer.indexers.morphline import MorphlineIndexer
 from indexer.solr_client import SolrClient
 from indexer.solr_client_tests import MockSolrCdhCloudHdfsApi
 
+if sys.version_info[0] > 2:
+  from io import StringIO as string_io
+else:
+  from StringIO import StringIO as string_io
 
 LOG = logging.getLogger(__name__)
 
 
-class TestIndexer():
+class TestIndexer(object):
 
   simpleCSVString = """id,Rating,Location,Name,Time
 1,5,San Francisco,Good Restaurant,8:30pm
@@ -107,7 +116,7 @@ class TestIndexer():
     self.finish()
 
   def test_guess_csv_format(self):
-    stream = StringIO.StringIO(TestIndexer.simpleCSVString)
+    stream = string_io(TestIndexer.simpleCSVString)
     indexer = MorphlineIndexer("test", solr_client=self.solr_client)
 
     guessed_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
@@ -127,7 +136,7 @@ class TestIndexer():
 
   def test_guess_format_invalid_csv_format(self):
     indexer = MorphlineIndexer("test", solr_client=self.solr_client)
-    stream = StringIO.StringIO(TestIndexer.simpleCSVString)
+    stream = string_io(TestIndexer.simpleCSVString)
 
     guessed_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
 
@@ -305,7 +314,7 @@ class TestIndexer():
     assert_true(isinstance(morphline, basestring))
 
 
-class MockedRequest():
+class MockedRequest(object):
   def __init__(self, user, fs, jt):
     self.user = user
     self.fs = fs

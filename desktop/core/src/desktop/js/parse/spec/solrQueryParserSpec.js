@@ -22,6 +22,7 @@ describe('solrQueryParser.js', () => {
     if (!expectedResult.locations) {
       delete result.locations;
     }
+
     expect(result).toEqual(expectedResult);
   };
 

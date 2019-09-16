@@ -49,7 +49,7 @@ from django.utils.http import http_date
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
-from aws.s3.s3fs import S3FileSystemException
+from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException
 from avro import datafile, io
 from desktop import appmanager
 from desktop.lib import i18n
@@ -226,10 +226,6 @@ def view(request, path):
 
         if "Connection refused" in e.message:
             msg += _(" The HDFS REST service is not available. ")
-        elif request.fs._get_scheme(path).lower() == 'hdfs':
-            if is_admin(request.user) and not _is_hdfs_superuser(request):
-                msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
-                        % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
 
         if request.is_ajax():
           exception = {
@@ -465,11 +461,16 @@ def listdir_paged(request, path):
     else:
       home_dir_path = None
     breadcrumbs = parse_breadcrumbs(path)
+    s3_listing_not_allowed = ''
 
-    if do_as:
-      all_stats = request.fs.do_as_user(do_as, request.fs.listdir_stats, path)
-    else:
-      all_stats = request.fs.listdir_stats(path)
+    try:
+      if do_as:
+        all_stats = request.fs.do_as_user(do_as, request.fs.listdir_stats, path)
+      else:
+        all_stats = request.fs.listdir_stats(path)
+    except S3ListAllBucketsException as e:
+      s3_listing_not_allowed = e.message
+      all_stats = []
 
 
     # Filter first
@@ -550,6 +551,7 @@ def listdir_paged(request, path):
         'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
         'show_upload_button': SHOW_UPLOAD_BUTTON.get(),
         'is_embeddable': request.GET.get('is_embeddable', False),
+        's3_listing_not_allowed': s3_listing_not_allowed
     }
     return render('listdir.mako', request, data)
 
@@ -1097,14 +1099,10 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
                 op(*args)
             except (IOError, WebHdfsException) as e:
                 msg = _("Cannot perform operation.")
-                # TODO: Only apply this message for HDFS
-                if is_admin(request.user) and not _is_hdfs_superuser(request):
-                    msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
-                           % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
                 raise PopupException(msg, detail=e)
             except S3FileSystemException as e:
-              msg = _("S3 filesystem exception.")
-              raise PopupException(msg, detail=e)
+                msg = _("S3 filesystem exception.")
+                raise PopupException(msg, detail=e)
             except NotImplementedError as e:
                 msg = _("Cannot perform operation.")
                 raise PopupException(msg, detail=e)
@@ -1347,7 +1345,7 @@ def _upload_file(request):
           'result': _massage_stats(request, stat_absolute_path(filepath, request.fs.stats(filepath))),
           'next': request.GET.get("next")
         })
-
+ 
         return response
     else:
         raise PopupException(_("Error in upload form: %s") % (form.errors,))

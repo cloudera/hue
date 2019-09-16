@@ -68,17 +68,17 @@ class S3Stat(object):
     return False
 
   @classmethod
-  def from_bucket(cls, bucket):
-    return cls(bucket.name, 's3a://%s' % bucket.name, True, 0, None)
+  def from_bucket(cls, bucket, fs='s3a'):
+    return cls(bucket.name, '%s://%s' % (fs, bucket.name), True, 0, None)
 
   @classmethod
-  def from_key(cls, key, is_dir=False):
+  def from_key(cls, key, is_dir=False, fs='s3a'):
     if key.name:
       name = posixpath.basename(key.name[:-1] if key.name[-1] == '/' else key.name)
-      path = 's3a://%s/%s' % (key.bucket.name, key.name)
+      path = '%s://%s/%s' % (fs, key.bucket.name, key.name)
     else:
       name = ''
-      path = 's3a://%s' % key.bucket.name
+      path = '%s://%s' % (fs, key.bucket.name)
 
     size = key.size or 0
 

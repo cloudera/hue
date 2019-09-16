@@ -177,7 +177,7 @@
           'position': 'fixed',
           'bottom': '20px',
           'opacity': 0.85
-        }).addClass('hueAnchor hue-datatable-search').appendTo(HUE_CONTAINER);
+        }).addClass('hueAnchor hue-datatable-search').appendTo('body');
         search.html('<input type="text"> <i class="fa fa-chevron-up pointer muted"></i> <i class="fa fa-chevron-down pointer muted"></i> &nbsp; <span></span> &nbsp; <i class="fa fa-times pointer inactive-action"></i>');
 
         search.find('.fa-times').on('click', function () {

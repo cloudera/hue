@@ -14,12 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import logging
 import posixpath
 import requests
 import threading
-import urllib
-from urlparse import urlparse
+import sys
 
 from django.utils.encoding import iri_to_uri, smart_str
 from django.utils.http import urlencode
@@ -27,9 +29,16 @@ from django.utils.http import urlencode
 from desktop import conf
 
 from requests import exceptions
-from requests.auth import HTTPBasicAuth, HTTPDigestAuth
+from requests.auth import AuthBase ,HTTPBasicAuth, HTTPDigestAuth
 from requests_kerberos import HTTPKerberosAuth, REQUIRED, OPTIONAL, DISABLED
 from urllib3.contrib import pyopenssl
+
+if sys.version_info[0] > 2:
+  import urllib.request, urllib.error
+  from urllib.parse import quote as urllib_quote, urlparse as lib_urlparse
+else:
+  from urllib import quote as urllib_quote
+  from urlparse import urlparse as lib_urlparse
 
 pyopenssl.DEFAULT_SSL_CIPHER_LIST = conf.SSL_CIPHER_LIST.get()
 
@@ -39,6 +48,7 @@ LOG = logging.getLogger(__name__)
 
 CACHE_SESSION = {}
 CACHE_SESSION_LOCK = threading.Lock()
+
 
 def get_request_session(url, logger):
   global CACHE_SESSION, CACHE_SESSION_LOCK
@@ -51,6 +61,7 @@ def get_request_session(url, logger):
       logger.debug("Setting session adapter for %s" % url)
 
   return CACHE_SESSION
+
 
 class RestException(Exception):
   """
@@ -108,7 +119,7 @@ class HttpClient(object):
     self._cookies = None
 
   def _extract_netloc(self, base_url):
-    parsed_uri = urlparse(base_url)
+    parsed_uri = lib_urlparse(base_url)
     short_url = '%(scheme)s://%(netloc)s' % {'scheme': parsed_uri.scheme, 'netloc': parsed_uri.netloc}
     return short_url
 
@@ -133,6 +144,9 @@ class HttpClient(object):
     self._session.auth = HTTPDigestAuth(username, password)
     return self
 
+  def set_bearer_auth(self, token):
+    self._session.auth = HTTPBearerAuth(token)
+
   def set_headers(self, headers):
     """
     Add headers to the request
@@ -141,7 +155,6 @@ class HttpClient(object):
     """
     self._session.headers.update(headers)
     return self
-
 
   @property
   def base_url(self):
@@ -154,7 +167,7 @@ class HttpClient(object):
   def set_verify(self, verify=True):
     self._session.verify = verify
     return self
-      
+
   def _get_headers(self, headers):
     if headers:
       self._session.headers.update(headers)
@@ -178,7 +191,7 @@ class HttpClient(object):
     """
     # Prepare URL and params
     if urlencode:
-      path = urllib.quote(smart_str(path))
+      path = urllib_quote(smart_str(path))
     url = self._make_url(path, params)
     if http_method in ("GET", "DELETE"):
       if data is not None:
@@ -211,7 +224,7 @@ class HttpClient(object):
             exceptions.HTTPError,
             exceptions.RequestException,
             exceptions.URLRequired,
-            exceptions.TooManyRedirects), ex:
+            exceptions.TooManyRedirects) as ex:
       raise self._exc_class(ex)
 
   def _make_url(self, path, params):
@@ -222,3 +235,20 @@ class HttpClient(object):
       param_str = urlencode(params)
       res += '?' + param_str
     return iri_to_uri(res)
+
+
+class HTTPBearerAuth(AuthBase):
+    """Attaches HTTP Basic Authentication to the given Request object."""
+
+    def __init__(self, token):
+        self.token = token
+
+    def __eq__(self, other):
+        return self.token == getattr(other, 'token', None)
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __call__(self, r):
+        r.headers['Authorization'] = 'Bearer %s' % self.token
+        return r

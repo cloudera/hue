@@ -107,15 +107,19 @@ describe('sqlAutocomplete.js', () => {
 
   it('should create suggestions for Hive', () => {
     subject = createSubject('hive', '', '');
+
     expect(subject.suggestions.filtered().length).toBe(0);
     subject.autocomplete();
+
     expect(subject.suggestions.filtered().length).toBeGreaterThan(0);
   });
 
   it('should create suggestions for Impala', () => {
     subject = createSubject('impala', '', '');
+
     expect(subject.suggestions.filtered().length).toBe(0);
     subject.autocomplete();
+
     expect(subject.suggestions.filtered().length).toBeGreaterThan(0);
   });
 
@@ -123,15 +127,19 @@ describe('sqlAutocomplete.js', () => {
     subject = createSubject('hive', 'SELECT FROMzzz bla LIMIT 1; SELECT ', ' FROM bla', {
       location: { first_line: 1, last_line: 1, first_column: 27, last_column: 52 }
     });
+
     expect(subject.suggestions.filtered().length).toBe(0);
     subject.autocomplete();
+
     expect(subject.suggestions.filtered().length).toBeGreaterThan(0);
   });
 
   it("should only fallback to the active query when there are surrounding errors if there's an active query", () => {
     subject = createSubject('hive', 'SELECT FROMzzz bla LIMIT 1; SELECT ', ' FROM bla');
+
     expect(subject.suggestions.filtered().length).toBe(0);
     subject.autocomplete();
+
     expect(subject.suggestions.filtered().length).toBe(0);
   });
 
@@ -141,8 +149,10 @@ describe('sqlAutocomplete.js', () => {
       'SELECT ',
       ' FROM customers, (SELECT app FROM web_logs) AS subQ;'
     );
+
     expect(subject.suggestions.filtered().length).toBe(0);
     subject.autocomplete();
+
     expect(subject.suggestions.filtered().length).toBeGreaterThan(0);
 
     const appFound = subject.suggestions.filtered().some(suggestion => {

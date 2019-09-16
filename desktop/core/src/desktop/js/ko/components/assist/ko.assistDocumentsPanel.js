@@ -342,6 +342,12 @@ class AssistDocumentsPanel {
       }
     });
 
+    huePubSub.subscribe('assist.documents.set.type.filter', docType => {
+      if (docType) {
+        this.setTypeFilter(docType);
+      }
+    });
+
     self.init();
   }
 

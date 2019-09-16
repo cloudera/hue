@@ -84,7 +84,7 @@
       $("<div>").attr("id", "jHueGenericAutocomplete").addClass("jHueAutocomplete popover")
         .attr("style", "position:absolute;display:none;max-width:1000px;z-index:33000")
         .html('<div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><ul class="unstyled"></ul></div></div>')
-        .appendTo(HUE_CONTAINER);
+        .appendTo('body');
     }
 
     $el.wrap('<div class="inline">');

@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import os
 
 from subprocess import CalledProcessError
 
@@ -23,14 +24,14 @@ from django.utils.translation import ugettext_lazy as _t
 
 from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, CLUSTER_ID as DEFAULT_CLUSTER_ID
 from desktop.lib.conf import Config, ConfigSection, coerce_bool, coerce_password_from_script
-from desktop.lib.paths import get_config_root
+from desktop.lib.paths import get_config_root, get_desktop_root
 
 from metadata.settings import DJANGO_APPS
+from metadata.catalog import atlas_flags
 
 
 OPTIMIZER_AUTH_PASSWORD = None
 NAVIGATOR_AUTH_PASSWORD = None
-CATALOG_AUTH_PASSWORD = None
 
 LOG = logging.getLogger(__name__)
 
@@ -39,18 +40,17 @@ def get_auth_username():
   """Get from top level default from desktop"""
   return DEFAULT_AUTH_USERNAME.get()
 
-
 def default_catalog_url():
   """Get from main Hue config directory if present"""
-  return None
+  return atlas_flags.get_api_url() if atlas_flags.get_api_url() else None
 
 def default_catalog_config_dir():
   """Get from usual main Hue config directory"""
-  return get_config_root()
+  return os.environ.get("HUE_CONF_DIR", get_desktop_root("conf")) + '/hive-conf'
 
 def default_catalog_interface():
   """Detect if the configured catalog is Navigator or default to Atlas"""
-  return 'navigator' if default_navigator_url() else 'atlas'
+  return 'atlas' if atlas_flags.get_api_url() else 'navigator'
 
 def default_navigator_config_dir():
   """Get from usual main Hue config directory"""
@@ -224,12 +224,15 @@ DEFAULT_PUBLIC_KEY = Config(
 # Data Catalog
 
 def get_catalog_url():
-  return (CATALOG.API_URL.get() and CATALOG.API_URL.get().strip('/')[:-3]) or get_navigator_url()
+  return (CATALOG.API_URL.get() and CATALOG.API_URL.get().strip('/')) or (CATALOG.INTERFACE.get() == 'navigator' and get_navigator_url())
 
 def has_catalog(user):
   from desktop.auth.backend import is_admin
-  return ((bool(get_catalog_url() and get_catalog_auth_password())) or has_navigator(user)) \
-      and (is_admin(user) or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
+  return (
+      bool(get_catalog_url()) or has_navigator(user)
+    ) and (
+      is_admin(user) or user.has_hue_permission(action="access", app=DJANGO_APPS[0])
+    )
 
 def has_readonly_catalog(user):
   return has_catalog(user) and not has_navigator(user)
@@ -237,17 +240,14 @@ def has_readonly_catalog(user):
 def get_catalog_search_cluster():
   return CATALOG.SEARCH_CLUSTER.get()
 
-def get_catalog_auth_password():
-  '''Get the password to authenticate with.'''
-  global CATALOG_AUTH_PASSWORD
+def get_kerberos_enabled_default():
+  '''Use atlas.authentication.method.kerberos if catalog interface is atlas else False '''
+  return atlas_flags.is_kerberos_enabled() if CATALOG.INTERFACE.get() == 'atlas' else False
 
-  if CATALOG_AUTH_PASSWORD is None:
-    try:
-      CATALOG_AUTH_PASSWORD = CATALOG.SERVER_PASSWORD.get()
-    except CalledProcessError:
-      LOG.exception('Could not read Catalog password file, need to restart Hue to re-enable it.')
+def get_catalog_server_password_script():
+  '''Execute script at path'''
+  return CATALOG.SERVER_PASSWORD_SCRIPT.get()
 
-  return CATALOG_AUTH_PASSWORD
 
 CATALOG = ConfigSection(
   key='catalog',
@@ -269,6 +269,12 @@ CATALOG = ConfigSection(
       key="server_password",
       help=_t("Password of the user used for authentication."),
       private=True,
+      dynamic_default=get_catalog_server_password_script),
+    SERVER_PASSWORD_SCRIPT=Config(
+      key="server_password_script",
+      help=_t("Execute this script to produce the server password secret. This will be used when `server_password` is not set."),
+      private=True,
+      type=coerce_password_from_script,
       default=None),
     SEARCH_CLUSTER=Config(
       key="search_cluster",
@@ -280,6 +286,17 @@ CATALOG = ConfigSection(
       default=25,
       type=int
     ),
+    KERBEROS_ENABLED=Config(
+      key="kerberos_enabled",
+      help=_t("Set to true when authenticating via kerberos instead of username/password"),
+      type=coerce_bool,
+      dynamic_default=get_kerberos_enabled_default
+    ),
+    CONF_DIR=Config(
+      key="conf_dir",
+      help=_t("Directory of the configuration. Defaults to HUE_CONF_DIR/hue-conf"),
+      dynamic_default=default_catalog_config_dir
+    )
   )
 )
 

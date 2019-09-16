@@ -66,7 +66,7 @@ Plugin.prototype.init = function() {
       .html(
         '<div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p><ul class="unstyled"></ul></p></div></div>'
       )
-      .appendTo($(HUE_CONTAINER));
+      .appendTo($('body'));
   }
 
   function setHueBreadcrumbCaretAtEnd(element) {

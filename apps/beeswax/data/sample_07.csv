@@ -267,16 +267,15 @@
 27-1026	Merchandise displayers and window trimmers	68660	27370
 27-1027	Set and exhibit designers	8620	47620
 27-1029	Designers, all other	11890	50420
-27-2011	Actors	44860	*
 27-2012	Producers and directors	72390	77070
 27-2021	Athletes and sports competitors	12670	71920
 27-2022	Coaches and scouts	165410	34720
 27-2023	Umpires, referees, and other sports officials	13630	29850
-27-2031	Dancers	12530	*
+27-2031	Dancers	12530	NULL
 27-2032	Choreographers	15250	39600
 27-2041	Music directors and composers	9110	53970
-27-2042	Musicians and singers	47520	*
-27-2099	Entertainers and performers, sports and related workers, all other	32040	*
+27-2042	Musicians and singers	47520	NULL
+27-2099	Entertainers and performers, sports and related workers, all other	32040	NULL
 27-3011	Radio and television announcers	39500	39360
 27-3012	Public address system and other announcers	8490	35890
 27-3021	Broadcast news analysts	6550	70370

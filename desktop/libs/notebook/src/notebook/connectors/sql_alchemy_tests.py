@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 
 from mock import patch, Mock, MagicMock
@@ -33,7 +34,7 @@ from notebook.connectors.sql_alchemy import SqlAlchemyApi
 LOG = logging.getLogger(__name__)
 
 
-class TestApi():
+class TestApi(object):
 
   def setUp(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
@@ -42,9 +43,38 @@ class TestApi():
     grant_access("test", "default", "notebook")
 
 
+  def test_column_backticks_escaping(self):
+    interpreter = {
+      'options': {
+        'url': 'mysql://'
+      }
+    }
+    assert_equal(SqlAlchemyApi(self.user, interpreter).backticks, '`')
+
+    interpreter = {
+      'options': {
+        'url': 'postgresql://'
+      }
+    }
+    assert_equal(SqlAlchemyApi(self.user, interpreter).backticks, '"')
+
+
+  def test_create_athena_engine(self):
+    interpreter = {
+      'options': {
+        'url': 'awsathena+rest://XXXXXXXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?s3_staging_dir=s3://gethue-athena/scratch'
+      }
+    }
+
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      SqlAlchemyApi(self.user, interpreter)._create_engine()
+
+
   def test_fetch_result_empty(self):
     interpreter = {
-      'options': {}
+      'options': {
+        'url': 'mysql://hue:localhost@hue:3306/hue'
+      },
     }
 
     notebook = Mock()
@@ -77,7 +107,9 @@ class TestApi():
 
   def test_fetch_result_rows(self):
     interpreter = {
-      'options': {}
+      'options': {
+        'url': 'mysql://hue:localhost@hue:3306/hue'
+      }
     }
 
     notebook = Mock()
@@ -106,3 +138,28 @@ class TestApi():
 
       assert_equal(data['data'], [['row1'], ['row2']])
       assert_equal(data['meta'](), [{'type': 'BIGINT_TYPE'}])
+
+
+class TestAutocomplete(object):
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+
+    self.user = rewrite_user(User.objects.get(username="test"))
+    grant_access("test", "default", "notebook")
+
+
+  def test_empty_database_names(self):
+    interpreter = {
+      'options': {'url': 'phoenix://'}
+    }
+
+    snippet = Mock()
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      with patch('notebook.connectors.sql_alchemy.inspect') as inspect:
+        with patch('notebook.connectors.sql_alchemy.Assist') as Assist:
+          Assist.return_value=Mock(get_databases=Mock(return_value=['SYSTEM', None]))
+
+          data = SqlAlchemyApi(self.user, interpreter).autocomplete(snippet)
+
+          assert_equal(data['databases'], ['SYSTEM', 'NULL'])

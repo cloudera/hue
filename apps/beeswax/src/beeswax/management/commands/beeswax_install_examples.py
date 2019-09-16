@@ -16,10 +16,11 @@
 # limitations under the License.
 
 from builtins import object
+import csv
 import logging
+import json
 import os
 import pwd
-import json
 
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
@@ -35,6 +36,7 @@ from useradmin.models import get_default_user_group, install_sample_user
 import beeswax.conf
 from beeswax.models import SavedQuery, HQL, IMPALA
 from beeswax.design import hql_query
+from beeswax.hive_site import has_concurrency_support
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config, QueryServerException
 
@@ -60,7 +62,7 @@ class Command(BaseCommand):
       db_name = options.get('db_name', 'default')
       user = options['user']
 
-    tables = options['tables'] if 'tables' in options else 'tables.json'
+    tables = options['tables'] if 'tables' in options else ('tables_transactional.json' if has_concurrency_support() else 'tables.json')
 
     exception = None
 
@@ -76,7 +78,7 @@ class Command(BaseCommand):
 
     if exception is not None:
       pretty_msg = None
-      
+
       if "AlreadyExistsException" in exception.message:
         pretty_msg = _("SQL table examples already installed.")
       if "Permission denied" in exception.message:
@@ -84,7 +86,7 @@ class Command(BaseCommand):
 
       if pretty_msg is not None:
         raise PopupException(pretty_msg)
-      else: 
+      else:
         raise exception
 
   def _install_tables(self, django_user, app_name, db_name, tables):
@@ -110,7 +112,8 @@ class Command(BaseCommand):
     design_list = [d for d in design_list if int(d['type']) == app_type]
 
     for design_dict in design_list:
-      design = SampleQuery(design_dict)
+      if not has_concurrency_support() or design_dict['name'] != 'Sample: Customers':
+        design = SampleQuery(design_dict)
       try:
         design.install(django_user)
       except Exception as ex:
@@ -132,6 +135,7 @@ class SampleTable(object):
     self.query_server = get_query_server_config(app_name)
     self.app_name = app_name
     self.db_name = db_name
+    self.columns = data_dict.get('columns')
 
     # Sanity check
     self._data_dir = beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get()
@@ -149,9 +153,10 @@ class SampleTable(object):
     if self.create(django_user):
       if self.partition_files:
         for partition_spec, filepath in list(self.partition_files.items()):
-          self.load_partition(django_user, partition_spec, filepath)
+          self.load_partition(django_user, partition_spec, filepath, columns=self.columns)
       else:
         self.load(django_user)
+
 
   def create(self, django_user):
     """
@@ -161,7 +166,6 @@ class SampleTable(object):
     db = dbms.get(django_user, self.query_server)
 
     try:
-      # Already exists?
       if self.app_name == 'impala':
         db.invalidate(database=self.db_name, flush_all=False)
       db.get_table(self.db_name, self.name)
@@ -183,41 +187,61 @@ class SampleTable(object):
         LOG.error(msg)
         raise InstallException(msg)
 
-  def load_partition(self, django_user, partition_spec, filepath):
-    """
-    Upload data found at filepath to HDFS home of user, the load intto a specific partition
-    """
-    LOAD_PARTITION_HQL = \
-      """
-      ALTER TABLE %(tablename)s ADD PARTITION(%(partition_spec)s) LOCATION '%(filepath)s'
-      """
+  def load_partition(self, django_user, partition_spec, filepath, columns):
+    if has_concurrency_support():
+      with open(filepath) as f:
+        hql = \
+          """
+          INSERT INTO TABLE %(tablename)s
+          PARTITION (%(partition_spec)s)
+          VALUES %(values)s
+          """ % {
+            'tablename': self.name,
+            'partition_spec': partition_spec,
+            'values': self._get_sql_insert_values(f, columns)
+          }
+    else:
+      # Upload data found at filepath to HDFS home of user, the load intto a specific partition
+      LOAD_PARTITION_HQL = \
+        """
+        ALTER TABLE %(tablename)s ADD PARTITION(%(partition_spec)s) LOCATION '%(filepath)s'
+        """
 
-    partition_dir = self._get_partition_dir(partition_spec)
-    hdfs_root_destination = self._get_hdfs_root_destination(django_user, subdir=partition_dir)
-    filename = filepath.split('/')[-1]
-    hdfs_file_destination = self._upload_to_hdfs(django_user, filepath, hdfs_root_destination, filename)
+      partition_dir = self._get_partition_dir(partition_spec)
+      hdfs_root_destination = self._get_hdfs_root_destination(django_user, subdir=partition_dir)
+      filename = filepath.split('/')[-1]
+      hdfs_file_destination = self._upload_to_hdfs(django_user, filepath, hdfs_root_destination, filename)
 
-    hql = LOAD_PARTITION_HQL % {'tablename': self.name, 'partition_spec': partition_spec, 'filepath': hdfs_root_destination}
-    LOG.info('Running load query: %s' % hql)
-    self._load_data_to_table(django_user, hql, hdfs_file_destination)
+      hql = LOAD_PARTITION_HQL % {'tablename': self.name, 'partition_spec': partition_spec, 'filepath': hdfs_root_destination}
+
+    self._load_data_to_table(django_user, hql)
 
 
   def load(self, django_user):
-    """
-    Upload data to HDFS home of user then load (aka move) it into the Hive table (in the Hive metastore in HDFS).
-    """
-    LOAD_HQL = \
-      """
-      LOAD DATA INPATH
-      '%(filename)s' OVERWRITE INTO TABLE %(tablename)s
-      """
+    if has_concurrency_support():
+      with open(self._contents_file) as f:
+        hql = \
+          """
+          INSERT INTO TABLE %(tablename)s
+          VALUES %(values)s
+          """ % {
+            'tablename': self.name,
+            'values': self._get_sql_insert_values(f)
+          }
+    else:
+      # Upload data to HDFS home of user then load (aka move) it into the Hive table (in the Hive metastore in HDFS).
+      hdfs_root_destination = self._get_hdfs_root_destination(django_user)
+      hdfs_file_destination = self._upload_to_hdfs(django_user, self._contents_file, hdfs_root_destination)
+      hql = \
+        """
+        LOAD DATA INPATH
+        '%(filename)s' OVERWRITE INTO TABLE %(tablename)s
+        """ % {
+          'tablename': self.name,
+          'filename': hdfs_file_destination
+        }
 
-    hdfs_root_destination = self._get_hdfs_root_destination(django_user)
-    hdfs_file_destination = self._upload_to_hdfs(django_user, self._contents_file, hdfs_root_destination)
-
-    hql = LOAD_HQL % {'tablename': self.name, 'filename': hdfs_file_destination}
-    LOG.info('Running load query: %s' % hql)
-    self._load_data_to_table(django_user, hql, hdfs_file_destination)
+    self._load_data_to_table(django_user, hql)
 
 
   def _check_file_contents(self, filepath):
@@ -237,7 +261,7 @@ class SampleTable(object):
 
   def _get_hdfs_root_destination(self, django_user, subdir=None):
     fs = cluster.get_hdfs()
-
+    hdfs_root_destination = None
     if self.app_name == 'impala':
       # Because Impala does not have impersonation on by default, we use a public destination for the upload.
       from impala.conf import IMPERSONATION_ENABLED
@@ -247,7 +271,8 @@ class SampleTable(object):
           tmp_public += '/%s' % subdir
         fs.do_as_user(django_user, fs.mkdir, tmp_public, '0777')
         hdfs_root_destination = tmp_public
-    else:
+
+    if hdfs_root_destination is None:
       hdfs_root_destination = fs.do_as_user(django_user, fs.get_home_dir)
       if subdir:
         hdfs_root_destination += '/%s' % subdir
@@ -269,7 +294,7 @@ class SampleTable(object):
     return hdfs_destination
 
 
-  def _load_data_to_table(self, django_user, hql, hdfs_destination):
+  def _load_data_to_table(self, django_user, hql):
     LOG.info('Loading data into table "%s"' % (self.name,))
     query = hql_query(hql)
 
@@ -283,6 +308,25 @@ class SampleTable(object):
       msg = _('Error loading table %(table)s: %(error)s.') % {'table': self.name, 'error': ex}
       LOG.error(msg)
       raise InstallException(msg)
+
+
+  def _get_sql_insert_values(self, f, columns=None):
+    data = f.read()
+    dialect = csv.Sniffer().sniff(data)
+    reader = csv.reader(data.splitlines(), delimiter=dialect.delimiter)
+
+    rows = [
+      ', '.join(
+        col if is_number(col, i, columns) else "'%s'" % col.replace("'", "\\'") for i, col in enumerate(row)
+      ) for row in reader
+    ]
+
+    return ', '.join('(%s)' % row for row in rows)
+
+
+def is_number(col, i, columns):
+  '''Basic check. For proper check, use columns headers like for the web_logs table.'''
+  return columns[i]['type'] != 'string' if columns else col.isdigit() or col == 'NULL'
 
 
 class SampleQuery(object):

@@ -15,12 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 import datetime
 import json
 import logging
 import math
 import numbers
-import urllib
+import sys
 import uuid
 
 from datetime import timedelta
@@ -29,15 +33,21 @@ from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.db.models import Count
 from django.db.models.functions import Trunc
-from desktop.lib.paths import SAFE_CHARACTERS_URI
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
+from desktop.conf import has_connectors
 from desktop.lib.i18n import smart_unicode
+from desktop.lib.paths import SAFE_CHARACTERS_URI
 from desktop.models import Document2
 
-from notebook.connectors.base import Notebook
+from notebook.connectors.base import Notebook, get_interpreter
 
+if sys.version_info[0] > 2:
+  import urllib.request, urllib.error
+  from urllib.parse import quote as urllib_quote
+else:
+  from urllib import quote as urllib_quote
 
 LOG = logging.getLogger(__name__)
 
@@ -66,19 +76,23 @@ def escape_rows(rows, nulls_only=False, encoding=None):
   return data
 
 
-def make_notebook(name='Browse', description='', editor_type='hive', statement='', status='ready',
-                  files=None, functions=None, settings=None, is_saved=False, database='default', snippet_properties=None, batch_submit=False,
-                  on_success_url=None, skip_historify=False, is_task=False, last_executed=-1, is_notebook=False, pub_sub_url=None, result_properties={},
-                  namespace=None, compute=None):
+def make_notebook(
+    name='Browse', description='', editor_type='hive', statement='', status='ready',
+    files=None, functions=None, settings=None, is_saved=False, database='default', snippet_properties=None, batch_submit=False,
+    on_success_url=None, skip_historify=False, is_task=False, last_executed=-1, is_notebook=False, pub_sub_url=None, result_properties={},
+    namespace=None, compute=None):
   '''
   skip_historify: do not add the task to the query history. e.g. SQL Dashboard
   is_task / isManaged: true when being a managed by Hue operation (include_managed=True in document), e.g. exporting query result, dropping some tables
   '''
   from notebook.connectors.hiveserver2 import HS2Api
 
-  # impala can have compute name appended to the editor_type (impala/dbms.py - get_query_server_config)
-  if editor_type.startswith('impala'):
-    editor_type = 'impala'
+  if has_connectors():
+    interpreter = get_interpreter(connector_type=editor_type)
+    editor_connector = editor_type
+    editor_type = interpreter['dialect']
+  else:
+    editor_connector = editor_type
 
   editor = Notebook()
   if snippet_properties is None:
@@ -109,16 +123,16 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
     'description': description,
     'sessions': [
       {
-         'type': editor_type,
+         'type': editor_connector,
          'properties': sessions_properties,
          'id': None
       }
     ],
-    'selectedSnippet': editor_type,
+    'selectedSnippet': editor_connector, # TODO: might need update in notebook.ko.js
     'type': 'notebook' if is_notebook else 'query-%s' % editor_type,
     'showHistory': True,
     'isSaved': is_saved,
-    'onSuccessUrl': urllib.quote(on_success_url.encode('utf-8'), safe=SAFE_CHARACTERS_URI) if on_success_url else None,
+    'onSuccessUrl': urllib_quote(on_success_url.encode('utf-8'), safe=SAFE_CHARACTERS_URI) if on_success_url else None,
     'pubSubUrl': pub_sub_url,
     'skipHistorify': skip_historify,
     'isManaged': is_task,
@@ -128,7 +142,7 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
          'id': str(uuid.uuid4()),
          'statement_raw': statement,
          'statement': statement,
-         'type': editor_type,
+         'type': editor_connector,
          'wasBatchExecuted': batch_submit,
          'lastExecuted': last_executed,
          'properties': {
@@ -212,7 +226,7 @@ def make_notebook2(name='Browse', description='', is_saved=False, snippets=None)
   return editor
 
 
-class MockedDjangoRequest():
+class MockedDjangoRequest(object):
 
   def __init__(self, user, get=None, post=None, method='POST'):
     self.user = user
@@ -285,7 +299,7 @@ def import_saved_mapreduce_job(wf):
     files = json.loads(node.files)
     for filepath in files:
       snippet_properties['files'].append({'type': 'file', 'path': filepath})
-  except ValueError, e:
+  except ValueError as e:
     LOG.warn('Failed to parse files for mapreduce job design "%s".' % wf.name)
 
   snippet_properties['archives'] = []
@@ -293,7 +307,7 @@ def import_saved_mapreduce_job(wf):
     archives = json.loads(node.archives)
     for filepath in archives:
       snippet_properties['archives'].append(filepath)
-  except ValueError, e:
+  except ValueError as e:
     LOG.warn('Failed to parse archives for mapreduce job design "%s".' % wf.name)
 
   snippet_properties['hadoopProperties'] = []
@@ -302,7 +316,7 @@ def import_saved_mapreduce_job(wf):
     if properties:
       for prop in properties:
         snippet_properties['hadoopProperties'].append("%s=%s" % (prop.get('name'), prop.get('value')))
-  except ValueError, e:
+  except ValueError as e:
     LOG.warn('Failed to parse job properties for mapreduce job design "%s".' % wf.name)
 
   snippet_properties['app_jar'] = node.jar_path
@@ -342,7 +356,7 @@ def import_saved_shell_job(wf):
             snippet_properties['arguments'].append(param['value'])
           else:
             snippet_properties['env_var'].append(param['value'])
-    except ValueError, e:
+    except ValueError as e:
       LOG.warn('Failed to parse parameters for shell job design "%s".' % wf.name)
 
     snippet_properties['hadoopProperties'] = []
@@ -351,7 +365,7 @@ def import_saved_shell_job(wf):
       if properties:
         for prop in properties:
           snippet_properties['hadoopProperties'].append("%s=%s" % (prop.get('name'), prop.get('value')))
-    except ValueError, e:
+    except ValueError as e:
       LOG.warn('Failed to parse job properties for shell job design "%s".' % wf.name)
 
     snippet_properties['files'] = []
@@ -359,7 +373,7 @@ def import_saved_shell_job(wf):
       files = json.loads(node.files)
       for filepath in files:
         snippet_properties['files'].append({'type': 'file', 'path': filepath})
-    except ValueError, e:
+    except ValueError as e:
       LOG.warn('Failed to parse files for shell job design "%s".' % wf.name)
 
     snippet_properties['archives'] = []
@@ -367,7 +381,7 @@ def import_saved_shell_job(wf):
       archives = json.loads(node.archives)
       for archive in archives:
         snippet_properties['archives'].append(archive['name'])
-    except ValueError, e:
+    except ValueError as e:
       LOG.warn('Failed to parse archives for shell job design "%s".' % wf.name)
 
     snippet_properties['capture_output'] = node.capture_output
@@ -406,7 +420,7 @@ def import_saved_java_job(wf):
       if properties:
         for prop in properties:
           snippet_properties['hadoopProperties'].append("%s=%s" % (prop.get('name'), prop.get('value')))
-    except ValueError, e:
+    except ValueError as e:
       LOG.warn('Failed to parse job properties for Java job design "%s".' % wf.name)
 
     snippet_properties['files'] = []
@@ -414,7 +428,7 @@ def import_saved_java_job(wf):
       files = json.loads(node.files)
       for filepath in files:
         snippet_properties['files'].append({'type': 'file', 'path': filepath})
-    except ValueError, e:
+    except ValueError as e:
       LOG.warn('Failed to parse files for Java job design "%s".' % wf.name)
 
     snippet_properties['archives'] = []
@@ -422,7 +436,7 @@ def import_saved_java_job(wf):
       archives = json.loads(node.archives)
       for archive in archives:
         snippet_properties['archives'].append(archive['name'])
-    except ValueError, e:
+    except ValueError as e:
       LOG.warn('Failed to parse archives for Java job design "%s".' % wf.name)
 
     snippet_properties['capture_output'] = node.capture_output
@@ -471,7 +485,12 @@ def _update_property_value(properties, key, value):
       prop.update({'value': value})
 
 
-class Analytics():
+def _get_editor_type(editor_id):
+  document = Document2.objects.get(id=editor_id)
+  return document.type.rsplit('-', 1)[-1]
+
+
+class Analytics(object):
 
   @classmethod
   def admin_stats(cls):

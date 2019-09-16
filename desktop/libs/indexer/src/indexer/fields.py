@@ -14,10 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
 
+from builtins import object
 import re
 
 
-class FieldType():
+class FieldType(object):
 
   def __init__(self, name, regex, heuristic_regex=None):
     self._name = name

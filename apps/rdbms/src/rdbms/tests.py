@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import str
 from builtins import object
 import json
 import os
@@ -130,6 +129,9 @@ class TestAPI(TestSQLiteRdbmsBase):
       'query': 'SELECT * FROM test1'
     }
     response = self.client.post(reverse('rdbms:api_execute_query'), data, follow=True)
+    import traceback
+    for tb in traceback.extract_stack():
+      print(tb)
     response_dict = json.loads(response.content)
     assert_equal(1, len(response_dict['results']['rows']), response_dict)
 

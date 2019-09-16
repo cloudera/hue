@@ -120,6 +120,6 @@ class SAML2Backend(_Saml2Backend):
         user = User.objects.get(username__iexact=username)
       else:
         user = User.objects.get(username=username)
-    except User.DoesNotExist, e:
+    except User.DoesNotExist as e:
       user = None
     return user

@@ -1,0 +1,3 @@
+include LICENSE
+include versioneer.py
+include django_opentracing/_version.py

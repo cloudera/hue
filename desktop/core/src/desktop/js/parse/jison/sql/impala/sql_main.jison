@@ -100,7 +100,6 @@ NonReservedKeyword
  | 'KEY'
  | 'OPTION'
  | 'OWNER'
- | 'ROLE'
  | 'SERVER'
  | 'STRUCT'
  | 'URI'
@@ -551,6 +550,13 @@ FromOrIn
 DatabasesOrSchemas
  : 'DATABASES'
  | 'SCHEMAS'
+ ;
+
+
+GroupRoleOrUser
+ : 'GROUP'
+ | 'ROLE'
+ | 'USER'
  ;
 
 RoleOrUser

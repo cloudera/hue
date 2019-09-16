@@ -44,7 +44,8 @@ module.exports = {
     sqlSyntaxWebWorker: ['./desktop/core/src/desktop/js/sql/sqlSyntaxWebWorker.js']
   },
   optimization: {
-    minimize: true
+    //minimize: true
+    minimize: false
   },
   output: {
     path: __dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/workers',

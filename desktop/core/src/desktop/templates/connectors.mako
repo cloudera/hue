@@ -43,6 +43,7 @@ else:
       self.categories = ko.observableArray();
       self.selectedConnectorCategory = ko.observable('All');
       self.connectorsFilter = ko.observable();
+      self.aggregateConnectors = ko.observable(false);
 
       self.instances = ko.observableArray(); // Saved connectors
       self.instance = ko.observable();
@@ -63,7 +64,11 @@ else:
           var lowerQuery = self.connectorsFilter().toLowerCase();
           var filteredConnectors = []
           connectors.forEach(function (connector) {
-            var _connector = {"category": connector.category, "category_name": $.grep(categories, function(cat) { return cat.type == connector.category})[0].category_name, "values": []};
+            var _connector = {
+                "category": connector.category,
+                "category_name": $.grep(self.categories(), function(cat) { return cat.type == connector.category})[0].category_name,
+                "values": []
+            };
             _connector.values = connector.values.filter(function (subMetricKey) {
               return subMetricKey.name.toLowerCase().indexOf(lowerQuery) !== -1;
             });
@@ -83,49 +88,65 @@ else:
 
       self.fetchConnectors = function () {
         self.fetchConnectorTypes(); // TODO: might be cleaner to chain below
-        self.apiHelper.simpleGet('/desktop/connectors/api/instances/', {}, {successCallback: function (data) {
-          self.instances(data.connectors);
-        }});
+        self.apiHelper.simpleGet('/desktop/connectors/api/instances/', {}, {
+          successCallback: function (data) {
+            self.instances(data.connectors);
+          }
+        });
       };
       self.editConnector = function (data) {
         if (self.section() == 'installed-connectors-page') {
           self.instance(data);
         } else {
-          self.newConnector(data.type);
+          self.newConnector(data.dialect);
         }
         self.section('connector-page');
       };
 
-      self.newConnector = function (type) {
-        self.apiHelper.simpleGet('/desktop/connectors/api/instance/new/' + type, {}, {successCallback: function (data) {
-          self.instance(ko.mapping.fromJS(data.connector));
-        }});
+      self.newConnector = function (dialect) {
+        self.apiHelper.simpleGet('/desktop/connectors/api/instance/new/' + dialect, {}, {
+          successCallback: function (data) {
+            self.instance(ko.mapping.fromJS(data.connector));
+          }
+        });
       };
       self.fetchConnector = function (id) {
-        self.apiHelper.simpleGet('/desktop/connectors/api/instance/get/' + id, {}, {successCallback: function (data) {
-          self.instance(ko.mapping.fromJS(data.connector));
-        }});
+        self.apiHelper.simpleGet('/desktop/connectors/api/instance/get/' + id, {}, {
+          successCallback: function (data) {
+            self.instance(ko.mapping.fromJS(data.connector));
+          }
+        });
       };
       self.deleteConnector = function (connector) {
-        self.apiHelper.simplePost('/desktop/connectors/api/instance/delete', {'connector': ko.mapping.toJSON(connector)}, {successCallback: function (data) {
-          self.section('installed-connectors-page');
-          self.fetchConnectors();
-          huePubSub.publish('cluster.config.refresh.config');
-        }});
+        self.apiHelper.simplePost('/desktop/connectors/api/instance/delete', {
+            'connector': ko.mapping.toJSON(connector)
+          }, {
+          successCallback: function (data) {
+            self.section('installed-connectors-page');
+            self.fetchConnectors();
+            huePubSub.publish('cluster.config.refresh.config');
+          }
+        });
       };
       self.updateConnector = function (connector) {
-        self.apiHelper.simplePost('/desktop/connectors/api/instance/update', {'connector': ko.mapping.toJSON(connector)}, {successCallback: function (data) {
-          connector.id = data.connector.id;
-          self.section('installed-connectors-page');
-          self.fetchConnectors();
-          huePubSub.publish('cluster.config.refresh.config');
-        }});
+        self.apiHelper.simplePost('/desktop/connectors/api/instance/update', {
+            'connector': ko.mapping.toJSON(connector)
+          }, {
+          successCallback: function (data) {
+            connector.id = data.connector.id;
+            self.section('installed-connectors-page');
+            self.fetchConnectors();
+            huePubSub.publish('cluster.config.refresh.config');
+          }
+        });
       };
       self.fetchConnectorTypes = function () {
-        self.apiHelper.simpleGet('/desktop/connectors/api/types/', {}, {successCallback: function (data) {
-          self.connectors(data.connectors);
-          self.categories(data.categories);
-        }});
+        self.apiHelper.simpleGet('/desktop/connectors/api/types/', {}, {
+          successCallback: function (data) {
+            self.connectors(data.connectors);
+            self.categories(data.categories);
+          }
+        });
       };
     }
 
@@ -154,7 +175,7 @@ ${ layout.menubar(section='connectors') }
     <div data-bind="template: { name: 'add-connector-page' }"></div>
   <!-- /ko -->
 
-  <!-- ko if: section() == 'connector-page' -->
+  <!-- ko if: section() == 'connector-page' && $root.instance() -->
     <div data-bind="template: { name: 'connector-page', data: $root.instance() }"></div>
   <!-- /ko -->
 </div>
@@ -208,6 +229,8 @@ ${ layout.menubar(section='connectors') }
               <i class="fa fa-question-circle"></i> ${ _('Help') }
             </a>
           </span>
+          <label for="groupConnector" class="pull-right">${ _('Group') }</label>
+          <input type="checkbox" name="groupConnector" data-bind="checked: $root.aggregateConnectors" class="pull-right">
           <input type="text" data-bind="clearable: $root.connectorsFilter, valueUpdate: 'afterkeydown'"
               class="input-xlarge pull-right margin-bottom-10" placeholder="${ _('Filter...') }">
         </div>
@@ -225,7 +248,7 @@ ${ layout.menubar(section='connectors') }
               <!-- ko if: $data.values.length > 0 -->
               <tbody data-bind="foreach: values">
                 <tr data-bind="click: $root.editConnector">
-                  <td data-bind="text: name"></td>
+                  <td data-bind="text: nice_name"></td>
                   <td data-bind="text: description"></td>
                 </tr>
               </tbody>
@@ -279,10 +302,10 @@ ${ layout.menubar(section='connectors') }
 
 <script type="text/html" id="connector-page">
   <div class="row-fluid">
-    <input data-bind="value: name">
+    <input data-bind="value: nice_name">
     <!-- ko if: typeof id != 'undefined' -->
       <!-- ko if: id -->
-        (<span data-bind="text: connector_name"></span>)
+        (<span data-bind="text: name"></span>)
         <a href="javascript:void(0)" data-bind="click: $root.updateConnector">
           ${ _('Update') }
         </a>

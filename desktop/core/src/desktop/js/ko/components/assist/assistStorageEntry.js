@@ -27,6 +27,10 @@ const TYPE_SPECIFICS = {
     apiHelperFetchFunction: 'fetchAdlsPath',
     dblClickPubSubId: 'assist.dblClickAdlsItem'
   },
+  abfs: {
+    apiHelperFetchFunction: 'fetchAbfsPath',
+    dblClickPubSubId: 'assist.dblClickAbfsItem'
+  },
   hdfs: {
     apiHelperFetchFunction: 'fetchHdfsPath',
     dblClickPubSubId: 'assist.dblClickHdfsItem'
@@ -141,6 +145,7 @@ class AssistStorageEntry {
         self.entries(
           filteredFiles.map(file => {
             return new AssistStorageEntry({
+              originalType: self.originalType,
               type: self.type,
               definition: file,
               parent: self
@@ -149,6 +154,8 @@ class AssistStorageEntry {
         );
         self.loaded = true;
         self.loading(false);
+        self.hasErrors(!!data.s3_listing_not_allowed); // Special case where we want errors inline instead of the default popover. We don't want errorCallback handling
+        self.errorText(data.s3_listing_not_allowed);
         if (callback) {
           callback();
         }
@@ -258,6 +265,7 @@ class AssistStorageEntry {
             filteredFiles.map(
               file =>
                 new AssistStorageEntry({
+                  originalType: self.originalType,
                   type: self.type,
                   definition: file,
                   parent: self
@@ -328,6 +336,7 @@ class AssistStorageEntry {
     type = typeMatch ? typeMatch[1] : type || 'hdfs';
     type = type.replace(/s3.*/i, 's3');
     type = type.replace(/adl.*/i, 'adls');
+    type = type.replace(/abfs.*/i, 'abfs');
 
     const rootEntry = new AssistStorageEntry({
       type: type.toLowerCase(),

@@ -96,7 +96,7 @@ Plugin.prototype.init = function() {
       .html(
         '<div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><ul class="unstyled"></ul></div></div>'
       )
-      .appendTo(window.HUE_CONTAINER);
+      .appendTo('body');
   }
 
   $el.wrap('<div class="inline">');

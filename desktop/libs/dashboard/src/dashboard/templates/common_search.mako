@@ -4146,11 +4146,11 @@ function loadSearch(collection, query, initial) {
   searchViewModel.isPlayerMode.subscribe(function(value) {
     if (value){
       $(".navigator").hide();
-      $(HUE_CONTAINER).css("paddingTop", "40px");
+      $('body').css("paddingTop", "40px");
     }
     else {
       $(".navigator").show();
-      $(HUE_CONTAINER).css("paddingTop", "80px");
+      $('body').css("paddingTop", "80px");
     }
   });
 

@@ -31,6 +31,7 @@ const DOCUMENTS_SEARCH_API = '/desktop/api2/docs/';
 const FETCH_CONFIG = '/desktop/api2/get_config/';
 const HDFS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('/');
 const ADLS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('adl:/');
+const ABFS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('ABFS://');
 const GIT_API_PREFIX = '/desktop/api/vcs/contents/';
 const S3_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('S3A://');
 const IMPALA_INVALIDATE_API = '/impala/api/invalidate';
@@ -196,6 +197,7 @@ class ApiHelper {
       });
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'hdfs' }), {});
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'adls' }), {});
+      $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'abfs' }), {});
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'git' }), {});
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 's3' }), {});
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'collections' }), {});
@@ -333,7 +335,7 @@ class ApiHelper {
    * @returns {Function}
    */
   assistErrorCallback(options) {
-    return function(errorResponse) {
+    return errorResponse => {
       let errorMessage = 'Unknown error occurred';
       if (typeof errorResponse !== 'undefined' && errorResponse !== null) {
         if (
@@ -527,7 +529,7 @@ class ApiHelper {
    *
    * @param {Object} options
    * @param {string[]} options.path
-   * @param {string} options.type - 's3', 'adls' or 'hdfs'
+   * @param {string} options.type - 's3', 'adls', 'abfs' or 'hdfs'
    * @param {number} [options.offset]
    * @param {number} [options.length]
    * @param {boolean} [options.silenceErrors]
@@ -539,6 +541,8 @@ class ApiHelper {
       url = S3_API_PREFIX;
     } else if (options.type === 'adls') {
       url = ADLS_API_PREFIX;
+    } else if (options.type === 'abfs') {
+      url = ABFS_API_PREFIX;
     } else {
       url = HDFS_API_PREFIX;
     }
@@ -703,6 +707,74 @@ class ApiHelper {
     return fetchCached.bind(self)(
       $.extend({}, options, {
         sourceType: 'adls',
+        url: url,
+        fetchFunction: fetchFunction
+      })
+    );
+  }
+
+  /**
+   * @param {Object} options
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   * @param {Number} [options.timeout]
+   * @param {Object} [options.editor] - Ace editor
+   *
+   * @param {string[]} options.pathParts
+   * @param {number} [options.pageSize] - Default 500
+   * @param {number} [options.page] - Default 1
+   * @param {string} [options.filter]
+   */
+  fetchAbfsPath(options) {
+    const self = this;
+    options.pathParts.shift();
+    let url =
+      ABFS_API_PREFIX +
+      encodeURI(options.pathParts.join('/')) +
+      '?format=json&sortby=name&descending=false&pagesize=' +
+      (options.pageSize || 500) +
+      '&pagenum=' +
+      (options.page || 1);
+    if (options.filter) {
+      url += '&filter=' + options.filter;
+    }
+    const fetchFunction = function(storeInCache) {
+      if (options.timeout === 0) {
+        self.assistErrorCallback(options)({ status: -1 });
+        return;
+      }
+      return $.ajax({
+        dataType: 'json',
+        url: url,
+        timeout: options.timeout,
+        success: function(data) {
+          if (
+            !data.error &&
+            !self.successResponseIsError(data) &&
+            typeof data.files !== 'undefined' &&
+            data.files !== null
+          ) {
+            if (data.files.length > 2 && !options.filter) {
+              storeInCache(data);
+            }
+            options.successCallback(data);
+          } else {
+            self.assistErrorCallback(options)(data);
+          }
+        }
+      })
+        .fail(self.assistErrorCallback(options))
+        .always(() => {
+          if (typeof options.editor !== 'undefined' && options.editor !== null) {
+            options.editor.hideSpinner();
+          }
+        });
+    };
+
+    return fetchCached.bind(self)(
+      $.extend({}, options, {
+        sourceType: 'abfs',
         url: url,
         fetchFunction: fetchFunction
       })
@@ -1528,7 +1600,7 @@ class ApiHelper {
           data.new_table_name = options.properties.name;
         }
       }
-    } else if (options.path > 2) {
+    } else if (options.path.length > 2) {
       url = '/metastore/table/' + options.path[0] + '/' + options.path[1] + '/alter_column';
       data.column = options.path.slice(2).join('.');
       if (options.properties) {
@@ -1789,13 +1861,157 @@ class ApiHelper {
     return new CancellablePromise(deferred, undefined, cancellablePromises);
   }
 
+  clearNotebookHistory(options) {
+    const data = {
+      notebook: options.notebookJson,
+      doc_type: options.docType,
+      is_notification_manager: options.isNotificationManager
+    };
+    return this.simplePost('/notebook/api/clear_history', data);
+  }
+
+  closeNotebook(options) {
+    const data = {
+      notebook: options.notebookJson,
+      editorMode: options.editorMode
+    };
+    return this.simplePost('/notebook/api/notebook/close', data);
+  }
+
+  /**
+   * Creates a new session
+   *
+   * @param {Object} options
+   * @param {String} options.type
+   * @param {Array<SessionProperty>} [options.properties] - Default []
+   * @return {Promise<Session>}
+   */
+  async createSession(options) {
+    return new Promise((resolve, reject) => {
+      const data = {
+        session: JSON.stringify({ type: options.type, properties: options.properties || [] })
+      };
+      $.post({
+        url: '/notebook/api/create_session',
+        data: data
+      })
+        .done(data => {
+          if (data.status === 401) {
+            resolve({ auth: true, message: data.message });
+          } else if (this.successResponseIsError(data)) {
+            reject(this.assistErrorCallback(options)(data));
+          } else {
+            resolve(data.session);
+          }
+        })
+        .fail(this.assistErrorCallback(options));
+    });
+  }
+
+  closeSession(options) {
+    const data = {
+      session: JSON.stringify(options.session)
+    };
+    return this.simplePost('/notebook/api/close_session', data, options);
+  }
+
+  checkStatus(options) {
+    const data = {
+      notebook: options.notebookJson
+    };
+    return this.simplePost('/notebook/api/check_status', data);
+  }
+
+  getExternalStatement(options) {
+    const data = {
+      notebook: options.notebookJson,
+      snippet: options.snippetJson
+    };
+    return this.simplePost('/notebook/api/get_external_statement', data);
+  }
+
+  fetchResultSize(options) {
+    const data = {
+      notebook: options.notebookJson,
+      snippet: options.snippetJson
+    };
+    return this.simplePost('/notebook/api/fetch_result_size', data);
+  }
+
+  statementRisk(options) {
+    const data = {
+      notebook: options.notebookJson,
+      snippet: options.snippetJson
+    };
+    return this.simplePost('/notebook/api/optimizer/statement/risk', data);
+  }
+
+  getLogs(options) {
+    const data = {
+      notebook: options.notebookJson,
+      snippet: options.snippetJson,
+      from: options.from,
+      jobs: options.jobsJson,
+      full_log: options.fullLog
+    };
+    return this.simplePost('/notebook/api/get_logs', data);
+  }
+
+  statementCompatibility(options) {
+    const data = {
+      notebook: options.notebookJson,
+      snippet: options.snippetJson,
+      sourcePlatform: options.sourcePlatform,
+      targetPlatform: options.targetPlatform
+    };
+    return this.simplePost('/notebook/api/optimizer/statement/compatibility', data);
+  }
+
+  statementSimilarity(options) {
+    const data = {
+      notebook: options.notebookJson,
+      snippet: options.snippetJson,
+      sourcePlatform: options.sourcePlatform
+    };
+    return this.simplePost('/notebook/api/optimizer/statement/similarity', data);
+  }
+
+  saveNotebook(options) {
+    const data = {
+      notebook: options.notebookJson,
+      editorMode: options.editorMode
+    };
+    return this.simplePost('/notebook/api/notebook/save', data);
+  }
+
+  async getHistory(options) {
+    return new Promise((resolve, reject) => {
+      $.get('/notebook/api/get_history', {
+        doc_type: options.type,
+        limit: options.limit || 50,
+        page: options.page || 1,
+        doc_text: options.docFilter,
+        is_notification_manager: options.isNotificationManager
+      })
+        .done(data => {
+          if (this.successResponseIsError(data)) {
+            reject(self.assistErrorCallback(options)(data));
+            return;
+          }
+          resolve(data);
+        })
+        .fail(reject);
+    });
+  }
+
   /**
    *
    * @param {ExecutableStatement} executable
+   * @param {Session} [session]
    *
    * @return {{snippet: string, notebook: string}}
    */
-  static adaptExecutableToNotebook(executable) {
+  static adaptExecutableToNotebook(executable, session) {
     const statement = executable.getStatement();
     const snippet = {
       type: executable.sourceType,
@@ -1818,7 +2034,7 @@ class ApiHelper {
       id: executable.notebookId,
       name: '',
       isSaved: false,
-      sessions: executable.sessions || []
+      sessions: session ? [session] : []
     };
 
     return {
@@ -1849,6 +2065,7 @@ class ApiHelper {
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
    * @param {ExecutableStatement} options.executable
+   * @param {Session} options.session
    *
    * @return {Promise<ExecutionHandle>}
    */
@@ -1857,7 +2074,7 @@ class ApiHelper {
     const url = EXECUTE_API_PREFIX + executable.sourceType;
     const deferred = $.Deferred();
 
-    this.simplePost(url, ApiHelper.adaptExecutableToNotebook(executable), options)
+    this.simplePost(url, ApiHelper.adaptExecutableToNotebook(executable, options.session), options)
       .done(response => {
         if (response.handle) {
           deferred.resolve(response.handle);

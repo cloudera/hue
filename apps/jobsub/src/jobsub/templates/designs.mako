@@ -922,22 +922,22 @@ $(document).ready(function(e) {
       }
     );
   });
-  $(HUE_CONTAINER).on('click', '#edit-design', function() {
+  $('body').on('click', '#edit-design', function() {
     routie('edit-design/' + designs.selectedDesign().id());
   });
-  $(HUE_CONTAINER).on('click', '#trash-designs', function() {
+  $('body').on('click', '#trash-designs', function() {
     $('#trashWf').modal('show');
   });
-  $(HUE_CONTAINER).on('click', '#destroy-designs', function() {
+  $('body').on('click', '#destroy-designs', function() {
     $('#destroyWf').modal('show');
   });
-  $(HUE_CONTAINER).on('click', '#purge-trashed-designs', function() {
+  $('body').on('click', '#purge-trashed-designs', function() {
     $('#purgeWf').modal('show');
   });
-  $(HUE_CONTAINER).on('click', '#restore-designs', function() {
+  $('body').on('click', '#restore-designs', function() {
     $('#restoreWf').modal('show');
   });
-  $(HUE_CONTAINER).on('click', '#copy-designs', function() {
+  $('body').on('click', '#copy-designs', function() {
     designs.isLoading(true);
     designs.cloneDesigns();
   });

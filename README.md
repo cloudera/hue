@@ -18,7 +18,7 @@ It features:
    * [Browsers](http://gethue.com/browsers/) for data and a Data Catalog
 
 
-![alt text](docs/images/hue-screens-demo.gif "Hue Editor and Dashboard")
+![alt text](docs/images/sql-editor.png "Hue Editor")
 
 
 Who is using Hue
@@ -48,8 +48,12 @@ Start Hue in a single click with the [Docker Guide](https://github.com/cloudera/
 
 Kubernetes
 ----------
-Configurations to start a Hue server are available at [``tools/kubernetes``](tools/kubernetes/). The Kubernetes [hue.yaml](tools/kubernetes/helm/hue/templates/hue.yaml)
-configuration is available in the template directory.
+
+    helm repo add gethue https://helm.gethue.com
+    helm repo update
+    helm install gethue/hue
+
+Read more about configurations at [``tools/kubernetes``](tools/kubernetes/).
 
 
 Community

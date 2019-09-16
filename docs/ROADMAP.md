@@ -7,7 +7,6 @@ High Level Roadmap
 * [ ] SQL Alchemy full support [HUE-8740](https://issues.cloudera.org/browse/HUE-8740)
 * [ ] Public SQL REST APIs [HUE-1450](https://issues.cloudera.org/browse/HUE-1450)
 * [ ] Configuration of connectors via the interface [HUE-8758](https://issues.cloudera.org/browse/HUE-8758)
-* [ ] Kubernetes [HUE-8744](https://issues.cloudera.org/browse/HUE-8744)
 * [ ] Multi clusters [HUE-8330](https://issues.cloudera.org/browse/HUE-8330)
 * [ ] Multi tenants [HUE-8530](https://issues.cloudera.org/browse/HUE-8530)
 * [ ] Task Server workers [HUE-8738](https://issues.cloudera.org/browse/HUE-8738)
@@ -23,10 +22,12 @@ High Level Roadmap
 * [ ] Generify the risk alert and suggestion optimization API [HUE-8824](https://issues.cloudera.org/browse/HUE-8824)
 * [ ] Git integration [HUE-951](https://issues.cloudera.org/browse/HUE-951)
 * [ ] Modernize CI/CD [HUE-8888](https://issues.cloudera.org/browse/HUE-8888)
+* [ ] SQL queries & Requests tracing [HUE-8936](https://issues.cloudera.org/browse/HUE-8936)
 
 
 Done
 
+* [x] Kubernetes [HUE-8744](https://issues.cloudera.org/browse/HUE-8744)
 * [x] Minimal Continuous Integration [Blog post](http://gethue.com/improving-the-developer-productivity-with-some-continuous-integration/)
 * [x] Integrate with Apache Atlas [HUE-8749](https://issues.cloudera.org/browse/HUE-8749)
 * [x] Integrate with Apache Knox [HUE-8750](https://issues.cloudera.org/browse/HUE-8750)
@@ -40,6 +41,5 @@ Done
 Links
 
 * [Open Tasks](https://issues.cloudera.org/projects/HUE/issues)
-* [Easy Tasks](https://issues.cloudera.org/browse/HUE-8745?filter=10431)
 * [Designs](/docs/designs)
-* How to [contribute](CONTRIBUTING.md)
+* How to [contribute](/CONTRIBUTING.md)

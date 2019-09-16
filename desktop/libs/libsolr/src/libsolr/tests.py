@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 import json
 
@@ -44,7 +45,7 @@ except:
   LOG.exception('Testing libsolr requires the search app to not be blacklisted')
 
 
-class TestLibSolrWithSolr:
+class TestLibSolrWithSolr(object):
   integration = True
 
   @classmethod

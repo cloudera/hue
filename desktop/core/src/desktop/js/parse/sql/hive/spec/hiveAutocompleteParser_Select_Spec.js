@@ -27,6 +27,7 @@ describe('hiveAutocompleteParser.js SELECT statements', () => {
 
   const assertAutoComplete = testDefinition => {
     const debug = false;
+
     expect(
       hiveAutocompleteParser.parseSql(
         testDefinition.beforeCursor,

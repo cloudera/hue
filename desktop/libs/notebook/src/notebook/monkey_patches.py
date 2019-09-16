@@ -17,6 +17,7 @@
 
 # Start DBProxy server if we have some JDBC snippets
 
+from builtins import range
 from notebook.conf import get_ordered_interpreters, ENABLE_DBPROXY_SERVER
 
 
@@ -30,7 +31,7 @@ def _start_livy_server():
 
   def cleanup():
     p.terminate()
-    for _ in xrange(5):
+    for _ in range(5):
       if p.poll() == None:
         time.sleep(1)
       else:

@@ -15,6 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
 import logging
 import os
 import os.path
@@ -30,7 +33,7 @@ def _deprecation_check(arg0):
   if os.path.basename(arg0) == 'desktop':
     to_use = os.path.join(os.path.dirname(arg0), 'hue')
     msg = "Warning: '%s' has been deprecated. Please use '%s' instead." % (arg0, to_use)
-    print >> sys.stderr, msg
+    print(msg, file=sys.stderr)
     LOG.warn(msg)
 
 def reload_with_cm_env(cm_managed):
@@ -38,15 +41,15 @@ def reload_with_cm_env(cm_managed):
     from django.db.backends.oracle.base import Oracle_datetime
   except:
     if 'LD_LIBRARY_PATH' in os.environ:
-      print "We need to reload the process to include LD_LIBRARY_PATH for Oracle backend"
+      print("We need to reload the process to include LD_LIBRARY_PATH for Oracle backend")
       try:
         if cm_managed:
           sys.argv.append("--cm-managed")
  
         sys.argv.append("--skip-reload")
         os.execv(sys.argv[0], sys.argv)
-      except Exception, exc:
-        print 'Failed re-exec: %s' % exc
+      except Exception as exc:
+        print('Failed re-exec: %s' % exc)
         sys.exit(1)
 
 def entry():
@@ -60,7 +63,7 @@ def entry():
   os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'desktop.settings')
   cm_config_file = '/etc/cloudera-scm-agent/config.ini'
   ld_path_orig = None
-  if "LD_LIBRARY_PATH" in os.environ.keys():
+  if "LD_LIBRARY_PATH" in list(os.environ.keys()):
     ld_path_orig = os.environ["LD_LIBRARY_PATH"]
 
   # What's the subcommand being run?
@@ -89,17 +92,20 @@ def entry():
     prof_id = subcommand = sys.argv[1]
     #Check if this is a CM managed cluster
     if os.path.isfile(cm_config_file) and not cm_managed and not skip_reload:
-        print "ALERT: This appears to be a CM Managed environment"
-        print "ALERT: HUE_CONF_DIR must be set when running hue commands in CM Managed environment"
-        print "ALERT: Please run 'hue <command> --cm-managed'"
+        print("ALERT: This appears to be a CM Managed environment")
+        print("ALERT: HUE_CONF_DIR must be set when running hue commands in CM Managed environment")
+        print("ALERT: Please run 'hue <command> --cm-managed'")
   else:
     prof_id = str(os.getpid())
 
   # CM managed configure env vars
   if cm_managed:
-    import ConfigParser
-    from ConfigParser import NoOptionError
-    config = ConfigParser.RawConfigParser()
+    if sys.version_info[0] > 2:
+      from configparser import NoOptionError, RawConfigParser
+    else:
+      from ConfigParser import NoOptionError, RawConfigParser
+
+    config = RawConfigParser()
     config.read(cm_config_file)
     try:
       cm_agent_run_dir = config.get('General', 'agent_wide_credential_cache_location')
@@ -136,19 +142,19 @@ def entry():
             empty, hue_conf_dir = line.split("directory=")
             os.environ["HUE_CONF_DIR"] = hue_conf_dir.rstrip()
     else:
-      print "This appears to be a CM managed cluster, but the"
-      print "supervisor/include file for Hue could not be found"
-      print "in order to successfully run commands that access"
-      print "the database you need to set the following env vars:"
-      print ""
-      print "  export JAVA_HOME=<java_home>"
-      print "  export HUE_CONF_DIR=\"%s/`ls -1 %s | grep %s | sort -n | tail -1 `\"" % (cm_processs_dir, cm_process_dir, cm_hue_string)
-      print "  export HUE_IGNORE_PASSWORD_SCRIPT_ERRORS=1"
-      print "  export HUE_DATABASE_PASSWORD=<hueDBpassword>"
-      print "If using Oracle as your database:"
-      print "  export LD_LIBRARY_PATH=/path/to/instantclient"
-      print ""
-      print "If the above does not work, make sure Hue has been started on this server."
+      print("This appears to be a CM managed cluster, but the")
+      print("supervisor/include file for Hue could not be found")
+      print("in order to successfully run commands that access")
+      print("the database you need to set the following env vars:")
+      print("")
+      print("  export JAVA_HOME=<java_home>")
+      print("  export HUE_CONF_DIR=\"%s/`ls -1 %s | grep %s | sort -n | tail -1 `\"" % (cm_processs_dir, cm_process_dir, cm_hue_string))
+      print("  export HUE_IGNORE_PASSWORD_SCRIPT_ERRORS=1")
+      print("  export HUE_DATABASE_PASSWORD=<hueDBpassword>")
+      print("If using Oracle as your database:")
+      print("  export LD_LIBRARY_PATH=/path/to/instantclient")
+      print("")
+      print("If the above does not work, make sure Hue has been started on this server.")
 
     if not envline == None:
       empty, environment = envline.split("environment=")
@@ -160,7 +166,7 @@ def entry():
           os.environ[envkey] = envval
 
     #Set JAVA_HOME
-    if "JAVA_HOME" not in os.environ.keys():
+    if "JAVA_HOME" not in list(os.environ.keys()):
       if os.path.isfile('/usr/lib64/cmf/service/common/cloudera-config.sh'):
         locate_java = subprocess.Popen(
           ['bash', '-c', '. /usr/lib64/cmf/service/common/cloudera-config.sh; locate_java_home'], stdout=subprocess.PIPE,
@@ -182,14 +188,14 @@ def entry():
       if JAVA_HOME != "UNKNOWN":
         os.environ["JAVA_HOME"] = JAVA_HOME
 
-      if "JAVA_HOME" not in os.environ.keys():
-        print "JAVA_HOME must be set and can't be found, please set JAVA_HOME environment variable"
-        print "  export JAVA_HOME=<java_home>"
+      if "JAVA_HOME" not in list(os.environ.keys()):
+        print("JAVA_HOME must be set and can't be found, please set JAVA_HOME environment variable")
+        print("  export JAVA_HOME=<java_home>")
         sys.exit(1)
 
     #Make sure we set Oracle Client if configured
-    if "LD_LIBRARY_PATH" not in os.environ.keys():
-      if "SCM_DEFINES_SCRIPTS" in os.environ.keys():
+    if "LD_LIBRARY_PATH" not in list(os.environ.keys()):
+      if "SCM_DEFINES_SCRIPTS" in list(os.environ.keys()):
         for scm_script in os.environ["SCM_DEFINES_SCRIPTS"].split(":"):
           if "ORACLE" in scm_script:
             if os.path.isfile(scm_script):
@@ -199,12 +205,12 @@ def entry():
                   var, oracle_ld_path = line.split("=")
                   os.environ["LD_LIBRARY_PATH"] = oracle_ld_path
 
-    if "LD_LIBRARY_PATH" not in os.environ.keys():
-      print "LD_LIBRARY_PATH can't be found, if you are using ORACLE for your Hue database"
-      print "then it must be set, if not, you can ignore"
-      print "  export LD_LIBRARY_PATH=/path/to/instantclient"
+    if "LD_LIBRARY_PATH" not in list(os.environ.keys()):
+      print("LD_LIBRARY_PATH can't be found, if you are using ORACLE for your Hue database")
+      print("then it must be set, if not, you can ignore")
+      print("  export LD_LIBRARY_PATH=/path/to/instantclient")
 
-  if "LD_LIBRARY_PATH" in os.environ.keys():
+  if "LD_LIBRARY_PATH" in list(os.environ.keys()):
     if ld_path_orig is not None and ld_path_orig == os.environ["LD_LIBRARY_PATH"]:
       skip_reload = True
 
@@ -217,16 +223,16 @@ def entry():
       _profile(prof_id, lambda: execute_from_command_line(sys.argv))
     else:
       execute_from_command_line(sys.argv)
-  except ImproperlyConfigured, e:
+  except ImproperlyConfigured as e:
     if len(sys.argv) > 1 and sys.argv[1] == 'is_db_alive' and 'oracle' in str(e).lower():
-      print >> sys.stderr, e # Oracle connector is improperly configured
+      print(e, file=sys.stderr) # Oracle connector is improperly configured
       sys.exit(10)
     else:
       raise e
-  except subprocess.CalledProcessError, e:
+  except subprocess.CalledProcessError as e:
     if "altscript.sh" in str(e).lower():
-      print "%s" % e
-      print "HUE_CONF_DIR seems to be set to CM location and '--cm-managed' flag not used"
+      print("%s" % e)
+      print("HUE_CONF_DIR seems to be set to CM location and '--cm-managed' flag not used")
 
 def _profile(prof_id, func):
   """
@@ -250,4 +256,4 @@ def _profile(prof_id, func):
     prof.dump_stats(PROF_DAT)
     # Sort the calls by time spent and show top 50
     pstats.Stats(PROF_DAT).sort_stats('time').print_stats(50)
-    print >>sys.stderr, "Complete profile data in %s" % (PROF_DAT,)
+    print("Complete profile data in %s" % (PROF_DAT,), file=sys.stderr)

@@ -39,7 +39,7 @@ class Migration(SchemaMigration):
 
                 DocumentPermission.objects.filter(id__in=docs).delete()
             db.commit_transaction()
-        except Exception, e:
+        except Exception as e:
             db.rollback_transaction()
             raise e
 
@@ -48,7 +48,7 @@ class Migration(SchemaMigration):
             # Adding unique constraint on 'DocumentPermission', fields ['doc', 'perms']
             db.create_unique(u'desktop_documentpermission', ['doc_id', 'perms'])
             db.commit_transaction()
-        except Exception, e:
+        except Exception as e:
             db.rollback_transaction()
             raise e
 

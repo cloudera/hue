@@ -16,6 +16,7 @@
 # limitations under the License.
 # a thirdparty project
 
+from __future__ import print_function
 import logging
 import pprint
 import sys
@@ -114,11 +115,11 @@ def runcpserver(argset=[], **kwargs):
         options[k.lower()] = v
     
     if "help" in options:
-        print CPSERVER_HELP
+        print(CPSERVER_HELP)
         return
 
     # Start the webserver
-    print _('starting server with options:')
+    print(_('starting server with options:'))
     pprint.pprint(options)
 
     start_server(options)

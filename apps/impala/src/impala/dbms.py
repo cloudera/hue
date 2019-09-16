@@ -19,47 +19,46 @@ import logging
 
 from django.utils.translation import ugettext as _
 
-from beeswax.design import hql_query
-from beeswax.models import QUERY_TYPES
-from beeswax.server import dbms
-from beeswax.server.dbms import HiveServer2Dbms, QueryServerException, QueryServerTimeoutException,\
-  get_query_server_config as beeswax_query_server_config
-
 from desktop.conf import CLUSTER_ID
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
 from desktop.models import Cluster, ClusterConfig
+from beeswax.design import hql_query
+from beeswax.models import QUERY_TYPES
+from beeswax.server import dbms
+from beeswax.server.dbms import HiveServer2Dbms, QueryServerException, QueryServerTimeoutException,\
+  get_query_server_config as beeswax_query_server_config, get_query_server_config_via_connector
+from notebook.conf import get_ordered_interpreters
 
 from impala import conf
-from notebook.conf import get_ordered_interpreters
 
 
 LOG = logging.getLogger(__name__)
 
 
-def get_query_server_config(cluster_config=None):
-  query_server = {
-      'server_name': _get_server_name(cluster_config),
-      'server_host': conf.SERVER_HOST.get() if not cluster_config else cluster_config.get('server_host'),
-      'server_port': conf.SERVER_PORT.get() if not cluster_config else 21050,
-      'principal': conf.IMPALA_PRINCIPAL.get(),
-      'impersonation_enabled': conf.IMPERSONATION_ENABLED.get(),
-      'querycache_rows': conf.QUERYCACHE_ROWS.get(),
-      'QUERY_TIMEOUT_S': conf.QUERY_TIMEOUT_S.get(),
-      'SESSION_TIMEOUT_S': conf.SESSION_TIMEOUT_S.get(),
-      'auth_username': conf.AUTH_USERNAME.get(),
-      'auth_password': conf.AUTH_PASSWORD.get()
-  }
+def get_query_server_config(connector=None):
+  if connector and has_connectors():
+    query_server = get_query_server_config_via_connector(connector)
+  else:
+    query_server = {
+        'server_name': 'impala',
+        'server_host': conf.SERVER_HOST.get(),
+        'server_port': conf.SERVER_PORT.get(),
+        'principal': conf.IMPALA_PRINCIPAL.get(),
+        'impersonation_enabled': conf.IMPERSONATION_ENABLED.get(),
+        'querycache_rows': conf.QUERYCACHE_ROWS.get(),
+        'QUERY_TIMEOUT_S': conf.QUERY_TIMEOUT_S.get(),
+        'SESSION_TIMEOUT_S': conf.SESSION_TIMEOUT_S.get(),
+        'auth_username': conf.AUTH_USERNAME.get(),
+        'auth_password': conf.AUTH_PASSWORD.get(),
+        'use_sasl': conf.USE_SASL.get()
+    }
 
   debug_query_server = query_server.copy()
   debug_query_server['auth_password_used'] = bool(debug_query_server.pop('auth_password'))
   LOG.debug("Query Server: %s" % debug_query_server)
 
   return query_server
-
-
-def _get_server_name(cluster_config):
-  return 'impala' + ('-' + cluster_config.get('name') if cluster_config and cluster_config.get('name') != CLUSTER_ID.get() else '')
 
 
 class ImpalaDbms(HiveServer2Dbms):

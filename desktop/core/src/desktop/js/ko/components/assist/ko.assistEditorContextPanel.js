@@ -17,17 +17,19 @@
 import $ from 'jquery';
 import ko from 'knockout';
 
-import AssistDbSource from 'ko/components/assist/assistDbSource';
+import ASSIST_TABLE_TEMPLATES from 'ko/components/assist/ko.assistDbPanel';
 import AssistDbEntry from 'ko/components/assist/assistDbEntry';
+import AssistDbSource from 'ko/components/assist/assistDbSource';
 import componentUtils from 'ko/components/componentUtils';
-import huePubSub from 'utils/huePubSub';
 import dataCatalog from 'catalog/dataCatalog';
+import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 
-const TEMPLATE = `
+const TEMPLATE =
+  ASSIST_TABLE_TEMPLATES +
+  `
   <div class="assist-inner-panel assist-assistant-panel">
     <div class="assist-flex-panel">
-
       <div class="assist-flex-header">
         <div class="assist-inner-header">
           <!-- ko if: isSolr -->
@@ -128,8 +130,8 @@ const TEMPLATE = `
           <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: function() { uploadTableStats(true) }, attr: { 'title': ('${I18n(
             'Add table '
           )}'  + (isMissingDDL() ? 'DDL' : '') + (isMissingDDL() && isMissingStats() ? ' ${I18n(
-  'and'
-)} ' : '') + (isMissingStats() ? 'stats' : '')) }">
+    'and'
+  )} ' : '') + (isMissingStats() ? 'stats' : '')) }">
             <i class="fa fa-fw fa-plus-circle"></i> ${I18n('Improve Analysis')}
           </a>
           <!-- /ko -->

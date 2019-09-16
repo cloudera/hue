@@ -47,7 +47,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 % endif
 </style>
 
-<span id="importerComponents" class="notebook importer-main" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR, params: {dest: DROPZONE_HOME_DIR}, paramName: 'hdfs_file', onComplete: function(path){ createWizard.source.path(path); }, disabled: '${ not SHOW_UPLOAD_BUTTON.get() }' === 'True'  }">
+<span id="importerComponents" class="notebook importer-main" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR, params: {dest: DROPZONE_HOME_DIR}, paramName: 'hdfs_file', onComplete: function(path){ createWizard.source.path(path); }, disabled: '${ not hasattr(SHOW_UPLOAD_BUTTON, 'get') or not SHOW_UPLOAD_BUTTON.get() }' === 'True'  }">
 <div class="dz-message" data-dz-message></div>
 <div class="navbar hue-title-bar">
   <div class="navbar-inner">
@@ -1734,7 +1734,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         resizeElements();
       });
       self.isObjectStore = ko.pureComputed(function() {
-        return self.inputFormat() === 'file' && /^(s3a|adl):\/.*$/.test(self.path());
+        return self.inputFormat() === 'file' && /^(s3a|adl|abfs):\/.*$/.test(self.path());
       });
       self.isObjectStore.subscribe(function(newVal) {
         wizard.destination.useDefaultLocation(!newVal);
