@@ -150,7 +150,7 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
 
   % if CUSTOM.LOGIN_SPLASH_HTML.get():
   <div class="alert alert-info" id="login-splash">
-    ${ conf.CUSTOM.LOGIN_SPLASH_HTML.get() | n,unicode }
+    ${ CUSTOM.LOGIN_SPLASH_HTML.get() | n,unicode }
   </div>
   % endif
 </div>
