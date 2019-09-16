@@ -23,8 +23,8 @@ import ChartTransformers from 'apps/notebook/chartTransformers';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 
-import { Notebook } from 'apps/notebook2/notebook';
-import { Snippet } from 'apps/notebook2/snippet';
+import Notebook from 'apps/notebook2/notebook';
+import Snippet from 'apps/notebook2/snippet';
 
 class EditorViewModel {
   constructor(editorId, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
@@ -328,13 +328,12 @@ class EditorViewModel {
   }
 
   loadNotebook(notebookRaw, queryTab) {
-    const self = this;
     let currentQueries;
-    if (self.selectedNotebook() != null) {
-      currentQueries = self.selectedNotebook().unload();
+    if (this.selectedNotebook() != null) {
+      currentQueries = this.selectedNotebook().unload();
     }
 
-    const notebook = new Notebook(self, notebookRaw);
+    const notebook = new Notebook(this, notebookRaw);
 
     if (notebook.snippets().length > 0) {
       huePubSub.publish('detach.scrolls', notebook.snippets()[0]);
@@ -364,7 +363,7 @@ class EditorViewModel {
           snippet.result.statement_range.valueHasMutated();
         }
 
-        snippet.previousChartOptions = self.getPreviousChartOptions(snippet);
+        snippet.previousChartOptions = this.getPreviousChartOptions(snippet);
       });
 
       if (notebook.snippets()[0].result.data().length > 0) {
@@ -381,94 +380,89 @@ class EditorViewModel {
       }
     }
 
-    self.selectedNotebook(notebook);
+    this.selectedNotebook(notebook);
     huePubSub.publish('check.job.browser');
     huePubSub.publish('recalculate.name.description.width');
   }
 
-  newNotebook(editorType, callback, queryTab) {
-    const self = this;
-    huePubSub.publish('active.snippet.type.changed', {
-      type: editorType,
-      isSqlDialect: editorType ? self.getSnippetViewSettings(editorType).sqlDialect : undefined
-    });
-    $.post(
-      '/notebook/api/create_notebook',
-      {
-        type: editorType || self.editorType(),
+  async newNotebook(editorType, callback, queryTab) {
+    return new Promise((resolve, reject) => {
+      huePubSub.publish('active.snippet.type.changed', {
+        type: editorType,
+        isSqlDialect: editorType ? this.getSnippetViewSettings(editorType).sqlDialect : undefined
+      });
+      $.post('/notebook/api/create_notebook', {
+        type: editorType || this.editorType(),
         directory_uuid: window.location.getParameter('directory_uuid')
-      },
-      data => {
-        self.loadNotebook(data.notebook);
-        if (self.editorMode() && !self.isNotificationManager()) {
-          const snippet = self.selectedNotebook().newSnippet(self.editorType());
-          if (
-            queryTab &&
-            ['queryHistory', 'savedQueries', 'queryBuilderTab'].indexOf(queryTab) > -1
-          ) {
-            snippet.currentQueryTab(queryTab);
+      })
+        .then(data => {
+          this.loadNotebook(data.notebook);
+          if (this.editorMode() && !this.isNotificationManager()) {
+            const snippet = this.selectedNotebook().newSnippet(this.editorType());
+            if (
+              queryTab &&
+              ['queryHistory', 'savedQueries', 'queryBuilderTab'].indexOf(queryTab) > -1
+            ) {
+              snippet.currentQueryTab(queryTab);
+            }
+            huePubSub.publish('detach.scrolls', this.selectedNotebook().snippets()[0]);
+            if (window.location.getParameter('type') === '') {
+              hueUtils.changeURLParameter('type', this.editorType());
+            }
+            huePubSub.publish('active.snippet.type.changed', {
+              type: editorType,
+              isSqlDialect: editorType
+                ? this.getSnippetViewSettings(editorType).sqlDialect
+                : undefined
+            });
           }
-          huePubSub.publish('detach.scrolls', self.selectedNotebook().snippets()[0]);
-          if (window.location.getParameter('type') === '') {
-            hueUtils.changeURLParameter('type', self.editorType());
-          }
-          huePubSub.publish('active.snippet.type.changed', {
-            type: editorType,
-            isSqlDialect: editorType
-              ? self.getSnippetViewSettings(editorType).sqlDialect
-              : undefined
-          });
-        }
 
-        if (typeof callback !== 'undefined' && callback !== null) {
-          callback();
-        }
-      }
-    );
+          if (typeof callback !== 'undefined' && callback !== null) {
+            callback();
+          }
+          resolve();
+        })
+        .catch(reject);
+    });
   }
 
-  openNotebook(uuid, queryTab, skipUrlChange, callback) {
-    const self = this;
-    const deferredOpen = new $.Deferred();
-    $.get(
-      '/desktop/api2/doc/',
-      {
+  async openNotebook(uuid, queryTab, skipUrlChange, callback) {
+    return new Promise((resolve, reject) => {
+      $.get('/desktop/api2/doc/', {
         uuid: uuid,
         data: true,
         dependencies: true
-      },
-      data => {
+      }).then(data => {
         if (data.status === 0) {
           data.data.dependents = data.dependents;
           data.data.can_write = data.user_perms.can_write;
-          const notebook = data.data;
-          self.loadNotebook(notebook, queryTab);
-          if (typeof skipUrlChange === 'undefined' && !self.isNotificationManager()) {
-            if (self.editorMode()) {
-              self.editorType(data.document.type.substring('query-'.length));
+          const notebookRaw = data.data;
+          this.loadNotebook(notebookRaw, queryTab);
+          if (typeof skipUrlChange === 'undefined' && !this.isNotificationManager()) {
+            if (this.editorMode()) {
+              this.editorType(data.document.type.substring('query-'.length));
               huePubSub.publish('active.snippet.type.changed', {
-                type: self.editorType(),
-                isSqlDialect: self.getSnippetViewSettings(self.editorType()).sqlDialect
+                type: this.editorType(),
+                isSqlDialect: this.getSnippetViewSettings(this.editorType()).sqlDialect
               });
-              self.changeURL(
-                self.URLS.editor + '?editor=' + data.document.id + '&type=' + self.editorType()
+              this.changeURL(
+                this.URLS.editor + '?editor=' + data.document.id + '&type=' + this.editorType()
               );
             } else {
-              self.changeURL(self.URLS.notebook + '?notebook=' + data.document.id);
+              this.changeURL(this.URLS.notebook + '?notebook=' + data.document.id);
             }
           }
           if (typeof callback !== 'undefined') {
             callback();
           }
-          deferredOpen.resolve();
+          resolve();
         } else {
           $(document).trigger('error', data.message);
-          deferredOpen.reject();
-          self.newNotebook();
+          reject();
+          this.newNotebook();
         }
-      }
-    );
-    return deferredOpen.promise();
+      });
+    });
   }
 
   prepareShareModal() {
@@ -508,9 +502,8 @@ class EditorViewModel {
     });
   }
 
-  saveNotebook() {
-    const self = this;
-    self.selectedNotebook().save();
+  async saveNotebook() {
+    await this.selectedNotebook().save();
   }
 
   showContextPopover(field, event) {

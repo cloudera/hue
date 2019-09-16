@@ -1976,12 +1976,16 @@ class ApiHelper {
     return this.simplePost('/notebook/api/optimizer/statement/similarity', data);
   }
 
-  saveNotebook(options) {
+  async saveNotebook(options) {
     const data = {
       notebook: options.notebookJson,
       editorMode: options.editorMode
     };
-    return this.simplePost('/notebook/api/notebook/save', data);
+    return new Promise((resolve, reject) => {
+      this.simplePost('/notebook/api/notebook/save', data)
+        .then(resolve)
+        .catch(reject);
+    });
   }
 
   async getHistory(options) {

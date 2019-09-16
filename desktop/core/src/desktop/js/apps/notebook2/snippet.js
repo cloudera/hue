@@ -27,11 +27,11 @@ import Executor from 'apps/notebook2/execution/executor';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
-import { NOTEBOOK_MAPPING } from 'apps/notebook2/notebook';
 import Result from 'apps/notebook2/result';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 
 import 'apps/notebook2/components/ko.snippetExecuteButtonActions';
+import { notebookToContextJSON, snippetToContextJSON } from './notebookSerde';
 
 // TODO: Remove. Temporary here for debug
 window.ExecutableStatement = ExecutableStatement;
@@ -51,7 +51,7 @@ const TYPE = {
   sqoop1: 'sqoop1'
 };
 
-const STATUS = {
+export const STATUS = {
   available: 'available',
   canceled: 'canceled',
   canceling: 'canceling',
@@ -98,7 +98,7 @@ const COMPATIBILITY_TARGET_PLATFORMS = {
   impala: { name: 'Impala', value: TYPE.impala }
 };
 
-const getDefaultSnippetProperties = function(snippetType) {
+const getDefaultSnippetProperties = snippetType => {
   const properties = {};
 
   if (snippetType === TYPE.jar || snippetType === TYPE.py) {
@@ -165,215 +165,213 @@ const getDefaultSnippetProperties = function(snippetType) {
 
 const ERROR_REGEX = /line ([0-9]+)(:([0-9]+))?/i;
 
-class Snippet {
+export default class Snippet {
   constructor(vm, notebook, snippet) {
-    const self = this;
+    this.parentVm = vm;
+    this.parentNotebook = notebook;
 
-    self.parentVm = vm;
-    self.parentNotebook = notebook;
-
-    self.id = ko.observable(snippet.id || hueUtils.UUID());
-    self.name = ko.observable(snippet.name || '');
-    self.type = ko.observable();
-    self.type.subscribe(newValue => {
+    this.id = ko.observable(snippet.id || hueUtils.UUID());
+    this.name = ko.observable(snippet.name || '');
+    this.type = ko.observable();
+    this.type.subscribe(newValue => {
       // TODO: Add session disposal for ENABLE_NOTEBOOK_2
       // Pre-create a session to speed up execution
       sessionManager.getSession({ type: newValue }).then(() => {
-        self.status(STATUS.ready);
+        this.status(STATUS.ready);
       });
     });
-    self.type(snippet.type || TYPE.hive);
-    self.isBatchable = ko.pureComputed(
+    this.type(snippet.type || TYPE.hive);
+    this.isBatchable = ko.pureComputed(
       () =>
-        self.type() === TYPE.hive ||
-        self.type() === TYPE.impala ||
-        self.parentVm.availableLanguages.some(
-          language => language.type === self.type() && language.interface === 'oozie'
+        this.type() === this.hive ||
+        this.type() === this.impala ||
+        this.parentVm.availableLanguages.some(
+          language => language.type === this.type() && language.interface === 'oozie'
         )
     );
 
-    self.autocompleteSettings = {
+    this.autocompleteSettings = {
       temporaryOnly: false
     };
 
     // Ace stuff
-    self.aceCursorPosition = ko.observable(
-      self.parentNotebook.isHistory() ? snippet.aceCursorPosition : null
+    this.aceCursorPosition = ko.observable(
+      this.parentNotebook.isHistory() ? snippet.aceCursorPosition : null
     );
 
-    self.aceEditor = null;
+    this.aceEditor = null;
 
-    self.errors = ko.observableArray([]);
+    this.errors = ko.observableArray([]);
 
-    self.executor = ko.observable();
+    this.executor = ko.observable();
 
-    self.aceErrorsHolder = ko.observableArray([]);
-    self.aceWarningsHolder = ko.observableArray([]);
+    this.aceErrorsHolder = ko.observableArray([]);
+    this.aceWarningsHolder = ko.observableArray([]);
 
-    self.aceErrors = ko.pureComputed(() => (self.showOptimizer() ? self.aceErrorsHolder() : []));
-    self.aceWarnings = ko.pureComputed(() =>
-      self.showOptimizer() ? self.aceWarningsHolder() : []
+    this.aceErrors = ko.pureComputed(() => (this.showOptimizer() ? this.aceErrorsHolder() : []));
+    this.aceWarnings = ko.pureComputed(() =>
+      this.showOptimizer() ? this.aceWarningsHolder() : []
     );
 
-    self.availableSnippets = self.parentVm.availableSnippets();
-    self.inFocus = ko.observable(false);
+    this.availableSnippets = this.parentVm.availableSnippets();
+    this.inFocus = ko.observable(false);
 
-    self.inFocus.subscribe(newValue => {
+    this.inFocus.subscribe(newValue => {
       if (newValue) {
         huePubSub.publish('active.snippet.type.changed', {
-          type: self.type(),
-          isSqlDialect: self.isSqlDialect()
+          type: this.type(),
+          isSqlDialect: this.isSqlDialect()
         });
       }
     });
 
-    self.editorMode = self.parentVm.editorMode;
+    this.editorMode = this.parentVm.editorMode;
 
-    self.getAceMode = () => self.parentVm.getSnippetViewSettings(self.type()).aceMode;
+    this.getAceMode = () => this.parentVm.getSnippetViewSettings(this.type()).aceMode;
 
-    self.dbSelectionVisible = ko.observable(false);
+    this.dbSelectionVisible = ko.observable(false);
 
-    self.showExecutionAnalysis = ko.observable(false);
+    this.showExecutionAnalysis = ko.observable(false);
 
-    self.isSqlDialect = ko.pureComputed(
-      () => self.parentVm.getSnippetViewSettings(self.type()).sqlDialect
+    this.isSqlDialect = ko.pureComputed(
+      () => this.parentVm.getSnippetViewSettings(this.type()).sqlDialect
     );
 
     // namespace and compute might be initialized as empty object {}
-    self.namespace = ko.observable(
+    this.namespace = ko.observable(
       snippet.namespace && snippet.namespace.id ? snippet.namespace : undefined
     );
-    self.compute = ko.observable(
+    this.compute = ko.observable(
       snippet.compute && snippet.compute.id ? snippet.compute : undefined
     );
 
-    self.availableDatabases = ko.observableArray();
-    self.database = ko.observable();
+    this.availableDatabases = ko.observableArray();
+    this.database = ko.observable();
     let previousDatabase = null;
 
-    self.database.subscribe(newValue => {
+    this.database.subscribe(newValue => {
       if (newValue !== null) {
         apiHelper.setInTotalStorage('editor', 'last.selected.database', newValue);
         if (previousDatabase !== null && previousDatabase !== newValue) {
-          huePubSub.publish('editor.refresh.statement.locations', self);
+          huePubSub.publish('editor.refresh.statement.locations', this);
         }
         previousDatabase = newValue;
       }
     });
 
-    self.database(snippet.database);
+    this.database(snippet.database);
 
     // History is currently in Notebook, same with saved queries by snippets, might be better in assist
-    self.currentQueryTab = ko.observable(snippet.currentQueryTab || 'queryHistory');
-    self.pinnedContextTabs = ko.observableArray(snippet.pinnedContextTabs || []);
+    this.currentQueryTab = ko.observable(snippet.currentQueryTab || 'queryHistory');
+    this.pinnedContextTabs = ko.observableArray(snippet.pinnedContextTabs || []);
 
-    self.errorLoadingQueries = ko.observable(false);
-    self.loadingQueries = ko.observable(false);
+    this.errorLoadingQueries = ko.observable(false);
+    this.loadingQueries = ko.observable(false);
 
-    self.queriesHasErrors = ko.observable(false);
-    self.queriesCurrentPage = ko.observable(
-      self.parentVm.selectedNotebook() && self.parentVm.selectedNotebook().snippets().length > 0
-        ? self.parentVm
+    this.queriesHasErrors = ko.observable(false);
+    this.queriesCurrentPage = ko.observable(
+      this.parentVm.selectedNotebook() && this.parentVm.selectedNotebook().snippets().length > 0
+        ? this.parentVm
             .selectedNotebook()
             .snippets()[0]
             .queriesCurrentPage()
         : 1
     );
-    self.queriesTotalPages = ko.observable(
-      self.parentVm.selectedNotebook() && self.parentVm.selectedNotebook().snippets().length > 0
-        ? self.parentVm
+    this.queriesTotalPages = ko.observable(
+      this.parentVm.selectedNotebook() && this.parentVm.selectedNotebook().snippets().length > 0
+        ? this.parentVm
             .selectedNotebook()
             .snippets()[0]
             .queriesTotalPages()
         : 1
     );
-    self.queries = ko.observableArray([]);
+    this.queries = ko.observableArray([]);
 
-    self.queriesFilter = ko.observable('');
-    self.queriesFilterVisible = ko.observable(false);
-    self.queriesFilter.extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 900 } });
-    self.queriesFilter.subscribe(() => {
-      self.fetchQueries();
+    this.queriesFilter = ko.observable('');
+    this.queriesFilterVisible = ko.observable(false);
+    this.queriesFilter.extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 900 } });
+    this.queriesFilter.subscribe(() => {
+      this.fetchQueries();
     });
 
-    self.lastFetchQueriesRequest = null;
+    this.lastFetchQueriesRequest = null;
 
-    self.lastQueriesPage = 1;
-    self.currentQueryTab.subscribe(newValue => {
+    this.lastQueriesPage = 1;
+    this.currentQueryTab.subscribe(newValue => {
       huePubSub.publish('redraw.fixed.headers');
       huePubSub.publish('current.query.tab.switched', newValue);
       if (
         newValue === 'savedQueries' &&
-        (self.queries().length === 0 || self.lastQueriesPage !== self.queriesCurrentPage())
+        (this.queries().length === 0 || this.lastQueriesPage !== this.queriesCurrentPage())
       ) {
-        self.fetchQueries();
+        this.fetchQueries();
       }
     });
 
     huePubSub.subscribeOnce(
       'assist.source.set',
       source => {
-        if (source !== self.type()) {
-          huePubSub.publish('assist.set.source', self.type());
+        if (source !== this.type()) {
+          huePubSub.publish('assist.set.source', this.type());
         }
       },
-      self.parentVm.huePubSubId
+      this.parentVm.huePubSubId
     );
 
     huePubSub.publish('assist.get.source');
 
-    self.ignoreNextAssistDatabaseUpdate = false;
+    this.ignoreNextAssistDatabaseUpdate = false;
 
-    if (!self.database()) {
+    if (!this.database()) {
       huePubSub.publish('assist.get.database.callback', {
-        source: self.type(),
-        callback: function(databaseDef) {
-          self.handleAssistSelection(databaseDef);
+        source: this.type(),
+        callback: databaseDef => {
+          this.handleAssistSelection(databaseDef);
         }
       });
     }
 
-    self.statementType = ko.observable(snippet.statementType || 'text');
-    self.statementTypes = ko.observableArray(['text', 'file']); // Maybe computed later for Spark
-    if (!self.parentVm.editorMode()) {
-      self.statementTypes.push('document');
+    this.statementType = ko.observable(snippet.statementType || 'text');
+    this.statementTypes = ko.observableArray(['text', 'file']); // Maybe computed later for Spark
+    if (!this.parentVm.editorMode()) {
+      this.statementTypes.push('document');
     }
-    self.statementPath = ko.observable(snippet.statementPath || '');
-    self.externalStatementLoaded = ko.observable(false);
+    this.statementPath = ko.observable(snippet.statementPath || '');
+    this.externalStatementLoaded = ko.observable(false);
 
-    self.statementPath.subscribe(() => {
-      self.getExternalStatement();
+    this.statementPath.subscribe(() => {
+      this.getExternalStatement();
     });
 
-    self.associatedDocumentLoading = ko.observable(true);
-    self.associatedDocument = ko.observable();
-    self.associatedDocumentUuid = ko.observable(snippet.associatedDocumentUuid);
-    self.associatedDocumentUuid.subscribe(val => {
+    this.associatedDocumentLoading = ko.observable(true);
+    this.associatedDocument = ko.observable();
+    this.associatedDocumentUuid = ko.observable(snippet.associatedDocumentUuid);
+    this.associatedDocumentUuid.subscribe(val => {
       if (val !== '') {
-        self.getExternalStatement();
+        this.getExternalStatement();
       } else {
-        self.statement_raw('');
-        self.ace().setValue('', 1);
+        this.statement_raw('');
+        this.ace().setValue('', 1);
       }
     });
-    self.statement_raw = ko.observable(snippet.statement_raw || '');
-    self.selectedStatement = ko.observable('');
-    self.positionStatement = ko.observable(null);
-    self.lastExecutedStatement = ko.observable(null);
-    self.statementsList = ko.observableArray();
+    this.statement_raw = ko.observable(snippet.statement_raw || '');
+    this.selectedStatement = ko.observable('');
+    this.positionStatement = ko.observable(null);
+    this.lastExecutedStatement = ko.observable(null);
+    this.statementsList = ko.observableArray();
 
     huePubSub.subscribe(
       'editor.active.statement.changed',
       statementDetails => {
-        if (self.ace() && self.ace().container.id === statementDetails.id) {
+        if (this.ace() && this.ace().container.id === statementDetails.id) {
           for (let i = statementDetails.precedingStatements.length - 1; i >= 0; i--) {
             if (statementDetails.precedingStatements[i].database) {
-              self.availableDatabases().some(availableDatabase => {
+              this.availableDatabases().some(availableDatabase => {
                 if (
                   availableDatabase.toLowerCase() ===
                   statementDetails.precedingStatements[i].database.toLowerCase()
                 ) {
-                  self.database(availableDatabase);
+                  this.database(availableDatabase);
                   return true;
                 }
               });
@@ -381,9 +379,9 @@ class Snippet {
             }
           }
           if (statementDetails.activeStatement) {
-            self.positionStatement(statementDetails.activeStatement);
+            this.positionStatement(statementDetails.activeStatement);
           } else {
-            self.positionStatement(null);
+            this.positionStatement(null);
           }
 
           if (statementDetails.activeStatement) {
@@ -395,60 +393,60 @@ class Snippet {
             statementDetails.followingStatements.forEach(statement => {
               _statements.push(statement.statement);
             });
-            self.statementsList(_statements); // Or fetch on demand via editor.refresh.statement.locations and remove observableArray?
+            this.statementsList(_statements); // Or fetch on demand via editor.refresh.statement.locations and remove observableArray?
           } else {
-            self.statementsList([]);
+            this.statementsList([]);
           }
-          if (!self.parentNotebook.isPresentationModeInitialized()) {
-            if (self.parentNotebook.isPresentationModeDefault()) {
+          if (!this.parentNotebook.isPresentationModeInitialized()) {
+            if (this.parentNotebook.isPresentationModeDefault()) {
               // When switching to presentation mode, the snippet in non presentation mode cannot get status notification.
               // On initiailization, status is set to loading and does not get updated, because we moved to presentation mode.
-              self.status(STATUS.ready);
+              this.status(STATUS.ready);
             }
             // Changing to presentation mode requires statementsList to be initialized. statementsList is initialized asynchronously.
             // When presentation mode is default, we cannot change before statementsList has been calculated.
             // Cleaner implementation would be to make toggleEditorMode statementsList asynchronous
             // However this is currently impossible due to delete _notebook.presentationSnippets()[key];
-            self.parentNotebook.isPresentationModeInitialized(true);
-            self.parentNotebook.isPresentationMode(self.parentNotebook.isPresentationModeDefault());
+            this.parentNotebook.isPresentationModeInitialized(true);
+            this.parentNotebook.isPresentationMode(this.parentNotebook.isPresentationModeDefault());
           }
         }
       },
-      self.parentVm.huePubSubId
+      this.parentVm.huePubSubId
     );
 
-    self.aceSize = ko.observable(snippet.aceSize || 100);
-    self.status = ko.observable(snippet.status || STATUS.loading);
-    self.statusForButtons = ko.observable(STATUS_FOR_BUTTONS.executed);
+    this.aceSize = ko.observable(snippet.aceSize || 100);
+    this.status = ko.observable(snippet.status || STATUS.loading);
+    this.statusForButtons = ko.observable(STATUS_FOR_BUTTONS.executed);
 
-    self.properties = ko.observable(
-      komapping.fromJS(snippet.properties || getDefaultSnippetProperties(self.type()))
+    this.properties = ko.observable(
+      komapping.fromJS(snippet.properties || getDefaultSnippetProperties(this.type()))
     );
-    self.hasProperties = ko.pureComputed(
-      () => Object.keys(komapping.toJS(self.properties())).length > 0
+    this.hasProperties = ko.pureComputed(
+      () => Object.keys(komapping.toJS(this.properties())).length > 0
     );
 
-    self.viewSettings = ko.pureComputed(() => self.parentVm.getSnippetViewSettings(self.type()));
+    this.viewSettings = ko.pureComputed(() => this.parentVm.getSnippetViewSettings(this.type()));
 
     const previousProperties = {};
-    self.type.subscribe(
+    this.type.subscribe(
       oldValue => {
-        previousProperties[oldValue] = self.properties();
+        previousProperties[oldValue] = this.properties();
       },
       null,
       'beforeChange'
     );
 
-    self.type.subscribe(newValue => {
+    this.type.subscribe(newValue => {
       if (typeof previousProperties[newValue] !== 'undefined') {
-        self.properties(previousProperties[newValue]);
+        this.properties(previousProperties[newValue]);
       } else {
-        self.properties(komapping.fromJS(getDefaultSnippetProperties(newValue)));
+        this.properties(komapping.fromJS(getDefaultSnippetProperties(newValue)));
       }
-      self.result.clear();
+      this.result.clear();
       window.setTimeout(() => {
-        if (self.ace() !== null) {
-          self.ace().focus();
+        if (this.ace() !== null) {
+          this.ace().focus();
         }
       }, 100);
     });
@@ -467,23 +465,23 @@ class Snippet {
         delete variable.defaultValue;
       });
     }
-    self.variables = komapping.fromJS(snippet.variables || []);
-    self.variables.subscribe(() => {
-      $(document).trigger('updateResultHeaders', self);
+    this.variables = komapping.fromJS(snippet.variables || []);
+    this.variables.subscribe(() => {
+      $(document).trigger('updateResultHeaders', this);
     });
-    self.hasCurlyBracketParameters = ko.pureComputed(() => self.type() !== TYPE.pig);
+    this.hasCurlyBracketParameters = ko.pureComputed(() => this.type() !== TYPE.pig);
 
-    self.variableNames = ko.pureComputed(() => {
+    this.variableNames = ko.pureComputed(() => {
       let match,
         matches = {},
         matchList;
-      if (self.type() === TYPE.pig) {
-        matches = self.getPigParameters();
+      if (this.type() === TYPE.pig) {
+        matches = this.getPigParameters();
       } else {
         const re = /(?:^|\W)\${(\w*)=?([^{}]*)}/g;
         const reComment = /(^\s*--.*)|(\/\*[\s\S]*?\*\/)/gm;
         const reList = /(?!\s*$)\s*(?:(?:([^,|()\\]*)\(\s*([^,|()\\]*)\)(?:\\[\S\s][^,|()\\]*)?)|([^,|\\]*(?:\\[\S\s][^,|\\]*)*))\s*(?:,|\||$)/g;
-        const statement = self.statement_raw();
+        const statement = this.statement_raw();
         let matchComment = reComment.exec(statement);
         // if re is n & reComment is m
         // finding variables is O(n+m)
@@ -539,14 +537,14 @@ class Snippet {
         return { name: key, meta: meta };
       });
     });
-    self.variableValues = {};
-    self.variableNames.extend({ rateLimit: 150 });
-    self.variableNames.subscribe(newVal => {
-      const variablesLength = self.variables().length;
+    this.variableValues = {};
+    this.variableNames.extend({ rateLimit: 150 });
+    this.variableNames.subscribe(newVal => {
+      const variablesLength = this.variables().length;
       const diffLengthVariables = variablesLength - newVal.length;
       const needsMore = diffLengthVariables < 0;
       const needsLess = diffLengthVariables > 0;
-      self.variableValues = self.variables().reduce((variableValues, variable) => {
+      this.variableValues = this.variables().reduce((variableValues, variable) => {
         if (!variableValues[variable.name()]) {
           variableValues[variable.name()] = { sampleUser: [] };
         }
@@ -556,10 +554,10 @@ class Snippet {
         variableValues[variable.name()].path = variable.path();
         variableValues[variable.name()].type = variable.type();
         return variableValues;
-      }, self.variableValues);
+      }, this.variableValues);
       if (needsMore) {
         for (let i = 0, length = Math.abs(diffLengthVariables); i < length; i++) {
-          self.variables.push(
+          this.variables.push(
             komapping.fromJS({
               name: '',
               value: '',
@@ -573,15 +571,15 @@ class Snippet {
           );
         }
       } else if (needsLess) {
-        self.variables.splice(self.variables().length - diffLengthVariables, diffLengthVariables);
+        this.variables.splice(this.variables().length - diffLengthVariables, diffLengthVariables);
       }
       newVal.forEach((item, index) => {
-        const variable = self.variables()[index];
+        const variable = this.variables()[index];
         variable.name(item.name);
         window.setTimeout(() => {
           variable.value(
-            self.variableValues[item.name]
-              ? self.variableValues[item.name].value
+            this.variableValues[item.name]
+              ? this.variableValues[item.name].value
               : (!needsMore && variable.value()) || ''
           );
         }, 0);
@@ -592,16 +590,16 @@ class Snippet {
             : variable.sampleUser()
         );
         variable.sampleUser(
-          self.variableValues[item.name] ? self.variableValues[item.name].sampleUser : []
+          this.variableValues[item.name] ? this.variableValues[item.name].sampleUser : []
         );
         variable.type(
-          self.variableValues[item.name] ? self.variableValues[item.name].type || 'text' : 'text'
+          this.variableValues[item.name] ? this.variableValues[item.name].type || 'text' : 'text'
         );
         variable.path(
-          self.variableValues[item.name] ? self.variableValues[item.name].path || '' : ''
+          this.variableValues[item.name] ? this.variableValues[item.name].path || '' : ''
         );
         variable.catalogEntry =
-          self.variableValues[item.name] && self.variableValues[item.name].catalogEntry;
+          this.variableValues[item.name] && this.variableValues[item.name].catalogEntry;
       });
     });
 
@@ -623,7 +621,7 @@ class Snippet {
           variables[name] = location;
           return variables;
         }, {});
-      const updateVariableType = function(variable, sourceMeta) {
+      const updateVariableType = (variable, sourceMeta) => {
         let type;
         if (sourceMeta && sourceMeta.type) {
           type = sourceMeta.type.toLowerCase();
@@ -676,7 +674,7 @@ class Snippet {
         variable.type(variablesValues.type);
         variable.step(variablesValues.step);
       };
-      self.variables().forEach(variable => {
+      this.variables().forEach(variable => {
         if (oLocations[variable.name()]) {
           activeSourcePromises.push(
             oLocations[variable.name()].resolveCatalogEntry({ cancellable: true }).done(entry => {
@@ -689,7 +687,7 @@ class Snippet {
                     silenceErrors: true,
                     cancellable: true
                   })
-                  .then(updateVariableType.bind(self, variable))
+                  .then(updateVariableType.bind(this, variable))
               );
             })
           );
@@ -701,21 +699,20 @@ class Snippet {
       });
     });
 
-    self.statement = ko.pureComputed(() => {
-      let statement = self.isSqlDialect()
-        ? self.selectedStatement()
-          ? self.selectedStatement()
-          : self.positionStatement() !== null
-          ? self.positionStatement().statement
-          : self.statement_raw()
-        : self.statement_raw();
-      const variables = self.variables().reduce((variables, variable) => {
+    this.statement = ko.pureComputed(() => {
+      let statement = this.isSqlDialect()
+        ? this.selectedStatement()
+          ? this.selectedStatement()
+          : this.positionStatement() !== null
+          ? this.positionStatement().statement
+          : this.statement_raw()
+        : this.statement_raw();
+      const variables = this.variables().reduce((variables, variable) => {
         variables[variable.name()] = variable;
         return variables;
       }, {});
-      if (self.variables().length) {
-        const variablesString = self
-          .variables()
+      if (this.variables().length) {
+        const variablesString = this.variables()
           .map(variable => {
             return variable.name();
           })
@@ -723,10 +720,10 @@ class Snippet {
         statement = statement.replace(
           RegExp(
             '([^\\\\])?\\$' +
-              (self.hasCurlyBracketParameters() ? '{(' : '(') +
+              (this.hasCurlyBracketParameters() ? '{(' : '(') +
               variablesString +
               ')(=[^}]*)?' +
-              (self.hasCurlyBracketParameters() ? '}' : ''),
+              (this.hasCurlyBracketParameters() ? '}' : ''),
             'g'
           ),
           (match, p1, p2) => {
@@ -757,235 +754,235 @@ class Snippet {
       }
     );
 
-    self.result = new Result(snippet.result, self);
-    if (!self.result.hasSomeResults()) {
-      self.currentQueryTab('queryHistory');
+    this.result = new Result(snippet.result || {}, this);
+    if (!this.result.hasSomeResults()) {
+      this.currentQueryTab('queryHistory');
     }
-    self.showGrid = ko.observable(snippet.showGrid !== false);
-    self.showChart = ko.observable(!!snippet.showChart);
-    if (!self.showGrid() && !self.showChart()) {
-      self.showGrid(true);
+    this.showGrid = ko.observable(snippet.showGrid !== false);
+    this.showChart = ko.observable(!!snippet.showChart);
+    if (!this.showGrid() && !this.showChart()) {
+      this.showGrid(true);
     }
     let defaultShowLogs = true;
-    if (self.parentVm.editorMode() && $.totalStorage('hue.editor.showLogs')) {
+    if (this.parentVm.editorMode() && $.totalStorage('hue.editor.showLogs')) {
       defaultShowLogs = $.totalStorage('hue.editor.showLogs');
     }
-    self.showLogs = ko.observable(snippet.showLogs || defaultShowLogs);
-    self.progress = ko.observable(snippet.progress || 0);
-    self.jobs = ko.observableArray(snippet.jobs || []);
+    this.showLogs = ko.observable(snippet.showLogs || defaultShowLogs);
+    this.progress = ko.observable(snippet.progress || 0);
+    this.jobs = ko.observableArray(snippet.jobs || []);
 
-    self.executeNextTimeout = -1;
-    self.refreshTimeouts = {};
+    this.executeNextTimeout = -1;
+    this.refreshTimeouts = {};
 
-    self.progress.subscribe(val => {
-      $(document).trigger('progress', { data: val, snippet: self });
+    this.progress.subscribe(val => {
+      $(document).trigger('progress', { data: val, snippet: this });
     });
 
-    self.showGrid.subscribe(val => {
+    this.showGrid.subscribe(val => {
       if (val) {
-        self.showChart(false);
-        huePubSub.publish('editor.grid.shown', self);
+        this.showChart(false);
+        huePubSub.publish('editor.grid.shown', this);
       }
     });
 
-    self.showChart.subscribe(val => {
+    this.showChart.subscribe(val => {
       if (val) {
-        self.showGrid(false);
-        self.isResultSettingsVisible(true);
-        $(document).trigger('forceChartDraw', self);
-        huePubSub.publish('editor.chart.shown', self);
-        self.prepopulateChart();
+        this.showGrid(false);
+        this.isResultSettingsVisible(true);
+        $(document).trigger('forceChartDraw', this);
+        huePubSub.publish('editor.chart.shown', this);
+        this.prepopulateChart();
       }
     });
-    self.showLogs.subscribe(val => {
+    this.showLogs.subscribe(val => {
       huePubSub.publish('redraw.fixed.headers');
       if (val) {
-        self.getLogs();
+        this.getLogs();
       }
-      if (self.parentVm.editorMode()) {
+      if (this.parentVm.editorMode()) {
         $.totalStorage('hue.editor.showLogs', val);
       }
     });
 
-    self.isLoading = ko.pureComputed(() => self.status() === STATUS.loading);
+    this.isLoading = ko.pureComputed(() => this.status() === STATUS.loading);
 
-    self.resultsKlass = ko.pureComputed(() => 'results ' + self.type());
+    this.resultsKlass = ko.pureComputed(() => 'results ' + this.type());
 
-    self.errorsKlass = ko.pureComputed(() => self.resultsKlass() + ' alert alert-error');
+    this.errorsKlass = ko.pureComputed(() => this.resultsKlass() + ' alert alert-error');
 
-    self.is_redacted = ko.observable(!!snippet.is_redacted);
+    this.is_redacted = ko.observable(!!snippet.is_redacted);
 
-    self.chartType = ko.observable(snippet.chartType || window.HUE_CHARTS.TYPES.BARCHART);
-    self.chartType.subscribe(self.prepopulateChart.bind(self));
-    self.chartSorting = ko.observable(snippet.chartSorting || 'none');
-    self.chartScatterGroup = ko.observable(snippet.chartScatterGroup);
-    self.chartScatterSize = ko.observable(snippet.chartScatterSize);
-    self.chartScope = ko.observable(snippet.chartScope || 'world');
-    self.chartTimelineType = ko.observable(snippet.chartTimelineType || 'bar');
-    self.chartLimits = ko.observableArray([5, 10, 25, 50, 100]);
-    self.chartLimit = ko.observable(snippet.chartLimit);
-    self.chartLimit.extend({ notify: 'always' });
-    self.chartX = ko.observable(snippet.chartX);
-    self.chartX.extend({ notify: 'always' });
-    self.chartXPivot = ko.observable(snippet.chartXPivot);
-    self.chartXPivot.extend({ notify: 'always' });
-    self.chartXPivot.subscribe(self.prepopulateChart.bind(self));
-    self.chartYSingle = ko.observable(snippet.chartYSingle);
-    self.chartYMulti = ko.observableArray(snippet.chartYMulti || []);
-    self.chartData = ko.observableArray(snippet.chartData || []);
-    self.chartMapType = ko.observable(snippet.chartMapType || 'marker');
-    self.chartMapLabel = ko.observable(snippet.chartMapLabel);
-    self.chartMapHeat = ko.observable(snippet.chartMapHeat);
-    self.hideStacked = ko.pureComputed(() => self.chartYMulti().length <= 1);
+    this.chartType = ko.observable(snippet.chartType || window.HUE_CHARTS.TYPES.BARCHART);
+    this.chartType.subscribe(this.prepopulateChart.bind(this));
+    this.chartSorting = ko.observable(snippet.chartSorting || 'none');
+    this.chartScatterGroup = ko.observable(snippet.chartScatterGroup);
+    this.chartScatterSize = ko.observable(snippet.chartScatterSize);
+    this.chartScope = ko.observable(snippet.chartScope || 'world');
+    this.chartTimelineType = ko.observable(snippet.chartTimelineType || 'bar');
+    this.chartLimits = ko.observableArray([5, 10, 25, 50, 100]);
+    this.chartLimit = ko.observable(snippet.chartLimit);
+    this.chartLimit.extend({ notify: 'always' });
+    this.chartX = ko.observable(snippet.chartX);
+    this.chartX.extend({ notify: 'always' });
+    this.chartXPivot = ko.observable(snippet.chartXPivot);
+    this.chartXPivot.extend({ notify: 'always' });
+    this.chartXPivot.subscribe(this.prepopulateChart.bind(this));
+    this.chartYSingle = ko.observable(snippet.chartYSingle);
+    this.chartYMulti = ko.observableArray(snippet.chartYMulti || []);
+    this.chartData = ko.observableArray(snippet.chartData || []);
+    this.chartMapType = ko.observable(snippet.chartMapType || 'marker');
+    this.chartMapLabel = ko.observable(snippet.chartMapLabel);
+    this.chartMapHeat = ko.observable(snippet.chartMapHeat);
+    this.hideStacked = ko.pureComputed(() => this.chartYMulti().length <= 1);
 
-    self.hasDataForChart = ko.pureComputed(() => {
+    this.hasDataForChart = ko.pureComputed(() => {
       if (
-        self.chartType() === window.HUE_CHARTS.TYPES.BARCHART ||
-        self.chartType() === window.HUE_CHARTS.TYPES.LINECHART ||
-        self.chartType() === window.HUE_CHARTS.TYPES.TIMELINECHART
+        this.chartType() === window.HUE_CHARTS.TYPES.BARCHART ||
+        this.chartType() === window.HUE_CHARTS.TYPES.LINECHART ||
+        this.chartType() === window.HUE_CHARTS.TYPES.TIMELINECHART
       ) {
         return (
-          typeof self.chartX() !== 'undefined' &&
-          self.chartX() !== null &&
-          self.chartYMulti().length > 0
+          typeof this.chartX() !== 'undefined' &&
+          this.chartX() !== null &&
+          this.chartYMulti().length > 0
         );
       }
       return (
-        typeof self.chartX() !== 'undefined' &&
-        self.chartX() !== null &&
-        typeof self.chartYSingle() !== 'undefined' &&
-        self.chartYSingle() !== null
+        typeof this.chartX() !== 'undefined' &&
+        this.chartX() !== null &&
+        typeof this.chartYSingle() !== 'undefined' &&
+        this.chartYSingle() !== null
       );
     });
 
-    self.hasDataForChart.subscribe(() => {
-      self.chartX.notifySubscribers();
-      self.chartX.valueHasMutated();
+    this.hasDataForChart.subscribe(() => {
+      this.chartX.notifySubscribers();
+      this.chartX.valueHasMutated();
     });
 
-    self.chartType.subscribe(() => {
-      $(document).trigger('forceChartDraw', self);
+    this.chartType.subscribe(() => {
+      $(document).trigger('forceChartDraw', this);
     });
 
-    self.previousChartOptions = {};
+    this.previousChartOptions = {};
 
-    self.result.meta.subscribe(() => {
-      self.chartLimit(self.previousChartOptions.chartLimit);
-      self.chartX(self.guessMetaField(self.previousChartOptions.chartX));
-      self.chartXPivot(self.previousChartOptions.chartXPivot);
-      self.chartYSingle(self.guessMetaField(self.previousChartOptions.chartYSingle));
-      self.chartMapType(self.previousChartOptions.chartMapType);
-      self.chartMapLabel(self.guessMetaField(self.previousChartOptions.chartMapLabel));
-      self.chartMapHeat(self.previousChartOptions.chartMapHeat);
-      self.chartYMulti(self.guessMetaFields(self.previousChartOptions.chartYMulti) || []);
-      self.chartSorting(self.previousChartOptions.chartSorting);
-      self.chartScatterGroup(self.previousChartOptions.chartScatterGroup);
-      self.chartScatterSize(self.previousChartOptions.chartScatterSize);
-      self.chartScope(self.previousChartOptions.chartScope);
-      self.chartTimelineType(self.previousChartOptions.chartTimelineType);
+    this.result.meta.subscribe(() => {
+      this.chartLimit(this.previousChartOptions.chartLimit);
+      this.chartX(this.guessMetaField(this.previousChartOptions.chartX));
+      this.chartXPivot(this.previousChartOptions.chartXPivot);
+      this.chartYSingle(this.guessMetaField(this.previousChartOptions.chartYSingle));
+      this.chartMapType(this.previousChartOptions.chartMapType);
+      this.chartMapLabel(this.guessMetaField(this.previousChartOptions.chartMapLabel));
+      this.chartMapHeat(this.previousChartOptions.chartMapHeat);
+      this.chartYMulti(this.guessMetaFields(this.previousChartOptions.chartYMulti) || []);
+      this.chartSorting(this.previousChartOptions.chartSorting);
+      this.chartScatterGroup(this.previousChartOptions.chartScatterGroup);
+      this.chartScatterSize(this.previousChartOptions.chartScatterSize);
+      this.chartScope(this.previousChartOptions.chartScope);
+      this.chartTimelineType(this.previousChartOptions.chartTimelineType);
     });
 
-    self.isResultSettingsVisible = ko.observable(!!snippet.isResultSettingsVisible);
+    this.isResultSettingsVisible = ko.observable(!!snippet.isResultSettingsVisible);
 
-    self.isResultSettingsVisible.subscribe(() => {
-      $(document).trigger('toggleResultSettings', self);
+    this.isResultSettingsVisible.subscribe(() => {
+      $(document).trigger('toggleResultSettings', this);
     });
 
-    self.settingsVisible = ko.observable(!!snippet.settingsVisible);
-    self.saveResultsModalVisible = ko.observable(false);
+    this.settingsVisible = ko.observable(!!snippet.settingsVisible);
+    this.saveResultsModalVisible = ko.observable(false);
 
-    self.checkStatusTimeout = null;
-    self.getLogsTimeout = null;
+    this.checkStatusTimeout = null;
+    this.getLogsTimeout = null;
 
-    self.complexity = ko.observable();
-    self.hasComplexity = ko.pureComputed(
-      () => self.complexity() && Object.keys(self.complexity()).length > 0
+    this.complexity = ko.observable();
+    this.hasComplexity = ko.pureComputed(
+      () => this.complexity() && Object.keys(this.complexity()).length > 0
     );
-    self.hasRisks = ko.pureComputed(
+    this.hasRisks = ko.pureComputed(
       () =>
-        self.hasComplexity() && self.complexity()['hints'] && self.complexity()['hints'].length > 0
+        this.hasComplexity() && this.complexity()['hints'] && this.complexity()['hints'].length > 0
     );
-    self.topRisk = ko.pureComputed(() =>
-      self.hasRisks() ? self.complexity()['hints'][0] : undefined
+    this.topRisk = ko.pureComputed(() =>
+      this.hasRisks() ? this.complexity()['hints'][0] : undefined
     );
 
-    self.suggestion = ko.observable('');
-    self.hasSuggestion = ko.observable(null);
+    this.suggestion = ko.observable('');
+    this.hasSuggestion = ko.observable(null);
 
-    self.compatibilityCheckRunning = ko.observable(false);
+    this.compatibilityCheckRunning = ko.observable(false);
 
-    self.compatibilitySourcePlatforms = [];
+    this.compatibilitySourcePlatforms = [];
     Object.keys(COMPATIBILITY_SOURCE_PLATFORMS).forEach(key => {
-      self.compatibilitySourcePlatforms.push(COMPATIBILITY_SOURCE_PLATFORMS[key]);
+      this.compatibilitySourcePlatforms.push(COMPATIBILITY_SOURCE_PLATFORMS[key]);
     });
 
-    self.compatibilitySourcePlatform = ko.observable(COMPATIBILITY_SOURCE_PLATFORMS[self.type()]);
-    self.compatibilitySourcePlatform.subscribe(newValue => {
-      if (newValue && newValue.value !== self.type()) {
-        self.hasSuggestion(null);
-        self.compatibilityTargetPlatform(COMPATIBILITY_TARGET_PLATFORMS[self.type()]);
-        self.queryCompatibility();
+    this.compatibilitySourcePlatform = ko.observable(COMPATIBILITY_SOURCE_PLATFORMS[this.type()]);
+    this.compatibilitySourcePlatform.subscribe(newValue => {
+      if (newValue && newValue.value !== this.type()) {
+        this.hasSuggestion(null);
+        this.compatibilityTargetPlatform(COMPATIBILITY_TARGET_PLATFORMS[this.type()]);
+        this.queryCompatibility();
       }
     });
 
-    self.compatibilityTargetPlatforms = [];
+    this.compatibilityTargetPlatforms = [];
     Object.keys(COMPATIBILITY_TARGET_PLATFORMS).forEach(key => {
-      self.compatibilityTargetPlatforms.push(COMPATIBILITY_TARGET_PLATFORMS[key]);
+      this.compatibilityTargetPlatforms.push(COMPATIBILITY_TARGET_PLATFORMS[key]);
     });
-    self.compatibilityTargetPlatform = ko.observable(COMPATIBILITY_TARGET_PLATFORMS[self.type()]);
+    this.compatibilityTargetPlatform = ko.observable(COMPATIBILITY_TARGET_PLATFORMS[this.type()]);
 
-    self.showOptimizer = ko.observable(
+    this.showOptimizer = ko.observable(
       apiHelper.getFromTotalStorage('editor', 'show.optimizer', false)
     );
-    self.showOptimizer.subscribe(newValue => {
+    this.showOptimizer.subscribe(newValue => {
       if (newValue !== null) {
         apiHelper.setInTotalStorage('editor', 'show.optimizer', newValue);
       }
     });
 
-    if (HAS_OPTIMIZER && !self.parentVm.isNotificationManager()) {
+    if (HAS_OPTIMIZER && !this.parentVm.isNotificationManager()) {
       let lastComplexityRequest;
       let lastCheckedComplexityStatement;
       const knownResponses = [];
 
-      self.delayedStatement = ko
-        .pureComputed(self.statement)
+      this.delayedStatement = ko
+        .pureComputed(this.statement)
         .extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 2000 } });
 
-      const handleRiskResponse = function(data) {
+      const handleRiskResponse = data => {
         if (data.status === 0) {
-          self.hasSuggestion('');
-          self.complexity(data.query_complexity);
+          this.hasSuggestion('');
+          this.complexity(data.query_complexity);
         } else {
-          self.hasSuggestion('error');
-          self.complexity({ hints: [] });
+          this.hasSuggestion('error');
+          this.complexity({ hints: [] });
         }
         huePubSub.publish('editor.active.risks', {
-          editor: self.ace(),
-          risks: self.complexity() || {}
+          editor: this.ace(),
+          risks: this.complexity() || {}
         });
-        lastCheckedComplexityStatement = self.statement();
+        lastCheckedComplexityStatement = this.statement();
       };
 
-      const clearActiveRisks = function() {
-        if (self.hasSuggestion() !== null && typeof self.hasSuggestion() !== 'undefined') {
-          self.hasSuggestion(null);
+      const clearActiveRisks = () => {
+        if (this.hasSuggestion() !== null && typeof this.hasSuggestion() !== 'undefined') {
+          this.hasSuggestion(null);
         }
 
-        if (self.suggestion() !== '') {
-          self.suggestion('');
+        if (this.suggestion() !== '') {
+          this.suggestion('');
         }
 
-        if (self.complexity() !== {}) {
-          self.complexity(undefined);
+        if (this.complexity() !== {}) {
+          this.complexity(undefined);
           huePubSub.publish('editor.active.risks', {
-            editor: self.ace(),
+            editor: this.ace(),
             risks: {}
           });
         }
       };
 
-      self.positionStatement.subscribe(newStatement => {
+      this.positionStatement.subscribe(newStatement => {
         if (newStatement) {
           const hash = newStatement.statement.hashCode();
           const unknownResponse = knownResponses.every(knownResponse => {
@@ -1001,14 +998,14 @@ class Snippet {
         }
       });
 
-      self.checkComplexity = function() {
-        if (!self.inFocus() || lastCheckedComplexityStatement === self.statement()) {
+      this.checkComplexity = () => {
+        if (!this.inFocus() || lastCheckedComplexityStatement === this.statement()) {
           return;
         }
 
         // The syntaxError property is only set if the syntax checker is active and has found an
         // error, see AceLocationHandler.
-        if (self.positionStatement() && self.positionStatement().syntaxError) {
+        if (this.positionStatement() && this.positionStatement().syntaxError) {
           return;
         }
 
@@ -1017,12 +1014,12 @@ class Snippet {
         hueAnalytics.log('notebook', 'get_query_risk');
         clearActiveRisks();
 
-        const changeSubscription = self.statement.subscribe(() => {
+        const changeSubscription = this.statement.subscribe(() => {
           changeSubscription.dispose();
           apiHelper.cancelActiveRequest(lastComplexityRequest);
         });
 
-        const hash = self.statement().hashCode();
+        const hash = this.statement().hashCode();
 
         const unknownResponse = knownResponses.every(knownResponse => {
           if (knownResponse.hash === hash) {
@@ -1034,8 +1031,8 @@ class Snippet {
         if (unknownResponse) {
           lastComplexityRequest = apiHelper
             .statementRisk({
-              notebookJson: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-              snippetJson: komapping.toJSON(self.getContext())
+              notebookJson: notebookToContextJSON(this.parentNotebook),
+              snippetJson: snippetToContextJSON(this)
             })
             .then(data => {
               knownResponses.unshift({
@@ -1053,291 +1050,282 @@ class Snippet {
         }
       };
 
-      if (self.type() === TYPE.hive || self.type() === TYPE.impala) {
-        if (self.statement_raw()) {
+      if (this.type() === TYPE.hive || this.type() === TYPE.impala) {
+        if (this.statement_raw()) {
           window.setTimeout(() => {
-            self.checkComplexity();
+            this.checkComplexity();
           }, 2000);
         }
-        self.delayedStatement.subscribe(() => {
-          self.checkComplexity();
+        this.delayedStatement.subscribe(() => {
+          this.checkComplexity();
         });
       }
     }
 
-    self.wasBatchExecuted = ko.observable(!!snippet.wasBatchExecuted);
-    self.isReady = ko.pureComputed(
+    this.wasBatchExecuted = ko.observable(!!snippet.wasBatchExecuted);
+    this.isReady = ko.pureComputed(
       () =>
-        (self.statementType() === 'text' &&
-          ((self.isSqlDialect() && self.statement() !== '') ||
-            ([TYPE.jar, TYPE.java, TYPE.spark2, TYPE.distcp].indexOf(self.type()) === -1 &&
-              self.statement() !== '') ||
-            ([TYPE.jar, TYPE.java].indexOf(self.type()) !== -1 &&
-              (self.properties().app_jar() !== '' && self.properties().class() !== '')) ||
-            (TYPE.spark2 === self.type() && self.properties().jars().length > 0) ||
-            (TYPE.shell === self.type() && self.properties().command_path().length > 0) ||
-            (TYPE.mapreduce === self.type() && self.properties().app_jar().length > 0) ||
-            (TYPE.distcp === self.type() &&
-              self.properties().source_path().length > 0 &&
-              self.properties().destination_path().length > 0))) ||
-        (self.statementType() === 'file' && self.statementPath().length > 0) ||
-        (self.statementType() === 'document' &&
-          self.associatedDocumentUuid() &&
-          self.associatedDocumentUuid().length > 0)
+        (this.statementType() === 'text' &&
+          ((this.isSqlDialect() && this.statement() !== '') ||
+            ([TYPE.jar, TYPE.java, TYPE.spark2, TYPE.distcp].indexOf(this.type()) === -1 &&
+              this.statement() !== '') ||
+            ([TYPE.jar, TYPE.java].indexOf(this.type()) !== -1 &&
+              (this.properties().app_jar() !== '' && this.properties().class() !== '')) ||
+            (TYPE.spark2 === this.type() && this.properties().jars().length > 0) ||
+            (TYPE.shell === this.type() && this.properties().command_path().length > 0) ||
+            (TYPE.mapreduce === this.type() && this.properties().app_jar().length > 0) ||
+            (TYPE.distcp === this.type() &&
+              this.properties().source_path().length > 0 &&
+              this.properties().destination_path().length > 0))) ||
+        (this.statementType() === 'file' && this.statementPath().length > 0) ||
+        (this.statementType() === 'document' &&
+          this.associatedDocumentUuid() &&
+          this.associatedDocumentUuid().length > 0)
     );
-    self.lastExecuted = ko.observable(snippet.lastExecuted || 0);
-    self.lastAceSelectionRowOffset = ko.observable(snippet.lastAceSelectionRowOffset || 0);
+    this.lastExecuted = ko.observable(snippet.lastExecuted || 0);
+    this.lastAceSelectionRowOffset = ko.observable(snippet.lastAceSelectionRowOffset || 0);
 
-    self.executingBlockingOperation = null; // A ExecuteStatement()
-    self.showLongOperationWarning = ko.observable(false);
-    self.showLongOperationWarning.subscribe(newValue => {
+    this.executingBlockingOperation = null; // A ExecuteStatement()
+    this.showLongOperationWarning = ko.observable(false);
+    this.showLongOperationWarning.subscribe(newValue => {
       if (newValue) {
         hueAnalytics.convert('editor', 'showLongOperationWarning');
       }
     });
 
-    self.longOperationTimeout = -1;
+    this.longOperationTimeout = -1;
 
-    self.lastExecutedStatements = undefined;
-    self.lastExecutedSelectionRange = undefined;
+    this.lastExecutedStatements = undefined;
+    this.lastExecutedSelectionRange = undefined;
 
-    self.formatEnabled = ko.pureComputed(
+    this.formatEnabled = ko.pureComputed(
       () =>
-        self.statement_raw && self.statement_raw() != null && self.statement_raw().length < 400000
+        this.statement_raw && this.statement_raw() != null && this.statement_raw().length < 400000
     );
 
-    self.lastCompatibilityRequest = undefined;
+    this.lastCompatibilityRequest = undefined;
 
-    self.isFetchingData = false;
+    this.isFetchingData = false;
 
-    self.isCanceling = ko.observable(false);
+    this.isCanceling = ko.observable(false);
 
-    self.autocompleter = new AceAutocompleteWrapper({
-      snippet: self,
-      user: self.parentVm.user,
+    this.autocompleter = new AceAutocompleteWrapper({
+      snippet: this,
+      user: this.parentVm.user,
       optEnabled: false,
-      timeout: self.parentVm.autocompleteTimeout
+      timeout: this.parentVm.autocompleteTimeout
     });
 
     huePubSub.subscribe('hue.executor.updated', details => {
       const executable = details.executable;
 
-      if (details.executor === self.executor()) {
-        self.status(executable.status);
-        self.progress(executable.progress);
+      if (details.executor === this.executor()) {
+        this.status(executable.status);
+        this.progress(executable.progress);
       }
     });
 
-    self.refreshHistory = notebook.fetchHistory;
+    this.refreshHistory = notebook.fetchHistory;
   }
 
   ace(newVal) {
-    const self = this;
     if (newVal) {
-      self.aceEditor = newVal;
-      if (!self.parentNotebook.isPresentationMode()) {
-        self.aceEditor.focus();
+      this.aceEditor = newVal;
+      if (!this.parentNotebook.isPresentationMode()) {
+        this.aceEditor.focus();
       }
     }
-    return self.aceEditor;
+    return this.aceEditor;
   }
 
   cancel() {
-    const self = this;
-    window.clearTimeout(self.executeNextTimeout);
-    self.isCanceling(true);
-    if (self.checkStatusTimeout != null) {
-      clearTimeout(self.checkStatusTimeout);
-      self.checkStatusTimeout = null;
-      clearTimeout(self.getLogsTimeout);
-      self.getLogsTimeout = null;
+    window.clearTimeout(this.executeNextTimeout);
+    this.isCanceling(true);
+    if (this.checkStatusTimeout != null) {
+      clearTimeout(this.checkStatusTimeout);
+      this.checkStatusTimeout = null;
+      clearTimeout(this.getLogsTimeout);
+      this.getLogsTimeout = null;
     }
     hueAnalytics.log('notebook', 'cancel');
 
-    if (self.executingBlockingOperation != null) {
-      self.executingBlockingOperation.abort();
-      self.executingBlockingOperation = null;
+    if (this.executingBlockingOperation != null) {
+      this.executingBlockingOperation.abort();
+      this.executingBlockingOperation = null;
     }
 
-    if ($.isEmptyObject(self.result.handle())) {
+    if ($.isEmptyObject(this.result.handle())) {
       // Query was not even submitted yet
-      self.statusForButtons(STATUS_FOR_BUTTONS.canceled);
-      self.status(STATUS.failed);
-      self.isCanceling(false);
-      self.parentNotebook.isExecutingAll(false);
+      this.statusForButtons(STATUS_FOR_BUTTONS.canceled);
+      this.status(STATUS.failed);
+      this.isCanceling(false);
+      this.parentNotebook.isExecutingAll(false);
     } else {
-      self.statusForButtons(STATUS_FOR_BUTTONS.canceling);
+      this.statusForButtons(STATUS_FOR_BUTTONS.canceling);
       apiHelper
         .cancelNotebookStatement({
-          notebookJson: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-          snippetJson: komapping.toJSON(self.getContext())
+          notebookJson: notebookToContextJSON(this.parentNotebook),
+          snippetJson: snippetToContextJSON(this)
         })
         .then(data => {
-          self.statusForButtons(STATUS_FOR_BUTTONS.canceled);
+          this.statusForButtons(STATUS_FOR_BUTTONS.canceled);
           if (data.status === 0) {
-            self.status(STATUS.canceled);
-            self.parentNotebook.isExecutingAll(false);
+            this.status(STATUS.canceled);
+            this.parentNotebook.isExecutingAll(false);
           } else {
-            self.handleAjaxError(data);
+            this.handleAjaxError(data);
           }
         })
         .fail(xhr => {
           if (xhr.status !== 502) {
             $(document).trigger('error', xhr.responseText);
           }
-          self.statusForButtons(STATUS_FOR_BUTTONS.canceled);
-          self.status(STATUS.failed);
-          self.parentNotebook.isExecutingAll(false);
+          this.statusForButtons(STATUS_FOR_BUTTONS.canceled);
+          this.status(STATUS.failed);
+          this.parentNotebook.isExecutingAll(false);
         })
         .always(() => {
-          self.isCanceling(false);
+          this.isCanceling(false);
         });
     }
   }
 
   checkCompatibility() {
-    const self = this;
-    self.hasSuggestion(null);
-    self.compatibilitySourcePlatform(COMPATIBILITY_SOURCE_PLATFORMS[self.type()]);
-    self.compatibilityTargetPlatform(
-      COMPATIBILITY_TARGET_PLATFORMS[self.type() === TYPE.hive ? TYPE.impala : TYPE.hive]
+    this.hasSuggestion(null);
+    this.compatibilitySourcePlatform(COMPATIBILITY_SOURCE_PLATFORMS[this.type()]);
+    this.compatibilityTargetPlatform(
+      COMPATIBILITY_TARGET_PLATFORMS[this.type() === TYPE.hive ? TYPE.impala : TYPE.hive]
     );
-    self.queryCompatibility();
+    this.queryCompatibility();
   }
 
   checkDdlNotification() {
-    const self = this;
     if (
-      self.lastExecutedStatement() &&
+      this.lastExecutedStatement() &&
       /ALTER|CREATE|DELETE|DROP|GRANT|INSERT|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i.test(
-        self.lastExecutedStatement().firstToken
+        this.lastExecutedStatement().firstToken
       )
     ) {
-      self.onDdlExecute();
+      this.onDdlExecute();
     } else {
-      window.clearTimeout(self.executeNextTimeout);
+      window.clearTimeout(this.executeNextTimeout);
     }
   }
 
   checkStatus() {
-    const self = this;
-    const _checkStatus = function() {
-      $.post(
-        '/notebook/api/check_status',
-        {
-          notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-          snippet: komapping.toJSON(self.getContext())
-        },
-        data => {
+    const _checkStatus = () => {
+      $.post('/notebook/api/check_status', {
+        notebook: notebookToContextJSON(this.parentNotebook),
+        snippet: snippetToContextJSON(this)
+      })
+        .then(data => {
           if (
-            self.statusForButtons() === STATUS_FOR_BUTTONS.canceling ||
-            self.status() === STATUS.canceled
+            this.statusForButtons() === STATUS_FOR_BUTTONS.canceling ||
+            this.status() === STATUS.canceled
           ) {
             // Query was canceled in the meantime, do nothing
           } else {
-            self.result.endTime(new Date());
+            this.result.endTime(new Date());
 
             if (data.status === 0) {
-              self.status(data.query_status.status);
+              this.status(data.query_status.status);
 
               if (
-                self.status() === STATUS.running ||
-                self.status() === STATUS.starting ||
-                self.status() === STATUS.waiting
+                this.status() === STATUS.running ||
+                this.status() === STATUS.starting ||
+                this.status() === STATUS.waiting
               ) {
-                const delay = self.result.executionTime() > 45000 ? 5000 : 1000; // 5s if more than 45s
-                if (!self.parentNotebook.unloaded()) {
-                  self.checkStatusTimeout = setTimeout(_checkStatus, delay);
+                const delay = this.result.executionTime() > 45000 ? 5000 : 1000; // 5s if more than 45s
+                if (!this.parentNotebook.unloaded()) {
+                  this.checkStatusTimeout = setTimeout(_checkStatus, delay);
                 }
-              } else if (self.status() === STATUS.available) {
-                self.fetchResult(100);
-                self.progress(100);
-                if (self.isSqlDialect()) {
-                  if (self.result.handle().has_result_set) {
-                    const _query_id = self.parentNotebook.id();
+              } else if (this.status() === STATUS.available) {
+                this.fetchResult(100);
+                this.progress(100);
+                if (this.isSqlDialect()) {
+                  if (this.result.handle().has_result_set) {
+                    const _query_id = this.parentNotebook.id();
                     setTimeout(() => {
                       // Delay until we get IMPALA-5555
-                      self.fetchResultSize(10, _query_id);
+                      this.fetchResultSize(10, _query_id);
                     }, 2000);
-                    self.checkDdlNotification(); // DDL CTAS with Impala
-                  } else if (self.lastExecutedStatement()) {
-                    self.checkDdlNotification();
+                    this.checkDdlNotification(); // DDL CTAS with Impala
+                  } else if (this.lastExecutedStatement()) {
+                    this.checkDdlNotification();
                   } else {
-                    self.onDdlExecute();
+                    this.onDdlExecute();
                   }
                 }
-                if (self.parentNotebook.isExecutingAll()) {
-                  self.parentNotebook.executingAllIndex(
-                    self.parentNotebook.executingAllIndex() + 1
+                if (this.parentNotebook.isExecutingAll()) {
+                  this.parentNotebook.executingAllIndex(
+                    this.parentNotebook.executingAllIndex() + 1
                   );
                   if (
-                    self.parentNotebook.executingAllIndex() < self.parentNotebook.snippets().length
+                    this.parentNotebook.executingAllIndex() < this.parentNotebook.snippets().length
                   ) {
-                    self.parentNotebook
+                    this.parentNotebook
                       .snippets()
-                      [self.parentNotebook.executingAllIndex()].execute();
+                      [this.parentNotebook.executingAllIndex()].execute();
                   } else {
-                    self.parentNotebook.isExecutingAll(false);
+                    this.parentNotebook.isExecutingAll(false);
                   }
                 }
-                if (!self.result.handle().has_more_statements && self.parentVm.successUrl()) {
-                  huePubSub.publish('open.link', self.parentVm.successUrl()); // Not used anymore in Hue 4
+                if (!this.result.handle().has_more_statements && this.parentVm.successUrl()) {
+                  huePubSub.publish('open.link', this.parentVm.successUrl()); // Not used anymore in Hue 4
                 }
-              } else if (self.status() === STATUS.success) {
-                self.progress(99);
+              } else if (this.status() === STATUS.success) {
+                this.progress(99);
               }
             } else if (data.status === -3) {
-              self.status(STATUS.expired);
-              self.parentNotebook.isExecutingAll(false);
+              this.status(STATUS.expired);
+              this.parentNotebook.isExecutingAll(false);
             } else {
-              self.handleAjaxError(data);
-              self.parentNotebook.isExecutingAll(false);
+              this.handleAjaxError(data);
+              this.parentNotebook.isExecutingAll(false);
             }
           }
-        }
-      ).fail((xhr, textStatus) => {
-        if (xhr.status !== 502) {
-          $(document).trigger('error', xhr.responseText || textStatus);
-        }
-        self.status(STATUS.failed);
-        self.parentNotebook.isExecutingAll(false);
-      });
+        })
+        .fail((xhr, textStatus) => {
+          if (xhr.status !== 502) {
+            $(document).trigger('error', xhr.responseText || textStatus);
+          }
+          this.status(STATUS.failed);
+          this.parentNotebook.isExecutingAll(false);
+        });
     };
     const activeStatus = ['running', 'starting', 'waiting'];
-    const _getLogs = function(isLastTime) {
-      self.getLogs().then(() => {
-        const lastTime = activeStatus.indexOf(self.status()) < 0; // We to run getLogs at least one time after status is terminated to make sure we have last logs
+    const _getLogs = isLastTime => {
+      this.getLogs().then(() => {
+        const lastTime = activeStatus.indexOf(this.status()) < 0; // We to run getLogs at least one time after status is terminated to make sure we have last logs
         if (lastTime && isLastTime) {
           return;
         }
-        const delay = self.result.executionTime() > 45000 ? 5000 : 1000; // 5s if more than 45s
-        self.getLogsTimeout = setTimeout(_getLogs.bind(self, lastTime), delay);
+        const delay = this.result.executionTime() > 45000 ? 5000 : 1000; // 5s if more than 45s
+        this.getLogsTimeout = setTimeout(_getLogs.bind(this, lastTime), delay);
       });
     };
     _checkStatus();
-    _getLogs(activeStatus.indexOf(self.status()) < 0);
+    _getLogs(activeStatus.indexOf(this.status()) < 0);
   }
 
   clear() {
-    const self = this;
     hueAnalytics.log('notebook', 'clear');
-    self.ace().setValue('', 1);
-    self.result.clear();
-    self.status(STATUS.ready);
+    this.ace().setValue('', 1);
+    this.result.clear();
+    this.status(STATUS.ready);
   }
 
   close() {
-    const self = this;
-    if (self.checkStatusTimeout != null) {
-      clearTimeout(self.checkStatusTimeout);
-      self.checkStatusTimeout = null;
-      clearTimeout(self.getLogsTimeout);
-      self.getLogsTimeout = null;
+    if (this.checkStatusTimeout != null) {
+      clearTimeout(this.checkStatusTimeout);
+      this.checkStatusTimeout = null;
+      clearTimeout(this.getLogsTimeout);
+      this.getLogsTimeout = null;
     }
 
     $.post('/notebook/api/close_statement', {
-      notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-      snippet: komapping.toJSON(self.getContext())
+      notebook: notebookToContextJSON(this.parentNotebook),
+      snippet: snippetToContextJSON(this)
     });
   }
 
@@ -1415,38 +1403,33 @@ class Snippet {
   }
 
   explain() {
-    const self = this;
     hueAnalytics.log('notebook', 'explain');
 
     if (
-      self.statement() === '' ||
-      self.status() === STATUS.running ||
-      self.status() === STATUS.loading
+      this.statement() === '' ||
+      this.status() === STATUS.running ||
+      this.status() === STATUS.loading
     ) {
       return;
     }
 
-    self.result.explanation('');
-    self.errors([]);
-    self.progress(0);
-    self.status(STATUS.ready);
+    this.result.explanation('');
+    this.errors([]);
+    this.progress(0);
+    this.status(STATUS.ready);
 
-    $.post(
-      '/notebook/api/explain',
-      {
-        notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-        snippet: komapping.toJSON(self.getContext())
-      },
-      data => {
-        if (data.status === 0) {
-          self.currentQueryTab('queryExplain');
-          self.result.fetchedOnce(true);
-          self.result.explanation(data.explanation);
-        } else {
-          self.handleAjaxError(data);
-        }
+    $.post('/notebook/api/explain', {
+      notebook: notebookToContextJSON(this.parentNotebook),
+      snippet: snippetToContextJSON(this)
+    }).then(data => {
+      if (data.status === 0) {
+        this.currentQueryTab('queryExplain');
+        this.result.fetchedOnce(true);
+        this.result.explanation(data.explanation);
+      } else {
+        this.handleAjaxError(data);
       }
-    );
+    });
   }
 
   async exportHistory() {
@@ -1462,14 +1445,13 @@ class Snippet {
   }
 
   fetchExecutionAnalysis() {
-    const self = this;
-    if (self.type() === TYPE.impala) {
+    if (this.type() === TYPE.impala) {
       // TODO: Use real query ID
       huePubSub.publish('editor.update.execution.analysis', {
         analysisPossible: true,
-        compute: self.compute(),
-        queryId: self.parentNotebook.getContext().id(),
-        name: self.jobs()[0] && self.jobs()[0].name
+        compute: this.compute(),
+        queryId: this.parentNotebook.id(),
+        name: this.jobs()[0] && this.jobs()[0].name
       });
     } else {
       huePubSub.publish('editor.update.execution.analysis', {
@@ -1479,28 +1461,27 @@ class Snippet {
   }
 
   fetchQueries() {
-    const self = this;
-    apiHelper.cancelActiveRequest(self.lastFetchQueriesRequest);
+    apiHelper.cancelActiveRequest(this.lastFetchQueriesRequest);
 
     const QUERIES_PER_PAGE = 50;
-    self.lastQueriesPage = self.queriesCurrentPage();
-    self.loadingQueries(true);
-    self.queriesHasErrors(false);
-    self.lastFetchQueriesRequest = apiHelper.searchDocuments({
-      successCallback: function(result) {
-        self.queriesTotalPages(Math.ceil(result.count / QUERIES_PER_PAGE));
-        self.queries(komapping.fromJS(result.documents)());
-        self.loadingQueries(false);
-        self.queriesHasErrors(false);
+    this.lastQueriesPage = this.queriesCurrentPage();
+    this.loadingQueries(true);
+    this.queriesHasErrors(false);
+    this.lastFetchQueriesRequest = apiHelper.searchDocuments({
+      successCallback: result => {
+        this.queriesTotalPages(Math.ceil(result.count / QUERIES_PER_PAGE));
+        this.queries(komapping.fromJS(result.documents)());
+        this.loadingQueries(false);
+        this.queriesHasErrors(false);
       },
-      errorCallback: function() {
-        self.loadingQueries(false);
-        self.queriesHasErrors(true);
+      errorCallback: () => {
+        this.loadingQueries(false);
+        this.queriesHasErrors(true);
       },
-      page: self.queriesCurrentPage(),
+      page: this.queriesCurrentPage(),
       limit: QUERIES_PER_PAGE,
-      type: 'query-' + self.type(),
-      query: self.queriesFilter(),
+      type: 'query-' + this.type(),
+      query: this.queriesFilter(),
       include_trashed: false
     });
   }
@@ -1512,32 +1493,31 @@ class Snippet {
 
   // fetchResultData(rows, startOver) {
   //   console.log('fetchResultData');
-  //   const self = this;
-  //   if (!self.isFetchingData) {
-  //     if (self.status() === STATUS.available) {
-  //       self.startLongOperationTimeout();
-  //       self.isFetchingData = true;
+  //   if (!this.isFetchingData) {
+  //     if (this.status() === STATUS.available) {
+  //       this.startLongOperationTimeout();
+  //       this.isFetchingData = true;
   //       hueAnalytics.log('notebook', 'fetchResult/' + rows + '/' + startOver);
   //       $.post(
   //         '/notebook/api/fetch_result_data',
   //         {
-  //           notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-  //           snippet: komapping.toJSON(self.getContext()),
+  //           notebook: notebookContextToJSON(this.parentNotebook),
+  //           snippet: snippetContextToJSON(this),
   //           rows: rows,
   //           startOver: startOver
   //         },
   //         data => {
-  //           self.stopLongOperationTimeout();
+  //           this.stopLongOperationTimeout();
   //           data = JSON.bigdataParse(data);
   //           if (data.status === 0) {
-  //             self.showExecutionAnalysis(true);
-  //             self.loadData(data.result, rows);
+  //             this.showExecutionAnalysis(true);
+  //             this.loadData(data.result, rows);
   //           } else {
-  //             self.handleAjaxError(data, () => {
-  //               self.isFetchingData = false;
-  //               self.fetchResultData(rows, startOver);
+  //             this.handleAjaxError(data, () => {
+  //               this.isFetchingData = false;
+  //               this.fetchResultData(rows, startOver);
   //             });
-  //             $(document).trigger('renderDataError', { snippet: self });
+  //             $(document).trigger('renderDataError', { snippet: this });
   //           }
   //         },
   //         'text'
@@ -1548,53 +1528,49 @@ class Snippet {
   //           }
   //         })
   //         .always(() => {
-  //           self.isFetchingData = false;
+  //           this.isFetchingData = false;
   //         });
   //     } else {
-  //       huePubSub.publish('editor.snippet.result.normal', self);
+  //       huePubSub.publish('editor.snippet.result.normal', this);
   //     }
   //   }
   // }
 
   fetchResultMetadata() {
-    const self = this;
-    $.post(
-      '/notebook/api/fetch_result_metadata',
-      {
-        notebook: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-        snippet: komapping.toJSON(self.getContext())
-      },
-      data => {
+    $.post('/notebook/api/fetch_result_metadata', {
+      notebook: notebookToContextJSON(this.parentNotebook),
+      snippet: snippetToContextJSON(this)
+    })
+      .then(data => {
         if (data.status === 0) {
-          self.result.meta(data.result.meta);
+          this.result.meta(data.result.meta);
         } else {
           $(document).trigger('error', data.message);
         }
-      }
-    ).fail(xhr => {
-      if (xhr.status !== 502) {
-        $(document).trigger('error', xhr.responseText);
-      }
-      self.status(STATUS.failed);
-    });
+      })
+      .fail(xhr => {
+        if (xhr.status !== 502) {
+          $(document).trigger('error', xhr.responseText);
+        }
+        this.status(STATUS.failed);
+      });
   }
 
   fetchResultSize(n, query_id) {
-    const self = this;
     apiHelper
       .fetchResultSize({
-        notebookJson: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-        snippetJson: komapping.toJSON(self.getContext())
+        notebookJson: notebookToContextJSON(this.parentNotebook),
+        snippetJson: snippetToContextJSON(this)
       })
       .then(data => {
-        if (query_id === self.parentNotebook.id()) {
+        if (query_id === this.parentNotebook.id()) {
           // If still on the same result
           if (data.status === 0) {
             if (data.result.rows != null) {
-              self.result.rows(data.result.rows);
-            } else if (self.type() === TYPE.impala && n > 0) {
+              this.result.rows(data.result.rows);
+            } else if (this.type() === TYPE.impala && n > 0) {
               setTimeout(() => {
-                self.fetchResultSize(n - 1, query_id);
+                this.fetchResultSize(n - 1, query_id);
               }, 1000);
             }
           } else if (data.status === 5) {
@@ -1607,83 +1583,59 @@ class Snippet {
   }
 
   format() {
-    const self = this;
-    if (self.isSqlDialect()) {
+    if (this.isSqlDialect()) {
       apiHelper
         .formatSql({
           statements:
-            self.ace().getSelectedText() !== ''
-              ? self.ace().getSelectedText()
-              : self.statement_raw()
+            this.ace().getSelectedText() !== ''
+              ? this.ace().getSelectedText()
+              : this.statement_raw()
         })
         .done(data => {
           if (data.status === 0) {
-            if (self.ace().getSelectedText() !== '') {
-              self
-                .ace()
-                .session.replace(
-                  self.ace().session.selection.getRange(),
-                  data.formatted_statements
-                );
+            if (this.ace().getSelectedText() !== '') {
+              this.ace().session.replace(
+                this.ace().session.selection.getRange(),
+                data.formatted_statements
+              );
             } else {
-              self.statement_raw(data.formatted_statements);
-              self.ace().setValue(self.statement_raw(), 1);
+              this.statement_raw(data.formatted_statements);
+              this.ace().setValue(this.statement_raw(), 1);
             }
           } else {
-            self.handleAjaxError(data);
+            this.handleAjaxError(data);
           }
         });
     }
     hueAnalytics.log('notebook', 'format');
   }
 
-  getContext() {
-    const self = this;
-    return {
-      id: self.id,
-      type: self.type,
-      status: self.status,
-      statementType: self.statementType,
-      statement: self.statement,
-      aceCursorPosition: self.aceCursorPosition,
-      statementPath: self.statementPath,
-      associatedDocumentUuid: self.associatedDocumentUuid,
-      properties: self.properties,
-      result: self.result.getContext(),
-      database: self.database,
-      compute: self.compute(),
-      wasBatchExecuted: self.wasBatchExecuted()
-    };
-  }
-
   getExternalStatement() {
-    const self = this;
-    self.externalStatementLoaded(false);
+    this.externalStatementLoaded(false);
     apiHelper
       .getExternalStatement({
-        notebookJson: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-        snippetJson: komapping.toJSON(self.getContext())
+        notebookJson: notebookToContextJSON(this.parentNotebook),
+        snippetJson: snippetToContextJSON(this)
       })
       .then(data => {
         if (data.status === 0) {
-          self.externalStatementLoaded(true);
-          self.statement_raw(data.statement);
-          self.ace().setValue(self.statement_raw(), 1);
+          this.externalStatementLoaded(true);
+          this.statement_raw(data.statement);
+          this.ace().setValue(this.statement_raw(), 1);
         } else {
-          self.handleAjaxError(data);
+          this.handleAjaxError(data);
         }
       });
   }
 
   getLogs() {
-    const self = this;
     apiHelper
       .getLogs({
-        notebookJson: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-        snippetJson: komapping.toJSON(self.getContext()),
-        from: self.result.logLines,
-        jobsJson: komapping.toJSON(self.jobs, { ignore: ['percentJob'] }),
-        fullLog: self.result.logs
+        notebookJson: notebookToContextJSON(this.parentNotebook),
+        snippetJson: snippetToContextJSON(this),
+        from: this.result.logLines,
+        jobsJson: komapping.toJSON(this.jobs, { ignore: ['percentJob'] }),
+        fullLog: this.result.logs
       })
       .then(data => {
         if (data.status === 1) {
@@ -1694,21 +1646,21 @@ class Snippet {
         if (data.status === 0) {
           if (data.logs.length > 0) {
             const logs = data.logs.split('\n');
-            self.result.logLines += logs.length;
-            const oldLogs = self.result.logs();
+            this.result.logLines += logs.length;
+            const oldLogs = this.result.logs();
             if (
               data.logs &&
               (oldLogs === '' ||
-                (self.wasBatchExecuted() && data.logs.indexOf('Unable to locate') === -1) ||
+                (this.wasBatchExecuted() && data.logs.indexOf('Unable to locate') === -1) ||
                 data.isFullLogs)
             ) {
-              self.result.logs(data.logs);
+              this.result.logs(data.logs);
             } else {
-              self.result.logs(oldLogs + '\n' + data.logs);
+              this.result.logs(oldLogs + '\n' + data.logs);
             }
           }
 
-          self.jobs().forEach(job => {
+          this.jobs().forEach(job => {
             if (typeof job.percentJob === 'undefined') {
               job.percentJob = ko.observable(-1);
             }
@@ -1716,7 +1668,7 @@ class Snippet {
 
           if (data.jobs && data.jobs.length > 0) {
             data.jobs.forEach(job => {
-              const _found = ko.utils.arrayFilter(self.jobs(), item => {
+              const _found = ko.utils.arrayFilter(this.jobs(), item => {
                 return item.name === job.name;
               });
               if (_found.length === 0) {
@@ -1725,46 +1677,45 @@ class Snippet {
                 } else {
                   job.percentJob = ko.observable(job.percentJob);
                 }
-                self.jobs.push(job);
+                this.jobs.push(job);
               } else if (typeof job.percentJob !== 'undefined') {
                 for (let i = 0; i < _found.length; i++) {
                   _found[i].percentJob(job.percentJob);
                 }
               }
             });
-            self.jobs().forEach(job => {
-              const _found = ko.utils.arrayFilter(self.jobs(), item => {
+            this.jobs().forEach(job => {
+              const _found = ko.utils.arrayFilter(this.jobs(), item => {
                 return item.name === job.name;
               });
               if (_found.length === 0) {
-                self.jobs.remove(job);
+                this.jobs.remove(job);
               }
             });
           }
-          if (self.status() === STATUS.running) {
+          if (this.status() === STATUS.running) {
             // Maybe the query finished or failed in the meantime
-            self.progress(data.progress);
+            this.progress(data.progress);
           }
         } else {
-          self.handleAjaxError(data);
+          this.handleAjaxError(data);
         }
       })
       .fail((xhr, textStatus) => {
         if (xhr.status !== 502) {
           $(document).trigger('error', xhr.responseText || textStatus);
         }
-        self.status(STATUS.failed);
+        this.status(STATUS.failed);
       });
   }
 
   getPigParameters() {
-    const self = this;
     const params = {};
-    const variables = self.statement_raw().match(/([^\\]|^)\$[^\d'"](\w*)/g);
-    const declares = self.statement_raw().match(/%declare +([^ ])+/gi);
-    const defaults = self.statement_raw().match(/%default +([^;])+/gi);
-    const macro_defines = self.statement_raw().match(/define [^ ]+ *\(([^)]*)\)/gi); // no multiline
-    const macro_returns = self.statement_raw().match(/returns +([^{]*)/gi); // no multiline
+    const variables = this.statement_raw().match(/([^\\]|^)\$[^\d'"](\w*)/g);
+    const declares = this.statement_raw().match(/%declare +([^ ])+/gi);
+    const defaults = this.statement_raw().match(/%default +([^;])+/gi);
+    const macro_defines = this.statement_raw().match(/define [^ ]+ *\(([^)]*)\)/gi); // no multiline
+    const macro_returns = this.statement_raw().match(/returns +([^{]*)/gi); // no multiline
 
     if (variables) {
       variables.forEach(param => {
@@ -1820,19 +1771,17 @@ class Snippet {
   }
 
   getPlaceHolder() {
-    const self = this;
-    return self.parentVm.getSnippetViewSettings(self.type()).placeHolder;
+    return this.parentVm.getSnippetViewSettings(this.type()).placeHolder;
   }
 
   getSimilarQueries() {
-    const self = this;
     hueAnalytics.log('notebook', 'get_query_similarity');
 
     apiHelper
       .statementSimilarity({
-        notebookJson: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-        snippetJson: komapping.toJSON(self.getContext()),
-        sourcePlatform: self.type()
+        notebookJson: notebookToContextJSON(this.parentNotebook),
+        snippetJson: snippetToContextJSON(this),
+        sourcePlatform: this.type()
       })
       .then(data => {
         if (data.status === 0) {
@@ -1845,11 +1794,10 @@ class Snippet {
   }
 
   guessMetaField(field) {
-    const self = this;
     let _fld = null;
     if (field) {
-      if (self.result.cleanedMeta().length > 0) {
-        self.result.cleanedMeta().forEach(fld => {
+      if (this.result.cleanedMeta().length > 0) {
+        this.result.cleanedMeta().forEach(fld => {
           if (
             fld.name.toLowerCase() === field.toLowerCase() ||
             field.toLowerCase() === fld.name.toLowerCase()
@@ -1863,11 +1811,10 @@ class Snippet {
   }
 
   guessMetaFields(fields) {
-    const self = this;
     const _fields = [];
     if (fields) {
       fields.forEach(fld => {
-        const _field = self.guessMetaField(fld);
+        const _field = this.guessMetaField(fld);
         if (_field) {
           _fields.push(_field);
         }
@@ -1877,23 +1824,22 @@ class Snippet {
   }
 
   handleAjaxError(data, callback) {
-    const self = this;
     if (data.status === -2) {
       // TODO: Session expired, check if handleAjaxError is used for ENABLE_NOTEBOOK_2
     } else if (data.status === -3) {
       // Statement expired
-      self.status(STATUS.expired);
+      this.status(STATUS.expired);
       if (data.message) {
-        self.errors.push({ message: data.message, help: null, line: null, col: null });
-        huePubSub.publish('editor.snippet.result.normal', self);
+        this.errors.push({ message: data.message, help: null, line: null, col: null });
+        huePubSub.publish('editor.snippet.result.normal', this);
       }
     } else if (data.status === -4) {
       // Operation timed out
-      self.parentNotebook.retryModalCancel = function() {
-        self.status(STATUS.failed);
+      this.parentNotebook.retryModalCancel = () => {
+        this.status(STATUS.failed);
         huePubSub.publish('hide.retry.modal');
       };
-      self.parentNotebook.retryModalConfirm = function() {
+      this.parentNotebook.retryModalConfirm = () => {
         if (callback) {
           callback();
         }
@@ -1902,14 +1848,14 @@ class Snippet {
       huePubSub.publish('show.retry.modal');
     } else if (data.status === 401) {
       // Auth required
-      self.status(STATUS.expired);
+      this.status(STATUS.expired);
       $(document).trigger('showAuthModal', {
-        type: self.type(),
-        callback: self.execute,
+        type: this.type(),
+        callback: this.execute,
         message: data.message
       });
     } else if (data.status === 1 || data.status === -1) {
-      self.status(STATUS.failed);
+      this.status(STATUS.failed);
       const match = ERROR_REGEX.exec(data.message);
       if (match) {
         let errorLine = parseInt(match[1]);
@@ -1917,14 +1863,14 @@ class Snippet {
         if (typeof match[3] !== 'undefined') {
           errorCol = parseInt(match[3]);
         }
-        if (self.positionStatement()) {
+        if (this.positionStatement()) {
           if (errorCol && errorLine === 1) {
-            errorCol += self.positionStatement().location.first_column;
+            errorCol += this.positionStatement().location.first_column;
           }
-          errorLine += self.positionStatement().location.first_line - 1;
+          errorLine += this.positionStatement().location.first_line - 1;
         }
 
-        self.errors.push({
+        this.errors.push({
           message: data.message.replace(
             match[0],
             'line ' + errorLine + (errorCol !== null ? ':' + errorCol : '')
@@ -1934,7 +1880,7 @@ class Snippet {
           col: errorCol
         });
       } else {
-        self.errors.push({
+        this.errors.push({
           message: data.message,
           help: data.help,
           line: null,
@@ -1943,111 +1889,102 @@ class Snippet {
       }
     } else {
       $(document).trigger('error', data.message);
-      self.status(STATUS.failed);
+      this.status(STATUS.failed);
     }
   }
 
   handleAssistSelection(databaseDef) {
-    const self = this;
-    if (self.ignoreNextAssistDatabaseUpdate) {
-      self.ignoreNextAssistDatabaseUpdate = false;
-    } else if (databaseDef.sourceType === self.type()) {
-      if (self.namespace() !== databaseDef.namespace) {
-        self.namespace(databaseDef.namespace);
+    if (this.ignoreNextAssistDatabaseUpdate) {
+      this.ignoreNextAssistDatabaseUpdate = false;
+    } else if (databaseDef.sourceType === this.type()) {
+      if (this.namespace() !== databaseDef.namespace) {
+        this.namespace(databaseDef.namespace);
       }
-      if (self.database() !== databaseDef.name) {
-        self.database(databaseDef.name);
+      if (this.database() !== databaseDef.name) {
+        this.database(databaseDef.name);
       }
     }
   }
 
   init() {
-    const self = this;
     if (
-      (self.status() === STATUS.running || self.status() === STATUS.available) &&
-      self.parentNotebook.isHistory()
+      (this.status() === STATUS.running || this.status() === STATUS.available) &&
+      this.parentNotebook.isHistory()
     ) {
-      self.checkStatus();
-    } else if (self.status() === STATUS.loading) {
-      self.status(STATUS.failed);
-      self.progress(0);
-      self.jobs([]);
-    } else if (self.status() === STATUS.readyExecute) {
-      self.execute();
+      this.checkStatus();
+    } else if (this.status() === STATUS.loading) {
+      this.status(STATUS.failed);
+      this.progress(0);
+      this.jobs([]);
+    } else if (this.status() === STATUS.readyExecute) {
+      this.execute();
     }
   }
 
   // loadData(result, rows) {
-  //   const self = this;
   //   rows -= result.data.length;
   //
   //   if (result.data.length > 0) {
-  //     self.currentQueryTab('queryResults');
+  //     this.currentQueryTab('queryResults');
   //   }
   //
   //   if (result.has_more && rows > 0) {
   //     setTimeout(() => {
-  //       self.fetchResultData(rows, false);
+  //       this.fetchResultData(rows, false);
   //     }, 500);
   //   } else if (
-  //     !self.parentVm.editorMode() &&
-  //     !self.parentNotebook.isPresentationMode() &&
-  //     self.parentNotebook.snippets()[self.parentNotebook.snippets().length - 1] === self
+  //     !this.parentVm.editorMode() &&
+  //     !this.parentNotebook.isPresentationMode() &&
+  //     this.parentNotebook.snippets()[this.parentNotebook.snippets().length - 1] === this
   //   ) {
-  //     self.parentNotebook.newSnippet();
+  //     this.parentNotebook.newSnippet();
   //   }
   // }
 
   nextQueriesPage() {
-    const self = this;
-    if (self.queriesCurrentPage() !== self.queriesTotalPages()) {
-      self.queriesCurrentPage(self.queriesCurrentPage() + 1);
-      self.fetchQueries();
+    if (this.queriesCurrentPage() !== this.queriesTotalPages()) {
+      this.queriesCurrentPage(this.queriesCurrentPage() + 1);
+      this.fetchQueries();
     }
   }
 
   onDdlExecute() {
-    const self = this;
-    if (self.result.handle() && self.result.handle().has_more_statements) {
-      window.clearTimeout(self.executeNextTimeout);
-      self.executeNextTimeout = setTimeout(() => {
-        self.execute(true); // Execute next, need to wait as we disabled fast click
+    if (this.result.handle() && this.result.handle().has_more_statements) {
+      window.clearTimeout(this.executeNextTimeout);
+      this.executeNextTimeout = setTimeout(() => {
+        this.execute(true); // Execute next, need to wait as we disabled fast click
       }, 1000);
     }
     if (
-      self.lastExecutedStatement() &&
-      /CREATE|DROP/i.test(self.lastExecutedStatement().firstToken)
+      this.lastExecutedStatement() &&
+      /CREATE|DROP/i.test(this.lastExecutedStatement().firstToken)
     ) {
-      let match = self
-        .statement()
-        .match(
-          /(?:CREATE|DROP)\s+TABLE\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))\..*/i
-        );
+      let match = this.statement().match(
+        /(?:CREATE|DROP)\s+TABLE\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))\..*/i
+      );
       const path = [];
       if (match) {
         path.push(match[1] || match[2]); // group 1 backticked db name, group 2 regular db name
       } else {
-        match = self
-          .statement()
-          .match(
-            /(?:CREATE|DROP)\s+(?:DATABASE|SCHEMA)\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))/i
-          );
+        match = this.statement().match(
+          /(?:CREATE|DROP)\s+(?:DATABASE|SCHEMA)\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))/i
+        );
         if (match) {
           path.push(match[1] || match[2]); // group 1 backticked db name, group 2 regular db name
-        } else if (self.database()) {
-          path.push(self.database());
+        } else if (this.database()) {
+          path.push(this.database());
         }
       }
 
       if (path.length) {
-        window.clearTimeout(self.refreshTimeouts[path.join('.')]);
-        self.refreshTimeouts[path.join('.')] = window.setTimeout(() => {
-          self.ignoreNextAssistDatabaseUpdate = true;
+        window.clearTimeout(this.refreshTimeouts[path.join('.')]);
+        this.refreshTimeouts[path.join('.')] = window.setTimeout(() => {
+          this.ignoreNextAssistDatabaseUpdate = true;
           dataCatalog
             .getEntry({
-              sourceType: self.type(),
-              namespace: self.namespace(),
-              compute: self.compute(),
+              sourceType: this.type(),
+              namespace: this.namespace(),
+              compute: this.compute(),
               path: path
             })
             .done(entry => {
@@ -2059,27 +1996,25 @@ class Snippet {
   }
 
   onKeydownInVariable(context, e) {
-    const self = this;
     if ((e.ctrlKey || e.metaKey) && e.which === 13) {
       // Ctrl-enter
-      self.ace().commands.commands['execute'].exec();
+      this.ace().commands.commands['execute'].exec();
     } else if ((e.ctrlKey || e.metaKey) && e.which === 83) {
       // Ctrl-s
-      self.ace().commands.commands['save'].exec();
+      this.ace().commands.commands['save'].exec();
       e.preventDefault(); // Prevent browser page save dialog
     }
     return true;
   }
 
   prepopulateChart() {
-    const self = this;
-    const type = self.chartType();
+    const type = this.chartType();
     hueAnalytics.log('notebook', 'chart/' + type);
 
-    if (type === window.HUE_CHARTS.TYPES.MAP && self.result.cleanedNumericMeta().length >= 2) {
-      if (self.chartX() === null || typeof self.chartX() === 'undefined') {
-        let name = self.result.cleanedNumericMeta()[0].name;
-        self.result.cleanedNumericMeta().forEach(fld => {
+    if (type === window.HUE_CHARTS.TYPES.MAP && this.result.cleanedNumericMeta().length >= 2) {
+      if (this.chartX() === null || typeof this.chartX() === 'undefined') {
+        let name = this.result.cleanedNumericMeta()[0].name;
+        this.result.cleanedNumericMeta().forEach(fld => {
           if (
             fld.name.toLowerCase().indexOf('lat') > -1 ||
             fld.name.toLowerCase().indexOf('ltd') > -1
@@ -2087,11 +2022,11 @@ class Snippet {
             name = fld.name;
           }
         });
-        self.chartX(name);
+        this.chartX(name);
       }
-      if (self.chartYSingle() === null || typeof self.chartYSingle() === 'undefined') {
-        let name = self.result.cleanedNumericMeta()[1].name;
-        self.result.cleanedNumericMeta().forEach(fld => {
+      if (this.chartYSingle() === null || typeof this.chartYSingle() === 'undefined') {
+        let name = this.result.cleanedNumericMeta()[1].name;
+        this.result.cleanedNumericMeta().forEach(fld => {
           if (
             fld.name.toLowerCase().indexOf('lon') > -1 ||
             fld.name.toLowerCase().indexOf('lng') > -1
@@ -2099,82 +2034,80 @@ class Snippet {
             name = fld.name;
           }
         });
-        self.chartYSingle(name);
+        this.chartYSingle(name);
       }
       return;
     }
 
     if (
-      (self.chartX() === null || typeof self.chartX() === 'undefined') &&
+      (this.chartX() === null || typeof this.chartX() === 'undefined') &&
       (type === window.HUE_CHARTS.TYPES.BARCHART ||
         type === window.HUE_CHARTS.TYPES.PIECHART ||
         type === window.HUE_CHARTS.TYPES.GRADIENTMAP) &&
-      self.result.cleanedStringMeta().length >= 1
+      this.result.cleanedStringMeta().length >= 1
     ) {
-      self.chartX(self.result.cleanedStringMeta()[0].name);
+      this.chartX(this.result.cleanedStringMeta()[0].name);
     }
 
-    if (self.result.cleanedNumericMeta().length > 0) {
+    if (this.result.cleanedNumericMeta().length > 0) {
       if (
-        self.chartYMulti().length === 0 &&
+        this.chartYMulti().length === 0 &&
         (type === window.HUE_CHARTS.TYPES.BARCHART || type === window.HUE_CHARTS.TYPES.LINECHART)
       ) {
-        self.chartYMulti.push(
-          self.result.cleanedNumericMeta()[Math.min(self.result.cleanedNumericMeta().length - 1, 1)]
+        this.chartYMulti.push(
+          this.result.cleanedNumericMeta()[Math.min(this.result.cleanedNumericMeta().length - 1, 1)]
             .name
         );
       } else if (
-        (self.chartYSingle() === null || typeof self.chartYSingle() === 'undefined') &&
+        (this.chartYSingle() === null || typeof this.chartYSingle() === 'undefined') &&
         (type === window.HUE_CHARTS.TYPES.PIECHART ||
           type === window.HUE_CHARTS.TYPES.MAP ||
           type === window.HUE_CHARTS.TYPES.GRADIENTMAP ||
           type === window.HUE_CHARTS.TYPES.SCATTERCHART ||
-          (type === window.HUE_CHARTS.TYPES.BARCHART && self.chartXPivot() !== null))
+          (type === window.HUE_CHARTS.TYPES.BARCHART && this.chartXPivot() !== null))
       ) {
-        if (self.chartYMulti().length === 0) {
-          self.chartYSingle(
-            self.result.cleanedNumericMeta()[
-              Math.min(self.result.cleanedNumericMeta().length - 1, 1)
+        if (this.chartYMulti().length === 0) {
+          this.chartYSingle(
+            this.result.cleanedNumericMeta()[
+              Math.min(this.result.cleanedNumericMeta().length - 1, 1)
             ].name
           );
         } else {
-          self.chartYSingle(self.chartYMulti()[0]);
+          this.chartYSingle(this.chartYMulti()[0]);
         }
       }
     }
   }
 
   prevQueriesPage() {
-    const self = this;
-    if (self.queriesCurrentPage() !== 1) {
-      self.queriesCurrentPage(self.queriesCurrentPage() - 1);
-      self.fetchQueries();
+    if (this.queriesCurrentPage() !== 1) {
+      this.queriesCurrentPage(this.queriesCurrentPage() - 1);
+      this.fetchQueries();
     }
   }
 
   queryCompatibility(targetPlatform) {
-    const self = this;
-    apiHelper.cancelActiveRequest(self.lastCompatibilityRequest);
+    apiHelper.cancelActiveRequest(this.lastCompatibilityRequest);
 
     hueAnalytics.log('notebook', 'compatibility');
-    self.compatibilityCheckRunning(targetPlatform !== self.type());
-    self.hasSuggestion(null);
-    const positionStatement = self.positionStatement();
+    this.compatibilityCheckRunning(targetPlatform !== this.type());
+    this.hasSuggestion(null);
+    const positionStatement = this.positionStatement();
 
-    self.lastCompatibilityRequest = apiHelper
+    this.lastCompatibilityRequest = apiHelper
       .statementCompatibility({
-        notebookJson: komapping.toJSON(self.parentNotebook.getContext(), NOTEBOOK_MAPPING),
-        snippetJson: komapping.toJSON(self.getContext()),
-        sourcePlatform: self.compatibilitySourcePlatform().value,
-        targetPlatform: self.compatibilityTargetPlatform().value
+        notebookJson: notebookToContextJSON(this.parentNotebook),
+        snippetJson: snippetToContextJSON(this),
+        sourcePlatform: this.compatibilitySourcePlatform().value,
+        targetPlatform: this.compatibilityTargetPlatform().value
       })
       .then(data => {
         if (data.status === 0) {
-          self.aceErrorsHolder([]);
-          self.aceWarningsHolder([]);
-          self.suggestion(komapping.fromJS(data.query_compatibility));
-          if (self.suggestion().queryError && self.suggestion().queryError.errorString()) {
-            const match = ERROR_REGEX.exec(self.suggestion().queryError.errorString());
+          this.aceErrorsHolder([]);
+          this.aceWarningsHolder([]);
+          this.suggestion(komapping.fromJS(data.query_compatibility));
+          if (this.suggestion().queryError && this.suggestion().queryError.errorString()) {
+            const match = ERROR_REGEX.exec(this.suggestion().queryError.errorString());
             let line = null;
             if (match) {
               if (positionStatement) {
@@ -2183,26 +2116,26 @@ class Snippet {
                 line = parseInt(match[1]) - 1;
               }
             }
-            self.aceWarningsHolder.push({
-              message: self.suggestion().queryError.errorString(),
+            this.aceWarningsHolder.push({
+              message: this.suggestion().queryError.errorString(),
               line: line,
               col:
                 match === null ? null : typeof match[3] !== 'undefined' ? parseInt(match[3]) : null
             });
-            self.status(STATUS.withOptimizerReport);
+            this.status(STATUS.withOptimizerReport);
           }
-          if (self.suggestion().parseError()) {
-            const match = ERROR_REGEX.exec(self.suggestion().parseError());
-            self.aceErrorsHolder.push({
-              message: self.suggestion().parseError(),
+          if (this.suggestion().parseError()) {
+            const match = ERROR_REGEX.exec(this.suggestion().parseError());
+            this.aceErrorsHolder.push({
+              message: this.suggestion().parseError(),
               line: match === null ? null : parseInt(match[1]) - 1,
               col:
                 match === null ? null : typeof match[3] !== 'undefined' ? parseInt(match[3]) : null
             });
-            self.status(STATUS.withOptimizerReport);
+            this.status(STATUS.withOptimizerReport);
           }
-          self.showOptimizer(true);
-          self.hasSuggestion(true);
+          this.showOptimizer(true);
+          this.hasSuggestion(true);
         } else {
           $(document).trigger('error', data.message);
         }
@@ -2213,22 +2146,20 @@ class Snippet {
         }
       })
       .always(() => {
-        self.compatibilityCheckRunning(false);
+        this.compatibilityCheckRunning(false);
       });
   }
 
   reexecute() {
-    const self = this;
-    self.result.cancelBatchExecution();
-    self.execute();
+    this.result.cancelBatchExecution();
+    this.execute();
   }
 
   removeContextTab(context) {
-    const self = this;
-    if (context.tabId === self.currentQueryTab()) {
-      self.currentQueryTab('queryHistory');
+    if (context.tabId === this.currentQueryTab()) {
+      this.currentQueryTab('queryHistory');
     }
-    self.pinnedContextTabs.remove(context);
+    this.pinnedContextTabs.remove(context);
   }
 
   renderMarkdown() {
@@ -2265,16 +2196,14 @@ class Snippet {
   }
 
   startLongOperationTimeout() {
-    const self = this;
-    self.longOperationTimeout = window.setTimeout(() => {
-      self.showLongOperationWarning(true);
+    this.longOperationTimeout = window.setTimeout(() => {
+      this.showLongOperationWarning(true);
     }, 2000);
   }
 
   stopLongOperationTimeout() {
-    const self = this;
-    window.clearTimeout(self.longOperationTimeout);
-    self.showLongOperationWarning(false);
+    window.clearTimeout(this.longOperationTimeout);
+    this.showLongOperationWarning(false);
   }
 
   toggleAllResultColumns(linkElement) {
@@ -2295,45 +2224,37 @@ class Snippet {
   }
 
   toggleResultSettings() {
-    const self = this;
-    self.isResultSettingsVisible(!self.isResultSettingsVisible());
+    this.isResultSettingsVisible(!this.isResultSettingsVisible());
   }
 
   uploadQuery(query_id) {
-    const self = this;
     $.post('/metadata/api/optimizer/upload/query', {
       query_id: query_id,
-      sourcePlatform: self.type()
+      sourcePlatform: this.type()
     });
   }
 
   uploadQueryHistory(n) {
-    const self = this;
     hueAnalytics.log('notebook', 'upload_query_history');
 
-    $.post(
-      '/metadata/api/optimizer/upload/history',
-      {
-        n: typeof n != 'undefined' ? n : null,
-        sourcePlatform: self.type()
-      },
-      data => {
-        if (data.status === 0) {
-          $(document).trigger(
-            'info',
-            data.upload_history[self.type()].count +
-              ' queries uploaded successfully. Processing them...'
-          );
-          self.watchUploadStatus(data.upload_history[self.type()].status.workloadId);
-        } else {
-          $(document).trigger('error', data.message);
-        }
+    $.post('/metadata/api/optimizer/upload/history', {
+      n: typeof n != 'undefined' ? n : null,
+      sourcePlatform: this.type()
+    }).then(data => {
+      if (data.status === 0) {
+        $(document).trigger(
+          'info',
+          data.upload_history[this.type()].count +
+            ' queries uploaded successfully. Processing them...'
+        );
+        this.watchUploadStatus(data.upload_history[this.type()].status.workloadId);
+      } else {
+        $(document).trigger('error', data.message);
       }
-    );
+    });
   }
 
   uploadTableStats(options) {
-    const self = this;
     hueAnalytics.log('notebook', 'load_table_stats');
     if (options.showProgress) {
       $(document).trigger('info', 'Preparing table data...');
@@ -2342,13 +2263,13 @@ class Snippet {
     $.post(
       '/metadata/api/optimizer/upload/table_stats',
       {
-        db_tables: komapping.toJSON(
+        db_tables: JSON.stringify(
           options.activeTables.map(table => table.databaseName + '.' + table.tableName)
         ),
-        sourcePlatform: komapping.toJSON(self.type()),
-        with_ddl: komapping.toJSON(true),
-        with_table_stats: komapping.toJSON(true),
-        with_columns_stats: komapping.toJSON(true)
+        sourcePlatform: JSON.stringify(this.type()),
+        with_ddl: JSON.stringify(true),
+        with_table_stats: JSON.stringify(true),
+        with_columns_stats: JSON.stringify(true)
       },
       data => {
         if (data.status === 0) {
@@ -2362,7 +2283,7 @@ class Snippet {
           }
           if (data.upload_table_ddl && options.showProgress) {
             // With showProgress only currently as can be very slow
-            self.watchUploadStatus(data.upload_table_ddl.status.workloadId, options.showProgress);
+            this.watchUploadStatus(data.upload_table_ddl.status.workloadId, options.showProgress);
           }
         } else if (options.showProgress) {
           $(document).trigger('error', data.message);
@@ -2376,48 +2297,42 @@ class Snippet {
   }
 
   watchUploadStatus(workloadId, showProgress) {
-    const self = this;
-    $.post(
-      '/metadata/api/optimizer/upload/status',
-      {
-        workloadId: workloadId
-      },
-      data => {
-        if (data.status === 0) {
-          if (showProgress) {
-            $(document).trigger('info', 'Query processing: ' + data.upload_status.status.state);
-          }
-          if (['WAITING', 'IN_PROGRESS'].indexOf(data.upload_status.status.state) !== -1) {
-            window.setTimeout(() => {
-              self.watchUploadStatus(workloadId);
-            }, 2000);
-          } else if (showProgress) {
-            $(document).trigger(
-              'warn',
-              data.upload_status.status.statusMsg +
-                (data.upload_status.status.failedQueries > 0
-                  ? '. ' +
-                    data.upload_status.status.failQueryDetails.map(query => {
-                      return query.error;
-                    })
-                  : '')
-            );
-          }
-        } else if (showProgress) {
-          $(document).trigger('error', data.message);
+    $.post('/metadata/api/optimizer/upload/status', {
+      workloadId: workloadId
+    }).then(data => {
+      if (data.status === 0) {
+        if (showProgress) {
+          $(document).trigger('info', 'Query processing: ' + data.upload_status.status.state);
         }
+        if (['WAITING', 'IN_PROGRESS'].indexOf(data.upload_status.status.state) !== -1) {
+          window.setTimeout(() => {
+            this.watchUploadStatus(workloadId);
+          }, 2000);
+        } else if (showProgress) {
+          $(document).trigger(
+            'warn',
+            data.upload_status.status.statusMsg +
+              (data.upload_status.status.failedQueries > 0
+                ? '. ' +
+                  data.upload_status.status.failQueryDetails.map(query => {
+                    return query.error;
+                  })
+                : '')
+          );
+        }
+      } else if (showProgress) {
+        $(document).trigger('error', data.message);
       }
-    );
+    });
   }
 
   whenContextSet() {
-    const self = this;
     let namespaceSub;
     const namespaceDeferred = $.Deferred();
-    if (self.namespace()) {
-      namespaceDeferred.resolve(self.namespace());
+    if (this.namespace()) {
+      namespaceDeferred.resolve(this.namespace());
     } else {
-      namespaceSub = self.namespace.subscribe(newVal => {
+      namespaceSub = this.namespace.subscribe(newVal => {
         if (newVal) {
           namespaceDeferred.resolve(newVal);
           namespaceSub.dispose();
@@ -2426,10 +2341,10 @@ class Snippet {
     }
     let computeSub;
     const computeDeferred = $.Deferred();
-    if (self.compute()) {
-      computeDeferred.resolve(self.compute());
+    if (this.compute()) {
+      computeDeferred.resolve(this.compute());
     } else {
-      computeSub = self.compute.subscribe(newVal => {
+      computeSub = this.compute.subscribe(newVal => {
         if (newVal) {
           computeDeferred.resolve(newVal);
           computeSub.dispose();
@@ -2439,7 +2354,7 @@ class Snippet {
 
     const result = $.when(namespaceDeferred, computeDeferred);
 
-    result.dispose = function() {
+    result.dispose = () => {
       if (namespaceSub) {
         namespaceSub.dispose();
       }
@@ -2453,5 +2368,3 @@ class Snippet {
     return result;
   }
 }
-
-export { Snippet, STATUS };
