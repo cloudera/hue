@@ -720,6 +720,11 @@ def coerce_password_from_script(script):
   p = subprocess.Popen(script, shell=True, stdout=subprocess.PIPE)
   stdout, stderr = p.communicate()
 
+  if isinstance(stdout, bytes):
+    stdout = stdout.decode('utf-8')
+  if isinstance(stderr, bytes):
+    stderr = stderr.decode('utf-8')
+
   if p.returncode != 0:
     if stderr:
       LOG.error("Failed to read password from script:\n%s" % stderr)

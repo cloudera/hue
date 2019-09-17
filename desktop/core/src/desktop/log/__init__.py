@@ -35,8 +35,10 @@ from desktop.log.formatter import MessageOnlyFormatter
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
+  open_file = open
 else:
   from cStringIO import StringIO as string_io
+  open_file = file
 
 DEFAULT_LOG_DIR = 'logs'
 LOG_FORMAT = '[%(asctime)s] %(module)-12s %(levelname)-8s %(message)s'
@@ -65,7 +67,7 @@ def _read_log_conf(proc_name, log_dir):
     return None
 
   try:
-    raw = file(log_conf).read()
+    raw = open_file(log_conf).read()
     sio = string_io(CONF_RE.sub(_repl, raw))
     return sio
   except IOError as ex:
