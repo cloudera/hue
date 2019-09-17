@@ -1,0 +1,196 @@
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+import $ from 'jquery';
+import ko from 'knockout';
+
+import 'ko/bindings/ko.publish';
+
+import apiHelper from 'api/apiHelper';
+import componentUtils from 'ko/components/componentUtils';
+import hueAnalytics from 'utils/hueAnalytics';
+import I18n from 'utils/i18n';
+import { notebookToContextJSON, snippetToContextJSON } from 'apps/notebook2/notebookSerde';
+import { STATUS } from 'apps/notebook2/snippet';
+
+const TEMPLATE = `
+<div class="snippet-editor-actions">
+  <div class="btn-group">
+    <button class="btn btn-mini btn-editor dropdown-toggle" data-toggle="dropdown">
+      <i class="fa fa-fw fa-ellipsis-v"></i> ${I18n('More')}
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu pull-right">
+      <li>
+        <a href="javascript:void(0)" data-bind="click: explain, css: {'disabled': !explainEnabled() }" title="${I18n(
+          'Explain the current SQL query'
+        )}">
+          <i class="fa fa-fw fa-map-o"></i> ${I18n('Explain')}
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0)" data-bind="click: format, css: { 'disabled': !formatEnabled() }" title="${I18n(
+          'Format the current SQL query'
+        )}">
+          <i class="fa fa-fw fa-indent"></i> ${I18n('Format')}
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0)" data-bind="click: clear, css: {'disabled': !clearEnabled() }" title="${I18n(
+          'Clear the current editor'
+        )}">
+          <i class="fa fa-fw fa-eraser"></i> ${I18n('Clear')}
+        </a>
+      </li>
+      <!-- ko if: window.HAS_OPTIMIZER -->
+      <li>
+        <a href="javascript:void(0)" data-bind="click: checkCompatibility, css: {'disabled': !compatibilityEnabled() }" title="${I18n(
+          'Get hints on how to port SQL from other databases'
+        )}">
+          <i class="fa fa-fw fa-random"></i> ${I18n('Check compatibility')}
+        </a>
+      </li>
+      <!-- ko if: window.DJANGO_DEBUG_MODE && window.USER_IS_ADMIN -->
+      <li>
+        <a href="javascript:void(0)" data-bind="publish: 'editor.upload.history'" title="${I18n(
+          'Load recent queries in order to improve recommendations'
+        )}">
+          <i class="fa fa-fw fa-cloud-upload"></i> ${I18n('Upload optimizer history')}
+        </a>
+      </li>
+      <!-- /ko -->
+      <!-- /ko -->
+      <li>
+        <a href="javascript:void(0)" data-bind="toggle: snippet.settingsVisible, visible: snippet.hasProperties" title="${I18n(
+          'Query settings'
+        )}">
+          <i class="fa fa-fw fa-cog"></i> ${I18n('Settings')}
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+`;
+
+class SnippetEditorActions {
+  constructor(params) {
+    this.snippet = params.snippet;
+
+    this.clearEnabled = this.snippet.isReady;
+
+    this.compatibilityEnabled = ko.pureComputed(
+      () => this.snippet.type() === 'hive' || this.snippet.type() === 'impala'
+    );
+
+    this.explainEnabled = ko.pureComputed(
+      () =>
+        this.snippet.isReady() &&
+        this.snippet.statement() !== '' &&
+        this.snippet.status() !== STATUS.running &&
+        this.snippet.status() !== STATUS.loading
+    );
+
+    this.formatEnabled = ko.pureComputed(
+      () =>
+        this.snippet.isReady() &&
+        this.snippet.isSqlDialect() &&
+        this.snippet.statement_raw() &&
+        this.snippet.statement_raw().length < 400000
+    );
+  }
+
+  checkCompatibility() {
+    if (!this.compatibilityEnabled()) {
+      return;
+    }
+    hueAnalytics.log('notebook', 'compatibility');
+
+    // TODO: Move compatibility check logic here
+    this.snippet.checkCompatibility();
+  }
+
+  clear() {
+    if (!this.clearEnabled()) {
+      return;
+    }
+    hueAnalytics.log('notebook', 'clear');
+
+    this.snippet.ace().setValue('', 1);
+    this.snippet.result.clear();
+    this.snippet.status(STATUS.ready);
+  }
+
+  explain() {
+    if (!this.explainEnabled()) {
+      return;
+    }
+    hueAnalytics.log('notebook', 'explain');
+
+    this.snippet.result.explanation('');
+    this.snippet.errors([]);
+    this.snippet.progress(0);
+    this.snippet.status(STATUS.ready);
+
+    $.post('/notebook/api/explain', {
+      notebook: notebookToContextJSON(this.snippet.parentNotebook),
+      snippet: snippetToContextJSON(this.snippet)
+    }).then(data => {
+      if (data.status === 0) {
+        this.snippet.currentQueryTab('queryExplain');
+        this.snippet.result.fetchedOnce(true);
+        this.snippet.result.explanation(data.explanation);
+      } else {
+        this.snippet.handleAjaxError(data);
+      }
+    });
+  }
+
+  format() {
+    if (!this.formatEnabled()) {
+      return;
+    }
+
+    hueAnalytics.log('notebook', 'format');
+    apiHelper
+      .formatSql({
+        statements:
+          this.snippet.ace().getSelectedText() !== ''
+            ? this.snippet.ace().getSelectedText()
+            : this.snippet.statement_raw()
+      })
+      .done(data => {
+        if (data.status === 0) {
+          if (this.snippet.ace().getSelectedText() !== '') {
+            this.snippet
+              .ace()
+              .session.replace(
+                this.snippet.ace().session.selection.getRange(),
+                data.formatted_statements
+              );
+          } else {
+            this.snippet.statement_raw(data.formatted_statements);
+            this.snippet.ace().setValue(this.snippet.statement_raw(), 1);
+          }
+        } else {
+          this.snippet.handleAjaxError(data);
+        }
+      });
+  }
+
+  dispose() {}
+}
+
+componentUtils.registerComponent('snippet-editor-actions', SnippetEditorActions, TEMPLATE);

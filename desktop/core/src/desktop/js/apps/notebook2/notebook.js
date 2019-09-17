@@ -226,13 +226,6 @@ export default class Notebook {
     return newSnippet;
   }
 
-  cancelExecutingAll() {
-    const index = this.executingAllIndex();
-    if (this.isExecutingAll() && this.snippets()[index]) {
-      this.snippets()[index].cancel();
-    }
-  }
-
   clearHistory() {
     hueAnalytics.log('notebook', 'clearHistory');
     apiHelper

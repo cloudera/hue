@@ -28,6 +28,8 @@ const EXECUTION_FLOW = {
   // batchNoBreak: 'batchNoBreak'
 };
 
+export const EXECUTOR_UPDATED_EVENT = 'hue.executor.updated';
+
 const BATCHABLE_STATEMENT_TYPES = /ALTER|CREATE|DELETE|DROP|GRANT|INSERT|INVALIDATE|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i;
 
 class Executor {
@@ -91,7 +93,7 @@ class Executor {
         executable === this.currentExecutable ||
         this.executed.some(executed => executed === executable)
       ) {
-        huePubSub.publish('hue.executor.updated', {
+        huePubSub.publish(EXECUTOR_UPDATED_EVENT, {
           executable: executable,
           executor: this
         });
