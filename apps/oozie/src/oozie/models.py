@@ -39,7 +39,7 @@ from django.core.validators import RegexValidator
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.forms.models import inlineformset_factory
-from django.utils.encoding import force_unicode, smart_str
+from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 import django.utils.timezone as dtz
 
@@ -61,8 +61,10 @@ from oozie.timezones import TIMEZONES
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
+  from django.utils.encoding import force_text as force_unicode
 else:
   from cStringIO import StringIO as string_io
+  from django.utils.encoding import force_unicode
 
 
 LOG = logging.getLogger(__name__)

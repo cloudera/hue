@@ -15,17 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import str
 from builtins import object
 import logging
 import re
+import sys
 import threading
 import time
 import json
 
 from django.core.cache import caches
 from django.urls import reverse
-from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 from kazoo.client import KazooClient
 
@@ -48,6 +47,12 @@ from beeswax.common import apply_natural_sort
 from beeswax.design import hql_query
 from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.models import QueryHistory, QUERY_TYPES
+
+
+if sys.version_info[0] > 2:
+    from django.utils.encoding import force_text as force_unicode
+else:
+    from django.utils.encoding import force_unicode
 
 
 LOG = logging.getLogger(__name__)

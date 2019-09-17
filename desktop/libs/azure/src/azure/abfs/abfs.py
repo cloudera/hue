@@ -23,13 +23,12 @@ standard_library.install_aliases()
 from builtins import object
 import logging
 import os
+import sys
 import threading
 import re
 
 from math import ceil
 from posixpath import join
-from urllib.parse import urlparse
-from urllib import quote
 
 from hadoop.hdfs_site import get_umask_mode
 from hadoop.fs.exceptions import WebHdfsException
@@ -41,6 +40,13 @@ from azure.abfs.abfsfile import ABFSFile
 from azure.abfs.abfsstats import ABFSStat
 from azure.conf import PERMISSION_ACTION_ABFS
 
+if sys.version_info[0] > 2:
+  import urllib.request, urllib.error
+  from urllib.parse import quote as urllib_quote
+  from urllib.parse import urlparse as lib_urlparse
+else:
+  from urlparse import urlparse as lib_urlparse
+  from urllib import quote as urllib_quote
 
 LOG = logging.getLogger(__name__)
 
@@ -75,7 +81,7 @@ class ABFS(object):
     self._logical_name = logical_name
     self._supergroup = hdfs_supergroup
     self._auth_provider = auth_provider
-    split = urlparse(fs_defaultfs)
+    split = lib_urlparse(fs_defaultfs)
     self._scheme = split.scheme
     self._netloc = split.netloc
     self._is_remote = True
@@ -509,7 +515,7 @@ class ABFS(object):
     Renames a file
     """ 
     LOG.debug("%s\n%s" % (old, new))
-    headers = {'x-ms-rename-source' : '/' + quote(Init_ABFS.strip_scheme(old)) }
+    headers = {'x-ms-rename-source' : '/' + urllib_quote(Init_ABFS.strip_scheme(old)) }
     try:
       self._create_path(new, headers=headers, overwrite=True)
     except WebHdfsException as e:
