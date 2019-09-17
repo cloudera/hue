@@ -8,6 +8,10 @@ spec:
   # type: LoadBalancer
   selector:
     pod: hue
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 86400
   ports:
     - protocol: TCP
       port: 80

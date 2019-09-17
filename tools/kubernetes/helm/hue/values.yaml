@@ -3,7 +3,7 @@ image:
    tag: "latest"
    pullPolicy: "IfNotPresent"
 hue:
-  replicas: 1
+  replicas: 2
   database:
     create: true
     persist: true
