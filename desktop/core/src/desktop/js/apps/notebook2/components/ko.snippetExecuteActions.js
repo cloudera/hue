@@ -19,7 +19,10 @@ import ko from 'knockout';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { EXECUTION_STATUS } from '../execution/executableStatement';
+import { EXECUTION_STATUS } from 'apps/notebook2/execution/executableStatement';
+import { EXECUTOR_UPDATED_EVENT } from 'apps/notebook2/execution/executor';
+
+export const NAME = 'snippet-execute-actions';
 
 const TEMPLATE = `
 <div class="snippet-execute-actions">
@@ -47,13 +50,17 @@ const TEMPLATE = `
 
 class SnippetExecuteActions {
   constructor(params) {
+    this.disposals = [];
     this.stopping = ko.observable(false);
     this.snippet = params.snippet;
     this.status = ko.observable(EXECUTION_STATUS.ready);
-    huePubSub.subscribe('hue.executor.updated', executorUpdate => {
+    const updateSub = huePubSub.subscribe('hue.executor.updated', executorUpdate => {
       if (this.snippet.executor() === executorUpdate.executor) {
         this.status(executorUpdate.executable.status);
       }
+    });
+    this.disposals.push(() => {
+      updateSub.remove();
     });
   }
 
@@ -72,7 +79,11 @@ class SnippetExecuteActions {
     this.snippet.execute();
   }
 
-  dispose() {}
+  dispose() {
+    while (this.disposals.length) {
+      this.disposals.pop()();
+    }
+  }
 }
 
-componentUtils.registerComponent('snippet-execute-actions', SnippetExecuteActions, TEMPLATE);
+componentUtils.registerComponent(NAME, SnippetExecuteActions, TEMPLATE);

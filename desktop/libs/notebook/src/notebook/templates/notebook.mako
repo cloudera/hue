@@ -27,7 +27,7 @@
 <%namespace name="hueAceAutocompleter" file="/hue_ace_autocompleter.mako" />
 
 
-<span id="notebookComponents" class="notebook">
+<div id="notebookComponents" class="notebook">
 %if ENABLE_NOTEBOOK_2.get():
   ${ editorComponents2.includes(is_embeddable=is_embeddable, suffix='notebook') }
   ${ editorComponents2.topBar(suffix='notebook') }
@@ -79,4 +79,4 @@
 
   ${ editorComponents.commonJS(is_embeddable=is_embeddable, bindableElement='notebookComponents', suffix='notebook') }
 %endif
-</span>
+</div>

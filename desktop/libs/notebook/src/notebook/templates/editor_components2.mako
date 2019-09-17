@@ -33,7 +33,7 @@
   % if not is_embeddable:
     <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
   % endif
-  <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
+  <link rel="stylesheet" href="${ static('notebook/css/notebook2.css') }">
   <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
 
   <link rel="stylesheet" href="${ static('desktop/ext/css/medium-editor.min.css') }">
@@ -392,11 +392,7 @@
 
 
   <div data-bind="css: {'main-content': true, 'editor-mode': $root.editorMode()}">
-    <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() || $root.isPresentationMode() || $root.isResultFullScreenMode() ? '0' : '20px' }" >
-      <div class="vertical-full">
-        <div class="vertical-full tab-pane row-fluid panel-container" data-bind="css: { active: selectedNotebook() === $data }, template: { name: 'notebook${ suffix }'}">
-        </div>
-      </div>
+    <div class="vertical-full tab-pane row-fluid panel-container" data-bind="css: { active: selectedNotebook() === $data }, template: { name: 'notebook${ suffix }'}">
     </div>
   </div>
 
@@ -428,56 +424,54 @@
       % endif
 
     <div class="content-panel" data-bind="event: { scroll: function(){ var ls = $(MAIN_SCROLLABLE).data('lastScroll'); if (ls && ls != $(MAIN_SCROLLABLE).scrollTop()){ $(document).trigger('hideAutocomplete'); }; $(MAIN_SCROLLABLE).data('lastScroll', $(MAIN_SCROLLABLE).scrollTop()) } }, with: selectedNotebook">
-      <div>
-        <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing, 'margin-left-10': $root.isPresentationMode},
-        sortable: {
-          template: 'snippet${ suffix }',
-          data: snippets,
-          isEnabled: true,
-          options: {
-            'handle': '.move-widget',
-            'axis' : 'y',
-            'opacity': 0.8,
-            'placeholder': 'snippet-move-placeholder',
-            'greedy': true,
-            'stop': function(event, ui) {
-              var $element = $(event.target);
-              $element.find('.snippet-body').slideDown('fast', function () { $(MAIN_SCROLLABLE).scrollTop(lastWindowScrollPosition); });
-            },
-            'helper': function(event) {
-              lastWindowScrollPosition = $(MAIN_SCROLLABLE).scrollTop();
-              var $element = $(event.target);
-              $element.find('.snippet-body').slideUp('fast', function () {
-                $('.sortable-snippets').sortable('refreshPositions')
-              });
-              var _par = $('<div>')
-                .css('overflow', 'hidden')
-                .addClass('card-widget snippet-move-helper')
-                .width($element.parents('.snippet').width());
-              $('<h2>')
-                .addClass('card-heading')
-                .html($element.parents('h2').html())
-                .appendTo(_par)
-                .find('.hover-actions, .snippet-actions')
-                .removeClass('hover-actions')
-                .removeClass('snippet-actions');
-              $('<pre>')
-                .addClass('dragging-pre muted')
-                .html(ko.dataFor($element.parents('.card-widget')[0]).statement())
-                .appendTo(_par);
-              _par.css('height', '100px');
-              return _par;
-            }
+      <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing},
+      sortable: {
+        template: 'snippet${ suffix }',
+        data: snippets,
+        isEnabled: true,
+        options: {
+          'handle': '.move-widget',
+          'axis' : 'y',
+          'opacity': 0.8,
+          'placeholder': 'snippet-move-placeholder',
+          'greedy': true,
+          'stop': function(event, ui) {
+            var $element = $(event.target);
+            $element.find('.snippet-body').slideDown('fast', function () { $(MAIN_SCROLLABLE).scrollTop(lastWindowScrollPosition); });
           },
-          dragged: function (widget) {
-            $('.snippet-body').slideDown('fast', function () { $(MAIN_SCROLLABLE).scrollTop(lastWindowScrollPosition); });
+          'helper': function(event) {
+            lastWindowScrollPosition = $(MAIN_SCROLLABLE).scrollTop();
+            var $element = $(event.target);
+            $element.find('.snippet-body').slideUp('fast', function () {
+              $('.sortable-snippets').sortable('refreshPositions')
+            });
+            var _par = $('<div>')
+              .css('overflow', 'hidden')
+              .addClass('card-widget snippet-move-helper')
+              .width($element.parents('.snippet').width());
+            $('<h2>')
+              .addClass('card-heading')
+              .html($element.parents('h2').html())
+              .appendTo(_par)
+              .find('.hover-actions, .snippet-actions')
+              .removeClass('hover-actions')
+              .removeClass('snippet-actions');
+            $('<pre>')
+              .addClass('dragging-pre muted')
+              .html(ko.dataFor($element.parents('.card-widget')[0]).statement())
+              .appendTo(_par);
+            _par.css('height', '100px');
+            return _par;
           }
-        }">
-        </div>
-        % if hasattr(caller, "addSnippetHTML"):
-          ${ caller.addSnippetHTML() }
-        % endif
+        },
+        dragged: function (widget) {
+          $('.snippet-body').slideDown('fast', function () { $(MAIN_SCROLLABLE).scrollTop(lastWindowScrollPosition); });
+        }
+      }">
       </div>
+      % if hasattr(caller, "addSnippetHTML"):
+        ${ caller.addSnippetHTML() }
+      % endif
     </div>
   </script>
 
@@ -617,7 +611,7 @@
         </ul>
 
         <div class="tab-content" style="border: none; overflow-x: hidden">
-          <div class="tab-pane" id="queryHistory" data-bind="css: {'active': currentQueryTab() == 'queryHistory'}, style: { 'height' : $parent.historyInitialHeight() > 0 ? Math.max($parent.historyInitialHeight(), 40) + 'px' : '' }">
+          <div class="tab-pane" id="queryHistory" style="min-height: 80px;" data-bind="css: {'active': currentQueryTab() == 'queryHistory'}, style: { 'height' : $parent.historyInitialHeight() > 0 ? Math.max($parent.historyInitialHeight(), 40) + 'px' : '' }">
             <!-- ko if: $parent.loadingHistory -->
             <div class="margin-top-10 margin-left-10">
               <i class="fa fa-spinner fa-spin muted"></i>
@@ -807,7 +801,6 @@
       <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
 
       <!-- ko template: { name: 'snippet-header-database-selection' } --><!-- /ko -->
-      <!-- ko template: { name: 'snippet-header-statement-type${ suffix }' } --><!-- /ko -->
 
       <a class="inactive-action move-widget" href="javascript:void(0)"><i class="fa fa-arrows"></i></a>
       <a class="inactive-action" href="javascript:void(0)" data-bind="toggle: settingsVisible, visible: hasProperties, css: { 'blue' : settingsVisible }" title="${ _('Snippet settings') }"><i class="fa fa-cog"></i></a>
@@ -823,9 +816,7 @@
       <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
 
       <!-- ko template: { name: 'snippet-header-database-selection' } --><!-- /ko -->
-      <!-- ko template: { name: 'snippet-header-statement-type${ suffix }' } --><!-- /ko -->
 
-      <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="toggle: settingsVisible, visible: hasProperties, css: { 'blue' : settingsVisible }" title="${ _('Query settings') }"><i class="fa fa-cog"></i></a>
       <a class="inactive-action margin-left-10 pointer" title="${ _('Show editor help') }" data-toggle="modal" data-target="#helpModal${ suffix }"><i class="fa fa-question"></i></a>
     </div>
   </script>
@@ -846,15 +837,6 @@
     <!-- /ko -->
   </script>
 
-  <script type="text/html" id="snippet-header-statement-type${ suffix }">
-      % if ENABLE_EXTERNAL_STATEMENT.get():
-        <!-- ko if: isSqlDialect() -->
-        <span class="editor-header-title">${ _('Type') }</span>
-        <div data-bind="component: { name: 'hue-drop-down', params: { value: statementType, entries: statementTypes, linkTitle: '${ _ko('Statement type') }' } }" style="display: inline-block"></div>
-        <!-- /ko -->
-      % endif
-  </script>
-
   <script type="text/html" id="snippet${ suffix }">
     <div data-bind="visibleOnHover: { override: inFocus() || settingsVisible() || dbSelectionVisible() || $root.editorMode() || saveResultsModalVisible(), selector: '.hover-actions' }">
       <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: $root.editorMode() || inFocus() || saveResultsModalVisible(), selector: '.snippet-actions' }">
@@ -873,7 +855,7 @@
                 <!-- ko template: { if: type() == 'markdown', name: 'markdown-snippet-body${ suffix }' } --><!-- /ko -->
                 <!-- ko template: { if: ['java', 'distcp', 'shell', 'mapreduce', 'jar', 'py', 'spark2'].indexOf(type()) != -1, name: 'executable-snippet-body${ suffix }' } --><!-- /ko -->
               </div>
-              <div style="position: absolute; top:25px; margin-left:35px; width: calc(100% - 35px)" data-bind="style: { 'z-index': 400 - $index() }">
+              <div style="position: absolute; top:25px; width: 100%" data-bind="style: { 'z-index': 400 - $index() }">
                 <!-- ko template: 'snippet-settings${ suffix }' --><!-- /ko -->
               </div>
             </div>
@@ -907,6 +889,16 @@
       </div>
       <div class="snippet-settings-body">
         <form class="form-horizontal">
+          % if ENABLE_EXTERNAL_STATEMENT.get():
+            <!-- ko if: isSqlDialect -->
+            <div class="config-property">
+              <label class="config-label">${ _('Type') }</label>
+              <div class="config-controls">
+                <div style="padding-top: 4px; display: inline-block;" data-bind="component: { name: 'hue-drop-down', params: { value: statementType, entries: statementTypes, linkTitle: '${ _ko('Statement type') }' } }"></div>
+              </div>
+            </div>
+            <!-- /ko -->
+          % endif
           <!-- ko template: { if: typeof properties().driverCores != 'undefined', name: 'property', data: { type: 'number', label: '${ _ko('Driver Cores') }', value: properties().driverCores, title: '${ _ko('Number of cores used by the driver, only in cluster mode (Default: 1)') }'}} --><!-- /ko -->
           <!-- ko template: { if: typeof properties().executorCores != 'undefined', name: 'property', data: { type: 'number', label: '${ _ko('Executor Cores') }', value: properties().executorCores, title: '${ _ko('Number of cores per executor (Default: 1)') }' }} --><!-- /ko -->
           <!-- ko template: { if: typeof properties().numExecutors != 'undefined', name: 'property', data: { type: 'number', label: '${ _ko('Executors') }', value: properties().numExecutors, title: '${ _ko('Number of executors to launch (Default: 2)') }' }} --><!-- /ko -->
@@ -1655,9 +1647,11 @@
   </script>
 
   <script type ="text/html" id="snippet-execution-controls${ suffix }">
-    <div class="snippet-actions">
-      <!-- ko component: { name: 'snippet-execute-actions', params: { snippet: $data } } --><!-- /ko -->
-
+    <div class="snippet-actions clearfix">
+      <div class="pull-left" data-bind="component: { name: 'snippet-execute-actions', params: { snippet: $data } }" />
+      <!-- ko if: isSqlDialect() && !$root.isPresentationMode() -->
+      <div class="pull-right" data-bind="component: { name: 'snippet-editor-actions', params: { snippet: $data } }" />
+      <!-- /ko -->
       <div class="pull-right">
         <!-- ko if: status() === 'loading' -->
         <i class="fa fa-fw fa-spinner fa-spin"></i> ${ _('Creating session') }
@@ -1719,51 +1713,6 @@
 ##           <!-- /ko -->
 ##         % endif
 ##       </div>
-
-      <!-- ko if: isSqlDialect && ! $root.isPresentationMode() -->
-      <div style="display: inline-block" class="inactive-action dropdown hover-actions pointer" data-bind="css: {'disabled': ! isReady() || status() === 'running' || status() === 'loading' }">
-        <a class="snippet-side-btn" style="padding-right:0; padding-left: 2px;" href="javascript: void(0)" data-bind="click: explain, css: {'disabled': ! isReady() || status() === 'running' || status() === 'loading', 'blue': currentQueryTab() == 'queryExplain' }" title="${ _('Explain the current SQL query') }">
-          <i class="fa fa-fw fa-map-o"></i>
-        </a>
-        <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown" href="javascript: void(0)" data-bind="css: {'disabled': ! isReady(), 'blue': currentQueryTab() == 'queryExplain' }">
-          <i class="fa fa-caret-down"></i>
-        </a>
-        <ul class="dropdown-menu less-padding">
-          <li>
-            <a href="javascript:void(0)" data-bind="click: explain, style: { color: ! isReady() || status() === 'running' || status() === 'loading' ? '#999' : ''}, css: {'disabled': ! isReady() || status() === 'running' || status() === 'loading' }" title="${ _('Explain the current SQL query') }">
-              <i class="fa fa-fw fa-map-o"></i> ${_('Explain')}
-            </a>
-          </li>
-          <!-- ko if: formatEnabled -->
-          <li>
-            <a href="javascript:void(0)" data-bind="click: format, css: {'disabled': ! isReady() }" title="${ _('Format the current SQL query') }">
-              <i class="fa fa-fw fa-indent"></i> ${_('Format')}
-            </a>
-          </li>
-          <!-- /ko -->
-          <li>
-            <a href="javascript:void(0)" data-bind="click: clear, css: {'disabled': ! isReady() }" title="${ _('Clear the current editor') }">
-              <i class="fa fa-fw fa-eraser"></i> ${_('Clear')}
-            </a>
-          </li>
-          <!-- ko if: HAS_OPTIMIZER -->
-          <li class="divider"></li>
-          <li>
-            <a href="javascript:void(0)" data-bind="click: checkCompatibility, visible: type() == 'hive' || type() == 'impala'" title="${ _('Get hints on how to port SQL from other databases') }">
-              <i class="fa fa-fw fa-random"></i> ${_('Check compatibility')}
-            </a>
-          </li>
-          % if conf.DJANGO_DEBUG_MODE.get() and is_admin(user):
-            <li>
-              <a href="javascript:void(0)" data-bind="click: function() { huePubSub.publish('editor.upload.history'); }" title="${ _('Load recent queries in order to improve recommendations') }">
-                <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload history')}
-              </a>
-            </li>
-          % endif
-          <!-- /ko -->
-        </ul>
-      </div>
-      <!-- /ko -->
     </div>
   </script>
 

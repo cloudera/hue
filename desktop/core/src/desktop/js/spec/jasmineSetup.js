@@ -60,6 +60,7 @@ export const koSetup = () => {
   afterEach(() => {
     ko.components.defaultLoader.loadTemplate = originalLoadTemplate;
     wrapper.parentNode.removeChild(wrapper);
+    ko.cleanNode(wrapper);
   });
 
   return {

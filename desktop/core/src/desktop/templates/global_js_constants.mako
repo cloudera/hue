@@ -509,6 +509,7 @@
 
   window.USER_VIEW_EDIT_USER_ENABLED = '${ user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or is_admin(user) }' === 'True';
   window.USER_IS_ADMIN = '${ is_admin(user) }' === 'True';
+  window.DJANGO_DEBUG_MODE = '${ conf.DJANGO_DEBUG_MODE.get() }' === 'True';
   window.IS_LDAP_SETUP = '${ 'desktop.auth.backend.LdapBackend' in conf.AUTH.BACKEND.get() }' === 'True';
   window.LOGGED_USERNAME = '${ user.username }';
   window.LOGGED_USER_ID = ${ user.id };

@@ -19,19 +19,20 @@ import ko from 'knockout';
 import komapping from 'knockout.mapping';
 import { markdown } from 'markdown';
 
+import 'apps/notebook2/components/ko.snippetEditorActions';
+import 'apps/notebook2/components/ko.snippetExecuteActions';
+
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
 import apiHelper from 'api/apiHelper';
 import dataCatalog from 'catalog/dataCatalog';
-import { ExecutableStatement } from 'apps/notebook2/execution/executableStatement';
 import Executor from 'apps/notebook2/execution/executor';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 import Result from 'apps/notebook2/result';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
-
-import 'apps/notebook2/components/ko.snippetExecuteButtonActions';
-import { notebookToContextJSON, snippetToContextJSON } from './notebookSerde';
+import { ExecutableStatement } from 'apps/notebook2/execution/executableStatement';
+import { notebookToContextJSON, snippetToContextJSON } from 'apps/notebook2/notebookSerde';
 
 // TODO: Remove. Temporary here for debug
 window.ExecutableStatement = ExecutableStatement;
@@ -1098,11 +1099,6 @@ export default class Snippet {
     this.lastExecutedStatements = undefined;
     this.lastExecutedSelectionRange = undefined;
 
-    this.formatEnabled = ko.pureComputed(
-      () =>
-        this.statement_raw && this.statement_raw() != null && this.statement_raw().length < 400000
-    );
-
     this.lastCompatibilityRequest = undefined;
 
     this.isFetchingData = false;
@@ -1308,13 +1304,6 @@ export default class Snippet {
     _getLogs(activeStatus.indexOf(this.status()) < 0);
   }
 
-  clear() {
-    hueAnalytics.log('notebook', 'clear');
-    this.ace().setValue('', 1);
-    this.result.clear();
-    this.status(STATUS.ready);
-  }
-
   close() {
     if (this.checkStatusTimeout != null) {
       clearTimeout(this.checkStatusTimeout);
@@ -1400,36 +1389,6 @@ export default class Snippet {
     } catch (error) {
       this.stopLongOperationTimeout();
     }
-  }
-
-  explain() {
-    hueAnalytics.log('notebook', 'explain');
-
-    if (
-      this.statement() === '' ||
-      this.status() === STATUS.running ||
-      this.status() === STATUS.loading
-    ) {
-      return;
-    }
-
-    this.result.explanation('');
-    this.errors([]);
-    this.progress(0);
-    this.status(STATUS.ready);
-
-    $.post('/notebook/api/explain', {
-      notebook: notebookToContextJSON(this.parentNotebook),
-      snippet: snippetToContextJSON(this)
-    }).then(data => {
-      if (data.status === 0) {
-        this.currentQueryTab('queryExplain');
-        this.result.fetchedOnce(true);
-        this.result.explanation(data.explanation);
-      } else {
-        this.handleAjaxError(data);
-      }
-    });
   }
 
   async exportHistory() {
@@ -1580,34 +1539,6 @@ export default class Snippet {
           }
         }
       });
-  }
-
-  format() {
-    if (this.isSqlDialect()) {
-      apiHelper
-        .formatSql({
-          statements:
-            this.ace().getSelectedText() !== ''
-              ? this.ace().getSelectedText()
-              : this.statement_raw()
-        })
-        .done(data => {
-          if (data.status === 0) {
-            if (this.ace().getSelectedText() !== '') {
-              this.ace().session.replace(
-                this.ace().session.selection.getRange(),
-                data.formatted_statements
-              );
-            } else {
-              this.statement_raw(data.formatted_statements);
-              this.ace().setValue(this.statement_raw(), 1);
-            }
-          } else {
-            this.handleAjaxError(data);
-          }
-        });
-    }
-    hueAnalytics.log('notebook', 'format');
   }
 
   getExternalStatement() {
