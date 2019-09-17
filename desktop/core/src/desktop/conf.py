@@ -1533,12 +1533,6 @@ HTTP_500_DEBUG_MODE = Config(
   default=True
 )
 
-MEMORY_PROFILER = Config(
-  key='memory_profiler',
-  help=_('Enable or disable memory profiling.'),
-  type=coerce_bool,
-  default=False)
-
 def get_instrumentation_default():
   """If django_debug_mode is True, this is automatically enabled"""
   return DJANGO_DEBUG_MODE.get()
