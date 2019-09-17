@@ -95,6 +95,12 @@ def get_app_info(app_loc):
     res = popen.wait()
     stdout, stderr = popen.communicate()
     # Cmd failure?
+
+    if isinstance(stdout, bytes):
+      stdout = stdout.decode('utf-8')
+    if isinstance(stderr, bytes):
+      stderr = stderr.decode('utf-8')
+
     if res != 0:
       LOG.error("Error getting application info from %s:\n%s" % (app_loc, stderr))
       raise OSError(stderr)
