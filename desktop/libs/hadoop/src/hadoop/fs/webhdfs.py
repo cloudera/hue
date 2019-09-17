@@ -78,7 +78,7 @@ class WebHdfs(Hdfs):
       security_enabled=False,
       ssl_cert_ca_verify=True,
       temp_dir="/tmp",
-      umask=01022,
+      umask=0o1022,
       hdfs_supergroup=None):
     self._url = url
     self._superuser = hdfs_superuser

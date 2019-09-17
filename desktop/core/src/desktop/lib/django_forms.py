@@ -33,7 +33,7 @@ from django.forms.fields import MultiValueField, CharField, ChoiceField, Boolean
 from django.forms.widgets import MultiWidget, Select, TextInput, Textarea, HiddenInput, Input
 from django.utils import formats
 from django.utils.safestring import mark_safe
-from django.utils.encoding import python_2_unicode_compatible, force_unicode
+from django.utils.encoding import python_2_unicode_compatible
 
 import desktop.lib.i18n
 from desktop.lib.i18n import smart_str
@@ -41,8 +41,10 @@ from desktop.lib.i18n import smart_str
 if sys.version_info[0] > 2:
   import urllib.request, urllib.error
   from urllib.parse import quote_plus as urllib_quote_plus
+  from django.utils.encoding import force_text as force_unicode
 else:
   from urllib import quote_plus as urllib_quote_plus
+  from django.utils.encoding import force_unicode
 
 LOG = logging.getLogger(__name__)
 

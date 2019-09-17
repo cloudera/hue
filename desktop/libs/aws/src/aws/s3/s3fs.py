@@ -23,7 +23,7 @@ import logging
 import os
 import posixpath
 import re
-from urlparse import urlparse
+import sys
 import time
 
 from boto.exception import BotoClientError, S3ResponseError
@@ -38,6 +38,12 @@ from aws.conf import get_default_region, get_locations, PERMISSION_ACTION_S3
 from aws.s3 import normpath, s3file, translate_s3_error, S3A_ROOT
 from aws.s3.s3stat import S3Stat
 
+if sys.version_info[0] > 2:
+  import urllib.request, urllib.error
+  from urllib.parse import quote as urllib_quote, urlparse as lib_urlparse
+else:
+  from urllib import quote as urllib_quote
+  from urlparse import urlparse as lib_urlparse
 
 DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
 BUCKET_NAME_PATTERN = re.compile("^((?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9_\-]*[A-Za-z0-9]))$")
@@ -205,7 +211,7 @@ class S3FileSystem(object):
 
   @staticmethod
   def isroot(path):
-    parsed = urlparse(path)
+    parsed = lib_urlparse(path)
     return (parsed.path == '/' or parsed.path == '') and parsed.netloc == ''
 
   @staticmethod
