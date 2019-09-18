@@ -44,7 +44,7 @@
 
   window.CACHEABLE_TTL = {
     default: ${ conf.CUSTOM.CACHEABLE_TTL.get() },
-    optimizer: ${ hasattr(OPTIMIZER, 'ConfigSection') and OPTIMIZER.CACHEABLE_TTL.get() or 0 }
+    optimizer: ${ OPTIMIZER.CACHEABLE_TTL.get() or 0 }
   };
 
   window.DEV = '${ conf.DEV.get() }' === 'True';
