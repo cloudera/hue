@@ -21,18 +21,10 @@ from django.utils.translation import ugettext as _
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
+from beeswax.conf import DOWNLOAD_ROW_LIMIT, DOWNLOAD_BYTES_LIMIT
 from notebook.conf import ENABLE_SQL_INDEXER
-
-
-LOG = logging.getLogger(__name__)
-
-try:
-  from beeswax.conf import DOWNLOAD_ROW_LIMIT, DOWNLOAD_BYTES_LIMIT
-except ImportError, e:
-  LOG.warn("Hive app is not enabled")
-  DOWNLOAD_ROW_LIMIT = None
-  DOWNLOAD_BYTES_LIMIT = None
 %>
+
 
 <%def name="addSnippetMenu()">
   <script type="text/html" id="add-snippet-menu-template">
