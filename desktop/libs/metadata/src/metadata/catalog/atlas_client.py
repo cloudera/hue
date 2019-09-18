@@ -61,7 +61,7 @@ class AtlasApi(Api):
   def __init__(self, user=None):
     super(AtlasApi, self).__init__(user)
 
-    self._api_url = CATALOG.API_URL.get().strip('/')
+    self._api_url = CATALOG.API_URL.get().strip('/') + "/api/atlas"
     self._username = CATALOG.SERVER_USER.get()
     self._password = CATALOG.SERVER_PASSWORD.get()
 
