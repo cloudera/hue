@@ -173,9 +173,13 @@ const TEMPLATE = `
     <!-- ko template: 'assist-document-header-actions' --><!-- /ko -->
   </div>
   <div class="assist-flex-search">
-    <div class="assist-filter"><input class="clearable" type="text" placeholder="${I18n(
-      'Filter...'
-    )}" data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/></div>
+    <div class="assist-filter">
+      <form autocomplete="off">
+        <input class="clearable" type="text" autocorrect="off" autocomplete="do-not-autocomplete" spellcheck="false" placeholder="${I18n(
+          'Filter...'
+        )}" data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/>
+      </form>
+    </div>
   </div>
   <div class="assist-flex-fill assist-file-scrollable" data-bind="delayedOverflow">
     <div data-bind="visible: ! loading() && ! hasErrors() && entries().length > 0">
