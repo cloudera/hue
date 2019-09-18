@@ -18,6 +18,7 @@ from __future__ import division
 from builtins import zip
 from builtins import range
 from builtins import object
+from functools import reduce
 from past.utils import old_div
 import copy
 import glob
@@ -26,19 +27,25 @@ import logging
 import os
 import re
 import types
+import sys
 import struct
 
 from dateutil.parser import parse as dtparse
 from itertools import groupby
 
-from libanalyze.utils import Timer
-
 from libanalyze import models
 from libanalyze import exprs
 from libanalyze import utils
-from functools import reduce
+from libanalyze.utils import Timer
+
+if sys.version_info[0] > 2:
+  string_types = str
+else:
+  string_types = types.StringTypes
+
 
 LOG = logging.getLogger(__name__)
+
 
 def to_double(metric_value):
     return struct.unpack('d', struct.pack('q', metric_value))[0]
@@ -63,7 +70,7 @@ class SQLOperatorReason(object):
     def __init__(self, node_name, metric_names,
                  rule, exprs=[], to_json=True, **kwargs):
         self.node_name = node_name
-        if isinstance(metric_names, types.StringTypes):
+        if isinstance(metric_names, string_types):
             self.metric_names = [metric_names]
         else:
             self.metric_names = metric_names

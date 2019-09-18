@@ -19,6 +19,7 @@ import json
 from itertools import groupby
 from functools import reduce
 
+
 class Contributor(object):
   def __init__(self, **kwargs):
     self.id = None
