@@ -1585,13 +1585,7 @@
     <div class="snippet-execution-status" data-bind="clickForAceFocus: ace">
       <a class="inactive-action pull-left snippet-logs-btn" href="javascript:void(0)" data-bind="visible: status() === 'running' && errors().length == 0, click: function() { hideFixedHeaders(); $data.showLogs(!$data.showLogs());}, css: {'blue': $data.showLogs}" title="${ _('Toggle Logs') }"><i class="fa fa-fw" data-bind="css: { 'fa-caret-right': !$data.showLogs(), 'fa-caret-down': $data.showLogs() }"></i></a>
       <div class="snippet-progress-container" data-bind="visible: status() != 'canceled' && status() != 'with-optimizer-report'">
-        <div class="progress-snippet progress" data-bind="css: {
-        'progress-starting': progress() == 0 && (status() == 'running' || status() == 'starting'),
-        'progress-warning': progress() > 0 && progress() < 100,
-        'progress-success': progress() == 100,
-        'progress-danger': progress() == 0 && errors().length > 0}" style="background-color: #FFF; width: 100%">
-          <div class="bar" data-bind="style: {'width': (errors().length > 0 ? 100 : Math.max(2, progress())) + '%'}"></div>
-        </div>
+        <!-- ko component: { name: 'executable-progress-bar', params: { snippet: $data } } --><!-- /ko -->
       </div>
       <div class="snippet-error-container alert alert-error" style="margin-bottom: 0" data-bind="visible: errors().length > 0">
         <ul class="unstyled" data-bind="foreach: errors">
