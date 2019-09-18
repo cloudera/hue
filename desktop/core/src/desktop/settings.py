@@ -353,9 +353,11 @@ EMAIL_SUBJECT_PREFIX = 'Hue %s - ' % desktop.conf.CLUSTER_ID.get()
 if os.getenv('DESKTOP_DB_CONFIG'):
   conn_string = os.getenv('DESKTOP_DB_CONFIG')
   logging.debug("DESKTOP_DB_CONFIG SET: %s" % (conn_string))
-  default_db = dict(list(zip(
-    ["ENGINE", "NAME", "TEST_NAME", "USER", "PASSWORD", "HOST", "PORT"],
-    conn_string.split(':'))))
+  default_db = dict(
+    list(
+      zip(["ENGINE", "NAME", "TEST_NAME", "USER", "PASSWORD", "HOST", "PORT"], conn_string.split(':'))
+    )
+  )
   default_db['NAME'] = default_db['NAME'].replace('#', ':') # For is_db_alive command
 else:
   test_name = os.environ.get('DESKTOP_DB_TEST_NAME', get_desktop_root('desktop-test.db'))
