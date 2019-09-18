@@ -47,7 +47,7 @@ OPTIMIZER_TENANT_ID_CACHE_KEY = 'navopt-tenant-id'
 try:
   from navoptapi.api_lib import ApiLib
 except Exception as e:
-  LOG.exception('NavOpt module is not installed: %s' % e)
+  LOG.warn('NavOpt module is not installed: %s' % e)
 
 
 class NavOptException(Exception):

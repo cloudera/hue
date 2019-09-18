@@ -24,6 +24,7 @@ from . import conf
 from . import confparse
 from hadoop.conf import DEFAULT_NN_HTTP_PORT
 
+
 LOG = logging.getLogger(__name__)
 
 _HDFS_SITE_DICT = None
@@ -82,7 +83,7 @@ def _parse_hdfs_site():
 
   try:
     hdfs_site_path = os.path.join(conf.HDFS_CLUSTERS['default'].HADOOP_CONF_DIR.get(), 'hdfs-site.xml')
-    data = file(hdfs_site_path, 'r').read()
+    data = open(hdfs_site_path, 'r').read()
   except KeyError:
     data = ""
   except IOError as err:

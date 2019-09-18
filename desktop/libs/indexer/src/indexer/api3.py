@@ -56,12 +56,13 @@ from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
 from indexer.indexers.flume import FlumeIndexer
 
 if sys.version_info[0] > 2:
-  from io import string_io as string_io
+  from io import StringIO as string_io
   from urllib.parse import urlparse, unquote as urllib_unquote
 else:
   from StringIO import StringIO as string_io
   from urllib import unquote as urllib_unquote
   from urlparse import urlparse
+
 
 LOG = logging.getLogger(__name__)
 

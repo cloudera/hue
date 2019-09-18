@@ -36,7 +36,7 @@ DATE_FORMAT = "%Y-%m-%d"
 try:
   from navoptapi.api_lib import ApiLib
 except Exception as e:
-  LOG.exception('NavOpt module is not installed: %s' % e)
+  LOG.warn('NavOpt module is not installed: %s' % e)
 
 
 def _exec(service, command, parameters=None):
