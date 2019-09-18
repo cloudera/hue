@@ -50,7 +50,9 @@ const TEMPLATE = `
       </div>
       <div class="assist-flex-search">
         <div class="assist-filter">
-          <input class="clearable" type="text" placeholder="Filter..." data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
+          <form autocomplete="off">
+            <input class="clearable" type="text" autocorrect="off" autocomplete="do-not-autocomplete" spellcheck="false" placeholder="Filter..." data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
+          </form>
         </div>
       </div>
       <div class="assist-docs-topics" data-bind="css: { 'assist-flex-fill': !selectedTopic(), 'assist-flex-40': selectedTopic() }">
