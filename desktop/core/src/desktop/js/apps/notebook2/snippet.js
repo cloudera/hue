@@ -19,6 +19,7 @@ import ko from 'knockout';
 import komapping from 'knockout.mapping';
 import { markdown } from 'markdown';
 
+import 'apps/notebook2/components/ko.executableProgressBar';
 import 'apps/notebook2/components/ko.snippetEditorActions';
 import 'apps/notebook2/components/ko.snippetExecuteActions';
 

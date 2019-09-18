@@ -25,6 +25,7 @@ import sessionManager from 'apps/notebook2/execution/sessionManager';
  */
 export const EXECUTION_STATUS = {
   available: 'available',
+  failed: 'failed',
   success: 'success',
   expired: 'expired',
   running: 'running',
@@ -81,6 +82,7 @@ export class ExecutableStatement {
       let statusCheckCount = 0;
       let checkStatusTimeout = -1;
 
+      // TODO: Switch to async/await when we have cancellable Promise (not $.deferred)
       const checkStatus = () =>
         new Promise((statusResolve, statusReject) => {
           statusCheckCount++;
@@ -152,6 +154,8 @@ export class ExecutableStatement {
               });
           })
           .fail(error => {
+            this.status = EXECUTION_STATUS.failed;
+            notifyUpdates(this);
             reject(error);
           });
       });

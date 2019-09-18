@@ -99,7 +99,7 @@ describe('executableStatement.js', () => {
       .execute()
       .then(fail)
       .catch(() => {
-        expect(subject.status).toEqual(EXECUTION_STATUS.running);
+        expect(subject.status).toEqual(EXECUTION_STATUS.failed);
         done();
       });
 

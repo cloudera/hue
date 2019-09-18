@@ -10,10 +10,10 @@ describe('ko.snippetExecuteActions.js', () => {
   it('should render component', async () => {
     const element = await setup.renderComponent(NAME, {});
 
-    expect(element.querySelector('.snippet-execute-actions')).toBeTruthy();
+    expect(element.querySelector('[data-test="' + NAME + '"]')).toBeTruthy();
   });
 
-  it('should handle play and stop clicks', async () => {
+  it('should handle execute and stop clicks', async () => {
     let executeCalled = false;
     let cancelCalled = false;
     const mockExecutor = {
@@ -33,9 +33,9 @@ describe('ko.snippetExecuteActions.js', () => {
 
     // Click play
     expect(executeCalled).toBeFalsy();
-    expect(wrapper.querySelector('.fa-play')).toBeTruthy();
-    expect(wrapper.querySelector('.fa-stop')).toBeFalsy();
-    wrapper.querySelector('.fa-play').click();
+    expect(wrapper.querySelector('[data-test="execute"]')).toBeTruthy();
+    expect(wrapper.querySelector('[data-test="stop"]')).toBeFalsy();
+    wrapper.querySelector('[data-test="execute"]').click();
 
     expect(executeCalled).toBeTruthy();
     huePubSub.publish(EXECUTOR_UPDATED_EVENT, {
@@ -49,9 +49,9 @@ describe('ko.snippetExecuteActions.js', () => {
 
     // Click stop
     expect(cancelCalled).toBeFalsy();
-    expect(wrapper.querySelector('.fa-play')).toBeFalsy();
-    expect(wrapper.querySelector('.fa-stop')).toBeTruthy();
-    wrapper.querySelector('.fa-stop').click();
+    expect(wrapper.querySelector('[data-test="execute"]')).toBeFalsy();
+    expect(wrapper.querySelector('[data-test="stop"]')).toBeTruthy();
+    wrapper.querySelector('[data-test="stop"]').click();
 
     expect(cancelCalled).toBeTruthy();
   });

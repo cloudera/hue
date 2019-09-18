@@ -61,6 +61,7 @@ export const koSetup = () => {
     ko.components.defaultLoader.loadTemplate = originalLoadTemplate;
     wrapper.parentNode.removeChild(wrapper);
     ko.cleanNode(wrapper);
+    expect(window.document.querySelectorAll('[data-test]').length).toEqual(0);
   });
 
   return {
