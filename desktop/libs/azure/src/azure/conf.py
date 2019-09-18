@@ -17,11 +17,11 @@ from __future__ import absolute_import
 
 import logging
 
-
 from django.utils.translation import ugettext_lazy as _, ugettext as _t
+from hadoop.core_site import get_adls_client_id, get_adls_authentication_code, get_adls_refresh_url
 
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_password_from_script
-from hadoop.core_site import get_adls_client_id, get_adls_authentication_code, get_adls_refresh_url
+
 
 LOG = logging.getLogger(__name__)
 

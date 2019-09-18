@@ -24,18 +24,19 @@ from datetime import datetime, timedelta
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
-from metadata.conf import ALTUS, K8S
-from navoptapi.api_lib import ApiLib
-
-
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
-
+from metadata.conf import ALTUS, K8S
 
 LOG = logging.getLogger(__name__)
 
 DATE_FORMAT = "%Y-%m-%d"
+
+try:
+  from navoptapi.api_lib import ApiLib
+except Exception as e:
+  LOG.exception('NavOpt module is not installed: %s' % e)
 
 
 def _exec(service, command, parameters=None):

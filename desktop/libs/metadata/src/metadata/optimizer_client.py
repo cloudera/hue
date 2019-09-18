@@ -28,23 +28,26 @@ from django.core.cache import cache
 from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
 
+from desktop.auth.backend import is_admin
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib import export_csvxls
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.rest.http_client import RestException
 from libsentry.sentry_site import get_hive_sentry_provider
 from libsentry.privilege_checker import get_checker, MissingSentryPrivilegeException
-from navoptapi.api_lib import ApiLib
 
 from metadata.conf import OPTIMIZER, get_optimizer_url
 
-from desktop.auth.backend import is_admin
 
 LOG = logging.getLogger(__name__)
 
-
 _JSON_CONTENT_TYPE = 'application/json'
 OPTIMIZER_TENANT_ID_CACHE_KEY = 'navopt-tenant-id'
+
+try:
+  from navoptapi.api_lib import ApiLib
+except Exception as e:
+  LOG.exception('NavOpt module is not installed: %s' % e)
 
 
 class NavOptException(Exception):
