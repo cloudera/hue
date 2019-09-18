@@ -24,10 +24,9 @@ import re
 import sys
 import urllib.request, urllib.parse, urllib.error
 
-from avro import datafile, io
-
 from django.utils.translation import ugettext as _
 
+from desktop.auth.backend import is_admin
 from desktop.lib.django_util import JsonResponse, render
 
 from hbase import conf
@@ -37,12 +36,12 @@ from hbase.api import HbaseApi
 from hbase.management.commands import hbase_setup
 from hbase.server.hbase_lib import get_thrift_type
 
-from desktop.auth.backend import is_admin
-
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
 else:
   from cStringIO import StringIO as string_io
+  from avro import datafile, io
+
 
 LOG = logging.getLogger(__name__)
 
