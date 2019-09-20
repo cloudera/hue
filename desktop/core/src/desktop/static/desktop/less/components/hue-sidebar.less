@@ -90,6 +90,11 @@
     margin-bottom: 8px;
     padding: 0 0 0 24px;
     background-color: @header-bg;
+    &.hue-sidebar-custom-logo {
+      background-color: @cui-white;
+      border-top: 2px solid @hue-primary-color-dark;
+      height: calc(@sidebar-header-height - 3px);
+    }
 
     .hue-app-switcher-trigger {
       color: @hue-primary-color-dark;
@@ -142,6 +147,15 @@
     .hue-sidebar-logo svg {
       height: 32px;
       width: 100px;
+    }
+
+    &.hue-sidebar-custom-logo {
+      .hue-sidebar-logo {
+        margin-left: 32px;
+      }
+      .hue-sidebar-logo svg {
+        width: 128px;
+      }
     }
   }
 
@@ -265,6 +279,14 @@
         color: @cui-white;
       }
 
+      &.hue-sidebar-custom-logo {
+        padding: 0;
+        .hue-sidebar-logo {
+          width: 56px;
+          margin-left: -6px;
+        }
+      }
+
       .hue-app-switcher-trigger svg {
         width: 32px;
         height: 32px;
@@ -348,6 +370,9 @@
 
   &:not(.collapsed) .hue-sidebar-header {
     background-color: @header-bg-open !important;
+    &.hue-sidebar-custom-logo {
+      background-color: @cui-white !important;
+    }
   }
 
   .item-spacer {

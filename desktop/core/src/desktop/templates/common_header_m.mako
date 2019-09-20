@@ -49,7 +49,11 @@ if USE_NEW_EDITOR.get():
   <meta charset="utf-8">
   <title>Hue ${get_nice_name(current_app, section)} - ${get_title(title)}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
-  <link rel="icon" type="image/x-icon" href="${ static('desktop/art/favicon.ico') }" />
+   % if conf.CUSTOM.LOGO_SVG.get():
+  <link rel="icon" type="image/x-icon" href="${ static('desktop/art/custom-branding/favicon.ico') }"/>
+  % else:
+  <link rel="icon" type="image/x-icon" href="${ static('desktop/art/favicon.ico') }"/>
+  % endif
   <meta name="description" content="">
   <meta name="author" content="">
 
