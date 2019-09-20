@@ -21,13 +21,9 @@ import json
 
 from nose.tools import assert_equal, assert_false, assert_true
 
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User, Group
-else:
-  from django.contrib.auth.models import User, Group
+from useradmin.models import User, Group
 
 
 class TestUseradminApi(object):

@@ -24,14 +24,9 @@ from nose.tools import assert_true, assert_false, assert_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.models import Settings
 from oozie.tests import OozieBase
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
+from useradmin.models import User
 
 
 class TestAboutBase(object):

@@ -30,18 +30,13 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 from enum import Enum
 from TCLIService.ttypes import TSessionHandle, THandleIdentifier, TOperationState, TOperationHandle, TOperationType
 
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document
 from desktop.redaction import global_redaction_engine
 from librdbms.server import dbms as librdbms_dbms
+from useradmin.models import User
 
 from beeswax.design import HQLdesign
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

@@ -45,11 +45,11 @@ from django.utils.translation import ugettext as _
 from django.utils.http import urlquote, is_safe_url
 
 from hadoop import cluster
+from useradmin.models import User
 
 import desktop.views
 import desktop.conf
 from desktop.auth.backend import is_admin
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.context_processors import get_app_name
 from desktop.lib import apputil, i18n, fsmanager
 from desktop.lib.django_util import JsonResponse, render, render_json
@@ -59,11 +59,6 @@ from desktop.log import get_audit_logger
 from desktop.log.access import access_log, log_page_hit, access_warn
 from desktop import appmanager
 from desktop import metrics
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

@@ -25,15 +25,10 @@ from django.db import models
 from django.utils.html import escape
 from django.utils.translation import ugettext_lazy as _t
 
-from desktop.conf import ENABLE_ORGANIZATIONS
 from libsolr.api import SolrApi
+from useradmin.models import User
 
 from search.conf import SOLR_URL
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

@@ -24,13 +24,10 @@ import sys
 
 from urlparse import urlparse
 
-from desktop.auth.backend import is_admin
-from desktop.conf import DEFAULT_USER, ENABLE_ORGANIZATIONS
+from useradmin.models import User
 
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
+from desktop.auth.backend import is_admin
+from desktop.conf import DEFAULT_USER
 
 if sys.version_info[0] > 2:
   from urllib.parse import urlparse as lib_urlparse

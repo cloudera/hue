@@ -35,10 +35,11 @@ from django.db.models.functions import Trunc
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
-from desktop.conf import has_connectors, ENABLE_ORGANIZATIONS
+from desktop.conf import has_connectors, TASK_SERVER
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.paths import SAFE_CHARACTERS_URI
 from desktop.models import Document2
+from useradmin.models import User
 
 from notebook.connectors.base import Notebook, get_interpreter
 
@@ -47,11 +48,6 @@ if sys.version_info[0] > 2:
   from urllib.parse import quote as urllib_quote
 else:
   from urllib import quote as urllib_quote
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

@@ -25,23 +25,18 @@ import uuid
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
-from desktop.conf import ENABLE_ORGANIZATIONS
+from azure.abfs.__init__ import abfspath
+from notebook.models import make_notebook
+from useradmin.models import User
+
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
-
-from notebook.models import make_notebook
-from azure.abfs.__init__ import abfspath
 
 if sys.version_info[0] > 2:
   from urllib.parse import urlparse, unquote as urllib_unquote
 else:
   from urllib import unquote as urllib_unquote
   from urlparse import urlparse
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

@@ -19,31 +19,23 @@
 from __future__ import absolute_import
 import ldap
 
+from django.conf import settings
+from django.urls import reverse
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false
 
 import desktop.conf
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.test_utils import grant_access
 from desktop.lib.django_test_util import make_logged_in_client
-from django.conf import settings
-from django.urls import reverse
-
-from useradmin.models import LdapGroup, UserProfile, get_profile
-
 from hadoop import pseudo_hdfs4
 from hadoop.pseudo_hdfs4 import is_live_cluster
+from useradmin.models import LdapGroup, UserProfile, get_profile, User, Group
 from useradmin.views import sync_ldap_users, sync_ldap_groups, import_ldap_users, import_ldap_groups, \
-                  add_ldap_users, add_ldap_groups, sync_ldap_users_groups
+    add_ldap_users, add_ldap_groups, sync_ldap_users_groups
 
 from useradmin import ldap_access
 from useradmin.tests import BaseUserAdminTests, LdapTestConnection, reset_all_groups, reset_all_users
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User, Group
-else:
-  from django.contrib.auth.models import User, Group
 
 
 class TestUserAdminLdapDeprecated(BaseUserAdminTests):

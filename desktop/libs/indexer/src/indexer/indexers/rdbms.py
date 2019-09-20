@@ -22,20 +22,16 @@ import uuid
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
-from desktop.conf import ENABLE_ORGANIZATIONS
-from desktop.lib.django_util import JsonResponse
-from desktop.lib.i18n import smart_str
 from librdbms.conf import DATABASES, get_database_password, get_server_choices, get_connector_name
 from librdbms.jdbc import Jdbc
 from librdbms.server import dbms as rdbms
 from notebook.conf import get_ordered_interpreters
 from notebook.connectors.base import get_api
 from notebook.models import make_notebook
+from useradmin.models import User
 
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
+from desktop.lib.django_util import JsonResponse
+from desktop.lib.i18n import smart_str
 
 
 LOG = logging.getLogger(__name__)

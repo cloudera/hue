@@ -43,6 +43,7 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 from dashboard.conf import get_engines, HAS_REPORT_ENABLED
 from kafka.conf import has_kafka
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
+from useradmin.models import User, Group, get_organization
 
 from desktop import appmanager
 from desktop.auth.backend import is_admin
@@ -61,11 +62,6 @@ if sys.version_info[0] > 2:
   from urllib.parse import quote as urllib_quote
 else:
   from urllib import quote as urllib_quote
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User, Group
-else:
-  from django.contrib.auth.models import User, Group
 
 
 LOG = logging.getLogger(__name__)

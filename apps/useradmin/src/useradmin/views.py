@@ -51,14 +51,11 @@ from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm, AddLdapU
   PermissionsEditForm, GroupEditForm, SuperUserChangeForm, validate_username, validate_first_name, \
   validate_last_name, PasswordChangeForm
 from useradmin.ldap_access import LdapBindException, LdapSearchException
-from useradmin.models import HuePermission, UserProfile, LdapGroup
-from useradmin.models import get_profile, get_default_user_group
+from useradmin.models import HuePermission, UserProfile, LdapGroup, get_profile, get_default_user_group, User, Group
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User, Group
   from useradmin.forms import OrganizationUserChangeForm as UserChangeForm, OrganizationSuperUserChangeForm as SuperUserChangeForm
 else:
-  from django.contrib.auth.models import User, Group
   from useradmin.forms import UserChangeForm, SuperUserChangeForm
 
 

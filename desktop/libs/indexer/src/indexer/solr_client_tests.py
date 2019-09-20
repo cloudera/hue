@@ -20,16 +20,11 @@ from nose.tools import assert_equal, assert_true, assert_false
 
 from django.urls import reverse
 
-from desktop.conf import ENABLE_ORGANIZATIONS
+from indexer.solr_client import SolrClient
+from useradmin.models import User
+
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
-
-from indexer.solr_client import SolrClient
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 class TestSolrClient(object):

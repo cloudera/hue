@@ -16,16 +16,10 @@
 <%!
 from django.utils.translation import ugettext as _
 
-from useradmin.models import group_permissions
-
 from desktop.auth.backend import is_admin
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.views import commonheader, commonfooter
 
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import Group
-else:
-  from django.contrib.auth.models import Group
+from useradmin.models import group_permissions, Group
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />

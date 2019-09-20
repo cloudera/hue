@@ -21,13 +21,9 @@ import logging
 from django.core.management.base import CommandError, BaseCommand
 from django.utils.translation import ugettext_lazy as _
 
-from desktop.conf import ENABLE_ORGANIZATIONS
-from desktop.models import Document2
+from useradmin.models import User
 
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
+from desktop.models import Document2
 
 
 LOG = logging.getLogger(__name__)

@@ -21,17 +21,12 @@ import os
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
-from desktop.conf import ENABLE_ORGANIZATIONS
-from desktop.lib.exceptions_renderable import PopupException
 from libzookeeper.conf import zkensemble
-from metadata.manager_client import ManagerApi
-
 from indexer.conf import config_morphline_path
+from metadata.manager_client import ManagerApi
+from useradmin.models import User
 
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
+from desktop.lib.exceptions_renderable import PopupException
 
 
 LOG = logging.getLogger(__name__)
