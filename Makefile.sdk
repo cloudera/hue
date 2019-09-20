@@ -118,6 +118,8 @@ ext-env-pip-install:
 	@echo '--- Installing requirement.txt into virtual-env via $(ENV_PIP) command to file $(REQUIREMENT_FILE).'
 	@$(ENV_PIP) install -r $(REQUIREMENT_FILE)
 	@echo '--- Finished requirement.txt into virtual-env'
+	@$(ENV_PIP) install $(NAVOPTAPI_WHL)
+	@echo '--- Finished $(NAVOPTAPI_WHL) into virtual-env'
 
 #
 # ext-eggs
