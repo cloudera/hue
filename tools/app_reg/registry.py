@@ -19,6 +19,7 @@
 Registry for the applications
 """
 
+from builtins import object
 import glob
 import logging
 import os
@@ -26,6 +27,7 @@ import sys
 import json
 
 import common
+from common import cmp
 
 if sys.version_info[0] > 2:
   from builtins import object
