@@ -29,16 +29,11 @@ import sys
 from django.utils.translation import ugettext as _
 
 from desktop.auth.backend import force_username_case, DesktopBackendBase
-from desktop.conf import AUTH, ENABLE_ORGANIZATIONS
-from useradmin.models import get_profile, get_default_user_group, UserProfile
+
+from useradmin.models import get_profile, get_default_user_group, UserProfile, User
 
 import liboauth.conf
 import liboauth.metrics
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 try:
   import oauth2 as oauth
@@ -51,7 +46,9 @@ if sys.version_info[0] > 2:
 else:
   from urllib import urlencode as lib_urlencode
 
+
 LOG = logging.getLogger(__name__)
+
 
 class OAuthBackend(DesktopBackendBase):
 
@@ -152,7 +149,7 @@ class OAuthBackend(DesktopBackendBase):
             consumer_secret=liboauth.conf.CONSUMER_SECRET_LINKEDIN.get()
             access_token_uri=liboauth.conf.ACCESS_TOKEN_URL_LINKEDIN.get()
             authentication_token_uri=liboauth.conf.AUTHORIZE_URL_LINKEDIN.get()
-        
+
         params = lib_urlencode({
            'code':code,
            'redirect_uri':redirect_uri,

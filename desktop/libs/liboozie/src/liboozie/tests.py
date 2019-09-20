@@ -19,19 +19,14 @@ import logging
 
 from nose.tools import assert_equal
 
-import desktop.conf as desktop_conf
-from desktop.conf import ENABLE_ORGANIZATIONS
-from desktop.lib.test_utils import reformat_xml
-
 from liboozie import conf
 from liboozie.types import WorkflowAction, Coordinator
 from liboozie.utils import config_gen
 from oozie.tests import MockOozieApi
+from useradmin.models import User
 
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
+import desktop.conf as desktop_conf
+from desktop.lib.test_utils import reformat_xml
 
 
 LOG = logging.getLogger(__name__)

@@ -46,10 +46,11 @@ from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises, nottest
 
+from dashboard.conf import HAS_SQL_ENABLED
+from desktop.settings import DATABASES
 from beeswax.conf import HIVE_SERVER_HOST
 from pig.models import PigScript
-from useradmin.models import GroupPermission
-from desktop.settings import DATABASES
+from useradmin.models import GroupPermission, User
 
 import desktop
 import desktop.conf
@@ -59,7 +60,6 @@ import desktop.views as views
 
 from desktop.auth.backend import rewrite_user
 from desktop.appmanager import DESKTOP_APPS
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.conf import validate_path
 from desktop.lib.django_util import TruncatingModel
@@ -73,17 +73,11 @@ from desktop.models import Directory, Document, Document2, get_data_link, _versi
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
 from desktop.views import check_config, home, generate_configspec, load_confs, collect_validation_messages
-from dashboard.conf import HAS_SQL_ENABLED
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
 else:
   from cStringIO import StringIO as string_io
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

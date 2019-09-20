@@ -26,23 +26,17 @@ from nose.tools import assert_equal, assert_false, assert_true, assert_not_equal
 from django.core import management
 from django.db.utils import OperationalError
 
-from desktop.conf import ENABLE_ORGANIZATIONS
+from beeswax.models import SavedQuery
+from beeswax.design import hql_query
+from notebook.models import import_saved_beeswax_query
+from oozie.models2 import Workflow
+from useradmin.models import get_default_user_group, User
+
 from desktop.converters import DocumentConverter
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.fs import ProxyFS
 from desktop.lib.test_utils import grant_access
 from desktop.models import Directory, Document2, Document
-from notebook.models import import_saved_beeswax_query
-
-from beeswax.models import SavedQuery
-from beeswax.design import hql_query
-from useradmin.models import get_default_user_group
-from oozie.models2 import Workflow
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 class MockFs(object):

@@ -34,22 +34,17 @@ from django.contrib.sessions.models import Session
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from hadoop.fs.exceptions import WebHdfsException
+from useradmin.models import User
 from useradmin.views import ensure_home_directory
 
 from desktop.auth.backend import AllowFirstUserDjangoBackend
 from desktop.auth.forms import UserCreationForm, AuthenticationForm
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_util import render
 from desktop.lib.django_util import login_notrequired
 from desktop.log.access import access_warn, last_access_map
 
 import liboauth.conf
 from liboauth.backend import OAuthBackend
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 @login_notrequired

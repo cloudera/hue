@@ -37,12 +37,12 @@ from django.http import FileResponse, HttpRequest
 
 from beeswax import data_export
 from desktop.auth.backend import rewrite_user
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.celery import app
 from desktop.conf import TASK_SERVER
 from desktop.lib import export_csvxls
 from desktop.lib import fsmanager
 from desktop.settings import CACHES_CELERY_KEY, CACHES_CELERY_QUERY_RESULT_KEY
+from useradmin.models import User
 
 from notebook.connectors.base import get_api, QueryExpired, ExecutionWrapper
 from notebook.sql_utils import get_current_statement
@@ -51,11 +51,6 @@ if sys.version_info[0] > 2:
   from io import StringIO as string_io
 else:
   from StringIO import StringIO as string_io
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 LOG_TASK = get_task_logger(__name__)

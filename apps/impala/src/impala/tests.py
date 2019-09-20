@@ -27,13 +27,10 @@ from mock import patch, Mock
 from django.urls import reverse
 
 import desktop.conf as desktop_conf
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.test_utils import add_to_group
 from desktop.models import Document
-from hadoop.pseudo_hdfs4 import get_db_prefix, is_live_cluster
-
 from beeswax import data_export
 from beeswax.design import hql_query
 from beeswax.data_export import download
@@ -41,14 +38,11 @@ from beeswax.models import SavedQuery, QueryHistory
 from beeswax.server import dbms
 from beeswax.test_base import get_query_server_config, wait_for_query_to_finish, fetch_query_result_data
 from beeswax.tests import _make_query
+from hadoop.pseudo_hdfs4 import get_db_prefix, is_live_cluster
+from useradmin.models import User
 
 from impala import conf
 from impala.dbms import ImpalaDbms
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

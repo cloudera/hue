@@ -19,14 +19,9 @@
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true
 
-from desktop.conf import ENABLE_ORGANIZATIONS
+from useradmin.models import User
 
 from indexer.indexers.flume import FlumeIndexer
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 def test_generate_from_directory_to_solr_index():

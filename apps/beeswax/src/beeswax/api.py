@@ -27,7 +27,6 @@ from django.views.decorators.http import require_POST
 
 from thrift.transport.TTransport import TTransportException
 from desktop.auth.backend import is_admin
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.context_processors import get_app_name
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions import StructuredThriftTransportException
@@ -50,11 +49,7 @@ from beeswax.views import authorized_get_design, authorized_get_query_history, m
     safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state, parse_out_jobs
 from metastore.conf import FORCE_HS2_METADATA
 from metastore.views import _get_db, _get_servername
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
+from useradmin.models import User
 
 
 LOG = logging.getLogger(__name__)

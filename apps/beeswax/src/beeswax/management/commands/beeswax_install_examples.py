@@ -26,11 +26,11 @@ from django.core.management.base import BaseCommand
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.conf import USE_NEW_EDITOR, ENABLE_ORGANIZATIONS
+from desktop.conf import USE_NEW_EDITOR
 from desktop.models import Directory, Document, Document2, Document2Permission
 from hadoop import cluster
 from notebook.models import import_saved_beeswax_query
-from useradmin.models import get_default_user_group, install_sample_user
+from useradmin.models import get_default_user_group, install_sample_user, User
 
 import beeswax.conf
 from beeswax.models import SavedQuery, HQL, IMPALA
@@ -38,11 +38,6 @@ from beeswax.design import hql_query
 from beeswax.hive_site import has_concurrency_support
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config, QueryServerException
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

@@ -41,8 +41,7 @@ from django.urls import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_permission, add_to_group, reformat_json, reformat_xml
-from desktop.conf import ENABLE_ORGANIZATIONS
-from desktop.models import Document, Document2
+from desktop.models import Document, Document2, User
 import desktop.views as views
 
 from hadoop import cluster as originalCluster
@@ -67,11 +66,6 @@ if sys.version_info[0] > 2:
   from io import StringIO as string_io
 else:
   from cStringIO import StringIO as string_io
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

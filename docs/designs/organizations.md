@@ -7,7 +7,13 @@ Goal: support of more than one tenant per server instance [HUE-8530](https://iss
 Add an `organization` model in `useradmin/models2.py` and have `User`, `Group` classes link to it.
 Keep all the models in models2.py and do not change the current `useradmin/models.py` logic so that it is backward compatible.
 
-e.g. how to import the organization models:
+e.g. How to import the organization models:
+
+```
+from useradmin.models import User, Group
+```
+
+Which under the cover does the switch between regular users and organizational users:
 
 ```
 if ENABLE_ORGANIZATIONS.get():

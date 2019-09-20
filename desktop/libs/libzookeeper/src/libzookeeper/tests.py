@@ -23,18 +23,13 @@ import tempfile
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_false
 
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 from hadoop.pseudo_hdfs4 import is_live_cluster
+from useradmin.models import User
 
 from libzookeeper.models import ZookeeperClient
 from libzookeeper.conf import zkensemble, ENSEMBLE
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 class UnitTests(object):
