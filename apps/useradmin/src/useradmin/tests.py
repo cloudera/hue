@@ -40,7 +40,7 @@ import desktop.conf
 
 from desktop import appmanager
 from desktop.auth.backend import is_admin
-from desktop.conf import APP_BLACKLIST ENABLE_ORGANIZATIONS
+from desktop.conf import APP_BLACKLIST, ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from desktop.views import home
