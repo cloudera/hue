@@ -211,7 +211,9 @@ if ENABLE_ORGANIZATIONS.get():
 
     class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
       model =  User
-      fields = ["first_name", "last_name", "email", "ensure_home_directory", "organization"]
+      fields = ["first_name", "last_name", "email", "ensure_home_directory"]
+      if ENABLE_ORGANIZATIONS.get():
+        fields.append('organization') # Because of import logic
 
     def __init__(self, *args, **kwargs):
       super(OrganizationUserChangeForm, self).__init__(*args, **kwargs)
