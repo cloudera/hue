@@ -20,6 +20,7 @@ ifeq ($(ROOT),)
   $(error "Error: Expect the environment variable $$ROOT to point to the Desktop installation")
 endif
 
+
 # The default RSYNC_OPT copies unsafe links. We don't want that because
 # the symlink targets are always installed (separately). See HUE-565.
 RSYNC_OPT := -a
@@ -27,12 +28,15 @@ include $(ROOT)/Makefile.sdk
 
 default::
 	@echo '  env-install    : Install into virtual-env'
+	@echo 'desktop/core/Makefile default EXT_ENV_INSTALL: $(EXT_ENV_INSTALL)'
 
 #
 # env-install
 # 	Install app into the virtual environment.
 #
 .PHONY: env-install
-env-install: compile ext-env-install
+env-install: compile $(EXT_ENV_INSTALL)
 	@echo '--- Installing $(APP_NAME) into virtual-env'
+	@echo '--- env-install: EXT_ENV_INSTALL: $(EXT_ENV_INSTALL)'
 	@$(ENV_PYTHON) setup.py develop -N -q
+
