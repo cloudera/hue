@@ -30,7 +30,6 @@ from nose.tools import assert_true, assert_equal, assert_false
 from django.utils.encoding import smart_str
 from django.urls import reverse
 
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod_whitespace
 from desktop.lib.test_utils import add_permission, grant_access
 from hadoop.pseudo_hdfs4 import is_live_cluster
@@ -43,11 +42,6 @@ from beeswax.test_base import make_query, wait_for_query_to_finish, verify_histo
 from beeswax.models import QueryHistory
 from beeswax.server import dbms
 from beeswax.test_base import BeeswaxSampleProvider
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group
-else:
-  from django.contrib.auth.models import User, Group
 
 
 LOG = logging.getLogger(__name__)

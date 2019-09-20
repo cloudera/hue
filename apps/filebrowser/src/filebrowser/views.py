@@ -50,7 +50,6 @@ from django.utils.translation import ugettext as _
 from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException
 from desktop import appmanager
 from desktop.auth.backend import is_admin
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib import i18n
 from desktop.lib.conf import coerce_bool
 from desktop.lib.django_util import render, format_preserving_redirect
@@ -76,7 +75,6 @@ from filebrowser.lib import xxd
 from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkDirForm, EditorForm, TouchForm,\
     RenameFormSet, RmTreeFormSet, ChmodFormSet, ChownFormSet, CopyFormSet, RestoreFormSet,\
     TrashPurgeForm, SetReplicationFactorForm
-
 
 if sys.version_info[0] > 2:
   import io

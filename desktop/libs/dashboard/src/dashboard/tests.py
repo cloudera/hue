@@ -23,7 +23,6 @@ from django.urls import reverse
 
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from desktop.lib.rest import resource
@@ -33,11 +32,6 @@ from useradmin.models import User
 from dashboard.facet_builder import _round_number_range
 from dashboard.models import Collection2, augment_response
 from dashboard.controller import DashboardController
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
-else:
-  from django.contrib.auth.models import User
 
 
 QUERY = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}

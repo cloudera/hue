@@ -31,7 +31,7 @@ from django.urls import reverse
 from TCLIService.ttypes import TStatusCode, TProtocolVersion, TOperationType
 
 from desktop.auth.backend import rewrite_user
-from desktop.conf import has_connectors, ENABLE_ORGANIZATIONS
+from desktop.conf import has_connectors
 from desktop.lib.i18n import smart_str
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access

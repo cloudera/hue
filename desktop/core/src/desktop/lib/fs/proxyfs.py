@@ -27,8 +27,7 @@ from urlparse import urlparse
 from useradmin.models import User
 
 from desktop.auth.backend import is_admin
-from desktop.conf import DEFAULT_USER, ENABLE_ORGANIZATIONS
-
+from desktop.conf import DEFAULT_USER
 
 if sys.version_info[0] > 2:
   from urllib.parse import urlparse as lib_urlparse

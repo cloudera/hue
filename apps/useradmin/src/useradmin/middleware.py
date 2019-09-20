@@ -30,16 +30,11 @@ from django.db.models import Q
 from django.utils.translation import ugettext as _
 
 from desktop.auth.views import dt_logout
-from desktop.conf import AUTH, LDAP, SESSION, ENABLE_ORGANIZATIONS
+from desktop.conf import AUTH, LDAP, SESSION
 
 from useradmin import ldap_access
 from useradmin.models import UserProfile, get_profile, User
 from useradmin.views import import_ldap_users
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
-else:
-  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

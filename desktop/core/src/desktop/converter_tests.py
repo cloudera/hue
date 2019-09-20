@@ -35,17 +35,6 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from desktop.models import Directory, Document, Document2, DocumentPermission, DocumentTag
 
-from desktop.conf import ENABLE_ORGANIZATIONS
-from desktop.converters import DocumentConverter
-from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import grant_access
-from desktop.models import Directory, Document, Document2, DocumentPermission, DocumentTag
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
-else:
-  from django.contrib.auth.models import User
-
 
 class TestDocumentConverter(object):
 

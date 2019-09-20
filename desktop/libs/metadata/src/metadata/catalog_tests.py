@@ -25,7 +25,6 @@ from nose.tools import assert_equal, assert_true
 from django.urls import reverse
 
 from desktop.auth.backend import rewrite_user
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 from hadoop.pseudo_hdfs4 import is_live_cluster
@@ -37,10 +36,6 @@ from metadata.catalog_api import _augment_highlighting
 from metadata.catalog.navigator_client import NavigatorApi
 from metadata.catalog.atlas_client import AtlasApi
 
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
-else:
-  from django.contrib.auth.models import User
 
 LOG = logging.getLogger(__name__)
 

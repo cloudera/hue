@@ -31,13 +31,7 @@ from libsaml import metrics
 from useradmin.models import get_profile, get_default_user_group, UserProfile, User
 
 from desktop.auth.backend import force_username_case, rewrite_user
-from desktop.conf import AUTH, ENABLE_ORGANIZATIONS
-
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
-else:
-  from django.contrib.auth.models import User
+from desktop.conf import AUTH
 
 
 LOG = logging.getLogger(__name__)

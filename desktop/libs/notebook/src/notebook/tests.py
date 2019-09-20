@@ -28,7 +28,7 @@ from django.urls import reverse
 from azure.conf import is_adls_enabled
 
 from desktop import appmanager
-from desktop.conf import APP_BLACKLIST, ENABLE_ORGANIZATIONS
+from desktop.conf import APP_BLACKLIST
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_permission
 from desktop.models import Directory, Document, Document2
@@ -42,11 +42,6 @@ from notebook.connectors.base import Notebook, QueryError, Api
 from notebook.decorators import api_error_handler
 from notebook.conf import get_ordered_interpreters, INTERPRETERS_SHOWN_ON_WHEEL, INTERPRETERS
 from notebook.models import Analytics
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
-else:
-  from django.contrib.auth.models import User
 
 
 class TestNotebookApi(object):

@@ -27,7 +27,6 @@ from mock import patch, Mock
 from django.urls import reverse
 
 import desktop.conf as desktop_conf
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.test_utils import add_to_group
@@ -44,11 +43,6 @@ from useradmin.models import User
 
 from impala import conf
 from impala.dbms import ImpalaDbms
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User
-else:
-  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)
