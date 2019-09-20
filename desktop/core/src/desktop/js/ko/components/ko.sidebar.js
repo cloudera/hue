@@ -100,7 +100,7 @@ const TEMPLATE = `
   <!-- ko component: { name: 'hue-app-switcher' } --><!-- /ko -->
   <!-- /ko -->
   <!-- ko ifnot: window.DISPLAY_APP_SWITCHER -->
-  <div class="hue-sidebar-header">
+  <div class="hue-sidebar-header" data-bind="css: { 'hue-sidebar-custom-logo' : window.CUSTOM_LOGO }">
     <a data-bind="hueLink: '/home/'" href="javascript: void(0);" title="${I18n('Documents')}">
       <div class="hue-sidebar-logo"><svg><use xlink:href="#hi-sidebar-logo"></use></svg></div>
     </a>

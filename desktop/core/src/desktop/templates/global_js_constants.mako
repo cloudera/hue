@@ -58,6 +58,7 @@
   window.APP_SWITCHER_ALTUS_BASE_URL = '${ APP_SWITCHER_ALTUS_BASE_URL.get() }';
   window.APP_SWITCHER_MOW_BASE_URL = '${ APP_SWITCHER_MOW_BASE_URL.get() }';
   window.DISPLAY_APP_SWITCHER = '${ DISPLAY_APP_SWITCHER.get() }' === 'True';
+  window.CUSTOM_LOGO = '${ conf.CUSTOM.LOGO_SVG.get() }' !== '';
 
   window.KNOX_BASE_PATH_HUE = '/KNOX_BASE_PATH_HUE';
   window._KNOX_BASE_PATH = '/KNOX_BASE_PATH_KNOX';

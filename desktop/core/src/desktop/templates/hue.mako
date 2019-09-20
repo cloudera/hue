@@ -43,7 +43,11 @@
   <meta charset="utf-8">
   <title>Hue</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  % if conf.CUSTOM.LOGO_SVG.get():
+  <link rel="icon" type="image/x-icon" href="${ static('desktop/art/custom-branding/favicon.ico') }"/>
+  % else:
   <link rel="icon" type="image/x-icon" href="${ static('desktop/art/favicon.ico') }"/>
+  % endif
   <meta name="description" content="">
   <meta name="author" content="">
 
