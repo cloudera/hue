@@ -25,24 +25,17 @@ from django.urls import reverse
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false
 
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
-from desktop.models import SAMPLE_USER_ID
+from desktop.models import SAMPLE_USER_ID, User
 from hadoop import pseudo_hdfs4
 from hadoop.pseudo_hdfs4 import is_live_cluster
 from liboozie.oozie_api_tests import OozieServerProvider
 from liboozie.conf import SECURITY_ENABLED
-
 from oozie.tests import OozieBase
 
 from pig.models import create_or_update_script, PigScript
 from pig.api import OozieApi, get
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 class TestPigBase(object):

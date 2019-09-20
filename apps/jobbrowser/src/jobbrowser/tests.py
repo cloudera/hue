@@ -28,7 +28,6 @@ from django.urls import reverse
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal, assert_raises
 
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group
 from desktop.models import Document
@@ -39,6 +38,7 @@ from hadoop.yarn import resource_manager_api, mapreduce_api, history_server_api,
 from hadoop.yarn.spark_history_server_api import SparkHistoryServerApi
 from liboozie.oozie_api_tests import OozieServerProvider
 from oozie.models import Workflow
+from useradmin.models import User
 
 from jobbrowser import views
 from jobbrowser.api import get_api
@@ -47,11 +47,6 @@ from jobbrowser.apis import job_api
 from jobbrowser.conf import SHARE_JOBS
 from jobbrowser.models import can_view_job, can_modify_job, LinkJobLogs
 from jobbrowser.yarn_models import SparkJob
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

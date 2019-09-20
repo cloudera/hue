@@ -50,7 +50,6 @@ from django.utils.translation import ugettext as _
 from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException
 from desktop import appmanager
 from desktop.auth.backend import is_admin
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib import i18n
 from desktop.lib.conf import coerce_bool
 from desktop.lib.django_util import render, format_preserving_redirect
@@ -63,11 +62,11 @@ from desktop.lib.paths import SAFE_CHARACTERS_URI, SAFE_CHARACTERS_URI_COMPONENT
 from desktop.lib.tasks.compress_files.compress_utils import compress_files_in_hdfs
 from desktop.lib.tasks.extract_archive.extract_utils import extract_archive_in_hdfs
 from desktop.views import serve_403_error
-
 from hadoop.core_site import get_trash_interval
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.fsutils import do_overwrite_save
+from useradmin.models import User, Group
 
 from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE, SHOW_DOWNLOAD_BUTTON, SHOW_UPLOAD_BUTTON, REDIRECT_DOWNLOAD
 from filebrowser.lib.archives import archive_factory
@@ -76,12 +75,6 @@ from filebrowser.lib import xxd
 from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkDirForm, EditorForm, TouchForm,\
     RenameFormSet, RmTreeFormSet, ChmodFormSet, ChownFormSet, CopyFormSet, RestoreFormSet,\
     TrashPurgeForm, SetReplicationFactorForm
-
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User, Group
-else:
-  from django.contrib.auth.models import User, Group
 
 if sys.version_info[0] > 2:
   import io

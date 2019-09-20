@@ -44,7 +44,6 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 import django.utils.timezone as dtz
 
 from desktop.auth.backend import is_admin
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.log.access import access_warn
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
@@ -54,6 +53,7 @@ from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.hadoopfs import Hdfs
 from liboozie.submittion import Submission
 from liboozie.submittion import create_directories
+from useradmin.models import User
 
 from oozie.conf import REMOTE_SAMPLE_DIR
 from oozie.utils import utc_datetime_format
@@ -63,11 +63,6 @@ if sys.version_info[0] > 2:
   from io import StringIO as string_io
 else:
   from cStringIO import StringIO as string_io
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

@@ -23,20 +23,15 @@ from nose.tools import assert_equal
 from django.core.cache import cache
 
 from desktop.auth.backend import rewrite_user
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 from libsentry.privilege_checker import SENTRY_PRIVILEGE_CACHE_KEY, PrivilegeChecker
 from libsentry.test_privilege_checker import MockSentryApiV2
+from useradmin.models import User
 
 from metadata.conf import NAVIGATOR
 from metadata.metadata_sites import get_navigator_hue_server_name
 from metadata.catalog.navigator_client import NavigatorApi
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

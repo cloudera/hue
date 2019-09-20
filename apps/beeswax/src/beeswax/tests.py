@@ -54,7 +54,7 @@ from desktop.conf import \
     AUTH_PASSWORD_SCRIPT as DEFAULT_AUTH_PASSWORD_SCRIPT, \
     LDAP_USERNAME, \
     LDAP_PASSWORD, \
-    USE_NEW_EDITOR, ENABLE_ORGANIZATIONS
+    USE_NEW_EDITOR
 from desktop import redaction
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
@@ -64,6 +64,7 @@ from desktop.lib.test_utils import grant_access, add_to_group
 from desktop.lib.security_util import get_localhost_name
 from desktop.lib.test_export_csvxls import _read_xls_sheet_data
 from hadoop.fs.hadoopfs import Hdfs
+from useradmin.models import User
 
 from hadoop import ssl_client_site
 from hadoop.pseudo_hdfs4 import is_live_cluster
@@ -96,11 +97,6 @@ if sys.version_info[0] > 2:
   from io import StringIO as string_io
 else:
   from cStringIO import StringIO as string_io
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

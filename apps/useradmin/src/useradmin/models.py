@@ -62,6 +62,9 @@ if ENABLE_ORGANIZATIONS.get():
   from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group, Organization, default_organization
 else:
   from django.contrib.auth.models import User, Group
+  class Organization(): pass
+  def default_organization(): pass
+  def get_organization(): pass
 
 
 LOG = logging.getLogger(__name__)

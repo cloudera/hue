@@ -19,13 +19,9 @@ import re
 
 from django.core.validators import RegexValidator
 
-from desktop.conf import ENABLE_ORGANIZATIONS
-from desktop.lib.django_util import get_username_re_rule
+from useradmin.models import User
 
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
+from desktop.lib.django_util import get_username_re_rule
 
 
 def monkey_patch_username_validator():

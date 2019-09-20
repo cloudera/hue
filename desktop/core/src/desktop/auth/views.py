@@ -38,30 +38,23 @@ from django.utils.translation import ugettext as _
 
 from hadoop.fs.exceptions import WebHdfsException
 from notebook.connectors.base import get_api
-from useradmin.models import get_profile, UserProfile
+from useradmin.models import get_profile, UserProfile, User, Group
 from useradmin.views import ensure_home_directory, require_change_password
 
 from desktop.auth import forms as auth_forms
 from desktop.auth.backend import OIDCBackend
 from desktop.auth.forms import ImpersonationAuthenticationForm, OrganizationUserCreationForm, OrganizationAuthenticationForm
 from desktop.conf import OAUTH, ENABLE_ORGANIZATIONS
-from desktop.lib.django_util import render
-from desktop.lib.django_util import login_notrequired
-from desktop.lib.django_util import JsonResponse
+from desktop.lib.django_util import render, login_notrequired, JsonResponse
 from desktop.log.access import access_log, access_warn, last_access_map
 from desktop.settings import LOAD_BALANCER_COOKIE
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User, Group
-else:
-  from django.contrib.auth.models import User, Group
-
 
 if sys.version_info[0] > 2:
   import urllib.request, urllib.error
   from urllib.parse import urlencode as urllib_urlencode
 else:
   from urllib import urlencode as urllib_urlencode
+
 
 LOG = logging.getLogger(__name__)
 

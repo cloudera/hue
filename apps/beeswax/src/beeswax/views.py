@@ -34,7 +34,7 @@ from django.utils.translation import ugettext as _
 from django.urls import reverse
 
 from desktop.appmanager import get_apps_dict
-from desktop.conf import ENABLE_DOWNLOAD, REDIRECT_WHITELIST, ENABLE_ORGANIZATIONS
+from desktop.conf import ENABLE_DOWNLOAD, REDIRECT_WHITELIST
 from desktop.context_processors import get_app_name
 
 from desktop.lib.django_util import JsonResponse
@@ -45,6 +45,7 @@ from desktop.models import Document, _get_apps
 from desktop.lib.parameterization import find_variables
 from desktop.views import serve_403_error
 from notebook.models import escape_rows
+from useradmin.models import User
 
 import beeswax.forms
 import beeswax.design
@@ -56,11 +57,6 @@ from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException
 
 from desktop.auth.backend import is_admin
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

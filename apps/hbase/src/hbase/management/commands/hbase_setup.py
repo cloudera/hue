@@ -23,18 +23,11 @@ from datetime import datetime, timedelta
 from django.core.management.base import BaseCommand
 from django.utils.translation import ugettext as _
 
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.paths import get_apps_root
-
-from useradmin.models import install_sample_user
+from useradmin.models import install_sample_user, User
 
 from hbased.ttypes import AlreadyExists
 from hbase.api import HbaseApi
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 LOG = logging.getLogger(__name__)

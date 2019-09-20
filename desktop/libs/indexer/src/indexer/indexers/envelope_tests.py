@@ -21,14 +21,8 @@ from builtins import object
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true
 
-from desktop.conf import ENABLE_ORGANIZATIONS
-
 from indexer.indexers.envelope import EnvelopeIndexer
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
+from useradmin.models import User
 
 
 class TestEnvelope(object):

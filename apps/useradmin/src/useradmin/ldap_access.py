@@ -26,17 +26,11 @@ import logging
 import re
 
 import desktop.conf
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.python_util import CaseInsensitiveDict
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
+from useradmin.models import User
 
 
 LOG = logging.getLogger(__name__)
-
 CACHED_LDAP_CONN = None
 
 

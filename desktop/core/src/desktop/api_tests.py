@@ -23,18 +23,13 @@ from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 from nose.plugins.skip import SkipTest
 
 from desktop.api import massaged_documents_for_json, _get_docs
-from desktop.conf import USE_NEW_EDITOR, ENABLE_ORGANIZATIONS
+from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from desktop.models import DocumentTag , Document
+from useradmin.models import get_default_user_group, User
 
 from pig.models import PigScript
-from useradmin.models import get_default_user_group
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
 
 
 class TestDocModelTags(object):

@@ -22,15 +22,9 @@ import re
 
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises
 
-from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
-from desktop.models import Document2
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User
-else:
-  from django.contrib.auth.models import User
+from desktop.models import Document2, User
 
 
 class TestApi2(object):
