@@ -22,7 +22,7 @@ from builtins import object
 import logging
 import sys
 
-from useradmin.models import User
+from useradmin.models import User, orm_user_lookup
 
 from desktop.auth.backend import is_admin
 from desktop.conf import DEFAULT_USER, ENABLE_ORGANIZATIONS
@@ -77,7 +77,7 @@ class ProxyFS(object):
       #if not filebrowser_action (hdfs) then handle permission via doas else check permission in hue
       if not filebrowser_action:
         return True
-      lookup = {'email' if ENABLE_ORGANIZATIONS.get() else 'username': self.getuser()}
+      lookup = {orm_user_lookup(): self.getuser()}
       user = rewrite_user(User.objects.get(**lookup))
       return user.is_authenticated() and user.is_active and (is_admin(user) or not filebrowser_action or user.has_hue_permission(action=filebrowser_action, app="filebrowser"))
     except User.DoesNotExist:

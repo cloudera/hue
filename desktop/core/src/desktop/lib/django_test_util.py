@@ -25,7 +25,7 @@ import json
 import django.test.client
 import nose.tools
 
-from useradmin.models import User, Group, default_organization
+from useradmin.models import User, Group, default_organization, orm_user_lookup
 
 from desktop.conf import ENABLE_ORGANIZATIONS
 
@@ -55,7 +55,8 @@ def make_logged_in_client(username="test", password="test", is_superuser=True, r
   mess with is_active and such.
   """
   try:
-    user = User.objects.get(username=username)
+    lookup = {orm_user_lookup(): username}
+    user = User.objects.get(**lookup)
     if recreate:
       user.delete()
       raise User.DoesNotExist
