@@ -31,7 +31,7 @@ from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule
 from desktop.settings import LANGUAGES
 
 from useradmin.hue_password_policy import hue_get_password_validators
-from useradmin.models import GroupPermission, HuePermission, get_default_user_group, User, Group, default_organization, Organization
+from useradmin.models import GroupPermission, HuePermission, get_default_user_group, User, Group, default_organization, Organization, orm_user_lookup
 
 
 LOG = logging.getLogger(__name__)
@@ -434,7 +434,7 @@ class GroupEditForm(forms.ModelForm):
   def __init__(self, *args, **kwargs):
     super(GroupEditForm, self).__init__(*args, **kwargs)
 
-    ordering_field = 'email' if ENABLE_ORGANIZATIONS.get() else 'username'
+    ordering_field = orm_user_lookup()
 
     if self.instance.id:
       self.fields['name'].widget.attrs['readonly'] = True

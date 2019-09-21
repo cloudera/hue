@@ -353,3 +353,6 @@ def install_sample_user():
     LOG.exception('Failed to create home directory for user %s: %s' % (SAMPLE_USER_INSTALL, str(ex)))
 
   return user
+
+def orm_user_lookup():
+  return 'email' if ENABLE_ORGANIZATIONS.get() else 'username'

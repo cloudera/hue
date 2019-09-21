@@ -52,7 +52,7 @@ from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm, AddLdapU
   PermissionsEditForm, GroupEditForm, SuperUserChangeForm, validate_username, validate_first_name, \
   validate_last_name, PasswordChangeForm
 from useradmin.ldap_access import LdapBindException, LdapSearchException
-from useradmin.models import HuePermission, UserProfile, LdapGroup, get_profile, get_default_user_group, User, Group
+from useradmin.models import HuePermission, UserProfile, LdapGroup, get_profile, get_default_user_group, User, Group, orm_user_lookup
 
 if sys.version_info[0] > 2:
   unicode = str
@@ -458,7 +458,7 @@ def edit_group(request, name=None):
     if form.is_valid():
       form.save()
 
-      value_field = 'email' if ENABLE_ORGANIZATIONS.get() else 'username'
+      value_field = orm_user_lookup()
 
       if name is not None:
         usernames = instance.user_set.all().values_list(value_field, flat=True)
