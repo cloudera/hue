@@ -28,6 +28,7 @@ _SSL_SITE_PATH = None                  # Path to ssl-client.xml
 _SSL_SITE_DICT = None                  # A dictionary of name/value config options
 
 _CNF_TRUSTORE_LOCATION = 'ssl.client.truststore.location'
+_CNF_TRUSTORE_PASSWORD = 'ssl.client.truststore.password'
 
 LOG = logging.getLogger(__name__)
 
@@ -66,3 +67,7 @@ def _parse_ssl_client_site():
 
 def get_trustore_location():
   return get_conf().get(_CNF_TRUSTORE_LOCATION)
+
+
+def get_trustore_password():
+  return get_conf().get(_CNF_TRUSTORE_PASSWORD)
