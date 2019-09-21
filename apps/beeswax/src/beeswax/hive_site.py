@@ -28,7 +28,7 @@ import socket
 
 from desktop.lib import security_util
 from hadoop import confparse
-from hadoop.ssl_client_site import get_trustore_location
+from hadoop.ssl_client_site import get_trustore_location, get_trustore_password
 
 import beeswax.conf
 
@@ -155,6 +155,8 @@ def hiveserver2_jdbc_url():
 
     if get_conf().get(_CNF_HIVESERVER2_TRUSTSTORE_PASSWORD):
       urlbase += ';trustStorePassword=%s' % get_conf().get(_CNF_HIVESERVER2_TRUSTSTORE_PASSWORD)
+    elif get_trustore_password():
+      urlbase += ';trustStorePassword=%s' % get_trustore_password()
 
   if is_transport_mode_http:
     urlbase += ';transportMode=http'

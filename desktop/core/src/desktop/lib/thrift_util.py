@@ -317,7 +317,7 @@ def connect_to_thrift(conf):
 
   if conf.transport_mode == 'http':
     if conf.use_sasl and conf.mechanism != 'PLAIN':
-      mode.set_kerberos_auth()
+      mode.set_kerberos_auth(service=conf.kerberos_principal)
     else:
       mode.set_basic_auth(conf.username, conf.password)
 

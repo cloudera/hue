@@ -55,8 +55,8 @@ class THttpClient(TTransportBase):
   def open(self):
     pass
 
-  def set_kerberos_auth(self):
-    self._client.set_kerberos_auth()
+  def set_kerberos_auth(self, service="HTTP"):
+    self._client.set_kerberos_auth(service=service)
 
   def set_basic_auth(self, username, password):
     self._client.set_basic_auth(username, password)
