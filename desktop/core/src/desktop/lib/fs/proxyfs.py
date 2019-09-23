@@ -44,7 +44,8 @@ class ProxyFS(object):
   def __init__(self, filesystems_dict, default_scheme, name='default'):
     if default_scheme not in filesystems_dict:
       raise ValueError(
-        'Default scheme "%s" is not a member of provided schemes: %s' % (default_scheme, list(filesystems_dict.keys())))
+        'Default scheme "%s" is not a member of provided schemes: %s' % (default_scheme, list(filesystems_dict.keys()))
+      )
 
     self._name = name
     self._fs_dict = filesystems_dict
