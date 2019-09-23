@@ -68,6 +68,7 @@ if sys.version_info[0] > 2:
 else:
   from StringIO import StringIO as string_io
 
+
 LOG = logging.getLogger(__name__)
 
 
@@ -133,7 +134,7 @@ def home(request):
 
 def home2(request, is_embeddable=False):
   apps = appmanager.get_apps_dict(request.user)
-  
+
   return render('home2.mako', request, {
     'apps': apps,
     'is_embeddable': request.GET.get('is_embeddable', False)
@@ -303,7 +304,7 @@ def dump_config(request):
 
   apps = sorted(app_modules, key=lambda app: app.name)
   apps_names = [app.name for app in apps]
-  top_level = sorted(list(GLOBAL_CONFIG.get().values()), key=lambda obj: apps_names.index(obj.config.key))
+  top_level = sorted(config_modules, key=lambda obj: apps_names.index(obj.config.key))
 
   return render("dump_config.mako", request, {
       'show_private': show_private,

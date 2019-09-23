@@ -35,8 +35,7 @@ def find_file_recursive(desired_glob, root):
       matches = fnmatch.filter(filenames, desired_glob)
       if matches:
         if len(matches) != 1:
-          logging.warning("Found multiple jars matching %s: %s" %
-                          (desired_glob, matches))
+          logging.warning("Found multiple jars matching %s: %s" % (desired_glob, matches))
         return os.path.join(dirpath, matches[0])
 
     logging.error("Trouble finding jars matching %s" % (desired_glob,))

@@ -20,7 +20,6 @@ import re
 from django.core.validators import RegexValidator
 
 from useradmin.models import User
-
 from desktop.lib.django_util import get_username_re_rule
 
 
@@ -40,6 +39,3 @@ def monkey_patch_username_validator():
   for validator in username.validators:
     if isinstance(validator, RegexValidator):
       validator.regex = regex
-
-
-monkey_patch_username_validator()
