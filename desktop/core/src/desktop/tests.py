@@ -274,15 +274,8 @@ def test_dump_config():
 
   finish = desktop.conf.ENABLE_CONNECTORS.set_for_testing(True)
   try:
-    with patch('desktop.lib.connectors.api.CONNECTORS.get') as CONNECTORS:
-      CONNECTORS.return_value = {
-        'hdfs-1': Mock(
-          NICE_NAME=Mock(get=Mock(return_value='HDFS')),
-          DIALECT=Mock(get=Mock(return_value='hdfs')),
-          INTERFACE=Mock(get=Mock(return_value='rest')),
-          SETTINGS=Mock(get=Mock(return_value=[{"name": "server_url", "value": "http://gethue.com:20101/webhdfs/v1"}])),
-        )
-      }
+    with patch('desktop.lib.fsmanager.has_hdfs_enabled') as has_hdfs_enabled:
+      has_hdfs_enabled.return_value = True
       response = c.get(reverse('desktop.views.dump_config'))
       assert_equal(1, len(response.context[0]['apps']), response.context[0])
   finally:

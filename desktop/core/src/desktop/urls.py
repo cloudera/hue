@@ -198,10 +198,9 @@ if METRICS.ENABLE_WEB_METRICS.get():
     url(r'^desktop/metrics/?', include('desktop.lib.metrics.urls'))
   ]
 
-if has_connectors():
-  dynamic_patterns += [
-    url(r'^desktop/connectors/?', include('desktop.lib.connectors.urls'))
-  ]
+dynamic_patterns += [
+  url(r'^desktop/connectors/?', include('desktop.lib.connectors.urls'))
+]
 
 if ANALYTICS.IS_ENABLED.get():
   dynamic_patterns += [

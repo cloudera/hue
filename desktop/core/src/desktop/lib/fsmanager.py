@@ -27,7 +27,7 @@ from azure.conf import is_adls_enabled, is_abfs_enabled, has_adls_access, has_ab
 
 from desktop.lib.fs.proxyfs import ProxyFS
 from desktop.conf import is_gs_enabled, has_gs_access
-from desktop.lib.fs.gc.client import get_client as get_client_gs 
+from desktop.lib.fs.gc.client import get_client as get_client_gs
 
 from hadoop.cluster import get_hdfs
 from hadoop.conf import has_hdfs_enabled
@@ -49,7 +49,7 @@ def has_access(fs=None, user=None):
     return has_gs_access(user)
 
 
-def is_enabled(fs=None):
+def is_enabled(fs):
   if fs == 'hdfs':
     return has_hdfs_enabled()
   elif fs == 'adl':
@@ -110,6 +110,7 @@ def get_filesystem(name='default'):
 
 def get_filesystems(user):
   return [fs for fs in SUPPORTED_FS if is_enabled(fs) and has_access(fs, user)]
+
 
 def _get_client(fs=None):
   if fs == 'hdfs':
