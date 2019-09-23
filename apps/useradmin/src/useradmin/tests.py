@@ -699,14 +699,16 @@ class TestUserAdmin(BaseUserAdminTests):
       assert_equal({ 'username': ['Username already exists.']}, response.context[0]["form"].errors)
 
       # Create a new regular user (for real)
-      response = c.post('/useradmin/users/new', dict(username=FUNNY_NAME,
-                                               password1="test",
-                                               password2="test",
-                                               is_superuser=True,
-                                               is_active=True))
+      response = c.post('/useradmin/users/new', dict(
+          username=FUNNY_NAME,
+          password1="test",
+          password2="test",
+          is_superuser=True,
+          is_active=True)
+      )
       response = c.get('/useradmin/')
 
-      assert_true(FUNNY_NAME in response.content)
+      assert_true(FUNNY_NAME in response.content, response.context[0])
       assert_true(len(response.context[0]["users"]) > 1)
       assert_true("Hue Users" in response.content)
       # Validate profile is created.
