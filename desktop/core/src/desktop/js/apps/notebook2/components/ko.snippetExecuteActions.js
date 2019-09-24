@@ -19,7 +19,7 @@ import ko from 'knockout';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
-import { EXECUTION_STATUS } from 'apps/notebook2/execution/executableStatement';
+import { EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
 import { EXECUTOR_UPDATED_EVENT } from 'apps/notebook2/execution/executor';
 
 export const NAME = 'snippet-execute-actions';

@@ -17,16 +17,22 @@
 import $ from 'jquery';
 
 import ApiHelper from 'api/apiHelper';
-import { ExecutableStatement, EXECUTION_STATUS } from '../executableStatement';
+import SqlExecutable from '../sqlExecutable';
+import { EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
+import sessionManager from 'apps/notebook2/execution/sessionManager';
 
-describe('executableStatement.js', () => {
+describe('sqlExecutable.js', () => {
+  afterEach(() => {
+    sessionManager.knownSessionPromises = {};
+  });
+
   /**
    * @param statement
-   * @return {ExecutableStatement}
+   * @return {SqlExecutable}
    */
   const createSubject = statement => {
     if (typeof statement === 'string') {
-      return new ExecutableStatement({
+      return new SqlExecutable({
         compute: { id: 'compute' },
         namespace: { id: 'namespace' },
         database: 'default',
@@ -35,7 +41,7 @@ describe('executableStatement.js', () => {
       });
     }
 
-    return new ExecutableStatement({
+    return new SqlExecutable({
       compute: { id: 'compute' },
       namespace: { id: 'namespace' },
       database: 'default',

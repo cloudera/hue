@@ -39,7 +39,7 @@ const RESULT_STATUS = {
 class ExecutionResult {
   /**
    *
-   * @param {ExecutableStatement} executable
+   * @param {Executable} executable
    */
   constructor(executable) {
     this.executable = executable;

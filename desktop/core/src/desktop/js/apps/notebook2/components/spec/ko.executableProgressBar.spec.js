@@ -1,7 +1,7 @@
 import huePubSub from 'utils/huePubSub';
 import { koSetup } from 'spec/jasmineSetup';
 import { NAME } from '../ko.executableProgressBar';
-import { EXECUTION_STATUS } from 'apps/notebook2/execution/executableStatement';
+import { EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
 import { EXECUTOR_UPDATED_EVENT } from 'apps/notebook2/execution/executor';
 
 describe('ko.executableProgressBar.js', () => {

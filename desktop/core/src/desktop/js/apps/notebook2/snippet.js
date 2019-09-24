@@ -32,11 +32,11 @@ import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 import Result from 'apps/notebook2/result';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
-import { ExecutableStatement } from 'apps/notebook2/execution/executableStatement';
+import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
 import { notebookToContextJSON, snippetToContextJSON } from 'apps/notebook2/notebookSerde';
 
 // TODO: Remove. Temporary here for debug
-window.ExecutableStatement = ExecutableStatement;
+window.SqlExecutable = SqlExecutable;
 window.Executor = Executor;
 
 const TYPE = {

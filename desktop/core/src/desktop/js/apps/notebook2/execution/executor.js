@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { EXECUTION_STATUS, ExecutableStatement } from './executableStatement';
-import sqlStatementsParser from 'parse/sqlStatementsParser';
+import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
+import { EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
 import huePubSub from 'utils/huePubSub';
-import sessionManager from './sessionManager';
+import sessionManager from 'apps/notebook2/execution/sessionManager';
 
 // TODO: Remove, debug var
 window.sessionManager = sessionManager;
@@ -29,8 +29,6 @@ const EXECUTION_FLOW = {
 };
 
 export const EXECUTOR_UPDATED_EVENT = 'hue.executor.updated';
-
-const BATCHABLE_STATEMENT_TYPES = /ALTER|CREATE|DELETE|DROP|GRANT|INSERT|INVALIDATE|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i;
 
 class Executor {
   /**
@@ -58,34 +56,9 @@ class Executor {
     this.executed = [];
 
     if (this.isSqlEngine) {
-      let database = options.database;
-      sqlStatementsParser.parse(options.statement).forEach(parsedStatement => {
-        // If there's no first token it's a trailing comment
-        if (parsedStatement.firstToken) {
-          let skip = false;
-          // TODO: Do we want to send USE statements separately or do we want to send database as param instead?
-          if (/USE/i.test(parsedStatement.firstToken)) {
-            const dbMatch = parsedStatement.statement.match(/use\s+([^;]+)/i);
-            if (dbMatch) {
-              database = dbMatch[1];
-              skip = this.sourceType === 'impala' || this.sourceType === 'hive';
-            }
-          }
-          if (!skip) {
-            this.toExecute.push(
-              new ExecutableStatement({
-                sourceType: options.sourceType,
-                compute: options.compute,
-                namespace: options.namespace,
-                database: database,
-                parsedStatement: parsedStatement
-              })
-            );
-          }
-        }
-      });
+      this.toExecute = SqlExecutable.fromStatement(options);
     } else {
-      this.toExecute.push(new ExecutableStatement(options));
+      throw new Error('Not implemented yet');
     }
 
     huePubSub.subscribe('hue.executable.updated', executable => {
@@ -146,8 +119,7 @@ class Executor {
       (this.isSqlEngine &&
         this.executionFlow !== EXECUTION_FLOW.step &&
         this.currentExecutable &&
-        this.currentExecutable.parsedStatement &&
-        BATCHABLE_STATEMENT_TYPES.test(this.currentExecutable.parsedStatement.firstToken))
+        this.currentExecutable.canExecuteInBatch())
     );
   }
 }

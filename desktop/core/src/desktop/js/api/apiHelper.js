@@ -2010,7 +2010,7 @@ class ApiHelper {
 
   /**
    *
-   * @param {ExecutableStatement} executable
+   * @param {Executable} executable
    * @param {Session} [session]
    *
    * @return {{snippet: string, notebook: string}}
@@ -2064,11 +2064,11 @@ class ApiHelper {
    */
 
   /**
-   * API function to execute an ExecutableStatement
+   * API function to execute an SqlExecutable
    *
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
-   * @param {ExecutableStatement} options.executable
+   * @param {SqlExecutable} options.executable
    * @param {Session} options.session
    *
    * @return {Promise<ExecutionHandle>}
@@ -2110,7 +2110,7 @@ class ApiHelper {
    *
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
-   * @param {ExecutableStatement} options.executable
+   * @param {Executable} options.executable
    *
    * @return {CancellablePromise<string>}
    */
@@ -2134,7 +2134,7 @@ class ApiHelper {
    *
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
-   * @param {ExecutableStatement} options.executable
+   * @param {SqlExecutable} options.executable
    *
    * @return {Promise}
    */
@@ -2166,7 +2166,7 @@ class ApiHelper {
    *
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
-   * @param {ExecutableStatement} options.executable
+   * @param {SqlExecutable} options.executable
    * @param {number} options.rows
    * @param {boolean} options.startOver
    *
@@ -2199,7 +2199,7 @@ class ApiHelper {
    *
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
-   * @param {ExecutableStatement} options.executable
+   * @param {SqlExecutable} options.executable
    *
    * @return {Promise<ResultResponse>}
    */
@@ -2221,7 +2221,7 @@ class ApiHelper {
    *
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
-   * @param {ExecutableStatement} options.executable
+   * @param {SqlExecutable} options.executable
    *
    * @return {Promise}
    */

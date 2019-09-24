@@ -19,7 +19,7 @@ import ko from 'knockout';
 import 'ko/bindings/ko.publish';
 
 import componentUtils from 'ko/components/componentUtils';
-import { EXECUTION_STATUS } from 'apps/notebook2/execution/executableStatement';
+import { EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
 import huePubSub from 'utils/huePubSub';
 import { EXECUTOR_UPDATED_EVENT } from 'apps/notebook2/execution/executor';
 import DisposableComponent from 'ko/components/DisposableComponent';
