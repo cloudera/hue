@@ -17,8 +17,8 @@
 import $ from 'jquery';
 
 import ApiHelper from 'api/apiHelper';
-import { EXECUTION_STATUS } from '../executableStatement';
-import Executor from '../executor';
+import { EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
+import Executor from 'apps/notebook2/execution/executor';
 
 describe('executor.js', () => {
   /**

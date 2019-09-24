@@ -19,8 +19,9 @@ import komapping from 'knockout.mapping';
 
 import 'ko/bindings/ko.slideVisible';
 import 'ko/bindings/ko.toggle';
-import apiHelper from '../../api/apiHelper';
-import componentUtils from './componentUtils';
+
+import apiHelper from 'api/apiHelper';
+import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
