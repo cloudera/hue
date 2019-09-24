@@ -42,6 +42,7 @@ from django.urls import reverse
 from django.test.client import Client
 from django.views.static import serve
 from django.http import HttpResponse
+from mock import patch, Mock, MagicMock
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises, nottest
@@ -273,8 +274,10 @@ def test_dump_config():
 
   finish = desktop.conf.ENABLE_CONNECTORS.set_for_testing(True)
   try:
-    response = c.get(reverse('desktop.views.dump_config'))
-    assert_equal(1, len(response.context[0]['apps']), response.context[0])
+    with patch('desktop.lib.fsmanager.has_hdfs_enabled') as has_hdfs_enabled:
+      has_hdfs_enabled.return_value = True
+      response = c.get(reverse('desktop.views.dump_config'))
+      assert_equal(1, len(response.context[0]['apps']), response.context[0])
   finally:
     finish()
 

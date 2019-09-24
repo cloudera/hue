@@ -22,6 +22,7 @@ import grp
 import logging
 import threading
 import subprocess
+import sys
 import json
 
 from axes.decorators import FAILURE_LIMIT, LOCK_OUT_AT_FAILURE
@@ -52,6 +53,9 @@ from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm, AddLdapU
   validate_last_name, PasswordChangeForm
 from useradmin.ldap_access import LdapBindException, LdapSearchException
 from useradmin.models import HuePermission, UserProfile, LdapGroup, get_profile, get_default_user_group, User, Group
+
+if sys.version_info[0] > 2:
+  unicode = str
 
 if ENABLE_ORGANIZATIONS.get():
   from useradmin.forms import OrganizationUserChangeForm as UserChangeForm, OrganizationSuperUserChangeForm as SuperUserChangeForm
@@ -830,7 +834,7 @@ def ensure_home_directory(fs, user):
     home_directory = userprofile.home_directory.split('@')[0]
 
   if userprofile is not None and userprofile.home_directory:
-    if not isinstance(home_directory, str):
+    if not isinstance(home_directory, unicode):
       home_directory = home_directory.decode("utf-8")
     fs.do_as_user(username, fs.create_home_dir, home_directory)
   else:

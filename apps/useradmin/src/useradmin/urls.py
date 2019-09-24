@@ -22,6 +22,7 @@ from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule
 from useradmin import views as useradmin_views
 from useradmin import api as useradmin_api
 
+
 username_re = get_username_re_rule()
 groupname_re = get_groupname_re_rule()
 

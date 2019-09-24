@@ -123,17 +123,17 @@ class HttpClient(object):
     short_url = '%(scheme)s://%(netloc)s' % {'scheme': parsed_uri.scheme, 'netloc': parsed_uri.netloc}
     return short_url
 
-  def set_kerberos_auth(self):
+  def set_kerberos_auth(self, service="HTTP"):
     """Set up kerberos auth for the client, based on the current ticket."""
     mutual_auth = conf.KERBEROS.MUTUAL_AUTHENTICATION.get().upper()
     if mutual_auth == 'OPTIONAL':
-      self._session.auth = HTTPKerberosAuth(mutual_authentication=OPTIONAL)
+      self._session.auth = HTTPKerberosAuth(mutual_authentication=OPTIONAL, service=service)
     elif mutual_auth == 'REQUIRED':
-      self._session.auth = HTTPKerberosAuth(mutual_authentication=REQUIRED)
+      self._session.auth = HTTPKerberosAuth(mutual_authentication=REQUIRED, service=service)
     elif mutual_auth == 'DISABLED':
-      self._session.auth = HTTPKerberosAuth(mutual_authentication=DISABLED)
+      self._session.auth = HTTPKerberosAuth(mutual_authentication=DISABLED, service=service)
     else:
-      self._session.auth = HTTPKerberosAuth(mutual_authentication=OPTIONAL)
+      self._session.auth = HTTPKerberosAuth(mutual_authentication=OPTIONAL, service=service)
     return self
 
   def set_basic_auth(self, username, password):

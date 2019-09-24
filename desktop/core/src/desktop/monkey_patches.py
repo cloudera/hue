@@ -40,6 +40,3 @@ def monkey_patch_username_validator():
   for validator in username.validators:
     if isinstance(validator, RegexValidator):
       validator.regex = regex
-
-
-monkey_patch_username_validator()

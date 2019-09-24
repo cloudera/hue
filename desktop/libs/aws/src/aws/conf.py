@@ -38,24 +38,29 @@ PERMISSION_ACTION_S3 = "s3_access"
 
 def get_locations():
   return ('EU',  # Ireland
-    'eu-central-1',  # Frankfurt
-    'eu-west-1',
-    'eu-west-2',
-    'eu-west-3',
-    'ca-central-1',
-    'us-east-1',
-    'us-east-2',
-    'us-west-1',
-    'us-west-2',
-    'sa-east-1',
+    'ap-east-1',
     'ap-northeast-1',
     'ap-northeast-2',
     'ap-northeast-3',
     'ap-southeast-1',
     'ap-southeast-2',
     'ap-south-1',
+    'ca-central-1',
     'cn-north-1',
-    'cn-northwest-1')
+    'cn-northwest-1',
+    'eu-central-1',  # Frankfurt
+    'eu-north-1',
+    'eu-west-1',
+    'eu-west-2',
+    'eu-west-3',
+    'me-south-1',
+    'sa-east-1',
+    'us-east-1',
+    'us-east-2',
+    'us-gov-east-1',
+    'us-gov-west-1',
+    'us-west-1',
+    'us-west-2')
 
 
 def get_default_access_key_id():
@@ -101,10 +106,22 @@ def get_region(conf):
     elif conf.REGION.get():
       region = conf.REGION.get()
 
-    # If the parsed out region is not in the list of supported regions, fallback to the default
-    if region not in get_locations():
-      LOG.warn("Region, %s, not found in the list of supported regions: %s" % (region, ', '.join(get_locations())))
-      region = ''
+  if not region and is_ec2_instance():
+    try:
+      import boto.utils
+      data = boto.utils.get_instance_identity(timeout=1, num_retries=1)
+      if data:
+        region = data['document']['region']
+    except Exception as e:
+      LOG.exception("Encountered error when fetching instance identity: %s" % e)
+
+  if not region:
+    region = AWS_ACCOUNT_REGION_DEFAULT
+
+  # If the parsed out region is not in the list of supported regions, fallback to the default
+  if region not in get_locations():
+    LOG.warn("Region, %s, not found in the list of supported regions: %s" % (region, ', '.join(get_locations())))
+    region = ''
 
   return region
 
@@ -160,7 +177,7 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
       ),
       REGION=Config(
         key='region',
-        default=AWS_ACCOUNT_REGION_DEFAULT,
+        default=None,
         type=str
       ),
       HOST=Config(
@@ -218,12 +235,20 @@ def is_enabled():
   return ('default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()) or has_iam_metadata() or conf_idbroker.is_idbroker_enabled('s3a')
 
 
+def is_ec2_instance():
+  # To avoid unnecessary network call, check if Hue is running on EC2 instance
+  # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/identify_ec2_instances.html
+  # /sys/hypervisor/uuid doesn't work on m5/c5, but /sys/devices/virtual/dmi/id/product_uuid does
+  try:
+    return (os.path.exists('/sys/hypervisor/uuid') and open('/sys/hypervisor/uuid', 'read').read()[:3].lower() == 'ec2') or (os.path.exists('/sys/devices/virtual/dmi/id/product_uuid') and open('/sys/devices/virtual/dmi/id/product_uuid', 'read').read()[:3].lower() == 'ec2')
+  except Exception as e:
+    LOG.exception("Failed to read /sys/hypervisor/uuid or /sys/devices/virtual/dmi/id/product_uuid: %s" % e)
+    return False
+
 def has_iam_metadata():
   try:
     import boto.utils
-    # To avoid unnecessary network call, check if Hue is running on EC2 instance
-    # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/identify_ec2_instances.html
-    if os.path.exists('/sys/hypervisor/uuid') and open('/sys/hypervisor/uuid', 'read').read()[:3] == 'ec2':
+    if is_ec2_instance():
       metadata = boto.utils.get_instance_metadata(timeout=1, num_retries=1)
       return 'iam' in metadata
   except Exception as e:

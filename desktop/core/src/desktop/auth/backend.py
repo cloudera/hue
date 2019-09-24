@@ -48,7 +48,7 @@ from mozilla_django_oidc.auth import OIDCAuthenticationBackend, default_username
 from mozilla_django_oidc.utils import absolutify, import_from_settings
 
 from desktop import metrics
-from desktop.conf import AUTH, LDAP, OIDC
+from desktop.conf import AUTH, LDAP, OIDC, ENABLE_ORGANIZATIONS
 from desktop.settings import LOAD_BALANCER_COOKIE
 
 from useradmin import ldap_access
