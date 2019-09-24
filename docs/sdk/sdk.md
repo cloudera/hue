@@ -1237,7 +1237,7 @@ Add them in a "spec" subfolder relative to the file under test and the filename 
 
     someFile.js              <- File under test
     ├── spec/
-    │   ├── someFileSpec.js  <- File containing tests
+    │   ├── someFileSpec.js  <- File containing tests    
 
 Run all the tests once with:
 
@@ -1248,6 +1248,39 @@ Optionally to use Karma and headless chrome for the tests you can run
     npm run test-karma
 
 See ```desktop/core/src/desktop/js/spec/karma.config.js``` for various options
+
+#### Testing KO components
+
+jasmineSetup provides utilities to test knockout components using jsdom. A simple example:
+
+```
+import { koSetup } from 'spec/jasmineSetup';
+
+describe('ko.someComponent.js', () => {
+  const setup = koSetup(); // Adds the necessary setup and teardown
+
+  it('should render component', async () => {
+    const someParams = {}
+    
+    const wrapper = await setup.renderComponent('someComponent', someParams);
+    
+    expect(wrapper.querySelector('[data-test="'some-test-id'"]')).toBeTruthy();
+  });
+
+  it('should change after observable update', async () => {
+    const someParams = { visible: ko.observable(false) };
+    const wrapper = await setup.renderComponent('someComponent', someParams);
+	expect(wrapper.querySelector('[data-test="some-test-id"]').style['display']).toEqual('none');
+    
+    someParams.visible(true);
+    await setup.waitForKoUpdate(); // Waits for re-render
+
+    expect(wrapper.querySelector('[data-test="some-test-id"]').style['display']).toEqual('inline-block');
+  });
+});
+
+
+``` 
 
 
 ### Special environment variables
