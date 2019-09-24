@@ -672,6 +672,65 @@ Optionally to use Karma and headless chrome for the tests you can run
 
 See ```desktop/core/src/desktop/js/spec/karma.config.js``` for various options
 
+#### Testing KO components and bindings
+
+jasmineSetup provides utilities to test knockout components and bindings using jsdom.
+
+An example of component test:
+
+```
+import { koSetup } from 'spec/jasmineSetup';
+
+describe('ko.someComponent.js', () => {
+  const setup = koSetup(); // Adds the necessary setup and teardown
+
+  it('should render component', async () => {
+    const someParams = {}
+
+    const wrapper = await setup.renderComponent('someComponent', someParams);
+
+    expect(wrapper.querySelector('[data-test="'some-test-id'"]')).toBeTruthy();
+  });
+
+  it('should change after observable update', async () => {
+    const someParams = { visible: ko.observable(false) };
+    const wrapper = await setup.renderComponent('someComponent', someParams);
+    expect(wrapper.querySelector('[data-test="some-test-id"]').style['display']).toEqual('none');
+
+    someParams.visible(true); // Or trigger some event on an elmement etc.
+    await setup.waitForKoUpdate(); // Waits for re-render
+
+    expect(wrapper.querySelector('[data-test="some-test-id"]').style['display']).toEqual('inline-block');
+  });
+});
+```
+
+An example of a binding test:
+
+```
+import ko from 'knockout';
+import { koSetup } from 'spec/jasmineSetup';
+import '../ko.myBinding';
+
+describe('ko.myBinding.js', () => {
+  const setup = koSetup();
+
+  it('should toggle observable', async () => {
+    const viewModel = { testObservable: ko.observable(false) };
+    const wrapper = await setup.renderKo(
+      '<div class="click-test" data-bind="myBinding: testObservable"></div>',
+      viewModel
+    );
+
+    expect(viewModel.testObservable()).toBeFalsy();
+
+    wrapper.querySelector('.click-test').click();
+    await setup.waitForKoUpdate();
+
+    expect(viewModel.testObservable()).toBeTruthy();
+  });
+});
+```
 
 #### Special environment variables
 
