@@ -76,6 +76,15 @@ export const koSetup = () => {
         }, 0);
       }),
 
+    renderKo: async (html, viewModel) =>
+      new Promise(resolve => {
+        wrapper.innerHTML = html;
+        ko.applyBindings(viewModel, wrapper);
+        window.setTimeout(() => {
+          resolve(wrapper);
+        }, 0);
+      }),
+
     waitForKoUpdate: async () => {
       return new Promise(resolve => {
         window.setTimeout(resolve, 0);
