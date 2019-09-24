@@ -15,8 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 from builtins import object
+
+
 def get_api(request, interface):
   if interface == 'beat':
     from desktop.lib.scheduler.lib.beat import CeleryBeatApi

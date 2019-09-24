@@ -83,7 +83,7 @@ class CeleryBeatApi(Api):
 
   def action(self, schedule_id, action='suspend'):
     task = PeriodicTask.objects.get(id=schedule_id, description=self.user.username)
-    print schedule_id, action, task
+
     if action == 'suspend':
       task.enabled = False
       task.save()

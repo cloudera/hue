@@ -182,7 +182,10 @@ class Snippet {
         self.type() == 'hive' ||
         self.type() == 'impala' ||
         $.grep(vm.availableLanguages, language => {
-          return language.type == self.type() && (language.interface == 'oozie' || language.interface == 'sqlalchemy');
+          return (
+            language.type == self.type() &&
+            (language.interface == 'oozie' || language.interface == 'sqlalchemy')
+          );
         }).length > 0
       );
     });
