@@ -718,9 +718,16 @@ class SpnegoMiddleware(object):
       return
 
   def clean_host(self, pattern):
+    hosts = []
     if pattern:
-      return set([socket.gethostbyaddr(hostport.split(':')[0].strip())[0] for hostport in pattern.split(',')])
-    return set([])
+      for hostport in pattern.split(','):
+        host = hostport.split(':')[0].strip()
+        try:
+          hosts.append(socket.gethostbyaddr(host)[0])
+        except Exception:
+          LOG.exception('Could not resolve host addr %s' % host)
+          hosts.append(host)
+    return set(hosts)
 
   def clean_username(self, username, request):
     """
