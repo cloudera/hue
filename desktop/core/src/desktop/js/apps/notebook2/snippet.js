@@ -187,7 +187,9 @@ export default class Snippet {
         this.type() === this.hive ||
         this.type() === this.impala ||
         this.parentVm.availableLanguages.some(
-          language => language.type === self.type() && (language.interface == 'oozie' || language.interface == 'sqlalchemy')
+          language =>
+            language.type === self.type() &&
+            (language.interface == 'oozie' || language.interface == 'sqlalchemy')
         )
     );
 
