@@ -92,3 +92,30 @@ Then select the indexes with the “logs*” patterns and use “@timestamp” a
 It becomes then easy to look at what the users are doing, which errors they are facing… For example, here is one way to look at how many query have been executed:
 
 Next step: in addition to Elastic Search, the logs can also be automatically stored into additional outputs like HDFS, S3 or sent to Kafka.
+
+### Metrics
+
+Hue [metrics]({{% param baseURL %}}administrator/administration/operations#metrics) are useful for checking the load (how many users), slowness (average or percentile times taken by requests)... Those have been available via the /metrics page, but here is how to collect and aggregate this information in Kubernetes.
+
+Prometheus is the metric collecting system heavily used in the Kubernetes world.
+
+First we suppose we have the Prometheus operator running, which powers the Prometheus pods in the monitoring namespace:
+
+    kubectl get pods -n monitoring
+    NAME                                   READY   STATUS    RESTARTS   AGE
+    alertmanager-main-0                    2/2     Running   268        48d
+    grafana-7789c44cc7-7c4pb               1/1     Running   125        48d
+    kube-state-metrics-78c549dd89-kwmwg    4/4     Running   512        48d
+    node-exporter-zlg4s                    2/2     Running   259        48d
+    prometheus-adapter-644b448b48-7t8rt    1/1     Running   131        48d
+    prometheus-k8s-0                       3/3     Running   364        47d
+    prometheus-operator-7695b59fb8-k2qm2   1/1     Running   130        48d
+
+To tell Prometheus how to get the metrics, we use a ServiceMonitor. Those metrics are available on the /metrics page of Hue via the Django Prometheus module. Note that to expose this URL, Hue needs to have this property turned on:
+
+    [desktop]
+    enable_prometheus=true
+
+Then we can check that Prometheus is scraping properly Hue: http://prometheus:9090/targets and get a series of metrics to understand how the Hues are behaving: http://prometheus:9090/graph.
+
+This was a very basic introduction to metrics of Hue in the Kubernetes ecosystem. In a following next step, we should describe which metrics are particularly useful and how to setup default dashboards and alerts.
