@@ -67,8 +67,8 @@ class SQLIndexer(object):
 
     if destination['useCustomDelimiters']:
       field_delimiter = destination['customFieldDelimiter']
-      collection_delimiter = destination['customCollectionDelimiter']
-      map_delimiter = destination['customMapDelimiter']
+      collection_delimiter = destination['customCollectionDelimiter'] or None
+      map_delimiter = destination['customMapDelimiter'] or None
     else:
       field_delimiter = ','
       collection_delimiter = r'\002'
