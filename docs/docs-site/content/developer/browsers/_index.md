@@ -2,7 +2,7 @@
 title: "Browsers"
 date: 2019-03-13T18:28:09-07:00
 draft: false
-weight: 3
+weight: 4
 ---
 
 ## Jobs
