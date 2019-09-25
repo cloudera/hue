@@ -2,7 +2,7 @@
 title: "Applications"
 date: 2019-03-13T18:28:09-07:00
 draft: false
-weight: 4
+weight: 6
 ---
 
 Building a brand new application is more work but is ideal for creating a custom solution.
