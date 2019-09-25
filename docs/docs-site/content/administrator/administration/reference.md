@@ -15,12 +15,8 @@ Typical setups range from 2 to 5 Hue servers, e.g. 3 Hue servers, 300+ unique us
 
 In practice ~50 users / Hue peak time is the rule of thumb. This is accounting for the worse case scenarios and it will go much higher with the upcoming Task Server [HUE-8738](https://issues.cloudera.org/browse/HUE-8738) and Gunicorn [HUE-8739](https://issues.cloudera.org/browse/HUE-8739) integrations. Most of the scale issues are actually related to resource intensive operations like large download of query results or when an RPC call from Hue to a service is slow (e.g. submitting a query hangs when Hive is slow), not by the number of users.
 
-Hue comes with caching of SQL metadata throughout all the application, meaning the list of tables or a database or the column description of a table are only fetched once and re-used in the autocomplete, table browser, left and right panels etc.. The profiling of calls adds in the logs with a total time taken by each request automatically logged.
+![Reference Architecture]({{% param baseURL %}}images/hue_architecture.png)
 
-e.g.
-
-    [24/Jul/2019 14:17:32 +0000] resource     DEBUG    GET /jobs Got response in 151ms: {"total":0,"offset":1,"len":1,"coordinatorjobs":[]}
-    [24/Jul/2019 14:17:32 +0000] access       INFO     127.0.0.1 romain - "POST /jobbrowser/api/jobs HTTP/1.1" returned in 157ms (mem: 164mb)
 
 ## General Performance
 
@@ -38,6 +34,12 @@ e.g.
 
 The [Config Check]({{% param baseURL %}}administrator/administration/reference/) page of Hue (`/hue/about/`) in the administrator section will warn about detected risks. Make sure it is at zero.
 
+Hue comes with caching of SQL metadata throughout all the application, meaning the list of tables or a database or the column description of a table are only fetched once and re-used in the autocomplete, table browser, left and right panels etc.. The profiling of calls adds in the logs with a total time taken by each request automatically logged.
+
+e.g.
+
+    [24/Jul/2019 14:17:32 +0000] resource     DEBUG    GET /jobs Got response in 151ms: {"total":0,"offset":1,"len":1,"coordinatorjobs":[]}
+    [24/Jul/2019 14:17:32 +0000] access       INFO     127.0.0.1 romain - "POST /jobbrowser/api/jobs HTTP/1.1" returned in 157ms (mem: 164mb)
 
 ## Query Editor Performance
 
