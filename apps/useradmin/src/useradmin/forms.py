@@ -31,16 +31,7 @@ from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule
 from desktop.settings import LANGUAGES
 
 from useradmin.hue_password_policy import hue_get_password_validators
-<<<<<<< HEAD
 from useradmin.models import GroupPermission, HuePermission, get_default_user_group, User, Group, default_organization, Organization
-=======
-from useradmin.models import GroupPermission, HuePermission, get_default_user_group
-
-if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group, default_organization, Organization
-else:
-  from django.contrib.auth.models import User, Group
->>>>>>> 71647438c1... HUE-8530 [organization] Support creating a new user
 
 
 LOG = logging.getLogger(__name__)
@@ -98,11 +89,7 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
       max_length=30,
       regex='^%s$' % (get_username_re_rule(),), # Could use UnicodeUsernameValidator()
       help_text = _t("Required. 30 characters or fewer. No whitespaces or colons."),
-<<<<<<< HEAD
       error_messages = {'invalid': _t("Whitespaces and ':' are not allowed") })
-=======
-      error_messages = {'invalid': _t("Whitespaces and ':' not allowed") })
->>>>>>> 71647438c1... HUE-8530 [organization] Support creating a new user
 
   password1 = forms.CharField(
       label=_t("New Password"),
@@ -257,15 +244,6 @@ if ENABLE_ORGANIZATIONS.get():
         else:
           self.initial['groups'] = []
 
-    self.fields['organization'] = forms.ChoiceField(choices=((default_organization().id, default_organization()),), initial=default_organization())
-
-  def clean_organization(self):
-    try:
-      return Organization.objects.get(id=int(self.cleaned_data.get('organization')))
-    except:
-      LOG.exception('The organization does not exist.')
-      return None
-
 
 class PasswordChangeForm(UserChangeForm):
   """
@@ -285,24 +263,6 @@ class SuperUserChangeForm(UserChangeForm):
 
   def __init__(self, *args, **kwargs):
     super(SuperUserChangeForm, self).__init__(*args, **kwargs)
-    if self.instance.id:
-      # If the user exists already, we'll use its current group memberships
-      self.initial['groups'] = set(self.instance.groups.all())
-    else:
-      # If his is a new user, suggest the default group
-      default_group = get_default_user_group()
-      if default_group is not None:
-        self.initial['groups'] = set([default_group])
-      else:
-        self.initial['groups'] = []
-
-# Mixin __init__ method?
-class OrganizationSuperUserChangeForm(OrganizationUserChangeForm):
-  class Meta(UserChangeForm.Meta):
-    fields = ["email", "is_active"] + OrganizationUserChangeForm.Meta.fields + ["is_superuser", "unlock_account", "groups"]
-
-  def __init__(self, *args, **kwargs):
-    super(OrganizationSuperUserChangeForm, self).__init__(*args, **kwargs)
     if self.instance.id:
       # If the user exists already, we'll use its current group memberships
       self.initial['groups'] = set(self.instance.groups.all())
