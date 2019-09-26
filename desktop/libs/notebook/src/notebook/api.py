@@ -45,7 +45,6 @@ from notebook.connectors.hiveserver2 import HS2Api
 from notebook.connectors.oozie_batch import OozieApi
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
 from notebook.models import escape_rows, make_notebook, upgrade_session_properties, get_api
-from notebook.views import upgrade_session_properties, get_api
 
 if sys.version_info[0] > 2:
   import urllib.request, urllib.error

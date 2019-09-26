@@ -31,7 +31,6 @@ from celery.utils.log import get_task_logger
 from celery import states
 from django.core.cache import caches
 from django.core.files.storage import get_storage_class
-from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import FileResponse, HttpRequest
 

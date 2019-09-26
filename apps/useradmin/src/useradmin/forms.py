@@ -204,14 +204,6 @@ if ENABLE_ORGANIZATIONS.get():
         widget=forms.TextInput(attrs={'maxlength': 150, 'placeholder': _t("Email"), 'autocomplete': 'off', 'autofocus': 'autofocus'})
     )
 
-if ENABLE_ORGANIZATIONS.get():
-  class OrganizationUserChangeForm(UserChangeForm):
-    username = None
-    email = forms.CharField(
-        label=_t("Email"),
-        widget=forms.TextInput(attrs={'maxlength': 150, 'placeholder': _t("Email"), 'autocomplete': 'off', 'autofocus': 'autofocus'})
-    )
-
     class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
       model =  User
       fields = ["first_name", "last_name", "email", "ensure_home_directory"]
