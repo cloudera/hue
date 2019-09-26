@@ -1,4 +1,4 @@
-FROM httpd:2.4
+FROM huelb_httpd:2.4
 
 LABEL description="Hue Project https://github.com/cloudera/hue"
 
@@ -6,37 +6,38 @@ ARG GBN
 ARG GSHA
 ARG GBRANCH
 ARG VERSION
+ARG HUEUSER
 
 # Set the environment variable
 ENV NAME="hue" \
-    HUE_HOME="/opt/hue" \
+    HUE_USER=${HUEUSER} \
     HUE_CONF="/etc/hue" \
+    HUE_HOME="/opt/${HUEUSER}" \
+    HUE_CONF_DIR="${HUE_CONF}/conf" \
+    HUE_LOG_DIR="/var/log/${HUEUSER}" \
     HUE_BUILDNO=${GBN} \
     HUE_SHAURL=${GSHA} \
     HUE_BRANCHURL=${GBRANCH} \
     HUE_VERSION=${VERSION} \
-    HUE_BIN="/opt/hue/build/env/bin" \
-    PATH=$PATH:$HUE_BIN
+    HUE_BIN="/opt/${HUEUSER}/build/env/bin" \
+    PATH=$PATH:${HUE_BIN} \
+    SUPERVISOR_VERSION=4.0.2
 
-RUN apt-get update; \
-    apt-get install -y --no-install-recommends \
-      netcat \
-      ; \
-    rm -r /var/lib/apt/lists/*;
+# create hue user
+RUN groupadd -g 1123 ${HUE_USER} && useradd -g 1123 -d ${HUE_HOME} -s /bin/bash -u 1123 ${HUE_USER}
 
-RUN echo "Include /usr/local/apache2/conf/hue_httpd.conf" >> /usr/local/apache2/conf/httpd.conf
+RUN mkdir -p ${HUE_LOG_DIR} && chown -R ${HUE_USER}:${HUE_USER} ${HUE_LOG_DIR}
+RUN echo "Include /etc/httpd/conf.d/hue_httpd.conf" >> /etc/httpd/conf/httpd.conf
 
-RUN groupadd -g 1123 hue && useradd -g 1123 -d ${HUE_HOME} -s /bin/bash -u 1123 hue
-
-COPY static ${HUE_HOME}/build/static
-
-COPY run_httpd.sh ${HUE_HOME}
-COPY healthz.sh /
-
-WORKDIR ${HUE_HOME}
-
-COPY hue_httpd.conf /usr/local/apache2/conf/hue_httpd.conf
+COPY --chown=${HUE_USER}:${HUE_USER} static ${HUE_HOME}/build/static
+COPY --chown=${HUE_USER}:${HUE_USER} hue_httpd.conf /etc/httpd/conf.d/hue_httpd.conf
+COPY --chown=${HUE_USER}:${HUE_USER} hue.conf /etc/httpd/conf.d/hue.conf
+COPY --chown=${HUE_USER}:${HUE_USER} run_httpd.sh ${HUE_HOME}
+RUN chmod -v +x ${HUE_HOME}/run_httpd.sh
 
 EXPOSE 80
+# https://httpd.apache.org/docs/2.4/stopping.html#gracefulstop
+STOPSIGNAL SIGINT
 
+WORKDIR ${HUE_HOME}
 CMD ["run_httpd.sh"]
