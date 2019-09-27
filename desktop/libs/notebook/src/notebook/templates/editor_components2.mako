@@ -1384,14 +1384,14 @@
         </div>
 
         <div class="row-fluid table-results" data-bind="visible: result.type() == 'table'" style="display: none; max-height: 400px; min-height: 290px;">
+          <!-- ko if: showGrid -->
           <div>
             <div class="column-side" data-bind="visible: isResultSettingsVisible, css:{'span3 result-settings': isResultSettingsVisible, 'hidden': ! isResultSettingsVisible()}" style="position:relative;white-space: nowrap;">
-              <!-- ko template: { name: 'snippet-grid-settings${ suffix }', if: showGrid } --><!-- /ko -->
-              <!-- ko template: { name: 'snippet-chart-settings${ suffix }', if: showChart } --><!-- /ko -->
+              <!-- ko template: { name: 'snippet-grid-settings${ suffix }' } --><!-- /ko -->
               <div class="resize-bar" style="top: 0; right: -10px; cursor: col-resize;"></div>
             </div>
             <div class="grid-side" data-bind="css: {'span9': isResultSettingsVisible, 'span12 nomargin': ! isResultSettingsVisible() }">
-              <div data-bind="visible: showGrid, delayedOverflow: 'slow', css: resultsKlass" style="display: none;">
+              <div data-bind="delayedOverflow: 'slow', css: resultsKlass">
                 <table class="table table-condensed resultTable">
                   <thead>
                   <tr data-bind="foreach: result.meta">
@@ -1405,49 +1405,34 @@
                   <pre class="margin-top-10"><i class="fa fa-check muted"></i> ${ _("Results have expired, rerun the query if needed.") }</pre>
                 </div>
               </div>
-
-              <div data-bind="visible: showChart" class="chart-container" style="display:none;">
-                <h1 class="empty" data-bind="visible: !hasDataForChart()">${ _('Select the chart parameters on the left') }</h1>
-
-                <div data-bind="visible: hasDataForChart">
-                  <!-- ko if: chartType() == window.HUE_CHARTS.TYPES.PIECHART -->
-                  <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: result.data, sorting: chartSorting(), snippet: $data, limit: chartLimit()}, fqs: ko.observableArray([]),
-                      transformer: $root.ChartTransformers.pie, maxWidth: 350, parentSelector: '.chart-container' }, visible: chartType() == window.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
-                  <!-- /ko -->
-
-                  <!-- ko if: chartType() == window.HUE_CHARTS.TYPES.BARCHART -->
-                  <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {skipWindowResize: true, datum: {counts: result.data, sorting: chartSorting(), snippet: $data, limit: chartLimit()}, fqs: ko.observableArray([]), hideSelection: true, enableSelection: false, hideStacked: hideStacked,
-                      transformer: $root.ChartTransformers.multiSerie, stacked: false, showLegend: true, isPivot: typeof chartXPivot() !== 'undefined', type: chartTimelineType},  stacked: true, showLegend: true, visible: chartType() == window.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
-                  <!-- /ko -->
-
-                  <!-- ko if: chartType() == window.HUE_CHARTS.TYPES.LINECHART -->
-                  <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data, limit: chartLimit()},
-                      transformer: $root.ChartTransformers.multiSerie, showControls: false, enableSelection: false }, visible: chartType() == window.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
-                  <!-- /ko -->
-
-                  <!-- ko if: chartType() == window.HUE_CHARTS.TYPES.TIMELINECHART -->
-                  <div data-bind="attr:{'id': 'timelineChart_'+id()}, timelineChart: {type: chartTimelineType, skipWindowResize: true, datum: {counts: result.data, sorting: chartSorting(), snippet: $data, limit: chartLimit()}, fqs: ko.observableArray([]), hideSelection: true, enableSelection: false, hideStacked: hideStacked,
-                      transformer: $root.ChartTransformers.timeline, stacked: false, showLegend: true}, visible: chartType() == window.HUE_CHARTS.TYPES.TIMELINECHART" class="chart"></div>
-                  <!-- /ko -->
-
-                  <!-- ko if: chartType() == window.HUE_CHARTS.TYPES.MAP -->
-                  <div data-bind="attr:{'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data, limit: chartLimit()},
-                      transformer: $root.ChartTransformers.leafletMap, showControls: false, height: 380, visible: chartType() == window.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
-                  <!-- /ko -->
-
-                  <!-- ko if: chartType() == window.HUE_CHARTS.TYPES.GRADIENTMAP -->
-                  <div data-bind="attr:{'id': 'gradientMapChart_'+id()}, mapChart: {data: {counts: result.data, sorting: chartSorting(), snippet: $data, scope: chartScope(), limit: chartLimit()},
-                      transformer: $root.ChartTransformers.map, isScale: true, showControls: false, height: 380, maxWidth: 750, parentSelector: '.chart-container', visible: chartType() == window.HUE_CHARTS.TYPES.GRADIENTMAP}" class="chart"></div>
-                  <!-- /ko -->
-
-                  <!-- ko if: chartType() == window.HUE_CHARTS.TYPES.SCATTERCHART -->
-                  <div data-bind="attr:{'id': 'scatterChart_'+id()}, scatterChart: {datum: {counts: result.data, snippet: $data, limit: chartLimit()},
-                      transformer: $root.ChartTransformers.scatter, maxWidth: 350, y: chartYSingle(), x: chartX(), size: chartScatterSize(), group: chartScatterGroup() }, visible: chartType() == window.HUE_CHARTS.TYPES.SCATTERCHART" class="chart"></div>
-                  <!-- /ko -->
-                </div>
-              </div>
             </div>
           </div>
+          <!-- /ko -->
+          <!-- ko if: showChart-->
+            <!-- ko component: { name: 'result-chart', params: {
+              data: result.data,
+              snippet: $data,
+              id: id,
+              isResultSettingsVisible: isResultSettingsVisible,
+              chartLimit: chartLimit,
+              chartMapHeat: chartMapHeat,
+              chartMapLabel: chartMapLabel,
+              chartMapType: chartMapType,
+              chartScatterGroup: chartScatterGroup,
+              chartScatterSize: chartScatterSize,
+              chartScope: chartScope,
+              chartSorting: chartSorting,
+              chartTimelineType: chartTimelineType,
+              chartType: chartType,
+              chartX: chartX,
+              chartXPivot: chartXPivot,
+              chartYMulti: chartYMulti,
+              chartYSingle: chartYSingle,
+              cleanedMeta: result.cleanedMeta,
+              cleanedDateTimeMeta: result.cleanedDateTimeMeta,
+              cleanedNumericMeta: result.cleanedNumericMeta
+            } } --><!-- /ko -->
+          <!-- /ko -->
         </div>
       </div>
     </div>
