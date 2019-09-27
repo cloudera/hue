@@ -2,7 +2,7 @@
 # Build an image from a remote github or local cloned Hue repository.
 
 FROM ubuntu:18.04
-LABEL description="Hue Project https://github.com/cloudera/hue"
+LABEL description="Hue SQL Assistant - gethue.com"
 
 RUN apt-get update -y && apt-get install -y \
   build-essential \
@@ -33,7 +33,6 @@ RUN apt-get update -y && apt-get install -y \
   # openssl \ # Breaks build
   xmlsec1 \
   libxmlsec1-openssl \
-  hugo \
   && rm -rf /var/lib/apt/lists/*
 
 ADD . /hue
@@ -49,9 +48,6 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | sudo bash - \
 
 RUN PREFIX=/usr/share make install
 RUN useradd -ms /bin/bash hue && chown -R hue /usr/share/hue
-
-# Build the docs (not in Makefile yet)
-# RUN hugo --source docs/docs-site
 
 # Only keep install dir
 WORKDIR /usr/share/hue
