@@ -22,6 +22,8 @@ import { markdown } from 'markdown';
 import 'apps/notebook2/components/ko.executableProgressBar';
 import 'apps/notebook2/components/ko.snippetEditorActions';
 import 'apps/notebook2/components/ko.snippetExecuteActions';
+import 'apps/notebook2/components/resultChart/ko.resultChart';
+import 'apps/notebook2/components/resultGrid/ko.resultGrid';
 
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
 import apiHelper from 'api/apiHelper';

@@ -1305,58 +1305,6 @@
     </div>
   </script>
 
-  <script type="text/html" id="snippet-grid-settings${ suffix }">
-    <div class="snippet-grid-settings" data-bind="delayedOverflow">
-      <table class="table table-condensed margin-top-10 no-border">
-        <thead>
-        <tr>
-          <th width="16">
-            <input class="all-meta-checked no-margin-top" type="checkbox" data-bind="enable: !result.isMetaFilterVisible() && result.filteredMeta().length > 0, event: { change: function(){ toggleAllResultColumns($element); result.clickFilteredMetaCheck() } }, checked: result.filteredMetaChecked" />
-          </th>
-          <th colspan="2" class="nav-header-like">
-            <span class="meta-title pointer" data-bind="click: function() { result.isMetaFilterVisible(true); }, attr: { title: result.filteredColumnCount() }">${_('columns')}</span>
-            (<span class="meta-title pointer" data-bind="click: function() { result.isMetaFilterVisible(true); }, text: result.filteredColumnCount()"></span>)
-            <span class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ result.isMetaFilterVisible(true); }, css: { 'blue' : result.isMetaFilterVisible }"><i class="pointer fa fa-search" title="${ _('Search') }"></i></span>
-          </th>
-        </tr>
-        <tr data-bind="visible: result.isMetaFilterVisible">
-          <td colspan="3">
-            <div class="context-popover-inline-autocomplete" style="display: block;">
-              <!-- ko component: {
-                name: 'inline-autocomplete',
-                params: {
-                  placeHolder: '${ _ko('Filter columns...') }',
-                  querySpec: result.metaFilter,
-                  facets: Object.keys(SQL_COLUMNS_KNOWN_FACET_VALUES),
-                  knownFacetValues: SQL_COLUMNS_KNOWN_FACET_VALUES,
-                  autocompleteFromEntries: result.autocompleteFromEntries
-                }
-              } --><!-- /ko -->
-              ##<input class="meta-filter" type="text" data-bind="blurHide: result.isMetaFilterVisible, clearable: result.metaFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }" title="${ _('Type column:xxx or type:yyy for specific filters.') }" style="width: 257px" />
-            </div>
-          </td>
-        </tr>
-        </thead>
-        <tbody class="unstyled filtered-meta" data-bind="foreach: result.filteredMeta">
-        <tr data-bind="visible: name != ''">
-          <td><input class="no-margin-top" type="checkbox" data-bind="event: { change: function() { $parent.toggleResultColumn($element, originalIndex);} }, checked: checked" /></td>
-          <td><a class="pointer" data-bind="click: function(){ $parent.scrollToResultColumn($element); }, attr: { title: name + ' - ' + type}"><span data-bind="text: name"></span></a></td>
-          <td><span data-bind="text: type" class="muted margin-left-20"></span></td>
-        </tr>
-        </tbody>
-        <tfoot>
-        <tr>
-          <td colspan="3">
-            <div class="margin-top-10 muted meta-noresults" data-bind="visible: result.filteredMeta().length === 0">
-              ${ _('No results found') }
-            </div>
-          </td>
-        </tr>
-        </tfoot>
-      </table>
-    </div>
-  </script>
-
   <script type="text/html" id="snippet-explain${ suffix }">
     <pre class="no-margin-bottom" data-bind="text: result.explanation"></pre>
   </script>
@@ -1383,30 +1331,24 @@
           <!-- /ko -->
         </div>
 
-        <div class="row-fluid table-results" data-bind="visible: result.type() == 'table'" style="display: none; max-height: 400px; min-height: 290px;">
+        <div class="row-fluid table-results" data-bind="visible: result.type() === 'table'" style="display: none; max-height: 400px; min-height: 290px;">
           <!-- ko if: showGrid -->
-          <div>
-            <div class="column-side" data-bind="visible: isResultSettingsVisible, css:{'span3 result-settings': isResultSettingsVisible, 'hidden': ! isResultSettingsVisible()}" style="position:relative;white-space: nowrap;">
-              <!-- ko template: { name: 'snippet-grid-settings${ suffix }' } --><!-- /ko -->
-              <div class="resize-bar" style="top: 0; right: -10px; cursor: col-resize;"></div>
-            </div>
-            <div class="grid-side" data-bind="css: {'span9': isResultSettingsVisible, 'span12 nomargin': ! isResultSettingsVisible() }">
-              <div data-bind="delayedOverflow: 'slow', css: resultsKlass">
-                <table class="table table-condensed resultTable">
-                  <thead>
-                  <tr data-bind="foreach: result.meta">
-                    <th class="sorting" data-bind="text: ($index() == 0 ? '&nbsp;' : $data.name), css: typeof cssClass != 'undefined' ? cssClass : 'sort-string', attr: {title: $data.type }, style:{'width': $index() == 0 ? '1%' : '', 'height': $index() == 0 ? '32px' : ''}, click: function(obj, e){ $(e.target).parents('table').trigger('sort', obj); }"></th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  </tbody>
-                </table>
-                <div data-bind="visible: status() == 'expired' && result.data() && result.data().length > 99, css: resultsKlass" style="display:none;">
-                  <pre class="margin-top-10"><i class="fa fa-check muted"></i> ${ _("Results have expired, rerun the query if needed.") }</pre>
-                </div>
-              </div>
-            </div>
-          </div>
+            <!-- ko component: { name: 'result-grid', params: {
+              status: status,
+              isResultSettingsVisible: isResultSettingsVisible,
+              isMetaFilterVisible: result.isMetaFilterVisible,
+              filteredMeta: result.filteredMeta,
+              filteredMetaChecked: result.filteredMetaChecked,
+              clickFilteredMetaCheck: result.clickFilteredMetaCheck,
+              filteredColumnCount: result.filteredColumnCount,
+              metaFilter: result.metaFilter,
+              autocompleteFromEntries: result.autocompleteFromEntries,
+              toggleResultColumn: toggleResultColumn,
+              scrollToResultColumn: scrollToResultColumn,
+              resultsKlass: resultsKlass,
+              meta: result.meta,
+              data: result.data
+            } } --><!-- /ko -->
           <!-- /ko -->
           <!-- ko if: showChart-->
             <!-- ko component: { name: 'result-chart', params: {
