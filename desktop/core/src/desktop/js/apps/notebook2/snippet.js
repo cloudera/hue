@@ -191,7 +191,7 @@ export default class Snippet {
         this.type() === this.impala ||
         this.parentVm.availableLanguages.some(
           language =>
-            language.type === self.type() &&
+            language.type === this.type() &&
             (language.interface == 'oozie' || language.interface == 'sqlalchemy')
         )
     );
