@@ -59,6 +59,7 @@ RUN ./build/env/bin/pip install redis==2.10.6
 RUN ./build/env/bin/pip install django_redis
 RUN ./build/env/bin/pip install flower
 RUN ./build/env/bin/pip install gevent
+RUN ./build/env/bin/pip install threadloop # Needed for Jaeger
 
 COPY tools/docker/hue/conf desktop/conf
 COPY tools/docker/hue/startup.sh .
