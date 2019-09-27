@@ -16,27 +16,8 @@
 
 import ko from 'knockout';
 
-import hueUtils from 'utils/hueUtils';
+import { sleep, UUID } from 'utils/hueUtils';
 import huePubSub from 'utils/huePubSub';
-
-const adaptMeta = meta => {
-  meta.forEach((item, index) => {
-    if (typeof item.checked === 'undefined') {
-      item.checked = ko.observable(true);
-      item.checked.subscribe(() => {
-        self.filteredMetaChecked(
-          self.filteredMeta().some(item => {
-            return item.checked();
-          })
-        );
-      });
-    }
-    item.type = item.type.replace(/_type/i, '').toLowerCase();
-    if (typeof item.originalIndex === 'undefined') {
-      item.originalIndex = index;
-    }
-  });
-};
 
 const isNumericColumn = type =>
   ['tinyint', 'smallint', 'int', 'bigint', 'float', 'double', 'decimal', 'real'].indexOf(type) !==
@@ -51,24 +32,37 @@ const isStringColumn = type =>
 
 class Result {
   constructor(result, snippet) {
-    const self = this;
+    this.id = ko.observable(result.id || UUID());
+    this.type = ko.observable(result.type || 'table');
+    this.hasResultset = ko.observable(result.hasResultset !== false).extend('throttle', 100);
+    this.handle = ko.observable(result.handle || {});
+    this.meta = ko.observableArray(result.meta || []);
+    this.snippet = snippet;
 
-    self.id = ko.observable(result.id || hueUtils.UUID());
-    self.type = ko.observable(result.type || 'table');
-    self.hasResultset = ko.observable(result.hasResultset !== false).extend('throttle', 100);
-    self.handle = ko.observable(result.handle || {});
-    self.meta = ko.observableArray(result.meta || []);
-    self.snippet = snippet;
+    const adaptMeta = () => {
+      this.meta().forEach((item, index) => {
+        if (typeof item.checked === 'undefined') {
+          item.checked = ko.observable(true);
+          item.checked.subscribe(() => {
+            this.filteredMetaChecked(this.filteredMeta().some(item => item.checked()));
+          });
+        }
+        item.type = item.type.replace(/_type/i, '').toLowerCase();
+        if (typeof item.originalIndex === 'undefined') {
+          item.originalIndex = index;
+        }
+      });
+    };
 
-    adaptMeta(self.meta());
-    self.meta.subscribe(() => {
-      adaptMeta(self.meta());
+    adaptMeta();
+    this.meta.subscribe(() => {
+      adaptMeta();
     });
 
-    self.rows = ko.observable(result.rows);
-    self.hasMore = ko.observable(!!result.hasMore);
-    self.statement_id = ko.observable(result.statement_id || 0);
-    self.statement_range = ko.observable(
+    this.rows = ko.observable(result.rows);
+    this.hasMore = ko.observable(!!result.hasMore);
+    this.statement_id = ko.observable(result.statement_id || 0);
+    this.statement_range = ko.observable(
       result.statement_range || {
         start: {
           row: 0,
@@ -82,30 +76,30 @@ class Result {
     );
     // We don't keep track of any previous selection so prevent entering into batch execution mode after load by setting
     // statements_count to 1. For the case when a selection is not starting at row 0.
-    self.statements_count = ko.observable(1);
-    self.previous_statement_hash = ko.observable(result.previous_statement_hash);
-    self.cleanedMeta = ko.pureComputed(() => self.meta().filter(item => item.name !== ''));
-    self.metaFilter = ko.observable();
+    this.statements_count = ko.observable(1);
+    this.previous_statement_hash = ko.observable(result.previous_statement_hash);
+    this.cleanedMeta = ko.pureComputed(() => this.meta().filter(item => item.name !== ''));
+    this.metaFilter = ko.observable();
 
-    self.isMetaFilterVisible = ko.observable(false);
-    self.filteredMetaChecked = ko.observable(true);
+    this.isMetaFilterVisible = ko.observable(false);
+    this.filteredMetaChecked = ko.observable(true);
 
-    self.filteredColumnCount = ko.pureComputed(() => {
-      if (!self.metaFilter() || self.metaFilter().query === '') {
-        return self.meta().length - 1;
+    this.filteredColumnCount = ko.pureComputed(() => {
+      if (!this.metaFilter() || this.metaFilter().query === '') {
+        return this.meta().length - 1;
       }
-      return self.filteredMeta().length;
+      return this.filteredMeta().length;
     });
 
-    self.filteredMeta = ko.pureComputed(() => {
-      if (!self.metaFilter() || self.metaFilter().query === '') {
-        return self.meta();
+    this.filteredMeta = ko.pureComputed(() => {
+      if (!this.metaFilter() || this.metaFilter().query === '') {
+        return this.meta();
       }
 
-      return self.meta().filter(item => {
-        const facets = self.metaFilter().facets;
+      return this.meta().filter(item => {
+        const facets = this.metaFilter().facets;
         const isFacetMatch = !facets || Object.keys(facets).length === 0 || !facets['type']; // So far only type facet is used for SQL
-        const isTextMatch = !self.metaFilter().text || self.metaFilter().text.length === 0;
+        const isTextMatch = !this.metaFilter().text || this.metaFilter().text.length === 0;
         let match = true;
 
         if (!isFacetMatch) {
@@ -113,7 +107,7 @@ class Result {
         }
 
         if (match && !isTextMatch) {
-          match = self.metaFilter().text.every(text => {
+          match = this.metaFilter().text.every(text => {
             return item.name.toLowerCase().indexOf(text.toLowerCase()) !== -1;
           });
         }
@@ -121,36 +115,35 @@ class Result {
       });
     });
 
-    self.fetchedOnce = ko.observable(!!result.fetchedOnce);
-    self.startTime = ko.observable(result.startTime ? new Date(result.startTime) : new Date());
-    self.endTime = ko.observable(result.endTime ? new Date(result.endTime) : new Date());
-    self.executionTime = ko.pureComputed(
-      () => self.endTime().getTime() - self.startTime().getTime()
+    this.fetchedOnce = ko.observable(!!result.fetchedOnce);
+    this.startTime = ko.observable(result.startTime ? new Date(result.startTime) : new Date());
+    this.endTime = ko.observable(result.endTime ? new Date(result.endTime) : new Date());
+    this.executionTime = ko.pureComputed(
+      () => this.endTime().getTime() - this.startTime().getTime()
     );
 
-    self.cleanedNumericMeta = ko.pureComputed(() =>
-      self.meta().filter(item => item.name !== '' && isNumericColumn(item.type))
+    this.cleanedNumericMeta = ko.pureComputed(() =>
+      this.meta().filter(item => item.name !== '' && isNumericColumn(item.type))
     );
-    self.cleanedStringMeta = ko.pureComputed(() =>
-      self.meta().filter(item => item.name !== '' && isStringColumn(item.type))
+    this.cleanedStringMeta = ko.pureComputed(() =>
+      this.meta().filter(item => item.name !== '' && isStringColumn(item.type))
     );
-    self.cleanedDateTimeMeta = ko.pureComputed(() =>
-      self.meta().filter(item => item.name !== '' && isDateTimeColumn(item.type))
+    this.cleanedDateTimeMeta = ko.pureComputed(() =>
+      this.meta().filter(item => item.name !== '' && isDateTimeColumn(item.type))
     );
 
-    self.data = ko.observableArray(result.data || []).extend({ rateLimit: 50 });
-    self.explanation = ko.observable(result.explanation || '');
-    self.images = ko.observableArray(result.images || []).extend({ rateLimit: 50 });
-    self.logs = ko.observable('');
-    self.logLines = 0;
-    self.hasSomeResults = ko.pureComputed(() => self.hasResultset() && self.data().length > 0);
+    this.data = ko.observableArray(result.data || []).extend({ rateLimit: 50 });
+    this.explanation = ko.observable(result.explanation || '');
+    this.images = ko.observableArray(result.images || []).extend({ rateLimit: 50 });
+    this.logs = ko.observable('');
+    this.logLines = 0;
+    this.hasSomeResults = ko.pureComputed(() => this.hasResultset() && this.data().length > 0);
   }
 
   autocompleteFromEntries(nonPartial, partial) {
-    const self = this;
     const result = [];
     const partialLower = partial.toLowerCase();
-    self.meta().forEach(column => {
+    this.meta().forEach(column => {
       if (column.name.toLowerCase().indexOf(partialLower) === 0) {
         result.push(nonPartial + partial + column.name.substring(partial.length));
       } else if (column.name.toLowerCase().indexOf('.' + partialLower) !== -1) {
@@ -168,10 +161,9 @@ class Result {
   }
 
   cancelBatchExecution() {
-    const self = this;
-    self.statements_count(1);
-    self.hasMore(false);
-    self.statement_range({
+    this.statements_count(1);
+    this.hasMore(false);
+    this.statement_range({
       start: {
         row: 0,
         column: 0
@@ -181,24 +173,23 @@ class Result {
         column: 0
       }
     });
-    self.handle()['statement_id'] = 0;
-    self.handle()['start'] = {
+    this.handle()['statement_id'] = 0;
+    this.handle()['start'] = {
       row: 0,
       column: 0
     };
-    self.handle()['end'] = {
+    this.handle()['end'] = {
       row: 0,
       column: 0
     };
-    self.handle()['has_more_statements'] = false;
-    self.handle()['previous_statement_hash'] = '';
+    this.handle()['has_more_statements'] = false;
+    this.handle()['previous_statement_hash'] = '';
   }
 
   clear() {
-    const self = this;
-    self.fetchedOnce(false);
-    self.hasMore(false);
-    self.statement_range({
+    this.fetchedOnce(false);
+    this.hasMore(false);
+    this.statement_range({
       start: {
         row: 0,
         column: 0
@@ -208,41 +199,37 @@ class Result {
         column: 0
       }
     });
-    self.meta.removeAll();
-    self.data.removeAll();
-    self.images.removeAll();
-    self.logs('');
-    self.handle({
+    this.meta.removeAll();
+    this.data.removeAll();
+    this.images.removeAll();
+    this.logs('');
+    this.handle({
       // Keep multiquery indexing
-      has_more_statements: self.handle()['has_more_statements'],
-      statement_id: self.handle()['statement_id'],
-      statements_count: self.handle()['statements_count'],
-      previous_statement_hash: self.handle()['previous_statement_hash']
+      has_more_statements: this.handle()['has_more_statements'],
+      statement_id: this.handle()['statement_id'],
+      statements_count: this.handle()['statements_count'],
+      previous_statement_hash: this.handle()['previous_statement_hash']
     });
-    self.startTime(new Date());
-    self.endTime(new Date());
-    self.explanation('');
-    self.logLines = 0;
-    self.rows(null);
+    this.startTime(new Date());
+    this.endTime(new Date());
+    this.explanation('');
+    this.logLines = 0;
+    this.rows(null);
   }
 
   clickFilteredMetaCheck() {
-    const self = this;
-    self.filteredMeta().forEach(item => {
-      item.checked(self.filteredMetaChecked());
+    this.filteredMeta().forEach(item => {
+      item.checked(this.filteredMetaChecked());
     });
   }
 
   getContext() {
-    const self = this;
     return {
-      id: self.id,
-      type: self.type,
-      handle: self.handle
+      id: this.id,
+      type: this.type,
+      handle: this.handle
     };
   }
-
-  applyResultResponse(resultResponse) {}
 
   /**
    *
@@ -255,89 +242,75 @@ class Result {
 
     await this.fetchMoreRows(100, false);
 
-    window.setTimeout(() => {
-      this.executionResult.fetchResultSize().then(resultSize => {
-        this.rows(resultSize.rows);
-      });
-    }, 2000);
+    await sleep(2000);
 
-    // TODO: load additional 100 in background
-    /*
+    const resultSize = await this.executionResult.fetchResultSize();
 
-     if (result.has_more && rows > 0) {
-      setTimeout(() => {
-        self.fetchResultData(rows, false);
-      }, 500);
-    } else if (
-
-     */
+    if (resultSize && resultSize.rows) {
+      this.rows(resultSize.rows);
+    }
   }
 
   async fetchMoreRows(rowCount, startOver) {
-    return new Promise((resolve, reject) => {
-      if (!this.executionResult) {
-        reject();
-      }
-      this.executionResult
-        .fetchRows({
-          rows: rowCount,
-          startOver: !!startOver
-        })
-        .then(resultResponse => {
-          const initialIndex = this.data().length;
-          const tempData = [];
+    if (!this.executionResult) {
+      return Promise.reject();
+    }
 
-          resultResponse.data.forEach((row, index) => {
-            row.unshift(initialIndex + index + 1);
-            this.data.push(row);
-            tempData.push(row);
-          });
-
-          if (this.rows() == null || (this.rows() + '').indexOf('+') !== -1) {
-            this.rows(this.data().length + (resultResponse.has_more ? '+' : ''));
-          }
-
-          this.images(resultResponse.images || []);
-
-          huePubSub.publish('editor.render.data', {
-            data: tempData,
-            snippet: this.snippet,
-            initial: initialIndex === 0
-          });
-
-          if (!this.fetchedOnce()) {
-            resultResponse.meta.unshift({ type: 'INT_TYPE', name: '', comment: null });
-            this.meta(resultResponse.meta);
-            this.type(resultResponse.type);
-            this.fetchedOnce(true);
-          }
-
-          this.meta().forEach(meta => {
-            switch (meta.type) {
-              case 'TINYINT_TYPE':
-              case 'SMALLINT_TYPE':
-              case 'INT_TYPE':
-              case 'BIGINT_TYPE':
-              case 'FLOAT_TYPE':
-              case 'DOUBLE_TYPE':
-              case 'DECIMAL_TYPE':
-                meta.cssClass = 'sort-numeric';
-                break;
-              case 'TIMESTAMP_TYPE':
-              case 'DATE_TYPE':
-              case 'DATETIME_TYPE':
-                meta.cssClass = 'sort-date';
-                break;
-              default:
-                meta.cssClass = 'sort-string';
-            }
-          });
-
-          this.hasMore(resultResponse.has_more);
-          resolve();
-        })
-        .catch(reject);
+    const resultResponse = await this.executionResult.fetchRows({
+      rows: rowCount,
+      startOver: !!startOver
     });
+
+    const initialIndex = this.data().length;
+    const tempData = [];
+
+    resultResponse.data.forEach((row, index) => {
+      row.unshift(initialIndex + index + 1);
+      this.data.push(row);
+      tempData.push(row);
+    });
+
+    if (this.rows() == null || (this.rows() + '').indexOf('+') !== -1) {
+      this.rows(this.data().length + (resultResponse.has_more ? '+' : ''));
+    }
+
+    this.images(resultResponse.images || []);
+
+    huePubSub.publish('editor.render.data', {
+      data: tempData,
+      snippet: this.snippet,
+      initial: initialIndex === 0
+    });
+
+    if (!this.fetchedOnce()) {
+      resultResponse.meta.unshift({ type: 'INT_TYPE', name: '', comment: null });
+      this.meta(resultResponse.meta);
+      this.type(resultResponse.type);
+      this.fetchedOnce(true);
+    }
+
+    this.meta().forEach(meta => {
+      switch (meta.type) {
+        case 'TINYINT_TYPE':
+        case 'SMALLINT_TYPE':
+        case 'INT_TYPE':
+        case 'BIGINT_TYPE':
+        case 'FLOAT_TYPE':
+        case 'DOUBLE_TYPE':
+        case 'DECIMAL_TYPE':
+          meta.cssClass = 'sort-numeric';
+          break;
+        case 'TIMESTAMP_TYPE':
+        case 'DATE_TYPE':
+        case 'DATETIME_TYPE':
+          meta.cssClass = 'sort-date';
+          break;
+        default:
+          meta.cssClass = 'sort-string';
+      }
+    });
+
+    this.hasMore(resultResponse.has_more);
   }
 }
 

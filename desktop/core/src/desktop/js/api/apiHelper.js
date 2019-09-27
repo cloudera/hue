@@ -2199,11 +2199,11 @@ class ApiHelper {
    *
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
-   * @param {SqlExecutable} options.executable
+   * @param {Executable} options.executable
    *
    * @return {Promise<ResultResponse>}
    */
-  async fetchResultSize(options) {
+  async fetchResultSize2(options) {
     return new Promise((resolve, reject) => {
       this.simplePost(
         '/notebook/api/fetch_result_size',

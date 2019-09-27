@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import apiHelper from 'api/apiHelper';
+import { sleep } from 'utils/hueUtils';
 
 /**
  *  available +----> fetching +----> done
@@ -46,36 +47,32 @@ class ExecutionResult {
     this.status = executable.handle.has_result_set ? RESULT_STATUS.available : RESULT_STATUS.done;
   }
 
-  async fetchResultSize(options) {
-    return new Promise((resolve, reject) => {
-      if (this.status === RESULT_STATUS.fail) {
-        reject();
-        return;
-      }
+  async fetchResultSize() {
+    if (this.status === RESULT_STATUS.fail) {
+      return;
+    }
 
-      let attempts = 0;
-      const waitForRows = () => {
-        attempts++;
-        if (attempts < 10) {
-          apiHelper
-            .fetchResultSize({
-              executable: this.executable
-            })
-            .then(resultSizeResponse => {
-              if (resultSizeResponse.rows !== null) {
-                resolve(resultSizeResponse);
-              } else {
-                window.setTimeout(waitForRows, 1000);
-              }
-            })
-            .catch(reject);
+    let attempts = 0;
+    const waitForRows = async () => {
+      attempts++;
+      if (attempts < 10) {
+        const resultSizeResponse = await apiHelper.fetchResultSize2({
+          executable: this.executable,
+          silenceErrors: true
+        });
+
+        if (resultSizeResponse.rows !== null) {
+          return resultSizeResponse;
         } else {
-          reject();
+          await sleep(1000);
+          return await waitForRows();
         }
-      };
+      } else {
+        return Promise.reject();
+      }
+    };
 
-      waitForRows();
-    });
+    return await waitForRows();
   }
 
   /**
@@ -88,31 +85,30 @@ class ExecutionResult {
    * @return {Promise}
    */
   async fetchRows(options) {
-    return new Promise((resolve, reject) => {
-      if (this.status !== RESULT_STATUS.available) {
-        reject();
-        return;
+    if (this.status !== RESULT_STATUS.available) {
+      return Promise.reject();
+    }
+
+    this.status = RESULT_STATUS.fetching;
+
+    try {
+      const resultResponse = await apiHelper.fetchResults({
+        executable: this.executable,
+        rows: options.rows,
+        startOver: !!options.startOver
+      });
+
+      if (resultResponse.has_more) {
+        this.status = RESULT_STATUS.available;
+      } else {
+        this.status = RESULT_STATUS.done;
       }
-      this.status = RESULT_STATUS.fetching;
-      apiHelper
-        .fetchResults({
-          executable: this.executable,
-          rows: options.rows,
-          startOver: !!options.startOver
-        })
-        .then(resultResponse => {
-          if (resultResponse.has_more) {
-            this.status = RESULT_STATUS.available;
-          } else {
-            this.status = RESULT_STATUS.done;
-          }
-          resolve(resultResponse);
-        })
-        .catch(error => {
-          this.status = RESULT_STATUS.fail;
-          reject(error);
-        });
-    });
+
+      return resultResponse;
+    } catch (err) {
+      this.status = RESULT_STATUS.fail;
+      return Promise.reject(err);
+    }
   }
 }
 
