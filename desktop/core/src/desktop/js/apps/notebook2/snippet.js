@@ -839,32 +839,6 @@ export default class Snippet {
     this.chartMapType = ko.observable(snippet.chartMapType || 'marker');
     this.chartMapLabel = ko.observable(snippet.chartMapLabel);
     this.chartMapHeat = ko.observable(snippet.chartMapHeat);
-    this.hideStacked = ko.pureComputed(() => this.chartYMulti().length <= 1); // To delete
-
-    this.hasDataForChart = ko.pureComputed(() => { // To delete
-      if (
-        this.chartType() === window.HUE_CHARTS.TYPES.BARCHART ||
-        this.chartType() === window.HUE_CHARTS.TYPES.LINECHART ||
-        this.chartType() === window.HUE_CHARTS.TYPES.TIMELINECHART
-      ) {
-        return (
-          typeof this.chartX() !== 'undefined' &&
-          this.chartX() !== null &&
-          this.chartYMulti().length > 0
-        );
-      }
-      return (
-        typeof this.chartX() !== 'undefined' &&
-        this.chartX() !== null &&
-        typeof this.chartYSingle() !== 'undefined' &&
-        this.chartYSingle() !== null
-      );
-    });
-
-    this.hasDataForChart.subscribe(() => { // To delete
-      this.chartX.notifySubscribers();
-      this.chartX.valueHasMutated();
-    });
 
     this.chartType.subscribe(() => {
       $(document).trigger('forceChartDraw', this);

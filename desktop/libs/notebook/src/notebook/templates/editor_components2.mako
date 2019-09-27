@@ -1353,7 +1353,7 @@
           <!-- ko if: showChart-->
             <!-- ko component: { name: 'result-chart', params: {
               data: result.data,
-              snippet: $data,
+              meta: result.meta,
               id: id,
               isResultSettingsVisible: isResultSettingsVisible,
               chartLimit: chartLimit,

@@ -389,7 +389,6 @@ class ResultChart extends DisposableComponent {
     super();
 
     this.data = params.data;
-    this.snippet = params.snippet;
     this.id = params.id;
     this.isResultSettingsVisible = params.isResultSettingsVisible;
     this.chartLimit = params.chartLimit;
@@ -407,6 +406,7 @@ class ResultChart extends DisposableComponent {
     this.chartYMulti = params.chartYMulti;
     this.chartYSingle = params.chartYSingle;
 
+    this.meta = params.meta;
     this.cleanedMeta = params.cleanedMeta;
     this.cleanedDateTimeMeta = params.cleanedDateTimeMeta;
     this.cleanedNumericMeta = params.cleanedNumericMeta;
@@ -456,13 +456,7 @@ class ResultChart extends DisposableComponent {
     });
 
     this.pieChartParams = ko.pureComputed(() => ({
-      data: {
-        counts: this.data,
-        sorting: this.chartSorting(),
-        snippet: this.snippet,
-        limit: this.chartLimit()
-      },
-      fqs: ko.observableArray(),
+      data: this,
       transformer: pieChartTransformer,
       maxWidth: 350,
       parentSelector: '.chart-container'
@@ -470,13 +464,7 @@ class ResultChart extends DisposableComponent {
 
     this.barChartParams = ko.pureComputed(() => ({
       skipWindowResize: true,
-      datum: {
-        counts: this.data,
-        sorting: this.chartSorting(),
-        snippet: this.snippet,
-        limit: this.chartLimit()
-      },
-      fqs: ko.observableArray(),
+      datum: this,
       hideSelection: true,
       enableSelection: false,
       hideStacked: this.hideStacked,
@@ -488,12 +476,7 @@ class ResultChart extends DisposableComponent {
     }));
 
     this.lineChartParams = ko.pureComputed(() => ({
-      datum: {
-        counts: this.data,
-        sorting: this.chartSorting(),
-        snippet: this.snippet,
-        limit: this.chartLimit()
-      },
+      datum: this,
       transformer: multiSerieChartTransformer,
       showControls: false,
       enableSelection: false
@@ -502,13 +485,7 @@ class ResultChart extends DisposableComponent {
     this.timeLineChartParams = ko.pureComputed(() => ({
       type: this.chartTimelineType,
       skipWindowResize: true,
-      datum: {
-        counts: this.data,
-        sorting: this.chartSorting(),
-        snippet: this.snippet,
-        limit: this.chartLimit()
-      },
-      fqs: ko.observableArray(),
+      datum: this,
       hideSelection: true,
       enableSelection: false,
       hideStacked: this.hideStacked,
@@ -518,12 +495,7 @@ class ResultChart extends DisposableComponent {
     }));
 
     this.leafletMapChartParams = ko.pureComputed(() => ({
-      datum: {
-        counts: this.data,
-        sorting: this.chartSorting(),
-        snippet: this.snippet,
-        limit: this.chartLimit()
-      },
+      datum: this,
       transformer: leafletMapChartTransformer,
       showControls: false,
       height: 380,
@@ -531,13 +503,7 @@ class ResultChart extends DisposableComponent {
     }));
 
     this.mapChartParams = ko.pureComputed(() => ({
-      data: {
-        counts: this.data,
-        sorting: this.chartSorting(),
-        snippet: this.snippet,
-        scope: this.chartScope(),
-        limit: this.chartLimit()
-      },
+      data: this,
       transformer: mapChartTransformer,
       isScale: true,
       showControls: false,
@@ -547,11 +513,7 @@ class ResultChart extends DisposableComponent {
     }));
 
     this.scatterChartParams = ko.pureComputed(() => ({
-      datum: {
-        counts: this.data,
-        snippet: this.snippet,
-        limit: this.chartLimit()
-      },
+      datum: this,
       transformer: scatterChartTransformer,
       maxWidth: 350,
       y: this.chartYSingle(),

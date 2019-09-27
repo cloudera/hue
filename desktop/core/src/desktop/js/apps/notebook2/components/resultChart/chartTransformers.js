@@ -17,85 +17,7 @@
 import $ from 'jquery';
 
 import HueColors from 'utils/hueColors';
-import hueUtils from 'utils/hueUtils';
-
-const isNotNullForCharts = val => val !== 'NULL' && val !== null;
-
-export const pieChartTransformer = function(rawDatum) {
-  let _data = [];
-
-  if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null) {
-    let _idxValue = -1;
-    let _idxLabel = -1;
-    rawDatum.snippet.result.meta().forEach((col, idx) => {
-      if (col.name === rawDatum.snippet.chartX()) {
-        _idxLabel = idx;
-      }
-      if (col.name === rawDatum.snippet.chartYSingle()) {
-        _idxValue = idx;
-      }
-    });
-    const colors = HueColors.cuiD3Scale();
-    $(rawDatum.counts()).each((cnt, item) => {
-      if (isNotNullForCharts(item[_idxValue])) {
-        let val = item[_idxValue] * 1;
-        if (isNaN(val)) {
-          val = 0;
-        }
-        _data.push({
-          label: hueUtils.html2text(item[_idxLabel]),
-          value: val,
-          color: colors[cnt % colors.length],
-          obj: item
-        });
-      }
-    });
-  }
-
-  if (rawDatum.sorting === 'asc') {
-    _data.sort((a, b) => a.value - b.value);
-  } else if (rawDatum.sorting === 'desc') {
-    _data.sort((a, b) => b.value - a.value);
-  }
-
-  if (rawDatum.snippet.chartLimit()) {
-    _data = _data.slice(0, rawDatum.snippet.chartLimit());
-  }
-
-  return _data;
-};
-
-export const mapChartTransformer = function(rawDatum) {
-  let _data = [];
-  if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null) {
-    let _idxRegion = -1;
-    let _idxValue = -1;
-    rawDatum.snippet.result.meta().forEach((col, idx) => {
-      if (col.name === rawDatum.snippet.chartX()) {
-        _idxRegion = idx;
-      }
-      if (col.name === rawDatum.snippet.chartYSingle()) {
-        _idxValue = idx;
-      }
-    });
-
-    $(rawDatum.counts()).each((cnt, item) => {
-      if (isNotNullForCharts(item[_idxValue]) && isNotNullForCharts(item[_idxRegion])) {
-        _data.push({
-          label: item[_idxRegion],
-          value: item[_idxValue],
-          obj: item
-        });
-      }
-    });
-  }
-
-  if (rawDatum.snippet.chartLimit()) {
-    _data = _data.slice(0, rawDatum.snippet.chartLimit());
-  }
-
-  return _data;
-};
+import { html2text } from 'utils/hueUtils';
 
 // The leaflet map can freeze the browser with numbers outside the map
 const MIN_LAT = -90;
@@ -103,50 +25,131 @@ const MAX_LAT = 90;
 const MIN_LNG = -180;
 const MAX_LNG = 180;
 
-export const leafletMapChartTransformer = function(rawDatum) {
-  let _data = [];
-  if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null) {
-    let _idxLat = -1;
-    let _idxLng = -1;
-    let _idxLabel = -1;
-    let _idxHeat = -1;
-    rawDatum.snippet.result.meta().forEach((col, idx) => {
-      if (col.name === rawDatum.snippet.chartX()) {
-        _idxLat = idx;
+const isNotNullForCharts = val => val !== 'NULL' && val !== null;
+
+export const pieChartTransformer = function(rawDatum) {
+  let data = [];
+
+  if (rawDatum.chartX() != null && rawDatum.chartYSingle() != null) {
+    let valueIndex = -1;
+    let labelIndex = -1;
+    rawDatum.meta().some((col, index) => {
+      if (col.name === rawDatum.chartX()) {
+        labelIndex = index;
       }
-      if (col.name === rawDatum.snippet.chartYSingle()) {
-        _idxLng = idx;
+      if (col.name === rawDatum.chartYSingle()) {
+        valueIndex = index;
       }
-      if (col.name === rawDatum.snippet.chartMapLabel()) {
-        _idxLabel = idx;
-      }
-      if (col.name === rawDatum.snippet.chartMapHeat()) {
-        _idxHeat = idx;
+      return valueIndex !== -1 && labelIndex !== -1;
+    });
+    const colors = HueColors.cuiD3Scale();
+    rawDatum.data().forEach((item, index) => {
+      if (isNotNullForCharts(item[valueIndex])) {
+        let val = item[valueIndex] * 1;
+        if (isNaN(val)) {
+          val = 0;
+        }
+        data.push({
+          label: html2text(item[labelIndex]),
+          value: val,
+          color: colors[index % colors.length],
+          obj: item
+        });
       }
     });
-    if (rawDatum.snippet.chartMapLabel() != null) {
-      $(rawDatum.counts()).each((cnt, item) => {
-        if (isNotNullForCharts(item[_idxLat]) && isNotNullForCharts(item[_idxLng])) {
-          _data.push({
-            lat: Math.min(Math.max(MIN_LAT, item[_idxLat]), MAX_LAT),
-            lng: Math.min(Math.max(MIN_LNG, item[_idxLng]), MAX_LNG),
-            label: hueUtils.html2text(item[_idxLabel]),
-            isHeat: rawDatum.snippet.chartMapType() === 'heat',
+  }
+
+  if (rawDatum.chartSorting() === 'asc') {
+    data.sort((a, b) => a.value - b.value);
+  } else if (rawDatum.chartSorting() === 'desc') {
+    data.sort((a, b) => b.value - a.value);
+  }
+
+  if (rawDatum.chartLimit()) {
+    data = data.slice(0, rawDatum.chartLimit());
+  }
+
+  return data;
+};
+
+export const mapChartTransformer = function(rawDatum) {
+  let datum = [];
+  if (rawDatum.chartX() != null && rawDatum.chartYSingle() != null) {
+    let regionIndex = -1;
+    let valueIndex = -1;
+    rawDatum.meta().some((col, idx) => {
+      if (col.name === rawDatum.chartX()) {
+        regionIndex = idx;
+      }
+      if (col.name === rawDatum.chartYSingle()) {
+        valueIndex = idx;
+      }
+      return regionIndex !== -1 && valueIndex !== -1;
+    });
+
+    rawDatum.data().forEach(item => {
+      if (isNotNullForCharts(item[valueIndex]) && isNotNullForCharts(item[regionIndex])) {
+        datum.push({
+          label: item[regionIndex],
+          value: item[valueIndex],
+          obj: item
+        });
+      }
+    });
+  }
+
+  if (rawDatum.chartLimit()) {
+    datum = datum.slice(0, rawDatum.chartLimit());
+  }
+
+  return datum;
+};
+
+export const leafletMapChartTransformer = function(rawDatum) {
+  let datum = [];
+  if (rawDatum.chartX() != null && rawDatum.chartYSingle() != null) {
+    let latIndex = -1;
+    let lngIndex = -1;
+    let labelIndex = -1;
+    let heatIndex = -1;
+    rawDatum.meta().some((col, idx) => {
+      if (col.name === rawDatum.chartX()) {
+        latIndex = idx;
+      }
+      if (col.name === rawDatum.chartYSingle()) {
+        lngIndex = idx;
+      }
+      if (col.name === rawDatum.chartMapLabel()) {
+        labelIndex = idx;
+      }
+      if (col.name === rawDatum.chartMapHeat()) {
+        heatIndex = idx;
+      }
+      return latIndex !== -1 && lngIndex !== -1 && labelIndex !== -1 && heatIndex !== -1;
+    });
+    if (rawDatum.chartMapLabel() != null) {
+      rawDatum.data().forEach(item => {
+        if (isNotNullForCharts(item[latIndex]) && isNotNullForCharts(item[lngIndex])) {
+          datum.push({
+            lat: Math.min(Math.max(MIN_LAT, item[latIndex]), MAX_LAT),
+            lng: Math.min(Math.max(MIN_LNG, item[lngIndex]), MAX_LNG),
+            label: html2text(item[labelIndex]),
+            isHeat: rawDatum.chartMapType() === 'heat',
             intensity:
-              _idxHeat > -1 ? (item[_idxHeat] * 1 != NaN ? item[_idxHeat] * 1 : null) : null,
+              heatIndex > -1 ? (!isNaN(item[heatIndex] * 1) ? item[heatIndex] * 1 : null) : null,
             obj: item
           });
         }
       });
     } else {
-      $(rawDatum.counts()).each((cnt, item) => {
-        if (isNotNullForCharts(item[_idxLat]) && isNotNullForCharts(item[_idxLng])) {
-          _data.push({
-            lat: Math.min(Math.max(MIN_LAT, item[_idxLat]), MAX_LAT),
-            lng: Math.min(Math.max(MIN_LNG, item[_idxLng]), MAX_LNG),
-            isHeat: rawDatum.snippet.chartMapType() === 'heat',
+      rawDatum.data().forEach(item => {
+        if (isNotNullForCharts(item[latIndex]) && isNotNullForCharts(item[lngIndex])) {
+          datum.push({
+            lat: Math.min(Math.max(MIN_LAT, item[latIndex]), MAX_LAT),
+            lng: Math.min(Math.max(MIN_LNG, item[lngIndex]), MAX_LNG),
+            isHeat: rawDatum.chartMapType() === 'heat',
             intensity:
-              _idxHeat > -1 ? (item[_idxHeat] * 1 != NaN ? item[_idxHeat] * 1 : null) : null,
+              heatIndex > -1 ? (!isNaN(item[heatIndex] * 1) ? item[heatIndex] * 1 : null) : null,
             obj: item
           });
         }
@@ -154,119 +157,117 @@ export const leafletMapChartTransformer = function(rawDatum) {
     }
   }
 
-  if (rawDatum.snippet.chartLimit()) {
-    _data = _data.slice(0, rawDatum.snippet.chartLimit());
+  if (rawDatum.chartLimit()) {
+    datum = datum.slice(0, rawDatum.chartLimit());
   }
 
-  return _data;
+  return datum;
 };
 
 export const timelineChartTransformer = function(rawDatum) {
-  const _datum = [];
-  let _plottedSerie = 0;
+  const datum = [];
+  let plottedSeries = 0;
 
-  rawDatum.snippet.result.meta().forEach(meta => {
-    if (rawDatum.snippet.chartYMulti().indexOf(meta.name) > -1) {
+  rawDatum.meta().forEach(meta => {
+    if (rawDatum.chartYMulti().indexOf(meta.name) > -1) {
       const col = meta.name;
-      let _idxValue = -1;
-      let _idxLabel = -1;
-      rawDatum.snippet.result.meta().forEach((icol, idx) => {
-        if (icol.name === rawDatum.snippet.chartX()) {
-          _idxLabel = idx;
+      let valueIndex = -1;
+      let labelIndex = -1;
+      rawDatum.meta().some((icol, idx) => {
+        if (icol.name === rawDatum.chartX()) {
+          labelIndex = idx;
         }
         if (icol.name === col) {
-          _idxValue = idx;
+          valueIndex = idx;
         }
+        return labelIndex !== -1 && valueIndex !== -1;
       });
 
-      if (_idxValue > -1) {
-        let _data = [];
+      if (valueIndex > -1) {
+        let values = [];
         const colors = HueColors.cuiD3Scale();
-        $(rawDatum.counts()).each((cnt, item) => {
-          if (isNotNullForCharts(item[_idxLabel]) && isNotNullForCharts(item[_idxValue])) {
-            _data.push({
-              series: _plottedSerie,
-              x: new Date(moment(hueUtils.html2text(item[_idxLabel])).valueOf()),
-              y: item[_idxValue] * 1,
-              color: colors[_plottedSerie % colors.length],
+        rawDatum.data().forEach(item => {
+          if (isNotNullForCharts(item[labelIndex]) && isNotNullForCharts(item[valueIndex])) {
+            values.push({
+              series: plottedSeries,
+              x: new Date(moment(html2text(item[labelIndex])).valueOf()),
+              y: item[valueIndex] * 1,
+              color: colors[plottedSeries % colors.length],
               obj: item
             });
           }
         });
-        if (rawDatum.sorting === 'asc') {
-          _data.sort((a, b) => {
+        if (rawDatum.chartSorting() === 'asc') {
+          values.sort((a, b) => {
             return a.y - b.y;
           });
-        }
-        if (rawDatum.sorting === 'desc') {
-          _data.sort((a, b) => {
+        } else if (rawDatum.chartSorting() === 'desc') {
+          values.sort((a, b) => {
             return b.y - a.y;
           });
         }
-        if (rawDatum.snippet.chartLimit()) {
-          _data = _data.slice(0, rawDatum.snippet.chartLimit());
+        if (rawDatum.chartLimit()) {
+          values = values.slice(0, rawDatum.chartLimit());
         }
-        _datum.push({
+        datum.push({
           key: col,
-          values: _data
+          values: values
         });
-        _plottedSerie++;
+        plottedSeries++;
       }
     }
   });
 
-  return _datum;
+  return datum;
 };
 
 export const multiSerieChartTransformer = function(rawDatum) {
-  let _datum = [];
+  let datum = [];
 
-  console.log(rawDatum.snippet);
-  if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYMulti().length > 0) {
-    let _plottedSerie = 0;
+  if (rawDatum.chartX() != null && rawDatum.chartYMulti().length > 0) {
+    let plottedSerie = 0;
 
-    if (typeof rawDatum.snippet.chartXPivot() !== 'undefined') {
-      let _idxValue = -1;
-      let _idxLabel = -1;
-      let _isXDate = false;
+    if (typeof rawDatum.chartXPivot() !== 'undefined') {
+      let valueIndex = -1;
+      let labelIndex = -1;
+      let isDate = false;
 
-      rawDatum.snippet.result.meta().forEach((icol, idx) => {
-        if (icol.name === rawDatum.snippet.chartX()) {
-          _isXDate = icol.type.toUpperCase().indexOf('DATE') > -1;
-          _idxLabel = idx;
+      rawDatum.meta().some((col, idx) => {
+        if (col.name === rawDatum.chartX()) {
+          isDate = col.type.toUpperCase().indexOf('DATE') > -1;
+          labelIndex = idx;
         }
-        if (icol.name === rawDatum.snippet.chartYSingle()) {
-          _idxValue = idx;
+        if (col.name === rawDatum.chartYSingle()) {
+          valueIndex = idx;
         }
+        return labelIndex !== -1 && valueIndex !== -1;
       });
 
-      rawDatum.snippet.result.meta().forEach((meta, cnt) => {
-        if (rawDatum.snippet.chartXPivot() === meta.name) {
-          const _idxPivot = cnt;
+      rawDatum.meta().forEach((meta, cnt) => {
+        if (rawDatum.chartXPivot() === meta.name) {
+          const pivotIndex = cnt;
           const colors = HueColors.cuiD3Scale();
-          let pivotValues = $.map(rawDatum.counts(), p => {
-            return p[_idxPivot];
-          });
+          let pivotValues = rawDatum.data().map(p => p[pivotIndex]);
           pivotValues = pivotValues.filter((item, pos) => {
             return pivotValues.indexOf(item) === pos;
           });
           pivotValues.forEach((val, pivotCnt) => {
-            const _data = [];
-            $(rawDatum.counts()).each((cnt, item) => {
-              if (item[_idxPivot] === val) {
-                if (isNotNullForCharts(item[_idxValue]) && isNotNullForCharts(item[_idxLabel])) {
-                  _data.push({
-                    x: _isXDate ? moment(item[_idxLabel]) : hueUtils.html2text(item[_idxLabel]),
-                    y: item[_idxValue] * 1,
+            const values = [];
+            rawDatum.data().forEach(item => {
+              if (item[pivotIndex] === val) {
+                if (isNotNullForCharts(item[valueIndex]) && isNotNullForCharts(item[labelIndex])) {
+                  values.push({
+                    x: isDate ? moment(item[labelIndex]) : html2text(item[labelIndex]),
+                    y: item[valueIndex] * 1,
                     color: colors[pivotCnt % colors.length],
                     obj: item
                   });
                 }
               }
             });
-            _datum.push({
-              key: hueUtils.html2text(val),
-              values: _data
+            datum.push({
+              key: html2text(val),
+              values: values
             });
           });
         }
@@ -275,7 +276,7 @@ export const multiSerieChartTransformer = function(rawDatum) {
       // fills in missing values
       let longest = 0;
       const allXValues = [];
-      _datum.forEach(d => {
+      datum.forEach(d => {
         d.values.forEach(val => {
           if (allXValues.indexOf(val.x) === -1) {
             allXValues.push(val.x);
@@ -283,14 +284,14 @@ export const multiSerieChartTransformer = function(rawDatum) {
         });
       });
 
-      _datum.forEach(d => {
+      datum.forEach(d => {
         allXValues.forEach(val => {
           if (
             !d.values.some(item => {
               return item.x === val;
             })
           ) {
-            const zeroObj = jQuery.extend({}, d.values[0]);
+            const zeroObj = $.extend({}, d.values[0]);
             zeroObj.y = 0;
             zeroObj.x = val;
             d.values.push(zeroObj);
@@ -303,9 +304,9 @@ export const multiSerieChartTransformer = function(rawDatum) {
 
       // this is to avoid D3 js errors when the data the user is trying to display is bogus
       if (allXValues.length < longest) {
-        _datum.forEach(d => {
+        datum.forEach(d => {
           for (let i = d.values.length; i < longest; i++) {
-            const zeroObj = jQuery.extend({}, d.values[0]);
+            const zeroObj = $.extend({}, d.values[0]);
             zeroObj.y = 0;
             zeroObj.x = '';
             d.values.push(zeroObj);
@@ -313,12 +314,12 @@ export const multiSerieChartTransformer = function(rawDatum) {
         });
       }
 
-      if (rawDatum.snippet.chartLimit()) {
-        _datum = _datum.slice(0, rawDatum.snippet.chartLimit());
+      if (rawDatum.chartLimit()) {
+        datum = datum.slice(0, rawDatum.chartLimit());
       }
 
-      if (rawDatum.sorting === 'desc') {
-        _datum.forEach(d => {
+      if (rawDatum.chartSorting() === 'desc') {
+        datum.forEach(d => {
           d.values.sort((a, b) => {
             if (a.x > b.x) {
               return -1;
@@ -330,7 +331,7 @@ export const multiSerieChartTransformer = function(rawDatum) {
           });
         });
       } else {
-        _datum.forEach(d => {
+        datum.forEach(d => {
           d.values.sort((a, b) => {
             if (a.x > b.x) {
               return 1;
@@ -343,123 +344,124 @@ export const multiSerieChartTransformer = function(rawDatum) {
         });
       }
     } else {
-      rawDatum.snippet.result.meta().forEach(meta => {
-        if (rawDatum.snippet.chartYMulti().indexOf(meta.name) > -1) {
+      rawDatum.meta().forEach(meta => {
+        if (rawDatum.chartYMulti().indexOf(meta.name) > -1) {
           const col = meta.name;
-          let _idxValue = -1;
-          let _idxLabel = -1;
-          let _isXDate = false;
-          rawDatum.snippet.result.meta().forEach((icol, idx) => {
-            if (icol.name === rawDatum.snippet.chartX()) {
-              _isXDate = icol.type.toUpperCase().indexOf('DATE') > -1;
-              _idxLabel = idx;
+          let valueIndex = -1;
+          let labelIndex = -1;
+          let isDate = false;
+          rawDatum.meta().some((icol, idx) => {
+            if (icol.name === rawDatum.chartX()) {
+              isDate = icol.type.toUpperCase().indexOf('DATE') > -1;
+              labelIndex = idx;
             }
             if (icol.name === col) {
-              _idxValue = idx;
+              valueIndex = idx;
             }
+            return labelIndex !== -1 && valueIndex !== -1;
           });
 
-          if (_idxValue > -1) {
-            let _data = [];
+          if (valueIndex > -1) {
+            let values = [];
             const colors = HueColors.cuiD3Scale();
-            $(rawDatum.counts()).each((cnt, item) => {
-              if (isNotNullForCharts(item[_idxValue]) && isNotNullForCharts(item[_idxLabel])) {
-                _data.push({
-                  series: _plottedSerie,
-                  x: _isXDate ? moment(item[_idxLabel]) : hueUtils.html2text(item[_idxLabel]),
-                  y: item[_idxValue] * 1,
-                  color: colors[cnt % colors.length],
+            rawDatum.data().forEach((item, index) => {
+              if (isNotNullForCharts(item[valueIndex]) && isNotNullForCharts(item[labelIndex])) {
+                values.push({
+                  series: plottedSerie,
+                  x: isDate ? moment(item[labelIndex]) : html2text(item[labelIndex]),
+                  y: item[valueIndex] * 1,
+                  color: colors[index % colors.length],
                   obj: item
                 });
               }
             });
-            if (rawDatum.sorting === 'asc') {
-              _data.sort((a, b) => {
+            if (rawDatum.chartSorting() === 'asc') {
+              values.sort((a, b) => {
                 return a.y - b.y;
               });
-            }
-            if (rawDatum.sorting === 'desc') {
-              _data.sort((a, b) => {
+            } else if (rawDatum.chartSorting() === 'desc') {
+              values.sort((a, b) => {
                 return b.y - a.y;
               });
             }
-            if (rawDatum.snippet.chartLimit()) {
-              _data = _data.slice(0, rawDatum.snippet.chartLimit());
+            if (rawDatum.chartLimit()) {
+              values = values.slice(0, rawDatum.chartLimit());
             }
-            _datum.push({
+            datum.push({
               key: col,
-              values: _data
+              values: values
             });
-            _plottedSerie++;
+            plottedSerie++;
           }
         }
       });
     }
   }
-  return _datum;
+  return datum;
 };
 
 export const scatterChartTransformer = function(rawDatum) {
-  const datum = {};
+  const datumIndex = {};
 
-  if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null) {
-    let idxX = -1;
-    let idxY = -1;
-    let idxSize = -1;
-    let idxGroup = -1;
-    rawDatum.snippet.result.meta().forEach((icol, idx) => {
-      if (icol.name === rawDatum.snippet.chartX()) {
-        idxX = idx;
+  if (rawDatum.chartX() != null && rawDatum.chartYSingle() != null) {
+    let xIndex = -1;
+    let yIndex = -1;
+    let sizeIndex = -1;
+    let groupIndex = -1;
+    rawDatum.meta().some((col, idx) => {
+      if (col.name === rawDatum.chartX()) {
+        xIndex = idx;
       }
-      if (icol.name === rawDatum.snippet.chartYSingle()) {
-        idxY = idx;
+      if (col.name === rawDatum.chartYSingle()) {
+        yIndex = idx;
       }
-      if (icol.name === rawDatum.snippet.chartScatterSize()) {
-        idxSize = idx;
+      if (col.name === rawDatum.chartScatterSize()) {
+        sizeIndex = idx;
       }
-      if (icol.name === rawDatum.snippet.chartScatterGroup()) {
-        idxGroup = idx;
+      if (col.name === rawDatum.chartScatterGroup()) {
+        groupIndex = idx;
       }
+      return xIndex !== -1 && yIndex !== -1 && sizeIndex !== -1 && groupIndex !== -1;
     });
 
-    if (idxX > -1 && idxY > -1) {
+    if (xIndex > -1 && yIndex > -1) {
       const createAndAddToArray = function(key, item) {
-        if (!datum[key]) {
-          datum[key] = [];
+        if (!datumIndex[key]) {
+          datumIndex[key] = [];
         }
-        if (isNotNullForCharts(item[idxX]) && isNotNullForCharts(item[idxY])) {
-          datum[key].push({
-            x: item[idxX],
-            y: item[idxY],
+        if (isNotNullForCharts(item[xIndex]) && isNotNullForCharts(item[yIndex])) {
+          datumIndex[key].push({
+            x: item[xIndex],
+            y: item[yIndex],
             shape: 'circle',
-            size: idxSize > -1 ? item[idxSize] : 100,
+            size: sizeIndex > -1 ? item[sizeIndex] : 100,
             obj: item
           });
         }
       };
 
-      if (idxGroup > -1) {
-        $(rawDatum.counts()).each((cnt, item) => {
-          createAndAddToArray(item[idxGroup], item);
+      if (groupIndex > -1) {
+        rawDatum.data().forEach(item => {
+          createAndAddToArray(item[groupIndex], item);
         });
       } else {
-        $(rawDatum.counts()).each((cnt, item) => {
+        rawDatum.data().forEach(item => {
           createAndAddToArray('distro', item);
         });
       }
     }
   }
 
-  const returndDatum = [];
+  const datum = [];
 
-  Object.keys(datum).forEach(key => {
-    returndDatum.push({
+  Object.keys(datumIndex).forEach(key => {
+    datum.push({
       key: key,
-      values: rawDatum.snippet.chartLimit()
-        ? datum[key].slice(0, rawDatum.snippet.chartLimit())
-        : datum[key]
+      values: rawDatum.chartLimit()
+        ? datumIndex[key].slice(0, rawDatum.chartLimit())
+        : datumIndex[key]
     });
   });
 
-  return returndDatum;
+  return datum;
 };
