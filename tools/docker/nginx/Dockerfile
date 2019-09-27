@@ -1,7 +1,7 @@
 # Welcome to Hue NGINX (http://gethue.com) Dockerfile
 
 FROM nginx
-LABEL description="Image for Webserver"
+LABEL description="Host files of Hue"
 
 COPY --from=gethue/hue:latest /usr/share/hue/build/static/ /usr/share/nginx/html/hue/static
 
