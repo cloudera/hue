@@ -1311,7 +1311,7 @@
 
   <script type="text/html" id="snippet-results${ suffix }">
     <div class="snippet-row" data-bind="slideVisible: result.hasSomeResults">
-      <div class="snippet-left-bar">
+      <div class="result-left-bar">
         <!-- ko template: { if: result.type() == 'table' && result.hasSomeResults(), name: 'snippet-result-controls${ suffix }' }--><!-- /ko -->
       </div>
       <div class="result-body">
