@@ -4,6 +4,8 @@ metadata:
   name: hue
   labels:
     deployment: hue
+  annotations:
+    "sidecar.jaegertracing.io/inject": "true"
 spec:
   selector:
     matchLabels:
