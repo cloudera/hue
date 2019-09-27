@@ -823,7 +823,7 @@ export default class Snippet {
     this.chartScatterSize = ko.observable(snippet.chartScatterSize);
     this.chartScope = ko.observable(snippet.chartScope || 'world');
     this.chartTimelineType = ko.observable(snippet.chartTimelineType || 'bar');
-    this.chartLimits = ko.observableArray([5, 10, 25, 50, 100]);
+    this.chartLimits = ko.observableArray([5, 10, 25, 50, 100]); // To Delete
     this.chartLimit = ko.observable(snippet.chartLimit);
     this.chartLimit.extend({ notify: 'always' });
     this.chartX = ko.observable(snippet.chartX);
@@ -837,9 +837,9 @@ export default class Snippet {
     this.chartMapType = ko.observable(snippet.chartMapType || 'marker');
     this.chartMapLabel = ko.observable(snippet.chartMapLabel);
     this.chartMapHeat = ko.observable(snippet.chartMapHeat);
-    this.hideStacked = ko.pureComputed(() => this.chartYMulti().length <= 1);
+    this.hideStacked = ko.pureComputed(() => this.chartYMulti().length <= 1); // To delete
 
-    this.hasDataForChart = ko.pureComputed(() => {
+    this.hasDataForChart = ko.pureComputed(() => { // To delete
       if (
         this.chartType() === window.HUE_CHARTS.TYPES.BARCHART ||
         this.chartType() === window.HUE_CHARTS.TYPES.LINECHART ||
@@ -859,7 +859,7 @@ export default class Snippet {
       );
     });
 
-    this.hasDataForChart.subscribe(() => {
+    this.hasDataForChart.subscribe(() => { // To delete
       this.chartX.notifySubscribers();
       this.chartX.valueHasMutated();
     });
