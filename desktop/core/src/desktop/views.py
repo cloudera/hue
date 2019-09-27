@@ -56,7 +56,6 @@ from desktop.lib.conf import GLOBAL_CONFIG, BoundConfig, _configs_from_dir
 from desktop.lib.config_spec_dump import ConfigSpec
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
 from desktop.lib.i18n import smart_str
-from desktop.lib.metrics.registry import global_registry
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.thread_util import dump_traceback
 from desktop.log.access import access_log_level, access_warn, AccessInfo
@@ -73,11 +72,6 @@ LOG = logging.getLogger(__name__)
 
 
 def is_alive(request):
-  metrics = global_registry().dump_metrics()
-
-  if 'requests.response-time' in metrics:
-    LOG.info('Is Alive Metrics [request.response-time]: %(requests.response-time)s' % metrics)
-
   return HttpResponse('')
 
 
