@@ -1,0 +1,5 @@
+build
+logs
+node_modules
+.git
+.vscode
