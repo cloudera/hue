@@ -5,7 +5,7 @@ draft: false
 weight: 1
 ---
 
-Open-up or install Hue then [configure it]({{% param baseURL %}}administrator/configuration/).
+Open-up or install Hue then [configure it](/administrator/configuration/).
 
 ## Demo
 

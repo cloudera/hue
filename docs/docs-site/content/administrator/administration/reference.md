@@ -9,13 +9,13 @@ A recommended setup consists in:
 
 * 2 Hues and 1 Load Balancer
 * Databases: MySQL InnoDB, PostgreSQL, Oracle
-* Authentication: [LDAP or Username/Password]({{% param baseURL %}}administrator/configuration/server/#authentication)
+* Authentication: [LDAP or Username/Password](/administrator/configuration/server/#authentication)
 
 Typical setups range from 2 to 5 Hue servers, e.g. 3 Hue servers, 300+ unique users, peaks at 125 users/hour with 300 queries
 
 In practice ~50 users / Hue peak time is the rule of thumb. This is accounting for the worse case scenarios and it will go much higher with the upcoming Task Server [HUE-8738](https://issues.cloudera.org/browse/HUE-8738) and Gunicorn [HUE-8739](https://issues.cloudera.org/browse/HUE-8739) integrations. Most of the scale issues are actually related to resource intensive operations like large download of query results or when an RPC call from Hue to a service is slow (e.g. submitting a query hangs when Hive is slow), not by the number of users.
 
-![Reference Architecture]({{% param baseURL %}}images/hue_architecture.png)
+![Reference Architecture](/images/hue_architecture.png)
 
 
 ## General Performance
@@ -24,7 +24,7 @@ In practice ~50 users / Hue peak time is the rule of thumb. This is accounting f
 * Adding more Hue instances behind the load balancer will increase performances by 50 concurrent users.
 * Database backend should be such as MySql/Postgres/Oracle. Hue does not work on SQLite as it makes concurrent calls to the database.
 * Check the number of documents in the Hue database. If they are too many (more than 100 000), delete the old records:
-  Stop the Hue service. Log on to the host of your Hue server. Go to Hue directory and run following clean up [command]({{% param baseURL %}}administrator/administration/operations/#commands):
+  Stop the Hue service. Log on to the host of your Hue server. Go to Hue directory and run following clean up [command](/administrator/administration/operations/#commands):
 <pre>
     cd /opt/cloudera/parcels/CDH/lib/hue # Hue home directory
     ./build/env/bin/hue desktop_document_cleanup
@@ -32,7 +32,7 @@ In practice ~50 users / Hue peak time is the rule of thumb. This is accounting f
 
 * There are some memory fragmentation issues in Python that manifest in Hue. Check the memory usage of Hue periodically. Browsing HDFS dir with many files, downloading a query result, copying a HDFS files are costly operations memory wise.
 
-The [Config Check]({{% param baseURL %}}administrator/administration/reference/) page of Hue (`/hue/about/`) in the administrator section will warn about detected risks. Make sure it is at zero.
+The [Config Check](/administrator/administration/reference/) page of Hue (`/hue/about/`) in the administrator section will warn about detected risks. Make sure it is at zero.
 
 Hue comes with caching of SQL metadata throughout all the application, meaning the list of tables or a database or the column description of a table are only fetched once and re-used in the autocomplete, table browser, left and right panels etc.. The profiling of calls adds in the logs with a total time taken by each request automatically logged.
 

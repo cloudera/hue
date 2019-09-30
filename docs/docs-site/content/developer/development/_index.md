@@ -12,7 +12,7 @@ This section goes into greater detail on how to build and reuse the components o
 
 ### Dependencies
 
-* The OS specific install instructions are listed in the [install guide]({{% param baseURL %}}administrator/installation/dependencies/)
+* The OS specific install instructions are listed in the [install guide](/administrator/installation/dependencies/)
 * Python 2.7+ (Python 3 support tracked in [HUE-8737](https://issues.cloudera.org/browse/HUE-8737))
 * Django (1.11 already included in the distribution)
 * Java (Java 1.8) (should go away after [HUE-8740](https://issues.cloudera.org/browse/HUE-8740))
@@ -71,7 +71,7 @@ Note: code updates won’t be seen after the Docker container runs. For this Hue
 
     ./build/env/bin/hue runserver 0.0.0.0:8888
 
-and recompiling the Docker image. It will then auto-restart on Python code changes. For JavaScript, those would need to be [compiled]({{% param baseURL %}}/developer/development/#javascript).
+and recompiling the Docker image. It will then auto-restart on Python code changes. For JavaScript, those would need to be [compiled](//developer/development/#javascript).
 
 ### Javascript
 
@@ -188,27 +188,27 @@ Recommended extensions:
 #### PyCharm
 
 First step is to configure pycharm to use the Hue virtual environment at ./build/env/env
-![Pycharm virtualenv]({{% param baseURL %}}images/pycharm_virtualenv.png)
+![Pycharm virtualenv](/images/pycharm_virtualenv.png)
 
 Second step is to configure the debug configuration
-![Pycharm debug]({{% param baseURL %}}images/pycharm_debug.png)
+![Pycharm debug](/images/pycharm_debug.png)
 
 #### Eclipse
 
 First step is to configure Eclipse to use the Hue virtual environment at ./build/env/env
-![Eclipse interpreter]({{% param baseURL %}}images/eclipse_interpreter.png)
+![Eclipse interpreter](/images/eclipse_interpreter.png)
 
 Second step is to configure the debug configuration
-![Eclipse debug]({{% param baseURL %}}images/eclipse_debug.png)
-![Eclipse debug arguments]({{% param baseURL %}}images/eclipse_debug_arguments.png)
-![Eclipse debug interpreter]({{% param baseURL %}}images/eclipse_debug_interpreter.png)
+![Eclipse debug](/images/eclipse_debug.png)
+![Eclipse debug arguments](/images/eclipse_debug_arguments.png)
+![Eclipse debug interpreter](/images/eclipse_debug_interpreter.png)
 
 
 ## API Server
 
 ### From 30,000 feet
 
-![From up on high]({{% param baseURL %}}images/from30kfeet.png)
+![From up on high](/images/from30kfeet.png)
 
 Hue, as a "container" web application, sits in between your Hadoop installation
 and the browser.  It hosts all the Hue Apps, including the built-in ones, and
@@ -216,7 +216,7 @@ ones that you may write yourself.
 
 ### The Hue Server
 
-![Web Back-end]({{% param baseURL %}}images/webbackend.png)
+![Web Back-end](/images/webbackend.png)
 
 Hue is a web application built on the Django python web framework.
 Django, running on the WSGI container/web server (typically CherryPy), manages
@@ -231,14 +231,14 @@ daemon processes "on the side". Some examples are the `Celery Task Server`, `Cel
 
 ### Interacting with external services
 
-![Interacting with Hadoop]({{% param baseURL %}}images/interactingwithhadoop.png)
+![Interacting with Hadoop](/images/interactingwithhadoop.png)
 
 Hue provides some APIs for interacting with external services like Databases of File storages.
 These APIs work by making REST or Thrift calls.
 
 ### An Architectural View
 
-![Architecture]({{% param baseURL %}}images/architecture.png)
+![Architecture](/images/architecture.png)
 
 A Hue application may span three tiers: (1) the UI
 and user interaction in the client's browser, (2) the
@@ -395,7 +395,7 @@ are Django's Object-Relational Mapping framework.
 
 ### Walk-through of a Django View
 
-![Django Request]({{% param baseURL %}}images/django_request.png)
+![Django Request](/images/django_request.png)
 
 
 Django is an MVC framework, except that the controller is called a

@@ -31,7 +31,7 @@ Each app of Hue can be extended to support your own languages or apps as detaile
 
 The layout simplifies the interface and is a snappy single page app.
 
-![image]({{% param baseURL %}}images/hue-4-interface-concept.png)
+![image](/images/hue-4-interface-concept.png)
 
 From top to bottom we have:
 

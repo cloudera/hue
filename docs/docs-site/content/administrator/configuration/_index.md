@@ -17,4 +17,4 @@ The most important things to configure are:
 
 ## Services to interact with
 
-Sometimes some Hadoop components need to be configured to properly work with Hue. Hue is using Hadoop `impersonation` to be able to communicate properly with certain services. This is described in the following [Service Configuration]({{% param baseURL %}}administrator/configuration/).
+Sometimes some Hadoop components need to be configured to properly work with Hue. Hue is using Hadoop `impersonation` to be able to communicate properly with certain services. This is described in the following [Service Configuration](/administrator/configuration/).

@@ -164,4 +164,4 @@ If `django_debug_mode` is enabled, instrumentation is automatically enabled. Thi
 
 ## Database
 
-See the dedicated [Database section]({{% param baseURL %}}administrator/administration/database/).
+See the dedicated [Database section](/administrator/administration/database/).

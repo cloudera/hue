@@ -14,8 +14,8 @@ components. Your Hue installation is now running.
 
 After installation, you can use Hue by navigating to `http://myserver:8888/`.
 
-Next step is to [configure]({{% param baseURL %}}administrator/configuration/) Hue to point to the external services.
-Then, the [user guide]({{% param baseURL %}}user/index.html) will help users go through the various installed applications.
+Next step is to [configure](/administrator/configuration/) Hue to point to the external services.
+Then, the [user guide](/user/index.html) will help users go through the various installed applications.
 
 
 **Supported Browsers**

@@ -8,7 +8,7 @@ weight: 5
 
 ## Data Catalog
 
-In the `[metadata]` section, Hue is supporting Cloudera Navigator and soon Apache Atlas ([HUE-8749](https://issues.cloudera.org/browse/HUE-8749)) in order to enrich the [data catalog]({{% param baseURL %}}user/browsers/).
+In the `[metadata]` section, Hue is supporting Cloudera Navigator and soon Apache Atlas ([HUE-8749](https://issues.cloudera.org/browse/HUE-8749)) in order to enrich the [data catalog](/user/browsers/).
 
 ## Spark
 

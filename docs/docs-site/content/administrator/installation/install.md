@@ -5,7 +5,7 @@ draft: false
 weight: 2
 ---
 
-Start from a [release]({{% param baseURL %}}releases/) tarball or [building](https://github.com/cloudera/hue#getting-started) the project yourself.
+Start from a [release](/releases/) tarball or [building](https://github.com/cloudera/hue#getting-started) the project yourself.
 
 Then configure `$PREFIX` with the path where you want to install Hue by running:
 
