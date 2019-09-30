@@ -55,13 +55,17 @@
     if (disableScrollingTable == null || disableScrollingTable != true) {
       resizeScrollingTable(_this);
       var _resizeTimeout = -1;
-      $(window).resize(function () {
+      $(window).on('resize.jHueTableScroller', function () {
         window.clearTimeout(_resizeTimeout);
         _resizeTimeout = window.setTimeout(function(){
           resizeScrollingTable(_this);
         }, 400);
       });
     }
+  };
+
+  Plugin.prototype.destroy = function () {
+    $(window).off('resize.jHueTableScroller');
   };
 
   function resizeScrollingTable(_this) {

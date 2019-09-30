@@ -1335,6 +1335,11 @@
           <!-- ko if: showGrid -->
             <!-- ko component: { name: 'result-grid', params: {
               status: status,
+              isResultFullScreenMode: parentVm.isResultFullScreenMode,
+              editorMode: parentVm.editorMode,
+              isPresentationMode: parentNotebook.isPresentationMode,
+              hasMore: result.hasMore,
+              fetchResult: result.fetchMoreRows,
               isResultSettingsVisible: isResultSettingsVisible,
               isMetaFilterVisible: result.isMetaFilterVisible,
               filteredMeta: result.filteredMeta,

@@ -582,6 +582,11 @@ export const stripHtmlFromFunctions = template => {
 
 export const sleep = async timeout => new Promise(resolve => setTimeout(resolve, timeout));
 
+export const defer = async callback => {
+  await sleep(0);
+  callback();
+};
+
 export default {
   bootstrapRatios: bootstrapRatios,
   getFileBrowseButton: getFileBrowseButton,

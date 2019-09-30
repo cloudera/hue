@@ -17,7 +17,6 @@
 import ko from 'knockout';
 
 import { sleep, UUID } from 'utils/hueUtils';
-import huePubSub from 'utils/huePubSub';
 
 const isNumericColumn = type =>
   ['tinyint', 'smallint', 'int', 'bigint', 'float', 'double', 'decimal', 'real'].indexOf(type) !==
@@ -275,12 +274,6 @@ class Result {
     }
 
     this.images(resultResponse.images || []);
-
-    huePubSub.publish('editor.render.data', {
-      data: tempData,
-      snippet: this.snippet,
-      initial: initialIndex === 0
-    });
 
     if (!this.fetchedOnce()) {
       resultResponse.meta.unshift({ type: 'INT_TYPE', name: '', comment: null });
