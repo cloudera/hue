@@ -736,10 +736,10 @@ if desktop.conf.TRACING.ENABLED.get():
                   'type': 'const',
                   'param': 1,
               },
-              'logging': False,
           },
           # metrics_factory=PrometheusMetricsFactory(namespace='hue-api'),
-          service_name='hue-api'
+          service_name='hue-api',
+          validate=True,
       )
       return config.initialize_tracer()
 

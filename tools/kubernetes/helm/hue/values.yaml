@@ -54,3 +54,5 @@ ingress:
   loadBalancerIp: "127.0.0.1"
 monitoring:
   enabled: true
+tracing:
+  enabled: true
