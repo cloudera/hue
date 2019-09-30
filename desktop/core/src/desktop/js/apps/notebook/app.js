@@ -85,6 +85,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
         .addClass('hide');
     };
 
+    // TODO: Remove with ENABLE_NOTEBOOK_2
     const createHueDatatable = (el, snippet, vm) => {
       let DATATABLES_MAX_HEIGHT = 330;
       let invisibleRows = 10;
@@ -159,6 +160,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
       return _dt;
     };
 
+    // TODO: Remove with ENABLE_NOTEBOOK_2
     const createDatatable = (el, snippet, vm) => {
       const parent = $(el).parent();
       // When executing few columns -> many columns -> few columns we have to clear the style
@@ -314,6 +316,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
 
     window.hideFixedHeaders = hideFixedHeaders;
 
+    // TODO: Remove with ENABLE_NOTEBOOK_2
     let redrawTimeout = -1;
     const redrawFixedHeaders = function(timeout) {
       const renderer = function() {
@@ -600,6 +603,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
       huePubSub.publish('editor.presentation.operate.toggle', newValue);
     });
 
+    // TODO: Remove with ENABLE_NOTEBOOK_2
     viewModel.isLeftPanelVisible.subscribe(value => {
       redrawFixedHeaders(200);
     });
@@ -750,6 +754,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
       );
     });
 
+    // TODO: Remove with ENABLE_NOTEBOOK_2
     const resetResultsResizer = snippet => {
       const $snippet = $('#snippet_' + snippet.id());
       $snippet
@@ -811,6 +816,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
       });
     };
 
+    // TODO: Remove with ENABLE_NOTEBOOK_2
     const resizeToggleResultSettings = (snippet, initial) => {
       let _dtElement;
       const $snip = $('#snippet_' + snippet.id());
@@ -898,6 +904,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
       HUE_PUB_SUB_EDITOR_ID
     );
 
+    // TODO: Remove with ENABLE_NOTEBOOK_2?
     huePubSub.subscribe(
       'redraw.fixed.headers',
       () => {
@@ -1141,6 +1148,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
 
     huePubSub.subscribe('editor.save', saveKeyHandler, HUE_PUB_SUB_EDITOR_ID);
 
+    // TODO: Remove with ENABLE_NOTEBOOK_2
     huePubSub.subscribe(
       'editor.render.data',
       options => {
@@ -1195,6 +1203,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
       HUE_PUB_SUB_EDITOR_ID
     );
 
+    // TODO: Remove with ENABLE_NOTEBOOK_2
     huePubSub.subscribe(
       'editor.snippet.result.gray',
       snippet => {
@@ -1207,6 +1216,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
       HUE_PUB_SUB_EDITOR_ID
     );
 
+    // TODO: Remove with ENABLE_NOTEBOOK_2
     huePubSub.subscribe(
       'editor.snippet.result.normal',
       snippet => {
@@ -1389,6 +1399,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
       $('#clearHistoryModal' + window.EDITOR_SUFFIX).modal('hide');
     });
 
+    // TODO: Migrate to ko.resultChart.js for ENABLE_NOTEBOOK_2
     $(document).on('toggleResultSettings', (e, snippet) => {
       window.setTimeout(() => {
         const $snip = $('#snippet_' + snippet.id());
@@ -1411,14 +1422,17 @@ huePubSub.subscribe('app.dom.loaded', app => {
       }, 10);
     });
 
+    // TODO: Migrate to ko.resultChart.js for ENABLE_NOTEBOOK_2
     $(document).on('editorSizeChanged', () => {
       window.setTimeout(forceChartDraws, 50);
     });
 
+    // TODO: Migrate to ko.resultChart.js for ENABLE_NOTEBOOK_2
     $(document).on('redrawResults', () => {
       window.setTimeout(forceChartDraws, 50);
     });
 
+    // TODO: Migrate to ko.resultGrid.js for ENABLE_NOTEBOOK_2
     $(document).on('executeStarted', (e, options) => {
       const $snip = $('#snippet_' + options.snippet.id());
       const $el = $snip.find('.resultTable');
@@ -1448,6 +1462,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
       }
     });
 
+    // TODO: Migrate to ko.resultGrid.js for ENABLE_NOTEBOOK_2
     $(document).on('renderDataError', (e, options) => {
       huePubSub.publish('editor.snippet.result.normal', options.snippet);
     });
@@ -1471,6 +1486,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
       }
     });
 
+    // TODO: Migrate to ko.resultChart.js for ENABLE_NOTEBOOK_2
     $(document).on('forceChartDraw', (e, snippet) => {
       window.setTimeout(() => {
         snippet.chartX.notifySubscribers();
@@ -1489,6 +1505,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
       }, 100);
     });
 
+    // TODO: Migrate to ko.resultChart.js for ENABLE_NOTEBOOK_2
     let _resizeTimeout = -1;
     $(window).on('resize', () => {
       huePubSub.publish('recalculate.name.description.width');

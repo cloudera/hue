@@ -23,7 +23,10 @@ const globalVars = {
   HAS_OPTIMIZER: false,
   AUTOCOMPLETE_TIMEOUT: 1,
   HUE_I18n: {},
-  HUE_BASE_URL: ''
+  HUE_BASE_URL: '',
+  HUE_CHARTS: {
+    TYPES: 'bar'
+  }
 };
 
 Object.keys(globalVars).forEach(key => {
