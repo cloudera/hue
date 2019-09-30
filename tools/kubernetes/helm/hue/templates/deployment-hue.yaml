@@ -4,8 +4,10 @@ metadata:
   name: hue
   labels:
     deployment: hue
+{{ if .Values.monitoring.enabled }}
   annotations:
     "sidecar.jaegertracing.io/inject": "true"
+{{ end }}
 spec:
   selector:
     matchLabels:
