@@ -126,10 +126,10 @@ class ConcurrentUserSessionMiddleware(object):
     if request.user.is_authenticated() and request.session.modified and request.user.id: # request.session.modified checks if a user just logged in
       limit = SESSION.CONCURRENT_USER_SESSION_LIMIT.get()
       if limit:
-        count = 1;
+        count = 1
         for session in Session.objects.filter(~Q(session_key=request.session.session_key), expire_date__gte=datetime.now()).order_by('-expire_date'):
           data = session.get_decoded()
-          if data.get('_auth_user_id') == request.user.id:
+          if data.get('_auth_user_id') == str(request.user.id):
             if count >= limit:
               LOG.info('Expiring concurrent user session %s' % request.user.username)
               session.expire_date = datetime.now()
