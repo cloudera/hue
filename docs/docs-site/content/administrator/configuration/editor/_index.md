@@ -6,7 +6,7 @@ weight: 2
 ---
 
 The goal of the Editor is to open-up data to more users by making self service querying easy and productive.
-It has one of the best SQL autocomplete and many [more features]({{% param baseURL %}}administrator/configuration/editor/).
+It has one of the best SQL autocomplete and many [more features](/administrator/configuration/editor/).
 
 It is available in Editor or Notebook. Dialects can be added to the main `[notebook]` section like this:
 
@@ -97,7 +97,7 @@ Display an analysis panel post Impala queries executions with some hints and sug
 
 ### Query Optimization
 
-In the `[metadata]` section, Hue is supporting Cloudera Navigator Optimiser and soon other services. The goal is to provide recommendation on how to write better queries and get risk alerts on dangerous operations directly within the [editor]({{% param baseURL %}}user/editor/).
+In the `[metadata]` section, Hue is supporting Cloudera Navigator Optimiser and soon other services. The goal is to provide recommendation on how to write better queries and get risk alerts on dangerous operations directly within the [editor](/user/editor/).
 
 ### One-click scheduling
 
@@ -245,7 +245,7 @@ Direct interface:
       interface=presto
       ## Specific options for connecting to the Presto server.
       ## To connect to Presto over HTTPS/SSL you will need to construct connection string like below:
-      ## "url": "jdbc:presto://localhost:8080/catalog/schema?SSL=true&SSLTrustStorePath=/path/to/key_file&SSLTrustStorePassword=${password}"   
+      ## "url": "jdbc:presto://localhost:8080/catalog/schema?SSL=true&SSLTrustStorePath=/path/to/key_file&SSLTrustStorePassword=${password}"
       ## The JDBC driver presto-jdbc.jar need to be in the CLASSPATH environment variable.
       ## If 'user' and 'password' are omitted, they will be prompted in the UI.
       options='{"url": "jdbc:presto://localhost:8080/catalog/schema", "driver": "io.prestosql.jdbc.PrestoDriver", "user": "root", "password": "root"}'
@@ -854,7 +854,7 @@ Then make sure the `hive` interpreter is present in the `[[interpreters]]` list.
 
 ### Custom
 
-A series of native connectors interacting with the editor have been developed and are listed in the [developer section]({{% param baseURL %}}developer/editor/).
+A series of native connectors interacting with the editor have been developed and are listed in the [developer section](/developer/editor/).
 
 ### JDBC
 

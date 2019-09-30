@@ -72,7 +72,7 @@ If the configuration is not present, add it to /etc/hadoop/conf/core-site.xml an
 
 Hue's filebrowser can now allow users to explore, manage, and upload data in an S3 account, in addition to HDFS.
 
-Read more about it in the [S3 User Documentation]({{% param baseURL %}}user/browsers#s3).
+Read more about it in the [S3 User Documentation](/user/browsers#s3).
 
 In order to add an S3 account to Hue, you'll need to configure Hue with valid S3 credentials, including the access key ID and secret access key: [AWSCredentials](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html)
 
@@ -109,7 +109,7 @@ New end points have been added in [HUE-5420](https://issues.cloudera.org/browse/
 
 Hue's file browser can now allow users to explore, manage, and upload data in an ADLS v1 or ADLS v2 (ABFS), in addition to HDFS and S3. ABFS is currently a work in progress with [HUE-8908](https://issues.cloudera.org/browse/HUE-8908)
 
-Read more about it in the [ADLS User Documentation]({{% param baseURL %}}user/browsers#adls).
+Read more about it in the [ADLS User Documentation](/user/browsers#adls).
 
 In order to add an ADLS account to Hue, you'll need to configure Hue with valid ADLS credentials, including the client ID, client secret and tenant ID.
 These keys can securely stored in a script that outputs the actual access key and secret key to stdout to be read by Hue (this is similar to how Hue reads password scripts). In order to use script files, add the following section to your hue.ini configuration file:

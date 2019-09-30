@@ -7,7 +7,7 @@ weight: 1
 
 ## Quick Start
 
-Follow the [Quick Start](https://github.com/cloudera/hue#getting-started) or [Container]({{% param baseURL %}}administrator/installation/containers/) guides.
+Follow the [Quick Start](https://github.com/cloudera/hue#getting-started) or [Container](/administrator/installation/containers/) guides.
 
 
 ## Installation

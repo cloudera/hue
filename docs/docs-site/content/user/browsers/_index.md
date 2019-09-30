@@ -13,7 +13,7 @@ The browsers can be "enriched" with [Search and Tagging](http://gethue.com/impro
 
 The Table Browser enables you to manage the databases, tables, and partitions of the metastore shared by the Hive and Impala. You can perform the following operations:
 
--   Search and display metadata like tags and additional description from [Catalog backends]({{% param baseURL %}}administrator/configuration/external/).
+-   Search and display metadata like tags and additional description from [Catalog backends](/administrator/configuration/external/).
 
 -   Databases
     -   Select a database

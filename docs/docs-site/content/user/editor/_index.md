@@ -11,7 +11,7 @@ It focuses on SQL but also supports job submissions. It comes with an intelligen
 
 Any editor can be `starred` next to its name so that it becomes the default editor and the landing page when logging in.
 
-Configuration of the connectors is currently done by the [Administrator]({{% param baseURL %}}administrator/configuration/editor/).
+Configuration of the connectors is currently done by the [Administrator](/administrator/configuration/editor/).
 
 ## Concepts
 ### Running Queries
@@ -162,7 +162,7 @@ Turns a list of semi-colon separated queries into an interactive presentation. I
 
 ## SQL Databases
 
-Use the query editor with any database. Those databases need to be configured by the [administratior]({{% param baseURL %}}administrator/configuration/editor/)
+Use the query editor with any database. Those databases need to be configured by the [administratior](/administrator/configuration/editor/)
 
 ### Apache Hive
 ### Apache Impala

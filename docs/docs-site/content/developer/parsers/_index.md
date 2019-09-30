@@ -101,7 +101,7 @@ So if a “lonely” cursor is encountered it will tell us to suggest the ‘SEL
 
 ### Prerequisites
 
-Make sure you have [jison]({{% param baseURL %}}developer/development/#sql-autocomplete) installed and a [development]({{% param baseURL %}}administrator/installation/dependencies/) Hue. Then configure a [PostgreSQL interpreter]({{% param baseURL %}}administrator/configuration/editor/#postgresql).
+Make sure you have [jison](/developer/development/#sql-autocomplete) installed and a [development](/administrator/installation/dependencies/) Hue. Then configure a [PostgreSQL interpreter](/administrator/configuration/editor/#postgresql).
 
 In the Hue folder:
 

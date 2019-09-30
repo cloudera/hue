@@ -95,7 +95,7 @@ Next step: in addition to Elastic Search, the logs can also be automatically sto
 
 ### Metrics
 
-Hue [metrics]({{% param baseURL %}}administrator/administration/operations#metrics) are useful for checking the load (how many users), slowness (average or percentile times taken by requests)... Those have been available via the /metrics page, but here is how to collect and aggregate this information in Kubernetes.
+Hue [metrics](/administrator/administration/operations#metrics) are useful for checking the load (how many users), slowness (average or percentile times taken by requests)... Those have been available via the /metrics page, but here is how to collect and aggregate this information in Kubernetes.
 
 Prometheus is the metric collecting system heavily used in the Kubernetes world.
 
