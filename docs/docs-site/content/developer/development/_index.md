@@ -174,17 +174,30 @@ How to create a new locale for an app:
 
 ### Dev environment
 
-#### Debugging with PyCharm
+#### Visual Code
+
+Adding 'hue' as a workspace, then:
+
+Recommended extensions:
+
+* Python - Microsoft
+* EsLint - Dirk Baeumur https://github.com/cloudera/hue/blob/master/.eslintrc.js
+* Mako - tommorris
+* Docker - Microsoft
+
+#### PyCharm
 
 First step is to configure pycharm to use the Hue virtual environment at ./build/env/env
 ![Pycharm virtualenv]({{% param baseURL %}}images/pycharm_virtualenv.png)
+
 Second step is to configure the debug configuration
 ![Pycharm debug]({{% param baseURL %}}images/pycharm_debug.png)
 
-#### Debugging with Eclipse
+#### Eclipse
 
 First step is to configure Eclipse to use the Hue virtual environment at ./build/env/env
 ![Eclipse interpreter]({{% param baseURL %}}images/eclipse_interpreter.png)
+
 Second step is to configure the debug configuration
 ![Eclipse debug]({{% param baseURL %}}images/eclipse_debug.png)
 ![Eclipse debug arguments]({{% param baseURL %}}images/eclipse_debug_arguments.png)
