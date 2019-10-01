@@ -569,7 +569,6 @@
             <li style="margin-right: 25px;" data-bind="click: function(){ currentQueryTab('queryBuilderTab'); }, css: {'active': currentQueryTab() == 'queryBuilderTab'}"><a class="inactive-action" href="#queryBuilderTab" data-toggle="tab">${_('Query Builder')}</a></li>
             <!-- /ko -->
           % endif
-          <!-- ko if: result.hasSomeResults -->
           <li data-bind="click: function(){ currentQueryTab('queryResults'); }, css: {'active': currentQueryTab() == 'queryResults'}">
             <a class="inactive-action" style="display:inline-block" href="#queryResults" data-toggle="tab">${_('Results')}
               <!-- ko if: result.rows() != null  -->
@@ -590,7 +589,6 @@
               </div>
             </div>
           </li>
-          <!-- /ko -->
           <!-- ko if: result.explanation().length > 0 -->
           <li data-bind="click: function(){ currentQueryTab('queryExplain'); }, css: {'active': currentQueryTab() == 'queryExplain'}"><a class="inactive-action" href="#queryExplain" data-toggle="tab">${_('Explain')}</a></li>
           <!-- /ko -->
@@ -733,7 +731,53 @@
           % endif
 
           <div class="tab-pane" id="queryResults" data-bind="css: {'active': currentQueryTab() == 'queryResults'}">
-            <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results${ suffix }' } --><!-- /ko -->
+            <!-- ko if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) === -1 -->
+              <!-- ko component: { name: 'snippet-results', params: {
+                autocompleteFromEntries: result.autocompleteFromEntries,
+                chartLimit: chartLimit,
+                chartMapHeat: chartMapHeat,
+                chartMapLabel: chartMapLabel,
+                chartMapType: chartMapType,
+                chartScatterGroup: chartScatterGroup,
+                chartScatterSize: chartScatterSize,
+                chartScope: chartScope,
+                chartSorting: chartSorting,
+                chartTimelineType: chartTimelineType,
+                chartType: chartType,
+                chartX: chartX,
+                chartXPivot: chartXPivot,
+                chartYMulti: chartYMulti,
+                chartYSingle: chartYSingle,
+                cleanedDateTimeMeta: result.cleanedDateTimeMeta,
+                cleanedMeta: result.cleanedMeta,
+                cleanedNumericMeta: result.cleanedNumericMeta,
+                clickFilteredMetaCheck: result.clickFilteredMetaCheck,
+                data: result.data,
+                editorMode: parentVm.editorMode,
+                fetchResult: result.fetchMoreRows,
+                filteredColumnCount: result.filteredColumnCount,
+                filteredMeta: result.filteredMeta,
+                filteredMetaChecked: result.filteredMetaChecked,
+                hasMore: result.hasMore,
+                hasSomeResults: result.hasSomeResults,
+                id: id,
+                images: result.images,
+                isMetaFilterVisible: result.isMetaFilterVisible,
+                isPresentationMode: parentNotebook.isPresentationMode,
+                isResultFullScreenMode: parentVm.isResultFullScreenMode,
+                isResultSettingsVisible: isResultSettingsVisible,
+                isResultSettingsVisible: isResultSettingsVisible,
+                meta: result.meta,
+                metaFilter: result.metaFilter,
+                resultsKlass: resultsKlass,
+                scrollToResultColumn: scrollToResultColumn,
+                showChart: showChart,
+                showGrid: showGrid,
+                status: status,
+                toggleResultColumn: toggleResultColumn,
+                type: result.type,
+              }} --><!-- /ko -->
+            <!-- /ko -->
           </div>
 
           <!-- ko if: result.explanation().length > 0 -->
@@ -871,10 +915,53 @@
             <!-- ko if: $root.editorMode() -->
             <!-- ko template: 'query-tabs${ suffix }' --><!-- /ko -->
             <!-- /ko -->
-            <!-- ko ifnot: $root.editorMode() -->
-            <!-- ko template: { if: ['text', 'jar', 'java', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results${ suffix }' } --><!-- /ko -->
+            <!-- ko if: !$root.editorMode() && ['text', 'jar', 'java', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'].indexOf(type()) === -1 -->
+              <!-- ko component: { name: 'snippet-results', params: {
+                autocompleteFromEntries: result.autocompleteFromEntries,
+                chartLimit: chartLimit,
+                chartMapHeat: chartMapHeat,
+                chartMapLabel: chartMapLabel,
+                chartMapType: chartMapType,
+                chartScatterGroup: chartScatterGroup,
+                chartScatterSize: chartScatterSize,
+                chartScope: chartScope,
+                chartSorting: chartSorting,
+                chartTimelineType: chartTimelineType,
+                chartType: chartType,
+                chartX: chartX,
+                chartXPivot: chartXPivot,
+                chartYMulti: chartYMulti,
+                chartYSingle: chartYSingle,
+                cleanedDateTimeMeta: result.cleanedDateTimeMeta,
+                cleanedMeta: result.cleanedMeta,
+                cleanedNumericMeta: result.cleanedNumericMeta,
+                clickFilteredMetaCheck: result.clickFilteredMetaCheck,
+                data: result.data,
+                editorMode: parentVm.editorMode,
+                fetchResult: result.fetchMoreRows,
+                filteredColumnCount: result.filteredColumnCount,
+                filteredMeta: result.filteredMeta,
+                filteredMetaChecked: result.filteredMetaChecked,
+                hasMore: result.hasMore,
+                hasSomeResults: result.hasSomeResults,
+                id: id,
+                images: result.images,
+                isMetaFilterVisible: result.isMetaFilterVisible,
+                isPresentationMode: parentNotebook.isPresentationMode,
+                isResultFullScreenMode: parentVm.isResultFullScreenMode,
+                isResultSettingsVisible: isResultSettingsVisible,
+                isResultSettingsVisible: isResultSettingsVisible,
+                meta: result.meta,
+                metaFilter: result.metaFilter,
+                resultsKlass: resultsKlass,
+                scrollToResultColumn: scrollToResultColumn,
+                showChart: showChart,
+                showGrid: showGrid,
+                status: status,
+                toggleResultColumn: toggleResultColumn,
+                type: result.type,
+              }} --><!-- /ko -->
             <!-- /ko -->
-
             <div class="clearfix"></div>
           </div>
         </div>
@@ -1309,87 +1396,9 @@
     <pre class="no-margin-bottom" data-bind="text: result.explanation"></pre>
   </script>
 
-  <script type="text/html" id="snippet-results${ suffix }">
-    <div class="snippet-row" data-bind="slideVisible: result.hasSomeResults">
-      <div class="result-left-bar">
-        <!-- ko template: { if: result.type() == 'table' && result.hasSomeResults(), name: 'snippet-result-controls${ suffix }' }--><!-- /ko -->
-      </div>
-      <div class="result-body">
-        <div class="row-fluid" data-bind="visible: result.type() != 'table'" style="display:none; max-height: 400px; margin: 10px 0; overflow-y: auto">
-          <!-- ko if: result.data().length != 0 && result.data()[0][1] != "" -->
-          <pre data-bind="text: result.data()[0][1]" class="no-margin-bottom"></pre>
-          <!-- /ko -->
-          <!-- ko ifnot: result.data().length != 0 && result.data()[0][1] != "" -->
-          <pre class="no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Done.") }</pre>
-          <!-- /ko -->
-          <!-- ko if: result.images().length != 0 -->
-          <ul class="unstyled results-images" data-bind="foreach: result.images()">
-            <li>
-              <img data-bind="attr: {'src': 'data:image/png;base64,' + $data}" class="margin-bottom-10"  alt="${ _('Result image') }"/>
-            </li>
-          </ul>
-          <!-- /ko -->
-        </div>
-
-        <div class="row-fluid table-results" data-bind="visible: result.type() === 'table'" style="display: none; max-height: 400px; min-height: 290px;">
-          <!-- ko if: showGrid -->
-            <!-- ko component: { name: 'result-grid', params: {
-              status: status,
-              isResultFullScreenMode: parentVm.isResultFullScreenMode,
-              editorMode: parentVm.editorMode,
-              isPresentationMode: parentNotebook.isPresentationMode,
-              hasMore: result.hasMore,
-              fetchResult: result.fetchMoreRows,
-              isResultSettingsVisible: isResultSettingsVisible,
-              isMetaFilterVisible: result.isMetaFilterVisible,
-              filteredMeta: result.filteredMeta,
-              filteredMetaChecked: result.filteredMetaChecked,
-              clickFilteredMetaCheck: result.clickFilteredMetaCheck,
-              filteredColumnCount: result.filteredColumnCount,
-              metaFilter: result.metaFilter,
-              autocompleteFromEntries: result.autocompleteFromEntries,
-              toggleResultColumn: toggleResultColumn,
-              scrollToResultColumn: scrollToResultColumn,
-              resultsKlass: resultsKlass,
-              meta: result.meta,
-              data: result.data
-            } } --><!-- /ko -->
-          <!-- /ko -->
-          <!-- ko if: showChart-->
-            <!-- ko component: { name: 'result-chart', params: {
-              data: result.data,
-              meta: result.meta,
-              id: id,
-              isResultSettingsVisible: isResultSettingsVisible,
-              chartLimit: chartLimit,
-              chartMapHeat: chartMapHeat,
-              chartMapLabel: chartMapLabel,
-              chartMapType: chartMapType,
-              chartScatterGroup: chartScatterGroup,
-              chartScatterSize: chartScatterSize,
-              chartScope: chartScope,
-              chartSorting: chartSorting,
-              chartTimelineType: chartTimelineType,
-              chartType: chartType,
-              chartX: chartX,
-              chartXPivot: chartXPivot,
-              chartYMulti: chartYMulti,
-              chartYSingle: chartYSingle,
-              cleanedMeta: result.cleanedMeta,
-              cleanedDateTimeMeta: result.cleanedDateTimeMeta,
-              cleanedNumericMeta: result.cleanedNumericMeta
-            } } --><!-- /ko -->
-          <!-- /ko -->
-        </div>
-      </div>
-    </div>
-  </script>
-
-
   <script type="text/html" id="text-snippet-body${ suffix }">
     <div data-bind="attr: {'id': 'editor_' + id()}, html: statement_raw, value: statement_raw, medium: {}" data-placeHolder="${ _('Type your text here, select some text to format it') }" class="text-snippet"></div>
   </script>
-
 
   <script type="text/html" id="markdown-snippet-body${ suffix }">
     <!-- ko ifnot: $root.isPresentationMode() -->
@@ -1639,78 +1648,6 @@
 ##           <!-- /ko -->
 ##         % endif
 ##       </div>
-    </div>
-  </script>
-
-  <script type="text/html" id="snippet-result-controls${ suffix }">
-    <div class="snippet-actions" style="opacity:1">
-      <div style="margin-top:25px;">
-        <a class="snippet-side-btn" href="javascript: void(0)" data-bind="click: function() { $data.showGrid(true); huePubSub.publish('redraw.fixed.headers'); huePubSub.publish('table.extender.redraw'); }, css: {'active': $data.showGrid}" title="${ _('Grid') }">
-          <i class="fa fa-fw fa-th"></i>
-        </a>
-      </div>
-
-      <div class="dropdown">
-        <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="css: {'active': $data.showChart }, click: function() { $data.showChart(true); }" >
-          <i class="hcha fa-fw hcha-bar-chart" data-bind="visible: chartType() == window.HUE_CHARTS.TYPES.BARCHART" title="${ _('Bars') }"></i>
-          <i class="hcha fa-fw hcha-timeline-chart" data-bind="visible: chartType() == window.HUE_CHARTS.TYPES.TIMELINECHART" title="${ _('Time') }"></i>
-          <i class="hcha fa-fw hcha-pie-chart" data-bind="visible: chartType() == window.HUE_CHARTS.TYPES.PIECHART" title="${ _('Pie') }"></i>
-          <i class="fa fa-fw fa-dot-circle-o" data-bind="visible: chartType() == window.HUE_CHARTS.TYPES.SCATTERCHART" title="${ _('Scatter') }"></i>
-          <i class="fa fa-fw fa-map-marker" data-bind="visible: chartType() == window.HUE_CHARTS.TYPES.MAP" title="${ _('Marker Map') }"></i>
-          <i class="hcha fa-fw hcha-map-chart" data-bind="visible: chartType() == window.HUE_CHARTS.TYPES.GRADIENTMAP" title="${ _('Gradient Map') }"></i>
-        </a>
-        <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown" href="javascript: void(0)" data-bind="css: {'active': $data.showChart}">
-          <i class="fa fa-caret-down"></i>
-        </a>
-
-        <ul class="dropdown-menu less-padding">
-          <li>
-            <a href="javascript:void(0)" data-bind="css: {'active': chartType() == window.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $data.showChart(true); chartType(window.HUE_CHARTS.TYPES.BARCHART); }">
-              <i class="hcha hcha-bar-chart"></i> ${_('Bars')}
-            </a>
-          </li>
-          <li data-bind="visible: result.cleanedDateTimeMeta().length > 0">
-            <a href="javascript:void(0)" data-bind="css: {'active': chartType() == window.HUE_CHARTS.TYPES.TIMELINECHART}, click: function(){ $data.showChart(true); chartType(window.HUE_CHARTS.TYPES.TIMELINECHART); }">
-              <i class="hcha hcha-timeline-chart"></i> ${_('Time')}
-            </a>
-          </li>
-          <li>
-            <a href="javascript:void(0)" data-bind="css: {'active': chartType() == window.HUE_CHARTS.TYPES.PIECHART}, click: function(){ $data.showChart(true); chartType(window.HUE_CHARTS.TYPES.PIECHART); }">
-              <i class="hcha hcha-pie-chart"></i> ${_('Pie')}
-            </a>
-          </li>
-          <li>
-            <a href="javascript:void(0)" data-bind="css: {'active': chartType() == window.HUE_CHARTS.TYPES.SCATTERCHART}, click: function(){ $data.showChart(true); chartType(window.HUE_CHARTS.TYPES.SCATTERCHART); }">
-              <i class="fa fa-fw fa-dot-circle-o chart-icon"></i> ${_('Scatter')}
-            </a>
-          </li>
-          <li>
-            <a href="javascript:void(0)" data-bind="css: {'active': chartType() == window.HUE_CHARTS.TYPES.MAP}, click: function(){ $data.showChart(true); chartType(window.HUE_CHARTS.TYPES.MAP); }">
-              <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
-            </a>
-          </li>
-          <li>
-            <a href="javascript:void(0)" data-bind="css: {'active': chartType() == window.HUE_CHARTS.TYPES.GRADIENTMAP}, click: function(){ $data.showChart(true); chartType(window.HUE_CHARTS.TYPES.GRADIENTMAP); }">
-              <i class="hcha hcha-map-chart"></i> ${_('Gradient Map')}
-            </a>
-          </li>
-        </ul>
-      </div>
-
-      <div>
-        <a class="snippet-side-btn" href="javascript:void(0)" data-bind="click: function(){ huePubSub.publish('chart.hard.reset'); isResultSettingsVisible(! isResultSettingsVisible()) }, css: { 'blue' : isResultSettingsVisible }" title="${ _('Columns') }">
-          <!-- ko if: isResultSettingsVisible() -->
-          <i class="fa fa-fw fa-chevron-left"></i>
-          <!-- /ko -->
-          <!-- ko ifnot: isResultSettingsVisible() -->
-          <i class="fa fa-fw fa-columns"></i>
-          <!-- /ko -->
-        </a>
-      </div>
-
-      % if conf.ENABLE_DOWNLOAD.get():
-        <div data-bind="component: { name: 'downloadSnippetResults', params: { gridSideBtn: false, snippet: $data, notebook: $parent } }" style="display:inline-block;"></div>
-      % endif
     </div>
   </script>
 

@@ -301,12 +301,13 @@ class ResultGrid extends DisposableComponent {
       window.clearTimeout(resultFollowTimeout);
     });
 
+    const $snippet = this.getSnippetElement();
+    const $resultLeftBar = $snippet.find('.result-left-bar');
+
     const dataScroll = () => {
-      const $resultTable = this.getResultTableElement();
-      if ($resultTable.is(':visible')) {
+      if (!$resultTable.is(':visible')) {
         return;
       }
-      const $snippet = this.getSnippetElement();
       if (this.editorMode()) {
         window.clearTimeout(resultFollowTimeout);
         resultFollowTimeout = window.setTimeout(() => {
@@ -335,8 +336,8 @@ class ResultGrid extends DisposableComponent {
               marginTop: margin
             });
           }
-          $snippet.find('.snippet-actions').css({
-            marginTop: margin + 25
+          $resultLeftBar.css({
+            marginTop: margin
           });
         }, 100);
       } else {
