@@ -2077,33 +2077,6 @@ export default class Snippet {
     });
   }
 
-  scrollToResultColumn(linkElement) {
-    const $resultTable = $(linkElement)
-      .parents('.snippet')
-      .find('table.resultTable:eq(0)');
-    const _text = $.trim($(linkElement).text());
-    const _col = $resultTable.find('th').filter(function() {
-      return $.trim($(this).text()) === _text;
-    });
-    $resultTable.find('.columnSelected').removeClass('columnSelected');
-    const _colSel = $resultTable.find('tr th:nth-child(' + (_col.index() + 1) + ')');
-    if (_colSel.length > 0) {
-      $resultTable.find('tr td:nth-child(' + (_col.index() + 1) + ')').addClass('columnSelected');
-      $resultTable
-        .parent()
-        .scrollLeft(
-          _colSel.position().left +
-            $resultTable.parent().scrollLeft() -
-            $resultTable.parent().offset().left -
-            30
-        );
-      $resultTable.data('scrollToCol', _col.index());
-      $resultTable.data('scrollToRow', null);
-      $resultTable.data('scrollAnimate', true);
-      $resultTable.parent().trigger('scroll');
-    }
-  }
-
   startLongOperationTimeout() {
     this.longOperationTimeout = window.setTimeout(() => {
       this.showLongOperationWarning(true);
@@ -2113,23 +2086,6 @@ export default class Snippet {
   stopLongOperationTimeout() {
     window.clearTimeout(this.longOperationTimeout);
     this.showLongOperationWarning(false);
-  }
-
-  toggleAllResultColumns(linkElement) {
-    const $t = $(linkElement)
-      .parents('.snippet')
-      .find('table.resultTable:eq(0)');
-    const dt = $t.hueDataTable();
-    dt.fnToggleAllCols(linkElement.checked);
-    dt.fnDraw();
-  }
-
-  toggleResultColumn(linkElement, index) {
-    const $t = $(linkElement)
-      .parents('.snippet')
-      .find('table.resultTable:eq(0)');
-    const dt = $t.hueDataTable();
-    dt.fnSetColumnVis(index, linkElement.checked);
   }
 
   toggleResultSettings() {

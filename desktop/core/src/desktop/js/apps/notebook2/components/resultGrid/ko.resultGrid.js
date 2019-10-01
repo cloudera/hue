@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
+import ko from 'knockout';
 
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
@@ -38,7 +39,7 @@ const TEMPLATE = `
             <input class="all-meta-checked no-margin-top" type="checkbox" data-bind="
                 enable: !isMetaFilterVisible() && filteredMeta().length,
                 event: {
-                  change: function() { toggleAllResultColumns($element); clickFilteredMetaCheck() }
+                  change: function() { toggleAllResultColumns($element); }
                 },
                 checked: filteredMetaChecked
               "/>
@@ -59,7 +60,7 @@ const TEMPLATE = `
                   querySpec: metaFilter,
                   facets: Object.keys(SQL_COLUMNS_KNOWN_FACET_VALUES),
                   knownFacetValues: SQL_COLUMNS_KNOWN_FACET_VALUES,
-                  autocompleteFromEntries: autocompleteFromEntries
+                  autocompleteFromEntries: autocompleteColumns.bind($data)
                 }
               } --><!-- /ko -->
             </div>
@@ -70,7 +71,7 @@ const TEMPLATE = `
         <tr data-bind="visible: name !== ''">
           <td><input class="no-margin-top" type="checkbox" data-bind="
               event: {
-                change: function() { $parent.toggleResultColumn($element, originalIndex);}
+                change: function() { $parent.toggleResultColumn($element, originalIndex); }
               },
               checked: checked
             "/></td>
@@ -139,20 +140,67 @@ class ResultGrid extends DisposableComponent {
 
     this.status = params.status;
     this.isResultSettingsVisible = params.isResultSettingsVisible;
-    this.isMetaFilterVisible = params.isMetaFilterVisible; // result
-    this.filteredMeta = params.filteredMeta; // result
-    this.filteredMetaChecked = params.filteredMetaChecked; // result
-    this.clickFilteredMetaCheck = params.clickFilteredMetaCheck; // result
-    this.filteredColumnCount = params.filteredColumnCount; // result
-    this.metaFilter = params.metaFilter; // result
-    this.autocompleteFromEntries = params.autocompleteFromEntries; // result
-    this.toggleResultColumn = params.toggleResultColumn;
-    this.scrollToResultColumn = params.scrollToResultColumn;
+    this.isMetaFilterVisible = ko.observable(false);
+    this.metaFilter = ko.observable();
     this.resultsKlass = params.resultsKlass;
     this.meta = params.meta; // result
     this.data = params.data; // result
 
-    this.hueDatatable;
+    this.hueDatatable = undefined;
+
+    const adaptMeta = () => {
+      this.meta().forEach((item, index) => {
+        if (typeof item.checked === 'undefined') {
+          item.checked = ko.observable(true);
+          item.type = item.type.replace(/_type/i, '').toLowerCase();
+          item.originalIndex = index;
+        }
+      });
+    };
+
+    adaptMeta();
+    const metaSub = this.meta.subscribe(() => {
+      adaptMeta();
+    });
+
+    this.disposals.push(() => {
+      metaSub.dispose();
+    });
+
+    this.filteredMeta = ko.pureComputed(() => {
+      if (!this.metaFilter() || this.metaFilter().query === '') {
+        return this.meta();
+      }
+
+      return this.meta().filter(item => {
+        const facets = this.metaFilter().facets;
+        const isFacetMatch = !facets || Object.keys(facets).length === 0 || !facets['type']; // So far only type facet is used for SQL
+        const isTextMatch = !this.metaFilter().text || this.metaFilter().text.length === 0;
+        let match = true;
+
+        if (!isFacetMatch) {
+          match = !!facets['type'][item.type];
+        }
+
+        if (match && !isTextMatch) {
+          match = this.metaFilter().text.every(
+            text => item.name.toLowerCase().indexOf(text.toLowerCase()) !== -1
+          );
+        }
+        return match;
+      });
+    });
+
+    this.filteredMetaChecked = ko.pureComputed(() =>
+      this.filteredMeta().some(item => typeof item.checked === 'undefined' || item.checked())
+    );
+
+    this.filteredColumnCount = ko.pureComputed(() => {
+      if (!this.metaFilter() || this.metaFilter().query === '') {
+        return this.meta().length - 1;
+      }
+      return this.filteredMeta().length;
+    });
 
     const dataSub = this.data.subscribe(() => {
       this.render();
@@ -164,6 +212,26 @@ class ResultGrid extends DisposableComponent {
         this.hueDatatable.fnDestroy();
       }
     });
+  }
+
+  autocompleteColumns(nonPartial, partial) {
+    const result = [];
+    const partialLower = partial.toLowerCase();
+    this.meta().forEach(column => {
+      if (column.name.toLowerCase().indexOf(partialLower) === 0) {
+        result.push(nonPartial + partial + column.name.substring(partial.length));
+      } else if (column.name.toLowerCase().indexOf('.' + partialLower) !== -1) {
+        result.push(
+          nonPartial +
+            partial +
+            column.name.substring(
+              partial.length + column.name.toLowerCase().indexOf('.' + partialLower) + 1
+            )
+        );
+      }
+    });
+
+    return result;
   }
 
   createHueDatatable() {
@@ -257,7 +325,7 @@ class ResultGrid extends DisposableComponent {
     }
     $resultTable.addClass('dt');
 
-    const hueDatatable = this.createHueDatatable($resultTable);
+    this.hueDatatable = this.createHueDatatable($resultTable);
 
     const $dataTablesWrapper = $resultTable.parents('.dataTables_wrapper');
 
@@ -353,7 +421,7 @@ class ResultGrid extends DisposableComponent {
             lastScrollPosition !== $scrollElement.scrollTop() &&
             $scrollElement.scrollTop() + $scrollElement.outerHeight() + 20 >=
               $scrollElement[0].scrollHeight &&
-            hueDatatable &&
+            this.hueDatatable &&
             this.hasMore()
           ) {
             this.showGrayedOutResult();
@@ -381,7 +449,7 @@ class ResultGrid extends DisposableComponent {
     //   }, 0);
     // });
 
-    return hueDatatable;
+    return this.hueDatatable;
   }
 
   getSnippetElement() {
@@ -549,6 +617,34 @@ class ResultGrid extends DisposableComponent {
     $snippet.find('.snippet-grid-settings').scrollLeft(0);
   }
 
+  // TODO: Fix for multiple clicks
+  scrollToResultColumn(linkElement) {
+    const $resultTable = this.getResultTableElement();
+    const searchText = $.trim($(linkElement).text());
+    const foundColumn = $resultTable.find('th').filter(function() {
+      return $.trim($(this).text()) === searchText;
+    });
+    $resultTable.find('.columnSelected').removeClass('columnSelected');
+    const selectedColumn = $resultTable.find('tr th:nth-child(' + (foundColumn.index() + 1) + ')');
+    if (selectedColumn.length > 0) {
+      $resultTable
+        .find('tr td:nth-child(' + (foundColumn.index() + 1) + ')')
+        .addClass('columnSelected');
+      $resultTable
+        .parent()
+        .scrollLeft(
+          selectedColumn.position().left +
+            $resultTable.parent().scrollLeft() -
+            $resultTable.parent().offset().left -
+            30
+        );
+      $resultTable.data('scrollToCol', foundColumn.index());
+      $resultTable.data('scrollToRow', null);
+      $resultTable.data('scrollAnimate', true);
+      $resultTable.parent().trigger('scroll');
+    }
+  }
+
   showGrayedOutResult() {
     const $wrapper = this.getSnippetElement().find('.dataTables_wrapper');
     $wrapper.find('.fixed-first-column').css({ opacity: '0' });
@@ -563,6 +659,18 @@ class ResultGrid extends DisposableComponent {
     $wrapper.find('.fixed-header-row').css({ opacity: '1' });
     $wrapper.find('.fixed-first-cell').css({ opacity: '1' });
     $wrapper.find('.resultTable').css({ opacity: '1' });
+  }
+
+  toggleAllResultColumns(linkElement) {
+    this.hueDatatable.fnToggleAllCols(linkElement.checked);
+    this.hueDatatable.fnDraw();
+    this.filteredMeta().forEach(item => {
+      item.checked(linkElement.checked);
+    });
+  }
+
+  toggleResultColumn(linkElement, index) {
+    this.hueDatatable.fnSetColumnVis(index, linkElement.checked);
   }
 
   async resultTableRendered() {
