@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import ko from 'knockout';
+
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
 import I18n from 'utils/i18n';
@@ -22,6 +24,17 @@ import 'apps/notebook2/components/resultChart/ko.resultChart';
 import 'apps/notebook2/components/resultGrid/ko.resultGrid';
 
 export const NAME = 'snippet-results';
+
+const isNumericColumn = type =>
+  ['tinyint', 'smallint', 'int', 'bigint', 'float', 'double', 'decimal', 'real'].indexOf(type) !==
+  -1;
+
+const isDateTimeColumn = type => ['timestamp', 'date', 'datetime'].indexOf(type) !== -1;
+
+const isComplexColumn = type => ['array', 'map', 'struct'].indexOf(type) !== -1;
+
+const isStringColumn = type =>
+  !isNumericColumn(type) && !isDateTimeColumn(type) && !isComplexColumn(type);
 
 // prettier-ignore
 const TEMPLATE = `
@@ -149,27 +162,16 @@ const TEMPLATE = `
       </div>
       <div data-bind="visible: showChart" style="display: none;">
         <!-- ko component: { name: 'result-chart', params: {
-          chartLimit: chartLimit,
-          chartMapHeat: chartMapHeat,
-          chartMapLabel: chartMapLabel,
-          chartMapType: chartMapType,
-          chartScatterGroup: chartScatterGroup,
-          chartScatterSize: chartScatterSize,
-          chartScope: chartScope,
-          chartSorting: chartSorting,
-          chartTimelineType: chartTimelineType,
           chartType: chartType,
-          chartX: chartX,
-          chartXPivot: chartXPivot,
-          chartYMulti: chartYMulti,
-          chartYSingle: chartYSingle,
-          cleanedDateTimeMeta: cleanedDateTimeMeta,
           cleanedMeta: cleanedMeta,
+          cleanedDateTimeMeta: cleanedDateTimeMeta,
           cleanedNumericMeta: cleanedNumericMeta,
+          cleanedStringMeta: cleanedStringMeta,
           data: data,
           id: id,
           isResultSettingsVisible: isResultSettingsVisible,
-          meta: meta
+          meta: meta,
+          showChart: showChart
         } } --><!-- /ko -->
       </div>
     </div>
@@ -189,7 +191,6 @@ class SnippetResults extends DisposableComponent {
     this.images = params.images; // result
     this.showGrid = params.showGrid;
     this.showChart = params.showChart;
-    this.cleanedDateTimeMeta = params.cleanedDateTimeMeta;
     this.isResultSettingsVisible = params.isResultSettingsVisible;
     this.data = params.data; // result
     this.meta = params.meta; // result
@@ -204,22 +205,21 @@ class SnippetResults extends DisposableComponent {
     this.status = params.status;
 
     // Chart specific
-    this.chartLimit = params.chartLimit;
-    this.chartMapHeat = params.chartMapHeat;
-    this.chartMapLabel = params.chartMapLabel;
-    this.chartMapType = params.chartMapType;
-    this.chartScatterGroup = params.chartScatterGroup;
-    this.chartScatterSize = params.chartScatterSize;
-    this.chartScope = params.chartScope;
-    this.chartSorting = params.chartSorting;
-    this.chartTimelineType = params.chartTimelineType;
-    this.chartX = params.chartX;
-    this.chartXPivot = params.chartXPivot;
-    this.chartYMulti = params.chartYMulti;
-    this.chartYSingle = params.chartYSingle;
-    this.cleanedMeta = params.cleanedMeta;
-    this.cleanedNumericMeta = params.cleanedNumericMeta;
     this.id = params.id;
+
+    this.cleanedMeta = ko.pureComputed(() => this.meta().filter(item => item.name !== ''));
+
+    this.cleanedDateTimeMeta = ko.pureComputed(() =>
+      this.meta().filter(item => item.name !== '' && isDateTimeColumn(item.type))
+    );
+
+    self.cleanedStringMeta = ko.pureComputed(() =>
+      this.meta().filter(item => item.name !== '' && isStringColumn(item.type))
+    );
+
+    this.cleanedNumericMeta = ko.pureComputed(() =>
+      this.meta().filter(item => item.name !== '' && isNumericColumn(item.type))
+    );
   }
 }
 

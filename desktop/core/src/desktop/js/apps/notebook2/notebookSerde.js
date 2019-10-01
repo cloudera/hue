@@ -68,20 +68,30 @@ export const notebookToJSON = notebook =>
       aceSize: snippet.aceSize(),
       associatedDocumentUuid: snippet.associatedDocumentUuid(),
       chartData: snippet.chartData(),
-      chartLimit: snippet.chartLimit(),
-      chartMapHeat: snippet.chartMapHeat(),
-      chartMapLabel: snippet.chartMapLabel(),
-      chartMapType: snippet.chartMapType(),
-      chartScatterGroup: snippet.chartScatterGroup(),
-      chartScatterSize: snippet.chartScatterSize(),
-      chartScope: snippet.chartScope(),
-      chartSorting: snippet.chartSorting(),
-      chartTimelineType: snippet.chartTimelineType(),
+      // chartLimit: snippet.chartLimit(), // TODO: Move somewhere else
+      // chartMapHeat: snippet.chartMapHeat(), // TODO: Move somewhere else
+      // chartMapLabel: snippet.chartMapLabel(), // TODO: Move somewhere else
+      // chartMapType: snippet.chartMapType(), // TODO: Move somewhere else
+      // chartScatterGroup: snippet.chartScatterGroup(), // TODO: Move somewhere else
+      // chartScatterSize: snippet.chartScatterSize(), // TODO: Move somewhere else
+      // chartScope: snippet.chartScope(), // TODO: Move somewhere else
+      // chartSorting: snippet.chartSorting(), // TODO: Move somewhere else
+      // chartTimelineType: snippet.chartTimelineType(), // TODO: Move somewhere else
+      //
+      // $.extend(
+      //   snippet,
+      //   snippet.chartType === 'lines' && {
+      //     // Retire line chart
+      //     chartType: 'bars',
+      //     chartTimelineType: 'line'
+      //   }
+      // );
+      //
       chartType: snippet.chartType(),
-      chartX: snippet.chartX(),
-      chartXPivot: snippet.chartXPivot(),
-      chartYMulti: snippet.chartYMulti(),
-      chartYSingle: snippet.chartYSingle(),
+      // chartX: snippet.chartX(), // TODO: Move somewhere else
+      // chartXPivot: snippet.chartXPivot(), // TODO: Move somewhere else
+      // chartYMulti: snippet.chartYMulti(), // TODO: Move somewhere else
+      // chartYSingle: snippet.chartYSingle(), // TODO: Move somewhere else
       compute: snippet.compute(),
       currentQueryTab: snippet.currentQueryTab(),
       database: snippet.database(),

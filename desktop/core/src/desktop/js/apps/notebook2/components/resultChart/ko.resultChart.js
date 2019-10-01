@@ -18,6 +18,7 @@ import ko from 'knockout';
 
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
+import hueAnalytics from 'utils/hueAnalytics';
 import I18n from 'utils/i18n';
 import {
   leafletMapChartTransformer,
@@ -31,6 +32,37 @@ import {
 export const NAME = 'result-chart';
 
 const TYPES = window.HUE_CHARTS.TYPES;
+
+export const CHART_MAP_TYPE = {
+  HEAT: 'heat',
+  MARKER: 'marker'
+};
+
+export const CHART_SCOPE = {
+  AUS: 'aus',
+  BRA: 'bra',
+  CAN: 'can',
+  CHN: 'chn',
+  DEU: 'deu',
+  EUROPE: 'europe',
+  FRA: 'fra',
+  GBR: 'gbr',
+  ITA: 'ita',
+  JPN: 'jpn',
+  USA: 'usa',
+  WORLD: 'world'
+};
+
+export const CHART_SORTING = {
+  ASC: 'asc',
+  DESC: 'desc',
+  NONE: 'none'
+};
+
+export const CHART_TIMELINE_TYPE = {
+  BAR: 'bar',
+  LINE: 'line'
+};
 
 // prettier-ignore
 const TEMPLATE = `
@@ -56,8 +88,8 @@ const TEMPLATE = `
               dropdownAutoWidth: true
             }
           ">
-          <option value="bar">${ I18n("Bars") }</option>
-          <option value="line">${ I18n("Lines") }</option>
+          <option value="${ CHART_TIMELINE_TYPE.BAR }">${ I18n("Bars") }</option>
+          <option value="${ CHART_TIMELINE_TYPE.LINE }">${ I18n("Lines") }</option>
         </select>
       </div>
       <!-- /ko -->
@@ -204,12 +236,12 @@ const TEMPLATE = `
               dropdownAutoWidth: true
             }
           ">
-          <option value="marker">${ I18n("Markers") }</option>
-          <option value="heat">${ I18n("Heatmap") }</option>
+          <option value="${ CHART_MAP_TYPE.MARKER }">${ I18n("Markers") }</option>
+          <option value="${ CHART_MAP_TYPE.HEAT }">${ I18n("Heatmap") }</option>
         </select>
       </div>
 
-      <!-- ko if: chartMapType() === 'marker' -->
+      <!-- ko if: chartMapType() === '${ CHART_MAP_TYPE.MARKER }' -->
       <ul class="nav nav-list" style="border: none; background-color: #FFF">
         <li class="nav-header">${ I18n('label') }</li>
       </ul>
@@ -230,7 +262,7 @@ const TEMPLATE = `
       </div>
       <!-- /ko -->
 
-      <!-- ko if: chartMapType() === 'heat' -->
+      <!-- ko if: chartMapType() === '${ CHART_MAP_TYPE.HEAT }' -->
       <ul class="nav nav-list" style="border: none; background-color: #FFF">
         <li class="nav-header">${ I18n('intensity') }</li>
       </ul>
@@ -307,18 +339,18 @@ const TEMPLATE = `
               dropdownAutoWidth: true
             }
           ">
-          <option value="world">${ I18n("World") }</option>
-          <option value="europe">${ I18n("Europe") }</option>
-          <option value="aus">${ I18n("Australia") }</option>
-          <option value="bra">${ I18n("Brazil") }</option>
-          <option value="can">${ I18n("Canada") }</option>
-          <option value="chn">${ I18n("China") }</option>
-          <option value="fra">${ I18n("France") }</option>
-          <option value="deu">${ I18n("Germany") }</option>
-          <option value="ita">${ I18n("Italy") }</option>
-          <option value="jpn">${ I18n("Japan") }</option>
-          <option value="gbr">${ I18n("UK") }</option>
-          <option value="usa">${ I18n("USA") }</option>
+          <option value="${ CHART_SCOPE.WORLD }">${ I18n("World") }</option>
+          <option value="${ CHART_SCOPE.EUROPE }">${ I18n("Europe") }</option>
+          <option value="${ CHART_SCOPE.AUS }">${ I18n("Australia") }</option>
+          <option value="${ CHART_SCOPE.BRA }">${ I18n("Brazil") }</option>
+          <option value="${ CHART_SCOPE.CAN }">${ I18n("Canada") }</option>
+          <option value="${ CHART_SCOPE.CHN }">${ I18n("China") }</option>
+          <option value="${ CHART_SCOPE.FRA }">${ I18n("France") }</option>
+          <option value="${ CHART_SCOPE.DEU }">${ I18n("Germany") }</option>
+          <option value="${ CHART_SCOPE.ITA }">${ I18n("Italy") }</option>
+          <option value="${ CHART_SCOPE.JPN }">${ I18n("Japan") }</option>
+          <option value="${ CHART_SCOPE.GBR }">${ I18n("UK") }</option>
+          <option value="${ CHART_SCOPE.USA }">${ I18n("USA") }</option>
         </select>
       </div>
       <!-- /ko -->
@@ -329,16 +361,16 @@ const TEMPLATE = `
       </ul>
       <div class="btn-group" data-toggle="buttons-radio">
         <a rel="tooltip" data-placement="top" title="${ I18n('No sorting') }" href="javascript:void(0)" class="btn" data-bind="
-            css: { 'active': chartSorting() === 'none' },
-            click: function() { chartSorting('none'); }
+            css: { 'active': chartSorting() === '${ CHART_SORTING.NONE }' },
+            click: function() { chartSorting('${ CHART_SORTING.NONE }'); }
           "><i class="fa fa-align-left fa-rotate-270"></i></a>
         <a rel="tooltip" data-placement="top" title="${ I18n('Sort ascending') }" href="javascript:void(0)" class="btn" data-bind="
-            css: { 'active': chartSorting() == 'asc' },
-            click: function() { chartSorting('asc'); }
+            css: { 'active': chartSorting() == '${ CHART_SORTING.ASC }' },
+            click: function() { chartSorting('${ CHART_SORTING.ASC }'); }
           "><i class="fa fa-sort-amount-asc fa-rotate-270"></i></a>
         <a rel="tooltip" data-placement="top" title="${ I18n('Sort descending') }" href="javascript:void(0)" class="btn" data-bind="
-            css: { 'active': chartSorting() == 'desc' },
-            click: function(){ chartSorting('desc'); }
+            css: { 'active': chartSorting() == '${ CHART_SORTING.DESC }' },
+            click: function(){ chartSorting('${ CHART_SORTING.DESC }'); }
           "><i class="fa fa-sort-amount-desc fa-rotate-270"></i></a>
       </div>
       <!-- /ko -->
@@ -391,27 +423,29 @@ class ResultChart extends DisposableComponent {
     this.data = params.data;
     this.id = params.id;
     this.isResultSettingsVisible = params.isResultSettingsVisible;
-    this.chartLimit = params.chartLimit;
-    this.chartMapHeat = params.chartMapHeat;
-    this.chartMapLabel = params.chartMapLabel;
-    this.chartMapType = params.chartMapType;
-    this.chartScatterGroup = params.chartScatterGroup;
-    this.chartScatterSize = params.chartScatterSize;
-    this.chartScope = params.chartScope;
-    this.chartSorting = params.chartSorting;
-    this.chartTimelineType = params.chartTimelineType;
     this.chartType = params.chartType;
-    this.chartX = params.chartX;
-    this.chartXPivot = params.chartXPivot;
-    this.chartYMulti = params.chartYMulti;
-    this.chartYSingle = params.chartYSingle;
 
     this.meta = params.meta;
     this.cleanedMeta = params.cleanedMeta;
     this.cleanedDateTimeMeta = params.cleanedDateTimeMeta;
     this.cleanedNumericMeta = params.cleanedNumericMeta;
+    this.cleanedStringMeta = params.cleanedNumericMeta;
 
+    this.chartLimit = ko.observable().extend({ notify: 'always' }); // TODO: Should be persisted
     this.chartLimits = ko.observableArray([5, 10, 25, 50, 100]);
+    this.chartMapHeat = ko.observable(); // TODO: Should be persisted
+    this.chartMapLabel = ko.observable(); // TODO: Should be persisted
+    this.chartMapType = ko.observable(CHART_MAP_TYPE.MARKER); // TODO: Should be persisted
+    this.chartScatterGroup = ko.observable(); // TODO: Should be persisted
+    this.chartScatterSize = ko.observable(); // TODO: Should be persisted
+    this.chartScope = ko.observable(CHART_SCOPE.WORLD); // TODO: Should be persisted
+    this.chartSorting = ko.observable(CHART_SORTING.NONE); // TODO: Should be persisted
+    this.chartTimelineType = ko.observable(CHART_TIMELINE_TYPE.BAR); // TODO: Should be persisted
+    this.chartX = ko.observable().extend({ notify: 'always' }); // TODO: Should be persisted
+    this.chartXPivot = ko.observable().extend({ notify: 'always' }); // TODO: Should be persisted
+    this.chartYMulti = ko.observableArray(); // TODO: Should be persisted
+    this.chartYSingle = ko.observable(); // TODO: Should be persisted
+    this.showChart = params.showChart;
 
     this.chartId = ko.pureComputed(() => this.chartType() + '_' + this.id());
     this.isBarChart = ko.pureComputed(() => TYPES.BARCHART === this.chartType());
@@ -438,10 +472,36 @@ class ResultChart extends DisposableComponent {
       );
     });
 
-    this.hasDataForChart.subscribe(() => {
-      this.chartX.notifySubscribers();
-      this.chartX.valueHasMutated();
-    });
+    this.trackKoSub(
+      this.meta.subscribe(() => {
+        if (this.chartX()) {
+          this.chartX(this.guessMetaField(this.chartX()));
+        }
+        if (this.chartXPivot()) {
+          this.chartXPivot(this.guessMetaField(this.chartXPivot()));
+        }
+        if (this.chartYSingle()) {
+          this.chartYSingle(this.guessMetaField(this.chartYSingle()));
+        }
+        if (this.chartMapLabel()) {
+          this.chartMapLabel(this.guessMetaField(this.chartMapLabel()));
+        }
+        if (this.chartYMulti()) {
+          this.chartYMulti(this.guessMetaFields(this.chartYMulti()));
+        }
+      })
+    );
+
+    this.trackKoSub(this.showChart.subscribe(this.prepopulateChart.bind(this)));
+    this.trackKoSub(this.chartType.subscribe(this.prepopulateChart.bind(this)));
+    this.trackKoSub(this.chartXPivot.subscribe(this.prepopulateChart.bind(this)));
+
+    this.trackKoSub(
+      this.hasDataForChart.subscribe(() => {
+        this.chartX.notifySubscribers();
+        this.chartX.valueHasMutated();
+      })
+    );
 
     this.hideStacked = ko.pureComputed(() => !this.chartYMulti().length);
 
@@ -521,6 +581,97 @@ class ResultChart extends DisposableComponent {
       size: this.chartScatterSize(),
       group: this.chartScatterGroup()
     }));
+  }
+
+  guessMetaField(originalField) {
+    let newField = undefined;
+    this.cleanedMeta().some(fld => {
+      if (
+        fld.name.toLowerCase() === originalField.toLowerCase() ||
+        originalField.toLowerCase() === fld.name.toLowerCase()
+      ) {
+        newField = fld.name;
+        return true;
+      }
+    });
+    return newField;
+  }
+
+  guessMetaFields(originalFields) {
+    const newFields = [];
+    originalFields.forEach(field => {
+      const newField = this.guessMetaField(field);
+      if (newField) {
+        newFields.push(newField);
+      }
+    });
+    return newFields;
+  }
+
+  prepopulateChart() {
+    const type = this.chartType();
+    hueAnalytics.log('notebook', 'chart/' + type);
+
+    if (this.isMapChart() && this.cleanedNumericMeta().length >= 2) {
+      if (this.chartX() === null || typeof this.chartX() === 'undefined') {
+        let name = this.cleanedNumericMeta()[0].name;
+        this.cleanedNumericMeta().some(column => {
+          if (
+            column.name.toLowerCase().indexOf('lat') > -1 ||
+            column.name.toLowerCase().indexOf('ltd') > -1
+          ) {
+            name = column.name;
+            return true;
+          }
+        });
+        this.chartX(name);
+      }
+      if (this.chartYSingle() === null || typeof this.chartYSingle() === 'undefined') {
+        let name = this.cleanedNumericMeta()[1].name;
+        this.cleanedNumericMeta().some(column => {
+          if (
+            column.name.toLowerCase().indexOf('lon') > -1 ||
+            column.name.toLowerCase().indexOf('lng') > -1
+          ) {
+            name = column.name;
+            return true;
+          }
+        });
+        this.chartYSingle(name);
+      }
+      return;
+    }
+
+    if (
+      (this.chartX() === null || typeof this.chartX() === 'undefined') &&
+      (this.isBarChart() || this.isPieChart() || this.isGradientMapChart()) &&
+      this.cleanedStringMeta().length
+    ) {
+      this.chartX(this.cleanedStringMeta()[0].name);
+    }
+
+    if (this.cleanedNumericMeta().length) {
+      if (!this.chartYMulti().length && (this.isBarChart() || this.isLineChart())) {
+        this.chartYMulti.push(
+          this.cleanedNumericMeta()[Math.min(this.cleanedNumericMeta().length - 1, 1)].name
+        );
+      } else if (
+        (this.chartYSingle() === null || typeof this.chartYSingle() === 'undefined') &&
+        (this.isPieChart() ||
+          this.isMapChart() ||
+          this.isGradientMapChart() ||
+          this.isScatterChart() ||
+          (this.isBarChart() && this.chartXPivot() !== null))
+      ) {
+        if (!this.chartYMulti().length) {
+          this.chartYSingle(
+            this.cleanedNumericMeta()[Math.min(this.cleanedNumericMeta().length - 1, 1)].name
+          );
+        } else {
+          this.chartYSingle(this.chartYMulti()[0]);
+        }
+      }
+    }
   }
 }
 

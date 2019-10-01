@@ -158,14 +158,11 @@ class ResultGrid extends DisposableComponent {
       });
     };
 
-    adaptMeta();
-    const metaSub = this.meta.subscribe(() => {
-      adaptMeta();
-    });
-
-    this.disposals.push(() => {
-      metaSub.dispose();
-    });
+    this.trackKoSub(
+      this.meta.subscribe(() => {
+        adaptMeta();
+      })
+    );
 
     this.filteredMeta = ko.pureComputed(() => {
       if (!this.metaFilter() || this.metaFilter().query === '') {
@@ -202,12 +199,13 @@ class ResultGrid extends DisposableComponent {
       return this.filteredMeta().length;
     });
 
-    const dataSub = this.data.subscribe(() => {
-      this.render();
-    });
+    this.trackKoSub(
+      this.data.subscribe(() => {
+        this.render();
+      })
+    );
 
     this.disposals.push(() => {
-      dataSub.dispose();
       if (this.hueDatatable) {
         this.hueDatatable.fnDestroy();
       }
@@ -434,11 +432,14 @@ class ResultGrid extends DisposableComponent {
     this.disposals.push(() => {
       $scrollElement.off('scroll.resultGrid');
     });
-    this.isResultSettingsVisible.subscribe(newValue => {
-      if (newValue) {
-        dataScroll();
-      }
-    });
+
+    this.trackKoSub(
+      this.isResultSettingsVisible.subscribe(newValue => {
+        if (newValue) {
+          dataScroll();
+        }
+      })
+    );
 
     // huePubSub.subscribeOnce('chart.hard.reset', () => {
     //   // hard reset once the default opened chart

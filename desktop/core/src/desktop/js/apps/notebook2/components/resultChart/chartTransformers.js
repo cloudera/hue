@@ -18,6 +18,10 @@ import $ from 'jquery';
 
 import HueColors from 'utils/hueColors';
 import { html2text } from 'utils/hueUtils';
+import {
+  CHART_MAP_TYPE,
+  CHART_SORTING
+} from 'apps/notebook2/components/resultChart/ko.resultChart';
 
 // The leaflet map can freeze the browser with numbers outside the map
 const MIN_LAT = -90;
@@ -59,9 +63,9 @@ export const pieChartTransformer = function(rawDatum) {
     });
   }
 
-  if (rawDatum.chartSorting() === 'asc') {
+  if (rawDatum.chartSorting() === CHART_SORTING.ASC) {
     data.sort((a, b) => a.value - b.value);
-  } else if (rawDatum.chartSorting() === 'desc') {
+  } else if (rawDatum.chartSorting() === CHART_SORTING.DESC) {
     data.sort((a, b) => b.value - a.value);
   }
 
@@ -127,34 +131,20 @@ export const leafletMapChartTransformer = function(rawDatum) {
       }
       return latIndex !== -1 && lngIndex !== -1 && labelIndex !== -1 && heatIndex !== -1;
     });
-    if (rawDatum.chartMapLabel() != null) {
-      rawDatum.data().forEach(item => {
-        if (isNotNullForCharts(item[latIndex]) && isNotNullForCharts(item[lngIndex])) {
-          datum.push({
-            lat: Math.min(Math.max(MIN_LAT, item[latIndex]), MAX_LAT),
-            lng: Math.min(Math.max(MIN_LNG, item[lngIndex]), MAX_LNG),
-            label: html2text(item[labelIndex]),
-            isHeat: rawDatum.chartMapType() === 'heat',
-            intensity:
-              heatIndex > -1 ? (!isNaN(item[heatIndex] * 1) ? item[heatIndex] * 1 : null) : null,
-            obj: item
-          });
-        }
-      });
-    } else {
-      rawDatum.data().forEach(item => {
-        if (isNotNullForCharts(item[latIndex]) && isNotNullForCharts(item[lngIndex])) {
-          datum.push({
-            lat: Math.min(Math.max(MIN_LAT, item[latIndex]), MAX_LAT),
-            lng: Math.min(Math.max(MIN_LNG, item[lngIndex]), MAX_LNG),
-            isHeat: rawDatum.chartMapType() === 'heat',
-            intensity:
-              heatIndex > -1 ? (!isNaN(item[heatIndex] * 1) ? item[heatIndex] * 1 : null) : null,
-            obj: item
-          });
-        }
-      });
-    }
+
+    rawDatum.data().forEach(item => {
+      if (isNotNullForCharts(item[latIndex]) && isNotNullForCharts(item[lngIndex])) {
+        datum.push({
+          lat: Math.min(Math.max(MIN_LAT, item[latIndex]), MAX_LAT),
+          lng: Math.min(Math.max(MIN_LNG, item[lngIndex]), MAX_LNG),
+          label: labelIndex !== -1 ? html2text(item[labelIndex]) : undefined,
+          isHeat: rawDatum.chartMapType() === CHART_MAP_TYPE.HEAT,
+          intensity:
+            heatIndex > -1 ? (!isNaN(item[heatIndex] * 1) ? item[heatIndex] * 1 : null) : null,
+          obj: item
+        });
+      }
+    });
   }
 
   if (rawDatum.chartLimit()) {
@@ -197,11 +187,11 @@ export const timelineChartTransformer = function(rawDatum) {
             });
           }
         });
-        if (rawDatum.chartSorting() === 'asc') {
+        if (rawDatum.chartSorting() === CHART_SORTING.ASC) {
           values.sort((a, b) => {
             return a.y - b.y;
           });
-        } else if (rawDatum.chartSorting() === 'desc') {
+        } else if (rawDatum.chartSorting() === CHART_SORTING.DESC) {
           values.sort((a, b) => {
             return b.y - a.y;
           });
@@ -318,7 +308,7 @@ export const multiSerieChartTransformer = function(rawDatum) {
         datum = datum.slice(0, rawDatum.chartLimit());
       }
 
-      if (rawDatum.chartSorting() === 'desc') {
+      if (rawDatum.chartSorting() === CHART_SORTING.DESC) {
         datum.forEach(d => {
           d.values.sort((a, b) => {
             if (a.x > b.x) {
@@ -375,11 +365,11 @@ export const multiSerieChartTransformer = function(rawDatum) {
                 });
               }
             });
-            if (rawDatum.chartSorting() === 'asc') {
+            if (rawDatum.chartSorting() === CHART_SORTING.ASC) {
               values.sort((a, b) => {
                 return a.y - b.y;
               });
-            } else if (rawDatum.chartSorting() === 'desc') {
+            } else if (rawDatum.chartSorting() === CHART_SORTING.DESC) {
               values.sort((a, b) => {
                 return b.y - a.y;
               });

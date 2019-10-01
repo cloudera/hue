@@ -287,14 +287,16 @@ huePubSub.subscribe('app.dom.loaded', app => {
         }
       });
 
-      huePubSub.subscribeOnce('chart.hard.reset', () => {
-        // hard reset once the default opened chart
-        const oldChartX = snippet.chartX();
-        snippet.chartX(null);
-        window.setTimeout(() => {
-          snippet.chartX(oldChartX);
-        }, 0);
-      });
+      if (!window.ENABLE_NOTEBOOK_2) {
+        huePubSub.subscribeOnce('chart.hard.reset', () => {
+          // hard reset the default opened chart once
+          const oldChartX = snippet.chartX();
+          snippet.chartX(null);
+          window.setTimeout(() => {
+            snippet.chartX(oldChartX);
+          }, 0);
+        });
+      }
 
       return _dt;
     };
@@ -1487,12 +1489,14 @@ huePubSub.subscribe('app.dom.loaded', app => {
     });
 
     // TODO: Migrate to ko.resultChart.js for ENABLE_NOTEBOOK_2
-    $(document).on('forceChartDraw', (e, snippet) => {
-      window.setTimeout(() => {
-        snippet.chartX.notifySubscribers();
-        snippet.chartX.valueHasMutated();
-      }, 100);
-    });
+    if (!window.ENABLE_NOTEBOOK_2) {
+      $(document).on('forceChartDraw', (e, snippet) => {
+        window.setTimeout(() => {
+          snippet.chartX.notifySubscribers();
+          snippet.chartX.valueHasMutated();
+        }, 100);
+      });
+    }
 
     let hideTimeout = -1;
     $(document).on('hideAutocomplete', () => {

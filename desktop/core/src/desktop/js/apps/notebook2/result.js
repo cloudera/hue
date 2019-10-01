@@ -18,17 +18,6 @@ import ko from 'knockout';
 
 import { sleep, UUID } from 'utils/hueUtils';
 
-const isNumericColumn = type =>
-  ['tinyint', 'smallint', 'int', 'bigint', 'float', 'double', 'decimal', 'real'].indexOf(type) !==
-  -1;
-
-const isDateTimeColumn = type => ['timestamp', 'date', 'datetime'].indexOf(type) !== -1;
-
-const isComplexColumn = type => ['array', 'map', 'struct'].indexOf(type) !== -1;
-
-const isStringColumn = type =>
-  !isNumericColumn(type) && !isDateTimeColumn(type) && !isComplexColumn(type);
-
 class Result {
   constructor(result, snippet) {
     this.id = ko.observable(result.id || UUID());
@@ -57,23 +46,12 @@ class Result {
     // statements_count to 1. For the case when a selection is not starting at row 0.
     this.statements_count = ko.observable(1);
     this.previous_statement_hash = ko.observable(result.previous_statement_hash);
-    this.cleanedMeta = ko.pureComputed(() => this.meta().filter(item => item.name !== ''));
 
     this.fetchedOnce = ko.observable(!!result.fetchedOnce);
     this.startTime = ko.observable(result.startTime ? new Date(result.startTime) : new Date());
     this.endTime = ko.observable(result.endTime ? new Date(result.endTime) : new Date());
     this.executionTime = ko.pureComputed(
       () => this.endTime().getTime() - this.startTime().getTime()
-    );
-
-    this.cleanedNumericMeta = ko.pureComputed(() =>
-      this.meta().filter(item => item.name !== '' && isNumericColumn(item.type))
-    );
-    this.cleanedStringMeta = ko.pureComputed(() =>
-      this.meta().filter(item => item.name !== '' && isStringColumn(item.type))
-    );
-    this.cleanedDateTimeMeta = ko.pureComputed(() =>
-      this.meta().filter(item => item.name !== '' && isDateTimeColumn(item.type))
     );
 
     this.data = ko.observableArray(result.data || []).extend({ rateLimit: 50 });
@@ -83,7 +61,6 @@ class Result {
     this.logLines = 0;
     this.hasSomeResults = ko.pureComputed(() => this.hasResultset() && this.data().length > 0);
   }
-
 
   cancelBatchExecution() {
     this.statements_count(1);

@@ -273,26 +273,6 @@ class EditorViewModel {
     $('#combinedContentModal' + self.suffix).modal('show');
   }
 
-  getPreviousChartOptions(snippet) {
-    return {
-      chartLimit: snippet.chartLimit() || snippet.previousChartOptions.chartLimit,
-      chartX: snippet.chartX() || snippet.previousChartOptions.chartX,
-      chartXPivot: snippet.chartXPivot() || snippet.previousChartOptions.chartXPivot,
-      chartYSingle: snippet.chartYSingle() || snippet.previousChartOptions.chartYSingle,
-      chartMapType: snippet.chartMapType() || snippet.previousChartOptions.chartMapType,
-      chartMapLabel: snippet.chartMapLabel() || snippet.previousChartOptions.chartMapLabel,
-      chartMapHeat: snippet.chartMapHeat() || snippet.previousChartOptions.chartMapHeat,
-      chartYMulti: snippet.chartYMulti() || snippet.previousChartOptions.chartYMulti,
-      chartScope: snippet.chartScope() || snippet.previousChartOptions.chartScope,
-      chartTimelineType:
-        snippet.chartTimelineType() || snippet.previousChartOptions.chartTimelineType,
-      chartSorting: snippet.chartSorting() || snippet.previousChartOptions.chartSorting,
-      chartScatterGroup:
-        snippet.chartScatterGroup() || snippet.previousChartOptions.chartScatterGroup,
-      chartScatterSize: snippet.chartScatterSize() || snippet.previousChartOptions.chartScatterSize
-    };
-  }
-
   getSnippetName(snippetType) {
     const self = this;
     const availableSnippets = self.availableSnippets();
@@ -362,8 +342,6 @@ class EditorViewModel {
           });
           snippet.result.statement_range.valueHasMutated();
         }
-
-        snippet.previousChartOptions = this.getPreviousChartOptions(snippet);
       });
 
       if (notebook.snippets()[0].result.data().length > 0) {

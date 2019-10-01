@@ -750,15 +750,6 @@ export default class Snippet {
       return statement;
     });
 
-    $.extend(
-      snippet,
-      snippet.chartType === 'lines' && {
-        // Retire line chart
-        chartType: 'bars',
-        chartTimelineType: 'line'
-      }
-    );
-
     this.result = new Result(snippet.result || {}, this);
     if (!this.result.hasSomeResults()) {
       this.currentQueryTab('queryHistory');
@@ -796,7 +787,6 @@ export default class Snippet {
         this.isResultSettingsVisible(true);
         $(document).trigger('forceChartDraw', this);
         huePubSub.publish('editor.chart.shown', this);
-        this.prepopulateChart();
       }
     });
     this.showLogs.subscribe(val => {
@@ -818,48 +808,14 @@ export default class Snippet {
     this.is_redacted = ko.observable(!!snippet.is_redacted);
 
     this.chartType = ko.observable(snippet.chartType || window.HUE_CHARTS.TYPES.BARCHART);
-    this.chartType.subscribe(this.prepopulateChart.bind(this));
-    this.chartSorting = ko.observable(snippet.chartSorting || 'none');
-    this.chartScatterGroup = ko.observable(snippet.chartScatterGroup);
-    this.chartScatterSize = ko.observable(snippet.chartScatterSize);
-    this.chartScope = ko.observable(snippet.chartScope || 'world');
-    this.chartTimelineType = ko.observable(snippet.chartTimelineType || 'bar');
-    this.chartLimits = ko.observableArray([5, 10, 25, 50, 100]); // To Delete
-    this.chartLimit = ko.observable(snippet.chartLimit);
-    this.chartLimit.extend({ notify: 'always' });
-    this.chartX = ko.observable(snippet.chartX);
-    this.chartX.extend({ notify: 'always' });
-    this.chartXPivot = ko.observable(snippet.chartXPivot);
-    this.chartXPivot.extend({ notify: 'always' });
-    this.chartXPivot.subscribe(this.prepopulateChart.bind(this));
-    this.chartYSingle = ko.observable(snippet.chartYSingle);
-    this.chartYMulti = ko.observableArray(snippet.chartYMulti || []);
+
     this.chartData = ko.observableArray(snippet.chartData || []);
-    this.chartMapType = ko.observable(snippet.chartMapType || 'marker');
-    this.chartMapLabel = ko.observable(snippet.chartMapLabel);
-    this.chartMapHeat = ko.observable(snippet.chartMapHeat);
 
     this.chartType.subscribe(() => {
       $(document).trigger('forceChartDraw', this);
     });
 
     this.previousChartOptions = {};
-
-    this.result.meta.subscribe(() => {
-      this.chartLimit(this.previousChartOptions.chartLimit);
-      this.chartX(this.guessMetaField(this.previousChartOptions.chartX));
-      this.chartXPivot(this.previousChartOptions.chartXPivot);
-      this.chartYSingle(this.guessMetaField(this.previousChartOptions.chartYSingle));
-      this.chartMapType(this.previousChartOptions.chartMapType);
-      this.chartMapLabel(this.guessMetaField(this.previousChartOptions.chartMapLabel));
-      this.chartMapHeat(this.previousChartOptions.chartMapHeat);
-      this.chartYMulti(this.guessMetaFields(this.previousChartOptions.chartYMulti) || []);
-      this.chartSorting(this.previousChartOptions.chartSorting);
-      this.chartScatterGroup(this.previousChartOptions.chartScatterGroup);
-      this.chartScatterSize(this.previousChartOptions.chartScatterSize);
-      this.chartScope(this.previousChartOptions.chartScope);
-      this.chartTimelineType(this.previousChartOptions.chartTimelineType);
-    });
 
     this.isResultSettingsVisible = ko.observable(!!snippet.isResultSettingsVisible);
 
@@ -1322,7 +1278,6 @@ export default class Snippet {
       this.lastAceSelectionRowOffset(Math.min(selectionRange.start.row, selectionRange.end.row));
     }
 
-    this.previousChartOptions = this.parentVm.getPreviousChartOptions(this);
     $(document).trigger('executeStarted', { vm: this.parentVm, snippet: this });
     $('.jHueNotify').remove();
     this.parentNotebook.forceHistoryInitialHeight(true);
@@ -1702,36 +1657,6 @@ export default class Snippet {
       });
   }
 
-  guessMetaField(field) {
-    let _fld = null;
-    if (field) {
-      if (this.result.cleanedMeta().length > 0) {
-        this.result.cleanedMeta().forEach(fld => {
-          if (
-            fld.name.toLowerCase() === field.toLowerCase() ||
-            field.toLowerCase() === fld.name.toLowerCase()
-          ) {
-            _fld = fld.name;
-          }
-        });
-      }
-    }
-    return _fld;
-  }
-
-  guessMetaFields(fields) {
-    const _fields = [];
-    if (fields) {
-      fields.forEach(fld => {
-        const _field = this.guessMetaField(fld);
-        if (_field) {
-          _fields.push(_field);
-        }
-      });
-    }
-    return _fields;
-  }
-
   handleAjaxError(data, callback) {
     if (data.status === -2) {
       // TODO: Session expired, check if handleAjaxError is used for ENABLE_NOTEBOOK_2
@@ -1914,78 +1839,6 @@ export default class Snippet {
       e.preventDefault(); // Prevent browser page save dialog
     }
     return true;
-  }
-
-  prepopulateChart() {
-    const type = this.chartType();
-    hueAnalytics.log('notebook', 'chart/' + type);
-
-    if (type === window.HUE_CHARTS.TYPES.MAP && this.result.cleanedNumericMeta().length >= 2) {
-      if (this.chartX() === null || typeof this.chartX() === 'undefined') {
-        let name = this.result.cleanedNumericMeta()[0].name;
-        this.result.cleanedNumericMeta().forEach(fld => {
-          if (
-            fld.name.toLowerCase().indexOf('lat') > -1 ||
-            fld.name.toLowerCase().indexOf('ltd') > -1
-          ) {
-            name = fld.name;
-          }
-        });
-        this.chartX(name);
-      }
-      if (this.chartYSingle() === null || typeof this.chartYSingle() === 'undefined') {
-        let name = this.result.cleanedNumericMeta()[1].name;
-        this.result.cleanedNumericMeta().forEach(fld => {
-          if (
-            fld.name.toLowerCase().indexOf('lon') > -1 ||
-            fld.name.toLowerCase().indexOf('lng') > -1
-          ) {
-            name = fld.name;
-          }
-        });
-        this.chartYSingle(name);
-      }
-      return;
-    }
-
-    if (
-      (this.chartX() === null || typeof this.chartX() === 'undefined') &&
-      (type === window.HUE_CHARTS.TYPES.BARCHART ||
-        type === window.HUE_CHARTS.TYPES.PIECHART ||
-        type === window.HUE_CHARTS.TYPES.GRADIENTMAP) &&
-      this.result.cleanedStringMeta().length >= 1
-    ) {
-      this.chartX(this.result.cleanedStringMeta()[0].name);
-    }
-
-    if (this.result.cleanedNumericMeta().length > 0) {
-      if (
-        this.chartYMulti().length === 0 &&
-        (type === window.HUE_CHARTS.TYPES.BARCHART || type === window.HUE_CHARTS.TYPES.LINECHART)
-      ) {
-        this.chartYMulti.push(
-          this.result.cleanedNumericMeta()[Math.min(this.result.cleanedNumericMeta().length - 1, 1)]
-            .name
-        );
-      } else if (
-        (this.chartYSingle() === null || typeof this.chartYSingle() === 'undefined') &&
-        (type === window.HUE_CHARTS.TYPES.PIECHART ||
-          type === window.HUE_CHARTS.TYPES.MAP ||
-          type === window.HUE_CHARTS.TYPES.GRADIENTMAP ||
-          type === window.HUE_CHARTS.TYPES.SCATTERCHART ||
-          (type === window.HUE_CHARTS.TYPES.BARCHART && this.chartXPivot() !== null))
-      ) {
-        if (this.chartYMulti().length === 0) {
-          this.chartYSingle(
-            this.result.cleanedNumericMeta()[
-              Math.min(this.result.cleanedNumericMeta().length - 1, 1)
-            ].name
-          );
-        } else {
-          this.chartYSingle(this.chartYMulti()[0]);
-        }
-      }
-    }
   }
 
   prevQueriesPage() {

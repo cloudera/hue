@@ -19,6 +19,12 @@ export default class DisposableComponent {
     this.disposals = [];
   }
 
+  trackKoSub(koSub) {
+    this.disposals.push(() => {
+      koSub.dispose();
+    });
+  }
+
   addDisposalCallback(callback) {
     this.disposals.push(callback);
   }
