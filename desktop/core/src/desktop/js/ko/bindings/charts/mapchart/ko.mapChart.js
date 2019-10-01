@@ -46,8 +46,8 @@ ko.bindingHandlers.mapChart = {
 
       $element.height($element.width() / 2.23);
 
-      const _scope =
-        typeof _options.data.scope != 'undefined' ? String(_options.data.scope) : 'world';
+      const scopeObservable = _options.data.scope || _options.data.chartScope;
+      const _scope = scopeObservable ? String(ko.unwrap(scopeObservable)) : 'world';
       const _data = _options.transformer(_options.data);
       let _is2d = false;
       const _pivotCategories = [];

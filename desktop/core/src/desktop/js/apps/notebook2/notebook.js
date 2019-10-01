@@ -155,7 +155,6 @@ export default class Notebook {
           snippet.status = 'ready'; // Protect from storm of check_statuses
           const _snippet = new Snippet(vm, this, snippet);
           _snippet.init();
-          _snippet.previousChartOptions = vm.getPreviousChartOptions(_snippet);
           this.presentationSnippets()[key] = _snippet;
         });
       }
