@@ -135,25 +135,16 @@ const TEMPLATE = `
     <div class="table-results" data-bind="visible: type() === 'table'" style="display: none; max-height: 400px; min-height: 290px;">
       <div data-bind="visible: showGrid" style="display: none;">
         <!-- ko component: { name: 'result-grid', params: {
-          autocompleteFromEntries: autocompleteFromEntries,
-          clickFilteredMetaCheck: clickFilteredMetaCheck,
           data: data,
           editorMode: editorMode,
           fetchResult: fetchResult,
-          filteredColumnCount: filteredColumnCount,
-          filteredMeta: filteredMeta,
-          filteredMetaChecked: filteredMetaChecked,
           hasMore: hasMore,
-          isMetaFilterVisible: isMetaFilterVisible,
           isPresentationMode: isPresentationMode,
           isResultFullScreenMode: isResultFullScreenMode,
           isResultSettingsVisible: isResultSettingsVisible,
           meta: meta,
-          metaFilter: metaFilter,
           resultsKlass: resultsKlass,
-          scrollToResultColumn: scrollToResultColumn,
           status: status,
-          toggleResultColumn: toggleResultColumn,
         } } --><!-- /ko -->
       </div>
       <div data-bind="visible: showChart" style="display: none;">
@@ -204,22 +195,13 @@ class SnippetResults extends DisposableComponent {
     this.meta = params.meta; // result
 
     // Grid specific
-    this.autocompleteFromEntries = params.autocompleteFromEntries; // result
-    this.clickFilteredMetaCheck = params.clickFilteredMetaCheck; // result
     this.editorMode = params.editorMode;
     this.fetchResult = params.fetchResult;
-    this.filteredColumnCount = params.filteredColumnCount; // result
-    this.filteredMeta = params.filteredMeta; // result
-    this.filteredMetaChecked = params.filteredMetaChecked; // result
     this.hasMore = params.hasMore;
-    this.isMetaFilterVisible = params.isMetaFilterVisible; // result
     this.isPresentationMode = params.isPresentationMode;
     this.isResultFullScreenMode = params.isResultFullScreenMode;
-    this.metaFilter = params.metaFilter; // result
     this.resultsKlass = params.resultsKlass;
-    this.scrollToResultColumn = params.scrollToResultColumn;
     this.status = params.status;
-    this.toggleResultColumn = params.toggleResultColumn;
 
     // Chart specific
     this.chartLimit = params.chartLimit;

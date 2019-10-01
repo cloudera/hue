@@ -38,26 +38,6 @@ class Result {
     this.meta = ko.observableArray(result.meta || []);
     this.snippet = snippet;
 
-    const adaptMeta = () => {
-      this.meta().forEach((item, index) => {
-        if (typeof item.checked === 'undefined') {
-          item.checked = ko.observable(true);
-          item.checked.subscribe(() => {
-            this.filteredMetaChecked(this.filteredMeta().some(item => item.checked()));
-          });
-        }
-        item.type = item.type.replace(/_type/i, '').toLowerCase();
-        if (typeof item.originalIndex === 'undefined') {
-          item.originalIndex = index;
-        }
-      });
-    };
-
-    adaptMeta();
-    this.meta.subscribe(() => {
-      adaptMeta();
-    });
-
     this.rows = ko.observable(result.rows);
     this.hasMore = ko.observable(!!result.hasMore);
     this.statement_id = ko.observable(result.statement_id || 0);
@@ -78,41 +58,6 @@ class Result {
     this.statements_count = ko.observable(1);
     this.previous_statement_hash = ko.observable(result.previous_statement_hash);
     this.cleanedMeta = ko.pureComputed(() => this.meta().filter(item => item.name !== ''));
-    this.metaFilter = ko.observable();
-
-    this.isMetaFilterVisible = ko.observable(false);
-    this.filteredMetaChecked = ko.observable(true);
-
-    this.filteredColumnCount = ko.pureComputed(() => {
-      if (!this.metaFilter() || this.metaFilter().query === '') {
-        return this.meta().length - 1;
-      }
-      return this.filteredMeta().length;
-    });
-
-    this.filteredMeta = ko.pureComputed(() => {
-      if (!this.metaFilter() || this.metaFilter().query === '') {
-        return this.meta();
-      }
-
-      return this.meta().filter(item => {
-        const facets = this.metaFilter().facets;
-        const isFacetMatch = !facets || Object.keys(facets).length === 0 || !facets['type']; // So far only type facet is used for SQL
-        const isTextMatch = !this.metaFilter().text || this.metaFilter().text.length === 0;
-        let match = true;
-
-        if (!isFacetMatch) {
-          match = !!facets['type'][item.type];
-        }
-
-        if (match && !isTextMatch) {
-          match = this.metaFilter().text.every(text => {
-            return item.name.toLowerCase().indexOf(text.toLowerCase()) !== -1;
-          });
-        }
-        return match;
-      });
-    });
 
     this.fetchedOnce = ko.observable(!!result.fetchedOnce);
     this.startTime = ko.observable(result.startTime ? new Date(result.startTime) : new Date());
@@ -139,25 +84,6 @@ class Result {
     this.hasSomeResults = ko.pureComputed(() => this.hasResultset() && this.data().length > 0);
   }
 
-  autocompleteFromEntries(nonPartial, partial) {
-    const result = [];
-    const partialLower = partial.toLowerCase();
-    this.meta().forEach(column => {
-      if (column.name.toLowerCase().indexOf(partialLower) === 0) {
-        result.push(nonPartial + partial + column.name.substring(partial.length));
-      } else if (column.name.toLowerCase().indexOf('.' + partialLower) !== -1) {
-        result.push(
-          nonPartial +
-            partial +
-            column.name.substring(
-              partial.length + column.name.toLowerCase().indexOf('.' + partialLower) + 1
-            )
-        );
-      }
-    });
-
-    return result;
-  }
 
   cancelBatchExecution() {
     this.statements_count(1);
@@ -214,12 +140,6 @@ class Result {
     this.explanation('');
     this.logLines = 0;
     this.rows(null);
-  }
-
-  clickFilteredMetaCheck() {
-    this.filteredMeta().forEach(item => {
-      item.checked(this.filteredMetaChecked());
-    });
   }
 
   getContext() {
