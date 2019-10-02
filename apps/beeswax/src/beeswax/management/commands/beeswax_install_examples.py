@@ -111,8 +111,7 @@ class Command(BaseCommand):
     design_list = [d for d in design_list if int(d['type']) == app_type]
 
     for design_dict in design_list:
-      if not has_concurrency_support() or design_dict['name'] != 'Sample: Customers':
-        design = SampleQuery(design_dict)
+      design = SampleQuery(design_dict)
       try:
         design.install(django_user)
       except Exception as ex:
@@ -135,6 +134,7 @@ class SampleTable(object):
     self.app_name = app_name
     self.db_name = db_name
     self.columns = data_dict.get('columns')
+    self.is_transactional = data_dict.get('transactional')
 
     # Sanity check
     self._data_dir = beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get()
@@ -187,7 +187,7 @@ class SampleTable(object):
         raise InstallException(msg)
 
   def load_partition(self, django_user, partition_spec, filepath, columns):
-    if has_concurrency_support():
+    if has_concurrency_support() and self.is_transactional:
       with open(filepath) as f:
         hql = \
           """
@@ -217,7 +217,7 @@ class SampleTable(object):
 
 
   def load(self, django_user):
-    if has_concurrency_support():
+    if has_concurrency_support() and self.is_transactional:
       with open(self._contents_file) as f:
         hql = \
           """
