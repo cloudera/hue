@@ -261,21 +261,24 @@ class SampleTable(object):
   def _get_hdfs_root_destination(self, django_user, subdir=None):
     fs = cluster.get_hdfs()
     hdfs_root_destination = None
-    if self.app_name == 'impala':
-      # Because Impala does not have impersonation on by default, we use a public destination for the upload.
-      from impala.conf import IMPERSONATION_ENABLED
-      if not IMPERSONATION_ENABLED.get():
-        tmp_public = '/tmp/public_hue_examples'
-        if subdir:
-          tmp_public += '/%s' % subdir
-        fs.do_as_user(django_user, fs.mkdir, tmp_public, '0777')
-        hdfs_root_destination = tmp_public
+    can_impersonate_hdfs = False
 
-    if hdfs_root_destination is None:
+    if self.app_name == 'impala':
+      # Impala can support impersonation, so use home instead of a public destination for the upload
+      from impala.conf import IMPERSONATION_ENABLED
+      can_impersonate_hdfs = IMPERSONATION_ENABLED.get()
+
+    if can_impersonate_hdfs:
       hdfs_root_destination = fs.do_as_user(django_user, fs.get_home_dir)
       if subdir:
         hdfs_root_destination += '/%s' % subdir
         fs.do_as_user(django_user, fs.mkdir, hdfs_root_destination, '0777')
+    else:
+      tmp_public = '/tmp/public_hue_examples'
+      if subdir:
+        tmp_public += '/%s' % subdir
+      fs.do_as_user(django_user, fs.mkdir, tmp_public, '0777')
+      hdfs_root_destination = tmp_public
 
     return hdfs_root_destination
 
