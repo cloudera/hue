@@ -1,12 +1,12 @@
 
 ## Build
 
-    docker build . -t gethue/website:latest -f tools/docker/website/Dockerfile
+    docker build . -t gethue/documentation:latest -f tools/docker/website/Dockerfile
 
 ## Push
 
-    docker push gethue/website:latest
+    docker push gethue/documentation:latest
 
 ## Run
 
-    docker run -it -p 80:80 gethue/website:latest
+    docker run -it -p 80:80 gethue/documentation:latest
