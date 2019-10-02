@@ -17,7 +17,7 @@ In addition, whole new apps can also be created in order to provide end to end s
 
 Upcoming & Contribution ideas
 
-* How to add new SQL grammar and highlighting
+* How to improve the [SQL autocomplete](/developer/parsers/) for your own database
 * Improved Query Builder
 * Improved Dashboard & Reporting
 * Framework to add new/embed vizualizations

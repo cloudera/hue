@@ -20,3 +20,7 @@ One click on [http://demo.gethue.com](http://demo.gethue.com).
 ## Docker
 
     docker run -it -p 8888:8888 gethue/hue:latest
+
+## Develop
+
+How to improve the [SQL autocomplete](/developer/parsers/) for your own database.

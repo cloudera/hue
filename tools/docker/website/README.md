@@ -9,4 +9,4 @@
 
 ## Run
 
-    docker run -it -p 80:80 gethue/documentation:latest
+    docker run -it -p 9000:80 gethue/documentation:latest
