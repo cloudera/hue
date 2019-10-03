@@ -98,16 +98,14 @@ class AccessInfo(dict):
     # get peak memory usage, bytes on OSX, Kilobytes on Linux
     return old_div(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss, rusage_denom)
 
-  def log(self, level, msg=None, start_time=None):
+  def log(self, level, msg=None, start_time=None, response=None):
     is_instrumentation = desktop.conf.INSTRUMENTATION.get()
     self['duration'] = ' returned in %dms' % ((time.time() - start_time) * 1000) if start_time is not None else ''
     self['memory'] = ' (mem: %dmb)' % self.memory_usage_resource() if is_instrumentation else ''
+    self['http_code'] = ' %s %s' % (response.status_code, len(response.content)) if response is not None else ('', '')
+    self['msg'] = ('-- %s' % msg) if msg else ''
 
-    if msg is not None:
-      self['msg'] = msg
-      ACCESS_LOG.log(level, '%(remote_ip)s %(username)s - "%(method)s %(path)s %(proto)s"%(duration)s%(memory)s-- %(msg)s' % self)
-    else:
-      ACCESS_LOG.log(level, '%(remote_ip)s %(username)s - "%(method)s %(path)s %(proto)s"%(duration)s%(memory)s' % self)
+    ACCESS_LOG.log(level, '%(remote_ip)s %(username)s - "%(method)s %(path)s %(proto)s"%(duration)s%(http_code)s%(memory)s%(msg)s' % self)
 
   def add_to_access_history(self, app):
     """Record this user access to the recent access map"""
@@ -156,12 +154,12 @@ class AccessInfo(dict):
 
 _MODULE_RE = re.compile('[^.]*')
 
-def log_page_hit(request, view_func, level=None, start_time=None):
+def log_page_hit(request, view_func, level=None, start_time=None, response=None):
   """Log the request to the access log"""
   if level is None:
     level = logging.INFO
   ai = AccessInfo(request)
-  ai.log(level, start_time=start_time)
+  ai.log(level, start_time=start_time, response=response)
 
   # Disabled for now as not used
   # Find the app

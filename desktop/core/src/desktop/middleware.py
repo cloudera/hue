@@ -354,7 +354,7 @@ class LoginAndPermissionMiddleware(object):
 
   def process_response(self, request, response):
     if hasattr(request, 'ts') and hasattr(request, 'view_func'):
-      log_page_hit(request, request.view_func, level=logging.INFO, start_time=request.ts)
+      log_page_hit(request, request.view_func, level=logging.INFO, start_time=request.ts, response=response)
     return response
 
 
