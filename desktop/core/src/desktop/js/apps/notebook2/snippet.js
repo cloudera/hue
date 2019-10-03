@@ -1201,7 +1201,7 @@ export default class Snippet {
   checkDdlNotification() {
     if (
       this.lastExecutedStatement() &&
-      /ALTER|CREATE|DELETE|DROP|GRANT|INSERT|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i.test(
+      /ALTER|CREATE|DELETE|DROP|GRANT|INSERT|INVALIDATE|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i.test(
         this.lastExecutedStatement().firstToken
       )
     ) {
