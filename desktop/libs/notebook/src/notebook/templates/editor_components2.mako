@@ -735,19 +735,13 @@
           <div class="tab-pane" id="queryResults" data-bind="css: {'active': currentQueryTab() == 'queryResults'}">
             <!-- ko if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) === -1 -->
               <!-- ko component: { name: 'snippet-results', params: {
-                data: result.data,
+                latestExecutable: latestExecutable,
+                activeExecutable: activeExecutable,
                 editorMode: parentVm.editorMode,
-                fetchResult: result.fetchMoreRows,
-                hasMore: result.hasMore,
-                hasSomeResults: result.hasSomeResults,
                 id: id,
-                images: result.images,
                 isPresentationMode: parentNotebook.isPresentationMode,
                 isResultFullScreenMode: parentVm.isResultFullScreenMode,
-                meta: result.meta,
-                resultsKlass: resultsKlass,
-                status: status,
-                type: result.type,
+                resultsKlass: resultsKlass
               }} --><!-- /ko -->
             <!-- /ko -->
           </div>
@@ -889,19 +883,13 @@
             <!-- /ko -->
             <!-- ko if: !$root.editorMode() && ['text', 'jar', 'java', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'].indexOf(type()) === -1 -->
               <!-- ko component: { name: 'snippet-results', params: {
-                data: result.data,
+                latestExecutable: latestExecutable,
+                activeExecutable: activeExecutable,
                 editorMode: parentVm.editorMode,
-                fetchResult: result.fetchMoreRows,
-                hasMore: result.hasMore,
-                hasSomeResults: result.hasSomeResults,
                 id: id,
-                images: result.images,
                 isPresentationMode: parentNotebook.isPresentationMode,
                 isResultFullScreenMode: parentVm.isResultFullScreenMode,
-                meta: result.meta,
-                resultsKlass: resultsKlass,
-                status: status,
-                type: result.type,
+                resultsKlass: resultsKlass
               }} --><!-- /ko -->
             <!-- /ko -->
             <div class="clearfix"></div>

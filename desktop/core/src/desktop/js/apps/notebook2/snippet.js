@@ -27,7 +27,7 @@ import 'apps/notebook2/components/ko.snippetResults';
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
 import apiHelper from 'api/apiHelper';
 import dataCatalog from 'catalog/dataCatalog';
-import Executor from 'apps/notebook2/execution/executor';
+import Executor, { EXECUTOR_UPDATED_EVENT } from 'apps/notebook2/execution/executor';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
@@ -1008,10 +1008,15 @@ export default class Snippet {
       timeout: this.parentVm.autocompleteTimeout
     });
 
-    huePubSub.subscribe('hue.executor.updated', details => {
+    this.latestExecutable = ko.observable();
+    this.activeExecutable = ko.observable();
+
+    huePubSub.subscribe(EXECUTOR_UPDATED_EVENT, details => {
       const executable = details.executable;
 
       if (details.executor === this.executor()) {
+        this.latestExecutable(executable);
+        this.activeExecutable(executable); // TODO: Move to pureComputed (based on cursor)
         this.status(executable.status);
         this.progress(executable.progress);
       }

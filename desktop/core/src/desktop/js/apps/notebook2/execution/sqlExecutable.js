@@ -29,6 +29,7 @@ export default class SqlExecutable extends Executable {
    * @param {string} [options.statement] - Either supply a statement or a parsedStatement
    * @param {SqlStatementsParserResult} [options.parsedStatement] - Either supply a statement or a parsedStatement
    * @param {string} [options.database]
+   * @param {Executor} options.executor
    * @param {Session[]} [options.sessions]
    */
   constructor(options) {
@@ -56,6 +57,17 @@ export default class SqlExecutable extends Executable {
     });
   }
 
+  /**
+   *
+   * @param options
+   * @param options.database
+   * @param options.statement
+   * @param options.executor
+   * @param options.sourceType
+   * @param options.compute
+   * @param options.namespace
+   * @return {Array}
+   */
   static fromStatement(options) {
     const result = [];
     let database = options.database;
@@ -74,6 +86,7 @@ export default class SqlExecutable extends Executable {
         if (!skip) {
           result.push(
             new SqlExecutable({
+              executor: options.executor,
               sourceType: options.sourceType,
               compute: options.compute,
               namespace: options.namespace,

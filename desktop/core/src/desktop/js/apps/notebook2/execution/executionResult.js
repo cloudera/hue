@@ -15,40 +15,37 @@
 // limitations under the License.
 
 import apiHelper from 'api/apiHelper';
+import huePubSub from 'utils/huePubSub';
 import { sleep } from 'utils/hueUtils';
+import { EXECUTION_STATUS } from './executable';
 
-/**
- *  available +----> fetching +----> done
- *      ^                     |
- *      |                     +----> fail
- *      |                     |
- *      +---------------------+
- *
- * If the handle indidcates that there's no result set available the ExecutionResult will have initial status set to
- * RESULT_STATUS.done
- *
- * @type { { canceling: string, canceled: string, fail: string, ready: string, executing: string, done: string } }
- */
-const RESULT_STATUS = {
-  ready: 'ready',
-  available: 'available',
-  fetching: 'fetching',
-  done: 'done',
-  fail: 'fail'
+export const RESULT_UPDATED_EVENT = 'hue.executable.result.updated';
+
+export const RESULT_TYPE = {
+  TABLE: 'table'
 };
 
-class ExecutionResult {
+export default class ExecutionResult {
   /**
    *
    * @param {Executable} executable
    */
   constructor(executable) {
     this.executable = executable;
-    this.status = executable.handle.has_result_set ? RESULT_STATUS.available : RESULT_STATUS.done;
+
+    this.type = RESULT_TYPE.TABLE;
+    this.state = {};
+    this.rows = [];
+    this.meta = [];
+    this.lastRows = [];
+    this.images = [];
+    this.type = undefined;
+    this.hasMore = true;
+    this.isEscaped = false;
   }
 
   async fetchResultSize() {
-    if (this.status === RESULT_STATUS.fail) {
+    if (this.executable.status === EXECUTION_STATUS.failed) {
       return;
     }
 
@@ -78,38 +75,38 @@ class ExecutionResult {
   /**
    * Fetches additional rows
    *
-   * @param {Object} options
-   * @param {number} options.rows
+   * @param {Object} [options]
+   * @param {number} [options.rows]
    * @param {boolean} [options.startOver]
    *
    * @return {Promise}
    */
   async fetchRows(options) {
-    if (this.status !== RESULT_STATUS.available) {
+    if (this.executable.status !== EXECUTION_STATUS.available) {
       return Promise.reject();
     }
 
-    this.status = RESULT_STATUS.fetching;
+    const resultResponse = await apiHelper.fetchResults({
+      executable: this.executable,
+      rows: (options && options.rows) || 100,
+      startOver: options && options.startOver
+    });
 
-    try {
-      const resultResponse = await apiHelper.fetchResults({
-        executable: this.executable,
-        rows: options.rows,
-        startOver: !!options.startOver
-      });
+    const initialIndex = this.rows.length;
+    resultResponse.data.forEach((row, index) => {
+      row.unshift(initialIndex + index + 1);
+    });
 
-      if (resultResponse.has_more) {
-        this.status = RESULT_STATUS.available;
-      } else {
-        this.status = RESULT_STATUS.done;
-      }
-
-      return resultResponse;
-    } catch (err) {
-      this.status = RESULT_STATUS.fail;
-      return Promise.reject(err);
+    this.rows.push(...resultResponse.data);
+    this.lastRows = resultResponse.data;
+    if (!this.meta.length) {
+      this.meta = resultResponse.meta;
+      this.meta.unshift({ type: 'INT_TYPE', name: '', comment: null });
     }
+    this.hasMore = resultResponse.has_more;
+    this.isEscaped = resultResponse.isEscaped;
+    this.type = resultResponse.type;
+
+    huePubSub.publish(RESULT_UPDATED_EVENT, this);
   }
 }
-
-export { RESULT_STATUS, ExecutionResult };

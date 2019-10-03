@@ -25,8 +25,23 @@ import 'apps/notebook2/components/resultChart/ko.resultChart';
 import 'apps/notebook2/components/resultGrid/ko.resultGrid';
 import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/components/resultGrid/ko.resultGrid';
 import { REDRAW_CHART_EVENT } from 'apps/notebook2/components/resultChart/ko.resultChart';
+import { EXECUTABLE_UPDATED_EVENT } from 'apps/notebook2/execution/executable';
+import { RESULT_TYPE, RESULT_UPDATED_EVENT } from 'apps/notebook2/execution/executionResult';
 
 export const NAME = 'snippet-results';
+
+const META_TYPE_TO_CSS = {
+  TINYINT_TYPE: 'sort-numeric',
+  SMALLINT_TYPE: 'sort-numeric',
+  INT_TYPE: 'sort-numeric',
+  BIGINT_TYPE: 'sort-numeric',
+  FLOAT_TYPE: 'sort-numeric',
+  DOUBLE_TYPE: 'sort-numeric',
+  DECIMAL_TYPE: 'sort-numeric',
+  TIMESTAMP_TYPE: 'sort-date',
+  DATE_TYPE: 'sort-date',
+  DATETIME_TYPE: 'sort-date'
+};
 
 const isNumericColumn = type =>
   ['tinyint', 'smallint', 'int', 'bigint', 'float', 'double', 'decimal', 'real'].indexOf(type) !==
@@ -82,7 +97,7 @@ const TEMPLATE = `
           params: {
             data: data,
             editorMode: editorMode,
-            fetchResult: fetchResult,
+            fetchResult: fetchResult.bind($data),
             hasMore: hasMore,
             isPresentationMode: isPresentationMode,
             isResultFullScreenMode: isResultFullScreenMode,
@@ -117,23 +132,39 @@ class SnippetResults extends DisposableComponent {
     super();
     this.element = element;
 
-    this.type = params.type; // result
-    this.hasSomeResults = params.hasSomeResults; // result
-    this.images = params.images; // result
-    this.data = params.data; // result
-    this.meta = params.meta; // result
+    this.activeExecutable = params.activeExecutable;
+    this.latestExecutable = params.latestExecutable;
 
-    // Grid specific
     this.editorMode = params.editorMode;
-    this.fetchResult = params.fetchResult;
-    this.hasMore = params.hasMore;
     this.isPresentationMode = params.isPresentationMode;
     this.isResultFullScreenMode = params.isResultFullScreenMode;
     this.resultsKlass = params.resultsKlass;
-    this.status = params.status;
+    this.id = params.id; // TODO: Get rid of
 
-    // Chart specific
-    this.id = params.id;
+    huePubSub.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
+      if (this.activeExecutable() === executable) {
+        this.updateFromExecutable(executable);
+      }
+    });
+
+    const lastRenderedResult = undefined;
+    huePubSub.subscribe(RESULT_UPDATED_EVENT, executionResult => {
+      if (this.activeExecutable() === executionResult.executable) {
+        const refresh = lastRenderedResult === executionResult;
+        this.updateFromExecutionResult(executionResult, refresh);
+        this.lastRenderedResult = executionResult;
+      }
+    });
+
+    this.status = ko.observable();
+    this.type = ko.observable(RESULT_TYPE.TABLE);
+    this.meta = ko.observableArray();
+    this.data = ko.observableArray();
+    this.images = ko.observableArray();
+    this.hasMore = ko.observable();
+    this.hasResultSet = ko.observable();
+
+    this.hasSomeResult = ko.pureComputed(() => this.data().length);
 
     this.showGrid = ko.observable(true); // TODO: Should be persisted
     this.showChart = ko.observable(false); // TODO: Should be persisted
@@ -173,6 +204,52 @@ class SnippetResults extends DisposableComponent {
       this.meta().filter(item => item.name !== '' && isNumericColumn(item.type))
     );
   }
+
+  reset() {
+    this.images([]);
+    this.data([]);
+    this.meta([]);
+    this.hasMore(false);
+    this.type(RESULT_TYPE.TABLE);
+    this.status(undefined);
+  }
+
+  updateFromExecutionResult(executionResult, refresh) {
+    if (refresh) {
+      this.reset();
+    }
+
+    if (executionResult) {
+      this.hasMore(executionResult.hasMore);
+      this.type(executionResult.type);
+
+      if (!this.meta().length && executionResult.meta.length) {
+        this.meta(
+          executionResult.meta.map((item, index) => ({
+            name: item.name,
+            type: item.type.replace(/_type/i, '').toLowerCase(),
+            comment: item.comment,
+            cssClass: META_TYPE_TO_CSS[item.type] || 'sort-string',
+            checked: ko.observable(true),
+            originalIndex: index
+          }))
+        );
+      }
+
+      if (executionResult.lastRows.length) {
+        this.data.push(...executionResult.lastRows);
+      }
+    }
+  }
+
+  updateFromExecutable(executable) {
+    this.hasResultSet(executable.handle.has_result_set);
+    if (!this.hasResultSet) {
+      this.reset();
+    }
+  }
+
+  fetchResult() {}
 }
 
 componentUtils.registerComponent(
