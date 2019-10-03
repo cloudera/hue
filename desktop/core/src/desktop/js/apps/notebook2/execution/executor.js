@@ -16,6 +16,7 @@
 
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
 import { EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
+import { EXECUTABLE_UPDATED_EVENT } from 'apps/notebook2/execution/executable';
 import huePubSub from 'utils/huePubSub';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 
@@ -56,12 +57,12 @@ class Executor {
     this.executed = [];
 
     if (this.isSqlEngine) {
-      this.toExecute = SqlExecutable.fromStatement(options);
+      this.toExecute = SqlExecutable.fromStatement({ executor: this, ...options });
     } else {
       throw new Error('Not implemented yet');
     }
 
-    huePubSub.subscribe('hue.executable.updated', executable => {
+    huePubSub.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
       if (
         executable === this.currentExecutable ||
         this.executed.some(executed => executed === executable)
@@ -85,32 +86,19 @@ class Executor {
   }
 
   async executeNext() {
-    return new Promise((resolve, reject) => {
-      const executeBatch = () => {
-        if (this.toExecute.length === 0) {
-          reject();
-        } else {
-          this.currentExecutable = this.toExecute.shift();
-          this.currentExecutable
-            .execute()
-            .then(executionResult => {
-              this.executed.push(this.currentExecutable);
-              this.currentExecutable = undefined;
+    if (this.toExecute.length === 0) {
+      return;
+    }
 
-              if (this.canExecuteNextInBatch()) {
-                this.executeNext()
-                  .then(executeBatch)
-                  .catch(reject);
-              } else {
-                resolve(executionResult);
-              }
-            })
-            .catch(reject);
-        }
-      };
+    this.currentExecutable = this.toExecute.shift();
 
-      executeBatch();
-    });
+    await this.currentExecutable.execute();
+
+    this.executed.push(this.currentExecutable);
+
+    if (this.canExecuteNextInBatch()) {
+      await this.executeNext();
+    }
   }
 
   canExecuteNextInBatch() {

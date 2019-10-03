@@ -187,25 +187,9 @@ class ResultGrid extends DisposableComponent {
 
     this.hueDatatable = undefined;
 
-    const adaptMeta = () => {
-      this.meta().forEach((item, index) => {
-        if (typeof item.checked === 'undefined') {
-          item.checked = ko.observable(true);
-          item.type = item.type.replace(/_type/i, '').toLowerCase();
-          item.originalIndex = index;
-        }
-      });
-    };
-
     this.trackKoSub(
       this.columnsVisible.subscribe(() => {
         defer(this.redrawFixedHeaders.bind(this));
-      })
-    );
-
-    this.trackKoSub(
-      this.meta.subscribe(() => {
-        adaptMeta();
       })
     );
 
