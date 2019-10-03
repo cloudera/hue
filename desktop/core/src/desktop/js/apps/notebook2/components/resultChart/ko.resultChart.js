@@ -19,6 +19,7 @@ import ko from 'knockout';
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
 import hueAnalytics from 'utils/hueAnalytics';
+import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import {
   leafletMapChartTransformer,
@@ -28,6 +29,9 @@ import {
   scatterChartTransformer,
   timelineChartTransformer
 } from './chartTransformers';
+import $ from 'jquery';
+import { UUID } from 'utils/hueUtils';
+import { REDRAW_CHART_EVENT } from 'apps/notebook2/events';
 
 export const NAME = 'result-chart';
 
@@ -66,14 +70,74 @@ export const CHART_TIMELINE_TYPE = {
 
 // prettier-ignore
 const TEMPLATE = `
-<div>
-  <div class="column-side" style="position:relative; white-space: nowrap;" data-bind="
-      visible: isResultSettingsVisible,
-      css: { 'span3 result-settings': isResultSettingsVisible, 'hidden': ! isResultSettingsVisible() }
-    ">
+<div class="result-actions-append">
+  <div class="btn-group">
+    <button class="btn btn-mini btn-editor dropdown-toggle" data-toggle="dropdown">
+      <!-- ko if: isBarChart -->
+      <i class="hcha fa-fw hcha-bar-chart"></i> ${ I18n('Bar Chart') }
+      <!-- /ko -->
+      <!-- ko if: isTimelineChart -->
+      <i class="hcha fa-fw hcha-timeline-chart"></i> ${ I18n('Timeline Chart') }
+      <!-- /ko -->
+      <!-- ko if: isPieChart -->
+      <i class="hcha fa-fw hcha-pie-chart"></i> ${ I18n('Pie Chart') }
+      <!-- /ko -->
+      <!-- ko if: isScatterChart -->
+      <i class="fa fa-fw fa-dot-circle-o"></i> ${ I18n('Scatter Plot') }
+      <!-- /ko -->
+      <!-- ko if: isMapChart -->
+      <i class="fa fa-fw fa-map-marker"></i> ${ I18n('Marker Map') }
+      <!-- /ko -->
+      <!-- ko if: isGradientMapChart -->
+      <i class="hcha fa-fw hcha-map-chart"></i> ${ I18n('Gradient Map') }
+      <!-- /ko -->
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+      <li>
+        <a href="javascript:void(0);" data-bind="click: function() { chartType(window.HUE_CHARTS.TYPES.BARCHART); }">
+          <i class="hcha fa-fw hcha-bar-chart"></i> ${ I18n('Bar Chart') }
+        </a>
+      </li>
+      <li data-bind="if: cleanedDateTimeMeta().length">
+        <a href="javascript:void(0);" data-bind="click: function() { chartType(window.HUE_CHARTS.TYPES.TIMELINECHART); }">
+          <i class="hcha fa-fw hcha-timeline-chart"></i> ${ I18n('Timeline Chart') }
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0);" data-bind="click: function() { chartType(window.HUE_CHARTS.TYPES.PIECHART); }">
+          <i class="hcha fa-fw hcha-pie-chart"></i> ${ I18n('Pie Chart') }
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0);" data-bind="click: function() { chartType(window.HUE_CHARTS.TYPES.SCATTERCHART); }">
+          <i class="fa fa-fw fa-dot-circle-o"></i> ${ I18n('Scatter Plot') }
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0);" data-bind="click: function() { chartType(window.HUE_CHARTS.TYPES.MAP); }">
+          <i class="fa fa-fw fa-map-marker"></i> ${ I18n('Marker Map') }
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0);" data-bind="click: function() { chartType(window.HUE_CHARTS.TYPES.GRADIENTMAP); }">
+          <i class="hcha fa-fw hcha-map-chart"></i> ${ I18n('Gradient Map') }
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="btn-group">
+    <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: chartSettingsVisible, css: { 'active' : chartSettingsVisible }">
+      <i class="fa fa-cog"></i> ${ I18n('Settings') }
+    </button>
+  </div>
+</div>
+
+<div class="split-result-container">
+  <div class="result-settings-panel" style="display: none;" data-bind="visible: chartSettingsVisible">
     <div>
       <!-- ko if: chartType -->
-      <!-- ko if: isTimeLineChart() || isBarChart() -->
+      <!-- ko if: isTimelineChart() || isBarChart() -->
       <ul class="nav nav-list" style="border: none; background-color: #FFF">
         <li class="nav-header">${ I18n('type') }</li>
       </ul>
@@ -162,7 +226,7 @@ const TEMPLATE = `
 
       <div style="max-height: 220px" data-bind="
           delayedOverflow,
-          visible: ((isBarChart() && !chartXPivot()) || isLineChart() || isTimeLineChart())
+          visible: ((isBarChart() && !chartXPivot()) || isLineChart() || isTimelineChart())
         ">
         <ul class="unstyled" data-bind="foreach: cleanedNumericMeta" style="margin-bottom: 0">
           <li><label class="checkbox"><input type="checkbox" data-bind="checkedValue: name, checked: $parent.chartYMulti" /> <span data-bind="text: $data.name"></span></label></li>
@@ -376,41 +440,51 @@ const TEMPLATE = `
       <!-- /ko -->
       <!-- /ko -->
     </div>
-    <div class="resize-bar" style="top: 0; right: -10px; cursor: col-resize;"></div>
   </div>
-  <div class="grid-side" data-bind="css: { 'span9': isResultSettingsVisible, 'span12 nomargin': ! isResultSettingsVisible() }">
-    <div class="chart-container">
-      <h1 class="empty" data-bind="visible: !hasDataForChart()">${ I18n('Select the chart parameters on the left') }</h1>
+  
+  <div class="split-result-resizer" style="display: none;" data-bind="
+      visible: chartSettingsVisible,
+      splitFlexDraggable : {
+        containerSelector: '.split-result-container',
+        sidePanelSelector: '.result-settings-panel',
+        sidePanelVisible: chartSettingsVisible,
+        orientation: 'left',
+        appName: 'result_chart',
+        onPosition: function() {  }
+      }
+    "><div class="resize-bar"></div></div>
+  
+  <div class="split-result-content chart-container">
+    <h1 class="empty" data-bind="visible: !hasDataForChart()" style="display:none">${ I18n('Select the chart parameters on the left') }</h1>
 
-      <div data-bind="visible: hasDataForChart">
-        <!-- ko if: isPieChart -->
-        <div class="chart" data-bind="attr: { 'id': chartId }, pieChart: pieChartParams()" />
-        <!-- /ko -->
+    <div data-bind="visible: hasDataForChart" style="display:none">
+      <!-- ko if: isPieChart -->
+      <div class="chart" data-bind="attr: { 'id': chartId }, pieChart: pieChartParams()" />
+      <!-- /ko -->
 
-        <!-- ko if: isBarChart -->
-        <div class="chart" data-bind="attr: { 'id': chartId }, barChart: barChartParams()" />
-        <!-- /ko -->
+      <!-- ko if: isBarChart -->
+      <div class="chart" data-bind="attr: { 'id': chartId }, barChart: barChartParams()" />
+      <!-- /ko -->
 
-        <!-- ko if: isLineChart -->
-        <div class="chart" data-bind="attr: { 'id': chartId }, lineChart: lineChartParams()" />
-        <!-- /ko -->
+      <!-- ko if: isLineChart -->
+      <div class="chart" data-bind="attr: { 'id': chartId }, lineChart: lineChartParams()" />
+      <!-- /ko -->
 
-        <!-- ko if: isTimeLineChart -->
-        <div class="chart" data-bind="attr:{ 'id': chartId }, timelineChart: timeLineChartParams()" />
-        <!-- /ko -->
+      <!-- ko if: isTimelineChart -->
+      <div class="chart" data-bind="attr:{ 'id': chartId }, timelineChart: timeLineChartParams()" />
+      <!-- /ko -->
 
-        <!-- ko if: isMapChart -->
-        <div class="chart" data-bind="attr:{ 'id': chartId }, leafletMapChart: leafletMapChartParams()" />
-        <!-- /ko -->
+      <!-- ko if: isMapChart -->
+      <div class="chart" data-bind="attr:{ 'id': chartId }, leafletMapChart: leafletMapChartParams()" />
+      <!-- /ko -->
 
-        <!-- ko if: isGradientMapChart -->
-        <div class="chart" data-bind="attr:{ 'id': chartId }, mapChart: mapChartParams()" />
-        <!-- /ko -->
+      <!-- ko if: isGradientMapChart -->
+      <div class="chart" data-bind="attr:{ 'id': chartId }, mapChart: mapChartParams()" />
+      <!-- /ko -->
 
-        <!-- ko if: isScatterChart -->
-        <div class="chart" data-bind="attr:{ 'id': chartId }, scatterChart: scatterChartParams()" />
-        <!-- /ko -->
-      </div>
+      <!-- ko if: isScatterChart -->
+      <div class="chart" data-bind="attr:{ 'id': chartId }, scatterChart: scatterChartParams()" />
+      <!-- /ko -->
     </div>
   </div>
 </div>
@@ -422,14 +496,14 @@ class ResultChart extends DisposableComponent {
 
     this.data = params.data;
     this.id = params.id;
-    this.isResultSettingsVisible = params.isResultSettingsVisible;
-    this.chartType = params.chartType;
+    this.chartSettingsVisible = ko.observable(true);
 
     this.meta = params.meta;
     this.cleanedMeta = params.cleanedMeta;
     this.cleanedDateTimeMeta = params.cleanedDateTimeMeta;
     this.cleanedNumericMeta = params.cleanedNumericMeta;
     this.cleanedStringMeta = params.cleanedNumericMeta;
+    this.showChart = params.showChart;
 
     this.chartLimit = ko.observable().extend({ notify: 'always' }); // TODO: Should be persisted
     this.chartLimits = ko.observableArray([5, 10, 25, 50, 100]);
@@ -445,7 +519,7 @@ class ResultChart extends DisposableComponent {
     this.chartXPivot = ko.observable().extend({ notify: 'always' }); // TODO: Should be persisted
     this.chartYMulti = ko.observableArray(); // TODO: Should be persisted
     this.chartYSingle = ko.observable(); // TODO: Should be persisted
-    this.showChart = params.showChart;
+    this.chartType = ko.observable(window.HUE_CHARTS.TYPES.BARCHART); // TODO: Should be persisted
 
     this.chartId = ko.pureComputed(() => this.chartType() + '_' + this.id());
     this.isBarChart = ko.pureComputed(() => TYPES.BARCHART === this.chartType());
@@ -454,10 +528,10 @@ class ResultChart extends DisposableComponent {
     this.isScatterChart = ko.pureComputed(() => TYPES.SCATTERCHART === this.chartType());
     this.isGradientMapChart = ko.pureComputed(() => TYPES.GRADIENTMAP === this.chartType());
     this.isPieChart = ko.pureComputed(() => TYPES.PIECHART === this.chartType());
-    this.isTimeLineChart = ko.pureComputed(() => TYPES.TIMELINECHART === this.chartType());
+    this.isTimelineChart = ko.pureComputed(() => TYPES.TIMELINECHART === this.chartType());
 
     this.hasDataForChart = ko.pureComputed(() => {
-      if (this.isBarChart() || this.isLineChart() || this.isTimeLineChart()) {
+      if (this.isBarChart() || this.isLineChart() || this.isTimelineChart()) {
         return (
           typeof this.chartX() !== 'undefined' &&
           this.chartX() !== null &&
@@ -471,6 +545,8 @@ class ResultChart extends DisposableComponent {
         this.chartYSingle() !== null
       );
     });
+
+    this.trackKoSub(this.chartType.subscribe(this.redrawChart.bind(this)));
 
     this.trackKoSub(
       this.meta.subscribe(() => {
@@ -509,7 +585,7 @@ class ResultChart extends DisposableComponent {
       if (this.isBarChart() || this.isGradientMapChart()) {
         return this.cleanedMeta();
       }
-      if (this.isTimeLineChart()) {
+      if (this.isTimelineChart()) {
         return this.cleanedDateTimeMeta();
       }
       return this.cleanedNumericMeta();
@@ -581,6 +657,21 @@ class ResultChart extends DisposableComponent {
       size: this.chartScatterSize(),
       group: this.chartScatterGroup()
     }));
+
+    this.trackPubSub(huePubSub.subscribe(REDRAW_CHART_EVENT, this.redrawChart.bind(this)));
+
+    const resizeId = UUID();
+    let resizeTimeout = -1;
+    $(window).on('resize.' + resizeId, () => {
+      window.clearTimeout(resizeTimeout);
+      resizeTimeout = window.setTimeout(() => {
+        this.redrawChart();
+      }, 100);
+    });
+    this.disposals.push(() => {
+      window.clearTimeout(resizeTimeout);
+      $(window).off('resize.' + resizeId);
+    });
   }
 
   guessMetaField(originalField) {
@@ -672,6 +763,11 @@ class ResultChart extends DisposableComponent {
         }
       }
     }
+  }
+
+  redrawChart() {
+    this.chartX.notifySubscribers();
+    this.chartX.valueHasMutated();
   }
 }
 

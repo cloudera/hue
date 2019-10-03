@@ -67,7 +67,6 @@ export const notebookToJSON = notebook =>
       aceCursorPosition: snippet.aceCursorPosition(),
       aceSize: snippet.aceSize(),
       associatedDocumentUuid: snippet.associatedDocumentUuid(),
-      chartData: snippet.chartData(),
       // chartLimit: snippet.chartLimit(), // TODO: Move somewhere else
       // chartMapHeat: snippet.chartMapHeat(), // TODO: Move somewhere else
       // chartMapLabel: snippet.chartMapLabel(), // TODO: Move somewhere else
@@ -87,7 +86,7 @@ export const notebookToJSON = notebook =>
       //   }
       // );
       //
-      chartType: snippet.chartType(),
+      // chartType: snippet.chartType(), // TODO: Move somewhere else
       // chartX: snippet.chartX(), // TODO: Move somewhere else
       // chartXPivot: snippet.chartXPivot(), // TODO: Move somewhere else
       // chartYMulti: snippet.chartYMulti(), // TODO: Move somewhere else
@@ -97,7 +96,7 @@ export const notebookToJSON = notebook =>
       database: snippet.database(),
       id: snippet.id(),
       is_redacted: snippet.is_redacted(),
-      isResultSettingsVisible: snippet.isResultSettingsVisible(),
+      //isResultSettingsVisible: snippet.isResultSettingsVisible(), // TODO: Move somewhere else
       lastAceSelectionRowOffset: snippet.lastAceSelectionRowOffset(),
       lastExecuted: snippet.lastExecuted(),
       name: snippet.name(),
@@ -107,8 +106,8 @@ export const notebookToJSON = notebook =>
       // result: ...,
       settingsVisible: snippet.settingsVisible(),
       // schedulerViewModel: ?
-      showChart: snippet.showChart(),
-      showGrid: snippet.showGrid(),
+      // showChart: snippet.showChart(), // TODO: Move somewhere else
+      // showGrid: snippet.showGrid(), // TODO: Move somewhere else
       showLogs: snippet.showLogs(),
       statement_raw: snippet.statement_raw(),
       statementPath: snippet.statementPath(),

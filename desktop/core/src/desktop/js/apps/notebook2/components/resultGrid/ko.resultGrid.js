@@ -21,16 +21,45 @@ import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
 import I18n from 'utils/i18n';
 import huePubSub from 'utils/huePubSub';
-import { bootstrapRatios, defer, sleep } from 'utils/hueUtils';
+import { defer, sleep } from 'utils/hueUtils';
+import {
+  HIDE_FIXED_HEADERS_EVENT,
+  REDRAW_FIXED_HEADERS_EVENT,
+  SHOW_GRID_SEARCH_EVENT,
+  SHOW_NORMAL_RESULT_EVENT
+} from 'apps/notebook2/events';
 
 export const NAME = 'result-grid';
 
 // prettier-ignore
 const TEMPLATE = `
-<div>
-  <div class="column-side" style="position: relative; white-space: nowrap;" data-bind="
-      visible: isResultSettingsVisible,
-      css: { 'span3 result-settings': isResultSettingsVisible, 'hidden': !isResultSettingsVisible() }">
+<div class="result-actions-append">
+  <div class="btn-group">
+    <button class="btn btn-editor btn-mini disable-feedback" data-bind="click: showSearch.bind($data), css: { 'disabled': !data().length }">
+      <i class="fa fa-search"></i> ${ I18n('Search') }
+    </button>
+  </div>
+  <div class="btn-group">
+    <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: columnsVisible, css: { 'active' : columnsVisible }">
+      <i class="fa fa-columns"></i> ${ I18n('Columns') }
+    </button>
+  </div>
+  <!-- ko if: false && window.ENABLE_DOWNLOAD -->
+    <div data-bind="
+        component: {
+          name: 'downloadSnippetResults',
+          params: {
+            gridSideBtn: false,
+            snippet: $data,
+            notebook: $parent 
+          } 
+        }
+      " style="display:inline-block;"></div>
+  <!-- /ko -->
+</div>
+
+<div class="split-result-container">
+  <div class="result-settings-panel" style="display: none;" data-bind="visible: columnsVisible">
     <div class="snippet-grid-settings" data-bind="delayedOverflow">
       <table class="table table-condensed margin-top-10 no-border">
         <thead>
@@ -86,43 +115,53 @@ const TEMPLATE = `
         <tr>
           <td colspan="3">
             <div class="margin-top-10 muted meta-noresults" data-bind="visible: !filteredMeta().length">
-              ${ I18n('No results found') }
+              ${ I18n('No columns found') }
             </div>
           </td>
         </tr>
         </tfoot>
       </table>
     </div>
-    <div class="resize-bar" style="top: 0; right: -10px; cursor: col-resize;"></div>
   </div>
-  <div class="grid-side" data-bind="css: { 'span9': isResultSettingsVisible, 'span12 nomargin': !isResultSettingsVisible() }">
-    <div data-bind="delayedOverflow: 'slow', css: resultsKlass">
-      <table class="table table-condensed resultTable">
-        <thead>
-        <tr data-bind="foreach: meta">
-          <th class="sorting" data-bind="
-              text: ($index() == 0 ? '&nbsp;' : $data.name),
-              css: typeof cssClass != 'undefined' ? cssClass : 'sort-string',
-              attr: { title: $data.type },
-              style: { 
-                'width': $index() == 0 ? '1%' : '',
-                'height': $index() == 0 ? '32px' : ''
-              },
-              click: function(obj, e) { $(e.target).parents('table').trigger('sort', obj); }
-            "></th>
-        </tr>
-        </thead>
-        <tbody>
-        </tbody>
-      </table>
-      <div style="display:none;" data-bind="
-          visible: status() == 'expired' && data() && data().length > 99,
-          css: resultsKlass
-        ">
-        <pre class="margin-top-10"><i class="fa fa-check muted"></i> ${ I18n("Results have expired, rerun the query if needed.") }</pre>
-      </div>
-      <span data-bind="template: { afterRender: resultTableRendered.bind($data) }"></span>
+
+  <div class="split-result-resizer" style="display: none;" data-bind="
+      visible: columnsVisible,
+      splitFlexDraggable : {
+        containerSelector: '.split-result-container',
+        sidePanelSelector: '.result-settings-panel',
+        sidePanelVisible: columnsVisible,
+        orientation: 'left',
+        appName: 'result_grid',
+        onPosition: function() { redrawFixedHeaders(); }
+      }
+    "><div class="resize-bar"></div></div>
+    
+  <div class="split-result-content" data-bind="delayedOverflow: 'slow', css: resultsKlass">
+    <table class="table table-condensed resultTable">
+      <thead>
+      <tr data-bind="foreach: meta">
+        <th class="sorting" data-bind="
+            text: ($index() == 0 ? '&nbsp;' : $data.name),
+            css: typeof cssClass != 'undefined' ? cssClass : 'sort-string',
+            attr: { title: $data.type },
+            style: { 
+              'width': $index() == 0 ? '1%' : '',
+              'height': $index() == 0 ? '32px' : ''
+            },
+            click: function(obj, e) { $(e.target).parents('table').trigger('sort', obj); }
+          "></th>
+      </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+    <div style="display:none;" data-bind="
+        visible: status() == 'expired' && data() && data().length > 99,
+        css: resultsKlass
+      ">
+      <pre class="margin-top-10"><i class="fa fa-check muted"></i> ${ I18n("Results have expired, rerun the query if needed.") }</pre>
     </div>
+    <span data-bind="template: { afterRender: resultTableRendered.bind($data) }"></span>
   </div>
 </div>
 `;
@@ -139,7 +178,7 @@ class ResultGrid extends DisposableComponent {
     this.fetchResult = params.fetchResult;
 
     this.status = params.status;
-    this.isResultSettingsVisible = params.isResultSettingsVisible;
+    this.columnsVisible = ko.observable(true);
     this.isMetaFilterVisible = ko.observable(false);
     this.metaFilter = ko.observable();
     this.resultsKlass = params.resultsKlass;
@@ -157,6 +196,12 @@ class ResultGrid extends DisposableComponent {
         }
       });
     };
+
+    this.trackKoSub(
+      this.columnsVisible.subscribe(() => {
+        defer(this.redrawFixedHeaders.bind(this));
+      })
+    );
 
     this.trackKoSub(
       this.meta.subscribe(() => {
@@ -386,7 +431,7 @@ class ResultGrid extends DisposableComponent {
           if (window.BANNER_TOP_HTML) {
             margin += 31;
           }
-          if (this.isResultSettingsVisible()) {
+          if (this.columnsVisible()) {
             $snippet.find('.snippet-grid-settings').css({
               height:
                 this.isPresentationMode() || !this.editorMode()
@@ -434,21 +479,26 @@ class ResultGrid extends DisposableComponent {
     });
 
     this.trackKoSub(
-      this.isResultSettingsVisible.subscribe(newValue => {
+      this.columnsVisible.subscribe(newValue => {
         if (newValue) {
           dataScroll();
         }
       })
     );
 
-    // huePubSub.subscribeOnce('chart.hard.reset', () => {
-    //   // hard reset once the default opened chart
-    //   const oldChartX = snippet.chartX();
-    //   snippet.chartX(null);
-    //   window.setTimeout(() => {
-    //     snippet.chartX(oldChartX);
-    //   }, 0);
-    // });
+    this.trackPubSub(
+      huePubSub.subscribe(REDRAW_FIXED_HEADERS_EVENT, this.redrawFixedHeaders.bind(this))
+    );
+
+    this.trackPubSub(huePubSub.subscribe(SHOW_GRID_SEARCH_EVENT, this.showSearch.bind(this)));
+
+    this.trackPubSub(
+      huePubSub.subscribe(HIDE_FIXED_HEADERS_EVENT, this.hideFixedHeaders.bind(this))
+    );
+
+    this.trackPubSub(
+      huePubSub.subscribe(SHOW_NORMAL_RESULT_EVENT, this.showNormalResult.bind(this))
+    );
 
     return this.hueDatatable;
   }
@@ -461,66 +511,24 @@ class ResultGrid extends DisposableComponent {
     return this.getSnippetElement().find('.resultTable');
   }
 
-  resetResultsResizer() {
+  hideFixedHeaders() {
     const $snippet = this.getSnippetElement();
-    $snippet
-      .find('.table-results .column-side')
-      .width(bootstrapRatios.span3() + '%')
-      .data('newWidth', bootstrapRatios.span3());
-    if (this.isResultSettingsVisible()) {
-      $snippet
-        .find('.table-results .grid-side')
-        .data('newWidth', bootstrapRatios.span9())
-        .width(bootstrapRatios.span9() + '%');
-    } else {
-      $snippet
-        .find('.table-results .grid-side')
-        .data('newWidth', 100)
-        .width('100%');
-    }
-    $snippet.find('.resize-bar').css('left', '');
-    try {
-      $snippet.find('.resize-bar').draggable('destroy');
-    } catch (e) {}
+    $snippet.find('.jHueTableExtenderClonedContainer').hide();
+    $snippet.find('.jHueTableExtenderClonedContainerColumn').hide();
+    $snippet.find('.jHueTableExtenderClonedContainerCell').hide();
+    $snippet.find('.fixed-header-row').hide();
+    $snippet.find('.fixed-first-cell').hide();
+    $snippet.find('.fixed-first-column').hide();
+  }
 
-    let initialPosition = 0;
-
-    $snippet.find('.resize-bar').draggable({
-      axis: 'x',
-      containment: $snippet.find('.table-results'),
-      create: () => {
-        const $snippet = this.getSnippetElement();
-        initialPosition = $snippet.find('.resize-bar').position().left;
-        $snippet.find('.table-results .column-side').data('newWidth', bootstrapRatios.span3());
-        $snippet
-          .find('.meta-filter')
-          .width($snippet.find('.table-results .column-side').width() - 28);
-      },
-      drag: (event, ui) => {
-        const $snippet = this.getSnippetElement();
-        if (initialPosition === 0) {
-          initialPosition = $snippet.find('.resize-bar').position().left;
-        }
-        ui.position.left = Math.max(150, ui.position.left);
-        const newSpan3Width = (ui.position.left * bootstrapRatios.span3()) / initialPosition;
-        const newSpan9Width = 100 - newSpan3Width - bootstrapRatios.margin();
-        $snippet
-          .find('.table-results .column-side')
-          .width(newSpan3Width + '%')
-          .data('newWidth', newSpan3Width);
-        $snippet
-          .find('.table-results .grid-side')
-          .width(newSpan9Width + '%')
-          .data('newWidth', newSpan9Width);
-        $snippet
-          .find('.meta-filter')
-          .width($snippet.find('.table-results .column-side').width() - 28);
-      },
-      stop: () => {
-        this.redrawFixedHeaders();
-        huePubSub.publish('resize.leaflet.map');
-      }
-    });
+  showFixedHeaders() {
+    const $snippet = this.getSnippetElement();
+    $snippet.find('.jHueTableExtenderClonedContainer').show();
+    $snippet.find('.jHueTableExtenderClonedContainerColumn').show();
+    $snippet.find('.jHueTableExtenderClonedContainerCell').show();
+    $snippet.find('.fixed-header-row').show();
+    $snippet.find('.fixed-first-cell').show();
+    $snippet.find('.fixed-first-column').show();
   }
 
   redrawFixedHeaders() {
@@ -534,12 +542,7 @@ class ResultGrid extends DisposableComponent {
       $(window.MAIN_SCROLLABLE).data('lastScroll', $(window.MAIN_SCROLLABLE).scrollTop());
       $(window.MAIN_SCROLLABLE).trigger('scroll');
     }
-    $snippet.find('.jHueTableExtenderClonedContainer').show();
-    $snippet.find('.jHueTableExtenderClonedContainerColumn').show();
-    $snippet.find('.jHueTableExtenderClonedContainerCell').show();
-    $snippet.find('.fixed-header-row').show();
-    $snippet.find('.fixed-first-cell').show();
-    $snippet.find('.fixed-first-column').show();
+    this.showFixedHeaders();
   }
 
   resizeToggleResultSettings(initial) {
@@ -598,7 +601,6 @@ class ResultGrid extends DisposableComponent {
         this.meta.notifySubscribers();
         $snippet.find('select').trigger('chosen:updated');
         dataTable = this.createDatatable();
-        this.resetResultsResizer();
         $resultTable.data('rendered', true);
       } else {
         dataTable = $resultTable.hueDataTable();
@@ -660,6 +662,12 @@ class ResultGrid extends DisposableComponent {
     $wrapper.find('.fixed-header-row').css({ opacity: '1' });
     $wrapper.find('.fixed-first-cell').css({ opacity: '1' });
     $wrapper.find('.resultTable').css({ opacity: '1' });
+  }
+
+  showSearch() {
+    if (this.hueDatatable) {
+      this.hueDatatable.fnShowSearch();
+    }
   }
 
   toggleAllResultColumns(linkElement) {

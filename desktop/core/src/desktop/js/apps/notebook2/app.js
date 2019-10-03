@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import ko from 'knockout';
 import $ from 'jquery';
 import Clipboard from 'clipboard';
 import 'jquery-mousewheel';
-import ko from 'knockout';
 import 'ext/bootstrap-datepicker.min';
 import 'ext/jquery.hotkeys';
 import 'jquery/plugins/jquery.hdfstree';
@@ -26,11 +26,16 @@ import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
-import { initNotebook2 } from 'apps/notebook2/app';
 
-if (window.ENABLE_NOTEBOOK_2) {
-  initNotebook2();
-} else {
+import {
+  HIDE_FIXED_HEADERS_EVENT,
+  REDRAW_FIXED_HEADERS_EVENT,
+  SHOW_GRID_SEARCH_EVENT,
+  SHOW_NORMAL_RESULT_EVENT,
+  REDRAW_CHART_EVENT
+} from 'apps/notebook2/events';
+
+export const initNotebook2 = () => {
   window.Clipboard = Clipboard;
 
   const HUE_PUB_SUB_EDITOR_ID =
@@ -89,274 +94,11 @@ if (window.ENABLE_NOTEBOOK_2) {
           .addClass('hide');
       };
 
-      const createHueDatatable = (el, snippet, vm) => {
-        let DATATABLES_MAX_HEIGHT = 330;
-        let invisibleRows = 10;
-        if (snippet.result && snippet.result.data() && snippet.result.data().length) {
-          const cols = snippet.result.data()[0].length;
-          invisibleRows = cols > 200 ? 10 : cols > 30 ? 50 : 100;
-        }
-        const _dt = $(el).hueDataTable({
-          i18n: {
-            NO_RESULTS: I18n('No results found.'),
-            OF: I18n('of')
-          },
-          fnDrawCallback: function(oSettings) {
-            if (vm.editorMode()) {
-              $('#queryResults').removeAttr('style');
-              DATATABLES_MAX_HEIGHT =
-                $(window).height() -
-                $(el)
-                  .parent()
-                  .offset().top -
-                40;
-              $(el)
-                .parents('.dataTables_wrapper')
-                .css('overflow-x', 'hidden');
-              $(el).jHueHorizontalScrollbar();
-              $(el)
-                .parents('.dataTables_wrapper')
-                .jHueScrollLeft();
-            } else if ($(el).data('fnDraws') === 1) {
-              $(el)
-                .parents('.dataTables_wrapper')
-                .jHueTableScroller({
-                  maxHeight: DATATABLES_MAX_HEIGHT,
-                  heightAfterCorrection: 0
-                });
-            }
-          },
-          scrollable:
-            vm.editorMode() && !vm.isPresentationMode()
-              ? window.MAIN_SCROLLABLE
-              : '.dataTables_wrapper',
-          contained: !vm.editorMode() || vm.isPresentationMode(),
-          forceInvisible: invisibleRows
-        });
-
-        window.setTimeout(() => {
-          if (vm.editorMode()) {
-            $(el)
-              .parents('.dataTables_wrapper')
-              .css('overflow-x', 'hidden');
-            const bannerTopHeight = window.BANNER_TOP_HTML ? 30 : 2;
-            $(el).jHueTableExtender2({
-              mainScrollable: window.MAIN_SCROLLABLE,
-              fixedFirstColumn: vm.editorMode(),
-              stickToTopPosition: 48 + bannerTopHeight,
-              parentId: 'snippet_' + snippet.id(),
-              clonedContainerPosition: 'fixed',
-              app: 'editor'
-            });
-            $(el).jHueHorizontalScrollbar();
-          } else {
-            $(el).jHueTableExtender2({
-              mainScrollable: $(el).parents('.dataTables_wrapper')[0],
-              fixedFirstColumn: vm.editorMode(),
-              parentId: 'snippet_' + snippet.id(),
-              clonedContainerPosition: 'absolute',
-              app: 'editor'
-            });
-          }
-        }, 0);
-
-        return _dt;
-      };
-
-      const createDatatable = (el, snippet, vm) => {
-        const parent = $(el).parent();
-        // When executing few columns -> many columns -> few columns we have to clear the style
-        $(el).removeAttr('style');
-        if ($(el).hasClass('table-huedatatable')) {
-          $(el).removeClass('table-huedatatable');
-          if (parent.hasClass('dataTables_wrapper')) {
-            $(el).unwrap();
-          }
-        }
-        $(el).addClass('dt');
-
-        const _dt = createHueDatatable(el, snippet, vm);
-
-        const dataTableEl = $(el).parents('.dataTables_wrapper');
-
-        if (!vm.editorMode()) {
-          dataTableEl.bind('mousewheel DOMMouseScroll wheel', function(e) {
-            if (
-              $(el)
-                .closest('.results')
-                .css('overflow') === 'hidden'
-            ) {
-              return;
-            }
-            const _e = e.originalEvent,
-              _deltaX = _e.wheelDeltaX || -_e.deltaX,
-              _deltaY = _e.wheelDeltaY || -_e.deltaY;
-            this.scrollTop += -_deltaY / 2;
-            this.scrollLeft += -_deltaX / 2;
-
-            if (this.scrollTop === 0) {
-              $('body')[0].scrollTop += -_deltaY / 3;
-              $('html')[0].scrollTop += -_deltaY / 3; // for firefox
-            }
-            e.preventDefault();
-          });
-        }
-
-        let _scrollTimeout = -1;
-
-        let scrollElement = dataTableEl;
-        if (vm.editorMode()) {
-          scrollElement = $(window.MAIN_SCROLLABLE);
-        }
-
-        if (scrollElement.data('scrollFnDtCreation')) {
-          scrollElement.off('scroll', scrollElement.data('scrollFnDtCreation'));
-        }
-
-        let resultFollowTimeout = -1;
-        const dataScroll = function() {
-          if (vm.editorMode()) {
-            const snippetEl = $('#snippet_' + snippet.id());
-            if (snippetEl.find('.dataTables_wrapper').length > 0 && snippet.showGrid()) {
-              window.clearTimeout(resultFollowTimeout);
-              resultFollowTimeout = window.setTimeout(() => {
-                const topCoord = vm.isPresentationMode() || vm.isResultFullScreenMode() ? 50 : 73;
-                let offsetTop = 0;
-                if (
-                  snippetEl.find('.dataTables_wrapper').length > 0 &&
-                  snippetEl.find('.dataTables_wrapper').offset()
-                ) {
-                  offsetTop = (snippetEl.find('.dataTables_wrapper').offset().top - topCoord) * -1;
-                }
-                let margin = Math.max(offsetTop, 0);
-                if (window.BANNER_TOP_HTML) {
-                  margin += 31;
-                }
-                if (snippet.isResultSettingsVisible()) {
-                  snippetEl.find('.snippet-grid-settings').css({
-                    height:
-                      vm.isPresentationMode() || !vm.editorMode()
-                        ? '330px'
-                        : Math.max(
-                            100,
-                            Math.ceil(
-                              $(window).height() -
-                                Math.max($('#queryResults').offset().top, topCoord)
-                            )
-                          ) + 'px'
-                  });
-                  snippetEl.find('.result-settings').css({
-                    marginTop: margin
-                  });
-                }
-                snippetEl.find('.snippet-actions').css({
-                  marginTop: margin + 25
-                });
-              }, 100);
-            }
-          }
-          if (
-            !vm.editorMode() ||
-            (vm.editorMode() && snippet.currentQueryTab() === 'queryResults' && snippet.showGrid())
-          ) {
-            let _lastScrollPosition =
-              scrollElement.data('scrollPosition') != null
-                ? scrollElement.data('scrollPosition')
-                : 0;
-            window.clearTimeout(_scrollTimeout);
-            scrollElement.data('scrollPosition', scrollElement.scrollTop());
-            _scrollTimeout = window.setTimeout(() => {
-              if (vm.editorMode()) {
-                _lastScrollPosition--; //hack for forcing fetching
-              }
-              if (
-                _lastScrollPosition !== scrollElement.scrollTop() &&
-                scrollElement.scrollTop() + scrollElement.outerHeight() + 20 >=
-                  scrollElement[0].scrollHeight &&
-                _dt &&
-                snippet.result.hasMore()
-              ) {
-                huePubSub.publish('editor.snippet.result.gray', snippet);
-                snippet.fetchResult(100, false);
-              }
-            }, 100);
-          }
-        };
-        scrollElement.data('scrollFnDtCreation', dataScroll);
-        scrollElement.on('scroll', dataScroll);
-        snippet.isResultSettingsVisible.subscribe(newValue => {
-          if (newValue) {
-            dataScroll();
-          }
-        });
-
-        huePubSub.subscribeOnce('chart.hard.reset', () => {
-          // hard reset once the default opened chart
-          const oldChartX = snippet.chartX();
-          snippet.chartX(null);
-          window.setTimeout(() => {
-            snippet.chartX(oldChartX);
-          }, 0);
-        });
-
-        return _dt;
-      };
-
       if (ko.options) {
         ko.options.deferUpdates = true;
       }
 
       let viewModel;
-
-      const hideFixedHeaders = function() {
-        $('.jHueTableExtenderClonedContainer').hide();
-        $('.jHueTableExtenderClonedContainerColumn').hide();
-        $('.jHueTableExtenderClonedContainerCell').hide();
-        $('.fixed-header-row').hide();
-        $('.fixed-first-cell').hide();
-        $('.fixed-first-column').hide();
-      };
-
-      window.hideFixedHeaders = hideFixedHeaders;
-
-      let redrawTimeout = -1;
-      const redrawFixedHeaders = function(timeout) {
-        const renderer = function() {
-          if (!viewModel.selectedNotebook()) {
-            return;
-          }
-          viewModel
-            .selectedNotebook()
-            .snippets()
-            .forEach(snippet => {
-              if (snippet.result.meta().length > 0) {
-                const tableExtender = $('#snippet_' + snippet.id() + ' .resultTable').data(
-                  'plugin_jHueTableExtender2'
-                );
-                if (typeof tableExtender !== 'undefined') {
-                  tableExtender.repositionHeader();
-                  tableExtender.drawLockedRows();
-                }
-                $(window.MAIN_SCROLLABLE).data('lastScroll', $(window.MAIN_SCROLLABLE).scrollTop());
-                $(window.MAIN_SCROLLABLE).trigger('scroll');
-              }
-            });
-          $('.jHueTableExtenderClonedContainer').show();
-          $('.jHueTableExtenderClonedContainerColumn').show();
-          $('.jHueTableExtenderClonedContainerCell').show();
-          $('.fixed-header-row').show();
-          $('.fixed-first-cell').show();
-          $('.fixed-first-column').show();
-        };
-
-        if (timeout) {
-          window.clearTimeout(redrawTimeout);
-          redrawTimeout = window.setTimeout(renderer, timeout);
-        } else {
-          renderer();
-        }
-      };
-      window.redrawFixedHeaders = redrawFixedHeaders;
 
       const replaceAce = content => {
         const snip = viewModel.selectedNotebook().snippets()[0];
@@ -377,7 +119,7 @@ if (window.ENABLE_NOTEBOOK_2) {
           snip.ace()._emit('focus');
         }
         hideHoverMsg(viewModel);
-        redrawFixedHeaders(200);
+        huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
       };
       window.replaceAce = replaceAce;
 
@@ -397,7 +139,7 @@ if (window.ENABLE_NOTEBOOK_2) {
               aceChecks--;
               if (aceChecks === 0) {
                 hideHoverMsg(viewModel);
-                redrawFixedHeaders(200);
+                huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
               }
             }
           }, 100);
@@ -609,7 +351,7 @@ if (window.ENABLE_NOTEBOOK_2) {
       });
 
       viewModel.isLeftPanelVisible.subscribe(value => {
-        redrawFixedHeaders(200);
+        huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
       });
 
       // Close the notebook snippets when leaving the page
@@ -693,14 +435,7 @@ if (window.ENABLE_NOTEBOOK_2) {
               .currentQueryTab() === 'queryResults'
           ) {
             e.preventDefault();
-            const $t = $(
-              '#snippet_' +
-                viewModel
-                  .selectedNotebook()
-                  .snippets()[0]
-                  .id()
-            ).find('.resultTable');
-            $t.hueDataTable().fnShowSearch();
+            huePubSub.publish(SHOW_GRID_SEARCH_EVENT);
             return false;
           }
         }
@@ -723,25 +458,14 @@ if (window.ENABLE_NOTEBOOK_2) {
           axis: 'y',
           start: function(e, ui) {
             initialResizePosition = ui.offset.top;
+            huePubSub.publish(HIDE_FIXED_HEADERS_EVENT);
           },
           drag: function(e, ui) {
             draggableHelper($(this), e, ui);
-            $('.jHueTableExtenderClonedContainer').hide();
-            $('.jHueTableExtenderClonedContainerColumn').hide();
-            $('.jHueTableExtenderClonedContainerCell').hide();
-            $('.fixed-header-row').hide();
-            $('.fixed-first-cell').hide();
-            $('.fixed-first-column').hide();
           },
           stop: function(e, ui) {
-            $('.jHueTableExtenderClonedContainer').show();
-            $('.jHueTableExtenderClonedContainerColum').show();
-            $('.jHueTableExtenderClonedContainerCell').show();
-            $('.fixed-header-row').show();
-            $('.fixed-first-cell').show();
-            $('.fixed-first-column').show();
             draggableHelper($(this), e, ui, true);
-            redrawFixedHeaders();
+            huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
             ui.helper.first().removeAttr('style');
           },
           containment: [0, minY, 4000, minY + 400]
@@ -758,144 +482,6 @@ if (window.ENABLE_NOTEBOOK_2) {
         );
       });
 
-      const resetResultsResizer = snippet => {
-        const $snippet = $('#snippet_' + snippet.id());
-        $snippet
-          .find('.table-results .column-side')
-          .width(hueUtils.bootstrapRatios.span3() + '%')
-          .data('newWidth', hueUtils.bootstrapRatios.span3());
-        if (snippet.isResultSettingsVisible()) {
-          $snippet
-            .find('.table-results .grid-side')
-            .data('newWidth', hueUtils.bootstrapRatios.span9())
-            .width(hueUtils.bootstrapRatios.span9() + '%');
-        } else {
-          $snippet
-            .find('.table-results .grid-side')
-            .data('newWidth', 100)
-            .width('100%');
-        }
-        $snippet.find('.resize-bar').css('left', '');
-        try {
-          $snippet.find('.resize-bar').draggable('destroy');
-        } catch (e) {}
-
-        let initialPosition = 0;
-
-        $snippet.find('.resize-bar').draggable({
-          axis: 'x',
-          containment: $snippet.find('.table-results'),
-          create: function() {
-            const $snip = $('#snippet_' + snippet.id());
-            initialPosition = $snip.find('.resize-bar').position().left;
-            $snip
-              .find('.table-results .column-side')
-              .data('newWidth', hueUtils.bootstrapRatios.span3());
-            $snip
-              .find('.meta-filter')
-              .width($snip.find('.table-results .column-side').width() - 28);
-          },
-          drag: function(event, ui) {
-            const $snip = $('#snippet_' + snippet.id());
-            if (initialPosition === 0) {
-              initialPosition = $snip.find('.resize-bar').position().left;
-            }
-            ui.position.left = Math.max(150, ui.position.left);
-            const newSpan3Width =
-              (ui.position.left * hueUtils.bootstrapRatios.span3()) / initialPosition;
-            const newSpan9Width = 100 - newSpan3Width - hueUtils.bootstrapRatios.margin();
-            $snip
-              .find('.table-results .column-side')
-              .width(newSpan3Width + '%')
-              .data('newWidth', newSpan3Width);
-            $snip
-              .find('.table-results .grid-side')
-              .width(newSpan9Width + '%')
-              .data('newWidth', newSpan9Width);
-            $snip
-              .find('.meta-filter')
-              .width($snip.find('.table-results .column-side').width() - 28);
-          },
-          stop: function() {
-            redrawFixedHeaders();
-            huePubSub.publish('resize.leaflet.map');
-          }
-        });
-      };
-
-      const resizeToggleResultSettings = (snippet, initial) => {
-        let _dtElement;
-        const $snip = $('#snippet_' + snippet.id());
-        if (snippet.showGrid()) {
-          _dtElement = $snip.find('.dataTables_wrapper');
-          const topCoord =
-            viewModel.isPresentationMode() || viewModel.isResultFullScreenMode()
-              ? window.BANNER_TOP_HTML
-                ? 31
-                : 1
-              : 73;
-          $snip.find('.snippet-grid-settings').css({
-            height:
-              viewModel.isPresentationMode() || !viewModel.editorMode()
-                ? '330px'
-                : Math.ceil(
-                    $(window).height() -
-                      Math.max(
-                        $('.result-settings').length > 0 ? $('.result-settings').offset().top : 0,
-                        topCoord
-                      )
-                  ) + 'px'
-          });
-        } else {
-          _dtElement = $snip.find('.chart:visible');
-        }
-        if (_dtElement.length === 0) {
-          _dtElement = $snip.find('.table-results');
-        }
-        _dtElement
-          .parents('.snippet-body')
-          .find('.toggle-result-settings')
-          .css({
-            height: _dtElement.height() - 30 + 'px',
-            'line-height': _dtElement.height() - 30 + 'px'
-          });
-        if (initial) {
-          $snip.find('.result-settings').css({
-            marginTop: 0
-          });
-          $snip.find('.snippet-actions').css({
-            marginTop: 0
-          });
-          huePubSub.publish('resize.leaflet.map');
-        }
-      };
-
-      const forceChartDraws = initial => {
-        if (viewModel.selectedNotebook()) {
-          viewModel
-            .selectedNotebook()
-            .snippets()
-            .forEach(snippet => {
-              if (snippet.result.data().length > 0) {
-                let _elCheckerInterval = -1;
-                const _el = $('#snippet_' + snippet.id());
-                _elCheckerInterval = window.setInterval(() => {
-                  if (_el.find('.resultTable').length > 0) {
-                    try {
-                      resizeToggleResultSettings(snippet, initial);
-                      resetResultsResizer(snippet);
-                      $(document).trigger('forceChartDraw', snippet);
-                    } catch (e) {}
-                    window.clearInterval(_elCheckerInterval);
-                  }
-                }, 200);
-              }
-            });
-        }
-      };
-
-      forceChartDraws(true);
-
       // ======== PubSub ========
 
       let splitDraggableTimeout = -1;
@@ -904,17 +490,8 @@ if (window.ENABLE_NOTEBOOK_2) {
         () => {
           window.clearTimeout(splitDraggableTimeout);
           splitDraggableTimeout = window.setTimeout(() => {
-            redrawFixedHeaders(100);
+            huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
           }, 200);
-        },
-        HUE_PUB_SUB_EDITOR_ID
-      );
-
-      huePubSub.subscribe(
-        'redraw.fixed.headers',
-        () => {
-          hideFixedHeaders();
-          redrawFixedHeaders(200);
         },
         HUE_PUB_SUB_EDITOR_ID
       );
@@ -923,7 +500,7 @@ if (window.ENABLE_NOTEBOOK_2) {
         'app.gained.focus',
         app => {
           if (app === 'editor') {
-            huePubSub.publish('redraw.fixed.headers');
+            huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
             huePubSub.publish('hue.scrollleft.show');
             huePubSub.publish('active.snippet.type.changed', {
               type: viewModel.editorType(),
@@ -951,20 +528,6 @@ if (window.ENABLE_NOTEBOOK_2) {
                 huePubSub.publish('editor.calculate.history.height');
               }
             );
-          }
-        },
-        HUE_PUB_SUB_EDITOR_ID
-      );
-
-      huePubSub.subscribe(
-        'detach.scrolls',
-        snippet => {
-          let scrollElement = $('#snippet_' + snippet.id()).find('.dataTables_wrapper');
-          if (viewModel.editorMode()) {
-            scrollElement = $(window.MAIN_SCROLLABLE);
-          }
-          if (scrollElement.data('scrollFnDt')) {
-            scrollElement.off('scroll', scrollElement.data('scrollFnDt'));
           }
         },
         HUE_PUB_SUB_EDITOR_ID
@@ -1090,10 +653,12 @@ if (window.ENABLE_NOTEBOOK_2) {
             } else {
               $('.main-content').css('top', '1px');
             }
-            redrawFixedHeaders(200);
+            window.setTimeout(() => {
+              huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
+            }, 200);
             $(window).bind('keydown', 'esc', exitPlayerMode);
           } else {
-            hideFixedHeaders();
+            huePubSub.publish(HIDE_FIXED_HEADERS_EVENT);
             huePubSub.publish('both.assists.show', true);
             viewModel.assistWithoutStorage(true);
             viewModel.isLeftPanelVisible(wasLeftPanelVisible);
@@ -1109,7 +674,9 @@ if (window.ENABLE_NOTEBOOK_2) {
             } else {
               $('.main-content').css('top', '74px');
             }
-            redrawFixedHeaders(200);
+            window.setTimeout(() => {
+              huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
+            }, 200);
             $(window).unbind('keydown', exitPlayerMode);
           }
         },
@@ -1152,84 +719,6 @@ if (window.ENABLE_NOTEBOOK_2) {
       );
 
       huePubSub.subscribe('editor.save', saveKeyHandler, HUE_PUB_SUB_EDITOR_ID);
-
-      huePubSub.subscribe(
-        'editor.render.data',
-        options => {
-          const $snip = $('#snippet_' + options.snippet.id());
-          const _el = $snip.find('.resultTable');
-          if (options.data.length > 0) {
-            window.setTimeout(() => {
-              let _dt;
-              if (options.initial) {
-                options.snippet.result.meta.notifySubscribers();
-                $('#snippet_' + options.snippet.id())
-                  .find('select')
-                  .trigger('chosen:updated');
-                _dt = createDatatable(_el, options.snippet, viewModel);
-                resetResultsResizer(options.snippet);
-              } else {
-                _dt = _el.hueDataTable();
-              }
-              try {
-                _dt.fnAddData(options.data);
-              } catch (e) {}
-              const _dtElement = $snip.find('.dataTables_wrapper');
-              huePubSub.publish('editor.snippet.result.normal', options.snippet);
-              _dtElement.scrollTop(_dtElement.data('scrollPosition'));
-              redrawFixedHeaders();
-              resizeToggleResultSettings(options.snippet, options.initial);
-            }, 300);
-          } else {
-            huePubSub.publish('editor.snippet.result.normal', options.snippet);
-          }
-          $snip.find('select').trigger('chosen:updated');
-          $snip.find('.snippet-grid-settings').scrollLeft(0);
-        },
-        HUE_PUB_SUB_EDITOR_ID
-      );
-
-      huePubSub.subscribe(
-        'editor.redraw.data',
-        options => {
-          hueUtils.waitForRendered(
-            '#snippet_' + options.snippet.id() + ' .resultTable',
-            el => {
-              return el.is(':visible');
-            },
-            () => {
-              const $el = $('#snippet_' + options.snippet.id()).find('.resultTable');
-              const dt = createDatatable($el, options.snippet, viewModel);
-              dt.fnAddData(options.snippet.result.data());
-            }
-          );
-        },
-        HUE_PUB_SUB_EDITOR_ID
-      );
-
-      huePubSub.subscribe(
-        'editor.snippet.result.gray',
-        snippet => {
-          const $snippet = $('#snippet_' + snippet.id());
-          $snippet.find('.dataTables_wrapper .fixed-first-column').css({ opacity: '0' });
-          $snippet.find('.dataTables_wrapper .fixed-header-row').css({ opacity: '0' });
-          $snippet.find('.dataTables_wrapper .fixed-first-cell').css({ opacity: '0' });
-          $snippet.find('.dataTables_wrapper .resultTable').css({ opacity: '0.55' });
-        },
-        HUE_PUB_SUB_EDITOR_ID
-      );
-
-      huePubSub.subscribe(
-        'editor.snippet.result.normal',
-        snippet => {
-          const $snippet = $('#snippet_' + snippet.id());
-          $snippet.find('.dataTables_wrapper .fixed-first-column').css({ opacity: '1' });
-          $snippet.find('.dataTables_wrapper .fixed-header-row').css({ opacity: '1' });
-          $snippet.find('.dataTables_wrapper .fixed-first-cell').css({ opacity: '1' });
-          $snippet.find('.dataTables_wrapper .resultTable').css({ opacity: '1' });
-        },
-        HUE_PUB_SUB_EDITOR_ID
-      );
 
       huePubSub.subscribe(
         'render.jqcron',
@@ -1326,34 +815,6 @@ if (window.ENABLE_NOTEBOOK_2) {
       );
 
       huePubSub.subscribe(
-        'editor.grid.shown',
-        snippet => {
-          hueUtils.waitForRendered(
-            '#snippet_' + snippet.id() + ' .dataTables_wrapper',
-            el => {
-              return el.is(':visible');
-            },
-            () => {
-              resizeToggleResultSettings(snippet, true);
-              forceChartDraws();
-              $('#snippet_' + snippet.id())
-                .find('.snippet-grid-settings')
-                .scrollLeft(0);
-            }
-          );
-        },
-        HUE_PUB_SUB_EDITOR_ID
-      );
-
-      huePubSub.subscribe(
-        'editor.chart.shown',
-        snippet => {
-          resizeToggleResultSettings(snippet, true);
-        },
-        HUE_PUB_SUB_EDITOR_ID
-      );
-
-      huePubSub.subscribe(
         'recalculate.name.description.width',
         () => {
           hueUtils.waitForRendered(
@@ -1384,8 +845,10 @@ if (window.ENABLE_NOTEBOOK_2) {
       );
 
       $(document).on('updateResultHeaders', e => {
-        hideFixedHeaders();
-        redrawFixedHeaders(200);
+        huePubSub.publish(HIDE_FIXED_HEADERS_EVENT);
+        window.setTimeout(() => {
+          huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
+        }, 200);
       });
 
       $(document).on('showAuthModal', (e, data) => {
@@ -1401,34 +864,16 @@ if (window.ENABLE_NOTEBOOK_2) {
         $('#clearHistoryModal' + window.EDITOR_SUFFIX).modal('hide');
       });
 
-      $(document).on('toggleResultSettings', (e, snippet) => {
-        window.setTimeout(() => {
-          const $snip = $('#snippet_' + snippet.id());
-          $snip.find('.chart').trigger('forceUpdate');
-          $snip.find('.snippet-grid-settings').scrollLeft(0);
-          if (snippet.isResultSettingsVisible()) {
-            $snip
-              .find('.table-results .grid-side')
-              .width(
-                100 -
-                  $snip.find('.table-results .column-side').data('newWidth') -
-                  hueUtils.bootstrapRatios.margin() +
-                  '%'
-              );
-          } else {
-            $snip.find('.table-results .grid-side').width('100%');
-          }
-          redrawFixedHeaders();
-          $(window).trigger('resize');
-        }, 10);
-      });
-
       $(document).on('editorSizeChanged', () => {
-        window.setTimeout(forceChartDraws, 50);
+        window.setTimeout(() => {
+          huePubSub.publish(REDRAW_CHART_EVENT);
+        }, 50);
       });
 
       $(document).on('redrawResults', () => {
-        window.setTimeout(forceChartDraws, 50);
+        window.setTimeout(() => {
+          huePubSub.publish(REDRAW_CHART_EVENT);
+        }, 50);
       });
 
       $(document).on('executeStarted', (e, options) => {
@@ -1461,7 +906,7 @@ if (window.ENABLE_NOTEBOOK_2) {
       });
 
       $(document).on('renderDataError', (e, options) => {
-        huePubSub.publish('editor.snippet.result.normal', options.snippet);
+        huePubSub.publish(SHOW_NORMAL_RESULT_EVENT);
       });
 
       $(document).on('progress', (e, options) => {
@@ -1476,18 +921,11 @@ if (window.ENABLE_NOTEBOOK_2) {
                 100,
                 () => {
                   options.snippet.progress(0);
-                  redrawFixedHeaders();
+                  huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
                 }
               );
           }, 2000);
         }
-      });
-
-      $(document).on('forceChartDraw', (e, snippet) => {
-        window.setTimeout(() => {
-          snippet.chartX.notifySubscribers();
-          snippet.chartX.valueHasMutated();
-        }, 100);
       });
 
       let hideTimeout = -1;
@@ -1501,14 +939,9 @@ if (window.ENABLE_NOTEBOOK_2) {
         }, 100);
       });
 
-      let _resizeTimeout = -1;
       $(window).on('resize', () => {
         huePubSub.publish('recalculate.name.description.width');
-        window.clearTimeout(_resizeTimeout);
-        _resizeTimeout = window.setTimeout(() => {
-          forceChartDraws();
-        }, 200);
       });
     }
   });
-}
+};

@@ -25,6 +25,12 @@ export default class DisposableComponent {
     });
   }
 
+  trackPubSub(pubSub) {
+    this.disposals.push(() => {
+      pubSub.remove();
+    });
+  }
+
   addDisposalCallback(callback) {
     this.disposals.push(callback);
   }

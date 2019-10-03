@@ -508,7 +508,22 @@
         <pre data-bind="visible: result.logs() && result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs" class="logs logs-bigger logs-populated"></pre>
       </span>
       </div>
-      <div class="snippet-log-resizer" data-bind="visible: result.logs().length > 0, logResizer: {parent: '.snippet-log-container', target: '.logs-populated', mainScrollable: MAIN_SCROLLABLE, onStart: hideFixedHeaders, onResize: function(){ hideFixedHeaders(); redrawFixedHeaders(500); }, minHeight: 50}">
+      <div class="snippet-log-resizer" data-bind="
+          visible: result.logs().length > 0,
+          logResizer: {
+            parent: '.snippet-log-container',
+            target: '.logs-populated',
+            mainScrollable: MAIN_SCROLLABLE,
+            onStart: function () { huePubSub.publish('result.grid.hide.fixed.headers') },
+            onResize: function() {
+              huePubSub.publish('result.grid.hide.fixed.headers');
+              window.setTimeout(function () {
+                huePubSub.publish('result.grid.redraw.fixed.headers');
+              }, 500);
+            },
+            minHeight: 50
+          }
+        ">
         <i class="fa fa-ellipsis-h"></i>
       </div>
     </div>
@@ -575,19 +590,6 @@
               (<span data-bind="text: result.rows().toLocaleString() + (type() == 'impala' && result.rows() == 1024 ? '+' : '')" title="${ _('Number of rows') }"></span>)
               <!-- /ko -->
             </a>
-            <div style="margin-left: -15px;" class="inline-block">
-              <!-- ko if: showGrid -->
-              <div class="inline-block inactive-action pointer visible-on-hover" title="${_('Search the results')}" data-bind="click: function(data, e){ $(e.target).parents('.snippet').find('.resultTable').hueDataTable().fnShowSearch() }">
-                <i class="snippet-icon fa fa-search"></i>
-              </div>
-              <!-- /ko -->
-              <div class="inline-block inactive-action pointer visible-on-hover" title="${_('Expand results')}" rel="tooltip" data-bind="css: { 'margin-left-10': !showGrid()}, visible: !$root.isResultFullScreenMode(), click: function(){ $root.isResultFullScreenMode(true); }">
-                <i class="snippet-icon fa fa-expand"></i>
-              </div>
-              <div class="inline-block inactive-action pointer visible-on-hover" title="${_('Collapse results')}" rel="tooltip" data-bind="visible: $root.isResultFullScreenMode(), click: function(){ $root.isResultFullScreenMode(false); }">
-                <i class="snippet-icon fa fa-compress"></i>
-              </div>
-            </div>
           </li>
           <!-- ko if: result.explanation().length > 0 -->
           <li data-bind="click: function(){ currentQueryTab('queryExplain'); }, css: {'active': currentQueryTab() == 'queryExplain'}"><a class="inactive-action" href="#queryExplain" data-toggle="tab">${_('Explain')}</a></li>
@@ -733,7 +735,6 @@
           <div class="tab-pane" id="queryResults" data-bind="css: {'active': currentQueryTab() == 'queryResults'}">
             <!-- ko if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) === -1 -->
               <!-- ko component: { name: 'snippet-results', params: {
-                chartType: chartType,
                 data: result.data,
                 editorMode: parentVm.editorMode,
                 fetchResult: result.fetchMoreRows,
@@ -743,12 +744,8 @@
                 images: result.images,
                 isPresentationMode: parentNotebook.isPresentationMode,
                 isResultFullScreenMode: parentVm.isResultFullScreenMode,
-                isResultSettingsVisible: isResultSettingsVisible,
-                isResultSettingsVisible: isResultSettingsVisible,
                 meta: result.meta,
                 resultsKlass: resultsKlass,
-                showChart: showChart,
-                showGrid: showGrid,
                 status: status,
                 type: result.type,
               }} --><!-- /ko -->
@@ -892,7 +889,6 @@
             <!-- /ko -->
             <!-- ko if: !$root.editorMode() && ['text', 'jar', 'java', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'].indexOf(type()) === -1 -->
               <!-- ko component: { name: 'snippet-results', params: {
-                chartType: chartType,
                 data: result.data,
                 editorMode: parentVm.editorMode,
                 fetchResult: result.fetchMoreRows,
@@ -902,12 +898,8 @@
                 images: result.images,
                 isPresentationMode: parentNotebook.isPresentationMode,
                 isResultFullScreenMode: parentVm.isResultFullScreenMode,
-                isResultSettingsVisible: isResultSettingsVisible,
-                isResultSettingsVisible: isResultSettingsVisible,
                 meta: result.meta,
                 resultsKlass: resultsKlass,
-                showChart: showChart,
-                showGrid: showGrid,
                 status: status,
                 type: result.type,
               }} --><!-- /ko -->
@@ -1327,7 +1319,14 @@
 
   <script type="text/html" id="snippet-execution-status${ suffix }">
     <div class="snippet-execution-status" data-bind="clickForAceFocus: ace">
-      <a class="inactive-action pull-left snippet-logs-btn" href="javascript:void(0)" data-bind="visible: status() === 'running' && errors().length == 0, click: function() { hideFixedHeaders(); $data.showLogs(!$data.showLogs());}, css: {'blue': $data.showLogs}" title="${ _('Toggle Logs') }"><i class="fa fa-fw" data-bind="css: { 'fa-caret-right': !$data.showLogs(), 'fa-caret-down': $data.showLogs() }"></i></a>
+      <a class="inactive-action pull-left snippet-logs-btn" href="javascript:void(0)" data-bind="
+          visible: status() === 'running' && errors().length == 0,
+          click: function() {
+            huePubSub.publish('result.grid.hide.fixed.headers');
+            $data.showLogs(!$data.showLogs());
+          },
+          css: {'blue': $data.showLogs}
+        " title="${ _('Toggle Logs') }"><i class="fa fa-fw" data-bind="css: { 'fa-caret-right': !$data.showLogs(), 'fa-caret-down': $data.showLogs() }"></i></a>
       <div class="snippet-progress-container" data-bind="visible: status() != 'canceled' && status() != 'with-optimizer-report'">
         <!-- ko component: { name: 'executable-progress-bar', params: { snippet: $data } } --><!-- /ko -->
       </div>
@@ -1364,7 +1363,13 @@
   </script>
 
   <script type="text/html" id="snippet-code-resizer${ suffix }">
-    <div class="snippet-code-resizer" data-bind="aceResizer : { snippet: $data, target: '.ace-container-resizable', onStart: hideFixedHeaders, onStop: redrawFixedHeaders }">
+    <div class="snippet-code-resizer" data-bind="
+        aceResizer : {
+          snippet: $data,
+          target: '.ace-container-resizable',
+          onStart: function () { huePubSub.publish('result.grid.hide.fixed.headers') },
+          onStop: function () { huePubSub.publish('result.grid.redraw.fixed.headers') }
+        }">
       <i class="fa fa-ellipsis-h"></i>
     </div>
   </script>
