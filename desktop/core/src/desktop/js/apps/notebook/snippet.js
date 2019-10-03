@@ -2351,7 +2351,7 @@ class Snippet {
     self.checkDdlNotification = function() {
       if (
         self.lastExecutedStatement() &&
-        /ALTER|CREATE|DELETE|DROP|GRANT|INSERT|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i.test(
+        /ALTER|CREATE|DELETE|DROP|GRANT|INSERT|INVALIDATE|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i.test(
           self.lastExecutedStatement().firstToken
         )
       ) {
