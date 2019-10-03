@@ -40,7 +40,7 @@ RUN mkdir -p ${HUE_CONF} && chown -R ${HUE_USER}:${HUE_USER} ${HUE_CONF}
 RUN echo "${HUE_USER} ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/${HUE_USER} && \
     chmod 0440 /etc/sudoers.d/${HUE_USER}
 
-COPY --chown=${HUE_USER}:${HUE_USER} hueconf ${HUE_CONF_DIR}
+COPY --chown=${HUE_USER}:${HUE_USER} hueconf ${HUE_CONF}/conf
 
 RUN ln -s ${HUE_CONF}/conf/log.conf ${HUE_HOME}/desktop/conf/log.conf; \
     ln -s ${HUE_CONF}/conf/log4j.properties ${HUE_HOME}/desktop/conf/log4j.properties

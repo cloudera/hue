@@ -37,7 +37,10 @@ subst_var() {
     fi
   fi
 
-  envsubst < $file_name > $out_name
+  eval "cat <<EOF
+$(<$file_name)
+EOF
+" | tee $out_name 2> /dev/null
 }
 
 docker_hue_build() {
