@@ -35,6 +35,7 @@ import Result from 'apps/notebook2/result';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
 import { notebookToContextJSON, snippetToContextJSON } from 'apps/notebook2/notebookSerde';
+import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/components/resultGrid/ko.resultGrid';
 
 // TODO: Remove. Temporary here for debug
 window.SqlExecutable = SqlExecutable;
@@ -303,7 +304,7 @@ export default class Snippet {
 
     this.lastQueriesPage = 1;
     this.currentQueryTab.subscribe(newValue => {
-      huePubSub.publish('redraw.fixed.headers');
+      huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
       huePubSub.publish('current.query.tab.switched', newValue);
       if (
         newValue === 'savedQueries' &&
@@ -754,11 +755,6 @@ export default class Snippet {
     if (!this.result.hasSomeResults()) {
       this.currentQueryTab('queryHistory');
     }
-    this.showGrid = ko.observable(snippet.showGrid !== false);
-    this.showChart = ko.observable(!!snippet.showChart);
-    if (!this.showGrid() && !this.showChart()) {
-      this.showGrid(true);
-    }
     let defaultShowLogs = true;
     if (this.parentVm.editorMode() && $.totalStorage('hue.editor.showLogs')) {
       defaultShowLogs = $.totalStorage('hue.editor.showLogs');
@@ -774,23 +770,8 @@ export default class Snippet {
       $(document).trigger('progress', { data: val, snippet: this });
     });
 
-    this.showGrid.subscribe(val => {
-      if (val) {
-        this.showChart(false);
-        huePubSub.publish('editor.grid.shown', this);
-      }
-    });
-
-    this.showChart.subscribe(val => {
-      if (val) {
-        this.showGrid(false);
-        this.isResultSettingsVisible(true);
-        $(document).trigger('forceChartDraw', this);
-        huePubSub.publish('editor.chart.shown', this);
-      }
-    });
     this.showLogs.subscribe(val => {
-      huePubSub.publish('redraw.fixed.headers');
+      huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
       if (val) {
         this.getLogs();
       }
@@ -806,22 +787,6 @@ export default class Snippet {
     this.errorsKlass = ko.pureComputed(() => this.resultsKlass() + ' alert alert-error');
 
     this.is_redacted = ko.observable(!!snippet.is_redacted);
-
-    this.chartType = ko.observable(snippet.chartType || window.HUE_CHARTS.TYPES.BARCHART);
-
-    this.chartData = ko.observableArray(snippet.chartData || []);
-
-    this.chartType.subscribe(() => {
-      $(document).trigger('forceChartDraw', this);
-    });
-
-    this.previousChartOptions = {};
-
-    this.isResultSettingsVisible = ko.observable(!!snippet.isResultSettingsVisible);
-
-    this.isResultSettingsVisible.subscribe(() => {
-      $(document).trigger('toggleResultSettings', this);
-    });
 
     this.settingsVisible = ko.observable(!!snippet.settingsVisible);
     this.saveResultsModalVisible = ko.observable(false);
@@ -1029,9 +994,6 @@ export default class Snippet {
     });
 
     this.longOperationTimeout = -1;
-
-    this.lastExecutedStatements = undefined;
-    this.lastExecutedSelectionRange = undefined;
 
     this.lastCompatibilityRequest = undefined;
 
@@ -1939,10 +1901,6 @@ export default class Snippet {
   stopLongOperationTimeout() {
     window.clearTimeout(this.longOperationTimeout);
     this.showLongOperationWarning(false);
-  }
-
-  toggleResultSettings() {
-    this.isResultSettingsVisible(!this.isResultSettingsVisible());
   }
 
   uploadQuery(query_id) {

@@ -18,10 +18,13 @@ import ko from 'knockout';
 
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
+import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 
 import 'apps/notebook2/components/resultChart/ko.resultChart';
 import 'apps/notebook2/components/resultGrid/ko.resultGrid';
+import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/components/resultGrid/ko.resultGrid';
+import { REDRAW_CHART_EVENT } from 'apps/notebook2/components/resultChart/ko.resultChart';
 
 export const NAME = 'snippet-results';
 
@@ -39,97 +42,25 @@ const isStringColumn = type =>
 // prettier-ignore
 const TEMPLATE = `
 <div class="snippet-row">
-  <div class="result-left-bar">
-    <!-- ko if: type() === 'table' && hasSomeResults() -->
-    <div class="snippet-actions" style="opacity:1">
-      <div style="margin-top:25px;">
-        <a class="snippet-side-btn" href="javascript: void(0)" data-bind="
-            click: function() { showGrid(true); huePubSub.publish('redraw.fixed.headers'); huePubSub.publish('table.extender.redraw'); },
-            css: { 'active': showGrid }
-          " title="${ I18n('Grid') }">
-          <i class="fa fa-fw fa-th"></i>
-        </a>
-      </div>
-
-      <div class="dropdown">
-        <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="css: { 'active': showChart }, click: function() { showChart(true); }" >
-          <i class="hcha fa-fw hcha-bar-chart" data-bind="visible: chartType() === window.HUE_CHARTS.TYPES.BARCHART" title="${ I18n('Bars') }"></i>
-          <i class="hcha fa-fw hcha-timeline-chart" data-bind="visible: chartType() === window.HUE_CHARTS.TYPES.TIMELINECHART" title="${ I18n('Time') }"></i>
-          <i class="hcha fa-fw hcha-pie-chart" data-bind="visible: chartType() === window.HUE_CHARTS.TYPES.PIECHART" title="${ I18n('Pie') }"></i>
-          <i class="fa fa-fw fa-dot-circle-o" data-bind="visible: chartType() === window.HUE_CHARTS.TYPES.SCATTERCHART" title="${ I18n('Scatter') }"></i>
-          <i class="fa fa-fw fa-map-marker" data-bind="visible: chartType() === window.HUE_CHARTS.TYPES.MAP" title="${ I18n('Marker Map') }"></i>
-          <i class="hcha fa-fw hcha-map-chart" data-bind="visible: chartType() === window.HUE_CHARTS.TYPES.GRADIENTMAP" title="${ I18n('Gradient Map') }"></i>
-        </a>
-        <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown" href="javascript: void(0)" data-bind="css: { 'active': showChart }">
-          <i class="fa fa-caret-down"></i>
-        </a>
-
-        <ul class="dropdown-menu less-padding">
-          <li>
-            <a href="javascript:void(0)" data-bind="css: { 'active': chartType() === window.HUE_CHARTS.TYPES.BARCHART }, click: function() { showChart(true); chartType(window.HUE_CHARTS.TYPES.BARCHART); }">
-              <i class="hcha hcha-bar-chart"></i> ${ I18n('Bars') }
-            </a>
-          </li>
-          <li data-bind="visible: cleanedDateTimeMeta().length > 0">
-            <a href="javascript:void(0)" data-bind="css: { 'active': chartType() === window.HUE_CHARTS.TYPES.TIMELINECHART }, click: function() { showChart(true); chartType(window.HUE_CHARTS.TYPES.TIMELINECHART); }">
-              <i class="hcha hcha-timeline-chart"></i> ${ I18n('Time') }
-            </a>
-          </li>
-          <li>
-            <a href="javascript:void(0)" data-bind="css: { 'active': chartType() === window.HUE_CHARTS.TYPES.PIECHART }, click: function() { showChart(true); chartType(window.HUE_CHARTS.TYPES.PIECHART); }">
-              <i class="hcha hcha-pie-chart"></i> ${ I18n('Pie') }
-            </a>
-          </li>
-          <li>
-            <a href="javascript:void(0)" data-bind="css: { 'active': chartType() === window.HUE_CHARTS.TYPES.SCATTERCHART }, click: function() { showChart(true); chartType(window.HUE_CHARTS.TYPES.SCATTERCHART); }">
-              <i class="fa fa-fw fa-dot-circle-o chart-icon"></i> ${ I18n('Scatter') }
-            </a>
-          </li>
-          <li>
-            <a href="javascript:void(0)" data-bind="css: { 'active': chartType() === window.HUE_CHARTS.TYPES.MAP }, click: function() { showChart(true); chartType(window.HUE_CHARTS.TYPES.MAP); }">
-              <i class="fa fa-fw fa-map-marker chart-icon"></i> ${ I18n('Marker Map') }
-            </a>
-          </li>
-          <li>
-            <a href="javascript:void(0)" data-bind="css: {' active': chartType() === window.HUE_CHARTS.TYPES.GRADIENTMAP }, click: function() { showChart(true); chartType(window.HUE_CHARTS.TYPES.GRADIENTMAP); }">
-              <i class="hcha hcha-map-chart"></i> ${ I18n('Gradient Map') }
-            </a>
-          </li>
-        </ul>
-      </div>
-
-      <div>
-        <a class="snippet-side-btn" href="javascript:void(0)" data-bind="
-            toggle: isResultSettingsVisible,
-            publish: 'chart.hard.reset',
-            css: { 'blue' : isResultSettingsVisible }
-          " title="${ I18n('Columns') }">
-          <!-- ko if: isResultSettingsVisible() -->
-          <i class="fa fa-fw fa-chevron-left"></i>
-          <!-- /ko -->
-          <!-- ko ifnot: isResultSettingsVisible() -->
-          <i class="fa fa-fw fa-columns"></i>
-          <!-- /ko -->
-        </a>
-      </div>
-
-      <!-- ko if: false && window.ENABLE_DOWNLOAD -->
-        <div data-bind="
-            component: {
-              name: 'downloadSnippetResults',
-              params: {
-                gridSideBtn: false,
-                snippet: $data,
-                notebook: $parent 
-              } 
-            }
-          " style="display:inline-block;"></div>
-      <!-- /ko -->
+  <div class="result-actions">
+    <div class="btn-group">
+      <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: showGrid, css: { 'active': showGrid }"><i class="fa fa-fw fa-th"></i> ${ I18n('Grid') }</button>
+      <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: showChart, css: { 'active': showChart }"><i class="hcha fa-fw hcha-bar-chart"></i> ${ I18n('Chart') }</button>
     </div>
-    <!-- /ko -->
+    <div class="btn-group pull-right">
+      <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: isResultFullScreenMode">
+        <!-- ko if: isResultFullScreenMode -->
+        <i class="fa fa-compress"></i> ${ I18n('Collapse') }
+        <!-- /ko -->
+        <!-- ko ifnot: isResultFullScreenMode -->
+        <i class="fa fa-expand"></i> ${ I18n('Expand') }
+        <!-- /ko -->
+      </button>
+    </div>
   </div>
+  
   <div class="result-body">
-    <div data-bind="visible: type() !== 'table'" style="display:none; max-height: 400px; margin: 10px 0; overflow-y: auto">
+    <div data-bind="visible: type() !== 'table'" style="display:none; margin: 10px 0; overflow-y: auto">
       <!-- ko if: data().length && data()[0][1] != "" -->
       <pre data-bind="text: data()[0][1]" class="no-margin-bottom"></pre>
       <!-- /ko -->
@@ -144,35 +75,37 @@ const TEMPLATE = `
       </ul>
       <!-- /ko -->
     </div>
-
-    <div class="table-results" data-bind="visible: type() === 'table'" style="display: none; max-height: 400px; min-height: 290px;">
-      <div data-bind="visible: showGrid" style="display: none;">
-        <!-- ko component: { name: 'result-grid', params: {
-          data: data,
-          editorMode: editorMode,
-          fetchResult: fetchResult,
-          hasMore: hasMore,
-          isPresentationMode: isPresentationMode,
-          isResultFullScreenMode: isResultFullScreenMode,
-          isResultSettingsVisible: isResultSettingsVisible,
-          meta: meta,
-          resultsKlass: resultsKlass,
-          status: status,
-        } } --><!-- /ko -->
+    <div class="table-results" data-bind="visible: type() === 'table'" style="display: none;">
+      <div data-bind="visible: showGrid" style="display: none; position: relative;">
+        <!-- ko component: { 
+          name: 'result-grid',
+          params: {
+            data: data,
+            editorMode: editorMode,
+            fetchResult: fetchResult,
+            hasMore: hasMore,
+            isPresentationMode: isPresentationMode,
+            isResultFullScreenMode: isResultFullScreenMode,
+            meta: meta,
+            resultsKlass: resultsKlass,
+            status: status
+          }
+        } --><!-- /ko -->
       </div>
-      <div data-bind="visible: showChart" style="display: none;">
-        <!-- ko component: { name: 'result-chart', params: {
-          chartType: chartType,
-          cleanedMeta: cleanedMeta,
-          cleanedDateTimeMeta: cleanedDateTimeMeta,
-          cleanedNumericMeta: cleanedNumericMeta,
-          cleanedStringMeta: cleanedStringMeta,
-          data: data,
-          id: id,
-          isResultSettingsVisible: isResultSettingsVisible,
-          meta: meta,
-          showChart: showChart
-        } } --><!-- /ko -->
+      <div data-bind="visible: showChart" style="display: none; position: relative;">
+        <!-- ko component: {
+          name: 'result-chart',
+          params: {
+            cleanedMeta: cleanedMeta,
+            cleanedDateTimeMeta: cleanedDateTimeMeta,
+            cleanedNumericMeta: cleanedNumericMeta,
+            cleanedStringMeta: cleanedStringMeta,
+            data: data,
+            id: id,
+            meta: meta,
+            showChart: showChart
+          }
+        } --><!-- /ko -->
       </div>
     </div>
   </div>
@@ -184,14 +117,9 @@ class SnippetResults extends DisposableComponent {
     super();
     this.element = element;
 
-    // For this and possibly chart and grid
-    this.chartType = params.chartType;
     this.type = params.type; // result
     this.hasSomeResults = params.hasSomeResults; // result
     this.images = params.images; // result
-    this.showGrid = params.showGrid;
-    this.showChart = params.showChart;
-    this.isResultSettingsVisible = params.isResultSettingsVisible;
     this.data = params.data; // result
     this.meta = params.meta; // result
 
@@ -206,6 +134,30 @@ class SnippetResults extends DisposableComponent {
 
     // Chart specific
     this.id = params.id;
+
+    this.showGrid = ko.observable(true); // TODO: Should be persisted
+    this.showChart = ko.observable(false); // TODO: Should be persisted
+
+    this.trackKoSub(
+      this.showChart.subscribe(val => {
+        if (val) {
+          this.showGrid(false);
+          huePubSub.publish(REDRAW_CHART_EVENT);
+          huePubSub.publish('editor.chart.shown', this);
+        }
+      })
+    );
+
+    this.trackKoSub(
+      this.showGrid.subscribe(val => {
+        if (val) {
+          this.showChart(false);
+          huePubSub.publish('editor.grid.shown', this);
+          huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
+          huePubSub.publish('table.extender.redraw');
+        }
+      })
+    );
 
     this.cleanedMeta = ko.pureComputed(() => this.meta().filter(item => item.name !== ''));
 

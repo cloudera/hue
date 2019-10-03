@@ -28,18 +28,18 @@ const TEMPLATE = `
 <div class="snippet-execute-actions" data-test="${NAME}">
   <div class="btn-group">
     <!-- ko if: status() !== '${EXECUTION_STATUS.running}' -->
-    <button class="btn btn-primary btn-mini btn-execute" data-test="execute" data-bind="click: execute"><i class="fa fa-play fa-fw"></i> ${I18n(
+    <button class="btn btn-primary btn-mini btn-execute disable-feedback" data-test="execute" data-bind="click: execute"><i class="fa fa-play fa-fw"></i> ${I18n(
       'Execute'
     )}</button>
     <!-- /ko -->
     <!-- ko if: status() === '${EXECUTION_STATUS.running}' -->
     <!-- ko ifnot: stopping -->
-    <button class="btn btn-primary btn-mini btn-execute" data-test="stop" data-bind="click: stop"><i class="fa fa-stop fa-fw"></i> ${I18n(
+    <button class="btn btn-primary btn-mini btn-execute disable-feedback" data-test="stop" data-bind="click: stop"><i class="fa fa-stop fa-fw"></i> ${I18n(
       'Stop'
     )}</button>
     <!-- /ko -->
     <!-- ko if: stopping -->
-    <button class="btn btn-primary btn-mini btn-execute disabled"><i class="fa fa-spinner fa-spin fa-fw"></i> ${I18n(
+    <button class="btn btn-primary btn-mini btn-execute disable-feedback disabled"><i class="fa fa-spinner fa-spin fa-fw"></i> ${I18n(
       'Stop'
     )}</button>
     <!-- /ko -->
