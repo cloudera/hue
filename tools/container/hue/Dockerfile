@@ -26,8 +26,10 @@ ENV NAME="hue" \
 # create hue user
 RUN groupadd -g 1123 ${HUEUSER} && useradd -g 1123 -d ${HUE_HOME} -s /bin/bash -u 1123 ${HUEUSER}
 
-COPY --chown=${HUEUSER}:${HUEUSER} hue ${HUE_HOME}
-COPY --chown=${HUEUSER}:${HUEUSER} hue.sh ${HUE_HOME}/hue.sh
+COPY hue ${HUE_HOME}
+COPY hue.sh ${HUE_HOME}/hue.sh
+
+RUN chown -R ${HUEUSER}:${HUEUSER} ${HUE_HOME}
 
 # Install psycopg2-binary
 RUN $HUE_BIN/pip install /tmp/psycopg2_binary-2.8.3-cp27-cp27mu-manylinux1_x86_64.whl
@@ -40,7 +42,8 @@ RUN mkdir -p ${HUE_CONF} && chown -R ${HUEUSER}:${HUEUSER} ${HUE_CONF}
 RUN echo "${HUEUSER} ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/${HUEUSER} && \
     chmod 0440 /etc/sudoers.d/${HUEUSER}
 
-COPY --chown=${HUEUSER}:${HUEUSER} hueconf ${HUE_CONF}/conf
+COPY hueconf ${HUE_CONF}/conf
+RUN chown -R ${HUEUSER}:${HUEUSER} ${HUE_CONF}/conf
 
 RUN ln -s ${HUE_CONF}/conf/log.conf ${HUE_HOME}/desktop/conf/log.conf; \
     ln -s ${HUE_CONF}/conf/log4j.properties ${HUE_HOME}/desktop/conf/log4j.properties
