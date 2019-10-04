@@ -24,23 +24,23 @@ ENV NAME="hue" \
     SUPERVISOR_VERSION=4.0.2
 
 # create hue user
-RUN groupadd -g 1123 ${HUE_USER} && useradd -g 1123 -d ${HUE_HOME} -s /bin/bash -u 1123 ${HUE_USER}
+RUN groupadd -g 1123 ${HUEUSER} && useradd -g 1123 -d ${HUE_HOME} -s /bin/bash -u 1123 ${HUEUSER}
 
-COPY --chown=${HUE_USER}:${HUE_USER} hue ${HUE_HOME}
-COPY --chown=${HUE_USER}:${HUE_USER} hue.sh ${HUE_HOME}/hue.sh
+COPY --chown=${HUEUSER}:${HUEUSER} hue ${HUE_HOME}
+COPY --chown=${HUEUSER}:${HUEUSER} hue.sh ${HUE_HOME}/hue.sh
 
 # Install psycopg2-binary
 RUN $HUE_BIN/pip install /tmp/psycopg2_binary-2.8.3-cp27-cp27mu-manylinux1_x86_64.whl
 
 # Setup directory structure
-RUN mkdir -p ${HUE_LOG_DIR} && chown -R ${HUE_USER}:${HUE_USER} ${HUE_LOG_DIR}
-RUN mkdir -p ${HUE_CONF} && chown -R ${HUE_USER}:${HUE_USER} ${HUE_CONF}
+RUN mkdir -p ${HUE_LOG_DIR} && chown -R ${HUEUSER}:${HUEUSER} ${HUE_LOG_DIR}
+RUN mkdir -p ${HUE_CONF} && chown -R ${HUEUSER}:${HUEUSER} ${HUE_CONF}
 
 # sudo privilege
-RUN echo "${HUE_USER} ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/${HUE_USER} && \
-    chmod 0440 /etc/sudoers.d/${HUE_USER}
+RUN echo "${HUEUSER} ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/${HUEUSER} && \
+    chmod 0440 /etc/sudoers.d/${HUEUSER}
 
-COPY --chown=${HUE_USER}:${HUE_USER} hueconf ${HUE_CONF}/conf
+COPY --chown=${HUEUSER}:${HUEUSER} hueconf ${HUE_CONF}/conf
 
 RUN ln -s ${HUE_CONF}/conf/log.conf ${HUE_HOME}/desktop/conf/log.conf; \
     ln -s ${HUE_CONF}/conf/log4j.properties ${HUE_HOME}/desktop/conf/log4j.properties
