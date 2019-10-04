@@ -24,15 +24,15 @@ ENV NAME="hue" \
     SUPERVISOR_VERSION=4.0.2
 
 # create hue user
-RUN groupadd -g 1123 ${HUE_USER} && useradd -g 1123 -d ${HUE_HOME} -s /bin/bash -u 1123 ${HUE_USER}
+RUN groupadd -g 1123 ${HUEUSER} && useradd -g 1123 -d ${HUE_HOME} -s /bin/bash -u 1123 ${HUEUSER}
 
-RUN mkdir -p ${HUE_LOG_DIR} && chown -R ${HUE_USER}:${HUE_USER} ${HUE_LOG_DIR}
+RUN mkdir -p ${HUE_LOG_DIR} && chown -R ${HUEUSER}:${HUEUSER} ${HUE_LOG_DIR}
 RUN echo "Include /etc/httpd/conf.d/hue_httpd.conf" >> /etc/httpd/conf/httpd.conf
 
-COPY --chown=${HUE_USER}:${HUE_USER} static ${HUE_HOME}/build/static
-COPY --chown=${HUE_USER}:${HUE_USER} hue_httpd.conf /etc/httpd/conf.d/hue_httpd.conf
-COPY --chown=${HUE_USER}:${HUE_USER} hue.conf /etc/httpd/conf.d/hue.conf
-COPY --chown=${HUE_USER}:${HUE_USER} run_httpd.sh ${HUE_HOME}
+COPY --chown=${HUEUSER}:${HUEUSER} static ${HUE_HOME}/build/static
+COPY --chown=${HUEUSER}:${HUEUSER} hue_httpd.conf /etc/httpd/conf.d/hue_httpd.conf
+COPY --chown=${HUEUSER}:${HUEUSER} hue.conf /etc/httpd/conf.d/hue.conf
+COPY --chown=${HUEUSER}:${HUEUSER} run_httpd.sh ${HUE_HOME}
 RUN chmod -v +x ${HUE_HOME}/run_httpd.sh
 
 EXPOSE 80
