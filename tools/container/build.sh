@@ -65,6 +65,7 @@ docker_hue_build() {
     --build-arg GBRANCH=$GBRANCH \
     --build-arg VERSION=$VERSION \
     --build-arg HUEUSER=$HUEUSER \
+    --build-arg HUE_CONF=$HUE_CONF \
     .
 }
 
@@ -88,6 +89,7 @@ docker_huelb_build() {
     --build-arg GBRANCH=$GBRANCH \
     --build-arg VERSION=$VERSION \
     --build-arg HUEUSER=$HUEUSER \
+    --build-arg HUE_CONF=$HUE_CONF \
     .
 }
 
