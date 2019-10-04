@@ -101,13 +101,12 @@ def is_admin(user):
   is_admin = False
   if hasattr(user, 'is_superuser'):
     is_admin = user.is_superuser
-  if not is_admin:
+  if not is_admin and user.is_authenticated():
     try:
       user = rewrite_user(user)
       is_admin = user.has_hue_permission(action="superuser", app="useradmin")
     except Exception as e:
       LOG.exception("Could not validate if %s is a superuser assuming False." % user)
-      is_admin = False
   return is_admin
 
 class DefaultUserAugmentor(object):
