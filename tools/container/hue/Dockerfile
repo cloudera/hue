@@ -7,11 +7,11 @@ ARG GSHA
 ARG GBRANCH
 ARG VERSION
 ARG HUEUSER
+ARG HUE_CONF
 
 # Set the environment variable
 ENV NAME="hue" \
     HUE_USER=${HUEUSER} \
-    HUE_CONF="/etc/hue" \
     HUE_HOME="/opt/${HUEUSER}" \
     HUE_CONF_DIR="${HUE_CONF}/conf" \
     HUE_LOG_DIR="/var/log/${HUEUSER}" \
