@@ -28,11 +28,13 @@ RUN groupadd -g 1123 ${HUEUSER} && useradd -g 1123 -d ${HUE_HOME} -s /bin/bash -
 RUN mkdir -p ${HUE_LOG_DIR} && chown -R ${HUEUSER}:${HUEUSER} ${HUE_LOG_DIR}
 RUN echo "Include /etc/httpd/conf.d/hue_httpd.conf" >> /etc/httpd/conf/httpd.conf
 
-COPY --chown=${HUEUSER}:${HUEUSER} static ${HUE_HOME}/build/static
-COPY --chown=${HUEUSER}:${HUEUSER} hue_httpd.conf /etc/httpd/conf.d/hue_httpd.conf
-COPY --chown=${HUEUSER}:${HUEUSER} hue.conf /etc/httpd/conf.d/hue.conf
-COPY --chown=${HUEUSER}:${HUEUSER} run_httpd.sh ${HUE_HOME}
-RUN chmod -v +x ${HUE_HOME}/run_httpd.sh
+COPY static ${HUE_HOME}/build/static
+COPY hue_httpd.conf /etc/httpd/conf.d/hue_httpd.conf
+COPY hue.conf /etc/httpd/conf.d/hue.conf
+COPY run_httpd.sh ${HUE_HOME}
+RUN chown -R ${HUEUSER}:${HUEUSER} ${HUE_HOME}/build/static \
+      /etc/httpd/conf.d/hue* \
+      ${HUE_HOME}/run_httpd.sh && chmod -v +x ${HUE_HOME}/run_httpd.sh
 
 EXPOSE 80
 # https://httpd.apache.org/docs/2.4/stopping.html#gracefulstop
