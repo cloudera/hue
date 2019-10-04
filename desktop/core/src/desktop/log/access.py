@@ -102,10 +102,11 @@ class AccessInfo(dict):
     is_instrumentation = desktop.conf.INSTRUMENTATION.get()
     self['duration'] = ' returned in %dms' % ((time.time() - start_time) * 1000) if start_time is not None else ''
     self['memory'] = ' (mem: %dmb)' % self.memory_usage_resource() if is_instrumentation else ''
-    self['http_code'] = ' %s %s' % (response.status_code, len(response.content)) if response is not None else ('', '')
+    self['http_code'] = ' %s' % response.status_code if response is not None else ''
+    self['size'] = ' %s' % len(response.content) if response is not None and hasattr(response, 'content') else ' -'
     self['msg'] = ('-- %s' % msg) if msg else ''
 
-    ACCESS_LOG.log(level, '%(remote_ip)s %(username)s - "%(method)s %(path)s %(proto)s"%(duration)s%(http_code)s%(memory)s%(msg)s' % self)
+    ACCESS_LOG.log(level, '%(remote_ip)s %(username)s - "%(method)s %(path)s %(proto)s"%(duration)s%(http_code)s%(size)s%(memory)s%(msg)s' % self)
 
   def add_to_access_history(self, app):
     """Record this user access to the recent access map"""
