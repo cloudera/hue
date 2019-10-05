@@ -11,7 +11,7 @@ metadata:
     nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
 spec:
   rules:
-  - host: {{ .Values.ingress.domain }}
+  - host: {{ .Values.docs.domain }}
     http:
       paths:
       - backend:

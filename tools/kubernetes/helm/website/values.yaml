@@ -1,6 +1,6 @@
 image:
    registry: "localhost:32000"
-   tag: "registry"
+   tag: "latest"
    pullPolicy: "Always"
    # registry: "gethue"
    # tag: "latest"

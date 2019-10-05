@@ -7,8 +7,6 @@
 
     kubectl delete -f hue/
 
-
-
 # If using Workers
 
     kubectl create -f celery/
