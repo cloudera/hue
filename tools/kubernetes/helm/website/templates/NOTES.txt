@@ -1,0 +1,27 @@
+Congratulations, you've launched the website of Hue!
+
+To check the status of your installation run:
+
+  helm list {{ .Release.Name }}
+
+Run below commands to get the recommended URLs:
+{{ if true }}
+  export WEB_HOST=$(kubectl get node -o jsonpath="{.items[0].metadata.name}")
+{{- end -}}
+
+{{ if and .Values.ingress.create (eq .Values.ingress.type "nginx") }}
+
+  echo http://$WEB_HOST
+
+{{ else if and .Values.ingress.create (eq .Values.ingress.type "nginx-ssl") }}
+
+  echo https://{{ .Values.docs.domain }}
+
+{{ else }}
+
+  export WEB_PORT=$(kubectl get service gethue-docs -o jsonpath="{.spec.ports[*].nodePort}" --namespace {{ .Release.Namespace }})
+
+  echo http://$WEB_HOST:$WEB_PORT
+
+{{ end }}
+Happy Querying!
