@@ -1,0 +1,18 @@
+image:
+   registry: "localhost:32000"
+   tag: "registry"
+   pullPolicy: "Always"
+   # registry: "gethue"
+   # tag: "latest"
+   # pullPolicy: "IfNotPresent"
+docs:
+  enabled: true
+  replicas: 1
+  domain: "docs.gethue.com"
+monitoring:
+  enabled: false
+ingress:
+  create: false
+  type: "nginx"
+  # type: "nginx-ssl"
+  email: "team@gethue.com"
