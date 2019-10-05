@@ -1,0 +1,12 @@
+{{- if .Values.websocket.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: dahpne-websocket
+spec:
+  selector:
+    pod: dahpne-websocket
+  ports:
+  - port: 8001
+  type: ClusterIP
+{{- end -}}
