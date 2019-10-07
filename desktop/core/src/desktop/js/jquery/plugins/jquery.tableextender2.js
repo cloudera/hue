@@ -214,6 +214,18 @@ Plugin.prototype.destroy = function() {
   self.disposeFunctions.forEach(disposeFunction => {
     disposeFunction();
   });
+  if (self.headerRowContainer) {
+    self.headerRowContainer.remove();
+  }
+  if (self.firstColumnInner) {
+    self.firstColumnInner.remove();
+  }
+  if (self.firstColumnTopCell) {
+    self.firstColumnTopCell.remove();
+  }
+  if (self.firstColumn) {
+    self.firstColumn.remove();
+  }
   self.$element.data('plugin_' + PLUGIN_NAME, null);
 };
 

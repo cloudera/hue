@@ -241,11 +241,10 @@ class ResultGrid extends DisposableComponent {
             this.hueDatatable = undefined;
           }
 
-          //   $('#eT' + options.snippet.id() + 'jHueTableExtenderClonedContainer').remove();
-          //   $('#eT' + options.snippet.id() + 'jHueTableExtenderClonedContainerColumn').remove();
-          //   $('#eT' + options.snippet.id() + 'jHueTableExtenderClonedContainerCell').remove();
-
           const $resultTable = this.getResultTableElement();
+          if ($resultTable.data('plugin_jHueTableExtender2')) {
+            $resultTable.data('plugin_jHueTableExtender2').destroy();
+          }
           $resultTable.data('scrollToCol', null);
           $resultTable.data('scrollToRow', null);
           $resultTable.data('rendered', false);
@@ -606,7 +605,6 @@ class ResultGrid extends DisposableComponent {
       const initial = !$resultTable.data('rendered');
       let dataTable;
       if (!$resultTable.data('rendered')) {
-        this.meta.notifySubscribers();
         $snippet.find('select').trigger('chosen:updated');
         dataTable = this.createDatatable();
         $resultTable.data('rendered', true);
