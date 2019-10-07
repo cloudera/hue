@@ -109,7 +109,7 @@ function Plugin(element, options) {
   });
 
   const redrawSubscription = huePubSub.subscribe('table.extender.redraw', parentId => {
-    if (parentId == self.options.parentId) {
+    if (parentId === self.options.parentId) {
       self.redraw();
     }
   });
@@ -214,6 +214,7 @@ Plugin.prototype.destroy = function() {
   self.disposeFunctions.forEach(disposeFunction => {
     disposeFunction();
   });
+  self.$element.data('plugin_' + PLUGIN_NAME, null);
 };
 
 Plugin.prototype.setOptions = function(options) {
@@ -334,7 +335,7 @@ Plugin.prototype.drawHeader = function() {
   clonedTable.appendTo(headerRowDiv);
 
   let topPosition;
-  if (self.options.clonedContainerPosition == 'absolute') {
+  if (self.options.clonedContainerPosition === 'absolute') {
     topPosition = self.$parent.position().top - self.$mainScrollable.scrollTop();
   } else {
     topPosition = self.$parent.offset().top - self.$mainScrollable.scrollTop();
@@ -374,7 +375,7 @@ Plugin.prototype.drawFirstColumn = function(repositionHeader) {
 
   const originalTh = self.$element.find('thead>tr th:eq(0)');
   let topPosition;
-  if (self.options.clonedContainerPosition == 'absolute') {
+  if (self.options.clonedContainerPosition === 'absolute') {
     topPosition = self.$parent.position().top - self.$mainScrollable.scrollTop();
   } else {
     topPosition = self.$parent.offset().top - self.$mainScrollable.scrollTop();

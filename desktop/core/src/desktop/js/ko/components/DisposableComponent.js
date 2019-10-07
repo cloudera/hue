@@ -37,7 +37,11 @@ export default class DisposableComponent {
 
   dispose() {
     while (this.disposals.length) {
-      this.disposals.pop()();
+      try {
+        this.disposals.pop()();
+      } catch (err) {
+        console.warn(err);
+      }
     }
   }
 }

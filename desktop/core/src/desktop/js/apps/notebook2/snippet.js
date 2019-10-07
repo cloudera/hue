@@ -35,7 +35,7 @@ import Result from 'apps/notebook2/result';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
 import { notebookToContextJSON, snippetToContextJSON } from 'apps/notebook2/notebookSerde';
-import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/components/resultGrid/ko.resultGrid';
+import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
 
 // TODO: Remove. Temporary here for debug
 window.SqlExecutable = SqlExecutable;
@@ -1257,8 +1257,6 @@ export default class Snippet {
     this.parentNotebook.historyCurrentPage(1);
 
     this.startLongOperationTimeout();
-
-    this.currentQueryTab('queryHistory');
 
     if (this.executor() && this.executor().isRunning()) {
       this.executor().cancel();

@@ -878,31 +878,12 @@ export const initNotebook2 = () => {
 
       $(document).on('executeStarted', (e, options) => {
         const $snip = $('#snippet_' + options.snippet.id());
-        const $el = $snip.find('.resultTable');
-        if (options.vm.editorMode()) {
-          $('#queryResults').css({
-            height: $el.height() + 'px'
-          });
-        }
-        $el.data('scrollToCol', null);
-        $el.data('scrollToRow', null);
         $snip.find('.progress-snippet').animate(
           {
             height: '3px'
           },
           100
         );
-        if ($el.hasClass('dt')) {
-          $el.removeClass('dt');
-          $('#eT' + options.snippet.id() + 'jHueTableExtenderClonedContainer').remove();
-          $('#eT' + options.snippet.id() + 'jHueTableExtenderClonedContainerColumn').remove();
-          $('#eT' + options.snippet.id() + 'jHueTableExtenderClonedContainerCell').remove();
-          if ($el.hueDataTable()) {
-            $el.hueDataTable().fnDestroy();
-          }
-          $el.find('thead tr').empty();
-          $el.data('lockedRows', {});
-        }
       });
 
       $(document).on('renderDataError', (e, options) => {
