@@ -181,8 +181,9 @@ class ResultGrid extends DisposableComponent {
     this.isMetaFilterVisible = ko.observable(false);
     this.metaFilter = ko.observable();
     this.resultsKlass = params.resultsKlass;
-    this.meta = params.meta; // result
-    this.data = params.data; // result
+    this.meta = params.meta;
+    this.data = params.data;
+    this.lastFetchedRows = params.lastFetchedRows;
 
     this.hueDatatable = undefined;
 
@@ -410,76 +411,39 @@ class ResultGrid extends DisposableComponent {
       $scrollElement = $(window.MAIN_SCROLLABLE);
     }
 
-    $scrollElement.off('scroll.resultGrid');
     let scrollThrottle = -1;
-    let resultFollowTimeout = -1;
 
     this.disposals.push(() => {
       window.clearTimeout(scrollThrottle);
-      window.clearTimeout(resultFollowTimeout);
     });
-
-    const $snippet = this.getSnippetElement();
-    const $resultLeftBar = $snippet.find('.result-left-bar');
 
     const dataScroll = () => {
       if (!$resultTable.is(':visible')) {
         return;
       }
-      if (this.editorMode()) {
-        window.clearTimeout(resultFollowTimeout);
-        resultFollowTimeout = window.setTimeout(() => {
-          const topCoord = this.isPresentationMode() || this.isResultFullScreenMode() ? 50 : 73;
-          let offsetTop = 0;
-          if ($dataTablesWrapper.length > 0 && $dataTablesWrapper.offset()) {
-            offsetTop = ($dataTablesWrapper.offset().top - topCoord) * -1;
-          }
-          let margin = Math.max(offsetTop, 0);
-          if (window.BANNER_TOP_HTML) {
-            margin += 31;
-          }
-          if (this.columnsVisible()) {
-            $snippet.find('.snippet-grid-settings').css({
-              height:
-                this.isPresentationMode() || !this.editorMode()
-                  ? '330px'
-                  : Math.max(
-                      100,
-                      Math.ceil(
-                        $(window).height() - Math.max($('#queryResults').offset().top, topCoord)
-                      )
-                    ) + 'px'
-            });
-            $snippet.find('.result-settings').css({
-              marginTop: margin
-            });
-          }
-          $resultLeftBar.css({
-            marginTop: margin
-          });
-        }, 100);
-      } else {
-        let lastScrollPosition =
-          $scrollElement.data('scrollPosition') != null ? $scrollElement.data('scrollPosition') : 0;
-        window.clearTimeout(scrollThrottle);
-        $scrollElement.data('scrollPosition', $scrollElement.scrollTop());
-        scrollThrottle = window.setTimeout(() => {
-          if (this.editorMode()) {
-            lastScrollPosition--; //hack for forcing fetching
-          }
-          if (
-            lastScrollPosition !== $scrollElement.scrollTop() &&
-            $scrollElement.scrollTop() + $scrollElement.outerHeight() + 20 >=
-              $scrollElement[0].scrollHeight &&
-            this.hueDatatable &&
-            this.hasMore()
-          ) {
-            this.showGrayedOutResult();
-            this.fetchResult(100, false);
-          }
-        }, 100);
-      }
+
+      let lastScrollPosition =
+        $scrollElement.data('scrollPosition') != null ? $scrollElement.data('scrollPosition') : 0;
+      window.clearTimeout(scrollThrottle);
+      $scrollElement.data('scrollPosition', $scrollElement.scrollTop());
+      scrollThrottle = window.setTimeout(() => {
+        if (this.editorMode()) {
+          lastScrollPosition--; //hack for forcing fetching
+        }
+        if (
+          lastScrollPosition !== $scrollElement.scrollTop() &&
+          $scrollElement.scrollTop() + $scrollElement.outerHeight() + 20 >=
+            $scrollElement[0].scrollHeight &&
+          this.hueDatatable &&
+          this.hasMore()
+        ) {
+          this.showGrayedOutResult();
+          this.fetchResult(100, false);
+        }
+      }, 100);
     };
+
+    $scrollElement.off('scroll.resultGrid');
     $scrollElement.on('scroll.resultGrid', dataScroll);
     this.disposals.push(() => {
       $scrollElement.off('scroll.resultGrid');
@@ -599,12 +563,12 @@ class ResultGrid extends DisposableComponent {
 
   async render() {
     const $snippet = this.getSnippetElement();
-    if (this.data().length > 0) {
+    if (this.data().length || this.lastFetchedRows().length) {
       await sleep(300);
       const $resultTable = $snippet.find('.resultTable');
       const initial = !$resultTable.data('rendered');
       let dataTable;
-      if (!$resultTable.data('rendered')) {
+      if (initial) {
         $snippet.find('select').trigger('chosen:updated');
         dataTable = this.createDatatable();
         $resultTable.data('rendered', true);
@@ -612,7 +576,7 @@ class ResultGrid extends DisposableComponent {
         dataTable = $resultTable.hueDataTable();
       }
       try {
-        dataTable.fnAddData(this.data());
+        dataTable.fnAddData(initial && this.data().length ? this.data() : this.lastFetchedRows());
       } catch (e) {}
       const $dataTablesWrapper = $snippet.find('.dataTables_wrapper');
       this.showNormalResult();
