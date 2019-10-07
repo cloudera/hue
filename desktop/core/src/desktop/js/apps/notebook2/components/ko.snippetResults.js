@@ -96,6 +96,7 @@ const TEMPLATE = `
           name: 'result-grid',
           params: {
             data: data,
+            lastFetchedRows: lastFetchedRows,
             editorMode: editorMode,
             fetchResult: fetchResult.bind($data),
             hasMore: hasMore,
@@ -145,6 +146,7 @@ class SnippetResults extends DisposableComponent {
     this.type = ko.observable(RESULT_TYPE.TABLE);
     this.meta = ko.observableArray();
     this.data = ko.observableArray();
+    this.lastFetchedRows = ko.observableArray();
     this.images = ko.observableArray();
     this.hasMore = ko.observable();
     this.hasResultSet = ko.observable();
@@ -239,6 +241,7 @@ class SnippetResults extends DisposableComponent {
       if (executionResult.lastRows.length) {
         this.data.push(...executionResult.lastRows);
       }
+      this.lastFetchedRows(executionResult.lastRows);
     }
   }
 
@@ -249,7 +252,11 @@ class SnippetResults extends DisposableComponent {
     }
   }
 
-  fetchResult() {}
+  fetchResult() {
+    if (this.activeExecutable() && this.activeExecutable().result) {
+      this.activeExecutable().result.fetchRows({ rows: 100 });
+    }
+  }
 }
 
 componentUtils.registerComponent(
