@@ -296,6 +296,9 @@ conf.initialize(_desktop_conf_modules, _config_dir)
 # Register the redaction filters into the root logger as soon as possible.
 desktop.redaction.register_log_filtering(desktop.conf.get_redaction_policy())
 
+# Not there anymore in CDP
+if 'pig' not in desktop.conf.APP_BLACKLIST.get():
+  desktop.conf.APP_BLACKLIST.set_for_testing(desktop.conf.APP_BLACKLIST.get() + ['pig'])
 
 # Activate l10n
 # Install apps

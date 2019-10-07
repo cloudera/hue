@@ -50,7 +50,6 @@ from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 from dashboard.conf import HAS_SQL_ENABLED
 from desktop.settings import DATABASES
 from beeswax.conf import HIVE_SERVER_HOST
-from pig.models import PigScript
 from useradmin.models import GroupPermission, User
 
 import desktop
@@ -91,12 +90,6 @@ def test_home():
   response = c.get(reverse(home))
   assert_equal(["notmine", "trash", "mine", "history"], list(json.loads(response.context[0]['json_tags']).keys()))
   assert_equal(200, response.status_code)
-
-  script, created = PigScript.objects.get_or_create(owner=user)
-  doc = Document.objects.link(script, owner=script.owner, name='test_home')
-
-  response = c.get(reverse(home))
-  assert_true(str(doc.id) in json.loads(response.context[0]['json_documents']))
 
   response = c.get(reverse(home))
   tags = json.loads(response.context[0]['json_tags'])
@@ -499,7 +492,6 @@ def test_app_permissions():
     check_app(401, 'hive')
     check_app(401, 'impala')
     check_app(401, 'hbase')
-    check_app(401, 'pig')
     check_app(401, 'search')
     check_app(401, 'spark')
     check_app(401, 'oozie')
@@ -507,7 +499,6 @@ def test_app_permissions():
     apps = ClusterConfig(user=user).get_apps()
     assert_false('hive' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_false('impala' in apps.get('editor', {}).get('interpreter_names', []), apps)
-    assert_false('pig' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_false('solr' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_false('spark' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_false('browser' in apps, apps)
@@ -525,7 +516,6 @@ def test_app_permissions():
     check_app(200, 'hive')
     check_app(401, 'impala')
     check_app(401, 'hbase')
-    check_app(401, 'pig')
     check_app(401, 'search')
     check_app(401, 'spark')
     check_app(401, 'oozie')
@@ -533,7 +523,6 @@ def test_app_permissions():
     apps = ClusterConfig(user=user).get_apps()
     assert_true('hive' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_false('impala' in apps.get('editor', {}).get('interpreter_names', []), apps)
-    assert_false('pig' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_false('solr' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_false('spark' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_false('browser' in apps, apps)
@@ -548,7 +537,6 @@ def test_app_permissions():
     check_app(200, 'hive')
     check_app(401, 'impala')
     check_app(200, 'hbase')
-    check_app(401, 'pig')
     check_app(401, 'search')
     check_app(401, 'spark')
     check_app(401, 'oozie')
@@ -556,7 +544,6 @@ def test_app_permissions():
     apps = ClusterConfig(user=user).get_apps()
     assert_true('hive' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_false('impala' in apps.get('editor', {}).get('interpreter_names', []), apps)
-    assert_false('pig' in apps.get('editor', {}).get('interpreter_names', []), apps)
     if 'hbase' not in desktop.conf.APP_BLACKLIST.get():
       assert_true('browser' in apps, apps)
       assert_true('hbase' in apps['browser']['interpreter_names'], apps['browser'])
@@ -572,7 +559,6 @@ def test_app_permissions():
     check_app(401, 'beeswax')
     check_app(401, 'impala')
     check_app(401, 'hbase')
-    check_app(401, 'pig')
     check_app(401, 'search')
     check_app(401, 'spark')
     check_app(401, 'oozie')
@@ -580,7 +566,6 @@ def test_app_permissions():
     apps = ClusterConfig(user=user).get_apps()
     assert_false('hive' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_false('impala' in apps.get('editor', {}).get('interpreter_names', []), apps)
-    assert_false('pig' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_false('solr' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_false('spark' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_false('browser' in apps, apps)
@@ -594,7 +579,6 @@ def test_app_permissions():
     check_app(401, 'beeswax')
     check_app(200, 'impala')
     check_app(401, 'hbase')
-    check_app(401, 'pig')
     check_app(401, 'search')
     check_app(401, 'spark')
     check_app(401, 'oozie')
@@ -602,7 +586,6 @@ def test_app_permissions():
     apps = ClusterConfig(user=user).get_apps()
     assert_false('hive' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_true('impala' in apps.get('editor', {}).get('interpreter_names', []), apps)
-    assert_false('pig' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_false('solr' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_false('spark' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_false('browser' in apps, apps)
@@ -616,7 +599,6 @@ def test_app_permissions():
     check_app(401, 'hive')
     check_app(200, 'impala')
     check_app(401, 'hbase')
-    check_app(401, 'pig')
     check_app(401, 'search')
     check_app(401, 'spark')
     check_app(200, 'oozie')
@@ -627,28 +609,11 @@ def test_app_permissions():
     assert_false('solr' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_false('spark' in apps.get('editor', {}).get('interpreter_names', []), apps)
 
-    grant_access(USERNAME, GROUPNAME, "pig")
-    check_app(401, 'hive')
-    check_app(200, 'impala')
-    check_app(401, 'hbase')
-    check_app(200, 'pig')
-    check_app(401, 'search')
-    check_app(401, 'spark')
-    check_app(200, 'oozie')
-
-    apps = ClusterConfig(user=user).get_apps()
-    assert_false('hive' in apps.get('editor', {}).get('interpreter_names', []), apps)
-    assert_true('impala' in apps.get('editor', {}).get('interpreter_names', []), apps)
-    assert_true('pig' in apps.get('editor', {}).get('interpreter_names', []), apps)
-    assert_false('solr' in apps.get('editor', {}).get('interpreter_names', []), apps)
-    assert_false('spark' in apps.get('editor', {}).get('interpreter_names', []), apps)
-
     if 'search' not in desktop.conf.APP_BLACKLIST.get():
       grant_access(USERNAME, GROUPNAME, "search")
       check_app(401, 'hive')
       check_app(200, 'impala')
       check_app(401, 'hbase')
-      check_app(200, 'pig')
       check_app(200, 'search')
       check_app(401, 'spark')
       check_app(200, 'oozie')
@@ -656,7 +621,6 @@ def test_app_permissions():
       apps = ClusterConfig(user=user).get_apps()
       assert_false('hive' in apps.get('editor', {}).get('interpreter_names', []), apps)
       assert_true('impala' in apps.get('editor', {}).get('interpreter_names', []), apps)
-      assert_true('pig' in apps.get('editor', {}).get('interpreter_names', []), apps)
       assert_true('solr' in apps.get('editor', {}).get('interpreter_names', []), apps)
       assert_false('spark' in apps.get('editor', {}).get('interpreter_names', []), apps)
 
@@ -665,7 +629,6 @@ def test_app_permissions():
       check_app(401, 'hive')
       check_app(200, 'impala')
       check_app(401, 'hbase')
-      check_app(200, 'pig')
       check_app(200, 'search')
       check_app(200, 'spark')
       check_app(200, 'oozie')
@@ -673,7 +636,6 @@ def test_app_permissions():
       apps = ClusterConfig(user=user).get_apps()
       assert_false('hive' in apps.get('editor', {}).get('interpreter_names', []), apps)
       assert_true('impala' in apps.get('editor', {}).get('interpreter_names', []), apps)
-      assert_true('pig' in apps.get('editor', {}).get('interpreter_names', []), apps)
       assert_true('solr' in apps.get('editor', {}).get('interpreter_names', []), apps)
       assert_true('spark' in apps.get('editor', {}).get('interpreter_names', []), apps)
       assert_true('pyspark' in apps.get('editor', {}).get('interpreter_names', []), apps)
@@ -910,7 +872,6 @@ class TestStrictRedirection(object):
   def test_redirection_allowed(self):
     # Redirection to the host where Hue is running should be OK.
     self._test_redirection(redirection_url='/', expected_status_code=302)
-    self._test_redirection(redirection_url='/pig', expected_status_code=302)
     self._test_redirection(redirection_url='http://testserver/', expected_status_code=302)
     self._test_redirection(redirection_url='https://testserver/', expected_status_code=302, **{
       'SERVER_PORT': '443',
