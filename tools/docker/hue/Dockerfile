@@ -50,8 +50,10 @@ RUN PREFIX=/usr/share make install
 RUN useradd -ms /bin/bash hue && chown -R hue /usr/share/hue
 
 # Only keep install dir
+# Note: get more minimal image by pulling install dir in a stage 2 image
 WORKDIR /usr/share/hue
 RUN rm -rf /hue
+RUN rm -rf node_modules
 
 # Install DB connectors
 RUN ./build/env/bin/pip install psycopg2-binary
