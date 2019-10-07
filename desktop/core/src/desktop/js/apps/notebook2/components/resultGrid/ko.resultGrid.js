@@ -161,7 +161,6 @@ const TEMPLATE = `
       ">
       <pre class="margin-top-10"><i class="fa fa-check muted"></i> ${ I18n("Results have expired, rerun the query if needed.") }</pre>
     </div>
-    <span data-bind="template: { afterRender: resultTableRendered.bind($data) }"></span>
   </div>
 </div>
 `;
@@ -229,8 +228,33 @@ class ResultGrid extends DisposableComponent {
     });
 
     this.trackKoSub(
-      this.data.subscribe(() => {
+      this.data.subscribe(data => {
         this.render();
+      })
+    );
+
+    this.trackKoSub(
+      this.meta.subscribe(meta => {
+        if (meta) {
+          if (this.hueDatatable) {
+            this.hueDatatable.fnDestroy();
+            this.hueDatatable = undefined;
+          }
+
+          //   $('#eT' + options.snippet.id() + 'jHueTableExtenderClonedContainer').remove();
+          //   $('#eT' + options.snippet.id() + 'jHueTableExtenderClonedContainerColumn').remove();
+          //   $('#eT' + options.snippet.id() + 'jHueTableExtenderClonedContainerCell').remove();
+
+          const $resultTable = this.getResultTableElement();
+          $resultTable.data('scrollToCol', null);
+          $resultTable.data('scrollToRow', null);
+          $resultTable.data('rendered', false);
+          if ($resultTable.hasClass('dt')) {
+            $resultTable.removeClass('dt');
+            $resultTable.find('thead tr').empty();
+            $resultTable.data('lockedRows', {});
+          }
+        }
       })
     );
 
@@ -595,7 +619,6 @@ class ResultGrid extends DisposableComponent {
       const $dataTablesWrapper = $snippet.find('.dataTables_wrapper');
       this.showNormalResult();
       $dataTablesWrapper.scrollTop($dataTablesWrapper.data('scrollPosition'));
-      this.redrawFixedHeaders();
       this.resizeToggleResultSettings(initial);
     } else {
       this.showNormalResult();
@@ -664,12 +687,6 @@ class ResultGrid extends DisposableComponent {
 
   toggleResultColumn(linkElement, index) {
     this.hueDatatable.fnSetColumnVis(index, linkElement.checked);
-  }
-
-  async resultTableRendered() {
-    await defer(() => {
-      this.render(true);
-    });
   }
 }
 

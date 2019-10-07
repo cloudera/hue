@@ -23,8 +23,8 @@ import I18n from 'utils/i18n';
 
 import 'apps/notebook2/components/resultChart/ko.resultChart';
 import 'apps/notebook2/components/resultGrid/ko.resultGrid';
-import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/components/resultGrid/ko.resultGrid';
-import { REDRAW_CHART_EVENT } from 'apps/notebook2/components/resultChart/ko.resultChart';
+import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
+import { REDRAW_CHART_EVENT } from 'apps/notebook2/events';
 import { EXECUTABLE_UPDATED_EVENT } from 'apps/notebook2/execution/executable';
 import { RESULT_TYPE, RESULT_UPDATED_EVENT } from 'apps/notebook2/execution/executionResult';
 
@@ -141,21 +141,6 @@ class SnippetResults extends DisposableComponent {
     this.resultsKlass = params.resultsKlass;
     this.id = params.id; // TODO: Get rid of
 
-    huePubSub.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
-      if (this.activeExecutable() === executable) {
-        this.updateFromExecutable(executable);
-      }
-    });
-
-    const lastRenderedResult = undefined;
-    huePubSub.subscribe(RESULT_UPDATED_EVENT, executionResult => {
-      if (this.activeExecutable() === executionResult.executable) {
-        const refresh = lastRenderedResult === executionResult;
-        this.updateFromExecutionResult(executionResult, refresh);
-        this.lastRenderedResult = executionResult;
-      }
-    });
-
     this.status = ko.observable();
     this.type = ko.observable(RESULT_TYPE.TABLE);
     this.meta = ko.observableArray();
@@ -168,6 +153,20 @@ class SnippetResults extends DisposableComponent {
 
     this.showGrid = ko.observable(true); // TODO: Should be persisted
     this.showChart = ko.observable(false); // TODO: Should be persisted
+
+    this.cleanedMeta = ko.pureComputed(() => this.meta().filter(item => item.name !== ''));
+
+    this.cleanedDateTimeMeta = ko.pureComputed(() =>
+      this.meta().filter(item => item.name !== '' && isDateTimeColumn(item.type))
+    );
+
+    self.cleanedStringMeta = ko.pureComputed(() =>
+      this.meta().filter(item => item.name !== '' && isStringColumn(item.type))
+    );
+
+    this.cleanedNumericMeta = ko.pureComputed(() =>
+      this.meta().filter(item => item.name !== '' && isNumericColumn(item.type))
+    );
 
     this.trackKoSub(
       this.showChart.subscribe(val => {
@@ -190,19 +189,20 @@ class SnippetResults extends DisposableComponent {
       })
     );
 
-    this.cleanedMeta = ko.pureComputed(() => this.meta().filter(item => item.name !== ''));
+    huePubSub.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
+      if (this.activeExecutable() === executable) {
+        this.updateFromExecutable(executable);
+      }
+    });
 
-    this.cleanedDateTimeMeta = ko.pureComputed(() =>
-      this.meta().filter(item => item.name !== '' && isDateTimeColumn(item.type))
-    );
-
-    self.cleanedStringMeta = ko.pureComputed(() =>
-      this.meta().filter(item => item.name !== '' && isStringColumn(item.type))
-    );
-
-    this.cleanedNumericMeta = ko.pureComputed(() =>
-      this.meta().filter(item => item.name !== '' && isNumericColumn(item.type))
-    );
+    let lastRenderedResult = undefined;
+    huePubSub.subscribe(RESULT_UPDATED_EVENT, executionResult => {
+      if (this.activeExecutable() === executionResult.executable) {
+        const refresh = lastRenderedResult !== executionResult;
+        this.updateFromExecutionResult(executionResult, refresh);
+        lastRenderedResult = executionResult;
+      }
+    });
   }
 
   reset() {
