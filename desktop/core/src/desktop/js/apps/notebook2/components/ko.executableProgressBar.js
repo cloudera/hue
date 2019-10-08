@@ -66,7 +66,7 @@ class ExecutableProgressBar extends DisposableComponent {
     });
 
     const updateSub = huePubSub.subscribe(EXECUTOR_UPDATED_EVENT, executorUpdate => {
-      if (this.snippet.executor() === executorUpdate.executor) {
+      if (this.snippet.executor === executorUpdate.executor) {
         this.status(executorUpdate.executable.status);
         this.progress(executorUpdate.executable.progress);
       }
