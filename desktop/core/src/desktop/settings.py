@@ -603,7 +603,11 @@ if os.environ.get('REQUESTS_CA_BUNDLE') and os.environ.get('REQUESTS_CA_BUNDLE')
 
 # Instrumentation
 if desktop.conf.INSTRUMENTATION.get():
-  gc.set_debug(gc.DEBUG_UNCOLLECTABLE | gc.DEBUG_OBJECTS)
+  if sys.version_info[0] > 2:
+    gc.set_debug(gc.DEBUG_UNCOLLECTABLE)
+  else:
+    gc.set_debug(gc.DEBUG_UNCOLLECTABLE | gc.DEBUG_OBJECTS)
+
 
 if not desktop.conf.DATABASE_LOGGING.get():
   def disable_database_logging():
