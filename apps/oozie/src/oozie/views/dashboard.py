@@ -451,7 +451,7 @@ def list_oozie_workflow(request, job_id):
 @show_oozie_error
 def list_oozie_coordinator(request, job_id):
   kwargs = {'cnt': 50, 'filters': []}
-  kwargs['offset'] = request.GET.get('offset', 1)
+  kwargs['offset'] = request.GET.get('offset', default=1)
   if request.GET.getlist('status'):
       kwargs['filters'].extend([('status', status) for status in request.GET.getlist('status')])
 
