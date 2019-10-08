@@ -23,8 +23,16 @@ It features:
 
 Who is using Hue
 ----------------
-Thousands of companies and organizations use Hue to open-up their data and provide self service querying. Just at Cloudera, Hue is heavily used by 1000 customers executing millions of queries daily. Hue also ships in Amazon AWS and its open source version is used by hundred of companies.
+Thousands of companies and organizations use Hue to open-up their data and provide self service querying. Hue is heavily used by
 
+* 1000+ paying customers
+* top Fortune 500
+
+who are executing 100s of 1000 of queries daily.
+
+It also ships in Amazon AWS and its open source version is used by hundred of companies.
+
+Hue is ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/parsers/) and any [contributions](CONTRIBUTING.md) are welcome.
 
 Getting Started
 ---------------
@@ -42,8 +50,10 @@ Read more in the [installation documentation](http://cloudera.github.io/hue/late
 
 Docker
 ------
-Start Hue in a single click with the [Docker Guide](https://github.com/cloudera/hue/tree/master/tools/docker) or the
+Start Hue in a single click with the [Docker Guide](https://github.com/cloudera/hue/tree/master/tools/docker/hue) or the
 [video blog post](http://gethue.com/getting-started-with-hue-in-2-minutes-with-docker/).
+
+    docker run -it -p 8888:8888 gethue/hue:latest
 
 
 Kubernetes
