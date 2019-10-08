@@ -5,7 +5,7 @@ The Hue project gladly welcomes [pull requests](https://github.com/cloudera/hue/
 
 This document contains instructions on how to help get involved with Hue.
 
-In any case, feel free to ask here, on the [forum](Help Forum: https://discourse.gethue.com/) or [@gethue](https://twitter.com/gethue).
+In any case, feel free to ask here, on the [forum](https://discourse.gethue.com/) or [@gethue](https://twitter.com/gethue).
 
 # What to improve
 
@@ -17,12 +17,12 @@ Here is some inspiration on which areas would love to have some contributions:
 4. Generally, improving or creating connectors should be the best projects:
 * SQL (Tip: read (how to write a parser)[link]
   * Hive LLAP
-  * Parser for Calcite
+  * Parser for [Apache Calcite](https://calcite.apache.org)
   * Parser for PartiQl
   * Parser for ZetaSql
   * SqlAlchemy (any improvements to connectors for Druid, Phoenix...)
-  * Kafka Sql
-  * Elastic Search
+  * Sql streams (Kafka SQL, Flink SQL...)
+  * Elastic Search, [Solr](http://gethue.com/sql-editor-for-solr-sql/)
 * Storage: Google Storage
 * Query Optimization
 * Data Catalog
