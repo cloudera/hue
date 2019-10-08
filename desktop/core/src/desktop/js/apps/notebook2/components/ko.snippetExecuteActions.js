@@ -21,6 +21,7 @@ import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
 import { EXECUTOR_UPDATED_EVENT } from 'apps/notebook2/execution/executor';
+import DisposableComponent from 'ko/components/DisposableComponent';
 
 export const NAME = 'snippet-execute-actions';
 
@@ -28,9 +29,16 @@ const TEMPLATE = `
 <div class="snippet-execute-actions" data-test="${NAME}">
   <div class="btn-group">
     <!-- ko if: status() !== '${EXECUTION_STATUS.running}' -->
+    <!-- ko ifnot: hasMoreToExecute -->
     <button class="btn btn-primary btn-mini btn-execute disable-feedback" data-test="execute" data-bind="click: execute"><i class="fa fa-play fa-fw"></i> ${I18n(
       'Execute'
     )}</button>
+    <!-- /ko -->
+    <!-- ko if: hasMoreToExecute -->
+    <button class="btn btn-primary btn-mini btn-execute disable-feedback" data-test="execute" data-bind="click: executeNext"><i class="fa fa-play fa-fw"></i> ${I18n(
+      'Continue'
+    )}</button>
+    <!-- /ko -->
     <!-- /ko -->
     <!-- ko if: status() === '${EXECUTION_STATUS.running}' -->
     <!-- ko ifnot: stopping -->
@@ -48,35 +56,38 @@ const TEMPLATE = `
 </div>
 `;
 
-class SnippetExecuteActions {
+class SnippetExecuteActions extends DisposableComponent {
   constructor(params) {
-    this.disposals = [];
+    super();
     this.stopping = ko.observable(false);
     this.snippet = params.snippet;
     this.status = ko.observable(EXECUTION_STATUS.ready);
-    const updateSub = huePubSub.subscribe(EXECUTOR_UPDATED_EVENT, executorUpdate => {
-      if (this.snippet.executor() === executorUpdate.executor) {
-        this.status(executorUpdate.executable.status);
-      }
-    });
-    this.disposals.push(() => {
-      updateSub.remove();
-    });
+    this.hasMoreToExecute = ko.observable(false);
+    this.trackPubSub(
+      huePubSub.subscribe(EXECUTOR_UPDATED_EVENT, executorUpdate => {
+        if (this.snippet.executor === executorUpdate.executor) {
+          this.hasMoreToExecute(!!executorUpdate.executor.hasMoreToExecute());
+          this.status(executorUpdate.executable.status);
+        }
+      })
+    );
   }
 
   async stop() {
     if (this.stopping()) {
       return;
     }
-    if (this.snippet.executor()) {
-      this.stopping(true);
-      await this.snippet.executor().cancel();
-      this.stopping(false);
-    }
+    this.stopping(true);
+    await this.snippet.executor.cancel();
+    this.stopping(false);
   }
 
   execute() {
     this.snippet.execute();
+  }
+
+  executeNext() {
+    this.snippet.executeNext();
   }
 
   dispose() {

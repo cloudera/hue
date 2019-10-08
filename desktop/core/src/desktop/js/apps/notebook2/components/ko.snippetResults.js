@@ -63,6 +63,10 @@ const TEMPLATE = `
       <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: showChart, css: { 'active': showChart }"><i class="hcha fa-fw hcha-bar-chart"></i> ${ I18n('Chart') }</button>
     </div>
     <div class="btn-group pull-right">
+      <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: showLatestResult, css: { 'active': showLatestResult }">${ I18n('Latest') }</button>
+      <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: showLatestResult, css: { 'active': !showLatestResult() }">${ I18n('Active') }</button>
+    </div>
+    <div class="btn-group pull-right">
       <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: isResultFullScreenMode">
         <!-- ko if: isResultFullScreenMode -->
         <i class="fa fa-compress"></i> ${ I18n('Collapse') }
@@ -91,7 +95,7 @@ const TEMPLATE = `
       <!-- /ko -->
     </div>
     <div class="table-results" data-bind="visible: type() === 'table'" style="display: none;">
-      <div data-bind="visible: showGrid" style="display: none; position: relative;">
+      <div data-bind="visible: showGrid() && data().length" style="display: none; position: relative;">
         <!-- ko component: { 
           name: 'result-grid',
           params: {
@@ -108,7 +112,7 @@ const TEMPLATE = `
           }
         } --><!-- /ko -->
       </div>
-      <div data-bind="visible: showChart" style="display: none; position: relative;">
+      <div data-bind="visible: showChart() && data().length" style="display: none; position: relative;">
         <!-- ko component: {
           name: 'result-chart',
           params: {
@@ -123,6 +127,14 @@ const TEMPLATE = `
           }
         } --><!-- /ko -->
       </div>
+      <div data-bind="visible: !data().length" style="display: none;">
+        <!-- ko if: showLatestResult -->
+        <h1 class="empty">${ I18n('Execute a query to see the latest result.') }</h1>
+        <!-- /ko -->
+        <!-- ko ifnot: showLatestResult -->
+        <h1 class="empty">${ I18n('Execute the active statement to see the result.') }</h1>
+        <!-- /ko -->
+      </div>
     </div>
   </div>
 </div>
@@ -135,6 +147,11 @@ class SnippetResults extends DisposableComponent {
 
     this.activeExecutable = params.activeExecutable;
     this.latestExecutable = params.latestExecutable;
+
+    this.showLatestResult = ko.observable(true);
+    this.selectedExecutable = ko.pureComputed(() =>
+      this.showLatestResult() ? this.latestExecutable() : this.activeExecutable()
+    );
 
     this.editorMode = params.editorMode;
     this.isPresentationMode = params.isPresentationMode;
@@ -192,23 +209,37 @@ class SnippetResults extends DisposableComponent {
     );
 
     huePubSub.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
-      if (this.activeExecutable() === executable) {
+      if (this.selectedExecutable() === executable) {
         this.updateFromExecutable(executable);
       }
     });
 
     let lastRenderedResult = undefined;
     huePubSub.subscribe(RESULT_UPDATED_EVENT, executionResult => {
-      if (this.activeExecutable() === executionResult.executable) {
+      if (this.selectedExecutable() === executionResult.executable) {
         const refresh = lastRenderedResult !== executionResult;
         this.updateFromExecutionResult(executionResult, refresh);
         lastRenderedResult = executionResult;
       }
     });
+
+    this.trackKoSub(
+      this.selectedExecutable.subscribe(executable => {
+        if (executable && executable.result) {
+          if (executable !== lastRenderedResult) {
+            this.updateFromExecutionResult(executable.result, true);
+            lastRenderedResult = executable;
+          }
+        } else {
+          this.reset();
+        }
+      })
+    );
   }
 
   reset() {
     this.images([]);
+    this.lastFetchedRows([]);
     this.data([]);
     this.meta([]);
     this.hasMore(false);

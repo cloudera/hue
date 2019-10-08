@@ -209,8 +209,6 @@ export default class Snippet {
 
     this.errors = ko.observableArray([]);
 
-    this.executor = ko.observable();
-
     this.aceErrorsHolder = ko.observableArray([]);
     this.aceWarningsHolder = ko.observableArray([]);
 
@@ -386,8 +384,10 @@ export default class Snippet {
           }
           if (statementDetails.activeStatement) {
             this.positionStatement(statementDetails.activeStatement);
+            this.activeExecutable(this.executor.getExecutable(statementDetails.activeStatement));
           } else {
             this.positionStatement(null);
+            this.activeExecutable(undefined);
           }
 
           if (statementDetails.activeStatement) {
@@ -1011,10 +1011,19 @@ export default class Snippet {
     this.latestExecutable = ko.observable();
     this.activeExecutable = ko.observable();
 
+    this.executor = new Executor({
+      compute: this.compute,
+      database: this.database,
+      sourceType: this.type,
+      namespace: this.namespace,
+      statement: this.statement,
+      isSqlEngine: this.isSqlDialect
+    });
+
     huePubSub.subscribe(EXECUTOR_UPDATED_EVENT, details => {
       const executable = details.executable;
 
-      if (details.executor === this.executor()) {
+      if (details.executor === this.executor) {
         this.latestExecutable(executable);
         this.activeExecutable(executable); // TODO: Move to pureComputed (based on cursor)
         this.status(executable.status);
@@ -1219,7 +1228,7 @@ export default class Snippet {
     });
   }
 
-  async execute(automaticallyTriggered) {
+  async executeNext() {
     hueAnalytics.log('notebook', 'execute/' + this.type());
 
     const now = new Date().getTime();
@@ -1245,7 +1254,14 @@ export default class Snippet {
       this.lastAceSelectionRowOffset(Math.min(selectionRange.start.row, selectionRange.end.row));
     }
 
-    $(document).trigger('executeStarted', { vm: this.parentVm, snippet: this });
+    const $snip = $('#snippet_' + this.id());
+    $snip.find('.progress-snippet').animate(
+      {
+        height: '3px'
+      },
+      100
+    );
+
     $('.jHueNotify').remove();
     this.parentNotebook.forceHistoryInitialHeight(true);
     this.errors([]);
@@ -1258,23 +1274,8 @@ export default class Snippet {
 
     this.startLongOperationTimeout();
 
-    if (this.executor() && this.executor().isRunning()) {
-      this.executor().cancel();
-    }
-
-    this.executor(
-      new Executor({
-        compute: this.compute(),
-        database: this.database(),
-        sourceType: this.type(),
-        namespace: this.namespace(),
-        statement: this.statement(),
-        isSqlEngine: this.isSqlDialect()
-      })
-    );
-
     try {
-      const result = await this.executor().executeNext();
+      const result = await this.executor.executeNext();
 
       this.stopLongOperationTimeout();
       this.result.clear();
@@ -1287,6 +1288,11 @@ export default class Snippet {
     } catch (error) {
       this.stopLongOperationTimeout();
     }
+  }
+
+  async execute() {
+    await this.executor.reset();
+    await this.executeNext();
   }
 
   async exportHistory() {

@@ -31,6 +31,13 @@ const EXECUTION_FLOW = {
 
 export const EXECUTOR_UPDATED_EVENT = 'hue.executor.updated';
 
+const parsedStatementEquals = (a, b) =>
+  a.statement === b.statement &&
+  a.location.first_column === b.location.first_column &&
+  a.location.last_column === b.location.last_column &&
+  a.location.first_line === b.location.first_line &&
+  a.location.last_line === b.location.last_line;
+
 class Executor {
   /**
    * @param options
@@ -48,6 +55,7 @@ class Executor {
     this.namespace = options.namespace;
     this.database = options.database;
     this.isSqlEngine = options.isSqlEngine;
+    this.statement = options.statement;
     this.executionFlow = this.isSqlEngine
       ? options.executionFlow || EXECUTION_FLOW.batch
       : EXECUTION_FLOW.step;
@@ -55,12 +63,6 @@ class Executor {
     this.toExecute = [];
     this.currentExecutable = undefined;
     this.executed = [];
-
-    if (this.isSqlEngine) {
-      this.toExecute = SqlExecutable.fromStatement({ executor: this, ...options });
-    } else {
-      throw new Error('Not implemented yet');
-    }
 
     huePubSub.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
       if (
@@ -75,6 +77,38 @@ class Executor {
     });
   }
 
+  getExecutable(parsedStatement) {
+    return this.executed
+      .concat(this.currentExecutable, this.toExecute)
+      .find(
+        executable =>
+          executable &&
+          executable.parsedStatement &&
+          parsedStatementEquals(parsedStatement, executable.parsedStatement)
+      );
+  }
+
+  async reset() {
+    if (this.isRunning()) {
+      await this.cancel();
+    }
+
+    if (this.isSqlEngine()) {
+      this.toExecute = SqlExecutable.fromStatement({
+        executor: this,
+        statement: this.statement(),
+        database: this.database(),
+        sourceType: this.sourceType(),
+        compute: this.compute(),
+        namespace: this.namespace()
+      });
+      this.executed = [];
+      this.currentExecutable = undefined;
+    } else {
+      throw new Error('Not implemented yet');
+    }
+  }
+
   isRunning() {
     return this.currentExecutable && this.currentExecutable.status === EXECUTION_STATUS.running;
   }
@@ -85,8 +119,12 @@ class Executor {
     }
   }
 
+  hasMoreToExecute() {
+    return !!this.toExecute.length;
+  }
+
   async executeNext() {
-    if (this.toExecute.length === 0) {
+    if (!this.toExecute.length) {
       return;
     }
 
@@ -104,7 +142,7 @@ class Executor {
   canExecuteNextInBatch() {
     return (
       !this.executed.length ||
-      (this.isSqlEngine &&
+      (this.isSqlEngine() &&
         this.executionFlow !== EXECUTION_FLOW.step &&
         this.currentExecutable &&
         this.currentExecutable.canExecuteInBatch())

@@ -876,16 +876,6 @@ export const initNotebook2 = () => {
         }, 50);
       });
 
-      $(document).on('executeStarted', (e, options) => {
-        const $snip = $('#snippet_' + options.snippet.id());
-        $snip.find('.progress-snippet').animate(
-          {
-            height: '3px'
-          },
-          100
-        );
-      });
-
       $(document).on('renderDataError', (e, options) => {
         huePubSub.publish(SHOW_NORMAL_RESULT_EVENT);
       });
