@@ -22,8 +22,6 @@ from builtins import object
 import logging
 import sys
 
-from urlparse import urlparse
-
 from useradmin.models import User
 
 from desktop.auth.backend import is_admin
