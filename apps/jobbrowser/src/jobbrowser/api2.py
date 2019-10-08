@@ -72,7 +72,11 @@ def job(request, interface=None):
   interface = interface or json.loads(request.POST.get('interface'))
   app_id = json.loads(request.POST.get('app_id'))
 
-  response_app = get_api(request.user, interface, cluster=cluster).app(app_id)
+  if interface == 'schedules':
+    offset = json.loads(request.POST.get('pagination', '{"offset": 1}')).get('offset')
+    response_app = get_api(request.user, interface, cluster=cluster).app(app_id, offset=offset)
+  else :
+    response_app = get_api(request.user, interface, cluster=cluster).app(app_id)
 
   if response_app.get('status') == -1 and response_app.get('message'):
     response.update(response_app)
