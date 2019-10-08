@@ -33,169 +33,114 @@ function Plugin(element, options) {
 }
 
 function initWhenReady(el) {
-  if ($(el).parents('.dataTables_wrapper').length > 0) {
-    const colWidth = $(el)
-      .find('thead tr th')
-      .outerWidth();
-    if (
-      $(el)
-        .parents('.dataTables_wrapper')
-        .find('.hue-scrollbar-x-rail').length == 0 &&
-      $(el)
-        .parents('.dataTables_wrapper')
-        .width() < $(el).parents('.dataTables_wrapper')[0].scrollWidth
-    ) {
-      $('.hue-scrollbar-x-rail').remove();
-      const scrollbarRail = $('<div>');
-      const scrollbar = $('<div>').addClass('hue-scrollbar-x');
-      scrollbar.width(
-        Math.max(
-          20,
-          $(el)
-            .parents('.dataTables_wrapper')
-            .width() *
-            ($(el)
-              .parents('.dataTables_wrapper')
-              .width() /
-              $(el).parents('.dataTables_wrapper')[0].scrollWidth)
-        )
-      );
-      scrollbar.appendTo(scrollbarRail);
-      try {
-        scrollbar.draggable('destroy');
-      } catch (e) {}
-      let throttleScrollTimeout = -1;
-      scrollbar.draggable({
-        axis: 'x',
-        containment: 'parent',
-        drag: function(e, ui) {
-          $(el)
-            .parents('.dataTables_wrapper')
-            .scrollLeft(
-              ($(el).parents('.dataTables_wrapper')[0].scrollWidth -
-                $(el)
-                  .parents('.dataTables_wrapper')
-                  .width()) *
-                (ui.position.left / (scrollbarRail.width() - $(this).width()))
-            );
-          throttleScrollTimeout = window.setTimeout(() => {
-            $(el)
-              .parents('.dataTables_wrapper')
-              .trigger('scroll');
-          }, 50);
-        }
-      });
-      $(el)
-        .parents('.dataTables_wrapper')
-        .bind('mousewheel', function(e) {
-          const _deltaX = e.deltaX * e.deltaFactor,
-            _deltaY = e.deltaY;
+  let $wrapper = $(el).parents('.dataTables_wrapper');
+  if (!$wrapper.length) {
+    return;
+  }
 
-          if (Math.abs(_deltaX) >= Math.abs(_deltaY)) {
-            const self = this;
-            self.scrollLeft += _deltaX;
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            if (self.scrollLeft > 0) {
-              scrollbar.css(
-                'left',
-                (scrollbarRail[0].getBoundingClientRect().width -
-                  scrollbar[0].getBoundingClientRect().width) *
-                  (self.scrollLeft / (self.scrollWidth - self.getBoundingClientRect().width)) +
-                  'px'
-              );
-              window.clearTimeout(throttleScrollTimeout);
-              throttleScrollTimeout = window.setTimeout(() => {
-                $(el)
-                  .parents('.dataTables_wrapper')
-                  .trigger('scroll');
-              }, 50);
-            }
-          }
-        });
-      scrollbarRail.addClass('hue-scrollbar-x-rail').appendTo($(el).parents('.dataTables_wrapper'));
-      scrollbarRail.width(
-        $(el)
-          .parents('.dataTables_wrapper')
-          .width() - colWidth
-      );
-      scrollbarRail.css('marginLeft', colWidth + 'px');
-      if (scrollbarRail.position().top > $(window).height() - 10) {
-        scrollbarRail.css('bottom', '0');
+  const colWidth = $(el)
+    .find('thead tr th')
+    .outerWidth();
+
+  let wrapperWidth = $wrapper.width();
+  let wrapperScrollWidth = $wrapper[0].scrollWidth;
+
+  if ($wrapper.find('.hue-scrollbar-x-rail').length === 0 && wrapperWidth < wrapperScrollWidth) {
+    $('.hue-scrollbar-x-rail').remove();
+    const $scrollbarRail = $('<div>');
+    const $scrollbar = $('<div>').addClass('hue-scrollbar-x');
+    $scrollbar.width(Math.max(20, wrapperWidth * (wrapperWidth / wrapperScrollWidth)));
+    $scrollbar.appendTo($scrollbarRail);
+    try {
+      $scrollbar.draggable('destroy');
+    } catch (e) {}
+
+    let throttleScrollTimeout = -1;
+    let scrollbarWidth = 0;
+    let railWidth = 0;
+    $scrollbar.draggable({
+      axis: 'x',
+      containment: 'parent',
+      start: function() {
+        $wrapper = $(el).parents('.dataTables_wrapper');
+        wrapperScrollWidth = $wrapper[0].scrollWidth;
+        wrapperWidth = $wrapper.width();
+        scrollbarWidth = $(this).outerWidth();
+        railWidth = $scrollbarRail.innerWidth();
+        $scrollbarRail.css('opacity', '1');
+      },
+      drag: (e, ui) => {
+        $wrapper.scrollLeft(
+          (wrapperScrollWidth - wrapperWidth) * (ui.position.left / (railWidth - scrollbarWidth))
+        );
+        window.clearTimeout(throttleScrollTimeout);
+        throttleScrollTimeout = window.setTimeout(() => {
+          $wrapper.trigger('scroll');
+        }, 50);
+      },
+      stop: () => {
+        $scrollbarRail.css('opacity', '');
       }
-      $(el)
-        .parents('.dataTables_wrapper')
-        .bind('scroll_update', () => {
-          scrollbar.css(
+    });
+
+    $wrapper.bind('mousewheel', function(e) {
+      const _deltaX = e.deltaX * e.deltaFactor,
+        _deltaY = e.deltaY;
+
+      if (Math.abs(_deltaX) >= Math.abs(_deltaY)) {
+        const self = this;
+        self.scrollLeft += _deltaX;
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        if (self.scrollLeft > 0) {
+          $scrollbar.css(
             'left',
-            (scrollbarRail.width() - scrollbar.width()) *
-              ($(el)
-                .parents('.dataTables_wrapper')
-                .scrollLeft() /
-                ($(el).parents('.dataTables_wrapper')[0].scrollWidth -
-                  $(el)
-                    .parents('.dataTables_wrapper')
-                    .width())) +
+            ($scrollbarRail[0].getBoundingClientRect().width -
+              $scrollbar[0].getBoundingClientRect().width) *
+              (self.scrollLeft / (self.scrollWidth - self.getBoundingClientRect().width)) +
               'px'
           );
-        });
-    } else {
-      if (
-        $(el)
-          .parents('.dataTables_wrapper')
-          .width() === $(el).parents('.dataTables_wrapper')[0].scrollWidth
-      ) {
-        $('.hue-scrollbar-x-rail').hide();
-      } else {
-        $('.hue-scrollbar-x-rail').show();
+          window.clearTimeout(throttleScrollTimeout);
+          throttleScrollTimeout = window.setTimeout(() => {
+            $wrapper.trigger('scroll');
+          }, 50);
+        }
       }
-      $(el)
-        .parents('.dataTables_wrapper')
-        .find('.hue-scrollbar-x-rail')
-        .width(
-          $(el)
-            .parents('.dataTables_wrapper')
-            .width() - colWidth
-        );
-      const scrollbar = $(el)
-        .parents('.dataTables_wrapper')
-        .find('.hue-scrollbar-x');
-      scrollbar.width(
-        Math.max(
-          20,
-          $(el)
-            .parents('.dataTables_wrapper')
-            .width() *
-            ($(el)
-              .parents('.dataTables_wrapper')
-              .width() /
-              $(el).parents('.dataTables_wrapper')[0].scrollWidth)
-        )
-      );
-
-      const scrollbarRail = $(el)
-        .parents('.dataTables_wrapper')
-        .find('.hue-scrollbar-x-rail');
-      scrollbarRail.width(
-        $(el)
-          .parents('.dataTables_wrapper')
-          .width() - colWidth
-      );
-      scrollbarRail.css('marginLeft', colWidth + 'px');
-      scrollbar.css(
+    });
+    $scrollbarRail.addClass('hue-scrollbar-x-rail').appendTo($wrapper);
+    $scrollbarRail.width(wrapperWidth - colWidth);
+    $scrollbarRail.css('marginLeft', colWidth + 'px');
+    if ($scrollbarRail.position().top > $(window).height() - 10) {
+      $scrollbarRail.css('bottom', '0');
+    }
+    $wrapper.bind('scroll_update', () => {
+      $scrollbar.css(
         'left',
-        (scrollbarRail.width() - scrollbar.width()) *
-          ($(el)
-            .parents('.dataTables_wrapper')
-            .scrollLeft() /
-            ($(el).parents('.dataTables_wrapper')[0].scrollWidth -
-              $(el)
-                .parents('.dataTables_wrapper')
-                .width())) +
+        ($scrollbarRail.width() - $scrollbar.width()) *
+          ($wrapper.scrollLeft() / (wrapperScrollWidth - wrapperWidth)) +
           'px'
       );
+    });
+  } else {
+    if (wrapperWidth === wrapperScrollWidth) {
+      $('.hue-scrollbar-x-rail').hide();
+    } else {
+      $('.hue-scrollbar-x-rail').show();
     }
+    $wrapper.find('.hue-scrollbar-x-rail').width(wrapperWidth - colWidth);
+    const scrollbar = $wrapper.find('.hue-scrollbar-x');
+    scrollbar.width(Math.max(20, wrapperWidth * (wrapperWidth / wrapperScrollWidth)));
+
+    const scrollbarRail = $wrapper.find('.hue-scrollbar-x-rail');
+    scrollbarRail.width(wrapperWidth - colWidth);
+    scrollbarRail.css('marginLeft', colWidth + 'px');
+    scrollbar.css(
+      'left',
+      (scrollbarRail.width() - scrollbar.width()) *
+        ($wrapper.scrollLeft() / (wrapperScrollWidth - wrapperWidth)) +
+        'px'
+    );
   }
 }
 
