@@ -519,6 +519,31 @@ database has the correct tables and fields.
   the server whole-heartedly.
 * We recommend developing with the Chrome console.
 
+* Special environment variables
+
+    DESKTOP_LOGLEVEL=<level>
+      level can be DEBUG, INFO, WARN, ERROR, or CRITICAL.
+      When specified, the console logger is set to the given log level. A console
+      logger is created if one is not defined.
+
+    DESKTOP_DEBUG
+      A shorthand for DESKTOP_LOG_LEVEL=DEBUG. Also turns on output HTML
+      validation.
+
+    DESKTOP_PROFILE
+      Turn on Python profiling. The profile data is saved in a file. See the
+      console output for the location of the file.
+
+    DESKTOP_LOG_DIR=$dir
+      Specify the HUE log directory. Defaults to ./log.
+
+    DESKTOP_DB_CONFIG=$db engine:db name:test db name:username:password:host:port
+      Specify alternate DB connection parameters for HUE to use. Useful for
+      testing your changes against, for example, MySQL instead of sqlite. String
+      is a colon-delimited list.
+
+    TEST_IMPALAD_HOST=impalad-01.gethue.com
+      Point to an Impalad and trigger the Impala tests.
 
 ## Web interface
 
@@ -602,15 +627,13 @@ development mode.
 
 ### The short story
 
-Install the mini cluster (only once):
+Run the unit tests
 
-    ./tools/jenkins/jenkins.sh slow
+    ./build/env/bin/hue test unit
 
-Run all the tests:
+Open a pull request which will automaticlly trigger a [CircleCi](https://circleci.com/gh/cloudera/hue) unit test run.
 
-    build/env/bin/hue test all
-
-Or just some parts of the tests, e.g.:
+How to run just some parts of the tests, e.g.:
 
     build/env/bin/hue test specific impala
     build/env/bin/hue test specific impala.tests:TestMockedImpala
@@ -631,16 +654,17 @@ Tests themselves should be named *_test.py.  These will be found
 as long as they're in packages covered by django.  You can use the
 unittest frameworks, or you can just name your method with
 the word "test" at a word boundary, and nose will find it.
+
 See apps/hello/src/hello/hello_test.py for an example.
 
 
-#### Helpful command-line tricks
+#### Running only unit, integration or some or one specific tests
 
-To run tests that do not depend on Hadoop, use:
+To run the unit tests (should take 5-10 minutes):
 
     build/env/bin/hue test fast
 
-To run all tests, use:
+To run all the tests (unit and integration), use:
 
     build/env/bin/hue test all
 
@@ -648,23 +672,37 @@ To run only tests of a particular app, use:
 
     build/env/bin/hue test specific <app>
 
-E.g.
-  build/env/bin/hue test specific filebrowser
+e.g.
+
+    build/env/bin/hue test specific filebrowser
 
 To run a specific test, use:
 
-    build/env/bin/hue test specific <test_func>
+    build/env/bin/hue test specific <app><module>:<test_func>
+    build/env/bin/hue test specific <app><module>:<class>
 
-E.g.
-  build/env/bin/hue test specific useradmin.tests:test_user_admin
+e.g.
+
+    build/env/bin/hue test specific useradmin.tests:test_user_admin
+    build/env/bin/hue test specific useradmin.tests:AdminTest
+
+To run a specific test in a class, use:
+
+    build/env/bin/hue test specific <app><module>:<class><test_func>
+
+e.g.
+
+    build/env/bin/hue test specific useradmin.tests:AdminTest.test_login
 
 Start up pdb on test failures:
 
     build/env/bin/hue test <args> --pdb --pdb-failure -s
 
-Point to an Impalad and trigger the Impala tests:
+#### Coverage
 
-    build/env/bin/hue test impala impalad-01.gethue.com
+Add the following options:
+
+    ./build/env/bin/hue test unit --with-xunit --with-cover
 
 
 #### Create and run the Jasmine tests
@@ -684,6 +722,7 @@ Optionally to use Karma and headless chrome for the tests you can run
     npm run test-karma
 
 See ```desktop/core/src/desktop/js/spec/karma.config.js``` for various options
+
 
 #### Testing KO components and bindings
 
@@ -745,43 +784,22 @@ describe('ko.myBinding.js', () => {
 });
 ```
 
-#### Special environment variables
-
-    DESKTOP_LOGLEVEL=<level>
-      level can be DEBUG, INFO, WARN, ERROR, or CRITICAL
-
-      When specified, the console logger is set to the given log level. A console
-      logger is created if one is not defined.
-
-    DESKTOP_DEBUG
-      A shorthand for DESKTOP_LOG_LEVEL=DEBUG. Also turns on output HTML
-      validation.
-
-    DESKTOP_PROFILE
-      Turn on Python profiling. The profile data is saved in a file. See the
-      console output for the location of the file.
-
-    DESKTOP_LOG_DIR=$dir
-      Specify the HUE log directory. Defaults to ./log.
-
-    DESKTOP_DB_CONFIG=$db engine:db name:test db name:username:password:host:port
-      Specify alternate DB connection parameters for HUE to use. Useful for
-      testing your changes against, for example, MySQL instead of sqlite. String
-      is a colon-delimited list.
-
-    TEST_IMPALAD_HOST=impalad-01.gethue.com
-      Point to an Impalad and trigger the Impala tests.
-
-
 #### Continuous Integration (CI)
 
-[CircleCi](https://circleci.com/gh/cloudera/hue) automatically run the unit tests (Python, Javascript, linting) on branch updates and pull requests. Branches containing `ci-commit-master` will tried to be auto pushed to master if the run is green and github permissions match.
+[CircleCi](https://circleci.com/gh/cloudera/hue) automatically run the unit tests (Python, Javascript, linting) on branch updates and pull requests. Branches containing `ci-commit-master` will try to be auto pushed to master if the run is green and the Github permissions match.
+This logic is described in the [config.yml](https://github.com/cloudera/hue/tree/master/.circleci).
 
 The runs happen in an image based on [latest Hue's image](https://hub.docker.com/u/gethue/).
 
 Note: until the `desktop/ext-py` dependencies are moved to a `requirement.txt`, adding new Python modules will require adding them first to the Docker image by building a Hue branch which has them.
 
 #### Integration tests
+
+To not fail on integration tests, Hue would need to be configured to point to a live cluster, or you could install the mini cluster (only once) with:
+
+    ./tools/jenkins/jenkins.sh slow
+
+Note: the integration tests are going to be ported to a more modern CI with dependencies provided by containers.
 
 Those are tagged with `integration` either at the class or method level:
 
@@ -802,8 +820,6 @@ Historically, the same thing used to be done with the `requires_hadoop` tag:
     @attr('requires_hadoop')
     def your_test():
       ...
-
-Because running integration tests is slow, the Jenkins builds are separated into "fast" and "slow". Both are ran via `scripts/jenkins.sh`.
 
 ## Release
 
