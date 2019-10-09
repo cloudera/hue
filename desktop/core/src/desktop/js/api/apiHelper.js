@@ -2018,7 +2018,7 @@ class ApiHelper {
   static adaptExecutableToNotebook(executable, session) {
     const statement = executable.getStatement();
     const snippet = {
-      type: executable.sourceType,
+      type: executable.executor.sourceType(),
       result: {
         handle: executable.handle
       },
@@ -2027,15 +2027,17 @@ class ApiHelper {
       statement_raw: statement,
       statement: statement,
       variables: [],
-      compute: executable.compute,
+      compute: executable.executor.compute(),
+      namespace: executable.executor.namespace(),
       database: executable.database,
       properties: { settings: [] }
     };
 
     const notebook = {
-      type: executable.sourceType,
+      type: executable.executor.sourceType(),
       snippets: [snippet],
       id: executable.notebookId,
+      uuid: hueUtils.UUID(),
       name: '',
       isSaved: false,
       sessions: session ? [session] : []

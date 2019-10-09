@@ -23,20 +23,15 @@ const BATCHABLE_STATEMENT_TYPES = /ALTER|CREATE|DELETE|DROP|GRANT|INSERT|INVALID
 export default class SqlExecutable extends Executable {
   /**
    * @param options
-   * @param {string} options.sourceType
-   * @param {ContextCompute} options.compute
-   * @param {ContextNamespace} options.namespace
-   * @param {string} [options.statement] - Either supply a statement or a parsedStatement
-   * @param {SqlStatementsParserResult} [options.parsedStatement] - Either supply a statement or a parsedStatement
-   * @param {string} [options.database]
    * @param {Executor} options.executor
-   * @param {Session[]} [options.sessions]
+   *
+   * @param {string} options.database
+   * @param {SqlStatementsParserResult} options.parsedStatement
    */
   constructor(options) {
     super(options);
     this.database = options.database;
     this.parsedStatement = options.parsedStatement;
-    this.statement = options.statement;
   }
 
   getStatement() {
@@ -48,6 +43,10 @@ export default class SqlExecutable extends Executable {
       executable: this,
       session: session
     });
+  }
+
+  getKey() {
+    return this.database + '_' + this.parsedStatement.statement;
   }
 
   /**

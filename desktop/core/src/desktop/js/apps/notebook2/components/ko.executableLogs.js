@@ -123,28 +123,46 @@ class ExecutableLogs extends DisposableComponent {
 
     this.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
       if (this.activeExecutable() === executable) {
-        this.hasResultset(executable.handle.has_result_set);
-        this.status(executable.status);
-        this.sourceType(executable.sourceType);
-        if (!this.compute) {
-          this.compute = executable.compute;
-        }
+        this.updateFromExecutable(executable);
       }
     });
 
+    this.subscribe(this.activeExecutable, this.updateFromExecutable.bind(this));
+
     this.subscribe(RESULT_UPDATED_EVENT, executionResult => {
       if (this.activeExecutable() === executionResult.executable) {
-        this.fetchedOnce(executionResult.fetchedOnce);
-        this.hasEmptyResult(executionResult.rows.length === 0);
+        this.updateFromResult(executionResult);
       }
     });
 
     this.subscribe(LOGS_UPDATED_EVENT, executionLogs => {
       if (this.activeExecutable() === executionLogs.executable) {
-        this.logs(executionLogs.fullLog);
-        this.jobs(executionLogs.jobs);
+        this.updateFromLogs(executionLogs);
       }
     });
+  }
+
+  updateFromExecutable(executable) {
+    this.hasResultset(executable.handle.has_result_set);
+    this.status(executable.status);
+    this.sourceType(executable.sourceType);
+    if (!this.compute) {
+      this.compute = executable.compute;
+    }
+    if (executable.result) {
+      this.updateFromResult(executable.result);
+    }
+    this.updateFromLogs(executable.logs);
+  }
+
+  updateFromLogs(executionLogs) {
+    this.logs(executionLogs.fullLog);
+    this.jobs(executionLogs.jobs);
+  }
+
+  updateFromResult(executionResult) {
+    this.fetchedOnce(executionResult.fetchedOnce);
+    this.hasEmptyResult(executionResult.rows.length === 0);
   }
 }
 

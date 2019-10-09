@@ -44,19 +44,11 @@ export const EXECUTABLE_UPDATED_EVENT = 'hue.executable.updated';
 export default class Executable {
   /**
    * @param options
-   * @param {string} options.sourceType
-   * @param {ContextCompute} options.compute
-   * @param {ContextNamespace} options.namespace
    * @param {string} [options.statement] - Either supply a statement or a parsedStatement
-   * @param {SqlStatementsParserResult} [options.parsedStatement] - Either supply a statement or a parsedStatement
-   * @param {string} [options.database]
    * @param {Executor} options.executor
    * @param {Session[]} [options.sessions]
    */
   constructor(options) {
-    this.compute = options.compute;
-    this.namespace = options.namespace;
-    this.sourceType = options.sourceType;
     this.executor = options.executor;
 
     this.handle = {
@@ -72,6 +64,8 @@ export default class Executable {
 
     this.executeStarted = 0;
     this.executeEnded = 0;
+
+    this.nextExecutable = undefined;
   }
 
   setStatus(status) {
@@ -95,6 +89,10 @@ export default class Executable {
     }, 1);
   }
 
+  isReady() {
+    return this.status === EXECUTION_STATUS.ready;
+  }
+
   async execute() {
     if (this.status !== EXECUTION_STATUS.ready) {
       return;
@@ -105,8 +103,8 @@ export default class Executable {
     this.setProgress(0);
 
     try {
-      const session = await sessionManager.getSession({ type: this.sourceType });
-      hueAnalytics.log('notebook', 'execute/' + this.sourceType);
+      const session = await sessionManager.getSession({ type: this.executor.sourceType() });
+      hueAnalytics.log('notebook', 'execute/' + this.executor.sourceType());
       this.handle = await this.internalExecute(session);
 
       if (this.handle.has_result_set && this.handle.sync) {
@@ -189,9 +187,13 @@ export default class Executable {
     throw new Error('Implement in subclass!');
   }
 
+  getKey() {
+    throw new Error('Implement in subclass!');
+  }
+
   async cancel() {
     if (this.cancellables.length && this.status === EXECUTION_STATUS.running) {
-      hueAnalytics.log('notebook', 'cancel/' + this.sourceType);
+      hueAnalytics.log('notebook', 'cancel/' + this.executor.sourceType());
       this.setStatus(EXECUTION_STATUS.canceling);
       while (this.cancellables.length) {
         await this.cancellables.pop().cancel();
@@ -202,7 +204,12 @@ export default class Executable {
 
   async close() {
     while (this.cancellables.length) {
-      await this.cancellables.pop().cancel();
+      const nextCancellable = this.cancellables.pop();
+      try {
+        await nextCancellable.cancel();
+      } catch (err) {
+        console.warn(err);
+      }
     }
 
     return new Promise(resolve => {

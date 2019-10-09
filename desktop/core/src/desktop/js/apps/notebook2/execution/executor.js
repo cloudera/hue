@@ -15,28 +15,10 @@
 // limitations under the License.
 
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
-import { EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
-import { EXECUTABLE_UPDATED_EVENT } from 'apps/notebook2/execution/executable';
-import huePubSub from 'utils/huePubSub';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 
 // TODO: Remove, debug var
 window.sessionManager = sessionManager;
-
-const EXECUTION_FLOW = {
-  step: 'step',
-  batch: 'batch'
-  // batchNoBreak: 'batchNoBreak'
-};
-
-export const EXECUTOR_UPDATED_EVENT = 'hue.executor.updated';
-
-const parsedStatementEquals = (a, b) =>
-  a.statement === b.statement &&
-  a.location.first_column === b.location.first_column &&
-  a.location.last_column === b.location.last_column &&
-  a.location.first_line === b.location.first_line &&
-  a.location.last_line === b.location.last_line;
 
 class Executor {
   /**
@@ -45,7 +27,6 @@ class Executor {
    * @param {string} options.sourceType
    * @param {ContextCompute} options.compute
    * @param {ContextNamespace} options.namespace
-   * @param {EXECUTION_FLOW} [options.executionFlow] (default EXECUTION_FLOW.batch)
    * @param {string} options.statement
    * @param {string} [options.database]
    */
@@ -55,98 +36,53 @@ class Executor {
     this.namespace = options.namespace;
     this.database = options.database;
     this.isSqlEngine = options.isSqlEngine;
-    this.statement = options.statement;
-    this.executionFlow = this.isSqlEngine
-      ? options.executionFlow || EXECUTION_FLOW.batch
-      : EXECUTION_FLOW.step;
-
-    this.toExecute = [];
-    this.currentExecutable = undefined;
-    this.executed = [];
-
-    huePubSub.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
-      if (
-        executable === this.currentExecutable ||
-        this.executed.some(executed => executed === executable)
-      ) {
-        huePubSub.publish(EXECUTOR_UPDATED_EVENT, {
-          executable: executable,
-          executor: this
-        });
-      }
-    });
+    this.executables = [];
   }
 
-  getExecutable(parsedStatement) {
-    return this.executed
-      .concat(this.currentExecutable, this.toExecute)
-      .find(
-        executable =>
-          executable &&
-          executable.parsedStatement &&
-          parsedStatementEquals(parsedStatement, executable.parsedStatement)
+  update(statementDetails) {
+    const newExecutables = statementDetails.precedingStatements
+      .concat(statementDetails.activeStatement, statementDetails.followingStatements)
+      .map(
+        parsedStatement =>
+          new SqlExecutable({
+            parsedStatement: parsedStatement,
+            database: this.database(),
+            executor: this
+          })
       );
-  }
 
-  async reset() {
-    if (this.isRunning()) {
-      await this.cancel();
+    const existingExecutableIndex = {};
+    this.executables.forEach(executable => {
+      existingExecutableIndex[executable.getKey()] = executable;
+    });
+
+    let activeExecutable = new SqlExecutable({
+      parsedStatement: statementDetails.activeStatement,
+      database: this.database(),
+      executor: this
+    });
+
+    if (existingExecutableIndex[activeExecutable.getKey()]) {
+      activeExecutable = existingExecutableIndex[activeExecutable.getKey()];
     }
 
-    if (this.isSqlEngine()) {
-      this.toExecute = SqlExecutable.fromStatement({
-        executor: this,
-        statement: this.statement(),
-        database: this.database(),
-        sourceType: this.sourceType(),
-        compute: this.compute(),
-        namespace: this.namespace()
-      });
-      this.executed = [];
-      this.currentExecutable = undefined;
-    } else {
-      throw new Error('Not implemented yet');
-    }
-  }
+    // Refresh the executables list
+    this.executables = newExecutables.map(newExecutable => {
+      let actualExecutable = newExecutable;
+      const existingExecutable = existingExecutableIndex[newExecutable.getKey()];
+      if (existingExecutable) {
+        actualExecutable = existingExecutable;
+        delete existingExecutableIndex[newExecutable.getKey()];
+      }
+      return actualExecutable;
+    });
 
-  isRunning() {
-    return this.currentExecutable && this.currentExecutable.status === EXECUTION_STATUS.running;
-  }
+    // Cancel lost executables
+    Object.keys(existingExecutableIndex).forEach(key => {
+      existingExecutableIndex[key].cancel();
+    });
 
-  async cancel() {
-    if (this.isRunning()) {
-      return await this.currentExecutable.cancel();
-    }
-  }
-
-  hasMoreToExecute() {
-    return !!this.toExecute.length;
-  }
-
-  async executeNext() {
-    if (!this.toExecute.length) {
-      return;
-    }
-
-    this.currentExecutable = this.toExecute.shift();
-
-    await this.currentExecutable.execute();
-
-    this.executed.push(this.currentExecutable);
-
-    if (this.canExecuteNextInBatch()) {
-      await this.executeNext();
-    }
-  }
-
-  canExecuteNextInBatch() {
-    return (
-      !this.executed.length ||
-      (this.isSqlEngine() &&
-        this.executionFlow !== EXECUTION_FLOW.step &&
-        this.currentExecutable &&
-        this.currentExecutable.canExecuteInBatch())
-    );
+    return activeExecutable;
   }
 }
 
