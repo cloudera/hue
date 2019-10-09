@@ -187,11 +187,9 @@ class ResultGrid extends DisposableComponent {
 
     this.hueDatatable = undefined;
 
-    this.trackKoSub(
-      this.columnsVisible.subscribe(() => {
-        defer(this.redrawFixedHeaders.bind(this));
-      })
-    );
+    this.subscribe(this.columnsVisible, () => {
+      defer(this.redrawFixedHeaders.bind(this));
+    });
 
     this.filteredMeta = ko.pureComputed(() => {
       if (!this.metaFilter() || this.metaFilter().query === '') {
@@ -228,35 +226,29 @@ class ResultGrid extends DisposableComponent {
       return this.filteredMeta().length;
     });
 
-    this.trackKoSub(
-      this.data.subscribe(data => {
-        this.render();
-      })
-    );
+    this.subscribe(this.data, this.render.bind(this));
 
-    this.trackKoSub(
-      this.meta.subscribe(meta => {
-        if (meta) {
-          if (this.hueDatatable) {
-            this.hueDatatable.fnDestroy();
-            this.hueDatatable = undefined;
-          }
-
-          const $resultTable = this.getResultTableElement();
-          if ($resultTable.data('plugin_jHueTableExtender2')) {
-            $resultTable.data('plugin_jHueTableExtender2').destroy();
-          }
-          $resultTable.data('scrollToCol', null);
-          $resultTable.data('scrollToRow', null);
-          $resultTable.data('rendered', false);
-          if ($resultTable.hasClass('dt')) {
-            $resultTable.removeClass('dt');
-            $resultTable.find('thead tr').empty();
-            $resultTable.data('lockedRows', {});
-          }
+    this.subscribe(this.meta, meta => {
+      if (meta) {
+        if (this.hueDatatable) {
+          this.hueDatatable.fnDestroy();
+          this.hueDatatable = undefined;
         }
-      })
-    );
+
+        const $resultTable = this.getResultTableElement();
+        if ($resultTable.data('plugin_jHueTableExtender2')) {
+          $resultTable.data('plugin_jHueTableExtender2').destroy();
+        }
+        $resultTable.data('scrollToCol', null);
+        $resultTable.data('scrollToRow', null);
+        $resultTable.data('rendered', false);
+        if ($resultTable.hasClass('dt')) {
+          $resultTable.removeClass('dt');
+          $resultTable.find('thead tr').empty();
+          $resultTable.data('lockedRows', {});
+        }
+      }
+    });
 
     this.disposals.push(() => {
       if (this.hueDatatable) {
@@ -449,27 +441,19 @@ class ResultGrid extends DisposableComponent {
       $scrollElement.off('scroll.resultGrid');
     });
 
-    this.trackKoSub(
-      this.columnsVisible.subscribe(newValue => {
-        if (newValue) {
-          dataScroll();
-        }
-      })
-    );
+    this.subscribe(this.columnsVisible, newValue => {
+      if (newValue) {
+        dataScroll();
+      }
+    });
 
-    this.trackPubSub(
-      huePubSub.subscribe(REDRAW_FIXED_HEADERS_EVENT, this.redrawFixedHeaders.bind(this))
-    );
+    this.subscribe(REDRAW_FIXED_HEADERS_EVENT, this.redrawFixedHeaders.bind(this));
 
-    this.trackPubSub(huePubSub.subscribe(SHOW_GRID_SEARCH_EVENT, this.showSearch.bind(this)));
+    this.subscribe(SHOW_GRID_SEARCH_EVENT, this.showSearch.bind(this));
 
-    this.trackPubSub(
-      huePubSub.subscribe(HIDE_FIXED_HEADERS_EVENT, this.hideFixedHeaders.bind(this))
-    );
+    this.subscribe(HIDE_FIXED_HEADERS_EVENT, this.hideFixedHeaders.bind(this));
 
-    this.trackPubSub(
-      huePubSub.subscribe(SHOW_NORMAL_RESULT_EVENT, this.showNormalResult.bind(this))
-    );
+    this.subscribe(SHOW_NORMAL_RESULT_EVENT, this.showNormalResult.bind(this));
 
     return this.hueDatatable;
   }

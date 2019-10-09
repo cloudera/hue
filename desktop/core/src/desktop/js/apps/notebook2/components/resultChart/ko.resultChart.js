@@ -19,7 +19,6 @@ import ko from 'knockout';
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
 import hueAnalytics from 'utils/hueAnalytics';
-import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import {
   leafletMapChartTransformer,
@@ -546,38 +545,34 @@ class ResultChart extends DisposableComponent {
       );
     });
 
-    this.trackKoSub(this.chartType.subscribe(this.redrawChart.bind(this)));
+    this.subscribe(this.chartType, this.redrawChart.bind(this));
 
-    this.trackKoSub(
-      this.meta.subscribe(() => {
-        if (this.chartX()) {
-          this.chartX(this.guessMetaField(this.chartX()));
-        }
-        if (this.chartXPivot()) {
-          this.chartXPivot(this.guessMetaField(this.chartXPivot()));
-        }
-        if (this.chartYSingle()) {
-          this.chartYSingle(this.guessMetaField(this.chartYSingle()));
-        }
-        if (this.chartMapLabel()) {
-          this.chartMapLabel(this.guessMetaField(this.chartMapLabel()));
-        }
-        if (this.chartYMulti()) {
-          this.chartYMulti(this.guessMetaFields(this.chartYMulti()));
-        }
-      })
-    );
+    this.subscribe(this.meta, () => {
+      if (this.chartX()) {
+        this.chartX(this.guessMetaField(this.chartX()));
+      }
+      if (this.chartXPivot()) {
+        this.chartXPivot(this.guessMetaField(this.chartXPivot()));
+      }
+      if (this.chartYSingle()) {
+        this.chartYSingle(this.guessMetaField(this.chartYSingle()));
+      }
+      if (this.chartMapLabel()) {
+        this.chartMapLabel(this.guessMetaField(this.chartMapLabel()));
+      }
+      if (this.chartYMulti()) {
+        this.chartYMulti(this.guessMetaFields(this.chartYMulti()));
+      }
+    });
 
-    this.trackKoSub(this.showChart.subscribe(this.prepopulateChart.bind(this)));
-    this.trackKoSub(this.chartType.subscribe(this.prepopulateChart.bind(this)));
-    this.trackKoSub(this.chartXPivot.subscribe(this.prepopulateChart.bind(this)));
+    this.subscribe(this.showChart, this.prepopulateChart.bind(this));
+    this.subscribe(this.chartType, this.prepopulateChart.bind(this));
+    this.subscribe(this.chartXPivot, this.prepopulateChart.bind(this));
 
-    this.trackKoSub(
-      this.hasDataForChart.subscribe(() => {
-        this.chartX.notifySubscribers();
-        this.chartX.valueHasMutated();
-      })
-    );
+    this.subscribe(this.hasDataForChart, () => {
+      this.chartX.notifySubscribers();
+      this.chartX.valueHasMutated();
+    });
 
     this.hideStacked = ko.pureComputed(() => !this.chartYMulti().length);
 
@@ -658,7 +653,7 @@ class ResultChart extends DisposableComponent {
       group: this.chartScatterGroup()
     }));
 
-    this.trackPubSub(huePubSub.subscribe(REDRAW_CHART_EVENT, this.redrawChart.bind(this)));
+    this.subscribe(REDRAW_CHART_EVENT, this.redrawChart.bind(this));
 
     const resizeId = UUID();
     let resizeTimeout = -1;
