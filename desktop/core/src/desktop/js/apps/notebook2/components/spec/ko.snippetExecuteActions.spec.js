@@ -1,14 +1,24 @@
 import huePubSub from 'utils/huePubSub';
 import { koSetup } from 'spec/jasmineSetup';
 import { NAME } from '../ko.snippetExecuteActions';
-import { EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
-import { EXECUTOR_UPDATED_EVENT } from 'apps/notebook2/execution/executor';
+import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
 
 describe('ko.snippetExecuteActions.js', () => {
   const setup = koSetup();
 
   it('should render component', async () => {
-    const element = await setup.renderComponent(NAME, {});
+    const mockExecutable = {
+      cancel: () => {},
+      execute: () => {},
+      isReady: () => true,
+      nextExecutable: {},
+      status: EXECUTION_STATUS.ready
+    };
+    const activeExecutable = () => mockExecutable;
+    activeExecutable.prototype.subscribe = () => {};
+    const element = await setup.renderComponent(NAME, {
+      activeExecutable: activeExecutable
+    });
 
     expect(element.querySelector('[data-test="' + NAME + '"]')).toBeTruthy();
   });
@@ -16,20 +26,21 @@ describe('ko.snippetExecuteActions.js', () => {
   it('should handle execute and stop clicks', async () => {
     let executeCalled = false;
     let cancelCalled = false;
-    const mockExecutor = {
+    const mockExecutable = {
       cancel: () => {
         cancelCalled = true;
       },
-      hasMoreToExecute: () => true
-    };
-    const snippet = {
-      executor: mockExecutor,
       execute: () => {
         executeCalled = true;
-      }
+      },
+      isReady: () => true,
+      nextExecutable: {},
+      status: EXECUTION_STATUS.ready
     };
+    const activeExecutable = () => mockExecutable;
+    activeExecutable.prototype.subscribe = () => {};
     const wrapper = await setup.renderComponent(NAME, {
-      snippet: snippet
+      activeExecutable: activeExecutable
     });
 
     // Click play
@@ -39,12 +50,8 @@ describe('ko.snippetExecuteActions.js', () => {
     wrapper.querySelector('[data-test="execute"]').click();
 
     expect(executeCalled).toBeTruthy();
-    huePubSub.publish(EXECUTOR_UPDATED_EVENT, {
-      executor: mockExecutor,
-      executable: {
-        status: EXECUTION_STATUS.running
-      }
-    });
+    mockExecutable.status = EXECUTION_STATUS.running;
+    huePubSub.publish(EXECUTABLE_UPDATED_EVENT, mockExecutable);
 
     await setup.waitForKoUpdate();
 

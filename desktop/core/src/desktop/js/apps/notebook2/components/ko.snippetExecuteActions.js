@@ -18,11 +18,12 @@ import ko from 'knockout';
 
 import componentUtils from 'ko/components/componentUtils';
 import I18n from 'utils/i18n';
-import { EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
-import { EXECUTOR_UPDATED_EVENT } from 'apps/notebook2/execution/executor';
+import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
 import DisposableComponent from 'ko/components/DisposableComponent';
 
 export const NAME = 'snippet-execute-actions';
+
+export const EXECUTE_ACTIVE_EXECUTABLE_EVENT = 'executable.active.executable';
 
 // prettier-ignore
 const TEMPLATE = `
@@ -60,38 +61,54 @@ class SnippetExecuteActions extends DisposableComponent {
   constructor(params) {
     super();
     this.stopping = ko.observable(false);
-    this.snippet = params.snippet;
+    this.activeExecutable = params.activeExecutable;
     this.status = ko.observable(EXECUTION_STATUS.ready);
     this.hasMoreToExecute = ko.observable(false);
-    this.subscribe(EXECUTOR_UPDATED_EVENT, executorUpdate => {
-      if (this.snippet.executor === executorUpdate.executor) {
-        this.hasMoreToExecute(!!executorUpdate.executor.hasMoreToExecute());
-        this.status(executorUpdate.executable.status);
+
+    this.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
+      if (this.activeExecutable() === executable) {
+        this.hasMoreToExecute(!!executable.nextExecutable);
+        this.status(executable.status);
       }
+    });
+
+    this.subscribe(EXECUTE_ACTIVE_EXECUTABLE_EVENT, executable => {
+      if (this.activeExecutable() === executable) {
+        this.execute();
+      }
+    });
+
+    this.subscribe(this.activeExecutable, executable => {
+      // TODO: If previousExecutable show 'waiting...' ?
+      this.hasMoreToExecute(!!executable.nextExecutable);
+      this.status(executable.status);
     });
   }
 
   async stop() {
-    if (this.stopping()) {
+    if (this.stopping() || !this.activeExecutable()) {
       return;
     }
     this.stopping(true);
-    await this.snippet.executor.cancel();
+    await this.activeExecutable().cancel();
     this.stopping(false);
   }
 
   execute() {
-    this.snippet.execute();
+    const executable = this.activeExecutable();
+    if (executable) {
+      if (!executable.isReady()) {
+        executable.close();
+      }
+      executable.execute();
+    }
   }
 
   executeNext() {
-    this.snippet.executeNext();
-  }
-
-  dispose() {
-    while (this.disposals.length) {
-      this.disposals.pop()();
+    if (this.activeExecutable() && this.activeExecutable().nextExecutable) {
+      this.activeExecutable(this.activeExecutable().nextExecutable);
     }
+    this.execute();
   }
 }
 

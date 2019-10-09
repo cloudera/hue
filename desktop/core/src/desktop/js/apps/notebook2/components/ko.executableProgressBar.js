@@ -19,9 +19,7 @@ import ko from 'knockout';
 import 'ko/bindings/ko.publish';
 
 import componentUtils from 'ko/components/componentUtils';
-import { EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
-import huePubSub from 'utils/huePubSub';
-import { EXECUTOR_UPDATED_EVENT } from 'apps/notebook2/execution/executor';
+import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
 import DisposableComponent from 'ko/components/DisposableComponent';
 
 export const NAME = 'executable-progress-bar';
@@ -35,7 +33,7 @@ const TEMPLATE = `
 class ExecutableProgressBar extends DisposableComponent {
   constructor(params) {
     super();
-    this.snippet = params.snippet;
+    this.activeExecutable = params.activeExecutable;
 
     this.status = ko.observable();
     this.progress = ko.observable(0);
@@ -65,15 +63,16 @@ class ExecutableProgressBar extends DisposableComponent {
       return Math.max(2, this.progress()) + '%';
     });
 
-    const updateSub = huePubSub.subscribe(EXECUTOR_UPDATED_EVENT, executorUpdate => {
-      if (this.snippet.executor === executorUpdate.executor) {
-        this.status(executorUpdate.executable.status);
-        this.progress(executorUpdate.executable.progress);
+    this.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
+      if (this.activeExecutable() === executable) {
+        this.status(executable.status);
+        this.progress(executable.progress);
       }
     });
 
-    this.addDisposalCallback(() => {
-      updateSub.remove();
+    this.subscribe(this.activeExecutable, executable => {
+      this.status(executable.status);
+      this.progress(executable.progress);
     });
   }
 }

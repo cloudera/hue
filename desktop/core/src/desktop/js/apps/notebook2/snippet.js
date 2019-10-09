@@ -27,7 +27,7 @@ import 'apps/notebook2/components/ko.snippetResults';
 
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
 import apiHelper from 'api/apiHelper';
-import Executor, { EXECUTOR_UPDATED_EVENT } from 'apps/notebook2/execution/executor';
+import Executor from 'apps/notebook2/execution/executor';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
@@ -35,6 +35,12 @@ import sessionManager from 'apps/notebook2/execution/sessionManager';
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
 import { notebookToContextJSON, snippetToContextJSON } from 'apps/notebook2/notebookSerde';
 import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
+import { EXECUTABLE_UPDATED_EVENT } from 'apps/notebook2/execution/executable';
+import {
+  ACTIVE_STATEMENT_CHANGED_EVENT,
+  REFRESH_STATEMENT_LOCATIONS_EVENT
+} from 'sql/aceLocationHandler';
+import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from 'apps/notebook2/components/ko.snippetExecuteActions';
 
 // TODO: Remove. Temporary here for debug
 window.SqlExecutable = SqlExecutable;
@@ -364,7 +370,7 @@ export default class Snippet {
     this.statementsList = ko.observableArray();
 
     huePubSub.subscribe(
-      'editor.active.statement.changed',
+      ACTIVE_STATEMENT_CHANGED_EVENT,
       statementDetails => {
         if (this.ace() && this.ace().container.id === statementDetails.id) {
           for (let i = statementDetails.precedingStatements.length - 1; i >= 0; i--) {
@@ -381,13 +387,9 @@ export default class Snippet {
               break;
             }
           }
-          if (statementDetails.activeStatement) {
-            this.positionStatement(statementDetails.activeStatement);
-            this.activeExecutable(this.executor.getExecutable(statementDetails.activeStatement));
-          } else {
-            this.positionStatement(null);
-            this.activeExecutable(undefined);
-          }
+
+          this.positionStatement(statementDetails.activeStatement);
+          this.activeExecutable(this.executor.update(statementDetails));
 
           if (statementDetails.activeStatement) {
             const _statements = [];
@@ -996,7 +998,6 @@ export default class Snippet {
       timeout: this.parentVm.autocompleteTimeout
     });
 
-    this.latestExecutable = ko.observable();
     this.activeExecutable = ko.observable();
 
     this.executor = new Executor({
@@ -1004,22 +1005,18 @@ export default class Snippet {
       database: this.database,
       sourceType: this.type,
       namespace: this.namespace,
-      statement: this.statement,
       isSqlEngine: this.isSqlDialect
     });
 
-    huePubSub.subscribe(EXECUTOR_UPDATED_EVENT, details => {
-      const executable = details.executable;
-
-      if (details.executor === this.executor) {
-        this.latestExecutable(executable);
-        this.activeExecutable(executable); // TODO: Move to pureComputed (based on cursor)
+    huePubSub.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
+      if (this.activeExecutable() === executable) {
         this.status(executable.status);
-        this.progress(executable.progress);
       }
     });
 
     this.refreshHistory = notebook.fetchHistory;
+
+    huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this);
   }
 
   ace(newVal) {
@@ -1048,60 +1045,56 @@ export default class Snippet {
     });
   }
 
-  async executeNext() {
-    hueAnalytics.log('notebook', 'execute/' + this.type());
+  // async executeNext() {
+  //   hueAnalytics.log('notebook', 'execute/' + this.type());
+  //
+  //   const now = new Date().getTime();
+  //   if (now - this.lastExecuted() < 1000) {
+  //     return; // Prevent fast clicks
+  //   }
+  //   this.lastExecuted(now);
+  //
+  //   if (this.type() === TYPE.impala) {
+  //     this.showExecutionAnalysis(false);
+  //     huePubSub.publish('editor.clear.execution.analysis');
+  //   }
+  //
+  //   // Editor based execution
+  //   if (this.ace()) {
+  //     const selectionRange = this.ace().getSelectionRange();
+  //
+  //     huePubSub.publish('ace.set.autoexpand', { autoExpand: false, snippet: this });
+  //     this.lastAceSelectionRowOffset(Math.min(selectionRange.start.row, selectionRange.end.row));
+  //   }
+  //
+  //   const $snip = $('#snippet_' + this.id());
+  //   $snip.find('.progress-snippet').animate(
+  //     {
+  //       height: '3px'
+  //     },
+  //     100
+  //   );
+  //
+  //   $('.jHueNotify').remove();
+  //   this.parentNotebook.forceHistoryInitialHeight(true);
+  //   this.errors([]);
+  //   huePubSub.publish('editor.clear.highlighted.errors', this.ace());
+  //   this.progress(0);
+  //   this.jobs([]);
+  //
+  //   this.parentNotebook.historyCurrentPage(1);
+  //
+  //   this.startLongOperationTimeout();
+  //
+  //   try {
+  //     await this.executor.executeNext();
+  //   } catch (error) {}
+  //   this.stopLongOperationTimeout();
+  // }
 
-    const now = new Date().getTime();
-    if (now - this.lastExecuted() < 1000) {
-      return; // Prevent fast clicks
-    }
-    this.lastExecuted(now);
-
-    if (this.type() === TYPE.impala) {
-      this.showExecutionAnalysis(false);
-      huePubSub.publish('editor.clear.execution.analysis');
-    }
-
-    // Editor based execution
-    if (this.ace()) {
-      const selectionRange = this.ace().getSelectionRange();
-
-      if (this.isSqlDialect()) {
-        huePubSub.publish('editor.refresh.statement.locations', this);
-      }
-
-      huePubSub.publish('ace.set.autoexpand', { autoExpand: false, snippet: this });
-      this.lastAceSelectionRowOffset(Math.min(selectionRange.start.row, selectionRange.end.row));
-    }
-
-    const $snip = $('#snippet_' + this.id());
-    $snip.find('.progress-snippet').animate(
-      {
-        height: '3px'
-      },
-      100
-    );
-
-    $('.jHueNotify').remove();
-    this.parentNotebook.forceHistoryInitialHeight(true);
-    this.errors([]);
-    huePubSub.publish('editor.clear.highlighted.errors', this.ace());
-    this.progress(0);
-    this.jobs([]);
-
-    this.parentNotebook.historyCurrentPage(1);
-
-    this.startLongOperationTimeout();
-
-    try {
-      await this.executor.executeNext();
-    } catch (error) {}
-    this.stopLongOperationTimeout();
-  }
-
-  async execute() {
-    await this.executor.reset();
-    await this.executeNext();
+  execute() {
+    // From ctrl + enter
+    huePubSub.publish(EXECUTE_ACTIVE_EXECUTABLE_EVENT, this.activeExecutable());
   }
 
   async exportHistory() {

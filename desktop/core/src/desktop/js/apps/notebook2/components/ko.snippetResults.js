@@ -63,10 +63,6 @@ const TEMPLATE = `
       <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: showChart, css: { 'active': showChart }"><i class="hcha fa-fw hcha-bar-chart"></i> ${ I18n('Chart') }</button>
     </div>
     <div class="btn-group pull-right">
-      <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: showLatestResult, css: { 'active': showLatestResult }">${ I18n('Latest') }</button>
-      <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: showLatestResult, css: { 'active': !showLatestResult() }">${ I18n('Active') }</button>
-    </div>
-    <div class="btn-group pull-right">
       <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: isResultFullScreenMode">
         <!-- ko if: isResultFullScreenMode -->
         <i class="fa fa-compress"></i> ${ I18n('Collapse') }
@@ -128,12 +124,7 @@ const TEMPLATE = `
         } --><!-- /ko -->
       </div>
       <div data-bind="visible: !data().length" style="display: none;">
-        <!-- ko if: showLatestResult -->
-        <h1 class="empty">${ I18n('Execute a query to see the latest result.') }</h1>
-        <!-- /ko -->
-        <!-- ko ifnot: showLatestResult -->
-        <h1 class="empty">${ I18n('Execute the active statement to see the result.') }</h1>
-        <!-- /ko -->
+        <h1 class="empty">${ I18n('Select and execute a query to see the result.') }</h1>
       </div>
     </div>
   </div>
@@ -146,12 +137,6 @@ class SnippetResults extends DisposableComponent {
     this.element = element;
 
     this.activeExecutable = params.activeExecutable;
-    this.latestExecutable = params.latestExecutable;
-
-    this.showLatestResult = ko.observable(true);
-    this.selectedExecutable = ko.pureComputed(() =>
-      this.showLatestResult() ? this.latestExecutable() : this.activeExecutable()
-    );
 
     this.editorMode = params.editorMode;
     this.isPresentationMode = params.isPresentationMode;
@@ -205,21 +190,21 @@ class SnippetResults extends DisposableComponent {
     });
 
     this.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
-      if (this.selectedExecutable() === executable) {
+      if (this.activeExecutable() === executable) {
         this.updateFromExecutable(executable);
       }
     });
 
     let lastRenderedResult = undefined;
     this.subscribe(RESULT_UPDATED_EVENT, executionResult => {
-      if (this.selectedExecutable() === executionResult.executable) {
+      if (this.activeExecutable() === executionResult.executable) {
         const refresh = lastRenderedResult !== executionResult;
         this.updateFromExecutionResult(executionResult, refresh);
         lastRenderedResult = executionResult;
       }
     });
 
-    this.subscribe(this.selectedExecutable, executable => {
+    this.subscribe(this.activeExecutable, executable => {
       if (executable && executable.result) {
         if (executable !== lastRenderedResult) {
           this.updateFromExecutionResult(executable.result, true);

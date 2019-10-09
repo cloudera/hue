@@ -671,7 +671,6 @@
           <div class="tab-pane" id="queryResults" data-bind="css: {'active': currentQueryTab() == 'queryResults'}">
             <!-- ko if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) === -1 -->
               <!-- ko component: { name: 'snippet-results', params: {
-                latestExecutable: latestExecutable,
                 activeExecutable: activeExecutable,
                 editorMode: parentVm.editorMode,
                 id: id,
@@ -825,7 +824,6 @@
             <!-- /ko -->
             <!-- ko if: !$root.editorMode() && ['text', 'jar', 'java', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'].indexOf(type()) === -1 -->
               <!-- ko component: { name: 'snippet-results', params: {
-                latestExecutable: latestExecutable,
                 activeExecutable: activeExecutable,
                 editorMode: parentVm.editorMode,
                 id: id,
@@ -1274,7 +1272,7 @@
           css: {'blue': $data.showLogs}
         " title="${ _('Toggle Logs') }"><i class="fa fa-fw" data-bind="css: { 'fa-caret-right': !$data.showLogs(), 'fa-caret-down': $data.showLogs() }"></i></a>
       <div class="snippet-progress-container" data-bind="visible: status() != 'canceled' && status() != 'with-optimizer-report'">
-        <!-- ko component: { name: 'executable-progress-bar', params: { snippet: $data } } --><!-- /ko -->
+        <!-- ko component: { name: 'executable-progress-bar', params: { activeExecutable: activeExecutable } } --><!-- /ko -->
       </div>
       <div class="snippet-error-container alert alert-error" style="margin-bottom: 0" data-bind="visible: errors().length > 0">
         <ul class="unstyled" data-bind="foreach: errors">
@@ -1337,7 +1335,7 @@
 
   <script type ="text/html" id="snippet-execution-controls${ suffix }">
     <div class="snippet-actions clearfix">
-      <div class="pull-left" data-bind="component: { name: 'snippet-execute-actions', params: { snippet: $data } }" />
+      <div class="pull-left" data-bind="component: { name: 'snippet-execute-actions', params: { activeExecutable: activeExecutable } }" />
       <!-- ko if: isSqlDialect() && !$root.isPresentationMode() -->
       <div class="pull-right" data-bind="component: { name: 'snippet-editor-actions', params: { snippet: $data } }" />
       <!-- /ko -->

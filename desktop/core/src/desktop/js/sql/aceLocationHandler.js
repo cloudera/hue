@@ -27,6 +27,9 @@ import stringDistance from 'sql/stringDistance';
 
 // TODO: depends on Ace, sqlStatementsParser
 
+export const REFRESH_STATEMENT_LOCATIONS_EVENT = 'editor.refresh.statement.locations';
+export const ACTIVE_STATEMENT_CHANGED_EVENT = 'editor.active.statement.changed';
+
 const STATEMENT_COUNT_AROUND_ACTIVE = 10;
 
 const VERIFY_LIMIT = 50;
@@ -568,7 +571,7 @@ class AceLocationHandler {
         }
       }
 
-      huePubSub.publish('editor.active.statement.changed', {
+      huePubSub.publish(ACTIVE_STATEMENT_CHANGED_EVENT, {
         id: self.editorId,
         editorChangeTime: lastKnownStatements.editorChangeTime,
         activeStatementIndex: statementIndex,
@@ -650,19 +653,16 @@ class AceLocationHandler {
       }
     });
 
-    const locateSubscription = huePubSub.subscribe(
-      'editor.refresh.statement.locations',
-      snippet => {
-        if (snippet === self.snippet) {
-          cursorChangePaused = true;
-          window.clearTimeout(changeThrottle);
-          window.clearTimeout(updateThrottle);
-          parseForStatements();
-          updateActiveStatement();
-          cursorChangePaused = false;
-        }
+    const locateSubscription = huePubSub.subscribe(REFRESH_STATEMENT_LOCATIONS_EVENT, snippet => {
+      if (snippet === self.snippet) {
+        cursorChangePaused = true;
+        window.clearTimeout(changeThrottle);
+        window.clearTimeout(updateThrottle);
+        parseForStatements();
+        updateActiveStatement();
+        cursorChangePaused = false;
       }
-    );
+    });
 
     self.disposeFunctions.push(() => {
       window.clearTimeout(changeThrottle);
