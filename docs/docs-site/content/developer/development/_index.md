@@ -658,7 +658,7 @@ the word "test" at a word boundary, and nose will find it.
 See apps/hello/src/hello/hello_test.py for an example.
 
 
-#### Running only unit, integration or some or one specific tests
+#### Running only specific tests
 
 To run the unit tests (should take 5-10 minutes):
 
