@@ -27,12 +27,10 @@ import 'apps/notebook2/components/ko.snippetResults';
 
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
 import apiHelper from 'api/apiHelper';
-import dataCatalog from 'catalog/dataCatalog';
 import Executor, { EXECUTOR_UPDATED_EVENT } from 'apps/notebook2/execution/executor';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
-import Result from 'apps/notebook2/result';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
 import { notebookToContextJSON, snippetToContextJSON } from 'apps/notebook2/notebookSerde';
@@ -450,7 +448,6 @@ export default class Snippet {
       } else {
         this.properties(komapping.fromJS(getDefaultSnippetProperties(newValue)));
       }
-      this.result.clear();
       window.setTimeout(() => {
         if (this.ace() !== null) {
           this.ace().focus();
@@ -752,10 +749,6 @@ export default class Snippet {
       return statement;
     });
 
-    this.result = new Result(snippet.result || {}, this);
-    if (!this.result.hasSomeResults()) {
-      this.currentQueryTab('queryHistory');
-    }
     let defaultShowLogs = true;
     if (this.parentVm.editorMode() && $.totalStorage('hue.editor.showLogs')) {
       defaultShowLogs = $.totalStorage('hue.editor.showLogs');
@@ -788,9 +781,6 @@ export default class Snippet {
 
     this.settingsVisible = ko.observable(!!snippet.settingsVisible);
     this.saveResultsModalVisible = ko.observable(false);
-
-    this.checkStatusTimeout = null;
-    this.getLogsTimeout = null;
 
     this.complexity = ko.observable();
     this.hasComplexity = ko.pureComputed(
@@ -1042,58 +1032,6 @@ export default class Snippet {
     return this.aceEditor;
   }
 
-  cancel() {
-    window.clearTimeout(this.executeNextTimeout);
-    this.isCanceling(true);
-    if (this.checkStatusTimeout != null) {
-      clearTimeout(this.checkStatusTimeout);
-      this.checkStatusTimeout = null;
-      clearTimeout(this.getLogsTimeout);
-      this.getLogsTimeout = null;
-    }
-    hueAnalytics.log('notebook', 'cancel');
-
-    if (this.executingBlockingOperation != null) {
-      this.executingBlockingOperation.abort();
-      this.executingBlockingOperation = null;
-    }
-
-    if ($.isEmptyObject(this.result.handle())) {
-      // Query was not even submitted yet
-      this.statusForButtons(STATUS_FOR_BUTTONS.canceled);
-      this.status(STATUS.failed);
-      this.isCanceling(false);
-      this.parentNotebook.isExecutingAll(false);
-    } else {
-      this.statusForButtons(STATUS_FOR_BUTTONS.canceling);
-      apiHelper
-        .cancelNotebookStatement({
-          notebookJson: notebookToContextJSON(this.parentNotebook),
-          snippetJson: snippetToContextJSON(this)
-        })
-        .then(data => {
-          this.statusForButtons(STATUS_FOR_BUTTONS.canceled);
-          if (data.status === 0) {
-            this.status(STATUS.canceled);
-            this.parentNotebook.isExecutingAll(false);
-          } else {
-            this.handleAjaxError(data);
-          }
-        })
-        .fail(xhr => {
-          if (xhr.status !== 502) {
-            $(document).trigger('error', xhr.responseText);
-          }
-          this.statusForButtons(STATUS_FOR_BUTTONS.canceled);
-          this.status(STATUS.failed);
-          this.parentNotebook.isExecutingAll(false);
-        })
-        .always(() => {
-          this.isCanceling(false);
-        });
-    }
-  }
-
   checkCompatibility() {
     this.hasSuggestion(null);
     this.compatibilitySourcePlatform(COMPATIBILITY_SOURCE_PLATFORMS[this.type()]);
@@ -1103,123 +1041,7 @@ export default class Snippet {
     this.queryCompatibility();
   }
 
-  checkDdlNotification() {
-    if (
-      this.lastExecutedStatement() &&
-      /ALTER|CREATE|DELETE|DROP|GRANT|INSERT|INVALIDATE|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i.test(
-        this.lastExecutedStatement().firstToken
-      )
-    ) {
-      this.onDdlExecute();
-    } else {
-      window.clearTimeout(this.executeNextTimeout);
-    }
-  }
-
-  checkStatus() {
-    const _checkStatus = () => {
-      $.post('/notebook/api/check_status', {
-        notebook: notebookToContextJSON(this.parentNotebook),
-        snippet: snippetToContextJSON(this)
-      })
-        .then(data => {
-          if (
-            this.statusForButtons() === STATUS_FOR_BUTTONS.canceling ||
-            this.status() === STATUS.canceled
-          ) {
-            // Query was canceled in the meantime, do nothing
-          } else {
-            this.result.endTime(new Date());
-
-            if (data.status === 0) {
-              this.status(data.query_status.status);
-
-              if (
-                this.status() === STATUS.running ||
-                this.status() === STATUS.starting ||
-                this.status() === STATUS.waiting
-              ) {
-                const delay = this.result.executionTime() > 45000 ? 5000 : 1000; // 5s if more than 45s
-                if (!this.parentNotebook.unloaded()) {
-                  this.checkStatusTimeout = setTimeout(_checkStatus, delay);
-                }
-              } else if (this.status() === STATUS.available) {
-                this.fetchResult(100);
-                this.progress(100);
-                if (this.isSqlDialect()) {
-                  if (this.result.handle().has_result_set) {
-                    const _query_id = this.parentNotebook.id();
-                    setTimeout(() => {
-                      // Delay until we get IMPALA-5555
-                      this.fetchResultSize(10, _query_id);
-                    }, 2000);
-                    this.checkDdlNotification(); // DDL CTAS with Impala
-                  } else if (this.lastExecutedStatement()) {
-                    this.checkDdlNotification();
-                  } else {
-                    this.onDdlExecute();
-                  }
-                }
-                if (this.parentNotebook.isExecutingAll()) {
-                  this.parentNotebook.executingAllIndex(
-                    this.parentNotebook.executingAllIndex() + 1
-                  );
-                  if (
-                    this.parentNotebook.executingAllIndex() < this.parentNotebook.snippets().length
-                  ) {
-                    this.parentNotebook
-                      .snippets()
-                      [this.parentNotebook.executingAllIndex()].execute();
-                  } else {
-                    this.parentNotebook.isExecutingAll(false);
-                  }
-                }
-                if (!this.result.handle().has_more_statements && this.parentVm.successUrl()) {
-                  huePubSub.publish('open.link', this.parentVm.successUrl()); // Not used anymore in Hue 4
-                }
-              } else if (this.status() === STATUS.success) {
-                this.progress(99);
-              }
-            } else if (data.status === -3) {
-              this.status(STATUS.expired);
-              this.parentNotebook.isExecutingAll(false);
-            } else {
-              this.handleAjaxError(data);
-              this.parentNotebook.isExecutingAll(false);
-            }
-          }
-        })
-        .fail((xhr, textStatus) => {
-          if (xhr.status !== 502) {
-            $(document).trigger('error', xhr.responseText || textStatus);
-          }
-          this.status(STATUS.failed);
-          this.parentNotebook.isExecutingAll(false);
-        });
-    };
-    const activeStatus = ['running', 'starting', 'waiting'];
-    const _getLogs = isLastTime => {
-      this.getLogs().then(() => {
-        const lastTime = activeStatus.indexOf(this.status()) < 0; // We to run getLogs at least one time after status is terminated to make sure we have last logs
-        if (lastTime && isLastTime) {
-          return;
-        }
-        const delay = this.result.executionTime() > 45000 ? 5000 : 1000; // 5s if more than 45s
-        this.getLogsTimeout = setTimeout(_getLogs.bind(this, lastTime), delay);
-      });
-    };
-    _checkStatus();
-    _getLogs(activeStatus.indexOf(this.status()) < 0);
-  }
-
   close() {
-    if (this.checkStatusTimeout != null) {
-      clearTimeout(this.checkStatusTimeout);
-      this.checkStatusTimeout = null;
-      clearTimeout(this.getLogsTimeout);
-      this.getLogsTimeout = null;
-    }
-
     $.post('/notebook/api/close_statement', {
       notebook: notebookToContextJSON(this.parentNotebook),
       snippet: snippetToContextJSON(this)
@@ -1264,7 +1086,6 @@ export default class Snippet {
     this.parentNotebook.forceHistoryInitialHeight(true);
     this.errors([]);
     huePubSub.publish('editor.clear.highlighted.errors', this.ace());
-    this.result.clear();
     this.progress(0);
     this.jobs([]);
 
@@ -1273,19 +1094,9 @@ export default class Snippet {
     this.startLongOperationTimeout();
 
     try {
-      const result = await this.executor.executeNext();
-
-      this.stopLongOperationTimeout();
-      this.result.clear();
-
-      await this.result.update(result);
-
-      if (this.result.data().length) {
-        this.currentQueryTab('queryResults');
-      }
-    } catch (error) {
-      this.stopLongOperationTimeout();
-    }
+      await this.executor.executeNext();
+    } catch (error) {}
+    this.stopLongOperationTimeout();
   }
 
   async execute() {
@@ -1329,9 +1140,9 @@ export default class Snippet {
     this.loadingQueries(true);
     this.queriesHasErrors(false);
     this.lastFetchQueriesRequest = apiHelper.searchDocuments({
-      successCallback: result => {
-        this.queriesTotalPages(Math.ceil(result.count / QUERIES_PER_PAGE));
-        this.queries(komapping.fromJS(result.documents)());
+      successCallback: foundDocuments => {
+        this.queriesTotalPages(Math.ceil(foundDocuments.count / QUERIES_PER_PAGE));
+        this.queries(komapping.fromJS(foundDocuments.documents)());
         this.loadingQueries(false);
         this.queriesHasErrors(false);
       },
@@ -1345,102 +1156,6 @@ export default class Snippet {
       query: this.queriesFilter(),
       include_trashed: false
     });
-  }
-
-  // TODO: Switch to result.fetchMoreRows in ko mako
-  fetchResult(rows, startOver) {
-    this.result.fetchMoreRows(rows, startOver);
-  }
-
-  // fetchResultData(rows, startOver) {
-  //   console.log('fetchResultData');
-  //   if (!this.isFetchingData) {
-  //     if (this.status() === STATUS.available) {
-  //       this.startLongOperationTimeout();
-  //       this.isFetchingData = true;
-  //       hueAnalytics.log('notebook', 'fetchResult/' + rows + '/' + startOver);
-  //       $.post(
-  //         '/notebook/api/fetch_result_data',
-  //         {
-  //           notebook: notebookContextToJSON(this.parentNotebook),
-  //           snippet: snippetContextToJSON(this),
-  //           rows: rows,
-  //           startOver: startOver
-  //         },
-  //         data => {
-  //           this.stopLongOperationTimeout();
-  //           data = JSON.bigdataParse(data);
-  //           if (data.status === 0) {
-  //             this.showExecutionAnalysis(true);
-  //             this.loadData(data.result, rows);
-  //           } else {
-  //             this.handleAjaxError(data, () => {
-  //               this.isFetchingData = false;
-  //               this.fetchResultData(rows, startOver);
-  //             });
-  //             $(document).trigger('renderDataError', { snippet: this });
-  //           }
-  //         },
-  //         'text'
-  //       )
-  //         .fail(xhr => {
-  //           if (xhr.status !== 502) {
-  //             $(document).trigger('error', xhr.responseText);
-  //           }
-  //         })
-  //         .always(() => {
-  //           this.isFetchingData = false;
-  //         });
-  //     } else {
-  //       huePubSub.publish('editor.snippet.result.normal', this);
-  //     }
-  //   }
-  // }
-
-  fetchResultMetadata() {
-    $.post('/notebook/api/fetch_result_metadata', {
-      notebook: notebookToContextJSON(this.parentNotebook),
-      snippet: snippetToContextJSON(this)
-    })
-      .then(data => {
-        if (data.status === 0) {
-          this.result.meta(data.result.meta);
-        } else {
-          $(document).trigger('error', data.message);
-        }
-      })
-      .fail(xhr => {
-        if (xhr.status !== 502) {
-          $(document).trigger('error', xhr.responseText);
-        }
-        this.status(STATUS.failed);
-      });
-  }
-
-  fetchResultSize(n, query_id) {
-    apiHelper
-      .fetchResultSize({
-        notebookJson: notebookToContextJSON(this.parentNotebook),
-        snippetJson: snippetToContextJSON(this)
-      })
-      .then(data => {
-        if (query_id === this.parentNotebook.id()) {
-          // If still on the same result
-          if (data.status === 0) {
-            if (data.result.rows != null) {
-              this.result.rows(data.result.rows);
-            } else if (this.type() === TYPE.impala && n > 0) {
-              setTimeout(() => {
-                this.fetchResultSize(n - 1, query_id);
-              }, 1000);
-            }
-          } else if (data.status === 5) {
-            // No supported yet for this snippet
-          } else {
-            //$(document).trigger("error", data.message);
-          }
-        }
-      });
   }
 
   getExternalStatement() {
@@ -1458,87 +1173,6 @@ export default class Snippet {
         } else {
           this.handleAjaxError(data);
         }
-      });
-  }
-
-  getLogs() {
-    apiHelper
-      .getLogs({
-        notebookJson: notebookToContextJSON(this.parentNotebook),
-        snippetJson: snippetToContextJSON(this),
-        from: this.result.logLines,
-        jobsJson: komapping.toJSON(this.jobs, { ignore: ['percentJob'] }),
-        fullLog: this.result.logs
-      })
-      .then(data => {
-        if (data.status === 1) {
-          // Append errors to the logs
-          data.status = 0;
-          data.logs = data.message;
-        }
-        if (data.status === 0) {
-          if (data.logs.length > 0) {
-            const logs = data.logs.split('\n');
-            this.result.logLines += logs.length;
-            const oldLogs = this.result.logs();
-            if (
-              data.logs &&
-              (oldLogs === '' ||
-                (this.wasBatchExecuted() && data.logs.indexOf('Unable to locate') === -1) ||
-                data.isFullLogs)
-            ) {
-              this.result.logs(data.logs);
-            } else {
-              this.result.logs(oldLogs + '\n' + data.logs);
-            }
-          }
-
-          this.jobs().forEach(job => {
-            if (typeof job.percentJob === 'undefined') {
-              job.percentJob = ko.observable(-1);
-            }
-          });
-
-          if (data.jobs && data.jobs.length > 0) {
-            data.jobs.forEach(job => {
-              const _found = ko.utils.arrayFilter(this.jobs(), item => {
-                return item.name === job.name;
-              });
-              if (_found.length === 0) {
-                if (typeof job.percentJob === 'undefined') {
-                  job.percentJob = ko.observable(-1);
-                } else {
-                  job.percentJob = ko.observable(job.percentJob);
-                }
-                this.jobs.push(job);
-              } else if (typeof job.percentJob !== 'undefined') {
-                for (let i = 0; i < _found.length; i++) {
-                  _found[i].percentJob(job.percentJob);
-                }
-              }
-            });
-            this.jobs().forEach(job => {
-              const _found = ko.utils.arrayFilter(this.jobs(), item => {
-                return item.name === job.name;
-              });
-              if (_found.length === 0) {
-                this.jobs.remove(job);
-              }
-            });
-          }
-          if (this.status() === STATUS.running) {
-            // Maybe the query finished or failed in the meantime
-            this.progress(data.progress);
-          }
-        } else {
-          this.handleAjaxError(data);
-        }
-      })
-      .fail((xhr, textStatus) => {
-        if (xhr.status !== 502) {
-          $(document).trigger('error', xhr.responseText || textStatus);
-        }
-        this.status(STATUS.failed);
       });
   }
 
@@ -1714,7 +1348,7 @@ export default class Snippet {
       (this.status() === STATUS.running || this.status() === STATUS.available) &&
       this.parentNotebook.isHistory()
     ) {
-      this.checkStatus();
+      // this.checkStatus();
     } else if (this.status() === STATUS.loading) {
       this.status(STATUS.failed);
       this.progress(0);
@@ -1724,77 +1358,10 @@ export default class Snippet {
     }
   }
 
-  // loadData(result, rows) {
-  //   rows -= result.data.length;
-  //
-  //   if (result.data.length > 0) {
-  //     this.currentQueryTab('queryResults');
-  //   }
-  //
-  //   if (result.has_more && rows > 0) {
-  //     setTimeout(() => {
-  //       this.fetchResultData(rows, false);
-  //     }, 500);
-  //   } else if (
-  //     !this.parentVm.editorMode() &&
-  //     !this.parentNotebook.isPresentationMode() &&
-  //     this.parentNotebook.snippets()[this.parentNotebook.snippets().length - 1] === this
-  //   ) {
-  //     this.parentNotebook.newSnippet();
-  //   }
-  // }
-
   nextQueriesPage() {
     if (this.queriesCurrentPage() !== this.queriesTotalPages()) {
       this.queriesCurrentPage(this.queriesCurrentPage() + 1);
       this.fetchQueries();
-    }
-  }
-
-  onDdlExecute() {
-    if (this.result.handle() && this.result.handle().has_more_statements) {
-      window.clearTimeout(this.executeNextTimeout);
-      this.executeNextTimeout = setTimeout(() => {
-        this.execute(true); // Execute next, need to wait as we disabled fast click
-      }, 1000);
-    }
-    if (
-      this.lastExecutedStatement() &&
-      /CREATE|DROP/i.test(this.lastExecutedStatement().firstToken)
-    ) {
-      let match = this.statement().match(
-        /(?:CREATE|DROP)\s+TABLE\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))\..*/i
-      );
-      const path = [];
-      if (match) {
-        path.push(match[1] || match[2]); // group 1 backticked db name, group 2 regular db name
-      } else {
-        match = this.statement().match(
-          /(?:CREATE|DROP)\s+(?:DATABASE|SCHEMA)\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))/i
-        );
-        if (match) {
-          path.push(match[1] || match[2]); // group 1 backticked db name, group 2 regular db name
-        } else if (this.database()) {
-          path.push(this.database());
-        }
-      }
-
-      if (path.length) {
-        window.clearTimeout(this.refreshTimeouts[path.join('.')]);
-        this.refreshTimeouts[path.join('.')] = window.setTimeout(() => {
-          this.ignoreNextAssistDatabaseUpdate = true;
-          dataCatalog
-            .getEntry({
-              sourceType: this.type(),
-              namespace: this.namespace(),
-              compute: this.compute(),
-              path: path
-            })
-            .done(entry => {
-              entry.clearCache({ refreshCache: true, cascade: true, silenceErrors: true });
-            });
-        }, 5000);
-      }
     }
   }
 
@@ -1879,11 +1446,6 @@ export default class Snippet {
       .always(() => {
         this.compatibilityCheckRunning(false);
       });
-  }
-
-  reexecute() {
-    this.result.cancelBatchExecution();
-    this.execute();
   }
 
   removeContextTab(context) {
@@ -2035,9 +1597,9 @@ export default class Snippet {
       });
     }
 
-    const result = $.when(namespaceDeferred, computeDeferred);
+    const contextSetPromise = $.when(namespaceDeferred, computeDeferred);
 
-    result.dispose = () => {
+    contextSetPromise.dispose = () => {
       if (namespaceSub) {
         namespaceSub.dispose();
       }
@@ -2048,6 +1610,6 @@ export default class Snippet {
       computeDeferred.reject();
     };
 
-    return result;
+    return contextSetPromise;
   }
 }

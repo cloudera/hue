@@ -324,29 +324,30 @@ class EditorViewModel {
       notebook.snippets().forEach(snippet => {
         snippet.aceAutoExpand = false;
         snippet.statement_raw.valueHasMutated();
-        if (
-          snippet.result.handle().statements_count > 1 &&
-          snippet.result.handle().start != null &&
-          snippet.result.handle().end != null
-        ) {
-          const aceLineOffset = snippet.result.handle().aceLineOffset || 0;
-          snippet.result.statement_range({
-            start: {
-              row: snippet.result.handle().start.row + aceLineOffset,
-              column: snippet.result.handle().start.column
-            },
-            end: {
-              row: snippet.result.handle().end.row + aceLineOffset,
-              column: snippet.result.handle().end.column
-            }
-          });
-          snippet.result.statement_range.valueHasMutated();
-        }
+        // if (
+        //   snippet.result.handle().statements_count > 1 &&
+        //   snippet.result.handle().start != null &&
+        //   snippet.result.handle().end != null
+        // ) {
+        //   const aceLineOffset = snippet.result.handle().aceLineOffset || 0;
+        //   snippet.result.statement_range({
+        //     start: {
+        //       row: snippet.result.handle().start.row + aceLineOffset,
+        //       column: snippet.result.handle().start.column
+        //     },
+        //     end: {
+        //       row: snippet.result.handle().end.row + aceLineOffset,
+        //       column: snippet.result.handle().end.column
+        //     }
+        //   });
+        //   snippet.result.statement_range.valueHasMutated();
+        // }
       });
 
-      if (notebook.snippets()[0].result.data().length > 0) {
-        $(document).trigger('redrawResults');
-      } else if (queryTab) {
+      // if (notebook.snippets()[0].result.data().length > 0) {
+      //   $(document).trigger('redrawResults');
+      // } else
+      if (queryTab) {
         notebook.snippets()[0].currentQueryTab(queryTab);
       }
 
@@ -563,7 +564,6 @@ class EditorViewModel {
             _snippet = new Snippet(self, _notebook, {
               type: _notebook.initialType,
               statement_raw: _statement.join('\n'),
-              result: {},
               name: _title.join('\n'),
               variables: komapping.toJS(_variables)
             });
