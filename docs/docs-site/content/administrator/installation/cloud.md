@@ -7,11 +7,21 @@ weight: 3
 
 ## Docker
 
+To start a Hue instance:
+
+    docker run -it -p 8888:8888 gethue/hue:latest
+
 In addition to providing to providing a ready to use image, the [Docker Guide](https://github.com/cloudera/hue/tree/testing/tools/docker) shows how to build it.
 
 It then details how to start the containers and parameterize them.
 
 ## Kubernetes
+
+To start a full Hue service:
+
+    helm repo add gethue https://helm.gethue.com
+    helm repo update
+    helm install gethue/hue
 
 The [Kubernetes Guide](https://github.com/cloudera/hue/tree/testing/tools/kubernetes) shows how to run the services via Helm or native YAML configs.
 
