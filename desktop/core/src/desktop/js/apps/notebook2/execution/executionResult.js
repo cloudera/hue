@@ -42,6 +42,7 @@ export default class ExecutionResult {
     this.type = undefined;
     this.hasMore = true;
     this.isEscaped = false;
+    this.fetchedOnce = false;
   }
 
   async fetchResultSize() {
@@ -106,7 +107,7 @@ export default class ExecutionResult {
     this.hasMore = resultResponse.has_more;
     this.isEscaped = resultResponse.isEscaped;
     this.type = resultResponse.type;
-
+    this.fetchedOnce = true;
     huePubSub.publish(RESULT_UPDATED_EVENT, this);
   }
 }

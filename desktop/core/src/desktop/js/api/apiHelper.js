@@ -2076,32 +2076,34 @@ class ApiHelper {
   executeStatement(options) {
     const executable = options.executable;
     const url = EXECUTE_API_PREFIX + executable.sourceType;
-    const deferred = $.Deferred();
 
-    this.simplePost(url, ApiHelper.adaptExecutableToNotebook(executable, options.session), options)
-      .done(response => {
-        if (response.handle) {
-          deferred.resolve(response.handle);
-        } else {
-          deferred.reject('No handle in execute response');
-        }
-      })
-      .fail(deferred.reject);
+    const promise = new Promise((resolve, reject) => {
+      this.simplePost(
+        url,
+        ApiHelper.adaptExecutableToNotebook(executable, options.session),
+        options
+      )
+        .done(response => {
+          if (response.handle) {
+            resolve(response.handle);
+          } else {
+            reject('No handle in execute response');
+          }
+        })
+        .fail(reject);
+    });
 
-    const promise = deferred.promise();
-
-    promise.cancel = () => {
-      const cancelDeferred = $.Deferred();
-      deferred
-        .done(handle => {
+    executable.addCancellable({
+      cancel: async () => {
+        try {
+          const handle = await promise;
           if (options.executable.handle !== handle) {
             options.executable.handle = handle;
           }
-          this.cancelStatement(options).always(cancelDeferred.resolve);
-        })
-        .fail(cancelDeferred.resolve);
-      return cancelDeferred;
-    };
+          this.cancelStatement(options);
+        } catch (err) {}
+      }
+    });
 
     return promise;
   }
@@ -2128,6 +2130,41 @@ class ApiHelper {
       .fail(deferred.reject);
 
     return new CancellablePromise(deferred, request);
+  }
+
+  /**
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {Executable} options.executable
+   * @param {number} [options.from]
+   * @param {Object[]} [options.jobs]
+   * @param {string} options.fullLog
+   *
+   * @return {Promise<?>}
+   */
+  fetchLogs(options) {
+    return new Promise((resolve, reject) => {
+      const data = ApiHelper.adaptExecutableToNotebook(options.executable);
+      data.full_log = options.fullLog;
+      data.jobs = options.jobs && JSON.stringify(options.jobs);
+      data.from = options.from || 0;
+      const request = this.simplePost('/notebook/api/get_logs', data, options)
+        .done(response => {
+          resolve({
+            logs: (response.status === 1 && response.message) || response.logs || '',
+            jobs: response.jobs || [],
+            isFullLogs: response.isFullLogs
+          });
+        })
+        .fail(reject);
+
+      options.executable.addCancellable({
+        cancel: () => {
+          this.cancelActiveRequest(request);
+        }
+      });
+    });
   }
 
   /**
@@ -2178,7 +2215,7 @@ class ApiHelper {
       data.rows = options.rows;
       data.startOver = !!options.startOver;
 
-      this.simplePost(
+      const request = this.simplePost(
         '/notebook/api/fetch_result_data',
         data,
         {
@@ -2192,6 +2229,12 @@ class ApiHelper {
           resolve(data.result);
         })
         .fail(reject);
+
+      options.executable.addCancellable({
+        cancel: () => {
+          this.cancelActiveRequest(request);
+        }
+      });
     });
   }
 
@@ -2205,7 +2248,7 @@ class ApiHelper {
    */
   async fetchResultSize2(options) {
     return new Promise((resolve, reject) => {
-      this.simplePost(
+      const request = this.simplePost(
         '/notebook/api/fetch_result_size',
         ApiHelper.adaptExecutableToNotebook(options.executable),
         options
@@ -2214,6 +2257,12 @@ class ApiHelper {
           resolve(response.result);
         })
         .fail(reject);
+
+      options.executable.addCancellable({
+        cancel: () => {
+          this.cancelActiveRequest(request);
+        }
+      });
     });
   }
 

@@ -64,11 +64,11 @@
         $("a[href='#queryBuilderTab']").click();
       });
       function generateQuery() {
-        var result = QueryBuilder.buildHiveQuery();
-        if (result.status == "fail") {
+        var hiveQuery = QueryBuilder.buildHiveQuery();
+        if (hiveQuery.status == "fail") {
           $("#invalidQueryBuilder${ suffix }").modal("show");
         } else {
-          replaceAce(result.query);
+          replaceAce(hiveQuery.query);
         }
       }
 
@@ -484,70 +484,6 @@
     <!-- /ko -->
   </script>
 
-  <script type="text/html" id="snippet-log${ suffix }">
-    <div class="snippet-log-container margin-bottom-10" data-bind="visible: showLogs">
-      <div data-bind="delayedOverflow: 'slow', css: resultsKlass" style="margin-top: 5px; position: relative;">
-        <a href="javascript: void(0)" class="inactive-action close-logs-overlay" data-bind="click: function(){ showLogs(false) }">&times;</a>
-        <ul data-bind="visible: jobs().length > 0, foreach: jobs" class="unstyled jobs-overlay">
-          <li data-bind="attr: {'id': $data.name.substr(4)}">
-            % if is_embeddable:
-              <a class="pointer" data-bind="text: $.trim($data.name), click: function() { huePubSub.publish('show.jobs.panel', {id: $data.name, interface: $parent.type() == 'impala' ? 'queries' : 'jobs', compute: $parent.compute}); }, clickBubble: false"></a>
-            % else:
-              <a data-bind="text: $.trim($data.name), hueLink: $data.url"></a>
-            % endif
-            <!-- ko if: typeof percentJob === 'function' && percentJob() > -1 -->
-            <div class="progress-job progress pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': percentJob() < 100, 'progress-success': percentJob() === 100}">
-              <div class="bar" data-bind="style: {'width': percentJob() + '%'}"></div>
-            </div>
-            <!-- /ko -->
-            <div class="clearfix"></div>
-          </li>
-        </ul>
-        <span data-bind="visible: !$root.isPresentationMode() || !$root.isHidingCode()">
-        <pre data-bind="visible: (!result.logs() || result.logs().length == 0) && jobs().length > 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
-        <pre data-bind="visible: result.logs() && result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs" class="logs logs-bigger logs-populated"></pre>
-      </span>
-      </div>
-      <div class="snippet-log-resizer" data-bind="
-          visible: result.logs().length > 0,
-          logResizer: {
-            parent: '.snippet-log-container',
-            target: '.logs-populated',
-            mainScrollable: MAIN_SCROLLABLE,
-            onStart: function () { huePubSub.publish('result.grid.hide.fixed.headers') },
-            onResize: function() {
-              huePubSub.publish('result.grid.hide.fixed.headers');
-              window.setTimeout(function () {
-                huePubSub.publish('result.grid.redraw.fixed.headers');
-              }, 500);
-            },
-            minHeight: 50
-          }
-        ">
-        <i class="fa fa-ellipsis-h"></i>
-      </div>
-    </div>
-    <div class="snippet-log-container margin-bottom-10">
-      <div data-bind="visible: ! result.hasResultset() && status() == 'available' && result.fetchedOnce(), css: resultsKlass, click: function(){  }" style="display:none;">
-        <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _('Success.') }</pre>
-      </div>
-
-      <div data-bind="visible: result.hasResultset() && status() == 'available' && result.data().length == 0 && result.fetchedOnce() && result.explanation().length <= 0, css: resultsKlass" style="display:none;">
-        <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Done. 0 results.") }</pre>
-      </div>
-
-      <div data-bind="visible: status() == 'expired', css: resultsKlass" style="display:none;">
-        <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Results have expired, rerun the query if needed.") }</pre>
-      </div>
-
-      <!-- ko if: status() == 'available' && ! result.fetchedOnce() -->
-      <div data-bind="css: resultsKlass">
-        <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-spin fa-spinner"></i> ${ _('Loading...') }</pre>
-      </div>
-      <!-- /ko -->
-    </div>
-  </script>
-
   <script type="text/html" id="query-tabs${ suffix }">
     <div class="query-history-container" data-bind="onComplete: function(){ redrawFixedHeaders(200); }">
       <div data-bind="delayedOverflow: 'slow', css: resultsKlass" style="margin-top: 5px; position: relative;">
@@ -586,14 +522,14 @@
           % endif
           <li data-bind="click: function(){ currentQueryTab('queryResults'); }, css: {'active': currentQueryTab() == 'queryResults'}">
             <a class="inactive-action" style="display:inline-block" href="#queryResults" data-toggle="tab">${_('Results')}
-              <!-- ko if: result.rows() != null  -->
-              (<span data-bind="text: result.rows().toLocaleString() + (type() == 'impala' && result.rows() == 1024 ? '+' : '')" title="${ _('Number of rows') }"></span>)
-              <!-- /ko -->
+##               <!-- ko if: result.rows() != null  -->
+##               (<span data-bind="text: result.rows().toLocaleString() + (type() == 'impala' && result.rows() == 1024 ? '+' : '')" title="${ _('Number of rows') }"></span>)
+##               <!-- /ko -->
             </a>
           </li>
-          <!-- ko if: result.explanation().length > 0 -->
-          <li data-bind="click: function(){ currentQueryTab('queryExplain'); }, css: {'active': currentQueryTab() == 'queryExplain'}"><a class="inactive-action" href="#queryExplain" data-toggle="tab">${_('Explain')}</a></li>
-          <!-- /ko -->
+##           <!-- ko if: result.explanation().length > 0 -->
+##           <li data-bind="click: function(){ currentQueryTab('queryExplain'); }, css: {'active': currentQueryTab() == 'queryExplain'}"><a class="inactive-action" href="#queryExplain" data-toggle="tab">${_('Explain')}</a></li>
+##           <!-- /ko -->
           <!-- ko foreach: pinnedContextTabs -->
           <li data-bind="click: function() { $parent.currentQueryTab(tabId) }, css: { 'active': $parent.currentQueryTab() === tabId }">
             <a class="inactive-action" data-toggle="tab" data-bind="attr: { 'href': '#' + tabId }">
@@ -746,11 +682,11 @@
             <!-- /ko -->
           </div>
 
-          <!-- ko if: result.explanation().length > 0 -->
-          <div class="tab-pane" id="queryExplain" data-bind="css: {'active': currentQueryTab() == 'queryExplain'}">
-            <!-- ko template: { name: 'snippet-explain${ suffix }' } --><!-- /ko -->
-          </div>
-          <!-- /ko -->
+##           <!-- ko if: result.explanation().length > 0 -->
+##           <div class="tab-pane" id="queryExplain" data-bind="css: {'active': currentQueryTab() == 'queryExplain'}">
+##             <!-- ko template: { name: 'snippet-explain${ suffix }' } --><!-- /ko -->
+##           </div>
+##           <!-- /ko -->
 
           <!-- ko if: HAS_WORKLOAD_ANALYTICS && type() === 'impala' -->
           <div class="tab-pane" id="executionAnalysis" data-bind="css: {'active': currentQueryTab() == 'executionAnalysis'}" style="padding: 10px;">
@@ -808,7 +744,7 @@
     <div class="hover-actions inline pull-right" style="font-size: 15px;">
       <!-- ko template: { name: 'query-redacted${ suffix }' } --><!-- /ko -->
       <!-- ko template: { name: 'longer-operation${ suffix }' } --><!-- /ko -->
-      <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
+##       <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
 
       <!-- ko template: { name: 'snippet-header-database-selection' } --><!-- /ko -->
 
@@ -823,7 +759,7 @@
     <div class="hover-actions inline pull-right" style="font-size: 15px; position: relative;" data-bind="style: { 'marginRight': $root.isPresentationMode() || $root.isResultFullScreenMode() ? '40px' : '0' }">
       <!-- ko template: { name: 'query-redacted${ suffix }' } --><!-- /ko -->
       <!-- ko template: { name: 'longer-operation${ suffix }' } --><!-- /ko -->
-      <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
+##       <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
 
       <!-- ko template: { name: 'snippet-header-database-selection' } --><!-- /ko -->
 
@@ -876,7 +812,13 @@
               <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1 && ! $root.isResultFullScreenMode(), name: 'snippet-execution-controls${ suffix }' } --><!-- /ko -->
             </div>
             <!-- ko if: !$root.isResultFullScreenMode() -->
-            <!-- ko template: 'snippet-log${ suffix }' --><!-- /ko -->
+            <!-- ko component: { name: 'executable-logs', params: {
+              activeExecutable: activeExecutable,
+              showLogs: showLogs,
+              resultsKlass: resultsKlass,
+              isPresentationMode: parentNotebook.isPresentationMode,
+              isHidingCode: parentNotebook.isHidingCode
+            }} --><!-- /ko -->
             <!-- /ko -->
             <!-- ko if: $root.editorMode() -->
             <!-- ko template: 'query-tabs${ suffix }' --><!-- /ko -->
@@ -1057,19 +999,35 @@
         <div class="clearfix margin-bottom-20"></div>
         <!-- /ko -->
 
-        <div class="ace-editor" data-bind="visible: statementType() === 'text' || statementType() !== 'text' && externalStatementLoaded(), css: {'single-snippet-editor ace-editor-resizable' : $root.editorMode(), 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow: 'slow', aceEditor: {
-        snippet: $data,
-        contextTooltip: '${ _ko("Right-click for details") }',
-        expandStar: '${ _ko("Right-click to expand with columns") }',
-        highlightedRange: result.statement_range,
-        readOnly: $root.isPresentationMode(),
-        aceOptions: {
-          showLineNumbers: $root.editorMode(),
-          showGutter: $root.editorMode(),
-          maxLines: $root.editorMode() ? null : 25,
-          minLines: $root.editorMode() ? null : 3
-        }
-      }, style: {opacity: statementType() !== 'text' || $root.isPresentationMode() ? '0.75' : '1', 'min-height': $root.editorMode() ? '0' : '48px', 'top': $root.editorMode() && statementType() !== 'text' ? '60px' : '0'}"></div>
+        <div class="ace-editor" data-bind="
+            visible: statementType() === 'text' || statementType() !== 'text' && externalStatementLoaded(),
+            css: {
+              'single-snippet-editor ace-editor-resizable' : $root.editorMode(),
+              'active-editor': inFocus
+            },
+            attr: {
+              id: id()
+            },
+            delayedOverflow: 'slow',
+            aceEditor: {
+              snippet: $data,
+              contextTooltip: '${ _ko("Right-click for details") }',
+              expandStar: '${ _ko("Right-click to expand with columns") }',
+##               highlightedRange: result.statement_range,
+              readOnly: $root.isPresentationMode(),
+              aceOptions: {
+                showLineNumbers: $root.editorMode(),
+                showGutter: $root.editorMode(),
+                maxLines: $root.editorMode() ? null : 25,
+                minLines: $root.editorMode() ? null : 3
+              }
+            },
+            style: {
+              'opacity': statementType() !== 'text' || $root.isPresentationMode() ? '0.75' : '1',
+              'min-height': $root.editorMode() ? '0' : '48px',
+              'top': $root.editorMode() && statementType() !== 'text' ? '60px' : '0'
+            }
+          "></div>
         <!-- ko component: { name: 'hueAceAutocompleter', params: { editor: ace.bind($data), snippet: $data } } --><!-- /ko -->
 
         <ul class="table-drop-menu hue-context-menu">
@@ -1120,11 +1078,11 @@
             <span data-bind="visible: ! $root.isHidingCode()">${ _('Hide the code') }</span>
           </a>
         </li>
-        <li>
-          <a class="pointer" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
-            <i class="fa fa-fw fa-eraser"></i> ${ _('Clear results') }
-          </a>
-        </li>
+##         <li>
+##           <a class="pointer" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
+##             <i class="fa fa-fw fa-eraser"></i> ${ _('Clear results') }
+##           </a>
+##         </li>
         <li>
           <a href="javascript:void(0)" data-bind="click: displayCombinedContent, visible: ! $root.isPresentationMode() ">
             <i class="fa fa-fw fa-file-text-o"></i> ${ _('Show all content') }
@@ -1175,9 +1133,9 @@
     </div>
   </script>
 
-  <script type="text/html" id="snippet-explain${ suffix }">
-    <pre class="no-margin-bottom" data-bind="text: result.explanation"></pre>
-  </script>
+##   <script type="text/html" id="snippet-explain${ suffix }">
+##     <pre class="no-margin-bottom" data-bind="text: result.explanation"></pre>
+##   </script>
 
   <script type="text/html" id="text-snippet-body${ suffix }">
     <div data-bind="attr: {'id': 'editor_' + id()}, html: statement_raw, value: statement_raw, medium: {}" data-placeHolder="${ _('Type your text here, select some text to format it') }" class="text-snippet"></div>
@@ -1387,16 +1345,15 @@
         <!-- ko if: status() === 'loading' -->
         <i class="fa fa-fw fa-spinner fa-spin"></i> ${ _('Creating session') }
         <!-- /ko -->
-        <!-- ko if: status() !== 'loading' && $root.editorMode() && result.statements_count() > 1 -->
-        ${ _('Statement ')} <span data-bind="text: (result.statement_id() + 1) + '/' + result.statements_count()"></span>
-        <div style="display: inline-block"
-             class="label label-info"
-             data-bind="attr: {
-             'title':'${ _ko('Showing results of the statement #')}' + (result.statement_id() + 1)}">
-          <div class="pull-left" data-bind="text: (result.statement_id() + 1)"></div><div class="pull-left">/</div><div class="pull-left" data-bind="text: result.statements_count()"></div>
-        </div>
-
-        <!-- /ko -->
+##         <!-- ko if: status() !== 'loading' && $root.editorMode() && result.statements_count() > 1 -->
+##         ${ _('Statement ')} <span data-bind="text: (result.statement_id() + 1) + '/' + result.statements_count()"></span>
+##         <div style="display: inline-block"
+##              class="label label-info"
+##              data-bind="attr: {
+##              'title':'${ _ko('Showing results of the statement #')}' + (result.statement_id() + 1)}">
+##           <div class="pull-left" data-bind="text: (result.statement_id() + 1)"></div><div class="pull-left">/</div><div class="pull-left" data-bind="text: result.statements_count()"></div>
+##         </div>
+##         <!-- /ko -->
       </div>
 
 ##       TODO: Move to snippet execution-actions

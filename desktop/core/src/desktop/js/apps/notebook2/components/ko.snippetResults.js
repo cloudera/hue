@@ -187,35 +187,31 @@ class SnippetResults extends DisposableComponent {
       this.meta().filter(item => item.name !== '' && isNumericColumn(item.type))
     );
 
-    this.trackKoSub(
-      this.showChart.subscribe(val => {
-        if (val) {
-          this.showGrid(false);
-          huePubSub.publish(REDRAW_CHART_EVENT);
-          huePubSub.publish('editor.chart.shown', this);
-        }
-      })
-    );
+    this.subscribe(this.showChart, val => {
+      if (val) {
+        this.showGrid(false);
+        huePubSub.publish(REDRAW_CHART_EVENT);
+        huePubSub.publish('editor.chart.shown', this);
+      }
+    });
 
-    this.trackKoSub(
-      this.showGrid.subscribe(val => {
-        if (val) {
-          this.showChart(false);
-          huePubSub.publish('editor.grid.shown', this);
-          huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
-          huePubSub.publish('table.extender.redraw');
-        }
-      })
-    );
+    this.subscribe(this.showGrid, val => {
+      if (val) {
+        this.showChart(false);
+        huePubSub.publish('editor.grid.shown', this);
+        huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
+        huePubSub.publish('table.extender.redraw');
+      }
+    });
 
-    huePubSub.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
+    this.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
       if (this.selectedExecutable() === executable) {
         this.updateFromExecutable(executable);
       }
     });
 
     let lastRenderedResult = undefined;
-    huePubSub.subscribe(RESULT_UPDATED_EVENT, executionResult => {
+    this.subscribe(RESULT_UPDATED_EVENT, executionResult => {
       if (this.selectedExecutable() === executionResult.executable) {
         const refresh = lastRenderedResult !== executionResult;
         this.updateFromExecutionResult(executionResult, refresh);
@@ -223,18 +219,16 @@ class SnippetResults extends DisposableComponent {
       }
     });
 
-    this.trackKoSub(
-      this.selectedExecutable.subscribe(executable => {
-        if (executable && executable.result) {
-          if (executable !== lastRenderedResult) {
-            this.updateFromExecutionResult(executable.result, true);
-            lastRenderedResult = executable;
-          }
-        } else {
-          this.reset();
+    this.subscribe(this.selectedExecutable, executable => {
+      if (executable && executable.result) {
+        if (executable !== lastRenderedResult) {
+          this.updateFromExecutionResult(executable.result, true);
+          lastRenderedResult = executable;
         }
-      })
-    );
+      } else {
+        this.reset();
+      }
+    });
   }
 
   reset() {

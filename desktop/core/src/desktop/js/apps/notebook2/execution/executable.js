@@ -19,6 +19,7 @@ import ExecutionResult from 'apps/notebook2/execution/executionResult';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
+import ExecutionLogs from 'apps/notebook2/execution/executionLogs';
 
 /**
  *
@@ -64,9 +65,13 @@ export default class Executable {
     this.status = EXECUTION_STATUS.ready;
     this.progress = 0;
     this.result = undefined;
+    this.logs = new ExecutionLogs(this);
 
-    this.lastCancellable = undefined;
+    this.cancellables = [];
     this.notifyThrottle = -1;
+
+    this.executeStarted = 0;
+    this.executeEnded = 0;
   }
 
   setStatus(status) {
@@ -77,6 +82,10 @@ export default class Executable {
   setProgress(progress) {
     this.progress = progress;
     this.notify();
+  }
+
+  getExecutionTime() {
+    return (this.executeEnded || Date.now()) - this.executeStarted;
   }
 
   notify() {
@@ -90,6 +99,7 @@ export default class Executable {
     if (this.status !== EXECUTION_STATUS.ready) {
       return;
     }
+    this.executeStarted = Date.now();
 
     this.setStatus(EXECUTION_STATUS.running);
     this.setProgress(0);
@@ -107,6 +117,7 @@ export default class Executable {
       }
 
       this.checkStatus();
+      this.logs.fetchLogs();
     } catch (err) {
       this.setStatus(EXECUTION_STATUS.failed);
       throw err;
@@ -114,20 +125,28 @@ export default class Executable {
   }
 
   checkStatus(statusCheckCount) {
+    let checkStatusTimeout = -1;
+
     if (!statusCheckCount) {
       statusCheckCount = 0;
+      this.cancellables.push({
+        cancel: () => {
+          window.clearTimeout(checkStatusTimeout);
+        }
+      });
     }
     statusCheckCount++;
-    let checkStatusTimeout = -1;
-    this.lastCancellable = apiHelper
-      .checkExecutionStatus({ executable: this })
-      .done(queryStatus => {
+
+    this.cancellables.push(
+      apiHelper.checkExecutionStatus({ executable: this }).done(queryStatus => {
         switch (this.status) {
           case EXECUTION_STATUS.success:
+            this.executeEnded = Date.now();
             this.setStatus(queryStatus);
             this.setProgress(99); // TODO: why 99 here (from old code)?
             break;
           case EXECUTION_STATUS.available:
+            this.executeEnded = Date.now();
             this.setStatus(queryStatus);
             this.setProgress(100);
             if (!this.result && this.handle.has_result_set) {
@@ -136,6 +155,7 @@ export default class Executable {
             }
             break;
           case EXECUTION_STATUS.expired:
+            this.executeEnded = Date.now();
             this.setStatus(queryStatus);
             break;
           case EXECUTION_STATUS.running:
@@ -150,17 +170,15 @@ export default class Executable {
             );
             break;
           default:
+            this.executeEnded = Date.now();
             console.warn('Got unknown status ' + queryStatus);
         }
-      });
-
-    this.lastCancellable.onCancel(() => {
-      window.clearTimeout(checkStatusTimeout);
-    });
+      })
+    );
   }
 
-  setLastCancellable(lastCancellable) {
-    this.lastCancellable = lastCancellable;
+  addCancellable(cancellable) {
+    this.cancellables.push(cancellable);
   }
 
   async internalExecute(session) {
@@ -172,30 +190,26 @@ export default class Executable {
   }
 
   async cancel() {
-    return new Promise(resolve => {
-      if (this.lastCancellable && this.status === EXECUTION_STATUS.running) {
-        hueAnalytics.log('notebook', 'cancel/' + this.sourceType);
-        this.setStatus(EXECUTION_STATUS.canceling);
-        this.lastCancellable.cancel().always(() => {
-          this.setStatus(EXECUTION_STATUS.canceled);
-          resolve();
-        });
-        this.lastCancellable = undefined;
-      } else {
-        resolve();
+    if (this.cancellables.length && this.status === EXECUTION_STATUS.running) {
+      hueAnalytics.log('notebook', 'cancel/' + this.sourceType);
+      this.setStatus(EXECUTION_STATUS.canceling);
+      while (this.cancellables.length) {
+        await this.cancellables.pop().cancel();
       }
-    });
+      this.setStatus(EXECUTION_STATUS.canceled);
+    }
   }
 
   async close() {
+    while (this.cancellables.length) {
+      await this.cancellables.pop().cancel();
+    }
+
     return new Promise(resolve => {
-      if (this.status === EXECUTION_STATUS.running) {
-        this.cancel().finally(resolve);
-      } else if (this.status !== EXECUTION_STATUS.closed) {
-        apiHelper.closeStatement({ executable: this }).finally(resolve);
-      }
-    }).finally(() => {
-      this.setStatus(EXECUTION_STATUS.closed);
+      apiHelper.closeStatement({ executable: this }).finally(() => {
+        this.setStatus(EXECUTION_STATUS.closed);
+        resolve();
+      });
     });
   }
 }

@@ -19,6 +19,7 @@ import ko from 'knockout';
 import komapping from 'knockout.mapping';
 import { markdown } from 'markdown';
 
+import 'apps/notebook2/components/ko.executableLogs';
 import 'apps/notebook2/components/ko.executableProgressBar';
 import 'apps/notebook2/components/ko.snippetEditorActions';
 import 'apps/notebook2/components/ko.snippetExecuteActions';
@@ -772,9 +773,6 @@ export default class Snippet {
 
     this.showLogs.subscribe(val => {
       huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
-      if (val) {
-        this.getLogs();
-      }
       if (this.parentVm.editorMode()) {
         $.totalStorage('hue.editor.showLogs', val);
       }

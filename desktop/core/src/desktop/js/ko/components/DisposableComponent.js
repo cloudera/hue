@@ -14,21 +14,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import huePubSub from 'utils/huePubSub';
+
 export default class DisposableComponent {
   constructor() {
     this.disposals = [];
   }
 
-  trackKoSub(koSub) {
-    this.disposals.push(() => {
-      koSub.dispose();
-    });
-  }
-
-  trackPubSub(pubSub) {
-    this.disposals.push(() => {
-      pubSub.remove();
-    });
+  subscribe(subscribable, callback) {
+    if (typeof subscribable === 'string') {
+      const pubSub = huePubSub.subscribe(subscribable, callback);
+      this.disposals.push(() => {
+        pubSub.remove();
+      });
+    } else if (subscribable.subscribe) {
+      const sub = subscribable.subscribe(callback);
+      this.disposals.push(() => {
+        sub.dispose();
+      });
+    }
   }
 
   addDisposalCallback(callback) {

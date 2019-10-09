@@ -44,16 +44,9 @@ export default class SqlExecutable extends Executable {
   }
 
   async internalExecute(session) {
-    return new Promise((resolve, reject) => {
-      this.setLastCancellable(
-        apiHelper
-          .executeStatement({
-            executable: this,
-            session: session
-          })
-          .done(resolve)
-          .fail(reject)
-      );
+    return await apiHelper.executeStatement({
+      executable: this,
+      session: session
     });
   }
 
