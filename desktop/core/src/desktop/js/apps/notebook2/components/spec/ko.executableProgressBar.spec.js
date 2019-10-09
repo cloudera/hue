@@ -16,7 +16,7 @@ describe('ko.executableProgressBar.js', () => {
   it('should reflect progress updates', async () => {
     const mockExecutor = {};
     const snippet = {
-      executor: () => mockExecutor
+      executor: mockExecutor
     };
     const wrapper = await setup.renderComponent(NAME, {
       snippet: snippet
@@ -40,7 +40,7 @@ describe('ko.executableProgressBar.js', () => {
   it('should be 100% and have .progress-danger when failed', async () => {
     const mockExecutor = {};
     const snippet = {
-      executor: () => mockExecutor
+      executor: mockExecutor
     };
     const wrapper = await setup.renderComponent(NAME, {
       snippet: snippet

@@ -19,10 +19,11 @@ describe('ko.snippetExecuteActions.js', () => {
     const mockExecutor = {
       cancel: () => {
         cancelCalled = true;
-      }
+      },
+      hasMoreToExecute: () => true
     };
     const snippet = {
-      executor: () => mockExecutor,
+      executor: mockExecutor,
       execute: () => {
         executeCalled = true;
       }

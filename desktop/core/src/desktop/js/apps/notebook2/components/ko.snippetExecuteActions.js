@@ -17,7 +17,6 @@
 import ko from 'knockout';
 
 import componentUtils from 'ko/components/componentUtils';
-import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
 import { EXECUTOR_UPDATED_EVENT } from 'apps/notebook2/execution/executor';
@@ -25,10 +24,11 @@ import DisposableComponent from 'ko/components/DisposableComponent';
 
 export const NAME = 'snippet-execute-actions';
 
+// prettier-ignore
 const TEMPLATE = `
 <div class="snippet-execute-actions" data-test="${NAME}">
   <div class="btn-group">
-    <!-- ko if: status() !== '${EXECUTION_STATUS.running}' -->
+    <!-- ko if: status() !== '${ EXECUTION_STATUS.running }' -->
     <!-- ko ifnot: hasMoreToExecute -->
     <button class="btn btn-primary btn-mini btn-execute disable-feedback" data-test="execute" data-bind="click: execute"><i class="fa fa-play fa-fw"></i> ${I18n(
       'Execute'
@@ -40,7 +40,7 @@ const TEMPLATE = `
     )}</button>
     <!-- /ko -->
     <!-- /ko -->
-    <!-- ko if: status() === '${EXECUTION_STATUS.running}' -->
+    <!-- ko if: status() === '${ EXECUTION_STATUS.running }' -->
     <!-- ko ifnot: stopping -->
     <button class="btn btn-primary btn-mini btn-execute disable-feedback" data-test="stop" data-bind="click: stop"><i class="fa fa-stop fa-fw"></i> ${I18n(
       'Stop'
@@ -63,14 +63,12 @@ class SnippetExecuteActions extends DisposableComponent {
     this.snippet = params.snippet;
     this.status = ko.observable(EXECUTION_STATUS.ready);
     this.hasMoreToExecute = ko.observable(false);
-    this.trackPubSub(
-      huePubSub.subscribe(EXECUTOR_UPDATED_EVENT, executorUpdate => {
-        if (this.snippet.executor === executorUpdate.executor) {
-          this.hasMoreToExecute(!!executorUpdate.executor.hasMoreToExecute());
-          this.status(executorUpdate.executable.status);
-        }
-      })
-    );
+    this.subscribe(EXECUTOR_UPDATED_EVENT, executorUpdate => {
+      if (this.snippet.executor === executorUpdate.executor) {
+        this.hasMoreToExecute(!!executorUpdate.executor.hasMoreToExecute());
+        this.status(executorUpdate.executable.status);
+      }
+    });
   }
 
   async stop() {
