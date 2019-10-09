@@ -1,7 +1,7 @@
 
 ## Build
 
-    docker build . -t gethue/documentation:latest -f tools/docker/website/Dockerfile
+    docker build . -t gethue/documentation:latest -f tools/docker/documentation/Dockerfile
 
 ## Push
 
