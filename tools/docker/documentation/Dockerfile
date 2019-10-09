@@ -1,6 +1,6 @@
 
 FROM nginx
-LABEL description="Hue websites, e.g. docs, gethue..."
+LABEL description="Hue documentation docs.gethue.com"
 
 RUN apt-get update -y && apt-get install -y \
   wget \
@@ -11,7 +11,7 @@ RUN dpkg -i hugo*.deb && rm hugo*.deb
 RUN pip install Pygments
 
 COPY tools/docker/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY tools/docker/website/docs.gethue.com.conf /etc/nginx/sites-available/docs.gethue.com
+COPY tools/docker/documentation/docs.gethue.com.conf /etc/nginx/sites-available/docs.gethue.com
 
 RUN mkdir /etc/nginx/sites-enabled
 
