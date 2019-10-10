@@ -90,11 +90,15 @@ export default class Executable {
   }
 
   isReady() {
-    return this.status === EXECUTION_STATUS.ready;
+    return (
+      this.status === EXECUTION_STATUS.ready ||
+      this.status === EXECUTION_STATUS.closed ||
+      this.status === EXECUTION_STATUS.canceled
+    );
   }
 
   async execute() {
-    if (this.status !== EXECUTION_STATUS.ready) {
+    if (!this.isReady()) {
       return;
     }
     this.executeStarted = Date.now();
@@ -202,7 +206,19 @@ export default class Executable {
     }
   }
 
+  async reset() {
+    this.result = undefined;
+    this.logs.reset();
+    if (!this.isReady()) {
+      try {
+        await this.close();
+      } catch (err) {}
+    }
+    this.setProgress(0);
+  }
+
   async close() {
+    console.log('closing');
     while (this.cancellables.length) {
       const nextCancellable = this.cancellables.pop();
       try {
@@ -212,11 +228,11 @@ export default class Executable {
       }
     }
 
-    return new Promise(resolve => {
-      apiHelper.closeStatement({ executable: this }).finally(() => {
-        this.setStatus(EXECUTION_STATUS.closed);
-        resolve();
-      });
-    });
+    try {
+      await apiHelper.closeStatement({ executable: this, silenceErrors: true });
+    } catch (err) {
+      console.warn('Failed closing statement');
+    }
+    this.setStatus(EXECUTION_STATUS.closed);
   }
 }

@@ -117,7 +117,9 @@ SqlStatementsParser
    }
  | 'EOF'
    {
-     return [];
+     var result = [];
+     parser.addEntry(result, 'statement', $1, @1);
+     return result;
    }
  ;
 
@@ -186,8 +188,10 @@ parser.handleTrailingStatements = function (result, emptyStatements) {
 }
 
 parser.removeTrailingWhiteSpace = function (result) {
-  var lastStatement = result[result.length - 1];
-  if (/^\s+$/.test(lastStatement.statement)) {
-    result.pop()
+  if (result.length > 1) {
+      var lastStatement = result[result.length - 1];
+      if (/^\s+$/.test(lastStatement.statement)) {
+        result.pop()
+      }
   }
 }
