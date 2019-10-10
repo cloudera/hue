@@ -5,26 +5,28 @@ draft: false
 weight: 1
 ---
 
-After getting Hue then [configure it](/administrator/configuration/).
+## Get
 
-## Demo
-
-One click on [http://demo.gethue.com](http://demo.gethue.com).
-
-## Kubernetes
+Via [Kubernetes](/administrator/installation/cloud/#kubernetes):
 
     helm repo add gethue https://helm.gethue.com
     helm repo update
     helm install gethue/hue
 
-## Docker
+Or [Docker](/administrator/installation/cloud/#docker):
 
     docker run -it -p 8888:8888 gethue/hue:latest
 
-## Query
+## Configure
 
-List of connectors to [Databases, Warehouses, Storages](/administrator/configuration/connectors/) to connect to.
+Then [configure the server](/administrator/configuration/) and point connectors to your [Databases, Warehouses, Storages](/administrator/configuration/connectors/).
 
-## Develop
+## Use or Develop
 
-How to improve the [SQL autocomplete](/developer/parsers/) for your own database.
+Some tutorials on how to:
+
+* [Query a Customer 360](http://gethue.com/self-service-bi-doing-a-customer-360-by-querying-and-joining-salesforce-marketing-and-log-datasets/)
+* [Troubleshoot SQL](http://gethue.com/self-service-impala-sql-query-troubleshooting/)
+* [Ingest data](http://gethue.com/querying-exploring-the-instacart-dataset-part-1-ingesting-the-data/)
+
+How to improve and contribute the [SQL autocomplete](/developer/parsers/) for your own database.
