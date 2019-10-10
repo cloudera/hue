@@ -2,7 +2,7 @@
 title: "Connectors"
 date: 2019-03-13T18:28:09-07:00
 draft: false
-weight: 3
+weight: 2
 ---
 
 ## Databases
