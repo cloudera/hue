@@ -23,16 +23,14 @@ It features:
 
 Who is using Hue
 ----------------
-Thousands of companies and organizations use Hue to open-up their data and provide self service querying. Hue is heavily used by
+Thousands of companies and organizations use Hue to open-up their data and provide self service querying. Hue is heavily used by:
 
 * 1000+ paying customers
 * top Fortune 500
 
-who are executing 100s of 1000 of queries daily.
+who are executing 100s of 1000s of queries daily. It also ships in Amazon AWS and its open source version is used by hundred of companies.
 
-It also ships in Amazon AWS and its open source version is used by hundred of companies.
-
-Hue is ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/parsers/) and any [contributions](CONTRIBUTING.md) are welcome.
+Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/parsers/) and any [contributions](CONTRIBUTING.md) are welcome.
 
 Getting Started
 ---------------
@@ -43,9 +41,7 @@ cd hue
 make apps
 build/env/bin/hue runserver
 ```
-Now Hue should be running on [http://localhost:8000](http://localhost:8000) ! The configuration in development mode is `desktop/conf/pseudo-distributed.ini`.
-
-Read more in the [installation documentation](https://docs.gethue.com/administrator/installation/).
+Now Hue should be running on [http://localhost:8000](http://localhost:8000) ! The configuration in development mode is `desktop/conf/pseudo-distributed.ini`. Read more in the [installation documentation](https://docs.gethue.com/administrator/installation/).
 
 
 Docker

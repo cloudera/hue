@@ -162,13 +162,13 @@ Turns a list of semi-colon separated queries into an interactive presentation. I
 
 ## SQL Databases
 
-Use the query editor with any database. Those databases need to be configured by the [administrator](/administrator/configuration/editor/)
+Use the query editor with any database. Those databases need to be configured by the [administrator](/administrator/configuration/connectors/).
 
 ### Apache Hive
 ### Apache Impala
 ### MySQL
 ### Oracle
-### KSQL / Apache Kafka SQL
+### Apache Kafka SQL
 ### Apache Solr SQL
 
 With Solr 5+, query collections like we would query a regular Hive or Impala table.
@@ -190,8 +190,8 @@ Presto is a high performance, distributed SQL query engine for big data.
 [Read more about it here](https://prestosql.io/)
 
 ### PostgreSQL
-### Redshift
-### BigQuery
+### AWS Redshift
+### Google BigQuery
 ### AWS Athena
 ### Spark SQL
 ### Apache Phoenix
@@ -204,7 +204,21 @@ Apache Kylin is an open-source online analytical processing (OLAP) engine.
 See how to configure the [Kylin Query Editor](http://gethue.com/using-hue-to-interact-with-apache-kylin/).
 
 ### Others
-Extend with SQL Alchemy, JDBC or build your own [connectors](../../developer/).
+Check the [list](/administrator/configuration/connectors/) or extend with SQL Alchemy, JDBC or build your own [connectors](../../developer/).
+
+
+## Dashboards
+
+Dashboards are an interactive way to explore your data quickly and easily. No programming is required and the analysis is done by drag & drops and clicks.
+
+Read more about [Dashboards](http://gethue.com/search-dashboards/).
+
+Simply drag & drop widgets that are interconnected together. This is great for exploring new datasets or monitoring without having to type.
+
+The top search bar offers a [full autocomplete](http://gethue.com/intuitively-discovering-and-exploring-a-wine-dataset-with-the-dynamic-dashboards/) on all the values of the index.
+
+The “More like This” feature lets you selected fields you would like to use to find similar records. This is a great way to find similar issues, customers, people... with regard to a list of attributes.
+
 
 ## Jobs
 
@@ -298,15 +312,3 @@ Job Properties setting.
 ### DistCp
 
 A DistCp job design consists of a DistCp command.
-
-## Dashboards
-
-Dashboards are an interactive way to explore your data quickly and easily. No programming is required and the analysis is done by drag & drops and clicks.
-
-Read more about [Dashboards](http://gethue.com/search-dashboards/).
-
-Simply drag & drop widgets that are interconnected together. This is great for exploring new datasets or monitoring without having to type.
-
-The top search bar offers a [full autocomplete](http://gethue.com/intuitively-discovering-and-exploring-a-wine-dataset-with-the-dynamic-dashboards/) on all the values of the index.
-
-The “More like This” feature lets you selected fields you would like to use to find similar records. This is a great way to find similar issues, customers, people... with regard to a list of attributes.

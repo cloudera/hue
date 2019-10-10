@@ -9,13 +9,16 @@ pre = "<b>1. </b>"
 
 <span style="font-size:52px; text-align:center; display: block">Documentation</span>
 
-The manual to install, use and develop Hue.
+Hue is a mature open source SQL Assistant for querying, visualizing and sharing data in Databases & Data Warehouses: [gethue.com](http://gethue.com).
 
-Hue is a mature open source workbench for self-service operation and development of SQL applications
-in a Data Warehouse: [gethue.com](http://gethue.com).
+Thousands of companies and organizations use Hue to open-up their data and provide self service querying. Hue is heavily used by:
 
-Thousands of companies and organizations use Hue to open-up and query their data and make smarter decisions. Hue is heavily
-used by hundreds of Cloudera customers and community users executing millions of queries daily.
+* 1000+ paying customers
+* top Fortune 500
+
+who are executing 100s of 1000s of queries daily. It also ships in Amazon AWS and its open source version is used by hundred of companies.
+
+Hue is also ideal for building your own Cloud SQL Editor and any contributions are welcome.
 
 
 Administrate
