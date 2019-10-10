@@ -5,7 +5,7 @@ draft: false
 weight: 1
 ---
 
-Open-up or install Hue then [configure it](/administrator/configuration/).
+After getting Hue then [configure it](/administrator/configuration/).
 
 ## Demo
 
@@ -20,6 +20,10 @@ One click on [http://demo.gethue.com](http://demo.gethue.com).
 ## Docker
 
     docker run -it -p 8888:8888 gethue/hue:latest
+
+## Query
+
+List of connectors to [Databases, Warehouses, Storages](/administrator/configuration/connectors/) to connect to.
 
 ## Develop
 

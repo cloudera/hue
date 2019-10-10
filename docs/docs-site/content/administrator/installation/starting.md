@@ -27,7 +27,7 @@ The two latest LTS versions of each browsers:
 * Chrome
 * Firefox
 
-## Troubleshooting the tarball Installation
+## Troubleshooting
 
 Q: I moved my Hue installation from one directory to another and now Hue no
 longer functions correctly.
@@ -51,10 +51,7 @@ software components.
 
 ## Feedback
 
-Your feedback is welcome. The best way to send feedback is to join the
-[mailing list](https://groups.google.com/a/cloudera.org/group/hue-user) and
-send e-mail to [hue-user@cloudera.org](mailto:hue-user@cloudera.org).
-[@gethue](https://twitter.com/gethue) is also a good
+Your feedback is welcome. The best way to send feedback is to post on the [Forum](https://discourse.gethue.com) or [github](https://github.com/cloudera/hue/issues).
 
 ## Reporting Bugs
 
