@@ -28,5 +28,6 @@ Some tutorials on how to:
 * [Query a Customer 360](http://gethue.com/self-service-bi-doing-a-customer-360-by-querying-and-joining-salesforce-marketing-and-log-datasets/)
 * [Troubleshoot SQL](http://gethue.com/self-service-impala-sql-query-troubleshooting/)
 * [Ingest data](http://gethue.com/querying-exploring-the-instacart-dataset-part-1-ingesting-the-data/)
+* [Bike Data Analysis](https://docs.cloudera.com/runtime/7.0.1/using-hue/topics/hue-using.html)
 
 How to improve and contribute the [SQL autocomplete](/developer/parsers/) for your own database.

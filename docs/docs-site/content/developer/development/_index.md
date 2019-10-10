@@ -16,10 +16,7 @@ This section goes into greater detail on how to build and reuse the components o
 * Python 2.7+ (Python 3 support tracked in [HUE-8737](https://issues.cloudera.org/browse/HUE-8737))
 * Django (1.11 already included in the distribution)
 * Java (Java 1.8) (should go away after [HUE-8740](https://issues.cloudera.org/browse/HUE-8740))
-* npm (6.4+)
-* [Mako](http://www.makotemplates.org/) is the templating language
-* [Bootstrap](http://twitter.github.com/bootstrap/)
-* [Knockout js](http://knockoutjs.com/)
+* npm ([10.0+](https://deb.nodesource.com/setup_10.x))
 
 ### Build & Start
 
@@ -420,15 +417,17 @@ database has the correct tables and fields.
     TEST_IMPALAD_HOST=impalad-01.gethue.com
       Point to an Impalad and trigger the Impala tests.
 
-## Web interface
+## User interface
 
 Developing applications for Hue requires a minimal amount of CSS
 (and potentially JavaScript) to use existing functionality.
 
-In a nutshell, front-end development in Hue is using
-[Bootstrap](http://twitter.github.com/bootstrap/) and
-[Knockout js](http://knockoutjs.com/) to layout your app and script the custom
-interactions.
+In a nutshell, front-end development is using:
+
+* [Mako](http://www.makotemplates.org/) is the templating language (Mako to be slowly removed in [HUE-9036](https://issues.cloudera.org/browse/HUE-9036))
+* [Bootstrap](http://twitter.github.com/bootstrap/) to layout your app
+* [Knockout js](http://knockoutjs.com/) to script the custom interactions
+
 
 ### Javascript
 
@@ -694,7 +693,7 @@ Historically, the same thing used to be done with the `requires_hadoop` tag:
     def your_test():
       ...
 
-## Release
+## Releasing
 
 Update the versions to the next release (current release +1):
 
