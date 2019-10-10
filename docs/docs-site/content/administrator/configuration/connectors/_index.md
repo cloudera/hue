@@ -1,124 +1,13 @@
 ---
-title: "Editor"
+title: "Connectors"
 date: 2019-03-13T18:28:09-07:00
 draft: false
-weight: 2
+weight: 3
 ---
 
-The goal of the Editor is to open-up data to more users by making self service querying easy and productive.
-It has one of the best SQL autocomplete and many [more features](/administrator/configuration/editor/).
+## Databases
 
-It is available in Editor or Notebook. Dialects can be added to the main `[notebook]` section like this:
-
-    [notebook]
-
-      [[interpreters]]
-
-        [[[hive]]]
-          # The name of the snippet.
-          name=Hive
-          # The backend connection to use to communicate with the server.
-          interface=hiveserver2
-
-        [[[mysql]]]
-          name = MySQL
-          interface=sqlalchemy
-          options='{"url": "mysql://root:root@localhost:3306/hue"}'
-
-**Tip** Do not forget to uncomment the lines by removing the `#` and editing the sections at the correct levels.
-
-## Editor
-
-The editor supports some global settings.
-
-### Downloads
-
-Download and export options with limited scalability can be limited in the number of rows or bytes transferred using the following options respectively in your hue.ini:
-
-        [beeswax]
-        # A limit to the number of rows that can be downloaded from a query before it is truncated.
-        # A value of -1 means there will be no limit.
-        download_row_limit=-1
-
-        # A limit to the number of bytes that can be downloaded from a query before it is truncated.
-        # A value of -1 means there will be no limit.
-        download_bytes_limit=-1
-
-In addition, it is possible to disable the download and export feature in the editor, dashboard, as well as in the file browser with the following option in your hue.ini:
-
-        [desktop]
-        # Global setting to allow or disable end user downloads in all Hue.
-        # e.g. Query result in Editors and Dashboards, file in File Browser...
-        enable_download=false
-
-The download feature in the file browser can be disabled separately with the following options in your hue.ini:
-
-        [filebrowser]
-        show_download_button=false
-
-### Notebook
-
-Enable the Notebook mode which supports multiple snippets of code.
-
-      [notebook]
-      show_notebooks=true
-
-### External statements
-
-Enable the selection of queries from files, saved queries into the editor or as snippet.
-
-      [notebook]
-      enable_external_statements=false
-
-### Batch querying
-
-This option currently only works with Hive and relies on Oozie until [HUE-8738](https://issues.cloudera.org/browse/HUE-8738) gets done.
-
-      [notebook]
-      enable_batch_execute=true
-
-### Assist Query Builder
-
-Flag to enable a lightweight SQL query builder where tables and columns can be dragged & dropped from the left table assist. Not to be confused with the [Query Builder](../dashboard).
-
-**Note** This feature is experimental.
-
-      [notebook]
-      enable_query_builder=true
-
-### Query Analysis
-
-Display an analysis panel post Impala queries executions with some hints and suggestions.
-
-**Note** This feature is experimental.
-
-      [notebook]
-      enable_query_analysis=true
-
-### Query Optimization
-
-In the `[metadata]` section, Hue is supporting Cloudera Navigator Optimiser and soon other services. The goal is to provide recommendation on how to write better queries and get risk alerts on dangerous operations directly within the [editor](/user/editor/).
-
-### One-click scheduling
-
-Enable the creation of a coordinator for the current SQL query.
-
-**Note** This feature is experimental until Task Server scheduler [HUE-8740](https://issues.cloudera.org/browse/HUE-8740).
-
-      [notebook]
-      enable_query_scheduling=true
-
-### Credentials
-
-When username or password are not specified in the connection URL, they will be prompted at connection time in the user browser.
-
-Parameters are not saved at any time in the Hue database. The are currently not even cached in the Hue process. The clients serves these parameters
-each time a query is sent.
-
-
-## Connectors
-
-Native connectors (via the `hiveserver2` interface) are recommended for Hive and Impala, otherwise SqlAlchemy is prefered. Read more about the [interfaces below](#interfaces).
+Native connectors (via the `hiveserver2` interface) are recommended for Hive and Impala, otherwise SqlAlchemy is prefered. Read more about the [connectors](../apps#connectors).
 
 ### Impala
 
@@ -131,7 +20,7 @@ Support is native via a dedicated section.
       # Port of the Impala Server
       server_port=21050
 
-Read more about [LDAP or PAM pass-through authentication](http://gethue.com/ldap-or-pam-pass-through-authentication-with-hive-or-impala/) and [High Availability](../external/).
+Read more about [LDAP or PAM pass-through authentication](http://gethue.com/ldap-or-pam-pass-through-authentication-with-hive-or-impala/) and [High Availability](../server/).
 
 ### Hive
 
@@ -146,7 +35,7 @@ Support is native via a dedicated section.
       # Port where HiveServer2 Thrift server runs on.
       hive_server_port=10000
 
-Read more about [LDAP or PAM pass-through authentication](http://gethue.com/ldap-or-pam-pass-through-authentication-with-hive-or-impala/) and [High Availability](../external/).
+Read more about [LDAP or PAM pass-through authentication](http://gethue.com/ldap-or-pam-pass-through-authentication-with-hive-or-impala/) and [High Availability](../server/).
 
 
 **Note** For historical reason, the name of the configuration section is `[beeswax]`.
@@ -806,132 +695,256 @@ Then give Hue the information about the database source:
        options='{"url": "postgresql+psycopg2://user:password@host:31335/database"}'
 
 
-## Interfaces
+## Storage
 
-Several interfaces are possible and sometimes more than one works for a certain database. When available `HiveServer2` or `SqlAlchemy` are recommended as they are native.
+### HDFS
+
+Hue supports one HDFS cluster. That cluster should be defined under the `[[[default]]]` sub-section.
+
+    [hadoop]
+
+      # Configuration for HDFS NameNode
+      # ------------------------------------------------------------------------
+      [[hdfs_clusters]]
+
+        [[[default]]]
+          fs_defaultfs=hdfs://hdfs-name-node.com:8020
+          webhdfs_url=http://hdfs-name-node.com:20101/webhdfs/v1
+
+HA is supported by pointing to the HttpFs service instead of the NameNode.
 
 
-### Sql Alchemy
+Make sure the HDFS service has in it `hdfs-site.xml`:
 
-SQL Alchemy is a robust [connector](https://docs.sqlalchemy.org/en/latest/core/engines.html#sqlalchemy.create_engine) that supports
-many [SQL dialects](https://docs.sqlalchemy.org/en/latest/dialects) natively. This is the recommended connector for most of the databases.
+    <property>
+    <name>dfs.webhdfs.enable</name>
+    <value>true</value>
+    </property>
 
-The dialect should be added to the Python system or Hue Python virtual environment. For example for MySQL:
+Configure Hue as a proxy user for all other users and groups, meaning it may submit a request on behalf of any other user:
 
-      ./build/env/bin/pip install mysqlclient
+WebHDFS: Add to core-site.xml:
 
-Then give Hue the information about the database source:
+        <!-- Hue WebHDFS proxy user setting -->
+        <property>
+        <name>hadoop.proxyuser.hue.hosts</name>
+        <value>*</value>
+        </property>
+        <property>
+        <name>hadoop.proxyuser.hue.groups</name>
+        <value>*</value>
+        </property>
 
-    [[[mysql]]]
-       name = MySQL
-       interface=sqlalchemy
-       options='{"url": "mysql://root:root@localhost:3306/hue"}'
+HttpFS: Verify that /etc/hadoop-httpfs/conf/httpfs-site.xml has the following configuration:
 
-**Tip**
+        <!-- Hue HttpFS proxy user setting -->
+        <property>
+        <name>httpfs.proxyuser.hue.hosts</name>
+        <value>*</value>
+        </property>
+        <property>
+        <name>httpfs.proxyuser.hue.groups</name>
+        <value>*</value>
+        </property>
 
-To offer more self service capabilities, parts of the URL can be parameterized and the information will be asked to the user.
+If the configuration is not present, add it to /etc/hadoop-httpfs/conf/httpfs-site.xml and restart the HttpFS daemon.
+Verify that core-site.xml has the following configuration:
 
-Supported parameters are:
+        <property>
+        <name>hadoop.proxyuser.httpfs.hosts</name>
+        <value>*</value>
+        </property>
+        <property>
+        <name>hadoop.proxyuser.httpfs.groups</name>
+        <value>*</value>
+        </property>
 
-* USER
-* PASSWORD
+If the configuration is not present, add it to /etc/hadoop/conf/core-site.xml and restart Hadoop.
 
-e.g.
+### S3
 
-      mysql://${USER}:${PASSWORD}@localhost:3306/hue
+Hue's filebrowser can now allow users to explore, manage, and upload data in an S3 account, in addition to HDFS.
 
-### HiveServer2
+Read more about it in the [S3 User Documentation](/user/browsers#s3).
 
-This is the interface that was created for Apache Hive and Apache Impala. The main advantages are that they provide asynchronous executions and so:
+In order to add an S3 account to Hue, you'll need to configure Hue with valid S3 credentials, including the access key ID and secret access key: [AWSCredentials](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html)
 
-* non blocking submission
-* progress reports
-* non blocking result fetching
+These keys can securely stored in a script that outputs the actual access key and secret key to stdout to be read by Hue (this is similar to how Hue reads password scripts). In order to use script files, add the following section to your hue.ini configuration file:
 
-For example to point to Hive, first configure the `[beeswax]` section.
 
-    [beeswax]
-      # Host where HiveServer2 is running.
-      hive_server_host=localhost
+    [aws]
+    [[aws_accounts]]
+    [[[default]]]
+    access_key_id_script=/path/to/access_key_script
+    secret_access_key_script= /path/to/secret_key_script
+    allow_environment_credentials=false
+    region=us-east-1
 
-      # Port where HiveServer2 Thrift server runs on.
-      hive_server_port=10000
 
-Then make sure the `hive` interpreter is present in the `[[interpreters]]` list.
+Alternatively (but not recommended for production or secure environments), you can set the access_key_id and secret_access_key values to the plain-text values of your keys:
 
-  [[interpreters]]
+    [aws]
+    [[aws_accounts]]
+    [[[default]]]
+    access_key_id=s3accesskeyid
+    secret_access_key=s3secretaccesskey
+    allow_environment_credentials=false
+    region=us-east-1
 
-    [[[hive]]]
-      name=Hive
-      interface=hiveserver2
+The region should be set to the AWS region corresponding to the S3 account. By default, this region will be set to 'us-east-1'.
 
-### Custom
 
-A series of native connectors interacting with the editor have been developed and are listed in the [developer section](/developer/editor/).
+**Using Ceph**
+New end points have been added in [HUE-5420](https://issues.cloudera.org/browse/HUE-5420)
 
-### JDBC
 
-**Note** This is an historical connector, SQLAlchemy should be prefered at this time.
+### ADLS / ABFS
 
-Use the query editor with any JDBC database.
+Hue's file browser can now allow users to explore, manage, and upload data in an ADLS v1 or ADLS v2 (ABFS), in addition to HDFS and S3. ABFS is currently a work in progress with [HUE-8908](https://issues.cloudera.org/browse/HUE-8908)
 
-The “rdbms” interface works great for MySQL, PostgreSQL, SQLite, and Oracle, but for other JDBC-compatible databases Hue now finally supports a “jdbc” interface to integrate such databases with the new query editor!
+Read more about it in the [ADLS User Documentation](/user/browsers#adls).
 
-Integrating an external JDBC database involves a 3-step process:
+In order to add an ADLS account to Hue, you'll need to configure Hue with valid ADLS credentials, including the client ID, client secret and tenant ID.
+These keys can securely stored in a script that outputs the actual access key and secret key to stdout to be read by Hue (this is similar to how Hue reads password scripts). In order to use script files, add the following section to your hue.ini configuration file:
 
-Download the compatible client driver JAR file for your specific OS and database. Usually you can find the driver files from the official database vendor site; for example, the MySQL JDBC connector for Mac OSX can be found here: https://dev.mysql.com/downloads/connector/j/. (NOTE: In the case of MySQL, the JDBC driver is platform independent, but some drivers are specific to certain OSes and versions so be sure to verify compatibility.)
-Add the path to the driver JAR file to your Java CLASSPATH. Here, we set the CLASSPATH environment variable in our `.bash_profile` script.
+    [adls]
+    [[azure_accounts]]
+    [[[default]]]
+    client_id_script=/path/to/client_id_script.sh
+    client_secret_script=/path/to/client_secret_script.sh
+    tenant_id_script=/path/to/tenant_id_script.sh
 
-    # MySQL
-    export MYSQL_HOME=/Users/hue/Dev/mysql
-    export CLASSPATH=$MYSQL_HOME/mysql-connector-java-5.1.38-bin.jar:$CLASSPATH
+    [[adls_clusters]]
+    [[[default]]]
+    fs_defaultfs=adl://<account_name>.azuredatalakestore.net
+    webhdfs_url=https://<account_name>.azuredatalakestore.net
 
-Add a new interpreter to the notebook app and supply the “name”, set “interface” to jdbc, and set “options” to a JSON object that contains the JDBC connection information. For example, we can connect a local MySQL database named “hue” running on `localhost` and port `8080` via JDBC with the following configuration:
+    [[abfs_clusters]]
+    [[[default]]]
+    fs_defaultfs=abfss://<container_name>@<account_name>.dfs.core.windows.net
+    webhdfs_url=https://<container_name>@<account_name>.dfs.core.windows.net
 
-    [notebook]
-      [[interpreters]]
-        [[[mysql]]]
-        name=MySQL JDBC
-        interface=jdbc
-        options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver", "user": "root", "password": ""}'
+Alternatively (but not recommended for production or secure environments), you can set the client_secret value in plain-text:
 
-Technically the JDBC is connecting to the database to query via a Java Proxy powered with Py4j. It will automatically
-be started if any interpreter is using it.
+    [adls]
+    [[azure_account]]
+    [[[default]]]
+    client_id=adlsclientid
+    client_secret=adlsclientsecret
+    tenant_id=adlstenantid
 
-    ## Main flag to override the automatic starting of the DBProxy server.
-    enable_dbproxy_server=true
+    [[adls_clusters]]
+    [[[default]]]
+    fs_defaultfs=adl://<account_name>.azuredatalakestore.net
+    webhdfs_url=https://<account_name>.azuredatalakestore.net
 
-**Tip**: Testing JDBC Configurations
-Before adding your interpreter’s JDBC configurations to hue.ini, verify that the JDBC driver and connection settings work in a SQL client like SQuirrel SQL.
+    [[abfs_clusters]]
+    [[[default]]]
+    fs_defaultfs=abfss://<container_name>@<account_name>.dfs.core.windows.net
+    webhdfs_url=https://<container_name>@<account_name>.dfs.core.windows.net
 
-**Tip**: Prompt for JDBC authentication
-You can leave out the username and password in the JDBC options, and Hue will instead prompt the user for a username and password. This allows administrators to provide access to JDBC sources without granting all Hue users the same access.
+### GCS
 
-### Django DB Connectors
+Hue's file browser for Google Cloud Storage is currently a work in progress with [HUE-8978](https://issues.cloudera.org/browse/HUE-8978)
 
-**Note** This is an historical connector, SQLAlchemy should be prefered at this time.
+The json credentials of a service account can be stored for development in plain-text
 
-Those rely on the `[dbms]` lib an dedicated Python libs.
+    [desktop]
+    [[gc_accounts]]
+    [[[default]]]
+    json_credentials='{ "type": "service_account", "project_id": .... }'
 
-First, in your hue.ini file, add the relevant database connection information under the `[librdbms]` section:
 
-    [librdbms]
-      [[databases]]
-        [[[postgresql]]]
-        nice_name=PostgreSQL
-        name=music
-        engine=postgresql_psycopg2
-        port=5432
-        user=hue
-        password=hue
-        options={}
+### HBase
 
-Secondly, add a new interpreter to the notebook app. This will allow the new database type to be registered as a snippet-type in the Notebook app. For query editors that use a Django-compatible database, the name in the brackets should match the database configuration name in the librdbms section (e.g. – postgresql). The interface will be set to rdbms. This tells Hue to use the librdbms driver and corresponding connection information to connect to the database. For example, with the above postgresql connection configuration in the librdbms section, we can add a PostgreSQL interpreter with the following notebook configuration:
+Specify the comma-separated list of HBase Thrift servers for clusters in the format of "(name|host:port)":
 
-    [notebook]
-      [[interpreters]]
-        [[[postgresql]]]
-        name=PostgreSQL
-        interface=rdbms
+    [hbase]
+    hbase_clusters=(Cluster|localhost:9090)
 
-After updating the configuration and restarting Hue, we can access the new PostgreSQL interpreter in the Notebook app:
+HBase Impersonation:
+
+Enable impersonation for the Thrift server by adding the following properties to hbase-site.xml on each Thrift gateway:
+
+    <property>
+      <name>hbase.regionserver.thrift.http</name>
+      <value>true</value>
+    </property>
+    <property>
+      <name>hbase.thrift.support.proxyuser</name>
+      <value>true/value>
+    </property>
+
+Note: If you use framed transport, you cannot use doAs impersonation, because SASL does not work with Thrift framed transport.
+
+doAs Impersonation provides a flexible way to use the same client to impersonate multiple principals. doAs is supported only in Thrift 1.
+Enable doAs support by adding the following properties to hbase-site.xml on each Thrift gateway:
+
+    <property>
+      <name>hbase.regionserver.thrift.http</name>
+      <value>true</value>
+    </property>
+    <property>
+      <name>hbase.thrift.support.proxyuser</name>
+      <value>true/value>
+    </property>
+
+## Others
+
+### Data Catalog
+
+In the `[metadata]` section, Hue is supporting Cloudera Navigator and soon Apache Atlas ([HUE-8749](https://issues.cloudera.org/browse/HUE-8749)) in order to enrich the [data catalog](/user/browsers/).
+
+### Spark
+
+The `[spark]` section details how to point to [Livy](https://livy.incubator.apache.org/) in order to execute interactive Spark snippets in Scala or Python.
+
+    [spark]
+      # Host address of the Livy Server.
+      ## livy_server_host=localhost
+
+      # Port of the Livy Server.
+      ## livy_server_port=8998
+
+### Kafka
+
+The configuration is in `[kafka]` but the service is still experiemental.
+
+
+### Oozie
+
+In oder to schedule workflows, the `[liboozie]` section of the configuration file:
+
+    [liboozie]
+      oozie_url=http://oozie-server.com:11000/oozie
+
+Make sure that the [Share Lib](https://oozie.apache.org/docs/5.1.0/DG_QuickStart.html#Oozie_Share_Lib_Installation) is installed.
+
+To configure Hue as a default proxy user, add the following properties to /etc/oozie/conf/oozie-site.xml:
+
+    <!-- Default proxyuser configuration for Hue -->
+    <property>
+        <name>oozie.service.ProxyUserService.proxyuser.hue.hosts</name>
+        <value>*</value>
+    </property>
+    <property>
+        <name>oozie.service.ProxyUserService.proxyuser.hue.groups</name>
+        <value>*</value>
+    </property>
+
+### YARN Cluster
+
+Hue supports one or two Yarn clusters (two for HA). These clusters should be defined
+under the `[[[default]]]` and `[[[ha]]]` sub-sections.
+
+    # Configuration for YARN (MR2)
+    # ------------------------------------------------------------------------
+    [[yarn_clusters]]
+
+      [[[default]]]
+
+        resourcemanager_host=yarn-rm.com
+        resourcemanager_api_url=http://yarn-rm.com:8088/
+        proxy_api_url=http://yarn-proxy.com:8088/
+        resourcemanager_port=8032
+        history_server_api_url=http://yarn-rhs-com:19888/
