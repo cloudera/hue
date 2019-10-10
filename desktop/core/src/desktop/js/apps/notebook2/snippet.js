@@ -756,15 +756,10 @@ export default class Snippet {
       defaultShowLogs = $.totalStorage('hue.editor.showLogs');
     }
     this.showLogs = ko.observable(snippet.showLogs || defaultShowLogs);
-    this.progress = ko.observable(snippet.progress || 0);
     this.jobs = ko.observableArray(snippet.jobs || []);
 
     this.executeNextTimeout = -1;
     this.refreshTimeouts = {};
-
-    this.progress.subscribe(val => {
-      $(document).trigger('progress', { data: val, snippet: this });
-    });
 
     this.showLogs.subscribe(val => {
       huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
@@ -1083,7 +1078,6 @@ export default class Snippet {
   //   this.parentNotebook.forceHistoryInitialHeight(true);
   //   this.errors([]);
   //   huePubSub.publish('editor.clear.highlighted.errors', this.ace());
-  //   this.progress(0);
   //   this.jobs([]);
   //
   //   this.parentNotebook.historyCurrentPage(1);
@@ -1348,7 +1342,6 @@ export default class Snippet {
       // this.checkStatus();
     } else if (this.status() === STATUS.loading) {
       this.status(STATUS.failed);
-      this.progress(0);
       this.jobs([]);
     } else if (this.status() === STATUS.readyExecute) {
       this.execute();

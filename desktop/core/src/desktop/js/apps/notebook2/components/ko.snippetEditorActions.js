@@ -141,7 +141,6 @@ class SnippetEditorActions {
 
     this.snippet.result.explanation('');
     this.snippet.errors([]);
-    this.snippet.progress(0);
     this.snippet.status(STATUS.ready);
 
     $.post('/notebook/api/explain', {

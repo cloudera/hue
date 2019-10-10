@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import $ from 'jquery';
 import ko from 'knockout';
 
 import 'ko/bindings/ko.publish';
@@ -21,6 +22,9 @@ import 'ko/bindings/ko.publish';
 import componentUtils from 'ko/components/componentUtils';
 import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
 import DisposableComponent from 'ko/components/DisposableComponent';
+import { sleep } from 'utils/hueUtils';
+import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
+import huePubSub from 'utils/huePubSub';
 
 export const NAME = 'executable-progress-bar';
 
@@ -31,7 +35,7 @@ const TEMPLATE = `
 `;
 
 class ExecutableProgressBar extends DisposableComponent {
-  constructor(params) {
+  constructor(params, element) {
     super();
     this.activeExecutable = params.activeExecutable;
 
@@ -63,10 +67,27 @@ class ExecutableProgressBar extends DisposableComponent {
       return Math.max(2, this.progress()) + '%';
     });
 
-    this.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
+    this.subscribe(EXECUTABLE_UPDATED_EVENT, async executable => {
       if (this.activeExecutable() === executable) {
         this.status(executable.status);
         this.progress(executable.progress);
+        if (executable.progress === 100) {
+          await sleep(2000);
+          $(element)
+            .parent()
+            .find('.progress-snippet')
+            .animate(
+              {
+                height: '0'
+              },
+              100
+            );
+        } else {
+          $(element)
+            .parent()
+            .find('.progress-snippet')
+            .css('height', '');
+        }
       }
     });
 
@@ -77,4 +98,11 @@ class ExecutableProgressBar extends DisposableComponent {
   }
 }
 
-componentUtils.registerComponent(NAME, ExecutableProgressBar, TEMPLATE);
+componentUtils.registerComponent(
+  NAME,
+  {
+    createViewModel: (params, componentInfo) =>
+      new ExecutableProgressBar(params, componentInfo.element)
+  },
+  TEMPLATE
+);
