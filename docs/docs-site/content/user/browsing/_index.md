@@ -1,11 +1,11 @@
 ---
-title: "Data Catalog"
+title: "Browsing"
 date: 2019-03-13T18:28:09-07:00
 draft: false
-weight: 4
+weight: 3
 ---
 
-Hue Browsers power the Data Catalog. They let you easily search, glance and perform actions on data or jobs in Cloud or on premise clusters.
+Browsers power the Data Catalog. They let you easily search, glance and perform actions on data or jobs in Cloud or on premise clusters.
 
 The browsers can be "enriched" with [Search and Tagging](http://gethue.com/improved-sql-exploration-in-hue-4-3/) by metadata services.
 
@@ -227,7 +227,7 @@ column range, etc. Remember that if you ever need help with the
 searchbar, you can use the help menu that pops up while typing, which
 will suggest next steps to complete your query.
 
-## Solr Indexes / Collections
+## Solr Indexes
 
 Solr indexes can be created and are listed in the interface.
 
