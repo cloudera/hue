@@ -45,7 +45,7 @@ build/env/bin/hue runserver
 ```
 Now Hue should be running on [http://localhost:8000](http://localhost:8000) ! The configuration in development mode is `desktop/conf/pseudo-distributed.ini`.
 
-Read more in the [installation documentation](http://cloudera.github.io/hue/latest/administrator/installation/).
+Read more in the [installation documentation](https://docs.gethue.com/administrator/installation/).
 
 
 Docker

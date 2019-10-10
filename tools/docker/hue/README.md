@@ -105,7 +105,7 @@ If you want to be able to query a database out of the box, update the connector 
   # One entry for each type of snippet.
   [[interpreters]]
     # Define the name and how to connect and execute the language.
-    # http://cloudera.github.io/hue/latest/administrator/configuration/editor/
+    # https://docs.gethue.com/administrator/configuration/editor/
 
     [[[mysql]]]
       name = MySQL

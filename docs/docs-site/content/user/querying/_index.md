@@ -162,7 +162,7 @@ Turns a list of semi-colon separated queries into an interactive presentation. I
 
 ## SQL Databases
 
-Use the query editor with any database. Those databases need to be configured by the [administratior](/administrator/configuration/editor/)
+Use the query editor with any database. Those databases need to be configured by the [administrator](/administrator/configuration/editor/)
 
 ### Apache Hive
 ### Apache Impala
