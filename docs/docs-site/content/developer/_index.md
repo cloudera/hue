@@ -6,22 +6,18 @@ chapter = false
 pre = "<b>3. </b>"
 +++
 
-Hue service integration is generic and lets you integrate with other analytics systems. Here is a list of the main APIs:
+Hue services are getting more and more generic to let you integrate with other analytics systems. Here is a list of the main APIs:
 
 * Connect or create SQL connectors to any database (Impala, MySQL, Presto...)
-* List any files from any filesytem (HDFS, S3, ADLS...)
-* List any job or query list (YARN, SQL queries, Kubernetes...)
-* Integrate with a Data Catalog (Cloudera Navigator, Apache Atlas...)
+* Browse additional storage systems (HDFS, S3, ADLS, GS...)
+* List any jobs or queries (YARN, SQL queries, Kubernetes...)
+* Integrate with a Data Catalog (Cloudera Navigator, Apache Atlas...) or a Query Optimization service
 
 In addition, whole new apps can also be created in order to provide end to end solutions.
 
-Upcoming & Contribution ideas
+Majoritively, this section would be useful for:
 
+* Ramping-up with the overall Hue [development](/developer/development) project
 * How to improve the [SQL autocomplete](/developer/parsers/) for your own database
-* Improved Query Builder
-* Improved Dashboard & Reporting
-* Framework to add new/embed vizualizations
-* How to integrate smart query troubleshooting/recommendation systems (Cloudera Navigator Optimizer...)
-* Generic workflow system (Apache Oozie, Apache Airflow, Celery Tasks...)
-* ADLS gen2, Google FS integrations
-* Check the [Roadmap](https://github.com/cloudera/hue/blob/master/docs/ROADMAP.md)
+* SqlAlchemy is becoming the [standard API](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/sql_alchemy.py) for databases other than Hive and Impala
+* Check some [contribution ideas](https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md)
