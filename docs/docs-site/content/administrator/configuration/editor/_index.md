@@ -658,6 +658,19 @@ Alternative:
       ## The JDBC driver clickhouse-jdbc.jar and its related jars need to be in the CLASSPATH environment variable.
       options='{"url": "jdbc:clickhouse://localhost:8123", "driver": "ru.yandex.clickhouse.ClickHouseDriver", "user": "readonly", "password": ""}'
 
+### Pinot DB
+
+The dialect for https://pinot.apache.org should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install pinotdb
+
+Then give Hue the information about the database source:
+
+    [[[pinot]]]
+       name = Pinot
+       interface=sqlalchemy
+       options='{"url": "pinot+http://localhost:8099/query?server=http://localhost:9000/"}'
+
 ### Spark
 
 This connector leverage the [Apache Livy REST Api](https://livy.incubator.apache.org/):
