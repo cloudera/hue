@@ -1,17 +1,17 @@
 ---
-title: "Editor"
+title: "Querying"
 date: 2019-03-13T18:28:09-07:00
 draft: false
 weight: 2
 ---
 
-The goal of Hue's Editor is to make data querying easy and productive.
+The goal of Hue's is to make data querying easy and productive.
 
 It focuses on SQL but also supports job submissions. It comes with an intelligent autocomplete, [risk alerts and self service troubleshooting](http://gethue.com/hue-4-sql-editor-improvements/) and query assistance.
 
 Any editor can be `starred` next to its name so that it becomes the default editor and the landing page when logging in.
 
-Configuration of the connectors is currently done by the [Administrator](/administrator/configuration/editor/).
+Configuration of the connectors is currently done by the [Administrator](/administrator/configuration/connectors/).
 
 ## Concepts
 ### Running Queries
@@ -298,3 +298,15 @@ Job Properties setting.
 ### DistCp
 
 A DistCp job design consists of a DistCp command.
+
+## Dashboards
+
+Dashboards are an interactive way to explore your data quickly and easily. No programming is required and the analysis is done by drag & drops and clicks.
+
+Read more about [Dashboards](http://gethue.com/search-dashboards/).
+
+Simply drag & drop widgets that are interconnected together. This is great for exploring new datasets or monitoring without having to type.
+
+The top search bar offers a [full autocomplete](http://gethue.com/intuitively-discovering-and-exploring-a-wine-dataset-with-the-dynamic-dashboards/) on all the values of the index.
+
+The “More like This” feature lets you selected fields you would like to use to find similar records. This is a great way to find similar issues, customers, people... with regard to a list of attributes.
