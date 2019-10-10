@@ -949,7 +949,7 @@ namespace. See ``apps/about/src/about/urls.py`` for an example.
 
 ### Dependencies
 
-* The OS specific dependencies listed [here](http://cloudera.github.io/hue/latest/admin-manual/manual.html)
+* The OS specific dependencies listed [here](https://docs.gethue.com/admin-manual/manual.html)
 * Python 2.7
 * Django (1.11 included with our distribution)
 * Hadoop (Apache Hadoop 2+)
