@@ -1008,6 +1008,10 @@ export default class Snippet {
       isSqlEngine: this.isSqlDialect
     });
 
+    this.beforeExecute = () => {
+      huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this);
+    };
+
     huePubSub.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
       if (this.activeExecutable() === executable) {
         this.status(executable.status);

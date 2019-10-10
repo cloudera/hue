@@ -68,7 +68,12 @@ describe('sqlStatementsParser.js', () => {
   };
 
   it('should split "" correctly', () => {
-    testParser('', []);
+    testParser('', [
+      {
+        statement: '',
+        location: { first_line: 1, first_column: 0, last_line: 1, last_column: 0 }
+      }
+    ]);
   });
 
   it('should split ";" correctly', () => {

@@ -2077,7 +2077,7 @@ class ApiHelper {
    */
   executeStatement(options) {
     const executable = options.executable;
-    const url = EXECUTE_API_PREFIX + executable.sourceType;
+    const url = EXECUTE_API_PREFIX + executable.executor.sourceType();
 
     const promise = new Promise((resolve, reject) => {
       this.simplePost(
@@ -2276,17 +2276,18 @@ class ApiHelper {
    *
    * @return {Promise}
    */
-  closeStatement(options) {
+  async closeStatement(options) {
     const executable = options.executable;
 
-    return this.simplePost(
-      '/notebook/api/close_statement',
-      ApiHelper.adaptExecutableToNotebook({
-        sourceType: executable.sourceType,
-        handle: executable.handle
-      }),
-      options
-    );
+    return new Promise((resolve, reject) => {
+      this.simplePost(
+        '/notebook/api/close_statement',
+        ApiHelper.adaptExecutableToNotebook(executable),
+        options
+      )
+        .done(resolve)
+        .fail(reject);
+    });
   }
 
   /**

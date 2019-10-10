@@ -1335,7 +1335,7 @@
 
   <script type ="text/html" id="snippet-execution-controls${ suffix }">
     <div class="snippet-actions clearfix">
-      <div class="pull-left" data-bind="component: { name: 'snippet-execute-actions', params: { activeExecutable: activeExecutable } }" />
+      <div class="pull-left" data-bind="component: { name: 'snippet-execute-actions', params: { activeExecutable: activeExecutable, beforeExecute: beforeExecute } }" />
       <!-- ko if: isSqlDialect() && !$root.isPresentationMode() -->
       <div class="pull-right" data-bind="component: { name: 'snippet-editor-actions', params: { snippet: $data } }" />
       <!-- /ko -->

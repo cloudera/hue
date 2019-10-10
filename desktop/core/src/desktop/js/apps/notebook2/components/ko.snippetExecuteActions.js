@@ -64,6 +64,7 @@ class SnippetExecuteActions extends DisposableComponent {
     this.activeExecutable = params.activeExecutable;
     this.status = ko.observable(EXECUTION_STATUS.ready);
     this.hasMoreToExecute = ko.observable(false);
+    this.beforeExecute = params.beforeExecute;
 
     this.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
       if (this.activeExecutable() === executable) {
@@ -94,12 +95,11 @@ class SnippetExecuteActions extends DisposableComponent {
     this.stopping(false);
   }
 
-  execute() {
+  async execute() {
+    this.beforeExecute();
     const executable = this.activeExecutable();
     if (executable) {
-      if (!executable.isReady()) {
-        executable.close();
-      }
+      await executable.reset();
       executable.execute();
     }
   }
