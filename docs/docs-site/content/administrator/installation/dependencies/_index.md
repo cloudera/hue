@@ -143,3 +143,12 @@ and finally
 
     cd sdk
     unzip ottclasses.zip
+
+### Supported Browsers
+
+The two latest LTS versions of each browsers:
+
+* Edge
+* Safari
+* Chrome
+* Firefox
