@@ -880,25 +880,6 @@ export const initNotebook2 = () => {
         huePubSub.publish(SHOW_NORMAL_RESULT_EVENT);
       });
 
-      $(document).on('progress', (e, options) => {
-        if (options.data === 100) {
-          window.setTimeout(() => {
-            $('#snippet_' + options.snippet.id())
-              .find('.progress-snippet')
-              .animate(
-                {
-                  height: '0'
-                },
-                100,
-                () => {
-                  options.snippet.progress(0);
-                  huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
-                }
-              );
-          }, 2000);
-        }
-      });
-
       let hideTimeout = -1;
       $(document).on('hideAutocomplete', () => {
         window.clearTimeout(hideTimeout);
