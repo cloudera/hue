@@ -1011,6 +1011,9 @@ export default class Snippet {
     huePubSub.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
       if (this.activeExecutable() === executable) {
         this.status(executable.status);
+        if (executable.result) {
+          this.currentQueryTab('queryResults');
+        }
       }
     });
 
