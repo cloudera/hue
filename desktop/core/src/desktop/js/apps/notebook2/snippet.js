@@ -19,10 +19,10 @@ import ko from 'knockout';
 import komapping from 'knockout.mapping';
 import { markdown } from 'markdown';
 
+import 'apps/notebook2/components/ko.executableActions';
 import 'apps/notebook2/components/ko.executableLogs';
 import 'apps/notebook2/components/ko.executableProgressBar';
 import 'apps/notebook2/components/ko.snippetEditorActions';
-import 'apps/notebook2/components/ko.snippetExecuteActions';
 import 'apps/notebook2/components/ko.snippetResults';
 
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
@@ -40,7 +40,7 @@ import {
   ACTIVE_STATEMENT_CHANGED_EVENT,
   REFRESH_STATEMENT_LOCATIONS_EVENT
 } from 'sql/aceLocationHandler';
-import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from 'apps/notebook2/components/ko.snippetExecuteActions';
+import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from 'apps/notebook2/components/ko.executableActions';
 
 // TODO: Remove. Temporary here for debug
 window.SqlExecutable = SqlExecutable;
@@ -369,6 +369,12 @@ export default class Snippet {
     this.lastExecutedStatement = ko.observable(null);
     this.statementsList = ko.observableArray();
 
+    let beforeExecute = false;
+    this.beforeExecute = () => {
+      beforeExecute = true;
+      huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this);
+    };
+
     huePubSub.subscribe(
       ACTIVE_STATEMENT_CHANGED_EVENT,
       statementDetails => {
@@ -387,10 +393,9 @@ export default class Snippet {
               break;
             }
           }
-
           this.positionStatement(statementDetails.activeStatement);
-          this.activeExecutable(this.executor.update(statementDetails));
-
+          this.activeExecutable(this.executor.update(statementDetails, beforeExecute));
+          beforeExecute = false;
           if (statementDetails.activeStatement) {
             const _statements = [];
             statementDetails.precedingStatements.forEach(statement => {
@@ -1002,10 +1007,6 @@ export default class Snippet {
       namespace: this.namespace,
       isSqlEngine: this.isSqlDialect
     });
-
-    this.beforeExecute = () => {
-      huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this);
-    };
 
     huePubSub.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
       if (this.activeExecutable() === executable) {

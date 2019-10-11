@@ -23,8 +23,6 @@ import componentUtils from 'ko/components/componentUtils';
 import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
 import DisposableComponent from 'ko/components/DisposableComponent';
 import { sleep } from 'utils/hueUtils';
-import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
-import huePubSub from 'utils/huePubSub';
 
 export const NAME = 'executable-progress-bar';
 

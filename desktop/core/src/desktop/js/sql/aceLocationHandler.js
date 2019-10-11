@@ -498,17 +498,30 @@ class AceLocationHandler {
       );
     };
 
+    const getFirstPosition = (editorPositionOne, editorPositionTwo) => {
+      if (editorPositionOne.row === editorPositionTwo.row) {
+        return editorPositionOne.column <= editorPositionTwo.column
+          ? editorPositionOne
+          : editorPositionTwo;
+      }
+      return editorPositionOne.row < editorPositionTwo.row ? editorPositionOne : editorPositionTwo;
+    };
+
+    const equalPositions = (editorPositionOne, editorPositionTwo) => {
+      return (
+        editorPositionOne.row === editorPositionTwo.row &&
+        editorPositionOne.column === editorPositionTwo.column
+      );
+    };
+
     let lastExecutingStatement = null;
     const updateActiveStatement = function(cursorChange) {
       if (!self.snippet.isSqlDialect()) {
         return;
       }
       const selectionRange = self.editor.getSelectionRange();
-      const editorLocation = selectionRange.start;
-      if (
-        selectionRange.start.row !== selectionRange.end.row ||
-        selectionRange.start.column !== selectionRange.end.column
-      ) {
+      const cursorLocation = selectionRange.start;
+      if (!equalPositions(selectionRange.start, selectionRange.end)) {
         if (!cursorChange && self.snippet.result && self.snippet.result.statement_range()) {
           let executingStatement = self.snippet.result.statement_range();
           // Row and col are 0 for both start and end on execute, so if the selection hasn't changed we'll use last known executed statement
@@ -522,10 +535,10 @@ class AceLocationHandler {
             executingStatement = lastExecutingStatement;
           }
           if (executingStatement.start.row === 0) {
-            editorLocation.column += executingStatement.start.column;
+            cursorLocation.column += executingStatement.start.column;
           } else if (executingStatement.start.row !== 0 || executingStatement.start.column !== 0) {
-            editorLocation.row += executingStatement.start.row;
-            editorLocation.column = executingStatement.start.column;
+            cursorLocation.row += executingStatement.start.row;
+            cursorLocation.column = executingStatement.start.column;
           }
           lastExecutingStatement = executingStatement;
         } else {
@@ -533,23 +546,45 @@ class AceLocationHandler {
         }
       }
 
-      if (cursorChange && activeStatement) {
+      if (cursorChange && activeStatement && !window.ENABLE_NOTEBOOK_2) {
         // Don't update when cursor stays in the same statement
-        if (isPointInside(activeStatement.location, editorLocation)) {
+        if (isPointInside(activeStatement.location, cursorLocation)) {
           return;
         }
       }
+      const selectedStatements = [];
       const precedingStatements = [];
       const followingStatements = [];
       activeStatement = null;
 
+      const firstSelectionPoint = getFirstPosition(selectionRange.start, selectionRange.end);
+      const lastSelectionPoint =
+        selectionRange.start === firstSelectionPoint ? selectionRange.end : selectionRange.start;
+
       let found = false;
       let statementIndex = 0;
+      let insideSelection = false;
       if (lastKnownStatements.length === 1) {
         activeStatement = lastKnownStatements[0];
       } else {
         lastKnownStatements.forEach(statement => {
-          if (isPointInside(statement.location, editorLocation)) {
+          if (!equalPositions(firstSelectionPoint, lastSelectionPoint)) {
+            if (!insideSelection && isPointInside(statement.location, firstSelectionPoint)) {
+              insideSelection = true;
+            }
+            if (insideSelection) {
+              selectedStatements.push(statement);
+
+              if (
+                isPointInside(statement.location, lastSelectionPoint) ||
+                (statement.location.last_line === lastSelectionPoint.row + 1 &&
+                  statement.location.last_column === lastSelectionPoint.column)
+              ) {
+                insideSelection = false;
+              }
+            }
+          }
+          if (isPointInside(statement.location, cursorLocation)) {
             statementIndex++;
             found = true;
             activeStatement = statement;
@@ -571,6 +606,10 @@ class AceLocationHandler {
         }
       }
 
+      if (!selectedStatements.length) {
+        selectedStatements.push(activeStatement);
+      }
+
       huePubSub.publish(ACTIVE_STATEMENT_CHANGED_EVENT, {
         id: self.editorId,
         editorChangeTime: lastKnownStatements.editorChangeTime,
@@ -578,11 +617,12 @@ class AceLocationHandler {
         totalStatementCount: lastKnownStatements.length,
         precedingStatements: precedingStatements,
         activeStatement: activeStatement,
+        selectedStatements: selectedStatements,
         followingStatements: followingStatements
       });
 
       if (activeStatement) {
-        self.checkForSyntaxErrors(activeStatement.location, editorLocation);
+        self.checkForSyntaxErrors(activeStatement.location, firstSelectionPoint);
       }
     };
 
@@ -609,6 +649,7 @@ class AceLocationHandler {
     let cursorChangePaused = false; // On change the cursor is also moved, this limits the calls while typing
 
     let lastStart;
+    let lastEnd;
     let lastCursorPosition;
     const changeSelectionListener = self.editor.on('changeSelection', () => {
       if (cursorChangePaused) {
@@ -628,13 +669,15 @@ class AceLocationHandler {
 
         // The active statement is initially the top one in the selection, batch execution updates this.
         const newStart = self.editor.getSelectionRange().start;
+        const newEnd = self.editor.getSelectionRange().end;
         if (
-          self.snippet.isSqlDialect() &&
-          (!lastStart || lastStart.row !== newStart.row || lastStart.column !== newStart.column)
+          (self.snippet.isSqlDialect() && (!lastStart || !equalPositions(lastStart, newStart))) ||
+          (window.ENABLE_NOTEBOOK_2 && (!lastEnd || !equalPositions(lastEnd, newEnd)))
         ) {
           window.clearTimeout(updateThrottle);
           updateActiveStatement(true);
           lastStart = newStart;
+          lastEnd = newEnd;
         }
       }, 100);
     });

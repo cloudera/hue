@@ -1,9 +1,10 @@
 import huePubSub from 'utils/huePubSub';
 import { koSetup } from 'spec/jasmineSetup';
-import { NAME } from '../ko.snippetExecuteActions';
+import { NAME } from '../ko.executableActions';
 import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
+import { sleep } from 'utils/hueUtils';
 
-describe('ko.snippetExecuteActions.js', () => {
+describe('ko.executableActions.js', () => {
   const setup = koSetup();
 
   it('should render component', async () => {
@@ -11,6 +12,7 @@ describe('ko.snippetExecuteActions.js', () => {
       cancel: () => {},
       execute: () => {},
       isReady: () => true,
+      reset: () => {},
       nextExecutable: {},
       status: EXECUTION_STATUS.ready
     };
@@ -30,10 +32,11 @@ describe('ko.snippetExecuteActions.js', () => {
       cancel: () => {
         cancelCalled = true;
       },
-      execute: () => {
+      execute: async () => {
         executeCalled = true;
       },
       isReady: () => true,
+      reset: () => {},
       nextExecutable: {},
       status: EXECUTION_STATUS.ready
     };
@@ -48,6 +51,8 @@ describe('ko.snippetExecuteActions.js', () => {
     expect(wrapper.querySelector('[data-test="execute"]')).toBeTruthy();
     expect(wrapper.querySelector('[data-test="stop"]')).toBeFalsy();
     wrapper.querySelector('[data-test="execute"]').click();
+
+    await sleep(0);
 
     expect(executeCalled).toBeTruthy();
     mockExecutable.status = EXECUTION_STATUS.running;
