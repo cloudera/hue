@@ -10,7 +10,9 @@ describe('ko.executableActions.js', () => {
   it('should render component', async () => {
     const mockExecutable = {
       cancel: () => {},
+      cancelBatchChain: () => {},
       execute: () => {},
+      isPartOfRunningExecution: () => false,
       isReady: () => true,
       reset: () => {},
       nextExecutable: {},
@@ -32,9 +34,13 @@ describe('ko.executableActions.js', () => {
       cancel: () => {
         cancelCalled = true;
       },
+      cancelBatchChain: () => {
+        cancelCalled = true;
+      },
       execute: async () => {
         executeCalled = true;
       },
+      isPartOfRunningExecution: () => false,
       isReady: () => true,
       reset: () => {},
       nextExecutable: {},

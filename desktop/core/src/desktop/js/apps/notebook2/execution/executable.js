@@ -98,22 +98,42 @@ export default class Executable {
     );
   }
 
-  cancelBatchChain() {
+  isPartOfRunningExecution() {
+    if (!this.isReady()) {
+      return true;
+    }
+    return this.previousExecutable && this.previousExecutable.isPartOfRunningExecution();
+  }
+
+  async cancelBatchChain(wait) {
     if (this.previousExecutable) {
       this.previousExecutable.nextExecutable = undefined;
-      this.previousExecutable.cancelBatchChain();
+      if (wait) {
+        await this.previousExecutable.cancelBatchChain(wait);
+      } else {
+        this.previousExecutable.cancelBatchChain();
+      }
       this.previousExecutable = undefined;
     }
 
     if (!this.isReady()) {
-      this.cancel();
+      if (wait) {
+        await this.cancel();
+      } else {
+        this.cancel();
+      }
     }
 
     if (this.nextExecutable) {
       this.nextExecutable.previousExecutable = undefined;
-      this.nextExecutable.cancelBatchChain();
+      if (wait) {
+        await this.nextExecutable.cancelBatchChain(wait);
+      } else {
+        this.nextExecutable.cancelBatchChain();
+      }
       this.nextExecutable = undefined;
     }
+    this.notify();
   }
 
   async execute() {

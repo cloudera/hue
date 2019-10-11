@@ -27,31 +27,27 @@ export const EXECUTE_ACTIVE_EXECUTABLE_EVENT = 'executable.active.executable';
 
 // prettier-ignore
 const TEMPLATE = `
-<div class="snippet-execute-actions" data-test="${NAME}">
+<div class="snippet-execute-actions" data-test="${ NAME }">
   <div class="btn-group">
-    <!-- ko if: status() !== '${ EXECUTION_STATUS.running }' -->
-    <!-- ko ifnot: hasMoreToExecute -->
+    <!-- ko if: status() !== '${ EXECUTION_STATUS.running }' && !waiting() -->
     <button class="btn btn-primary btn-mini btn-execute disable-feedback" data-test="execute" data-bind="click: execute"><i class="fa fa-play fa-fw"></i> ${I18n(
       'Execute'
     )}</button>
     <!-- /ko -->
-    <!-- ko if: hasMoreToExecute -->
-    <button class="btn btn-primary btn-mini btn-execute disable-feedback" data-test="execute" data-bind="click: executeNext"><i class="fa fa-play fa-fw"></i> ${I18n(
-      'Continue'
-    )}</button>
-    <!-- /ko -->
-    <!-- /ko -->
-    <!-- ko if: status() === '${ EXECUTION_STATUS.running }' -->
-    <!-- ko ifnot: stopping -->
-    <button class="btn btn-primary btn-mini btn-execute disable-feedback" data-test="stop" data-bind="click: stop"><i class="fa fa-stop fa-fw"></i> ${I18n(
-      'Stop'
-    )}</button>
-    <!-- /ko -->
-    <!-- ko if: stopping -->
-    <button class="btn btn-primary btn-mini btn-execute disable-feedback disabled"><i class="fa fa-spinner fa-spin fa-fw"></i> ${I18n(
-      'Stop'
-    )}</button>
-    <!-- /ko -->
+    <!-- ko if: status() === '${ EXECUTION_STATUS.running }' || waiting() -->
+      <!-- ko ifnot: stopping -->
+      <button class="btn btn-primary btn-mini btn-execute disable-feedback" data-test="stop" data-bind="click: stop"><i class="fa fa-stop fa-fw"></i>
+      <!-- ko ifnot: waiting -->
+        ${ I18n('Stop') }
+      <!-- /ko --> 
+      <!-- ko if: waiting -->
+        ${ I18n('Stop batch') }
+      <!-- /ko --> 
+      </button>
+      <!-- /ko -->
+      <!-- ko if: stopping -->
+      <button class="btn btn-primary btn-mini btn-execute disable-feedback disabled"><i class="fa fa-spinner fa-spin fa-fw"></i>${ I18n('Stopping') }</button>
+      <!-- /ko -->
     <!-- /ko -->
   </div>
 </div>
@@ -63,13 +59,19 @@ class ExecutableActions extends DisposableComponent {
     this.stopping = ko.observable(false);
     this.activeExecutable = params.activeExecutable;
     this.status = ko.observable(EXECUTION_STATUS.ready);
-    this.hasMoreToExecute = ko.observable(false);
+    this.partOfRunningExecution = ko.observable(false);
     this.beforeExecute = params.beforeExecute;
+
+    this.waiting = ko.pureComputed(
+      () =>
+        this.activeExecutable() &&
+        this.activeExecutable().isReady() &&
+        this.partOfRunningExecution()
+    );
 
     this.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
       if (this.activeExecutable() === executable) {
-        this.hasMoreToExecute(!!executable.nextExecutable);
-        this.status(executable.status);
+        this.updateFromExecutable(executable);
       }
     });
 
@@ -79,11 +81,12 @@ class ExecutableActions extends DisposableComponent {
       }
     });
 
-    this.subscribe(this.activeExecutable, executable => {
-      // TODO: If previousExecutable show 'waiting...' ?
-      this.hasMoreToExecute(!!executable.nextExecutable);
-      this.status(executable.status);
-    });
+    this.subscribe(this.activeExecutable, this.updateFromExecutable.bind(this));
+  }
+
+  updateFromExecutable(executable) {
+    this.status(executable.status);
+    this.partOfRunningExecution(executable.isPartOfRunningExecution());
   }
 
   async stop() {
@@ -91,7 +94,7 @@ class ExecutableActions extends DisposableComponent {
       return;
     }
     this.stopping(true);
-    await this.activeExecutable().cancel();
+    await this.activeExecutable().cancelBatchChain(true);
     this.stopping(false);
   }
 
