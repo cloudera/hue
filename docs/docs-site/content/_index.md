@@ -23,11 +23,11 @@ Hue is also ideal for building your own Cloud SQL Editor and any contributions a
 
 Administrate
 ------------
-The [Administrator guide](administrator/index.html) describes how to install and configure.
+The [Administrator guide](administrator/index.html) describes how to install and manage the server and configure connectors to your [Databases, Warehouses, Storages](/administrator/configuration/connectors/).
 
 Use
 ---
-The [User guide](user/index.html) has instructions about how to leverage functionalities.
+The [User guide](user/index.html) has instructions about how to leverage Querying and Sharing functionalities.
 
 Develop
 -------
