@@ -672,7 +672,7 @@ class SpnegoMiddleware(object):
           if 'desktop.auth.backend.KnoxSpnegoDjangoBackend' in \
                 desktop.conf.AUTH.BACKEND.get():
             knox_verification = False
-            if desktop.conf.KNOX.KNOX_PRINCIPAL.get() in username:
+            if username in desktop.conf.KNOX.KNOX_PRINCIPAL.get():
               # This may contain chain of reverse proxies, e.g. knox proxy, hue load balancer
               # Compare hostname on both HTTP_X_FORWARDED_HOST & KNOX_PROXYHOSTS. Both of these can be configured to use either hostname or IPs and we have to normalize to one or the other
               req_hosts = self.clean_host(request.META['HTTP_X_FORWARDED_HOST'])
@@ -720,7 +720,8 @@ class SpnegoMiddleware(object):
   def clean_host(self, pattern):
     hosts = []
     if pattern:
-      for hostport in pattern.split(','):
+      pattern_list = pattern if isinstance(pattern, list) else pattern.split(',')
+      for hostport in pattern_list:
         host = hostport.split(':')[0].strip()
         try:
           hosts.append(socket.gethostbyaddr(host)[0])
