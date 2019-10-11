@@ -87,10 +87,11 @@ const TEMPLATE = `
     <div class="sidebar-menu support-menu" data-bind="css: { 'open' : $component.supportMenuOpen }">
       <div class="menu">
         <ul class="sidebar-nav-list">
+          <li><a href="https://docs.gethue.com" target="_blank">${I18n('Documentation')}</a></li>
           <li><a href="javascript:void(0)" data-bind="publish: 'show.welcome.tour'">${I18n(
             'Welcome Tour'
           )}</a></li>
-          <li><a href="http://gethue.com" target="_blank">${I18n('Help')}</a></li>
+          <li><a href="http://gethue.com" target="_blank">Gethue.com</a></li>
         </ul>
       </div>
     </div>
