@@ -21,7 +21,7 @@ import I18n from 'utils/i18n';
 import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
 import DisposableComponent from 'ko/components/DisposableComponent';
 
-export const NAME = 'snippet-execute-actions';
+export const NAME = 'executable-actions';
 
 export const EXECUTE_ACTIVE_EXECUTABLE_EVENT = 'executable.active.executable';
 
@@ -57,7 +57,7 @@ const TEMPLATE = `
 </div>
 `;
 
-class SnippetExecuteActions extends DisposableComponent {
+class ExecutableActions extends DisposableComponent {
   constructor(params) {
     super();
     this.stopping = ko.observable(false);
@@ -96,7 +96,9 @@ class SnippetExecuteActions extends DisposableComponent {
   }
 
   async execute() {
-    this.beforeExecute();
+    if (this.beforeExecute) {
+      await this.beforeExecute();
+    }
     const executable = this.activeExecutable();
     if (executable) {
       await executable.reset();
@@ -112,4 +114,4 @@ class SnippetExecuteActions extends DisposableComponent {
   }
 }
 
-componentUtils.registerComponent(NAME, SnippetExecuteActions, TEMPLATE);
+componentUtils.registerComponent(NAME, ExecutableActions, TEMPLATE);

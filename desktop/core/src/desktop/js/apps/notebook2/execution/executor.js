@@ -39,50 +39,77 @@ class Executor {
     this.executables = [];
   }
 
-  update(statementDetails) {
+  getExecutables(statementDetails) {
+    const allExecutablesIndex = {};
+    this.executables.forEach(executable => {
+      allExecutablesIndex[executable.getKey()] = executable;
+    });
+
+    const selectedExecutables = [];
+    let activeDatabase = this.database();
+    let currentSelectedIndex = 0;
     const newExecutables = statementDetails.precedingStatements
       .concat(statementDetails.activeStatement, statementDetails.followingStatements)
-      .map(
-        parsedStatement =>
-          new SqlExecutable({
-            parsedStatement: parsedStatement,
-            database: this.database(),
-            executor: this
-          })
-      );
+      .map(parsedStatement => {
+        if (/USE/i.test(parsedStatement.firstToken)) {
+          const dbMatch = parsedStatement.statement.match(/use\s+([^;]+)/i);
+          if (dbMatch) {
+            activeDatabase = dbMatch[1];
+          }
+        }
+        let executable = new SqlExecutable({
+          parsedStatement: parsedStatement,
+          database: activeDatabase,
+          executor: this
+        });
+        if (allExecutablesIndex[executable.getKey()]) {
+          executable = allExecutablesIndex[executable.getKey()];
+          delete allExecutablesIndex[executable.getKey()];
+        }
+        if (
+          currentSelectedIndex < statementDetails.selectedStatements.length &&
+          parsedStatement === statementDetails.selectedStatements[currentSelectedIndex]
+        ) {
+          selectedExecutables.push(executable);
+          currentSelectedIndex++;
+        }
+        return executable;
+      });
 
-    const existingExecutableIndex = {};
-    this.executables.forEach(executable => {
-      existingExecutableIndex[executable.getKey()] = executable;
+    const lostExecutables = Object.keys(allExecutablesIndex).map(key => allExecutablesIndex[key]);
+    return {
+      all: newExecutables,
+      lost: lostExecutables,
+      selected: selectedExecutables
+    };
+  }
+
+  update(statementDetails, beforeExecute) {
+    const executables = this.getExecutables(statementDetails);
+
+    // Cancel any "lost" executables and any batch chain it's part of
+    executables.lost.forEach(lostExecutable => {
+      lostExecutable.cancelBatchChain();
     });
 
-    let activeExecutable = new SqlExecutable({
-      parsedStatement: statementDetails.activeStatement,
-      database: this.database(),
-      executor: this
-    });
+    // Cancel any intersecting batch chains and create a new chain if just before execute
+    if (beforeExecute) {
+      executables.selected.forEach(executable => executable.cancelBatchChain());
 
-    if (existingExecutableIndex[activeExecutable.getKey()]) {
-      activeExecutable = existingExecutableIndex[activeExecutable.getKey()];
+      let previous = undefined;
+      executables.selected.forEach(executable => {
+        if (previous) {
+          executable.previousExecutable = previous;
+          previous.nextExecutable = executable;
+        }
+        previous = executable;
+      });
     }
 
-    // Refresh the executables list
-    this.executables = newExecutables.map(newExecutable => {
-      let actualExecutable = newExecutable;
-      const existingExecutable = existingExecutableIndex[newExecutable.getKey()];
-      if (existingExecutable) {
-        actualExecutable = existingExecutable;
-        delete existingExecutableIndex[newExecutable.getKey()];
-      }
-      return actualExecutable;
-    });
+    // Update the executables list
+    this.executables = executables.all;
 
-    // Cancel lost executables
-    Object.keys(existingExecutableIndex).forEach(key => {
-      existingExecutableIndex[key].cancel();
-    });
-
-    return activeExecutable;
+    return executables.selected[0];
   }
 }
 

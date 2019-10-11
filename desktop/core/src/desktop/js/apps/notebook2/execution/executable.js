@@ -65,6 +65,7 @@ export default class Executable {
     this.executeStarted = 0;
     this.executeEnded = 0;
 
+    this.previousExecutable = undefined;
     this.nextExecutable = undefined;
   }
 
@@ -95,6 +96,24 @@ export default class Executable {
       this.status === EXECUTION_STATUS.closed ||
       this.status === EXECUTION_STATUS.canceled
     );
+  }
+
+  cancelBatchChain() {
+    if (this.previousExecutable) {
+      this.previousExecutable.nextExecutable = undefined;
+      this.previousExecutable.cancelBatchChain();
+      this.previousExecutable = undefined;
+    }
+
+    if (!this.isReady()) {
+      this.cancel();
+    }
+
+    if (this.nextExecutable) {
+      this.nextExecutable.previousExecutable = undefined;
+      this.nextExecutable.cancelBatchChain();
+      this.nextExecutable = undefined;
+    }
   }
 
   async execute() {
@@ -140,7 +159,7 @@ export default class Executable {
     statusCheckCount++;
 
     this.cancellables.push(
-      apiHelper.checkExecutionStatus({ executable: this }).done(queryStatus => {
+      apiHelper.checkExecutionStatus({ executable: this }).done(async queryStatus => {
         switch (this.status) {
           case EXECUTION_STATUS.success:
             this.executeEnded = Date.now();
@@ -154,6 +173,12 @@ export default class Executable {
             if (!this.result && this.handle.has_result_set) {
               this.result = new ExecutionResult(this);
               this.result.fetchRows();
+            }
+            if (this.nextExecutable) {
+              if (!this.nextExecutable.isReady()) {
+                await this.nextExecutable.reset();
+              }
+              this.nextExecutable.execute();
             }
             break;
           case EXECUTION_STATUS.expired:
@@ -214,11 +239,14 @@ export default class Executable {
         await this.close();
       } catch (err) {}
     }
+    this.handle = {
+      statement_id: 0
+    };
     this.setProgress(0);
+    this.setStatus(EXECUTION_STATUS.ready);
   }
 
   async close() {
-    console.log('closing');
     while (this.cancellables.length) {
       const nextCancellable = this.cancellables.pop();
       try {

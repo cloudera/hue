@@ -16,7 +16,6 @@
 
 import apiHelper from 'api/apiHelper';
 import Executable from 'apps/notebook2/execution/executable';
-import sqlStatementsParser from 'parse/sqlStatementsParser';
 
 const BATCHABLE_STATEMENT_TYPES = /ALTER|CREATE|DELETE|DROP|GRANT|INSERT|INVALIDATE|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i;
 
@@ -47,49 +46,6 @@ export default class SqlExecutable extends Executable {
 
   getKey() {
     return this.database + '_' + this.parsedStatement.statement;
-  }
-
-  /**
-   *
-   * @param options
-   * @param options.database
-   * @param options.statement
-   * @param options.executor
-   * @param options.sourceType
-   * @param options.compute
-   * @param options.namespace
-   * @return {Array}
-   */
-  static fromStatement(options) {
-    const result = [];
-    let database = options.database;
-    sqlStatementsParser.parse(options.statement).forEach(parsedStatement => {
-      // If there's no first token it's a trailing comment
-      if (parsedStatement.firstToken) {
-        let skip = false;
-        // TODO: Do we want to send USE statements separately or do we want to send database as param instead?
-        if (/USE/i.test(parsedStatement.firstToken)) {
-          const dbMatch = parsedStatement.statement.match(/use\s+([^;]+)/i);
-          if (dbMatch) {
-            database = dbMatch[1];
-            skip = this.sourceType === 'impala' || this.sourceType === 'hive';
-          }
-        }
-        if (!skip) {
-          result.push(
-            new SqlExecutable({
-              executor: options.executor,
-              sourceType: options.sourceType,
-              compute: options.compute,
-              namespace: options.namespace,
-              database: database,
-              parsedStatement: parsedStatement
-            })
-          );
-        }
-      }
-    });
-    return result;
   }
 
   canExecuteInBatch() {
