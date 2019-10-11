@@ -808,6 +808,12 @@ SESSION = ConfigSection(
       help=_("If set, limits the number of concurrent user sessions. 1 represents 1 session per user. Default: 0 (unlimited sessions per user)"),
       type=int,
       default=0,
+    ),
+    TRUSTED_ORIGINS = Config(
+      key="trusted_origins",
+      help=_("A list of hosts which are trusted origins for unsafe requests. See django's CSRF_TRUSTED_ORIGINS for more information"),
+      type=coerce_csv,
+      default='.cloudera.com',
     )
   )
 )
@@ -818,13 +824,13 @@ KNOX = ConfigSection(
   members=dict(
     KNOX_PRINCIPAL=Config(
       key='knox_principal',
-      help=_("Kerberos principal name for Hue. Typically 'knox/hostname.foo.com'."),
-      type=str,
+      help=_("Comma separated list of Kerberos principal name for Hue. Typically 'knox/hostname.foo.com'."),
+      type=coerce_csv,
       default="knox/%s" % socket.getfqdn()),
     KNOX_PROXYHOSTS = Config(
       key='knox_proxyhosts',
       default="%s" % socket.getfqdn(),
-      type=str,
+      type=coerce_csv,
       help=_('Comma separated list of strings representing the host names that the Hue server can trust as knox hosts.')
     ),
   )
