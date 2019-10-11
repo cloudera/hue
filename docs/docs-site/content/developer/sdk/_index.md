@@ -51,7 +51,8 @@ The Job Browser is generic and can list any type of jobs, queries and provide bu
 Here is its [API](https://github.com/cloudera/hue/tree/master/apps/jobbrowser/src/jobbrowser/apis).
 
 ## Files
-Here is an example on how the File Browser can list HDFS, S3 files and [ADLS](https://issues.cloudera.org/browse/HUE-7248).
+
+Various storage systems like Hadoop HDFS, AWS S3 and Azure [ADLS](https://issues.cloudera.org/browse/HUE-7248) can be interacted with. The [`fsmanager.py`](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/lib/fsmanager.py) is the main router to each API.
 
 **Note** Ceph can be used via the S3 browser.
 
