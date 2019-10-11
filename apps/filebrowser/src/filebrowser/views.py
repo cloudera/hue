@@ -225,7 +225,7 @@ def view(request, path):
     except (IOError, WebHdfsException) as e:
         msg = _("Cannot access: %(path)s. ") % {'path': escape(path)}
 
-        if "Connection refused" in e.args[0]:
+        if "Connection refused" in str(e):
             msg += _(" The HDFS REST service is not available. ")
 
         if request.is_ajax():
