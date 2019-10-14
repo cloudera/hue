@@ -68,24 +68,9 @@ class MetastoreViewModel {
 
     huePubSub.publish('cluster.config.get.config', clusterConfig => {
       const initialSourceType = options.sourceType || 'hive';
-      if (
-        clusterConfig &&
-        clusterConfig.app_config &&
-        ((clusterConfig.app_config.editor && clusterConfig.app_config.editor.interpreters) ||
-          clusterConfig.app_config.catalogs)
-      ) {
+
+      if (clusterConfig && clusterConfig.app_config && clusterConfig.app_config.catalogs) {
         const sources = [];
-        clusterConfig.app_config.editor.interpreters.forEach(interpreter => {
-          if (interpreter.is_sql) {
-            sources.push(
-              new MetastoreSource({
-                metastoreViewModel: this,
-                name: interpreter.name,
-                type: interpreter.type
-              })
-            );
-          }
-        });
         if (clusterConfig.app_config.catalogs) {
           clusterConfig.app_config.catalogs.forEach(interpreter => {
             sources.push(
