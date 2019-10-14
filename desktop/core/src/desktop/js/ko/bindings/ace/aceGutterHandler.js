@@ -81,20 +81,18 @@ export default class AceGutterHandler {
     });
 
     if (this.executor) {
+      const session = this.editor.getSession();
+
       const executableSub = huePubSub.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
         if (executable.executor === this.executor) {
           const statement = executable.parsedStatement;
-          const session = this.editor.getSession();
           forEachLine(statement, line => {
+            session.removeGutterDecoration(line, COMPLETED_CSS);
+            session.removeGutterDecoration(line, EXECUTING_CSS);
             if (executable.isRunning()) {
-              session.removeGutterDecoration(line, COMPLETED_CSS);
               session.addGutterDecoration(line, EXECUTING_CSS);
             } else if (executable.isSuccess()) {
-              session.removeGutterDecoration(line, EXECUTING_CSS);
               session.addGutterDecoration(line, COMPLETED_CSS);
-            } else {
-              session.removeGutterDecoration(line, EXECUTING_CSS);
-              session.removeGutterDecoration(line, COMPLETED_CSS);
             }
           });
         }
