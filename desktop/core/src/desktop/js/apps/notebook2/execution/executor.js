@@ -109,6 +109,8 @@ class Executor {
     // Update the executables list
     this.executables = executables.all;
 
+    this.executables.forEach(executable => executable.notify());
+
     return executables.selected[0];
   }
 }
