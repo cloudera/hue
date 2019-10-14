@@ -40,7 +40,8 @@ export default class SqlExecutable extends Executable {
   async internalExecute(session) {
     return await apiHelper.executeStatement({
       executable: this,
-      session: session
+      session: session,
+      silenceErrors: true
     });
   }
 

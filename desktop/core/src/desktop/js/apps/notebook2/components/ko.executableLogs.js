@@ -19,7 +19,7 @@ import ko from 'knockout';
 import 'ko/bindings/ko.publish';
 
 import componentUtils from 'ko/components/componentUtils';
-import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
+import { EXECUTABLE_UPDATED_EVENT } from 'apps/notebook2/execution/executable';
 import DisposableComponent from 'ko/components/DisposableComponent';
 import I18n from 'utils/i18n';
 import { RESULT_UPDATED_EVENT } from 'apps/notebook2/execution/executionResult';
@@ -29,6 +29,12 @@ export const NAME = 'executable-logs';
 
 // prettier-ignore
 const TEMPLATE = `
+<div class="snippet-error-container alert alert-error" data-bind="visible: errors().length" style="display: none;">
+  <ul class="unstyled" data-bind="foreach: errors">
+    <li data-bind="text: $data"></li>
+  </ul>
+</div>
+
 <div class="snippet-log-container margin-bottom-10" data-bind="visible: showLogs" style="display: none;">
   <div data-bind="delayedOverflow: 'slow', css: resultsKlass" style="margin-top: 5px; position: relative;">
     <a href="javascript: void(0)" class="inactive-action close-logs-overlay" data-bind="toggle: showLogs">&times;</a>
@@ -119,6 +125,7 @@ class ExecutableLogs extends DisposableComponent {
     this.compute = undefined;
 
     this.jobs = ko.observableArray();
+    this.errors = ko.observableArray();
     this.logs = ko.observable();
 
     this.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
@@ -158,6 +165,7 @@ class ExecutableLogs extends DisposableComponent {
   updateFromLogs(executionLogs) {
     this.logs(executionLogs.fullLog);
     this.jobs(executionLogs.jobs);
+    this.errors(executionLogs.errors);
   }
 
   updateFromResult(executionResult) {

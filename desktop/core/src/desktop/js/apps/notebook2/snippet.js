@@ -1010,16 +1010,25 @@ export default class Snippet {
 
     huePubSub.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
       if (this.activeExecutable() === executable) {
-        this.status(executable.status);
-        if (executable.result) {
-          this.currentQueryTab('queryResults');
-        }
+        this.updateFromExecutable();
       }
     });
+
+    this.activeExecutable.subscribe(this.updateFromExecutable.bind(this));
 
     this.refreshHistory = notebook.fetchHistory;
 
     huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this);
+  }
+
+  updateFromExecutable(executable) {
+    if (executable) {
+      this.status(executable.status);
+      if (executable.result) {
+        this.currentQueryTab('queryResults');
+      }
+    } else {
+    }
   }
 
   ace(newVal) {

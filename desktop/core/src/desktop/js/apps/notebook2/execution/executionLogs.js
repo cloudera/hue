@@ -30,13 +30,19 @@ export default class ExecutionLogs {
     this.fullLog = '';
     this.logLines = 0;
     this.jobs = [];
+    this.errors = [];
+  }
+
+  notify() {
+    huePubSub.publish(LOGS_UPDATED_EVENT, this);
   }
 
   reset() {
     this.fullLog = '';
     this.logLines = 0;
     this.jobs = [];
-    huePubSub.publish(LOGS_UPDATED_EVENT, this);
+    this.errors = [];
+    this.notify();
   }
 
   async fetchLogs(finalFetch) {
