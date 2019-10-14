@@ -24,6 +24,7 @@ import I18n from 'utils/i18n';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
 import sqlUtils from 'sql/sqlUtils';
 import stringDistance from 'sql/stringDistance';
+import { EXECUTABLE_UPDATED_EVENT } from 'apps/notebook2/execution/executable';
 
 // TODO: depends on Ace, sqlStatementsParser
 
@@ -41,6 +42,7 @@ class AceLocationHandler {
     self.editor = options.editor;
     self.editorId = options.editorId;
     self.snippet = options.snippet;
+    self.executor = options.executor;
     self.expandStar =
       (options.i18n && options.i18n.expandStar) || 'Right-click to expand with columns';
     self.contextTooltip =
@@ -52,7 +54,6 @@ class AceLocationHandler {
 
     self.attachStatementLocator();
     self.attachSqlWorker();
-    self.attachGutterHandler();
     self.attachMouseListeners();
 
     self.verifyThrottle = -1;
@@ -431,47 +432,6 @@ class AceLocationHandler {
 
     self.disposeFunctions.push(() => {
       self.editor.container.removeEventListener('contextmenu', contextmenuListener);
-    });
-  }
-
-  attachGutterHandler() {
-    const self = this;
-    const lastMarkedGutterLines = [];
-
-    const changedSubscription = huePubSub.subscribe(
-      'editor.active.statement.changed',
-      statementDetails => {
-        if (statementDetails.id !== self.editorId || !statementDetails.activeStatement) {
-          return;
-        }
-        let leadingEmptyLineCount = 0;
-        const leadingWhiteSpace = statementDetails.activeStatement.statement.match(/^\s+/);
-        if (leadingWhiteSpace) {
-          const lineBreakMatch = leadingWhiteSpace[0].match(/(\r\n)|(\n)|(\r)/g);
-          if (lineBreakMatch) {
-            leadingEmptyLineCount = lineBreakMatch.length;
-          }
-        }
-
-        while (lastMarkedGutterLines.length) {
-          self.editor
-            .getSession()
-            .removeGutterDecoration(lastMarkedGutterLines.shift(), 'ace-active-gutter-decoration');
-        }
-        for (
-          let line =
-            statementDetails.activeStatement.location.first_line - 1 + leadingEmptyLineCount;
-          line < statementDetails.activeStatement.location.last_line;
-          line++
-        ) {
-          lastMarkedGutterLines.push(line);
-          self.editor.getSession().addGutterDecoration(line, 'ace-active-gutter-decoration');
-        }
-      }
-    );
-
-    self.disposeFunctions.push(() => {
-      changedSubscription.remove();
     });
   }
 

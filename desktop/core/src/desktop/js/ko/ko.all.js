@@ -34,8 +34,8 @@ import 'ko/bindings/charts/ko.pieChart';
 import 'ko/bindings/charts/ko.scatterChart';
 import 'ko/bindings/charts/ko.timelineChart';
 
-import 'ko/bindings/ko.aceEditor';
-import 'ko/bindings/ko.aceResizer';
+import 'ko/bindings/ace/ko.aceEditor';
+import 'ko/bindings/ace/ko.aceResizer';
 import 'ko/bindings/ko.appAwareTemplateContextMenu';
 import 'ko/bindings/ko.assistFileDraggable';
 import 'ko/bindings/ko.assistFileDroppable';

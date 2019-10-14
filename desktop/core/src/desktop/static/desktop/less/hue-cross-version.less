@@ -251,6 +251,26 @@ input[type='password']::-ms-reveal {
       border-right: 1px solid @hue-primary-color-dark;
     }
 
+    &.ace-executing-gutter-decoration {
+      background-color: @hue-primary-color-light;
+      border-right: 1px solid @hue-primary-color-dark;
+      .animation(execute-pulse 2s infinite ease-in-out);
+    }
+
+    .keyframes(execute-pulse, {
+      0% { background-color: rgba(0, 140, 255, 0.1); }
+      50% {
+        background-color: rgba(0, 140, 255, 0.4);
+        color: #505050;
+      }
+      100% { background-color: rgba(0, 140, 255, 0.1); }
+    });
+
+    &.ace-completed-gutter-decoration {
+      background-color: @cui-green-100;
+      border-right: 1px solid @cui-green-400;
+    }
+
     &.ace_error {
       background-color: @cui-pink-010;
       border-right: 1px solid @cui-red-700;

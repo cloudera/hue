@@ -39,7 +39,7 @@ import { EXECUTABLE_UPDATED_EVENT } from 'apps/notebook2/execution/executable';
 import {
   ACTIVE_STATEMENT_CHANGED_EVENT,
   REFRESH_STATEMENT_LOCATIONS_EVENT
-} from 'sql/aceLocationHandler';
+} from 'ko/bindings/ace/aceLocationHandler';
 import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from 'apps/notebook2/components/ko.executableActions';
 
 // TODO: Remove. Temporary here for debug
