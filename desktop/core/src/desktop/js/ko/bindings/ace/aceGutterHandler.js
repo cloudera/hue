@@ -24,8 +24,9 @@ const LINE_BREAK_REGEX = /(\r\n)|(\n)|(\r)/g;
 const LEADING_WHITE_SPACE_REGEX = /^\s+/;
 
 const ACTIVE_CSS = 'ace-active-gutter-decoration';
-const EXECUTING_CSS = 'ace-executing-gutter-decoration';
 const COMPLETED_CSS = 'ace-completed-gutter-decoration';
+const EXECUTING_CSS = 'ace-executing-gutter-decoration';
+const FAILED_CSS = 'ace-failed-gutter-decoration';
 
 const getLeadingEmptyLineCount = parsedStatement => {
   let leadingEmptyLineCount = 0;
@@ -45,6 +46,21 @@ const forEachLine = (statement, callback) => {
   for (line; line < statement.location.last_line; line++) {
     callback(line);
   }
+};
+
+const clearErrorForLine = (session, line) => {
+  const markers = session.getMarkers(false);
+  Object.keys(markers).some(key => {
+    const marker = markers[key];
+    if (
+      marker.clazz === 'ace_error-line' &&
+      marker.range.start.row <= line &&
+      line <= marker.range.end.row
+    ) {
+      session.removeMarker(marker.id);
+      return true;
+    }
+  });
 };
 
 export default class AceGutterHandler {
@@ -82,6 +98,7 @@ export default class AceGutterHandler {
 
     if (this.executor) {
       const session = this.editor.getSession();
+      const AceRange = window.ace.require('ace/range').Range;
 
       const executableSub = huePubSub.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
         if (executable.executor === this.executor) {
@@ -89,10 +106,15 @@ export default class AceGutterHandler {
           forEachLine(statement, line => {
             session.removeGutterDecoration(line, COMPLETED_CSS);
             session.removeGutterDecoration(line, EXECUTING_CSS);
+            clearErrorForLine(session, line);
             if (executable.isRunning()) {
               session.addGutterDecoration(line, EXECUTING_CSS);
             } else if (executable.isSuccess()) {
               session.addGutterDecoration(line, COMPLETED_CSS);
+            } else if (executable.isFailed()) {
+              const range = new AceRange(line, 0, line, session.getLine(line).length);
+              session.addMarker(range, 'ace_error-line');
+              session.addGutterDecoration(line, FAILED_CSS);
             }
           });
         }

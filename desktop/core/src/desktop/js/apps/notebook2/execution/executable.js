@@ -41,6 +41,8 @@ export const EXECUTION_STATUS = {
 
 export const EXECUTABLE_UPDATED_EVENT = 'hue.executable.updated';
 
+const ERROR_REGEX = /line ([0-9]+)(\:([0-9]+))?/i;
+
 export default class Executable {
   /**
    * @param options
@@ -106,6 +108,10 @@ export default class Executable {
     return this.status === EXECUTION_STATUS.success || this.status === EXECUTION_STATUS.available;
   }
 
+  isFailed() {
+    return this.status === EXECUTION_STATUS.failed;
+  }
+
   isPartOfRunningExecution() {
     if (!this.isReady()) {
       return true;
@@ -156,8 +162,32 @@ export default class Executable {
     try {
       const session = await sessionManager.getSession({ type: this.executor.sourceType() });
       hueAnalytics.log('notebook', 'execute/' + this.executor.sourceType());
-      this.handle = await this.internalExecute(session);
+      try {
+        this.handle = await this.internalExecute(session);
+      } catch (err) {
+        const match = ERROR_REGEX.exec(err);
+        if (match) {
+          const errorLine = parseInt(match[1]) + this.parsedStatement.location.first_line - 1;
+          let errorCol = match[3] && parseInt(match[3]);
+          if (errorCol && errorLine === 1) {
+            errorCol += this.parsedStatement.location.first_column;
+          }
 
+          const adjustedErr = err.replace(
+            match[0],
+            'line ' + errorLine + (errorCol !== null ? ':' + errorCol : '')
+          );
+
+          this.logs.errors.push(adjustedErr);
+          this.logs.notify();
+
+          throw new Error(adjustedErr);
+        }
+
+        this.logs.errors.push(err);
+
+        throw err;
+      }
       if (this.handle.has_result_set && this.handle.sync) {
         this.result = new ExecutionResult(this);
         if (this.handle.sync) {

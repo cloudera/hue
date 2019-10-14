@@ -266,8 +266,13 @@ input[type='password']::-ms-reveal {
       100% { background-color: rgba(0, 140, 255, 0.1); }
     });
 
+    &.ace-failed-gutter-decoration {
+      background-color: @cui-pink-010;
+      border-right: 1px solid @cui-red-700;
+    }
+
     &.ace-completed-gutter-decoration {
-      background-color: @cui-green-100;
+      background-color: @cui-green-050;
       border-right: 1px solid @cui-green-400;
     }
 
