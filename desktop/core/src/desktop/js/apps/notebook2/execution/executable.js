@@ -98,6 +98,14 @@ export default class Executable {
     );
   }
 
+  isRunning() {
+    return this.status === EXECUTION_STATUS.running;
+  }
+
+  isSuccess() {
+    return this.status === EXECUTION_STATUS.success || this.status === EXECUTION_STATUS.available;
+  }
+
   isPartOfRunningExecution() {
     if (!this.isReady()) {
       return true;

@@ -17,13 +17,14 @@
 import $ from 'jquery';
 import ko from 'knockout';
 
-import AceLocationHandler from 'sql/aceLocationHandler';
+import AceLocationHandler from 'ko/bindings/ace/aceLocationHandler';
 import componentUtils from 'ko/components/componentUtils';
 import hueUtils from 'utils/hueUtils';
 import SolrFormulaAutocompleter from './solrFormulaAutocompleter';
 import SolrQueryAutocompleter from './solrQueryAutocompleter';
 import SqlAutocompleter from 'sql/sqlAutocompleter';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
+import AceGutterHandler from 'ko/bindings/ace/aceGutterHandler';
 
 const SIMPLE_ACE_TEMPLATE = `
   <div class="simple-ace-single-line">
@@ -125,8 +126,14 @@ class SimpleAceEditor {
           editorId: $element.attr('id'),
           snippet: snippet
         });
+        const aceGutterHandler = new AceGutterHandler({
+          editor: editor,
+          editorId: $element.attr('id'),
+          executor: snippet.executor
+        });
         self.disposeFunctions.push(() => {
           aceLocationHandler.dispose();
+          aceGutterHandler.dispose();
         });
         aceLocationHandler.attachSqlSyntaxWorker();
       }

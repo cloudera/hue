@@ -18,9 +18,10 @@ import $ from 'jquery';
 import ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
-import AceLocationHandler from 'sql/aceLocationHandler';
+import AceLocationHandler from 'ko/bindings/ace/aceLocationHandler';
 import huePubSub from 'utils/huePubSub';
 import sqlUtils from 'sql/sqlUtils';
+import AceGutterHandler from 'ko/bindings/ace/aceGutterHandler';
 
 // TODO: Depends on Ace
 
@@ -67,10 +68,18 @@ ko.bindingHandlers.aceEditor = {
       editor: editor,
       editorId: $el.attr('id'),
       snippet: snippet,
+      executor: snippet.executor,
       i18n: { expandStar: options.expandStar, contextTooltip: options.contextTooltip }
+    });
+
+    const aceGutterHandler = new AceGutterHandler({
+      editor: editor,
+      editorId: $el.attr('id'),
+      executor: snippet.executor
     });
     disposeFunctions.push(() => {
       aceLocationHandler.dispose();
+      aceGutterHandler.dispose();
     });
 
     editor.session.setMode(snippet.getAceMode());
