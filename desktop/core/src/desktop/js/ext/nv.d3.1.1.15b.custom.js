@@ -52,34 +52,29 @@ nv.log = function() {
 };
 
 
-nv.render = function render(step) {
-  step = step || 1;
-
+nv.render = () => {
   nv.render.active = true;
   nv.dispatch.render_start();
 
-  const renderLoop = function() {
-    let chart, graph;
-
-    for (let i = 0; i < step && (graph = nv.render.queue[i]); i++) {
-      chart = graph.generate();
-      if (typeof graph.callback === 'function') {
-        graph.callback(chart);
-      }
-      nv.graphs.push(chart);
-    }
-
-    nv.render.queue.splice(0, i);
-
-    if (nv.render.queue.length) {
-      setTimeout(renderLoop, 0);
-    } else {
+  const renderLoop = () => {
+    if (!nv.render.queue.length) {
       nv.dispatch.render_end();
       nv.render.active = false;
+      return;
     }
+
+    const graph = nv.render.queue.shift()
+    const chart = graph.generate();
+
+    if (typeof graph.callback === 'function') {
+      graph.callback(chart);
+    }
+    nv.graphs.push(chart);
+
+    window.setTimeout(renderLoop, 0);
   };
 
-  setTimeout(renderLoop,0);
+  window.setTimeout(renderLoop,0);
 };
 
 nv.render.active = false;
