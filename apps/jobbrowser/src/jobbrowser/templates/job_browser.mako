@@ -1810,7 +1810,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </tr>
             </thead>
             <tbody data-bind="foreach: properties['actions']">
-              <tr data-bind="click: function() {  $root.job().id(id); $root.job().fetchJob(); }" class="pointer">
+              <tr>
                 <td>
                   <a data-bind="hueLink: '/jobbrowser/jobs/' + externalId(), clickBubble: false">
                     <i class="fa fa-tasks"></i>
@@ -1819,8 +1819,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <td data-bind="text: status"></td>
                 <td data-bind="text: errorMessage"></td>
                 <td data-bind="text: errorCode"></td>
-                <td data-bind="text: externalId"></td>
-                <td data-bind="text: id"></td>
+                <td data-bind="text: externalId, click: function() { $root.job().id(externalId()); $root.job().fetchJob();}, style: { color: '#0B7FAD' }" class="pointer"></td>
+                <td data-bind="text: id, click: function() {  $root.job().id(id); $root.job().fetchJob(); }, style: { color: '#0B7FAD' }" class="pointer"></td>
                 <td data-bind="moment: {data: startTime, format: 'LLL'}"></td>
                 <td data-bind="moment: {data: endTime, format: 'LLL'}"></td>
               </tr>
