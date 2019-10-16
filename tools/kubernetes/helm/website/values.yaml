@@ -12,7 +12,7 @@ docs:
 monitoring:
   enabled: false
 ingress:
-  create: false
-  type: "nginx"
-  # type: "nginx-ssl"
+  create: true
+  #type: "nginx"
+  type: "nginx-ssl"
   email: "team@gethue.com"
