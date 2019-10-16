@@ -2,7 +2,7 @@
 [![DockerPulls](https://img.shields.io/docker/pulls/gethue/hue.svg)](https://registry.hub.docker.com/u/gethue/hue/)
 ![GitHub contributors](https://img.shields.io/github/contributors-anon/cloudera/hue.svg)
 
-![alt text](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/hue_logo.png "Hue Logo")
+![Hue Logo](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/hue_logo.png)
 
 
 Query. Explore. Share.
