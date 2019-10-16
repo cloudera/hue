@@ -30,6 +30,7 @@ const TEMPLATE = `
         <span>${I18n('Queries')}</span>
       </a>
     <!-- /ko -->
+    <!-- ko if: window.HAS_JOB_BROWSER -->
     <!-- ko ifnot: window.IS_K8S_ONLY -->
       <a class="btn btn-flat" style="padding-right: 4px" title="${I18n(
         'Job browser'
@@ -43,6 +44,7 @@ const TEMPLATE = `
       <span class="jobs-badge" data-bind="visible: jobCount() > 0, text: jobCount"></span>
       <i class="fa fa-tasks"></i>
     </button>
+    <!-- /ko -->
   </div>
 `;
 

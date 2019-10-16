@@ -56,7 +56,7 @@ class TopNavViewModel {
     self.mainQuickCreateAction = ko.observable();
     self.quickCreateActions = ko.observableArray();
 
-    self.hasJobBrowser = ko.observable(true);
+    self.hasJobBrowser = ko.observable(window.HAS_JOB_BROWSER);
     self.clusters = ko.observableArray();
 
     huePubSub.subscribe('cluster.config.set.config', clusterConfig => {
@@ -127,7 +127,8 @@ class TopNavViewModel {
       }
 
       self.hasJobBrowser(
-        clusterConfig &&
+        window.HAS_JOB_BROWSER &&
+          clusterConfig &&
           clusterConfig['app_config'] &&
           clusterConfig['app_config']['browser'] &&
           (clusterConfig['app_config']['browser']['interpreter_names'].indexOf('yarn') != -1 ||
