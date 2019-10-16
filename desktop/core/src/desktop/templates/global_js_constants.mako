@@ -60,6 +60,7 @@
   window.DISPLAY_APP_SWITCHER = '${ DISPLAY_APP_SWITCHER.get() }' === 'True';
   window.CUSTOM_LOGO = '${ conf.CUSTOM.LOGO_SVG.get() }' !== '';
 
+  window.HAS_JOB_BROWSER = '${ 'jobbrowser' in apps }' === 'True';
   window.KNOX_BASE_PATH_HUE = '/KNOX_BASE_PATH_HUE';
   window._KNOX_BASE_PATH = '/KNOX_BASE_PATH_KNOX';
   window._KNOX_BASE_URL = '/KNOX_BASE_URL';
