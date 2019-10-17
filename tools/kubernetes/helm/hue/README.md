@@ -48,38 +48,3 @@ And can edit `--default-backend-service=$(POD_NAMESPACE)/default-http-backend`.
     helm install stable/nginx-ingress -n nginx-ingress
 
 And set `ingress.create=true` and `ingress.type=nginx` in [values.yaml](values.yaml).
-
-### SSL
-
-Requires NGINX previous step first.
-
-Then based on Jetstack and Let's encrypt and nginx-ingress:
-
-    kubectl create namespace cert-manager
-    kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
-    kubectl label namespace cert-manager certmanager.k8s.io/disable-validation="true"
-    helm repo add jetstack https://charts.jetstack.io
-    helm repo update
-    helm install --name cert-manager --namespace cert-manager jetstack/cert-manager
-
-#### Manual troubleshooting
-
-Generate certificates:
-
-    kubectl apply -f tools/kubernetes/yaml/cert-manager/clusterissuer-letsencrypt-hue-prod.yaml
-    kubectl apply -f tools/kubernetes/yaml/cert-manager/ingress-https.yaml
-
-    kubectl get certificate
-    kubectl describe ingress
-
-Reset certificate:
-
-    kubectl delete certificate letsencrypt-hue-prod
-    kubectl delete secrets letsencrypt-hue-prod
-
-Debug certificate:
-
-    kubectl describe certificate
-    # <events>  Normal  OrderCreated  77m   cert-manager  Created Order resource "example-tls-754518127"
-    kubectl describe  order example-tls-754518127
-    kubectl describe  challenges.certmanager.k8s.io example-tls-754518127
