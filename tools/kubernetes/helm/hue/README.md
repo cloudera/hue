@@ -66,7 +66,7 @@ Then based on Jetstack and Let's encrypt and nginx-ingress:
 
 Generate certificates:
 
-    kubectl apply -f tools/kubernetes/yaml/cert-manager/clusterissuer-letsencrypt-prod.yaml
+    kubectl apply -f tools/kubernetes/yaml/cert-manager/clusterissuer-letsencrypt-hue-prod.yaml
     kubectl apply -f tools/kubernetes/yaml/cert-manager/ingress-https.yaml
 
     kubectl get certificate
@@ -74,8 +74,8 @@ Generate certificates:
 
 Reset certificate:
 
-    kubectl delete certificate letsencrypt-prod
-    kubectl delete secrets letsencrypt-prod
+    kubectl delete certificate letsencrypt-hue-prod
+    kubectl delete secrets letsencrypt-hue-prod
 
 Debug certificate:
 

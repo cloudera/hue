@@ -19,4 +19,4 @@ spec:
   # tls:
   # - hosts:
   #   - demo.gethue.com
-  #   secretName: letsencrypt-pro
+  #   secretName: letsencrypt-prod
