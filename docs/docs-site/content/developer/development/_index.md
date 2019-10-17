@@ -724,6 +724,8 @@ Documentation
 
 Build the doc website:
 
+    cd docs/docs-site
+
     hugo
 
 Release:
@@ -773,7 +775,17 @@ Install [Hugo](https://gohugo.io/getting-started/quick-start/).
 
 Build it and see live changes:
 
+    cd docs/docs-site
+
     hugo serve
+
+Check for links not working (returning a 404) with muffet, a fast link checker crawler:
+
+    sudo snap install muffet
+
+Then after booting the hugo documentation server, we point to its url. We also blacklist certain urls to avoid some noisy false positives:
+
+    muffet http://localhost:35741/ --exclude ".*releases.*" -f
 
 ### SQL Autocomplete
 
