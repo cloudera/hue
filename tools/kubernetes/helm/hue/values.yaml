@@ -52,6 +52,7 @@ ingress:
   create: false
   type: "nginx"
   # type: "nginx-ssl"
+  # type: "nginx-ssl-staging"
   # type: "traefik"
   domain: "demo.gethue.com"
   email: "team@gethue.com"
