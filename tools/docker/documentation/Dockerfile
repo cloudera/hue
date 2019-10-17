@@ -18,6 +18,7 @@ RUN mkdir /etc/nginx/sites-enabled
 # Docs
 ADD docs/docs-site /docs
 WORKDIR /docs
+
 RUN hugo
 
 RUN mkdir -p /var/www/docs.gethue.com/html

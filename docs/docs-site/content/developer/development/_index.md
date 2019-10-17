@@ -334,41 +334,6 @@ Please download from http://thrift.apache.org/.
 The modules using ``Thrift`` have some helper scripts like ``regenerate_thrift.sh``
 for regenerating the code from the interfaces.
 
-### Profiling
-
-Hue has a profiling system built in, which can be used to analyze server-side
-performance of applications.  To enable profiling:
-
-    build/env/bin/hue runprofileserver
-
-Then, access the page that you want to profile.  This will create files like
-/tmp/useradmin.users.000072ms.2011-02-21T13:03:39.745851.prof.  The format for
-the file names is /tmp/<app_module>.<page_url>.<time_taken>.<timestamp>.prof.
-
-Hue uses the hotshot profiling library for instrumentation.  The documentation
-for this library is located at: http://docs.python.org/library/hotshot.html.
-
-You can use kcachegrind to view the profiled data graphically:
-
-    hotshot2calltree /tmp/xyz.prof > /tmp/xyz.trace
-    kcachegrind /tmp/xyz.trace
-
-More generally, you can programmatically inspect a trace:
-
-    #!/usr/bin/python
-    import hotshot.stats
-    import sys
-
-    stats = hotshot.stats.load(sys.argv[1])
-    stats.sort_stats('cumulative', 'calls')
-    stats.print_stats(100)
-
-This script takes in a .prof file, and orders function calls by the cumulative
-time spent in that function, followed by the number of times the function was
-called, and then prints out the top 100 time-wasters.  For information on the
-other stats available, take a look at this website:
-http://docs.python.org/library/profile.html#pstats.Stats
-
 
 ### Upgrades
 
@@ -737,7 +702,7 @@ Other things to update:
 * Create the after next release tag in Jira and Blog
 * Update http://gethue.com 'Release' menu
 * Update Docker image https://hub.docker.com/u/gethue/
-* Update release date on https://en.wikipedia.org/wiki/Hue_(Software)
+* Update release date on https://wikipedia.org/wiki/Hue_(Software)
 
 Instructions:
 
@@ -771,7 +736,7 @@ Release:
     scp -r docs/docs-site/public/* root@docs.gethue.com:/var/www/docs.gethue.com/4.5.0
 
 
-Then send release notes to the [Forum](https://discourse.gethue.com/), [hue-user](https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user), https://twitter.com/gethue!
+Then send release notes to the [Forum](https://discourse.gethue.com/), [hue-user](https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user), https://twitter.com/gethue !
 
 ## Building
 

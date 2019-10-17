@@ -13,7 +13,7 @@ Connectors are pluggable and can new engines can be supported. Feel free to cont
 
 ## SQL Autocomplete
 
-Close to 100% of [Hive and Impala grammar](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/static/desktop/js/autocomplete/jison) is supported which makes the autocomplete extremly powerful. Other languages defaults to a generic SQL grammar.
+Close to 100% of [Hive and Impala grammar](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/jison) is supported which makes the autocomplete extremly powerful. Other languages defaults to a generic SQL grammar.
 
 See [How to write your own SQL parser](/developer/parsers/). Integrating [Apache Calcite](https://calcite.apache.org/docs/reference.html), [ZetaSql](https://github.com/google/zetasql)... would make SQL users even happier with a lot more Databases!
 
@@ -143,7 +143,7 @@ Once the request is successful then capture headers and cookies for subsequent r
 
 The [metadata API](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata) is powering [Search and Tagging here](http://gethue.com/improved-sql-exploration-in-hue-4-3/) and the [Query Assistant with Navigator Optimizer Integration](http://gethue.com/hue-4-sql-editor-improvements/).
 
-The backends is pluggable by providing alternative [client interfaces](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata/catalog):
+The backends is pluggable by providing alternative [client interfaces](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata/src/metadata/catalog):
 
 * Cloudera Navigator (default)
 * Apache Atlas ([HUE-8749](https://issues.cloudera.org/browse/HUE-8749))
