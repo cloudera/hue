@@ -472,12 +472,12 @@ The [Drill JDBC driver](http://maprdocs.mapr.com/home/Hue/ConfigureHuewithDrill.
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
-      ./build/env/bin/pip install sqlalchemy-teradata
+      ./build/env/bin/pip install python-sybase
 
 Then give Hue the information about the database source:
 
-    [[[teradata]]]
-       name = Teradata
+    [[[sybase]]]
+       name = Sybase
        interface=sqlalchemy
        options='{"url": "sybase+pysybase://<username>:<password>@<dsn>/[database name]"}'
 
