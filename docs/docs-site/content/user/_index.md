@@ -12,7 +12,7 @@ Hue consists in a single page interface that allow the users to perform data
 analyses without losing any context. The goal is to promote self service and stay simple like Excel
 so that 80% of the user can find, explore and query data and become more data driven.
 
-Please refer to [database list](/administrator/configuration/editor/#connectors) or the main [configuration section](/administrator/configuration/) for all the Database/Data Warehouse connectors.
+Please refer to [database list](/administrator/configuration/connectors/#databases) or the main [configuration section](/administrator/configuration/) for all the Database/Data Warehouse connectors.
 
 **1. Find or import your data**
 

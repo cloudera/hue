@@ -8,7 +8,7 @@ weight: 3
 ## Editor
 
 The goal of the Editor is to open-up data to more users by making self service querying easy and productive.
-It has one of the best SQL autocomplete and many [more features](/administrator/configuration/editor/).
+It has one of the best SQL autocomplete and many [more features](/administrator/configuration/connectors/#databases).
 
 It is available in Editor or Notebook. Dialects can be added to the main `[notebook]` section like this:
 
@@ -79,7 +79,7 @@ This option currently only works with Hive and relies on Oozie until [HUE-8738](
 
 ### Assist Query Builder
 
-Flag to enable a lightweight SQL query builder where tables and columns can be dragged & dropped from the left table assist. Not to be confused with the [Query Builder](../dashboard).
+Flag to enable a lightweight SQL query builder where tables and columns can be dragged & dropped from the left table assist. Not to be confused with the [Query Builder](/user/querying/#dashboards).
 
 **Note** This feature is experimental.
 
@@ -97,7 +97,7 @@ Display an analysis panel post Impala queries executions with some hints and sug
 
 ### Query Optimization
 
-In the `[metadata]` section, Hue is supporting Cloudera Navigator Optimiser and soon other services. The goal is to provide recommendation on how to write better queries and get risk alerts on dangerous operations directly within the [editor](/user/editor/).
+In the `[metadata]` section, Hue is supporting Cloudera Navigator Optimiser and soon other services. The goal is to provide recommendation on how to write better queries and get risk alerts on dangerous operations directly within the [editor](/user/querying/).
 
 ### One-click scheduling
 
@@ -233,7 +233,7 @@ Then make sure the `hive` interpreter is present in the `[[interpreters]]` list.
 
 ### Custom
 
-A series of native connectors interacting with the editor have been developed and are listed in the [developer section](/developer/editor/).
+A series of native connectors interacting with the editor have been developed and are listed in the [developer section](/developer/sdk/#sql-connectors).
 
 ### JDBC
 

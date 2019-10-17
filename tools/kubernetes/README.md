@@ -8,6 +8,7 @@ Assuming you have a Kubernetes cluster configured with Helm installed and images
 
 * [Helm](helm)
    * [Hue](helm/hue)
+   * [Website](helm/website)
 * [YAML](yaml)
    * [Hue](yaml/hue)
    * [Postgres](yaml/postgres)

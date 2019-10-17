@@ -43,7 +43,7 @@ MapReduce or [Impala jobs](#impala-queries) that the query generated.
 The pane to the top of the Editor lets you specify the following
 options:
 
-* Settings: depends on the query engines. For information about [Hive configuration variables](http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration).
+* Settings: depends on the query engines. For information about [Hive configuration variables](https://cwiki.apache.org/confluence/display/Hive/AdminManual+Configuration).
 * Files: load a jar of files to use as UDF
 * UDFs: register a custom function
 
