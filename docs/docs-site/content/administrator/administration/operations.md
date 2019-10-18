@@ -152,15 +152,11 @@ If `django_debug_mode` is enabled, instrumentation is automatically enabled. Thi
 
 ### Instrumentation enabled
 
-<pre>
-[17/Apr/2018 15:18:43 -0700] access       INFO     127.0.0.1 admin - "POST /jobbrowser/jobs/ HTTP/1.1" `returned in 97ms (mem: 135mb)`
-</pre>
+    [17/Apr/2018 15:18:43 -0700] access       INFO     127.0.0.1 admin - "POST /jobbrowser/jobs/ HTTP/1.1" `returned in 97ms (mem: 135mb)`
 
 ### Instrumentation not enabled
 
-<pre>
-[23/Apr/2018 10:59:01 -0700] INFO     127.0.0.1 admin - "POST /jobbrowser/jobs/ HTTP/1.1" returned in 88ms
-</pre>
+    [23/Apr/2018 10:59:01 -0700] INFO     127.0.0.1 admin - "POST /jobbrowser/jobs/ HTTP/1.1" returned in 88ms
 
 ### Exporting Documents
 

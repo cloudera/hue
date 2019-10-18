@@ -23,7 +23,9 @@ The docker images could be forked for QA and comes with a series of flags.
 
 By updating the makefile to build the new [Website](/docs/docs-site). Would need to install Hugo and [build it](https://docs.gethue.com/developer/development/#documentation).
 
-Step 2 would be to setup so that the documentation would get published automatically.
+Step 2 would be to setup so that the documentation would get published automatically [done].
+
+Step 3 would be to check and get warnings about dead links.
 
 ### Release
 
