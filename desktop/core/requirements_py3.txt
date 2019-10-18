@@ -8,7 +8,6 @@ monotonic==1.5
 python-ldap==3.1.0
 djangomako==1.0.1
 lockfile==0.12.2
-chardet==3.0.4
 defusedxml==0.5.0
 gunicorn==19.9.0
 vine==1.2.0
