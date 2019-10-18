@@ -2248,7 +2248,12 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <a href="javascript:void(0)" data-bind="toggle: $parents[0].isAdding" class="pull-right"><i class="fa fa-times inactive-action"></i></a>
       <!-- /ko -->
       <!-- ko with: aggregate -->
-      <select data-bind="selectize: metrics, optionsText: 'label', optionsValue: 'value', value: $data.function, disable: $parents[1].widgetType() != 'hit-widget' && (typeof $index != 'undefined' && $index() == 0)" class="input-small"></select>
+      <!-- ko ifnot: $parents[1].widgetType() !== 'hit-widget' && $index && $index() === 0 -->
+      <select data-bind="selectize: metrics, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-small"></select>
+      <!-- /ko -->
+      <!-- ko if: $parents[1].widgetType() !== 'hit-widget' && $index && $index() === 0 -->
+      <select data-bind="selectize: metrics().filter(function (metric) { return metric.value === $data.function() }), optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-small"></select>
+      <!-- /ko -->
 
       <!-- ko if: $data.function() == 'percentile' -->
       <input type="number" class="input-mini" data-bind="value: percentile"/>
