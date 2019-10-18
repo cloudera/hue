@@ -162,6 +162,26 @@ If `django_debug_mode` is enabled, instrumentation is automatically enabled. Thi
 [23/Apr/2018 10:59:01 -0700] INFO     127.0.0.1 admin - "POST /jobbrowser/jobs/ HTTP/1.1" returned in 88ms
 </pre>
 
+### Exporting Documents
+
+Export all documents:
+
+    ./build/env/bin/hue dumpdata desktop.Document2 --indent 2 --natural > data.json
+
+Export specific documents:
+
+20000013 is the id you can see in the URL of the dashboard.
+
+    ./build/env/bin/hue dumpdata desktop.Document2 --indent 2 --pks=20000013 --natural > data.json
+
+You can specify more than one id:
+
+    --pks=20000013,20000014,20000015
+
+Load the documents:
+
+    ./build/env/bin/hue loaddata data.json
+
 ## Database
 
 See the dedicated [Database section](/administrator/administration/database/).
