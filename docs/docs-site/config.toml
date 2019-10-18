@@ -1,7 +1,7 @@
 baseUrl = 'https://docs.gethue.com/'
 
 languageCode = "en-us"
-title = "Hue Documentation"
+title = "Hue SQL Assistant Documentation"
 
 # Change the default theme to be use when building the site with Hugo
 theme = "hugo-theme-learn"
