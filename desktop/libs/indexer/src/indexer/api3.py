@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import chardet
 import json
 import logging
 import urllib
@@ -33,6 +32,7 @@ from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
+from desktop.lib.python_util import check_encoding
 from desktop.models import Document2
 from kafka.kafka_api import get_topics
 from metadata.manager_client import ManagerApi
@@ -165,7 +165,7 @@ def guess_field_types(request):
     indexer = MorphlineIndexer(request.user, request.fs)
     path = urllib.unquote(file_format["path"])
     stream = request.fs.open(path)
-    encoding = chardet.detect(stream.read(10000)).get('encoding')
+    encoding = check_encoding(stream.read(10000))
     stream.seek(0)
     _convert_format(file_format["format"], inverse=True)
 

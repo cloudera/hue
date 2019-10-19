@@ -41,12 +41,11 @@ is at <http://python-requests.org>.
 """
 
 import urllib3
-import chardet
 import warnings
 from .exceptions import RequestsDependencyWarning
 
 
-def check_compatibility(urllib3_version, chardet_version):
+def check_compatibility(urllib3_version):
     urllib3_version = urllib3_version.split('.')
     assert urllib3_version != ['dev']  # Verify urllib3 isn't installed from git.
 
@@ -62,21 +61,13 @@ def check_compatibility(urllib3_version, chardet_version):
     assert minor >= 21
     assert minor <= 22
 
-    # Check chardet for compatibility.
-    major, minor, patch = chardet_version.split('.')[:3]
-    major, minor, patch = int(major), int(minor), int(patch)
-    # chardet >= 3.0.2, < 3.1.0
-    assert major == 3
-    assert minor < 1
-    assert patch >= 2
-
 
 # Check imported dependencies for compatibility.
 try:
-    check_compatibility(urllib3.__version__, chardet.__version__)
+    check_compatibility(urllib3.__version__)
 except (AssertionError, ValueError):
     warnings.warn("urllib3 ({0}) or chardet ({1}) doesn't match a supported "
-                  "version!".format(urllib3.__version__, chardet.__version__),
+                  "version!".format(urllib3.__version__),
                   RequestsDependencyWarning)
 
 # Attempt to enable urllib3's SNI support, if possible
