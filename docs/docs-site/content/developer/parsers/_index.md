@@ -5,11 +5,14 @@ draft: false
 weight: 2
 ---
 
-In this post we’ll guide you through the steps necessary to create an autocompleter for any SQL dialect in Hue.
+This guide goes you through the steps necessary to create an autocompleter for any SQL dialect in Hue. The major benefits are:
+
+* showing only valid syntax in the autocomplete
+* getting the list of tables, columns automatically
 
 ## Parser Theory
 
-There are currently three parsers for this in Hue, one for Impala, one for Hive and a generic SQL parser that is used for other dialects. The parsers are written using a [bison](https://www.gnu.org/software/bison/) grammar and are generated with [jison](https://github.com/zaach/jison). They’re 100% javascript and live on the client side, this gives the performance of a desktop editor in your browser.
+There are several parsers in Hue already (e.g. one for Impala, one for Hive..) and a generic SQL that is used for other dialects. The parsers are written using a [bison](https://www.gnu.org/software/bison/) grammar and are generated with [jison](https://github.com/zaach/jison). They arere 100% Javascript and live on the client side, this gives the performance of a desktop editor in your browser.
 
 ### Structure
 
@@ -59,7 +62,7 @@ Here’s a list of some of the different types of suggestions the parser can ide
     suggestTables
     suggestValues
 
-Parsers are generated and added to the repository using our custom cli app generateParsers.js under tools/jison/. To for instance generate all the Impala parsers you would run the following command in the hue folder:
+Parsers are generated and added to the repository using the command generateParsers.js under tools/jison/. To for instance generate all the Impala parsers you would run the following command in the hue folder:
 
     node tools/jison/generateParsers.js impala
 
@@ -68,6 +71,7 @@ In reality two parsers are generated per dialect, one for syntax and one for aut
 All the jison grammar files can be found [here](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/jison/sql) and the generated parsers are also committed together with their tests [here](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/sql).
 
 ### The grammar
+
 In a regular SQL parser you might define the grammar of a select statement like this:
 
     SelectStatement
@@ -97,7 +101,7 @@ For the statement above we’d add an extra rule with an _EDIT postfix like this
 
 So if a “lonely” cursor is encountered it will tell us to suggest the ‘SELECT’ keyword etc.
 
-## Tutorial: Creating a basic PostgreSQL parser
+## Tutorial: Creating a PostgreSQL parser
 
 ### Prerequisites
 
@@ -109,21 +113,22 @@ In the Hue folder:
 
 and edit your hue config desktop/conf/pseudo-distributed.ini to contain:
 
-  [notebook]
-  [[interpreters]]
-    [[[postgresql]]]
-      name = postgresql
-      interface=sqlalchemy
-      options='"postgresql://hue:hue@host:31335/hue"'
+    [notebook]
+    [[interpreters]]
+      [[[postgresql]]]
+        name = postgresql
+        interface=sqlalchemy
+        options='"postgresql://hue:hue@host:31335/hue"'
 
 Our generateParsers tool can take an existing dialect and setup the source code for a new parsers based on that.
 
 In the hue folder run:
 
     node tools/jison/generateParsers.js -new generic postgresql
+
 After the -new argument you specify an existing dialect to clone first and then the name of the new parser.
 
-Once executed the tool has cloned the generic parser with tests and generated a new postgresql parsers. The jison files can be found under desktop/core/src/desktop/js/parse/jison/sql/postgresql/ and the jasmine specs can be found in desktop/core/src/desktop/js/parse/sql/postgresql/spec
+Once executed the tool has cloned the generic parser with tests and generated a new postgresql parsers. The jison files can be found under `desktop/core/src/desktop/js/parse/jison/sql/postgresql/` and the jasmine specs can be found in `desktop/core/src/desktop/js/parse/sql/postgresql/spec`.
 
 To regenerate the parsers after changes to the jison files run:
 
@@ -137,7 +142,7 @@ This gives you an idea on how to add custom syntax to the newly generated postgr
 
     REINDEX { INDEX | TABLE | DATABASE | SYSTEM } name [ FORCE ]
 
-We’ll start by adding a test, in postgresqlAutocompleteParserSpec.js in the specs folder inside the main describe function before the first ‘it(“should …’:
+We’ll start by adding a test, in `postgresqlAutocompleteParserSpec.js` in the specs folder inside the main describe function before the first `it('should...`:
 
     fdescribe('REINDEX', () => {
       it('should handle "REINDEX TABLE foo FORCE; |"', () => {
@@ -165,9 +170,9 @@ We’ll start by adding a test, in postgresqlAutocompleteParserSpec.js in the sp
       });
     });
 
-When we now run npm run test there should be two failing tests.
+When we now run `npm run test` there should be two failing tests.
 
-Next we’ll have to add the keyword to the lexer, let’s open sql.jisonlex in the jison folder for postgresql and add the following new tokens:
+Next we’ll have to add the keyword to the lexer, let’s open `sql.jisonlex` in the jison folder for postgresql and add the following new tokens:
 
     'REINDEX'                                  { parser.determineCase(yytext); return 'REINDEX'; }
     'INDEX'                                    { return 'INDEX'; }
@@ -197,7 +202,7 @@ Now let’s add the grammar, starting with the complete specification. For simpl
     ;
     “DataDefinition” is an existing rule and this extends that rule with “ReindexStatement”.
 
-Save the file(s) and first run node tools/jison/generateParsers.js postgresql then npm run test and we should be down to one failing test.
+Save the file(s) and first run `node tools/jison/generateParsers.js postgresql` then `npm run test` and we should be down to one failing test.
 
 For the next one we’ll add some keyword suggestions after the user has typed REINDEX, we’ll continue below the ReindexStatement in sql_main.jison:
 
@@ -212,7 +217,7 @@ For the next one we’ll add some keyword suggestions after the user has typed R
       }
     ;
 
-Again, run node tools/jison/generateParsers.js postgresql then npm run test and the tests should both be green.
+Again, run `node tools/jison/generateParsers.js postgresql` then `npm run test` and the tests should both be green.
 
 We also want the autocompleter to suggest the keyword REINDEX when the user hasn’t typed anything, to do that let’s first add the following test with the other new ones in postgresqlAutocompleteParserSpec.js:
 
@@ -237,6 +242,6 @@ In order to use the newly generated parsers we have to add them to the webpack b
     npm run webpack
     npm run webpack-workers
 
-While developing it will speed up if the webpack bundling runs in the background, for this open two terminal sessions and run on npm run dev in one and npm run dev-workers in the other. It will then monitor changes to the files and build a lot quicker.
+While developing it will speed up if the webpack bundling runs in the background, for this open two terminal sessions and run `npm run dev` in one and `npm run dev-workers` in the other. It will then monitor changes to the files and build a lot quicker.
 
 After the bundling you can now test it directly in the editor!
