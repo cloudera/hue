@@ -21,10 +21,20 @@ from past.builtins import basestring
 from builtins import object
 import select
 import socket
+import sys
 from django.utils.translation import ugettext as _
 from desktop import conf
 from desktop.lib.i18n import smart_str
 
+from codecs import BOM_UTF8, BOM_UTF16_BE, BOM_UTF16_LE, BOM_UTF32_BE, BOM_UTF32_LE
+
+BOMS = (
+    (BOM_UTF8, "UTF-8"),
+    (BOM_UTF32_BE, "UTF-32-BE"),
+    (BOM_UTF32_LE, "UTF-32-LE"),
+    (BOM_UTF16_BE, "UTF-16-BE"),
+    (BOM_UTF16_LE, "UTF-16-LE"),
+)
 
 __all__ = ['CaseInsensitiveDict', 'create_synchronous_io_multiplexer']
 
@@ -144,3 +154,66 @@ def force_dict_to_strings(dictionary):
       new_dict[new_key] = dictionary[k]
 
   return new_dict
+
+
+def isASCII(data):
+  try:
+    data.decode('ASCII')
+  except UnicodeDecodeError:
+    return False
+  else:
+    return True
+
+
+def isUTF8(data):
+  try:
+    data.decode('UTF-8')
+  except UnicodeDecodeError:
+    return False
+  else:
+    return True
+
+
+def isGB2312(data):
+  try:
+    data.decode('gb2312')
+  except UnicodeDecodeError:
+    return False
+  else:
+    return True
+
+
+def isUTF8Strict(data):
+  try:
+    decoded = data.decode('UTF-8')
+  except UnicodeDecodeError:
+    return False
+  else:
+    for ch in decoded:
+      if 0xD800 <= ord(ch) <= 0xDFFF:
+        return False
+    return True
+
+
+def check_bom(data):
+  return [encoding for bom, encoding in BOMS if data.startswith(bom)]
+
+
+def check_encoding(data):
+  """
+  this is a simplified alternative to GPL chardet
+  """
+  if isASCII(data):
+    return 'ASCII'
+  elif sys.version_info[0] == 2 and isUTF8(data):
+    return 'utf-8'
+  elif sys.version_info[0] > 2 and isUTF8Strict(data):
+    return 'utf-8'
+  else:
+    encoding = check_bom(data)
+    if encoding:
+      return encoding[0]
+    elif isGB2312(data):
+      return 'gb2312'
+    else:
+      return 'cp1252'
