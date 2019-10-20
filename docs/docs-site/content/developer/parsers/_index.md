@@ -179,7 +179,7 @@ Next we’ll have to add the keyword to the lexer, let’s open `sql.jisonlex` i
     'SYSTEM'                                   { return 'SYSTEM'; }
     'FORCE'                                    { return 'FORCE'; }
 
-Now let’s add the grammar, starting with the complete specification. For simplicity we’ll add it in sql_main.jison, at the bottom of the file add:
+Now let’s add the grammar, starting with the complete specification. For simplicity we’ll add it in `sql_main.jison`, at the bottom of the file add:
 
     DataDefinition
     : ReindexStatement
@@ -204,7 +204,7 @@ Now let’s add the grammar, starting with the complete specification. For simpl
 
 Save the file(s) and first run `node tools/jison/generateParsers.js postgresql` then `npm run test` and we should be down to one failing test.
 
-For the next one we’ll add some keyword suggestions after the user has typed REINDEX, we’ll continue below the ReindexStatement in sql_main.jison:
+For the next one we’ll add some keyword suggestions after the user has typed REINDEX, we’ll continue below the ReindexStatement in `sql_main.jison`:
 
     DataDefinition_EDIT
     : ReindexStatement_EDIT
@@ -219,7 +219,7 @@ For the next one we’ll add some keyword suggestions after the user has typed R
 
 Again, run `node tools/jison/generateParsers.js postgresql` then `npm run test` and the tests should both be green.
 
-We also want the autocompleter to suggest the keyword REINDEX when the user hasn’t typed anything, to do that let’s first add the following test with the other new ones in postgresqlAutocompleteParserSpec.js:
+We also want the autocompleter to suggest the keyword REINDEX when the user hasn’t typed anything, to do that let’s first add the following test with the other new ones in `postgresqlAutocompleteParserSpec.js`:
 
     it('should suggest REINDEX for "|"', () => {
       assertAutoComplete({
@@ -233,7 +233,7 @@ We also want the autocompleter to suggest the keyword REINDEX when the user hasn
       });
     });
 
-For this to pass we need to add REINDEX to the list of DDL and DML keywords in the file sqlParseSupport.js next to the generated parser (`desktop/core/src/desktop/js/parse/sql/postgresql/sqlParseSupport.js/`). Find the function parser.suggestDdlAndDmlKeywords and add ‘REINDEX’ to the keywords array. Now run npm run test and the three tests should pass.
+For this to pass we need to add REINDEX to the list of DDL and DML keywords in the file `sqlParseSupport.js` next to the generated parser (`desktop/core/src/desktop/js/parse/sql/postgresql/sqlParseSupport.js/`). Find the function `parser.suggestDdlAndDmlKeywords` and add ‘REINDEX’ to the keywords array. Now run `npm run test` and the three tests should pass.
 
 Before you continue further be sure to remove the ‘f’ from ‘fdescribe’ in the spec to allow all other jasmine tests to run. Note that in this case there will be two new failing tests where the keyword ‘REINDEX’ has to be added.
 
