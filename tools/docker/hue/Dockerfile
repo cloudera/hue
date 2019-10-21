@@ -1,5 +1,4 @@
 # Welcome to Hue (http://gethue.com) Dockerfile
-# Build an image from a remote github or local cloned Hue repository.
 
 FROM ubuntu:18.04
 LABEL description="Hue SQL Assistant - gethue.com"
@@ -52,16 +51,17 @@ RUN useradd -ms /bin/bash hue && chown -R hue /usr/share/hue
 # Only keep install dir
 # Note: get more minimal image by pulling install dir in a stage 2 image
 WORKDIR /usr/share/hue
-RUN rm -rf /hue
-RUN rm -rf node_modules
+RUN rm -rf /hue \
+  && rm -rf node_modules
 
 # Install DB connectors
-RUN ./build/env/bin/pip install psycopg2-binary
-RUN ./build/env/bin/pip install redis==2.10.6
-RUN ./build/env/bin/pip install django_redis
-RUN ./build/env/bin/pip install flower
-RUN ./build/env/bin/pip install gevent
-RUN ./build/env/bin/pip install threadloop # Needed for Jaeger
+RUN ./build/env/bin/pip install \
+  psycopg2-binary \
+  redis==2.10.6 \
+  django_redis \
+  flower \
+  gevent \
+  threadloop # Needed for Jaeger
 
 COPY tools/docker/hue/conf desktop/conf
 COPY tools/docker/hue/startup.sh .
