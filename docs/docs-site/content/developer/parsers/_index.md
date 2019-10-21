@@ -83,7 +83,13 @@ In a regular SQL parser you might define the grammar of a select statement like 
       | ColumnList ',' Identifier
       ;
 
-This would be able to parse a statement like 'SELECT a, b, c FROM some_table' (depending on lexer definitions of course). To turn this into an autocompleter we add the notion of a cursor to the mix, it’s defined as an obscure character that’s unlikely to be used in a statement. We went for '\u2020', the dagger, identified as 'CURSOR' in the lexer. The actual parsed string is therefore beforeCursor + ‘\u2020’ + afterCursor.
+This would be able to parse a statement like 'SELECT a, b, c FROM some_table' (depending on lexer definitions of course).
+
+### Notion of cursor
+
+To turn this into an autocompleter we add the notion of a cursor. Often, the user has the cursor somewhere in the statement. In the previous section, we were assuming that the query was already typed and the user had not mouse cursor within it.
+
+The cursor is represented as an obscure character that is unlikely to be used in a statement. Currently '\u2020' was picked, the dagger, identified as 'CURSOR' in the lexer. The actual parsed string is therefore beforeCursor + ‘\u2020’ + afterCursor.
 
 For the statement above we’d add an extra rule with an _EDIT postfix like this:
 
@@ -99,7 +105,7 @@ For the statement above we’d add an extra rule with an _EDIT postfix like this
       | 'SELECT' ColumnList_EDIT 'FROM' Identifier --> { suggestColumns: { table: $4 } }
       ;
 
-So if a “lonely” cursor is encountered it will tell us to suggest the ‘SELECT’ keyword etc.
+So for example if a cursor without any text is encountered, it will tell us to suggest the ‘SELECT’ keyword etc.
 
 ## Tutorial: Creating a PostgreSQL parser
 
