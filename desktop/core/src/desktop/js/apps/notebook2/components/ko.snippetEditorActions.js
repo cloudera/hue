@@ -40,6 +40,13 @@ const TEMPLATE = `
         </a>
       </li>
       <li>
+        <a href="javascript:void(0)" data-bind="click: format, css: { 'disabled': !createGistEnabled() }" title="${I18n(
+          'Create a gist link for sharing the selected SQL queries'
+        )}">
+          <i class="fa fa-wf fa-link"></i> ${I18n('Share')}
+        </a>
+      </li>
+      <li>
         <a href="javascript:void(0)" data-bind="click: format, css: { 'disabled': !formatEnabled() }" title="${I18n(
           'Format the current SQL query'
         )}">
@@ -92,6 +99,8 @@ class SnippetEditorActions {
     this.compatibilityEnabled = ko.pureComputed(
       () => this.snippet.type() === 'hive' || this.snippet.type() === 'impala'
     );
+
+    this.createGistEnabled = ko.pureComputed(() => this.snippet.statement() !== '');
 
     this.explainEnabled = ko.pureComputed(
       () =>
