@@ -286,6 +286,7 @@
     'Foreign key': '${_('Foreign key')}',
     'Foreign keys': '${_('Foreign keys')}',
     'Format the current SQL query': '${ _('Format the current SQL query') }',
+    'Create a gist link for sharing the selected SQL queries': '${ _('Create a gist link for sharing the selected SQL queries') }',
     'Format': '${ _('Format') }',
     'France': '${ _('France') }',
     'Functions': '${ _('Functions') }',
