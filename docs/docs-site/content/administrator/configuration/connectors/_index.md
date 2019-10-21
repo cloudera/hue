@@ -862,20 +862,7 @@ Specify the comma-separated list of HBase Thrift servers for clusters in the for
     [hbase]
     hbase_clusters=(Cluster|localhost:9090)
 
-HBase Impersonation:
-
-Enable impersonation for the Thrift server by adding the following properties to hbase-site.xml on each Thrift gateway:
-
-    <property>
-      <name>hbase.regionserver.thrift.http</name>
-      <value>true</value>
-    </property>
-    <property>
-      <name>hbase.thrift.support.proxyuser</name>
-      <value>true/value>
-    </property>
-
-Note: If you use framed transport, you cannot use doAs impersonation, because SASL does not work with Thrift framed transport.
+### Impersonation
 
 doAs Impersonation provides a flexible way to use the same client to impersonate multiple principals. doAs is supported only in Thrift 1.
 Enable doAs support by adding the following properties to hbase-site.xml on each Thrift gateway:
@@ -888,6 +875,37 @@ Enable doAs support by adding the following properties to hbase-site.xml on each
       <name>hbase.thrift.support.proxyuser</name>
       <value>true/value>
     </property>
+
+And the Hue hosts, or * to authorize from any host:
+
+    <property>
+      <name>hadoop.proxyuser.hbase.hosts</name>
+      <value>*</value>
+    </property>
+    <property>
+      <name>hadoop.proxyuser.hbase.groups</name>
+      <value>*/value>
+    </property>
+
+Note: If you use framed transport, you cannot use doAs impersonation, because SASL does not work with Thrift framed transport.
+
+### Kerberos cluster
+
+In a secure cluster its also needs these properties:
+
+    <property>
+      <name>hbase.thrift.spnego.principal</name>
+      <value>HTTP/<hostname_from_above>@REALM</value>
+      <!-->Note, _HOST does not work. ## Can be found from CM-Administration->Security->Kerberos Credentials (HTTP/....)</!-->
+    </property>
+    <property>
+      <name>hbase.thrift.spnego.keytab.file</name>
+      <value>hbase.keytab/value>
+    </property>
+
+And from the HBase shell, authorize some ends users, e.g. to give full access to `admin`:
+
+    hbase shell> grant 'admin', 'RWXCA'
 
 ## Others
 
