@@ -1,5 +1,5 @@
 
-FROM nginx
+FROM ubuntu:18.04 as build
 LABEL description="Hue documentation docs.gethue.com"
 
 RUN apt-get update -y && apt-get install -y \
@@ -21,10 +21,9 @@ WORKDIR /docs
 
 RUN hugo
 
-RUN mkdir -p /var/www/docs.gethue.com/html
-RUN cp -R public/* /var/www/docs.gethue.com/html
-RUN chmod -R 755 /var/www/docs.gethue.com
-RUN ln -s /etc/nginx/sites-available/docs.gethue.com /etc/nginx/sites-enabled/docs.gethue.com
-RUN rm -rf /docs
+
+FROM nginx:1.17-alpine
+COPY --from=build /docs/public /usr/share/nginx/html
 
 EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
