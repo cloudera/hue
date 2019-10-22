@@ -14,11 +14,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# 
+#
 # Extra python utils
 
 from past.builtins import basestring
 from builtins import object
+import datetime
 import select
 import socket
 import sys
@@ -155,7 +156,6 @@ def force_dict_to_strings(dictionary):
 
   return new_dict
 
-
 def isASCII(data):
   try:
     data.decode('ASCII')
@@ -217,3 +217,6 @@ def check_encoding(data):
       return 'gb2312'
     else:
       return 'cp1252'
+
+def current_ms_from_utc():
+  return (datetime.datetime.utcnow() - datetime.datetime.utcfromtimestamp(0)).total_seconds() * 1000

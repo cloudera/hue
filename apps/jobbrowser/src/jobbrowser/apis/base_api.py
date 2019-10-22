@@ -37,13 +37,16 @@ def get_api(user, interface, cluster=None):
   from jobbrowser.apis.livy_api import LivySessionsApi, LivyJobApi
   from jobbrowser.apis.job_api import JobApi
   from jobbrowser.apis.query_api import QueryApi
+  from jobbrowser.apis.beeswax_query_api import BeeswaxQueryApi
   from jobbrowser.apis.schedule_api import ScheduleApi
   from jobbrowser.apis.workflow_api import WorkflowApi
 
   if interface == 'jobs':
     return JobApi(user)
-  elif interface == 'queries':
+  elif interface == 'queries-impala':
     return QueryApi(user, cluster=cluster)
+  elif interface == 'queries-hive':
+    return BeeswaxQueryApi(user, cluster=cluster)
   elif interface == 'workflows':
     return WorkflowApi(user)
   elif interface == 'schedules':
