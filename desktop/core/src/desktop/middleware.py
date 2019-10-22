@@ -672,7 +672,9 @@ class SpnegoMiddleware(object):
           if 'desktop.auth.backend.KnoxSpnegoDjangoBackend' in \
                 desktop.conf.AUTH.BACKEND.get():
             knox_verification = False
-            if username in desktop.conf.KNOX.KNOX_PRINCIPAL.get():
+            principals = self.clean_principal(desktop.conf.KNOX.KNOX_PRINCIPAL.get())
+            principal = self.clean_principal(username)
+            if principal.intersection(principals):
               # This may contain chain of reverse proxies, e.g. knox proxy, hue load balancer
               # Compare hostname on both HTTP_X_FORWARDED_HOST & KNOX_PROXYHOSTS. Both of these can be configured to use either hostname or IPs and we have to normalize to one or the other
               req_hosts = self.clean_host(request.META['HTTP_X_FORWARDED_HOST'])
@@ -682,7 +684,7 @@ class SpnegoMiddleware(object):
               else:
                 access_warn(request, 'Failed to verify provided host %s with %s ' % (req_hosts, knox_proxy))
             else:
-              access_warn(request, 'Failed to verify provided username %s with %s ' % (username, desktop.conf.KNOX.KNOX_PRINCIPAL.get()))
+              access_warn(request, 'Failed to verify provided username %s with %s ' % (principal, principals))
             # If knox authentication failed then generate 401 (Unauthorized error)
             if not knox_verification:
               request.META['Return-401'] = ''
@@ -729,6 +731,15 @@ class SpnegoMiddleware(object):
           LOG.exception('Could not resolve host addr %s' % host)
           hosts.append(host)
     return set(hosts)
+
+  def clean_principal(self, pattern):
+    principals = []
+    if pattern:
+      pattern_list = pattern if isinstance(pattern, list) else pattern.split(',')
+      for principal_host in pattern_list:
+        principal = principal_host.split('/')[0].strip()
+      principals.append(principal)
+    return set(principals)
 
   def clean_username(self, username, request):
     """
