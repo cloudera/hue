@@ -65,6 +65,7 @@ _CNF_HIVESERVER2_THRIFT_SASL_QOP = 'hive.server2.thrift.sasl.qop'
 _CNF_HIVESERVER2_USE_SASL = 'hive.metastore.sasl.enabled'
 
 _CNF_HIVE_SUPPORT_CONCURRENCY = 'hive.support.concurrency'
+_CNF_HIVE_HOOK_PROTO_BASE_DIR = 'hive.hook.proto.base-directory'
 
 
 # Host is whatever up to the colon. Allow and ignore a trailing slash.
@@ -191,6 +192,8 @@ def has_concurrency_support():
   '''For SQL transactions like INSERT, DELETE, UPDATE since Hive 3. Possibly use set -v in future to obtain properties hive.create.as.acid=true & hive.create.as.insert.only=true'''
   return get_conf().get(_CNF_HIVE_SUPPORT_CONCURRENCY, 'TRUE').upper() == 'TRUE'
 
+def get_hive_hook_proto_base_directory():
+  return get_conf().get(_CNF_HIVE_HOOK_PROTO_BASE_DIR)
 
 def _parse_hive_site():
   """

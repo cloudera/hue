@@ -206,7 +206,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <td data-bind="text: user"></td>
           <td data-bind="text: type"></td>
           <td><span class="label job-status-label" data-bind="text: status"></span></td>
+          <!-- ko if: progress() !== '' -->
           <td data-bind="text: $root.formatProgress(progress)"></td>
+          <!-- /ko -->
+          <!-- ko if: progress() === '' -->
+          <td data-bind="text: ''"></td>
+          <!-- /ko -->
           <td data-bind="text: queue"></td>
           <td data-bind="moment: {data: submitted, format: 'LLL'}"></td>
           <td data-bind="text: duration().toHHMMSS()"></td>
@@ -319,7 +324,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <!-- ko if: interface() !== 'slas' && interface() !== 'oozie-info' -->
               <!-- ko if: !$root.job() -->
               <form class="form-inline">
-                <!-- ko if: !$root.isMini() && interface() == 'queries' -->
+                <!-- ko if: !$root.isMini() && interface() == 'queries-impala' -->
                   ${ _('Impala queries from') }
                 <!-- /ko -->
                 <!-- ko if: interface() != 'dataware2-clusters' && interface() != 'engines' -->
@@ -402,7 +407,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                   <div class="jb-panel" data-bind="template: { name: 'job-page${ SUFFIX }' }"></div>
                 <!-- /ko -->
 
-                <!-- ko if: mainType() == 'queries' -->
+                <!-- ko if: mainType() == 'queries-impala' || mainType() == 'queries-hive' -->
                   <div class="jb-panel" data-bind="template: { name: 'queries-page${ SUFFIX }' }"></div>
                 <!-- /ko -->
 
@@ -1509,7 +1514,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Id') }</li>
           <li>
-            <a data-bind="attr: { href: doc_url_modified }" target="_blank" title="${ _('Open in impalad') }">
+            <a data-bind="attr: { href: doc_url_modified }" target="_blank" title="${ _('Open in Impalad') }">
               <span data-bind="text: id"></span>
             </a>
             <!-- ko if: $root.isMini() -->
@@ -1555,6 +1560,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
     <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
+        <!-- ko if: $root.job().mainType() == 'queries-impala' -->
         <li>
           <a href="#queries-page-plan${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-plan${ SUFFIX }\']').tab('show'); }, event: {'shown': function () { if (!properties.plan || !properties.plan()) { fetchProfile('plan'); } } }">
             ${ _('Plan') }</a>
@@ -1587,11 +1593,27 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <a href="#queries-page-finstances${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-finstances${ SUFFIX }\']').tab('show'); }, event: {'shown': function () { if (!properties.finstances || !properties.finstances().backend_instances) { fetchProfile('finstances'); } } }">
             ${ _('Instances') }</a>
         </li>
+        <!-- /ko -->
+        <!-- ko if: $root.job().mainType() == 'queries-hive' -->
+        <li class="active">
+          <a href="#queries-page-hive-plan-text${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-hive-plan-text${ SUFFIX }\']').tab('show'); }">
+            ${ _('Plan') }</a>
+        </li>
+        <li>
+          <a href="#queries-page-hive-stmt${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-hive-stmt${ SUFFIX }\']').tab('show'); }">
+            ${ _('Query') }</a>
+        </li>
+        <li>
+          <a href="#queries-page-hive-perf${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-hive-perf${ SUFFIX }\']').tab('show'); }">
+            ${ _('Perf') }</a>
+        </li>
+        <!-- /ko -->
       </ul>
 
       <div class="clearfix"></div>
 
       <div class="tab-content">
+        <!-- ko if: $root.job().mainType() == 'queries-impala' -->
         <div class="tab-pane" id="queries-page-plan${ SUFFIX }" data-profile="plan">
           <div data-bind="visible:properties.plan && properties.plan().plan_json && properties.plan().plan_json.plan_nodes.length">
             <div class="query-plan" id="queries-page-plan-graph${ SUFFIX }" data-bind="impalaDagre: { value: properties.plan && properties.plan(), height:$root.isMini() ? 535 : 600 }">
@@ -1667,6 +1689,19 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <pre data-bind="text: _('The selected tab has no data')"/>
           <!-- /ko -->
         </div>
+        <!-- /ko -->
+
+        <!-- ko if: $root.job().mainType() == 'queries-hive' -->
+        <div class="tab-pane active" id="queries-page-hive-plan-text${ SUFFIX }" data-profile="plan">
+          <pre data-bind="text: (properties.plan && properties.plan().plan && JSON.stringify(ko.toJS(properties.plan().plan), null, 2)) || _('The selected tab has no data')"/>
+        </div>
+        <div class="tab-pane" id="queries-page-hive-stmt${ SUFFIX }" data-profile="stmt">
+          <pre data-bind="text: (properties.plan && properties.plan().stmt) || _('The selected tab has no data')"/>
+        </div>
+        <div class="tab-pane" id="queries-page-hive-perf${ SUFFIX }" data-profile="perf">
+          <pre data-bind="text: (properties.plan && properties.plan().perf && properties.plan().perf && JSON.stringify(JSON.parse(properties.plan().perf), null, 2)) || _('The selected tab has no data')"/>
+        </div>
+        <!-- /ko -->
       </div>
     </div>
     <!-- /ko -->
@@ -2554,7 +2589,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         return self.logsByName()[self.logActive()];
       });
 
-      self.properties = ko.mapping.fromJS(job.properties || { properties: '' });
+      self.properties = ko.mapping.fromJS(job.properties && Object.keys(job.properties).reduce(function(p, key) { p[key] = ''; return p;}, {}) || {'properties': ''});
+      Object.keys(job.properties || []).reduce(function(p, key) { p[key](job.properties[key]); return p;}, self.properties);
       self.mainType = ko.observable(vm.interface());
       self.lastEvent = ko.observable(job.lastEvent || '');
 
@@ -2751,7 +2787,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           interface = 'dataware-clusters';
         }
         else if (/[a-z0-9]{16}:[a-z0-9]{16}/.test(self.id())) {
-          interface = 'queries';
+          interface = 'queries-impala';
+        }
+        else if (/hive_[a-z0-9]*_[a-z0-9]*/.test(self.id())) {
+          interface = 'queries-hive';
         }
         else if (/livy-[0-9]+/.test(self.id())) {
           interface = 'livy-sessions';
@@ -2813,7 +2852,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             vm.resetBreadcrumbs(crumbs);
             // Show is still bound to old job, setTimeout allows knockout model change event done at begining of this method to sends it's notification
             setTimeout(function () {
-              if (vm.job().type() === 'queries' && !$("#queries-page-plan${ SUFFIX }").parent().children().hasClass("active")) {
+              if (vm.job().mainType() === 'queries-impala' && !$("#queries-page-plan${ SUFFIX }").parent().children().hasClass("active")) {
                 $("a[href=\'#queries-page-plan${ SUFFIX }\']").tab("show");
               }
             }, 0);
@@ -3179,7 +3218,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           'workflows',
           'schedules',
           'bundles',
-          'queries',
+          'queries-impala',
           'dataeng-jobs',
           'dataeng-clusters',
           'dataware-clusters',
@@ -3552,6 +3591,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         var queryInterfaceCondition = function () {
           return '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
         };
+        var queryHiveInterfaceCondition = function () {
+          return '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('hive') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
+        };
 
         var interfaces = [
           {'interface': 'jobs', 'label': '${ _ko('Jobs') }', 'condition': jobsInterfaceCondition},
@@ -3560,7 +3602,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           {'interface': 'dataware-clusters', 'label': '${ _ko('Clusters') }', 'condition': dataWarehouseInterfaceCondition},
           {'interface': 'dataware2-clusters', 'label': '${ _ko('Warehouses') }', 'condition': dataWarehouse2InterfaceCondition},
           {'interface': 'engines', 'label': '${ _ko('') }', 'condition': enginesInterfaceCondition},
-          {'interface': 'queries', 'label': '${ _ko('Queries') }', 'condition': queryInterfaceCondition},
+          {'interface': 'queries-impala', 'label': '${ _ko('Impala') }', 'condition': queryInterfaceCondition},
+          {'interface': 'queries-hive', 'label': '${ _ko('Hive') }', 'condition': queryHiveInterfaceCondition},
           {'interface': 'celery-beat', 'label': '${ _ko('Scheduled Tasks') }', 'condition': schedulerBeatInterfaceCondition},
           {'interface': 'workflows', 'label': '${ _ko('Workflows') }', 'condition': schedulerInterfaceCondition},
           {'interface': 'schedules', 'label': '${ _ko('Schedules') }', 'condition': schedulerInterfaceCondition},
@@ -3749,7 +3792,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           case 'slas':
           case 'oozie-info':
           case 'jobs':
-          case 'queries':
+          case 'queries-impala':
+          case 'queries-hive':
           case 'celery-beat':
           case 'workflows':
           case 'schedules':
