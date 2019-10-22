@@ -200,9 +200,10 @@ Now let’s add the grammar, starting with the complete specification. For simpl
     :
     | 'FORCE'
     ;
-    “DataDefinition” is an existing rule and this extends that rule with “ReindexStatement”.
 
-Save the file(s) and first run `node tools/jison/generateParsers.js postgresql` then `npm run test` and we should be down to one failing test.
+"DataDefinition" is an existing rule and this extends that rule with "ReindexStatement".
+
+Save the files and first run `node tools/jison/generateParsers.js postgresql` then `npm run test` and we should be down to one failing test.
 
 For the next one we’ll add some keyword suggestions after the user has typed REINDEX, we’ll continue below the ReindexStatement in `sql_main.jison`:
 
