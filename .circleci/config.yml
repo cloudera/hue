@@ -80,20 +80,14 @@ jobs:
             # make doc
             # hugo --source docs/docs-site
 
-      # Run tests
+      # Run code analyses
       - run:
-          name: run python API tests
+          name: run python lints
           command: |
-            cd /usr/share/hue
-            ./build/env/bin/hue test unit --with-xunit --with-cover
+            cd ~/repo
 
-      - run:
-          name: run js tests
-          command: |
-            cd /usr/share/hue
-            npm run test
+            ./tools/ci/check_non_ascii_characters.sh
 
-      # Code analyses
       - run:
           name: run js lint
           command: |
@@ -102,6 +96,20 @@ jobs:
             cp ~/repo/.eslint* .
             cp ~/repo/tools . -r
             npm run lint
+
+      # Run tests
+      - run:
+          name: run python API tests
+          command: |
+            cd /usr/share/hue
+
+            ./build/env/bin/hue test unit --with-xunit --with-cover
+
+      - run:
+          name: run js tests
+          command: |
+            cd /usr/share/hue
+            npm run test
 
       - store_artifacts:
           path: test-reports
