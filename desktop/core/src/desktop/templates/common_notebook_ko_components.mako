@@ -389,33 +389,30 @@ from notebook.conf import ENABLE_SQL_INDEXER
         });
 
         var clipboard = new Clipboard('.clipboard' + self.snippet.id().split('-')[0], {
-          target: function (trigger) {
+          text: function () {
             if (self.snippet.result && self.snippet.result.data()) {
               var data = self.snippet.result.data();
-              var result = '<table><tr>';
+              var result = '';
               for (var i = 1; i < self.snippet.result.meta().length; i++) { // Skip the row number column
-                result += '<th>' + hueUtils.html2text(self.snippet.result.meta()[i].name) + '</th>';
+                result += hueUtils.html2text(self.snippet.result.meta()[i].name) + '\t';
               }
-              result += '</tr>';
+              result += '\n';
               data.forEach(function (row) {
-                result += '<tr>';
                 for (var i = 1; i < row.length; i++) { // Skip the row number column
-                  result += '<td>' + hueUtils.html2text(row[i]) + '</td>';
+                  result += hueUtils.html2text(row[i]) + '\t';
                 }
-                result += '</tr>';
+                result += '\n';
               });
-              $('.clipboard-content').html(result);
+              return result;
             } else {
-              $('.clipboard-content').html(window.I18n('Error while copying results.'));
+              return window.I18n('Error while copying results.');
             }
-            return $('.clipboard-content')[0];
           }
         });
 
         clipboard.on('success', function (e) {
           $.jHueNotify.info(self.snippet.result.data().length + ' ' + window.I18n('result(s) copied to the clipboard'));
           e.clearSelection();
-          $('.clipboard-content').empty();
         });
 
         self.trySaveResults = function () {

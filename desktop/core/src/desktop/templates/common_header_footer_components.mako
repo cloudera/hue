@@ -285,8 +285,6 @@ from metadata.conf import has_optimizer, OPTIMIZER
   </div>
 </div>
 
-<div class="clipboard-content"></div>
-
 <script type="text/javascript">
 
   $(document).ready(function () {
