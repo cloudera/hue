@@ -389,7 +389,7 @@ from notebook.conf import ENABLE_SQL_INDEXER
         });
 
         var clipboard = new Clipboard('.clipboard' + self.snippet.id().split('-')[0], {
-          target: function (trigger) {
+          target: function (trigger) {
             if (self.snippet.result && self.snippet.result.data()) {
               var data = self.snippet.result.data();
               var result = '<table><tr>';
@@ -408,7 +408,7 @@ from notebook.conf import ENABLE_SQL_INDEXER
             } else {
               $('.clipboard-content').html(window.I18n('Error while copying results.'));
             }
-            return $('.clipboard-content')[0];
+            return $('.clipboard-content')[0];
           }
         });
 
