@@ -833,6 +833,12 @@ KNOX = ConfigSection(
       type=coerce_csv,
       help=_('Comma separated list of strings representing the host names that the Hue server can trust as knox hosts.')
     ),
+    KNOX_PORTS = Config(
+      key='knox_ports',
+      default=['80', '8443'],
+      type=coerce_csv,
+      help=_('Comma separated list of strings representing the ports that the Hue server can trust as knox port.')
+    ),
   )
 )
 

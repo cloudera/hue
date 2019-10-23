@@ -424,8 +424,18 @@ if desktop.conf.SESSION.TRUSTED_ORIGINS.get():
 
 # This is required for knox
 if desktop.conf.KNOX.KNOX_PROXYHOSTS.get(): # The hosts provided here don't have port. Add default knox port
-  TRUSTED_ORIGINS += desktop.conf.KNOX.KNOX_PROXYHOSTS.get()
-  TRUSTED_ORIGINS = [host.split(':')[0] + ':' + (host.split(':')[1] if len(host.split(':')) > 1 else '8443') for host in TRUSTED_ORIGINS]
+  if desktop.conf.KNOX.KNOX_PORTS.get():
+    hostport = []
+    ports = [host.split(':')[1] for host in desktop.conf.KNOX.KNOX_PROXYHOSTS.get() if len(host.split(':')) > 1] # In case the ports are in hostname
+    for port in ports + desktop.conf.KNOX.KNOX_PORTS.get():
+      if port == '80':
+        port = '' # Default port needs to be empty
+      else:
+        port = ':' + port
+      hostport += [host.split(':')[0] + port for host in desktop.conf.KNOX.KNOX_PROXYHOSTS.get()]
+    TRUSTED_ORIGINS += hostport
+  else:
+    TRUSTED_ORIGINS += desktop.conf.KNOX.KNOX_PROXYHOSTS.get()
 
 if TRUSTED_ORIGINS:
   CSRF_TRUSTED_ORIGINS = TRUSTED_ORIGINS
