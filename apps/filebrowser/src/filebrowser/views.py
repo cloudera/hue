@@ -18,7 +18,6 @@
 from future import standard_library
 standard_library.install_aliases()
 from builtins import object
-from builtins import str
 import errno
 import logging
 import mimetypes
@@ -29,7 +28,6 @@ import re
 import stat as stat_module
 import sys
 import urllib.request, urllib.error
-from urllib.parse import urlparse
 
 from bz2 import decompress
 from datetime import datetime
@@ -81,10 +79,14 @@ if sys.version_info[0] > 2:
   from io import StringIO as string_io
   from urllib.parse import quote as urllib_quote
   from urllib.parse import unquote as urllib_unquote
+  from urllib.parse import urlparse as lib_urlparse
+  from builtins import str as new_str
 else:
   from cStringIO import StringIO as string_io
   from urllib import quote as urllib_quote
   from urllib import unquote as urllib_unquote
+  from urlparse import urlparse as lib_urlparse
+  new_str = unicode
   import parquet
   from avro import datafile, io
 
@@ -280,7 +282,7 @@ def edit(request, path, form=None):
             f = request.fs.open(path)
             try:
                 try:
-                    current_contents = str(f.read(), encoding)
+                    current_contents = new_str(f.read(), encoding)
                 except UnicodeDecodeError:
                     raise PopupException(_("File is not encoded in %(encoding)s; cannot be edited: %(path)s.") % {'encoding': encoding, 'path': path})
             finally:
@@ -557,8 +559,8 @@ def listdir_paged(request, path):
     return render('listdir.mako', request, data)
 
 def scheme_absolute_path(root, path):
-  splitPath = urlparse(path)
-  splitRoot = urlparse(root)
+  splitPath = lib_urlparse(path)
+  splitRoot = lib_urlparse(root)
   if splitRoot.scheme and not splitPath.scheme:
     path = splitPath._replace(scheme=splitRoot.scheme).geturl()
   return path
@@ -695,7 +697,7 @@ def display(request, path):
     # Get contents as string for text mode, or at least try
     uni_contents = None
     if not mode or mode == 'text':
-        uni_contents = str(contents, encoding, errors='replace')
+        uni_contents = new_str(contents, encoding, errors='replace')
         is_binary = uni_contents.find(i18n.REPLACEMENT_CHAR) != -1
         # Auto-detect mode
         if not mode:
