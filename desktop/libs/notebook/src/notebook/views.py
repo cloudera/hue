@@ -31,7 +31,7 @@ from desktop.lib import export_csvxls
 from desktop.lib.django_util import render, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
-from desktop.models import Document2, Document, FilesystemException
+from desktop.models import Document2, Document, FilesystemException, _get_gist_document
 from desktop.views import serve_403_error
 from metadata.conf import has_optimizer, has_catalog, has_workload_analytics
 
@@ -106,11 +106,17 @@ def notebook_embeddable(request):
 def editor(request, is_mobile=False, is_embeddable=False):
   editor_id = request.GET.get('editor')
   editor_type = request.GET.get('type', 'hive')
+  gist_id = request.GET.get('gist')
 
   if editor_type == 'notebook' or request.GET.get('notebook'):
     return notebook(request)
 
-  if editor_id:  # Open existing saved editor document
+  if editor_type == 'gist':
+    _get_gist_document(uuid=gist_id)
+    editor_type = 'query-impala'
+  #   manage unfurling
+
+  if editor_id and not gist_id:  # Open existing saved editor document
     editor_type = _get_editor_type(editor_id)
 
   template = 'editor.mako'

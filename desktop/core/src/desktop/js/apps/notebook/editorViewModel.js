@@ -419,6 +419,8 @@ class EditorViewModel {
         self.loadNotebook(notebooks[0]); // Old way of loading json for /browse
       } else if (window.location.getParameter('type') !== '') {
         self.newNotebook(window.location.getParameter('type'));
+      } else if (window.location.getParameter('gist') !== '') {
+        self.newNotebook();
       } else {
         self.newNotebook();
       }
@@ -591,7 +593,8 @@ class EditorViewModel {
         '/notebook/api/create_notebook',
         {
           type: editorType || options.editor_type,
-          directory_uuid: window.location.getParameter('directory_uuid')
+          directory_uuid: window.location.getParameter('directory_uuid'),
+          gist: window.location.getParameter('gist')
         },
         data => {
           self.loadNotebook(data.notebook);
