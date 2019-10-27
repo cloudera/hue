@@ -39,7 +39,6 @@ from django.views.decorators.http import require_POST
 
 from metadata.conf import has_catalog
 from metadata.catalog_api import search_entities as metadata_search_entities, _highlight, search_entities_interactive as metadata_search_entities_interactive
-from notebook.api import _create_notebook
 from notebook.connectors.altus import SdxApi, AnalyticDbApi, DataEngApi, DataWarehouse2Api
 from notebook.connectors.base import Notebook, get_interpreter
 
@@ -49,7 +48,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
 from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, \
-  UserPreferences, get_user_preferences, set_user_preferences, get_cluster_config, __paginate
+  UserPreferences, get_user_preferences, set_user_preferences, get_cluster_config, __paginate, _get_gist_document
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
@@ -822,7 +821,7 @@ def user_preferences(request, key=None):
   return JsonResponse(response)
 
 
-@api_error_handler()
+@api_error_handler
 def gist_create(request):
   response = {'status': 0}
 
@@ -843,22 +842,12 @@ def gist_create(request):
   return JsonResponse(response)
 
 
-@api_error_handler()
 def gist_get(request):
-  response = {'status': 0}
+  gist_uuid = request.GET.get('uuid')
 
-  gist_uuid = request.POST.get('uuid', '')
-  # if get, manage unfurling
+  gist_doc = _get_gist_document(uuid=gist_uuid)
 
-  gist_doc = Document2.objects.get(uuid=uuid) # Workaround until there is a share to all permission
-
-  # check type
-  # return new notebook but with default text
-  return _create_notebook(
-    editor_type='query-impala',
-    #default_content=json.dumps({'statement'})
-  )
-  # return JsonResponse(response)
+  return redirect('/hue/editor?gist=fdbe0862-cd1f-40b5-9801-a5abfb7c2f77&type=impala')
 
 
 def search_entities(request):

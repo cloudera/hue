@@ -47,12 +47,17 @@ def check_editor_access_permission():
     def decorate(request, *args, **kwargs):
       editor_id = request.GET.get('editor')
       editor_type = request.GET.get('type', 'hive')
+      gist_id = request.POST.get('gist')
 
-      if editor_id:  # Open existing saved editor document
-        editor_type = _get_editor_type(editor_id)
+      if editor_type == 'gist' or gist_id: # Gist don't have permissions currently
+        pass
+      else:
+        if editor_id:  # Open existing saved editor document
+          editor_type = _get_editor_type(editor_id)
 
-      if check_permissions(request.user, editor_type):
-        raise PopupException(_('Missing permission to access the %s Editor' % editor_type), error_code=401)
+        if check_permissions(request.user, editor_type):
+          raise PopupException(_('Missing permission to access the %s Editor' % editor_type), error_code=401)
+
       return view_func(request, *args, **kwargs)
     return wraps(view_func)(decorate)
   return inner

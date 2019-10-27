@@ -2059,8 +2059,11 @@ def get_data_link(meta):
   return link
 
 
-def __paginate(page, limit, queryset):
+def _get_gist_document(uuid):
+  return Document2.objects.get(uuid=uuid) # Workaround until there is a share to all permission
 
+
+def __paginate(page, limit, queryset):
   if limit > 0:
     offset = (page - 1) * limit
     last = offset + limit

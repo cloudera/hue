@@ -491,6 +491,13 @@ class OnePageViewModel {
         }
       },
       {
+        url: '/gist',
+        app: function() {
+          const uuid = getUrlParameter('uuid');
+          location.href = '/desktop/api2/gist/open?uuid=' + uuid;
+        }
+      },
+      {
         url: '/desktop/metrics',
         app: function() {
           self.loadApp('metrics');

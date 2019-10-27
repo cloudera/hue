@@ -2958,7 +2958,7 @@ class ApiHelper {
     const deferred = $.Deferred();
 
     const request = self.simplePost(
-      GIST_API,
+      GIST_API + 'create',
       {
         text: options.text,
         name: options.name,
