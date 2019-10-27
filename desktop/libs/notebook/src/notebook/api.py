@@ -30,11 +30,10 @@ from django.views.decorators.http import require_GET, require_POST
 import opentracing.tracer
 
 from azure.abfs.__init__ import abfspath
-from desktop.api2 import __paginate
 from desktop.conf import TASK_SERVER
 from desktop.lib.i18n import smart_str
 from desktop.lib.django_util import JsonResponse
-from desktop.models import Document2, Document
+from desktop.models import Document2, Document, __paginate
 from indexer.file_format import HiveFormat
 from indexer.fields import Field
 

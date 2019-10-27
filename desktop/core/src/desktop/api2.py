@@ -49,7 +49,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
 from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, \
-  UserPreferences, get_user_preferences, set_user_preferences, get_cluster_config
+  UserPreferences, get_user_preferences, set_user_preferences, get_cluster_config, __paginate
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
@@ -1098,17 +1098,3 @@ def _paginate(request, queryset):
   limit = int(request.GET.get('limit', 0))
 
   return __paginate(page, limit, queryset)
-
-
-def __paginate(page, limit, queryset):
-
-  if limit > 0:
-    offset = (page - 1) * limit
-    last = offset + limit
-    queryset = queryset.all()[offset:last]
-
-  return {
-    'documents': queryset,
-    'page': page,
-    'limit': limit
-  }

@@ -2057,3 +2057,17 @@ def get_data_link(meta):
     link = '/metastore/table/%(database)s/%(table)s' % meta # Could also add col=val
 
   return link
+
+
+def __paginate(page, limit, queryset):
+
+  if limit > 0:
+    offset = (page - 1) * limit
+    last = offset + limit
+    queryset = queryset.all()[offset:last]
+
+  return {
+    'documents': queryset,
+    'page': page,
+    'limit': limit
+  }
