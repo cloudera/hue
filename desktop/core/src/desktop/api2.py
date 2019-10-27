@@ -821,6 +821,7 @@ def user_preferences(request, key=None):
   return JsonResponse(response)
 
 
+@api_error_handler()
 def gist_create(request):
   response = {'status': 0}
 
@@ -837,6 +838,21 @@ def gist_create(request):
 
   response['id'] = gist_doc.id
   response['uuid'] = gist_doc.uuid
+
+  return JsonResponse(response)
+
+
+@api_error_handler()
+def gist_get(request):
+  response = {'status': 0}
+
+  gist_uuid = request.POST.get('uuid', '')
+  # if get, manage unfurling
+
+  gist_doc = Document2.objects.get(uuid=uuid) # Workaround until there is a share to all permission
+
+  # check type
+  # return new notebook but with default text
 
   return JsonResponse(response)
 
