@@ -43,6 +43,7 @@ const SOLR_FIELDS_API = '/indexer/api/index/list/';
 const DASHBOARD_TERMS_API = '/dashboard/get_terms';
 const DASHBOARD_STATS_API = '/dashboard/get_stats';
 const FORMAT_SQL_API = '/notebook/api/format';
+const GIST_API = '/desktop/api2/gist/';
 const TOPO_URL = '/desktop/topo/';
 
 const SEARCH_API = '/desktop/api/search/entities';
@@ -2933,6 +2934,35 @@ class ApiHelper {
       FORMAT_SQL_API,
       {
         statements: options.statements
+      },
+      {
+        silenceErrors: options.silenceErrors,
+        successCallback: deferred.resolve,
+        errorCallback: deferred.reject
+      }
+    );
+
+    return new CancellablePromise(deferred, request);
+  }
+
+  /**
+   *
+   * @param {Object} options
+   * @param {string} options.text
+   * @param {string} options.name
+   * @param {string} options.description
+   * @param {boolean} [options.silenceErrors]
+   */
+  createGist(options) {
+    const self = this;
+    const deferred = $.Deferred();
+
+    const request = self.simplePost(
+      GIST_API,
+      {
+        text: options.text,
+        name: options.name,
+        description: options.description
       },
       {
         silenceErrors: options.silenceErrors,

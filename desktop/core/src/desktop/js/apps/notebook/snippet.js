@@ -1911,6 +1911,28 @@ class Snippet {
       ); // ie: 5000 lines at 80 chars per line
     });
 
+    self.createGist = function() {
+      if (self.isSqlDialect()) {
+        apiHelper
+          .createGist({
+            text:
+              self.ace().getSelectedText() != ''
+                ? self.ace().getSelectedText()
+                : self.statement_raw(),
+            name: self.name(),
+            description: ''
+          })
+          .done(data => {
+            if (data.status == 0) {
+              $(document).trigger('info', 'Gist created at ..' + data);
+            } else {
+              self._ajaxError(data);
+            }
+          });
+      }
+      hueAnalytics.log('notebook', 'format');
+    };
+
     self.format = function() {
       if (self.isSqlDialect()) {
         apiHelper

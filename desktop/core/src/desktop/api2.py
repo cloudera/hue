@@ -821,6 +821,26 @@ def user_preferences(request, key=None):
   return JsonResponse(response)
 
 
+def gist_create(request):
+  response = {'status': 0}
+
+  text = request.POST.get('text', '')
+  name = request.POST.get('name', '')
+  description = request.POST.get('description', '')
+
+  gist_doc = Document2.objects.create(
+    name=name,
+    type='gist',
+    owner=request.user,
+    data=json.dumps({'text': text})
+  )
+
+  response['id'] = gist_doc.id
+  response['uuid'] = gist_doc.uuid
+
+  return JsonResponse(response)
+
+
 def search_entities(request):
   sources = json.loads(request.POST.get('sources')) or []
 

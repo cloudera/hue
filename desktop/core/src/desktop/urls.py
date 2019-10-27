@@ -167,6 +167,8 @@ dynamic_patterns += [
   url(r'^desktop/api2/doc/export/?$', desktop_api2.export_documents),
   url(r'^desktop/api2/doc/import/?$', desktop_api2.import_documents),
 
+  url(r'^/desktop/api2/gist/?$', desktop_api2.create_gist),
+
   url(r'^desktop/api/search/entities/?$', desktop_api2.search_entities),
   url(r'^desktop/api/search/entities_interactive/?$', desktop_api2.search_entities_interactive),
 ]
