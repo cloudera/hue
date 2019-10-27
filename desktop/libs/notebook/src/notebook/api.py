@@ -63,15 +63,38 @@ def create_notebook(request):
   editor_type = request.POST.get('type', 'notebook')
   directory_uuid = request.POST.get('directory_uuid')
 
-  editor = Notebook()
+  editor = _create_notebook(editor_type=editor_type, directory_uuid=directory_uuid)
   data = editor.get_data()
 
   if editor_type != 'notebook':
     data['name'] = ''
     data['type'] = 'query-%s' % editor_type  # TODO: Add handling for non-SQL types
 
+  if default_content is not None:
+    data.update(default_content)
+
   data['directoryUuid'] = directory_uuid
   editor.data = json.dumps(data)
+
+  response['notebook'] = editor.get_data()
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+def _create_notebook(editor_type, directory_uuid=None, default_content=None):
+  notebook = Notebook()
+  data = notebook.get_data()
+
+  if editor_type != 'notebook':
+    data['name'] = ''
+    data['type'] = 'query-%s' % editor_type  # TODO: Add handling for non-SQL types
+
+  if default_content is not None:
+    data.update(default_content)
+
+  data['directoryUuid'] = directory_uuid
+  notebook.data = json.dumps(data)
 
   response['notebook'] = editor.get_data()
   response['status'] = 0

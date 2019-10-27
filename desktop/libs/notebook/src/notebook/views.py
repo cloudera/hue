@@ -157,12 +157,25 @@ def browse(request, database, table, partition_spec=None):
   compute = json.loads(request.POST.get('cluster', '{}'))
 
   if request.method == 'POST':
-    notebook = make_notebook(name='Execute and watch', editor_type=editor_type, statement=statement, status='ready-execute',
-                             is_task=True, namespace=namespace, compute=compute)
+    notebook = make_notebook(
+        name='Execute and watch',
+        editor_type=editor_type,
+        statement=statement,
+        status='ready-execute',
+        is_task=True,
+        namespace=namespace,
+        compute=compute
+    )
     return JsonResponse(notebook.execute(request, batch=False))
   else:
-    editor = make_notebook(name='Browse', editor_type=editor_type, statement=statement, status='ready-execute',
-                           namespace=namespace, compute=compute)
+    editor = make_notebook(
+        name='Browse',
+        editor_type=editor_type,
+        statement=statement,
+        status='ready-execute',
+        namespace=namespace,
+        compute=compute
+    )
 
     return render('editor.mako', request, {
         'notebooks_json': json.dumps([editor.get_data()]),
