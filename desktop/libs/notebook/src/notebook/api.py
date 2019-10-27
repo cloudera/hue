@@ -45,7 +45,6 @@ from notebook.decorators import api_error_handler, check_document_access_permiss
 from notebook.models import escape_rows, make_notebook, upgrade_session_properties, get_api
 
 if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
   from urllib.parse import unquote as urllib_unquote
 else:
   from urllib import unquote as urllib_unquote
