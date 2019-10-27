@@ -1794,7 +1794,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           </a>
         </li>
         <li>
-          <a href="javascript:void(0)" data-bind="click: clear, css: {'disabled': ! isReady() }" title="${ _('Create a gist link for sharing the selected SQL queries') }">
+          <a href="javascript:void(0)" data-bind="click: createGist, css: {'disabled': ! isReady() }" title="${ _('Create a gist link for sharing the selected SQL queries') }">
             <i class="fa fa-fw fa-link"></i> ${_('Share')}
           </a>
         </li>
