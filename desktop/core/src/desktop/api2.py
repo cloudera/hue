@@ -39,6 +39,7 @@ from django.views.decorators.http import require_POST
 
 from metadata.conf import has_catalog
 from metadata.catalog_api import search_entities as metadata_search_entities, _highlight, search_entities_interactive as metadata_search_entities_interactive
+from notebook.api import _create_notebook
 from notebook.connectors.altus import SdxApi, AnalyticDbApi, DataEngApi, DataWarehouse2Api
 from notebook.connectors.base import Notebook, get_interpreter
 
@@ -853,8 +854,11 @@ def gist_get(request):
 
   # check type
   # return new notebook but with default text
-
-  return JsonResponse(response)
+  return _create_notebook(
+    editor_type='query-impala',
+    #default_content=json.dumps({'statement'})
+  )
+  # return JsonResponse(response)
 
 
 def search_entities(request):
