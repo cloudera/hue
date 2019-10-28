@@ -15,12 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Skips files that are: deleted, binary.
 
 FOUND_ISSUE=0
 
-for f in `git diff --name-only origin/master`
+for f in `git diff --name-only origin/master --diff-filter=b`
 do
- grep --color='auto' -P -n "[^\x00-\x7F]" $f
+ grep --color='auto' -P -n "[^\x00-\x7F]" --binary-files=without-match $f
  if [ "$?" -eq "0" ]
   then
     echo "Non ASCII characters found in $f"
