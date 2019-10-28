@@ -26,15 +26,13 @@ from django.utils.translation import ugettext as _
 from desktop.lib import django_mako
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config
-from desktop.conf import DEFAULT_USER
 
 from beeswax.design import hql_query
 from beeswax import hive_site
-from useradmin.models import User
+from useradmin.models import install_sample_user
 
 
 LOG = logging.getLogger(__name__)
-DEFAULT_USER = DEFAULT_USER.get()
 
 
 class Command(BaseCommand):
@@ -51,7 +49,7 @@ class Command(BaseCommand):
 
 def create_table(user=None, query_server=None, table=None):
   if not user:
-    user = User.objects.get(username=DEFAULT_USER)
+    user = install_sample_user()
   if not query_server:
     query_server = get_query_server_config('beeswax')
   if not table:
