@@ -90,7 +90,7 @@ class HiveServerTable(Table):
   @property
   def partition_keys(self):
     try:
-      return [PartitionKeyCompatible(row['col_name'], row['data_type'], row['comment']) for row in self._get_partition_column()]
+      return [PartitionKeyCompatible(row['col_name'], row['data_type'], row['comment']) for row in self._get_partition_columns()]
     except:
       LOG.exception('failed to get partition keys')
       return []
@@ -119,14 +119,14 @@ class HiveServerTable(Table):
         col_row_index = col_row_index + 1
         cols.pop(0)
       end_cols_index = cols.index('')
-      return rows[col_row_index:][:end_cols_index] + self._get_partition_column()
+      return rows[col_row_index:][:end_cols_index] + self._get_partition_columns()
     except ValueError:  # DESCRIBE on columns and nested columns does not always contain additional rows beyond cols
       return rows[col_row_index:]
     except:
       # Impala does not have it
       return rows
 
-  def _get_partition_column(self):
+  def _get_partition_columns(self):
     rows = self.describe
     try:
       col_row_index = list(map(itemgetter('col_name'), rows)).index('# Partition Information') + 3
