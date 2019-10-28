@@ -64,7 +64,7 @@ try:
   from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, HiveServerQueryHistory, QueryHistory, Session
   from beeswax.server import dbms
   from beeswax.server.dbms import get_query_server_config, QueryServerException
-  from beeswax.views import parse_out_jobs
+  from beeswax.views import parse_out_jobs, parse_out_queries
 except ImportError as e:
   LOG.warn('Hive and HiveServer2 interfaces are not enabled: %s' % e)
   hive_settings = None
@@ -79,12 +79,14 @@ except ImportError as e:
 
 try:
   from jobbrowser.views import get_job
-  from jobbrowser.conf import ENABLE_QUERY_BROWSER
+  from jobbrowser.conf import ENABLE_QUERY_BROWSER, ENABLE_HIVE_QUERY_BROWSER
   from jobbrowser.apis.query_api import _get_api
   has_query_browser = ENABLE_QUERY_BROWSER.get()
+  has_hive_query_browser = ENABLE_HIVE_QUERY_BROWSER.get()
 except (AttributeError, ImportError) as e:
   LOG.warn("Job Browser app is not enabled")
   has_query_browser = False
+  has_hive_query_browser = False
 
 
 DEFAULT_HIVE_ENGINE = 'mr'
@@ -442,6 +444,7 @@ class HS2Api(Api):
     if snippet['type'] == 'hive':
       engine = self._get_hive_execution_engine(notebook, snippet)
       jobs_with_state = parse_out_jobs(logs, engine=engine, with_state=True)
+      queries_with_state = parse_out_queries(logs, engine=engine, with_state=True)
 
       jobs = [{
         'name': job.get('job_id', ''),
@@ -449,6 +452,13 @@ class HS2Api(Api):
         'started': job.get('started', False),
         'finished': job.get('finished', False)
       } for job in jobs_with_state]
+      if has_hive_query_browser:
+        jobs += [{
+          'name': job.get('job_id', ''),
+          'url': 'api/job/queries-hive/',
+          'started': job.get('started', False),
+          'finished': job.get('finished', False)
+        } for job in queries_with_state]
     elif snippet['type'] == 'impala' and has_query_browser:
       query_id = unpack_guid_base64(snippet['result']['handle']['guid'])
       progress = min(self.progress(notebook, snippet, logs), 99) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100

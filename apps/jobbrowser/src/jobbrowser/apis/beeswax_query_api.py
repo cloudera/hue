@@ -21,7 +21,10 @@ import re
 
 from datetime import datetime
 
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.python_util import current_ms_from_utc
+
+from django.utils.translation import ugettext as _
 
 from jobbrowser.apis.base_api import Api
 
@@ -82,6 +85,8 @@ class BeeswaxQueryApi(Api):
     jobs = query_history.get_query_by_id(self.user.get_username(), query_id=appid)
 
     current_time = current_ms_from_utc()
+    if not jobs['data']:
+      raise PopupException(_('Could not find query id %s' % appid))
     job = jobs['data'][0]
     app = {
       'id': job[0],
