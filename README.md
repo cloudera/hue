@@ -34,7 +34,9 @@ Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.c
 
 Getting Started
 ---------------
-Add the development packages, build and get the development server running:
+The [Forum](https://discourse.gethue.com/) is here in case you are looking for help.
+
+First, add the development packages, build and get the development server running:
 ```
 git clone https://github.com/cloudera/hue.git
 cd hue
@@ -65,7 +67,7 @@ Read more about configurations at [``tools/kubernetes``](tools/kubernetes/).
 Community
 -----------
    * How to [contribute](CONTRIBUTING.md)
-   * Help Forum: https://discourse.gethue.com/ ([previous mailing list](http://groups.google.com/a/cloudera.org/group/hue-user))
+   * Help Forum: https://discourse.gethue.com/
    * High level [roadmap](docs/ROADMAP.md)
    * Jira: https://issues.cloudera.org/browse/HUE
 
