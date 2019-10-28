@@ -1245,6 +1245,16 @@ class DataCatalogEntry {
   }
 
   /**
+   * Returns true if the entry is either a partition or primary key. Note that the definition has to come from a parent entry, i.e.
+   * getChildren().
+   *
+   * @return {boolean}
+   */
+  isKey() {
+    return this.isPartitionKey() || this.isPrimaryKey();
+  }
+
+  /**
    * Returns true if the entry is a table. It will be accurate once the source meta has been loaded.
    *
    * @return {boolean}
