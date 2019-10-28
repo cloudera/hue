@@ -293,7 +293,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
     <div class="row-fluid">
       <div class="span12">
         <div>
-          <input class="input-xlarge" name="gist-link" type="text" placeholder="${ _('Link') }"/>
+          <input class="input-xxlarge" name="gist-link" type="text" placeholder="${ _('Link') }"/>
         </div>
         <div class="input-prepend">
           <a class="btn" data-dismiss="modal">${_('Copy')}</a>

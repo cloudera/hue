@@ -2948,7 +2948,8 @@ class ApiHelper {
   /**
    *
    * @param {Object} options
-   * @param {string} options.text
+   * @param {string} options.statement
+   * @param {string} options.doc_type
    * @param {string} options.name
    * @param {string} options.description
    * @param {boolean} [options.silenceErrors]
@@ -2960,7 +2961,8 @@ class ApiHelper {
     const request = self.simplePost(
       GIST_API + 'create',
       {
-        text: options.text,
+        statement: options.statement,
+        doc_type: options.doc_type,
         name: options.name,
         description: options.description
       },

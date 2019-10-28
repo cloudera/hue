@@ -1020,6 +1020,13 @@ class Document2Manager(models.Manager, Document2QueryMixin):
 
       return parent_home_dir
 
+  def get_gist_directory(self, user):
+    try:
+      home_dir = self.get_home_directory(user)
+      return self.get(owner=user, parent_directory=home_dir, name=Document2.GIST_DIR, type='directory')
+    except Document2.DoesNotExist:
+      return self.create_user_directories(user)
+
   def get_by_path(self, user, path):
     """
     This can be an expensive operation b/c we have to traverse the path tree, so if possible, request a document by UUID
@@ -1060,6 +1067,11 @@ class Document2Manager(models.Manager, Document2QueryMixin):
     if created:
       LOG.info('Successfully created trash directory for user: %s' % user.username)
 
+    gist_dir, created = Directory.objects.get_or_create(name=Document2.GIST_DIR, owner=user, parent_directory=home_dir)
+
+    if created:
+      LOG.info('Successfully created gist directory for user: %s' % user.username)
+
     # For any directories or documents that do not have a parent directory, assign it to home directory
     count = 0
     for doc in Document2.objects.filter(owner=user).filter(parent_directory=None).exclude(id__in=[home_dir.id, trash_dir.id]):
@@ -1074,6 +1086,7 @@ class Document2Manager(models.Manager, Document2QueryMixin):
 class Document2(models.Model):
 
   HOME_DIR = ''
+  GIST_DIR = 'Gist'
   TRASH_DIR = '.Trash'
   EXAMPLES_DIR = 'examples'
 
@@ -1173,6 +1186,8 @@ class Document2(models.Model):
         url = '/editor' + '?editor=' + str(self.id)
       elif self.type == 'directory':
         url = '/home2' + '?uuid=' + self.uuid
+      elif self.type == 'gist':
+        url = '/hue/gist?uuid=' + str(self.uuid)
       elif self.type == 'notebook':
         url = reverse('notebook:notebook') + '?notebook=' + str(self.id)
       elif self.type == 'search-dashboard':
@@ -2060,7 +2075,7 @@ def get_data_link(meta):
 
 
 def _get_gist_document(uuid):
-  return Document2.objects.get(uuid=uuid) # Workaround until there is a share to all permission
+  return Document2.objects.get(uuid=uuid, type='gist') # Workaround until there is a share to all permission
 
 
 def __paginate(page, limit, queryset):
