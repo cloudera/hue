@@ -112,9 +112,8 @@ def editor(request, is_mobile=False, is_embeddable=False):
     return notebook(request)
 
   if editor_type == 'gist':
-    _get_gist_document(uuid=gist_id)
-    editor_type = 'query-impala'
-  #   manage unfurling
+    gist_doc = _get_gist_document(uuid=gist_id)
+    editor_type = gist_doc.extra
 
   if editor_id and not gist_id:  # Open existing saved editor document
     editor_type = _get_editor_type(editor_id)

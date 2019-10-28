@@ -823,9 +823,13 @@ def user_preferences(request, key=None):
 
 @api_error_handler
 def gist_create(request):
+  '''
+  Only supporting Editor currently.
+  '''
   response = {'status': 0}
 
   text = request.POST.get('text', '')
+  gist_type = request.POST.get('type', 'query-hive')
   name = request.POST.get('name', '')
   description = request.POST.get('description', '')
 
@@ -833,11 +837,13 @@ def gist_create(request):
     name=name,
     type='gist',
     owner=request.user,
-    data=json.dumps({'text': text})
+    data=json.dumps({'text': text}),
+    extra=gist_type
   )
 
   response['id'] = gist_doc.id
   response['uuid'] = gist_doc.uuid
+  response['link'] = '/gist?=%s' % gist_doc.uuid
 
   return JsonResponse(response)
 
@@ -847,7 +853,11 @@ def gist_get(request):
 
   gist_doc = _get_gist_document(uuid=gist_uuid)
 
-  return redirect('/hue/editor?gist=fdbe0862-cd1f-40b5-9801-a5abfb7c2f77&type=impala')
+  return redirect('%(host)s/hue/editor?gist=%(uuid)s&type=%s(type)' % {
+    'host': get_host(),
+    'uuid': gist_doc.uuid,
+    'type': gist_doc.extra.rsplit('-')[-1]
+  })
 
 
 def search_entities(request):
