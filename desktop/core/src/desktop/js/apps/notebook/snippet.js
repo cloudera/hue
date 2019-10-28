@@ -1924,13 +1924,15 @@ class Snippet {
           })
           .done(data => {
             if (data.status == 0) {
-              $(document).trigger('info', 'Gist created at ..' + data);
+              $(document).trigger('showGistModal', {
+                link: data.link
+              });
             } else {
               self._ajaxError(data);
             }
           });
       }
-      hueAnalytics.log('notebook', 'format');
+      hueAnalytics.log('gist', self.type());
     };
 
     self.format = function() {

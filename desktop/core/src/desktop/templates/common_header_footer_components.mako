@@ -280,8 +280,30 @@ from metadata.conf import has_optimizer, OPTIMIZER
   </div>
   <div class="modal-body">
     <table class="table table-condensed">
-
     </table>
+  </div>
+</div>
+
+<div id="gistModal" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${ _('Shareable link') }</h2>
+  </div>
+  <div class="modal-body">
+    <div class="row-fluid">
+      <div class="span12">
+        <div>
+          <input class="input-xlarge" name="gist-link" type="text" placeholder="${ _('Link') }"/>
+        </div>
+        <div class="input-prepend">
+          <a class="btn" data-dismiss="modal">${_('Copy')}</a>
+          <span class="add-on muted"><i class="fa fa-clipboard"></i></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${_('Close')}</a>
   </div>
 </div>
 
@@ -565,9 +587,12 @@ from metadata.conf import has_optimizer, OPTIMIZER
     };
   }
 
+  $(document).on('showGistModal', (e, data) => {
+    $('#gistModal input[name="gist-link"]').val(data['link']);
+    $('#gistModal').modal('show');
+  });
 
-  %if collect_usage:
-
+  % if collect_usage:
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
@@ -593,8 +618,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
         });
       }
     }
-
-  %endif
+  % endif
 
 </script>
 </%def>
