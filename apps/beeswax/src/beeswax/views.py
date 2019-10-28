@@ -65,6 +65,8 @@ LOG = logging.getLogger(__name__)
 HADOOP_JOBS_RE = re.compile("Starting Job = ([a-z0-9_]+?),")
 SPARK_APPLICATION_RE = re.compile("Running with YARN Application = (?P<application_id>application_\d+_\d+)")
 TEZ_APPLICATION_RE = re.compile("Executing on YARN cluster with App id ([a-z0-9_]+?)\)")
+TEZ_QUERY_RE = re.compile("\(queryId=([a-z0-9_-]+?)\)")
+
 
 
 def index(request):
@@ -953,6 +955,46 @@ def parse_out_jobs(log, engine='mr', with_state=False):
 
   return ret
 
+def parse_out_queries(log, engine=None, with_state=False):
+  """
+  Ideally, Hive would tell us what jobs it has run directly from the Thrift interface.
+
+  with_state: If True, will return a list of dict items with 'job_id', 'started', 'finished'
+  """
+  ret = []
+
+  if engine.lower() == 'tez':
+    start_pattern = TEZ_QUERY_RE
+  else:
+    return ret
+
+  for match in start_pattern.finditer(log):
+    job_id = match.group(1)
+
+    if with_state:
+      if job_id not in list(job['job_id'] for job in ret):
+        ret.append({'job_id': job_id, 'started': False, 'finished': False})
+      start_pattern = 'Executing command(queryId=%s' % job_id
+      end_pattern = 'Completed executing command(queryId=%s' % job_id
+
+      if start_pattern in log:
+        job = next((job for job in ret if job['job_id'] == job_id), None)
+        if job is not None:
+          job['started'] = True
+        else:
+          ret.append({'job_id': job_id, 'started': True, 'finished': False})
+
+      if end_pattern in log:
+        job = next((job for job in ret if job['job_id'] == job_id), None)
+        if job is not None:
+          job['finished'] = True
+        else:
+          ret.append({'job_id': job_id, 'started': True, 'finished': True})
+    else:
+      if job_id not in ret:
+        ret.append(job_id)
+
+  return ret
 
 def _copy_prefix(prefix, base_dict):
   """Copy keys starting with ``prefix``"""

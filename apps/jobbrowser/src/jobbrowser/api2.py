@@ -52,7 +52,7 @@ def jobs(request, interface=None):
   response = {'status': -1}
 
   cluster = json.loads(request.POST.get('cluster', '{}'))
-  interface = json.loads(request.POST.get('interface'))
+  interface = interface or json.loads(request.POST.get('interface'))
   filters = dict([(key, value) for _filter in json.loads(request.POST.get('filters', '[]')) for key, value in list(_filter.items()) if value])
 
   jobs = get_api(request.user, interface, cluster=cluster).apps(filters)
@@ -69,7 +69,7 @@ def job(request, interface=None):
   response = {'status': -1}
 
   cluster = json.loads(request.POST.get('cluster', '{}'))
-  interface = json.loads(request.POST.get('interface'))
+  interface = interface or json.loads(request.POST.get('interface'))
   app_id = json.loads(request.POST.get('app_id'))
 
   response_app = get_api(request.user, interface, cluster=cluster).app(app_id)

@@ -126,7 +126,7 @@ class QueryHistory(object):
       by_user = self.by_user.get(request_user)
       if by_user and by_user['filters'] == filters:
         del self.by_user[request_user] # Moving request_user to head of queue
-        by_user[request_user] = by_user
+        self.by_user[request_user] = by_user
         return by_user
       return None
     finally:

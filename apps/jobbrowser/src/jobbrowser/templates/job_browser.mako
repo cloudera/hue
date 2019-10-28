@@ -20,7 +20,7 @@ from desktop.conf import CUSTOM, IS_K8S_ONLY
 from desktop.views import commonheader, commonfooter, _ko
 from metadata.conf import PROMETHEUS
 
-from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH, ENABLE_QUERY_BROWSER
+from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH, ENABLE_QUERY_BROWSER, ENABLE_HIVE_QUERY_BROWSER
 %>
 
 <%
@@ -3592,7 +3592,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('impala') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
         };
         var queryHiveInterfaceCondition = function () {
-          return '${ ENABLE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('hive') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
+          return '${ ENABLE_HIVE_QUERY_BROWSER.get() }' == 'True' && self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('hive') != -1 && (!self.cluster() || self.cluster()['type'].indexOf('altus') == -1);
         };
 
         var interfaces = [

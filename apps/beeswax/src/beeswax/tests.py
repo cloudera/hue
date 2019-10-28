@@ -79,7 +79,7 @@ import beeswax.views
 from beeswax import conf, hive_site
 from beeswax.common import apply_natural_sort
 from beeswax.conf import HIVE_SERVER_HOST, AUTH_USERNAME, AUTH_PASSWORD, AUTH_PASSWORD_SCRIPT
-from beeswax.views import collapse_whitespace, _save_design, parse_out_jobs
+from beeswax.views import collapse_whitespace, _save_design, parse_out_jobs, parse_out_queries
 from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server_config,\
   fetch_query_result_data
 from beeswax.design import hql_query
@@ -134,6 +134,28 @@ def get_csv(client, result_response):
   csv_resp = client.get(csv_link)
   return ''.join(csv_resp.streaming_content)
 
+
+class TestBeeswax(object):
+  def test_parse_out_queries(self):
+    text = """INFO  : Compiling command(queryId=hive_20191029132605_17883ebe-d3d5-41bf-a1e9-01cf207a3c6b): select 1
+INFO  : Semantic Analysis Completed (retrial = false)
+INFO  : Returning Hive schema: Schema(fieldSchemas:[FieldSchema(name:_c0, type:int, comment:null)], properties:null)
+INFO  : Completed compiling command(queryId=hive_20191029132605_17883ebe-d3d5-41bf-a1e9-01cf207a3c6b); Time taken: 0.031 seconds
+INFO  : Executing command(queryId=hive_20191029132605_17883ebe-d3d5-41bf-a1e9-01cf207a3c6b): select 1
+INFO  : Completed executing command(queryId=hive_20191029132605_17883ebe-d3d5-41bf-a1e9-01cf207a3c6b); Time taken: 0.004 seconds
+INFO  : OK"""
+    jobs = parse_out_queries(text, engine='tez', with_state=True)
+    assert_true(jobs and jobs[0]['job_id'] == 'hive_20191029132605_17883ebe-d3d5-41bf-a1e9-01cf207a3c6b')
+    assert_true(jobs and jobs[0]['started'] == True)
+    assert_true(jobs and jobs[0]['finished'] == True)
+
+    text = """INFO  : Compiling command(queryId=hive_20191029132605_17883ebe-d3d5-41bf-a1e9-01cf207a3c6a): select 1
+INFO  : OK"""
+    jobs = parse_out_queries(text, engine='tez', with_state=True)
+    assert_true(jobs and jobs[0]['job_id'] == 'hive_20191029132605_17883ebe-d3d5-41bf-a1e9-01cf207a3c6a')
+    assert_true(jobs and jobs[0]['started'] == False)
+    assert_true(jobs and jobs[0]['finished'] == False)
+    
 
 class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
   requires_hadoop = True
