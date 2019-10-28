@@ -824,26 +824,36 @@ def user_preferences(request, key=None):
 @api_error_handler
 def gist_create(request):
   '''
-  Only supporting Editor currently.
+  Only supporting Editor App currently.
   '''
   response = {'status': 0}
 
-  text = request.POST.get('text', '')
-  gist_type = request.POST.get('type', 'query-hive')
+  statement = request.POST.get('statement', '')
+  gist_type = request.POST.get('doc_type', 'query-hive')
   name = request.POST.get('name', '')
   description = request.POST.get('description', '')
+
+  if not name:
+    name = _('%s Query') % gist_type.rsplit('-')[-1].capitalize()
+  if not statement.strip().startswith('--'):
+    statement = '-- Created by %s\n\n%s' % (request.user.get_full_name() or request.user.username, statement)
 
   gist_doc = Document2.objects.create(
     name=name,
     type='gist',
     owner=request.user,
-    data=json.dumps({'text': text}),
-    extra=gist_type
+    data=json.dumps({'statement': statement}),
+    extra=gist_type,
+    parent_directory=Document2.objects.get_gist_directory(request.user)
   )
 
   response['id'] = gist_doc.id
   response['uuid'] = gist_doc.uuid
-  response['link'] = '/gist?=%s' % gist_doc.uuid
+  response['link'] = '%(scheme)s://%(host)s/hue/gist?uuid=%(uuid)s' % {
+    'scheme': 'https' if request.is_secure() else 'http',
+    'host': request.get_host(),
+    'uuid': gist_doc.uuid,
+  }
 
   return JsonResponse(response)
 
@@ -853,8 +863,7 @@ def gist_get(request):
 
   gist_doc = _get_gist_document(uuid=gist_uuid)
 
-  return redirect('%(host)s/hue/editor?gist=%(uuid)s&type=%s(type)' % {
-    'host': get_host(),
+  return redirect('/hue/editor?gist=%(uuid)s&type=%(type)s' % {
     'uuid': gist_doc.uuid,
     'type': gist_doc.extra.rsplit('-')[-1]
   })

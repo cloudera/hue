@@ -1915,10 +1915,11 @@ class Snippet {
       if (self.isSqlDialect()) {
         apiHelper
           .createGist({
-            text:
+            statement:
               self.ace().getSelectedText() != ''
                 ? self.ace().getSelectedText()
                 : self.statement_raw(),
+            doc_type: self.type(),
             name: self.name(),
             description: ''
           })

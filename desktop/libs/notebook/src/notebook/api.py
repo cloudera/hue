@@ -34,7 +34,7 @@ from azure.abfs.__init__ import abfspath
 from desktop.conf import TASK_SERVER
 from desktop.lib.i18n import smart_str
 from desktop.lib.django_util import JsonResponse
-from desktop.models import Document2, Document, __paginate
+from desktop.models import Document2, Document, __paginate, _get_gist_document
 from indexer.file_format import HiveFormat
 from indexer.fields import Field
 
@@ -64,12 +64,14 @@ def create_notebook(request):
   directory_uuid = request.POST.get('directory_uuid')
 
   if gist_id:
-    editor_type = 'impala'
+    gist_doc = _get_gist_document(uuid=gist_id)
+    statement = json.loads(gist_doc.data)['statement']
+
     editor = make_notebook(
-      name='name',
-      description='desc',
+      name='',
+      description='',
       editor_type=editor_type,
-      statement='SELECT ...',
+      statement=statement,
     )
   else:
     editor = Notebook()
