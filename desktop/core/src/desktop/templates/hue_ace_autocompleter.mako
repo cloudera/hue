@@ -591,7 +591,7 @@ from desktop.views import _ko
           };
 
           if (!self.active() || (!self.base || newBase.column !== self.base.column || newBase.row !== self.base.row)) {
-            self.autocompleter.autocomplete().then(() => {
+            self.autocompleter.autocomplete().then(function () {
               afterAutocomp();
               self.attach();
             }).catch(afterAutocomp);
