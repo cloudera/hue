@@ -82,6 +82,7 @@
 'INNER'                              { return 'INNER'; }
 'INSERT'                             { parser.determineCase(yytext); return 'INSERT'; }
 'INT'                                { return 'INT'; }
+'INTEGER'                            { return 'INTEGER'; }
 'INTO'                               { return 'INTO'; }
 'IS'                                 { return 'IS'; }
 'JOIN'                               { return 'JOIN'; }

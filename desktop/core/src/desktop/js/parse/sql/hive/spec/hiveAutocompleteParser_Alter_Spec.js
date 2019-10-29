@@ -361,7 +361,7 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
       assertAutoComplete({
         beforeCursor: 'ALTER TABLE bar ADD COLUMNS (boo ',
         afterCursor: '',
-        containsKeywords: ['INT', 'STRUCT<>'],
+        containsKeywords: ['INT', 'INTEGER', 'STRUCT<>'],
         expectedResult: {
           lowerCase: false
         }

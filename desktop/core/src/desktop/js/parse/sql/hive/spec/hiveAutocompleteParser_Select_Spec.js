@@ -2211,7 +2211,7 @@ describe('hiveAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'select cast(bla as ',
         afterCursor: '',
-        containsKeywords: ['INT', 'STRING'],
+        containsKeywords: ['INT', 'INTEGER', 'STRING'],
         expectedResult: {
           lowerCase: true
         }

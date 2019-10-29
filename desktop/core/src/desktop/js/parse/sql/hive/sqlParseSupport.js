@@ -249,6 +249,7 @@ const initSqlParser = function(parser) {
       'DOUBLE PRECISION',
       'FLOAT',
       'INT',
+      'INTEGER',
       'SMALLINT',
       'TIMESTAMP',
       'STRING',
