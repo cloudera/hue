@@ -120,6 +120,8 @@ Fix the possible missing Python headers message by installing the MacOS SDK head
 
 ### Oracle Client lib
 
+#### Version 11
+
 Download both instantclient-basic and instantclient-sdk of the same version (11.2.0.4.0 for this example) and on your ~/.bash_profile, add
 
     export ORACLE_HOME=/usr/local/share/oracle
@@ -143,6 +145,20 @@ and finally
 
     cd sdk
     unzip ottclasses.zip
+
+#### Version 12
+
+Hue comes with an older Oracle client cx_Oracle-5.2.1 Python module so it will fail. We need to do the above client install and then upgrade Hue's client module to at least cx_Oracle-5.3.
+
+Make sure you have the `python-dev` package dependencies, ensure that ORACLE_HOME and LB_LIBRARY_PATH are properly set so that pip knows which version to install, then:
+
+    echo $ORACLE_HOME $LD_LIBRARY_PATH
+
+    ./build/env/bin/pip install cx_Oracle
+
+Tip: You can also wget the proper cx_Oracle file yourself: https://pypi.python.org/pypi/cx_Oracle/.
+
+There is more details on this [Apply Temporary Workaround for Oracle 12 Client](https://docs.cloudera.com/documentation/enterprise/latest/topics/hue_dbs_oracle_pkg.html#concept_qx3_hfw_4z).
 
 ### Supported Browsers
 
