@@ -33,10 +33,9 @@ Configuration of the connectors is currently done by the [Administrator](/admini
 
 When you have multiple statements it's enough to put the cursor in the statement you want to execute, the active statement is indicated with a blue gutter marking.
 
-**Note**: Use CTRL/Cmd + ENTER to execute queries.
+**Note**: Use `CTRL/Cmd + ENTER` to execute queries.
 
-**Note**: Under the logs panel, you can view any
-MapReduce or [Impala jobs](#impala-queries) that the query generated.
+**Note**: Under the logs panel, you can view any MapReduce or Impala queries.
 
 **Advanced Query Settings**
 
@@ -90,11 +89,23 @@ Right click on any fragement of the queries (e.g. a table name) to gets all its 
 
 A little red underline will display the incorrect syntax so that the query can be fixed before submitting. A right click offers suggestions.
 
-**All about quality**
+**Advanced Settings**
 
-The live autocompletion is fine-tuned for a better experience advanced settings an be accessed via CTRL + , (or on Mac CMD + ,) or clicking on the '?' icon.
+The live autocompletion is fine-tuned for a better experience advanced settings an be accessed via `CTRL +` , (or on Mac `CMD + ,`) or clicking on the '?' icon.
 
 The autocompleter talks to the backend to get data for tables and databases etc and caches it to keep it quick. Clicking on the refresh icon in the left assist will clear the cache. This can be useful if a new table was created outside of Hue and is not yet showing-up (Hue will regularly clear his cache to automatically pick-up metadata changes done outside of Hue).
+
+### Language reference
+
+You can find the Language Reference in the right assist panel. The right panel itself has a new look with icons on the left hand side and can be minimised by clicking the active icon.
+
+The filter input on top will only filter on the topic titles in this initial version. Below is an example on how to find documentation about joins in select statements.
+
+![Language Reference Panel](https://cdn.gethue.com/uploads/2018/10/impala_lang_ref_joins.gif)
+
+While editing a statement there’s a quicker way to find the language reference for the current statement type, just right-click the first word and the reference appears in a popover below:
+
+![Language Reference context](https://cdn.gethue.com/uploads/2018/10/impala_lang_ref_context.png)
 
 ### Variables
 Variables are used to easily configure parameters in a query. They are ideal for saving reports that can be shared or executed repetitively:
@@ -129,7 +140,20 @@ These visualizations are convenient for plotting chronological data or when subs
 * Scattered plot
 * Maps (Marker and Gradient)
 
-Read more about extending [charts](../../developer/).
+Read more about extending [charts](/developer/).
+
+### Context popup
+
+It’s quite handy to be able to look at column samples while writing a query to see what type of values you can expect. Hue now has the ability to perform some operations on the sample data, you can now view distinct values as well as min and max values. Expect to see more operations in coming releases.
+
+![Sample column popup](https://cdn.gethue.com/uploads/2018/10/sample_context_operations.gif)
+
+### Editor dark mode
+We’ve introduced a dark mode for the editor! Initially this mode is limited to the actual editor area and we’re considering extending this to cover all of Hue.
+
+![Editor Dark Mode](https://cdn.gethue.com/uploads/2018/10/editor_dark_mode.png)
+
+To toggle the dark mode you can either press `Ctrl-Alt-T` or `Command-Option-T` on Mac while the editor has focus. Alternatively you can control this through the settings menu which is shown by pressing `Ctrl-`, or `Command-`, on Mac.
 
 ### Self service troubleshooting
 
@@ -204,7 +228,7 @@ Apache Kylin is an open-source online analytical processing (OLAP) engine.
 See how to configure the [Kylin Query Editor](http://gethue.com/using-hue-to-interact-with-apache-kylin/).
 
 ### Others
-Check the [list](/administrator/configuration/connectors/) or extend with SQL Alchemy, JDBC or build your own [connectors](../../developer/).
+Check the [list](/administrator/configuration/connectors/) or extend with SQL Alchemy, JDBC or build your own [connectors](/developer/).
 
 
 ## Dashboards
