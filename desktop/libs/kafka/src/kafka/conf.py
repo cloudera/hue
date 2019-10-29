@@ -46,6 +46,11 @@ KAFKA = ConfigSection(
     API_URL=Config(
       key='api_url',
       help=_t('Base URL of Kafka REST API.'),
-      default=None),
+      default=None
+    ),
+    KSQL_API_URL=Config(
+      key='ksql_api_url',
+      help=_t('Base URL of Kafka Ksql API.'),
+      default='http://127.0.0.1:8088'),
   )
 )
