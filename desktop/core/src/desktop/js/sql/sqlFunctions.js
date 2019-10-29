@@ -1966,7 +1966,7 @@ const SqlFunctions = (function() {
         signature: 'from_unixtime(BIGINT unixtime [, STRING format])',
         draggable: 'from_unixtime()',
         description:
-          "Converts time string in format yyyy-MM-dd HH:mm:ss to Unix timestamp (in seconds), using the default timezone and the default locale, return 0 if fail: unix_timestamp('2009-03-20 11:30:01') = 1237573801"
+          "Converts the number of seconds from unix epoch (1970-01-01 00:00:00 UTC) to a string representing the timestamp of that moment in the current system time zone in the format of '1970-01-01 00:00:00'"
       },
       from_utc_timestamp: {
         returnTypes: ['TIMESTAMP'],
