@@ -396,6 +396,9 @@ def get_api(request, snippet):
   elif interface == 'hbase':
     from notebook.connectors.hbase import HBaseApi
     return HBaseApi(request.user)
+  elif interface == 'ksql':
+    from notebook.connectors.ksql import KSqlApi
+    return KSqlApi(request.user)
   elif interface == 'kafka':
     from notebook.connectors.kafka import KafkaApi
     return KafkaApi(request.user)

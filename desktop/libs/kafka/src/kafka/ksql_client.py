@@ -56,7 +56,7 @@ class KSqlApi(object):
     except ImportError:
       raise KSqlApiException('Module missing: pip install ksql')
 
-    self._api_url = KAFKA.API_URL.get().strip('/') if KAFKA.API_URL.get() else ''
+    self._api_url = KAFKA.KSQL_API_URL.get().strip('/') if KAFKA.KSQL_API_URL.get() else ''
 
     self.user = user
     self.client = client = KSQLAPI(self._api_url)
