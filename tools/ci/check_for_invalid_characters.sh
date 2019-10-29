@@ -21,12 +21,13 @@ FOUND_ISSUE=0
 
 for f in `git diff --name-only origin/master --diff-filter=b`
 do
- grep --color='auto' -P -n "[^\x00-\x7F]" --binary-files=without-match $f
+ grep --color='auto' -P -n "[\x80-\xFF]" --binary-files=without-match $f
  if [ "$?" -eq "0" ]
   then
-    echo "Non ASCII characters found in $f"
+    echo "Invalid characters found in $f"
     FOUND_ISSUE=-1
   fi
 done
 
-exit $FOUND_ISSUE
+#exit $FOUND_ISSUE
+echo $FOUND_ISSUE
