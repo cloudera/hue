@@ -24,9 +24,9 @@ from django.core.cache import cache
 from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import smart_unicode
+from desktop.lib.rest.http_client import RestException
 
 from kafka.conf import KAFKA
-from libzookeeper.conf import zkensemble
 
 
 LOG = logging.getLogger(__name__)
@@ -64,16 +64,16 @@ class KSqlApi(object):
 
   def show_tables(self):
     try:
-      response = self._client.ksql('show tables')
-      return json.loads(response)['tables']['tables']
-    except RestException as e:
-      raise KafkaApiException(e)
+      response = self.client.ksql('SHOW TABLES')
+      return response[0]['tables']
+    except Exception as e:
+      raise KSqlApiException(e)
 
 
   def query(self, statement):
     result = []
 
-    for line in self._client.query(statement):
+    for line in self.client.query(statement):
       data_line = json.loads(line)
       result.append(data_line['row']['columns']) # TODO: streams, dataline['errorMessage']
 
