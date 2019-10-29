@@ -684,6 +684,17 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
       });
     });
 
+    it('should handle for "CREATE TABLE foo (id INTEGER);|"', () => {
+      assertAutoComplete({
+        beforeCursor: 'CREATE TABLE foo (id INTEGER);',
+        afterCursor: '',
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
     it('should suggest keywords for "CREATE TABLE foo (id |"', () => {
       assertAutoComplete({
         beforeCursor: 'CREATE TABLE foo (id ',

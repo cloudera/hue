@@ -370,6 +370,7 @@ NonStartingToken
  | 'INPATH'
  | 'INPUTFORMAT'
  | 'INT'
+ | 'INTEGER'
  | 'INTO'
  | 'IS'
  | 'ITEMS'
@@ -1121,6 +1122,7 @@ PrimitiveType
  | 'DOUBLE_PRECISION'
  | 'FLOAT'
  | 'INT'
+ | 'INTEGER'
  | 'SMALLINT'
  | 'STRING'
  | 'TIMESTAMP'
@@ -3456,35 +3458,35 @@ CountFunction_EDIT
  ;
 
 ExtractFunction
- : 'EXTRACT' '(' DateField 'FROM' ValueExpression ')'  -> { types: ['INT'] }
+ : 'EXTRACT' '(' DateField 'FROM' ValueExpression ')'  -> { types: ['INT', 'INTEGER'] }
  ;
 
 ExtractFunction_EDIT
  : 'EXTRACT' '(' AnyCursor RightParenthesisOrError
    {
      parser.suggestKeywords(['DAY', 'DAYOFWEEK', 'HOUR', 'MINUTE', 'MONTH', 'QUARTER', 'SECOND', 'WEEK', 'YEAR']);
-     $$ = { types: ['INT'] }
+     $$ = { types: ['INT', 'INTEGER'] }
    }
  | 'EXTRACT' '(' DateField 'CURSOR' RightParenthesisOrError
    {
      parser.suggestKeywords(['FROM']);
-     $$ = { types: ['INT'] }
+     $$ = { types: ['INT', 'INTEGER'] }
    }
  | 'EXTRACT' '(' DateField 'FROM' 'CURSOR' RightParenthesisOrError
    {
      parser.valueExpressionSuggest();
-     $$ = { types: ['INT'] }
+     $$ = { types: ['INT', 'INTEGER'] }
    }
- | 'EXTRACT' '(' DateField 'FROM' ValueExpression_EDIT RightParenthesisOrError  -> { types: ['INT'] }
+ | 'EXTRACT' '(' DateField 'FROM' ValueExpression_EDIT RightParenthesisOrError  -> { types: ['INT', 'INTEGER'] }
  | 'EXTRACT' '(' AnyCursor 'FROM' ValueExpression RightParenthesisOrError
    {
       parser.suggestKeywords(['DAY', 'DAYOFWEEK', 'HOUR', 'MINUTE', 'MONTH', 'QUARTER', 'SECOND', 'WEEK', 'YEAR']);
-      $$ = { types: ['INT'] }
+      $$ = { types: ['INT', 'INTEGER'] }
    }
  | 'EXTRACT' '(' DateField 'CURSOR' ValueExpression RightParenthesisOrError
    {
      parser.suggestKeywords(['FROM']);
-     $$ = { types: ['INT'] }
+     $$ = { types: ['INT', 'INTEGER'] }
    }
  ;
 
