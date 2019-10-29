@@ -39,7 +39,7 @@ Example of searches:
 * owner:admin type:field usage → List all the fields created by the admin user that matches the usage string
 * parentPath:"/default/web_logs" type:FIELD  originalName:b* → List all the columns starting with `b` of the table `web_logs` in the database `default`.
 
-Learn more on the [Tagging](https://blog.cloudera.com/blog/2017/05/new-in-cloudera-enterprise-5-11-hue-data-search-and-tagging/).
+Learn more on the [Search](http://gethue.com/realtime-catalog-search-with-hue-and-apache-atlas/).
 
 ### Tagging
 
@@ -51,6 +51,8 @@ Data where you need it when you need it.
 
 Find your documents, HDFS and S3 files and more in the left assist panel, right-clicking items will show a list of actions, you can also drag-and-drop a file to get the path in your editor and more.
 
+![Left assist Navigation and drop](https://cdn.gethue.com/uploads/2018/05/HDFS_Context_Change_Path_2.gif)
+
 ### Right assist
 
 This assistant content depends on the context of the application selected and will display the current tables or available UDFs.
@@ -58,6 +60,8 @@ This assistant content depends on the context of the application selected and wi
 ### Sample popup
 
 This popup offers a quick way to see sample of the data and other statistics on databases, tables, and columns. You can open the popup from the SQL Assist or with a right-click on any SQL object (table, column, function…). In this release, it also opens faster and caches the data.
+
+![Sample popup Navigation](https://cdn.gethue.com/uploads/2018/05/SQL_Context_Navigation.gif)
 
 ## Documents
 
