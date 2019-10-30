@@ -104,9 +104,10 @@ class KSqlApi(object):
 
     if result['@type'] == 'statement_error':
       raise KSqlApiException(result['message'])
-    elif result['@type'] == 'kafka_topics':
-      columns = result['topics'][0].keys()
-      for line in result['topics']:
+    elif result['@type'] in ('kafka_topics', 'streams'):
+      result_type = 'topics' if result['@type'] == 'kafka_topics' else result['@type']
+      columns = result[result_type][0].keys()
+      for line in result[result_type]:
         row = []
         for column in columns:
           row.append(
