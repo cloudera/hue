@@ -124,6 +124,9 @@ class KSqlApi(object):
           data.append(['', ''])
         else:
           data.append([key, result['sourceDescription'][key]])
+    elif result['@type'] == 'currentStatus':
+      data.append([result['commandStatus']['status']])
+      data.append([result['commandStatus']['message']])
 
     columns = [[col, 'STRING'] for col in columns]
 
