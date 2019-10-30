@@ -81,13 +81,14 @@ class KSqlApi(object):
     metadata = []
 
     if statement.strip().lower().startswith('select') or statement.strip().lower().startswith('print'):
-      # STREAMS requires a LIMIT currently or https://github.com/bryanyang0528/ksql-python/pull/60
+      # STREAMS requires a LIMIT currently or will hang without https://github.com/bryanyang0528/ksql-python/pull/60
       result = self.client.query(statement)
       for line in ''.join(list(result)).split('\n'):
         # Until https://github.com/bryanyang0528/ksql-python/issues/57
         # columns = line.keys()
         # data.append([line[col] for col in columns])
         data.append([line])
+        # TODO: WS to plug-in
       metadata = [['Row', 'STRING']]
     else:
       data, metadata = self._decode_result(
@@ -112,6 +113,17 @@ class KSqlApi(object):
             json.dumps(line[column])
           )
         data.append(row)
+    elif result['@type'] == 'sourceDescription':
+      columns = ['name', 'description']
+      for key in result['sourceDescription']:
+        if key == 'fields':
+          data.append(['', ''])
+          data.append(['Fields:', ''])
+          for field in result['sourceDescription'][key]:
+            data.append([field['name'], field['schema']['type']])
+          data.append(['', ''])
+        else:
+          data.append([key, result['sourceDescription'][key]])
 
     columns = [[col, 'STRING'] for col in columns]
 
