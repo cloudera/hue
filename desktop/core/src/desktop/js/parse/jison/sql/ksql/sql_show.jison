@@ -15,25 +15,25 @@
 // limitations under the License.
 
 DataDefinition
- : UseStatement
+ : 'SHOW' ShowStatement
  ;
 
 DataDefinition_EDIT
- : UseStatement_EDIT
+ : ShowStatement_EDIT
  ;
 
-UseStatement
- : 'USE' RegularIdentifier
-   {
-     if (! parser.yy.cursorFound) {
-       parser.yy.result.useDatabase = $2;
-     }
-   }
+ShowStatement
+ : 'TABLES'
+ | 'STREAMS'
+ | 'TOPICS'
+ | 'QUERIES'
+ | 'PROPERTIES'
  ;
 
-UseStatement_EDIT
- : 'USE' 'CURSOR'
+
+ShowStatement_EDIT
+ : 'SHOW' 'CURSOR'
    {
-     parser.suggestDatabases();
+     parser.suggestKeywords(['TABLES', 'STREAMS', 'TOPICS', 'QUERIES', 'PROPERTIES']);
    }
  ;
