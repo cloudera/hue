@@ -104,16 +104,17 @@ class KSqlApi(object):
 
     if result['@type'] == 'statement_error':
       raise KSqlApiException(result['message'])
-    elif result['@type'] in ('kafka_topics', 'streams', 'tables'):
+    elif result['@type'] in ('kafka_topics', 'streams', 'tables', 'queries'):
       result_type = 'topics' if result['@type'] == 'kafka_topics' else result['@type']
-      columns = result[result_type][0].keys()
-      for line in result[result_type]:
-        row = []
-        for column in columns:
-          row.append(
-            json.dumps(line[column])
-          )
-        data.append(row)
+      if result[result_type]:
+        columns = result[result_type][0].keys()
+        for line in result[result_type]:
+          row = []
+          for column in columns:
+            row.append(
+              json.dumps(line[column])
+            )
+          data.append(row)
     elif result['@type'] == 'sourceDescription':
       columns = ['name', 'description']
       for key in result['sourceDescription']:
