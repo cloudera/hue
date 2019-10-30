@@ -105,6 +105,7 @@ CONFIG_WHITELIST = Config(
 IMPALA_CONF_DIR = Config(
   key='impala_conf_dir',
   help=_t('Impala configuration directory, where impala_flags is located.'),
+  type=str,
   default=os.environ.get("HUE_CONF_DIR", get_desktop_root("conf")) + '/impala-conf'
 )
 
