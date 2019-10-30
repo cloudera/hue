@@ -106,5 +106,5 @@ def _parse_impala_flags():
       LOG.error('Cannot read from "%s": %s' % (impala_flags_path, err))
     _IMPALA_FLAGS = {}
   except Exception as ex:
-    LOG.error('Failed to parse Impala config from "%s": %s' % (impala_flags_path, ex))
+    LOG.error('Failed to parse Impala flag file %s' % ex)
     _IMPALA_FLAGS = {}
