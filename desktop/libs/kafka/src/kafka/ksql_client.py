@@ -80,10 +80,15 @@ class KSqlApi(object):
     data = []
     metadata = []
 
-    if statement.strip().lower().startswith('select'):
-      for line in self.client.query(statement):
-        data_line = json.loads(line)
-        data.append(data_line['row']['columns']) # TODO: streams, dataline['errorMessage']
+    if statement.strip().lower().startswith('select') or statement.strip().lower().startswith('print'):
+      # STREAMS requires a LIMIT currently or https://github.com/bryanyang0528/ksql-python/pull/60
+      result = self.client.query(statement)
+      for line in ''.join(list(result)).split('\n'):
+        # Until https://github.com/bryanyang0528/ksql-python/issues/57
+        # columns = line.keys()
+        # data.append([line[col] for col in columns])
+        data.append([line])
+      metadata = [['Row', 'STRING']]
     else:
       data, metadata = self._decode_result(
         self.ksql(statement)
@@ -96,7 +101,9 @@ class KSqlApi(object):
     columns = []
     data = []
 
-    if result['@type'] == 'kafka_topics':
+    if result['@type'] == 'statement_error':
+      raise KSqlApiException(result['message'])
+    elif result['@type'] == 'kafka_topics':
       columns = result['topics'][0].keys()
       for line in result['topics']:
         row = []
