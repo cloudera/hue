@@ -80,14 +80,19 @@ class KSqlApi(object):
     data = []
     metadata = []
 
-    if statement.strip().lower().startswith('select') or statement.strip().lower().startswith('print'):
+    is_select = statement.strip().lower().startswith('select')
+    if is_select or statement.strip().lower().startswith('print'):
       # STREAMS requires a LIMIT currently or will hang without https://github.com/bryanyang0528/ksql-python/pull/60
       result = self.client.query(statement)
-      for line in ''.join(list(result)).split('\n'):
-        # Until https://github.com/bryanyang0528/ksql-python/issues/57
+      for line in ''.join(list(result)).split('\n'): # Until https://github.com/bryanyang0528/ksql-python/issues/57
         # columns = line.keys()
         # data.append([line[col] for col in columns])
-        data.append([line])
+        if is_select and line: # Empty first 2 lines?
+          data_line = json.loads(line)
+          if data_line['row']: # If limit not reached
+            data.append(data_line['row']['columns'])
+        else:
+          data.append([line])
         # TODO: WS to plug-in
       metadata = [['Row', 'STRING']]
     else:
