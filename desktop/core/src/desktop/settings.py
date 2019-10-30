@@ -204,6 +204,8 @@ INSTALLED_APPS = [
     # Desktop injects all the other installed apps into here magically.
     'desktop',
 
+    'channels',
+
     # App that keeps track of failed logins.
     'axes',
     'webpack_loader',
@@ -479,6 +481,17 @@ if EMAIL_BACKEND == 'sendgrid_backend.SendgridBackend':
   SENDGRID_API_KEY = desktop.conf.get_smtp_password()
   SENDGRID_SANDBOX_MODE_IN_DEBUG = DEBUG
 
+
+ASGI_APPLICATION = 'desktop.routing.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 # Used for securely creating sessions. Should be unique and not shared with anybody. Changing auth backends will invalidate all open sessions.
 SECRET_KEY = desktop.conf.get_secret_key()

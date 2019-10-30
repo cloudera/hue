@@ -45,6 +45,7 @@ if sys.version_info[0] > 2:
 else:
   new_str = unicode
 
+
 LOG = logging.getLogger(__name__)
 
 
