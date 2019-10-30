@@ -527,6 +527,8 @@ class Api(object):
   def describe_database(self, notebook, snippet, database=None):
     return {}
 
+  def close_statement(self, notebook, snippet): pass
+
   def _get_current_statement(self, notebook, snippet):
     should_close, resp = get_current_statement(snippet)
     if should_close:

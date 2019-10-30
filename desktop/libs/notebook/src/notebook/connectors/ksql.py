@@ -51,7 +51,7 @@ class KSqlApi(Api):
 
   @query_error_handler
   def execute(self, notebook, snippet):
-    data, description = query_and_fetch(self.db, snippet['statement'], 1000)
+    data, description = self.db.query(snippet['statement'])
     has_result_set = data is not None
 
     return {

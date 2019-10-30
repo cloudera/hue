@@ -70,11 +70,42 @@ class KSqlApi(object):
       raise KSqlApiException(e)
 
 
+  def ksql(self, statement):
+    response = self.client.ksql(statement)
+    print(response)
+    return response[0]
+
+
   def query(self, statement):
-    result = []
+    data = []
+    metadata = []
 
-    for line in self.client.query(statement):
-      data_line = json.loads(line)
-      result.append(data_line['row']['columns']) # TODO: streams, dataline['errorMessage']
+    if statement.strip().lower().startswith('select'):
+      for line in self.client.query(statement):
+        data_line = json.loads(line)
+        data.append(data_line['row']['columns']) # TODO: streams, dataline['errorMessage']
+    else:
+      data, metadata = self._decode_result(
+        self.ksql(statement)
+      )
 
-    return result
+    return data, metadata
+
+
+  def _decode_result(self, result):
+    columns = []
+    data = []
+
+    if result['@type'] == 'kafka_topics':
+      columns = result['topics'][0].keys()
+      for line in result['topics']:
+        row = []
+        for column in columns:
+          row.append(
+            json.dumps(line[column])
+          )
+        data.append(row)
+
+    columns = [[col, 'STRING'] for col in columns]
+
+    return data, columns

@@ -495,6 +495,7 @@ class ApiWrapper(object):
   def __init__(self, request, snippet):
     self.request = request
     self.api = _get_api(request, snippet)
+
   def __getattr__(self, name):
     from notebook import tasks as ntasks
     if TASK_SERVER.ENABLED.get() and hasattr(ntasks, name):
