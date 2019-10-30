@@ -158,6 +158,10 @@ Make sure you have the `python-dev` package dependencies, ensure that ORACLE_HOM
 
 Tip: You can also wget the proper cx_Oracle file yourself: https://pypi.python.org/pypi/cx_Oracle/.
 
+Tip: Going to where is the Oracle client, e.g. /usr/local/share/oracle then creating a symlink similar to below could even trick the cx_Oracle-5.2.1 module to work with 12.2 without doing the pip upgrade:
+
+    ln -s libclntsh.so.12.2 libclntsh.so.11.1
+
 There is more details on this [Apply Temporary Workaround for Oracle 12 Client](https://docs.cloudera.com/documentation/enterprise/latest/topics/hue_dbs_oracle_pkg.html#concept_qx3_hfw_4z).
 
 ### Supported Browsers
