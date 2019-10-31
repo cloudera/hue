@@ -42,6 +42,9 @@ const TEMPLATE = `
       'Delete document'
     )}</a></li>
     <!-- /ko -->
+    <li><a href="javascript: void(0);" data-bind="publish: { 'doc.show.share.modal': $data }"><i class="fa fa-fw fa-users"></i> ${I18n(
+      'Share'
+    )}</a></li>
   </script>
   
   <script type="text/html" id="assist-document-header-actions">

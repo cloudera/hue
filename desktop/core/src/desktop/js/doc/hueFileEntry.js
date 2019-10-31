@@ -376,7 +376,7 @@ class HueFileEntry {
     }
     if (this.selectedEntry()) {
       this.selectedEntry().loadDocument();
-      $('#shareDocumentModal').modal('show');
+      huePubSub.publish('doc.show.share.modal', this.selectedEntry());
     }
   }
 

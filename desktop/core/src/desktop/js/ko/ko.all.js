@@ -163,6 +163,7 @@ import 'ko/components/ko.pollingCatalogEntriesList';
 import 'ko/components/ko.sentryPrivileges';
 import 'ko/components/ko.sessionAuthModal';
 import 'ko/components/ko.sessionPanel';
+import 'ko/components/ko.shareDocModal';
 import 'ko/components/ko.sidebar';
 import 'ko/components/ko.sqlColumnsTable';
 
