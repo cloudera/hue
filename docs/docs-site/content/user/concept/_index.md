@@ -28,6 +28,8 @@ Have you ever struggled to remember table names related to your project? Does it
 
 The new search bar is always accessible on the top of screen, and it offers a document search and metadata search too if Hue is configured to access a metadata server.
 
+![Top Search](https://cdn.gethue.com/uploads/2016/04/table_search.png)
+
 Existing tags and indexed objects show up automatically, any additional tags you add appear back in metadata server, and the familiar metadata server search syntax is supported.
 
 By default, only tables and views are returned. To search for columns, partitions, databases use the ‘type:' filter.
@@ -40,6 +42,8 @@ Example of searches:
 * parentPath:"/default/web_logs" type:FIELD  originalName:b* → List all the columns starting with `b` of the table `web_logs` in the database `default`.
 
 Learn more on the [Search](http://gethue.com/realtime-catalog-search-with-hue-and-apache-atlas/).
+
+![Data Catalog](https://cdn.gethue.com/uploads/2016/04/tags.png)
 
 ### Tagging
 
@@ -76,7 +80,9 @@ Two types of sharing permissions exist:
 - read only
 - can modify
 
-Shared documents will show-up with a little blue icon in the homepage.
+Shared documents will show-up with a little blue icon.
+
+![Sharing](https://cdn.gethue.com/uploads/2019/04/editor_sharing.png)
 
 ### Import / Export
 
