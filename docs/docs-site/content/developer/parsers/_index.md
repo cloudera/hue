@@ -256,7 +256,7 @@ After the bundling you can now test it directly in the editor!
 
 ## Syntax highlighting
 
-New keywords might not be properly colored highligted in the editor. This is especially true when adding a new language. Here is how to fix that.
+New keywords might not be properly colored highlighted in the editor. This is especially true when adding a new language. Here is how to fix that.
 
 ![Missing highlighting](https://cdn.gethue.com/docs/dev/syntax_highlighting_missing.png)
 

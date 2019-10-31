@@ -227,26 +227,21 @@ Make sure that the Notebook and interpreters are set in the hue.ini, and Livy is
       livy_server_host=localhost
 
     [notebook]
-
-    ## Show the notebook menu or not
-    show_notebooks=true
+      show_notebooks=true
 
     [[interpreters]]
-        # Define the name and how to connect and execute the language.
 
-        [[[hive]]]
-          # The name of the snippet.
-          name=Hive
-          # The backend connection to use to communicate with the server.
-          interface=hiveserver2
+      [[[hive]]]
+        name=Hive
+        interface=hiveserver2
 
       [[[spark]]]
         name=Scala
         interface=livy
 
-        [[[pyspark]]]
-          name=PySpark
-          interface=livy
+      [[[pyspark]]]
+        name=PySpark
+        interface=livy
 
 #### Batch
 
