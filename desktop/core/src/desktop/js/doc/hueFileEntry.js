@@ -408,9 +408,9 @@ class HueFileEntry {
     copyNext();
   }
 
-  loadDocument() {
+  loadDocument(callback) {
     this.document(new HueDocument({ fileEntry: this }));
-    this.document().load();
+    this.document().load(callback);
   }
 
   /**
