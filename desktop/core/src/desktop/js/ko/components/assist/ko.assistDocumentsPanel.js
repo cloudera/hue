@@ -198,7 +198,7 @@ const TEMPLATE = `
             )}"></i></a>
           </div>
           <a href="javascript:void(0)" class="assist-entry assist-document-link" data-bind="click: open, attr: {'title': name }">
-            <!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: false } } --><!-- /ko -->
+            <!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: true } } --><!-- /ko -->
             <span class="highlightable" data-bind="css: { 'highlight': highlight }, text: definition().name"></span>
           </a>
         </li>
