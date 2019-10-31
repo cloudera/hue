@@ -664,8 +664,9 @@ class EditorViewModel {
 
   prepareShareModal() {
     const selectedNotebookUuid = this.selectedNotebook() && this.selectedNotebook().uuid();
-    window.shareViewModel.setDocUuid(selectedNotebookUuid);
-    window.openShareModal();
+    if (selectedNotebookUuid) {
+      huePubSub.publish('doc.show.share.modal', selectedNotebookUuid);
+    }
   }
 }
 

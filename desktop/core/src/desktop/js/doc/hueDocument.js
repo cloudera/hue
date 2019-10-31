@@ -46,7 +46,7 @@ class HueDocument {
 
   onShareAutocompleteUserEnter() {
     const self = this;
-    const searchAutoCompInput = $('#userSearchAutocomp').val();
+    const searchAutoCompInput = $('#shareDocUserInput').val();
     const selectedUserOrGroup = self.userMap[searchAutoCompInput]
       ? self.userMap[searchAutoCompInput]
       : self.groupMap[searchAutoCompInput];
@@ -58,7 +58,7 @@ class HueDocument {
       }
       this.persistPerms();
     }
-    $('#userSearchAutocomp').val('');
+    $('#shareDocUserInput').val('');
   }
 
   shareAutocompleteUserSource(request, callback) {

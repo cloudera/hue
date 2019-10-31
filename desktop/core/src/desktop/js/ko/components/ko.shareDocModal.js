@@ -69,9 +69,9 @@ const TEMPLATE = `
       ${ I18n('There was an error loading the document.')}
     </div>
     <div style="margin-top: 20px" data-bind="visible: fileEntry.canModify() && ! hasErrors() && ! loading()">
+      <div id="shareDocAutocompleteMenu"></div>
       <div class="input-append" style="font-size: inherit">
-        <div id="menu"></div>
-        <input id="userSearchAutocomp" placeholder="${ I18n('Type a username or a group name') }" type="text" data-bind="
+        <input id="shareDocUserInput" placeholder="${ I18n('Type a username or a group name') }" type="text" data-bind="
             autocomplete: {
               source: shareAutocompleteUserSource.bind($data),
               itemTemplate: 'user-search-autocomp-item',
@@ -80,7 +80,7 @@ const TEMPLATE = `
               showSpinner: true,
               classPrefix: 'hue-',
               onEnter: onShareAutocompleteUserEnter.bind($data),
-              appendTo: $('#menu')
+              appendTo: '#shareDocAutocompleteMenu'
             }, 
             clearable: {
               value: searchInput,
@@ -106,8 +106,36 @@ const TEMPLATE = `
   <!-- /ko -->
 `;
 
+const getEntry = async params =>
+  new Promise(resolve => {
+    if (typeof params === 'string') {
+      const entry = new HueFileEntry({
+        activeEntry: ko.observable(),
+        trashEntry: ko.observable(),
+        app: 'documents',
+        activeSort: ko.observable(),
+        user: window.LOGGED_USERNAME,
+        definition: {
+          uuid: params
+        }
+      });
+      entry.load(
+        () => {
+          resolve(entry);
+        },
+        () => {
+          resolve(entry);
+        }
+      );
+    } else {
+      resolve(params);
+    }
+  });
+
 componentUtils.registerComponent('share-doc-modal', undefined, TEMPLATE).then(() => {
-  huePubSub.subscribe('doc.show.share.modal', hueFileEntry => {
+  huePubSub.subscribe('doc.show.share.modal', async params => {
+    const hueFileEntry = await getEntry(params);
+
     let $shareDocMocal = $('#shareDocModal');
     if ($shareDocMocal.length) {
       ko.cleanNode($shareDocMocal[0]);
