@@ -85,8 +85,8 @@ class ABFSStat(object):
       permissions = ABFSStat.char_permissions_to_oct_permissions(resp['permissions'])
     except:
       permissions = None
-    return cls(isDir, headers['date'], resp['lastModified'], size, path, resp['owner'], resp['group'], mode = permissions)
-  
+    return cls(isDir, headers['date'], resp['lastModified'], size, path, resp.get('owner'), resp.get('group'), mode = permissions)
+
   @classmethod
   def for_single(cls,resp, path):
     size = int(resp['Content-Length'])
@@ -95,12 +95,12 @@ class ABFSStat(object):
       permissions = ABFSStat.char_permissions_to_oct_permissions(resp['x-ms-permissions'])
     except:
       permissions = None
-    return cls(isDir, resp['date'],resp['Last-Modified'], size, path, resp['x-ms-owner'], resp['x-ms-group'], mode = permissions)
-  
+    return cls(isDir, resp['date'],resp['Last-Modified'], size, path, resp.get('x-ms-owner'), resp.get('x-ms-group'), mode = permissions)
+
   @classmethod
   def for_filesystem(cls, resp, path):
     return cls(True, resp['date'], resp['Last-Modified'], 0, path)
-  
+
   @staticmethod
   def char_permissions_to_oct_permissions(permissions):
     try:
