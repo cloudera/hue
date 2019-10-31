@@ -9,6 +9,8 @@ boto==2.46.1
 celery==4.2.1
 certifi==2018.1.18
 cffi==1.11.5
+channels==2.1.6
+channels-redis==2.3.2
 colorama==0.3.2
 configobj==5.0.6
 cryptography==2.1.4
