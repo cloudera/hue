@@ -73,6 +73,7 @@
 'LEFT'                                     { return 'LEFT'; }
 'LIKE'                                     { return 'LIKE'; }
 'LIMIT'                                    { return 'LIMIT'; }
+'LIST'                                     { return 'LIST'; }
 'NOT'                                      { return 'NOT'; }
 'NULL'                                     { return 'NULL'; }
 'ON'                                       { return 'ON'; }
@@ -82,6 +83,7 @@
 'OUTER'                                    { return 'OUTER'; }
 'PARTITION'                                { return 'PARTITION'; }
 'PRECEDING'                                { return 'PRECEDING'; }
+'PRINT'                                    { return 'PRINT'; }
 'PURGE'                                    { return 'PURGE'; }
 'RANGE'                                    { return 'RANGE'; }
 'REGEXP'                                   { return 'REGEXP'; }
