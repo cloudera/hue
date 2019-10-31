@@ -5,15 +5,18 @@ draft: false
 weight: 2
 ---
 
-The goal of Hue's is to make data querying easy and productive.
+The goal of the Editor is to make data querying easy and productive.
 
-It focuses on SQL but also supports job submissions. It comes with an intelligent autocomplete, [risk alerts and self service troubleshooting](http://gethue.com/hue-4-sql-editor-improvements/) and query assistance.
+It focuses on SQL but also supports job submissions. It comes with an intelligent autocomplete, risk alerts and self service troubleshooting and query assistance. The Editor is also available in Notebook mode.
 
-Any editor can be `starred` next to its name so that it becomes the default editor and the landing page when logging in.
+Any editor can be starred next to its name so that it becomes the default editor and the landing page when logging in.
 
-Configuration of the connectors is currently done by the [Administrator](/administrator/configuration/connectors/).
+The list of databases and configuration of the connectors is currently done by the [Administrator](/administrator/configuration/connectors/).
 
-## Concepts
+## Editor
+
+![Editor](https://cdn.gethue.com/uploads/2019/08/hue_4.5.png)
+
 ### Running Queries
 
 1.  The currently selected statement has a **left blue** border. To execute a portion of a query, highlight one or more query
@@ -49,6 +52,8 @@ Two of them offer greater scalability:
 
  * Export to an empty folder on your cluster's file system.
  * Export to a table. You can choose an already existing table or a new one.
+
+![Downloading and Exporting Results](https://cdn.gethue.com/uploads/2019/04/editor_export_results.png)
 
 ### Autocomplete
 
@@ -90,6 +95,10 @@ The live autocompletion is fine-tuned for a better experience advanced settings 
 
 The autocompleter talks to the backend to get data for tables and databases etc and caches it to keep it quick. Clicking on the refresh icon in the left assist will clear the cache. This can be useful if a new table was created outside of Hue and is not yet showing-up (Hue will regularly clear his cache to automatically pick-up metadata changes done outside of Hue).
 
+### Sharing
+
+Any query can be shared with permissions, as detailed in the [concepts](/user/concepts).
+
 ### Language reference
 
 You can find the Language Reference in the right assist panel. The right panel itself has a new look with icons on the left hand side and can be minimised by clicking the active icon.
@@ -109,6 +118,8 @@ Variables are used to easily configure parameters in a query. They are ideal for
 
     select * from web_logs where country_code = "${country_code}"
 
+![Single valued variable](https://cdn.gethue.com/uploads/2017/10/var_defaults.png)
+
 **The variable can have a default value**
 
     select * from web_logs where country_code = "${country_code=US}"
@@ -120,6 +131,8 @@ Variables are used to easily configure parameters in a query. They are ideal for
 **In addition, the displayed text for multi valued variables can be changed**
 
     select * from web_logs where country_code = "${country_code=CA(Canada), FR(France), US(United States)}"
+
+![Multi valued variables](https://cdn.gethue.com/uploads/2018/04/variables_multi.png)
 
 **For values that are not textual, omit the quotes.**
 
@@ -135,7 +148,7 @@ These visualizations are convenient for plotting chronological data or when subs
 * Scattered plot
 * Maps (Marker and Gradient)
 
-Read more about extending [charts](/developer/).
+![Charts](https://cdn.gethue.com/uploads/2019/04/editor_charting.png)
 
 ### Context popup
 
@@ -143,14 +156,21 @@ It’s quite handy to be able to look at column samples while writing a query to
 
 ![Sample column popup](https://cdn.gethue.com/uploads/2018/10/sample_context_operations.gif)
 
-### Editor dark mode
-We’ve introduced a dark mode for the editor! Initially this mode is limited to the actual editor area and we’re considering extending this to cover all of Hue.
+### Notebook mode
+
+Snippets of different dialects can be added into a single page:
+
+![Notebook mode](https://cdn.gethue.com/uploads/2015/10/notebook-october.png)
+
+### Dark mode
+
+Initially this mode is limited to the actual editor area and we’re considering extending this to cover all of Hue.
 
 ![Editor Dark Mode](https://cdn.gethue.com/uploads/2018/10/editor_dark_mode.png)
 
 To toggle the dark mode you can either press `Ctrl-Alt-T` or `Command-Option-T` on Mac while the editor has focus. Alternatively you can control this through the settings menu which is shown by pressing `Ctrl-`, or `Command-`, on Mac.
 
-### Self service troubleshooting
+### Query troubleshooting
 
 #### Pre-query execution
 
@@ -184,10 +204,12 @@ A new experimental panel when enabled can offer post risk analysis and recommend
 
 Turns a list of semi-colon separated queries into an interactive presentation by clicking on the 'Dashboard' icon. It is great for doing demos or reporting.
 
-## SQL Databases
+## Databases & Datawarehouses
 
+### List
 Use the query editor with [any database or datawarehouse](/administrator/configuration/connectors/). Those databases currently need to be first configured by the administrator.
 
+### Autocompletes & Connectors
 Also read about building some [better autocompletes](/developer/parsers/) or extending the connectors with SQL Alchemy, JDBC or building your own [connectors](/developer/sdk).
 
 
