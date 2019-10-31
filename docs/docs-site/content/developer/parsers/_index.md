@@ -9,6 +9,7 @@ This guide goes you through the steps necessary to create an autocompleter for a
 
 * showing only valid syntax in the autocomplete
 * getting the list of tables, columns automatically
+* proper syntax highlighting of the keywords
 
 ## Parser Theory
 
@@ -124,7 +125,7 @@ and edit your hue config desktop/conf/pseudo-distributed.ini to contain:
       [[[postgresql]]]
         name = postgresql
         interface=sqlalchemy
-        options='"postgresql://hue:hue@host:31335/hue"'
+        options='{"url": "postgresql://hue:hue@host:31335/hue"}'
 
 Our generateParsers tool can take an existing dialect and setup the source code for a new parsers based on that.
 
@@ -252,3 +253,67 @@ In order to use the newly generated parsers we have to add them to the webpack b
 While developing it will speed up if the webpack bundling runs in the background, for this open two terminal sessions and run `npm run dev` in one and `npm run dev-workers` in the other. It will then monitor changes to the files and build a lot quicker.
 
 After the bundling you can now test it directly in the editor!
+
+## Syntax highlighting
+
+New keywords might not be properly colored highligted in the editor. This is especially true when adding a new language. Here is how to fix that.
+
+![Missing highlighting](https://cdn.gethue.com/docs/dev/syntax_highlighting_missing.png)
+
+Missing highlighting for 'REINDEX' keyword
+
+![With highlighting](https://cdn.gethue.com/docs/dev/syntax_highlighting_updated.png)
+
+With correct highlighting
+
+### Updating keywords
+
+The Editor is currently visually powered by [Ace](https://ace.c9.io). The list of supported languages is found in the [mode](https://github.com/cloudera/hue/tree/master/tools/ace-editor/lib/ace/mode) directory.
+
+For each dialect, we have two files. e.g. with PostgreSQL:
+
+    pgsql.js
+    pgsql_highlight_rules.js
+
+The list of keywords is present in `*_highlight_rules.js` and can be updated there.
+
+    var keywords = (
+        "ALL|ALTER|REINDEX|..."
+    )
+
+Afterwards, run:
+
+    make ace
+
+And after refreshing the editor page, the updated mode will be activated.
+
+### Adding new dialect
+
+To add a new dialect, it is recommended to copy the two files of the closest mode and rename all the names inside. For example, if we were creating a new `ksql` mode, `pgsql_highlight_rules.js` would become `ksql_highlight_rules.js` and we would rename all the references inside to `psql` to `ksql`. Same with `pgsql.js` to `ksql.js`. In particular, the name of the mode to be referenced later is in:
+
+    KsqlHighlightRules.metaData = {
+      fileTypes: ["ksql"],
+      name: "ksql",
+      scopeName: "source.ksql"
+    };
+
+Tip: inheritance of modes is supported by Ace, which make it handy for avoiding potential duplications.
+
+In the Editor, the mapping between Ace's modes and the type of snippets is happening in [editor_components.mako](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/templates/editor_components.mako#L2118).
+
+In the KSQL case we have:
+
+    ksql: {
+      placeHolder: '${ _("Example: SELECT * FROM stream, or press CTRL + space") }',
+      aceMode: 'ace/mode/ksql',
+      snippetIcon: 'fa-database',
+      sqlDialect: true
+    },
+
+And cf. above [prerequisites](#prerequisites), any interpreter snippet with `ksql` will pick-up the new highlighter:
+
+      [[[ksql]]]
+        name = KSQL Analytics
+        interface=ksql
+
+Note: after [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) we will be able to have multiple interpreters on the same dialect (e.g. pointing to two different databases of the same type).
