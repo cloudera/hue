@@ -44,6 +44,17 @@ class HueDocument {
     this.items = [];
   }
 
+  isShared() {
+    const perms = this.definition() && this.definition().perms;
+    return (
+      perms &&
+      (perms.read.users.length > 0 ||
+        perms.read.groups.length > 0 ||
+        perms.write.users.length > 0 ||
+        perms.write.groups.length > 0)
+    );
+  }
+
   onShareAutocompleteUserEnter() {
     const self = this;
     const searchAutoCompInput = $('#shareDocUserInput').val();
@@ -145,7 +156,7 @@ class HueDocument {
     });
   }
 
-  load() {
+  load(callback) {
     const self = this;
     if (self.loading()) {
       return;
@@ -183,6 +194,9 @@ class HueDocument {
         fetchDocumentsSuccessCallback(data);
         self.loading(false);
         self.loaded(true);
+        if (callback) {
+          callback();
+        }
       })
       .fail(() => {
         self.hasErrors(true);

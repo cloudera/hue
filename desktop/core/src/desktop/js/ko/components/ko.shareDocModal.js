@@ -20,6 +20,7 @@ import ko from 'knockout';
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import HueFileEntry from 'doc/hueFileEntry';
 
 // prettier-ignore
 const TEMPLATE = `
@@ -142,8 +143,14 @@ componentUtils.registerComponent('share-doc-modal', undefined, TEMPLATE).then(()
       $shareDocMocal.remove();
     }
 
+    let isSharedBefore;
+
     if (!hueFileEntry.document()) {
-      hueFileEntry.loadDocument();
+      hueFileEntry.loadDocument(() => {
+        isSharedBefore = hueFileEntry.document().isShared();
+      });
+    } else {
+      isSharedBefore = hueFileEntry.document().isShared();
     }
 
     $shareDocMocal = $(
@@ -153,5 +160,10 @@ componentUtils.registerComponent('share-doc-modal', undefined, TEMPLATE).then(()
 
     ko.applyBindings(hueFileEntry, $shareDocMocal[0]);
     $shareDocMocal.modal('show');
+    $shareDocMocal.on('hide', () => {
+      if (isSharedBefore !== hueFileEntry.document().isShared()) {
+        huePubSub.publish('assist.document.refresh');
+      }
+    });
   });
 });
