@@ -16,13 +16,12 @@ Configuration of the connectors is currently done by the [Administrator](/admini
 ## Concepts
 ### Running Queries
 
-1.  The currently selected statement has a left blue order. To execute a portion of a query, highlight one or more query
+1.  The currently selected statement has a **left blue** border. To execute a portion of a query, highlight one or more query
     statements.
 2.  Click **Execute**. The Query Results window appears.
-    -   There is a **Log** caret on the left of the progress bar.
-    -   To view the columns of the query, expand the **Columns** icon. Clicking
-        on the column label will scroll to the column. Names and types can be filtered.
-    -   Select the chart icon to plot the results
+    -   There is a Log caret on the left of the progress bar.
+    -   Expand the **Columns** by clicking on the column label will scroll to the column. Names and types can be filtered.
+    -   Select the **Chart** icon to plot the results
     -   To expand a row, click on the row number.
     -   To lock a row, click on the lock icon in the row number column.
     -   Search either by clicking on the magnifier icon on the results tab, or pressing Ctrl/Cmd + F
@@ -35,35 +34,29 @@ When you have multiple statements it's enough to put the cursor in the statement
 
 **Note**: Use `CTRL/Cmd + ENTER` to execute queries.
 
-**Note**: Under the logs panel, you can view any MapReduce or Impala queries.
-
-**Advanced Query Settings**
-
-The pane to the top of the Editor lets you specify the following
-options:
-
-* Settings: depends on the query engines. For information about [Hive configuration variables](https://cwiki.apache.org/confluence/display/Hive/AdminManual+Configuration).
-* Files: load a jar of files to use as UDF
-* UDFs: register a custom function
+**Note**: On top of the logs panel, there is a link to open the query profile in the Query Browser.
 
 ### Downloading and Exporting Results
 
-To get things started, press the export icon, the bottom last element of the action bar to the top left of the results. There are several ways you can export results of a query.
+There are several ways you can export results of a query.
 
-Two of them offer great scalability:
-1.  Export to an empty folder on your cluster's file system. This exports the results using multiple files. In the export icon, choose Export and then All.
-2.  Export to a table. You can choose an already existing table or a new one. In the export icon, choose Export and then Table.
+The most common:
 
-Two of them offer limited scalability:
-1.  Export to a file on your cluster's file systems. This exports the results to a single file. In the export icon, choose Export and then First XXX.
-2.  Download to your computer as a CSV or XLS. This exports the results to a single file in comma-separated values or Microsoft Office Excel format. In the export icon, choose Download as CSV or Download as XLS.
+* Download to your computer as a CSV or XLS
+* Copy the currently fetched rows to the clipboard
 
+Two of them offer greater scalability:
+
+ * Export to an empty folder on your cluster's file system.
+ * Export to a table. You can choose an already existing table or a new one.
 
 ### Autocomplete
 
 To make your SQL editing experience, Hue comes with one of the best SQL autocomplete on the planet. The new autocompleter knows all the ins and outs of the Hive and Impala SQL dialects and will suggest keywords, functions, columns, tables, databases, etc. based on the structure of the statement and the position of the cursor.
 
 The result is improved completion throughout. We now have completion for more than just SELECT statements, it will help you with the other DDL and DML statements too, INSERT, CREATE, ALTER, DROP etc.
+
+![Autocomplete and context assist](https://cdn.gethue.com/uploads/2017/07/hue_4_assistant_2.gif)
 
 **Smart column suggestions**
 
@@ -76,6 +69,8 @@ The autocompleter suggests keywords based on where the cursor is positioned in t
 **UDFs**
 
 The improved autocompleter will now suggest functions, for each function suggestion an additional panel is added in the autocomplete dropdown showing the documentation and the signature of the function. The autocompleter know about the expected types for the arguments and will only suggest the columns or functions that match the argument at the cursor position in the argument list.
+
+![SQL functions reference](https://cdn.gethue.com/uploads/2017/07/hue_4_functions.png)
 
 **Sub-queries, correlated or not**
 
@@ -165,24 +160,29 @@ The autocompleter will suggest popular tables, columns, filters, joins, group by
 
 This is particularly useful for doing joins on unknown datasets or getting the most interesting columns of tables with hundreds of them.
 
+![Popular joins suggestion](https://cdn.gethue.com/uploads/2017/07/hue_4_query_joins.png)
+![Popular columns suggestion](https://cdn.gethue.com/uploads/2017/07/hue_4_popular_filter_agg.png)
+
+
 **Risk alerts**
 
 While editing, Hue will run your queries through Navigator Optimizer in the background to identify potential risks that could affect the performance of your query. If a risk is identified an exclamation mark is shown above the query editor and suggestions on how to improve it is displayed in the lower part of the right assistant panel.
 
-See a video on  [Self service troubleshooting](http://gethue.com/hue-4-sql-editor-improvements/).
+![Query Risk alerts](https://cdn.gethue.com/uploads/2017/07/hue_4_risk_6.gif)
 
 #### During execution
 
-The Query Profile visualizer details the plan of the query and the bottle necks. When detected, "Health" risks are listed with suggestions on how to fix them.
+The Query Browser details the plan of the query and the bottle necks. When detected, "Health" risks are listed with suggestions on how to fix them.
+
+![Pretty Query Profile](https://cdn.gethue.com/uploads/2019/03/Screen-Shot-2019-03-07-at-11.40.24-AM.png)
 
 #### Post-query execution
 
 A new experimental panel when enabled can offer post risk analysis and recommendation on how to tweak the query for better speed.
 
-
 ### Presentation Mode
 
-Turns a list of semi-colon separated queries into an interactive presentation. It is great for doing demos or basic reporting.
+Turns a list of semi-colon separated queries into an interactive presentation by clicking on the 'Dashboard' icon. It is great for doing demos or reporting.
 
 ## SQL Databases
 
@@ -192,7 +192,7 @@ Use the query editor with any database. Those databases need to be configured by
 ### Apache Impala
 ### MySQL
 ### Oracle
-### Apache Kafka SQL
+### KSQL
 ### Apache Solr SQL
 
 With Solr 5+, query collections like we would query a regular Hive or Impala table.
@@ -243,48 +243,11 @@ The top search bar offers a [full autocomplete](http://gethue.com/intuitively-di
 
 The “More like This” feature lets you selected fields you would like to use to find similar records. This is a great way to find similar issues, customers, people... with regard to a list of attributes.
 
-
 ## Jobs
 
 In addition to SQL queries, the Editor application enables you to create and submit batch jobs to the cluster.
 
-### Pig
-
-Type [Apache Pig](https://pig.apache.org/) Latin instructions to load/merge data to perform ETL or Analytics.
-
-### Sqoop
-
-Run an SQL import from a traditional relational database via an [Apache Sqoop](https://sqoop.apache.org/) command.
-
-### Shell
-
-Type or specify a path to a regular shell script.
-
-[Read more about it here](http://gethue.com/use-the-shell-action-in-oozie/).
-
-### Java
-
-A Java job design consists of a main class written in Java.
-
-<table>
-<tr><td>Jar path</td><td>The fully-qualified path to a JAR file containing the main class.</td></tr>
-<tr><td>Main class</td><td>The main class to invoke the program.</td></tr>
-<tr><td>Args</td><td>The arguments to pass to the main class.</td></tr>
-<tr><td>Java opts</td><td>The options to pass to the JVM.</td></tr>
-</table>
-
 ### Spark
-
-#### Batch
-
-This is a quick way to submit any Jar or Python jar/script to a cluster via the Scheduler or Editor.
-
-How to run Spark jobs with Spark on YARN? This often requires trial and error in order to make it work.
-
-Hue is leveraging Apache Oozie to submit the jobs. It focuses on the yarn-client mode, as Oozie is already running the spark-summit command in a MapReduce2 task in the cluster. You can read more about the Spark modes here.
-
-[Here is how to get started successfully](http://gethue.com/how-to-schedule-spark-jobs-with-spark-on-yarn-and-oozie/).
-And how to use the [Spark Action](http://gethue.com/use-the-spark-action-in-oozie/).
 
 #### Interactive
 
@@ -324,6 +287,42 @@ Make sure that the Notebook and interpreters are set in the hue.ini, and Livy is
         [[[pyspark]]]
           name=PySpark
           interface=livy
+
+#### Batch
+
+This is a quick way to submit any Jar or Python jar/script to a cluster via the Scheduler or Editor.
+
+How to run Spark jobs with Spark on YARN? This often requires trial and error in order to make it work.
+
+Hue is leveraging Apache Oozie to submit the jobs. It focuses on the yarn-client mode, as Oozie is already running the spark-summit command in a MapReduce2 task in the cluster. You can read more about the Spark modes here.
+
+[Here is how to get started successfully](http://gethue.com/how-to-schedule-spark-jobs-with-spark-on-yarn-and-oozie/).
+And how to use the [Spark Action](http://gethue.com/use-the-spark-action-in-oozie/).
+
+### Pig
+
+Type [Apache Pig](https://pig.apache.org/) Latin instructions to load/merge data to perform ETL or Analytics.
+
+### Sqoop
+
+Run an SQL import from a traditional relational database via an [Apache Sqoop](https://sqoop.apache.org/) command.
+
+### Shell
+
+Type or specify a path to a regular shell script.
+
+[Read more about it here](http://gethue.com/use-the-shell-action-in-oozie/).
+
+### Java
+
+A Java job design consists of a main class written in Java.
+
+<table>
+<tr><td>Jar path</td><td>The fully-qualified path to a JAR file containing the main class.</td></tr>
+<tr><td>Main class</td><td>The main class to invoke the program.</td></tr>
+<tr><td>Args</td><td>The arguments to pass to the main class.</td></tr>
+<tr><td>Java opts</td><td>The options to pass to the JVM.</td></tr>
+</table>
 
 ### MapReduce
 
