@@ -1766,6 +1766,35 @@ TASK_SERVER = ConfigSection(
 ))
 
 
+def has_channels():
+  return sys.version_info[0] > 2 and WEBSOCKETS.ENABLED.get()
+
+
+WEBSOCKETS = ConfigSection(
+  key="websockets",
+  help=_("Django channels Websockets configuration. Requires Python 3."),
+  members=dict(
+    ENABLED= Config(
+      key='enabled',
+      default=False,
+      type=coerce_bool,
+      help=_('If websockets channels are to be used for communicating with clients.')
+    ),
+    LAYER_HOST = Config(
+      key='layer_host',
+      default='127.0.0.1',
+      help=_('Layer backend host.')
+    ),
+    LAYER_PORT = Config(
+      key='layer_port',
+      type=int,
+      default=6379,
+      help=_('Layer backend port.')
+    ),
+  )
+)
+
+
 def get_clusters(user):
   clusters = []
   cluster_config = CLUSTERS.get()

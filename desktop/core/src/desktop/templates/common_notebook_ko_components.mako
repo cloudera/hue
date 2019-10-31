@@ -21,6 +21,7 @@ from django.utils.translation import ugettext as _
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
+
 from beeswax.conf import DOWNLOAD_ROW_LIMIT, DOWNLOAD_BYTES_LIMIT
 from notebook.conf import ENABLE_SQL_INDEXER
 %>
@@ -418,7 +419,8 @@ from notebook.conf import ENABLE_SQL_INDEXER
           $('.clipboard-content').empty();
         });
 
-        var chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/' + self.snippet.id() + '/');
+        % if conf.WEBSOCKETS.ENABLED.get():
+        var chatSocket = new WebSocket('ws://' + window.location.host + '/ws/editor/results/' + self.snippet.id() + '/');
 
         chatSocket.onmessage = function(e) {
           var data = JSON.parse(e.data);
@@ -429,6 +431,7 @@ from notebook.conf import ENABLE_SQL_INDEXER
         chatSocket.onclose = function(e) {
           console.error('Chat socket closed unexpectedly');
         };
+        % endif
 
         self.trySaveResults = function () {
           if (self.isValidDestination()) {

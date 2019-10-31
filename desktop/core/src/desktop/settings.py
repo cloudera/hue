@@ -36,6 +36,7 @@ from django.utils.translation import ugettext_lazy as _
 import desktop.redaction
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.python_util import force_dict_to_strings
+from desktop.conf import has_channels
 
 from aws.conf import is_enabled as is_s3_enabled
 from azure.conf import is_abfs_enabled
@@ -203,8 +204,6 @@ INSTALLED_APPS = [
 
     # Desktop injects all the other installed apps into here magically.
     'desktop',
-
-    'channels',
 
     # App that keeps track of failed logins.
     'axes',
@@ -482,16 +481,17 @@ if EMAIL_BACKEND == 'sendgrid_backend.SendgridBackend':
   SENDGRID_SANDBOX_MODE_IN_DEBUG = DEBUG
 
 
-ASGI_APPLICATION = 'desktop.routing.application'
-
-CHANNEL_LAYERS = {
+if has_channels():
+  INSTALLED_APPS.append('channels')
+  ASGI_APPLICATION = 'desktop.routing.application'
+  CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
-        },
+      'BACKEND': 'channels_redis.core.RedisChannelLayer',
+      'CONFIG': {
+        'hosts': [(desktop.conf.WEBSOCKETS.LAYER_HOST.get(), desktop.conf.WEBSOCKETS.LAYER_PORT.get())],
+      },
     },
-}
+  }
 
 # Used for securely creating sessions. Should be unique and not shared with anybody. Changing auth backends will invalidate all open sessions.
 SECRET_KEY = desktop.conf.get_secret_key()

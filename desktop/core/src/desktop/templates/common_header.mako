@@ -217,7 +217,7 @@ if USE_NEW_EDITOR.get():
 ${ hueIcons.symbols() }
 
 
-% if request.environ.get("PATH_INFO").find("/hue/") < 0:
+% if hasattr(request, 'environ') and request.environ.get("PATH_INFO").find("/hue/") < 0:
   <script>
     window.location.replace("/");
   </script>
@@ -239,6 +239,7 @@ ${ hueIcons.symbols() }
         count += 1
     return found_app, count
 %>
+
 % if not skip_topbar:
 <div class="navigator">
   <div class="pull-right">
