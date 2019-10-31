@@ -470,7 +470,7 @@ The [Drill JDBC driver](http://maprdocs.mapr.com/home/Hue/ConfigureHuewithDrill.
       ## If 'user' and 'password' are omitted, they will be prompted in the UI.
       options='{"url": "<drill-jdbc-url>", "driver": "org.apache.drill.jdbc.Driver", "user": "admin", "password": "admin"}'</code>
 
-### Sybase
+### SAP Sybase
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
@@ -592,21 +592,21 @@ This connector leverage the [Apache Livy REST Api](https://livy.incubator.apache
 
 In the `[[interpreters]]` section:
 
-      [[[pyspark]]]
-            name=PySpark
-            interface=livy
+    [[[pyspark]]]
+      name=PySpark
+      interface=livy
 
-      [[[sql]]]
-            name=SparkSql
-            interface=livy
+    [[[sql]]]
+      name=SparkSql
+      interface=livy
 
-      [[[spark]]]
-            name=Scala
-            interface=livy
+    [[[spark]]]
+      name=Scala
+      interface=livy
 
-      [[[r]]]
-            name=R
-            interface=livy
+    [[[r]]]
+      name=R
+      interface=livy
 
 In the `[spark]` section:
 
