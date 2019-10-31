@@ -186,49 +186,9 @@ Turns a list of semi-colon separated queries into an interactive presentation by
 
 ## SQL Databases
 
-Use the query editor with any database. Those databases need to be configured by the [administrator](/administrator/configuration/connectors/).
+Use the query editor with [any database or datawarehouse](/administrator/configuration/connectors/). Those databases currently need to be first configured by the administrator.
 
-### Apache Hive
-### Apache Impala
-### MySQL
-### Oracle
-### KSQL
-### Apache Solr SQL
-
-With Solr 5+, query collections like we would query a regular Hive or Impala table.
-
-[Read more about it here](http://gethue.com/sql-editor-for-solr-sql/).
-
-As Solr SQL is pretty recent, there are some caveats, notably Solr lacks support of:
-
-* SELECT *
-* WHERE close with a LIKE
-* resultset pagination
-
-which prevents a SQL UX experience comparable to the standard other databases (but we track it in [HUE-3686](https://issues.cloudera.org/browse/HUE-3686)).
-
-### Apache Presto
-
-Presto is a high performance, distributed SQL query engine for big data.
-
-[Read more about it here](https://prestosql.io/)
-
-### PostgreSQL
-### AWS Redshift
-### Google BigQuery
-### AWS Athena
-### Spark SQL
-### Apache Phoenix
-### Apache Druid
-
-Apache Druid is an ["OLAP style"](http://druid.io/) database.
-
-### Apache Kylin
-Apache Kylin is an open-source online analytical processing (OLAP) engine.
-See how to configure the [Kylin Query Editor](http://gethue.com/using-hue-to-interact-with-apache-kylin/).
-
-### Others
-Check the [list](/administrator/configuration/connectors/) or extend with SQL Alchemy, JDBC or build your own [connectors](/developer/).
+Also read about building some [better autocompletes](/developer/parsers/) or extending the connectors with SQL Alchemy, JDBC or building your own [connectors](/developer/sdk).
 
 
 ## Dashboards

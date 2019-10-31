@@ -7,9 +7,11 @@ weight: 2
 
 ## Databases
 
-Native connectors (via the `hiveserver2` interface) are recommended for Hive and Impala, otherwise SqlAlchemy is prefered. Read more about the [connectors](../apps#connectors).
+Hue connect to any database or warehouse via native connectors or SqlAlchemy.
 
-### Impala
+Read about building some [better autocompletes](/developer/parsers/) or extending the connectors with SQL Alchemy, JDBC or building your own [connectors](/developer/sdk).
+
+### Apache Impala
 
 Support is native via a dedicated section.
 
@@ -22,7 +24,7 @@ Support is native via a dedicated section.
 
 Read more about [LDAP or PAM pass-through authentication](http://gethue.com/ldap-or-pam-pass-through-authentication-with-hive-or-impala/) and [High Availability](../server/).
 
-### Hive
+### Apache Hive
 
 Support is native via a dedicated section.
 
@@ -45,45 +47,45 @@ Read more about [LDAP or PAM pass-through authentication](http://gethue.com/ldap
 Requires support for sending multiple queries when using Tez (instead of a maximum of just one at the time). You can turn it on with this setting:
 
     [beeswax]
-    max_number_of_sessions=10
+    max_number_of_sessions=3
 
 **LLAP**
 
 When the LLAP interpreter is added, there are 2 ways to enable connectivity (direct configuration or service discovery). LLAP is added by enabling the following settings:
 
     [notebook]
-        [[interpreters]]
-            [[[llap]]]
-               name=LLAP
-               interface=hiveserver2
+    [[interpreters]]
+      [[[llap]]]
+      name=LLAP
+      interface=hiveserver2
 
     [beeswax]
-        # Direct Configuration
-        llap_server_host = localhost
-        llap_server_port = 10500
-        llap_server_thrift_port = 10501
+    # Direct Configuration
+    llap_server_host = localhost
+    llap_server_port = 10500
+    llap_server_thrift_port = 10501
 
-        # or Service Discovery
-        ## hive_discovery_llap = true
-        ## hive_discovery_llap_ha = false
-        # Shortcuts to finding LLAP znode Key
-        # Non-HA - hiveserver-interactive-site - hive.server2.zookeeper.namespace ex hive2 = /hive2
-        # HA-NonKerberized - <llap_app_name>_llap ex app name llap0 = /llap0_llap
-        # HA-Kerberized - <llap_app_name>_llap-sasl ex app name llap0 = /llap0_llap-sasl
-        ## hive_discovery_llap_znode = /hiveserver2-hive2
+    # or Service Discovery
+    ## hive_discovery_llap = true
+    ## hive_discovery_llap_ha = false
+    # Shortcuts to finding LLAP znode Key
+    # Non-HA - hiveserver-interactive-site - hive.server2.zookeeper.namespace ex hive2 = /hive2
+    # HA-NonKerberized - <llap_app_name>_llap ex app name llap0 = /llap0_llap
+    # HA-Kerberized - <llap_app_name>_llap-sasl ex app name llap0 = /llap0_llap-sasl
+    ## hive_discovery_llap_znode = /hiveserver2-hive2
 
 **Service Discovery**
 
 When setup, Hue will query zookeeper to find an enabled hiveserver2 or LLAP endpoint.
 
-        [beeswax]
-            hive_discovery_llap = true
-            hive_discovery_hs2 = true
+    [beeswax]
+    hive_discovery_llap = true
+    hive_discovery_hs2 = true
 
 In order to prevent spamming zookeeper, HiveServer2 is cached for the life of the process and llap is cached based on the following setting:
 
-        [beeswax]
-            cache_timeout = 60
+    [beeswax]
+    cache_timeout = 60
 
 ### MySQL
 
@@ -112,7 +114,7 @@ Alternative:
        options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver", "user": "root", "password": "root"}'
        ## options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver"}'
 
-### Presto
+### Apache Presto
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
@@ -277,7 +279,7 @@ Alternative:
       interface=jdbc
       options='{"url": "jdbc:db2://db2.vpc.cloudera.com:50000/SQOOP", "driver": "com.ibm.db2.jcc.DB2Driver", "user": "DB2INST1", "password": "cloudera"}'
 
-### Spark SQL
+### Apache Spark SQL
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
@@ -310,7 +312,7 @@ Via native HiveServer2 API:
       name=SparkSql
       interface=hiveserver2
 
-### Kafka SQL
+### KSQL
 
     [[[kafkasql]]]
       name=Kafka SQL
@@ -379,7 +381,7 @@ Vertica’s JDBC client drivers can be downloaded here: [Vertica JDBC Client Dri
     interface=jdbc
     options='{"url": "jdbc:vertica://localhost:5433/example", "driver": "com.vertica.jdbc.Driver", "user": "admin", "password": "pass"}'
 
-### Phoenix
+### Apache Phoenix
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
@@ -482,7 +484,7 @@ Then give Hue the information about the database source:
        options='{"url": "sybase+pysybase://<username>:<password>@<dsn>/[database name]"}'
 
 
-### Hana
+### SAP Hana
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
@@ -497,7 +499,27 @@ Then give Hue the information about the database source:
        interface=sqlalchemy
        options='{"url": "hana://username:password@example.de:30015"}'
 
-### Solr SQL
+### Apache Solr SQL
+
+With Solr 5+, query collections like we would query a regular Hive or Impala table.
+
+[Read more about it here](http://gethue.com/sql-editor-for-solr-sql/).
+
+As Solr SQL is pretty recent, there are some caveats, notably Solr lacks support of:
+
+* SELECT *
+* WHERE close with a LIKE
+* resultset pagination
+
+which prevents a SQL UX experience comparable to the standard other databases (but we track it in [HUE-3686](https://issues.cloudera.org/browse/HUE-3686)).
+
+First make sure Solr search is configured:
+
+    [search]
+      # URL of the Solr Server
+      solr_url=http://localhost:8983/solr/
+
+Then add the interpreter:
 
     [[[solr]]]
       name = Solr SQL
@@ -505,7 +527,11 @@ Then give Hue the information about the database source:
       ## Name of the collection handler
       # options='{"collection": "default"}'
 
-### Kylin
+### Apache Kylin
+
+Apache Kylin is an open-source online analytical processing (OLAP) engine.
+See how to configure the [Kylin Query Editor](http://gethue.com/using-hue-to-interact-with-apache-kylin/).
+
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
@@ -547,7 +573,7 @@ Alternative:
       ## The JDBC driver clickhouse-jdbc.jar and its related jars need to be in the CLASSPATH environment variable.
       options='{"url": "jdbc:clickhouse://localhost:8123", "driver": "ru.yandex.clickhouse.ClickHouseDriver", "user": "readonly", "password": ""}'
 
-### Pinot DB
+### Apache Pinot DB
 
 The dialect for https://pinot.apache.org should be added to the Python system or Hue Python virtual environment:
 
@@ -560,7 +586,7 @@ Then give Hue the information about the database source:
        interface=sqlalchemy
        options='{"url": "pinot+http://localhost:8099/query?server=http://localhost:9000/"}'
 
-### Spark
+### Apache Spark
 
 This connector leverage the [Apache Livy REST Api](https://livy.incubator.apache.org/):
 
@@ -624,7 +650,7 @@ Livy supports a configuration parameter in the Livy conf:
       # Whether Livy requires client to use csrf protection.
       ## csrf_enabled=false
 
-### Pig
+### Apache Pig
 
 Pig is native to Hue and depends on the [Oozie service](/administrator/configuration/connectors/#oozie) to be configured:
 
@@ -862,7 +888,7 @@ Specify the comma-separated list of HBase Thrift servers for clusters in the for
     [hbase]
     hbase_clusters=(Cluster|localhost:9090)
 
-### Impersonation
+#### Impersonation
 
 doAs Impersonation provides a flexible way to use the same client to impersonate multiple principals. doAs is supported only in Thrift 1.
 Enable doAs support by adding the following properties to hbase-site.xml on each Thrift gateway:
@@ -889,7 +915,7 @@ And the Hue hosts, or * to authorize from any host:
 
 Note: If you use framed transport, you cannot use doAs impersonation, because SASL does not work with Thrift framed transport.
 
-### Kerberos cluster
+#### Kerberos cluster
 
 In a secure cluster its also needs these properties:
 
@@ -909,11 +935,11 @@ And from the HBase shell, authorize some ends users, e.g. to give full access to
 
 ## Others
 
-### Data Catalog
+### Apache Atlas
 
 In the `[metadata]` section, Hue is supporting Cloudera Navigator and soon Apache Atlas ([HUE-8749](https://issues.cloudera.org/browse/HUE-8749)) in order to enrich the [data catalog](/user/browsing/).
 
-### Spark
+### Apache Spark
 
 The `[spark]` section details how to point to [Livy](https://livy.incubator.apache.org/) in order to execute interactive Spark snippets in Scala or Python.
 
@@ -924,12 +950,7 @@ The `[spark]` section details how to point to [Livy](https://livy.incubator.apac
       # Port of the Livy Server.
       ## livy_server_port=8998
 
-### Kafka
-
-The configuration is in `[kafka]` but the service is still experiemental.
-
-
-### Oozie
+### Apache Oozie
 
 In oder to schedule workflows, the `[liboozie]` section of the configuration file:
 
@@ -950,7 +971,7 @@ To configure Hue as a default proxy user, add the following properties to /etc/o
         <value>*</value>
     </property>
 
-### YARN Cluster
+### Apache YARN
 
 Hue supports one or two Yarn clusters (two for HA). These clusters should be defined
 under the `[[[default]]]` and `[[[ha]]]` sub-sections.
