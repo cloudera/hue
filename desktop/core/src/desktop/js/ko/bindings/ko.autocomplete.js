@@ -23,6 +23,12 @@ ko.bindingHandlers.autocomplete = {
   init: function(element, valueAccessor) {
     let options = valueAccessor();
     const $element = $(element);
+    const getMenuElement = () => {
+      if (typeof options.appendTo === 'string') {
+        return $(options.appendTo);
+      }
+      return options.appendTo;
+    };
 
     const delay = 400;
 
@@ -82,7 +88,7 @@ ko.bindingHandlers.autocomplete = {
             $('<div>')
               .addClass('autocomplete-count')
               .text('(' + count + ')')
-              .appendTo($menu);
+              .appendTo(getMenuElement());
           }
         });
       };
