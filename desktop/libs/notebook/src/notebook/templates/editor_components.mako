@@ -2094,6 +2094,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         snippetImage: '${ static("impala/art/icon_impala_48.png") }',
         sqlDialect: true
       },
+<<<<<<< HEAD
       presto: {
         placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
         aceMode: 'ace/mode/presto',
