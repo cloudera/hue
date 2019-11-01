@@ -71,11 +71,11 @@ If multiple tables appear in the FROM clause, including derived and joined table
 
 The autocompleter suggests keywords based on where the cursor is positioned in the statement. Where possible it will even suggest more than one word at at time, like in the case of IF NOT EXISTS, no one likes to type too much right? In the parts where order matters but the keywords are optional, for instance after FROM tbl, it will list the keyword suggestions in the order they are expected with the first expected one on top. So after FROM tbl the WHERE keyword is listed above GROUP BY etc.
 
-**UDFs**
+**Functions**
 
 The improved autocompleter will now suggest functions, for each function suggestion an additional panel is added in the autocomplete dropdown showing the documentation and the signature of the function. The autocompleter know about the expected types for the arguments and will only suggest the columns or functions that match the argument at the cursor position in the argument list.
 
-![SQL functions reference](https://cdn.gethue.com/uploads/2017/07/hue_4_functions.png)
+<img src="https://cdn.gethue.com/uploads/2017/07/hue_4_functions.png" alt="SQL functions reference" height="400"/>
 
 **Sub-queries, correlated or not**
 
@@ -85,9 +85,17 @@ When editing subqueries it will only make suggestions within the scope of the su
 
 Right click on any fragement of the queries (e.g. a table name) to gets all its metadata information. This is a handy shortcut to get more description or check what types of values are contained in the table or columns.
 
+It’s quite handy to be able to look at column samples while writing a query to see what type of values you can expect. Hue now has the ability to perform some operations on the sample data, you can now view distinct values as well as min and max values. Expect to see more operations in coming releases.
+
+![Sample column popup](https://cdn.gethue.com/uploads/2018/10/sample_context_operations.gif)
+
 **Syntax checker**
 
 A little red underline will display the incorrect syntax so that the query can be fixed before submitting. A right click offers suggestions.
+
+![Syntax checker](https://cdn.gethue.com/uploads/2018/01/syntax_checkerhigh.png)
+
+![Syntax checker](https://cdn.gethue.com/uploads/2018/01/checker_help.png)
 
 **Advanced Settings**
 
@@ -150,12 +158,6 @@ These visualizations are convenient for plotting chronological data or when subs
 
 ![Charts](https://cdn.gethue.com/uploads/2019/04/editor_charting.png)
 
-### Context popup
-
-It’s quite handy to be able to look at column samples while writing a query to see what type of values you can expect. Hue now has the ability to perform some operations on the sample data, you can now view distinct values as well as min and max values. Expect to see more operations in coming releases.
-
-![Sample column popup](https://cdn.gethue.com/uploads/2018/10/sample_context_operations.gif)
-
 ### Notebook mode
 
 Snippets of different dialects can be added into a single page:
@@ -207,23 +209,47 @@ Turns a list of semi-colon separated queries into an interactive presentation by
 ## Databases & Datawarehouses
 
 ### List
-Use the query editor with [any database or datawarehouse](/administrator/configuration/connectors/). Those databases currently need to be first configured by the administrator.
+
+Use the Editor or Dashboard to query [any database or datawarehouse](/administrator/configuration/connectors/). Those databases currently need to be first configured by the administrator.
 
 ### Autocompletes & Connectors
+
 Also read about building some [better autocompletes](/developer/parsers/) or extending the connectors with SQL Alchemy, JDBC or building your own [connectors](/developer/sdk).
 
 
 ## Dashboards
 
-Dashboards are an interactive way to explore your data quickly and easily. No programming is required and the analysis is done by drag & drops and clicks.
+Dashboards are an interactive way to explore your SQL or Solr data quickly and easily. No programming is required and the analysis is done by drag & drops and clicks.
 
 ![Search Full](https://cdn.gethue.com/uploads/2015/08/search-full-mode.png)
 
 Simply drag & drop widgets that are interconnected together. This is great for exploring new datasets or monitoring without having to type.
 
-The top search bar offers a [full autocomplete](http://gethue.com/intuitively-discovering-and-exploring-a-wine-dataset-with-the-dynamic-dashboards/) on all the values of the index.
+![Analytics dimensions](https://cdn.gethue.com/uploads/2018/08/dashboard_layout_dnd.gif)
 
-The “More like This” feature lets you selected fields you would like to use to find similar records. This is a great way to find similar issues, customers, people... with regard to a list of attributes.
+Currently supported databases are Apache Solr, Apache Hive and Apache Impala. To add [more databases](/user/querying/#databases-datawarehouses), feel free to check the [SDK](/developer/sdk/).
+
+Tutorials
+
+* The top search bar offers a [full autocomplete](http://gethue.com/intuitively-discovering-and-exploring-a-wine-dataset-with-the-dynamic-dashboards/) on all the values of the index
+* Comprehensive demo is available on the [BikeShare data visualization post](http://gethue.com/bay-area-bikeshare-data-analysis-with-search-and-spark-notebook/).
+
+### Analytics facets
+
+Drill down the dimensions of the datasets and apply aggregates functions on top of it:
+
+![Analytics dimensions](https://cdn.gethue.com/uploads/2018/08/dashboard_layout_dimensions.gif)
+
+Some facets can be nested:
+
+![Nested Analytics facets](https://cdn.gethue.com/uploads/2015/08/search-nested-facet-1024x304.png)
+![Nested Analytics Counts](https://cdn.gethue.com/uploads/2015/08/search-hit-widget.png)
+
+
+### Autocomplete
+The top bar support faceted and free word text search, with autocompletion.
+
+![Search Autocomplete](https://cdn.gethue.com/uploads/2018/01/dashboard_autocomplete.png)
 
 ### Marker Map
 Points close to each other are grouped together and will expand when zooming-in. A Yelp-like search filtering experience can also be created by checking the box.
@@ -234,7 +260,7 @@ Points close to each other are grouped together and will expand when zooming-in.
 
 Indexed records can be directly edited in the Grid or HTML widgets by admins.
 
-### link to original documents
+### Link to original documents
 
 Links to the original documents can also be inserted. Add to the record a field named ‘link-meta’ that contains some json describing the URL or address of a table or file that can be open in the HBase Browser, Metastore App or File Browser:
 
@@ -270,14 +296,11 @@ Real time indexing can now shine with the rolling window filter and the automati
 
 ![Rolling time](https://cdn.gethue.com/uploads/2015/08/search-fixed-time.png)
 
-### Nested Analytics facets
+### 'More like this'
 
-![Nested Analytics facets](https://cdn.gethue.com/uploads/2015/08/search-nested-facet-1024x304.png)
-![Nested Analytics Counts](https://cdn.gethue.com/uploads/2015/08/search-hit-widget.png)
+This feature lets you selected fields you would like to use to find similar records. This is a great way to find similar issues, customers, people... with regard to a list of attributes.
 
-A more comprehensive demo is available on the [BikeShare data visualization post](http://gethue.com/bay-area-bikeshare-data-analysis-with-search-and-spark-notebook/).
-
-
+![Rolling time](https://cdn.gethue.com/uploads/2018/01/solr_more_like_this.png)
 
 ## Jobs
 

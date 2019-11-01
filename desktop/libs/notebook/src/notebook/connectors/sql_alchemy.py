@@ -75,6 +75,7 @@ if sys.version_info[0] > 2:
 else:
   from urllib import quote_plus as urllib_quote_plus
 
+
 CONNECTION_CACHE = {}
 LOG = logging.getLogger(__name__)
 
@@ -104,7 +105,7 @@ class SqlAlchemyApi(Api):
   def __init__(self, user, interpreter):
     self.user = user
     self.options = interpreter['options']
-    self.backticks = '"' if re.match('^(postgresql://|awsathena)', self.options.get('url', '')) else '`'
+    self.backticks = '"' if re.match('^(postgresql://|awsathena|elasticsearch)', self.options.get('url', '')) else '`'
 
   def _create_engine(self):
     if '${' in self.options['url']: # URL parameters substitution

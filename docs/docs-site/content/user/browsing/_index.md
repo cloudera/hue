@@ -45,7 +45,7 @@ Searching all the available queries or data in the cluster
 
 Listing the possible tags to filter on. This also works for ‘types’.
 
-### Unification and Caching of all SQL metadata
+### Unification of metadata
 
 The list of tables and their columns is displayed in multiple part of the interface. This data is pretty costly to fetch and comes from different sources. In this new version, the information is now cached and reused by all the Hue components. As the sources are diverse, e.g. Apache Hive, Apache Atlas those are stored into a single object, so that it is easier and faster to display without caring about the underlying technical details.
 
@@ -105,9 +105,101 @@ Learn more about it on the [ingesting data from traditional databases](http://ge
 
 ### Indexing
 
-In the past, indexing data into Solr to then explore it with a [Dynamic Dashboard](http://gethue.com/search-dashboards/) has been quite difficult. The task involved writing a Solr schema and a Morphlines file then submitting a job to YARN to do the indexing. Often times getting this correct for non trivial imports could take a few days of work. Now with Hue's new feature you can start your YARN indexing job in minutes.
+In the past, indexing data into Solr to then explore it with a [Dynamic Dashboard](/user/querying/#dashboards) has been quite difficult. The task involved writing a Solr schema and a Morphlines file then submitting a job to YARN to do the indexing. Often times getting this correct for non trivial imports could take a few days of work. Now with Hue's new feature you can start your YARN indexing job in minutes.
 
-[Read more about it here](http://gethue.com/easy-indexing-of-data-into-solr/).
+#### CSV
+
+Any small CSV file can be ingested into a new index in a few clicks.
+
+#### Scalable
+First you’ll need to have a running Solr cluster that Hue is configured with.
+
+Next you’ll need to install these required libraries. To do so place them in a directory somewhere on HDFS and set the path for config_indexer_libs_path under indexer in the Hue ini to match by default, the config_indexer_libs_path value is set to /tmp/smart_indexer_lib. Additionally under indexer in the Hue ini you’ll need to set enable_new_indexer to true.
+
+    [indexer]
+
+    # Flag to turn on the morphline based Solr indexer.
+    enable_new_indexer=false
+
+    # Oozie workspace template for indexing.
+    ## config_indexer_libs_path=/tmp/smart_indexer_lib
+
+We’ll pick a name for our new collection and select our reviews data file from HDFS. Then we’ll click next.
+
+![Solr Indexer](https://cdn.gethue.com/uploads/2016/08/indexer-wizard.png)
+
+Field selection and ETL
+
+On this tab we can see all the fields the indexer has picked up from the file. Note that Hue has also made an educated guess on the field type. Generally, Hue does a good job inferring data type. However, we should do a quick check to confirm that the field types look correct.
+
+![Solr Indexer](https://cdn.gethue.com/uploads/2016/08/indexer-wizard-fields.png)
+
+For our data we’re going to perform 4 operations to make a very searchable Solr Collection.
+
+Convert Date
+
+This operation is implicit. By setting the field type to date we inform Hue that we want to convert this date to a Solr Date. Hue can convert most standard date formats automatically. If we had a unique date format we would have to define it for Hue by explicitly using the convert date operation.
+
+![Solr Indexer](https://cdn.gethue.com/uploads/2016/08/indexer-op-date.png)
+
+Translate star ratings to integer ratings
+
+Under the rating field we’ll change the field type from string to long and click add operation. We’ll then select the translate operation and setup the following translation mapping.
+
+![Solr Indexer](https://cdn.gethue.com/uploads/2016/08/indexer-translate-date.png)
+
+Grok the city from the full address field
+
+We’ll add a grok operation to the full address field, fill in the following regex .* (?<city>\w+),.* and set the number of expected fields to
+
+![Solr Indexer](https://cdn.gethue.com/uploads/2016/08/indexer-op-grok.png)
+
+1. In the new child field we’ll set the name to city. This new field will now contain the value matching the city capture group in the regex.
+
+Use a split operation to separate the latitude/longitude field into two separate floating point fields.
+Here we have an annoyance. Our data file contains the latitude and longitude of the place that’s being reviewed – Awesome! For some reason though they’ve been clumped into one field with a comma between the two numbers. We’ll use a split operation to grab each individually. Set the split value to ‘,’ and the number of output fields to 2. Then change the child fields’ types to doubles and give them logical names. In this case there’s not really much sense in keeping the parent field so let’s uncheck the “keep in index” box.
+
+![Solr Indexer](https://cdn.gethue.com/uploads/2016/08/indexer-op-split.png)
+
+Here we’ll add a geo ip operation and select iso_code as our output. This will give us the country code.
+
+![Solr Indexer](https://cdn.gethue.com/uploads/2016/08/indexer-op-geoip.png)
+
+Before we index, let’s make sure everything looks good with a quick scan of the preview. This can be handy to avoid any silly typos or anything like that.
+
+Now that we’ve defined our ETL Hue can do the rest. Click index and wait for Hue to index our data. At the bottom of this screen we can see a progress bar of the process. Yellow means our data is currently being indexed and green means it’s done. Feel free to close this window. The indexing will continue on your cluster.
+
+Once our data has been indexed into a Solr Collection we have access to all of Hue’s search features and can make a nice analytics dashboard like this one for our data.
+
+![Solr Dashboard](https://cdn.gethue.com/uploads/2016/08/indexer-dash.png)
+
+**Dependencies**
+
+The indexer libs path is where all required libraries for indexing should be. If you’d prefer you can assemble this directory yourself. There are three main components to the libs directory:
+
+1. JAR files required by the [MapReduceIndexerTool](http://www.cloudera.com/documentation/enterprise/5-5-x/topics/search_mapreduceindexertool.html)
+
+All required jar files should have shipped with CDH. Currently the list of required JARs is:
+
+    argparse4j-0.4.3.jar
+    readme.txt
+    httpmime-4.2.5.jar
+    search-mr-1.0.0-cdh5.8.0-job.jar
+    kite-morphlines-core-1.0.0-cdh5.8.0.jar
+    solr-core-4.10.3-cdh5.8.0.jar
+    kite-morphlines-solr-core-1.0.0-cdh5.8.0.jar
+    solr-solrj-4.10.3-cdh5.8.0.jar
+    noggit-0.5.jar
+
+Should this change and you get a missing class error, you can find whatever jar may be missing by grepping all the jars packaged with CDH for the missing class.
+
+2. Maxmind GeoLite2 database
+
+This file is required for the GeoIP lookup command and can be found on [MaxMind’s website](https://dev.maxmind.com/geoip/geoip2/geolite2/).
+
+3. Grok Dictionaries
+
+Any grok commands can be defined in text files within the grok_dictionaries sub directory.
 
 
 ## Files
@@ -262,7 +354,6 @@ prefixed row, simply type the row key followed by a star \*. The prefix
 should be highlighted like any other searchbar keyword. A prefix scan is
 performed exactly like a regular scan, but with a prefixed row.
 
-
     domain.10* +10
 
 
@@ -272,9 +363,7 @@ string between curly braces. HBase Browser autocompletes your filters
 for you so you don't have to look them up every time. You can apply
 filters to rows or scans.
 
-
     domain.1000 {ColumnPrefixFilter('100-') AND ColumnCountGetFilter(3)}
-
 
 This doc only covers a few basic features of the Smart Search. You can
 take advantage of the full querying language by referring to the help
@@ -285,7 +374,9 @@ will suggest next steps to complete your query.
 
 ## Solr Indexes
 
-Solr indexes can be created and are listed in the interface.
+Solr indexes can be created via the [importer](/user/browsing/#data-importer) and are listed in the interface.
+
+![Solr Indexer](https://cdn.gethue.com/uploads/2016/08/indexer-op-grok.png)
 
 ## Jobs
 
@@ -304,6 +395,8 @@ There are three ways to access the Query browser:
 * Best: Click on the query ID after executing a SQL query in the editor. This will open the mini job browser overlay at the current query. Having the query execution information side by side the SQL editor is especially helpful to understand the performance characteristics of your queries.
 * Open the mini job browser overlay and navigate to the queries tab.
 * Open the job browser and navigate to the queries tab.
+
+![Pretty Query Profile](https://cdn.gethue.com/uploads/2019/03/Screen-Shot-2019-03-07-at-11.40.24-AM.png)
 
 Query capabilities
 

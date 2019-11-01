@@ -5,36 +5,43 @@ draft: false
 weight: 3
 ---
 
+# Autocompletes
+
+Close to 100% of [Hive and Impala grammar](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/jison) are supported which makes the autocomplete extremly powerful. Other languages defaults to a generic SQL grammar.
+
+See the [SQL parser](/developer/parsers/) for more details. Integrating [Apache Calcite](https://calcite.apache.org/docs/reference.html), [ZetaSql](https://github.com/google/zetasql)... would make SQL users even happier with a lot more Databases!
+
 # Connectors
 
-They provide SQL integration with any database. Here is a list of the [existing connectors](https://github.com/cloudera/hue/tree/master/desktop/libs/notebook/src/notebook/connectors).
+They provide integration with any SQL database or Job execution engine. Here is a list of the [existing connectors](https://github.com/cloudera/hue/tree/master/desktop/libs/notebook/src/notebook/connectors).
 
-Connectors are pluggable and can new engines can be supported. Feel free to contact the community.
+Connectors are pluggable and new engines can be added. Feel free to contact the [community](https://discourse.gethue.com/c/developer-sdk-api).
 
-## SQL Autocomplete
+## Editor
 
-Close to 100% of [Hive and Impala grammar](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/jison) is supported which makes the autocomplete extremly powerful. Other languages defaults to a generic SQL grammar.
+### SQL
 
-See [How to write your own SQL parser](/developer/parsers/). Integrating [Apache Calcite](https://calcite.apache.org/docs/reference.html), [ZetaSql](https://github.com/google/zetasql)... would make SQL users even happier with a lot more Databases!
-
-
-## SQL Connectors
+#### SqlAlchemy
 
 [SqlAlchemy](https://www.sqlalchemy.org) is the prefered way if the HiveServer2 API is not supported by the database. The implementation is in [`sql_alchemy.py`](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/sql_alchemy.py) and is depends on the repective SqlAlchemy dialects.
+
+#### Jdbc
 
 With the JDBC proxy, query editor with any JDBC compatible database. View the [JDBC connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/jdbc.py).
 
 **Note** In the long term, SqlAlchemy is prefered as more "Python native".
 
-### Solr SQL
+#### Solr SQL
 
 [Solr connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/solr.py).
 
-### Oozie Jobs
+#### Custom
 
-MapReduce, Pig, Java, Shell, Sqoop, DistCp [Oozie connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/oozie_batch.py).
+If the built-in HiveServer2 (Hive, Impala, Spark SQL), RDBMS (MySQL, PostgreSQL, Oracle, SQLite), and JDBC interfaces don’t meet your needs, you can implement your own connector to the notebook app: [Notebook Connectors](https://github.com/cloudera/hue/tree/master/desktop/libs/notebook/src/notebook/connectors). Each connector API subclasses the [Base API](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/base.py) and must implement the methods defined within; refer to the [JdbcApi](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/jdbc.py) or [RdbmsApi](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/rdbms.py) for representative examples.
 
-### Spark / Livy
+### Jobs
+
+#### Spark / Livy
 
 Based on the [Livy REST API](https://livy.incubator.apache.org/docs/latest/rest-api.html)
 
@@ -44,13 +51,18 @@ Based on the [Livy REST API](https://livy.incubator.apache.org/docs/latest/rest-
   * Spark SQL
 * [Batch connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/spark_batch.py)
 
-## Jobs
+#### Oozie
+
+MapReduce, Pig, Java, Shell, Sqoop, DistCp [Oozie connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/oozie_batch.py).
+
+
+## Job Browser
 
 The Job Browser is generic and can list any type of jobs, queries and provide bulk operations like kill, pause, delete... and access to logs and recommendations.
 
 Here is its [API](https://github.com/cloudera/hue/tree/master/apps/jobbrowser/src/jobbrowser/apis).
 
-## Files
+## File Browser
 
 Various storage systems like Hadoop HDFS, AWS S3 and Azure [ADLS](https://issues.cloudera.org/browse/HUE-7248) can be interacted with. The [`fsmanager.py`](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/lib/fsmanager.py) is the main router to each API.
 
@@ -58,7 +70,7 @@ Various storage systems like Hadoop HDFS, AWS S3 and Azure [ADLS](https://issues
 
 ## Dashboard
 
-Dashboards are generic and support [Solr and any SQL](http://gethue.com/search-dashboards):
+[Dashboards](/user/querying/#dashboards) are generic and support Apache Solr and SQL:
 
 The API was influenced by Solr but is now generic:
 
@@ -73,11 +85,7 @@ Implementations:
 * [Impala API](https://github.com/cloudera/hue/blob/master/apps/impala/src/impala/dashboard_api.py)
 * [Hive API](https://github.com/cloudera/hue/blob/master/apps/beeswax/src/beeswax/dashboard_api.py)
 
-When HS2, RDBMS, and JDBC Are Not Enough
-
-If the built-in HiveServer2 (Hive, Impala, Spark SQL), RDBMS (MySQL, PostgreSQL, Oracle, SQLite), and JDBC interfaces don’t meet your needs, you can implement your own connector to the notebook app: [Notebook Connectors](https://github.com/cloudera/hue/tree/master/desktop/libs/notebook/src/notebook/connectors). Each connector API subclasses the [Base API](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/base.py) and must implement the methods defined within; refer to the [JdbcApi](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/jdbc.py) or [RdbmsApi](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/rdbms.py) for representative examples.
-
-### Solr
+### Apache Solr
 
 [Solr Dashboard API](https://github.com/cloudera/hue/blob/master/apps/search/src/search/dashboard_api.py)
 
@@ -88,7 +96,6 @@ A connector similar to Solr or SQL Alchemy binding would need to be developed [H
 # Public API
 
 Hue can be accessed directly via a Django Python Shell or by its REST API.
-
 
 ## REST
 
