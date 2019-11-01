@@ -87,10 +87,10 @@ def get_default_session_token():
 
 
 def get_default_region():
-  return get_region(AWS_ACCOUNTS['default']) if 'default' in AWS_ACCOUNTS else ''
+  return get_region(conf=AWS_ACCOUNTS['default']) if 'default' in AWS_ACCOUNTS else get_region()
 
 
-def get_region(conf):
+def get_region(conf=None):
   region = ''
 
   if conf:
@@ -241,6 +241,8 @@ def is_ec2_instance():
   # /sys/hypervisor/uuid doesn't work on m5/c5, but /sys/devices/virtual/dmi/id/product_uuid does
   try:
     return (os.path.exists('/sys/hypervisor/uuid') and open('/sys/hypervisor/uuid', 'read').read()[:3].lower() == 'ec2') or (os.path.exists('/sys/devices/virtual/dmi/id/product_uuid') and open('/sys/devices/virtual/dmi/id/product_uuid', 'read').read()[:3].lower() == 'ec2')
+  except IOError as e:
+    return 'Permission denied' in str(e) # If permission is denied, assume cost of network call
   except Exception as e:
     LOG.exception("Failed to read /sys/hypervisor/uuid or /sys/devices/virtual/dmi/id/product_uuid: %s" % e)
     return False

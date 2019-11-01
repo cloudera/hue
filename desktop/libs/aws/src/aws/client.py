@@ -166,7 +166,7 @@ class Client(object):
         aws_access_key_id=credentials.get('AccessKeyId'),
         aws_secret_access_key=credentials.get('SecretAccessKey'),
         aws_security_token=credentials.get('SessionToken'),
-        region=aws_conf.get_region(conf),
+        region=aws_conf.get_region(conf=conf),
         host=conf.HOST.get(),
         proxy_address=conf.PROXY_ADDRESS.get(),
         proxy_port=conf.PROXY_PORT.get(),
@@ -181,7 +181,8 @@ class Client(object):
         aws_access_key_id=credentials.get('AccessKeyId'),
         aws_secret_access_key=credentials.get('SecretAccessKey'),
         aws_security_token=credentials.get('SessionToken'),
-        expiration=credentials.get('Expiration')
+        expiration=credentials.get('Expiration'),
+        region=aws_conf.get_region()
       )
 
   def get_s3_connection(self):
