@@ -287,34 +287,6 @@ will suggest next steps to complete your query.
 
 Solr indexes can be created and are listed in the interface.
 
-## Sentry Permissions
-
-Sentry roles and privileges can directly be edited in the Security interface.
-
-**Note** Sentry is going to be replaced by Apache Ranger in [HUE-8748](https://issues.cloudera.org/browse/HUE-8748).
-
-### SQL
-
-[Hive UI](http://gethue.com/apache-sentry-made-easy-with-the-new-hue-security-app/).
-
-### Solr
-
-[Solr](http://gethue.com/ui-to-edit-sentry-privilege-of-solr-collections/) privileges can be edited directly via the interface.
-
-For listing collections, query and creating collection:
-
-    Admin=*->action=*
-    Collection=*->action=*
-    Schema=*->action=*
-    Config=*->action=*
-
-### Kafka
-
-Kafka topics can be listed.
-
-**Note** This is currently an experimental feature.
-
-
 ## Jobs
 
 The Job Browser application lets you to examine multiple types of jobs
@@ -352,3 +324,128 @@ List submitted workflows, schedules and bundles.
 ### Livy / Spark
 
 List Livy sessions and submitted statements.
+
+## Streams
+
+### Kafka
+
+Topics, Streams, tables can be listed via the `ksql` connector.
+
+## Sentry Permissions
+
+Sentry roles and privileges can directly be edited in the Security interface.
+
+**Note** Apache Sentry is going to be replaced by Apache Ranger in [HUE-8748](https://issues.cloudera.org/browse/HUE-8748).
+
+### SQL
+
+It can be tricky to grant a new user proper permissions on a secure cluster, let’s walk through the steps to enable any new user for table creation on a kerberized cluster. Depends on your cluster size, creating user and group on each node can be tedious. Here we use pssh (Parallel ssh) for this task.
+
+1. Install the tool and prepare a file which contains all your hosts.
+
+For Mac user:
+
+    brew install pssh
+
+For Debian or Ubuntu user:
+
+    sudo apt-get install pssh
+
+    cat ~/Documents/nodeshue.txt
+    hue-1.test.cloudera.com
+    hue-2.test.cloudera.com
+    hue-3.test.cloudera.com
+    hue-4.test.cloudera.com
+
+2. Run follow commands to create user: t1 and group: grp1 on your cluster:
+
+    pssh -h ~/Documents/nodeshue.txt -i useradd t1
+    [1] 13:58:48 [SUCCESS] hue-1.test.cloudera.com
+    [2] 13:58:48 [SUCCESS] hue-2.test.cloudera.com
+    [3] 13:58:48 [SUCCESS] hue-3.test.cloudera.com
+    [4] 13:58:48 [SUCCESS] hue-4.test.cloudera.com
+
+    pssh --hosts ~/Documents/nodes.txt -i groupadd grp1
+    [1] 13:59:20 [SUCCESS] hue-1.test.cloudera.com
+    [2] 13:59:20 [SUCCESS] hue-2.test.cloudera.com
+    [3] 13:59:20 [SUCCESS] hue-3.test.cloudera.com
+    [4] 13:59:20 [SUCCESS] hue-4.test.cloudera.com
+
+    pssh --hosts ~/Documents/nodes.txt -i usermod -a -G grp1 t1
+    [1] 13:59:28 [SUCCESS] hue-1.test.cloudera.com
+    [2] 13:59:28 [SUCCESS] hue-2.test.cloudera.com
+    [3] 13:59:28 [SUCCESS] hue-3.test.cloudera.com
+    [4] 13:59:28 [SUCCESS] hue-4.test.cloudera.com
+
+3. Create same Hue user: t1 and group: grp1 and make “t1″a member of “grp1”.
+
+4. Then log in as any user with sentry admin permission to run following queries in hive editor:
+
+    create role write_role;
+    GRANT ROLE write_role TO GROUP grp1;
+    GRANT ALL ON SERVER server1 TO ROLE write_role;
+
+Now “t1” user or any user in “grp1” can log in and create table by running any hive/impala DDL queries or through Hue importer.
+
+
+But mostly we would like to grant proper permissions for users instead of “ALL” on “server”. let’s walk through two other examples like read_only_role and read_write_role for specific databases.
+
+Using similar commands to create t2 user in group grp2 and t3 user in group grp3 on cluster and Hue. Then use following statements to grant proper permission to each group:
+
+1. Read write access to database: ‘s3db’ for any user in group ‘grp3’:
+
+    create role read_write_s3db_role;
+    GRANT ROLE read_write_s3db_role TO GROUP grp3;
+    GRANT ALL ON DATABASE s3db TO ROLE read_write_s3db_role;
+    GRANT ALL ON URI 'hdfs://hue-1.test.cloudera.com:8020/user/t3' to ROLE read_write_s3db_role;
+
+2. Read only permission for database: ‘default’ for any user in group ‘grp2’:
+
+    create role read_only_defaultDb_role;
+    GRANT ROLE read_only_defaultDb_role TO GROUP grp2;
+    GRANT SELECT ON DATABASE default TO ROLE read_only_defaultDb_role;
+    GRANT REFRESH ON DATABASE default TO ROLE read_only_defaultDb_role;
+
+Now ‘t3’ user can read and create new tables in database:s3db while ‘t2’ user can read database: default only.
+
+We can grant those permission through Hue security page too, it should ends like following.
+
+![Listing of Sentry Table privileges](https://cdn.gethue.com/uploads/2019/04/HueSecurityRoles.png)
+
+Note: You have to grant URI permission to avoid following error during table creation:
+
+    Error while compiling statement: FAILED: SemanticException No valid privileges User t3 does not have privileges for CREATETABLE The required privileges: Server=server1->URI=hdfs://hue-1.gce.cloudera.com:8020/user/t3/t3_dir->action=*->grantOption=false;
+
+
+### Solr
+
+[Solr](http://gethue.com/ui-to-edit-sentry-privilege-of-solr-collections/) privileges can be edited directly via the interface.
+
+For listing collections, query and creating collection:
+
+    Admin=*->action=*
+    Collection=*->action=*
+    Schema=*->action=*
+    Config=*->action=*
+
+
+![Listing of Solr collection](https://cdn.gethue.com/uploads/2016/05/solr-secu-1024x624.png)
+Listing of Solr collections and configs with their related privileges.
+
+![Listing of all the roles and their privileges.](https://cdn.gethue.com/uploads/2016/05/solr-secu2-e1464909489928.png)
+Listing of all the roles and their privileges. Possibility to filter by groups.
+
+
+![Apply privilege to all the collections or configs with *](https://cdn.gethue.com/uploads/2016/05/solr-sentry-query-error.png)
+Apply privilege to all the collections or configs with *
+
+
+![End user error when querying a collection without the QUERY privilege](https://cdn.gethue.com/uploads/2016/06/solr-sentry-all.png)
+End user error when querying a collection without the QUERY privilege
+
+
+![End user error when modifying a record without the UPDATE privilege](https://cdn.gethue.com/uploads/2016/06/solr-sentry-update-error.png)
+End user error when modifying a record without the UPDATE privilege
+
+
+### HDFS Acls

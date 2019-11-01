@@ -217,13 +217,67 @@ Also read about building some [better autocompletes](/developer/parsers/) or ext
 
 Dashboards are an interactive way to explore your data quickly and easily. No programming is required and the analysis is done by drag & drops and clicks.
 
-Read more about [Dashboards](http://gethue.com/search-dashboards/).
+![Search Full](https://cdn.gethue.com/uploads/2015/08/search-full-mode.png)
 
 Simply drag & drop widgets that are interconnected together. This is great for exploring new datasets or monitoring without having to type.
 
 The top search bar offers a [full autocomplete](http://gethue.com/intuitively-discovering-and-exploring-a-wine-dataset-with-the-dynamic-dashboards/) on all the values of the index.
 
 The “More like This” feature lets you selected fields you would like to use to find similar records. This is a great way to find similar issues, customers, people... with regard to a list of attributes.
+
+### Marker Map
+Points close to each other are grouped together and will expand when zooming-in. A Yelp-like search filtering experience can also be created by checking the box.
+
+![Marker Map](https://cdn.gethue.com/uploads/2015/08/search-marker-map.png)
+
+### Edit records
+
+Indexed records can be directly edited in the Grid or HTML widgets by admins.
+
+### link to original documents
+
+Links to the original documents can also be inserted. Add to the record a field named ‘link-meta’ that contains some json describing the URL or address of a table or file that can be open in the HBase Browser, Metastore App or File Browser:
+
+Any link
+
+    {'type': 'link', 'link': 'gethue.com'}
+
+HBase Browser
+
+    {'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527'}
+    {'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1'}
+    {'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1', 'col': 'c1'}
+
+File Browser
+
+    {'type': 'hdfs', 'path': '/data/hue/file.txt'}
+
+Table Catalog
+
+    {'type': 'hive', 'database': 'default', 'table': 'sample_07'}
+
+![Data Links](https://cdn.gethue.com/uploads/2015/08/search-link-1024x630.png)
+
+### Save queries
+
+Current selected facets and filters, query strings can be saved with a name within the dashboard. These are useful for defining “cohorts” or pre-selection of records and quickly reloading them.
+
+![Rolling time](https://cdn.gethue.com/uploads/2015/08/search-query-def-1024x507.png)
+
+### ‘Fixed’ or ‘rolling’ time window
+
+Real time indexing can now shine with the rolling window filter and the automatic refresh of the dashboard every N seconds. See it in action in the real time Twitter indexing with Spark streaming post.
+
+![Rolling time](https://cdn.gethue.com/uploads/2015/08/search-fixed-time.png)
+
+### Nested Analytics facets
+
+![Nested Analytics facets](https://cdn.gethue.com/uploads/2015/08/search-nested-facet-1024x304.png)
+![Nested Analytics Counts](https://cdn.gethue.com/uploads/2015/08/search-hit-widget.png)
+
+A more comprehensive demo is available on the [BikeShare data visualization post](http://gethue.com/bay-area-bikeshare-data-analysis-with-search-and-spark-notebook/).
+
+
 
 ## Jobs
 

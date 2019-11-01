@@ -1019,3 +1019,93 @@ under the `[[[default]]]` and `[[[ha]]]` sub-sections.
         proxy_api_url=http://yarn-proxy.com:8088/
         resourcemanager_port=8032
         history_server_api_url=http://yarn-rhs-com:19888/
+
+### Apache Sentry
+
+To have Hue point to a Sentry service and another host, modify these hue.ini properties:
+
+    [libsentry]
+      # Hostname or IP of server.
+      hostname=localhost
+
+      # Port the sentry service is running on.
+      port=8038
+
+      # Sentry configuration directory, where sentry-site.xml is located.
+      sentry_conf_dir=/etc/sentry/conf
+
+Hue will also automatically pick up the server name of HiveServer2 from the sentry-site.xml file of /etc/hive/conf.
+
+![Listing of Sentry Tables privileges](https://cdn.gethue.com/uploads/2019/04/HueSecurityRoles.png
+
+And that’s it, you can know specify who can see/do what directly in a Web UI! The app sits on top of the standard Sentry API and so it fully compatible with Sentry. Next planned features will bring Solr Collections, HBase privilege management as well as more bulk operations and a tighter integration with HDFS.
+
+
+To be able to edit roles and privileges in Hue, the logged-in Hue user needs to belong to a group in Hue that is also an admin group in Sentry (whatever UserGroupMapping Sentry is using, the corresponding groups must exist in Hue or need to be entered manually). For example, our ‘hive’ user belongs to a ‘hive’ group in Hue and also to a ‘hive’ group in Sentry:
+
+    <property>
+      <name>sentry.service.admin.group</name>
+      <value>hive,impala,hue</value>
+    </property>
+
+**Notes**
+
+* Create a role in the Sentry app through Hue
+* Grant privileges to that role such that the role can see the database in the Sentry app
+* Create a group in Hue with the same name as the role in Sentry
+* Grant that role to a user in Hue
+* Ensure that the user in Hue has an equivalent O/S level
+* Ensure a user has an O/S level account on all hosts and that user is part of a group with the same name as the group in Hue (this assumes that the default ShellBasedUnixGroupsMapping is set for HDFS in CM)
+
+Our users are:
+
+* hive (admin) belongs to the hive group
+* user1_1 belongs to the user_group1 group
+* user2_1 belongs to the user_group2 group
+
+We synced the Unix users/groups into Hue with these commands:
+
+    export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE | tail -1 | awk '{print $9}'`"
+
+    build/env/bin/hue useradmin_sync_with_unix --min-uid=1000
+
+If using the package version and has the CDH repository register, install sentry with:
+
+    sudo apt-get install sentry
+
+If using Kerberos, make sure ‘hue’ is allowed to connect to Sentry in /etc/sentry/conf/sentry-site.xml:
+
+    <property>
+        <name>sentry.service.allow.connect</name>
+        <value>impala,hive,solr,hue</value>
+    </property>
+
+Here is an example of sentry-site.xml
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <configuration>
+    <property>
+      <name>sentry.service.security.mode</name>
+      <value>none</value>
+    </property>
+    <property>
+      <name>sentry.service.admin.group</name>
+      <value>hive,romain</value>
+    </property>
+    <property>
+      <name>sentry.service.allow.connect</name>
+      <value>impala,hive,solr</value>
+    </property>
+    <property>
+      <name>sentry.store.jdbc.url</name>
+      <value>jdbc:derby:;databaseName=sentry_store_db;create=true</value>
+    </property>
+    <property>
+      <name>sentry.store.jdbc.driver</name>
+      <value>org.apache.derby.jdbc.EmbeddedDriver</value>
+    </property>
+    <property>
+      <name>sentry.store.jdbc.password</name>
+      <value>aaa</value>
+    </property>
+    </configuration>
