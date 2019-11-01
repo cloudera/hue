@@ -30,24 +30,6 @@ The new search bar is always accessible on the top of screen, and it offers a do
 
 ![Top Search](https://cdn.gethue.com/uploads/2016/04/table_search.png)
 
-Existing tags and indexed objects show up automatically, any additional tags you add appear back in metadata server, and the familiar metadata server search syntax is supported.
-
-By default, only tables and views are returned. To search for columns, partitions, databases use the ‘type:' filter.
-
-Example of searches:
-
-* table:customer → Find the customer table
-* table:tax* tags:finance → List all the tables starting with tax and tagged with ‘finance'
-* owner:admin type:field usage → List all the fields created by the admin user that matches the usage string
-* parentPath:"/default/web_logs" type:FIELD  originalName:b* → List all the columns starting with `b` of the table `web_logs` in the database `default`.
-
-Learn more on the [Search](http://gethue.com/realtime-catalog-search-with-hue-and-apache-atlas/).
-
-![Data Catalog](https://cdn.gethue.com/uploads/2016/04/tags.png)
-
-### Tagging
-
-In addition, you can also now tag objects with names to better categorize them and group them to different projects. These tags are searchable, expediting the exploration process through easier, more intuitive discovery.
 
 ### Left assist
 
