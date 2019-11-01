@@ -64,6 +64,7 @@ class Executor {
         });
         if (allExecutablesIndex[executable.getKey()]) {
           executable = allExecutablesIndex[executable.getKey()];
+          executable.parsedStatement = parsedStatement;
           delete allExecutablesIndex[executable.getKey()];
         }
         if (
@@ -89,6 +90,7 @@ class Executor {
 
     // Cancel any "lost" executables and any batch chain it's part of
     executables.lost.forEach(lostExecutable => {
+      lostExecutable.lost = true;
       lostExecutable.cancelBatchChain();
     });
 
