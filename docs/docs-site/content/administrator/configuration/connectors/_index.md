@@ -573,6 +573,18 @@ Alternative:
       ## The JDBC driver clickhouse-jdbc.jar and its related jars need to be in the CLASSPATH environment variable.
       options='{"url": "jdbc:clickhouse://localhost:8123", "driver": "ru.yandex.clickhouse.ClickHouseDriver", "user": "readonly", "password": ""}'
 
+### Elastic Search
+
+The dialect for https://github.com/elastic/elasticsearch should be added to the Python system or Hue Python virtual environment:
+
+      ./build/env/bin/pip install elasticsearch-dbapi
+
+    [[[es]]]
+      name = Elastic Search
+      interface=sqlalchemy
+      options='{"url": "elasticsearch+http://localhost:9200/"}'
+
+
 ### Apache Pinot DB
 
 The dialect for https://pinot.apache.org should be added to the Python system or Hue Python virtual environment:
