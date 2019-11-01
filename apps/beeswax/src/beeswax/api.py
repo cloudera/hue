@@ -124,7 +124,7 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
 
       if table.is_impala_only:
         if db.client.query_server['server_name'] != 'impala': # Expand Kudu columns information
-          query_server = get_query_server_config('impala', cluster=cluster)
+          query_server = get_query_server_config('impala', connector=cluster)
           db = dbms.get(db.client.user, query_server, cluster=cluster)
 
         col_options = db.get_table_describe(database, table.name)
@@ -653,7 +653,7 @@ def get_sample_data(request, database, table, column=None):
   app_name = get_app_name(request)
   cluster = json.loads(request.POST.get('cluster', '{}'))
 
-  query_server = get_query_server_config(app_name, cluster=cluster)
+  query_server = get_query_server_config(app_name, connector=cluster)
   db = dbms.get(request.user, query_server)
 
   response = _get_sample_data(db, database, table, column, cluster=cluster)
@@ -663,7 +663,7 @@ def get_sample_data(request, database, table, column=None):
 def _get_sample_data(db, database, table, column, async=False, cluster=None, operation=None):
   table_obj = db.get_table(database, table)
   if table_obj.is_impala_only and db.client.query_server['server_name'] != 'impala':
-    query_server = get_query_server_config('impala', cluster=cluster)
+    query_server = get_query_server_config('impala', connector=cluster)
     db = dbms.get(db.client.user, query_server, cluster=cluster)
 
   sample_data = db.get_sample(database, table_obj, column, generate_sql_only=async, operation=operation)
@@ -755,7 +755,7 @@ def analyze_table(request, database, table, columns=None):
   app_name = get_app_name(request)
   cluster = json.loads(request.POST.get('cluster', '{}'))
 
-  query_server = get_query_server_config(app_name, cluster=cluster)
+  query_server = get_query_server_config(app_name, connector=cluster)
   db = dbms.get(request.user, query_server)
 
   table_obj = db.get_table(database, table)
@@ -784,7 +784,7 @@ def get_table_stats(request, database, table, column=None):
   app_name = get_app_name(request)
   cluster = json.loads(request.POST.get('cluster', '{}'))
 
-  query_server = get_query_server_config(app_name, cluster=cluster)
+  query_server = get_query_server_config(app_name, connector=cluster)
   db = dbms.get(request.user, query_server)
 
   response = {'status': -1, 'message': '', 'redirect': ''}
@@ -807,7 +807,7 @@ def get_top_terms(request, database, table, column, prefix=None):
   app_name = get_app_name(request)
   cluster = json.loads(request.POST.get('cluster', '{}'))
 
-  query_server = get_query_server_config(app_name, cluster=cluster)
+  query_server = get_query_server_config(app_name, connector=cluster)
   db = dbms.get(request.user, query_server)
 
   response = {'status': -1, 'message': '', 'redirect': ''}
