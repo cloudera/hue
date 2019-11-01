@@ -75,7 +75,7 @@ Navigator
 * owner:admin type:field usage → List all the fields created by the admin user that matches the usage string
 * parentPath:"/default/web_logs" type:FIELD  originalName:b* → List all the columns starting with `b` of the table `web_logs` in the database `default`.
 
-![Data Catalog Search](https://cdn.gethue.com/uploads/2019/06/SearchBy_Classification_Tag.png)
+![Data Catalog Search](https://cdn.gethue.com/uploads/2019/06/SearchWithType_field_name.png)
 
 Learn more on the [Search](http://gethue.com/realtime-catalog-search-with-hue-and-apache-atlas/).
 
