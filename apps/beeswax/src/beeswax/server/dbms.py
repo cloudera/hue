@@ -39,7 +39,7 @@ from indexer.file_format import HiveFormat
 from libzookeeper import conf as libzookeeper_conf
 
 from beeswax import hive_site
-from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, HIVE_METASTORE_HOST, HIVE_METASTORE_PORT, LIST_PARTITIONS_LIMIT, SERVER_CONN_TIMEOUT, \
+from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, HIVE_SERVER_HOST, HIVE_HTTP_THRIFT_PORT, HIVE_METASTORE_HOST, HIVE_METASTORE_PORT, LIST_PARTITIONS_LIMIT, SERVER_CONN_TIMEOUT, \
   AUTH_USERNAME, AUTH_PASSWORD, APPLY_NATURAL_SORT_MAX, QUERY_PARTITIONS_LIMIT, HIVE_DISCOVERY_HIVESERVER2_ZNODE, \
   HIVE_DISCOVERY_HS2, HIVE_DISCOVERY_LLAP, HIVE_DISCOVERY_LLAP_HA, HIVE_DISCOVERY_LLAP_ZNODE, CACHE_TIMEOUT, \
   LLAP_SERVER_HOST, LLAP_SERVER_PORT, LLAP_SERVER_THRIFT_PORT, USE_SASL as HIVE_USE_SASL
@@ -120,7 +120,7 @@ def get_query_server_config(name='beeswax', connector=None):
                   cache.set("llap", json.dumps({"host": llap_servers["addresses"][0]["host"], "port": llap_servers["addresses"][0]["port"]}), CACHE_TIMEOUT.get())
             else:
               LOG.error("LLAP Endpoint not found, reverting to HiveServer2")
-              cache.set("llap", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": hive_site.hiveserver2_thrift_http_port()}), CACHE_TIMEOUT.get())
+              cache.set("llap", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}), CACHE_TIMEOUT.get())
           else:
             znode = "{0}".format(HIVE_DISCOVERY_LLAP_ZNODE.get())
             LOG.debug("Setting up LLAP with the following node {0}".format(znode))
@@ -146,10 +146,10 @@ def get_query_server_config(name='beeswax', connector=None):
             server_to_use = 0 # if CONF.HIVE_SPREAD.get() randint(0, len(hiveservers)-1) else 0
             cache.set("hiveserver2", json.dumps({"host": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[0], "port": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[1]}))
           else:
-            cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": hive_site.hiveserver2_thrift_http_port()}))
+            cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}))
           zk.stop()
         else:
-          cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": hive_site.hiveserver2_thrift_http_port()}))
+          cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}))
       activeEndpoint = json.loads(cache.get("hiveserver2"))
 
     if name == 'impala':
