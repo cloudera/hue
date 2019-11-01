@@ -17,6 +17,7 @@
 import huePubSub from 'utils/huePubSub';
 import { EXECUTABLE_UPDATED_EVENT } from 'apps/notebook2/execution/executable';
 import { ACTIVE_STATEMENT_CHANGED_EVENT } from 'ko/bindings/ace/aceLocationHandler';
+import AceAnchoredRange from 'ko/bindings/ace/aceAnchoredRange';
 
 // TODO: depends on Ace
 
@@ -27,6 +28,7 @@ const ACTIVE_CSS = 'ace-active-gutter-decoration';
 const COMPLETED_CSS = 'ace-completed-gutter-decoration';
 const EXECUTING_CSS = 'ace-executing-gutter-decoration';
 const FAILED_CSS = 'ace-failed-gutter-decoration';
+const FAILED_MARKER_CSS = 'ace-failed-marker';
 
 const getLeadingEmptyLineCount = parsedStatement => {
   let leadingEmptyLineCount = 0;
@@ -40,29 +42,6 @@ const getLeadingEmptyLineCount = parsedStatement => {
   return leadingEmptyLineCount;
 };
 
-const forEachLine = (statement, callback) => {
-  const leadingEmptyLineCount = getLeadingEmptyLineCount(statement);
-  let line = statement.location.first_line - 1 + leadingEmptyLineCount;
-  for (line; line < statement.location.last_line; line++) {
-    callback(line);
-  }
-};
-
-const clearErrorForLine = (session, line) => {
-  const markers = session.getMarkers(false);
-  Object.keys(markers).some(key => {
-    const marker = markers[key];
-    if (
-      marker.clazz === 'ace_error-line' &&
-      marker.range.start.row <= line &&
-      line <= marker.range.end.row
-    ) {
-      session.removeMarker(marker.id);
-      return true;
-    }
-  });
-};
-
 export default class AceGutterHandler {
   constructor(options) {
     this.editor = options.editor;
@@ -71,7 +50,8 @@ export default class AceGutterHandler {
 
     this.disposals = [];
 
-    const previouslyMarkedActiveLines = [];
+    const activeStatementAnchor = new AceAnchoredRange(this.editor);
+    activeStatementAnchor.addGutterCss(ACTIVE_CSS);
 
     const changedSubscription = huePubSub.subscribe(
       ACTIVE_STATEMENT_CHANGED_EVENT,
@@ -79,44 +59,50 @@ export default class AceGutterHandler {
         if (statementDetails.id !== this.editorId || !statementDetails.activeStatement) {
           return;
         }
-
-        const session = this.editor.getSession();
-        while (previouslyMarkedActiveLines.length) {
-          session.removeGutterDecoration(previouslyMarkedActiveLines.shift(), ACTIVE_CSS);
-        }
-
-        forEachLine(statementDetails.activeStatement, line => {
-          previouslyMarkedActiveLines.push(line);
-          session.addGutterDecoration(line, ACTIVE_CSS);
-        });
+        const leadingEmptyLineCount = getLeadingEmptyLineCount(statementDetails.activeStatement);
+        activeStatementAnchor.move(
+          statementDetails.activeStatement.location,
+          leadingEmptyLineCount
+        );
       }
     );
 
     this.disposals.push(() => {
       changedSubscription.remove();
+      activeStatementAnchor.dispose();
     });
 
     if (this.executor) {
-      const session = this.editor.getSession();
-      const AceRange = window.ace.require('ace/range').Range;
-
       const executableSub = huePubSub.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
         if (executable.executor === this.executor) {
-          const statement = executable.parsedStatement;
-          forEachLine(statement, line => {
-            session.removeGutterDecoration(line, COMPLETED_CSS);
-            session.removeGutterDecoration(line, EXECUTING_CSS);
-            clearErrorForLine(session, line);
-            if (executable.isRunning()) {
-              session.addGutterDecoration(line, EXECUTING_CSS);
-            } else if (executable.isSuccess()) {
-              session.addGutterDecoration(line, COMPLETED_CSS);
-            } else if (executable.isFailed()) {
-              const range = new AceRange(line, 0, line, session.getLine(line).length);
-              session.addMarker(range, 'ace_error-line');
-              session.addGutterDecoration(line, FAILED_CSS);
+          if (executable.lost) {
+            if (executable.obseverState.aceAnchor) {
+              executable.obseverState.aceAnchor.dispose();
+              delete executable.obseverState.aceAnchor;
             }
-          });
+            return;
+          }
+
+          const statement = executable.parsedStatement;
+          if (!executable.obseverState.aceAnchor) {
+            executable.obseverState.aceAnchor = new AceAnchoredRange(this.editor);
+          }
+          const leadingEmptyLineCount = getLeadingEmptyLineCount(statement);
+          executable.obseverState.aceAnchor.move(statement.location, leadingEmptyLineCount);
+          const anchoredRange = executable.obseverState.aceAnchor;
+          anchoredRange.removeGutterCss(COMPLETED_CSS);
+          anchoredRange.removeGutterCss(EXECUTING_CSS);
+          anchoredRange.removeGutterCss(FAILED_CSS);
+          anchoredRange.removeMarkerCss(FAILED_MARKER_CSS);
+
+          if (executable.isRunning()) {
+            anchoredRange.addGutterCss(EXECUTING_CSS);
+          } else if (executable.isSuccess()) {
+            anchoredRange.addGutterCss(COMPLETED_CSS);
+          } else if (executable.isFailed()) {
+            anchoredRange.addMarkerCss(FAILED_MARKER_CSS);
+            anchoredRange.addGutterCss(FAILED_CSS);
+          }
         }
       });
 
