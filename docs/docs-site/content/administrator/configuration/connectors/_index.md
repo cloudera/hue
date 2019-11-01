@@ -933,11 +933,43 @@ And from the HBase shell, authorize some ends users, e.g. to give full access to
 
     hbase shell> grant 'admin', 'RWXCA'
 
-## Others
+## Metadata
 
 ### Apache Atlas
 
-In the `[metadata]` section, Hue is supporting Cloudera Navigator and soon Apache Atlas ([HUE-8749](https://issues.cloudera.org/browse/HUE-8749)) in order to enrich the [data catalog](/user/browsing/).
+In the `[metadata]` section, Hue is supporting Cloudera Navigator and Apache Atlas in order to enrich the [data catalog](/user/browsing/#data-catalog).
+
+    [metadata]
+    [[catalog]]
+      # The type of Catalog: Apache Atlas, Cloudera Navigator...
+      interface=atlas
+      # Catalog API URL (without version suffix).
+      api_url=http://localhost:21000/atlas/v2
+
+      # Username of the CM user used for authentication.
+      ## server_user=hue
+      # Password of the user used for authentication.
+      server_password=
+
+      # Limits found entities to a specific cluster. When empty the entities from all clusters will be included in the search results.
+      ## search_cluster=
+
+      # Set to true when authenticating via kerberos instead of username/password
+      ## kerberos_enabled=false
+
+![Data Catalog Search](https://cdn.gethue.com/uploads/2019/06/SearchWithType_field_name.png)
+
+### Cloudera Navigator
+
+The integration was replaced with Apache Atlas but can still be used.
+
+### Cloudera Navigator Optimizer
+
+The integration is powering the [Risk Alerts and Popular Values](/user/querying/#query-troubleshooting) in the SQL Autocomplete.
+
+![Popular joins suggestion](https://cdn.gethue.com/uploads/2017/07/hue_4_query_joins.png)
+
+## Jobs
 
 ### Apache Spark
 
