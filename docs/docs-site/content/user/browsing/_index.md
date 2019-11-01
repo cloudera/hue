@@ -9,7 +9,7 @@ Browsers power the Data Catalog. They let you easily search, glance and perform 
 
 The browsers can be "enriched" with [Search and Tagging](http://gethue.com/improved-sql-exploration-in-hue-4-3/) by metadata services.
 
-## SQL Tables
+## Tables
 
 The Table Browser enables you to manage the databases, tables, and partitions of the metastore shared by the Hive and Impala. You can perform the following operations:
 
@@ -28,6 +28,62 @@ The Table Browser enables you to manage the databases, tables, and partitions of
     -   Import data into a table
     -   [Filter, Sort and Browse Partitions](http://gethue.com/filter-sort-browse-hive-partitions-with-hues-metastore/)
 
+
+## Data Catalog
+
+[Apache Atlas](https://atlas.apache.org/) is powering the Search and Commenting of tables, columns. Other Catalogs like previously Cloudera Navigator can be integrated via the [SDK](/developer/sdk).
+
+Existing tags, descriptions and indexed objects show up automatically, any additional tags you add appear back in metadata server, and the familiar metadata server search syntax is supported.
+
+Before typing any query to get insights, users need to find and explore the correct datasets. The Data Catalog search usability experience has been improved in each release since. It is accessible from the top bar of the interface and offers free text search of SQL tables, columns, tags and saved queries. This is particularly useful for quickly looking up a table among thousands or finding existing queries already analyzing a certain dataset.
+
+![Data Catalog top search](https://cdn.gethue.com/uploads/2018/04/blog_top_search_.png)
+
+Searching all the available queries or data in the cluster
+
+![Data Catalog tags](https://cdn.gethue.com/uploads/2018/04/blog_tag_listing.png)
+
+Listing the possible tags to filter on. This also works for ‘types’.
+
+### Unification and Caching of all SQL metadata
+
+The list of tables and their columns is displayed in multiple part of the interface. This data is pretty costly to fetch and comes from different sources. In this new version, the information is now cached and reused by all the Hue components. As the sources are diverse, e.g. Apache Hive, Apache Atlas those are stored into a single object, so that it is easier and faster to display without caring about the underlying technical details.
+
+In addition to editing the tags of any SQL objects like tables, views, columns… which has been available since version one, table descriptions can now also be edited. This allows a self service documentation of the metadata by the end users, which was not possible until know as directly editing Hive comments require some admin Sentry privileges which are not granted to regular users in a secure cluster.
+
+![Data Catalog](https://cdn.gethue.com/uploads/2018/04/blog_metadata.png)
+
+### Search
+
+By default, only tables and views are returned. To search for columns, partitions, databases use the ‘type:' filter.
+
+Example of searches:
+
+Atlas
+
+* ‘sample’ → Any table or Hue document with prefix ‘sample’ will be returned
+* ‘type:database’→ List all databases on this cluster
+* ‘type:table → List all tables on this cluster
+* ‘type:field name’→ List tables with field(column): ‘name’
+* ‘tag:classification_testdb5’ or ‘classification:classification_testdb5’→ List entities with classification ‘classification_testdb5’
+* ‘owner:admin’→ List all tables owned by ‘admin’ user
+
+Navigator
+
+* table:customer → Find the customer table
+* table:tax* tags:finance → List all the tables starting with tax and tagged with ‘finance'
+* owner:admin type:field usage → List all the fields created by the admin user that matches the usage string
+* parentPath:"/default/web_logs" type:FIELD  originalName:b* → List all the columns starting with `b` of the table `web_logs` in the database `default`.
+
+![Data Catalog Search](https://cdn.gethue.com/uploads/2019/06/SearchBy_Classification_Tag.png)
+
+Learn more on the [Search](http://gethue.com/realtime-catalog-search-with-hue-and-apache-atlas/).
+
+### Tagging
+
+In addition, you can also now tag objects with names to better categorize them and group them to different projects. These tags are searchable, expediting the exploration process through easier, more intuitive discovery.
+
+![Data Catalog](https://cdn.gethue.com/uploads/2016/04/tags.png)
 
 ## Data Importer
 
