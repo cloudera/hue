@@ -13,12 +13,12 @@ Hue is a mature open source SQL Assistant for querying, visualizing and sharing 
 
 Thousands of companies and organizations use Hue to open-up their data and provide self service querying. Hue is heavily used by:
 
-* 1000+ paying customers
-* top Fortune 500
+* 1000+ customers
+* Top Fortune 500
 
 who are executing 100s of 1000s of queries daily. It also ships in Amazon AWS and its open source version is used by hundred of companies.
 
-Hue is also ideal for building your own Cloud SQL Editor and any contributions are welcome.
+Hue is also ideal for building your own Cloud SQL Editor and any contributions are welcomed.
 
 
 Administrate
