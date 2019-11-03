@@ -96,6 +96,15 @@ class KSqlApi(Api):
             {'name': t['name'], 'type': t['type'], 'comment': 'Topic: %(topic)s Format: %(format)s' % t}
             for t in self.db.show_streams()
           ]
+      elif column is None:
+        columns = self.db.get_columns(table)
+        response['columns'] = [col['name'] for col in columns]
+        response['extended_columns'] = [{
+            'comment': col.get('comment'),
+            'name': col.get('name'),
+            'type': str(col['schema'].get('type'))
+          } for col in columns
+        ]
       else:
         response = {}
 
