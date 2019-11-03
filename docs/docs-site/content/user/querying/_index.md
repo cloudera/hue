@@ -206,6 +206,12 @@ A new experimental panel when enabled can offer post risk analysis and recommend
 
 Turns a list of semi-colon separated queries into an interactive presentation by clicking on the 'Dashboard' icon. It is great for doing demos or reporting.
 
+### Scheduling
+
+Scheduling of queries is currently done via Apache Oozie and will be open to other schedulers with [HUE-3797](https://issues.cloudera.org/browse/HUE-3797).
+
+![Oozie workflows](https://cdn.gethue.comuploads/2016/04/hue-workflows.png)
+
 ## Databases & Datawarehouses
 
 ### List

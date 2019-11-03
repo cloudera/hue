@@ -410,9 +410,11 @@ Query capabilities
 Read more about it on [Browsing Impala Query Execution within the SQL Editor
 ](http://gethue.com/browsing-impala-query-execution-within-the-sql-editor/).
 
-### Workflow / Schedules (Oozie)
+### Oozie Workflow / Schedules
 
 List submitted workflows, schedules and bundles.
+
+![Oozie jobs](https://cdn.gethue.com/uploads/2016/04/hue-dash-oozie.png)
 
 ### Livy / Spark
 
