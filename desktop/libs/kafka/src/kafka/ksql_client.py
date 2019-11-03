@@ -94,6 +94,14 @@ class KSqlApi(object):
       raise KSqlApiException(e)
 
 
+  def get_columns(self, table):
+    try:
+      response = self.client.ksql('DESCRIBE %s' % table)
+      return response[0]['sourceDescription']['fields']
+    except Exception as e:
+      raise KSqlApiException(e)
+
+
   def ksql(self, statement):
     response = self.client.ksql(statement)
     print(response)
