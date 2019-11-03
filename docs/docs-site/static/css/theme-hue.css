@@ -35,6 +35,10 @@ textarea:focus, input[type="email"]:focus, input[type="number"]:focus, input[typ
     box-shadow: none;
 }
 
+h1 {
+  font-size: 2.5rem;
+}
+
 h2, h3, h4, h5 {
     color: var(--MAIN-TITLES-TEXT-color) !important;
 }
@@ -103,11 +107,9 @@ a:hover {
 }
 
 .toc {
-  position: fixed;
-  top: 100px;
-  right: 0;
+  position: unset;
   width: auto;
-  border-left: thin solid #ccc;
+  border-left: none;
 }
 .toc .wrapper{
   margin-left: 20px;
@@ -133,5 +135,23 @@ a:hover {
 }
 
 #body-inner {
-  width: calc(100% - 300px);
+  width: 100%;
 }
+
+@media (min-width: 992px) {
+  h1 {
+    font-size: 3.25rem;
+  }
+  
+  #body-inner {
+    width: calc(100% - 300px);
+  }
+
+  .toc {
+    position: fixed;
+    top: 100px;
+    right: 0;
+    border-left: thin solid #ccc;
+  }
+}
+
