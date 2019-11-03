@@ -88,7 +88,7 @@ def check_privileges(view_func):
   return wraps(view_func)(decorate)
 
 
-class OptimizerApi(object):
+class OptimizerClient(object):
 
   def __init__(self, user, api_url=None, auth_key=None, auth_key_secret=None, tenant_id=None):
     self.user = user
@@ -190,19 +190,8 @@ class OptimizerApi(object):
   # Sentry permissions work bottom to top.
   # @check_privileges
   def top_tables(self, workfloadId=None, database_name='default', page_size=1000, startingToken=None):
-    data = self._call('getTopTables', {'tenant' : self._tenant_id, 'dbName': database_name.lower(), 'pageSize': page_size, 'startingToken': startingToken})
+    return self._call('getTopTables', {'tenant' : self._tenant_id, 'dbName': database_name.lower(), 'pageSize': page_size, 'startingToken': startingToken})
 
-    if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
-      checker = get_checker(user=self.user)
-      action = 'SELECT'
-
-      def getkey(table):
-        names = _get_table_name(table['name'])
-        return {'server': get_hive_sentry_provider(), 'db': names['database'], 'table': names['table']}
-
-      data['results'] = list(checker.filter_objects(data['results'], action, key=getkey))
-
-    return data
 
   @check_privileges
   def table_details(self, database_name, table_name, page_size=100, startingToken=None):
@@ -251,16 +240,7 @@ class OptimizerApi(object):
     if db_tables:
       args['dbTableList'] = [db_table.lower() for db_table in db_tables]
 
-    results = self._call('getTopFilters', args)
-
-    if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
-      filtered_filters = []
-      for result in results['results']:
-        cols = [_get_table_name(col['columnName']) for col in result["popularValues"][0]["group"]]
-        if len(cols) == len(list(_secure_results(cols, self.user))):
-          filtered_filters.append(result)
-      results['results'] = filtered_filters
-    return results
+    return self._call('getTopFilters', args)
 
 
   @check_privileges

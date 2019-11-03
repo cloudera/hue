@@ -42,7 +42,7 @@ from desktop.lib.paths import SAFE_CHARACTERS_URI_COMPONENTS
 from desktop.lib.rest.http_client import RestException
 from desktop.lib.thrift_util import unpack_guid, unpack_guid_base64
 from desktop.models import DefaultConfiguration, Document2
-from metadata.optimizer_client import OptimizerApi
+from metadata.optimizer.optimizer_client import OptimizerClient
 
 from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported, _get_snippet_name, Notebook, get_interpreter
 
@@ -595,27 +595,27 @@ DROP TABLE IF EXISTS `%(table)s`;
     response = self._get_current_statement(notebook, snippet)
     query = response['statement']
 
-    api = OptimizerApi(self.user)
+    client = OptimizerClient(self.user)
 
-    return api.query_risk(query=query, source_platform=snippet['type'], db_name=snippet.get('database') or 'default')
+    return client.query_risk(query=query, source_platform=snippet['type'], db_name=snippet.get('database') or 'default')
 
 
   def statement_compatibility(self, notebook, snippet, source_platform, target_platform):
     response = self._get_current_statement(notebook, snippet)
     query = response['statement']
 
-    api = OptimizerApi(self.user)
+    client = OptimizerClient(self.user)
 
-    return api.query_compatibility(source_platform, target_platform, query)
+    return client.query_compatibility(source_platform, target_platform, query)
 
 
   def statement_similarity(self, notebook, snippet, source_platform):
     response = self._get_current_statement(notebook, snippet)
     query = response['statement']
 
-    api = OptimizerApi(self.user)
+    client = OptimizerClient(self.user)
 
-    return api.similar_queries(source_platform, query)
+    return client.similar_queries(source_platform, query)
 
 
   def upgrade_properties(self, lang='hive', properties=None):
