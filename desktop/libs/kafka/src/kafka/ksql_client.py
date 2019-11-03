@@ -78,6 +78,22 @@ class KSqlApi(object):
       raise KSqlApiException(e)
 
 
+  def show_topics(self):
+    try:
+      response = self.client.ksql('SHOW TOPICS')
+      return response[0]['topics']
+    except Exception as e:
+      raise KSqlApiException(e)
+
+
+  def show_streams(self):
+    try:
+      response = self.client.ksql('SHOW STREAMS')
+      return response[0]['streams']
+    except Exception as e:
+      raise KSqlApiException(e)
+
+
   def ksql(self, statement):
     response = self.client.ksql(statement)
     print(response)

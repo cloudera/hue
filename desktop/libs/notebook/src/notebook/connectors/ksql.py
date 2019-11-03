@@ -85,9 +85,17 @@ class KSqlApi(Api):
 
     try:
       if database is None:
-        response['databases'] = ['default']
+        response['databases'] = ['tables', 'topics', 'streams']
       elif table is None:
-        response['tables_meta'] = self.db.show_tables()
+        if database == 'tables':
+          response['tables_meta'] = self.db.show_tables()
+        elif database == 'topics':
+          response['tables_meta'] = self.db.show_topics()
+        elif database == 'streams':
+          response['tables_meta'] = [
+            {'name': t['name'], 'type': t['type'], 'comment': 'Topic: %(topic)s Format: %(format)s' % t}
+            for t in self.db.show_streams()
+          ]
       else:
         response = {}
 
