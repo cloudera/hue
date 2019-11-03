@@ -29,97 +29,124 @@
 <between>'AND'                             { this.popState(); return 'BETWEEN_AND'; }
 
 // Reserved Keywords
-'ALL'                                      { return 'ALL'; }
-'ALTER'                                    { parser.determineCase(yytext); parser.addStatementTypeLocation('ALTER', yylloc, yy.lexer.upcomingInput()); return 'ALTER'; }
+'ADVANCE'                                  { return 'ADVANCE'; }
+'ANALYZE'                                  { return 'ANALYZE'; }
 'AND'                                      { return 'AND'; }
+'ARRAY'                                    { return 'ARRAY'; }
 'AS'                                       { return 'AS'; }
-'ASC'                                      { return 'ASC'; }
+'AT'                                       { return 'AT'; }
+'BEGINNING'                                { return 'BEGINNING' }
 'BETWEEN'                                  { this.begin('between'); return 'BETWEEN'; }
 'BIGINT'                                   { return 'BIGINT'; }
 'BOOLEAN'                                  { return 'BOOLEAN'; }
 'BY'                                       { return 'BY'; }
-'CASCADE'                                  { return 'CASCADE'; }
 'CASE'                                     { return 'CASE'; }
-'CHAR'                                     { return 'CHAR'; }
-'COMMENT'                                  { return 'COMMENT'; }
+'CAST'                                     { return 'CAST'; }
+'CATALOG'                                  { return 'CATALOG'; }
+'CHANGES'                                  { return 'CHANGES'; }
+'COLUMN'                                   { return 'COLUMN'; }
+'COLUMNS'                                  { return 'COLUMNS'; }
+'CONNECTOR'                                { return 'CONNECTOR'; }
+'CONNECTORS'                               { return 'CONNECTORS'; }
 'CREATE'                                   { parser.determineCase(yytext); return 'CREATE'; }
-'CROSS'                                    { return 'CROSS'; }
-'CURRENT'                                  { return 'CURRENT'; }
-'DATABASE'                                 { return 'DATABASE'; }
+'DATE'                                     { return 'DATE'; }
+'DAY'                                      { return 'DAY'; }
 'DECIMAL'                                  { return 'DECIMAL'; }
-'DESC'                                     { return 'DESC'; }
+'DELETE'                                   { return 'DELETE'; }
+'DESCRIBE'                                 { return 'DESCRIBE'; }
 'DISTINCT'                                 { return 'DISTINCT'; }
-'DIV'                                      { return 'ARITHMETIC_OPERATOR'; }
 'DOUBLE'                                   { return 'DOUBLE'; }
 'DROP'                                     { parser.determineCase(yytext); parser.addStatementTypeLocation('DROP', yylloc, yy.lexer.upcomingInput()); return 'DROP'; }
 'ELSE'                                     { return 'ELSE'; }
+'EMIT'                                     { return 'EMIT'; }
 'END'                                      { return 'END'; }
 'EXISTS'                                   { parser.yy.correlatedSubQuery = true; return 'EXISTS'; }
-'FALSE'                                    { return 'FALSE'; }
-'FLOAT'                                    { return 'FLOAT'; }
-'FOLLOWING'                                { return 'FOLLOWING'; }
+'EXPLAIN'                                  { parser.determineCase(yytext); return 'EXPLAIN'; }
+'EXPORT'                                   { return 'EXPORT'; }
+'EXTENDED'                                 { return 'EXTENDED'; }
 'FROM'                                     { parser.determineCase(yytext); return 'FROM'; }
 'FULL'                                     { return 'FULL'; }
+'FUNCTION'                                 { return 'FUNCTION'; }
+'FUNCTIONS'                                { return 'FUNCTIONS'; }
 'GROUP'                                    { return 'GROUP'; }
 'HAVING'                                   { return 'HAVING'; }
+'HOPPING'                                  { return 'HOPPING'; }
+'HOUR'                                     { return 'HOUR'; }
+'HOURS'                                    { return 'HOURS'; }
 'IF'                                       { return 'IF'; }
 'IN'                                       { return 'IN'; }
 'INNER'                                    { return 'INNER'; }
 'INSERT'                                   { return 'INSERT'; }
 'INT'                                      { return 'INT'; }
+'INTEGER'                                  { return 'INTEGER'; }
 'INTO'                                     { return 'INTO'; }
 'IS'                                       { return 'IS'; }
 'JOIN'                                     { return 'JOIN'; }
+'KEY'                                      { return 'KEY'; }
 'LEFT'                                     { return 'LEFT'; }
 'LIKE'                                     { return 'LIKE'; }
 'LIMIT'                                    { return 'LIMIT'; }
 'LIST'                                     { return 'LIST'; }
+'LOAD'                                     { return 'LOAD'; }
+'MAP'                                      { return 'MAP'; }
+'MILLISECOND'                              { return 'MILLISECOND'; }
+'MILLISECONDS'                             { return 'MILLISECONDS'; }
+'MINUTE'                                   { return 'MINUTE'; }
+'MINUTES'                                  { return 'MINUTES'; }
+'MONTH'                                    { return 'MONTH'; }
+'MONTHS'                                   { return 'MONTHS'; }
 'NOT'                                      { return 'NOT'; }
 'NULL'                                     { return 'NULL'; }
 'ON'                                       { return 'ON'; }
-'OPTION'                                   { return 'OPTION'; }
 'OR'                                       { return 'OR'; }
-'ORDER'                                    { return 'ORDER'; }
 'OUTER'                                    { return 'OUTER'; }
 'PARTITION'                                { return 'PARTITION'; }
-'PRECEDING'                                { return 'PRECEDING'; }
+'PARTITIONS'                               { return 'PARTITIONS'; }
 'PRINT'                                    { return 'PRINT'; }
-'PURGE'                                    { return 'PURGE'; }
-'RANGE'                                    { return 'RANGE'; }
-'REGEXP'                                   { return 'REGEXP'; }
+'PROPERTIES'                               { return 'PROPERTIES'; }
+'QUERIES'                                  { return 'QUERIES'; }
+'QUERY'                                    { return 'QUERY'; }
+'RENAME'                                   { return 'RENAME'; }
+'RESET'                                    { return 'RESET'; }
 'RIGHT'                                    { return 'RIGHT'; }
-'RLIKE'                                    { return 'RLIKE'; }
-'ROW'                                      { return 'ROW'; }
-'ROLE'                                     { return 'ROLE'; }
-'ROWS'                                     { return 'ROWS'; }
-'SCHEMA'                                   { return 'SCHEMA'; }
+'RUN'                                      { return 'RUN'; }
+'SAMPLE'                                   { return 'SAMPLE'; }
+'SCRIPT'                                   { return 'SCRIPT'; }
+'SECOND'                                   { return 'SECOND'; }
+'SECOND'                                   { return 'SECOND'; }
 'SELECT'                                   { parser.determineCase(yytext); parser.addStatementTypeLocation('SELECT', yylloc); return 'SELECT'; }
-'SEMI'                                     { return 'SEMI'; }
+'SESSION'                                  { return 'SESSION'; }
 'SET'                                      { parser.determineCase(yytext); parser.addStatementTypeLocation('SET', yylloc); return 'SET'; }
 'SHOW'                                     { parser.determineCase(yytext); parser.addStatementTypeLocation('SHOW', yylloc); return 'SHOW'; }
-'SMALLINT'                                 { return 'SMALLINT'; }
+'SINK'                                     { return 'SINK'; }
+'SOURCE'                                   { return 'SOURCE'; }
+'STREAM'                                   { return 'STREAM'; }
+'STREAMS'                                  { return 'STREAMS'; }
 'STRING'                                   { return 'STRING'; }
+'STRUCT'                                   { return 'STRUCT'; }
 'TABLE'                                    { return 'TABLE'; }
+'TABLES'                                   { return 'TABLES'; }
+'TERMINATE'                                { return 'TERMINATE'; }
 'THEN'                                     { return 'THEN'; }
+'TIME'                                     { return 'TIME'; }
 'TIMESTAMP'                                { return 'TIMESTAMP'; }
-'TINYINT'                                  { return 'TINYINT'; }
 'TO'                                       { return 'TO'; }
 'TRUE'                                     { return 'TRUE'; }
-'TRUNCATE'                                 { parser.determineCase(yytext); parser.addStatementTypeLocation('TRUNCATE', yylloc, yy.lexer.upcomingInput()); return 'TRUNCATE'; }
-'UNBOUNDED'                                { return 'UNBOUNDED'; }
-'UNION'                                    { return 'UNION'; }
-'UPDATE'                                   { parser.determineCase(yytext); return 'UPDATE'; }
-'USE'                                      { parser.determineCase(yytext); parser.addStatementTypeLocation('USE', yylloc); return 'USE'; }
+'TOPIC'                                    { return 'TOPIC'; }
+'TOPICS'                                   { return 'TOPICS'; }
+'TUMBLING'                                 { return 'TUMBLING'; }
+'TYPE'                                     { return 'TYPE'; }
+'TYPES'                                    { return 'TYPES'; }
+'UNSET'                                    { return 'UNSET'; }
 'VALUES'                                   { return 'VALUES'; }
 'VARCHAR'                                  { return 'VARCHAR'; }
-'VIEW'                                     { return 'VIEW'; }
 'WHEN'                                     { return 'WHEN'; }
 'WHERE'                                    { return 'WHERE'; }
 'WITH'                                     { parser.determineCase(yytext); parser.addStatementTypeLocation('WITH', yylloc); return 'WITH'; }
-
-// Non-reserved Keywords
-'OVER'                                     { return 'OVER'; }
-'ROLE'                                     { return 'ROLE'; }
+'WITHIN'                                   { return 'WITHIN'; }
+'YEAR'                                     { return 'YEAR'; }
+'YEARS'                                    { return 'YEARS'; }
+'ZONE'                                     { return 'ZONE'; }
 
 // --- UDFs ---
 AVG\s*\(                                   { yy.lexer.unput('('); yytext = 'avg'; parser.addFunctionLocation(yylloc, yytext); return 'AVG'; }
