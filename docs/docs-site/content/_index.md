@@ -7,7 +7,7 @@ pre = "<b>1. </b>"
 +++
 ![Hue Logo Back-end](/images/hue_logo.png)
 
-<span style="font-size:52px; text-align:center; display: block">Documentation</span>
+<h1>Documentation</h1>
 
 Hue is a mature open source SQL Assistant for querying, visualizing and sharing data in Databases & Data Warehouses: [gethue.com](http://gethue.com).
 
