@@ -175,7 +175,7 @@ def _parse_sites():
 
 def _parse_site(site_path):
   try:
-    data = file(site_path, 'r').read()
+    data = open(site_path, 'r').read()
   except IOError as err:
     if err.errno != errno.ENOENT:
       LOG.error('Cannot read from "%s": %s' % (site_path, err))
