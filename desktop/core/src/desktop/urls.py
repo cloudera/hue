@@ -227,9 +227,6 @@ static_patterns = []
 if settings.SAML_AUTHENTICATION:
   static_patterns.append(url(r'^saml2/', include('libsaml.urls')))
 
-# OpenId specific
-if settings.OPENID_AUTHENTICATION:
-    static_patterns.append(url(r'^openid/', include('libopenid.urls')))
 
 if settings.OAUTH_AUTHENTICATION:
   static_patterns.append(url(r'^oauth/', include('liboauth.urls')))
