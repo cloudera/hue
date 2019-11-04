@@ -72,8 +72,7 @@ class EditorViewModel {
       () =>
         this.selectedNotebook() &&
         this.selectedNotebook().snippets().length === 1 &&
-        this
-          .selectedNotebook()
+        this.selectedNotebook()
           .snippets()[0]
           .isSqlDialect()
     );
@@ -251,8 +250,7 @@ class EditorViewModel {
       this.combinedContent('');
     } else {
       let statements = '';
-      this
-        .selectedNotebook()
+      this.selectedNotebook()
         .snippets()
         .forEach(snippet => {
           if (snippet.statement()) {
@@ -397,42 +395,41 @@ class EditorViewModel {
   }
 
   async openNotebook(uuid, queryTab, skipUrlChange, callback) {
-    return new Promise((resolve, reject) => {
-      $.get('/desktop/api2/doc/', {
+    try {
+      const docData = await apiHelper.fetchDocumentAsync({
         uuid: uuid,
-        data: true,
+        fetchContents: true,
         dependencies: true
-      }).then(data => {
-        if (data.status === 0) {
-          data.data.dependents = data.dependents;
-          data.data.can_write = data.user_perms.can_write;
-          const notebookRaw = data.data;
-          this.loadNotebook(notebookRaw, queryTab);
-          if (typeof skipUrlChange === 'undefined' && !this.isNotificationManager()) {
-            if (this.editorMode()) {
-              this.editorType(data.document.type.substring('query-'.length));
-              huePubSub.publish('active.snippet.type.changed', {
-                type: this.editorType(),
-                isSqlDialect: this.getSnippetViewSettings(this.editorType()).sqlDialect
-              });
-              this.changeURL(
-                this.URLS.editor + '?editor=' + data.document.id + '&type=' + this.editorType()
-              );
-            } else {
-              this.changeURL(this.URLS.notebook + '?notebook=' + data.document.id);
-            }
-          }
-          if (typeof callback !== 'undefined') {
-            callback();
-          }
-          resolve();
-        } else {
-          $(document).trigger('error', data.message);
-          reject();
-          this.newNotebook();
-        }
       });
-    });
+
+      docData.data.dependents = docData.dependents;
+      docData.data.can_write = docData.user_perms.can_write;
+
+      const notebookRaw = docData.data;
+
+      this.loadNotebook(notebookRaw, queryTab);
+
+      if (typeof skipUrlChange === 'undefined' && !this.isNotificationManager()) {
+        if (this.editorMode()) {
+          this.editorType(docData.document.type.substring('query-'.length));
+          huePubSub.publish('active.snippet.type.changed', {
+            type: this.editorType(),
+            isSqlDialect: this.getSnippetViewSettings(this.editorType()).sqlDialect
+          });
+          this.changeURL(
+            this.URLS.editor + '?editor=' + docData.document.id + '&type=' + this.editorType()
+          );
+        } else {
+          this.changeURL(this.URLS.notebook + '?notebook=' + docData.document.id);
+        }
+      }
+      if (typeof callback !== 'undefined') {
+        callback();
+      }
+    } catch (err) {
+      console.error(err);
+      await this.newNotebook();
+    }
   }
 
   prepareShareModal() {

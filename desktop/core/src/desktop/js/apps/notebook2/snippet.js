@@ -35,14 +35,14 @@ import sessionManager from 'apps/notebook2/execution/sessionManager';
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
 import { notebookToContextJSON, snippetToContextJSON } from 'apps/notebook2/notebookSerde';
 import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
-import { EXECUTABLE_UPDATED_EVENT } from 'apps/notebook2/execution/executable';
+import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
 import {
   ACTIVE_STATEMENT_CHANGED_EVENT,
   REFRESH_STATEMENT_LOCATIONS_EVENT
 } from 'ko/bindings/ace/aceLocationHandler';
 import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from 'apps/notebook2/components/ko.executableActions';
 
-// TODO: Remove. Temporary here for debug
+// TODO: Remove for ENABLE_NOTEBOOK_2. Temporary here for debug
 window.SqlExecutable = SqlExecutable;
 window.Executor = Executor;
 
@@ -397,15 +397,15 @@ export default class Snippet {
           this.activeExecutable(this.executor.update(statementDetails, beforeExecute));
           beforeExecute = false;
           if (statementDetails.activeStatement) {
-            const _statements = [];
+            const statementsList = [];
             statementDetails.precedingStatements.forEach(statement => {
-              _statements.push(statement.statement);
+              statementsList.push(statement.statement);
             });
-            _statements.push(statementDetails.activeStatement.statement);
+            statementsList.push(statementDetails.activeStatement.statement);
             statementDetails.followingStatements.forEach(statement => {
-              _statements.push(statement.statement);
+              statementsList.push(statement.statement);
             });
-            this.statementsList(_statements); // Or fetch on demand via editor.refresh.statement.locations and remove observableArray?
+            this.statementsList(statementsList); // Or fetch on demand via editor.refresh.statement.locations and remove observableArray?
           } else {
             this.statementsList([]);
           }
@@ -1008,6 +1008,31 @@ export default class Snippet {
       isSqlEngine: this.isSqlDialect
     });
 
+    if (snippet.executor) {
+      try {
+        this.executor.executables = snippet.executor.executables.map(executableRaw => {
+          switch (executableRaw.type) {
+            case 'sqlExecutable': {
+              return SqlExecutable.fromJs(this.executor, executableRaw);
+            }
+            default: {
+              throw new Error('Failed to created executable of type ' + executableRaw.type);
+            }
+          }
+        });
+
+        this.executor.executables.forEach(async executable => {
+          if (executable.status !== EXECUTION_STATUS.ready) {
+            await executable.checkStatus();
+          } else {
+            executable.notify();
+          }
+        });
+      } catch (err) {
+        console.error(err); // TODO: Move up
+      }
+    }
+
     huePubSub.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
       if (this.activeExecutable() === executable) {
         this.updateFromExecutable();
@@ -1473,6 +1498,48 @@ export default class Snippet {
   stopLongOperationTimeout() {
     window.clearTimeout(this.longOperationTimeout);
     this.showLongOperationWarning(false);
+  }
+
+  toJs() {
+    return {
+      aceCursorPosition: this.aceCursorPosition(),
+      aceSize: this.aceSize(),
+      associatedDocumentUuid: this.associatedDocumentUuid(),
+      executor: this.executor.toJs(),
+      compute: this.compute(),
+      currentQueryTab: this.currentQueryTab(),
+      database: this.database(),
+      id: this.id(),
+      is_redacted: this.is_redacted(),
+      lastAceSelectionRowOffset: this.lastAceSelectionRowOffset(),
+      lastExecuted: this.lastExecuted(),
+      name: this.name(),
+      namespace: this.namespace(),
+      pinnedContextTabs: this.pinnedContextTabs(),
+      properties: komapping.toJS(this.properties), // TODO: Drop komapping
+      settingsVisible: this.settingsVisible(),
+      showLogs: this.showLogs(),
+      statement_raw: this.statement_raw(),
+      statementPath: this.statementPath(),
+      statementType: this.statementType(),
+      status: this.status(),
+      type: this.type(),
+      variables: this.variables().map(variable => ({
+        meta: variable.meta && {
+          options: variable.meta.options && variable.meta.options(), // TODO: Map?
+          placeHolder: variable.meta.placeHolder && variable.meta.placeHolder(),
+          type: variable.meta.type && variable.meta.type()
+        },
+        name: variable.name(),
+        path: variable.path(),
+        sample: variable.sample(),
+        sampleUser: variable.sampleUser(),
+        step: variable.step(),
+        type: variable.type(),
+        value: variable.value()
+      })),
+      wasBatchExecuted: this.wasBatchExecuted()
+    };
   }
 
   uploadQuery(query_id) {

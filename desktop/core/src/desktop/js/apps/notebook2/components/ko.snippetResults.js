@@ -27,6 +27,7 @@ import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
 import { REDRAW_CHART_EVENT } from 'apps/notebook2/events';
 import { EXECUTABLE_UPDATED_EVENT } from 'apps/notebook2/execution/executable';
 import { RESULT_TYPE, RESULT_UPDATED_EVENT } from 'apps/notebook2/execution/executionResult';
+import { attachTracker } from 'apps/notebook2/components/executableStateHandler';
 
 export const NAME = 'snippet-results';
 
@@ -95,6 +96,7 @@ const TEMPLATE = `
         <!-- ko component: { 
           name: 'result-grid',
           params: {
+            activeExecutable: activeExecutable,
             data: data,
             lastFetchedRows: lastFetchedRows,
             editorMode: editorMode,
@@ -112,6 +114,7 @@ const TEMPLATE = `
         <!-- ko component: {
           name: 'result-chart',
           params: {
+            activeExecutable: activeExecutable,
             cleanedMeta: cleanedMeta,
             cleanedDateTimeMeta: cleanedDateTimeMeta,
             cleanedNumericMeta: cleanedNumericMeta,
@@ -155,8 +158,15 @@ class SnippetResults extends DisposableComponent {
 
     this.hasSomeResult = ko.pureComputed(() => this.data().length);
 
-    this.showGrid = ko.observable(true); // TODO: Should be persisted
-    this.showChart = ko.observable(false); // TODO: Should be persisted
+    const trackedObservables = {
+      showGrid: true,
+      showChart: false
+    };
+
+    this.showGrid = ko.observable(trackedObservables.showGrid);
+    this.showChart = ko.observable(trackedObservables.showChart);
+
+    attachTracker(this.activeExecutable, NAME, this, trackedObservables);
 
     this.cleanedMeta = ko.pureComputed(() => this.meta().filter(item => item.name !== ''));
 

@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { notebookToContextJSON, notebookToJSON, snippetToContextJSON } from '../notebookSerde';
+import { notebookToContextJSON, snippetToContextJSON } from '../notebookSerde';
 import Notebook from '../notebook';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 
@@ -42,7 +42,7 @@ describe('notebookSerde.js', () => {
     notebook.addSnippet({ type: 'hive' });
     notebook.addSnippet({ type: 'impala' });
 
-    const notebookJSON = notebookToJSON(notebook);
+    const notebookJSON = notebook.toJson();
 
     const notebookRaw = JSON.parse(notebookJSON);
 
