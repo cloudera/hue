@@ -498,29 +498,31 @@ class SuperClient(object):
           duration = time.time() - st
 
           # Log the duration at different levels, depending on how long it took.
-          logmsg = "Thrift call: %s.%s(args=%s, kwargs=%s) returned in %dms: %s" % (str(self.wrapped.__class__), attr, str_args, repr(kwargs), duration * 1000, log_msg)
+          logmsg = "Thrift call: %s.%s(args=%s, kwargs=%s) returned in %dms: %s" % (
+            str(self.wrapped.__class__),
+            attr, str_args, repr(kwargs), duration * 1000, log_msg
+          )
           log_if_slow_call(duration=duration, message=logmsg)
 
           return ret
-        except socket.error as e:
-          pass
-        except TTransportException as e:
-          pass
+        except (socket.error, socket.timeout, TTransportException) as e:
+          self.transport.close()
+
+          if isinstance(e, socket.timeout) or 'read operation timed out' in str(e): # Can come from ssl.SSLError
+            logging.warn("Not retrying thrift call %s due to socket timeout" % attr)
+            raise
+          else:
+            tries_left -= 1
+            if tries_left:
+              logging.info("Thrift exception; retrying: " + str(e), exc_info=0)
+              if 'generic failure: Unable to find a callback: 32775' in str(e):
+                logging.warn("Increase the sasl_max_buffer value in hue.ini")
+            else:
+              raise
         except Exception as e:
           logging.exception("Thrift saw exception (this may be expected).")
           raise
 
-        self.transport.close()
-
-        if isinstance(e, socket.timeout) or 'read operation timed out' in str(e): # Can come from ssl.SSLError
-          logging.warn("Not retrying thrift call %s due to socket timeout" % attr)
-          raise
-        else:
-          tries_left -= 1
-          if tries_left:
-            logging.info("Thrift exception; retrying: " + str(e), exc_info=0)
-            if 'generic failure: Unable to find a callback: 32775' in str(e):
-              logging.warn("Increase the sasl_max_buffer value in hue.ini")
       logging.warn("Out of retries for thrift call: " + attr)
       raise
     return wrapper
