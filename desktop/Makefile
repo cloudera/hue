@@ -47,7 +47,6 @@ APPS := core \
 	libs/libanalyze \
 	libs/liboauth \
 	libs/liboozie \
-	libs/libopenid \
 	libs/librdbms \
 	libs/libsaml \
 	libs/libsentry \
@@ -186,4 +185,3 @@ compile-locales: $(COMPILE_LOCALE_TARGETS)
 .recursive-compile-locales/%:
 	@$(MAKE) -C $* compile-locale
 # END DEV ONLY >>>>
-	
