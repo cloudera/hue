@@ -36,8 +36,7 @@ import sys
 
 from thrift.Thrift import TType, TApplicationException
 from thrift.transport.TSocket import TSocket
-from thrift.transport.TTransport import TBufferedTransport, TFramedTransport, TMemoryBuffer,\
-                                        TTransportException
+from thrift.transport.TTransport import TBufferedTransport, TFramedTransport, TMemoryBuffer, TTransportException
 from thrift.protocol.TBinaryProtocol import TBinaryProtocol
 from thrift.protocol.TMultiplexedProtocol import TMultiplexedProtocol
 

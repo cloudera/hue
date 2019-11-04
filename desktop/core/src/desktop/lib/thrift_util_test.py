@@ -25,24 +25,28 @@ import threading
 import time
 import unittest
 
-LOG = logging.getLogger(__name__)
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
+else:
+  from mock import patch, Mock
 
 gen_py_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "gen-py"))
 if not gen_py_path in sys.path:
   sys.path.insert(1, gen_py_path)
 
-from djangothrift_test_gen.ttypes import TestStruct, TestNesting, TestEnum, TestManyTypes
 from djangothrift_test_gen import TestService
+from djangothrift_test_gen.ttypes import TestStruct, TestNesting, TestEnum, TestManyTypes
+from nose.tools import assert_equal, assert_true
+from thrift.protocol.TBinaryProtocol import TBinaryProtocolFactory
+from thrift.server import TServer
+from thrift.transport import TSocket
+from thrift.transport.TTransport import TBufferedTransportFactory, TTransportException
 
 from desktop.lib import python_util, thrift_util
 from desktop.lib.thrift_util import jsonable2thrift, thrift2json, _unpack_guid_secret_in_handle
 
-from thrift.protocol.TBinaryProtocol import TBinaryProtocolFactory
-from thrift.server import TServer
-from thrift.transport import TSocket
-from thrift.transport.TTransport import TBufferedTransportFactory
 
-from nose.tools import assert_equal
+LOG = logging.getLogger(__name__)
 
 
 class SimpleThriftServer(object):
@@ -302,6 +306,35 @@ class TestJsonable2Thrift(unittest.TestCase):
     """
     self.assertBackAndForth(TestManyTypes(a_string_list=["alpha", "beta"]))
     self.assertBackAndForth(TestManyTypes(a_string_list=[u"alpha", u"beta"]))
+
+
+class TestSuperClient(unittest.TestCase):
+
+  def test_wrapper_no_retry(self):
+    wrapped_client, transport = Mock(), Mock()
+    wrapped_client.my_call = Mock(
+      side_effect=TTransportException(message='read operation timed out')
+    )
+
+    client = thrift_util.SuperClient(wrapped_client, transport)
+
+    with self.assertRaises(TTransportException):
+      client.my_call()
+      # Could check output for "Not retrying thrift call my_call due to socket timeout"
+
+
+  def test_wrapper_with_retry(self):
+    wrapped_client, transport = Mock(), Mock()
+    wrapped_client.my_call = Mock(
+      side_effect=TTransportException(message='some error')
+    )
+
+    client = thrift_util.SuperClient(wrapped_client, transport)
+
+    with self.assertRaises(TTransportException):
+      client.my_call()
+      # Could check output for several "Thrift exception; retrying: some error"
+
 
 if __name__ == '__main__':
   unittest.main()
