@@ -24,7 +24,7 @@ import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 
 import Snippet, { STATUS as SNIPPET_STATUS } from 'apps/notebook2/snippet';
-import { notebookToContextJSON, notebookToJSON } from 'apps/notebook2/notebookSerde';
+import { notebookToContextJSON } from 'apps/notebook2/notebookSerde';
 
 export default class Notebook {
   constructor(vm, notebook) {
@@ -261,7 +261,7 @@ export default class Notebook {
   close() {
     hueAnalytics.log('notebook', 'close');
     apiHelper.closeNotebook({
-      notebookJson: notebookToJSON(this),
+      notebookJson: this.toJson(),
       editorMode: this.parentVm.editorMode()
     });
   }
@@ -460,7 +460,7 @@ export default class Notebook {
 
     try {
       const data = await apiHelper.saveNotebook({
-        notebookJson: notebookToJSON(this),
+        notebookJson: this.toJson(),
         editorMode: editorMode
       });
 
@@ -520,6 +520,7 @@ export default class Notebook {
         $(document).trigger('error', data.message);
       }
     } catch (err) {
+      console.error(err);
       if (err && err.status !== 502) {
         $(document).trigger('error', err.responseText);
       }
@@ -556,6 +557,37 @@ export default class Notebook {
         $(document).trigger('error', xhr.responseText);
       }
     });
+  }
+
+  toJs() {
+    return {
+      coordinatorUuid: this.coordinatorUuid(),
+      description: this.description(),
+      directoryUuid: this.directoryUuid(),
+      executingAllIndex: this.executingAllIndex(),
+      id: this.id(),
+      isExecutingAll: this.isExecutingAll(),
+      isHidingCode: this.isHidingCode(),
+      isHistory: this.isHistory(),
+      isManaged: this.isManaged(),
+      isPresentationModeDefault: this.isPresentationModeDefault(),
+      isSaved: this.isSaved(),
+      name: this.name(),
+      onSuccessUrl: this.onSuccessUrl(),
+      parentSavedQueryUuid: this.parentSavedQueryUuid(),
+      presentationSnippets: this.presentationSnippets(),
+      pubSubUrl: this.pubSubUrl(),
+      result: {}, // TODO: Moved to executor but backend requires it
+      sessions: [], // TODO: Moved to executor but backend requires it
+      snippets: this.snippets().map(snippet => snippet.toJs()),
+      type: this.type(),
+      uuid: this.uuid(),
+      viewSchedulerId: this.viewSchedulerId()
+    };
+  }
+
+  toJson() {
+    return JSON.stringify(this.toJs());
   }
 
   unload() {

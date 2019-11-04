@@ -22,7 +22,7 @@ const clearGutterCss = (cssClass, session, startRow, endRow) => {
   }
 };
 
-const setGuttercss = (cssClass, session, startRow, endRow) => {
+const setGutterCss = (cssClass, session, startRow, endRow) => {
   for (let row = startRow; row <= endRow; row++) {
     session.addGutterDecoration(row, cssClass);
   }
@@ -30,7 +30,6 @@ const setGuttercss = (cssClass, session, startRow, endRow) => {
 
 export default class AceAnchoredRange {
   constructor(editor) {
-    this.id = Math.random();
     this.editor = editor;
     const doc = this.editor.getSession().doc;
     this.startAnchor = doc.createAnchor(0, 0);
@@ -64,7 +63,7 @@ export default class AceAnchoredRange {
       clearGutterCss(cssClass, session, rowSpan.start, rowSpan.end);
       rowSpan.start = newStart.row;
       rowSpan.end = newEnd.row;
-      setGuttercss(cssClass, session, rowSpan.start, rowSpan.end);
+      setGutterCss(cssClass, session, rowSpan.start, rowSpan.end);
     });
   }
 
@@ -81,7 +80,7 @@ export default class AceAnchoredRange {
     const startRow = this.startAnchor.getPosition().row;
     const endRow = this.endAnchor.getPosition().row;
     this.gutterCssClasses[cssClass] = { start: startRow, end: endRow };
-    setGuttercss(cssClass, session, startRow, endRow);
+    setGutterCss(cssClass, session, startRow, endRow);
   }
 
   addMarkerCss(cssClass) {

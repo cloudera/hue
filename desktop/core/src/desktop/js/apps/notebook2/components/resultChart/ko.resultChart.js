@@ -31,6 +31,7 @@ import {
 import $ from 'jquery';
 import { UUID } from 'utils/hueUtils';
 import { REDRAW_CHART_EVENT } from 'apps/notebook2/events';
+import { attachTracker } from 'apps/notebook2/components/executableStateHandler';
 
 export const NAME = 'result-chart';
 
@@ -495,7 +496,7 @@ class ResultChart extends DisposableComponent {
 
     this.data = params.data;
     this.id = params.id;
-    this.chartSettingsVisible = ko.observable(true);
+    this.activeExecutable = params.activeExecutable;
 
     this.meta = params.meta;
     this.cleanedMeta = params.cleanedMeta;
@@ -504,21 +505,42 @@ class ResultChart extends DisposableComponent {
     this.cleanedStringMeta = params.cleanedNumericMeta;
     this.showChart = params.showChart;
 
-    this.chartLimit = ko.observable().extend({ notify: 'always' }); // TODO: Should be persisted
+    const trackedObservables = {
+      chartLimit: undefined,
+      chartMapHeat: undefined,
+      chartMapLabel: undefined,
+      chartMapType: CHART_MAP_TYPE.MARKER,
+      chartScatterGroup: undefined,
+      chartScatterSize: undefined,
+      chartScope: CHART_SCOPE.WORLD,
+      chartSettingsVisible: true,
+      chartSorting: CHART_SORTING.NONE,
+      chartTimelineType: CHART_TIMELINE_TYPE.BAR,
+      chartX: undefined,
+      chartXPivot: undefined,
+      chartYMulti: [],
+      chartYSingle: undefined,
+      chartType: window.HUE_CHARTS.TYPES.BARCHART
+    };
+
+    this.chartLimit = ko.observable(trackedObservables.chartLimit).extend({ notify: 'always' });
     this.chartLimits = ko.observableArray([5, 10, 25, 50, 100]);
-    this.chartMapHeat = ko.observable(); // TODO: Should be persisted
-    this.chartMapLabel = ko.observable(); // TODO: Should be persisted
-    this.chartMapType = ko.observable(CHART_MAP_TYPE.MARKER); // TODO: Should be persisted
-    this.chartScatterGroup = ko.observable(); // TODO: Should be persisted
-    this.chartScatterSize = ko.observable(); // TODO: Should be persisted
-    this.chartScope = ko.observable(CHART_SCOPE.WORLD); // TODO: Should be persisted
-    this.chartSorting = ko.observable(CHART_SORTING.NONE); // TODO: Should be persisted
-    this.chartTimelineType = ko.observable(CHART_TIMELINE_TYPE.BAR); // TODO: Should be persisted
-    this.chartX = ko.observable().extend({ notify: 'always' }); // TODO: Should be persisted
-    this.chartXPivot = ko.observable().extend({ notify: 'always' }); // TODO: Should be persisted
-    this.chartYMulti = ko.observableArray(); // TODO: Should be persisted
-    this.chartYSingle = ko.observable(); // TODO: Should be persisted
-    this.chartType = ko.observable(window.HUE_CHARTS.TYPES.BARCHART); // TODO: Should be persisted
+    this.chartMapHeat = ko.observable(trackedObservables.chartMapHeat);
+    this.chartMapLabel = ko.observable(trackedObservables.chartMapLabel);
+    this.chartMapType = ko.observable(trackedObservables.chartMapType);
+    this.chartScatterGroup = ko.observable(trackedObservables.chartScatterGroup);
+    this.chartScatterSize = ko.observable(trackedObservables.chartScatterSize);
+    this.chartScope = ko.observable(trackedObservables.chartScope);
+    this.chartSettingsVisible = ko.observable(trackedObservables.chartSettingsVisible);
+    this.chartSorting = ko.observable(trackedObservables.chartSorting);
+    this.chartTimelineType = ko.observable(trackedObservables.chartTimelineType);
+    this.chartX = ko.observable(trackedObservables.chartX).extend({ notify: 'always' });
+    this.chartXPivot = ko.observable(trackedObservables.chartXPivot).extend({ notify: 'always' });
+    this.chartYMulti = ko.observableArray(trackedObservables.chartYMulti);
+    this.chartYSingle = ko.observable(trackedObservables.chartYSingle);
+    this.chartType = ko.observable(trackedObservables.chartType);
+
+    attachTracker(this.activeExecutable, NAME, this, trackedObservables);
 
     this.chartId = ko.pureComputed(() => this.chartType() + '_' + this.id());
     this.isBarChart = ko.pureComputed(() => TYPES.BARCHART === this.chartType());

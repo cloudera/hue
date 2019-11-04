@@ -76,20 +76,20 @@ export default class AceGutterHandler {
       const executableSub = huePubSub.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
         if (executable.executor === this.executor) {
           if (executable.lost) {
-            if (executable.obseverState.aceAnchor) {
-              executable.obseverState.aceAnchor.dispose();
-              delete executable.obseverState.aceAnchor;
+            if (executable.observerState.aceAnchor) {
+              executable.observerState.aceAnchor.dispose();
+              delete executable.observerState.aceAnchor;
             }
             return;
           }
 
           const statement = executable.parsedStatement;
-          if (!executable.obseverState.aceAnchor) {
-            executable.obseverState.aceAnchor = new AceAnchoredRange(this.editor);
+          if (!executable.observerState.aceAnchor) {
+            executable.observerState.aceAnchor = new AceAnchoredRange(this.editor);
           }
           const leadingEmptyLineCount = getLeadingEmptyLineCount(statement);
-          executable.obseverState.aceAnchor.move(statement.location, leadingEmptyLineCount);
-          const anchoredRange = executable.obseverState.aceAnchor;
+          executable.observerState.aceAnchor.move(statement.location, leadingEmptyLineCount);
+          const anchoredRange = executable.observerState.aceAnchor;
           anchoredRange.removeGutterCss(COMPLETED_CSS);
           anchoredRange.removeGutterCss(EXECUTING_CSS);
           anchoredRange.removeGutterCss(FAILED_CSS);

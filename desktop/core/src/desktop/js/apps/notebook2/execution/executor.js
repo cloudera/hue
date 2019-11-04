@@ -85,6 +85,12 @@ class Executor {
     };
   }
 
+  toJs() {
+    return {
+      executables: this.executables.map(executable => executable.toJs())
+    };
+  }
+
   update(statementDetails, beforeExecute) {
     const executables = this.getExecutables(statementDetails);
 
