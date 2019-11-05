@@ -442,7 +442,7 @@ class TestWithMockedSolr(TestSearchBase):
          {'isDynamic': False, 'isId': None, 'type': 'string', 'name': 'content_type'},
          {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'description'},
          {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'features'},
-         {'isDynamic': False, 'isId': True, 'type': 'string', 'name': 'id'}
+         {'isDynamic': False, 'isId': True, 'type': 'string', 'name': 'id'},
          {'isDynamic': False, 'isId': None, 'type': 'boolean', 'name': 'inStock'},
          {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'includes'},
          {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'keywords'},

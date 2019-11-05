@@ -138,6 +138,7 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
       response['extended_columns'] = cols_extended
       response['is_view'] = table.is_view
       response['partition_keys'] = [{'name': part.name, 'type': part.type} for part in table.partition_keys]
+      response['primary_keys'] = [{'name': pk.name} for pk in table.primary_keys]
     else:
       col = db.get_column(database, table, column)
       if col:

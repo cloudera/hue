@@ -420,6 +420,12 @@ class DataCatalogEntry {
             partitionKeys[partitionKey.name] = true;
           });
         }
+        const primaryKeys = {};
+        if (sourceMeta.primary_keys) {
+          sourceMeta.primary_keys.forEach(primaryKey => {
+            primaryKeys[primaryKey.name] = true;
+          });
+        }
 
         const entities =
           sourceMeta.databases ||
@@ -455,6 +461,9 @@ class DataCatalogEntry {
                       }
                       if (sourceMeta.partition_keys) {
                         definition.partitionKey = !!partitionKeys[entity.name];
+                      }
+                      if (sourceMeta.primary_keys) {
+                        definition.primaryKey = !!primaryKeys[entity.name];
                       }
                       definition.index = index++;
                       catalogEntry.definition = definition;
@@ -1230,7 +1239,7 @@ class DataCatalogEntry {
    */
   isPrimaryKey() {
     const self = this;
-    return self.isColumn() && self.definition && /true/i.test(self.definition.primary_key);
+    return self.isColumn() && self.definition && !!self.definition.primaryKey;
   }
 
   /**
