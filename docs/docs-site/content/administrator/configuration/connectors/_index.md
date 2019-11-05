@@ -392,7 +392,32 @@ The dialect should be added to the Python system or Hue Python virtual environme
     interface=sqlalchemy
     options='{"url": "phoenix://sql-phoenix-1.gce.cloudera.com:8765/"}'
 
-**Note**: Check the list of know issues [here](https://github.com/Pirionfr/pyPhoenix#known-issues).
+**Notes**
+
+1. Existing HBase tables need to be mapped to views
+
+    ```
+    0: jdbc:phoenix:> CREATE VIEW if not exists "analytics_demo_view" ( pk VARCHAR PRIMARY KEY, "hours"."01-Total" VARCHAR );
+    Error: ERROR 505 (42000): Table is read only. (state=42000,code=505)
+    -->
+    0: jdbc:phoenix:> CREATE Table if not exists "analytics_demo" ( pk VARCHAR PRIMARY KEY, "hours"."01-Total" VARCHAR );
+    ```
+
+2. Tables are seeing as uppercase by Phoenix. When getting started, it is simpler to just create the table via Phoenix.
+
+    ```
+    Error: ERROR 1012 (42M03): Table undefined. tableName=ANALYTICS_DEMO (state=42M03,code=1012)
+    -->
+    0: jdbc:phoenix:> select * from "analytics_demo" where pk = "domain.0" limit 5;
+    ```
+
+3. Phoenix follows Apache Calcite. Feel free to help improve the SQL autocomplete support for it.
+
+4. Skip the semicolon ‘;’.
+
+5. Not tested yet with security.
+
+6. List of some of the known issues are listed on the [Phoenix SqlAlchemy](https://github.com/Pirionfr/pyPhoenix#known-issues) connector page.
 
 Alternative:
 
