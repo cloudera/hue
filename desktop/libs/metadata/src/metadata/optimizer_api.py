@@ -237,7 +237,7 @@ def top_filters(request):
   response = {'status': -1}
 
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
-  db_tables = json.loads(request.POST.get('dbTables'), '[]')
+  db_tables = json.loads(request.POST.get('dbTables', '[]'))
   column_name = request.POST.get('columnName') # Unused
 
   api = get_api(request, interface)
@@ -267,7 +267,7 @@ def top_joins(request):
   response = {'status': -1}
 
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
-  db_tables = json.loads(request.POST.get('dbTables'), '[]')
+  db_tables = json.loads(request.POST.get('dbTables', '[]'))
 
   api = get_api(request, interface)
 
@@ -288,7 +288,7 @@ def top_aggs(request):
   response = {'status': -1}
 
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
-  db_tables = json.loads(request.POST.get('dbTables'), '[]')
+  db_tables = json.loads(request.POST.get('dbTables', '[]'))
 
   api = get_api(request, interface)
 
@@ -329,7 +329,7 @@ def top_columns(request):
   response = {'status': -1}
 
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
-  db_tables = json.loads(request.POST.get('dbTables'), '[]')
+  db_tables = json.loads(request.POST.get('dbTables', '[]'))
 
   api = get_api(request, interface)
 
@@ -430,7 +430,7 @@ def upload_table_stats(request):
   response = {'status': -1}
 
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
-  db_tables = json.loads(request.POST.get('db_tables'), '[]')
+  db_tables = json.loads(request.POST.get('db_tables', '[]'))
   source_platform = json.loads(request.POST.get('sourcePlatform', '"hive"'))
   with_ddl = json.loads(request.POST.get('with_ddl', 'false'))
   with_table_stats = json.loads(request.POST.get('with_table', 'false'))
