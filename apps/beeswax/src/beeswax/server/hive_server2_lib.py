@@ -123,17 +123,18 @@ class HiveServerTable(Table):
     except ValueError: # DESCRIBE on nested columns does not always contain additional rows beyond cols
       return rows[col_row_index:]
     except:
-      # Impala does not have it
       return rows
 
   def _get_partition_columns(self):
     rows = self.describe
     try:
-      col_row_index = list(map(itemgetter('col_name'), rows)).index('# Partition Information') + 3
+      col_row_index = list(map(itemgetter('col_name'), rows)).index('# Partition Information') + 2
+      if rows[col_row_index]['col_name'] == '': # Impala has a blank line
+        col_row_index += 1
       end_cols_index = list(map(itemgetter('col_name'), rows[col_row_index:])).index('')
       return rows[col_row_index:][:end_cols_index]
     except:
-      # Impala does not have it
+      # Not partitioned
       return []
 
   @property
