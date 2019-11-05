@@ -100,3 +100,70 @@ class TestHiveServerTable():
       assert_equal(table.cols[1], {'col_name': 'description', 'data_type': 'string', 'comment': ''})
       assert_equal(table.cols[2], {'col_name': 'total_emp', 'data_type': 'int', 'comment': ''})
       assert_equal(table.cols[3], {'col_name': 'salary', 'data_type': 'int', 'comment': ''})
+
+
+  def test_partition_keys_impala(self):
+
+      table_results = Mock()
+      table_schema = Mock()
+      desc_results = Mock(
+        columns=[
+          # Dump of `DESCRIBE FORMATTED table`
+          Mock(stringVal=Mock(values=['# col_name', '', 'code', 'description', 'total_emp', 'salary', '', '# Partition Information', '# col_name', '', 'date', '', '# Detailed Table Information', 'Database:', 'OwnerType:', 'Owner:', 'CreateTime:', 'LastAccessTime:', 'Retention:', 'Location:', 'Table Type:', 'Table Parameters:', '', '', '', '', '', '', '', '', '', '', '# Storage Information', 'SerDe Library:', 'InputFormat:', 'OutputFormat:', 'Compressed:', 'Num Buckets:', 'Bucket Columns:', 'Sort Columns:', 'Storage Desc Params:', ], nulls='')),
+          Mock(stringVal=Mock(values=['data_type', 'NULL', 'string', 'string', 'int', 'int', 'NULL', 'NULL', 'data_type', 'NULL', 'string', 'NULL', 'NULL', 'default', 'USER', 'hive', 'Mon Nov 04 07:44:10 PST 2019', 'UNKNOWN', '0', 'hdfs://nightly7x-unsecure-1.vpc.cloudera.com:8020/warehouse/tablespace/managed/hive/sample_07', 'MANAGED_TABLE', 'NULL', 'COLUMN_STATS_ACCURATE', 'bucketing_version', 'numFiles', 'numRows', 'rawDataSize', 'totalSize', 'transactional', 'transactional_properties', 'transient_lastDdlTime', 'NULL', 'NULL', 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe', 'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat', 'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat', 'No', '-1', '[]', '[]', 'NULL', 'serialization.format', ], nulls='')),
+          Mock(stringVal=Mock(values=['comment', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'comment', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"code\":\"true\",\"description\":\"true\",\"salary\":\"true\",\"total_emp\":\"true\"}}', '2', '1', '822', '3288', '48445', 'true', 'insert_only', '1572882268', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '1', ], nulls='')),
+        ]
+      )
+      desc_schema = Mock(
+        columns=[
+          Mock(columnName='col_name'),
+          Mock(columnName='data_type'),
+          Mock(columnName='comment')
+        ]
+      )
+
+      table = HiveServerTable(
+        table_results=table_results,
+        table_schema=table_schema,
+        desc_results=desc_results,
+        desc_schema=desc_schema
+      )
+
+      assert_equal(len(table.partition_keys), 1)
+      assert_equal(table.partition_keys[0].name, 'date')
+      assert_equal(table.partition_keys[0].type, 'string')
+      assert_equal(table.partition_keys[0].comment, 'NULL')
+
+
+  def test_partition_keys_hive(self):
+
+      table_results = Mock()
+      table_schema = Mock()
+      desc_results = Mock(
+        columns=[
+          # Dump of `DESCRIBE FORMATTED table`
+          # Note: missing blank line below '# Partition Information'
+          Mock(stringVal=Mock(values=['# col_name', '', 'code', 'description', 'total_emp', 'salary', '', '# Partition Information', '# col_name', 'date', '', '# Detailed Table Information', 'Database:', 'OwnerType:', 'Owner:', 'CreateTime:', 'LastAccessTime:', 'Retention:', 'Location:', 'Table Type:', 'Table Parameters:', '', '', '', '', '', '', '', '', '', '', '# Storage Information', 'SerDe Library:', 'InputFormat:', 'OutputFormat:', 'Compressed:', 'Num Buckets:', 'Bucket Columns:', 'Sort Columns:', 'Storage Desc Params:', ], nulls='')),
+          Mock(stringVal=Mock(values=['data_type', 'NULL', 'string', 'string', 'int', 'int', 'NULL', 'NULL', 'data_type', 'string', 'NULL', 'NULL', 'default', 'USER', 'hive', 'Mon Nov 04 07:44:10 PST 2019', 'UNKNOWN', '0', 'hdfs://nightly7x-unsecure-1.vpc.cloudera.com:8020/warehouse/tablespace/managed/hive/sample_07', 'MANAGED_TABLE', 'NULL', 'COLUMN_STATS_ACCURATE', 'bucketing_version', 'numFiles', 'numRows', 'rawDataSize', 'totalSize', 'transactional', 'transactional_properties', 'transient_lastDdlTime', 'NULL', 'NULL', 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe', 'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat', 'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat', 'No', '-1', '[]', '[]', 'NULL', 'serialization.format', ], nulls='')),
+          Mock(stringVal=Mock(values=['comment', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'comment', '', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"code\":\"true\",\"description\":\"true\",\"salary\":\"true\",\"total_emp\":\"true\"}}', '2', '1', '822', '3288', '48445', 'true', 'insert_only', '1572882268', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '1', ], nulls='')),
+        ]
+      )
+      desc_schema = Mock(
+        columns=[
+          Mock(columnName='col_name'),
+          Mock(columnName='data_type'),
+          Mock(columnName='comment')
+        ]
+      )
+
+      table = HiveServerTable(
+        table_results=table_results,
+        table_schema=table_schema,
+        desc_results=desc_results,
+        desc_schema=desc_schema
+      )
+
+      assert_equal(len(table.partition_keys), 1)
+      assert_equal(table.partition_keys[0].name, 'date')
+      assert_equal(table.partition_keys[0].type, 'string')
+      assert_equal(table.partition_keys[0].comment, '')
