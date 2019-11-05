@@ -228,12 +228,14 @@ def render(template, request, data, json=None, template_lib=None, force_template
       return render_json(data, request.GET.get("callback"), status=status)
   else:
     data.update({'user': request.user})
-    return _render_to_response(template,
-                               request,
-                               RequestContext(request, data),
-                               template_lib=template_lib,
-                               status=status,
-                               **kwargs)
+    return _render_to_response(
+        template,
+        request,
+        RequestContext(request, data),
+        template_lib=template_lib,
+        status=status,
+        **kwargs
+    )
 
 
 def render_injected(http_resp, extra_html):
@@ -291,21 +293,23 @@ class IllegalJsonpCallbackNameException(Exception):
 
 def render_json(data, jsonp_callback=None, js_safe=False, status=200):
   """
-  Renders data as json.  If jsonp is specified, wraps
-  the result in a function.
+  Renders data as json.  If jsonp is specified, wraps the result in a function.
   """
   if settings.DEBUG:
     indent = 2
   else:
     indent = 0
+
   if js_safe:
     json = encode_json_for_js(data, indent)
   else:
     json = encode_json(data, indent)
+
   if jsonp_callback is not None:
     if not VALID_JSON_IDENTIFIER.match(jsonp_callback):
       raise IllegalJsonpCallbackNameException("Invalid jsonp callback name: %s" % jsonp_callback)
     json = "%s(%s);" % (jsonp_callback, json)
+
   return HttpResponse(json, content_type='text/javascript', status=status)
 
 def update_if_dirty(model_instance, **kwargs):
