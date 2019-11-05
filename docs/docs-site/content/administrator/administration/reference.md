@@ -25,10 +25,10 @@ In practice ~50 users / Hue peak time is the rule of thumb. This is accounting f
 * Database backend should be such as MySql/Postgres/Oracle. Hue does not work on SQLite as it makes concurrent calls to the database.
 * Check the number of documents in the Hue database. If they are too many (more than 100 000), delete the old records:
   Stop the Hue service. Log on to the host of your Hue server. Go to Hue directory and run following clean up [command](/administrator/administration/operations/#commands):
-<pre>
+
     cd /opt/cloudera/parcels/CDH/lib/hue # Hue home directory
     ./build/env/bin/hue desktop_document_cleanup
-</pre>
+
 
 * There are some memory fragmentation issues in Python that manifest in Hue. Check the memory usage of Hue periodically. Browsing HDFS dir with many files, downloading a query result, copying a HDFS files are costly operations memory wise.
 
