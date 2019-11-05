@@ -96,7 +96,7 @@ from aws.conf import get_default_region
           <div class="nav-collapse">
             <ul class="nav">
               <li class="app-header">
-                <a href="/${app_name}/">
+                <a href="/filebrowser/">
                   <img src="${ static('filebrowser/art/icon_filebrowser_48.png') }" class="app-icon" alt="${ _('File browser icon') }" />
                   ${ _('File Browser') }
                 </a>
@@ -107,4 +107,3 @@ from aws.conf import get_default_region
       </div>
   </div>
 </%def>
-
