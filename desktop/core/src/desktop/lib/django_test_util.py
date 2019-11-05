@@ -27,6 +27,8 @@ import nose.tools
 
 from useradmin.models import User, Group, default_organization
 
+from desktop.conf import ENABLE_ORGANIZATIONS
+
 
 class Client(django.test.client.Client):
   """
