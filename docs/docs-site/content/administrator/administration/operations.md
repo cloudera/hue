@@ -189,6 +189,12 @@ To clean up Hue database, go to Hue directory and run following clean up command
 
     ./build/env/bin/hue desktop_document_cleanup
 
+### Too many connections
+
+When getting an error similar to `OperationalError: (1040, 'Too many connections')`, this indicates that the Hue database is overloaded and out of connections. Hue only needs 2 but often the database is used by other services that might "hog" them. Increasing max_connections to around 1000 should be sufficient. e.g. for MySQL, connect to it and set below parameter:
+
+    mysql> SET GLOBAL max_connections = 1000;
+
 ## Database
 
 See the dedicated [Database section](/administrator/administration/database/).
