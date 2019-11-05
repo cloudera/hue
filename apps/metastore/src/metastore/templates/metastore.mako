@@ -22,10 +22,9 @@ from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter, _ko
 from beeswax.conf import LIST_PARTITIONS_LIMIT
+from webpack_loader.templatetags.webpack_loader import render_bundle
 
 from metastore.conf import ENABLE_NEW_CREATE_TABLE
-
-from webpack_loader.templatetags.webpack_loader import render_bundle
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
