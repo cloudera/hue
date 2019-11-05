@@ -120,9 +120,10 @@ class SaveResultsTableForm(forms.Form):
   """Used for saving the query result data to hive table"""
 
   target_table = common.HiveIdentifierField(
-                                  label=_t("Table Name"),
-                                  required=True,
-                                  help_text=_t("Name of the new table")) # Can also contain a DB prefixed table name, e.g. DB_NAME.TABLE_NAME
+      label=_t("Table Name"),
+      required=True,
+      help_text=_t("Name of the new table")
+  ) # Can also contain a DB prefixed table name, e.g. DB_NAME.TABLE_NAME
 
   def __init__(self, *args, **kwargs):
     self.db = kwargs.pop('db', None)

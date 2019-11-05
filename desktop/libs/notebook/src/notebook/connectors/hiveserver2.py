@@ -865,10 +865,12 @@ DROP TABLE IF EXISTS `%(table)s`;
   def describe_table(self, notebook, snippet, database=None, table=None):
     db = self._get_db(snippet, self.interpreter)
     tb = db.get_table(database, table)
+
     return {
       'status': 0,
       'name': tb.name,
       'partition_keys': [{'name': part.name, 'type': part.type} for part in tb.partition_keys],
+      'primary_keys': [{'name': pk.name} for pk in tb.primary_keys],
       'cols': [{'name': col.name, 'type': col.type, 'comment': col.comment} for col in tb.cols],
       'path_location': tb.path_location,
       'hdfs_link': tb.hdfs_link,
