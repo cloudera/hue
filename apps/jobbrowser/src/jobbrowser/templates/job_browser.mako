@@ -129,7 +129,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 </a>
               % else:
               <!-- ko ifnot: $root.cluster() && $root.cluster()['type'].indexOf("altus-dw") !== -1 -->
-              <a href="/${app_name}">
+              <a href="/jobbrowser">
                 <img src="${ static('jobbrowser/art/icon_jobbrowser_48.png') }" class="app-icon" alt="${ _('Job browser icon') }"/>
                 <!-- ko if: !$root.cluster() || $root.cluster()['type'].indexOf("altus") == -1 -->
                   ${ _('Job Browser') }
