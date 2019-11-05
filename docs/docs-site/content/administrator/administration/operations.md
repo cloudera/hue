@@ -178,6 +178,17 @@ Load the documents:
 
     ./build/env/bin/hue loaddata data.json
 
+
+### Slow because too documents
+
+When the database has too many entries, it will cause performance issue. The config check will help superuser to find this issue. Login as superuser and go to “Hue Administration”, this sample screenshot will be displayed in the quick start wizard when the tables have too many entries.
+
+![Check config too many documents](https://cdn.gethue.com/uploads/2019/03/Doc2CountCheck.png)
+
+To clean up Hue database, go to Hue directory and run following clean up command:
+
+    ./build/env/bin/hue desktop_document_cleanup
+
 ## Database
 
 See the dedicated [Database section](/administrator/administration/database/).
