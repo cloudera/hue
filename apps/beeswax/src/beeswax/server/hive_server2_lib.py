@@ -138,6 +138,18 @@ class HiveServerTable(Table):
       return []
 
   @property
+  def primary_keys(self):
+    rows = self.describe
+    try:
+      col_row_index = list(map(itemgetter('col_name'), rows)).index('# Primary Key') + 2
+      keys = rows[col_row_index:]
+    except:
+      # No info (e.g. IMPALA-8291)
+      keys = []
+
+    return [PartitionKeyCompatible(row['data_type'], 'NULL', row['comment']) for row in keys]
+
+  @property
   def comment(self):
     return HiveServerTRow(self.table, self.table_schema).col('REMARKS')
 
