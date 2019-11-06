@@ -27,7 +27,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFutureHandlers, StopUpload, UploadFileException
 from django.utils.translation import ugettext as _
 
-from azure.client import get_client_abfs
+from desktop.lib import fsmanager
 from azure.abfs.__init__ import parse_uri
 from azure.abfs.abfs import ABFSFileSystemException
 
@@ -109,16 +109,16 @@ class ABFSFileUploadHandler(FileUploadHandler):
       return None
 
   def _get_abfs(self, request):
-    fs = get_client_abfs()
-    
+    fs = fsmanager.get_client(fs='abfs')
+
     if not fs:
       raise ABFSFileUploadError(_("No ABFS filesystem found"))
-    
+
     return fs
-  
+
   def _is_abfs_upload(self):
     return self._get_scheme() and self._get_scheme().startswith('ABFS')
-  
+
   def _get_scheme(self):
     if self.destination:
       dst_parts = self.destination.split('://')
@@ -128,4 +128,3 @@ class ABFSFileUploadHandler(FileUploadHandler):
         raise ABFSFileSystemException('Destination does not start with a valid scheme.')
     else:
       return None
-  

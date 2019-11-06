@@ -70,7 +70,9 @@ class ABFS(object):
                temp_dir="/tmp",
                umask=0o1022,
                hdfs_supergroup=None,
-               auth_provider=None):
+               access_token=None,
+               token_type=None,
+               expiration=None):
     self._url = url
     self._superuser = hdfs_superuser
     self._security_enabled = security_enabled
@@ -80,7 +82,8 @@ class ABFS(object):
     self._fs_defaultfs = fs_defaultfs
     self._logical_name = logical_name
     self._supergroup = hdfs_supergroup
-    self._auth_provider = auth_provider
+    self._access_token = access_token
+    self._token_type = token_type
     split = lib_urlparse(fs_defaultfs)
     self._scheme = split.scheme
     self._netloc = split.netloc
@@ -88,8 +91,8 @@ class ABFS(object):
     self._has_trash_support = False
     self._filebrowser_action = PERMISSION_ACTION_ABFS
 
-    self._client = http_client.HttpClient(url, exc_class=WebHdfsException, logger=LOG)
-    self._root = resource.Resource(self._client)
+    self.expiration = expiration
+    self._root = self.get_client(url)
 
     # To store user info
     self._thread_local = threading.local()
@@ -98,6 +101,7 @@ class ABFS(object):
 
   @classmethod
   def from_config(cls, hdfs_config, auth_provider):
+    credentials = auth_provider.get_credentials()
     return cls(url=hdfs_config.WEBHDFS_URL.get(),
                fs_defaultfs=hdfs_config.FS_DEFAULTFS.get(),
                logical_name=None,
@@ -106,14 +110,19 @@ class ABFS(object):
                temp_dir=None,
                umask=get_umask_mode(),
                hdfs_supergroup=None,
-               auth_provider=auth_provider)
+               access_token=credentials.get('access_token'),
+               token_type=credentials.get('token_type'),
+               expiration=int(credentials.get('expires_on')) * 1000 if credentials.get('expires_on') is not None else None)
+
+  def get_client(self, url):
+    return resource.Resource(http_client.HttpClient(url, exc_class=WebHdfsException, logger=LOG))
 
   def _getheaders(self):
     return {
-      "Authorization": self._auth_provider.get_token(),
+      "Authorization": self._token_type + " " + self._access_token,
       "x-ms-version" : "2019-02-02" #note this is required for setaccesscontrols
     }
-  
+
   # Parse info about filesystems, directories, and files
   # --------------------------------
   def isdir(self, path):

@@ -93,6 +93,7 @@ class WebHdfs(Hdfs):
     self._netloc = "";
     self._is_remote = False
     self._has_trash_support = True
+    self.expiration = None
 
     self._client = self._make_client(url, security_enabled, ssl_cert_ca_verify)
     self._root = resource.Resource(self._client)

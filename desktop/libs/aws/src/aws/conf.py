@@ -289,10 +289,10 @@ def has_s3_access(user):
 
 def config_validator(user):
   res = []
-  from aws.client import get_client # Circular dependecy
+  import desktop.lib.fsmanager # Circular dependecy
   if is_enabled():
     try:
-      conn = get_client('default')._s3_connection
+      conn = desktop.lib.fsmanager.get_client(name='default', fs='s3a')._s3_connection
       conn.get_canonical_user_id()
     except Exception as e:
       LOG.exception('AWS failed configuration check.')
