@@ -354,7 +354,9 @@ class ResultGrid extends DisposableComponent {
       $resultTable.jHueTableExtender2(tableExtenderOptions);
 
       this.disposals.push(() => {
-        $resultTable.data('plugin_jHueTableExtender2').destroy();
+        if ($resultTable.data('plugin_jHueTableExtender2')) {
+          $resultTable.data('plugin_jHueTableExtender2').destroy();
+        }
       });
 
       if (this.editorMode()) {
