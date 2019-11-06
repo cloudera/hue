@@ -525,7 +525,7 @@ tasks in layers for quick access to the logs and troubleshooting.
 
 Any job running on the Resource Manager will be automatically listed. The information will be fetched accordingly if the job got moved to one of the history servers.
 
-### Impala Queries
+### SQL Queries
 
 There are three ways to access the Query browser:
 
@@ -553,6 +553,6 @@ List submitted workflows, schedules and bundles. See more in details in the [Sch
 
 ![Oozie jobs](https://cdn.gethue.com/uploads/2016/04/hue-dash-oozie.png)
 
-### Livy / Spark
+### Spark / Livy
 
 List Livy sessions and submitted statements.
