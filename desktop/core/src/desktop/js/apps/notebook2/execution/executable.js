@@ -70,7 +70,7 @@ export default class Executable {
     this.previousExecutable = undefined;
     this.nextExecutable = undefined;
 
-    this.obseverState = {};
+    this.observerState = {};
 
     this.lost = false;
   }

@@ -165,7 +165,6 @@ const TEMPLATE = `
       <div>
         <select class="input-medium" data-bind="
             options: cleanedNumericMeta,
-            value: chartYSingle,
             optionsText: 'name',
             optionsValue: 'name',
             optionsCaption: '${ I18n('Choose a column...') }',
@@ -183,16 +182,16 @@ const TEMPLATE = `
       <div>
         <select class="input-medium" data-bind="
             options: cleanedMeta,
-            value: chartX,
             optionsText: 'name',
             optionsValue: 'name',
             optionsCaption: '${ I18n('Choose a column...') }',
-            select2: { 
+            select2: {
               width: '100%',
               placeholder: '${ I18n("Choose a column...") }',
               update: chartX,
               dropdownAutoWidth: true
-            }"></select>
+            }
+          "></select>
       </div>
       <!-- /ko -->
 
@@ -205,7 +204,6 @@ const TEMPLATE = `
       <div>
         <select class="input-medium" data-bind="
             options: chartMetaOptions, 
-            value: chartX,
             optionsText: 'name',
             optionsValue: 'name',
             optionsCaption: '${ I18n('Choose a column...') }',
@@ -235,7 +233,6 @@ const TEMPLATE = `
       <div class="input-medium" data-bind="visible: (isBarChart() && chartXPivot()) || isMapChart() || isGradientMapChart() || isScatterChart()">
         <select data-bind="
             options: isGradientMapChart() ? cleanedMeta : cleanedNumericMeta,
-            value: chartYSingle,
             optionsText: 'name',
             optionsValue: 'name',
             optionsCaption: '${ I18n('Choose a column...') }',
@@ -255,7 +252,6 @@ const TEMPLATE = `
       <div data-bind="visible: isBarChart">
         <select class="input-medium" data-bind="
             options: cleanedMeta,
-            value: chartXPivot,
             optionsText: 'name',
             optionsValue: 'name',
             optionsCaption: '${ I18n('Choose a column to pivot...') }',
@@ -274,7 +270,6 @@ const TEMPLATE = `
       <div>
         <select class="input-medium" data-bind="
           options: chartLimits,
-          value: chartLimit,
           optionsCaption: '${ I18n('Limit the number of results to...') }',
           select2: {
             width: '100%',
@@ -312,7 +307,6 @@ const TEMPLATE = `
       <div>
         <select class="input-medium" data-bind="
             options: cleanedMeta,
-            value: chartMapLabel,
             optionsText: 'name',
             optionsValue: 'name',
             optionsCaption: '${ I18n('Choose a column...') }',
@@ -333,7 +327,6 @@ const TEMPLATE = `
       <div>
         <select class="input-medium" data-bind="
             options: cleanedNumericMeta,
-            value: chartMapHeat,
             optionsText: 'name',
             optionsValue: 'name',
             optionsCaption: '${ I18n('Choose a column...') }',
@@ -355,7 +348,6 @@ const TEMPLATE = `
       <div>
         <select class="input-medium" data-bind="
             options: cleanedNumericMeta,
-            value: chartScatterSize,
             optionsText: 'name',
             optionsValue: 'name',
             optionsCaption: '${ I18n('Choose a column...') }',
@@ -374,7 +366,6 @@ const TEMPLATE = `
       <div>
         <select class="input-medium" data-bind="
             options: cleanedMeta,
-            value: chartScatterGroup,
             optionsText: 'name',
             optionsValue: 'name',
             optionsCaption: '${ I18n('Choose a column...') }',
