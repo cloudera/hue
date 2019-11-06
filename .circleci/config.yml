@@ -20,26 +20,6 @@ jobs:
     steps:
       - checkout
 
-      # Download and cache dependencies
-      # - restore_cache:
-      #     keys:
-      #       - v1-dependencies-{{ checksum "requirements.txt" }}
-      #       # fallback to using the latest cache if no exact match is found
-      #       - v1-dependencies-
-
-      # - run:
-      #     name: install dependencies
-      #     command: |
-      #       python -m venv venv
-      #       . venv/bin/activate
-      #       pip install -r requirements.txt
-
-      # - save_cache:
-      #     paths:
-      #       - ./venv
-      #     key: v1-dependencies-{{ checksum "requirements.txt" }}
-
-      # Revert to traditional pip install when build refactored, in the meantime:
       - run:
           name: refresh sources
           command: |
@@ -196,12 +176,10 @@ jobs:
     steps:
       - checkout
 
-      # Download and cache dependencies
-      # - restore_cache:
-      #     keys:
-      #       - v1-dependencies-{{ checksum "desktop/core/requirements.txt" }}
-      #       # fallback to using the latest cache if no exact match is found
-      #       - v1-dependencies-
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "desktop/core/requirements.txt" }}
+            - v1-dependencies- # fallback to using the latest cache if no exact match is found
 
       - run:
           name: compile
@@ -211,22 +189,15 @@ jobs:
             export PYTHON_VER=python3.6
             make apps
 
+      - save_cache:
+          paths:
+            - ./build/venv
+          key: v1-dependencies-{{ checksum "esktop/core/requirements.txt" }}
+
       - run:
           name: run tests
           command: |
             ./build/env/bin/hue test unit --with-xunit --with-cover
-
-      # - run:
-      #     name: install dependencies
-      #     command: |
-      #       python -m venv venv
-      #       make apps
-
-      # - save_cache:
-      #     paths:
-      #       - ./build/venv
-      #     key: v1-dependencies-{{ checksum "esktop/core/requirements.txt" }}
-
 
   build-py3.8:
     docker:
