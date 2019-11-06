@@ -19,7 +19,9 @@ The configuration of the connectors is currently done by the [Administrator](/ad
 
 ![Editor](https://cdn.gethue.com/uploads/2019/08/hue_4.5.png)
 
-### Running Queries
+### Running
+
+#### Queries
 
 SQL query execution is the primary use case of the Editor.
 
@@ -43,12 +45,12 @@ When you have multiple statements it's enough to put the cursor in the statement
 
 **Note**: On top of the logs panel, there is a link to open the query profile in the [Query Browser](/user/browsing/#impala-queries).
 
-### Running Jobs
+#### Jobs
 
 In addition to SQL, these types of jobs are supported:
 
-* [Apache Pig](https://pig.apache.org/) Latin instructions to load/merge data to perform ETL or Analytics.
-* Running an SQL import from a traditional relational database via an [Apache Sqoop](https://sqoop.apache.org/) command.
+* [Apache Pig](https://pig.apache.org/) latin instructions to load/merge data to perform ETL or Analytics.
+* Running an [SQL import](/user/browsing/#relational-databases) from a traditional relational database via an [Apache Sqoop](https://sqoop.apache.org/) command.
 * Regular Java, MapReduce, [shell script](http://gethue.com/use-the-shell-action-in-oozie/).
 * [Spark](http://gethue.com/use-the-spark-action-in-oozie/) Jar or Python script to trial and error them in YARN via [Oozie](http://gethue.com/how-to-schedule-spark-jobs-with-spark-on-yarn-and-oozie/) or Livy.
 
@@ -194,7 +196,7 @@ While editing, Hue will run your queries through Navigator Optimizer in the back
 
 #### During execution
 
-The Query Browser details the plan of the query and the bottle necks. When detected, "Health" risks are listed with suggestions on how to fix them.
+The [Query Browser](/user/browsing/#sql-queries) details the plan of the query and the bottle necks. When detected, "Health" risks are listed with suggestions on how to fix them.
 
 ![Pretty Query Profile](https://cdn.gethue.com/uploads/2019/03/Screen-Shot-2019-03-07-at-11.40.24-AM.png)
 
@@ -218,7 +220,7 @@ To toggle the dark mode you can either press `Ctrl-Alt-T` or `Command-Option-T` 
 
 Scheduling is detailed in its [own section](/user/scheduling/).
 
-## Dashboards
+## Dashboard
 
 Dashboards provide an interactive way to query indexed data quickly and easily. No programming is required and the analysis is done by drag & drops and clicks.
 
@@ -314,7 +316,7 @@ The main advantage is to be able to add snippets of different dialects (e.g. PyS
 
 ![Notebook mode](https://cdn.gethue.com/uploads/2015/10/notebook-october.png)
 
-Any configured language of the Editor will be available as a dialect. Each snippet has a code editor, wih autocomplete, syntax highlighting and other feature like shortcut links to HDFS paths and Hive tables have been added.
+Any configured language of the Editor will be available as a dialect. Each snippet has a code editor, wih autocomplete, syntax highlighting and other feature like shortcut links to HDFS paths and Hive tables.
 
 ![Notebook Screen](https://cdn.gethue.com/uploads/2015/08/notebook.png)
 

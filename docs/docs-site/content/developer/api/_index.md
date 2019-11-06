@@ -50,21 +50,11 @@ Once the request is successful then capture headers and cookies for subsequent r
     # check metadata output
     print r.text
 
-
-### SQL Querying
-### SQL Risk Optimization
-### Data Browsing
-### Workflow scheduling
-
 ### Data Catalog
 
-The [metadata API](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata) is powering [Search and Tagging here](http://gethue.com/improved-sql-exploration-in-hue-4-3/) and the [Query Assistant with Navigator Optimizer Integration](http://gethue.com/hue-4-sql-editor-improvements/).
+The [metadata API](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata) is powering [Search and Tagging here](/user/browsing/#data-catalogs).
 
-The backends is pluggable by providing alternative [client interfaces](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata/src/metadata/catalog):
-
-* Cloudera Navigator (default)
-* Apache Atlas ([HUE-8749](https://issues.cloudera.org/browse/HUE-8749))
-* Dummy (skeleton for integrating new catalogs)
+See the backends API in the [data catalog connector](/developer/connectors/#data-catalog) section.
 
 #### Searching for entities
 
@@ -192,6 +182,10 @@ Adding/updating a comment with the dummy backend:
       console.log(ko.mapping.toJSON(data));
     });
 
+### SQL Querying
+### SQL Risk Optimization
+### Data Browsing
+### Workflow scheduling
 
 ## Python
 

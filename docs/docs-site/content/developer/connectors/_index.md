@@ -63,11 +63,41 @@ The Job Browser is generic and can list any type of jobs, queries and provide bu
 
 Here is its [API](https://github.com/cloudera/hue/tree/master/apps/jobbrowser/src/jobbrowser/apis).
 
+#### SQL Queries
+
+The API currently supports:
+
+* [Apache Impala](https://github.com/cloudera/hue/blob/master/apps/jobbrowser/src/jobbrowser/apis/query_api.py)
+* [Apache Hive](https://github.com/cloudera/hue/blob/master/apps/jobbrowser/src/jobbrowser/apis/beeswax_query_api.py)
+
+#### Spark / Livy
+
+* [Livy API](https://github.com/cloudera/hue/blob/master/apps/jobbrowser/src/jobbrowser/apis/livy_api.py)
+
+#### Oozie
+
+* [Workflow API](https://github.com/cloudera/hue/blob/master/apps/jobbrowser/src/jobbrowser/apis/workflow_api.py)
+* [Coordinators API](https://github.com/cloudera/hue/blob/master/apps/jobbrowser/src/jobbrowser/apis/schedule_api.py)
+* [Bundles API](https://github.com/cloudera/hue/blob/master/apps/jobbrowser/src/jobbrowser/apis/bundle_api.py)
+
 ## File Browser
 
-Various storage systems like Hadoop HDFS, AWS S3 and Azure [ADLS](https://issues.cloudera.org/browse/HUE-7248) can be interacted with. The [`fsmanager.py`](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/lib/fsmanager.py) is the main router to each API.
+Various storage systems can be interacted with. The [`fsmanager.py`](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/lib/fsmanager.py) is the main router to each API.
 
 **Note** Ceph can be used via the S3 browser.
+
+### Hadoop HDFS
+
+* [WebHdfs API](https://github.com/cloudera/hue/blob/master/desktop/libs/hadoop/src/hadoop/fs/webhdfs.py)
+
+### AWS S3
+
+* [S3 API](https://github.com/cloudera/hue/blob/master/desktop/libs/aws/src/aws/s3)
+
+### Azure ADLS
+
+* [ADLS v2](https://github.com/cloudera/hue/blob/master/desktop/libs/azure/src/azure/abfs)
+* [ADLS v1](https://github.com/cloudera/hue/blob/master/desktop/libs/azure/src/azure/adls)
 
 ## Dashboard
 
@@ -94,7 +124,20 @@ Implementations:
 
 A connector similar to Solr or SQL Alchemy binding would need to be developed [HUE-7828](https://issues.cloudera.org/browse/HUE-7828).
 
+## Data Catalog
+
+The backends is pluggable by providing alternative [client interfaces](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata/src/metadata/catalog):
+
+* Cloudera Navigator (default)
+* Dummy (skeleton for integrating new catalogs)
+
+### Apache Atlas
+
+* [Client API](desktop/libs/metadata/src/metadata/catalog/atlas_client.py)
+
 ## Scheduling
+
+### Oozie
 
 Currently only Apache Oozie is supported for your Datawarehouse, but the API is getting generic with [HUE-3797](https://issues.cloudera.org/browse/HUE-3797) that is bringing Celery Beat integration.
 
