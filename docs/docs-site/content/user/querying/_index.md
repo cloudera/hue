@@ -5,13 +5,15 @@ draft: false
 weight: 2
 ---
 
-The goal of the Editor is to make data querying easy and productive.
+Hue's goal is to make Databases & Datawarehouses querying easy and productive.
 
-It focuses on SQL but also supports job submissions. It comes with an intelligent autocomplete, risk alerts and self service troubleshooting and query assistance. The Editor is also available in Notebook mode.
+Several apps, each one specialized in a certain type of querying are available. Data sources can be explored first via the [browsers](/user/browsing/).
 
-Any editor can be starred next to its name so that it becomes the default editor and the landing page when logging in.
+* The Editor shines for SQL queries but also supports job submissions. It comes with an intelligent autocomplete, risk alerts and self service troubleshooting.
+* The Editor is also available in Notebook mode for quickly executing light programming snippets.
+* Dashboards are focusing on visualizing indexed data but can also query SQL databases.
 
-The list of databases and configuration of the connectors is currently done by the [Administrator](/administrator/configuration/connectors/).
+The configuration of the connectors is currently done by the [Administrator](/administrator/configuration/connectors/).
 
 ## Editor
 
@@ -19,27 +21,39 @@ The list of databases and configuration of the connectors is currently done by t
 
 ### Running Queries
 
+SQL query execution is the primary use case of the Editor.
+
 1.  The currently selected statement has a **left blue** border. To execute a portion of a query, highlight one or more query
     statements.
-2.  Click **Execute**. The Query Results window appears.
-    -   There is a Log caret on the left of the progress bar.
-    -   Expand the **Columns** by clicking on the column label will scroll to the column. Names and types can be filtered.
+2.  Click **Execute**. The Query Results window appears
+    -   There is a Log caret on the left of the progress bar
+    -   Expand the **Columns** by clicking on the column label will scroll to the column. Names and types can be filtered
     -   Select the **Chart** icon to plot the results
-    -   To expand a row, click on the row number.
-    -   To lock a row, click on the lock icon in the row number column.
-    -   Search either by clicking on the magnifier icon on the results tab, or pressing Ctrl/Cmd + F
+    -   To expand a row, click on the row number
+    -   To lock a row, click on the lock icon in the row number column
+    -   Search either by clicking on the magnifier icon on the results tab, or pressing `Ctrl/Cmd + F`
     -   [See more how to refine your results](http://gethue.com/new-features-in-the-sql-results-grid-in-hive-and-impala/).
 
-3.  If there are multiple statements in the query (separated by semi-colons), click Next in the
-    Multi-statement query pane to execute the remaining statements.
+3.  If there are **multiple statements** in the query (separated by semi-colons), click Next in the
+    multi-statement query pane to execute the remaining statements.
 
 When you have multiple statements it's enough to put the cursor in the statement you want to execute, the active statement is indicated with a blue gutter marking.
 
 **Note**: Use `CTRL/Cmd + ENTER` to execute queries.
 
-**Note**: On top of the logs panel, there is a link to open the query profile in the Query Browser.
+**Note**: On top of the logs panel, there is a link to open the query profile in the [Query Browser](/user/browsing/#impala-queries).
 
-### Downloading and Exporting Results
+### Running Jobs
+
+In addition to SQL, these types of jobs are supported:
+
+* [Apache Pig](https://pig.apache.org/) Latin instructions to load/merge data to perform ETL or Analytics.
+* Running an SQL import from a traditional relational database via an [Apache Sqoop](https://sqoop.apache.org/) command.
+* Regular Java, MapReduce, [shell script](http://gethue.com/use-the-shell-action-in-oozie/).
+* [Spark](http://gethue.com/use-the-spark-action-in-oozie/) Jar or Python script to trial and error them in YARN via [Oozie](http://gethue.com/how-to-schedule-spark-jobs-with-spark-on-yarn-and-oozie/) or Livy.
+
+
+### Downloading Results
 
 There are several ways you can export results of a query.
 
@@ -158,20 +172,6 @@ These visualizations are convenient for plotting chronological data or when subs
 
 ![Charts](https://cdn.gethue.com/uploads/2019/04/editor_charting.png)
 
-### Notebook mode
-
-Snippets of different dialects can be added into a single page:
-
-![Notebook mode](https://cdn.gethue.com/uploads/2015/10/notebook-october.png)
-
-### Dark mode
-
-Initially this mode is limited to the actual editor area and we’re considering extending this to cover all of Hue.
-
-![Editor Dark Mode](https://cdn.gethue.com/uploads/2018/10/editor_dark_mode.png)
-
-To toggle the dark mode you can either press `Ctrl-Alt-T` or `Command-Option-T` on Mac while the editor has focus. Alternatively you can control this through the settings menu which is shown by pressing `Ctrl-`, or `Command-`, on Mac.
-
 ### Query troubleshooting
 
 #### Pre-query execution
@@ -206,39 +206,39 @@ A new experimental panel when enabled can offer post risk analysis and recommend
 
 Turns a list of semi-colon separated queries into an interactive presentation by clicking on the 'Dashboard' icon. It is great for doing demos or reporting.
 
+### Dark mode
+
+Initially this mode is limited to the actual editor area and we’re considering extending this to cover all of Hue.
+
+![Editor Dark Mode](https://cdn.gethue.com/uploads/2018/10/editor_dark_mode.png)
+
+To toggle the dark mode you can either press `Ctrl-Alt-T` or `Command-Option-T` on Mac while the editor has focus. Alternatively you can control this through the settings menu which is shown by pressing `Ctrl-`, or `Command-`, on Mac.
+
 ### Scheduling
 
 Scheduling of queries is currently done via Apache Oozie and will be open to other schedulers with [HUE-3797](https://issues.cloudera.org/browse/HUE-3797).
 
 ![Oozie workflows](https://cdn.gethue.comuploads/2016/04/hue-workflows.png)
 
-## Databases & Datawarehouses
-
-### List
-
-Use the Editor or Dashboard to query [any database or datawarehouse](/administrator/configuration/connectors/). Those databases currently need to be first configured by the administrator.
-
-### Autocompletes & Connectors
-
-Also read about building some [better autocompletes](/developer/parsers/) or extending the connectors with SQL Alchemy, JDBC or building your own [connectors](/developer/sdk).
-
 
 ## Dashboards
 
-Dashboards are an interactive way to explore your SQL or Solr data quickly and easily. No programming is required and the analysis is done by drag & drops and clicks.
+Dashboards provide an interactive way to query indexed data quickly and easily. No programming is required and the analysis is done by drag & drops and clicks.
 
 ![Search Full](https://cdn.gethue.com/uploads/2015/08/search-full-mode.png)
 
-Simply drag & drop widgets that are interconnected together. This is great for exploring new datasets or monitoring without having to type.
+Widgets are interconnected together. This is great for exploring new datasets or monitoring without having to type.
 
 ![Analytics dimensions](https://cdn.gethue.com/uploads/2018/08/dashboard_layout_dnd.gif)
 
-Currently supported databases are Apache Solr, Apache Hive and Apache Impala. To add [more databases](/user/querying/#databases-datawarehouses), feel free to check the [SDK](/developer/sdk/).
+The best supported engine is Apache Solr, then support for SQL databases like Apache Hive and Apache Impala is getting better. To help add more databases, feel free to check the [dashboard connector](/developer/connectors/#dashboard) section.
 
-Tutorials
+These tutorials showcase the capabilities:
 
 * The top search bar offers a [full autocomplete](http://gethue.com/intuitively-discovering-and-exploring-a-wine-dataset-with-the-dynamic-dashboards/) on all the values of the index
-* Comprehensive demo is available on the [BikeShare data visualization post](http://gethue.com/bay-area-bikeshare-data-analysis-with-search-and-spark-notebook/).
+* Seeing [real time data](http://gethue.com/build-a-real-time-analytic-dashboard-with-solr-search-and-spark-streaming/)
+* Comprehensive demo of [BikeShare data visualization post](http://gethue.com/bay-area-bikeshare-data-analysis-with-search-and-spark-notebook/)
+
 
 ### Analytics facets
 
@@ -266,7 +266,7 @@ Points close to each other are grouped together and will expand when zooming-in.
 
 Indexed records can be directly edited in the Grid or HTML widgets by admins.
 
-### Link to original documents
+### Links
 
 Links to the original documents can also be inserted. Add to the record a field named ‘link-meta’ that contains some json describing the URL or address of a table or file that can be open in the HBase Browser, Metastore App or File Browser:
 
@@ -290,104 +290,58 @@ Table Catalog
 
 ![Data Links](https://cdn.gethue.com/uploads/2015/08/search-link-1024x630.png)
 
-### Save queries
+### Saved queries
 
 Current selected facets and filters, query strings can be saved with a name within the dashboard. These are useful for defining “cohorts” or pre-selection of records and quickly reloading them.
 
 ![Rolling time](https://cdn.gethue.com/uploads/2015/08/search-query-def-1024x507.png)
 
-### ‘Fixed’ or ‘rolling’ time window
+### ‘Fixed’ or ‘rolling’ window
 
 Real time indexing can now shine with the rolling window filter and the automatic refresh of the dashboard every N seconds. See it in action in the real time Twitter indexing with Spark streaming post.
 
-![Rolling time](https://cdn.gethue.com/uploads/2015/08/search-fixed-time.png)
+![Fixed time](https://cdn.gethue.com/uploads/2015/08/search-fixed-time.png)
 
 ### 'More like this'
 
 This feature lets you selected fields you would like to use to find similar records. This is a great way to find similar issues, customers, people... with regard to a list of attributes.
 
-![Rolling time](https://cdn.gethue.com/uploads/2018/01/solr_more_like_this.png)
+![More like this](https://cdn.gethue.com/uploads/2018/01/solr_more_like_this.png)
 
-## Jobs
 
-In addition to SQL queries, the Editor application enables you to create and submit batch jobs to the cluster.
+## Notebook
 
-### Spark
+The goal of Notebooks is to quickly experiment with small programming snippets (with in particular Spark) and do interactive demos. Its goal is to stay lightweight with regards to other notebook or programming systems.
 
-#### Interactive
+The main advantage is to be able to add snippets of different dialects (e.g. PySpark, Hive SQL...) into a single page:
 
-Hue relies on [Livy](http://livy.io/) for the interactive Scala, Python and R snippets.
+![Notebook mode](https://cdn.gethue.com/uploads/2015/10/notebook-october.png)
 
-Livy got initially developed in the Hue project but got a lot of traction and was moved to its own project on livy.io. Here is a tutorial on how to use a notebook to perform some Bike Data analysis.
-
-Read more about it:
-
-* [How to use the Livy Spark REST Job Server API for doing some interactive Spark with curl](http://gethue.com/how-to-use-the-livy-spark-rest-job-server-for-interactive-spark-2-2/)
-* [How to use the Livy Spark REST Job Server API for submitting batch jar, Python and Streaming Jobs](http://gethue.com/how-to-use-the-livy-spark-rest-job-server-api-for-submitting-batch-jar-python-and-streaming-spark-jobs/)
-
-Make sure that the Notebook and interpreters are set in the hue.ini, and Livy is up and running:
-
-    [spark]
-      # Host address of the Livy Server.
-      livy_server_host=localhost
-
-    [notebook]
-      show_notebooks=true
-
-    [[interpreters]]
-
-      [[[hive]]]
-        name=Hive
-        interface=hiveserver2
-
-      [[[spark]]]
-        name=Scala
-        interface=livy
-
-      [[[pyspark]]]
-        name=PySpark
-        interface=livy
-
-#### Batch
-
-This is a quick way to submit any Jar or Python jar/script to a cluster via the Scheduler or Editor.
-
-How to run Spark jobs with Spark on YARN? This often requires trial and error in order to make it work.
-
-Hue is leveraging Apache Oozie to submit the jobs. It focuses on the yarn-client mode, as Oozie is already running the spark-summit command in a MapReduce2 task in the cluster. You can read more about the Spark modes here.
-
-[Here is how to get started successfully](http://gethue.com/how-to-schedule-spark-jobs-with-spark-on-yarn-and-oozie/).
-And how to use the [Spark Action](http://gethue.com/use-the-spark-action-in-oozie/).
-
-### Livy
-
-Livy is an open source REST interface for interacting with Apache Spark from anywhere. It supports executing snippets of Python, Scala, R code or programs in a Spark Context that runs locally or in YARN.
-
-Livy supports the three languages of Spark:
-
-Kinds	Languages
-* spark	Scala
-* pyspark	Python
-* sparkr	R
-* sql SparkSQL
-
-Each snippet has a code editor, wih autocomplete, syntax highlighting and other feature like shortcut links to HDFS paths and Hive tables have been added.
+Any configured language of the Editor will be available as a dialect. Each snippet has a code editor, wih autocomplete, syntax highlighting and other feature like shortcut links to HDFS paths and Hive tables have been added.
 
 ![Notebook Screen](https://cdn.gethue.com/uploads/2015/08/notebook.png)
 
-The SparkR shell is now available, and plots can be displayed inline
+Example of SparkR shell with inline plot
 
-![Notebook sessions](https://cdn.gethue.com/uploads/2015/08/spark-r-snippet.png)
+![Notebook r snippet](https://cdn.gethue.com/uploads/2015/08/spark-r-snippet.png)
 
 All the spark-submit, spark-shell, pyspark, sparkR properties of jobs & shells can be added to the sessions of a Notebook. This will for example let you add files, modules and tweak the memory and number of executors.
 
 ![Notebook sessions](https://cdn.gethue.com/uploads/2015/08/notebook-sessions.png)
 
-#### Livy Spark REST Job Server basics
+### Spark
+
+Hue relies on [Livy](http://livy.io/) for the interactive Scala, Python, SparkSQL and R snippets.
+
+Livy is an open source REST interface for interacting with Apache Spark from anywhere. It got initially developed in the Hue project but got a lot of traction and was moved to its own project on livy.io.
+
+Make sure that the Notebook and interpreters [configured](/administrator/configuration/connectors/#apache-spark).
+
+#### Livy
 
 Starting the Livy REST server is detailed on livy.io the [get started](http://livy.incubator.apache.org/get-started/).
 
-Executing some Spark
+**Executing some Spark**
 
 As the REST server is running, we can communicate with it. We are on the same machine so will use ‘localhost’ as the address of Livy.
 
@@ -460,6 +414,15 @@ We check the status of the session until its state becomes idle: it means it is 
 
 ![Livy Architecture sessions](https://cdn.gethue.com/uploads/2015/09/20150818_scalabythebay.024.png)
 
+**Session properties**
+
+All the properties supported by spark shells like the number of executors, the memory, etc can be changed at session creation. Their format is the same as when typing spark-shell -h
+
+    curl -X POST --data '{"kind": "pyspark", "numExecutors": "3", "executorMemory": "2G"}' -H "Content-Type: application/json" localhost:8998/sessions
+    {"id":0,"state":"starting","kind":"pyspark","numExecutors":"3","executorMemory":"2G","log":[]}
+
+**Executing statements**
+
 In YARN mode, Livy creates a remote Spark Shell in the cluster that can be accessed easily with REST
 
 When the session state is idle, it means it is ready to accept statements! Lets compute 1 + 1
@@ -494,37 +457,9 @@ Let’s close the session to free up the cluster. Note that Livy will automatica
 
     {"msg":"deleted"}
 
+#### Tutorial: Sharing RDDs
 
-### Impersonation
-
-Let’s say we want to create a shell running as the user bob, this is particularly useful when multi users are sharing a Notebook server
-
-    curl -X POST --data '{"kind": "pyspark", "proxyUser": "bob"}' -H "Content-Type: application/json" localhost:8998/sessions
-
-    {"id":0,"state":"starting","kind":"pyspark","proxyUser":"bob","log":[]}
-
-Do not forget to add the user running Hue (your current login in dev or hue in production) in the Hadoop proxy user list (/etc/hadoop/conf/core-site.xml):
-
-    <property>
-      <name>hadoop.proxyuser.hue.hosts</name>
-      <value>*</value>
-    </property>
-    <property>
-      <name>hadoop.proxyuser.hue.groups</name>
-      <value>*</value>
-    </property>
-
-### Additional properties
-
-All the properties supported by spark shells like the number of executors, the memory, etc can be changed at session creation. Their format is the same as when typing spark-shell -h
-
-    curl -X POST --data '{"kind": "pyspark", "numExecutors": "3", "executorMemory": "2G"}' -H "Content-Type: application/json" localhost:8998/sessions
-    {"id":0,"state":"starting","kind":"pyspark","numExecutors":"3","executorMemory":"2G","log":[]}
-
-
-#### Sharing Spark RDDs and contexts
-
-Livy offers remote Spark sessions to users. They usually have one each (or one by Notebook):
+This section shows how to share Spark RDDs and contexts. Livy offers remote Spark sessions to users. They usually have one each (or one by Notebook):
 
     # Client 1
     curl localhost:8998/sessions/0/statements -X POST -H 'Content-Type: application/json' -d '{"code":"1 + 1"}'
@@ -641,41 +576,3 @@ And just interact with the RDD transparently:
 
     states.get('ak')
     states.set('hi', 'Hawaii')
-
-
-### Pig
-
-Type [Apache Pig](https://pig.apache.org/) Latin instructions to load/merge data to perform ETL or Analytics.
-
-### Sqoop
-
-Run an SQL import from a traditional relational database via an [Apache Sqoop](https://sqoop.apache.org/) command.
-
-### Shell
-
-Type or specify a path to a regular shell script.
-
-[Read more about it here](http://gethue.com/use-the-shell-action-in-oozie/).
-
-### Java
-
-A Java job design consists of a main class written in Java.
-
-<table>
-<tr><td>Jar path</td><td>The fully-qualified path to a JAR file containing the main class.</td></tr>
-<tr><td>Main class</td><td>The main class to invoke the program.</td></tr>
-<tr><td>Args</td><td>The arguments to pass to the main class.</td></tr>
-<tr><td>Java opts</td><td>The options to pass to the JVM.</td></tr>
-</table>
-
-### MapReduce
-
-A MapReduce job design consists of MapReduce functions written in Java.
-You can create a MapReduce job design from existing mapper and reducer
-classes without having to write a main Java class. You must specify the
-mapper and reducer classes as well as other MapReduce properties in the
-Job Properties setting.
-
-### DistCp
-
-A DistCp job design consists of a DistCp command.

@@ -163,7 +163,7 @@ Then give Hue the information about the database source:
        interface=sqlalchemy
        options='{"url": "oracle://scott:tiger@dsn"}'
 
-### PostgreSql
+### PostgreSQL
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
@@ -623,78 +623,6 @@ Then give Hue the information about the database source:
        interface=sqlalchemy
        options='{"url": "pinot+http://localhost:8099/query?server=http://localhost:9000/"}'
 
-### Apache Spark
-
-This connector leverage the [Apache Livy REST Api](https://livy.incubator.apache.org/):
-
-In the `[[interpreters]]` section:
-
-    [[[pyspark]]]
-      name=PySpark
-      interface=livy
-
-    [[[sql]]]
-      name=SparkSql
-      interface=livy
-
-    [[[spark]]]
-      name=Scala
-      interface=livy
-
-    [[[r]]]
-      name=R
-      interface=livy
-
-In the `[spark]` section:
-
-    [spark]
-      # The Livy Server URL.
-      livy_server_url=http://localhost:8998
-
-And if using Cloudera distribution, make sure you have notebooks enabled:
-
-    [desktop]
-      app_blacklist=
-
-    [notebook]
-      show_notebooks=true
-
-**YARN: Spark session could not be created**
-
-If seeing an error similar to this with `primitiveMkdir`:
-
-    The Spark session could not be created in the cluster: at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeMethod(RetryInvocationHandler.java:165)
-    at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invoke(RetryInvocationHandler.java:157)
-    at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeOnce(RetryInvocationHandler.java:95)
-    at org.apache.hadoop.io.retry.RetryInvocationHandler.invoke(RetryInvocationHandler.java:359) at com.sun.proxy.$Proxy10.mkdirs(Unknown Source)
-    at org.apache.hadoop.hdfs.DFSClient.primitiveMkdir(DFSClient.java:2333) ... 20 more
-    19/05/13 12:27:07 INFO util.ShutdownHookManager: Shutdown hook called 19/05/13 12:27:07 INFO util.ShutdownHookManager:
-    Deleting directory /tmp/spark-0d045154-77a0-4e12-94b2-2df18725a4ae YARN Diagnostics:
-
-Does your logged-in user have a home dir on HDFS (i.e. `/user/bob`)? (you should see the full error in the Livy or YARN logs).
-
-In Hue admin for you user, you can click the 'Create home' checkbox and save.
-
-**CSRF**
-
-Livy supports a configuration parameter in the Livy conf:
-
-      livy.server.csrf-protection.enabled
-
-...which is false by default. Upon trying to launch a Livy session from the notebook, Hue will pass along the connection error from Livy as a 400 response that the "Missing Required Header for CSRF protection". To enable it, add to the Hue config:
-
-      [spark]
-      # Whether Livy requires client to use csrf protection.
-      ## csrf_enabled=false
-
-### Apache Pig
-
-Pig is native to Hue and depends on the [Oozie service](/administrator/configuration/connectors/#oozie) to be configured:
-
-    [[[pig]]]
-      name=Pig
-      interface=oozie
-
 ### Snowflake
 
 The dialect should be added to the Python system or Hue Python virtual environment:
@@ -1010,14 +938,95 @@ The integration is powering the [Risk Alerts and Popular Values](/user/querying/
 
 ### Apache Spark
 
-The `[spark]` section details how to point to [Livy](https://livy.incubator.apache.org/) in order to execute interactive Spark snippets in Scala or Python.
+This connector leverage the [Apache Livy REST Api](https://livy.incubator.apache.org/):
+
+In the `[[interpreters]]` section:
+
+    [[[pyspark]]]
+      name=PySpark
+      interface=livy
+
+    [[[sql]]]
+      name=SparkSql
+      interface=livy
+
+    [[[spark]]]
+      name=Scala
+      interface=livy
+
+    [[[r]]]
+      name=R
+      interface=livy
+
+In the `[spark]` section:
 
     [spark]
-      # Host address of the Livy Server.
-      ## livy_server_host=localhost
+      # The Livy Server URL.
+      livy_server_url=http://localhost:8998
 
-      # Port of the Livy Server.
-      ## livy_server_port=8998
+And if using Cloudera distribution, make sure you have notebooks enabled:
+
+    [desktop]
+      app_blacklist=
+
+    [notebook]
+      show_notebooks=true
+
+**YARN: Spark session could not be created**
+
+If seeing an error similar to this with `primitiveMkdir`:
+
+    The Spark session could not be created in the cluster: at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeMethod(RetryInvocationHandler.java:165)
+    at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invoke(RetryInvocationHandler.java:157)
+    at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeOnce(RetryInvocationHandler.java:95)
+    at org.apache.hadoop.io.retry.RetryInvocationHandler.invoke(RetryInvocationHandler.java:359) at com.sun.proxy.$Proxy10.mkdirs(Unknown Source)
+    at org.apache.hadoop.hdfs.DFSClient.primitiveMkdir(DFSClient.java:2333) ... 20 more
+    19/05/13 12:27:07 INFO util.ShutdownHookManager: Shutdown hook called 19/05/13 12:27:07 INFO util.ShutdownHookManager:
+    Deleting directory /tmp/spark-0d045154-77a0-4e12-94b2-2df18725a4ae YARN Diagnostics:
+
+Does your logged-in user have a home dir on HDFS (i.e. `/user/bob`)? (you should see the full error in the Livy or YARN logs).
+
+In Hue admin for you user, you can click the 'Create home' checkbox and save.
+
+**CSRF**
+
+Livy supports a configuration parameter in the Livy conf:
+
+      livy.server.csrf-protection.enabled
+
+...which is false by default. Upon trying to launch a Livy session from the notebook, Hue will pass along the connection error from Livy as a 400 response that the "Missing Required Header for CSRF protection". To enable it, add to the Hue config:
+
+      [spark]
+      # Whether Livy requires client to use csrf protection.
+      ## csrf_enabled=false
+
+**Impersonation**
+
+Let’s say we want to create a shell running as the user bob, this is particularly useful when multi users are sharing a Notebook server
+
+    curl -X POST --data '{"kind": "pyspark", "proxyUser": "bob"}' -H "Content-Type: application/json" localhost:8998/sessions
+
+    {"id":0,"state":"starting","kind":"pyspark","proxyUser":"bob","log":[]}
+
+Do not forget to add the user running Hue (your current login in dev or hue in production) in the Hadoop proxy user list (/etc/hadoop/conf/core-site.xml):
+
+    <property>
+      <name>hadoop.proxyuser.hue.hosts</name>
+      <value>*</value>
+    </property>
+    <property>
+      <name>hadoop.proxyuser.hue.groups</name>
+      <value>*</value>
+    </property>
+
+
+### Apache Pig
+
+Pig is native to Hue and depends on the [Oozie service](/administrator/configuration/connectors/#oozie) to be configured:
+
+    [[[pig]]]
+      name=Pig
+      interface=oozie
 
 ### Apache Oozie
 

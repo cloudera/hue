@@ -59,8 +59,8 @@ Sharing happens on the main page or via the top right menu of the selected appli
 
 Two types of sharing permissions exist:
 
-- read only
-- can modify
+- Read only
+- Can modify
 
 Shared documents will show-up with a little blue icon.
 
@@ -71,6 +71,10 @@ Shared documents will show-up with a little blue icon.
 Via the Home page, saved documents can be exported for backups or transferring to another Hue.
 
 ## Settings
+
+### Landing page
+
+Any application or editor can be starred next to its name so that it becomes the default editor and the landing page when logging in.
 
 ### Changing the language
 
