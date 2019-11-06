@@ -2133,6 +2133,27 @@ class ApiHelper {
   /**
    *
    * @param {Object} options
+   * @param {Snippet} options.snippet
+   *
+   * @return {CancellablePromise<string>}
+   */
+  async explainAsync(options) {
+    const data = {
+      notebook: await options.snippet.parentNotebook.toContextJson(),
+      snippet: options.snippet.toContextJson()
+    };
+    return new Promise((resolve, reject) => {
+      this.simplePost('/notebook/api/explain', data, options)
+        .done(response => {
+          resolve(response.explanation);
+        })
+        .fail(reject);
+    });
+  }
+
+  /**
+   *
+   * @param {Object} options
    * @param {boolean} [options.silenceErrors]
    * @param {Executable} options.executable
    *

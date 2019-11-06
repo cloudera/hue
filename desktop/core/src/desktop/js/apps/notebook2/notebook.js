@@ -22,9 +22,9 @@ import apiHelper from 'api/apiHelper';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
+import sessionManager from 'apps/notebook2/execution/sessionManager';
 
 import Snippet, { STATUS as SNIPPET_STATUS } from 'apps/notebook2/snippet';
-import { notebookToContextJSON } from 'apps/notebook2/notebookSerde';
 
 export default class Notebook {
   constructor(vm, notebook) {
@@ -225,11 +225,11 @@ export default class Notebook {
     return newSnippet;
   }
 
-  clearHistory() {
+  async clearHistory() {
     hueAnalytics.log('notebook', 'clearHistory');
     apiHelper
       .clearNotebookHistory({
-        notebookJson: notebookToContextJSON(this),
+        notebookJson: await this.toContextJson(),
         docType: this.selectedSnippet(),
         isNotificationManager: this.parentVm.isNotificationManager()
       })
@@ -258,10 +258,10 @@ export default class Notebook {
     });
   }
 
-  close() {
+  async close() {
     hueAnalytics.log('notebook', 'close');
     apiHelper.closeNotebook({
-      notebookJson: this.toJson(),
+      notebookJson: await this.toJson(),
       editorMode: this.parentVm.editorMode()
     });
   }
@@ -460,7 +460,7 @@ export default class Notebook {
 
     try {
       const data = await apiHelper.saveNotebook({
-        notebookJson: this.toJson(),
+        notebookJson: await this.toJson(),
         editorMode: editorMode
       });
 
@@ -559,7 +559,19 @@ export default class Notebook {
     });
   }
 
-  toJs() {
+  async toContextJson() {
+    return JSON.stringify({
+      id: this.id(),
+      isSaved: this.isSaved(),
+      name: this.name(),
+      parentSavedQueryUuid: this.parentSavedQueryUuid(),
+      sessions: await sessionManager.getAllSessions(),
+      type: this.type(),
+      uuid: this.uuid()
+    });
+  }
+
+  async toJs() {
     return {
       coordinatorUuid: this.coordinatorUuid(),
       description: this.description(),
@@ -578,7 +590,7 @@ export default class Notebook {
       presentationSnippets: this.presentationSnippets(),
       pubSubUrl: this.pubSubUrl(),
       result: {}, // TODO: Moved to executor but backend requires it
-      sessions: [], // TODO: Moved to executor but backend requires it
+      sessions: await sessionManager.getAllSessions(),
       snippets: this.snippets().map(snippet => snippet.toJs()),
       type: this.type(),
       uuid: this.uuid(),
@@ -586,8 +598,8 @@ export default class Notebook {
     };
   }
 
-  toJson() {
-    return JSON.stringify(this.toJs());
+  async toJson() {
+    return JSON.stringify(await this.toJs());
   }
 
   unload() {
@@ -612,7 +624,7 @@ export default class Notebook {
 
     const updateHistoryCall = item => {
       apiHelper
-        .checkStatus({ notebookJson: komapping.toJSON({ id: item.uuid() }) })
+        .checkStatus({ notebookJson: JSON.stringify({ id: item.uuid() }) })
         .then(data => {
           const status =
             data.status === -3

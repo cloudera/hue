@@ -14,11 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { notebookToContextJSON, snippetToContextJSON } from '../notebookSerde';
 import Notebook from '../notebook';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 
-describe('notebookSerde.js', () => {
+describe('snippet.js', () => {
   const viewModel = {
     editorType: () => 'notebook',
     selectedNotebook: () => undefined,
@@ -37,36 +36,11 @@ describe('notebookSerde.js', () => {
     spyOn(sessionManager, 'getSession').and.callFake(() => Promise.resolve());
   });
 
-  it('should serialize a notebook to JSON', async () => {
-    const notebook = new Notebook(viewModel, {});
-    notebook.addSnippet({ type: 'hive' });
-    notebook.addSnippet({ type: 'impala' });
-
-    const notebookJSON = notebook.toJson();
-
-    const notebookRaw = JSON.parse(notebookJSON);
-
-    expect(notebookRaw.snippets.length).toEqual(2);
-    expect(notebookRaw.snippets[0].type).toEqual('hive');
-    expect(notebookRaw.snippets[1].type).toEqual('impala');
-  });
-
-  it('should serialize a notebook context to JSON', async () => {
-    const notebook = new Notebook(viewModel, {});
-    notebook.addSnippet({ type: 'hive' });
-
-    const notebookContextJSON = notebookToContextJSON(notebook);
-
-    const notebookContextRaw = JSON.parse(notebookContextJSON);
-
-    expect(notebookContextRaw.id).toEqual(notebook.id());
-  });
-
   it('should serialize a snippet context to JSON', async () => {
     const notebook = new Notebook(viewModel, {});
     const snippet = notebook.addSnippet({ type: 'hive' });
 
-    const snippetContextJSON = snippetToContextJSON(snippet);
+    const snippetContextJSON = snippet.toContextJson();
 
     const snippetContextRaw = JSON.parse(snippetContextJSON);
 

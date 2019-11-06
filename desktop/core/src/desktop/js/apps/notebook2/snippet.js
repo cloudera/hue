@@ -33,7 +33,6 @@ import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
-import { notebookToContextJSON, snippetToContextJSON } from 'apps/notebook2/notebookSerde';
 import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
 import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
 import {
@@ -235,6 +234,8 @@ export default class Snippet {
     });
 
     this.editorMode = this.parentVm.editorMode;
+
+    this.explanation = ko.observable();
 
     this.getAceMode = () => this.parentVm.getSnippetViewSettings(this.type()).aceMode;
 
@@ -888,7 +889,7 @@ export default class Snippet {
         }
       });
 
-      this.checkComplexity = () => {
+      this.checkComplexity = async () => {
         if (!this.inFocus() || lastCheckedComplexityStatement === this.statement()) {
           return;
         }
@@ -921,8 +922,8 @@ export default class Snippet {
         if (unknownResponse) {
           lastComplexityRequest = apiHelper
             .statementRisk({
-              notebookJson: notebookToContextJSON(this.parentNotebook),
-              snippetJson: snippetToContextJSON(this)
+              notebookJson: await this.parentNotebook.toContextJson(),
+              snippetJson: this.toContextJson()
             })
             .then(data => {
               knownResponses.unshift({
@@ -1075,10 +1076,10 @@ export default class Snippet {
     this.queryCompatibility();
   }
 
-  close() {
+  async close() {
     $.post('/notebook/api/close_statement', {
-      notebook: notebookToContextJSON(this.parentNotebook),
-      snippet: snippetToContextJSON(this)
+      notebook: await this.parentNotebook.toContextJson(),
+      snippet: this.toContextJson()
     });
   }
 
@@ -1187,12 +1188,12 @@ export default class Snippet {
     });
   }
 
-  getExternalStatement() {
+  async getExternalStatement() {
     this.externalStatementLoaded(false);
     apiHelper
       .getExternalStatement({
-        notebookJson: notebookToContextJSON(this.parentNotebook),
-        snippetJson: snippetToContextJSON(this)
+        notebookJson: await this.parentNotebook.toContextJson(),
+        snippetJson: this.toContextJson()
       })
       .then(data => {
         if (data.status === 0) {
@@ -1270,13 +1271,13 @@ export default class Snippet {
     return this.parentVm.getSnippetViewSettings(this.type()).placeHolder;
   }
 
-  getSimilarQueries() {
+  async getSimilarQueries() {
     hueAnalytics.log('notebook', 'get_query_similarity');
 
     apiHelper
       .statementSimilarity({
-        notebookJson: notebookToContextJSON(this.parentNotebook),
-        snippetJson: snippetToContextJSON(this),
+        notebookJson: await this.parentNotebook.toContextJson(),
+        snippetJson: this.toContextJson(),
         sourcePlatform: this.type()
       })
       .then(data => {
@@ -1412,7 +1413,7 @@ export default class Snippet {
     }
   }
 
-  queryCompatibility(targetPlatform) {
+  async queryCompatibility(targetPlatform) {
     apiHelper.cancelActiveRequest(this.lastCompatibilityRequest);
 
     hueAnalytics.log('notebook', 'compatibility');
@@ -1422,8 +1423,8 @@ export default class Snippet {
 
     this.lastCompatibilityRequest = apiHelper
       .statementCompatibility({
-        notebookJson: notebookToContextJSON(this.parentNotebook),
-        snippetJson: snippetToContextJSON(this),
+        notebookJson: await this.parentNotebook.toContextJson(),
+        snippetJson: this.toContextJson(),
         sourcePlatform: this.compatibilitySourcePlatform().value,
         targetPlatform: this.compatibilityTargetPlatform().value
       })
@@ -1498,6 +1499,24 @@ export default class Snippet {
   stopLongOperationTimeout() {
     window.clearTimeout(this.longOperationTimeout);
     this.showLongOperationWarning(false);
+  }
+
+  toContextJson() {
+    return JSON.stringify({
+      id: this.id(),
+      type: this.type(),
+      status: this.status(),
+      statementType: this.statementType(),
+      statement: this.statement(),
+      aceCursorPosition: this.aceCursorPosition(),
+      statementPath: this.statementPath(),
+      associatedDocumentUuid: this.associatedDocumentUuid(),
+      properties: komapping.toJS(this.properties), // TODO: Drop komapping
+      result: {}, // TODO: Moved to executor but backend requires it
+      database: this.database(),
+      compute: this.compute(),
+      wasBatchExecuted: this.wasBatchExecuted()
+    });
   }
 
   toJs() {

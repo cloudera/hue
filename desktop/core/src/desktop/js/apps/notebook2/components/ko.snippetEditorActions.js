@@ -14,7 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery';
 import ko from 'knockout';
 
 import 'ko/bindings/ko.publish';
@@ -23,7 +22,6 @@ import apiHelper from 'api/apiHelper';
 import componentUtils from 'ko/components/componentUtils';
 import hueAnalytics from 'utils/hueAnalytics';
 import I18n from 'utils/i18n';
-import { notebookToContextJSON, snippetToContextJSON } from 'apps/notebook2/notebookSerde';
 import { STATUS } from 'apps/notebook2/snippet';
 
 const TEMPLATE = `
@@ -133,28 +131,16 @@ class SnippetEditorActions {
     this.snippet.status(STATUS.ready);
   }
 
-  explain() {
+  async explain() {
     if (!this.explainEnabled()) {
       return;
     }
     hueAnalytics.log('notebook', 'explain');
 
-    this.snippet.result.explanation('');
-    this.snippet.errors([]);
-    this.snippet.status(STATUS.ready);
-
-    $.post('/notebook/api/explain', {
-      notebook: notebookToContextJSON(this.snippet.parentNotebook),
-      snippet: snippetToContextJSON(this.snippet)
-    }).then(data => {
-      if (data.status === 0) {
-        this.snippet.currentQueryTab('queryExplain');
-        this.snippet.result.fetchedOnce(true);
-        this.snippet.result.explanation(data.explanation);
-      } else {
-        this.snippet.handleAjaxError(data);
-      }
-    });
+    this.snippet.explanation('');
+    const explanation = await apiHelper.explainAsync({ snippet: this.snippet });
+    this.snippet.explanation(explanation);
+    this.snippet.currentQueryTab('queryExplain');
   }
 
   format() {
