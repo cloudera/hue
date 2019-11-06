@@ -44,6 +44,7 @@ class TestAWS(unittest.TestCase):
     finally:
       finish()
       clear_cache()
+      conf.clear_cache()
 
   def test_with_idbroker(self):
     try:
@@ -74,6 +75,7 @@ class TestAWS(unittest.TestCase):
     finally:
       finish()
       clear_cache()
+      conf.clear_cache()
 
   def test_with_idbroker_and_config(self):
     try:
@@ -95,3 +97,4 @@ class TestAWS(unittest.TestCase):
     finally:
       finish()
       clear_cache()
+      conf.clear_cache()

@@ -55,7 +55,8 @@ def current_ms_from_utc():
 
 def get_client(identifier='default', user=_DEFAULT_USER):
   global CLIENT_CACHE
-  _init_clients()
+  if not CLIENT_CACHE:
+    CLIENT_CACHE = {}
 
   cache_key = _get_cache_key(identifier, user) if conf_idbroker.is_idbroker_enabled('s3a') else _get_cache_key(identifier) # We don't want to cache by username when IDBroker not enabled
   client = CLIENT_CACHE.get(cache_key)
@@ -70,20 +71,6 @@ def get_client(identifier='default', user=_DEFAULT_USER):
 def get_credential_provider(identifier='default', user=_DEFAULT_USER):
   client_conf = aws_conf.AWS_ACCOUNTS[identifier] if identifier in aws_conf.AWS_ACCOUNTS else None
   return CredentialProviderIDBroker(IDBroker.from_core_site('s3a', user)) if conf_idbroker.is_idbroker_enabled('s3a') else CredentialProviderConf(client_conf)
-
-
-def _init_clients():
-  global CLIENT_CACHE
-  if CLIENT_CACHE is not None:
-    return
-  CLIENT_CACHE = {} # Can't convert this to django cache, because S3FileSystem is not pickable
-  if conf_idbroker.is_idbroker_enabled('s3a'):
-    return # No default initializations when IDBroker is enabled
-  for identifier in list(aws_conf.AWS_ACCOUNTS.keys()):
-    CLIENT_CACHE[_get_cache_key(identifier)] = _make_client(identifier)
-  # If default configuration not initialized, initialize client connection with IAM metadata
-  if not CLIENT_CACHE.has_key(_get_cache_key()) and aws_conf.has_iam_metadata():
-    CLIENT_CACHE[_get_cache_key()] = _make_client('default')
 
 
 def _make_client(identifier, user=_DEFAULT_USER):
