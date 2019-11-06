@@ -240,7 +240,7 @@ def is_ec2_instance():
   # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/identify_ec2_instances.html
   # /sys/hypervisor/uuid doesn't work on m5/c5, but /sys/devices/virtual/dmi/id/product_uuid does
   try:
-    return (os.path.exists('/sys/hypervisor/uuid') and open('/sys/hypervisor/uuid', 'read').read()[:3].lower() == 'ec2') or (os.path.exists('/sys/devices/virtual/dmi/id/product_uuid') and open('/sys/devices/virtual/dmi/id/product_uuid', 'read').read()[:3].lower() == 'ec2')
+    return (os.path.exists('/sys/hypervisor/uuid') and open('/sys/hypervisor/uuid', 'r').read()[:3].lower() == 'ec2') or (os.path.exists('/sys/devices/virtual/dmi/id/product_uuid') and open('/sys/devices/virtual/dmi/id/product_uuid', 'r').read()[:3].lower() == 'ec2')
   except IOError as e:
     return 'Permission denied' in str(e) # If permission is denied, assume cost of network call
   except Exception as e:
