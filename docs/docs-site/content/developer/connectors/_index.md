@@ -93,3 +93,9 @@ Implementations:
 ### Elastic Search
 
 A connector similar to Solr or SQL Alchemy binding would need to be developed [HUE-7828](https://issues.cloudera.org/browse/HUE-7828).
+
+## Scheduling
+
+Currently only Apache Oozie is supported for your Datawarehouse, but the API is getting generic with [HUE-3797](https://issues.cloudera.org/browse/HUE-3797) that is bringing Celery Beat integration.
+
+* [API](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/lib/scheduler/lib/beat.py)

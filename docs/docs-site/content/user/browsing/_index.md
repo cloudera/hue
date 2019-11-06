@@ -549,7 +549,7 @@ Read more about it on [Browsing Impala Query Execution within the SQL Editor
 
 ### Oozie Workflow / Schedules
 
-List submitted workflows, schedules and bundles.
+List submitted workflows, schedules and bundles. See more in details in the [Scheduling](/user/scheduling/) section.
 
 ![Oozie jobs](https://cdn.gethue.com/uploads/2016/04/hue-dash-oozie.png)
 
