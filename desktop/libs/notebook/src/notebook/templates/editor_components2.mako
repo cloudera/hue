@@ -520,16 +520,16 @@
             <li style="margin-right: 25px;" data-bind="click: function(){ currentQueryTab('queryBuilderTab'); }, css: {'active': currentQueryTab() == 'queryBuilderTab'}"><a class="inactive-action" href="#queryBuilderTab" data-toggle="tab">${_('Query Builder')}</a></li>
             <!-- /ko -->
           % endif
-          <li data-bind="click: function(){ currentQueryTab('queryResults'); }, css: {'active': currentQueryTab() == 'queryResults'}">
+          <li data-bind="click: function() { currentQueryTab('queryResults'); }, css: {'active': currentQueryTab() == 'queryResults'}">
             <a class="inactive-action" style="display:inline-block" href="#queryResults" data-toggle="tab">${_('Results')}
 ##               <!-- ko if: result.rows() != null  -->
 ##               (<span data-bind="text: result.rows().toLocaleString() + (type() == 'impala' && result.rows() == 1024 ? '+' : '')" title="${ _('Number of rows') }"></span>)
 ##               <!-- /ko -->
             </a>
           </li>
-##           <!-- ko if: result.explanation().length > 0 -->
-##           <li data-bind="click: function(){ currentQueryTab('queryExplain'); }, css: {'active': currentQueryTab() == 'queryExplain'}"><a class="inactive-action" href="#queryExplain" data-toggle="tab">${_('Explain')}</a></li>
-##           <!-- /ko -->
+          <!-- ko if: explanation -->
+          <li data-bind="click: function() { currentQueryTab('queryExplain'); }, css: {'active': currentQueryTab() == 'queryExplain'}"><a class="inactive-action" href="#queryExplain" data-toggle="tab">${_('Explain')}</a></li>
+          <!-- /ko -->
           <!-- ko foreach: pinnedContextTabs -->
           <li data-bind="click: function() { $parent.currentQueryTab(tabId) }, css: { 'active': $parent.currentQueryTab() === tabId }">
             <a class="inactive-action" data-toggle="tab" data-bind="attr: { 'href': '#' + tabId }">
@@ -681,11 +681,11 @@
             <!-- /ko -->
           </div>
 
-##           <!-- ko if: result.explanation().length > 0 -->
-##           <div class="tab-pane" id="queryExplain" data-bind="css: {'active': currentQueryTab() == 'queryExplain'}">
-##             <!-- ko template: { name: 'snippet-explain${ suffix }' } --><!-- /ko -->
-##           </div>
-##           <!-- /ko -->
+          <!-- ko if: explanation -->
+          <div class="tab-pane" id="queryExplain" data-bind="css: {'active': currentQueryTab() == 'queryExplain'}">
+            <pre class="no-margin-bottom" data-bind="text: explanation"></pre>
+          </div>
+          <!-- /ko -->
 
           <!-- ko if: HAS_WORKLOAD_ANALYTICS && type() === 'impala' -->
           <div class="tab-pane" id="executionAnalysis" data-bind="css: {'active': currentQueryTab() == 'executionAnalysis'}" style="padding: 10px;">
@@ -1130,10 +1130,6 @@
       </ul>
     </div>
   </script>
-
-##   <script type="text/html" id="snippet-explain${ suffix }">
-##     <pre class="no-margin-bottom" data-bind="text: result.explanation"></pre>
-##   </script>
 
   <script type="text/html" id="text-snippet-body${ suffix }">
     <div data-bind="attr: {'id': 'editor_' + id()}, html: statement_raw, value: statement_raw, medium: {}" data-placeHolder="${ _('Type your text here, select some text to format it') }" class="text-snippet"></div>
