@@ -274,7 +274,32 @@ Then use the Python code to access a certain user information:
       u'desktop.Document_tags': 18524L})
 
 
-### Creating the app
+### Creating an App
+
+Building a brand new application is more work but is ideal for creating a custom solution.
+
+**Note** It is now more recommended to integrate external services (e.g. integrate a new SQL Datatase with the Editor, add a new visualization...) to the core Hue APIs instead of building brand new application. This page gives good content in both cases. Feel free to contact the community for advice.
+
+#### Overview
+
+Hue leverages the browser to provide users with an environment for exploring
+and analyzing data.
+
+Build on top of the Hue SDK to enable your application to interact efficiently with
+Hadoop and the other Hue services.
+
+By building on top of Hue SDK, you get, out of the box:
+
++ Configuration Management
++ Hadoop interoperability
++ Supervision of subprocesses
++ A collaborative UI
++ Basic user administration and authorization
+
+This document will orient you with the general structure of Hue
+and will walk you through adding a new application using the SDK.
+
+#### Creating the app
 
 Run "create_desktop_app" to Set up a New Source Tree
 
@@ -302,7 +327,7 @@ Run "create_desktop_app" to Set up a New Source Tree
   Check the hue.ini 'app_blacklist' parameter for details.
 </div>
 
-### Install SDK Application
+#### Install SDK Application
 
 As you'll discover if you look at calculator's <tt>setup.py</tt>,
 Hue uses a distutils <tt>entrypoint</tt> to
@@ -347,8 +372,7 @@ You can now browse the new application.
 And then visit <a href="http://localhost:8000">http://localhost:8000/</a> to check it out!
 You should see the app in the left menu.
 
-
-### Customizing
+#### Customizing
 
 Now that your app has been installed, you'll want to customize it.
 As you may have guessed, we're going to build a small calculator
