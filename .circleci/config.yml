@@ -133,6 +133,47 @@ jobs:
           command: |
             git push origin HEAD:master
 
+  build-py3:
+    docker:
+      - image: gethue/hue:latest # Should be circleci/python:3.6.1 at some point
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      # - restore_cache:
+      #     keys:
+      #       - v1-dependencies-{{ checksum "desktop/core/requirements_py3.txt" }}
+      #       # fallback to using the latest cache if no exact match is found
+      #       - v1-dependencies-
+
+      - run:
+          name: compile
+          command: |
+            apt-get install -y python3.6-dev libsnappy-dev # This should not be needed as some point
+
+            export PYTHON_VER=python3.6
+            make apps
+
+      - run:
+          name: run tests
+          command: |
+            ./build/env/bin/hue test unit --with-xunit --with-cover
+
+      # - run:
+      #     name: install dependencies
+      #     command: |
+      #       python -m venv venv
+      #       make apps
+
+      # - save_cache:
+      #     paths:
+      #       - ./build/venv
+      #     key: v1-dependencies-{{ checksum "esktop/core/requirements_py3.txt" }}
+
+
 
 workflows:
   version: 2
@@ -143,6 +184,7 @@ workflows:
             branches:
               ignore:
                 - master
+                - py3-ci
       - commit:
           requires:
             - build
@@ -150,3 +192,8 @@ workflows:
             branches:
               only:
                 - /.*ci-commit-master.*/
+      - build-py3:
+          filters:
+            branches:
+              only:
+                - py3-ci
