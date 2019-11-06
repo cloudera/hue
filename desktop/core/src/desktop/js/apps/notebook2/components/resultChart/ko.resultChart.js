@@ -203,7 +203,7 @@ const TEMPLATE = `
       </ul>
       <div>
         <select class="input-medium" data-bind="
-            options: chartMetaOptions, 
+            options: chartMetaOptions,
             optionsText: 'name',
             optionsValue: 'name',
             optionsCaption: '${ I18n('Choose a column...') }',
@@ -310,7 +310,7 @@ const TEMPLATE = `
             optionsText: 'name',
             optionsValue: 'name',
             optionsCaption: '${ I18n('Choose a column...') }',
-            select2: { 
+            select2: {
               width: '100%',
               placeholder: '${ I18n('Choose a column...') }',
               update: chartMapLabel,
@@ -330,7 +330,7 @@ const TEMPLATE = `
             optionsText: 'name',
             optionsValue: 'name',
             optionsCaption: '${ I18n('Choose a column...') }',
-            select2: { 
+            select2: {
               width: '100%',
               placeholder: '${ I18n('Choose a column...') }',
               update: chartMapHeat,
@@ -385,7 +385,7 @@ const TEMPLATE = `
       </ul>
       <div data-bind="visible: chartType() != ''">
         <select data-bind="
-            selectedOptions: chartScope, 
+            selectedOptions: chartScope,
             optionsCaption: '${ I18n('Choose a scope...') }',
             select2: {
               width: '100%',
@@ -432,7 +432,7 @@ const TEMPLATE = `
       <!-- /ko -->
     </div>
   </div>
-  
+
   <div class="split-result-resizer" style="display: none;" data-bind="
       visible: chartSettingsVisible,
       splitFlexDraggable : {
@@ -443,8 +443,9 @@ const TEMPLATE = `
         appName: 'result_chart',
         onPosition: function() {  }
       }
-    "><div class="resize-bar"></div></div>
-  
+    "><div class="resize-bar"></div>
+  </div>
+
   <div class="split-result-content chart-container">
     <h1 class="empty" data-bind="visible: !hasDataForChart()" style="display:none">${ I18n('Select the chart parameters on the left') }</h1>
 
