@@ -42,6 +42,7 @@ KAFKA = ConfigSection(
       type=coerce_bool,
       default=False
     ),
+    # Deprecated
     API_URL=Config(
       key='api_url',
       help=_t('Base URL of Kafka REST API.'),
