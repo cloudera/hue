@@ -216,10 +216,7 @@ To toggle the dark mode you can either press `Ctrl-Alt-T` or `Command-Option-T` 
 
 ### Scheduling
 
-Scheduling of queries is currently done via Apache Oozie and will be open to other schedulers with [HUE-3797](https://issues.cloudera.org/browse/HUE-3797).
-
-![Oozie workflows](https://cdn.gethue.comuploads/2016/04/hue-workflows.png)
-
+Scheduling is detailed in its [own section](/user/scheduling/).
 
 ## Dashboards
 
