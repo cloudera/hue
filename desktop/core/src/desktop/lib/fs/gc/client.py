@@ -16,7 +16,6 @@
 from __future__ import absolute_import
 
 import boto
-import datetime
 import logging
 import gcs_oauth2_boto_plugin
 import json
@@ -28,55 +27,16 @@ from boto.provider import Provider
 from boto.s3.connection import SubdomainCallingFormat
 
 from desktop import conf
-from desktop.conf import DEFAULT_USER
 from desktop.lib.idbroker import conf as conf_idbroker
 from desktop.lib.idbroker.client import IDBroker
 
 LOG = logging.getLogger(__name__)
 
-CLIENT_CACHE = None
-
-_DEFAULT_USER = DEFAULT_USER.get()
-
-# FIXME: Should we check hue principal for the default user?
-def _get_cache_key(identifier='default', user=_DEFAULT_USER): # FIXME: Caching via username has issues when users get deleted. Need to switch to userid, but bigger change
-  return identifier + ':' + user
-
-
-def clear_cache():
-  global CLIENT_CACHE
-  CLIENT_CACHE = None
-
-
-def current_ms_from_utc():
-  return (datetime.datetime.utcnow() - datetime.datetime.utcfromtimestamp(0)).total_seconds() * 1000
-
-
-def get_client(identifier='default', user=_DEFAULT_USER):
-  global CLIENT_CACHE
-  _init_clients()
-
-  cache_key = _get_cache_key(identifier, user) if conf_idbroker.is_idbroker_enabled('gs') else _get_cache_key(identifier) # We don't want to cache by username when IDBroker not enabled
-  client = CLIENT_CACHE.get(cache_key)
-
-  if client and (client.expiration is None or client.expiration > int(current_ms_from_utc())): # expiration from IDBroker returns java timestamp in MS
-    return client
-  else:
-    client = _make_client(identifier, user)
-    CLIENT_CACHE[cache_key] = client
-    return client
-
-def get_credential_provider(config=None, user=_DEFAULT_USER):
+def get_credential_provider(config, user):
   return CredentialProviderIDBroker(IDBroker.from_core_site('gs', user)) if conf_idbroker.is_idbroker_enabled('gs') else CredentialProviderConf(config)
 
 
-def _init_clients():
-  global CLIENT_CACHE
-  if CLIENT_CACHE is not None:
-    return
-  CLIENT_CACHE = {} # Can't convert this to django cache, because S3FileSystem is not pickable
-
-def _make_client(identifier, user=_DEFAULT_USER):
+def _make_client(identifier, user):
   config = conf.GC_ACCOUNTS[identifier] if identifier in list(conf.GC_ACCOUNTS.keys()) else None
   client = Client.from_config(config, get_credential_provider(config, user))
   return S3FileSystem(client.get_s3_connection(), client.expiration, headers={"x-goog-project-id": client.project}, filebrowser_action=conf.PERMISSION_ACTION_GS) # It would be nice if the connection is lazy loaded

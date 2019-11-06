@@ -21,6 +21,7 @@ from django.utils.translation import ugettext_lazy as _, ugettext as _t
 from hadoop.core_site import get_adls_client_id, get_adls_authentication_code, get_adls_refresh_url
 
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_password_from_script
+from desktop.lib.idbroker import conf as conf_idbroker
 
 
 LOG = logging.getLogger(__name__)
@@ -144,10 +145,10 @@ ABFS_CLUSTERS = UnspecifiedConfigSection(
 )
 
 def is_adls_enabled():
-  return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() is not None and 'default' in list(ADLS_CLUSTERS.keys()) and ADLS_CLUSTERS['default'].get_raw())
+  return ('default' in list(AZURE_ACCOUNTS.keys() and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get()) or (conf_idbroker.is_idbroker_enabled('azure')) and 'default' in list(ADLS_CLUSTERS.keys()))
 
 def is_abfs_enabled():
-  return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() is not None and 'default' in list(ABFS_CLUSTERS.keys()) and ABFS_CLUSTERS['default'].get_raw())
+  return ('default' in list(AZURE_ACCOUNTS.keys() and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get()) or (conf_idbroker.is_idbroker_enabled('azure')) and 'default' in list(ABFS_CLUSTERS.keys()))
 
 def has_adls_access(user):
   from desktop.auth.backend import is_admin
@@ -160,11 +161,11 @@ def has_abfs_access(user):
 def config_validator(user):
   res = []
 
-  import azure.client # Avoid cyclic loop
+  import desktop.lib.fsmanager # Avoid cyclic loop
 
   if is_adls_enabled() or is_abfs_enabled():
     try:
-      headers = azure.client.get_client('default')._getheaders()
+      headers = desktop.lib.fsmanager.get_client(name='default', fs='abfs')._getheaders()
       if not headers.get('Authorization'):
         raise ValueError('Failed to obtain Azure authorization token')
     except Exception as e:

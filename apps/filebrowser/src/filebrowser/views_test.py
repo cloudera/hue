@@ -1247,6 +1247,8 @@ class TestS3AccessPermissions(object):
 class TestABFSAccessPermissions(object):
 
   def setUp(self):
+    if not is_abfs_enabled():
+      raise SkipTest
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     grant_access('test', 'test', 'filebrowser')
     add_to_group('test')
@@ -1254,8 +1256,6 @@ class TestABFSAccessPermissions(object):
     self.user = User.objects.get(username="test")
 
   def test_no_default_permissions(self):
-    if not is_abfs_enabled():
-      raise SkipTest
     response = self.client.get('/filebrowser/view=ABFS://')
     assert_equal(500, response.status_code)
 
@@ -1266,8 +1266,6 @@ class TestABFSAccessPermissions(object):
 #       assert_raises(S3FileSystemException, self.client.post, '/filebrowser/upload/file?dest=%s' % DEST_DIR, dict(dest=DEST_DIR, hdfs_file=file(LOCAL_FILE)))
 
   def test_has_default_permissions(self):
-    if not is_abfs_enabled():
-      raise SkipTest
     add_permission(self.user.username, 'has_abfs', permname='abfs_access', appname='filebrowser')
 
     try:
@@ -1279,6 +1277,8 @@ class TestABFSAccessPermissions(object):
 class TestADLSAccessPermissions(object):
 
   def setUp(self):
+    if not is_adls_enabled():
+      raise SkipTest
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     grant_access('test', 'test', 'filebrowser')
     add_to_group('test')
@@ -1286,8 +1286,6 @@ class TestADLSAccessPermissions(object):
     self.user = User.objects.get(username="test")
 
   def test_no_default_permissions(self):
-    if not is_adls_enabled():
-      raise SkipTest
     response = self.client.get('/filebrowser/view=ADL://')
     assert_equal(500, response.status_code)
 
@@ -1313,8 +1311,6 @@ class TestADLSAccessPermissions(object):
 #       assert_raises(S3FileSystemException, self.client.post, '/filebrowser/upload/file?dest=%s' % DEST_DIR, dict(dest=DEST_DIR, hdfs_file=file(LOCAL_FILE)))
 
   def test_has_default_permissions(self):
-    if not is_adls_enabled():
-      raise SkipTest
     add_permission(self.user.username, 'has_adls', permname='adls_access', appname='filebrowser')
 
     try:
