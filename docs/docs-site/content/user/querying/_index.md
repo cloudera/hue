@@ -359,6 +359,290 @@ Hue is leveraging Apache Oozie to submit the jobs. It focuses on the yarn-client
 [Here is how to get started successfully](http://gethue.com/how-to-schedule-spark-jobs-with-spark-on-yarn-and-oozie/).
 And how to use the [Spark Action](http://gethue.com/use-the-spark-action-in-oozie/).
 
+### Livy
+
+Livy is an open source REST interface for interacting with Apache Spark from anywhere. It supports executing snippets of Python, Scala, R code or programs in a Spark Context that runs locally or in YARN.
+
+Livy supports the three languages of Spark:
+
+Kinds	Languages
+* spark	Scala
+* pyspark	Python
+* sparkr	R
+* sql SparkSQL
+
+Each snippet has a code editor, wih autocomplete, syntax highlighting and other feature like shortcut links to HDFS paths and Hive tables have been added.
+
+![Notebook Screen](https://cdn.gethue.com/uploads/2015/08/notebook.png)
+
+The SparkR shell is now available, and plots can be displayed inline
+
+![Notebook sessions](https://cdn.gethue.com/uploads/2015/08/spark-r-snippet.png)
+
+All the spark-submit, spark-shell, pyspark, sparkR properties of jobs & shells can be added to the sessions of a Notebook. This will for example let you add files, modules and tweak the memory and number of executors.
+
+![Notebook sessions](https://cdn.gethue.com/uploads/2015/08/notebook-sessions.png)
+
+#### Livy Spark REST Job Server basics
+
+Starting the Livy REST server is detailed on livy.io the [get started](http://livy.incubator.apache.org/get-started/).
+
+Executing some Spark
+
+As the REST server is running, we can communicate with it. We are on the same machine so will use ‘localhost’ as the address of Livy.
+
+Let’s list our open sessions
+
+    curl localhost:8998/sessions
+
+    {"from":0,"total":0,"sessions":[]}
+
+**Note** You can use
+
+    | python -m json.tool
+
+at the end of the command to prettify the output, e.g.:
+
+    curl localhost:8998/sessions/0 | python -m json.tool
+
+There is zero session. We create an interactive PySpark session
+
+    curl -X POST --data '{"kind": "pyspark"}' -H "Content-Type: application/json" localhost:8998/sessions
+
+    {"id":0,"state":"starting","kind":"pyspark","log":[]}
+
+Sessions ids are incrementing numbers starting from 0. We can then reference the session later by its id.
+
+We check the status of the session until its state becomes idle: it means it is ready to be execute snippet of PySpark:
+
+    curl localhost:8998/sessions/0 | python -m json.tool
+
+
+    % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+
+                                    Dload  Upload   Total   Spent    Left  Speed
+
+    100  1185    0  1185    0     0  72712      0 --:--:-- --:--:-- --:--:-- 79000
+
+    {
+
+        "id": 5,
+
+        "kind": "pyspark",
+
+        "log": [
+
+          "15/09/03 17:44:14 INFO util.Utils: Successfully started service 'SparkUI' on port 4040.",
+
+          "15/09/03 17:44:14 INFO ui.SparkUI: Started SparkUI at http://172.21.2.198:4040",
+
+          "15/09/03 17:44:14 INFO spark.SparkContext: Added JAR file:/home/romain/projects/hue/apps/spark/java-lib/livy-assembly.jar at http://172.21.2.198:33590/jars/livy-assembly.jar with timestamp 1441327454666",
+
+          "15/09/03 17:44:14 WARN metrics.MetricsSystem: Using default name DAGScheduler for source because spark.app.id is not set.",
+
+          "15/09/03 17:44:14 INFO executor.Executor: Starting executor ID driver on host localhost",
+
+          "15/09/03 17:44:14 INFO util.Utils: Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 54584.",
+
+          "15/09/03 17:44:14 INFO netty.NettyBlockTransferService: Server created on 54584",
+
+          "15/09/03 17:44:14 INFO storage.BlockManagerMaster: Trying to register BlockManager",
+
+          "15/09/03 17:44:14 INFO storage.BlockManagerMasterEndpoint: Registering block manager localhost:54584 with 530.3 MB RAM, BlockManagerId(driver, localhost, 54584)",
+
+          "15/09/03 17:44:15 INFO storage.BlockManagerMaster: Registered BlockManager"
+
+        ],
+
+        "state": "idle"
+
+    }
+
+![Livy Architecture sessions](https://cdn.gethue.com/uploads/2015/09/20150818_scalabythebay.024.png)
+
+In YARN mode, Livy creates a remote Spark Shell in the cluster that can be accessed easily with REST
+
+When the session state is idle, it means it is ready to accept statements! Lets compute 1 + 1
+
+    curl localhost:8998/sessions/0/statements -X POST -H 'Content-Type: application/json' -d '{"code":"1 + 1"}'
+
+    {"id":0,"state":"running","output":null}
+
+We check the result of statement 0 when its state is available
+
+    curl localhost:8998/sessions/0/statements/0
+
+    {"id":0,"state":"available","output":{"status":"ok","execution_count":0,"data":{"text/plain":"2"}}}
+
+**Note** If the statement is taking less than a few milliseconds, Livy returns the response directly in the response of the POST command.
+
+Statements are incrementing and all share the same context, so we can have a sequences
+
+    curl localhost:8998/sessions/0/statements -X POST -H 'Content-Type: application/json' -d '{"code":"a = 10"}'
+
+    {"id":1,"state":"available","output":{"status":"ok","execution_count":1,"data":{"text/plain":""}}}
+
+Spanning multiple statements
+
+    curl localhost:8998/sessions/5/statements -X POST -H 'Content-Type: application/json' -d '{"code":"a + 1"}'
+
+    {"id":2,"state":"available","output":{"status":"ok","execution_count":2,"data":{"text/plain":"11"}}}
+
+Let’s close the session to free up the cluster. Note that Livy will automatically inactive idle sessions after 1 hour (configurable).
+
+    curl localhost:8998/sessions/0 -X DELETE
+
+    {"msg":"deleted"}
+
+
+### Impersonation
+
+Let’s say we want to create a shell running as the user bob, this is particularly useful when multi users are sharing a Notebook server
+
+    curl -X POST --data '{"kind": "pyspark", "proxyUser": "bob"}' -H "Content-Type: application/json" localhost:8998/sessions
+
+    {"id":0,"state":"starting","kind":"pyspark","proxyUser":"bob","log":[]}
+
+Do not forget to add the user running Hue (your current login in dev or hue in production) in the Hadoop proxy user list (/etc/hadoop/conf/core-site.xml):
+
+    <property>
+      <name>hadoop.proxyuser.hue.hosts</name>
+      <value>*</value>
+    </property>
+    <property>
+      <name>hadoop.proxyuser.hue.groups</name>
+      <value>*</value>
+    </property>
+
+### Additional properties
+
+All the properties supported by spark shells like the number of executors, the memory, etc can be changed at session creation. Their format is the same as when typing spark-shell -h
+
+    curl -X POST --data '{"kind": "pyspark", "numExecutors": "3", "executorMemory": "2G"}' -H "Content-Type: application/json" localhost:8998/sessions
+    {"id":0,"state":"starting","kind":"pyspark","numExecutors":"3","executorMemory":"2G","log":[]}
+
+
+#### Sharing Spark RDDs and contexts
+
+Livy offers remote Spark sessions to users. They usually have one each (or one by Notebook):
+
+    # Client 1
+    curl localhost:8998/sessions/0/statements -X POST -H 'Content-Type: application/json' -d '{"code":"1 + 1"}'
+    # Client 2
+    curl localhost:8998/sessions/1/statements -X POST -H 'Content-Type: application/json' -d '{"code":"..."}'
+    # Client 3
+    curl localhost:8998/sessions/2/statements -X POST -H 'Content-Type: application/json' -d '{"code":"..."}'
+    livy_shared_contexts2
+
+![Livy shared context](https://cdn.gethue.com/uploads/2015/10/livy_shared_contexts2.png)
+
+##### ... and so sharing RDDs
+
+If the users were pointing to the same session, they would interact with the same Spark context. This context would itself manages several RDDs. Users simply need to use the same session id, e.g. 0, and issue commands there:
+
+    # Client 1
+    curl localhost:8998/sessions/0/statements -X POST -H 'Content-Type: application/json' -d '{"code":"1 + 1"}'
+
+    # Client 2
+    curl localhost:8998/sessions/0/statements -X POST -H 'Content-Type: application/json' -d '{"code":"..."}'
+
+    # Client 3
+    curl localhost:8998/sessions/0/statements -X POST -H 'Content-Type: application/json' -d '{"code":"..."}'
+
+![Livy multi rdds](https://cdn.gethue.com/uploads/2015/10/livy_multi_rdds2.png)
+
+##### ...Accessing them from anywhere
+
+Now we can even make it more sophisticated while keeping it simple. Imagine we want to simulate a shared in memory key/value store. One user can start a named RDD on a remote Livy PySpark session and anybody could access it.
+
+![Livy anywhere rdds](https://cdn.gethue.com/uploads/2015/10/livy_shared_rdds_anywhere2.png)
+
+To make it prettier, we can wrap it in a few lines of Python and call it ShareableRdd. Then users can directly connect to the session and set or retrieve values.
+
+    class ShareableRdd():
+
+    def __init__(self):
+      self.data = sc.parallelize([])
+
+    def get(self, key):
+      return self.data.filter(lambda row: row[0] == key).take(1)
+
+    def set(self, key, value):
+      new_key = sc.parallelize([[key, value]])
+      self.data = self.data.union(new_key)
+
+set() adds a value to the shared RDD, while get() retrieves it.
+
+    srdd = ShareableRdd()
+
+    srdd.set('ak', 'Alaska')
+    srdd.set('ca', 'California')
+
+    srdd.get('ak')
+
+If using the REST Api directly someone can access it with just these commands:
+
+    curl localhost:8998/sessions/0/statements -X POST -H 'Content-Type: application/json' -d '{"code":"srdd.get(\"ak\")"}'
+    {"id":3,"state":"running","output":null}
+
+    curl localhost:8998/sessions/0/statements/3
+    {"id":3,"state":"available","output":{"status":"ok","execution_count":3,"data":{"text/plain":"[['ak', 'Alaska']]"}}}
+
+We can even get prettier data back, directly in json format by adding the %json magic keyword:
+
+    curl localhost:8998/sessions/0/statements -X POST -H 'Content-Type: application/json' -d  '{"code":"data = srdd.get(\"ak\")\n%json data"}'
+    {"id":4,"state":"running","output":null}
+
+    curl localhost:8998/sessions/0/statements/4
+    {"id":4,"state":"available","output":{"status":"ok","execution_count":2,"data":{"application/json":[["ak","Alaska"]]}}}
+
+##### Even from any languages
+
+As Livy is providing a simple REST Api, we can quickly implement a little wrapper around it to offer the shared RDD functionality in any languages. Let’s do it with regular Python:
+
+    pip install requests
+    python
+
+Then in the Python shell just declare the wrapper:
+
+    import requests
+    import json
+
+    class SharedRdd():
+      """
+      Perform REST calls to a remote PySpark shell containing a Shared named RDD.
+      """
+      def __init__(self, session_url, name):
+        self.session_url = session_url
+        self.name = name
+
+      def get(self, key):
+        return self._curl('%(rdd)s.get("%(key)s")' % {'rdd': self.name, 'key': key})
+
+      def set(self, key, value):
+        return self._curl('%(rdd)s.set("%(key)s", "%(value)s")' % {'rdd': self.name, 'key': key, 'value': value})
+
+      def _curl(self, code):
+        statements_url = self.session_url + '/statements'
+        data = {'code': code}
+        r = requests.post(statements_url, data=json.dumps(data), headers={'Content-Type': 'application/json'})
+        resp = r.json()
+        statement_id = str(resp['id'])
+        while resp['state'] == 'running':
+          r = requests.get(statements_url + '/' + statement_id)
+          resp = r.json()
+        return r.json()['data']
+
+Instantiate it and make it point to a live session that contains a ShareableRdd:
+
+    states = SharedRdd('http://localhost:8998/sessions/0', 'states')
+
+And just interact with the RDD transparently:
+
+    states.get('ak')
+    states.set('hi', 'Hawaii')
+
+
 ### Pig
 
 Type [Apache Pig](https://pig.apache.org/) Latin instructions to load/merge data to perform ETL or Analytics.
