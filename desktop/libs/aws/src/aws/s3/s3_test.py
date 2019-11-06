@@ -78,6 +78,7 @@ def test_get_default_region():
   try:
     assert_equal('ap-northeast-2', get_default_region())
   finally:
+    conf.clear_cache()
     if finish:
       finish()
 
@@ -86,6 +87,7 @@ def test_get_default_region():
   try:
     assert_equal('ap-south-1', get_default_region())
   finally:
+    conf.clear_cache()
     if finish:
       finish()
 
@@ -94,6 +96,7 @@ def test_get_default_region():
   try:
     assert_equal('ap-southeast-2', get_default_region())
   finally:
+    conf.clear_cache()
     if finish:
       finish()
 
@@ -102,6 +105,7 @@ def test_get_default_region():
   try:
     assert_equal(Location.DEFAULT, get_default_region())
   finally:
+    conf.clear_cache()
     if finish:
       finish()
 
@@ -110,5 +114,6 @@ def test_get_default_region():
   try:
     assert_equal('ca-central-1', get_default_region())
   finally:
+    conf.clear_cache()
     if finish:
       finish()
