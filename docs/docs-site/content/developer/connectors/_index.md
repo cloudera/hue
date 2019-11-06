@@ -9,7 +9,7 @@ They provide integration with any SQL database or Job execution engine. Here is 
 
 Connectors are pluggable and new engines can be added. Feel free to contact the [community](https://discourse.gethue.com/c/developer-sdk-api).
 
-## Editor
+## Querying
 
 ### SQL
 
@@ -17,11 +17,9 @@ Connectors are pluggable and new engines can be added. Feel free to contact the 
 
 [SqlAlchemy](https://www.sqlalchemy.org) is the prefered way if the HiveServer2 API is not supported by the database. The implementation is in [`sql_alchemy.py`](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/sql_alchemy.py) and is depends on the repective SqlAlchemy dialects.
 
-#### Jdbc
+#### Kafka SQL
 
-With the JDBC proxy, query editor with any JDBC compatible database. View the [JDBC connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/jdbc.py).
-
-**Note** In the long term, SqlAlchemy is prefered as more "Python native".
+[Kafka connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/ksql.py).
 
 #### Solr SQL
 
@@ -29,13 +27,24 @@ With the JDBC proxy, query editor with any JDBC compatible database. View the [J
 
 #### Custom
 
-If the built-in HiveServer2 (Hive, Impala, Spark SQL), RDBMS (MySQL, PostgreSQL, Oracle, SQLite), and JDBC interfaces don’t meet your needs, you can implement your own connector to the notebook app: [Notebook Connectors](https://github.com/cloudera/hue/tree/master/desktop/libs/notebook/src/notebook/connectors). Each connector API subclasses the [Base API](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/base.py) and must implement the methods defined within; refer to the [JdbcApi](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/jdbc.py) or [RdbmsApi](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/rdbms.py) for representative examples.
+If the built-in HiveServer2 (Hive, Impala, Spark SQL), RDBMS (MySQL, PostgreSQL, Oracle, SQLite), and JDBC interfaces don’t meet your needs, you can implement your own connector to the notebook app:
+
+* List of the existing [Notebook Connectors](https://github.com/cloudera/hue/tree/master/desktop/libs/notebook/src/notebook/connectors)
+* Each connector API subclasses the [Base API](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/base.py) and must implement the methods defined within
+* Refer to the [JdbcApi](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/jdbc.py) or [RdbmsApi](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/rdbms.py) for representative examples
+
+#### JDBC
+
+With the JDBC proxy, query editor with any JDBC compatible database. View the [JDBC connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/jdbc.py).
+
+**Note** In the long term, SqlAlchemy is prefered as more "Python native".
+
 
 ### Jobs
 
 #### Spark / Livy
 
-Based on the [Livy REST API](https://livy.incubator.apache.org/docs/latest/rest-api.html)
+Based on the [Livy REST API](/administrator/configuration/connectors/#apache-spark).
 
 * [Notebook connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/spark_shell.py)
   * PySpark
@@ -83,4 +92,4 @@ Implementations:
 
 ### Elastic Search
 
-A connector similar to Solr or SQL Alchemy binding would need to be developed [HUE-7828](https://issues.cloudera.org/browse/HUE-7828)
+A connector similar to Solr or SQL Alchemy binding would need to be developed [HUE-7828](https://issues.cloudera.org/browse/HUE-7828).

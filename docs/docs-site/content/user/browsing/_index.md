@@ -9,7 +9,9 @@ Browsers power the Data Catalog. They let you easily search, glance and perform 
 
 The browsers can be "enriched" with [Search and Tagging](http://gethue.com/improved-sql-exploration-in-hue-4-3/) by metadata services.
 
-## Tables
+## Catalogs
+
+### Tables
 
 The Table Browser enables you to manage the databases, tables, and partitions of the metastore shared by the Hive and Impala. You can perform the following operations:
 
@@ -28,10 +30,13 @@ The Table Browser enables you to manage the databases, tables, and partitions of
     -   Import data into a table
     -   [Filter, Sort and Browse Partitions](http://gethue.com/filter-sort-browse-hive-partitions-with-hues-metastore/)
 
+### Streams
 
-## Data Catalog
+Kafka topics, Streams, Tables can be listed via the [`ksql` connector](/administrator/configuration/connectors/#ksql).
 
-[Apache Atlas](https://atlas.apache.org/) is powering the Search and Commenting of tables, columns. Other Catalogs like previously Cloudera Navigator can be integrated via the [SDK](/developer/sdk).
+### Data Catalogs
+
+[Apache Atlas](https://atlas.apache.org/) is powering the Search and Commenting of tables, columns. New Catalogs can be integrated via [connectors](/developer/connectors/).
 
 Existing tags, descriptions and indexed objects show up automatically, any additional tags you add appear back in metadata server, and the familiar metadata server search syntax is supported.
 
@@ -45,7 +50,7 @@ Searching all the available queries or data in the cluster
 
 Listing the possible tags to filter on. This also works for ‘types’.
 
-### Unification of metadata
+#### Unification of metadata
 
 The list of tables and their columns is displayed in multiple part of the interface. This data is pretty costly to fetch and comes from different sources. In this new version, the information is now cached and reused by all the Hue components. As the sources are diverse, e.g. Apache Hive, Apache Atlas those are stored into a single object, so that it is easier and faster to display without caring about the underlying technical details.
 
@@ -53,7 +58,7 @@ In addition to editing the tags of any SQL objects like tables, views, columns�
 
 ![Data Catalog](https://cdn.gethue.com/uploads/2018/04/blog_metadata.png)
 
-### Search
+#### Search
 
 By default, only tables and views are returned. To search for columns, partitions, databases use the ‘type:' filter.
 
@@ -79,13 +84,13 @@ Navigator
 
 Learn more on the [Search](http://gethue.com/realtime-catalog-search-with-hue-and-apache-atlas/).
 
-### Tagging
+#### Tagging
 
 In addition, you can also now tag objects with names to better categorize them and group them to different projects. These tags are searchable, expediting the exploration process through easier, more intuitive discovery.
 
 ![Data Catalog](https://cdn.gethue.com/uploads/2016/04/tags.png)
 
-## Data Importer
+### Importing Data
 
 The goal of the importer is to allow ad-hoc queries on data not yet in the clusters and simplifies self-service analytics.
 
@@ -97,21 +102,20 @@ To learn more, watch the video on [Data Import Wizard](http://gethue.com/import-
 
 **Note** Files can be dragged & dropped, selected from HDFS or S3 (if configured), and their formats are automatically detected. The wizard also assists when performing advanced functionalities like table partitioning, Kudu tables, and nested types.
 
-### Traditional Databases
+#### CSV file
+
+Any small CSV file can be ingested into a new index in a few clicks.
+
+#### Relational Databases
 
 Import data from relational databases to HDFS file or Hive table using Apache Sqoop. It enables to bring large amount of data into the cluster in just few clicks via interactive UI. The imports run on YARN and are scheduled by Oozie.
 
 Learn more about it on the [ingesting data from traditional databases](http://gethue.com/importing-data-from-traditional-databases-into-hdfshive-in-just-a-few-clicks/) post.
 
-### Indexing
+#### Apache Solr
 
 In the past, indexing data into Solr to then explore it with a [Dynamic Dashboard](/user/querying/#dashboards) has been quite difficult. The task involved writing a Solr schema and a Morphlines file then submitting a job to YARN to do the indexing. Often times getting this correct for non trivial imports could take a few days of work. Now with Hue's new feature you can start your YARN indexing job in minutes.
 
-#### CSV
-
-Any small CSV file can be ingested into a new index in a few clicks.
-
-#### Scalable
 First you’ll need to have a running Solr cluster that Hue is configured with.
 
 Next you’ll need to install these required libraries. To do so place them in a directory somewhere on HDFS and set the path for config_indexer_libs_path under indexer in the Hue ini to match by default, the config_indexer_libs_path value is set to /tmp/smart_indexer_lib. Additionally under indexer in the Hue ini you’ll need to set enable_new_indexer to true.
@@ -201,8 +205,135 @@ This file is required for the GeoIP lookup command and can be found on [MaxMind�
 
 Any grok commands can be defined in text files within the grok_dictionaries sub directory.
 
+### Permissions
 
-## Files
+Sentry roles and privileges can directly be edited in the Security interface.
+
+**Note** Apache Sentry is going to be replaced by Apache Ranger in [HUE-8748](https://issues.cloudera.org/browse/HUE-8748).
+
+#### Sentry Tables
+
+It can be tricky to grant a new user proper permissions on a secure cluster, let’s walk through the steps to enable any new user for table creation on a kerberized cluster. Depends on your cluster size, creating user and group on each node can be tedious. Here we use pssh (Parallel ssh) for this task.
+
+1. Install the tool and prepare a file which contains all your hosts.
+
+For Mac user:
+
+    brew install pssh
+
+For Debian or Ubuntu user:
+
+    sudo apt-get install pssh
+
+    cat ~/Documents/nodeshue.txt
+    hue-1.test.cloudera.com
+    hue-2.test.cloudera.com
+    hue-3.test.cloudera.com
+    hue-4.test.cloudera.com
+
+2. Run follow commands to create user: t1 and group: grp1 on your cluster:
+
+    ```
+    pssh -h ~/Documents/nodeshue.txt -i useradd t1
+    [1] 13:58:48 [SUCCESS] hue-1.test.cloudera.com
+    [2] 13:58:48 [SUCCESS] hue-2.test.cloudera.com
+    [3] 13:58:48 [SUCCESS] hue-3.test.cloudera.com
+    [4] 13:58:48 [SUCCESS] hue-4.test.cloudera.com
+
+    pssh --hosts ~/Documents/nodes.txt -i groupadd grp1
+    [1] 13:59:20 [SUCCESS] hue-1.test.cloudera.com
+    [2] 13:59:20 [SUCCESS] hue-2.test.cloudera.com
+    [3] 13:59:20 [SUCCESS] hue-3.test.cloudera.com
+    [4] 13:59:20 [SUCCESS] hue-4.test.cloudera.com
+
+    pssh --hosts ~/Documents/nodes.txt -i usermod -a -G grp1 t1
+    [1] 13:59:28 [SUCCESS] hue-1.test.cloudera.com
+    [2] 13:59:28 [SUCCESS] hue-2.test.cloudera.com
+    [3] 13:59:28 [SUCCESS] hue-3.test.cloudera.com
+    [4] 13:59:28 [SUCCESS] hue-4.test.cloudera.com
+    ```
+
+3. Create same Hue user: t1 and group: grp1 and make “t1″a member of “grp1”.
+
+4. Then log in as any user with sentry admin permission to run following queries in hive editor:
+
+    ```
+    create role write_role;
+    GRANT ROLE write_role TO GROUP grp1;
+    GRANT ALL ON SERVER server1 TO ROLE write_role;
+    ```
+
+Now “t1” user or any user in “grp1” can log in and create table by running any hive/impala DDL queries or through Hue importer.
+
+
+But mostly we would like to grant proper permissions for users instead of `ALL` on `server`. let’s walk through two other examples like `read_only_role` and `read_write_role` for specific databases.
+
+Using similar commands to create t2 user in group grp2 and t3 user in group grp3 on cluster and Hue. Then use following statements to grant proper permission to each group:
+
+1. Read write access to database: ‘s3db’ for any user in group ‘grp3’:
+
+    ```
+    create role read_write_s3db_role;
+    GRANT ROLE read_write_s3db_role TO GROUP grp3;
+    GRANT ALL ON DATABASE s3db TO ROLE read_write_s3db_role;
+    GRANT ALL ON URI 'hdfs://hue-1.test.cloudera.com:8020/user/t3' to ROLE read_write_s3db_role;
+    ```
+
+2. Read only permission for database: ‘default’ for any user in group ‘grp2’:
+
+    ```
+    create role read_only_defaultDb_role;
+    GRANT ROLE read_only_defaultDb_role TO GROUP grp2;
+    GRANT SELECT ON DATABASE default TO ROLE read_only_defaultDb_role;
+    GRANT REFRESH ON DATABASE default TO ROLE read_only_defaultDb_role;
+    ```
+
+Now ‘t3’ user can read and create new tables in `database:s3db` while ‘t2’ user can read database: default only.
+
+We can grant those permission through Hue security page too, it should ends like following.
+
+![Listing of Sentry Table privileges](https://cdn.gethue.com/uploads/2019/04/HueSecurityRoles.png)
+
+Note: You have to grant URI permission to avoid following error during table creation:
+
+    Error while compiling statement: FAILED: SemanticException No valid privileges User t3 does not have privileges for CREATETABLE The required privileges: Server=server1->URI=hdfs://hue-1.gce.cloudera.com:8020/user/t3/t3_dir->action=*->grantOption=false;
+
+
+#### Sentry Solr
+
+[Apache Solr](http://gethue.com/ui-to-edit-sentry-privilege-of-solr-collections/) privileges can be edited directly via the interface.
+
+For listing collections, query and creating collection:
+
+    Admin=*->action=*
+    Collection=*->action=*
+    Schema=*->action=*
+    Config=*->action=*
+
+
+![Listing of Solr collection](https://cdn.gethue.com/uploads/2016/05/solr-secu-1024x624.png)
+Listing of Solr collections and configs with their related privileges.
+
+![Listing of all the roles and their privileges.](https://cdn.gethue.com/uploads/2016/05/solr-secu2-e1464909489928.png)
+Listing of all the roles and their privileges. Possibility to filter by groups.
+
+![Apply privilege to all the collections or configs with *](https://cdn.gethue.com/uploads/2016/06/solr-sentry-all.png)
+Apply privilege to all the collections or configs with *
+
+![End user error when querying a collection without the QUERY privilege](https://cdn.gethue.com/uploads/2016/06/solr-sentry-query-error.png)
+End user error when querying a collection without the QUERY privilege
+
+![End user error when modifying a record without the UPDATE privilege](https://cdn.gethue.com/uploads/2016/06/solr-sentry-update-error.png)
+End user error when modifying a record without the UPDATE privilege
+
+
+#### HDFS Acls
+
+Editing [HDFS acls](https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/HdfsPermissionsGuide.html#ACLs_.28Access_Control_Lists.29) in the Security app:
+
+![HDFS Acls](https://cdn.gethue.com/docs/user/storage_hdfs_acls.png)
+
+## Data
 
 The File Browser application lets you interact with these file systems HDFS, S3 or ADLS:
 
@@ -233,7 +364,13 @@ Learn more about it on the [ADLS integration post](http://gethue.com/browsing-ad
 
 Google Cloud Storage is currently a work in progress [HUE-8978](https://issues.cloudera.org/browse/HUE-8978)
 
-### HBase Browser
+### Streams
+
+#### Kafka
+
+Topics, Streams can be listed via the [`ksql` connector](/administrator/configuration/connectors/#ksql).
+
+### HBase
 
 We'll take a look at the [HBase Browser App](http://gethue.com/the-web-ui-for-hbase-hbase-browser).
 
@@ -241,7 +378,7 @@ We'll take a look at the [HBase Browser App](http://gethue.com/the-web-ui-for-hb
 the HBase browser could be compatible with Apache Kudu or Google Big Table.
 
 
-#### SmartView
+#### Smart View
 
 The smartview is the view that you land on when you first enter a table.
 On the left hand side are the row keys and hovering over a row reveals a
@@ -372,9 +509,9 @@ column range, etc. Remember that if you ever need help with the
 searchbar, you can use the help menu that pops up while typing, which
 will suggest next steps to complete your query.
 
-## Solr Indexes
+### Indexes
 
-Solr indexes can be created via the [importer](/user/browsing/#data-importer) and are listed in the interface.
+Apache Solr indexes can be created via the [importer](/user/browsing/#data-importer) and are listed in the interface.
 
 ![Solr Indexer](https://cdn.gethue.com/uploads/2016/08/indexer-op-grok.png)
 
@@ -419,137 +556,3 @@ List submitted workflows, schedules and bundles.
 ### Livy / Spark
 
 List Livy sessions and submitted statements.
-
-## Streams
-
-### Kafka
-
-Topics, Streams, tables can be listed via the `ksql` connector.
-
-## Permissions
-
-Sentry roles and privileges can directly be edited in the Security interface.
-
-**Note** Apache Sentry is going to be replaced by Apache Ranger in [HUE-8748](https://issues.cloudera.org/browse/HUE-8748).
-
-### Sentry SQL
-
-It can be tricky to grant a new user proper permissions on a secure cluster, let’s walk through the steps to enable any new user for table creation on a kerberized cluster. Depends on your cluster size, creating user and group on each node can be tedious. Here we use pssh (Parallel ssh) for this task.
-
-1. Install the tool and prepare a file which contains all your hosts.
-
-For Mac user:
-
-    brew install pssh
-
-For Debian or Ubuntu user:
-
-    sudo apt-get install pssh
-
-    cat ~/Documents/nodeshue.txt
-    hue-1.test.cloudera.com
-    hue-2.test.cloudera.com
-    hue-3.test.cloudera.com
-    hue-4.test.cloudera.com
-
-2. Run follow commands to create user: t1 and group: grp1 on your cluster:
-
-    ```
-    pssh -h ~/Documents/nodeshue.txt -i useradd t1
-    [1] 13:58:48 [SUCCESS] hue-1.test.cloudera.com
-    [2] 13:58:48 [SUCCESS] hue-2.test.cloudera.com
-    [3] 13:58:48 [SUCCESS] hue-3.test.cloudera.com
-    [4] 13:58:48 [SUCCESS] hue-4.test.cloudera.com
-
-    pssh --hosts ~/Documents/nodes.txt -i groupadd grp1
-    [1] 13:59:20 [SUCCESS] hue-1.test.cloudera.com
-    [2] 13:59:20 [SUCCESS] hue-2.test.cloudera.com
-    [3] 13:59:20 [SUCCESS] hue-3.test.cloudera.com
-    [4] 13:59:20 [SUCCESS] hue-4.test.cloudera.com
-
-    pssh --hosts ~/Documents/nodes.txt -i usermod -a -G grp1 t1
-    [1] 13:59:28 [SUCCESS] hue-1.test.cloudera.com
-    [2] 13:59:28 [SUCCESS] hue-2.test.cloudera.com
-    [3] 13:59:28 [SUCCESS] hue-3.test.cloudera.com
-    [4] 13:59:28 [SUCCESS] hue-4.test.cloudera.com
-    ```
-
-3. Create same Hue user: t1 and group: grp1 and make “t1″a member of “grp1”.
-
-4. Then log in as any user with sentry admin permission to run following queries in hive editor:
-
-    ```
-    create role write_role;
-    GRANT ROLE write_role TO GROUP grp1;
-    GRANT ALL ON SERVER server1 TO ROLE write_role;
-    ```
-
-Now “t1” user or any user in “grp1” can log in and create table by running any hive/impala DDL queries or through Hue importer.
-
-
-But mostly we would like to grant proper permissions for users instead of `ALL` on `server`. let’s walk through two other examples like `read_only_role` and `read_write_role` for specific databases.
-
-Using similar commands to create t2 user in group grp2 and t3 user in group grp3 on cluster and Hue. Then use following statements to grant proper permission to each group:
-
-1. Read write access to database: ‘s3db’ for any user in group ‘grp3’:
-
-    ```
-    create role read_write_s3db_role;
-    GRANT ROLE read_write_s3db_role TO GROUP grp3;
-    GRANT ALL ON DATABASE s3db TO ROLE read_write_s3db_role;
-    GRANT ALL ON URI 'hdfs://hue-1.test.cloudera.com:8020/user/t3' to ROLE read_write_s3db_role;
-    ```
-
-2. Read only permission for database: ‘default’ for any user in group ‘grp2’:
-
-    ```
-    create role read_only_defaultDb_role;
-    GRANT ROLE read_only_defaultDb_role TO GROUP grp2;
-    GRANT SELECT ON DATABASE default TO ROLE read_only_defaultDb_role;
-    GRANT REFRESH ON DATABASE default TO ROLE read_only_defaultDb_role;
-    ```
-
-Now ‘t3’ user can read and create new tables in `database:s3db` while ‘t2’ user can read database: default only.
-
-We can grant those permission through Hue security page too, it should ends like following.
-
-![Listing of Sentry Table privileges](https://cdn.gethue.com/uploads/2019/04/HueSecurityRoles.png)
-
-Note: You have to grant URI permission to avoid following error during table creation:
-
-    Error while compiling statement: FAILED: SemanticException No valid privileges User t3 does not have privileges for CREATETABLE The required privileges: Server=server1->URI=hdfs://hue-1.gce.cloudera.com:8020/user/t3/t3_dir->action=*->grantOption=false;
-
-
-### Sentry Solr
-
-[Apache Solr](http://gethue.com/ui-to-edit-sentry-privilege-of-solr-collections/) privileges can be edited directly via the interface.
-
-For listing collections, query and creating collection:
-
-    Admin=*->action=*
-    Collection=*->action=*
-    Schema=*->action=*
-    Config=*->action=*
-
-
-![Listing of Solr collection](https://cdn.gethue.com/uploads/2016/05/solr-secu-1024x624.png)
-Listing of Solr collections and configs with their related privileges.
-
-![Listing of all the roles and their privileges.](https://cdn.gethue.com/uploads/2016/05/solr-secu2-e1464909489928.png)
-Listing of all the roles and their privileges. Possibility to filter by groups.
-
-![Apply privilege to all the collections or configs with *](https://cdn.gethue.com/uploads/2016/06/solr-sentry-all.png)
-Apply privilege to all the collections or configs with *
-
-![End user error when querying a collection without the QUERY privilege](https://cdn.gethue.com/uploads/2016/06/solr-sentry-query-error.png)
-End user error when querying a collection without the QUERY privilege
-
-![End user error when modifying a record without the UPDATE privilege](https://cdn.gethue.com/uploads/2016/06/solr-sentry-update-error.png)
-End user error when modifying a record without the UPDATE privilege
-
-
-### HDFS Acls
-
-Editing [HDFS acls](https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/HdfsPermissionsGuide.html#ACLs_.28Access_Control_Lists.29) in the Security app:
-
-![HDFS Acls](https://cdn.gethue.com/docs/user/storage_hdfs_acls.png)

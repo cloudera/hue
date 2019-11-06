@@ -314,9 +314,22 @@ Via native HiveServer2 API:
 
 ### KSQL
 
-    [[[kafkasql]]]
-      name=Kafka SQL
-      interface=kafka
+To add to the list of [[interpreters]]:
+
+    [[[ksql]]]
+      name=ksql
+      interface=ksql
+
+And provide the address of the KSQL REST Api:
+
+    [kafka]
+
+      [[kafka]]
+        # Enable the Kafka integration.
+        is_enabled=true
+
+        # Base URL of Kafka Ksql API.
+        ## ksql_api_url=http://127.0.0.1:8088
 
 ### Azure SQL Database
 
@@ -938,7 +951,7 @@ The integration is powering the [Risk Alerts and Popular Values](/user/querying/
 
 ### Apache Spark
 
-This connector leverage the [Apache Livy REST Api](https://livy.incubator.apache.org/):
+This connector leverage the [Apache Livy REST Api](https://livy.incubator.apache.org/).
 
 In the `[[interpreters]]` section:
 
