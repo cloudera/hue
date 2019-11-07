@@ -30,10 +30,6 @@ The Table Browser enables you to manage the databases, tables, and partitions of
     -   Import data into a table
     -   [Filter, Sort and Browse Partitions](http://gethue.com/filter-sort-browse-hive-partitions-with-hues-metastore/)
 
-### Streams
-
-Kafka topics, Streams, Tables can be listed via the [`ksql` connector](/administrator/configuration/connectors/#ksql).
-
 ### Data Catalogs
 
 [Apache Atlas](https://atlas.apache.org/) is powering the Search and Commenting of tables, columns. New Catalogs can be integrated via [connectors](/developer/connectors/).
@@ -204,6 +200,10 @@ This file is required for the GeoIP lookup command and can be found on [MaxMindâ
 3. Grok Dictionaries
 
 Any grok commands can be defined in text files within the grok_dictionaries sub directory.
+
+### Streams
+
+Kafka topics, Streams, Tables can be listed via the [`ksql` connector](/administrator/configuration/connectors/#ksql).
 
 ### Permissions
 
@@ -521,10 +521,6 @@ The Job Browser application lets you to examine multiple types of jobs
 jobs running in the cluster. Job Browser presents the job and
 tasks in layers for quick access to the logs and troubleshooting.
 
-### YARN (Spark, MapReduce, Tez)
-
-Any job running on the Resource Manager will be automatically listed. The information will be fetched accordingly if the job got moved to one of the history servers.
-
 ### SQL Queries
 
 There are three ways to access the Query browser:
@@ -546,6 +542,11 @@ Query capabilities
 
 Read more about it on [Browsing Impala Query Execution within the SQL Editor
 ](http://gethue.com/browsing-impala-query-execution-within-the-sql-editor/).
+
+### YARN (Spark, MapReduce, Tez)
+
+Any job running on the Resource Manager will be automatically listed. The information will be fetched accordingly if the job got moved to one of the history servers.
+
 
 ### Oozie Workflow / Schedules
 

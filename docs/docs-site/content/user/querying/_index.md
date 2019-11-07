@@ -9,7 +9,7 @@ Hue's goal is to make Databases & Datawarehouses querying easy and productive.
 
 Several apps, each one specialized in a certain type of querying are available. Data sources can be explored first via the [browsers](/user/browsing/).
 
-* The Editor shines for SQL queries but also supports job submissions. It comes with an intelligent autocomplete, risk alerts and self service troubleshooting.
+* The Editor shines for SQL queries. It comes with an intelligent autocomplete, risk alerts and self service troubleshooting.
 * The Editor is also available in Notebook mode for quickly executing light programming snippets.
 * Dashboards are focusing on visualizing indexed data but can also query SQL databases.
 
@@ -19,11 +19,9 @@ The configuration of the connectors is currently done by the [Administrator](/ad
 
 ![Editor](https://cdn.gethue.com/uploads/2019/08/hue_4.5.png)
 
-### Running
+### Running Queries
 
-#### Queries
-
-SQL query execution is the primary use case of the Editor.
+SQL query execution is the primary use case of the Editor. See the list of most common [Databases and Datawarehouses](/administrator/configuration/connectors/).
 
 1.  The currently selected statement has a **left blue** border. To execute a portion of a query, highlight one or more query
     statements.
@@ -44,16 +42,6 @@ When you have multiple statements it's enough to put the cursor in the statement
 **Note**: Use `CTRL/Cmd + ENTER` to execute queries.
 
 **Note**: On top of the logs panel, there is a link to open the query profile in the [Query Browser](/user/browsing/#impala-queries).
-
-#### Jobs
-
-In addition to SQL, these types of jobs are supported:
-
-* [Apache Pig](https://pig.apache.org/) latin instructions to load/merge data to perform ETL or Analytics.
-* Running an [SQL import](/user/browsing/#relational-databases) from a traditional relational database via an [Apache Sqoop](https://sqoop.apache.org/) command.
-* Regular Java, MapReduce, [shell script](http://gethue.com/use-the-shell-action-in-oozie/).
-* [Spark](http://gethue.com/use-the-spark-action-in-oozie/) Jar or Python script to trial and error them in YARN via [Oozie](http://gethue.com/how-to-schedule-spark-jobs-with-spark-on-yarn-and-oozie/) or Livy.
-
 
 ### Downloading Results
 
@@ -230,7 +218,7 @@ Widgets are interconnected together. This is great for exploring new datasets or
 
 ![Analytics dimensions](https://cdn.gethue.com/uploads/2018/08/dashboard_layout_dnd.gif)
 
-The best supported engine is Apache Solr, then support for SQL databases like Apache Hive and Apache Impala is getting better. To help add more databases, feel free to check the [dashboard connector](/developer/connectors/#dashboard) section.
+The best supported engine is Apache Solr, then support for SQL databases is getting better. To help add more SQL support, feel free to check the [dashboard connector](/developer/connectors/#dashboard) section.
 
 These tutorials showcase the capabilities:
 
