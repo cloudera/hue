@@ -131,6 +131,8 @@ class KSqlApi(object):
         # data.append([line[col] for col in columns])
         if is_select and line: # Empty first 2 lines?
           data_line = json.loads(line)
+          if data_line.get('@type') == 'statement_error':
+            raise KSqlApiException(data_line['message'])
           if data_line['row']: # If limit not reached
             data.append(data_line['row']['columns'])
         else:
