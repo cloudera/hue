@@ -85,4 +85,11 @@ export default class ExecutionLogs {
       });
     }
   }
+
+  toJs() {
+    return {
+      jobs: this.jobs,
+      errors: this.errors
+    };
+  }
 }

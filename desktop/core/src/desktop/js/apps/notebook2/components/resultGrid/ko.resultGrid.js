@@ -28,6 +28,7 @@ import {
   SHOW_GRID_SEARCH_EVENT,
   SHOW_NORMAL_RESULT_EVENT
 } from 'apps/notebook2/events';
+import { attachTracker } from 'apps/notebook2/components/executableStateHandler';
 
 export const NAME = 'result-grid';
 
@@ -169,6 +170,7 @@ class ResultGrid extends DisposableComponent {
   constructor(params, element) {
     super();
     this.element = element;
+    this.activeExecutable = params.activeExecutable;
 
     this.isResultFullScreenMode = params.isResultFullScreenMode;
     this.editorMode = params.editorMode;
@@ -176,14 +178,22 @@ class ResultGrid extends DisposableComponent {
     this.hasMore = params.hasMore;
     this.fetchResult = params.fetchResult;
 
+    const trackedObservables = {
+      columnsVisible: true,
+      isMetaFilterVisible: false
+    };
+
     this.status = params.status;
-    this.columnsVisible = ko.observable(true);
-    this.isMetaFilterVisible = ko.observable(false);
+    this.columnsVisible = ko.observable(trackedObservables.columnsVisible);
+    this.isMetaFilterVisible = ko.observable(trackedObservables.isMetaFilterVisible);
     this.metaFilter = ko.observable();
     this.resultsKlass = params.resultsKlass;
     this.meta = params.meta;
     this.data = params.data;
     this.lastFetchedRows = params.lastFetchedRows;
+
+    const tracker = attachTracker(this.activeExecutable, NAME, this, trackedObservables);
+    super.addDisposalCallback(tracker.dispose.bind(tracker));
 
     this.hueDatatable = undefined;
 
@@ -344,7 +354,9 @@ class ResultGrid extends DisposableComponent {
       $resultTable.jHueTableExtender2(tableExtenderOptions);
 
       this.disposals.push(() => {
-        $resultTable.data('plugin_jHueTableExtender2').destroy();
+        if ($resultTable.data('plugin_jHueTableExtender2')) {
+          $resultTable.data('plugin_jHueTableExtender2').destroy();
+        }
       });
 
       if (this.editorMode()) {

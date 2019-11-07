@@ -92,7 +92,7 @@ const TEMPLATE = `
     <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ I18n('Success.') }</pre>
   </div>
 
-  <div data-bind="visible: hasResultset() && status() === 'available' && hasEmptyResult() && fetchedOnce() && !explanation().length, css: resultsKlass" style="display:none;">
+  <div data-bind="visible: hasResultset() && status() === 'available' && hasEmptyResult() && fetchedOnce(), css: resultsKlass" style="display:none;">
     <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ I18n("Done. 0 results.") }</pre>
   </div>
 

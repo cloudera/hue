@@ -22,6 +22,7 @@ import CancellablePromise from 'api/cancellablePromise';
 import hueDebug from 'utils/hueDebug';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
+import { EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
 
 const AUTOCOMPLETE_API_PREFIX = '/notebook/api/autocomplete/';
 const SAMPLE_API_PREFIX = '/notebook/api/sample/';
@@ -1256,38 +1257,57 @@ class ApiHelper {
   /**
    * @param {Object} options
    * @param {number} options.uuid
+   * @param {boolean} [options.dependencies]
    * @param {boolean} [options.silenceErrors]
    * @param {boolean} [options.fetchContents]
    *
    * @return {CancellablePromise}
    */
   fetchDocument(options) {
-    const self = this;
     const deferred = $.Deferred();
     const request = $.ajax({
       url: DOCUMENTS_API,
       data: {
         uuid: options.uuid,
-        data: !!options.fetchContents
+        data: !!options.fetchContents,
+        dependencies: options.dependencies
       },
-      success: function(data) {
-        if (!self.successResponseIsError(data)) {
+      success: data => {
+        if (!this.successResponseIsError(data)) {
           deferred.resolve(data);
         } else {
           deferred.reject(
-            self.assistErrorCallback({
+            this.assistErrorCallback({
               silenceErrors: options.silenceErrors
             })
           );
         }
       }
     }).fail(
-      self.assistErrorCallback({
+      this.assistErrorCallback({
         silenceErrors: options.silenceErrors,
         errorCallback: deferred.reject
       })
     );
     return new CancellablePromise(deferred, request);
+  }
+
+  /**
+   * @param {Object} options
+   * @param {number} options.uuid
+   * @param {boolean} [options.silenceErrors]
+   * @param {boolean} [options.dependencies]
+   * @param {boolean} [options.fetchContents]
+   *
+   * @param options
+   * @return {Promise<unknown>}
+   */
+  async fetchDocumentAsync(options) {
+    return new Promise((resolve, reject) => {
+      this.fetchDocument(options)
+        .done(resolve)
+        .fail(reject);
+    });
   }
 
   /**
@@ -2113,6 +2133,27 @@ class ApiHelper {
   /**
    *
    * @param {Object} options
+   * @param {Snippet} options.snippet
+   *
+   * @return {CancellablePromise<string>}
+   */
+  async explainAsync(options) {
+    const data = {
+      notebook: await options.snippet.parentNotebook.toContextJson(),
+      snippet: options.snippet.toContextJson()
+    };
+    return new Promise((resolve, reject) => {
+      this.simplePost('/notebook/api/explain', data, options)
+        .done(response => {
+          resolve(response.explanation);
+        })
+        .fail(reject);
+    });
+  }
+
+  /**
+   *
+   * @param {Object} options
    * @param {boolean} [options.silenceErrors]
    * @param {Executable} options.executable
    *
@@ -2121,15 +2162,22 @@ class ApiHelper {
   checkExecutionStatus(options) {
     const deferred = $.Deferred();
 
-    const request = this.simplePost(
-      '/notebook/api/check_status',
-      ApiHelper.adaptExecutableToNotebook(options.executable),
-      options
-    )
+    const request = $.post({
+      url: '/notebook/api/check_status',
+      data: ApiHelper.adaptExecutableToNotebook(options.executable)
+    })
       .done(response => {
-        deferred.resolve(response.query_status.status);
+        if (response && response.query_status) {
+          deferred.resolve(response.query_status.status);
+        } else if (response && response.status === -3) {
+          deferred.resolve(EXECUTION_STATUS.expired);
+        } else {
+          deferred.resolve(EXECUTION_STATUS.failed);
+        }
       })
-      .fail(deferred.reject);
+      .fail(err => {
+        deferred.reject(this.assistErrorCallback(options)(err));
+      });
 
     return new CancellablePromise(deferred, request);
   }

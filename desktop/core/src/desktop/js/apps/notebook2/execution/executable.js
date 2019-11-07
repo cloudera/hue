@@ -69,6 +69,10 @@ export default class Executable {
 
     this.previousExecutable = undefined;
     this.nextExecutable = undefined;
+
+    this.observerState = {};
+
+    this.lost = false;
   }
 
   setStatus(status) {
@@ -218,7 +222,7 @@ export default class Executable {
 
     this.cancellables.push(
       apiHelper.checkExecutionStatus({ executable: this }).done(async queryStatus => {
-        switch (this.status) {
+        switch (queryStatus) {
           case EXECUTION_STATUS.success:
             this.executeEnded = Date.now();
             this.setStatus(queryStatus);
@@ -302,6 +306,23 @@ export default class Executable {
     };
     this.setProgress(0);
     this.setStatus(EXECUTION_STATUS.ready);
+  }
+
+  toJs() {
+    const state = Object.assign({}, this.observerState);
+    delete state.aceAnchor;
+
+    return {
+      type: 'executable',
+      handle: this.handle,
+      status: this.status,
+      progress: this.progress,
+      logs: this.logs.toJs(),
+      executeStarted: this.executeStarted,
+      executeEnded: this.executeEnded,
+      observerState: state,
+      lost: this.lost
+    };
   }
 
   async close() {

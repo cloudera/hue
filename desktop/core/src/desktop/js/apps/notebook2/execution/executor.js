@@ -64,6 +64,7 @@ class Executor {
         });
         if (allExecutablesIndex[executable.getKey()]) {
           executable = allExecutablesIndex[executable.getKey()];
+          executable.parsedStatement = parsedStatement;
           delete allExecutablesIndex[executable.getKey()];
         }
         if (
@@ -84,11 +85,18 @@ class Executor {
     };
   }
 
+  toJs() {
+    return {
+      executables: this.executables.map(executable => executable.toJs())
+    };
+  }
+
   update(statementDetails, beforeExecute) {
     const executables = this.getExecutables(statementDetails);
 
     // Cancel any "lost" executables and any batch chain it's part of
     executables.lost.forEach(lostExecutable => {
+      lostExecutable.lost = true;
       lostExecutable.cancelBatchChain();
     });
 

@@ -540,9 +540,11 @@ class OnePageViewModel {
               if (getUrlParameter('editor') !== '') {
                 self.getActiveAppViewModel(viewModel => {
                   self.isLoadingEmbeddable(true);
-                  viewModel.openNotebook(getUrlParameter('editor')).always(() => {
-                    self.isLoadingEmbeddable(false);
-                  });
+                  viewModel
+                    .openNotebook(getUrlParameter('editor'))
+                    [window.ENABLE_NOTEBOOK_2 ? 'finally' : 'always'](() => {
+                      self.isLoadingEmbeddable(false);
+                    });
                 });
               } else if (getUrlParameter('type') !== '') {
                 self.changeEditorType(getUrlParameter('type'));
@@ -640,9 +642,11 @@ class OnePageViewModel {
           if (notebookId !== '') {
             self.getActiveAppViewModel(viewModel => {
               self.isLoadingEmbeddable(true);
-              viewModel.openNotebook(notebookId).always(() => {
-                self.isLoadingEmbeddable(false);
-              });
+              viewModel
+                .openNotebook(notebookId)
+                [window.ENABLE_NOTEBOOK_2 ? 'finally' : 'always'](() => {
+                  self.isLoadingEmbeddable(false);
+                });
             });
           } else {
             self.getActiveAppViewModel(viewModel => {

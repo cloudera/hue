@@ -52,4 +52,30 @@ export default class SqlExecutable extends Executable {
   canExecuteInBatch() {
     return this.parsedStatement && BATCHABLE_STATEMENT_TYPES.test(this.parsedStatement.firstToken);
   }
+
+  static fromJs(executor, executableRaw) {
+    const executable = new SqlExecutable({
+      executor: executor,
+      database: executableRaw.database,
+      parsedStatement: executableRaw.parsedStatement
+    });
+    executable.observerState = executableRaw.observerState || {};
+    executable.progress = executableRaw.progress;
+    executable.status = executableRaw.status;
+    executable.handle = executableRaw.handle;
+    executable.lost = executableRaw.lost;
+    executable.logs.jobs = executableRaw.logs.jobs;
+    executable.logs.errors = executableRaw.logs.errors;
+    executable.executeStarted = executableRaw.executeStarted;
+    executable.executeEnded = executableRaw.executeEnded;
+    return executable;
+  }
+
+  toJs() {
+    const executableJs = super.toJs();
+    executableJs.type = 'sqlExecutable';
+    executableJs.database = this.database;
+    executableJs.parsedStatement = this.parsedStatement;
+    return executableJs;
+  }
 }

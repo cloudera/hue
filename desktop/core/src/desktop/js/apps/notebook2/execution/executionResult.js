@@ -34,7 +34,6 @@ export default class ExecutionResult {
     this.executable = executable;
 
     this.type = RESULT_TYPE.TABLE;
-    this.state = {};
     this.rows = [];
     this.meta = [];
     this.lastRows = [];
