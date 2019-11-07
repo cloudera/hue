@@ -2004,6 +2004,26 @@ class ClusterConfig(object):
           'page': '/jobbrowser/'
         })
 
+    if TASK_SERVER.ENABLED.get():
+      interpreters.append({
+          'type': 'celery-task',
+          'displayName': _('Tasks'),
+          'buttonName': _('Tasks'),
+          'tooltip': _('Tasks'),
+          'page': '/jobbrowser/'
+        }
+      )
+
+    if TASK_SERVER.BEAT_ENABLED.get():
+      interpreters.append({
+          'type': 'celery-beat',
+          'displayName': _('Scheduled Tasks'),
+          'buttonName': _('Scheduled Tasks'),
+          'tooltip': _('Scheduled Tasks'),
+          'page': '/jobbrowser/'
+        }
+      )
+
     if has_kafka():
       interpreters.append({
         'type': 'kafka',
@@ -2088,26 +2108,6 @@ class ClusterConfig(object):
           'page': '/oozie/editor/bundle/new/'
         }
       ])
-
-    if TASK_SERVER.ENABLED.get():
-      interpreters.append({
-          'type': 'celery-task',
-          'displayName': _('Tasks'),
-          'buttonName': _('Tasks'),
-          'tooltip': _('Tasks'),
-          'page': '/jobbrowser/'
-        }
-      )
-
-    if TASK_SERVER.BEAT_ENABLED.get():
-      interpreters.append({
-          'type': 'celery-beat',
-          'displayName': _('Scheduled Tasks'),
-          'buttonName': _('Scheduled Tasks'),
-          'tooltip': _('Scheduled Tasks'),
-          'page': '/jobbrowser/'
-        }
-      )
 
     if interpreters:
       return {
