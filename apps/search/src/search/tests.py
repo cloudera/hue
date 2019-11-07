@@ -442,6 +442,7 @@ class TestWithMockedSolr(TestSearchBase):
          {'isDynamic': False, 'isId': None, 'type': 'string', 'name': 'content_type'},
          {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'description'},
          {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'features'},
+         {'isDynamic': False, 'isId': True, 'type': 'string', 'name': 'id'}
          {'isDynamic': False, 'isId': None, 'type': 'boolean', 'name': 'inStock'},
          {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'includes'},
          {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'keywords'},
@@ -462,8 +463,8 @@ class TestWithMockedSolr(TestSearchBase):
          {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'title'},
          {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'url'},
          {'isDynamic': False, 'isId': None, 'type': 'float', 'name': 'weight'},
-         {'isDynamic': False, 'isId': True, 'type': 'string', 'name': 'id'}],
-         self.collection.fields_data(self.user, 'collection_1')
+        ],
+        self.collection.fields_data(self.user, 'collection_1')
     )
 
   # TODO
@@ -493,9 +494,9 @@ class TestWithMockedSolr(TestSearchBase):
     assert_equal('application/csv', csv_response['Content-Type'])
     assert_equal('attachment; filename="query_result.csv"', csv_response['Content-Disposition'])
     assert_equal(4 + 1 + 1, len(csv_response_content.split('\n')), csv_response_content.split('\n'))
-    assert_true('&lt;script&gt;alert(1234)&lt;/script&gt;,_version_,author,category,comments,content,content_type,description,features,inStock,includes,keywords,last_modified,links,manu,manu_exact,name,payloads,popularity,price,resourcename,sku,store,subject,text,text_rev,title,url,weight,id' in csv_response_content, csv_response_content)
+    assert_true('&lt;script&gt;alert(1234)&lt;/script&gt;,_version_,author,category,comments,content,content_type,description,features,id,inStock,includes,keywords,last_modified,links,manu,manu_exact,name,payloads,popularity,price,resourcename,sku,store,subject,text,text_rev,title,url,weight' in csv_response_content, csv_response_content)
     # Fields does not exactly match the response but this is because the collection schema does not match the query response.
-    assert_true(""",1450807641462800385,"['B B Hallberg', 'M M Blennow']",,,,,,,,,,,,,,,,,,,,,,,,,,,23680099""" in csv_response_content, csv_response_content)
+    assert_true(""",1450807641462800385,"['B B Hallberg', 'M M Blennow']",,,,,,,23680099,,,,,,,,,,,,,,,,,,,,""" in csv_response_content, csv_response_content)
 
     xls_response = self.c.post(reverse('search:download'), {
         'type': 'xls',
