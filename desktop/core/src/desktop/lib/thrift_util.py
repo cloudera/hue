@@ -537,8 +537,12 @@ class SuperClient(object):
 
 def _unpack_guid_secret_in_handle(str_args):
   if 'operationHandle' in str_args or 'sessionHandle' in str_args:
-    secret = re.search('secret=(\".*\"), guid', str_args) or re.search('secret=(\'.*\'), guid', str_args)
-    guid = re.search('guid=(\".*\")\)\)', str_args) or re.search('guid=(\'.*\')\)\)', str_args)
+    if sys.version_info[0] > 2:
+      guid = re.search('guid=(b".*"), secret', str_args) or re.search('guid=(b\'.*\'), secret', str_args)
+      secret = re.search('secret=(b".+?")\)', str_args) or re.search('secret=(b\'.+?\')\)', str_args)
+    else:
+      secret = re.search('secret=(".*"), guid', str_args) or re.search('secret=(\'.*\'), guid', str_args)
+      guid = re.search('guid=(".*")\)\)', str_args) or re.search('guid=(\'.*\')\)\)', str_args)
 
     if secret and guid:
       try:

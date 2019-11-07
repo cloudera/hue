@@ -459,7 +459,10 @@ class HS2Api(Api):
           'finished': job.get('finished', False)
         } for job in queries_with_state]
     elif snippet['type'] == 'impala' and has_query_browser:
-      query_id = unpack_guid_base64(snippet['result']['handle']['guid'])
+      guid = snippet['result']['handle']['guid']
+      if isinstance(guid, str):
+        guid = guid.encode('utf-8')
+      query_id = unpack_guid_base64(guid)
       progress = min(self.progress(notebook, snippet, logs), 99) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
       jobs = [{
         'name': query_id,
