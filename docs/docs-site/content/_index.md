@@ -9,7 +9,7 @@ pre = "<b>1. </b>"
 
 <h1>Documentation</h1>
 
-Hue is a mature open source SQL Assistant for querying, visualizing and sharing data in Databases & Data Warehouses: [gethue.com](http://gethue.com).
+Hue is a mature open source Query Assistant for querying, visualizing and sharing data in Databases & Data Warehouses: [gethue.com](http://gethue.com)
 
 Thousands of companies and organizations use Hue to open-up their data and provide self service querying. Hue is heavily used by:
 
