@@ -24,9 +24,9 @@ import sys
 import traceback
 
 if sys.version_info[0] > 2:
-    from django.utils.encoding import force_text as force_unicode
+  from django.utils.encoding import force_text as force_unicode
 else:
-    from django.utils.encoding import force_unicode
+  from django.utils.encoding import force_unicode
 
 import desktop.lib.django_util
 

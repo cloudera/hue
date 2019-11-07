@@ -156,8 +156,9 @@ def jobs(request):
       )
     except Exception as ex:
       ex_message = str(ex)
-      if 'Connection refused' in ex_message or 'standby RM' in ex_message:
-        raise PopupException(_('Resource Manager cannot be contacted or might be down.'))
+      if 'Connection refused' in ex_message or 'standby RM' in ex_message or 'Name or service not known' in ex_message:
+        response = {'status': 1, 'message': _('Resource Manager cannot be contacted or might be down.')}
+        return JsonResponse(response)
       elif 'Could not connect to' in ex_message:
         raise PopupException(_('Job Tracker cannot be contacted or might be down.'))
       else:
@@ -375,7 +376,7 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
     params = {
       'doAs': request.user.username
     }
-      
+
     if offset != 0:
       params['start'] = offset
 
