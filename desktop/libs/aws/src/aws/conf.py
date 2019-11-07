@@ -34,7 +34,15 @@ HYPHEN_ENDPOINT_RE = 's3-(?P<region>[a-z0-9-]+).amazonaws.com'
 DUALSTACK_ENDPOINT_RE = 's3.dualstack.(?P<region>[a-z0-9-]+).amazonaws.com'
 AWS_ACCOUNT_REGION_DEFAULT = 'us-east-1' # Location.USEast
 PERMISSION_ACTION_S3 = "s3_access"
+REGION_CACHED = None
+IS_IAM_CACHED = None
+IS_EC2_CACHED = None
 
+def clear_cache():
+  global REGION_CACHED, IS_IAM_CACHED, IS_EC2_CACHED
+  REGION_CACHED = None
+  IS_IAM_CACHED = None
+  IS_EC2_CACHED = None
 
 def get_locations():
   return ('EU',  # Ireland
@@ -91,6 +99,9 @@ def get_default_region():
 
 
 def get_region(conf=None):
+  global REGION_CACHED
+  if REGION_CACHED is not None:
+    return REGION_CACHED
   region = ''
 
   if conf:
@@ -122,6 +133,8 @@ def get_region(conf=None):
   if region not in get_locations():
     LOG.warn("Region, %s, not found in the list of supported regions: %s" % (region, ', '.join(get_locations())))
     region = ''
+
+  REGION_CACHED = region
 
   return region
 
@@ -239,23 +252,34 @@ def is_ec2_instance():
   # To avoid unnecessary network call, check if Hue is running on EC2 instance
   # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/identify_ec2_instances.html
   # /sys/hypervisor/uuid doesn't work on m5/c5, but /sys/devices/virtual/dmi/id/product_uuid does
+  global IS_EC2_CACHED
+  if IS_EC2_CACHED is not None:
+    return IS_EC2_CACHED
   try:
-    return (os.path.exists('/sys/hypervisor/uuid') and open('/sys/hypervisor/uuid', 'read').read()[:3].lower() == 'ec2') or (os.path.exists('/sys/devices/virtual/dmi/id/product_uuid') and open('/sys/devices/virtual/dmi/id/product_uuid', 'read').read()[:3].lower() == 'ec2')
+    IS_EC2_CACHED = (os.path.exists('/sys/hypervisor/uuid') and open('/sys/hypervisor/uuid', 'r').read()[:3].lower() == 'ec2') or (os.path.exists('/sys/devices/virtual/dmi/id/product_uuid') and open('/sys/devices/virtual/dmi/id/product_uuid', 'r').read()[:3].lower() == 'ec2') 
   except IOError as e:
-    return 'Permission denied' in str(e) # If permission is denied, assume cost of network call
+    IS_EC2_CACHED = 'Permission denied' in str(e) # If permission is denied, assume cost of network call
   except Exception as e:
+    IS_EC2_CACHED = False
     LOG.exception("Failed to read /sys/hypervisor/uuid or /sys/devices/virtual/dmi/id/product_uuid: %s" % e)
-    return False
+  return IS_EC2_CACHED
+
 
 def has_iam_metadata():
   try:
+    global IS_IAM_CACHED
+    if IS_IAM_CACHED is not None:
+      return IS_IAM_CACHED
     import boto.utils
     if is_ec2_instance():
       metadata = boto.utils.get_instance_metadata(timeout=1, num_retries=1)
-      return 'iam' in metadata
+      IS_IAM_CACHED = 'iam' in metadata
+    else:
+      IS_IAM_CACHED = False
   except Exception as e:
+    IS_IAM_CACHED = False
     LOG.exception("Encountered error when checking IAM metadata: %s" % e)
-  return False
+  return IS_IAM_CACHED
 
 
 def has_s3_access(user):

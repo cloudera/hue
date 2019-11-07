@@ -26,7 +26,6 @@ django-debug-toolbar==1.9.1
 django-extensions==1.8.0
 djangomako==1.0.1
 django-nose==1.4.5
-django-openid-auth==0.14
 django_opentracing==1.1.0
 django_prometheus==1.0.15
 djangosaml2==0.16.11

@@ -24,7 +24,6 @@ Checked-in third party dependencies
 |Y|django-axes|1.5.0|MIT|http://github.com/django-pci/django-axes.git|
 |Y|Django Extensions|1.5.0|New BSD|http://pypi.python.org/pypi/django-extensions/1.5.0|
 |Y|Django_nose (part of basie)|1.3|MIT|http://code.basieproject.org/trunk/apps/django_nose/nose_runner.py|
-|Y|django-openid-auth|0.5| |http://openidenabled.com/python-openid/|
 |Y|django-webpack-loader|0.5.0|MIT|https://github.com/owais/django-webpack-loader/|
 |Y|djangosaml2|0.16.4|Apache ||
 |Y|dnspython|1.15.0|ISC|https://pypi.org/project/dnspython/1.15.0/|
