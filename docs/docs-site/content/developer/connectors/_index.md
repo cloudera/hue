@@ -99,6 +99,11 @@ Various storage systems can be interacted with. The [`fsmanager.py`](https://git
 * [ADLS v2](https://github.com/cloudera/hue/blob/master/desktop/libs/azure/src/azure/abfs)
 * [ADLS v1](https://github.com/cloudera/hue/blob/master/desktop/libs/azure/src/azure/adls)
 
+### HBase / Key Value Stores
+
+With just a few changes in the [Python API](https://github.com/cloudera/hue/blob/master/apps/hbase/src/hbase/api.py),
+the HBase browser could be compatible with Apache Kudu or Google Big Table.
+
 ## Dashboard
 
 [Dashboards](/user/querying/#dashboards) are generic and support Apache Solr and SQL:

@@ -344,6 +344,27 @@ The File Browser application lets you interact with these file systems HDFS, S3 
 -   View and edit files as text or binary.
 -   Create external tables or export query results
 
+**Exploring ADLS in Hue’s file browser**
+
+Once Hue is successfully configured to connect to ADLS, we can view all accessible folders within the account by clicking on the ADLS root. From here, we can view the existing keys (both directories and files) and create, rename, move, copy, or delete existing directories and files. Additionally, we can directly upload files to ADLS.
+
+![Browse files](https://cdn.gethue.com/uploads/2016/08/image2.png)
+
+**Create Hive Tables Directly From ADLS**
+
+Hue’s table browser import wizard can create external Hive tables directly from files in ADLS. This allows ADLS data to be queried via SQL from Hive or Impala, without moving or copying the data into HDFS or the Hive Warehouse. To create an external Hive table from ADLS, navigate to the table browser, select the desired database and then click the plus icon in the upper right. Select a file using the file picker and browse to a file on ADLS.
+
+Choose your input files’ delimiter and press next. Keep unchecked “Store in Default location” if you want the file to stay intact on ADLS, update the column definition options and finally click “Submit” when you’re ready to create the Hive table. Once created, you should see the newly created table details in the table browser.
+
+![Create tables from external files](https://cdn.gethue.com/uploads/2017/11/image4-1.png)
+
+**Save Query Results to ADLS**
+
+Now that we have created external Hive tables created from our ADLS data, we can jump into either the Hive or Impala editor and start querying the data directly from ADLS seamlessly. These queries can join tables and objects that are backed either by ADLS, HDFS, or both. Query results can then easily be saved back to ADLS.
+
+![Save results to storage](https://cdn.gethue.com/uploads/2017/11/image1-1.png)
+
+
 ### HDFS
 
 Hue is fully compatible with HDFS and is handy for browsing, peeking at file content, upload or downloading data.
@@ -372,11 +393,6 @@ Topics, Streams can be listed via the [`ksql` connector](/administrator/configur
 
 ### HBase
 
-We'll take a look at the [HBase Browser App](http://gethue.com/the-web-ui-for-hbase-hbase-browser).
-
-**Note**: With just a few changes in the [Python API](https://github.com/cloudera/hue/blob/master/apps/hbase/src/hbase/api.py),
-the HBase browser could be compatible with Apache Kudu or Google Big Table.
-
 
 #### Smart View
 
@@ -388,35 +404,41 @@ amount of standard database operations. To explore a row, simple scroll
 to the right. By scrolling, the row should continue to lazily-load cells
 until the end.
 
+![HBase](https://lh4.googleusercontent.com/rSmhp0hTq4xtod8SsoIn1A8tp7omHB46j0xtpnmtOQAHzn1PHw1C0rN7Yq8CBq0WOeSh_GVfFWB1P0mKsGGWIpAnGr-mxxJRIR3uW4exevkS5_mKBG0xIbJW)
+
 #### Adding Data
 
 To initially populate the table, you can insert a new row or bulk upload
 CSV/TSV/etc. type data into your table.
 
+![HBase](https://lh4.googleusercontent.com/3aMhyC8qDYdNf98Ge8qbD2EPXzCiL62lCWxHpzhfiYfZPj1F-nAgu3IhbuDYQpTVz1OCqaMDC1WDZ617YfiTsZDafbhHjXufv_f9yyXJbk95fMLNlywLZkHS)
 
-On the right hand side of a row is a '+' sign that lets you insert
-columns into your
-row
+On the right hand side of a row is a '+' sign that lets you insert columns into your row.
+
 
 #### Mutating Data
 
 To edit a cell, simply click to edit inline.
 
+![HBase](https://lh4.googleusercontent.com/ADTmywVLvEGPordZoEdsOIFkzCWlgc6lG6hrQdtAzT74nHgXqmyto4tPEqqrNmwk0pu709EnP_VIPAgvFPhlPT7NYSDj4LCbApRmw1z-mPyad2jMehWXiZAb)
+
 If you need more control or data about your cell, click “Full Editor” to
 edit.
+
+![HBase](https://lh4.googleusercontent.com/irYJEB6muPCT5Oj3x-LJvMZIhSskXJhIJUsnYL00VpaoYKNTI8NnL09WsmzkxuryFWQpETnUb6EfRkT3ZrrTu7-yAXRDmDCG940Ssh-wbJhaGYt3Sj4txn4T)
 
 In the full editor, you can view cell history or upload binary data to
 the cell. Binary data of certain MIME Types are detected, meaning you
 can view and edit images, PDFs, JSON, XML, and other types directly in
 your browser!
 
+![HBase](https://lh5.googleusercontent.com/N5MqnAhIPQ5D7KSU-ulHTLS0mGFZqC22ciwKGeWhntzpYx4bvqCSvcTc3xCYfCCP6HuxNTr7FlEVMowbSIJ_1nOt36wOXzNpvC-Bhy3gRXve4rIS-Ei6t_By)
+
 Hovering over a cell also reveals some more controls (such as the delete
 button or the timestamp). Click the title to select a few and do batch
 operations:
 
-If you need some sample data to get started and explore, check out this
-howto create [HBase table
-tutorial](http://gethue.com/hadoop-tutorial-how-to-create-example-tables-in-hbase).
+![HBase](https://lh3.googleusercontent.com/ECcsG6M0zGESG4vuHO8KvgsxrGPbZ5cEhbFxjq2uPhgKzUS-8eTaPq3W2P-rSm13fLxEnEMJY1yFJ8pb2IBmy2KwhGgdFjqQUOTQhQV0sWsxnPFPxpjvoe3T)
 
 
 #### Smart Searchbar
@@ -429,6 +451,8 @@ two row keys with:
 
     domain.100, domain.200
 
+
+![HBase](https://lh4.googleusercontent.com/2swltMjM0iwMfsN5oL4CAGJvg_2ZEow_swIfUbUqfugC6WfwY7zSlCBeejTTH9u7ixy5w01KKJv4YEoh3ipGTQQrm0PZGgRxXyuqlD4XKS39w3NMVxSHGrx5)
 
 Submitting this query gives me the two rows I was looking for. If I want
 to fetch rows after one of these, I have to do a scan. This is as easy
@@ -531,17 +555,44 @@ There are three ways to access the Query browser:
 
 ![Pretty Query Profile](https://cdn.gethue.com/uploads/2019/03/Screen-Shot-2019-03-07-at-11.40.24-AM.png)
 
-Query capabilities
+There are three ways to access the new browser:
 
-* Display the list of currently running queries on the user's current Impala coordinator and a certain number of completed queries based on your configuration (25 by default).
-* Display the summary report which shows physical timing and memory information of each operation of the explain plan. You can quickly find bottlenecks in the execution of the query which you can resolve by replacing expensive operations, repartitioning, changing file format or moving data.
-* Display the query plan which is a condensed version of the summary report in graphical form
-* Display the memory profile which contains information about the memory usage during the execution of the query. You can use this to determine if the memory available to your query is sufficient.
-* Display the profile which gives you physical execution of the query in great detail. This view is used to analyze data exchange between the various operator and the performance of the IO (disk, network, CPU). You can use this to reorganize the location of your data (on disk, in memory, different partitions or file formats).
-* Manually close an opened query.
+Best: Click on the query ID after executing a SQL query in the editor. This will open the mini job browser overlay at the current query. Having the query execution information side by side the SQL editor is especially helpful to understand the performance characteristics of your queries.
+Open the mini job browser overlay and navigate to the queries tab.
+Open the job browser and navigate to the queries tab.
 
-Read more about it on [Browsing Impala Query Execution within the SQL Editor
-](http://gethue.com/browsing-impala-query-execution-within-the-sql-editor/).
+
+**Query capabilities**
+
+Display the list of currently running queries on the user’s current Impala coordinator and a certain number of completed queries based on your configuration (25 by default).
+
+![Pretty Query Profile](https://cdn.gethue.com/uploads/2017/12/JB.png)
+
+
+Display the explain plan which outlines logical execution steps. You can verify here that the execution will not proceed in an unexpected way (i.e. wrong join type, join order, projection order). This can happen if the statistics for the table are out of date as shown in the image below by the mention of “cardinality: unavailable”. You can obtain statistics by running:
+
+    COMPUTE STATS <TABLE_NAME>
+
+![Pretty Query Profile](https://cdn.gethue.com/uploads/2017/11/Explain.png)
+
+Display the summary report which shows physical timing and memory information of each operation of the explain plan. You can quickly find bottlenecks in the execution of the query which you can resolve by replacing expensive operations, repartitioning, changing file format or moving data.
+
+![Pretty Query Profile](https://cdn.gethue.com/uploads/2017/11/Summary.png)
+
+Display the query plan which is a condensed version of the summary report in graphical form.
+
+![Pretty Query Profile](https://cdn.gethue.com/uploads/2017/12/Plan.png)
+
+Display the memory profile which contains information about the memory usage during the execution of the query. You can use this to determine if the memory available to your query is sufficient.
+
+![Pretty Query Profile](https://cdn.gethue.com/uploads/2017/11/Memory.png)
+
+Display the profile which gives you physical execution of the query in great detail. This view is used to analyze data exchange between the various operator and the performance of the IO (disk, network, CPU). You can use this to reorganize the location of your data (on disk, in memory, different partitions or file formats).
+
+![Pretty Query Profile](https://cdn.gethue.com/uploads/2017/12/Profile.png)
+
+Manually close an opened query.
+
 
 ### YARN (Spark, MapReduce, Tez)
 
@@ -556,4 +607,4 @@ List submitted workflows, schedules and bundles. See more in details in the [Sch
 
 ### Spark / Livy
 
-List Livy sessions and submitted statements.
+List [Spark Livy](/user/querying/#spark) sessions and submitted statements.
