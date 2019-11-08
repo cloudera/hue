@@ -179,7 +179,7 @@ class ResultGrid extends DisposableComponent {
     this.fetchResult = params.fetchResult;
 
     const trackedObservables = {
-      columnsVisible: true,
+      columnsVisible: false,
       isMetaFilterVisible: false
     };
 
