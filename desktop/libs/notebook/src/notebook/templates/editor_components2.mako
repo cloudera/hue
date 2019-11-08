@@ -546,7 +546,7 @@
           <!-- /ko -->
         </ul>
 
-        <div class="tab-content" style="border: none; overflow-x: hidden">
+        <div class="tab-content" style="border: none; overflow-x: hidden; min-height: 250px;">
           <div class="tab-pane" id="queryHistory" style="min-height: 80px;" data-bind="css: {'active': currentQueryTab() == 'queryHistory'}, style: { 'height' : $parent.historyInitialHeight() > 0 ? Math.max($parent.historyInitialHeight(), 40) + 'px' : '' }">
             <!-- ko if: $parent.loadingHistory -->
             <div class="margin-top-10 margin-left-10">

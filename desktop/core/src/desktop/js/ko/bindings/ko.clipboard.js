@@ -14,18 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const I18n = (identifier, ...replacements) => {
-  if (window.DJANGO_DEBUG_MODE && !HUE_I18n[identifier]) {
-    if (!window.missing_I18n) {
-      window.missing_I18n = [];
-    }
-    window.missing_I18n.push(`'${identifier}': '\${ _('${identifier}') }',`);
-  }
-  let result = HUE_I18n[identifier] || identifier;
-  replacements.forEach(replacement => {
-    result = result.replace('%s', replacement);
-  });
-  return result;
-};
+import ko from 'knockout';
 
-export default I18n;
+ko.bindingHandlers.clipboard = {
+  init: (element, valueAccessor) => {
+    if (!window.Clipboard) {
+      console.warn('ko.clipboard.js depends on window.Clipboard');
+      return;
+    }
+    const options = valueAccessor();
+
+    const clipboard = new window.Clipboard(element, {
+      target: options.target,
+      text: options.text
+    });
+
+    if (options.onSuccess) {
+      clipboard.on('success', options.onSuccess);
+    }
+
+    ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
+      clipboard.destroy();
+    });
+  }
+};
