@@ -63,7 +63,16 @@ def make_logged_in_client(username="test", password="test", is_superuser=True, r
       user.delete()
       raise User.DoesNotExist
   except User.DoesNotExist:
-    user = User.objects.create_user(username, username + '@localhost', password)
+    user_attrs = {
+      'password': password
+    }
+    if ENABLE_ORGANIZATIONS.get():
+      user_attrs['email'] = username
+      user_attrs['organization'] = default_organization()
+    else:
+      user_attrs['username'] = username
+      user_attrs['email'] = username + '@localhost'
+    user = User.objects.create_user(**user_attrs)
     user.is_superuser = is_superuser
     user.save()
   else:
