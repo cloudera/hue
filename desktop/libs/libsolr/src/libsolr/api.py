@@ -80,6 +80,7 @@ class SolrApi(object):
 
   def query(self, collection, query):
     solr_query = {}
+    json_facets = {}
 
     solr_query['collection'] = collection['name']
 
@@ -106,7 +107,6 @@ class SolrApi(object):
         ('facet.mincount', 0),
         ('facet.limit', 10),
       )
-      json_facets = {}
 
       timeFilter = self._get_range_borders(collection, query)
 
@@ -217,11 +217,6 @@ class SolrApi(object):
                 ('facet.pivot', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s %(fields_limits)s}%(fields)s' % keys),
             )
 
-      if json_facets:
-        params += (
-            ('json.facet', json.dumps(json_facets)),
-        )
-
     params += self._get_fq(collection, query)
 
     fl = urllib.unquote(utf_quoter(','.join(Collection2.get_field_list(collection))))
@@ -269,7 +264,15 @@ class SolrApi(object):
           ('sort', ','.join(fields)),
         )
 
-    response = self._root.get('%(collection)s/select' % solr_query, params)
+    if json_facets:
+      response = self._root.post(
+          '%(collection)s/select' % solr_query,
+          params,
+          data=json.dumps({'facet': json_facets}),
+          contenttype='application/json')
+    else:
+      response = self._root.get('%(collection)s/select' % solr_query, params)
+
     return self._get_json(response)
 
 
