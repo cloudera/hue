@@ -537,11 +537,25 @@ Then give Hue the information about the database source:
        interface=sqlalchemy
        options='{"url": "hana://username:password@example.de:30015"}'
 
+### Apache Solr
+
+Solr provide great [dashboards](/user/querying/#dashboard). Just point to an existing Solr:
+
+    [search]
+
+      # URL of the Solr Server
+      solr_url=http://localhost:8983/solr/
+
+      # Requires FQDN in solr_url if enabled
+      ## security_enabled=false
+
+      ## Query sent when no term is entered
+      ## empty_query=*:*
+
+
 ### Apache Solr SQL
 
-With Solr 5+, query collections like we would query a regular Hive or Impala table.
-
-[Read more about it here](http://gethue.com/sql-editor-for-solr-sql/).
+Query collections like we would query a regular database.
 
 As Solr SQL is pretty recent, there are some caveats, notably Solr lacks support of:
 
@@ -551,11 +565,7 @@ As Solr SQL is pretty recent, there are some caveats, notably Solr lacks support
 
 which prevents a SQL UX experience comparable to the standard other databases (but we track it in [HUE-3686](https://issues.cloudera.org/browse/HUE-3686)).
 
-First make sure Solr search is configured:
-
-    [search]
-      # URL of the Solr Server
-      solr_url=http://localhost:8983/solr/
+First make sure Solr search is [configured](#apache-solr):
 
 Then add the interpreter:
 
@@ -721,8 +731,8 @@ HA is supported by pointing to the HttpFs service instead of the NameNode.
 Make sure the HDFS service has in it `hdfs-site.xml`:
 
     <property>
-    <name>dfs.webhdfs.enable</name>
-    <value>true</value>
+      <name>dfs.webhdfs.enable</name>
+      <value>true</value>
     </property>
 
 Configure Hue as a proxy user for all other users and groups, meaning it may submit a request on behalf of any other user:
@@ -1035,7 +1045,7 @@ Do not forget to add the user running Hue (your current login in dev or hue in p
 
 ### Apache Pig
 
-Pig is native to Hue and depends on the [Oozie service](/administrator/configuration/connectors/#oozie) to be configured:
+Pig is native to Hue and depends on the [Oozie service](/administrator/configuration/connectors/#apache-oozie) to be configured:
 
     [[[pig]]]
       name=Pig
@@ -1135,8 +1145,8 @@ If using the package version and has the CDH repository register, install sentry
 If using Kerberos, make sure ‘hue’ is allowed to connect to Sentry in /etc/sentry/conf/sentry-site.xml:
 
     <property>
-        <name>sentry.service.allow.connect</name>
-        <value>impala,hive,solr,hue</value>
+      <name>sentry.service.allow.connect</name>
+      <value>impala,hive,solr,hue</value>
     </property>
 
 Here is an example of sentry-site.xml
@@ -1168,3 +1178,16 @@ Here is an example of sentry-site.xml
       <value>aaa</value>
     </property>
     </configuration>
+
+### Apache Knox
+
+    [[knox]]
+
+      # This is a list of hosts that knox proxy requests can come from
+      ## knox_proxyhosts=server1.domain.com,server2.domain.com
+
+      # List of Kerberos principal name which is allowed to impersonate others
+      ## knox_principal=knox1,knox2
+
+      # Comma separated list of strings representing the ports that the Hue server can trust as knox port.
+      ## knox_ports=80,8443
