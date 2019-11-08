@@ -109,7 +109,7 @@ The autocompleter talks to the backend to get data for tables and databases etc 
 
 ### Sharing
 
-Any query can be shared with permissions, as detailed in the [concepts](/user/concepts).
+Any query can be shared with permissions, as detailed in the [concepts](/user/concept/).
 
 ### Language reference
 

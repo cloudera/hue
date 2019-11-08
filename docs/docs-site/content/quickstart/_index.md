@@ -7,15 +7,15 @@ weight: 1
 
 ## Get
 
-Via [Kubernetes](/administrator/installation/cloud/#kubernetes):
+Via [Docker](/administrator/installation/cloud/#docker):
+
+    docker run -it -p 8888:8888 gethue/hue:latest
+
+Or [Kubernetes](/administrator/installation/cloud/#kubernetes):
 
     helm repo add gethue https://helm.gethue.com
     helm repo update
     helm install gethue/hue
-
-Or [Docker](/administrator/installation/cloud/#docker):
-
-    docker run -it -p 8888:8888 gethue/hue:latest
 
 ## Configure
 
