@@ -17,6 +17,8 @@
 import $ from 'jquery';
 import ko from 'knockout';
 
+import './ko.resultDownloadActions';
+
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
 import I18n from 'utils/i18n';
@@ -28,6 +30,7 @@ import {
   SHOW_GRID_SEARCH_EVENT,
   SHOW_NORMAL_RESULT_EVENT
 } from 'apps/notebook2/events';
+
 import { attachTracker } from 'apps/notebook2/components/executableStateHandler';
 
 export const NAME = 'result-grid';
@@ -36,15 +39,25 @@ export const NAME = 'result-grid';
 const TEMPLATE = `
 <div class="result-actions-append">
   <div class="btn-group">
-    <button class="btn btn-editor btn-mini disable-feedback" data-bind="click: showSearch.bind($data), css: { 'disabled': !data().length }">
-      <i class="fa fa-search"></i> ${ I18n('Search') }
-    </button>
-  </div>
-  <div class="btn-group">
     <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: columnsVisible, css: { 'active' : columnsVisible }">
       <i class="fa fa-columns"></i> ${ I18n('Columns') }
     </button>
   </div>
+
+  <div class="btn-group">
+    <button class="btn btn-editor btn-mini disable-feedback" data-bind="click: showSearch.bind($data), css: { 'disabled': !data().length }">
+      <i class="fa fa-search"></i> ${ I18n('Search') }
+    </button>
+  </div>
+
+  <!-- ko component: {
+    name: 'result-download-actions',
+    params: {
+      meta: meta,
+      data: data
+    }
+  } --><!-- /ko -->
+
   <!-- ko if: false && window.ENABLE_DOWNLOAD -->
     <div data-bind="
         component: {

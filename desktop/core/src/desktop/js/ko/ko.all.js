@@ -50,6 +50,7 @@ import 'ko/bindings/ko.chosen';
 import 'ko/bindings/ko.clearable';
 import 'ko/bindings/ko.clickForAceFocus';
 import 'ko/bindings/ko.clickToCopy';
+import 'ko/bindings/ko.clipboard';
 import 'ko/bindings/ko.codemirror';
 import 'ko/bindings/ko.contextMenu';
 import 'ko/bindings/ko.contextSubMenu';

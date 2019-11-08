@@ -18,18 +18,18 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
-  from desktop.auth.backend import is_admin;
+  from desktop.auth.backend import is_admin
   from desktop.conf import APP_SWITCHER_ALTUS_BASE_URL, APP_SWITCHER_MOW_BASE_URL, DISPLAY_APP_SWITCHER, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_DEFAULT_CONFIGURATION, USE_NEW_SIDE_PANELS, VCS
   from desktop.models import hue_version, _get_apps, get_cluster_config
 
-  from beeswax.conf import LIST_PARTITIONS_LIMIT
+  from beeswax.conf import DOWNLOAD_BYTES_LIMIT, DOWNLOAD_ROW_LIMIT, LIST_PARTITIONS_LIMIT
   from dashboard.conf import HAS_SQL_ENABLED
   from filebrowser.conf import SHOW_UPLOAD_BUTTON
   from indexer.conf import ENABLE_NEW_INDEXER
   from metadata.conf import has_catalog, has_readonly_catalog, has_optimizer, has_workload_analytics, OPTIMIZER, get_optimizer_url, get_catalog_url
   from metastore.conf import ENABLE_NEW_CREATE_TABLE
   from metastore.views import has_write_access
-  from notebook.conf import ENABLE_NOTEBOOK_2, ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ordered_interpreters, SHOW_NOTEBOOKS
+  from notebook.conf import ENABLE_NOTEBOOK_2, ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_SQL_INDEXER, get_ordered_interpreters, SHOW_NOTEBOOKS
 %>
 
 <%namespace name="sqlDocIndex" file="/sql_doc_index.mako" />
@@ -75,6 +75,9 @@
 
   window.DROPZONE_HOME_DIR = '${ user.get_home_directory() if not user.is_anonymous() else "" }';
 
+  window.DOWNLOAD_ROW_LIMIT = ${ DOWNLOAD_ROW_LIMIT.get() if hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get() >= 0 else 'undefined' };
+  window.DOWNLOAD_BYTES_LIMIT = ${ DOWNLOAD_BYTES_LIMIT.get() if hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get() >= 0 else 'undefined' };
+
   window.USE_DEFAULT_CONFIGURATION = '${ USE_DEFAULT_CONFIGURATION.get() }' === 'True';
 
   window.USER_HAS_METADATA_WRITE_PERM = '${ user.has_hue_permission(action="write", app="metadata") }' === 'True';
@@ -82,6 +85,7 @@
   window.ENABLE_DOWNLOAD = '${ conf.ENABLE_DOWNLOAD.get() }' === 'True';
   window.ENABLE_NEW_CREATE_TABLE = '${ hasattr(ENABLE_NEW_CREATE_TABLE, 'get') and ENABLE_NEW_CREATE_TABLE.get()}' === 'True';
   window.ENABLE_NOTEBOOK_2 = '${ ENABLE_NOTEBOOK_2.get() }' === 'True';
+  window.ENABLE_SQL_INDEXER = '${ ENABLE_SQL_INDEXER.get() }' === 'True';
 
   window.ENABLE_QUERY_BUILDER = '${ ENABLE_QUERY_BUILDER.get() }' === 'True';
   window.ENABLE_QUERY_SCHEDULING = '${ ENABLE_QUERY_SCHEDULING.get() }' === 'True';
