@@ -224,7 +224,6 @@ class TestDocument2(object):
     assert_not_equal(copy_workflow.get_data()['workflow']['uuid'], workflow.get_data()['workflow']['uuid'])
 
 
-
   def test_directory_move(self):
     source_dir = Directory.objects.create(name='test_mv', owner=self.user, parent_directory=self.home_dir)
     target_dir = Directory.objects.create(name='test_mv_dst', owner=self.user, parent_directory=self.home_dir)
@@ -270,13 +269,13 @@ class TestDocument2(object):
     response = self.client.get('/desktop/api2/doc', {'path': '/'})
     data = json.loads(response.content)
     assert_true('children' in data)
-    assert_equal(5, data['count'])  # This includes the 4 docs and .Trash
+    assert_equal(6, data['count'])  # This includes the 4 docs and .Trash and Gist
 
     # Test filter type
     response = self.client.get('/desktop/api2/doc', {'path': '/', 'type': ['directory']})
     data = json.loads(response.content)
     assert_equal(['directory'], data['types'])
-    assert_equal(3, data['count'])
+    assert_equal(4, data['count'])
     assert_true(all(doc['type'] == 'directory' for doc in data['children']))
 
     # Test search text
@@ -292,7 +291,7 @@ class TestDocument2(object):
     # Test pagination with limit
     response = self.client.get('/desktop/api2/doc', {'path': '/', 'page': 2, 'limit': 2})
     data = json.loads(response.content)
-    assert_equal(5, data['count'])
+    assert_equal(6, data['count'])
     assert_equal(2, len(data['children']))
 
 
@@ -380,8 +379,8 @@ class TestDocument2(object):
     response = self.client.get('/desktop/api2/doc', {'path': '/'})
     data = json.loads(response.content)
     assert_true('children' in data)
-    assert_equal(1, data['count'])
-    assert_equal(Document2.TRASH_DIR, data['children'][0]['name'])
+    assert_equal(2, data['count'])
+    assert_true(Document2.TRASH_DIR in [f['name'] for f in data['children']])
 
 
   def test_validate_immutable_user_directories(self):

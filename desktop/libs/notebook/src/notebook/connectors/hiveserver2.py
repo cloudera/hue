@@ -47,7 +47,6 @@ from metadata.optimizer.optimizer_client import OptimizerClient
 from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported, _get_snippet_name, Notebook, get_interpreter
 
 if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
   from urllib.parse import quote as urllib_quote, unquote as urllib_unquote
 else:
   from urllib import quote as urllib_quote, unquote as urllib_unquote

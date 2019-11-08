@@ -42,7 +42,6 @@ from django.urls import reverse
 from django.test.client import Client
 from django.views.static import serve
 from django.http import HttpResponse
-from mock import patch, Mock, MagicMock
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises, nottest
@@ -77,8 +76,10 @@ from desktop.views import check_config, home, generate_configspec, load_confs, c
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
+  from unittest.mock import patch, Mock
 else:
   from cStringIO import StringIO as string_io
+  from mock import patch, Mock, MagicMock
 
 
 LOG = logging.getLogger(__name__)
@@ -1076,16 +1077,20 @@ class TestDocument(object):
     make_logged_in_client(username="copy_owner", groupname="test_doc", recreate=True, is_superuser=False)
     self.copy_user = User.objects.get(username="copy_owner")
 
-    self.document2 = Document2.objects.create(name='Test Document2',
-                                              type='search-dashboard',
-                                              owner=self.user,
-                                              description='Test Document2')
+    self.document2 = Document2.objects.create(
+        name='Test Document2',
+        type='search-dashboard',
+        owner=self.user,
+        description='Test Document2'
+    )
 
-    self.document = Document.objects.link(content_object=self.document2,
-                                          owner=self.user,
-                                          name='Test Document',
-                                          description='Test Document',
-                                          extra='test')
+    self.document = Document.objects.link(
+        content_object=self.document2,
+        owner=self.user,
+        name='Test Document',
+        description='Test Document',
+        extra='test'
+    )
 
     self.document.save()
     self.document2.doc.add(self.document)
@@ -1164,42 +1169,48 @@ class TestDocument(object):
 
   def test_multiple_home_directories(self):
     home_dir = Directory.objects.get_home_directory(self.user)
-    test_doc1 = Document2.objects.create(name='test-doc1',
-                                         type='query-hive',
-                                         owner=self.user,
-                                         description='',
-                                         parent_directory=home_dir)
+    test_doc1 = Document2.objects.create(
+        name='test-doc1',
+        type='query-hive',
+        owner=self.user,
+        description='',
+        parent_directory=home_dir
+    )
 
-    assert_equal(home_dir.children.exclude(name='.Trash').count(), 2)
+    assert_equal(home_dir.children.exclude(name__in=['.Trash', 'Gist']).count(), 2)
 
     # Cannot create second home directory directly as it will fail in Document2.validate()
     second_home_dir = Document2.objects.create(owner=self.user, parent_directory=None, name='second_home_dir', type='directory')
     Document2.objects.filter(name='second_home_dir').update(name=Document2.HOME_DIR, parent_directory=None)
     assert_equal(Document2.objects.filter(owner=self.user, name=Document2.HOME_DIR).count(), 2)
 
-    test_doc2 = Document2.objects.create(name='test-doc2',
-                                              type='query-hive',
-                                              owner=self.user,
-                                              description='',
-                                              parent_directory=second_home_dir)
+    test_doc2 = Document2.objects.create(
+        name='test-doc2',
+        type='query-hive',
+        owner=self.user,
+        description='',
+        parent_directory=second_home_dir
+    )
     assert_equal(second_home_dir.children.count(), 1)
 
     merged_home_dir = Directory.objects.get_home_directory(self.user)
     children = merged_home_dir.children.all()
-    assert_equal(children.exclude(name='.Trash').count(), 3)
+    assert_equal(children.exclude(name__in=['.Trash', 'Gist']).count(), 3)
     children_names = [child.name for child in children]
     assert_true(test_doc2.name in children_names)
     assert_true(test_doc1.name in children_names)
 
   def test_multiple_trash_directories(self):
     home_dir = Directory.objects.get_home_directory(self.user)
-    test_doc1 = Document2.objects.create(name='test-doc1',
-                                         type='query-hive',
-                                         owner=self.user,
-                                         description='',
-                                         parent_directory=home_dir)
+    test_doc1 = Document2.objects.create(
+        name='test-doc1',
+        type='query-hive',
+        owner=self.user,
+        description='',
+        parent_directory=home_dir
+    )
 
-    assert_equal(home_dir.children.count(), 3)
+    assert_equal(home_dir.children.count(), 4)
 
     # Cannot create second trash directory directly as it will fail in Document2.validate()
     Document2.objects.create(owner=self.user, parent_directory=home_dir, name='second_trash_dir', type='directory')
@@ -1207,16 +1218,18 @@ class TestDocument(object):
     assert_equal(Directory.objects.filter(owner=self.user, name=Document2.TRASH_DIR).count(), 2)
 
 
-    test_doc2 = Document2.objects.create(name='test-doc2',
-                                              type='query-hive',
-                                              owner=self.user,
-                                              description='',
-                                              parent_directory=home_dir)
-    assert_equal(home_dir.children.count(), 5) # Including the second trash
+    test_doc2 = Document2.objects.create(
+        name='test-doc2',
+        type='query-hive',
+        owner=self.user,
+        description='',
+        parent_directory=home_dir
+    )
+    assert_equal(home_dir.children.count(), 6) # Including the second trash
     assert_raises(Document2.MultipleObjectsReturned, Directory.objects.get, name=Document2.TRASH_DIR)
 
     test_doc1.trash()
-    assert_equal(home_dir.children.count(), 3) # As trash documents are merged count is back to 3
+    assert_equal(home_dir.children.count(), 4) # As trash documents are merged count is back to 3
     merged_trash_dir = Directory.objects.get(name=Document2.TRASH_DIR, owner=self.user)
 
     test_doc2.trash()
