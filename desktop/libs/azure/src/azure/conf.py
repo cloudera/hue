@@ -145,10 +145,10 @@ ABFS_CLUSTERS = UnspecifiedConfigSection(
 )
 
 def is_adls_enabled():
-  return ('default' in list(AZURE_ACCOUNTS.keys() and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get()) or (conf_idbroker.is_idbroker_enabled('azure')) and 'default' in list(ADLS_CLUSTERS.keys()))
+  return ('default' in list(AZURE_ACCOUNTS.keys() and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get()) or conf_idbroker.is_idbroker_enabled('azure')) and 'default' in list(ADLS_CLUSTERS.keys())
 
 def is_abfs_enabled():
-  return ('default' in list(AZURE_ACCOUNTS.keys() and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get()) or (conf_idbroker.is_idbroker_enabled('azure')) and 'default' in list(ABFS_CLUSTERS.keys()))
+  return ('default' in list(AZURE_ACCOUNTS.keys() and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get()) or conf_idbroker.is_idbroker_enabled('azure')) and 'default' in list(ABFS_CLUSTERS.keys())
 
 def has_adls_access(user):
   from desktop.auth.backend import is_admin
