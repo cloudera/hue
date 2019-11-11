@@ -668,7 +668,7 @@ Update the versions to the next release (current release +1):
 
 How to count the number of commits since the last release:
 
-    git log --oneline --since=2018-01-01 | grep 'release' -r
+    git log --oneline --since=2019-08-01 | grep 'release' -n -i
     git log --oneline -449 > commits.txt
 
     cat commits.txt | sed 's/\(HUE\-[[:digit:]][[:digit:]][[:digit:]][[:digit:]]\)/\[\1\]\(https:\/\/issues.cloudera.org\/browse\/\1\)/' | sed 's/^\(.*\)/* \1/' > commits.md
@@ -679,22 +679,22 @@ And add them and the authors to the release notes:
 
 Pushing the release branch:
 
-    git push origin HEAD:branch-4.5.0
+    git push origin HEAD:branch-4.6.0
 
 Tagging the release:
 
-    git tag -a release-4.5.0 -m "release-4.5.0"
-    git push origin release-4.5.0
+    git tag -a release-4.6.0 -m "release-4.6.0"
+    git push origin release-4.6.0
 
 Building the tarball release:
 
     make prod
 
-Source of the release: https://github.com/cloudera/hue/archive/release-4.5.0.zip
+Source of the release: https://github.com/cloudera/hue/archive/release-4.6.0.zip
 
 Push to the CDN:
 
-    scp hue-4.5.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads
+    scp hue-4.6.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads
 
 Other things to update:
 
@@ -706,17 +706,17 @@ Other things to update:
 
 Instructions:
 
-    docker build https://github.com/cloudera/hue.git#release-4.5.0 -t gethue/hue:4.5.0 -f tools/docker/hue/Dockerfile
-    docker tag gethue/hue:4.5.0 gethue/hue:latest
+    docker build https://github.com/cloudera/hue.git#release-4.6.0 -t gethue/hue:4.6.0 -f tools/docker/hue/Dockerfile
+    docker tag gethue/hue:4.6.0 gethue/hue:latest
     docker images
     docker login
     docker push gethue/hue
-    docker push gethue/hue:4.5.0
+    docker push gethue/hue:4.6.0
 
-    docker build . -t gethue/nginx:4.5.0 -f tools/docker/nginx/Dockerfile;
-    docker tag gethue/nginx:4.5.0 gethue/nginx:latest
+    docker build . -t gethue/nginx:4.6.0 -f tools/docker/nginx/Dockerfile;
+    docker tag gethue/nginx:4.6.0 gethue/nginx:latest
     docker push gethue/nginx
-    docker push gethue/nginx:4.5.0
+    docker push gethue/nginx:4.6.0
 
 Documentation
 
@@ -732,10 +732,10 @@ Release:
 
     ssh root@docs.gethue.com
     cd /var/www/docs.gethue.com
-    mkdir 4.5.0
-    rm latest; ln -s 4.5.0 latest
+    mkdir 4.6.0
+    rm latest; ln -s 4.6.0 latest
 
-    scp -r docs/docs-site/public/* root@docs.gethue.com:/var/www/docs.gethue.com/4.5.0
+    scp -r docs/docs-site/public/* root@docs.gethue.com:/var/www/docs.gethue.com/4.6.0
 
 
 Then send release notes to the [Forum](https://discourse.gethue.com/), [hue-user](https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user), https://twitter.com/gethue !
