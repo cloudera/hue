@@ -40,7 +40,7 @@ const TEMPLATE = `
         </a>
       </li>
       <li>
-        <a href="javascript:void(0)" data-bind="click: format, css: { 'disabled': !createGistEnabled() }" title="${I18n(
+        <a href="javascript:void(0)" data-bind="click: createGist, css: { 'disabled': !createGistEnabled() }" title="${I18n(
           'Share the query selection via a link'
         )}">
           <i class="fa fa-wf fa-link"></i> ${I18n('Share link')}
@@ -100,7 +100,9 @@ class SnippetEditorActions {
       () => this.snippet.type() === 'hive' || this.snippet.type() === 'impala'
     );
 
-    this.createGistEnabled = ko.pureComputed(() => this.snippet.statement() !== '');
+    this.createGistEnabled = ko.pureComputed(
+      () => this.snippet.isSqlDialect() && this.snippet.statement() !== ''
+    );
 
     this.explainEnabled = ko.pureComputed(
       () =>
@@ -150,6 +152,29 @@ class SnippetEditorActions {
     const explanation = await apiHelper.explainAsync({ snippet: this.snippet });
     this.snippet.explanation(explanation);
     this.snippet.currentQueryTab('queryExplain');
+  }
+
+  async createGist() {
+    if (!this.createGistEnabled()) {
+      return;
+    }
+    hueAnalytics.log('notebook', 'createGist');
+
+    const gist = await apiHelper.createGistAsync({
+      statement:
+        this.snippet.ace().getSelectedText() != '' ? this.snippet.ace().getSelectedText() : this.snippet.statement_raw(),
+      doc_type: this.snippet.type(),
+      name: this.snippet.name(),
+      description: ''
+    });
+
+    if (gist.status == 0) {
+      $(document).trigger('showGistModal', {
+        link: gist.link
+      });
+    } else {
+      this.snippet.handleAjaxError(gist);
+    }
   }
 
   format() {
