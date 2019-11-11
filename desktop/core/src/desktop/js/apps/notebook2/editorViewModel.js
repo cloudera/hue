@@ -285,12 +285,15 @@ class EditorViewModel {
   init() {
     if (this.editorId) {
       this.openNotebook(this.editorId);
+    } else if (
+      window.location.getParameter('gist') !== '' ||
+      window.location.getParameter('type') !== ''
+    ) {
+      this.newNotebook(window.location.getParameter('type'));
     } else if (window.location.getParameter('editor') !== '') {
       this.openNotebook(window.location.getParameter('editor'));
     } else if (this.notebooks.length > 0) {
       this.loadNotebook(this.notebooks[0]); // Old way of loading json for /browse
-    } else if (window.location.getParameter('type') !== '') {
-      this.newNotebook(window.location.getParameter('type'));
     } else {
       this.newNotebook();
     }
@@ -361,7 +364,8 @@ class EditorViewModel {
       });
       $.post('/notebook/api/create_notebook', {
         type: editorType || this.editorType(),
-        directory_uuid: window.location.getParameter('directory_uuid')
+        directory_uuid: window.location.getParameter('directory_uuid'),
+        gist: window.location.getParameter('gist')
       })
         .then(data => {
           this.loadNotebook(data.notebook);

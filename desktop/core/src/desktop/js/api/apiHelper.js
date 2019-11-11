@@ -2130,6 +2130,32 @@ class ApiHelper {
   /**
    *
    * @param {Object} options
+   * @param {statement} options.statement
+   * @param {doc_type} options.doc_type
+   * @param {name} options.name
+   * @param {description} options.description
+   *
+   * @return {CancellablePromise<string>}
+   */
+  async createGistAsync(options) {
+    const data = {
+      statement: options.statement,
+      doc_type: options.doc_type,
+      name: options.name,
+      description: options.description
+    };
+    return new Promise((resolve, reject) => {
+      this.simplePost(GIST_API + 'create', data, options)
+        .done(response => {
+          resolve(response);
+        })
+        .fail(reject);
+    });
+  }
+
+  /**
+   *
+   * @param {Object} options
    * @param {boolean} [options.silenceErrors]
    * @param {Executable} options.executable
    *
