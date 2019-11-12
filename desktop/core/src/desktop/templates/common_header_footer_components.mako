@@ -292,12 +292,14 @@ from metadata.conf import has_optimizer, OPTIMIZER
   <div class="modal-body">
     <div class="row-fluid">
       <div class="span12">
-        <div>
-          <input class="input-xxlarge" name="gist-link" type="text" placeholder="${ _('Link') }"/>
+        <div class="input-group">
+          <input class="input-xxlarge" onfocus="this.select()" name="gist-link" id="gist-link" type="text" placeholder="${ _('Link') }"/>
         </div>
         <div class="input-prepend">
-          <a class="btn" data-dismiss="modal">${_('Copy')}</a>
-          <span class="add-on muted"><i class="fa fa-clipboard"></i></span>
+          <a class="btn gist-link-btn" data-clipboard-target="#gist-link" data-dismiss="modal">${_('Copy')}</a>
+          <button class="add-on muted gist-link-btn" data-clipboard-target="#gist-link">
+            <i class="fa fa-clipboard"></i>
+          </button>
         </div>
       </div>
     </div>

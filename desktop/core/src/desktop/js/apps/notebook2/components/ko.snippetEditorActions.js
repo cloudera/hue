@@ -160,7 +160,7 @@ class SnippetEditorActions {
     }
     hueAnalytics.log('notebook', 'createGist');
 
-    const gist = await apiHelper.createGistAsync({
+    const gistLink = await apiHelper.createGistAsync({
       statement:
         this.snippet.ace().getSelectedText() != '' ? this.snippet.ace().getSelectedText() : this.snippet.statement_raw(),
       doc_type: this.snippet.type(),
@@ -168,13 +168,11 @@ class SnippetEditorActions {
       description: ''
     });
 
-    if (gist.status == 0) {
-      $(document).trigger('showGistModal', {
-        link: gist.link
-      });
-    } else {
-      this.snippet.handleAjaxError(gist);
-    }
+    new window.Clipboard(".gist-link-btn");
+
+    $(document).trigger('showGistModal', {
+      link: gistLink
+    });
   }
 
   format() {
