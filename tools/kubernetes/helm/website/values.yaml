@@ -9,6 +9,10 @@ docs:
   enabled: true
   replicas: 1
   domain: "docs.gethue.com"
+website:
+  enabled: true
+  replicas: 1
+  domain: "gethue.com"
 monitoring:
   enabled: false
 ingress:

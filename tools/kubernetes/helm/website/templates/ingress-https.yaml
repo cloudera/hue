@@ -21,8 +21,16 @@ spec:
           serviceName: gethue-docs
           servicePort: 80
         path: /
+  - host: {{ .Values.website.domain }}
+    http:
+      paths:
+      - backend:
+          serviceName: gethue-website
+          servicePort: 80
+        path: /
   tls:
   - hosts:
     - {{ .Values.docs.domain }}
+    - {{ .Values.website.domain }}
     secretName: letsencrypt-website-prod
 {{- end -}}
