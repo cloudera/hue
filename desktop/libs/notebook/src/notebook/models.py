@@ -81,7 +81,7 @@ def make_notebook(
     name='Browse', description='', editor_type='hive', statement='', status='ready',
     files=None, functions=None, settings=None, is_saved=False, database='default', snippet_properties=None, batch_submit=False,
     on_success_url=None, skip_historify=False, is_task=False, last_executed=-1, is_notebook=False, pub_sub_url=None, result_properties={},
-    namespace=None, compute=None):
+    namespace=None, compute=None, is_presentation_mode=False):
   '''
   skip_historify: do not add the task to the query history. e.g. SQL Dashboard
   is_task / isManaged: true when being a managed by Hue operation (include_managed=True in document), e.g. exporting query result, dropping some tables
@@ -136,6 +136,7 @@ def make_notebook(
     'onSuccessUrl': urllib_quote(on_success_url.encode('utf-8'), safe=SAFE_CHARACTERS_URI) if on_success_url else None,
     'pubSubUrl': pub_sub_url,
     'skipHistorify': skip_historify,
+    'isPresentationModeDefault': is_presentation_mode,
     'isManaged': is_task,
     'snippets': [
       {

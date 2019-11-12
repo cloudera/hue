@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import $ from 'jquery';
 import ko from 'knockout';
 
 import 'ko/bindings/ko.publish';
@@ -162,13 +163,15 @@ class SnippetEditorActions {
 
     const gistLink = await apiHelper.createGistAsync({
       statement:
-        this.snippet.ace().getSelectedText() != '' ? this.snippet.ace().getSelectedText() : this.snippet.statement_raw(),
+        this.snippet.ace().getSelectedText() != ''
+          ? this.snippet.ace().getSelectedText()
+          : this.snippet.statement_raw(),
       doc_type: this.snippet.type(),
       name: this.snippet.name(),
       description: ''
     });
 
-    new window.Clipboard(".gist-link-btn");
+    new window.Clipboard('.gist-link-btn');
 
     $(document).trigger('showGistModal', {
       link: gistLink

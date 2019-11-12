@@ -71,6 +71,7 @@ def create_notebook(request):
       description='',
       editor_type=editor_type,
       statement=statement,
+      is_presentation_mode=True
     )
   else:
     editor = Notebook()
