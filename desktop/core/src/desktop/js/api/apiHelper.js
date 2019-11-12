@@ -2147,7 +2147,7 @@ class ApiHelper {
     return new Promise((resolve, reject) => {
       this.simplePost(GIST_API + 'create', data, options)
         .done(response => {
-          resolve(response);
+          resolve(response.link);
         })
         .fail(reject);
     });
