@@ -11,6 +11,7 @@ Available on [Docker Hub](https://hub.docker.com/u/gethue/) as well.
 
 * [Hue](hue) (core)
 * [Nginx](nginx)
+* [Website](website)
 * [Documentation website](documentation)
 
 ## Kubernetes
