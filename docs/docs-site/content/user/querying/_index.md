@@ -470,7 +470,7 @@ All the spark-submit, spark-shell, pyspark, sparkR properties of jobs & shells c
 
 ### Spark
 
-Hue relies on [Livy](http://livy.io/) for the interactive Scala, Python, SparkSQL and R snippets.
+Hue relies on [Livy](http://livy.io/) for the interactive Scala, Python, SparkSQL and R snippets. Batch submission is both compatible with Livy and Apache Oozie as described in the [scheduling section](/user/scheduling/).
 
 Livy is an open source REST interface for interacting with Apache Spark from anywhere. It got initially developed in the Hue project but got a lot of traction and was moved to its own project on livy.io.
 
@@ -715,3 +715,20 @@ And just interact with the RDD transparently:
 
     states.get('ak')
     states.set('hi', 'Hawaii')
+
+### Others
+
+**Apache Pig**
+Type [Apache Pig](https://pig.apache.org/) latin instructions to load/merge data to perform ETL or Analytics.
+
+**Apache Sqoop**
+Run an [SQL import](/user/browsing/#relational-databases) from a traditional relational database via an [Apache Sqoop](https://sqoop.apache.org/) command.
+
+**Java**
+Described in the [scheduling section](/user/scheduling/).
+
+**MapReduce**
+Described in the [scheduling section](/user/scheduling/).
+
+**Shell script**
+Described in the [scheduling section](/user/scheduling/).

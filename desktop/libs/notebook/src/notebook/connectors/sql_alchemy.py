@@ -69,7 +69,6 @@ from notebook.connectors.base import Api, QueryError, QueryExpired, _get_snippet
 from notebook.models import escape_rows
 
 if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
   from urllib.parse import quote_plus as urllib_quote_plus
   from past.builtins import long
 else:
