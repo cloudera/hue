@@ -599,7 +599,10 @@ class EditorViewModel {
         data => {
           self.loadNotebook(data.notebook);
           if (self.editorMode() && !self.isNotificationManager()) {
-            const snippet = self.selectedNotebook().newSnippet(self.editorType());
+            const snippet =
+              self.selectedNotebook().snippets().length == 0
+                ? self.selectedNotebook().newSnippet(self.editorType())
+                : self.selectedNotebook().snippets()[0];
             if (
               queryTab &&
               ['queryHistory', 'savedQueries', 'queryBuilderTab'].indexOf(queryTab) > -1
