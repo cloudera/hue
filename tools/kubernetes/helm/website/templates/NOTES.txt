@@ -15,13 +15,16 @@ Run below commands to get the recommended URLs:
 
 {{ else if and .Values.ingress.create (eq .Values.ingress.type "nginx-ssl") }}
 
+  echo https://{{ .Values.website.domain }}
   echo https://{{ .Values.docs.domain }}
 
 {{ else }}
 
-  export WEB_PORT=$(kubectl get service gethue-docs -o jsonpath="{.spec.ports[*].nodePort}" --namespace {{ .Release.Namespace }})
+  export WEBSITE_PORT=$(kubectl get service gethue-website -o jsonpath="{.spec.ports[*].nodePort}" --namespace {{ .Release.Namespace }})
+  export DOCS_PORT=$(kubectl get service gethue-docs -o jsonpath="{.spec.ports[*].nodePort}" --namespace {{ .Release.Namespace }})
 
-  echo http://$WEB_HOST:$WEB_PORT
+  echo http://$WEB_HOST:$WEBSITE_PORT
+  echo http://$WEB_HOST:$DOCS_PORT
 
 {{ end }}
 Happy Querying!
