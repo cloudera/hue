@@ -32,14 +32,11 @@ LOG = logging.getLogger(__name__)
 
 
 class TestAzureAdl(unittest.TestCase):
-  def setUp(self):
-    if not is_enabled('adl'):
-      raise SkipTest('adl not enabled')
-
 
   def test_with_credentials(self):
     try:
-      finish = conf.AZURE_ACCOUNTS.set_for_testing({'default': {'client_id':'client_id', 'client_secret': 'client_secret', 'tenant_id': 'tenant_id'}})
+      finish = (conf.AZURE_ACCOUNTS.set_for_testing({'default': {'client_id':'client_id', 'client_secret': 'client_secret', 'tenant_id': 'tenant_id'}}),
+                conf.ADLS_CLUSTERS.set_for_testing({'default': {'fs_defaultfs': 'fs_defaultfs', 'webhdfs_url': 'webhdfs_url'}}))
       with patch('azure.client.conf_idbroker.get_conf') as get_conf:
         with patch('azure.client.WebHdfs'):
           with patch('azure.client.ActiveDirectory.get_token') as get_token:
@@ -52,13 +49,15 @@ class TestAzureAdl(unittest.TestCase):
             assert_equal(provider.get_credentials().get('access_token'), 'access_token')
             assert_equal(client1, client2) # Should be the same as no support for user based client with credentials & no Expiration
     finally:
-      finish()
+      for f in finish:
+        f()
       clear_cache()
 
 
   def test_with_idbroker(self):
     try:
-      finish = conf.AZURE_ACCOUNTS.set_for_testing({}) # Set empty to test when no configs are set
+      finish = (conf.AZURE_ACCOUNTS.set_for_testing({}),
+                conf.ADLS_CLUSTERS.set_for_testing({'default': {'fs_defaultfs': 'fs_defaultfs', 'webhdfs_url': 'webhdfs_url'}}))
       with patch('azure.client.conf_idbroker.get_conf') as get_conf:
         with patch('azure.client.WebHdfs.get_client'):
           with patch('azure.client.IDBroker.get_cab') as get_cab:
@@ -81,19 +80,17 @@ class TestAzureAdl(unittest.TestCase):
             assert_equal(client3, client4) # Test that with 10 sec expiration, clients equal
             assert_not_equal(client4, client5) # Test different user have different clients
     finally:
-      finish()
+      for f in finish:
+        f()
       clear_cache()
 
 
 class TestAzureAbfs(unittest.TestCase):
-  def setUp(self):
-    if not is_enabled('abfs'):
-      raise SkipTest('abfs not enabled')
-
 
   def test_with_credentials(self):
     try:
-      finish = conf.AZURE_ACCOUNTS.set_for_testing({'default': {'client_id':'client_id', 'client_secret': 'client_secret', 'tenant_id': 'tenant_id'}})
+      finish = (conf.AZURE_ACCOUNTS.set_for_testing({'default': {'client_id':'client_id', 'client_secret': 'client_secret', 'tenant_id': 'tenant_id'}}),
+                conf.ABFS_CLUSTERS.set_for_testing({'default': {'fs_defaultfs': 'fs_defaultfs', 'webhdfs_url': 'webhdfs_url'}}))
       with patch('azure.client.conf_idbroker.get_conf') as get_conf:
         with patch('azure.client.ABFS'):
           with patch('azure.client.ActiveDirectory.get_token') as get_token:
@@ -106,13 +103,15 @@ class TestAzureAbfs(unittest.TestCase):
             assert_equal(provider.get_credentials().get('access_token'), 'access_token')
             assert_equal(client1, client2) # Should be the same as no support for user based client with credentials & no Expiration
     finally:
-      finish()
+      for f in finish:
+        f()
       clear_cache()
 
 
   def test_with_idbroker(self):
     try:
-      finish = conf.AZURE_ACCOUNTS.set_for_testing({}) # Set empty to test when no configs are set
+      finish = (conf.AZURE_ACCOUNTS.set_for_testing({}),
+                conf.ABFS_CLUSTERS.set_for_testing({'default': {'fs_defaultfs': 'fs_defaultfs', 'webhdfs_url': 'webhdfs_url'}}))
       with patch('azure.client.conf_idbroker.get_conf') as get_conf:
         with patch('azure.client.ABFS.get_client'):
           with patch('azure.client.IDBroker.get_cab') as get_cab:
@@ -135,5 +134,6 @@ class TestAzureAbfs(unittest.TestCase):
             assert_equal(client3, client4) # Test that with 10 sec expiration, clients equal
             assert_not_equal(client4, client5) # Test different user have different clients
     finally:
-      finish()
+      for f in finish:
+        f()
       clear_cache()
