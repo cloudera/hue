@@ -1006,6 +1006,7 @@ export default class Snippet {
       database: this.database,
       sourceType: this.type,
       namespace: this.namespace,
+      snippet: this,
       isSqlEngine: this.isSqlDialect
     });
 
@@ -1053,7 +1054,16 @@ export default class Snippet {
       if (executable.result) {
         this.currentQueryTab('queryResults');
       }
-    } else {
+      if (this.parentVm.editorMode() && executable.history) {
+        this.parentNotebook.id(executable.history.id);
+        this.parentNotebook.uuid(executable.history.uuid);
+        this.parentNotebook.isHistory(true);
+        this.parentNotebook.parentSavedQueryUuid(executable.history.parentId);
+        if (!this.parentVm.isNotificationManager()) {
+          const url = this.parentVm.URLS.editor + '?editor=' + executable.history.id;
+          this.parentVm.changeURL(url);
+        }
+      }
     }
   }
 

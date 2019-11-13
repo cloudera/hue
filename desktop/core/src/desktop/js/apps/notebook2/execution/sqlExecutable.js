@@ -37,10 +37,9 @@ export default class SqlExecutable extends Executable {
     return this.statement || this.parsedStatement.statement;
   }
 
-  async internalExecute(session) {
+  async internalExecute() {
     return await apiHelper.executeStatement({
       executable: this,
-      session: session,
       silenceErrors: true
     });
   }

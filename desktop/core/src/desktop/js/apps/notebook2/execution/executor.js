@@ -29,6 +29,7 @@ class Executor {
    * @param {ContextNamespace} options.namespace
    * @param {string} options.statement
    * @param {string} [options.database]
+   * @param {Snippet} [options.snippet] - Optional snippet for history
    */
   constructor(options) {
     this.sourceType = options.sourceType;
@@ -37,6 +38,8 @@ class Executor {
     this.database = options.database;
     this.isSqlEngine = options.isSqlEngine;
     this.executables = [];
+
+    this.snippet = options.snippet;
   }
 
   getExecutables(statementDetails) {

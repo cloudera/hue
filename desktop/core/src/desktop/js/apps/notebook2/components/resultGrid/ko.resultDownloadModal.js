@@ -17,7 +17,6 @@
 import $ from 'jquery';
 import ko from 'knockout';
 
-import { ApiHelper } from 'api/apiHelper';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';

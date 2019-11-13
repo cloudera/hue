@@ -20,6 +20,7 @@ import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 import ExecutionLogs from 'apps/notebook2/execution/executionLogs';
+import hueUtils, { UUID } from 'utils/hueUtils';
 
 /**
  *
@@ -56,6 +57,7 @@ export default class Executable {
     this.handle = {
       statement_id: 0 // TODO: Get rid of need for initial handle in the backend
     };
+    this.history = undefined;
     this.status = EXECUTION_STATUS.ready;
     this.progress = 0;
     this.result = undefined;
@@ -164,10 +166,11 @@ export default class Executable {
     this.setProgress(0);
 
     try {
-      const session = await sessionManager.getSession({ type: this.executor.sourceType() });
       hueAnalytics.log('notebook', 'execute/' + this.executor.sourceType());
       try {
-        this.handle = await this.internalExecute(session);
+        const response = await this.internalExecute();
+        this.handle = response.handle;
+        this.history = response.history;
       } catch (err) {
         const match = ERROR_REGEX.exec(err);
         if (match) {
@@ -273,7 +276,7 @@ export default class Executable {
     this.cancellables.push(cancellable);
   }
 
-  async internalExecute(session) {
+  async internalExecute() {
     throw new Error('Implement in subclass!');
   }
 
@@ -344,5 +347,46 @@ export default class Executable {
       console.warn('Failed closing statement');
     }
     this.setStatus(EXECUTION_STATUS.closed);
+  }
+
+  async toContext(id) {
+    if (this.executor.snippet) {
+      return {
+        snippet: this.executor.snippet.toContextJson(),
+        notebook: await this.executor.snippet.parentNotebook.toContextJson()
+      };
+    }
+    const session = await sessionManager.getSession({ type: this.executor.sourceType() });
+    const statement = this.getStatement();
+    const snippet = {
+      type: this.executor.sourceType(),
+      result: {
+        handle: this.handle
+      },
+      status: this.status,
+      id: id || UUID(),
+      statement_raw: statement,
+      statement: statement,
+      variables: [],
+      compute: this.executor.compute(),
+      namespace: this.executor.namespace(),
+      database: this.database,
+      properties: { settings: [] }
+    };
+
+    const notebook = {
+      type: this.executor.sourceType(),
+      snippets: [snippet],
+      id: this.notebookId,
+      uuid: hueUtils.UUID(),
+      name: '',
+      isSaved: false,
+      sessions: [session]
+    };
+
+    return {
+      snippet: JSON.stringify(snippet),
+      notebook: JSON.stringify(notebook)
+    };
   }
 }
