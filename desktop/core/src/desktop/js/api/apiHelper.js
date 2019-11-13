@@ -2030,47 +2030,6 @@ class ApiHelper {
   }
 
   /**
-   *
-   * @param {Executable} executable
-   * @param {Session} [session]
-   *
-   * @return {{snippet: string, notebook: string}}
-   */
-  static adaptExecutableToNotebook(executable, session) {
-    const statement = executable.getStatement();
-    const snippet = {
-      type: executable.executor.sourceType(),
-      result: {
-        handle: executable.handle
-      },
-      status: executable.status,
-      id: executable.snippetId || hueUtils.UUID(),
-      statement_raw: statement,
-      statement: statement,
-      variables: [],
-      compute: executable.executor.compute(),
-      namespace: executable.executor.namespace(),
-      database: executable.database,
-      properties: { settings: [] }
-    };
-
-    const notebook = {
-      type: executable.executor.sourceType(),
-      snippets: [snippet],
-      id: executable.notebookId,
-      uuid: hueUtils.UUID(),
-      name: '',
-      isSaved: false,
-      sessions: session ? [session] : []
-    };
-
-    return {
-      snippet: JSON.stringify(snippet),
-      notebook: JSON.stringify(notebook)
-    };
-  }
-
-  /**
    * @typedef {Object} ExecutionHandle
    * @property {string} guid
    * @property {boolean} has_more_statements
@@ -2096,22 +2055,38 @@ class ApiHelper {
    *
    * @return {Promise<ExecutionHandle>}
    */
-  executeStatement(options) {
+  async executeStatement(options) {
     const executable = options.executable;
     const url = EXECUTE_API_PREFIX + executable.executor.sourceType();
 
-    const promise = new Promise((resolve, reject) => {
-      this.simplePost(
-        url,
-        ApiHelper.adaptExecutableToNotebook(executable, options.session),
-        options
-      )
+    const promise = new Promise(async (resolve, reject) => {
+      let data = {};
+      if (executable.executor.snippet) {
+        data = {
+          notebook: await executable.executor.snippet.parentNotebook.toJson(),
+          snippet: executable.executor.snippet.toContextJson()
+        };
+      } else {
+        data = await executable.toContext();
+      }
+
+      this.simplePost(url, data, options)
         .done(response => {
+          const executeResponse = {};
           if (response.handle) {
-            resolve(response.handle);
+            executeResponse.handle = response.handle;
           } else {
             reject('No handle in execute response');
+            return;
           }
+          if (response.history_id) {
+            executeResponse.history = {
+              id: response.history_id,
+              uuid: response.history_uuid,
+              parentUuid: response.history_parent_uuid
+            };
+          }
+          resolve(executeResponse);
         })
         .fail(reject);
     });
@@ -2163,24 +2138,32 @@ class ApiHelper {
   checkExecutionStatus(options) {
     const deferred = $.Deferred();
 
-    const request = $.post({
-      url: '/notebook/api/check_status',
-      data: ApiHelper.adaptExecutableToNotebook(options.executable)
-    })
-      .done(response => {
-        if (response && response.query_status) {
-          deferred.resolve(response.query_status.status);
-        } else if (response && response.status === -3) {
-          deferred.resolve(EXECUTION_STATUS.expired);
-        } else {
-          deferred.resolve(EXECUTION_STATUS.failed);
-        }
-      })
-      .fail(err => {
-        deferred.reject(this.assistErrorCallback(options)(err));
-      });
+    const result = new CancellablePromise(deferred);
 
-    return new CancellablePromise(deferred, request);
+    options.executable
+      .toContext()
+      .then(notebookApiContext => {
+        const request = $.post({
+          url: '/notebook/api/check_status',
+          data: notebookApiContext
+        })
+          .done(response => {
+            if (response && response.query_status) {
+              deferred.resolve(response.query_status.status);
+            } else if (response && response.status === -3) {
+              deferred.resolve(EXECUTION_STATUS.expired);
+            } else {
+              deferred.resolve(EXECUTION_STATUS.failed);
+            }
+          })
+          .fail(err => {
+            deferred.reject(this.assistErrorCallback(options)(err));
+          });
+        result.request = request;
+      })
+      .catch(deferred.reject);
+
+    return result;
   }
 
   /**
@@ -2195,8 +2178,8 @@ class ApiHelper {
    * @return {Promise<?>}
    */
   fetchLogs(options) {
-    return new Promise((resolve, reject) => {
-      const data = ApiHelper.adaptExecutableToNotebook(options.executable);
+    return new Promise(async (resolve, reject) => {
+      const data = options.executable.toContext();
       data.full_log = options.fullLog;
       data.jobs = options.jobs && JSON.stringify(options.jobs);
       data.from = options.from || 0;
@@ -2226,12 +2209,12 @@ class ApiHelper {
    *
    * @return {Promise}
    */
-  cancelStatement(options) {
-    return this.simplePost(
-      '/notebook/api/cancel_statement',
-      ApiHelper.adaptExecutableToNotebook(options.executable),
-      options
-    );
+  async cancelStatement(options) {
+    return new Promise(async (resolve, reject) => {
+      this.simplePost('/notebook/api/cancel_statement', options.executable.toContext(), options)
+        .done(resolve)
+        .fail(reject);
+    });
   }
 
   /**
@@ -2261,8 +2244,8 @@ class ApiHelper {
    * @return {Promise<ResultResponse>}
    */
   async fetchResults(options) {
-    return new Promise((resolve, reject) => {
-      const data = ApiHelper.adaptExecutableToNotebook(options.executable);
+    return new Promise(async (resolve, reject) => {
+      const data = await options.executable.toContext();
       data.rows = options.rows;
       data.startOver = !!options.startOver;
 
@@ -2298,10 +2281,10 @@ class ApiHelper {
    * @return {Promise<ResultResponse>}
    */
   async fetchResultSize2(options) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       const request = this.simplePost(
         '/notebook/api/fetch_result_size',
-        ApiHelper.adaptExecutableToNotebook(options.executable),
+        await options.executable.toContext(),
         options
       )
         .done(response => {
@@ -2326,12 +2309,10 @@ class ApiHelper {
    * @return {Promise}
    */
   async closeStatement(options) {
-    const executable = options.executable;
-
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       this.simplePost(
         '/notebook/api/close_statement',
-        ApiHelper.adaptExecutableToNotebook(executable),
+        await options.executable.toContext(),
         options
       )
         .done(resolve)
