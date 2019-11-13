@@ -342,16 +342,12 @@ describe('ksqlAutocompleteParser.js', () => {
           right: 0
         });
 
-        expect(ksqlAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo', '')).toEqual(
-          {
-            left: 6,
-            right: 0
-          }
-        );
+        expect(ksqlAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo', '')).toEqual({
+          left: 6,
+          right: 0
+        });
 
-        expect(
-          ksqlAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo ', '')
-        ).toEqual({
+        expect(ksqlAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo ', '')).toEqual({
           left: 0,
           right: 0
         });
