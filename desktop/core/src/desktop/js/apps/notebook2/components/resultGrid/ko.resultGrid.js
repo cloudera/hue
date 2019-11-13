@@ -53,6 +53,7 @@ const TEMPLATE = `
   <!-- ko component: {
     name: 'result-download-actions',
     params: {
+      activeExecutable: activeExecutable,
       meta: meta,
       data: data
     }

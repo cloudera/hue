@@ -20,7 +20,9 @@ import ko from 'knockout';
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
 import I18n from 'utils/i18n';
+import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
+import { SHOW_DOWNLOAD_RESULT_MODAL_EVENT } from 'apps/notebook2/components/resultGrid/ko.resultDownloadModal';
 
 export const NAME = 'result-download-actions';
 
@@ -38,7 +40,7 @@ const TEMPLATE = `
     <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
-    <li style="display: none;">
+    <li>
       <a href="javascript:void(0)" data-bind="
           click: downloadCsv,
           event: { mouseover: mouseOver, mouseout: mouseOut },
@@ -91,6 +93,7 @@ class ResultDownloadActions extends DisposableComponent {
   constructor(params) {
     super();
 
+    this.activeExecutable = params.activeExecutable;
     this.data = params.data;
     this.meta = params.meta;
 
@@ -158,9 +161,19 @@ class ResultDownloadActions extends DisposableComponent {
     $('.clipboard-content').empty();
   }
 
-  downloadCsv() {}
+  downloadCsv() {
+    huePubSub.publish(SHOW_DOWNLOAD_RESULT_MODAL_EVENT, {
+      format: 'csv',
+      executable: this.activeExecutable()
+    });
+  }
 
-  downloadXls() {}
+  downloadXls() {
+    huePubSub.publish(SHOW_DOWNLOAD_RESULT_MODAL_EVENT, {
+      format: 'xls',
+      executable: this.activeExecutable()
+    });
+  }
 
   exportToDashboard() {
     // saveTarget('dashboard');
