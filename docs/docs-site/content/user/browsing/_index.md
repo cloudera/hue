@@ -344,42 +344,37 @@ The File Browser application lets you interact with these file systems HDFS, S3 
 -   View and edit files as text or binary.
 -   Create external tables or export query results
 
-**Exploring ADLS in Hue’s file browser**
+**Exploring in File Browser**
 
-Once Hue is successfully configured to connect to ADLS, we can view all accessible folders within the account by clicking on the ADLS root. From here, we can view the existing keys (both directories and files) and create, rename, move, copy, or delete existing directories and files. Additionally, we can directly upload files to ADLS.
+Once Hue is successfully [configured to connect](/administrator/configuration/connectors/#storage) to the storage, we can view all accessible folders within the account by clicking on the storage root. From here, we can view the existing keys (both directories and files) and create, rename, move, copy, or delete existing directories and files. Additionally, we can directly upload files to the storage.
 
 ![Browse files](https://cdn.gethue.com/uploads/2016/08/image2.png)
 
-**Create Hive Tables Directly From ADLS**
+**Creating SQL Tables**
 
-Hue’s table browser import wizard can create external Hive tables directly from files in ADLS. This allows ADLS data to be queried via SQL from Hive or Impala, without moving or copying the data into HDFS or the Hive Warehouse. To create an external Hive table from ADLS, navigate to the table browser, select the desired database and then click the plus icon in the upper right. Select a file using the file picker and browse to a file on ADLS.
+Hue’s table browser import wizard can create external Hive tables directly from files in the storage. This allows the data to be queried via SQL, without moving or copying the data into HDFS or the Hive Warehouse. To create an external table from the storage, navigate to the table browser, select the desired database and then click the plus icon in the upper right. Select a file using the file picker and browse to a file on the storage.
 
-Choose your input files’ delimiter and press next. Keep unchecked “Store in Default location” if you want the file to stay intact on ADLS, update the column definition options and finally click “Submit” when you’re ready to create the Hive table. Once created, you should see the newly created table details in the table browser.
+Choose your input files’ delimiter and press next. Keep unchecked “Store in Default location” if you want the file to stay intact on the storage, update the column definition options and finally click “Submit” when you’re ready to create the table. Once created, you should see the newly created table details in the table browser.
 
 ![Create tables from external files](https://cdn.gethue.com/uploads/2017/11/image4-1.png)
 
-**Save Query Results to ADLS**
+**Saving Query Results**
 
-Now that we have created external Hive tables created from our ADLS data, we can jump into either the Hive or Impala editor and start querying the data directly from ADLS seamlessly. These queries can join tables and objects that are backed either by ADLS, HDFS, or both. Query results can then easily be saved back to ADLS.
+Now that we have created external Hive tables created from our data, we can jump into either the Hive or Impala editor and start querying the data directly from the storage seamlessly. These queries can join tables. Query results can then easily be saved back to the storage.
 
 ![Save results to storage](https://cdn.gethue.com/uploads/2017/11/image1-1.png)
-
 
 ### HDFS
 
 Hue is fully compatible with HDFS and is handy for browsing, peeking at file content, upload or downloading data.
 
-### S3
+### AWS S3
 
 Hue can be setup to read and write to a configured S3 account, and users get autocomplete capabilities and can directly query from and save data to S3 without any intermediate moving/copying to HDFS.
 
-[Read more about it](http://gethue.com/introducing-s3-support-in-hue/).
+### Azure
 
-### ADLS / ABFS
-
-Learn more about it on the [ADLS integration post](http://gethue.com/browsing-adls-data-querying-it-with-sql-and-exporting-the-results-back-in-hue-4-2/).
-
-**Note** ADLS v2 / ABFS is currently a work in progress [HUE-8908](https://issues.cloudera.org/browse/HUE-8908)
+ADLS v1 as well as ABFS (ADLS v2) are supported.
 
 ### GCS
 
@@ -392,7 +387,6 @@ Google Cloud Storage is currently a work in progress [HUE-8978](https://issues.c
 Topics, Streams can be listed via the [`ksql` connector](/administrator/configuration/connectors/#ksql).
 
 ### HBase
-
 
 #### Smart View
 
