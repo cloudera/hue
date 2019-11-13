@@ -92,6 +92,10 @@ export default class ExecutionResult {
       startOver: options && options.startOver
     });
 
+    this.handleResultResponse(resultResponse);
+  }
+
+  handleResultResponse(resultResponse) {
     const initialIndex = this.rows.length;
     resultResponse.data.forEach((row, index) => {
       row.unshift(initialIndex + index + 1);

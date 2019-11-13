@@ -195,6 +195,9 @@ export default class Executable {
       if (this.handle.has_result_set && this.handle.sync) {
         this.result = new ExecutionResult(this);
         if (this.handle.sync) {
+          if (this.handle.result) {
+            this.result.handleResultResponse(this.handle.result);
+          }
           this.result.fetchRows();
         }
       }
