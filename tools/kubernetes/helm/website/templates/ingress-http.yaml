@@ -11,6 +11,7 @@ metadata:
     nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
 spec:
   rules:
+  {{- if .Values.docs.enabled -}}
   - host: {{ .Values.docs.domain }}
     http:
       paths:
@@ -18,6 +19,8 @@ spec:
           serviceName: gethue-docs
           servicePort: 80
         path: /
+  {{- end -}}
+  {{- if .Values.website.enabled -}}
   - host: {{ .Values.website.domain }}
     http:
       paths:
@@ -25,4 +28,5 @@ spec:
           serviceName: gethue-website
           servicePort: 80
         path: /
+  {{- end -}}
 {{- end -}}

@@ -1,3 +1,4 @@
+{{- if .Values.website.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -27,3 +28,4 @@ spec:
           initialDelaySeconds: 3
           periodSeconds: 60
           failureThreshold: 30
+{{- end -}}
