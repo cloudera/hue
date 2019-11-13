@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: gethue-website
-        image: {{ .Values.image.registry }}/website:{{ .Values.image.tag }}
+        image: {{ .Values.image.registry }}/website:latest
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
           - containerPort: 80
