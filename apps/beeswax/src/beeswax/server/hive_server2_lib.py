@@ -1123,7 +1123,8 @@ class HiveServerTableCompatible(HiveServerTable):
     self.describe = HiveServerTTableSchema(self.desc_results, self.desc_schema).cols()
     self._details = None
     try:
-      self.is_impala_only = 'org.apache.kudu.mapreduce.KuduTableOutputFormat' in str(hive_table.properties)
+      self.is_impala_only = 'org.apache.hadoop.hive.kudu.KuduSerDe' in str(hive_table.properties) or \
+        'org.apache.kudu.mapreduce.KuduTableOutputFormat' in str(hive_table.properties) # Deprecated since CDP
     except Exception as e:
       LOG.warn('Autocomplete data fetching error: %s' % e)
       self.is_impala_only = False
