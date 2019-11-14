@@ -323,7 +323,7 @@ def get_api(request, snippet):
   if snippet.get('wasBatchExecuted') and not TASK_SERVER.ENABLED.get():
     return OozieApi(user=request.user, request=request)
 
-  if snippet['type'] == 'report':
+  if snippet.get('type') == 'report':
     snippet['type'] = 'impala'
 
   interpreter = get_interpreter(connector_type=snippet['type'], user=request.user)

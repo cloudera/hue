@@ -22,7 +22,6 @@ import apiHelper from 'api/apiHelper';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
-import I18n from 'utils/i18n';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 
 import Snippet, { STATUS as SNIPPET_STATUS } from 'apps/notebook2/snippet';
@@ -32,7 +31,7 @@ export default class Notebook {
     this.parentVm = vm;
     this.id = ko.observable(notebook.id);
     this.uuid = ko.observable(notebook.uuid || hueUtils.UUID());
-    this.name = ko.observable(notebook.name || I18n('My Notebook'));
+    this.name = ko.observable(notebook.name || '');
     this.description = ko.observable(notebook.description || '');
     this.type = ko.observable(notebook.type || 'notebook');
     this.initialType = this.type().replace('query-', '');
