@@ -122,23 +122,26 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
 
       cols_extended = massage_columns_for_json(table.cols)
 
-      if table.is_impala_only:
-        if db.client.query_server['server_name'] != 'impala': # Expand Kudu columns information
+      if table.is_impala_only: # Expand Kudu table information
+        if db.client.query_server['server_name'] != 'impala':
           query_server = get_query_server_config('impala', connector=cluster)
           db = dbms.get(db.client.user, query_server, cluster=cluster)
 
-        col_options = db.get_table_describe(database, table.name)
+        col_options = db.get_table_describe(database, table.name) # Expand columns information
         extra_col_options = dict([(col[0], dict(list(zip(col_options.cols(), col)))) for col in col_options.rows()])
-
         for col_props in cols_extended:
           col_props.update(extra_col_options.get(col_props['name'], {}))
+
+        primary_keys = [col['name'] for col in extra_col_options.values() if col.get('primary_key') == 'true'] # Until IMPALA-8291
+      else:
+        primary_keys = [pk.name for pk in table.primary_keys]
 
       response['support_updates'] = table.is_impala_only
       response['columns'] = [column.name for column in table.cols]
       response['extended_columns'] = cols_extended
       response['is_view'] = table.is_view
       response['partition_keys'] = [{'name': part.name, 'type': part.type} for part in table.partition_keys]
-      response['primary_keys'] = [{'name': pk.name} for pk in table.primary_keys]
+      response['primary_keys'] = [{'name': pk} for pk in primary_keys]
     else:
       col = db.get_column(database, table, column)
       if col:
