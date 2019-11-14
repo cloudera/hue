@@ -150,6 +150,8 @@ def _execute_notebook(request, notebook, snippet):
       if historify:
         _snippet = [s for s in notebook['snippets'] if s['id'] == snippet['id']][0]
         if 'handle' in response: # No failure
+          if 'result' not in _snippet: # Editor v2
+            _snippet['result'] = {}
           _snippet['result']['handle'] = response['handle']
           _snippet['result']['statements_count'] = response['handle'].get('statements_count', 1)
           _snippet['result']['statement_id'] = response['handle'].get('statement_id', 0)
@@ -210,12 +212,13 @@ def execute(request, engine=None):
 def check_status(request):
   response = {'status': -1}
 
+  operation_id = request.POST.get('operationId')
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  if not snippet:
-    nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['id'])
-    notebook = Notebook(document=nb_doc).get_data()
+  if operation_id or not snippet: # To unify with _get_snippet
+    nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=operation_id or notebook['id'])
+    notebook = Notebook(document=nb_doc).get_data() # Used below
     snippet = notebook['snippets'][0]
 
   try:
@@ -260,10 +263,14 @@ def check_status(request):
 def fetch_result_data(request):
   response = {'status': -1}
 
+  operation_id = request.POST.get('operationId')
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
+
   rows = json.loads(request.POST.get('rows', '100'))
   start_over = json.loads(request.POST.get('startOver', 'false'))
+
+  snippet = _get_snippet(request.user, notebook, snippet, operation_id)
 
   with opentracing.tracer.start_span('notebook-fetch_result_data') as span:
     response['result'] = get_api(request, snippet).fetch_result(notebook, snippet, rows, start_over)
@@ -290,8 +297,11 @@ def fetch_result_data(request):
 def fetch_result_metadata(request):
   response = {'status': -1}
 
+  operation_id = request.POST.get('operationId')
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
+
+  snippet = _get_snippet(request.user, notebook, snippet, operation_id)
 
   with opentracing.tracer.start_span('notebook-fetch_result_metadata') as span:
     response['result'] = get_api(request, snippet).fetch_result_metadata(notebook, snippet)
@@ -313,8 +323,11 @@ def fetch_result_metadata(request):
 def fetch_result_size(request):
   response = {'status': -1}
 
+  operation_id = request.POST.get('operationId')
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
+
+  snippet = _get_snippet(request.user, notebook, snippet, operation_id)
 
   with opentracing.tracer.start_span('notebook-fetch_result_size') as span:
     response['result'] = get_api(request, snippet).fetch_result_size(notebook, snippet)
@@ -337,9 +350,10 @@ def cancel_statement(request):
   response = {'status': -1}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
-  nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['uuid'])
-  notebook = Notebook(document=nb_doc).get_data()
-  snippet = notebook['snippets'][0]
+  snippet = None
+  operation_id = request.POST.get('operationId') or notebook['uuid']
+
+  snippet = _get_snippet(request.user, notebook, snippet, operation_id)
 
   with opentracing.tracer.start_span('notebook-cancel_statement') as span:
     response['result'] = get_api(request, snippet).cancel(notebook, snippet)
@@ -361,13 +375,17 @@ def cancel_statement(request):
 def get_logs(request):
   response = {'status': -1}
 
+  operation_id = request.POST.get('operationId')
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
+
   startFrom = request.POST.get('from')
   startFrom = int(startFrom) if startFrom else None
   size = request.POST.get('size')
   size = int(size) if size else None
   full_log = smart_str(request.POST.get('full_log', ''))
+
+  snippet = _get_snippet(request.user, notebook, snippet, operation_id)
 
   db = get_api(request, snippet)
 
@@ -616,11 +634,11 @@ def close_notebook(request):
 def close_statement(request):
   response = {'status': -1}
 
-  # Passed by check_document_access_permission but unused by APIs
   notebook = json.loads(request.POST.get('notebook', '{}'))
-  nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['uuid'])
-  notebook = Notebook(document=nb_doc).get_data()
-  snippet = notebook['snippets'][0]
+  snippet = None
+  operation_id = request.POST.get('operationId') or notebook['uuid']
+
+  snippet = _get_snippet(request.user, notebook, snippet, operation_id)
 
   try:
     with opentracing.tracer.start_span('notebook-close_statement') as span:
@@ -919,3 +937,11 @@ def describe(request, database, table=None, column=None):
   response.update(describe)
 
   return JsonResponse(response)
+
+
+def _get_snippet(user, notebook, snippet, operation_id):
+  if operation_id or not snippet:
+    nb_doc = Document2.objects.get_by_uuid(user=user, uuid=operation_id or notebook['uuid'])
+    notebook = Notebook(document=nb_doc).get_data()
+    snippet = notebook['snippets'][0]
+  return snippet

@@ -57,6 +57,7 @@ export default class Executable {
     this.handle = {
       statement_id: 0 // TODO: Get rid of need for initial handle in the backend
     };
+    this.operationId = undefined;
     this.history = undefined;
     this.status = EXECUTION_STATUS.ready;
     this.progress = 0;
@@ -171,6 +172,7 @@ export default class Executable {
         const response = await this.internalExecute();
         this.handle = response.handle;
         this.history = response.history;
+        this.operationId = response.history.uuid;
       } catch (err) {
         const match = ERROR_REGEX.exec(err);
         if (match) {
@@ -352,10 +354,12 @@ export default class Executable {
   async toContext(id) {
     if (this.executor.snippet) {
       return {
+        operationId: id || this.operationId,
         snippet: this.executor.snippet.toContextJson(),
         notebook: await this.executor.snippet.parentNotebook.toContextJson()
       };
     }
+
     const session = await sessionManager.getSession({ type: this.executor.sourceType() });
     const statement = this.getStatement();
     const snippet = {
@@ -385,6 +389,7 @@ export default class Executable {
     };
 
     return {
+      operationId: id,
       snippet: JSON.stringify(snippet),
       notebook: JSON.stringify(notebook)
     };
