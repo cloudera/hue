@@ -16,12 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import json
 import logging
-import os
-import time
-import uuid
 
 from django.utils.translation import ugettext as _
 
@@ -31,8 +26,6 @@ from metadata.optimizer.base import Api, _get_table_name
 
 
 LOG = logging.getLogger(__name__)
-
-_JSON_CONTENT_TYPE = 'application/json'
 
 
 class DummyClient(Api):
