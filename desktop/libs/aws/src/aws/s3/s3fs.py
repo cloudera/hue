@@ -353,7 +353,7 @@ class S3FileSystem(object):
   def filebrowser_action(self):
     return self._filebrowser_action
 
-  def create_home_dir(self, path):
+  def create_home_dir(self, home_path):
     LOG.info('Create home directory is not available for S3 filesystem')
 
   @translate_s3_error
