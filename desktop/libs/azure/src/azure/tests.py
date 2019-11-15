@@ -33,6 +33,28 @@ LOG = logging.getLogger(__name__)
 
 class TestAzureAdl(unittest.TestCase):
 
+  def test_with_core_site(self):
+    try:
+      finish = (conf.AZURE_ACCOUNTS.set_for_testing({'default': {}}),
+                conf.ADLS_CLUSTERS.set_for_testing({'default': {'fs_defaultfs': 'fs_defaultfs', 'webhdfs_url': 'webhdfs_url'}}))
+      with patch('azure.client.conf_idbroker.get_conf') as get_conf:
+        with patch('azure.client.WebHdfs'):
+          with patch('azure.client.ActiveDirectory.get_token') as get_token:
+            with patch('azure.conf.core_site.get_conf') as core_site_get_conf:
+              get_token.return_value = {'access_token': 'access_token', 'token_type': '', 'expires_on': None}
+              get_conf.return_value = {}
+              core_site_get_conf.return_value = {'dfs.adls.oauth2.client.id': 'client_id', 'dfs.adls.oauth2.credential': 'client_secret', 'dfs.adls.oauth2.refresh.url': 'refresh_url'}
+              client1 = get_client(name='default', fs='adl')
+              client2 = get_client(name='default', fs='adl', user='test')
+
+              provider = get_credential_provider('default', 'hue')
+              assert_equal(provider.get_credentials().get('access_token'), 'access_token')
+              assert_equal(client1, client2) # Should be the same as no support for user based client with credentials & no Expiration
+    finally:
+      for f in finish:
+        f()
+      clear_cache()
+
   def test_with_credentials(self):
     try:
       finish = (conf.AZURE_ACCOUNTS.set_for_testing({'default': {'client_id':'client_id', 'client_secret': 'client_secret', 'tenant_id': 'tenant_id'}}),
@@ -86,6 +108,28 @@ class TestAzureAdl(unittest.TestCase):
 
 
 class TestAzureAbfs(unittest.TestCase):
+
+  def test_with_core_site(self):
+    try:
+      finish = (conf.AZURE_ACCOUNTS.set_for_testing({'default': {}}),
+                conf.ABFS_CLUSTERS.set_for_testing({'default': {'fs_defaultfs': 'fs_defaultfs', 'webhdfs_url': 'webhdfs_url'}}))
+      with patch('azure.client.conf_idbroker.get_conf') as get_conf:
+        with patch('azure.client.ABFS'):
+          with patch('azure.client.ActiveDirectory.get_token') as get_token:
+            with patch('azure.conf.core_site.get_conf') as core_site_get_conf:
+              get_token.return_value = {'access_token': 'access_token', 'token_type': '', 'expires_on': None}
+              get_conf.return_value = {}
+              core_site_get_conf.return_value = {'fs.azure.account.oauth2.client.id': 'client_id', 'fs.azure.account.oauth2.client.secret': 'client_secret', 'fs.azure.account.oauth2.client.endpoint': 'refresh_url'}
+              client1 = get_client(name='default', fs='abfs')
+              client2 = get_client(name='default', fs='abfs', user='test')
+
+              provider = get_credential_provider('default', 'hue')
+              assert_equal(provider.get_credentials().get('access_token'), 'access_token')
+              assert_equal(client1, client2) # Should be the same as no support for user based client with credentials & no Expiration
+    finally:
+      for f in finish:
+        f()
+      clear_cache()
 
   def test_with_credentials(self):
     try:

@@ -18,11 +18,11 @@ from __future__ import absolute_import
 import logging
 
 from django.utils.translation import ugettext_lazy as _, ugettext as _t
-from hadoop.core_site import get_adls_client_id, get_adls_authentication_code, get_adls_refresh_url
 
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_password_from_script
 from desktop.lib.idbroker import conf as conf_idbroker
 
+from hadoop import core_site
 
 LOG = logging.getLogger(__name__)
 
@@ -30,32 +30,31 @@ PERMISSION_ACTION_ABFS = "abfs_access"
 PERMISSION_ACTION_ADLS = "adls_access"
 REFRESH_URL = 'https://login.microsoftonline.com/<tenant_id>/oauth2/<version>token'
 
-
 def get_default_client_id():
   """
   Attempt to set AWS client id from script, else core-site, else None
   """
   client_id_script = AZURE_ACCOUNTS['default'].CLIENT_ID_SCRIPT.get()
-  return client_id_script or get_adls_client_id()
+  return client_id_script or core_site.get_adls_client_id() or core_site.get_azure_client_id()
 
 def get_default_secret_key():
   """
   Attempt to set AWS secret key from script, else core-site, else None
   """
   client_secret_script = AZURE_ACCOUNTS['default'].CLIENT_SECRET_SCRIPT.get()
-  return client_secret_script or get_adls_authentication_code()
+  return client_secret_script or core_site.get_adls_authentication_code() or core_site.get_azure_client_secret()
 
 def get_default_tenant_id():
   """
   Attempt to set AWS tenant id from script, else core-site, else None
   """
-  tenant_id_script = AZURE_ACCOUNTS['default'].TENANT_ID_SCRIPT.get()
-  return tenant_id_script or get_adls_refresh_url()
+  return AZURE_ACCOUNTS['default'].TENANT_ID_SCRIPT.get()
 
-def get_default_refresh_url(version):
-  refresh_url = REFRESH_URL.replace('<tenant_id>', AZURE_ACCOUNTS['default'].TENANT_ID.get()).replace('<version>', version + '/' if version else '')
-  refresh_url = refresh_url if refresh_url else get_adls_refresh_url()
-  return refresh_url or get_adls_refresh_url()
+def get_refresh_url(conf, version):
+  refresh_url = core_site.get_adls_refresh_url() or core_site.get_azure_client_endpoint()
+  if not refresh_url:
+    refresh_url = REFRESH_URL.replace('<tenant_id>', conf.TENANT_ID.get()).replace('<version>', version + '/' if version else '')
+  return refresh_url
 
 def get_default_region():
   return ""
