@@ -752,7 +752,7 @@ class HiveServerClient(object):
         session_guid = snippet_data.get('result', {}).get('handle', {}).get('session_guid')
         status = snippet_data.get('status')
 
-        if status in [str(QueryHistory.STATE.submitted), str(QueryHistory.STATE.running)]:
+        if status in [QueryHistory.STATE.submitted.name, QueryHistory.STATE.running.name]:
           if session_guid is not None and session_guid not in busy_sessions:
             busy_sessions.add(session_guid)
 
