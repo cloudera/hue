@@ -80,3 +80,19 @@ class Api(object):
     self.user = user
 
   # To implement
+
+
+def _get_table_name(path):
+  column = None
+
+  if path.count('.') == 1:
+    database, table = path.split('.', 1)
+  elif path.count('.') == 2:
+    database, table, column = path.split('.', 2)
+  else:
+    database, table = 'default', path
+
+  name = {'database': database, 'table': table}
+  if column:
+    name['column'] = column
+  return name

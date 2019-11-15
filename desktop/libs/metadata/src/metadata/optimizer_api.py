@@ -124,14 +124,11 @@ def top_tables(request):
 
 
   tables = [{
-      'eid': table['eid'],
       'database': _get_table_name(table['name'])['database'],
       'name': _get_table_name(table['name'])['table'],
       'popularity': table['workloadPercent'],
       'column_count': table['columnCount'],
-      'patternCount': table['patternCount'],
       'total': table['total'],
-      'is_fact': table['type'] != 'Dimension'
     } for table in data['results']
   ]
 
