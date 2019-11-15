@@ -314,7 +314,7 @@ class ABFS(object):
       self._writedata(path, data, len(data))
 
   def create_home_dir(self, home_path=None):
-    raise NotImplementedError("File System not named")
+    LOG.info('Create home directory is not available for Azure filesystem')
 
   def _create_path(self,path, params=None, headers=None, overwrite=False):
     """
@@ -541,7 +541,7 @@ class ABFS(object):
     """
     local_src = local_src.endswith('/') and local_src[:-1] or local_src
     remote_dst = remote_dst.endswith('/') and remote_dst[:-1] or remote_dst
-    
+
     if os.path.isdir(local_src):
       self._local_copy_dir(local_src,remote_dst)
     else:
