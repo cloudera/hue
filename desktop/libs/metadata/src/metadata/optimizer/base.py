@@ -27,6 +27,9 @@ def get_api(request, interface):
   if interface == 'optimizer':
     from metadata.optimizer.optimizer_client import OptimizerClient
     return OptimizerClient(request.user)
+  elif interface == 'optimizer_rest':
+    from metadata.optimizer.optimizer_rest_client import OptimizerRestClient
+    return OptimizerRestClient(request.user)
   elif interface == 'dummy':
     from metadata.optimizer.dummy_client import DummyClient
     return DummyClient(user=request.user)
