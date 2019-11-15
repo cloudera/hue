@@ -173,7 +173,7 @@ class OptimizerClient(object):
       }
       parameters.update(extra_parameters)
       response = self._api.call_api('upload', parameters)
-      status = json.loads(response)
+      status = json.loads(response) # Workaround getting back a string
 
       status['count'] = len(data)
       return status
@@ -190,16 +190,39 @@ class OptimizerClient(object):
   # Sentry permissions work bottom to top.
   # @check_privileges
   def top_tables(self, workfloadId=None, database_name='default', page_size=1000, startingToken=None):
-    return self._call('getTopTables', {'tenant' : self._tenant_id, 'dbName': database_name.lower(), 'pageSize': page_size, 'startingToken': startingToken})
+    return self._call(
+      'getTopTables', {
+        'tenant' : self._tenant_id,
+        'dbName': database_name.lower(),
+        'pageSize': page_size,
+        'startingToken': startingToken
+      }
+    )
 
 
   @check_privileges
   def table_details(self, database_name, table_name, page_size=100, startingToken=None):
-    return self._call('getTablesDetail', {'tenant' : self._tenant_id, 'dbName': database_name.lower(), 'tableName': table_name.lower(), 'pageSize': page_size, 'startingToken': startingToken})
+    return self._call(
+      'getTablesDetail', {
+        'tenant' : self._tenant_id,
+        'dbName': database_name.lower(),
+        'tableName': table_name.lower(),
+        'pageSize': page_size,
+        'startingToken': startingToken
+      }
+    )
 
 
   def query_compatibility(self, source_platform, target_platform, query, page_size=100, startingToken=None):
-    return self._call('getQueryCompatible', {'tenant' : self._tenant_id, 'query': query, 'sourcePlatform': source_platform, 'targetPlatform': target_platform, 'startingToken': startingToken})
+    return self._call(
+      'getQueryCompatible', {
+        'tenant' : self._tenant_id,
+        'query': query,
+        'sourcePlatform': source_platform,
+        'targetPlatform': target_platform,
+        'startingToken': startingToken
+      }
+    )
 
 
   def query_risk(self, query, source_platform, db_name, page_size=100, startingToken=None):

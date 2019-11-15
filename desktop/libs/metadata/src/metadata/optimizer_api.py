@@ -111,7 +111,6 @@ def top_tables(request):
 
   data = api.top_tables(database_name=database, page_size=limit)
 
-
   if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
     checker = get_checker(user=self.user)
     action = 'SELECT'
@@ -121,7 +120,6 @@ def top_tables(request):
       return {'server': get_hive_sentry_provider(), 'db': names['database'], 'table': names['table']}
 
     data['results'] = list(checker.filter_objects(data['results'], action, key=getkey))
-
 
   tables = [{
       'database': _get_table_name(table['name'])['database'],

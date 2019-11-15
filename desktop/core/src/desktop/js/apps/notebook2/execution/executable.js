@@ -206,6 +206,9 @@ export default class Executable {
           this.result.fetchRows();
         }
       }
+      if (true || this.isOptimizerEnabled()) {
+        huePubSub.publish('editor.upload.query', this.history.id);
+      }
 
       this.checkStatus();
       this.logs.fetchLogs();
