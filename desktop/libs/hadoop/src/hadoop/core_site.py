@@ -44,9 +44,12 @@ _CNF_S3A_SESSION_TOKEN = 'fs.s3a.session.token'
 
 _CNF_ADLS_CLIENT_ID = 'dfs.adls.oauth2.client.id'
 _CNF_ADLS_AUTHENTICATION_CODE = 'dfs.adls.oauth2.credential'
-_CNF_ADLS_SECRET_KEY = 'dfs.adls.oauth2.credential'
 _CNF_ADLS_REFRESH_URL = 'dfs.adls.oauth2.refresh.url'
 _CNF_ADLS_GRANT_TYPE = 'dfs.adls.oauth2.access.token.provider.type'
+
+_CNF_AZURE_CLIENT_ID = 'fs.azure.account.oauth2.client.id'
+_CNF_AZURE_CLIENT_SECRET = 'fs.azure.account.oauth2.client.secret'
+_CNF_AZURE_CLIENT_ENDPOINT = 'fs.azure.account.oauth2.client.endpoint'
 
 _CNF_SECURITY = 'hadoop.security.authentication'
 
@@ -138,3 +141,12 @@ def get_adls_grant_type():
 
 def is_kerberos_enabled():
   return get_conf().get(_CNF_SECURITY) == 'kerberos'
+
+def get_azure_client_id():
+  return get_conf().get(_CNF_AZURE_CLIENT_ID)
+
+def get_azure_client_secret():
+  return get_conf().get(_CNF_AZURE_CLIENT_SECRET)
+
+def get_azure_client_endpoint():
+  return get_conf().get(_CNF_AZURE_CLIENT_ENDPOINT)

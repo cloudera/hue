@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from builtins import object
 import logging
 
-from azure.conf import AZURE_ACCOUNTS, get_default_refresh_url
+from azure.conf import get_refresh_url
 from desktop.lib.python_util import current_ms_from_utc
 from desktop.lib.rest import http_client, resource
 
@@ -56,14 +56,14 @@ class ActiveDirectory(object):
 
 
   @classmethod
-  def from_config(cls, conf='default', version=None):
-    access_key_id = AZURE_ACCOUNTS['default'].CLIENT_ID.get()
-    secret_access_key = AZURE_ACCOUNTS['default'].CLIENT_SECRET.get()
+  def from_config(cls, conf=None, version=None):
+    access_key_id = conf.CLIENT_ID.get()
+    secret_access_key = conf.CLIENT_SECRET.get()
 
     if None in (access_key_id, secret_access_key):
       raise ValueError('Can\'t create azure client, credential is not configured')
 
-    url = get_default_refresh_url(version)
+    url = get_refresh_url(conf, version)
 
     return cls(
       url,
