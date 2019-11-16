@@ -33,6 +33,28 @@ const TEMPLATE = `
     <h2 class="modal-title">${ I18n('Sharing') } - <span data-bind="text: $parent.definition().name"></span></h2>
   </div>
   <div class="modal-body" style="overflow: visible; height: 240px">
+
+    <a href="javascript:void(0)"  title="${ I18n(
+      'Share the query selection via a link'
+    ) }">
+      <i class="fa fa-wf fa-link"></i> ${ I18n('Share link') }
+    </a>
+
+    <div class="row-fluid">
+      <div class="span12">
+        <h4 class="muted" style="margin-top: 0">${ I18n('Shareable link') }</h4>
+        <div class="input-group">
+          <input class="input-xxlarge" onfocus="this.select()" name="gist-link" id="gist-link" type="text" placeholder="${ I18n('Link') }"/>
+        </div>
+        <div class="input-prepend">
+          <a class="btn gist-link-btn" data-clipboard-target="#gist-link" data-dismiss="modal">${ I18n('Copy')}</a>
+          <button class="add-on muted gist-link-btn" data-clipboard-target="#gist-link">
+            <i class="fa fa-clipboard"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- ko with: definition -->
     <div class="row-fluid" data-bind="visible: !$parent.hasErrors()" style="max-height: 114px;" id="scrolldiv">
       <div class="span6">
@@ -55,12 +77,25 @@ const TEMPLATE = `
         <div data-bind="visible: (perms.write.users.length == 0 && perms.write.groups.length == 0)">${ I18n('The document is not shared for modify.') }</div>
         <ul class="unstyled airy" data-bind="foreach: perms.write.users">
           <li>
-            <span class="badge badge-info badge-left" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }"><i class="fa fa-user"></i> <span data-bind="text: $parents[1].prettifyUsernameById(id), attr:{'data-id': id}"></span></span><span class="badge badge-right trash-share" data-bind="visible: $parents[1].fileEntry.canModify(), click: function() { $parents[1].removeUserWriteShare($data) }"> <i class="fa fa-times"></i></span>
+            <span class="badge badge-info badge-left" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }">
+              <i class="fa fa-user">
+              </i>
+              <span data-bind="text: $parents[1].prettifyUsernameById(id), attr:{'data-id': id}">
+              </span>
+            </span>
+            <span class="badge badge-right trash-share" data-bind="visible: $parents[1].fileEntry.canModify(), click: function() { $parents[1].removeUserWriteShare($data) }">
+              <i class="fa fa-times"></i>
+            </span>
           </li>
         </ul>
         <ul class="unstyled airy" data-bind="foreach: perms.write.groups">
           <li>
-            <span class="badge badge-info badge-left" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }"><i class="fa fa-users"></i> ${ I18n('Group') } &quot;<span data-bind="text: name"></span>&quot;</span><span class="badge badge-right trash-share" data-bind="visible: $parents[1].fileEntry.canModify(), click: function() { $parents[1].removeGroupWriteShare($data) }"> <i class="fa fa-times"></i></span>
+            <span class="badge badge-info badge-left" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }">
+              <i class="fa fa-users"></i> ${ I18n('Group') } &quot;
+              <span data-bind="text: name"></span>&quot;</span>
+              <span class="badge badge-right trash-share" data-bind="visible: $parents[1].fileEntry.canModify(), click: function() { $parents[1].removeGroupWriteShare($data) }">
+              <i class="fa fa-times"></i>
+            </span>
           </li>
         </ul>
       </div>
@@ -85,20 +120,31 @@ const TEMPLATE = `
               classPrefix: 'hue-',
               onEnter: onShareAutocompleteUserEnter.bind($data),
               appendTo: '#shareDocAutocompleteMenu'
-            }, 
+            },
             clearable: {
               value: searchInput,
               textInput: searchInput
             }
           " class="ui-autocomplete-input" autocomplete="off" style="width: 420px">
         <div class="btn-group" style="overflow:visible">
-          <a id="documentShareAddBtn" class="btn" data-bind="click: function () {  onShareAutocompleteUserEnter() }"><span data-bind="text: selectedPerm() == 'read' ? '${ I18n('Read') }' : '${ I18n('Modify') }'"></span></a>
+          <a id="documentShareAddBtn" class="btn" data-bind="click: function () {  onShareAutocompleteUserEnter() }">
+            <span data-bind="text: selectedPerm() == 'read' ? '${ I18n('Read') }' : '${ I18n('Modify') }'">
+            </span>
+          </a>
           <a id="documentShareCaret" class="btn dropdown-toggle" data-toggle="dropdown">
            <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">
-            <li><a data-bind="click: function () { selectedPerm('read'); onShareAutocompleteUserEnter() }" href="javascript:void(0)"><i class="fa fa-plus"></i> ${ I18n('Read') }</a></li>
-            <li><a data-bind="click: function () { selectedPerm('write'); onShareAutocompleteUserEnter() }" href="javascript:void(0)"><i class="fa fa-plus"></i> ${ I18n('Modify') }</a></li>
+            <li>
+              <a data-bind="click: function () { selectedPerm('read'); onShareAutocompleteUserEnter() }" href="javascript:void(0)">
+                <i class="fa fa-plus"></i> ${ I18n('Read') }
+              </a>
+            </li>
+            <li>
+              <a data-bind="click: function () { selectedPerm('write'); onShareAutocompleteUserEnter() }" href="javascript:void(0)">
+                <i class="fa fa-plus"></i> ${ I18n('Modify') }
+              </a>
+            </li>
           </ul>
         </div>
       </div>
