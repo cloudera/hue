@@ -5,31 +5,33 @@ High Level Roadmap
 
 * Editor
   * [ ] Editor v2 [HUE-8768](https://issues.cloudera.org/browse/HUE-8768)
+  * [ ] Query Browser v2
   * [ ] Query Scheduling [HUE-3797](https://issues.cloudera.org/browse/HUE-3797)
-  * [ ] Generify the risk alert and suggestion optimization API [HUE-8824](https://issues.cloudera.org/browse/HUE-8824)
-  * [ ] SQL Dashboards and Query Builder [HUE-3228](https://issues.cloudera.org/browse/HUE-3228)
+  * [ ] Generify risk alert and optimization API [HUE-8824](https://issues.cloudera.org/browse/HUE-8824)
+  * [ ] Query Builder [HUE-3228](https://issues.cloudera.org/browse/HUE-3228)
   * [ ] Public SQL REST APIs [HUE-1450](https://issues.cloudera.org/browse/HUE-1450)
-  * [ ] Additional/Improved SQL autocomplete
-    * Parser for [Apache Calcite](https://calcite.apache.org) familly, Phoenix, Druid, Presto..
-    * Parser for KSQL, Flink SQL, Elastic Search SQL, Solr SQL, PartiQl, ZetaSql..
-    * SqlAlchemy improvements for Druid, Phoenix, Elastic Search SQL..
-    * Dialect/Connector for KSQL, Flink SQL, Solr SQL, PartiQl, ZetaSql, Elastic Search..
+  * [ ] Additional/Improved SQL autocompletes
+    * [Apache Calcite](https://calcite.apache.org) based: Phoenix, Druid, Spark SQL, Presto, Flink SQL..
+    * KSQL
+    * Elastic Search SQL
+    * Solr SQL
+    * PartiQl
+    * ZetaSql...
 * Cloud
-  * [ ] Configuration of connectors via the interface [HUE-8758](https://issues.cloudera.org/browse/HUE-8758)
+  * [ ] Configuration of connectors via UI [HUE-8758](https://issues.cloudera.org/browse/HUE-8758)
   * [ ] Multi clusters [HUE-8330](https://issues.cloudera.org/browse/HUE-8330)
   * [ ] Multi tenants [HUE-8530](https://issues.cloudera.org/browse/HUE-8530)
   * [ ] Modernize CI/CD [HUE-8888](https://issues.cloudera.org/browse/HUE-8888)
   * [ ] SQL queries and requests tracing [HUE-8936](https://issues.cloudera.org/browse/HUE-8936)
   * [ ] Productionize metrics [HUE-9021](https://issues.cloudera.org/browse/HUE-9021)
   * [ ] Google Storage connector
-* Scale
-  * [ ] Task Server workers [HUE-8738](https://issues.cloudera.org/browse/HUE-8738)
-  * [ ] Result caching and storage [HUE-8787](https://issues.cloudera.org/browse/HUE-8787)
 * Collaboration
-  * [ ] Document sharing and collaboration improvements [HUE-8790](https://issues.cloudera.org/browse/HUE-8790)
+  * [ ] Document sharing improvements [HUE-8790](https://issues.cloudera.org/browse/HUE-8790)
   * [ ] Charting and visualization revamp [HUE-6093](https://issues.cloudera.org/browse/HUE-6093)
   * [ ] Result Sharing (Google Spreadsheet, Slack...)
 * Core
+  * [ ] Task Server workers [HUE-8738](https://issues.cloudera.org/browse/HUE-8738)
+  * [ ] Result caching and storage [HUE-8787](https://issues.cloudera.org/browse/HUE-8787)
   * [ ] Reference architecture [HUE-8815](https://issues.cloudera.org/browse/HUE-8815)
   * [ ] Python 3 support [HUE-8737](https://issues.cloudera.org/browse/HUE-8737)
   * [ ] Gunicorn [HUE-8739](https://issues.cloudera.org/browse/HUE-8739)
