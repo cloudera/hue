@@ -54,26 +54,28 @@ class TestAWS(unittest.TestCase):
       with patch('aws.client.conf_idbroker.get_conf') as get_conf:
         with patch('aws.client.Client.get_s3_connection'):
           with patch('aws.client.IDBroker.get_cab') as get_cab:
-            get_conf.return_value = {
-              'fs.s3a.ext.cab.address': 'address'
-            }
-            get_cab.return_value = {
-              'Credentials': {'AccessKeyId': 'AccessKeyId', 'Expiration': 0}
-            }
-            provider = get_credential_provider('default', 'hue')
-            assert_equal(provider.get_credentials().get('AccessKeyId'), 'AccessKeyId')
-            client1 = get_client(name='default', fs='s3a', user='hue')
-            client2 = get_client(name='default', fs='s3a', user='hue')
-            assert_not_equal(client1, client2) # Test that with Expiration 0 clients not equal
+            with patch('aws.client.aws_conf.has_iam_metadata') as has_iam_metadata:
+              get_conf.return_value = {
+                'fs.s3a.ext.cab.address': 'address'
+              }
+              get_cab.return_value = {
+                'Credentials': {'AccessKeyId': 'AccessKeyId', 'Expiration': 0}
+              }
+              has_iam_metadata.return_value = True
+              provider = get_credential_provider('default', 'hue')
+              assert_equal(provider.get_credentials().get('AccessKeyId'), 'AccessKeyId')
+              client1 = get_client(name='default', fs='s3a', user='hue')
+              client2 = get_client(name='default', fs='s3a', user='hue')
+              assert_not_equal(client1, client2) # Test that with Expiration 0 clients not equal
 
-            get_cab.return_value = {
-              'Credentials': {'AccessKeyId': 'AccessKeyId', 'Expiration': int(current_ms_from_utc()) + 10*1000}
-            }
-            client3 = get_client(name='default', fs='s3a', user='hue')
-            client4 = get_client(name='default', fs='s3a', user='hue')
-            client5 = get_client(name='default', fs='s3a', user='test')
-            assert_equal(client3, client4) # Test that with 10 sec expiration, clients equal
-            assert_not_equal(client4, client5) # Test different user have different clients
+              get_cab.return_value = {
+                'Credentials': {'AccessKeyId': 'AccessKeyId', 'Expiration': int(current_ms_from_utc()) + 10*1000}
+              }
+              client3 = get_client(name='default', fs='s3a', user='hue')
+              client4 = get_client(name='default', fs='s3a', user='hue')
+              client5 = get_client(name='default', fs='s3a', user='test')
+              assert_equal(client3, client4) # Test that with 10 sec expiration, clients equal
+              assert_not_equal(client4, client5) # Test different user have different clients
     finally:
       finish()
       clear_cache()
@@ -85,17 +87,19 @@ class TestAWS(unittest.TestCase):
       with patch('aws.client.conf_idbroker.get_conf') as get_conf:
         with patch('aws.client.Client.get_s3_connection'):
           with patch('aws.client.IDBroker.get_cab') as get_cab:
-            get_conf.return_value = {
-              'fs.s3a.ext.cab.address': 'address'
-            }
-            get_cab.return_value = {
-              'Credentials': {'AccessKeyId': 'AccessKeyId', 'Expiration': 0}
-            }
-            provider = get_credential_provider('default', 'hue')
-            assert_equal(provider.get_credentials().get('AccessKeyId'), 'AccessKeyId')
+            with patch('aws.client.aws_conf.has_iam_metadata') as has_iam_metadata:
+              get_conf.return_value = {
+                'fs.s3a.ext.cab.address': 'address'
+              }
+              get_cab.return_value = {
+                'Credentials': {'AccessKeyId': 'AccessKeyId', 'Expiration': 0}
+              }
+              has_iam_metadata.return_value = True
+              provider = get_credential_provider('default', 'hue')
+              assert_equal(provider.get_credentials().get('AccessKeyId'), 'AccessKeyId')
 
-            client = Client.from_config(conf.AWS_ACCOUNTS['default'], get_credential_provider('default', 'hue'))
-            assert_equal(client._region, 'ap-northeast-1')
+              client = Client.from_config(conf.AWS_ACCOUNTS['default'], get_credential_provider('default', 'hue'))
+              assert_equal(client._region, 'ap-northeast-1')
     finally:
       finish()
       clear_cache()
@@ -108,15 +112,17 @@ class TestAWS(unittest.TestCase):
         with patch('aws.client.conf_idbroker.get_conf') as get_conf:
           with patch('aws.client.Client.get_s3_connection'):
             with patch('aws.client.IDBroker.get_cab') as get_cab:
-              get_region.return_value = 'us-west-1'
-              get_conf.return_value = {
-                'fs.s3a.ext.cab.address': 'address'
-              }
-              get_cab.return_value = {
-                'Credentials': {'AccessKeyId': 'AccessKeyId', 'Expiration': 0}
-              }
-              client = Client.from_config(None, get_credential_provider('default', 'hue'))
-              assert_equal(client._region, 'us-west-1') # Test different user have different clients
+              with patch('aws.client.aws_conf.has_iam_metadata') as has_iam_metadata:
+                get_region.return_value = 'us-west-1'
+                get_conf.return_value = {
+                  'fs.s3a.ext.cab.address': 'address'
+                }
+                get_cab.return_value = {
+                  'Credentials': {'AccessKeyId': 'AccessKeyId', 'Expiration': 0}
+                }
+                has_iam_metadata.return_value = True
+                client = Client.from_config(None, get_credential_provider('default', 'hue'))
+                assert_equal(client._region, 'us-west-1') # Test different user have different clients
     finally:
       finish()
       clear_cache()

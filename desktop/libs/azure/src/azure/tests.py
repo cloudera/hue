@@ -83,24 +83,26 @@ class TestAzureAdl(unittest.TestCase):
       with patch('azure.client.conf_idbroker.get_conf') as get_conf:
         with patch('azure.client.WebHdfs.get_client'):
           with patch('azure.client.IDBroker.get_cab') as get_cab:
-            get_conf.return_value = {
-              'fs.azure.ext.cab.address': 'address'
-            }
-            get_cab.return_value = { 'access_token': 'access_token', 'token_type': 'token_type', 'expires_on': 0 }
-            provider = get_credential_provider('default', 'hue')
-            assert_equal(provider.get_credentials().get('access_token'), 'access_token')
-            client1 = get_client(name='default', fs='adl', user='hue')
-            client2 = get_client(name='default', fs='adl', user='hue')
-            assert_not_equal(client1, client2) # Test that with Expiration 0 clients not equal
+            with patch('azure.client.conf.has_azure_metadata') as has_azure_metadata:
+              get_conf.return_value = {
+                'fs.azure.ext.cab.address': 'address'
+              }
+              has_azure_metadata.return_value = True
+              get_cab.return_value = { 'access_token': 'access_token', 'token_type': 'token_type', 'expires_on': 0 }
+              provider = get_credential_provider('default', 'hue')
+              assert_equal(provider.get_credentials().get('access_token'), 'access_token')
+              client1 = get_client(name='default', fs='adl', user='hue')
+              client2 = get_client(name='default', fs='adl', user='hue')
+              assert_not_equal(client1, client2) # Test that with Expiration 0 clients not equal
 
-            get_cab.return_value = {
-              'Credentials': {'access_token': 'access_token', 'token_type': 'token_type', 'expires_on': int(current_ms_from_utc()) + 10*1000}
-            }
-            client3 = get_client(name='default', fs='adl', user='hue')
-            client4 = get_client(name='default', fs='adl', user='hue')
-            client5 = get_client(name='default', fs='adl', user='test')
-            assert_equal(client3, client4) # Test that with 10 sec expiration, clients equal
-            assert_not_equal(client4, client5) # Test different user have different clients
+              get_cab.return_value = {
+                'Credentials': {'access_token': 'access_token', 'token_type': 'token_type', 'expires_on': int(current_ms_from_utc()) + 10*1000}
+              }
+              client3 = get_client(name='default', fs='adl', user='hue')
+              client4 = get_client(name='default', fs='adl', user='hue')
+              client5 = get_client(name='default', fs='adl', user='test')
+              assert_equal(client3, client4) # Test that with 10 sec expiration, clients equal
+              assert_not_equal(client4, client5) # Test different user have different clients
     finally:
       for f in finish:
         f()
@@ -159,24 +161,26 @@ class TestAzureAbfs(unittest.TestCase):
       with patch('azure.client.conf_idbroker.get_conf') as get_conf:
         with patch('azure.client.ABFS.get_client'):
           with patch('azure.client.IDBroker.get_cab') as get_cab:
-            get_conf.return_value = {
-              'fs.azure.ext.cab.address': 'address'
-            }
-            get_cab.return_value = { 'access_token': 'access_token', 'token_type': 'token_type', 'expires_on': 0 }
-            provider = get_credential_provider('default', 'hue')
-            assert_equal(provider.get_credentials().get('access_token'), 'access_token')
-            client1 = get_client(name='default', fs='abfs', user='hue')
-            client2 = get_client(name='default', fs='abfs', user='hue')
-            assert_not_equal(client1, client2) # Test that with Expiration 0 clients not equal
+            with patch('azure.client.conf.has_azure_metadata') as has_azure_metadata:
+              get_conf.return_value = {
+                'fs.azure.ext.cab.address': 'address'
+              }
+              has_azure_metadata.return_value = True
+              get_cab.return_value = { 'access_token': 'access_token', 'token_type': 'token_type', 'expires_on': 0 }
+              provider = get_credential_provider('default', 'hue')
+              assert_equal(provider.get_credentials().get('access_token'), 'access_token')
+              client1 = get_client(name='default', fs='abfs', user='hue')
+              client2 = get_client(name='default', fs='abfs', user='hue')
+              assert_not_equal(client1, client2) # Test that with Expiration 0 clients not equal
 
-            get_cab.return_value = {
-              'Credentials': {'access_token': 'access_token', 'token_type': 'token_type', 'expires_on': int(current_ms_from_utc()) + 10*1000}
-            }
-            client3 = get_client(name='default', fs='abfs', user='hue')
-            client4 = get_client(name='default', fs='abfs', user='hue')
-            client5 = get_client(name='default', fs='abfs', user='test')
-            assert_equal(client3, client4) # Test that with 10 sec expiration, clients equal
-            assert_not_equal(client4, client5) # Test different user have different clients
+              get_cab.return_value = {
+                'Credentials': {'access_token': 'access_token', 'token_type': 'token_type', 'expires_on': int(current_ms_from_utc()) + 10*1000}
+              }
+              client3 = get_client(name='default', fs='abfs', user='hue')
+              client4 = get_client(name='default', fs='abfs', user='hue')
+              client5 = get_client(name='default', fs='abfs', user='test')
+              assert_equal(client3, client4) # Test that with 10 sec expiration, clients equal
+              assert_not_equal(client4, client5) # Test different user have different clients
     finally:
       for f in finish:
         f()
