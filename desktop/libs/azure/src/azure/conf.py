@@ -29,6 +29,8 @@ LOG = logging.getLogger(__name__)
 PERMISSION_ACTION_ABFS = "abfs_access"
 PERMISSION_ACTION_ADLS = "adls_access"
 REFRESH_URL = 'https://login.microsoftonline.com/<tenant_id>/oauth2/<version>token'
+META_DATA_URL = 'http://169.254.169.254/metadata/instance'
+AZURE_METADATA = None
 
 def get_default_client_id():
   """
@@ -144,10 +146,10 @@ ABFS_CLUSTERS = UnspecifiedConfigSection(
 )
 
 def is_adls_enabled():
-  return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() or conf_idbroker.is_idbroker_enabled('azure')) and 'default' in list(ADLS_CLUSTERS.keys())
+  return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() or (conf_idbroker.is_idbroker_enabled('azure') and has_azure_metadata())) and 'default' in list(ADLS_CLUSTERS.keys())
 
 def is_abfs_enabled():
-  return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() or conf_idbroker.is_idbroker_enabled('azure')) and 'default' in list(ABFS_CLUSTERS.keys())
+  return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() or (conf_idbroker.is_idbroker_enabled('azure') and has_azure_metadata())) and 'default' in list(ABFS_CLUSTERS.keys())
 
 def has_adls_access(user):
   from desktop.auth.backend import is_admin
@@ -156,6 +158,21 @@ def has_adls_access(user):
 def has_abfs_access(user):
   from desktop.auth.backend import is_admin
   return user.is_authenticated() and user.is_active and (is_admin(user) or user.has_hue_permission(action="abfs_access", app="filebrowser"))
+
+def azure_metadata():
+  global AZURE_METADATA
+  if AZURE_METADATA is None:
+    from desktop.lib.rest import http_client, resource
+    client = http_client.HttpClient(META_DATA_URL, logger=LOG)
+    root = resource.Resource(client)
+    try:
+      AZURE_METADATA = root.get('/compute', params={'api-version':'2019-06-04', 'format':'json'}, headers={'Metadata': 'true'})
+    except Exception as e:
+      AZURE_METADATA = False
+  return AZURE_METADATA
+
+def has_azure_metadata():
+  return azure_metadata() is not None
 
 def config_validator(user):
   res = []
