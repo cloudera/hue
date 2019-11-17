@@ -21,6 +21,7 @@ import base64
 import logging
 import json
 import struct
+import sys
 
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
@@ -29,18 +30,15 @@ from beeswax.api import error_handler
 from beeswax.models import Session
 from beeswax.server import dbms as beeswax_dbms
 from beeswax.views import authorized_get_query_history
-
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.thrift_util import unpack_guid
 from desktop.models import Document2
-
 from jobbrowser.apis.query_api import _get_api
+from libanalyze import analyze as analyzer, rules
+from notebook.models import make_notebook
+
 from impala import dbms
 from impala.server import get_api as get_impalad_api, _get_impala_server_url
-
-from libanalyze import analyze as analyzer, rules
-
-from notebook.models import make_notebook
 
 
 LOG = logging.getLogger(__name__)
@@ -137,8 +135,10 @@ def alanize(request):
     doc = Document2.objects.get(id=query_id)
     snippets = doc.data_dict.get('snippets', [])
     secret = snippets[0]['result']['handle']['secret']
-    impala_query_id = unpack_guid(base64.decodestring(secret))
+
+    impala_query_id = unpack_guid(base64.b64decode(secret) if sys.version_info[0] > 2 else base64.decodestring(secret))
     query_profile = api.get_query_profile_encoded(impala_query_id)
+
     profile = analyzer.analyze(analyzer.parse_data(query_profile))
     ANALYZER.pre_process(profile)
     result = ANALYZER.run(profile)

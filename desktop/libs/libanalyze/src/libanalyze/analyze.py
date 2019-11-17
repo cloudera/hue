@@ -15,8 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import print_function
-from builtins import range
-from builtins import object
+from builtins import range, object
 import base64
 import json
 import os
@@ -445,7 +444,10 @@ def parse(file_name):
       return decode_thrift(val)
 
 def parse_data(data):
-  val = base64.decodestring(data)
+  if sys.version_info[0] > 2:
+    val = base64.b64decode(data)
+  else:
+    val = base64.decodestring(data)
   try:
       val = decompress(val.strip())
   except:
