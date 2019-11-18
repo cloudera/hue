@@ -10,7 +10,7 @@ High Level Roadmap
   * [ ] Generify risk alert and optimization API [HUE-8824](https://issues.cloudera.org/browse/HUE-8824)
   * [ ] Query Builder [HUE-3228](https://issues.cloudera.org/browse/HUE-3228)
   * [ ] Public SQL REST APIs [HUE-1450](https://issues.cloudera.org/browse/HUE-1450)
-  * [ ] Additional/Improved SQL autocompletes
+  * [ ] Additional/Improved SQL autocompletes [HUE-9084](https://issues.cloudera.org/browse/HUE-9084)
     * [Apache Calcite](https://calcite.apache.org) based: Phoenix, Druid, Spark SQL, Presto, Flink SQL..
     * KSQL
     * Elastic Search SQL
@@ -24,7 +24,7 @@ High Level Roadmap
   * [ ] Modernize CI/CD [HUE-8888](https://issues.cloudera.org/browse/HUE-8888)
   * [ ] SQL queries and requests tracing [HUE-8936](https://issues.cloudera.org/browse/HUE-8936)
   * [ ] Productionize metrics [HUE-9021](https://issues.cloudera.org/browse/HUE-9021)
-  * [ ] Google Storage connector
+  * [ ] Google Storage connector [HUE-8978](https://issues.cloudera.org/browse/HUE-8978)
 * Collaboration
   * [ ] Document sharing improvements [HUE-8790](https://issues.cloudera.org/browse/HUE-8790)
   * [ ] Charting and visualization revamp [HUE-6093](https://issues.cloudera.org/browse/HUE-6093)
