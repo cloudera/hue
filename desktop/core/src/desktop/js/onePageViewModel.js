@@ -274,7 +274,16 @@ class OnePageViewModel {
       });
     });
 
-    self.loadApp = function(app, loadDeep) {
+    let loadAppTimeout = -1;
+    self.loadApp = (app, loadDeep) => {
+      // This prevents loading an app twice when the URL is changed multiple times in one operation
+      window.clearTimeout(loadAppTimeout);
+      loadAppTimeout = window.setTimeout(() => {
+        self.loadAppThrottled(app, loadDeep);
+      }, 0);
+    };
+
+    self.loadAppThrottled = (app, loadDeep) => {
       if (self.currentApp() === 'editor' && $('#editorComponents').length) {
         const vm = ko.dataFor($('#editorComponents')[0]);
         if (vm.isPresentationMode()) {
