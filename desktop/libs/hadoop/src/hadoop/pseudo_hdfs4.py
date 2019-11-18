@@ -25,6 +25,7 @@ import shutil
 import signal
 import subprocess
 import socket
+import sys
 import tempfile
 import textwrap
 import time
@@ -37,6 +38,10 @@ import hadoop
 from hadoop import cluster
 from hadoop.mini_cluster import write_config
 
+if sys.version_info[0] > 2:
+  open_file = open
+else:
+  open_file = file
 
 _shared_cluster = None
 
@@ -342,8 +347,8 @@ class PseudoHdfs4(object):
 
   def _log_exit(self, proc_name, exit_code):
     LOG.info('%s exited with %s' % (proc_name, exit_code))
-    LOG.debug('--------------------- STDOUT:\n' + file(self._logpath(proc_name + '.stdout')).read())
-    LOG.debug('--------------------- STDERR:\n' + file(self._logpath(proc_name + '.stderr')).read())
+    LOG.debug('--------------------- STDOUT:\n' + open_file(self._logpath(proc_name + '.stdout')).read())
+    LOG.debug('--------------------- STDERR:\n' + open_file(self._logpath(proc_name + '.stderr')).read())
 
   def _is_hdfs_ready(self, env):
     if self._nn_proc.poll() is not None:
@@ -406,8 +411,8 @@ class PseudoHdfs4(object):
     args = (hadoop_bin, '--config', conf_dir, proc_name)
 
     LOG.info('Starting Hadoop cluster daemon: %s' % (args,))
-    stdout = file(self._logpath(proc_name + ".stdout"), 'w')
-    stderr = file(self._logpath(proc_name + ".stderr"), 'w')
+    stdout = open_file(self._logpath(proc_name + ".stdout"), 'w')
+    stderr = open_file(self._logpath(proc_name + ".stderr"), 'w')
 
     return subprocess.Popen(args=args, stdout=stdout, stderr=stderr, env=env)
 
@@ -533,7 +538,7 @@ class PseudoHdfs4(object):
     write_config(mapred_configs, self._tmppath('conf/mapred-site.xml'))
 
   def _write_hadoop_metrics_conf(self, conf_dir):
-    f = file(os.path.join(conf_dir, "hadoop-metrics.properties"), "w")
+    f = open_file(os.path.join(conf_dir, "hadoop-metrics.properties"), "w")
     try:
       f.write(textwrap.dedent("""
           dfs.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext

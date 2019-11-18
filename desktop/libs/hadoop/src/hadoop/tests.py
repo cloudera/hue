@@ -35,9 +35,11 @@ from hadoop import confparse
 from hadoop import pseudo_hdfs4
 
 if sys.version_info[0] > 2:
-  from io import StringIO as string_io
+  from io import BytesIO as string_io
+  open_file = open
 else:
   from cStringIO import StringIO as string_io
+  open_file = file
 
 def test_confparse():
   data = """
@@ -63,6 +65,8 @@ def test_confparse():
   """
 
   cp_data = confparse.ConfParse(data)
+  if not isinstance(data, bytes):
+    data = data.encode()
   cp_file = confparse.ConfParse(string_io(data))
 
   for cp in (cp_data, cp_file):
@@ -87,7 +91,7 @@ def test_tricky_confparse():
   We found (experimentally) that dealing with a file
   sometimes triggered the wrong results here.
   """
-  cp_data = confparse.ConfParse(file(os.path.join(os.path.dirname(__file__),
+  cp_data = confparse.ConfParse(open_file(os.path.join(os.path.dirname(__file__),
                                                   "test_data",
                                                   "sample_conf.xml")))
   assert_equal("org.apache.hadoop.examples.SleepJob", cp_data["mapred.mapper.class"])

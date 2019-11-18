@@ -16,9 +16,9 @@
 from __future__ import absolute_import
 
 import logging
+import sys
 import unittest
 
-from mock import patch, Mock
 from nose.tools import assert_equal, assert_true, assert_not_equal
 
 from aws import conf
@@ -26,6 +26,11 @@ from aws.client import Client, get_credential_provider
 
 from desktop.lib.fsmanager import get_client, clear_cache
 from desktop.lib.python_util import current_ms_from_utc
+
+if sys.version_info[0] > 2:
+  from unittest.mock import patch
+else:
+  from mock import patch
 
 LOG = logging.getLogger(__name__)
 

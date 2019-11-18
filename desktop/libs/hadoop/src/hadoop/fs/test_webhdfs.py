@@ -592,7 +592,7 @@ class WebhdfsTests(unittest.TestCase):
     LOG.debug("%s" % resp)
     
     test_dir = self.prefix + "/temp2"
-    self.cluster.fs.mkdir(test_dir, 0333)
+    self.cluster.fs.mkdir(test_dir, 0o333)
     test_file2 = test_dir + "/fortest.txt"
     f = self.cluster.fs.open(test_file2, "w")
     f.write("ok")

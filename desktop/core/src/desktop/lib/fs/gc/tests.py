@@ -18,7 +18,6 @@ from __future__ import absolute_import
 import logging
 import unittest
 
-from mock import patch, Mock
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_not_equal
 
