@@ -16,9 +16,9 @@
 from __future__ import absolute_import
 
 import logging
+import sys
 import unittest
 
-from mock import patch, Mock, PropertyMock
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_not_equal
 
@@ -27,6 +27,11 @@ from azure.client import get_credential_provider
 
 from desktop.lib.fsmanager import get_client, clear_cache, is_enabled
 from desktop.lib.python_util import current_ms_from_utc
+
+if sys.version_info[0] > 2:
+  from unittest.mock import patch
+else:
+  from mock import patch
 
 LOG = logging.getLogger(__name__)
 
