@@ -18,8 +18,8 @@
 
 from builtins import object
 import logging
+import sys
 
-from mock import patch, Mock, MagicMock
 from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false
 
 from desktop.auth.backend import rewrite_user
@@ -29,6 +29,10 @@ from useradmin.models import User
 
 from notebook.connectors.sql_alchemy import SqlAlchemyApi
 
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock, MagicMock
+else:
+  from mock import patch, Mock, MagicMock
 
 LOG = logging.getLogger(__name__)
 

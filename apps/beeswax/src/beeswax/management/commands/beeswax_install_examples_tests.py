@@ -17,8 +17,8 @@
 # limitations under the License.
 
 import logging
+import sys
 
-from mock import patch, Mock, MagicMock
 from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false
 
 from desktop.auth.backend import rewrite_user
@@ -29,6 +29,10 @@ from beeswax.management.commands.beeswax_install_examples import SampleTable, Co
 
 from django.contrib.auth.models import User
 
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
+else:
+  from mock import patch, Mock
 
 LOG = logging.getLogger(__name__)
 

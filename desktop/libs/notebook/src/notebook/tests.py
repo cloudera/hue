@@ -18,9 +18,9 @@
 
 from builtins import object
 import json
+import sys
 
 from collections import OrderedDict
-from mock import patch, Mock, MagicMock
 from nose.plugins.attrib import attr
 from nose.tools import assert_equal, assert_true, assert_false
 
@@ -42,6 +42,11 @@ from notebook.connectors.base import Notebook, QueryError, Api
 from notebook.decorators import api_error_handler
 from notebook.conf import get_ordered_interpreters, INTERPRETERS_SHOWN_ON_WHEEL, INTERPRETERS
 from notebook.models import Analytics
+
+if sys.version_info[0] > 2:
+  from unittest.mock import patch
+else:
+  from mock import patch
 
 
 class TestNotebookApi(object):

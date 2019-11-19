@@ -21,9 +21,9 @@ from builtins import object
 import json
 import logging
 import re
+import sys
 import time
 
-from mock import patch, Mock
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true
 
@@ -44,6 +44,10 @@ from notebook.api import _save_notebook
 from notebook.connectors.hiveserver2 import HS2Api
 from notebook.models import make_notebook, Notebook
 
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
+else:
+  from mock import patch, Mock
 
 LOG = logging.getLogger(__name__)
 
