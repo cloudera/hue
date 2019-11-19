@@ -566,7 +566,7 @@ def get_history(request):
 def clear_history(request):
   response = {'status': -1}
 
-  notebook = json.loads(request.POST.get('notebook'), '{}')
+  notebook = json.loads(request.POST.get('notebook', '{}'))
   doc_type = request.POST.get('doc_type')
   is_notification_manager = request.POST.get('is_notification_manager', 'false') == 'true'
 

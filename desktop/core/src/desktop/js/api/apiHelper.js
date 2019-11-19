@@ -1936,6 +1936,7 @@ class ApiHelper {
     return this.simplePost('/notebook/api/close_session', data, options);
   }
 
+  // Used by check history status
   checkStatus(options) {
     const data = {
       notebook: options.notebookJson
