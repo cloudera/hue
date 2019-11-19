@@ -2075,6 +2075,7 @@ class ApiHelper {
           const executeResponse = {};
           if (response.handle) {
             executeResponse.handle = response.handle;
+            executeResponse.handle.result = response.result;
           } else {
             reject('No handle in execute response');
             return;
