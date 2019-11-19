@@ -21,18 +21,22 @@
 const AUTOCOMPLETE_MODULES = {
   calcite: () => import(/* webpackChunkName: "calcite-parser" */ 'parse/sql/calcite/calciteAutocompleteParser'),
   druid: () => import(/* webpackChunkName: "druid-parser" */ 'parse/sql/druid/druidAutocompleteParser'),
+  elasticsearch: () => import(/* webpackChunkName: "elasticsearch-parser" */ 'parse/sql/elasticsearch/elasticsearchAutocompleteParser'),
   generic: () => import(/* webpackChunkName: "generic-parser" */ 'parse/sql/generic/genericAutocompleteParser'),
   hive: () => import(/* webpackChunkName: "hive-parser" */ 'parse/sql/hive/hiveAutocompleteParser'),
   impala: () => import(/* webpackChunkName: "impala-parser" */ 'parse/sql/impala/impalaAutocompleteParser'),
-  ksql: () => import(/* webpackChunkName: "ksql-parser" */ 'parse/sql/ksql/ksqlAutocompleteParser')
+  ksql: () => import(/* webpackChunkName: "ksql-parser" */ 'parse/sql/ksql/ksqlAutocompleteParser'),
+  presto: () => import(/* webpackChunkName: "presto-parser" */ 'parse/sql/presto/prestoAutocompleteParser')
 };
 const SYNTAX_MODULES = {
   calcite: () => import(/* webpackChunkName: "calcite-parser" */ 'parse/sql/calcite/calciteSyntaxParser'),
   druid: () => import(/* webpackChunkName: "druid-parser" */ 'parse/sql/druid/druidSyntaxParser'),
+  elasticsearch: () => import(/* webpackChunkName: "elasticsearch-parser" */ 'parse/sql/elasticsearch/elasticsearchSyntaxParser'),
   generic: () => import(/* webpackChunkName: "generic-parser" */ 'parse/sql/generic/genericSyntaxParser'),
   hive: () => import(/* webpackChunkName: "hive-parser" */ 'parse/sql/hive/hiveSyntaxParser'),
   impala: () => import(/* webpackChunkName: "impala-parser" */ 'parse/sql/impala/impalaSyntaxParser'),
-  ksql: () => import(/* webpackChunkName: "ksql-parser" */ 'parse/sql/ksql/ksqlSyntaxParser')
+  ksql: () => import(/* webpackChunkName: "ksql-parser" */ 'parse/sql/ksql/ksqlSyntaxParser'),
+  presto: () => import(/* webpackChunkName: "presto-parser" */ 'parse/sql/presto/prestoSyntaxParser')
 };
 /* eslint-enable */
 

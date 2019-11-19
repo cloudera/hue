@@ -28,3 +28,6 @@
 /desktop/core/src/desktop/js/parse/sql/elasticsearch/elasticsearchAutocompleteParser.js
 /desktop/core/src/desktop/js/parse/sql/elasticsearch/elasticsearchSyntaxParser.js
 /desktop/core/src/desktop/js/parse/sql/elasticsearch/spec/elasticsearchAutocompleteParser_Locations_Spec.js
+/desktop/core/src/desktop/js/parse/sql/presto/prestoAutocompleteParser.js
+/desktop/core/src/desktop/js/parse/sql/presto/prestoSyntaxParser.js
+/desktop/core/src/desktop/js/parse/sql/presto/spec/prestoAutocompleteParser_Locations_Spec.js
