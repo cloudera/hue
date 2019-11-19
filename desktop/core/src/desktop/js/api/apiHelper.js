@@ -2206,7 +2206,7 @@ class ApiHelper {
    */
   fetchLogs(options) {
     return new Promise(async (resolve, reject) => {
-      const data = options.executable.toContext();
+      const data = await options.executable.toContext();
       data.full_log = options.fullLog;
       data.jobs = options.jobs && JSON.stringify(options.jobs);
       data.from = options.from || 0;

@@ -357,7 +357,7 @@ export default class Executable {
   async toContext(id) {
     if (this.executor.snippet) {
       return {
-        operationId: id || this.operationId,
+        operationId: this.operationId,
         snippet: this.executor.snippet.toContextJson(),
         notebook: await this.executor.snippet.parentNotebook.toContextJson()
       };
@@ -392,7 +392,7 @@ export default class Executable {
     };
 
     return {
-      operationId: id,
+      operationId: undefined,
       snippet: JSON.stringify(snippet),
       notebook: JSON.stringify(notebook)
     };
