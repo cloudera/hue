@@ -18,23 +18,26 @@
 import logging
 import os.path
 import subprocess
+import sys
 
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
-from desktop.lib import paths
 from django.utils.translation import ugettext as _
+
+from desktop.lib import paths
+
 
 class Command(BaseCommand):
   help = _("""
   Runs pylint on desktop and app code.
 
-  With no arguments, or with "all", this will run pylint on all
-  installed apps.  Otherwise, specify modules to run, as well
-  as other parameters to pylint.  Note that you'll want to preface the section
-  of pylint arguments with "--" so Django's manage.py passes them along.
+  With no arguments, or with "all", this will run pylint on all installed apps. Otherwise, specify a list of files
+  or modules to run, as well as other parameters to pylint.
+  Note that you'll want to preface the section of pylint arguments with "--" so Django's manage.py passes them along.
 
   Examples:
     python core/manage.py runpylint all -- -f parseable
+    python core/manage.py runpylint --files="apps/jobbrowser/src/jobbrowser/apis/base_api.py desktop/libs/notebook/src/notebook/api.py"
     python core/manage.py runpylint filebrowser
     python core/manage.py runpylint
   """)
@@ -48,9 +51,9 @@ class Command(BaseCommand):
 
   def add_arguments(self, parser):
     parser.add_argument('-f', '--force', dest='force', default='true', action="store_true")
-    parser.add_argument('--output-format',
-      action='store', dest='outputformat', default='parseable')
+    parser.add_argument('--output-format', action='store', dest='outputformat', default='parseable')
     parser.add_argument('-a', '--app', dest='app', action='store', default='all', choices=self.valid_app())
+    parser.add_argument('-F', '--files', dest='files', action='store', default='')
 
   def handle(self, *args, **options):
     """Check the source code using PyLint."""
@@ -59,7 +62,9 @@ class Command(BaseCommand):
     pylint_prog = paths.get_build_dir('env', 'bin', 'pylint')
     pylint_args = [pylint_prog, "--rcfile=" + settings.PYLINTRC]
 
-    if options['app']=='all':
+    if options['files']:
+      pylint_args.extend(options['files'].split(' '))
+    elif options['app'] == 'all':
       pylint_args.extend(self.valid_app())
     else:
       pylint_args.append(options['app'])
@@ -79,4 +84,6 @@ class Command(BaseCommand):
 
     # We exec pylint directly due to a "maximum recursion depth" bug when doing
     # pylint.lint(...) programmatically.
-    subprocess.call(pylint_args)
+    ret = subprocess.call(pylint_args)
+    if ret != 0:
+      sys.exit(1)
