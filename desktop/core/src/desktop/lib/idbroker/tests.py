@@ -17,11 +17,16 @@ from __future__ import absolute_import
 
 import logging
 import unittest
+import sys
 
-from mock import patch, Mock
 from nose.tools import assert_equal, assert_true
 
 from desktop.lib.idbroker.client import IDBroker
+
+if sys.version_info[0] > 2:
+  from unittest.mock import patch
+else:
+  from mock import patch
 
 LOG = logging.getLogger(__name__)
 

@@ -19,10 +19,10 @@ from builtins import object
 import json
 import logging
 import re
+import sys
 
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false, assert_raises
-from mock import patch, Mock
 
 from django.urls import reverse
 
@@ -44,6 +44,10 @@ from useradmin.models import User
 from impala import conf
 from impala.dbms import ImpalaDbms
 
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
+else:
+  from mock import patch, Mock
 
 LOG = logging.getLogger(__name__)
 

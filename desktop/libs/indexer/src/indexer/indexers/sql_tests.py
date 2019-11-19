@@ -19,7 +19,6 @@
 from builtins import object
 import json
 
-from mock import patch, Mock, MagicMock
 from nose.tools import assert_equal, assert_true
 
 from desktop.lib.django_test_util import make_logged_in_client

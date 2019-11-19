@@ -15,12 +15,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import sys
 
-from mock import patch, Mock, MagicMock
 from nose.tools import assert_equal, assert_true, assert_false
 
 from desktop.lib.connectors.api import _get_installed_connectors
 
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
+else:
+  from mock import patch, Mock
 
 def test_get_installed_editor_connectors():
 
