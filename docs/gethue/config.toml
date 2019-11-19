@@ -1,0 +1,9 @@
+baseURL = "https://gethue.com/"
+languageCode = "en-us"
+title = "Hue - The open source SQL Assistant for Data Warehouses"
+theme = "stack-hue-theme"
+pygmentsStyle = "monokailight"
+disqusShortname = "gethue"
+
+[params]
+docsHost = "https://docs.gethue.com"
