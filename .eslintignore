@@ -17,8 +17,11 @@
 /desktop/core/src/desktop/js/parse/sql/ksql/ksqlSyntaxParser.js
 /desktop/core/src/desktop/js/parse/sql/calcite/calciteAutocompleteParser.js
 /desktop/core/src/desktop/js/parse/sql/calcite/calciteSyntaxParser.js
+/desktop/core/src/desktop/js/parse/sql/druid/druidAutocompleteParser.js
+/desktop/core/src/desktop/js/parse/sql/druid/druidSyntaxParser.js
 /desktop/core/src/desktop/js/parse/sql/generic/spec/genericAutocompleteParser_Locations_Spec.js
 /desktop/core/src/desktop/js/parse/sql/impala/spec/impalaAutocompleteParser_Locations_Spec.js
 /desktop/core/src/desktop/js/parse/sql/hive/spec/hiveAutocompleteParser_Locations_Spec.js
 /desktop/core/src/desktop/js/parse/sql/ksql/spec/ksqlAutocompleteParser_Locations_Spec.js
 /desktop/core/src/desktop/js/parse/sql/calcite/spec/calciteAutocompleteParser_Locations_Spec.js
+/desktop/core/src/desktop/js/parse/sql/druid/spec/druidAutocompleteParser_Locations_Spec.js
