@@ -5827,6 +5827,9 @@ fieldset[disabled] .btn-info {
   border-color: #E0E0E0;
   background-color: #E0E0E0;
 }
+.btn-primary {
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
 .btn-danger {
   color: #FFFFFF;
   border-color: #bd362f;

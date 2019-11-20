@@ -36,7 +36,7 @@ const TEMPLATE = `
     <!-- /ko -->
     <!-- ko if: status() === '${ EXECUTION_STATUS.running }' || waiting() -->
       <!-- ko ifnot: stopping -->
-      <button class="btn btn-primary btn-mini btn-execute disable-feedback" data-test="stop" data-bind="click: stop"><i class="fa fa-stop fa-fw"></i>
+      <button class="btn btn-danger btn-mini btn-execute disable-feedback" data-test="stop" data-bind="click: stop"><i class="fa fa-stop fa-fw"></i>
       <!-- ko ifnot: waiting -->
         ${ I18n('Stop') }
       <!-- /ko --> 
