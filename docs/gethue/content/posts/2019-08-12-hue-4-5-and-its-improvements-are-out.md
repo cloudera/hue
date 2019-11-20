@@ -50,29 +50,26 @@ Hi SQL Data Explorers,
 
 The Hue Team is glad to thanks all the contributors and release Hue 4.5!
 
-<img class="" src="https://cdn.gethue.com/uploads/2015/08/hue-logo-copy.png" alt="hue-logo (copy)" width="85" height="63" />
+<img class="" src="https://cdn.gethue.com/uploads/2015/08/hue-logo-copy.png" alt="hue-logo" width="85" height="63" />
 
-
-&nbsp;
-
-<div>
-  <div>
-    The focus of this release was to modularize the tech stack, improve SQL integrations and prepare major upcoming features.
-  </div>
-</div>
+The focus of this release was to modularize the tech stack, improve SQL integrations and prepare major upcoming features.
 
 This release comes with 660 commits and 150+ bug fixes! For all the changes, check out the [release notes][2].
 
-Go grab the tarball or [source][3], and give it a spin! And for <span style="font-weight: 400;">a quick try, &#8216;<a href="https://github.com/cloudera/hue/tree/master/tools/docker">docker pull gethue/4.5.0</a>&#8216; or open-up </span>[<span style="font-weight: 400;">demo.gethue.com</span>][4]<span style="font-weight: 400;">. </span>If you have a Kubernetes cluster:
+They are several ways to give it a spin!
 
-<pre class="brush: bash; title: ; notranslate" title="">helm repo add gethue https://helm.gethue.com
-helm repo update
-helm install gethue/hue
-</pre>
-
-<p style="text-align: center;">
-  <a class="sf-button standard accent standard  dropshadow" style="color: #fff!important; font-size: 200%;" title="Click to download the tarball release" href="https://cdn.gethue.com/downloads/hue-4.5.0.tgz" target="_blank" rel="noopener noreferrer"><br /> <span class="text">Download</span><br /> </a>
-</p>
+* [Tarball](https://cdn.gethue.com/downloads/hue-4.5.0.tgz) or [source][3]
+* From <a href="https://github.com/cloudera/hue/tree/master/tools/docker">Docker Hub</a>
+    ```
+    docker pull gethue/4.5.0
+    ```
+* [demo.gethue.com][4]
+* Kubernetes cluster
+    ```
+    helm repo add gethue https://helm.gethue.com
+    helm repo update
+    helm install gethue/hue
+    ```
 
 <a href="https://cdn.gethue.com/uploads/2019/08/hue_4.5.png"><img src="https://cdn.gethue.com/uploads/2019/08/hue_4.5.png" /></a>
 
