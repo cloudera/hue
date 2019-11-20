@@ -28,6 +28,7 @@ import { REDRAW_CHART_EVENT } from 'apps/notebook2/events';
 import { EXECUTABLE_UPDATED_EVENT } from 'apps/notebook2/execution/executable';
 import { RESULT_TYPE, RESULT_UPDATED_EVENT } from 'apps/notebook2/execution/executionResult';
 import { attachTracker } from 'apps/notebook2/components/executableStateHandler';
+import { defer } from 'utils/hueUtils';
 
 export const NAME = 'snippet-results';
 
@@ -194,7 +195,7 @@ class SnippetResults extends DisposableComponent {
       if (val) {
         this.showChart(false);
         huePubSub.publish('editor.grid.shown', this);
-        huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
+        defer(() => huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT));
         huePubSub.publish('table.extender.redraw');
       }
     });
