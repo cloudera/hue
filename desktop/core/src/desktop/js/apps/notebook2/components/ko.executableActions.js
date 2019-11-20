@@ -30,7 +30,7 @@ const TEMPLATE = `
 <div class="snippet-execute-actions" data-test="${ NAME }">
   <div class="btn-group">
     <!-- ko if: status() !== '${ EXECUTION_STATUS.running }' && !waiting() -->
-    <button class="btn btn-primary btn-mini btn-execute disable-feedback" data-test="execute" data-bind="click: execute"><i class="fa fa-play fa-fw"></i> ${I18n(
+    <button class="btn btn-primary btn-mini btn-execute disable-feedback" data-test="execute" data-bind="click: execute, disable: disabled"><i class="fa fa-play fa-fw"></i> ${I18n(
       'Execute'
     )}</button>
     <!-- /ko -->
@@ -53,6 +53,8 @@ const TEMPLATE = `
 </div>
 `;
 
+const WHITE_SPACE_REGEX = /^\s*$/;
+
 class ExecutableActions extends DisposableComponent {
   constructor(params) {
     super();
@@ -68,6 +70,15 @@ class ExecutableActions extends DisposableComponent {
         this.activeExecutable().isReady() &&
         this.partOfRunningExecution()
     );
+
+    this.disabled = ko.pureComputed(() => {
+      const executable = this.activeExecutable();
+
+      return (
+        !executable ||
+        (executable.parsedStatement && WHITE_SPACE_REGEX.test(executable.parsedStatement.statement))
+      );
+    });
 
     this.subscribe(EXECUTABLE_UPDATED_EVENT, executable => {
       if (this.activeExecutable() === executable) {

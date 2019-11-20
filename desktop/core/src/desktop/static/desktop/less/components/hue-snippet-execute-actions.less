@@ -26,7 +26,10 @@
   .btn-group {
     .btn {
       font-size: 11px;
-      border-bottom-color: @hue-primary-color-dark;
+
+      &:not([disabled]) {
+        border-bottom-color: @hue-primary-color-dark;
+      }
     }
 
     .btn-execute {
