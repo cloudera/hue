@@ -2100,8 +2100,11 @@ class ApiHelper {
           if (options.executable.handle !== handle) {
             options.executable.handle = handle;
           }
-          this.cancelStatement(options);
-        } catch (err) {}
+          await this.cancelStatement(options);
+        } catch (err) {
+          console.warn('Failed cancelling statement');
+          console.warn(err);
+        }
       }
     });
 
@@ -2239,7 +2242,11 @@ class ApiHelper {
    */
   async cancelStatement(options) {
     return new Promise(async (resolve, reject) => {
-      this.simplePost('/notebook/api/cancel_statement', options.executable.toContext(), options)
+      this.simplePost(
+        '/notebook/api/cancel_statement',
+        await options.executable.toContext(),
+        options
+      )
         .done(resolve)
         .fail(reject);
     });

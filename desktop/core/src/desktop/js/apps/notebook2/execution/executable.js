@@ -269,6 +269,10 @@ export default class Executable {
               statusCheckCount > 45 ? 5000 : 1000
             );
             break;
+          case EXECUTION_STATUS.failed:
+            this.executeEnded = Date.now();
+            this.setStatus(queryStatus);
+            break;
           default:
             this.executeEnded = Date.now();
             console.warn('Got unknown status ' + queryStatus);
