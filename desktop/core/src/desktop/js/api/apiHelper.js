@@ -1863,13 +1863,13 @@ class ApiHelper {
           if (response && response.query_status && response.query_status.status) {
             const status = response.query_status.status;
             if (status === 'available') {
-              deferred.resolve();
+              deferred.resolve(response.query_status);
             } else if (status === 'running' || status === 'starting' || status === 'waiting') {
               waitTimeout = window.setTimeout(() => {
                 waitForAvailable();
               }, 500);
             } else {
-              deferred.reject();
+              deferred.reject(response.query_status);
             }
           }
         })
@@ -2427,13 +2427,16 @@ class ApiHelper {
                 compute: options.compute,
                 silenceErrors: options.silenceErrors
               })
-              .done(() => {
+              .done((resultStatus) => {
+                if (queryResult.result && queryResult.result.handle && resultStatus && resultStatus.has_result_set !== undefined) {
+                  queryResult.result.handle.has_result_set = resultStatus.has_result_set;
+                }
                 const resultRequest = self
                   .simplePost(
                     '/notebook/api/fetch_result_data',
                     {
                       notebook: notebookJson,
-                      snippet: snippetJson,
+                      snippet: JSON.stringify(queryResult),
                       rows: options.sampleCount || 100,
                       startOver: 'false'
                     },

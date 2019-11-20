@@ -2297,6 +2297,10 @@ class Snippet {
 
               if (data.status === 0) {
                 self.status(data.query_status.status);
+                if (self.result.handle() && data.query_status.has_result_set !== undefined) {
+                  self.result.handle().has_result_set = data.query_status.has_result_set;
+                  self.result.hasResultset(self.result.handle().has_result_set);
+                }
 
                 if (
                   self.status() == 'running' ||

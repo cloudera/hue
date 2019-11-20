@@ -233,7 +233,7 @@ def check_status(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
   if operation_id or not snippet: # To unify with _get_snippet
-    nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=operation_id or notebook['id'])
+    nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=operation_id or notebook['uuid'])
     notebook = Notebook(document=nb_doc).get_data() # Used below
     snippet = notebook['snippets'][0]
 
@@ -260,15 +260,20 @@ def check_status(request):
       status = 'expired'
     else:
       status = 'failed'
+    if response.get('query_status'):
+      has_result_set = response['query_status'].get('has_result_set')
+    else:
+      has_result_set = None
 
     if notebook['type'].startswith('query') or notebook.get('isManaged'):
-      nb_doc = Document2.objects.get(id=notebook['id'])
-      if nb_doc.can_write(request.user):
-        nb = Notebook(document=nb_doc).get_data()
-        if status != nb['snippets'][0]['status']:
-          nb['snippets'][0]['status'] = status
-          nb_doc.update_data(nb)
-          nb_doc.save()
+      nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=operation_id or notebook['uuid'])
+      nb = Notebook(document=nb_doc).get_data()
+      if status != nb['snippets'][0]['status'] or has_result_set != nb['snippets'][0].get('has_result_set'):
+        nb['snippets'][0]['status'] = status
+        if has_result_set is not None:
+          nb['snippets'][0]['has_result_set'] = has_result_set
+        nb_doc.update_data(nb)
+        nb_doc.save()
 
   return JsonResponse(response)
 
@@ -283,10 +288,10 @@ def fetch_result_data(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
+  snippet = _get_snippet(request.user, notebook, snippet, operation_id)
+
   rows = json.loads(request.POST.get('rows', '100'))
   start_over = json.loads(request.POST.get('startOver', 'false'))
-
-  snippet = _get_snippet(request.user, notebook, snippet, operation_id)
 
   with opentracing.tracer.start_span('notebook-fetch_result_data') as span:
     response['result'] = get_api(request, snippet).fetch_result(notebook, snippet, rows, start_over)
