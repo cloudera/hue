@@ -16,6 +16,7 @@
 
 <%!
 import logging
+import sys
 
 from desktop.lib.conf import BoundContainer, is_anonymous
 from desktop.views import commonheader, commonfooter
@@ -140,12 +141,12 @@ LOG = logging.getLogger(__name__)
             % if 'password' in config_obj.config.key:
               ${ "*" * 10 }
             % else:
-              ${ str(config_obj.get_raw()).decode('utf-8', 'replace') }
+              ${ config_obj.get_raw() if sys.version_info[0] > 2 else str(config_obj.get_raw()).decode('utf-8', 'replace') }
             % endif
               <%
                 config_str = None
                 try:
-                  config_str = str(config_obj.get_raw()).decode('utf-8', 'replace')
+                  config_str = str(config_obj.get_raw()) if sys.version_info[0] > 2 else str(config_obj.get_raw()).decode('utf-8', 'replace')
                 except:
                   LOG.exception("Potential misconfiguration. Error value of key '%s' in configuration." % config_obj.grab_key)
               %>
@@ -156,7 +157,7 @@ LOG = logging.getLogger(__name__)
               %if config_obj.config.help:
                 <i>${ config_obj.config.help or _('No help available.') }</i>
               %endif
-            <span class="muted">${ _('Default:') } <i>${ str(config_obj.config.default).decode('utf-8', 'replace') }</i></span>
+            <span class="muted">${ _('Default:') } <i>${ config_obj.config.default if sys.version_info[0] > 2 else str(config_obj.config.default).decode('utf-8', 'replace') }</i></span>
           % endif
           </td>
         </tr>
