@@ -30,7 +30,10 @@ class ConfigSpec(object):
     self.file.close()
 
   def p(self, s):
-    self.file.write("\n" + " " * self.indent + s + "\n")
+    bytes_obj = "\n" + " " * self.indent + s + "\n"
+    if not isinstance(bytes_obj, bytes):
+      bytes_obj = bytes_obj.encode()
+    self.file.write(bytes_obj)
 
   def recurse(self, config_obj):
     if isinstance(config_obj, BoundContainer):

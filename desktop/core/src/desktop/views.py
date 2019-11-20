@@ -628,6 +628,7 @@ def _get_config_errors(request, cache=True):
   return _CONFIG_ERROR_LIST
 
 def validate_by_spec(error_list):
+  configspec = None
   try:
     # Generate the spec file
     configspec = generate_configspec()
@@ -637,7 +638,8 @@ def validate_by_spec(error_list):
     # Validate after merging all the confs
     collect_validation_messages(conf, error_list)
   finally:
-    os.remove(configspec.name)
+    if configspec:
+      os.remove(configspec.name)
 
 def load_confs(configspecpath, conf_source=None):
   """Loads and merges all of the configurations passed in,
