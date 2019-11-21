@@ -103,9 +103,9 @@ Restart Hue, open the Editors and start typing your first queries!
 #### Lint configs
 
 * [.eslintrc.js](https://github.com/cloudera/hue/blob/master/.eslintrc.js)
-* [.pylintrc](https://github.com/cloudera/hue/blob/master/desktop/.pylintrc)
+* [.pylintrc](https://github.com/cloudera/hue/blob/master/.pylintrc)
 * [.prettierrc](https://github.com/cloudera/hue/blob/master/.prettierrc)
-* [git hooks](https://github.com/cloudera/hue/blob/master/tools/githooks)
+* [Git hooks](https://github.com/cloudera/hue/blob/master/tools/githooks)
 
     cp tools/githooks/* .git/hooks
     chmod +x .git/hooks/*

@@ -48,6 +48,7 @@ confidence=
   # W0311(bad-indentation)
   # C0301(line-too-long
 
+
 # Disable the message, report, category or checker with the given id(s). You
 # can either give multiple identifiers separated by comma (,) or put this
 # option multiple times (only on the command line, not in the configuration
@@ -57,7 +58,6 @@ confidence=
 # --enable=similarities". If you want to run only the classes checker, but have
 # no Warning level messages displayed, use"--disable=all --enable=classes
 # --disable=W"
-
 disable=all
 
   #attribute-defined-outside-init,
@@ -128,7 +128,7 @@ ignore-imports=no
 [VARIABLES]
 
 # Tells whether we should check for unused import in __init__ files.
-init-import=no
+init-import=yes
 
 # A regular expression matching the name of dummy variables (i.e. expectedly
 # not used).
@@ -146,7 +146,7 @@ callbacks=cb_,_cb
 [FORMAT]
 
 # Maximum number of characters on a single line.
-max-line-length=150
+max-line-length=140
 
 # Regexp for a line that is allowed to be longer than the limit.
 ignore-long-lines=^\s*(# )?<?https?://\S+>?$
@@ -189,7 +189,7 @@ bad-names=foo,bar,baz,toto,tutu,tata
 name-group=
 
 # Include a hint for the correct naming format with invalid-name
-include-naming-hint=no
+include-naming-hint=yes
 
 # Regular expression matching correct function names
 function-rgx=[a-z_][a-z0-9_]{2,30}$
@@ -378,4 +378,3 @@ int-import-graph=
 # Exceptions that will emit a warning when being caught. Defaults to
 # "Exception"
 overgeneral-exceptions=Exception
-ignored-classes=SQLObject,Config,BoundConfig,ConfigSection
