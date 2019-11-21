@@ -58,15 +58,17 @@ export default class SqlExecutable extends Executable {
       database: executableRaw.database,
       parsedStatement: executableRaw.parsedStatement
     });
+    executable.executeEnded = executableRaw.executeEnded;
+    executable.executeStarted = executableRaw.executeStarted;
+    executable.handle = executableRaw.handle;
+    executable.history = executableRaw.history;
+    executable.logs.errors = executableRaw.logs.errors;
+    executable.logs.jobs = executableRaw.logs.jobs;
+    executable.lost = executableRaw.lost;
     executable.observerState = executableRaw.observerState || {};
+    executable.operationId = executableRaw.history && executableRaw.history.uuid;
     executable.progress = executableRaw.progress;
     executable.status = executableRaw.status;
-    executable.handle = executableRaw.handle;
-    executable.lost = executableRaw.lost;
-    executable.logs.jobs = executableRaw.logs.jobs;
-    executable.logs.errors = executableRaw.logs.errors;
-    executable.executeStarted = executableRaw.executeStarted;
-    executable.executeEnded = executableRaw.executeEnded;
     return executable;
   }
 

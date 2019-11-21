@@ -2169,32 +2169,26 @@ class ApiHelper {
   checkExecutionStatus(options) {
     const deferred = $.Deferred();
 
-    const result = new CancellablePromise(deferred);
-
-    options.executable
-      .toContext()
-      .then(notebookApiContext => {
-        const request = $.post({
-          url: '/notebook/api/check_status',
-          data: notebookApiContext
-        })
-          .done(response => {
-            if (response && response.query_status) {
-              deferred.resolve(response.query_status.status);
-            } else if (response && response.status === -3) {
-              deferred.resolve(EXECUTION_STATUS.expired);
-            } else {
-              deferred.resolve(EXECUTION_STATUS.failed);
-            }
-          })
-          .fail(err => {
-            deferred.reject(this.assistErrorCallback(options)(err));
-          });
-        result.request = request;
+    const request = $.post({
+      url: '/notebook/api/check_status',
+      data: {
+        operationId: options.executable.operationId
+      }
+    })
+      .done(response => {
+        if (response && response.query_status) {
+          deferred.resolve(response.query_status.status);
+        } else if (response && response.status === -3) {
+          deferred.resolve(EXECUTION_STATUS.expired);
+        } else {
+          deferred.resolve(EXECUTION_STATUS.failed);
+        }
       })
-      .catch(deferred.reject);
+      .fail(err => {
+        deferred.reject(this.assistErrorCallback(options)(err));
+      });
 
-    return result;
+    return new CancellablePromise(deferred, request);
   }
 
   /**
