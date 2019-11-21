@@ -27,23 +27,23 @@ import sessionManager from 'apps/notebook2/execution/sessionManager';
 import Snippet, { STATUS as SNIPPET_STATUS } from 'apps/notebook2/snippet';
 
 export default class Notebook {
-  constructor(vm, notebook) {
+  constructor(vm, notebookRaw) {
     this.parentVm = vm;
-    this.id = ko.observable(notebook.id);
-    this.uuid = ko.observable(notebook.uuid || hueUtils.UUID());
-    this.name = ko.observable(notebook.name || '');
-    this.description = ko.observable(notebook.description || '');
-    this.type = ko.observable(notebook.type || 'notebook');
+    this.id = ko.observable(notebookRaw.id);
+    this.uuid = ko.observable(notebookRaw.uuid || hueUtils.UUID());
+    this.name = ko.observable(notebookRaw.name || '');
+    this.description = ko.observable(notebookRaw.description || '');
+    this.type = ko.observable(notebookRaw.type || 'notebook');
     this.initialType = this.type().replace('query-', '');
-    this.coordinatorUuid = ko.observable(notebook.coordinatorUuid);
-    this.isHistory = ko.observable(!!notebook.is_history);
-    this.isManaged = ko.observable(!!notebook.isManaged);
-    this.parentSavedQueryUuid = ko.observable(notebook.parentSavedQueryUuid); // History parent
-    this.isSaved = ko.observable(!!notebook.isSaved);
-    this.canWrite = ko.observable(notebook.can_write !== false);
-    this.onSuccessUrl = ko.observable(notebook.onSuccessUrl);
-    this.pubSubUrl = ko.observable(notebook.pubSubUrl);
-    this.isPresentationModeDefault = ko.observable(!!notebook.isPresentationModeDefault);
+    this.coordinatorUuid = ko.observable(notebookRaw.coordinatorUuid);
+    this.isHistory = ko.observable(!!notebookRaw.is_history);
+    this.isManaged = ko.observable(!!notebookRaw.isManaged);
+    this.parentSavedQueryUuid = ko.observable(notebookRaw.parentSavedQueryUuid); // History parent
+    this.isSaved = ko.observable(!!notebookRaw.isSaved);
+    this.canWrite = ko.observable(notebookRaw.can_write !== false);
+    this.onSuccessUrl = ko.observable(notebookRaw.onSuccessUrl);
+    this.pubSubUrl = ko.observable(notebookRaw.pubSubUrl);
+    this.isPresentationModeDefault = ko.observable(!!notebookRaw.isPresentationModeDefault);
     this.isPresentationMode = ko.observable(false);
     this.isPresentationModeInitialized = ko.observable(false);
     this.isPresentationMode.subscribe(newValue => {
@@ -57,12 +57,12 @@ export default class Notebook {
       }
     });
     this.presentationSnippets = ko.observable({});
-    this.isHidingCode = ko.observable(!!notebook.isHidingCode);
+    this.isHidingCode = ko.observable(!!notebookRaw.isHidingCode);
 
     this.snippets = ko.observableArray();
     this.selectedSnippet = ko.observable(vm.editorType()); // Aka selectedSnippetType
-    this.directoryUuid = ko.observable(notebook.directoryUuid);
-    this.dependents = komapping.fromJS(notebook.dependents || []);
+    this.directoryUuid = ko.observable(notebookRaw.directoryUuid);
+    this.dependents = komapping.fromJS(notebookRaw.dependents || []);
     this.dependentsCoordinator = ko.pureComputed(() =>
       this.dependents().filter(doc => doc.type() === 'oozie-coordinator2' && doc.is_managed())
     );
@@ -120,9 +120,9 @@ export default class Notebook {
       () => this.snippets().length > 0 && this.snippets().every(snippet => snippet.isBatchable())
     );
 
-    this.isExecutingAll = ko.observable(!!notebook.isExecutingAll);
+    this.isExecutingAll = ko.observable(!!notebookRaw.isExecutingAll);
 
-    this.executingAllIndex = ko.observable(notebook.executingAllIndex || 0);
+    this.executingAllIndex = ko.observable(notebookRaw.executingAllIndex || 0);
 
     this.retryModalConfirm = null;
     this.retryModalCancel = null;
@@ -134,7 +134,7 @@ export default class Notebook {
     this.unloaded = ko.observable(false);
     this.updateHistoryFailed = false;
 
-    this.viewSchedulerId = ko.observable(notebook.viewSchedulerId || '');
+    this.viewSchedulerId = ko.observable(notebookRaw.viewSchedulerId || '');
     this.viewSchedulerId.subscribe(() => {
       this.save();
     });
@@ -142,16 +142,16 @@ export default class Notebook {
     this.loadingScheduler = ko.observable(false);
 
     // Init
-    if (notebook.snippets) {
-      notebook.snippets.forEach(snippet => {
-        this.addSnippet(snippet);
+    if (notebookRaw.snippets) {
+      notebookRaw.snippets.forEach(snippetRaw => {
+        this.addSnippet(snippetRaw);
       });
       if (
-        typeof notebook.presentationSnippets != 'undefined' &&
-        notebook.presentationSnippets != null
+        typeof notebookRaw.presentationSnippets != 'undefined' &&
+        notebookRaw.presentationSnippets != null
       ) {
         // Load
-        $.each(notebook.presentationSnippets, (key, snippet) => {
+        $.each(notebookRaw.presentationSnippets, (key, snippet) => {
           snippet.status = 'ready'; // Protect from storm of check_statuses
           const _snippet = new Snippet(vm, this, snippet);
           _snippet.init();
@@ -218,8 +218,8 @@ export default class Notebook {
     huePubSub.publish('assist.is.db.panel.ready');
   }
 
-  addSnippet(snippet) {
-    const newSnippet = new Snippet(this.parentVm, this, snippet);
+  addSnippet(snippetRaw) {
+    const newSnippet = new Snippet(this.parentVm, this, snippetRaw);
     this.snippets.push(newSnippet);
     newSnippet.init();
     return newSnippet;

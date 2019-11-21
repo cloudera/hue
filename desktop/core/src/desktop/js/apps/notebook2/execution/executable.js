@@ -330,15 +330,16 @@ export default class Executable {
     delete state.aceAnchor;
 
     return {
-      type: 'executable',
-      handle: this.handle,
-      status: this.status,
-      progress: this.progress,
-      logs: this.logs.toJs(),
-      executeStarted: this.executeStarted,
       executeEnded: this.executeEnded,
+      executeStarted: this.executeStarted,
+      handle: this.handle,
+      history: this.history,
+      logs: this.logs.toJs(),
+      lost: this.lost,
       observerState: state,
-      lost: this.lost
+      progress: this.progress,
+      status: this.status,
+      type: 'executable'
     };
   }
 
