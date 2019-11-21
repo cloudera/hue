@@ -25,7 +25,7 @@ import 'apps/notebook2/components/resultChart/ko.resultChart';
 import 'apps/notebook2/components/resultGrid/ko.resultGrid';
 import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
 import { REDRAW_CHART_EVENT } from 'apps/notebook2/events';
-import { EXECUTABLE_UPDATED_EVENT } from 'apps/notebook2/execution/executable';
+import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
 import { RESULT_TYPE, RESULT_UPDATED_EVENT } from 'apps/notebook2/execution/executionResult';
 import { attachTracker } from 'apps/notebook2/components/executableStateHandler';
 import { defer } from 'utils/hueUtils';
@@ -93,7 +93,7 @@ const TEMPLATE = `
       <!-- /ko -->
     </div>
     <div class="table-results" data-bind="visible: type() === 'table'" style="display: none;">
-      <div data-bind="visible: showGrid() && data().length" style="display: none; position: relative;">
+      <div data-bind="visible: !executing() && showGrid() && hasSomeResult()" style="display: none; position: relative;">
         <!-- ko component: { 
           name: 'result-grid',
           params: {
@@ -111,7 +111,7 @@ const TEMPLATE = `
           }
         } --><!-- /ko -->
       </div>
-      <div data-bind="visible: showChart() && data().length" style="display: none; position: relative;">
+      <div data-bind="visible: !executing() && showChart() && hasSomeResult()" style="display: none; position: relative;">
         <!-- ko component: {
           name: 'result-chart',
           params: {
@@ -127,8 +127,11 @@ const TEMPLATE = `
           }
         } --><!-- /ko -->
       </div>
-      <div data-bind="visible: !data().length" style="display: none;">
+      <div data-bind="visible: !executing() && !hasSomeResult()" style="display: none;">
         <h1 class="empty">${ I18n('Select and execute a query to see the result.') }</h1>
+      </div>
+      <div data-bind="visible: executing" style="display: none;">
+        <h1 class="empty"><i class="fa fa-spinner fa-spin"></i> ${ I18n('Executing...') }</h1>
       </div>
     </div>
   </div>
@@ -156,6 +159,8 @@ class SnippetResults extends DisposableComponent {
     this.images = ko.observableArray();
     this.hasMore = ko.observable();
     this.hasResultSet = ko.observable();
+
+    this.executing = ko.pureComputed(() => this.status() === EXECUTION_STATUS.running);
 
     this.hasSomeResult = ko.pureComputed(() => this.data().length);
 
@@ -267,6 +272,7 @@ class SnippetResults extends DisposableComponent {
   }
 
   updateFromExecutable(executable) {
+    this.status(executable.status);
     this.hasResultSet(executable.handle.has_result_set);
     if (!this.hasResultSet) {
       this.reset();
