@@ -35,16 +35,17 @@ import django_opentracing
 from django.utils.translation import ugettext_lazy as _
 
 import desktop.redaction
-from desktop.lib.paths import get_desktop_root
-from desktop.lib.python_util import force_dict_to_strings
+
 from desktop.conf import has_channels
+from desktop.lib.paths import get_desktop_root, get_run_root
+from desktop.lib.python_util import force_dict_to_strings
 
 from aws.conf import is_enabled as is_s3_enabled
 from azure.conf import is_abfs_enabled
 
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', '..', '..'))
-
 
 HUE_DESKTOP_VERSION = pkg_resources.get_distribution("desktop").version or "Unknown"
 NICE_NAME = "Hue"
@@ -277,7 +278,7 @@ AUTH_PROFILE_MODULE = None
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/" # For djangosaml2 bug.
 
-PYLINTRC = get_desktop_root('.pylintrc')
+PYLINTRC = get_run_root('.pylintrc')
 
 # Custom CSRF Failure View
 CSRF_FAILURE_VIEW = 'desktop.views.csrf_failure'
