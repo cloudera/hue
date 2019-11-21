@@ -52,8 +52,8 @@ export default class Executable {
    * @param {Session[]} [options.sessions]
    */
   constructor(options) {
+    this.id = UUID();
     this.executor = options.executor;
-
     this.handle = {
       statement_id: 0 // TODO: Get rid of need for initial handle in the backend
     };
@@ -334,6 +334,7 @@ export default class Executable {
       executeStarted: this.executeStarted,
       handle: this.handle,
       history: this.history,
+      id: this.id,
       logs: this.logs.toJs(),
       lost: this.lost,
       observerState: state,

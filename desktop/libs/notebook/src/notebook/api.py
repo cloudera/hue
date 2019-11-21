@@ -132,6 +132,11 @@ def _execute_notebook(request, notebook, snippet):
   try:
     try:
       session = notebook.get('sessions') and notebook['sessions'][0] # Session reference for snippet execution without persisting it
+
+      active_executable = json.loads(request.POST.get('executable', '{}')) # Editor v2
+
+      # TODO: Use statement, database etc. from active_executable
+
       if historify:
         history = _historify(notebook, request.user)
         notebook = Notebook(document=history).get_data()
@@ -149,6 +154,18 @@ def _execute_notebook(request, notebook, snippet):
     finally:
       if historify:
         _snippet = [s for s in notebook['snippets'] if s['id'] == snippet['id']][0]
+
+        if 'id' in active_executable: # Editor v2
+          # notebook_executable is the 1-to-1 match of active_executable in the notebook structure
+          notebook_executable = [e for e in _snippet['executor']['executables'] if e['id'] == active_executable['id']][0]
+          notebook_executable['handle'] = response['handle']
+          if history:
+            notebook_executable['history'] = {
+              'id': history.id,
+              'uuid': history.uuid
+            }
+            notebook_executable['operationId'] = history.uuid
+
         if 'handle' in response: # No failure
           if 'result' not in _snippet: # Editor v2
             _snippet['result'] = {}

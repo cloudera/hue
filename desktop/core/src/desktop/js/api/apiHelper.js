@@ -2063,6 +2063,8 @@ class ApiHelper {
     const promise = new Promise(async (resolve, reject) => {
       let data = {};
       if (executable.executor.snippet) {
+        // TODO: Refactor away the snippet, it currently works because snippet.statement is a computed from
+        // the active executable, but we n
         data = {
           notebook: await executable.executor.snippet.parentNotebook.toJson(),
           snippet: executable.executor.snippet.toContextJson()
@@ -2070,6 +2072,8 @@ class ApiHelper {
       } else {
         data = await executable.toContext();
       }
+
+      data.executable = executable.toJson();
 
       this.simplePost(url, data, options)
         .done(response => {
