@@ -29,6 +29,7 @@ class Executor {
    * @param {ContextNamespace} options.namespace
    * @param {string} options.statement
    * @param {string} [options.database]
+   * @param {boolean} [options.isOptimizerEnabled] - Default false
    * @param {Snippet} [options.snippet] - Optional snippet for history
    */
   constructor(options) {
@@ -37,6 +38,7 @@ class Executor {
     this.namespace = options.namespace;
     this.database = options.database;
     this.isSqlEngine = options.isSqlEngine;
+    this.isOptimizerEnabled = options.isOptimizerEnabled;
     this.executables = [];
 
     this.snippet = options.snippet;

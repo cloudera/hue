@@ -1006,6 +1006,7 @@ export default class Snippet {
       database: this.database,
       sourceType: this.type,
       namespace: this.namespace,
+      isOptimizerEnabled: this.parentVm.isOptimizerEnabled(),
       snippet: this,
       isSqlEngine: this.isSqlDialect
     });
