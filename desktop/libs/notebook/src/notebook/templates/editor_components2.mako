@@ -1565,6 +1565,12 @@
           snippetIcon: 'fa-database',
           sqlDialect: true
         },
+        druid: {
+          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+          aceMode: 'ace/mode/druid',
+          snippetIcon: 'fa-database',
+          sqlDialect: true
+        },
         phoenix: {
           placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
           aceMode: 'ace/mode/phoenix',
