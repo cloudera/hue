@@ -1571,6 +1571,12 @@
           snippetIcon: 'fa-database',
           sqlDialect: true
         },
+        bigquery: {
+          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+          aceMode: 'ace/mode/bigquery',
+          snippetIcon: 'fa-database',
+          sqlDialect: true
+        },
         phoenix: {
           placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
           aceMode: 'ace/mode/phoenix',
