@@ -197,6 +197,7 @@ export default class Executable {
 
         throw err;
       }
+
       if (this.handle.has_result_set && this.handle.sync) {
         this.result = new ExecutionResult(this);
         if (this.handle.sync) {
@@ -206,7 +207,8 @@ export default class Executable {
           this.result.fetchRows();
         }
       }
-      if (true || this.isOptimizerEnabled()) {
+
+      if (this.executor.isOptimizerEnabled) {
         huePubSub.publish('editor.upload.query', this.history.id);
       }
 
