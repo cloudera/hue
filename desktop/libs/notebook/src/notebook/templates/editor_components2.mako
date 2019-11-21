@@ -1559,6 +1559,12 @@
           snippetIcon: 'fa-database',
           sqlDialect: true
         },
+        elasticsearch: {
+          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+          aceMode: 'ace/mode/elasticsearch',
+          snippetIcon: 'fa-database',
+          sqlDialect: true
+        },
         phoenix: {
           placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
           aceMode: 'ace/mode/phoenix',
