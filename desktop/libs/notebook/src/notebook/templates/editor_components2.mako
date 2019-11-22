@@ -1694,6 +1694,26 @@
       }
     });
 
+    % if conf.WEBSOCKETS.ENABLED.get():
+        var editorWs = new WebSocket('ws://' + window.location.host + '/ws/editor/results/' + 'userA' + '/');
+
+        editorWs.onopen = function(e) {
+          console.info('Notification socket open.');
+        };
+
+        editorWs.onmessage = function(e) {
+          var data = JSON.parse(e.data);
+          if (data['type'] == 'channel_name') {
+            window.WS_CHANNEL = data['data'];
+          }
+          console.log(data);
+        };
+
+        editorWs.onclose = function(e) {
+          console.error('Chat socket closed unexpectedly');
+        };
+    % endif
+
     window.EDITOR_ENABLE_QUERY_SCHEDULING = '${ ENABLE_QUERY_SCHEDULING.get() }' === 'True';
 
     window.EDITOR_ID = ${ editor_id or 'null' };

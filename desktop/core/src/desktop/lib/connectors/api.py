@@ -50,7 +50,7 @@ CONNECTOR_TYPES += [
   {'nice_name': "Hive Tez", 'dialect': 'hive-tez', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
   {'nice_name': "Hive LLAP", 'dialect': 'hive-llap', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
   {'nice_name': "Druid", 'dialect': 'sql-druid', 'interface': 'sqlalchemy', 'settings': [{'name': 'url', 'value': 'druid://druid-host.com:8082/druid/v2/sql/'}], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
-  {'nice_name': "Kafka SQL", 'dialect': 'kafka-sql', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
+  {'nice_name': "Kafka SQL", 'dialect': 'ksql', 'interface': 'ksql', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
   {'nice_name': "SparkSQL", 'dialect': 'spark-sql', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
   {'nice_name': "MySQL", 'dialect': 'mysql', 'interface': 'sqlalchemy', 'settings': [{'name': 'url', 'value': 'mysql://username:password@mysq-host:3306/hue'}], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
   {'nice_name': "Presto", 'dialect': 'presto', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},

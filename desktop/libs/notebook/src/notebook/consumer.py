@@ -16,11 +16,18 @@
 # limitations under the License.
 
 import json
+import logging
 
 from desktop.conf import has_channels
 
+
+LOG = logging.getLogger(__name__)
+
+
 if has_channels():
+  from asgiref.sync import async_to_sync
   from channels.generic.websocket import AsyncWebsocketConsumer
+  from channels.layers import get_channel_layer
 
 
   class EditorConsumer(AsyncWebsocketConsumer):
@@ -28,23 +35,39 @@ if has_channels():
     async def connect(self):
       await self.accept()
 
-      await self.send(text_data=json.dumps({
-        'type': 'channel_name',
-        'data': self.channel_name,
-        'accept': True
-      }))
+      LOG.info('User %(user)s connected to WS Editor.' % self.scope)
+
+      await self.send(
+        text_data=json.dumps({
+          'type': 'channel_name',
+          'data': self.channel_name,
+          'accept': True
+        })
+      )
 
 
     async def task_progress(self, event):
-      await self.send(text_data=json.dumps({
-        'type': 'task_progress',
-        'data': event["data"]
-      }))
+      await self.send(
+        text_data=json.dumps({
+          'type': 'query_progress',
+          'data': event["data"]
+        })
+      )
+
+    async def task_result(self, event):
+      await self.send(
+        text_data=json.dumps({
+          'type': 'query_result',
+          'data': event["data"]
+        })
+      )
 
 
   def _send_to_channel(channel_name, message_type, message_data):
     channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.send)(channel_name, {
+    async_to_sync(channel_layer.send)(
+      channel_name, {
         "type": message_type,
         "data": message_data,
-    })
+      }
+    )

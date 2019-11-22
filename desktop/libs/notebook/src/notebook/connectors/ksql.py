@@ -51,7 +51,11 @@ class KSqlApi(Api):
 
   @query_error_handler
   def execute(self, notebook, snippet):
-    data, description = self.db.query(snippet['statement'])
+
+    data, description = self.db.query(
+        snippet['statement'],
+        channel_name=snippet.get('editorWsChannel')
+    )
     has_result_set = data is not None
 
     return {
