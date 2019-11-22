@@ -234,7 +234,7 @@ def check_status(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
   if operation_id or not snippet: # To unify with _get_snippet
-    nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=operation_id or notebook['id'])
+    nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=operation_id or notebook['uuid'])
     notebook = Notebook(document=nb_doc).get_data() # Used below
     snippet = notebook['snippets'][0]
 
@@ -263,7 +263,7 @@ def check_status(request):
       status = 'failed'
 
     if notebook['type'].startswith('query') or notebook.get('isManaged'):
-      nb_doc = Document2.objects.get(id=notebook['id'])
+      nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=operation_id or notebook['uuid'])
       if nb_doc.can_write(request.user):
         nb = Notebook(document=nb_doc).get_data()
         if status != nb['snippets'][0]['status']:
