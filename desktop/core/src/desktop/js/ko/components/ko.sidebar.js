@@ -22,6 +22,7 @@ import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 
+// prettier-ignore
 const TEMPLATE = `
   <script type="text/html" id="sidebar-inner-item">
     <!-- ko if: iconHtml -->
@@ -61,11 +62,12 @@ const TEMPLATE = `
         </div>
         <ul class="sidebar-nav-list">
           <!-- ko if: window.USER_VIEW_EDIT_USER_ENABLED -->
-          <li><a href="javascript:void(0);" data-bind="hueLink: '/useradmin/users/edit/${
-            window.LOGGED_USERNAME
-          }', attr: { 'title': window.IS_LDAP_SETUP ? ${I18n('View Profile')} : ${I18n(
-  'Edit Profile'
-)}">${I18n('My Profile')}</a></li>
+          <li><a href="javascript:void(0);" data-bind="
+              hueLink: '/useradmin/users/edit/${window.LOGGED_USERNAME}',
+              attr: { 
+                'title': window.IS_LDAP_SETUP ? '${I18n('View Profile')}' : '${I18n('Edit Profile')}'
+              }
+            ">${I18n('My Profile')}</a></li>
           <!-- /ko -->
           <!-- ko if: window.USER_IS_ADMIN -->
           <li><a href="javascript: void(0);" data-bind="hueLink: '/useradmin/users/'">${I18n(
