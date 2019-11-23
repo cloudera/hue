@@ -26,6 +26,7 @@ import datetime
 
 from django.conf import settings
 from django.core import urlresolvers, serializers
+from django.template import context as django_template_context
 from django.template.context_processors import csrf
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
@@ -41,6 +42,7 @@ import desktop.conf
 import desktop.lib.thrift_util
 from desktop.lib import django_mako
 from desktop.lib.json_utils import JSONEncoderForHTML
+from desktop.monkey_patches import monkey_patch_request_context_init
 
 
 LOG = logging.getLogger(__name__)
@@ -52,6 +54,8 @@ MAKO = 'mako'
 # This is what Debian allows. See chkname.c in shadow.
 USERNAME_RE_RULE = "[^-:\s][^:\s]*"
 GROUPNAME_RE_RULE = ".{,80}"
+
+django_template_context.RequestContext.__init__ = monkey_patch_request_context_init
 
 
 # For backward compatibility for upgrades to Hue 2.2
