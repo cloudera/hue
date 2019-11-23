@@ -585,8 +585,10 @@ class TestDocument2Permissions(object):
     data = json.loads(response.content)
     assert_equal(new_doc.uuid, data['document']['uuid'], data)
     assert_true('perms' in data['document'])
-    assert_equal({'read': {'users': [], 'groups': []}, 'write': {'users': [], 'groups': []}},
-                 data['document']['perms'])
+    assert_equal(
+        {'read': {'users': [], 'groups': []}, 'write': {'users': [], 'groups': []}},
+        data['document']['perms']
+    )
 
 
   def test_share_document_read_by_user(self):
@@ -918,10 +920,16 @@ class TestDocument2Permissions(object):
 
     response = self.client.get('/desktop/api2/doc/', {'uuid': doc1.uuid})
     data = json.loads(response.content)
-    assert_equal([{'id': self.default_group.id, 'name': self.default_group.name}],
-                 data['document']['perms']['read']['groups'], data)
-    assert_equal([{'id': self.user_not_me.id, 'username': self.user_not_me.username}],
-                 data['document']['perms']['write']['users'], data)
+    assert_equal(
+        [{'id': self.default_group.id, 'name': self.default_group.name}],
+        data['document']['perms']['read']['groups'],
+        data
+    )
+    assert_equal(
+        [{'id': self.user_not_me.id, 'username': self.user_not_me.username}],
+        data['document']['perms']['write']['users'],
+        data
+    )
 
 
   def test_search_documents(self):
@@ -956,12 +964,12 @@ class TestDocument2Permissions(object):
     doc_names = [doc['name'] for doc in data['documents']]
     assert_true('history.sql' in doc_names)
 
+
   def test_x_share_directory_y_add_file_x_share(self):
     # Test that when another User, Y, adds a doc to dir shared by User X, User X doesn't fail to share the dir next time:
     # /
     #   test_dir/
     #     query1.sql
-
 
     # Dir owned by self.user
     parent_dir = Directory.objects.create(name='test_dir', owner=self.user, parent_directory=self.home_dir)
@@ -984,8 +992,13 @@ class TestDocument2Permissions(object):
       })
     })
 
-    user_y_child_doc = Document2.objects.create(name='other_query1.sql', type='query-hive', owner=user_y, data={},
-                                          parent_directory=parent_dir)
+    user_y_child_doc = Document2.objects.create(
+        name='other_query1.sql',
+        type='query-hive',
+        owner=user_y,
+        data={},
+        parent_directory=parent_dir
+    )
 
     share_test_user = User.objects.create(username='share_test_user', password="share_test_user")
 
@@ -1013,8 +1026,13 @@ class TestDocument2Permissions(object):
 
 
   def test_unicode_name(self):
-    doc = Document2.objects.create(name='My Bundle a voté « non » à l’accord', type='oozie-workflow2', owner=self.user,
-                                   data={}, parent_directory=self.home_dir)
+    doc = Document2.objects.create(
+        name='My Bundle a voté « non » à l’accord',
+        type='oozie-workflow2',
+        owner=self.user,
+        data={},
+        parent_directory=self.home_dir
+    )
 
     # Verify that home directory contents return correctly
     response = self.client.get('/desktop/api2/doc/', {'uuid': self.home_dir.uuid})
@@ -1027,6 +1045,49 @@ class TestDocument2Permissions(object):
     assert_equal(0, data['status'])
     path = data['document']['path']
     assert_equal('/My%20Bundle%20a%20vot%C3%A9%20%C2%AB%20non%20%C2%BB%20%C3%A0%20l%E2%80%99accord', path)
+
+
+  def test_link_permissions(self):
+    doc = Document2.objects.create(
+        name='test_link_permissions.sql',
+        type='query-hive',
+        owner=self.user,
+        data={},
+        parent_directory=self.home_dir
+    )
+
+    try:
+      assert_true(doc.can_read(self.user))
+      assert_true(doc.can_write(self.user))
+      assert_false(doc.can_read(self.user_not_me))
+      assert_false(doc.can_write(self.user_not_me))
+
+      doc.share(name=Document2Permission.LINK_READ_PERM, is_link_on=True)
+
+      assert_true(doc.can_read(self.user))
+      assert_true(doc.can_write(self.user))
+      assert_true(doc.can_read(self.user_not_me))
+      assert_false(doc.can_write(self.user_not_me))
+
+      assert_false(doc.get_permission('read').users.all())  # There is no doc listing via links, only direct access
+      assert_false(doc.get_permission('read').groups.all())
+
+      doc.share(name=Document2Permission.LINK_READ_PERM, is_link_on=False)
+
+      assert_true(doc.can_read(self.user))
+      assert_true(doc.can_write(self.user))
+      assert_false(doc.can_read(self.user_not_me))
+      assert_false(doc.can_write(self.user_not_me))
+
+      doc.share(name=Document2Permission.LINK_READ_PERM, is_link_on=True)
+      doc.share(name=Document2Permission.LINK_WRITE_PERM, is_link_on=True)
+
+      assert_true(doc.can_read(self.user))
+      assert_true(doc.can_write(self.user))
+      assert_true(doc.can_read(self.user_not_me))
+      assert_true(doc.can_write(self.user_not_me))
+    finally:
+      doc.delete()
 
 
 class TestDocument2ImportExport(object):

@@ -1356,8 +1356,14 @@ class Document2(models.Model):
       raise PopupException(_("Document does not exist or you don't have the permission to access it."))
 
   def get_permission(self, perm='read'):
+    if perm == 'read':
+      perms = Q(perms=Document2Permission.READ_PERM) | (Q(perms=Document2Permission.LINK_READ_PERM) & Q(is_link_on=True))
+    elif perm == 'write':
+      perms = Q(perms=Document2Permission.WRITE_PERM) | (Q(perms=Document2Permission.LINK_WRITE_PERM) & Q(is_link_on=True))
+    else:
+      perms = Q(perms=Document2Permission.WRITE_PERM)
     try:
-      return Document2Permission.objects.get(doc=self, perms=perm)
+      return Document2Permission.objects.get(Q(doc=self) & perms)
     except Document2Permission.DoesNotExist:
       return None
 
@@ -1544,6 +1550,8 @@ class Document2Permission(models.Model):
   READ_PERM = 'read'
   WRITE_PERM = 'write'
   COMMENT_PERM = 'comment'
+  LINK_READ_PERM = 'link_read'
+  LINK_WRITE_PERM = 'link_write'
 
   doc = models.ForeignKey(Document2)
 
@@ -1554,10 +1562,12 @@ class Document2Permission(models.Model):
     (READ_PERM, 'read'),
     (WRITE_PERM, 'write'),
     (COMMENT_PERM, 'comment'), # PLAYER PERM?
+    (LINK_READ_PERM, 'link read'),
+    (LINK_WRITE_PERM, 'link write'),
   ))
 
-  # link = models.CharField(default=uuid_default, max_length=255, unique=True) # Short link like dropbox
-  # embed
+  link = models.CharField(default='', max_length=255, unique=True) # uuid_default
+  link_on = models.BooleanField(default=False)
 
   class Meta(object):
     unique_together = ('doc', 'perms')
