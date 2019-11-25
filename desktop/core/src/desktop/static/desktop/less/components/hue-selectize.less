@@ -232,7 +232,6 @@
   display: -moz-inline-stack;
   display: inline-block;
   zoom: 1;
-  *display: inline;
 }
 
 .selectize-control.multi .selectize-input > div {
@@ -305,7 +304,7 @@
 
 .selectize-dropdown {
   position: absolute;
-  z-index: 10;
+  z-index: 10000 !important;
   border: 1px solid @cui-gray-400;
   background: @cui-white;
   margin: -1px 0 0 0;
@@ -476,10 +475,6 @@
   .selectize-input {
     padding: 2px !important;
   }
-}
-
-.selectize-dropdown {
-  z-index: 10000 !important;
 }
 
 .selectize-control.plugin-clear_button .clearAll {
