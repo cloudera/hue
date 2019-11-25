@@ -24,7 +24,7 @@
     "node": ">=0.10.0"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.4.0",
+    "@babel/polyfill": "^7.7.0",
     "clipboard": "1.7.1",
     "d3": "5.7.0",
     "d3v3": "1.0.3",
@@ -56,15 +56,15 @@
     "sprintf-js": "1.1.2"
   },
   "devDependencies": {
-    "@babel/core": "7.2.2",
-    "@babel/node": "7.2.2",
-    "@babel/plugin-syntax-dynamic-import": "7.2.0",
-    "@babel/preset-env": "7.3.1",
+    "@babel/core": "7.7.4",
+    "@babel/node": "7.7.4",
+    "@babel/plugin-syntax-dynamic-import": "7.7.4",
+    "@babel/preset-env": "7.7.4",
     "@types/jasmine": "^3.3.9",
     "architect-build": "0.1.1",
-    "babel-eslint": "10.0.1",
+    "babel-eslint": "10.0.3",
     "babel-jscs": "3.0.0-beta1",
-    "babel-loader": "8.0.5",
+    "babel-loader": "8.0.6",
     "babel-plugin-module-resolver": "^3.2.0",
     "clean-webpack-plugin": "1.0.1",
     "dryice": "0.4.11",
@@ -92,11 +92,11 @@
     "prettier": "1.16.1",
     "stylelint": "^9.10.1",
     "stylelint-config-standard": "^18.2.0",
-    "webpack": "4.35.2",
-    "webpack-bundle-analyzer": "^3.3.2",
-    "webpack-bundle-tracker": "0.4.2-beta",
+    "webpack": "4.41.2",
+    "webpack-bundle-analyzer": "^3.6.0",
+    "webpack-bundle-tracker": "^0.4.3",
     "webpack-clean-obsolete-chunks": "^0.4.0",
-    "webpack-cli": "^3.3.5"
+    "webpack-cli": "^3.3.10"
   },
   "scripts": {
     "devinstall": "npm cache clean && npm install && npm prune",
