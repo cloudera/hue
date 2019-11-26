@@ -15,7 +15,8 @@
 // limitations under the License.
 
 import 'utils/publicPath';
-import '@babel/polyfill';
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 import _ from 'lodash';
 import $ from 'jquery/jquery.common';
 import 'ext/bootstrap.2.3.2.min';
