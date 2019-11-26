@@ -14,32 +14,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import huePubSub from 'utils/huePubSub';
-import sessionManager from 'apps/notebook2/execution/sessionManager';
+import $ from 'jquery';
 import { koSetup } from 'jest/koTestUtils';
-import { NAME, SESSION_PANEL_SHOW_EVENT } from './ko.sessionPanel';
+import { NAME } from './ko.catalogEntriesList';
 
-describe('ko.sessionPanel.js', () => {
+describe('ko.catalogEntriesList.js', () => {
   const setup = koSetup();
 
   it('should render component', async () => {
-    const element = await setup.renderComponent(NAME, {});
+    const element = await setup.renderComponent(NAME, {
+      catalogEntry: {
+        isField: () => true,
+        isComplex: () => false,
+        getChildren: () => $.Deferred().resolve([]),
+        loadNavigatorMetaForChildren: () => $.Deferred().reject(),
+        loadNavOptPopularityForChildren: () => $.Deferred().reject(),
+        isTableOrView: () => false
+      }
+    });
 
     expect(element.innerHTML).toMatchSnapshot();
-  });
-
-  it('should be visible on publish event', async () => {
-    const wrapper = await setup.renderComponent(NAME, {});
-    const sessionPanelElement = wrapper.querySelector('[data-test="' + NAME + '"]');
-    jest.spyOn(sessionManager, 'getAllSessions').mockReturnValue(Promise.resolve([]));
-
-    // Initially hidden
-    expect(sessionPanelElement.style['display']).toEqual('none');
-
-    huePubSub.publish(SESSION_PANEL_SHOW_EVENT, 'impala');
-    await setup.waitForKoUpdate();
-
-    // Visible after pubsub
-    expect(sessionPanelElement.style['display']).toBeFalsy();
   });
 });
