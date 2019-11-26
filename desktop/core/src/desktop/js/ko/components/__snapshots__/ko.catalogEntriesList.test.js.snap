@@ -1,0 +1,166 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.catalogEntriesList.js should render component 1`] = `
+"<div data-bind=\\"component: { name: &quot;catalog-entries-list&quot;, params: $data }\\"><script type=\\"text/html\\" id=\\"entries-table-td-description\\">
+    <td data-bind=\\"attr: { 'title': comment }\\">
+    <!-- ko if: $parent.editableDescriptions && !window.HAS_READ_ONLY_CATALOG -->
+      <div class=\\"hue-catalog-entries-table-desc\\" data-bind=\\"visibleOnHover: { selector: '.editable-inline-action' }\\">
+        <div data-bind=\\"editable: comment, editableOptions: {
+          mode: 'inline',
+          enabled: true,
+          type: 'textarea',
+          showbuttons: 'bottom',
+          inputclass: 'hue-table-browser-desc-input',
+          toggle: 'manual',
+          toggleElement: '.toggle-editable',
+          placeholder: 'Add a description...',
+          emptytext: 'Add a description...',
+          inputclass: 'hue-catalog-entries-table-desc-input',
+          rows: 6,
+          save: saveComment,
+          inlineEditAction: { editClass: 'toggle-editable editable-inline-action' },
+          multiLineEllipsis: { overflowHeight: '40px', expandable: true, expandActionClass: 'editable-inline-action' }
+        }\\">Add a description...</div>
+      </div>
+    <!-- /ko -->
+    <!-- ko if: !$parent.editableDescriptions || window.HAS_READ_ONLY_CATALOG -->
+      <div class=\\"entries-table-description\\" data-bind=\\"text: comment, multiLineEllipsis\\"></div>
+    <!-- /ko -->
+    </td>
+  </script><script type=\\"text/html\\" id=\\"entries-table-tbody-no-entries\\">
+    <tbody>
+      <tr>
+        <td style=\\"font-style: italic;\\" data-bind=\\"attr: { 'colspan': colCount + (typeof $component.selectedEntries !== 'undefined' ? 1 : 0) + ($component.contextPopoverEnabled ? 1 : 0) }\\">
+          <!-- ko ifnot: hasErrors -->
+          No entries found
+          <!-- /ko -->
+          <!-- ko if: hasErrors -->
+          Error loading entries
+          <!-- /ko -->
+        </td>
+      </tr>
+    </tbody>
+  </script><script type=\\"text/html\\" id=\\"entries-table-shared-headers\\">
+    <!-- ko if: typeof selectedEntries !== 'undefined' -->
+    <th width=\\"1%\\" class=\\"select-column\\"><div class=\\"hue-checkbox fa\\" data-bind=\\"hueCheckAll: { allValues: filteredEntries, selectedValues: selectedEntries }\\"></div></th>
+    <!-- /ko -->
+    <!-- ko if: contextPopoverEnabled -->
+    <th width=\\"1%\\">&nbsp;</th>
+    <!-- /ko -->
+  </script><script type=\\"text/html\\" id=\\"entries-table-shared-columns\\">
+    <!-- ko if: typeof $parent.selectedEntries !== 'undefined' -->
+    <td width=\\"1%\\" class=\\"select-column\\"><div class=\\"hue-checkbox fa\\" data-bind=\\"multiCheck: '#entryTable', value: $data, hueChecked: $parent.selectedEntries\\"></div></td>
+    <!-- /ko -->
+    <!-- ko if: $parent.contextPopoverEnabled -->
+    <td width=\\"1%\\"><a href=\\"javascript: void(0);\\" data-bind=\\"click: showContextPopover\\"><i class=\\"fa fa-info\\"></i></a></td>
+    <!-- /ko -->
+  </script><div class=\\"context-popover-inline-autocomplete\\">
+    <div class=\\"context-popover-sample-filter\\">
+      <!-- ko component: {
+        name: 'inline-autocomplete',
+        params: {
+          querySpec: querySpec,
+          facets: facets,
+          knownFacetValues: knownFacetValues,
+          autocompleteFromEntries: autocompleteFromEntries
+        }
+      } --><!-- /ko -->
+    </div>
+  </div><div class=\\"catalog-entries-list-container\\">
+    <!-- ko hueSpinner: { spin: loading, center: true, size: 'xlarge' } --><!-- /ko -->
+    <!-- ko if: !loading() && catalogEntry().isSource() -->
+    <table id=\\"entryTable\\" class=\\"table table-condensed table-nowrap\\">
+      <thead>
+        <tr>
+          <!-- ko template: 'entries-table-shared-headers' --><!-- /ko -->
+          <th>Database</th>
+          <th>Description <!-- ko if: loadingNav --><i class=\\"fa fa-spinner fa-spin\\"></i><!-- /ko --></th>
+        </tr>
+      </thead>
+      <!-- ko if: filteredEntries().length -->
+      <tbody data-bind=\\"foreach: filteredEntries\\">
+        <tr data-bind=\\"click: onRowClick\\">
+          <!-- ko template: 'entries-table-shared-columns' --><!-- /ko -->
+          <td><a href=\\"javascript: void(0);\\" data-bind=\\"text: catalogEntry().name, click: onClick, attr: { 'title': catalogEntry().getTitle() }\\"></a></td>
+          <!-- ko template: 'entries-table-td-description' --><!-- /ko -->
+        </tr>
+      </tbody>
+      <!-- /ko -->
+      <!-- ko if: filteredEntries().length === 0 -->
+      <!-- ko template: { name: 'entries-table-tbody-no-entries', data: { colCount: 2, hasErrors: hasErrors } } --><!-- /ko -->
+      <!-- /ko -->
+    </table>
+    <!-- /ko -->
+
+    <!-- ko if: !loading() && catalogEntry().isDatabase() -->
+    <table id=\\"entryTable\\" class=\\"table table-condensed table-nowrap\\">
+      <thead>
+      <tr>
+        <!-- ko template: 'entries-table-shared-headers' --><!-- /ko -->
+        <th data-bind=\\"text: catalogEntry().getSourceType() !== 'solr' ? 'Table' : 'Collection'\\"></th>
+        <th>Description <!-- ko if: loadingNav --><i class=\\"fa fa-spinner fa-spin\\"></i><!-- /ko --></th>
+      </tr>
+      </thead>
+      <!-- ko if: filteredEntries().length -->
+      <tbody data-bind=\\"foreach: filteredEntries\\">
+      <tr data-bind=\\"click: onRowClick\\">
+        <!-- ko template: 'entries-table-shared-columns' --><!-- /ko -->
+        <td><a href=\\"javascript: void(0);\\" data-bind=\\"text: catalogEntry().name, click: onClick, attr: { 'title': catalogEntry().getTitle() }\\"></a></td>
+        <!-- ko template: 'entries-table-td-description' --><!-- /ko -->
+      </tr>
+      </tbody>
+      <!-- /ko -->
+      <!-- ko if: filteredEntries().length === 0 -->
+      <!-- ko template: { name: 'entries-table-tbody-no-entries', data: { colCount: 2, hasErrors: hasErrors } } --><!-- /ko -->
+      <!-- /ko -->
+    </table>
+    <!-- /ko -->
+
+    <!-- ko if: !loading() && (catalogEntry().isTableOrView() || catalogEntry().isComplex()) -->
+    <table class=\\"table table-condensed table-nowrap\\">
+      <thead>
+      <tr>
+        <!-- ko template: 'entries-table-shared-headers' --><!-- /ko -->
+        <th><span data-bind=\\"text: catalogEntry().getSourceType() !== 'solr' ? 'Column' : 'Field'\\"></span> (<span data-bind=\\"text: filteredEntries().length\\"></span>)</th>
+        <th>Type</th>
+        <th with=\\"25%\\">Description <!-- ko if: loadingNav --><i class=\\"fa fa-spinner fa-spin\\"></i><!-- /ko --></th>
+        <th colspan=\\"2\\">Sample <!-- ko if: loadingSamples() || sampleRefreshEnabled() --><i class=\\"fa fa-spinner fa-spin\\"></i><!-- /ko --> <!-- ko if: sampleRefreshEnabled --><a class=\\"inactive-action\\" href=\\"javascript: void(0);\\" data-bind=\\"toggle: sampleRefreshEnabled\\"><i class=\\"fa fa-stop\\"></i></a><!-- /ko --></th>
+      </tr>
+      </thead>
+      <!-- ko if: filteredEntries().length -->
+      <tbody data-bind=\\"foreach: filteredEntries\\">
+      <tr data-bind=\\"click: onRowClick\\">
+        <!-- ko template: 'entries-table-shared-columns' --><!-- /ko -->
+        <td class=\\"name-column\\" data-bind=\\"attr: { 'title': catalogEntry().name + ' - Click for more details' }\\">
+          <a href=\\"javascript: void(0);\\" data-bind=\\"click: onClick\\">
+            <span data-bind=\\"text: catalogEntry().name\\"></span>
+            <!-- ko if: isKey -->
+            &nbsp;<i class=\\"fa fa-key\\" data-bind=\\"tooltip: { title: keyText, html: true }\\"></i>
+            <!-- /ko -->
+            <!-- ko if: popularity && popularity() >= 5 -->
+            &nbsp;<i data-bind=\\"tooltip: { title: 'Popularity: ' + popularity() + '%' }\\" class=\\"fa fa-star-o\\"></i>
+            <!-- /ko -->
+          </a>
+        </td>
+        <td class=\\"type-column\\" data-bind=\\"text: catalogEntry().getType(), attr: { 'title': catalogEntry().getRawType() }\\"></td>
+        <!-- ko template: 'entries-table-td-description' --><!-- /ko -->
+        <td class=\\"sample-column\\" data-bind=\\"html: firstSample, attr: { 'title': hueUtils.html2text(firstSample()) }\\"></td>
+        <td class=\\"sample-column\\" data-bind=\\"html: secondSample, attr: { 'title': hueUtils.html2text(secondSample()) }\\"></td>
+      </tr>
+      </tbody>
+      <!-- /ko -->
+      <!-- ko if: filteredEntries().length === 0 -->
+      <!-- ko template: { name: 'entries-table-tbody-no-entries', data: { colCount: 5, hasErrors: hasErrors } } --><!-- /ko -->
+      <!-- /ko -->
+    </table>
+    <!-- /ko -->
+
+    <!-- ko if: !loading() && catalogEntry().isField() && !catalogEntry().isComplex() -->
+    <!-- ko component: { name: 'field-samples', params: {
+        catalogEntry: catalogEntry,
+        onSampleClick: onSampleClick,
+        refreshSampleInterval: refreshSampleInterval
+      }} --><!-- /ko -->
+    <!-- /ko -->
+  </div></div>"
+`;

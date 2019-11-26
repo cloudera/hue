@@ -42,14 +42,32 @@ export const koSetup = () => {
 
   return {
     renderComponent: async (name, data) =>
-      new Promise(resolve => {
+      new Promise((resolve, reject) => {
         const element = window.document.createElement('div');
         element.setAttribute('data-bind', `component: { name: "${name}", params: $data }`);
         wrapper.appendChild(element);
-        ko.applyBindings(data, wrapper);
-        window.setTimeout(() => {
-          resolve(wrapper);
-        }, 0);
+
+        try {
+          ko.components.get(name, comp => {
+            if (comp.createViewModel) {
+              // Instantiate the view model to catch any exception that otherwise would be lost as it's async.
+              // Fire any timeouts right away
+              const origSetTimeout = window.setTimeout;
+              window.setTimeout = cb => cb();
+              comp.createViewModel(data, { element: element });
+              window.setTimeout = origSetTimeout;
+
+              ko.applyBindings(data, wrapper);
+              window.setTimeout(() => {
+                resolve(wrapper);
+              }, 0);
+            } else {
+              reject('no createViewModel function found on component ' + name);
+            }
+          });
+        } catch (e) {
+          reject(e);
+        }
       }),
 
     renderKo: async (html, viewModel) =>
