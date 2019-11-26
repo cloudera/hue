@@ -69,164 +69,160 @@ describe('AutocompleteResults.js', () => {
 
     deferred.done(options.successCallback);
 
-    if (Math.random() < 0.5) {
-      deferred.resolve(failResponse);
-    } else {
-      deferred.resolve({
-        superuser: 'hdfs',
-        current_request_path: '/filebrowser/view=///var',
-        current_dir_path: '///var',
-        show_download_button: true,
-        cwd_set: true,
-        breadcrumbs: [
-          {
-            url: '/',
-            label: '/'
-          },
-          {
-            url: '/var',
-            label: 'var'
-          }
-        ],
-        apps: [
-          'help',
-          'sqoop',
-          'pig',
-          'hbase',
-          'rdbms',
-          'indexer',
-          'metastore',
-          'beeswax',
-          'jobsub',
-          'metadata',
-          'zookeeper',
-          'search',
-          'useradmin',
-          'notebook',
-          'proxy',
-          'oozie',
-          'spark',
-          'filebrowser',
-          'about',
-          'jobbrowser',
-          'dashboard',
-          'security',
-          'impala'
-        ],
-        show_upload_button: true,
-        files: [
-          {
-            humansize: '0\u00a0bytes',
-            url: '/filebrowser/view=/',
-            stats: {
-              size: 0,
-              group: 'supergroup',
-              blockSize: 0,
-              replication: 0,
-              user: 'hdfs',
-              mtime: 1476970119,
-              path: '///var/..',
-              atime: 0,
-              mode: 16877
-            },
-            name: '..',
-            mtime: 'October 20, 2016 06:28 AM',
-            rwx: 'drwxr-xr-x',
-            path: '/',
-            is_sentry_managed: false,
-            type: 'dir',
-            mode: '40755'
-          },
-          {
-            humansize: '0\u00a0bytes',
-            url: '/filebrowser/view=/var',
-            stats: {
-              size: 0,
-              group: 'supergroup',
-              blockSize: 0,
-              replication: 0,
-              user: 'hdfs',
-              mtime: 1470887321,
-              path: '///var',
-              atime: 0,
-              mode: 16877
-            },
-            name: '.',
-            mtime: 'August 10, 2016 08:48 PM',
-            rwx: 'drwxr-xr-x',
-            path: '/var',
-            is_sentry_managed: false,
-            type: 'dir',
-            mode: '40755'
-          },
-          {
-            humansize: '0\u00a0bytes',
-            url: '/filebrowser/view=/var/lib',
-            stats: {
-              size: 0,
-              group: 'supergroup',
-              blockSize: 0,
-              replication: 0,
-              user: 'hdfs',
-              mtime: 1470887321,
-              path: '/var/lib',
-              atime: 0,
-              mode: 16877
-            },
-            name: 'lib',
-            mtime: 'August 10, 2016 08:48 PM',
-            rwx: 'drwxr-xr-x',
-            path: '/var/lib',
-            is_sentry_managed: false,
-            type: 'dir',
-            mode: '40755'
-          },
-          {
-            humansize: '0\u00a0bytes',
-            url: '/filebrowser/view=/var/log',
-            stats: {
-              size: 0,
-              group: 'mapred',
-              blockSize: 0,
-              replication: 0,
-              user: 'yarn',
-              mtime: 1470887196,
-              path: '/var/log',
-              atime: 0,
-              mode: 17405
-            },
-            name: 'log',
-            mtime: 'August 10, 2016 08:46 PM',
-            rwx: 'drwxrwxr-xt',
-            path: '/var/log',
-            is_sentry_managed: false,
-            type: 'dir',
-            mode: '41775'
-          }
-        ],
-        users: [],
-        is_embeddable: false,
-        supergroup: 'supergroup',
-        descending: 'false',
-        groups: [],
-        is_trash_enabled: true,
-        pagesize: 50,
-        file_filter: 'any',
-        is_fs_superuser: false,
-        is_sentry_managed: false,
-        home_directory: '/user/admin',
-        path: '///var',
-        page: {
-          num_pages: 1,
-          total_count: 2,
-          next_page_number: 1,
-          end_index: 2,
-          number: 1,
-          previous_page_number: 1,
-          start_index: 1
+    deferred.resolve({
+      superuser: 'hdfs',
+      current_request_path: '/filebrowser/view=///var',
+      current_dir_path: '///var',
+      show_download_button: true,
+      cwd_set: true,
+      breadcrumbs: [
+        {
+          url: '/',
+          label: '/'
+        },
+        {
+          url: '/var',
+          label: 'var'
         }
-      });
-    }
+      ],
+      apps: [
+        'help',
+        'sqoop',
+        'pig',
+        'hbase',
+        'rdbms',
+        'indexer',
+        'metastore',
+        'beeswax',
+        'jobsub',
+        'metadata',
+        'zookeeper',
+        'search',
+        'useradmin',
+        'notebook',
+        'proxy',
+        'oozie',
+        'spark',
+        'filebrowser',
+        'about',
+        'jobbrowser',
+        'dashboard',
+        'security',
+        'impala'
+      ],
+      show_upload_button: true,
+      files: [
+        {
+          humansize: '0\u00a0bytes',
+          url: '/filebrowser/view=/',
+          stats: {
+            size: 0,
+            group: 'supergroup',
+            blockSize: 0,
+            replication: 0,
+            user: 'hdfs',
+            mtime: 1476970119,
+            path: '///var/..',
+            atime: 0,
+            mode: 16877
+          },
+          name: '..',
+          mtime: 'October 20, 2016 06:28 AM',
+          rwx: 'drwxr-xr-x',
+          path: '/',
+          is_sentry_managed: false,
+          type: 'dir',
+          mode: '40755'
+        },
+        {
+          humansize: '0\u00a0bytes',
+          url: '/filebrowser/view=/var',
+          stats: {
+            size: 0,
+            group: 'supergroup',
+            blockSize: 0,
+            replication: 0,
+            user: 'hdfs',
+            mtime: 1470887321,
+            path: '///var',
+            atime: 0,
+            mode: 16877
+          },
+          name: '.',
+          mtime: 'August 10, 2016 08:48 PM',
+          rwx: 'drwxr-xr-x',
+          path: '/var',
+          is_sentry_managed: false,
+          type: 'dir',
+          mode: '40755'
+        },
+        {
+          humansize: '0\u00a0bytes',
+          url: '/filebrowser/view=/var/lib',
+          stats: {
+            size: 0,
+            group: 'supergroup',
+            blockSize: 0,
+            replication: 0,
+            user: 'hdfs',
+            mtime: 1470887321,
+            path: '/var/lib',
+            atime: 0,
+            mode: 16877
+          },
+          name: 'lib',
+          mtime: 'August 10, 2016 08:48 PM',
+          rwx: 'drwxr-xr-x',
+          path: '/var/lib',
+          is_sentry_managed: false,
+          type: 'dir',
+          mode: '40755'
+        },
+        {
+          humansize: '0\u00a0bytes',
+          url: '/filebrowser/view=/var/log',
+          stats: {
+            size: 0,
+            group: 'mapred',
+            blockSize: 0,
+            replication: 0,
+            user: 'yarn',
+            mtime: 1470887196,
+            path: '/var/log',
+            atime: 0,
+            mode: 17405
+          },
+          name: 'log',
+          mtime: 'August 10, 2016 08:46 PM',
+          rwx: 'drwxrwxr-xt',
+          path: '/var/log',
+          is_sentry_managed: false,
+          type: 'dir',
+          mode: '41775'
+        }
+      ],
+      users: [],
+      is_embeddable: false,
+      supergroup: 'supergroup',
+      descending: 'false',
+      groups: [],
+      is_trash_enabled: true,
+      pagesize: 50,
+      file_filter: 'any',
+      is_fs_superuser: false,
+      is_sentry_managed: false,
+      home_directory: '/user/admin',
+      path: '///var',
+      page: {
+        num_pages: 1,
+        total_count: 2,
+        next_page_number: 1,
+        end_index: 2,
+        number: 1,
+        previous_page_number: 1,
+        start_index: 1
+      }
+    });
 
     return deferred.promise();
   });
@@ -279,32 +275,30 @@ describe('AutocompleteResults.js', () => {
     });
 
     LOTS_OF_PARSE_RESULTS.forEach(parseResult => {
-      if (parseResult.index === 213) {
-        it('should handle parse result no. ' + parseResult.index, () => {
-          if (parseResult.suggestKeywords) {
-            const cleanedKeywords = [];
-            parseResult.suggestKeywords.forEach(keyword => {
-              if (!keyword.value) {
-                cleanedKeywords.push({ value: keyword });
-              } else {
-                cleanedKeywords.push(keyword);
-              }
-            });
-            parseResult.suggestKeywords = cleanedKeywords;
-          }
-          try {
-            subject.update(parseResult);
-          } catch (e) {
-            fail('Got exception');
-            console.error(e);
-          }
-          if (subject.loading()) {
-            fail('Still loading, missing ajax spec?');
-          }
+      it('should handle parse result no. ' + parseResult.index, () => {
+        if (parseResult.suggestKeywords) {
+          const cleanedKeywords = [];
+          parseResult.suggestKeywords.forEach(keyword => {
+            if (!keyword.value) {
+              cleanedKeywords.push({ value: keyword });
+            } else {
+              cleanedKeywords.push(keyword);
+            }
+          });
+          parseResult.suggestKeywords = cleanedKeywords;
+        }
+        try {
+          subject.update(parseResult);
+        } catch (e) {
+          fail('Got exception');
+          console.error(e);
+        }
+        if (subject.loading()) {
+          fail('Still loading, missing ajax spec?');
+        }
 
-          expect(subject.loading()).toBeFalsy();
-        });
-      }
+        expect(subject.loading()).toBeFalsy();
+      });
     });
   });
 
