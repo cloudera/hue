@@ -19,11 +19,17 @@
 import os
 import re
 import shutil
+import sys
 from django.core.management.base import CommandError, BaseCommand
 from mako.template import Template
 
 import logging
 from django.utils.translation import ugettext as _
+
+if sys.version_info[0] > 2:
+  open_file = open
+else:
+  open_file = file
 
 LOG = logging.getLogger(__name__)
 
@@ -83,7 +89,7 @@ def copy_template(app_template, copy_to, app_name, app_url):
       LOG.info("Writing %s" % path_new)
       fp_new = open(path_new, 'w')
       if path_old.endswith(".png"):
-        shutil.copyfileobj(file(path_old), fp_new)
+        shutil.copyfileobj(open_file(path_old), fp_new)
       else:
         fp_new.write( Template(filename=path_old).render(app_name=app_name, app_name_camel=app_name_camel, app_name_spaces=app_name_spaces, app_url=app_url) )
       fp_new.close()

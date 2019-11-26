@@ -18,10 +18,15 @@
 import errno
 import logging
 import os.path
+import sys
 
 from hadoop import confparse
 from desktop.lib.security_util import get_components
 
+if sys.version_info[0] > 2:
+  open_file = open
+else:
+  open_file = file
 
 LOG = logging.getLogger(__name__)
 
@@ -94,7 +99,7 @@ def _parse_site():
   from hbase.conf import HBASE_CONF_DIR
   SITE_PATH = os.path.join(HBASE_CONF_DIR.get(), 'hbase-site.xml')
   try:
-    data = file(SITE_PATH, 'r').read()
+    data = open_file(SITE_PATH, 'r').read()
   except IOError as err:
     if err.errno != errno.ENOENT:
       LOG.error('Cannot read from "%s": %s' % (SITE_PATH, err))

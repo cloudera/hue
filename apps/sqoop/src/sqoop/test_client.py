@@ -17,6 +17,7 @@
 
 import os
 import shutil
+import sys
 import tempfile
 
 from nose.tools import assert_true, assert_equal, assert_false
@@ -25,6 +26,10 @@ from sqoop.conf import SQOOP_CONF_DIR
 from sqoop.client.base import SqoopClient
 from sqoop.sqoop_properties import reset
 
+if sys.version_info[0] > 2:
+  open_file = open
+else:
+  open_file = file
 
 def test_security_plain():
   tmpdir = tempfile.mkdtemp()
@@ -32,7 +37,7 @@ def test_security_plain():
 
   try:
     xml = sqoop_properties(authentication='SIMPLE')
-    with file(os.path.join(tmpdir, 'sqoop.properties'), 'w') as f:
+    with open_file(os.path.join(tmpdir, 'sqoop.properties'), 'w') as f:
       f.write(xml)
     reset()
 
@@ -50,7 +55,7 @@ def test_security_kerberos():
 
   try:
     xml = sqoop_properties(authentication='KERBEROS')
-    with file(os.path.join(tmpdir, 'sqoop.properties'), 'w') as f:
+    with open_file(os.path.join(tmpdir, 'sqoop.properties'), 'w') as f:
       f.write(xml)
     reset()
 
