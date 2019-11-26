@@ -20,7 +20,7 @@ describe('impalaAutocompleteParser.js', () => {
     impalaAutocompleteParser.yy.parseError = function(msg) {
       throw Error(msg);
     };
-    });
+  });
 
   const assertAutoComplete = testDefinition => {
     const debug = false;

@@ -21,7 +21,7 @@ describe('elasticsearchAutocompleteParser.js', () => {
     elasticsearchAutocompleteParser.yy.parseError = function(msg) {
       throw Error(msg);
     };
-    });
+  });
 
   const assertAutoComplete = testDefinition => {
     const debug = false;

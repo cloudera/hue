@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import $ from 'jquery';
 import ko from 'knockout';
 
 import HdfsAutocompleter from './hdfsAutocompleter';

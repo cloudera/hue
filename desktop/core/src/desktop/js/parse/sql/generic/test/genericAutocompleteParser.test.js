@@ -21,7 +21,7 @@ describe('genericAutocompleteParser.js', () => {
     genericAutocompleteParser.yy.parseError = function(msg) {
       throw Error(msg);
     };
-    });
+  });
 
   const assertAutoComplete = testDefinition => {
     const debug = false;

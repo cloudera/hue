@@ -21,7 +21,7 @@ describe('phoenixAutocompleteParser.js', () => {
     phoenixAutocompleteParser.yy.parseError = function(msg) {
       throw Error(msg);
     };
-    });
+  });
 
   const assertAutoComplete = testDefinition => {
     const debug = false;

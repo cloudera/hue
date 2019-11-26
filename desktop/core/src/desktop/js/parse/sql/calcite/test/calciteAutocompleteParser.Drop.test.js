@@ -21,7 +21,7 @@ describe('calciteAutocompleteParser.js DROP statements', () => {
     calciteAutocompleteParser.yy.parseError = function(msg) {
       throw Error(msg);
     };
-    });
+  });
 
   const assertAutoComplete = testDefinition => {
     const debug = false;

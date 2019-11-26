@@ -20,7 +20,7 @@ describe('hiveAutocompleteParser.js DROP statements', () => {
     hiveAutocompleteParser.yy.parseError = function(msg) {
       throw Error(msg);
     };
-    });
+  });
 
   const assertAutoComplete = testDefinition => {
     const debug = false;
