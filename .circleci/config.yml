@@ -70,7 +70,7 @@ jobs:
 
             cp ~/repo/webpack.config*.js .
             npm install
-            npm i eslint-plugin-jasmine@latest --save-dev # Seems to not be found otherwise
+            npm i eslint-plugin-jest@latest --save-dev # Seems to not be found otherwise
             npm run webpack
             npm run webpack-login
             npm run webpack-workers

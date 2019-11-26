@@ -21,7 +21,7 @@ describe('impalaAutocompleteParser.js DROP statements', () => {
     impalaAutocompleteParser.yy.parseError = function(msg) {
       throw Error(msg);
     };
-    });
+  });
 
   const assertAutoComplete = testDefinition => {
     const debug = false;

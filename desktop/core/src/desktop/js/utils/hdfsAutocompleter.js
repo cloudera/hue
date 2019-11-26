@@ -88,7 +88,6 @@ class HdfsAutocompleter {
         }
       };
 
-
       apiHelper.fetchHdfsPath({
         pathParts: parts,
         successCallback: successCallback,

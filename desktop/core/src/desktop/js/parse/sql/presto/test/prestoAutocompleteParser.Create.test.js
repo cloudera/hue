@@ -21,7 +21,7 @@ describe('prestoAutocompleteParser.js CREATE statements', () => {
     prestoAutocompleteParser.yy.parseError = function(msg) {
       throw Error(msg);
     };
-    });
+  });
 
   const assertAutoComplete = testDefinition => {
     const debug = false;

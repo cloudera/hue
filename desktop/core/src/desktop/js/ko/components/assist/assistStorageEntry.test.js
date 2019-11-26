@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import $ from 'jquery';
+
 import AssistStorageEntry from './assistStorageEntry';
 
 describe('assistStorageEntry.js', () => {

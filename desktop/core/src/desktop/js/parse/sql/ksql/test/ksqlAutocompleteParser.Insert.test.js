@@ -21,7 +21,7 @@ describe('ksqlAutocompleteParser.js INSERT statements', () => {
     ksqlAutocompleteParser.yy.parseError = function(msg) {
       throw Error(msg);
     };
-    });
+  });
 
   const assertAutoComplete = testDefinition => {
     const debug = false;
