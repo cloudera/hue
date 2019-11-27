@@ -6,5 +6,6 @@ module.exports = {
   testEnvironment: 'jest-environment-jsdom-fourteen',
   testURL: 'https://www.gethue.com/hue',
   setupFilesAfterEnv: ['<rootDir>/desktop/core/src/desktop/js/jest/jest.init.js'],
-  watchPathIgnorePatterns: ['<rootDir>/desktop/core/src/desktop/static']
+  watchPathIgnorePatterns: ['<rootDir>/desktop/core/src/desktop/static'],
+  collectCoverageFrom: ['<rootDir>/desktop/core/src/desktop/js/**/*.{js,jsx}']
 };
