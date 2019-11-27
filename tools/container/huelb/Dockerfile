@@ -1,4 +1,4 @@
-FROM huelb_httpd:2.4
+FROM ${HUELBBASE_VERSION}
 
 LABEL description="Hue Project https://github.com/cloudera/hue"
 
