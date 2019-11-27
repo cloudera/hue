@@ -22,6 +22,8 @@ import globalSearchParser from 'parse/globalSearchParser';
 import hueDebug from 'utils/hueDebug';
 import I18n from 'utils/i18n';
 
+export const NAME = 'inline-autocomplete';
+
 const TEMPLATE = `
   <div class="inline-autocomp-container">
     <div>
@@ -440,4 +442,4 @@ class InlineAutocomplete {
   }
 }
 
-componentUtils.registerComponent('inline-autocomplete', InlineAutocomplete, TEMPLATE);
+componentUtils.registerComponent(NAME, InlineAutocomplete, TEMPLATE);

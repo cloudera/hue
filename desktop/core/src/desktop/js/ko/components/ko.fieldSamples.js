@@ -21,6 +21,8 @@ import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
 
+export const NAME = 'field-samples';
+
 const TEMPLATE = `
   <div class="context-popover-inline-autocomplete" style="display: flex">
     <div class="context-popover-sample-filter">
@@ -232,4 +234,4 @@ class FieldSamples {
   }
 }
 
-componentUtils.registerComponent('field-samples', FieldSamples, TEMPLATE);
+componentUtils.registerComponent(NAME, FieldSamples, TEMPLATE);

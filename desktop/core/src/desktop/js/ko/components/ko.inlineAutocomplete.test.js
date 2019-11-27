@@ -14,32 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Ensure singletons
-import 'core-js/stable';
-import 'regenerator-runtime/runtime';
+import ko from 'knockout';
 
-import 'apps/notebook2/execution/sessionManager';
-import './jquery.setup';
-import './sqlTestUtils';
+import { koSetup } from 'jest/koTestUtils';
+import { NAME } from './ko.inlineAutocomplete';
 
-const globalVars = {
-  AUTOCOMPLETE_TIMEOUT: 1,
-  CACHEABLE_TTL: 1,
-  HAS_OPTIMIZER: false,
-  HUE_I18n: {},
-  HUE_BASE_URL: '',
-  HUE_CHARTS: {
-    TYPES: 'bar'
-  },
-  LOGGED_USERNAME: 'foo',
-  LOGGED_USER_ID: 'bar',
-  STATIC_URLS: {
-    'impala/art/icon_impala_48.png': 'impala/art/icon_impala_48.png',
-    'beeswax/art/icon_beeswax_48.png': 'beeswax/art/icon_beeswax_48.png'
-  }
-};
+describe('ko.inlineAutocomplete.js', () => {
+  const setup = koSetup();
 
-Object.keys(globalVars).forEach(key => {
-  global[key] = globalVars[key];
-  global.window[key] = globalVars[key];
+  it('should render component', async () => {
+    const element = await setup.renderComponent(NAME, {
+      querySpec: ko.observable()
+    });
+
+    expect(element.innerHTML).toMatchSnapshot();
+  });
 });

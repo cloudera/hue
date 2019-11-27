@@ -23,6 +23,8 @@ import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 
+export const NAME = 'hue-global-search';
+
 const TEMPLATE = `
   <script type="text/html" id="top-search-autocomp-item">
     <a href="javascript:void(0);">
@@ -596,4 +598,4 @@ class GlobalSearch {
   }
 }
 
-componentUtils.registerComponent('hue-global-search', GlobalSearch, TEMPLATE);
+componentUtils.registerComponent(NAME, GlobalSearch, TEMPLATE);

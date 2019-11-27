@@ -15,14 +15,14 @@
 // limitations under the License.
 
 import $ from 'jquery';
+
 import { koSetup } from 'jest/koTestUtils';
-import { NAME } from './ko.catalogEntriesList';
+import { NAME } from './ko.fieldSamples';
 
 import 'ko/components/ko.inlineAutocomplete';
-import 'ko/components/ko.fieldSamples';
 import 'ko/components/ko.dropDown';
 
-describe('ko.catalogEntriesList.js', () => {
+describe('ko.fieldSamples.js', () => {
   const setup = koSetup();
 
   it('should render component', async () => {
@@ -30,14 +30,12 @@ describe('ko.catalogEntriesList.js', () => {
       catalogEntry: {
         isField: () => true,
         isComplex: () => false,
-        isDatabase: () => false,
         getChildren: () => $.Deferred().resolve([]),
         getSample: () => $.Deferred().reject(),
-        getSourceType: () => 'impala',
         loadNavigatorMetaForChildren: () => $.Deferred().reject(),
         loadNavOptPopularityForChildren: () => $.Deferred().reject(),
         isTableOrView: () => false,
-        isSource: () => false
+        getSourceType: () => 'impala'
       }
     });
 

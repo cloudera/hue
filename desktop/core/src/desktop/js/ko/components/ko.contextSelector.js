@@ -24,6 +24,8 @@ import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 
+export const NAME = 'hue-context-selector';
+
 const TEMPLATE = `
   <!-- ko if: loadingContext -->
   <i class="fa fa-spinner fa-spin muted"></i>
@@ -478,4 +480,4 @@ HueContextSelector.prototype.dispose = function() {
   }
 };
 
-componentUtils.registerComponent('hue-context-selector', HueContextSelector, TEMPLATE);
+componentUtils.registerComponent(NAME, HueContextSelector, TEMPLATE);
