@@ -1,4 +1,4 @@
-FROM huebase_centos:7
+FROM ${HUEBASE_VERSION}
 
 LABEL description="Hue Project https://github.com/cloudera/hue"
 

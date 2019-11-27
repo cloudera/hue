@@ -1,4 +1,4 @@
-FROM centos:7
+FROM ${BASEOS_URL}
 
 LABEL description="Hue Project https://github.com/cloudera/hue"
 
@@ -43,6 +43,8 @@ RUN set -eux; \
         ncurses-devel \
         openldap-devel \
         openssl-devel \
+        postgresql \
+        postgresql-libs \
         python-devel \
         python-setuptools \
         readline-devel \
