@@ -14,32 +14,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Ensure singletons
-import 'core-js/stable';
-import 'regenerator-runtime/runtime';
+import $ from 'jquery';
+import { koSetup } from 'jest/koTestUtils';
+import { NAME } from './ko.jobBrowserLinks';
 
-import 'apps/notebook2/execution/sessionManager';
-import './jquery.setup';
-import './sqlTestUtils';
+describe('ko.jobBrowserLinks.js', () => {
+  const setup = koSetup();
 
-const globalVars = {
-  AUTOCOMPLETE_TIMEOUT: 1,
-  CACHEABLE_TTL: 1,
-  HAS_OPTIMIZER: false,
-  HUE_I18n: {},
-  HUE_BASE_URL: '',
-  HUE_CHARTS: {
-    TYPES: 'bar'
-  },
-  LOGGED_USERNAME: 'foo',
-  LOGGED_USER_ID: 'bar',
-  STATIC_URLS: {
-    'impala/art/icon_impala_48.png': 'impala/art/icon_impala_48.png',
-    'beeswax/art/icon_beeswax_48.png': 'beeswax/art/icon_beeswax_48.png'
-  }
-};
+  it('should render component', async () => {
+    jest.spyOn($, 'post').mockImplementation(url => {
+      if (url === '/jobbrowser/jobs/') {
+        return $.Deferred()
+          .resolve({ jobs: [] })
+          .promise();
+      }
+    });
 
-Object.keys(globalVars).forEach(key => {
-  global[key] = globalVars[key];
-  global.window[key] = globalVars[key];
+    const element = await setup.renderComponent(NAME, {});
+
+    expect(element.innerHTML).toMatchSnapshot();
+  });
 });

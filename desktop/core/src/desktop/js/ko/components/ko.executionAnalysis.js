@@ -25,6 +25,8 @@ import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 
+export const NAME = 'hue-execution-analysis';
+
 const TEMPLATE = `
   <div class="hue-execution-analysis">
     <!-- ko hueSpinner: { spin: loading, inline: true } --><!-- /ko -->
@@ -289,4 +291,4 @@ class ExecutionAnalysis {
   }
 }
 
-componentUtils.registerComponent('hue-execution-analysis', ExecutionAnalysis, TEMPLATE);
+componentUtils.registerComponent(NAME, ExecutionAnalysis, TEMPLATE);

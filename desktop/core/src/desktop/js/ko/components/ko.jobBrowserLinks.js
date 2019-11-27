@@ -21,6 +21,8 @@ import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 
+export const NAME = 'hue-job-browser-links';
+
 const TEMPLATE = `
   <div class="btn-group pull-right">
     <!-- ko if: window.IS_K8S_ONLY -->
@@ -190,4 +192,4 @@ class JobBrowserPanel {
   }
 }
 
-componentUtils.registerComponent('hue-job-browser-links', JobBrowserPanel, TEMPLATE);
+componentUtils.registerComponent(NAME, JobBrowserPanel, TEMPLATE);
