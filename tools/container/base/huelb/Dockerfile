@@ -1,4 +1,4 @@
-FROM centos:7
+FROM ${BASEOS_URL}
 
 LABEL description="Hue Project https://github.com/cloudera/hue"
 
