@@ -69,6 +69,7 @@ docker_hue_build() {
     subst_var $f
   done
 
+  sed -i -e "s#\${HUEBASE_VERSION}#${HUEBASE_VERSION}#g" $HUE_DIR/Dockerfile
   docker build -f $HUE_DIR/Dockerfile -t ${REGISTRY}/hue:$GBN \
     --build-arg GBN=$GBN \
     --build-arg GSHA="$GSHA" \
@@ -93,6 +94,7 @@ docker_huelb_build() {
     subst_var $f
   done
 
+  sed -i -e "s#\${HUELBBASE_VERSION}#${HUELBBASE_VERSION}#g" $APACHE_DIR/Dockerfile
   docker build -f $APACHE_DIR/Dockerfile -t ${REGISTRY}/huelb:$GBN \
     --build-arg GBN=$GBN \
     --build-arg GSHA="$GSHA" \
@@ -139,7 +141,6 @@ pull_base_images() {
   docker pull ${REGISTRY}/$HUEBASE_VERSION
   if [[ $? != 0 ]]; then
     pull_hueos
-    sed -i -e "s#\${HUEBASE_VERSION}#${HUEBASE_VERSION}#g" $BASEHUE_DIR/Dockerfile
     build_huebase
   fi
   docker tag ${REGISTRY}/$HUEBASE_VERSION $HUEBASE_VERSION
@@ -147,7 +148,6 @@ pull_base_images() {
   docker pull ${REGISTRY}/$HUELBBASE_VERSION
   if [[ $? != 0 ]]; then
     pull_huelbos
-    sed -i -e "s#\${HUELBBASE_VERSION}#${HUELBBASE_VERSION}#g" $BASEHUELB_DIR/Dockerfile
     build_huelbbase
   fi
   docker tag ${REGISTRY}/$HUELBBASE_VERSION $HUELBBASE_VERSION
