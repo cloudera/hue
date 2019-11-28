@@ -431,7 +431,15 @@ app look at home in Hue.
 
 After changing the CSS in a .less file, rebuilding with:
 
-    make css
+    npm run less
+    
+Or run in watch mode that will generate the .css on any change to the .less files:
+
+    npm run less-dev
+
+After less changes make sure linting is run with:
+
+    npm run less-lint
 
 ### Icons
 
@@ -476,7 +484,7 @@ How to run just some parts of the tests, e.g.:
     build/env/bin/hue test specific impala.tests:TestMockedImpala
     build/env/bin/hue test specific impala.tests:TestMockedImpala.test_basic_flow
 
-Jasmine tests:
+Jest tests:
 
     npm run test
 
@@ -541,34 +549,38 @@ Add the following options:
 
     ./build/env/bin/hue test unit --with-xunit --with-cover
 
+For js run:
 
-#### Create and run the Jasmine tests
+    npm run test-coverage
 
-Add them in a "spec" subfolder relative to the file under test and the filename of the test has to end with "Spec.js".
+#### Create and run the Jest tests
 
-    someFile.js              <- File under test
-    ├── spec/
-    │   ├── someFileSpec.js  <- File containing tests
+Add them next to the file under test, the filename of the test has to end with ".test.js".
+
+    someFile.js         <- File under test
+    someFile.test.js    <- File containing tests
 
 Run all the tests once with:
 
     npm run test
 
-Optionally to use Karma and headless chrome for the tests you can run
+To run the tests in watch mode:
 
-    npm run test-karma
+    npm run test-dev
 
-See ```desktop/core/src/desktop/js/spec/karma.config.js``` for various options
-
+While in watch mode Jest will detect changes to all files and re-run related tests. There are
+also options to target specific files or tests. Press 'w' in the console to see the options.
 
 #### Testing KO components and bindings
 
-jasmineSetup provides utilities to test knockout components and bindings using jsdom.
+koSetup provides utilities to test knockout components and bindings using jsdom from jest.
 
 An example of component test:
 
 ```
-import { koSetup } from 'spec/jasmineSetup';
+import { koSetup } from 'jest/koTestUtils';
+
+import 'ko/someComponent';
 
 describe('ko.someComponent.js', () => {
   const setup = koSetup(); // Adds the necessary setup and teardown
@@ -576,9 +588,9 @@ describe('ko.someComponent.js', () => {
   it('should render component', async () => {
     const someParams = {}
 
-    const wrapper = await setup.renderComponent('someComponent', someParams);
+    const element = await setup.renderComponent('someComponent', someParams);
 
-    expect(wrapper.querySelector('[data-test="'some-test-id'"]')).toBeTruthy();
+    expect(element.innerHTML).toMatchSnapshot();
   });
 
   it('should change after observable update', async () => {
@@ -598,8 +610,8 @@ An example of a binding test:
 
 ```
 import ko from 'knockout';
-import { koSetup } from 'spec/jasmineSetup';
-import '../ko.myBinding';
+import { koSetup } from 'jest/koTestUtils';
+import './ko.myBinding';
 
 describe('ko.myBinding.js', () => {
   const setup = koSetup();

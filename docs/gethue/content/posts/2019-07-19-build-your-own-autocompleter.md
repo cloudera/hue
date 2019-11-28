@@ -158,7 +158,7 @@ In the hue folder run:
 
 After the -new argument you specify an existing dialect to clone first and then the name of the new parser.
 
-Once executed the tool has cloned the generic parser with tests and generated a new postgresql parsers. The jison files can be found under `desktop/core/src/desktop/js/parse/jison/sql/postgresql/` and the jasmine specs can be found in `desktop/core/src/desktop/js/parse/sql/postgresql/spec`
+Once executed the tool has cloned the generic parser with tests and generated a new postgresql parsers. The jison files can be found under `desktop/core/src/desktop/js/parse/jison/sql/postgresql/` and the tests can be found in `desktop/core/src/desktop/js/parse/sql/postgresql/test`
 
 To regenerate the parsers after changes to the jison files run:
 
@@ -172,7 +172,7 @@ This gives you an idea on how to add custom syntax to the newly generated postgr
 
 <pre class="brush: plain; title: ; notranslate" title="">REINDEX { INDEX | TABLE | DATABASE | SYSTEM } name [ FORCE ]</pre>
 
-We&#8217;ll start by adding a test, in `postgresqlAutocompleteParserSpec.js` in the specs folder inside the main describe function before the first &#8216;it(&#8220;should &#8230;&#8217;:
+We&#8217;ll start by adding a test, in `postgresqlAutocompleteParser.test.js` in the test folder inside the main describe function before the first &#8216;it(&#8220;should &#8230;&#8217;:
 
 <pre class="brush: jscript; title: ; notranslate" title="">fdescribe('REINDEX', () =&gt; {
     it('should handle "REINDEX TABLE foo FORCE; |"', () =&gt; {
@@ -271,7 +271,7 @@ We also want the autocompleter to suggest the keyword REINDEX when the user hasn
 
 For this to pass we need to add `REINDEX` to the list of DDL and DML keywords in the file `sqlParseSupport.js` next to the generated parser (`desktop/core/src/desktop/js/parse/sql/postgresql/sqlParseSupport.js/`). Find the function `parser.suggestDdlAndDmlKeywords` and add &#8216;REINDEX&#8217; to the keywords array. Now run `npm run test` and the three tests should pass.
 
-Before you continue further be sure to remove the &#8216;f&#8217; from &#8216;fdescribe&#8217; in the spec to allow all other jasmine tests to run. Note that in this case there will be two new failing tests where the keyword &#8216;REINDEX&#8217; has to be added.
+Before you continue further be sure to remove the &#8216;f&#8217; from &#8216;fdescribe&#8217; in the spec to allow all other tests to run. Note that in this case there will be two new failing tests where the keyword &#8216;REINDEX&#8217; has to be added.
 
 In order to use the newly generated parsers we have to add them to the webpack bundles:
 

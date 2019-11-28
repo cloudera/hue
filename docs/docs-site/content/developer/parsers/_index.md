@@ -135,7 +135,7 @@ In the hue folder run:
 
 After the -new argument you specify an existing dialect to clone first and then the name of the new parser.
 
-Once executed the tool has cloned the generic parser with tests and generated a new postgresql parsers. The jison files can be found under `desktop/core/src/desktop/js/parse/jison/sql/postgresql/` and the jasmine specs can be found in `desktop/core/src/desktop/js/parse/sql/postgresql/spec`.
+Once executed the tool has cloned the generic parser with tests and generated a new postgresql parsers. The jison files can be found under `desktop/core/src/desktop/js/parse/jison/sql/postgresql/` and the testscan be found in `desktop/core/src/desktop/js/parse/sql/postgresql/test`.
 
 To regenerate the parsers after changes to the jison files run:
 
@@ -149,7 +149,7 @@ This gives you an idea on how to add custom syntax to the newly generated postgr
 
     REINDEX { INDEX | TABLE | DATABASE | SYSTEM } name [ FORCE ]
 
-We’ll start by adding a test, in `postgresqlAutocompleteParserSpec.js` in the specs folder inside the main describe function before the first `it('should...`:
+We’ll start by adding a test, in `postgresqlAutocompleteParser.test.js` in the test folder inside the main describe function before the first `it('should...`:
 
     fdescribe('REINDEX', () => {
       it('should handle "REINDEX TABLE foo FORCE; |"', () => {
@@ -227,7 +227,7 @@ For the next one we’ll add some keyword suggestions after the user has typed R
 
 Again, run `node tools/jison/generateParsers.js postgresql` then `npm run test` and the tests should both be green.
 
-We also want the autocompleter to suggest the keyword REINDEX when the user hasn’t typed anything, to do that let’s first add the following test with the other new ones in `postgresqlAutocompleteParserSpec.js`:
+We also want the autocompleter to suggest the keyword REINDEX when the user hasn’t typed anything, to do that let’s first add the following test with the other new ones in `postgresqlAutocompleteParser.test.js`:
 
     it('should suggest REINDEX for "|"', () => {
       assertAutoComplete({
@@ -243,7 +243,7 @@ We also want the autocompleter to suggest the keyword REINDEX when the user hasn
 
 For this to pass we need to add REINDEX to the list of DDL and DML keywords in the file `sqlParseSupport.js` next to the generated parser (`desktop/core/src/desktop/js/parse/sql/postgresql/sqlParseSupport.js/`). Find the function `parser.suggestDdlAndDmlKeywords` and add ‘REINDEX’ to the keywords array. Now run `npm run test` and the three tests should pass.
 
-Before you continue further be sure to remove the ‘f’ from ‘fdescribe’ in the spec to allow all other jasmine tests to run. Note that in this case there will be two new failing tests where the keyword ‘REINDEX’ has to be added.
+Before you continue further be sure to remove the ‘f’ from ‘fdescribe’ in the spec to allow all other tests to run. Note that in this case there will be two new failing tests where the keyword ‘REINDEX’ has to be added.
 
 In order to use the newly generated parsers we have to add them to the webpack bundles:
 
