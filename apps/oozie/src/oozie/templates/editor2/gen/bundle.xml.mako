@@ -20,7 +20,7 @@
   from oozie.models import BundledCoordinator
 %>
 
-<bundle-app name="${ bundle.validated_name }"
+<bundle-app name="${ bundle.name }"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="${ bundle.data['properties']['schema_version'] }">
   % if bundle.data['properties']['parameters']:

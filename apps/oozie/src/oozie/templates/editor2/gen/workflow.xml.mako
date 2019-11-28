@@ -18,7 +18,7 @@
 <%namespace name="common" file="workflow-common.xml.mako" />
 
 
-<workflow-app name="${ wf.validated_name }" xmlns="${ 'uri:oozie:workflow:0.5' if wf.has_some_slas else workflow['properties']['schema_version'] | n,unicode }"${ ' xmlns:sla="uri:oozie:sla:0.2"' if wf.has_some_slas else '' | n,unicode }>
+<workflow-app name="${ wf.name }" xmlns="${ 'uri:oozie:workflow:0.5' if wf.has_some_slas else workflow['properties']['schema_version'] | n,unicode }"${ ' xmlns:sla="uri:oozie:sla:0.2"' if wf.has_some_slas else '' | n,unicode }>
   % if workflow['properties']['job_xml'] or workflow['properties']['properties']:
   <global>
     % if workflow['properties']['job_xml']:
