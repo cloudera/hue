@@ -22,6 +22,9 @@ import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import HueFileEntry from 'doc/hueFileEntry';
 
+export const SHOW_EVENT = 'doc.show.share.modal';
+export const SHOWN_EVENT = 'doc.share.modal.shown';
+
 // prettier-ignore
 const TEMPLATE = `
   <!-- ko with: document -->
@@ -134,7 +137,7 @@ const getEntry = async params =>
   });
 
 componentUtils.registerComponent('share-doc-modal', undefined, TEMPLATE).then(() => {
-  huePubSub.subscribe('doc.show.share.modal', async params => {
+  huePubSub.subscribe(SHOW_EVENT, async params => {
     const hueFileEntry = await getEntry(params);
 
     let $shareDocMocal = $('#shareDocModal');
@@ -154,11 +157,18 @@ componentUtils.registerComponent('share-doc-modal', undefined, TEMPLATE).then(()
     }
 
     $shareDocMocal = $(
-      '<div id="shareDocModal" data-bind="component: { name: \'share-doc-modal\', params: $data }" data-keyboard="true" class="modal hide fade" tabindex="-1"/>'
+      '<div id="shareDocModal" data-bind="descendantsComplete: descendantsComplete, component: { name: \'share-doc-modal\', params: params }" data-keyboard="true" class="modal hide fade" tabindex="-1"/>'
     );
     $('body').append($shareDocMocal);
 
-    ko.applyBindings(hueFileEntry, $shareDocMocal[0]);
+    const data = {
+      params: hueFileEntry,
+      descendantsComplete: () => {
+        huePubSub.publish(SHOWN_EVENT);
+      }
+    };
+
+    ko.applyBindings(data, $shareDocMocal[0]);
     $shareDocMocal.modal('show');
     $shareDocMocal.on('hide', () => {
       if (isSharedBefore !== hueFileEntry.document().isShared()) {
