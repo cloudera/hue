@@ -22,6 +22,8 @@ import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 
+export const NAME = 'hue-sidebar';
+
 // prettier-ignore
 const TEMPLATE = `
   <script type="text/html" id="sidebar-inner-item">
@@ -387,7 +389,7 @@ class Sidebar {
 }
 
 componentUtils.registerComponent(
-  'hue-sidebar',
+  NAME,
   {
     createViewModel: function(params, componentInfo) {
       return new Sidebar(params, componentInfo.element);

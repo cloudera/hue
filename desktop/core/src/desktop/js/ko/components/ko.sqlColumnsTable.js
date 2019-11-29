@@ -19,6 +19,8 @@ import ko from 'knockout';
 import componentUtils from './componentUtils';
 import I18n from 'utils/i18n';
 
+export const NAME = 'sql-columns-table';
+
 const TEMPLATE = `
     <div class="context-popover-flex">
       <div class="context-popover-flex-header">
@@ -145,4 +147,4 @@ class SqlColumnsTable {
   }
 }
 
-componentUtils.registerComponent('sql-columns-table', SqlColumnsTable, TEMPLATE);
+componentUtils.registerComponent(NAME, SqlColumnsTable, TEMPLATE);
