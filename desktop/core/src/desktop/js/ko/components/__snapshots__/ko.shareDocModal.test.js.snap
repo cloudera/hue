@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.shareDocModal.js should render component 1`] = `
+"<html><head></head><body class=\\"modal-open\\"><div id=\\"shareDocModal\\" data-bind=\\"descendantsComplete: descendantsComplete, component: { name: 'share-doc-modal', params: params }\\" data-keyboard=\\"true\\" class=\\"modal hide fade in\\" tabindex=\\"-1\\" aria-hidden=\\"false\\">
+  <!-- ko with: document --><!-- /ko -->
+</div><div class=\\"modal-backdrop fade in\\"></div></body></html>"
+`;

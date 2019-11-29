@@ -1,0 +1,47 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.importDocumentsModal.js should render component 1`] = `
+"<html><head></head><body class=\\"modal-open\\"><div id=\\"importDocumentsModal\\" data-bind=\\"descendantsComplete: descendantsComplete, component: { name: 'import-documents-modal', params: params }\\" data-keyboard=\\"true\\" class=\\"modal hide fade fileupload-modal in\\" tabindex=\\"-1\\" aria-hidden=\\"false\\">
+<div class=\\"modal-header\\">
+  <button type=\\"button\\" class=\\"close\\" data-dismiss=\\"modal\\" aria-label=\\"Close\\"><span aria-hidden=\\"true\\">×</span></button>
+  <!-- ko if: isHistory --><!-- /ko -->
+  <!-- ko ifnot: isHistory -->
+  <h2 class=\\"modal-title\\">Import Hue Documents</h2>
+  <!-- /ko -->
+</div>
+
+<!-- ko ifnot: imported --> 
+<div class=\\"modal-body\\">
+  <!-- ko with: activeEntry -->
+  <form id=\\"importDocumentsForm\\" class=\\"form-horizontal\\" style=\\"display: inline\\" enctype=\\"multipart/form-data\\">
+    <div data-bind=\\"visible: uploading() || uploadComplete()\\" style=\\"display: none;\\">
+      <span data-bind=\\"visible: uploading()\\" style=\\"display: none;\\">Importing...</span>
+      <span data-bind=\\"visible: !uploadFailed() &amp;&amp; uploadComplete()\\" style=\\"display: none;\\">Import complete!</span>
+      <span data-bind=\\"visible: uploadFailed\\" style=\\"display: none;\\">Import failed!</span>
+      <progress data-bind=\\"visible: uploading() || uploadComplete()\\" id=\\"importDocumentsProgress\\" value=\\"0\\" max=\\"100\\" style=\\"width: 560px; display: none;\\"></progress>
+    </div>
+    <div class=\\"pull-right\\">
+      <!-- ko ifnot: uploading() || uploadComplete() -->
+      <input type=\\"button\\" class=\\"btn\\" data-clear=\\"fileupload\\" data-bind=\\"click: closeUploadModal\\" value=\\"Cancel\\">
+      <input type=\\"submit\\" class=\\"btn btn-danger\\" data-clear=\\"fileupload\\" data-bind=\\"enable: importEnabled, click: function() { upload($parent.importComplete) }\\" value=\\"Import\\" disabled=\\"\\">
+      <!-- /ko -->
+      <!-- ko if: uploading() || uploadComplete() --><!-- /ko -->
+    </div>
+
+    <div class=\\"fileupload fileupload-new\\" data-provides=\\"fileupload\\" data-bind=\\"visible: !uploading() &amp;&amp; !uploadComplete()\\">
+      <span class=\\"btn btn-file\\">
+        <span class=\\"fileupload-new\\">Select json file</span>
+        <span class=\\"fileupload-exists\\">Change</span>
+        <input id=\\"importDocumentInput\\" type=\\"file\\" name=\\"documents\\" accept=\\".json\\" data-bind=\\"value: selectedImportFile\\">
+      </span>
+      &nbsp;&nbsp;<span class=\\"fileupload-preview\\"></span>
+      <a href=\\"#\\" class=\\"fileupload-exists\\" data-clear=\\"fileupload\\"><i class=\\"fa fa-times\\"></i></a>
+    </div>
+    <input type=\\"hidden\\" name=\\"path\\" data-bind=\\"value: definition().path\\" value=\\"\\">
+  </form>
+  <!-- /ko -->
+</div>
+<!-- /ko -->
+<!-- ko if: imported --><!-- /ko -->
+</div><div class=\\"modal-backdrop fade in\\"></div></body></html>"
+`;
