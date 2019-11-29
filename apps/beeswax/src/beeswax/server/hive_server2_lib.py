@@ -18,12 +18,12 @@
 from builtins import next
 from builtins import filter
 from builtins import map
+from builtins import str
 from builtins import object
 import logging
 import itertools
 import json
 import re
-import sys
 
 
 from operator import itemgetter
@@ -90,7 +90,7 @@ class HiveServerTable(Table):
   @property
   def partition_keys(self):
     try:
-      return [PartitionKeyCompatible(row['col_name'], row['data_type'], row['comment']) for row in self._get_partition_columns()]
+      return [PartitionKeyCompatible(row['col_name'], row['data_type'], row['comment']) for row in self._get_partition_column()]
     except:
       LOG.exception('failed to get partition keys')
       return []
@@ -112,42 +112,29 @@ class HiveServerTable(Table):
   @property
   def cols(self):
     rows = self.describe
-    col_row_index = 0
+    col_row_index = 1
     try:
-      cols = [col.strip() for col in map(itemgetter('col_name'), rows[col_row_index:])]
-      if cols[0] == '# col_name': # Hive MR/Impala have headers and one blank line, Hive Tez has nothing
-        col_row_index = 2
-        cols = cols[2:]
+      cols = list(map(itemgetter('col_name'), rows[col_row_index:]))
+      if cols.index('') == 0: # TEZ starts at 1 vs Hive, Impala starts at 2
+        col_row_index = col_row_index + 1
+        cols.pop(0)
       end_cols_index = cols.index('')
-      return rows[col_row_index:][:end_cols_index] + self._get_partition_columns()
-    except ValueError: # DESCRIBE on nested columns does not always contain additional rows beyond cols
+      return rows[col_row_index:][:end_cols_index] + self._get_partition_column()
+    except ValueError:  # DESCRIBE on columns and nested columns does not always contain additional rows beyond cols
       return rows[col_row_index:]
     except:
+      # Impala does not have it
       return rows
 
-  def _get_partition_columns(self):
+  def _get_partition_column(self):
     rows = self.describe
     try:
-      col_row_index = list(map(itemgetter('col_name'), rows)).index('# Partition Information') + 2
-      if rows[col_row_index]['col_name'] == '': # Impala has a blank line
-        col_row_index += 1
+      col_row_index = list(map(itemgetter('col_name'), rows)).index('# Partition Information') + 3
       end_cols_index = list(map(itemgetter('col_name'), rows[col_row_index:])).index('')
       return rows[col_row_index:][:end_cols_index]
     except:
-      # Not partitioned
+      # Impala does not have it
       return []
-
-  @property
-  def primary_keys(self):
-    rows = self.describe
-    try:
-      col_row_index = list(map(itemgetter('col_name'), rows)).index('# Primary Key') + 3
-      keys = rows[col_row_index:]
-    except:
-      # No info (e.g. IMPALA-8291)
-      keys = []
-
-    return [PartitionKeyCompatible(row['data_type'].strip(), 'NULL', row['comment']) for row in keys]
 
   @property
   def comment(self):
@@ -308,10 +295,7 @@ class HiveServerTColumnValue2(object):
 
   @classmethod
   def mark_nulls(cls, values, bytestring):
-    if sys.version_info[0] < 3 or isinstance(bytestring, bytes):
-      mask = bytearray(bytestring)
-    else:
-      mask = bytearray(bytestring, 'utf-8')
+    mask = bytearray(bytestring)
 
     for n in mask:
       yield n & 0x01
@@ -326,14 +310,7 @@ class HiveServerTColumnValue2(object):
 
   @classmethod
   def set_nulls(cls, values, bytestring):
-    can_decode = True
-    if sys.version_info[0] == 3 and isinstance(bytestring, bytes):
-      try:
-        bytestring = bytestring.decode('utf-8')
-      except:
-        can_decode = False
-
-    if bytestring == '' or (can_decode and re.match('^(\x00)+$', bytestring)): # HS2 has just \x00 or '', Impala can have \x00\x00...
+    if bytestring == '' or re.match('^(\x00)+$', bytestring): # HS2 has just \x00 or '', Impala can have \x00\x00...
       return values
     else:
       _values = [None if is_null else value for value, is_null in zip(values, cls.mark_nulls(values, bytestring))]
@@ -578,7 +555,8 @@ class HiveServerClient(object):
         validate=validate,
         transport_mode=query_server.get('transport_mode', 'socket'),
         http_url=query_server.get('http_url', ''),
-        coordinator_host=self.coordinator_host
+        coordinator_host=self.coordinator_host,
+        user=user
     )
 
 
@@ -752,7 +730,7 @@ class HiveServerClient(object):
         session_guid = snippet_data.get('result', {}).get('handle', {}).get('session_guid')
         status = snippet_data.get('status')
 
-        if status in [QueryHistory.STATE.submitted.name, QueryHistory.STATE.running.name]:
+        if status in [str(QueryHistory.STATE.submitted), str(QueryHistory.STATE.running)]:
           if session_guid is not None and session_guid not in busy_sessions:
             busy_sessions.add(session_guid)
 
@@ -904,9 +882,8 @@ class HiveServerClient(object):
     return self.execute_query_statement(statement=query.query['query'], max_rows=max_rows, configuration=configuration)
 
 
-  def execute_query_statement(self, statement, max_rows=1000, configuration=None, orientation=TFetchOrientation.FETCH_FIRST, close_operation=False):
-    if configuration is None:
-      configuration = {}
+  def execute_query_statement(self, statement, max_rows=1000, configuration={}, orientation=TFetchOrientation.FETCH_FIRST,
+                              close_operation=False):
     (results, schema), operation_handle = self.execute_statement(statement=statement, max_rows=max_rows, configuration=configuration, orientation=orientation)
 
     if close_operation:
@@ -934,9 +911,7 @@ class HiveServerClient(object):
     return self.execute_async_statement(statement=query_statement, confOverlay=configuration, with_multiple_session=with_multiple_session)
 
 
-  def execute_statement(self, statement, max_rows=1000, configuration=None, orientation=TFetchOrientation.FETCH_NEXT):
-    if configuration is None:
-      configuration = {}
+  def execute_statement(self, statement, max_rows=1000, configuration={}, orientation=TFetchOrientation.FETCH_NEXT):
     if self.query_server['server_name'].startswith('impala') and self.query_server['QUERY_TIMEOUT_S'] > 0:
       configuration['QUERY_TIMEOUT_S'] = str(self.query_server['QUERY_TIMEOUT_S'])
 
@@ -1123,8 +1098,7 @@ class HiveServerTableCompatible(HiveServerTable):
     self.describe = HiveServerTTableSchema(self.desc_results, self.desc_schema).cols()
     self._details = None
     try:
-      self.is_impala_only = 'org.apache.hadoop.hive.kudu.KuduSerDe' in str(hive_table.properties) or \
-        'org.apache.kudu.mapreduce.KuduTableOutputFormat' in str(hive_table.properties) # Deprecated since CDP
+      self.is_impala_only = 'org.apache.kudu.mapreduce.KuduTableOutputFormat' in str(hive_table.properties)
     except Exception as e:
       LOG.warn('Autocomplete data fetching error: %s' % e)
       self.is_impala_only = False

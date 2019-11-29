@@ -15,16 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
 from builtins import object
 import logging
 import re
-import sys
 import threading
 import time
 import json
 
 from django.core.cache import caches
 from django.urls import reverse
+from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 from kazoo.client import KazooClient
 
@@ -39,7 +40,7 @@ from indexer.file_format import HiveFormat
 from libzookeeper import conf as libzookeeper_conf
 
 from beeswax import hive_site
-from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, HIVE_SERVER_HOST, HIVE_HTTP_THRIFT_PORT, HIVE_METASTORE_HOST, HIVE_METASTORE_PORT, LIST_PARTITIONS_LIMIT, SERVER_CONN_TIMEOUT, \
+from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, HIVE_METASTORE_HOST, HIVE_METASTORE_PORT, LIST_PARTITIONS_LIMIT, SERVER_CONN_TIMEOUT, \
   AUTH_USERNAME, AUTH_PASSWORD, APPLY_NATURAL_SORT_MAX, QUERY_PARTITIONS_LIMIT, HIVE_DISCOVERY_HIVESERVER2_ZNODE, \
   HIVE_DISCOVERY_HS2, HIVE_DISCOVERY_LLAP, HIVE_DISCOVERY_LLAP_HA, HIVE_DISCOVERY_LLAP_ZNODE, CACHE_TIMEOUT, \
   LLAP_SERVER_HOST, LLAP_SERVER_PORT, LLAP_SERVER_THRIFT_PORT, USE_SASL as HIVE_USE_SASL
@@ -48,22 +49,18 @@ from beeswax.design import hql_query
 from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.models import QueryHistory, QUERY_TYPES
 
-
-if sys.version_info[0] > 2:
-    from django.utils.encoding import force_text as force_unicode
-else:
-    from django.utils.encoding import force_unicode
-
-
 LOG = logging.getLogger(__name__)
+
 
 DBMS_CACHE = {}
 DBMS_CACHE_LOCK = threading.Lock()
 cache = caches[CACHES_HIVE_DISCOVERY_KEY]
-
+cache_user_host_port = {}
 # Using file cache to make sure eventlet threads are uniform, this cache is persistent on startup
 # So we clear it to make sure the server resets hiveserver2 host.
 cache.clear()
+
+DBMS_OLDHS2_NAME_CACHE = {}
 
 
 def get(user, query_server=None, cluster=None):
@@ -71,12 +68,12 @@ def get(user, query_server=None, cluster=None):
   global DBMS_CACHE_LOCK
 
   if query_server is None:
-    query_server = get_query_server_config(connector=cluster)
+    LOG.info("FDD_dbms if query_server is None  user is : %s" % user)
+    query_server = get_query_server_config(connector=cluster, user=user)
 
   DBMS_CACHE_LOCK.acquire()
   try:
     DBMS_CACHE.setdefault(user.id, {})
-
     if query_server['server_name'] not in DBMS_CACHE[user.id]:
       # Avoid circular dependency
       from beeswax.server.hive_server2_lib import HiveServerClientCompatible
@@ -97,11 +94,15 @@ def get(user, query_server=None, cluster=None):
     DBMS_CACHE_LOCK.release()
 
 
-def get_query_server_config(name='beeswax', connector=None):
+def get_query_server_config(name='beeswax', connector=None, user=None):
+  global DBMS_OLDHS2_NAME_CACHE
+  global DBMS_CACHE
+  username = user.username
+
   if connector and has_connectors(): # TODO: Give empty connector when no connector in use
     query_server = get_query_server_config_via_connector(connector)
   else:
-    LOG.debug("Query cluster %s" % name)
+    LOG.debug("Query cluster %s and username is : %s" % (name, username))
     if name == "llap":
       activeEndpoint = cache.get('llap')
       if activeEndpoint is None:
@@ -120,7 +121,7 @@ def get_query_server_config(name='beeswax', connector=None):
                   cache.set("llap", json.dumps({"host": llap_servers["addresses"][0]["host"], "port": llap_servers["addresses"][0]["port"]}), CACHE_TIMEOUT.get())
             else:
               LOG.error("LLAP Endpoint not found, reverting to HiveServer2")
-              cache.set("llap", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}), CACHE_TIMEOUT.get())
+              cache.set("llap", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": hive_site.hiveserver2_thrift_http_port()}), CACHE_TIMEOUT.get())
           else:
             znode = "{0}".format(HIVE_DISCOVERY_LLAP_ZNODE.get())
             LOG.debug("Setting up LLAP with the following node {0}".format(znode))
@@ -134,7 +135,12 @@ def get_query_server_config(name='beeswax', connector=None):
           cache.set("llap", json.dumps({"host": LLAP_SERVER_HOST.get(), "port": LLAP_SERVER_THRIFT_PORT.get()}), CACHE_TIMEOUT.get())
       activeEndpoint = json.loads(cache.get("llap"))
     elif name != 'hms' and name != 'impala':
-      activeEndpoint = cache.get("hiveserver2")
+      Endpoint = cache.get("hiveserver2")
+      LOG.info(cache.get("hiveserver2"))
+      if Endpoint is None:
+        activeEndpoint = None
+      else:
+        activeEndpoint = Endpoint.get(username)
       if activeEndpoint is None:
         if HIVE_DISCOVERY_HS2.get():
           zk = KazooClient(hosts=libzookeeper_conf.ENSEMBLE.get(), read_only=True)
@@ -143,14 +149,25 @@ def get_query_server_config(name='beeswax', connector=None):
           LOG.info("Setting up Hive with the following node {0}".format(znode))
           if zk.exists(znode):
             hiveservers = zk.get_children(znode)
-            server_to_use = 0 # if CONF.HIVE_SPREAD.get() randint(0, len(hiveservers)-1) else 0
-            cache.set("hiveserver2", json.dumps({"host": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[0], "port": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[1]}))
+            server_to_use = abs(hash(str(username))) % 10 % len(hiveservers) #server_to_use = 0 # if CONF.HIVE_SPREAD.get() randint(0, len(hiveservers)-1) else 0
+            LOG.info("FDD_dbms server_to_use is : %s user is : %s length is :%s and hash is : %s" % (server_to_use, username, len(hiveservers), abs(hash(str(username)))))
+            LOG.info(hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[0])
+            if hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[0] == DBMS_OLDHS2_NAME_CACHE.get(username):
+              server_to_use = (server_to_use + 1) % len(hiveservers)
+            DBMS_OLDHS2_NAME_CACHE[username] = hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[0]
+            cache_user_host_port[username] = json.dumps({"host": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[0], "port": hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[1]})
+            cache.set("hiveserver2", cache_user_host_port)
+            DBMS_CACHE.pop(user.id, None)
           else:
-            cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}))
+            cache.set("hiveserver2", {username: json.dumps({"host": HIVE_SERVER_HOST.get(), "port": hive_site.hiveserver2_thrift_http_port()})})
           zk.stop()
+          LOG.info("FDD_dbms cache is : %s" % cache.get("hiveserver2"))
         else:
-          cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}))
-      activeEndpoint = json.loads(cache.get("hiveserver2"))
+          cache.set("hiveserver2", {username: json.dumps({"host": HIVE_SERVER_HOST.get(), "port": hive_site.hiveserver2_thrift_http_port()})})
+      LOG.info(DBMS_OLDHS2_NAME_CACHE)
+      LOG.info(cache_user_host_port)
+      LOG.info("FDD_dbms look changes")
+      activeEndpoint = json.loads(cache.get("hiveserver2").get(username))
 
     if name == 'impala':
       from impala.dbms import get_query_server_config as impala_query_server_config
@@ -220,7 +237,6 @@ def get_query_server_config_via_connector(connector):
       'auth_password': AUTH_PASSWORD.get(),
 
       'impersonation_enabled': False, # TODO, Impala only, to add to connector class
-      'use_sasl': connector['dialect'] in ('impala', 'hive'),
       'SESSION_TIMEOUT_S': 15 * 60,
       'querycache_rows': 1000,
       'QUERY_TIMEOUT_S': 15 * 60,
