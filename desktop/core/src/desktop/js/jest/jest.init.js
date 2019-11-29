@@ -22,7 +22,13 @@ import 'apps/notebook2/execution/sessionManager';
 import './jquery.setup';
 import './sqlTestUtils';
 
+import ko from 'knockout';
+import komapping from 'knockout.mapping';
+
+ko.mapping = komapping;
+
 const globalVars = {
+  ko: ko,
   AUTOCOMPLETE_TIMEOUT: 1,
   CACHEABLE_TTL: 1,
   HAS_OPTIMIZER: false,
@@ -36,6 +42,9 @@ const globalVars = {
   STATIC_URLS: {
     'impala/art/icon_impala_48.png': 'impala/art/icon_impala_48.png',
     'beeswax/art/icon_beeswax_48.png': 'beeswax/art/icon_beeswax_48.png'
+  },
+  SQL_COLUMNS_KNOWN_FACET_VALUES: {
+    type: { array: -1, boolean: -1 }
   }
 };
 

@@ -21,6 +21,8 @@ import 'ko/components/ko.catalogEntriesList';
 import componentUtils from './componentUtils';
 import dataCatalog from 'catalog/dataCatalog';
 
+export const NAME = 'polling-catalog-entries-list';
+
 const TEMPLATE = `
   <div>
     <!-- ko hueSpinner: { spin: !catalogEntryExists(), inline: true } --><!-- /ko -->
@@ -162,7 +164,7 @@ class PollingCatalogEntriesList {
 }
 
 componentUtils.registerComponent(
-  'polling-catalog-entries-list',
+  NAME,
   PollingCatalogEntriesList,
   TEMPLATE
 );

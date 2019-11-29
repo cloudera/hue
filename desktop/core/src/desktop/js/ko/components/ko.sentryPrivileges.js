@@ -21,6 +21,8 @@ import componentUtils from './componentUtils';
 import I18n from 'utils/i18n';
 import hueUtils from 'utils/hueUtils';
 
+export const NAME = 'hue-sentry-privileges';
+
 const TEMPLATE = `
   <script type="text/html" id="sentry-privileges-component-role">
     <div class="acl-block-title">
@@ -765,4 +767,4 @@ class SentryPrivilegesViewModel {
   }
 }
 
-componentUtils.registerComponent('hue-sentry-privileges', SentryPrivilegesViewModel, TEMPLATE);
+componentUtils.registerComponent(NAME, SentryPrivilegesViewModel, TEMPLATE);
