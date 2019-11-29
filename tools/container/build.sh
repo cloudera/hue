@@ -9,8 +9,18 @@ HUE_DIR=$WORK_DIR/hue
 APACHE_DIR=$WORK_DIR/huelb
 BASEHUE_DIR=$WORK_DIR/base/hue
 BASEHUELB_DIR=$WORK_DIR/base/huelb
-REGISTRY=${REGISTRY:-"docker.io/hortonworks"}
+HUEBASE_VERSION=huebase_centos:7.6
+HUELBBASE_VERSION=huelb_httpd:2.4.7.6
 HUEUSER="hive"
+
+if [ -z "$REGISTRY" ]; then
+  REGISTRY=${REGISTRY:-"docker.io/hortonworks"}
+  BASEOS_URL=${REGISTRY:-"docker.io/centos:centos7"}
+else
+  if [[ $REGISTRY == *cdh ]]; then
+    BASEOS_URL=$(echo $(echo $REGISTRY | cut -d '/' -f 1)/cloudera_base/centos:7.6.1810)
+  fi
+fi
 
 compile_hue() {
   mkdir -p $BUILD_DIR
@@ -59,6 +69,7 @@ docker_hue_build() {
     subst_var $f
   done
 
+  sed -i -e "s#\${HUEBASE_VERSION}#${HUEBASE_VERSION}#g" $HUE_DIR/Dockerfile
   docker build -f $HUE_DIR/Dockerfile -t ${REGISTRY}/hue:$GBN \
     --build-arg GBN=$GBN \
     --build-arg GSHA="$GSHA" \
@@ -83,6 +94,7 @@ docker_huelb_build() {
     subst_var $f
   done
 
+  sed -i -e "s#\${HUELBBASE_VERSION}#${HUELBBASE_VERSION}#g" $APACHE_DIR/Dockerfile
   docker build -f $APACHE_DIR/Dockerfile -t ${REGISTRY}/huelb:$GBN \
     --build-arg GBN=$GBN \
     --build-arg GSHA="$GSHA" \
@@ -95,33 +107,50 @@ docker_huelb_build() {
 
 build_huebase() {
   cd $BASEHUE_DIR
-  docker build -f $BASEHUE_DIR/Dockerfile -t ${REGISTRY}/huebase_centos:7 .
-  docker tag ${REGISTRY}/huebase_centos:7 huebase_centos:7
-  docker push ${REGISTRY}/huebase_centos:7
-  docker pull ${REGISTRY}/huebase_centos:7
+  docker build -f $BASEHUE_DIR/Dockerfile -t ${REGISTRY}/$HUEBASE_VERSION .
+  docker tag ${REGISTRY}/$HUEBASE_VERSION $HUEBASE_VERSION
+  docker push ${REGISTRY}/$HUEBASE_VERSION
+  docker pull ${REGISTRY}/$HUEBASE_VERSION
 }
 
 build_huelbbase() {
   cd $BASEHUELB_DIR
-  docker build -f $BASEHUELB_DIR/Dockerfile -t ${REGISTRY}/huelb_httpd:2.4 .
-  docker tag ${REGISTRY}/huelb_httpd:2.4 huelb_httpd:2.4
-  docker push ${REGISTRY}/huelb_httpd:2.4
-  docker pull ${REGISTRY}/huelb_httpd:2.4
+  docker build -f $BASEHUELB_DIR/Dockerfile -t ${REGISTRY}/$HUELBBASE_VERSION .
+  docker tag ${REGISTRY}/$HUELBBASE_VERSION $HUELBBASE_VERSION
+  docker push ${REGISTRY}/$HUELBBASE_VERSION
+  docker pull ${REGISTRY}/$HUELBBASE_VERSION
+}
+
+pull_hueos() {
+  docker pull ${BASEOS_URL}
+
+  FROMOS_URL=$(echo "$BASEOS_URL as base-centos-jdk")
+  sed -i -e "s#\${BASEOS_URL}#${FROMOS_URL}#g" $BASEHUE_DIR/Dockerfile
+}
+
+pull_huelbos() {
+  docker pull ${BASEOS_URL}
+
+  FROMOS_URL=$(echo "$BASEOS_URL as base-centos-jdk")
+  sed -i -e "s#\${BASEOS_URL}#${FROMOS_URL}#g" $BASEHUELB_DIR/Dockerfile
 }
 
 pull_base_images() {
   set +e
-  docker pull ${REGISTRY}/huebase_centos:7
+
+  docker pull ${REGISTRY}/$HUEBASE_VERSION
   if [[ $? != 0 ]]; then
+    pull_hueos
     build_huebase
   fi
-  docker tag ${REGISTRY}/huebase_centos:7 huebase_centos:7
+  docker tag ${REGISTRY}/$HUEBASE_VERSION $HUEBASE_VERSION
 
-  docker pull ${REGISTRY}/huelb_httpd:2.4
+  docker pull ${REGISTRY}/$HUELBBASE_VERSION
   if [[ $? != 0 ]]; then
+    pull_huelbos
     build_huelbbase
   fi
-  docker tag ${REGISTRY}/huelb_httpd:2.4 huelb_httpd:2.4
+  docker tag ${REGISTRY}/$HUELBBASE_VERSION $HUELBBASE_VERSION
   set -e
 }
 

@@ -31,8 +31,8 @@ LOG = logging.getLogger(__name__)
 
 
 # TODO: automatically load modules from lib module
-# TODO: offer to white/black list available connector classes
-CONNECTOR_CLASSES = [{
+# TODO: offer to white/black list available connector types
+CONNECTOR_TYPES = [{
     'nice_name': connector.NAME,
     'dialect': connector.TYPE,
     'interface': connector.INTERFACE, # interfaces = ['int1', 'int2'...]
@@ -46,7 +46,7 @@ CONNECTOR_CLASSES = [{
   ]
 ]
 
-CONNECTOR_CLASSES += [
+CONNECTOR_TYPES += [
   {'nice_name': "Hive Tez", 'dialect': 'hive-tez', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
   {'nice_name': "Hive LLAP", 'dialect': 'hive-llap', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
   {'nice_name': "Druid", 'dialect': 'sql-druid', 'interface': 'sqlalchemy', 'settings': [{'name': 'url', 'value': 'druid://druid-host.com:8082/druid/v2/sql/'}], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
@@ -111,7 +111,7 @@ def _group_category_connectors(connectors):
   } for category in CATEGORIES
 ]
 
-AVAILABLE_CONNECTORS = _group_category_connectors(CONNECTOR_CLASSES)
+AVAILABLE_CONNECTORS = _group_category_connectors(CONNECTOR_TYPES)
 
 
 # TODO: persist in DB
@@ -119,11 +119,11 @@ AVAILABLE_CONNECTORS = _group_category_connectors(CONNECTOR_CLASSES)
 # TODO: load back from DB and apply Category properties, e.g. defaults, interface, category, category_name...
 # TODO: connector groups: if we want one type (e.g. Hive) to show-up with multiple computes and the same saved query.
 
-# connector_class: category --> engine, is_sql --> engine_type: sql
+# connector_type: category --> engine, is_sql --> engine_type: sql
 CONNECTOR_INSTANCES = None
 CONNECTOR_IDS = 1
 
-def get_connector_classes(request):
+def get_connector_types(request):
   global AVAILABLE_CONNECTORS
   global CATEGORIES
 
@@ -178,9 +178,9 @@ def update_connector(request):
 
 
 def _get_connector_by_type(dialect):
-  global CONNECTOR_CLASSES
+  global CONNECTOR_TYPES
 
-  instance = [connector for connector in CONNECTOR_CLASSES if connector['dialect'] == dialect]
+  instance = [connector for connector in CONNECTOR_TYPES if connector['dialect'] == dialect]
 
   if instance:
     return instance[0]
@@ -210,25 +210,35 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
 
   if CONNECTOR_INSTANCES is None:
     CONNECTOR_INSTANCES = []
+
     for i in config_connectors:
-      connector_class = [
-        connector_class
-        for connector_class in CONNECTOR_CLASSES
-            if connector_class['dialect'] == config_connectors[i].DIALECT.get() and connector_class['interface'] == config_connectors[i].INTERFACE.get()
-      ]
-      connector = {
-        'nice_name': config_connectors[i].NICE_NAME.get() or i,
-        'name': i,
-        'dialect': config_connectors[i].DIALECT.get(),
-        'interface': config_connectors[i].INTERFACE.get(),
-        'settings': config_connectors[i].SETTINGS.get(),
-        'id': CONNECTOR_IDS,
-        'category': connector_class[0]['category'],
-        'description': connector_class[0]['description']
-      }
-      connector.update(connector_class[0]['properties'])
-      CONNECTOR_INSTANCES.append(connector)
-      CONNECTOR_IDS += 1
+      connector_types = []
+      for connector_type in CONNECTOR_TYPES:
+        if connector_type['dialect'] == config_connectors[i].DIALECT.get():
+          connector_types.insert(0, connector_type)
+        elif connector_type.get('interface') == config_connectors[i].INTERFACE.get():
+          connector_types.append(connector_type)
+
+      if not connector_types:
+        LOG.warn('Skipping connector %s as connector dialect %s or interface %s are not installed.' % (
+            i, config_connectors[i].DIALECT.get(), config_connectors[i].INTERFACE.get()
+          )
+        )
+      else:
+        connector_type = connector_types[0]
+        connector = {
+          'nice_name': config_connectors[i].NICE_NAME.get() or i,
+          'name': i,
+          'dialect': config_connectors[i].DIALECT.get(),
+          'interface': config_connectors[i].INTERFACE.get(),
+          'settings': config_connectors[i].SETTINGS.get(),
+          'id': CONNECTOR_IDS,
+          'category': connector_type['category'],
+          'description': connector_type['description']
+        }
+        connector.update(connector_type['properties'])
+        CONNECTOR_INSTANCES.append(connector)
+        CONNECTOR_IDS += 1
 
   connectors = CONNECTOR_INSTANCES
 

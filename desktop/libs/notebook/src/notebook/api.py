@@ -131,6 +131,11 @@ def _execute_notebook(request, notebook, snippet):
   try:
     try:
       session = notebook.get('sessions') and notebook['sessions'][0] # Session reference for snippet execution without persisting it
+
+      active_executable = json.loads(request.POST.get('executable', '{}')) # Editor v2
+
+      # TODO: Use statement, database etc. from active_executable
+
       if historify:
         history = _historify(notebook, request.user)
         notebook = Notebook(document=history).get_data()
@@ -148,6 +153,18 @@ def _execute_notebook(request, notebook, snippet):
     finally:
       if historify:
         _snippet = [s for s in notebook['snippets'] if s['id'] == snippet['id']][0]
+
+        if 'id' in active_executable: # Editor v2
+          # notebook_executable is the 1-to-1 match of active_executable in the notebook structure
+          notebook_executable = [e for e in _snippet['executor']['executables'] if e['id'] == active_executable['id']][0]
+          notebook_executable['handle'] = response['handle']
+          if history:
+            notebook_executable['history'] = {
+              'id': history.id,
+              'uuid': history.uuid
+            }
+            notebook_executable['operationId'] = history.uuid
+
         if 'handle' in response: # No failure
           if 'result' not in _snippet: # Editor v2
             _snippet['result'] = {}
@@ -216,7 +233,7 @@ def check_status(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
   if operation_id or not snippet: # To unify with _get_snippet
-    nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=operation_id or notebook['id'])
+    nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=operation_id or notebook['uuid'])
     notebook = Notebook(document=nb_doc).get_data() # Used below
     snippet = notebook['snippets'][0]
 
@@ -243,13 +260,19 @@ def check_status(request):
       status = 'expired'
     else:
       status = 'failed'
+    if response.get('query_status'):
+      has_result_set = response['query_status'].get('has_result_set')
+    else:
+      has_result_set = None
 
     if notebook['type'].startswith('query') or notebook.get('isManaged'):
-      nb_doc = Document2.objects.get(id=notebook['id'])
+      nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=operation_id or notebook['uuid'])
       if nb_doc.can_write(request.user):
         nb = Notebook(document=nb_doc).get_data()
-        if status != nb['snippets'][0]['status']:
+        if status != nb['snippets'][0]['status'] or has_result_set != nb['snippets'][0].get('has_result_set'):
           nb['snippets'][0]['status'] = status
+          if has_result_set is not None:
+            nb['snippets'][0]['has_result_set'] = has_result_set
           nb_doc.update_data(nb)
           nb_doc.save()
 
@@ -566,7 +589,7 @@ def get_history(request):
 def clear_history(request):
   response = {'status': -1}
 
-  notebook = json.loads(request.POST.get('notebook'), '{}')
+  notebook = json.loads(request.POST.get('notebook', '{}'))
   doc_type = request.POST.get('doc_type')
   is_notification_manager = request.POST.get('is_notification_manager', 'false') == 'true'
 

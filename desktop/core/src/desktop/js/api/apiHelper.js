@@ -1863,13 +1863,13 @@ class ApiHelper {
           if (response && response.query_status && response.query_status.status) {
             const status = response.query_status.status;
             if (status === 'available') {
-              deferred.resolve();
+              deferred.resolve(response.query_status);
             } else if (status === 'running' || status === 'starting' || status === 'waiting') {
               waitTimeout = window.setTimeout(() => {
                 waitForAvailable();
               }, 500);
             } else {
-              deferred.reject();
+              deferred.reject(response.query_status);
             }
           }
         })
@@ -1936,6 +1936,7 @@ class ApiHelper {
     return this.simplePost('/notebook/api/close_session', data, options);
   }
 
+  // Used by check history status
   checkStatus(options) {
     const data = {
       notebook: options.notebookJson
@@ -2062,6 +2063,8 @@ class ApiHelper {
     const promise = new Promise(async (resolve, reject) => {
       let data = {};
       if (executable.executor.snippet) {
+        // TODO: Refactor away the snippet, it currently works because snippet.statement is a computed from
+        // the active executable, but we n
         data = {
           notebook: await executable.executor.snippet.parentNotebook.toJson(),
           snippet: executable.executor.snippet.toContextJson()
@@ -2069,6 +2072,8 @@ class ApiHelper {
       } else {
         data = await executable.toContext();
       }
+
+      data.executable = executable.toJson();
 
       this.simplePost(url, data, options)
         .done(response => {
@@ -2099,8 +2104,11 @@ class ApiHelper {
           if (options.executable.handle !== handle) {
             options.executable.handle = handle;
           }
-          this.cancelStatement(options);
-        } catch (err) {}
+          await this.cancelStatement(options);
+        } catch (err) {
+          console.warn('Failed cancelling statement');
+          console.warn(err);
+        }
       }
     });
 
@@ -2165,32 +2173,26 @@ class ApiHelper {
   checkExecutionStatus(options) {
     const deferred = $.Deferred();
 
-    const result = new CancellablePromise(deferred);
-
-    options.executable
-      .toContext()
-      .then(notebookApiContext => {
-        const request = $.post({
-          url: '/notebook/api/check_status',
-          data: notebookApiContext
-        })
-          .done(response => {
-            if (response && response.query_status) {
-              deferred.resolve(response.query_status.status);
-            } else if (response && response.status === -3) {
-              deferred.resolve(EXECUTION_STATUS.expired);
-            } else {
-              deferred.resolve(EXECUTION_STATUS.failed);
-            }
-          })
-          .fail(err => {
-            deferred.reject(this.assistErrorCallback(options)(err));
-          });
-        result.request = request;
+    const request = $.post({
+      url: '/notebook/api/check_status',
+      data: {
+        operationId: options.executable.operationId
+      }
+    })
+      .done(response => {
+        if (response && response.query_status) {
+          deferred.resolve(response.query_status.status);
+        } else if (response && response.status === -3) {
+          deferred.resolve(EXECUTION_STATUS.expired);
+        } else {
+          deferred.resolve(EXECUTION_STATUS.failed);
+        }
       })
-      .catch(deferred.reject);
+      .fail(err => {
+        deferred.reject(this.assistErrorCallback(options)(err));
+      });
 
-    return result;
+    return new CancellablePromise(deferred, request);
   }
 
   /**
@@ -2238,7 +2240,11 @@ class ApiHelper {
    */
   async cancelStatement(options) {
     return new Promise(async (resolve, reject) => {
-      this.simplePost('/notebook/api/cancel_statement', options.executable.toContext(), options)
+      this.simplePost(
+        '/notebook/api/cancel_statement',
+        await options.executable.toContext(),
+        options
+      )
         .done(resolve)
         .fail(reject);
     });
@@ -2421,13 +2427,18 @@ class ApiHelper {
                 compute: options.compute,
                 silenceErrors: options.silenceErrors
               })
-              .done(() => {
+              .done(resultStatus => {
+                if (resultStatus) {
+                  $.extend(true, queryResult.result, {
+                    handle: resultStatus
+                  });
+                }
                 const resultRequest = self
                   .simplePost(
                     '/notebook/api/fetch_result_data',
                     {
                       notebook: notebookJson,
-                      snippet: snippetJson,
+                      snippet: JSON.stringify(queryResult),
                       rows: options.sampleCount || 100,
                       startOver: 'false'
                     },

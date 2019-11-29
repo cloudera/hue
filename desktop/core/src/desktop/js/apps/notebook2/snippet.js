@@ -174,12 +174,12 @@ const getDefaultSnippetProperties = snippetType => {
 const ERROR_REGEX = /line ([0-9]+)(:([0-9]+))?/i;
 
 export default class Snippet {
-  constructor(vm, notebook, snippet) {
+  constructor(vm, notebook, snippetRaw) {
     this.parentVm = vm;
     this.parentNotebook = notebook;
 
-    this.id = ko.observable(snippet.id || hueUtils.UUID());
-    this.name = ko.observable(snippet.name || '');
+    this.id = ko.observable(snippetRaw.id || hueUtils.UUID());
+    this.name = ko.observable(snippetRaw.name || '');
     this.type = ko.observable();
     this.type.subscribe(newValue => {
       // TODO: Add session disposal for ENABLE_NOTEBOOK_2
@@ -188,7 +188,7 @@ export default class Snippet {
         this.status(STATUS.ready);
       });
     });
-    this.type(snippet.type || TYPE.hive);
+    this.type(snippetRaw.type || TYPE.hive);
     this.isBatchable = ko.pureComputed(
       () =>
         this.type() === this.hive ||
@@ -206,7 +206,7 @@ export default class Snippet {
 
     // Ace stuff
     this.aceCursorPosition = ko.observable(
-      this.parentNotebook.isHistory() ? snippet.aceCursorPosition : null
+      this.parentNotebook.isHistory() ? snippetRaw.aceCursorPosition : null
     );
 
     this.aceEditor = null;
@@ -249,10 +249,10 @@ export default class Snippet {
 
     // namespace and compute might be initialized as empty object {}
     this.namespace = ko.observable(
-      snippet.namespace && snippet.namespace.id ? snippet.namespace : undefined
+      snippetRaw.namespace && snippetRaw.namespace.id ? snippetRaw.namespace : undefined
     );
     this.compute = ko.observable(
-      snippet.compute && snippet.compute.id ? snippet.compute : undefined
+      snippetRaw.compute && snippetRaw.compute.id ? snippetRaw.compute : undefined
     );
 
     this.availableDatabases = ko.observableArray();
@@ -269,11 +269,11 @@ export default class Snippet {
       }
     });
 
-    this.database(snippet.database);
+    this.database(snippetRaw.database);
 
     // History is currently in Notebook, same with saved queries by snippets, might be better in assist
-    this.currentQueryTab = ko.observable(snippet.currentQueryTab || 'queryHistory');
-    this.pinnedContextTabs = ko.observableArray(snippet.pinnedContextTabs || []);
+    this.currentQueryTab = ko.observable(snippetRaw.currentQueryTab || 'queryHistory');
+    this.pinnedContextTabs = ko.observableArray(snippetRaw.pinnedContextTabs || []);
 
     this.errorLoadingQueries = ko.observable(false);
     this.loadingQueries = ko.observable(false);
@@ -341,12 +341,12 @@ export default class Snippet {
       });
     }
 
-    this.statementType = ko.observable(snippet.statementType || 'text');
+    this.statementType = ko.observable(snippetRaw.statementType || 'text');
     this.statementTypes = ko.observableArray(['text', 'file']); // Maybe computed later for Spark
     if (!this.parentVm.editorMode()) {
       this.statementTypes.push('document');
     }
-    this.statementPath = ko.observable(snippet.statementPath || '');
+    this.statementPath = ko.observable(snippetRaw.statementPath || '');
     this.externalStatementLoaded = ko.observable(false);
 
     this.statementPath.subscribe(() => {
@@ -355,7 +355,7 @@ export default class Snippet {
 
     this.associatedDocumentLoading = ko.observable(true);
     this.associatedDocument = ko.observable();
-    this.associatedDocumentUuid = ko.observable(snippet.associatedDocumentUuid);
+    this.associatedDocumentUuid = ko.observable(snippetRaw.associatedDocumentUuid);
     this.associatedDocumentUuid.subscribe(val => {
       if (val !== '') {
         this.getExternalStatement();
@@ -364,7 +364,7 @@ export default class Snippet {
         this.ace().setValue('', 1);
       }
     });
-    this.statement_raw = ko.observable(snippet.statement_raw || '');
+    this.statement_raw = ko.observable(snippetRaw.statement_raw || '');
     this.selectedStatement = ko.observable('');
     this.positionStatement = ko.observable(null);
     this.lastExecutedStatement = ko.observable(null);
@@ -428,12 +428,12 @@ export default class Snippet {
       this.parentVm.huePubSubId
     );
 
-    this.aceSize = ko.observable(snippet.aceSize || 100);
-    this.status = ko.observable(snippet.status || STATUS.loading);
+    this.aceSize = ko.observable(snippetRaw.aceSize || 100);
+    this.status = ko.observable(snippetRaw.status || STATUS.loading);
     this.statusForButtons = ko.observable(STATUS_FOR_BUTTONS.executed);
 
     this.properties = ko.observable(
-      komapping.fromJS(snippet.properties || getDefaultSnippetProperties(this.type()))
+      komapping.fromJS(snippetRaw.properties || getDefaultSnippetProperties(this.type()))
     );
     this.hasProperties = ko.pureComputed(
       () => Object.keys(komapping.toJS(this.properties())).length > 0
@@ -462,8 +462,8 @@ export default class Snippet {
         }
       }, 100);
     });
-    if (snippet.variables) {
-      snippet.variables.forEach(variable => {
+    if (snippetRaw.variables) {
+      snippetRaw.variables.forEach(variable => {
         variable.meta = (typeof variable.defaultValue === 'object' && variable.defaultValue) || {
           type: 'text',
           placeholder: ''
@@ -477,7 +477,7 @@ export default class Snippet {
         delete variable.defaultValue;
       });
     }
-    this.variables = komapping.fromJS(snippet.variables || []);
+    this.variables = komapping.fromJS(snippetRaw.variables || []);
     this.variables.subscribe(() => {
       $(document).trigger('updateResultHeaders', this);
     });
@@ -761,8 +761,8 @@ export default class Snippet {
     if (this.parentVm.editorMode() && $.totalStorage('hue.editor.showLogs')) {
       defaultShowLogs = $.totalStorage('hue.editor.showLogs');
     }
-    this.showLogs = ko.observable(snippet.showLogs || defaultShowLogs);
-    this.jobs = ko.observableArray(snippet.jobs || []);
+    this.showLogs = ko.observable(snippetRaw.showLogs || defaultShowLogs);
+    this.jobs = ko.observableArray(snippetRaw.jobs || []);
 
     this.executeNextTimeout = -1;
     this.refreshTimeouts = {};
@@ -780,9 +780,9 @@ export default class Snippet {
 
     this.errorsKlass = ko.pureComputed(() => this.resultsKlass() + ' alert alert-error');
 
-    this.is_redacted = ko.observable(!!snippet.is_redacted);
+    this.is_redacted = ko.observable(!!snippetRaw.is_redacted);
 
-    this.settingsVisible = ko.observable(!!snippet.settingsVisible);
+    this.settingsVisible = ko.observable(!!snippetRaw.settingsVisible);
     this.saveResultsModalVisible = ko.observable(false);
 
     this.complexity = ko.observable();
@@ -953,7 +953,7 @@ export default class Snippet {
       }
     }
 
-    this.wasBatchExecuted = ko.observable(!!snippet.wasBatchExecuted);
+    this.wasBatchExecuted = ko.observable(!!snippetRaw.wasBatchExecuted);
     this.isReady = ko.pureComputed(
       () =>
         (this.statementType() === 'text' &&
@@ -973,8 +973,8 @@ export default class Snippet {
           this.associatedDocumentUuid() &&
           this.associatedDocumentUuid().length > 0)
     );
-    this.lastExecuted = ko.observable(snippet.lastExecuted || 0);
-    this.lastAceSelectionRowOffset = ko.observable(snippet.lastAceSelectionRowOffset || 0);
+    this.lastExecuted = ko.observable(snippetRaw.lastExecuted || 0);
+    this.lastAceSelectionRowOffset = ko.observable(snippetRaw.lastAceSelectionRowOffset || 0);
 
     this.executingBlockingOperation = null; // A ExecuteStatement()
     this.showLongOperationWarning = ko.observable(false);
@@ -1006,13 +1006,14 @@ export default class Snippet {
       database: this.database,
       sourceType: this.type,
       namespace: this.namespace,
+      isOptimizerEnabled: this.parentVm.isOptimizerEnabled(),
       snippet: this,
       isSqlEngine: this.isSqlDialect
     });
 
-    if (snippet.executor) {
+    if (snippetRaw.executor) {
       try {
-        this.executor.executables = snippet.executor.executables.map(executableRaw => {
+        this.executor.executables = snippetRaw.executor.executables.map(executableRaw => {
           switch (executableRaw.type) {
             case 'sqlExecutable': {
               return SqlExecutable.fromJs(this.executor, executableRaw);

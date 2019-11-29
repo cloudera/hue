@@ -54,27 +54,40 @@ export default class SqlExecutable extends Executable {
 
   static fromJs(executor, executableRaw) {
     const executable = new SqlExecutable({
-      executor: executor,
       database: executableRaw.database,
+      executor: executor,
       parsedStatement: executableRaw.parsedStatement
     });
+    executable.executeEnded = executableRaw.executeEnded;
+    executable.executeStarted = executableRaw.executeStarted;
+    executable.handle = executableRaw.handle;
+    executable.history = executableRaw.history;
+    executable.id = executableRaw.id;
+    executable.logs.errors = executableRaw.logs.errors;
+    executable.logs.jobs = executableRaw.logs.jobs;
+    executable.lost = executableRaw.lost;
     executable.observerState = executableRaw.observerState || {};
+    executable.operationId = executableRaw.history && executableRaw.history.uuid;
     executable.progress = executableRaw.progress;
     executable.status = executableRaw.status;
-    executable.handle = executableRaw.handle;
-    executable.lost = executableRaw.lost;
-    executable.logs.jobs = executableRaw.logs.jobs;
-    executable.logs.errors = executableRaw.logs.errors;
-    executable.executeStarted = executableRaw.executeStarted;
-    executable.executeEnded = executableRaw.executeEnded;
     return executable;
   }
 
   toJs() {
     const executableJs = super.toJs();
-    executableJs.type = 'sqlExecutable';
     executableJs.database = this.database;
     executableJs.parsedStatement = this.parsedStatement;
+    executableJs.type = 'sqlExecutable';
     return executableJs;
+  }
+
+  // TODO: Use this for execute instead of snippet
+  toJson() {
+    return JSON.stringify({
+      id: this.id,
+      statement: this.parsedStatement.statement,
+      database: this.database
+      // session:
+    });
   }
 }

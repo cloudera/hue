@@ -27,28 +27,28 @@ Once the request is successful then capture headers and cookies for subsequent r
 
     import requests
 
-    def login_djangosite():
     next_url = "/"
-    login_url = "http://localhost:8888/accounts/login?next=/"
+    login_url = "http://localhost:8888/accounts/login"
 
     session = requests.Session()
-    r = session.get(login_url)
-    form_data = dict(username="[your hue username]",password="[your hue password]",
-                      csrfmiddlewaretoken=session.cookies['csrftoken'],next=next_url)
-    r = session.post(login_url, data=form_data, cookies=dict(), headers=dict(Referer=login_url))
+    response = session.get(login_url)
 
-    # check if request executed successfully?
-    print r.status_code
+    form_data = {
+        'username': '[your Hue username]',
+        'password': '[your Hue password]',
+        'csrfmiddlewaretoken': session.cookies['csrftoken'],
+        'next': next_url
+    }
+    response = session.post(login_url, data=form_data, cookies={}, headers={'Referer': login_url})
+
+    print('Logged in successfully: %s %s' % (response.status_code == 200, response.status_code))
 
     cookies = session.cookies
     headers = session.headers
 
-    r=session.get('http://localhost:8888/metastore/databases/default/metadata',
-    cookies=session.cookies, headers=session.headers)
-    print r.status_code
-
-    # check metadata output
-    print r.text
+    response = session.get('http://localhost:8888/metastore/databases/default/metadata')
+    print(response.status_code)
+    print(response.text)
 
 ### Data Catalog
 

@@ -679,7 +679,7 @@ class Notebook {
 
       function updateHistoryCall(item) {
         $.post('/notebook/api/check_status', {
-          notebook: komapping.toJSON({ id: item.uuid() })
+          notebook: komapping.toJSON({ uuid: item.uuid() })
         })
           .done(data => {
             const status =

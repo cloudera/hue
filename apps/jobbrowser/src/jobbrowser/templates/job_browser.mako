@@ -451,6 +451,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <!-- /ko -->
               <!-- /ko -->
 
+              <!-- ko if: $root.job() && $root.job().hasPagination() && interface() === 'schedules' -->
+              <div data-bind="template: { name: 'pagination${ SUFFIX }', data: $root.job() }, visible: !jobs.loadingJobs()"></div>
+              <!-- /ko -->
               <div data-bind="template: { name: 'pagination${ SUFFIX }', data: $root.jobs }, visible: !$root.job() && !jobs.loadingJobs()"></div>
               <!-- /ko -->
 
@@ -2012,14 +2015,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <tbody data-bind="foreach: properties['actions']">
               <tr>
                 <td>
-                  <a data-bind="hueLink: '/jobbrowser/jobs/' + externalId(), clickBubble: false">
+                  <a data-bind="hueLink: '/jobbrowser/jobs/' + ko.unwrap(externalId), clickBubble: false">
                     <i class="fa fa-tasks"></i>
                   </a>
                 </td>
                 <td data-bind="text: status"></td>
                 <td data-bind="text: errorMessage"></td>
                 <td data-bind="text: errorCode"></td>
-                <td data-bind="text: externalId, click: function() { $root.job().id(externalId()); $root.job().fetchJob();}, style: { color: '#0B7FAD' }" class="pointer"></td>
+                <td data-bind="text: externalId, click: function() { $root.job().id(ko.unwrap(externalId)); $root.job().fetchJob();}, style: { color: '#0B7FAD' }" class="pointer"></td>
                 <td data-bind="text: id, click: function() {  $root.job().id(id); $root.job().fetchJob(); }, style: { color: '#0B7FAD' }" class="pointer"></td>
                 <td data-bind="moment: {data: startTime, format: 'LLL'}"></td>
                 <td data-bind="moment: {data: endTime, format: 'LLL'}"></td>
@@ -2323,7 +2326,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </tr>
             </thead>
             <tbody data-bind="foreach: properties['actions']">
-              <tr class="status-border pointer" data-bind="css: {'completed': status() == 'SUCCEEDED', 'running': ['SUCCEEDED', 'FAILED', 'KILLED'].indexOf(status()) != -1, 'failed': status() == 'FAILED' || status() == 'KILLED'}, click: function() { if (id()) { $root.job().id(id()); $root.job().fetchJob();} }">
+              <tr class="status-border pointer" data-bind="css: {'completed': ko.unwrap(status) == 'SUCCEEDED', 'running': ['SUCCEEDED', 'FAILED', 'KILLED'].indexOf(ko.unwrap(status)) != -1, 'failed': ko.unwrap(status) == 'FAILED' || ko.unwrap(status) == 'KILLED'}, click: function() { if (ko.unwrap(id)) { $root.job().id(ko.unwrap(id)); $root.job().fetchJob();} }">
                 <td><span class="label job-status-label" data-bind="text: status"></span></td>
                 <td data-bind="text: name"></td>
                 <td data-bind="text: type"></td>
@@ -2533,6 +2536,42 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     var Job = function (vm, job) {
       var self = this;
 
+      self.paginationPage = ko.observable(1);
+      self.paginationOffset = ko.observable(1); // Starting index
+      self.paginationResultPage = ko.observable(50);
+      self.totalApps = ko.observable(null);
+      self.hasPagination = ko.computed(function() {
+        return ['workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1;
+      });
+      self.pagination = ko.pureComputed(function() {
+        return {
+          'page': self.paginationPage(),
+          'offset': self.paginationOffset(),
+          'limit': self.paginationResultPage()
+        };
+      });
+
+      self.pagination.subscribe(function(value) {
+        if (vm.interface() === 'schedules' && value.page > 1) {
+          vm.interface('schedules');
+          self.hasPagination(true);
+          self.fetchJob();
+        }
+      });
+
+      self.showPreviousPage = ko.computed(function() {
+        return self.paginationOffset() > 1;
+      });
+      self.showNextPage = ko.computed(function() {
+        return self.totalApps() != null && (self.paginationOffset() + self.paginationResultPage()) < self.totalApps();
+      });
+      self.previousPage = function() {
+        self.paginationOffset(self.paginationOffset() - self.paginationResultPage());
+      };
+      self.nextPage = function() {
+        self.paginationOffset(self.paginationOffset() + self.paginationResultPage());
+      };
+
       self.id = ko.observableDefault(job.id);
       %if not is_mini:
       self.id.subscribe(function () {
@@ -2614,7 +2653,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         if (self.mainType() == 'schedules' && self.properties['tasks']) {
           var apps = self.properties['tasks']().map(function (instance) {
             var job = new CoordinatorAction(vm, ko.mapping.toJS(instance), self);
-            job.properties = instance;
+            job.properties = ko.mapping.fromJS(instance);
             return job;
           });
           var instances = new Jobs(vm);
@@ -2737,7 +2776,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         return $.post("/jobbrowser/api/job/" + vm.interface(), {
           cluster: ko.mapping.toJSON(vm.compute),
           app_id: ko.mapping.toJSON(self.id),
-          interface: ko.mapping.toJSON(vm.interface)
+          interface: ko.mapping.toJSON(vm.interface),
+          pagination: ko.mapping.toJSON(self.pagination)
         }, function (data) {
           if (data.status == 0) {
             if (data.app) {
@@ -2745,7 +2785,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             }
             if (callback) {
               callback(data);
-            };
+            }
           } else {
             $(document).trigger("error", data.message);
           }
@@ -2911,6 +2951,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                       return selectedIDs.indexOf(coordinatorAction.id()) != -1
                   })
                 )
+              }
+              if (vm.job().type() == 'schedule') {
+                self.totalApps(data.app.properties.total_actions);
               }
             } else {
               requests.push(vm.job().fetchStatus());

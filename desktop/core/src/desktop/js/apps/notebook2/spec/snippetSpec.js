@@ -23,7 +23,8 @@ describe('snippet.js', () => {
     selectedNotebook: () => undefined,
     availableSnippets: () => ({}),
     editorMode: () => false,
-    getSnippetViewSettings: () => ({ sqlDialect: true })
+    getSnippetViewSettings: () => ({ sqlDialect: true }),
+    isOptimizerEnabled: () => false
   };
 
   window.HUE_CHARTS = {

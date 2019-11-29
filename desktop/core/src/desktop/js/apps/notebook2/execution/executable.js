@@ -52,8 +52,8 @@ export default class Executable {
    * @param {Session[]} [options.sessions]
    */
   constructor(options) {
+    this.id = UUID();
     this.executor = options.executor;
-
     this.handle = {
       statement_id: 0 // TODO: Get rid of need for initial handle in the backend
     };
@@ -197,6 +197,7 @@ export default class Executable {
 
         throw err;
       }
+
       if (this.handle.has_result_set && this.handle.sync) {
         this.result = new ExecutionResult(this);
         if (this.handle.sync) {
@@ -206,7 +207,8 @@ export default class Executable {
           this.result.fetchRows();
         }
       }
-      if (true || this.isOptimizerEnabled()) {
+
+      if (this.executor.isOptimizerEnabled) {
         huePubSub.publish('editor.upload.query', this.history.id);
       }
 
@@ -269,6 +271,10 @@ export default class Executable {
               statusCheckCount > 45 ? 5000 : 1000
             );
             break;
+          case EXECUTION_STATUS.failed:
+            this.executeEnded = Date.now();
+            this.setStatus(queryStatus);
+            break;
           default:
             this.executeEnded = Date.now();
             console.warn('Got unknown status ' + queryStatus);
@@ -324,15 +330,17 @@ export default class Executable {
     delete state.aceAnchor;
 
     return {
-      type: 'executable',
-      handle: this.handle,
-      status: this.status,
-      progress: this.progress,
-      logs: this.logs.toJs(),
-      executeStarted: this.executeStarted,
       executeEnded: this.executeEnded,
+      executeStarted: this.executeStarted,
+      handle: this.handle,
+      history: this.history,
+      id: this.id,
+      logs: this.logs.toJs(),
+      lost: this.lost,
       observerState: state,
-      lost: this.lost
+      progress: this.progress,
+      status: this.status,
+      type: 'executable'
     };
   }
 

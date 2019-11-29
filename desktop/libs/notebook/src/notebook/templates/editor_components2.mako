@@ -1553,6 +1553,42 @@
           snippetImage: '${ static("impala/art/icon_impala_48.png") }',
           sqlDialect: true
         },
+        presto: {
+          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+          aceMode: 'ace/mode/presto',
+          snippetIcon: 'fa-database',
+          sqlDialect: true
+        },
+        elasticsearch: {
+          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+          aceMode: 'ace/mode/elasticsearch',
+          snippetIcon: 'fa-database',
+          sqlDialect: true
+        },
+        druid: {
+          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+          aceMode: 'ace/mode/druid',
+          snippetIcon: 'fa-database',
+          sqlDialect: true
+        },
+        bigquery: {
+          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+          aceMode: 'ace/mode/bigquery',
+          snippetIcon: 'fa-database',
+          sqlDialect: true
+        },
+        phoenix: {
+          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+          aceMode: 'ace/mode/phoenix',
+          snippetIcon: 'fa-database',
+          sqlDialect: true
+        },
+        ksql: {
+          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+          aceMode: 'ace/mode/ksql',
+          snippetIcon: 'fa-database',
+          sqlDialect: true
+        },
         jar : {
           snippetIcon: 'fa-file-archive-o '
         },

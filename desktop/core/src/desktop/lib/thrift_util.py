@@ -518,7 +518,10 @@ class SuperClient(object):
           pass
         except Exception, e:
           logging.exception("Thrift saw exception (this may be expected).")
-          raise
+          if "'client_protocol' is unset" in e.message:
+            raise StructuredException('OPEN_SESSION', 'Check if the thrift_version configured is supported. Request failed with "%s"' % str(e), data=None, error_code=502)
+          else:
+            raise
 
         self.transport.close()
 

@@ -68,11 +68,13 @@ class ScheduleApi(Api):
     }
 
 
-  def app(self, appid):
+  def app(self, appid, offset=1):
     oozie_api = get_oozie(self.user)
     coordinator = oozie_api.get_coordinator(jobid=appid)
 
-    request = MockDjangoRequest(self.user, get=MockGet())
+    mock_get = MockGet()
+    mock_get.update('offset', offset)
+    request = MockDjangoRequest(self.user, get=mock_get)
     response = list_oozie_coordinator(request, job_id=appid)
 
     common = {
@@ -164,14 +166,26 @@ class ScheduleApi(Api):
 
 
 class MockGet(object):
+  _prop = None
+
   def __ini__(self, statuses):
     self.statuses = []
+
+  @property
+  def properties(self):
+    if self._prop == None:
+      self._prop = {}
+    return self._prop
+
+  def update(self, prop, value):
+    if prop != 'format':
+      self.properties.update({prop: value})
 
   def get(self, prop, default=None):
     if prop == 'format':
       return 'json'
     else:
-      return default
+      return self._prop.get(prop, default)
 
   def getlist(self, prop):
     return []
