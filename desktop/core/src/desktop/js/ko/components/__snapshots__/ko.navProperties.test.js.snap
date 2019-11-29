@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ko.navProperties.js should render component 1`] = `
-"<div data-bind=\\"descendantsComplete: $data.descendantsComplete.bind($data), component: { name: &quot;nav-properties&quot;, params: $data.params }\\"><script type=\\"text/html\\" id=\\"nav-property-edit-popover-content\\">
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;nav-properties&quot;, params: params }\\"><script type=\\"text/html\\" id=\\"nav-property-edit-popover-content\\">
     <div class=\\"hue-nav-property-edit-content\\">
       <a href=\\"javascript: void(0);\\" class=\\"close-popover\\"><i class=\\"fa fa-times\\"></i></a>
       <div class=\\"control-group\\" data-bind=\\"css: { 'error': keyInvalid }\\">

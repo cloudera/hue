@@ -46,7 +46,7 @@ export const koSetup = () => {
         const element = window.document.createElement('div');
         element.setAttribute(
           'data-bind',
-          `descendantsComplete: $data.descendantsComplete.bind($data), component: { name: "${name}", params: $data.params }`
+          `descendantsComplete: descendantsComplete, component: { name: "${name}", params: params }`
         );
         wrapper.appendChild(element);
 
@@ -80,11 +80,22 @@ export const koSetup = () => {
 
     renderKo: async (html, viewModel) =>
       new Promise(resolve => {
-        wrapper.innerHTML = html;
-        ko.applyBindings(viewModel, wrapper);
-        window.setTimeout(() => {
-          resolve(wrapper);
-        }, 0);
+        const setupContainer = window.document.createElement('div');
+        setupContainer.setAttribute(
+          'data-bind',
+          '{ descendantsComplete: descendantsComplete, with: model }'
+        );
+
+        const container = window.document.createElement('div');
+        container.innerHTML = html;
+        setupContainer.appendChild(container);
+
+        const data = {
+          model: viewModel,
+          descendantsComplete: () => resolve(container)
+        };
+
+        ko.applyBindings(data, setupContainer);
       }),
 
     waitForKoUpdate: async () => {

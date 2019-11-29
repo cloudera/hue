@@ -14,24 +14,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { SHOWN_EVENT, SHOW_EVENT } from './ko.sessionAuthModal';
-import huePubSub from 'utils/huePubSub';
-
 import 'ext/bootstrap.2.3.2.min';
 
-describe('ko.sessionAuthModal.js', () => {
-  it('should render component', async () => {
-    huePubSub.publish(SHOW_EVENT, {
-      session: {
-        properties: []
-      },
-      message: 'hello'
-    });
+import { koSetup } from 'jest/koTestUtils';
 
-    await new Promise(resolve => {
-      huePubSub.subscribeOnce(SHOWN_EVENT, resolve);
-    });
+import './ko.toggleOverflow';
+import hueUtils from 'utils/hueUtils';
 
-    expect(window.document.documentElement.outerHTML).toMatchSnapshot();
+describe('ko.toggleOverflow.js', () => {
+  const setup = koSetup();
+
+  jest.useFakeTimers();
+
+  it('should render binding', async () => {
+    jest.spyOn(hueUtils, 'isOverflowing').mockImplementation(() => true);
+
+    const wrapper = await setup.renderKo(`<div data-bind="toggleOverflow">Some text</div>`, {});
+
+    jest.runOnlyPendingTimers();
+
+    expect(wrapper.innerHTML).toMatchSnapshot();
   });
 });

@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.tooltip.js should render binding 1`] = `"<div data-bind=\\"tooltip\\" data-original-title=\\"some title\\"></div>"`;

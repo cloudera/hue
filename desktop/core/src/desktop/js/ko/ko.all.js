@@ -119,7 +119,6 @@ import 'ko/bindings/ko.tagsNotAllowed';
 import 'ko/bindings/ko.templateContextMenu';
 import 'ko/bindings/ko.templatePopover';
 import 'ko/bindings/ko.textSqueezer';
-import 'ko/bindings/ko.timepicker';
 import 'ko/bindings/ko.toggle';
 import 'ko/bindings/ko.toggleOverflow';
 import 'ko/bindings/ko.tooltip';

@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ko.sqlColumnsTable.js should render component 1`] = `
-"<div data-bind=\\"descendantsComplete: $data.descendantsComplete.bind($data), component: { name: &quot;sql-columns-table&quot;, params: $data.params }\\"><div class=\\"context-popover-flex\\">
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;sql-columns-table&quot;, params: params }\\"><div class=\\"context-popover-flex\\">
       <div class=\\"context-popover-flex-header\\">
         <div class=\\"context-popover-header\\" style=\\"display:inline-block;\\">Columns (<span data-bind=\\"text: filteredColumns().length\\">0</span>)</div>
         <div class=\\"context-popover-inline-autocomplete\\">

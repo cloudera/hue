@@ -163,8 +163,4 @@ class PollingCatalogEntriesList {
   }
 }
 
-componentUtils.registerComponent(
-  NAME,
-  PollingCatalogEntriesList,
-  TEMPLATE
-);
+componentUtils.registerComponent(NAME, PollingCatalogEntriesList, TEMPLATE);

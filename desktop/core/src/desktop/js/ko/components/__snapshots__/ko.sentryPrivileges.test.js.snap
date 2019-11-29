@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ko.sentryPrivileges.js should render component 1`] = `
-"<div data-bind=\\"descendantsComplete: $data.descendantsComplete.bind($data), component: { name: &quot;hue-sentry-privileges&quot;, params: $data.params }\\"><script type=\\"text/html\\" id=\\"sentry-privileges-component-role\\">
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;hue-sentry-privileges&quot;, params: params }\\"><script type=\\"text/html\\" id=\\"sentry-privileges-component-role\\">
     <div class=\\"acl-block-title\\">
       <i class=\\"fa fa-cube muted\\"></i> <a class=\\"pointer\\" data-bind=\\"click: function(){  $parents[0].showRole($data); }\\"><span data-bind=\\"text: name\\"></span></a>
     </div>

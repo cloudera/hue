@@ -14,24 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { SHOWN_EVENT, SHOW_EVENT } from './ko.sessionAuthModal';
-import huePubSub from 'utils/huePubSub';
+import { koSetup } from 'jest/koTestUtils';
 
-import 'ext/bootstrap.2.3.2.min';
+import './ko.visibleOnHover';
 
-describe('ko.sessionAuthModal.js', () => {
-  it('should render component', async () => {
-    huePubSub.publish(SHOW_EVENT, {
-      session: {
-        properties: []
-      },
-      message: 'hello'
-    });
+describe('ko.visibleOnHover.js', () => {
+  const setup = koSetup();
 
-    await new Promise(resolve => {
-      huePubSub.subscribeOnce(SHOWN_EVENT, resolve);
-    });
+  it('should render binding', async () => {
+    const wrapper = await setup.renderKo(
+      `<div id="foo" data-bind="visibleOnHover: { selector: '#foo' }"></div>`,
+      {}
+    );
 
-    expect(window.document.documentElement.outerHTML).toMatchSnapshot();
+    expect(wrapper.innerHTML).toMatchSnapshot();
   });
 });

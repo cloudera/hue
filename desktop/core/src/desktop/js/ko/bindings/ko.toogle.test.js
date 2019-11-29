@@ -21,6 +21,15 @@ import './ko.toggle';
 describe('ko.toggle.js', () => {
   const setup = koSetup();
 
+  it('should render binding', async () => {
+    const wrapper = await setup.renderKo(
+      '<div class="toggle-test" data-bind="toggle: testObservable"></div>',
+      { testObservable: ko.observable(false) }
+    );
+
+    expect(wrapper.innerHTML).toMatchSnapshot();
+  });
+
   it('should toggle observable', async () => {
     const viewModel = { testObservable: ko.observable(false) };
     const wrapper = await setup.renderKo(

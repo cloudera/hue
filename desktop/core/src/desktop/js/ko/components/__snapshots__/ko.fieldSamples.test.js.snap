@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ko.fieldSamples.js should render component 1`] = `
-"<div data-bind=\\"descendantsComplete: $data.descendantsComplete.bind($data), component: { name: &quot;field-samples&quot;, params: $data.params }\\"><div class=\\"context-popover-inline-autocomplete\\" style=\\"display: flex\\">
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;field-samples&quot;, params: params }\\"><div class=\\"context-popover-inline-autocomplete\\" style=\\"display: flex\\">
     <div class=\\"context-popover-sample-filter\\">
       <!-- ko component: {
         name: 'inline-autocomplete',
