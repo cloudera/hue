@@ -14,24 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { SHOWN_EVENT, SHOW_EVENT } from './ko.sessionAuthModal';
-import huePubSub from 'utils/huePubSub';
-
 import 'ext/bootstrap.2.3.2.min';
 
-describe('ko.sessionAuthModal.js', () => {
-  it('should render component', async () => {
-    huePubSub.publish(SHOW_EVENT, {
-      session: {
-        properties: []
-      },
-      message: 'hello'
-    });
+import { koSetup } from 'jest/koTestUtils';
 
-    await new Promise(resolve => {
-      huePubSub.subscribeOnce(SHOWN_EVENT, resolve);
-    });
+import './ko.templateContextMenu';
 
-    expect(window.document.documentElement.outerHTML).toMatchSnapshot();
+describe('ko.templateContextMenu.js', () => {
+  const setup = koSetup();
+
+  jest.useFakeTimers();
+
+  it('should render binding', async () => {
+    const wrapper = await setup.renderKo(`<div data-bind="templateContextMenu: { }"></div>`, {});
+
+    expect(wrapper.innerHTML).toMatchSnapshot();
   });
 });

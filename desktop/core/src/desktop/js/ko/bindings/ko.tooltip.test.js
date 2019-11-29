@@ -14,16 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery';
-import ko from 'knockout';
+import 'ext/bootstrap.2.3.2.min';
 
-ko.bindingHandlers.timepicker = {
-  init: function(element) {
-    $(element).timepicker({
-      minuteStep: 1,
-      showSeconds: false,
-      showMeridian: false,
-      defaultTime: false
-    });
-  }
-};
+import { koSetup } from 'jest/koTestUtils';
+
+import './ko.tooltip';
+
+describe('ko.tooltip.js', () => {
+  const setup = koSetup();
+
+  it('should render binding', async () => {
+    const wrapper = await setup.renderKo(`<div title="some title" data-bind="tooltip"></div>`, {});
+
+    expect(wrapper.innerHTML).toMatchSnapshot();
+  });
+});

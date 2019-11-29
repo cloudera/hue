@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ko.performanceGraph.js should render component 1`] = `
-"<div data-bind=\\"descendantsComplete: $data.descendantsComplete.bind($data), component: { name: &quot;performance-graph&quot;, params: $data.params }\\"><script type=\\"text/html\\" id=\\"performance-graph-d3-template\\">
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;performance-graph&quot;, params: params }\\"><script type=\\"text/html\\" id=\\"performance-graph-d3-template\\">
   <div style=\\"position:relative;\\"
       data-bind=\\"attr: { 'id': id }, style: { height: graphHeight + 'px', width: graphWidth + 'px' }\\"></div>
 </script><div style=\\"position: relative\\" data-bind=\\"template: { afterRender: componentRendered }\\">

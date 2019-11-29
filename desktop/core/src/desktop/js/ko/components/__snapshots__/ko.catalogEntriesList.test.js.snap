@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ko.catalogEntriesList.js should render component 1`] = `
-"<div data-bind=\\"descendantsComplete: $data.descendantsComplete.bind($data), component: { name: &quot;catalog-entries-list&quot;, params: $data.params }\\"><script type=\\"text/html\\" id=\\"entries-table-td-description\\">
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;catalog-entries-list&quot;, params: params }\\"><script type=\\"text/html\\" id=\\"entries-table-td-description\\">
     <td data-bind=\\"attr: { 'title': comment }\\">
     <!-- ko if: $parent.editableDescriptions && !window.HAS_READ_ONLY_CATALOG -->
       <div class=\\"hue-catalog-entries-table-desc\\" data-bind=\\"visibleOnHover: { selector: '.editable-inline-action' }\\">

@@ -14,24 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { SHOWN_EVENT, SHOW_EVENT } from './ko.sessionAuthModal';
-import huePubSub from 'utils/huePubSub';
+import ko from 'knockout';
 
-import 'ext/bootstrap.2.3.2.min';
+import { koSetup } from 'jest/koTestUtils';
 
-describe('ko.sessionAuthModal.js', () => {
-  it('should render component', async () => {
-    huePubSub.publish(SHOW_EVENT, {
-      session: {
-        properties: []
-      },
-      message: 'hello'
+import './ko.truncatedText';
+
+describe('ko.truncatedText.js', () => {
+  const setup = koSetup();
+
+  it('should render binding', async () => {
+    const wrapper = await setup.renderKo(`<div data-bind="truncatedText: text"></div>`, {
+      text: ko.observable('More than 20 characters')
     });
 
-    await new Promise(resolve => {
-      huePubSub.subscribeOnce(SHOWN_EVENT, resolve);
-    });
-
-    expect(window.document.documentElement.outerHTML).toMatchSnapshot();
+    expect(wrapper.innerHTML).toMatchSnapshot();
   });
 });
