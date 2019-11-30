@@ -222,7 +222,7 @@ Note: Keys and S3 buckets need to be URL quoted but Hue does it automatically fo
 
 ### Apache Druid
 
-First, make sure that Hue can talk to Druid via the pydruid SqlAlchemy connector. Either make sure it is in the global Python environment or install it in the Hue virtual environment.
+First, make sure that Hue can talk to Druid via the [pydruid SqlAlchemy connector](https://github.com/druid-io/pydruid). Either make sure it is in the global Python environment or install it in the Hue virtual environment.
 
       ./build/env/bin/pip install pydruid
 
@@ -230,12 +230,17 @@ First, make sure that Hue can talk to Druid via the pydruid SqlAlchemy connector
 
 In the hue.ini configuration file, now let's add the interpreter. Here 'druid-host.com' would be the machine where Druid is running.
 
-      [notebook]
-      [[interpreters]]
-      [[[druid]]]
-      name = Druid
-      interface=sqlalchemy
-      options='{"url": "druid://druid-host.com:8082/druid/v2/sql/"}'
+    [notebook]
+    [[interpreters]]
+    [[[druid]]]
+    name = Druid
+    interface=sqlalchemy
+    options='{"url": "druid://druid-host.com:8082/druid/v2/sql/?header=true"}'
+
+`?header=true` option requires Druid 13.0 or later.
+Adding the `+https` prefix will use HTTPS e.g.:
+
+    druid+https://druid-host.com:8082/druid/v2/sql/?header=true
 
 ### Teradata
 
