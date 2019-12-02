@@ -1558,15 +1558,14 @@ class Document2Permission(models.Model):
   users = models.ManyToManyField(User, db_index=True, db_table='documentpermission2_users')
   groups = models.ManyToManyField(Group, db_index=True, db_table='documentpermission2_groups')
 
-  perms = models.CharField(default=READ_PERM, max_length=10, db_index=True, choices=( # one perm
+  perms = models.CharField(default=READ_PERM, max_length=10, db_index=True, choices=( # One perm
     (READ_PERM, 'read'),
     (WRITE_PERM, 'write'),
-    (COMMENT_PERM, 'comment'),
+    (COMMENT_PERM, 'comment'), # Unused
     (LINK_READ_PERM, 'link read'),
     (LINK_WRITE_PERM, 'link write'),
   ))
 
-  link = models.CharField(default=uuid_default, max_length=255, db_index=True) # unique=True has migration issues
   is_link_on = models.BooleanField(default=False)
 
   class Meta(object):
