@@ -574,16 +574,16 @@ class TestDocument2(object):
 class TestDocument2Permissions(object):
 
   def setUp(self):
-    self.client = make_logged_in_client(username="perm_user", groupname="default", recreate=True, is_superuser=False)
-    self.client_not_me = make_logged_in_client(username="not_perm_user", groupname="default", recreate=True, is_superuser=False)
+    self.default_group = get_default_user_group()
+
+    self.client = make_logged_in_client(username="perm_user", groupname=self.default_group.name, recreate=True, is_superuser=False)
+    self.client_not_me = make_logged_in_client(username="not_perm_user", groupname=self.default_group.name, recreate=True, is_superuser=False)
 
     self.user = User.objects.get(username="perm_user")
     self.user_not_me = User.objects.get(username="not_perm_user")
 
     grant_access(self.user.username, self.user.username, "desktop")
     grant_access(self.user_not_me.username, self.user_not_me.username, "desktop")
-
-    self.default_group = get_default_user_group()
 
     # This creates the user directories for the new user
     response = self.client.get('/desktop/api2/doc/')
