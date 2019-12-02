@@ -29,7 +29,11 @@ from django.db.utils import OperationalError
 from beeswax.models import SavedQuery
 from beeswax.design import hql_query
 from notebook.models import import_saved_beeswax_query
-from oozie.models2 import Workflow
+try:
+  from oozie.models2 import Workflow
+  has_oozie = True
+except RuntimeError:
+  has_oozie = False
 from useradmin.models import get_default_user_group, User
 
 from desktop.converters import DocumentConverter
@@ -175,11 +179,23 @@ class TestDocument2(object):
     assert_equal(orig_last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
 
   def test_file_copy(self):
+    if not has_oozie:
+      raise SkipTest
 
-    workflow_doc = Document2.objects.create(name='Copy Test', type='oozie-workflow2', owner=self.user, data={},
-                                            parent_directory=self.home_dir)
-    Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name,
-                          description=workflow_doc.description, extra='workflow2')
+    workflow_doc = Document2.objects.create(
+        name='Copy Test',
+        type='oozie-workflow2',
+        owner=self.user,
+        data={},
+        parent_directory=self.home_dir
+    )
+    Document.objects.link(
+      workflow_doc,
+      owner=workflow_doc.owner,
+      name=workflow_doc.name,
+      description=workflow_doc.description,
+      extra='workflow2'
+    )
 
     workflow = Workflow(user=self.user)
     workflow.update_name('Copy Test')
