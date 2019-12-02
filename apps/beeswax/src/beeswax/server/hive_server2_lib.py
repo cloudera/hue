@@ -578,7 +578,8 @@ class HiveServerClient(object):
         validate=validate,
         transport_mode=query_server.get('transport_mode', 'socket'),
         http_url=query_server.get('http_url', ''),
-        coordinator_host=self.coordinator_host
+        coordinator_host=self.coordinator_host,
+        user=user
     )
 
 
