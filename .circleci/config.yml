@@ -111,6 +111,9 @@ jobs:
           name: run js tests
           command: |
             cd /usr/share/hue
+
+            # https://jestjs.io/docs/en/troubleshooting.html#tests-are-extremely-slow-on-docker-andor-continuous-integration-ci-server
+            sed -i 's/"test": "jest"/"test": "jest --runInBand"/g' package.json
             npm run test
 
       - store_artifacts:
