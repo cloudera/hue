@@ -20,6 +20,10 @@ spec:
           image: {{ .Values.image.registry }}/hue:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ['./build/env/bin/celery', 'worker', '-A', 'desktop', '-l', 'info']
+          resources:
+            requests:
+              # memory: "400Mi"
+              cpu: "50m"
           volumeMounts:
           - name: config-volume
             mountPath: /usr/share/hue/desktop/conf/z-hue.ini
