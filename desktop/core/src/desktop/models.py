@@ -1561,13 +1561,13 @@ class Document2Permission(models.Model):
   perms = models.CharField(default=READ_PERM, max_length=10, db_index=True, choices=( # one perm
     (READ_PERM, 'read'),
     (WRITE_PERM, 'write'),
-    (COMMENT_PERM, 'comment'), # PLAYER PERM?
+    (COMMENT_PERM, 'comment'),
     (LINK_READ_PERM, 'link read'),
     (LINK_WRITE_PERM, 'link write'),
   ))
 
-  link = models.CharField(default='', max_length=255, unique=True) # uuid_default
-  link_on = models.BooleanField(default=False)
+  link = models.CharField(default=uuid_default, max_length=255, db_index=True) # unique=True has migration issues
+  is_link_on = models.BooleanField(default=False)
 
   class Meta(object):
     unique_together = ('doc', 'perms')
