@@ -2,14 +2,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: gethue-docs
+  name: docs
   labels:
-    pod: gethue-docs
+    pod: docs
 spec:
   selector:
-    pod: gethue-docs
+    pod: docs
   ports:
-  - name: gethue-docs
+  - name: docs
     port: 9001
     targetPort: 80
   type: NodePort

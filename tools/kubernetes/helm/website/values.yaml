@@ -5,14 +5,14 @@ image:
    # registry: "gethue"
    # tag: "latest"
    # pullPolicy: "IfNotPresent"
-docs:
-  enabled: true
-  replicas: 1
-  domain: "docs.gethue.com"
 website:
   enabled: true
   replicas: 1
   domain: "gethue.com"
+docs:
+  enabled: true
+  replicas: 1
+  domain: "docs.gethue.com"
 monitoring:
   enabled: false
 ingress:

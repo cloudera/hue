@@ -2,21 +2,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gethue-docs
+  name: docs
   labels:
-    deployment: gethue-docs
+    deployment: docs
 spec:
   selector:
     matchLabels:
-      pod: gethue-docs
+      pod: docs
   replicas: 1
   template:
     metadata:
       labels:
-        pod: gethue-docs
+        pod: docs
     spec:
       containers:
-      - name: gethue-docs
+      - name: docs
         image: {{ .Values.image.registry }}/documentation:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
