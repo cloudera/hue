@@ -521,7 +521,12 @@ class SuperClient(object):
         except Exception as e:
           logging.exception("Thrift saw exception (this may be expected).")
           if "'client_protocol' is unset" in e.message:
-            raise StructuredException('OPEN_SESSION', 'Check if the thrift_version configured is supported. Request failed with "%s"' % str(e), data=None, error_code=502)
+            raise StructuredException(
+              'OPEN_SESSION',
+              'Thrift version configured by property thrift_version might be too high. Request failed with "%s"' % str(e),
+              data=None,
+              error_code=502
+            )
           else:
             raise
 
