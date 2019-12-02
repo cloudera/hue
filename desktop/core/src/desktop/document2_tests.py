@@ -40,7 +40,7 @@ from desktop.converters import DocumentConverter
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.fs import ProxyFS
 from desktop.lib.test_utils import grant_access
-from desktop.models import Directory, Document2, Document
+from desktop.models import Directory, Document2, Document, Document2Permission
 
 
 class MockFs(object):
@@ -1078,7 +1078,7 @@ class TestDocument2Permissions(object):
       assert_false(doc.can_read(self.user_not_me))
       assert_false(doc.can_write(self.user_not_me))
 
-      doc.share(name=Document2Permission.LINK_READ_PERM, is_link_on=True)
+      doc.share(self.user, name=Document2Permission.LINK_READ_PERM, is_link_on=True)
 
       assert_true(doc.can_read(self.user))
       assert_true(doc.can_write(self.user))
@@ -1088,20 +1088,26 @@ class TestDocument2Permissions(object):
       assert_false(doc.get_permission('read').users.all())  # There is no doc listing via links, only direct access
       assert_false(doc.get_permission('read').groups.all())
 
-      doc.share(name=Document2Permission.LINK_READ_PERM, is_link_on=False)
+      doc.share(self.user, name=Document2Permission.LINK_READ_PERM, is_link_on=False)
 
       assert_true(doc.can_read(self.user))
       assert_true(doc.can_write(self.user))
       assert_false(doc.can_read(self.user_not_me))
       assert_false(doc.can_write(self.user_not_me))
 
-      doc.share(name=Document2Permission.LINK_READ_PERM, is_link_on=True)
-      doc.share(name=Document2Permission.LINK_WRITE_PERM, is_link_on=True)
+      doc.share(self.user, name=Document2Permission.LINK_WRITE_PERM, is_link_on=True)
 
       assert_true(doc.can_read(self.user))
       assert_true(doc.can_write(self.user))
       assert_true(doc.can_read(self.user_not_me))
       assert_true(doc.can_write(self.user_not_me))
+
+      doc.share(self.user, name=Document2Permission.LINK_WRITE_PERM, is_link_on=False)
+
+      assert_true(doc.can_read(self.user))
+      assert_true(doc.can_write(self.user))
+      assert_false(doc.can_read(self.user_not_me))
+      assert_false(doc.can_write(self.user_not_me))
     finally:
       doc.delete()
 

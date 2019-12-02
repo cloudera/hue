@@ -1367,23 +1367,23 @@ class Document2(models.Model):
     except Document2Permission.DoesNotExist:
       return None
 
-  def share(self, user, name='read', users=None, groups=None):
+  def share(self, user, name='read', users=None, groups=None, is_link_on=False):
     try:
       with transaction.atomic():
-        self.update_permission(user, name, users, groups)
+        self.update_permission(user, name, users, groups, is_link_on)
         # For directories, update all children recursively with same permissions
         for child in self.children.all():
-          child.share(user, name, users, groups)
+          child.share(user, name, users, groups, is_link_on)
     except Exception as e:
       raise PopupException(_("Failed to share document: %s") % e)
     return self
 
-  def update_permission(self, user, name='read', users=None, groups=None):
+  def update_permission(self, user, name='read', users=None, groups=None, is_link_on=False):
     # Check if user has access to grant permissions
     if users or groups:
-      if name == 'read':
+      if name == 'read' or name == 'link_read':
         self.can_read_or_exception(user)
-      elif name == 'write':
+      elif name == 'write' or name == 'link_write':
         self.can_write_or_exception(user)
       else:
         raise ValueError(_('Invalid permission type: %s') % name)
@@ -1397,6 +1397,8 @@ class Document2(models.Model):
     perm.groups = []
     if groups is not None:
       perm.groups = groups
+
+    perm.is_link_on = is_link_on
 
     perm.save()
 
@@ -1583,7 +1585,7 @@ class Document2Permission(models.Model):
     """
     Returns true if the given user has permissions based on users, groups, or all flag
     """
-    return self.groups.filter(id__in=user.groups.all()).exists() or user in self.users.all()
+    return self.groups.filter(id__in=user.groups.all()).exists() or user in self.users.all() or self.is_link_on
 
 
 def get_cluster_config(user):
