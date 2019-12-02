@@ -183,8 +183,7 @@ class HS2Api(Api):
 
     reuse_session = session is not None
     if not reuse_session:
-      db = dbms.get(self.user, query_server=get_query_server_config(name=lang, connector=self.interpreter))
-      session = db.open_session(self.user)
+      db = dbms.get(self.user, query_server=get_query_server_config(name=lang, connector=self.interpreter, user=self.user))
 
     response = {
       'type': lang,
@@ -744,7 +743,7 @@ DROP TABLE IF EXISTS `%(table)s`;
     else:
       name = 'sparksql'
 
-    return dbms.get(self.user, query_server=get_query_server_config(name=name, connector=interpreter)) # Note: name is not used if interpreter is present
+    return dbms.get(self.user, query_server=get_query_server_config(name=name, connector=interpreter, user=self.user)) # Note: name is not used if interpreter is present
 
 
   def _parse_job_counters(self, job_id):
