@@ -69,7 +69,11 @@ def make_logged_in_client(username="test", password="test", is_superuser=True, r
       user.save()
 
   if groupname is not None:
-    group, created = Group.objects.get_or_create(name=groupname)
+    group_attrs = {'name': groupname}
+    if ENABLE_ORGANIZATIONS.get():
+      group_attrs['organization'] = default_organization()
+
+    group, created = Group.objects.get_or_create(**group_attrs)
     if not user.groups.filter(name=group.name).exists():
       user.groups.add(group)
       user.save()
