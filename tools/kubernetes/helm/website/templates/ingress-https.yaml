@@ -28,7 +28,7 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: gethue-website
+          serviceName: website
           servicePort: 80
         path: /
   {{ end }}
