@@ -50,6 +50,8 @@ from desktop.lib.thrift_.http_client import THttpClient
 from desktop.lib.thrift_.TSSLSocketWithWildcardSAN import TSSLSocketWithWildcardSAN
 from desktop.lib.thrift_sasl import TSaslClientTransport
 from desktop.lib.exceptions import StructuredException, StructuredThriftTransportException
+from desktop.settings import CACHES_HIVE_DISCOVERY_KEY
+from django.core.cache import caches
 
 if sys.version_info[0] > 2:
   from past.builtins import long
@@ -103,7 +105,8 @@ class ConnectionConfig(object):
                multiple=False,
                transport_mode='socket',
                http_url='',
-               coordinator_host=''):
+               coordinator_host=''
+               user=None):
     """
     @param klass The thrift client class
     @param host Host to connect to
@@ -148,6 +151,7 @@ class ConnectionConfig(object):
     self.transport_mode = transport_mode
     self.http_url = http_url
     self.coordinator_host = coordinator_host
+    self.user = user
 
   def __str__(self):
     return ', '.join(map(str, [self.klass, self.host, self.port, self.service_name, self.use_sasl, self.kerberos_principal, self.timeout_seconds,
@@ -277,20 +281,25 @@ class ConnectionPooler(object):
       conf.update_coordinator_host(client.get_coordinator_host())
 
     self.pooldict[_get_pool_key(conf)].put(client)
+  def clear_client(self, conf):
+    self.pooldict.pop(_get_pool_key(conf), None)
+
+  def check_pool_empty(self, conf):
+    return self.pooldict.get(_get_pool_key(conf)) is None
 
 def _get_pool_key(conf):
   """
   Given a ConnectionConfig, return the tuple used as the key in the dictionary
   of connections by the ConnectionPooler class.
   """
-  return (conf.klass, conf.host, conf.port, conf.get_coordinator_host())
+  return (conf.klass, conf.host, conf.port, conf.get_coordinator_host(), conf.user.username)
 
 def construct_superclient(conf):
   """
   Constructs a thrift client, lazily.
   """
   service, protocol, transport = connect_to_thrift(conf)
-  return SuperClient(service, transport, timeout_seconds=conf.timeout_seconds)
+  return SuperClient(service, transport, timeout_seconds=conf.timeout_seconds, user=conf.user)
 
 
 def connect_to_thrift(conf):
@@ -424,6 +433,11 @@ class PooledClient(object):
         except TTransportException as e:
           err_msg = str(e)
           logging.info("Thrift saw a transport exception: " + err_msg, exc_info=False)
+          cache = caches[CACHES_HIVE_DISCOVERY_KEY]
+          if cache.get("hiveserver2"):
+            user_conn = cache.get("hiveserver2")
+            user_conn.pop(self.user.username, None)
+            cache.set("hiveserver2", user_conn)
           if err_msg and 'generic failure: Unable to find a callback: 32775' in err_msg:
             raise StructuredException(_("Increase the sasl_max_buffer value in hue.ini"), err_msg, data=None, error_code=502)
           raise StructuredThriftTransportException(e, error_code=502)
@@ -448,12 +462,12 @@ class SuperClient(object):
   TODO(todd): get this into the Thrift lib
   """
 
-  def __init__(self, wrapped_client, transport, timeout_seconds=None, coordinator_host=None):
+  def __init__(self, wrapped_client, transport, timeout_seconds=None, coordinator_host=None, user=None):
     self.wrapped = wrapped_client
     self.transport = transport
     self.timeout_seconds = timeout_seconds
     self.coordinator_host = coordinator_host
-
+    self.user = user
   def get_coordinator_host(self):
     return self.coordinator_host
 
@@ -526,6 +540,11 @@ class SuperClient(object):
             raise
 
       logging.warn("Out of retries for thrift call: " + attr)
+      cache = caches[CACHES_HIVE_DISCOVERY_KEY]
+      if cache.get("hiveserver2"):
+        user_conn = cache.get("hiveserver2")
+        user_conn.pop(self.user.username, None)
+        cache.set("hiveserver2", user_conn)
       raise
     return wrapper
 
