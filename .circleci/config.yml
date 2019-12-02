@@ -67,6 +67,7 @@ jobs:
             cd /usr/share/hue
             # make npm-install # Not available
             cp ~/repo/.babelrc .
+            cp ~/repo/jest.config.js .
 
             cp ~/repo/webpack.config*.js .
             npm install
@@ -95,6 +96,7 @@ jobs:
             cp ~/repo/.prettierrc .
             cp ~/repo/.eslint* .
             cp ~/repo/tools . -r
+
             npm run lint
 
       # Run tests
