@@ -7,5 +7,13 @@ module.exports = {
   testURL: 'https://www.gethue.com/hue',
   setupFilesAfterEnv: ['<rootDir>/desktop/core/src/desktop/js/jest/jest.init.js'],
   watchPathIgnorePatterns: ['<rootDir>/desktop/core/src/desktop/static'],
+  testPathIgnorePatterns: [
+    '<rootDir>/desktop/core/src/desktop/js/parse/sql/ksql/test',
+    '<rootDir>/desktop/core/src/desktop/js/parse/sql/elasticsearch/test',
+    '<rootDir>/desktop/core/src/desktop/js/parse/sql/phoenix/test',
+    '<rootDir>/desktop/core/src/desktop/js/parse/sql/druid/test',
+    '<rootDir>/desktop/core/src/desktop/js/parse/sql/presto/test',
+    '<rootDir>/desktop/core/src/desktop/js/parse/sql/calcite/test',
+  ],
   collectCoverageFrom: ['<rootDir>/desktop/core/src/desktop/js/**/*.{js,jsx}']
 };
