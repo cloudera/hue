@@ -19,7 +19,7 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: gethue-docs
+          serviceName: docs
           servicePort: 80
         path: /
   {{ end }}
