@@ -2,21 +2,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gethue-website
+  name: website
   labels:
-    deployment: gethue-website
+    deployment: website
 spec:
   selector:
     matchLabels:
-      pod: gethue-website
+      pod: website
   replicas: 1
   template:
     metadata:
       labels:
-        pod: gethue-website
+        pod: website
     spec:
       containers:
-      - name: gethue-website
+      - name: website
         image: {{ .Values.image.registry }}/website:latest
         imagePullPolicy: Always
         ports:
