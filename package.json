@@ -23,6 +23,13 @@
   "engines": {
     "node": ">=0.10.0"
   },
+  "stylelint": {
+    "extends": "stylelint-config-standard",
+    "rules": {
+      "number-leading-zero": null,
+      "no-descending-specificity": null
+    }
+  },
   "dependencies": {
     "regenerator-runtime": "^0.13.3",
     "core-js": "^3.4.2",
@@ -103,7 +110,8 @@
     "dev-workers": "webpack --config webpack.config.workers.js --watch -d",
     "less": "./node_modules/.bin/grunt less",
     "less-dev": "./node_modules/.bin/grunt watch",
-    "less-lint": "stylelint \"desktop/core/src/desktop/static/desktop/less/**/*.less\" --fix",
+    "less-lint": "stylelint \"desktop/core/src/desktop/static/desktop/less/**/*.less\"",
+    "less-lint-fix": "npm run less-lint -- --fix",
     "lint": "eslint desktop/core/src/desktop/js tools/sql-docs tools/jison",
     "lint-debug": "npm run lint -- --debug",
     "lint-fix": "npm run lint -- --fix",
