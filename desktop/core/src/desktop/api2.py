@@ -618,8 +618,8 @@ def share_document(request):
 
   Example of input: {'read': {'user_ids': [1, 2, 3], 'group_ids': [1, 2, 3]}}
   """
-  perms_dict = request.POST.get('data')
   uuid = request.POST.get('uuid')
+  perms_dict = request.POST.get('data')
 
   if not uuid or not perms_dict:
     raise PopupException(_('share_document requires uuid and perms_dict'))
@@ -657,8 +657,8 @@ def share_document_link(request):
 
   Example of input: {'name': 'link_read', 'is_link_on': true}
   """
-  perm = request.POST.get('data')
   uuid = request.POST.get('uuid')
+  perm = request.POST.get('data')
 
   if not uuid or not perm:
     raise PopupException(_('share_document_link requires uuid and permission data'))
