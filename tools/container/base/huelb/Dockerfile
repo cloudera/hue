@@ -1,4 +1,4 @@
-FROM ${BASEOS_URL}
+FROM docker-private.infra.cloudera.com/cloudera_base/centos:7.6.1810 as base-centos-jdk
 
 LABEL description="Hue Project https://github.com/cloudera/hue"
 
