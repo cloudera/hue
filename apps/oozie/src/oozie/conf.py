@@ -96,21 +96,21 @@ ENABLE_OOZIE_BACKEND_FILTERING = Config(
 ENABLE_DOCUMENT_ACTION = Config(
   key="enable_document_action",
   help=_t("Flag to enable the saved Editor queries to be dragged and dropped into a workflow."),
-  type=bool,
+  type=coerce_bool,
   default=True
 )
 
 ENABLE_IMPALA_ACTION = Config(
   key="enable_impala_action",
   help=_t("Flag to enable the Impala action."),
-  type=bool,
+  type=coerce_bool,
   default=False
 )
 
 ENABLE_ALTUS_ACTION = Config(
   key="enable_altus_action",
   help=_t("Flag to enable the Altus action."),
-  type=bool,
+  type=coerce_bool,
   default=False
 )
 
