@@ -34,7 +34,7 @@ try:
   from oozie.forms import ParameterForm
   from oozie.views.editor2 import edit_coordinator, new_coordinator, Coordinator
 except Exception as e:
-  LOG.exception('Oozie application is not enabled: %s' % e)
+  LOG.warn('Oozie application is not enabled: %s' % e)
 
 
 def new_schedule(request):
