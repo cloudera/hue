@@ -85,7 +85,6 @@ Checked-in third party dependencies
 |Y|ssl|1.15|Python|http://pypi.python.org/pypi/ssl/1.15|
 |Y|tablib|0.10.0|MIT|http://docs.python-tablib.org/en/latest/|
 |Y|Thrift|0.9.1|Apache|http://incubator.apache.org/thrift/download/|
-|Y|thriftpy|0.3.9|Apache|https://github.com/eleme/thriftpy|
 |Y|urllib2_kerberos|0.1.6|ASL2|http://pypi.python.org/pypi/urllib2_kerberos|
 
 ---
