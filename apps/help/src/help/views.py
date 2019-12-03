@@ -26,6 +26,12 @@ from hadoop.fs import LocalSubFileSystem
 import markdown
 import urllib.request, urllib.parse, urllib.error
 import os
+import sys
+
+if sys.version_info[0] > 2:
+  open_file = open
+else:
+  open_file = file
 
 INDEX_FILENAMES = ("index.md", "index.html", "index.txt")
 
@@ -68,7 +74,8 @@ def view(request, app, path):
     raise PopupException("Could not find or read the file: %s (app %s)" % (path, app))
 
   content = fs.open(path, 'r').read()
-  content = str(content, 'utf-8', errors='replace')
+  if isinstance(content, bytes):
+    content = str(content, 'utf-8', errors='replace')
   if path.lower().endswith(".md"):
     content = ('<div class="print rendered-markdown">' +
                markdown.markdown(content, ['extra']) +

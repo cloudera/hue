@@ -63,8 +63,10 @@ from filebrowser.views import snappy_installed
 
 if sys.version_info[0] > 2:
   from urllib.parse import unquote as urllib_unquote
+  open_file = open
 else:
   from urllib import unquote as urllib_unquote
+  open_file = file
 
 
 LOG = logging.getLogger(__name__)
@@ -915,7 +917,7 @@ alert("XSS")
 
       # Just upload the current python file
       resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR, # GET param avoids infinite looping
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+                         dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(LOCAL_FILE)))
       response = json.loads(resp.content)
 
       assert_equal(0, response['status'], response)
@@ -925,12 +927,12 @@ alert("XSS")
 
       f = self.cluster.fs.open(HDFS_FILE)
       actual = f.read(file_size)
-      expected = file(LOCAL_FILE).read()
+      expected = open_file(LOCAL_FILE).read()
       assert_equal(actual, expected, 'files do not match: %s != %s' % (len(actual), len(expected)))
 
       # Upload again and so fails because file already exits
       resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+                         dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(LOCAL_FILE)))
       response = json.loads(resp.content)
       assert_equal(-1, response['status'], response)
       assert_true('already exists' in response['data'], response)
@@ -940,7 +942,7 @@ alert("XSS")
       grant_access("not_me", "not_me", "filebrowser")
       try:
         resp = not_me.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                           dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+                           dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(LOCAL_FILE)))
         response = json.loads(resp.content)
         assert_equal(-1, response['status'], response)
         assert_true('User not_me does not have permissions' in response['data'], response)
@@ -965,7 +967,7 @@ alert("XSS")
 
       # Upload archive
       resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=file(ZIP_FILE)))
+                         dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(ZIP_FILE)))
       response = json.loads(resp.content)
       assert_equal(0, response['status'], response)
       assert_true(self.cluster.fs.exists(HDFS_ZIP_FILE))
@@ -988,7 +990,7 @@ alert("XSS")
       test_file = test_dir + '/test.txt'
       self.cluster.fs.mkdir(test_dir)
       self.cluster.fs.chown(test_dir, 'test')
-      self.cluster.fs.chmod(test_dir, 0700)
+      self.cluster.fs.chmod(test_dir, 0o700)
       for i in range(3):
         f = self.cluster.fs.open(test_file + "%s" %i, "w")
         f.close()
@@ -1042,7 +1044,7 @@ alert("XSS")
     try:
       # Upload archive
       resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=file(TGZ_FILE)))
+                         dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(TGZ_FILE)))
       response = json.loads(resp.content)
       assert_equal(0, response['status'], response)
       assert_true(self.cluster.fs.exists(HDFS_TGZ_FILE))
@@ -1070,7 +1072,7 @@ alert("XSS")
     try:
       # Upload archive
       resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=file(BZ2_FILE)))
+                         dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(BZ2_FILE)))
       response = json.loads(resp.content)
       assert_equal(0, response['status'], response)
       assert_true(self.cluster.fs.exists(HDFS_BZ2_FILE))
