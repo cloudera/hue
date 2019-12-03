@@ -21,8 +21,6 @@ import os
 import sys
 from posixpath import curdir, sep, pardir, join
 
-if sys.version_info[0] > 2:
-  from past.builtins import cmp
 
 # The root of the Hue installation
 INSTALL_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -31,7 +29,7 @@ INSTALL_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '.
 APPS_ROOT = os.path.join(INSTALL_ROOT, 'apps')
 
 # Directory holding app.reg
-HUE_APP_REG_DIR = os.environ.get("HUE_APP_REG_DIR", INSTALL_ROOT) 
+HUE_APP_REG_DIR = os.environ.get("HUE_APP_REG_DIR", INSTALL_ROOT)
 
 # Directory holding hue.pth
 HUE_PTH_DIR = os.environ.get('HUE_PTH_DIR', None)
