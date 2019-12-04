@@ -78,9 +78,9 @@ class Command(BaseCommand):
     if exception is not None:
       pretty_msg = None
 
-      if "AlreadyExistsException" in exception.message:
+      if "AlreadyExistsException" in str(exception):
         pretty_msg = _("SQL table examples already installed.")
-      if "Permission denied" in exception.message:
+      if "Permission denied" in str(exception):
         pretty_msg = _("Permission denied. Please check with your system administrator.")
 
       if pretty_msg is not None:
