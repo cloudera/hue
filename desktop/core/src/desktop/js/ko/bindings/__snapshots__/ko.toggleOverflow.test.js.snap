@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.toggleOverflow.js should render binding 1`] = `"<div data-bind=\\"toggleOverflow\\"><div class=\\"toggle-overflow\\">Some text</div><div class=\\"toggle-overflow-toggle\\"><i class=\\"fa fa-caret-down muted\\"></i></div></div>"`;

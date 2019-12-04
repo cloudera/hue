@@ -23,6 +23,8 @@ import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 
+export const NAME = 'hue-history-panel';
+
 const TEMPLATE = `
   <button class="btn btn-flat pull-right btn-toggle-jobs-panel" title="${I18n(
     'Task History'
@@ -315,4 +317,4 @@ class HistoryPanel {
   }
 }
 
-componentUtils.registerComponent('hue-history-panel', HistoryPanel, TEMPLATE);
+componentUtils.registerComponent(NAME, HistoryPanel, TEMPLATE);

@@ -399,7 +399,7 @@ class ApiHelper {
   /**
    * @param {string} url
    * @param {Object} data
-   * @param {Object} options
+   * @param {Object} [options]
    * @param {function} [options.successCallback]
    * @param {function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
@@ -911,6 +911,22 @@ class ApiHelper {
         fetchFunction: fetchFunction
       })
     );
+  }
+
+  async fetchFavoriteApp(options) {
+    return new Promise((resolve, reject) => {
+      this.simpleGet('/desktop/api2/user_preferences/default_app')
+        .done(resolve)
+        .fail(reject);
+    });
+  }
+
+  async setFavoriteAppAsync(options) {
+    return new Promise((resolve, reject) => {
+      this.simplePost('/desktop/api2/user_preferences/default_app', options)
+        .done(resolve)
+        .fail(reject);
+    });
   }
 
   /**

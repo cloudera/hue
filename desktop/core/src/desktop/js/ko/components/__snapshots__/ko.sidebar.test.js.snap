@@ -1,0 +1,139 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.sidebar.js should render component 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;hue-sidebar&quot;, params: params }\\" class=\\"collapsed\\"><script type=\\"text/html\\" id=\\"sidebar-inner-item\\">
+    <!-- ko if: iconHtml -->
+    <div class=\\"icon\\" data-bind=\\"html: iconHtml\\"></div><span data-bind=\\"text: displayName\\"></span>
+    <!-- /ko -->
+    <!-- ko ifnot: iconHtml -->
+    <div class=\\"icon\\" data-bind=\\"hueAppIcon: icon\\"></div><span data-bind=\\"text: displayName\\"></span>
+    <!-- /ko -->
+  </script><script type=\\"text/html\\" id=\\"sidebar-item\\">
+    <div class=\\"item-wrapper\\" data-bind=\\"css: itemClass\\">
+      <!-- ko if: click -->
+      <a href=\\"javascript: void(0);\\" data-bind=\\"click: click, attr: { 'aria-label': displayName, 'data-tooltip': displayName }, css: { 'active': active }\\" class=\\"item\\">
+        <!-- ko template: 'sidebar-inner-item' --><!-- /ko -->
+      </a>
+      <!-- /ko -->
+      <!-- ko ifnot: click -->
+      <a href=\\"javascript: void(0);\\" data-bind=\\"hueLink: url, publish: 'hue.sidebar.update.active', attr: { 'aria-label': displayName, 'data-tooltip': displayName }, css: { 'active': active }\\" class=\\"item\\">
+        <!-- ko template: 'sidebar-inner-item' --><!-- /ko -->
+      </a>
+      <!-- /ko -->
+      <!-- ko if: subMenuTemplate -->
+      <!-- ko template: subMenuTemplate --><!-- /ko -->
+      <!-- /ko -->
+    </div>
+  </script><script type=\\"text/html\\" id=\\"user-sub-menu-template\\">
+    <div class=\\"sidebar-menu user-menu\\" data-bind=\\"css: { 'open' : $component.userMenuOpen }\\">
+      <div class=\\"menu\\">
+        <div class=\\"menu-header\\">
+          <div class=\\"user-icon\\" style=\\"background-color: #fff\\">F</div>
+          <div>
+            <div>foo</div>
+          </div>
+        </div>
+        <ul class=\\"sidebar-nav-list\\">
+          <!-- ko if: window.USER_VIEW_EDIT_USER_ENABLED -->
+          <li><a href=\\"javascript:void(0);\\" data-bind=\\"
+              hueLink: '/useradmin/users/edit/foo',
+              attr: { 
+                'title': window.IS_LDAP_SETUP ? 'View Profile' : 'Edit Profile'
+              }
+            \\">My Profile</a></li>
+          <!-- /ko -->
+          <!-- ko if: window.USER_IS_ADMIN -->
+          <li><a href=\\"javascript: void(0);\\" data-bind=\\"hueLink: '/useradmin/users/'\\">Manage Users</a></li>
+          <li><a href=\\"javascript: void(0);\\" data-bind=\\"hueLink: '/about/'\\">Administration</a></li>
+          <!-- /ko -->
+          <li><a href=\\"javascript: void(0);\\" data-bind=\\"hueLink: '/accounts/logout'\\" title=\\"Sign out\\" >Sign out</a></li>
+        </ul>
+      </div>
+    </div>
+  </script><script type=\\"text/html\\" id=\\"support-sub-menu-template\\">
+    <div class=\\"sidebar-menu support-menu\\" data-bind=\\"css: { 'open' : $component.supportMenuOpen }\\">
+      <div class=\\"menu\\">
+        <ul class=\\"sidebar-nav-list\\">
+          <li><a href=\\"https://docs.gethue.com\\" target=\\"_blank\\">Documentation</a></li>
+          <li><a href=\\"javascript:void(0)\\" data-bind=\\"publish: 'show.welcome.tour'\\">Welcome Tour</a></li>
+          <li><a href=\\"http://gethue.com\\" target=\\"_blank\\">Gethue.com</a></li>
+        </ul>
+      </div>
+    </div>
+  </script><div class=\\"hue-sidebar-header\\" data-bind=\\"css: { 'hue-sidebar-custom-logo' : window.CUSTOM_LOGO }\\">
+    <a data-bind=\\"hueLink: '/home/'\\" href=\\"javascript: void(0);\\" title=\\"Documents\\">
+      <div class=\\"hue-sidebar-logo\\"><svg><use xlink:href=\\"#hi-sidebar-logo\\"></use></svg></div>
+    </a>
+  </div><div class=\\"hue-sidebar-body\\">
+    <!-- ko foreach: items --><!-- /ko -->
+  </div><div class=\\"hue-sidebar-footer\\">
+    <!-- ko foreach: footerItems -->
+    <!-- ko template: { name: 'sidebar-item' } -->
+    <div class=\\"item-wrapper\\" data-bind=\\"css: itemClass\\">
+      <!-- ko if: click -->
+      <a href=\\"javascript: void(0);\\" data-bind=\\"click: click, attr: { 'aria-label': displayName, 'data-tooltip': displayName }, css: { 'active': active }\\" class=\\"item\\" aria-label=\\"Support\\" data-tooltip=\\"Support\\">
+        <!-- ko template: 'sidebar-inner-item' -->
+    <!-- ko if: iconHtml --><!-- /ko -->
+    <!-- ko ifnot: iconHtml -->
+    <div class=\\"icon\\" data-bind=\\"hueAppIcon: icon\\"></div><span data-bind=\\"text: displayName\\">Support</span>
+    <!-- /ko -->
+  <!-- /ko -->
+      </a>
+      <!-- /ko -->
+      <!-- ko ifnot: click --><!-- /ko -->
+      <!-- ko if: subMenuTemplate -->
+      <!-- ko template: subMenuTemplate -->
+    <div class=\\"sidebar-menu support-menu\\" data-bind=\\"css: { 'open' : $component.supportMenuOpen }\\">
+      <div class=\\"menu\\">
+        <ul class=\\"sidebar-nav-list\\">
+          <li><a href=\\"https://docs.gethue.com\\" target=\\"_blank\\">Documentation</a></li>
+          <li><a href=\\"javascript:void(0)\\" data-bind=\\"publish: 'show.welcome.tour'\\">Welcome Tour</a></li>
+          <li><a href=\\"http://gethue.com\\" target=\\"_blank\\">Gethue.com</a></li>
+        </ul>
+      </div>
+    </div>
+  <!-- /ko -->
+      <!-- /ko -->
+    </div>
+  <!-- /ko -->
+    
+    <!-- ko template: { name: 'sidebar-item' } -->
+    <div class=\\"item-wrapper shepherd-user-menu\\" data-bind=\\"css: itemClass\\">
+      <!-- ko if: click -->
+      <a href=\\"javascript: void(0);\\" data-bind=\\"click: click, attr: { 'aria-label': displayName, 'data-tooltip': displayName }, css: { 'active': active }\\" class=\\"item\\" aria-label=\\"foo\\" data-tooltip=\\"foo\\">
+        <!-- ko template: 'sidebar-inner-item' -->
+    <!-- ko if: iconHtml -->
+    <div class=\\"icon\\" data-bind=\\"html: iconHtml\\"><div class=\\"user-icon\\">F</div></div><span data-bind=\\"text: displayName\\">foo</span>
+    <!-- /ko -->
+    <!-- ko ifnot: iconHtml --><!-- /ko -->
+  <!-- /ko -->
+      </a>
+      <!-- /ko -->
+      <!-- ko ifnot: click --><!-- /ko -->
+      <!-- ko if: subMenuTemplate -->
+      <!-- ko template: subMenuTemplate -->
+    <div class=\\"sidebar-menu user-menu\\" data-bind=\\"css: { 'open' : $component.userMenuOpen }\\">
+      <div class=\\"menu\\">
+        <div class=\\"menu-header\\">
+          <div class=\\"user-icon\\" style=\\"background-color: #fff\\">F</div>
+          <div>
+            <div>foo</div>
+          </div>
+        </div>
+        <ul class=\\"sidebar-nav-list\\">
+          <!-- ko if: window.USER_VIEW_EDIT_USER_ENABLED --><!-- /ko -->
+          <!-- ko if: window.USER_IS_ADMIN --><!-- /ko -->
+          <li><a href=\\"javascript: void(0);\\" data-bind=\\"hueLink: '/accounts/logout'\\" title=\\"Sign out\\">Sign out</a></li>
+        </ul>
+      </div>
+    </div>
+  <!-- /ko -->
+      <!-- /ko -->
+    </div>
+  <!-- /ko -->
+    <!-- /ko -->
+    <a class=\\"hue-sidebar-trigger\\" data-bind=\\"toggle: collapsed\\">
+      <svg><use xlink:href=\\"#hi-collapse-nav\\"></use></svg>
+    </a>
+  </div></div>"
+`;

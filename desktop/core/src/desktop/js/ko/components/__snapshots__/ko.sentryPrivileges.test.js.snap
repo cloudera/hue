@@ -1,0 +1,102 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.sentryPrivileges.js should render component 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;hue-sentry-privileges&quot;, params: params }\\"><script type=\\"text/html\\" id=\\"sentry-privileges-component-role\\">
+    <div class=\\"acl-block-title\\">
+      <i class=\\"fa fa-cube muted\\"></i> <a class=\\"pointer\\" data-bind=\\"click: function(){  $parents[0].showRole($data); }\\"><span data-bind=\\"text: name\\"></span></a>
+    </div>
+    <div data-bind=\\"template: { name: 'sentry-privileges-component-privilege', foreach: privilegesForView }\\"></div>
+    <div class=\\"acl-block acl-actions\\">
+      <span class=\\"pointer\\" data-bind=\\"visible: privilegesForViewTo() < privileges().length, click: function(){ privilegesForViewTo(privilegesForViewTo() + 50) }\\" title=\\"Show 50 more...\\"><i class=\\"fa fa-ellipsis-h\\"></i></span>
+      <span class=\\"pointer\\" data-bind=\\"click: addPrivilege, visible: $parents[0].isSentryAdmin && !$parents[0].readOnly\\" title=\\"Add privilege\\"><i class=\\"fa fa-plus\\"></i></span>
+      <span class=\\"pointer\\" data-bind=\\"click: function() { $parents[0].listSentryPrivilegesByAuthorizable() }, visible: privilegesChanged().length > 0\\" title=\\"Undo\\"> &nbsp; <i class=\\"fa fa-undo\\"></i></span>
+      <span class=\\"pointer\\" data-bind=\\"click: function() { $parents[0].deletePrivilegeModal($data) }, visible: privilegesChanged().length > 0\\" title=\\"Save\\"> &nbsp; <i class=\\"fa fa-save\\"></i></span>
+    </div>
+  </script><script type=\\"text/html\\" id=\\"sentry-privileges-component-privilege\\">
+    <div data-bind=\\"visible: status() != 'deleted' && status() != 'alreadydeleted'\\" class=\\"acl-block acl-block-airy\\">
+      <!-- ko if: editing -->
+      <div class=\\"pull-right privilege-actions\\" data-bind=\\"visible: (grantOption() || $parents[1].isSentryAdmin) && !$parents[1].readOnly\\">
+        <a class=\\"pointer\\" style=\\"margin-right: 4px\\" data-bind=\\"click: function() { if (editing()) { editing(false); }}\\"><i class=\\"fa fa-eye\\"></i></a>
+        <a class=\\"pointer\\" style=\\"margin-right: 4px\\" data-bind=\\"click: remove\\"><i class=\\"fa fa-times\\"></i></a>
+      </div>
+    
+      <div class=\\"inline-block\\" style=\\"vertical-align: middle\\">
+        <a class=\\"pointer\\" style=\\"padding-top: 4px\\" data-bind=\\"click: function(){ privilegeType('db'); action($parents[1].availableActions(privilegeScope())[0]) }\\">
+          <i class=\\"fa fa-fw fa-1halfx muted\\" data-bind=\\"css: {'fa-circle-o': privilegeType() != 'db' , 'fa-check-circle-o': privilegeType() == 'db'}\\"></i>
+        </a>
+      </div>
+      <input type=\\"text\\" data-bind=\\"hiveChooser: $data.path, enable: privilegeType() == 'db', apiHelperUser: 'foo', apiHelperType: 'hive'\\" placeholder=\\"dbName.tableName <CTRL+SPACE>\\">
+    
+      <div class=\\"inline-block\\" style=\\"vertical-align: middle\\">
+        <a class=\\"pointer\\" style=\\"padding-top: 4px\\" data-bind=\\"click: function(){ privilegeType('uri'); action('ALL'); }\\">
+          <i class=\\"fa fa-fw fa-1halfx muted\\" data-bind=\\"css: {'fa-circle-o': privilegeType() != 'uri' , 'fa-check-circle-o': privilegeType() == 'uri'}\\"></i>
+        </a>
+      </div>
+      <input type=\\"text\\" data-bind=\\"filechooser: $data.URI, enable: privilegeType() == 'uri', valueUpdate: 'afterkeydown'\\" placeholder=\\"URI\\">
+    
+      <select data-bind=\\"options: $parents[1].availableActions(privilegeScope()), value: $data.action, enable: (privilegeType() == 'db')\\" style=\\"width: 100px; margin-bottom: 0\\"></select>
+    
+      <div class=\\"margin-top-10\\">
+        <label class=\\"checkbox pull-left\\"><input type=\\"checkbox\\" data-bind=\\"checked: grantOption\\"> With grant</label>
+        <div class=\\"inline-block margin-left-10\\" style=\\"margin-top: 6px\\">
+          <a class=\\"pointer showAdvanced\\" data-bind=\\"click: function(){ showAdvanced(true); }, visible: !showAdvanced()\\"><i class=\\"fa fa-cog\\"></i> Show advanced</a>
+          <a class=\\"pointer showAdvanced\\" data-bind=\\"click: function(){ showAdvanced(false); }, visible: showAdvanced()\\"><i class=\\"fa fa-cog\\"></i> Hide advanced</a>
+        </div>
+        <div class=\\"clearfix\\"></div>
+      </div>
+    
+      <div class=\\"acl-block-section\\" data-bind=\\"visible: showAdvanced\\" style=\\"margin-top: 0\\">
+        Server <input type=\\"text\\" data-bind=\\"value: serverName\\" placeholder=\\"serverName\\" style=\\"margin-left: 6px\\">
+      </div>
+      <!-- /ko -->
+  
+      <!-- ko ifnot: editing -->
+      <div class=\\"pull-right privilege-actions\\" data-bind=\\"visible: (grantOption() || $parents[1].isSentryAdmin) && !$parents[1].readOnly\\">
+        <a title=\\"Edit this privilege\\" class=\\"pointer\\" style=\\"margin-right: 4px\\" data-bind=\\"visible: $parents[1].isSentryAdmin, click: function() { if (! editing()) { editing(true); }}\\"><i class=\\"fa fa-pencil\\"></i></a>
+        <a title=\\"Delete this privilege\\" class=\\"pointer\\" style=\\"margin-right: 4px\\" data-bind=\\"visible: $parents[1].isSentryAdmin, click: remove\\"><i class=\\"fa fa-times\\"></i></a>
+      </div>
+  
+      <span class=\\"muted\\" data-bind=\\"text: privilegeScope, attr: {title: moment(timestamp()).fromNow()}\\"></span>
+      <!-- ko if: grantOption -->
+        <i class=\\"fa fa-unlock muted\\" title=\\"With grant option\\"></i>
+      <!-- /ko -->
+      <span data-bind=\\"visible: metastorePath() != '' && privilegeType() == 'db'\\">
+        <a data-bind=\\"hueLink: metastorePath()\\" class=\\"muted\\" style=\\"margin-left: 4px\\" title=\\"Open in Table Browser...\\"><i class=\\"fa fa-external-link\\"></i></a>
+      </span>
+      <br/>
+  
+      server=<span data-bind=\\"text: serverName\\"></span>
+  
+      <!-- ko if: privilegeType() == 'db' -->
+      <span data-bind=\\"visible: dbName\\">
+        <i class=\\"fa fa-long-arrow-right\\"></i> db=<a class=\\"pointer\\" data-bind=\\"click: function(){ $parents[1].linkToBrowse(dbName()) }\\" title=\\"Browse db privileges\\"><span data-bind=\\"text: dbName\\"></span></a>
+      </span>
+      <span data-bind=\\"visible: tableName\\">
+        <i class=\\"fa fa-long-arrow-right\\"></i> table=<a class=\\"pointer\\" data-bind=\\"click: function(){ $parents[1].linkToBrowse(dbName() + '.' + tableName()) }\\" title=\\"Browse table privileges\\"><span data-bind=\\"text: tableName\\"></span></a>
+      </span>
+      <span data-bind=\\"visible: columnName\\">
+        <i class=\\"fa fa-long-arrow-right\\"></i> column=<a class=\\"pointer\\" data-bind=\\"click: function(){ $parents[1].linkToBrowse(dbName() + '.' + tableName() + '.' + columnName()) }\\" title=\\"Browse column privileges\\"><span data-bind=\\"text: columnName\\"></span></a>
+      </span>
+      <!-- /ko -->
+  
+      <!-- ko if: privilegeType() == 'uri' -->
+      <i class=\\"fa fa-long-arrow-right\\"></i> <i class=\\"fa fa-file-o\\"></i> <i class=\\"fa fa-long-arrow-right\\"></i> <a data-bind=\\"hueLink: '/filebrowser/view=/' + URI().split('/')[3]\\"><span data-bind=\\"text: URI\\"></span></a>
+      <!-- /ko -->
+  
+      <i class=\\"fa fa-long-arrow-right\\"></i> action=<span data-bind=\\"text: action\\"></span>
+      <!-- /ko -->
+    </div>
+  </script><div data-bind=\\"template: { name: 'sentry-privileges-component-role', foreach: roles }\\"></div><em>No privileges found for the selected object.</em><div id=\\"sentryPrivilegesComponentDeletePrivilegeModal\\" class=\\"modal hide fade in\\" role=\\"dialog\\">
+    <div class=\\"modal-header\\">
+      <button type=\\"button\\" class=\\"close\\" data-dismiss=\\"modal\\" aria-label=\\"Close\\"><span aria-hidden=\\"true\\">×</span></button>
+      <h2 class=\\"modal-title\\">Confirm the deletion?</h2>
+    </div>
+    <div class=\\"modal-body\\">
+      Sentry will recursively delete the SERVER or DATABASE privileges you marked for deletion.
+    </div>
+    <div class=\\"modal-footer\\">
+      <button class=\\"btn\\" data-dismiss=\\"modal\\" aria-hidden=\\"true\\">Cancel</button>
+      <button data-loading-text=\\"Deleting...\\" class=\\"btn btn-danger\\" data-bind=\\"click: function() { roleToUpdate().savePrivileges(roleToUpdate()); }\\">Yes, delete</button>
+    </div>
+  </div></div>"
+`;

@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.sessionPanel.js should render component 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;session-panel&quot;, params: params }\\"><div class=\\"session-panel\\" data-test=\\"session-panel\\" data-bind=\\"slideVisible: visible\\" style=\\"display: none;\\">
+  <div class=\\"margin-top-10 padding-left-10 padding-right-10\\">
+    <h4 class=\\"margin-bottom-10\\"><i class=\\"fa fa-cogs\\"></i> Sessions</h4>
+    <div class=\\"session-panel-content\\">
+      <!-- ko ifnot: sessions().length -->
+      There are currently no information about the sessions.
+      <!-- /ko -->
+      
+      <!-- ko if: sessions().length --><!-- /ko -->
+    </div>
+    <a class=\\"pointer demi-modal-chevron\\" style=\\"position: absolute; bottom: 0\\" data-bind=\\"toggle: visible\\"><i class=\\"fa fa-chevron-up\\"></i></a>
+  </div>
+</div></div>"
+`;

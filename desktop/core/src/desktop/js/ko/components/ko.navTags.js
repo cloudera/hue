@@ -22,6 +22,8 @@ import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 
+export const NAME = 'nav-tags';
+
 const TEMPLATE = `
   <!-- ko if: loading -->
   <div style="width: 100%; height: 20px; left: 6px; position: relative;" data-bind="hueSpinner: { spin: loading }"></div>
@@ -174,4 +176,4 @@ class NavTags {
   }
 }
 
-componentUtils.registerComponent('nav-tags', NavTags, TEMPLATE);
+componentUtils.registerComponent(NAME, NavTags, TEMPLATE);

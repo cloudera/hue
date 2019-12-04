@@ -95,9 +95,10 @@ from beeswax.hive_site import get_metastore, hiveserver2_jdbc_url
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
+  open_file = open
 else:
   from cStringIO import StringIO as string_io
-
+  open_file = file
 
 LOG = logging.getLogger(__name__)
 
@@ -429,7 +430,7 @@ for x in sys.stdin:
     # BeeswaxTest.jar is gone
     raise SkipTest
 
-    src = file(os.path.join(os.path.dirname(__file__), "..", "..", "java-lib", "BeeswaxTest.jar"))
+    src = open_file(os.path.join(os.path.dirname(__file__), "..", "..", "java-lib", "BeeswaxTest.jar"))
     udf = self.cluster.fs_prefix + "hive1157.jar"
     dest = self.cluster.fs.open(udf, "w")
     shutil.copyfileobj(src, dest)
@@ -2128,7 +2129,7 @@ for x in sys.stdin:
 def test_import_gzip_reader():
   """Test the gzip reader in create table"""
   # Make gzipped data
-  data = file(__file__).read()
+  data = open_file(__file__).read()
   data_gz_sio = string_io()
   gz = gzip.GzipFile(fileobj=data_gz_sio, mode='wb')
   gz.write(data)
@@ -2267,7 +2268,7 @@ def test_hive_site():
         return tmpdir
 
     xml = hive_site_xml(is_local=True, use_sasl=False)
-    file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
+    open_file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
 
     beeswax.hive_site.reset()
     saved = beeswax.conf.HIVE_CONF_DIR
@@ -2295,7 +2296,7 @@ def test_hive_site_host_pattern_local_host():
 
     thrift_uris = 'thrift://%s:9999' % hostname
     xml = hive_site_xml(is_local=False, use_sasl=False, thrift_uris=thrift_uris, kerberos_principal='test/_HOST@TEST.COM', hs2_kerberos_principal='test/_HOST@TEST.COM')
-    file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
+    open_file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
 
     beeswax.hive_site.reset()
     saved = beeswax.conf.HIVE_CONF_DIR
@@ -2326,7 +2327,7 @@ def test_hive_site_null_hs2krb():
         return tmpdir
 
     xml = hive_site_xml(is_local=True, use_sasl=False, hs2_kerberos_principal=None)
-    file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
+    open_file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
 
     beeswax.hive_site.reset()
     saved = beeswax.conf.HIVE_CONF_DIR
@@ -3135,7 +3136,7 @@ def test_metastore_security():
         return tmpdir
 
     xml = hive_site_xml(is_local=False, use_sasl=True, kerberos_principal='hive/_HOST@test.com')
-    file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
+    open_file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
 
     beeswax.hive_site.reset()
     saved = beeswax.conf.HIVE_CONF_DIR

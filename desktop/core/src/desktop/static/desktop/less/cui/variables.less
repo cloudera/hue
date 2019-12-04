@@ -30,7 +30,6 @@
 // The default foreground color when used on an inverse element.
 @cui-default-inverse-color: @cui-default-bg-color;
 
-
 //== Colors
 //
 //## Gray and brand colors for use across Bootstrap.
@@ -64,7 +63,6 @@
 //## Link hover decoration.
 @link-hover-decoration: underline;
 
-
 //== Typography
 //
 //## Font, line-height, and color for body text, headings, and more.
@@ -96,7 +94,6 @@
 @headings-font-weight:    500;
 @headings-line-height:    1.1;
 @headings-color:          @text-color;
-
 
 //== Iconography
 //
@@ -143,7 +140,6 @@
 //## Carets increase slightly in size for larger components.
 @caret-width-large:         5px;
 
-
 //== Tables
 //
 //## Customizes the `.table` component with basic values, each used across all table variations.
@@ -163,7 +159,6 @@
 
 //## Border color for table and cell borders.
 @table-border-color:            @cui-default-border-color;
-
 
 //== Buttons
 //
@@ -201,7 +196,6 @@
 @btn-border-radius-base:         @border-radius-base;
 @btn-border-radius-large:        @border-radius-base;
 @btn-border-radius-small:        @border-radius-base;
-
 
 //== Forms
 //
@@ -253,7 +247,6 @@
 //## Disabled cursor for form controls and buttons.
 @cursor-disabled:                not-allowed;
 
-
 //== Dropdowns
 //
 //## Dropdown menu container and contents.
@@ -288,7 +281,6 @@
 //## Deprecated `@dropdown-caret-color` as of v3.1.0
 @dropdown-caret-color:           #000;
 
-
 //-- Z-index master list
 //
 // Warning: Avoid customizing these values. They're used for a bird's eye view
@@ -303,7 +295,6 @@
 @zindex-navbar-fixed:      1030;
 @zindex-modal-background:  1040;
 @zindex-modal:             1050;
-
 
 //== Media queries breakpoints
 //
@@ -343,7 +334,6 @@
 @screen-sm-max:              (@screen-md-min - 1);
 @screen-md-max:              (@screen-lg-min - 1);
 
-
 //== Grid system
 //
 //## Define your custom responsive grid.
@@ -357,7 +347,6 @@
 @grid-float-breakpoint:     @screen-sm-min;
 //## Point at which the navbar begins collapsing.
 @grid-float-breakpoint-max: (@grid-float-breakpoint - 1);
-
 
 //== Container sizes
 //
@@ -377,7 +366,6 @@
 @container-large-desktop:      (1140px + @grid-gutter-width);
 //## For `@screen-lg-min` and up.
 @container-lg:                 @container-large-desktop;
-
 
 //== Navbar
 //
@@ -414,7 +402,6 @@
 @navbar-default-toggle-icon-bar-bg:        #888;
 @navbar-default-toggle-border-color:       #ddd;
 
-
 //=== Inverted navbar
 // Reset inverted navbar basics
 @navbar-inverse-color:                      @cui-default-inverse-color;
@@ -439,7 +426,6 @@
 @navbar-inverse-toggle-hover-bg:            #333;
 @navbar-inverse-toggle-icon-bar-bg:         @cui-default-bg-color;
 @navbar-inverse-toggle-border-color:        #333;
-
 
 //== Navs
 //
@@ -469,7 +455,6 @@
 @nav-pills-active-link-hover-bg:            @component-active-bg;
 @nav-pills-active-link-hover-color:         @component-active-color;
 
-
 //== Pagination
 //
 //##
@@ -490,7 +475,6 @@
 @pagination-disabled-bg:               @cui-default-bg-color;
 @pagination-disabled-border:           transparent;
 
-
 //== Pager
 //
 //##
@@ -506,7 +490,6 @@
 
 @pager-disabled-color:                 @pagination-disabled-color;
 
-
 //== Jumbotron
 //
 //##
@@ -517,7 +500,6 @@
 @jumbotron-heading-color:        inherit;
 @jumbotron-font-size:            ceil((@font-size-base * 1.5));
 @jumbotron-heading-font-size:    ceil((@font-size-base * 4.5));
-
 
 //== Form states and alerts
 //
@@ -556,7 +538,6 @@
 //## Tooltip arrow color
 @tooltip-arrow-color:         @tooltip-bg;
 
-
 //== Popovers
 //
 //##
@@ -585,7 +566,6 @@
 //## Popover outer arrow fallback color
 @popover-arrow-outer-fallback-color:  darken(@popover-fallback-border-color, 20%);
 
-
 //== Labels
 //
 //##
@@ -607,7 +587,6 @@
 @label-color:                 @cui-default-inverse-color;
 //## Default text color of a linked label
 @label-link-hover-color:      @cui-default-inverse-color;
-
 
 //== Modals
 //
@@ -641,7 +620,6 @@
 @modal-md:                    600px;
 @modal-sm:                    300px;
 
-
 //== Alerts
 //
 //## Define alert colors, border radius, and padding.
@@ -666,7 +644,6 @@
 @alert-danger-text:           @state-danger-text;
 @alert-danger-border:         @state-danger-border;
 
-
 //== Progress bars
 //
 //##
@@ -688,7 +665,6 @@
 @progress-bar-danger-bg:      @brand-danger;
 //## Info progress bar color
 @progress-bar-info-bg:        @brand-info;
-
 
 //== List group
 //
@@ -722,7 +698,6 @@
 @list-group-link-color:         #555;
 @list-group-link-hover-color:   @list-group-link-color;
 @list-group-link-heading-color: #333;
-
 
 //== Panels
 //
@@ -762,7 +737,6 @@
 @panel-danger-border:         @state-danger-border;
 @panel-danger-heading-bg:     @state-danger-bg;
 
-
 //== Thumbnails
 //
 //##
@@ -781,14 +755,12 @@
 //## Padding around the thumbnail caption
 @thumbnail-caption-padding:   9px;
 
-
 //== Wells
 //
 //##
 
 @well-bg: @cui-gray-050;
 @well-border: @cui-default-border-color;
-
 
 //== Badges
 //
@@ -808,7 +780,6 @@
 @badge-line-height:           1;
 @badge-border-radius:         0;
 
-
 //== Breadcrumbs
 //
 //##
@@ -823,7 +794,6 @@
 @breadcrumb-active-color:       @gray-light;
 //## Textual separator for between breadcrumb elements
 @breadcrumb-separator:          "/";
-
 
 //== Carousel
 //
@@ -841,7 +811,6 @@
 
 @carousel-caption-color:                      @cui-default-inverse-color;
 
-
 //== Close
 //
 //##
@@ -849,7 +818,6 @@
 @close-font-weight:           bold;
 @close-color:                 #000;
 @close-text-shadow:           0 1px 0 #fff;
-
 
 //== Code
 //
@@ -865,7 +833,6 @@
 @pre-color:                   @text-color;
 @pre-border-color:            #ccc;
 @pre-scrollable-max-height:   340px;
-
 
 //== Type
 //

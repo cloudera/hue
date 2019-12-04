@@ -15,11 +15,6 @@ HUEUSER="hive"
 
 if [ -z "$REGISTRY" ]; then
   REGISTRY=${REGISTRY:-"docker.io/hortonworks"}
-  BASEOS_URL=${REGISTRY:-"docker.io/centos:centos7"}
-else
-  if [[ $REGISTRY == *cdh ]]; then
-    BASEOS_URL=$(echo $(echo $REGISTRY | cut -d '/' -f 1)/cloudera_base/centos:7.6.1810)
-  fi
 fi
 
 compile_hue() {
@@ -121,33 +116,17 @@ build_huelbbase() {
   docker pull ${REGISTRY}/$HUELBBASE_VERSION
 }
 
-pull_hueos() {
-  docker pull ${BASEOS_URL}
-
-  FROMOS_URL=$(echo "$BASEOS_URL as base-centos-jdk")
-  sed -i -e "s#\${BASEOS_URL}#${FROMOS_URL}#g" $BASEHUE_DIR/Dockerfile
-}
-
-pull_huelbos() {
-  docker pull ${BASEOS_URL}
-
-  FROMOS_URL=$(echo "$BASEOS_URL as base-centos-jdk")
-  sed -i -e "s#\${BASEOS_URL}#${FROMOS_URL}#g" $BASEHUELB_DIR/Dockerfile
-}
-
 pull_base_images() {
   set +e
 
   docker pull ${REGISTRY}/$HUEBASE_VERSION
   if [[ $? != 0 ]]; then
-    pull_hueos
     build_huebase
   fi
   docker tag ${REGISTRY}/$HUEBASE_VERSION $HUEBASE_VERSION
 
   docker pull ${REGISTRY}/$HUELBBASE_VERSION
   if [[ $? != 0 ]]; then
-    pull_huelbos
     build_huelbbase
   fi
   docker tag ${REGISTRY}/$HUELBBASE_VERSION $HUELBBASE_VERSION

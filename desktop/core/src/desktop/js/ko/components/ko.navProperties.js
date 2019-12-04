@@ -21,6 +21,8 @@ import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 
+export const NAME = 'nav-properties';
+
 const TEMPLATE = `
   <script type="text/html" id="nav-property-edit-popover-content">
     <div class="hue-nav-property-edit-content">
@@ -320,7 +322,7 @@ class NavProperties {
 }
 
 componentUtils.registerComponent(
-  'nav-properties',
+  NAME,
   {
     createViewModel: function(params, componentInfo) {
       return new NavProperties(params, componentInfo.element);

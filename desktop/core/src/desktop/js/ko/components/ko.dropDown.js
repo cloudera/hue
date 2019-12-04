@@ -20,6 +20,8 @@ import ko from 'knockout';
 import componentUtils from './componentUtils';
 import I18n from 'utils/i18n';
 
+export const NAME = 'hue-drop-down';
+
 const TEMPLATE = `
   <!-- ko if: !menuOnly && (!dropDownVisible() || !searchable) -->
   <a class="inactive-action hue-drop-down-active" href="javascript:void(0)" data-bind="toggle: dropDownVisible, css: { 'blue': dropDownVisible }">
@@ -256,7 +258,7 @@ class HueDropDown {
 }
 
 componentUtils.registerComponent(
-  'hue-drop-down',
+  NAME,
   {
     createViewModel: function(params, componentInfo) {
       return new HueDropDown(params, componentInfo.element);

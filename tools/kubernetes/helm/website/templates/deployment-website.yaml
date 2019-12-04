@@ -1,0 +1,31 @@
+{{- if .Values.website.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: website
+  labels:
+    deployment: website
+spec:
+  selector:
+    matchLabels:
+      pod: website
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        pod: website
+    spec:
+      containers:
+      - name: website
+        image: {{ .Values.image.registry }}/website:latest
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 60
+          failureThreshold: 30
+{{- end -}}

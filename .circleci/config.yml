@@ -67,10 +67,11 @@ jobs:
             cd /usr/share/hue
             # make npm-install # Not available
             cp ~/repo/.babelrc .
+            cp ~/repo/jest.config.js .
 
             cp ~/repo/webpack.config*.js .
             npm install
-            npm i eslint-plugin-jasmine@latest --save-dev # Seems to not be found otherwise
+            npm i eslint-plugin-jest@latest --save-dev # Seems to not be found otherwise
             npm run webpack
             npm run webpack-login
             npm run webpack-workers
@@ -95,6 +96,7 @@ jobs:
             cp ~/repo/.prettierrc .
             cp ~/repo/.eslint* .
             cp ~/repo/tools . -r
+
             npm run lint
 
       # Run tests
@@ -109,6 +111,9 @@ jobs:
           name: run js tests
           command: |
             cd /usr/share/hue
+
+            # https://jestjs.io/docs/en/troubleshooting.html#tests-are-extremely-slow-on-docker-andor-continuous-integration-ci-server
+            sed -i 's/"test": "jest"/"test": "jest --runInBand"/g' package.json
             npm run test
 
       - store_artifacts:

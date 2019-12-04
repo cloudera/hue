@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.templatePopover.js should render binding 1`] = `"<div id=\\"popoverTest\\" data-bind=\\"templatePopover: { trigger: 'click' }\\"></div>"`;
