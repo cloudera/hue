@@ -16,7 +16,7 @@
 
 import $ from 'jquery';
 import d3v3 from 'd3v3';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import HueColors from 'utils/hueColors';
 import huePubSub from 'utils/huePubSub';

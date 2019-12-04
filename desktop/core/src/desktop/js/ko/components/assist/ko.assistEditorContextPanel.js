@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import ASSIST_TABLE_TEMPLATES from 'ko/components/assist/ko.assistDbPanel';
 import AssistDbEntry from 'ko/components/assist/assistDbEntry';

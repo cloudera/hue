@@ -21,7 +21,7 @@
  */
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 import Plotly from 'plotly.js-dist';
 
 import huePubSub from 'utils/huePubSub';
