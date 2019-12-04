@@ -289,7 +289,7 @@ class SqlAlchemyApi(Api):
 
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False, operation=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
     engine = self._create_engine()
     inspector = inspect(engine)
 

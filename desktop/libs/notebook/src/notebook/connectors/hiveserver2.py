@@ -496,10 +496,10 @@ class HS2Api(Api):
 
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False, operation=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
     try:
-      db = self._get_db(snippet, async, interpreter=self.interpreter)
-      return _get_sample_data(db, database, table, column, async, operation=operation, cluster=self.interpreter)
+      db = self._get_db(snippet, is_async=is_async, interpreter=self.interpreter)
+      return _get_sample_data(db, database, table, column, is_async, operation=operation, cluster=self.interpreter)
     except QueryServerException as ex:
       raise QueryError(ex.message)
 
@@ -732,8 +732,8 @@ DROP TABLE IF EXISTS `%(table)s`;
     return HiveServerQueryHandle(**handle)
 
 
-  def _get_db(self, snippet, async=False, interpreter=None):
-    if not async and snippet['type'] == 'hive':
+  def _get_db(self, snippet, is_async=False, interpreter=None):
+    if not is_async and snippet['type'] == 'hive':
       name = 'beeswax'
     elif snippet['type'] == 'hive':
       name = 'hive'
