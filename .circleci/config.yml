@@ -137,9 +137,10 @@ jobs:
           command: |
             git push origin HEAD:master
 
-  build-py3:
+
+  build-py3.6:
     docker:
-      - image: gethue/hue:latest # Should be circleci/python:3.x at some point
+      - image: gethue/hue:latest # Should be circleci/python:3.6 at some point
 
     working_directory: ~/repo
 
@@ -156,9 +157,9 @@ jobs:
       - run:
           name: compile
           command: |
-            apt-get install -y python3.8-dev python3.8-venv python3.8-distutils libsnappy-dev # This should not be needed as some point
+            apt-get install -y python3.6-dev libsnappy-dev # This should not be needed as some point
 
-            export PYTHON_VER=python3.8
+            export PYTHON_VER=python3.6
             make apps
 
       - run:
@@ -178,6 +179,28 @@ jobs:
       #     key: v1-dependencies-{{ checksum "esktop/core/requirements_py3.txt" }}
 
 
+  build-py3.8:
+    docker:
+      - image: gethue/hue:latest # Should be circleci/python:3.x at some point
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - run:
+          name: compile
+          command: |
+            apt-get install -y python3.8-dev python3.8-venv python3.8-distutils libsnappy-dev # This should not be needed as some point
+
+            export PYTHON_VER=python3.8
+            make apps
+
+      - run:
+          name: run tests
+          command: |
+            ./build/env/bin/hue test unit --with-xunit --with-cover
+
 
 workflows:
   version: 2
@@ -196,7 +219,14 @@ workflows:
             branches:
               only:
                 - /.*ci-commit-master.*/
-      - build-py3:
+  build-python3:
+    jobs:
+      - build-py3.8:
+          filters:
+            branches:
+              only:
+                - py3-ci
+      - build-py3.6:
           filters:
             branches:
               only:
