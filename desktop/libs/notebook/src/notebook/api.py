@@ -711,10 +711,10 @@ def get_sample_data(request, server=None, database=None, table=None, column=None
   # Passed by check_document_access_permission but unused by APIs
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
-  async = json.loads(request.POST.get('async', 'false'))
+  is_async = json.loads(request.POST.get('async', 'false'))
   operation = json.loads(request.POST.get('operation', '"default"'))
 
-  sample_data = get_api(request, snippet).get_sample_data(snippet, database, table, column, async=async, operation=operation)
+  sample_data = get_api(request, snippet).get_sample_data(snippet, database, table, column, is_async=is_async, operation=operation)
   response.update(sample_data)
 
   response['status'] = 0

@@ -664,18 +664,18 @@ def get_sample_data(request, database, table, column=None):
   return JsonResponse(response)
 
 
-def _get_sample_data(db, database, table, column, async=False, cluster=None, operation=None):
+def _get_sample_data(db, database, table, column, is_async=False, cluster=None, operation=None):
   table_obj = db.get_table(database, table)
   if table_obj.is_impala_only and db.client.query_server['server_name'] != 'impala':
     query_server = get_query_server_config('impala', connector=cluster)
     db = dbms.get(db.client.user, query_server, cluster=cluster)
 
-  sample_data = db.get_sample(database, table_obj, column, generate_sql_only=async, operation=operation)
+  sample_data = db.get_sample(database, table_obj, column, generate_sql_only=is_async, operation=operation)
   response = {'status': -1}
 
   if sample_data:
     response['status'] = 0
-    if async:
+    if is_async:
       notebook = make_notebook(
           name=_('Table sample for `%(database)s`.`%(table)s`.`%(column)s`') % {'database': database, 'table': table, 'column': column},
           editor_type=_get_servername(db),
