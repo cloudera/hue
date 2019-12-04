@@ -104,7 +104,7 @@ class TopNavViewModel {
             interpreters.push({
               displayName: I18n('Add more...'),
               dividerAbove: true,
-              href: 'http://gethue.com/sql-editor/'
+              href: 'http://gethue.com/new-sql-editor/'
             });
           }
 
