@@ -65,7 +65,7 @@ variables.
 # using it. So instead of breaking compatibility, we make a "pytype" alias.
 
 from __future__ import print_function
-from past.builtins import basestring
+from six import string_types
 from builtins import object
 pytype = type
 
@@ -629,7 +629,7 @@ def coerce_bool(value):
   if isinstance(value, bool):
     return value
 
-  if isinstance(value, basestring):
+  if isinstance(value, string_types):
     upper = value.upper()
   else:
     upper = value
@@ -654,7 +654,7 @@ def coerce_csv(value):
   raise Exception("Could not coerce %r to csv array." % value)
 
 def coerce_json_dict(value):
-  if isinstance(value, basestring):
+  if isinstance(value, string_types):
     return json.loads(value)
   elif isinstance(value, dict):
     return value
@@ -662,7 +662,7 @@ def coerce_json_dict(value):
 
 def list_of_compiled_res(skip_empty=False):
   def fn(list_of_strings):
-    if isinstance(list_of_strings, basestring):
+    if isinstance(list_of_strings, string_types):
       list_of_strings = list_of_strings.split(',')
     list_of_strings = [string if skip_empty else True for string in list_of_strings]
     return list(re.compile(x) for x in list_of_strings)
