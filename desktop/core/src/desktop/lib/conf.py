@@ -69,27 +69,26 @@ from six import string_types
 from builtins import object
 pytype = type
 
-from django.utils.encoding import smart_str
-from django.utils.translation import ugettext as _
-
-from desktop.lib.paths import get_desktop_root, get_build_dir
-
-from configobj import ConfigObj, ConfigObjError
 import json
 import logging
+import numbers
 import os
 import textwrap
 import re
 import subprocess
 import sys
 
+from django.utils.encoding import smart_str
+from django.utils.translation import ugettext as _
+from configobj import ConfigObj, ConfigObjError
+
+from desktop.lib.paths import get_desktop_root, get_build_dir
+
 try:
   from collections import OrderedDict
 except ImportError:
   from ordereddict import OrderedDict # Python 2.6
 
-if sys.version_info[0] > 2:
-  from past.builtins import long
 
 # Magical object for use as a "symbol"
 _ANONYMOUS = ("_ANONYMOUS")
@@ -222,7 +221,7 @@ class Config(object):
     if dynamic_default is not None and not dynamic_default.__doc__ and not private:
       raise ValueError("Dynamic default '%s' must have __doc__ defined!" % (key,))
 
-    if pytype(default) in (int, long, float, complex, bool) and \
+    if (isinstance(default, numbers.Number) or pytype(default) is bool) and \
           not isinstance(type(default), pytype(default)):
       raise ValueError("%s: '%s' does not match that of the default value %r (%s)"
                       % (key, type, default, pytype(default)))
