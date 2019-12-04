@@ -29,6 +29,7 @@ import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execu
 import { RESULT_TYPE, RESULT_UPDATED_EVENT } from 'apps/notebook2/execution/executionResult';
 import { attachTracker } from 'apps/notebook2/components/executableStateHandler';
 import { defer } from 'utils/hueUtils';
+import { CURRENT_QUERY_TAB_SWITCHED_EVENT } from 'apps/notebook2/snippet';
 
 export const NAME = 'snippet-results';
 
@@ -159,6 +160,14 @@ class SnippetResults extends DisposableComponent {
     this.images = ko.observableArray();
     this.hasMore = ko.observable();
     this.hasResultSet = ko.observable();
+
+    this.subscribe(CURRENT_QUERY_TAB_SWITCHED_EVENT, queryTab => {
+      if (queryTab === 'queryResults') {
+        defer(() => {
+          huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
+        });
+      }
+    });
 
     this.executing = ko.pureComputed(() => this.status() === EXECUTION_STATUS.running);
 
