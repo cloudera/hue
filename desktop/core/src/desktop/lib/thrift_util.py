@@ -396,7 +396,8 @@ class PooledClient(object):
       else:
         return attr
     finally:
-      self._return_client(superclient)
+      if not _connection_pool.check_pool_empty(self.conf):
+        self._return_client(superclient)
 
   def _wrap_callable(self, attr_name):
     # It's gonna be a thrift call. Add wrapping logic to reopen the transport,
@@ -438,6 +439,7 @@ class PooledClient(object):
             user_conn = cache.get("hiveserver2")
             user_conn.pop(self.user.username, None)
             cache.set("hiveserver2", user_conn)
+          _connection_pool.clear_client(self.conf)
           if err_msg and 'generic failure: Unable to find a callback: 32775' in err_msg:
             raise StructuredException(_("Increase the sasl_max_buffer value in hue.ini"), err_msg, data=None, error_code=502)
           raise StructuredThriftTransportException(e, error_code=502)
@@ -446,7 +448,8 @@ class PooledClient(object):
           logging.info("Thrift saw exception: " + str(e), exc_info=False)
           raise
       finally:
-        self._return_client(superclient)
+        if not _connection_pool.check_pool_empty(self.conf):
+          self._return_client(superclient)
     wrapper.attr = attr_name # Save the name of the attribute as it is replaced by 'wrapper'
 
     return wrapper
