@@ -94,7 +94,7 @@ const TEMPLATE = `
       <!-- /ko -->
     </div>
     <div class="table-results" data-bind="visible: type() === 'table'" style="display: none;">
-      <div data-bind="visible: !executing() && showGrid() && hasSomeResult()" style="display: none; position: relative;">
+      <div data-bind="visible: !executing() && hasData() && showGrid()" style="display: none; position: relative;">
         <!-- ko component: { 
           name: 'result-grid',
           params: {
@@ -112,7 +112,7 @@ const TEMPLATE = `
           }
         } --><!-- /ko -->
       </div>
-      <div data-bind="visible: !executing() && showChart() && hasSomeResult()" style="display: none; position: relative;">
+      <div data-bind="visible: !executing() && hasData() && showChart()" style="display: none; position: relative;">
         <!-- ko component: {
           name: 'result-chart',
           params: {
@@ -128,8 +128,14 @@ const TEMPLATE = `
           }
         } --><!-- /ko -->
       </div>
-      <div data-bind="visible: !executing() && !hasSomeResult()" style="display: none;">
-        <h1 class="empty">${ I18n('Select and execute a query to see the result.') }</h1>
+      <div data-bind="visible: !executing() && !hasData() && !hasResultSet() && status() === 'available' && fetchedOnce()" style="display: none;">
+        <h1 class="empty">${ I18n('Success.') }</h1>
+      </div>
+      <div data-bind="visible: !executing() && !hasData() && hasResultSet() && status() === 'available' && fetchedOnce()" style="display: none;">
+        <h1 class="empty">${ I18n('Empty result.') }</h1>
+      </div>
+      <div data-bind="visible: !executing() && !hasData() && status() === 'expired'" style="display: none;">
+        <h1 class="empty">${ I18n('Results have expired, rerun the query if needed.') }</h1>
       </div>
       <div data-bind="visible: executing" style="display: none;">
         <h1 class="empty"><i class="fa fa-spinner fa-spin"></i> ${ I18n('Executing...') }</h1>
@@ -160,6 +166,7 @@ class SnippetResults extends DisposableComponent {
     this.images = ko.observableArray();
     this.hasMore = ko.observable();
     this.hasResultSet = ko.observable();
+    this.fetchedOnce = ko.observable(false);
 
     this.subscribe(CURRENT_QUERY_TAB_SWITCHED_EVENT, queryTab => {
       if (queryTab === 'queryResults') {
@@ -171,7 +178,7 @@ class SnippetResults extends DisposableComponent {
 
     this.executing = ko.pureComputed(() => this.status() === EXECUTION_STATUS.running);
 
-    this.hasSomeResult = ko.pureComputed(() => this.data().length);
+    this.hasData = ko.pureComputed(() => this.data().length);
 
     const trackedObservables = {
       showGrid: true,
@@ -236,27 +243,27 @@ class SnippetResults extends DisposableComponent {
           lastRenderedResult = executable;
         }
       } else {
-        this.reset();
+        this.resetResultData();
       }
     });
   }
 
-  reset() {
+  resetResultData() {
     this.images([]);
     this.lastFetchedRows([]);
     this.data([]);
     this.meta([]);
     this.hasMore(false);
     this.type(RESULT_TYPE.TABLE);
-    this.status(undefined);
   }
 
   updateFromExecutionResult(executionResult, refresh) {
     if (refresh) {
-      this.reset();
+      this.resetResultData();
     }
 
     if (executionResult) {
+      this.fetchedOnce(executionResult.fetchedOnce);
       this.hasMore(executionResult.hasMore);
       this.type(executionResult.type);
 
@@ -284,7 +291,7 @@ class SnippetResults extends DisposableComponent {
     this.status(executable.status);
     this.hasResultSet(executable.handle.has_result_set);
     if (!this.hasResultSet) {
-      this.reset();
+      this.resetResultData();
     }
   }
 
