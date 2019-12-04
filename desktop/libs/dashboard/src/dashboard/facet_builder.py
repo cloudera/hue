@@ -16,17 +16,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import division
-from __future__ import print_function
+from __future__ import division, print_function
 from future import standard_library
 standard_library.install_aliases()
 
 from builtins import str, range
+
 import logging
 import math
 import numbers
-import urllib.request, urllib.parse, urllib.error
 import re
+import urllib.request, urllib.parse, urllib.error
 
 from datetime import datetime, timedelta
 from math import ceil

@@ -37,7 +37,7 @@ enum34==1.1.6
 enum-compat==0.0.2
 et_xmlfile==1.0.1
 eventlet==0.24.1
-future==0.17.1
+future==0.18.2
 gcs-oauth2-boto-plugin==2.5
 greenlet==0.4.15
 gunicorn==19.9.0
