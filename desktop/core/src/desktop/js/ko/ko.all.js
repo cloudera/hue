@@ -112,6 +112,7 @@ import 'ko/bindings/ko.spinEdit';
 import 'ko/bindings/ko.splitDraggable';
 import 'ko/bindings/ko.splitFlexDraggable';
 import 'ko/bindings/ko.sqlContextPopover';
+import 'ko/bindings/ko.stickVertical';
 import 'ko/bindings/ko.storageContextPopover';
 import 'ko/bindings/ko.stretchDown';
 import 'ko/bindings/ko.tagEditor';
