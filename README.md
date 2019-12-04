@@ -12,7 +12,7 @@ Hue is an open source SQL Assistant for querying, visualizing and sharing data i
 
 It features:
 
-   * [Editors](http://gethue.com/sql-editor/) to query with SQL [any database](https://docs.gethue.com/administrator/configuration/connectors/) and submit jobs
+   * [Editors](http://gethue.com/new-sql-editor/) to query with SQL [any database](https://docs.gethue.com/administrator/configuration/connectors/) and submit jobs
    * [Dashboards](http://gethue.com/search-dashboards/) to dynamically interact and visualize data
    * [Scheduler](http://gethue.com/scheduling/) of jobs and workflows
    * [Catalog](http://gethue.com/browsers/) for browsing data storages and metadata
