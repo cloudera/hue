@@ -64,7 +64,7 @@ cache = caches[CACHES_HIVE_DISCOVERY_KEY]
 # Using file cache to make sure eventlet threads are uniform, this cache is persistent on startup
 # So we clear it to make sure the server resets hiveserver2 host.
 cache.clear()
-
+DBMS_OLDHS2_NAME_CACHE = {}
 
 def get(user, query_server=None, cluster=None):
   global DBMS_CACHE
@@ -98,6 +98,9 @@ def get(user, query_server=None, cluster=None):
 
 
 def get_query_server_config(name='beeswax', connector=None):
+  global DBMS_CACHE
+  global DBMS_CACHE_LOCK
+  username = user.username
   if connector and has_connectors(): # TODO: Give empty connector when no connector in use
     query_server = get_query_server_config_via_connector(connector)
   else:
@@ -134,11 +137,11 @@ def get_query_server_config(name='beeswax', connector=None):
           cache.set("llap", json.dumps({"host": LLAP_SERVER_HOST.get(), "port": LLAP_SERVER_THRIFT_PORT.get()}), CACHE_TIMEOUT.get())
       activeEndpoint = json.loads(cache.get("llap"))
     elif name != 'hms' and name != 'impala':
-      Endpoint = cache.get("hiveserver2")
-      if Endpoint is None:
+      endPoint = cache.get("hiveserver2")
+      if endPoint is None:
         activeEndpoint = None
       else:
-        activeEndpoint = Endpoint.get(username)
+        activeEndpoint = endPoint.get(username)
       activeEndpoint = cache.get("hiveserver2")
       if activeEndpoint is None:
         if HIVE_DISCOVERY_HS2.get():
@@ -148,7 +151,7 @@ def get_query_server_config(name='beeswax', connector=None):
           LOG.info("Setting up Hive with the following node {0}".format(znode))
           if zk.exists(znode):
             hiveservers = zk.get_children(znode)
-            server_to_use = abs(hash(str(username))) % 10 % len(hiveservers)
+            server_to_use = abs(hash(str(username))) % len(hiveservers)
             if hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[0] == DBMS_OLDHS2_NAME_CACHE.get(username):
               server_to_use = (server_to_use + 1) % len(hiveservers)
             DBMS_OLDHS2_NAME_CACHE[username] = hiveservers[server_to_use].split(";")[0].split("=")[1].split(":")[0]
