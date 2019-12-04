@@ -93,18 +93,13 @@ class TestDocumentApiSharingPermissions(object):
         'data': json.dumps(permissions)
     })
 
-  def share_doc_read_only(self, doc):
-    return self.share_doc(doc, {
-      'read': {
-        'user_ids': [
-          self.user.id
-        ],
-        'group_ids': []
-      },
-      'write': {
-        'user_ids': [],
-        'group_ids': []
-      }
+  def share_link_doc(self, doc, perm, is_on=False, client=None):
+    if client is None:
+      client = self.client
+
+    return client.post("/desktop/api2/doc/share/link", {
+        'uuid': json.dumps(doc.uuid),
+        'data': json.dumps({'name': 'link_%s' % perm, 'is_link_on': is_on})
     })
 
   def test_update_permissions(self):
@@ -125,24 +120,20 @@ class TestDocumentApiSharingPermissions(object):
   def test_share_document_permissions(self):
     # No doc
     response = self.client.get('/desktop/api2/docs/')
-    data = json.loads(response.content)
-    assert_false(data['documents'])
+    assert_false(json.loads(response.content)['documents'])
 
     response = self.client_not_me.get('/desktop/api2/docs/')
-    data = json.loads(response.content)
-    assert_false(data['documents'])
+    assert_false(json.loads(response.content)['documents'])
 
     # Add doc
     doc = self._add_doc('test_update_permissions')
     doc_id = '%s' % doc.id
 
     response = self.client.get('/desktop/api2/docs/')
-    data = json.loads(response.content)
-    assert_true(data['documents'])
+    assert_true(json.loads(response.content)['documents'])
 
     response = self.client_not_me.get('/desktop/api2/docs/')
-    data = json.loads(response.content)
-    assert_false(data['documents'])
+    assert_false(json.loads(response.content)['documents'])
 
     assert_true(doc.can_read(self.user))
     assert_true(doc.can_write(self.user))
@@ -172,12 +163,10 @@ class TestDocumentApiSharingPermissions(object):
     assert_false(doc.can_write(self.user_not_me))
 
     response = self.client.get('/desktop/api2/docs/')
-    data = json.loads(response.content)
-    assert_true(data['documents'])
+    assert_true(json.loads(response.content)['documents'])
 
     response = self.client_not_me.get('/desktop/api2/docs/')
-    data = json.loads(response.content)
-    assert_true(data['documents'])
+    assert_true(json.loads(response.content)['documents'])
 
     # Un-share
     response = self.share_doc(doc, {
@@ -201,12 +190,10 @@ class TestDocumentApiSharingPermissions(object):
     assert_false(doc.can_write(self.user_not_me))
 
     response = self.client.get('/desktop/api2/docs/')
-    data = json.loads(response.content)
-    assert_true(data['documents'])
+    assert_true(json.loads(response.content)['documents'])
 
     response = self.client_not_me.get('/desktop/api2/docs/')
-    data = json.loads(response.content)
-    assert_false(data['documents'])
+    assert_false(json.loads(response.content)['documents'])
 
     # Share by group
     default_group = get_default_user_group()
@@ -232,12 +219,10 @@ class TestDocumentApiSharingPermissions(object):
     assert_true(doc.can_write(self.user_not_me))
 
     response = self.client.get('/desktop/api2/docs/')
-    data = json.loads(response.content)
-    assert_true(data['documents'])
+    assert_true(json.loads(response.content)['documents'])
 
     response = self.client_not_me.get('/desktop/api2/docs/')
-    data = json.loads(response.content)
-    assert_true(data['documents'])
+    assert_true(json.loads(response.content)['documents'])
 
     # Un-share
     response = self.share_doc(doc, {
@@ -261,12 +246,10 @@ class TestDocumentApiSharingPermissions(object):
     assert_false(doc.can_write(self.user_not_me))
 
     response = self.client.get('/desktop/api2/docs/')
-    data = json.loads(response.content)
-    assert_true(data['documents'])
+    assert_true(json.loads(response.content)['documents'])
 
     response = self.client_not_me.get('/desktop/api2/docs/')
-    data = json.loads(response.content)
-    assert_false(data['documents'])
+    assert_false(json.loads(response.content)['documents'])
 
     # Modify by other user
     response = self.share_doc(doc, {
@@ -290,12 +273,10 @@ class TestDocumentApiSharingPermissions(object):
     assert_true(doc.can_write(self.user_not_me))
 
     response = self.client.get('/desktop/api2/docs/')
-    data = json.loads(response.content)
-    assert_true(data['documents'])
+    assert_true(json.loads(response.content)['documents'])
 
     response = self.client_not_me.get('/desktop/api2/docs/')
-    data = json.loads(response.content)
-    assert_true(data['documents'])
+    assert_true(json.loads(response.content)['documents'])
 
     # Un-share
     response = self.share_doc(doc, {
@@ -319,12 +300,10 @@ class TestDocumentApiSharingPermissions(object):
     assert_false(doc.can_write(self.user_not_me))
 
     response = self.client.get('/desktop/api2/docs/')
-    data = json.loads(response.content)
-    assert_true(data['documents'])
+    assert_true(json.loads(response.content)['documents'])
 
     response = self.client_not_me.get('/desktop/api2/docs/')
-    data = json.loads(response.content)
-    assert_false(data['documents'])
+    assert_false(json.loads(response.content)['documents'])
 
     # Modify by group
     response = self.share_doc(doc, {
@@ -348,12 +327,10 @@ class TestDocumentApiSharingPermissions(object):
     assert_true(doc.can_write(self.user_not_me))
 
     response = self.client.get('/desktop/api2/docs/')
-    data = json.loads(response.content)
-    assert_true(data['documents'])
+    assert_true(json.loads(response.content)['documents'])
 
     response = self.client_not_me.get('/desktop/api2/docs/')
-    data = json.loads(response.content)
-    assert_true(data['documents'])
+    assert_true(json.loads(response.content)['documents'])
 
     # Un-share
     response = self.share_doc(doc, {
@@ -377,12 +354,10 @@ class TestDocumentApiSharingPermissions(object):
     assert_false(doc.can_write(self.user_not_me))
 
     response = self.client.get('/desktop/api2/docs/')
-    data = json.loads(response.content)
-    assert_true(data['documents'])
+    assert_true(json.loads(response.content)['documents'])
 
     response = self.client_not_me.get('/desktop/api2/docs/')
-    data = json.loads(response.content)
-    assert_false(data['documents'])
+    assert_false(json.loads(response.content)['documents'])
 
 
   def test_update_permissions_cannot_escalate_privileges(self):
@@ -436,3 +411,115 @@ class TestDocumentApiSharingPermissions(object):
     assert_true(doc.can_write(self.user))
     assert_true(doc.can_read(self.user_not_me))
     assert_false(doc.can_write(self.user_not_me))
+
+
+  def test_link_sharing_permissions(self):
+    # Add doc
+    doc = self._add_doc('test_link_sharing_permissions')
+    doc_id = '%s' % doc.id
+
+    response = self.client.get('/desktop/api2/docs/?text=test_link_sharing_permissions')
+    assert_true(json.loads(response.content)['documents'])
+
+    response = self.client_not_me.get('/desktop/api2/docs/?text=test_link_sharing_permissions')
+    assert_false(json.loads(response.content)['documents'])
+
+    response = self.client.get('/desktop/api2/doc/?uuid=%s' % doc_id)
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    response = self.client_not_me.get('/desktop/api2/doc/?uuid=%s' % doc_id)
+    assert_equal(-1, json.loads(response.content)['status'], response.content)
+
+
+    assert_true(doc.can_read(self.user))
+    assert_true(doc.can_write(self.user))
+    assert_false(doc.can_read(self.user_not_me))
+    assert_false(doc.can_write(self.user_not_me))
+
+    # Share by read link
+    response = self.share_link_doc(doc, perm='read', is_on=True)
+
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    assert_true(doc.can_read(self.user))
+    assert_true(doc.can_write(self.user))
+    assert_true(doc.can_read(self.user_not_me))
+    assert_false(doc.can_write(self.user_not_me))
+
+    response = self.client.get('/desktop/api2/docs/?text=test_link_sharing_permissions')
+    assert_true(json.loads(response.content)['documents'])
+
+    response = self.client_not_me.get('/desktop/api2/docs/?text=test_link_sharing_permissions')
+    assert_false(json.loads(response.content)['documents'])  #  Link sharing does not list docs in Home, only provides direct access
+
+    response = self.client.get('/desktop/api2/doc/?uuid=%s' % doc_id)
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    response = self.client_not_me.get('/desktop/api2/doc/?uuid=%s' % doc_id)
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    # Un-share
+    response = self.share_link_doc(doc, perm='read', is_on=False)
+
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    assert_true(doc.can_read(self.user))
+    assert_true(doc.can_write(self.user))
+    assert_false(doc.can_read(self.user_not_me))
+    assert_false(doc.can_write(self.user_not_me))
+
+    response = self.client.get('/desktop/api2/docs/?text=test_link_sharing_permissions')
+    assert_true(json.loads(response.content)['documents'])
+
+    response = self.client_not_me.get('/desktop/api2/docs/?text=test_link_sharing_permissions')
+    assert_false(json.loads(response.content)['documents'])
+
+    response = self.client.get('/desktop/api2/doc/?uuid=%s' % doc_id)
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    response = self.client_not_me.get('/desktop/api2/doc/?uuid=%s' % doc_id)
+    assert_equal(-1, json.loads(response.content)['status'], response.content)
+
+    # Share by write link
+    response = self.share_link_doc(doc, perm='write', is_on=True)
+
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    assert_true(doc.can_read(self.user))
+    assert_true(doc.can_write(self.user))
+    assert_true(doc.can_read(self.user_not_me))
+    assert_true(doc.can_write(self.user_not_me))
+
+    response = self.client.get('/desktop/api2/docs/?text=test_link_sharing_permissions')
+    assert_true(json.loads(response.content)['documents'])
+
+    response = self.client_not_me.get('/desktop/api2/docs/?text=test_link_sharing_permissions')
+    assert_false(json.loads(response.content)['documents'])
+
+    response = self.client.get('/desktop/api2/doc/?uuid=%s' % doc_id)
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    response = self.client_not_me.get('/desktop/api2/doc/?uuid=%s' % doc_id)
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    # Un-share
+    response = self.share_link_doc(doc, perm='write', is_on=False)
+
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    assert_true(doc.can_read(self.user))
+    assert_true(doc.can_write(self.user))
+    assert_false(doc.can_read(self.user_not_me))
+    assert_false(doc.can_write(self.user_not_me))
+
+    response = self.client.get('/desktop/api2/docs/?text=test_link_sharing_permissions')
+    assert_true(json.loads(response.content)['documents'])
+
+    response = self.client_not_me.get('/desktop/api2/docs/?text=test_link_sharing_permissions')
+    assert_false(json.loads(response.content)['documents'])
+
+    response = self.client.get('/desktop/api2/doc/?uuid=%s' % doc_id)
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    response = self.client_not_me.get('/desktop/api2/doc/?uuid=%s' % doc_id)
+    assert_equal(-1, json.loads(response.content)['status'], response.content)
