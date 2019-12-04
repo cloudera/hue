@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import apps from 'ko/components/appSwitcher/apps.v2';
 import componentUtils from 'ko/components/componentUtils';

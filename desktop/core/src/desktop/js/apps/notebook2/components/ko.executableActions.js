@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import componentUtils from 'ko/components/componentUtils';
 import I18n from 'utils/i18n';

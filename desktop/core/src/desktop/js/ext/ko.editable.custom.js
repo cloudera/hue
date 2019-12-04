@@ -17,7 +17,7 @@
 // based on the original https://github.com/brianchance/knockout-x-editable
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 ko.bindingHandlers.editable = {
   init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {

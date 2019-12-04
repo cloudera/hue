@@ -17,7 +17,7 @@
 import $ from 'jquery';
 import d3v3 from 'd3v3';
 import 'ext/d3-tip.min';
-import ko from 'knockout';
+import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
 
 import apiHelper from 'api/apiHelper';
