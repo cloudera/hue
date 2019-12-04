@@ -432,7 +432,7 @@ app look at home in Hue.
 After changing the CSS in a .less file, rebuilding with:
 
     npm run less
-    
+
 Or run in watch mode that will generate the .css on any change to the .less files:
 
     npm run less-dev
@@ -677,6 +677,7 @@ Update the versions to the next release (current release +1):
     :100644 100644 4db6d5f... f907d04... M	VERSION
     :100644 100644 9332f95... 45b28ad... M	desktop/libs/librdbms/java/pom.xml
     :100644 100644 551f62f... 694f021... M	maven/pom.xml
+    :100644 100644 658d54a... 671ce01... M  package.json
 
 How to count the number of commits since the last release:
 
@@ -712,7 +713,6 @@ Other things to update:
 
 * In Jira, setting the [release as shipped](https://issues.cloudera.org/projects/HUE?selectedItem=com.atlassian.jira.jira-projects-plugin%3Arelease-page&status=all) and moving all non finished jiras to another target. Also archiving old releases.
 * Create the after next release tag in Jira and Blog
-* Update http://gethue.com 'Release' menu
 * Update Docker image https://hub.docker.com/u/gethue/
 * Update release date on https://wikipedia.org/wiki/Hue_(Software)
 
