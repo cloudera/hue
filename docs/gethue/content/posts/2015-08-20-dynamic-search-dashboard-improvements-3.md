@@ -66,25 +66,25 @@ Links to the original documents can also be inserted. Add to the record a field
 
 Any link
 
-{{< highlight javascript >}}{'type': 'link', 'link': 'gethue.com'}{{< /highlight >}}
+<pre><code class="javascript">{'type': 'link', 'link': 'gethue.com'}</code></pre>
 
 HBase Browser
 
-{{< highlight javascript >}}{'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527'}
+<pre><code class="javascript">{'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527'}
 
 {'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1'}
 
 {'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1', 'col': 'c1'}
 
-{{< /highlight >}}
+</code></pre>
 
 File Browser
 
-{{< highlight javascript >}}{'type': 'hdfs', 'path': '/data/hue/file.txt'}{{< /highlight >}}
+<pre><code class="javascript">{'type': 'hdfs', 'path': '/data/hue/file.txt'}</code></pre>
 
 Metastore
 
-{{< highlight javascript >}}{'type': 'hive', 'database': 'default', 'table': 'sample_07'}{{< /highlight >}}
+<pre><code class="javascript">{'type': 'hive', 'database': 'default', 'table': 'sample_07'}</code></pre>
 
 <img src="https://cdn.gethue.com/uploads/2015/08/search-link-1024x630.png" />
 
@@ -128,11 +128,11 @@ The dashboard experience is even more real with this new browser full screen mod
 
 Solr 5.1 is seeing new [Analytics Facets][8]. A beta support for them has been added and can be enabled in the hue.ini with:
 
-{{< highlight bash >}}[search]
+<pre><code class="bash">[search]
 
 latest=true
 
-{{< /highlight >}}
+</code></pre>
 
 A more comprehensive demo is available on the [BikeShare data visualization][2] post.
 

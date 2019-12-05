@@ -63,29 +63,29 @@ categories:
 
 <span style="font-weight: 400;">Based on the <a href="https://github.com/cloudera/hue/tree/master/apps/spark/java#building-livy">README</a>, we check out Livy's code. It is currently living in Hue repository for simplicity but hopefully will eventually graduate in its top project.</span>
 
-{{< highlight bash >}}git clone git@github.com:cloudera/hue.git{{< /highlight >}}
+<pre><code class="bash">git clone git@github.com:cloudera/hue.git</code></pre>
 
 <span style="font-weight: 400;">Then we compile Livy with</span>
 
-{{< highlight bash >}}cd hue/apps/spark/java
+<pre><code class="bash">cd hue/apps/spark/java
 
 mvn -DskipTests clean package
 
-{{< /highlight >}}
+</code></pre>
 
 <span style="font-weight: 400;">Export these variables</span>
 
-{{< highlight bash >}}export SPARK_HOME=/usr/lib/spark
+<pre><code class="bash">export SPARK_HOME=/usr/lib/spark
 
-export HADOOP_CONF_DIR=/etc/hadoop/conf{{< /highlight >}}
+export HADOOP_CONF_DIR=/etc/hadoop/conf</code></pre>
 
 <span style="font-weight: 400;">And start it</span>
 
-{{< highlight bash >}}./bin/livy-server{{< /highlight >}}
+<pre><code class="bash">./bin/livy-server</code></pre>
 
 **Note**: Livy defaults to Spark local mode, to use the YARN mode copy the configuration template file [apps/spark/java/conf/livy-defaults.conf.tmpl][4] into livy-defaults.conf and set the property:
 
-{{< highlight bash >}}livy.server.session.factory = yarn{{< /highlight >}}
+<pre><code class="bash">livy.server.session.factory = yarn</code></pre>
 
 &nbsp;
 
@@ -95,31 +95,31 @@ As the REST server is running, we can communicate with it. We are on the same ma
 
 <span style="font-weight: 400;">Let's list our open sessions</span>
 
-{{< highlight bash >}}curl localhost:8998/sessions
+<pre><code class="bash">curl localhost:8998/sessions
 
 {"from":0,"total":0,"sessions":[]}
 
-{{< /highlight >}}
+</code></pre>
 
 Note
 
 You can use
 
-{{< highlight bash >}} | python -m json.tool{{< /highlight >}}
+<pre><code class="bash"> | python -m json.tool</code></pre>
 
 at the end of the command to prettify the output, e.g.:
 
-{{< highlight bash >}}curl localhost:8998/sessions/0 | python -m json.tool{{< /highlight >}}
+<pre><code class="bash">curl localhost:8998/sessions/0 | python -m json.tool</code></pre>
 
 &nbsp;
 
 <span style="font-weight: 400;">There is zero session. We create an interactive PySpark session</span>
 
-{{< highlight bash >}}curl -X POST -data '{"kind": "pyspark"}' -H "Content-Type: application/json" localhost:8998/sessions
+<pre><code class="bash">curl -X POST -data '{"kind": "pyspark"}' -H "Content-Type: application/json" localhost:8998/sessions
 
 {"id":0,"state":"starting","kind":"pyspark","log":[]}
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -173,7 +173,7 @@ Livy supports the three languages of Spark:
 
 We check the status of the session until its state becomes `idle`: it means it is ready to be execute snippet of PySpark:
 
-{{< highlight bash >}}curl localhost:8998/sessions/0 | python -m json.tool
+<pre><code class="bash">curl localhost:8998/sessions/0 | python -m json.tool
 
 % Total % Received % Xferd Average Speed Time Time Time Current
 
@@ -213,7 +213,7 @@ Dload Upload Total Spent Left Speed
 
 "state": "idle"
 
-}{{< /highlight >}}
+}</code></pre>
 
 &nbsp;
 
@@ -227,19 +227,19 @@ Dload Upload Total Spent Left Speed
 
 <span style="font-weight: 400;">When the session state is <code>idle</code>, it means it is ready to accept statements! Lets compute <code>1 + 1</code></span>
 
-{{< highlight bash >}}curl localhost:8998/sessions/0/statements -X POST -H 'Content-Type: application/json' -d '{"code":"1 + 1"}'
+<pre><code class="bash">curl localhost:8998/sessions/0/statements -X POST -H 'Content-Type: application/json' -d '{"code":"1 + 1"}'
 
 {"id":0,"state":"running","output":null}
 
-{{< /highlight >}}
+</code></pre>
 
 We check the result of statement 0 when its state is `available`
 
-{{< highlight bash >}}curl localhost:8998/sessions/0/statements/0
+<pre><code class="bash">curl localhost:8998/sessions/0/statements/0
 
 {"id":0,"state":"available","output":{"status":"ok","execution_count":0,"data":{"text/plain":"2"}}}
 
-{{< /highlight >}}
+</code></pre>
 
 Note
 
@@ -247,29 +247,29 @@ If the statement is taking less than a few milliseconds, Livy returns the respo
 
 Statements are incrementing and all share the same context, so we can have a sequences
 
-{{< highlight bash >}}curl localhost:8998/sessions/0/statements -X POST -H 'Content-Type: application/json' -d '{"code":"a = 10"}'
+<pre><code class="bash">curl localhost:8998/sessions/0/statements -X POST -H 'Content-Type: application/json' -d '{"code":"a = 10"}'
 
 {"id":1,"state":"available","output":{"status":"ok","execution_count":1,"data":{"text/plain":""}}}
 
-{{< /highlight >}}
+</code></pre>
 
 Spanning multiple statements
 
-{{< highlight bash >}}curl localhost:8998/sessions/5/statements -X POST -H 'Content-Type: application/json' -d '{"code":"a + 1"}'
+<pre><code class="bash">curl localhost:8998/sessions/5/statements -X POST -H 'Content-Type: application/json' -d '{"code":"a + 1"}'
 
 {"id":2,"state":"available","output":{"status":"ok","execution_count":2,"data":{"text/plain":"11"}}}
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
 <span style="font-weight: 400;">Let's close the session to free up the cluster. Note that Livy will automatically inactive idle sessions after 1 hour (<a href="https://github.com/cloudera/hue/blob/master/apps/spark/java/conf/livy-defaults.conf.tmpl#L17">configurable</a>).</span>
 
-{{< highlight bash >}}curl localhost:8998/sessions/0 -X DELETE
+<pre><code class="bash">curl localhost:8998/sessions/0 -X DELETE
 
 {"msg":"deleted"}
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -277,15 +277,15 @@ Spanning multiple statements
 
 Let's say we want to create a shell running as the user `bob`, this is particularly useful when multi users are sharing a Notebook server
 
-{{< highlight bash >}}curl -X POST -data '{"kind": "pyspark", "proxyUser": "bob"}' -H "Content-Type: application/json" localhost:8998/sessions
+<pre><code class="bash">curl -X POST -data '{"kind": "pyspark", "proxyUser": "bob"}' -H "Content-Type: application/json" localhost:8998/sessions
 
 {"id":0,"state":"starting","kind":"pyspark","proxyUser":"bob","log":[]}
 
-{{< /highlight >}}
+</code></pre>
 
 Do not forget to add the user running Hue (your current login in dev or `hue` in production) in the Hadoop proxy user list (`/etc/hadoop/conf/core-site.xml`):
 
-{{< highlight xml >}}<property>
+<pre><code class="xml"><property>
 
 <name>hadoop.proxyuser.hue.hosts</name>
 
@@ -301,15 +301,15 @@ Do not forget to add the user running Hue (your current login in dev or `hue` in
 
 </property>
 
-{{< /highlight >}}
+</code></pre>
 
 ## <span style="font-weight: 400;">Additional properties</span>
 
 <span style="font-weight: 400;">All the properties supported by spark shells like the <a href="https://github.com/cloudera/hue/tree/master/apps/spark/java#request-body">number of executors, the memory</a>, etc can be changed at session creation. Their format is the same as when typing <code>spark-shell -h</code></span>
 
-{{< highlight bash >}}curl -X POST -data '{"kind": "pyspark", "numExecutors": "3", "executorMemory": "2G"}' -H "Content-Type: application/json" localhost:8998/sessions
+<pre><code class="bash">curl -X POST -data '{"kind": "pyspark", "numExecutors": "3", "executorMemory": "2G"}' -H "Content-Type: application/json" localhost:8998/sessions
 
-{"id":0,"state":"starting","kind":"pyspark","numExecutors":"3","executorMemory":"2G","log":[]} {{< /highlight >}}
+{"id":0,"state":"starting","kind":"pyspark","numExecutors":"3","executorMemory":"2G","log":[]} </code></pre>
 
 &nbsp;
 

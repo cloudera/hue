@@ -58,7 +58,7 @@ categories:
 
 &nbsp;
 
-{{< highlight sql >}}REGISTER piggybank.jar
+<pre><code class="sql">REGISTER piggybank.jar
 
 data = load '/user/hive/warehouse/review/yelp_academic_dataset_review_clean.json'
 
@@ -102,7 +102,7 @@ USING org.apache.pig.piggybank.storage.avro.AvroStorage(
 
 ]}
 
-}');{{< /highlight >}}
+}');</code></pre>
 
 &nbsp;
 
@@ -110,7 +110,7 @@ USING org.apache.pig.piggybank.storage.avro.AvroStorage(
 
 &nbsp;
 
-{{< highlight sql >}}CREATE TABLE review_avro
+<pre><code class="sql">CREATE TABLE review_avro
 
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.avro.AvroSerDe'
 
@@ -150,7 +150,7 @@ tblproperties ('avro.schema.literal'='{
 
 {"name":"user_id", "type":"string"}]}'
 
-);{{< /highlight >}}
+);</code></pre>
 
 &nbsp;
 
@@ -158,7 +158,7 @@ tblproperties ('avro.schema.literal'='{
 
 &nbsp;
 
-{{< highlight sql >}}REFRESH avro_table{{< /highlight >}}
+<pre><code class="sql">REFRESH avro_table</code></pre>
 
 &nbsp;
 
@@ -168,7 +168,7 @@ tblproperties ('avro.schema.literal'='{
 
 &nbsp;
 
-{{< highlight sql >}}CREATE TABLE review_parquet LIKE review STORED AS PARQUETFILE;{{< /highlight >}}
+<pre><code class="sql">CREATE TABLE review_parquet LIKE review STORED AS PARQUETFILE;</code></pre>
 
 &nbsp;
 
@@ -176,7 +176,7 @@ tblproperties ('avro.schema.literal'='{
 
 &nbsp;
 
-{{< highlight sql >}}INSERT OVERWRITE review_parquet SELECT * FROM review;{{< /highlight >}}
+<pre><code class="sql">INSERT OVERWRITE review_parquet SELECT * FROM review;</code></pre>
 
 &nbsp;
 

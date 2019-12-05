@@ -40,11 +40,11 @@ categories:
 ---
 When using Hadoop security and scheduling jobs using [Hive][1] (or Pig, [HBase][2]) you might have received this error:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 Caused by: MetaException(message:Could not connect to meta store using any of the URIs provided. Most recent failure: org.apache.thrift.transport.TTransportException: GSS initiate failed
 
-{{< /highlight >}}
+</code></pre>
 
 Indeed, in order to use an Oozie Hive action with the Hive metastore server when Kerberos is enabled, you need to use HCatalog credentials in your workflow.
 
@@ -69,7 +69,7 @@ Hive should not access directly the metastore database via JDBC, or it will bypa
 
 Include a <span style="color: #ff0000;">hive-config.xml</span> in the Job XML property of the Hive action with this type of configuration:
 
-{{< highlight xml >}}
+<pre><code class="xml">
 
 <property>
 
@@ -103,11 +103,11 @@ Include a <span style="color: #ff0000;">hive-config.xml</span> in the Job XML pr
 
 </property>
 
-{{< /highlight >}}
+</code></pre>
 
 Use this one:
 
-{{< highlight xml >}}
+<pre><code class="xml">
 
 <property>
 
@@ -133,21 +133,21 @@ Use this one:
 
 </property>
 
-{{< /highlight >}}
+</code></pre>
 
 **Note**:
 
 When the job will try to connect to MySql, you might hit this missing jar problem:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 Caused by: org.datanucleus.store.rdbms.datasource.DatastoreDriverNotFoundException: The specified datastore driver ("com.mysql.jdbc.Driver") was not found in the CLASSPATH. Please check your CLASSPATH specification, and the name of the driver.
 
-<pre>{{< /highlight >}}
+<pre></code></pre>
 
 To solve it, simply download the MySql jar connector from http://dev.mysql.com/downloads/connector/j/, and have HiveServer2 points to it with:
 
-{{< highlight xml >}}
+<pre><code class="xml">
 
 <property>
 
@@ -157,13 +157,13 @@ To solve it, simply download the MySql jar connector from http://dev.mysql.com/d
 
 </property>
 
-{{< /highlight >}}
+</code></pre>
 
 **Note**:
 
 To activate the credentials in Oozie itself, update this property in oozie-site.xml
 
-{{< highlight xml >}}
+<pre><code class="xml">
 
 <property>
 
@@ -179,7 +179,7 @@ To activate the credentials in Oozie itself, update this property in oozie-site.
 
 </property>
 
-{{< /highlight >}}
+</code></pre>
 
  [1]: https://gethue.com/hadoop-tutorial-how-to-access-hive-in-pig-with/
  [2]: https://gethue.com/hadoop-tutorial-use-pig-and-hive-with-hbase/

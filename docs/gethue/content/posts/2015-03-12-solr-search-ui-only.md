@@ -59,23 +59,23 @@ The [Solr Search App][1] is having a great success and users often wonder if th
 
 In the hue.ini (See '[Where is my hue.ini][4]'?), blacklist all the other apps:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [desktop]
 
 app_blacklist=beeswax,impala,security,filebrowser,jobbrowser,rdbms,jobsub,pig,hbase,sqoop,zookeeper,metastore,spark,oozie
 
-{{< /highlight >}}
+</code></pre>
 
 At the same time, double check Hue is pointing to your correct Solr:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [search]
 
 solr_url=http://localhost:8983/solr/
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -93,7 +93,7 @@ Have any questions? Feel free to contact us on [hue-user][6] or [@gethue][7]!
 
 If you want to install the examples you could enable the [indexer][8]
 
-{{< highlight bash >}}indexer{{< /highlight >}}
+<pre><code class="bash">indexer</code></pre>
 
 **
 

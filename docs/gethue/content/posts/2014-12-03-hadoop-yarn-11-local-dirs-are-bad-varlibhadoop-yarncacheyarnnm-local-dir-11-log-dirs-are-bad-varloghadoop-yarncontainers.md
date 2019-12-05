@@ -42,11 +42,11 @@ categories:
 ---
 If you are getting this error, make some disk space!
 
-{{< highlight bash >}}
+<pre><code class="bash">
   
 1/1 local-dirs are bad: /var/lib/hadoop-yarn/cache/yarn/nm-local-dir; 1/1 log-dirs are bad: /var/log/hadoop-yarn/containers
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -54,7 +54,7 @@ If you are getting this error, make some disk space!
 
 ## Node Manager logs
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 yarn.server.nodemanager.DirectoryCollection: Directory /var/lib/hadoop-yarn/cache/yarn/nm-local-dir error, used space above threshold of 90.0%, removing from list of valid directories
   
@@ -62,17 +62,17 @@ yarn.server.nodemanager.DirectoryCollection: Directory /var/lib/hadoop-yarn/cach
   
 2014-11-17 17:45:00,713 INFO org.apache.hadoop.yarn.server.nodemanager.LocalDirsHandlerService: Disk(s) failed: 1/1 local-dirs are bad: /var/lib/hadoop-yarn/cache/yarn/nm-local-dir; 1/1 log-dirs are bad: /var/log/hadoop
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
 ## Resource Manager logs
 
-{{< highlight bash >}}
+<pre><code class="bash">
   
 2014-11-17 16:57:07,301 INFO org.apache.hadoop.yarn.server.resourcemanager.rmnode.RMNodeImpl: Node localhost:34650 reported UNHEALTHY with details: 1/1 local-dirs are bad: /var/lib/hadoop-yarn/cache/yarn/nm-local-dir; 1/1 log-dirs are bad: /var/log/hadoop-yarn/containers
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 

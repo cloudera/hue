@@ -63,11 +63,11 @@ When Hue database has too many entries in certain tables, it will cause performa
   <span style="font-weight: 400;">Go to Hue directory and run following clean up command</span>
 </li>
 
-{{< highlight bash >}}cd /opt/cloudera/parcels/CDH/lib/hue # Hue home directory
+<pre><code class="bash">cd /opt/cloudera/parcels/CDH/lib/hue # Hue home directory
 
 ./build/env/bin/hue desktop_document_cleanup
 
-{{< /highlight >}}
+</code></pre>
 
 Note: if using Cloudera Manager you probably need the instructions detailed in the [Hue Shell][2] post.
 

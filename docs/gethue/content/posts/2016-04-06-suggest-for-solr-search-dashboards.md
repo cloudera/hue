@@ -58,7 +58,7 @@ We hope that you like the interactivity, and feel free to send feedbackÂ on theÂ
 
 First grab a [Solr 5][4], start it and make sure that it has a suggester configured:
 
-{{< highlight bash >}}romain@unreal:$ ./bin/solr -e techproducts
+<pre><code class="bash">romain@unreal:$ ./bin/solr -e techproducts
 
 Waiting to see Solr listening on port 8983 [/]
 
@@ -68,11 +68,11 @@ Checked core existence using Core API command:
 
 http://localhost:8983/solr/admin/cores?action=STATUS&core=techproducts
 
-{{< /highlight >}}
+</code></pre>
 
 Confirm that Solr has a `suggester` configured, here named `mySuggester`:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 http://127.0.0.1:8983/solr/#/techproducts/files?file=solrconfig.xml
 
@@ -98,7 +98,7 @@ http://127.0.0.1:8983/solr/#/techproducts/files?file=solrconfig.xml
 
 </searchComponent>
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 

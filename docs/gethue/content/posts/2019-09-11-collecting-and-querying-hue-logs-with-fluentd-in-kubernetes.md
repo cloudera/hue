@@ -49,12 +49,12 @@ Hue is getting easy to run with its [Docker][1] container and Kubernetes [Helm p
 
 First we install the [fluentd add-on][5]:
 
-<pre class="brush: bash; title: ; notranslate" title="">microk8s.enable fluentd
-</pre>
+<pre><code class="bash">microk8s.enable fluentd
+</code></pre>
 
 And see that the Elastic Search, Fluentd and Kibana UI are running:
 
-<pre class="brush: bash; title: ; notranslate" title="">kubectl get pods -A
+<pre><code class="bash">kubectl get pods -A
 NAMESPACE            NAME                                     READY   STATUS    RESTARTS   AGE
 container-registry   registry-577986746b-btjdz                1/1     Running   299        96d
 default              hue-rp2qf                                1/1     Running   69         32d
@@ -68,14 +68,14 @@ kube-system          kibana-logging-df8d4c8fd-kms74           1/1     Running   
 kube-system          kube-dns-6bfbdd666c-gzbh9                3/3     Running   369        47d
 kube-system          metrics-server-v0.2.1-57dfcb796b-9v7dn   2/2     Running   832        114d
 kube-system          tiller-deploy-765dcb8745-zlm6t           1/1     Running   382        106d
-</pre>
+</code></pre>
 
 Microk8s automatically ships the logs of each container. If you are curious, here is one way to see its configuration:
 
-<pre class="brush: bash; title: ; notranslate" title="">kubectl edit configmaps fluentd-es-config-v0.1.5 -n kube-system
-</pre>
+<pre><code class="bash">kubectl edit configmaps fluentd-es-config-v0.1.5 -n kube-system
+</code></pre>
 
-<pre class="brush: bash; title: ; notranslate" title="">containers.input.conf: |2-
+<pre><code class="bash">containers.input.conf: |2-
 
     &lt;source&gt;
       @id fluentd-containers.log
@@ -108,17 +108,17 @@ Microk8s automatically ships the logs of each container. If you are curious, her
       max_bytes 500000
       max_lines 1000
     &lt;/match&gt;
-</pre>
+</code></pre>
 
 Fluent inject some metadata to each log line. It contains information about Kubernetes properties like container and image names. Now let&#8217;s open the Kibana UI and look at the &#8220;hue&#8221; container logs:
 
-<pre class="brush: bash; title: ; notranslate" title="">https://127.0.0.1:16443/api/v1/namespaces/kube-system/services/kibana-logging/proxy/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now%2Fd,mode:quick,to:now%2Fd))&_a=(columns:!(log),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:b51668f0-a9aa-11e9-afc4-53db22981ed0,key:kubernetes.container_name,negate:!f,params:(query:hue,type:phrase),type:phrase,value:hue),query:(match:(kubernetes.container_name:(query:hue,type:phrase))))),index:b51668f0-a9aa-11e9-afc4-53db22981ed0,interval:auto,query:(language:lucene,query:''),sort:!('@timestamp',desc))
-</pre>
+<pre><code class="bash">https://127.0.0.1:16443/api/v1/namespaces/kube-system/services/kibana-logging/proxy/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now%2Fd,mode:quick,to:now%2Fd))&_a=(columns:!(log),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:b51668f0-a9aa-11e9-afc4-53db22981ed0,key:kubernetes.container_name,negate:!f,params:(query:hue,type:phrase),type:phrase,value:hue),query:(match:(kubernetes.container_name:(query:hue,type:phrase))))),index:b51668f0-a9aa-11e9-afc4-53db22981ed0,interval:auto,query:(language:lucene,query:''),sort:!('@timestamp',desc))
+</code></pre>
 
 The credentials can be seen by looking at the bottom of the command:
 
-<pre class="brush: bash; title: ; notranslate" title="">microk8s.config
-</pre>
+<pre><code class="bash">microk8s.config
+</code></pre>
 
 Then select the indexes with the &#8220;logs*&#8221; patterns and use &#8220;@timestamp&#8221; as the time field:
 

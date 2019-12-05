@@ -83,23 +83,23 @@ Then open up Beeswax in the [Hadoop UI Hue][5], click on the 'Settings' tab.
 
 In File Resources, upload _<span class="code">myudfs.jar</span>_, pick the jar file and point to it, e.g.:
 
-{{< highlight bash >}}/user/hue/myudf.jar{{< /highlight >}}
+<pre><code class="bash">/user/hue/myudf.jar</code></pre>
 
 Make the UDF available by registering a UDF (User Defined Function ):
 
 Name
 
-{{< highlight bash >}}myUpper{{< /highlight >}}
+<pre><code class="bash">myUpper</code></pre>
 
 Class
 
-{{< highlight bash >}}org.hue.udf.MyUpper{{< /highlight >}}
+<pre><code class="bash">org.hue.udf.MyUpper</code></pre>
 
 &nbsp;
 
 **That’s it**! Just test it on one of the Hue example tables:
 
-{{< highlight sql >}}select myUpper(description) FROM sample_07 limit 10{{< /highlight >}}
+<pre><code class="sql">select myUpper(description) FROM sample_07 limit 10</code></pre>
 
 # Summary
 
@@ -115,7 +115,7 @@ Have any questions? Feel free to contact us on [hue-user][7] or [@gethue][8]!
 
 If you did not register the UDF as explained above, you will get this error:
 
-{{< highlight bash >}}error while compiling statement: failed: parseexception line 1:0 cannot recognize input near 'myupper' " "{{< /highlight >}}
+<pre><code class="bash">error while compiling statement: failed: parseexception line 1:0 cannot recognize input near 'myupper' " "</code></pre>
 
  [1]: https://github.com/romainr/hadoop-tutorials-examples
  [2]: https://github.com/romainr/hadoop-tutorials-examples/raw/master/hive-udf/myudfs.jar

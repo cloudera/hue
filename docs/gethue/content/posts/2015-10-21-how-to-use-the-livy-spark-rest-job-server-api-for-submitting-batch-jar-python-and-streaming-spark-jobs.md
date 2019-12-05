@@ -61,7 +61,7 @@ We are using the `YARN` mode here, so all the paths needs to exist on HDFS. For 
 
 <span style="font-weight: 400;">Livy offers a wrapper around <code>spark-submit</code> that work with jar and py files. The API is slightly different than the interactive. Let's start by listing the active running jobs:</span>
 
-{{< highlight bash >}}curl localhost:8998/sessions | python -m json.tool % Total % Received % Xferd Average Speed Time Time Time Current
+<pre><code class="bash">curl localhost:8998/sessions | python -m json.tool % Total % Received % Xferd Average Speed Time Time Time Current
 
 Dload Upload Total Spent Left Speed
 
@@ -77,19 +77,19 @@ Dload Upload Total Spent Left Speed
 
 }
 
-{{< /highlight >}}
+</code></pre>
 
 Then we upload the Spark example jar `/usr/lib/spark/lib/spark-examples.jar` on HDFS and point to it. If you are using Livy in local mode and not YARN mode, just keep the local path `/usr/lib/spark/lib/spark-examples.jar`.
 
-{{< highlight bash >}}curl -X POST -data '{"file": "/user/romain/spark-examples.jar", "className": "org.apache.spark.examples.SparkPi"}' -H "Content-Type: application/json" localhost:8998/batches
+<pre><code class="bash">curl -X POST -data '{"file": "/user/romain/spark-examples.jar", "className": "org.apache.spark.examples.SparkPi"}' -H "Content-Type: application/json" localhost:8998/batches
 
 {"id":0,"state":"running","log":[]}
 
-{{< /highlight >}}
+</code></pre>
 
 We get the submission id, in our case 0, and can check its progress. It should actually already be done:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 curl localhost:8998/batches/0 | python -m json.tool
 
@@ -131,11 +131,11 @@ Dload Upload Total Spent Left Speed
 
 }
 
-{{< /highlight >}}
+</code></pre>
 
 We can see the output logs:
 
-{{< highlight bash >}}curl localhost:8998/batches/0/log | python -m json.tool
+<pre><code class="bash">curl localhost:8998/batches/0/log | python -m json.tool
 
 % Total % Received % Xferd Average Speed Time Time Time Current
 
@@ -217,37 +217,37 @@ Dload Upload Total Spent Left Speed
 
 }
 
-{{< /highlight >}}
+</code></pre>
 
 We can add an argument to the command, for example do 100 iterations that way the result is more precise and will run longer:
 
-{{< highlight bash >}}curl -X POST -data '{"file": "/usr/lib/spark/lib/spark-examples.jar", "className": "org.apache.spark.examples.SparkPi", "args": ["100"]}' -H "Content-Type: application/json" localhost:8998/batches
+<pre><code class="bash">curl -X POST -data '{"file": "/usr/lib/spark/lib/spark-examples.jar", "className": "org.apache.spark.examples.SparkPi", "args": ["100"]}' -H "Content-Type: application/json" localhost:8998/batches
 
 {"id":1,"state":"running","log":[]}
 
-{{< /highlight >}}
+</code></pre>
 
 In case we want to stop the running job, we just issue:
 
-{{< highlight bash >}}curl -X DELETE localhost:8998/batches/1
+<pre><code class="bash">curl -X DELETE localhost:8998/batches/1
 
 {"msg":"deleted"}
 
-{{< /highlight >}}
+</code></pre>
 
 Doing it another time will return nothing as the job was removed from Livy:
 
-{{< highlight bash >}}curl -X DELETE localhost:8998/batches/1
+<pre><code class="bash">curl -X DELETE localhost:8998/batches/1
 
 session not found
 
-{{< /highlight >}}
+</code></pre>
 
 ## **Submitting a Python job**
 
 <span style="font-weight: 400;">Submitting Python jobs is almost identical to jar jobs. We uncompress the spark examples and upload <code>pi.py</code> on HDFS:</span>
 
-{{< highlight bash >}}~/tmp$ tar -zxvf /usr/lib/spark/examples/lib/python.tar.gz
+<pre><code class="bash">~/tmp$ tar -zxvf /usr/lib/spark/examples/lib/python.tar.gz
 
 ./
 
@@ -291,17 +291,17 @@ session not found
 
 ./hbase_inputformat.py
 
-{{< /highlight >}}
+</code></pre>
 
 Then start the job:
 
-{{< highlight bash >}}curl -X POST -data '{"file": "/user/romain/pi.py"}' -H "Content-Type: application/json" localhost:8998/batches
+<pre><code class="bash">curl -X POST -data '{"file": "/user/romain/pi.py"}' -H "Content-Type: application/json" localhost:8998/batches
 
-{"id":2,"state":"starting","log":[]}{{< /highlight >}}
+{"id":2,"state":"starting","log":[]}</code></pre>
 
 As always, we can check its status with a simple GET:
 
-{{< highlight bash >}}curl localhost:8998/batches/2 | python -m json.tool
+<pre><code class="bash">curl localhost:8998/batches/2 | python -m json.tool
 
 % Total % Received % Xferd Average Speed Time Time Time Current
 
@@ -341,11 +341,11 @@ Dload Upload Total Spent Left Speed
 
 }
 
-{{< /highlight >}}
+</code></pre>
 
 And the output by adding the `/log` suffix!
 
-{{< highlight bash >}}curl localhost:8998/batches/2/log | python -m json.tool{{< /highlight >}}
+<pre><code class="bash">curl localhost:8998/batches/2/log | python -m json.tool</code></pre>
 
 ## **Submitting a Streaming job**
 
@@ -353,15 +353,15 @@ And the output by adding the `/log` suffix!
 
 After we compiling the jar, we upload it on HDFS, and also upload the twitter4j.properties.
 
-{{< highlight bash >}}curl -X POST -data '{"file": "/user/romain/spark-solr-1.0-SNAPSHOT.jar", "className": "com.lucidworks.spark.SparkApp", "args": ["twitter-to-solr", "-zkHost", "localhost:9983", "-collection", "tweets"], "files": ["/user/romain/twitter4j.properties"]}' -H "Content-Type: application/json" localhost:8998/batches
+<pre><code class="bash">curl -X POST -data '{"file": "/user/romain/spark-solr-1.0-SNAPSHOT.jar", "className": "com.lucidworks.spark.SparkApp", "args": ["twitter-to-solr", "-zkHost", "localhost:9983", "-collection", "tweets"], "files": ["/user/romain/twitter4j.properties"]}' -H "Content-Type: application/json" localhost:8998/batches
 
 {"id":3,"state":"starting","log":[]}
 
-{{< /highlight >}}
+</code></pre>
 
 We check the status and see that it is running correctly:
 
-{{< highlight bash >}}curl localhost:8998/batches/3 | python -m json.tool
+<pre><code class="bash">curl localhost:8998/batches/3 | python -m json.tool
 
 % Total % Received % Xferd Average Speed Time Time Time Current
 
@@ -401,7 +401,7 @@ Dload Upload Total Spent Left Speed
 
 }
 
-{{< /highlight >}}
+</code></pre>
 
 If we open the Dashboard and configure it like in the blog post, we can see the tweets coming:
 
@@ -409,13 +409,13 @@ If we open the Dashboard and configure it like in the blog post, we can see the 
 
 At the end, we can just stop the job with:
 
-{{< highlight bash >}}curl -X DELETE localhost:8998/batches/3{{< /highlight >}}
+<pre><code class="bash">curl -X DELETE localhost:8998/batches/3</code></pre>
 
 &nbsp;
 
 You can refer to the [Batch API documentation][6] for how to specify additional `spark-submit` properties. For example to add a custom name or queue:
 
-{{< highlight bash >}}curl -X POST -data '{"file": "/usr/lib/spark/lib/spark-examples.jar", "className": "org.apache.spark.examples.SparkPi", "queue": "my_queue", "name": "Livy Pi Example"}' -H "Content-Type: application/json" localhost:8998/batches{{< /highlight >}}
+<pre><code class="bash">curl -X POST -data '{"file": "/usr/lib/spark/lib/spark-examples.jar", "className": "org.apache.spark.examples.SparkPi", "queue": "my_queue", "name": "Livy Pi Example"}' -H "Content-Type: application/json" localhost:8998/batches</code></pre>
 
 Next time we will explore magic keywords and how to integrate better with IPython!
 

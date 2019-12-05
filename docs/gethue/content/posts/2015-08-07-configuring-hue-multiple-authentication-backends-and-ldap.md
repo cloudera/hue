@@ -46,7 +46,7 @@ Hue already allows you to authenticate with several authentication services incl
 
 For example, to enable Hue to first attempt LDAP directory lookup before falling back to the database-backed user model, we can update the hue.ini configuration file or [Hue safety valve][4] in Cloudera Manager with a list containing first the `LdapBackend` followed by either the `ModelBackend` or custom `AllowFirstUserDjangoBackend` (permits first login and relies on user model for all subsequent authentication):
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [desktop]
 
@@ -54,7 +54,7 @@ For example, to enable Hue to first attempt LDAP directory lookup before falling
 
 backend=desktop.auth.backend.LdapBackend,desktop.auth.backend.AllowFirstUserDjangoBackend
 
-{{< /highlight >}}
+</code></pre>
 
 This tells Hue to first check against the [configured LDAP directory service][5], and if the username is not found in the directory, then attempt to authenticate the user with the Django user manager.
 

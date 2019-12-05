@@ -70,7 +70,7 @@ Come al solito commentate pure sulla lista [hue-user][10] o su Twitter [@gethue
 
 Un modo veloce per indicizzare i dati con Solr:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 bin/solr create_collection  -c  bikes
 
@@ -80,7 +80,7 @@ u="$URL/bikes/update?commitWithin=5000"
 
 curl $u -data-binary @/home/test/index_data.csv -H 'Content-type:text/csv'
 
-{{< /highlight >}}
+</code></pre>
 
  [1]: http://www.bayareabikeshare.com
  [2]: https://www.dropbox.com/s/jw44si1gy26tdhj/bikedataclean.csv?dl=0

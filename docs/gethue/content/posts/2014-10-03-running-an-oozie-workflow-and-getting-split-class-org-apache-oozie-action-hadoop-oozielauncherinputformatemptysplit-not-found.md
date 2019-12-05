@@ -43,7 +43,7 @@ categories:
 ---
 If after installing your cluster and submitting some Oozie jobs you are seeing this type of error:
 
-{{< highlight bash >}}2015-03-11 09:11:19,821 WARN ActionStartXCommand:544 - SERVER[local] USER[hue] GROUP[-] TOKEN[] APP[pig-app-hue-script] JOB[0000000-150311091052117-oozie-hue-W] ACTION[0000000-150311091052117-oozie-hue-W@pig] Error starting action [pig]. ErrorType [FAILED], ErrorCode [It should never happen], Message [File /user/oozie/share/lib does not exist]
+<pre><code class="bash">2015-03-11 09:11:19,821 WARN ActionStartXCommand:544 - SERVER[local] USER[hue] GROUP[-] TOKEN[] APP[pig-app-hue-script] JOB[0000000-150311091052117-oozie-hue-W] ACTION[0000000-150311091052117-oozie-hue-W@pig] Error starting action [pig]. ErrorType [FAILED], ErrorCode [It should never happen], Message [File /user/oozie/share/lib does not exist]
 
 org.apache.oozie.action.ActionExecutorException: File /user/oozie/share/lib does not exist
 
@@ -77,11 +77,11 @@ at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:61
 
 at java.lang.Thread.run(Thread.java:745)
 
-{{< /highlight >}}
+</code></pre>
 
 or
 
-{{< highlight bash >}} Error: java.io.IOException: Split class org.apache.oozie.action.hadoop.OozieLauncherInputFormat$EmptySplit not found
+<pre><code class="bash"> Error: java.io.IOException: Split class org.apache.oozie.action.hadoop.OozieLauncherInputFormat$EmptySplit not found
 
 at org.apache.hadoop.mapred.MapTask.getSplitDetails(MapTask.java:363)
 
@@ -107,11 +107,11 @@ at org.apache.hadoop.mapred.MapTask.getSplitDetails(MapTask.java:361)
 
 ... 7 more
 
-{{< /highlight >}}
+</code></pre>
 
 This is because the [Oozie Share Lib][1] is not installed. Here is one command to install the YARN one:
 
-{{< highlight bash >}}sudo -u oozie /usr/lib/oozie/bin/oozie-setup.sh sharelib create -fs hdfs://localhost:8020 -locallib /usr/lib/oozie/oozie-sharelib-yarn.tar.gz
+<pre><code class="bash">sudo -u oozie /usr/lib/oozie/bin/oozie-setup.sh sharelib create -fs hdfs://localhost:8020 -locallib /usr/lib/oozie/oozie-sharelib-yarn.tar.gz
 
 setting JAVA_LIBRARY_PATH="$JAVA_LIBRARY_PATH:/usr/lib/hadoop/lib/native"
 
@@ -183,15 +183,15 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
 
 the destination path for sharelib is: /user/oozie/share/lib/lib_20141003111250
 
-{{< /highlight >}}
+</code></pre>
 
 On latest version of Oozie, just point to a folder instead:
 
-{{< highlight bash >}}sudo -u oozie /usr/lib/oozie/bin/oozie-setup.sh sharelib create -fs hdfs://localhost:8020 -locallib /usr/lib/oozie/oozie-sharelib-yarn{{< /highlight >}}
+<pre><code class="bash">sudo -u oozie /usr/lib/oozie/bin/oozie-setup.sh sharelib create -fs hdfs://localhost:8020 -locallib /usr/lib/oozie/oozie-sharelib-yarn</code></pre>
 
 And how to check it:
 
-{{< highlight bash >}}sudo -u oozie oozie admin -shareliblist -oozie http://localhost:11000/oozie
+<pre><code class="bash">sudo -u oozie oozie admin -shareliblist -oozie http://localhost:11000/oozie
 
 [Available ShareLib]
 
@@ -211,7 +211,7 @@ hive2
 
 pig
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -219,27 +219,27 @@ pig
 
 If you have upgraded your cluster, use 'upgrade' instead of 'create':
 
-{{< highlight bash >}}sudo -u oozie /usr/lib/oozie/bin/oozie-setup.sh sharelib upgrade -fs hdfs://localhost:8020 -locallib /usr/lib/oozie/oozie-sharelib-yarn.tar.gz{{< /highlight >}}
+<pre><code class="bash">sudo -u oozie /usr/lib/oozie/bin/oozie-setup.sh sharelib upgrade -fs hdfs://localhost:8020 -locallib /usr/lib/oozie/oozie-sharelib-yarn.tar.gz</code></pre>
 
 **Note**
 
 If you are seeing:
 
-{{< highlight bash >}}sharelib.system.libpath (unavailable){{< /highlight >}}
+<pre><code class="bash">sharelib.system.libpath (unavailable)</code></pre>
 
 You need something like that in your oozie-site.xml
 
-{{< highlight xml >}}<property>
+<pre><code class="xml"><property>
 
 <name>oozie.service.HadoopAccessorService.hadoop.configurations</name>
 
 <value>*=/etc/hadoop/conf</value>
 
-</property>{{< /highlight >}}
+</property></code></pre>
 
 And now restart Oozie:
 
-{{< highlight bash >}}sudo service oozie restart{{< /highlight >}}
+<pre><code class="bash">sudo service oozie restart</code></pre>
 
 That's it, you are now ready to submit [workflows][2]!
 

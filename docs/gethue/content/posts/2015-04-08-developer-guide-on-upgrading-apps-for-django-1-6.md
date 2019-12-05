@@ -58,33 +58,33 @@ Hue was upgraded from Django 1.4.5 to Django 1.6.10. While the Django release no
 
 We backported Django 1.7’s [JsonResponse][6] to simplify responding with Json records. So views that used to be written as:
 
-{{< highlight python >}}def view(request):
+<pre><code class="python">def view(request):
 
 value = { “x”: “y” }
 
 HttpResponse(json.dumps(value))
 
-{{< /highlight >}}
+</code></pre>
 
 Can now be written as:
 
-{{< highlight python >}}def view(request):
+<pre><code class="python">def view(request):
 
 value = { “x”: “y” }
 
 return JsonResponse(value)
 
-{{< /highlight >}}
+</code></pre>
 
 One thing to note though is that Django now by default will raise an error if a non-dictionary is serialized. This is to prevent against [attack against older browsers][7]. Here is how to disable this error:
 
-{{< highlight python >}}def view(request):
+<pre><code class="python">def view(request):
 
 value = [“x”, “y”]
 
 return JsonResponse(value, safe=False)
 
-{{< /highlight >}}
+</code></pre>
 
 We recommend that developers migrate over to returning objects. Hue itself should be completely transitioned by 3.8.0.
 
@@ -92,21 +92,21 @@ We recommend that developers migrate over to returning objects. Hue itself shoul
 
 Django’s `django.core.urlresolvers.reverse` (and therefore the `url` function in mako scripts) now automatically escapes arguments. So so uses of these functions should be changed from:
 
-{{< highlight python >}}<a href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }">...</a>
+<pre><code class="python"><a href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }">...</a>
 
-{{< /highlight >}}
+</code></pre>
 
 To:
 
-{{< highlight python >}}<a href="${ url('useradmin.views.edit_user', username=user.username) }">...</a>
+<pre><code class="python"><a href="${ url('useradmin.views.edit_user', username=user.username) }">...</a>
 
-{{< /highlight >}}
+</code></pre>
 
 ### StreamingHttpResponse
 
 In order to return a generator from a view, it is now required to use `StreamingHttpResponse`. When testing, change code from
 
-{{< highlight python >}} csv_response = self.c.post(reverse('search:download'), {
+<pre><code class="python"> csv_response = self.c.post(reverse('search:download'), {
 
 'csv': True,
 
@@ -118,11 +118,11 @@ In order to return a generator from a view, it is now required to use `Streaming
 
 csv_response_content = csv_response.content
 
-{{< /highlight >}}
+</code></pre>
 
 To:
 
-{{< highlight python >}}csv_response = self.c.post(reverse('search:download'), {
+<pre><code class="python">csv_response = self.c.post(reverse('search:download'), {
 
 'csv': True,
 
@@ -134,7 +134,7 @@ To:
 
 csv_response_content = ".join(csv_response.streaming_content)
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -160,35 +160,35 @@ In order to make the transition, do:
 
   * Move static files from <code>/apps/$name/static</code> to <code>/apps/$name/src/$name/static</code>
   * Update <code>.mako</code> files to change from:
-    {{< highlight python >}}<link rel=”stylesheet” href=”/metastore/static/css/metastore.css”>{{< /highlight >}}
+    <pre><code class="python"><link rel=”stylesheet” href=”/metastore/static/css/metastore.css”></code></pre>
 
     To:
 
-    {{< highlight python >}}<link rel=”stylesheet” href=”${ static(‘metastore/css/metastore.css’) }”>{{< /highlight >}}
+    <pre><code class="python"><link rel=”stylesheet” href=”${ static(‘metastore/css/metastore.css’) }”></code></pre>
 
   * Update the “ICON” in apps/$name/src/help/settings.py from:
-    {{< highlight python >}}ICON = “/help/static/art/icon_help_24.png”
+    <pre><code class="python">ICON = “/help/static/art/icon_help_24.png”
 
-    {{< /highlight >}}
+    </code></pre>
 
     To:
 
-    {{< highlight python >}}ICON = “help/art/icon_help_24.png”
+    <pre><code class="python">ICON = “help/art/icon_help_24.png”
 
-    {{< /highlight >}}
+    </code></pre>
 
   * Update any Python python templates from:
-    {{< highlight python >}}def view(request):
+    <pre><code class="python">def view(request):
 
     data = {‘image’: “/help/static/art/icon_help_24.png”}
 
     return render(“template.mako”, request, data)
 
-    {{< /highlight >}}
+    </code></pre>
 
     To:
 
-    {{< highlight python >}}from django.contrib.staticfiles.storage import staticfiles_storage
+    <pre><code class="python">from django.contrib.staticfiles.storage import staticfiles_storage
 
     …
 
@@ -198,7 +198,7 @@ In order to make the transition, do:
 
     return render(“template.mako”, request, data)
 
-    {{< /highlight >}}
+    </code></pre>
 
 Finally, in order to run Hue with `debug=False`, it is now required to first run either `make apps` or `./build/env/bin/hue collectstatic` in order to gather all the files into the `build/static` directory. This is not necessary for `debug=True`, where hue will serve the static files directly from the `/apps/$name/src/$name/static` directory.
 

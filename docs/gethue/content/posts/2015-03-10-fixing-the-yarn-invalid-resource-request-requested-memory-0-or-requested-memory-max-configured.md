@@ -40,7 +40,7 @@ categories:
 ---
 Are you seeing this error when submitting a job to YARN? Are you launching an Oozie workflow with a Spark action? You might be hitting this issue!
 
-{{< highlight bash >}}Error starting action [spark-e27e]. ErrorType [TRANSIENT], ErrorCode [JA009], Message [JA009: org.apache.hadoop.yarn.exceptions.InvalidResourceRequestException: Invalid resource request, requested memory < 0, or requested memory > max configured, requestedMemory=1536, maxMemory=1024
+<pre><code class="bash">Error starting action [spark-e27e]. ErrorType [TRANSIENT], ErrorCode [JA009], Message [JA009: org.apache.hadoop.yarn.exceptions.InvalidResourceRequestException: Invalid resource request, requested memory < 0, or requested memory > max configured, requestedMemory=1536, maxMemory=1024
 
 at org.apache.hadoop.yarn.server.resourcemanager.scheduler.SchedulerUtils.validateResourceRequest(SchedulerUtils.java:203)
 
@@ -72,7 +72,7 @@ at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.jav
 
 at org.apache.hadoop.ipc.Server$Handler.run(Server.java:2033)
 
-]{{< /highlight >}}
+]</code></pre>
 
 [
 
@@ -82,17 +82,17 @@ at org.apache.hadoop.ipc.Server$Handler.run(Server.java:2033)
 
 Your job is asking for more memory than what YARN is authorizing him to do. One way to fix it is to up these parameters to more like 2000:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 yarn.scheduler.maximum-allocation-mb
 
-{{< /highlight >}}
+</code></pre>
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 yarn.nodemanager.resource.memory-mb
 
-{{< /highlight >}}
+</code></pre>
 
 Have any questions? Feel free to contact us on [hue-user][2] or [@gethue][3]!
 

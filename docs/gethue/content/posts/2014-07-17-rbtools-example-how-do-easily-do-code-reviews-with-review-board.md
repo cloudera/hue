@@ -50,11 +50,11 @@ First, join the 'hue' group in your account <a href="https://review.cloudera.org
 
 Then install the Review Board tools:
 
-{{< highlight bash >}}sudo pip install -allow-all-external RBTools{{< /highlight >}}
+<pre><code class="bash">sudo pip install -allow-all-external RBTools</code></pre>
 
 Point it to your git repository:
 
-{{< highlight bash >}}romain@runreal:~/projects/hue$ rbt setup-repo
+<pre><code class="bash">romain@runreal:~/projects/hue$ rbt setup-repo
 
 Enter the Review Board server URL: https://review.cloudera.org
 
@@ -72,15 +72,15 @@ BRANCH = "master"
 
 Config written to /home/romain/projects/hue/.reviewboardrc
 
-{{< /highlight >}}
+</code></pre>
 
 # Post a review
 
 We have wrapped up the typical submission in a dedicated 'tools/scripts/hue-review' script prefilled with all the details of the commits:
 
-{{< highlight bash >}}vim tools/scripts/hue-review{{< /highlight >}}
+<pre><code class="bash">vim tools/scripts/hue-review</code></pre>
 
-{{< highlight bash >}}function hue-review {
+<pre><code class="bash">function hue-review {
 
 #!/usr/bin/env bash
 
@@ -116,11 +116,11 @@ exec $RBT post -o -description="$(git whatchanged $REVLIST)" -target-groups=hue 
 
 }
 
-{{< /highlight >}}
+</code></pre>
 
 If you use a Mac:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 #!/usr/bin/env bash
 
@@ -168,23 +168,23 @@ $@ \
 
 $REVLIST
 
-{{< /highlight >}}
+</code></pre>
 
 Then:
 
-{{< highlight bash >}}source /home/romain/.bashrc{{< /highlight >}}
+<pre><code class="bash">source /home/romain/.bashrc</code></pre>
 
 or put it in your PATH.
 
 Now we post the review:
 
-{{< highlight bash >}}tools/scripts/hue-review HEAD~1..HEAD romain,enricoberti,erickt "HUE-2123 [beeswax] Handle cancel state properly" -bugs-closed=HUE-2123
+<pre><code class="bash">tools/scripts/hue-review HEAD~1..HEAD romain,enricoberti,erickt "HUE-2123 [beeswax] Handle cancel state properly" -bugs-closed=HUE-2123
 
 Review request #4501 posted.
 
 https://review.cloudera.org/r/4501/
 
-{{< /highlight >}}
+</code></pre>
 
 Et voila! Here is our review <a href="https://review.cloudera.org/r/4501/" target="_blank" rel="noopener noreferrer">https://review.cloudera.org/r/4501/</a>.
 
@@ -196,7 +196,7 @@ If you have more than one diff, update `HEAD~1..HEAD` accordingly (e.g. `HEAD~2.
 
 Modify the previous commit diff:
 
-{{< highlight bash >}}git commit -a -amend
+<pre><code class="bash">git commit -a -amend
 
 ... Update a file ...
 
@@ -204,13 +204,13 @@ Modify the previous commit diff:
 
 3 files changed, 10 insertions(+), 4 deletions(-)
 
-{{< /highlight >}}
+</code></pre>
 
 Update the review:
 
-{{< highlight bash >}}rbt post -u -r 6092 HEAD~1..HEAD
+<pre><code class="bash">rbt post -u -r 6092 HEAD~1..HEAD
 
-Review request #6092 posted. {{< /highlight >}}
+Review request #6092 posted. </code></pre>
 
 # Sump-up
 

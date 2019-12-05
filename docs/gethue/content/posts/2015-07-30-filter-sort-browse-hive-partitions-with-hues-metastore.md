@@ -45,15 +45,15 @@ However, partitioning is also useful for external tables where the data may alre
 
 Take for example an external table called "blog" created with the following partition scheme:
 
-{{< highlight sql >}}
+<pre><code class="sql">
 
 CREATE TABLE blog (title STRING, body STRING, pubdate DATE) PARTITIONED BY (dy STRING, dm STRING, dd STRING, dh STRING);
 
-{{< /highlight >}}
+</code></pre>
 
 We can continue to alter the table as needed to add data at specific partition locations:
 
-{{< highlight sql >}}
+<pre><code class="sql">
 
 ALTER TABLE blog ADD PARTITION (dy='2015', dm='2015-01', dd='2015-01-01', dh='2015-01-01 00') LOCATION '/user/jennykim/2015/01/01/00';
 
@@ -71,7 +71,7 @@ ALTER TABLE blog ADD PARTITION (dy='2015', dm='2015-01', dd='2015-01-04', dh='20
 
 ALTER TABLE blog ADD PARTITION (dy='2015', dm='2015-01', dd='2015-01-04', dh='2015-01-04 12') LOCATION '/user/jennykim/2015/01/04/12';
 
-{{< /highlight >}}
+</code></pre>
 
 Regardless of a table's partition locations, Hue's metastore now enables you to browse all the partitions in the table, by clicking the "Show Partitions" link from the table view. By default, the partitions view will sort the partitions in reverse order by name (or newest first, if partitioned by date) and display the first 250 partitions.
 

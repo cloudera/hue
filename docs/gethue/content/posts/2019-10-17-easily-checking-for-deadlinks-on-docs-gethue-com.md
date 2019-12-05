@@ -45,17 +45,17 @@ categories:
 
 First we used the [muffet][2] tool. muffet is a fast link checker crawler, very easy to use:
 
-<pre class="brush: bash; title: ; notranslate" title="">sudo snap install muffet
-</pre>
+<pre><code class="bash">sudo snap install muffet
+</code></pre>
 
 Then after booting the hugo [documentation server][3], we point to its url. We also blacklist certain urls to avoid some noisy false positives:
 
-<pre class="brush: bash; title: ; notranslate" title="">muffet http://localhost:35741/ --exclude ".*releases.*" -f
-</pre>
+<pre><code class="bash">muffet http://localhost:35741/ --exclude ".*releases.*" -f
+</code></pre>
 
 And here is the output:
 
-<pre class="brush: bash; title: ; notranslate" title="">$ muffet http://localhost:35741/ --exclude ".*releases.*" -f
+<pre><code class="bash">$ muffet http://localhost:35741/ --exclude ".*releases.*" -f
 http://localhost:35741/user/
 404 http://localhost:35741/administrator/configuration/editor/#connectors
 http://localhost:35741/developer/parsers/
@@ -89,7 +89,7 @@ http://localhost:35741/developer/development/
 404 http://docs.python.org/library/hotshot.html
 404 https://en.wikipedia.org/wiki/Hue_(Software
 404 https://twitter.com/gethue!
-lookup developer on 127.0.0.53:53: server misbehaving http://developer/development/#javascript </pre>
+lookup developer on 127.0.0.53:53: server misbehaving http://developer/development/#javascript </code></pre>
 
 <a href="https://cdn.gethue.com/uploads/2019/10/website_link_checker.png"><img src="https://cdn.gethue.com/uploads/2019/10/website_link_checker.png" /></a>
 

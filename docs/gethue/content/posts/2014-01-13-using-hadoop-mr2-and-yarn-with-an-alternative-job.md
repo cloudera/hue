@@ -54,7 +54,7 @@ First, it is a bit simpler to configure Hue with MR2 than in MR1 as Hue does not
 
 Here is how to configure the clusters in [hue.ini][3]. Mainly, if you are using a pseudo distributed cluster it will work by default. If not, you will just need to update all the localhost to the hostnames of the Resource Manager and History Server:
 
-{{< highlight bash >}}[hadoop]
+<pre><code class="bash">[hadoop]
 
 ...
 
@@ -102,7 +102,7 @@ history_server_api_url=http://localhost:19888
 
 submit_to=False
 
-{{< /highlight >}}
+</code></pre>
 
 <span>And that’s it! You can now look at jobs in Job Browser, get logs and submit jobs to Yarn!</span>
 

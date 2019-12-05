@@ -47,7 +47,7 @@ categories:
 ---
 When going on the Home page (/home) in Hue 3.0, this error could appear:
 
-{{< highlight bash >}}MultipleObjectsReturned: get() returned more than one DocumentPermission - it returned 2! Lookup parameters were {'perms': 'read', 'doc': <Document: saved query Sample: Job loss sample>}{{< /highlight >}}
+<pre><code class="bash">MultipleObjectsReturned: get() returned more than one DocumentPermission - it returned 2! Lookup parameters were {'perms': 'read', 'doc': <Document: saved query Sample: Job loss sample>}</code></pre>
 
 This is fixed in Hue 3.6 and here is a way to repair it:
 
@@ -55,7 +55,7 @@ This is fixed in Hue 3.6 and here is a way to repair it:
 
 2. Run the cleanup script
 
-{{< highlight python >}}
+<pre><code class="python">
 
 from desktop.models import DocumentPermission, Document
 
@@ -79,4 +79,4 @@ print 'Deleting duplicate %s' % dup
 
 dup.delete()
 
-{{< /highlight >}}
+</code></pre>

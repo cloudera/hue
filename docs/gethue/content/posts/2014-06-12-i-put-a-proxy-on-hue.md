@@ -49,7 +49,7 @@ Here's a sample configuration we use on our servers. We know the Apache web serv
 
 What you need to do is to install and enable the `mod_proxy` module (e.g. `a2enmod proxy_http`) and then configure the main virtual host (on Ubuntu it's `/etc/apache2/sites-available/000-default.conf`) to just proxy and reverse proxy any request to your Hue instance (and any HTTP 503 error to another path):
 
-{{< highlight xml >}}<VirtualHost *:80>
+<pre><code class="xml"><VirtualHost *:80>
 
 ProxyPreserveHost On
 
@@ -69,29 +69,29 @@ ServerName demo.gethue.com
 
 </VirtualHost>
 
-{{< /highlight >}}
+</code></pre>
 
 Change `demo.gethue.com` with your qualified server name available on your internal or external DNS.
 
 and then add an additional virtual host (running on a different port, 81 for instance, on `/etc/apache2/sites-available/001-error.conf`) to serve the error path you specified in the default vhost:
 
-{{< highlight xml >}}<VirtualHost *:81>
+<pre><code class="xml"><VirtualHost *:81>
 
 DocumentRoot /var/www/
 
 </VirtualHost>
 
-{{< /highlight >}}
+</code></pre>
 
 in `/var/www` you need to have a folder `error` with an `index.html` inside (need inspiration? look [here!][4]) that is going to be displayed when Hue is not reachable.
 
 The last thing we need to do is to tell Apache we are listening to the port 81 as well, so edit `/etc/apache2/ports.conf` and just add
 
-{{< highlight xml >}}
+<pre><code class="xml">
 
 Listen 81
 
-{{< /highlight >}}
+</code></pre>
 
 After everything, let's restart Apache with `sudo service apache2 restart` and... et voila! You are good to go!
 

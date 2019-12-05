@@ -40,7 +40,7 @@ With the latest release of Hue 3.10, we've added an additional security feature
 
 Hue now offers a new property, `idle_session_timeout`, that can be configured in the hue.ini file:
 
-{{< highlight bash >}}
+<pre><code class="bash">
   
 [desktop]
   
@@ -48,7 +48,7 @@ Hue now offers a new property, `idle_session_timeout`, that can be configured i
   
 idle_session_timeout=600
   
-{{< /highlight >}}
+</code></pre>
 
 When `idle_session_timeout` is set, users will automatically be logged out after N (e.g. - 600) seconds of inactivity and be prompted to login again:
 

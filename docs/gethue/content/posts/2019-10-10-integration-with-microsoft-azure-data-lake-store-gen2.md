@@ -71,55 +71,55 @@ Hue’s file browser allows users to explore, manage, and upload data in both ve
 
 As a result of adding ADLS Gen 2, the [configuration][5] for ADLS will be different. Nonetheless, the same client id, client secret and tenant ID can be used for ADLS Gen2. The same scripts can also be used to output the actual access key and secret key to stdout to be read by Hue. To use script files, add the following section to your hue.ini configuration file:
 
-<pre class="brush: bash; title: ; notranslate" title="">[azure]
-[[azure_accounts]]
-[[[default]]]
-client_id_script=/path/to/client_id_script.sh
-client_secret_script=/path/to/client_secret_script.sh
-tenant_id_script=/path/to/tenant_id_script.sh&lt;/pre&gt;
-[[abfs_clusters]]
-[[[default]]]
-fs_defaultfs=abfs://&lt;filesystem_name&gt;@&lt;account_name&gt;.dfs.core.windows.net
-webhdfs_url=https://&lt;account_name&gt;.dfs.core.windows.net
+<pre><code class="ini">[azure]
+  [[azure_accounts]]
+    [[[default]]]
+    client_id_script=/path/to/client_id_script.sh
+    client_secret_script=/path/to/client_secret_script.sh
+    tenant_id_script=/path/to/tenant_id_script.sh&lt;/pre&gt;
+  [[abfs_clusters]]
+    [[[default]]]
+    fs_defaultfs=abfs://&lt;filesystem_name&gt;@&lt;account_name&gt;.dfs.core.windows.net
+    webhdfs_url=https://&lt;account_name&gt;.dfs.core.windows.net
+</code></pre>
 
 If ADLS configuration exists just add the following to the end of “[azure]”:
 
-[[abfs_clusters]]
-[[[default]]]
-fs_defaultfs=abfs://&lt;filesystem_name&gt;@&lt;account_name&gt;.dfs.core.windows.net
-webhdfs_url=https://&lt;account_name&gt;.dfs.core.windows.net
-</pre>
+<pre><code class="ini">[[abfs_clusters]]
+  [[[default]]]
+  fs_defaultfs=abfs://&lt;filesystem_name&gt;@&lt;account_name&gt;.dfs.core.windows.net
+  webhdfs_url=https://&lt;account_name&gt;.dfs.core.windows.net
+</code></pre>
 
 ## Integrating Hadoop with ADLS Gen2
 
 If ADLS Gen 1 is configured to Hadoop, then ADLS Gen2 should be able to use the same authentication credentials in order to read from and save to ADLS. Assuming that ADLS Gen1 credentials does not work or that the user does not have it, users can set the following properties in the core-site.xml file.
 
-<pre class="brush: bash; title: ; notranslate" title="">&lt;/pre&gt;
-&lt;property&gt;
-&lt;name&gt;fs.azure.account.auth.type&lt;/name&gt;
-&lt;value&gt;OAuth&lt;/value&gt;
-&lt;/property/&gt;
+<pre><code class="xml">&lt;property&gt;
+  &lt;name&gt;fs.azure.account.auth.type&lt;/name&gt;
+  &lt;value&gt;OAuth&lt;/value&gt;
+&lt;/property&gt;
 
 &lt;property&gt;
-&lt;name&gt;fs.azure.account.oauth.provider.type&lt;/name&gt;
-&lt;value&gt;org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider&lt;/value&gt;
-&lt;/property/&gt;
+  &lt;name&gt;fs.azure.account.oauth.provider.type&lt;/name&gt;
+  &lt;value&gt;org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider&lt;/value&gt;
+&lt;/property&gt;
 
 &lt;property&gt;
-&lt;name&gt;fs.azure.account.oauth2.client.id&lt;/name&gt;
-&lt;value&gt;azureclientid&lt;/value&gt;
-&lt;/property/&gt;
+  &lt;name&gt;fs.azure.account.oauth2.client.id&lt;/name&gt;
+  &lt;value&gt;azureclientid&lt;/value&gt;
+&lt;/property&gt;
 
 &lt;property&gt;
-&lt;name&gt;fs.azure.account.oauth2.client.secret&lt;/name&gt;
-&lt;value&gt;azureclientsecret&lt;/value&gt;
-&lt;/property/&gt;
+  &lt;name&gt;fs.azure.account.oauth2.client.secret&lt;/name&gt;
+  &lt;value&gt;azureclientsecret&lt;/value&gt;
+&lt;/property&gt;
 
 &lt;property&gt;
-&lt;name&gt;fs.azure.account.oauth2.client.endpoint&lt;/name&gt;
-&lt;value&gt;https://login.microsoftonline.com/${azure_tenant_id}/oauth2/token&lt;/value&gt;
-&lt;/property/&gt;
-&lt;pre&gt;</pre>
+  &lt;name&gt;fs.azure.account.oauth2.client.endpoint&lt;/name&gt;
+  &lt;value&gt;https://login.microsoftonline.com/${azure_tenant_id}/oauth2/token&lt;/value&gt;
+&lt;/property&gt;
+</code></pre>
 
 Hue integrates with HDFS, S3, ADLS v1/v2 and soon Google Cloud Storage. So go [query][6] data in these [storages][7]!
 

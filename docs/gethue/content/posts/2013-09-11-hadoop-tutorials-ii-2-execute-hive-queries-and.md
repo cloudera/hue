@@ -73,7 +73,7 @@ Goal: we want to get the 10 coolest restaurants for a day.
 
 Let’s open Beeswax Hive Editor and explore the range of dates that we have:
 
-{{< highlight sql >}}SELECT DISTINCT \`date\` FROM review ORDER BY \`date\` DESC;{{< /highlight >}}
+<pre><code class="sql">SELECT DISTINCT \`date\` FROM review ORDER BY \`date\` DESC;</code></pre>
 
 Notice that you need to use backticks in order to use date as a column name in Hive.
 
@@ -83,7 +83,7 @@ The data is a bit old, so let’s pick 2012-12-01 as our target date. We can joi
 
 &nbsp;
 
-{{< highlight sql >}}SELECT r.business_id, name, AVG(cool) AS coolness
+<pre><code class="sql">SELECT r.business_id, name, AVG(cool) AS coolness
 
 FROM review r JOIN business b
 
@@ -99,11 +99,11 @@ ORDER BY coolness DESC
 
 LIMIT 10
 
-{{< /highlight >}}
+</code></pre>
 
 We have a good Hive query. Let’s [create][2] a result table ‘top_cool’ that will contain the top 10:
 
-{{< highlight sql >}}CREATE TABLE top_cool AS
+<pre><code class="sql">CREATE TABLE top_cool AS
 
 SELECT r.business_id, name, SUM(cool) AS coolness, '$date' as \`date\`
 
@@ -121,11 +121,11 @@ ORDER BY coolness DESC
 
 LIMIT 10
 
-{{< /highlight >}}
+</code></pre>
 
 And later replace ‘CREATE TABLE top_cool AS’ by ‘INSERT INTO TABLE top_cool’ in the Hive script as we want to create the table only the first time:
 
-{{< highlight sql >}}INSERT INTO TABLE top_cool
+<pre><code class="sql">INSERT INTO TABLE top_cool
 
 SELECT r.business_id, name, SUM(cool) AS coolness, '${date}' as \`date\`
 
@@ -143,7 +143,7 @@ ORDER BY coolness DESC
 
 LIMIT 10
 
-{{< /highlight >}}
+</code></pre>
 
 # Hive action in Apache Oozie
 
@@ -169,11 +169,11 @@ Note: when using a real cluster, as the workflow is going to run somewhere in th
 
 Lets specify that we are using a ‘date’ parameter in the Hive script. In our case we add the parameter in the Hive action:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 date=${date}
 
-{{< /highlight >}}
+</code></pre>
 
 The we save the workflow, fill up the date when prompted and look at the dynamic progress of the workflow! The output of the query will appear when you click on the ‘View the logs’ button on the action graph. In practice, INSERT, LOAD DATA would be used instead of SELECT in order to persist the calculation.
 

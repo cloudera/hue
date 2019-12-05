@@ -80,13 +80,13 @@ SASL QOP values are
 
 In Thrift SASL library, the sasl_max_buffer support is already implemented. sasl_max_buffer in the hue.ini provides a bigger and configurable buffer size that allow to provide support for hive.server2.thrift.sasl.qop="auth-conf".
 
-{{< highlight bash >}}[desktop]
+<pre><code class="bash">[desktop]
 
 \# This property specifies the maximum size of the receive buffer in bytes in thrift sasl communication (default 2 MB).
 
 sasl_max_buffer=2 \* 1024 \* 1024
 
-{{< /highlight >}}
+</code></pre>
 
 ### Fixed XML Injection for oozie
 
@@ -104,11 +104,11 @@ Turn off HSTS header in Hue Load Balancer and made sure Hue server is generating
 
 The Request Session object allows to persist certain parameters across requests. It also persists cookies across all requests made from the Session instance, and will use urllib3's connection pooling. We are making several requests to the same host:port, with this change the underlying TCP connection will be reused, which can result in a significant performance increase. With current pool size set to 40 connections and is configurable using "CHERRYPY_SERVER_THREADS" parameter.
 
-{{< highlight python >}}CACHE_SESSION = requests.Session()
+<pre><code class="python">CACHE_SESSION = requests.Session()
 
 CACHE_SESSION.mount('http://', requests.adapters.HTTPAdapter(pool_connections=conf.CHERRYPY_SERVER_THREADS.get(), pool_maxsize=conf.CHERRYPY_SERVER_THREADS.get()))
 
-CACHE_SESSION.mount('https://', requests.adapters.HTTPAdapter(pool_connections=conf.CHERRYPY_SERVER_THREADS.get(), pool_maxsize=conf.CHERRYPY_SERVER_THREADS.get())){{< /highlight >}}
+CACHE_SESSION.mount('https://', requests.adapters.HTTPAdapter(pool_connections=conf.CHERRYPY_SERVER_THREADS.get(), pool_maxsize=conf.CHERRYPY_SERVER_THREADS.get()))</code></pre>
 
  [1]: https://gethue.com/hue-security-improvements/
  [2]: https://cdn.gethue.com/uploads/2016/12/Screen-Shot-2016-12-15-at-4.22.11-PM.png
