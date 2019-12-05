@@ -28,7 +28,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
 
 from notebook.connectors.base import AuthenticationRequired
-from notebook.connectors.sql_alchemy import SqlAlchemyApi
+from notebook.connectors.sql_alchemy import SqlAlchemyApi, Assist
 
 
 if sys.version_info[0] > 2:
@@ -299,6 +299,40 @@ class TestAutocomplete(object):
           Assist.return_value=Mock(get_columns=Mock(return_value=[col1, col2]))
 
           data = SqlAlchemyApi(self.user, interpreter).autocomplete(snippet, database='database', table='table')
+
+          assert_equal(data['columns'], ['col1', 'col2'])
+          assert_equal([col['type'] for col in data['extended_columns']], ['string', 'Null'])
+
+  def test_get_foreign_keys(self):
+
+    interpreter = {
+      'options': {'url': 'phoenix://'}
+    }
+
+    snippet = Mock()
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      with patch('notebook.connectors.sql_alchemy.inspect') as inspect:
+        with patch('notebook.connectors.sql_alchemy.Assist') as Assist:
+          def col1_dict(key):
+            return {
+              'name': 'col1',
+              'type': 'string'
+            }.get(key, Mock())
+          col1 = MagicMock()
+          col1.__getitem__.side_effect = col1_dict
+          col1.get = col1_dict
+          def col2_dict(key):
+            return {
+              'name': 'col2',
+              'type': NullType()
+            }.get(key, Mock())
+          col2 = MagicMock()
+          col2.__getitem__.side_effect = col2_dict
+          col2.get = col2_dict
+
+          Assist.return_value=Mock(get_columns=Mock(return_value=[col1, col2]))
+
+
 
           assert_equal(data['columns'], ['col1', 'col2'])
           assert_equal([col['type'] for col in data['extended_columns']], ['string', 'Null'])
