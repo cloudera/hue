@@ -18,9 +18,9 @@
 from __future__ import division
 from __future__ import absolute_import
 from builtins import next
-from past.utils import old_div
 from builtins import object
 import logging
+import math
 from datetime import datetime
 
 from django.contrib import messages
@@ -114,7 +114,7 @@ class LastActivityMiddleware(object):
     if hasattr(dt, 'total_seconds'):
       return dt.total_seconds()
     else:
-      return old_div((dt.microseconds + (dt.seconds + dt.days * 24 * 3600) * 10**6), 10**6)
+      return math.floor((dt.microseconds + (dt.seconds + dt.days * 24 * 3600) * 10**6) / 10**6)
 
 class ConcurrentUserSessionMiddleware(object):
   """

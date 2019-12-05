@@ -19,7 +19,6 @@ from __future__ import division
 from future import standard_library
 standard_library.install_aliases()
 from builtins import next
-from past.utils import old_div
 from builtins import object
 import binascii
 import copy
@@ -428,7 +427,7 @@ class HS2Api(Api):
       started = logs.count('Starting Job')
       ended = logs.count('Ended Job')
 
-      progress = int(old_div((started + ended) * 100, (total * 2)))
+      progress = int((started + ended) * 100 / (total * 2))
       return max(progress, 5)  # Return 5% progress as a minimum
     elif snippet['type'] == 'impala':
       match = re.findall('(\d+)% Complete', logs, re.MULTILINE)
