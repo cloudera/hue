@@ -1086,6 +1086,8 @@ class TestDocument2Permissions(object):
       assert_true(doc.can_read(self.user_not_me))
       assert_false(doc.can_write(self.user_not_me))
 
+      assert_true(doc.get_permissions('read'))
+      assert_false(doc.get_permissions('write'))
       assert_false(doc.get_permission('read').users.all())  # There is no doc listing via links, only direct access
       assert_false(doc.get_permission('read').groups.all())
 
@@ -1109,6 +1111,84 @@ class TestDocument2Permissions(object):
       assert_true(doc.can_write(self.user))
       assert_false(doc.can_read(self.user_not_me))
       assert_false(doc.can_write(self.user_not_me))
+    finally:
+      doc.delete()
+
+  def test_combined_permissions(self):
+    doc = Document2.objects.create(
+        name='test_combined_permissions.sql',
+        type='query-hive',
+        owner=self.user,
+        data={},
+        parent_directory=self.home_dir
+    )
+
+    try:
+      assert_true(doc.can_read(self.user))
+      assert_true(doc.can_write(self.user))
+      assert_false(doc.can_read(self.user_not_me))
+      assert_false(doc.can_write(self.user_not_me))
+
+      assert_equal(0, doc.get_permissions('read').count())
+      assert_equal(0, doc.get_permissions('write').count())
+
+      # READ and LINK_READ
+      doc.share(self.user, name=Document2Permission.LINK_READ_PERM, is_link_on=True)
+      doc.share(self.user, name=Document2Permission.READ_PERM, users=[self.user_not_me])
+
+      assert_true(doc.can_read(self.user))
+      assert_true(doc.can_write(self.user))
+      assert_true(doc.can_read(self.user_not_me))
+      assert_false(doc.can_write(self.user_not_me))
+
+      assert_equal(2, doc.get_permissions('read').count())
+      assert_equal(0, doc.get_permissions('write').count())
+
+      # READ, WRITE and LINK_READ
+      doc.share(self.user, name=Document2Permission.WRITE_PERM, users=[self.user_not_me])
+
+      assert_true(doc.can_read(self.user))
+      assert_true(doc.can_write(self.user))
+      assert_true(doc.can_read(self.user_not_me))
+      assert_true(doc.can_write(self.user_not_me))
+
+      assert_equal(2, doc.get_permissions('read').count())
+      assert_equal(1, doc.get_permissions('write').count())
+
+      # READ, WRITE, LINK_READ and LINK_WRITE
+      doc.share(self.user, name=Document2Permission.LINK_WRITE_PERM, is_link_on=True)
+
+      assert_true(doc.can_read(self.user))
+      assert_true(doc.can_write(self.user))
+      assert_true(doc.can_read(self.user_not_me))
+      assert_true(doc.can_write(self.user_not_me))
+
+      assert_equal(2, doc.get_permissions('read').count())
+      assert_equal(2, doc.get_permissions('write').count())
+
+      # WRITE and WRITE_READ
+      doc.share(self.user, name=Document2Permission.LINK_READ_PERM, is_link_on=False)
+      doc.share(self.user, name=Document2Permission.READ_PERM, users=[])
+
+      assert_true(doc.can_read(self.user))
+      assert_true(doc.can_write(self.user))
+      assert_true(doc.can_read(self.user_not_me))
+      assert_true(doc.can_write(self.user_not_me))
+
+      assert_equal(0, doc.get_permissions('read').count())
+      assert_equal(2, doc.get_permissions('write').count())
+
+      # Not shared
+      doc.share(self.user, name=Document2Permission.LINK_WRITE_PERM, is_link_on=False)
+      doc.share(self.user, name=Document2Permission.WRITE_PERM, users=[])
+
+      assert_true(doc.can_read(self.user))
+      assert_true(doc.can_write(self.user))
+      assert_false(doc.can_read(self.user_not_me))
+      assert_false(doc.can_write(self.user_not_me))
+
+      assert_equal(0, doc.get_permissions('read').count())
+      assert_equal(0, doc.get_permissions('write').count())
     finally:
       doc.delete()
 

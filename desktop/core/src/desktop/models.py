@@ -1333,9 +1333,11 @@ class Document2(models.Model):
     return children_ids
 
   def can_read(self, user):
-    perm = self.get_permission('read')
-    has_read_permissions = perm.user_has_access(user) if perm else False
-    return self.owner == user or is_admin(user) or has_read_permissions or self.can_write(user)
+    return \
+        self.owner == user \
+        or is_admin(user) \
+        or any([perm.user_has_access(user) for perm in self.get_permissions('read')]) \
+        or self.can_write(user)
 
   def can_read_or_exception(self, user):
     if self.can_read(user):
@@ -1344,9 +1346,11 @@ class Document2(models.Model):
       raise PopupException(_("Document does not exist or you don't have the permission to access it."), error_code=401)
 
   def can_write(self, user):
-    perm = self.get_permission('write')
-    has_write_permissions = perm.user_has_access(user) if perm else False
-    return self.owner == user or is_admin(user) or has_write_permissions or (self.parent_directory and self.parent_directory.can_write(user))
+    return \
+        self.owner == user \
+        or is_admin(user) \
+        or any([perm.user_has_access(user) for perm in self.get_permissions('write')]) \
+        or (self.parent_directory and self.parent_directory.can_write(user))
 
   def can_write_or_exception(self, user):
     if self.can_write(user):
@@ -1355,16 +1359,24 @@ class Document2(models.Model):
       raise PopupException(_("Document does not exist or you don't have the permission to access it."))
 
   def get_permission(self, perm='read'):
+    try:
+      return Document2Permission.objects.get(doc=self, perms=perm)
+    except Document2Permission.DoesNotExist:
+      return None
+
+  def get_permissions(self, perm='read'):
+    '''
+    Return the sub permissions that make one of the two top privileges.
+    e.g. 'read' and 'link_read' perms give the global 'read' privilege.
+    '''
     if perm == 'read':
       perms = Q(perms=Document2Permission.READ_PERM) | (Q(perms=Document2Permission.LINK_READ_PERM) & Q(is_link_on=True))
     elif perm == 'write':
       perms = Q(perms=Document2Permission.WRITE_PERM) | (Q(perms=Document2Permission.LINK_WRITE_PERM) & Q(is_link_on=True))
     else:
-      perms = Q(perms=Document2Permission.WRITE_PERM)
-    try:
-      return Document2Permission.objects.get(Q(doc=self) & perms)
-    except Document2Permission.DoesNotExist:
-      return None
+      raise PopupException(_("Permission name %s is invalid.") % perm)
+
+    return Document2Permission.objects.filter(Q(doc=self) & perms)
 
   def share(self, user, name='read', users=None, groups=None, is_link_on=False):
     try:
@@ -1425,16 +1437,28 @@ class Document2(models.Model):
     """
     permissions = {
       'read': {'users': [], 'groups': []},
-      'write': {'users': [], 'groups': []}
+      'write': {'users': [], 'groups': []},
+      'link_sharing_on': False,
+      'link_read': False,
+      'link_write': False,
     }
 
-    read_perms = self.get_permission(perm='read')
-    write_perms = self.get_permission(perm='write')
+    read_perm = self.get_permission(perm='read')
+    write_perm = self.get_permission(perm='write')
 
-    if read_perms:
-      permissions.update(read_perms.to_dict())
-    if write_perms:
-      permissions.update(write_perms.to_dict())
+    if read_perm:
+      permissions.update(read_perm.to_dict())
+    if write_perm:
+      permissions.update(write_perm.to_dict())
+
+    link_read_perm = self.get_permission(perm=Document2Permission.LINK_READ_PERM)
+    link_write_perm = self.get_permission(perm=Document2Permission.LINK_WRITE_PERM)
+
+    if link_read_perm:
+      permissions['link_read'] = True
+    if link_write_perm:
+      permissions['link_write'] = True
+    permissions['link_sharing_on'] = permissions['link_read'] or permissions['link_write']
 
     return permissions
 
