@@ -156,6 +156,7 @@ dynamic_patterns += [
   url(r'^desktop/api2/doc/delete/?$', desktop_api2.delete_document),
   url(r'^desktop/api2/doc/copy/?$', desktop_api2.copy_document),
   url(r'^desktop/api2/doc/restore/?$', desktop_api2.restore_document),
+  url(r'^desktop/api2/doc/share/link/?$', desktop_api2.share_document_link),
   url(r'^desktop/api2/doc/share/?$', desktop_api2.share_document),
 
   url(r'^desktop/api2/get_config/?$', desktop_api2.get_config),

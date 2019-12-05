@@ -618,8 +618,8 @@ def share_document(request):
 
   Example of input: {'read': {'user_ids': [1, 2, 3], 'group_ids': [1, 2, 3]}}
   """
-  perms_dict = request.POST.get('data')
   uuid = request.POST.get('uuid')
+  perms_dict = request.POST.get('data')
 
   if not uuid or not perms_dict:
     raise PopupException(_('share_document requires uuid and perms_dict'))
@@ -642,6 +642,33 @@ def share_document(request):
       groups = []
 
     doc = doc.share(request.user, name=name, users=users, groups=groups)
+
+  return JsonResponse({
+    'status': 0,
+    'document': doc.to_dict()
+  })
+
+
+@api_error_handler
+@require_POST
+def share_document_link(request):
+  """
+  Globally activate of de-activate access to the document to logged-in users.
+
+  Example of input: {'name': 'link_read', 'is_link_on': true}
+  """
+  uuid = request.POST.get('uuid')
+  perm = request.POST.get('data')
+
+  if not uuid or not perm:
+    raise PopupException(_('share_document_link requires uuid and permission data'))
+  else:
+    perm = json.loads(perm)
+    uuid = json.loads(uuid)
+
+  doc = Document2.objects.get_by_uuid(user=request.user, uuid=uuid)
+
+  doc = doc.share(request.user, name=perm['name'], is_link_on=perm['is_link_on'])
 
   return JsonResponse({
     'status': 0,

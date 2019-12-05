@@ -1356,28 +1356,34 @@ class Document2(models.Model):
       raise PopupException(_("Document does not exist or you don't have the permission to access it."))
 
   def get_permission(self, perm='read'):
+    if perm == 'read':
+      perms = Q(perms=Document2Permission.READ_PERM) | (Q(perms=Document2Permission.LINK_READ_PERM) & Q(is_link_on=True))
+    elif perm == 'write':
+      perms = Q(perms=Document2Permission.WRITE_PERM) | (Q(perms=Document2Permission.LINK_WRITE_PERM) & Q(is_link_on=True))
+    else:
+      perms = Q(perms=Document2Permission.WRITE_PERM)
     try:
-      return Document2Permission.objects.get(doc=self, perms=perm)
+      return Document2Permission.objects.get(Q(doc=self) & perms)
     except Document2Permission.DoesNotExist:
       return None
 
-  def share(self, user, name='read', users=None, groups=None):
+  def share(self, user, name='read', users=None, groups=None, is_link_on=False):
     try:
       with transaction.atomic():
-        self.update_permission(user, name, users, groups)
+        self.update_permission(user, name, users, groups, is_link_on)
         # For directories, update all children recursively with same permissions
         for child in self.children.all():
-          child.share(user, name, users, groups)
+          child.share(user, name, users, groups, is_link_on)
     except Exception as e:
       raise PopupException(_("Failed to share document: %s") % e)
     return self
 
-  def update_permission(self, user, name='read', users=None, groups=None):
+  def update_permission(self, user, name='read', users=None, groups=None, is_link_on=False):
     # Check if user has access to grant permissions
     if users or groups:
-      if name == 'read':
+      if name == 'read' or name == 'link_read':
         self.can_read_or_exception(user)
-      elif name == 'write':
+      elif name == 'write' or name == 'link_write':
         self.can_write_or_exception(user)
       else:
         raise ValueError(_('Invalid permission type: %s') % name)
@@ -1391,6 +1397,8 @@ class Document2(models.Model):
     perm.groups = []
     if groups is not None:
       perm.groups = groups
+
+    perm.is_link_on = is_link_on
 
     perm.save()
 
@@ -1544,20 +1552,23 @@ class Document2Permission(models.Model):
   READ_PERM = 'read'
   WRITE_PERM = 'write'
   COMMENT_PERM = 'comment'
+  LINK_READ_PERM = 'link_read'
+  LINK_WRITE_PERM = 'link_write'
 
   doc = models.ForeignKey(Document2)
 
   users = models.ManyToManyField(User, db_index=True, db_table='documentpermission2_users')
   groups = models.ManyToManyField(Group, db_index=True, db_table='documentpermission2_groups')
 
-  perms = models.CharField(default=READ_PERM, max_length=10, db_index=True, choices=( # one perm
+  perms = models.CharField(default=READ_PERM, max_length=10, db_index=True, choices=( # One perm
     (READ_PERM, 'read'),
     (WRITE_PERM, 'write'),
-    (COMMENT_PERM, 'comment'), # PLAYER PERM?
+    (COMMENT_PERM, 'comment'), # Unused
+    (LINK_READ_PERM, 'link read'),
+    (LINK_WRITE_PERM, 'link write'),
   ))
 
-  # link = models.CharField(default=uuid_default, max_length=255, unique=True) # Short link like dropbox
-  # embed
+  is_link_on = models.BooleanField(default=False)
 
   class Meta(object):
     unique_together = ('doc', 'perms')
@@ -1574,7 +1585,7 @@ class Document2Permission(models.Model):
     """
     Returns true if the given user has permissions based on users, groups, or all flag
     """
-    return self.groups.filter(id__in=user.groups.all()).exists() or user in self.users.all()
+    return self.groups.filter(id__in=user.groups.all()).exists() or user in self.users.all() or self.is_link_on
 
 
 def get_cluster_config(user):
