@@ -48,7 +48,8 @@ module.exports = {
     //minimize: true,
     minimize: false,
     splitChunks: {
-      chunks: 'all'
+      chunks: 'all',
+      automaticNameMaxLength: 90
     },
     runtimeChunk: {
       name: 'hue'
