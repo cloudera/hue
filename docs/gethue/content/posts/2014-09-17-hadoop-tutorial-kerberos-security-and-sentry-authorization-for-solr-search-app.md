@@ -55,7 +55,7 @@ First, make sure that you have a [kerberized Cluster][6] (and it particular [So
 
 Make sure you use the secure version of solrconfig.xml:
 
-{{< highlight bash >}}solrctl instancedir -generate foosecure
+<pre><code class="bash">solrctl instancedir -generate foosecure
 
 cp foosecure/conf/solrconfig.xml.secure solr_configs_twitter_demo/conf/solrconfig.xml
 
@@ -63,21 +63,21 @@ solrctl instancedir -update twitter_demo solr_configs_twitter_demo
 
 solrctl collection -reload twitter_demo
 
-{{< /highlight >}}
+</code></pre>
 
 Then, create the collection. The command should work as-is if you have the proper Solr environment variables.
 
-{{< highlight bash >}}cd $HUE_HOME/apps/search/examples/bin
+<pre><code class="bash">cd $HUE_HOME/apps/search/examples/bin
 
 ./create_collections.sh
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
 You should then see the collections:
 
-{{< highlight bash >}}solrctl instancedir -list
+<pre><code class="bash">solrctl instancedir -list
 
 jobs_demo
 
@@ -87,17 +87,17 @@ twitter_demo
 
 yelp_demo
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
 The next step is to create the Solr cores. To keep it simple, we will just use one collection, the twitter demo. When creating the core
 
-{{< highlight bash >}}sudo -u systest solrctl collection -create twitter_demo -s 1{{< /highlight >}}
+<pre><code class="bash">sudo -u systest solrctl collection -create twitter_demo -s 1</code></pre>
 
 if using Sentry, you will probably see this error the first time:
 
-{{< highlight bash >}}Error: A call to SolrCloud WEB APIs failed: HTTP/1.1 401 Unauthorized
+<pre><code class="bash">Error: A call to SolrCloud WEB APIs failed: HTTP/1.1 401 Unauthorized
 
 Server: Apache-Coyote/1.1
 
@@ -153,7 +153,7 @@ org.apache.sentry.binding.solr.authz.SentrySolrAuthorizationException: User syst
 
 </lst>
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -163,13 +163,13 @@ This is because by default our ‘systest’ user does not have permissions to c
 
 In order to do this, we need to update:
 
-{{< highlight bash >}}/user/solr/sentry/sentry-provider.ini{{< /highlight >}}
+<pre><code class="bash">/user/solr/sentry/sentry-provider.ini</code></pre>
 
 &nbsp;
 
 with something similar to this:
 
-{{< highlight bash >}}[groups]
+<pre><code class="bash">[groups]
 
 admin = admin_role
 
@@ -181,7 +181,7 @@ admin_role = collection=admin->action=\*, collection=twitter_demo->action=\*
 
 query_role = collection=twitter_demo->action=query
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -199,19 +199,19 @@ Then it is time to create the core and upload some data. Update the [post.sh][10
 
 Replace ‘curl’ by:
 
-{{< highlight bash >}}curl -negotiate -u: foo:bar{{< /highlight >}}
+<pre><code class="bash">curl -negotiate -u: foo:bar</code></pre>
 
 &nbsp;
 
 and make sure that you use the real hostname in the URL:
 
-{{< highlight bash >}}URL=http://hue-c5-sentry.ent.cloudera.com:8983/solr{{< /highlight >}}
+<pre><code class="bash">URL=http://hue-c5-sentry.ent.cloudera.com:8983/solr</code></pre>
 
 &nbsp;
 
 A quick way to test is is to run the indexing command:
 
-{{< highlight bash >}}sudo -u systest curl -negotiate -u: foo:bar http://hue-c5-sentry.ent.cloudera.com:8983/solr/twitter_demo/update -data-binary @../collections/solr_configs_twitter_demo/index_data.csv -H 'Content-type:text/csv'{{< /highlight >}}
+<pre><code class="bash">sudo -u systest curl -negotiate -u: foo:bar http://hue-c5-sentry.ent.cloudera.com:8983/solr/twitter_demo/update -data-binary @../collections/solr_configs_twitter_demo/index_data.csv -H 'Content-type:text/csv'</code></pre>
 
 &nbsp;
 

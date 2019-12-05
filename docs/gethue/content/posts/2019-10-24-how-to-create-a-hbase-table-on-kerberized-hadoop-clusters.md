@@ -49,8 +49,8 @@ Hi SQL Data Explorers,
 
 If you are using HBase with Hue on CDH6.1.x or later, you may find Hue&#8217;s check configuration fails for HBase with following error:
 
-{{< highlight bash >}}Failed to authenticate to HBase Thrift Server, check authentication configurations.
-{{< /highlight >}}
+<pre><code class="bash">Failed to authenticate to HBase Thrift Server, check authentication configurations.
+</code></pre>
 
 <a href="https://cdn.gethue.com/uploads/2019/10/Screen-Shot-2019-10-23-at-2.24.44-PM.png"><img src="https://cdn.gethue.com/uploads/2019/10/Screen-Shot-2019-10-23-at-2.24.44-PM.png" /></a>
 
@@ -71,17 +71,17 @@ otherwise, follow step 2b
 ### Step 2b
 on same page, search for &#8220;core-site&#8221; and fill in as following to &#8220;HBase Service Advanced Configuration Snippet (Safety Valve) for core-site.xml&#8221;
 
-{{< highlight bash >}}hadoop.proxyuser.hbase.hosts: *
+<pre><code class="bash">hadoop.proxyuser.hbase.hosts: *
 hadoop.proxyuser.hbase.groups: * 
-{{< /highlight >}}
+</code></pre>
 
 ### Step 3
 If your cluster is kerberized cluster, find out your HBase thrift server and its HTTP kerberos principal and then config following parameters:
   
 HBase Service Advanced Configuration Snippet (Safety Valve) for hbase-site.xml:
 
-{{< highlight bash >}}hbase.thrift.spnego.principal: HTTP/${YOUR_HBASE_THRIFT_SERVER_NAME}/${REALM}
-hbase.thrift.spnego.keytab.file: hbase.keytab {{< /highlight >}}
+<pre><code class="bash">hbase.thrift.spnego.principal: HTTP/${YOUR_HBASE_THRIFT_SERVER_NAME}/${REALM}
+hbase.thrift.spnego.keytab.file: hbase.keytab </code></pre>
 
 ### Step 3a
 Find out HBase thrift server host: navigate to CM->Clusters->HBASE-1&#8211;>Instances and search for &#8220;thrift&#8221;
@@ -106,14 +106,14 @@ Now, navigate to Hue UI, https://${huehost}:8889/hue/about/#step1, the &#8216;Ch
 
 Now let&#8217;s navigate to &#8220;Examples&#8221; tab to try installing the HBase examples, it may fail with error:
 
-{{< highlight bash >}}IOError(_message='org.apache.hadoop.hbase.security.AccessDeniedException: org.apache.hadoop.hbase.security.AccessDeniedException: Insufficient permissions ..."{{< /highlight >}}
+<pre><code class="bash">IOError(_message='org.apache.hadoop.hbase.security.AccessDeniedException: org.apache.hadoop.hbase.security.AccessDeniedException: Insufficient permissions ..."</code></pre>
 
 All you need to do is ssh to your hosts run following hbase shell command to grant the user:&#8217;testadmin&#8217; with proper permission.
 
-{{< highlight bash >}}sudo -u hbase hbase shell
+<pre><code class="bash">sudo -u hbase hbase shell
 
 grant 'testadmin','RWC'
-{{< /highlight >}}
+</code></pre>
 
 Yeah, now you are all set to create your HBase table on secure cluster.
 

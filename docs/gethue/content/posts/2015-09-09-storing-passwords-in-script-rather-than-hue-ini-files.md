@@ -54,7 +54,7 @@ Any parameter that defines a password in the hue.ini can be replaced with the sa
 
 On startup, Hue runs the startup script and grabs the password from stdout. This is an example configuration:
 
-{{< highlight bash >}}[desktop]
+<pre><code class="bash">[desktop]
   
 ldap_username=hueservice
   
@@ -70,11 +70,11 @@ bind_password_script="/var/lib/hue/hue_passwords.sh bind_password"
   
 password_script="/var/lib/hue/hue_passwords.sh database"
   
-{{< /highlight >}}
+</code></pre>
 
 The script should go in a location where it can be read and executed by only the hue user. You can have a script per password or a single script that takes parameters. Here is an example single script that takes parameters that matches the above config:
 
-{{< highlight bash >}}#!/bin/bash
+<pre><code class="bash">#!/bin/bash
 
 SERVICE=$1
 
@@ -110,7 +110,7 @@ echo "password"
   
 fi
 
-{{< /highlight >}}
+</code></pre>
 
 Starting in Cloudera Manager 5.5 passwords are not stored in configuration files in clear text anymore.  As a result on Cloudera Manager 5.5 and higher you will need to know the password for Hue's DB connection to be able to run the Hue command line.
 

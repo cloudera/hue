@@ -57,7 +57,7 @@ categories:
 
 <span style="font-weight: 400;">To enable this debug panel, set following to hue.ini. If you are using Cloudera Manager, put them in Safety Valve.</span>
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [desktop]
 
@@ -73,7 +73,7 @@ enable_django_debug_tool=true
 
 django_debug_tool_users=admin,ying
 
-{{< /highlight >}}
+</code></pre>
 
 Reference:
 

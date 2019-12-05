@@ -75,11 +75,11 @@ Supports:
 
 If the Spark app is not visible in the ‘Editor’ menu, you will need to unblacklist it from the [hue.ini][7]:
 
-{{< highlight bash >}}[desktop]
+<pre><code class="bash">[desktop]
 
 app_blacklist=
 
-{{< /highlight >}}
+</code></pre>
 
 **Note:** To override a value in Cloudera Manager, you need to enter verbatim each mini section from below into the Hue [Safety Valve][8]: Hue Service → Configuration → Service-Wide → Advanced → Hue Service Advanced Configuration Snippet (Safety Valve) for hue_safety_valve.ini
 
@@ -89,7 +89,7 @@ On the same machine as Hue, go in the Hue home:
 
 If using the package installed:
 
-{{< highlight bash >}}cd /usr/lib/hue{{< /highlight >}}
+<pre><code class="bash">cd /usr/lib/hue</code></pre>
 
 &nbsp;
 
@@ -101,7 +101,7 @@ Use Livy Spark Job Server from the Hue master repository instead of CDH (it is c
 
 If not, use Cloudera Manager:
 
-{{< highlight bash >}}cd /opt/cloudera/parcels/CDH/lib/
+<pre><code class="bash">cd /opt/cloudera/parcels/CDH/lib/
 
 HUE_CONF_DIR=/var/run/cloudera-scm-agent/process/-hue-HUE_SERVER-#
 
@@ -109,7 +109,7 @@ echo $HUE_CONF_DIR
 
 export HUE_CONF_DIR
 
-{{< /highlight >}}
+</code></pre>
 
 <div>
   Where # is substituted by the last number, e.g. hue-HUE_SERVER-65
@@ -117,13 +117,13 @@ export HUE_CONF_DIR
 
 Then cd to hue directory And start the [Spark Job Server][4] from the Hue home:
 
-{{< highlight bash >}}./build/env/bin/hue livy_server{{< /highlight >}}
+<pre><code class="bash">./build/env/bin/hue livy_server</code></pre>
 
 &nbsp;
 
 You can customize the setup by modifying these properties in the hue.ini:
 
-{{< highlight bash >}}[spark]
+<pre><code class="bash">[spark]
 
 \# URL of the REST Spark Job Server.
 
@@ -137,7 +137,7 @@ languages='[{"name": "Scala", "type": "scala"},{"name": "Python", "type": "pytho
 
 \## livy_server_session_kind=yarn
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 

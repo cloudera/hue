@@ -58,34 +58,34 @@ Just pull the latest from the Internet or build it yourself from the Hue reposit
 
 Pull the image from [Hue's Docker Hub][5]:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
-sudo docker pull gethue/hue:latest{{< /highlight >}}
+sudo docker pull gethue/hue:latest</code></pre>
 
 ## Build the image
 
 Directly from Github source:
 
-{{< highlight bash >}}sudo docker build https://github.com/cloudera/hue.git#master -t hue -f tools/docker/hue/Dockerfile{{< /highlight >}}
+<pre><code class="bash">sudo docker build https://github.com/cloudera/hue.git#master -t hue -f tools/docker/hue/Dockerfile</code></pre>
 
 Or from a cloned local Hue:
 
-{{< highlight bash >}}sudo docker build . -t hue -f tools/docker/hue/Dockerfile{{< /highlight >}}
+<pre><code class="bash">sudo docker build . -t hue -f tools/docker/hue/Dockerfile</code></pre>
 
 **Note**
 
   * Feel free to replace -t hue in all the commands by your own docker repository and image tag, e.g. gethue/hue:latest
   * Tag and push the image to the container registry
 
-{{< highlight bash >}}docker build . -t docker-registry.gethue.com/gethue/hue:v4.4
+<pre><code class="bash">docker build . -t docker-registry.gethue.com/gethue/hue:v4.4
 
-docker push docker-registry.gethue.com/gethue/hue:v4.4{{< /highlight >}}
+docker push docker-registry.gethue.com/gethue/hue:v4.4</code></pre>
 
 ## Run the image
 
 ### Directly boot the image:
 
-{{< highlight bash >}}docker run -it -p 8888:8888 gethue/hue:latest{{< /highlight >}}
+<pre><code class="bash">docker run -it -p 8888:8888 gethue/hue:latest</code></pre>
 
 Hue should then be up and running on your default Docker IP on the port 8888, so usually <http://127.0.0.1:8888>.
 
@@ -106,13 +106,13 @@ By default the Hue container is using a default configuration that assumes local
   </ul>
 </div>
 
-{{< highlight bash >}}docker run -it -p 8888:8888 -v $PWD/tools/docker/hue/hue.ini:/usr/share/hue/desktop/conf/z-hue.ini gethue/hue{{< /highlight >}}
+<pre><code class="bash">docker run -it -p 8888:8888 -v $PWD/tools/docker/hue/hue.ini:/usr/share/hue/desktop/conf/z-hue.ini gethue/hue</code></pre>
 
 and for advanced properties copy the [full configuration ini][7]:
 
-{{< highlight bash >}}cp /desktop/conf.dist/hue.ini .{{< /highlight >}}
+<pre><code class="bash">cp /desktop/conf.dist/hue.ini .</code></pre>
 
-{{< highlight bash >}}docker run -it -p 8888:8888 -v $PWD/hue.ini:/usr/share/hue/desktop/conf/z-hue.ini gethue/hue{{< /highlight >}}
+<pre><code class="bash">docker run -it -p 8888:8888 -v $PWD/hue.ini:/usr/share/hue/desktop/conf/z-hue.ini gethue/hue</code></pre>
 
 &nbsp;
 

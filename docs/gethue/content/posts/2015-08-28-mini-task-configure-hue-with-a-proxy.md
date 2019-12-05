@@ -40,7 +40,7 @@ categories:
 ---
 We explained how to run Hue with [NGINX][1] serving the static files or under [Apache][2]. If you use another proxy, you might need to set these options:
 
-{{< highlight bash >}}[desktop]
+<pre><code class="bash">[desktop]
   
 \# Enable X-Forwarded-Host header if the load balancer requires it.
   
@@ -50,7 +50,7 @@ use_x_forwarded_host=false
   
 secure_proxy_ssl_header=false
   
-{{< /highlight >}}
+</code></pre>
 
  [1]: https://gethue.com/using-nginx-to-speed-up-hue-3-8-0/
  [2]: https://gethue.com/how-to-run-hue-with-the-apache-server/

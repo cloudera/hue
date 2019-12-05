@@ -50,7 +50,7 @@ Hue admins can thus easily `monitor` superuser operations such as adding/editing
 
 To enable and configure the log file used for the audit log, there are 2 new configuration properties that have been added to the hue.ini file, and can be overridden in [Cloudera Manager's Service Access Audit Log Properties][4] controls.
 
-{{< highlight bash >}}[desktop]
+<pre><code class="bash">[desktop]
   
 \# The directory where to store the auditing logs. Auditing is disable if the value is empty.
   
@@ -62,11 +62,11 @@ audit_event_log_dir=/Users/jennykim/Dev/hue/logs/audit.log
   
 audit_log_max_file_size=100MB
   
-{{< /highlight >}}
+</code></pre>
 
 After configuring the audit log and restarting Hue, you can then start viewing the audited operations by tailing the log:
 
-{{< highlight bash >}}$ tail logs/audit.log
+<pre><code class="bash">$ tail logs/audit.log
 
 {"username": "admin", "impersonator": "hue", "eventTime": 1447271632364, "operationText": "Successful login for user: admin", "service": "accounts", "url": "/accounts/login/", "allowed": true, "operation": "USER_LOGIN", "ipAddress": "127.0.0.1"}
   
@@ -76,7 +76,7 @@ After configuring the audit log and restarting Hue, you can then start viewing t
   
 {"username": "admin", "impersonator": "hue", "eventTime": 1447271788277, "operationText": "Successfully edited permissions: useradmin/access", "service": "useradmin", "url": "/useradmin/permissions/edit/useradmin/access", "allowed": true, "operation": "EDIT_PERMISSION", "ipAddress": "127.0.0.1"}
   
-{{< /highlight >}}
+</code></pre>
 
 Each audited record contains fields for:
 

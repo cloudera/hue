@@ -56,7 +56,7 @@ Note: in MR1 Hue is using a [plugin][3] to communicate with the Job Tracker. Thi
 
 We configure two Job Trackers in the [hue.ini][5]:
 
-{{< highlight bash >}}[hadoop]
+<pre><code class="bash">[hadoop]
 
 ...
 
@@ -82,7 +82,7 @@ jobtracker_host=host-2
 
 submit_to=True
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -92,7 +92,7 @@ And that’s it! Hue will communicate with the available Job Tracker automatical
 
 Notice that in the case of Oozie jobs, Oozie will try to re-submit the job but will need a logical name ([HUE-1631][6]). To enable this in Hue, specify it in each MapReduce cluster, e.g.:
 
-{{< highlight bash >}}[hadoop]
+<pre><code class="bash">[hadoop]
 
 [[mapred_clusters]]
 
@@ -102,7 +102,7 @@ Notice that in the case of Oozie jobs, Oozie will try to re-submit the job but w
 
 \## logical_name=MY_NAME
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 

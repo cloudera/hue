@@ -77,11 +77,11 @@ In Hue 4.1, we added the ability to share any query you've saved with other Hue 
 
 [<img src="https://cdn.gethue.com/uploads/2018/04/variables_basic.png"class="alignnone size-medium wp-image-5319" />][3]
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 select * from web_logs where country_code = "${country_code}"
 
-{{< /highlight >}}
+</code></pre>
 
 <p class="p1">
   In Hue 4.1, we've added the ability to add default values to your variables. Default values can be of two types:
@@ -89,29 +89,29 @@ select * from web_logs where country_code = "${country_code}"
 
 **Single Valued**
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 select * from web_logs where country_code = "${country_code=US}"
 
-{{< /highlight >}}
+</code></pre>
 
 **Multi Valued**
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 select * from web_logs where country_code = "${country_code=CA, FR, US}"
 
-{{< /highlight >}}
+</code></pre>
 
 <p class="p1">
   In addition, the displayed text for multi valued variables can be changed.
 </p>
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 select * from web_logs where country_code = "${country_code=CA(Canada), FR(France), US(United States)}"
 
-{{< /highlight >}}
+</code></pre>
 
 [<img src="https://cdn.gethue.com/uploads/2018/04/variables_multi.png"class="alignnone size-full wp-image-5321" />][4]
 

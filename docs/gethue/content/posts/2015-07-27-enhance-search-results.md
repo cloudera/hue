@@ -53,7 +53,7 @@ We want to create a couple of functions to make our results prettier: a graphica
 
 On the CSS/JS tab we can specify something the new Mustache functions 'hue_fn_renderStars' and 'hue_fn_renderMap':
 
-{{< highlight html >}}
+<pre><code class="html">
 
 <script>
 
@@ -101,13 +101,13 @@ return '<img src="https://maps.googleapis.com/maps/api/staticmap?center=' + coor
 
 </script>
 
-{{< /highlight >}}
+</code></pre>
 
 it's very important to prefix the name of the additional Mustache functions with 'hue_fn_' so Hue can pick them up and process them.
 
 On the HTML tab we write this:
 
-{{< highlight html >}}
+<pre><code class="html">
 
 <div class="row-fluid">
 
@@ -129,7 +129,7 @@ On the HTML tab we write this:
 
 </div>
 
-{{< /highlight >}}
+</code></pre>
 
 As you can see, the newly added functions can be called with {{#renderStars}}{{/renderStars}} and {{#renderMap}}{{/renderMap}}
 
@@ -141,7 +141,7 @@ To access the string that is in between the function declaration in the HTML tem
 
 For instance, if you want to do a conditional function like 'if' and test for a variable inside it, you can do something like
 
-{{< highlight html >}}
+<pre><code class="html">
 
 <script>
 
@@ -169,15 +169,15 @@ return isTrue ? "The condition is true!" : "No, it's false";
 
 </script>
 
-{{< /highlight >}}
+</code></pre>
 
 and use it in the HTML tab with
 
-{{< highlight html >}}
+<pre><code class="html">
 
 {{#if}}{{field_to_test}}{{/if}}
 
-{{< /highlight >}}
+</code></pre>
 
 With the HTML result widget the sky is the limit! 🙂
 

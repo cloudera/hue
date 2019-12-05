@@ -50,7 +50,7 @@ Inspired from the Beeswax application, it allows you to query a relational datab
 
 Example of configuration in hue.ini:
 
-{{< highlight bash >}}[librdbms]
+<pre><code class="bash">[librdbms]
 
 \# The RDBMS app can have any number of databases configured in the databases
 
@@ -126,7 +126,7 @@ user=root
 
 password=root
 
-{{< /highlight >}}
+</code></pre>
 
 **Note**: you can look at the [Hue database guide][2] for installing the DB connectors
 

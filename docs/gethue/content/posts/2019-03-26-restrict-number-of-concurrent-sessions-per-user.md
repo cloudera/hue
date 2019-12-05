@@ -40,13 +40,13 @@ categories:
 ---
 <span style="font-weight: 400;">Hue administrators can restrict the number of concurrent sessions per user. The default value is 0 to represent no restrictions. In that case, a user can have as many simultaneous Hue sessions, i.e. logins, as he wishes. For security purposes, this can be restricted. When it is, normally the concurrent_user_session_limit is set to 1.</span>
 
-{{< highlight bash >}}[desktop]
+<pre><code class="bash">[desktop]
   
 [[session]]
   
 concurrent_user_session_limit=1
   
-{{< /highlight >}}
+</code></pre>
 
 <span style="font-weight: 400;">When concurrent_user_session_limit is set to 1 any session, i.e. on a different machine or browser, in excess of 1 is removed by eldest. If a user gets logged out automatically, then he or she can assume somebody else is logging in as his/her credential on a different machine.</span>
 

@@ -81,19 +81,19 @@ Let’s step through the procedure to create certificates and keys:
 
 1) Generate keystore.jks containing private key (used by Hive to decrypt messages received from Hue over SSL) and public certificate (used by Hue to encrypt messages over SSL)
 
-{{< highlight bash >}}keytool -genkeypair -alias certificatekey -keyalg RSA -validity 7 -keystore
+<pre><code class="bash">keytool -genkeypair -alias certificatekey -keyalg RSA -validity 7 -keystore
 
 keystore.jks
 
-{{< /highlight >}}
+</code></pre>
 
 2) Generate certificate from keystore
 
-{{< highlight bash >}}keytool -export -alias certificatekey -keystore keystore.jks -rfc -file
+<pre><code class="bash">keytool -export -alias certificatekey -keystore keystore.jks -rfc -file
 
 cert.pem
 
-{{< /highlight >}}
+</code></pre>
 
 3) Export private key and certificate with openSSL for Hue's SSL library to ingest.
 
@@ -101,7 +101,7 @@ Exporting the private key from a jks file (Java keystore) needs an intermediate
 
 a. Import the keystore from JKS to PKCS12
 
-{{< highlight bash >}}keytool -importkeystore -srckeystore keystore.jks -destkeystore keystore.p12
+<pre><code class="bash">keytool -importkeystore -srckeystore keystore.jks -destkeystore keystore.p12
 
 -srcstoretype JKS -deststoretype PKCS12 -srcstorepass mysecret -deststorepass
 
@@ -109,27 +109,27 @@ mysecret -srcalias certificatekey -destalias certificatekey -srckeypass
 
 mykeypass -destkeypass mykeypass -noprompt
 
-{{< /highlight >}}
+</code></pre>
 
 b. Convert pkcs12 to pem using OpenSSL
 
-{{< highlight bash >}}openssl pkcs12 -in keystore.p12 -out keystore.pem -passin pass:mysecret
+<pre><code class="bash">openssl pkcs12 -in keystore.p12 -out keystore.pem -passin pass:mysecret
 
 -passout pass:mysecret
 
-{{< /highlight >}}
+</code></pre>
 
 c. Strip the pass phrase so Python doesn't prompt for password while connecting to Hive
 
-{{< highlight bash >}}openssl rsa -in keystore.pem -out hue_private_keystore.pem
+<pre><code class="bash">openssl rsa -in keystore.pem -out hue_private_keystore.pem
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
 Then the following needs to be setup in Hue’s configuration file hue.ini under [beeswax] section:
 
-{{< highlight bash >}} [[ssl]]
+<pre><code class="bash"> [[ssl]]
 
 \# SSL communication enabled for this server. (optional since Hue 3.8)
 
@@ -143,13 +143,13 @@ enabled=true
 
 validate=false
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
 Then make sure no custom authentication mechanism is turned on and configure your hive-site.xml with the following properties on Hive 0.13:
 
-{{< highlight xml >}} <property>
+<pre><code class="xml"> <property>
 
   <name>hive.server2.use.SSL</name>
 
@@ -173,7 +173,7 @@ Then make sure no custom authentication mechanism is turned on and configure you
 
 </property>
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 

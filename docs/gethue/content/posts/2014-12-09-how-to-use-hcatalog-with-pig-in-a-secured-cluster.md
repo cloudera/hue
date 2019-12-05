@@ -53,7 +53,7 @@ As usual, if you have questions or feedback, feel free to contact the Hue commun
 
 We are going to use this simple script that display the first records of one of the sample Hive tables:
 
-{{< highlight bash >}}- Load table 'sample_07'
+<pre><code class="bash">- Load table 'sample_07'
 
 sample_07 = LOAD 'sample_07' USING org.apache.hcatalog.pig.HCatLoader();
 
@@ -61,7 +61,7 @@ out = LIMIT sample_07 15;
 
 DUMP out;
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -69,13 +69,13 @@ DUMP out;
 
 As usual, if it is [missing][4], some jars won't be found and you will get:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 ERROR 1070: Could not resolve org.apache.hcatalog.pig.HCatLoader using imports: [, java.lang., org.apache.pig.builtin., org.apache.pig.impl.builtin.]
 
 org.apache.pig.impl.logicalLayer.FrontendException: ERROR 1000: Error during parsing. Could not resolve org.apache.hcatalog.pig.HCatLoader using imports: [, java.lang., org.apache.pig.builtin., org.apache.pig.impl.builtin.]
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -87,13 +87,13 @@ org.apache.pig.impl.logicalLayer.FrontendException: ERROR 1000: Error during par
 
 In the workflow properties, make sure that these Oozie properties are set:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 oozie.use.system.libpath true
 
 oozie.action.sharelib.for.pig pig,hcatalog
 
-{{< /highlight >}}
+</code></pre>
 
 [<img src="https://cdn.gethue.com/uploads/2014/12/pig-hcat-cred-1024x402.png" />][7]
 
@@ -117,7 +117,7 @@ And that's it!
 
 Examples of XML workflow
 
-{{< highlight xml >}}<workflow-app name="pig-app-hue-script" xmlns="uri:oozie:workflow:0.4">
+<pre><code class="xml"><workflow-app name="pig-app-hue-script" xmlns="uri:oozie:workflow:0.4">
 
 <credentials>
 
@@ -175,11 +175,11 @@ Examples of XML workflow
 
 </workflow-app>
 
-{{< /highlight >}}
+</code></pre>
 
 Properties
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 Name Value
 
@@ -201,11 +201,11 @@ oozie.wf.application.path hdfs://hue-c5-sentry.ent.cloudera.com:8020/user/hue/oo
 
 user.name hive
 
-{{< /highlight >}}
+</code></pre>
 
 If you get the dreaded 'ERROR 2245: Cannot get schema from loadFunc org.apache.hcatalog.pig.HCatLoader' error this could be that the hive-site.xml is not added or that you need[HUE-2152][9] that injects the HCat credential in the script.
 
-{{< highlight bash >}}ERROR 2245: Cannot get schema from loadFunc org.apache.hcatalog.pig.HCatLoader
+<pre><code class="bash">ERROR 2245: Cannot get schema from loadFunc org.apache.hcatalog.pig.HCatLoader
 
 org.apache.pig.impl.logicalLayer.FrontendException: ERROR 1000: Error during parsing. Cannot get schema from loadFunc org.apache.hcatalog.pig.HCatLoader
 
@@ -501,7 +501,7 @@ at org.datanucleus.store.rdbms.ConnectionFactoryImpl.generateDataSources(Connect
 
 ... 109 more
 
-{{< /highlight >}}
+</code></pre>
 
  [1]: https://gethue.com/hadoop-tutorial-how-to-access-hive-in-pig-with/
  [2]: http://groups.google.com/a/cloudera.org/group/hue-user

@@ -57,13 +57,13 @@ Once the job finishes, you can find the extracted contents in the same HDFS fold
 
 Flag to enable this feature until Hue 4:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [filebrowser]
 
 \# enable_extract_uploaded_archive=true
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 

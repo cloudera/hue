@@ -55,7 +55,7 @@ if you have an Ambari managed HDP cluster, here is a guide of how test the lates
 
 On any host other than Ambari server, run following commands to [compile][1] the latest Hue and its dependencies:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 yum install -y git
 
@@ -63,17 +63,17 @@ git clone https://github.com/cloudera/hue.git
 
 sudo yum install -y ant asciidoc cyrus-sasl-devel cyrus-sasl-gssapi cyrus-sasl-plain gcc gcc-c++ krb5-devel libffi-devel libxml2-devel libxslt-devel make mysql mysql-devel openldap-devel python-devel sqlite-devel gmp-devel libtidy maven
 
-{{< /highlight >}}
+</code></pre>
 
 Build:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 cd hue
 
 sudo make apps
 
-{{< /highlight >}}
+</code></pre>
 
 **Step 2:**
 
@@ -87,7 +87,7 @@ Update Ambari Configurations
 
 3. On MySql server host usually host-1 create the Hue database:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 ssh root@hue-1.example.com
 
@@ -101,29 +101,29 @@ grant all on huedb.* to 'hueuser'@'%' identified by 'huepassword';
 
 exit;
 
-{{< /highlight >}}
+</code></pre>
 
 4. On hue host update the hue.ini with following values
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 ssh root@hue-2.example.com
 
 vim ~/hue/desktop/conf/pseudo-distributed.ini
 
-{{< /highlight >}}
+</code></pre>
 
 <pre>hue.ini</pre>
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [beeswax]
 
 max_number_of_sessions=2
 
-{{< /highlight >}}
+</code></pre>
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [hadoop]
 
@@ -131,11 +131,11 @@ webhdfs_url=http://hue-1.example.com:50070/webhdfs/v1
 
 resourcemanager_api_url=http://hue-1.example.com:8088
 
-{{< /highlight >}}
+</code></pre>
 
 <pre>And run:</pre>
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 cd hue build/env/bin/hue syncdb
 
@@ -143,7 +143,7 @@ build/env/bin/hue migrate
 
 build/env/bin/hue runcpserver
 
-{{< /highlight >}}
+</code></pre>
 
 5. Go to the [hue-2.example.com:8888][4] to explore more and the [configuration page][5] for adding more components!
 

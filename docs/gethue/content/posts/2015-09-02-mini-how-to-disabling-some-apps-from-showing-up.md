@@ -42,13 +42,13 @@ In the Hue ini [configuration file][1], in the `[desktop]` section, you can ente
 
 &nbsp;
 
-{{< highlight bash >}}[desktop]
+<pre><code class="bash">[desktop]
   
 \# Comma separated list of apps to not load at server startup.
   
 app_blacklist=beeswax,impala,security,filebrowser,jobbrowser,rdbms,jobsub,pig,hbase,sqoop,zookeeper,metastore,spark,oozie,indexer
   
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 

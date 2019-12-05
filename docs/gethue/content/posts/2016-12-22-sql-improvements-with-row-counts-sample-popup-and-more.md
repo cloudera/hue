@@ -84,11 +84,11 @@ categories:
 
 <span style="font-weight: 400;">An </span>[<span style="font-weight: 400;">external contribution</span>][7] <span style="font-weight: 400;">provided support for sending multiple queries when using Tez (instead of a maximum of just one at the time). You can turn it on with this setting:</span>
 
-{{< highlight bash >}}[beeswax]
+<pre><code class="bash">[beeswax]
 
 max_number_of_sessions=10
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 

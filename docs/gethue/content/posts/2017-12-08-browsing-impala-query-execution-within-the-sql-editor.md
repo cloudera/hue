@@ -76,11 +76,11 @@ categories:
 
 Display the [explain][2] plan which outlines logical execution steps. You can verify here that the execution will not proceed in an unexpected way (i.e. wrong join type, join order, projection order). This can happen if the statistics for the table are out of date as shown in the image below by the mention of "cardinality: unavailable". You can obtain statistics by running:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 COMPUTE STATS <TABLE_NAME>
 
-{{< /highlight >}}
+</code></pre>
 
 <img class="aligncenter wp-image-5077" src="https://cdn.gethue.com/uploads/2017/11/Explain.png"/>
 
@@ -116,7 +116,7 @@ Manually close an opened query.
   The enable_query_browser flag should be on by default. All you need to access the new browser is to make sure Impala is configured inside of Hue.
 </p>
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [impala]
 
@@ -128,7 +128,7 @@ server_port=<impala_port>
 
 enable_query_browser=true
 
-{{< /highlight >}}
+</code></pre>
 
 As always, if you have any questions, feel free to comment here or on the [hue-user list][8] or [@gethue][9]!
 

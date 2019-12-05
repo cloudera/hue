@@ -62,13 +62,13 @@ Currently only Scala jobs are supported and programs need to implement this trai
 
 If you are using Cloudera Manager, enable the Spark App by removing it from the blacklist by adding this in the Hue Safety Valve:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [desktop]
 
 app_blacklist=
 
-{{< /highlight >}}
+</code></pre>
 
 ## Requirements
 
@@ -78,41 +78,41 @@ We assume you have Spark 0.9.0, Scala 2.10. installed on your system. Make sur
 
 Currently on github on this branch:
 
-{{< highlight bash >}}git clone https://github.com/ooyala/spark-jobserver.git
+<pre><code class="bash">git clone https://github.com/ooyala/spark-jobserver.git
 
 cd spark-jobserver
 
-{{< /highlight >}}
+</code></pre>
 
 Then type:
 
-{{< highlight bash >}}sbt
+<pre><code class="bash">sbt
 
-re-start{{< /highlight >}}
+re-start</code></pre>
 
 ## Get Hue
 
 <span style="line-height: 1.5em;">If Hue and Spark Job Server are not on the same machine update the </span><a style="line-height: 1.5em;" href="https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini">hue.ini</a> <span style="line-height: 1.5em;">property in desktop/conf/pseudo-distributed.ini:</span>
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [spark]
 
 \# URL of the Spark Job Server.
 
-server_url=http://localhost:8090/{{< /highlight >}}
+server_url=http://localhost:8090/</code></pre>
 
 To point to your Spark Cluster
 
-{{< highlight bash >}}vim ./job-server/src/main/resources/application.conf{{< /highlight >}}
+<pre><code class="bash">vim ./job-server/src/main/resources/application.conf</code></pre>
 
 Replace:
 
-{{< highlight bash >}}master = "local[4]"{{< /highlight >}}
+<pre><code class="bash">master = "local[4]"</code></pre>
 
 With the Spark Master URL (you can get it from the Spark Master UI: http://SPARK-HOST:18080/):
 
-{{< highlight bash >}}master = "spark://localhost:7077"{{< /highlight >}}
+<pre><code class="bash">master = "spark://localhost:7077"</code></pre>
 
 ## Get a Spark example to run
 

@@ -98,17 +98,17 @@ HUE will be deployed as a “Gateway” access node to our Hadoop cluster; this 
 
 <span style="color: #ff0000;">Note about Hive and HDP 2.5+: <span style="color: #000000;">Since at least HDP 2.5, the default Hive shipped won't work with Hue unless you change the property:</span></span>
 
-{{< highlight bash >}}hive.server2.parallel.ops.in.session=true{{< /highlight >}}
+<pre><code class="bash">hive.server2.parallel.ops.in.session=true</code></pre>
 
 Note about <span style="color: #ff0000;">Tez</span>:
 
-{{< highlight bash >}}[beeswax]
+<pre><code class="bash">[beeswax]
    
 \# Hue will use at most this many HiveServer2 sessions per user at a time.
    
 \# For Tez, increase the number to more if you need more than one query at the time, e.g. 2 or 3 (Tez as a maximum of 1 query by session).
    
-max_number_of_sessions=1{{< /highlight >}}
+max_number_of_sessions=1</code></pre>
 
 &nbsp;
 
@@ -132,7 +132,7 @@ Ubuntu uses ‘apt-get’ for package management. In our example, we’re using 
 
 Prepare dependencies:
 
-{{< highlight bash >}}sudo apt-get install -y ant
+<pre><code class="bash">sudo apt-get install -y ant
   
 sudo apt-get install -y gcc g++
   
@@ -150,7 +150,7 @@ sudo apt-get install -y libldap2-dev
   
 sudo apt-get install -y python-dev python-simplejson python-setuptools
 
-{{< /highlight >}}
+</code></pre>
 
 Download Hue 3.8.1 release tarball (in case, older version [3.7.1 link][5]):
 
@@ -160,17 +160,17 @@ Make sure you have Java installed and configured correctly!
   
 I’m using Open JDK 1.7 in this example:
 
-{{< highlight bash >}}sudo apt-get install -y openjdk-7-jre openjdk-7-jdk
+<pre><code class="bash">sudo apt-get install -y openjdk-7-jre openjdk-7-jdk
   
 sudo echo “JAVA_HOME=\”/usr/lib/jvm/java-7-openjdk-amd64/jre\”" &gt;&gt; /etc/environment
 
-{{< /highlight >}}
+</code></pre>
 
 Unpackage the HUE 3.7.1 release tarball and change to the directory.
 
 Install HUE:
 
-{{< highlight bash >}}sudo make install{{< /highlight >}}
+<pre><code class="bash">sudo make install</code></pre>
 
 By default, HUE installs to ‘/usr/local/hue’ in your Gateway node’s local filesystem.
 
@@ -178,7 +178,7 @@ As installed, the HUE installation folders and file ownership will be set to the
 
 Let’s fix that so HUE can run correctly without root user permissions:
 
-{{< highlight bash >}}sudo chown -R ubuntu:ubuntu /usr/local/hue{{< /highlight >}}
+<pre><code class="bash">sudo chown -R ubuntu:ubuntu /usr/local/hue</code></pre>
 
 ## Configuring Hadoop and HUE
 

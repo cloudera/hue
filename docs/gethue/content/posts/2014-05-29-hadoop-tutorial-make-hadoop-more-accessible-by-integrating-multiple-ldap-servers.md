@@ -56,7 +56,7 @@ As described in [How to Make Hadoop Accessible to your Employees with Hue][1], t
 
 You can have multiple LDAP servers configured in the hue.ini by providing multiple server declarations:
 
-{{< highlight bash >}}[desktop]
+<pre><code class="bash">[desktop]
     
 [[ldap]]
       
@@ -106,7 +106,7 @@ group_name_attr="cn"
           
 group_member_attr="member"
   
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 

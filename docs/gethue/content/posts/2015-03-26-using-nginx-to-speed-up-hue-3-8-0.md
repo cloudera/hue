@@ -57,23 +57,23 @@ In comparison, in Hue 3.8 behind NGINX, rendering that same page performs 5 requ
 
 The simplest option is to just follow the instructions described in [Automatic High Availability with Hue and Cloudera Manager][5], which we’ve updated to support this optimization. Or if you want to just set up a simple NGINX configuration, you can install NGINX on Redhat systems with:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 % yum install nginx
 
-{{< /highlight >}}
+</code></pre>
 
 Or on a Debian/Ubuntu system with:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 % apt-get install nginx
 
-{{< /highlight >}}
+</code></pre>
 
 Next, add a `/etc/nginx/conf.d/hue.conf` file with the following contents. Make sure to tweak `server_name` to this machine's hostname (or just localhost), the `alias` to point at Hue's static files, and the `server` to point at the Hue instance. Note that if you're running multiple Hue instances, be sure to use a database like MySQL, PostgreSQL, or Oracle which allows for remote access:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 server {
 
@@ -137,7 +137,7 @@ server HUE_HOST2:8888 max_fails=3;
 
 }
 
-{{< /highlight >}}
+</code></pre>
 
 Finally, start NGINX with `sudo service nginx start` and navigate to http://NGINX_HOSTNAME:8001.
 

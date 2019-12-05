@@ -59,7 +59,7 @@ categories:
 
 To give you a feel for the new features, we'll execute a few queries.
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 SELECT *
 
@@ -69,7 +69,7 @@ transactions1g s07 left JOIN transactions1g s08
 
 ON ( s07.field_1 = s08.field_1) limit 100
 
-{{< /highlight >}}
+</code></pre>
 
 transactions1g is a 1GB table and the self join with no predicates will force a network transfer of the whole table.
 
@@ -101,19 +101,19 @@ The detail pane also contains detailed statistics aggregated per host per node s
 
 In the detail pane, for each node, you will find a section titled risks. This section will contain hints on how to improve performance for this operator. Currently, this is not enabled by default. To enable it, go to your Hue ini file and enable this flag:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [notebook]
 
 enable_query_analysis=true
 
-{{< /highlight >}}
+</code></pre>
 
 ### CodeGen
 
 Let's look at a few queries and some of the risks that can be identified.
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 SELECT s07.description, s07.salary, s08.salary,
 
@@ -127,7 +127,7 @@ ON ( s07.code = s08.code)
 
 where s07.salary > 100000
 
-{{< /highlight >}}
+</code></pre>
 
 sample_07 & sample_08 are small sample tables that come with Hue.
 
@@ -140,22 +140,22 @@ Looking at the graph, the timelines are mostly empty. If we open one of the node
 Impala compiles SQL requests to native code to execute each node in the graph. On queries with large table this gives a large performance boost. On smaller tables, we can see that CodeGen is the main contributor to execution time. Normally, Impala disables CodeGen with tables of [small sizes][7], but Impala doesn't know it's a small table as is pointed out in the risks section by the statement "Statistics missing". Two solutions are available here:
 
   1. Adding the [missing statistics][8]. One way to do this is to execute the following command:
-    {{< highlight bash >}}
+    <pre><code class="bash">
 
     compute stats sample_07;
 
     compute stats sample_08;
 
-    {{< /highlight >}}
+    </code></pre>
 
     This is usually the right thing to do, but on larger tables it can be quite expensive.</li>
 
       * [Disable codegen][9] for the query via:
-        {{< highlight bash >}}
+        <pre><code class="bash">
 
         set DISABLE_CODEGEN=true
 
-        {{< /highlight >}}</ol>
+        </code></pre></ol>
 
     [<img class="aligncenter size-medium wp-image-5673" src="https://cdn.gethue.com/uploads/2019/03/Screen-Shot-2019-03-07-at-9.52.37-AM.png"/>][10]
 
@@ -171,7 +171,7 @@ Impala compiles SQL requests to native code to execute each node in the graph. O
 
       1. Add the missing statistics as described earlier.
       2. Rewrite the query the change the join order:
-        {{< highlight bash >}}
+        <pre><code class="bash">
 
         SELECT s07.description, s07.salary, s08.salary,
 
@@ -185,7 +185,7 @@ Impala compiles SQL requests to native code to execute each node in the graph. O
 
         where s07.salary > 100000
 
-        {{< /highlight >}}
+        </code></pre>
 
     [<img src="https://cdn.gethue.com/uploads/2019/03/Screen-Shot-2019-03-07-at-9.57.14-AM.png"/>][13]
 
@@ -195,7 +195,7 @@ Impala compiles SQL requests to native code to execute each node in the graph. O
 
     Impala will execute all of its operators in memory if enough is available. If the execution does not all fit in memory, Impala will use the [available disk][14] to store its data temporarily. To see this in action, we'll use the same query as before, but we'll set a [memory limit][15] to trigger spilling:
 
-    {{< highlight bash >}}
+    <pre><code class="bash">
 
     set MEM_LIMIT=1g;
 
@@ -207,7 +207,7 @@ Impala compiles SQL requests to native code to execute each node in the graph. O
 
     ON ( s07.field_1 = s08.field_1);
 
-    {{< /highlight >}}
+    </code></pre>
 
     [<img class="aligncenter wp-image-5676" src="https://cdn.gethue.com/uploads/2019/03/Screen-Shot-2019-03-07-at-11.40.24-AM.png"/>][16]
 
@@ -217,25 +217,25 @@ Impala compiles SQL requests to native code to execute each node in the graph. O
 
     Kudu is one of the supported storage backends for Impala. While Impala stand alone can query a variety of file data formats, Impala on Kudu allows fast updates and inserts on your data, and also is a better choice if small files are involved. When using Impala on Kudu, Impala will push down some of the operations to Kudu to reduce the data transfer between the two. However, Kudu does not support all the [operators][17] that Impala support. For example, at the time of writing, Impala support the ‘like’ operator, but Kudu does not. In those cases, all the data that cannot be natively filtered in Kudu is transferred to Impala where it will be filtered. Let’s look at a behavior difference between the two.
 
-    {{< highlight bash >}}
+    <pre><code class="bash">
 
     SELECT * FROM transactions1g_kudu s07 left JOIN transactions1g_kudu s08 on s07.field_1 = s08.field_1
 
     where s07.field_5 LIKE '2000-01%';
 
-    {{< /highlight >}}
+    </code></pre>
 
     [<img class="aligncenter wp-image-5680" src="https://cdn.gethue.com/uploads/2019/03/Screen-Shot-2019-03-07-at-5.00.59-PM.png"/>][18]
 
     When we look at the graph, we see that on the Kudu node we have both IO, which represent the time spent in Kudu, and CPU, which represent the time spent in Impala, for a total of 2.1s. In the risk section, we can also find a warning that Kudu could not evaluate the predicate.
 
-    {{< highlight bash >}}
+    <pre><code class="bash">
 
     SELECT * FROM transactions1g_kudu s07 left JOIN transactions1g_kudu s08 on s07.field_1 = s08.field_1
 
     where s07.field_5 <= '2000-01-31' and s07.field_5 >= '2000-01-01';
 
-    {{< /highlight >}}
+    </code></pre>
 
     [<img src="https://cdn.gethue.com/uploads/2019/03/Screen-Shot-2019-03-07-at-4.02.33-PM.png"/>][19]
 
@@ -249,11 +249,11 @@ Impala compiles SQL requests to native code to execute each node in the graph. O
 
     Looking at the global timeline, we see that the planning phase took 3.8s with most of the time in metadata load. When Impala doesn't have metadata about a table, which can happen after a user executes:
 
-    {{< highlight bash >}}
+    <pre><code class="bash">
 
     invalidate metadata;
 
-    {{< /highlight >}}
+    </code></pre>
 
     Impala has to refetch the metadata from the metastore. Furthermore, we see that the second most expensive item at 4.1s is first row fetched. This is the time it took the client, Hue in this case, to fetch the results. While both of these events are not things that a user can change, it's good to see where the time is spent.
 

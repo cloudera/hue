@@ -55,7 +55,7 @@ Hue tries to close the query when the user navigates away from the result page (
 
 <pre></pre>
 
-{{< highlight bash >}}[impala]
+<pre><code class="bash">[impala]
 
 \# If &amp;gt; 0, the query will be timed out (i.e. cancelled) if Impala does not do any work
 
@@ -67,7 +67,7 @@ query_timeout_s=600
 
 \# (compute or send back results) for that session within QUERY_TIMEOUT_S seconds (default 1 hour).
 
-session_timeout_s=3600 {{< /highlight >}}
+session_timeout_s=3600 </code></pre>
 
 Until this version, the only alternative workaround to close all the queries, is to restart Hue (or Impala).
 
@@ -77,7 +77,7 @@ Until this version, the only alternative workaround to close all the queries, is
 
 Hue never closes the Hive queries by default (as some queries can take hours of processing time). Also if your query volume is low (e.g. < a few hundreds a day) and you restart HiveServer2 every week, you are probably not affected. To get the same behavior as Impala (and close the query when the user leaves the page), switch on in the hue.ini:
 
-{{< highlight bash >}}[beeswax]
+<pre><code class="bash">[beeswax]
 
 \# Hue will try to close the Hive query when the user leaves the editor page.
 
@@ -85,19 +85,19 @@ Hue never closes the Hive queries by default (as some queries can take hours of 
 
 close_queries=true
 
-{{< /highlight >}}
+</code></pre>
 
 Starting in CDH5 and CDH4.6 (with HiveServer2), some close_query and close_session commands were added to Hue.
 
-{{< highlight bash >}}build/env/bin/hue close_queries -help
+<pre><code class="bash">build/env/bin/hue close_queries -help
 
 Usage: build/env/bin/hue close_queries [options] &amp;amp;lt;age_in_days&amp;amp;gt; (default is 7)
 
-{{< /highlight >}}
+</code></pre>
 
 Closes the non running queries older than 7 days. If <all> is specified, close the ones of any types.   To run them while using Cloudera Manager, be sure to export these two environment variables:
 
-{{< highlight bash >}}export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/\`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE | tail -1 | awk '{print $9}'\`"
+<pre><code class="bash">export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/\`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE | tail -1 | awk '{print $9}'\`"
 
 ./build/env/bin/hue close_queries 0
 
@@ -111,7 +111,7 @@ Closing (all=False) HiveServer2 sessions older than 0 days...
 
 1 sessions closed.
 
-{{< /highlight >}}
+</code></pre>
 
 You can then add this commands into a crontab and expire the queries older than N days.
 
@@ -119,11 +119,11 @@ You can then add this commands into a crontab and expire the queries older than 
 
 When using Kerberos you also need:
 
-{{< highlight bash >}}export HIVE_CONF_DIR="/var/run/cloudera-scm-agent/process/\`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE | tail -1 | awk '{print $9}'\`/hive-conf"{{< /highlight >}}
+<pre><code class="bash">export HIVE_CONF_DIR="/var/run/cloudera-scm-agent/process/\`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE | tail -1 | awk '{print $9}'\`/hive-conf"</code></pre>
 
 A cleaner solution comes with [HIVE-5799][5] (available in Hive 0.14 or C5.2). Like Impala, HiveServer2 can now automatically expires queries. So tweak hive-site.xml with:
 
-{{< highlight xml >}}<property>
+<pre><code class="xml"><property>
 
 <name>hive.server2.session.check.interval</name>
 
@@ -153,7 +153,7 @@ A cleaner solution comes with [HIVE-5799][5] (available in Hive 0.14 or C5.2). L
 
 </property>
 
-{{< /highlight >}}
+</code></pre>
 
 **Note**
 

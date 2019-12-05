@@ -53,25 +53,25 @@ Hue comes with a set of commands for simplifying the management of the service. 
 
 If using CM, export this variable in order to point to the correct Hue:
 
-{{< highlight bash >}}cd /opt/cloudera/parcels/CDH/lib/{{< /highlight >}}
+<pre><code class="bash">cd /opt/cloudera/parcels/CDH/lib/</code></pre>
 
-{{< highlight bash >}}HUE_CONF_DIR=/var/run/cloudera-scm-agent/process/-hue-HUE_SERVER-id
+<pre><code class="bash">HUE_CONF_DIR=/var/run/cloudera-scm-agent/process/-hue-HUE_SERVER-id
 
 echo $HUE_CONF_DIR
 
-export HUE_CONF_DIR{{< /highlight >}}
+export HUE_CONF_DIR</code></pre>
 
 Where <id> is the most recent ID in that process directory for hue-HUE_SERVER.
 
 If not using CM, just append the root of Hue home, normally:
 
-{{< highlight bash >}}/usr/lib/hue{{< /highlight >}}
+<pre><code class="bash">/usr/lib/hue</code></pre>
 
 Note:
 
 You might need to have access to a local directory for the logs of the command, e.g.:
 
-{{< highlight bash >}}cd /tmp{{< /highlight >}}
+<pre><code class="bash">cd /tmp</code></pre>
 
 &nbsp;
 
@@ -104,7 +104,7 @@ You might need to have access to a local directory for the logs of the command, 
 
 <span style="font-weight: 400;">Example running </span><span style="font-weight: 400;">changepassword</span><span style="font-weight: 400;">:</span>
 
-{{< highlight bash >}}[root@nightly55-1 ~]# export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/\`ls -1 /var/run/cloudera-scm-agent/process | grep HUE | sort -n | tail -1 \`"
+<pre><code class="bash">[root@nightly55-1 ~]# export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/\`ls -1 /var/run/cloudera-scm-agent/process | grep HUE | sort -n | tail -1 \`"
 
 [root@nightly55-1 ~]# HUE_IGNORE_PASSWORD_SCRIPT_ERRORS=1 HUE_DATABASE_PASSWORD=password /opt/cloudera/parcels/CDH/lib/hue/build/env/bin/hue changepassword admin
 
@@ -116,11 +116,11 @@ Password (again):
 
 Password changed successfully for user 'admin'
 
-{{< /highlight >}}
+</code></pre>
 
 <span style="font-weight: 400;">If you are performing command line actions that require other password, such as </span><span style="font-weight: 400;">bind_password</span> <span style="font-weight: 400;">for syncing LDAP users and groups, you need to include environment variables to set those as well.  Here is a list:</span>
 
-{{< highlight bash >}}HUE_AUTH_PASSWORD = password used to authenticate to HS2/Impala.
+<pre><code class="bash">HUE_AUTH_PASSWORD = password used to authenticate to HS2/Impala.
 
 HUE_LDAP_PASSWORD = password used to authenticate to HS2/Impala.
 
@@ -128,7 +128,7 @@ HUE_SSL_PASSWORD = password used for private key file.
 
 HUE_SMTP_PASSWORD = password used for SMTP.
 
-HUE_LDAP_BIND_PASSWORD = password used for Ldap Bind.{{< /highlight >}}
+HUE_LDAP_BIND_PASSWORD = password used for Ldap Bind.</code></pre>
 
 ##
 
@@ -149,7 +149,7 @@ HUE_LDAP_BIND_PASSWORD = password used for Ldap Bind.{{< /highlight >}}
 
 <span style="font-weight: 400;">Example running </span><span style="font-weight: 400;">changepassword</span><span style="font-weight: 400;">.</span>
 
-{{< highlight bash >}}[root@cdhnok54-1 tmp]# export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/\`ls -1 /var/run/cloudera-scm-agent/process | grep HUE | sort -n | tail -1 \`"
+<pre><code class="bash">[root@cdhnok54-1 tmp]# export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/\`ls -1 /var/run/cloudera-scm-agent/process | grep HUE | sort -n | tail -1 \`"
 
 [root@cdhnok54-1 tmp]# /opt/cloudera/parcels/CDH/lib/hue/build/env/bin/hue changepassword admin
 
@@ -159,7 +159,7 @@ Password:
 
 Password (again):
 
-Password changed successfully for user 'admin'{{< /highlight >}}
+Password changed successfully for user 'admin'</code></pre>
 
 &nbsp;
 
@@ -167,7 +167,7 @@ Password changed successfully for user 'admin'{{< /highlight >}}
 
 Executing the hue command with no argument will list them all:
 
-{{< highlight bash >}}./build/env/bin/hue
+<pre><code class="bash">./build/env/bin/hue
 
 ...
 
@@ -385,17 +385,17 @@ sync_ldap_users_and_groups
 
 useradmin_sync_with_unix
 
-{{< /highlight >}}
+</code></pre>
 
 ## Starting the server
 
 For stating the test server, defaulting to port 8000:
 
-{{< highlight bash >}}./build/env/bin/hue runserver{{< /highlight >}}
+<pre><code class="bash">./build/env/bin/hue runserver</code></pre>
 
 For stating the production server, defaulting to port 8888:
 
-{{< highlight bash >}}./build/env/bin/hue runcpserver{{< /highlight >}}
+<pre><code class="bash">./build/env/bin/hue runcpserver</code></pre>
 
 These commands are more detailed on the [How to get started page][1].
 
@@ -403,11 +403,11 @@ These commands are more detailed on the [How to get started page][1].
 
 All the commands finishing by '_setup' will install the example of the particular app.
 
-{{< highlight bash >}}./build/env/bin/hue search_setup{{< /highlight >}}
+<pre><code class="bash">./build/env/bin/hue search_setup</code></pre>
 
 In the case of Hive, in order to install the sample_07 and sample_08 tables and SQL queries, type:
 
-{{< highlight bash >}}./build/env/bin/hue beeswax_install_examples{{< /highlight >}}
+<pre><code class="bash">./build/env/bin/hue beeswax_install_examples</code></pre>
 
 **Note**:
 
@@ -419,35 +419,35 @@ These commands are also accessible directly from the [Web UI][2].
 
 This command is explained in more detail in the [How to change or reset a forgotten password][4] post:
 
-{{< highlight bash >}}./build/env/bin/hue changepassword{{< /highlight >}}
+<pre><code class="bash">./build/env/bin/hue changepassword</code></pre>
 
 ## Closing Hive queries
 
 This command is explained in more detail in the [Hive and Impala queries life cycle][5] post:
 
-{{< highlight bash >}}./build/env/bin/hue close_queries{{< /highlight >}}
+<pre><code class="bash">./build/env/bin/hue close_queries</code></pre>
 
-{{< highlight bash >}}./build/env/bin/hue close_sessions{{< /highlight >}}
+<pre><code class="bash">./build/env/bin/hue close_sessions</code></pre>
 
 ## Running the tests
 
 This command is explained in more detail in the [How to run the tests][6] post:
 
-{{< highlight bash >}}./build/env/bin/hue test{{< /highlight >}}
+<pre><code class="bash">./build/env/bin/hue test</code></pre>
 
 ## Connect to the Database
 
 This command is explained in more detail in the [How to manage the database with the shell][7] post:
 
-{{< highlight bash >}}./build/env/bin/hue dbshell{{< /highlight >}}
+<pre><code class="bash">./build/env/bin/hue dbshell</code></pre>
 
 ## Connect to the Python shell
 
 In order to type any Django to Python:
 
-{{< highlight bash >}}./build/env/bin/hue shell{{< /highlight >}}
+<pre><code class="bash">./build/env/bin/hue shell</code></pre>
 
-{{< highlight bash >}}./build/env/bin/hue shell < script.py{{< /highlight >}}
+<pre><code class="bash">./build/env/bin/hue shell < script.py</code></pre>
 
 &nbsp;
 
