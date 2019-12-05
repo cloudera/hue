@@ -19,9 +19,9 @@ from __future__ import division
 from future import standard_library
 standard_library.install_aliases()
 from builtins import str
-from past.utils import old_div
 from builtins import object
 import logging
+import math
 import os
 import re
 import time
@@ -252,7 +252,7 @@ class Job(object):
 
       if self.desiredReduces > 0:
         if self.progress is not None:
-          self.progress = int(old_div((self.progress + self.reduces_percent_complete), 2))
+          self.progress = int(math.floor((self.progress + self.reduces_percent_complete) / 2))
         else:
           self.progress = self.reduces_percent_complete
 

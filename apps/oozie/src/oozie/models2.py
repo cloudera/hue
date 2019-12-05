@@ -18,10 +18,10 @@
 from __future__ import division
 from builtins import str
 from past.builtins import basestring
-from past.utils import old_div
 from builtins import object
 import json
 import logging
+import math
 import os
 import re
 import sys
@@ -696,14 +696,14 @@ def _create_workflow_layout(nodes, adj_list, nodes_uuid_set, size=12):
           "columns":[
              {
                 "id": str(uuid.uuid4()),
-                "size": (old_div(size, len(node[1]))),
+                "size": (math.floor(size / len(node[1]))),
                 "rows":
                    [{
                       "id": str(uuid.uuid4()),
                       "widgets": c['widgets'],
                       "columns":c.get('columns') or []
                     } for c in col],
-                "klass":"card card-home card-column span%s" % (old_div(size, len(node[1])))
+                "klass":"card card-home card-column span%s" % (math.floor(size / len(node[1])))
              }
              for col in [_create_workflow_layout(item, adj_list, nodes_uuid_set, size) for item in node[1]]
           ]
@@ -3140,7 +3140,7 @@ def import_workflow_from_hue_3_7(old_wf):
             "columns":[
                {
                   "id": str(uuid.uuid4()),
-                  "size": (old_div(size, len(node[1]))),
+                  "size": (math.floor(size / len(node[1]))),
                   "rows":
                      [{
                         "id": str(uuid.uuid4()),
@@ -3154,7 +3154,7 @@ def import_workflow_from_hue_3_7(old_wf):
                       }
                    ]
                   ,
-                  "klass":"card card-home card-column span%s" % (old_div(size, len(node[1])))
+                  "klass":"card card-home card-column span%s" % (math.floor(size / len(node[1])))
                }
                for col in _create_layout(node[1], size)
             ]

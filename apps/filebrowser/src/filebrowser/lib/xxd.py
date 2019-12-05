@@ -20,7 +20,7 @@ Implements xxd-like functionality.
 from __future__ import division
 from builtins import map
 from builtins import range
-from past.utils import old_div
+import math
 import string
 import sys
 
@@ -94,7 +94,7 @@ def main(input, output):
         return "%02x" % ord
       hex = " ".join([ "".join(map(ashex, sentence)) for sentence in ordinals])
       # 2 characters per byte, 1 extra for spacing, and 1 extra at the end.
-      hex = hex.ljust(bytes_per_line*2 + (old_div(bytes_per_line,bytes_per_sentence)) - 1)
+      hex = hex.ljust(bytes_per_line*2 + (math.floor(bytes_per_line / bytes_per_sentence)) - 1)
       output.write("%07x: %s  %s\n" % (off, hex, printable))
 
     offset += len(data)
