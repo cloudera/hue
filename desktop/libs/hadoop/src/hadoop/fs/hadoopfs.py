@@ -26,10 +26,10 @@ from __future__ import division
 from past.builtins import cmp
 from future import standard_library
 standard_library.install_aliases()
-from past.utils import old_div
 from builtins import object
 import errno
 import logging
+import math
 import os
 import posixpath
 import random
@@ -521,7 +521,7 @@ class BlockCache(object):
     if _max_idx < _min_idx:
       return None
 
-    pivot_idx = old_div((_max_idx + _min_idx), 2)
+    pivot_idx = math.floor((_max_idx + _min_idx) / 2)
     pivot_block = self.blocks[pivot_idx]
     if pos < pivot_block.startOffset:
       return self.find_block(pos, _min_idx, pivot_idx - 1)

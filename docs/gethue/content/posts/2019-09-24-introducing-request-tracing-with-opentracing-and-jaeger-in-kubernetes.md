@@ -52,18 +52,18 @@ In order to help get clarity on where exactly each request time is being spent, 
 
 Hue now ships with the open tracing integration, and details about the current state of this feature are in the [Tracing design document][9]. To turn it on, in the hue.ini:
 
-<pre class="brush: bash; title: ; notranslate" title="">[desktop]
+<pre><code class="bash">[desktop]
 [[tracing]]
 ## If tracing is enabled.
 enabled=true
 
 ## Trace all the requests instead of a few specific ones like the SQL Editor. Much noisier but currently required.
 trace_all=true
-</pre>
+</code></pre>
 
 On the Jaerger side, as explained in the [quick start][10], it is simple to run it on the same host as Hue with this container:
 
-<pre class="brush: bash; title: ; notranslate" title="">docker run -d --name jaeger \
+<pre><code class="bash">docker run -d --name jaeger \
   -e COLLECTOR_ZIPKIN_HTTP_PORT=9411 \
   -p 5775:5775/udp \
   -p 6831:6831/udp \
@@ -72,7 +72,7 @@ On the Jaerger side, as explained in the [quick start][10], it is simple to run 
   -p 16686:16686 \
   -p 14268:14268 \
   -p 9411:9411 \
-  jaegertracing/all-in-one:1.14</pre>
+  jaegertracing/all-in-one:1.14</code></pre>
 
 And that&#8217;s it! Jaeger should show up at this page http://localhost:16686.
 

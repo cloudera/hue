@@ -63,11 +63,11 @@ Ready? Go!
   </li>
 </ul>
 
-{{< highlight bash >}}#!/bin/bash
+<pre><code class="bash">#!/bin/bash
 
 SUMMARY=$(curl -s https://issues.cloudera.org/rest/api/2/issue/HUE-${1} | jq -r '.fields | .summary')
 
-git commit -m "HUE-${1} ${SUMMARY}"{{< /highlight >}}
+git commit -m "HUE-${1} ${SUMMARY}"</code></pre>
 
 </span>
 

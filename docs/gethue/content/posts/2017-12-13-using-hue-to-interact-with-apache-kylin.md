@@ -57,49 +57,49 @@ In this post, we will demonstrate how you can connect Hue to Apache Kylin and ge
 
 Use docker to pull the latest hue.
 
-{{< highlight bash >}}docker pull gethue/hue:latest{{< /highlight >}}
+<pre><code class="bash">docker pull gethue/hue:latest</code></pre>
 
 #### <a class="md-header-anchor " name="header-n16"></a>Prepare kylin jdbc driver
 
 Download Apache Kylin installer package
 
-{{< highlight bash >}}wget -c http://mirror.bit.edu.cn/apache/kylin/apache-kylin-2.2.0/apache-kylin-2.2.0-bin-hbase1x.tar.gz{{< /highlight >}}
+<pre><code class="bash">wget -c http://mirror.bit.edu.cn/apache/kylin/apache-kylin-2.2.0/apache-kylin-2.2.0-bin-hbase1x.tar.gz</code></pre>
 
 Unzip package
 
-{{< highlight bash >}}tar -zxvf apache-kylin-2.2.0-bin-hbase1x.tar.gz{{< /highlight >}}
+<pre><code class="bash">tar -zxvf apache-kylin-2.2.0-bin-hbase1x.tar.gz</code></pre>
 
 cp Kylin jdbc driver
 
-{{< highlight bash >}}cp apache-kylin-2.2.0-bin/lib/kylin-jdbc-2.2.0.jar .
+<pre><code class="bash">cp apache-kylin-2.2.0-bin/lib/kylin-jdbc-2.2.0.jar .
 
 hue$ ls
 
 apache-kylin-2.2.0-bin apache-kylin-2.2.0-bin-hbase1x.tar.gz kylin-jdbc-2.2.0.jar
 
-{{< /highlight >}}
+</code></pre>
 
 #### <a class="md-header-anchor " name="header-n27"></a>Copy hub config file to host machine
 
 Copy the file from docker
 
-{{< highlight bash >}}docker run -it -d -name hue_tmp gethue/hue /bin/bash
+<pre><code class="bash">docker run -it -d -name hue_tmp gethue/hue /bin/bash
 
 cp hue_tmp:/hue/desktop/conf/pseudo-distributed.ini .
 
 docker stop hue_tmp; docker rm hue_tmp
 
-{{< /highlight >}}
+</code></pre>
 
 Now you should have the `pseudo-distributed.ini` in your current directory.
 
 #### <a class="md-header-anchor " name="header-n35"></a>Configure pseudo-distributed.ini with Kylin connection
 
-{{< highlight bash >}}vim pseudo-distributed.ini{{< /highlight >}}
+<pre><code class="bash">vim pseudo-distributed.ini</code></pre>
 
 copy below kylin section in the file
 
-{{< highlight bash >}}dbproxy_extra_classpath=/hue/kylin-jdbc-2.2.0.jar
+<pre><code class="bash">dbproxy_extra_classpath=/hue/kylin-jdbc-2.2.0.jar
 
 [[[kylin]]]
 
@@ -109,11 +109,11 @@ interface=jdbc
 
 options='{"url": "jdbc:kylin://<your_host>:<port>/<project_name>","driver": "org.apache.kylin.jdbc.Driver", "user": "<username>", "password": "<password>"}'
 
-{{< /highlight >}}
+</code></pre>
 
 For example, add below configuration section in the file
 
-{{< highlight bash >}}dbproxy_extra_classpath=/hue/kylin-jdbc-2.2.0.jar
+<pre><code class="bash">dbproxy_extra_classpath=/hue/kylin-jdbc-2.2.0.jar
 
 \# One entry for each type of snippet.
 
@@ -139,19 +139,19 @@ name=Hive
 
 interface=hiveserver2
 
-{{< /highlight >}}
+</code></pre>
 
 #### <a class="md-header-anchor " name="header-n43"></a>Edit Dockerfile
 
-{{< highlight bash >}}touch Dockerfile
+<pre><code class="bash">touch Dockerfile
 
 vim Dockerfile
 
-{{< /highlight >}}
+</code></pre>
 
 paste below script in Dockerfile
 
-{{< highlight bash >}}FROM gethue/hue:latest
+<pre><code class="bash">FROM gethue/hue:latest
 
 COPY ./kylin-jdbc-2.2.0.jar /hue/kylin-jdbc-2.2.0.jar
 
@@ -159,17 +159,17 @@ COPY ./pseudo-distributed.ini /hue/desktop/conf/pseudo-distributed.ini
 
 EXPOSE 8888
 
-{{< /highlight >}}
+</code></pre>
 
 This configuration will copy the kylin jdbc jar and pseudo-distributed.ini into the hue in Docker. And expose port 8888 in Docker.
 
 #### <a class="md-header-anchor " name="header-n50"></a>Build and start docker container
 
-{{< highlight bash >}}docker build -t hue-demo -f Dockerfile .
+<pre><code class="bash">docker build -t hue-demo -f Dockerfile .
 
 docker run -itd -p 8888:8888 -name hue hue-demo
 
-{{< /highlight >}}
+</code></pre>
 
 Hue is now up and running in your localhost:8888
 
@@ -211,7 +211,7 @@ After you installed Apache Kylin on AWS EMR, you can now deploy Hue on AWS EMR w
   </li>
 </ol>
 
-{{< highlight bash >}}[
+<pre><code class="bash">[
 
 {
 
@@ -273,9 +273,9 @@ After you installed Apache Kylin on AWS EMR, you can now deploy Hue on AWS EMR w
 
 ]
 
-{{< /highlight >}}
+</code></pre>
 
-{{< highlight bash >}}aws emr create-cluster -name "HUE Cluster" -release-label emr-5.10.0 \
+<pre><code class="bash">aws emr create-cluster -name "HUE Cluster" -release-label emr-5.10.0 \
 
 -ec2-attributes KeyName=<keypair_name>,InstanceProfile=EMR_EC2_DefaultRole,SubnetId=<subnet_id> \
 
@@ -291,7 +291,7 @@ After you installed Apache Kylin on AWS EMR, you can now deploy Hue on AWS EMR w
 
 -bootstrap-action Path="s3://<your_bucket>/download.sh"
 
-{{< /highlight >}}
+</code></pre>
 
 <ol start="3">
   <li>

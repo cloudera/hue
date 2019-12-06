@@ -70,43 +70,43 @@ Once the database has been set up, the following instructions describe setting u
 
 On a Redhat/Fedora-based system:
 
-{{< highlight bash >}}% sudo yum install git nginx haproxy python python-pip
+<pre><code class="bash">% sudo yum install git nginx haproxy python python-pip
 
 % pip install virtualenv
 
-{{< /highlight >}}
+</code></pre>
 
 On a Debian/Ubuntu-based system:
 
-{{< highlight bash >}}% sudo apt-get install git nginx haproxy python python-pip
+<pre><code class="bash">% sudo apt-get install git nginx haproxy python python-pip
 
 % pip install virtualenv
 
-{{< /highlight >}}
+</code></pre>
 
 ## Running the load balancers
 
 First we want to start the load balancer:
 
-{{< highlight bash >}}% cd $HUE_HOME_DIR/tools/load-balancer
+<pre><code class="bash">% cd $HUE_HOME_DIR/tools/load-balancer
 
-{{< /highlight >}}
+</code></pre>
 
 Next we install the load balancer specific dependencies in a python virtual environment to keep those dependencies from affecting other projects on the system.
 
-{{< highlight bash >}}% virtualenv build
+<pre><code class="bash">% virtualenv build
 
 % source build/bin/activate
 
 % pip install -r requirements.txt
 
-{{< /highlight >}}
+</code></pre>
 
 Finally, modify `etc/hue-lb.toml` to point at your instance of Cloudera Manager (as in "cloudera-manager.example.com" without the port or "http://"), and provide a username and password for an account that has read access to the Hue state.
 
 Now we are ready to start the load balancers. Run:
 
-{{< highlight bash >}}% ./bin/supervisord
+<pre><code class="bash">% ./bin/supervisord
 
 % ./bin/supervisorctl status
 
@@ -116,7 +116,7 @@ monitor-hue-lb RUNNING pid 36919, uptime 0:00:01
 
 nginx RUNNING pid 36921, uptime 0:00:01
 
-{{< /highlight >}}
+</code></pre>
 
 You should be able to access Hue from either `http://HUE-LB-HOSTNAME:8000` for NGINX, or `http://HUE-LB-HOSTNAME:8001` for HAProxy. To demonstrate the that it’s load balancing:
 
@@ -132,9 +132,9 @@ You should be able to access Hue from either `http://HUE-LB-HOSTNAME:8000` for N
 
 Finally, if you want to shut down the load balancers, run:
 
-{{< highlight bash >}}% ./bin/supervisorctl shutdown
+<pre><code class="bash">% ./bin/supervisorctl shutdown
 
-{{< /highlight >}}
+</code></pre>
 
 ## Automatic Updates from Cloudera Manager
 

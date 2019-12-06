@@ -90,7 +90,7 @@ For more information on configuring Hue via Cloudera Manager, see [Managing Clus
   1. Download and unzip the [binary distribution][8] of [HA Proxy 1.4][3] on the node that doesn’t have Hue installed.
   2. Add the following [HA Proxy configuration][9] to /etc/impala/haproxy-impala.conf:
 
-{{< highlight bash >}}global
+<pre><code class="bash">global
 
 daemon
 
@@ -128,11 +128,11 @@ server impala2 server2.cloudera.com:21050 check
 
 server impala3 server3.cloudera.com:21050 check
 
-{{< /highlight >}}
+</code></pre>
 
   1. Start HA Proxy:
 
-{{< highlight bash >}}haproxy -f /etc/impala/haproxy-impala.conf{{< /highlight >}}
+<pre><code class="bash">haproxy -f /etc/impala/haproxy-impala.conf</code></pre>
 
 &nbsp;
 
@@ -140,7 +140,7 @@ The key configuration options are [**balance**][10] and [**server**][11] in the 
 
 &nbsp;
 
-{{< highlight bash >}}server <name> <address>[:port] [settings ...]{{< /highlight >}}
+<pre><code class="bash">server <name> <address>[:port] [settings ...]</code></pre>
 
 &nbsp;
 

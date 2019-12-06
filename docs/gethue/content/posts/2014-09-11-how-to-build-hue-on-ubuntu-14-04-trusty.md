@@ -52,7 +52,7 @@ Due to a [package bug,][1] we got quite a few questions about how to build Hue c
 
 First, make sure that you are indeed on the 14.04:
 
-{{< highlight bash >}}> lsb_release -a
+<pre><code class="bash">> lsb_release -a
 
 No LSB modules are available.
 
@@ -64,21 +64,21 @@ Release: 14.04
 
 Codename: trusty
 
-{{< /highlight >}}
+</code></pre>
 
 Then install git and fetch Hue [source code][2] from github:
 
-{{< highlight bash >}}sudo apt-get install git
+<pre><code class="bash">sudo apt-get install git
 
 git clone https://github.com/cloudera/hue.git
 
 cd hue
 
-{{< /highlight >}}
+</code></pre>
 
 Then some [development packages][3] need to be installed:
 
-{{< highlight bash >}}apt-get install python2.7-dev \
+<pre><code class="bash">apt-get install python2.7-dev \
 
 make \
 
@@ -98,11 +98,11 @@ libldap2-dev \
 
 python-pip
 
-{{< /highlight >}}
+</code></pre>
 
 You can also try this one line:
 
-{{< highlight bash >}}sudo apt-get install ant gcc g++ libkrb5-dev libffi-dev libmysqlclient-dev libssl-dev libsasl2-dev libsasl2-modules-gssapi-mit libsqlite3-dev libtidy-0.99-0 libxml2-dev libxslt-dev make libldap2-dev maven python-dev python-setuptools libgmp3-dev{{< /highlight >}}
+<pre><code class="bash">sudo apt-get install ant gcc g++ libkrb5-dev libffi-dev libmysqlclient-dev libssl-dev libsasl2-dev libsasl2-modules-gssapi-mit libsqlite3-dev libtidy-0.99-0 libxml2-dev libxslt-dev make libldap2-dev maven python-dev python-setuptools libgmp3-dev</code></pre>
 
 You will also need the ‘maven’ package. You could install it with apt-get but it is also recommended to install from a [maven3 tarball][4] in order to avoid to pull a lot of dependencies.
 
@@ -110,7 +110,7 @@ Then it is time to build Hue. Just issue the ‘make apps’ command.
 
 You will hit the Ubuntu package problem the first time if you are using a Hue version [smaller than 3.8][5]:
 
-{{< highlight bash >}}- Creating virtual environment at /root/hue/build/env
+<pre><code class="bash">- Creating virtual environment at /root/hue/build/env
 
 python2.7 /root/hue/tools/virtual-bootstrap/virtual-bootstrap.py \
 
@@ -146,19 +146,19 @@ OSError: Command /root/hue/build/env/bin/python2.7 -c "#!python
 
 \"\"\"Bootstrap setuptoo...
 
-{{< /highlight >}}
+</code></pre>
 
 We use one of the workaround:
 
-{{< highlight bash >}}sudo ln -s /usr/lib/python2.7/plat-*/_sysconfigdata_nd.py /usr/lib/python2.7/
+<pre><code class="bash">sudo ln -s /usr/lib/python2.7/plat-*/_sysconfigdata_nd.py /usr/lib/python2.7/
 
-{{< /highlight >}}
+</code></pre>
 
 Links on <https://issues.cloudera.org/browse/HUE-2246> detail its cause.
 
 If you don’t have Oracle Java 7 installed the build will then stop with:
 
-{{< highlight bash >}}[INFO] ------------------------
+<pre><code class="bash">[INFO] ------------------------
 
 [INFO] BUILD FAILURE
 
@@ -196,23 +196,23 @@ make[1]: Leaving directory \`/root/hue/desktop'
 
 make: \*** [desktop] Error 2
 
-{{< /highlight >}}
+</code></pre>
 
 To fix is install this packages:
 
-{{< highlight bash >}}sudo add-apt-repository ppa:webupd8team/java
+<pre><code class="bash">sudo add-apt-repository ppa:webupd8team/java
 
 sudo apt-get install oracle-java7-installer
 
 sudo apt-get install oracle-java7-set-default
 
-{{< /highlight >}}
+</code></pre>
 
 **Note**
 
 ‘asciidoc‘ is also required if you want to build a tarball release at some point with ‘make prod’. If not you will get this error:
 
-{{< highlight bash >}}make[1]: Leaving directory \`/root/hue/apps'
+<pre><code class="bash">make[1]: Leaving directory \`/root/hue/apps'
 
 make[1]: Entering directory \`/root/hue/docs'
 
@@ -264,11 +264,11 @@ make[1]: Entering directory \`/root/hue/docs'
 
 mv: cannot stat ‘release-notes/*.html’: No such file or directory
 
-{{< /highlight >}}
+</code></pre>
 
 And that’s it! At the end of the build:
 
-{{< highlight bash >}}=== Installing app at oozie
+<pre><code class="bash">=== Installing app at oozie
 
 === oozie v.3.6.0 is already installed
 
@@ -482,13 +482,13 @@ Installed 0 object(s) from 0 fixture(s)
 
 make[1]: Leaving directory \`/home/romain/projects/hue/apps'
 
-{{< /highlight >}}
+</code></pre>
 
 Just start the development server:
 
-{{< highlight bash >}}./build/env/bin/hue runserver
+<pre><code class="bash">./build/env/bin/hue runserver
 
-{{< /highlight >}}
+</code></pre>
 
 and visit <http://127.0.0.1:8000/> !
 

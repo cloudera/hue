@@ -20,11 +20,11 @@ from __future__ import division
 from builtins import str
 from builtins import range
 from builtins import object
-from past.utils import old_div
 import csv
 import gzip
 import json
 import logging
+import math
 import re
 
 from django.urls import reverse
@@ -401,11 +401,11 @@ def _readfields(lines, delimiters):
     if min(len_list) == 1:
       return 0
 
-    avg_n_fields = old_div(sum(len_list), n_lines)
+    avg_n_fields = math.floor(sum(len_list) / n_lines)
     sq_of_exp = avg_n_fields * avg_n_fields
 
     len_list_sq = [l * l for l in len_list]
-    exp_of_sq = old_div(sum(len_list_sq), n_lines)
+    exp_of_sq = math.floor(sum(len_list_sq) / n_lines)
     var = exp_of_sq - sq_of_exp
     # Favour more fields
     return (1000.0 / (var + 1)) + avg_n_fields

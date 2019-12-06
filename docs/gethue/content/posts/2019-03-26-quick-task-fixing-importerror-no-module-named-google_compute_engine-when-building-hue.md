@@ -45,11 +45,11 @@ categories:
 ---
 When [building Hue][1] on a Google Compute Engine machine, you might it this issue:
 
-{{< highlight bash >}} ImportError: No module named google_compute_engine{{< /highlight >}}
+<pre><code class="bash"> ImportError: No module named google_compute_engine</code></pre>
 
 with this full trace:
 
-{{< highlight bash >}} 
+<pre><code class="bash"> 
 
 creating 'dist/kombu-4.3.0-py2.7.egg' and adding 'build/bdist.linux-x86_64/egg' to it
 
@@ -139,15 +139,15 @@ Makefile:148: recipe for target 'desktop' failed
 
 make: \*** [desktop] Error 2
 
-{{< /highlight >}}
+</code></pre>
 
 <pre>On quick workaround if you do not use boto, it to no not configure it:</p>
 
 
 <p>
-  {{< highlight bash >}}
+  <pre><code class="bash">
   sudo mv /etc/boto.cfg /etc/boto.cfg.back<br />
-  {{< /highlight >}}
+  </code></pre>
 </p>
 
  [1]: http://cloudera.github.io/hue/latest/administrator/installation/

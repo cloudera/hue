@@ -50,7 +50,7 @@ It turns out it’s pretty simple to do. It only requires a small script, a Hue 
 
 This script (which was just added in [`desktop/core/desktop/wsgi.py`][4]) enables any Web server that speaks WSGI to launch Hue and route requests to it:
 
-{{< highlight python >}}
+<pre><code class="python">
   
 import os
   
@@ -62,7 +62,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "desktop.settings")
   
 from django.core.wsgi import get_wsgi_application
   
-application = get_wsgi_application(){{< /highlight >}}
+application = get_wsgi_application()</code></pre>
 
 The next step disables booting Hue from the `runcpserver` command. In Cloudera Manager, go to **Hue** > **Configuration** > **Service-Wide** > **Advanced**, and add the following to the hue safety valve:
 
@@ -70,7 +70,7 @@ The next step disables booting Hue from the `runcpserver` command. In Cloudera 
 
 If you are [running Hue outside of Cloudera Manager][5], modify `desktop/conf/hue.ini` with:
 
-{{< highlight bash >}}
+<pre><code class="bash">
   
 [desktop]
     
@@ -78,11 +78,11 @@ If you are [running Hue outside of Cloudera Manager][5], modify `desktop/conf/hu
     
 enable_server=no
   
-{{< /highlight >}}
+</code></pre>
 
 The final step is to configure Apache to launch Hue by adding the following to the `apache.conf`:
 
-{{< highlight bash >}}WSGIScriptAlias / $HUE_PATH/desktop/core/src/desktop/wsgi.py
+<pre><code class="bash">WSGIScriptAlias / $HUE_PATH/desktop/core/src/desktop/wsgi.py
   
 WSGIPythonPath $HUE_PATH/desktop/core/src/desktop:$HUE_PATH/build/env/lib/python2.7/site-packages
   
@@ -112,7 +112,7 @@ Require all granted
   
 </Directory>
   
-{{< /highlight >}}
+</code></pre>
 
 Where `$HOSTNAME` should be the hostname of the machine running Hue, and `$HUE_PATH` is where Hue is installed. If you’re using Cloudera Manager, by default it should be either `/usr/lib/hue` for a package install, or `/opt/cloudera/parcels/CDH/lib/hue` for a parcel install.
 

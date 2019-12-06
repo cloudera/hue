@@ -207,7 +207,7 @@ This post was originally published on [Install Hue 3 with Pivotal HD 3.0][1] by�
   </p>
 
   <p>
-    {{< highlight bash >}}# External dependencies<br /> sudo yum -y install cyrus-sasl-gssapi cyrus-sasl-plain libxml2 libxslt zlib python sqlite python-psycopg2<br /> # Hue packages<br /> sudo yum -y install ./hue-common-3.7.1-1.el6.x86_64.rpm<br /> sudo yum -y install ./hue-server-3.7.1-1.el6.x86_64.rpm<br /> sudo yum -y install ./hue-rdbms-3.7.1-1.el6.x86_64.rpm<br /> sudo yum -y install ./hue-zookeeper-3.7.1-1.el6.x86_64.rpm<br /> sudo yum -y install ./hue-pig-3.7.1-1.el6.x86_64.rpm<br /> sudo yum -y install ./hue-hbase-3.7.1-1.el6.x86_64.rpm<br /> sudo yum -y install ./hue-beeswax-3.7.1-1.el6.x86_64.rpm<br /> (sudo rpm -i -nodeps hue-beeswax-3.7.0+cdh5.3.3+180-1.cdh5.3.3.p0.8.el6.x86_64.rpm)<br /> sudo yum -y install ./hue-sqoop-3.7.1-1.el6.x86_64.rpm<br /> sudo yum -y install ./hue-impala-3.7.1-1.el6.x86_64.rpm<br /> {{< /highlight >}}
+    <pre><code class="bash"># External dependencies<br /> sudo yum -y install cyrus-sasl-gssapi cyrus-sasl-plain libxml2 libxslt zlib python sqlite python-psycopg2<br /> # Hue packages<br /> sudo yum -y install ./hue-common-3.7.1-1.el6.x86_64.rpm<br /> sudo yum -y install ./hue-server-3.7.1-1.el6.x86_64.rpm<br /> sudo yum -y install ./hue-rdbms-3.7.1-1.el6.x86_64.rpm<br /> sudo yum -y install ./hue-zookeeper-3.7.1-1.el6.x86_64.rpm<br /> sudo yum -y install ./hue-pig-3.7.1-1.el6.x86_64.rpm<br /> sudo yum -y install ./hue-hbase-3.7.1-1.el6.x86_64.rpm<br /> sudo yum -y install ./hue-beeswax-3.7.1-1.el6.x86_64.rpm<br /> (sudo rpm -i -nodeps hue-beeswax-3.7.0+cdh5.3.3+180-1.cdh5.3.3.p0.8.el6.x86_64.rpm)<br /> sudo yum -y install ./hue-sqoop-3.7.1-1.el6.x86_64.rpm<br /> sudo yum -y install ./hue-impala-3.7.1-1.el6.x86_64.rpm<br /> </code></pre>
   </p>
 
   <p>
@@ -219,7 +219,7 @@ This post was originally published on [Install Hue 3 with Pivotal HD 3.0][1] by�
   </div>
 
   <p>
-    {{< highlight bash >}}sudo /etc/init.d/hue start{{< /highlight >}}
+    <pre><code class="bash">sudo /etc/init.d/hue start</code></pre>
   </p>
 
   <div dir="ltr">
@@ -248,7 +248,7 @@ This post was originally published on [Install Hue 3 with Pivotal HD 3.0][1] by�
 
   <div dir="ltr">
     <p>
-      {{< highlight bash >}}sudo /etc/init.d/hue restart{{< /highlight >}}
+      <pre><code class="bash">sudo /etc/init.d/hue restart</code></pre>
     </p>
   </div>
 
@@ -270,7 +270,7 @@ This post was originally published on [Install Hue 3 with Pivotal HD 3.0][1] by�
 
   <div dir="ltr">
     <p>
-      {{< highlight bash >}}sudo vi /data/hawq/master/gpseg-1/pg_hba.conf{{< /highlight >}}
+      <pre><code class="bash">sudo vi /data/hawq/master/gpseg-1/pg_hba.conf</code></pre>
     </p>
   </div>
 
@@ -284,7 +284,7 @@ This post was originally published on [Install Hue 3 with Pivotal HD 3.0][1] by�
 
   <div dir="ltr">
     <p>
-      {{< highlight bash >}}host    all     gpadmin <Add your AmbariHost IP here>/32        trust{{< /highlight >}}
+      <pre><code class="bash">host    all     gpadmin <Add your AmbariHost IP here>/32        trust</code></pre>
     </p>
   </div>
 
@@ -317,7 +317,7 @@ This post was originally published on [Install Hue 3 with Pivotal HD 3.0][1] by�
   </div>
 
   <p>
-    {{< highlight bash >}}sudo nohup /usr/bin/hbase thrift start &{{< /highlight >}}
+    <pre><code class="bash">sudo nohup /usr/bin/hbase thrift start &</code></pre>
   </p>
 
   <p>
@@ -568,7 +568,7 @@ This post was originally published on [Install Hue 3 with Pivotal HD 3.0][1] by�
   </p>
 
   <p>
-    {{< highlight bash >}}<br /> ###########################################################################<br /> # General configuration for core Desktop features (authentication, etc)<br /> ###########################################################################<br /> [desktop]<br />  # Set this to a random string, the longer the better.<br />  # This is used for secure hashing in the session store.<br />  secret_key=bozanovakozagoza<br />  # Time zone name<br />  time_zone=Europe/Amsterdam<br />  # Comma separated list of apps to not load at server startup.<br />  # e.g.: pig,zookeeper<br />  app_blacklist=impala,indexer<br /> ###########################################################################<br /> # Settings for the RDBMS application<br /> ###########################################################################<br /> [librdbms]<br />  # The RDBMS app can have any number of databases configured in the databases<br />  # section. A database is known by its section name<br />  # (IE sqlite, mysql, psql, and oracle in the list below).<br />  [[databases]]<br />    # mysql, oracle, or postgresql configuration.<br />    [[[postgresql]]]<br />      # Name to show in the UI.<br />      nice_name=&quot;HAWQ&quot;<br />      name=postgres<br />      engine=postgresql<br />      host=phd3.localdomain<br />      port=5432<br />      user=gpadmin<br />      password=<br /> ###########################################################################<br /> # Settings to configure your Hadoop cluster.<br /> ###########################################################################<br /> [hadoop]<br />  # Configuration for HDFS NameNode<br />  # ------------------------<br />  [[hdfs_clusters]]<br />    [[[default]]]<br />      # Enter the filesystem uri<br />      fs_defaultfs=hdfs://phd1.localdomain:8020<br />      # Use WebHdfs/HttpFs as the communication mechanism.<br />      # Domain should be the NameNode or HttpFs host.<br />      # Default port is 14000 for HttpFs.<br />      webhdfs_url=http://phd1.localdomain:50070/webhdfs/v1<br />  # Configuration for YARN (MR2)<br />  # ------------------------<br />  [[yarn_clusters]]<br />    [[[default]]]<br />      # Enter the host on which you are running the ResourceManager<br />      resourcemanager_host=phd1.localdomain<br />      # The port where the ResourceManager IPC listens on<br />      resourcemanager_port=8030<br />      # URL of the ResourceManager API<br />      resourcemanager_api_url=http://phd1.localdomain:8088<br />      # URL of the HistoryServer API<br />      history_server_api_url=http://phd2.localdomain:19888<br /> ###########################################################################<br /> # Settings to configure liboozie<br /> ###########################################################################<br /> [liboozie]<br />  # The URL where the Oozie service runs on. This is required in order for<br />  # users to submit jobs. Empty value disables the config check.<br />  oozie_url=http://phd2.localdomain:11000/oozie<br /> ###########################################################################<br /> # Settings to configure Beeswax with Hive<br /> ###########################################################################<br /> [beeswax]<br />  # Host where HiveServer2 is running.<br />  # If Kerberos security is enabled, use fully-qualified domain name (FQDN).<br />  hive_server_host=phd1.localdomain<br />  # Port where HiveServer2 Thrift server runs on.<br />  hive_server_port=10000<br />  # Choose whether Hue uses the GetLog() thrift call to retrieve Hive logs.<br />  # If false, Hue will use the FetchResults() thrift call instead.<br />  use_get_log_api=false<br />  # Set a LIMIT clause when browsing a partitioned table.<br />  # A positive value will be set as the LIMIT. If 0 or negative, do not set any limit.<br />  browse_partitioned_table_limit=250<br />  # A limit to the number of rows that can be downloaded from a query.<br />  # A value of -1 means there will be no limit.<br />  # A maximum of 65,000 is applied to XLS downloads.<br />  download_row_limit=10000<br />  # Thrift version to use when communicating with HiveServer2<br />  thrift_version=5<br /> ###########################################################################<br /> # Settings to configure the Zookeeper application.<br /> ###########################################################################<br /> [zookeeper]<br />  [[clusters]]<br />    [[[default]]]<br />      # Zookeeper ensemble. Comma separated list of Host/Port.<br />      # e.g. localhost:2181,localhost:2182,localhost:2183<br />      host_ports=phd2.localdomain:2181<br />      # The URL of the REST contrib service (required for znode browsing)<br />      rest_url=http://phd2.localdomain:9998<br /> ###########################################################################<br /> # Settings to configure HBase Browser<br /> ###########################################################################<br /> [hbase]<br />  # Comma-separated list of HBase Thrift servers for clusters in the format of '(name|host:port)'.<br />  # Use full hostname with security.<br />  hbase_clusters=(Cluster|phd2.localdomain:9090)<br /> {{< /highlight >}}
+    <pre><code class="bash"><br /> ###########################################################################<br /> # General configuration for core Desktop features (authentication, etc)<br /> ###########################################################################<br /> [desktop]<br />  # Set this to a random string, the longer the better.<br />  # This is used for secure hashing in the session store.<br />  secret_key=bozanovakozagoza<br />  # Time zone name<br />  time_zone=Europe/Amsterdam<br />  # Comma separated list of apps to not load at server startup.<br />  # e.g.: pig,zookeeper<br />  app_blacklist=impala,indexer<br /> ###########################################################################<br /> # Settings for the RDBMS application<br /> ###########################################################################<br /> [librdbms]<br />  # The RDBMS app can have any number of databases configured in the databases<br />  # section. A database is known by its section name<br />  # (IE sqlite, mysql, psql, and oracle in the list below).<br />  [[databases]]<br />    # mysql, oracle, or postgresql configuration.<br />    [[[postgresql]]]<br />      # Name to show in the UI.<br />      nice_name=&quot;HAWQ&quot;<br />      name=postgres<br />      engine=postgresql<br />      host=phd3.localdomain<br />      port=5432<br />      user=gpadmin<br />      password=<br /> ###########################################################################<br /> # Settings to configure your Hadoop cluster.<br /> ###########################################################################<br /> [hadoop]<br />  # Configuration for HDFS NameNode<br />  # ------------------------<br />  [[hdfs_clusters]]<br />    [[[default]]]<br />      # Enter the filesystem uri<br />      fs_defaultfs=hdfs://phd1.localdomain:8020<br />      # Use WebHdfs/HttpFs as the communication mechanism.<br />      # Domain should be the NameNode or HttpFs host.<br />      # Default port is 14000 for HttpFs.<br />      webhdfs_url=http://phd1.localdomain:50070/webhdfs/v1<br />  # Configuration for YARN (MR2)<br />  # ------------------------<br />  [[yarn_clusters]]<br />    [[[default]]]<br />      # Enter the host on which you are running the ResourceManager<br />      resourcemanager_host=phd1.localdomain<br />      # The port where the ResourceManager IPC listens on<br />      resourcemanager_port=8030<br />      # URL of the ResourceManager API<br />      resourcemanager_api_url=http://phd1.localdomain:8088<br />      # URL of the HistoryServer API<br />      history_server_api_url=http://phd2.localdomain:19888<br /> ###########################################################################<br /> # Settings to configure liboozie<br /> ###########################################################################<br /> [liboozie]<br />  # The URL where the Oozie service runs on. This is required in order for<br />  # users to submit jobs. Empty value disables the config check.<br />  oozie_url=http://phd2.localdomain:11000/oozie<br /> ###########################################################################<br /> # Settings to configure Beeswax with Hive<br /> ###########################################################################<br /> [beeswax]<br />  # Host where HiveServer2 is running.<br />  # If Kerberos security is enabled, use fully-qualified domain name (FQDN).<br />  hive_server_host=phd1.localdomain<br />  # Port where HiveServer2 Thrift server runs on.<br />  hive_server_port=10000<br />  # Choose whether Hue uses the GetLog() thrift call to retrieve Hive logs.<br />  # If false, Hue will use the FetchResults() thrift call instead.<br />  use_get_log_api=false<br />  # Set a LIMIT clause when browsing a partitioned table.<br />  # A positive value will be set as the LIMIT. If 0 or negative, do not set any limit.<br />  browse_partitioned_table_limit=250<br />  # A limit to the number of rows that can be downloaded from a query.<br />  # A value of -1 means there will be no limit.<br />  # A maximum of 65,000 is applied to XLS downloads.<br />  download_row_limit=10000<br />  # Thrift version to use when communicating with HiveServer2<br />  thrift_version=5<br /> ###########################################################################<br /> # Settings to configure the Zookeeper application.<br /> ###########################################################################<br /> [zookeeper]<br />  [[clusters]]<br />    [[[default]]]<br />      # Zookeeper ensemble. Comma separated list of Host/Port.<br />      # e.g. localhost:2181,localhost:2182,localhost:2183<br />      host_ports=phd2.localdomain:2181<br />      # The URL of the REST contrib service (required for znode browsing)<br />      rest_url=http://phd2.localdomain:9998<br /> ###########################################################################<br /> # Settings to configure HBase Browser<br /> ###########################################################################<br /> [hbase]<br />  # Comma-separated list of HBase Thrift servers for clusters in the format of '(name|host:port)'.<br />  # Use full hostname with security.<br />  hbase_clusters=(Cluster|phd2.localdomain:9090)<br /> </code></pre>
   </p>
 
   <div id="appendixb" class="article-content entry-content">
@@ -586,11 +586,11 @@ This post was originally published on [Install Hue 3 with Pivotal HD 3.0][1] by�
   </div>
 
   <p>
-    {{< highlight python >}}def get_tables(self, database, table_names=[]):<br /> # Doesn’t use database and only retrieves tables for database currently in use.<br /> cursor =self.connection.cursor()<br /> #cursor.execute(“SELECT table_name FROM information_schema.tables WHERE table_schema=’%s'” % database)<br /> cursor.execute(“SELECT table_name FROM information_schema.tables WHERE table_schema NOT IN (‘hawq_toolkit’,’information_schema’,’madlib’,’pg_aoseg’,’pg_bitmapindex’,’pg_catalog’,’pg_toast’)”)<br /> self.connection.commit()<br /> return[row[0]for row in cursor.fetchall()]
+    <pre><code class="python">def get_tables(self, database, table_names=[]):<br /> # Doesn’t use database and only retrieves tables for database currently in use.<br /> cursor =self.connection.cursor()<br /> #cursor.execute(“SELECT table_name FROM information_schema.tables WHERE table_schema=’%s'” % database)<br /> cursor.execute(“SELECT table_name FROM information_schema.tables WHERE table_schema NOT IN (‘hawq_toolkit’,’information_schema’,’madlib’,’pg_aoseg’,’pg_bitmapindex’,’pg_catalog’,’pg_toast’)”)<br /> self.connection.commit()<br /> return[row[0]for row in cursor.fetchall()]
   </p>
 
   <p>
-    def get_columns(self, database, table):<br /> cursor =self.connection.cursor()<br /> #cursor.execute(“SELECT column_name FROM information_schema.columns WHERE table_schema=’%s’ and table_name=’%s'” % (database, table))<br /> cursor.execute(“SELECT column_name FROM information_schema.columns WHERE table_name=’%s’ AND table_schema NOT IN (‘hawq_toolkit’,’information_schema’,’madlib’,’pg_aoseg’,’pg_bitmapindex’,’pg_catalog’,’pg_toast’)”% table)<br /> self.connection.commit()<br /> return[row[0]for row in cursor.fetchall()]{{< /highlight >}}
+    def get_columns(self, database, table):<br /> cursor =self.connection.cursor()<br /> #cursor.execute(“SELECT column_name FROM information_schema.columns WHERE table_schema=’%s’ and table_name=’%s'” % (database, table))<br /> cursor.execute(“SELECT column_name FROM information_schema.columns WHERE table_name=’%s’ AND table_schema NOT IN (‘hawq_toolkit’,’information_schema’,’madlib’,’pg_aoseg’,’pg_bitmapindex’,’pg_catalog’,’pg_toast’)”% table)<br /> self.connection.commit()<br /> return[row[0]for row in cursor.fetchall()]</code></pre>
   </p>
 </div>
 
@@ -605,7 +605,7 @@ This post was originally published on [Install Hue 3 with Pivotal HD 3.0][1] by�
 
 <div dir="ltr">
   <p>
-    {{< highlight bash >}}<br /> sudo sed -i “s/=’%s’\” % database/NOT IN (‘hawq_toolkit’,’information_schema’,’madlib’,’pg_aoseg’,’pg_bitmapindex’,’pg_catalog’,’pg_toast’)\”/g”/usr/lib/hue/desktop/libs/librdbms/src/librdbms/server/postgresql_lib.py<br /> sudo sed -i “s/table_schema=’%s’ and table_name=’%s’\” % (database, table)/table_name=’%s’ AND table_schema NOT IN (‘hawq_toolkit’,’information_schema’,’madlib’,’pg_aoseg’,’pg_bitmapindex’,’pg_catalog’,’pg_toast’)\” % table/g”/usr/lib/hue/desktop/libs/librdbms/src/librdbms/server/postgresql_lib.py{{< /highlight >}}
+    <pre><code class="bash"><br /> sudo sed -i “s/=’%s’\” % database/NOT IN (‘hawq_toolkit’,’information_schema’,’madlib’,’pg_aoseg’,’pg_bitmapindex’,’pg_catalog’,’pg_toast’)\”/g”/usr/lib/hue/desktop/libs/librdbms/src/librdbms/server/postgresql_lib.py<br /> sudo sed -i “s/table_schema=’%s’ and table_name=’%s’\” % (database, table)/table_name=’%s’ AND table_schema NOT IN (‘hawq_toolkit’,’information_schema’,’madlib’,’pg_aoseg’,’pg_bitmapindex’,’pg_catalog’,’pg_toast’)\” % table/g”/usr/lib/hue/desktop/libs/librdbms/src/librdbms/server/postgresql_lib.py</code></pre>
   </p>
 </div>
 
@@ -620,7 +620,7 @@ This post was originally published on [Install Hue 3 with Pivotal HD 3.0][1] by�
 
     <div dir="ltr">
       <p>
-        {{< highlight bash >}}sudo /etc/init.d/hue restart{{< /highlight >}}
+        <pre><code class="bash">sudo /etc/init.d/hue restart</code></pre>
       </p>
     </div>
 

@@ -61,27 +61,27 @@ When a Hue administrator loses their password, a more programmatic approach is r
 
 If using CM, export this variable in order to point to the correct database:
 
-{{< highlight bash >}}HUE_CONF_DIR=/var/run/cloudera-scm-agent/process/-hue-HUE_SERVER-id
+<pre><code class="bash">HUE_CONF_DIR=/var/run/cloudera-scm-agent/process/-hue-HUE_SERVER-id
 
 echo $HUE_CONF_DIR
 
-export HUE_CONF_DIR{{< /highlight >}}
+export HUE_CONF_DIR</code></pre>
 
 Where <id> is the most recent ID in that process directory for hue-HUE_SERVER.
 
 A quick way to get the correct directory is to use this script:
 
-{{< highlight bash >}}export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/\`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE | tail -1 | awk '{print $9}'\`"{{< /highlight >}}
+<pre><code class="bash">export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/\`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE | tail -1 | awk '{print $9}'\`"</code></pre>
 
 Then:
 
-{{< highlight bash >}}cd /usr/lib/hue (or /opt/cloudera/parcels/CDH-XXXXX/share/hue if using parcels and CM)
+<pre><code class="bash">cd /usr/lib/hue (or /opt/cloudera/parcels/CDH-XXXXX/share/hue if using parcels and CM)
 
-build/env/bin/hue shell{{< /highlight >}}
+build/env/bin/hue shell</code></pre>
 
 The following is a small script, that can be executed within the Hue shell, to change the password for a user named “example”:
 
-{{< highlight python >}}from django.contrib.auth.models import User
+<pre><code class="python">from django.contrib.auth.models import User
 
 user = User.objects.get(username='example')
 
@@ -89,19 +89,19 @@ user.set_password('some password')
 
 user.save()
 
-{{< /highlight >}}
+</code></pre>
 
 The script can also be invoked in the shell by using input redirection (assuming the script is in a file named script.py):
 
-{{< highlight bash >}}build/env/bin/hue shell < script.py{{< /highlight >}}
+<pre><code class="bash">build/env/bin/hue shell < script.py</code></pre>
 
 # How to make a certain user a Hue admin
 
-{{< highlight bash >}}build/env/bin/hue shell{{< /highlight >}}
+<pre><code class="bash">build/env/bin/hue shell</code></pre>
 
 Then set these properties to true:
 
-{{< highlight python >}}from django.contrib.auth.models import User
+<pre><code class="python">from django.contrib.auth.models import User
 
 a = User.objects.get(username='hdfs')
 
@@ -113,7 +113,7 @@ a.set_password('my_secret')
 
 a.save()
 
-{{< /highlight >}}
+</code></pre>
 
 # How to change or reset a forgotten password?
 
@@ -121,11 +121,11 @@ Go on the Hue machine, then in the Hue home directory and either type:
 
 To change the password of the currently logged in Unix user:
 
-{{< highlight bash >}}build/env/bin/hue changepassword{{< /highlight >}}
+<pre><code class="bash">build/env/bin/hue changepassword</code></pre>
 
 If you don’t remember the admin username, create a new Hue admin (you will then also be able to login and could change the password of another user in Hue):
 
-{{< highlight bash >}}build/env/bin/hue createsuperuser{{< /highlight >}}
+<pre><code class="bash">build/env/bin/hue createsuperuser</code></pre>
 
 &nbsp;
 

@@ -59,23 +59,23 @@ Most of the instructions are on the [github][4].
 
 We start by checking out the repository and building the project (note: if you are on Ubuntu and encrypted your disk, you will need to build from  /tmp). Then, from the Spark Job Server root directory:
 
-{{< highlight bash >}}mkdir bin/config
+<pre><code class="bash">mkdir bin/config
 
 cp config/local.sh.template bin/config/settings.sh
 
-{{< /highlight >}}
+</code></pre>
 
 And these two variables in settings.sh:
 
-{{< highlight bash >}}LOG_DIR=/var/log/job-server
+<pre><code class="bash">LOG_DIR=/var/log/job-server
 
 SPARK_HOME=/usr/lib/spark (or SPARK_HOME=/opt/cloudera/parcels/CDH/lib/spark)
 
-{{< /highlight >}}
+</code></pre>
 
 Then package everything:
 
-{{< highlight bash >}}bin/server_deploy.sh settings.sh
+<pre><code class="bash">bin/server_deploy.sh settings.sh
 
 [info] - should return error message if classPath does not match
 
@@ -103,7 +103,7 @@ spark-job-server.jar
 
 Created distribution at /tmp/job-server/job-server.tar.gz
 
-{{< /highlight >}}
+</code></pre>
 
 We have our main tarball `/tmp/job-server/job-server.tar.gz`, ready to be copied on a server.
 
@@ -117,15 +117,15 @@ We then extract `job-server.tar.gz` and copy our application.conf on the server.
 
 <!--email_off-->
 
-{{< highlight bash >}}scp /tmp/spark-jobserver/./job-server/src/main/resources/application.conf hue@server.com:
+<pre><code class="bash">scp /tmp/spark-jobserver/./job-server/src/main/resources/application.conf hue@server.com:
 
-{{< /highlight >}}
+</code></pre>
 
 <!--/email_off-->
 
 Edit application.conf to point to the master:
 
-{{< highlight bash >}}# Settings for safe local mode development
+<pre><code class="bash"># Settings for safe local mode development
 
 spark {
 
@@ -135,11 +135,11 @@ master = "spark://spark-host:7077"
 
 }
 
-{{< /highlight >}}
+</code></pre>
 
 Here is the content of our jobserver folder:
 
-{{< highlight bash >}}ls -l
+<pre><code class="bash">ls -l
 
 total 25208
 
@@ -155,7 +155,7 @@ total 25208
 
 -rw-rw-r- 1 ubuntu ubuntu 13673788 Jun  9 23:05 spark-job-server.jar
 
-{{< /highlight >}}
+</code></pre>
 
 Note:
 
@@ -165,23 +165,23 @@ Also make sure that you see at least one Spark work:  `"Workers: 1"`
 
 In the past, we had some problems (e.g. spark worker not starting) when trying to bind Spark to a localhost. We fixed it by hardcoding in the `spark-env.sh`:
 
-{{< highlight bash >}}sudo vim /etc/spark/conf/spark-env.sh
+<pre><code class="bash">sudo vim /etc/spark/conf/spark-env.sh
 
 export STANDALONE_SPARK_MASTER_HOST=spark-host
 
-{{< /highlight >}}
+</code></pre>
 
 Now just start the server and the process will run in the background:
 
-{{< highlight bash >}}./server_start.sh{{< /highlight >}}
+<pre><code class="bash">./server_start.sh</code></pre>
 
 You can check if it is alive by grepping it:
 
-{{< highlight bash >}}ps -ef | grep 9999
+<pre><code class="bash">ps -ef | grep 9999
 
 ubuntu   28755     1  2 01:41 pts/0    00:00:11 java -cp /home/ubuntu/spark-server:/home/ubuntu/spark-server/spark-job-server.jar::/opt/cloudera/parcels/CDH-5.0.0-1.cdh5.0.0.p0.47/lib/spark/conf:/opt/cloudera/parcels/CDH-5.0.0-1.cdh5.0.0.p0.47/lib/spark/assembly/lib/\*:/opt/cloudera/parcels/CDH-5.0.0-1.cdh5.0.0.p0.47/lib/spark/examples/lib/\*:/etc/hadoop/conf:/opt/cloudera/parcels/CDH-5.0.0-1.cdh5.0.0.p0.47/lib/hadoop/\*:/opt/cloudera/parcels/CDH-5.0.0-1.cdh5.0.0.p0.47/lib/hadoop/../hadoop-hdfs/\*:/opt/cloudera/parcels/CDH-5.0.0-1.cdh5.0.0.p0.47/lib/hadoop/../hadoop-yarn/\*:/opt/cloudera/parcels/CDH-5.0.0-1.cdh5.0.0.p0.47/lib/hadoop/../hadoop-mapreduce/\*:/opt/cloudera/parcels/CDH-5.0.0-1.cdh5.0.0.p0.47/lib/spark/lib/scala-library.jar:/opt/cloudera/parcels/CDH-5.0.0-1.cdh5.0.0.p0.47/lib/spark/lib/scala-compiler.jar:/opt/cloudera/parcels/CDH-5.0.0-1.cdh5.0.0.p0.47/lib/spark/lib/jline.jar -XX:+UseConcMarkSweepGC -verbose:gc -XX:+PrintGCTimeStamps -Xloggc:/home/ubuntu/spark-server/gc.out -XX:MaxPermSize=512m -XX:+CMSClassUnloadingEnabled -Xmx5g -XX:MaxDirectMemorySize=512M -XX:+HeapDumpOnOutOfMemoryError -Djava.net.preferIPv4Stack=true -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.manage
 
-{{< /highlight >}}
+</code></pre>
 
 That’s it!
 

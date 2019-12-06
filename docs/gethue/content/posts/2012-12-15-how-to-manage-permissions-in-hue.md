@@ -96,11 +96,11 @@ By explicitly setting the app level permissions, the apps that these users will 
 
 You can also blacklist the apps at the code level, e.g. in the hue.ini:
 
-{{< highlight bash >}}[desktop]
+<pre><code class="bash">[desktop]
   
 app_blacklist=search,security,oozie,jobbrowser,pig,beeswax,search,zookeeper,impala,rdbms,spark,metastore,hbase,sqoop,jobsub
   
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 

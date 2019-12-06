@@ -49,25 +49,25 @@ categories:
 
 20000013 is the id you can see in the URL of the dashboard. If you don't specify -pks it will export all your dashboards.
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 ./build/env/bin/hue dumpdata search.Collection -indent 2 -pks=20000013 -natural > data.json
 
-{{< /highlight >}}
+</code></pre>
 
 **Using Hue 3.7 or less**
 
-{{< highlight bash >}}./build/env/bin/hue dumpdata search -indent 2 > data.json
+<pre><code class="bash">./build/env/bin/hue dumpdata search -indent 2 > data.json
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
 then
 
-{{< highlight bash >}}./build/env/bin/hue loaddata data.json
+<pre><code class="bash">./build/env/bin/hue loaddata data.json
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -81,11 +81,11 @@ And that's it, the dashboards with the same IDs will be refreshed with the impo
 
 If using CM, export this variable in order to point to the correct database:
 
-{{< highlight bash >}}HUE_CONF_DIR=/var/run/cloudera-scm-agent/process/-hue-HUE_SERVER-id
+<pre><code class="bash">HUE_CONF_DIR=/var/run/cloudera-scm-agent/process/-hue-HUE_SERVER-id
 
 echo $HUE_CONF_DIR
 
-export HUE_CONF_DIR{{< /highlight >}}
+export HUE_CONF_DIR</code></pre>
 
 Where <id> is the most recent ID in that process directory for hue-HUE_SERVER.
 

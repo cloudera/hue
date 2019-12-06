@@ -52,11 +52,11 @@ You can now view Snappy compressed <a href="http://avro.apache.org/" target="_bl
   1. Make sure Hue is stopped before installing.
   2. Install the snappy system packages on your system. They can either be downloaded from <https://code.google.com/p/snappy/> or, preferably, installed via your package management system (e.g. `yum install snappy-devel`).
   3. Install the python-snappy package via ‘pip’ from the Hue home (cd /usr/lib/hue or /opt/cloudera/parcels/CDH/lib/hue):
-    {{< highlight bash >}}yum install gcc gcc-c++ python-devel snappy-devel
+    <pre><code class="bash">yum install gcc gcc-c++ python-devel snappy-devel
 
     build/env/bin/pip install -U setuptools
 
-    build/env/bin/pip install python-snappy{{< /highlight >}}
+    build/env/bin/pip install python-snappy</code></pre>
 
   4. Start Hue!
 
@@ -74,7 +74,7 @@ Note: In this demo, we are using Avro files found in this [github][2] (1).
 
 It turns out that `python-snappy` is not compatible with the python library called `snappy`. If you see this error, uninstall `snappy`:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [03/Sep/2015 06:56:34 -0700] views WARNING Could not read avro file at //user/cconner/test_snappy.avro
 
@@ -114,7 +114,7 @@ raise PopupException(_("Failed to read Avro file."))
 
 PopupException: Failed to read Avro file.
 
-{{< /highlight >}}
+</code></pre>
 
 #
 

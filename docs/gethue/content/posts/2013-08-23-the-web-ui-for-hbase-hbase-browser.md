@@ -60,7 +60,7 @@ Prerequisites before starting Hue:
 
 3. Configure your list of HBase Clusters in <a href="https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L467" target="_blank" rel="noopener noreferrer">hue.ini</a> to point to your Thrift IP/Port
 
-{{< highlight bash >}}[hbase]
+<pre><code class="bash">[hbase]
 
 \# Comma-separated list of HBase Thrift servers for clusters in the format of '(name|host:port)'.
 
@@ -70,7 +70,7 @@ hbase_clusters=(Cluster|my-host1:9090),(Cluster2|localhost:9090)
 
 \## truncate_limit = 500
 
-{{< /highlight >}}
+</code></pre>
 
 In this video, we’re walking through two main features of this app.  Let’s talk about HBase Browser!
 

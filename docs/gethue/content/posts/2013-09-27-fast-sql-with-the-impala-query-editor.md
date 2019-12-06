@@ -69,7 +69,7 @@ categories:
 
 <span>Then we are back to our Yelp data. Let’s take the query from </span>[<span>episode one</span>][1] <span>and execute it in both apps:</span>
 
-{{< highlight sql >}}
+<pre><code class="sql">
 
 SELECT r.business_id, name, SUM(cool) AS coolness
 
@@ -87,7 +87,7 @@ ORDER BY coolness DESC
 
 LIMIT 10
 
-{{< /highlight >}}
+</code></pre>
 
 <span>Again, you can see the benefits of Impala’s </span>[<span>architecture and optimization</span>][3]<span>.</span>
 

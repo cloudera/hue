@@ -63,7 +63,7 @@ HBase can now be configured to [offer impersonation][3] (with or without Kerbero
 
 First, make sure you have this in your hbase-site.xml:
 
-{{< highlight xml >}}<property>
+<pre><code class="xml"><property>
 
 <name>hbase.thrift.support.proxyuser</name>
 
@@ -79,7 +79,7 @@ First, make sure you have this in your hbase-site.xml:
 
 </property>
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -91,7 +91,7 @@ If using Cloudera Manager, this is done by typing ‘thrift’ in the configurat
 
 Then check in core-site.xml that HBase is authorized to impersonates someone:
 
-{{< highlight xml >}}<property>
+<pre><code class="xml"><property>
 
 <name>hadoop.proxyuser.hbase.hosts</name>
 
@@ -107,17 +107,17 @@ Then check in core-site.xml that HBase is authorized to impersonates someone:
 
 </property>
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
 And finally check that Hue point to a local config directory of HBase specified in its hue.ini:
 
-{{< highlight bash >}}[hbase]
+<pre><code class="bash">[hbase]
 
 hbase_conf_dir=/etc/hbase/conf
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -125,11 +125,11 @@ hbase_conf_dir=/etc/hbase/conf
 
 If you are using Cloudera Manager, you might want to select the HBase Thrift server in the Hue configuration and enter something like this in the Hue Service Advanced Configuration Snippet (Safety Valve) for hue_safety_valve.ini.
 
-{{< highlight bash >}}[hbase]
+<pre><code class="bash">[hbase]
 
 hbase_conf_dir={{HBASE_CONF_DIR}}
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -145,7 +145,7 @@ Make sure that HBase is configured with [Kerberos][4] and that you have this in 
 
 <!--email_off-->
 
-{{< highlight xml >}}<property>
+<pre><code class="xml"><property>
 
 <name>hbase.security.authentication</name>
 
@@ -161,7 +161,7 @@ Make sure that HBase is configured with [Kerberos][4] and that you have this in 
 
 </property>
 
-{{< /highlight >}}
+</code></pre>
 
 <!--/email_off-->
 
@@ -181,19 +181,19 @@ If using Cloudera Manager, go to "Hbase service > Configuration > Service-Wide /
 
 And similarly to above, make sure that the hue.ini points to a valid directory with hbase-site.xml:
 
-{{< highlight bash >}}[hbase]
+<pre><code class="bash">[hbase]
 
 hbase_conf_dir=/etc/hbase/conf
 
-{{< /highlight >}}
+</code></pre>
 
 or
 
-{{< highlight bash >}}[hbase]
+<pre><code class="bash">[hbase]
 
 hbase_conf_dir={{HBASE_CONF_DIR}}
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -231,19 +231,19 @@ As usual feel free to comment on the [hue-user][7] list or [@gethue][8]!
 
 This error means that the above ‘hadoop.proxyuser.hbase.hosts’ / ‘hadoop.proxyuser.hbase.groups’ properties are not correct:
 
-{{< highlight bash >}}Api Error: Error 500 User: hbase is not allowed to impersonate romain HTTP ERROR 500 Problem accessing /.
+<pre><code class="bash">Api Error: Error 500 User: hbase is not allowed to impersonate romain HTTP ERROR 500 Problem accessing /.
 
 Reason: User: hbase is not allowed to impersonate bob Caused by:javax.servlet.ServletException:
 
 User: hbase is not allowed to impersonate bob at org.apache.hadoop.hbase.thrift.ThriftHttpServlet.doPost(ThriftHttpServlet.java:117) at
 
-{{< /highlight >}}
+</code></pre>
 
 **Note**
 
 You might now see permission errors like below.
 
-{{< highlight bash >}}Api Error: org.apache.hadoop.hbase.security.AccessDeniedException: Insufficient permissions (user=admin, scope=default, action=CREATE)...{{< /highlight >}}
+<pre><code class="bash">Api Error: org.apache.hadoop.hbase.security.AccessDeniedException: Insufficient permissions (user=admin, scope=default, action=CREATE)...</code></pre>
 
 This is because either:
 
@@ -254,11 +254,11 @@ This is because either:
 
 A quick way to fix this is to just give all the permissions. Obviously this is not recommended for a real setup, instead read more about [HBase Access Control][9]!
 
-{{< highlight bash >}}sudo -u hbase hbase shell
+<pre><code class="bash">sudo -u hbase hbase shell
 
 hbase(main):004:0> grant 'bob', 'RWC'
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -268,11 +268,11 @@ If you are getting a “Api Error: TSocket read 0 bytes”, this is because Hue 
 
 A temporary hack would be to insert this in the hue.ini:
 
-{{< highlight bash >}}[hbase]
+<pre><code class="bash">[hbase]
 
 use_doas=true
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -294,7 +294,7 @@ buffered transport mode was not tested when using impersonation but might work.
 
 If you are getting this error:
 
-{{< highlight bash >}}Caused by: org.apache.hadoop.hbase.thrift.HttpAuthenticationException: Authorization header received from the client is empty.{{< /highlight >}}
+<pre><code class="bash">Caused by: org.apache.hadoop.hbase.thrift.HttpAuthenticationException: Authorization header received from the client is empty.</code></pre>
 
 You are very probably hitting <https://issues.apache.org/jira/browse/HBASE-13069>. Also make sure the HTTP/_HOST principal is in the keytab of for their HBase Thrift Server. Beware that as a follow-up you might get <https://issues.apache.org/jira/browse/HBASE-14471>.
 

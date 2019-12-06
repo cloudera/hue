@@ -63,21 +63,21 @@ The Editor is currently visually powered by [Ace][3]. The list of supported lan
 
 For each dialect, we have two files. e.g. with PostgreSQL:
 
-{{< highlight bash >}}pgsql.js
+<pre><code class="bash">pgsql.js
 pgsql_highlight_rules.js
-{{< /highlight >}}
+</code></pre>
 
 The list of keywords is present in `*_highlight_rules.js` and can be updated there.
 
-{{< highlight javascript >}}var keywords = (
+<pre><code class="javascript">var keywords = (
     "ALL|ALTER|REINDEX|..."
 )
-{{< /highlight >}}
+</code></pre>
 
 Afterwards, run:
 
-{{< highlight bash >}}make ace
-{{< /highlight >}}
+<pre><code class="bash">make ace
+</code></pre>
 
 And after refreshing the editor page, the updated mode will be activated.
 
@@ -85,12 +85,12 @@ And after refreshing the editor page, the updated mode will be activated.
 
 To add a new dialect, it is recommended to copy the two files of the closest mode and rename all the names inside. For example, if we were creating a new `ksql` mode, `pgsql_highlight_rules.js` would become `ksql_highlight_rules.js` and we would rename all the references inside to `psql` to `ksql`. Same with `pgsql.js` to `ksql.js`. In particular, the name of the mode to be referenced later is in:
 
-{{< highlight javascript >}}KsqlHighlightRules.metaData = {
+<pre><code class="javascript">KsqlHighlightRules.metaData = {
   fileTypes: ["ksql"],
   name: "ksql",
   scopeName: "source.ksql"
 };
-{{< /highlight >}}
+</code></pre>
 
 Tip: inheritance of modes is supported by Ace, which make it handy for avoiding potential duplications.
 
@@ -98,20 +98,20 @@ In the Editor, the mapping between Ace’s modes and the type of snippets is hap
 
 In the KSQL case we have:
 
-{{< highlight javascript >}}ksql: {
+<pre><code class="javascript">ksql: {
   placeHolder: '${ _("Example: SELECT * FROM stream, or press CTRL + space") }',
   aceMode: 'ace/mode/ksql',
   snippetIcon: 'fa-database',
   sqlDialect: true
 },
-{{< /highlight >}}
+</code></pre>
 
 And cf. above [prerequisites][6], any interpreter snippet with `ksql` will pick-up the new highlighter:
 
-{{< highlight bash >}}[[[ksql]]]
+<pre><code class="bash">[[[ksql]]]
     name = KSQL Analytics
     interface=ksql
-{{< /highlight >}}
+</code></pre>
 
 Note: after [HUE-8758][7] we will be able to have multiple interpreters on the same dialect (e.g. pointing to two different databases of the same type).
 

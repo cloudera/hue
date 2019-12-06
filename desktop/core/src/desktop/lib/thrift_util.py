@@ -21,11 +21,11 @@ standard_library.install_aliases()
 from builtins import map
 from builtins import range
 from past.builtins import basestring
-from past.utils import old_div
 from builtins import object
 import base64
 import queue
 import logging
+import math
 import socket
 import threading
 import time
@@ -820,9 +820,9 @@ def is_thrift_struct(o):
 
 # Same in resource.py for not losing the trace class
 def log_if_slow_call(duration, message):
-  if duration >= old_div(WARN_LEVEL_CALL_DURATION_MS, 1000):
+  if duration >= math.floor(WARN_LEVEL_CALL_DURATION_MS / 1000):
     LOG.warn('SLOW: %.2f - %s' % (duration, message))
-  elif duration >= old_div(INFO_LEVEL_CALL_DURATION_MS, 1000):
+  elif duration >= math.floor(INFO_LEVEL_CALL_DURATION_MS / 1000):
     LOG.info('SLOW: %.2f - %s' % (duration, message))
   else:
     LOG.debug(message)

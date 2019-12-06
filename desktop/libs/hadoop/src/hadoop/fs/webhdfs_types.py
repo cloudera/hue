@@ -22,7 +22,7 @@ from __future__ import division
 
 from builtins import oct
 from builtins import object
-from past.utils import old_div
+import math
 import stat
 
 from django.utils.encoding import smart_str
@@ -40,8 +40,8 @@ class WebHdfsStat(object):
     self.path = Hdfs.join(parent_path, self.name)
     self.isDir = file_status['type'] == 'DIRECTORY'
     self.type = file_status['type']
-    self.atime = old_div(file_status['accessTime'], 1000)
-    self.mtime = old_div(file_status['modificationTime'], 1000)
+    self.atime = math.floor(file_status['accessTime'] / 1000)
+    self.mtime = math.floor(file_status['modificationTime'] / 1000)
     self.user = file_status['owner']
     self.group = file_status['group']
     self.size = file_status['length']

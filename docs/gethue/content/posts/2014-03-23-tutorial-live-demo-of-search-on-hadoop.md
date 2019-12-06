@@ -76,29 +76,29 @@ The next step is to create the indexed into Solr. First, make sure that Solr has
 
 In order to query a live dataset, you need to index some data. Go on the Hue machine:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 cd $HUE_HOME
 
 cd apps/search/examples/bin
 
-{{< /highlight >}}
+</code></pre>
 
 Then create the Solr collections:
 
-{{< highlight bash >}}./create_collections.sh{{< /highlight >}}
+<pre><code class="bash">./create_collections.sh</code></pre>
 
 In case Solr is not on the same machine, add this parameter in the script:
 
-{{< highlight bash >}}-solr http://localhost:8983/solr{{< /highlight >}}
+<pre><code class="bash">-solr http://localhost:8983/solr</code></pre>
 
 Then index some example data with:
 
-{{< highlight bash >}}./post.sh{{< /highlight >}}
+<pre><code class="bash">./post.sh</code></pre>
 
 Same, if Solr is on a different machine, update the url:
 
-{{< highlight bash >}}URL=http://localhost:8983/solr{{< /highlight >}}
+<pre><code class="bash">URL=http://localhost:8983/solr</code></pre>
 
 And that’s it! The above warning message will disappear and you will be able to query Solr indexes in live!
 

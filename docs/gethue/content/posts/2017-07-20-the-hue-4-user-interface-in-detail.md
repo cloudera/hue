@@ -105,13 +105,13 @@ The older Hue 3 UI is still there and it's easily reachable just by clicking on 
 
 Administrators can also decide to enable/disable the new UI at a global level on the <a href="https://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/" target="_blank" rel="noopener noreferrer">hue.ini or CM safety valve</a>
 
-{{< highlight bash >}}[desktop]
+<pre><code class="bash">[desktop]
 
 \# Choose whether to enable the new Hue 4 interface.
 
 is_hue_4=true
 
-{{< /highlight >}}
+</code></pre>
 
 If you look at your browser's address bar, you will notice that all the URLs with the <span class="emphasis"><em>/hue</em></span> prefix point to Hue 4. It is possible to just remove the prefix and land on the Hue 3 version of the page, e.g. /hue/editor (Hue 4) → /editor (Hue 3)
 

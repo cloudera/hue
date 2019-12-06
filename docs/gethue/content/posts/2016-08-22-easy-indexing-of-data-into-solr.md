@@ -61,7 +61,7 @@ categories:
 
 <span style="font-weight: 400;">Next you'll need to install these required <a href="https://www.dropbox.com/s/unex80g7xbx1aq7/smart_indexer_lib-2016-08-22.zip?dl=0">libraries</a>. To do so place them in a directory somewhere on HDFS and set the path for </span>_<span style="font-weight: 400;">config_indexer_libs_path</span>_ <span style="font-weight: 400;">under indexer in the Hue ini to match by default, the </span>_<span style="font-weight: 400;">config_indexer_libs_path</span>_ <span style="font-weight: 400;">value is set to </span>_<span style="font-weight: 400;">/tmp/smart_indexer_lib</span>_<span style="font-weight: 400;">. Additionally under indexer in the Hue ini you’ll need to set </span>_<span style="font-weight: 400;">enable_new_indexer </span>_<span style="font-weight: 400;">to true</span><span style="font-weight: 400;">.</span>
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [indexer]
 
@@ -73,7 +73,7 @@ enable_new_indexer=false
 
 \## config_indexer_libs_path=/tmp/smart_indexer_lib
 
-{{< /highlight >}}
+</code></pre>
 
 **Note**:
 

@@ -51,7 +51,7 @@ First, clone the Hue repository and make sure that you have all the pre-requisi
 
 <!--email_off-->
 
-{{< highlight bash >}}git clone git@github.com:cloudera/hue.git{{< /highlight >}}
+<pre><code class="bash">git clone git@github.com:cloudera/hue.git</code></pre>
 
 <!--/email_off-->
 
@@ -59,13 +59,13 @@ First, clone the Hue repository and make sure that you have all the pre-requisi
 
 The regular unit tests do not require all this setup! Just run them directly:
 
-{{< highlight bash >}}build/env/bin/hue test specific beeswax.tests:test_split_statements &> a; vim a{{< /highlight >}}
+<pre><code class="bash">build/env/bin/hue test specific beeswax.tests:test_split_statements &> a; vim a</code></pre>
 
 **Note**
 
 This requires to have done an <a href="https://github.com/cloudera/hue#getting-started" target="_blank" rel="noopener noreferrer">initial build</a> of Hue with:
 
-{{< highlight bash >}}make apps{{< /highlight >}}
+<pre><code class="bash">make apps</code></pre>
 
 # Integration Tests
 
@@ -73,7 +73,7 @@ This requires to have done an <a href="https://github.com/cloudera/hue#getting-s
 
 The tests will run against the cluster configured in your hue.ini one if you specify:
 
-{{< highlight bash >}}export LIVE_CLUSTER=true{{< /highlight >}}
+<pre><code class="bash">export LIVE_CLUSTER=true</code></pre>
 
 ### Mini cluster
 
@@ -81,7 +81,7 @@ The test will run in a mini cluster (mini Hadoop, Oozie, Sqoop2 and Hive) create
 
 Here is how to get started:
 
-{{< highlight bash >}}./tools/jenkins/jenkins.sh slow{{< /highlight >}}
+<pre><code class="bash">./tools/jenkins/jenkins.sh slow</code></pre>
 
 **Note**
 
@@ -89,17 +89,17 @@ You might have lost all the changes in your local pseudo hue.ini because of the 
 
 In order to avoid this, add this into your \`~/.bashrc\`:
 
-{{< highlight bash >}}export SKIP_CLEAN=true{{< /highlight >}}
+<pre><code class="bash">export SKIP_CLEAN=true</code></pre>
 
 **Note**
 
 To point to an Impalad and trigger the Impala tests:
 
-{{< highlight bash >}}export TEST_IMPALAD_HOST=impalad-01.gethue.com{{< /highlight >}}
+<pre><code class="bash">export TEST_IMPALAD_HOST=impalad-01.gethue.com</code></pre>
 
 or
 
-{{< highlight bash >}}./build/env/bin/hue test impalaimpalad-01.gethue.com{{< /highlight >}}
+<pre><code class="bash">./build/env/bin/hue test impalaimpalad-01.gethue.com</code></pre>
 
 &nbsp;
 
@@ -107,7 +107,7 @@ It is then going to download the 4 latest Hadoop, Oozie, Sqoop2 and Hive and pre
 
 You can CTRL+C and kill the script when you see:
 
-{{< highlight bash >}}INFO: Oozie webconsole disabled, ExtJS library not specified
+<pre><code class="bash">INFO: Oozie webconsole disabled, ExtJS library not specified
 
 New Oozie WAR file with added 'JARs' at /home/romain/projects/hue-master/ext/oozie/oozie-4.0.0-cdh5.1.0/oozie-server/webapps/oozie.war
 
@@ -239,11 +239,11 @@ cd /home/romain/projects/hue-master/maven && mvn install
 
 [INFO] ------------------------
 
-{{< /highlight >}}
+</code></pre>
 
 And that's it! You can run all the tests or some parts with this <a href="https://github.com/cloudera/hue#getting-started" target="_blank" rel="noopener noreferrer">syntax</a>:
 
-{{< highlight bash >}}build/env/bin/hue test specific filebrowser.views_test:test_listdir_sort_and_filter &> a; vim a{{< /highlight >}}
+<pre><code class="bash">build/env/bin/hue test specific filebrowser.views_test:test_listdir_sort_and_filter &> a; vim a</code></pre>
 
 &nbsp;
 
@@ -251,15 +251,15 @@ And that's it! You can run all the tests or some parts with this <a href="https
 
 In some cases you might need to clear up your your cache with something like:
 
-{{< highlight bash >}}rm /home/romain/.hue_cache/.*{{< /highlight >}}
+<pre><code class="bash">rm /home/romain/.hue_cache/.*</code></pre>
 
 then in
 
-{{< highlight bash >}}ext/{{< /highlight >}}
+<pre><code class="bash">ext/</code></pre>
 
 delete everything but
 
-{{< highlight bash >}}thirdparty/{{< /highlight >}}
+<pre><code class="bash">thirdparty/</code></pre>
 
 &nbsp;
 

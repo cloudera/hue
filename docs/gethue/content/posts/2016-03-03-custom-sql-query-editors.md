@@ -48,7 +48,7 @@ Hue's new query editor can easily be configured to work with any database backen
 
 First, in your `hue.ini` file, you will need to add the relevant database connection information under the `librdbms` section:
 
-{{< highlight bash >}}[librdbms]
+<pre><code class="bash">[librdbms]
 
 [[databases]]
 
@@ -68,11 +68,11 @@ password=hue
 
 options={}
 
-{{< /highlight >}}
+</code></pre>
 
 Secondly, we need to add a new interpreter to the notebook app. This will allow the new database type to be registered as a snippet-type in the Notebook app. For query editors that use a Django-compatible database, the name in the brackets should match the database configuration name in the `librdbms` section (e.g. - `postgresql`). The interface will be set to `rdbms`. This tells Hue to use the `librdbms` driver and corresponding connection information to connect to the database. For example, with the above postgresql connection configuration in the `librdbms` section, we can add a PostgreSQL interpreter with the following `notebook` configuration:
 
-{{< highlight bash >}}[notebook]
+<pre><code class="bash">[notebook]
 
 [[interpreters]]
 
@@ -82,7 +82,7 @@ name=PostgreSQL
 
 interface=rdbms
 
-{{< /highlight >}}
+</code></pre>
 
 After updating the configuration and restarting Hue, we can access the new PostgreSQL interpreter in the Notebook app:
 
@@ -111,16 +111,16 @@ Integrating an external JDBC database involves a 3-step process:
 
   1. Download the compatible client driver JAR file for your specific OS and database. Usually you can find the driver files from the official database vendor site; for example, the MySQL JDBC connector for Mac OSX can be found here: <https://dev.mysql.com/downloads/connector/j/>. (NOTE: In the case of MySQL, the JDBC driver is platform independent, but some drivers are specific to certain OSes and versions so be sure to verify compatibility.)
   2. Add the path to the driver JAR file to your Java CLASSPATH. Here, we set the CLASSPATH environment variable in our \`.bash_profile\` script.
-    {{< highlight bash >}}# MySQL
+    <pre><code class="bash"># MySQL
 
     export MYSQL_HOME=/Users/hue/Dev/mysql
 
     export CLASSPATH=$MYSQL_HOME/mysql-connector-java-5.1.38-bin.jar:$CLASSPATH
 
-    {{< /highlight >}}
+    </code></pre>
 
   3. Add a new interpreter to the notebook app and supply the "name", set "interface" to `jdbc`, and set "options" to a JSON object that contains the JDBC connection information. For example, we can connect a local MySQL database named "hue" running on \`localhost\` and port \`8080\` via JDBC with the following configuration:
-    {{< highlight bash >}}[notebook]
+    <pre><code class="bash">[notebook]
 
     [[interpreters]]
 
@@ -132,7 +132,7 @@ Integrating an external JDBC database involves a 3-step process:
 
     options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver", "user": "root", "password": ""}'
 
-    {{< /highlight >}}
+    </code></pre>
 
 #### TIP: Testing JDBC Configurations
 
@@ -178,7 +178,7 @@ Microsoft's SQL Server JDBC drivers can be downloaded from the official site: [
 
 ##### Sample Configuration
 
-{{< highlight bash >}}[[[sqlserver]]]
+<pre><code class="bash">[[[sqlserver]]]
 
 name=SQLServer JDBC
 
@@ -186,7 +186,7 @@ interface=jdbc
 
 options='{"url": "jdbc:microsoft:sqlserver://localhost:1433", "driver": "com.microsoft.jdbc.sqlserver.SQLServerDriver", "user": "admin": "password": "pass"}'
 
-{{< /highlight >}}
+</code></pre>
 
 ####
 
@@ -198,7 +198,7 @@ Vertica's JDBC client drivers can be downloaded here: [Vertica JDBC Client Driv
 
 ##### Sample Configuration
 
-{{< highlight bash >}}[[[vertica]]]
+<pre><code class="bash">[[[vertica]]]
 
 name=Vertica JDBC
 
@@ -206,7 +206,7 @@ interface=jdbc
 
 options='{"url": "jdbc:vertica://localhost:5433/example", "driver": "com.vertica.jdbc.Driver", "user": "admin", "password": "pass"}'
 
-{{< /highlight >}}
+</code></pre>
 
 ####
 
@@ -218,7 +218,7 @@ The Phoenix JDBC client driver is bundled with the Phoenix binary and source rel
 
 ##### Sample Configuration
 
-{{< highlight bash >}}[[[phoenix]]]
+<pre><code class="bash">[[[phoenix]]]
 
 name=Phoenix JDBC
 
@@ -226,7 +226,7 @@ interface=jdbc
 
 options='{"url": "jdbc:phoenix:localhost:2181/hbase", "driver": "org.apache.phoenix.jdbc.PhoenixDriver", "user": "", "password": ""}'
 
-{{< /highlight >}}
+</code></pre>
 
 **NOTE**: Currently, the Phoenix JDBC connector for Hue only supports read-only operations (SELECT and EXPLAIN statements).
 
@@ -240,7 +240,7 @@ The Presto JDBC client driver is maintained by the Presto Team and can be downlo
 
 ##### Sample Configuration
 
-{{< highlight bash >}}[[[presto]]]
+<pre><code class="bash">[[[presto]]]
 
 name=Presto JDBC
 
@@ -248,7 +248,7 @@ interface=jdbc
 
 options='{"url": "jdbc:presto://localhost:8080/", "driver": "com.facebook.presto.jdbc.PrestoDriver"}'
 
-{{< /highlight >}}
+</code></pre>
 
 ####
 
@@ -258,7 +258,7 @@ The [Drill JDBC driver][11] can be used.
 
 ##### Sample Configuration
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 <pre class="pre codeblock"><code>[[[drill]]]
 
@@ -274,7 +274,7 @@ interface=jdbc
 
 options='{"url": "<drill-jdbc-url>", "driver": "org.apache.drill.jdbc.Driver", "user": "admin", "password": "admin"}'</code>
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -286,7 +286,7 @@ The Kylin JDBC client driver is maintained can be downloaded here: <http://kyl
 
 ##### Sample Configuration
 
-{{< highlight bash >}}[[[kylin]]]
+<pre><code class="bash">[[[kylin]]]
 
 name=kylin JDBC
 
@@ -294,7 +294,7 @@ interface=jdbc
 
 options='{"url": "jdbc:kylin://172.17.0.2:7070/learn_kylin","driver": "org.apache.kylin.jdbc.Driver", "user": "ADMIN", "password": "KYLIN"}'
 
-{{< /highlight >}}
+</code></pre>
 
 ### When HS2, RDBMS, and JDBC Are Not Enough
 

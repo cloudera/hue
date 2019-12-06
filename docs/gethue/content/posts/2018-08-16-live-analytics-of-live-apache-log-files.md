@@ -61,7 +61,7 @@ Here we are leveraging Apache Flume and installed one agent on the Apache Server
 
 Then in Cloudera Manager, in the Flume service we enter this Flume configuration:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 tier1.sources = source1
 
@@ -89,7 +89,7 @@ tier1.sinks.sink1.morphlineFile = /tmp/morphline.conf
 
 tier1.sinks.sink1.channel = channel1
 
-{{< /highlight >}}
+</code></pre>
 
 Note: for a more robust sourcing, using [TaildirSource][6] instead of the 'tail -F /var/log/hue/access.log'. Additionally, a [KafkaChannel][7] would make sure that we don't drop events in case of crashes of the command.
 
@@ -97,25 +97,25 @@ Note: when doing this, we need to make sure that the Flume Agent user runs as a 
 
 Note: this is how to create the Kafka topic via the CLI (until the UI supports it):
 
-{{< highlight bash >}}kafka-topics -create -topic=hueAccessLogs -partitions=1 -replication-factor=1 -zookeeper=analytics-1.gce.cloudera.com:2181
+<pre><code class="bash">kafka-topics -create -topic=hueAccessLogs -partitions=1 -replication-factor=1 -zookeeper=analytics-1.gce.cloudera.com:2181
 
-{{< /highlight >}}
+</code></pre>
 
 Note: as explained in previous Cloudera blog post, the '/tmp/morphline.conf will grok and parse the logs and convert it into a table. Depending on your Apache webserver, you might or might not have the first hostname field.
 
-{{< highlight bash >}}demo.gethue.com:80 92.58.20.110 - - [12/May/2018:14:07:39 +0000] "POST /jobbrowser/jobs/ HTTP/1.1" 200 392 "http://demo.gethue.com/hue/dashboard/new_search?engine=solr" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:59.0) Gecko/20100101 Firefox/59.0"
+<pre><code class="bash">demo.gethue.com:80 92.58.20.110 - - [12/May/2018:14:07:39 +0000] "POST /jobbrowser/jobs/ HTTP/1.1" 200 392 "http://demo.gethue.com/hue/dashboard/new_search?engine=solr" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:59.0) Gecko/20100101 Firefox/59.0"
 
-{{< /highlight >}}
+</code></pre>
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 columns: [C0,client_ip,C1,C2,time,dummy1,request,code,bytes,referer,user_agent]
 
-{{< /highlight >}}
+</code></pre>
 
 We also used the UTC timezone conversion as Solr expects dates in UTC.
 
-{{< highlight bash >}}[/code]
+<pre><code class="bash">[/code]
 
 inputTimezone : UTC
 
@@ -125,7 +125,7 @@ After the refresh of the Flume configuration, the Metrics tab will show the busi
 
 Note: if you want to delete all the documents in the log_analytics_demo collection to start fresh, you could delete and recreate it via Hue UI or issue this command:
 
-{{< highlight bash >}}curl "http://demo.gethue.com:8983/solr/log_analytics_demo/update?commit=true" -H "Content-Type: text/xml" -data-binary '<delete><query>\*:\*</query></delete>'{{< /highlight >}}
+<pre><code class="bash">curl "http://demo.gethue.com:8983/solr/log_analytics_demo/update?commit=true" -H "Content-Type: text/xml" -data-binary '<delete><query>\*:\*</query></delete>'</code></pre>
 
 ## Live Querying
 

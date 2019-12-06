@@ -66,25 +66,25 @@ Note:** To override a value in Cloudera Manager, you need to enter verbatim each
 
 At any time, you can see the path to the hue.ini and what are its values on the [/desktop/dump_config][11] page. Then, for each Hadoop Service, Hue contains a section that needs to be updated with the correct hostnames and ports. Here is an example of the Hive section in the ini file:
 
-{{< highlight bash >}}[beeswax]
+<pre><code class="bash">[beeswax]
 
  # Host where HiveServer2 is running.
 
  hive_server_host=localhost
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
 To point to another server, just replaced the host value by 'hiveserver.ent.com':
 
-{{< highlight bash >}}[beeswax]
+<pre><code class="bash">[beeswax]
 
  # Host where HiveServer2 is running.
 
  hive_server_host=hiveserver.ent.com
 
-{{< /highlight >}}
+</code></pre>
 
 **Note: **Any line starting with a # is considered as a comment so is not used.
 
@@ -106,7 +106,7 @@ This is required for [listing or creating files][15]. Replace localhost by the r
 
 <samp class="ph codeph">Enter this in hdfs-site.xml</samp> to enable WebHDFS in the NameNode and DataNodes:
 
-{{< highlight xml >}}
+<pre><code class="xml">
 
 <property>
 
@@ -116,11 +116,11 @@ This is required for [listing or creating files][15]. Replace localhost by the r
 
 </property>
 
-{{< /highlight >}}
+</code></pre>
 
 Configure Hue as a proxy user for all other users and groups, meaning it may submit a request on behalf of any other user. Add to <samp class="ph codeph">core-site.xml</samp>:
 
-{{< highlight xml >}}
+<pre><code class="xml">
 
 <property>
 
@@ -138,11 +138,11 @@ Configure Hue as a proxy user for all other users and groups, meaning it may sub
 
 </property>
 
-{{< /highlight >}}
+</code></pre>
 
 Then, if the Namenode is on another host than Hue, don't forget to update in the hue.ini:
 
-{{< highlight bash >}}[hadoop]
+<pre><code class="bash">[hadoop]
 
  [[hdfs_clusters]]
 
@@ -158,13 +158,13 @@ Then, if the Namenode is on another host than Hue, don't forget to update in the
 
      webhdfs_url=http://localhost:50070/webhdfs/v1
 
-{{< /highlight >}}
+</code></pre>
 
 ## YARN
 
 The Resource Manager is often on http://localhost:8088 by default. The ProxyServer and Job History servers also needs to be specified. Then Job Browser will let you [list and kill running applications][16] and get their logs.
 
-{{< highlight bash >}}[hadoop]
+<pre><code class="bash">[hadoop]
 
  [[yarn_clusters]]
 
@@ -190,25 +190,25 @@ The Resource Manager is often on http://localhost:8088 by default. The ProxyServ
 
      history_server_api_url=http://localhost:19888
 
-{{< /highlight >}}
+</code></pre>
 
 ## Hive
 
 Here we need a running HiveServer2 in order to [send SQL queries][17].
 
-{{< highlight bash >}}[beeswax]
+<pre><code class="bash">[beeswax]
 
  # Host where HiveServer2 is running.
 
  hive_server_host=localhost
 
-{{< /highlight >}}
+</code></pre>
 
 Note:
 
 If HiveServer2 is on another machine and you are using security or customized HiveServer2 configuration, you will need to copy the hive-site.xml on the Hue machine too:
 
-{{< highlight bash >}}[beeswax]
+<pre><code class="bash">[beeswax]
 
  # Host where HiveServer2 is running.
 
@@ -218,43 +218,43 @@ If HiveServer2 is on another machine and you are using security or customized Hi
 
 hive_conf_dir=/etc/hive/conf
 
-{{< /highlight >}}
+</code></pre>
 
 ## Impala
 
 We need to specify one of the Impalad address for [interactive SQL][17] in the Impala app.
 
-{{< highlight bash >}}[impala]
+<pre><code class="bash">[impala]
 
  # Host of the Impala Server (one of the Impalad)
 
  server_host=localhost
 
-{{< /highlight >}}
+</code></pre>
 
 ## Solr Search
 
 We just need to specify the address of a Solr Cloud (or non Cloud Solr), then [interactive dashboards][18] capabilities are unleashed!
 
-{{< highlight bash >}}[search]
+<pre><code class="bash">[search]
 
  # URL of the Solr Server
 
  solr_url=http://localhost:8983/solr/
 
-{{< /highlight >}}
+</code></pre>
 
 ## Oozie
 
 An Oozie server should be up and running before [submitting or monitoring workflows][19].
 
-{{< highlight bash >}}[liboozie]
+<pre><code class="bash">[liboozie]
 
  # The URL where the Oozie service runs on.
 
 oozie_url=http://localhost:11000/oozie
 
-{{< /highlight >}}
+</code></pre>
 
 ## Pig
 
@@ -264,25 +264,25 @@ The [Pig Editor][20] requires Oozie to be setup with its [sharelib][21].
 
 The HBase app works with a HBase Thrift Server version 1. It lets you [browse, query and edit HBase tables][22].
 
-{{< highlight bash >}}[hbase]
+<pre><code class="bash">[hbase]
 
  # Comma-separated list of HBase Thrift server 1 for clusters in the format of '(name|host:port)'.
 
 hbase_clusters=(Cluster|localhost:9090)
 
-{{< /highlight >}}
+</code></pre>
 
 ## Sentry
 
 Hue just needs to point to the machine with the Sentry server running.
 
-{{< highlight bash >}}[libsentry]
+<pre><code class="bash">[libsentry]
 
  # Hostname or IP of server.
 
  hostname=localhost
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 

@@ -50,33 +50,33 @@ Hue supports JDBC or SqlAlchemy interfaces as described in the [SQL Connector do
 
 On the Hue host:
 
-<pre class="brush: bash; title: ; notranslate" title="">./build/env/bin/pip install pyPhoenix
-</pre>
+<pre><code class="bash">./build/env/bin/pip install pyPhoenix
+</code></pre>
 
 Then in the desktop/conf/hue.ini config file section:
 
-<pre class="brush: bash; title: ; notranslate" title="">[notebook]
+<pre><code class="bash">[notebook]
   [[interpreters]]
     [[[phoenix]]]
       name = phoenix
       interface=sqlalchemy
       options='{"url": "phoenix://sql-phoenix.gethue.com:8765/"}'
-</pre>
+</code></pre>
 
 Then start the Phoenix queryserver:
 
-<pre class="brush: bash; title: ; notranslate" title="">phoenix-queryserver
+<pre><code class="bash">phoenix-queryserver
 ...
 19/07/24 20:55:13 INFO util.log: Logging initialized @1563ms
 19/07/24 20:55:13 INFO server.Server: jetty-9.2.z-SNAPSHOT
 19/07/24 20:55:14 INFO server.ServerConnector: Started ServerConnector@662b4c69{HTTP/1.1}{0.0.0.0:8765}
 19/07/24 20:55:14 INFO server.Server: Started @1793ms
 19/07/24 20:55:14 INFO server.HttpServer: Service listening on port 8765.
-</pre>
+</code></pre>
 
 And we are ready to query HBase!
 
-<pre class="brush: sql; title: ; notranslate" title="">select * from us_population limit 10</pre>
+<pre><code class="sql">select * from us_population limit 10</code></pre>
 
 <a href="https://cdn.gethue.com/uploads/2019/07/editor_phoenix_select.png"><img src="https://cdn.gethue.com/uploads/2019/07/editor_phoenix_select.png" /></a>
 
@@ -86,18 +86,18 @@ Notes
 
 **1** Existing HBase tables need to be mapped to views
 
-<pre class="brush: bash; title: ; notranslate" title="">0: jdbc:phoenix:&gt; CREATE VIEW if not exists "analytics_demo_view" ( pk VARCHAR PRIMARY KEY, "hours"."01-Total" VARCHAR );
+<pre><code class="bash">0: jdbc:phoenix:&gt; CREATE VIEW if not exists "analytics_demo_view" ( pk VARCHAR PRIMARY KEY, "hours"."01-Total" VARCHAR );
 Error: ERROR 505 (42000): Table is read only. (state=42000,code=505)
 --&gt;
 0: jdbc:phoenix:&gt; CREATE Table if not exists "analytics_demo" ( pk VARCHAR PRIMARY KEY, "hours"."01-Total" VARCHAR );
-</pre>
+</code></pre>
 
 **2** Tables are seeing as uppercase by Phoenix. When getting started, it is simpler to just create the table via Phoenix.
 
-<pre class="brush: bash; title: ; notranslate" title="">Error: ERROR 1012 (42M03): Table undefined. tableName=ANALYTICS_DEMO (state=42M03,code=1012)
+<pre><code class="bash">Error: ERROR 1012 (42M03): Table undefined. tableName=ANALYTICS_DEMO (state=42M03,code=1012)
 --&gt;
 0: jdbc:phoenix:&gt; select * from "analytics_demo" where pk = "domain.0" limit 5;
-</pre>
+</code></pre>
 
 **3** Phoenix follows Apache Calcite. Feel free to help improve [the SQL autocomplete][9] support for it.
 
