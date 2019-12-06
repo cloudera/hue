@@ -83,6 +83,8 @@ def reformat_json(json_obj):
 
 def reformat_xml(xml_obj):
     if isinstance(xml_obj, basestring):
+        if not isinstance(xml_obj, bytes):
+            xml_obj = xml_obj.encode()
         return etree.tostring(objectify.fromstring(xml_obj, etree.XMLParser(strip_cdata=False, remove_blank_text=True)))
     else:
         return etree.tostring(xml_obj)

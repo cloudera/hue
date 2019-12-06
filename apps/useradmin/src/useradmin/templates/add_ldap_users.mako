@@ -16,7 +16,6 @@
 <%!
 from desktop.views import commonheader, commonfooter
 from desktop.lib.django_util import extract_field_data
-import urllib
 from django.utils.translation import ugettext as _
 %>
 

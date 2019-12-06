@@ -18,7 +18,6 @@
 
 from future import standard_library
 standard_library.install_aliases()
-from builtins import str
 from builtins import object
 import json
 import ldap
@@ -32,7 +31,6 @@ from nose.tools import assert_true, assert_equal, assert_false, assert_not_equal
 from datetime import datetime
 from django.contrib.sessions.models import Session
 from django.db.models import Q
-from django.utils.encoding import smart_unicode
 from django.urls import reverse
 from django.test.client import Client
 
@@ -53,6 +51,11 @@ from useradmin.forms import UserChangeForm
 from useradmin.middleware import ConcurrentUserSessionMiddleware
 from useradmin.models import HuePermission, GroupPermission, UserProfile, get_profile, get_default_user_group, User, Group
 from useradmin.hue_password_policy import reset_password_policy
+
+if sys.version_info[0] > 2:
+  from django.utils.encoding import smart_text as smart_unicode
+else:
+  from django.utils.encoding import smart_unicode
 
 
 def reset_all_users():
@@ -270,7 +273,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
     # Make sure that a superuser can always access applications
     response = c.get('/useradmin/users')
-    assert_true('Hue Users' in response.content)
+    assert_true(b'Hue Users' in response.content)
 
     assert_true(len(GroupPermission.objects.all()) == 0)
     c.post('/useradmin/groups/edit/test-group',
@@ -306,11 +309,11 @@ class TestUserAdmin(BaseUserAdminTests):
     # Create user to try to edit
     notused = User.objects.get_or_create(username="notused", is_superuser=False)
     response = cadmin.get('/useradmin/users/edit/notused?is_embeddable=true')
-    assert_true('Hue Users - Edit user: notused' in response.content)
+    assert_true(b'Hue Users - Edit user: notused' in response.content)
 
     # Make sure we can modify permissions
     response = cadmin.get('/useradmin/permissions/edit/useradmin/access/?is_embeddable=true')
-    assert_true('Hue Permissions - Edit app: useradmin' in response.content)
+    assert_true(b'Hue Permissions - Edit app: useradmin' in response.content)
 
     # Revoke superuser privilege from groups
     c.post('/useradmin/permissions/edit/useradmin/superuser', dict(
@@ -326,7 +329,7 @@ class TestUserAdmin(BaseUserAdminTests):
     # Now test that we have limited access
     c1 = make_logged_in_client(username="nonadmin", is_superuser=False)
     response = c1.get('/useradmin/users')
-    assert_true('You do not have permission to access the Useradmin application.' in response.content)
+    assert_true(b'You do not have permission to access the Useradmin application.' in response.content)
 
     # Add the non-admin to a group that should grant permissions to the app
     test_user = User.objects.get(username="nonadmin")
@@ -335,19 +338,19 @@ class TestUserAdmin(BaseUserAdminTests):
 
     # Make sure that a user of nonadmin fails where supertest succeeds
     response = c1.get("/useradmin/users/edit/notused?is_embeddable=true")
-    assert_true('You must be a superuser to add or edit another user' in response.content)
+    assert_true(b'You must be a superuser to add or edit another user' in response.content)
 
     response = c1.get("/useradmin/permissions/edit/useradmin/access/?is_embeddable=true")
-    assert_true('You must be a superuser to change permissions' in response.content)
+    assert_true(b'You must be a superuser to change permissions' in response.content)
 
     # Check that we have access now
     response = c1.get('/useradmin/users')
     assert_true(get_profile(test_user).has_hue_permission('access','useradmin'))
-    assert_true('Hue Users' in response.content)
+    assert_true(b'Hue Users' in response.content)
 
     # Make sure we can't modify permissions
     response = c1.get('/useradmin/permissions/edit/useradmin/access')
-    assert_true('must be a superuser to change permissions' in response.content)
+    assert_true(b'must be a superuser to change permissions' in response.content)
 
     # And revoke access from the group
     c.post('/useradmin/permissions/edit/useradmin/access', dict(
@@ -363,7 +366,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
     # We should no longer have access to the app
     response = c1.get('/useradmin/users')
-    assert_true('You do not have permission to access the Useradmin application.' in response.content)
+    assert_true(b'You do not have permission to access the Useradmin application.' in response.content)
 
 
   def test_list_permissions(self):
@@ -408,7 +411,7 @@ class TestUserAdmin(BaseUserAdminTests):
       # Try deleting the default group
       assert_true(Group.objects.filter(name='test_default').exists())
       response = c.post('/useradmin/groups/delete', {'group_names': ['test_default']})
-      assert_true('default user group may not be deleted' in response.content)
+      assert_true(b'default user group may not be deleted' in response.content)
       assert_true(Group.objects.filter(name='test_default').exists())
 
       # Change the name of the default group, and try deleting again
@@ -435,7 +438,7 @@ class TestUserAdmin(BaseUserAdminTests):
     response = c.get('/useradmin/groups')
     # No groups just yet
     assert_true(len(response.context[0]["groups"]) == 0)
-    assert_true("Hue Groups" in response.content)
+    assert_true(b"Hue Groups" in response.content)
 
     # Create a group
     response = c.get('/useradmin/groups/new')
@@ -468,17 +471,17 @@ class TestUserAdmin(BaseUserAdminTests):
 
     # Make sure non-superusers can't do bad things
     response = c2.get('/useradmin/groups/new')
-    assert_true("You must be a superuser" in response.content)
+    assert_true(b"You must be a superuser" in response.content)
     response = c2.get('/useradmin/groups/edit/testgroup')
-    assert_true("You must be a superuser" in response.content)
+    assert_true(b"You must be a superuser" in response.content)
 
     response = c2.post('/useradmin/groups/new', dict(name="nonsuperuser"))
-    assert_true("You must be a superuser" in response.content)
+    assert_true(b"You must be a superuser" in response.content)
     response = c2.post('/useradmin/groups/edit/testgroup',
                       dict(name="nonsuperuser",
                       members=[User.objects.get(username="test").pk],
                       save="Save"), follow=True)
-    assert_true("You must be a superuser" in response.content)
+    assert_true(b"You must be a superuser" in response.content)
 
     # Should be one group left, because we created the other group
     response = c.post('/useradmin/groups/delete', {'group_names': ['testgroup']})
@@ -529,7 +532,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
       # Test password hint is displayed
       response = c.get('/useradmin/users/edit/superuser')
-      assert_true(password_hint in response.content)
+      assert_true(password_hint in (response.content if isinstance(response.content, str) else response.content.decode()))
 
       # Password is less than 8 characters
       response = c.post('/useradmin/users/edit/superuser',
@@ -630,7 +633,7 @@ class TestUserAdmin(BaseUserAdminTests):
       # Test basic output.
       response = c.get('/useradmin/')
       assert_true(len(response.context[0]["users"]) > 0)
-      assert_true("Hue Users" in response.content)
+      assert_true(b"Hue Users" in response.content)
 
       # Test editing a superuser
       # Just check that this comes back
@@ -643,7 +646,7 @@ class TestUserAdmin(BaseUserAdminTests):
                              is_superuser=True,
                              is_active=True),
                         follow=True)
-      assert_true("User information updated" in response.content,
+      assert_true(b"User information updated" in response.content,
                   "Notification should be displayed in: %s" % response.content)
       # Edit it, can't change username
       response = c.post('/useradmin/users/edit/test',
@@ -653,20 +656,20 @@ class TestUserAdmin(BaseUserAdminTests):
                              is_superuser=True,
                              is_active=True),
                         follow=True)
-      assert_true("You cannot change a username" in response.content)
+      assert_true(b"You cannot change a username" in response.content)
       # Now make sure that those were materialized
       response = c.get('/useradmin/users/edit/test')
       assert_equal(smart_unicode("Inglés"), response.context[0]["form"].instance.first_name)
-      assert_true("Español" in response.content)
+      assert_true(("Español" if isinstance(response.content, str) else "Español".encode('utf-8')) in response.content)
       # Shouldn't be able to demote to non-superuser
       response = c.post('/useradmin/users/edit/test', dict(username="test",
                             first_name=u"Inglés", last_name=u"Español",
                             is_superuser=False, is_active=True))
-      assert_true("You cannot remove" in response.content,
+      assert_true(b"You cannot remove" in response.content,
                   "Shouldn't be able to remove the last superuser")
       # Shouldn't be able to delete oneself
       response = c.post('/useradmin/users/delete', {u'user_ids': [user.id]})
-      assert_true("You cannot remove yourself" in response.content,
+      assert_true(b"You cannot remove yourself" in response.content,
                   "Shouldn't be able to delete the last superuser")
 
       # Let's try changing the password
@@ -692,7 +695,7 @@ class TestUserAdmin(BaseUserAdminTests):
       group = get_default_user_group()
       response = c.get('/useradmin/users/new')
       assert_true(response)
-      assert_true(('<option value="%s" selected>%s</option>' % (group.id, group.name)) in str(response))
+      assert_true(('<option value="%s" selected>%s</option>' % (group.id, group.name)) in (response.content if isinstance(response.content, str) else response.content.decode()))
 
       # Create a new regular user (duplicate name)
       response = c.post('/useradmin/users/new', dict(username="test", password1="test", password2="test"))
@@ -713,9 +716,9 @@ class TestUserAdmin(BaseUserAdminTests):
       assert_equal(response.status_code, 200, response.content)
 
       response = c.get('/useradmin/')
-      assert_true(FUNNY_NAME in response.content, response.content)
+      assert_true(FUNNY_NAME in (response.content if isinstance(response.content, str) else response.content.decode()), response.content)
       assert_true(len(response.context[0]["users"]) > 1)
-      assert_true("Hue Users" in response.content)
+      assert_true(b"Hue Users" in response.content)
       # Validate profile is created.
       assert_true(UserProfile.objects.filter(user__username=FUNNY_NAME).exists())
 
@@ -750,7 +753,7 @@ class TestUserAdmin(BaseUserAdminTests):
       funny_user = User.objects.get(username=FUNNY_NAME)
       # Can't edit other people.
       response = c_reg.post("/useradmin/users/delete", {u'user_ids': [funny_user.id]})
-      assert_true("You must be a superuser" in response.content,
+      assert_true(b"You must be a superuser" in response.content,
                   "Regular user can't edit other people")
 
       # Revert to regular "test" user, that has superuser powers.
@@ -771,7 +774,7 @@ class TestUserAdmin(BaseUserAdminTests):
                                                      password2="test",
                                                      is_active=True))
       response = c.get('/useradmin/')
-      assert_true('christian_häusler' in response.content)
+      assert_true('christian_häusler' in (response.content if isinstance(response.content, str) else response.content.decode()))
       assert_true(len(response.context[0]["users"]) > 1)
 
       # Validate profile is created.
@@ -802,7 +805,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
       # You shouldn't be able to create a user without a password
       response = c_su.post('/useradmin/users/new', dict(username="test"))
-      assert_true("You must specify a password when creating a new user." in response.content)
+      assert_true(b"You must specify a password when creating a new user." in response.content)
     finally:
       for reset in resets:
         reset()
@@ -876,18 +879,18 @@ class TestUserAdmin(BaseUserAdminTests):
     grant_access('test', 'test', 'useradmin')
 
     response = client.get('/useradmin/users/edit/test')
-    assert_true("Language Preference" in response.content)
+    assert_true(b"Language Preference" in response.content)
 
     # Does not appear for superuser editing other profiles
     other_client = make_logged_in_client('test_super', is_superuser=True, groupname='test')
     superuser = User.objects.get(username='test_super')
 
     response = other_client.get('/useradmin/users/edit/test')
-    assert_false("Language Preference" in response.content, response.content)
+    assert_false(b"Language Preference" in response.content, response.content)
 
     # Changing language preference will change language setting
     response = client.post('/useradmin/users/edit/test', dict(language='ko'))
-    assert_true('<option value="ko" selected>Korean</option>' in response.content)
+    assert_true(b'<option value="ko" selected>Korean</option>' in response.content)
 
   def test_edit_user_xss(self):
     # Hue 3 Admin
@@ -898,7 +901,7 @@ class TestUserAdmin(BaseUserAdminTests):
                                                                       password2="foo",
                                                                       language="en-us><script>alert('Hacked')</script>"
                                                                       ))
-    assert_true('Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; is not one of the available choices.' in response.content)
+    assert_true(b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; is not one of the available choices.' in response.content)
     # Hue 4 Admin
     response = edit_user.post('/useradmin/users/edit/admin', dict(username="admin",
                                                                       is_superuser=True,
@@ -916,7 +919,7 @@ class TestUserAdmin(BaseUserAdminTests):
                                                                       password2="foo",
                                                                       language="en-us><script>alert('Hacked')</script>"
                                                                       ))
-    assert_true('Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; is not one of the available choices.' in response.content)
+    assert_true(b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; is not one of the available choices.' in response.content)
     # Hue 4, User with access to useradmin app
     response = edit_user.post('/useradmin/users/edit/edit_user', dict(username="edit_user",
                                                                       is_superuser=False,
@@ -1050,20 +1053,20 @@ def test_get_connection_bind_password_script():
   # Unfortunately our tests leak a cached test ldap connection across functions, so we need to clear it out.
   useradmin.ldap_access.CACHED_LDAP_CONN = None
 
-  SCRIPT = '%s -c "print \'\\n password from script \\n\'"' % sys.executable
+  SCRIPT = '%s -c "print(\'\\n password from script \\n\')"' % sys.executable
 
   # Monkey patch the LdapConnection class as we don't want to make a real connection.
   OriginalLdapConnection = useradmin.ldap_access.LdapConnection
   reset = [
       desktop.conf.LDAP.LDAP_URL.set_for_testing('default.example.com'),
       desktop.conf.LDAP.BIND_PASSWORD_SCRIPT.set_for_testing(
-        '%s -c "print \'\\n default password \\n\'"' % sys.executable
+        '%s -c "print(\'\\n default password \\n\')"' % sys.executable
       ),
       desktop.conf.LDAP.LDAP_SERVERS.set_for_testing({
         'test': {
           'ldap_url': 'test.example.com',
           'bind_password_script':
-            '%s -c "print \'\\n test password \\n\'"' % sys.executable,
+            '%s -c "print(\'\\n test password \\n\')"' % sys.executable,
         }
       })
   ]
