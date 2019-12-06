@@ -34,11 +34,11 @@ spec:
   {{ end }}
   tls:
   - hosts:
-    {{- if .Values.docs.enabled -}}
+    {{ if .Values.docs.enabled }}
     - {{ .Values.docs.domain }}
-    {{- end -}}
-    {{- if .Values.website.enabled -}}
+    {{ end }}
+    {{ if .Values.website.enabled }}
     - {{ .Values.website.domain }}
-    {{- end -}}
+    {{ end }}
     secretName: letsencrypt-website-prod
 {{- end -}}
