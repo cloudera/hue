@@ -43,7 +43,7 @@ class TestAzureAdl(unittest.TestCase):
       finish = (conf.AZURE_ACCOUNTS.set_for_testing({'default': {}}),
                 conf.ADLS_CLUSTERS.set_for_testing({'default': {'fs_defaultfs': 'fs_defaultfs', 'webhdfs_url': 'webhdfs_url'}}))
       with patch('azure.client.conf_idbroker.get_conf') as get_conf:
-        with patch('azure.client.WebHdfs'):
+        with patch('azure.client.WebHdfs.get_client'):
           with patch('azure.client.ActiveDirectory.get_token') as get_token:
             with patch('azure.conf.core_site.get_conf') as core_site_get_conf:
               get_token.return_value = {'access_token': 'access_token', 'token_type': '', 'expires_on': None}
@@ -65,7 +65,7 @@ class TestAzureAdl(unittest.TestCase):
       finish = (conf.AZURE_ACCOUNTS.set_for_testing({'default': {'client_id':'client_id', 'client_secret': 'client_secret', 'tenant_id': 'tenant_id'}}),
                 conf.ADLS_CLUSTERS.set_for_testing({'default': {'fs_defaultfs': 'fs_defaultfs', 'webhdfs_url': 'webhdfs_url'}}))
       with patch('azure.client.conf_idbroker.get_conf') as get_conf:
-        with patch('azure.client.WebHdfs'):
+        with patch('azure.client.WebHdfs.get_client'):
           with patch('azure.client.ActiveDirectory.get_token') as get_token:
             get_token.return_value = {'access_token': 'access_token', 'token_type': '', 'expires_on': None}
             get_conf.return_value = {}
@@ -121,7 +121,7 @@ class TestAzureAbfs(unittest.TestCase):
       finish = (conf.AZURE_ACCOUNTS.set_for_testing({'default': {}}),
                 conf.ABFS_CLUSTERS.set_for_testing({'default': {'fs_defaultfs': 'fs_defaultfs', 'webhdfs_url': 'webhdfs_url'}}))
       with patch('azure.client.conf_idbroker.get_conf') as get_conf:
-        with patch('azure.client.ABFS'):
+        with patch('azure.client.ABFS.get_client'):
           with patch('azure.client.ActiveDirectory.get_token') as get_token:
             with patch('azure.conf.core_site.get_conf') as core_site_get_conf:
               get_token.return_value = {'access_token': 'access_token', 'token_type': '', 'expires_on': None}
@@ -143,7 +143,7 @@ class TestAzureAbfs(unittest.TestCase):
       finish = (conf.AZURE_ACCOUNTS.set_for_testing({'default': {'client_id':'client_id', 'client_secret': 'client_secret', 'tenant_id': 'tenant_id'}}),
                 conf.ABFS_CLUSTERS.set_for_testing({'default': {'fs_defaultfs': 'fs_defaultfs', 'webhdfs_url': 'webhdfs_url'}}))
       with patch('azure.client.conf_idbroker.get_conf') as get_conf:
-        with patch('azure.client.ABFS'):
+        with patch('azure.client.ABFS.get_client'):
           with patch('azure.client.ActiveDirectory.get_token') as get_token:
             get_token.return_value = {'access_token': 'access_token', 'token_type': '', 'expires_on': None}
             get_conf.return_value = {}
