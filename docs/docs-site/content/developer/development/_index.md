@@ -749,7 +749,7 @@ Release:
 
     scp -r docs/docs-site/public/* root@docs.gethue.com:/var/www/docs.gethue.com/4.6.0
 
-    scp -r hue-4.6/build/release/prod/hue-4.6.0.tgz root@104.248.178.223:/var/www/cdn.gethue.com/downloads/
+    scp -r hue-4.6/build/release/prod/hue-4.6.0.tgz root@cdn.gethue.com:/var/www/cdn.gethue.com/downloads/
 
 
 Then send release notes to the [Forum](https://discourse.gethue.com/), [hue-user](https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user), https://twitter.com/gethue !
