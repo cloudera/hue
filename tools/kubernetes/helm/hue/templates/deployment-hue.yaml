@@ -48,6 +48,10 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
           - containerPort: 80
+        resources:
+          requests:
+            # memory: "64Mi"
+            cpu: "20m"
         volumeMounts:
         - name: nginx-config
           mountPath: /etc/nginx/sites-available/hue
