@@ -13,6 +13,7 @@ hue:
     user: "hue"
     password: "hue"
     name: "hue"
+    storageName: "microk8s-hostpath"
   interpreters: |
     [[[postgresql]]]
       name = postgresql
