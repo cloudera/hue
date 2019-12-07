@@ -51,6 +51,7 @@ cron:
   emailStats: "0 13 * * WED,SUN"
 ingress:
   create: false
+  hasAuth: false
   type: "nginx"
   # type: "nginx-ssl"
   # type: "nginx-ssl-staging"
