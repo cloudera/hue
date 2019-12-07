@@ -5,7 +5,7 @@ metadata:
   name: hue
   annotations:
     kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: letsencrypt-hue-prod
     cert-manager.io/acme-challenge-type: http01
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/affinity: "cookie"
@@ -24,5 +24,5 @@ spec:
   tls:
   - hosts:
     - {{ .Values.ingress.domain }}
-    secretName: letsencrypt-prod
+    secretName: letsencrypt-hue-prod-tls
 {{- end -}}

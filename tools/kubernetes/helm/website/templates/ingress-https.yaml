@@ -2,14 +2,14 @@
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: gethue-ingress
+  name: gethue
   annotations:
     kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: letsencrypt-website-prod
     cert-manager.io/acme-challenge-type: http01
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/affinity: "cookie"
-    nginx.ingress.kubernetes.io/session-cookie-name: "gethue-website-ingress"
+    nginx.ingress.kubernetes.io/session-cookie-name: "gethue-website"
     nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
     nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
 spec:
@@ -40,5 +40,5 @@ spec:
     {{ if .Values.website.enabled }}
     - {{ .Values.website.domain }}
     {{ end }}
-    secretName: letsencrypt-website-prod
+    secretName: letsencrypt-website-prod-tls
 {{- end -}}
