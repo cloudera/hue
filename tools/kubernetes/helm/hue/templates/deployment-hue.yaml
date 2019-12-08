@@ -17,6 +17,8 @@ spec:
     metadata:
       labels:
         pod: hue
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap-hue-extra.yaml") . | sha256sum }}
     spec:
       containers:
       - name: hue
