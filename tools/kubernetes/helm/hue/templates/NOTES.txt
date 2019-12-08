@@ -5,17 +5,8 @@ To check the status of your installation run:
   helm list {{ .Release.Name }}
 
 
-You should be able to execute queries by typing:
-
-  kubectl port-forward svc/hue 8888:8888 --address 0.0.0.0 &
-
-Then opening-up:
-
-  http://localhost:8888
-
-
-Or running below commands to get the recommended URL:
-{{ if true }}
+Get the recommended URL below and start executing queries:
+{{- if ne .Values.ingress.type "nginx-ssl" -}}
   export WEB_HOST=$(kubectl get node -o jsonpath="{.items[0].metadata.name}")
 {{- end -}}
 
@@ -25,7 +16,7 @@ Or running below commands to get the recommended URL:
 
 {{ else if and .Values.ingress.create (eq .Values.ingress.type "nginx-ssl") }}
 
-  echo https://{{ .Values.ingress.domain }}
+  https://{{ .Values.ingress.domain }}
 
 {{ else if .Values.balancer.enabled }}
 
