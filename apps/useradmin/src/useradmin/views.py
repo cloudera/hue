@@ -825,6 +825,10 @@ def ensure_home_directory(fs, user):
 
   Throws IOError, WebHdfsException.
   """
+  if fs is None:
+    LOG.warn("Not creating home directory of %s as no file system connector is configured" % user)
+    return
+
   userprofile = get_profile(user)
   username = user.username
   home_directory = userprofile.home_directory

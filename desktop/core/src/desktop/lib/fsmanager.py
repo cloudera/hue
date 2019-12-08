@@ -142,7 +142,7 @@ def get_filesystem(name='default'):
   for fs in SUPPORTED_FS:
     if is_enabled(fs):
       pdict[fs] = _get_client(fs)
-  return ProxyFS(pdict, get_default_schema(), name)
+  return ProxyFS(pdict, get_default_schema(), name) if pdict else None
 
 
 def get_filesystems(user):
