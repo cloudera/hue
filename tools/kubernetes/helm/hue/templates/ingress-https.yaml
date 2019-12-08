@@ -14,7 +14,7 @@ metadata:
     nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
     {{ if .Values.ingress.hasAuth }}
     nginx.ingress.kubernetes.io/auth-type: basic
-    nginx.ingress.kubernetes.io/auth-secret: basic-auth-gethue
+    nginx.ingress.kubernetes.io/auth-secret: basic-auth-hue
     nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
     {{ end }}
 spec:
