@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import './ko.resultDownloadActions';
 
@@ -74,8 +74,8 @@ const TEMPLATE = `
 </div>
 
 <div class="split-result-container">
-  <div class="result-settings-panel" style="display: none;" data-bind="visible: columnsVisible">
-    <div class="snippet-grid-settings" data-bind="delayedOverflow">
+  <div class="result-settings-panel" style="display: none; height: auto; position:relative" data-bind="visible: columnsVisible">
+    <div class="snippet-grid-settings" data-bind="delayedOverflow, stickVertical: { scrollContainer: MAIN_SCROLLABLE }">
       <table class="table table-condensed margin-top-10 no-border">
         <thead>
         <tr>
@@ -531,22 +531,6 @@ class ResultGrid extends DisposableComponent {
     const $snippet = this.getSnippetElement();
     if ($snippet.find('.resultTable').is(':visible')) {
       $datatablesWrapper = $snippet.find('.dataTables_wrapper');
-      const topCoord =
-        this.isPresentationMode() || this.isResultFullScreenMode()
-          ? window.BANNER_TOP_HTML
-            ? 31
-            : 1
-          : 73;
-      const $resultSettings = $('.result-settings');
-      $snippet.find('.snippet-grid-settings').css({
-        height:
-          this.isPresentationMode() || !this.editorMode()
-            ? '330px'
-            : Math.ceil(
-                $(window).height() -
-                  Math.max($resultSettings.length ? $resultSettings.offset().top : 0, topCoord)
-              ) + 'px'
-      });
     } else {
       $datatablesWrapper = $snippet.find('.chart:visible');
     }

@@ -56,14 +56,14 @@ The parsers provide one function, `parseSql`, that accepts the text before the c
 
 As an example:
 
-<pre class="brush: jscript; title: ; notranslate" title="">sqlParserRepository.getAutocompleter('impala').then(parser =&gt; {
+<pre><code class="javascript">sqlParserRepository.getAutocompleter('impala').then(parser =&gt; {
     console.log(parser.parseSql('SELECT * FROM customers'));
   });
-</pre>
+</code></pre>
 
 Would output something like:
 
-<pre>{
+<pre><code class="javascript">{
     definitions: [],
     locations: (6) [{…}, {…}, {…}, {…}, {…}, {…}],
     lowerCase: false,
@@ -73,7 +73,7 @@ Would output something like:
     suggestFunctions: {},
     suggestKeywords: (8) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
   }
-</pre>
+</code></pre>
 
 We take this output and link it to various sources of metadata to provide the list of suggestions the user finally sees. In this case we&#8217;d use the data from &#8220;suggestColumns&#8221; to call the backend for all the columns of the &#8220;customers&#8221; table. We&#8217;d also use the functions library to list all the UDFs etc.
 
@@ -93,7 +93,7 @@ Here&#8217;s a list of some of the different types of suggestions the parser can
 
 Parsers are generated and added to the repository using our custom cli app `generateParsers.js` under tools/jison/. To for instance generate all the Impala parsers you would run the following command in the hue folder:
 
-<pre class="brush: bash; title: ; notranslate" title="">node tools/jison/generateParsers.js impala</pre>
+<pre><code class="bash">node tools/jison/generateParsers.js impala</code></pre>
 
 In reality two parsers are generated per dialect, one for syntax and one for autocomplete. The syntax parsers is a subset of the autocomplete parser with no error recovery and without the autocomplete specific grammar.
 
@@ -138,23 +138,23 @@ Prerequisites: make sure you have [jison installed][6] and a [development Hue][
 
 In the Hue folder:
 
-<pre class="brush: bash; title: ; notranslate" title="">./build/env/bin/pip install psycopg2-binary</pre>
+./build/env/bin/pip install psycopg2-binary</pre>
 
 and edit your hue config `desktop/conf/pseudo-distributed.ini` to contain:
 
-<pre class="brush: bash; title: ; notranslate" title="">[notebook]
+<pre><code class="bash">[notebook]
    [[interpreters]]
     [[[postgresql]]]
       name = postgresql
       interface=sqlalchemy
       options='{";url&amp;amp;quot;: &amp;amp;quot;postgresql://hue:pwd@dbhost:31335/huedb"}'
-</pre>
+</code></pre>
 
 Our generateParsers tool can take an existing dialect and setup the source code for a new parsers based on that.
 
 In the hue folder run:
 
-<pre class="brush: bash; title: ; notranslate" title="">node tools/jison/generateParsers.js -new generic postgresql</pre>
+<pre><code class="bash">node tools/jison/generateParsers.js -new generic postgresql</code></pre>
 
 After the -new argument you specify an existing dialect to clone first and then the name of the new parser.
 
@@ -162,7 +162,7 @@ Once executed the tool has cloned the generic parser with tests and generated a
 
 To regenerate the parsers after changes to the jison files run:
 
-<pre class="brush: bash; title: ; notranslate" title="">node tools/jison/generateParsers.js postgresql</pre>
+<pre><code class="bash">node tools/jison/generateParsers.js postgresql</code></pre>
 
 The tool will report any problems with the grammar. Note that it might still generate a parser if the grammar isn&#8217;t ambiguous but it&#8217;s likely that there will be test failures.
 
@@ -170,11 +170,11 @@ The tool will report any problems with the grammar. Note that it might still gen
 
 This gives you an idea on how to add custom syntax to the newly generated postgresql parser. For this example we&#8217;ll add the [REINDEX][9] statement as it&#8217;s quite simple.
 
-<pre class="brush: plain; title: ; notranslate" title="">REINDEX { INDEX | TABLE | DATABASE | SYSTEM } name [ FORCE ]</pre>
+<pre><code class="bash">REINDEX { INDEX | TABLE | DATABASE | SYSTEM } name [ FORCE ]</code></pre>
 
 We&#8217;ll start by adding a test, in `postgresqlAutocompleteParser.test.js` in the test folder inside the main describe function before the first &#8216;it(&#8220;should &#8230;&#8217;:
 
-<pre class="brush: jscript; title: ; notranslate" title="">fdescribe('REINDEX', () =&gt; {
+<pre><code class="javascript">fdescribe('REINDEX', () =&gt; {
     it('should handle "REINDEX TABLE foo FORCE; |"', () =&gt; {
       assertAutoComplete({
         beforeCursor: 'REINDEX TABLE foo FORCE;  ',
@@ -199,7 +199,7 @@ We&#8217;ll start by adding a test, in `postgresqlAutocompleteParser.test.js` i
       });
     });
   });
-</pre>
+</code></pre>
 
 When we now run `npm run test` there should be two failing tests.
 
@@ -256,7 +256,7 @@ Again, run `node tools/jison/generateParsers.js postgresql` then `npm run test` 
 
 We also want the autocompleter to suggest the keyword REINDEX when the user hasn&#8217;t typed anything, to do that let&#8217;s first add the following test with the other new ones in `postgresqlAutocompleteParserSpec.js`:
 
-<pre class="brush: jscript; title: ; notranslate" title="">it('should suggest REINDEX for "|"', () =&gt; {
+<pre><code class="javascript">it('should suggest REINDEX for "|"', () =&gt; {
       assertAutoComplete({
         beforeCursor: '',
         afterCursor: '',
@@ -267,7 +267,7 @@ We also want the autocompleter to suggest the keyword REINDEX when the user hasn
         }
       });
     });
-</pre>
+</code></pre>
 
 For this to pass we need to add `REINDEX` to the list of DDL and DML keywords in the file `sqlParseSupport.js` next to the generated parser (`desktop/core/src/desktop/js/parse/sql/postgresql/sqlParseSupport.js/`). Find the function `parser.suggestDdlAndDmlKeywords` and add &#8216;REINDEX&#8217; to the keywords array. Now run `npm run test` and the three tests should pass.
 
@@ -275,8 +275,8 @@ Before you continue further be sure to remove the &#8216;f&#8217; from &#8216;fd
 
 In order to use the newly generated parsers we have to add them to the webpack bundles:
 
-<pre class="brush: bash; title: ; notranslate" title="">npm run webpack
-npm run webpack-workers</pre>
+<pre><code class="bash">npm run webpack
+npm run webpack-workers</code></pre>
 
 While developing it will speed up if the webpack bundling runs in the background, for this open two terminal sessions and run on `npm run dev` in one and `npm run dev-workers` in the other. It will then monitor changes to the files and build a lot quicker.
 

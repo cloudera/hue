@@ -96,27 +96,27 @@ SLAs can be setup in the Editor in the advanced tabs of:
   First make sure you are using Oozie 4. If you need to upgrade from Oozie 3, don’t forget to update the Oozie sharelib with:
 </p>
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 sudo -u oozie /usr/lib/oozie/bin/oozie-setup.sh sharelib create -fs hdfs://localhost:8020 -locallib /usr/lib/oozie/oozie-sharelib-yarn.tar.gz
 
-{{< /highlight >}}
+</code></pre>
 
 <p dir="ltr">
   If for some reason you need to reset the Oozie DB, delete it and recreate it with:
 </p>
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 sudo -u oozie /usr/lib/oozie/bin/ooziedb.sh create -sqlfile oozie.sql -run
 
-{{< /highlight >}}
+</code></pre>
 
 <p dir="ltr">
   <strong>Note</strong><br /> In order to avoid the exception below, you should not have the SLA properties in oozie-site.xml.
 </p>
 
-{{< highlight java >}}
+<pre><code class="java">
 
 Exception in thread "main" java.lang.NoClassDefFoundError: javax/mail/MessagingException
 
@@ -124,13 +124,13 @@ at java.lang.Class.forName0(Native Method)
 
 at java.lang.Class.forName(Class.java:270)
 
-{{< /highlight >}}
+</code></pre>
 
 <p dir="ltr">
   Then open oozie-site.xml and add these <a href="http://oozie.apache.org/docs/4.0.0/AG_Install.html#Notifications_Configuration">properties</a> and restart Oozie:
 </p>
 
-{{< highlight xml >}}
+<pre><code class="xml">
 
 <property>
 
@@ -160,4 +160,4 @@ org.apache.oozie.sla.listener.SLAEmailEventListener
 
 </property>
 
-{{< /highlight >}}
+</code></pre>

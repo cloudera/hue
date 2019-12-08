@@ -38,7 +38,7 @@ try:
   from oozie.views.dashboard import check_job_access_permission, check_job_edition_permission
   from oozie.views.editor2 import _submit_workflow
 except Exception as e:
-  LOG.exception('Oozie application is not enabled: %s' % e)
+  LOG.warn('Oozie application is not enabled: %s' % e)
 
 
 class OozieApi(Api):

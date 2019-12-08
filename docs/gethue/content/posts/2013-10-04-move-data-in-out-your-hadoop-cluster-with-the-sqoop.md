@@ -61,7 +61,7 @@ The following is the canonical import job example sourced from <http://sqoop.apa
 
 First, make sure that Sqoop2 is up and running and the Hue points to it in its hue.ini:
 
-{{< highlight bash >}}###########################################################################
+<pre><code class="bash">###########################################################################
 
 \# Settings to configure Sqoop
 
@@ -73,7 +73,7 @@ First, make sure that Sqoop2 is up and running and the Hue points to it in its h
 
 server_url=http://sqoop2.com:12000/sqoop
 
-{{< /highlight >}}
+</code></pre>
 
 ### Troubleshooting
 

@@ -8,29 +8,20 @@
 Query. Explore. Share.
 ----------------------
 
-Hue is an open source SQL Assistant for querying, visualizing and sharing data in Databases & Data Warehouses: [gethue.com](http://gethue.com)
+Hue is a mature open source SQL Assistant for querying [Databases & Data Warehouses](https://docs.gethue.com/administrator/configuration/connectors/) and collaborating: [gethue.com](http://gethue.com)
 
-It features:
+Many companies and organizations use Hue to quickly answer questions via self-service querying e.g.:
 
-   * [Editors](http://gethue.com/new-sql-editor/) to query with SQL [any database](https://docs.gethue.com/administrator/configuration/connectors/) and submit jobs
-   * [Dashboards](http://gethue.com/search-dashboards/) to dynamically interact and visualize data
-   * [Scheduler](http://gethue.com/scheduling/) of jobs and workflows
-   * [Catalog](http://gethue.com/browsers/) for browsing data storages and metadata
+* 1000+ customers
+* Top Fortune 500
 
-
-![alt text](docs/images/sql-editor.png "Hue Editor")
-
-
-Who is using Hue
-----------------
-Thousands of companies and organizations use Hue to open-up their data and provide self service querying. Hue is heavily used by:
-
-* 1000+ paying customers
-* top Fortune 500
-
-who are executing 100s of 1000s of queries daily. It also ships in Amazon AWS and its open source version is used by hundred of companies.
+are executing 100s of 1000s of queries daily. It also ships in Amazon AWS and its open source version is used by hundreds of companies.
 
 Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/parsers/) and any [contributions](CONTRIBUTING.md) are welcome.
+
+
+![Hue Editor](docs/images/sql-editor.png)
+
 
 Getting Started
 ---------------

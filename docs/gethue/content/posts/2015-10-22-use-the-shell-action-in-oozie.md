@@ -56,11 +56,11 @@ If using Hue version less than 4.3 (it is automated from then):
 
 If the executable is a script instead of a standard UNIX command, it needs to be copied to HDFS and the path can be specified by using the File Chooser in `Files+` field.
 
-{{< highlight bash >}}#!/usr/bin/env bash
+<pre><code class="bash">#!/usr/bin/env bash
 
 sleep
 
-{{< /highlight >}}
+</code></pre>
 
 [<img class="alignnone wp-image-3417 size-full" src="https://cdn.gethue.com/uploads/2015/10/5.png" />][6]
 

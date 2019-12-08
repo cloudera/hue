@@ -19,11 +19,11 @@ from builtins import zip
 from builtins import range
 from builtins import object
 from functools import reduce
-from past.utils import old_div
 import copy
 import glob
 import json
 import logging
+import math
 import os
 import re
 import types
@@ -63,7 +63,7 @@ class ProfileContext(object):
                 dtparse(node.info_strings["Start Time"])).total_seconds()
 
     def percentage_of_total(self, compare):
-        return old_div(compare, self.query_duration())
+        return math.floor(compare / self.query_duration())
 
 
 class SQLOperatorReason(object):
@@ -291,7 +291,7 @@ class JoinOrderStrategyCheck(SQLOperatorReason):
             rhsRows = buildRows * hosts
             lhsRows = probeRows * hosts
 
-        impact = old_div((rhsRows - lhsRows * 1.5), hosts / 0.01)
+        impact = math.floor((rhsRows - lhsRows * 1.5) / hosts / 0.01)
         if (impact > 0):
             return {
                 "impact": impact,
@@ -301,7 +301,7 @@ class JoinOrderStrategyCheck(SQLOperatorReason):
 
         bcost = rhsRows * hosts
         scost = lhsRows + rhsRows
-        impact = old_div((networkcost - min(bcost, scost) - 1), hosts / 0.01)
+        impact = math.floor((networkcost - min(bcost, scost) - 1) / hosts / 0.01)
         return {
             "impact": impact,
             "message": "RHS %d; LHS %d" % (rhsRows, lhsRows),
@@ -331,7 +331,7 @@ class ExplodingJoinCheck(SQLOperatorReason):
 
         impact = 0
         if (rowsReturned > 0):
-            impact = old_div(probeTime * (rowsReturned - probeRows), rowsReturned)
+            impact = math.floor(probeTime * (rowsReturned - probeRows) / rowsReturned)
         return {
             "impact": impact,
             "message": "%d input rows are exploded to %d output rows" % (probeRows, rowsReturned),
@@ -356,7 +356,7 @@ class NNRpcCheck(SQLOperatorReason):
         hdfsRawReadTime = models.query_node_by_id_value(profile, plan_node_id, "TotalRawHdfsReadTime(*)", True)
         avgReadThreads = models.query_node_by_id_value(profile, plan_node_id, "AverageHdfsReadThreadConcurrency", True)
         avgReadThreads = max(1, to_double(avgReadThreads))
-        impact = max(0, old_div((totalStorageTime - hdfsRawReadTime), avgReadThreads))
+        impact = max(0, math.floor((totalStorageTime - hdfsRawReadTime) / avgReadThreads))
         return {
             "impact": impact,
             "message": "This is the time waiting for HDFS NN RPC.",

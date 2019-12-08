@@ -12,5 +12,5 @@ spec:
   - name: docs
     port: 9001
     targetPort: 80
-  type: NodePort
+  type: ClusterIP
 {{- end -}}

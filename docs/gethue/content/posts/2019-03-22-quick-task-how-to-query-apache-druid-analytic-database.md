@@ -53,17 +53,17 @@ If not already running, it is easy to get Druid [downloaded][6] and [started][7
 
 First, let's make sure that Hue can talk to Druid via the [pydruid SqlAlchemy][8] connector. Either make sure it is in the global Python environment via a usual 'pip install' or install it in the Hue virtual environment.
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 ./build/env/bin/pip install pydruid
 
-{{< /highlight >}}
+</code></pre>
 
 **Note:** Make sure the version is equal or more to 0.4.1 if not you will get a "Can't load plugin: sqlalchemy.dialects:druid".
 
 In the hue.ini configuration file, now let's add the interpreter. Here 'druid-host.com' would be the machine where Druid is running.
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [notebook]
 
@@ -77,7 +77,7 @@ interface=sqlalchemy
 
 options='{"url": "druid://druid-host.com:8082/druid/v2/sql/"}'
 
-{{< /highlight >}}
+</code></pre>
 
 And now restart Hue.
 
@@ -85,7 +85,7 @@ And now restart Hue.
 
 And that's it, now open-up <http://127.0.0.1:8000/hue/editor/?type=pydruid> (replace host or port of your actual Hue) and you can start querying!
 
-{{< highlight sql >}}
+<pre><code class="sql">
 
 SELECT countryName, count(*) t
 
@@ -97,7 +97,7 @@ ORDER BY t DESC
 
 LIMIT 100
 
-{{< /highlight >}}
+</code></pre>
 
 As usual feel free to comment here or to send feedback to the [hue-user][9] list or [@gethue][10]!
 

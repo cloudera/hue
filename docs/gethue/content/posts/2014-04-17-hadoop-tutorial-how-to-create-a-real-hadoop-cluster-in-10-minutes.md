@@ -216,7 +216,7 @@ categories:
 
 <!--email_off-->
 
-{{< highlight bash >}}ssh -i ~/demo.pem ubuntu@ec2-11-222-333-444.compute-1.amazonaws.com{{< /highlight >}}
+<pre><code class="bash">ssh -i ~/demo.pem ubuntu@ec2-11-222-333-444.compute-1.amazonaws.com</code></pre>
 
 &nbsp;
 
@@ -224,13 +224,13 @@ categories:
   Retrieve and start Cloudera Manager:
 </p>
 
-{{< highlight bash >}}wget http://archive.cloudera.com/cm5/installer/latest/cloudera-manager-installer.bin
+<pre><code class="bash">wget http://archive.cloudera.com/cm5/installer/latest/cloudera-manager-installer.bin
 
 chmod +x cloudera-manager-installer.bin
 
 sudo ./cloudera-manager-installer.bin
 
-{{< /highlight >}}
+</code></pre>
 
 <p dir="ltr">
   After, login with the default credentials admin/admin (note: you might need to wait 5 minutes before http://ec2-54-178-21-60.compute-1.amazonaws.com:7180/ becomes available).
@@ -256,9 +256,9 @@ sudo ./cloudera-manager-installer.bin
   If you are getting a "Bad Request (400)" error, you will need to enter in the hue.ini or CM safety valve:
 </p>
 
-{{< highlight bash >}}[desktop]
+<pre><code class="bash">[desktop]
 
-allowed_hosts=*{{< /highlight >}}
+allowed_hosts=*</code></pre>
 
 <p dir="ltr">
   <strong>Note</strong>

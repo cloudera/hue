@@ -102,23 +102,23 @@ When authenticating via LDAP, Hue validates login credentials against a director
 
 &nbsp;
 
-{{< highlight bash >}}'desktop]
+<pre><code class="bash">'desktop]
    
 [[auth]]
    
 backend=desktop.auth.backend.LdapBackend
   
-{{< /highlight >}}
+</code></pre>
 
 The LDAP authentication backend will automatically create users that don’t exist in Hue by default. Hue needs to import users in order to properly perform the authentication. The password is never imported when importing users. The following configuration can be used to disable automatic import:
 
-{{< highlight bash >}}'desktop]
+<pre><code class="bash">'desktop]
     
 [[ldap]]
     
 create_users_on_login=false
   
-{{< /highlight >}}
+</code></pre>
 
 The purpose of disabling the automatic import is to only allow to login a predefined list of manually imported users.
 
@@ -156,25 +156,25 @@ If ‘nt_domain’ is provided, then Hue will use a UPN to bind to the LDAP serv
 
 &nbsp;
 
-{{< highlight bash >}}'desktop]
+<pre><code class="bash">'desktop]
     
 [[ldap]]
     
 nt_domain=example.com
   
-{{< /highlight >}}
+</code></pre>
 
 Otherwise, the ‘ldap_username_pattern’ configuration is used (the <username> parameter will be replaced with the username provided at login):
 
 &nbsp;
 
-{{< highlight bash >}}'desktop]
+<pre><code class="bash">'desktop]
       
 [[ldap]]
       
 ldap_username_pattern="uid=<username>,ou=People,DC=hue-search,DC=ent,DC=cloudera,DC=com"
   
-{{< /highlight >}}
+</code></pre>
 
 Typical attributes to search for include:
 
@@ -189,13 +189,13 @@ To enable direct bind authentication, the ‘search_bind_authentication’ confi
 
 &nbsp;
 
-{{< highlight bash >}}'desktop]
+<pre><code class="bash">'desktop]
       
 [[ldap]]
       
 search_bind_authentication=false
   
-{{< /highlight >}}
+</code></pre>
 
 # 2.    Importing users {#t4}
 
@@ -234,7 +234,7 @@ Users and groups can be synchronized with the directory service via the Useradmi
 
 The groups of a user can be synced when he logs in (to keep its permission in sync):
 
-{{< highlight bash >}}'desktop]
+<pre><code class="bash">'desktop]
     
 [[ldap]]
     
@@ -242,7 +242,7 @@ The groups of a user can be synced when he logs in (to keep its permission in sy
     
 \## sync_groups_on_login=false
   
-{{< /highlight >}}
+</code></pre>
 
 ## 4.1.    Attributes synchronized {#t7}
 
@@ -269,7 +269,7 @@ There are two configurations for restricting the search process:
 
 Here is an example configuration:
 
-{{< highlight bash >}}'desktop]
+<pre><code class="bash">'desktop]
       
 [[ldap]]
       
@@ -283,7 +283,7 @@ user_name_attr=uid
       
 \## follow_referrals=false
   
-{{< /highlight >}}
+</code></pre>
 
 With the above configuration, the LDAP search filter will take on the form:
 
@@ -295,7 +295,7 @@ Hue can be configured to ignore the case of usernames as well as force usernames
 
 [desktop]
 
-{{< highlight bash >}}'desktop]
+<pre><code class="bash">'desktop]
       
 [[ldap]]
       
@@ -303,29 +303,29 @@ ignore_username_case=true
       
 force_username_lowercase=true
   
-{{< /highlight >}}
+</code></pre>
 
 # 7.    LDAPS/StartTLS support {#t12}
 
 Secure communication with LDAP is provided via the SSL/TLS and StartTLS protocols. It allows Hue to validate the directory service it’s going to converse with. Practically speaking, if a Certificate Authority Certificate file is provided, Hue will communicate via LDAPS:
 
-{{< highlight bash >}}'desktop]
+<pre><code class="bash">'desktop]
       
 [[ldap]]
       
 ldap_cert=/etc/hue/ca.crt
   
-{{< /highlight >}}
+</code></pre>
 
 The StartTLS protocol can be used as well (step up to SSL/TLS):
 
-{{< highlight bash >}}'desktop]
+<pre><code class="bash">'desktop]
       
 [[ldap]]
       
 use_start_tls=true
   
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -333,7 +333,7 @@ use_start_tls=true
 
 Get more information when querying LDAP and use the ldapsearch tool:
 
-{{< highlight bash >}}'desktop]
+<pre><code class="bash">'desktop]
       
 [[ldap]]
       
@@ -349,15 +349,15 @@ debug=true
       
 trace_level=0
   
-{{< /highlight >}}
+</code></pre>
 
 **Note**
 
 Make sure to add to the Hue server environment:
 
-{{< highlight bash >}}DESKTOP_DEBUG=true
+<pre><code class="bash">DESKTOP_DEBUG=true
   
-DEBUG=true{{< /highlight >}}
+DEBUG=true</code></pre>
 
 &nbsp;
 

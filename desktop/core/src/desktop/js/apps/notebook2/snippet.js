@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
 import { markdown } from 'markdown';
 
@@ -44,6 +44,8 @@ import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from 'apps/notebook2/components/ko.ex
 // TODO: Remove for ENABLE_NOTEBOOK_2. Temporary here for debug
 window.SqlExecutable = SqlExecutable;
 window.Executor = Executor;
+
+export const CURRENT_QUERY_TAB_SWITCHED_EVENT = 'current.query.tab.switched';
 
 const TYPE = {
   hive: 'hive',
@@ -308,8 +310,7 @@ export default class Snippet {
 
     this.lastQueriesPage = 1;
     this.currentQueryTab.subscribe(newValue => {
-      huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
-      huePubSub.publish('current.query.tab.switched', newValue);
+      huePubSub.publish(CURRENT_QUERY_TAB_SWITCHED_EVENT, newValue);
       if (
         newValue === 'savedQueries' &&
         (this.queries().length === 0 || this.lastQueriesPage !== this.queriesCurrentPage())

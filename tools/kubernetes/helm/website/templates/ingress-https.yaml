@@ -20,7 +20,7 @@ spec:
       paths:
       - backend:
           serviceName: docs
-          servicePort: 80
+          servicePort: 9001
         path: /
   {{ end }}
   {{ if .Values.website.enabled }}
@@ -29,16 +29,16 @@ spec:
       paths:
       - backend:
           serviceName: website
-          servicePort: 80
+          servicePort: 9002
         path: /
   {{ end }}
   tls:
   - hosts:
-    {{- if .Values.docs.enabled -}}
+    {{ if .Values.docs.enabled }}
     - {{ .Values.docs.domain }}
-    {{- end -}}
-    {{- if .Values.website.enabled -}}
+    {{ end }}
+    {{ if .Values.website.enabled }}
     - {{ .Values.website.domain }}
-    {{- end -}}
+    {{ end }}
     secretName: letsencrypt-website-prod
 {{- end -}}

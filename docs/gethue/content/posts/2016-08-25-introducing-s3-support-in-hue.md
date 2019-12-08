@@ -59,7 +59,7 @@ categories:
   These keys can securely stored in a script that outputs the actual access key and secret key to stdout to be read by Hue (this is similar to how <a href="https://gethue.com/storing-passwords-in-script-rather-than-hue-ini-files/">Hue reads password scripts</a>). In order to use script files, add the following section to your <code>hue.ini</code> configuration file:
 </p>
 
-{{< highlight bash >}}[aws]
+<pre><code class="bash">[aws]
 
 [[aws_accounts]]
 
@@ -73,13 +73,13 @@ allow_environment_credentials=false
 
 region=us-east-1
 
-{{< /highlight >}}
+</code></pre>
 
 <p class="p1">
   Alternatively (but not recommended for production or secure environments), you can set the <code>access_key_id</code> and <code>secret_access_key</code> values to the plain-text values of your keys:
 </p>
 
-{{< highlight bash >}}[aws]
+<pre><code class="bash">[aws]
 
 [[aws_accounts]]
 
@@ -93,7 +93,7 @@ allow_environment_credentials=false
 
 region=us-east-1
 
-{{< /highlight >}}
+</code></pre>
 
 <p class="p1">
   The region should be set to the AWS region corresponding to the S3 account. By default, this region will be set to ‘us-east-1’.
@@ -105,7 +105,7 @@ region=us-east-1
   In addition to configuring Hue with your S3 credentials, Hadoop will also need to be configured with the S3 authentication credentials in order to read from and save to S3. This can be done by setting the following properties in your <code>core-site.xml</code> file:
 </p>
 
-{{< highlight xml >}}
+<pre><code class="xml">
 
 <property>
 
@@ -123,7 +123,7 @@ region=us-east-1
 
 </property/>
 
-{{< /highlight >}}
+</code></pre>
 
 <p class="p4">
   <span class="s2">For more information see <a href="http://wiki.apache.org/hadoop/AmazonS3"><span class="s1">http://wiki.apache.org/hadoop/AmazonS3</span></a></span>

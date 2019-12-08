@@ -107,7 +107,7 @@ convert.py notes.txt READ_FIRST-Phoenix_Academic_Dataset_Agreement-3-11-13.pdf y
 
     **Top 25: business with most of the reviews**
 
-    {{< highlight sql >}}
+    <pre><code class="sql">
     SELECT name, review_count
     FROM business
     ORDER BY review_count DESC
@@ -116,7 +116,7 @@ convert.py notes.txt READ_FIRST-Phoenix_Academic_Dataset_Agreement-3-11-13.pdf y
 
     **Top 25: coolest restaurants**
 
-    {{< highlight sql >}}SELECT r.review_id, name, SUM(cool) AS coolness
+    <pre><code class="sql">SELECT r.review_id, name, SUM(cool) AS coolness
 
     FROM review r JOIN business b
 
@@ -130,7 +130,7 @@ convert.py notes.txt READ_FIRST-Phoenix_Academic_Dataset_Agreement-3-11-13.pdf y
 
     LIMIT 25
 
-    {{< /highlight >}}
+    </code></pre>
 
     [<img title="hue4" src="http://www.cloudera.com/wp-content/uploads/2013/04/hue4.png"/>][11]
 

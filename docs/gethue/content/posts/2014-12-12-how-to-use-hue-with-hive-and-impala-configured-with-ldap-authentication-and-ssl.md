@@ -61,7 +61,7 @@ The same Hue behavior occurred after making the change, but now the HiveServer2 
 
 So, we added the following to the Hue Safety Valve:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [beeswax]
 
@@ -75,11 +75,11 @@ cacerts=/etc/hue/cacerts.pem
 
 validate=false
 
-{{< /highlight >}}
+</code></pre>
 
 or
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [impala]
 
@@ -97,21 +97,21 @@ cacerts=/etc/hue/cacerts.pem
 
 validate=false
 
-{{< /highlight >}}
+</code></pre>
 
 3.
 
 Hue still showed the same behavior. HiveServer2 logs showed:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 <HUE_LDAP_USERNAME> is not allowed to impersonate bob
 
-{{< /highlight >}}
+</code></pre>
 
 We solved this by adding the following to the HDFS > Service-Wide ->Advanced>Safety Valve for core-site.xml.
 
-{{< highlight xml >}}
+<pre><code class="xml">
 
 <property>
 
@@ -129,7 +129,7 @@ We solved this by adding the following to the HDFS > Service-Wide ->Advanced>Saf
 
 </property>
 
-{{< /highlight >}}
+</code></pre>
 
 4.
 

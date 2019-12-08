@@ -55,7 +55,7 @@ In order to provide better security, it is also now possible to provide a path t
 
 For example, here is how to configure a 'hue' user and password in a file for all the apps
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [desktop]
 
@@ -65,11 +65,11 @@ auth_username=hue
 
 auth_password_script=/path/to/ldap_password
 
-{{< /highlight >}}
+</code></pre>
 
 If Hue needs to authenticate to HiveServer2 with some different username and password:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [beeswax]
 
@@ -79,11 +79,11 @@ auth_password=hue_hive_pwd
 
 \# auth_password_script=
 
-{{< /highlight >}}
+</code></pre>
 
 If Impala is not using LDAP authentication but Hive does, we disable it in [desktop] and do not specify anything in [impala]:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [desktop]
 
@@ -107,7 +107,7 @@ auth_password=hue_hive_pwd
 
 \# auth_password_script=/
 
-{{< /highlight >}}
+</code></pre>
 
 **Note**
 

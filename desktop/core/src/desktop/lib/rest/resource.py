@@ -15,9 +15,9 @@ from __future__ import division
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from past.utils import old_div
 from builtins import object
 import logging
+import math
 import posixpath
 import urllib
 import time
@@ -214,9 +214,9 @@ class Resource(object):
 
 # Same in thrift_util.py for not losing the trace class
 def log_if_slow_call(duration, message, logger):
-  if duration >= old_div(WARN_LEVEL_CALL_DURATION_MS, 1000):
+  if duration >= math.floor(WARN_LEVEL_CALL_DURATION_MS / 1000):
     logger.warn('SLOW: %.2f - %s' % (duration, message))
-  elif duration >= old_div(INFO_LEVEL_CALL_DURATION_MS, 1000):
+  elif duration >= math.floor(INFO_LEVEL_CALL_DURATION_MS / 1000):
     logger.info('SLOW: %.2f - %s' % (duration, message))
   else:
     logger.debug(message)

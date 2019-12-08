@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import HueColors from 'utils/hueColors';
 import huePubSub from 'utils/huePubSub';

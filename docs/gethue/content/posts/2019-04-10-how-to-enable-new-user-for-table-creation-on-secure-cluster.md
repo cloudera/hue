@@ -50,15 +50,15 @@ It can be tricky to grant a new user proper permissions on a secure cluster, let
 
 For Mac user:
 
-{{< highlight bash >}}$ brew install pssh{{< /highlight >}}
+<pre><code class="bash">$ brew install pssh</code></pre>
 
 For Debian or Ubuntu user:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 $ sudo apt-get install pssh
-{{< /highlight >}}
+</code></pre>
 
-{{< highlight bash >}}
+<pre><code class="bash">
 $ cat ~/Documents/nodeshue.txt
 
   hue-1.test.cloudera.com
@@ -66,11 +66,11 @@ $ cat ~/Documents/nodeshue.txt
   hue-3.test.cloudera.com
   hue-4.test.cloudera.com
 
-{{< /highlight >}}
+</code></pre>
 
 **2. Run follow commands to create user: t1 and group: grp1 on your cluster:**
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 $ pssh -h ~/Documents/nodeshue.txt -i useradd t1
 
@@ -102,7 +102,7 @@ $ pssh -hosts ~/Documents/nodes.txt -i usermod -a -G grp1 t1
 
 [4] 13:59:28 [SUCCESS] hue-4.test.cloudera.com
 
-{{< /highlight >}}
+</code></pre>
 
 **3.Create same Hue user: t1 and group: grp1 and make "t1" a member of "grp1".**
 
@@ -110,7 +110,7 @@ $ pssh -hosts ~/Documents/nodes.txt -i usermod -a -G grp1 t1
 
 **4.Then log in as any user with sentry admin permission to run following queries in hive editor:**
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 create role write_role;
 
@@ -118,7 +118,7 @@ GRANT ROLE write_role TO GROUP grp1;
 
 GRANT ALL ON SERVER server1 TO ROLE write_role;
 
-{{< /highlight >}}
+</code></pre>
 
 Now "t1" user or any user in "grp1" can log in and create table by running any hive/impala DDL queries or through Hue importer.
 
@@ -130,7 +130,7 @@ Using similar commands to create t2 user in group grp2 and t3 user in group grp3
 
 1.Read write access to database: 's3db' for any user in group 'grp3':
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 create role read_write_s3db_role;
 
@@ -140,11 +140,11 @@ GRANT ALL ON DATABASE s3db TO ROLE read_write_s3db_role;
 
 GRANT ALL ON URI 'hdfs://hue-1.test.cloudera.com:8020/user/t3' to ROLE read_write_s3db_role;
 
-{{< /highlight >}}
+</code></pre>
 
 2. Read only permission for database: 'default' for any user in group 'grp2':
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 create role read_only_defaultDb_role;
 
@@ -154,7 +154,7 @@ GRANT SELECT ON DATABASE default TO ROLE read_only_defaultDb_role;
 
 GRANT REFRESH ON DATABASE default TO ROLE read_only_defaultDb_role;
 
-{{< /highlight >}}
+</code></pre>
 
 Now 't3' user can read and create new tables in database:s3db while 't2' user can read database: default only.
 

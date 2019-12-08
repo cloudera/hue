@@ -39,7 +39,7 @@ categories:
 ---
 We have already seen <a href="https://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/" target="_blank" rel="noopener noreferrer">in this post</a> how you can configure Hue in your cluster. But did you know that there’s a property that can make a top banner appear in your Hue installation? [<img src="https://cdn.gethue.com/uploads/2015/03/Screenshot-2015-03-23-16.33.12-1024x610.png"  />][1] This is quite useful if you want for instance to show a disclaimer to your users, or to clearly mark a testing or production environment, or if you want to display some dynamic information there. Depending on if you are using <a href="https://gethue.com/hadoop-tutorial-how-to-create-a-real-hadoop-cluster-in-10-minutes/" target="_blank" rel="noopener noreferrer">Cloudera Manager</a> or not, you should either add a safety valve or edit a .ini file to use this feature. For details on how to change the configuration, <a href="https://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/" target="_blank" rel="noopener noreferrer">read here</a>. In the desktop/custom section of the ini file you can find the banner_top_html property:
 
-{{< highlight bash >}}[desktop]
+<pre><code class="bash">[desktop]
 
 [[custom]]
 
@@ -47,13 +47,13 @@ We have already seen <a href="https://gethue.com/how-to-configure-hue-in-your-ha
 
 banner_top_html=
 
-{{< /highlight >}}
+</code></pre>
 
 Then it’s just a matter of writing some HTML/CSS and even Javascript code to customized it as you prefer. Keep in mind that you have a limited height to do that (30px). For instance, to write a the same message you see on <a href="demo.gethue.com" target="_blank" rel="noopener noreferrer">demo.gethue.com</a>, you can write this:
 
 <!--email_off-->
 
-{{< highlight bash >}}[desktop]
+<pre><code class="bash">[desktop]
 
 [[custom]]
 
@@ -61,11 +61,11 @@ Then it’s just a matter of writing some HTML/CSS and even Javascript code to c
 
 banner_top_html='<div style="padding: 4px; text-align: center; background-color: #EEE; height: 40px"><i class="fa fa-flash muted"></i> This is Hue 3.11 read-only demo - <a href="https://gethue.com/hue-3-11-with-its-new-s3-browser-and-sql-autocomplete-is-out/" target="_blank">Read more about it</a> or <a href="/notebook/editor?editor=11">open a sample query</a>! <i class="fa fa-flash muted"></i></div>'
 
-{{< /highlight >}}
+</code></pre>
 
 <!--/email_off-->Or we could even use a very old HTML tag to display a running ticker!
 
-{{< highlight bash >}}[desktop]
+<pre><code class="bash">[desktop]
 
 [[custom]]
 
@@ -73,7 +73,7 @@ banner_top_html='<div style="padding: 4px; text-align: center; background-color:
 
 banner_top_html='<marquee behavior="scroll" direction="left" scrollamount="2" style="font-size: 15px;padding: 5px;color:#338BB8;font-weight:bold">Welcome to the test environment.</marquee>'
 
-{{< /highlight >}}
+</code></pre>
 
 [<img src="https://cdn.gethue.com/uploads/2015/03/Screenshot-2015-03-23-18.56.32-1024x610.png"  />][2].
 

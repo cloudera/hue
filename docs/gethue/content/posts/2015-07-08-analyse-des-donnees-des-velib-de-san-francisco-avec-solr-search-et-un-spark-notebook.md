@@ -66,11 +66,11 @@ Un moyen rapide pour indexer les données avec Solr:
 
 <div>
   <p>
-    {{< highlight bash >}}<br /> bin/solr create_collection  -c  bikes
+    <pre><code class="bash"><br /> bin/solr create_collection  -c  bikes
   </p>
 
   <p>
-    URL=http://localhost:8983/solr<br /> u="$URL/bikes/update?commitWithin=5000"<br /> curl $u -data-binary @/home/test/index_data.csv -H 'Content-type:text/csv'<br /> {{< /highlight >}}
+    URL=http://localhost:8983/solr<br /> u="$URL/bikes/update?commitWithin=5000"<br /> curl $u -data-binary @/home/test/index_data.csv -H 'Content-type:text/csv'<br /> </code></pre>
   </p>
 </div>
 

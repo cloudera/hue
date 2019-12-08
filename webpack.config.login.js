@@ -46,9 +46,12 @@ module.exports = {
   },
   optimization: {
     minimize: true,
+    splitChunks: {
+      automaticNameMaxLength: 90
+    }
   },
   output: {
-    path:  __dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/login',
+    path: __dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/login',
     filename: '[name]-bundle-[hash].js'
   },
   module: {

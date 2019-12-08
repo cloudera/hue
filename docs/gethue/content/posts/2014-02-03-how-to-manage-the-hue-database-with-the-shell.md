@@ -49,31 +49,31 @@ _Last update on March 9 2016_
 
 First, **<span style="color: #ff0000;">backup</span>** the database. By default this is this SqlLite file:
 
-{{< highlight bash >}}cp /var/lib/hue/desktop.db ~/{{< /highlight >}}
+<pre><code class="bash">cp /var/lib/hue/desktop.db ~/</code></pre>
 
 Then if using CM, export this variable in order to point to the correct database:
 
-{{< highlight bash >}}HUE_CONF_DIR=/var/run/cloudera-scm-agent/process/-hue-HUE_SERVER-id
+<pre><code class="bash">HUE_CONF_DIR=/var/run/cloudera-scm-agent/process/-hue-HUE_SERVER-id
 
 echo $HUE_CONF_DIR
 
-export HUE_CONF_DIR{{< /highlight >}}
+export HUE_CONF_DIR</code></pre>
 
 Where <id> is the most recent ID in that process directory for hue-HUE_SERVER.
 
 A quick way to get the correct directory is to use this script:
 
-{{< highlight bash >}}export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/\`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE | tail -1 | awk '{print $9}'\`"{{< /highlight >}}
+<pre><code class="bash">export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/\`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE | tail -1 | awk '{print $9}'\`"</code></pre>
 
 Then go in the Database. From the Hue root (/use/lib/hue by default):
 
-{{< highlight bash >}}root@hue:hue# build/env/bin/hue dbshell{{< /highlight >}}
+<pre><code class="bash">root@hue:hue# build/env/bin/hue dbshell</code></pre>
 
 Note:
 
 You might hit some permissions error about the logs:
 
-{{< highlight bash >}}build/env/bin/hue dbshell
+<pre><code class="bash">build/env/bin/hue dbshell
 
 Traceback (most recent call last):
 
@@ -119,15 +119,15 @@ stream = open(self.baseFilename, self.mode)
 
 IOError: [Errno 13] Permission denied: '/tmp/logs/dbshell.log'
 
-{{< /highlight >}}
+</code></pre>
 
 A "workaround" is to run the command as root:
 
-{{< highlight bash >}}sudo HUE_CONF_DIR=/var/run/cloudera-scm-agent/process/9679-hue-HUE_SERVER /opt/cloudera/parcels/CDH-5.1.0-1.cdh5.1.0.p0.53/lib/hue/build/env/bin/hue dbshell{{< /highlight >}}
+<pre><code class="bash">sudo HUE_CONF_DIR=/var/run/cloudera-scm-agent/process/9679-hue-HUE_SERVER /opt/cloudera/parcels/CDH-5.1.0-1.cdh5.1.0.p0.53/lib/hue/build/env/bin/hue dbshell</code></pre>
 
 And you can start typing SQL queries:
 
-{{< highlight bash >}}sqlite> .tables
+<pre><code class="bash">sqlite> .tables
 
 auth_group oozie_dataset
 
@@ -203,13 +203,13 @@ oozie_coordinator useradmin_ldapgroup
 
 oozie_datainput useradmin_userprofile
 
-oozie_dataoutput{{< /highlight >}}
+oozie_dataoutput</code></pre>
 
 Or migrating the database manually:
 
-{{< highlight bash >}}build/env/bin/hue syncdb
+<pre><code class="bash">build/env/bin/hue syncdb
 
-build/env/bin/hue migrate{{< /highlight >}}
+build/env/bin/hue migrate</code></pre>
 
 If you want to switch to another database (we recommend MySql), this [guide][1] details the migration process.
 
@@ -225,7 +225,7 @@ Transfer Oozie workflows belonging to the user Bob to Joe.
 
 **until** Hue 3.8
 
-{{< highlight bash >}}# First move the objects
+<pre><code class="bash"># First move the objects
 
 from oozie.models import Job
 
@@ -253,11 +253,11 @@ Job.objects.filter(owner=u2)
 
 wfs = Job.objects.filter(owner=u2)
 
-{{< /highlight >}}
+</code></pre>
 
 **For** Hue 3.9+
 
-{{< highlight bash >}}# First move the objects
+<pre><code class="bash"># First move the objects
 
 from desktop.models import Document2
 
@@ -285,11 +285,11 @@ Document2.objects.filter(owner=u2, type='oozie-workflow2')
 
 wfs = Document2.objects.filter(owner=u2, type='oozie-workflow2')
 
-{{< /highlight >}}
+</code></pre>
 
 **For** both
 
-{{< highlight bash >}}# The list of ALL the workflows (will also list the already known ones) of the second user
+<pre><code class="bash"># The list of ALL the workflows (will also list the already known ones) of the second user
 
 \# Then move the documents
 
@@ -307,7 +307,7 @@ Document.objects.filter(object_id__in=wfs).update(owner=u2)
 
 > [<Document: workflow MyWf joe>]
 
-{{< /highlight >}}
+</code></pre>
 
 **Note**: it will change again in Hue 3.10 and be easier.
 

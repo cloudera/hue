@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ko from 'knockout';
+import * as ko from 'knockout';
 import 'ko/ko.init';
 import komapping from 'knockout.mapping';
 import 'knockout-switch-case';
@@ -112,6 +112,7 @@ import 'ko/bindings/ko.spinEdit';
 import 'ko/bindings/ko.splitDraggable';
 import 'ko/bindings/ko.splitFlexDraggable';
 import 'ko/bindings/ko.sqlContextPopover';
+import 'ko/bindings/ko.stickVertical';
 import 'ko/bindings/ko.storageContextPopover';
 import 'ko/bindings/ko.stretchDown';
 import 'ko/bindings/ko.tagEditor';

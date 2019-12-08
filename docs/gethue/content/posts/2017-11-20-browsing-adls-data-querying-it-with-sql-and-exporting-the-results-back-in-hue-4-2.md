@@ -94,7 +94,7 @@ categories:
   In order to add an ADLS account to Hue, you’ll need to configure Hue with valid <a href="https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-service-to-service-authenticate-rest-api">ADLS credentials</a>, including the client ID, client secret and tenant ID.<br /> These keys can securely stored in a script that outputs the actual access key and secret key to stdout to be read by Hue (this is similar to how <a href="https://gethue.com/storing-passwords-in-script-rather-than-hue-ini-files/">Hue reads password scripts</a>). In order to use script files, add the following section to your hue.ini configuration file:
 </p>
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [adls]
 
@@ -116,13 +116,13 @@ fs_defaultfs=adl://<account_name>.azuredatalakestore.net
 
 webhdfs_url=https://<account_name>.azuredatalakestore.net
 
-{{< /highlight >}}
+</code></pre>
 
 <p class="p1">
   Alternatively (but not recommended for production or secure environments), you can set the client_secret value in plain-text:
 </p>
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [adls]
 
@@ -144,13 +144,13 @@ fs_defaultfs=adl://<account_name>.azuredatalakestore.net
 
 webhdfs_url=https://<account_name>.azuredatalakestore.net
 
-{{< /highlight >}}
+</code></pre>
 
 <p class="p1">
   Alternatively (but not recommended for production or secure environments), you can set the client_secret value in plain-text:
 </p>
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [adls]
 
@@ -172,7 +172,7 @@ fs_defaultfs=adl://<account_name>.azuredatalakestore.net
 
 webhdfs_url=https://<account_name>.azuredatalakestore.net
 
-{{< /highlight >}}
+</code></pre>
 
 ## Integrating Hadoop with ADLS {.p3}
 
@@ -180,7 +180,7 @@ webhdfs_url=https://<account_name>.azuredatalakestore.net
   In addition to configuring Hue with your ADLS credentials, Hadoop will also need to be configured with the ADLS authentication credentials in order to read from and save to ADLS. This can be done by setting the following properties in your <a href="https://hadoop.apache.org/docs/current/hadoop-azure-datalake/index.html#Using_Client_Keys">core-site.xml</a> file:
 </p>
 
-{{< highlight xml >}}
+<pre><code class="xml">
 
 <property>
 
@@ -214,7 +214,7 @@ webhdfs_url=https://<account_name>.azuredatalakestore.net
 
 </property/>
 
-{{< /highlight >}}
+</code></pre>
 
 <p class="p1">
   With Hue and Hadoop configured, we can verify that Hue is able to successfully connect to ADLS by restarting Hue and checking the configuration page. You should not see any errors related to ADLS, and you should notice an additional option in the menu from the main navigation.

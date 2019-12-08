@@ -53,10 +53,10 @@ Hue ships with a Helm chart to make it really easy to get started. [Helm][3] is 
 
 In a Shell, after installing Helm, just execute these three instructions to boot a live Hue with its database:
 
-<pre class="brush: bash; title: ; notranslate" title="">helm repo add gethue https://helm.gethue.com
+<pre><code class="bash">helm repo add gethue https://helm.gethue.com
 helm repo update
 helm install gethue/hue
-</pre>
+</code></pre>
 
 <a href="https://cdn.gethue.com/uploads/2017/12/Screen-Shot-2017-11-15-at-3.34.20-PM.png"><img src="https://cdn.gethue.com/uploads/2017/12/Screen-Shot-2017-11-15-at-3.34.20-PM.png" /></a>
 

@@ -161,7 +161,7 @@ blockquote {
 }
 ul,
 ol {
-  list-style: none;
+  list-style: unset;
   line-height: 1.85714286em;
 }
 ul.bullets {
@@ -4145,7 +4145,7 @@ p strong {
 }
 pre {
   padding: 0.92857143em;
-  background: #fafafa;
+  background: #f8f8f8;
   border: 1px solid #ececec;
   border-radius: 6px;
   line-height: 20px;

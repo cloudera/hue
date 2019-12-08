@@ -51,7 +51,7 @@ categories:
 
 <span style="font-weight: 400;">Then update </span>**Hue Service Advanced Configuration Snippet (Safety Valve) for hue_safety_valve.ini** <span style="font-weight: 400;">as following:</span>
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [desktop]
 
@@ -59,7 +59,7 @@ categories:
 
 backend=desktop.auth.backend.LdapBackend,desktop.auth.backend.AllowFirstUserDjangoBackend
 
-{{< /highlight >}}
+</code></pre>
 
 Then configure Hue LDAP related configurations through CM UI: http://YourCluster.com:7180/cmf/services/10/config as following:
 
@@ -67,7 +67,7 @@ Then configure Hue LDAP related configurations through CM UI: http://YourCluster
 
 Here is a sample of the multi-authentication with ldap for /etc/hue/conf/hue.ini in case that you don’t have CM:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [desktop]
 
@@ -101,7 +101,7 @@ user_name_attr="sAMAccountName"
 
 group_filter="objectclass=group"
 
-{{< /highlight >}}
+</code></pre>
 
 <!--more-->
 
@@ -135,13 +135,13 @@ group_filter="objectclass=group"
 
 <span style="font-weight: 400;">You can always use ldapsearch command on your host to verify if the user/group exists on your LDAP server.</span>
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 ldapsearch -LLL -H ldap://ldapserver.ad.com:389 -D admin@ad.com -w yourbindPassword -b "cn=testuser,ou=test,DC=ad,DC=com"
 
 ldapsearch -LLL -H ldap://ldapserver.ad.com:389 -D admin@ad.com -w yourbindPassword -b "cn=testgroup,ou=test,DC=ad,DC=com"
 
-{{< /highlight >}}
+</code></pre>
 
 <span style="font-weight: 400;">As always feel free to comment and send feedback on the </span>[<span style="font-weight: 400;">hue-user</span>][9] <span style="font-weight: 400;">list or </span>[<span style="font-weight: 400;">@gethue</span>][10]<span style="font-weight: 400;">!</span>
 

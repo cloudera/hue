@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import 'ko/bindings/ko.publish';
 
@@ -85,23 +85,6 @@ const TEMPLATE = `
       }
     ">
     <i class="fa fa-ellipsis-h"></i>
-  </div>
-</div>
-<div class="snippet-log-container margin-bottom-10">
-  <div data-bind="visible: !hasResultset() && status() == 'available' && fetchedOnce(), css: resultsKlass" style="display:none;">
-    <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ I18n('Success.') }</pre>
-  </div>
-
-  <div data-bind="visible: hasResultset() && status() === 'available' && hasEmptyResult() && fetchedOnce(), css: resultsKlass" style="display:none;">
-    <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ I18n("Done. 0 results.") }</pre>
-  </div>
-
-  <div data-bind="visible: status() === 'expired', css: resultsKlass" style="display:none;">
-    <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ I18n("Results have expired, rerun the query if needed.") }</pre>
-  </div>
-
-  <div data-bind="visible: status() === 'available' && !fetchedOnce(), css: resultsKlass" style="display:none;">
-    <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-spin fa-spinner"></i> ${ I18n('Loading...') }</pre>
   </div>
 </div>
 `;

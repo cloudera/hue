@@ -63,7 +63,7 @@ We are going to save our data analysis into this format with a [Pig script][3] w
 
 We previously created a MySql table ‘stats’ with this [SQL script][5]. This table is going to store the exported data. Here are the properties of our job. They are explained in more depth in the previous Sqoop2 App blog post.
 
-{{< highlight bash >}}Table name: yelp_cool_test
+<pre><code class="bash">Table name: yelp_cool_test
 
 Input directory: /user/hdfs/test_sqoop
 
@@ -73,13 +73,13 @@ JDBC Driver Class : com.mysql.jdbc.Driver
 
 JDBC Connection String: jdbc:mysql://hue.com/test
 
-{{< /highlight >}}
+</code></pre>
 
 Then click ‘Save & Execute’, and here we go, the data is now available in MySql!
 
 &nbsp;
 
-{{< highlight bash >}}mysql> select * from yelp_cool_test limit 2;
+<pre><code class="bash">mysql> select * from yelp_cool_test limit 2;
 
 +--+--+--+--+
 
@@ -95,7 +95,7 @@ Then click ‘Save & Execute’, and here we go, the data is now available in My
 
 2 rows in set (0.00 sec)
 
-{{< /highlight >}}
+</code></pre>
 
 Data stored in Hive or HBase can not be sqooped natively yet by Sqoop2. A current (less efficient) workaround would be to dump it to a HDFS directory with [Hive or Pig][6] and then do a similar Sqoop export.
 

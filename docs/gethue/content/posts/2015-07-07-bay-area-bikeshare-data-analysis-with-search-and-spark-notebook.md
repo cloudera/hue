@@ -67,7 +67,7 @@ As usual feel free to comment on the [hue-user][11] list or [@gethue][12]!
 
 A quick way to index the data with Solr:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 bin/solr create_collection  -c  bikes
 
@@ -77,7 +77,7 @@ u="$URL/bikes/update?commitWithin=5000"
 
 curl $u -data-binary @/home/test/index_data.csv -H 'Content-type:text/csv'
 
-{{< /highlight >}}
+</code></pre>
 
  [1]: http://www.bayareabikeshare.com
  [2]: https://www.dropbox.com/s/jw44si1gy26tdhj/bikedataclean.csv?dl=0

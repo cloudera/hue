@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import * as d3 from 'd3';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import componentUtils from './componentUtils';

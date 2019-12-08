@@ -60,7 +60,7 @@ One more feature landing in Hue 3.8 that could interest some users is the Thrif
 
 By configure HiveServer2 in [HTTP mode][6]:
 
-{{< highlight xml >}}<property>
+<pre><code class="xml"><property>
 
 <name>hive.server2.transport.mode</name>
 
@@ -68,7 +68,7 @@ By configure HiveServer2 in [HTTP mode][6]:
 
 </property>
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 

@@ -62,7 +62,7 @@ def rm_ha(funct):
 def get_hdfs(identifier="default", user=None):
   global FS_CACHE
   get_all_hdfs()
-  return FS_CACHE[FS_CACHE.keys()[0]] if has_connectors() else FS_CACHE[identifier]
+  return FS_CACHE[list(FS_CACHE.keys())[0]] if has_connectors() else FS_CACHE[identifier]
 
 
 def get_defaultfs():

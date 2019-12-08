@@ -14,12 +14,18 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-import urllib
+import sys
 
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import extract_field_data
 from desktop.views import commonheader, commonfooter
+
+if sys.version_info[0] > 2:
+  from urllib.parse import quote as urllib_quote
+  unicode = str
+else:
+  from urllib import quote as urllib_quote
 %>
 
 <%namespace name="layout" file="layout.mako" />
@@ -58,7 +64,7 @@ ${ layout.menubar(section='groups') }
 
     <br/>
 
-    <form id="editForm" action="${urllib.quote(action)}" method="POST" class="form form-horizontal" autocomplete="off">
+    <form id="editForm" action="${urllib_quote(action)}" method="POST" class="form form-horizontal" autocomplete="off">
       ${ csrf_token(request) | n,unicode }
       <fieldset>
         % for field in form:

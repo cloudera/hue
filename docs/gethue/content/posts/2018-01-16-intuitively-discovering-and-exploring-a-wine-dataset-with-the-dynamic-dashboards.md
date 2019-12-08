@@ -69,13 +69,13 @@ On top of this, the Solr 7 Analytic Facets are close to be fully supported in th
 
 If you are not getting any suggestion, and opening the field information popup on the right assist shows the error below, it means the collection needs to have the [Solr Term Handler][7] configured.
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 <h1>HTTP Status 404 - /solr/jira_search/terms</h1>
 
 There are no terms to be shown
 
-{{< /highlight >}}
+</code></pre>
 
 ## Coming up Next!
 

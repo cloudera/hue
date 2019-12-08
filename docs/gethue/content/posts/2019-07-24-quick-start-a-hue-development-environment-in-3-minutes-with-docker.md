@@ -49,24 +49,24 @@ Typically the development is made [natively][1] but here is a new way to quickl
 
 &nbsp;
 
-<pre class="brush: bash; title: ; notranslate" title="">git clone https://github.com/cloudera/hue.git
+<pre><code class="bash">git clone https://github.com/cloudera/hue.git
 
 cd hue
 
 cp desktop/conf/pseudo-distributed.ini.tmpl desktop/conf/pseudo-distributed.ini
 
-</pre>
+</code></pre>
 
 Then edit the [[database]] section to specify a proper database, here MySql:
 
 <div>
-  <pre class="brush: bash; title: ; notranslate" title="">
+<pre><code class="bash">
 host=127.0.0.1 # Not localhost if Docker
 engine=mysql
 user=hue
 password=hue
 name=huedb
-</pre>
+</code></pre>
 </div>
 
 <div>
@@ -76,7 +76,7 @@ name=huedb
   Then map the local Hue source code into the running container (so that local edits are seen in the running Hue):
 </div>
 
-<pre class="brush: bash; title: ; notranslate" title="">sudo docker run -it -v $PWD/apps:/usr/share/hue/apps -v $PWD/desktop:/usr/share/hue/desktop -v $PWD/desktop/conf/pseudo-distributed.ini:/usr/share/hue/desktop/conf/z-hue.ini --network="host" gethue/hue</pre>
+<pre><code class="bash">sudo docker run -it -v $PWD/apps:/usr/share/hue/apps -v $PWD/desktop:/usr/share/hue/desktop -v $PWD/desktop/conf/pseudo-distributed.ini:/usr/share/hue/desktop/conf/z-hue.ini --network="host" gethue/hue</code></pre>
 
 Then open-up <http://127.0.0.1:8888>!
 
@@ -85,7 +85,7 @@ Then open-up <http://127.0.0.1:8888>!
 
 Note: code updates won&#8217;t be seen after the Docker container runs. For this Hue would need to be [started][3] in dev server mode by replacing the line by
 
-<pre class="brush: bash; title: ; notranslate" title="">./build/env/bin/hue runserver 0.0.0.0:8888</pre>
+<pre><code class="bash">./build/env/bin/hue runserver 0.0.0.0:8888</code></pre>
 
 and it will auto-restart on Python code changes. For JavaScript, those would need to be [compiled][4].
 

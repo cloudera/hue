@@ -17,8 +17,8 @@
 
 from __future__ import division
 from builtins import str
-from past.utils import old_div
 import logging
+import math
 import os.path
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
@@ -194,7 +194,7 @@ DOWNLOAD_CELL_LIMIT = Config(
 
 def get_deprecated_download_cell_limit():
   """Get the old default"""
-  return old_div(DOWNLOAD_CELL_LIMIT.get(), 100) if DOWNLOAD_CELL_LIMIT.get() > 0 else DOWNLOAD_CELL_LIMIT.get()
+  return math.floor(DOWNLOAD_CELL_LIMIT.get() / 100) if DOWNLOAD_CELL_LIMIT.get() > 0 else DOWNLOAD_CELL_LIMIT.get()
 
 DOWNLOAD_ROW_LIMIT = Config(
   key='download_row_limit',

@@ -63,23 +63,23 @@ You can see the tweets rolling in! Compared to the previous version:
 
 Download a [nightly Solr 5.x][6], uncompress it and start it:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 bin/solr start -cloud
 
 bin/solr create -c tweets
 
-{{< /highlight >}}
+</code></pre>
 
 Then compile the [Spark Solr app][7].
 
 Enable the analytic widgets in hue.ini:
 
-{{< highlight bash >}}[search]
+<pre><code class="bash">[search]
 
 latest=true
 
-{{< /highlight >}}
+</code></pre>
 
 **Sum-up**
 

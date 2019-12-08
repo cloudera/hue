@@ -17,7 +17,7 @@
 import $ from 'jquery';
 import Clipboard from 'clipboard';
 import 'jquery-mousewheel';
-import ko from 'knockout';
+import * as ko from 'knockout';
 import 'ext/bootstrap-datepicker.min';
 import 'ext/jquery.hotkeys';
 import 'jquery/plugins/jquery.hdfstree';

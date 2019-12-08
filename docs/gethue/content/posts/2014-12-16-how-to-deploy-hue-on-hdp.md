@@ -90,7 +90,7 @@ Hue uses an SQLite database by default and you may find the following error when
     
     <div>
       <p>
-        {{< highlight bash >}}[desktop]<br /> app_blacklist=impala<br /> {{< /highlight >}}
+        <pre><code class="bash">[desktop]<br /> app_blacklist=impala<br /> </code></pre>
       </p>
     </div>
   </div>
@@ -138,7 +138,7 @@ Hue uses an SQLite database by default and you may find the following error when
                 </p>
                 
                 <p>
-                  {{< highlight xml >}}<property><br /> <name>hadoop.proxyuser.hue.hosts</name><br /> <value>*</value><br /> </property><br /> <property><br /> <name>hadoop.proxyuser.hue.groups</name><br /> <value>*</value><br /> </property><br /> {{< /highlight >}}
+                  <pre><code class="xml"><property><br /> <name>hadoop.proxyuser.hue.hosts</name><br /> <value>*</value><br /> </property><br /> <property><br /> <name>hadoop.proxyuser.hue.groups</name><br /> <value>*</value><br /> </property><br /> </code></pre>
                 </p>
                 
                 <p>
@@ -239,7 +239,7 @@ Hue uses an SQLite database by default and you may find the following error when
     
     <div>
       <p>
-        {{< highlight bash >}}"Server does not support GetLog()"{{< /highlight >}}
+        <pre><code class="bash">"Server does not support GetLog()"</code></pre>
       </p>
     </div>
     
@@ -254,7 +254,7 @@ Hue uses an SQLite database by default and you may find the following error when
       <div>
         <div>
           <p>
-            {{< highlight bash >}}[beeswax]<br /> # Choose whether Hue uses the GetLog() thrift call to retrieve Hive logs.<br /> # If false, Hue will use the FetchResults() thrift call instead.<br /> use_get_log_api=false<br /> {{< /highlight >}}
+            <pre><code class="bash">[beeswax]<br /> # Choose whether Hue uses the GetLog() thrift call to retrieve Hive logs.<br /> # If false, Hue will use the FetchResults() thrift call instead.<br /> use_get_log_api=false<br /> </code></pre>
           </p>
         </div>
       </div>
@@ -366,7 +366,7 @@ Hue uses an SQLite database by default and you may find the following error when
     <div>
       <div>
         <p>
-          {{< highlight bash >}}2014-12-15 23:32:17,626  INFO ActionStartXCommand:543 - SERVER[hdptest.construct.dev] USER[amo] GROUP[-] TOKEN[] APP[pig-app-hue-script] JOB[0000001-141215230246520-<wbr />oozie-oozi-W] ACTION[0000001-<wbr />141215230246520-oozie-oozi-W@:<wbr />start:] Start action [0000001-141215230246520-<wbr />oozie-oozi-W@:start:] with user-retry state : userRetryCount [0], userRetryMax [0], userRetryInterval [10]
+          <pre><code class="bash">2014-12-15 23:32:17,626  INFO ActionStartXCommand:543 - SERVER[hdptest.construct.dev] USER[amo] GROUP[-] TOKEN[] APP[pig-app-hue-script] JOB[0000001-141215230246520-<wbr />oozie-oozi-W] ACTION[0000001-<wbr />141215230246520-oozie-oozi-W@:<wbr />start:] Start action [0000001-141215230246520-<wbr />oozie-oozi-W@:start:] with user-retry state : userRetryCount [0], userRetryMax [0], userRetryInterval [10]
         </p>
         
         <p>
@@ -378,7 +378,7 @@ Hue uses an SQLite database by default and you may find the following error when
         </p>
         
         <p>
-          2014-12-15 23:32:17,873  INFO ActionStartXCommand:543 - SERVER[hdptest.construct.dev] USER[amo] GROUP[-] TOKEN[] APP[pig-app-hue-script] JOB[0000001-141215230246520-<wbr />oozie-oozi-W] ACTION[0000001-<wbr />141215230246520-oozie-oozi-W@<wbr />pig] Start action [0000001-141215230246520-<wbr />oozie-oozi-W@pig] with user-retry state : userRetryCount [0], userRetryMax [0], userRetryInterval [10]<br /> {{< /highlight >}}
+          2014-12-15 23:32:17,873  INFO ActionStartXCommand:543 - SERVER[hdptest.construct.dev] USER[amo] GROUP[-] TOKEN[] APP[pig-app-hue-script] JOB[0000001-141215230246520-<wbr />oozie-oozi-W] ACTION[0000001-<wbr />141215230246520-oozie-oozi-W@<wbr />pig] Start action [0000001-141215230246520-<wbr />oozie-oozi-W@pig] with user-retry state : userRetryCount [0], userRetryMax [0], userRetryInterval [10]<br /> </code></pre>
         </p>
       </div>
     </div>

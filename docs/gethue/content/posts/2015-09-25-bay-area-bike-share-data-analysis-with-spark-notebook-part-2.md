@@ -69,7 +69,7 @@ Now that we've imported the data into our cluster, we can create a new Notebook 
 
 Let's find the top 10 most popular start stations based on the trip data:
 
-{{< highlight sql >}}SELECT startterminal, startstation, COUNT(1) AS count FROM bikeshare.trips GROUP BY startterminal, startstation ORDER BY count DESC LIMIT 10{{< /highlight >}}
+<pre><code class="sql">SELECT startterminal, startstation, COUNT(1) AS count FROM bikeshare.trips GROUP BY startterminal, startstation ORDER BY count DESC LIMIT 10</code></pre>
 
 [<img src="https://cdn.gethue.com/uploads/2015/09/impala_query-1024x339.png"  />][9]
 
@@ -79,7 +79,7 @@ Once our results are returned, we can easily visualize this data; a bar graph wo
 
 It seems that the San Francisco Caltrain (Townsend at 4th) was by far the most common start station. Let's determine which end stations, for trips starting from the SF Caltrain Townsend station, were the most popular. We'll fetch the latitude and longitude coordinates so that we can visualize the results on a map.
 
-{{< highlight sql >}}
+<pre><code class="sql">
 
 SELECT
 
@@ -103,7 +103,7 @@ GROUP BY s.station_id, s.name, s.lat, s.long
 
 ORDER BY count DESC LIMIT 10
 
-{{< /highlight >}}
+</code></pre>
 
 [<img src="https://cdn.gethue.com/uploads/2015/08/impala_map-e1443111522857-1024x223.png" />][11]
 
@@ -117,7 +117,7 @@ Let's say we wanted to dig further into the trip data for the SF Caltrain statio
 
 Since the trip data stores startdate as a STRING, we'll need to apply some string-manipulation to extract the hour within an inline SQL query. The outer query will aggregate the count of trips and the average duration.
 
-{{< highlight sql >}}
+<pre><code class="sql">
 
 SELECT
 
@@ -151,7 +151,7 @@ GROUP BY hour
 
 ORDER BY hour ASC;
 
-{{< /highlight >}}
+</code></pre>
 
 Since this data produces several numeric dimensions of data, we can visualize the results using a scatterplot graph, with the hour as the x-axis, number of trips as the y-axis, and the average duration as the scatterplot size.
 
@@ -159,7 +159,7 @@ Since this data produces several numeric dimensions of data, we can visualize th
 
 Let's add another Hive snippet to analyze an hour-by-hour breakdown of availability at the SF Caltrain Station:
 
-{{< highlight sql >}}
+<pre><code class="sql">
 
 SELECT
 
@@ -199,7 +199,7 @@ GROUP BY hour
 
 ORDER BY hour ASC;
 
-{{< /highlight >}}
+</code></pre>
 
 We'll visualize the results as a line graph, which indicates that the bike availability tends to fall starting at 6 AM and is regained around 6 PM.
 
@@ -213,7 +213,7 @@ Hue's Spark notebooks allow users to mix exploratory SQL-analysis with custom Sc
 
 For example, we can open a pyspark snippet and load the trip data directly from the Hive warehouse and apply a sequence of filter, map, and reduceByKey operations to determine the average number of trips starting from the SF Caltrain Station:
 
-{{< highlight python >}}
+<pre><code class="python">
 
 trips = sc.textFile('/user/hive/warehouse/bikeshare.db/trips/201402_trip_data.csv')
 
@@ -245,7 +245,7 @@ avg_trips_sorted = sorted(avg_trips_by_hour.collect())
 
 %table avg_trips_sorted
 
-{{< /highlight >}}
+</code></pre>
 
 [<img src="https://cdn.gethue.com/uploads/2015/09/Screenshot-2015-09-23-23.13.46-e1443110910319-1024x268.png" />][14]
 
@@ -265,7 +265,7 @@ Stay tuned for a number of exciting improvements to the notebook app, and as usu
 
 The BABS rebalancing data (named 201402_status_data.csv) uses quotes.  In these cases, it is easier to create the table in Hive in the Beeswax editor and use the OpenCSV Row SERDE for Hive:
 
-{{< highlight sql >}}
+<pre><code class="sql">
 
 CREATE TABLE rebalancing(station_id int, bikes_available int, docks_available int, time string)
 
@@ -283,7 +283,7 @@ WITH SERDEPROPERTIES (
 
 STORED AS TEXTFILE;
 
-{{< /highlight >}}
+</code></pre>
 
 Then you can go back to the Metastore to import the CSV into the table; note that you may have to remove the header line manually.
 

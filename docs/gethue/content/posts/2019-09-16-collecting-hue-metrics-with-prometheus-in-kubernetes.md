@@ -49,12 +49,12 @@ Hue is getting easy to run with its [Docker][1] container and Kubernetes [Helm p
 
 First we install the Prometheus operator via [the add-on][6]:
 
-<pre class="brush: bash; title: ; notranslate" title="">microk8s.enable prometheus
-</pre>
+<pre><code class="bash">microk8s.enable prometheus
+</code></pre>
 
 And see that the Prometheus operator is running, which powers the Prometheus pods in the monitoring namespace:
 
-<pre class="brush: bash; title: ; notranslate" title="">kubectl get pods -n monitoring
+<pre><code class="bash">kubectl get pods -n monitoring
 NAME                                   READY   STATUS    RESTARTS   AGE
 alertmanager-main-0                    2/2     Running   268        48d
 grafana-7789c44cc7-7c4pb               1/1     Running   125        48d
@@ -63,15 +63,15 @@ node-exporter-zlg4s                    2/2     Running   259        48d
 prometheus-adapter-644b448b48-7t8rt    1/1     Running   131        48d
 prometheus-k8s-0                       3/3     Running   364        47d
 prometheus-operator-7695b59fb8-k2qm2   1/1     Running   130        48d
-</pre>
+</code></pre>
 
 To tell Prometheus how to get the metrics, we use a [ServiceMonitor.][7] Those metrics are available on the /metrics page of Hue via the [Django Prometheus][8] module.
 
 Note that to expose this URL, Hue needs to have this property turned on:
 
-<pre class="brush: bash; title: ; notranslate" title="">[desktop]
+<pre><code class="bash">[desktop]
 enable_prometheus=true
-</pre>
+</code></pre>
 
 Then we can check that Prometheus is scraping properly Hue: <http://gethue:9090/targets>
 

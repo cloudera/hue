@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 import 'ext/leaflet/leaflet';
 import 'ext/leaflet/leaflet.markercluster';
 import 'ext/leaflet/leaflet.heat';

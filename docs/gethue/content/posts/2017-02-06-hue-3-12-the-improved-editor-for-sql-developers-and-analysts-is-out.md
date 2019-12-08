@@ -133,7 +133,7 @@ Fixed Arbitrary host header acceptance in Hue. Now one can set host/domain names
 
 allowed_hosts="host.domain,host2.domain,host3.domain"
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [desktop]
 
@@ -143,7 +143,7 @@ allowed_hosts="*.domain"
 
 \# or specific example: allowed_hosts="hue1.hadoop.cloudera.com,hue2.hadoop.cloudera.com"
 
-{{< /highlight >}}
+</code></pre>
 
 <span style="color: #ff0000;"><strong>Note</strong></span>: “Bad Request (400)” error: when [hosting Hue in an AWS cluster][14], you might need to set the value to '*' to allow external client of the network to access Hue.
 
@@ -157,31 +157,31 @@ allowed_hosts="*.domain"
 
 <span style="font-weight: 400;">In Thrift SASL library, the </span><span style="font-weight: 400;">sasl_max_buffer</span> <span style="font-weight: 400;">support is already implemented. </span><span style="font-weight: 400;">sasl_max_buffer</span> <span style="font-weight: 400;">in the </span><span style="font-weight: 400;">hue.ini</span> <span style="font-weight: 400;">provides a bigger and configurable buffer size that allow to provide support for </span><span style="font-weight: 400;"><code>hive.server2.thrift.sasl.qop="auth-conf"&lt;code></code></code></span><span style="font-weight: 400;">.</span>
 
-{{< highlight bash >}}[desktop]
+<pre><code class="bash">[desktop]
 
 \# This property specifies the maximum size of the receive buffer in bytes in thrift sasl communication (default 2 MB).
 
 sasl_max_buffer=2 \* 1024 \* 1024
 
-{{< /highlight >}}
+</code></pre>
 
 ## <span style="font-weight: 400;">Introducing Request HTTP Pool in Hue</span>
 
 <span style="font-weight: 400;">The Request Session object allows the persistence of certain parameters across requests. It also persists cookies across all requests made from the Session instance, and will use urllib3’s connection pooling. We are making several requests to the same host:port, with this change the underlying TCP connection will be reused, which can result in a significant performance increase.</span>
 
-{{< highlight python >}}CACHE_SESSION = requests.Session()
+<pre><code class="python">CACHE_SESSION = requests.Session()
 
 CACHE_SESSION.mount('http://', requests.adapters.HTTPAdapter(pool_connections=conf.CHERRYPY_SERVER_THREADS.get(), pool_maxsize=conf.CHERRYPY_SERVER_THREADS.get()))
 
 CACHE_SESSION.mount('https://', requests.adapters.HTTPAdapter(pool_connections=conf.CHERRYPY_SERVER_THREADS.get(), pool_maxsize=conf.CHERRYPY_SERVER_THREADS.get()))
 
-{{< /highlight >}}
+</code></pre>
 
 ## Content-Security-Policy: header
 
 The new Content-Security-Policy HTTP response header helps you reduce XSS risks on modern browsers by declaring what dynamic resources are allowed to load via a HTTP Header. (For more reading: <https://content-security-policy.com/>)
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [desktop]
 
@@ -189,7 +189,7 @@ secure_content_security_policy="script-src 'self' 'unsafe-inline' 'unsafe-eval' 
 
 #In HUE 3.11 and higher it is enabled by default.
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 

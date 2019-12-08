@@ -16,13 +16,13 @@
 # limitations under the License.
 
 from __future__ import division
-from past.utils import old_div
 from librdbms.jdbc import query_and_fetch
 
 from notebook.connectors.jdbc import JdbcApi
 from notebook.connectors.jdbc import Assist
 import time
 import logging
+import math
 
 
 LOG = logging.getLogger(__name__)
@@ -65,8 +65,8 @@ class VerticaAssist(Assist):
                     + ", cache is used in "
                     + "%.2f"
                     % (
-                        old_div(100
-                        * float(self.cache_use_stat["cache"]), (self.cache_use_stat["query"] + self.cache_use_stat["cache"]))
+                        math.floor(100
+                        * float(self.cache_use_stat["cache"]) / (self.cache_use_stat["query"] + self.cache_use_stat["cache"]))
                     )
                     + "% cases"
                 )

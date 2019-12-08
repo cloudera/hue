@@ -58,7 +58,7 @@ Main features:
 
 To have Hue point to a Sentry service and another host, modify these [hue.ini][4] properties:
 
-{{< highlight bash >}}[libsentry]
+<pre><code class="bash">[libsentry]
 
  # Hostname or IP of server.
 
@@ -72,7 +72,7 @@ To have Hue point to a Sentry service and another host, modify these [hue.ini][4
 
  sentry_conf_dir=/etc/sentry/conf
 
-{{< /highlight >}}
+</code></pre>
 
 Hue will also automatically pick up the server name of HiveServer2 from the sentry-site.xml file of /etc/hive/conf.
 
@@ -88,7 +88,7 @@ As usual, feel free to continue to send us questions and feedback on the [hue-u
 
 To be able to edit roles and privileges in Hue, the logged-in Hue user needs to belong to a **group in Hue** that is also an **admin group in Sentry** (whatever UserGroupMapping Sentry is using, the corresponding groups must exist in Hue or need to be entered manually). For example, our 'hive' user belongs to a 'hive' group in Hue and also to a 'hive' group in Sentry:
 
-{{< highlight xml >}}<property>
+<pre><code class="xml"><property>
 
   <name>sentry.service.admin.group</name>
 
@@ -96,7 +96,7 @@ To be able to edit roles and privileges in Hue, the logged-in Hue user needs to 
 
 </property>
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -123,21 +123,21 @@ Our users are:
 
 We [synced the Unix users/groups][9] into Hue with these commands:
 
-{{< highlight bash >}}export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/\`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE | tail -1 | awk '{print $9}'\`"
+<pre><code class="bash">export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/\`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE | tail -1 | awk '{print $9}'\`"
 
 build/env/bin/hue useradmin_sync_with_unix -min-uid=1000
 
-{{< /highlight >}}
+</code></pre>
 
 If using the package version and has the CDH repository register, install sentry with:
 
-{{< highlight bash >}}sudo apt-get install sentry
+<pre><code class="bash">sudo apt-get install sentry
 
-{{< /highlight >}}
+</code></pre>
 
 If using Kerberos, make sure ‘hue’ is allowed to connect to Sentry in /etc/sentry/conf/sentry-site.xml:
 
-{{< highlight xml >}}<property>
+<pre><code class="xml"><property>
 
   <name>sentry.service.allow.connect</name>
 
@@ -145,13 +145,13 @@ If using Kerberos, make sure ‘hue’ is allowed to connect to Sentry in /etc/s
 
 </property>
 
-{{< /highlight >}}
+</code></pre>
 
 Here is an example of sentry-site.xml
 
 Here is an example of sentry-site.xml
 
-{{< highlight xml >}}<?xml version="1.0" encoding="UTF-8"?>
+<pre><code class="xml"><?xml version="1.0" encoding="UTF-8"?>
 
 <configuration>
 
@@ -205,27 +205,27 @@ Here is an example of sentry-site.xml
 
 </configuration>
 
-{{< /highlight >}}
+</code></pre>
 
 For testing purposes, here is how to create the initial Sentry database:
 
-{{< highlight bash >}}romain@runreal:~/projects/hue$ sentry -command schema-tool -initSchema -conffile /etc/sentry/conf/sentry-site.xml -dbType derby
+<pre><code class="bash">romain@runreal:~/projects/hue$ sentry -command schema-tool -initSchema -conffile /etc/sentry/conf/sentry-site.xml -dbType derby
 
-{{< /highlight >}}
+</code></pre>
 
 And start the service:
 
-{{< highlight bash >}}sentry -command service  -conffile /etc/sentry/conf/sentry-site.xml
+<pre><code class="bash">sentry -command service  -conffile /etc/sentry/conf/sentry-site.xml
 
-{{< /highlight >}}
+</code></pre>
 
 **Note**
 
 In Sentry 1.5, you will need to specify a ‘entry.store.jdbc.password’ property in the sentry-site.xml, if not you will get:
 
-{{< highlight bash >}}Caused by: org.apache.sentry.provider.db.service.thrift.SentryConfigurationException: Error reading sentry.store.jdbc.password
+<pre><code class="bash">Caused by: org.apache.sentry.provider.db.service.thrift.SentryConfigurationException: Error reading sentry.store.jdbc.password
 
-{{< /highlight >}}
+</code></pre>
 
  [1]: http://sentry.incubator.apache.org/
  [2]: https://gethue.com/hadoop-tutorial-new-impala-and-hive-editors/

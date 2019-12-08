@@ -50,11 +50,11 @@ The previous methods were very error prone as they required to insert data in mu
 
 **Export all workflows**
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 ./build/env/bin/hue dumpdata desktop.Document2 -indent 2 -natural > data.json
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -62,15 +62,15 @@ The previous methods were very error prone as they required to insert data in mu
 
 20000013 is the id you can see in the URL of the dashboard.
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 ./build/env/bin/hue dumpdata desktop.Document2 -indent 2 -pks=20000013 -natural > data.json
 
-{{< /highlight >}}
+</code></pre>
 
 You can specify more than one id:
 
-{{< highlight bash >}}-pks=20000013,20000014,20000015{{< /highlight >}}
+<pre><code class="bash">-pks=20000013,20000014,20000015</code></pre>
 
 &nbsp;
 
@@ -78,9 +78,9 @@ You can specify more than one id:
 
 Then
 
-{{< highlight bash >}}./build/env/bin/hue loaddata data.json
+<pre><code class="bash">./build/env/bin/hue loaddata data.json
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -88,7 +88,7 @@ Then
 
 Until we hit Hue 4, this step is required in order to make the imported documents appear:
 
-{{< highlight bash >}}./build/env/bin/hue sync_documents{{< /highlight >}}
+<pre><code class="bash">./build/env/bin/hue sync_documents</code></pre>
 
 &nbsp;
 
@@ -102,15 +102,15 @@ And that's it, the dashboards with the same IDs will be refreshed with the impo
 
 If the document with the same id already exists in the database, just set its id to null in data.json and it will be inserted as a new document.
 
-{{< highlight bash >}}vim data.json{{< /highlight >}}
+<pre><code class="bash">vim data.json</code></pre>
 
 then change
 
-{{< highlight bash >}}"pk": 16,{{< /highlight >}}
+<pre><code class="bash">"pk": 16,</code></pre>
 
 to
 
-{{< highlight bash >}}"pk": null,{{< /highlight >}}
+<pre><code class="bash">"pk": null,</code></pre>
 
 &nbsp;
 
@@ -118,21 +118,21 @@ to
 
 If using CM, export this variable in order to point to the correct database:
 
-{{< highlight bash >}}HUE_CONF_DIR=/var/run/cloudera-scm-agent/process/-hue-HUE_SERVER-id
+<pre><code class="bash">HUE_CONF_DIR=/var/run/cloudera-scm-agent/process/-hue-HUE_SERVER-id
 
 echo $HUE_CONF_DIR
 
-export HUE_CONF_DIR{{< /highlight >}}
+export HUE_CONF_DIR</code></pre>
 
 Where <id> is the most recent ID in that process directory for hue-HUE_SERVER.
 
 or even quicker
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/\`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE | tail -1 | awk '{print $9}'\`"
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 

@@ -48,11 +48,11 @@ categories:
 
 First enable impersonation in the [hue.ini][1] that way permissions will be checked against the current user and not ‘hue’ which acts as a proxy:
 
-{{< highlight bash >}}[impala]
+<pre><code class="bash">[impala]
 
 impersonation_enabled=True
 
-{{< /highlight >}}
+</code></pre>
 
 Then you might hit this error:
 
@@ -60,7 +60,7 @@ Then you might hit this error:
 
 This is because Hue is not authorized to be a proxy. To fix it, startup Impala with this flag:
 
-{{< highlight bash >}}-authorized_proxy_user_config=hue=*{{< /highlight >}}
+<pre><code class="bash">-authorized_proxy_user_config=hue=*</code></pre>
 
 Note: if you use Cloudera Manager, add it to the ‘Impalad Command Line Argument Safety Valve’
 
@@ -72,7 +72,7 @@ And that’s it! You can now benefit from real security similar to [Hive][2]! As
 
 Note: if you are on CDH4/Hue 2.x, make sure that Hue is configured to talk to Impala with the HiveServer2 API:
 
-{{< highlight bash >}}[impala]
+<pre><code class="bash">[impala]
 
 \# Host of the Impala Server (one of the Impalad)
 
@@ -102,7 +102,7 @@ server_port=21050
 
 impersonation_enabled=True
 
-{{< /highlight >}}
+</code></pre>
 
 Note: to give a concrete idea, here is video demo that shows the end user interaction in the UI (it is using the <a href="https://gethue.com/hadoop-tutorial-hive-query-editor-with-hiveserver2-and/" target="_blank" rel="noopener noreferrer">Hive App</a> but you will get the exact same result with the Impala app)
 

@@ -70,45 +70,45 @@ They are two ways: just pull the latest from the Internet or build it yourself f
 
 ### [][9]{#user-content-pull-the-image-from-docker-hub.anchor}Pull the image from Docker Hub
 
-{{< highlight bash >}}sudo docker pull gethue/hue:latest
+<pre><code class="bash">sudo docker pull gethue/hue:latest
 
-{{< /highlight >}}
+</code></pre>
 
 ### [][10]{#user-content-build-the-image.anchor}Build the image
 
-{{< highlight bash >}}cd tools/docker/hue-base
+<pre><code class="bash">cd tools/docker/hue-base
 
 sudo docker build -rm -t gethue/hue:latest .
 
-{{< /highlight >}}
+</code></pre>
 
 ## [][11]{#user-content-running-the-image.anchor}Running the image
 
-{{< highlight bash >}}docker run -it -p 8888:8888 gethue/hue:latest bash
+<pre><code class="bash">docker run -it -p 8888:8888 gethue/hue:latest bash
 
-{{< /highlight >}}
+</code></pre>
 
 This opens a bash to the root of the project. From there you can run the development version of Hue with the command
 
-{{< highlight bash >}}./build/env/bin/hue runserver_plus 0.0.0.0:8888
+<pre><code class="bash">./build/env/bin/hue runserver_plus 0.0.0.0:8888
 
-{{< /highlight >}}
+</code></pre>
 
 Hue should then be up and running on your default Docker IP on the port 8888, so usually [http://192.168.99.100:8888][12].
 
 **Note** If 192.168.99.100 does not work, get the IP of the docker container with:
 
-{{< highlight bash >}}sudo docker ps
+<pre><code class="bash">sudo docker ps
 
 CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES
 
 b7950388c1db gethue/hue:latest "bash" 10 minutes ago Up 10 minutes 22/tcp, 0.0.0.0:8888->8888/tcp agitated_mccarthy
 
-{{< /highlight >}}
+</code></pre>
 
 Then get `inet addr`, so in our case [http://172.17.0.1:8888][13]:
 
-{{< highlight bash >}}sudo docker exec -it b7950388c1db /sbin/ifconfig eth0
+<pre><code class="bash">sudo docker exec -it b7950388c1db /sbin/ifconfig eth0
 
 eth0 Link encap:Ethernet HWaddr 02:42:ac:11:00:01
 
@@ -126,7 +126,7 @@ collisions:0 txqueuelen:0
 
 RX bytes:10626 (10.6 KB) TX bytes:648 (648.0 B)
 
-{{< /highlight >}}
+</code></pre>
 
 <a href="https://raw.githubusercontent.com/cloudera/hue/master/docs/images/login.png" target="_blank" rel="noopener noreferrer"><img title="Hue First Login" src="https://raw.githubusercontent.com/cloudera/hue/master/docs/images/login.png" alt="alt text" /></a>
 

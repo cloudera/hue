@@ -54,7 +54,7 @@ Let's display the Esri.WorldImagery in Hue!
 
 The properties we need to tweak are `leaflet_tile_layer` and `leaflet_tile_layer_attribution`, that can be configured in the hue.ini file:
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [desktop]
 
@@ -62,19 +62,19 @@ leaflet_tile_layer=https://server.arcgisonline.com/ArcGIS/rest/services/World_Im
 
 leaflet_tile_layer_attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 
-{{< /highlight >}}
+</code></pre>
 
 The values are exactly the same taken from the Leaflet providers demo.
 
 With the recent security improvements in Hue, we need to whitelist the tile domain `server.arcgisonline.com` as well like and put it instead of `*.tile.osm.org`
 
-{{< highlight bash >}}
+<pre><code class="bash">
 
 [desktop]
 
 secure_content_security_policy="script-src 'self' 'unsafe-inline' 'unsafe-eval' \*.google-analytics.com \*.doubleclick.net \*.mathjax.org data:;img-src 'self' \*.google-analytics.com *.doubleclick.net server.arcgisonline.com data:;style-src 'self' 'unsafe-inline';connect-src 'self';child-src 'none';object-src 'none'"
 
-{{< /highlight >}}
+</code></pre>
 
 Et voila, when we restart Hue, we'll have the world imagery in every app that uses maps!
 

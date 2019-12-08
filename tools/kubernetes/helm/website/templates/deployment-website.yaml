@@ -21,6 +21,10 @@ spec:
         imagePullPolicy: Always
         ports:
           - containerPort: 80
+        resources:
+          requests:
+            # memory: "100Mi"
+            cpu: "10m"
         readinessProbe:
           httpGet:
             path: /

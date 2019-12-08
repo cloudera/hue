@@ -50,11 +50,11 @@ To configure Hue to use HTTPS we need a self signed SSL certificate that does n
 
 Here is how to generate a private key and a self-signed certificate for the Hue server:
 
-{{< highlight bash >}}openssl genrsa 4096 > server.key
+<pre><code class="bash">openssl genrsa 4096 > server.key
 
 openssl req -new -x509 -nodes -sha1 -key server.key > server.cert
 
-{{< /highlight >}}
+</code></pre>
 
 **
   
@@ -82,7 +82,7 @@ Make sure Hue is setting the [cookie as secure][3].
 
 Here is an example of creation of a certificate for enabling SSL:
 
-{{< highlight bash >}}
+<pre><code class="bash">
   
 [root@cehd1 hue]# pwd
   
@@ -92,21 +92,21 @@ Here is an example of creation of a certificate for enabling SSL:
   
 cacerts  cert  key
   
-{{< /highlight >}}
+</code></pre>
 
 Generate a private key for the server:
 
-{{< highlight bash >}}[root@cehd1 hue]# openssl genrsa -out key/server.key 4096{{< /highlight >}}
+<pre><code class="bash">[root@cehd1 hue]# openssl genrsa -out key/server.key 4096</code></pre>
 
 Generate a "certificate request" for the server:
 
-{{< highlight bash >}}[root@cehd1 hue] openssl req -new -key key/server.key -out request/server.csr{{< /highlight >}}
+<pre><code class="bash">[root@cehd1 hue] openssl req -new -key key/server.key -out request/server.csr</code></pre>
 
 You are about to be asked to enter information that will be incorporated into your certificate request. What you are about to enter is what is called a Distinguished Name or a DN.
   
 There are quite a few fields but you can leave some blank. For some fields there will be a default value, if you enter '.', the field will be left blank.
 
-{{< highlight bash >}}Country Name (2 letter code) [XX]:US
+<pre><code class="bash">Country Name (2 letter code) [XX]:US
    
 State or Province Name (full name) []:Colorado
    
@@ -126,11 +126,11 @@ A challenge password []:  ## note this was left
   
 An optional company name []:
 
-{{< /highlight >}}
+</code></pre>
 
 Self-sign the request, creating a certificate for the server:
 
-{{< highlight bash >}}[root@cehd1 hue] openssl x509 -req -days 365 -in request/server.csr -signkey key/server.key -out cert/server.crt
+<pre><code class="bash">[root@cehd1 hue] openssl x509 -req -days 365 -in request/server.csr -signkey key/server.key -out cert/server.crt
    
 Signature ok
    
@@ -138,9 +138,9 @@ subject=/C=US/ST=Colorado/L=<wbr />Denver/O=Cloudera/OU=COE/CN=test.lab
    
 Getting Private key
 
-{{< /highlight >}}
+</code></pre>
 
-{{< highlight bash >}}[root@cehd1 hue]# ls -lR
+<pre><code class="bash">[root@cehd1 hue]# ls -lR
   
 .
    
@@ -178,7 +178,7 @@ total 4
    
 -rw-r-r- 1 root root 1704 Jul 31 10:00 server.csr
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
@@ -197,7 +197,7 @@ Also, the Hue truststore has to be in PEM file format. At Cloudera we are using
 <div class="preformatted panel">
   <div class="preformattedContent panelContent">
     <p>
-      {{< highlight bash >}}keytool -exportcert -keystore hadoop-server.keystore -alias foo-1.cloudera.com \<br /> -storepass cloudera -file foo-1.cert<br /> openssl x509 -inform der -in foo-1.cert > foo-1.pem<br /> {{< /highlight >}}
+      <pre><code class="bash">keytool -exportcert -keystore hadoop-server.keystore -alias foo-1.cloudera.com \<br /> -storepass cloudera -file foo-1.cert<br /> openssl x509 -inform der -in foo-1.cert > foo-1.pem<br /> </code></pre>
     </p>
     
     <p>
@@ -207,7 +207,7 @@ Also, the Hue truststore has to be in PEM file format. At Cloudera we are using
     <div class="preformatted panel">
       <div class="preformattedContent panelContent">
         <p>
-          {{< highlight bash >}}cat foo-1.pem foo-2.pem ... > huetrust.pem{{< /highlight >}}
+          <pre><code class="bash">cat foo-1.pem foo-2.pem ... > huetrust.pem</code></pre>
         </p>
       </div>
     </div>

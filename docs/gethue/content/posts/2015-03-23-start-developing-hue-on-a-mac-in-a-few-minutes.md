@@ -50,7 +50,7 @@ In the meanwhile, let’s set up your Mac!
 
 To clone the Hue Github repository you need git installed on your system. Git (plus a ton of other tools) is included in the Xcode command line tools. To install it open Terminal and type
 
-{{< highlight bash >}}xcode-select -install{{< /highlight >}}
+<pre><code class="bash">xcode-select -install</code></pre>
 
 In the dialog choose "Install". If on Terminal you have the message "xcode-select: error: command line tools are already installed, use "Software Update" to install updates" it means you are almost good to go already.
 
@@ -58,7 +58,7 @@ From Terminal, navigate to a directory where you keep all your project and run
 
 <!--email_off-->
 
-{{< highlight bash >}}git clone https://github.com/cloudera/hue.git{{< /highlight >}}
+<pre><code class="bash">git clone https://github.com/cloudera/hue.git</code></pre>
 
 <!--/email_off-->
 
@@ -68,11 +68,11 @@ You now have the Hue source code in your Mac.
 
 The build process use Java to run. A quick way to get to the right download URL from Oracle is to run from Terminal
 
-{{< highlight bash >}}java -version{{< /highlight >}}
+<pre><code class="bash">java -version</code></pre>
 
 and then click on the "More info" button on the dialog that appears. On Oracle's website, accept the license and choose the Mac OS X JDK link. After the DMG has been downloaded, open it and double click on the installation package. Now, if we return to the Terminal and type again
 
-{{< highlight bash >}}java -version{{< /highlight >}}
+<pre><code class="bash">java -version</code></pre>
 
 we will have the version of the freshly installed JDK. At the time of writing, 1.8.0_40.
 
@@ -80,39 +80,39 @@ we will have the version of the freshly installed JDK. At the time of writing, 1
 
 Hue uses several libraries that are not included in the XCode command line tools so we will need to install that too. To do that we will use <a href="http://brew.sh" target="_blank" rel="noopener noreferrer">Homebrew</a>, the fantastic open source package manager for Mac OS X. Install it from Terminal with
 
-{{< highlight bash >}}ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"{{< /highlight >}}
+<pre><code class="bash">ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"</code></pre>
 
 You will need to enter your password to continue. Then, as suggested by the installation script, run
 
-{{< highlight bash >}}brew doctor{{< /highlight >}}
+<pre><code class="bash">brew doctor</code></pre>
 
 If you already have Homebrew installed, just update it running
 
-{{< highlight bash >}}brew update{{< /highlight >}}
+<pre><code class="bash">brew update</code></pre>
 
 As a first thing, we need to install Maven 3
 
-{{< highlight bash >}}brew install maven{{< /highlight >}}
+<pre><code class="bash">brew install maven</code></pre>
 
 And then Mysql to have the development libraries for it
 
-{{< highlight bash >}}brew install mysql{{< /highlight >}}
+<pre><code class="bash">brew install mysql</code></pre>
 
 This will install also lib-openssl. Let's go on install GMP
 
-{{< highlight bash >}}brew install gmp{{< /highlight >}}
+<pre><code class="bash">brew install gmp</code></pre>
 
 **Step 3b (just for El Capitan and Sierra): export ENV variables for openssl**
 
 If you have OS X El Capitan or macOS Sierra, you need an extra mini step to be able to make Hue:
 
-{{< highlight bash >}}export LDFLAGS=-L/usr/local/opt/openssl/lib && export CPPFLAGS=-I/usr/local/opt/openssl/include{{< /highlight >}}
+<pre><code class="bash">export LDFLAGS=-L/usr/local/opt/openssl/lib && export CPPFLAGS=-I/usr/local/opt/openssl/include</code></pre>
 
 **Step 4: Compile and configure Hue**
 
 Now that we are all set with the requirements we can compile Hue by running
 
-{{< highlight bash >}}make apps{{< /highlight >}}
+<pre><code class="bash">make apps</code></pre>
 
 from the Hue folder that was created by the git clone in step 1. After a while, if everything goes as planned, you should see as a last build message something like "N static files copied to ...".
 
@@ -130,11 +130,11 @@ The last thing we should do is to start the Quickstart VM and get its IP address
 
 (you can launch the terminal inside the VM and run 'ifconfig' for that; in my case it's 172.16.156.130). Then, on your Mac, edit the hosts file with
 
-{{< highlight bash >}}sudo vi /etc/hosts{{< /highlight >}}
+<pre><code class="bash">sudo vi /etc/hosts</code></pre>
 
 and add the line
 
-{{< highlight bash >}}172.16.156.130 quickstart.cloudera{{< /highlight >}}
+<pre><code class="bash">172.16.156.130 quickstart.cloudera</code></pre>
 
 with the IP you got from the VM. Save and you are good to go!
 
@@ -142,7 +142,7 @@ with the IP you got from the VM. Save and you are good to go!
 
 What you have to do on Terminal from the Hue folder is just
 
-{{< highlight bash >}}./build/env/bin/hue runserver{{< /highlight >}}
+<pre><code class="bash">./build/env/bin/hue runserver</code></pre>
 
 And point your browser to <http://localhost:8000>! Go and write a [new app][6] now! 🙂
 

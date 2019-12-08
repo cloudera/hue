@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import hueAnalytics from 'utils/hueAnalytics';
@@ -104,7 +104,7 @@ class TopNavViewModel {
             interpreters.push({
               displayName: I18n('Add more...'),
               dividerAbove: true,
-              href: 'http://gethue.com/new-sql-editor/'
+              href: 'https://docs.gethue.com/administrator/configuration/connectors/'
             });
           }
 

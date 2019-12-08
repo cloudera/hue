@@ -58,7 +58,7 @@ Here is a quick video demonstrating the above:
 
 From the Hue root (/use/lib/hue by default or /opt/cloudera/parcels/CDH/lib/hue/ with CM):
 
-{{< highlight bash >}}build/env/bin/hue useradmin_sync_with_unix{{< /highlight >}}
+<pre><code class="bash">build/env/bin/hue useradmin_sync_with_unix</code></pre>
 
 &nbsp;
 
@@ -68,7 +68,7 @@ Where <id> is the most recent ID in that process directory for hue-HUE_SERVER.
 
 A quick way to get the correct directory is to use this script:
 
-{{< highlight bash >}}export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/\`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE | tail -1 | awk '{print $9}'\`"{{< /highlight >}}
+<pre><code class="bash">export HUE_CONF_DIR="/var/run/cloudera-scm-agent/process/\`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE | tail -1 | awk '{print $9}'\`"</code></pre>
 
 &nbsp;
 
@@ -86,11 +86,11 @@ useradmin_sync_with_unix comes with a few useful command line arguments:
 
 To verify the hadoop group exists, you can use the ‘getent’ command:
 
-{{< highlight bash >}}getent group | grep hadoop{{< /highlight >}}
+<pre><code class="bash">getent group | grep hadoop</code></pre>
 
 To add the hadoop group, you can use the ‘groupadd’ command:
 
-{{< highlight bash >}}groupadd hadoop{{< /highlight >}}
+<pre><code class="bash">groupadd hadoop</code></pre>
 
 #
 

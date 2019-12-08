@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 const APP_ICON_INDEX = {
   adls: `<svg class="hi hi-fw"><use xlink:href="#hi-adls"></use></svg>`,

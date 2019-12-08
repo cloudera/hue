@@ -50,7 +50,7 @@ Hue will automatically pick up the active Resource Manager even if it failed ove
 
 Here is an example of configuration for the [[yarn_clusters]] section in hue.ini:
 
-{{< highlight bash >}}[hadoop]
+<pre><code class="bash">[hadoop]
 
 \# Configuration for YARN (MR2)
 
@@ -90,7 +90,7 @@ logical_name=ha-rm
 
 submit_to=True
 
-{{< /highlight >}}
+</code></pre>
 
 We hope that the multi Resource Manager support will make your life with Hadoop easier!
 

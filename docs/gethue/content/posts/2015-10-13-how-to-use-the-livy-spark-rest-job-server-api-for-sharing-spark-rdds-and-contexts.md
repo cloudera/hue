@@ -57,7 +57,7 @@ This is described in the [previous post section][2].
 
 <span style="font-weight: 400;">Livy offers remote Spark sessions to users. They usually have one each (or one by Notebook):</span>
 
-{{< highlight bash >}}# Client 1
+<pre><code class="bash"># Client 1
 
 curl localhost:8998/sessions/0/statements -X POST -H 'Content-Type: application/json' -d '{"code":"1 + 1"}'
 
@@ -69,7 +69,7 @@ curl localhost:8998/sessions/1/statements -X POST -H 'Content-Type: application/
 
 curl localhost:8998/sessions/2/statements -X POST -H 'Content-Type: application/json' -d '{"code":"..."}'
 
-{{< /highlight >}}
+</code></pre>
 
 [<img src="https://cdn.gethue.com/uploads/2015/10/livy_shared_contexts2-1024x565.png"  />][3]
 
@@ -79,7 +79,7 @@ curl localhost:8998/sessions/2/statements -X POST -H 'Content-Type: application/
 
 If the users were pointing to the same session, they would interact with the same Spark context. This context would itself manages several RDDs. Users simply need to use the same session id, e.g. 0, and issue commands there:
 
-{{< highlight bash >}}# Client 1
+<pre><code class="bash"># Client 1
 
 curl localhost:8998/sessions/0/statements -X POST -H 'Content-Type: application/json' -d '{"code":"1 <a href="https://cdn.gethue.com/uploads/2015/10/livy_multi_contexts.png"><img src="https://cdn.gethue.com/uploads/2015/10/livy_multi_contexts-1024x566.png"  /></a>+ 1"}'
 
@@ -89,7 +89,7 @@ curl localhost:8998/sessions/0/statements -X POST -H 'Content-Type: application/
 
 \# Client 3
 
-curl localhost:8998/sessions/0/statements -X POST -H 'Content-Type: application/json' -d '{"code":"..."}' {{< /highlight >}}
+curl localhost:8998/sessions/0/statements -X POST -H 'Content-Type: application/json' -d '{"code":"..."}' </code></pre>
 
 [<img src="https://cdn.gethue.com/uploads/2015/10/livy_multi_rdds2-1024x557.png"  />][4]
 
@@ -103,7 +103,7 @@ Now we can even make it more sophisticated while keeping it simple. Imagine we w
 
 To make it prettier, we can wrap it in a few lines of Python and call it `ShareableRdd`. Then users can directly connect to the session and set or retrieve values.
 
-{{< highlight python >}}
+<pre><code class="python">
 
 class ShareableRdd():
 
@@ -121,11 +121,11 @@ new_key = sc.parallelize([[key, value]])
 
 self.data = self.data.union(new_key)
 
-{{< /highlight >}}
+</code></pre>
 
 `set()` adds a value to the shared RDD, while `get()` retrieves it.
 
-{{< highlight python >}}
+<pre><code class="python">
 
 srdd = ShareableRdd()
 
@@ -133,33 +133,33 @@ srdd.set('ak', 'Alaska')
 
 srdd.set('ca', 'California')
 
-{{< /highlight >}}
+</code></pre>
 
-{{< highlight python >}}
+<pre><code class="python">
 
 srdd.get('ak')
 
-{{< /highlight >}}
+</code></pre>
 
 If using the REST Api directly someone can access it with just these commands:
 
-{{< highlight bash >}}curl localhost:8998/sessions/0/statements -X POST -H 'Content-Type: application/json' -d '{"code":"srdd.get(\"ak\")"}'
+<pre><code class="bash">curl localhost:8998/sessions/0/statements -X POST -H 'Content-Type: application/json' -d '{"code":"srdd.get(\"ak\")"}'
 
-{"id":3,"state":"running","output":null}{{< /highlight >}}
+{"id":3,"state":"running","output":null}</code></pre>
 
-{{< highlight bash >}}curl localhost:8998/sessions/0/statements/3
+<pre><code class="bash">curl localhost:8998/sessions/0/statements/3
 
-{"id":3,"state":"available","output":{"status":"ok","execution_count":3,"data":{"text/plain":"[['ak', 'Alaska']]"}}}{{< /highlight >}}
+{"id":3,"state":"available","output":{"status":"ok","execution_count":3,"data":{"text/plain":"[['ak', 'Alaska']]"}}}</code></pre>
 
 We can even get prettier data back, directly in json format by adding the `%json` magic keyword:
 
-{{< highlight bash >}}curl localhost:8998/sessions/0/statements -X POST -H 'Content-Type: application/json' -d '{"code":"data = srdd.get(\"ak\")\n%json data"}'
+<pre><code class="bash">curl localhost:8998/sessions/0/statements -X POST -H 'Content-Type: application/json' -d '{"code":"data = srdd.get(\"ak\")\n%json data"}'
 
-{"id":4,"state":"running","output":null}{{< /highlight >}}
+{"id":4,"state":"running","output":null}</code></pre>
 
-{{< highlight bash >}}curl localhost:8998/sessions/0/statements/4
+<pre><code class="bash">curl localhost:8998/sessions/0/statements/4
 
-{"id":4,"state":"available","output":{"status":"ok","execution_count":2,"data":{"application/json":[["ak","Alaska"]]}}}{{< /highlight >}}
+{"id":4,"state":"available","output":{"status":"ok","execution_count":2,"data":{"application/json":[["ak","Alaska"]]}}}</code></pre>
 
 Note
 
@@ -171,13 +171,13 @@ Support for `%json srdd.get("ak")` is on the way!
 
 <span style="font-weight: 400;">As Livy is providing a simple REST Api, we can quickly implement a little wrapper around it to offer the shared RDD functionality in any languages. Let's do it with regular Python:</span>
 
-{{< highlight python >}}pip install requests
+<pre><code class="python">pip install requests
 
-python{{< /highlight >}}
+python</code></pre>
 
 Then in the Python shell just declare the wrapper:
 
-{{< highlight python >}}
+<pre><code class="python">
 
 import requests
 
@@ -225,21 +225,21 @@ resp = r.json()
 
 return r.json()['data']
 
-{{< /highlight >}}
+</code></pre>
 
 Instantiate it and make it point to a live session that contains a `ShareableRdd`:
 
-{{< highlight python >}}states = SharedRdd('http://localhost:8998/sessions/0', 'states')
+<pre><code class="python">states = SharedRdd('http://localhost:8998/sessions/0', 'states')
 
-{{< /highlight >}}
+</code></pre>
 
 And just interact with the RDD transparently:
 
-{{< highlight python >}}states.get('ak')
+<pre><code class="python">states.get('ak')
 
 states.set('hi', 'Hawaii')
 
-{{< /highlight >}}
+</code></pre>
 
 &nbsp;
 
