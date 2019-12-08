@@ -686,7 +686,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <!-- /ko -->
       </ul>
 
-      <div class="tab-content" style="border: none; overflow-x: hidden">
+      <div class="tab-content" style="border: none; overflow-x: hidden" data-bind="style: {'max-height': !$root.isResultFullScreenMode() ? '400px' : '800px' }">
         <div class="tab-pane" style="min-height:80px;" id="queryHistory" data-bind="css: {'active': currentQueryTab() == 'queryHistory'}, style: { 'height' : $parent.historyInitialHeight() > 0 ? Math.max($parent.historyInitialHeight(), 40) + 'px' : '' }">
           <!-- ko if: $parent.loadingHistory -->
           <div class="margin-top-10 margin-left-10">
