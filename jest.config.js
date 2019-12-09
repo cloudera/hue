@@ -14,6 +14,7 @@ module.exports = {
     '<rootDir>/desktop/core/src/desktop/js/parse/sql/druid/test',
     '<rootDir>/desktop/core/src/desktop/js/parse/sql/presto/test',
     '<rootDir>/desktop/core/src/desktop/js/parse/sql/calcite/test',
+    '<rootDir>/desktop/core/src/desktop/js/parse/sql/flink/test',
   ],
   collectCoverageFrom: ['<rootDir>/desktop/core/src/desktop/js/**/*.{js,jsx}']
 };
