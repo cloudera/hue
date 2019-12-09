@@ -34,6 +34,7 @@ const TEMPLATE = `
   </div>
   <div class="modal-body" style="overflow: visible; height: 240px">
 
+    <!-- ko if: window.HAS_LINK_SHARING -->
     <a href="javascript:void(0)"  title="${ I18n(
       'Share the query selection via a link'
     ) }">
@@ -54,6 +55,7 @@ const TEMPLATE = `
         </div>
       </div>
     </div>
+    <!-- /ko -->
 
     <!-- ko with: definition -->
     <div class="row-fluid" data-bind="visible: !$parent.hasErrors()" style="max-height: 114px;" id="scrolldiv">
