@@ -1238,6 +1238,13 @@ const initSqlParser = function(parser) {
     ]);
   };
 
+  parser.suggestKeywordsForOptionalsLR = function(optionals, keywords, override) {
+    const result = parser.getKeywordsForOptionalsLR(optionals, keywords, override);
+    if (result.length) {
+      parser.suggestKeywords(result);
+    }
+  };
+
   parser.getKeywordsForOptionalsLR = function(optionals, keywords, override) {
     let result = [];
 

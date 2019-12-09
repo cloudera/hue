@@ -105,6 +105,7 @@
 'OUTER'                              { return 'OUTER'; }
 'PARTITION'                          { return 'PARTITION'; }
 'PRECEDING'                          { return 'PRECEDING'; }
+'PRECISION'                          { return 'PRECISION'; }
 'PRIMARY'                            { return 'PRIMARY'; }
 'PURGE'                              { return 'PURGE'; }
 'RANGE'                              { return 'RANGE'; }
@@ -168,11 +169,15 @@
 'COMPACTIONS'                        { return 'COMPACTIONS'; }
 'COMPUTE'                            { return 'COMPUTE'; }
 'CONCATENATE'                        { return 'CONCATENATE'; }
+'CURRENT_DATE'                       { return 'CURRENT_DATE'; }
+'CURRENT_TIMESTAMP'                  { return 'CURRENT_TIMESTAMP'; }
+'CURRENT_USER'                       { return 'CURRENT_USER'; }
 'DATA'                               { return 'DATA'; }
 'DATABASES'                          { return 'DATABASES'; }
 'DAY'                                { return 'DAY'; }
 'DAYOFWEEK'                          { return 'DAYOFWEEK'; }
 'DBPROPERTIES'                       { return 'DBPROPERTIES'; }
+'DEFAULT'                            { return 'DEFAULT'; }
 'DEFERRED'                           { return 'DEFERRED'; }
 'DEFINED'                            { return 'DEFINED'; }
 'DELIMITED'                          { return 'DELIMITED'; }
@@ -206,6 +211,7 @@ DOUBLE\s+PRECISION                   { return 'DOUBLE_PRECISION'; }
 'JSONFILE'                           { return 'JSONFILE'; }
 'KEY'                                { return 'KEY'; }
 'KEYS'                               { return 'KEYS'; }
+'LITERAL'                            { return 'LITERAL'; }
 'LINES'                              { return 'LINES'; }
 'LOAD'                               { parser.determineCase(yytext); return 'LOAD'; }
 'LOCATION'                           { this.begin('hdfs'); return 'LOCATION'; }
