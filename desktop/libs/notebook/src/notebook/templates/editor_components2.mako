@@ -1589,6 +1589,12 @@
           snippetIcon: 'fa-database',
           sqlDialect: true
         },
+        flink: {
+          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+          aceMode: 'ace/mode/flink',
+          snippetIcon: 'fa-database',
+          sqlDialect: true
+        },
         jar : {
           snippetIcon: 'fa-file-archive-o '
         },
