@@ -564,6 +564,10 @@ Run all the tests once with:
 
     npm run test
 
+Run tests from a specific file once:
+
+    npm run test -- foo.test.js
+
 To run the tests in watch mode:
 
     npm run test-dev
