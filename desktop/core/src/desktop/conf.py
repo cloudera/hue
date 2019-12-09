@@ -1870,6 +1870,13 @@ ENABLE_GIST = Config(
   help=_('Turn on the Gist snippet sharing.')
 )
 
+ENABLE_LINK_SHARING = Config(
+  key='enable_link_sharing',
+  default=False,
+  type=coerce_bool,
+  help=_('Turn on the direct link sharing of saved document.')
+)
+
 ENABLE_CONNECTORS = Config(
   key='enable_connectors',
   default=False,
