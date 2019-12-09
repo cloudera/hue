@@ -49,7 +49,6 @@ from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 from dashboard.conf import HAS_SQL_ENABLED
 from desktop.settings import DATABASES
 from beeswax.conf import HIVE_SERVER_HOST
-from pig.models import PigScript
 from useradmin.models import GroupPermission, User
 
 import desktop
@@ -60,6 +59,7 @@ import desktop.views as views
 
 from desktop.auth.backend import rewrite_user
 from desktop.appmanager import DESKTOP_APPS
+from desktop.conf import ENABLE_GIST
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.conf import validate_path
 from desktop.lib.django_util import TruncatingModel
@@ -93,6 +93,7 @@ def test_home():
   assert_equal(["notmine", "trash", "mine", "history"], list(json.loads(response.context[0]['json_tags']).keys()))
   assert_equal(200, response.status_code)
 
+  from pig.models import PigScript
   script, created = PigScript.objects.get_or_create(owner=user)
   doc = Document.objects.link(script, owner=script.owner, name='test_home')
 
@@ -1210,7 +1211,7 @@ class TestDocument(object):
         parent_directory=home_dir
     )
 
-    assert_equal(home_dir.children.count(), 4)
+    assert_equal(home_dir.children.count(), 4 if ENABLE_GIST.get() else 3)
 
     # Cannot create second trash directory directly as it will fail in Document2.validate()
     Document2.objects.create(owner=self.user, parent_directory=home_dir, name='second_trash_dir', type='directory')
@@ -1225,11 +1226,11 @@ class TestDocument(object):
         description='',
         parent_directory=home_dir
     )
-    assert_equal(home_dir.children.count(), 6) # Including the second trash
+    assert_equal(home_dir.children.count(), 6 if ENABLE_GIST.get() else 5) # Including the second trash
     assert_raises(Document2.MultipleObjectsReturned, Directory.objects.get, name=Document2.TRASH_DIR)
 
     test_doc1.trash()
-    assert_equal(home_dir.children.count(), 4) # As trash documents are merged count is back to 3
+    assert_equal(home_dir.children.count(), 4 if ENABLE_GIST.get() else 3) # As trash documents are merged count is back to 3
     merged_trash_dir = Directory.objects.get(name=Document2.TRASH_DIR, owner=self.user)
 
     test_doc2.trash()

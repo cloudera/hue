@@ -1793,11 +1793,13 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <i class="fa fa-fw fa-map-o"></i> ${_('Explain')}
           </a>
         </li>
+        % if conf.ENABLE_GIST.get():
         <li>
           <a href="javascript:void(0)" data-bind="click: createGist, css: {'disabled': ! isReady() }" title="${ _('Share the query selection via a link') }">
             <i class="fa fa-fw fa-link"></i> ${_('Share link')}
           </a>
         </li>
+        % endif
         <!-- ko if: formatEnabled -->
         <li>
           <a href="javascript:void(0)" data-bind="click: format, css: {'disabled': ! isReady() }" title="${ _('Format the current SQL query') }">

@@ -48,7 +48,7 @@ from useradmin.models import User, Group, get_organization
 from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_K8S_ONLY, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS,\
-    has_connectors, TASK_SERVER
+    has_connectors, TASK_SERVER, ENABLE_GIST
 from desktop.lib import fsmanager
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.i18n import force_unicode
@@ -1071,10 +1071,11 @@ class Document2Manager(models.Manager, Document2QueryMixin):
     if created:
       LOG.info('Successfully created trash directory for user: %s' % user.username)
 
-    gist_dir, created = Directory.objects.get_or_create(name=Document2.GIST_DIR, owner=user, parent_directory=home_dir)
+    if ENABLE_GIST.get():
+      gist_dir, created = Directory.objects.get_or_create(name=Document2.GIST_DIR, owner=user, parent_directory=home_dir)
 
-    if created:
-      LOG.info('Successfully created gist directory for user: %s' % user.username)
+      if created:
+        LOG.info('Successfully created gist directory for user: %s' % user.username)
 
     # For any directories or documents that do not have a parent directory, assign it to home directory
     count = 0

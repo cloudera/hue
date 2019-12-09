@@ -40,6 +40,7 @@ const TEMPLATE = `
           <i class="fa fa-fw fa-map-o"></i> ${I18n('Explain')}
         </a>
       </li>
+      <!-- ko if: window.HAS_GIST -->
       <li>
         <a href="javascript:void(0)" data-bind="click: createGist, css: { 'disabled': !createGistEnabled() }" title="${I18n(
           'Share the query selection via a link'
@@ -47,6 +48,7 @@ const TEMPLATE = `
           <i class="fa fa-wf fa-link"></i> ${I18n('Share link')}
         </a>
       </li>
+      <!-- /ko -->
       <li>
         <a href="javascript:void(0)" data-bind="click: format, css: { 'disabled': !formatEnabled() }" title="${I18n(
           'Format the current SQL query'

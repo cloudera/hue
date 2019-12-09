@@ -1863,6 +1863,13 @@ CLUSTERS = UnspecifiedConfigSection(
   )
 )
 
+ENABLE_GIST = Config(
+  key='enable_gist',
+  default=False,
+  type=coerce_bool,
+  help=_('Turn on the Gist snippet sharing.')
+)
+
 ENABLE_CONNECTORS = Config(
   key='enable_connectors',
   default=False,
