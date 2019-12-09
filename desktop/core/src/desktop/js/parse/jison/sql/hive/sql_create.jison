@@ -56,8 +56,7 @@ CreateStatement_EDIT
  ;
 
 DatabaseDefinition
- : 'CREATE' DatabaseOrSchema OptionalIfNotExists
- | 'CREATE' DatabaseOrSchema OptionalIfNotExists RegularIdentifier DatabaseDefinitionOptionals
+ : 'CREATE' DatabaseOrSchema OptionalIfNotExists RegularIdentifier DatabaseDefinitionOptionals
    {
      parser.addNewDatabaseLocation(@4, [{ name: $4 }]);
    }
@@ -327,15 +326,23 @@ ColumnSpecificationList_EDIT
  ;
 
 ColumnSpecification
- : ColumnIdentifier ColumnDataType OptionalColumnOptions
+ : ColumnIdentifier ColumnDataType OptionalColumnOptions OptionalComment
    {
      $$ = $1;
      $$.type = $2;
      var keywords = [];
-     if (!$3['comment']) {
-       keywords.push('COMMENT');
-       if ($2.toLowerCase() === 'double') {
-         keywords.push({ value: 'PRECISION', weight: 2 });
+     if (!$4) {
+       keywords = keywords.concat([
+         { value: 'COMMENT', weight: 1 },
+         { value: 'PRIMARY KEY', weight: 2 },
+         { value: 'UNIQUE', weight: 2 },
+         { value: 'NOT NULL', weight: 2 },
+         { value: 'DEFAULT', weight: 2 }
+       ]);
+       if (!$3 && $2.toLowerCase() === 'double') {
+         keywords.push({ value: 'PRECISION', weight: 3 });
+       } else if ($3 && $3.suggestKeywords) {
+         keywords = keywords.concat($3.suggestKeywords)
        }
      }
      if (keywords.length > 0) {
@@ -345,32 +352,87 @@ ColumnSpecification
  ;
 
 ColumnSpecification_EDIT
- : ColumnIdentifier 'CURSOR' OptionalColumnOptions
+ : ColumnIdentifier 'CURSOR' OptionalColumnOptions OptionalComment
    {
      parser.suggestKeywords(parser.getColumnDataTypeKeywords());
    }
- | ColumnIdentifier ColumnDataType_EDIT OptionalColumnOptions
+ | ColumnIdentifier ColumnDataType_EDIT OptionalColumnOptions OptionalComment
  ;
 
 OptionalColumnOptions
- :                      -> {}
+ :
  | ColumnOptions
  ;
 
 ColumnOptions
  : ColumnOption
-   {
-     $$ = {};
-     $$[$1] = true;
-   }
  | ColumnOptions ColumnOption
-   {
-     $1[$2] = true;
-   }
  ;
 
 ColumnOption
- : Comment                                                   -> 'comment'
+ : 'PRIMARY' 'KEY' ColumnOptionOptionals        -> $3
+ | 'PRIMARY'                                    -> { suggestKeywords: [{ value: 'KEY', weight: 3 }] }
+ | 'UNIQUE' ColumnOptionOptionals               -> $2
+ | 'NOT' 'NULL' ColumnOptionOptionals           -> $3
+ | 'NOT'                                        -> { suggestKeywords: [{ value: 'NULL', weight: 3 }] }
+ | 'DEFAULT' DefaultValue ColumnOptionOptionals -> $3
+ | 'DEFAULT'
+   {
+     $$ = {
+       suggestKeywords: [
+         { value: 'LITERAL', weight: 3 },
+         { value: 'CURRENT_USER()', weight: 3 },
+         { value: 'CURRENT_DATE()', weight: 3 },
+         { value: 'CURRENT_TIMESTAMP()', weight: 3 },
+         { value: 'NULL', weight: 3 }
+       ]
+     }
+   }
+ ;
+
+ColumnOptionOptionals
+ : OptionalEnableOrDisable OptionalNovalidate OptionalRelyOrNorely
+   {
+     var keywords = [];
+     if (!$3) {
+       keywords.push({ value: 'RELY', weight: 3 });
+       keywords.push({ value: 'NORELY', weight: 3 });
+       if (!$2) {
+         keywords.push({ value: 'NOVALIDATE', weight: 3 });
+         if (!$1) {
+           keywords.push({ value: 'RELY', weight: 3 });
+           keywords.push({ value: 'NORELY', weight: 3 });
+         }
+       }
+     }
+     if (keywords.length) {
+       $$ = { suggestKeywords: keywords };
+     }
+   }
+ ;
+
+DefaultValue
+ : 'LITERAL'
+ | 'CURRENT_USER' '(' ')'
+ | 'CURRENT_DATE' '(' ')'
+ | 'CURRENT_TIMESTAMP' '(' ')'
+ | 'NULL'
+ ;
+
+OptionalEnableOrDisable
+ :
+ | 'ENABLE'
+ | 'DISABLE'
+ ;
+
+OptionalDisable
+ :
+ | 'DISABLE'
+ ;
+
+OptionalNovalidate
+ :
+ | 'NOVALIDATE'
  ;
 
 ColumnDataType
@@ -545,7 +607,7 @@ ConstraintSpecification_EDIT
  | PrimaryKeySpecification_EDIT ',' 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification
  | 'CONSTRAINT' RegularOrBacktickedIdentifier 'CURSOR'
    {
-     parser.suggestKeywords(['FOREIGN KEY']);
+     parser.suggestKeywords(['CHECK', 'FOREIGN KEY', 'UNIQUE']);
    }
  | 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification_EDIT
  | 'CURSOR' 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification
@@ -555,25 +617,23 @@ ConstraintSpecification_EDIT
  ;
 
 PrimaryKeySpecification
- : PrimaryKey ParenthesizedColumnList 'DISABLE' 'NOVALIDATE'
+ : PrimaryKey ParenthesizedColumnList OptionalDisable OptionalNovalidate OptionalRelyOrNorely
  ;
 
 PrimaryKeySpecification_EDIT
  : PrimaryKey_EDIT
  | PrimaryKey ParenthesizedColumnList_EDIT
- | PrimaryKey ParenthesizedColumnList 'CURSOR'
+ | PrimaryKey ParenthesizedColumnList OptionalDisable OptionalNovalidate OptionalRelyOrNorely 'CURSOR'
    {
-     parser.suggestKeywords(['DISABLE NOVALIDATE']);
+     parser.suggestKeywordsForOptionalsLR([$5, $4, $3], [
+        [{ value: 'RELY', weight: 1 }, { value: 'NORELY', weight: 1 }],
+        { value: 'NOVALIDATE', weight: 2 },
+        { value: 'DISABLE', weight: 1 }]);
    }
- | PrimaryKey ParenthesizedColumnList 'DISABLE' 'CURSOR'
-   {
-     parser.suggestKeywords(['NOVALIDATE']);
-   }
- | PrimaryKey ParenthesizedColumnList_EDIT 'DISABLE' 'NOVALIDATE'
  ;
 
 ForeignKeySpecification
- : 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList 'DISABLE' 'NOVALIDATE' OptionalRelyNoRely
+ : 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList OptionalDisable OptionalNovalidate OptionalRelyOrNorely
    {
      parser.addTablePrimary($5);
    }
@@ -599,26 +659,17 @@ ForeignKeySpecification_EDIT
    {
      parser.addTablePrimary($5);
    }
- | 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList 'CURSOR'
+ | 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList OptionalDisable OptionalNovalidate OptionalRelyOrNorely 'CURSOR'
    {
      parser.addTablePrimary($5);
-     parser.suggestKeywords(['DISABLE NOVALIDATE']);
-   }
- | 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList 'DISABLE' 'CURSOR'
-   {
-     parser.addTablePrimary($5);
-     parser.suggestKeywords(['NOVALIDATE']);
-   }
- | 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList 'DISABLE' 'NOVALIDATE' OptionalRelyNoRely 'CURSOR'
-   {
-     parser.addTablePrimary($5);
-     if (!$9) {
-       parser.suggestKeywords(['NORELY', 'RELY']);
-     }
+     parser.suggestKeywordsForOptionalsLR([$9, $8, $7], [
+        [{ value: 'RELY', weight: 1 }, { value: 'NORELY', weight: 1 }],
+        { value: 'NOVALIDATE', weight: 2 },
+        { value: 'DISABLE', weight: 1 }]);
    }
  ;
 
-OptionalRelyNoRely
+OptionalRelyOrNorely
  :
  | 'RELY'
  | 'NORELY'

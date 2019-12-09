@@ -671,22 +671,37 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
       });
     });
 
-    it('should handle for "CREATE TABLE foo (id INT);|"', () => {
+    it('should handle "CREATE TABLE foo (id DOUBLE DEFAULT CURRENT_DATE() NOT NULL COMMENT \'foo\'); |"', () => {
       assertAutoComplete({
-        beforeCursor: 'CREATE TABLE foo (id INT);',
+        beforeCursor:
+          "CREATE TABLE foo (id DOUBLE DEFAULT CURRENT_DATE() NOT NULL COMMENT 'foo'); ",
         afterCursor: '',
         containsKeywords: ['SELECT'],
+        noErrors: true,
         expectedResult: {
           lowerCase: false
         }
       });
     });
 
-    it('should handle for "CREATE TABLE foo (id INTEGER);|"', () => {
+    it('should handle "CREATE TABLE foo (id INT);|"', () => {
+      assertAutoComplete({
+        beforeCursor: 'CREATE TABLE foo (id INT);',
+        afterCursor: '',
+        containsKeywords: ['SELECT'],
+        noErrors: true,
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should handle "CREATE TABLE foo (id INTEGER);|"', () => {
       assertAutoComplete({
         beforeCursor: 'CREATE TABLE foo (id INTEGER);',
         afterCursor: '',
         containsKeywords: ['SELECT'],
+        noErrors: true,
         expectedResult: {
           lowerCase: false
         }
@@ -829,7 +844,7 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['COMMENT']
+          suggestKeywords: ['DEFAULT', 'NOT NULL', 'PRIMARY KEY', 'UNIQUE', 'COMMENT']
         }
       });
     });
@@ -862,7 +877,7 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['DISABLE NOVALIDATE']
+          suggestKeywords: ['NOVALIDATE', 'DISABLE', 'NORELY', 'RELY']
         }
       });
     });
@@ -873,7 +888,7 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['NOVALIDATE']
+          suggestKeywords: ['NOVALIDATE', 'NORELY', 'RELY']
         }
       });
     });
@@ -945,7 +960,7 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['DISABLE NOVALIDATE']
+          suggestKeywords: ['NOVALIDATE', 'DISABLE', 'NORELY', 'RELY']
         }
       });
     });
@@ -957,7 +972,7 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['NOVALIDATE']
+          suggestKeywords: ['NOVALIDATE', 'NORELY', 'RELY']
         }
       });
     });
@@ -969,7 +984,7 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['NOVALIDATE']
+          suggestKeywords: ['NOVALIDATE', 'NORELY', 'RELY']
         }
       });
     });
@@ -1372,7 +1387,29 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['PRECISION', 'COMMENT']
+          suggestKeywords: ['PRECISION', 'DEFAULT', 'NOT NULL', 'PRIMARY KEY', 'UNIQUE', 'COMMENT']
+        }
+      });
+    });
+
+    it('should suggest keywords for "CREATE TABLE foo (id DOUBLE DEFAULT |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'CREATE TABLE foo (id DOUBLE DEFAULT ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: [
+            'CURRENT_DATE()',
+            'CURRENT_TIMESTAMP()',
+            'CURRENT_USER()',
+            'LITERAL',
+            'NULL',
+            'DEFAULT',
+            'NOT NULL',
+            'PRIMARY KEY',
+            'UNIQUE',
+            'COMMENT'
+          ]
         }
       });
     });
@@ -1506,7 +1543,7 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['COMMENT']
+          suggestKeywords: ['DEFAULT', 'NOT NULL', 'PRIMARY KEY', 'UNIQUE', 'COMMENT']
         }
       });
     });
