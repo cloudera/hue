@@ -586,6 +586,7 @@ class HueFileEntry {
             self.isRoot() &&
             self.entries().length === 1 &&
             self.entries()[0].definition().type === 'directory' &&
+            self.entries()[0].definition().name === 'Gist' &&
             self.entries()[0].isSharedWithMe()
           ) {
             self.activeEntry(self.entries()[0]);
