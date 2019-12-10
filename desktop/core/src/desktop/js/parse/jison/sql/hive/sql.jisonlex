@@ -160,6 +160,7 @@
 'BUCKETS'                            { return 'BUCKETS'; }
 'CASCADE'                            { return 'CASCADE'; }
 'CHANGE'                             { return 'CHANGE'; }
+'CHECK'                              { return 'CHECK'; }
 'CLUSTER'                            { return 'CLUSTER'; }
 'CLUSTERED'                          { return 'CLUSTERED'; }
 'COLLECTION'                         { return 'COLLECTION'; }
@@ -283,6 +284,7 @@ STORED\s+AS\s+DIRECTORIES            { return 'STORED_AS_DIRECTORIES'; }
 'TRANSACTIONS'                       { return 'TRANSACTIONS'; }
 'UNARCHIVE'                          { return 'UNARCHIVE'; }
 'UNIONTYPE'                          { return 'UNIONTYPE'; }
+'UNIQUE'                             { return 'UNIQUE'; }
 'USE'                                { parser.determineCase(yytext); return 'USE'; }
 'VIEW'                               { return 'VIEW'; }
 'WAIT'                               { return 'WAIT'; }

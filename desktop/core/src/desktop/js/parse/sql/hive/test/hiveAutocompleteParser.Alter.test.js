@@ -372,7 +372,7 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['DEFAULT', 'NOT NULL', 'PRIMARY KEY', 'UNIQUE', 'COMMENT']
+          suggestKeywords: ['CHECK', 'DEFAULT', 'NOT NULL', 'PRIMARY KEY', 'UNIQUE', 'COMMENT']
         }
       });
     });
@@ -406,18 +406,6 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
         expectedResult: {
           lowerCase: false,
           suggestKeywords: ['REFERENCES']
-        }
-      });
-    });
-
-    it('should suggest keywords for "ALTER TABLE bar ADD CONSTRAINT boo FOREIGN KEY (bla) REFERENCES tbl(col) DISABLE NOVALIDATE |"', () => {
-      assertAutoComplete({
-        beforeCursor:
-          'ALTER TABLE bar ADD CONSTRAINT boo FOREIGN KEY (bla) REFERENCES tbl(col) DISABLE NOVALIDATE ',
-        afterCursor: '',
-        expectedResult: {
-          lowerCase: false,
-          suggestKeywords: ['NORELY', 'RELY']
         }
       });
     });
@@ -600,6 +588,7 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
         expectedResult: {
           lowerCase: false,
           suggestKeywords: [
+            'CHECK',
             'DEFAULT',
             'NOT NULL',
             'PRIMARY KEY',
@@ -1033,7 +1022,7 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['DEFAULT', 'NOT NULL', 'PRIMARY KEY', 'UNIQUE', 'COMMENT']
+          suggestKeywords: ['CHECK', 'DEFAULT', 'NOT NULL', 'PRIMARY KEY', 'UNIQUE', 'COMMENT']
         }
       });
     });
@@ -1090,6 +1079,7 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
         expectedResult: {
           lowerCase: false,
           suggestKeywords: [
+            'CHECK',
             'DEFAULT',
             'NOT NULL',
             'PRIMARY KEY',
@@ -1243,7 +1233,7 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['DEFAULT', 'NOT NULL', 'PRIMARY KEY', 'UNIQUE', 'COMMENT']
+          suggestKeywords: ['CHECK', 'DEFAULT', 'NOT NULL', 'PRIMARY KEY', 'UNIQUE', 'COMMENT']
         }
       });
     });
@@ -1342,7 +1332,7 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['DEFAULT', 'NOT NULL', 'PRIMARY KEY', 'UNIQUE', 'COMMENT']
+          suggestKeywords: ['CHECK', 'DEFAULT', 'NOT NULL', 'PRIMARY KEY', 'UNIQUE', 'COMMENT']
         }
       });
     });
