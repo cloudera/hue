@@ -1684,6 +1684,18 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
       });
     });
 
+    it('should handle "MSCK REPAIR TABLE boo.baa SYNC PARTITIONS;|"', () => {
+      assertAutoComplete({
+        beforeCursor: 'MSCK REPAIR TABLE boo.baa SYNC PARTITIONS;',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
     it('should suggest keywords for "|"', () => {
       assertAutoComplete({
         beforeCursor: '',
@@ -1725,6 +1737,28 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
           lowerCase: false,
           suggestTables: { onlyTables: true },
           suggestDatabases: { appendDot: true }
+        }
+      });
+    });
+
+    it('should suggest keywords for "MSCK REPAIR TABLE boo |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'MSCK REPAIR TABLE boo ',
+        afterCursor: '',
+        containsKeywords: ['DROP PARTITIONS'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "MSCK REPAIR TABLE boo ADD |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'MSCK REPAIR TABLE boo ADD ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['PARTITIONS']
         }
       });
     });
