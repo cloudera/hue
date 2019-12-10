@@ -69,6 +69,7 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
           'EXTERNAL TABLE',
           'FUNCTION',
           'INDEX',
+          'MATERIALIZED VIEW',
           'ROLE',
           'SCHEMA',
           'TABLE',
@@ -1759,8 +1760,157 @@ describe('hiveAutocompleteParser.js CREATE statements', () => {
     });
   });
 
+  describe('CREATE MATERIALIZED VIEW', () => {
+    it(
+      'should handle "CREATE MATERIALIZED VIEW IF NOT EXISTS foo.bar DISABLE REWRITE \n' +
+        "COMMENT 'comment' PARTITIONED ON (a, b) CLUSTERED ON (c) ROW FORMAT DELIMITED \n" +
+        'STORED AS PARQUET LOCATION \'/baa/boo\' TBLPROPERTIES ("bla"=1) AS SELECT * from foo; |',
+      () => {
+        assertAutoComplete({
+          beforeCursor:
+            'CREATE MATERIALIZED VIEW IF NOT EXISTS foo.bar DISABLE REWRITE \n' +
+            "COMMENT 'comment' PARTITIONED ON (a, b) CLUSTERED ON (c) ROW FORMAT DELIMITED \n" +
+            'STORED AS PARQUET LOCATION \'/baa/boo\' TBLPROPERTIES ("bla"=1) AS SELECT * from foo; ',
+          afterCursor: '',
+          hasLocations: true,
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      }
+    );
+
+    it(
+      'should handle "CREATE MATERIALIZED VIEW foo.bar DISABLE REWRITE \n' +
+        "COMMENT 'comment' DISTRIBUTED ON (a, b) SORTED ON (c) AS SELECT * from foo; |",
+      () => {
+        assertAutoComplete({
+          beforeCursor:
+            'CREATE MATERIALIZED VIEW IF NOT EXISTS foo.bar DISABLE REWRITE \n' +
+            "COMMENT 'comment' DISTRIBUTED ON (a, b) SORTED ON (c) AS SELECT * from foo; ",
+          afterCursor: '',
+          hasLocations: true,
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      }
+    );
+
+    it('should suggest keywords for "CREATE MATERIALIZED |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'CREATE MATERIALIZED ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['VIEW']
+        }
+      });
+    });
+
+    it('should suggest keywords for "CREATE MATERIALIZED VIEW foo |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'CREATE MATERIALIZED VIEW foo ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: [
+            'DISABLE REWRITE',
+            'COMMENT',
+            'PARTITIONED ON',
+            'CLUSTERED ON',
+            'DISTRIBUTED ON',
+            'ROW FORMAT',
+            'STORED AS',
+            'STORED BY',
+            'LOCATION',
+            'TBLPROPERTIES',
+            'AS SELECT'
+          ]
+        }
+      });
+    });
+
+    it('should suggest keywords for "CREATE MATERIALIZED VIEW bar DISABLE |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'CREATE MATERIALIZED VIEW bar DISABLE ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['REWRITE']
+        }
+      });
+    });
+
+    it('should suggest keywords for "CREATE MATERIALIZED VIEW foo DISABLE REWRITE |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'CREATE MATERIALIZED VIEW foo DISABLE REWRITE ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: [
+            'COMMENT',
+            'PARTITIONED ON',
+            'CLUSTERED ON',
+            'DISTRIBUTED ON',
+            'ROW FORMAT',
+            'STORED AS',
+            'STORED BY',
+            'LOCATION',
+            'TBLPROPERTIES',
+            'AS SELECT'
+          ]
+        }
+      });
+    });
+
+    it('should suggest keywords for "CREATE MATERIALIZED VIEW foo DISABLE REWRITE CLUSTERED ON (a) |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'CREATE MATERIALIZED VIEW foo DISABLE REWRITE CLUSTERED ON (a) ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: [
+            'ROW FORMAT',
+            'STORED AS',
+            'STORED BY',
+            'LOCATION',
+            'TBLPROPERTIES',
+            'AS SELECT'
+          ]
+        }
+      });
+    });
+
+    it('should suggest keywords for "CREATE MATERIALIZED VIEW foo.bar DISABLE REWRITE DISTRIBUTED ON (a) |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'CREATE MATERIALIZED VIEW foo.bar DISABLE REWRITE DISTRIBUTED ON (a) ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['SORTED ON']
+        }
+      });
+    });
+
+    it('should suggest keywords for "CREATE MATERIALIZED VIEW foo DISABLE REWRITE CLUSTERED ON (a) |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'CREATE MATERIALIZED VIEW foo DISABLE REWRITE CLUSTERED ON (a) AS ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['SELECT']
+        }
+      });
+    });
+  });
+
   describe('CREATE VIEW', () => {
-    it('should handle "CREATE VIEW foo AS SELECT a, | FROM tableOne"', () => {
+    it('should suggest columns "CREATE VIEW foo AS SELECT a, | FROM tableOne"', () => {
       assertAutoComplete({
         beforeCursor: 'CREATE VIEW foo AS SELECT a, ',
         afterCursor: ' FROM tableOne',
