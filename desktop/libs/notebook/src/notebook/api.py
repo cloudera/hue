@@ -131,7 +131,7 @@ def _execute_notebook(request, notebook, snippet):
 
   try:
     try:
-      session = notebook.get('sessions') and notebook['sessions'][0] # Session reference for snippet execution without persisting it
+      sessions = notebook.get('sessions') and notebook['sessions'] # Session reference for snippet execution without persisting it
 
       active_executable = json.loads(request.POST.get('executable', '{}')) # Editor v2
 
@@ -143,10 +143,14 @@ def _execute_notebook(request, notebook, snippet):
 
       interpreter = get_api(request, snippet)
       if snippet.get('interface') == 'sqlalchemy':
-        interpreter.options['session'] = session
+        interpreter.options['session'] = sessions[0]
 
       with opentracing.tracer.start_span('interpreter') as span:
+        # interpreter.execute needs the sessions, but we don't want to persist them
+        pre_execute_sessions = notebook['sessions']
+        notebook['sessions'] = sessions
         response['handle'] = interpreter.execute(notebook, snippet)
+        notebook['sessions'] = pre_execute_sessions
 
       # Retrieve and remove the result from the handle
       if response['handle'].get('sync'):
@@ -627,27 +631,17 @@ def close_notebook(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
 
-  for session in [_s for _s in notebook['sessions'] if _s['type'] in ('scala', 'spark', 'pyspark', 'sparkr', 'r')]:
+  for session in [_s for _s in notebook['sessions']]:
     try:
-      response['result'].append(get_api(request, session).close_session(session))
+      api = get_api(request, session)
+      if hasattr(api, 'close_session_idle'):
+        response['result'].append(api.close_session_idle(notebook, session))
+      else:
+        response['result'].append(api.close_session(session))
     except QueryExpired:
       pass
     except Exception as e:
       LOG.exception('Error closing session %s' % str(e))
-
-  for snippet in [_s for _s in notebook['snippets'] if _s['type'] in ('hive', 'impala')]:
-    try:
-      if snippet['status'] != 'running':
-        response['result'].append(get_api(request, snippet).close_statement(notebook, snippet))
-      else:
-        LOG.info('Not closing SQL snippet as still running.')
-    except QueryExpired:
-      pass
-    except Exception as e:
-      LOG.exception('Error closing statement %s' % str(e))
-
-  response['status'] = 0
-  response['message'] = _('Notebook closed successfully')
 
   return JsonResponse(response)
 

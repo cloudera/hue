@@ -32,7 +32,6 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib import thrift_util
 from desktop.conf import DEFAULT_USER
-from desktop.models import Document2
 from beeswax import conf
 
 from TCLIService import TCLIService
@@ -47,7 +46,7 @@ from beeswax import hive_site
 from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.conf import CONFIG_WHITELIST, LIST_PARTITIONS_LIMIT
 from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory, QueryHistory
-from beeswax.server.dbms import Table, DataTable, QueryServerException
+from beeswax.server.dbms import Table, DataTable, QueryServerException, InvalidSessionQueryServerException
 
 
 LOG = logging.getLogger(__name__)
@@ -343,7 +342,7 @@ class HiveServerTColumnValue2(object):
 
 
 class HiveServerDataTable(DataTable):
-  def __init__(self, results, schema, operation_handle, query_server):
+  def __init__(self, results, schema, operation_handle, query_server, session=None):
     self.schema = schema and schema.schema
     self.row_set = HiveServerTRowSet(results.results, schema)
     self.operation_handle = operation_handle
@@ -352,6 +351,7 @@ class HiveServerDataTable(DataTable):
     else:
       self.has_more = not self.row_set.is_empty()    # Should be results.hasMoreRows but always True in HS2
     self.startRowOffset = self.row_set.startRowOffset    # Always 0 in HS2
+    self.session = session
 
   @property
   def ready(self):
@@ -518,6 +518,9 @@ class HiveServerClient(object):
     self.query_server = query_server
     self.user = user
     self.coordinator_host = ''
+    self.has_close_sessions = query_server.get('close_sessions', False)
+    self.has_session_pool = query_server.get('has_session_pool', False)
+    self.max_number_of_sessions = query_server.get('max_number_of_sessions', 1)
 
     use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, auth_username, auth_password = self.get_security()
     LOG.info(
@@ -671,7 +674,7 @@ class HiveServerClient(object):
     # TEZ returns properties, but we need the configuration to detect engine
     properties = session.get_properties()
     if not properties or self.query_server['server_name'] == 'beeswax':
-      configuration = self.get_configuration()
+      configuration = self.get_configuration(session=session)
       properties.update(configuration)
       session.properties = json.dumps(properties)
       session.save()
@@ -679,49 +682,59 @@ class HiveServerClient(object):
     return session
 
 
-  def call(self, fn, req, status=TStatusCode.SUCCESS_STATUS, with_multiple_session=False): # Note: with_multiple_session currently ignored
-    (res, session) = self.call_return_result_and_session(fn, req, status, with_multiple_session)
-    return res
+  def call(self, fn, req, status=TStatusCode.SUCCESS_STATUS, session=None):
+    return self.call_return_result_and_session(fn, req, status, session=session)
 
 
-  def call_return_result_and_session(self, fn, req, status=TStatusCode.SUCCESS_STATUS, with_multiple_session=False):
-    n_sessions = conf.MAX_NUMBER_OF_SESSIONS.get()
+  def call_return_result_and_session(self, fn, req, status=TStatusCode.SUCCESS_STATUS, session=None):
+    if not hasattr(req, 'sessionHandle'):
+      return self._call_return_result_and_session(fn, req, status=TStatusCode.SUCCESS_STATUS, session=session)
 
-    # When a single session is allowed, avoid multiple session logic
-    with_multiple_session = n_sessions > 1
+    if session:
+      if session.status_code not in (
+        TStatusCode.SUCCESS_STATUS, TStatusCode.SUCCESS_WITH_INFO_STATUS, TStatusCode.STILL_EXECUTING_STATUS):
+        LOG.info('Retrying with a new session for %s because status is %s' % (self.user, str(session.status_code)))
+        session = None
+      else:
+        try:
+          return self._call_return_result_and_session(fn, req, status=status, session=session)
+        except InvalidSessionQueryServerException as e:
+          LOG.info('Retrying with a new session because for %s of %s' % (self.user, str(e)))
 
-    session = None
-
-    if not with_multiple_session:
-      # Default behaviour: get one session
+    if self.has_session_pool:
+      session = Session.objects.get_tez_session(self.user, self.query_server['server_name'], self.max_number_of_sessions)
+    elif self.max_number_of_sessions == 1: # Default behaviour: reuse opened session
       session = Session.objects.get_session(self.user, self.query_server['server_name'])
-    else:
-      session = self._get_tez_session(n_sessions)
 
-    if session is None:
-      session = self.open_session(self.user)
+    if session:
+      try:
+        return self._call_return_result_and_session(fn, req, status=status, session=session)
+      except InvalidSessionQueryServerException as e:
+        LOG.info('Retrying with a new session because for %s of %s' % (self.user, str(e)))
 
-    if hasattr(req, 'sessionHandle') and req.sessionHandle is None:
+    if self.has_close_sessions and self.max_number_of_sessions > 1 and Session.objects.get_n_sessions(self.user, n=self.max_number_of_sessions, application=self.query_server['server_name']) >= self.max_number_of_sessions:
+      raise Exception('Too many open sessions. Stop a running query before starting a new one')
+
+    session = self.open_session(self.user)
+    return self._call_return_result_and_session(fn, req, status=status, session=session)
+
+
+  def _call_return_result_and_session(self, fn, req, status=TStatusCode.SUCCESS_STATUS, session=None):
+    if hasattr(req, 'sessionHandle') and session:
       req.sessionHandle = session.get_handle()
 
     res = fn(req)
 
     # Not supported currently in HS2 and Impala: TStatusCode.INVALID_HANDLE_STATUS
     if res.status.statusCode == TStatusCode.ERROR_STATUS and \
-        re.search('Invalid SessionHandle|Invalid session|Client session expired', res.status.errorMessage or '', re.I):
-      LOG.info('Retrying with a new session because for %s of %s' % (self.user, res))
-      session.status_code = TStatusCode.INVALID_HANDLE_STATUS
-      session.save()
-
-      session = self.open_session(self.user)
-
-      req.sessionHandle = session.get_handle()
-
-      # Get back the name of the function to call
-      res = getattr(self._client, fn.attr)(req)
+      re.search('Invalid SessionHandle|Invalid session|Client session expired', res.status.errorMessage or '', re.I):
+      if session:
+        session.status_code = TStatusCode.INVALID_HANDLE_STATUS
+        session.save()
+      raise InvalidSessionQueryServerException(Exception('Invalid Session %s:\n%s' % (req, res)))
 
     if status is not None and res.status.statusCode not in (
-        TStatusCode.SUCCESS_STATUS, TStatusCode.SUCCESS_WITH_INFO_STATUS, TStatusCode.STILL_EXECUTING_STATUS):
+      TStatusCode.SUCCESS_STATUS, TStatusCode.SUCCESS_WITH_INFO_STATUS, TStatusCode.STILL_EXECUTING_STATUS):
       if hasattr(res.status, 'errorMessage') and res.status.errorMessage:
         message = res.status.errorMessage
       else:
@@ -731,53 +744,17 @@ class HiveServerClient(object):
       return (res, session)
 
 
-  def _get_tez_session(self, n_sessions):
-    # Get 2 + n_sessions sessions and filter out the busy ones
-    sessions = Session.objects.get_n_sessions(self.user, n=2 + n_sessions, application=self.query_server['server_name'])
-    LOG.debug('%s sessions found' % len(sessions))
-    if sessions:
-      # Include trashed documents to keep the query lazy
-      # and avoid retrieving all documents
-      docs = Document2.objects.get_history(doc_type='query-hive', user=self.user, include_trashed=True)
-      busy_sessions = set()
-
-      # Only check last 40 documents for performance
-      for doc in docs[:40]:
-        try:
-          snippet_data = json.loads(doc.data)['snippets'][0]
-        except (KeyError, IndexError):
-          # data might not contain a 'snippets' field or it might be empty
-          LOG.warn('No snippets in Document2 object of type query-hive')
-          continue
-        session_guid = snippet_data.get('result', {}).get('handle', {}).get('session_guid')
-        status = snippet_data.get('status')
-
-        if status in [QueryHistory.STATE.submitted.name, QueryHistory.STATE.running.name]:
-          if session_guid is not None and session_guid not in busy_sessions:
-            busy_sessions.add(session_guid)
-
-      n_busy_sessions = 0
-      available_sessions = []
-      for session in sessions:
-        if session.guid not in busy_sessions:
-          available_sessions.append(session)
-        else:
-          n_busy_sessions += 1
-
-      if n_busy_sessions == n_sessions:
-        raise Exception('Too many open sessions. Stop a running query before starting a new one')
-
-      if available_sessions:
-        session = available_sessions[0]
-      else:
-        session = None # No available session found
-
-      return session
-
-
-  def close_session(self, sessionHandle):
-    req = TCloseSessionReq(sessionHandle=sessionHandle)
-    return self._client.CloseSession(req)
+  def close_session(self, session):
+    req = TCloseSessionReq(sessionHandle=session.get_handle())
+    try:
+      res = self._client.CloseSession(req)
+      session.status_code = TStatusCode.INVALID_HANDLE_STATUS
+      session.save()
+      return res
+    except Exception as e:
+      session.status_code = TStatusCode.ERROR_STATUS
+      session.save()
+      raise e
 
 
   def get_databases(self, schemaName=None):
@@ -788,10 +765,10 @@ class HiveServerClient(object):
     if self.query_server['server_name'].startswith('impala'):
       req.schemaName = None
 
-    res = self.call(self._client.GetSchemas, req)
+    (res, session) = self.call(self._client.GetSchemas, req)
 
     results, schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=5000)
-    self.close_operation(res.operationHandle)
+    self._close(res.operationHandle, session)
 
     col = 'TABLE_SCHEM'
     return HiveServerTRowSet(results.results, schema.schema).cols((col,))
@@ -800,8 +777,8 @@ class HiveServerClient(object):
   def get_database(self, database):
     query = 'DESCRIBE DATABASE EXTENDED `%s`' % (database)
 
-    (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=5000, orientation=TFetchOrientation.FETCH_NEXT)
-    self.close_operation(operation_handle)
+    desc_results, desc_schema, operation_handle, session = self.execute_statement(query, max_rows=5000, orientation=TFetchOrientation.FETCH_NEXT)
+    self._close(operation_handle, session)
 
     if self.query_server['server_name'].startswith('impala'):
       cols = ('name', 'location', 'comment') # Skip owner as on a new line
@@ -821,10 +798,10 @@ class HiveServerClient(object):
     if not table_types:
       table_types = self.DEFAULT_TABLE_TYPES
     req = TGetTablesReq(schemaName=database, tableName=table_names, tableTypes=table_types)
-    res = self.call(self._client.GetTables, req)
+    (res, session) = self.call(self._client.GetTables, req)
 
     results, schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=5000)
-    self.close_operation(res.operationHandle)
+    self._close(res.operationHandle, session)
 
     cols = ('TABLE_NAME', 'TABLE_TYPE', 'REMARKS')
     return HiveServerTRowSet(results.results, schema.schema).cols(cols)
@@ -834,17 +811,17 @@ class HiveServerClient(object):
     if not table_types:
       table_types = self.DEFAULT_TABLE_TYPES
     req = TGetTablesReq(schemaName=database, tableName=table_names, tableTypes=table_types)
-    res = self.call(self._client.GetTables, req)
+    (res, session) = self.call(self._client.GetTables, req)
 
     results, schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=5000)
-    self.close_operation(res.operationHandle)
+    self._close(res.operationHandle, session)
 
     return HiveServerTRowSet(results.results, schema.schema).cols(('TABLE_NAME',))
 
 
   def get_table(self, database, table_name, partition_spec=None):
     req = TGetTablesReq(schemaName=database.lower(), tableName=table_name.lower()) # Impala returns empty if not lower case
-    res = self.call(self._client.GetTables, req)
+    (res, session) = self.call(self._client.GetTables, req)
 
     table_results, table_schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT)
     self.close_operation(res.operationHandle)
@@ -855,22 +832,22 @@ class HiveServerClient(object):
       query = 'DESCRIBE FORMATTED `%s`.`%s`' % (database, table_name)
 
     try:
-      (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT)
+      desc_results, desc_schema, operation_handle, session = self.execute_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT, session=session)
       self.close_operation(operation_handle)
     except Exception as e:
       ex_string = str(e)
       if 'cannot find field' in ex_string: # Workaround until Hive 2.0 and HUE-3751
-        (desc_results, desc_schema), operation_handle = self.execute_statement('USE `%s`' % database)
+        desc_results, desc_schema, operation_handle, session = self.execute_statement('USE `%s`' % database, session=session)
         self.close_operation(operation_handle)
         if partition_spec:
           query = 'DESCRIBE FORMATTED `%s` PARTITION(%s)' % (table_name, partition_spec)
         else:
           query = 'DESCRIBE FORMATTED `%s`' % table_name
-        (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT)
+        desc_results, desc_schema, operation_handle, session = self.execute_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT, session=session)
         self.close_operation(operation_handle)
       elif 'not have privileges for DESCTABLE' in ex_string or 'AuthorizationException' in ex_string: # HUE-5608: No table permission but some column permissions
         query = 'DESCRIBE `%s`.`%s`' % (database, table_name)
-        (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT)
+        desc_results, desc_schema, operation_handle, session = self.execute_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT, session=session)
         self.close_operation(operation_handle)
 
         desc_results.results.columns[0].stringVal.values.insert(0, '# col_name')
@@ -895,32 +872,35 @@ class HiveServerClient(object):
           desc_results.results.columns[2].stringVal.values.append(None)
       else:
         raise e
+    finally:
+      if self.has_close_sessions:
+        self.close_session(session)
 
     return HiveServerTable(table_results.results, table_schema.schema, desc_results.results, desc_schema.schema)
 
 
-  def execute_query(self, query, max_rows=1000):
+  def execute_query(self, query, max_rows=1000, session=None):
     configuration = self._get_query_configuration(query)
-    return self.execute_query_statement(statement=query.query['query'], max_rows=max_rows, configuration=configuration)
+    return self.execute_query_statement(statement=query.query['query'], max_rows=max_rows, configuration=configuration, session=session)
 
 
-  def execute_query_statement(self, statement, max_rows=1000, configuration=None, orientation=TFetchOrientation.FETCH_FIRST, close_operation=False):
+  def execute_query_statement(self, statement, max_rows=1000, configuration=None, orientation=TFetchOrientation.FETCH_FIRST, close_operation=False, session=None):
     if configuration is None:
       configuration = {}
-    (results, schema), operation_handle = self.execute_statement(statement=statement, max_rows=max_rows, configuration=configuration, orientation=orientation)
+    results, schema, operation_handle, session = self.execute_statement(statement=statement, max_rows=max_rows, configuration=configuration, orientation=orientation, session=session)
 
     if close_operation:
       self.close_operation(operation_handle)
 
-    return HiveServerDataTable(results, schema, operation_handle, self.query_server)
+    return HiveServerDataTable(results, schema, operation_handle, self.query_server, session=session)
 
 
-  def execute_async_query(self, query, statement=0, with_multiple_session=False):
+  def execute_async_query(self, query, statement=0, session=None):
     if statement == 0:
       # Impala just has settings currently
       if self.query_server['server_name'] == 'beeswax':
         for resource in query.get_configuration_statements():
-          self.execute_statement(resource.strip())
+          self.execute_statement(resource.strip(), session=session)
 
     configuration = {}
 
@@ -931,27 +911,28 @@ class HiveServerClient(object):
     configuration.update(self._get_query_configuration(query))
     query_statement = query.get_query_statement(statement)
 
-    return self.execute_async_statement(statement=query_statement, confOverlay=configuration, with_multiple_session=with_multiple_session)
+    return self.execute_async_statement(statement=query_statement, confOverlay=configuration, session=session)
 
 
-  def execute_statement(self, statement, max_rows=1000, configuration=None, orientation=TFetchOrientation.FETCH_NEXT):
+  def execute_statement(self, statement, max_rows=1000, configuration=None, orientation=TFetchOrientation.FETCH_NEXT, session=None):
     if configuration is None:
       configuration = {}
     if self.query_server['server_name'].startswith('impala') and self.query_server['QUERY_TIMEOUT_S'] > 0:
       configuration['QUERY_TIMEOUT_S'] = str(self.query_server['QUERY_TIMEOUT_S'])
 
     req = TExecuteStatementReq(statement=statement.encode('utf-8'), confOverlay=configuration)
-    res = self.call(self._client.ExecuteStatement, req)
+    (res, session) = self.call(self._client.ExecuteStatement, req, session=session)
 
-    return self.fetch_result(res.operationHandle, max_rows=max_rows, orientation=orientation), res.operationHandle
+    results, schema = self.fetch_result(res.operationHandle, max_rows=max_rows, orientation=orientation)
+    return results, schema, res.operationHandle, session
 
 
-  def execute_async_statement(self, statement, confOverlay, with_multiple_session=False):
+  def execute_async_statement(self, statement, confOverlay, session=None):
     if self.query_server['server_name'].startswith('impala') and self.query_server['QUERY_TIMEOUT_S'] > 0:
       confOverlay['QUERY_TIMEOUT_S'] = str(self.query_server['QUERY_TIMEOUT_S'])
 
     req = TExecuteStatementReq(statement=statement.encode('utf-8'), confOverlay=confOverlay, runAsync=True)
-    (res, session) = self.call_return_result_and_session(self._client.ExecuteStatement, req, with_multiple_session=with_multiple_session)
+    (res, session) = self.call_return_result_and_session(self._client.ExecuteStatement, req, session=session)
 
     return HiveServerQueryHandle(
         secret=res.operationHandle.operationId.secret,
@@ -959,10 +940,11 @@ class HiveServerClient(object):
         operation_type=res.operationHandle.operationType,
         has_result_set=res.operationHandle.hasResultSet,
         modified_row_count=res.operationHandle.modifiedRowCount,
-        session_guid=session.guid
+        session_guid=thrift_util.unpack_guid(session.get_handle().sessionId.guid),
+        session_id=session.id
     )
 
-
+  # Note: An operation_handle is attached to a session. All operations that require operation_handle cannot recover if the session is closed. Passing the session is not required
   def fetch_data(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=1000):
     # Fetch until the result is empty dues to a HS2 bug instead of looking at hasMoreRows
     results, schema = self.fetch_result(operation_handle, orientation, max_rows)
@@ -971,34 +953,26 @@ class HiveServerClient(object):
 
   def cancel_operation(self, operation_handle):
     req = TCancelOperationReq(operationHandle=operation_handle)
-    return self.call(self._client.CancelOperation, req)
+    (res, session) = self.call(self._client.CancelOperation, req)
+    return res
 
 
   def close_operation(self, operation_handle):
     req = TCloseOperationReq(operationHandle=operation_handle)
-    return self.call(self._client.CloseOperation, req)
-
-
-  def get_columns(self, database, table):
-    req = TGetColumnsReq(schemaName=database, tableName=table)
-    res = self.call(self._client.GetColumns, req)
-
-    res, schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT)
-    self.close_operation(res.operationHandle)
-
-    return res, schema
+    (res, session) = self.call(self._client.CloseOperation, req)
+    return res
 
 
   def fetch_result(self, operation_handle, orientation=TFetchOrientation.FETCH_FIRST, max_rows=1000):
     if operation_handle.hasResultSet:
       fetch_req = TFetchResultsReq(operationHandle=operation_handle, orientation=orientation, maxRows=max_rows)
-      res = self.call(self._client.FetchResults, fetch_req)
+      (res, session) = self.call(self._client.FetchResults, fetch_req)
     else:
       res = TFetchResultsResp(results=TRowSet(startRowOffset=0, rows=[], columns=[]))
 
     if operation_handle.hasResultSet and TFetchOrientation.FETCH_FIRST: # Only fetch for the first call that should be with start_over
       meta_req = TGetResultSetMetadataReq(operationHandle=operation_handle)
-      schema = self.call(self._client.GetResultSetMetadata, meta_req)
+      (schema, session) = self.call(self._client.GetResultSetMetadata, meta_req)
     else:
       schema = None
 
@@ -1007,7 +981,7 @@ class HiveServerClient(object):
 
   def fetch_log(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=1000):
     req = TFetchResultsReq(operationHandle=operation_handle, orientation=orientation, maxRows=max_rows, fetchType=1)
-    res = self.call(self._client.FetchResults, req)
+    (res, session) = self.call(self._client.FetchResults, req)
 
     if beeswax_conf.THRIFT_VERSION.get() >= 7:
       lines = res.results.columns[0].stringVal.values
@@ -1019,18 +993,14 @@ class HiveServerClient(object):
 
   def get_operation_status(self, operation_handle):
     req = TGetOperationStatusReq(operationHandle=operation_handle)
-    return self.call(self._client.GetOperationStatus, req)
-
-  def explain(self, query):
-    query_statement = query.get_query_statement(0)
-    configuration = self._get_query_configuration(query)
-    return self.execute_query_statement(statement='EXPLAIN %s' % query_statement, configuration=configuration, orientation=TFetchOrientation.FETCH_NEXT)
+    (res, session) = self.call(self._client.GetOperationStatus, req)
+    return res
 
 
   def get_log(self, operation_handle):
     try:
       req = TGetLogReq(operationHandle=operation_handle)
-      res = self.call(self._client.GetLog, req)
+      (res, session) = self.call(self._client.GetLog, req)
       return res.log
     except Exception as e:
       if 'Invalid query handle' in str(e):
@@ -1043,7 +1013,29 @@ class HiveServerClient(object):
       return message
 
 
-  def get_partitions(self, database, table_name, partition_spec=None, max_parts=None, reverse_sort=True):
+  def _close(self, operation_handle, session):
+    if self.has_close_sessions: # Close session will close all associated operation_handle
+      self.close_session(session)
+    else:
+      self.close_operation(operation_handle)
+
+
+  def get_columns(self, database, table):
+    req = TGetColumnsReq(schemaName=database, tableName=table)
+    (res, session) = self.call(self._client.GetColumns, req)
+
+    results, schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT)
+    self._close(res.operationHandle, session)
+
+    return results, schema
+
+
+  def explain(self, query):
+    query_statement = query.get_query_statement(0)
+    configuration = self._get_query_configuration(query)
+    return self.execute_query_statement(statement='EXPLAIN %s' % query_statement, configuration=configuration, orientation=TFetchOrientation.FETCH_NEXT)
+
+  def get_partitions(self, database, table_name, partition_spec=None, max_parts=None, reverse_sort=True): #TODO execute both requests in same session
     table = self.get_table(database, table_name)
 
     query = 'SHOW PARTITIONS `%s`.`%s`' % (database, table_name)
@@ -1054,11 +1046,17 @@ class HiveServerClient(object):
     # Need to fetch more like this until SHOW PARTITIONS offers a LIMIT and ORDER BY
     partition_table = self.execute_query_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT, close_operation=True)
 
+    if self.has_close_sessions:
+      self.close_session(partition_table.session)
+
     if self.query_server['server_name'].startswith('impala'):
       try:
         # Fetch all partition key names, which are listed before the #Rows column
         cols = [col.name for col in partition_table.cols()]
-        stop = cols.index('#Rows')
+        try:
+          stop = cols.index('#Rows')
+        except ValueError:
+          stop = -1
         partition_keys = cols[:stop]
         num_parts = len(partition_keys)
 
@@ -1090,16 +1088,16 @@ class HiveServerClient(object):
     return partitions[:max_parts]
 
 
-  def get_configuration(self):
+  def get_configuration(self, session=None):
     configuration = {}
 
     if self.query_server['server_name'].startswith('impala'):  # Return all configuration settings
       query = 'SET'
-      results = self.execute_query_statement(query, orientation=TFetchOrientation.FETCH_NEXT, close_operation=True)
+      results = self.execute_query_statement(query, orientation=TFetchOrientation.FETCH_NEXT, close_operation=True, session=session)
       configuration = dict((row[0], row[1]) for row in results.rows())
     else:  # For Hive, only return white-listed configurations
       query = 'SET -v'
-      results = self.execute_query_statement(query, orientation=TFetchOrientation.FETCH_FIRST, max_rows=-1, close_operation=True)
+      results = self.execute_query_statement(query, orientation=TFetchOrientation.FETCH_FIRST, max_rows=-1, close_operation=True, session=session)
       config_whitelist = [config.lower() for config in CONFIG_WHITELIST.get()]
       properties = [(row[0].split('=')[0], row[0].split('=')[1]) for row in results.rows() if '=' in row[0]]
       configuration = dict((prop, value) for prop, value in properties if prop.lower() in config_whitelist)
@@ -1224,8 +1222,8 @@ class HiveServerClientCompatible(object):
     self.query_server = client.query_server
 
 
-  def query(self, query, statement=0, with_multiple_session=False):
-    return self._client.execute_async_query(query, statement, with_multiple_session=with_multiple_session)
+  def query(self, query, statement=0, session=None):
+    return self._client.execute_async_query(query, statement, session=session)
 
 
   def get_state(self, handle):
@@ -1239,8 +1237,8 @@ class HiveServerClientCompatible(object):
     return self._client.get_operation_status(operationHandle)
 
 
-  def use(self, query):
-    data = self._client.execute_query(query)
+  def use(self, query, session=None):
+    data = self._client.execute_query(query, session=session)
     self._client.close_operation(data.operation_handle)
     return data
 
@@ -1282,8 +1280,7 @@ class HiveServerClientCompatible(object):
 
 
   def close_session(self, session):
-    operationHandle = session.get_handle()
-    return self._client.close_session(operationHandle)
+    return self._client.close_session(session)
 
 
   def dump_config(self):

@@ -42,7 +42,7 @@ from beeswax import hive_site
 from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, HIVE_SERVER_HOST, HIVE_HTTP_THRIFT_PORT, HIVE_METASTORE_HOST, HIVE_METASTORE_PORT, LIST_PARTITIONS_LIMIT, SERVER_CONN_TIMEOUT, \
   AUTH_USERNAME, AUTH_PASSWORD, APPLY_NATURAL_SORT_MAX, QUERY_PARTITIONS_LIMIT, HIVE_DISCOVERY_HIVESERVER2_ZNODE, \
   HIVE_DISCOVERY_HS2, HIVE_DISCOVERY_LLAP, HIVE_DISCOVERY_LLAP_HA, HIVE_DISCOVERY_LLAP_ZNODE, CACHE_TIMEOUT, \
-  LLAP_SERVER_HOST, LLAP_SERVER_PORT, LLAP_SERVER_THRIFT_PORT, USE_SASL as HIVE_USE_SASL
+  LLAP_SERVER_HOST, LLAP_SERVER_PORT, LLAP_SERVER_THRIFT_PORT, USE_SASL as HIVE_USE_SASL, CLOSE_SESSIONS, has_session_pool, MAX_NUMBER_OF_SESSIONS
 from beeswax.common import apply_natural_sort
 from beeswax.design import hql_query
 from beeswax.hive_site import hiveserver2_use_ssl
@@ -183,7 +183,10 @@ def get_query_server_config(name='beeswax', connector=None):
           'transport_mode': 'http' if hive_site.hiveserver2_transport_mode() == 'HTTP' else 'socket',
           'auth_username': AUTH_USERNAME.get(),
           'auth_password': AUTH_PASSWORD.get(),
-          'use_sasl': HIVE_USE_SASL.get()
+          'use_sasl': HIVE_USE_SASL.get(),
+          'close_sessions': CLOSE_SESSIONS.get(),
+          'has_session_pool': has_session_pool(),
+          'max_number_of_sessions': MAX_NUMBER_OF_SESSIONS.get()
         }
 
     if name == 'sparksql': # Extends Hive as very similar
@@ -233,6 +236,11 @@ class QueryServerException(Exception):
   def __init__(self, e, message=''):
     super(QueryServerException, self).__init__(e)
     self.message = message
+
+
+class InvalidSessionQueryServerException(QueryServerException):
+  def __init__(self, e, message=''):
+    super(InvalidSessionQueryServerException, self).__init__(e, message=message)
 
 
 class QueryServerTimeoutException(Exception):
@@ -832,9 +840,9 @@ class HiveServer2Dbms(object):
     return query_history
 
 
-  def use(self, database):
+  def use(self, database, session=None):
     query = hql_query('USE `%s`' % database)
-    return self.client.use(query)
+    return self.client.use(query, session=session)
 
 
   def get_log(self, query_handle, start_over=True):

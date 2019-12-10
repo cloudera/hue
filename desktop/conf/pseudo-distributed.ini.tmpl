@@ -1237,7 +1237,13 @@
 
   # Hue will use at most this many HiveServer2 sessions per user at a time.
   # For Tez, increase the number to more if you need more than one query at the time, e.g. 2 or 3 (Tez has a maximum of 1 query by session).
+  # -1 is unlimited number of sessions.
   ## max_number_of_sessions=1
+
+  # When set to True, Hue will close sessions created for background queries and open new ones as needed.
+  # When set to False, Hue will keep sessions created for background queries opened and reuse them as needed.
+  # This flag is useful when max_number_of_sessions != 1
+  ## close_sessions=max_number_of_sessions != 1
 
   # Thrift version to use when communicating with HiveServer2.
   # Version 11 comes with Hive 3.0. If issues, try 7.

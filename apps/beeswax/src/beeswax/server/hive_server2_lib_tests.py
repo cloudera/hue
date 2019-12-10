@@ -24,15 +24,18 @@ if sys.version_info[0] > 2:
 else:
   from mock import patch, Mock, MagicMock
 
-from nose.tools import assert_equal, assert_true
+from nose.tools import assert_equal, assert_true, assert_raises, assert_not_equal
+from nose.plugins.skip import SkipTest
 from TCLIService.ttypes import TStatusCode
+
+from beeswax.conf import MAX_NUMBER_OF_SESSIONS, CLOSE_SESSIONS
+from beeswax.models import Session
+from beeswax.server.hive_server2_lib import HiveServerTable, HiveServerClient
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from useradmin.models import User
 
-from beeswax.models import Session
-from beeswax.server.hive_server2_lib import HiveServerTable, HiveServerClient
 
 
 LOG = logging.getLogger(__name__)
@@ -350,3 +353,176 @@ class TestHiveServerTable():
       assert_equal(table.primary_keys[1].name, 'id2')
       assert_equal(table.primary_keys[1].type, 'NULL')
       assert_equal(table.primary_keys[1].comment, 'NULL')
+
+class SessionTest():
+  def test_call_session_single(self):
+    finish = (MAX_NUMBER_OF_SESSIONS.set_for_testing(1),
+                CLOSE_SESSIONS.set_for_testing(False))
+    try:
+      with patch('beeswax.server.hive_server2_lib.thrift_util.get_client') as get_client:
+        with patch('beeswax.server.hive_server2_lib.HiveServerClient.open_session') as open_session:
+          with patch('beeswax.server.hive_server2_lib.Session.objects.get_session') as get_session:
+            open_session.return_value = MagicMock(status_code=0)
+            get_session.return_value = None
+            fn = MagicMock(attr='test')
+            req = MagicMock()
+
+            client = HiveServerClient(MagicMock(), MagicMock())
+            (res, session1) = client.call(fn, req, status=None)
+            open_session.assert_called_once()
+
+            # Reuse session from argument
+            (res, session2) = client.call(fn, req, status=None, session=session1)
+            open_session.assert_called_once() # open_session should not be called again, because we're reusing session
+            assert_equal(session1, session2)
+
+            # Reuse session from get_session
+            get_session.return_value = session1
+            (res, session3) = client.call(fn, req, status=None)
+            open_session.assert_called_once() # open_session should not be called again, because we're reusing session
+            assert_equal(session1, session3)
+    finally:
+      for f in finish:
+        f()
+
+  def test_call_session_pool(self):
+    finish = (MAX_NUMBER_OF_SESSIONS.set_for_testing(2),
+                CLOSE_SESSIONS.set_for_testing(False))
+    try:
+      with patch('beeswax.server.hive_server2_lib.thrift_util.get_client') as get_client:
+        with patch('beeswax.server.hive_server2_lib.HiveServerClient.open_session') as open_session:
+          with patch('beeswax.server.hive_server2_lib.Session.objects.get_tez_session') as get_session:
+            open_session.return_value = MagicMock(status_code=0)
+            get_session.return_value = None
+            fn = MagicMock(return_value=MagicMock(status=MagicMock(statusCode=0)))
+            req = MagicMock()
+
+            client = HiveServerClient(MagicMock(), MagicMock())
+            (res, session1) = client.call(fn, req, status=None)
+            open_session.assert_called_once()
+
+            # Reuse session from argument
+            (res, session2) = client.call(fn, req, status=None, session=session1)
+            open_session.assert_called_once() # open_session should not be called again, because we're reusing session
+            assert_equal(session1, session2)
+
+            # Reuse session from get_session
+            get_session.return_value = session1
+            (res, session3) = client.call(fn, req, status=None)
+            open_session.assert_called_once() # open_session should not be called again, because we're reusing session
+            assert_equal(session1, session3)
+    finally:
+      for f in finish:
+        f()
+
+  def test_call_session_pool_limit(self):
+    finish = (MAX_NUMBER_OF_SESSIONS.set_for_testing(2),
+                CLOSE_SESSIONS.set_for_testing(False))
+    try:
+      with patch('beeswax.server.hive_server2_lib.thrift_util.get_client') as get_client:
+        with patch('beeswax.server.hive_server2_lib.HiveServerClient.open_session') as open_session:
+          with patch('beeswax.server.hive_server2_lib.Session.objects.get_tez_session') as get_tez_session:
+            get_tez_session.side_effect=Exception('')
+            open_session.return_value = MagicMock(status_code=0)
+            fn = MagicMock(return_value=MagicMock(status=MagicMock(statusCode=0)))
+            req = MagicMock()
+            client = HiveServerClient(MagicMock(), MagicMock())
+            assert_raises(Exception, client.call, fn, req, status=None)
+    finally:
+      for f in finish:
+        f()
+
+  def test_call_session_close_idle(self):
+    finish = (MAX_NUMBER_OF_SESSIONS.set_for_testing(-1),
+                CLOSE_SESSIONS.set_for_testing(True))
+    try:
+      with patch('beeswax.server.hive_server2_lib.thrift_util.get_client') as get_client:
+        with patch('beeswax.server.hive_server2_lib.HiveServerClient.open_session') as open_session:
+          open_session.return_value = MagicMock(status_code=0)
+          fn = MagicMock(return_value=MagicMock(status=MagicMock(statusCode=0)))
+          req = MagicMock()
+
+          client = HiveServerClient(MagicMock(), MagicMock())
+          (res, session1) = client.call(fn, req, status=None)
+          open_session.assert_called_once()
+
+          # Reuse session from argument
+          (res, session2) = client.call(fn, req, status=None, session=session1)
+          open_session.assert_called_once() # open_session should not be called again, because we're reusing session
+          assert_equal(session1, session2)
+
+          # Create new session
+          open_session.return_value = MagicMock(status_code=0)
+          (res, session3) = client.call(fn, req, status=None)
+          assert_equal(open_session.call_count, 2)
+          assert_not_equal(session1, session3)
+    finally:
+      for f in finish:
+        f()
+
+  def test_call_session_close_idle_managed_queries(self):
+    finish = (MAX_NUMBER_OF_SESSIONS.set_for_testing(-1),
+                CLOSE_SESSIONS.set_for_testing(True))
+    try:
+      with patch('beeswax.server.hive_server2_lib.thrift_util.get_client') as get_client:
+        with patch('beeswax.server.hive_server2_lib.HiveServerClient.open_session') as open_session:
+          with patch('beeswax.server.hive_server2_lib.HiveServerClient.close_session') as close_session:
+            with patch('beeswax.server.hive_server2_lib.HiveServerTRowSet') as HiveServerTRowSet:
+              status = MagicMock(status=MagicMock(statusCode=0))
+              status_return = MagicMock(return_value=status)
+              get_client.return_value = MagicMock(return_value=status, GetSchemas=status_return, FetchResults=status_return, GetResultSetMetadata=status_return, CloseOperation=status_return, ExecuteStatement=status_return, GetTables=status_return, GetColumns=status_return)
+
+              open_session.return_value = MagicMock(status_code=0)
+              client = HiveServerClient(MagicMock(), MagicMock())
+
+              res = client.get_databases()
+              assert_equal(open_session.call_count, 1)
+              assert_equal(close_session.call_count, 1)
+
+              res = client.get_database(MagicMock())
+              assert_equal(open_session.call_count, 2)
+              assert_equal(close_session.call_count, 2)
+
+              res = client.get_tables_meta(MagicMock(), MagicMock())
+              assert_equal(open_session.call_count, 3)
+              assert_equal(close_session.call_count, 3)
+
+              res = client.get_tables(MagicMock(), MagicMock())
+              assert_equal(open_session.call_count, 4)
+              assert_equal(close_session.call_count, 4)
+
+              res = client.get_table(MagicMock(), MagicMock())
+              assert_equal(open_session.call_count, 5)
+              assert_equal(close_session.call_count, 5)
+
+              res = client.get_columns(MagicMock(), MagicMock())
+              assert_equal(open_session.call_count, 6)
+              assert_equal(close_session.call_count, 6)
+
+              res = client.get_partitions(MagicMock(), MagicMock()) # get_partitions does 2 requests with 1 session each
+              assert_equal(open_session.call_count, 8)
+              assert_equal(close_session.call_count, 8)
+    finally:
+      for f in finish:
+        f()
+
+  def test_call_session_close_idle_limit(self):
+    finish = (MAX_NUMBER_OF_SESSIONS.set_for_testing(2),
+                CLOSE_SESSIONS.set_for_testing(True))
+    try:
+      with patch('beeswax.server.hive_server2_lib.thrift_util.get_client') as get_client:
+        with patch('beeswax.server.hive_server2_lib.HiveServerClient.open_session') as open_session:
+          with patch('beeswax.server.hive_server2_lib.Session.objects.get_n_sessions') as get_n_sessions:
+            get_n_sessions.return_value = [MagicMock(), MagicMock()]
+            open_session.return_value = MagicMock(status_code=0)
+            fn = MagicMock(return_value=MagicMock(status=MagicMock(statusCode=0)))
+            req = MagicMock()
+            client = HiveServerClient(MagicMock(), MagicMock())
+            assert_raises(Exception, client.call, fn, req, status=None)
+
+            get_n_sessions.return_value = [MagicMock()]
+            (res, session1) = client.call(fn, req, status=None)
+            open_session.assert_called_once()
+    finally:
+      for f in finish:
+        f()

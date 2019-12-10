@@ -56,7 +56,7 @@ LOG = logging.getLogger(__name__)
 try:
   from beeswax import conf as beeswax_conf, data_export
   from beeswax.api import _autocomplete, _get_sample_data
-  from beeswax.conf import CONFIG_WHITELIST as hive_settings, DOWNLOAD_ROW_LIMIT, DOWNLOAD_BYTES_LIMIT
+  from beeswax.conf import CONFIG_WHITELIST as hive_settings, DOWNLOAD_ROW_LIMIT, DOWNLOAD_BYTES_LIMIT, MAX_NUMBER_OF_SESSIONS, has_session_pool, has_multiple_sessions, CLOSE_SESSIONS
   from beeswax.data_export import upload
   from beeswax.design import hql_query
   from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, HiveServerQueryHistory, QueryHistory, Session
@@ -178,7 +178,12 @@ class HS2Api(Api):
   def create_session(self, lang='hive', properties=None):
     application = 'beeswax' if lang == 'hive' or lang =='llap' else lang
 
-    session = Session.objects.get_session(self.user, application=application)
+    if has_session_pool():
+      session = Session.objects.get_tez_session(self.user, application, MAX_NUMBER_OF_SESSIONS.get())
+    elif not has_multiple_sessions():
+      session = Session.objects.get_session(self.user, application=application)
+    else:
+      session = None
 
     reuse_session = session is not None
     if not reuse_session:
@@ -251,6 +256,30 @@ class HS2Api(Api):
 
     return response
 
+  def close_session_idle(self, notebook, session):
+    idle = True
+    response = {'result': []}
+    for snippet in [_s for _s in notebook['snippets'] if _s['type'] == session['type']]:
+      try:
+        if snippet['status'] != 'running':
+          response['result'].append(self.close_statement(notebook, snippet))
+        else:
+          idle = False
+          LOG.info('Not closing SQL snippet as still running.')
+      except QueryExpired:
+        pass
+      except Exception as e:
+        LOG.exception('Error closing statement %s' % str(e))
+
+    try:
+      if idle and CLOSE_SESSIONS.get():
+        response['result'].append(self.close_session(session))
+    except QueryExpired:
+      pass
+    except Exception as e:
+      LOG.exception('Error closing statement %s' % str(e))
+
+    return response['result']
 
   @query_error_handler
   def execute(self, notebook, snippet):
@@ -260,12 +289,15 @@ class HS2Api(Api):
     session = self._get_session(notebook, snippet['type'])
 
     query = self._prepare_hql_query(snippet, statement['statement'], session)
+    _session = self._get_session_by_id(notebook, snippet['type'])
 
     try:
-      if statement.get('statement_id') == 0:
+      if statement.get('statement_id') == 0: # TODO: move this to client
         if query.database and not statement['statement'].lower().startswith('set'):
-          db.use(query.database)
-      handle = db.client.query(query, with_multiple_session=True) # Note: with_multiple_session currently ignored
+          result = db.use(query.database, session=_session)
+          if result.session:
+            _session = result.session
+      handle = db.client.query(query, session=_session)
     except QueryServerException as ex:
       raise QueryError(ex.message, handle=statement)
 
@@ -282,7 +314,8 @@ class HS2Api(Api):
       'has_result_set': handle.has_result_set,
       'modified_row_count': handle.modified_row_count,
       'log_context': handle.log_context,
-      'session_guid': handle.session_guid
+      'session_guid': handle.session_guid,
+      'session_id': handle.session_id
     }
     response.update(statement)
 
@@ -642,6 +675,16 @@ DROP TABLE IF EXISTS `%(table)s`;
   def _get_session(self, notebook, type='hive'):
     session = next((session for session in notebook['sessions'] if session['type'] == type), None)
     return session
+
+  def _get_session_by_id(self, notebook, type='hive'):
+    session = self._get_session(notebook, type)
+    if session:
+      session_id = session.get('id')
+      if session_id:
+        filters = {'id': session_id, 'application': 'beeswax' if type == 'hive' else type}
+        if not is_admin(self.user):
+          filters['owner'] = self.user
+        return Session.objects.get(**filters)
 
 
   def _get_hive_execution_engine(self, notebook, snippet):

@@ -32,7 +32,7 @@ from enum import Enum
 from TCLIService.ttypes import TSessionHandle, THandleIdentifier, TOperationState, TOperationHandle, TOperationType
 
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import Document
+from desktop.models import Document, Document2
 from desktop.redaction import global_redaction_engine
 from librdbms.server import dbms as librdbms_dbms
 from useradmin.models import User
@@ -404,7 +404,54 @@ class SessionManager(models.Manager):
     q = self.filter(owner=user, application=application).exclude(guid='').exclude(secret='')
     if filter_open:
       q = q.filter(status_code=0)
-    return q.order_by("-last_used")[0:n]
+    q = q.order_by("-last_used")
+    if n > 0:
+      return q[0:n]
+    else:
+      return q
+
+  def get_tez_session(self, user, application, n_sessions):
+    # Get 2 + n_sessions sessions and filter out the busy ones
+    sessions = Session.objects.get_n_sessions(user, n=2 + n_sessions, application=application)
+    LOG.debug('%s sessions found' % len(sessions))
+    if sessions:
+      # Include trashed documents to keep the query lazy
+      # and avoid retrieving all documents
+      docs = Document2.objects.get_history(doc_type='query-hive', user=user, include_trashed=True)
+      busy_sessions = set()
+
+      # Only check last 40 documents for performance
+      for doc in docs[:40]:
+        try:
+          snippet_data = json.loads(doc.data)['snippets'][0]
+        except (KeyError, IndexError):
+          # data might not contain a 'snippets' field or it might be empty
+          LOG.warn('No snippets in Document2 object of type query-hive')
+          continue
+        session_guid = snippet_data.get('result', {}).get('handle', {}).get('session_guid')
+        status = snippet_data.get('status')
+
+        if status in [QueryHistory.STATE.submitted.name, QueryHistory.STATE.running.name]:
+          if session_guid is not None and session_guid not in busy_sessions:
+            busy_sessions.add(session_guid)
+
+      n_busy_sessions = 0
+      available_sessions = []
+      for session in sessions:
+        if session.guid not in busy_sessions:
+          available_sessions.append(session)
+        else:
+          n_busy_sessions += 1
+
+      if n_sessions > 0 and n_busy_sessions == n_sessions:
+        raise Exception('Too many open sessions. Stop a running query before starting a new one')
+
+      if available_sessions:
+        session = available_sessions[0]
+      else:
+        session = None # No available session found
+
+      return session
 
 
 class Session(models.Model):
@@ -439,7 +486,7 @@ class Session(models.Model):
 
 
 class QueryHandle(object):
-  def __init__(self, secret=None, guid=None, operation_type=None, has_result_set=None, modified_row_count=None, log_context=None, session_guid=None):
+  def __init__(self, secret=None, guid=None, operation_type=None, has_result_set=None, modified_row_count=None, log_context=None, session_guid=None, session_id=None):
     self.secret = secret
     self.guid = guid
     self.operation_type = operation_type
@@ -467,6 +514,7 @@ class HiveServerQueryHandle(QueryHandle):
     super(HiveServerQueryHandle, self).__init__(**kwargs)
     self.secret, self.guid = self.get_encoded()
     self.session_guid = kwargs.get('session_guid')
+    self.session_id = kwargs.get('session_id')
 
   def get(self):
     return self.secret, self.guid
