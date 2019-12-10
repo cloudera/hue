@@ -146,7 +146,7 @@ class HiveMetastoreClient(object):
     pass
 
 
-  def query(self, query, statement=0, with_multiple_session=False):
+  def query(self, query, statement=0):
     return HiveServerQueryHandle(secret='mock', guid='mock')
 
 
