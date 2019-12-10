@@ -751,32 +751,66 @@ AlterViewLeftSide_EDIT
  ;
 
 Msck
- : 'MSCK' 'REPAIR' 'TABLE' SchemaQualifiedTableIdentifier
+ : 'MSCK' OptionalRepair 'TABLE' SchemaQualifiedTableIdentifier OptionalAddDropSyncPartitions
    {
      parser.addTablePrimary($4);
    }
  ;
 
 Msck_EDIT
- : 'MSCK' 'CURSOR'
+ : 'MSCK' OptionalRepair 'CURSOR'
    {
-     parser.suggestKeywords(['REPAIR TABLE']);
+     if (!$2) {
+       parser.suggestKeywords(['TABLE', 'REPAIR TABLE']);
+     } else {
+       parser.suggestKeywords(['TABLE']);
+     }
    }
- | 'MSCK' 'REPAIR' 'CURSOR'
-   {
-     parser.suggestKeywords(['TABLE']);
-   }
- | 'MSCK' 'REPAIR' 'TABLE' 'CURSOR'
+ | 'MSCK' OptionalRepair 'TABLE' 'CURSOR'
    {
      parser.suggestTables({ onlyTables: true });
      parser.suggestDatabases({ appendDot: true });
    }
- | 'MSCK' 'REPAIR' 'TABLE' SchemaQualifiedTableIdentifier_EDIT
+ | 'MSCK' OptionalRepair 'TABLE' SchemaQualifiedTableIdentifier_EDIT
    {
      if (parser.yy.result.suggestTables) {
        parser.yy.result.suggestTables.onlyViews = true;
      }
    }
+ | 'MSCK' OptionalRepair 'TABLE' SchemaQualifiedTableIdentifier AddDropSyncPartitions_EDIT
+   {
+     parser.addTablePrimary($4);
+   }
+ | 'MSCK' OptionalRepair 'TABLE' SchemaQualifiedTableIdentifier OptionalAddDropSyncPartitions 'CURSOR'
+   {
+     parser.addTablePrimary($4);
+     if (!$5) {
+       parser.suggestKeywords(['ADD PARTITIONS', 'DROP PARTITIONS', 'SYNC PARTITIONS']);
+     }
+   }
+ ;
+
+OptionalRepair
+ :
+ | 'REPAIR'
+ ;
+
+OptionalAddDropSyncPartitions
+ :
+ | AddDropOrSync 'PARTITIONS'
+ ;
+
+AddDropSyncPartitions_EDIT
+ : AddDropOrSync 'CURSOR'
+   {
+     parser.suggestKeywords(['PARTITIONS']);
+   }
+ ;
+
+AddDropOrSync
+ : 'ADD'
+ | 'DROP'
+ | 'SYNC'
  ;
 
 ReloadFunction
