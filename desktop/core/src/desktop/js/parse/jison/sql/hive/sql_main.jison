@@ -107,6 +107,7 @@ NonReservedKeyword
  | 'BUCKETS'
  | 'CASCADE'
  | 'CHANGE'
+ | 'CHECK'
  | 'CLUSTERED'
  | 'COLLECTION'
  | 'COLUMNS'

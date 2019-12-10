@@ -125,7 +125,7 @@ AlterIndex_EDIT
 AlterTable
  : AlterTableLeftSide 'ADD' OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs
  | AlterTableLeftSide 'ADD' 'CONSTRAINT' RegularOrBacktickedIdentifier PrimaryKeySpecification
- | AlterTableLeftSide 'ADD' 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification
+ | AlterTableLeftSide 'ADD' TableConstraint
  | AlterTableLeftSide 'RENAME' 'TO' RegularOrBackTickedSchemaQualifiedName
  | AlterTableLeftSide ClusteredBy
  | AlterTableLeftSide 'SKEWED' 'BY' ParenthesizedColumnList 'ON' ParenthesizedSkewedValueList OptionalStoredAsDirectories
@@ -147,6 +147,7 @@ AlterTable
 AlterTable_EDIT
  : AlterTableLeftSide_EDIT
  | AlterTableLeftSide_EDIT 'ADD' OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs
+ | AlterTableLeftSide_EDIT TableConstraint
  | AlterTableLeftSide_EDIT 'RENAME' 'TO' RegularOrBackTickedSchemaQualifiedName
  | AlterTableLeftSide_EDIT ClusteredBy
  | AlterTableLeftSide_EDIT 'SKEWED' 'BY' ParenthesizedColumnList 'ON' ParenthesizedSkewedValueList OptionalStoredAsDirectories
@@ -194,7 +195,7 @@ AlterTable_EDIT
  | AlterTableLeftSide 'ADD' 'CONSTRAINT' 'CURSOR'
  | AlterTableLeftSide 'ADD' 'CONSTRAINT' RegularOrBacktickedIdentifier 'CURSOR'
    {
-     parser.suggestKeywords(['FOREIGN KEY', 'PRIMARY KEY']);
+     parser.suggestKeywords(['CHECK', 'FOREIGN KEY', 'PRIMARY KEY', 'UNIQUE']);
    }
  | AlterTableLeftSide 'ADD' 'CONSTRAINT' RegularOrBacktickedIdentifier PrimaryKeySpecification_EDIT
  | AlterTableLeftSide 'ADD' 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification_EDIT

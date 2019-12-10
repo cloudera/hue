@@ -285,12 +285,12 @@ OptionalColumnSpecificationsOrLike_EDIT
 
 ParenthesizedColumnSpecificationList
  : '(' ColumnSpecificationList ')'                              -> $2
- | '(' ColumnSpecificationList ',' ConstraintSpecification ')'  -> $2
+ | '(' ColumnSpecificationList ',' TableConstraints ')'  -> $2
  ;
 
 ParenthesizedColumnSpecificationList_EDIT
  : '(' ColumnSpecificationList_EDIT RightParenthesisOrError
- | '(' ColumnSpecificationList ',' ConstraintSpecification_EDIT RightParenthesisOrError
+ | '(' ColumnSpecificationList ',' TableConstraints_EDIT RightParenthesisOrError
  | '(' ColumnSpecificationList ',' 'CURSOR' RightParenthesisOrError
    {
      parser.suggestKeywords([{ value: 'PRIMARY KEY', weight: 2 }, { value: 'CONSTRAINT', weight: 1 }]);
@@ -334,6 +334,7 @@ ColumnSpecification
      if (!$4) {
        keywords = keywords.concat([
          { value: 'COMMENT', weight: 1 },
+         { value: 'CHECK', weight: 2 },
          { value: 'PRIMARY KEY', weight: 2 },
          { value: 'UNIQUE', weight: 2 },
          { value: 'NOT NULL', weight: 2 },
@@ -370,12 +371,13 @@ ColumnOptions
  ;
 
 ColumnOption
- : 'PRIMARY' 'KEY' ColumnOptionOptionals        -> $3
- | 'PRIMARY'                                    -> { suggestKeywords: [{ value: 'KEY', weight: 3 }] }
- | 'UNIQUE' ColumnOptionOptionals               -> $2
- | 'NOT' 'NULL' ColumnOptionOptionals           -> $3
- | 'NOT'                                        -> { suggestKeywords: [{ value: 'NULL', weight: 3 }] }
- | 'DEFAULT' DefaultValue ColumnOptionOptionals -> $3
+ : 'PRIMARY' 'KEY' ColumnOptionOptionals                  -> $3
+ | 'PRIMARY'                                              -> { suggestKeywords: [{ value: 'KEY', weight: 3 }] }
+ | 'UNIQUE' ColumnOptionOptionals                         -> $2
+ | 'NOT' 'NULL' ColumnOptionOptionals                     -> $3
+ | 'NOT'                                                  -> { suggestKeywords: [{ value: 'NULL', weight: 3 }] }
+ | 'DEFAULT' DefaultValue ColumnOptionOptionals           -> $3
+ | 'CHECK' '(' ValueExpression ')' ColumnOptionOptionals  -> $5
  | 'DEFAULT'
    {
      $$ = {
@@ -587,35 +589,62 @@ GreaterThanOrError
  | error
  ;
 
-ConstraintSpecification
+TableConstraints
  : PrimaryKeySpecification
- | 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification
- | PrimaryKeySpecification ',' 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification
+ | ConstraintList
+ | PrimaryKeySpecification ',' ConstraintList
  ;
 
-ConstraintSpecification_EDIT
+TableConstraints_EDIT
  : PrimaryKeySpecification_EDIT
  | PrimaryKeySpecification ',' 'CURSOR'
    {
      parser.suggestKeywords(['CONSTRAINT']);
    }
- | PrimaryKeySpecification ',' 'CONSTRAINT' RegularOrBacktickedIdentifier 'CURSOR'
+ | ConstraintList_EDIT
+ | PrimaryKeySpecification ',' ConstraintList_EDIT
+ | PrimaryKeySpecification_EDIT ',' ConstraintList
+ ;
+
+ConstraintList
+ : TableConstraint
+ | ConstraintList ',' TableConstraint
+ ;
+
+ConstraintList_EDIT
+ : TableConstraint_EDIT
+ | ConstraintList ',' TableConstraint_EDIT
+ ;
+
+TableConstraint
+ : TableConstraintLeftPart OptionalDisable OptionalNovalidate OptionalRelyOrNorely
+ ;
+
+TableConstraint_EDIT
+ : TableConstraintLeftPart_EDIT OptionalDisable OptionalNovalidate OptionalRelyOrNorely
+ | TableConstraintLeftPart OptionalDisable OptionalNovalidate OptionalRelyOrNorely 'CURSOR'
    {
-     parser.suggestKeywords(['FOREIGN KEY']);
+     parser.suggestKeywordsForOptionalsLR([$4, $3, $2], [
+       [{ value: 'RELY', weight: 1 }, { value: 'NORELY', weight: 1 }],
+       { value: 'NOVALIDATE', weight: 2 },
+       { value: 'DISABLE', weight: 3 }
+     ]);
    }
- | PrimaryKeySpecification ',' 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification_EDIT
- | PrimaryKeySpecification_EDIT ',' 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification
- | 'CONSTRAINT' RegularOrBacktickedIdentifier 'CURSOR'
+ ;
+
+TableConstraintLeftPart
+ : 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification
+ | 'CONSTRAINT' RegularOrBacktickedIdentifier 'CHECK' '(' ValueExpression ')'
+ | 'CONSTRAINT' RegularOrBacktickedIdentifier 'UNIQUE' ParenthesizedColumnList
+ ;
+
+TableConstraintLeftPart_EDIT
+ : 'CONSTRAINT' RegularOrBacktickedIdentifier 'CURSOR'
    {
      parser.suggestKeywords(['CHECK', 'FOREIGN KEY', 'UNIQUE']);
    }
  | 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification_EDIT
- | 'CURSOR' 'CONSTRAINT' RegularOrBacktickedIdentifier ForeignKeySpecification
-   {
-     parser.suggestKeywords(['PRIMARY KEY']);
-   }
  ;
-
 PrimaryKeySpecification
  : PrimaryKey ParenthesizedColumnList OptionalDisable OptionalNovalidate OptionalRelyOrNorely
  ;
@@ -633,7 +662,7 @@ PrimaryKeySpecification_EDIT
  ;
 
 ForeignKeySpecification
- : 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList OptionalDisable OptionalNovalidate OptionalRelyOrNorely
+ : 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList
    {
      parser.addTablePrimary($5);
    }
@@ -658,14 +687,6 @@ ForeignKeySpecification_EDIT
  | 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList_EDIT
    {
      parser.addTablePrimary($5);
-   }
- | 'FOREIGN' 'KEY' ParenthesizedColumnList 'REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList OptionalDisable OptionalNovalidate OptionalRelyOrNorely 'CURSOR'
-   {
-     parser.addTablePrimary($5);
-     parser.suggestKeywordsForOptionalsLR([$9, $8, $7], [
-        [{ value: 'RELY', weight: 1 }, { value: 'NORELY', weight: 1 }],
-        { value: 'NOVALIDATE', weight: 2 },
-        { value: 'DISABLE', weight: 1 }]);
    }
  ;
 
