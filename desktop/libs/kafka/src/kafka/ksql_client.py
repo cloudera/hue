@@ -25,8 +25,12 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.rest.http_client import RestException
+from desktop.conf import has_channels
 
 from kafka.conf import KAFKA
+
+if has_channels():
+  from notebook.consumer import _send_to_channel
 
 
 LOG = logging.getLogger(__name__)
@@ -48,6 +52,10 @@ class KSqlApi(object):
   https://pypi.org/project/ksql/
 
   pip install ksql
+
+  https://github.com/bryanyang0528/ksql-python/pull/60 fixes:
+  - STREAMS requires a LIMIT currently or will hang or run forever
+  - https://github.com/bryanyang0528/ksql-python/issues/57
   """
 
   def __init__(self, user=None, security_enabled=False, ssl_cert_ca_verify=False):
@@ -76,15 +84,25 @@ class KSqlApi(object):
     return response[0]
 
 
-  def query(self, statement):
+  def query(self, statement, channel_name=None):
     data = []
     metadata = []
 
     is_select = statement.strip().lower().startswith('select')
     if is_select or statement.strip().lower().startswith('print'):
-      # STREAMS requires a LIMIT currently or will hang without https://github.com/bryanyang0528/ksql-python/pull/60
+
       result = self.client.query(statement)
-      for line in ''.join(list(result)).split('\n'): # Until https://github.com/bryanyang0528/ksql-python/issues/57
+
+      metadata = [['Row', 'STRING']]
+
+      if has_channels() and channel_name:
+        _send_to_channel(
+            channel_name,
+            message_type='task.progress',
+            message_data={'status': 'running', 'query_id': 1111}
+        )
+
+      for line in result:
         # columns = line.keys()
         # data.append([line[col] for col in columns])
         if is_select and line: # Empty first 2 lines?
@@ -93,8 +111,15 @@ class KSqlApi(object):
             data.append(data_line['row']['columns'])
         else:
           data.append([line])
-        # TODO: WS to plug-in
-      metadata = [['Row', 'STRING']]
+
+        if has_channels() and channel_name:
+          _send_to_channel(
+              channel_name,
+              message_type='task.result',
+              message_data={'data': data, 'metadata': metadata, 'query_id': 1111}
+          )
+          # TODO: special message when end of stream
+          data = []
     else:
       data, metadata = self._decode_result(
         self.ksql(statement)

@@ -932,7 +932,7 @@ class TestStrictRedirection(object):
 
 class BaseTestPasswordConfig(object):
 
-  SCRIPT = '%s -c "print \'\\n password from script \\n\'"' % sys.executable
+  SCRIPT = '%s -c "print(\'\\n password from script \\n\')"' % sys.executable
 
   def get_config_password(self):
     raise NotImplementedError

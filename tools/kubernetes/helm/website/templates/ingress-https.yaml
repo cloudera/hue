@@ -2,16 +2,21 @@
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: gethue-ingress
+  name: gethue
   annotations:
     kubernetes.io/ingress.class: nginx
-    certmanager.k8s.io/cluster-issuer: letsencrypt-website-prod
-    certmanager.k8s.io/acme-challenge-type: http01
+    cert-manager.io/cluster-issuer: letsencrypt-website-prod
+    cert-manager.io/acme-challenge-type: http01
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/affinity: "cookie"
-    nginx.ingress.kubernetes.io/session-cookie-name: "hue-website-ingress"
+    nginx.ingress.kubernetes.io/session-cookie-name: "gethue-website"
     nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
     nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+    {{ if .Values.ingress.hasAuth }}
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: basic-auth-gethue
+    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
+    {{ end }}
 spec:
   rules:
   {{ if .Values.docs.enabled }}
@@ -20,7 +25,7 @@ spec:
       paths:
       - backend:
           serviceName: docs
-          servicePort: 80
+          servicePort: 9001
         path: /
   {{ end }}
   {{ if .Values.website.enabled }}
@@ -29,16 +34,16 @@ spec:
       paths:
       - backend:
           serviceName: website
-          servicePort: 80
+          servicePort: 9002
         path: /
   {{ end }}
   tls:
   - hosts:
-    {{- if .Values.docs.enabled -}}
+    {{ if .Values.docs.enabled }}
     - {{ .Values.docs.domain }}
-    {{- end -}}
-    {{- if .Values.website.enabled -}}
+    {{ end }}
+    {{ if .Values.website.enabled }}
     - {{ .Values.website.domain }}
-    {{- end -}}
-    secretName: letsencrypt-website-prod
+    {{ end }}
+    secretName: letsencrypt-website-prod-tls
 {{- end -}}

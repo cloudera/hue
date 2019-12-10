@@ -113,10 +113,21 @@ def _extract_query_params(filters):
   for name, value in filters.items():
     if name == 'text':
       filter_params['text'] = value
-      user_filter = re.search('((user):([^ ]+))', value)
+
+      user_filter = re.search('((user):([^ ]+))', filter_params['text'])
       if user_filter:
         filter_params['username'] = user_filter.group(3)
         filter_params['text'] = filter_params['text'].replace(user_filter.group(1), '').strip()
+
+      id_filter = re.search('((id):([^ ]+))', filter_params['text'])
+      if id_filter:
+        filter_params['id'] = id_filter.group(3)
+        filter_params['text'] = filter_params['text'].replace(id_filter.group(1), '').strip()
+
+      name_filter = re.search('((name):([^ ]+))', filter_params['text'])
+      if name_filter:
+        filter_params['name'] = name_filter.group(3)
+        filter_params['text'] = filter_params['text'].replace(name_filter.group(1), '').strip()
     else:
       filter_params[name] = value
 

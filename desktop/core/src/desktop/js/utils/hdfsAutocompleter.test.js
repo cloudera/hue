@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import HdfsAutocompleter from './hdfsAutocompleter';
 describe('hdfsAutocompleter.js', () => {

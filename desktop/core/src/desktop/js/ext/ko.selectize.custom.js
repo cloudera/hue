@@ -17,7 +17,7 @@
 // Based on https://gist.githubusercontent.com/xtranophilist/8001624/raw/ko_selectize.js
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import I18n from 'utils/i18n';
 

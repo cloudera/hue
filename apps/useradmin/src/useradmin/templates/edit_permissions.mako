@@ -14,10 +14,16 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-import urllib
+import sys
 
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
+
+if sys.version_info[0] > 2:
+  from urllib.parse import quote as urllib_quote
+  unicode = str
+else:
+  from urllib import quote as urllib_quote
 %>
 
 <%namespace name="layout" file="layout.mako" />
@@ -48,7 +54,7 @@ ${layout.menubar(section='permissions')}
     <h1 class="card-heading simple">${_('Hue Permissions - Edit app: %(app)s') % dict(app=app)}</h1>
     <br/>
 
-    <form id="editForm" action="${urllib.quote(action)}" method="POST" class="form form-horizontal">
+    <form id="editForm" action="${urllib_quote(action)}" method="POST" class="form form-horizontal">
       ${ csrf_token(request) | n,unicode }
       <fieldset>
           % for field in form:

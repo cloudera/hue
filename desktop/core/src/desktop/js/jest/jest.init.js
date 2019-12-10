@@ -22,7 +22,7 @@ import 'apps/notebook2/execution/sessionManager';
 import './jquery.setup';
 import './sqlTestUtils';
 
-import ko from 'knockout';
+import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
 
 ko.mapping = komapping;

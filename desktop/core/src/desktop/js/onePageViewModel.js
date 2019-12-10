@@ -16,7 +16,7 @@
 
 import $ from 'jquery';
 import _ from 'lodash';
-import ko from 'knockout';
+import * as ko from 'knockout';
 import page from 'page';
 
 import hueUtils from 'utils/hueUtils';

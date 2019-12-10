@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import { koSetup } from 'jest/koTestUtils';
 import { NAME } from './ko.inlineAutocomplete';
