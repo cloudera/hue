@@ -187,6 +187,7 @@
 'DIRECTORY'                          { this.begin('hdfs'); return 'DIRECTORY'; }
 'DISABLE'                            { return 'DISABLE'; }
 'DISTRIBUTE'                         { return 'DISTRIBUTE'; }
+'DISTRIBUTED'                        { return 'DISTRIBUTED'; }
 DOUBLE\s+PRECISION                   { return 'DOUBLE_PRECISION'; }
 'ENABLE'                             { return 'ENABLE'; }
 'ESCAPED'                            { return 'ESCAPED'; }
@@ -218,6 +219,7 @@ DOUBLE\s+PRECISION                   { return 'DOUBLE_PRECISION'; }
 'LOCATION'                           { this.begin('hdfs'); return 'LOCATION'; }
 'LOCK'                               { return 'LOCK'; }
 'LOCKS'                              { return 'LOCKS'; }
+'MATERIALIZED'                       { return 'MATERIALIZED'; }
 'MATCHED'                            { return 'MATCHED'; }
 'MERGE'                              { return 'MERGE'; }
 'METADATA'                           { return 'METADATA'; }
@@ -252,6 +254,7 @@ OVERWRITE\s+DIRECTORY                { this.begin('hdfs'); return 'OVERWRITE_DIR
 'REPLACE'                            { return 'REPLACE'; }
 'REPLICATION'                        { return 'REPLICATION'; }
 'RESTRICT'                           { return 'RESTRICT'; }
+'REWRITE'                            { return 'REWRITE'; }
 'ROLE'                               { return 'ROLE'; }
 'ROLES'                              { return 'ROLES'; }
 'SCHEMA'                             { return 'SCHEMA'; }

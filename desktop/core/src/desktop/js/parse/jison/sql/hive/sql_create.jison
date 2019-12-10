@@ -26,6 +26,7 @@ CreateStatement
  : DatabaseDefinition
  | TableDefinition
  | ViewDefinition
+ | MaterializedViewDefinition
  | RoleDefinition
  | FunctionDefinition
  | IndexDefinition
@@ -36,6 +37,7 @@ CreateStatement_EDIT
  : DatabaseDefinition_EDIT
  | TableDefinition_EDIT
  | ViewDefinition_EDIT
+ | MaterializedViewDefinition_EDIT
  | FunctionDefinition_EDIT
  | IndexDefinition_EDIT
  | MacroDefinition_EDIT
@@ -47,7 +49,7 @@ CreateStatement_EDIT
        if ($2 && !$3) {
          parser.suggestKeywords(['EXTERNAL TABLE', 'FUNCTION', 'MACRO', 'TABLE']);
        } else if (!$2 && !$3) {
-         parser.suggestKeywords(['DATABASE', 'EXTERNAL TABLE', 'FUNCTION', 'INDEX', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY EXTERNAL TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'TEMPORARY TABLE', 'TRANSACTIONAL TABLE', 'VIEW']);
+         parser.suggestKeywords(['DATABASE', 'EXTERNAL TABLE', 'FUNCTION', 'INDEX', 'MATERIALIZED VIEW', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY EXTERNAL TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'TEMPORARY TABLE', 'TRANSACTIONAL TABLE', 'VIEW']);
        } else if ($3) {
          parser.suggestKeywords(['TABLE']);
        }
@@ -207,7 +209,7 @@ TableDefinitionRightPart_EDIT
    OptionalWithSerdeproperties HdfsLocation_EDIT OptionalTblproperties OptionalAsSelectStatement
  | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy
    OptionalClusteredBy OptionalSkewedBy OptionalRowFormat OptionalStoredAsOrBy
-   OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties OptionalAsSelectStatement_EDIT
+   OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties AsSelectStatement_EDIT
  | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy
    OptionalClusteredBy OptionalSkewedBy OptionalRowFormat OptionalStoredAsOrBy
    OptionalWithSerdeproperties OptionalHdfsLocation OptionalTblproperties 'CURSOR'
@@ -737,6 +739,23 @@ PartitionedBy_EDIT
    }
  ;
 
+OptionalPartitionedOn
+ :
+ | PartitionedOn
+ ;
+
+PartitionedOn
+ : 'PARTITIONED' 'ON' ParenthesizedColumnList
+ ;
+
+PartitionedOn_EDIT
+ : 'PARTITIONED' 'CURSOR'
+   {
+     parser.suggestKeywords(['ON']);
+   }
+ | 'PARTITIONED' 'ON' ParenthesizedColumnList_EDIT
+ ;
+
 LessThanOrEqualTo
  : '<'
  | 'COMPARISON_OPERATOR' // This is fine for autocompletion
@@ -772,6 +791,58 @@ ClusteredBy_EDIT
    }
  | 'CLUSTERED' 'BY' ParenthesizedColumnList OptionalSortedBy_EDIT 'INTO' 'UNSIGNED_INTEGER' 'BUCKETS'
  | 'CLUSTERED' 'BY' ParenthesizedColumnList OptionalSortedBy_EDIT
+ ;
+
+OptionalClusteredOrDistributedOn
+ :
+ | ClusteredOn
+ | DistributedOn SortedOn
+ ;
+
+ClusteredOrDistributedOn_EDIT
+ : ClusteredOn_EDIT
+ | DistributedOn_EDIT
+ | DistributedOn 'CURSOR'
+   {
+     parser.suggestKeywords(['SORTED ON']);
+   }
+ | DistributedOn SortedOn_EDIT
+ ;
+
+ClusteredOn
+ : 'CLUSTERED' 'ON' ParenthesizedColumnList
+ ;
+
+ClusteredOn_EDIT
+ : 'CLUSTERED' 'CURSOR'
+   {
+     parser.suggestKeywords(['ON']);
+   }
+ | 'CLUSTERED' 'ON' ParenthesizedColumnList_EDIT
+ ;
+
+DistributedOn
+ : 'DISTRIBUTED' 'ON' ParenthesizedColumnList
+ ;
+
+DistributedOn_EDIT
+ : 'DISTRIBUTED' 'CURSOR'
+   {
+     parser.suggestKeywords(['ON']);
+   }
+ | 'DISTRIBUTED' 'ON' ParenthesizedColumnList_EDIT
+ ;
+
+SortedOn
+ : 'SORTED' 'ON' ParenthesizedColumnList
+ ;
+
+SortedOn_EDIT
+ : 'SORTED' 'CURSOR'
+   {
+     parser.suggestKeywords(['ON']);
+   }
+ | 'SORTED' 'ON' ParenthesizedColumnList_EDIT
  ;
 
 OptionalSortedBy
@@ -1090,10 +1161,14 @@ TblProperties
 
 OptionalAsSelectStatement
  :
- | 'AS' CommitLocations QuerySpecification
+ | AsSelectStatement
  ;
 
-OptionalAsSelectStatement_EDIT
+AsSelectStatement
+ : 'AS' CommitLocations QuerySpecification
+ ;
+
+AsSelectStatement_EDIT
  : 'AS' CommitLocations 'CURSOR'
    {
      parser.suggestKeywords(['SELECT']);
@@ -1105,6 +1180,76 @@ CommitLocations
  : /* empty */
    {
      parser.commitLocations();
+   }
+ ;
+
+MaterializedViewDefinition
+ : 'CREATE' 'MATERIALIZED' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier
+    OptionalDisableRewrite OptionalComment OptionalPartitionedOn OptionalClusteredOrDistributedOn
+    OptionalRowFormat OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties
+    AsSelectStatement
+ ;
+
+MaterializedViewDefinition_EDIT
+ : 'CREATE' 'MATERIALIZED' 'CURSOR'
+   {
+     parser.suggestKeywords(['VIEW']);
+   }
+ | 'CREATE' 'MATERIALIZED' 'VIEW' OptionalIfNotExists 'CURSOR'
+   {
+     if (!$4) {
+       parser.suggestKeywords(['IF NOT EXISTS']);
+     }
+     parser.suggestDatabases({ appendDot: true });
+   }
+ | 'CREATE' 'MATERIALIZED' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalDisableRewrite OptionalComment
+   OptionalPartitionedOn OptionalClusteredOrDistributedOn OptionalRowFormat OptionalStoredAsOrBy OptionalHdfsLocation
+   OptionalTblproperties 'CURSOR'
+   {
+     parser.suggestKeywordsForOptionalsLR([undefined, $12, $11, $10, $9, $8, $7, $6, $5], [
+       { value: 'AS SELECT', weight: 1 },
+       { value: 'TBLPROPERTIES', weight: 2 },
+       { value: 'LOCATION', weight: 3 },
+       [{ value: 'ROW FORMAT', weight: 4 }, { value: 'STORED AS', weight: 4 }, { value: 'STORED BY', weight: 4 }],
+       [{ value: 'CLUSTERED ON', weight: 5 }, { value: 'DISTRIBUTED ON', weight: 5 }],
+       { value: 'PARTITIONED ON', weight: 6 },
+       { value: 'COMMENT', weight: 7 },
+       { value: 'DISABLE REWRITE', weight: 8 }
+     ]);
+   }
+ | 'CREATE' 'MATERIALIZED' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier DisableRewrite_EDIT OptionalComment
+   OptionalPartitionedOn OptionalClusteredOrDistributedOn OptionalRowFormat OptionalStoredAsOrBy OptionalHdfsLocation
+   OptionalTblproperties
+ | 'CREATE' 'MATERIALIZED' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalDisableRewrite OptionalComment
+   PartitionedOn_EDIT OptionalClusteredOrDistributedOn OptionalRowFormat OptionalStoredAsOrBy OptionalHdfsLocation
+   OptionalTblproperties
+ | 'CREATE' 'MATERIALIZED' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalDisableRewrite OptionalComment
+   OptionalPartitionedOn ClusteredOrDistributedOn_EDIT OptionalRowFormat OptionalStoredAsOrBy OptionalHdfsLocation
+   OptionalTblproperties
+ | 'CREATE' 'MATERIALIZED' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalDisableRewrite OptionalComment
+   OptionalPartitionedOn OptionalClusteredOrDistributedOn RowFormat_EDIT OptionalStoredAsOrBy OptionalHdfsLocation
+   OptionalTblproperties
+ | 'CREATE' 'MATERIALIZED' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalDisableRewrite OptionalComment
+   OptionalPartitionedOn OptionalClusteredOrDistributedOn OptionalRowFormat StoredAsOrBy_EDIT OptionalHdfsLocation
+   OptionalTblproperties
+ | 'CREATE' 'MATERIALIZED' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalDisableRewrite OptionalComment
+   OptionalPartitionedOn OptionalClusteredOrDistributedOn OptionalRowFormat OptionalStoredAsOrBy HdfsLocation_EDIT
+   OptionalTblproperties
+ | 'CREATE' 'MATERIALIZED' 'VIEW' OptionalIfNotExists SchemaQualifiedIdentifier OptionalDisableRewrite OptionalComment
+   OptionalPartitionedOn OptionalClusteredOrDistributedOn OptionalRowFormat OptionalStoredAsOrBy OptionalHdfsLocation
+   OptionalTblproperties AsSelectStatement_EDIT
+ ;
+
+
+OptionalDisableRewrite
+ :
+ | 'DISABLE' 'REWRITE'
+ ;
+
+DisableRewrite_EDIT
+ : 'DISABLE' 'CURSOR'
+   {
+     parser.suggestKeywords(['REWRITE']);
    }
  ;
 
@@ -1263,7 +1408,7 @@ RoleDefinition
 IndexDefinition
  : 'CREATE' 'INDEX' RegularOrBacktickedIdentifier 'ON' 'TABLE' ExistingTable ParenthesizedIndexColumnList
    'AS' IndexType OptionalWithDeferredRebuild OptionalIdxProperties OptionalInTable OptionalRowFormat
-   OptionalStoredAsOrBy  OptionalHdfsLocation OptionalTblproperties OptionalComment
+   OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalComment
  ;
 
 IndexDefinition_EDIT
