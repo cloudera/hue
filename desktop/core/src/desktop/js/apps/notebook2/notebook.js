@@ -624,7 +624,10 @@ export default class Notebook {
 
     const updateHistoryCall = item => {
       apiHelper
-        .checkStatus({ notebookJson: JSON.stringify({ uuid: item.uuid() }) })
+        .checkStatus({
+          notebookJson: JSON.stringify({ uuid: item.uuid() }),
+          silenceErrors: true
+        })
         .then(data => {
           const status =
             data.status === -3
