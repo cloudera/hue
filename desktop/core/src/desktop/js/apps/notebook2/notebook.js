@@ -93,25 +93,6 @@ export default class Notebook {
     this.historyFilter = ko.observable('');
     this.historyFilterVisible = ko.observable(false);
     this.historyFilter.extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 900 } });
-    this.historyFilter.subscribe(() => {
-      if (this.historyCurrentPage() !== 1) {
-        this.historyCurrentPage(1);
-      } else {
-        this.fetchHistory();
-      }
-    });
-    this.loadingHistory = ko.observable(this.history().length === 0);
-    this.historyInitialHeight = ko.observable(0).extend({ throttle: 1000 });
-    this.forceHistoryInitialHeight = ko.observable(false);
-    this.historyCurrentPage = ko.observable(
-      vm.selectedNotebook() ? vm.selectedNotebook().historyCurrentPage() : 1
-    );
-    this.historyCurrentPage.subscribe(() => {
-      this.fetchHistory();
-    });
-    this.historyTotalPages = ko.observable(
-      vm.selectedNotebook() ? vm.selectedNotebook().historyTotalPages() : 1
-    );
 
     this.schedulerViewModel = null;
     this.schedulerViewModelIsLoaded = ko.observable(false);
@@ -132,7 +113,6 @@ export default class Notebook {
     this.canSave = vm.canSave;
 
     this.unloaded = ko.observable(false);
-    this.updateHistoryFailed = false;
 
     this.viewSchedulerId = ko.observable(notebookRaw.viewSchedulerId || '');
     this.viewSchedulerId.subscribe(() => {
@@ -156,12 +136,6 @@ export default class Notebook {
           const _snippet = new Snippet(vm, this, snippet);
           _snippet.init();
           this.presentationSnippets()[key] = _snippet;
-        });
-      }
-      if (vm.editorMode() && this.history().length === 0) {
-        this.fetchHistory(() => {
-          this.updateHistory(['starting', 'running'], 30000);
-          this.updateHistory(['available'], 60000 * 5);
         });
       }
     }
@@ -277,46 +251,6 @@ export default class Notebook {
     this.snippets()[this.executingAllIndex()].execute();
   }
 
-  fetchHistory(callback) {
-    const QUERIES_PER_PAGE = 50;
-    this.loadingHistory(true);
-
-    $.get(
-      '/notebook/api/get_history',
-      {
-        doc_type: this.selectedSnippet(),
-        limit: QUERIES_PER_PAGE,
-        page: this.historyCurrentPage(),
-        doc_text: this.historyFilter(),
-        is_notification_manager: this.parentVm.isNotificationManager()
-      },
-      data => {
-        const parsedHistory = [];
-        if (data && data.history) {
-          data.history.forEach(nbk => {
-            parsedHistory.push(
-              this.makeHistoryRecord(
-                nbk.absoluteUrl,
-                nbk.data.statement,
-                nbk.data.lastExecuted,
-                nbk.data.status,
-                nbk.name,
-                nbk.uuid
-              )
-            );
-          });
-        }
-        this.history(parsedHistory);
-        this.historyTotalPages(Math.ceil(data.count / QUERIES_PER_PAGE));
-      }
-    ).always(() => {
-      this.loadingHistory(false);
-      if (callback) {
-        callback();
-      }
-    });
-  }
-
   getSnippets(type) {
     return this.snippets().filter(snippet => snippet.type() === type);
   }
@@ -397,17 +331,6 @@ export default class Notebook {
     }
   }
 
-  makeHistoryRecord(url, statement, lastExecuted, status, name, uuid) {
-    return komapping.fromJS({
-      url: url,
-      query: statement.substring(0, 1000) + (statement.length > 1000 ? '...' : ''),
-      lastExecuted: lastExecuted,
-      status: status,
-      name: name,
-      uuid: uuid
-    });
-  }
-
   newSnippet(type) {
     if (type) {
       this.selectedSnippet(type);
@@ -437,18 +360,6 @@ export default class Notebook {
       }
     });
     this.snippets(this.snippets().move(this.snippets().length - 1, idx));
-  }
-
-  nextHistoryPage() {
-    if (this.historyCurrentPage() < this.historyTotalPages()) {
-      this.historyCurrentPage(this.historyCurrentPage() + 1);
-    }
-  }
-
-  prevHistoryPage() {
-    if (this.historyCurrentPage() !== 1) {
-      this.historyCurrentPage(this.historyCurrentPage() - 1);
-    }
   }
 
   async save(callback) {
@@ -615,54 +526,5 @@ export default class Notebook {
       }
     });
     return currentQueries;
-  }
-
-  updateHistory(statuses, interval) {
-    let items = this.history()
-      .filter(item => statuses.indexOf(item.status()) !== -1)
-      .slice(0, 25);
-
-    const updateHistoryCall = item => {
-      apiHelper
-        .checkStatus({
-          notebookJson: JSON.stringify({ uuid: item.uuid() }),
-          silenceErrors: true
-        })
-        .then(data => {
-          const status =
-            data.status === -3
-              ? 'expired'
-              : data.status === 0
-              ? data.query_status.status
-              : 'failed';
-          if (status && item.status() !== status) {
-            item.status(status);
-          }
-        })
-        .fail(() => {
-          items = [];
-          this.updateHistoryFailed = true;
-          console.warn('Lost connectivity to the Hue history refresh backend.');
-        })
-        .always(() => {
-          if (items.length > 0) {
-            window.setTimeout(() => {
-              updateHistoryCall(items.pop());
-            }, 1000);
-          } else if (!this.updateHistoryFailed) {
-            window.setTimeout(() => {
-              this.updateHistory(statuses, interval);
-            }, interval);
-          }
-        });
-    };
-
-    if (items.length > 0) {
-      updateHistoryCall(items.pop());
-    } else if (!this.updateHistoryFailed) {
-      window.setTimeout(() => {
-        this.updateHistory(statuses, interval);
-      }, interval);
-    }
   }
 }
