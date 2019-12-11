@@ -173,6 +173,14 @@ export default class Executable {
         this.handle = response.handle;
         this.history = response.history;
         this.operationId = response.history.uuid;
+        if (response.handle.session_id) {
+          sessionManager.updateSession({
+            type: response.handle.session_type,
+            id: response.handle.session_id,
+            session_id: response.handle.session_guid,
+            properties: []
+          });
+        }
       } catch (err) {
         const match = ERROR_REGEX.exec(err);
         if (match) {
