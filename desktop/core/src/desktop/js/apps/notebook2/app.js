@@ -517,37 +517,6 @@ export const initNotebook2 = () => {
           if (tab !== 'queryResults') {
             $('.hue-datatable-search').hide();
           }
-          if (tab === 'queryHistory') {
-            hueUtils.waitForRendered(
-              $('#queryHistory .history-table'),
-              el => {
-                return el.is(':visible');
-              },
-              () => {
-                viewModel.selectedNotebook().forceHistoryInitialHeight(true);
-                huePubSub.publish('editor.calculate.history.height');
-              }
-            );
-          }
-        },
-        HUE_PUB_SUB_EDITOR_ID
-      );
-
-      huePubSub.subscribe(
-        'editor.calculate.history.height',
-        () => {
-          if (
-            viewModel.editorMode() &&
-            (viewModel.selectedNotebook().historyInitialHeight() === 0 ||
-              viewModel.selectedNotebook().forceHistoryInitialHeight())
-          ) {
-            let h = $('#queryHistory .history-table').height();
-            if (h === 0) {
-              h = viewModel.selectedNotebook().history().length * 32;
-            }
-            viewModel.selectedNotebook().historyInitialHeight(h + 80); // add pagination too
-            viewModel.selectedNotebook().forceHistoryInitialHeight(false);
-          }
         },
         HUE_PUB_SUB_EDITOR_ID
       );

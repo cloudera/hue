@@ -547,61 +547,15 @@
         </ul>
 
         <div class="tab-content" style="border: none; overflow-x: hidden; min-height: 250px;">
-          <div class="tab-pane" id="queryHistory" style="min-height: 80px;" data-bind="css: {'active': currentQueryTab() == 'queryHistory'}, style: { 'height' : $parent.historyInitialHeight() > 0 ? Math.max($parent.historyInitialHeight(), 40) + 'px' : '' }">
-            <!-- ko if: $parent.loadingHistory -->
-            <div class="margin-top-10 margin-left-10">
-              <i class="fa fa-spinner fa-spin muted"></i>
-            </div>
-            <!-- /ko -->
-
-            <!-- ko ifnot: $parent.loadingHistory -->
-            <!-- ko if: $parent.history().length === 0 && $parent.historyFilter() === '' -->
-            <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("No queries to be shown.") }</div>
-            <!-- /ko -->
-            <!-- ko if: $parent.history().length === 0 && $parent.historyFilter() !== '' -->
-            <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _('No queries found for') } <strong data-bind="text: $parent.historyFilter"></strong>.</div>
-            <!-- /ko -->
-
-
-            <!-- ko if: $parent.history().length > 0 -->
-            <table class="table table-condensed margin-top-10 history-table">
-              <tbody data-bind="foreach: { data: $parent.history, afterRender: function(){ huePubSub.publish('editor.calculate.history.height'); } }">
-              <tr data-bind="click: function() { if (uuid() != $root.selectedNotebook().uuid()) { $root.openNotebook(uuid()); } }, css: { 'highlight': uuid() == $root.selectedNotebook().uuid(), 'pointer': uuid() != $root.selectedNotebook().uuid() }">
-                <td style="width: 100px" class="muted" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}">
-                  <span data-bind="momentFromNow: {data: lastExecuted, interval: 10000, titleFormat: 'LLL'}"></span>
-                </td>
-                <td style="width: 25px" class="muted" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}">
-                  <!-- ko switch: status -->
-                  <!-- ko case: 'running' -->
-                  <div class="history-status" data-bind="tooltip: { title: '${ _ko("Query running") }', placement: 'bottom' }"><i class="fa fa-fighter-jet fa-fw"></i></div>
-                  <!-- /ko -->
-                  <!-- ko case: 'failed' -->
-                  <div class="history-status" data-bind="tooltip: { title: '${ _ko("Query failed") }', placement: 'bottom' }"><i class="fa fa-exclamation fa-fw"></i></div>
-                  <!-- /ko -->
-                  <!-- ko case: 'available' -->
-                  <div class="history-status" data-bind="tooltip: { title: '${ _ko("Result available") }', placement: 'bottom' }"><i class="fa fa-check fa-fw"></i></div>
-                  <!-- /ko -->
-                  <!-- ko case: 'expired' -->
-                  <div class="history-status" data-bind="tooltip: { title: '${ _ko("Result expired") }', placement: 'bottom' }"><i class="fa fa-unlink fa-fw"></i></div>
-                  <!-- /ko -->
-                  <!-- /ko -->
-                </td>
-                <td style="width: 25px" class="muted" data-bind="ellipsis: {data: name(), length: 30}, style: {'border-top-width': $index() == 0 ? '0' : ''}"></td>
-                <td data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}, click: function(){ if (window.getSelection().toString() === '' && uuid() != $root.selectedNotebook().uuid()) { $root.openNotebook(uuid()) }  }, clickBubble: false"><div data-bind="highlight: { value: query, dialect: $parent.type }"></div></td>
-              </tr>
-              </tbody>
-            </table>
-            <!-- /ko -->
-            <!-- ko with: $parent -->
-            <div class="pagination" data-bind="visible: historyTotalPages() > 1">
-              <ul>
-                <li data-bind="css: { 'disabled' : historyCurrentPage() === 1 }"><a href="javascript: void(0);" data-bind="click: function() { prevHistoryPage(); }">${ _("Prev") }</a></li>
-                <li class="active"><span data-bind="text: historyCurrentPage() + '/' + historyTotalPages()"></span></li>
-                <li data-bind="css: { 'disabled' : historyCurrentPage() === historyTotalPages() }"><a href="javascript: void(0);" data-bind="click: function() { nextHistoryPage(); }">${ _("Next") }</a></li>
-              </ul>
-            </div>
-            <!-- /ko -->
-            <!-- /ko -->
+          <div class="tab-pane" id="queryHistory" style="min-height: 80px;" data-bind="css: {'active': currentQueryTab() == 'queryHistory'}">
+            <!-- ko component: {
+              name: 'query-history',
+              params: {
+                currentNotebook: parentNotebook,
+                openFunction: parentVm.openNotebook.bind(parentVm),
+                type: type
+              }
+            } --><!-- /ko -->
           </div>
 
           <div class="tab-pane" id="savedQueries" data-bind="css: {'active': currentQueryTab() == 'savedQueries'}" style="overflow: hidden">

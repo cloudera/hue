@@ -24,6 +24,7 @@ import 'apps/notebook2/components/ko.executableLogs';
 import 'apps/notebook2/components/ko.executableProgressBar';
 import 'apps/notebook2/components/ko.snippetEditorActions';
 import 'apps/notebook2/components/ko.snippetResults';
+import 'apps/notebook2/components/ko.queryHistory';
 
 import AceAutocompleteWrapper from 'apps/notebook/aceAutocompleteWrapper';
 import apiHelper from 'api/apiHelper';

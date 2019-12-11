@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.queryHistory.js should render component 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;query-history&quot;, params: params }\\"><div class=\\"margin-top-10 margin-left-10\\">
+    <i class=\\"fa fa-spinner fa-spin muted\\"></i>
+  </div><div class=\\"margin-top-10 margin-left-10\\" style=\\"font-style: italic\\">No queries to be shown.</div><div class=\\"margin-top-10 margin-left-10\\" style=\\"font-style: italic\\">No queries found for <strong data-bind=\\"text: historyFilter\\"></strong>.</div><table class=\\"table table-condensed margin-top-10 history-table\\">
+      <tbody data-bind=\\"foreach: history\\"></tbody>
+    </table><div class=\\"pagination\\" data-bind=\\"visible: historyTotalPages() > 1\\" style=\\"display: none;\\">
+    <ul>
+      <li data-bind=\\"css: { 'disabled' : historyCurrentPage() === 1 }\\" class=\\"disabled\\">
+        <a href=\\"javascript: void(0);\\" data-bind=\\"click: prevHistoryPage.bind($data)\\">Prev</a>
+      </li>
+      <li class=\\"active\\"><span data-bind=\\"text: historyCurrentPage() + '/' + historyTotalPages()\\">1/1</span></li>
+      <li data-bind=\\"css: { 'disabled' : historyCurrentPage() === historyTotalPages() }\\" class=\\"disabled\\">
+        <a href=\\"javascript: void(0);\\" data-bind=\\"click: nextHistoryPage.bind($data)\\">Next</a>
+      </li>
+    </ul>
+  </div></div>"
+`;

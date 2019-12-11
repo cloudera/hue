@@ -1,0 +1,267 @@
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+import * as ko from 'knockout';
+
+import apiHelper from 'api/apiHelper';
+import componentUtils from 'ko/components/componentUtils';
+import DisposableComponent from 'ko/components/DisposableComponent';
+import I18n from 'utils/i18n';
+import { EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
+import { sleep } from 'utils/hueUtils';
+
+export const NAME = 'query-history';
+
+// prettier-ignore
+const TEMPLATE = `
+<!-- ko if: loadingHistory -->
+  <div class="margin-top-10 margin-left-10">
+    <i class="fa fa-spinner fa-spin muted"></i>
+  </div>
+<!-- /ko -->
+
+<!-- ko ifnot: loadingHistory -->
+  <!-- ko if: !history().length -->
+    <!-- ko ifnot: historyFilter -->
+      <div class="margin-top-10 margin-left-10" style="font-style: italic">${ I18n("No queries to be shown.") }</div>
+    <!-- /ko -->
+    <!-- ko if: historyFilter -->
+      <div class="margin-top-10 margin-left-10" style="font-style: italic">${ I18n('No queries found for') } <strong data-bind="text: historyFilter"></strong>.</div>
+    <!-- /ko -->
+  <!-- /ko -->
+
+  <!-- ko if: history().length -->
+    <table class="table table-condensed margin-top-10 history-table">
+      <tbody data-bind="foreach: history">
+        <tr data-bind="
+            click: function() {
+              $parent.openNotebook(uuid);
+            },
+            css: {
+              'highlight': uuid === $parent.currentNotebook.uuid(),
+              'pointer': uuid !== $parent.currentNotebook.uuid()
+            }
+          ">
+          <td style="width: 100px" class="muted" data-bind="style: { 'border-top-width': $index() === 0 ? '0' : ''}">
+            <span data-bind="momentFromNow: { data: lastExecuted, interval: 10000, titleFormat: 'LLL' }"></span>
+          </td>
+          <td style="width: 25px" class="muted" data-bind="style: { 'border-top-width': $index() === 0 ? '0' : ''}">
+            <!-- ko switch: status -->
+              <!-- ko case: 'running' -->
+              <div class="history-status" data-bind="tooltip: { title: '${ I18n("Query running") }', placement: 'bottom' }"><i class="fa fa-fighter-jet fa-fw"></i></div>
+              <!-- /ko -->
+              <!-- ko case: 'failed' -->
+              <div class="history-status" data-bind="tooltip: { title: '${ I18n("Query failed") }', placement: 'bottom' }"><i class="fa fa-exclamation fa-fw"></i></div>
+              <!-- /ko -->
+              <!-- ko case: 'available' -->
+              <div class="history-status" data-bind="tooltip: { title: '${ I18n("Result available") }', placement: 'bottom' }"><i class="fa fa-check fa-fw"></i></div>
+              <!-- /ko -->
+              <!-- ko case: 'expired' -->
+              <div class="history-status" data-bind="tooltip: { title: '${ I18n("Result expired") }', placement: 'bottom' }"><i class="fa fa-unlink fa-fw"></i></div>
+              <!-- /ko -->
+            <!-- /ko -->
+          </td>
+          <td style="width: 25px" class="muted" data-bind="
+              ellipsis: {
+                data: name,
+                length: 30
+              },
+              style: {
+                'border-top-width': $index() === 0 ? '0' : ''
+              }
+            "></td>
+          <td data-bind="
+              style: {
+                'border-top-width': $index() === 0 ? '0' : ''
+              },
+              click: function() {
+                $parent.openNotebook(uuid)
+              },
+              clickBubble: false
+            "><div data-bind="highlight: { value: query, dialect: $parent.type }"></div></td>
+        </tr>
+      </tbody>
+    </table>
+  <!-- /ko -->
+
+  <div class="pagination" data-bind="visible: historyTotalPages() > 1" style="display: none;">
+    <ul>
+      <li data-bind="css: { 'disabled' : historyCurrentPage() === 1 }">
+        <a href="javascript: void(0);" data-bind="click: prevHistoryPage.bind($data)">${ I18n("Prev") }</a>
+      </li>
+      <li class="active"><span data-bind="text: historyCurrentPage() + '/' + historyTotalPages()"></span></li>
+      <li data-bind="css: { 'disabled' : historyCurrentPage() === historyTotalPages() }">
+        <a href="javascript: void(0);" data-bind="click: nextHistoryPage.bind($data)">${ I18n("Next") }</a>
+      </li>
+    </ul>
+  </div>
+<!-- /ko -->
+`;
+
+const QUERIES_PER_PAGE = 50;
+
+const AVAILABLE_INTERVAL = 60000 * 5;
+const STARTING_RUNNING_INTERVAL = 30000;
+
+const trimEllipsis = str => str.substring(0, 1000) + (str.length > 1000 ? '...' : '');
+
+class QueryHistory extends DisposableComponent {
+  constructor(params) {
+    super();
+    this.currentNotebook = params.currentNotebook;
+    this.type = params.type;
+    this.openFunction = params.openFunction;
+
+    this.loadingHistory = ko.observable(true);
+    this.history = ko.observableArray();
+    this.historyFilter = ko.observable('');
+
+    this.historyCurrentPage = ko.observable(1);
+    this.historyTotalPages = ko.observable(1);
+
+    this.refreshStatusFailed = false;
+
+    this.addDisposalCallback(() => {
+      this.refreshStatusFailed = true; // Cancels the status check intervals
+    });
+
+    this.subscribe(this.historyFilter, () => {
+      if (this.historyCurrentPage() !== 1) {
+        this.historyCurrentPage(1);
+      } else {
+        this.fetchHistory();
+      }
+    });
+
+    this.subscribe(this.historyCurrentPage, () => {
+      this.fetchHistory();
+    });
+
+    this.fetchHistory();
+  }
+
+  async fetchHistory() {
+    this.loadingHistory(true);
+
+    try {
+      const historyData = await apiHelper.getHistory({
+        type: this.type(),
+        limit: QUERIES_PER_PAGE,
+        page: this.historyCurrentPage(),
+        docFilter: this.historyFilter()
+      });
+
+      if (historyData && historyData.history) {
+        this.history(
+          historyData.history.map(historyRecord => ({
+            url: historyRecord.absoluteUrl,
+            query: trimEllipsis(historyRecord.data.statement),
+            lastExecuted: historyRecord.data.lastExecuted,
+            status: ko.observable(historyRecord.data.status),
+            name: historyRecord.name,
+            uuid: historyRecord.uuid
+          }))
+        );
+      } else {
+        this.history([]);
+      }
+
+      this.historyTotalPages(Math.ceil(historyData.count / QUERIES_PER_PAGE));
+    } catch (err) {
+      this.history([]);
+      this.historyTotalPages(1);
+    }
+
+    this.loadingHistory(false);
+    this.refreshStatus(
+      [EXECUTION_STATUS.starting, EXECUTION_STATUS.running],
+      STARTING_RUNNING_INTERVAL
+    );
+    this.refreshStatus([EXECUTION_STATUS.available], AVAILABLE_INTERVAL);
+  }
+
+  prevHistoryPage() {
+    if (this.historyCurrentPage() !== 1) {
+      this.historyCurrentPage(this.historyCurrentPage() - 1);
+    }
+  }
+
+  nextHistoryPage() {
+    if (this.historyCurrentPage() < this.historyTotalPages()) {
+      this.historyCurrentPage(this.historyCurrentPage() + 1);
+    }
+  }
+
+  openNotebook(uuid) {
+    if (window.getSelection().toString() === '' && uuid !== this.currentNotebook.uuid()) {
+      this.openFunction(uuid);
+    }
+  }
+
+  async refreshStatus(statusesToRefresh, interval) {
+    const statusIndex = {};
+    statusesToRefresh.forEach(status => {
+      statusIndex[status] = true;
+    });
+
+    const items = this.history()
+      .filter(item => statusIndex[item.status()])
+      .slice(0, 25);
+
+    const refreshStatusForItem = item => {
+      if (this.refreshStatusFailed) {
+        return;
+      }
+      apiHelper
+        .checkStatus({
+          notebookJson: JSON.stringify({ uuid: item.uuid }),
+          silenceErrors: true
+        })
+        .then(data => {
+          if (data.status === -3) {
+            item.status(EXECUTION_STATUS.expired);
+          } else if (data.status !== 0) {
+            item.status(EXECUTION_STATUS.failed);
+          } else if (data.query_status.status) {
+            item.status(data.query_status.status);
+          }
+        })
+        .fail(() => {
+          items.length = 0;
+          this.refreshStatusFailed = true;
+          console.warn('Failed checking status for the history items.');
+        })
+        .always(async () => {
+          if (items.length) {
+            await sleep(1000);
+            refreshStatusForItem(items.pop());
+          } else if (!this.refreshStatusFailed) {
+            await sleep(interval);
+            this.refreshStatus(statusesToRefresh, interval);
+          }
+        });
+    };
+
+    if (items.length) {
+      refreshStatusForItem(items.pop());
+    } else if (!this.refreshStatusFailed) {
+      await sleep(interval);
+      this.refreshStatus(statusesToRefresh, interval);
+    }
+  }
+}
+
+componentUtils.registerComponent(NAME, QueryHistory, TEMPLATE);
