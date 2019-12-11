@@ -1845,6 +1845,22 @@ class Snippet {
           }
 
           if (data.handle) {
+            if (data.handle.session_id) {
+              // Execute can update the session
+              if (!notebook.sessions().length) {
+                notebook.addSession(
+                  new Session(vm, {
+                    type: self.type(),
+                    session_id: data.handle.session_guid,
+                    id: data.handle.session_id,
+                    properties: {}
+                  })
+                );
+              } else {
+                notebook.sessions()[0].session_id(data.handle.session_guid);
+                notebook.sessions()[0].id(data.handle.session_id);
+              }
+            }
             if (vm.editorMode()) {
               if (vm.isNotificationManager()) {
                 // Update task status
