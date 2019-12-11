@@ -24,4 +24,4 @@ LOG = logging.getLogger(__name__)
 
 
 def index(request):
-  return render("connectors.mako", request, {})
+  return render("/connectors/connectors.mako", request, {})
