@@ -20,11 +20,36 @@ import sys
 from nose.tools import assert_equal, assert_true, assert_false
 
 from desktop.lib.connectors.api import _get_installed_connectors
+from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.test_utils import grant_access
+
+from useradmin.models import User
 
 if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock
 else:
   from mock import patch, Mock
+
+
+class TestConnectors(object):
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test_connector", recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="test_connector")
+    grant_access(self.user.username, self.user.username, "desktop")
+
+
+  def test_page(self):
+    response = self.client.get("/desktop/connectors/")
+
+    assert_equal(200, response.status_code)
+
+
+  def test_get_connector_types(self):
+    response = self.client.post("/desktop/connectors/api/types/")
+
+    assert_equal(200, response.status_code)
+
 
 def test_get_installed_editor_connectors():
 

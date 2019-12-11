@@ -28,8 +28,8 @@ else:
   TOP_SNAP = "50px"
 %>
 
-<%namespace name="actionbar" file="actionbar.mako" />
-<%namespace name="layout" file="about_layout.mako" />
+<%namespace name="actionbar" file="../actionbar.mako" />
+<%namespace name="layout" file="../about_layout.mako" />
 
 
 <script type="text/javascript">
