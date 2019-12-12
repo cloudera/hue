@@ -37,7 +37,7 @@ export const NAME = 'result-grid';
 
 // prettier-ignore
 const TEMPLATE = `
-<div class="result-actions-append">
+<div class="snippet-tab-actions-append">
   <div class="btn-group">
     <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: columnsVisible, css: { 'active' : columnsVisible }">
       <i class="fa fa-columns"></i> ${ I18n('Columns') }

@@ -60,7 +60,7 @@ const isStringColumn = type =>
 // prettier-ignore
 const TEMPLATE = `
 <div class="snippet-row">
-  <div class="result-actions">
+  <div class="snippet-tab-actions">
     <div class="btn-group">
       <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: showGrid, css: { 'active': showGrid }"><i class="fa fa-fw fa-th"></i> ${ I18n('Grid') }</button>
       <button class="btn btn-editor btn-mini disable-feedback" data-bind="toggle: showChart, css: { 'active': showChart }"><i class="hcha fa-fw hcha-bar-chart"></i> ${ I18n('Chart') }</button>
@@ -77,7 +77,7 @@ const TEMPLATE = `
     </div>
   </div>
   
-  <div class="result-body">
+  <div class="snippet-tab-body">
     <div data-bind="visible: type() !== 'table'" style="display:none; margin: 10px 0; overflow-y: auto">
       <!-- ko if: data().length && data()[0][1] != "" -->
       <pre data-bind="text: data()[0][1]" class="no-margin-bottom"></pre>
