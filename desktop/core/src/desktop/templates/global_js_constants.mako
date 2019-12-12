@@ -299,6 +299,8 @@
     'Foreign keys': '${_('Foreign keys')}',
     'Format the current SQL query': '${ _('Format the current SQL query') }',
     'Share the query selection via a link': '${ _('Share the query selection via a link') }',
+    'Share link': '${ _('Share link') }',
+    'Share as a gist': '${ _('Share as a gist') }',
     'Format': '${ _('Format') }',
     'France': '${ _('France') }',
     'Functions': '${ _('Functions') }',

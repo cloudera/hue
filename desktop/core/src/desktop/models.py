@@ -1389,6 +1389,16 @@ class Document2(models.Model):
       raise PopupException(_("Failed to share document: %s") % e)
     return self
 
+  def share_link(self, user, perm='read'):
+    if perm == 'read':
+      doc = doc.share(user, name=Document2Permission.LINK_READ_PERM, is_link_on=True)
+    elif perm == 'write':
+      doc = doc.share(user, name=Document2Permission.LINK_WRITE_PERM, is_link_on=True)
+    else:
+      doc = doc.share(user, name=Document2Permission.LINK_READ_PERM, is_link_on=False)
+      doc = doc.share(user, name=Document2Permission.LINK_WRITE_PERM, is_link_on=False)
+    return doc
+
   def update_permission(self, user, name='read', users=None, groups=None, is_link_on=False):
     # Check if user has access to grant permissions
     if users or groups:
