@@ -25,6 +25,7 @@ import hueUtils from 'utils/hueUtils';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 
 import Snippet, { STATUS as SNIPPET_STATUS } from 'apps/notebook2/snippet';
+import { HISTORY_CLEARED_EVENT } from 'apps/notebook2/components/ko.queryHistory';
 
 export default class Notebook {
   constructor(vm, notebookRaw) {
@@ -123,6 +124,14 @@ export default class Notebook {
       }
     }
 
+    huePubSub.subscribe(HISTORY_CLEARED_EVENT, () => {
+      if (this.isHistory()) {
+        this.id(null);
+        this.uuid(hueUtils.UUID());
+        this.parentVm.changeURL(this.parentVm.URLS.editor + '?type=' + this.parentVm.editorType());
+      }
+    });
+
     huePubSub.subscribeOnce(
       'assist.db.panel.ready',
       () => {
@@ -180,32 +189,6 @@ export default class Notebook {
     this.snippets.push(newSnippet);
     newSnippet.init();
     return newSnippet;
-  }
-
-  async clearHistory() {
-    hueAnalytics.log('notebook', 'clearHistory');
-    apiHelper
-      .clearNotebookHistory({
-        notebookJson: await this.toContextJson(),
-        docType: this.selectedSnippet(),
-        isNotificationManager: this.parentVm.isNotificationManager()
-      })
-      .then(() => {
-        this.history.removeAll();
-        if (this.isHistory()) {
-          this.id(null);
-          this.uuid(hueUtils.UUID());
-          this.parentVm.changeURL(
-            this.parentVm.URLS.editor + '?type=' + this.parentVm.editorType()
-          );
-        }
-      })
-      .fail(xhr => {
-        if (xhr.status !== 502) {
-          $(document).trigger('error', xhr.responseText);
-        }
-      });
-    $(document).trigger('hideHistoryModal');
   }
 
   clearResults() {

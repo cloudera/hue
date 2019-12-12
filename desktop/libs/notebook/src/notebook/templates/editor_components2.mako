@@ -495,14 +495,6 @@
                 <i class="fa fa-fw fa-ellipsis-v"></i>
               </a>
               <ul class="dropdown-menu">
-                <li data-bind="visible: $parent.history().length > 0">
-                  <!-- ko if: editorMode -->
-                  <a data-target="#clearHistoryModal${ suffix }" data-toggle="modal" rel="tooltip">
-                    <i class="fa fa-fw fa-calendar-times-o"></i> Clear
-                  </a>
-                  <!-- /ko -->
-                  <!-- ko ifnot: editorMode --><!-- /ko -->
-                </li>
                 <li><a href="javascript:void(0);" data-bind="click: exportHistory.bind($data)"><i class="fa fa-fw fa-download"></i> ${_('Export')}</a></li>
                 <li><a href="javascript:void(0);" data-bind="publish: { 'show.import.documents.modal': { importedCallback: refreshHistory.bind($data.parentNotebook), isHistory: true }}"><i class="fa fa-fw fa-upload"></i> ${_('Import' )}</a></li>
               </ul>
@@ -1427,20 +1419,6 @@
     <div class="modal-footer">
       <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
       <input type="button" class="btn btn-primary disable-feedback" value="${_('Save')}" data-dismiss="modal" data-bind="click: function() { huePubSub.publish('save.snippet.to.file'); }"/>
-    </div>
-  </div>
-
-  <div id="clearHistoryModal${ suffix }" class="modal hide fade">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-      <h2 class="modal-title">${_('Confirm History Clear')}</h2>
-    </div>
-    <div class="modal-body">
-      <p>${_('Are you sure you want to clear the query history?')}</p>
-    </div>
-    <div class="modal-footer">
-      <a class="btn" data-dismiss="modal">${_('No')}</a>
-      <a class="btn btn-danger disable-feedback" data-bind="click: function() { $root.selectedNotebook().clearHistory(); }">${_('Yes')}</a>
     </div>
   </div>
 
