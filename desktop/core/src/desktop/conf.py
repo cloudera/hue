@@ -1870,6 +1870,17 @@ ENABLE_GIST = Config(
   help=_('Turn on the Gist snippet sharing.')
 )
 
+def default_gist_preview():
+  """Gist preview only enabled automatically in private setups."""
+  return not ENABLE_ORGANIZATIONS.get()
+
+ENABLE_GIST_PREVIEW = Config(
+  key='enable_gist_preview',
+  dynamic_default=default_gist_preview,
+  type=coerce_bool,
+  help=_('Add public description so that the link can be unfurled in a preview by websites like Slack.')
+)
+
 ENABLE_LINK_SHARING = Config(
   key='enable_link_sharing',
   default=False,
