@@ -42,8 +42,8 @@ from metadata.catalog_api import search_entities as metadata_search_entities, _h
 from notebook.connectors.altus import SdxApi, AnalyticDbApi, DataEngApi, DataWarehouse2Api
 from notebook.connectors.base import Notebook, get_interpreter
 
-from desktop.lib.django_util import JsonResponse
-from desktop.conf import get_clusters, IS_K8S_ONLY
+from desktop.lib.django_util import JsonResponse, login_notrequired, render
+from desktop.conf import get_clusters, IS_K8S_ONLY, ENABLE_GIST_PREVIEW
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
@@ -855,12 +855,13 @@ def gist_create(request):
   response = {'status': 0}
 
   statement = request.POST.get('statement', '')
-  gist_type = request.POST.get('doc_type', 'query-hive')
+  gist_type = request.POST.get('doc_type', 'hive')
   name = request.POST.get('name', '')
   description = request.POST.get('description', '')
 
   if not name:
-    name = _('%s Query') % gist_type.rsplit('-')[-1].capitalize()
+    name = _('%s Query') % gist_type.capitalize()
+  statement_raw = statement
   if not statement.strip().startswith('--'):
     statement = '-- Created by %s\n\n%s' % (request.user.get_full_name() or request.user.username, statement)
 
@@ -868,7 +869,7 @@ def gist_create(request):
     name=name,
     type='gist',
     owner=request.user,
-    data=json.dumps({'statement': statement}),
+    data=json.dumps({'statement': statement, 'statement_raw': statement_raw}),
     extra=gist_type,
     parent_directory=Document2.objects.get_gist_directory(request.user)
   )
@@ -884,15 +885,27 @@ def gist_create(request):
   return JsonResponse(response)
 
 
+@login_notrequired
 def gist_get(request):
   gist_uuid = request.GET.get('uuid')
 
   gist_doc = _get_gist_document(uuid=gist_uuid)
 
-  return redirect('/hue/editor?gist=%(uuid)s&type=%(type)s' % {
-    'uuid': gist_doc.uuid,
-    'type': gist_doc.extra.rsplit('-')[-1]
-  })
+  if ENABLE_GIST_PREVIEW.get() and 'Slackbot-LinkExpanding' in request.META.get('HTTP_USER_AGENT', ''):
+    statement = json.loads(gist_doc.data)['statement_raw']
+    return render(
+      'unfurl_link.mako',
+      request, {
+        'title': _('SQL gist from %s') % (gist_doc.owner.get_full_name() or gist_doc.owner.username),
+        'description': statement if len(statement) < 30 else (statement[:70] + '...'),
+        'image_link': None
+      }
+    )
+  else:
+    return redirect('/hue/editor?gist=%(uuid)s&type=%(type)s' % {
+      'uuid': gist_doc.uuid,
+      'type': gist_doc.extra
+    })
 
 
 def search_entities(request):

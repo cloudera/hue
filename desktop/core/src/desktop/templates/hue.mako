@@ -44,12 +44,12 @@
   <title>Hue</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   % if conf.CUSTOM.LOGO_SVG.get():
-  <link rel="icon" type="image/x-icon" href="${ static('desktop/art/custom-branding/favicon.ico') }"/>
+    <link rel="icon" type="image/x-icon" href="${ static('desktop/art/custom-branding/favicon.ico') }"/>
   % else:
-  <link rel="icon" type="image/x-icon" href="${ static('desktop/art/favicon.ico') }"/>
+    <link rel="icon" type="image/x-icon" href="${ static('desktop/art/favicon.ico') }"/>
   % endif
-  <meta name="description" content="">
-  <meta name="author" content="">
+  <meta name="description" content="Open source SQL Query Assistant for Databases/Warehouses.">
+  <meta name="author" content="Hue Team">
 
   <link href="${ static('desktop/css/roboto.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">

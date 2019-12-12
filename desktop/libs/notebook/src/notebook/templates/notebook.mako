@@ -14,7 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-  from desktop.views import commonheader, commonfooter, commonshare
+  from desktop.views import commonfooter, commonshare
   from desktop import conf
   from django.utils.translation import ugettext as _
   from notebook.conf import ENABLE_NOTEBOOK_2
@@ -28,7 +28,7 @@
 
 
 <div id="notebookComponents" class="notebook">
-%if ENABLE_NOTEBOOK_2.get():
+% if ENABLE_NOTEBOOK_2.get():
   ${ editorComponents2.includes(is_embeddable=is_embeddable, suffix='notebook') }
   ${ editorComponents2.topBar(suffix='notebook') }
   <%editorComponents2:commonHTML is_embeddable="${is_embeddable}" suffix="notebook">
@@ -53,7 +53,7 @@
   ${ notebookKoComponents.addSnippetMenu() }
 
   ${ editorComponents2.commonJS(is_embeddable=is_embeddable, bindableElement='notebookComponents', suffix='notebook') }
-%else:
+% else:
   ${ editorComponents.includes(is_embeddable=is_embeddable, suffix='notebook') }
   ${ editorComponents.topBar(suffix='notebook') }
   <%editorComponents:commonHTML is_embeddable="${is_embeddable}" suffix="notebook">
@@ -78,5 +78,5 @@
   ${ notebookKoComponents.addSnippetMenu() }
 
   ${ editorComponents.commonJS(is_embeddable=is_embeddable, bindableElement='notebookComponents', suffix='notebook') }
-%endif
+% endif
 </div>
