@@ -37,7 +37,7 @@ from django.utils.http import urlquote
 from desktop.lib import i18n
 
 if sys.version_info[0] > 2:
-  from io import StringIO as string_io
+  from io import BytesIO as string_io
 else:
   from StringIO import StringIO as string_io
 
@@ -154,7 +154,8 @@ def make_response(generator, format, name, encoding=None, user_agent=None): #TOD
 
   try:
     name = name.encode('ascii')
-    resp['Content-Disposition'] = 'attachment; filename="%s.%s"' % (name, format)
+    format = format.encode('ascii')
+    resp['Content-Disposition'] = b'attachment; filename="%s.%s"' % (name, format)
   except UnicodeEncodeError:
     name = urlquote(name)
     if user_agent is not None and 'Firefox' in user_agent:

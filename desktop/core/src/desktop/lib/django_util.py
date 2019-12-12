@@ -254,7 +254,7 @@ def render_injected(http_resp, extra_html):
     return http_resp
 
   # Look for the </body> tag and inject the popup <div>
-  markers = ('</body>', '</BODY>')
+  markers = (b'</body>', b'</BODY>')
   content = http_resp.content
   for marker in markers:
     pos = content.rfind(marker)
@@ -268,7 +268,9 @@ def render_injected(http_resp, extra_html):
     extra_html = extra_html.html
   if callable(extra_html):
     extra_html = extra_html()
-  http_resp.content = ''.join((content[:pos], extra_html, content[pos:]))
+  if not isinstance(extra_html, bytes):
+    extra_html = extra_html.encode('utf-8')
+  http_resp.content = b''.join((content[:pos], extra_html, content[pos:]))
   return http_resp
 
 

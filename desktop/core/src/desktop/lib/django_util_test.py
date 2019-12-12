@@ -151,15 +151,15 @@ def test_popup_injection():
   """Test that result injection works"""
   base = HttpResponse('<html><head></head><body>Hello</body></html>')
   resp = django_util.render_injected(base, ' Cookie monster')
-  assert_true('Hello Cookie monster' in resp.content)
+  assert_true(b'Hello Cookie monster' in resp.content)
 
   redirect = HttpResponseRedirect('http://www.cnn.com')
   resp = django_util.render_injected(redirect, 'Cookie monster')
-  assert_true('Cookie monster' not in resp.content)
+  assert_true(b'Cookie monster' not in resp.content)
 
   json = django_util.render_json('blah')
   resp = django_util.render_injected(json, 'Cookie monster')
-  assert_true('Cookie monster' not in resp.content)
+  assert_true(b'Cookie monster' not in resp.content)
 
   assert_raises(AssertionError, django_util.render_injected, "foo", "bar")
 
