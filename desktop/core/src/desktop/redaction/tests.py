@@ -83,7 +83,7 @@ class TestRedactionRule(object):
 
 
   def test_parse_redaction_policy_from_file(self):
-    with tempfile.NamedTemporaryFile() as f:
+    with tempfile.NamedTemporaryFile(mode='w') as f:
       json.dump({
           'version': 1,
           'rules': [

@@ -59,7 +59,7 @@ class TestDocModelTags(object):
   def share_doc(self, doc, permissions):
     response = self.client.post("/desktop/api/doc/update_permissions", {
         'doc_id': doc.id,
-        'data': json.dumps(*permissions)
+        'data': json.dumps(permissions)
     })
 
   def share_doc_read_only(self, doc):
