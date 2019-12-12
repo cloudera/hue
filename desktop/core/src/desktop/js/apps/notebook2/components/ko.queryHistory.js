@@ -28,6 +28,7 @@ import huePubSub from 'utils/huePubSub';
 
 export const NAME = 'query-history';
 export const HISTORY_CLEARED_EVENT = 'query.history.cleared';
+export const UPDATE_HISTORY_EVENT = 'query.history.update';
 
 // prettier-ignore
 const TEMPLATE = `
@@ -190,6 +191,8 @@ class QueryHistory extends DisposableComponent {
     });
 
     this.subscribe(this.historyCurrentPage, throttledFetch);
+
+    this.subscribe(UPDATE_HISTORY_EVENT, throttledFetch);
 
     throttledFetch();
   }
