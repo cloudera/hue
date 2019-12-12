@@ -1025,11 +1025,11 @@ class Document2Manager(models.Manager, Document2QueryMixin):
       return parent_home_dir
 
   def get_gist_directory(self, user):
-    try:
-      home_dir = self.get_home_directory(user)
-      return self.get(owner=user, parent_directory=home_dir, name=Document2.GIST_DIR, type='directory')
-    except Document2.DoesNotExist:
-      return self.create_user_directories(user)
+    home_dir = self.get_home_directory(user)
+    gist_dir, created = Directory.objects.get_or_create(name=Document2.GIST_DIR, owner=user, parent_directory=home_dir)
+    if created:
+      LOG.info('Successfully created gist directory for user: %s' % user.username)
+    return gist_dir
 
   def get_by_path(self, user, path):
     """
@@ -1070,12 +1070,6 @@ class Document2Manager(models.Manager, Document2QueryMixin):
 
     if created:
       LOG.info('Successfully created trash directory for user: %s' % user.username)
-
-    if ENABLE_GIST.get():
-      gist_dir, created = Directory.objects.get_or_create(name=Document2.GIST_DIR, owner=user, parent_directory=home_dir)
-
-      if created:
-        LOG.info('Successfully created gist directory for user: %s' % user.username)
 
     # For any directories or documents that do not have a parent directory, assign it to home directory
     count = 0
