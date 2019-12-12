@@ -70,7 +70,7 @@ export const CHART_TIMELINE_TYPE = {
 
 // prettier-ignore
 const TEMPLATE = `
-<div class="result-actions-append">
+<div class="snippet-tab-actions-append">
   <div class="btn-group">
     <button class="btn btn-mini btn-editor dropdown-toggle" data-toggle="dropdown">
       <!-- ko if: isBarChart -->
