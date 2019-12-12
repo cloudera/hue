@@ -41,6 +41,7 @@ import {
   REFRESH_STATEMENT_LOCATIONS_EVENT
 } from 'ko/bindings/ace/aceLocationHandler';
 import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from 'apps/notebook2/components/ko.executableActions';
+import { UPDATE_HISTORY_EVENT } from 'apps/notebook2/components/ko.queryHistory';
 
 // TODO: Remove for ENABLE_NOTEBOOK_2. Temporary here for debug
 window.SqlExecutable = SqlExecutable;
@@ -1053,6 +1054,13 @@ export default class Snippet {
 
   updateFromExecutable(executable) {
     if (executable) {
+      if (
+        executable.status === EXECUTION_STATUS.available ||
+        executable.status === EXECUTION_STATUS.failed ||
+        executable.status === EXECUTION_STATUS.success
+      ) {
+        huePubSub.publish(UPDATE_HISTORY_EVENT);
+      }
       this.status(executable.status);
       if (executable.result) {
         this.currentQueryTab('queryResults');
