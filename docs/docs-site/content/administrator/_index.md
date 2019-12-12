@@ -8,7 +8,7 @@ pre = "<b>1. </b>"
 
 ### Guide
 
-The following instructions describe how to install Hue and [configure it](/administrator/configuration/server/) to points to external services
+The following instructions describe how to install Hue and [configure it](/administrator/configuration/server/) to point to external services
 (e.g. Databases, Hadoop, S3, ...) via [connectors](/administrator/configuration/connectors/).
 
 Hue consists of [several services](/administrator/administration/reference/) that runs in your cluster.
