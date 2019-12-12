@@ -1335,7 +1335,7 @@ class Document2(models.Model):
   def can_read(self, user):
     perm = self.get_permission('read')
     has_read_permissions = perm.user_has_access(user) if perm else False
-    return is_admin(user) or self.owner == user or self.can_write(user) or has_read_permissions
+    return self.owner == user or is_admin(user) or has_read_permissions or self.can_write(user)
 
   def can_read_or_exception(self, user):
     if self.can_read(user):
@@ -1346,7 +1346,7 @@ class Document2(models.Model):
   def can_write(self, user):
     perm = self.get_permission('write')
     has_write_permissions = perm.user_has_access(user) if perm else False
-    return is_admin(user) or self.owner == user or has_write_permissions or (self.parent_directory and self.parent_directory.can_write(user))
+    return self.owner == user or is_admin(user) or has_write_permissions or (self.parent_directory and self.parent_directory.can_write(user))
 
   def can_write_or_exception(self, user):
     if self.can_write(user):
@@ -1582,9 +1582,9 @@ class Document2Permission(models.Model):
 
   def user_has_access(self, user):
     """
-    Returns true if the given user has permissions based on users, groups, or all flag
+    Returns true if the given user has permissions based on users, groups or all flag.
     """
-    return self.groups.filter(id__in=user.groups.all()).exists() or user in self.users.all() or self.is_link_on
+    return self.is_link_on or user in self.users.all() or self.groups.filter(id__in=user.groups.all()).exists()
 
 
 def get_cluster_config(user):
