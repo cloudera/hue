@@ -1796,7 +1796,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         % if conf.ENABLE_GIST.get():
         <li>
           <a href="javascript:void(0)" data-bind="click: createGist, css: {'disabled': ! isReady() }" title="${ _('Share the query selection via a link') }">
-            <i class="fa fa-fw fa-link"></i> ${_('Share link')}
+            <i class="fa fa-fw fa-link"></i> ${_('Share as a gist')}
           </a>
         </li>
         % endif

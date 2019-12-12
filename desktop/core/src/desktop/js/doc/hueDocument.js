@@ -156,6 +156,36 @@ class HueDocument {
     });
   }
 
+  persistLinkSharingPerms(perm) {
+    // Perm is either: read, write, off
+    const self = this;
+
+    $.post(
+      '/desktop/api2/doc/share/link',
+      {
+        uuid: JSON.stringify(self.fileEntry.definition().uuid),
+        data: JSON.stringify(perm)
+      },
+      response => {
+        if (response != null) {
+          if (response.status !== 0) {
+            $(document).trigger(
+              'error',
+              'There was an error processing your action: ' + response.message
+            );
+          } else {
+            // self.load();
+          }
+        }
+      }
+    ).fail(response => {
+      $(document).trigger(
+        'error',
+        'There was an error processing your action: ' + response.responseText
+      );
+    });
+  }
+
   load(callback) {
     const self = this;
     if (self.loading()) {
