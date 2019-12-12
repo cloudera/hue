@@ -488,10 +488,8 @@
     <div class="query-history-container" data-bind="onComplete: function(){ redrawFixedHeaders(200); }">
       <div data-bind="delayedOverflow: 'slow', css: resultsKlass" style="margin-top: 5px; position: relative;">
         <ul class="nav nav-tabs nav-tabs-editor">
-          <li data-bind="click: function(){ currentQueryTab('queryHistory'); }, css: {'active': currentQueryTab() == 'queryHistory'}, onClickOutside: function () { if ($parent.historyFilterVisible() && $parent.historyFilter() === '') { $parent.historyFilterVisible(false) } }">
+          <li data-bind="click: function(){ currentQueryTab('queryHistory'); }, css: {'active': currentQueryTab() == 'queryHistory'}">
             <a class="inactive-action" style="display:inline-block" href="#queryHistory" data-toggle="tab">${_('Query History')}</a>
-            <div style="margin-left: -15px;" class="inline-block inactive-action pointer visible-on-hover" title="${_('Search the query history')}" data-bind="click: function(data, e){ $parent.historyFilterVisible(!$parent.historyFilterVisible()); if ($parent.historyFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { $parent.historyFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
-            <input class="input-small inline-tab-filter" type="text" data-bind="visible: $parent.historyFilterVisible, clearable: $parent.historyFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
             <div class="dropdown inline-block inactive-action pointer visible-on-hover">
               <a class="" data-toggle="dropdown" href="javascript: void(0)">
                 <i class="fa fa-fw fa-ellipsis-v"></i>
