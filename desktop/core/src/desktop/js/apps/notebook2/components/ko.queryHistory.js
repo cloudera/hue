@@ -27,88 +27,99 @@ export const NAME = 'query-history';
 
 // prettier-ignore
 const TEMPLATE = `
-<!-- ko if: loadingHistory -->
-  <div class="margin-top-10 margin-left-10">
-    <i class="fa fa-spinner fa-spin muted"></i>
-  </div>
-<!-- /ko -->
+<div class="snippet-tab-actions">
+  <form autocomplete="off" class="inline-block">
+    <input class="input-small search-input" type="text" autocorrect="off" autocomplete="do-not-autocomplete" autocapitalize="off" spellcheck="false" placeholder="${ I18n('Search...') }" data-bind="
+        textInput: historyFilter,
+        clearable: historyFilter
+      "/>
+  </form>
+</div>
 
-<!-- ko ifnot: loadingHistory -->
-  <!-- ko if: !history().length -->
-    <!-- ko ifnot: historyFilter -->
-      <div class="margin-top-10 margin-left-10" style="font-style: italic">${ I18n("No queries to be shown.") }</div>
-    <!-- /ko -->
-    <!-- ko if: historyFilter -->
-      <div class="margin-top-10 margin-left-10" style="font-style: italic">${ I18n('No queries found for') } <strong data-bind="text: historyFilter"></strong>.</div>
-    <!-- /ko -->
+<div class="snippet-tab-body">
+  <!-- ko if: loadingHistory -->
+    <div>
+      <h1 class="empty"><i class="fa fa-spinner fa-spin"></i> ${ I18n('Loading...') }</h1>
+    </div>
   <!-- /ko -->
-
-  <!-- ko if: history().length -->
-    <table class="table table-condensed margin-top-10 history-table">
-      <tbody data-bind="foreach: history">
-        <tr data-bind="
-            click: function() {
-              $parent.openNotebook(uuid);
-            },
-            css: {
-              'highlight': uuid === $parent.currentNotebook.uuid(),
-              'pointer': uuid !== $parent.currentNotebook.uuid()
-            }
-          ">
-          <td style="width: 100px" class="muted" data-bind="style: { 'border-top-width': $index() === 0 ? '0' : ''}">
-            <span data-bind="momentFromNow: { data: lastExecuted, interval: 10000, titleFormat: 'LLL' }"></span>
-          </td>
-          <td style="width: 25px" class="muted" data-bind="style: { 'border-top-width': $index() === 0 ? '0' : ''}">
-            <!-- ko switch: status -->
-              <!-- ko case: 'running' -->
-              <div class="history-status" data-bind="tooltip: { title: '${ I18n("Query running") }', placement: 'bottom' }"><i class="fa fa-fighter-jet fa-fw"></i></div>
-              <!-- /ko -->
-              <!-- ko case: 'failed' -->
-              <div class="history-status" data-bind="tooltip: { title: '${ I18n("Query failed") }', placement: 'bottom' }"><i class="fa fa-exclamation fa-fw"></i></div>
-              <!-- /ko -->
-              <!-- ko case: 'available' -->
-              <div class="history-status" data-bind="tooltip: { title: '${ I18n("Result available") }', placement: 'bottom' }"><i class="fa fa-check fa-fw"></i></div>
-              <!-- /ko -->
-              <!-- ko case: 'expired' -->
-              <div class="history-status" data-bind="tooltip: { title: '${ I18n("Result expired") }', placement: 'bottom' }"><i class="fa fa-unlink fa-fw"></i></div>
-              <!-- /ko -->
-            <!-- /ko -->
-          </td>
-          <td style="width: 25px" class="muted" data-bind="
-              ellipsis: {
-                data: name,
-                length: 30
-              },
-              style: {
-                'border-top-width': $index() === 0 ? '0' : ''
-              }
-            "></td>
-          <td data-bind="
-              style: {
-                'border-top-width': $index() === 0 ? '0' : ''
-              },
+  
+  <!-- ko ifnot: loadingHistory -->
+    <!-- ko if: !history().length -->
+      <!-- ko ifnot: historyFilter -->
+        <div class="margin-top-10 margin-left-10" style="font-style: italic">${ I18n("No queries to be shown.") }</div>
+      <!-- /ko -->
+      <!-- ko if: historyFilter -->
+        <div class="margin-top-10 margin-left-10" style="font-style: italic">${ I18n('No queries found for') } <strong data-bind="text: historyFilter"></strong>.</div>
+      <!-- /ko -->
+    <!-- /ko -->
+  
+    <!-- ko if: history().length -->
+      <table class="table table-condensed margin-top-10 history-table">
+        <tbody data-bind="foreach: history">
+          <tr data-bind="
               click: function() {
-                $parent.openNotebook(uuid)
+                $parent.openNotebook(uuid);
               },
-              clickBubble: false
-            "><div data-bind="highlight: { value: query, dialect: $parent.type }"></div></td>
-        </tr>
-      </tbody>
-    </table>
+              css: {
+                'highlight': uuid === $parent.currentNotebook.uuid(),
+                'pointer': uuid !== $parent.currentNotebook.uuid()
+              }
+            ">
+            <td style="width: 100px" class="muted" data-bind="style: { 'border-top-width': $index() === 0 ? '0' : ''}">
+              <span data-bind="momentFromNow: { data: lastExecuted, interval: 10000, titleFormat: 'LLL' }"></span>
+            </td>
+            <td style="width: 25px" class="muted" data-bind="style: { 'border-top-width': $index() === 0 ? '0' : ''}">
+              <!-- ko switch: status -->
+                <!-- ko case: 'running' -->
+                <div class="history-status" data-bind="tooltip: { title: '${ I18n("Query running") }', placement: 'bottom' }"><i class="fa fa-fighter-jet fa-fw"></i></div>
+                <!-- /ko -->
+                <!-- ko case: 'failed' -->
+                <div class="history-status" data-bind="tooltip: { title: '${ I18n("Query failed") }', placement: 'bottom' }"><i class="fa fa-exclamation fa-fw"></i></div>
+                <!-- /ko -->
+                <!-- ko case: 'available' -->
+                <div class="history-status" data-bind="tooltip: { title: '${ I18n("Result available") }', placement: 'bottom' }"><i class="fa fa-check fa-fw"></i></div>
+                <!-- /ko -->
+                <!-- ko case: 'expired' -->
+                <div class="history-status" data-bind="tooltip: { title: '${ I18n("Result expired") }', placement: 'bottom' }"><i class="fa fa-unlink fa-fw"></i></div>
+                <!-- /ko -->
+              <!-- /ko -->
+            </td>
+            <td style="width: 25px" class="muted" data-bind="
+                ellipsis: {
+                  data: name,
+                  length: 30
+                },
+                style: {
+                  'border-top-width': $index() === 0 ? '0' : ''
+                }
+              "></td>
+            <td data-bind="
+                style: {
+                  'border-top-width': $index() === 0 ? '0' : ''
+                },
+                click: function() {
+                  $parent.openNotebook(uuid)
+                },
+                clickBubble: false
+              "><div data-bind="highlight: { value: query, dialect: $parent.type }"></div></td>
+          </tr>
+        </tbody>
+      </table>
+    <!-- /ko -->
+  
+    <div class="pagination" data-bind="visible: historyTotalPages() > 1" style="display: none;">
+      <ul>
+        <li data-bind="css: { 'disabled' : historyCurrentPage() === 1 }">
+          <a href="javascript: void(0);" data-bind="click: prevHistoryPage.bind($data)">${ I18n("Prev") }</a>
+        </li>
+        <li class="active"><span data-bind="text: historyCurrentPage() + '/' + historyTotalPages()"></span></li>
+        <li data-bind="css: { 'disabled' : historyCurrentPage() === historyTotalPages() }">
+          <a href="javascript: void(0);" data-bind="click: nextHistoryPage.bind($data)">${ I18n("Next") }</a>
+        </li>
+      </ul>
+    </div>
   <!-- /ko -->
-
-  <div class="pagination" data-bind="visible: historyTotalPages() > 1" style="display: none;">
-    <ul>
-      <li data-bind="css: { 'disabled' : historyCurrentPage() === 1 }">
-        <a href="javascript: void(0);" data-bind="click: prevHistoryPage.bind($data)">${ I18n("Prev") }</a>
-      </li>
-      <li class="active"><span data-bind="text: historyCurrentPage() + '/' + historyTotalPages()"></span></li>
-      <li data-bind="css: { 'disabled' : historyCurrentPage() === historyTotalPages() }">
-        <a href="javascript: void(0);" data-bind="click: nextHistoryPage.bind($data)">${ I18n("Next") }</a>
-      </li>
-    </ul>
-  </div>
-<!-- /ko -->
+</div>
 `;
 
 const QUERIES_PER_PAGE = 50;
@@ -127,7 +138,7 @@ class QueryHistory extends DisposableComponent {
 
     this.loadingHistory = ko.observable(true);
     this.history = ko.observableArray();
-    this.historyFilter = ko.observable('');
+    this.historyFilter = ko.observable('').extend({ rateLimit: 900 });
 
     this.historyCurrentPage = ko.observable(1);
     this.historyTotalPages = ko.observable(1);
@@ -146,9 +157,7 @@ class QueryHistory extends DisposableComponent {
       }
     });
 
-    this.subscribe(this.historyCurrentPage, () => {
-      this.fetchHistory();
-    });
+    this.subscribe(this.historyCurrentPage, this.fetchHistory.bind(this));
 
     this.fetchHistory();
   }

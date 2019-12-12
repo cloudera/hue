@@ -77,23 +77,6 @@ export default class Notebook {
         : []
     );
 
-    // This is to keep the "Saved Query" tab selected when opening a doc from the left assist
-    // TODO: Refactor code to reflect purpose
-    this.history.subscribe(val => {
-      if (
-        this.id() == null &&
-        val.length === 0 &&
-        this.historyFilter() === '' &&
-        !vm.isNotificationManager()
-      ) {
-        this.snippets()[0].currentQueryTab('savedQueries');
-      }
-    });
-
-    this.historyFilter = ko.observable('');
-    this.historyFilterVisible = ko.observable(false);
-    this.historyFilter.extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 900 } });
-
     this.schedulerViewModel = null;
     this.schedulerViewModelIsLoaded = ko.observable(false);
     this.schedulerViewerViewModel = ko.observable();
