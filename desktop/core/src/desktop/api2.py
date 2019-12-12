@@ -522,7 +522,7 @@ def delete_document(request):
 @api_error_handler
 @require_POST
 def copy_document(request):
-  uuid = json.loads(request.POST.get('uuid'), '""')
+  uuid = json.loads(request.POST.get('uuid', '""'))
 
   if not uuid:
     raise PopupException(_('copy_document requires uuid'))
@@ -724,7 +724,7 @@ def export_documents(request):
     zfile.close()
     response = HttpResponse(content_type="application/zip")
     response["Content-Length"] = len(f.getvalue())
-    response['Content-Disposition'] = 'attachment; filename="%s".zip' % filename
+    response['Content-Disposition'] = b'attachment; filename="%s".zip' % filename
     response.write(f.getvalue())
     return response
   else:

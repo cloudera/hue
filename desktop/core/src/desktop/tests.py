@@ -207,7 +207,7 @@ def test_download_log_view():
 def test_dump_config():
   c = make_logged_in_client()
 
-  CANARY = "abracadabra"
+  CANARY = b"abracadabra"
 
   # Depending on the order of the conf.initialize() in settings, the set_for_testing() are not seen in the global settings variable
   clear = HIVE_SERVER_HOST.set_for_testing(CANARY)
@@ -229,6 +229,8 @@ def test_dump_config():
 
   try:
     response1 = c.get(reverse('desktop.views.dump_config'))
+    if not isinstance(CANARY, bytes):
+      CANARY = CANARY.encode('utf-8')
     assert_true(CANARY in response1.content)
   finally:
     clear()
@@ -239,6 +241,8 @@ def test_dump_config():
 
   try:
     response1 = c.get(reverse('desktop.views.dump_config'))
+    if not isinstance(CANARY, bytes):
+      CANARY = CANARY.encode('utf-8')
     assert_true(CANARY in response1.content, response1.content)
   finally:
     clear()
@@ -247,26 +251,29 @@ def test_dump_config():
   finish = proxy.conf.WHITELIST.set_for_testing(CANARY)
   try:
     response = c.get(reverse('desktop.views.dump_config'))
-    assert_true(CANARY in response.content, response.content)
+    response_content = response.content
+    if not isinstance(response_content, str):
+      response_content = response_content.decode('utf-8')
+    assert_true(CANARY in response_content, response_content)
   finally:
     finish()
 
   # Not showing some passwords
   response = c.get(reverse('desktop.views.dump_config'))
-  assert_false('bind_password' in response.content)
+  assert_false(b'bind_password' in response.content)
 
   # Login as someone else
   client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
   grant_access("not_me", "test", "desktop")
 
   response = client_not_me.get(reverse('desktop.views.dump_config'))
-  assert_true("You must be a superuser" in response.content, response.content)
+  assert_true(b"You must be a superuser" in response.content, response.content)
 
   prev_env_conf = os.environ.get("HUE_CONF_DIR")
   try:
     os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
     resp = c.get(reverse('desktop.views.dump_config'))
-    assert_true('/tmp/test_hue_conf_dir' in resp.content, resp)
+    assert_true(b'/tmp/test_hue_conf_dir' in resp.content, resp)
   finally:
     if prev_env_conf is None:
       os.environ.pop("HUE_CONF_DIR", None)
@@ -394,7 +401,7 @@ def test_paginator():
 def test_thread_dump():
   c = make_logged_in_client()
   response = c.get("/desktop/debug/threads", HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-  assert_true("test_thread_dump" in response.content)
+  assert_true(b"test_thread_dump" in response.content)
 
 def test_truncating_model():
   class TinyModel(TruncatingModel):
@@ -726,7 +733,9 @@ def test_404_handling():
   c = make_logged_in_client()
   response = c.get(view_name)
   assert_true(any(['404.mako' in _template.filename for _template in response.templates]), response.templates)
-  assert_true('not found' in response.content)
+  assert_true(b'not found' in response.content)
+  if not isinstance(view_name, bytes):
+    view_name = view_name.encode('utf-8')
   assert_true(view_name in response.content)
 
 class RecordingHandler(logging.Handler):
@@ -859,6 +868,8 @@ def test_ui_customizations():
   try:
     c = make_logged_in_client()
     c.logout()
+    if not isinstance(custom_message, bytes):
+      custom_message = custom_message.encode('utf-8')
     resp = c.get('/hue/accounts/login/', follow=False)
     assert_true(custom_message in resp.content, resp)
     resp = c.get('/hue/about', follow=True)
@@ -896,9 +907,13 @@ def test_cx_Oracle():
 class TestStrictRedirection(object):
 
   def setUp(self):
+    self.finish = desktop.conf.AUTH.BACKEND.set_for_testing(['desktop.auth.backend.AllowFirstUserDjangoBackend'])
     self.client = make_logged_in_client()
     self.user = dict(username="test", password="test")
     desktop.conf.REDIRECT_WHITELIST.set_for_testing('^\/.*$,^http:\/\/example.com\/.*$')
+
+  def tearDown(self):
+    self.finish()
 
   def test_redirection_blocked(self):
     # Redirection with code 301 should be handled properly
@@ -921,13 +936,14 @@ class TestStrictRedirection(object):
     self._test_redirection(redirection_url='http://example.com/', expected_status_code=302)
 
   def _test_redirection(self, redirection_url, expected_status_code, **kwargs):
-    self.client.get('/accounts/logout', **kwargs)
     data = self.user.copy()
     data['next'] = redirection_url
     response = self.client.post('/hue/accounts/login/', data, **kwargs )
     assert_equal(expected_status_code, response.status_code)
     if expected_status_code == 403:
         error_msg = 'Redirect to ' + redirection_url + ' is not allowed.'
+        if not isinstance(error_msg, bytes):
+          error_msg = error_msg.encode('utf-8')
         assert_true(error_msg in response.content, response.content)
 
 
