@@ -490,15 +490,6 @@
         <ul class="nav nav-tabs nav-tabs-editor">
           <li data-bind="click: function(){ currentQueryTab('queryHistory'); }, css: {'active': currentQueryTab() == 'queryHistory'}">
             <a class="inactive-action" style="display:inline-block" href="#queryHistory" data-toggle="tab">${_('Query History')}</a>
-            <div class="dropdown inline-block inactive-action pointer visible-on-hover">
-              <a class="" data-toggle="dropdown" href="javascript: void(0)">
-                <i class="fa fa-fw fa-ellipsis-v"></i>
-              </a>
-              <ul class="dropdown-menu">
-                <li><a href="javascript:void(0);" data-bind="click: exportHistory.bind($data)"><i class="fa fa-fw fa-download"></i> ${_('Export')}</a></li>
-                <li><a href="javascript:void(0);" data-bind="publish: { 'show.import.documents.modal': { importedCallback: refreshHistory.bind($data.parentNotebook), isHistory: true }}"><i class="fa fa-fw fa-upload"></i> ${_('Import' )}</a></li>
-              </ul>
-            </div>
           </li>
           <li class="margin-right-20" data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: {'active': currentQueryTab() == 'savedQueries'}, onClickOutside: function () { if (queriesFilterVisible() && queriesFilter() === '') { queriesFilterVisible(false) } }">
             <a class="inactive-action" style="display:inline-block" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a>

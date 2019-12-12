@@ -1155,18 +1155,6 @@ export default class Snippet {
     huePubSub.publish(EXECUTE_ACTIVE_EXECUTABLE_EVENT, this.activeExecutable());
   }
 
-  async exportHistory() {
-    const historyResponse = await apiHelper.getHistory({ type: this.type(), limit: 500 });
-
-    if (historyResponse && historyResponse.history) {
-      window.location.href =
-        window.HUE_BASE_URL +
-        '/desktop/api2/doc/export?history=true&documents=[' +
-        historyResponse.history.map(historyDoc => historyDoc.id).join(',') +
-        ']';
-    }
-  }
-
   fetchExecutionAnalysis() {
     if (this.type() === TYPE.impala) {
       // TODO: Use real query ID

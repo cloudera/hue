@@ -76,7 +76,7 @@ const TEMPLATE = `
       </button>
     </div>
   </div>
-  
+
   <div class="snippet-tab-body">
     <div data-bind="visible: type() !== 'table'" style="display:none; margin: 10px 0; overflow-y: auto">
       <!-- ko if: data().length && data()[0][1] != "" -->

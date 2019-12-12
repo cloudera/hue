@@ -25,6 +25,7 @@ import { EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
 import { sleep } from 'utils/hueUtils';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
+import { SHOW_EVENT } from 'ko/components/ko.importDocumentsModal';
 
 export const NAME = 'query-history';
 export const HISTORY_CLEARED_EVENT = 'query.history.cleared';
@@ -45,7 +46,7 @@ const TEMPLATE = `
     <a class="btn btn-danger disable-feedback" data-bind="click: clearHistory.bind($data)">${ I18n('Yes') }</a>
   </div>
 </div>
-    
+
 <div class="snippet-tab-actions">
   <form autocomplete="off" class="inline-block">
     <input class="input-small search-input" type="text" autocorrect="off" autocomplete="do-not-autocomplete" autocapitalize="off" spellcheck="false" placeholder="${ I18n('Search...') }" data-bind="
@@ -59,6 +60,14 @@ const TEMPLATE = `
         <i class="fa fa-fw fa-calendar-times-o"></i> ${ I18n('Clear') }
       </button>
     </div>
+    <div class="btn-group">
+      <button class="btn btn-mini btn-editor" data-bind="enable: history().length, click: exportHistory.bind($data)">
+        <i class="fa fa-fw fa-download"></i> ${ I18n('Export') }
+      </button>
+      <button class="btn btn-mini btn-editor" data-bind="click: importHistory.bind($data)">
+        <i class="fa fa-fw fa-upload"></i> ${ I18n('import') }
+      </button>
+    </div>
   </div>
 </div>
 
@@ -68,7 +77,7 @@ const TEMPLATE = `
       <h1 class="empty"><i class="fa fa-spinner fa-spin"></i> ${ I18n('Loading...') }</h1>
     </div>
   <!-- /ko -->
-  
+
   <!-- ko ifnot: loadingHistory -->
     <!-- ko if: !history().length -->
       <!-- ko ifnot: historyFilter -->
@@ -78,7 +87,7 @@ const TEMPLATE = `
         <div class="margin-top-10 margin-left-10" style="font-style: italic">${ I18n('No queries found for') } <strong data-bind="text: historyFilter"></strong>.</div>
       <!-- /ko -->
     <!-- /ko -->
-  
+
     <!-- ko if: history().length -->
       <table class="table table-condensed margin-top-10 history-table">
         <tbody data-bind="foreach: history">
@@ -132,7 +141,7 @@ const TEMPLATE = `
         </tbody>
       </table>
     <!-- /ko -->
-  
+
     <div class="pagination" data-bind="visible: historyTotalPages() > 1" style="display: none;">
       <ul>
         <li data-bind="css: { 'disabled' : historyCurrentPage() === 1 }">
@@ -197,11 +206,6 @@ class QueryHistory extends DisposableComponent {
     throttledFetch();
   }
 
-  showClearHistoryModal() {
-    const $modal = $(this.element).find('.clear-history-modal');
-    $modal.modal('show');
-  }
-
   async clearHistory() {
     hueAnalytics.log('notebook', 'clearHistory');
 
@@ -224,6 +228,18 @@ class QueryHistory extends DisposableComponent {
 
     const $modal = $(this.element).find('.clear-history-modal');
     $modal.modal('hide');
+  }
+
+  async exportHistory() {
+    const historyResponse = await apiHelper.getHistory({ type: this.type(), limit: 500 });
+
+    if (historyResponse && historyResponse.history) {
+      window.location.href =
+        window.HUE_BASE_URL +
+        '/desktop/api2/doc/export?history=true&documents=[' +
+        historyResponse.history.map(historyDoc => historyDoc.id).join(',') +
+        ']';
+    }
   }
 
   async fetchHistory() {
@@ -266,10 +282,8 @@ class QueryHistory extends DisposableComponent {
     this.refreshStatus([EXECUTION_STATUS.available], AVAILABLE_INTERVAL);
   }
 
-  prevHistoryPage() {
-    if (this.historyCurrentPage() !== 1) {
-      this.historyCurrentPage(this.historyCurrentPage() - 1);
-    }
+  importHistory() {
+    huePubSub.publish(SHOW_EVENT, { importedCallback: this.fetchHistory.bind(this) });
   }
 
   nextHistoryPage() {
@@ -281,6 +295,12 @@ class QueryHistory extends DisposableComponent {
   openNotebook(uuid) {
     if (window.getSelection().toString() === '' && uuid !== this.currentNotebook.uuid()) {
       this.openFunction(uuid);
+    }
+  }
+
+  prevHistoryPage() {
+    if (this.historyCurrentPage() !== 1) {
+      this.historyCurrentPage(this.historyCurrentPage() - 1);
     }
   }
 
@@ -334,6 +354,11 @@ class QueryHistory extends DisposableComponent {
       await sleep(interval);
       this.refreshStatus(statusesToRefresh, interval);
     }
+  }
+
+  showClearHistoryModal() {
+    const $modal = $(this.element).find('.clear-history-modal');
+    $modal.modal('show');
   }
 }
 
