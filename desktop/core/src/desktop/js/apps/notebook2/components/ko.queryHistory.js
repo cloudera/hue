@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import $ from 'jquery';
 import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
@@ -22,11 +23,28 @@ import DisposableComponent from 'ko/components/DisposableComponent';
 import I18n from 'utils/i18n';
 import { EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
 import { sleep } from 'utils/hueUtils';
+import hueAnalytics from 'utils/hueAnalytics';
+import huePubSub from 'utils/huePubSub';
 
 export const NAME = 'query-history';
+export const HISTORY_CLEARED_EVENT = 'query.history.cleared';
 
 // prettier-ignore
 const TEMPLATE = `
+<div class="clear-history-modal modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ I18n('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${ I18n('Confirm History Clear') }</h2>
+  </div>
+  <div class="modal-body">
+    <p>${ I18n('Are you sure you want to clear the query history?') }</p>
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${ I18n('No') }</a>
+    <a class="btn btn-danger disable-feedback" data-bind="click: clearHistory.bind($data)">${ I18n('Yes') }</a>
+  </div>
+</div>
+    
 <div class="snippet-tab-actions">
   <form autocomplete="off" class="inline-block">
     <input class="input-small search-input" type="text" autocorrect="off" autocomplete="do-not-autocomplete" autocapitalize="off" spellcheck="false" placeholder="${ I18n('Search...') }" data-bind="
@@ -34,6 +52,13 @@ const TEMPLATE = `
         clearable: historyFilter
       "/>
   </form>
+  <div class="pull-right">
+    <div class="btn-group">
+      <button class="btn btn-mini btn-editor" data-bind="enable: history().length, click: showClearHistoryModal.bind($data)">
+        <i class="fa fa-fw fa-calendar-times-o"></i> ${ I18n('Clear') }
+      </button>
+    </div>
+  </div>
 </div>
 
 <div class="snippet-tab-body">
@@ -130,11 +155,12 @@ const STARTING_RUNNING_INTERVAL = 30000;
 const trimEllipsis = str => str.substring(0, 1000) + (str.length > 1000 ? '...' : '');
 
 class QueryHistory extends DisposableComponent {
-  constructor(params) {
+  constructor(params, element) {
     super();
     this.currentNotebook = params.currentNotebook;
     this.type = params.type;
     this.openFunction = params.openFunction;
+    this.element = element;
 
     this.loadingHistory = ko.observable(true);
     this.history = ko.observableArray();
@@ -149,17 +175,52 @@ class QueryHistory extends DisposableComponent {
       this.refreshStatusFailed = true; // Cancels the status check intervals
     });
 
+    let fetchTimeout = -1;
+    const throttledFetch = () => {
+      window.clearTimeout(fetchTimeout);
+      fetchTimeout = window.setTimeout(this.fetchHistory.bind(this), 10);
+    };
+
     this.subscribe(this.historyFilter, () => {
       if (this.historyCurrentPage() !== 1) {
         this.historyCurrentPage(1);
       } else {
-        this.fetchHistory();
+        throttledFetch();
       }
     });
 
-    this.subscribe(this.historyCurrentPage, this.fetchHistory.bind(this));
+    this.subscribe(this.historyCurrentPage, throttledFetch);
 
-    this.fetchHistory();
+    throttledFetch();
+  }
+
+  showClearHistoryModal() {
+    const $modal = $(this.element).find('.clear-history-modal');
+    $modal.modal('show');
+  }
+
+  async clearHistory() {
+    hueAnalytics.log('notebook', 'clearHistory');
+
+    apiHelper
+      .clearNotebookHistory({
+        notebookJson: await this.currentNotebook.toContextJson(),
+        docType: this.type()
+      })
+      .then(() => {
+        this.history.removeAll();
+        this.historyTotalPages(1);
+        this.historyFilter('');
+        huePubSub.publish(HISTORY_CLEARED_EVENT);
+      })
+      .fail(xhr => {
+        if (xhr.status !== 502) {
+          $(document).trigger('error', xhr.responseText);
+        }
+      });
+
+    const $modal = $(this.element).find('.clear-history-modal');
+    $modal.modal('hide');
   }
 
   async fetchHistory() {
@@ -273,4 +334,11 @@ class QueryHistory extends DisposableComponent {
   }
 }
 
-componentUtils.registerComponent(NAME, QueryHistory, TEMPLATE);
+componentUtils.registerComponent(
+  NAME,
+  {
+    createViewModel: (params, componentInfo) =>
+      new QueryHistory(params, componentInfo.element.parentElement)
+  },
+  TEMPLATE
+);
