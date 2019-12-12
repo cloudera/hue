@@ -653,7 +653,7 @@ def share_document(request):
 @require_POST
 def share_document_link(request):
   """
-  Globally activate of de-activate access to the document to logged-in users.
+  Globally activate of de-activate access to a document for logged-in users.
 
   Example of input: {'name': 'link_read', 'is_link_on': true}
   """

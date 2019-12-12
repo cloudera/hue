@@ -35,6 +35,10 @@ const TEMPLATE = `
   <div class="modal-body" style="overflow: visible; height: 240px">
 
     <!-- ko if: window.HAS_LINK_SHARING -->
+    Has Link sharing on: <span data-bind="text: $parent.definition().perms.link_sharing_on"></span>
+    Has Link Read: <span data-bind="text: $parent.definition().perms.link_read"></span>
+    Has link Write: <span data-bind="text: $parent.definition().perms.link_write"></span>
+
     <a href="javascript:void(0)"  title="${ I18n(
       'Share the query selection via a link'
     ) }">
