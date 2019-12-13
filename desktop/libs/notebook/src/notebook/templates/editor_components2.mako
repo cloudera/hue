@@ -488,13 +488,11 @@
     <div class="query-history-container" data-bind="onComplete: function(){ redrawFixedHeaders(200); }">
       <div data-bind="delayedOverflow: 'slow', css: resultsKlass" style="margin-top: 5px; position: relative;">
         <ul class="nav nav-tabs nav-tabs-editor">
-          <li data-bind="click: function(){ currentQueryTab('queryHistory'); }, css: {'active': currentQueryTab() == 'queryHistory'}">
+          <li data-bind="click: function() { currentQueryTab('queryHistory'); }, css: { 'active': currentQueryTab() == 'queryHistory' }">
             <a class="inactive-action" style="display:inline-block" href="#queryHistory" data-toggle="tab">${_('Query History')}</a>
           </li>
-          <li class="margin-right-20" data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: {'active': currentQueryTab() == 'savedQueries'}, onClickOutside: function () { if (queriesFilterVisible() && queriesFilter() === '') { queriesFilterVisible(false) } }">
+          <li class="margin-right-20" data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: { 'active': currentQueryTab() == 'savedQueries' }">
             <a class="inactive-action" style="display:inline-block" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a>
-            <div style="margin-left: -15px;" class="inline-block inactive-action pointer visible-on-hover" title="${_('Search the saved queries')}" data-bind="visible: !queriesHasErrors(), click: function(data, e){ queriesFilterVisible(!queriesFilterVisible()); if (queriesFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { queriesFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
-            <input class="input-small inline-tab-filter" type="text" data-bind="visible: queriesFilterVisible, clearable: queriesFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
           </li>
           % if ENABLE_QUERY_BUILDER.get():
             <!-- ko if: isSqlDialect -->
@@ -528,7 +526,7 @@
         </ul>
 
         <div class="tab-content" style="border: none; overflow-x: hidden; min-height: 250px;">
-          <div class="tab-pane" id="queryHistory" style="min-height: 80px;" data-bind="css: {'active': currentQueryTab() == 'queryHistory'}">
+          <div class="tab-pane" id="queryHistory" style="min-height: 80px;" data-bind="css: { 'active': currentQueryTab() === 'queryHistory' }">
             <!-- ko component: {
               name: 'query-history',
               params: {
@@ -539,52 +537,20 @@
             } --><!-- /ko -->
           </div>
 
-          <div class="tab-pane" id="savedQueries" data-bind="css: {'active': currentQueryTab() == 'savedQueries'}" style="overflow: hidden">
-            <!-- ko if: loadingQueries -->
-            <div class="margin-top-10 margin-left-10">
-              <i class="fa fa-spinner fa-spin muted"></i>
-            </div>
-            <!-- /ko -->
-            <!-- ko if: queriesHasErrors() -->
-            <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("Error loading my queries") }</div>
-            <!-- /ko -->
-            <!-- ko if: !queriesHasErrors() && !loadingQueries() && queries().length === 0 && queriesFilter() === '' -->
-            <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("You don't have any saved query.") }</div>
-            <!-- /ko -->
-            <!-- ko if: !queriesHasErrors() && !loadingQueries() && queries().length === 0 && queriesFilter() !== '' -->
-            <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _('No queries found for') } <strong data-bind="text: queriesFilter"></strong>.</div>
-            <!-- /ko -->
-            <!-- ko if: !queriesHasErrors() && !loadingQueries() && queries().length > 0 -->
-            <table class="table table-condensed margin-top-10 history-table">
-              <thead>
-              <tr>
-                <th style="width: 16%">${ _("Name") }</th>
-                <th style="width: 50%">${ _("Description") }</th>
-                <th style="width: 18%">${ _("Owner") }</th>
-                <th style="width: 16%">${ _("Last Modified") }</th>
-              </tr>
-              </thead>
-              <tbody data-bind="foreach: queries">
-              <tr data-bind="click: function() { if (uuid() != $root.selectedNotebook().uuid()) { $root.openNotebook(uuid(), 'savedQueries'); } }, css: { 'highlight': uuid() == $root.selectedNotebook().uuid(), 'pointer': uuid() != $root.selectedNotebook().uuid() }">
-                <td style="width: 16%"><span data-bind="ellipsis: {data: name(), length: 50}"></span></td>
-                <td style="width: 50%; white-space: normal"><span data-bind="text: description"></span></td>
-                <td style="width: 18%"><span data-bind="text: owner"></span></td>
-                <td style="width: 16%"><span data-bind="text: localeFormat(last_modified())"></span></td>
-              </tr>
-              </tbody>
-            </table>
-            <!-- /ko -->
-            <div class="pagination" data-bind="visible: queriesTotalPages() > 1">
-              <ul>
-                <li data-bind="css: { 'disabled' : queriesCurrentPage() === 1 }"><a href="javascript: void(0);" data-bind="click: prevQueriesPage">${ _("Prev") }</a></li>
-                <li class="active"><span data-bind="text: queriesCurrentPage() + '/' + queriesTotalPages()"></span></li>
-                <li data-bind="css: { 'disabled' : queriesCurrentPage() === queriesTotalPages() }"><a href="javascript: void(0);" data-bind="click: nextQueriesPage">${ _("Next") }</a></li>
-              </ul>
-            </div>
+          <div class="tab-pane" id="savedQueries" data-bind="css: { 'active': currentQueryTab() === 'savedQueries' }" style="overflow: hidden">
+            <!-- ko component: {
+              name: 'saved-queries',
+              params: {
+                currentNotebook: parentNotebook,
+                openFunction: parentVm.openNotebook.bind(parentVm),
+                type: type,
+                currentTab: currentQueryTab
+              }
+            } --><!-- /ko -->
           </div>
 
           % if ENABLE_QUERY_BUILDER.get():
-            <div class="tab-pane margin-top-10" id="queryBuilderTab" data-bind="css: {'active': currentQueryTab() == 'queryBuilderTab'}">
+            <div class="tab-pane margin-top-10" id="queryBuilderTab" data-bind="css: { 'active': currentQueryTab() === 'queryBuilderTab' }">
               <div id="queryBuilderAlert" style="display: none" class="alert">${ _('There are currently no rules defined. To get started, right click on any table column in the SQL Assist panel.') }</div>
               <table id="queryBuilder" class="table table-condensed">
                 <thead>

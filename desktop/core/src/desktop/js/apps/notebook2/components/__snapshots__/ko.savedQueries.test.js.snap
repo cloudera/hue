@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.savedQueries.js should render component 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;saved-queries&quot;, params: params }\\"><div class=\\"snippet-tab-actions\\">
+  <form autocomplete=\\"off\\" class=\\"inline-block\\">
+    <input class=\\"input-small search-input\\" type=\\"text\\" autocorrect=\\"off\\" autocomplete=\\"do-not-autocomplete\\" autocapitalize=\\"off\\" spellcheck=\\"false\\" placeholder=\\"Search...\\" data-bind=\\"
+        textInput: filter,
+        clearable: filter
+      \\">
+  </form>
+</div><div class=\\"snippet-tab-body\\">
+  <!-- ko if: loading -->
+    <div>
+      <h1 class=\\"empty\\"><i class=\\"fa fa-spinner fa-spin\\"></i> Loading...</h1>
+    </div>
+  <!-- /ko -->
+
+  <!-- ko ifnot: loading --><!-- /ko -->
+</div></div>"
+`;
