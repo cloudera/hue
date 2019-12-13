@@ -31,6 +31,8 @@ export const NAME = 'query-history';
 export const HISTORY_CLEARED_EVENT = 'query.history.cleared';
 export const UPDATE_HISTORY_EVENT = 'query.history.update';
 
+import { NAME as PAGINATOR_COMPONENT } from './ko.paginator';
+
 // prettier-ignore
 const TEMPLATE = `
 <div class="clear-history-modal modal hide fade">
@@ -142,17 +144,14 @@ const TEMPLATE = `
       </table>
     <!-- /ko -->
 
-    <div class="pagination" data-bind="visible: historyTotalPages() > 1" style="display: none;">
-      <ul>
-        <li data-bind="css: { 'disabled' : historyCurrentPage() === 1 }">
-          <a href="javascript: void(0);" data-bind="click: prevHistoryPage.bind($data)">${ I18n("Prev") }</a>
-        </li>
-        <li class="active"><span data-bind="text: historyCurrentPage() + '/' + historyTotalPages()"></span></li>
-        <li data-bind="css: { 'disabled' : historyCurrentPage() === historyTotalPages() }">
-          <a href="javascript: void(0);" data-bind="click: nextHistoryPage.bind($data)">${ I18n("Next") }</a>
-        </li>
-      </ul>
-    </div>
+    <!-- ko component: {
+      name: '${ PAGINATOR_COMPONENT }',
+      params: {
+        currentPage: historyCurrentPage,
+        totalPages: historyTotalPages,
+        onPageChange: onPageChange
+      }
+    } --><!-- /ko -->
   <!-- /ko -->
 </div>
 `;
@@ -199,7 +198,7 @@ class QueryHistory extends DisposableComponent {
       }
     });
 
-    this.subscribe(this.historyCurrentPage, throttledFetch);
+    this.onPageChange = throttledFetch;
 
     this.subscribe(UPDATE_HISTORY_EVENT, throttledFetch);
 
@@ -286,21 +285,9 @@ class QueryHistory extends DisposableComponent {
     huePubSub.publish(SHOW_EVENT, { importedCallback: this.fetchHistory.bind(this) });
   }
 
-  nextHistoryPage() {
-    if (this.historyCurrentPage() < this.historyTotalPages()) {
-      this.historyCurrentPage(this.historyCurrentPage() + 1);
-    }
-  }
-
   openNotebook(uuid) {
     if (window.getSelection().toString() === '' && uuid !== this.currentNotebook.uuid()) {
       this.openFunction(uuid);
-    }
-  }
-
-  prevHistoryPage() {
-    if (this.historyCurrentPage() !== 1) {
-      this.historyCurrentPage(this.historyCurrentPage() - 1);
     }
   }
 
