@@ -20,16 +20,162 @@ import logging
 import sys
 
 if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
+  from unittest.mock import patch, Mock, MagicMock
 else:
-  from mock import patch, Mock
+  from mock import patch, Mock, MagicMock
 
 from nose.tools import assert_equal, assert_true
+from TCLIService.ttypes import TStatusCode
 
-from beeswax.server.hive_server2_lib import HiveServerTable
+from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.test_utils import grant_access
+from useradmin.models import User
+
+from beeswax.models import Session
+from beeswax.server.hive_server2_lib import HiveServerTable, HiveServerClient
 
 
 LOG = logging.getLogger(__name__)
+
+
+class TestHiveServerClient():
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test_hive_server2_lib", groupname="default", recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="test_hive_server2_lib")
+
+    grant_access(self.user.username, self.user.username, "beeswax")
+
+    self.query_server = {
+        'principal': 'hue',
+        'server_name': 'hive',
+        'QUERY_TIMEOUT_S': 60,
+        'auth_username': 'hue',
+        'auth_password': 'hue',
+        'use_sasl': True,
+        'server_host': 'localhost',
+        'server_port': 10000,
+    }
+
+  def test_open_session(self):
+    query = Mock(
+      get_query_statement=Mock(return_value=['SELECT 1']),
+      settings=[]
+    )
+
+    with patch('beeswax.server.hive_server2_lib.thrift_util.get_client') as get_client:
+      get_client.return_value = Mock(
+        OpenSession=Mock(
+          return_value=Mock(
+            status=Mock(
+              statusCode=TStatusCode.SUCCESS_STATUS
+            ),
+            configuration={},
+            sessionHandle=Mock(
+              sessionId=Mock(
+                secret=b'1',
+                guid=b'1'
+              )
+            ),
+            serverProtocolVersion=11
+          )
+        ),
+        get_coordinator_host=Mock(return_value='hive-host')
+      )
+      session_count = Session.objects.filter(owner=self.user, application=self.query_server['server_name']).count()
+
+      # Send open session
+      session = HiveServerClient(self.query_server, self.user).open_session(self.user)
+
+      assert_equal(
+        session_count + 1,  # +1 as setUp resets the user which deletes cascade the sessions
+        Session.objects.filter(owner=self.user, application=self.query_server['server_name']).count()
+      )
+      assert_equal(
+        session.guid,
+        Session.objects.get_session(self.user, self.query_server['server_name']).guid.encode()
+      )
+
+  def test_explain(self):
+    query = Mock(
+      get_query_statement=Mock(return_value=['SELECT 1']),
+      settings=[]
+    )
+
+    with patch('beeswax.server.hive_server2_lib.thrift_util.get_client') as get_client:
+      get_client.return_value = Mock(
+        OpenSession=Mock(
+          return_value=Mock(
+            status=Mock(
+              statusCode=TStatusCode.SUCCESS_STATUS
+            ),
+            configuration={},
+            sessionHandle=Mock(
+              sessionId=Mock(
+                secret=b'1',
+                guid=b'1'
+              )
+            ),
+            serverProtocolVersion=11
+          )
+        ),
+        ExecuteStatement=Mock(
+          return_value=Mock(
+            status=Mock(
+              statusCode=TStatusCode.SUCCESS_STATUS
+            ),
+          )
+        ),
+        FetchResults=Mock(
+          return_value=Mock(
+            status=Mock(
+              statusCode=TStatusCode.SUCCESS_STATUS
+            ),
+            results=Mock(
+              columns=[
+                # Dump of `EXPLAIN SELECT 1`
+                Mock(stringVal=Mock(values=['Plan optimized by CBO.', '', 'Stage-0', '	  Fetch Operator', '5	    limit:-1' ], nulls='')),
+              ]
+            ),
+            schema=Mock(
+              columns=[
+                Mock(columnName='Explain'),
+              ]
+            )
+          )
+        ),
+        GetResultSetMetadata=Mock(
+          return_value=Mock(
+            status=Mock(
+              statusCode=TStatusCode.SUCCESS_STATUS
+            ),
+            results=Mock(
+              columns=[
+                Mock(stringVal=Mock(values=['Explain', ], nulls='')),  # Fake but ok
+              ]
+            ),
+            schema=Mock(
+              columns=[
+                Mock(columnName='primitiveEntry 7'),
+              ]
+            )
+          )
+        ),
+        get_coordinator_host=Mock(return_value='hive-host')
+      )
+      session_count = Session.objects.filter(owner=self.user, application=self.query_server['server_name']).count()
+
+      # Send explain
+      explain = HiveServerClient(self.query_server, self.user).explain(query)
+
+      assert_equal(
+        [['Plan optimized by CBO.'], [''], ['Stage-0'], ['	  Fetch Operator'], ['5	    limit:-1']],
+        list(explain.rows())
+      )
+      assert_equal(
+        session_count + 1,
+        Session.objects.filter(owner=self.user, application=self.query_server['server_name']).count()
+      )
 
 
 class TestHiveServerTable():
