@@ -27,11 +27,14 @@ export default class DisposableComponent {
       this.disposals.push(() => {
         pubSub.remove();
       });
-    } else if (subscribable.subscribe) {
+      return pubSub;
+    }
+    if (subscribable.subscribe) {
       const sub = subscribable.subscribe(callback);
       this.disposals.push(() => {
         sub.dispose();
       });
+      return sub;
     }
   }
 

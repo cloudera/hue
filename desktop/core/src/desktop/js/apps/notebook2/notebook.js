@@ -26,6 +26,7 @@ import sessionManager from 'apps/notebook2/execution/sessionManager';
 
 import Snippet, { STATUS as SNIPPET_STATUS } from 'apps/notebook2/snippet';
 import { HISTORY_CLEARED_EVENT } from 'apps/notebook2/components/ko.queryHistory';
+import { UPDATE_SAVED_QUERIES_EVENT } from 'apps/notebook2/components/ko.savedQueries';
 
 export default class Notebook {
   constructor(vm, notebookRaw) {
@@ -348,19 +349,7 @@ export default class Notebook {
         this.isHistory(false);
         $(document).trigger('info', data.message);
         if (editorMode) {
-          if (!data.save_as) {
-            const existingQuery = this.snippets()[0]
-              .queries()
-              .filter(item => item.uuid() === data.uuid);
-            if (existingQuery.length > 0) {
-              existingQuery[0].name(data.name);
-              existingQuery[0].description(data.description);
-              existingQuery[0].last_modified(data.last_modified);
-            }
-          } else if (this.snippets()[0].queries().length > 0) {
-            // Saved queries tab already loaded
-            this.snippets()[0].queries.unshift(komapping.fromJS(data));
-          }
+          huePubSub.publish(UPDATE_SAVED_QUERIES_EVENT, data);
 
           if (this.coordinatorUuid() && this.schedulerViewModel) {
             this.saveScheduler();

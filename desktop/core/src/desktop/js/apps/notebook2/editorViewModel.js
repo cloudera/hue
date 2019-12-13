@@ -300,19 +300,11 @@ class EditorViewModel {
   }
 
   loadNotebook(notebookRaw, queryTab) {
-    let currentQueries;
-    if (this.selectedNotebook() != null) {
-      currentQueries = this.selectedNotebook().unload();
-    }
-
     const notebook = new Notebook(this, notebookRaw);
 
     if (notebook.snippets().length > 0) {
       huePubSub.publish('detach.scrolls', notebook.snippets()[0]);
       notebook.selectedSnippet(notebook.snippets()[notebook.snippets().length - 1].type());
-      if (currentQueries != null) {
-        notebook.snippets()[0].queries(currentQueries);
-      }
       notebook.snippets().forEach(snippet => {
         snippet.aceAutoExpand = false;
         snippet.statement_raw.valueHasMutated();
@@ -345,9 +337,6 @@ class EditorViewModel {
 
       if (notebook.isSaved()) {
         notebook.snippets()[0].currentQueryTab('savedQueries');
-        if (notebook.snippets()[0].queries().length === 0) {
-          notebook.snippets()[0].fetchQueries(); // Subscribe not updating yet
-        }
       }
     }
 

@@ -23,6 +23,7 @@ import 'apps/notebook2/components/ko.executableActions';
 import 'apps/notebook2/components/ko.executableLogs';
 import 'apps/notebook2/components/ko.executableProgressBar';
 import 'apps/notebook2/components/ko.snippetEditorActions';
+import 'apps/notebook2/components/ko.savedQueries';
 import 'apps/notebook2/components/ko.snippetResults';
 import 'apps/notebook2/components/ko.queryHistory';
 
@@ -278,48 +279,6 @@ export default class Snippet {
     // History is currently in Notebook, same with saved queries by snippets, might be better in assist
     this.currentQueryTab = ko.observable(snippetRaw.currentQueryTab || 'queryHistory');
     this.pinnedContextTabs = ko.observableArray(snippetRaw.pinnedContextTabs || []);
-
-    this.errorLoadingQueries = ko.observable(false);
-    this.loadingQueries = ko.observable(false);
-
-    this.queriesHasErrors = ko.observable(false);
-    this.queriesCurrentPage = ko.observable(
-      this.parentVm.selectedNotebook() && this.parentVm.selectedNotebook().snippets().length > 0
-        ? this.parentVm
-            .selectedNotebook()
-            .snippets()[0]
-            .queriesCurrentPage()
-        : 1
-    );
-    this.queriesTotalPages = ko.observable(
-      this.parentVm.selectedNotebook() && this.parentVm.selectedNotebook().snippets().length > 0
-        ? this.parentVm
-            .selectedNotebook()
-            .snippets()[0]
-            .queriesTotalPages()
-        : 1
-    );
-    this.queries = ko.observableArray([]);
-
-    this.queriesFilter = ko.observable('');
-    this.queriesFilterVisible = ko.observable(false);
-    this.queriesFilter.extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 900 } });
-    this.queriesFilter.subscribe(() => {
-      this.fetchQueries();
-    });
-
-    this.lastFetchQueriesRequest = null;
-
-    this.lastQueriesPage = 1;
-    this.currentQueryTab.subscribe(newValue => {
-      huePubSub.publish(CURRENT_QUERY_TAB_SWITCHED_EVENT, newValue);
-      if (
-        newValue === 'savedQueries' &&
-        (this.queries().length === 0 || this.lastQueriesPage !== this.queriesCurrentPage())
-      ) {
-        this.fetchQueries();
-      }
-    });
 
     huePubSub.subscribeOnce(
       'assist.source.set',
@@ -1171,32 +1130,6 @@ export default class Snippet {
     }
   }
 
-  fetchQueries() {
-    apiHelper.cancelActiveRequest(this.lastFetchQueriesRequest);
-
-    const QUERIES_PER_PAGE = 50;
-    this.lastQueriesPage = this.queriesCurrentPage();
-    this.loadingQueries(true);
-    this.queriesHasErrors(false);
-    this.lastFetchQueriesRequest = apiHelper.searchDocuments({
-      successCallback: foundDocuments => {
-        this.queriesTotalPages(Math.ceil(foundDocuments.count / QUERIES_PER_PAGE));
-        this.queries(komapping.fromJS(foundDocuments.documents)());
-        this.loadingQueries(false);
-        this.queriesHasErrors(false);
-      },
-      errorCallback: () => {
-        this.loadingQueries(false);
-        this.queriesHasErrors(true);
-      },
-      page: this.queriesCurrentPage(),
-      limit: QUERIES_PER_PAGE,
-      type: 'query-' + this.type(),
-      query: this.queriesFilter(),
-      include_trashed: false
-    });
-  }
-
   async getExternalStatement() {
     this.externalStatementLoaded(false);
     apiHelper
@@ -1396,13 +1329,6 @@ export default class Snippet {
     }
   }
 
-  nextQueriesPage() {
-    if (this.queriesCurrentPage() !== this.queriesTotalPages()) {
-      this.queriesCurrentPage(this.queriesCurrentPage() + 1);
-      this.fetchQueries();
-    }
-  }
-
   onKeydownInVariable(context, e) {
     if ((e.ctrlKey || e.metaKey) && e.which === 13) {
       // Ctrl-enter
@@ -1413,13 +1339,6 @@ export default class Snippet {
       e.preventDefault(); // Prevent browser page save dialog
     }
     return true;
-  }
-
-  prevQueriesPage() {
-    if (this.queriesCurrentPage() !== 1) {
-      this.queriesCurrentPage(this.queriesCurrentPage() - 1);
-      this.fetchQueries();
-    }
   }
 
   async queryCompatibility(targetPlatform) {
