@@ -93,13 +93,13 @@ class TestDocumentApiSharingPermissions(object):
         'data': json.dumps(permissions)
     })
 
-  def share_link_doc(self, doc, perm, is_on=False, client=None):
+  def share_link_doc(self, doc, perm, client=None):
     if client is None:
       client = self.client
 
     return client.post("/desktop/api2/doc/share/link", {
         'uuid': json.dumps(doc.uuid),
-        'data': json.dumps({'name': 'link_%s' % perm, 'is_link_on': is_on})
+        'perm': json.dumps(perm)
     })
 
   def test_update_permissions(self):
@@ -437,12 +437,13 @@ class TestDocumentApiSharingPermissions(object):
     assert_false(doc.can_write(self.user_not_me))
 
     # Share by read link
-    response = self.share_link_doc(doc, perm='read', is_on=True)
+    response = self.share_link_doc(doc, perm='read')
 
     assert_equal(0, json.loads(response.content)['status'], response.content)
 
     assert_true(doc.can_read(self.user))
     assert_true(doc.can_write(self.user))
+
     assert_true(doc.can_read(self.user_not_me))
     assert_false(doc.can_write(self.user_not_me))
 
@@ -459,7 +460,7 @@ class TestDocumentApiSharingPermissions(object):
     assert_equal(0, json.loads(response.content)['status'], response.content)
 
     # Un-share
-    response = self.share_link_doc(doc, perm='read', is_on=False)
+    response = self.share_link_doc(doc, perm='off')
 
     assert_equal(0, json.loads(response.content)['status'], response.content)
 
@@ -481,7 +482,7 @@ class TestDocumentApiSharingPermissions(object):
     assert_equal(-1, json.loads(response.content)['status'], response.content)
 
     # Share by write link
-    response = self.share_link_doc(doc, perm='write', is_on=True)
+    response = self.share_link_doc(doc, perm='write')
 
     assert_equal(0, json.loads(response.content)['status'], response.content)
 
@@ -503,7 +504,7 @@ class TestDocumentApiSharingPermissions(object):
     assert_equal(0, json.loads(response.content)['status'], response.content)
 
     # Un-share
-    response = self.share_link_doc(doc, perm='write', is_on=False)
+    response = self.share_link_doc(doc, perm='off')
 
     assert_equal(0, json.loads(response.content)['status'], response.content)
 

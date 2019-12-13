@@ -164,7 +164,7 @@ class HueDocument {
       '/desktop/api2/doc/share/link',
       {
         uuid: JSON.stringify(self.fileEntry.definition().uuid),
-        data: JSON.stringify(perm)
+        perm: JSON.stringify(perm)
       },
       response => {
         if (response != null) {

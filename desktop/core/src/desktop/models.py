@@ -1391,13 +1391,13 @@ class Document2(models.Model):
 
   def share_link(self, user, perm='read'):
     if perm == 'read':
-      doc = doc.share(user, name=Document2Permission.LINK_READ_PERM, is_link_on=True)
+      self.share(user, name=Document2Permission.LINK_READ_PERM, is_link_on=True)
     elif perm == 'write':
-      doc = doc.share(user, name=Document2Permission.LINK_WRITE_PERM, is_link_on=True)
+      self.share(user, name=Document2Permission.LINK_WRITE_PERM, is_link_on=True)
     else:
-      doc = doc.share(user, name=Document2Permission.LINK_READ_PERM, is_link_on=False)
-      doc = doc.share(user, name=Document2Permission.LINK_WRITE_PERM, is_link_on=False)
-    return doc
+      self.share(user, name=Document2Permission.LINK_READ_PERM, is_link_on=False)
+      self.share(user, name=Document2Permission.LINK_WRITE_PERM, is_link_on=False)
+    return self
 
   def update_permission(self, user, name='read', users=None, groups=None, is_link_on=False):
     # Check if user has access to grant permissions
@@ -1605,6 +1605,11 @@ class Document2Permission(models.Model):
 
   class Meta(object):
     unique_together = ('doc', 'perms')
+
+  def __str__(self):
+    return force_unicode('Document: %s, Name: %s, Users: %s, Groups: %s, is_link_on: %s') % (
+      self.doc, self.perms, self.users, self.groups, self.is_link_on
+    )
 
   def to_dict(self):
     return {
