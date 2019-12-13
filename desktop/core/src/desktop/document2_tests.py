@@ -603,7 +603,13 @@ class TestDocument2Permissions(object):
     assert_equal(new_doc.uuid, data['document']['uuid'], data)
     assert_true('perms' in data['document'])
     assert_equal(
-        {'read': {'users': [], 'groups': []}, 'write': {'users': [], 'groups': []}},
+        {
+          'read': {'users': [], 'groups': []},
+          'write': {'users': [], 'groups': []},
+          'link_read': False,
+          'link_sharing_on': False,
+          'link_write': False,
+        },
         data['document']['perms']
     )
 
