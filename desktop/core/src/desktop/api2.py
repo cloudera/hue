@@ -655,10 +655,10 @@ def share_document_link(request):
   """
   Globally activate of de-activate access to a document for logged-in users.
 
-  Example of input: {"uuid": "xxxx", "data": "read" / "write" / "off"}
+  Example of input: {"uuid": "xxxx", "perm": "read" / "write" / "off"}
   """
   uuid = request.POST.get('uuid')
-  perm = request.POST.get('data')
+  perm = request.POST.get('perm')
 
   if not uuid or not perm:
     raise PopupException(_('share_document_link requires uuid and permission data'))

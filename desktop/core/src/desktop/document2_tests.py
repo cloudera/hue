@@ -1094,8 +1094,10 @@ class TestDocument2Permissions(object):
 
       assert_true(doc.get_permissions('read'))
       assert_false(doc.get_permissions('write'))
-      assert_false(doc.get_permission('read').users.all())  # There is no doc listing via links, only direct access
-      assert_false(doc.get_permission('read').groups.all())
+      assert_false(doc.get_permission('link_read').users.all())
+      assert_false(doc.get_permission('link_read').groups.all())
+      assert_false(doc.get_permission('read'))  # There is no doc listing via links, only direct access
+      assert_false(doc.get_permission('write'))
 
       doc.share(self.user, name=Document2Permission.LINK_READ_PERM, is_link_on=False)
 
@@ -1181,7 +1183,7 @@ class TestDocument2Permissions(object):
       assert_true(doc.can_read(self.user_not_me))
       assert_true(doc.can_write(self.user_not_me))
 
-      assert_equal(0, doc.get_permissions('read').count())
+      assert_equal(1, doc.get_permissions('read').count())
       assert_equal(2, doc.get_permissions('write').count())
 
       # Not shared
@@ -1193,8 +1195,12 @@ class TestDocument2Permissions(object):
       assert_false(doc.can_read(self.user_not_me))
       assert_false(doc.can_write(self.user_not_me))
 
-      assert_equal(0, doc.get_permissions('read').count())
-      assert_equal(0, doc.get_permissions('write').count())
+      assert_equal(1, doc.get_permissions('read').count())  # 1 READ but empty people
+      assert_false(doc.get_permissions('read')[0].users.all())
+      assert_false(doc.get_permissions('read')[0].groups.all())
+      assert_equal(1, doc.get_permissions('write').count())  # 1 WRITE but empty people
+      assert_false(doc.get_permissions('write')[0].users.all())
+      assert_false(doc.get_permissions('write')[0].groups.all())
     finally:
       doc.delete()
 
