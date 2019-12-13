@@ -51,7 +51,7 @@ const TEMPLATE = `
 
 <div class="snippet-tab-actions">
   <form autocomplete="off" class="inline-block">
-    <input class="input-small search-input" type="text" autocorrect="off" autocomplete="do-not-autocomplete" autocapitalize="off" spellcheck="false" placeholder="${ I18n('Search...') }" data-bind="
+    <input class="input-small search-input" type="text" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } placeholder="${ I18n('Search...') }" data-bind="
         textInput: historyFilter,
         clearable: historyFilter
       "/>

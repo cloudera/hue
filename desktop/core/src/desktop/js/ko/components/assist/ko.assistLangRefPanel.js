@@ -22,6 +22,7 @@ import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 
+// prettier-ignore
 const TEMPLATE = `
   <script type="text/html" id="language-reference-topic-tree">
     <!-- ko if: $data.length -->
@@ -51,7 +52,7 @@ const TEMPLATE = `
       <div class="assist-flex-search">
         <div class="assist-filter">
           <form autocomplete="off">
-            <input class="clearable" type="text" autocorrect="off" autocomplete="do-not-autocomplete" spellcheck="false" placeholder="Filter..." data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
+            <input class="clearable" type="text" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } placeholder="Filter..." data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
           </form>
         </div>
       </div>

@@ -39,6 +39,8 @@ const globalVars = {
   },
   LOGGED_USERNAME: 'foo',
   LOGGED_USER_ID: 'bar',
+  PREVENT_AUTOFILL_INPUT_ATTRS:
+    'autocorrect="off" autocomplete="do-not-autocomplete" autocapitalize="off" spellcheck="false"',
   STATIC_URLS: {
     'impala/art/icon_impala_48.png': 'impala/art/icon_impala_48.png',
     'beeswax/art/icon_beeswax_48.png': 'beeswax/art/icon_beeswax_48.png'

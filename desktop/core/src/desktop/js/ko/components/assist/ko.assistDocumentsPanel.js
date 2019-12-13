@@ -24,6 +24,7 @@ import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { DOCUMENT_TYPES } from 'doc/docSupport';
 
+// prettier-ignore
 const TEMPLATE = `
   <script type="text/html" id="document-context-items">
     <!-- ko if: definition().type === 'directory' -->
@@ -178,7 +179,7 @@ const TEMPLATE = `
   <div class="assist-flex-search">
     <div class="assist-filter">
       <form autocomplete="off">
-        <input class="clearable" type="text" autocorrect="off" autocomplete="do-not-autocomplete" spellcheck="false" placeholder="${I18n(
+        <input class="clearable" type="text" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } placeholder="${I18n(
           'Filter...'
         )}" data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/>
       </form>

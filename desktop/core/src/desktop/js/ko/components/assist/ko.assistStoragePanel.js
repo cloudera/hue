@@ -22,6 +22,7 @@ import componentUtils from 'ko/components/componentUtils';
 import huePubSub from '../../../utils/huePubSub';
 import I18n from 'utils/i18n';
 
+// prettier-ignore
 const TEMPLATE = `
   <script type="text/html" id="storage-context-items">
     <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: -15, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${I18n(
@@ -127,7 +128,7 @@ const TEMPLATE = `
       <form autocomplete="off">
         <input class="clearable" type="text" placeholder="${I18n(
           'Filter...'
-        )}" autocorrect="off" autocomplete="do-not-autocomplete" autocapitalize="off" spellcheck="false"
+        )}" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS }
         data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/>
       </form>
     </div>
