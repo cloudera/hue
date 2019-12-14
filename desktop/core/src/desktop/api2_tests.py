@@ -24,6 +24,7 @@ from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 
 from useradmin.models import get_default_user_group, User
 
+from desktop.conf import ENABLE_GIST_PREVIEW
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from desktop.models import Document2
@@ -524,3 +525,126 @@ class TestDocumentApiSharingPermissions(object):
 
     response = self.client_not_me.get('/desktop/api2/doc/?uuid=%s' % doc_id)
     assert_equal(-1, json.loads(response.content)['status'], response.content)
+
+
+class TestDocumentGist(object):
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="gist_user", groupname="default", recreate=True, is_superuser=False)
+    self.client_not_me = make_logged_in_client(username="other_gist_user", groupname="default", recreate=True, is_superuser=False)
+
+    self.user = User.objects.get(username="gist_user")
+    self.user_not_me = User.objects.get(username="other_gist_user")
+
+    grant_access(self.user.username, self.user.username, "desktop")
+    grant_access(self.user_not_me.username, self.user_not_me.username, "desktop")
+
+
+  def _create_gist(self, statement, doc_type, name='', description='', client=None):
+    if client is None:
+      client = self.client
+
+    return client.post("/desktop/api2/gist/create", {
+        'statement': statement,
+        'doc_type': doc_type,
+        'name': name,
+        'description': description,
+      },
+    )
+
+
+  def _get_gist(self, uuid, client=None, is_crawler_bot=False):
+    if client is None:
+      client = self.client
+    if is_crawler_bot:
+      headers = {'HTTP_USER_AGENT': 'Slackbot-LinkExpanding 1.0 (+https://api.slack.com/robots)'}
+    else:
+      headers = {}
+
+    return client.get("/desktop/api2/gist/open", {
+        'uuid': uuid,
+      },
+      **headers
+    )
+
+
+  def test_create(self):
+    assert_false(Document2.objects.filter(type='gist', name='test_gist_create'))
+
+    response = self._create_gist(
+        statement='SELECT 1',
+        doc_type='hive-query',
+        name='test_gist_create',
+    )
+    gist = json.loads(response.content)
+
+    assert_true(Document2.objects.filter(type='gist', name='test_gist_create'))
+    assert_true(Document2.objects.filter(type='gist', uuid=gist['uuid']))
+    assert_equal(
+        'SELECT 1',
+        json.loads(Document2.objects.get(type='gist', uuid=gist['uuid']).data)['statement_raw']
+    )
+
+    response2 = self._create_gist(
+        statement='SELECT 2',
+        doc_type='hive-query',
+        name='test_gist_create2',
+    )
+    gist2 = json.loads(response2.content)
+
+    assert_true(Document2.objects.filter(type='gist', name='test_gist_create2'))
+    assert_true(Document2.objects.filter(type='gist', uuid=gist2['uuid']))
+    assert_equal(
+        'SELECT 2',
+        json.loads(Document2.objects.get(type='gist', uuid=gist2['uuid']).data)['statement_raw']
+    )
+
+
+  def test_get(self):
+    response = self._create_gist(
+        statement='SELECT 1',
+        doc_type='hive-query',
+        name='test_gist_get',
+    )
+    gist = json.loads(response.content)
+
+    response = self._get_gist(uuid=gist['uuid'])
+    assert_equal(302, response.status_code)
+    assert_equal('/hue/editor?gist=%(uuid)s&type=hive-query' % gist, response.url)
+
+    response = self._get_gist(uuid=gist['uuid'], client=self.client_not_me)
+    assert_equal(302, response.status_code)
+    assert_equal('/hue/editor?gist=%(uuid)s&type=hive-query' % gist, response.url)
+
+
+  def test_get_unfurl(self):
+    # Unfurling on
+    response = self._create_gist(
+        statement='SELECT 1',
+        doc_type='hive-query',
+        name='test_gist_get',
+    )
+    gist = json.loads(response.content)
+
+    response = self._get_gist(
+      uuid=gist['uuid'],
+      is_crawler_bot=True
+    )
+
+    assert_equal(200, response.status_code)
+    assert_true(b'<meta name="twitter:card" content="summary">' in response.content, response.content)
+    assert_true(b'<meta property="og:description" content="SELECT 1"/>' in response.content, response.content)
+
+    # Unfurling off
+    f = ENABLE_GIST_PREVIEW.set_for_testing(False)
+
+    try:
+      response = self._get_gist(
+        uuid=gist['uuid'],
+        is_crawler_bot=True
+      )
+
+      assert_equal(302, response.status_code)
+      assert_equal('/hue/editor?gist=%(uuid)s&type=hive-query' % gist, response.url)
+    finally:
+      f()
