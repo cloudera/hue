@@ -60,6 +60,7 @@ RUN ./build/env/bin/pip install \
   redis==2.10.6 \
   django_redis \
   flower \
+  pyhive \
   gevent \
   threadloop # Needed for Jaeger
 
