@@ -40,7 +40,8 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Administration
-  - Version 4.5
+  - Version 4
+  # - Version 4.5
 
 ---
 Looking at simplifying the usage of Databases and Datawarehouses or learning how to build Cloud webapps? Hue would be a great candidate for you!

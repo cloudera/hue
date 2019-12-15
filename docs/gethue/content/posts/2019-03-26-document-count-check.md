@@ -40,7 +40,8 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Administration
-  - Version 4.4
+  - Version 4
+  # - Version 4.4
 
 ---
 When Hue database has too many entries in certain tables, it will cause performance issue. Now Hue config check will help superuser to find this issue. Login as superuser and go to "Hue Administration", this sample screenshot will be displayed in the quick start wizard when the tables have too many entries.

@@ -39,7 +39,8 @@ ampforwp-amp-on-off:
 categories:
   - Querying
   - Browsing
-  - Version 4.5
+  - Version 4
+  # - Version 4.5
 
 ---
 Similarly to the Apache Impala [dialect][1], the [Editor][2] now provides a direct access to [Hive documentatio][3]n in the right panel. It is also still possible to right click on an instruction to get more details about it. We hope that it makes your SQL querying even more productive!

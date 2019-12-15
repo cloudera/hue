@@ -40,7 +40,8 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Administration
-  - Version 4.4
+  - Version 4
+  # - Version 4.4
 
 ---
 When [building Hue][1] on a Google Compute Engine machine, you might it this issue:

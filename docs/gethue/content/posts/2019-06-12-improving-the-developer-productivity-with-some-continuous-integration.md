@@ -38,7 +38,8 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Administration
-  - Version 4.5
+  - Version 4
+  # - Version 4.5
 
 ---
 Tooling and automation has been simplified dramatically with technologies like [Docker][1] and the Cloud. On top of this, continuous integration companies like [Circle CI][2] and [Travis CI][3] have added one more layer of simplicity.

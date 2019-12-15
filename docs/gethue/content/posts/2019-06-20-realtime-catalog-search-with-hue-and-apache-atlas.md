@@ -40,7 +40,8 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Querying
-  - Version 4.5
+  - Version 4
+  # - Version 4.5
 
 ---
 With the latest Hue (future 4.5 release), we are glad to announce that Hue integrates with [Apache Atlas][1] as backend to enable SQL users for real time data catalog searching.
