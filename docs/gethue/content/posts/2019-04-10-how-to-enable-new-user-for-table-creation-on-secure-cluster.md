@@ -41,7 +41,8 @@ ampforwp-amp-on-off:
 categories:
   - Administration
   - Querying
-  - Version 4.5
+  - Version 4
+  # - Version 4.5
 
 ---
 It can be tricky to grant a new user proper permissions on a secure cluster, let's walk through the steps to enable any new user for table creation on a kerberized cluster. Depends on your cluster size, creating user and group on each node can be tedious. Here we use pssh (Parallel ssh) for this task.

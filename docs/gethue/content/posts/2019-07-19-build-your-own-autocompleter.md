@@ -39,7 +39,8 @@ ampforwp-amp-on-off:
 categories:
   - Administration
   - Querying
-  - Version 4.5
+  - Version 4
+  # - Version 4.5
 
 ---
 Hue is a SQL Editor integrating with the most common [data warehouses and databases.][1] Getting specialized autocomplete for each language brings better code maintainability (force a decoupled design), speed (no need to load all the parsers for only one language) and obviously a nicer end user experience (Impala, Hive, PostgreSQL&#8230; always have slight different syntax).

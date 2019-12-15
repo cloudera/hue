@@ -40,8 +40,9 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Administration
-  - Version 4.4
-  - Version 4.5
+  # - Version 4.4
+  - Version 4
+  # - Version 4.5
 
 ---
 Making Hue easier to install, use and develop with a modern documentation.

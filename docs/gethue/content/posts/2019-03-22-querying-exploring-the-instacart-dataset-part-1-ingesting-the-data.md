@@ -41,7 +41,8 @@ ampforwp-amp-on-off:
 categories:
   - Browsing
   - Querying
-  - Version 4.4
+  - Version 4
+  # - Version 4.4
 
 ---
 Self-service exploratory analytics is one of the most common use cases of the Hue users. In this tutorial, let's see how to get started on the analysis. We will use the free [Instacart][1] dataset and start with the [Importer][2] feature.

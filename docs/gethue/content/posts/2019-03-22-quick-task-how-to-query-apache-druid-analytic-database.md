@@ -40,7 +40,8 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Querying
-  - Version 4.4
+  - Version 4
+  # - Version 4.4
 
 ---
 Self-service exploratory analytics is one of the most common use cases of the Hue users. While deeply integrated with [Apache Impala][1] and [Apache Hive][2], Hue also lets you take advantage of its [smart editor][3] and assistants with any databases. In this tutorial, let's see how to query [Apache Druid][4].

@@ -40,7 +40,8 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Administration
-  - Version 4.5
+  - Version 4
+  # - Version 4.5
 
 ---
 Fast page loads are notorious for providing a much nicer user experience. Who likes to wait or have a slow display of the page?

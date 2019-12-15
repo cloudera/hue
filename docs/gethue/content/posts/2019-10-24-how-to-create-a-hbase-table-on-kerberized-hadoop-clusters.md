@@ -39,10 +39,11 @@ sf_caption_position:
 ampforwp-amp-on-off:
   - default
 categories:
-  - HBase
-  - Hue 4.3
-  - Hue 4.4
-  - Hue 4.5
+  - Browsing
+  # - Version 4.3
+  # - Version 4.4
+  - Version 4
+  # - Version 4.5
 
 ---
 Hi SQL Data Explorers,
@@ -58,7 +59,7 @@ With change from HBase([HBASE-19852][2]), we have to configure HBase properly th
 
 ### Step 1
 Navigate to CM->Clusters->HBASE-1->Configurations, search for &#8220;thrift&#8221; and verify the &#8220;Enable HBase Thrift Http Server&#8221; and &#8220;Enable HBase Thrift Proxy Users&#8221; are checked, and &#8220;Enable HBase Thrift Server Compact Protocol&#8221; and &#8220;Enable HBase Thrift Server Framed Transport&#8221; are unchecked.
-  
+
 <a href="https://cdn.gethue.com/uploads/2019/10/Hbase-Configuration1.png"><img src="https://cdn.gethue.com/uploads/2019/10/Hbase-Configuration1.png" /></a>
 
 ### Step 2
@@ -72,12 +73,12 @@ otherwise, follow step 2b
 on same page, search for &#8220;core-site&#8221; and fill in as following to &#8220;HBase Service Advanced Configuration Snippet (Safety Valve) for core-site.xml&#8221;
 
 <pre><code class="bash">hadoop.proxyuser.hbase.hosts: *
-hadoop.proxyuser.hbase.groups: * 
+hadoop.proxyuser.hbase.groups: *
 </code></pre>
 
 ### Step 3
 If your cluster is kerberized cluster, find out your HBase thrift server and its HTTP kerberos principal and then config following parameters:
-  
+
 HBase Service Advanced Configuration Snippet (Safety Valve) for hbase-site.xml:
 
 <pre><code class="bash">hbase.thrift.spnego.principal: HTTP/${YOUR_HBASE_THRIFT_SERVER_NAME}/${REALM}
@@ -97,7 +98,7 @@ Find out Kerberos Principal for HTTP on HBase thrift host: navigate to CM->Admin
 Configure Thrift server with the value you found at step 3a and 3b
 
 <a href="https://cdn.gethue.com/uploads/2019/10/ConfigureThriftServerSpnegoPrincipal.png"><img src="https://cdn.gethue.com/uploads/2019/10/ConfigureThriftServerSpnegoPrincipal.png" /></a>
-  
+
 Save Changes and deploy the staled configurations then restart HBase.
 
 Now, navigate to Hue UI, https://${huehost}:8889/hue/about/#step1, the &#8216;Check Configurations&#8217; for HBase should pass.

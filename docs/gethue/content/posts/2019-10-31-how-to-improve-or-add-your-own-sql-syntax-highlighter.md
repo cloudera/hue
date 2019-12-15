@@ -37,8 +37,8 @@ sf_caption_position:
 ampforwp-amp-on-off:
   - default
 categories:
-  - Editor / Notebook
-  - Hue 4.6
+  - Querying
+  - Version 4.6
 
 ---
 Hue&#8217;s Editor [SQL functionalities][1] makes it much more easier to query your databases and datawarehouses. It was previously described about how to [improve or create your own SQL autocompleter][2] so that the Querying Experience gets even more effective. This post is about going one step further and improving the SQL syntax highlighting.

@@ -40,7 +40,8 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Querying
-  - Version 4.4
+  - Version 4
+  # - Version 4.4
 
 ---
 <span style="font-weight: 400;">We’ve made some improvements when using </span>[<span style="font-weight: 400;">Apache TEZ</span>][1] <span style="font-weight: 400;">as the query engine of the </span>[<span style="font-weight: 400;">SQL Editor</span>][2]<span style="font-weight: 400;">:</span>
