@@ -161,7 +161,7 @@ blockquote {
 }
 ul,
 ol {
-  list-style: unset;
+  list-style: none;
   line-height: 1.85714286em;
 }
 ul.bullets {
@@ -8569,6 +8569,14 @@ article .article__body ul {
   line-height: 1.68421053em;
   font-weight: 400;
   color: #808080;
+}
+article .article__body ul {
+  list-style: unset;
+  margin-left: 1em;
+}
+article .article__body ul ul {
+  font-size: 1em;
+  margin-left: 1em;
 }
 article .article__body p:not(:last-child),
 article .article__body ul:not(:last-child) {
