@@ -46,7 +46,7 @@
 /**!**************/
 /**!**************/
 /**! 01. Reset **/
-/* *,
+*,
 h1,
 h2,
 h3,
@@ -58,7 +58,7 @@ ul,
 a {
   margin: 0;
   padding: 0;
-} */
+}
 /**! 02. Typography **/
 html {
   font-size: 87.5%;
@@ -8569,9 +8569,6 @@ article .article__body ul {
   line-height: 1.68421053em;
   font-weight: 400;
   color: #808080;
-}
-article .article__body ul ul {
-  font-size: 1em;
 }
 article .article__body p:not(:last-child),
 article .article__body ul:not(:last-child) {
