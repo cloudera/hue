@@ -4,7 +4,7 @@ FROM ubuntu:18.04
 LABEL description="Hue SQL Assistant - gethue.com"
 
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update -y && apt-get install -y \
+RUN apt-get update -y && apt-get install -y --no-install-recommends \
   build-essential \
   libkrb5-dev \
   libmysqlclient-dev \
@@ -35,6 +35,8 @@ RUN apt-get update -y && apt-get install -y \
   libxmlsec1-openssl \
   krb5-config \
   krb5-user \
+  # Needed when having --no-install-recommends
+  gpg-agent \
   && rm -rf /var/lib/apt/lists/*
 
 ADD . /hue
