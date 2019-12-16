@@ -220,6 +220,87 @@ describe('hiveAutocompleteParser.js ALTER statements', () => {
     });
   });
 
+  describe('ALTER MATERIALIZED VIEW', () => {
+    it('should handle "ALTER MATERIALIZED VIEW baa.boo ENABLE REWRITE;|"', () => {
+      assertAutoComplete({
+        beforeCursor: 'ALTER MATERIALIZED VIEW baa.boo ENABLE REWRITE;;',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "ALTER |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'ALTER ',
+        afterCursor: '',
+        containsKeywords: ['MATERIALIZED VIEW'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "ALTER MATERIALIZED |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'ALTER MATERIALIZED ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['VIEW']
+        }
+      });
+    });
+
+    it('should suggest views for "ALTER MATERIALIZED VIEW |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'ALTER MATERIALIZED VIEW ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestTables: { onlyViews: true },
+          suggestDatabases: { appendDot: true }
+        }
+      });
+    });
+
+    it('should suggest views for "ALTER MATERIALIZED VIEW boo.|"', () => {
+      assertAutoComplete({
+        beforeCursor: 'ALTER MATERIALIZED VIEW boo.',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestTables: { identifierChain: [{ name: 'boo' }], onlyViews: true }
+        }
+      });
+    });
+
+    it('should suggest keywords for "ALTER MATERIALIZED VIEW boo |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'ALTER MATERIALIZED VIEW boo ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['DISABLE REWRITE', 'ENABLE REWRITE']
+        }
+      });
+    });
+
+    it('should suggest keywords for "ALTER MATERIALIZED VIEW boo.foo DISABLE |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'ALTER MATERIALIZED VIEW boo.foo DISABLE ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['REWRITE']
+        }
+      });
+    });
+  });
+
   describe('ALTER TABLE', () => {
     it('should suggest keywords for "ALTER |"', () => {
       assertAutoComplete({
