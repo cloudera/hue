@@ -50,6 +50,7 @@ NICE_NAME = "Hue"
 
 ENV_HUE_PROCESS_NAME = "HUE_PROCESS_NAME"
 ENV_DESKTOP_DEBUG = "DESKTOP_DEBUG"
+LOGGING_CONFIG = None # We're handling our own logging config. Consider upgrading our logging infra to LOGGING_CONFIG
 
 
 ############################################################
