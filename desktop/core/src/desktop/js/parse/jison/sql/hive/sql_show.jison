@@ -33,6 +33,7 @@ ShowStatement
  | ShowGrantStatement
  | ShowIndexStatement
  | ShowLocksStatement
+ | ShowMaterializedViewsStatement
  | ShowPartitionsStatement
  | ShowRolesStatement
  | ShowRoleStatement
@@ -46,7 +47,7 @@ ShowStatement
 ShowStatement_EDIT
  : 'SHOW' 'CURSOR'
    {
-     parser.suggestKeywords(['COLUMNS', 'COMPACTIONS', 'CONF', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FORMATTED', 'FUNCTIONS', 'GRANT', 'INDEX', 'INDEXES', 'LOCKS', 'PARTITIONS', 'PRINCIPALS', 'ROLE GRANT', 'ROLES', 'SCHEMAS', 'TABLE EXTENDED', 'TABLES', 'TBLPROPERTIES', 'TRANSACTIONS', 'VIEWS']);
+     parser.suggestKeywords(['COLUMNS', 'COMPACTIONS', 'CONF', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FORMATTED', 'FUNCTIONS', 'GRANT', 'INDEX', 'INDEXES', 'LOCKS', 'MATERIALIZED VIEWS', 'PARTITIONS', 'PRINCIPALS', 'ROLE GRANT', 'ROLES', 'SCHEMAS', 'TABLE EXTENDED', 'TABLES', 'TBLPROPERTIES', 'TRANSACTIONS', 'VIEWS']);
    }
  | 'SHOW' 'CURSOR' RegularOrBackTickedSchemaQualifiedName
    {
@@ -69,6 +70,7 @@ ShowStatement_EDIT
  | ShowGrantStatement_EDIT
  | ShowIndexStatement_EDIT
  | ShowLocksStatement_EDIT
+ | ShowMaterializedViewsStatement_EDIT
  | ShowPartitionsStatement_EDIT
  | ShowRoleStatement_EDIT
  | ShowTablesStatement_EDIT
@@ -267,6 +269,27 @@ ShowIndexStatement_EDIT
    {
      parser.suggestTables({identifierChain: [{name: $6}]});
    }
+ ;
+
+ShowMaterializedViewsStatement
+ : 'SHOW' 'MATERIALIZED' 'VIEWS' OptionalInOrFromDatabase OptionalLike
+ ;
+
+ShowMaterializedViewsStatement_EDIT
+ : 'SHOW' 'MATERIALIZED' 'CURSOR'
+   {
+     parser.suggestKeywords(['VIEWS']);
+   }
+ | 'SHOW' 'MATERIALIZED' 'VIEWS' OptionalInOrFromDatabase OptionalLike 'CURSOR'
+   {
+     if (!$5 && !$4) {
+       parser.suggestKeywords([{ value: 'IN', weight: 2 }, { value: 'FROM', weight: 2 }, { value: 'LIKE', weight: 1 }]);
+     } else if (!$5) {
+       parser.suggestKeywords(['LIKE']);
+     }
+   }
+ | 'SHOW' 'MATERIALIZED' 'VIEWS' InOrFromDatabase_EDIT OptionalLike
+ | 'SHOW' 'MATERIALIZED' 'VIEWS' OptionalInOrFromDatabase Like_EDIT
  ;
 
 ShowLocksStatement
