@@ -2,7 +2,7 @@
 [![DockerPulls](https://img.shields.io/docker/pulls/gethue/hue.svg)](https://registry.hub.docker.com/u/gethue/hue/)
 ![GitHub contributors](https://img.shields.io/github/contributors-anon/cloudera/hue.svg)
 
-![Hue Logo](https://cdn.gethue.com/uploads/2019/12/hue4.6.png)
+![Hue Logo](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/hue_logo.png)
 
 
 Query. Explore. Share.
@@ -20,7 +20,7 @@ are executing 100s of 1000s of queries daily. It also ships in Amazon AWS and it
 Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/parsers/) and any [contributions](CONTRIBUTING.md) are welcome.
 
 
-![Hue Editor](docs/images/sql-editor.png)
+![Hue Editor](https://cdn.gethue.com/uploads/2019/12/hue4.6.png)
 
 
 Getting Started
