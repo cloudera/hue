@@ -27,7 +27,7 @@ DataManipulation_EDIT
  ;
 
 LoadStatement
- : 'LOAD' 'DATA' OptionalLocal 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec
+ : 'LOAD' 'DATA' OptionalLocal 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec OptionalInputFormat
    {
      parser.addTablePrimary($9);
    }
@@ -64,19 +64,25 @@ LoadStatement_EDIT
      parser.suggestTables();
      parser.suggestDatabases({ appendDot: true });
    }
- | 'LOAD' 'DATA' OptionalLocal 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
- | 'LOAD' 'DATA' OptionalLocal 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'
+ | 'LOAD' 'DATA' OptionalLocal 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec OptionalInputFormat
+ | 'LOAD' 'DATA' OptionalLocal 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec OptionalInputFormat 'CURSOR'
    {
      parser.addTablePrimary($9);
-     if (!$10) {
-       parser.suggestKeywords(['PARTITION']);
+     if (!$10 && !$11) {
+       parser.suggestKeywords(['INPUTFORMAT', 'PARTITION']);
+     } else if ($10 && !$11) {
+       parser.suggestKeywords(['INPUTFORMAT']);
      }
    }
- | 'LOAD' 'DATA' OptionalLocal 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
+ | 'LOAD' 'DATA' OptionalLocal 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT OptionalInputFormat
    {
      parser.addTablePrimary($9);
    }
- | 'LOAD' 'DATA' OptionalLocal 'INPATH' HdfsPath_EDIT OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec
+ | 'LOAD' 'DATA' OptionalLocal 'INPATH' HdfsPath OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec InputFormat_EDIT
+   {
+     parser.addTablePrimary($9);
+   }
+ | 'LOAD' 'DATA' OptionalLocal 'INPATH' HdfsPath_EDIT OptionalOverwrite 'INTO' 'TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec OptionalInputFormat
    {
      parser.addTablePrimary($9);
    }
@@ -90,6 +96,22 @@ OptionalOverwrite
 OptionalLocal
  :
  | 'LOCAL'
+ ;
+
+OptionalInputFormat
+ :
+ | InputFormat
+ ;
+
+InputFormat
+ : 'INPUTFORMAT' QuotedValue 'SERDE' QuotedValue
+ ;
+
+InputFormat_EDIT
+ : 'INPUTFORMAT' QuotedValue 'CURSOR'
+   {
+     parser.suggestKeywords(['SERDE']);
+   }
  ;
 
 ImportStatement
