@@ -39,6 +39,7 @@ DropStatement
  | DropTableStatement
  | DropIndexStatement
  | DropMacroStatement
+ | DropMaterializedViewStatement
  | DropViewStatement
  | TruncateTableStatement
  ;
@@ -49,11 +50,12 @@ DropStatement_EDIT
  | DropTableStatement_EDIT
  | DropIndexStatement_EDIT
  | DropMacroStatement_EDIT
+ | DropMaterializedViewStatement_EDIT
  | DropViewStatement_EDIT
  | TruncateTableStatement_EDIT
  | 'DROP' 'CURSOR'
    {
-     parser.suggestKeywords(['DATABASE', 'FUNCTION', 'INDEX', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'VIEW']);
+     parser.suggestKeywords(['DATABASE', 'FUNCTION', 'INDEX', 'MATERIALIZED VIEW', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'VIEW']);
    }
  ;
 
@@ -158,7 +160,6 @@ OptionalPurge
  | 'PURGE'
  ;
 
-
 DropIndexStatement
  : 'DROP' 'INDEX' OptionalIfExists RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier
    {
@@ -200,6 +201,32 @@ DropMacroStatement_EDIT
      }
    }
  | 'DROP' 'TEMPORARY' 'MACRO' OptionalIfExists_EDIT
+ ;
+
+
+DropMaterializedViewStatement
+ : 'DROP' 'MATERIALIZED' 'VIEW' SchemaQualifiedTableIdentifier
+   {
+     parser.addTablePrimary($4);
+   }
+ ;
+
+DropMaterializedViewStatement_EDIT
+ : 'DROP' 'MATERIALIZED' 'CURSOR'
+   {
+     parser.suggestKeywords(['VIEW']);
+   }
+ | 'DROP' 'MATERIALIZED' 'VIEW' 'CURSOR'
+   {
+     parser.suggestTables({ onlyViews: true });
+     parser.suggestDatabases({ appendDot: true });
+   }
+ | 'DROP' 'MATERIALIZED' VIEW SchemaQualifiedTableIdentifier_EDIT
+   {
+     if (parser.yy.result.suggestTables) {
+       parser.yy.result.suggestTables.onlyViews = true;
+     }
+   }
  ;
 
 DropViewStatement

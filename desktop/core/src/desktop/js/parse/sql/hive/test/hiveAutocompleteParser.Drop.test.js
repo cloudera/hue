@@ -66,6 +66,7 @@ describe('hiveAutocompleteParser.js DROP statements', () => {
           'DATABASE',
           'FUNCTION',
           'INDEX',
+          'MATERIALIZED VIEW',
           'ROLE',
           'SCHEMA',
           'TABLE',
@@ -346,6 +347,57 @@ describe('hiveAutocompleteParser.js DROP statements', () => {
           lowerCase: false,
           suggestTables: {},
           suggestDatabases: { appendDot: true }
+        }
+      });
+    });
+  });
+
+  describe('DROP MATERIALIZED VIEW', () => {
+    it('should handle "DROP MATERIALIZED VIEW foo.boo;|', () => {
+      assertAutoComplete({
+        beforeCursor: 'DROP MATERIALIZED VIEW foo.boo;',
+        afterCursor: '',
+        containsKeywords: ['SELECT'],
+        noErrors: true,
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "DROP MATERIALIZED |', () => {
+      assertAutoComplete({
+        beforeCursor: 'DROP MATERIALIZED ',
+        afterCursor: '',
+        noErrors: true,
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['VIEW']
+        }
+      });
+    });
+
+    it('should suggest views for "DROP MATERIALIZED VIEW |', () => {
+      assertAutoComplete({
+        beforeCursor: 'DROP MATERIALIZED VIEW ',
+        afterCursor: '',
+        noErrors: true,
+        expectedResult: {
+          lowerCase: false,
+          suggestTables: { onlyViews: true },
+          suggestDatabases: { appendDot: true }
+        }
+      });
+    });
+
+    it('should suggest views for "DROP MATERIALIZED VIEW boo.|', () => {
+      assertAutoComplete({
+        beforeCursor: 'DROP MATERIALIZED VIEW boo.',
+        afterCursor: '',
+        noErrors: true,
+        expectedResult: {
+          lowerCase: false,
+          suggestTables: { identifierChain: [{ name: 'boo' }], onlyViews: true }
         }
       });
     });
