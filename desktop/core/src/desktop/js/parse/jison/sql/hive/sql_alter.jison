@@ -25,6 +25,7 @@ DataDefinition_EDIT
 AlterStatement
  : AlterDatabase
  | AlterIndex
+ | AlterMaterializedView
  | AlterTable
  | AlterView
  | Msck
@@ -34,13 +35,14 @@ AlterStatement
 AlterStatement_EDIT
  : AlterDatabase_EDIT
  | AlterIndex_EDIT
+ | AlterMaterializedView_EDIT
  | AlterTable_EDIT
  | AlterView_EDIT
  | Msck_EDIT
  | ReloadFunction_EDIT
  | 'ALTER' 'CURSOR'
    {
-     parser.suggestKeywords(['DATABASE', 'INDEX', 'SCHEMA', 'TABLE', 'VIEW']);
+     parser.suggestKeywords(['DATABASE', 'INDEX', 'MATERIALIZED VIEW', 'SCHEMA', 'TABLE', 'VIEW']);
    }
  ;
 
@@ -119,6 +121,41 @@ AlterIndex_EDIT
      } else {
        parser.suggestKeywords(['REBUILD']);
      }
+   }
+ ;
+
+AlterMaterializedView
+ : 'ALTER' 'MATERIALIZED' 'VIEW' SchemaQualifiedTableIdentifier EnableOrDisable 'REWRITE'
+   {
+     parser.addTablePrimary($4);
+   }
+ ;
+
+AlterMaterializedView_EDIT
+ : 'ALTER' 'MATERIALIZED' 'CURSOR'
+   {
+     parser.suggestKeywords(['VIEW']);
+   }
+ | 'ALTER' 'MATERIALIZED' 'VIEW' 'CURSOR'
+   {
+     parser.suggestTables({ onlyViews: true });
+     parser.suggestDatabases({ appendDot: true });
+   }
+ | 'ALTER' 'MATERIALIZED' 'VIEW' SchemaQualifiedTableIdentifier_EDIT
+   {
+     if (parser.yy.result.suggestTables) {
+       parser.yy.result.suggestTables.onlyViews = true;
+     }
+   }
+ | 'ALTER' 'MATERIALIZED' 'VIEW' SchemaQualifiedTableIdentifier 'CURSOR'
+   {
+     parser.addTablePrimary($4);
+     parser.suggestKeywords(['DISABLE REWRITE', 'ENABLE REWRITE']);
+   }
+ | 'ALTER' 'MATERIALIZED' 'VIEW' SchemaQualifiedTableIdentifier EnableOrDisable 'CURSOR'
+   {
+     parser.addTablePrimary($4);
+     parser.suggestKeywords(['REWRITE']);
    }
  ;
 
