@@ -68,9 +68,6 @@ SqlStatement
  : DataDefinition
  | DataManipulation
  | QuerySpecification
- | ExplainClause DataDefinition
- | ExplainClause DataManipulation
- | ExplainClause QuerySpecification
  ;
 
 SqlStatement_EDIT
@@ -82,17 +79,10 @@ SqlStatement_EDIT
    {
      parser.suggestKeywords(['INSERT', 'SELECT']);
    }
- | ExplainClause_EDIT
  | DataDefinition_EDIT
  | DataManipulation_EDIT
  | QuerySpecification_EDIT
  | SetSpecification_EDIT
- | ExplainClause DataDefinition_EDIT
- | ExplainClause DataManipulation_EDIT
- | ExplainClause QuerySpecification_EDIT
- | ExplainClause_EDIT DataDefinition
- | ExplainClause_EDIT DataManipulation
- | ExplainClause_EDIT QuerySpecification
  ;
 
 NonReservedKeyword
@@ -102,10 +92,12 @@ NonReservedKeyword
  | 'AFTER'
  | 'ANALYZE'
  | 'ARCHIVE'
+ | 'AST'
  | 'AVRO'
  | 'BUCKET'
  | 'BUCKETS'
  | 'CASCADE'
+ | 'CBO'
  | 'CHANGE'
  | 'CHECK'
  | 'CLUSTERED'
@@ -116,26 +108,31 @@ NonReservedKeyword
  | 'COMPACTIONS'
  | 'COMPUTE'
  | 'CONCATENATE'
+ | 'COST'
  | 'CURRENT_DATE'
  | 'CURRENT_TIMESTAMP'
  | 'CURRENT_USER'
  | 'DATA'
  | 'DATABASES'
  | 'DAY'
+ | 'DAYOFWEEK'
  | 'DBPROPERTIES'
  | 'DEFAULT'
  | 'DEFERRED'
  | 'DEFINED'
  | 'DELIMITED'
  | 'DEPENDENCY'
+ | 'DETAIL'
  | 'DIRECTORY'
  | 'DISABLE'
+ | 'DISTRIBUTED'
  | 'DOUBLE_PRECISION'
  | 'ENABLE'
  | 'ESCAPED'
  | 'EXCHANGE'
  | 'EXPLAIN'
  | 'EXPORT'
+ | 'EXPRESSION'
  | 'FIELDS'
  | 'FILE'
  | 'FILEFORMAT'
@@ -148,16 +145,18 @@ NonReservedKeyword
  | 'INPUTFORMAT'
  | 'ITEMS'
  | 'JAR'
+ | 'JOINCOST'
  | 'JSONFILE'
  | 'KEY'
  | 'KEYS'
+ | 'LAST'
  | 'LINES'
  | 'LITERAL'
  | 'LOAD'
  | 'LOCATION'
  | 'LOCKS'
- | 'MATERIALIZED'
  | 'MATCHED'
+ | 'MATERIALIZED'
  | 'MERGE'
  | 'METADATA'
  | 'MINUTE'
@@ -168,10 +167,13 @@ NonReservedKeyword
  | 'NOSCAN'
  | 'NOVALIDATE'
  | 'OFFLINE'
+ | 'ONLY'
+ | 'OPERATOR'
  | 'OPTION'
  | 'ORC'
  | 'OUTPUTFORMAT'
  | 'OVERWRITE'
+ | 'OVERWRITE_DIRECTORY'
  | 'OWNER'
  | 'PARQUET'
  | 'PARTITIONED'
@@ -200,18 +202,20 @@ NonReservedKeyword
  | 'SERDEPROPERTIES'
  | 'SETS'
  | 'SHOW'
+ | 'SKEWED_LOCATION'
  | 'SKEWED'
  | 'SORTED'
  | 'STATISTICS'
  | 'STORED'
+ | 'STORED_AS_DIRECTORIES'
  | 'STRING'
  | 'STRUCT'
+ | 'SUMMARY'
  | 'TABLES'
  | 'TBLPROPERTIES'
  | 'TEMPORARY'
  | 'TERMINATED'
  | 'TEXTFILE'
- | 'TIMESTAMP'
  | 'TINYINT'
  | 'TOUCH'
  | 'TRANSACTIONAL'
@@ -220,7 +224,7 @@ NonReservedKeyword
  | 'UNIONTYPE'
  | 'UNIQUE'
  | 'USE'
- | 'USER'
+ | 'VECTORIZATION'
  | 'VIEW'
  | 'WAIT'
  | 'WEEK'
@@ -230,41 +234,22 @@ NonReservedKeyword
 // | 'DESC'
 // | 'DISTRIBUTE'
 // | 'FORMATTED'
-// | 'FUNCTION'
 // | 'INDEX'
 // | 'INDEXES'
 // | 'LOCK'
+// | 'OVER'
 // | 'SCHEMA'
 // | 'SHOW_DATABASE'
 // | 'SORT'
+// | 'TABLESAMPLE'
+// | 'WINDOW'
+// | 'WITH'
  ;
 
 RegularIdentifier
  : 'REGULAR_IDENTIFIER'
  | 'VARIABLE_REFERENCE'
  | NonReservedKeyword
- ;
-
-ExplainClause
- : 'EXPLAIN' OptionalExplainTypes
- ;
-
-ExplainClause_EDIT
- : 'EXPLAIN' OptionalExplainTypes 'CURSOR'
-   {
-     if (!$2) {
-       parser.suggestDdlAndDmlKeywords([{ value: 'AUTHORIZATION', weight: 2 }, { value: 'DEPENDENCY', weight: 2 }, { value: 'EXTENDED', weight: 2 }]);
-     } else {
-       parser.suggestDdlAndDmlKeywords();
-     }
-   }
- ;
-
-OptionalExplainTypes
- :
- | 'AUTHORIZATION'
- | 'DEPENDENCY'
- | 'EXTENDED'
  ;
 
 // This is a work-around for error handling when a statement starts with some token that the parser can understand but
