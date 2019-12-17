@@ -67,7 +67,8 @@ def config_validator(user):
     from desktop.lib.fsmanager import get_filesystem
     warehouse = beeswax.hive_site.get_metastore_warehouse_dir()
     fs = get_filesystem()
-    fs.do_as_superuser(fs.stats, warehouse)
+    if fs:
+      fs.do_as_superuser(fs.stats, warehouse)
   except Exception:
     msg = 'Failed to access Hive warehouse: %s'
     LOG.exception(msg % warehouse)
