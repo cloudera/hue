@@ -307,6 +307,76 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
     return User.objects.count() == 0
 
 
+class RemoteJwtBackend(DesktopBackendBase):
+  '''
+  Auth is done with with the JWT framework API on another server.
+  '''
+  def authenticate(self, username=None, password=None):
+    from desktop.models import set_user_preferences
+    from desktop.conf import API_URL
+
+    credentials = {
+      'email': username,
+      'password': password,
+    }
+    response = requests.post(API_URL.get() + '/auth/', credentials)
+
+    if response.status_code != 200:
+      raise PermissionDenied()
+
+    user = find_or_create_user(username, password)
+    user.is_superuser = False
+    user.save()
+
+    ensure_has_a_group(user)
+
+    token = response.json()['token']
+    set_user_preferences(user, 'token', token)
+
+    return user
+
+  @classmethod
+  def manages_passwords_externally(cls):
+    return True
+
+
+class GoogleSignInBackend(DesktopBackendBase):
+  '''
+  Auth is not done with the traditional login view, but directly with the JWT framework API.
+  This is for certain Hue API calls only.
+  '''
+  def authenticate(self, id_token):
+    import json
+    from desktop.models import set_user_preferences
+    from desktop.conf import API_URL
+
+    credentials = {
+      'id_token': id_token,
+    }
+    response = requests.post(
+        API_URL.get() + '/iam/api/v1/oauth/check_token/google',
+        json.dumps({'response': credentials})
+    )
+
+    if response.status_code != 200:
+      raise PermissionDenied()
+
+    user_profile = response.json()
+    user = find_or_create_user(username=user_profile['email'])
+    user.is_superuser = False
+    user.save()
+
+    ensure_has_a_group(user)
+
+    set_user_preferences(user, 'token', user_profile['token'])
+
+    return user
+
+  @classmethod
+  def manages_passwords_externally(cls):
+    return True
+
+
 class ImpersonationBackend(django.contrib.auth.backends.ModelBackend):
   """
   Authenticate with a proxy user username/password but then login as another user.

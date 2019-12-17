@@ -92,6 +92,8 @@ import { simpleGet } from 'api/apiUtils'; // In analytics.mako, metrics.mako, th
 //   });
 // });
 
+import JwtAuth from 'auth/auth.js';
+
 // TODO: Migrate away
 window._ = _;
 window.apiHelper = apiHelper;
@@ -122,6 +124,7 @@ window.HueGeo = HueGeo;
 window.huePubSub = huePubSub;
 window.hueUtils = hueUtils;
 window.I18n = I18n;
+window.JwtAuth = JwtAuth;
 window.localforage = localforage;
 window.MultiLineEllipsisHandler = MultiLineEllipsisHandler;
 window.nv = nv;

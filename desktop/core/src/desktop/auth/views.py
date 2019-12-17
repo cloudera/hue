@@ -106,6 +106,7 @@ def dt_login(request, from_modal=False):
     redirect_to = request.GET.get('next', '/')
   else:
     redirect_to = request.POST.get('next', '/')
+
   is_first_login_ever = first_login_ever()
   backend_names = auth_forms.get_backend_names()
   is_active_directory = auth_forms.is_active_directory()
@@ -124,6 +125,8 @@ def dt_login(request, from_modal=False):
     if ENABLE_ORGANIZATIONS.get():
       UserCreationForm = OrganizationUserCreationForm
       AuthenticationForm = OrganizationAuthenticationForm
+    if request.POST.get('id_token') or backend_names == ['GoogleSignInBackend']:
+      AuthenticationForm = auth_forms.GoogleSignInAuthenticationForm
 
   if request.method == 'POST':
     request.audit = {

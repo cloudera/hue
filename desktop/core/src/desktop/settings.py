@@ -23,6 +23,7 @@
 from builtins import map, zip
 import datetime
 import gc
+import datetime
 import json
 import logging
 import os
@@ -537,6 +538,38 @@ AXES_REVERSE_PROXY_HEADER = desktop.conf.AUTH.REVERSE_PROXY_HEADER.get()
 
 
 LOGIN_URL = '/hue/accounts/login'
+
+
+def is_jwt_configured():
+  return 'JwtBackend' in AUTHENTICATION_BACKENDS
+
+
+if is_jwt_configured():
+  INSTALLED_APPS.extend([
+    'rest_framework',
+    'rest_framework.authtoken',
+  ])
+
+  SECRET_KEY = desktop.conf.get_secret_key() # TODO: Move logic above
+
+  REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+      'rest_framework.permissions.IsAuthenticated',
+      # 'rest_framework.permissions.AllowAny'
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+      'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+    ),
+  }
+
+  JWT_AUTH = {
+    'JWT_VERIFY': True,
+    'JWT_VERIFY_EXPIRATION': True,
+    'JWT_LEEWAY': 0,
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=86400),
+    'JWT_ALLOW_REFRESH': True,
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
+  }
 
 
 # SAML

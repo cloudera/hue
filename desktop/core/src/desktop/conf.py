@@ -974,6 +974,18 @@ DEFAULT_HDFS_SUPERUSER = Config(
   type=str,
   default="hdfs")
 
+API_URL = Config(
+  key="api_url",
+  help=_("Api of the Hue server. This is for when the Web interface will be decoupled from the API."),
+  type=str,
+  default=None)
+
+SSO_GOOGLE_API_KEY = Config(
+  key="sso_google_api_key",
+  help=_("Api of the Hue server. This is for when the Web interface will be decoupled from the API."),
+  type=str,
+  default=None)
+
 CUSTOM = ConfigSection(
   key="custom",
   help=_("Customizations to the UI."),

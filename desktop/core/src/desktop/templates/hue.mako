@@ -276,6 +276,7 @@ ${ hueIcons.symbols() }
     </div>
   </div>
 </div>
+
 ${ commonshare() | n,unicode }
 
 % for bundle in get_hue_bundles('hue'):

@@ -18,6 +18,7 @@
 import datetime
 import logging
 
+from django import forms
 from django.conf import settings
 from django.contrib.auth import authenticate, get_backends
 from django.contrib.auth.forms import AuthenticationForm as DjangoAuthenticationForm, UserCreationForm as DjangoUserCreationForm
@@ -188,6 +189,49 @@ class ImpersonationAuthenticationForm(AuthenticationForm):
     request = None
     self.user_cache = authenticate(request, username=self.cleaned_data.get('username'), password=self.cleaned_data.get('password'), login_as=self.cleaned_data.get('login_as'))
     return self.user_cache
+
+
+class GoogleSignInAuthenticationForm(forms.Form):
+  id_token = CharField(label=_t("Google Id Token"), max_length=2000)
+  username = None
+  password = None
+
+  error_messages = {
+      'invalid_login': _(
+          "The google login did not work"
+      ),
+
+  }
+
+  def __init__(self, request=None, *args, **kwargs):
+      """
+      The 'request' parameter is set for custom auth use by subclasses.
+      The form data comes in via the standard 'data' kwarg.
+      """
+      self.request = request
+      self.user_cache = None
+      super(GoogleSignInAuthenticationForm, self).__init__(*args, **kwargs)
+
+  def clean(self):
+    id_token = self.cleaned_data.get('id_token')
+
+    if id_token is not None:
+      self.user_cache = authenticate(self.request, id_token=id_token)
+
+    if self.user_cache is None:
+      raise self.get_invalid_login_error()
+
+    return self.cleaned_data
+
+  def get_user(self):
+    return self.user_cache
+
+  def get_invalid_login_error(self):
+    return forms.ValidationError(
+      self.error_messages['invalid_login'],
+      code='invalid_login',
+      params={},
+    )
 
 
 class LdapAuthenticationForm(AuthenticationForm):
