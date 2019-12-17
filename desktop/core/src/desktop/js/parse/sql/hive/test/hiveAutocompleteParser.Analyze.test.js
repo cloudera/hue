@@ -254,4 +254,118 @@ describe('hiveAutocompleteParser.js ANALYZE statements', () => {
       });
     });
   });
+
+  describe('EXPLAIN', () => {
+    it('should handle "EXPLAIN DEPENDENCY SELECT key, count(1) FROM srcpart WHERE ds IS NOT NULL GROUP BY key;|"', () => {
+      assertAutoComplete({
+        beforeCursor:
+          'EXPLAIN DEPENDENCY SELECT key, count(1) FROM srcpart WHERE ds IS NOT NULL GROUP BY key;',
+        afterCursor: '',
+        noErrors: true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "|"', () => {
+      assertAutoComplete({
+        beforeCursor: '',
+        afterCursor: '',
+        containsKeywords: ['EXPLAIN'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "EXPLAIN |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'EXPLAIN ',
+        afterCursor: '',
+        containsKeywords: ['AST', 'AUTHORIZATION', 'DEPENDENCY', 'EXTENDED', 'SELECT'],
+        doesNotContainKeywords: ['EXPLAIN'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "EXPLAIN AUTHORIZATION |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'EXPLAIN AUTHORIZATION ',
+        afterCursor: '',
+        containsKeywords: ['SELECT'],
+        doesNotContainKeywords: [
+          'AUTHORIZATION',
+          'COST',
+          'DEPENDENCY',
+          'EXTENDED',
+          'EXPLAIN',
+          'JOINCOST'
+        ],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "EXPLAIN CBO |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'EXPLAIN CBO ',
+        afterCursor: '',
+        containsKeywords: ['SELECT', 'COST', 'JOINCOST'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "EXPLAIN FORMATTED |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'EXPLAIN FORMATTED ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['CBO']
+        }
+      });
+    });
+
+    it('should suggest keywords for "EXPLAIN VECTORIZATION |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'EXPLAIN VECTORIZATION ',
+        afterCursor: '',
+        containsKeywords: ['ONLY', 'DETAIL', 'SUMMARY'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "EXPLAIN VECTORIZATION ONLY |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'EXPLAIN VECTORIZATION ONLY ',
+        afterCursor: '',
+        containsKeywords: ['DETAIL', 'SUMMARY'],
+        doesNotContainKeywords: ['ONLY'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest tables for "EXPLAIN EXTENDED SELECT * FROM |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'EXPLAIN EXTENDED SELECT * FROM ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestTables: {},
+          suggestDatabases: { appendDot: true }
+        }
+      });
+    });
+  });
 });

@@ -32,7 +32,6 @@
 'AND'                                { return 'AND'; }
 'ARRAY'                              { return 'ARRAY'; }
 'AS'                                 { return 'AS'; }
-'ASC'                                { return 'ASC'; }
 'AUTHORIZATION'                      { return 'AUTHORIZATION'; }
 'BETWEEN'                            { this.begin('between'); return 'BETWEEN'; }
 'BIGINT'                             { return 'BIGINT'; }
@@ -53,7 +52,6 @@
 'DATE'                               { return 'DATE'; }
 'DECIMAL'                            { return 'DECIMAL'; }
 'DELETE'                             { parser.determineCase(yytext); return 'DELETE'; }
-'DESC'                               { return 'DESC'; }
 'DESCRIBE'                           { parser.determineCase(yytext); return 'DESCRIBE'; }
 'DISTINCT'                           { return 'DISTINCT'; }
 'DIV'                                { return 'ARITHMETIC_OPERATOR'; }
@@ -99,7 +97,6 @@
 'NULLS'                              { return 'NULLS'; }
 'OF'                                 { return 'OF'; }
 'ON'                                 { return 'ON'; }
-'OPTION'                             { return 'OPTION'; }
 'OR'                                 { return 'OR'; }
 'ORDER'                              { return 'ORDER'; }
 'OUT'                                { return 'OUT'; }
@@ -108,7 +105,6 @@
 'PRECEDING'                          { return 'PRECEDING'; }
 'PRECISION'                          { return 'PRECISION'; }
 'PRIMARY'                            { return 'PRIMARY'; }
-'PURGE'                              { return 'PURGE'; }
 'RANGE'                              { return 'RANGE'; }
 'REFERENCES'                         { return 'REFERENCES'; }
 'REGEXP'                             { return 'REGEXP'; }
@@ -118,31 +114,25 @@
 'ROLLUP'                             { return 'ROLLUP'; }
 'ROW'                                { return 'ROW'; }
 'ROWS'                               { return 'ROWS'; }
-'SCHEMA'                             { return 'SCHEMA'; }
 'SELECT'                             { parser.determineCase(yytext); parser.addStatementTypeLocation('SELECT', yylloc); return 'SELECT'; }
 'SEMI'                               { return 'SEMI'; }
 'SET'                                { parser.determineCase(yytext); parser.addStatementTypeLocation('SET', yylloc); return 'SET'; }
-'SHOW'                               { parser.determineCase(yytext); parser.addStatementTypeLocation('SHOW', yylloc); return 'SHOW'; }
 'SMALLINT'                           { return 'SMALLINT'; }
-'STRING'                             { return 'STRING'; }
 'SYNC'                               { return 'SYNC'; }
 'TABLE'                              { return 'TABLE'; }
 'THEN'                               { return 'THEN'; }
 'TIMESTAMP'                          { return 'TIMESTAMP'; }
-'TINYINT'                            { return 'TINYINT'; }
 'TO'                                 { return 'TO'; }
 'TRUE'                               { return 'TRUE'; }
 'TRUNCATE'                           { parser.determineCase(yytext); parser.addStatementTypeLocation('TRUNCATE', yylloc, yy.lexer.upcomingInput()); return 'TRUNCATE'; }
 'UNBOUNDED'                          { return 'UNBOUNDED'; }
 'UNION'                              { return 'UNION'; }
 'UPDATE'                             { parser.determineCase(yytext); return 'UPDATE'; }
-'USE'                                { parser.determineCase(yytext); parser.addStatementTypeLocation('USE', yylloc); return 'USE'; }
 'USER'                               { return 'USER'; }
 'USING'                              { return 'USING'; }
 'UTC_TIMESTAMP'                      { return 'UTC_TIMESTAMP'; }
 'VALUES'                             { return 'VALUES'; }
 'VARCHAR'                            { return 'VARCHAR'; }
-'VIEW'                               { return 'VIEW'; }
 'VIEWS'                              { return 'VIEWS'; }
 'WHEN'                               { return 'WHEN'; }
 'WHERE'                              { return 'WHERE'; }
@@ -156,10 +146,12 @@
 'ANALYZE'                            { parser.determineCase(yytext); return 'ANALYZE'; }
 'ARCHIVE'                            { return 'ARCHIVE'; }
 'ASC'                                { return 'ASC'; }
+'AST'                                { return 'AST'; }
 'AVRO'                               { return 'AVRO'; }
 'BUCKET'                             { return 'BUCKET'; }
 'BUCKETS'                            { return 'BUCKETS'; }
 'CASCADE'                            { return 'CASCADE'; }
+'CBO'                                { return 'CBO'; }
 'CHANGE'                             { return 'CHANGE'; }
 'CHECK'                              { return 'CHECK'; }
 'CLUSTER'                            { return 'CLUSTER'; }
@@ -171,6 +163,7 @@
 'COMPACTIONS'                        { return 'COMPACTIONS'; }
 'COMPUTE'                            { return 'COMPUTE'; }
 'CONCATENATE'                        { return 'CONCATENATE'; }
+'COST'                               { return 'COST'; }
 'CURRENT_DATE'                       { return 'CURRENT_DATE'; }
 'CURRENT_TIMESTAMP'                  { return 'CURRENT_TIMESTAMP'; }
 'CURRENT_USER'                       { return 'CURRENT_USER'; }
@@ -185,6 +178,7 @@
 'DELIMITED'                          { return 'DELIMITED'; }
 'DEPENDENCY'                         { return 'DEPENDENCY'; }
 'DESC'                               { return 'DESC'; }
+'DETAIL'                             { return 'DETAIL'; }
 'DIRECTORY'                          { this.begin('hdfs'); return 'DIRECTORY'; }
 'DISABLE'                            { return 'DISABLE'; }
 'DISTRIBUTE'                         { return 'DISTRIBUTE'; }
@@ -195,13 +189,13 @@ DOUBLE\s+PRECISION                   { return 'DOUBLE_PRECISION'; }
 'EXCHANGE'                           { return 'EXCHANGE'; }
 'EXPLAIN'                            { parser.determineCase(yytext); return 'EXPLAIN'; }
 'EXPORT'                             { parser.determineCase(yytext); return 'EXPORT'; }
+'EXPRESSION'                         { return 'EXPRESSION'; }
 'FIELDS'                             { return 'FIELDS'; }
 'FILE'                               { return 'FILE'; }
 'FILEFORMAT'                         { return 'FILEFORMAT'; }
 'FIRST'                              { return 'FIRST'; }
 'FORMAT'                             { return 'FORMAT'; }
 'FORMATTED'                          { return 'FORMATTED'; }
-'FUNCTION'                           { return 'FUNCTION'; }
 'FUNCTIONS'                          { return 'FUNCTIONS'; }
 'HOUR'                               { return 'HOUR'; }
 'IDXPROPERTIES'                      { return 'IDXPROPERTIES'; }
@@ -211,18 +205,19 @@ DOUBLE\s+PRECISION                   { return 'DOUBLE_PRECISION'; }
 'INPUTFORMAT'                        { return 'INPUTFORMAT'; }
 'ITEMS'                              { return 'ITEMS'; }
 'JAR'                                { return 'JAR'; }
+'JOINCOST'                           { return 'JOINCOST'; }
 'JSONFILE'                           { return 'JSONFILE'; }
 'KEY'                                { return 'KEY'; }
 'KEYS'                               { return 'KEYS'; }
 'LAST'                               { return 'LAST'; }
-'LITERAL'                            { return 'LITERAL'; }
 'LINES'                              { return 'LINES'; }
+'LITERAL'                            { return 'LITERAL'; }
 'LOAD'                               { parser.determineCase(yytext); return 'LOAD'; }
 'LOCATION'                           { this.begin('hdfs'); return 'LOCATION'; }
 'LOCK'                               { return 'LOCK'; }
 'LOCKS'                              { return 'LOCKS'; }
-'MATERIALIZED'                       { return 'MATERIALIZED'; }
 'MATCHED'                            { return 'MATCHED'; }
+'MATERIALIZED'                       { return 'MATERIALIZED'; }
 'MERGE'                              { return 'MERGE'; }
 'METADATA'                           { return 'METADATA'; }
 'MINUTE'                             { return 'MINUTE'; }
@@ -233,6 +228,9 @@ DOUBLE\s+PRECISION                   { return 'DOUBLE_PRECISION'; }
 'NOSCAN'                             { return 'NOSCAN'; }
 'NOVALIDATE'                         { return 'NOVALIDATE'; }
 'OFFLINE'                            { return 'OFFLINE'; }
+'ONLY'                               { return 'ONLY'; }
+'OPERATOR'                           { return 'OPERATOR'; }
+'OPTION'                             { return 'OPTION'; }
 'ORC'                                { return 'ORC'; }
 'OUTPUTFORMAT'                       { return 'OUTPUTFORMAT'; }
 'OVER'                               { return 'OVER'; }
@@ -266,7 +264,7 @@ OVERWRITE\s+DIRECTORY                { this.begin('hdfs'); return 'OVERWRITE_DIR
 'SERDE'                              { return 'SERDE'; }
 'SERDEPROPERTIES'                    { return 'SERDEPROPERTIES'; }
 'SETS'                               { return 'SETS'; }
-'SHOW'                               { parser.determineCase(yytext); return 'SHOW'; }
+'SHOW'                               { parser.determineCase(yytext); parser.addStatementTypeLocation('SHOW', yylloc); return 'SHOW'; }
 'SHOW_DATABASE'                      { return 'SHOW_DATABASE'; }
 'SKEWED LOCATION'                    { return 'SKEWED_LOCATION'; } // Hack to prevent hdfs lexer state
 'SKEWED'                             { return 'SKEWED'; }
@@ -277,6 +275,7 @@ OVERWRITE\s+DIRECTORY                { this.begin('hdfs'); return 'OVERWRITE_DIR
 STORED\s+AS\s+DIRECTORIES            { return 'STORED_AS_DIRECTORIES'; }
 'STRING'                             { return 'STRING'; }
 'STRUCT'                             { return 'STRUCT'; }
+'SUMMARY'                            { return 'SUMMARY'; }
 'TABLES'                             { return 'TABLES'; }
 'TABLESAMPLE'                        { return 'TABLESAMPLE'; }
 'TBLPROPERTIES'                      { return 'TBLPROPERTIES'; }
@@ -290,12 +289,12 @@ STORED\s+AS\s+DIRECTORIES            { return 'STORED_AS_DIRECTORIES'; }
 'UNARCHIVE'                          { return 'UNARCHIVE'; }
 'UNIONTYPE'                          { return 'UNIONTYPE'; }
 'UNIQUE'                             { return 'UNIQUE'; }
-'USE'                                { parser.determineCase(yytext); return 'USE'; }
+'USE'                                { parser.determineCase(yytext); parser.addStatementTypeLocation('USE', yylloc); return 'USE'; }
+'VECTORIZATION'                      { return 'VECTORIZATION'; }
 'VIEW'                               { return 'VIEW'; }
 'WAIT'                               { return 'WAIT'; }
 'WEEK'                               { return 'WEEK'; }
 'WINDOW'                             { return 'WINDOW'; }
-'WITH'                               { parser.determineCase(yytext); parser.addStatementTypeLocation('WITH', yylloc); return 'WITH'; }
 'YEAR'                               { return 'YEAR'; }
 
 '.'                                  { return '.'; }
