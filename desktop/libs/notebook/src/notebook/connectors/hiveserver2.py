@@ -387,23 +387,17 @@ class HS2Api(Api):
 
   @query_error_handler
   def close_statement(self, notebook, snippet):
-    if snippet['type'] == 'impala':
-      from impala import conf as impala_conf
+    db = self._get_db(snippet, interpreter=self.interpreter)
 
-    if (snippet['type'] == 'hive' and beeswax_conf.CLOSE_QUERIES.get()) or (snippet['type'] == 'impala' and impala_conf.CLOSE_QUERIES.get()):
-      db = self._get_db(snippet, interpreter=self.interpreter)
-
-      try:
-        handle = self._get_handle(snippet)
-        db.close_operation(handle)
-      except Exception as e:
-        if 'no valid handle' in str(e):
-          return {'status': -1}  # skipped
-        else:
-          raise e
-      return {'status': 0}
-    else:
-      return {'status': -1}  # skipped
+    try:
+      handle = self._get_handle(snippet)
+      db.close_operation(handle)
+    except Exception as e:
+      if 'no valid handle' in str(e):
+        return {'status': -1}  # skipped
+      else:
+        raise e
+    return {'status': 0}
 
 
   def can_start_over(self, notebook, snippet):
