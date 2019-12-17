@@ -1546,6 +1546,7 @@ class CherryPyWSGIServer(object):
     ssl_certificate_chain = None
     ssl_cipher_list = "DEFAULT:!aNULL:!eNULL:!LOW:!EXPORT:!SSLv2"
     ssl_password_cb = None
+    ssl_no_renegotiation = False
     
     def __init__(self, bind_addr, wsgi_app, numthreads=10, server_name=None,
                  max=-1, request_queue_size=5, timeout=10, shutdown_timeout=5):
@@ -1718,7 +1719,10 @@ class CherryPyWSGIServer(object):
             except Exception as ex:
               logging.exception('SSL key and certificate could not be found or have a problem')
               raise ex
-            ctx.set_options(SSL.OP_NO_SSLv2 | SSL.OP_NO_SSLv3)
+            options = SSL.OP_NO_SSLv2 | SSL.OP_NO_SSLv3
+            if self.ssl_no_renegotiation:
+              options |= SSL.OP_NO_RENEGOTIATION
+            ctx.set_options(options)
             self.socket = SSLConnection(ctx, self.socket)
             self.populate_ssl_environ()
  
