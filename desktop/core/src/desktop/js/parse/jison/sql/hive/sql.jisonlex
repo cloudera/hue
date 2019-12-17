@@ -96,6 +96,7 @@
 'NONE'                               { return 'NONE'; }
 'NOT'                                { return 'NOT'; }
 'NULL'                               { return 'NULL'; }
+'NULLS'                              { return 'NULLS'; }
 'OF'                                 { return 'OF'; }
 'ON'                                 { return 'ON'; }
 'OPTION'                             { return 'OPTION'; }
@@ -213,6 +214,7 @@ DOUBLE\s+PRECISION                   { return 'DOUBLE_PRECISION'; }
 'JSONFILE'                           { return 'JSONFILE'; }
 'KEY'                                { return 'KEY'; }
 'KEYS'                               { return 'KEYS'; }
+'LAST'                               { return 'LAST'; }
 'LITERAL'                            { return 'LITERAL'; }
 'LINES'                              { return 'LINES'; }
 'LOAD'                               { parser.determineCase(yytext); return 'LOAD'; }

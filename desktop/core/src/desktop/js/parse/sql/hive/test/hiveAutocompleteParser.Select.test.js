@@ -5613,9 +5613,20 @@ describe('hiveAutocompleteParser.js SELECT statements', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ',
         afterCursor: ', bla',
-        containsKeywords: ['ASC', 'DESC'],
+        containsKeywords: ['ASC', 'DESC', 'NULLS FIRST', 'NULLS LAST'],
         expectedResult: {
           lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo DESC, bar NULLS |, bla"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo DESC, bar NULLS ',
+        afterCursor: ', bla',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['FIRST', 'LAST']
         }
       });
     });
