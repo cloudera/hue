@@ -388,6 +388,7 @@ NonStartingToken
  | 'JSONFILE'
  | 'KEY'
  | 'KEYS'
+ | 'LAST'
  | 'LATERAL'
  | 'LEFT'
  | 'LIKE'
@@ -412,6 +413,7 @@ NonStartingToken
  | 'NOVALIDATE'
  | 'NTILE'
  | 'NULL'
+ | 'NULLS'
  | 'OF'
  | 'ON'
  | 'OPTION'
@@ -1986,30 +1988,52 @@ OrderByColumnList_EDIT
  ;
 
 OrderByIdentifier
- : ValueExpression OptionalAscOrDesc  -> parser.mergeSuggestKeywords($2)
+ : ValueExpression OptionalAscOrDesc OptionalNullsFirstOrLast
+   {
+     if ($2.suggestKeywords && $3.suggestKeywords) {
+       $$ = parser.mergeSuggestKeywords($2, $3);
+     } else {
+       $$ = parser.mergeSuggestKeywords($3);
+     }
+   }
  ;
 
 OrderByIdentifier_EDIT
- : ValueExpression_EDIT OptionalAscOrDesc
+ : ValueExpression_EDIT OptionalAscOrDesc OptionalNullsFirstOrLast
    {
      parser.suggestSelectListAliases();
    }
- | AnyCursor OptionalAscOrDesc
+ | AnyCursor OptionalAscOrDesc OptionalNullsFirstOrLast
    {
      $$ = { emptyOrderBy: true }
      parser.valueExpressionSuggest();
      parser.suggestAnalyticFunctions();
      parser.suggestSelectListAliases();
    }
+ | ValueExpression OptionalAscOrDesc NullsFirstOrLast_EDIT
  ;
 
 OptionalAscOrDesc
- :
-  {
-    $$ = { suggestKeywords: ['ASC', 'DESC'] };
-  }
+ :                          -> { suggestKeywords: ['ASC', 'DESC'] };
  | 'ASC'
  | 'DESC'
+ ;
+
+OptionalNullsFirstOrLast
+ :                          -> { suggestKeywords: ['NULLS FIRST', 'NULLS LAST'] }
+ | NullsFirstOrLast
+ ;
+
+NullsFirstOrLast
+ : 'NULLS' 'FIRST'
+ | 'NULLS' 'LAST'
+ ;
+
+NullsFirstOrLast_EDIT
+ : 'NULLS' 'CURSOR'
+   {
+     parser.suggestKeywords(['FIRST', 'LAST']);
+   }
  ;
 
 OptionalClusterOrDistributeBy
