@@ -25,6 +25,7 @@ import hueUtils from 'utils/hueUtils';
 
 import Notebook from 'apps/notebook2/notebook';
 import Snippet from 'apps/notebook2/snippet';
+import { UPDATE_HISTORY_EVENT } from 'apps/notebook2/components/ko.queryHistory';
 
 class EditorViewModel {
   constructor(editorId, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
@@ -52,7 +53,7 @@ class EditorViewModel {
       this.editorMode(newVal !== 'notebook');
       hueUtils.changeURLParameter('type', newVal);
       if (this.editorMode()) {
-        this.selectedNotebook().fetchHistory(); // Js error if notebook did not have snippets
+        huePubSub.publish(UPDATE_HISTORY_EVENT);
       }
     });
     this.preEditorTogglingSnippet = ko.observable();
