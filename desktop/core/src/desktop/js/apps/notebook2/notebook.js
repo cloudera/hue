@@ -450,7 +450,10 @@ export default class Notebook {
       name: this.name(),
       onSuccessUrl: this.onSuccessUrl(),
       parentSavedQueryUuid: this.parentSavedQueryUuid(),
-      presentationSnippets: this.presentationSnippets(),
+      presentationSnippets: Object.keys(this.presentationSnippets()).reduce((result, key) => {
+        result[key] = this.presentationSnippets()[key].toJs();
+        return result;
+      }, {}),
       pubSubUrl: this.pubSubUrl(),
       result: {}, // TODO: Moved to executor but backend requires it
       sessions: await sessionManager.getAllSessions(),

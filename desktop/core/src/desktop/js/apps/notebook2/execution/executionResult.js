@@ -111,6 +111,10 @@ export default class ExecutionResult {
     this.isEscaped = resultResponse.isEscaped;
     this.type = resultResponse.type;
     this.fetchedOnce = true;
+    this.notify();
+  }
+
+  notify() {
     huePubSub.publish(RESULT_UPDATED_EVENT, this);
   }
 }
