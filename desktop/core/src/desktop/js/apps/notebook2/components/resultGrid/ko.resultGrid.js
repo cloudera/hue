@@ -330,7 +330,9 @@ class ResultGrid extends DisposableComponent {
             heightAfterCorrection: 0
           });
           this.disposals.push(() => {
-            $datatablesWrapper.data('plugin_jHueTableScroller').destroy();
+            if ($datatablesWrapper.data('plugin_jHueTableScroller')) {
+              $datatablesWrapper.data('plugin_jHueTableScroller').destroy();
+            }
           });
         }
       },

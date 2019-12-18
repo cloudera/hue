@@ -41,7 +41,7 @@ export const attachTracker = (activeExecutable, id, target, trackedObservables) 
 
   Object.keys(trackedObservables).forEach(observableAttr => {
     const sub = target[observableAttr].subscribe(val => {
-      if (ignoreObservableChange) {
+      if (ignoreObservableChange || !activeExecutable()) {
         return;
       }
       if (!activeExecutable().observerState[id]) {

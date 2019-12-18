@@ -25,6 +25,7 @@ import hueUtils from 'utils/hueUtils';
 
 import Notebook from 'apps/notebook2/notebook';
 import Snippet from 'apps/notebook2/snippet';
+import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
 import { UPDATE_HISTORY_EVENT } from 'apps/notebook2/components/ko.queryHistory';
 
 class EditorViewModel {
@@ -513,51 +514,68 @@ class EditorViewModel {
     const selectedNotebook = this.selectedNotebook();
     const newSnippets = [];
 
-    if (this.editorType() !== 'notebook') {
+    const toPresentationMode = this.editorType() !== 'notebook';
+
+    if (toPresentationMode) {
       this.editorType('notebook');
-      this.preEditorTogglingSnippet(selectedNotebook.snippets()[0]);
-      const variables = selectedNotebook.snippets()[0].variables();
-      const statementKeys = [];
+      const sourceSnippet = selectedNotebook.snippets()[0];
+      this.preEditorTogglingSnippet(sourceSnippet);
+      const variables = sourceSnippet.variables();
+      const statementKeys = {};
       // Split statements
       selectedNotebook.type('notebook');
-      selectedNotebook
-        .snippets()[0]
-        .statementsList()
-        .forEach(sqlStatement => {
-          let presentationSnippet;
-          if (sqlStatement.hashCode() in selectedNotebook.presentationSnippets()) {
-            presentationSnippet = selectedNotebook.presentationSnippets()[sqlStatement.hashCode()]; // Persist result
-            presentationSnippet.variables(variables);
-          } else {
-            const titleParts = [];
-            const statementParts = [];
-            sqlStatement
-              .trim()
-              .split('\n')
-              .forEach(line => {
-                if (line.trim().startsWith('--') && statementParts.length === 0) {
-                  titleParts.push(line.substr(2));
-                } else {
-                  statementParts.push(line);
-                }
-              });
-            presentationSnippet = new Snippet(this, selectedNotebook, {
-              type: selectedNotebook.initialType,
-              statement_raw: statementParts.join('\n'),
-              name: titleParts.join('\n'),
-              variables: komapping.toJS(variables)
+
+      sourceSnippet.executor.executables.forEach(executable => {
+        const sqlStatement = executable.parsedStatement.statement;
+        const sqlStatementHash = sqlStatement.hashCode();
+
+        let presentationSnippet;
+
+        if (!selectedNotebook.presentationSnippets()[sqlStatementHash]) {
+          const titleParts = [];
+          const statementParts = [];
+          sqlStatement
+            .trim()
+            .split('\n')
+            .forEach(line => {
+              if (line.trim().startsWith('--') && statementParts.length === 0) {
+                titleParts.push(line.substr(2));
+              } else {
+                statementParts.push(line);
+              }
             });
-            presentationSnippet.variables = selectedNotebook.snippets()[0].variables;
-            presentationSnippet.init();
-            selectedNotebook.presentationSnippets()[sqlStatement.hashCode()] = presentationSnippet;
-          }
-          statementKeys.push(sqlStatement.hashCode());
-          newSnippets.push(presentationSnippet);
-        });
-      $.each(selectedNotebook.presentationSnippets(), key => {
+          presentationSnippet = new Snippet(this, selectedNotebook, {
+            type: selectedNotebook.initialType,
+            statement_raw: statementParts.join('\n'),
+            name: titleParts.join('\n'),
+            variables: komapping.toJS(variables)
+          });
+          window.setTimeout(() => {
+            const executableRaw = executable.toJs();
+            const reattachedExecutable = SqlExecutable.fromJs(
+              presentationSnippet.executor,
+              executableRaw
+            );
+            reattachedExecutable.result = executable.result;
+            presentationSnippet.executor.executables = [reattachedExecutable];
+            presentationSnippet.activeExecutable(reattachedExecutable);
+          }, 1000); // TODO: Make it possible to set activeSnippet on Snippet creation
+          presentationSnippet.init();
+          selectedNotebook.presentationSnippets()[sqlStatementHash] = presentationSnippet;
+        } else {
+          presentationSnippet = selectedNotebook.presentationSnippets()[sqlStatementHash];
+        }
+        presentationSnippet.variables(sourceSnippet.variables());
+        statementKeys[sqlStatement.hashCode()] = true;
+        newSnippets.push(presentationSnippet);
+      });
+
+      Object.keys(selectedNotebook.presentationSnippets()).forEach(key => {
         // Dead statements
-        if (!key in statementKeys) {
-          delete selectedNotebook.presentationSnippets()[key];
+        if (!statementKeys[key]) {
+          selectedNotebook.presentationSnippets()[key].executor.executables.forEach(executable => {
+            executable.cancelBatchChain();
+          });
         }
       });
     } else {
@@ -569,6 +587,16 @@ class EditorViewModel {
     selectedNotebook.snippets(newSnippets);
     newSnippets.forEach(snippet => {
       huePubSub.publish('editor.redraw.data', { snippet: snippet });
+      if (toPresentationMode) {
+        window.setTimeout(() => {
+          snippet.executor.executables.forEach(executable => {
+            executable.notify();
+            if (executable.result) {
+              executable.result.notify();
+            }
+          });
+        }, 1000); // TODO: Make it possible to set activeSnippet on Snippet creation
+      }
     });
   }
 
