@@ -49,9 +49,6 @@ export default class Notebook {
     this.isPresentationMode = ko.observable(false);
     this.isPresentationModeInitialized = ko.observable(false);
     this.isPresentationMode.subscribe(newValue => {
-      if (!newValue) {
-        this.cancelExecutingAll();
-      }
       huePubSub.publish('editor.presentation.operate.toggle', newValue); // Problem with headers / row numbers redraw on full screen results
       vm.togglePresentationMode();
       if (newValue) {
