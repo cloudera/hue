@@ -35,14 +35,14 @@ const TEMPLATE = `
   <div class="modal-body" style="overflow: visible; height: 240px">
 
     <!-- ko if: window.HAS_LINK_SHARING -->
-    <a href="javascript:void(0)" data-bind="visible: !$parent.definition().perms.link_sharing_on" title="${ I18n(
+    <a href="javascript:void(0)" data-bind="visible: !$parent.definition().perms.link_sharing_on, click: function() { persistLinkSharingPerms('read'); }" title="${ I18n(
       'Share the query via a link'
     ) }">
       <i class="fa fa-wf fa-link"></i> ${ I18n('Get link') }
     </a>
 
-    <!-- ko with: $parent.definition().perms.link_sharing_on -->
-    <a href="javascript:void(0)" title="${ I18n(
+    <!-- ko if: $parent.definition().perms.link_sharing_on -->
+    <a href="javascript:void(0)" data-bind="click: function() { persistLinkSharingPerms('off'); }" title="${ I18n(
       'Deactivate the link sharing'
     ) }">
       <i class="fa fa-wf fa-link"></i> ${ I18n('Deactivate link') }
@@ -52,7 +52,8 @@ const TEMPLATE = `
       <div class="span12">
         Anyone logged and with the link can:
         <br/>
-        Read: <span data-bind="text: $parent.definition().perms.link_read"></span> | Write: <span data-bind="text: $parent.definition().perms.link_write"></span>
+        Read: <span data-bind="text: $parent.definition().perms.link_read"></span> |
+        Write: <span data-bind="text: $parent.definition().perms.link_write"></span>
         <h4 class="muted" style="margin-top: 0">${ I18n('Shareable link') }</h4>
         <div class="input-group">
           <input class="input-xxlarge" onfocus="this.select()" name="gist-link" id="gist-link" type="text" placeholder="${ I18n('Link') }"/>
