@@ -183,7 +183,7 @@ How to update the value of some columns in certain rows:
     WHERE first_name = 'Elli';
 
 
-Any feedback or question? Feel free to comment here or on the <a href="https://discourse.gethue.com/">Forum</a> and <a href="https://docs.gethue.com/latest/quickstart/">quick start</a> SQL querying!
+Any feedback or question? Feel free to comment here or on the <a href="https://discourse.gethue.com/">Forum</a> and <a href="https://docs.gethue.com/quickstart/">quick start</a> SQL querying!
 
 
 Romain, from the Hue Team

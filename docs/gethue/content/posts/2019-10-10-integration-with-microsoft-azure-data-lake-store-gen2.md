@@ -127,7 +127,7 @@ Hue integrates with HDFS, S3, ADLS v1/v2 and soon Google Cloud Storage. So go [q
 
 <div>
   <div>
-    Any feedback or question? Feel free to comment here or on the <a href="https://discourse.gethue.com/">Forum</a> or <a href="https://twitter.com/gethue">@gethue</a> and <a href="https://docs.gethue.com/latest/quickstart/">quick start</a> SQL querying!
+    Any feedback or question? Feel free to comment here or on the <a href="https://discourse.gethue.com/">Forum</a> or <a href="https://twitter.com/gethue">@gethue</a> and <a href="https://docs.gethue.com/quickstart/">quick start</a> SQL querying!
   </div>
 
   <p>
