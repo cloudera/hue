@@ -97,7 +97,7 @@ Fine grain filtering at the user or query level operation is possible. For examp
 
 <div>
   <div>
-    Any feedback or question? Feel free to comment here or on the <a href="https://discourse.gethue.com/">Forum</a> or <a href="https://twitter.com/gethue">@gethue</a> and <a href="https://docs.gethue.com/latest/quickstart/">quick start</a> SQL querying!
+    Any feedback or question? Feel free to comment here or on the <a href="https://discourse.gethue.com/">Forum</a> or <a href="https://twitter.com/gethue">@gethue</a> and <a href="https://docs.gethue.com/quickstart/">quick start</a> SQL querying!
   </div>
 
   <p>

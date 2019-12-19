@@ -140,4 +140,4 @@ Weixia, from the Hue Team
  [9]: https://cdn.gethue.com/uploads/2019/10/NewlyCreatedHbaseTables.png
  [10]: https://discourse.gethue.com/
  [11]: https://twitter.com/gethue
- [12]: https://docs.gethue.com/latest/quickstart/
+ [12]: https://docs.gethue.com/quickstart/
