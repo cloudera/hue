@@ -142,6 +142,6 @@ Hue integrates with HDFS, S3, ADLS v1/v2 and soon Google Cloud Storage. So go [q
  [2]: https://cdn.gethue.com/uploads/2019/10/adls2_browse.png
  [3]: https://cdn.gethue.com/uploads/2019/10/adls2_upload.png
  [4]: https://cdn.gethue.com/uploads/2019/10/adls2_export_to.png
- [5]: https://docs.gethue.com/latest/administrator/configuration/files/#adls
+ [5]: https://docs.gethue.com/administrator/configuration/files/#adls
  [6]: https://docs.gethue.com/quickstart/
  [7]: https://docs.gethue.com/administrator/configuration/files/
