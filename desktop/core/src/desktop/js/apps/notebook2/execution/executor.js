@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
+import { syncExecutables } from 'apps/notebook2/execution/utils';
 
 // TODO: Remove, debug var
 window.sessionManager = sessionManager;
@@ -44,52 +44,6 @@ class Executor {
     this.snippet = options.snippet;
   }
 
-  getExecutables(statementDetails) {
-    const allExecutablesIndex = {};
-    this.executables.forEach(executable => {
-      allExecutablesIndex[executable.getKey()] = executable;
-    });
-
-    const selectedExecutables = [];
-    let activeDatabase = this.database();
-    let currentSelectedIndex = 0;
-    const newExecutables = statementDetails.precedingStatements
-      .concat(statementDetails.activeStatement, statementDetails.followingStatements)
-      .map(parsedStatement => {
-        if (/USE/i.test(parsedStatement.firstToken)) {
-          const dbMatch = parsedStatement.statement.match(/use\s+([^;]+)/i);
-          if (dbMatch) {
-            activeDatabase = dbMatch[1];
-          }
-        }
-        let executable = new SqlExecutable({
-          parsedStatement: parsedStatement,
-          database: activeDatabase,
-          executor: this
-        });
-        if (allExecutablesIndex[executable.getKey()]) {
-          executable = allExecutablesIndex[executable.getKey()];
-          executable.parsedStatement = parsedStatement;
-          delete allExecutablesIndex[executable.getKey()];
-        }
-        if (
-          currentSelectedIndex < statementDetails.selectedStatements.length &&
-          parsedStatement === statementDetails.selectedStatements[currentSelectedIndex]
-        ) {
-          selectedExecutables.push(executable);
-          currentSelectedIndex++;
-        }
-        return executable;
-      });
-
-    const lostExecutables = Object.keys(allExecutablesIndex).map(key => allExecutablesIndex[key]);
-    return {
-      all: newExecutables,
-      lost: lostExecutables,
-      selected: selectedExecutables
-    };
-  }
-
   toJs() {
     return {
       executables: this.executables.map(executable => executable.toJs())
@@ -97,7 +51,7 @@ class Executor {
   }
 
   update(statementDetails, beforeExecute) {
-    const executables = this.getExecutables(statementDetails);
+    const executables = syncExecutables(this, statementDetails);
 
     // Cancel any "lost" executables and any batch chain it's part of
     executables.lost.forEach(lostExecutable => {
