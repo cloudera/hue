@@ -189,10 +189,10 @@ def basic_logging(proc_name, log_dir=None):
     handler.setLevel(lvl)
 
     # Set all loggers but error.log to the same logging level
-    error_handler = logging.getLogger('handler_errorlog')
-    for h in root_logger.handlers:
-      if isinstance(h, (FileHandler, RotatingFileHandler)) and h != error_handler:
-        h.setLevel(lvl)
+    for h in root_logger.__dict__['handlers']:
+      if isinstance(h, (FileHandler, RotatingFileHandler)):
+        if os.path.basename(h.baseFilename) != 'error.log':
+          h.setLevel(lvl)
 
 
 def fancy_logging():
