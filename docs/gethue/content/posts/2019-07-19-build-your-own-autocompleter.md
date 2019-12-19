@@ -291,14 +291,14 @@ We hope this will get you to dive in to the wonderful world of autocompleters an
 
 And as always, if you have any feedback or questions then feel free to comment here or on [@gethue][13]!
 
- [1]: https://docs.gethue.com/latest/administrator/configuration/editor/
+ [1]: https://docs.gethue.com/administrator/configuration/editor/
  [2]: https://www.gnu.org/software/bison/
  [3]: https://github.com/zaach/jison
  [4]: https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/jison/sql
  [5]: https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/sql
- [6]: https://docs.gethue.com/latest/developer/development/#sql-autocomplete
- [7]: https://docs.gethue.com/latest/administrator/installation/dependencies/
- [8]: https://docs.gethue.com/latest/administrator/configuration/editor/#postgresql
+ [6]: https://docs.gethue.com/developer/development/#sql-autocomplete
+ [7]: https://docs.gethue.com/administrator/installation/dependencies/
+ [8]: https://docs.gethue.com/administrator/configuration/editor/#postgresql
  [9]: https://www.postgresql.org/docs/9.1/sql-reindex.html
  [10]: https://calcite.apache.org/docs/reference.html
  [11]: https://github.com/google/zetasql

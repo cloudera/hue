@@ -119,7 +119,7 @@ Fine grain filtering at the user or query level operation is possible. For examp
  [2]: https://github.com/cloudera/hue/tree/master/tools/kubernetes
  [3]: https://gethue.com/collecting-and-querying-hue-logs-with-fluentd-in-kubernetes/
  [4]: https://gethue.com/collecting-hue-metrics-with-prometheus-in-kubernetes/
- [5]: https://docs.gethue.com/latest/administrator/configuration/
+ [5]: https://docs.gethue.com/administrator/configuration/
  [6]: https://opentracing.io/
  [7]: https://www.jaegertracing.io
  [8]: https://microk8s.io

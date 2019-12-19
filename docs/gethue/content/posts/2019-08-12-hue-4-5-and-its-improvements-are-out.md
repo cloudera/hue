@@ -86,7 +86,7 @@ Here is a list of the main improvements:
       <a href="https://gethue.com/realtime-catalog-search-with-hue-and-apache-atlas/">Apache Atlas integration and Catalog API</a>
     </li>
     <li>
-      <a href="https://docs.gethue.com/latest/administrator/configuration/editor/#hiv">Hive LLAP + Service discovery</a>
+      <a href="https://docs.gethue.com/administrator/configuration/editor/#hiv">Hive LLAP + Service discovery</a>
     </li>
     <li>
       <a href="https://gethue.com/built-in-hive-language-reference-in-the-sql-editor/">Hive language reference is built-in</a>
@@ -121,10 +121,10 @@ Here is a list of the main improvements:
       <a href="https://gethue.com/build-your-own-autocompleter/">Building SQL Autocompletes</a>
     </li>
     <li>
-      <a href="https://docs.gethue.com/latest/administrator/administration/reference/">Architecture</a>
+      <a href="https://docs.gethue.com/administrator/administration/reference/">Architecture</a>
     </li>
     <li>
-      <a href="https://docs.gethue.com/latest/administrator/configuration/editor/">SQL connectors refresh</a>
+      <a href="https://docs.gethue.com/administrator/configuration/editor/">SQL connectors refresh</a>
     </li>
   </ul>
 
