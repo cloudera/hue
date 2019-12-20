@@ -356,7 +356,7 @@ class EditorViewModel {
       $.post('/notebook/api/create_notebook', {
         type: editorType || this.editorType(),
         directory_uuid: window.location.getParameter('directory_uuid'),
-        gist: window.location.getParameter('gist')
+        gist: this.isNotificationManager() ? undefined : window.location.getParameter('gist')
       })
         .then(data => {
           this.loadNotebook(data.notebook);
