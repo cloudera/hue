@@ -252,13 +252,16 @@ SSL_CIPHER_LIST = Config(
   ]))
 
 def has_ssl_no_renegotiation():
-  return sys.version >= (3, 7)
+  return sys.version_info[:2] >= (3, 7)
 
 SSL_NO_RENEGOTIATION = Config(
   key="ssl_no_renegotiation",
   type=coerce_bool,
   default=has_ssl_no_renegotiation(),
-  help=_("Disable all renegotiation in TLSv1.2 and earlier. Do not send HelloRequest messages, and ignore renegotiation requests via ClientHello. This option is only available with OpenSSL 1.1.0h and later and python 3.7"))
+  help=_(
+    "Disable all renegotiation in TLSv1.2 and earlier. Do not send HelloRequest messages, and ignore renegotiation requests"
+    " via ClientHello. This option is only available with OpenSSL 1.1.0h and later and python 3.7")
+  )
 
 SSL_PASSWORD = Config(
   key="ssl_password",
