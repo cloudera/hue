@@ -33,9 +33,9 @@ const TEMPLATE = `
   <div class="modal-body">
     <div class="row-fluid">
       <div class="span12">
-        <div class="input-group">
-          <input id="gistLink" class="input-xxlarge" onfocus="this.select()" data-bind="value: link" type="text" placeholder="${ I18n('Link') }"/>
-        </div>
+        <form autocomplete="off">
+          <input id="gistLink" class="input-xxlarge" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } onfocus="this.select()" data-bind="value: link" type="text" placeholder="${ I18n('Link') }"/>
+        </form>
         <div class="input-prepend">
           <a class="btn gist-link-btn" data-clipboard-target="#gistLink" data-bind="clipboard" data-dismiss="modal">${ I18n('Copy') }</a>
           <button class="add-on muted gist-link-btn" data-clipboard-target="#gistLink" data-bind="clipboard" >
