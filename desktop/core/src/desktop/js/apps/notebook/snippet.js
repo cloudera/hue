@@ -28,6 +28,7 @@ import hueUtils from 'utils/hueUtils';
 import Result from 'apps/notebook/result';
 import Session from 'apps/notebook/session';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
+import { SHOW_EVENT as SHOW_GIST_MODAL_EVENT } from 'ko/components/ko.shareGistModal';
 
 const NOTEBOOK_MAPPING = {
   ignore: [
@@ -1916,7 +1917,7 @@ class Snippet {
         apiHelper
           .createGist({
             statement:
-              self.ace().getSelectedText() != ''
+              self.ace().getSelectedText() !== ''
                 ? self.ace().getSelectedText()
                 : self.statement_raw(),
             doc_type: self.type(),
@@ -1924,8 +1925,8 @@ class Snippet {
             description: ''
           })
           .done(data => {
-            if (data.status == 0) {
-              $(document).trigger('showGistModal', {
+            if (data.status === 0) {
+              huePubSub.publish(SHOW_GIST_MODAL_EVENT, {
                 link: data.link
               });
             } else {

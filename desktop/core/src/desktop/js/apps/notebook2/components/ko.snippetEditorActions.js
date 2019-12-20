@@ -14,7 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import $ from 'jquery';
 import * as ko from 'knockout';
 
 import 'ko/bindings/ko.publish';
@@ -22,7 +21,9 @@ import 'ko/bindings/ko.publish';
 import apiHelper from 'api/apiHelper';
 import componentUtils from 'ko/components/componentUtils';
 import hueAnalytics from 'utils/hueAnalytics';
+import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { SHOW_EVENT as SHOW_GIST_MODAL_EVENT } from 'ko/components/ko.shareGistModal';
 import { STATUS } from 'apps/notebook2/snippet';
 
 const TEMPLATE = `
@@ -173,11 +174,7 @@ class SnippetEditorActions {
       description: ''
     });
 
-    new window.Clipboard('.gist-link-btn');
-
-    $(document).trigger('showGistModal', {
-      link: gistLink
-    });
+    huePubSub.publish(SHOW_GIST_MODAL_EVENT, { link: gistLink });
   }
 
   format() {

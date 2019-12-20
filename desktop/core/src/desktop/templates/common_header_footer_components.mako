@@ -286,31 +286,6 @@ from metadata.conf import has_optimizer, OPTIMIZER
   </div>
 </div>
 
-<div id="gistModal" class="modal hide fade">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-    <h2 class="modal-title">${ _('Shareable link') }</h2>
-  </div>
-  <div class="modal-body">
-    <div class="row-fluid">
-      <div class="span12">
-        <div class="input-group">
-          <input class="input-xxlarge" onfocus="this.select()" name="gist-link" id="gist-link" type="text" placeholder="${ _('Link') }"/>
-        </div>
-        <div class="input-prepend">
-          <a class="btn gist-link-btn" data-clipboard-target="#gist-link" data-dismiss="modal">${_('Copy')}</a>
-          <button class="add-on muted gist-link-btn" data-clipboard-target="#gist-link">
-            <i class="fa fa-clipboard"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${_('Close')}</a>
-  </div>
-</div>
-
 <div class="clipboard-content"></div>
 
 <script type="text/javascript">
@@ -590,11 +565,6 @@ from metadata.conf import has_optimizer, OPTIMIZER
     nv.log = function () {
     };
   }
-
-  $(document).on('showGistModal', (e, data) => {
-    $('#gistModal input[name="gist-link"]').val(data['link']);
-    $('#gistModal').modal('show');
-  });
 
   % if collect_usage:
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

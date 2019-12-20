@@ -14,27 +14,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as ko from 'knockout';
+import { SHOWN_EVENT, SHOW_EVENT } from './ko.shareGistModal';
+import huePubSub from 'utils/huePubSub';
 
-ko.bindingHandlers.clipboard = {
-  init: (element, valueAccessor) => {
-    if (!window.Clipboard) {
-      console.warn('ko.clipboard.js depends on window.Clipboard');
-      return;
-    }
-    const options = valueAccessor() || {};
+import 'ext/bootstrap.2.3.2.min';
 
-    const clipboard = new window.Clipboard(element, {
-      target: options.target,
-      text: options.text
+describe('ko.shareGistModal.js', () => {
+  it('should render component', async () => {
+    huePubSub.publish(SHOW_EVENT, {
+      link: 'http://some.url'
     });
 
-    if (options.onSuccess) {
-      clipboard.on('success', options.onSuccess);
-    }
-
-    ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-      clipboard.destroy();
+    await new Promise(resolve => {
+      huePubSub.subscribeOnce(SHOWN_EVENT, resolve);
     });
-  }
-};
+
+    expect(document.documentElement.outerHTML).toMatchSnapshot();
+  });
+
+  it('should set the link as the input value', async () => {
+    huePubSub.publish(SHOW_EVENT, {
+      link: 'http://some.url'
+    });
+
+    await new Promise(resolve => {
+      huePubSub.subscribeOnce(SHOWN_EVENT, resolve);
+    });
+
+    expect(document.querySelector('#gistLink').value).toEqual('http://some.url');
+  });
+});
