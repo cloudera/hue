@@ -36,15 +36,11 @@ const TEMPLATE = `
         <form autocomplete="off">
           <input id="gistLink" class="input-xxlarge" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } onfocus="this.select()" data-bind="value: link" type="text" placeholder="${ I18n('Link') }"/>
         </form>
-        <div class="input-prepend">
-          <a class="btn gist-link-btn" data-clipboard-target="#gistLink" data-bind="clipboard" data-dismiss="modal">${ I18n('Copy') }</a>
-          <button class="add-on muted gist-link-btn" data-clipboard-target="#gistLink" data-bind="clipboard" >
-            <i class="fa fa-clipboard"></i>
-          </button>
-        </div>
+        <button class="btn" type="button" data-dismiss="modal" data-clipboard-target="#gistLink" data-bind="clipboard">
+          <i class="fa fa-clipboard"></i> ${ I18n('Copy') }
+        </button>
       </div>
     </div>
-
   </div>
   <div class="modal-footer">
     <a class="btn" data-dismiss="modal">${ I18n('Close') }</a>
