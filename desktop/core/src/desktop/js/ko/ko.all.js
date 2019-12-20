@@ -24,7 +24,6 @@ import 'knockout.validation';
 import 'ext/ko.editable.custom';
 import 'ext/ko.selectize.custom';
 
-// import 'ko/bindings/charts/plotly/ko.plotly'; // The Plotly chart replacement
 import 'ko/bindings/charts/mapchart/ko.mapChart';
 import 'ko/bindings/charts/ko.barChart';
 import 'ko/bindings/charts/ko.leafletMapChart';
@@ -165,6 +164,7 @@ import 'ko/components/ko.sentryPrivileges';
 import 'ko/components/ko.sessionAuthModal';
 import 'ko/components/ko.sessionPanel';
 import 'ko/components/ko.shareDocModal';
+import 'ko/components/ko.shareGistModal';
 import 'ko/components/ko.sidebar';
 import 'ko/components/ko.sqlColumnsTable';
 
