@@ -991,7 +991,7 @@ ${ components.menubar(is_embeddable) }
       dataType: 'json',
       success: function(resp) {
         if (resp.history_uuid) {
-          huePubSub.publish('notebook.task.submitted', resp.history_uuid);
+          huePubSub.publish('notebook.task.submitted', resp);
           huePubSub.publish('metastore.clear.selection');
         } else if (resp && resp.message) {
           $(document).trigger("error", resp.message);
@@ -1029,7 +1029,7 @@ ${ components.menubar(is_embeddable) }
       cluster: compute
     },function(resp) {
       if (resp.history_uuid) {
-        huePubSub.publish('open.editor.query', resp.history_uuid);
+        huePubSub.publish('open.editor.query', resp);
       } else if (resp.message) {
         $(document).trigger("error", resp.message);
       }

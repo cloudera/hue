@@ -542,7 +542,7 @@ class EditorViewModel {
       };
     };
 
-    self.openNotebook = function(uuid, queryTab, skipUrlChange, callback) {
+    self.openNotebook = function(uuid, queryTab, skipUrlChange, callback, session) {
       const deferredOpen = new $.Deferred();
       $.get(
         '/desktop/api2/doc/',
@@ -555,6 +555,10 @@ class EditorViewModel {
           if (data.status == 0) {
             data.data.dependents = data.dependents;
             data.data.can_write = data.user_perms.can_write;
+            if (session) {
+              // backend doesn't store session, but can reuse an opened one.
+              data.data.sessions = [session];
+            }
             const notebook = data.data;
             self.loadNotebook(notebook, queryTab);
             if (typeof skipUrlChange === 'undefined' && !self.isNotificationManager()) {

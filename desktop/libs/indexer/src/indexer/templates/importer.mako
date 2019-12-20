@@ -2068,7 +2068,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           "source": ko.mapping.toJSON(self)
         }, function (resp) {
           if (resp.status === 0 && resp.data) {
-            huePubSub.publish('notebook.task.submitted', resp.history_uuid);
+            huePubSub.publish('notebook.task.submitted', resp);
           } else if (resp.status === 1) {
             $(document).trigger("error", "${ _('Connection Failed: ') }" + resp.message);
             self.rdbmsDbIsValid(false);
@@ -2895,7 +2895,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           if (resp.status === 0) {
             if (resp.history_uuid) {
               $.jHueNotify.info("${ _('Task submitted') }");
-              huePubSub.publish('notebook.task.submitted', resp.history_uuid);
+              huePubSub.publish('notebook.task.submitted', resp);
             } else if (resp.on_success_url) {
               if (resp.pub_sub_url) {
                 huePubSub.publish(resp.pub_sub_url);
