@@ -259,7 +259,7 @@ class ExecutionAnalysis {
         compute: self.details().compute
       })
       .done(resp => {
-        huePubSub.publish('notebook.task.submitted', resp.task.history_uuid);
+        huePubSub.publish('notebook.task.submitted', resp);
         fix.fixed = true;
         self.analysis.valueHasMutated();
       });

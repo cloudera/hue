@@ -315,7 +315,8 @@ class HS2Api(Api):
       'modified_row_count': handle.modified_row_count,
       'log_context': handle.log_context,
       'session_guid': handle.session_guid,
-      'session_id': handle.session_id
+      'session_id': handle.session_id,
+      'session_type': snippet['type']
     }
     response.update(statement)
 

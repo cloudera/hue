@@ -146,7 +146,7 @@ from django.utils.translation import ugettext as _
               $('#import-data-modal').html(response['data']);
             }
           } else {
-            huePubSub.publish('notebook.task.submitted', response.history_uuid);
+            huePubSub.publish('notebook.task.submitted', response);
             $("#import-data-modal").modal("hide");
           }
         }

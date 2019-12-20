@@ -453,7 +453,7 @@ from notebook.conf import ENABLE_SQL_INDEXER
                 huePubSub.publish('open.link', resp.watch_url);
               } else if (resp.history_uuid) {
                 $(self.saveResultsModalId).modal('hide');
-                huePubSub.publish('notebook.task.submitted', resp.history_uuid);
+                huePubSub.publish('notebook.task.submitted', resp);
               } else if (resp && resp.message) {
                 $(document).trigger("error", resp.message);
               }

@@ -1760,7 +1760,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         }, function (data) {
           if (data.status == 0) {
             $.jHueNotify.info("${ _('Task ') }" + data.history_uuid + "${_(' submitted.') }");
-            huePubSub.publish('notebook.task.submitted', data.history_uuid);
+            huePubSub.publish('notebook.task.submitted', data);
           } else {
             $(document).trigger("error", data.message);
           }
@@ -1796,7 +1796,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         }, function (data) {
           if (data.status == 0) {
             $.jHueNotify.info("${ _('Task ') }" + data.history_uuid + "${_(' submitted.') }");
-            huePubSub.publish('notebook.task.submitted', data.history_uuid);
+            huePubSub.publish('notebook.task.submitted', data);
           } else {
             $(document).trigger("error", data.message);
           }

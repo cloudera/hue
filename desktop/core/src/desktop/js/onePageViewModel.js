@@ -79,10 +79,19 @@ class OnePageViewModel {
       huePubSub.publish('set.current.app.name', self.currentApp());
     });
 
-    huePubSub.subscribe('open.editor.query', uuid => {
+    huePubSub.subscribe('open.editor.query', resp => {
       self.loadApp('editor');
+      const data = { uuid: resp.history_uuid };
+      if (resp.handle && resp.handle.session_id) {
+        data['session'] = {
+          type: resp.handle.session_type,
+          id: resp.handle.session_id,
+          session_id: resp.handle.session_guid,
+          properties: []
+        };
+      }
       self.getActiveAppViewModel(viewModel => {
-        viewModel.openNotebook(uuid);
+        viewModel.openNotebook(data.uuid, null, null, null, data.session);
       });
     });
 

@@ -151,7 +151,7 @@ $(document).ready(() => {
       },
       resp => {
         if (resp.history_uuid) {
-          huePubSub.publish('open.editor.query', resp.history_uuid);
+          huePubSub.publish('open.editor.query', resp);
         } else if (resp.message) {
           $(document).trigger('error', resp.message);
         }
