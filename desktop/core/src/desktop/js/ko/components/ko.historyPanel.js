@@ -271,6 +271,7 @@ class HistoryPanel {
               } else if (notebook.onSuccessUrl()) {
                 huePubSub.publish(notebook.pubSubUrl());
               }
+              notebook.close(); // TODO: Don't close when onSuccessUrl is editor?
             } else {
               // Perform last DROP statement execute
               snippet.execute();

@@ -2469,6 +2469,19 @@ class ApiHelper {
                     };
                     data.hueTimestamp = Date.now();
                     deferred.resolve(data);
+
+                    if (
+                      window.CLOSE_SESSIONS[options.sourceType] &&
+                      queryResult.result.handle &&
+                      queryResult.result.handle.session_id
+                    ) {
+                      self.closeSession({
+                        session: {
+                          type: options.sourceType,
+                          id: queryResult.result.handle.session_id
+                        }
+                      });
+                    }
                   })
                   .fail(deferred.reject);
 
