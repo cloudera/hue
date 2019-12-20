@@ -429,6 +429,7 @@ class EditorViewModel {
     self.loadNotebook = function(notebookRaw, queryTab) {
       let currentQueries;
       if (self.selectedNotebook() != null) {
+        self.selectedNotebook().close();
         currentQueries = self.selectedNotebook().unload();
       }
 
