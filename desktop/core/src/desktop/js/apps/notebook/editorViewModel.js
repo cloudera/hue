@@ -594,7 +594,7 @@ class EditorViewModel {
         {
           type: editorType || options.editor_type,
           directory_uuid: window.location.getParameter('directory_uuid'),
-          gist: window.location.getParameter('gist')
+          gist: self.isNotificationManager() ? undefined : window.location.getParameter('gist')
         },
         data => {
           self.loadNotebook(data.notebook);
