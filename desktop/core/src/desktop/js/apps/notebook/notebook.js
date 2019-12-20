@@ -324,14 +324,17 @@ class Notebook {
       const _snippet = new Snippet(vm, self, snippet);
       self.snippets.push(_snippet);
 
+      const deferred = $.Deferred().done(() => {
+        _snippet.init();
+      });
       if (self.getSession(_snippet.type()) == null && typeof skipSession == 'undefined') {
-        window.setTimeout(() => {
-          _snippet.status('loading');
-          self.createSession(new Session(vm, { type: _snippet.type() }));
-        }, 200);
+        self.createSession(new Session(vm, { type: _snippet.type() }), () => {
+          deferred.resolve();
+        });
+      } else {
+        deferred.resolve();
       }
 
-      _snippet.init();
       return _snippet;
     };
 
