@@ -23,6 +23,7 @@ from builtins import str
 import logging
 import re
 import string
+import sys
 import time
 import urllib.request, urllib.error, urllib.parse
 import urllib.parse
@@ -255,9 +256,14 @@ def single_job(request, job):
     return single_spark_job(request, job)
 
   failed_tasks = job.filter_tasks(task_states=('failed',))
-  failed_tasks.sort(cmp_exec_time)
   recent_tasks = job.filter_tasks(task_states=('running', 'succeeded',))
-  recent_tasks.sort(cmp_exec_time, reverse=True)
+
+  if sys.version_info[0] > 2:
+    failed_tasks.sort(key=lambda task: task.execStartTimeMs)
+    recent_tasks.sort(key=lambda task: task.execStartTimeMs, reverse=True)
+  else:
+    failed_tasks.sort(cmp_exec_time)
+    recent_tasks.sort(cmp_exec_time, reverse=True)
 
   if request.GET.get('format') == 'json':
     json_failed_tasks = [massage_task_for_json(task) for task in failed_tasks]
