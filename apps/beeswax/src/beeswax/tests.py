@@ -94,7 +94,7 @@ from beeswax.test_base import BeeswaxSampleProvider, is_hive_on_spark, get_avail
 from beeswax.hive_site import get_metastore, hiveserver2_jdbc_url
 
 if sys.version_info[0] > 2:
-  from io import StringIO as string_io
+  from io import BytesIO as string_io
   open_file = open
 else:
   from cStringIO import StringIO as string_io
@@ -2132,7 +2132,10 @@ def test_import_gzip_reader():
   data = open_file(__file__).read()
   data_gz_sio = string_io()
   gz = gzip.GzipFile(fileobj=data_gz_sio, mode='wb')
-  gz.write(data)
+  gz_data = data
+  if not isinstance(gz_data, bytes):
+    gz_data = gz_data.encode('utf-8')
+  gz.write(gz_data)
   gz.close()
   data_gz = data_gz_sio.getvalue()
 
@@ -2857,7 +2860,7 @@ class TestWithMockedServer(object):
 
   def test_get_history_xss(self):
     sql = 'SELECT count(sample_07.salary) FROM sample_07;"><iFrAME>src="javascript:alert(\'Hue has an xss\');"></iFraME>'
-    sql_escaped = 'SELECT count(sample_07.salary) FROM sample_07;&quot;&gt;&lt;iFrAME&gt;src=&quot;javascript:alert(&#39;Hue has an xss&#39;);&quot;&gt;&lt;/iFraME&gt;'
+    sql_escaped = b'SELECT count(sample_07.salary) FROM sample_07;&quot;&gt;&lt;iFrAME&gt;src=&quot;javascript:alert(&#39;Hue has an xss&#39;);&quot;&gt;&lt;/iFraME&gt;'
 
     response = _make_query(self.client, sql, submission_type='Save', name='My Name 1', desc='My Description')
     content = json.loads(response.content)
@@ -2881,6 +2884,8 @@ class TestWithMockedServer(object):
 
     resp = self.client.get('/beeswax/query_history?format=json')
     assert_true(sql_escaped in resp.content, resp.content)
+    if not isinstance(sql, bytes):
+      sql = sql.encode('utf-8')
     assert_false(sql in resp.content, resp.content)
 
   def test_redact_saved_design(self):
@@ -3160,14 +3165,14 @@ def test_close_queries_flag():
   finish = conf.CLOSE_QUERIES.set_for_testing(False)
   try:
     resp = c.get('/beeswax/execute')
-    assert_false('closeQuery()' in resp.content, resp.content)
+    assert_false(b'closeQuery()' in resp.content, resp.content)
   finally:
     finish()
 
   finish = conf.CLOSE_QUERIES.set_for_testing(True)
   try:
     resp = c.get('/beeswax/execute')
-    assert_true('closeQuery()' in resp.content, resp.content)
+    assert_true(b'closeQuery()' in resp.content, resp.content)
   finally:
     finish()
 
