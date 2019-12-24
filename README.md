@@ -15,7 +15,7 @@ Many companies and organizations use Hue to quickly answer questions via self-se
 * 1000+ customers
 * Top Fortune 500
 
-are executing 100s of 1000s of queries daily. It also ships in Amazon AWS and its open source version is used by hundreds of companies.
+are executing 100s of 1000s of queries daily. It also ships in Cloudera Data Platform, Amazon AWS, Open Data Hub...
 
 Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/parsers/) and any [contributions](CONTRIBUTING.md) are welcome.
 
