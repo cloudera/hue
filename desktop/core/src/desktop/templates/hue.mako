@@ -75,7 +75,15 @@
   <%
     global_constants_url = '/desktop/globalJsConstants.js?v=' + hue_version()
   %>
-  <script src="${global_constants_url}"></script>
+  <script src="${ global_constants_url }"></script>
+
+  % if user.auth_backend == 'desktop.auth.backend.GoogleSignInBackend':
+    <%!
+    from desktop.conf import SSO_GOOGLE_API_KEY
+    %>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id" content="${ SSO_GOOGLE_API_KEY.get() }">
+  % endif
 
   % if not conf.DEV.get():
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
@@ -485,6 +493,12 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       $(document).on('keyup', closeTourOnEsc);
       tour.start();
     });
+
+    % if user.auth_backend == 'desktop.auth.backend.GoogleSignInBackend':
+      gapi.load('auth2', function() {
+        gapi.auth2.init();
+      });
+    % endif
   });
 </script>
 

@@ -367,6 +367,7 @@ class GoogleSignInBackend(DesktopBackendBase):
     user.save()
 
     ensure_has_a_group(user)
+    user = rewrite_user(user)
 
     set_user_preferences(user, 'token', user_profile['token'])
 

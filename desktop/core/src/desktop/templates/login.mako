@@ -196,22 +196,17 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
 <script>
    % if 'GoogleSignInBackend' in backend_names:
     function onSignIn(googleUser) {
-      ## var profile = googleUser.getBasicProfile();
-      ## console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-      ## console.log('Name: ' + profile.getName());
-      ## console.log('Image URL: ' + profile.getImageUrl());
-      ## console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+      # TODO: save in user profile
+      var profile = googleUser.getBasicProfile();
+      console.log('Name: ' + profile.getName());
+      console.log('Image URL: ' + profile.getImageUrl());
+      console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
 
       var id_token = googleUser.getAuthResponse().id_token;
       $('input[name="id_token"]').val(id_token);
-      % if not user.is_authenticated():
-        console.log('is not auth');
-        $("form").submit();
-      % else:
-        console.log('is auth');
-      % endif
+      $("form").submit();
     }
-    % endif
+  % endif
 
   $(document).ready(function () {
 
@@ -230,12 +225,6 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
       $("input").bind('click', function () {
         window.location.replace('/login/oauth/');
         return false;
-      });
-    % endif
-
-    % if 'GoogleSignInBackend' in backend_names:
-      $("#gsso").bind('click', function () {
-        onSignIn()
       });
     % endif
 

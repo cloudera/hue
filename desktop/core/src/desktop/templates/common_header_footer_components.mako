@@ -35,7 +35,6 @@ from metadata.conf import has_optimizer, OPTIMIZER
   </script>
   <![endif]-->
 
-
   <script type="text/javascript">
     // check if it's a Firefox < 7
     var _UA = navigator.userAgent.toLowerCase();

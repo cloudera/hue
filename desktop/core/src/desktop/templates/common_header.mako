@@ -136,10 +136,10 @@ if USE_NEW_EDITOR.get():
   ${ commonHeaderFooterComponents.header_i18n_redirection() }
 
   % if user.is_authenticated():
-  <%
-    global_constants_url = '/desktop/globalJsConstants.js?v=' + hue_version()
-  %>
-  <script src="${global_constants_url}"></script>
+    <%
+      global_constants_url = '/desktop/globalJsConstants.js?v=' + hue_version()
+    %>
+    <script src="${ global_constants_url }"></script>
   % endif
 
   % if not conf.DEV.get():
@@ -194,7 +194,6 @@ if USE_NEW_EDITOR.get():
 
 <body>
 ${ hueIcons.symbols() }
-
 
 % if hasattr(request, 'environ') and request.environ.get("PATH_INFO").find("/hue/") < 0:
   <script>

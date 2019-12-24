@@ -652,6 +652,7 @@
   window.IS_LDAP_SETUP = '${ 'desktop.auth.backend.LdapBackend' in conf.AUTH.BACKEND.get() }' === 'True';
   window.LOGGED_USERNAME = '${ user.username }';
   window.LOGGED_USER_ID = ${ user.id };
+  window.IS_GOOGLE_SSO = '${ user.auth_backend == 'desktop.auth.backend.GoogleSignInBackend' }' === 'True';
 
   <%
     # TODO remove

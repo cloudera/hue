@@ -137,7 +137,7 @@ const TEMPLATE = `
         <!-- ko ifnot: $index() === 0 -->
         <div class="item-spacer"></div>
         <!-- /ko -->
-        <!-- ko template: {name: 'sidebar-item', foreach: children } --><!-- /ko -->
+        <!-- ko template: { name: 'sidebar-item', foreach: children } --><!-- /ko -->
       <!-- /ko -->
       <!-- ko ifnot: isCategory -->
         <!-- ko template: { name: 'sidebar-item' } --><!-- /ko -->
@@ -543,6 +543,13 @@ class Sidebar {
 
   toggleCollapse() {
     this.$element.toggleClass('collapsed');
+  }
+
+  ssoSignOut() {
+    var auth2 = gapi.auth2.getAuthInstance();
+    auth2.signOut().then(function () {
+      window.location.replace('/accounts/logout');
+    });
   }
 }
 
