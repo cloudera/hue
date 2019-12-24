@@ -20,34 +20,42 @@ import logging
 
 from django.utils.translation import ugettext as _
 
-from desktop.conf import has_connectors, CONNECTORS
+from desktop.conf import has_connectors, CONNECTORS, CONNECTORS_BLACKLIST, CONNECTORS_WHITELIST
 from desktop.lib.django_util import JsonResponse, render
-from desktop.lib.connectors.lib.impala import Impala
-from desktop.lib.connectors.lib.hive import Hive
 from desktop.lib.exceptions_renderable import PopupException
 
 
 LOG = logging.getLogger(__name__)
 
 
-# TODO: automatically load modules from lib module
-# TODO: offer to white/black list available connector types
-CONNECTOR_TYPES = [{
-    'nice_name': connector.NAME,
-    'dialect': connector.TYPE,
-    'interface': connector.INTERFACE, # interfaces = ['int1', 'int2'...]
-    'settings': connector.PROPERTIES,
+CONNECTOR_TYPES = [
+  {
+    'nice_name': "Hive",
+    'dialect': 'hive',
+    'interface': 'hiveserver2',
+    'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},],
     'category': 'editor',
     'description': '',
     'properties': {'is_sql': True}
-  }
-  for connector in [
-    Impala(), Hive()
-  ]
-]
-
-CONNECTOR_TYPES += [
-  {'nice_name': "Hive Tez", 'dialect': 'hive-tez', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
+  },
+  {
+    'nice_name': "Impala",
+    'dialect': 'impala',
+    'interface': 'hiveserver2',
+    'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},],
+    'category': 'editor',
+    'description': '',
+    'properties': {'is_sql': True}
+  },
+  {
+    'nice_name': "Hive Tez",
+    'dialect': 'hive-tez',
+    'interface': 'hiveserver2',
+    'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},],
+    'category': 'editor',
+    'description': '',
+    'properties': {'is_sql': True}
+  },
   {'nice_name': "Hive LLAP", 'dialect': 'hive-llap', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
   {'nice_name': "Druid", 'dialect': 'sql-druid', 'interface': 'sqlalchemy', 'settings': [{'name': 'url', 'value': 'druid://druid-host.com:8082/druid/v2/sql/'}], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
   {'nice_name': "Kafka SQL", 'dialect': 'ksql', 'interface': 'ksql', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
@@ -92,6 +100,12 @@ CONNECTOR_TYPES += [
   {'nice_name': "Oozie", 'dialect': 'oozie', 'settings': [], 'category': 'schedulers', 'description': '', 'properties': {}},
   {'nice_name': "Celery", 'dialect': 'celery', 'settings': [], 'category': 'schedulers', 'description': '', 'properties': {}},
 ]
+
+CONNECTOR_TYPES = [connector for connector in CONNECTOR_TYPES if connector['dialect'] not in CONNECTORS_BLACKLIST.get()]
+
+if CONNECTORS_WHITELIST.get():
+  CONNECTOR_TYPES = [connector for connector in CONNECTOR_TYPES if connector['dialect'] in CONNECTORS_WHITELIST.get()]
+
 
 CATEGORIES = [
   {"name": "Editor", 'type': 'editor', 'description': ''},

@@ -1907,9 +1907,23 @@ ENABLE_CONNECTORS = Config(
   help=_('Turn on the Connector configuration and usage.')
 )
 
+CONNECTORS_BLACKLIST = Config(
+  key='connectors_blacklist',
+  default='',
+  type=coerce_csv,
+  help=_('Comma separated list of connector types to hide.')
+)
+
+CONNECTORS_WHITELIST = Config(
+  key='connectors_whitelist',
+  default='',
+  type=coerce_csv,
+  help=_('If not empty, comma separated list of connector types to keep.')
+)
+
 CONNECTORS = UnspecifiedConfigSection(
   key='connectors',
-  help=_("""Configuration options for connectors to external services"""),
+  help=_("""Configuration options for connectors instances to external services"""),
   each=ConfigSection(
     help=_("Id of the connector."),
     members=dict(
