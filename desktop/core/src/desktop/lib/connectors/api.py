@@ -25,7 +25,7 @@ from useradmin.models import update_app_permissions
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.connectors import models
-from desktop.lib.connectors.models import AVAILABLE_CONNECTORS, _get_connector_by_id, _get_installed_connectors, _group_category_connectors
+from desktop.lib.connectors.models import AVAILABLE_CONNECTORS, _get_connector_by_id, _get_installed_connectors
 from desktop.lib.connectors.types import CONNECTOR_TYPES, CATEGORIES
 
 

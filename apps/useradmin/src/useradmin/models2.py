@@ -124,10 +124,9 @@ class OrganizationUser(AbstractUser):
     username = None
     email = models.EmailField(_t('Email address'), unique=True)
     token = models.CharField(_t('Token'), max_length=128, default=None, null=True)
-    customer_id = models.CharField(_t('Customer id'), max_length=128, default=None, null=True)
+    customer_id = models.CharField(_t('Customer id'), max_length=128, default=None, null=True) # Needed?
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     is_admin = models.BooleanField(default=False)
-    # settings are in UserProfile
 
     groups = models.ManyToManyField(
         OrganizationGroup,
