@@ -115,6 +115,10 @@ class OrganizationUser(AbstractUser):
     token = models.CharField(_t('token'), max_length=128, default=None, null=True)
     customer_id = models.CharField(_t('Customer id'), max_length=128, default=None, null=True)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    # settings = json
+    #   connector_whitelist
+    #   connector_blacklist
+    #   auths: login/password, Google SSO, SAML, LDAP, Github
 
     groups = models.ManyToManyField(
         OrganizationGroup,

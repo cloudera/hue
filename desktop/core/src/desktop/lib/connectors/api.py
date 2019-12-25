@@ -20,35 +20,14 @@ import logging
 
 from django.utils.translation import ugettext as _
 
-from desktop.conf import has_connectors, CONNECTORS
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.connectors.models import AVAILABLE_CONNECTORS, _get_connector_by_id, _get_installed_connectors
 from desktop.lib.connectors.types import CONNECTOR_TYPES, CATEGORIES
 
 
 LOG = logging.getLogger(__name__)
 
-
-def _group_category_connectors(connectors):
-  return [{
-    'category': category['type'],
-    'category_name': category['name'],
-    'description': category['description'],
-    'values': [_connector for _connector in connectors if _connector['category'] == category['type']],
-  } for category in CATEGORIES
-]
-
-AVAILABLE_CONNECTORS = _group_category_connectors(CONNECTOR_TYPES)
-
-
-# TODO: persist in DB
-# TODO: remove installed connectors that don't have a connector or are blacklisted
-# TODO: load back from DB and apply Category properties, e.g. defaults, interface, category, category_name...
-# TODO: connector groups: if we want one type (e.g. Hive) to show-up with multiple computes and the same saved query.
-
-# connector_type: category --> engine, is_sql --> engine_type: sql
-CONNECTOR_INSTANCES = None
-CONNECTOR_IDS = 1
 
 def get_connector_types(request):
   global AVAILABLE_CONNECTORS
@@ -126,66 +105,3 @@ def delete_connector(request):
     return JsonResponse({})
   else:
     raise PopupException(_('No connector with the name %(name)s found.') % connector)
-
-
-def _get_installed_connectors(category=None, categories=None, dialect=None, interface=None):
-  global CONNECTOR_INSTANCES
-  global CONNECTOR_IDS
-  config_connectors = CONNECTORS.get()
-
-  if CONNECTOR_INSTANCES is None:
-    CONNECTOR_INSTANCES = []
-
-    for i in config_connectors:
-      connector_types = []
-
-      for connector_type in CONNECTOR_TYPES:
-        if connector_type['dialect'] == config_connectors[i].DIALECT.get():
-          connector_types.insert(0, connector_type)
-        elif connector_type.get('interface') == config_connectors[i].INTERFACE.get():
-          connector_types.append(connector_type)
-
-      if not connector_types:
-        LOG.warn('Skipping connector %s as connector dialect %s or interface %s are not installed' % (
-            i, config_connectors[i].DIALECT.get(), config_connectors[i].INTERFACE.get()
-          )
-        )
-      else:
-        connector_type = connector_types[0]
-        connector = {
-          'nice_name': config_connectors[i].NICE_NAME.get() or i,
-          'name': i,
-          'dialect': config_connectors[i].DIALECT.get(),
-          'interface': config_connectors[i].INTERFACE.get(),
-          'settings': config_connectors[i].SETTINGS.get(),
-          'id': CONNECTOR_IDS,
-          'category': connector_type['category'],
-          'description': connector_type['description']
-        }
-        connector.update(connector_type['properties'])
-        CONNECTOR_INSTANCES.append(connector)
-        CONNECTOR_IDS += 1
-
-  connectors = CONNECTOR_INSTANCES
-
-  if categories is not None:
-    connectors = [connector for connector in connectors if connector['category'] in categories]
-  if category is not None:
-    connectors = [connector for connector in connectors if connector['category'] == category]
-  if dialect is not None:
-    connectors = [connector for connector in connectors if connector['dialect'] == dialect]
-  if interface is not None:
-    connectors = [connector for connector in connectors if connector['interface'] == interface]
-
-  return connectors
-
-
-def _get_connector_by_id(id):
-  global CONNECTOR_INSTANCES
-
-  instance = [connector for connector in CONNECTOR_INSTANCES if connector['id'] == id]
-
-  if instance:
-    return instance[0]
-  else:
-    raise PopupException(_('No connector with the id %s found.') % id)
