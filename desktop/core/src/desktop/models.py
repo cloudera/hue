@@ -2004,7 +2004,7 @@ class ClusterConfig(object):
           'page': '/jobbrowser/'
         })
 
-    if TASK_SERVER.ENABLED.get():
+    if TASK_SERVER.ENABLED.get() and False:
       interpreters.append({
           'type': 'celery-task',
           'displayName': _('Tasks'),
@@ -2014,7 +2014,7 @@ class ClusterConfig(object):
         }
       )
 
-    if TASK_SERVER.BEAT_ENABLED.get():
+    if TASK_SERVER.BEAT_ENABLED.get() and False:
       interpreters.append({
           'type': 'celery-beat',
           'displayName': _('Scheduled Tasks'),
