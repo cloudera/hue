@@ -312,14 +312,16 @@ class Sidebar {
         }
 
         const browserItems = [];
-        browserItems.push(
-          new SidebarItem({
-            displayName: I18n('Documents'),
-            url: '/home/',
-            icon: 'documents',
-            type: 'home'
-          })
-        );
+        if (appConfig['home']) {
+          browserItems.push(
+            new SidebarItem({
+              displayName: appConfig['home']['buttonName'],
+              url: appConfig['home']['page'],
+              icon: 'documents',
+              type: appConfig['home']['name']
+            })
+          );
+        }
         if (appConfig['browser'] && appConfig['browser']['interpreters']) {
           appConfig['browser']['interpreters'].forEach(browser => {
             browserItems.push(
