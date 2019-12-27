@@ -47,16 +47,18 @@ from django.db import connection, models, transaction
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.cache import cache
+from django.utils import timezone as dtz
 from django.utils.translation import ugettext_lazy as _t
-import django.utils.timezone as dtz
 
 from desktop import appmanager
 from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.idbroker.conf import is_idbroker_enabled
+from desktop.monkey_patches import monkey_patch_username_validator
 from hadoop import cluster
 
 import useradmin.conf
+
 
 if ENABLE_ORGANIZATIONS.get():
   from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group, Organization, default_organization
@@ -66,7 +68,7 @@ else:
   def default_organization(): pass
   def get_organization(): pass
 
-from desktop.monkey_patches import monkey_patch_username_validator
+
 monkey_patch_username_validator()
 
 
@@ -75,24 +77,8 @@ LOG = logging.getLogger(__name__)
 
 class UserProfile(models.Model):
   """
-  WARNING: Some of the columns in the UserProfile object have been added
-  via south migration scripts. During an upgrade that modifies this model,
-  the columns in the django ORM database will not match the
-  actual object defined here, until the latest migration has been executed.
-  The code that does the actual UserProfile population must reside in the most
-  recent migration that modifies the UserProfile model.
-
-  for user in User.objects.all():
-    try:
-      p = orm.UserProfile.objects.get(user=user)
-    except orm.UserProfile.DoesNotExist:
-      create_profile_for_user(user)
-
-  IF ADDING A MIGRATION THAT MODIFIES THIS MODEL, MAKE SURE TO MOVE THIS CODE
-  OUT OF THE CURRENT MIGRATION, AND INTO THE NEW ONE, OR UPGRADES WILL NOT WORK
-  PROPERLY
+  Extra settings / properties to store for each user.
   """
-  # Enum for describing the creation method of a user.
   class CreationMethod(Enum):
     HUE = 1
     EXTERNAL = 2
@@ -100,8 +86,7 @@ class UserProfile(models.Model):
   user = models.OneToOneField(User, unique=True)
   home_directory = models.CharField(editable=True, max_length=1024, null=True)
   creation_method = models.CharField(editable=True, null=False, max_length=64, default=CreationMethod.HUE.name)
-  first_login = models.BooleanField(default=True, verbose_name=_t('First Login'),
-                                   help_text=_t('If this is users first login.'))
+  first_login = models.BooleanField(default=True, verbose_name=_t('First Login'), help_text=_t('If this is users first login.'))
   last_activity = models.DateTimeField(auto_now=True, db_index=True)
 
   def get_groups(self):
