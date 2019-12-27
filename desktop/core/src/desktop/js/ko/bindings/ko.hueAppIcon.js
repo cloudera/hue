@@ -44,6 +44,7 @@ const APP_ICON_INDEX = {
   pig: `<svg class="hi hi-fw"><use xlink:href="#hi-pig"></use></svg>`,
   py: `<svg class="hi hi-fw"><use xlink:href="#hi-py"></use></svg>`,
   pyspark: `<svg class="hi hi-fw"><use xlink:href="#hi-spark"></use></svg>`,
+  queries: `<i class="fa fa-fw fa-tasks"></i>`,
   r: `<svg class="hi hi-fw"><use xlink:href="#hi-r"></use></svg>`,
   report: `<i class="fa fa-fw fa-area-chart"></i>`,
   s3: `<i class="fa fa-fw fa-cubes"></i>`,
