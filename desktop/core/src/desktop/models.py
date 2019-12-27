@@ -1715,7 +1715,7 @@ class ClusterConfig(object):
     return {
       'name': 'home',
       'displayName': _('Home'),
-      'buttonName': _('Documents'),
+      'buttonName': _('Saved Queries') if has_connectors() else _('Documents'),
       'interpreters': [],
       'page': '/home'
     }
