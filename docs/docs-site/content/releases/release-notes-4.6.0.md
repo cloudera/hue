@@ -20,7 +20,10 @@ The focus of this release was to keep building on top of 4.5 and modularize the 
 * The new version of the Editor with multi execution contexts and more robustness is 66% done
 * Build your own or improve [SQL parsers with highlighter](https://docs.gethue.com/developer/parsers/)
 
+
 Read the complete list of improvements on [Hue 4.6 is out!](http://gethue.com/hue-4-6-and-its-improvements-are-out/).
+
+Download the [tarball](https://cdn.gethue.com/downloads/hue-4.6.0.tgz) or [source](https://github.com/cloudera/hue/archive/release-4.6.0.zip) releases.
 
 
 ### Notable Changes
