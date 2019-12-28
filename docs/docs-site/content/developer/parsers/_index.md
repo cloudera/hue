@@ -5,11 +5,11 @@ draft: false
 weight: 2
 ---
 
-This guide goes you through the steps necessary to create an autocompleter for any SQL dialect in Hue. The major benefits are:
+This guide goes you through the steps necessary to create an autocompleter for any [SQL dialect](/administrator/configuration/connectors/#databases) in Hue. The major benefits are:
 
-* showing only valid syntax in the autocomplete
-* getting the list of tables, columns automatically
-* proper syntax highlighting of the keywords
+* Showing only valid syntax in the autocomplete
+* Getting the list of tables, columns automatically
+* Proper syntax highlighting of the keywords
 
 ## Parser Theory
 
