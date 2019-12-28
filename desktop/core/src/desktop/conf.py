@@ -1916,7 +1916,7 @@ CONNECTORS_BLACKLIST = Config(
 
 CONNECTORS_WHITELIST = Config(
   key='connectors_whitelist',
-  default='',
+  default=[],
   type=coerce_csv,
   help=_('If not empty, comma separated list of connector types to keep.')
 )
