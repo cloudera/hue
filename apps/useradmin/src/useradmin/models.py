@@ -39,6 +39,7 @@ Note that Django itself has a notion of users, groups, and permissions. We re-us
 permissions.  The permissions notion in Django is strongly tied to what models you may or may not edit, and there are elaborations (especially
 in Django 1.2) to manipulate this row by row. This does not map nicely onto actions which may not relate to database models.
 """
+import json
 import logging
 from datetime import datetime
 from enum import Enum
@@ -133,11 +134,10 @@ class UserProfile(models.Model):
       self.json_data = json.dumps({})
     return json.loads(self.json_data)
 
-  @data.setter
-  def data(self, val):
+  def update_data(self, val):
     data_dict = self.data
     data_dict.update(val)
-    self.data = json.dumps(data_dict)
+    self.json_data = json.dumps(data_dict)
 
 
 def get_profile(user):
