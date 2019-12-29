@@ -106,7 +106,7 @@ def is_admin(user):
   is_admin = False
   if hasattr(user, 'is_superuser'):
     is_admin = user.is_superuser
-  if not is_admin and user.is_authenticated() and not ENABLE_ORGANIZATIONS.get():  # Admin group only within an organization if later is enabled
+  if not is_admin and user.is_authenticated() and not ENABLE_ORGANIZATIONS.get():  # Admin group activated only in organization mode.
     try:
       user = rewrite_user(user)
       is_admin = user.has_hue_permission(action="superuser", app="useradmin")

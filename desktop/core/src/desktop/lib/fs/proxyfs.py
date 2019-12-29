@@ -47,7 +47,7 @@ class ProxyFS(object):
 
     self._name = name
     self._fs_dict = filesystems_dict
-    self._user = {'user': None} # wrapping in an object to avoid triggering __getattr__ / __setattr__
+    self._user = {'user': None}  # Wrapping in an object to avoid triggering __getattr__ / __setattr__
     self._default_scheme = default_scheme
     self._default_fs = filesystems_dict[self._default_scheme](name, user=None)
 
@@ -74,7 +74,7 @@ class ProxyFS(object):
     from desktop.auth.backend import rewrite_user  # Avoid cyclic loop
     try:
       filebrowser_action = fs.filebrowser_action()
-      #if not filebrowser_action (hdfs) then handle permission via doas else check permission in hue
+      # If not filebrowser_action (hdfs) then handle permission via doas else check permission in hue
       if not filebrowser_action:
         return True
       lookup = {orm_user_lookup(): self.getuser()}
@@ -214,7 +214,7 @@ class ProxyFS(object):
     return fs.mktemp(subdir=subdir, prefix=prefix, basedir=basedir)
 
   def purge_trash(self):
-    fs = self._get_fs() # Only webhdfs supports trash.
+    fs = self._get_fs()  # Only webhdfs supports trash.
     if fs and hasattr(fs, 'purge_trash'):
       fs.purge_trash()
 

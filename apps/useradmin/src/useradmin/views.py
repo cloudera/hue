@@ -540,7 +540,8 @@ def edit_permission(request, app=None, priv=None):
     form = PermissionsEditForm(instance=instance)
   if request.method == 'POST' and is_embeddable:
     return JsonResponse(
-      {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
+        {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]}
+    )
   else:
     return render('edit_permissions.mako', request, {
       'form': form,
@@ -699,7 +700,8 @@ def add_ldap_groups(request):
 
   if request.method == 'POST' and is_embeddable:
     return JsonResponse(
-      {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
+        {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]}
+    )
   else:
     return render('edit_group.mako', request, dict(form=form, action=request.path, ldap=True, is_embeddable=is_embeddable))
 
@@ -735,8 +737,7 @@ def sync_ldap_users_groups(request):
 
       failed_ldap_users = []
 
-      sync_ldap_users_and_groups(connection, is_ensuring_home_directory, request.fs,
-                                 failed_users=failed_ldap_users)
+      sync_ldap_users_and_groups(connection, is_ensuring_home_directory, request.fs, failed_users=failed_ldap_users)
 
       request.audit = {
         'operation': 'SYNC_LDAP_USERS_GROUPS',
@@ -756,7 +757,8 @@ def sync_ldap_users_groups(request):
 
   if request.method == 'POST' and is_embeddable:
     return JsonResponse(
-      {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
+        {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]}
+    )
   else:
     return render("sync_ldap_users_groups.mako", request, dict(path=request.path, form=form, is_embeddable=is_embeddable))
 
@@ -779,14 +781,15 @@ def sync_ldap_users_and_groups(connection, is_ensuring_home_directory=False, fs=
 
 
 def import_ldap_users(connection, user_pattern, sync_groups, import_by_dn, server=None, failed_users=None):
-  return _import_ldap_users(connection, user_pattern, sync_groups=sync_groups, import_by_dn=import_by_dn, server=server,
-                            failed_users=failed_users)
+  return _import_ldap_users(
+      connection, user_pattern, sync_groups=sync_groups, import_by_dn=import_by_dn, server=server, failed_users=failed_users
+  )
 
 
-def import_ldap_groups(connection, group_pattern, import_members, import_members_recursive, sync_users, import_by_dn,
-                       failed_users=None):
-  return _import_ldap_groups(connection, group_pattern, import_members, import_members_recursive, sync_users,
-                             import_by_dn, failed_users=failed_users)
+def import_ldap_groups(connection, group_pattern, import_members, import_members_recursive, sync_users, import_by_dn, failed_users=None):
+  return _import_ldap_groups(
+      connection, group_pattern, import_members, import_members_recursive, sync_users, import_by_dn, failed_users=failed_users
+  )
 
 
 def get_find_groups_filter(ldap_info, server=None):
