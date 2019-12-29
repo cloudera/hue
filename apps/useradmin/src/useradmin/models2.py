@@ -20,6 +20,8 @@ import logging
 from django.contrib.auth.models import models, AbstractUser, BaseUserManager
 from django.utils.translation import ugettext_lazy as _t
 
+from desktop.models import uuid_default
+
 
 LOG = logging.getLogger(__name__)
 
@@ -36,6 +38,8 @@ class OrganizationManager(models.Manager):
 
 class Organization(models.Model):
   name = models.CharField(max_length=200, help_text=_t("The name of the organization"))
+  uuid = models.CharField(default=uuid_default, max_length=36, db_index=True)
+  domain = models.CharField(max_length=200, help_text=_t("The domain name of the organization, e.g. gethue.com"))
   is_active = models.BooleanField(default=True)
 
   objects = OrganizationManager()
@@ -89,17 +93,21 @@ class UserManager(BaseUserManager):
       """Create and save a regular User with the given email and password."""
       extra_fields.setdefault('is_staff', False)
       extra_fields.setdefault('is_superuser', False)
+      extra_fields.setdefault('is_admin', False)
       return self._create_user(email, password, **extra_fields)
 
   def create_superuser(self, email, password, **extra_fields):
       """Create and save a SuperUser with the given email and password."""
-      extra_fields.setdefault('is_staff', True)
-      extra_fields.setdefault('is_superuser', True)
+      extra_fields.setdefault('is_staff', False)
+      extra_fields.setdefault('is_superuser', False)
+      extra_fields.setdefault('is_admin', True)
 
-      if extra_fields.get('is_staff') is not True:
-          raise ValueError('Superuser must have is_staff=True.')
-      if extra_fields.get('is_superuser') is not True:
-          raise ValueError('Superuser must have is_superuser=True.')
+      if extra_fields.get('is_staff') is not False:
+          raise ValueError('Organization superuser must have is_staff=False.')
+      if extra_fields.get('is_superuser') is not False:
+          raise ValueError('Organization superuser must have is_superuser=False.')
+      if extra_fields.get('is_admin') is not True:
+          raise ValueError('Organization superuser must have is_admin=False.')
 
       return self._create_user(email, password, **extra_fields)
 
@@ -108,17 +116,15 @@ def default_organization():
   return default_organization
 
 class OrganizationUser(AbstractUser):
-    """User model."""
+    """User model in a multi tenant setup."""
 
     username = None
-    email = models.EmailField(_t('email address'), unique=True)
-    token = models.CharField(_t('token'), max_length=128, default=None, null=True)
+    email = models.EmailField(_t('Email address'), unique=True)
+    token = models.CharField(_t('Token'), max_length=128, default=None, null=True)
     customer_id = models.CharField(_t('Customer id'), max_length=128, default=None, null=True)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
-    # settings = json
-    #   connector_whitelist
-    #   connector_blacklist
-    #   auths: login/password, Google SSO, SAML, LDAP, Github
+    is_admin = models.BooleanField(default=False)
+    # settings are in UserProfile
 
     groups = models.ManyToManyField(
         OrganizationGroup,

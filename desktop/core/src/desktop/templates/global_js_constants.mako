@@ -18,7 +18,7 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
-  from desktop.auth.backend import is_admin
+  from desktop.auth.backend import is_admin, is_organization_admin
   from desktop.conf import APP_SWITCHER_ALTUS_BASE_URL, APP_SWITCHER_MOW_BASE_URL, DISPLAY_APP_SWITCHER, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, \
       USE_DEFAULT_CONFIGURATION, USE_NEW_SIDE_PANELS, VCS, ENABLE_GIST, ENABLE_LINK_SHARING
   from desktop.models import hue_version, _get_apps, get_cluster_config
@@ -640,6 +640,7 @@
 
   window.USER_VIEW_EDIT_USER_ENABLED = '${ user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or is_admin(user) }' === 'True';
   window.USER_IS_ADMIN = '${ is_admin(user) }' === 'True';
+  window.USER_IS_ORG_ADMIN = '${ is_organization_admin(user) }' === 'True';
   window.DJANGO_DEBUG_MODE = '${ conf.DJANGO_DEBUG_MODE.get() }' === 'True';
   window.IS_LDAP_SETUP = '${ 'desktop.auth.backend.LdapBackend' in conf.AUTH.BACKEND.get() }' === 'True';
   window.LOGGED_USERNAME = '${ user.username }';

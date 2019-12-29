@@ -132,7 +132,7 @@ LOG = logging.getLogger(__name__)
             <td>
          % endif
           % if isinstance(config_obj, BoundContainer):
-            %if config_obj.config.help or len(config_obj.get().values()) == 0:
+            % if config_obj.config.help or not config_obj.get().values():
             <i>${ config_obj.config.help or _('No help available.') }</i>
             % endif
             ${ recurseList(config_obj.get().values(), depth + 1) }
@@ -150,13 +150,13 @@ LOG = logging.getLogger(__name__)
                 except:
                   LOG.exception("Potential misconfiguration. Error value of key '%s' in configuration." % config_obj.grab_key)
               %>
-              %if config_str == '':
+              % if config_str == '':
               &nbsp;
-              %endif
+              % endif
             </code><br/>
-              %if config_obj.config.help:
+              % if config_obj.config.help:
                 <i>${ config_obj.config.help or _('No help available.') }</i>
-              %endif
+              % endif
             <span class="muted">${ _('Default:') } <i>${ config_obj.config.default if sys.version_info[0] > 2 else str(config_obj.config.default).decode('utf-8', 'replace') }</i></span>
           % endif
           </td>
