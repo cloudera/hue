@@ -96,6 +96,9 @@ def rewrite_user(user):
     augment = get_user_augmentation_class()(user)
     for attr in ("get_groups", "get_home_directory", "has_hue_permission"):
       setattr(user, attr, getattr(augment, attr))
+
+    profile_data = get_profile(user).data
+    setattr(user, 'auth_backend', profile_data.get('auth_backend'))
   return user
 
 
