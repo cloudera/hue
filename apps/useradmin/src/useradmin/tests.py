@@ -32,6 +32,7 @@ from datetime import datetime
 from django.contrib.sessions.models import Session
 from django.db.models import Q
 from django.urls import reverse
+from django.test import override_settings
 from django.test.client import Client
 
 import desktop.conf
@@ -245,7 +246,7 @@ class BaseUserAdminTests(object):
   @classmethod
   def setUpClass(cls):
     cls._class_resets = [
-        useradmin.conf.DEFAULT_USER_GROUP.set_for_testing(None),
+      useradmin.conf.DEFAULT_USER_GROUP.set_for_testing(None),
     ]
 
   @classmethod
@@ -259,6 +260,38 @@ class BaseUserAdminTests(object):
 
   def tearDown(self):
     pass
+
+
+class TestUserProfile(BaseUserAdminTests):
+
+  @override_settings(AUTHENTICATION_BACKENDS=['desktop.auth.backend.AllowFirstUserDjangoBackend'])
+  def test_get_profile(self):
+    '''Ensure profiles are created after get_profile is called.'''
+    c = make_logged_in_client(username='test', password='test', is_superuser=True, recreate=True)
+    assert_equal(0, UserProfile.objects.count())
+    p = get_profile(User.objects.get(username='test'))
+    assert_equal(1, UserProfile.objects.count())
+
+
+  @override_settings(AUTHENTICATION_BACKENDS=['desktop.auth.backend.AllowFirstUserDjangoBackend'])
+  def test_get_and_update_profile(self):
+    c = make_logged_in_client(username='test', password='test', is_superuser=False, recreate=True)
+
+    user = User.objects.get(username='test')
+    userprofile = get_profile(user)
+    assert_false(userprofile.data.get('language_preference'))
+
+    userprofile.update_data({'language_preference': 'en'})
+    userprofile.save()
+    assert_equal('en', userprofile.data['language_preference'])
+
+    userprofile.update_data({'language_preference': 'es'})
+    userprofile.save()
+    assert_equal('es', userprofile.data['language_preference'])
+
+    user = User.objects.get(username='test')
+    userprofile = get_profile(user)
+    assert_equal('es', userprofile.data['language_preference'])
 
 
 class TestUserAdmin(BaseUserAdminTests):
@@ -423,14 +456,6 @@ class TestUserAdmin(BaseUserAdminTests):
     finally:
       for reset in resets:
         reset()
-
-
-  def test_get_profile(self):
-    # Ensure profiles are created after get_profile is called.
-    c = make_logged_in_client(username='test', password='test', is_superuser=True)
-    assert_equal(0, UserProfile.objects.count())
-    p = get_profile(User.objects.get(username='test'))
-    assert_equal(1, UserProfile.objects.count())
 
 
   def test_group_admin(self):
