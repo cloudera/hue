@@ -26,7 +26,7 @@ from django.test.client import Client
 from hadoop.test_base import PseudoHdfsTestBase
 from hadoop import pseudo_hdfs4
 from useradmin import ldap_access
-from useradmin.models import get_default_user_group, User, Group
+from useradmin.models import get_default_user_group, User, Group, get_profile
 from useradmin.tests import LdapTestConnection
 from useradmin.views import import_ldap_groups
 
@@ -771,8 +771,21 @@ class TestLoginNoHadoop(object):
     user.groups.all().delete()
     assert_false(user.groups.exists())
 
-    response = client.post('/hue/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
-    assert_equal(200, response.status_code, "Expected ok status.")
+    # Webpack bundles not found if follow=True and running test locally
+    response = client.post('/hue/accounts/login/', dict(username=self.test_username, password="test"))
+    assert_equal(302, response.status_code)
+
+
+  def test_login_set_auth_backend_in_profile(self):
+    client = make_logged_in_client(username=self.test_username, password="test")
+
+    response = client.post('/hue/accounts/login/', {'username': self.test_username, 'password': 'test'})
+    assert_equal(302, response.status_code)
+
+    user = User.objects.get(username=self.test_username)
+    existing_profile = get_profile(user)
+
+    assert_equal('desktop.auth.backend.AllowFirstUserDjangoBackend', existing_profile.data['auth_backend'])
 
 
 class TestImpersonationBackend(object):

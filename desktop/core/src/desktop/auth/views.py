@@ -153,9 +153,9 @@ def dt_login(request, from_modal=False):
 
         userprofile.first_login = False
         userprofile.last_activity = datetime.now()
-        # This is to fix a bug in Hue 4.3
-        if userprofile.creation_method == UserProfile.CreationMethod.EXTERNAL:
+        if userprofile.creation_method == UserProfile.CreationMethod.EXTERNAL: # This is to fix a bug in Hue 4.3
           userprofile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
+        userprofile.update_data({'auth_backend': user.backend})
         userprofile.save()
 
         msg = 'Successful login for user: %s' % user.username
