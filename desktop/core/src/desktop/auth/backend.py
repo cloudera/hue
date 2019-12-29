@@ -106,13 +106,17 @@ def is_admin(user):
   is_admin = False
   if hasattr(user, 'is_superuser'):
     is_admin = user.is_superuser
-  if not is_admin and user.is_authenticated():
+  if not is_admin and user.is_authenticated() and not ENABLE_ORGANIZATIONS.get():  # Admin group only within an organization if later is enabled
     try:
       user = rewrite_user(user)
       is_admin = user.has_hue_permission(action="superuser", app="useradmin")
     except Exception:
       LOG.exception("Could not validate if %s is a superuser, assuming False." % user)
   return is_admin
+
+
+def is_organization_admin(user):
+  return hasattr(user, 'is_admin') and user.is_admin
 
 
 class DefaultUserAugmentor(object):

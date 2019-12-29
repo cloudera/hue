@@ -71,7 +71,7 @@ const TEMPLATE = `
               }
             ">${I18n('My Profile')}</a></li>
           <!-- /ko -->
-          <!-- ko if: window.USER_IS_ADMIN -->
+          <!-- ko if: window.USER_IS_ADMIN || window.USER_IS_ORG_ADMIN -->
           <li><a href="javascript: void(0);" data-bind="hueLink: '/useradmin/users/'">${I18n(
             'Manage Users'
           )}</a></li>
