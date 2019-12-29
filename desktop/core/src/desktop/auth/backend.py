@@ -75,6 +75,7 @@ def load_augmentation_class():
     LOG.exception('failed to augment class')
     raise ImproperlyConfigured("Could not find user_augmentation_class: %s" % (class_name,))
 
+
 _user_augmentation_class = None
 def get_user_augmentation_class():
   global _user_augmentation_class
@@ -83,11 +84,11 @@ def get_user_augmentation_class():
     _user_augmentation_class = load_augmentation_class()
   return _user_augmentation_class
 
+
 def rewrite_user(user):
   """
   Rewrites the user according to the augmentation class.
-  We currently only re-write specific attributes,
-  though this could be generalized.
+  We currently only re-write specific attributes, though this could be generalized.
   """
   if user is None:
     LOG.warn('Failed to rewrite user, user is None.')
@@ -97,6 +98,7 @@ def rewrite_user(user):
       setattr(user, attr, getattr(augment, attr))
   return user
 
+
 def is_admin(user):
   is_admin = False
   if hasattr(user, 'is_superuser'):
@@ -105,9 +107,10 @@ def is_admin(user):
     try:
       user = rewrite_user(user)
       is_admin = user.has_hue_permission(action="superuser", app="useradmin")
-    except Exception as e:
-      LOG.exception("Could not validate if %s is a superuser assuming False." % user)
+    except Exception:
+      LOG.exception("Could not validate if %s is a superuser, assuming False." % user)
   return is_admin
+
 
 class DefaultUserAugmentor(object):
   def __init__(self, parent):
@@ -125,6 +128,7 @@ class DefaultUserAugmentor(object):
   def has_hue_permission(self, action, app):
     return self._get_profile().has_hue_permission(action=action, app=app)
 
+
 def find_user(username):
   lookup = {'email': username} if ENABLE_ORGANIZATIONS.get() else {'username': username}
 
@@ -134,6 +138,7 @@ def find_user(username):
   except User.DoesNotExist:
     user = None
   return user
+
 
 def create_user(username, password, is_superuser=True):
   if ENABLE_ORGANIZATIONS.get():
