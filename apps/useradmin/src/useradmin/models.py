@@ -88,6 +88,7 @@ class UserProfile(models.Model):
   creation_method = models.CharField(editable=True, null=False, max_length=64, default=CreationMethod.HUE.name)
   first_login = models.BooleanField(default=True, verbose_name=_t('First Login'), help_text=_t('If this is users first login.'))
   last_activity = models.DateTimeField(auto_now=True, db_index=True)
+  json_data = models.TextField(default='{}')
 
   def get_groups(self):
     return self.user.groups.all()
@@ -125,6 +126,18 @@ class UserProfile(models.Model):
       return
     else:
       raise PopupException(_t("You do not have permissions to %(description)s.") % {'description': perm.description})
+
+  @property
+  def data(self):
+    if not self.json_data:
+      self.json_data = json.dumps({})
+    return json.loads(self.json_data)
+
+  @data.setter
+  def data(self, val):
+    data_dict = self.data
+    data_dict.update(val)
+    self.data = json.dumps(data_dict)
 
 
 def get_profile(user):
@@ -213,6 +226,7 @@ def get_default_user_group(**kwargs):
     group.save()
 
   return group
+
 
 def update_app_permissions(**kwargs):
   """
@@ -353,6 +367,7 @@ def install_sample_user():
     LOG.exception('Failed to create home directory for user %s: %s' % (SAMPLE_USER_INSTALL, str(ex)))
 
   return user
+
 
 def orm_user_lookup():
   return 'email' if ENABLE_ORGANIZATIONS.get() else 'username'
