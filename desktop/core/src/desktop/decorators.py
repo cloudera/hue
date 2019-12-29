@@ -36,8 +36,7 @@ LOG = logging.getLogger(__name__)
 
 def hue_permission_required(action, app):
   """
-  Checks that the user has permissions to do
-  action 'action' on app 'app'.
+  Checks that the user has permissions to do action 'action' on app 'app'.
 
   Note that user must already be logged in.
   """
