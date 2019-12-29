@@ -21,6 +21,8 @@ import uuid
 from django.contrib.auth.models import models, AbstractUser, BaseUserManager
 from django.utils.translation import ugettext_lazy as _t
 
+from desktop.models import uuid_default
+
 
 LOG = logging.getLogger(__name__)
 
@@ -124,7 +126,6 @@ class OrganizationUser(AbstractUser):
     username = None
     email = models.EmailField(_t('Email address'), unique=True)
     token = models.CharField(_t('Token'), max_length=128, default=None, null=True)
-    customer_id = models.CharField(_t('Customer id'), max_length=128, default=None, null=True) # Needed?
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     is_admin = models.BooleanField(default=False)
 
