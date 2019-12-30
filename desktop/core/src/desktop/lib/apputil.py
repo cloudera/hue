@@ -52,7 +52,7 @@ def get_app_for_module(module):
   for app in settings.INSTALLED_APPS:
     if module.__name__.startswith('desktop.lib.metrics.views'):
       return app
-    if module.__name__.startswith('desktop.lib.connectors.views'):
+    if module.__name__.startswith('desktop.lib.connectors'):
       return app
     if module.__name__.startswith(app) and not module.__name__.startswith("desktop.lib"):
       return app
