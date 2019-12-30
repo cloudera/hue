@@ -16,11 +16,10 @@
 # limitations under the License.
 
 import logging
+import uuid
 
 from django.contrib.auth.models import models, AbstractUser, BaseUserManager
 from django.utils.translation import ugettext_lazy as _t
-
-from desktop.models import uuid_default
 
 
 LOG = logging.getLogger(__name__)
@@ -29,6 +28,10 @@ LOG = logging.getLogger(__name__)
 # -----------------------------------------------------------------------
 #  Organizations
 # -----------------------------------------------------------------------
+
+def uuid_default():
+  return str(uuid.uuid4())
+
 
 class OrganizationManager(models.Manager):
     use_in_migrations = True

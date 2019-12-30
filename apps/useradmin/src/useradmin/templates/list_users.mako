@@ -26,14 +26,14 @@ from desktop.auth.backend import is_admin
 <%namespace name="layout" file="layout.mako" />
 
 %if not is_embeddable:
-${ commonheader(_('Hue Users'), "useradmin", user, request) | n,unicode }
+${ commonheader(_('Users'), "useradmin", user, request) | n,unicode }
 %endif
 
 ${layout.menubar(section='users')}
 
 <div id="usersComponents" class="useradmin container-fluid">
   <div class="card card-small">
-    <h1 class="card-heading simple">${_('Hue Users')}</h1>
+    <h1 class="card-heading simple">${_('Users')}</h1>
 
     <%actionbar:render>
       <%def name="search()">

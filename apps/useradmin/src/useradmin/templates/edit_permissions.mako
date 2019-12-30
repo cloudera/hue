@@ -28,11 +28,11 @@ else:
 
 <%namespace name="layout" file="layout.mako" />
 
-%if not is_embeddable:
-${ commonheader(_('Hue Permissions'), "useradmin", user, request) | n,unicode }
-%endif
+% if not is_embeddable:
+  ${ commonheader(_('Permissions'), "useradmin", user, request) | n,unicode }
+% endif
 
-${layout.menubar(section='permissions')}
+${ layout.menubar(section='permissions') }
 
 <%def name="render_field(field)">
   %if not field.is_hidden:
@@ -51,7 +51,7 @@ ${layout.menubar(section='permissions')}
 
 <div id="editPermissionsComponents" class="useradmin container-fluid">
   <div class="card card-small">
-    <h1 class="card-heading simple">${_('Hue Permissions - Edit app: %(app)s') % dict(app=app)}</h1>
+    <h1 class="card-heading simple">${_('Edit %(app)s') % dict(app=app)}</h1>
     <br/>
 
     <form id="editForm" action="${urllib_quote(action)}" method="POST" class="form form-horizontal">
