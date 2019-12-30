@@ -6,7 +6,7 @@ RUN apt-get update -y && apt-get install -y \
   wget \
   python-pip
 
-RUN wget https://github.com/gohugoio/hugo/releases/download/v0.58.3/hugo_0.58.3_Linux-64bit.deb \
+RUN wget https://github.com/gohugoio/hugo/releases/download/v0.62.0/hugo_0.62.0_Linux-64bit.deb \
   && dpkg -i hugo*.deb \
   && rm hugo*.deb \
   && pip install Pygments
