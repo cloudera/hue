@@ -27,7 +27,7 @@ from useradmin.views import is_user_locked_out
 <%namespace name="layout" file="layout.mako" />
 
 % if not is_embeddable:
-${ commonheader(_('Users'), "useradmin", user, request) | n,unicode }
+  ${ commonheader(_('Users'), "useradmin", user, request) | n,unicode }
 % endif
 
 ${ layout.menubar(section='users') }
@@ -103,15 +103,15 @@ ${ layout.menubar(section='users') }
             ${layout.render_field(form["groups"])}
           % endif
         </div>
-      % if is_admin(user):
-        <div id="step3" class="stepDetails hide">
-          ${ layout.render_field(form["is_active"]) }
-          ${'is_superuser' in form.fields and layout.render_field(form["is_superuser"])}
-          % if is_user_locked_out(username):
-            ${ layout.render_field(form["unlock_account"]) }
-          % endif
-        </div>
-      % endif
+        % if is_admin(user):
+          <div id="step3" class="stepDetails hide">
+            ${ layout.render_field(form["is_active"]) }
+            ${ 'is_superuser' in form.fields and layout.render_field(form["is_superuser"]) }
+            % if is_user_locked_out(username):
+              ${ layout.render_field(form["unlock_account"]) }
+            % endif
+          </div>
+        % endif
       </div>
 
       <div class="form-actions">

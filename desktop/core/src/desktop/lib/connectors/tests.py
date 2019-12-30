@@ -19,11 +19,11 @@ import sys
 
 from nose.tools import assert_equal, assert_true, assert_false
 
+from desktop.auth.backend import rewrite_user
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import grant_access
 
-from useradmin.models import User
+from useradmin.models import User, update_app_permissions, get_default_user_group
 
 if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock
@@ -36,14 +36,11 @@ class TestConnectors(object):
   def setUp(self):
     self.client = make_logged_in_client(username="test_connector", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test_connector")
-    grant_access(self.user.username, self.user.username, "desktop")
-
 
   def test_page(self):
     response = self.client.get("/desktop/connectors/")
 
     assert_equal(200, response.status_code)
-
 
   def test_get_connector_types(self):
     response = self.client.post("/desktop/connectors/api/types/")
@@ -51,20 +48,63 @@ class TestConnectors(object):
     assert_equal(200, response.status_code)
 
 
-def test_get_installed_editor_connectors():
+class TestConnectorListing():
 
-  with patch('desktop.lib.connectors.api.CONNECTORS.get') as CONNECTORS:
-    CONNECTORS.return_value = {
-      'mysql-1': Mock(
-        NICE_NAME=Mock(get=Mock(return_value='MySql')),
-        DIALECT=Mock(get=Mock(return_value='mysql')),
-        INTERFACE=Mock(get=Mock(return_value='sqlalchemy')),
-        SETTINGS=Mock(get=Mock(return_value=[{"name": "url", "value": "mysql://hue:pwd@hue:3306/hue"}])),
-      )
-    }
+  def setUp(self):
+    self.client = make_logged_in_client(
+        username='test_connector',
+        groupname=get_default_user_group(),
+        recreate=True,
+        is_superuser=False
+    )
+    self.user = User.objects.get(username='test_connector')
+    self.user = rewrite_user(self.user)
 
-    connectors = _get_installed_connectors()
+    self.alone_client = make_logged_in_client(
+        username='test_alone',
+        groupname='alone',  # Not in default group
+        recreate=True,
+        is_superuser=False
+    )
+    self.alone_user = User.objects.get(username='test_alone')
+    self.alone_user = rewrite_user(self.alone_user)
 
-    editor_category = [category for category in connectors if category['category'] == 'editor']
-    assert_true(len(editor_category), connectors)
-    assert_equal(1, len(editor_category), editor_category)
+  @patch('desktop.lib.connectors.models.CONNECTOR_INSTANCES', None)
+  def test_get_installed_editor_connectors(self):
+
+    with patch('desktop.lib.connectors.models.CONNECTORS.get') as CONNECTORS:
+      CONNECTORS.return_value = {
+        'mysql-1': Mock(
+          NICE_NAME=Mock(get=Mock(return_value='MySql')),
+          DIALECT=Mock(get=Mock(return_value='mysql')),
+          INTERFACE=Mock(get=Mock(return_value='sqlalchemy')),
+          SETTINGS=Mock(get=Mock(return_value=[{"name": "url", "value": "mysql://hue:pwd@hue:3306/hue"}])),
+        )
+      }
+
+      connectors = _get_installed_connectors()
+
+      editor_category = [category for category in connectors if category['category'] == 'editor']
+      assert_true(editor_category, connectors)
+      assert_equal(1, len(editor_category), editor_category)
+
+  @patch('desktop.lib.connectors.models.CONNECTOR_INSTANCES', None)
+  def test_get_connectors_for_user(self):
+
+    with patch('desktop.lib.connectors.models.CONNECTORS.get') as CONNECTORS:
+      CONNECTORS.return_value = {
+        'mysql-1': Mock(
+          NICE_NAME=Mock(get=Mock(return_value='MySql')),
+          DIALECT=Mock(get=Mock(return_value='mysql')),
+          INTERFACE=Mock(get=Mock(return_value='sqlalchemy')),
+          SETTINGS=Mock(get=Mock(return_value=[{"name": "url", "value": "mysql://hue:pwd@hue:3306/hue"}])),
+        )
+      }
+
+      update_app_permissions()
+
+      connectors = _get_installed_connectors(user=self.user)
+      assert_true(connectors, connectors)
+
+      connectors = _get_installed_connectors(user=self.alone_user)
+      assert_false(connectors, connectors)

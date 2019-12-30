@@ -24,6 +24,7 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop.conf import CONNECTORS
 from desktop.lib.connectors.types import CONNECTOR_TYPES, CATEGORIES
+from desktop.lib.exceptions_renderable import PopupException
 
 
 LOG = logging.getLogger(__name__)
@@ -67,7 +68,7 @@ def _group_category_connectors(connectors):
 AVAILABLE_CONNECTORS = _group_category_connectors(CONNECTOR_TYPES)
 
 
-def _get_installed_connectors(category=None, categories=None, dialect=None, interface=None):
+def _get_installed_connectors(category=None, categories=None, dialect=None, interface=None, user=None):
   global CONNECTOR_INSTANCES
   global CONNECTOR_IDS
   config_connectors = CONNECTORS.get()
@@ -115,6 +116,9 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
     connectors = [connector for connector in connectors if connector['dialect'] == dialect]
   if interface is not None:
     connectors = [connector for connector in connectors if connector['interface'] == interface]
+  if user is not None:
+    allowed_connectors = user.get_permissions().values_list('app', flat=True)
+    connectors = [connector for connector in connectors if connector['name'] in allowed_connectors]
 
   return connectors
 

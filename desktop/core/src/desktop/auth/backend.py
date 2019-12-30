@@ -94,7 +94,7 @@ def rewrite_user(user):
     LOG.warn('Failed to rewrite user, user is None.')
   else:
     augment = get_user_augmentation_class()(user)
-    for attr in ("get_groups", "get_home_directory", "has_hue_permission"):
+    for attr in ('get_groups', 'get_home_directory', 'has_hue_permission', 'get_permissions'):
       setattr(user, attr, getattr(augment, attr))
 
     profile_data = get_profile(user).data
@@ -134,6 +134,9 @@ class DefaultUserAugmentor(object):
 
   def has_hue_permission(self, action, app):
     return self._get_profile().has_hue_permission(action=action, app=app)
+
+  def get_permissions(self):
+    return self._get_profile().get_permissions()
 
 
 def find_user(username):

@@ -40,7 +40,8 @@ CONNECTOR_TYPES = [
     ],
     'properties': {
       'is_sql': True,
-      'sql_identifiers_quote': '`',
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
       'has_catalog': True,
       'has_database': True,
       'has_table': True,
@@ -75,7 +76,15 @@ CONNECTOR_TYPES = [
   {'nice_name': "Kafka SQL", 'dialect': 'ksql', 'interface': 'ksql', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
   {'nice_name': "Flink SQL", 'dialect': 'flink', 'interface': 'flink', 'settings': [{'name': 'api_url', 'value': 'http://flink:10000'}], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
   {'nice_name': "SparkSQL", 'dialect': 'spark-sql', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
-  {'nice_name': "MySQL", 'dialect': 'mysql', 'interface': 'sqlalchemy', 'settings': [{'name': 'url', 'value': 'mysql://username:password@mysq-host:3306/hue'}], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
+  {
+    'nice_name': "MySQL",
+    'dialect': 'mysql',
+    'interface': 'sqlalchemy',
+    'settings': [{'name': 'url', 'value': 'mysql://username:password@mysq-host:3306/hue'}],
+    'category': 'editor',
+    'description': '',
+    'properties': {'is_sql': True}
+  },
   {'nice_name': "Presto", 'dialect': 'presto', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
   {'nice_name': "Athena", 'dialect': 'athena', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
   {'nice_name': "Redshift", 'dialect': 'redshift', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},

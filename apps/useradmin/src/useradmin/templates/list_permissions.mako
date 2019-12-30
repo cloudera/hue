@@ -54,7 +54,7 @@ from useradmin.models import group_permissions, Group
             <td>
               % if is_admin(user):
                 <strong>
-                  <a title="${_('Edit permission')}"
+                  <a title="${ _('Edit permission') }"
                       href="${ url('useradmin.views.edit_permission', app=perm.app, priv=perm.action) }"
                       data-name="${ perm.app }" data-row-selector="true">${ perm.app }
                   </a>

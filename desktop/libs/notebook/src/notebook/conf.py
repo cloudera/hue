@@ -57,9 +57,8 @@ def get_ordered_interpreters(user=None):
         'is_sql': connector.get('is_sql', False),
         'interface': connector['interface'],
         'options': {setting['name']: setting['value'] for setting in connector['settings']}
-      } for connector in _get_installed_connectors(categories=['editor', 'catalogs'])
+      } for connector in _get_installed_connectors(categories=['editor', 'catalogs'], user=user)
     ]
-    # No connector permission currently
   else:
     if not INTERPRETERS.get():
       _default_interpreters(user)
@@ -69,7 +68,7 @@ def get_ordered_interpreters(user=None):
     user_interpreters = []
     for interpreter in interpreters:
       if check_permissions(user, interpreter, user_apps=user_apps):
-        pass # Not allowed
+        pass  # Not allowed
       else:
         user_interpreters.append(interpreter)
 

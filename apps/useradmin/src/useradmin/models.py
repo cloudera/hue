@@ -115,6 +115,9 @@ class UserProfile(models.Model):
     group_ids = self.user.groups.values_list('id', flat=True)
     return GroupPermission.objects.filter(group__id__in=group_ids, hue_permission=perm).exists()
 
+  def get_permissions(self):
+    return HuePermission.objects.filter(groups__user=self.user)
+
   def check_hue_permission(self, perm=None, app=None, action=None):
     """
     Raises a PopupException if permission is denied.
@@ -274,7 +277,7 @@ def update_app_permissions(**kwargs):
 
     for app in apps:
       app_name = app.name
-      permission_description = "Use the connector %s" % app.nice_name if ENABLE_CONNECTORS.get() else "Launch this application"
+      permission_description = "Access the %s connection" % app.nice_name if ENABLE_CONNECTORS.get() else "Launch this application"
       actions = set([("access", permission_description)])
       actions.update(getattr(app.settings, "PERMISSION_ACTIONS", []))
 
@@ -300,20 +303,20 @@ def update_app_permissions(**kwargs):
     # Only with v2
     deleted, _ = HuePermission.objects.filter(app__in=old_apps).delete()
 
-    # Add all permissions to default group except some.
+    # Add all permissions to default group except some
     default_group = get_default_user_group()
     if default_group:
       for new_dp in added:
         if not (new_dp.app == 'useradmin' and new_dp.action == 'access') and \
-           not (new_dp.app == 'useradmin' and new_dp.action == 'superuser') and \
-           not (new_dp.app == 'metastore' and new_dp.action == 'write') and \
-           not (new_dp.app == 'hbase' and new_dp.action == 'write') and \
-           not (new_dp.app == 'security' and new_dp.action == 'impersonate') and \
-           not (new_dp.app == 'filebrowser' and new_dp.action == 's3_access' and not is_idbroker_enabled('s3a')) and \
-           not (new_dp.app == 'filebrowser' and new_dp.action == 'gs_access' and not is_idbroker_enabled('gs')) and \
-           not (new_dp.app == 'filebrowser' and new_dp.action == 'adls_access') and \
-           not (new_dp.app == 'filebrowser' and new_dp.action == 'abfs_access') and \
-           not (new_dp.app == 'oozie' and new_dp.action == 'disable_editor_access'):
+            not (new_dp.app == 'useradmin' and new_dp.action == 'superuser') and \
+            not (new_dp.app == 'metastore' and new_dp.action == 'write') and \
+            not (new_dp.app == 'hbase' and new_dp.action == 'write') and \
+            not (new_dp.app == 'security' and new_dp.action == 'impersonate') and \
+            not (new_dp.app == 'filebrowser' and new_dp.action == 's3_access' and not is_idbroker_enabled('s3a')) and \
+            not (new_dp.app == 'filebrowser' and new_dp.action == 'gs_access' and not is_idbroker_enabled('gs')) and \
+            not (new_dp.app == 'filebrowser' and new_dp.action == 'adls_access') and \
+            not (new_dp.app == 'filebrowser' and new_dp.action == 'abfs_access') and \
+            not (new_dp.app == 'oozie' and new_dp.action == 'disable_editor_access'):
           GroupPermission.objects.create(group=default_group, hue_permission=new_dp)
 
     available = HuePermission.objects.count()
