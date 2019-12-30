@@ -52,19 +52,19 @@ from useradmin.models import group_permissions, Group
           <tr class="tableRow"
               data-search="${perm.app}${perm.description}${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')])}">
           <td>
-            %if is_admin(user):
+            % if is_admin(user):
               <strong>
                 <a title="${_('Edit permission')}"
                     href="${ url('useradmin.views.edit_permission', app=perm.app, priv=perm.action) }"
-                    data-name="${perm.app}" data-row-selector="true">${ perm.app }
+                    data-name="${ perm.app }" data-row-selector="true">${ perm.app }
                 </a>
               </strong>
-            %else:
+            % else:
               <strong>${ perm.app }</strong>
-            %endif
+            % endif
           </td>
             <td>${ perm.description }</td>
-            <td>${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')])}</td>
+            <td>${', '.join([group.name for group in Group.objects.filter(grouppermission__hue_permission=perm).order_by('name')]) }</td>
           </tr>
           % endfor
       </tbody>

@@ -18,15 +18,13 @@
 The core of this module adds permissions functionality to Hue applications.
 
 A "Hue Permission" (colloquially, appname.action, but stored in the HuePermission model) is a way to specify some action whose
-control may be restricted.  Every Hue application, by default, has an "access" action. To specify extra actions, applications
+control may be restricted. Every Hue application, by default, has an "access" action. To specify extra actions, applications
 can specify them in appname.settings.PERMISSION_ACTIONS, as pairs of (action_name, description).
 
-Several mechanisms enforce permission.  First of all, the "access" permission
-is controlled by LoginAndPermissionMiddleware.  For eligible views
-within an application, the access permission is checked.  Second,
-views may use @desktop.decorators.hue_permission_required("action", "app")
-to annotate their function, and this decorator will check a permission.
-Thirdly, you may wish to do so manually, by using something akin to:
+Several mechanisms enforce permission. First of all, the "access" permission
+is controlled by LoginAndPermissionMiddleware. For eligible views within an application, the access permission is checked. Second,
+views may use @desktop.decorators.hue_permission_required("action", "app") to annotate their function, and this decorator will
+check a permission. Thirdly, you may wish to do so manually, by using something akin to:
 
   app = desktop.lib.apputil.get_current_app() # a string
   dp = HuePermission.objects.get(app=pp, action=action)
@@ -36,11 +34,13 @@ Permissions may be granted to groups, but not, currently, to users. A user's abi
 has access to.
 
 Note that Django itself has a notion of users, groups, and permissions. We re-use Django's notion of users and groups, but ignore its notion of
-permissions.  The permissions notion in Django is strongly tied to what models you may or may not edit, and there are elaborations (especially
+permissions. The permissions notion in Django is strongly tied to what models you may or may not edit, and there are elaborations (especially
 in Django 1.2) to manipulate this row by row. This does not map nicely onto actions which may not relate to database models.
 """
+import collections
 import json
 import logging
+
 from datetime import datetime
 from enum import Enum
 
@@ -57,9 +57,8 @@ from desktop.lib.connectors.models import _get_installed_connectors
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.idbroker.conf import is_idbroker_enabled
 from desktop.monkey_patches import monkey_patch_username_validator
-from hadoop import cluster
 
-import useradmin.conf
+from useradmin.conf import DEFAULT_USER_GROUP
 
 
 if ENABLE_ORGANIZATIONS.get():
@@ -214,7 +213,7 @@ class HuePermission(models.Model):
 
 
 def get_default_user_group(**kwargs):
-  default_user_group = useradmin.conf.DEFAULT_USER_GROUP.get()
+  default_user_group = DEFAULT_USER_GROUP.get()
   if default_user_group is None:
     return None
 
@@ -231,25 +230,24 @@ def get_default_user_group(**kwargs):
 
 def update_app_permissions(**kwargs):
   """
-  Inserts missing permissions into the database table.
-  This is a 'syncdb' callback.
+  Keep in sync apps and connectors permissions into the database table.
+  Map app + action to a HuePermission.
+
+  v2
+  Based on the connectors.
+  Permissions are either based on connectors instances or Hue specific actions.
+  Permissions can be deleted or added dynamically.
+
+  v1
+  This is a 'migrate' callback.
 
   We never delete permissions automatically, because apps might come and go.
 
-  Note that signing up to the "syncdb" signal is not necessarily
-  the best thing we can do, since some apps might not
-  have models, but nonetheless, "syncdb" is typically
-  run when apps are installed.
+  Note that signing up to the "migrate" signal is not necessarily the best thing we can do, since some apps might not
+  have models, but nonetheless, "syncdb" is typically run when apps are installed.
   """
-  # Map app->action->HuePermission.
-
-  # The HuePermission model needs to be sync'd for the following code to work
-  # The point of 'if u'useradmin_huepermission' in connection.introspection.table_names():'
-  # is to check if Useradmin has been installed.
-  # It is okay to follow appmanager.DESKTOP_APPS before they've been sync'd
-  # because apps are referenced by app name in Hue permission and not by model ID.
   created_tables = connection.introspection.table_names()
-  if u'useradmin_huepermission' in created_tables:
+  if u'useradmin_huepermission' in created_tables:  # Check if Useradmin has been installed.
     current = {}
 
     try:
@@ -264,23 +262,25 @@ def update_app_permissions(**kwargs):
     added = []
 
     if ENABLE_CONNECTORS.get():
-      import collections
+      previous_apps = list(current.keys())
       ConnectorPerm = collections.namedtuple('ConnectorPerm', 'name settings')
       apps = [
         ConnectorPerm(name=connector['name'], settings=[]) for connector in _get_installed_connectors()
       ]
     else:
+      previous_apps = []
       apps = appmanager.DESKTOP_APPS
 
     for app_obj in apps:
-      print(app_obj)
       app = app_obj.name
       actions = set([("access", "Launch this application")])
       actions.update(getattr(app_obj.settings, "PERMISSION_ACTIONS", []))
 
-      if app not in current:
+      if app in current:
+        previous_apps.remove(app)
+      else:
         current[app] = {}
-      print(current)
+
       for action, description in actions:
         c = current[app].get(action)
         if c:
@@ -294,9 +294,10 @@ def update_app_permissions(**kwargs):
           new_dp = HuePermission(app=app, action=action, description=description)
           new_dp.save()
           added.append(new_dp)
-        print('%s %s %s' % (updated, uptodate, added))
 
-    # Add all permissions to default group.
+    deleted, _ = HuePermission.objects.filter(app__in=previous_apps).delete()
+
+    # Add all permissions to default group except some.
     default_group = get_default_user_group()
     if default_group:
       for new_dp in added:
@@ -315,9 +316,9 @@ def update_app_permissions(**kwargs):
     available = HuePermission.objects.count()
     stale = available - len(added) - updated - uptodate
 
-    if len(added) or updated or stale:
-      LOG.info("HuePermissions: %d added, %d updated, %d up to date, %d stale" % (
-          len(added), updated, uptodate, stale
+    if len(added) or updated or stale or deleted:
+      LOG.info("HuePermissions: %d added, %d updated, %d up to date, %d stale, %d deleted" % (
+          len(added), updated, uptodate, stale, deleted
         )
       )
 
@@ -332,6 +333,8 @@ def install_sample_user():
   """
   #Moved to avoid circular import with is_admin
   from desktop.models import SAMPLE_USER_ID, SAMPLE_USER_INSTALL
+  from hadoop import cluster
+
   user = None
 
   try:
