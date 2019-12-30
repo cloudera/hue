@@ -27,7 +27,7 @@ from useradmin.views import is_user_locked_out
 <%namespace name="layout" file="layout.mako" />
 
 % if not is_embeddable:
-${ commonheader(_('Hue Users'), "useradmin", user, request) | n,unicode }
+${ commonheader(_('Users'), "useradmin", user, request) | n,unicode }
 % endif
 
 ${ layout.menubar(section='users') }
@@ -36,9 +36,9 @@ ${ layout.menubar(section='users') }
 <div id="editUserComponents" class="useradmin container-fluid">
   <div class="card card-small title">
     % if username:
-      <h1 class="card-heading simple">${_('Hue Users - Edit user: %(username)s') % dict(username=username)}</h1>
+      <h1 class="card-heading simple">${_('User %(username)s') % dict(username=username)}</h1>
     % else:
-      <h1 class="card-heading simple">${_('Hue Users - Create user')}</h1>
+      <h1 class="card-heading simple">${_('Create user')}</h1>
     % endif
 
     <br/>

@@ -26,13 +26,13 @@ from useradmin.models import group_permissions, Group
 <%namespace name="layout" file="layout.mako" />
 
 % if not is_embeddable:
-  ${ commonheader(_('Hue Permissions'), "useradmin", user, request) | n,unicode }
+  ${ commonheader(_('Permissions'), "useradmin", user, request) | n,unicode }
 % endif
   ${ layout.menubar(section='permissions') }
 
 <div id="permissionsComponents" class="useradmin container-fluid">
   <div class="card card-small">
-    <h1 class="card-heading simple">${_('Hue Permissions')}</h1>
+    <h1 class="card-heading simple">${_('Permissions')}</h1>
     <%actionbar:render>
       <%def name="search()">
           <input type="text" class="input-xlarge search-query filter-input" placeholder="${_('Search for application, group, etc...')}">

@@ -26,14 +26,14 @@ from desktop.views import commonheader, commonfooter, antixss
 <%namespace name="layout" file="layout.mako" />
 
 %if not is_embeddable:
-${ commonheader(_('Hue Groups'), "useradmin", user, request) | n,unicode }
+${ commonheader(_('Groups'), "useradmin", user, request) | n,unicode }
 %endif
 
 ${layout.menubar(section='groups')}
 
 <div id="groupsComponents" class="useradmin container-fluid">
   <div class="card card-small">
-    <h1 class="card-heading simple">${_('Hue Groups')}</h1>
+    <h1 class="card-heading simple">${_('Groups')}</h1>
 
     <%actionbar:render>
       <%def name="search()">

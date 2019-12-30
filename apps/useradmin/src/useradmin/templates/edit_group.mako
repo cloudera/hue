@@ -31,8 +31,9 @@ else:
 <%namespace name="layout" file="layout.mako" />
 
 % if not is_embeddable:
-${ commonheader(_('Hue Groups'), "useradmin", user, request) | n,unicode }
+  ${ commonheader(_('Groups'), "useradmin", user, request) | n,unicode }
 % endif
+
 ${ layout.menubar(section='groups') }
 
 <%def name="render_field(field)">
@@ -53,12 +54,12 @@ ${ layout.menubar(section='groups') }
 <div id="editGroupComponents" class="useradmin container-fluid">
   <div class="card card-small">
     % if name:
-        <h1 class="card-heading simple">${ _('Hue Groups - Edit group: %(name)s') % {'name': name} }</h1>
+        <h1 class="card-heading simple">${ _('Edit %(name)s') % {'name': name} }</h1>
     % else:
       % if ldap:
-          <h1 class="card-heading simple">${_('Hue Groups - Add/Sync LDAP group')}</h1>
+          <h1 class="card-heading simple">${_('Add/Sync LDAP group')}</h1>
       % else:
-          <h1 class="card-heading simple">${_('Hue Groups - Create group')}</h1>
+          <h1 class="card-heading simple">${_('Create group')}</h1>
       % endif
     % endif
 
@@ -133,5 +134,5 @@ ${ layout.menubar(section='groups') }
 ${ layout.commons() }
 
 % if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
+  ${ commonfooter(request, messages) | n,unicode }
 % endif
