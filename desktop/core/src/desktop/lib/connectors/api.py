@@ -20,9 +20,12 @@ import logging
 
 from django.utils.translation import ugettext as _
 
+from useradmin.models import update_app_permissions
+
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.connectors.models import AVAILABLE_CONNECTORS, _get_connector_by_id, _get_installed_connectors
+from desktop.lib.connectors import models
+from desktop.lib.connectors.models import AVAILABLE_CONNECTORS, _get_connector_by_id, _get_installed_connectors, _group_category_connectors
 from desktop.lib.connectors.types import CONNECTOR_TYPES, CATEGORIES
 
 
@@ -53,6 +56,8 @@ def new_connector(request, dialect):
   instance['nice_name'] = dialect.title()
   instance['id'] = None
 
+  update_app_permissions()
+
   return JsonResponse({'connector': instance})
 
 
@@ -63,9 +68,7 @@ def get_connector(request, id):
 
 
 def update_connector(request):
-  global CONNECTOR_IDS
-
-  connector = json.loads(request.POST.get('connector'), '{}')
+  connector = json.loads(request.POST.get('connector', '{}'))
   saved_as = False
 
   if connector.get('id'):
@@ -74,11 +77,13 @@ def update_connector(request):
   else:
     saved_as = True
     instance = connector
-    instance['id'] = CONNECTOR_IDS
+    instance['id'] = models.CONNECTOR_IDS
     instance['nice_name'] = instance['nice_name']
-    instance['name'] = '%s-%s' % (instance['dialect'], CONNECTOR_IDS)
-    CONNECTOR_IDS += 1
-    CONNECTOR_INSTANCES.append(instance)
+    instance['name'] = '%s-%s' % (instance['dialect'], models.CONNECTOR_IDS)
+    models.CONNECTOR_IDS += 1
+    models.CONNECTOR_INSTANCES.append(instance)
+
+  update_app_permissions()
 
   return JsonResponse({'connector': instance, 'saved_as': saved_as})
 
@@ -93,15 +98,14 @@ def _get_connector_by_type(dialect):
 
 
 def delete_connector(request):
-  global CONNECTOR_INSTANCES
-
   connector = json.loads(request.POST.get('connector'), '{}')
 
-  size_before = len(CONNECTOR_INSTANCES)
-  CONNECTOR_INSTANCES = [_connector for _connector in CONNECTOR_INSTANCES if _connector['name'] != connector['name']]
-  size_after = len(CONNECTOR_INSTANCES)
+  size_before = len(models.CONNECTOR_INSTANCES)
+  models.CONNECTOR_INSTANCES = [_connector for _connector in models.CONNECTOR_INSTANCES if _connector['name'] != connector['name']]
+  size_after = len(models.CONNECTOR_INSTANCES)
 
   if size_before == size_after + 1:
+    update_app_permissions()
     return JsonResponse({})
   else:
     raise PopupException(_('No connector with the name %(name)s found.') % connector)

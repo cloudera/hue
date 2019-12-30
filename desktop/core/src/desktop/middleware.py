@@ -169,7 +169,7 @@ class NotificationMiddleware(object):
 class AppSpecificMiddleware(object):
   @classmethod
   def augment_request_with_app(cls, request, view_func):
-    """ Stuff the app into the request for use in later-stage middleware """
+    """Inject the app name into the request for use in later-stage middleware"""
     if not hasattr(request, "_desktop_app"):
       module = inspect.getmodule(view_func)
       request._desktop_app = apputil.get_app_for_module(module)
@@ -185,7 +185,6 @@ class AppSpecificMiddleware(object):
     return self.middlewares_by_app.get(app, {}).get(type, [])
 
   def process_view(self, request, view_func, view_args, view_kwargs):
-    """View middleware"""
     self.augment_request_with_app(request, view_func)
     if not request._desktop_app:
       return None
@@ -194,7 +193,7 @@ class AppSpecificMiddleware(object):
     ret = None
     for middleware in self._get_middlewares(request._desktop_app, 'view'):
       ret = middleware(request, view_func, view_args, view_kwargs)
-      if ret: return ret # short circuit
+      if ret: return ret  # Short circuit
     return ret
 
   def process_response(self, request, response):

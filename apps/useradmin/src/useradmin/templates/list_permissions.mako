@@ -26,9 +26,9 @@ from useradmin.models import group_permissions, Group
 <%namespace name="layout" file="layout.mako" />
 
 % if not is_embeddable:
-${ commonheader(_('Hue Permissions'), "useradmin", user, request) | n,unicode }
+  ${ commonheader(_('Hue Permissions'), "useradmin", user, request) | n,unicode }
 % endif
-${ layout.menubar(section='permissions') }
+  ${ layout.menubar(section='permissions') }
 
 <div id="permissionsComponents" class="useradmin container-fluid">
   <div class="card card-small">
@@ -56,11 +56,11 @@ ${ layout.menubar(section='permissions') }
               <strong>
                 <a title="${_('Edit permission')}"
                     href="${ url('useradmin.views.edit_permission', app=perm.app, priv=perm.action) }"
-                    data-name="${perm.app}" data-row-selector="true">${perm.app}
+                    data-name="${perm.app}" data-row-selector="true">${ perm.app }
                 </a>
               </strong>
             %else:
-              <strong>${perm.app}</strong>
+              <strong>${ perm.app }</strong>
             %endif
           </td>
             <td>${ perm.description }</td>

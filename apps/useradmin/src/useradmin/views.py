@@ -40,7 +40,7 @@ from django.utils.translation import get_language, ugettext as _
 
 import desktop.conf
 from desktop.auth.backend import is_admin
-from desktop.conf import LDAP, ENABLE_ORGANIZATIONS
+from desktop.conf import LDAP, ENABLE_ORGANIZATIONS, ENABLE_CONNECTORS
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import _get_apps
@@ -93,10 +93,14 @@ def list_groups(request):
 
 
 def list_permissions(request):
-  current_app, other_apps, apps_list = _get_apps(request.user)
+  if ENABLE_CONNECTORS.get():
+    permissions = HuePermission.objects.all()
+  else:
+    current_app, other_apps, apps_list = _get_apps(request.user)
+    permissions = HuePermission.objects.filter(app__in=apps_list)
 
   return render("list_permissions.mako", request, {
-    'permissions': HuePermission.objects.filter(app__in=apps_list),
+    'permissions': permissions,
     'is_embeddable': request.GET.get('is_embeddable', False)
   })
 

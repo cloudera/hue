@@ -16,8 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import str
-from builtins import object
+from builtins import str, object
 import logging
 
 from django.db.models import Q

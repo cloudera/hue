@@ -52,7 +52,8 @@ from django.utils import timezone as dtz
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop import appmanager
-from desktop.conf import ENABLE_ORGANIZATIONS
+from desktop.conf import ENABLE_ORGANIZATIONS, ENABLE_CONNECTORS
+from desktop.lib.connectors.models import _get_installed_connectors
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.idbroker.conf import is_idbroker_enabled
 from desktop.monkey_patches import monkey_patch_username_validator
@@ -262,14 +263,24 @@ def update_app_permissions(**kwargs):
     uptodate = 0
     added = []
 
-    for app_obj in appmanager.DESKTOP_APPS:
+    if ENABLE_CONNECTORS.get():
+      import collections
+      ConnectorPerm = collections.namedtuple('ConnectorPerm', 'name settings')
+      apps = [
+        ConnectorPerm(name=connector['name'], settings=[]) for connector in _get_installed_connectors()
+      ]
+    else:
+      apps = appmanager.DESKTOP_APPS
+
+    for app_obj in apps:
+      print(app_obj)
       app = app_obj.name
       actions = set([("access", "Launch this application")])
       actions.update(getattr(app_obj.settings, "PERMISSION_ACTIONS", []))
 
       if app not in current:
         current[app] = {}
-
+      print(current)
       for action, description in actions:
         c = current[app].get(action)
         if c:
@@ -283,8 +294,9 @@ def update_app_permissions(**kwargs):
           new_dp = HuePermission(app=app, action=action, description=description)
           new_dp.save()
           added.append(new_dp)
+        print('%s %s %s' % (updated, uptodate, added))
 
-    # Add all hue permissions to default group.
+    # Add all permissions to default group.
     default_group = get_default_user_group()
     if default_group:
       for new_dp in added:
@@ -308,6 +320,7 @@ def update_app_permissions(**kwargs):
           len(added), updated, uptodate, stale
         )
       )
+
 
 models.signals.post_migrate.connect(update_app_permissions)
 # models.signals.post_migrate.connect(get_default_user_group)
