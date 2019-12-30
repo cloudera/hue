@@ -41,7 +41,6 @@ except:
   oauth = None
 
 if sys.version_info[0] > 2:
-  import urllib.request, urllib.parse, urllib.error
   from urllib.parse import urlencode as lib_urlencode
 else:
   from urllib import urlencode as lib_urlencode
