@@ -303,7 +303,7 @@ def update_app_permissions(**kwargs):
     # Only with v2
     deleted, _ = HuePermission.objects.filter(app__in=old_apps).delete()
 
-    # Add all permissions to default group except some
+    # Add all permissions to default group except some.
     default_group = get_default_user_group()
     if default_group:
       for new_dp in added:
