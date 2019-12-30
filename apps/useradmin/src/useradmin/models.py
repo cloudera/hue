@@ -263,26 +263,28 @@ def update_app_permissions(**kwargs):
 
     if ENABLE_CONNECTORS.get():
       previous_apps = list(current.keys())
-      ConnectorPerm = collections.namedtuple('ConnectorPerm', 'name settings')
+      ConnectorPerm = collections.namedtuple('ConnectorPerm', 'name nice_name settings')
       apps = [
-        ConnectorPerm(name=connector['name'], settings=[]) for connector in _get_installed_connectors()
+        ConnectorPerm(name=connector['name'], nice_name=connector['nice_name'], settings=[])
+        for connector in _get_installed_connectors()
       ]
     else:
       previous_apps = []
       apps = appmanager.DESKTOP_APPS
 
-    for app_obj in apps:
-      app = app_obj.name
-      actions = set([("access", "Launch this application")])
-      actions.update(getattr(app_obj.settings, "PERMISSION_ACTIONS", []))
+    for app in apps:
+      app_name = app.name
+      permission_description = "Use the connector %s" % app.nice_name if ENABLE_CONNECTORS.get() else "Launch this application"
+      actions = set([("access", permission_description)])
+      actions.update(getattr(app.settings, "PERMISSION_ACTIONS", []))
 
-      if app in current:
-        previous_apps.remove(app)
+      if app_name in current:
+        previous_apps.remove(app_name)
       else:
-        current[app] = {}
+        current[app_name] = {}
 
       for action, description in actions:
-        c = current[app].get(action)
+        c = current[app_name].get(action)
         if c:
           if c.description != description:
             c.description = description
@@ -291,7 +293,7 @@ def update_app_permissions(**kwargs):
           else:
             uptodate += 1
         else:
-          new_dp = HuePermission(app=app, action=action, description=description)
+          new_dp = HuePermission(app=app_name, action=action, description=description)
           new_dp.save()
           added.append(new_dp)
 
