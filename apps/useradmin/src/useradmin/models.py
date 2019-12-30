@@ -156,7 +156,7 @@ def get_profile(user):
     return profile
 
 def group_has_permission(group, perm):
-  return GroupPermission.objects.filter(group=group, hue_permission=perm).count() > 0
+  return GroupPermission.objects.filter(group=group, hue_permission=perm).exists()
 
 def group_permissions(group):
   return HuePermission.objects.filter(grouppermission__group=group).all()
