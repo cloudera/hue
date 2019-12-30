@@ -676,9 +676,14 @@ def collect_validation_messages(conf, error_list):
     'hadoop_conf_dir': [('hadoop', 'yarn_clusters', 'default'), ('hadoop', 'yarn_clusters', 'ha')],
     'ssl_cacerts': [('beeswax', 'ssl'), ('impala', 'ssl')],
     'remote_data_dir': [('liboozie', )],
-    'shell': [()]
+    'shell': [()],
   }
-  whitelist_extras = ((sections, name) for sections, name in get_extra_values(conf) if not (name in desktop.conf.APP_BLACKLIST.get() or (name in list(cm_extras.keys()) and sections in cm_extras[name])))
+
+  whitelist_extras = (
+      (sections, name)
+      for sections, name in get_extra_values(conf)
+      if not (name in desktop.conf.APP_BLACKLIST.get() or (name in list(cm_extras.keys()) and sections in cm_extras[name]))
+  )
 
   for sections, name in whitelist_extras:
     the_section = conf
