@@ -15,6 +15,7 @@
 ## limitations under the License.
 
 <%!
+from builtins import range
 from desktop.views import _ko
 from django.utils.translation import ugettext as _
 %>
@@ -282,7 +283,7 @@ from django.utils.translation import ugettext as _
                           ${ _('Every') }
                         </span>
                         <select data-bind="value: frequency_number, visible: ! same_frequency(), enable: $root.isEditing" style="width: 50px">
-                          % for i in xrange(0, 60):
+                          % for i in range(0, 60):
                           <option value="${ i }">${ i }</option>
                           % endfor
                         </select>
