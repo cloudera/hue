@@ -486,7 +486,7 @@ LIMIT $limit"""))
 
       # other user can access document
       response = self.client_not_me.get(reverse('oozie:edit_workflow'), {'workflow': wf_doc.uuid})
-      assert_false('Document does not exist or you don&#39;t have the permission to access it.' in response.content, response.content)
+      assert_false(b'Document does not exist or you don&#39;t have the permission to access it.' in response.content, response.content)
     finally:
       wf_doc.delete()
 

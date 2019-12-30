@@ -284,7 +284,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
       </div>
 
       <div class="tab-pane" id="definition">
-        <div id="definitionEditor">${ oozie_bundle.definition.decode('utf-8', 'replace') }</div>
+        <div id="definitionEditor">${ oozie_bundle.definition if isinstance(oozie_bundle.definition, str) else oozie_bundle.definition.decode('utf-8', 'replace') }</div>
       </div>
     </div>
 

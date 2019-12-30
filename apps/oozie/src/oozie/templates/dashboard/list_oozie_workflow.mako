@@ -16,9 +16,14 @@
 ## limitations under the License.
 
 <%!
+  import sys
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
   from oozie.forms import ParameterForm
+  from six import iteritems
+
+  if sys.version_info[0] > 2:
+    unicode = str
 %>
 
 <%namespace name="layout" file="../navigation-bar.mako" />
@@ -68,7 +73,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
           % if parameters and len(parameters) <= 15:
             <li class="nav-header">${ _('Variables') }</li>
-            % for var, value in parameters.iteritems():
+            % for var, value in iteritems(parameters):
                 % if utils.is_linkable(var, unicode(value)):
                   <li rel="tooltip" title="${ var } : ${ str(value) }">
                     <a href="${ utils.hdfs_link_js(str(value)) }"><i class="fa fa-eye"></i> <span class="variable hide">${ var }</span></a>
@@ -293,7 +298,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         </div>
 
         <div class="tab-pane" id="definition">
-          <div id="definitionEditor">${ oozie_workflow.definition.decode('utf-8', 'replace') }</div>
+          <div id="definitionEditor">${ oozie_workflow.definition if isinstance(oozie_workflow.definition, str) else oozie_workflow.definition.decode('utf-8', 'replace') }</div>
         </div>
 
         % if oozie_workflow.has_sla:

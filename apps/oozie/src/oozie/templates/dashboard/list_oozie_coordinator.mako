@@ -418,7 +418,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
             </div>
 
             <div class="tab-pane" id="definition" style="margin-bottom: 10px;">
-              <div id="definitionEditor">${ oozie_coordinator.definition.decode('utf-8', 'replace') }</div>
+              <div id="definitionEditor">${ oozie_coordinator.definition if isinstance(oozie_coordinator.definition, str) else oozie_coordinator.definition.decode('utf-8', 'replace') }</div>
             </div>
 
             % if oozie_coordinator.has_sla:
