@@ -480,7 +480,9 @@ class HiveServer2Dbms(object):
 
     # Filter on max # of partitions for partitioned tables
     column = '`%s`' % column if column else '*'
-    if table.partition_keys:
+    if operation == 'hello':
+      hql = "SELECT 'Hello World!'"
+    elif table.partition_keys:
       hql = self._get_sample_partition_query(database, table, column, limit, operation)
     elif self.server_name.startswith('impala'):
       if column or nested:

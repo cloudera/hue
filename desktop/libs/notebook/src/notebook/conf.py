@@ -15,13 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
+import logging
+
 from collections import OrderedDict
 
-from django.utils.translation import ugettext_lazy as _t
+from django.test.client import Client
+from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 from desktop import appmanager
 from desktop.conf import is_oozie_enabled, has_connectors
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_json_dict, coerce_bool, coerce_csv
+
+
+LOG = logging.getLogger(__name__)
 
 
 SHOW_NOTEBOOKS = Config(
@@ -293,3 +300,44 @@ def _default_interpreters(user):
     ))
 
   INTERPRETERS.set_for_testing(OrderedDict(interpreters))
+
+
+def config_validator(user):
+  from notebook.models import _excute_test_query
+
+  res = []
+
+  if not has_connectors():
+    return res
+
+  client = Client()
+  client.force_login(user=user)
+
+  if not user.is_authenticated():
+    res.append(('Editor', _('Could not authenticate with user %s to validate interpreters') % user))
+
+  for interpreter in get_ordered_interpreters(user=user):
+    if interpreter['interface'] == 'hiveserver2':  # TODO: switch to is_sql when SqlAlchmy is ported
+      connector = interpreter['type']
+
+      try:
+        response = _excute_test_query(client, connector)
+        data = json.loads(response.content)
+
+        if data['status'] != 0:
+          raise Exception(data['message'])
+      except Exception as e:
+        trace = str(e)
+        msg = "Testing the connector connection failed."
+        if 'Error validating the login' in trace or 'TSocket read 0 bytes' in trace:
+          msg += ' Failed to authenticate, check authentication configurations.'
+
+        LOG.exception(msg)
+        res.append(
+          (
+            connector,
+            _(msg) + (' %s' % trace[:100] + ('...' if len(trace) > 50 else ''))
+          )
+        )
+
+  return res

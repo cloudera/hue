@@ -17,12 +17,13 @@
 
 import logging
 import os
-import sys
 import socket
+import sys
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
-from desktop.conf import default_ssl_cacerts, default_ssl_validate, AUTH_USERNAME as DEFAULT_AUTH_USERNAME,\
-  AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD
+
+from desktop.conf import default_ssl_cacerts, default_ssl_validate, AUTH_USERNAME as DEFAULT_AUTH_USERNAME, \
+    AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, has_connectors
 from desktop.lib.conf import ConfigSection, Config, coerce_bool, coerce_csv, coerce_password_from_script
 from desktop.lib.exceptions import StructuredThriftTransportException
 from desktop.lib.paths import get_desktop_root
@@ -255,13 +256,16 @@ USE_SASL = Config(
 
 
 def config_validator(user):
-  # dbms is dependent on beeswax.conf (this file)
-  # import in method to avoid circular dependency
+  # dbms is dependent on beeswax.conf, import in method to avoid circular dependency
   from beeswax.design import hql_query
   from beeswax.server import dbms
   from beeswax.server.dbms import get_query_server_config
 
   res = []
+
+  if has_connectors():
+    return res
+
   try:
     try:
       if not 'test' in sys.argv: # Avoid tests hanging
