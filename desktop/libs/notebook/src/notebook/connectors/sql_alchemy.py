@@ -296,26 +296,28 @@ class SqlAlchemyApi(Api):
     assist = Assist(inspector, engine, backticks=self.backticks)
     response = {'status': -1, 'result': {}}
 
-    metadata, sample_data = assist.get_sample_data(database, table, column)
+    metadata, sample_data = assist.get_sample_data(database, table, column=column, operation=operation)
     has_result_set = sample_data is not None
 
     if sample_data:
       response['status'] = 0
       response['rows'] = escape_rows(sample_data)
 
-    if table:
+    if table and operation != 'hello':
       columns = assist.get_columns(database, table)
       response['full_headers'] = [{
         'name': col.get('name'),
         'type': str(col.get('type')),
         'comment': ''
-      } for col in columns]
+      } for col in columns
+    ]
     elif metadata:
       response['full_headers'] = [{
         'name': col[0] if type(col) is dict or type(col) is tuple else col,
         'type': 'STRING_TYPE',
         'comment': ''
-      } for col in metadata]
+      } for col in metadata
+    ]
 
     return response
 
@@ -358,19 +360,23 @@ class Assist(object):
   def get_columns(self, database, table):
     return self.db.get_columns(table, database)
 
-  def get_sample_data(self, database, table, column=None):
-    column = '%(backticks)s%(column)s%(backticks)s' % {'backticks': self.backticks, 'column': column} if column else '*'
-    statement = textwrap.dedent('''\
-      SELECT %(column)s
-      FROM %(backticks)s%(database)s%(backticks)s.%(backticks)s%(table)s%(backticks)s
-      LIMIT %(limit)s
-      ''' % {
-        'database': database,
-        'table': table,
-        'column': column,
-        'limit': 100,
-        'backticks': self.backticks
-    })
+  def get_sample_data(self, database, table, column=None, operation=None):
+    if operation == 'hello':
+      statement = "SELECT 'Hello World!'"
+    else:
+      column = '%(backticks)s%(column)s%(backticks)s' % {'backticks': self.backticks, 'column': column} if column else '*'
+      statement = textwrap.dedent('''\
+        SELECT %(column)s
+        FROM %(backticks)s%(database)s%(backticks)s.%(backticks)s%(table)s%(backticks)s
+        LIMIT %(limit)s
+        ''' % {
+          'database': database,
+          'table': table,
+          'column': column,
+          'limit': 100,
+          'backticks': self.backticks
+      })
+
     connection = self.engine.connect()
     try:
       result = connection.execution_options(stream_results=True).execute(statement)

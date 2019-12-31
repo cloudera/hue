@@ -317,7 +317,7 @@ def config_validator(user):
     res.append(('Editor', _('Could not authenticate with user %s to validate interpreters') % user))
 
   for interpreter in get_ordered_interpreters(user=user):
-    if interpreter['interface'] == 'hiveserver2':  # TODO: switch to is_sql when SqlAlchmy is ported
+    if interpreter.get('is_sql'):
       connector = interpreter['type']
 
       try:
