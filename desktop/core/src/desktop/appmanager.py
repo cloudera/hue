@@ -205,7 +205,11 @@ class DesktopModuleInfo(object):
     return "DesktopModule(%s: %s)" % (self.nice_name, self.module.__name__)
 
 def get_apps(user):
-  return [app for app in DESKTOP_APPS if user.has_hue_permission(action="access", app=app.display_name)]
+  return [
+    app
+      for app in DESKTOP_APPS
+      if user.has_hue_permission(action="access", app=app.display_name)
+  ]
 
 def get_apps_dict(user=None):
   if user is not None:

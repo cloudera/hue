@@ -49,9 +49,10 @@ from hadoop import cluster
 from useradmin.models import User
 
 import desktop.views
+from desktop import appmanager, metrics
 from desktop.auth.backend import is_admin
 from desktop.conf import AUTH, HTTP_ALLOWED_METHODS, ENABLE_PROMETHEUS, KNOX, DJANGO_DEBUG_MODE, AUDIT_EVENT_LOG_DIR, \
-    SERVER_USER, REDIRECT_WHITELIST, SECURE_CONTENT_SECURITY_POLICY
+    SERVER_USER, REDIRECT_WHITELIST, SECURE_CONTENT_SECURITY_POLICY, ENABLE_CONNECTORS
 from desktop.context_processors import get_app_name
 from desktop.lib import apputil, i18n, fsmanager
 from desktop.lib.django_util import JsonResponse, render, render_json
@@ -59,8 +60,6 @@ from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.log import get_audit_logger
 from desktop.log.access import access_log, log_page_hit, access_warn
-from desktop import appmanager
-from desktop import metrics
 
 
 LOG = logging.getLogger(__name__)
@@ -284,11 +283,12 @@ class LoginAndPermissionMiddleware(object):
     request.ts = time.time()
     request.view_func = view_func
     access_log_level = getattr(view_func, 'access_log_level', None)
-    # skip loop for oidc
+
+    # Skip loop for oidc
     if request.path in ['/oidc/authenticate/', '/oidc/callback/', '/oidc/logout/', '/hue/oidc_failed/']:
       return None
 
-    # First, skip views not requiring login
+    # Skip views not requiring login
 
     # If the view has "opted out" of login required, skip
     if hasattr(view_func, "login_notrequired"):
@@ -301,34 +301,35 @@ class LoginAndPermissionMiddleware(object):
       log_page_hit(request, view_func, level=access_log_level or logging.DEBUG)
       return None
 
-    # If user is logged in, check that he has permissions to access the
-    # app.
+    # If user is logged in, check that he has permissions to access the app
     if request.user.is_active and request.user.is_authenticated():
       AppSpecificMiddleware.augment_request_with_app(request, view_func)
 
-      # Until we get Django 1.3 and resolve returning the URL name, we just do a match of the name of the view
+      # Until Django 1.3 which resolves returning the URL name, just do a match of the name of the view
       try:
         access_view = 'access_view:%s:%s' % (request._desktop_app, resolve(request.path)[0].__name__)
       except Exception as e:
         access_log(request, 'error checking view perm: %s' % e, level=access_log_level)
         access_view = ''
 
-      # Accessing an app can access an underlying other app.
-      # e.g. impala or spark uses code from beeswax and so accessing impala shows up as beeswax here.
-      # Here we trust the URL to be the real app we need to check the perms.
       app_accessed = request._desktop_app
-      ui_app_accessed = get_app_name(request)
-      if app_accessed != ui_app_accessed and ui_app_accessed not in ('logs', 'accounts', 'login'):
-        app_accessed = ui_app_accessed
+      app_libs_whitelist = ("desktop", "home", "home2", "about", "hue", "editor", "notebook", "indexer", "404", "500", "403")
+      if not ENABLE_CONNECTORS.get():
+        # Accessing an app can access an underlying other app.
+        # e.g. impala or spark uses code from beeswax and so accessing impala shows up as beeswax here.
+        # Here we trust the URL to be the real app we need to check the perms.
+        ui_app_accessed = get_app_name(request)
+        if app_accessed != ui_app_accessed and ui_app_accessed not in ('logs', 'accounts', 'login'):
+          app_accessed = ui_app_accessed
 
       if app_accessed and \
-          app_accessed not in ("desktop", "home", "home2", "about", "hue", "editor", "notebook", "indexer", "404", "500", "403") and \
+          app_accessed not in app_libs_whitelist and \
           not (
               is_admin(request.user) or
               request.user.has_hue_permission(action="access", app=app_accessed) or
               request.user.has_hue_permission(action=access_view, app=app_accessed)
           ) and \
-          not (app_accessed == '__debug__' and DJANGO_DEBUG_MODE):
+          not (app_accessed == '__debug__' and DJANGO_DEBUG_MODE.get()):
         access_log(request, 'permission denied', level=access_log_level)
         return PopupException(
             _("You do not have permission to access the %(app_name)s application.") % {'app_name': app_accessed.capitalize()},
