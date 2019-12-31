@@ -21,15 +21,15 @@ from django.utils.translation import ugettext as _
 from metadata.conf import OPTIMIZER, has_optimizer
 
 from desktop.auth.backend import is_admin
-from desktop.lib.i18n import smart_unicode
 from desktop.conf import has_connectors
+from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter
 %>
 
 <%namespace name="layout" file="/about_layout.mako" />
 
 % if not is_embeddable:
-${ commonheader(_('Quick Start'), "quickstart", user, request, "70px") | n,unicode }
+  ${ commonheader(_('Quick Start'), "quickstart", user, request, "70px") | n,unicode }
 % endif
 
 ${ layout.menubar(section='quick_start') }
@@ -41,11 +41,11 @@ ${ layout.menubar(section='quick_start') }
         % if is_admin(user):
           ${ _('Quick Start Wizard') } -
         % endif
-        Hue&trade; ${version} -
-        Query. Explore. Repeat.
-        <a href="gethue.com" target="_blank" style="color:#777" title="${ _('Open in a new tab') }">
-          gethue.com
+        <a href="https://gethue.com" target="_blank" style="color:#777" title="${ _('Open Hue\'s website in a new tab') }">
+          Hue&trade;
         </a>
+        ${ version} -
+        Query. Explore. Repeat.
       </h1>
 
      % if is_admin(user):
@@ -225,11 +225,15 @@ ${ layout.menubar(section='quick_start') }
       % else:
        <div class="card-body">
         <p>
-          ${ _('Learn more about Hue and Hadoop on') } <a href="http://gethue.com" target="_blank">http://gethue.com</a>.
-          <span class="muted">${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }</span>
+          ${ _('Learn more about Hue and SQL Querying on') } <a href="https://gethue.com" target="_blank">https://gethue.com</a>.
+          <br/>
+          <br/>
+          <span class="pull-right muted">${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }</span>
           % if not user.is_authenticated():
             <br/>
-            <a href="${ url('desktop_views_home2') }" class="btn btn-primary" style="margin-top: 50px;margin-bottom: 20px"><i class="fa fa-sign-in"></i> ${ _('Sign in now!') }</a>
+            <a href="${ url('desktop_views_home2') }" class="btn btn-primary" style="margin-top: 50px;margin-bottom: 20px">
+              <i class="fa fa-sign-in"></i> ${ _('Sign in now!') }
+            </a>
           % endif
         </p>
        </div>
