@@ -575,7 +575,12 @@ class TestEditor(object):
 
   def test_open_saved_impala_query_when_no_hive_interepreter(self):
     try:
-      doc, created = Document2.objects.get_or_create(name='open_saved_query_with_hive_not_present', type='query-impala', owner=self.user, data={})
+      doc, created = Document2.objects.get_or_create(
+          name='open_saved_query_with_hive_not_present',
+          type='query-impala',
+          owner=self.user,
+          data={}
+      )
 
       with patch('desktop.middleware.fsmanager') as fsmanager:
         response = self.client.get(reverse('notebook:editor'), {'editor': doc.id, 'is_embeddable': True})

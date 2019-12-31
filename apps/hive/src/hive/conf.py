@@ -29,21 +29,25 @@ from beeswax.settings import NICE_NAME
 LOG = logging.getLogger(__name__)
 
 
-#
-# All the configuration happens in apps/beeswax.
-#
+'''
+v2
+When using the connectors, now 'hive' is seen as a dialect and only the list of connections
+(instance of the 'hive' connector, e.g. pointing to a Hive server in the Cloud) should be tested.
+The Editor/Notebook app is the one testing it.
 
+v1
+All the configuration happens in apps/beeswax.
+'''
 
 def config_validator(user):
-  # dbms is dependent on beeswax.conf (this file)
-  # import in method to avoid circular dependency
+  # dbms is dependent on beeswax.conf, import in method to avoid circular dependency
   from beeswax.design import hql_query
   from beeswax.server import dbms
 
   res = []
   try:
     try:
-      if not 'test' in sys.argv: # Avoid tests hanging
+      if not 'test' in sys.argv:  # Avoid tests hanging
         server = dbms.get(user)
         query = hql_query("SELECT 'Hello World!';")
         handle = server.execute_and_wait(query, timeout_sec=10.0)

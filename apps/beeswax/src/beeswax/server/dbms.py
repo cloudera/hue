@@ -50,9 +50,9 @@ from beeswax.models import QueryHistory, QUERY_TYPES
 
 
 if sys.version_info[0] > 2:
-    from django.utils.encoding import force_text as force_unicode
+  from django.utils.encoding import force_text as force_unicode
 else:
-    from django.utils.encoding import force_unicode
+  from django.utils.encoding import force_unicode
 
 
 LOG = logging.getLogger(__name__)
