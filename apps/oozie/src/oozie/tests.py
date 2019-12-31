@@ -63,7 +63,7 @@ from oozie.importlib.workflows import import_workflow
 from oozie.importlib.jobdesigner import convert_jobsub_design
 
 if sys.version_info[0] > 2:
-  from io import StringIO as string_io
+  from io import BytesIO as string_io
 else:
   from cStringIO import StringIO as string_io
 
@@ -955,15 +955,17 @@ class TestEditor(OozieMockBase):
         {'key': 'enabled', 'value': False},
         {'key': 'nominal-time', 'value': '${time}'},]}
     )
-    assert_equal([{'name': u'output', 'value': u''}, {'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US'}],
-                 self.wf.find_all_parameters())
+    all_parameters = sorted(self.wf.find_all_parameters(), key=lambda k: k['name'])
+    assert_equal([{'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US'}, {'name': u'output', 'value': u''}],
+                 all_parameters)
 
     self.wf.data = json.dumps({'sla': [
         {'key': 'enabled', 'value': True},
         {'key': 'nominal-time', 'value': '${time}'},]}
     )
-    assert_equal([{'name': u'output', 'value': u''}, {'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US'}, {'name': u'time', 'value': u''}],
-                 self.wf.find_all_parameters())
+    all_parameters = sorted(self.wf.find_all_parameters(), key=lambda k: k['name'])
+    assert_equal([{'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US'}, {'name': u'output', 'value': u''}, {'name': u'time', 'value': u''}],
+                 all_parameters)
 
 
   def test_workflow_has_cycle(self):
@@ -1392,7 +1394,7 @@ class TestEditor(OozieMockBase):
           return tmpdir
 
       xml = hive_site_xml(is_local=False, use_sasl=True, kerberos_principal='hive/_HOST@test.com')
-      file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
+      open(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
 
       beeswax.hive_site.reset()
       saved = beeswax.conf.HIVE_CONF_DIR
@@ -1681,7 +1683,7 @@ class TestEditor(OozieMockBase):
 
     try:
       assert_true(
-  """<controls>
+  b"""<controls>
     <timeout>100</timeout>
     <concurrency>3</concurrency>
     <execution>FIFO</execution>
@@ -1711,7 +1713,7 @@ class TestEditor(OozieMockBase):
       finish()
 
     assert_true(
-"""<controls>
+b"""<controls>
     <timeout>100</timeout>
     <concurrency>3</concurrency>
     <execution>FIFO</execution>
@@ -1743,9 +1745,9 @@ class TestEditor(OozieMockBase):
     coord = create_coordinator(self.wf, self.c, self.user)
     xml = coord.to_xml()
 
-    assert_false('<sla' in xml, xml)
-    assert_false('xmlns="uri:oozie:coordinator:0.4"' in xml, xml)
-    assert_false('xmlns:sla="uri:oozie:sla:0.2"' in xml, xml)
+    assert_false(b'<sla' in xml, xml)
+    assert_false(b'xmlns="uri:oozie:coordinator:0.4"' in xml, xml)
+    assert_false(b'xmlns:sla="uri:oozie:sla:0.2"' in xml, xml)
 
     sla = coord.sla
     sla[0]['value'] = True
@@ -1755,9 +1757,9 @@ class TestEditor(OozieMockBase):
     coord.save()
 
     xml = coord.to_xml()
-    assert_true('xmlns="uri:oozie:coordinator:0.4"' in xml, xml)
-    assert_true('xmlns:sla="uri:oozie:sla:0.2"' in xml, xml)
-    assert_true("""</workflow>
+    assert_true(b'xmlns="uri:oozie:coordinator:0.4"' in xml, xml)
+    assert_true(b'xmlns:sla="uri:oozie:sla:0.2"' in xml, xml)
+    assert_true(b"""</workflow>
           <sla:info>
             <sla:nominal-time>now</sla:nominal-time>
             <sla:should-end>${ 10 * MINUTES}</sla:should-end>
@@ -1788,7 +1790,7 @@ class TestEditor(OozieMockBase):
 
 
     assert_true(
-"""<uri-template>s3n://a-server/data/out/${YEAR}${MONTH}${DAY}</uri-template>
+b"""<uri-template>s3n://a-server/data/out/${YEAR}${MONTH}${DAY}</uri-template>
       <done-flag></done-flag>
     </dataset>
   </datasets>
@@ -1891,8 +1893,9 @@ class TestEditor(OozieMockBase):
 
 
   def test_get_workflow_parameters(self):
-    assert_equal([{'name': u'output', 'value': ''}, {'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US'}],
-                 self.wf.find_all_parameters())
+    all_parameters = sorted(self.wf.find_all_parameters(), key=lambda k: k['name'])
+    assert_equal([{'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US'}, {'name': u'output', 'value': ''}],
+                 all_parameters)
 
 
   def test_get_coordinator_parameters(self):
@@ -1930,18 +1933,19 @@ class TestEditor(OozieMockBase):
     self.wf = create_workflow(self.c, self.user, workflow_dict=data)
 
     resp = self.c.get('/oozie/list_workflows/')
-    assert_false('"><script>alert(1);</script>' in resp.content, resp.content)
-    assert_true('&quot;&gt;&lt;script&gt;alert(1);&lt;/script&gt;' in resp.content, resp.content)
+    assert_false(b'"><script>alert(1);</script>' in resp.content, resp.content)
+    assert_true(b'&quot;&gt;&lt;script&gt;alert(1);&lt;/script&gt;' in resp.content, resp.content)
 
 
   def test_submit_workflow(self):
     # Check param popup
     response = self.c.get(reverse('oozie:submit_workflow', args=[self.wf.id]))
-    assert_equal([{'name': u'output', 'value': ''},
-                  {'name': u'SLEEP', 'value': ''},
-                  {'name': u'market', 'value': u'US'}
+    sorted_parameters = sorted(response.context[0]['params_form'].initial, key=lambda k: k['name'])
+    assert_equal([{'name': u'SLEEP', 'value': ''},
+                  {'name': u'market', 'value': u'US'},
+                  {'name': u'output', 'value': ''}
                   ],
-                  response.context[0]['params_form'].initial)
+                  sorted_parameters)
 
   def test_submit_coordinator(self):
     coord = create_coordinator(self.wf, self.c, self.user)

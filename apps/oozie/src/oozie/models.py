@@ -60,7 +60,7 @@ from oozie.utils import utc_datetime_format
 from oozie.timezones import TIMEZONES
 
 if sys.version_info[0] > 2:
-  from io import StringIO as string_io
+  from io import BytesIO as string_io
   from django.utils.encoding import force_text as force_unicode
 else:
   from cStringIO import StringIO as string_io
@@ -603,7 +603,7 @@ class Workflow(Job):
 
     zfile = zipfile.ZipFile(fp, 'w')
     zfile.writestr("workflow.xml", smart_str(xml))
-    zfile.writestr("workflow-metadata.json", smart_str(json.dumps(metadata)))
+    zfile.writestr("workflow-metadata.json", smart_str(json.dumps(metadata, sort_keys=True)))
     zfile.close()
 
     return fp
@@ -635,6 +635,9 @@ class Link(models.Model):
 
   name = models.CharField(max_length=40)
   comment = models.CharField(max_length=1024, default='', blank=True)
+
+  def __str__(self):
+    return self.__unicode__()
 
   def __unicode__(self):
     return '%s %s %s' % (self.parent, self.child, self.name)
@@ -711,6 +714,9 @@ class Node(models.Model):
 
   def find_parameters(self):
     return find_parameters(self, self.PARAM_FIELDS)
+
+  def __str__(self):
+    return self.__unicode__()
 
   def __unicode__(self):
     if self.name != '':
