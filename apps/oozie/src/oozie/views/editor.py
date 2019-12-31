@@ -365,6 +365,8 @@ def submit_workflow(request, workflow):
                    'params_form': params_form,
                    'action': reverse('oozie:submit_workflow', kwargs={'workflow': workflow.id})
                  }, force_template=True).content
+  if not isinstance(popup, str):
+    popup = popup.decode('utf-8')
   return JsonResponse(popup, safe=False)
 
 
@@ -663,6 +665,8 @@ def submit_coordinator(request, coordinator):
                  'params_form': params_form,
                  'action': reverse('oozie:submit_coordinator',  kwargs={'coordinator': coordinator.id})
                 }, force_template=True).content
+  if not isinstance(popup, str):
+    popup = popup.decode('utf-8')
   return JsonResponse(popup, safe=False)
 
 
@@ -872,6 +876,8 @@ def submit_bundle(request, bundle):
                  'params_form': params_form,
                  'action': reverse('oozie:submit_bundle',  kwargs={'bundle': bundle.id})
                 }, force_template=True).content
+  if not isinstance(popup, str):
+    popup = popup.decode('utf-8')
   return JsonResponse(popup, safe=False)
 
 
