@@ -22,6 +22,7 @@ import beeswax.hive_site
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
+from desktop.conf import has_connectors
 from desktop.lib.exceptions import StructuredThriftTransportException
 from beeswax.settings import NICE_NAME
 
@@ -29,22 +30,24 @@ from beeswax.settings import NICE_NAME
 LOG = logging.getLogger(__name__)
 
 
-'''
-v2
-When using the connectors, now 'hive' is seen as a dialect and only the list of connections
-(instance of the 'hive' connector, e.g. pointing to a Hive server in the Cloud) should be tested.
-The Editor/Notebook app is the one testing it.
-
-v1
-All the configuration happens in apps/beeswax.
-'''
-
 def config_validator(user):
-  # dbms is dependent on beeswax.conf, import in method to avoid circular dependency
-  from beeswax.design import hql_query
+  '''
+  v2
+  When using the connectors, now 'hive' is seen as a dialect and only the list of connections
+  (instance of the 'hive' connector, e.g. pointing to a Hive server in the Cloud) should be tested.
+  Interpreters are now tested by the Editor in libs/notebook/conf.py.
+
+  v1
+  All the configuration happens in apps/beeswax.
+  '''
+  from beeswax.design import hql_query # dbms is dependent on beeswax.conf, import in method to avoid circular dependency
   from beeswax.server import dbms
 
   res = []
+
+  if has_connectors():
+    return res
+
   try:
     try:
       if not 'test' in sys.argv:  # Avoid tests hanging
@@ -76,7 +79,6 @@ def config_validator(user):
   except Exception:
     msg = 'Failed to access Hive warehouse: %s'
     LOG.exception(msg % warehouse)
-
-    return [(NICE_NAME, _(msg) % warehouse)]
+    res.append((NICE_NAME, _(msg) % warehouse))
 
   return res

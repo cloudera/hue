@@ -28,7 +28,6 @@ from beeswax.models import QUERY_TYPES
 from beeswax.server import dbms
 from beeswax.server.dbms import HiveServer2Dbms, QueryServerException, QueryServerTimeoutException,\
   get_query_server_config as beeswax_query_server_config, get_query_server_config_via_connector
-from notebook.conf import get_ordered_interpreters
 
 from impala import conf
 

@@ -41,7 +41,11 @@ ${ layout.menubar(section='quick_start') }
         % if is_admin(user):
           ${ _('Quick Start Wizard') } -
         % endif
-        Hue&trade; ${version} - <a href="http://gethue.com" target="_blank" style="color:#777" title="${ _('Open gethue.com in a new window.') }">${ _("Query. Explore. Repeat.") }</a>
+        Hue&trade; ${version} -
+        Query. Explore. Repeat.
+        <a href="gethue.com" target="_blank" style="color:#777" title="${ _('Open in a new tab') }">
+          gethue.com
+        </a>
       </h1>
 
      % if is_admin(user):
@@ -50,7 +54,7 @@ ${ layout.menubar(section='quick_start') }
 
            <div class="span2">
             <ul class="nav nav-pills nav-vertical-pills">
-              <li class="active"><a href="#step1" class="step">${ _('Step 1:') } <i class="fa fa-cogs"></i> ${ _('Check Configuration') }</a></li>
+              <li class="active"><a href="#step1" class="step">${ _('Step 1:') } <i class="fa fa-cogs"></i> ${ _('Checks') }</a></li>
               <li><a href="#step2" class="step">${ _('Step 2:') } <i class="fa fa-exchange"></i> ${ _('Connectors') }</a></li>
               <li><a href="#step3" class="step">${ _('Step 3:') } <i class="fa fa-book"></i> ${ _('Examples') }</a></li>
               <li><a id="lastStep" href="#step4" class="step">${ _('Step 4:') } <i class="fa fa-group"></i> ${ _('Users') }</a></li>
@@ -79,7 +83,7 @@ ${ layout.menubar(section='quick_start') }
             % else:
               <a href="${ url('desktop.views.dump_config') }" target="_blank">${ _('Configuration') }</a>
               <br>
-              <a href="https://docs.gethue.com/latest/administrator/configuration/" target="_blank">${ _('Documentation') }</a>
+              <a href="https://docs.gethue.com/administrator/configuration/" target="_blank">${ _('Documentation') }</a>
             % endif
           </div>
 
@@ -200,7 +204,7 @@ ${ layout.menubar(section='quick_start') }
                 <input id="updateSkipWizard" type="checkbox"
                        style="margin-right: 10px"
                        title="${ _('Check to skip this wizard next time.') }"/>
-                ${ _('Skip the Quick Start Wizard at next login and land directly on the home page.') }
+                ${ _('Skip the Quick Start Wizard at next login and land directly on your starred application.') }
               </label>
             </div>
             % endif

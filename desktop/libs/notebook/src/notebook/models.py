@@ -17,8 +17,7 @@
 
 from future import standard_library
 standard_library.install_aliases()
-from builtins import str
-from builtins import object
+from builtins import str, object
 import datetime
 import json
 import logging
@@ -32,8 +31,10 @@ from datetime import timedelta
 from django.contrib.sessions.models import Session
 from django.db.models import Count
 from django.db.models.functions import Trunc
+from django.urls import reverse
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
+
 
 from desktop.conf import has_connectors, TASK_SERVER
 from desktop.lib.i18n import smart_unicode
@@ -44,7 +45,6 @@ from useradmin.models import User
 from notebook.connectors.base import Notebook, get_api as _get_api, get_interpreter
 
 if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
   from urllib.parse import quote as urllib_quote
 else:
   from urllib import quote as urllib_quote
@@ -490,6 +490,41 @@ def _update_property_value(properties, key, value):
 def _get_editor_type(editor_id):
   document = Document2.objects.get(id=editor_id)
   return document.type.rsplit('-', 1)[-1]
+
+
+def _excute_test_query(client, interpreter):
+  '''
+  Helper utils until the API gets simplified.
+  '''
+  notebook_json = """
+    {
+      "selectedSnippet": "hive",
+      "showHistory": false,
+      "description": "Test Hive Query",
+      "name": "Test Hive Query",
+      "sessions": [
+          {
+              "type": "hive",
+              "properties": [],
+              "id": null
+          }
+      ],
+      "type": "hive",
+      "id": null,
+      "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"%(connector)s","status":"running","statement":"select * from web_logs","properties":{"settings":[],"variables":[],"files":[],"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"select * from web_logs","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
+      "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a"
+  }
+  """ % {
+    'connector': interpreter
+  }
+
+  return client.post(
+    reverse('notebook:api_sample_data', kwargs={'database': 'default', 'table': 'default'}), {
+      'notebook': notebook_json,
+      'snippet': json.dumps(json.loads(notebook_json)['snippets'][0]),
+      'is_async': json.dumps(True),
+      'operation': json.dumps('hello')
+  })
 
 
 class ApiWrapper(object):
