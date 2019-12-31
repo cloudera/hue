@@ -2040,6 +2040,7 @@ class ClusterConfig(object):
   def get_hive_metastore_interpreters(self):
     return [interpreter['type'] for interpreter in get_ordered_interpreters(self.user) if interpreter['type'] == 'hive' or interpreter['type'] == 'hms']
 
+
 class Cluster(object):
 
   def __init__(self, user):
