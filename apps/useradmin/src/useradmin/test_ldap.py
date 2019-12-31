@@ -565,9 +565,12 @@ class TestUserAdminLdap(BaseUserAdminTests):
 
       # Test dn with spaces in username and dn (should fail)
       response = c.post(URL, dict(server='multi_ldap_conf', username_pattern='uid=user with space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True))
-      assert_true("Could not get LDAP details for users in pattern" in response.content, response.content)
+      assert_true(b"Could not get LDAP details for users in pattern" in response.content, response.content)
       response = c.get(reverse(desktop.views.log_view))
-      assert_true("{username}: Username must not contain whitespaces".format(username='user with space') in response.content, response.content)
+      whitespaces_message = "{username}: Username must not contain whitespaces".format(username='user with space')
+      if not isinstance(whitespaces_message, bytes):
+        whitespaces_message = whitespaces_message.encode('utf-8')
+      assert_true(whitespaces_message in response.content, response.content)
 
       # Test dn with spaces in dn, but not username (should succeed)
       response = c.post(URL, dict(server='multi_ldap_conf', username_pattern='uid=user without space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True))
@@ -652,7 +655,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
       # Import test_longfirstname user
       ldap_access.CACHED_LDAP_CONN.add_user_group_for_test('uid=test_longfirstname,ou=People,dc=example,dc=com', 'TestUsers')
       response = c.post(URL, dict(server='multi_ldap_conf', groupname_pattern='TestUsers', import_members=True), follow=True)
-      assert_true('Failed to import following users: test_toolongusernametoolongusername, test_longfirstname' in response.content, response.content)
+      assert_true(b'Failed to import following users: test_toolongusernametoolongusername, test_longfirstname' in response.content, response.content)
 
       # Test with space
       response = c.post(URL, dict(server='multi_ldap_conf', groupname_pattern='Test Administrators'))
@@ -712,7 +715,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
 
     try:
       response = c.post(reverse(add_ldap_users), dict(server='multi_ldap_conf', username_pattern='moe', password1='test', password2='test'), follow=True)
-      assert_true('There was an error when communicating with LDAP' in response.content, response)
+      assert_true(b'There was an error when communicating with LDAP' in response.content, response)
     finally:
       for finish in reset:
         finish()
