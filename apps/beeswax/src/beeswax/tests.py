@@ -2129,7 +2129,10 @@ for x in sys.stdin:
 def test_import_gzip_reader():
   """Test the gzip reader in create table"""
   # Make gzipped data
-  data = open_file(__file__).read()
+  if sys.version_info[0] > 2:
+    data = open(__file__, encoding='utf-8').read()
+  else:
+    data = file(__file__).read()
   data_gz_sio = string_io()
   gz = gzip.GzipFile(fileobj=data_gz_sio, mode='wb')
   gz_data = data
