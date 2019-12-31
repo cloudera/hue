@@ -37,7 +37,7 @@ def _remove_duplications(a_list):
 def check_permissions(user, interpreter, user_apps=None):
   # TODO: port to cluster config
   if user_apps is None:
-    user_apps = appmanager.get_apps_dict(user) # Expensive method
+    user_apps = appmanager.get_apps_dict(user)  # Expensive method
   return (interpreter == 'hive' and 'hive' not in user_apps) or \
          (interpreter == 'impala' and 'impala' not in user_apps) or \
          (interpreter == 'pig' and 'pig' not in user_apps) or \

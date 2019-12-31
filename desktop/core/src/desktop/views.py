@@ -591,7 +591,7 @@ def _get_config_errors(request, cache=True):
   global _CONFIG_ERROR_LIST
 
   if not cache or _CONFIG_ERROR_LIST is None:
-    error_list = [ ]
+    error_list = []
     for module in appmanager.DESKTOP_MODULES:
       # Get the config_validator() function
       try:
@@ -600,8 +600,7 @@ def _get_config_errors(request, cache=True):
         continue
 
       if not callable(validator):
-        LOG.warn("Auto config validation: %s.%s is not a function" %
-                 (module.conf.__name__, CONFIG_VALIDATOR))
+        LOG.warn("Auto config validation: %s.%s is not a function" % (module.conf.__name__, CONFIG_VALIDATOR))
         continue
 
       try:
