@@ -481,7 +481,7 @@ class TestNotebookApiMocked(object):
         'snippet': json.dumps(json.loads(notebook_json)['snippets'][0]),
         'format': 'csv'
     })
-    content = "".join(response)
+    content = b"".join(response)
     assert_true(len(content) > 0)
 
 
