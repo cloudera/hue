@@ -124,7 +124,7 @@ class TestDjangoUtil(object):
     pass
 
   def test_render_json_jsonp(self):
-    assert_equal("foo(3);", django_util.render_json(3, jsonp_callback="foo").content)
+    assert_equal(b"foo(3);", django_util.render_json(3, jsonp_callback="foo").content)
 
   def test_render_json_jsonp_bad_name(self):
     # Bad names

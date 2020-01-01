@@ -215,7 +215,7 @@ def download_log_view(request):
         # in case it is rather big. So we write it to a file line by line
         # and pass that file to zipfile, which might follow a more efficient path.
         tmp = tempfile.NamedTemporaryFile()
-        log_tmp = tempfile.NamedTemporaryFile("w+t")
+        log_tmp = tempfile.NamedTemporaryFile("w+t") if sys.version_info[0] == 2 else tempfile.NamedTemporaryFile("w+t", encoding='utf-8')
         for l in h.buf:
           log_tmp.write(smart_str(l, errors='replace') + '\n')
         # This is not just for show - w/out flush, we often get truncated logs
@@ -267,7 +267,7 @@ def status_bar(request):
   Concatenates multiple views together to build up a "status bar"/"status_bar".
   These views are registered using register_status_bar_view above.
   """
-  resp = ""
+  resp = b""
   for view in _status_bar_views:
     try:
       r = view(request)
