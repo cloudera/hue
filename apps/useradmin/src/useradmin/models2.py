@@ -28,7 +28,7 @@ LOG = logging.getLogger(__name__)
 
 
 '''
-Organizations
+Organizations handle contained sets of setups (user, group, connectors).
 '''
 
 def default_organization():
@@ -52,10 +52,11 @@ class OrganizationManager(models.Manager):
 
 
 class Organization(models.Model):
-  name = models.CharField(max_length=200, help_text=_t("The name of the organization"))
-  uuid = models.CharField(default=uuid_default, max_length=36, db_index=True)
-  domain = models.CharField(max_length=200, help_text=_t("The domain name of the organization, e.g. gethue.com"))
+  name = models.CharField(max_length=200, help_text=_t("The name of the organization"), unique=True)
+  uuid = models.CharField(default=uuid_default, max_length=36, unique=True)
+  domain = models.CharField(max_length=200, help_text=_t("The domain name of the organization, e.g. gethue.com"), unique=True)
   is_active = models.BooleanField(default=True)
+  is_multi_user = models.BooleanField(default=True)
 
   objects = OrganizationManager()
 
