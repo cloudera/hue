@@ -21,7 +21,6 @@ import uuid
 from django.contrib.auth.models import models, AbstractUser, BaseUserManager
 from django.utils.translation import ugettext_lazy as _t
 
-from desktop.models import uuid_default
 
 
 LOG = logging.getLogger(__name__)
@@ -39,6 +38,9 @@ def get_organization(user):
   # TODO: depends on the logged-in user and its organization
   return default_organization()
 
+def uuid_default():
+  return str(uuid.uuid4())
+
 
 def uuid_default():
   return str(uuid.uuid4())
@@ -55,6 +57,7 @@ class Organization(models.Model):
   name = models.CharField(max_length=200, help_text=_t("The name of the organization"), unique=True)
   uuid = models.CharField(default=uuid_default, max_length=36, unique=True)
   domain = models.CharField(max_length=200, help_text=_t("The domain name of the organization, e.g. gethue.com"), unique=True)
+  customer_id = models.CharField(_t('Customer id'), max_length=128, default=None, null=True)
   is_active = models.BooleanField(default=True)
   is_multi_user = models.BooleanField(default=True)
 
@@ -143,8 +146,7 @@ class OrganizationUser(AbstractUser):
       verbose_name=_t('groups'),
       blank=True,
       help_text=_t(
-          'The groups this user belongs to. A user will get all permissions '
-          'granted to each of their groups.'
+          'The groups this user belongs to. A user will get all permissions granted to each of their groups.'
       ),
       related_name="user_set",
       related_query_name="user",

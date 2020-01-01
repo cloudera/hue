@@ -69,8 +69,7 @@ else:
   def default_organization(): pass
   def get_organization(): pass
 
-
-monkey_patch_username_validator()
+  monkey_patch_username_validator()
 
 
 LOG = logging.getLogger(__name__)
