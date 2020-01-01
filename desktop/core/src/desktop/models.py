@@ -58,7 +58,6 @@ from desktop.redaction import global_redaction_engine
 from desktop.settings import DOCUMENT2_SEARCH_MAX_LENGTH, HUE_DESKTOP_VERSION
 
 if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
   from urllib.parse import quote as urllib_quote
 else:
   from urllib import quote as urllib_quote
