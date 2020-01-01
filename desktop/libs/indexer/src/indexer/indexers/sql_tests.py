@@ -18,6 +18,7 @@
 
 from builtins import object
 import json
+import sys
 
 from nose.tools import assert_equal, assert_true
 
@@ -25,6 +26,10 @@ from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
 
 from indexer.indexers.sql import SQLIndexer
+
+table_properties_py2 = '"transactional" = "false", "skip.header.line.count" = "1"'
+table_properties_py3 = '"skip.header.line.count" = "1", "transactional" = "false"'
+is_py3 = sys.version_info[0] > 2
 
 
 class MockRequest(object):
@@ -66,7 +71,7 @@ def test_generate_create_text_table_with_data_partition():
 
   assert_true('''USE default;''' in  sql, sql)
 
-  assert_true('''CREATE TABLE `default`.`customer_stats`
+  statement = '''CREATE TABLE `default`.`customer_stats`
 (
   `customers.id` bigint ,
   `customers.name` string ,
@@ -78,8 +83,9 @@ ROW FORMAT   DELIMITED
     FIELDS TERMINATED BY ','
     COLLECTION ITEMS TERMINATED BY '\\002'
     MAP KEYS TERMINATED BY '\\003'
-  STORED AS TextFile TBLPROPERTIES("transactional" = "false", "skip.header.line.count" = "1")
-;''' in  sql, sql)
+  STORED AS TextFile TBLPROPERTIES(%s)
+;''' % table_properties_py3 if is_py3 else  table_properties_py2
+  assert_true(statement in sql, sql)
 
   assert_true('''LOAD DATA INPATH '/user/romain/customer_stats.csv' INTO TABLE `default`.`customer_stats` PARTITION (new_field_1='AAA');''' in  sql, sql)
 
@@ -93,7 +99,7 @@ def test_generate_create_kudu_table_with_data():
 
   assert_true('''DROP TABLE IF EXISTS `default`.`hue__tmp_index_data`;''' in  sql, sql)
 
-  assert_true('''CREATE EXTERNAL TABLE `default`.`hue__tmp_index_data`
+  statement = '''CREATE EXTERNAL TABLE `default`.`hue__tmp_index_data`
 (
   `business_id` string ,
   `cool` bigint ,
@@ -116,7 +122,8 @@ def test_generate_create_kudu_table_with_data():
 ROW FORMAT   DELIMITED
     FIELDS TERMINATED BY ','
   STORED AS TextFile LOCATION '/A'
-TBLPROPERTIES("transactional" = "false", "skip.header.line.count" = "1")''' in  sql, sql)
+TBLPROPERTIES(%s)''' % table_properties_py3 if is_py3 else  table_properties_py2
+  assert_true(statement in sql in sql, sql)
 
   assert_true('''CREATE TABLE `default`.`index_data` COMMENT "Big Data"
         PRIMARY KEY (id)
@@ -140,7 +147,7 @@ def test_generate_create_parquet_table():
 
   assert_true('''USE default;''' in  sql, sql)
 
-  assert_true('''CREATE EXTERNAL TABLE `default`.`hue__tmp_parquet_table`
+  statement = '''CREATE EXTERNAL TABLE `default`.`hue__tmp_parquet_table`
 (
   `acct_client` string ,
   `tran_amount` double ,
@@ -152,8 +159,9 @@ def test_generate_create_parquet_table():
     COLLECTION ITEMS TERMINATED BY '\\002'
     MAP KEYS TERMINATED BY '\\003'
   STORED AS TextFile LOCATION '/user/hue/data'
-TBLPROPERTIES("transactional" = "false", "skip.header.line.count" = "1")
-;''' in  sql, sql)
+TBLPROPERTIES(%s)
+;''' % table_properties_py3 if is_py3 else  table_properties_py2
+  assert_true(statement in  sql, sql)
 
   assert_true('''CREATE TABLE `default`.`parquet_table`
         STORED AS parquet
@@ -176,7 +184,7 @@ def test_generate_create_orc_table_transactional():
 
   assert_true('''USE default;''' in  sql, sql)
 
-  assert_true('''CREATE EXTERNAL TABLE `default`.`hue__tmp_parquet_table`
+  statement = '''CREATE EXTERNAL TABLE `default`.`hue__tmp_parquet_table`
 (
   `acct_client` string ,
   `tran_amount` double ,
@@ -188,8 +196,9 @@ def test_generate_create_orc_table_transactional():
     COLLECTION ITEMS TERMINATED BY '\\002'
     MAP KEYS TERMINATED BY '\\003'
   STORED AS TextFile LOCATION '/user/hue/data'
-TBLPROPERTIES("transactional" = "false", "skip.header.line.count" = "1")
-;''' in  sql, sql)
+TBLPROPERTIES(%s)
+;''' % table_properties_py3 if is_py3 else  table_properties_py2
+  assert_true(statement in sql in  sql, sql)
 
   assert_true('''CREATE TABLE `default`.`parquet_table`
         STORED AS orc

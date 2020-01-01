@@ -101,7 +101,7 @@ PARTITIONED BY ${ column_list(table, partition_columns) | n }
 ROW FORMAT \
 %   if table["row_format"] == "Delimited":
   DELIMITED
-%     if table.has_key('field_terminator'):
+%     if 'field_terminator' in table:
     FIELDS TERMINATED BY '${table["field_terminator"] | n}'
 %     endif
 ## [LINES TERMINATED BY char]
@@ -118,7 +118,7 @@ ROW FORMAT \
 %     endif
 %   endif
 % endif
-% if table.has_key('file_format'):
+% if 'file_format' in table:
   STORED AS ${ table["file_format"] | n } \
 % endif
 % if table.get("file_format") == "InputFormat":
