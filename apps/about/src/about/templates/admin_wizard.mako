@@ -44,7 +44,7 @@ ${ layout.menubar(section='quick_start') }
         <a href="https://gethue.com" target="_blank" style="color:#777" title="${ _('Open Hue\'s website in a new tab') }">
           Hue&trade;
         </a>
-        ${ version} -
+        ${ version } -
         Query. Explore. Repeat.
       </h1>
 
@@ -73,7 +73,6 @@ ${ layout.menubar(section='quick_start') }
                 <div class="info hide"></div>
               </div>
             </div>
-
           </div>
 
           <div id="step2" class="stepDetails hide">

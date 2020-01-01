@@ -29,12 +29,13 @@ User to remain a django.contrib.auth.models.User object.
 """
 
 from builtins import object
+from importlib import import_module
+
 import ldap
 import logging
 import pam
 import requests
 
-from importlib import import_module
 import django.contrib.auth.backends
 from django.contrib import auth
 from django.core.urlresolvers import reverse
@@ -106,7 +107,7 @@ def is_admin(user):
   is_admin = False
   if hasattr(user, 'is_superuser'):
     is_admin = user.is_superuser
-  if not is_admin and user.is_authenticated() and not ENABLE_ORGANIZATIONS.get():  # Admin group only within an organization if later is enabled
+  if not is_admin and user.is_authenticated() and not ENABLE_ORGANIZATIONS.get():  # Admin group not activated in organization mode.
     try:
       user = rewrite_user(user)
       is_admin = user.has_hue_permission(action="superuser", app="useradmin")
@@ -115,7 +116,7 @@ def is_admin(user):
   return is_admin
 
 
-def is_organization_admin(user):
+def is_org_admin(user):
   return hasattr(user, 'is_admin') and user.is_admin
 
 
@@ -730,8 +731,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
     if not code or not state:
       return None
 
-    reverse_url = import_from_settings('OIDC_AUTHENTICATION_CALLBACK_URL',
-                                       'oidc_authentication_callback')
+    reverse_url = import_from_settings('OIDC_AUTHENTICATION_CALLBACK_URL', 'oidc_authentication_callback')
 
     token_payload = {
       'client_id': self.OIDC_RP_CLIENT_ID,
