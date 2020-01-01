@@ -90,7 +90,7 @@ def test_home():
   user = User.objects.get(username="test_home")
 
   response = c.get(reverse(home))
-  assert_equal(["notmine", "trash", "mine", "history"], list(json.loads(response.context[0]['json_tags']).keys()))
+  assert_equal(sorted(["notmine", "trash", "mine", "history"]), sorted(list(json.loads(response.context[0]['json_tags']).keys())))
   assert_equal(200, response.status_code)
 
   from pig.models import PigScript
@@ -362,7 +362,7 @@ def test_status_bar():
   views.register_status_bar_view(f)
 
   response = c.get("/desktop/status_bar")
-  assert_equal("foobar", response.content)
+  assert_equal(b"foobar", response.content)
 
   views._status_bar_views = backup
 
