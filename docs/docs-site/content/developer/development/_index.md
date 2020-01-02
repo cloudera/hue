@@ -337,10 +337,8 @@ for regenerating the code from the interfaces.
 
 ### Upgrades
 
-After upgrading the version of Hue, running these two commands will make sure the
-database has the correct tables and fields.
+After upgrading the version of Hue, running these two commands will make sure the database has the correct tables and fields.
 
-    ./build/env/bin/hue syncdb
     ./build/env/bin/hue migrate
 
 

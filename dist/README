@@ -1,34 +1,39 @@
-=========================================
-        Hue - Data-warehouse Editor
-=========================================
+==============================
+Hue - DataWarehouse SQL Editor
+==============================
 
-Instructions to install the tarball release of Hue are available
-in the manual from http://gethue.com.
+Instructions to install the tarball release of Hue are available in the manual https://docs.gethue.com/administrator/installation/.
 
-If you're impatient, these are the key steps. Please check the full manual
-for more details.
+If you're impatient, these are the key steps. Please check the full manual for more details and browse https://gethue.com.
 
 
 Install
 -------
-## Install in any directory, e.g. /home/hue, /usr/share, /home/my_user
-PREFIX=/usr/share make install
 
-## If you don't have the permissions, you will need to 'sudo' the command and
-## make sure that the 'hue' user has write access to the 'logs' directory and 'desktop/desktop.db'.
-## e.g. sudo chown -R hue:hue /usr/local/hue
+    ## Install in any directory, e.g. /home/hue, /usr/share, /home/my_user
+    PREFIX=/usr/share make install
 
-## Run!
-${PREFIX}/hue/build/env/bin/supervisor
+    ## If you don't have the permissions, you will need to 'sudo' the command and
+    ## make sure that the 'hue' user has write access to the 'logs' directory and 'desktop/desktop.db'.
+    ## e.g. sudo chown -R hue:hue /usr/local/hue
+
+    ## Run!
+    ${PREFIX}/hue/build/env/bin/supervisor
 
 
 Upgrade
 -------
-Stop the current Hue and do a database backup.
-Install the new Hue to replace the old one and run the database migrations:
 
-./build/env/bin/hue syncdb
-./build/env/bin/hue migrate
+# Stop the current Hue and do a database backup.
+# Install the new Hue to replace the old one and run the database migrations:
+
+    ./build/env/bin/hue migrate
+
+
+Configure Hue
+-------------
+
+Point to other services: https://docs.gethue.com/administrator/configuration/
 
 
 Configure Hadoop
@@ -37,23 +42,15 @@ Configure Hadoop
 ## Configure HDFS
 Edit hdfs-site.xml:
 
-<property>
-  <name>dfs.webhdfs.enable</name>
-  <value>true</value>
-</property>
-
-
-Configure Hue
--------------
-
-Point to other services: http://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/
+    <property>
+      <name>dfs.webhdfs.enable</name>
+      <value>true</value>
+    </property>
 
 
 Problems?
 ---------
 
-Search or ask questions on the forum and http://groups.google.com/a/cloudera.org/group/hue-user
+Search or ask questions on the forum https://discourse.gethue.com/
 
-Some packages might be required during the 'make install': https://github.com/cloudera/hue#development-prerequisites)
-
-Download a pre-built packaged version (apt-get/yum install...) of Hue on http://gethue.com
+Some packages might be required during the 'make install': https://docs.gethue.com/administrator/installation/dependencies/

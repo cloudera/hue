@@ -130,7 +130,7 @@ def configure_django_for_test():
 def create_tables(model):
   """ Create all tables for the given model.
 
-  This is a subset of django.core.management.commands.syncdb
+  This is a subset of django.core.management.commands.migrate
   """
   from django.db import connection
   from django.db.models import Model

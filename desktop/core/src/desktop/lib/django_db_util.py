@@ -16,13 +16,15 @@
 # limitations under the License.
 
 """
-Utilities for django database operations.
+Utilities for Django database operations.
 """
 
 import logging
 from django.contrib.contenttypes.models import ContentType
 
+
 LOG = logging.getLogger(__name__)
+
 
 def remove_content_type(app_label, model_name):
   """
@@ -34,8 +36,7 @@ def remove_content_type(app_label, model_name):
   be prompted with a question as they run syncdb.
   """
   try:
-    ct = ContentType.objects.get(app_label=app_label,
-                                 model=model_name.lower())
+    ct = ContentType.objects.get(app_label=app_label, model=model_name.lower())
     ct.delete()
   except ContentType.DoesNotExist:
     pass
