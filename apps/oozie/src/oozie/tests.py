@@ -2158,7 +2158,7 @@ class TestEditorBundle(OozieMockBase):
      <kick-off-time>%s</kick-off-time>
   </controls>
 </bundle-app>
-""" % converted_kickoff_time in bundle.to_xml(), bundle.to_xml())
+""" % converted_kickoff_time in bundle.to_xml(), bundle.to_xml() + '\nconverted_kickoff_time: ' + converted_kickoff_time)
 
 
   def test_create_bundled_coordinator(self):

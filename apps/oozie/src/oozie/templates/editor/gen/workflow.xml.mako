@@ -31,7 +31,7 @@
   % endif
   % if workflow.credentials:
   <credentials>
-    % for cred_type in workflow.credentials:
+    % for cred_type in sorted(list(workflow.credentials)):
     <%
       credential = mapping['credentials'][cred_type]
     %>

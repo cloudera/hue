@@ -21,6 +21,7 @@ from builtins import object
 import json
 import logging
 import re
+import sys
 
 from django.urls import reverse
 from django.db.models import Q
@@ -90,13 +91,13 @@ LIMIT $limit"""))
 
 
   def test_hive_script_parsing(self):
-    assert_equal(['field', 'tablename', 'LIMIT'], find_dollar_braced_variables("""
+    assert_equal(sorted(['field', 'tablename', 'LIMIT']), sorted(find_dollar_braced_variables("""
     SELECT ${field}
     FROM ${hivevar:tablename}
     LIMIT ${hiveconf:LIMIT}
-    """))
+    """)))
 
-    assert_equal(['field', 'tablename', 'LIMIT'], find_dollar_braced_variables("SELECT ${field} FROM ${hivevar:tablename} LIMIT ${hiveconf:LIMIT}"))
+    assert_equal(sorted(['field', 'tablename', 'LIMIT']), sorted(find_dollar_braced_variables("SELECT ${field} FROM ${hivevar:tablename} LIMIT ${hiveconf:LIMIT}")))
 
 
   def test_workflow_gen_xml(self):
@@ -682,7 +683,9 @@ class TestExternalWorkflowGraph(object):
     node_hierarchy = ['start']
     _get_hierarchy_from_adj_list(adj_list, adj_list['start']['ok_to'], node_hierarchy)
 
-    assert_equal(node_hierarchy, ['start', [u'fork-fe93', [[u'shell-bd90'], [u'shell-d64c'], [u'shell-5429'], [u'shell-d8cc']], u'join-7f80'], ['Kill'], ['End']])
+    expected_node_hierarchy_py2 = ['start', [u'fork-fe93', [[u'shell-bd90'], [u'shell-d64c'], [u'shell-5429'], [u'shell-d8cc']], u'join-7f80'], ['Kill'], ['End']]
+    expected_node_hierarchy_py3 = ['start', [u'fork-fe93', [[u'shell-5429'], [u'shell-bd90'], [u'shell-d64c'], [u'shell-d8cc']], u'join-7f80'], ['Kill'], ['End']]
+    assert_equal(node_hierarchy, expected_node_hierarchy_py3 if sys.version_info[0] > 2 else expected_node_hierarchy_py2)
 
   def test_gen_workflow_data_from_xml(self):
     self.wf.definition = """<workflow-app name="fork-fork-test" xmlns="uri:oozie:workflow:0.5">
@@ -1123,7 +1126,7 @@ class TestExternalWorkflowGraph(object):
                 workflow_data_02['workflow']['nodes'][7]['type'] ==
                 workflow_data_03['workflow']['nodes'][7]['type'] ==
                 workflow_data_04['workflow']['nodes'][7]['type'] ==
-                'hive-widget')
+                'hive-widget' if sys.version_info[0] == 2 else 'spark-widget')
     assert_true(len(workflow_data_01['workflow']['nodes'][7]['children']) ==
                 len(workflow_data_02['workflow']['nodes'][7]['children']) ==
                 len(workflow_data_03['workflow']['nodes'][7]['children']) ==

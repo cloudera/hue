@@ -655,7 +655,9 @@ class TestUserAdminLdap(BaseUserAdminTests):
       # Import test_longfirstname user
       ldap_access.CACHED_LDAP_CONN.add_user_group_for_test('uid=test_longfirstname,ou=People,dc=example,dc=com', 'TestUsers')
       response = c.post(URL, dict(server='multi_ldap_conf', groupname_pattern='TestUsers', import_members=True), follow=True)
-      assert_true(b'Failed to import following users: test_toolongusernametoolongusername, test_longfirstname' in response.content, response.content)
+      user_list_a = b"test_toolongusernametoolongusername, test_longfirstname"
+      user_list_b = b"test_longfirstname, test_toolongusernametoolongusername"
+      assert_true(b'Failed to import following users: %s' % user_list_a in response.content or b'Failed to import following users: %s' % user_list_b in response.content, response.content)
 
       # Test with space
       response = c.post(URL, dict(server='multi_ldap_conf', groupname_pattern='Test Administrators'))

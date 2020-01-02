@@ -3665,7 +3665,7 @@ class Bundle(Job):
 
   @property
   def data(self):
-    if type(self._data['properties']['kickoff']) == str:
+    if type(self._data['properties']['kickoff']) == str and sys.version_info[2] == 2:
       self._data['properties']['kickoff'] = parse(self._data['properties']['kickoff'])
 
     if self.document is not None:
