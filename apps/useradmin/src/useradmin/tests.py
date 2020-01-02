@@ -308,7 +308,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
     # Make sure that a superuser can always access applications
     response = c.get('/useradmin/users')
-    assert_true(b'Hue Users' in response.content)
+    assert_true(b'Users' in response.content)
 
     assert_true(len(GroupPermission.objects.all()) == 0)
     c.post('/useradmin/groups/edit/test-group',
@@ -381,7 +381,7 @@ class TestUserAdmin(BaseUserAdminTests):
     # Check that we have access now
     response = c1.get('/useradmin/users')
     assert_true(get_profile(test_user).has_hue_permission('access','useradmin'))
-    assert_true(b'Hue Users' in response.content)
+    assert_true(b'Users' in response.content)
 
     # Make sure we can't modify permissions
     response = c1.get('/useradmin/permissions/edit/useradmin/access')
@@ -465,7 +465,7 @@ class TestUserAdmin(BaseUserAdminTests):
     response = c.get('/useradmin/groups')
     # No groups just yet
     assert_true(len(response.context[0]["groups"]) == 0)
-    assert_true(b"Hue Groups" in response.content)
+    assert_true(b"Groups" in response.content)
 
     # Create a group
     response = c.get('/useradmin/groups/new')
