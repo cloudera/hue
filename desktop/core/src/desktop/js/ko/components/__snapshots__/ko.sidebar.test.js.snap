@@ -37,12 +37,12 @@ exports[`ko.sidebar.js should render component 1`] = `
           <!-- ko if: window.USER_VIEW_EDIT_USER_ENABLED -->
           <li><a href=\\"javascript:void(0);\\" data-bind=\\"
               hueLink: '/useradmin/users/edit/foo',
-              attr: { 
+              attr: {
                 'title': window.IS_LDAP_SETUP ? 'View Profile' : 'Edit Profile'
               }
             \\">My Profile</a></li>
           <!-- /ko -->
-          <!-- ko if: window.USER_IS_ADMIN -->
+          <!-- ko if: window.USER_IS_ADMIN || window.USER_IS_ORG_ADMIN -->
           <li><a href=\\"javascript: void(0);\\" data-bind=\\"hueLink: '/useradmin/users/'\\">Manage Users</a></li>
           <li><a href=\\"javascript: void(0);\\" data-bind=\\"hueLink: '/about/'\\">Administration</a></li>
           <!-- /ko -->
@@ -122,7 +122,7 @@ exports[`ko.sidebar.js should render component 1`] = `
         </div>
         <ul class=\\"sidebar-nav-list\\">
           <!-- ko if: window.USER_VIEW_EDIT_USER_ENABLED --><!-- /ko -->
-          <!-- ko if: window.USER_IS_ADMIN --><!-- /ko -->
+          <!-- ko if: window.USER_IS_ADMIN || window.USER_IS_ORG_ADMIN --><!-- /ko -->
           <li><a href=\\"javascript: void(0);\\" data-bind=\\"hueLink: '/accounts/logout'\\" title=\\"Sign out\\">Sign out</a></li>
         </ul>
       </div>
