@@ -86,25 +86,27 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
 
       ${ form['email'].errors | n,unicode }
     % else:
-      <div class="text-input
-        % if backend_names == ['OAuthBackend']:
-          hide
-        % endif
-        % if form['username'].errors or (not form['username'].errors and not form['password'].errors and login_errors):
-          error
-        % endif
-      ">
-        ${ form['username'] | n,unicode }
-      </div>
+      % if 'username' in form.fields:
+        <div class="text-input
+          % if backend_names == ['OAuthBackend']:
+            hide
+          % endif
+          % if form['username'].errors or (login_errors and not form['username'].errors and not form['password'].errors):
+            error
+          % endif
+        ">
+          ${ form['username'] | n,unicode }
+        </div>
 
-      ${ form['username'].errors | n,unicode }
+        ${ form['username'].errors | n,unicode }
+      % endif
     % endif
 
     <div class="text-input
       % if 'AllowAllBackend' in backend_names or backend_names == ['OAuthBackend']:
         hide
       % endif
-      % if form['password'].errors or (('username' in form and not form['username'].errors) and not form['password'].errors and login_errors):
+      % if form['password'].errors or (login_errors and ('username' in form and not form['username'].errors) and not form['password'].errors):
         error
       % endif
     ">
@@ -139,11 +141,14 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
       % endif
     % endif
 
-    % if first_login_ever:
-      <input type="submit" class="btn btn-primary" value="${_('Create Account')}"/>
-    % else:
-      <input type="submit" class="btn btn-primary" value="${_('Sign In')}"/>
+    % if 'username' in form.fields or 'email' in form.fields:
+      % if first_login_ever:
+        <input type="submit" class="btn btn-primary" value="${ _('Create Account') }"/>
+      % else:
+        <input type="submit" class="btn btn-primary" value="${ _('Sign In') }"/>
+      % endif
     % endif
+
     <input type="hidden" name="next" value="${next}"/>
 
   </form>
