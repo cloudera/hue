@@ -329,6 +329,15 @@ if DEBUG: # For simplification, force all DEBUG when django_debug_mode is True a
 
 if desktop.conf.ENABLE_ORGANIZATIONS.get():
   AUTH_USER_MODEL = 'useradmin.OrganizationUser'
+  MIGRATION_MODULES = {
+    'beeswax': 'beeswax.org_migrations',
+    'jobsub': 'jobsub.org_migrations',
+    'oozie': 'oozie.org_migrations',
+    'pig': 'pig.org_migrations',
+    'search': 'search.org_migrations',
+    'useradmin': 'useradmin.org_migrations',
+    'desktop': 'desktop.org_migrations',
+  }
 
 # Configure allowed hosts
 ALLOWED_HOSTS = desktop.conf.ALLOWED_HOSTS.get()
