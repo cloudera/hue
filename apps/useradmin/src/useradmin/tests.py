@@ -38,7 +38,7 @@ from django.test.client import Client
 import desktop.conf
 
 from desktop import appmanager
-from desktop.auth.backend import is_admin
+from desktop.auth.backend import is_admin, create_user
 from desktop.conf import APP_BLACKLIST
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
@@ -67,7 +67,6 @@ def reset_all_users():
 
 def reset_all_groups():
   """Reset to a clean state by deleting all groups"""
-
   useradmin.conf.DEFAULT_USER_GROUP.set_for_testing(None)
   for grp in Group.objects.all():
     grp.delete()
@@ -267,10 +266,13 @@ class TestUserProfile(BaseUserAdminTests):
   @override_settings(AUTHENTICATION_BACKENDS=['desktop.auth.backend.AllowFirstUserDjangoBackend'])
   def test_get_profile(self):
     '''Ensure profiles are created after get_profile is called.'''
-    c = make_logged_in_client(username='test', password='test', is_superuser=True, recreate=True)
-    assert_equal(0, UserProfile.objects.count())
-    p = get_profile(User.objects.get(username='test'))
-    assert_equal(1, UserProfile.objects.count())
+    user = create_user(username='test', password='test', is_superuser=False)
+
+    assert_equal(0, UserProfile.objects.filter(user=user).count())
+
+    p = get_profile(user)
+
+    assert_equal(1, UserProfile.objects.filter(user=user).count())
 
 
   @override_settings(AUTHENTICATION_BACKENDS=['desktop.auth.backend.AllowFirstUserDjangoBackend'])
