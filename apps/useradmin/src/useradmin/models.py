@@ -262,14 +262,14 @@ def update_app_permissions(**kwargs):
     added = []
 
     if ENABLE_CONNECTORS.get():
-      previous_apps = list(current.keys())
+      old_apps = list(current.keys())
       ConnectorPerm = collections.namedtuple('ConnectorPerm', 'name nice_name settings')
       apps = [
         ConnectorPerm(name=connector['name'], nice_name=connector['nice_name'], settings=[])
         for connector in _get_installed_connectors()
       ]
     else:
-      previous_apps = []
+      old_apps = []
       apps = appmanager.DESKTOP_APPS
 
     for app in apps:
@@ -278,10 +278,10 @@ def update_app_permissions(**kwargs):
       actions = set([("access", permission_description)])
       actions.update(getattr(app.settings, "PERMISSION_ACTIONS", []))
 
-      if app_name in current:
-        previous_apps.remove(app_name)
-      else:
+      if app_name not in current:
         current[app_name] = {}
+      if app_name in old_apps:
+        old_apps.remove(app_name)
 
       for action, description in actions:
         c = current[app_name].get(action)
@@ -297,7 +297,8 @@ def update_app_permissions(**kwargs):
           new_dp.save()
           added.append(new_dp)
 
-    deleted, _ = HuePermission.objects.filter(app__in=previous_apps).delete()
+    # Only with v2
+    deleted, _ = HuePermission.objects.filter(app__in=old_apps).delete()
 
     # Add all permissions to default group except some.
     default_group = get_default_user_group()
