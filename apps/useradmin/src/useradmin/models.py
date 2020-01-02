@@ -107,7 +107,7 @@ class UserProfile(models.Model):
       try:
         perm = self._lookup_permission(app, action)
       except HuePermission.DoesNotExist:
-        LOG.exception("Permission object %s - %s not available. Was syncdb run after installation?" % (app, action))
+        LOG.exception("Permission object %s - %s not available. Was Django migrate command run after installation?" % (app, action))
         return self.user.is_superuser
     if self.user.is_superuser:
       return True
@@ -249,7 +249,7 @@ def update_app_permissions(**kwargs):
   We never delete permissions automatically, because apps might come and go.
 
   Note that signing up to the "migrate" signal is not necessarily the best thing we can do, since some apps might not
-  have models, but nonetheless, "syncdb" is typically run when apps are installed.
+  have models, but nonetheless, "migrate" is typically run when apps are installed.
   """
   created_tables = connection.introspection.table_names()
   if u'useradmin_huepermission' in created_tables:  # Check if Useradmin has been installed.

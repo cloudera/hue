@@ -101,14 +101,11 @@ To configure Hue to store data in MySQL:
     name=hue
     </pre>
 
-5. As the Hue user, configure Hue to load the existing data and create the
-   necessary database tables:
+5. As the Hue user, configure Hue to load the existing data and create the database tables:
 
-    <pre>
-    /usr/share/hue/build/env/bin/hue syncdb --noinput
+    /usr/share/hue/build/env/bin/hue migrate
     mysql -uhue -psecretpassword -e "DELETE FROM hue.django_content_type;"
     /usr/share/hue/build/env/bin/hue loaddata $temporary-file-containing-dumped-data.json
-    </pre>
 
 Your system is now configured and you can start the Hue server as normal.
 
