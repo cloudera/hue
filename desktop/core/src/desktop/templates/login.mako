@@ -102,18 +102,20 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
       % endif
     % endif
 
-    <div class="text-input
-      % if 'AllowAllBackend' in backend_names or backend_names == ['OAuthBackend']:
-        hide
-      % endif
-      % if form['password'].errors or (login_errors and ('username' in form and not form['username'].errors) and not form['password'].errors):
-        error
-      % endif
-    ">
-      ${ form['password'] | n,unicode }
-    </div>
+    % if 'password' in form.fields:
+      <div class="text-input
+        % if 'AllowAllBackend' in backend_names or backend_names == ['OAuthBackend']:
+          hide
+        % endif
+        % if form['password'].errors or (login_errors and ('username' in form and not form['username'].errors) and not form['password'].errors):
+          error
+        % endif
+      ">
+        ${ form['password'] | n,unicode }
+      </div>
 
-    ${ form['password'].errors | n,unicode }
+      ${ form['password'].errors | n,unicode }
+    % endif
 
     % if active_directory:
     <div
