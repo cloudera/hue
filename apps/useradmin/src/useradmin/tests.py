@@ -311,11 +311,14 @@ class TestUserAdmin(BaseUserAdminTests):
     assert_true(b'Users' in response.content)
 
     assert_true(len(GroupPermission.objects.all()) == 0)
-    c.post('/useradmin/groups/edit/test-group',
-           dict(name="test-group",
-           members=[User.objects.get(username="test").pk],
-           permissions=[HuePermission.objects.get(app='useradmin',action='access').pk],
-           save="Save"), follow=True)
+    c.post('/useradmin/groups/edit/test-group', dict(
+        name="test-group",
+        members=[User.objects.get(username="test").pk],
+        permissions=[HuePermission.objects.get(app='useradmin',action='access').pk],
+        save="Save"
+      ),
+      follow=True
+    )
     assert_true(len(GroupPermission.objects.all()) == 1)
 
     # Get ourselves set up with a user and a group with superuser group priv
@@ -344,11 +347,12 @@ class TestUserAdmin(BaseUserAdminTests):
     # Create user to try to edit
     notused = User.objects.get_or_create(username="notused", is_superuser=False)
     response = cadmin.get('/useradmin/users/edit/notused?is_embeddable=true')
-    assert_true(b'Hue Users - Edit user: notused' in response.content)
+    assert_true(b'User notused' in response.content)
 
     # Make sure we can modify permissions
     response = cadmin.get('/useradmin/permissions/edit/useradmin/access/?is_embeddable=true')
-    assert_true(b'Hue Permissions - Edit app: useradmin' in response.content)
+    assert_true(b'Permissions' in response.content)
+    assert_true(b'Edit useradmin' in response.content, response.content)
 
     # Revoke superuser privilege from groups
     c.post('/useradmin/permissions/edit/useradmin/superuser', dict(
@@ -359,7 +363,7 @@ class TestUserAdmin(BaseUserAdminTests):
       ),
       follow=True
     )
-    assert_equal(len(GroupPermission.objects.all()), 1)
+    assert_equal(GroupPermission.objects.count(), 1)
 
     # Now test that we have limited access
     c1 = make_logged_in_client(username="nonadmin", is_superuser=False)
@@ -660,7 +664,7 @@ class TestUserAdmin(BaseUserAdminTests):
       # Test basic output.
       response = c.get('/useradmin/')
       assert_true(len(response.context[0]["users"]) > 0)
-      assert_true(b"Hue Users" in response.content)
+      assert_true(b"Users" in response.content)
 
       # Test editing a superuser
       # Just check that this comes back
@@ -745,7 +749,7 @@ class TestUserAdmin(BaseUserAdminTests):
       response = c.get('/useradmin/')
       assert_true(FUNNY_NAME in (response.content if isinstance(response.content, str) else response.content.decode()), response.content)
       assert_true(len(response.context[0]["users"]) > 1)
-      assert_true(b"Hue Users" in response.content)
+      assert_true(b"Users" in response.content)
       # Validate profile is created.
       assert_true(UserProfile.objects.filter(user__username=FUNNY_NAME).exists())
 
@@ -768,11 +772,14 @@ class TestUserAdmin(BaseUserAdminTests):
       test_user.save()
 
       # Regular user should be able to modify oneself
-      response = c_reg.post('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,),
-                            dict(username = FUNNY_NAME,
-                                 first_name = "Hello",
-                                 is_active = True,
-                                 groups=[group.id for group in test_user.groups.all()]), follow=True)
+      response = c_reg.post('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,), dict(
+          username = FUNNY_NAME,
+          first_name = "Hello",
+          is_active = True,
+          groups=[group.id for group in test_user.groups.all()]
+          ),
+          follow=True
+      )
       assert_equal(response.status_code, 200)
       response = c_reg.get('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,), follow=True)
       assert_equal(response.status_code, 200)
@@ -786,20 +793,25 @@ class TestUserAdmin(BaseUserAdminTests):
       # Revert to regular "test" user, that has superuser powers.
       c_su = make_logged_in_client()
       # Inactivate FUNNY_NAME
-      c_su.post('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,),
-                            dict(username = FUNNY_NAME,
-                                 first_name = "Hello",
-                                 is_active = False))
+      c_su.post('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,), dict(
+          username = FUNNY_NAME,
+          first_name = "Hello",
+          is_active = False)
+      )
       # Now make sure FUNNY_NAME can't log back in
       response = c_reg.get('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,))
-      assert_true(response.status_code == 302 and "login" in response["location"],
-                  "Inactivated user gets redirected to login page")
+      assert_true(
+          response.status_code == 302 and "login" in response["location"],
+          "Inactivated user gets redirected to login page"
+      )
 
       # Create a new user with unicode characters
-      response = c.post('/useradmin/users/new', dict(username='christian_häusler',
-                                                     password1="test",
-                                                     password2="test",
-                                                     is_active=True))
+      response = c.post('/useradmin/users/new', dict(
+          username='christian_häusler',
+          password1="test",
+          password2="test",
+          is_active=True)
+      )
       response = c.get('/useradmin/')
       assert_true('christian_häusler' in (response.content if isinstance(response.content, str) else response.content.decode()))
       assert_true(len(response.context[0]["users"]) > 1)
@@ -922,39 +934,49 @@ class TestUserAdmin(BaseUserAdminTests):
   def test_edit_user_xss(self):
     # Hue 3 Admin
     edit_user = make_logged_in_client('admin', is_superuser=True)
-    response = edit_user.post('/useradmin/users/edit/admin', dict(username="admin",
-                                                                      is_superuser=True,
-                                                                      password1="foo",
-                                                                      password2="foo",
-                                                                      language="en-us><script>alert('Hacked')</script>"
-                                                                      ))
+    response = edit_user.post('/useradmin/users/edit/admin', dict(
+        username="admin",
+        is_superuser=True,
+        password1="foo",
+        password2="foo",
+        language="en-us><script>alert('Hacked')</script>"
+        )
+    )
     assert_true(b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; is not one of the available choices.' in response.content)
     # Hue 4 Admin
-    response = edit_user.post('/useradmin/users/edit/admin', dict(username="admin",
-                                                                      is_superuser=True,
-                                                                      language="en-us><script>alert('Hacked')</script>",
-                                                                      is_embeddable=True))
+    response = edit_user.post('/useradmin/users/edit/admin', dict(
+        username="admin",
+        is_superuser=True,
+        language="en-us><script>alert('Hacked')</script>",
+        is_embeddable=True)
+    )
     content = json.loads(response.content)
     assert_true('Select a valid choice. en-us>alert(\'Hacked\') is not one of the available choices.', content['errors'][0]['message'][0])
 
     # Hue 3, User with access to useradmin app
     edit_user = make_logged_in_client('edit_user', is_superuser=False)
     grant_access('edit_user', 'edit_user', 'useradmin')
-    response = edit_user.post('/useradmin/users/edit/edit_user', dict(username="edit_user",
-                                                                      is_superuser=False,
-                                                                      password1="foo",
-                                                                      password2="foo",
-                                                                      language="en-us><script>alert('Hacked')</script>"
-                                                                      ))
+    response = edit_user.post('/useradmin/users/edit/edit_user', dict(
+        username="edit_user",
+        is_superuser=False,
+        password1="foo",
+        password2="foo",
+        language="en-us><script>alert('Hacked')</script>"
+        )
+    )
     assert_true(b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; is not one of the available choices.' in response.content)
     # Hue 4, User with access to useradmin app
-    response = edit_user.post('/useradmin/users/edit/edit_user', dict(username="edit_user",
-                                                                      is_superuser=False,
-                                                                      language="en-us><script>alert('Hacked')</script>",
-                                                                      is_embeddable=True))
+    response = edit_user.post('/useradmin/users/edit/edit_user', dict(
+        username="edit_user",
+        is_superuser=False,
+        language="en-us><script>alert('Hacked')</script>",
+        is_embeddable=True)
+    )
     content = json.loads(response.content)
-    assert_true('Select a valid choice. en-us>alert(\'Hacked\') is not one of the available choices.',
-                content['errors'][0]['message'][0])
+    assert_true(
+        'Select a valid choice. en-us>alert(\'Hacked\') is not one of the available choices.',
+        content['errors'][0]['message'][0]
+    )
 
 
 class TestUserAdminWithHadoop(BaseUserAdminTests):

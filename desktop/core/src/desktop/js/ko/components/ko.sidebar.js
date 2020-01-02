@@ -66,7 +66,7 @@ const TEMPLATE = `
           <!-- ko if: window.USER_VIEW_EDIT_USER_ENABLED -->
           <li><a href="javascript:void(0);" data-bind="
               hueLink: '/useradmin/users/edit/${window.LOGGED_USERNAME}',
-              attr: { 
+              attr: {
                 'title': window.IS_LDAP_SETUP ? '${I18n('View Profile')}' : '${I18n('Edit Profile')}'
               }
             ">${I18n('My Profile')}</a></li>

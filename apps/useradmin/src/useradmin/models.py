@@ -357,7 +357,8 @@ def install_sample_user():
         is_active=False,
         is_superuser=False,
         id=SAMPLE_USER_ID,
-        pk=SAMPLE_USER_ID)
+        pk=SAMPLE_USER_ID
+      )
 
       if created:
         LOG.info('Installed a user called "%s"' % SAMPLE_USER_INSTALL)

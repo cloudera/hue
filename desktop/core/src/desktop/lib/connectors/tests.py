@@ -15,8 +15,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import sys
 
+import sys
+import unittest
+
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_false
 
 from desktop.auth.backend import rewrite_user
@@ -49,7 +52,7 @@ class TestConnectors(object):
     assert_equal(200, response.status_code)
 
 
-class TestConnectorListing():
+class TestConnectorListing(unittest.TestCase):
 
   def setUp(self):
     self.client = make_logged_in_client(
@@ -72,6 +75,9 @@ class TestConnectorListing():
 
   @classmethod
   def setUpClass(cls):
+    if not ENABLE_CONNECTORS.get():  # Skip for now
+      raise SkipTest
+
     cls._class_resets = [
       ENABLE_CONNECTORS.set_for_testing(True),
     ]

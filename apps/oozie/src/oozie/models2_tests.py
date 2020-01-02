@@ -52,8 +52,7 @@ class TestEditor(OozieMockBase):
     super(TestEditor, self).setUp()
     self.wf = Workflow()
 
-    self.client_not_me = make_logged_in_client(username="not_perm_user", groupname="default", recreate=True,
-                                               is_superuser=False)
+    self.client_not_me = make_logged_in_client(username="not_perm_user", groupname="default", recreate=True, is_superuser=False)
     self.user_not_me = User.objects.get(username="not_perm_user")
 
 
