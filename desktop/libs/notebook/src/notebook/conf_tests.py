@@ -17,9 +17,11 @@
 
 import sys
 
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_false
 
 from desktop.auth.backend import rewrite_user
+from desktop.conf import ENABLE_CONNECTORS
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User, update_app_permissions, get_default_user_group
@@ -44,6 +46,23 @@ class TestCheckConfig():
     )
     self.user = User.objects.get(username='test_check_config')
     self.user = rewrite_user(self.user)
+
+  @classmethod
+  def setUpClass(cls):
+    if not ENABLE_CONNECTORS.get():  # Skip for now
+      raise SkipTest
+
+    cls._class_resets = [
+      ENABLE_CONNECTORS.set_for_testing(True),
+    ]
+
+  @classmethod
+  def tearDownClass(cls):
+    for reset in cls._class_resets:
+      reset()
+
+    update_app_permissions()
+
 
   @patch('desktop.lib.connectors.models.CONNECTOR_INSTANCES', None)
   @patch('notebook.conf.has_connectors', return_value=True)
