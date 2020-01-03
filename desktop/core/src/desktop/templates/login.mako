@@ -149,6 +149,9 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
       % else:
         <input type="submit" class="btn btn-primary" value="${ _('Sign In') }"/>
       % endif
+      % if ENABLE_ORGANIZATIONS.get():
+        <input type="submit" class="btn btn-primary" value="${ _('Create Account') }"/>
+      % endif
     % endif
 
     <input type="hidden" name="next" value="${next}"/>
