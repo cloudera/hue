@@ -101,6 +101,8 @@ saved queries in the database.)
 In addition to the web server, some Hue applications run
 daemon processes "on the side". Some examples are the `Celery Task Server`, `Celery Beat`.
 
+![Reference Architecture](/images/hue_architecture.png)
+
 ### Interacting with external services
 
 ![Interacting with Hadoop](/images/interactingwithhadoop.png)
