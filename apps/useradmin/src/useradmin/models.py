@@ -361,7 +361,7 @@ def install_sample_user(django_user=None):
     else:
       user_attributes = lookup.copy()
       if ENABLE_ORGANIZATIONS.get():
-        user_attributes['organization'] = get_organization(django_user)
+        user_attributes['organization'] = get_organization(user=django_user)
       user_attributes.update({
         'password': '!',
         'is_active': False,

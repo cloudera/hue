@@ -22,24 +22,29 @@ from django.contrib.auth.models import models, AbstractUser, BaseUserManager
 from django.utils.translation import ugettext_lazy as _t
 
 
-
 LOG = logging.getLogger(__name__)
 
 
 '''
-Organizations handle contained sets of setups (user, group, connectors).
+Organizations handle contained sets of setups (user, group, connectors...).
 '''
 
 def default_organization():
-  default_organization, created = Organization.objects.get_or_create(name='default')
+  default_organization, created = Organization.objects.get_or_create(name='default', domain='default')
   return default_organization
 
-def get_organization(user):
-  # TODO: depends on the logged-in user and its organization
-  return default_organization()
 
-def uuid_default():
-  return str(uuid.uuid4())
+def get_organization(email, is_multi_user=False):
+  domain = email.split('@')[1]
+
+  if domain:
+    organization, created = Organization.objects.get_or_create(name=domain, domain=domain, is_multi_user=is_multi_user)
+    LOG.info("Materializing organization %s in the database, is_multi_user=%s" % (domain, is_multi_user))
+  else:
+    LOG.warn('No organization domain found for email %s' % email)  # For Backends without emails or when organization enabled by default
+    organization = default_organization()
+
+  return organization
 
 
 def uuid_default():

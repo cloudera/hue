@@ -95,7 +95,7 @@ def _version_from_properties(f):
 
 def get_sample_user_install(user):
   if ENABLE_ORGANIZATIONS.get():
-   return SAMPLE_USER_INSTALL + '@' + get_organization(user).name + '.com' # TODO: proper default domain
+   return SAMPLE_USER_INSTALL + '@' + get_organization(email=user.email).domain
   else:
     return SAMPLE_USER_INSTALL
 

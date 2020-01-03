@@ -53,11 +53,13 @@ from desktop.conf import AUTH, LDAP, OIDC, ENABLE_ORGANIZATIONS
 from desktop.settings import LOAD_BALANCER_COOKIE
 
 from useradmin import ldap_access
-from useradmin.models import get_profile, get_default_user_group, UserProfile, User, Organization
+from useradmin.models import get_profile, get_default_user_group, UserProfile, User, Organization, get_organization
 
 
 LOG = logging.getLogger(__name__)
 
+
+# TODO: slowly move those utils to the useradmin module
 
 def load_augmentation_class():
   """
@@ -98,8 +100,8 @@ def rewrite_user(user):
     for attr in ('get_groups', 'get_home_directory', 'has_hue_permission', 'get_permissions'):
       setattr(user, attr, getattr(augment, attr))
 
-    profile_data = get_profile(user).data
-    setattr(user, 'auth_backend', profile_data.get('auth_backend'))
+    setattr(user, 'profile', get_profile(user))
+    setattr(user, 'auth_backend', user.profile.data.get('auth_backend'))
   return user
 
 
@@ -166,7 +168,13 @@ def create_user(username, password, is_superuser=True):
     user.set_unusable_password()
   else:
     user.set_password(password)
-  user.is_superuser = is_superuser
+
+  if ENABLE_ORGANIZATIONS.get():
+    user.is_admin = is_superuser
+    user.is_superuser = User.objects.exists()
+  else:
+    user.is_superuser = is_superuser
+
   user.save()
 
   return user
@@ -190,11 +198,6 @@ def force_username_case(username):
   elif AUTH.FORCE_USERNAME_UPPERCASE.get():
     username = username.upper()
   return username
-
-def get_organization(email):
-  domain = email.split('@')[1]
-  organization, created = Organization.objects.get_or_create(name=domain)
-  return organization
 
 
 class DesktopBackendBase(object):
