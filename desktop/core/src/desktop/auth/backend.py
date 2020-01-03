@@ -312,7 +312,6 @@ class RemoteJwtBackend(DesktopBackendBase):
   Auth is done with with the JWT framework API on another server.
   '''
   def authenticate(self, username=None, password=None):
-    from desktop.models import set_user_preferences
     from desktop.conf import API_URL
 
     credentials = {
@@ -324,14 +323,18 @@ class RemoteJwtBackend(DesktopBackendBase):
     if response.status_code != 200:
       raise PermissionDenied()
 
-    user = find_or_create_user(username, password)
-    user.is_superuser = False
-    user.save()
+    user = find_or_create_user(username, password, is_superuser=False)
 
     ensure_has_a_group(user)
+    user = rewrite_user(user)
 
     token = response.json()['token']
-    set_user_preferences(user, 'token', token)
+
+    if ENABLE_ORGANIZATIONS.get():
+      user.token = token
+    else:
+      user.profile.update_data({'token': token})
+      user.profile.save()
 
     return user
 
@@ -347,7 +350,6 @@ class GoogleSignInBackend(DesktopBackendBase):
   '''
   def authenticate(self, id_token):
     import json
-    from desktop.models import set_user_preferences
     from desktop.conf import API_URL
 
     credentials = {
@@ -362,14 +364,16 @@ class GoogleSignInBackend(DesktopBackendBase):
       raise PermissionDenied()
 
     user_profile = response.json()
-    user = find_or_create_user(username=user_profile['email'])
-    user.is_superuser = False
-    user.save()
+    user = find_or_create_user(username=user_profile['email'], is_superuser=False)
 
     ensure_has_a_group(user)
     user = rewrite_user(user)
 
-    set_user_preferences(user, 'token', user_profile['token'])
+    if ENABLE_ORGANIZATIONS.get():
+      user.token = user_profile['token']
+    else:
+      user.profile.update_data({'token': user_profile['token']})
+      user.profile.save()
 
     return user
 
