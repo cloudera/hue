@@ -83,7 +83,18 @@ CONNECTOR_TYPES = [
     'settings': [{'name': 'url', 'value': 'mysql://username:password@mysq-host:3306/hue'}],
     'category': 'editor',
     'description': '',
-    'properties': {'is_sql': True}
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': True,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': False,
+      'has_optimizer_values': False,
+      'has_auto_limit': False,
+    }
   },
   {'nice_name': "Presto", 'dialect': 'presto', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
   {'nice_name': "Athena", 'dialect': 'athena', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},

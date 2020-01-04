@@ -63,7 +63,8 @@ def get_ordered_interpreters(user=None):
         'category': connector['category'],
         'is_sql': connector.get('is_sql', False),
         'interface': connector['interface'],
-        'options': {setting['name']: setting['value'] for setting in connector['settings']}
+        'options': {setting['name']: setting['value'] for setting in connector['settings']},
+        'dialect_properties': connector['dialect_properties'],
       } for connector in _get_installed_connectors(categories=['editor', 'catalogs'], user=user)
     ]
   else:
@@ -101,6 +102,7 @@ def get_ordered_interpreters(user=None):
       "interface": i['interface'],
       "options": i['options'],
       'dialect': i.get('dialect', i['name']).lower(),
+      'dialect_properties': i.get('dialect_properties'),
       'category': i.get('category', 'editor'),
       "is_sql": i.get('is_sql') or i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy", "ksql", "flink"],
       "is_catalog": i['interface'] in ["hms",],
