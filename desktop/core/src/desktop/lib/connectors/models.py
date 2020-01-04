@@ -100,9 +100,9 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
           'settings': config_connectors[i].SETTINGS.get(),
           'id': CONNECTOR_IDS,
           'category': connector_type['category'],
-          'description': connector_type['description']
+          'description': connector_type['description'],
+          'dialect_properties': connector_type.get('properties', {})
         }
-        connector.update(connector_type['properties'])
         CONNECTOR_INSTANCES.append(connector)
         CONNECTOR_IDS += 1
 

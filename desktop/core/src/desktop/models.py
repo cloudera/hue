@@ -1737,6 +1737,7 @@ class ClusterConfig(object):
           'page': '/editor/?type=%(type)s' % interpreter,
           'is_sql': interpreter['is_sql'],
           'dialect': interpreter['dialect'],
+          'dialect_properties': interpreter.get('dialect_properties'),
         })
 
     if SHOW_NOTEBOOKS.get():
