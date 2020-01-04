@@ -114,7 +114,7 @@ Alternative:
        options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver", "user": "root", "password": "root"}'
        ## options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver"}'
 
-### Apache Presto
+### Presto
 
 The dialect should be added to the Python system or Hue Python virtual environment:
 
