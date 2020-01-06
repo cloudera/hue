@@ -22,6 +22,7 @@ import AssistInnerPanel from 'ko/components/assist/assistInnerPanel';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'utils/hueConfig';
 
 const TEMPLATE = `
   <script type="text/html" id="assist-panel-inner-header">
@@ -91,7 +92,8 @@ class AssistPanel {
     self.lastOpenPanelType = ko.observable();
     apiHelper.withTotalStorage('assist', 'last.open.panel', self.lastOpenPanelType);
 
-    huePubSub.subscribeOnce('cluster.config.set.config', clusterConfig => {
+    // TODO: Support dynamic config changes
+    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, clusterConfig => {
       if (clusterConfig && clusterConfig['app_config']) {
         const panels = [];
         const appConfig = clusterConfig['app_config'];
@@ -290,13 +292,6 @@ class AssistPanel {
         lastFoundPanel.length === 1 ? lastFoundPanel[0] : self.availablePanels()[0]
       );
     });
-
-    window.setTimeout(() => {
-      // Main initialization trigger in hue.mako, this is for Hue 3
-      if (self.availablePanels().length === 0) {
-        huePubSub.publish('cluster.config.get.config');
-      }
-    }, 0);
   }
 }
 

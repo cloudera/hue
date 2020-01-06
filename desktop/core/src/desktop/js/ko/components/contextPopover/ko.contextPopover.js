@@ -32,6 +32,7 @@ import PartitionContext from './partitionContext';
 import ResizeHelper from './resizeHelper';
 import StorageContext from './storageContext';
 import componentUtils from '../componentUtils';
+import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 
 const SUPPORT_TEMPLATES = `
   <script type="text/html" id="context-popover-footer">
@@ -976,7 +977,7 @@ class SqlContextContentsGlobalSearch {
     let sourceType = params.data.sourceType && params.data.sourceType.toLowerCase();
 
     if (!sourceType || sourceType === 'hive') {
-      huePubSub.publish('cluster.config.get.config', clusterConfig => {
+      huePubSub.publish(GET_KNOWN_CONFIG_EVENT, clusterConfig => {
         if (clusterConfig) {
           const defaultEditor = clusterConfig['default_sql_interpreter'];
           if (!sourceType || (sourceType === 'hive' && defaultEditor === 'impala')) {

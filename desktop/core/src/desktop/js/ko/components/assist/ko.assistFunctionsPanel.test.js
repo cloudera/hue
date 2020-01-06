@@ -16,26 +16,34 @@
 
 import huePubSub from 'utils/huePubSub';
 import AssistFunctionsPanel from './ko.assistFunctionsPanel';
+import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 
 describe('ko.assistFunctionsPanel.js', () => {
   it('should handle cluster config updates', () => {
-    let clusterConfigGetCalled = false;
-    const configSub = huePubSub.subscribe('cluster.config.get.config', () => {
-      clusterConfigGetCalled = true;
-      huePubSub.publish('cluster.config.set.config', {
-        app_config: {
-          editor: {
-            interpreters: [{ type: 'pig' }, { type: 'pig' }, { type: 'impala' }, { type: 'banana' }]
+    const spy = jest.spyOn(huePubSub, 'publish').mockImplementation((topic, cb) => {
+      if (topic === GET_KNOWN_CONFIG_EVENT && cb) {
+        cb({
+          app_config: {
+            editor: {
+              interpreters: [
+                { type: 'pig' },
+                { type: 'pig' },
+                { type: 'impala' },
+                { type: 'banana' }
+              ]
+            }
           }
-        }
-      });
+        });
+      }
     });
     const subject = new AssistFunctionsPanel();
 
-    expect(clusterConfigGetCalled).toBeTruthy();
+    expect(spy).toHaveBeenCalled();
     expect(subject.availableTypes()).toEqual(['impala', 'pig']);
 
-    huePubSub.publish('cluster.config.set.config', {
+    spy.mockRestore();
+
+    huePubSub.publish(CONFIG_REFRESHED_EVENT, {
       app_config: {
         editor: {
           interpreters: [{ type: 'pig' }]
@@ -46,7 +54,7 @@ describe('ko.assistFunctionsPanel.js', () => {
     expect(subject.availableTypes()).toEqual(['pig']);
     expect(subject.activeType()).toEqual('pig');
 
-    huePubSub.publish('cluster.config.set.config', {
+    huePubSub.publish(CONFIG_REFRESHED_EVENT, {
       app_config: {
         editor: {
           interpreters: [{ type: 'banana' }]
@@ -57,7 +65,6 @@ describe('ko.assistFunctionsPanel.js', () => {
     expect(subject.availableTypes()).toEqual([]);
     expect(subject.activeType()).toBeFalsy();
 
-    configSub.remove();
     subject.dispose();
   });
 });
