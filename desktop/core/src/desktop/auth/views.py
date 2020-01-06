@@ -36,6 +36,7 @@ from django.contrib.auth import login, get_backends, authenticate
 from django.contrib.sessions.models import Session
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import csrf_exempt
 
 from hadoop.fs.exceptions import WebHdfsException
 from notebook.connectors.base import get_api
@@ -100,6 +101,7 @@ def dt_login_old(request, from_modal=False):
 
 
 @login_notrequired
+@csrf_exempt
 @watch_login
 def dt_login(request, from_modal=False):
   if request.method == 'GET':
