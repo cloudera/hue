@@ -96,6 +96,26 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
     }
   },
+  {
+    'nice_name': "PostgreSQL",
+    'dialect': 'postgresql',
+    'interface': 'sqlalchemy',
+    'settings': [{'name': 'url', 'value': 'postgresql://username:password@host:5432/hue'}],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '"',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': True,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': False,
+      'has_optimizer_values': False,
+      'has_auto_limit': False,
+    }
+  },
   {'nice_name': "Presto", 'dialect': 'presto', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
   {'nice_name': "Athena", 'dialect': 'athena', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
   {'nice_name': "Redshift", 'dialect': 'redshift', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
