@@ -21,6 +21,7 @@ import apiHelper from 'api/apiHelper';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'utils/hueConfig';
 
 export const NAME = 'hue-sidebar';
 
@@ -239,7 +240,7 @@ class Sidebar {
       });
     };
 
-    huePubSub.subscribe('cluster.config.set.config', clusterConfig => {
+    const configUpdated = clusterConfig => {
       const items = [];
       if (clusterConfig && clusterConfig['app_config']) {
         const appsItems = [];
@@ -369,7 +370,10 @@ class Sidebar {
 
       this.items(items);
       updateActive();
-    });
+    };
+
+    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, configUpdated);
+    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
 
     let throttle = -1;
     huePubSub.subscribe('set.current.app.name', appName => {

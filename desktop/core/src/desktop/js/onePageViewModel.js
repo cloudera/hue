@@ -22,6 +22,7 @@ import page from 'page';
 import hueUtils from 'utils/hueUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 
 class OnePageViewModel {
   constructor() {
@@ -810,7 +811,7 @@ class OnePageViewModel {
       );
     });
 
-    huePubSub.subscribe('cluster.config.set.config', clusterConfig => {
+    const configUpdated = clusterConfig => {
       page('/', () => {
         page(clusterConfig['main_button_action'].page);
       });
@@ -819,7 +820,10 @@ class OnePageViewModel {
         self.loadApp('404');
       });
       page();
-    });
+    };
+
+    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, configUpdated);
+    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
 
     huePubSub.subscribe('open.link', href => {
       if (href) {

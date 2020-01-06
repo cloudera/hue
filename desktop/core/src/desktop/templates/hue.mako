@@ -367,9 +367,6 @@ ${ hueAceAutocompleter.hueAceAutocompleter() }
 
 ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 
-## clusterConfig makes an Ajax call so it needs to be after commonHeaderFooterComponents
-<script src="${ static('desktop/js/clusterConfig.js') }"></script>
-
 % if request is not None:
 ${ smart_unicode(login_modal(request).content) | n,unicode }
 % endif
