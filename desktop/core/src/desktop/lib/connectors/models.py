@@ -96,7 +96,7 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
           'nice_name': config_connectors[i].NICE_NAME.get() or i,
           'name': i,
           'dialect': config_connectors[i].DIALECT.get(),
-          'interface': config_connectors[i].INTERFACE.get(),
+          'interface': config_connectors[i].INTERFACE.get() or connector_type.get('interface'),
           'settings': config_connectors[i].SETTINGS.get(),
           'id': CONNECTOR_IDS,
           'category': connector_type['category'],

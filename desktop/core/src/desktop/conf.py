@@ -1941,7 +1941,7 @@ CONNECTORS = UnspecifiedConfigSection(
       ),
       INTERFACE=Config(
           "interface",
-          help=_("The class of connector to use to connect to the service."),
+          help=_("The class of connector to use to connect to the service (optional)."),
           default=None,
           type=str,
       ),
