@@ -42,7 +42,7 @@ CONNECTOR_TYPES = [
       'is_sql': True,
       'sql_identifier_quote': '`',
       'sql_identifier_comment_single': '--',
-      'has_catalog': True,
+      'has_catalog': False,
       'has_database': True,
       'has_table': True,
       'has_live_queries': False,
@@ -55,32 +55,153 @@ CONNECTOR_TYPES = [
     'nice_name': "Impala",
     'dialect': 'impala',
     'interface': 'hiveserver2',
-    'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},],
+    'settings': [
+      {'name': 'server_host', 'value': ''},
+      {'name': 'server_port', 'value': ''},
+    ],
     'category': 'editor',
     'description': '',
     'properties': {
-      'is_sql': True
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
     }
   },
   {
     'nice_name': "Hive Tez",
-    'dialect': 'hive-tez',
+    'dialect': 'hive',
     'interface': 'hiveserver2',
-    'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},],
+    'settings': [
+      {'name': 'server_host', 'value': ''},
+      {'name': 'server_port', 'value': ''},
+    ],
     'category': 'editor',
     'description': '',
     'properties': {'is_sql': True}
   },
-  {'nice_name': "Hive LLAP", 'dialect': 'hive-llap', 'interface': 'hiveserver2', 'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
-  {'nice_name': "Druid", 'dialect': 'sql-druid', 'interface': 'sqlalchemy', 'settings': [{'name': 'url', 'value': 'druid://druid-host.com:8082/druid/v2/sql/'}], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
-  {'nice_name': "Kafka SQL", 'dialect': 'ksql', 'interface': 'ksql', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
-  {'nice_name': "Flink SQL", 'dialect': 'flink', 'interface': 'flink', 'settings': [{'name': 'api_url', 'value': 'http://flink:10000'}], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
-  {'nice_name': "SparkSQL", 'dialect': 'spark-sql', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
+  {
+    'nice_name': "Hive LLAP",
+    'dialect': 'hive',
+    'interface': 'hiveserver2',
+    'settings': [
+      {'name': 'server_host', 'value': ''},
+      {'name': 'server_port', 'value': ''},
+    ],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "Druid",
+    'dialect': 'druid',
+    'interface': 'sqlalchemy',
+    'settings': [
+      {'name': 'url', 'value': 'druid://druid-host.com:8082/druid/v2/sql/'}
+    ],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "Kafka SQL",
+    'dialect': 'ksql',
+    'interface': 'ksql',
+    'settings': [
+      {'name': 'url', 'value': 'http://localhost:8088'}
+    ],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': False,
+      'has_table': True,
+      'has_live_queries': True,
+      'has_optimizer_risks': False,
+      'has_optimizer_values': False,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "Flink SQL",
+    'dialect': 'flink',
+    'interface': 'flink',
+    'settings': [
+      {'name': 'api_url', 'value': 'http://flink:10000'}
+    ],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': False,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "SparkSQL",
+    'dialect': 'sparksql',
+    'interface': 'sqlalchemy',
+    'settings': [],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+    }
+  },
   {
     'nice_name': "MySQL",
     'dialect': 'mysql',
     'interface': 'sqlalchemy',
-    'settings': [{'name': 'url', 'value': 'mysql://username:password@mysq-host:3306/hue'}],
+    'settings': [
+      {'name': 'url', 'value': 'mysql://username:password@mysq-host:3306/hue'}
+    ],
     'category': 'editor',
     'description': '',
     'properties': {
@@ -100,7 +221,9 @@ CONNECTOR_TYPES = [
     'nice_name': "PostgreSQL",
     'dialect': 'postgresql',
     'interface': 'sqlalchemy',
-    'settings': [{'name': 'url', 'value': 'postgresql://username:password@host:5432/hue'}],
+    'settings': [
+      {'name': 'url', 'value': 'postgresql://username:password@host:5432/hue'}
+    ],
     'category': 'editor',
     'description': '',
     'properties': {
@@ -116,12 +239,33 @@ CONNECTOR_TYPES = [
       'has_auto_limit': False,
     }
   },
-  {'nice_name': "Presto", 'dialect': 'presto', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
+  {
+    'nice_name': "Presto",
+    'dialect': 'presto',
+    'interface': 'sqlalchemy',
+    'settings': [],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': True,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': False,
+      'has_optimizer_values': False,
+      'has_auto_limit': False,
+    }
+  },
   {
     'nice_name': "Elastic Search",
     'dialect': 'elasticsearch',
     'interface': 'sqlalchemy',
-    'settings': [{'name': 'url', 'value': 'elasticsearch+http://localhost:9200/'}],
+    'settings': [
+      {'name': 'url', 'value': 'elasticsearch+http://localhost:9200/'}
+    ],
     'category': 'editor',
     'description': '',
     'properties': {
@@ -139,6 +283,7 @@ CONNECTOR_TYPES = [
   },
   {'nice_name': "Athena", 'dialect': 'athena', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
   {'nice_name': "Redshift", 'dialect': 'redshift', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
+  {'nice_name': "Snowflake", 'dialect': 'snowflake', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
   {'nice_name': "Big Query", 'dialect': 'bigquery', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
   {'nice_name': "Oracle", 'dialect': 'oracle', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
   {'nice_name': "SQL Database", 'dialect': 'sql-alchemy', 'interface': 'sqlalchemy', 'settings': [], 'category': 'editor', 'description': '', 'properties': {'is_sql': True}},
