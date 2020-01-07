@@ -155,9 +155,6 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
       % else:
         <input type="submit" class="btn btn-primary" value="${ _('Sign In') }"/>
       % endif
-      % if ENABLE_ORGANIZATIONS.get():
-        <input type="submit" class="btn btn-primary" value="${ _('Create Account') }"/>
-      % endif
     % endif
 
     % if 'GoogleSignInBackend' in backend_names:
@@ -167,6 +164,10 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
 
       <div class="g-signin2" data-onsuccess="onSignIn"></div>
       <input type="hidden" name="id_token"/>
+
+      <div class="center">
+        ${ _('No account yet?') } <a href="https://datagen.iquery.io/create_account">[${ _('Sign  Up') }]</a>
+      </div>
     % endif
 
     <input type="hidden" name="next" value="${next}"/>
