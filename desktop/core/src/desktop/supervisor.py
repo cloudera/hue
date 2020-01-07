@@ -70,6 +70,7 @@ else:
       super(TimeoutPIDLockFile, self).acquire(timeout=self.timeout)
       return self
 
+
 PROC_NAME = 'supervisor'
 LOG = logging.getLogger()
 
@@ -93,8 +94,7 @@ ENTRY_POINT_GROUP = "desktop.supervisor.specs"
 LOCKFILE_TIMEOUT = 2
 
 # The hue program
-HUE_BIN = os.path.join(desktop.lib.paths.get_run_root(),
-                       'build', 'env', 'bin', 'hue')
+HUE_BIN = os.path.join(desktop.lib.paths.get_run_root(), 'build', 'env', 'bin', 'hue')
 
 ######
 
@@ -127,7 +127,7 @@ class DjangoCommandSupervisee(SuperviseeSpec):
 
   @property
   def cmdv(self):
-    return [ HUE_BIN, self.django_command ]
+    return [HUE_BIN, self.django_command]
 
 class Supervisor(threading.Thread):
   """A thread responsible for keeping the supervised subprocess running"""
@@ -149,9 +149,7 @@ class Supervisor(threading.Thread):
       while True:
         self.state = Supervisor.RUNNING
         LOG.info("Starting process %s" % proc_str)
-        pipe = subprocess.Popen(self.cmdv, close_fds=True,
-                                stdin=open_file("/dev/null"),
-                                **self.popen_kwargs)
+        pipe = subprocess.Popen(self.cmdv, close_fds=True, stdin=open_file("/dev/null"), **self.popen_kwargs)
         LOG.info("Started proceses (pid %s) %s" % (pipe.pid, proc_str))
         CHILD_PIDS.append(pipe.pid)
         exitcode = pipe.wait()
@@ -175,7 +173,8 @@ class Supervisor(threading.Thread):
           ago = et - earliest_restart
           LOG.error(
             "Process %s has restarted more than %d times in the last %d seconds" % (
-              proc_str, MAX_RESTARTS_IN_WINDOW, int(ago)))
+              proc_str, MAX_RESTARTS_IN_WINDOW, int(ago))
+          )
           self.state = Supervisor.ERROR
           return
 
@@ -223,27 +222,21 @@ def sig_handler(signum, frame):
 
 def parse_args():
   parser = optparse.OptionParser()
-  parser.add_option("-d", "--daemon", dest="daemonize",
-                    action="store_true", default=False)
-  parser.add_option("-p", "--pid-file", dest="pid_file",
-                    metavar="PID_FILE", default="supervisor.pid")
-  parser.add_option("-l", "--log-dir", dest="log_dir",
-                   metavar="DIR", default="logs")
-  parser.add_option('-e', '--exclude', dest='supervisee_exclusions',
-                    metavar='EXCLUSIONS', default=[], action='append',
-                    help='Command NOT to run from supervisor. May be included more than once.')
-  parser.add_option('-s', '--show', dest='show_supervisees',
-                    action='store_true', default=False)
-  parser.add_option('-u', '--user', dest='user',
-                    action='store', default=SETUID_USER)
-  parser.add_option('-g', '--group', dest='group',
-                    action='store', default=SETGID_GROUP)
+  parser.add_option("-d", "--daemon", dest="daemonize", action="store_true", default=False)
+  parser.add_option("-p", "--pid-file", dest="pid_file", metavar="PID_FILE", default="supervisor.pid")
+  parser.add_option("-l", "--log-dir", dest="log_dir", metavar="DIR", default="logs")
+  parser.add_option(
+      '-e', '--exclude', dest='supervisee_exclusions', metavar='EXCLUSIONS', default=[], action='append',
+      help='Command NOT to run from supervisor. May be included more than once.'
+  )
+  parser.add_option('-s', '--show', dest='show_supervisees', action='store_true', default=False)
+  parser.add_option('-u', '--user', dest='user', action='store', default=SETUID_USER)
+  parser.add_option('-g', '--group', dest='group', action='store', default=SETGID_GROUP)
   (options, args) = parser.parse_args()
   return options
 
 def get_pid_cmdline(pid):
-  return subprocess.Popen(["ps", "-p", str(pid), "-o", "cmd", "h"],
-                          stdout=subprocess.PIPE, close_fds=True).communicate()[0]
+  return subprocess.Popen(["ps", "-p", str(pid), "-o", "cmd", "h"], stdout=subprocess.PIPE, close_fds=True).communicate()[0]
 
 def get_supervisees():
   """Pull the supervisor specifications out of the entry point."""
@@ -257,8 +250,7 @@ def setup_user_info():
     return
 
   global g_user_uid, g_user_gid
-  g_user_uid, g_user_gid = \
-      desktop.lib.daemon_utils.get_uid_gid(SETUID_USER, SETGID_GROUP)
+  g_user_uid, g_user_gid = desktop.lib.daemon_utils.get_uid_gid(SETUID_USER, SETGID_GROUP)
 
 
 def drop_privileges():
@@ -332,8 +324,7 @@ def main():
       # pid is not actually running
       pidfile_context.break_lock()
     else:
-      LOG.error("Pid file %s indicates that Hue is already running (pid %d)" %
-                (pid_file, existing_pid))
+      LOG.error("Pid file %s indicates that Hue is already running (pid %d)" % (pid_file, existing_pid))
       sys.exit(1)
   elif pidfile_context.is_locked():
     # If there's no pidfile but there is a lock, it's a strange situation,
@@ -348,11 +339,11 @@ def main():
         pidfile=pidfile_context,
         stdout=outfile,
         stderr=outfile,
-        )
+    )
 
     context.signal_map = {
-        signal.SIGTERM: sig_handler,
-        }
+      signal.SIGTERM: sig_handler,
+    }
 
     context.open()
   os.umask(0o22)
@@ -381,16 +372,14 @@ def main():
         # standard fds from the supervisor
         log_stdout = None
         log_stderr = None
-      sup = Supervisor(supervisee.cmdv,
-                       stdout=log_stdout, stderr=log_stderr,
-                       preexec_fn=preexec_fn)
+      sup = Supervisor(supervisee.cmdv, stdout=log_stdout, stderr=log_stderr, preexec_fn=preexec_fn)
       sup.start()
       sups.append(sup)
 
     wait_loop(sups, options)
   except BaseException as ex:
     LOG.exception("Exception in supervisor main loop")
-    shutdown(sups)      # shutdown() exits the process
+    shutdown(sups)  # shutdown() exits the process
 
   return 0
 
@@ -404,7 +393,7 @@ def wait_loop(sups, options):
         if sup.state == Supervisor.FINISHED:
           sups.remove(sup)
         else:
-          shutdown(sups)        # shutdown() exits the process
+          shutdown(sups)  # shutdown() exits the process
 
 
 if __name__ == "__main__":
