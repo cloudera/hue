@@ -46,7 +46,9 @@ class KSqlApi(Api):
   def __init__(self, user, interpreter=None):
     Api.__init__(self, user, interpreter=interpreter)
 
-    self.db = KSqlClientApi(user=user)
+    self.options = interpreter['options']
+
+    self.db = KSqlClientApi(user=user, url=self.options['url'])
 
 
   @query_error_handler
