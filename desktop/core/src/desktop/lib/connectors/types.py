@@ -84,7 +84,18 @@ CONNECTOR_TYPES = [
     ],
     'category': 'editor',
     'description': '',
-    'properties': {'is_sql': True}
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+    }
   },
   {
     'nice_name': "Hive LLAP",
@@ -278,6 +289,29 @@ CONNECTOR_TYPES = [
       'has_live_queries': False,
       'has_optimizer_risks': False,
       'has_optimizer_values': False,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "Calcite",
+    'dialect': 'calcite',
+    'interface': 'sqlalchemy',
+    'settings': [
+      {'name': 'server_host', 'value': ''},
+      {'name': 'server_port', 'value': ''},
+    ],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
       'has_auto_limit': False,
     }
   },
