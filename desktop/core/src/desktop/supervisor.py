@@ -59,7 +59,7 @@ else:
   from daemon.pidlockfile import PIDLockFile
   open_file = file
 
-  class TimeOutPIDLockFile(PIDLockFile):
+  class TimeoutPIDLockFile(PIDLockFile):
     """A PIDLockFile subclass that passes through a timeout on acquisition."""
 
     def __init__(self, lockfile, timeout, **kwargs):
@@ -67,7 +67,7 @@ else:
       self.timeout = timeout
 
     def __enter__(self):
-      super(TimeOutPIDLockFile, self).acquire(timeout=self.timeout)
+      super(TimeoutPIDLockFile, self).acquire(timeout=self.timeout)
       return self
 
 PROC_NAME = 'supervisor'
@@ -323,10 +323,7 @@ def main():
   setup_user_info()
 
   pid_file = os.path.abspath(os.path.join(root, options.pid_file))
-  if sys.version_info[0] > 2:
-    pidfile_context = TimeoutPIDLockFile(pid_file, LOCKFILE_TIMEOUT)
-  else:
-    pidfile_context = TimeOutPIDLockFile(pid_file, LOCKFILE_TIMEOUT)
+  pidfile_context = TimeoutPIDLockFile(pid_file, LOCKFILE_TIMEOUT)
 
   existing_pid = pidfile_context.read_pid()
   if existing_pid:
