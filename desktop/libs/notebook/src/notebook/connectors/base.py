@@ -398,7 +398,7 @@ def get_api(request, snippet):
     return HBaseApi(request.user)
   elif interface == 'ksql':
     from notebook.connectors.ksql import KSqlApi
-    return KSqlApi(request.user)
+    return KSqlApi(request.user, interpreter=interpreter)
   elif interface == 'flink':
     from notebook.connectors.flink import FlinkSqlApi
     return FlinkSqlApi(request.user, interpreter=interpreter)

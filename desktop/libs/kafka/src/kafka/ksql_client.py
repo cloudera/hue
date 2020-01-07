@@ -27,7 +27,6 @@ from desktop.lib.i18n import smart_unicode
 from desktop.lib.rest.http_client import RestException
 from desktop.conf import has_channels
 
-from kafka.conf import KAFKA
 
 if has_channels():
   from notebook.consumer import _send_to_channel
@@ -58,15 +57,15 @@ class KSqlApi(object):
   - https://github.com/bryanyang0528/ksql-python/issues/57
   """
 
-  def __init__(self, user=None, security_enabled=False, ssl_cert_ca_verify=False):
+  def __init__(self, user=None, url=None, security_enabled=False, ssl_cert_ca_verify=False):
     try:
       from ksql import KSQLAPI
     except ImportError:
       raise KSqlApiException('Module missing: pip install ksql')
 
-    self._api_url = KAFKA.KSQL_API_URL.get().strip('/') if KAFKA.KSQL_API_URL.get() else ''
-
+    self._api_url = url.strip('/')
     self.user = user
+
     self.client = client = KSQLAPI(self._api_url)
 
 
