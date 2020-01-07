@@ -856,7 +856,7 @@ DROP TABLE IF EXISTS `%(table)s`;
       total_records = int(total_records_match.group('total_records'))
       query_plan = self._get_impala_profile_plan(query_id, fragment)
       if query_plan:
-        LOG.info('Query plan for Impala query %s: %s' % (query_id, query_plan))
+        LOG.debug('Query plan for Impala query %s: %s' % (query_id, query_plan))
       else:
         LOG.info('Query plan for Impala query %s not found.' % query_id)
 
