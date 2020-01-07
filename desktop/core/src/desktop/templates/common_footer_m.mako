@@ -59,8 +59,7 @@ from desktop.lib.i18n import smart_unicode
     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
     })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-40351920-1', 'auto');
-    ga('set', 'referrer', 'http://gethue.com'); // we force the referrer to prevent leaking sensitive information
+    ga('create', 'UA-155765954-1', 'auto');
 
     // We collect only 2 path levels: not hostname, no IDs, no anchors...
     var _pathName = location.pathname;
@@ -73,7 +72,6 @@ from desktop.lib.i18n import smart_unicode
 
     function trackOnGA(path) {
       if (typeof ga != "undefined" && ga != null) {
-        ga('set', 'referrer', 'http://gethue.com'); // we force the referrer to prevent leaking sensitive information
         ga('send', 'pageview', {
           'page': '/remote/${ version }/' + path
         });
