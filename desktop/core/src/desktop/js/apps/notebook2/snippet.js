@@ -35,7 +35,10 @@ import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
-import { REDRAW_FIXED_HEADERS_EVENT } from 'apps/notebook2/events';
+import {
+  ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT,
+  REDRAW_FIXED_HEADERS_EVENT
+} from 'apps/notebook2/events';
 import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
 import {
   ACTIVE_STATEMENT_CHANGED_EVENT,
@@ -43,6 +46,7 @@ import {
 } from 'ko/bindings/ace/aceLocationHandler';
 import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from 'apps/notebook2/components/ko.executableActions';
 import { UPDATE_HISTORY_EVENT } from 'apps/notebook2/components/ko.queryHistory';
+import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 
 // TODO: Remove for ENABLE_NOTEBOOK_2. Temporary here for debug
 window.SqlExecutable = SqlExecutable;
@@ -50,7 +54,7 @@ window.Executor = Executor;
 
 export const CURRENT_QUERY_TAB_SWITCHED_EVENT = 'current.query.tab.switched';
 
-const TYPE = {
+export const DIALECT = {
   hive: 'hive',
   impala: 'impala',
   jar: 'jar',
@@ -107,68 +111,68 @@ const COMPATIBILITY_SOURCE_PLATFORMS = {
 };
 
 const COMPATIBILITY_TARGET_PLATFORMS = {
-  hive: { name: 'Hive', value: TYPE.hive },
-  impala: { name: 'Impala', value: TYPE.impala }
+  hive: { name: 'Hive', value: DIALECT.hive },
+  impala: { name: 'Impala', value: DIALECT.impala }
 };
 
 const getDefaultSnippetProperties = snippetType => {
   const properties = {};
 
-  if (snippetType === TYPE.jar || snippetType === TYPE.py) {
+  if (snippetType === DIALECT.jar || snippetType === DIALECT.py) {
     properties['driverCores'] = '';
     properties['executorCores'] = '';
     properties['numExecutors'] = '';
     properties['queue'] = '';
     properties['archives'] = [];
     properties['files'] = [];
-  } else if (snippetType === TYPE.java) {
+  } else if (snippetType === DIALECT.java) {
     properties['archives'] = [];
     properties['files'] = [];
     properties['capture_output'] = false;
-  } else if (snippetType === TYPE.shell) {
+  } else if (snippetType === DIALECT.shell) {
     properties['archives'] = [];
     properties['files'] = [];
-  } else if (snippetType === TYPE.mapreduce) {
+  } else if (snippetType === DIALECT.mapreduce) {
     properties['app_jar'] = '';
     properties['hadoopProperties'] = [];
     properties['jars'] = [];
     properties['files'] = [];
     properties['archives'] = [];
-  } else if (snippetType === TYPE.spark2) {
+  } else if (snippetType === DIALECT.spark2) {
     properties['app_name'] = '';
     properties['class'] = '';
     properties['jars'] = [];
     properties['spark_opts'] = [];
     properties['spark_arguments'] = [];
     properties['files'] = [];
-  } else if (snippetType === TYPE.sqoop1) {
+  } else if (snippetType === DIALECT.sqoop1) {
     properties['files'] = [];
-  } else if (snippetType === TYPE.hive) {
+  } else if (snippetType === DIALECT.hive) {
     properties['settings'] = [];
     properties['files'] = [];
     properties['functions'] = [];
     properties['arguments'] = [];
-  } else if (snippetType === TYPE.impala) {
+  } else if (snippetType === DIALECT.impala) {
     properties['settings'] = [];
-  } else if (snippetType === TYPE.pig) {
+  } else if (snippetType === DIALECT.pig) {
     properties['parameters'] = [];
     properties['hadoopProperties'] = [];
     properties['resources'] = [];
-  } else if (snippetType === TYPE.distcp) {
+  } else if (snippetType === DIALECT.distcp) {
     properties['source_path'] = '';
     properties['destination_path'] = '';
-  } else if (snippetType === TYPE.shell) {
+  } else if (snippetType === DIALECT.shell) {
     properties['command_path'] = '';
     properties['arguments'] = [];
     properties['env_var'] = [];
     properties['capture_output'] = true;
   }
 
-  if (snippetType === TYPE.jar || snippetType === TYPE.java) {
+  if (snippetType === DIALECT.jar || snippetType === DIALECT.java) {
     properties['app_jar'] = '';
     properties['class'] = '';
     properties['arguments'] = [];
-  } else if (snippetType === TYPE.py) {
+  } else if (snippetType === DIALECT.py) {
     properties['py_file'] = '';
     properties['arguments'] = [];
   }
@@ -185,23 +189,46 @@ export default class Snippet {
 
     this.id = ko.observable(snippetRaw.id || hueUtils.UUID());
     this.name = ko.observable(snippetRaw.name || '');
-    this.type = ko.observable();
-    this.type.subscribe(newValue => {
-      // TODO: Add session disposal for ENABLE_NOTEBOOK_2
-      // Pre-create a session to speed up execution
-      sessionManager.getSession({ type: newValue }).then(() => {
+
+    this.connector = ko.observable();
+
+    this.dialect = ko.pureComputed(() => this.connector() && this.connector().dialect);
+
+    this.isSqlDialect = ko.pureComputed(() => this.connector() && this.connector().is_sql);
+
+    this.connector.subscribe(newValue => {
+      sessionManager.getSession({ type: newValue.type }).then(() => {
         this.status(STATUS.ready);
       });
     });
-    this.type(snippetRaw.type || TYPE.hive);
+
+    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, config => {
+      if (config && config.app_config && config.app_config.editor) {
+        const connectors = config.app_config.editor.interpreters;
+        if (snippetRaw.connector) {
+          this.connector(
+            connectors.find(connector => connector.type === snippetRaw.connector.type) ||
+              connectors.find(connector => connector.dialect === snippetRaw.connector.dialect)
+          );
+          if (!this.connector()) {
+            // Could happen if a connector is removed after a doc has been saved.
+            this.connector(snippetRaw.connector);
+          }
+        } else if (snippetRaw.type) {
+          // In the past "type" was used to denote dialect.
+          this.connector(connectors.find(connector => connector.dialect === snippetRaw.type));
+        }
+      }
+    });
+
     this.isBatchable = ko.pureComputed(
       () =>
-        this.type() === this.hive ||
-        this.type() === this.impala ||
+        this.dialect() === DIALECT.hive ||
+        this.dialect() === DIALECT.impala ||
         this.parentVm.availableLanguages.some(
           language =>
-            language.type === this.type() &&
-            (language.interface == 'oozie' || language.interface == 'sqlalchemy')
+            language.type === this.dialect() && // TODO: language.type = dialect ?
+            (language.interface === 'oozie' || language.interface === 'sqlalchemy')
         )
     );
 
@@ -231,8 +258,8 @@ export default class Snippet {
 
     this.inFocus.subscribe(newValue => {
       if (newValue) {
-        huePubSub.publish('active.snippet.type.changed', {
-          type: this.type(),
+        huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
+          type: this.dialect(),
           isSqlDialect: this.isSqlDialect()
         });
       }
@@ -242,15 +269,11 @@ export default class Snippet {
 
     this.explanation = ko.observable();
 
-    this.getAceMode = () => this.parentVm.getSnippetViewSettings(this.type()).aceMode;
+    this.getAceMode = () => this.parentVm.getSnippetViewSettings(this.dialect()).aceMode;
 
     this.dbSelectionVisible = ko.observable(false);
 
     this.showExecutionAnalysis = ko.observable(false);
-
-    this.isSqlDialect = ko.pureComputed(
-      () => this.parentVm.getSnippetViewSettings(this.type()).sqlDialect
-    );
 
     // namespace and compute might be initialized as empty object {}
     this.namespace = ko.observable(
@@ -283,8 +306,8 @@ export default class Snippet {
     huePubSub.subscribeOnce(
       'assist.source.set',
       source => {
-        if (source !== this.type()) {
-          huePubSub.publish('assist.set.source', this.type());
+        if (source !== this.dialect()) {
+          huePubSub.publish('assist.set.source', this.dialect());
         }
       },
       this.parentVm.huePubSubId
@@ -296,7 +319,7 @@ export default class Snippet {
 
     if (!this.database()) {
       huePubSub.publish('assist.get.database.callback', {
-        source: this.type(),
+        source: this.dialect(),
         callback: databaseDef => {
           this.handleAssistSelection(databaseDef);
         }
@@ -395,16 +418,16 @@ export default class Snippet {
     this.statusForButtons = ko.observable(STATUS_FOR_BUTTONS.executed);
 
     this.properties = ko.observable(
-      komapping.fromJS(snippetRaw.properties || getDefaultSnippetProperties(this.type()))
+      komapping.fromJS(snippetRaw.properties || getDefaultSnippetProperties(this.dialect()))
     );
     this.hasProperties = ko.pureComputed(
       () => Object.keys(komapping.toJS(this.properties())).length > 0
     );
 
-    this.viewSettings = ko.pureComputed(() => this.parentVm.getSnippetViewSettings(this.type()));
+    this.viewSettings = ko.pureComputed(() => this.parentVm.getSnippetViewSettings(this.dialect()));
 
     const previousProperties = {};
-    this.type.subscribe(
+    this.dialect.subscribe(
       oldValue => {
         previousProperties[oldValue] = this.properties();
       },
@@ -412,7 +435,7 @@ export default class Snippet {
       'beforeChange'
     );
 
-    this.type.subscribe(newValue => {
+    this.dialect.subscribe(newValue => {
       if (typeof previousProperties[newValue] !== 'undefined') {
         this.properties(previousProperties[newValue]);
       } else {
@@ -443,13 +466,13 @@ export default class Snippet {
     this.variables.subscribe(() => {
       $(document).trigger('updateResultHeaders', this);
     });
-    this.hasCurlyBracketParameters = ko.pureComputed(() => this.type() !== TYPE.pig);
+    this.hasCurlyBracketParameters = ko.pureComputed(() => this.dialect() !== DIALECT.pig);
 
     this.variableNames = ko.pureComputed(() => {
       let match,
         matches = {},
         matchList;
-      if (this.type() === TYPE.pig) {
+      if (this.dialect() === DIALECT.pig) {
         matches = this.getPigParameters();
       } else {
         const re = /(?:^|\W)\${(\w*)=?([^{}]*)}/g;
@@ -738,7 +761,7 @@ export default class Snippet {
 
     this.isLoading = ko.pureComputed(() => this.status() === STATUS.loading);
 
-    this.resultsKlass = ko.pureComputed(() => 'results ' + this.type());
+    this.resultsKlass = ko.pureComputed(() => 'results ' + this.dialect());
 
     this.errorsKlass = ko.pureComputed(() => this.resultsKlass() + ' alert alert-error');
 
@@ -769,11 +792,13 @@ export default class Snippet {
       this.compatibilitySourcePlatforms.push(COMPATIBILITY_SOURCE_PLATFORMS[key]);
     });
 
-    this.compatibilitySourcePlatform = ko.observable(COMPATIBILITY_SOURCE_PLATFORMS[this.type()]);
+    this.compatibilitySourcePlatform = ko.observable(
+      COMPATIBILITY_SOURCE_PLATFORMS[this.dialect()]
+    );
     this.compatibilitySourcePlatform.subscribe(newValue => {
-      if (newValue && newValue.value !== this.type()) {
+      if (newValue && newValue.value !== this.dialect()) {
         this.hasSuggestion(null);
-        this.compatibilityTargetPlatform(COMPATIBILITY_TARGET_PLATFORMS[this.type()]);
+        this.compatibilityTargetPlatform(COMPATIBILITY_TARGET_PLATFORMS[this.dialect()]);
         this.queryCompatibility();
       }
     });
@@ -782,7 +807,9 @@ export default class Snippet {
     Object.keys(COMPATIBILITY_TARGET_PLATFORMS).forEach(key => {
       this.compatibilityTargetPlatforms.push(COMPATIBILITY_TARGET_PLATFORMS[key]);
     });
-    this.compatibilityTargetPlatform = ko.observable(COMPATIBILITY_TARGET_PLATFORMS[this.type()]);
+    this.compatibilityTargetPlatform = ko.observable(
+      COMPATIBILITY_TARGET_PLATFORMS[this.dialect()]
+    );
 
     this.showOptimizer = ko.observable(
       apiHelper.getFromTotalStorage('editor', 'show.optimizer', false)
@@ -903,7 +930,7 @@ export default class Snippet {
         }
       };
 
-      if (this.type() === TYPE.hive || this.type() === TYPE.impala) {
+      if (this.dialect() === DIALECT.hive || this.dialect() === DIALECT.impala) {
         if (this.statement_raw()) {
           window.setTimeout(() => {
             this.checkComplexity();
@@ -920,14 +947,15 @@ export default class Snippet {
       () =>
         (this.statementType() === 'text' &&
           ((this.isSqlDialect() && this.statement() !== '') ||
-            ([TYPE.jar, TYPE.java, TYPE.spark2, TYPE.distcp].indexOf(this.type()) === -1 &&
+            ([DIALECT.jar, DIALECT.java, DIALECT.spark2, DIALECT.distcp].indexOf(this.dialect()) ===
+              -1 &&
               this.statement() !== '') ||
-            ([TYPE.jar, TYPE.java].indexOf(this.type()) !== -1 &&
+            ([DIALECT.jar, DIALECT.java].indexOf(this.dialect()) !== -1 &&
               (this.properties().app_jar() !== '' && this.properties().class() !== '')) ||
-            (TYPE.spark2 === this.type() && this.properties().jars().length > 0) ||
-            (TYPE.shell === this.type() && this.properties().command_path().length > 0) ||
-            (TYPE.mapreduce === this.type() && this.properties().app_jar().length > 0) ||
-            (TYPE.distcp === this.type() &&
+            (DIALECT.spark2 === this.dialect() && this.properties().jars().length > 0) ||
+            (DIALECT.shell === this.dialect() && this.properties().command_path().length > 0) ||
+            (DIALECT.mapreduce === this.dialect() && this.properties().app_jar().length > 0) ||
+            (DIALECT.distcp === this.dialect() &&
               this.properties().source_path().length > 0 &&
               this.properties().destination_path().length > 0))) ||
         (this.statementType() === 'file' && this.statementPath().length > 0) ||
@@ -963,10 +991,11 @@ export default class Snippet {
 
     this.activeExecutable = ko.observable();
 
+    // TODO: User connector instead of compute, namespace, sourceType, isOptimizerEnabled, isSqlEngine
     this.executor = new Executor({
       compute: this.compute,
       database: this.database,
-      sourceType: this.type,
+      sourceType: this.dialect,
       namespace: this.namespace,
       isOptimizerEnabled: this.parentVm.isOptimizerEnabled(),
       snippet: this,
@@ -1011,6 +1040,19 @@ export default class Snippet {
     huePubSub.publish(REFRESH_STATEMENT_LOCATIONS_EVENT, this);
   }
 
+  changeDialect(dialect) {
+    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, config => {
+      if (config && config.app_config && config.app_config.editor) {
+        const foundConnector = config.app_config.editor.interpreters.find(
+          connector => connector.dialect === dialect
+        );
+        if (foundConnector) {
+          this.connector(foundConnector);
+        }
+      }
+    });
+  }
+
   updateFromExecutable(executable) {
     if (executable) {
       if (
@@ -1049,9 +1091,11 @@ export default class Snippet {
 
   checkCompatibility() {
     this.hasSuggestion(null);
-    this.compatibilitySourcePlatform(COMPATIBILITY_SOURCE_PLATFORMS[this.type()]);
+    this.compatibilitySourcePlatform(COMPATIBILITY_SOURCE_PLATFORMS[this.dialect()]);
     this.compatibilityTargetPlatform(
-      COMPATIBILITY_TARGET_PLATFORMS[this.type() === TYPE.hive ? TYPE.impala : TYPE.hive]
+      COMPATIBILITY_TARGET_PLATFORMS[
+        this.dialect() === DIALECT.hive ? DIALECT.impala : DIALECT.hive
+      ]
     );
     this.queryCompatibility();
   }
@@ -1063,59 +1107,13 @@ export default class Snippet {
     });
   }
 
-  // async executeNext() {
-  //   hueAnalytics.log('notebook', 'execute/' + this.type());
-  //
-  //   const now = new Date().getTime();
-  //   if (now - this.lastExecuted() < 1000) {
-  //     return; // Prevent fast clicks
-  //   }
-  //   this.lastExecuted(now);
-  //
-  //   if (this.type() === TYPE.impala) {
-  //     this.showExecutionAnalysis(false);
-  //     huePubSub.publish('editor.clear.execution.analysis');
-  //   }
-  //
-  //   // Editor based execution
-  //   if (this.ace()) {
-  //     const selectionRange = this.ace().getSelectionRange();
-  //
-  //     huePubSub.publish('ace.set.autoexpand', { autoExpand: false, snippet: this });
-  //     this.lastAceSelectionRowOffset(Math.min(selectionRange.start.row, selectionRange.end.row));
-  //   }
-  //
-  //   const $snip = $('#snippet_' + this.id());
-  //   $snip.find('.progress-snippet').animate(
-  //     {
-  //       height: '3px'
-  //     },
-  //     100
-  //   );
-  //
-  //   $('.jHueNotify').remove();
-  //   this.parentNotebook.forceHistoryInitialHeight(true);
-  //   this.errors([]);
-  //   huePubSub.publish('editor.clear.highlighted.errors', this.ace());
-  //   this.jobs([]);
-  //
-  //   this.parentNotebook.historyCurrentPage(1);
-  //
-  //   this.startLongOperationTimeout();
-  //
-  //   try {
-  //     await this.executor.executeNext();
-  //   } catch (error) {}
-  //   this.stopLongOperationTimeout();
-  // }
-
   execute() {
     // From ctrl + enter
     huePubSub.publish(EXECUTE_ACTIVE_EXECUTABLE_EVENT, this.activeExecutable());
   }
 
   fetchExecutionAnalysis() {
-    if (this.type() === TYPE.impala) {
+    if (this.dialect() === DIALECT.impala) {
       // TODO: Use real query ID
       huePubSub.publish('editor.update.execution.analysis', {
         analysisPossible: true,
@@ -1210,7 +1208,7 @@ export default class Snippet {
   }
 
   getPlaceHolder() {
-    return this.parentVm.getSnippetViewSettings(this.type()).placeHolder;
+    return this.parentVm.getSnippetViewSettings(this.dialect()).placeHolder;
   }
 
   async getSimilarQueries() {
@@ -1220,7 +1218,7 @@ export default class Snippet {
       .statementSimilarity({
         notebookJson: await this.parentNotebook.toContextJson(),
         snippetJson: this.toContextJson(),
-        sourcePlatform: this.type()
+        sourcePlatform: this.dialect()
       })
       .then(data => {
         if (data.status === 0) {
@@ -1259,7 +1257,7 @@ export default class Snippet {
       // Auth required
       this.status(STATUS.expired);
       $(document).trigger('showAuthModal', {
-        type: this.type(),
+        type: this.dialect(),
         callback: this.execute,
         message: data.message
       });
@@ -1305,7 +1303,7 @@ export default class Snippet {
   handleAssistSelection(databaseDef) {
     if (this.ignoreNextAssistDatabaseUpdate) {
       this.ignoreNextAssistDatabaseUpdate = false;
-    } else if (databaseDef.sourceType === this.type()) {
+    } else if (databaseDef.sourceType === this.dialect()) {
       if (this.namespace() !== databaseDef.namespace) {
         this.namespace(databaseDef.namespace);
       }
@@ -1345,7 +1343,7 @@ export default class Snippet {
     apiHelper.cancelActiveRequest(this.lastCompatibilityRequest);
 
     hueAnalytics.log('notebook', 'compatibility');
-    this.compatibilityCheckRunning(targetPlatform !== this.type());
+    this.compatibilityCheckRunning(targetPlatform !== this.dialect());
     this.hasSuggestion(null);
     const positionStatement = this.positionStatement();
 
@@ -1432,7 +1430,8 @@ export default class Snippet {
   toContextJson() {
     return JSON.stringify({
       id: this.id(),
-      type: this.type(),
+      type: this.dialect(),
+      connector: this.connector(),
       status: this.status(),
       statementType: this.statementType(),
       statement: this.statement(),
@@ -1455,6 +1454,7 @@ export default class Snippet {
       associatedDocumentUuid: this.associatedDocumentUuid(),
       executor: this.executor.toJs(),
       compute: this.compute(),
+      connector: this.connector(),
       currentQueryTab: this.currentQueryTab(),
       database: this.database(),
       id: this.id(),
@@ -1471,7 +1471,7 @@ export default class Snippet {
       statementPath: this.statementPath(),
       statementType: this.statementType(),
       status: this.status(),
-      type: this.type(),
+      type: this.dialect(), // TODO: Drop once connectors are stable
       variables: this.variables().map(variable => ({
         meta: variable.meta && {
           options: variable.meta.options && variable.meta.options(), // TODO: Map?
@@ -1493,7 +1493,7 @@ export default class Snippet {
   uploadQuery(query_id) {
     $.post('/metadata/api/optimizer/upload/query', {
       query_id: query_id,
-      sourcePlatform: this.type()
+      sourcePlatform: this.dialect()
     });
   }
 
@@ -1502,15 +1502,15 @@ export default class Snippet {
 
     $.post('/metadata/api/optimizer/upload/history', {
       n: typeof n != 'undefined' ? n : null,
-      sourcePlatform: this.type()
+      sourcePlatform: this.dialect()
     }).then(data => {
       if (data.status === 0) {
         $(document).trigger(
           'info',
-          data.upload_history[this.type()].count +
+          data.upload_history[this.dialect()].count +
             ' queries uploaded successfully. Processing them...'
         );
-        this.watchUploadStatus(data.upload_history[this.type()].status.workloadId);
+        this.watchUploadStatus(data.upload_history[this.dialect()].status.workloadId);
       } else {
         $(document).trigger('error', data.message);
       }
@@ -1529,7 +1529,7 @@ export default class Snippet {
         db_tables: JSON.stringify(
           options.activeTables.map(table => table.databaseName + '.' + table.tableName)
         ),
-        sourcePlatform: JSON.stringify(this.type()),
+        sourcePlatform: JSON.stringify(this.dialect()),
         with_ddl: JSON.stringify(true),
         with_table_stats: JSON.stringify(true),
         with_columns_stats: JSON.stringify(true)

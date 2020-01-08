@@ -502,7 +502,7 @@
           <li data-bind="click: function() { currentQueryTab('queryResults'); }, css: {'active': currentQueryTab() == 'queryResults'}">
             <a class="inactive-action" style="display:inline-block" href="#queryResults" data-toggle="tab">${_('Results')}
 ##               <!-- ko if: result.rows() != null  -->
-##               (<span data-bind="text: result.rows().toLocaleString() + (type() == 'impala' && result.rows() == 1024 ? '+' : '')" title="${ _('Number of rows') }"></span>)
+##               (<span data-bind="text: result.rows().toLocaleString() + (dialect() == 'impala' && result.rows() == 1024 ? '+' : '')" title="${ _('Number of rows') }"></span>)
 ##               <!-- /ko -->
             </a>
           </li>
@@ -520,7 +520,7 @@
           </li>
           <!-- /ko -->
 
-          <!-- ko if: HAS_WORKLOAD_ANALYTICS && type() === 'impala' -->
+          <!-- ko if: HAS_WORKLOAD_ANALYTICS && dialect() === 'impala' -->
           <li data-bind="visible: showExecutionAnalysis, click: function(){ currentQueryTab('executionAnalysis'); }, css: {'active': currentQueryTab() == 'executionAnalysis'}"><a class="inactive-action" href="#executionAnalysis" data-toggle="tab" data-bind="click: function(){ $('a[href=\'#executionAnalysis\']').tab('show'); }, event: {'shown': fetchExecutionAnalysis }"><span>${_('Execution Analysis')} </span><span></span></a></li>
           <!-- /ko -->
         </ul>
@@ -532,7 +532,7 @@
               params: {
                 currentNotebook: parentNotebook,
                 openFunction: parentVm.openNotebook.bind(parentVm),
-                type: type
+                dialect: dialect
               }
             } --><!-- /ko -->
           </div>
@@ -543,7 +543,7 @@
               params: {
                 currentNotebook: parentNotebook,
                 openFunction: parentVm.openNotebook.bind(parentVm),
-                type: type,
+                dialect: dialect,
                 currentTab: currentQueryTab
               }
             } --><!-- /ko -->
@@ -570,7 +570,7 @@
           % endif
 
           <div class="tab-pane" id="queryResults" data-bind="css: {'active': currentQueryTab() == 'queryResults'}">
-            <!-- ko if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) === -1 -->
+            <!-- ko if: ['text', 'jar', 'py', 'markdown'].indexOf(dialect()) === -1 -->
               <!-- ko component: { name: 'snippet-results', params: {
                 activeExecutable: activeExecutable,
                 editorMode: parentVm.editorMode,
@@ -588,7 +588,7 @@
           </div>
           <!-- /ko -->
 
-          <!-- ko if: HAS_WORKLOAD_ANALYTICS && type() === 'impala' -->
+          <!-- ko if: HAS_WORKLOAD_ANALYTICS && dialect() === 'impala' -->
           <div class="tab-pane" id="executionAnalysis" data-bind="css: {'active': currentQueryTab() == 'executionAnalysis'}" style="padding: 10px;">
             <!-- ko component: { name: 'hue-execution-analysis' } --><!-- /ko -->
           </div>
@@ -644,7 +644,7 @@
     <div class="hover-actions inline pull-right" style="font-size: 15px;">
       <!-- ko template: { name: 'query-redacted${ suffix }' } --><!-- /ko -->
       <!-- ko template: { name: 'longer-operation${ suffix }' } --><!-- /ko -->
-##       <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
+##       <span class="execution-timer" data-bind="visible: dialect() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
 
       <!-- ko template: { name: 'snippet-header-database-selection' } --><!-- /ko -->
 
@@ -659,7 +659,7 @@
     <div class="hover-actions inline pull-right" style="font-size: 15px; position: relative;" data-bind="style: { 'marginRight': $root.isPresentationMode() || $root.isResultFullScreenMode() ? '40px' : '0' }">
       <!-- ko template: { name: 'query-redacted${ suffix }' } --><!-- /ko -->
       <!-- ko template: { name: 'longer-operation${ suffix }' } --><!-- /ko -->
-##       <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
+##       <span class="execution-timer" data-bind="visible: dialect() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
 
       <!-- ko template: { name: 'snippet-header-database-selection' } --><!-- /ko -->
 
@@ -668,11 +668,11 @@
   </script>
 
   <script type="text/html" id="snippet-header-database-selection">
-    <!-- ko if: isSqlDialect() || type() == 'spark2' -->
+    <!-- ko if: isSqlDialect() || dialect() === 'spark2' -->
     <!-- ko component: {
       name: 'hue-context-selector',
       params: {
-        sourceType: type,
+        sourceType: dialect,
         compute: compute,
         namespace: namespace,
         availableDatabases: availableDatabases,
@@ -686,7 +686,7 @@
   <script type="text/html" id="snippet${ suffix }">
     <div data-bind="visibleOnHover: { override: inFocus() || settingsVisible() || dbSelectionVisible() || $root.editorMode() || saveResultsModalVisible(), selector: '.hover-actions' }">
       <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: $root.editorMode() || inFocus() || saveResultsModalVisible(), selector: '.snippet-actions' }">
-        <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode(), 'editor-mode': $root.editorMode(), 'active-editor': inFocus, 'snippet-text' : type() == 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
+        <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode(), 'editor-mode': $root.editorMode(), 'active-editor': inFocus, 'snippet-text' : dialect() === 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
           <div style="position: relative;">
             <div class="snippet-row" style="position: relative;">
               <div class="snippet-body" data-bind="clickForAceFocus: ace, visible: ! $root.isResultFullScreenMode()">
@@ -696,20 +696,20 @@
                   <!-- ko template: { if: $root.editorMode(), name: 'editor-snippet-header${ suffix }' } --><!-- /ko -->
                   <!-- ko template: { if: ! $root.editorMode(), name: 'notebook-snippet-header${ suffix }' } --><!-- /ko -->
                 </h2>
-                <!-- ko template: { if: ['text', 'jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body${ suffix }' } --><!-- /ko -->
-                <!-- ko template: { if: type() == 'text', name: 'text-snippet-body${ suffix }' } --><!-- /ko -->
-                <!-- ko template: { if: type() == 'markdown', name: 'markdown-snippet-body${ suffix }' } --><!-- /ko -->
-                <!-- ko template: { if: ['java', 'distcp', 'shell', 'mapreduce', 'jar', 'py', 'spark2'].indexOf(type()) != -1, name: 'executable-snippet-body${ suffix }' } --><!-- /ko -->
+                <!-- ko template: { if: ['text', 'jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'].indexOf(dialect()) == -1, name: 'code-editor-snippet-body${ suffix }' } --><!-- /ko -->
+                <!-- ko template: { if: dialect() == 'text', name: 'text-snippet-body${ suffix }' } --><!-- /ko -->
+                <!-- ko template: { if: dialect() == 'markdown', name: 'markdown-snippet-body${ suffix }' } --><!-- /ko -->
+                <!-- ko template: { if: ['java', 'distcp', 'shell', 'mapreduce', 'jar', 'py', 'spark2'].indexOf(dialect()) != -1, name: 'executable-snippet-body${ suffix }' } --><!-- /ko -->
               </div>
               <div style="position: absolute; top:25px; width: 100%" data-bind="style: { 'z-index': 400 - $index() }">
                 <!-- ko template: 'snippet-settings${ suffix }' --><!-- /ko -->
               </div>
             </div>
-            <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status${ suffix }' } --><!-- /ko -->
-            <!-- ko template: { if: $root.editorMode() && ! $root.isResultFullScreenMode() && ['jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce', 'py'].indexOf(type()) == -1, name: 'snippet-code-resizer${ suffix }' } --><!-- /ko -->
+            <!-- ko template: { if: ['text', 'markdown'].indexOf(dialect()) == -1, name: 'snippet-execution-status${ suffix }' } --><!-- /ko -->
+            <!-- ko template: { if: $root.editorMode() && ! $root.isResultFullScreenMode() && ['jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce', 'py'].indexOf(dialect()) == -1, name: 'snippet-code-resizer${ suffix }' } --><!-- /ko -->
             <div class="snippet-footer-actions">
               <!-- ko template: { if: ! $root.editorMode() && ! $root.isPresentationMode() && ! $root.isResultFullScreenMode(), name: 'notebook-snippet-type-controls${ suffix }' } --><!-- /ko -->
-              <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1 && ! $root.isResultFullScreenMode(), name: 'snippet-execution-controls${ suffix }' } --><!-- /ko -->
+              <!-- ko template: { if: ['text', 'markdown'].indexOf(dialect()) == -1 && ! $root.isResultFullScreenMode(), name: 'snippet-execution-controls${ suffix }' } --><!-- /ko -->
             </div>
             <!-- ko if: !$root.isResultFullScreenMode() -->
             <!-- ko component: { name: 'executable-logs', params: {
@@ -723,7 +723,7 @@
             <!-- ko if: $root.editorMode() -->
             <!-- ko template: 'query-tabs${ suffix }' --><!-- /ko -->
             <!-- /ko -->
-            <!-- ko if: !$root.editorMode() && ['text', 'jar', 'java', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'].indexOf(type()) === -1 -->
+            <!-- ko if: !$root.editorMode() && ['text', 'jar', 'java', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'].indexOf(dialect()) === -1 -->
               <!-- ko component: { name: 'snippet-results', params: {
                 activeExecutable: activeExecutable,
                 editorMode: parentVm.editorMode,
@@ -780,12 +780,12 @@
   </script>
 
   <script type="text/html" id="code-editor-snippet-body${ suffix }">
-    <!-- ko if: HAS_OPTIMIZER && (type() == 'impala' || type() == 'hive') && ! $root.isPresentationMode() && ! $root.isResultFullScreenMode() -->
+    <!-- ko if: HAS_OPTIMIZER && (dialect() == 'impala' || dialect() == 'hive') && ! $root.isPresentationMode() && ! $root.isResultFullScreenMode() -->
     <div class="optimizer-container" data-bind="css: { 'active': showOptimizer }">
       <!-- ko if: hasSuggestion() -->
       <!-- ko with: suggestion() -->
       <!-- ko if: parseError -->
-      <!-- ko if: $parent.compatibilityTargetPlatform().value === $parent.type() && $parent.compatibilitySourcePlatform().value === $parent.type() -->
+      <!-- ko if: $parent.compatibilityTargetPlatform().value === $parent.dialect() && $parent.compatibilitySourcePlatform().value === $parent.dialect() -->
       <div class="optimizer-icon error" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
         <i class="fa fa-exclamation"></i>
       </div>
@@ -794,7 +794,7 @@
       <!-- /ko -->
       <!-- /ko -->
       ## Oracle, MySQL compatibility... as they return a parseError and not encounteredString.
-          <!-- ko if: $parent.compatibilityTargetPlatform().value !== $parent.type() || $parent.type() !== $parent.compatibilitySourcePlatform().value -->
+          <!-- ko if: $parent.compatibilityTargetPlatform().value !== $parent.dialect() || $parent.dialect() !== $parent.compatibilitySourcePlatform().value -->
       <div class="optimizer-icon warning" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
         <i class="fa fa-exclamation"></i>
       </div>
@@ -803,7 +803,7 @@
       <!-- /ko -->
       <!-- /ko -->
       <!-- /ko -->
-      <!-- ko if: !parseError() && ($parent.compatibilityTargetPlatform().value !== $parent.type() || $parent.compatibilitySourcePlatform().value !== $parent.type()) -->
+      <!-- ko if: !parseError() && ($parent.compatibilityTargetPlatform().value !== $parent.dialect() || $parent.compatibilitySourcePlatform().value !== $parent.dialect()) -->
       <!-- ko if: queryError.encounteredString().length == 0 -->
       <div class="optimizer-icon success" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
         <i class="fa fa-check"></i>
@@ -811,11 +811,11 @@
       <!-- ko if: $parent.showOptimizer -->
       <span class="optimizer-explanation alert-success alert-neutral">
               ${ _('The ') } <div data-bind="component: { name: 'hue-drop-down', params: { value: $parent.compatibilitySourcePlatform, entries: $parent.compatibilitySourcePlatforms, labelAttribute: 'name' } }" style="display: inline-block"></div>
-        <!-- ko if: $parent.compatibilitySourcePlatform().value === $parent.type() -->
+        <!-- ko if: $parent.compatibilitySourcePlatform().value === $parent.dialect() -->
         ${ _(' query is compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform().name"></span>.
-                <a href="javascript:void(0)" data-bind="click: function() { $parent.type($parent.compatibilityTargetPlatform().value); }">${ _('Execute it with ') } <span data-bind="text: $parent.compatibilityTargetPlatform().name"></span></a>.
+                <a href="javascript:void(0)" data-bind="click: function() { $parent.dialect($parent.compatibilityTargetPlatform().value); }">${ _('Execute it with ') } <span data-bind="text: $parent.compatibilityTargetPlatform().name"></span></a>.
         <!-- /ko -->
-        <!-- ko if: $parent.compatibilitySourcePlatform().value !== $parent.type() -->
+        <!-- ko if: $parent.compatibilitySourcePlatform().value !== $parent.dialect() -->
         ${ _(' query is compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform().name"></span>.
         <!-- /ko -->
             </span>
@@ -884,7 +884,7 @@
           <!-- /ko -->
           <label class="pull-left" style="margin-top: 6px;margin-right: 10px;" data-bind="visible: !associatedDocumentLoading()">${_('Document')}</label>
           <div class="selectize-wrapper" style="width: 300px;" data-bind="visible: !associatedDocumentLoading()">
-            <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { loading: associatedDocumentLoading, value: associatedDocumentUuid, document: associatedDocument, type: type }"></select>
+            <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { loading: associatedDocumentLoading, value: associatedDocumentUuid, document: associatedDocument, type: dialect }"></select>
           </div>
           <!-- ko if: associatedDocument() -->
           <div class="pull-left" style="margin-top: 4px">
@@ -1059,7 +1059,7 @@
   <script type="text/html" id="executable-snippet-body${ suffix }">
     <div style="padding:10px;">
       <form class="form-horizontal">
-        <!-- ko if: type() == 'distcp' -->
+        <!-- ko if: dialect() == 'distcp' -->
         <div class="control-group">
           <label class="control-label">${_('Source')}</label>
           <div class="controls">
@@ -1079,7 +1079,7 @@
           </div>
         </div>
         <!-- /ko -->
-        <!-- ko if: type() == 'shell' -->
+        <!-- ko if: dialect() == 'shell' -->
         <div class="control-group">
           <label class="control-label">${_('Script path')}</label>
           <div class="controls">
@@ -1094,7 +1094,7 @@
           </div>
         </div>
         <!-- /ko -->
-        <!-- ko if: type() == 'mapreduce' -->
+        <!-- ko if: dialect() == 'mapreduce' -->
         <div class="control-group">
           <label class="control-label">${_('Jar path')}</label>
           <div class="controls">
@@ -1108,7 +1108,7 @@
           </div>
         </div>
         <!-- /ko -->
-        <!-- ko if: type() == 'jar' || type() == 'java' -->
+        <!-- ko if: dialect() === 'jar' || dialect() === 'java' -->
         <div class="control-group">
           <label class="control-label">${_('Path')}</label>
           <div class="controls">
@@ -1128,7 +1128,7 @@
           </div>
         </div>
         <!-- /ko -->
-        <!-- ko if: type() == 'py'-->
+        <!-- ko if: dialect() === 'py'-->
         <div class="control-group">
           <label class="control-label">${_('Path')}</label>
           <div class="controls">
@@ -1136,7 +1136,7 @@
           </div>
         </div>
         <!-- /ko -->
-        <!-- ko if: type() == 'spark2' -->
+        <!-- ko if: dialect() === 'spark2' -->
         <div class="control-group">
           <!-- ko template: { if: typeof properties().jars != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Libs') }', value: properties().jars, title: '${ _ko('Path to jar or python files.') }', placeholder: '${ _ko('e.g. /user/hue/pi.py') }'}} --><!-- /ko -->
         </div>
@@ -1225,7 +1225,7 @@
       </a>
 
       <ul class="dropdown-menu" data-bind="foreach: $root.availableSnippets">
-        <li><a class="pointer" data-bind="click: function(){ $parent.type($data.type()); }, text: name"></a></li>
+        <li><a class="pointer" data-bind="click: function(){ $parent.changeDialect($data.type()); }, text: name"></a></li>
       </ul>
     </div>
   </script>
