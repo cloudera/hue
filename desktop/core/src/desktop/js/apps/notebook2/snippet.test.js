@@ -16,6 +16,8 @@
 
 import Notebook from './notebook';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
+import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import huePubSub from 'utils/huePubSub';
 
 describe('snippet.js', () => {
   const viewModel = {
@@ -33,13 +35,39 @@ describe('snippet.js', () => {
     }
   };
 
+  const previousEnableNotebook2 = window.ENABLE_NOTEBOOK_2;
+
+  beforeAll(() => {
+    window.ENABLE_NOTEBOOK_2 = true;
+  });
+
+  afterAll(() => {
+    window.ENABLE_NOTEBOOK_2 = previousEnableNotebook2;
+  });
+
   beforeEach(() => {
     jest.spyOn(sessionManager, 'getSession').mockImplementation(() => Promise.resolve());
   });
 
   it('should serialize a snippet context to JSON', async () => {
+    const spy = jest.spyOn(huePubSub, 'publish').mockImplementation((topic, cb) => {
+      if (topic === GET_KNOWN_CONFIG_EVENT && cb) {
+        cb({
+          app_config: {
+            editor: {
+              interpreters: [{ type: 'hive', dialect: 'hive' }]
+            }
+          }
+        });
+      }
+    });
+
     const notebook = new Notebook(viewModel, {});
     const snippet = notebook.addSnippet({ connector: { dialect: 'hive' } });
+
+    expect(spy).toHaveBeenCalled();
+
+    spy.mockRestore();
 
     const snippetContextJSON = snippet.toContextJson();
 
