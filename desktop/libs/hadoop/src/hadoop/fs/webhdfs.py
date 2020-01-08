@@ -472,8 +472,7 @@ class WebHdfs(Hdfs):
     headers = self._getheaders()
     result = self._root.put(old, params, headers=headers)
     if not result['boolean']:
-      raise IOError(_("Rename failed: %s -> %s") %
-                    (str(smart_str(old)), str(smart_str(new))))
+      raise IOError(_("Rename failed: %s -> %s") % (smart_str(old), smart_str(new)))
 
   def rename_star(self, old_dir, new_dir):
     """Equivalent to `mv old_dir/* new"""

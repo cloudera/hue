@@ -1298,7 +1298,8 @@ def upload_file(request):
         resp = _upload_file(request)
         response.update(resp)
     except Exception as ex:
-        response['data'] = str(ex).split('\n', 1)[0]
+        logger.exception('Upload failure')
+        response['data'] = smart_str(ex).split('\n', 1)[0]
         hdfs_file = request.FILES.get('hdfs_file')
         if hdfs_file and hasattr(hdfs_file, 'remove'):  # TODO: Call from proxyFS
             hdfs_file.remove()
@@ -1330,7 +1331,6 @@ def _upload_file(request):
         try:
             request.fs.upload(file=uploaded_file, path=dest, username=request.user.username)
             response['status'] = 0
-
         except IOError as ex:
             already_exists = False
             try:
