@@ -512,6 +512,7 @@ class HiveServerClient(object):
     'TABLE',
     'VIEW',
     'EXTERNAL_TABLE',
+    'MATERIALIZED_VIEW',
   ]
 
   def __init__(self, query_server, user):
