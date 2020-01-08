@@ -138,7 +138,7 @@ const TEMPLATE = `
                   $parent.openNotebook(uuid)
                 },
                 clickBubble: false
-              "><div data-bind="highlight: { value: query, dialect: $parent.type }"></div></td>
+              "><div data-bind="highlight: { value: query, dialect: $parent.dialect }"></div></td>
           </tr>
         </tbody>
       </table>
@@ -167,7 +167,7 @@ class QueryHistory extends DisposableComponent {
   constructor(params, element) {
     super();
     this.currentNotebook = params.currentNotebook;
-    this.type = params.type;
+    this.dialect = params.dialect;
     this.openFunction = params.openFunction;
     this.element = element;
 
@@ -211,7 +211,7 @@ class QueryHistory extends DisposableComponent {
     apiHelper
       .clearNotebookHistory({
         notebookJson: await this.currentNotebook.toContextJson(),
-        docType: this.type()
+        docType: this.dialect()
       })
       .then(() => {
         this.history.removeAll();
@@ -230,7 +230,7 @@ class QueryHistory extends DisposableComponent {
   }
 
   async exportHistory() {
-    const historyResponse = await apiHelper.getHistory({ type: this.type(), limit: 500 });
+    const historyResponse = await apiHelper.getHistory({ type: this.dialect(), limit: 500 });
 
     if (historyResponse && historyResponse.history) {
       window.location.href =
@@ -246,7 +246,7 @@ class QueryHistory extends DisposableComponent {
 
     try {
       const historyData = await apiHelper.getHistory({
-        type: this.type(),
+        type: this.dialect(),
         limit: QUERIES_PER_PAGE,
         page: this.historyCurrentPage(),
         docFilter: this.historyFilter()

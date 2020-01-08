@@ -32,8 +32,9 @@ import {
   REDRAW_FIXED_HEADERS_EVENT,
   SHOW_GRID_SEARCH_EVENT,
   SHOW_NORMAL_RESULT_EVENT,
-  REDRAW_CHART_EVENT
+  REDRAW_CHART_EVENT, ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT
 } from 'apps/notebook2/events';
+import {DIALECT} from 'apps/notebook2/snippet';
 
 export const initNotebook2 = () => {
   window.Clipboard = Clipboard;
@@ -502,7 +503,7 @@ export const initNotebook2 = () => {
           if (app === 'editor') {
             huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
             huePubSub.publish('hue.scrollleft.show');
-            huePubSub.publish('active.snippet.type.changed', {
+            huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
               type: viewModel.editorType(),
               isSqlDialect: viewModel.getSnippetViewSettings(viewModel.editorType()).sqlDialect
             });
@@ -713,7 +714,7 @@ export const initNotebook2 = () => {
         'jobbrowser.data',
         jobs => {
           const snippet = viewModel.selectedNotebook().snippets()[0];
-          if (!snippet || snippet.type() === 'impala') {
+          if (!snippet || snippet.dialect() === DIALECT.impala) {
             return;
           }
           if (jobs.length > 0) {

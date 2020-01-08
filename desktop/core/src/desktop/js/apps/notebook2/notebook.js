@@ -136,7 +136,7 @@ export default class Notebook {
         if (this.type().indexOf('query') === 0) {
           const whenDatabaseAvailable = function(snippet) {
             huePubSub.publish('assist.set.database', {
-              source: snippet.type(),
+              source: snippet.dialect(),
               namespace: snippet.namespace(),
               name: snippet.database()
             });
@@ -216,7 +216,7 @@ export default class Notebook {
   }
 
   getSnippets(type) {
-    return this.snippets().filter(snippet => snippet.type() === type);
+    return this.snippets().filter(snippet => snippet.dialect() === type);
   }
 
   loadScheduler() {

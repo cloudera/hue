@@ -39,21 +39,21 @@ describe('notebook.js', () => {
 
   it('should serialize a notebook to JSON', async () => {
     const notebook = new Notebook(viewModel, {});
-    notebook.addSnippet({ type: 'hive' });
-    notebook.addSnippet({ type: 'impala' });
+    notebook.addSnippet({ connector: { dialect: 'hive' } });
+    notebook.addSnippet({ connector: { dialect: 'impala' } });
 
     const notebookJSON = await notebook.toJson();
 
     const notebookRaw = JSON.parse(notebookJSON);
 
     expect(notebookRaw.snippets.length).toEqual(2);
-    expect(notebookRaw.snippets[0].type).toEqual('hive');
-    expect(notebookRaw.snippets[1].type).toEqual('impala');
+    expect(notebookRaw.snippets[0].connector.dialect).toEqual('hive');
+    expect(notebookRaw.snippets[1].connector.dialect).toEqual('impala');
   });
 
   it('should serialize a notebook context to JSON', async () => {
     const notebook = new Notebook(viewModel, {});
-    notebook.addSnippet({ type: 'hive' });
+    notebook.addSnippet({ connector: { dialect: 'hive' } });
 
     const notebookContextJSON = await notebook.toContextJson();
 

@@ -39,13 +39,13 @@ describe('snippet.js', () => {
 
   it('should serialize a snippet context to JSON', async () => {
     const notebook = new Notebook(viewModel, {});
-    const snippet = notebook.addSnippet({ type: 'hive' });
+    const snippet = notebook.addSnippet({ connector: { dialect: 'hive' } });
 
     const snippetContextJSON = snippet.toContextJson();
 
     const snippetContextRaw = JSON.parse(snippetContextJSON);
 
     expect(snippetContextRaw.id).toEqual(snippet.id());
-    expect(snippetContextRaw.type).toEqual('hive');
+    expect(snippetContextRaw.connector.dialect).toEqual('hive');
   });
 });

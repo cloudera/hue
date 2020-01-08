@@ -27,6 +27,7 @@ import Notebook from 'apps/notebook2/notebook';
 import Snippet from 'apps/notebook2/snippet';
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
 import { UPDATE_HISTORY_EVENT } from 'apps/notebook2/components/ko.queryHistory';
+import {ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT} from 'apps/notebook2/events';
 
 class EditorViewModel {
   constructor(editorId, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
@@ -174,9 +175,9 @@ class EditorViewModel {
       callback => {
         this.withActiveSnippet(activeSnippet => {
           if (callback) {
-            callback(activeSnippet.type());
+            callback(activeSnippet.dialect());
           } else {
-            huePubSub.publish('set.active.snippet.type', activeSnippet.type());
+            huePubSub.publish('set.active.snippet.type', activeSnippet.dialect());
           }
         });
       },
@@ -270,7 +271,7 @@ class EditorViewModel {
   getSnippetName(snippetType) {
     const availableSnippets = this.availableSnippets();
     for (let i = 0; i < availableSnippets.length; i++) {
-      if (availableSnippets[i].type() === snippetType) {
+      if (availableSnippets[i].dialect() === snippetType) {
         return availableSnippets[i].name();
       }
     }
@@ -306,7 +307,7 @@ class EditorViewModel {
 
     if (notebook.snippets().length > 0) {
       huePubSub.publish('detach.scrolls', notebook.snippets()[0]);
-      notebook.selectedSnippet(notebook.snippets()[notebook.snippets().length - 1].type());
+      notebook.selectedSnippet(notebook.snippets()[notebook.snippets().length - 1].dialect());
       notebook.snippets().forEach(snippet => {
         snippet.aceAutoExpand = false;
         snippet.statement_raw.valueHasMutated();
@@ -349,7 +350,7 @@ class EditorViewModel {
 
   async newNotebook(editorType, callback, queryTab) {
     return new Promise((resolve, reject) => {
-      huePubSub.publish('active.snippet.type.changed', {
+      huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
         type: editorType,
         isSqlDialect: editorType ? this.getSnippetViewSettings(editorType).sqlDialect : undefined
       });
@@ -375,7 +376,7 @@ class EditorViewModel {
             if (window.location.getParameter('type') === '') {
               hueUtils.changeURLParameter('type', this.editorType());
             }
-            huePubSub.publish('active.snippet.type.changed', {
+            huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
               type: editorType,
               isSqlDialect: editorType
                 ? this.getSnippetViewSettings(editorType).sqlDialect
@@ -410,7 +411,7 @@ class EditorViewModel {
       if (typeof skipUrlChange === 'undefined' && !this.isNotificationManager()) {
         if (this.editorMode()) {
           this.editorType(docData.document.type.substring('query-'.length));
-          huePubSub.publish('active.snippet.type.changed', {
+          huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
             type: this.editorType(),
             isSqlDialect: this.getSnippetViewSettings(this.editorType()).sqlDialect
           });
@@ -498,7 +499,7 @@ class EditorViewModel {
   showSessionPanel() {
     this.withActiveSnippet(
       snippet => {
-        huePubSub.publish('session.panel.show', snippet.type());
+        huePubSub.publish('session.panel.show', snippet.dialect());
       },
       () => {
         huePubSub.publish('session.panel.show');

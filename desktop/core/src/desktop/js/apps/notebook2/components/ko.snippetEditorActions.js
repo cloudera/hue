@@ -24,7 +24,7 @@ import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { SHOW_EVENT as SHOW_GIST_MODAL_EVENT } from 'ko/components/ko.shareGistModal';
-import { STATUS } from 'apps/notebook2/snippet';
+import { DIALECT, STATUS } from 'apps/notebook2/snippet';
 
 const TEMPLATE = `
 <div class="snippet-editor-actions">
@@ -101,7 +101,7 @@ class SnippetEditorActions {
     this.clearEnabled = this.snippet.isReady;
 
     this.compatibilityEnabled = ko.pureComputed(
-      () => this.snippet.type() === 'hive' || this.snippet.type() === 'impala'
+      () => this.snippet.dialect() === DIALECT.hive || this.snippet.dialect() === DIALECT.impala
     );
 
     this.createGistEnabled = ko.pureComputed(
@@ -169,7 +169,7 @@ class SnippetEditorActions {
         this.snippet.ace().getSelectedText() != ''
           ? this.snippet.ace().getSelectedText()
           : this.snippet.statement_raw(),
-      doc_type: this.snippet.type(),
+      doc_type: this.snippet.dialect(),
       name: this.snippet.name(),
       description: ''
     });
