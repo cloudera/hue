@@ -216,7 +216,10 @@ export default class Snippet {
           }
         } else if (snippetRaw.type) {
           // In the past "type" was used to denote dialect.
-          this.connector(connectors.find(connector => connector.dialect === snippetRaw.type));
+          this.connector(
+            connectors.find(connector => connector.dialect === snippetRaw.type) ||
+              connectors.find(connector => connector.type === snippetRaw.type)
+          );
         }
       }
     });

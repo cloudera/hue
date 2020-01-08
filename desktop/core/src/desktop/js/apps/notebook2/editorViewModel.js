@@ -27,7 +27,7 @@ import Notebook from 'apps/notebook2/notebook';
 import Snippet from 'apps/notebook2/snippet';
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
 import { UPDATE_HISTORY_EVENT } from 'apps/notebook2/components/ko.queryHistory';
-import {ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT} from 'apps/notebook2/events';
+import { ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT } from 'apps/notebook2/events';
 
 class EditorViewModel {
   constructor(editorId, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
