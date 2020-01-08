@@ -392,9 +392,9 @@
   }
 
   .sidebar-menu {
-    z-index: 1010;
+    z-index: 1011;
+    position: absolute;
     display: none;
-    position: fixed;
     background-color: @cui-gray-800;
     color: @cui-white;
     font-size: 14px;
@@ -402,10 +402,16 @@
     box-shadow: rgba(0, 0, 0, 0.2) 0 2px 4px 0;
     white-space: nowrap;
     padding: 4px 8px;
-    top: auto;
     height: auto;
-    bottom: 20px;
     transition: none;
+    margin-top: -40px;
+
+    &.user-menu {
+      margin-top: 0;
+      top: auto;
+      bottom: 20px;
+      position: fixed;
+    }
 
     &.open {
       display: block;
@@ -453,6 +459,12 @@
         li {
           margin-left: -8px;
           margin-right: -8px;
+
+          &.divider {
+            height: 2px;
+            margin: 4px -8px;
+            background-color: #3e4b56;
+          }
         }
 
         li a {

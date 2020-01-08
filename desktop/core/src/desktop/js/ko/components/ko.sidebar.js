@@ -36,20 +36,64 @@ const TEMPLATE = `
     <!-- /ko -->
   </script>
 
+  <script type="text/html" id="sidebar-sub-menu">
+    <div class="sidebar-menu" data-bind="css: { 'open' : open }">
+      <div class="menu">
+        <ul class="sidebar-nav-list" data-bind="foreach: children">
+          <li data-bind="css: { 'divider': isDivider }">
+            <!-- ko if: isDivider -->
+              &nbsp;
+            <!-- /ko -->
+            <!-- ko ifnot: isDivider -->
+              <!-- ko if: children && children.length -->
+                <a href="javascript:void(0);" data-bind="toggle: open, text: displayName"></a>
+                <!-- ko template: { name: 'sidebar-sub-menu' } --><!-- /ko -->
+              <!-- /ko -->
+              <!-- ko if: !children && url -->
+                <a href="javascript:void(0);" data-bind="hueLink: url, text: displayName"></a>
+              <!-- /ko -->
+              <!-- ko if: !children && href -->
+                <a href="javascript:void(0);" target="_blank" data-bind="attr: { 'href': href }, text: displayName"></a>
+              <!-- /ko -->
+            <!-- /ko -->
+          </li>
+        </ul>
+      </div>
+    </div>
+  </script>
+
   <script type="text/html" id="sidebar-item">
     <div class="item-wrapper" data-bind="css: itemClass">
-      <!-- ko if: click -->
-      <a href="javascript: void(0);" data-bind="click: click, attr: { 'aria-label': displayName, 'data-tooltip': displayName }, css: { 'active': active }" class="item">
-        <!-- ko template: 'sidebar-inner-item' --><!-- /ko -->
-      </a>
+      <!-- ko if: children && children.length -->
+        <a href="javascript: void(0);" data-bind="
+            toggle: open,
+            attr: { 'aria-label': displayName, 'data-tooltip': displayName },
+            css: { 'active': active },
+            template: 'sidebar-inner-item'
+          " class="item"></a>
+          <!-- ko template: 'sidebar-sub-menu' --><!-- /ko -->
       <!-- /ko -->
-      <!-- ko ifnot: click -->
-      <a href="javascript: void(0);" data-bind="hueLink: url, publish: 'hue.sidebar.update.active', attr: { 'aria-label': displayName, 'data-tooltip': displayName }, css: { 'active': active }" class="item">
-        <!-- ko template: 'sidebar-inner-item' --><!-- /ko -->
-      </a>
-      <!-- /ko -->
-      <!-- ko if: subMenuTemplate -->
-      <!-- ko template: subMenuTemplate --><!-- /ko -->
+      <!-- ko if: !children || !children.length -->
+        <!-- ko if: click -->
+          <a href="javascript: void(0);" data-bind="
+              click: click,
+              attr: { 'aria-label': displayName, 'data-tooltip': displayName },
+              css: { 'active': active },
+              template: 'sidebar-inner-item'
+            " class="item"></a>
+        <!-- /ko -->
+        <!-- ko ifnot: click -->
+          <a href="javascript: void(0);" data-bind="
+              hueLink: url,
+              publish: 'hue.sidebar.update.active',
+              attr: { 'aria-label': displayName, 'data-tooltip': displayName },
+              css: { 'active': active },
+              template: 'sidebar-inner-item'
+            " class="item"></a>
+        <!-- /ko -->
+        <!-- ko if: subMenuTemplate -->
+        <!-- ko template: subMenuTemplate --><!-- /ko -->
+        <!-- /ko -->
       <!-- /ko -->
     </div>
   </script>
@@ -135,20 +179,39 @@ const TEMPLATE = `
   </div>
 `;
 
+const trackCloseOnClick = (observable, id) => {
+  observable.subscribe(newVal => {
+    if (newVal) {
+      window.setTimeout(() => {
+        $(document).on('click.' + id, () => {
+          observable(false);
+        });
+      }, 0);
+    } else {
+      $(document).off('click.' + id);
+    }
+  });
+};
+
 class SidebarItem {
   constructor(options) {
     this.isCategory = !!options.isCategory;
     this.displayName = options.displayName;
+    this.isDivider = !!options.isDivider;
+    this.href = options.href;
     this.url = options.url;
     this.icon = options.icon;
     this.children = options.children;
     this.name = options.name;
     this.type = options.type;
     this.active = ko.observable(false);
+    this.open = ko.observable(false);
     this.click = options.click;
     this.subMenuTemplate = options.subMenuTemplate;
     this.iconHtml = options.iconHtml;
     this.itemClass = options.itemClass;
+
+    trackCloseOnClick(this.open, 'sidebar-sub');
   }
 }
 
@@ -160,31 +223,9 @@ class Sidebar {
     this.userMenuOpen = ko.observable(false);
     this.supportMenuOpen = ko.observable(false);
 
-    this.userMenuOpen.subscribe(newVal => {
-      if (newVal) {
-        window.setTimeout(() => {
-          $(document).on('click.userMenu', () => {
-            this.userMenuOpen(false);
-          });
-        }, 0);
-        this.supportMenuOpen(false);
-      } else {
-        $(document).off('click.userMenu');
-      }
-    });
+    trackCloseOnClick(this.userMenuOpen, 'userMenuOpen');
 
-    this.supportMenuOpen.subscribe(newVal => {
-      if (newVal) {
-        window.setTimeout(() => {
-          $(document).on('click.supportMenu', () => {
-            this.supportMenuOpen(false);
-          });
-        }, 0);
-        this.userMenuOpen(false);
-      } else {
-        $(document).off('click.supportMenu');
-      }
-    });
+    trackCloseOnClick(this.supportMenuOpen, 'supportMenuOpen');
 
     this.collapsed.subscribe(newVal => {
       if (newVal) {
@@ -233,7 +274,7 @@ class Sidebar {
               active = child.type === 'hdfs';
             }
           } else {
-            active = location.pathname == '/hue' + child.url;
+            active = location.pathname === '/hue' + child.url;
           }
           child.active(active);
         });
@@ -242,66 +283,81 @@ class Sidebar {
 
     const configUpdated = clusterConfig => {
       const items = [];
-      if (clusterConfig && clusterConfig['app_config']) {
+      if (clusterConfig && clusterConfig.app_config) {
         const appsItems = [];
-        const appConfig = clusterConfig['app_config'];
-        if (appConfig['editor']) {
-          let editor = null;
-          if (
-            clusterConfig['main_button_action'] &&
-            clusterConfig['main_button_action'].page.indexOf('/editor') === 0
-          ) {
-            editor = clusterConfig['main_button_action'];
-          }
+        const appConfig = clusterConfig.app_config;
 
-          if (!editor) {
-            const defaultEditor = appConfig['editor']['default_sql_interpreter'];
-            if (defaultEditor) {
-              const foundEditor = appConfig['editor']['interpreters'].filter(interpreter => {
-                return interpreter.type === defaultEditor;
+        ['editor', 'dashboard', 'scheduler', 'sdkapps'].forEach(appName => {
+          const config = appConfig[appName];
+          if (config && config.interpreters.length) {
+            if (config.interpreters.length === 1) {
+              appsItems.push(
+                new SidebarItem({
+                  displayName: config.displayName,
+                  url: config.interpreters[0].page,
+                  icon: config.name,
+                  type: config.name
+                })
+              );
+            } else {
+              const subApps = [];
+              const favourite = clusterConfig.main_button_action;
+
+              let lastWasSql = false;
+              let dividerAdded = false;
+              let favouriteFound = false;
+              config.interpreters.forEach(interpreter => {
+                if (!dividerAdded && lastWasSql && !interpreter.is_sql) {
+                  subApps.push(new SidebarItem({ isDivider: true }));
+                  dividerAdded = true;
+                }
+                if (!favourite || favourite.page !== interpreter.page) {
+                  subApps.push(
+                    new SidebarItem({
+                      displayName: interpreter.displayName,
+                      url: interpreter.page,
+                      icon: interpreter.dialect || interpreter.name,
+                      type: interpreter.dialect || interpreter.name
+                    })
+                  );
+                } else {
+                  favouriteFound = true;
+                }
+                lastWasSql = interpreter.is_sql;
               });
-              if (foundEditor.length === 1) {
-                editor = foundEditor[0];
+
+              if (favouriteFound) {
+                // Put the favourite on top
+                subApps.unshift(
+                  new SidebarItem({
+                    displayName: favourite.displayName,
+                    url: favourite.page,
+                    icon: favourite.dialect || favourite.name,
+                    type: favourite.dialect || favourite.name
+                  })
+                );
               }
+              if (appName === 'editor' && window.SHOW_ADD_MORE_EDITORS) {
+                subApps.push(new SidebarItem({ isDivider: true }));
+                subApps.push(
+                  new SidebarItem({
+                    displayName: I18n('Add more...'),
+                    href: 'https://docs.gethue.com/administrator/configuration/connectors/'
+                  })
+                );
+              }
+              appsItems.push(
+                new SidebarItem({
+                  displayName: config.displayName,
+                  icon: config.name,
+                  type: config.name,
+                  children: subApps
+                })
+              );
             }
           }
-
-          if (!editor && appConfig['editor']['interpreters'].length > 1) {
-            editor = appConfig['editor']['interpreters'][1];
-          }
-
-          if (editor) {
-            appsItems.push(
-              new SidebarItem({
-                displayName: I18n('Editor'),
-                url: editor['page'],
-                icon: 'editor',
-                type: 'editor'
-              })
-            );
-          } else {
-            appsItems.push(
-              new SidebarItem({
-                displayName: appConfig['editor']['displayName'],
-                url: appConfig['editor']['page'],
-                icon: 'editor',
-                type: 'editor'
-              })
-            );
-          }
-        }
-        ['dashboard', 'scheduler'].forEach(appName => {
-          if (appConfig[appName]) {
-            appsItems.push(
-              new SidebarItem({
-                displayName: appConfig[appName]['displayName'],
-                url: appConfig[appName]['page'],
-                icon: appName,
-                type: appName
-              })
-            );
-          }
         });
+
         if (appsItems.length > 0) {
           items.push(
             new SidebarItem({
@@ -313,18 +369,18 @@ class Sidebar {
         }
 
         const browserItems = [];
-        if (appConfig['home']) {
+        if (appConfig.home) {
           browserItems.push(
             new SidebarItem({
-              displayName: appConfig['home']['buttonName'],
-              url: appConfig['home']['page'],
+              displayName: appConfig.home.buttonName,
+              url: appConfig.home.page,
               icon: 'documents',
-              type: appConfig['home']['name']
+              type: appConfig.home.name
             })
           );
         }
-        if (appConfig['browser'] && appConfig['browser']['interpreters']) {
-          appConfig['browser']['interpreters'].forEach(browser => {
+        if (appConfig.browser && appConfig.browser.interpreters) {
+          appConfig.browser.interpreters.forEach(browser => {
             browserItems.push(
               new SidebarItem({
                 displayName: browser.displayName,
@@ -339,30 +395,8 @@ class Sidebar {
           items.push(
             new SidebarItem({
               isCategory: true,
-              displayName: I18n('Browsers'),
+              displayName: appConfig.browser.displayName,
               children: browserItems
-            })
-          );
-        }
-
-        const sdkItems = [];
-        if (appConfig['sdkapps'] && appConfig['sdkapps']['interpreters']) {
-          appConfig['sdkapps']['interpreters'].forEach(sdkInterpreter => {
-            sdkItems.push(
-              new SidebarItem({
-                displayName: sdkInterpreter['displayName'],
-                url: sdkInterpreter['page'],
-                type: sdkInterpreter.type
-              })
-            );
-          });
-        }
-        if (sdkItems.length > 0) {
-          items.push(
-            new SidebarItem({
-              isCategory: true,
-              displayName: appConfig['sdkapps']['displayName'],
-              children: sdkItems
             })
           );
         }
