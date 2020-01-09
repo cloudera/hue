@@ -283,7 +283,9 @@ class Sidebar {
 
     const configUpdated = clusterConfig => {
       const items = [];
+
       if (clusterConfig && clusterConfig.app_config) {
+        const favourite = clusterConfig.main_button_action;
         const appsItems = [];
         const appConfig = clusterConfig.app_config;
 
@@ -301,18 +303,16 @@ class Sidebar {
               );
             } else {
               const subApps = [];
-              const favourite = clusterConfig.main_button_action;
-
               let lastWasSql = false;
               let dividerAdded = false;
-              let favouriteFound = false;
               config.interpreters.forEach(interpreter => {
                 if (!dividerAdded && lastWasSql && !interpreter.is_sql) {
                   subApps.push(new SidebarItem({ isDivider: true }));
                   dividerAdded = true;
                 }
-                if (!favourite || favourite.page !== interpreter.page) {
-                  subApps.push(
+                if (favourite && favourite.page === interpreter.page) {
+                  // Put the favourite on top
+                  subApps.unshift(
                     new SidebarItem({
                       displayName: interpreter.displayName,
                       url: interpreter.page,
@@ -321,22 +321,18 @@ class Sidebar {
                     })
                   );
                 } else {
-                  favouriteFound = true;
+                  subApps.push(
+                    new SidebarItem({
+                      displayName: interpreter.displayName,
+                      url: interpreter.page,
+                      icon: interpreter.dialect || interpreter.name,
+                      type: interpreter.dialect || interpreter.name
+                    })
+                  );
                 }
                 lastWasSql = interpreter.is_sql;
               });
 
-              if (favouriteFound) {
-                // Put the favourite on top
-                subApps.unshift(
-                  new SidebarItem({
-                    displayName: favourite.displayName,
-                    url: favourite.page,
-                    icon: favourite.dialect || favourite.name,
-                    type: favourite.dialect || favourite.name
-                  })
-                );
-              }
               if (appName === 'editor' && window.SHOW_ADD_MORE_EDITORS) {
                 subApps.push(new SidebarItem({ isDivider: true }));
                 subApps.push(
