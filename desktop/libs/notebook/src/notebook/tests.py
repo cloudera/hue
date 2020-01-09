@@ -348,7 +348,14 @@ class MockFs(object):
     return ''
 
   def exists(self, path):
+    if path == '/user/hue/non_exists_directory':
+      return False
     return True
+
+  def listdir_stats(self, path):
+    if path == '/user/hue/non_empty_directory':
+      return ['mock_dir', 'mock_file']
+    return []
 
   def isdir(self, path):
     return path == '/user/hue'
@@ -454,6 +461,19 @@ class TestNotebookApiMocked(object):
       data = json.loads(response.content)
       assert_equal(0, data['status'], data)
       assert_equal('adl:/user/hue/path.csv', data['watch_url']['destination'], data)
+
+
+    response = self.client.post(reverse('notebook:export_result'), {
+      'notebook': notebook_json,
+      'snippet': json.dumps(json.loads(notebook_json)['snippets'][0]),
+      'format': json.dumps('hdfs-directory'),
+      'destination': json.dumps('/user/hue/non_empty_directory'),
+      'overwrite': json.dumps(False)
+    })
+
+    data = json.loads(response.content)
+    assert_equal(-1, data['status'], data)
+    assert_equal('The destination is not a empty directory!', data['message'], data)
 
 
   def test_download_result(self):
