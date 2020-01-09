@@ -179,6 +179,11 @@ We’ll start by adding a test, in `postgresqlAutocompleteParser.test.js` in the
 
 When we now run `npm run test -- postgresqlAutocompleteParser.test.js` there should be two failing tests.
 
+Alternatively, if using Jest directly and working on parsers currently being skipped in the CI, provide matching file names and an empty blacklist file pattern. e.g.:
+
+    jest calciteAutocompleteParser.Select.stream.test.js --testPathIgnorePatterns=[]
+    jest calciteAutocompleteParser --testPathIgnorePatterns=[]
+
 Next we’ll have to add the keyword to the lexer, let’s open `sql.jisonlex` in the jison folder for postgresql and add the following new tokens:
 
     'REINDEX'                                  { parser.determineCase(yytext); return 'REINDEX'; }
