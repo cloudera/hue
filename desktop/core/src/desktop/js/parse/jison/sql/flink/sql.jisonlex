@@ -29,183 +29,130 @@
 <between>'AND'                             { this.popState(); return 'BETWEEN_AND'; }
 
 // Reserved Keywords
-'ADVANCE'                                  { return 'ADVANCE'; }
-'ANALYZE'                                  { return 'ANALYZE'; }
+'ALL'                                      { return 'ALL'; }
+'ALTER'                                    { parser.determineCase(yytext); parser.addStatementTypeLocation('ALTER', yylloc, yy.lexer.upcomingInput()); return 'ALTER'; }
 'AND'                                      { return 'AND'; }
-'ARRAY'                                    { return 'ARRAY'; }
 'AS'                                       { return 'AS'; }
-'AT'                                       { return 'AT'; }
-'BEGINNING'                                { return 'BEGINNING' }
+'ASC'                                      { return 'ASC'; }
 'BETWEEN'                                  { this.begin('between'); return 'BETWEEN'; }
 'BIGINT'                                   { return 'BIGINT'; }
 'BOOLEAN'                                  { return 'BOOLEAN'; }
 'BY'                                       { return 'BY'; }
+'CASCADE'                                  { return 'CASCADE'; }
 'CASE'                                     { return 'CASE'; }
-'CAST'                                     { return 'CAST'; }
-'CATALOG'                                  { return 'CATALOG'; }
-'CHANGES'                                  { return 'CHANGES'; }
-'COLUMN'                                   { return 'COLUMN'; }
-'COLUMNS'                                  { return 'COLUMNS'; }
-'CONNECTOR'                                { return 'CONNECTOR'; }
-'CONNECTORS'                               { return 'CONNECTORS'; }
+'CHAR'                                     { return 'CHAR'; }
+'COMMENT'                                  { return 'COMMENT'; }
 'CREATE'                                   { parser.determineCase(yytext); return 'CREATE'; }
-'DATE'                                     { return 'DATE'; }
-'DAY'                                      { return 'DAY'; }
+'CROSS'                                    { return 'CROSS'; }
+'CURRENT'                                  { return 'CURRENT'; }
+'DATABASE'                                 { return 'DATABASE'; }
 'DECIMAL'                                  { return 'DECIMAL'; }
-'DELETE'                                   { return 'DELETE'; }
-'DESCRIBE'                                 { return 'DESCRIBE'; }
+'DESC'                                     { return 'DESC'; }
 'DISTINCT'                                 { return 'DISTINCT'; }
+'DIV'                                      { return 'ARITHMETIC_OPERATOR'; }
 'DOUBLE'                                   { return 'DOUBLE'; }
 'DROP'                                     { parser.determineCase(yytext); parser.addStatementTypeLocation('DROP', yylloc, yy.lexer.upcomingInput()); return 'DROP'; }
 'ELSE'                                     { return 'ELSE'; }
-'EMIT'                                     { return 'EMIT'; }
 'END'                                      { return 'END'; }
 'EXISTS'                                   { parser.yy.correlatedSubQuery = true; return 'EXISTS'; }
-'EXPLAIN'                                  { parser.determineCase(yytext); return 'EXPLAIN'; }
-'EXPORT'                                   { return 'EXPORT'; }
-'EXTENDED'                                 { return 'EXTENDED'; }
+'FALSE'                                    { return 'FALSE'; }
+'FLOAT'                                    { return 'FLOAT'; }
+'FOLLOWING'                                { return 'FOLLOWING'; }
 'FROM'                                     { parser.determineCase(yytext); return 'FROM'; }
 'FULL'                                     { return 'FULL'; }
-'FUNCTION'                                 { return 'FUNCTION'; }
-'FUNCTIONS'                                { return 'FUNCTIONS'; }
 'GROUP'                                    { return 'GROUP'; }
 'HAVING'                                   { return 'HAVING'; }
-'HOPPING'                                  { return 'HOPPING'; }
-'HOUR'                                     { return 'HOUR'; }
-'HOURS'                                    { return 'HOURS'; }
 'IF'                                       { return 'IF'; }
 'IN'                                       { return 'IN'; }
 'INNER'                                    { return 'INNER'; }
 'INSERT'                                   { return 'INSERT'; }
 'INT'                                      { return 'INT'; }
-'INTEGER'                                  { return 'INTEGER'; }
 'INTO'                                     { return 'INTO'; }
 'IS'                                       { return 'IS'; }
 'JOIN'                                     { return 'JOIN'; }
-'KEY'                                      { return 'KEY'; }
 'LEFT'                                     { return 'LEFT'; }
 'LIKE'                                     { return 'LIKE'; }
 'LIMIT'                                    { return 'LIMIT'; }
-'LIST'                                     { return 'LIST'; }
-'LOAD'                                     { return 'LOAD'; }
-'MAP'                                      { return 'MAP'; }
-'MILLISECOND'                              { return 'MILLISECOND'; }
-'MILLISECONDS'                             { return 'MILLISECONDS'; }
-'MINUTE'                                   { return 'MINUTE'; }
-'MINUTES'                                  { return 'MINUTES'; }
-'MONTH'                                    { return 'MONTH'; }
-'MONTHS'                                   { return 'MONTHS'; }
 'NOT'                                      { return 'NOT'; }
 'NULL'                                     { return 'NULL'; }
 'ON'                                       { return 'ON'; }
+'OPTION'                                   { return 'OPTION'; }
 'OR'                                       { return 'OR'; }
+'ORDER'                                    { return 'ORDER'; }
 'OUTER'                                    { return 'OUTER'; }
 'PARTITION'                                { return 'PARTITION'; }
-'PARTITIONS'                               { return 'PARTITIONS'; }
-'PRINT'                                    { return 'PRINT'; }
-'PROPERTIES'                               { return 'PROPERTIES'; }
-'QUERIES'                                  { return 'QUERIES'; }
-'QUERY'                                    { return 'QUERY'; }
-'RENAME'                                   { return 'RENAME'; }
-'RESET'                                    { return 'RESET'; }
+'PRECEDING'                                { return 'PRECEDING'; }
+'PURGE'                                    { return 'PURGE'; }
+'RANGE'                                    { return 'RANGE'; }
+'REGEXP'                                   { return 'REGEXP'; }
 'RIGHT'                                    { return 'RIGHT'; }
-'RUN'                                      { return 'RUN'; }
-'SAMPLE'                                   { return 'SAMPLE'; }
-'SCRIPT'                                   { return 'SCRIPT'; }
-'SECOND'                                   { return 'SECOND'; }
-'SECOND'                                   { return 'SECOND'; }
+'RLIKE'                                    { return 'RLIKE'; }
+'ROW'                                      { return 'ROW'; }
+'ROLE'                                     { return 'ROLE'; }
+'ROWS'                                     { return 'ROWS'; }
+'SCHEMA'                                   { return 'SCHEMA'; }
 'SELECT'                                   { parser.determineCase(yytext); parser.addStatementTypeLocation('SELECT', yylloc); return 'SELECT'; }
-'SESSION'                                  { return 'SESSION'; }
+'SEMI'                                     { return 'SEMI'; }
 'SET'                                      { parser.determineCase(yytext); parser.addStatementTypeLocation('SET', yylloc); return 'SET'; }
 'SHOW'                                     { parser.determineCase(yytext); parser.addStatementTypeLocation('SHOW', yylloc); return 'SHOW'; }
-'SINK'                                     { return 'SINK'; }
-'SOURCE'                                   { return 'SOURCE'; }
-'STREAM'                                   { return 'STREAM'; }
-'STREAMS'                                  { return 'STREAMS'; }
+'SMALLINT'                                 { return 'SMALLINT'; }
 'STRING'                                   { return 'STRING'; }
-'STRUCT'                                   { return 'STRUCT'; }
 'TABLE'                                    { return 'TABLE'; }
-'TABLES'                                   { return 'TABLES'; }
-'TERMINATE'                                { return 'TERMINATE'; }
 'THEN'                                     { return 'THEN'; }
-'TIME'                                     { return 'TIME'; }
 'TIMESTAMP'                                { return 'TIMESTAMP'; }
+'TINYINT'                                  { return 'TINYINT'; }
 'TO'                                       { return 'TO'; }
 'TRUE'                                     { return 'TRUE'; }
-'TOPIC'                                    { return 'TOPIC'; }
-'TOPICS'                                   { return 'TOPICS'; }
-'TUMBLING'                                 { return 'TUMBLING'; }
-'TYPE'                                     { return 'TYPE'; }
-'TYPES'                                    { return 'TYPES'; }
-'UNSET'                                    { return 'UNSET'; }
+'TRUNCATE'                                 { parser.determineCase(yytext); parser.addStatementTypeLocation('TRUNCATE', yylloc, yy.lexer.upcomingInput()); return 'TRUNCATE'; }
+'UNBOUNDED'                                { return 'UNBOUNDED'; }
+'UNION'                                    { return 'UNION'; }
+'UPDATE'                                   { parser.determineCase(yytext); return 'UPDATE'; }
+'USE'                                      { parser.determineCase(yytext); parser.addStatementTypeLocation('USE', yylloc); return 'USE'; }
 'VALUES'                                   { return 'VALUES'; }
 'VARCHAR'                                  { return 'VARCHAR'; }
+'VIEW'                                     { return 'VIEW'; }
 'WHEN'                                     { return 'WHEN'; }
 'WHERE'                                    { return 'WHERE'; }
 'WITH'                                     { parser.determineCase(yytext); parser.addStatementTypeLocation('WITH', yylloc); return 'WITH'; }
-'WITHIN'                                   { return 'WITHIN'; }
-'YEAR'                                     { return 'YEAR'; }
-'YEARS'                                    { return 'YEARS'; }
-'ZONE'                                     { return 'ZONE'; }
+
+// Non-reserved Keywords
+'OVER'                                     { return 'OVER'; }
+'ROLE'                                     { return 'ROLE'; }
 
 // --- UDFs ---
-ABS\s*\(                                   { yy.lexer.unput('('); yytext = 'abs'; parser.addFunctionLocation(yylloc, yytext); return 'ABS'; }
-ARRAYCONTAINS\s*\(                         { yy.lexer.unput('('); yytext = 'arraycontains'; parser.addFunctionLocation(yylloc, yytext); return 'ARRAYCONTAINS'; }
-CEIL\s*\(                                  { yy.lexer.unput('('); yytext = 'ceil'; parser.addFunctionLocation(yylloc, yytext); return 'CEIL'; }
-CONCAT\s*\(                                { yy.lexer.unput('('); yytext = 'concat'; parser.addFunctionLocation(yylloc, yytext); return 'CONCAT'; }
-DATETOSTRING\s*\(                          { yy.lexer.unput('('); yytext = 'datetostring'; parser.addFunctionLocation(yylloc, yytext); return 'DATETOSTRING'; }
-ELT\s*\(                                   { yy.lexer.unput('('); yytext = 'elt'; parser.addFunctionLocation(yylloc, yytext); return 'ELT'; }
-EXTRACTJSONFIELD\s*\(                      { yy.lexer.unput('('); yytext = 'extractjsonfield'; parser.addFunctionLocation(yylloc, yytext); return 'EXTRACTJSONFIELD'; }
-FIELD\s*\(                                 { yy.lexer.unput('('); yytext = 'field'; parser.addFunctionLocation(yylloc, yytext); return 'FIELD'; }
-FLOOR\s*\(                                 { yy.lexer.unput('('); yytext = 'floor'; parser.addFunctionLocation(yylloc, yytext); return 'FLOOR'; }
-GEO_DISTANCE\s*\(                          { yy.lexer.unput('('); yytext = 'geo_distance'; parser.addFunctionLocation(yylloc, yytext); return 'GEO_DISTANCE'; }
-IFNULL\s*\(                                { yy.lexer.unput('('); yytext = 'ifnull'; parser.addFunctionLocation(yylloc, yytext); return 'IFNULL'; }
-LCASE\s*\(                                 { yy.lexer.unput('('); yytext = 'lcase'; parser.addFunctionLocation(yylloc, yytext); return 'LCASE'; }
-LEN\s*\(                                   { yy.lexer.unput('('); yytext = 'len'; parser.addFunctionLocation(yylloc, yytext); return 'LEN'; }
-MASK\s*\(                                  { yy.lexer.unput('('); yytext = 'msk'; parser.addFunctionLocation(yylloc, yytext); return 'MASK'; }
-MASK_KEEP_LEFT\s*\(                        { yy.lexer.unput('('); yytext = 'mask_keep_left'; parser.addFunctionLocation(yylloc, yytext); return 'MASK_KEEP_LEFT'; }
-MASK_KEEP_RIGHT\s*\(                       { yy.lexer.unput('('); yytext = 'mask_keep_right'; parser.addFunctionLocation(yylloc, yytext); return 'MASK_KEEP_RIGHT'; }
-MASK_LEFT\s*\(                             { yy.lexer.unput('('); yytext = 'mask_left'; parser.addFunctionLocation(yylloc, yytext); return 'MASK_LEFT'; }
-MASK_RIGHT\s*\(                            { yy.lexer.unput('('); yytext = 'mask_right'; parser.addFunctionLocation(yylloc, yytext); return 'MASK_RIGHT'; }
-RANDOM\s*\(                                { yy.lexer.unput('('); yytext = 'random'; parser.addFunctionLocation(yylloc, yytext); return 'RANDOM'; }
-ROUND\s*\(                                 { yy.lexer.unput('('); yytext = 'round'; parser.addFunctionLocation(yylloc, yytext); return 'ROUND'; }
-SPLIT\s*\(                                 { yy.lexer.unput('('); yytext = 'split'; parser.addFunctionLocation(yylloc, yytext); return 'SPLIT'; }
-STRINGTODATE\s*\(                          { yy.lexer.unput('('); yytext = 'stringtodate'; parser.addFunctionLocation(yylloc, yytext); return 'STRINGTODATE'; }
-STRINGTOTIMESTAMP\s*\(                     { yy.lexer.unput('('); yytext = 'stringtotimestamp'; parser.addFunctionLocation(yylloc, yytext); return 'STRINGTOTIMESTAMP'; }
-SUBSTRING\s*\(                             { yy.lexer.unput('('); yytext = 'substring'; parser.addFunctionLocation(yylloc, yytext); return 'SUBSTRING'; }
-TIMESTAMPTOSTRING\s*\(                     { yy.lexer.unput('('); yytext = 'timestamptostring'; parser.addFunctionLocation(yylloc, yytext); return 'TIMESTAMPTOSTRING'; }
-TRIM\s*\(                                  { yy.lexer.unput('('); yytext = 'trim'; parser.addFunctionLocation(yylloc, yytext); return 'TRIM'; }
-UCASE\s*\(                                 { yy.lexer.unput('('); yytext = 'ucase'; parser.addFunctionLocation(yylloc, yytext); return 'UCASE'; }
-URL_DECODE_PARAM\s*\(                      { yy.lexer.unput('('); yytext = 'url_decode_param'; parser.addFunctionLocation(yylloc, yytext); return 'URL_DECODE_PARAM'; }
-URL_ENCODE_PARAM\s*\(                      { yy.lexer.unput('('); yytext = 'urel_encode_param'; parser.addFunctionLocation(yylloc, yytext); return 'URL_ENCODE_PARAM'; }
-URL_EXTRACT_FRAGMENT\s*\(                  { yy.lexer.unput('('); yytext = 'url_extract_fragment'; parser.addFunctionLocation(yylloc, yytext); return 'URL_EXTRACT_FRAGMENT'; }
-URL_EXTRACT_HOST\s*\(                      { yy.lexer.unput('('); yytext = 'url_extract_host'; parser.addFunctionLocation(yylloc, yytext); return 'URL_EXTRACT_HOST'; }
-URL_EXTRACT_PARAMETER\s*\(                 { yy.lexer.unput('('); yytext = 'url_extract_parameter'; parser.addFunctionLocation(yylloc, yytext); return 'URL_EXTRACT_PARAMETER'; }
-URL_EXTRACT_PATH\s*\(                      { yy.lexer.unput('('); yytext = 'url_extrct_path'; parser.addFunctionLocation(yylloc, yytext); return 'URL_EXTRACT_PATH'; }
-URL_EXTRACT_PORT\s*\(                      { yy.lexer.unput('('); yytext = 'url_extract_port'; parser.addFunctionLocation(yylloc, yytext); return 'URL_EXTRACT_PORT'; }
-URL_EXTRACT_PROTOCOL\s*\(                  { yy.lexer.unput('('); yytext = 'url_extract_protocol'; parser.addFunctionLocation(yylloc, yytext); return 'URL_EXTRACT_PROTOCOL'; }
-URL_EXTRACT_QUERY\s*\(                     { yy.lexer.unput('('); yytext = 'url_extract_query'; parser.addFunctionLocation(yylloc, yytext); return 'URL_EXTRACT_QUERY'; }
-
-
-// Analytical functions
-COLLECT_LIST\s*\(                          { yy.lexer.unput('('); yytext = 'collect_list'; parser.addFunctionLocation(yylloc, yytext); return 'COLLECT_LIST'; }
-COLLECT_SET\s*\(                           { yy.lexer.unput('('); yytext = 'collect_set'; parser.addFunctionLocation(yylloc, yytext); return 'COLLECT_SET'; }
+AVG\s*\(                                   { yy.lexer.unput('('); yytext = 'avg'; parser.addFunctionLocation(yylloc, yytext); return 'AVG'; }
+CAST\s*\(                                  { yy.lexer.unput('('); yytext = 'cast'; parser.addFunctionLocation(yylloc, yytext); return 'CAST'; }
 COUNT\s*\(                                 { yy.lexer.unput('('); yytext = 'count'; parser.addFunctionLocation(yylloc, yytext); return 'COUNT'; }
-HISTOGRAM\s*\(                             { yy.lexer.unput('('); yytext = 'historgram'; parser.addFunctionLocation(yylloc, yytext); return 'HISTOGRAM'; }
 MAX\s*\(                                   { yy.lexer.unput('('); yytext = 'max'; parser.addFunctionLocation(yylloc, yytext); return 'MAX'; }
 MIN\s*\(                                   { yy.lexer.unput('('); yytext = 'min'; parser.addFunctionLocation(yylloc, yytext); return 'MIN'; }
+STDDEV_POP\s*\(                            { yy.lexer.unput('('); yytext = 'stddev_pop'; parser.addFunctionLocation(yylloc, yytext); return 'STDDEV_POP'; }
+STDDEV_SAMP\s*\(                           { yy.lexer.unput('('); yytext = 'stddev_samp'; parser.addFunctionLocation(yylloc, yytext); return 'STDDEV_SAMP'; }
 SUM\s*\(                                   { yy.lexer.unput('('); yytext = 'sum'; parser.addFunctionLocation(yylloc, yytext); return 'SUM'; }
-TOPK\s*\(                                  { yy.lexer.unput('('); yytext = 'topk'; parser.addFunctionLocation(yylloc, yytext); return 'TOPK'; }
-TOPKDISTINCT\s*\(                          { yy.lexer.unput('('); yytext = 'topkdistinct'; parser.addFunctionLocation(yylloc, yytext); return 'TOPKDISTINCT'; }
-WindowStart\s*\(                           { yy.lexer.unput('('); yytext = 'windowstart'; parser.addFunctionLocation(yylloc, yytext); return 'WindowStart'; }
-WindowEnd\s*\(                             { yy.lexer.unput('('); yytext = 'windowend'; parser.addFunctionLocation(yylloc, yytext); return 'WindowEnd'; }
+VAR_POP\s*\(                               { yy.lexer.unput('('); yytext = 'var_pop'; parser.addFunctionLocation(yylloc, yytext); return 'VAR_POP'; }
+VAR_SAMP\s*\(                              { yy.lexer.unput('('); yytext = 'var_samp'; parser.addFunctionLocation(yylloc, yytext); return 'VAR_SAMP'; }
+VARIANCE\s*\(                              { yy.lexer.unput('('); yytext = 'variance'; parser.addFunctionLocation(yylloc, yytext); return 'VARIANCE'; }
 
+// Analytical functions
+CUME_DIST\s*\(                             { yy.lexer.unput('('); yytext = 'cume_dist'; parser.addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+DENSE_RANK\s*\(                            { yy.lexer.unput('('); yytext = 'dense_rank'; parser.addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+FIRST_VALUE\s*\(                           { yy.lexer.unput('('); yytext = 'first_value'; parser.addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+LAG\s*\(                                   { yy.lexer.unput('('); yytext = 'lag'; parser.addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+LAST_VALUE\s*\(                            { yy.lexer.unput('('); yytext = 'last_value'; parser.addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+LEAD\s*\(                                  { yy.lexer.unput('('); yytext = 'lead'; parser.addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+RANK\s*\(                                  { yy.lexer.unput('('); yytext = 'rank'; parser.addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+ROW_NUMBER\s*\(                            { yy.lexer.unput('('); yytext = 'row_number'; parser.addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
 
 [0-9]+                                     { return 'UNSIGNED_INTEGER'; }
 [0-9]+(?:[YSL]|BD)?                        { return 'UNSIGNED_INTEGER'; }
 [0-9]+E                                    { return 'UNSIGNED_INTEGER_E'; }
 [A-Za-z0-9_]+                              { return 'REGULAR_IDENTIFIER'; }
 
+<hdfs>'\u2020'                             { parser.yy.cursorFound = true; return 'CURSOR'; }
+<hdfs>'\u2021'                             { parser.yy.cursorFound = true; return 'PARTIAL_CURSOR'; }
+<hdfs>\s+['"]                              { return 'HDFS_START_QUOTE'; }
+<hdfs>[^'"\u2020\u2021]+                   { parser.addFileLocation(yylloc, yytext); return 'HDFS_PATH'; }
+<hdfs>['"]                                 { this.popState(); return 'HDFS_END_QUOTE'; }
+<hdfs><<EOF>>                              { return 'EOF'; }
 
 '&&'                                       { return 'AND'; }
 '||'                                       { return 'OR'; }
