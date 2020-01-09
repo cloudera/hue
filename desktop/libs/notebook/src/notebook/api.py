@@ -34,6 +34,7 @@ from azure.abfs.__init__ import abfspath
 from desktop.conf import TASK_SERVER
 from desktop.lib.i18n import smart_str
 from desktop.lib.django_util import JsonResponse
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2, Document, __paginate, _get_gist_document
 from indexer.file_format import HiveFormat
 from indexer.fields import Field
@@ -801,6 +802,8 @@ def export_result(request):
   elif data_format == 'hdfs-directory':
     if destination.lower().startswith("abfs"):
       destination = abfspath(destination)
+    if request.fs.exists(destination) and request.fs.listdir_stats(destination):
+      raise PopupException(_('The destination is not an empty directory!'))
     if is_embedded:
       sql, success_url = api.export_large_data_to_hdfs(notebook, snippet, destination)
 
