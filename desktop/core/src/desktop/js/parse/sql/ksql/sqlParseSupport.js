@@ -1471,8 +1471,6 @@ const initSqlParser = function(parser) {
             loc.identifier = 'CREATE TABLE';
           } else if (/CREATE\s+DATABASE/i.test(additionalText)) {
             loc.identifier = 'CREATE DATABASE';
-          } else if (/CREATE\s+ROLE/i.test(additionalText)) {
-            loc.identifier = 'CREATE ROLE';
           } else if (/CREATE\s+FUNCTION/i.test(additionalText)) {
             loc.identifier = 'CREATE FUNCTION';
           } else {
@@ -1486,8 +1484,6 @@ const initSqlParser = function(parser) {
             loc.identifier = 'DROP TABLE';
           } else if (/DROP\s+DATABASE/i.test(additionalText)) {
             loc.identifier = 'DROP DATABASE';
-          } else if (/DROP\s+ROLE/i.test(additionalText)) {
-            loc.identifier = 'DROP ROLE';
           } else if (/DROP\s+STATS/i.test(additionalText)) {
             loc.identifier = 'DROP STATS';
           } else if (/DROP\s+FUNCTION/i.test(additionalText)) {
@@ -1501,9 +1497,6 @@ const initSqlParser = function(parser) {
           break;
         case 'LOAD':
           loc.identifier = 'LOAD DATA';
-          break;
-        case 'TRUNCATE':
-          loc.identifier = 'TRUNCATE TABLE';
           break;
         default:
       }
