@@ -39,9 +39,21 @@ const TEMPLATE = `
   </script>
 
   <script type="text/html" id="sidebar-sub-menu">
-    <div class="sidebar-menu" data-bind="css: { 'open' : open() || hoverOpen() }, event: { mouseenter: mouseEnter  }">
+    <div class="sidebar-menu" data-bind="
+        css: {
+          'open' : open() || hoverOpen(),
+          'fixed-bottom': fixedBottom
+        },
+        event: {
+          mouseenter: mouseEnter
+        }
+      ">
       <div class="inner">
         <div class="menu">
+          <!-- ko if: headerTemplate -->
+          <div class="menu-header" data-bind="template: headerTemplate"></div>
+          <!-- /ko -->
+
           <ul class="sidebar-nav-list" data-bind="foreach: children">
             <li data-bind="css: { 'divider': isDivider }">
               <!-- ko if: isDivider -->
@@ -58,6 +70,9 @@ const TEMPLATE = `
                 <!-- ko if: !children && href -->
                   <a href="javascript:void(0);" target="_blank" data-bind="attr: { 'href': href }, text: displayName"></a>
                 <!-- /ko -->
+                <!-- ko if: !children && click -->
+                  <a href="javascript:void(0);" target="_blank" data-bind="click: click.bind($data), text: displayName"></a>
+                <!-- /ko -->
               <!-- /ko -->
             </li>
           </ul>
@@ -71,7 +86,6 @@ const TEMPLATE = `
       <!-- ko if: children && children.length -->
         <a href="javascript: void(0);" data-bind="
             toggle: open,
-            attr: { 'aria-label': displayName, 'data-tooltip': displayName },
             css: { 'active': active },
             template: 'sidebar-inner-item'
           " class="item"></a>
@@ -95,58 +109,14 @@ const TEMPLATE = `
               template: 'sidebar-inner-item'
             " class="item"></a>
         <!-- /ko -->
-        <!-- ko if: subMenuTemplate -->
-        <!-- ko template: subMenuTemplate --><!-- /ko -->
-        <!-- /ko -->
       <!-- /ko -->
     </div>
   </script>
 
-  <script type="text/html" id="user-sub-menu-template">
-    <div class="sidebar-menu user-menu" data-bind="css: { 'open' : $component.userMenuOpen }">
-      <div class="menu">
-        <div class="menu-header">
-          <div class="user-icon" style="background-color: #fff">${window.LOGGED_USERNAME[0].toUpperCase()}</div>
-          <div>
-            <div>${window.LOGGED_USERNAME}</div>
-          </div>
-        </div>
-        <ul class="sidebar-nav-list">
-          <!-- ko if: window.USER_VIEW_EDIT_USER_ENABLED -->
-          <li><a href="javascript:void(0);" data-bind="
-              hueLink: '/useradmin/users/edit/${window.LOGGED_USERNAME}',
-              attr: {
-                'title': window.IS_LDAP_SETUP ? '${I18n('View Profile')}' : '${I18n('Edit Profile')}'
-              }
-            ">${I18n('My Profile')}</a></li>
-          <!-- /ko -->
-          <!-- ko if: window.USER_IS_ADMIN || window.USER_IS_ORG_ADMIN -->
-          <li><a href="javascript: void(0);" data-bind="hueLink: '/useradmin/users/'">${I18n(
-            'Manage Users'
-          )}</a></li>
-          <li><a href="javascript: void(0);" data-bind="hueLink: '/about/'">${I18n(
-            'Administration'
-          )}</a></li>
-          <!-- /ko -->
-          <li><a href="javascript: void(0);" data-bind="hueLink: '/accounts/logout'" title="${I18n(
-            'Sign out'
-          )}" >${I18n('Sign out')}</a></li>
-        </ul>
-      </div>
-    </div>
-  </script>
-
-  <script type="text/html" id="support-sub-menu-template">
-    <div class="sidebar-menu support-menu" data-bind="css: { 'open' : $component.supportMenuOpen }">
-      <div class="menu">
-        <ul class="sidebar-nav-list">
-          <li><a href="https://docs.gethue.com" target="_blank">${I18n('Documentation')}</a></li>
-          <li><a href="javascript:void(0)" data-bind="publish: 'show.welcome.tour'">${I18n(
-            'Welcome Tour'
-          )}</a></li>
-          <li><a href="http://gethue.com" target="_blank">Gethue.com</a></li>
-        </ul>
-      </div>
+  <script type="text/html" id="user-header-template">
+    <div class="user-icon" style="background-color: #fff">${ window.LOGGED_USERNAME[0].toUpperCase() }</div>
+    <div>
+      <div>${ window.LOGGED_USERNAME }</div>
     </div>
   </script>
 
@@ -199,7 +169,6 @@ const trackCloseOnClick = (observable, id) => {
 
 class SidebarItem {
   constructor(options) {
-    this.id = Math.random();
     this.isCategory = !!options.isCategory;
     this.displayName = options.displayName;
     this.isDivider = !!options.isDivider;
@@ -213,11 +182,13 @@ class SidebarItem {
     this.open = ko.observable(false);
     this.hoverOpen = ko.observable(false);
     this.click = options.click;
-    this.subMenuTemplate = options.subMenuTemplate;
     this.iconHtml = options.iconHtml;
     this.itemClass = options.itemClass;
+    this.headerTemplate = options.headerTemplate;
+    this.fixedBottom = !!options.fixedBottom;
 
     trackCloseOnClick(this.open, 'sidebar-sub');
+    trackCloseOnClick(this.hoverOpen, 'sidebar-sub');
     this.hoverdelay = -1;
 
     this.open.subscribe(() => {
@@ -275,19 +246,56 @@ class Sidebar {
     apiHelper.withTotalStorage('hue.sidebar', 'collabse', this.collapsed, true);
 
     this.items = ko.observableArray();
+
+    const userChildren = [];
+
+    if (window.USER_VIEW_EDIT_USER_ENABLED) {
+      userChildren.push(
+        new SidebarItem({
+          url: '/useradmin/users/edit/' + window.LOGGED_USERNAME,
+          displayName: I18n('My Profile')
+        })
+      );
+    }
+
+    if (window.USER_IS_ADMIN || window.USER_IS_ORG_ADMIN) {
+      userChildren.push(
+        new SidebarItem({ url: '/useradmin/users/', displayName: I18n('Manage Users') })
+      );
+      userChildren.push(new SidebarItem({ url: '/about/', displayName: I18n('Administration') }));
+    }
+
+    userChildren.push(new SidebarItem({ url: '/accounts/logout', displayName: I18n('Sign out') }));
+
     this.footerItems = [
       new SidebarItem({
         displayName: 'Support',
         icon: 'support',
-        click: () => this.supportMenuOpen(!this.supportMenuOpen()),
-        subMenuTemplate: 'support-sub-menu-template'
+        children: [
+          new SidebarItem({
+            displayName: I18n('Documentation'),
+            href: 'https://docs.gethue.com'
+          }),
+          new SidebarItem({
+            displayName: I18n('Welcome Tour'),
+            click: () => {
+              huePubSub.publish('show.welcome.tour');
+            }
+          }),
+          new SidebarItem({
+            displayName: 'Gethue.com',
+            href: 'https://gethue.com'
+          })
+        ],
+        fixedBottom: true
       }),
       new SidebarItem({
         displayName: window.LOGGED_USERNAME,
         itemClass: 'shepherd-user-menu',
         iconHtml: '<div class="user-icon">' + window.LOGGED_USERNAME[0].toUpperCase() + '</div>',
-        click: () => this.userMenuOpen(!this.userMenuOpen()),
-        subMenuTemplate: 'user-sub-menu-template'
+        headerTemplate: 'user-header-template',
+        children: userChildren,
+        fixedBottom: true
       })
     ];
     this.lastAppName = undefined;
