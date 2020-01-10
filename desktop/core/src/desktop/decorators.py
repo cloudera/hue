@@ -19,16 +19,14 @@ import logging
 
 from django.utils.translation import ugettext as _
 
+from desktop.auth.backend import is_admin
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2
-
 
 try:
   from functools import wraps
 except ImportError:
   from django.utils.functional import wraps
-
-from desktop.auth.backend import is_admin
 
 
 LOG = logging.getLogger(__name__)

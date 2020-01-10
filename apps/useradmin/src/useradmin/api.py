@@ -20,6 +20,7 @@ import logging
 from desktop.decorators import check_superuser_permission
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import smart_unicode
+
 from useradmin.models import User, Group
 
 
