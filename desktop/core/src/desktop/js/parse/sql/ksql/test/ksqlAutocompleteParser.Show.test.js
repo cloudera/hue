@@ -41,7 +41,7 @@ describe('ksqlAutocompleteParser.js SHOW statements', () => {
       afterCursor: '',
       expectedResult: {
         lowerCase: false,
-        suggestKeywords: ['TABLES', 'STREAMS', 'TOPICS', 'QUERIES', 'PROPERTIES']
+        suggestKeywords: ['PROPERTIES', 'QUERIES', 'STREAMS', 'TABLES', 'TOPICS']
       }
     });
   });
@@ -52,7 +52,7 @@ describe('ksqlAutocompleteParser.js SHOW statements', () => {
       afterCursor: '',
       expectedResult: {
         lowerCase: false,
-        suggestKeywords: ['TABLES', 'STREAMS', 'TOPICS']
+        suggestKeywords: ['STREAMS', 'TABLES', 'TOPICS']
       }
     });
   });
