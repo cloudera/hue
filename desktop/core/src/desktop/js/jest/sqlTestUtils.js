@@ -230,7 +230,7 @@ expect.extend({
       deleteKeywords = true;
     }
     if (typeof testDefinition.doesNotContainKeywords !== 'undefined') {
-      const keywords = actualResponse.suggestKeywords;
+      const keywords = actualResponse.suggestKeywords || [];
       let contains = false;
       testDefinition.doesNotContainKeywords.forEach(keyword => {
         if (typeof keywords === 'undefined' || keywords.indexOf(keyword) !== -1) {
