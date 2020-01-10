@@ -384,27 +384,31 @@
   }
 
   &:not(.collapsed) .sidebar-menu {
-    left: @sidebar-width + 8px;
+    left: @sidebar-width;
   }
 
   &.collapsed .sidebar-menu {
-    left: @sidebar-collapsed-width + 8px;
+    left: @sidebar-collapsed-width;
   }
 
   .sidebar-menu {
     z-index: 1011;
     position: absolute;
     display: none;
-    background-color: @cui-gray-800;
-    color: @cui-white;
-    font-size: 14px;
-    border-radius: 3px;
-    box-shadow: rgba(0, 0, 0, 0.2) 0 2px 4px 0;
-    white-space: nowrap;
-    padding: 4px 8px;
-    height: auto;
-    transition: none;
     margin-top: -40px;
+    height: auto;
+    padding-left: 8px;
+
+    .inner {
+      background-color: @cui-gray-800;
+      color: @cui-white;
+      font-size: 14px;
+      border-radius: 3px;
+      box-shadow: rgba(0, 0, 0, 0.2) 0 2px 4px 0;
+      white-space: nowrap;
+      padding: 4px 8px;
+      transition: none;
+    }
 
     &.user-menu {
       margin-top: 0;

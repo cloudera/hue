@@ -39,27 +39,29 @@ const TEMPLATE = `
   </script>
 
   <script type="text/html" id="sidebar-sub-menu">
-    <div class="sidebar-menu" data-bind="css: { 'open' : open() || hoverOpen() }, event: { mouseenter: mouseEnter, mouseleave: mouseLeave }">
-      <div class="menu">
-        <ul class="sidebar-nav-list" data-bind="foreach: children">
-          <li data-bind="css: { 'divider': isDivider }">
-            <!-- ko if: isDivider -->
-              &nbsp;
-            <!-- /ko -->
-            <!-- ko ifnot: isDivider -->
-              <!-- ko if: children && children.length -->
-                <a href="javascript:void(0);" data-bind="toggle: open, text: displayName"></a>
-                <!-- ko template: { name: 'sidebar-sub-menu' } --><!-- /ko -->
+    <div class="sidebar-menu" data-bind="css: { 'open' : open() || hoverOpen() }, event: { mouseenter: mouseEnter  }">
+      <div class="inner">
+        <div class="menu">
+          <ul class="sidebar-nav-list" data-bind="foreach: children">
+            <li data-bind="css: { 'divider': isDivider }">
+              <!-- ko if: isDivider -->
+                &nbsp;
               <!-- /ko -->
-              <!-- ko if: !children && url -->
-                <a href="javascript:void(0);" data-bind="hueLink: url, text: displayName"></a>
+              <!-- ko ifnot: isDivider -->
+                <!-- ko if: children && children.length -->
+                  <a href="javascript:void(0);" data-bind="toggle: open, text: displayName"></a>
+                  <!-- ko template: { name: 'sidebar-sub-menu' } --><!-- /ko -->
+                <!-- /ko -->
+                <!-- ko if: !children && url -->
+                  <a href="javascript:void(0);" data-bind="hueLink: url, text: displayName"></a>
+                <!-- /ko -->
+                <!-- ko if: !children && href -->
+                  <a href="javascript:void(0);" target="_blank" data-bind="attr: { 'href': href }, text: displayName"></a>
+                <!-- /ko -->
               <!-- /ko -->
-              <!-- ko if: !children && href -->
-                <a href="javascript:void(0);" target="_blank" data-bind="attr: { 'href': href }, text: displayName"></a>
-              <!-- /ko -->
-            <!-- /ko -->
-          </li>
-        </ul>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </script>
@@ -197,6 +199,7 @@ const trackCloseOnClick = (observable, id) => {
 
 class SidebarItem {
   constructor(options) {
+    this.id = Math.random();
     this.isCategory = !!options.isCategory;
     this.displayName = options.displayName;
     this.isDivider = !!options.isDivider;
@@ -233,15 +236,16 @@ class SidebarItem {
   }
 
   mouseEnter() {
-    window.clearTimeout(this.hoverdelay);
     if (this.open()) {
       return;
     }
     huePubSub.publish(CLOSE_ON_NEW_HOVER_EVENT, this);
+    window.clearTimeout(this.hoverdelay);
     this.hoverOpen(true);
   }
 
   mouseLeave() {
+    window.clearTimeout(this.hoverdelay);
     this.hoverdelay = window.setTimeout(() => {
       this.hoverOpen(false);
     }, 400);
