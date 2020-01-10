@@ -323,7 +323,11 @@ class RemoteJwtBackend(DesktopBackendBase):
     if response.status_code != 200:
       raise PermissionDenied()
 
-    user = find_or_create_user(username, password, is_superuser=False)
+    user = find_or_create_user(
+      username,
+      password,
+      is_superuser=not User.objects.exists()
+    )
 
     ensure_has_a_group(user)
     user = rewrite_user(user)
