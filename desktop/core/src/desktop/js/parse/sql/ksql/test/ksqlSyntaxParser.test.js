@@ -137,7 +137,6 @@ describe('ksqlSyntaxParser.js', () => {
       'CREATE',
       'USE',
       'DROP',
-      'TRUNCATE',
       'UPDATE',
       'WITH'
     ]);
@@ -155,9 +154,7 @@ describe('ksqlSyntaxParser.js', () => {
       'create',
       'use',
       'drop',
-      'truncate',
-      'update',
-      'with'
+      'update'
     ]);
   });
 
