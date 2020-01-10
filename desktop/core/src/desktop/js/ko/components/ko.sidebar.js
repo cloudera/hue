@@ -206,6 +206,29 @@ class SidebarItem {
     });
   }
 
+  isActive(lastAppName) {
+    if (lastAppName === 'filebrowser') {
+      if (location.href.indexOf('=S3A') !== -1) {
+        return this.type === 's3';
+      } else if (location.href.indexOf('=adl') !== -1) {
+        return this.type === 'adls';
+      } else if (location.href.indexOf('=abfs') !== -1) {
+        return this.type === 'abfs';
+      }
+      return this.type === 'hdfs';
+    }
+
+    if (lastAppName && lastAppName === this.type) {
+      return true;
+    }
+
+    if (this.children && this.children.length) {
+      return this.children.some(child => child.isActive(lastAppName));
+    }
+
+    return location.pathname === '/hue' + this.url;
+  }
+
   mouseEnter() {
     if (this.open()) {
       return;
@@ -262,7 +285,13 @@ class Sidebar {
       userChildren.push(
         new SidebarItem({ url: '/useradmin/users/', displayName: I18n('Manage Users') })
       );
-      userChildren.push(new SidebarItem({ url: '/about/', displayName: I18n('Administration') }));
+      userChildren.push(
+        new SidebarItem({
+          url: '/about/',
+          displayName: I18n('Administration'),
+          type: 'admin_wizard'
+        })
+      );
     }
 
     userChildren.push(new SidebarItem({ url: '/accounts/logout', displayName: I18n('Sign out') }));
@@ -299,31 +328,26 @@ class Sidebar {
       })
     ];
     this.lastAppName = undefined;
+    this.lastHref = location.href;
 
     const updateActive = () => {
       this.userMenuOpen(false);
       this.supportMenuOpen(false);
+      let activeFound = false;
+
+      const testActive = child => {
+        if (!activeFound) {
+          child.active(child.isActive(this.lastAppName));
+          activeFound = child.active();
+        } else {
+          child.active(false);
+        }
+      };
+
       this.items().forEach(item => {
-        item.children.forEach(child => {
-          let active = false;
-          if (this.lastAppName === 'editor') {
-            active = child.type === 'editor';
-          } else if (this.lastAppName === 'filebrowser') {
-            if (location.href.indexOf('=S3A') !== -1) {
-              active = child.type === 's3';
-            } else if (location.href.indexOf('=adl') !== -1) {
-              active = child.type === 'adls';
-            } else if (location.href.indexOf('=abfs') !== -1) {
-              active = child.type === 'abfs';
-            } else {
-              active = child.type === 'hdfs';
-            }
-          } else {
-            active = location.pathname === '/hue' + child.url;
-          }
-          child.active(active);
-        });
+        item.children.forEach(testActive);
       });
+      this.footerItems.forEach(testActive);
     };
 
     const configUpdated = clusterConfig => {
@@ -455,9 +479,12 @@ class Sidebar {
       if (!appName) {
         return;
       }
-      this.lastAppName = appName;
-      window.clearTimeout(throttle);
-      throttle = window.setTimeout(updateActive, 20);
+      if (appName !== this.lastAppName || location.href !== this.lastHref) {
+        this.lastAppName = appName;
+        this.lastHref = location.href;
+        window.clearTimeout(throttle);
+        throttle = window.setTimeout(updateActive, 100);
+      }
     });
     updateActive();
 
