@@ -171,9 +171,8 @@ def create_user(username, password, is_superuser=True):
 
   if ENABLE_ORGANIZATIONS.get():
     user.is_admin = is_superuser or not organization.organizationuser_set.exists() or not organization.is_multi_user
-    user.is_superuser = not User.objects.exists()
-  else:
-    user.is_superuser = is_superuser
+
+  user.is_superuser = is_superuser
 
   user.save()
 
