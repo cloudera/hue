@@ -25,6 +25,8 @@ import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'utils/hueConfig'
 
 export const NAME = 'hue-sidebar';
 
+const CLOSE_ON_NEW_HOVER_EVENT = 'hue.sidebar.close.on.new.hover';
+
 // prettier-ignore
 const TEMPLATE = `
   <script type="text/html" id="sidebar-inner-item">
@@ -37,7 +39,7 @@ const TEMPLATE = `
   </script>
 
   <script type="text/html" id="sidebar-sub-menu">
-    <div class="sidebar-menu" data-bind="css: { 'open' : open }">
+    <div class="sidebar-menu" data-bind="css: { 'open' : open() || hoverOpen() }, event: { mouseenter: mouseEnter, mouseleave: mouseLeave }">
       <div class="menu">
         <ul class="sidebar-nav-list" data-bind="foreach: children">
           <li data-bind="css: { 'divider': isDivider }">
@@ -63,7 +65,7 @@ const TEMPLATE = `
   </script>
 
   <script type="text/html" id="sidebar-item">
-    <div class="item-wrapper" data-bind="css: itemClass">
+    <div class="item-wrapper" data-bind="css: itemClass, event: { mouseenter: mouseEnter, mouseleave: mouseLeave }">
       <!-- ko if: children && children.length -->
         <a href="javascript: void(0);" data-bind="
             toggle: open,
@@ -206,12 +208,43 @@ class SidebarItem {
     this.type = options.type;
     this.active = ko.observable(false);
     this.open = ko.observable(false);
+    this.hoverOpen = ko.observable(false);
     this.click = options.click;
     this.subMenuTemplate = options.subMenuTemplate;
     this.iconHtml = options.iconHtml;
     this.itemClass = options.itemClass;
 
     trackCloseOnClick(this.open, 'sidebar-sub');
+    this.hoverdelay = -1;
+
+    this.open.subscribe(() => {
+      huePubSub.publish(CLOSE_ON_NEW_HOVER_EVENT, this);
+      window.clearTimeout(this.hoverdelay);
+      this.hoverOpen(false);
+    });
+
+    huePubSub.subscribe(CLOSE_ON_NEW_HOVER_EVENT, item => {
+      if (item !== this) {
+        window.clearTimeout(this.hoverdelay);
+        this.hoverOpen(false);
+        this.open(false);
+      }
+    });
+  }
+
+  mouseEnter() {
+    window.clearTimeout(this.hoverdelay);
+    if (this.open()) {
+      return;
+    }
+    huePubSub.publish(CLOSE_ON_NEW_HOVER_EVENT, this);
+    this.hoverOpen(true);
+  }
+
+  mouseLeave() {
+    this.hoverdelay = window.setTimeout(() => {
+      this.hoverOpen(false);
+    }, 400);
   }
 }
 
