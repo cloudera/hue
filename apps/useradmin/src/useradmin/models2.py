@@ -18,6 +18,7 @@
 import logging
 import uuid
 
+from crequest.middleware import CrequestMiddleware
 from django.contrib.auth.models import models, AbstractUser, BaseUserManager
 from django.utils.translation import ugettext_lazy as _t
 
@@ -103,6 +104,18 @@ class UserManager(BaseUserManager):
   """Define a model manager for User model with no username field."""
 
   use_in_migrations = True
+
+  def get_queryset(self):
+    """Make sure to restrict to only organization's user"""
+    queryset = super(UserManager, self).get_queryset()
+    request = CrequestMiddleware.get_request()
+
+    if request:
+      queryset = queryset.filter(
+        organization=request.user.organization
+      )
+
+    return queryset
 
   def _create_user(self, email, password, **extra_fields):
     """Create and save a User with the given email and password."""
