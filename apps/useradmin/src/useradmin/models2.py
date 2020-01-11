@@ -36,7 +36,7 @@ def default_organization():
 
 
 def get_organization(email, is_multi_user=False):
-  domain = email.split('@')[1]
+  domain = email.split('@')[1] if is_multi_user else email
 
   if domain:
     organization, created = Organization.objects.get_or_create(name=domain, domain=domain, is_multi_user=is_multi_user)

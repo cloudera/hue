@@ -42,10 +42,10 @@ class TestOrganizationSingleUser(unittest.TestCase):
     if not ENABLE_ORGANIZATIONS.get():  # Skip for now as depends on DB changes
       raise SkipTest
 
-    cls.user1 = create_user('user1@gethue.com', 'test', is_superuser=False)
-    cls.user2 = create_user('user2@gethue.com', 'test', is_superuser=False)
-    cls.user3 = create_user('user3@gethue.com', 'test', is_superuser=False)
-    cls.user4 = create_user('user4@gethue.com', 'test', is_superuser=False)
+    cls.user1 = create_user('user1@testorg.gethue.com', 'test', is_superuser=False)
+    cls.user2 = create_user('user2@testorg.gethue.com', 'test', is_superuser=False)
+    cls.user3 = create_user('user3@testorg.gethue.com', 'test', is_superuser=False)
+    cls.user4 = create_user('user4@testorg.gethue.com', 'test', is_superuser=False)
 
     cls.client1 = make_logged_in_client(username=cls.user1.username)
     cls.client2 = make_logged_in_client(username=cls.user2.username)
@@ -58,18 +58,22 @@ class TestOrganizationSingleUser(unittest.TestCase):
     cls.user4.delete()
 
 
-  def test_users_groups(self):
-    assert_equal(4, User.objects.count())
-    assert_equal(4, Organization.objects.count())
+  def test_user_group(self):
+    assert_equal('user1@testorg.gethue.com', self.user1.email)
+    assert_true(self.user1.is_admin)
+    assert_equal([Group.objects.filter(name='user1@testorg.gethue.com')], self.user1.groups.all())
+    assert_equal(Organization.objects.filter(name='user1@testorg.gethue.com'), self.user1.organization)
 
-    assert_equal(4, Group.objects.count())
+
+  def test_users_groups(self):
+    assert_equal(4, User.objects.filter(email__contains='testorg.gethue.com').count(), User.objects.all())
+    assert_equal(4, Organization.objects.filter(name__contains='testorg.gethue.com').count(), Organization.objects.all())
+    assert_equal(4, Group.objects.filter(name__contains='testorg.gethue.com').count(), Group.objects.all())
 
 
   def test_get_users(self):
-
-    response = self.client2.get('/useradmin/api/get_users/')
+    response = self.client1.get('/useradmin/api/get_users/')
     data = json.loads(response.content)
 
     assert_equal(0, data['status'])
-    assert_true('users' in data)
-    assert_equal([ ], [user['username'] for user in data['users']])
+    assert_equal([self.user1.email], [user['username'] for user in data['users']])
