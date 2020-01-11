@@ -171,6 +171,7 @@ MIDDLEWARE_CLASSES = [
     #@TODO@ Prakash to check FailedLoginMiddleware working or not?
     #'axes.middleware.FailedLoginMiddleware',
     'desktop.middleware.MimeTypeJSFileFixStreamingMiddleware',
+    'crequest.middleware.CrequestMiddleware',
 ]
 
 # if os.environ.get(ENV_DESKTOP_DEBUG):
@@ -209,6 +210,7 @@ INSTALLED_APPS = [
     'axes',
     'webpack_loader',
     'django_prometheus',
+    'crequest',
     #'django_celery_results',
 ]
 
