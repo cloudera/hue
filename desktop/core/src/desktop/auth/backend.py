@@ -169,12 +169,13 @@ def create_user(username, password, is_superuser=True):
   else:
     user.set_password(password)
 
-  if ENABLE_ORGANIZATIONS.get():
-    user.is_admin = is_superuser or not organization.organizationuser_set.exists() or not organization.is_multi_user
-
   user.is_superuser = is_superuser
 
   user.save()
+
+  if ENABLE_ORGANIZATIONS.get():
+    user.is_admin = is_superuser or not organization.organizationuser_set.exists() or not organization.is_multi_user
+    ensure_has_a_group(user)
 
   return user
 

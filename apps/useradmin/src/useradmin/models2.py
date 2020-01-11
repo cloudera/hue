@@ -97,7 +97,7 @@ class OrganizationGroup(models.Model):
     unique_together = ('name', 'organization',)
 
   def __str__(self):
-    return '%s %s' % (self.organization, self.name)
+    return '%s @ %s' % (self.name, self.organization)
 
 
 class UserManager(BaseUserManager):
@@ -174,6 +174,9 @@ class OrganizationUser(AbstractUser):
   REQUIRED_FIELDS = []
 
   objects = UserManager()
+
+  def __str__(self):
+    return '%s @ %s' % (self.name, self.organization)
 
   @property
   def username(self):
