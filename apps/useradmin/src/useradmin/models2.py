@@ -111,7 +111,7 @@ class UserManager(BaseUserManager):
     queryset = super(UserManager, self).get_queryset()
     request = CrequestMiddleware.get_request()
 
-    if request and hasattr(request, 'user') and type(request.user) is not SimpleLazyObject:
+    if request and hasattr(request, 'user') and type(request.user._wrapped) is not object:  # Avoid infinite recursion
       queryset = queryset.filter(
         organization=request.user.organization
       )

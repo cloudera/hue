@@ -20,14 +20,15 @@
 # Local customizations are done by symlinking a file
 # as local_settings.py.
 
-from builtins import map
-from builtins import zip
+from builtins import map, zip
+import datetime
 import gc
 import json
 import logging
 import os
 import pkg_resources
 import sys
+import uuid
 
 import django_opentracing
 
@@ -509,7 +510,6 @@ SECRET_KEY = desktop.conf.get_secret_key()
 if SECRET_KEY:
   SECRET_KEY += str(AUTHENTICATION_BACKENDS)
 else:
-  import uuid
   SECRET_KEY = str(uuid.uuid4())
 
 # Axes

@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import sys
 import unittest
 
@@ -57,7 +58,6 @@ class TestOrganizationSingleUser(unittest.TestCase):
     cls.user3.delete()
     cls.user4.delete()
 
-
   def test_user_group(self):
     user1_organization = Organization.objects.get(name='user1@testorg.gethue.com')
 
@@ -69,16 +69,19 @@ class TestOrganizationSingleUser(unittest.TestCase):
       list(self.user1.groups.all())
     )
 
-
   def test_users_groups(self):
     assert_equal(4, User.objects.filter(email__contains='testorg.gethue.com').count(), User.objects.all())
     assert_equal(4, Organization.objects.filter(name__contains='testorg.gethue.com').count(), Organization.objects.all())
     assert_equal(4, Group.objects.filter(organization__name__contains='testorg.gethue.com').count(), Group.objects.all())
 
-
   def test_get_users(self):
+    # View
+    response = self.client1.get('/useradmin/users/')
+    assert_equal([self.user1], list(response.context[0]['users']))
+
+    # API
     response = self.client1.get('/useradmin/api/get_users/')
     data = json.loads(response.content)
 
     assert_equal(0, data['status'])
-    assert_equal([self.user1.email], [user['email'] for user in data['users']])
+    assert_equal([self.user1.email], [user['username'] for user in data['users']])
