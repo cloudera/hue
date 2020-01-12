@@ -221,10 +221,13 @@ def get_default_user_group(**kwargs):
   if default_user_group is None:
     return None
 
+  attributes = {
+    'name': default_user_group
+  }
   if ENABLE_ORGANIZATIONS.get():
-    group, created = Group.objects.get_or_create(name=default_user_group, organization=default_organization())
-  else:
-    group, created = Group.objects.get_or_create(name=default_user_group)
+    attributes['organization'] = organization = kwargs['user'].organization if kwargs.get('user') else default_organization()
+
+  group, created = Group.objects.get_or_create(**attributes)
 
   if created:
     group.save()
