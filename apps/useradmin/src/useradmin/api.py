@@ -21,7 +21,7 @@ from desktop.decorators import check_superuser_permission
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import smart_unicode
 
-from useradmin.models import User, Group
+from useradmin.models import User, Group, orm_user_lookup
 
 
 LOG = logging.getLogger(__name__)
@@ -64,7 +64,7 @@ def get_users(request):
     users = users.filter(is_active=True)
 
   if username:
-    users = users.filter(username=username)
+    users = users.filter({orm_user_lookup(): username})
 
   if groups:
     group_ids = []
@@ -77,7 +77,7 @@ def get_users(request):
         LOG.exception("Failed to filter by group, group with name %s not found." % groupname)
     users = users.filter(groups__in=group_ids)
 
-  users = users.order_by('username')
+  users = users.order_by(orm_user_lookup())
 
   for user in users:
     user = {
