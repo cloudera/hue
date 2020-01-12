@@ -85,3 +85,8 @@ class TestOrganizationSingleUser(unittest.TestCase):
 
     assert_equal(0, data['status'])
     assert_equal([self.user1.email], [user['username'] for user in data['users']])
+
+  def test_get_groups(self):
+    # View
+    response = self.client1.get('/useradmin/groups/')
+    assert_equal(list(self.user1.groups.all()), list(response.context[0]['groups']))

@@ -76,6 +76,11 @@ class Organization(models.Model):
 
 class OrganizationGroupManager(models.Manager):
 
+  def get_queryset(self):
+    """Make sure to restrict to only organization's groups"""
+    queryset = super(OrganizationGroupManager, self).get_queryset()
+    return _fitered_queryset(queryset)
+
   def natural_key(self):
     return (self.organization, self.name,)
 
@@ -109,14 +114,7 @@ class UserManager(BaseUserManager):
   def get_queryset(self):
     """Make sure to restrict to only organization's user"""
     queryset = super(UserManager, self).get_queryset()
-    request = CrequestMiddleware.get_request()
-
-    if request and hasattr(request, 'user') and type(request.user._wrapped) is not object:  # Avoid infinite recursion
-      queryset = queryset.filter(
-        organization=request.user.organization
-      )
-
-    return queryset
+    return _fitered_queryset(queryset)
 
   def _create_user(self, email, password, **extra_fields):
     """Create and save a User with the given email and password."""
@@ -190,3 +188,14 @@ class OrganizationUser(AbstractUser):
   @username.setter
   def username(self, value):
     pass
+
+
+def _fitered_queryset(queryset):
+  request = CrequestMiddleware.get_request()
+
+  if request and hasattr(request, 'user') and type(request.user._wrapped) is not object:  # Avoid infinite recursion
+    queryset = queryset.filter(
+      organization=request.user.organization
+    )
+
+  return queryset
