@@ -130,3 +130,4 @@ class TestOrganizationSingleUser(unittest.TestCase):
     User.objects.filter(groups__in=Group.objects.all()).order_by('username')
 
     self.client2.get('/useradmin/groups/edit/default')
+

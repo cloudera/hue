@@ -62,11 +62,13 @@ from useradmin.conf import DEFAULT_USER_GROUP
 from useradmin.permissions import HuePermission, GroupPermission, LdapGroup
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group, get_organization, Organization
+  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group, Organization, default_organization, get_organization, \
+      _fitered_queryset
 else:
   from django.contrib.auth.models import User, Group
   def get_organization(): pass
   class Organization(): pass
+  def _fitered_queryset(queryset): return queryset
 
   monkey_patch_username_validator()
 
