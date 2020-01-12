@@ -44,6 +44,7 @@ import logging
 from datetime import datetime
 from enum import Enum
 
+from crequest.middleware import CrequestMiddleware
 from django.db import connection, models, transaction
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
@@ -219,7 +220,9 @@ if ENABLE_ORGANIZATIONS.get():
     objects = OrganizationHuePermissionManager()
 
     def __init__(self, *args, **kwargs):
-      self.organization = kwargs.pop('organization', None)
+      if not kwargs.get('organization'):
+        kwargs['organization'] = get_user_request_organization()
+
       super(OrganizationHuePermission, self).__init__(*args, **kwargs)
 
     def __str__(self):
@@ -271,8 +274,8 @@ def get_default_user_group(**kwargs):
   attributes = {
     'name': default_user_group
   }
-  if ENABLE_ORGANIZATIONS.get():
-    attributes['organization'] = organization = kwargs['user'].organization if kwargs.get('user') else default_organization()
+  if ENABLE_ORGANIZATIONS.get() and kwargs.get('user'):
+    attributes['organization'] = kwargs['user'].organization
 
   group, created = Group.objects.get_or_create(**attributes)
 
@@ -280,6 +283,11 @@ def get_default_user_group(**kwargs):
     group.save()
 
   return group
+
+
+def get_user_request_organization():
+  request = CrequestMiddleware.get_request()
+  return request.user.organization if request and hasattr(request, 'user') else default_organization()
 
 
 def update_app_permissions(**kwargs):
@@ -356,8 +364,10 @@ def update_app_permissions(**kwargs):
             'action': action,
             'description': description
           }
-          if kwargs.get('organization'):
-            attributes['organization'] = kwargs['organization']
+          # if ENABLE_ORGANIZATIONS.get():
+          #   # Or move signals instead
+          #   attributes['organization'] = kwargs['organization'] if kwargs.get('organization') else default_organization()
+
           new_dp = HuePermission(**attributes)
           new_dp.save()
           added.append(new_dp)

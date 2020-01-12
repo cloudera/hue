@@ -98,6 +98,12 @@ class OrganizationGroup(models.Model):
 
   objects = OrganizationGroupManager()
 
+  def __init__(self, *args, **kwargs):
+    if not kwargs.get('organization'):
+      kwargs['organization'] = get_user_request_organization()
+
+    super(OrganizationGroup, self).__init__(*args, **kwargs)
+
   class Meta:
     verbose_name = _t('organization group')
     verbose_name_plural = _t('organization groups')
