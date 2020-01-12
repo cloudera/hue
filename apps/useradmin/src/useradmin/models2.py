@@ -23,8 +23,6 @@ from django.contrib.auth.models import models, AbstractUser, BaseUserManager
 from django.utils.functional import SimpleLazyObject
 from django.utils.translation import ugettext_lazy as _t
 
-from useradmin.models import HuePermission
-
 
 LOG = logging.getLogger(__name__)
 
@@ -193,37 +191,16 @@ class OrganizationUser(AbstractUser):
     pass
 
 
-class OrganizationHuePermissionManager(models.Manager):
-
-  def get_queryset(self):
-    """Make sure to restrict to only organization"""
-    queryset = super(HuePermissionManager, self).get_queryset()
-    return _fitered_queryset(queryset)
-
-
-class OrganizationHuePermission(HuePermission):
-
-  organization = models.ForeignKey(Organization)
-
-  objects = OrganizationHuePermissionManager()
-
-  def __init__(self):
-    super(OrganizationGroupManager, self)
-  OrganizationHuePermission
-  HuePermission
-
-
-def _fitered_queryset(queryset, by_owner=False, by_group):
+def _fitered_queryset(queryset, by_owner=False):
   request = CrequestMiddleware.get_request()
 
-  if request and hasattr(request, 'user') and type(request.user._wrapped) is not object:  # Avoid infinite recursion
+  # Avoid infinite recursion on very first retrieval of the user
+  if request and hasattr(request, 'user') and hasattr(request.user, '_wrapped') and type(request.user._wrapped) is not object and request.user.is_authenticated():
     if by_owner:
-      queryset = queryset.filter(
-        owner__organization=request.user.organization
-      )
+      filters = {'owner__organization': request.user.organization}
     else:
-      queryset = queryset.filter(
-        organization=request.user.organization
-      )
+      filters = {'organization': request.user.organization}
+
+    queryset = queryset.filter(**filters)
 
   return queryset
