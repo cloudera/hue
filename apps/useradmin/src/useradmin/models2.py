@@ -190,12 +190,17 @@ class OrganizationUser(AbstractUser):
     pass
 
 
-def _fitered_queryset(queryset):
+def _fitered_queryset(queryset, by_owner=False):
   request = CrequestMiddleware.get_request()
 
   if request and hasattr(request, 'user') and type(request.user._wrapped) is not object:  # Avoid infinite recursion
-    queryset = queryset.filter(
-      organization=request.user.organization
-    )
+    if by_owner:
+      queryset = queryset.filter(
+        owner__organization=request.user.organization
+      )
+    else:
+      queryset = queryset.filter(
+        organization=request.user.organization
+      )
 
   return queryset
