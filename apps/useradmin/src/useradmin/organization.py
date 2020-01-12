@@ -158,10 +158,8 @@ class UserManager(BaseUserManager):
 
     request = CrequestMiddleware.get_request()
 
-    if request and hasattr(request, 'user') and type(request.user._wrapped) is not object:  # Avoid infinite recursion
-      queryset = queryset.filter(
-        organization=request.user.organization
-      )
+    if request and hasattr(request, 'user') and hasattr(request.user, '_wrapped') and type(request.user._wrapped) is not object:  # Avoid infinite recursion
+      kwargs['organization'] = get_user_request_organization()
 
     return super(UserManager, self).get(*args, **kwargs)
 
