@@ -63,7 +63,7 @@ from useradmin.conf import DEFAULT_USER_GROUP
 
 if ENABLE_ORGANIZATIONS.get():
   from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group, Organization, default_organization, get_organization, \
-      _fitered_queryset
+      _fitered_queryset, OrganizationHuePermission as HuePermission
 else:
   from django.contrib.auth.models import User, Group
   class Organization(): pass
@@ -197,25 +197,26 @@ class GroupPermission(models.Model):
   hue_permission = models.ForeignKey("HuePermission")
 
 
-class HuePermission(models.Model):
-  """
-  Set of non-object specific permissions that an app supports.
+if not ENABLE_ORGANIZATIONS.get():
+  class HuePermission(models.Model):
+    """
+    Set of non-object specific permissions that an app supports.
 
-  Currently only assign permissions to groups (not users or roles).
-  Could be move to support Apache Ranger permissions, AWS IAM... for Hue and connector access.
-  """
-  app = models.CharField(max_length=30)
-  action = models.CharField(max_length=100)
-  description = models.CharField(max_length=255)
+    Currently only assign permissions to groups (not users or roles).
+    Could be move to support Apache Ranger permissions, AWS IAM... for Hue and connector access.
+    """
+    app = models.CharField(max_length=30)
+    action = models.CharField(max_length=100)
+    description = models.CharField(max_length=255)
 
-  groups = models.ManyToManyField(Group, through=GroupPermission)
+    groups = models.ManyToManyField(Group, through=GroupPermission)
 
-  def __str__(self):
-    return "%s.%s:%s(%d)" % (self.app, self.action, self.description, self.pk)
+    def __str__(self):
+      return "%s.%s:%s(%d)" % (self.app, self.action, self.description, self.pk)
 
-  @classmethod
-  def get_app_permission(cls, hue_app, action):
-    return HuePermission.objects.get(app=hue_app, action=action)
+    @classmethod
+    def get_app_permission(cls, hue_app, action):
+      return HuePermission.objects.get(app=hue_app, action=action)
 
 
 def get_default_user_group(**kwargs):
@@ -302,7 +303,14 @@ def update_app_permissions(**kwargs):
           else:
             uptodate += 1
         else:
-          new_dp = HuePermission(app=app_name, action=action, description=description)
+          attributes = {
+            'app': app_name,
+            'action': action,
+            'description': description
+          }
+          if kwargs.get('organization'):
+            attributes['organization'] = kwargs['organization']
+          new_dp = HuePermission(**attributes)
           new_dp.save()
           added.append(new_dp)
 
