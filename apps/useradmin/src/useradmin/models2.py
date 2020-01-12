@@ -23,6 +23,8 @@ from django.contrib.auth.models import models, AbstractUser, BaseUserManager
 from django.utils.functional import SimpleLazyObject
 from django.utils.translation import ugettext_lazy as _t
 
+from useradmin.models import HuePermission
+
 
 LOG = logging.getLogger(__name__)
 
@@ -51,6 +53,7 @@ def get_organization(email, is_multi_user=False):
 
 def uuid_default():
   return str(uuid.uuid4())
+
 
 
 class OrganizationManager(models.Manager):
@@ -190,7 +193,27 @@ class OrganizationUser(AbstractUser):
     pass
 
 
-def _fitered_queryset(queryset, by_owner=False):
+class OrganizationHuePermissionManager(models.Manager):
+
+  def get_queryset(self):
+    """Make sure to restrict to only organization"""
+    queryset = super(HuePermissionManager, self).get_queryset()
+    return _fitered_queryset(queryset)
+
+
+class OrganizationHuePermission(HuePermission):
+
+  organization = models.ForeignKey(Organization)
+
+  objects = OrganizationHuePermissionManager()
+
+  def __init__(self):
+    super(OrganizationGroupManager, self)
+  OrganizationHuePermission
+  HuePermission
+
+
+def _fitered_queryset(queryset, by_owner=False, by_group):
   request = CrequestMiddleware.get_request()
 
   if request and hasattr(request, 'user') and type(request.user._wrapped) is not object:  # Avoid infinite recursion
