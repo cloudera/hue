@@ -43,7 +43,7 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 from dashboard.conf import get_engines, HAS_REPORT_ENABLED
 from kafka.conf import has_kafka
 from notebook.conf import DEFAULT_LIMIT, SHOW_NOTEBOOKS, get_ordered_interpreters
-from useradmin.models import User, Group, get_organization
+from useradmin.models import User, Group, get_organization, _fitered_queryset
 
 from desktop import appmanager
 from desktop.auth.backend import is_admin
@@ -975,7 +975,12 @@ class Document2QuerySet(QuerySet, Document2QueryMixin):
 class Document2Manager(models.Manager, Document2QueryMixin):
 
   def get_queryset(self):
-    return Document2QuerySet(self.model, using=self._db)
+    """Make sure to restrict to only organization's documents"""
+
+    return _fitered_queryset(
+      Document2QuerySet(self.model, using=self._db),
+      by_owner=True
+    )
 
   # TODO prevent get() in favor of this
   def document(self, user, doc_id):

@@ -26,8 +26,9 @@ from nose.tools import assert_equal, assert_true, assert_false
 from desktop.auth.backend import rewrite_user, create_user
 from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
+from desktop.models import Document2
 
-from useradmin.models import User, Group, Organization
+from useradmin.models import User, Group, Organization, HuePermission
 
 
 if sys.version_info[0] > 2:
@@ -44,7 +45,7 @@ class TestOrganizationSingleUser(unittest.TestCase):
       raise SkipTest
 
     cls.user1 = create_user('user1@testorg.gethue.com', 'test', is_superuser=False)
-    cls.user2 = create_user('user2@testorg.gethue.com', 'test', is_superuser=False)
+    cls.user2 = create_user('user2@testorg.gethue.com', 'test', is_superuser=True)
     cls.user3 = create_user('user3@testorg.gethue.com', 'test', is_superuser=False)
     cls.user4 = create_user('user4@testorg.gethue.com', 'test', is_superuser=False)
 
@@ -90,3 +91,33 @@ class TestOrganizationSingleUser(unittest.TestCase):
     # View
     response = self.client1.get('/useradmin/groups/')
     assert_equal(list(self.user1.groups.all()), list(response.context[0]['groups']))
+
+  def test_get_permissions(self):
+    # View
+    response = self.client1.get('/useradmin/permissions/')
+    assert_equal(
+      list(HuePermission.objects.filter(organizationgroup__user=self.user1)),
+      list(response.context[0]['permissions'])
+    )
+
+  def test_get_documents(self):
+    document = Document2.objects.create(
+        name='TestOrganizationSingleUser.test_get_documents',
+        type='query-hive',
+        owner=self.user1,
+    )
+
+    try:
+      # API
+      response = self.client1.post('/desktop/api2/docs/?text=TestOrganizationSingleUser.test_get_document')
+      data = json.loads(response.content)
+
+      assert_equal([document.id], [doc['id'] for doc in data['documents']])
+
+      # Admin other Org
+      response = self.client2.post('/desktop/api2/docs/?text=TestOrganizationSingleUser.test_get_document')
+      data = json.loads(response.content)
+
+      assert_equal([], data['documents'])
+    finally:
+      document.delete()
