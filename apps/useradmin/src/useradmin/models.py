@@ -63,7 +63,7 @@ from useradmin.conf import DEFAULT_USER_GROUP
 
 if ENABLE_ORGANIZATIONS.get():
   from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group, Organization, default_organization, get_organization, \
-      _fitered_queryset, OrganizationHuePermission as HuePermission
+      _fitered_queryset
 else:
   from django.contrib.auth.models import User, Group
   class Organization(): pass
@@ -197,8 +197,46 @@ class GroupPermission(models.Model):
   hue_permission = models.ForeignKey("HuePermission")
 
 
-if not ENABLE_ORGANIZATIONS.get():
-  class HuePermission(models.Model):
+if ENABLE_ORGANIZATIONS.get():
+  class OrganizationHuePermissionManager(models.Manager):
+
+    def get_queryset(self):
+      """Make sure to restrict to only organization"""
+      queryset = super(OrganizationHuePermissionManager, self).get_queryset()
+      return _fitered_queryset(queryset)
+
+
+  # TODO: move to external abstract module?
+  class OrganizationHuePermission(models.Model):
+    app = models.CharField(max_length=30)
+    action = models.CharField(max_length=100)
+    description = models.CharField(max_length=255)
+
+    organization = models.ForeignKey(Organization)
+
+    groups = models.ManyToManyField(Group, through=GroupPermission)
+
+    objects = OrganizationHuePermissionManager()
+
+    def __init__(self, *args, **kwargs):
+      self.organization = kwargs.pop('organization', None)
+      super(OrganizationHuePermission, self).__init__(*args, **kwargs)
+
+    def __str__(self):
+      return "%s.%s:%s(%d)" % (self.app, self.action, self.description, self.pk)
+
+    @classmethod
+    def get_app_permission(cls, hue_app, action):
+      return HuePermission.objects.get(app=hue_app, action=action)
+
+    class Meta(object):
+      abstract = True
+
+  class HuePermission(OrganizationHuePermission):
+    pass
+
+else:
+  class HuePermissionBase(models.Model):
     """
     Set of non-object specific permissions that an app supports.
 
@@ -217,6 +255,12 @@ if not ENABLE_ORGANIZATIONS.get():
     @classmethod
     def get_app_permission(cls, hue_app, action):
       return HuePermission.objects.get(app=hue_app, action=action)
+
+    class Meta(object):
+      abstract = True
+
+  class HuePermission(HuePermissionBase):
+    pass
 
 
 def get_default_user_group(**kwargs):
@@ -257,6 +301,10 @@ def update_app_permissions(**kwargs):
   have models, but nonetheless, "migrate" is typically run when apps are installed.
   """
   created_tables = connection.introspection.table_names()
+
+  if ENABLE_ORGANIZATIONS.get() and 'useradmin_organization' not in created_tables:
+    return
+
   if u'useradmin_huepermission' in created_tables:  # Check if Useradmin has been installed.
     current = {}
 
