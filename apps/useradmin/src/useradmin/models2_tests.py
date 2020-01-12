@@ -59,16 +59,21 @@ class TestOrganizationSingleUser(unittest.TestCase):
 
 
   def test_user_group(self):
+    user1_organization = Organization.objects.get(name='user1@testorg.gethue.com')
+
     assert_equal('user1@testorg.gethue.com', self.user1.email)
     assert_true(self.user1.is_admin)
-    assert_equal([Group.objects.filter(name='user1@testorg.gethue.com')], self.user1.groups.all())
-    assert_equal(Organization.objects.filter(name='user1@testorg.gethue.com'), self.user1.organization)
+    assert_equal(user1_organization, self.user1.organization)
+    assert_equal(
+      list(Group.objects.filter(name='default', organization=user1_organization)),
+      list(self.user1.groups.all())
+    )
 
 
   def test_users_groups(self):
     assert_equal(4, User.objects.filter(email__contains='testorg.gethue.com').count(), User.objects.all())
     assert_equal(4, Organization.objects.filter(name__contains='testorg.gethue.com').count(), Organization.objects.all())
-    assert_equal(4, Group.objects.filter(name__contains='testorg.gethue.com').count(), Group.objects.all())
+    assert_equal(4, Group.objects.filter(organization__name__contains='testorg.gethue.com').count(), Group.objects.all())
 
 
   def test_get_users(self):
@@ -76,4 +81,4 @@ class TestOrganizationSingleUser(unittest.TestCase):
     data = json.loads(response.content)
 
     assert_equal(0, data['status'])
-    assert_equal([self.user1.email], [user['username'] for user in data['users']])
+    assert_equal([self.user1.email], [user['email'] for user in data['users']])

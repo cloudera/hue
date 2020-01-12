@@ -20,6 +20,7 @@ import uuid
 
 from crequest.middleware import CrequestMiddleware
 from django.contrib.auth.models import models, AbstractUser, BaseUserManager
+from django.utils.functional import SimpleLazyObject
 from django.utils.translation import ugettext_lazy as _t
 
 
@@ -110,7 +111,7 @@ class UserManager(BaseUserManager):
     queryset = super(UserManager, self).get_queryset()
     request = CrequestMiddleware.get_request()
 
-    if request:
+    if request and hasattr(request, 'user') and type(request.user) is not SimpleLazyObject:
       queryset = queryset.filter(
         organization=request.user.organization
       )
@@ -176,7 +177,7 @@ class OrganizationUser(AbstractUser):
   objects = UserManager()
 
   def __str__(self):
-    return '%s @ %s' % (self.name, self.organization)
+    return '%s @ %s' % (self.email, self.organization)
 
   @property
   def username(self):

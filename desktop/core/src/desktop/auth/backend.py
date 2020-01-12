@@ -186,7 +186,7 @@ def find_or_create_user(username, password=None, is_superuser=True):
   return user
 
 def ensure_has_a_group(user):
-  default_group = get_default_user_group()
+  default_group = get_default_user_group(user=user)
 
   if not user.groups.exists() and default_group is not None:
     user.groups.add(default_group)
