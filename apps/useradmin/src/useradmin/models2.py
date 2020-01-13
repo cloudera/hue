@@ -118,6 +118,19 @@ class UserManager(BaseUserManager):
     queryset = super(UserManager, self).get_queryset()
     return _fitered_queryset(queryset)
 
+  def get(self, *args, **kwargs):
+    if kwargs.get('username'):
+      kwargs['email'] = kwargs.pop('username')
+
+    return super(UserManager, self).get(*args, **kwargs)
+
+  def order_by(self, *args, **kwargs):
+    if 'username' in args:
+      args.remove('username')
+      args.append('email')
+
+    return super(UserManager, self).order_by(*args, **kwargs)
+
   def _create_user(self, email, password, **extra_fields):
     """Create and save a User with the given email and password."""
     if not email:

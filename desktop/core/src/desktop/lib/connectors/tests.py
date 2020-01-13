@@ -29,6 +29,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 
 from useradmin.models import User, update_app_permissions, get_default_user_group
 
+
 if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock
 else:
@@ -50,6 +51,7 @@ class TestConnectors(object):
     response = self.client.post("/desktop/connectors/api/types/")
 
     assert_equal(200, response.status_code)
+
 
 
 class TestConnectorListing(unittest.TestCase):

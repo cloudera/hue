@@ -52,7 +52,7 @@ from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm, AddLdapU
   PermissionsEditForm, GroupEditForm, SuperUserChangeForm, validate_username, validate_first_name, \
   validate_last_name, PasswordChangeForm
 from useradmin.ldap_access import LdapBindException, LdapSearchException
-from useradmin.models import HuePermission, UserProfile, LdapGroup, get_profile, get_default_user_group, User, Group, orm_user_lookup
+from useradmin.models import HuePermission, UserProfile, LdapGroup, get_profile, get_default_user_group, User, Group
 
 if sys.version_info[0] > 2:
   unicode = str
@@ -462,10 +462,8 @@ def edit_group(request, name=None):
     if form.is_valid():
       form.save()
 
-      value_field = orm_user_lookup()
-
       if name is not None:
-        usernames = instance.user_set.all().values_list(value_field, flat=True)
+        usernames = instance.user_set.all().values_list('username', flat=True)
         request.audit = {
           'operation': 'EDIT_GROUP',
           'operationText': 'Edited Group: %s, with member(s): %s' % (
@@ -474,7 +472,7 @@ def edit_group(request, name=None):
         }
       else:
         user_ids = request.POST.getlist('members', [])
-        usernames = User.objects.filter(pk__in=user_ids).values_list(value_field, flat=True)
+        usernames = User.objects.filter(pk__in=user_ids).values_list('username', flat=True)
         request.audit = {
           'operation': 'CREATE_GROUP',
           'operationText': 'Created Group: %s, with member(s): %s' % (request.POST.get('name', ''), ', '.join(usernames))

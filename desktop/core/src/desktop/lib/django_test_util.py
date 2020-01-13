@@ -22,7 +22,7 @@ import json
 import django.test.client
 import nose.tools
 
-from useradmin.models import User, Group, default_organization, orm_user_lookup
+from useradmin.models import User, Group, default_organization
 
 from desktop.conf import ENABLE_ORGANIZATIONS
 
@@ -57,8 +57,7 @@ def make_logged_in_client(username="test", password="test", is_superuser=True, r
     username = username + '@gethue.com'
 
   try:
-    lookup = {orm_user_lookup(): username}
-    user = User.objects.get(**lookup)
+    user = User.objects.get(username=username)
     if recreate:
       user.delete()
       raise User.DoesNotExist
@@ -117,8 +116,8 @@ def assert_similar_pages(first, second, ratio=0.9, msg=None):
   Asserts that most of the lines (90% by default) in the two pages are identical,
   ignoring leading/trailing spaces.
   """
-  lines_a = set([ l.strip() for l in first.split('\n') ])
-  lines_b = set([ l.strip() for l in second.split('\n') ])
+  lines_a = set([l.strip() for l in first.split('\n')])
+  lines_b = set([l.strip() for l in second.split('\n')])
   common = lines_a.intersection(lines_b)
   similarity = 1.0 * len(common) / max(len(lines_a), len(lines_b))
   nose.tools.assert_true(similarity >= ratio, msg)
