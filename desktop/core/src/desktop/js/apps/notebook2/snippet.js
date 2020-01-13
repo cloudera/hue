@@ -700,13 +700,17 @@ export default class Snippet {
     });
 
     this.statement = ko.pureComputed(() => {
-      let statement = this.isSqlDialect()
-        ? this.selectedStatement()
-          ? this.selectedStatement()
-          : this.positionStatement() !== null
-          ? this.positionStatement().statement
-          : this.statement_raw()
-        : this.statement_raw();
+      let statement = this.statement_raw();
+      if (this.isSqlDialect()) {
+        if (this.activeExecutable()) {
+          statement = this.activeExecutable().getStatement();
+        } else if (this.selectedStatement()) {
+          statement = this.selectedStatement();
+        } else if (this.positionStatement()) {
+          statement = this.positionStatement().statement;
+        }
+      }
+
       const variables = this.variables().reduce((variables, variable) => {
         variables[variable.name()] = variable;
         return variables;

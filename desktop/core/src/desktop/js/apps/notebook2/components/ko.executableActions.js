@@ -50,6 +50,9 @@ const TEMPLATE = `
       <!-- /ko -->
     <!-- /ko -->
   </div>
+  <form autocomplete="off" class="inline-block">
+    <input class="input-small limit-input" type="text" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } placeholder="${ I18n('Limit') }" data-bind="textInput: limit">
+  </form>
 </div>
 `;
 
@@ -63,6 +66,14 @@ class ExecutableActions extends DisposableComponent {
     this.status = ko.observable(EXECUTION_STATUS.ready);
     this.partOfRunningExecution = ko.observable(false);
     this.beforeExecute = params.beforeExecute;
+
+    this.limit = ko.observable();
+
+    this.subscribe(this.limit, newVal => {
+      if (this.activeExecutable()) {
+        this.activeExecutable().executor.limit = newVal;
+      }
+    });
 
     this.waiting = ko.pureComputed(
       () =>
@@ -93,11 +104,16 @@ class ExecutableActions extends DisposableComponent {
     });
 
     this.subscribe(this.activeExecutable, this.updateFromExecutable.bind(this));
+
+    if (this.activeExecutable()) {
+      this.updateFromExecutable(this.activeExecutable());
+    }
   }
 
   updateFromExecutable(executable) {
     this.status(executable.status);
     this.partOfRunningExecution(executable.isPartOfRunningExecution());
+    this.limit(executable.executor.limit);
   }
 
   async stop() {
