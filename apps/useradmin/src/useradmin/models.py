@@ -62,8 +62,8 @@ from useradmin.conf import DEFAULT_USER_GROUP
 
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group, Organization, default_organization, get_organization, \
-      _fitered_queryset, get_user_request_organization
+  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group, Organization, get_organization
+  from useradmin.organization import _fitered_queryset, get_user_request_organization, default_organization
 else:
   from django.contrib.auth.models import User, Group
   class Organization(): pass

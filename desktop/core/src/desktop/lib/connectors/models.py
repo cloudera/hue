@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 
 from django.db import connection, models, transaction
@@ -22,7 +23,7 @@ from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
-from useradmin.models import _fitered_queryset, get_user_request_organization
+from useradmin.organization import _fitered_queryset, get_user_request_organization
 
 from desktop.conf import CONNECTORS
 from desktop.lib.connectors.types import get_connectors_types
@@ -78,7 +79,7 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
         'description': connector.description,
         'dialect': connector.dialect,
         'interface': None,
-        'setting': json.loads(connector.settings),
+        'settings': json.loads(connector.settings),
         'is_demo': False,
       }
       for connector in Connector.objects.all()
