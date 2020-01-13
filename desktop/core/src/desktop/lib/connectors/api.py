@@ -98,7 +98,7 @@ def update_connector(request):
 
 # TODO: check if has perm
 def delete_connector(request):
-  connector = json.loads(request.POST.get('connector'), '{}')
+  connector = json.loads(request.POST.get('connector', '{}'))
 
   try:
     Connector.objects.get(id=connector['id']).delete()
