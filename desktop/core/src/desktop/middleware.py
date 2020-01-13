@@ -314,13 +314,12 @@ class LoginAndPermissionMiddleware(object):
 
       app_accessed = request._desktop_app
       app_libs_whitelist = ("desktop", "home", "home2", "about", "hue", "editor", "notebook", "indexer", "404", "500", "403")
-      if not ENABLE_CONNECTORS.get():
-        # Accessing an app can access an underlying other app.
-        # e.g. impala or spark uses code from beeswax and so accessing impala shows up as beeswax here.
-        # Here we trust the URL to be the real app we need to check the perms.
-        ui_app_accessed = get_app_name(request)
-        if app_accessed != ui_app_accessed and ui_app_accessed not in ('logs', 'accounts', 'login'):
-          app_accessed = ui_app_accessed
+      # Accessing an app can access an underlying other app.
+      # e.g. impala or spark uses code from beeswax and so accessing impala shows up as beeswax here.
+      # Here we trust the URL to be the real app we need to check the perms.
+      ui_app_accessed = get_app_name(request)
+      if app_accessed != ui_app_accessed and ui_app_accessed not in ('logs', 'accounts', 'login'):
+        app_accessed = ui_app_accessed
 
       if app_accessed and \
           app_accessed not in app_libs_whitelist and \

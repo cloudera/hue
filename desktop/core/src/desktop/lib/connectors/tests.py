@@ -52,6 +52,12 @@ class TestConnectors(object):
 
     assert_equal(200, response.status_code)
 
+  def test_create_connector_perm(self):
+    response = self.client.post("/desktop/connectors/api/instance/update/")
+    assert_equal(401, response.status_code)
+
+    response = self.client.post("/desktop/connectors/api/instance/delete/")
+    assert_equal(401, response.status_code)
 
 
 class TestConnectorListing(unittest.TestCase):
@@ -92,7 +98,6 @@ class TestConnectorListing(unittest.TestCase):
     update_app_permissions()
 
 
-  @patch('desktop.lib.connectors.models.CONNECTOR_INSTANCES', None)
   def test_get_installed_editor_connectors(self):
 
     with patch('desktop.lib.connectors.models.CONNECTORS.get') as CONNECTORS:
@@ -111,7 +116,7 @@ class TestConnectorListing(unittest.TestCase):
       assert_true(editor_category, connectors)
       assert_equal(1, len(editor_category), editor_category)
 
-  @patch('desktop.lib.connectors.models.CONNECTOR_INSTANCES', None)
+
   def test_get_connectors_for_user(self):
 
     with patch('desktop.lib.connectors.models.CONNECTORS.get') as CONNECTORS:

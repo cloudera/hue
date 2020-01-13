@@ -22,6 +22,7 @@ from django.utils.translation import ugettext as _
 
 from useradmin.models import update_app_permissions
 
+from desktop.auth.decorators import admin_required
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.connectors.models import _get_installed_connectors, get_connectors_types, Connector
@@ -69,7 +70,7 @@ def get_connector(request, id):
   })
 
 
-# TODO: check if has perm
+@admin_required
 def update_connector(request):
   connector = json.loads(request.POST.get('connector', '{}'))
   saved_as = False
@@ -96,7 +97,7 @@ def update_connector(request):
   return JsonResponse({'connector': connector, 'saved_as': saved_as})
 
 
-# TODO: check if has perm
+@admin_required
 def delete_connector(request):
   connector = json.loads(request.POST.get('connector', '{}'))
 
