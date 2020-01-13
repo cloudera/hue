@@ -44,7 +44,6 @@ import logging
 from datetime import datetime
 from enum import Enum
 
-from crequest.middleware import CrequestMiddleware
 from django.db import connection, models, transaction
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
