@@ -354,16 +354,7 @@ def update_app_permissions(**kwargs):
           else:
             uptodate += 1
         else:
-          attributes = {
-            'app': app_name,
-            'action': action,
-            'description': description
-          }
-          # if ENABLE_ORGANIZATIONS.get():
-          #   # Or move signals instead
-          #   attributes['organization'] = kwargs['organization'] if kwargs.get('organization') else default_organization()
-
-          new_dp = HuePermission(**attributes)
+          new_dp = HuePermission(app=app_name, action=action, description=description)
           new_dp.save()
           added.append(new_dp)
 
