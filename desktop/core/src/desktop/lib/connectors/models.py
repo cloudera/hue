@@ -41,7 +41,7 @@ class Connector(models.Model):
   settings = models.TextField(default='{}')
   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))
 
-  organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+  organization = models.ForeignKey('useradmin.Organization', on_delete=models.CASCADE)
 
   class Meta:
     verbose_name = _t('connector')
