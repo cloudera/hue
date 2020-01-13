@@ -30,12 +30,15 @@ describe('sqlExecutable.js', () => {
    * @param statement
    * @return {SqlExecutable}
    */
-  const createSubject = statement => {
+  const createSubject = (statement, limit) => {
     if (typeof statement === 'string') {
       return new SqlExecutable({
         database: 'default',
-        parsedStatement: { statement: statement },
-        sourceType: 'impala'
+        parsedStatement: { statement: statement, firstToken: 'select' },
+        sourceType: 'impala',
+        executor: {
+          limit: limit
+        }
       });
     }
 
@@ -44,7 +47,10 @@ describe('sqlExecutable.js', () => {
       namespace: { id: 'namespace' },
       database: 'default',
       parsedStatement: statement,
-      sourceType: 'impala'
+      sourceType: 'impala',
+      executor: {
+        limit: limit
+      }
     });
   };
 
@@ -55,7 +61,7 @@ describe('sqlExecutable.js', () => {
   });
 
   it('should handle parsed statements', () => {
-    const subject = createSubject({ statement: 'SELECT * FROM customers' });
+    const subject = createSubject({ statement: 'SELECT * FROM customers', firstToken: 'SELECT' });
 
     expect(subject.getStatement()).toEqual('SELECT * FROM customers');
   });

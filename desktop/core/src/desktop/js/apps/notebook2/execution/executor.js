@@ -41,6 +41,8 @@ class Executor {
     this.isOptimizerEnabled = options.isOptimizerEnabled;
     this.executables = [];
 
+    this.limit = 10;
+
     this.snippet = options.snippet;
   }
 
