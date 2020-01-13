@@ -25,7 +25,8 @@ from desktop.auth.decorators import admin_required
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.exceptions_renderable import PopupException
 
-from useradmin.models import User, Group, Organization, orm_user_lookup
+from useradmin.models import User, Group, Organization
+
 
 if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock
@@ -42,10 +43,10 @@ class TestDecorator(unittest.TestCase):
 
 
   def test_user_group(self):
-    request = Mock(user=User.objects.get(**{orm_user_lookup(): 'admin'}))
+    request = Mock(user=User.objects.get(username='admin'))
     hello(request)
 
-    request = Mock(user=User.objects.get(**{orm_user_lookup(): 'joe'}))
+    request = Mock(user=User.objects.get(username='joe'))
     assert_raises(PopupException, hello, request)
 
 

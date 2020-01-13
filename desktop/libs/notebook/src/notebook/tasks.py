@@ -41,7 +41,6 @@ from desktop.conf import TASK_SERVER
 from desktop.lib import export_csvxls, fsmanager
 from desktop.models import Document2
 from desktop.settings import CACHES_CELERY_KEY, CACHES_CELERY_QUERY_RESULT_KEY
-from useradmin.models import User, orm_user_lookup
 
 from notebook.api import _get_statement
 from notebook.connectors.base import get_api, QueryExpired, ExecutionWrapper
@@ -152,8 +151,7 @@ def run_sync_query(doc_id, user):
   # Add variable substitution
   # Send notifications: done/on failure
   if type(user) is str:
-    lookup = {orm_user_lookup(): user}
-    user = User.objects.get(**lookup)
+    user = User.objects.get(username=user)
     user = rewrite_user(user)
 
   query_document = Document2.objects.get_by_uuid(user=user, uuid=doc_id)

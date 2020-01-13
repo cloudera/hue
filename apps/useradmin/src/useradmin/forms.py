@@ -31,7 +31,7 @@ from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule
 from desktop.settings import LANGUAGES
 
 from useradmin.hue_password_policy import hue_get_password_validators
-from useradmin.models import GroupPermission, HuePermission, get_default_user_group, User, Group, default_organization, Organization, orm_user_lookup
+from useradmin.models import GroupPermission, HuePermission, get_default_user_group, User, Group, default_organization, Organization
 
 
 LOG = logging.getLogger(__name__)
@@ -434,17 +434,15 @@ class GroupEditForm(forms.ModelForm):
   def __init__(self, *args, **kwargs):
     super(GroupEditForm, self).__init__(*args, **kwargs)
 
-    ordering_field = orm_user_lookup()
-
     if self.instance.id:
       self.fields['name'].widget.attrs['readonly'] = True
-      initial_members = User.objects.filter(groups=self.instance).order_by(ordering_field)
+      initial_members = User.objects.filter(groups=self.instance).order_by('username')
       initial_perms = HuePermission.objects.filter(grouppermission__group=self.instance).order_by('app', 'description')
     else:
       initial_members = []
       initial_perms = []
 
-    self.fields["members"] = _make_model_field(_("members"), initial_members, User.objects.order_by(ordering_field))
+    self.fields["members"] = _make_model_field(_("members"), initial_members, User.objects.order_by('username'))
     self.fields["permissions"] = _make_model_field(_("permissions"), initial_perms, HuePermission.objects.order_by('app', 'description'))
     if 'organization' in self.fields:
       self.fields['organization'] = forms.ChoiceField(choices=((default_organization().id, default_organization()),), initial=default_organization())
