@@ -16,13 +16,13 @@
 <%!
 from django.utils.translation import ugettext as _
 
-from desktop import conf
+from desktop.conf import CUSTOM
 from desktop.views import commonheader, commonfooter
 %>
 
 <%
 MAIN_SCROLLABLE = "'.page-content'"
-if conf.CUSTOM.BANNER_TOP_HTML.get():
+if CUSTOM.BANNER_TOP_HTML.get():
   TOP_SNAP = "78px"
 else:
   TOP_SNAP = "50px"
@@ -70,7 +70,7 @@ else:
                 "values": []
             };
             _connector.values = connector.values.filter(function (subMetricKey) {
-              return subMetricKey.name.toLowerCase().indexOf(lowerQuery) !== -1;
+              return self.connectorsFilter() || subMetricKey.name.toLowerCase().indexOf(lowerQuery) !== -1;
             });
             if (_connector.values.length > 0) {
               filteredConnectors.push(_connector);
@@ -225,7 +225,7 @@ ${ layout.menubar(section='connectors') }
       <div class="span10">
         <div data-bind="dockable: { scrollable: ${ MAIN_SCROLLABLE }, jumpCorrection: 0, topSnap: '${ TOP_SNAP }', triggerAdjust: 0 }">
           <span class="pull-right">
-            <a href="http://gethue.com" target="_blank">
+            <a href="https://gethue.com" target="_blank">
               <i class="fa fa-question-circle"></i> ${ _('Help') }
             </a>
           </span>

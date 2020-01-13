@@ -23,7 +23,7 @@ from django.db.models.query import QuerySet
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop.conf import CONNECTORS
-from desktop.lib.connectors.types import CONNECTOR_TYPES, CATEGORIES
+from desktop.lib.connectors.types import get_connectors_types
 from desktop.lib.exceptions_renderable import PopupException
 
 
@@ -37,7 +37,6 @@ class Connector(models.Model):
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
   dialect = models.CharField(max_length=32, db_index=True, help_text=_t('Type of connector, e.g. hive, mysql... '))
-
   settings = models.TextField(default='{}')
   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))
 
@@ -47,19 +46,6 @@ class Connector(models.Model):
     verbose_name = _t('connector')
     verbose_name_plural = _t('connectors')
     unique_together = ('name', 'organization',)
-
-
-def _group_category_connectors(connectors):
-  return [{
-      'category': category['type'],
-      'category_name': category['name'],
-      'description': category['description'],
-      'values': [_connector for _connector in connectors if _connector['category'] == category['type']],
-    } for category in CATEGORIES
-  ]
-
-
-AVAILABLE_CONNECTORS = _group_category_connectors(CONNECTOR_TYPES)
 
 
 def _get_installed_connectors(category=None, categories=None, dialect=None, interface=None, user=None):
@@ -91,7 +77,7 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
   for connector in connector_instances:
     connector_types = []
 
-    for connector_type in CONNECTOR_TYPES:
+    for connector_type in get_connectors_types():
       if connector_type['dialect'] == connector['dialect']:
         connector_types.insert(0, connector_type)
       elif connector_type.get('interface') == connector['interface']:
@@ -129,12 +115,3 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
     connectors = [connector for connector in connectors if connector['name'] in allowed_connectors]
 
   return connectors
-
-
-def _get_connector_by_id(id):
-  instance = [connector for connector in _get_installed_connectors() if connector['id'] == id]
-
-  if instance:
-    return instance[0]
-  else:
-    raise PopupException(_('No connector with the id %s found.') % id)

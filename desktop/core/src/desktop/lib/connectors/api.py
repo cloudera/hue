@@ -24,88 +24,100 @@ from useradmin.models import update_app_permissions
 
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.connectors import models
-from desktop.lib.connectors.models import AVAILABLE_CONNECTORS, _get_connector_by_id, _get_installed_connectors, _group_category_connectors
-from desktop.lib.connectors.types import CONNECTOR_TYPES, CATEGORIES
+from desktop.lib.connectors.models import _get_installed_connectors, get_connectors_types, Connector
+from desktop.lib.connectors.types import get_connectors_types, get_connector_categories, get_connector_by_type
 
 
 LOG = logging.getLogger(__name__)
 
 
 def get_connector_types(request):
-  global AVAILABLE_CONNECTORS
-  global CATEGORIES
-
   return JsonResponse({
-    'connectors': AVAILABLE_CONNECTORS,
-    'categories': CATEGORIES
+    'connectors': _group_by_category(
+      get_connectors_types()
+    ),
+    'categories': get_connector_categories()
   })
 
 
-def get_installed_connectors(request):
+def get_connectors_instances(request):
   return JsonResponse({
-    'connectors': _group_category_connectors(
+    'connectors': _group_by_category(
       _get_installed_connectors()
-    ),
+    )
   })
 
 
 def new_connector(request, dialect):
-  instance = _get_connector_by_type(dialect)
+  instance = get_connector_by_type(dialect)
 
   instance['nice_name'] = dialect.title()
   instance['id'] = None
-
-  update_app_permissions()
 
   return JsonResponse({'connector': instance})
 
 
 def get_connector(request, id):
-  instance = _get_connector_by_id(id)
+  instance = Connector.objects.get(id=id)
 
-  return JsonResponse(instance)
+  return JsonResponse({
+    'id': instance.id,
+    'name': instance.name,
+    'description': instance.description,
+    'dialect': instance.dialect,
+    'settings': json.loads(instance.settings)
+  })
 
 
+# TODO: check if has perm
 def update_connector(request):
   connector = json.loads(request.POST.get('connector', '{}'))
   saved_as = False
 
   if connector.get('id'):
-    instance = _get_connector_by_id(connector['id'])
-    instance.update(connector)
+    instance = Connector.objects.get(id=connector['id'])
+    instance.name = connector['nice_name']
+    instance.description = connector['description']
+    instance.settings = json.dumps(connector['settings'])
+    instance.save()
   else:
     saved_as = True
-    instance = connector
-    instance['id'] = models.CONNECTOR_IDS
-    instance['nice_name'] = instance['nice_name']
-    instance['name'] = '%s-%s' % (instance['dialect'], models.CONNECTOR_IDS)
-    models.CONNECTOR_IDS += 1
-    models.CONNECTOR_INSTANCES.append(instance)
+    instance = Connector.objects.create(
+      name=instance['nice_name'],
+      description='',
+      dialect=instance['dialect'],
+      settings=json.dumps(instance['settings'])
+    )
+    connector['id'] = instance.id
+    connector['name'] = instance.id
 
   update_app_permissions()
 
-  return JsonResponse({'connector': instance, 'saved_as': saved_as})
+  return JsonResponse({'connector': connector, 'saved_as': saved_as})
 
 
-def _get_connector_by_type(dialect):
-  instance = [connector for connector in CONNECTOR_TYPES if connector['dialect'] == dialect]
-
-  if instance:
-    return instance[0]
-  else:
-    raise PopupException(_('No connector with the type %s found.') % type)
-
-
+# TODO: check if has perm
 def delete_connector(request):
   connector = json.loads(request.POST.get('connector'), '{}')
 
-  size_before = len(models.CONNECTOR_INSTANCES)
-  models.CONNECTOR_INSTANCES = [_connector for _connector in models.CONNECTOR_INSTANCES if _connector['name'] != connector['name']]
-  size_after = len(models.CONNECTOR_INSTANCES)
+  try:
+    Connector.objects.get(id=connector['id']).delete()
+  except Exception as e:
+    raise PopupException(_('Error deleting connector %s: %s') % (connector['name'], e))
 
-  if size_before == size_after + 1:
-    update_app_permissions()
-    return JsonResponse({})
-  else:
-    raise PopupException(_('No connector with the name %(name)s found.') % connector)
+  update_app_permissions()
+
+  return JsonResponse({})
+
+
+def _group_by_category(conns):
+  return [{
+      'category': category['type'],
+      'category_name': category['name'],
+      'description': category['description'],
+      'values': [
+        _connector
+        for _connector in conns if _connector['category'] == category['type']
+      ],
+    } for category in get_connector_categories()
+  ]
