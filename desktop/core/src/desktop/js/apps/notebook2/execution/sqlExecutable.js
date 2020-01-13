@@ -39,13 +39,15 @@ export default class SqlExecutable extends Executable {
     let statement = this.statement || this.parsedStatement.statement;
     if (
       this.parsedStatement &&
+      this.parsedStatement.firstToken &&
       this.parsedStatement.firstToken.toLowerCase() === 'select' &&
-      this.executor.limit &&
+      !isNaN(this.executor.defaultLimit()) &&
+      this.executor.defaultLimit() > 0 &&
       !/\slimit\s[0-9]/i.test(statement)
     ) {
       const endMatch = statement.match(SELECT_END_REGEX);
       if (endMatch) {
-        statement = endMatch[1] + ' LIMIT ' + this.executor.limit;
+        statement = endMatch[1] + ' LIMIT ' + this.executor.defaultLimit();
         if (endMatch[2]) {
           statement += endMatch[2];
         }

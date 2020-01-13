@@ -195,16 +195,23 @@ export default class Snippet {
     this.dialect = ko.pureComputed(() => this.connector() && this.connector().dialect);
 
     this.isSqlDialect = ko.pureComputed(() => this.connector() && this.connector().is_sql);
+    this.defaultLimit = ko.observable(snippetRaw.defaultLimit);
 
-    this.connector.subscribe(newValue => {
-      sessionManager.getSession({ type: newValue.type }).then(() => {
+    this.connector.subscribe(connector => {
+      sessionManager.getSession({ type: connector.type }).then(() => {
         this.status(STATUS.ready);
       });
     });
 
+    this.editorConfig = undefined;
+
     huePubSub.publish(GET_KNOWN_CONFIG_EVENT, config => {
       if (config && config.app_config && config.app_config.editor) {
-        const connectors = config.app_config.editor.interpreters;
+        this.editorConfig = config.app_config.editor;
+        if (!this.defaultLimit() && this.editorConfig.default_limit) {
+          this.defaultLimit(this.editorConfig.default_limit);
+        }
+        const connectors = this.editorConfig.interpreters;
         if (snippetRaw.connector) {
           this.connector(
             connectors.find(connector => connector.type === snippetRaw.connector.type) ||
@@ -1004,6 +1011,7 @@ export default class Snippet {
       database: this.database,
       sourceType: this.dialect,
       namespace: this.namespace,
+      defaultLimit: this.defaultLimit,
       isOptimizerEnabled: this.parentVm.isOptimizerEnabled(),
       snippet: this,
       isSqlEngine: this.isSqlDialect
@@ -1464,6 +1472,10 @@ export default class Snippet {
       connector: this.connector(),
       currentQueryTab: this.currentQueryTab(),
       database: this.database(),
+      defaultLimit:
+        !this.editorConfig || this.defaultLimit() !== this.editorConfig.default_limit
+          ? this.defaultLimit()
+          : undefined,
       id: this.id(),
       is_redacted: this.is_redacted(),
       lastAceSelectionRowOffset: this.lastAceSelectionRowOffset(),

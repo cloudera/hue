@@ -50,7 +50,7 @@ const TEMPLATE = `
       <!-- /ko -->
     <!-- /ko -->
   </div>
-  <form autocomplete="off" class="inline-block">
+  <form autocomplete="off" class="inline-block margin-left-10">
     <input class="input-small limit-input" type="text" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } placeholder="${ I18n('Limit') }" data-bind="textInput: limit">
   </form>
 </div>
@@ -71,7 +71,7 @@ class ExecutableActions extends DisposableComponent {
 
     this.subscribe(this.limit, newVal => {
       if (this.activeExecutable()) {
-        this.activeExecutable().executor.limit = newVal;
+        this.activeExecutable().executor.defaultLimit(newVal);
       }
     });
 
@@ -113,7 +113,7 @@ class ExecutableActions extends DisposableComponent {
   updateFromExecutable(executable) {
     this.status(executable.status);
     this.partOfRunningExecution(executable.isPartOfRunningExecution());
-    this.limit(executable.executor.limit);
+    this.limit(executable.executor.defaultLimit());
   }
 
   async stop() {

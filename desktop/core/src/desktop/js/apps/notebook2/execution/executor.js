@@ -29,6 +29,7 @@ class Executor {
    * @param {ContextNamespace} options.namespace
    * @param {string} options.statement
    * @param {string} [options.database]
+   * @param {function} [options.defaultLimit]
    * @param {boolean} [options.isOptimizerEnabled] - Default false
    * @param {Snippet} [options.snippet] - Optional snippet for history
    */
@@ -40,8 +41,7 @@ class Executor {
     this.isSqlEngine = options.isSqlEngine;
     this.isOptimizerEnabled = options.isOptimizerEnabled;
     this.executables = [];
-
-    this.limit = 10;
+    this.defaultLimit = options.defaultLimit || (() => {});
 
     this.snippet = options.snippet;
   }

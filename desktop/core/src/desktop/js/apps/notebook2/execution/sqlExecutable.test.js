@@ -37,7 +37,7 @@ describe('sqlExecutable.js', () => {
         parsedStatement: { statement: statement, firstToken: 'select' },
         sourceType: 'impala',
         executor: {
-          limit: limit
+          defaultLimit: () => limit
         }
       });
     }
@@ -49,7 +49,7 @@ describe('sqlExecutable.js', () => {
       parsedStatement: statement,
       sourceType: 'impala',
       executor: {
-        limit: limit
+        defaultLimit: () => limit
       }
     });
   };
