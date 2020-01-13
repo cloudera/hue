@@ -22,12 +22,25 @@ from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
+from useradmin.models import _fitered_queryset, get_user_request_organization
+
 from desktop.conf import CONNECTORS
 from desktop.lib.connectors.types import get_connectors_types
 from desktop.lib.exceptions_renderable import PopupException
 
 
 LOG = logging.getLogger(__name__)
+
+
+class ConnectorManager(models.Manager):
+
+  def get_queryset(self):
+    """Make sure to restrict to only organization's connectors"""
+    queryset = super(ConnectorManager, self).get_queryset()
+    return _fitered_queryset(queryset)
+
+  def natural_key(self):
+    return (self.organization, self.name,)
 
 
 class Connector(models.Model):
@@ -42,10 +55,18 @@ class Connector(models.Model):
 
   organization = models.ForeignKey('useradmin.Organization', on_delete=models.CASCADE)
 
+  objects = ConnectorManager()
+
   class Meta:
     verbose_name = _t('connector')
     verbose_name_plural = _t('connectors')
     unique_together = ('name', 'organization',)
+
+  def __init__(self, *args, **kwargs):
+    if not kwargs.get('organization'):
+      kwargs['organization'] = get_user_request_organization()
+
+    super(Connector, self).__init__(*args, **kwargs)
 
 
 def _get_installed_connectors(category=None, categories=None, dialect=None, interface=None, user=None):

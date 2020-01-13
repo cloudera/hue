@@ -83,10 +83,10 @@ def update_connector(request):
   else:
     saved_as = True
     instance = Connector.objects.create(
-      name=instance['nice_name'],
+      name=connector['nice_name'],
       description='',
-      dialect=instance['dialect'],
-      settings=json.dumps(instance['settings'])
+      dialect=connector['dialect'],
+      settings=json.dumps(connector['settings'])
     )
     connector['id'] = instance.id
     connector['name'] = instance.id
