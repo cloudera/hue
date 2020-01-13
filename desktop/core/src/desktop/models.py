@@ -42,7 +42,7 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from dashboard.conf import get_engines, HAS_REPORT_ENABLED
 from kafka.conf import has_kafka
-from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
+from notebook.conf import DEFAULT_LIMIT, SHOW_NOTEBOOKS, get_ordered_interpreters
 from useradmin.models import User, Group, get_organization
 
 from desktop import appmanager
@@ -1767,6 +1767,7 @@ class ClusterConfig(object):
         'displayName': _('Editor'),
         'buttonName': _('Query'),
         'interpreters': interpreters,
+        'default_limit': DEFAULT_LIMIT.get(),
         'interpreter_names': [interpreter['type'] for interpreter in interpreters],
         'page': interpreters[0]['page'],
         'default_sql_interpreter': next((interpreter['type'] for interpreter in interpreters if interpreter.get('is_sql')), 'hive')

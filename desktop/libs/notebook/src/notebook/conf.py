@@ -149,6 +149,13 @@ INTERPRETERS_SHOWN_ON_WHEEL = Config(
   default=[]
 )
 
+DEFAULT_LIMIT = Config(
+  "default_limit",
+  help="Default limit to use in SELECT statements if not present (optional).",
+  default=None,
+  type=int
+)
+
 ENABLE_DBPROXY_SERVER = Config(
   key="enable_dbproxy_server",
   help=_t("Main flag to override the automatic starting of the DBProxy server."),
