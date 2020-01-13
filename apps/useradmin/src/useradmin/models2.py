@@ -18,23 +18,18 @@
 import logging
 import uuid
 
-from crequest.middleware import CrequestMiddleware
 from django.contrib.auth.models import models, AbstractUser, BaseUserManager
 from django.utils.functional import SimpleLazyObject
 from django.utils.translation import ugettext_lazy as _t
 
+from useradmin.organization import _fitered_queryset, get_user_request_organization, default_organization
 
 LOG = logging.getLogger(__name__)
 
 
-'''
+"""
 Organizations handle contained sets of setups (user, group, connectors...).
-'''
-
-def default_organization():
-  default_organization, created = Organization.objects.get_or_create(name='default', domain='default')
-  return default_organization
-
+"""
 
 def get_organization(email, is_multi_user=False):
   domain = email.split('@')[1] if is_multi_user else email
@@ -195,23 +190,3 @@ class OrganizationUser(AbstractUser):
   @username.setter
   def username(self, value):
     pass
-
-
-def get_user_request_organization():
-  request = CrequestMiddleware.get_request()
-  return request.user.organization if request and hasattr(request, 'user') and request.user.is_authenticated() else default_organization()
-
-
-def _fitered_queryset(queryset, by_owner=False):
-  request = CrequestMiddleware.get_request()
-
-  # Avoid infinite recursion on very first retrieval of the user
-  if request and hasattr(request, 'user') and hasattr(request.user, '_wrapped') and type(request.user._wrapped) is not object and request.user.is_authenticated():
-    if by_owner:
-      filters = {'owner__organization': request.user.organization}
-    else:
-      filters = {'organization': request.user.organization}
-
-    queryset = queryset.filter(**filters)
-
-  return queryset
