@@ -326,7 +326,12 @@ def get_api(request, snippet):
   if snippet.get('type') == 'report':
     snippet['type'] = 'impala'
 
-  interpreter = get_interpreter(connector_type=snippet['type'], user=request.user)
+  if snippet.get('connector'):
+    connector_name = snippet['connector']['type'] # Ideally unify with name and nice_name
+  else:
+    connector_name = snippet['type']
+
+  interpreter = get_interpreter(connector_type=connector_name, user=request.user)
   interface = interpreter['interface']
 
   if get_cluster_config(request.user)['has_computes']:
