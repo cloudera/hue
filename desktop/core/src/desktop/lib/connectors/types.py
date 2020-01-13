@@ -21,6 +21,7 @@ import logging
 from django.utils.translation import ugettext as _
 
 from desktop.conf import CONNECTORS_BLACKLIST, CONNECTORS_WHITELIST
+from desktop.lib.exceptions_renderable import PopupException
 
 
 LOG = logging.getLogger(__name__)
@@ -521,3 +522,18 @@ CATEGORIES = [
   {"name": "Schedulers", 'type': 'schedulers', 'description': ''},
   {"name": "Plugins", 'type': 'plugins', 'description': ''},
 ]
+
+
+def get_connectors_types():
+  return CONNECTOR_TYPES
+
+def get_connector_categories():
+  return CATEGORIES
+
+def get_connector_by_type(dialect):
+  instance = [connector for connector in get_connectors_types() if connector['dialect'] == dialect]
+
+  if instance:
+    return instance[0]
+  else:
+    raise PopupException(_('No connector with the type %s found.') % type)
