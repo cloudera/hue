@@ -121,3 +121,12 @@ class TestOrganizationSingleUser(unittest.TestCase):
       assert_equal([], data['documents'])
     finally:
       document.delete()
+
+  def test_orm_compatiblity(self):
+    User.objects.get(username=self.user1.email)
+
+    User.objects.order_by('username')
+
+    User.objects.filter(groups__in=Group.objects.all()).order_by('username')
+
+    self.client2.get('/useradmin/groups/edit/default')

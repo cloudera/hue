@@ -216,7 +216,9 @@ if ENABLE_ORGANIZATIONS.get():
       if self.instance.id:
         self.fields['email'].widget.attrs['readonly'] = True
 
-      self.fields['organization'] = forms.ChoiceField(choices=((default_organization().id, default_organization()),), initial=default_organization())
+      self.fields['organization'] = forms.ChoiceField(
+        choices=((default_organization().id, default_organization()),), initial=default_organization()
+      )
 
     def clean_organization(self):
       try:
@@ -264,7 +266,9 @@ if ENABLE_ORGANIZATIONS.get():
       if self.instance.id:
         self.fields['email'].widget.attrs['readonly'] = True
 
-      self.fields['organization'] = forms.ChoiceField(choices=((default_organization().id, default_organization()),), initial=default_organization())
+      self.fields['organization'] = forms.ChoiceField(
+        choices=((default_organization().id, default_organization()),), initial=default_organization()
+      )
 
     def clean_organization(self):
       try:
@@ -436,7 +440,7 @@ class GroupEditForm(forms.ModelForm):
 
     if self.instance.id:
       self.fields['name'].widget.attrs['readonly'] = True
-      initial_members = User.objects.filter(groups=self.instance).order_by('username')
+      initial_members = User.objects.filter(groups=self.instance).order_by('email' if ENABLE_ORGANIZATIONS.get() else 'username')
       initial_perms = HuePermission.objects.filter(grouppermission__group=self.instance).order_by('app', 'description')
     else:
       initial_members = []
@@ -445,7 +449,9 @@ class GroupEditForm(forms.ModelForm):
     self.fields["members"] = _make_model_field(_("members"), initial_members, User.objects.order_by('username'))
     self.fields["permissions"] = _make_model_field(_("permissions"), initial_perms, HuePermission.objects.order_by('app', 'description'))
     if 'organization' in self.fields:
-      self.fields['organization'] = forms.ChoiceField(choices=((default_organization().id, default_organization()),), initial=default_organization())
+      self.fields['organization'] = forms.ChoiceField(
+        choices=((default_organization().id, default_organization()),), initial=default_organization()
+      )
 
   def _compute_diff(self, field_name):
     current = set(self.fields[field_name].initial_objs)
@@ -532,7 +538,7 @@ def _make_model_field(label, initial, choices, multi=True):
   if multi:
     field = forms.models.ModelMultipleChoiceField(choices, required=False)
     field.initial_objs = initial
-    field.initial = [ obj.pk for obj in initial ]
+    field.initial = [obj.pk for obj in initial]
     field.label = label
   else:
     field = forms.models.ModelChoiceField(choices, required=False)
