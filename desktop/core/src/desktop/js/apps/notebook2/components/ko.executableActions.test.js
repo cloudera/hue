@@ -16,7 +16,9 @@ describe('ko.executableActions.js', () => {
       isReady: () => true,
       reset: () => {},
       nextExecutable: {},
-      executor: {},
+      executor: {
+        defaultLimit: () => {}
+      },
       status: EXECUTION_STATUS.ready
     };
     const activeExecutable = () => mockExecutable;
@@ -45,7 +47,9 @@ describe('ko.executableActions.js', () => {
       isReady: () => true,
       reset: () => {},
       nextExecutable: {},
-      executor: {},
+      executor: {
+        defaultLimit: () => {}
+      },
       status: EXECUTION_STATUS.ready
     };
     const activeExecutable = () => mockExecutable;
