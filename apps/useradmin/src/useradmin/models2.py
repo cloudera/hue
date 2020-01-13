@@ -197,6 +197,11 @@ class OrganizationUser(AbstractUser):
     pass
 
 
+def get_user_request_organization():
+  request = CrequestMiddleware.get_request()
+  return request.user.organization if request and hasattr(request, 'user') and request.user.is_authenticated() else default_organization()
+
+
 def _fitered_queryset(queryset, by_owner=False):
   request = CrequestMiddleware.get_request()
 

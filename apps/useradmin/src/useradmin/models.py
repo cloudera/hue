@@ -64,13 +64,14 @@ from useradmin.conf import DEFAULT_USER_GROUP
 
 if ENABLE_ORGANIZATIONS.get():
   from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group, Organization, default_organization, get_organization, \
-      _fitered_queryset
+      _fitered_queryset, get_user_request_organization
 else:
   from django.contrib.auth.models import User, Group
   class Organization(): pass
   def default_organization(): pass
   def get_organization(): pass
   def _fitered_queryset(queryset): return queryset
+  def get_user_request_organization(): pass
 
   monkey_patch_username_validator()
 
@@ -283,11 +284,6 @@ def get_default_user_group(**kwargs):
     group.save()
 
   return group
-
-
-def get_user_request_organization():
-  request = CrequestMiddleware.get_request()
-  return request.user.organization if request and hasattr(request, 'user') else default_organization()
 
 
 def update_app_permissions(**kwargs):

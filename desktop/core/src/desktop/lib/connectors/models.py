@@ -63,7 +63,7 @@ AVAILABLE_CONNECTORS = _group_category_connectors(CONNECTOR_TYPES)
 
 
 def _get_installed_connectors(category=None, categories=None, dialect=None, interface=None, user=None):
-  connector = []
+  connectors = []
   connector_instances = [
       {
         'id': connector.id,
@@ -78,11 +78,11 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
   ] + [ # TODO move to samples? or auto
       {
         'id': i,
-        'nice_name':  config_connectors[i].NICE_NAME.get() or i,
+        'nice_name':  CONNECTORS.get()[i].NICE_NAME.get() or i,
         'description': '',
-        'dialect': config_connectors[i].DIALECT.get(),
-        'interface': config_connectors[i].INTERFACE.get(),
-        'settings': config_connectors[i].SETTINGS.get(),
+        'dialect': CONNECTORS.get()[i].DIALECT.get(),
+        'interface': CONNECTORS.get()[i].INTERFACE.get(),
+        'settings': CONNECTORS.get()[i].SETTINGS.get(),
         'is_demo': True,
       }
       for i in CONNECTORS.get()
@@ -99,16 +99,16 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
 
     if not connector_types:
       LOG.warn('Skipping connector %(id)s as connector dialect %(dialect)s or interface %(interface)s are not installed' % (
-          {'id': i, 'dialect': connector['dialect'], 'interface': connector['interface']}
+          {'id': connector['id'], 'dialect': connector['dialect'], 'interface': connector['interface']}
         )
       )
     else:
       connector_type = connector_types[0]
-      connector.append({
+      connectors.append({
         'nice_name': connector['nice_name'],
-        'name': i,
+        'name': connector['id'],
         'dialect': connector['dialect'],
-        'interface': connector['interface'],
+        'interface': connector['interface'] or connector_type['interface'],
         'settings': connector['settings'],
         'id': connector['id'],
         'category': connector_type['category'],
