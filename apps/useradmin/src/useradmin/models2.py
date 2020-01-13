@@ -126,6 +126,7 @@ class UserManager(BaseUserManager):
 
   def order_by(self, *args, **kwargs):
     if 'username' in args:
+      args = list(args)
       args.remove('username')
       args.append('email')
 
@@ -141,8 +142,13 @@ class UserManager(BaseUserManager):
     user.save(using=self._db)
     return user
 
-  def create_user(self, email, password=None, **extra_fields):
+  def create_user(self, email=None, password=None, **extra_fields):
     """Create and save a regular User with the given email and password."""
+    if extra_fields.get('username'):
+      email = extra_fields.pop('username')
+    if not extra_fields.get('organization'):
+      extra_fields['organization'] = get_user_request_organization()
+
     extra_fields.setdefault('is_staff', False)
     extra_fields.setdefault('is_superuser', False)
     extra_fields.setdefault('is_admin', False)

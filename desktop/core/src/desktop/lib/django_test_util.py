@@ -24,8 +24,6 @@ import nose.tools
 
 from useradmin.models import User, Group, default_organization
 
-from desktop.conf import ENABLE_ORGANIZATIONS
-
 
 class Client(django.test.client.Client):
   """
@@ -53,25 +51,13 @@ def make_logged_in_client(username="test", password="test", is_superuser=True, r
   Sometimes we recreate the user, because some tests like to
   mess with is_active and such.
   """
-  if ENABLE_ORGANIZATIONS.get() and username == 'test':
-    username = username + '@gethue.com'
-
   try:
     user = User.objects.get(username=username)
     if recreate:
       user.delete()
       raise User.DoesNotExist
   except User.DoesNotExist:
-    user_attrs = {
-      'password': password
-    }
-    if ENABLE_ORGANIZATIONS.get():
-      user_attrs['email'] = username
-      user_attrs['organization'] = default_organization()
-    else:
-      user_attrs['username'] = username
-      user_attrs['email'] = username + '@localhost'
-    user = User.objects.create_user(**user_attrs)
+    user = User.objects.create_user(username=username, password=password)
     user.is_superuser = is_superuser
     user.save()
   else:
@@ -80,11 +66,7 @@ def make_logged_in_client(username="test", password="test", is_superuser=True, r
       user.save()
 
   if groupname is not None:
-    group_attrs = {'name': groupname}
-    if ENABLE_ORGANIZATIONS.get():
-      group_attrs['organization'] = default_organization()
-
-    group, created = Group.objects.get_or_create(**group_attrs)
+    group, created = Group.objects.get_or_create(name=groupname)
     if not user.groups.filter(name=group.name).exists():
       user.groups.add(group)
       user.save()
@@ -94,6 +76,7 @@ def make_logged_in_client(username="test", password="test", is_superuser=True, r
 
   assert ret, "Login failed (user '%s')." % username
   return c
+
 
 _MULTI_WHITESPACE = re.compile("\s+", flags=re.MULTILINE)
 
@@ -133,8 +116,7 @@ def configure_django_for_test():
   # This must be run before importing models
   # Be sure not to include any INSTALLED_APPS, since then the models
   # code will try very hard to load it.
-  settings.configure(DATABASE_ENGINE="sqlite3", DATABASE_NAME=":memory:",
-    INSTALLED_APPS=())
+  settings.configure(DATABASE_ENGINE="sqlite3", DATABASE_NAME=":memory:", INSTALLED_APPS=())
 
 
 def create_tables(model):
