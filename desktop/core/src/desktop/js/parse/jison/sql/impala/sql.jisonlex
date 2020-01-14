@@ -181,6 +181,7 @@
 'INSENSITIVE'                              { return 'INSENSITIVE'; }
 'INSERT'                                   { parser.determineCase(yytext); parser.addStatementTypeLocation('INSERT', yylloc); return 'INSERT'; }
 'INT'                                      { return 'INT'; }
+'INTEGER'                                  { return 'INTEGER'; }
 'INTERMEDIATE'                             { return 'INTERMEDIATE'; }
 'INTERSECT'                                { return 'INTERSECT'; }
 'INTERSECTION'                             { return 'INTERSECTION'; }
