@@ -117,11 +117,11 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
       connector_type = connector_types[0]
       connectors.append({
         'nice_name': connector['nice_name'],
-        'name': connector['id'],
+        'name': str(connector['id']),
         'dialect': connector['dialect'],
         'interface': connector['interface'] or connector_type['interface'],
         'settings': connector['settings'],
-        'id': connector['id'],
+        'id': str(connector['id']),
         'category': connector_type['category'],
         'description': connector_type['description'],
         'dialect_properties': connector_type.get('properties', {})
@@ -137,6 +137,6 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
     connectors = [connector for connector in connectors if connector['interface'] == interface]
   if user is not None:
     allowed_connectors = user.get_permissions().values_list('app', flat=True)
-    connectors = [connector for connector in connectors if connector['name'] in allowed_connectors]
+    connectors = [connector for connector in connectors if connector['id'] in allowed_connectors]
 
   return connectors

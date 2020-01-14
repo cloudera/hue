@@ -209,7 +209,7 @@ if ENABLE_ORGANIZATIONS.get():
 
   # TODO: move to external abstract module?
   class OrganizationHuePermission(models.Model):
-    app = models.CharField(max_length=30)
+    app = models.CharField(max_length=30)   # FK to Connector?
     action = models.CharField(max_length=100)
     description = models.CharField(max_length=255)
 
@@ -244,7 +244,7 @@ else:
     Set of non-object specific permissions that an app supports.
 
     Currently only assign permissions to groups (not users or roles).
-    Could be move to support Apache Ranger permissions, AWS IAM... for Hue and connector access.
+    Could someday support external permissions of Apache Ranger permissions, AWS IAM...
     """
     app = models.CharField(max_length=30)
     action = models.CharField(max_length=100)
