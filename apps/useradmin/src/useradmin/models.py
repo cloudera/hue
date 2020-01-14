@@ -199,6 +199,8 @@ class GroupPermission(models.Model):
 
 
 if ENABLE_ORGANIZATIONS.get():
+  from desktop.lib.connectors.models import Connector
+
   class OrganizationHuePermissionManager(models.Manager):
 
     def get_queryset(self):
@@ -209,7 +211,7 @@ if ENABLE_ORGANIZATIONS.get():
 
   # TODO: move to external abstract module?
   class OrganizationHuePermission(models.Model):
-    app = models.CharField(max_length=30)   # FK to Connector?
+    connector = models.ForeignKey(Connector)
     action = models.CharField(max_length=100)
     description = models.CharField(max_length=255)
 
@@ -234,6 +236,9 @@ if ENABLE_ORGANIZATIONS.get():
 
     class Meta(object):
       abstract = True
+      verbose_name = _t('Hue permission')
+      verbose_name_plural = _t('Hue permissions')
+      unique_together = ('connector', 'action', 'organization',)
 
   class HuePermission(OrganizationHuePermission):
     pass

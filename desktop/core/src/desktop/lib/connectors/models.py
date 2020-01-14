@@ -36,7 +36,7 @@ LOG = logging.getLogger(__name__)
 class ConnectorManager(models.Manager):
 
   def get_queryset(self):
-    """Make sure to restrict to only organization's connectors"""
+    """Restrict to only organization's connectors"""
     queryset = super(ConnectorManager, self).get_queryset()
     return _fitered_queryset(queryset)
 
@@ -46,7 +46,7 @@ class ConnectorManager(models.Manager):
 
 class Connector(models.Model):
   """
-  Instance of a connector pointing to an external service: connection
+  Instance of a connector type pointing to an external service of a certain dialect.
   """
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')

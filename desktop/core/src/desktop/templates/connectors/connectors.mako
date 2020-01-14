@@ -43,12 +43,12 @@ else:
       self.categories = ko.observableArray();
       self.selectedConnectorCategory = ko.observable('All');
       self.connectorsFilter = ko.observable();
-      self.aggregateConnectors = ko.observable(false);
 
-      self.instances = ko.observableArray(); // Saved connectors
+      // Handle two types of objects are being listed: connector instances and types
+      self.instances = ko.observableArray(); // Connector instances (e.g. connector to a MySql DB on a certain host)
       self.instance = ko.observable();
 
-      self.connectors = ko.observableArray(); // Connector forms
+      self.connectors = ko.observableArray(); // Connector types (e.g. mysql dialect)
       self.connector = ko.observable();
 
       self.selectedConnectors = ko.pureComputed(function () {
@@ -229,8 +229,6 @@ ${ layout.menubar(section='connectors') }
               <i class="fa fa-question-circle"></i> ${ _('Help') }
             </a>
           </span>
-          <label for="groupConnector" class="pull-right">${ _('Group') }</label>
-          <input type="checkbox" name="groupConnector" data-bind="checked: $root.aggregateConnectors" class="pull-right">
           <input type="text" data-bind="clearable: $root.connectorsFilter, valueUpdate: 'afterkeydown'"
               class="input-xlarge pull-right margin-bottom-10" placeholder="${ _('Filter...') }">
         </div>
