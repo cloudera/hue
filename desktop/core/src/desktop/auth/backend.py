@@ -54,7 +54,7 @@ from desktop.settings import LOAD_BALANCER_COOKIE
 
 from useradmin import ldap_access
 from useradmin.organization import default_organization
-from useradmin.models import get_profile, get_default_user_group, UserProfile, User
+from useradmin.models import get_profile, get_default_user_group, UserProfile, User, get_organization
 
 
 LOG = logging.getLogger(__name__)

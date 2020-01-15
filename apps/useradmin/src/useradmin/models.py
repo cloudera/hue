@@ -34,8 +34,8 @@ Permissions may be granted to groups, but not, currently, to users. A user's abi
 has access to.
 
 Note that Django itself has a notion of users, groups, and permissions. We re-use Django's notion of users and groups, but ignore its notion of
-permissions. The permissions notion in Django is strongly tied to what models you may or may not edit, and there are elaborations (especially
-in Django 1.2) to manipulate this row by row. This does not map nicely onto actions which may not relate to database models.
+permissions. The permissions notion in Django is strongly tied to what models you may or may not edit, and there are elaborations to
+manipulate this row by row. This does not map nicely onto actions which may not relate to database models.
 """
 import collections
 import json
@@ -270,6 +270,8 @@ def update_app_permissions(**kwargs):
             uptodate += 1
         else:
           new_dp = HuePermission(app=app_name, action=action, description=description)
+          if ENABLE_CONNECTORS.get():
+            new_dp.connector = Connector.objects.get(id=app_name)
           new_dp.save()
           added.append(new_dp)
 

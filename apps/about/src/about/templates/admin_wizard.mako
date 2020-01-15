@@ -39,12 +39,13 @@ ${ layout.menubar(section='quick_start') }
     <div>
       <h1 class="margin-top-20 margin-bottom-30">
         % if is_admin(user):
-          ${ _('Quick Start Wizard') } -
+          ${ _('Quick Start') } -
         % endif
-        <a href="https://gethue.com" target="_blank" style="color:#777" title="${ _('Open Hue\'s website in a new tab') }">
+        <a href="https://gethue.com" target="_blank" title="${ _('Open Hue\'s website in a new tab') }">
           Hue&trade;
+          ${ version }
         </a>
-        ${ version } -
+        -
         Query. Explore. Repeat.
       </h1>
 

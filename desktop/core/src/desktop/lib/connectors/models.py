@@ -97,18 +97,19 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
         'is_demo': False,
       }
       for connector in Connector.objects.all()
-  ] + [ # TODO move to samples? or auto
-      {
-        'id': i,
-        'nice_name':  CONNECTORS.get()[i].NICE_NAME.get() or i,
-        'description': '',
-        'dialect': CONNECTORS.get()[i].DIALECT.get(),
-        'interface': CONNECTORS.get()[i].INTERFACE.get(),
-        'settings': CONNECTORS.get()[i].SETTINGS.get(),
-        'is_demo': True,
-      }
-      for i in CONNECTORS.get()
   ]
+  # + [ # TODO move to samples? or auto
+  #     {
+  #       'id': i,
+  #       'nice_name':  CONNECTORS.get()[i].NICE_NAME.get() or i,
+  #       'description': '',
+  #       'dialect': CONNECTORS.get()[i].DIALECT.get(),
+  #       'interface': CONNECTORS.get()[i].INTERFACE.get(),
+  #       'settings': CONNECTORS.get()[i].SETTINGS.get(),
+  #       'is_demo': True,
+  #     }
+  #     for i in CONNECTORS.get()
+  # ]
 
   for connector in connector_instances:
     connector_types = []
