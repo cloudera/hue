@@ -53,7 +53,7 @@ from django.utils.translation import ugettext_lazy as _t
 
 from desktop import appmanager
 from desktop.conf import ENABLE_ORGANIZATIONS, ENABLE_CONNECTORS
-from desktop.lib.connectors.models import _get_installed_connectors
+from desktop.lib.connectors.models import _get_installed_connectors, Connector
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.idbroker.conf import is_idbroker_enabled
 from desktop.monkey_patches import monkey_patch_username_validator
@@ -198,77 +198,71 @@ class GroupPermission(models.Model):
   hue_permission = models.ForeignKey("HuePermission")
 
 
-if ENABLE_ORGANIZATIONS.get():
-  from desktop.lib.connectors.models import Connector
+class BasePermission(models.Model):
+  """
+  Set of non-object specific permissions that an app supports.
 
-  class OrganizationHuePermissionManager(models.Manager):
+  Currently only assign permissions to groups (not users or roles).
+  Could someday support external permissions of Apache Ranger permissions, AWS IAM... This could be done via subclasses or creating new types
+  of connectors.
+  """
+  app = models.CharField(max_length=30)
+  action = models.CharField(max_length=100)
+  description = models.CharField(max_length=255)
 
-    def get_queryset(self):
-      """Make sure to restrict to only organization"""
-      queryset = super(OrganizationHuePermissionManager, self).get_queryset()
-      return _fitered_queryset(queryset)
+  groups = models.ManyToManyField(Group, through=GroupPermission)
+
+  def __str__(self):
+    return "%s.%s:%s(%d)" % (self.app, self.action, self.description, self.pk)
+
+  @classmethod
+  def get_app_permission(cls, hue_app, action):
+    return BasePermission.objects.get(app=hue_app, action=action)
+
+  class Meta(object):
+    abstract = True
 
 
-  # TODO: move to external abstract module?
-  class OrganizationHuePermission(models.Model):
-    connector = models.ForeignKey(Connector)
-    action = models.CharField(max_length=100)
-    description = models.CharField(max_length=255)
+class ConnectorPermission(BasePermission):
+  connector = models.ForeignKey(Connector)
 
-    organization = models.ForeignKey(Organization)
+  class Meta(object):
+    abstract = True
+    verbose_name = _t('Connector permission')
+    verbose_name_plural = _t('Connector permissions')
+    unique_together = ('connector', 'action',)
 
-    groups = models.ManyToManyField(Group, through=GroupPermission)
 
-    objects = OrganizationHuePermissionManager()
+class OrganizationConnectorPermissionManager(models.Manager):
 
-    def __init__(self, *args, **kwargs):
-      if not kwargs.get('organization'):
-        kwargs['organization'] = get_user_request_organization()
+  def get_queryset(self):
+    """Restrict to only organization"""
+    queryset = super(OrganizationConnectorPermissionManager, self).get_queryset()
+    return _fitered_queryset(queryset)
 
-      super(OrganizationHuePermission, self).__init__(*args, **kwargs)
+class OrganizationConnectorPermission(ConnectorPermission):
+  organization = models.ForeignKey(Organization)
 
-    def __str__(self):
-      return "%s.%s:%s(%d)" % (self.app, self.action, self.description, self.pk)
+  objects = OrganizationConnectorPermissionManager()
 
-    @classmethod
-    def get_app_permission(cls, hue_app, action):
-      return HuePermission.objects.get(app=hue_app, action=action)
+  def __init__(self, *args, **kwargs):
+    if not kwargs.get('organization'):
+      kwargs['organization'] = get_user_request_organization()
 
-    class Meta(object):
-      abstract = True
-      verbose_name = _t('Hue permission')
-      verbose_name_plural = _t('Hue permissions')
-      unique_together = ('connector', 'action', 'organization',)
+    super(OrganizationConnectorPermission, self).__init__(*args, **kwargs)
 
-  class HuePermission(OrganizationHuePermission):
-    pass
+  class Meta(ConnectorPermission.Meta):
+    abstract = True
+    unique_together = ('connector', 'action', 'organization',)
 
+
+if ENABLE_CONNECTORS.get():
+  if ENABLE_ORGANIZATIONS.get():
+    class HuePermission(OrganizationConnectorPermission): pass
+  else:
+    class HuePermission(ConnectorPermission): pass
 else:
-  class HuePermissionBase(models.Model):
-    """
-    Set of non-object specific permissions that an app supports.
-
-    Currently only assign permissions to groups (not users or roles).
-    Could someday support external permissions of Apache Ranger permissions, AWS IAM...
-    """
-    app = models.CharField(max_length=30)
-    action = models.CharField(max_length=100)
-    description = models.CharField(max_length=255)
-
-    groups = models.ManyToManyField(Group, through=GroupPermission)
-
-    def __str__(self):
-      return "%s.%s:%s(%d)" % (self.app, self.action, self.description, self.pk)
-
-    @classmethod
-    def get_app_permission(cls, hue_app, action):
-      return HuePermission.objects.get(app=hue_app, action=action)
-
-    class Meta(object):
-      abstract = True
-
-  class HuePermission(HuePermissionBase):
-    pass
+  class HuePermission(BasePermission): pass
 
 
 def get_default_user_group(**kwargs):
