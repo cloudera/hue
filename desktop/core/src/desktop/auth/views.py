@@ -46,15 +46,16 @@ from desktop.auth.backend import OIDCBackend
 from desktop.auth.forms import ImpersonationAuthenticationForm, OrganizationUserCreationForm, OrganizationAuthenticationForm
 from desktop.conf import OAUTH, ENABLE_ORGANIZATIONS
 from desktop.lib.django_util import render, login_notrequired, JsonResponse
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.log.access import access_log, access_warn, last_access_map
 from desktop.settings import LOAD_BALANCER_COOKIE
+
 
 if sys.version_info[0] > 2:
   from urllib.parse import urlencode as urllib_urlencode
 else:
   from urllib import urlencode as urllib_urlencode
 
-from desktop.lib.exceptions_renderable import PopupException
 
 LOG = logging.getLogger(__name__)
 
@@ -233,10 +234,9 @@ def dt_logout(request, next_page=None):
     try:
       get_api(request, session).close_session(session)
     except PopupException as e:
-      LOG.warn("Error closing Impala session: %s" % e.message.encode('utf-8'))
-      pass
+      LOG.warn("Error closing %s session: %s" % (session_app, e.message.encode('utf-8')))
     except Exception as e:
-      LOG.warn("Error closing Impala session: %s" % e)
+      LOG.warn("Error closing %s session: %s" % (session_app, e))
 
   backends = get_backends()
   if backends:
