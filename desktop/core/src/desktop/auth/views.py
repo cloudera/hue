@@ -169,7 +169,7 @@ def dt_login(request, from_modal=False):
           return HttpResponseRedirect(redirect_to)
       else:
         request.audit['allowed'] = False
-        msg = 'Failed login for user: %s' % request.POST.get('username')
+        msg = 'Failed login for user: %s' % request.POST.get('username', request.POST.get('email'))
         request.audit['operationText'] = msg
         access_warn(request, msg)
         if from_modal or request.GET.get('fromModal', 'false') == 'true':
