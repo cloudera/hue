@@ -25,7 +25,6 @@ import nose.tools
 from useradmin.models import User, Group, Organization
 
 
-
 class Client(django.test.client.Client):
   """
   Extends client to have a get_json method.
