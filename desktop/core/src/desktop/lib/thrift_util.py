@@ -825,4 +825,7 @@ def log_if_slow_call(duration, message):
   elif duration >= math.floor(INFO_LEVEL_CALL_DURATION_MS / 1000):
     LOG.info('SLOW: %.2f - %s' % (duration, message))
   else:
-    LOG.debug(message)
+    #Leave this as logging.debug and not logger.
+    #Otherwise we never get these logging messages even with debug enabled.
+    #Review this in the future to find out why.
+    logging.debug(message)
