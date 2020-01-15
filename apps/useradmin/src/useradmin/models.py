@@ -59,7 +59,7 @@ from desktop.lib.idbroker.conf import is_idbroker_enabled
 from desktop.monkey_patches import monkey_patch_username_validator
 
 from useradmin.conf import DEFAULT_USER_GROUP
-
+from useradmin.permissions import HuePermission, GroupPermission, LdapGroup
 
 if ENABLE_ORGANIZATIONS.get():
   from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group, Organization, get_organization
@@ -180,67 +180,6 @@ def create_profile_for_user(user):
   except:
     LOG.exception("Failed to automatically create user profile.")
     return None
-
-
-class LdapGroup(models.Model):
-  """
-  Groups that come from LDAP originally will have an LdapGroup
-  record generated at creation time.
-  """
-  group = models.ForeignKey(Group, related_name="group")
-
-
-class GroupPermission(models.Model):
-  """
-  Represents the permissions a group has.
-  """
-  group = models.ForeignKey(Group)
-  hue_permission = models.ForeignKey("HuePermission")
-
-
-class BasePermission(models.Model):
-  """
-  Set of non-object specific permissions that an app supports.
-
-  Currently only assign permissions to groups (not users or roles).
-  Could someday support external permissions of Apache Ranger permissions, AWS IAM... This could be done via subclasses or creating new types
-  of connectors.
-  """
-  app = models.CharField(max_length=30)
-  action = models.CharField(max_length=100)
-  description = models.CharField(max_length=255)
-
-  groups = models.ManyToManyField(Group, through=GroupPermission)
-
-  def __str__(self):
-    return "%s.%s:%s(%d)" % (self.app, self.action, self.description, self.pk)
-
-  @classmethod
-  def get_app_permission(cls, hue_app, action):
-    return BasePermission.objects.get(app=hue_app, action=action)
-
-  class Meta(object):
-    abstract = True
-
-
-class ConnectorPermission(BasePermission):
-  connector = models.ForeignKey(Connector)
-
-  class Meta(object):
-    abstract = True
-    verbose_name = _t('Connector permission')
-    verbose_name_plural = _t('Connector permissions')
-    unique_together = ('connector', 'action',)
-
-
-if ENABLE_CONNECTORS.get():
-  if ENABLE_ORGANIZATIONS.get():
-    from useradmin.organization import OrganizationConnectorPermission
-    class HuePermission(OrganizationConnectorPermission): pass
-  else:
-    class HuePermission(ConnectorPermission): pass
-else:
-  class HuePermission(BasePermission): pass
 
 
 def get_default_user_group(**kwargs):
