@@ -69,7 +69,7 @@ else:
   class Organization(): pass
   def default_organization(): pass
   def get_organization(): pass
-  def _fitered_queryset(queryset): return queryset
+  def _fitered_queryset(queryset, *args, **kwargs): return queryset
   def get_user_request_organization(): pass
 
   monkey_patch_username_validator()
