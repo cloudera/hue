@@ -233,31 +233,9 @@ class ConnectorPermission(BasePermission):
     unique_together = ('connector', 'action',)
 
 
-class OrganizationConnectorPermissionManager(models.Manager):
-
-  def get_queryset(self):
-    """Restrict to only organization"""
-    queryset = super(OrganizationConnectorPermissionManager, self).get_queryset()
-    return _fitered_queryset(queryset)
-
-class OrganizationConnectorPermission(ConnectorPermission):
-  organization = models.ForeignKey(Organization)
-
-  objects = OrganizationConnectorPermissionManager()
-
-  def __init__(self, *args, **kwargs):
-    if not kwargs.get('organization'):
-      kwargs['organization'] = get_user_request_organization()
-
-    super(OrganizationConnectorPermission, self).__init__(*args, **kwargs)
-
-  class Meta(ConnectorPermission.Meta):
-    abstract = True
-    unique_together = ('connector', 'action', 'organization',)
-
-
 if ENABLE_CONNECTORS.get():
   if ENABLE_ORGANIZATIONS.get():
+    from useradmin.organization import OrganizationConnectorPermission
     class HuePermission(OrganizationConnectorPermission): pass
   else:
     class HuePermission(ConnectorPermission): pass
