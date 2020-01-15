@@ -22,7 +22,8 @@ import json
 import django.test.client
 import nose.tools
 
-from useradmin.models import User, Group, default_organization
+from useradmin.models import User, Group
+from useradmin.organization import Organization
 
 
 class Client(django.test.client.Client):

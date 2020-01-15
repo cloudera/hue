@@ -43,7 +43,8 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 from dashboard.conf import get_engines, HAS_REPORT_ENABLED
 from kafka.conf import has_kafka
 from notebook.conf import DEFAULT_LIMIT, SHOW_NOTEBOOKS, get_ordered_interpreters
-from useradmin.models import User, Group, get_organization, _fitered_queryset
+from useradmin.models import User, Group, get_organization
+from useradmin.organization import _fitered_queryset
 
 from desktop import appmanager
 from desktop.auth.backend import is_admin
