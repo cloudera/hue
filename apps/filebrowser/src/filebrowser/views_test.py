@@ -55,7 +55,7 @@ from desktop.lib.view_util import location_to_url
 from desktop.conf import is_oozie_enabled
 from hadoop import pseudo_hdfs4
 from hadoop.conf import UPLOAD_CHUNK_SIZE
-from useradmin.models import User, Group, default_organization
+from useradmin.models import User, Group
 
 from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE
 from filebrowser.lib.rwx import expand_mode

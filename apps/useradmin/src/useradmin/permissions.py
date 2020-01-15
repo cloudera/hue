@@ -23,10 +23,11 @@ from django.utils.translation import ugettext_lazy as _t
 from desktop.conf import ENABLE_ORGANIZATIONS, ENABLE_CONNECTORS
 from desktop.lib.connectors.models import Connector
 
+from useradmin.organization import _fitered_queryset, get_user_request_organization
+
 
 if ENABLE_ORGANIZATIONS.get():
   from useradmin.models2 import OrganizationGroup as Group, Organization
-  from useradmin.organization import _fitered_queryset
 else:
   from django.contrib.auth.models import Group
 

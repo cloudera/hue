@@ -31,7 +31,8 @@ from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule
 from desktop.settings import LANGUAGES
 
 from useradmin.hue_password_policy import hue_get_password_validators
-from useradmin.models import GroupPermission, HuePermission, get_default_user_group, User, Group, default_organization, Organization
+from useradmin.models import GroupPermission, HuePermission, get_default_user_group, User, Group, Organization
+from useradmin.organization import default_organization
 
 
 LOG = logging.getLogger(__name__)

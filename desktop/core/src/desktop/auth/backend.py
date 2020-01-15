@@ -53,7 +53,8 @@ from desktop.conf import AUTH, LDAP, OIDC, ENABLE_ORGANIZATIONS
 from desktop.settings import LOAD_BALANCER_COOKIE
 
 from useradmin import ldap_access
-from useradmin.models import get_profile, get_default_user_group, UserProfile, User, Organization, get_organization
+from useradmin.organization import default_organization
+from useradmin.models import get_profile, get_default_user_group, UserProfile, User
 
 
 LOG = logging.getLogger(__name__)
