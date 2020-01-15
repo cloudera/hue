@@ -25,7 +25,7 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from useradmin.organization import _fitered_queryset, get_user_request_organization
 
-from desktop.conf import CONNECTORS
+from desktop.conf import CONNECTORS, ENABLE_ORGANIZATIONS
 from desktop.lib.connectors.types import get_connectors_types
 from desktop.lib.exceptions_renderable import PopupException
 
@@ -33,18 +33,7 @@ from desktop.lib.exceptions_renderable import PopupException
 LOG = logging.getLogger(__name__)
 
 
-class ConnectorManager(models.Manager):
-
-  def get_queryset(self):
-    """Restrict to only organization's connectors"""
-    queryset = super(ConnectorManager, self).get_queryset()
-    return _fitered_queryset(queryset)
-
-  def natural_key(self):
-    return (self.organization, self.name,)
-
-
-class Connector(models.Model):
+class BaseConnector(models.Model):
   """
   Instance of a connector type pointing to an external service of a certain dialect.
   """
@@ -54,23 +43,45 @@ class Connector(models.Model):
   settings = models.TextField(default='{}')
   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))
 
-  organization = models.ForeignKey('useradmin.Organization', on_delete=models.CASCADE)
-
-  objects = ConnectorManager()
-
   class Meta:
+    abstract = True
     verbose_name = _t('connector')
     verbose_name_plural = _t('connectors')
-    unique_together = ('name', 'organization',)
-
-  def __init__(self, *args, **kwargs):
-    if not kwargs.get('organization'):
-      kwargs['organization'] = get_user_request_organization()
-
-    super(Connector, self).__init__(*args, **kwargs)
+    unique_together = ('name',)
 
   def __str__(self):
-    return '%s (%s) @ %s' % (self.name, self.dialect, self.organization)
+    return '%s (%s)' % (self.name, self.dialect)
+
+
+if ENABLE_ORGANIZATIONS.get():
+  class ConnectorManager(models.Manager):
+
+    def get_queryset(self):
+      """Restrict to only organization's connectors"""
+      queryset = super(ConnectorManager, self).get_queryset()
+      return _fitered_queryset(queryset)
+
+    def natural_key(self):
+      return (self.organization, self.name,)
+
+  class Connector(BaseConnector):
+    organization = models.ForeignKey('useradmin.Organization', on_delete=models.CASCADE)
+
+    objects = ConnectorManager()
+
+    class Meta:
+      unique_together = ('name', 'organization',)
+
+    def __init__(self, *args, **kwargs):
+      if not kwargs.get('organization'):
+        kwargs['organization'] = get_user_request_organization()
+
+      super(Connector, self).__init__(*args, **kwargs)
+
+    def __str__(self):
+      return '%s (%s) @ %s' % (self.name, self.dialect, self.organization)
+else:
+  class Connector(BaseConnector): pass
 
 
 def _get_installed_connectors(category=None, categories=None, dialect=None, interface=None, user=None):
