@@ -410,9 +410,24 @@ class HueFileEntry {
     copyNext();
   }
 
-  loadDocument(callback) {
-    this.document(new HueDocument({ fileEntry: this }));
-    this.document().load(callback);
+  async loadDocument(successCallback, errorCallback) {
+    return new Promise((resolve, reject) => {
+      this.document(new HueDocument({ fileEntry: this }));
+      this.document().load(
+        () => {
+          if (successCallback) {
+            successCallback(this.document());
+          }
+          resolve(this.document());
+        },
+        err => {
+          if (errorCallback) {
+            errorCallback(err);
+          }
+          reject(err);
+        }
+      );
+    });
   }
 
   /**
