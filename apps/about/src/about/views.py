@@ -22,7 +22,7 @@ import logging
 from django.utils.translation import ugettext as _
 
 from desktop import appmanager
-from desktop.auth.backend import is_admin
+from desktop.auth.backend import is_hue_admin
 from desktop.auth.decorators import admin_required
 from desktop.lib.django_util import JsonResponse, render, login_notrequired
 from desktop.log.access import access_log_level
@@ -31,7 +31,7 @@ from desktop.views import collect_usage
 
 
 def admin_wizard(request):
-  if is_admin(request.user):
+  if is_hue_admin(request.user):
     apps = appmanager.get_apps(request.user)
   else:
     apps = []

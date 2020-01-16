@@ -89,7 +89,7 @@ ${ layout.menubar(section='quick_start') }
 
           <div id="step3" class="stepDetails hide">
             <div>
-              <h3>${ _('Install individual application examples') }</h3>
+              <h3>${ _('Install some data examples') }</h3>
               <ul class="unstyled samples">
               % if 'hive' in app_names:
                   <li>
