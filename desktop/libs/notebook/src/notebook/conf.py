@@ -151,8 +151,8 @@ INTERPRETERS_SHOWN_ON_WHEEL = Config(
 
 DEFAULT_LIMIT = Config(
   "default_limit",
-  help="Default limit to use in SELECT statements if not present (optional).",
-  default=None,
+  help="Default limit to use in SELECT statements if not present. Set to 0 to disable.",
+  default=5000,
   type=int
 )
 
