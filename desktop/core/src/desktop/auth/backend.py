@@ -107,20 +107,28 @@ def rewrite_user(user):
 
 
 def is_admin(user):
+  """
+  Admin of the Organization. Typically can edit users, connectors.
+  To rename to is_org_admin at some point.
+  """
   is_admin = False
-  if hasattr(user, 'is_superuser'):
+  if hasattr(user, 'is_superuser') and not ENABLE_ORGANIZATIONS.get():
     is_admin = user.is_superuser
-  if not is_admin and user.is_authenticated() and not ENABLE_ORGANIZATIONS.get():  # Admin group not activated in organization mode.
+  if not is_admin and user.is_authenticated():
     try:
       user = rewrite_user(user)
-      is_admin = user.has_hue_permission(action="superuser", app="useradmin")
+        # Either via flag or Admin group
+      is_admin = user.is_admin if ENABLE_ORGANIZATIONS.get() else user.has_hue_permission(action="superuser", app="useradmin")
     except Exception:
       LOG.exception("Could not validate if %s is a superuser, assuming False." % user)
   return is_admin
 
 
-def is_org_admin(user):
-  return hasattr(user, 'is_admin') and user.is_admin
+def is_hue_admin(user):
+  """
+  Hue service super user. Can manage global settings of the services used by all the organization.
+  """
+  return hasattr(user, 'is_superuser') and user.is_superuser
 
 
 class DefaultUserAugmentor(object):

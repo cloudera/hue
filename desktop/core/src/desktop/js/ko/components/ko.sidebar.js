@@ -281,7 +281,7 @@ class Sidebar {
       );
     }
 
-    if (window.USER_IS_ADMIN || window.USER_IS_ORG_ADMIN) {
+    if (window.USER_IS_ADMIN || window.USER_IS_HUE_ADMIN) {
       userChildren.push(
         new SidebarItem({ url: '/useradmin/users/', displayName: I18n('Manage Users') })
       );
