@@ -110,6 +110,12 @@ def is_admin(user):
   """
   Admin of the Organization. Typically can edit users, connectors.
   To rename to is_org_admin at some point.
+
+  If ENABLE_ORGANIZATIONS is false:
+    - Hue superusers are automaticall also admin
+
+  If ENABLE_ORGANIZATIONS is true:
+    - Hue superusers might not be admin of the organization
   """
   is_admin = False
   if hasattr(user, 'is_superuser') and not ENABLE_ORGANIZATIONS.get():
@@ -127,6 +133,8 @@ def is_admin(user):
 def is_hue_admin(user):
   """
   Hue service super user. Can manage global settings of the services used by all the organization.
+
+  Independent of ENABLE_ORGANIZATIONS.
   """
   return hasattr(user, 'is_superuser') and user.is_superuser
 

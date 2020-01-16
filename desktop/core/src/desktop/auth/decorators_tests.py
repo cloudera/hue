@@ -21,7 +21,7 @@ import unittest
 
 from nose.tools import assert_equal, assert_true, assert_false, assert_raises
 
-from desktop.auth.decorators import admin_required
+from desktop.auth.decorators import admin_required, hue_admin_required
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.exceptions_renderable import PopupException
 
@@ -42,14 +42,26 @@ class TestDecorator(unittest.TestCase):
     cls.client2 = make_logged_in_client(username='joe', recreate=True, is_superuser=False)
 
 
-  def test_user_group(self):
+  def test_admin_required(self):
     request = Mock(user=User.objects.get(username='admin'))
-    hello(request)
+    hello_admin(request)
 
     request = Mock(user=User.objects.get(username='joe'))
-    assert_raises(PopupException, hello, request)
+    assert_raises(PopupException, hello_admin, request)
+
+
+  def test_hue_admin_required(self):
+    request = Mock(user=User.objects.get(username='admin'))
+    hello_hue_admin(request)
+
+    request = Mock(user=User.objects.get(username='joe'))
+    assert_raises(PopupException, hello_hue_admin, request)
 
 
 @admin_required
-def hello(request, *args, **kwargs):
+def hello_admin(request, *args, **kwargs):
+  return 'Hello'
+
+@admin_required
+def hello_hue_admin(request, *args, **kwargs):
   return 'Hello'
