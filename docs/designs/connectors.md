@@ -4,6 +4,15 @@ Goal: [HUE-8758](https://issues.cloudera.org/browse/HUE-8758)
 Configuration of external services via an interface and API instead of hue.ini.
 
 
+## Summary
+
+Design is cleaner and cleaner. New org admin users get access to the admin wizard to add connectors etc..
+
+In traditional mode admins can add connectors via the UI or still read from ini. Also now making it easy to have both Connector perms and Hue perms (e.g. who can do downloads for example or access whatever piece of Hue logic). It could also easily be extended to support Roles of permissions or external perms like Ranger, AWS etc.
+LWot of changes to the desktop internals (added bunch of tests but still) so better when physically here.
+
+Then will be simpler to remove hardcoded dialects, finalize compute, etc... get it pretty componentized/generic.
+
 ## Apps and Connectors
 
 In Hue 4, apps and dialects are combined into the same configuration.
