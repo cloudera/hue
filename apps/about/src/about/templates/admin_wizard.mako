@@ -187,11 +187,13 @@ ${ layout.menubar(section='quick_start') }
             <div class="margin-top-30">
               <h3>${ _('Anonymous usage analytics') }</h3>
               <label class="checkbox">
-                <input class="updatePreferences" type="checkbox" name="collect_usage" style="margin-right: 10px" title="${ _('Check to enable usage analytics') }" ${ collect_usage and 'checked' or '' }/>
+                <input class="updatePreferences" type="checkbox" name="collect_usage" style="margin-right: 10px"
+                  title="${ _('Check to enable usage analytics') }" ${ collect_usage and 'checked' or '' }/>
                 ${ _('Help improve Hue with anonymous usage analytics.') }
-                <a href="javascript:void(0)" style="display: inline" data-trigger="hover" data-toggle="popover" data-placement="right" rel="popover"
-                   title="${ _('How does it work?') }"
-                   data-content="${ _('We are using Google Analytics to see how many times an application or specific section of an application is used, nothing more.') }">
+                <a href="javascript:void(0)" style="display: inline" data-trigger="hover" data-toggle="popover"
+                  data-placement="right" rel="popover"
+                  title="${ _('How does it work?') }"
+                  data-content="${ _('Hue is using Google Analytics to see how many times an application or specific section of an application is used, nothing more.') }">
                    <i class="fa fa-question-circle"></i>
                 </a>
               </label>

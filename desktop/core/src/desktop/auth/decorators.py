@@ -22,7 +22,8 @@ import logging
 from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
 
-from desktop.auth.backend import is_admin
+from desktop.auth.backend import is_admin, is_hue_admin
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.exceptions_renderable import PopupException
 
 
@@ -34,6 +35,16 @@ def admin_required(f):
   def wrapper(request, *args, **kwargs):
     if not is_admin(request.user):
       raise PopupException(_("You must be an admin."), error_code=401)
+
+    return f(request, *args, **kwargs)
+  return wrapper
+
+
+def hue_admin_required(f):
+  @wraps(f)
+  def wrapper(request, *args, **kwargs):
+    if not is_hue_admin(request.user):
+      raise PopupException(_("You must be a Hue admin."), error_code=401)
 
     return f(request, *args, **kwargs)
   return wrapper

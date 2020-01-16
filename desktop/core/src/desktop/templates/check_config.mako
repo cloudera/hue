@@ -18,10 +18,10 @@
 from django.utils.translation import ugettext as _
 
 from desktop.conf import has_connectors
-from desktop.auth.backend import is_admin
+from desktop.auth.backend import is_hue_admin
 %>
 
-% if is_admin(user):
+% if is_hue_admin(user):
   ${ _('Configuration files located in') } <code style="color: #0B7FAD">${ conf_dir }</code>
 % endif
 
