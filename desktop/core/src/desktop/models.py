@@ -1767,7 +1767,7 @@ class ClusterConfig(object):
         'displayName': _('Editor'),
         'buttonName': _('Query'),
         'interpreters': interpreters,
-        'default_limit': DEFAULT_LIMIT.get(),
+        'default_limit': None if DEFAULT_LIMIT.get() == 0 else DEFAULT_LIMIT.get(),
         'interpreter_names': [interpreter['type'] for interpreter in interpreters],
         'page': interpreters[0]['page'],
         'default_sql_interpreter': next((interpreter['type'] for interpreter in interpreters if interpreter.get('is_sql')), 'hive')
