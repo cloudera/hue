@@ -49,7 +49,7 @@ from useradmin.organization import _fitered_queryset
 from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_K8S_ONLY, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS,\
-    has_connectors, TASK_SERVER, ENABLE_GIST
+    has_connectors, TASK_SERVER, ENABLE_GIST, APP_BLACKLIST
 from desktop.lib import fsmanager
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.i18n import force_unicode
@@ -1857,7 +1857,10 @@ class ClusterConfig(object):
         'displayName': hdfs_connector,
         'buttonName': _('Browse'),
         'tooltip': hdfs_connector,
-        'page': '/filebrowser/' + (not self.user.is_anonymous() and 'view=' + urllib_quote(self.user.get_home_directory().encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) or '')
+        'page': '/filebrowser/' + (
+          not self.user.is_anonymous() and
+          'view=' + urllib_quote(self.user.get_home_directory().encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) or ''
+        )
       })
 
     if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('s3a', self.user):
@@ -1946,7 +1949,8 @@ class ClusterConfig(object):
         'page': '/security/hive'
       })
 
-    if 'indexer' in self.apps and 'filebrowser' in self.apps and self.user.has_hue_permission(action="access:importer", app="indexer"):
+    if 'indexer' in self.apps and 'filebrowser' in self.apps and self.user.has_hue_permission(action="access:importer", app="indexer") \
+        and 'importer' not in APP_BLACKLIST.get():
       interpreters.append({
         'type': 'importer',
         'displayName': _('Importer'),
