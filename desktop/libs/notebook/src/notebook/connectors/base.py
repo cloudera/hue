@@ -328,6 +328,7 @@ def get_api(request, snippet):
 
   if snippet.get('connector'):
     connector_name = snippet['connector']['type'] # Ideally unify with name and nice_name
+    snippet['type'] = connector_name
   else:
     connector_name = snippet['type']
 
