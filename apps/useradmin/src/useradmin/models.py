@@ -112,7 +112,7 @@ class UserProfile(models.Model):
         return self.user.is_superuser
     if self.user.is_superuser:
       return True
-    if ENABLE_CONNECTORS.get() and app in ('jobbrowser', 'metastore', 'filebrowser', 'indexer', 'useradmin'):
+    if ENABLE_CONNECTORS.get() and app in ('jobbrowser', 'metastore', 'filebrowser', 'indexer', 'useradmin', 'notebook'):
       return True
 
     group_ids = self.user.groups.values_list('id', flat=True)
