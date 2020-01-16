@@ -35,6 +35,7 @@ SITE_PATH = None
 SITE_DICT = None
 
 _CNF_HBASE_THRIFT_KERBEROS_PRINCIPAL = 'hbase.thrift.kerberos.principal'
+_CNF_HBASE_THRIFT_SPNEGO_PRINCIPAL = 'hbase.thrift.spnego.principal'
 _CNF_HBASE_AUTHENTICATION = 'hbase.security.authentication'
 _CNF_HBASE_REGIONSERVER_THRIFT_FRAMED = 'hbase.regionserver.thrift.framed'
 
@@ -56,7 +57,8 @@ def get_conf():
 
 
 def get_server_principal():
-  principal = get_conf().get(_CNF_HBASE_THRIFT_KERBEROS_PRINCIPAL, None)
+  thrift_principal = get_conf().get(_CNF_HBASE_THRIFT_KERBEROS_PRINCIPAL, None)
+  principal = get_conf().get(_CNF_HBASE_THRIFT_SPNEGO_PRINCIPAL, thrift_principal)
   components = get_components(principal)
   if components is not None:
     return components[0]
