@@ -19,7 +19,7 @@ import logging
 import sys
 
 from desktop.views import commonheader, commonfooter
-from django.utils.translation import ugettext as _
+
 
 LOG = logging.getLogger(__name__)
 %>

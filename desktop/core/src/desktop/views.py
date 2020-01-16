@@ -50,6 +50,7 @@ import desktop.log.log_buffer
 from desktop import appmanager
 from desktop.api import massaged_tags_for_json, massaged_documents_for_json, _get_docs
 from desktop.auth.backend import is_admin
+from desktop.auth.decorators import admin_required, hue_admin_required
 from desktop.conf import USE_NEW_EDITOR, HUE_LOAD_BALANCER, get_clusters, ENABLE_CONNECTORS
 from desktop.lib import django_mako, fsmanager
 from desktop.lib.conf import GLOBAL_CONFIG, BoundConfig, _configs_from_dir
@@ -180,6 +181,7 @@ def log_analytics(request):
   return JsonResponse({'status': 0})
 
 
+@hue_admin_required
 @access_log_level(logging.WARN)
 def log_view(request):
   """
@@ -187,26 +189,31 @@ def log_view(request):
   If it is attached to the root logger, this view will display that history,
   otherwise it will report that it can't be found.
   """
-  if not is_admin(request.user):
-    return HttpResponse(_("You must be a superuser."))
-
   hostname = socket.gethostname()
   l = logging.getLogger()
+
   for h in l.handlers:
     if isinstance(h, desktop.log.log_buffer.FixedBufferHandler):
-      return render('logs.mako', request, dict(log=[l for l in h.buf], query=request.GET.get("q", ""), hostname=hostname, is_embeddable=request.GET.get('is_embeddable', False)))
+      return render('logs.mako', request,
+        dict(
+          log=[l for l in h.buf],
+          query=request.GET.get("q", ""),
+          hostname=hostname, is_embeddable=request.GET.get('is_embeddable', False)
+        )
+      )
 
-  return render('logs.mako', request, dict(log=[_("No logs found!")], query='', hostname=hostname, is_embeddable=request.GET.get('is_embeddable', False)))
+  return render('logs.mako', request, dict(
+      log=[_("No logs found!")], query='', hostname=hostname, is_embeddable=request.GET.get('is_embeddable', False)
+    )
+  )
 
 
+@hue_admin_required
 @access_log_level(logging.WARN)
 def download_log_view(request):
   """
   Zip up the log buffer and then return as a file attachment.
   """
-  if not is_admin(request.user):
-    return HttpResponse(_("You must be a superuser."))
-
   l = logging.getLogger()
   for h in l.handlers:
     if isinstance(h, desktop.log.log_buffer.FixedBufferHandler):
@@ -280,6 +287,7 @@ def status_bar(request):
   return HttpResponse(resp)
 
 
+@hue_admin_required
 def dump_config(request):
   if not is_admin(request.user):
     return HttpResponse(_("You must be a superuser."))
@@ -287,14 +295,12 @@ def dump_config(request):
   return render("dump_config.mako", request, {})
 
 
+@hue_admin_required
 @access_log_level(logging.WARN)
 def threads(request):
   """Dumps out server threads. Useful for debugging."""
   out = string_io()
   dump_traceback(file=out)
-
-  if not is_admin(request.user):
-    return HttpResponse(_("You must be a superuser."))
 
   if request.is_ajax():
     return HttpResponse(out.getvalue(), content_type="text/plain")
@@ -302,11 +308,10 @@ def threads(request):
     return render("threads.mako", request, {'text': out.getvalue(), 'is_embeddable': request.GET.get('is_embeddable', False)})
 
 
+@hue_admin_required
 @access_log_level(logging.WARN)
 def memory(request):
   """Dumps out server threads. Useful for debugging."""
-  if not is_admin(request.user):
-    return HttpResponse(_("You must be a superuser."))
 
   if not hasattr(settings, 'MEMORY_PROFILER'):
     return HttpResponse(_("You must enable the memory profiler via the memory_profiler config in the hue.ini."))
@@ -352,6 +357,7 @@ def global_js_constants(request):
       'layer_options': json.dumps(desktop.conf.LEAFLET_TILE_LAYER_OPTIONS.get()),
     }
   }), content_type="application/javascript")
+
 
 def ace_sql_location_worker(request):
   return HttpResponse(render('ace_sql_location_worker.mako', request, None), content_type="application/javascript")
@@ -426,6 +432,7 @@ _LOG_LEVELS = {
 _MAX_LOG_FRONTEND_EVENT_LENGTH = 1024
 
 _LOG_FRONTEND_LOGGER = logging.getLogger("desktop.views.log_frontend_event")
+
 
 @login_notrequired
 def log_frontend_event(request):
@@ -695,10 +702,9 @@ def collect_validation_messages(conf, error_list):
     error_list.append(error)
 
 
+@admin_required
 def check_config(request):
   """Check config and view for the list of errors"""
-  if not is_admin(request.user):
-    return HttpResponse(_("You must be a superuser."))
 
   context = {
     'conf_dir': os.path.realpath(os.getenv("HUE_CONF_DIR", get_desktop_root("conf"))),
@@ -711,19 +717,20 @@ def check_config(request):
     return render('check_config.mako', request, context, force_template=True)
 
 
+@admin_required
 def check_config_ajax(request):
   """Alert administrators about configuration problems."""
-  if not is_admin(request.user):
-    return HttpResponse('')
 
   error_list = _get_config_errors(request)
   if not error_list:
     # Return an empty response, rather than using the mako template, for performance.
     return HttpResponse('')
-  return render('config_alert_dock.mako',
-                request,
-                dict(error_list=error_list),
-                force_template=True)
+  else:
+    return render('config_alert_dock.mako',
+        request,
+        dict(error_list=error_list),
+        force_template=True
+    )
 
 
 def get_debug_level(request):
@@ -731,20 +738,16 @@ def get_debug_level(request):
 
 
 @require_POST
+@admin_required
 def set_all_debug(request):
-  if not is_admin(request.user):
-    return JsonResponse({'status': 1, 'message': _('You must be a superuser.')})
-
   _set_all_debug()
 
   return JsonResponse({'status': 0, 'debug_all': True})
 
 
 @require_POST
+@admin_required
 def reset_all_debug(request):
-  if not is_admin(request.user):
-    return JsonResponse({'status': 1, 'message': _('You must be a superuser.')})
-
   _reset_all_debug()
 
   return JsonResponse({'status': 0, 'debug_all': False})

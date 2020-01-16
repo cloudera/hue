@@ -15,17 +15,15 @@
 ## limitations under the License.
 <%!
 from django.utils.translation import ugettext as _
-
-from desktop import conf
-from desktop.conf import USE_NEW_EDITOR
-from desktop.models import hue_version
-from desktop.lib.i18n import smart_unicode
+from webpack_loader.templatetags.webpack_loader import render_bundle
 
 from metadata.conf import has_optimizer, OPTIMIZER
 
+from desktop import conf
 from desktop.auth.backend import is_admin
-
-from webpack_loader.templatetags.webpack_loader import render_bundle
+from desktop.conf import USE_NEW_EDITOR
+from desktop.models import hue_version
+from desktop.lib.i18n import smart_unicode
 
 home_url = url('desktop_views_home')
 if USE_NEW_EDITOR.get():
