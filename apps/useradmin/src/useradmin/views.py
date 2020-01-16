@@ -20,7 +20,6 @@ from builtins import map
 import pwd
 import grp
 import logging
-import threading
 import subprocess
 import sys
 import json
@@ -64,9 +63,6 @@ else:
 
 
 LOG = logging.getLogger(__name__)
-
-__users_lock = threading.Lock()
-__groups_lock = threading.Lock()
 
 
 def is_ldap_setup():
@@ -197,22 +193,18 @@ def delete_user(request):
     raise PopupException(_('A POST request is required.'))
 
   ids = request.POST.getlist('user_ids')
-  global __users_lock
-  __users_lock.acquire()
-  try:
-    if str(request.user.id) in ids:
-      raise PopupException(_("You cannot remove yourself."), error_code=401)
 
-    usernames = list(User.objects.filter(id__in=ids).values_list('username', flat=True))
-    UserProfile.objects.filter(user__id__in=ids).delete()
-    User.objects.filter(id__in=ids).delete()
+  if str(request.user.id) in ids:
+    raise PopupException(_("You cannot remove yourself."), error_code=401)
 
-    request.audit = {
-      'operation': 'DELETE_USER',
-      'operationText': 'Deleted User(s): %s' % ', '.join(usernames)
-    }
-  finally:
-    __users_lock.release()
+  usernames = list(User.objects.filter(id__in=ids).values_list('username', flat=True))
+  UserProfile.objects.filter(user__id__in=ids).delete()
+  User.objects.filter(id__in=ids).delete()
+
+  request.audit = {
+    'operation': 'DELETE_USER',
+    'operationText': 'Deleted User(s): %s' % ', '.join(usernames)
+  }
 
   is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
 
@@ -324,31 +316,26 @@ def edit_user(request, username=None):
           request.user.username != username and len(form.changed_data) > 1
         )
 
-        global __users_lock
-        __users_lock.acquire()
-        try:
-          # form.instance (and instance) now carry the new data
-          orig = User.objects.get(**lookup)
-          if orig.is_superuser:
-            if not form.instance.is_superuser or not form.instance.is_active:
-              _check_remove_last_super(orig)
-          else:
-            if form.instance.is_superuser and not is_admin(request.user):
-              raise PopupException(_("You cannot make yourself a superuser."), error_code=401)
+        # form.instance (and instance) now carry the new data
+        orig = User.objects.get(**lookup)
+        if orig.is_superuser:
+          if not form.instance.is_superuser or not form.instance.is_active:
+            _check_remove_last_super(orig)
+        else:
+          if form.instance.is_superuser and not is_admin(request.user):
+            raise PopupException(_("You cannot make yourself a superuser."), error_code=401)
 
-          form.save()
+        form.save()
 
-          if form.cleaned_data.get('unlock_account'):
-            if not is_admin(request.user):
-              raise PopupException(_('You must be a superuser to reset users.'), error_code=401)
+        if form.cleaned_data.get('unlock_account'):
+          if not is_admin(request.user):
+            raise PopupException(_('You must be a superuser to reset users.'), error_code=401)
 
-            try:
-              reset(username=username)
-              request.info(_('Successfully unlocked account for user: %s') % username)
-            except Exception as e:
-              raise PopupException(_('Failed to reset login attempts for %s: %s') % (username, str(e)))
-        finally:
-          __users_lock.release()
+          try:
+            reset(username=username)
+            request.info(_('Successfully unlocked account for user: %s') % username)
+          except Exception as e:
+            raise PopupException(_('Failed to reset login attempts for %s: %s') % (username, str(e)))
 
       # Ensure home directory is created, if necessary.
       if form.cleaned_data.get('ensure_home_directory'):
@@ -855,14 +842,10 @@ def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
   groups from 'getent passwd' and 'getent groups'. This should also pull in
   users who are accessible via NSS.
   """
-  global __users_lock, __groups_lock
-
   hadoop_groups = dict((group.gr_name, group) for group in grp.getgrall() \
       if (group.gr_gid >= min_gid and group.gr_gid < max_gid) or group.gr_name == 'hadoop')
   user_groups = dict()
 
-  __users_lock.acquire()
-  __groups_lock.acquire()
   # Import groups
   for name, group in hadoop_groups.items():
     try:
@@ -905,9 +888,6 @@ def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
       hue_user.groups = user_groups[username]
     hue_user.save()
     LOG.info(_("Synced user %s from Unix") % hue_user.username)
-
-  __users_lock.release()
-  __groups_lock.release()
 
 
 def _check_remove_last_super(user_obj):
