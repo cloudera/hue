@@ -94,6 +94,7 @@ if ENABLE_ORGANIZATIONS.get():
         verbose_name=_t('permissions'),
         blank=True,
     )
+    # Could also have a set of Roles at some point.
 
     objects = OrganizationGroupManager()
 

@@ -17,7 +17,7 @@
 <%!
 from django.utils.translation import ugettext as _
 
-from desktop.auth.backend import is_admin, is_org_admin
+from desktop.auth.backend import is_admin, is_hue_admin
 from desktop.conf import METRICS, has_connectors, ANALYTICS
 
 def is_selected(section, matcher):
@@ -39,7 +39,7 @@ def is_selected(section, matcher):
                   ${ _('About Hue') }
                 </a>
               </li>
-              % if is_admin(user) or is_org_admin(user):
+              % if is_admin(user) or is_hue_admin(user):
                 <li class="${is_selected(section, 'quick_start')}">
                   <a href="${ url('about:admin_wizard') }">${_('Quick start')}</a>
                 </li>
@@ -49,7 +49,7 @@ def is_selected(section, matcher):
                   <a href="${ url('desktop.views.dump_config') }">${_('Configuration')}</a>
                 </li>
               % endif
-              % if has_connectors() and (is_admin(user) or is_org_admin(user)):
+              % if has_connectors() and (is_admin(user) or is_hue_admin(user)):
                 <li class="${is_selected(section, 'connectors')}">
                   <a href="${ url('desktop.lib.connectors.views.index') }">${_('Connectors')}</a>
                 </li>
