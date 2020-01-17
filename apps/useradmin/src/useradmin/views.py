@@ -289,8 +289,7 @@ def edit_user(request, username=None):
   is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
 
   if username is not None:
-    lookup = {'email': username} if ENABLE_ORGANIZATIONS.get() else {'username': username}
-    instance = User.objects.get(**lookup)
+    instance = User.objects.get(username=username)
   else:
     instance = None
 
@@ -316,7 +315,7 @@ def edit_user(request, username=None):
         if request.user.username == username and not form.instance.is_active:
           raise PopupException(_("You cannot make yourself inactive."), error_code=401)
 
-        # user changing his own information, form.changed_data=['ensure_home_directory', 'language']
+        # User changing his own information, form.changed_data=['ensure_home_directory', 'language']
         # or changing information about another user, form.changed_data=['ensure_home_directory']
         updated = (
           request.user.username == username and len(form.changed_data) > 2) or (
@@ -324,7 +323,7 @@ def edit_user(request, username=None):
         )
 
         # form.instance (and instance) now carry the new data
-        orig = User.objects.get(**lookup)
+        orig = User.objects.get(username=username)
         if orig.is_superuser:
           if not form.instance.is_superuser or not form.instance.is_active:
             _check_remove_last_super(orig)

@@ -15,8 +15,9 @@
 ## limitations under the License.
 
 <%!
-from desktop import conf
 from django.utils.translation import ugettext as _
+
+from desktop import conf
 from desktop.auth.backend import is_admin
 
 def is_selected(section, matcher):
