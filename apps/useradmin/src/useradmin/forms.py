@@ -153,6 +153,9 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
       if 'groups' in self.fields:
         self.fields['groups'].widget.attrs['readonly'] = True
 
+    if ENABLE_ORGANIZATIONS.get():
+      self.fields['groups'].choices = [(group.id, group.name) for group in self.instance.organization.organizationgroup_set.all()]
+
   def clean_username(self):
     username = self.cleaned_data["username"]
     if self.instance.username == username:
@@ -322,7 +325,7 @@ class SuperUserChangeForm(UserChangeForm):
       # If the user exists already, we'll use its current group memberships
       self.initial['groups'] = set(self.instance.groups.all())
     else:
-      # If his is a new user, suggest the default group
+      # If this is a new user, suggest the default group
       default_group = get_default_user_group()
       if default_group is not None:
         self.initial['groups'] = set([default_group])
