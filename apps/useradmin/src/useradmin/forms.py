@@ -32,7 +32,7 @@ from desktop.settings import LANGUAGES
 
 from useradmin.hue_password_policy import hue_get_password_validators
 from useradmin.models import GroupPermission, HuePermission, get_default_user_group, User, Group, Organization
-from useradmin.organization import default_organization
+from useradmin.organization import get_user_request_organization
 
 
 LOG = logging.getLogger(__name__)
@@ -154,7 +154,8 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
         self.fields['groups'].widget.attrs['readonly'] = True
 
     if ENABLE_ORGANIZATIONS.get():
-      self.fields['groups'].choices = [(group.id, group.name) for group in self.instance.organization.organizationgroup_set.all()]
+      organization = self.instance.organization if self.instance.id else get_user_request_organization()
+      self.fields['groups'].choices = [(group.id, group.name) for group in organization.organizationgroup_set.all()]
 
   def clean_username(self):
     username = self.cleaned_data["username"]
@@ -224,7 +225,7 @@ if ENABLE_ORGANIZATIONS.get():
         self.fields['email'].widget.attrs['readonly'] = True
 
       self.fields['organization'] = forms.ChoiceField(
-        choices=((default_organization().id, default_organization()),), initial=default_organization()
+        choices=((get_user_request_organization().id, get_user_request_organization()),), initial=get_user_request_organization()
       )
 
     def clean_organization(self):
@@ -274,7 +275,7 @@ if ENABLE_ORGANIZATIONS.get():
         self.fields['email'].widget.attrs['readonly'] = True
 
       self.fields['organization'] = forms.ChoiceField(
-        choices=((default_organization().id, default_organization()),), initial=default_organization()
+        choices=((get_user_request_organization().id, get_user_request_organization()),), initial=get_user_request_organization()
       )
 
     def clean_organization(self):
@@ -457,7 +458,7 @@ class GroupEditForm(forms.ModelForm):
     self.fields["permissions"] = _make_model_field(_("permissions"), initial_perms, HuePermission.objects.order_by('app', 'description'))
     if 'organization' in self.fields:
       self.fields['organization'] = forms.ChoiceField(
-        choices=((default_organization().id, default_organization()),), initial=default_organization()
+        choices=((get_user_request_organization().id, get_user_request_organization()),), initial=get_user_request_organization()
       )
 
   def _compute_diff(self, field_name):
