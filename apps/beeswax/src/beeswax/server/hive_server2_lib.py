@@ -728,7 +728,7 @@ class HiveServerClient(object):
 
     # Not supported currently in HS2 and Impala: TStatusCode.INVALID_HANDLE_STATUS
     if res.status.statusCode == TStatusCode.ERROR_STATUS and \
-      re.search('Invalid SessionHandle|Invalid session|Client session expired', res.status.errorMessage or '', re.I):
+      re.search('Invalid SessionHandle|Invalid session|Client session expired|Could not connect', res.status.errorMessage or '', re.I):
       if session:
         session.status_code = TStatusCode.INVALID_HANDLE_STATUS
         session.save()
