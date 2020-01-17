@@ -16,7 +16,7 @@
 <%!
 from django.utils.translation import ugettext as _
 
-from desktop.auth.backend import is_admin
+from desktop.auth.backend import is_admin, is_hue_admin
 from desktop.conf import ENABLE_ORGANIZATIONS, ENABLE_CONNECTORS
 from desktop.views import commonheader, commonfooter
 
@@ -35,16 +35,12 @@ ${ layout.menubar(section='users') }
 
 <div id="editUserComponents" class="useradmin container-fluid">
   <div class="card card-small title">
-    % if username:
-      <h1 class="card-heading simple">
-        ${_('User %(username)s') % dict(username=username)}
-        % if ENABLE_ORGANIZATIONS.get():
-          @ ${ user.organization }
-        % endif
-      </h1>
-    % else:
-      <h1 class="card-heading simple">${_('Create user')}</h1>
-    % endif
+    <h1 class="card-heading simple">
+      ${ _('User %(username)s') % dict(username=username) if username else _('Create user') }
+      % if ENABLE_ORGANIZATIONS.get():
+        @ ${ user.organization }
+      % endif
+    </h1>
 
     <br/>
 
@@ -87,7 +83,7 @@ ${ layout.menubar(section='users') }
           ${layout.render_field(form["password2"], extra_attrs=username is None and {'validate':'true'} or {})}
         % endif
 
-        % if ENABLE_CONNECTORS.get():
+        % if not ENABLE_CONNECTORS.get():
           ${ layout.render_field(form["ensure_home_directory"]) }
         % endif
         </div>
@@ -115,7 +111,11 @@ ${ layout.menubar(section='users') }
         % if is_admin(user):
           <div id="step3" class="stepDetails hide">
             ${ layout.render_field(form["is_active"]) }
-            ${ 'is_superuser' in form.fields and layout.render_field(form["is_superuser"]) }
+
+            % if is_hue_admin(user):
+              ${ 'is_superuser' in form.fields and layout.render_field(form["is_superuser"]) }
+            % endif
+
             % if is_user_locked_out(username):
               ${ layout.render_field(form["unlock_account"]) }
             % endif
