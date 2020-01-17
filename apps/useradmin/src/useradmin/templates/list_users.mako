@@ -37,15 +37,15 @@ ${layout.menubar(section='users')}
 
     <%actionbar:render>
       <%def name="search()">
-          <input type="text" class="input-xlarge search-query filter-input" placeholder="${_('Search for name, group, etc...')}">
+        <input type="text" class="input-xlarge search-query filter-input" placeholder="${_('Search for name, group, etc...')}">
       </%def>
       <%def name="actions()">
-        %if is_admin(user):
-            <button class="btn delete-user-btn" title="${_('Delete')}" disabled="disabled"><i class="fa fa-trash-o"></i> ${_('Delete')}</button>
-        %endif
+        % if is_admin(user):
+          <button class="btn delete-user-btn" title="${_('Delete')}" disabled="disabled"><i class="fa fa-trash-o"></i> ${_('Delete')}</button>
+        % endif
       </%def>
       <%def name="creation()">
-        %if is_admin(user):
+        % if is_admin(user):
             % if not is_ldap_setup:
               <a href="${ url('useradmin.views.edit_user') }" class="btn"><i class="fa fa-user"></i> ${_('Add user')}</a>
             %endif
@@ -62,7 +62,7 @@ ${layout.menubar(section='users')}
               title="${ _('Learn how to integrate Hue with your company LDAP') }" target="_blank">
               <i class="fa fa-question-circle"></i>
             </a>
-        %endif
+        % endif
       </%def>
     </%actionbar:render>
 
@@ -70,43 +70,51 @@ ${layout.menubar(section='users')}
       <thead>
       <tr>
         %if is_admin(user):
-            <th width="1%">
-              <div class="select-all hue-checkbox fa"></div>
-            </th>
+          <th width="1%">
+            <div class="select-all hue-checkbox fa"></div>
+          </th>
         %endif
         <th>${_('Username')}</th>
         <th>${_('First Name')}</th>
         <th>${_('Last Name')}</th>
         <th>${_('E-mail')}</th>
+        <th>${_('Is admin')}</th>
         <th>${_('Groups')}</th>
         <th>${_('Last Login')}</th>
       </tr>
       </thead>
       <tbody>
-          % for listed_user in users:
-          <tr class="tableRow"
-              data-search="${listed_user.username}${listed_user.first_name}${listed_user.last_name}${listed_user.email}${', '.join([group.name for group in listed_user.groups.all()])}">
-          %if is_admin(user):
-              <td data-row-selector-exclude="true">
-                <div class="hue-checkbox userCheck fa" data-row-selector-exclude="true" data-id="${ listed_user.id }"></div>
-              </td>
-          %endif
+        % for listed_user in users:
+        <tr class="tableRow"
+            data-search="${listed_user.username}${listed_user.first_name}${listed_user.last_name}${listed_user.email}${', '.join([group.name for group in listed_user.groups.all()])}">
+          % if is_admin(user):
+            <td data-row-selector-exclude="true">
+              <div class="hue-checkbox userCheck fa" data-row-selector-exclude="true" data-id="${ listed_user.id }"></div>
+            </td>
+          % endif
           <td>
-            %if is_admin(user) or user.username == listed_user.username:
-              <strong><a title="${_('Edit %(username)s') % dict(username=listed_user.username)}"
-                         href="${ url('useradmin.views.edit_user', username=listed_user.username) }"
-                         data-row-selector="true">${listed_user.username}</a></strong>
-            %else:
+            % if is_admin(user) or user.username == listed_user.username:
+              <strong>
+                <a title="${_('Edit %(username)s') % dict(username=listed_user.username)}"
+                    href="${ url('useradmin.views.edit_user', username=listed_user.username) }"
+                    data-row-selector="true">${listed_user.username}</a>
+              </strong>
+            % else:
               <strong>${listed_user.username}</strong>
-            %endif
+            % endif
           </td>
-            <td>${listed_user.first_name}</td>
-            <td>${listed_user.last_name}</td>
-            <td>${listed_user.email}</td>
-            <td>${', '.join([group.name for group in listed_user.groups.all()])}</td>
-            <td>${date(listed_user.last_login)} ${time(listed_user.last_login).replace("p.m.","PM").replace("a.m.","AM")}</td>
-          </tr>
-          % endfor
+          <td>${listed_user.first_name}</td>
+          <td>${listed_user.last_name}</td>
+          <td>${listed_user.email}</td>
+          <td>
+            % if is_admin(listed_user):
+              <i class="fa fa-check"></i>
+            % endif
+          </td>
+          <td>${', '.join([group.name for group in listed_user.groups.all()])}</td>
+          <td>${date(listed_user.last_login)} ${time(listed_user.last_login).replace("p.m.","PM").replace("a.m.","AM")}</td>
+        </tr>
+        % endfor
       </tbody>
       <tfoot class="hide">
       <tr>
@@ -170,9 +178,10 @@ ${layout.menubar(section='users')}
       "bInfo": false,
       "bFilter": true,
       "aoColumns": [
-        %if is_admin(user):
-            { "bSortable": false },
-        %endif
+        % if is_admin(user):
+          { "bSortable": false },
+        % endif
+        null,
         null,
         null,
         null,
