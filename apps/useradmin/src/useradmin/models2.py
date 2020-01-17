@@ -142,6 +142,11 @@ class UserManager(BaseUserManager):
 
     return super(UserManager, self).order_by(*args, **kwargs)
 
+  def filter(self, *args, **kwargs):
+    f = super(UserManager, self).filter(*args, **kwargs)
+    f.values_list = self.values_list  # Patch so that chaining after a filter is backward compatible
+    return f
+
   def values_list(self, *args, **kwargs):
     if 'username' in args:
       args = list(args)
