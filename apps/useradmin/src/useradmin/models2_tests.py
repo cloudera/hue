@@ -129,5 +129,7 @@ class TestOrganizationSingleUser(unittest.TestCase):
 
     User.objects.filter(groups__in=Group.objects.all()).order_by('username')
 
+    User.objects.values_list('username', flat=True)
+
     self.client2.get('/useradmin/groups/edit/default')
 
