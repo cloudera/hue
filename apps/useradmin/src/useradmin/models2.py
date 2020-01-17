@@ -142,6 +142,14 @@ class UserManager(BaseUserManager):
 
     return super(UserManager, self).order_by(*args, **kwargs)
 
+  def values_list(self, *args, **kwargs):
+    if 'username' in args:
+      args = list(args)
+      args.remove('username')
+      args.append('email')
+
+    return super(UserManager, self).values_list(*args, **kwargs)
+
   def _create_user(self, email, password, **extra_fields):
     """Create and save a User with the given email and password."""
     if not email:
