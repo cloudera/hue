@@ -79,8 +79,7 @@ def validate_last_name(last_name):
 
 class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
   """
-  This is similar, but not quite the same as djagno.contrib.auth.forms.UserChangeForm
-  and UserCreationForm.
+  This is similar, but not quite the same as djagno.contrib.auth.forms.UserChangeForm and UserCreationForm.
   """
 
   GENERIC_VALIDATION_ERROR = _("Username or password is invalid.")
@@ -105,7 +104,11 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
       required=False,
       validators=hue_get_password_validators()
   )
-  password_old = forms.CharField(label=_t("Current password"), widget=forms.PasswordInput, required=False)
+  password_old = forms.CharField(
+      label=_t("Current password"),
+      widget=forms.PasswordInput,
+      required=False
+  )
   ensure_home_directory = forms.BooleanField(
       label=_t("Create home directory"),
       help_text=_t("Create home directory if one doesn't already exist."),

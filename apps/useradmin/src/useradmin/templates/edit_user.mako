@@ -17,7 +17,7 @@
 from django.utils.translation import ugettext as _
 
 from desktop.auth.backend import is_admin
-from desktop.conf import ENABLE_ORGANIZATIONS
+from desktop.conf import ENABLE_ORGANIZATIONS, ENABLE_CONNECTORS
 from desktop.views import commonheader, commonfooter
 
 from useradmin.hue_password_policy import is_password_policy_enabled, get_password_hint
@@ -81,8 +81,12 @@ ${ layout.menubar(section='users') }
           % endif
           ${layout.render_field(form["password2"], extra_attrs=username is None and {'validate':'true'} or {})}
         % endif
-        ${layout.render_field(form["ensure_home_directory"])}
+
+        % if ENABLE_CONNECTORS.get():
+          ${ layout.render_field(form["ensure_home_directory"]) }
+        % endif
         </div>
+
         <div id="step2" class="stepDetails hide">
           % if "first_name" in form.fields:
             ${layout.render_field(form["first_name"])}
