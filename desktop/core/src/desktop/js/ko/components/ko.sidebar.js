@@ -295,7 +295,11 @@ class Sidebar {
       );
     }
 
-    userChildren.push(new SidebarItem({ url: '/accounts/logout', displayName: I18n('Sign out') }));
+    if (window.IS_GOOGLE_SSO) {
+      userChildren.push(new SidebarItem({ click: this.ssoSignOut, displayName: I18n('Sign out') }));
+    } else {
+      userChildren.push(new SidebarItem({ url: '/accounts/logout', displayName: I18n('Sign out') }));
+    }
 
     this.footerItems = [
       new SidebarItem({

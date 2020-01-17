@@ -197,7 +197,7 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
 <script>
    % if 'GoogleSignInBackend' in backend_names:
     function onSignIn(googleUser) {
-      # TODO: save in user profile
+      ## TODO: save in user profile
       var profile = googleUser.getBasicProfile();
       console.log('Name: ' + profile.getName());
       console.log('Image URL: ' + profile.getImageUrl());
