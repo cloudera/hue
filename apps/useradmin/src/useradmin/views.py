@@ -1007,8 +1007,10 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
           # Add only if user isn't part of group.
             current_ldap_groups.add(Group.objects.get(name=group_info['name']))
             if not user.groups.filter(name=group_info['name']).exists():
-              groups = import_ldap_groups(connection, group_info['dn'], import_members=False, import_members_recursive=False,
-                                          sync_users=True, import_by_dn=True, failed_users=failed_users)
+              groups = import_ldap_groups(
+                  connection, group_info['dn'], import_members=False, import_members_recursive=False,
+                  sync_users=True, import_by_dn=True, failed_users=failed_users
+              )
               if groups:
                 new_groups.update(groups)
         # Remove out of date groups
