@@ -17,9 +17,10 @@
 from django.template.defaultfilters import date, time
 from django.utils.translation import ugettext as _
 
+from desktop.auth.backend import is_admin
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_util import USERNAME_RE_RULE
 from desktop.views import commonheader, commonfooter, antixss
-from desktop.auth.backend import is_admin
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
@@ -33,7 +34,12 @@ ${layout.menubar(section='users')}
 
 <div id="usersComponents" class="useradmin container-fluid">
   <div class="card card-small">
-    <h1 class="card-heading simple">${_('Users')}</h1>
+    <h1 class="card-heading simple">
+      ${_('Users')}
+      % if ENABLE_ORGANIZATIONS.get():
+        @ ${ user.organization }
+      % endif
+    </h1>
 
     <%actionbar:render>
       <%def name="search()">

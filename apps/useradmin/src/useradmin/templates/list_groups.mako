@@ -15,10 +15,12 @@
 ## limitations under the License.
 <%!
 from django.utils.translation import ugettext as _
-from useradmin.models import group_permissions
-from desktop.auth.backend import is_admin
 
+from desktop.auth.backend import is_admin
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.views import commonheader, commonfooter, antixss
+
+from useradmin.models import group_permissions
 %>
 
 
@@ -33,7 +35,12 @@ ${layout.menubar(section='groups')}
 
 <div id="groupsComponents" class="useradmin container-fluid">
   <div class="card card-small">
-    <h1 class="card-heading simple">${_('Groups')}</h1>
+    <h1 class="card-heading simple">
+      ${_('Groups')}
+      % if ENABLE_ORGANIZATIONS.get():
+        @ ${ user.organization }
+      % endif
+    </h1>
 
     <%actionbar:render>
       <%def name="search()">

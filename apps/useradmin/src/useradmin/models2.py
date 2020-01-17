@@ -70,7 +70,7 @@ if ENABLE_ORGANIZATIONS.get():
     objects = OrganizationManager()
 
     def __str__(self):
-      return self.name
+      return self.name or self.domain
 
 
 class OrganizationGroupManager(models.Manager):

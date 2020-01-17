@@ -18,6 +18,7 @@ import sys
 
 from django.utils.translation import ugettext as _
 
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_util import extract_field_data
 from desktop.views import commonheader, commonfooter
 
@@ -54,7 +55,12 @@ ${ layout.menubar(section='groups') }
 <div id="editGroupComponents" class="useradmin container-fluid">
   <div class="card card-small">
     % if name:
-        <h1 class="card-heading simple">${ _('Edit %(name)s') % {'name': name} }</h1>
+        <h1 class="card-heading simple">
+          ${ _('Edit %(name)s') % {'name': name} }
+          % if ENABLE_ORGANIZATIONS.get():
+            @ ${ user.organization }
+          % endif
+        </h1>
     % else:
       % if ldap:
           <h1 class="card-heading simple">${_('Add/Sync LDAP group')}</h1>
