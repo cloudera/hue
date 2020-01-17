@@ -17,6 +17,7 @@
 from django.utils.translation import ugettext as _
 
 from desktop.auth.backend import is_admin
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.views import commonheader, commonfooter
 
 from useradmin.models import group_permissions, Group
@@ -32,7 +33,13 @@ from useradmin.models import group_permissions, Group
 
 <div id="permissionsComponents" class="useradmin container-fluid">
   <div class="card card-small">
-    <h1 class="card-heading simple">${_('Permissions')}</h1>
+    <h1 class="card-heading simple">
+      ${_('Permissions')}
+      % if ENABLE_ORGANIZATIONS.get():
+        @ ${ user.organization }
+      % endif
+    </h1>
+
     <%actionbar:render>
       <%def name="search()">
           <input type="text" class="input-xlarge search-query filter-input" placeholder="${_('Search for application, group, etc...')}">

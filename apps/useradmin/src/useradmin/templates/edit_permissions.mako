@@ -16,8 +16,10 @@
 <%!
 import sys
 
-from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
+
+from desktop.conf import ENABLE_ORGANIZATIONS
+from desktop.views import commonheader, commonfooter
 
 if sys.version_info[0] > 2:
   from urllib.parse import quote as urllib_quote
@@ -51,7 +53,12 @@ ${ layout.menubar(section='permissions') }
 
 <div id="editPermissionsComponents" class="useradmin container-fluid">
   <div class="card card-small">
-    <h1 class="card-heading simple">${_('Edit %(app)s') % dict(app=app)}</h1>
+    <h1 class="card-heading simple">
+      ${_('Edit %(app)s') % dict(app=app)}
+      % if ENABLE_ORGANIZATIONS.get():
+        @ ${ user.organization }
+      % endif
+    </h1>
     <br/>
 
     <form id="editForm" action="${urllib_quote(action)}" method="POST" class="form form-horizontal">

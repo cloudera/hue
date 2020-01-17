@@ -36,7 +36,12 @@ ${ layout.menubar(section='users') }
 <div id="editUserComponents" class="useradmin container-fluid">
   <div class="card card-small title">
     % if username:
-      <h1 class="card-heading simple">${_('User %(username)s') % dict(username=username)}</h1>
+      <h1 class="card-heading simple">
+        ${_('User %(username)s') % dict(username=username)}
+        % if ENABLE_ORGANIZATIONS.get():
+          @ ${ user.organization }
+        % endif
+      </h1>
     % else:
       <h1 class="card-heading simple">${_('Create user')}</h1>
     % endif
