@@ -144,14 +144,17 @@ class UserManager(BaseUserManager):
 
   def filter(self, *args, **kwargs):
     f = super(UserManager, self).filter(*args, **kwargs)
-    f.values_list = self.values_list  # Patch so that chaining after a filter is backward compatible
+    # f.values_list = self.values_list  # Patch so that chaining after a filter is backward compatible
     return f
 
   def values_list(self, *args, **kwargs):
+    print(args)
+    print(kwargs)
     if 'username' in args:
       args = list(args)
       args.remove('username')
       args.append('email')
+    print(args)
 
     return super(UserManager, self).values_list(*args, **kwargs)
 
