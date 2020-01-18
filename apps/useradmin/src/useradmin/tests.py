@@ -434,6 +434,15 @@ class TestUserAdmin(BaseUserAdminTests):
       appmanager.load_apps(APP_BLACKLIST.get())
 
 
+  def test_list_users(self):
+    c = make_logged_in_client(username="test", is_superuser=True)
+
+    response = c.get('/useradmin/users')
+
+    assert_true(b'Is admin' in response.content)
+    assert_true(b'fa fa-check' in response.content)
+
+
   def test_default_group(self):
     resets = [
       useradmin.conf.DEFAULT_USER_GROUP.set_for_testing('test_default')
