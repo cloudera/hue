@@ -41,30 +41,31 @@ ${layout.menubar(section='users')}
       </%def>
       <%def name="actions()">
         % if is_admin(user):
-          <button class="btn delete-user-btn" title="${_('Delete')}" disabled="disabled"><i class="fa fa-trash-o"></i> ${_('Delete')}</button>
+          <button class="btn delete-user-btn" title="${_('Delete')}" disabled="disabled">
+            <i class="fa fa-times"></i> ${_('Delete')}
+          </button>
         % endif
       </%def>
       <%def name="creation()">
         % if is_admin(user):
-
-            % if is_ldap_setup:
-              <a href="${ url('useradmin.views.add_ldap_users') }" class="btn">
-                <i class="fa fa-plus-circle"></i> ${_('Add/Sync LDAP user')}
-              </a>
-              <a href="javascript:void(0)" class="btn confirmationModal"
-                 data-confirmation-url="${ url('useradmin_views_sync_ldap_users_groups') }${ is_embeddable and '?is_embeddable=true' or ''}">
-                 <i class="fa fa-refresh"></i> ${_('Sync LDAP users/groups')}
-              </a>
-            % else:
-              <a href="${ url('useradmin.views.edit_user') }" class="btn">
-                <i class="fa fa-plus-circle"></i> ${_('Add user')}
-              </a>
-            % endif
-
-            <a href="https://docs.gethue.com/administrator/administration/user-management/"
-              title="${ _('Learn how to integrate Hue with your company LDAP') }" target="_blank">
-              <i class="fa fa-question-circle"></i>
+          % if is_ldap_setup:
+            <a href="${ url('useradmin.views.add_ldap_users') }" class="btn">
+              <i class="fa fa-plus-circle"></i> ${_('Add/Sync LDAP user')}
             </a>
+            <a href="javascript:void(0)" class="btn confirmationModal"
+                data-confirmation-url="${ url('useradmin_views_sync_ldap_users_groups') }${ is_embeddable and '?is_embeddable=true' or ''}">
+                <i class="fa fa-refresh"></i> ${_('Sync LDAP users/groups')}
+            </a>
+          % else:
+            <a href="${ url('useradmin.views.edit_user') }" class="btn">
+              <i class="fa fa-plus-circle"></i> ${_('Add user')}
+            </a>
+          % endif
+
+          <a href="https://docs.gethue.com/administrator/administration/user-management/"
+            title="${ _('Learn how to integrate Hue with your company LDAP') }" target="_blank">
+            <i class="fa fa-question-circle"></i>
+          </a>
         % endif
       </%def>
     </%actionbar:render>
@@ -72,11 +73,11 @@ ${layout.menubar(section='users')}
     <table class="table table-condensed datatables">
       <thead>
       <tr>
-        %if is_admin(user):
+        % if is_admin(user):
           <th width="1%">
             <div class="select-all hue-checkbox fa"></div>
           </th>
-        %endif
+        % endif
         <th>${_('Username')}</th>
         <th>${_('First Name')}</th>
         <th>${_('Last Name')}</th>
@@ -141,7 +142,13 @@ ${layout.menubar(section='users')}
       % endif
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-        <h2 class="modal-title">${ _("Are you sure you want to delete the selected user(s)?") }</h2>
+        <h2 class="modal-title">${ _("Are you sure you want to deactivate the user selection?") }</h2>
+      </div>
+      <div class="modal-body">
+        <div class="controls">
+          <input type="checkbox" name="is_delete">
+          ${ _('Delete forever the user selection and their data') }
+        </div>
       </div>
       <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
@@ -210,7 +217,7 @@ ${layout.menubar(section='users')}
 
     % if is_embeddable:
     $usersComponents.find('.delete-user form').ajaxForm({
-      dataType:  'json',
+      dataType: 'json',
       success: function(data) {
         $usersComponents.find(".delete-user").modal("hide");
         $.jHueNotify.info("${ _('The users were deleted.') }")
@@ -318,8 +325,8 @@ ${layout.menubar(section='users')}
   });
 </script>
 
-${layout.commons()}
+${ layout.commons() }
 
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif
+% if not is_embeddable:
+  ${ commonfooter(request, messages) | n,unicode }
+% endif
