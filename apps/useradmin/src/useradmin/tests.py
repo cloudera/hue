@@ -679,47 +679,85 @@ class TestUserAdmin(BaseUserAdminTests):
       # Just check that this comes back
       response = c.get('/useradmin/users/edit/test')
       # Edit it, to add a first and last name
-      response = c.post('/useradmin/users/edit/test',
-                        dict(username="test",
-                             first_name=u"Inglés",
-                             last_name=u"Español",
-                             is_superuser=True,
-                             is_active=True),
-                        follow=True)
+      response = c.post('/useradmin/users/edit/test', dict(
+          username="test",
+          first_name=u"Inglés",
+          last_name=u"Español",
+          is_superuser=True,
+          is_active=True
+        ),
+        follow=True
+      )
       assert_true(b"User information updated" in response.content,
                   "Notification should be displayed in: %s" % response.content)
       # Edit it, can't change username
-      response = c.post('/useradmin/users/edit/test',
-                        dict(username="test2",
-                             first_name=u"Inglés",
-                             last_name=u"Español",
-                             is_superuser=True,
-                             is_active=True),
-                        follow=True)
+      response = c.post('/useradmin/users/edit/test', dict(
+          username="test2",
+          first_name=u"Inglés",
+          last_name=u"Español",
+          is_superuser=True,
+          is_active=True
+        ),
+        follow=True
+      )
       assert_true(b"You cannot change a username" in response.content)
       # Now make sure that those were materialized
       response = c.get('/useradmin/users/edit/test')
       assert_equal(smart_unicode("Inglés"), response.context[0]["form"].instance.first_name)
       assert_true(("Español" if isinstance(response.content, str) else "Español".encode('utf-8')) in response.content)
       # Shouldn't be able to demote to non-superuser
-      response = c.post('/useradmin/users/edit/test', dict(username="test",
-                            first_name=u"Inglés", last_name=u"Español",
-                            is_superuser=False, is_active=True))
-      assert_true(b"You cannot remove" in response.content,
-                  "Shouldn't be able to remove the last superuser")
+      response = c.post('/useradmin/users/edit/test', dict(
+          username="test",
+          first_name=u"Inglés",
+          last_name=u"Español",
+          is_superuser=False,
+          is_active=True
+        )
+      )
+      assert_true(b"You cannot remove" in response.content,  "Shouldn't be able to remove the last superuser")
       # Shouldn't be able to delete oneself
-      response = c.post('/useradmin/users/delete', {u'user_ids': [user.id]})
-      assert_true(b"You cannot remove yourself" in response.content,
-                  "Shouldn't be able to delete the last superuser")
+      response = c.post('/useradmin/users/delete', {u'user_ids': [user.id], 'is_delete': True})
+      assert_true(b"You cannot remove yourself" in response.content, "Shouldn't be able to delete the last superuser")
 
       # Let's try changing the password
-      response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", is_superuser=True, password1="foo", password2="foobar"))
-      assert_equal(["Passwords do not match."], response.context[0]["form"]["password2"].errors, "Should have complained about mismatched password")
+      response = c.post('/useradmin/users/edit/test', dict(
+          username="test",
+          first_name="Tom",
+          last_name="Tester",
+          is_superuser=True,
+          password1="foo",
+          password2="foobar"
+        )
+      )
+      assert_equal(
+        ["Passwords do not match."], response.context[0]["form"]["password2"].errors, "Should have complained about mismatched password"
+      )
       # Old password not confirmed
-      response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", password1="foo", password2="foo", is_active=True, is_superuser=True))
-      assert_equal([UserChangeForm.GENERIC_VALIDATION_ERROR], response.context[0]["form"]["password_old"].errors, "Should have complained about old password")
+      response = c.post('/useradmin/users/edit/test', dict(
+          username="test",
+          first_name="Tom",
+          last_name="Tester",
+          password1="foo",
+          password2="foo",
+          is_active=True,
+          is_superuser=True
+        )
+      )
+      assert_equal(
+        [UserChangeForm.GENERIC_VALIDATION_ERROR], response.context[0]["form"]["password_old"].errors, "Should have complained about old password"
+      )
       # Good now
-      response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", password1="foo", password2="foo", password_old="test", is_active=True, is_superuser=True))
+      response = c.post('/useradmin/users/edit/test', dict(
+          username="test",
+          first_name="Tom",
+          last_name="Tester",
+          password1="foo",
+          password2="foo",
+          password_old="test",
+          is_active=True,
+          is_superuser=True
+        )
+      )
       assert_true(User.objects.get(username="test").is_superuser)
       assert_true(User.objects.get(username="test").check_password("foo"))
       # Change it back!
@@ -795,9 +833,8 @@ class TestUserAdmin(BaseUserAdminTests):
       assert_equal("Hello", response.context[0]["form"].instance.first_name)
       funny_user = User.objects.get(username=FUNNY_NAME)
       # Can't edit other people.
-      response = c_reg.post("/useradmin/users/delete", {u'user_ids': [funny_user.id]})
-      assert_true(b"You must be a superuser" in response.content,
-                  "Regular user can't edit other people")
+      response = c_reg.post("/useradmin/users/delete", {u'user_ids': [funny_user.id], 'is_delete': True})
+      assert_true(b"You must be a superuser" in response.content, "Regular user can't edit other people")
 
       # Revert to regular "test" user, that has superuser powers.
       c_su = make_logged_in_client()
@@ -819,7 +856,8 @@ class TestUserAdmin(BaseUserAdminTests):
           username='christian_häusler',
           password1="test",
           password2="test",
-          is_active=True)
+          is_active=True
+        )
       )
       response = c.get('/useradmin/')
       assert_true('christian_häusler' in (response.content if isinstance(response.content, str) else response.content.decode()))
@@ -828,9 +866,16 @@ class TestUserAdmin(BaseUserAdminTests):
       # Validate profile is created.
       assert_true(UserProfile.objects.filter(user__username='christian_häusler').exists())
 
-      # Delete that regular user
+      # Deactivate that regular user
       funny_profile = get_profile(test_user)
       response = c_su.post('/useradmin/users/delete', {u'user_ids': [funny_user.id]})
+      assert_equal(302, response.status_code)
+      assert_true(User.objects.filter(username=FUNNY_NAME).exists())
+      assert_true(UserProfile.objects.filter(id=funny_profile.id).exists())
+      assert_false(User.objects.get(username=FUNNY_NAME).is_active)
+
+      # Delete for real
+      response = c_su.post('/useradmin/users/delete', {u'user_ids': [funny_user.id], 'is_delete': True})
       assert_equal(302, response.status_code)
       assert_false(User.objects.filter(username=FUNNY_NAME).exists())
       assert_false(UserProfile.objects.filter(id=funny_profile.id).exists())
@@ -839,14 +884,14 @@ class TestUserAdmin(BaseUserAdminTests):
       u1 = User.objects.create(username='u1', password="u1")
       u2 = User.objects.create(username='u2', password="u2")
       assert_equal(User.objects.filter(username__in=['u1', 'u2']).count(), 2)
-      response = c_su.post('/useradmin/users/delete', {u'user_ids': [u1.id, u2.id]})
+      response = c_su.post('/useradmin/users/delete', {u'user_ids': [u1.id, u2.id], 'is_delete': True})
       assert_equal(User.objects.filter(username__in=['u1', 'u2']).count(), 0)
 
       # Make sure that user deletion works if the user has never performed a request.
       funny_user = User.objects.create(username=FUNNY_NAME, password='test')
       assert_true(User.objects.filter(username=FUNNY_NAME).exists())
       assert_false(UserProfile.objects.filter(user__username=FUNNY_NAME).exists())
-      response = c_su.post('/useradmin/users/delete', {u'user_ids': [funny_user.id]})
+      response = c_su.post('/useradmin/users/delete', {u'user_ids': [funny_user.id], 'is_delete': True})
       assert_equal(302, response.status_code)
       assert_false(User.objects.filter(username=FUNNY_NAME).exists())
       assert_false(UserProfile.objects.filter(user__username=FUNNY_NAME).exists())
@@ -858,6 +903,27 @@ class TestUserAdmin(BaseUserAdminTests):
       for reset in resets:
         reset()
 
+  def test_deactivate_users(self):
+    c = make_logged_in_client('test', is_superuser=True)
+
+    regular_username = 'regular_user'
+    regular_user_client = make_logged_in_client(regular_username, is_superuser=True, recreate=True)
+    regular_user = User.objects.get(username=regular_username)
+
+    try:
+      # Deactivate that regular user
+      response = c.post('/useradmin/users/delete', {u'user_ids': [regular_user.id]})
+      assert_equal(302, response.status_code)
+      assert_true(User.objects.filter(username=regular_username).exists())
+      assert_false(User.objects.get(username=regular_username).is_active)
+
+      # Delete for real
+      response = c.post('/useradmin/users/delete', {u'user_ids': [regular_user.id], 'is_delete': True})
+      assert_equal(302, response.status_code)
+      assert_false(User.objects.filter(username=regular_username).exists())
+      assert_false(UserProfile.objects.filter(id=regular_user.id).exists())
+    finally:
+      regular_user.delete()
 
   def test_list_for_autocomplete(self):
 

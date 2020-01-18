@@ -193,17 +193,24 @@ def delete_user(request):
     raise PopupException(_('A POST request is required.'))
 
   ids = request.POST.getlist('user_ids')
+  is_delete = request.POST.get('is_delete')
+  action_text = _('deleted') if is_delete else _('deactivated')
 
   if str(request.user.id) in ids:
     raise PopupException(_("You cannot remove yourself."), error_code=401)
 
-  usernames = list(User.objects.filter(id__in=ids).values_list('username', flat=True))
-  UserProfile.objects.filter(user__id__in=ids).delete()
-  User.objects.filter(id__in=ids).delete()
+  users = User.objects.filter(id__in=ids)
+  usernames = list(users.values_list('username', flat=True))
+
+  if is_delete:
+    UserProfile.objects.filter(user__id__in=ids).delete()
+    users.delete()
+  else:
+    users.update(is_active=False)
 
   request.audit = {
     'operation': 'DELETE_USER',
-    'operationText': 'Deleted User(s): %s' % ', '.join(usernames)
+    'operationText': '%s User(s): %s' % (action_text.title(), ', '.join(usernames))
   }
 
   is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
@@ -211,7 +218,7 @@ def delete_user(request):
   if is_embeddable:
     return JsonResponse({'url': '/hue' + reverse(list_users)})
   else:
-    request.info(_('The users were deleted.'))
+    request.info(_('The users were %s.') % action_text)
     return redirect(reverse(list_users))
 
 
