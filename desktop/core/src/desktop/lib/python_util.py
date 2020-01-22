@@ -156,6 +156,19 @@ def force_dict_to_strings(dictionary):
 
   return new_dict
 
+
+def from_string_to_bits(str_value):
+  return ''.join(format(ord(byte), '08b') for byte in str_value)
+
+
+def get_bytes_from_bits(bit_string):
+  """
+  This should be used in py3 or above
+  """
+  padded_bits = bit_string + '0' * (8 - len(bit_string) % 8)
+  return list(int(padded_bits, 2).to_bytes(len(padded_bits) // 8, 'big'))
+
+
 def isASCII(data):
   try:
     data.decode('ASCII')
