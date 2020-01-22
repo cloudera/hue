@@ -695,11 +695,13 @@ class AssistDbPanel {
                     name: assistDbSource.selectedNamespace().selectedDatabase().name
                   });
                 } else {
-                  const lastSelectedDb = apiHelper.getFromTotalStorage(
+                  let lastSelectedDb = apiHelper.getFromTotalStorage(
                     'assist_' + source + '_' + assistDbSource.selectedNamespace().namespace.id,
-                    'lastSelectedDb',
-                    'default'
+                    'lastSelectedDb'
                   );
+                  if (!lastSelectedDb && lastSelectedDb !== '') {
+                    lastSelectedDb = 'default';
+                  }
                   deferred.resolve({
                     sourceType: source,
                     namespace: assistDbSource.selectedNamespace().namespace,
@@ -857,6 +859,9 @@ class AssistDbPanel {
           this.selectedSource()
             .selectedNamespace()
             .selectedDatabase(null);
+          this.selectedSource()
+            .selectedNamespace()
+            .selectedDatabaseChanged();
         } else if (window.HAS_MULTI_CLUSTER) {
           this.selectedSource().selectedNamespace(null);
         } else {

@@ -907,10 +907,15 @@ class Notebook {
       () => {
         if (self.type().indexOf('query') === 0) {
           const whenDatabaseAvailable = function(snippet) {
+            const lastSelectedDb = apiHelper.getFromTotalStorage(
+              'assist_' + snippet.type() + '_' + snippet.namespace().id,
+              'lastSelectedDb'
+            );
+
             huePubSub.publish('assist.set.database', {
               source: snippet.type(),
               namespace: snippet.namespace(),
-              name: snippet.database()
+              name: lastSelectedDb === '' ? '' : snippet.database()
             });
           };
 
