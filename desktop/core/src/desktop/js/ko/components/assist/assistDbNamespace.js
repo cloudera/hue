@@ -156,6 +156,12 @@ class AssistDbNamespace {
             name: self.selectedDatabase().catalogEntry.name
           });
         }
+      } else {
+        apiHelper.setInTotalStorage(
+          'assist_' + self.sourceType + '_' + self.namespace.id,
+          'lastSelectedDb',
+          ''
+        );
       }
     };
 
@@ -176,15 +182,18 @@ class AssistDbNamespace {
         self.selectedDatabaseChanged();
         return;
       }
-      const lastSelectedDb = apiHelper.getFromTotalStorage(
+      let lastSelectedDb = apiHelper.getFromTotalStorage(
         'assist_' + self.sourceType + '_' + self.namespace.id,
-        'lastSelectedDb',
-        'default'
+        'lastSelectedDb'
       );
+
+      if (!lastSelectedDb && lastSelectedDb !== '') {
+        lastSelectedDb = 'default';
+      }
       if (lastSelectedDb && self.dbIndex[lastSelectedDb]) {
         self.selectedDatabase(self.dbIndex[lastSelectedDb]);
         self.selectedDatabaseChanged();
-      } else if (self.databases().length > 0) {
+      } else if (lastSelectedDb && self.databases().length > 0) {
         self.selectedDatabase(self.databases()[0]);
         self.selectedDatabaseChanged();
       }
@@ -273,9 +282,10 @@ class AssistDbNamespace {
         if (self.catalogEntry === details.entry) {
           self.initDatabases();
         } else {
+          const targetPath = details.entry.path.join('.');
           const findAndReloadInside = entries => {
             return entries.some(entry => {
-              if (entry.catalogEntry.path.join('.') === details.entry.path.join('.')) {
+              if (entry.catalogEntry.path.join('.') === targetPath) {
                 entry.catalogEntry = details.entry;
                 entry.loadEntries();
                 return true;
