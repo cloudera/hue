@@ -18,8 +18,8 @@
 from future import standard_library
 standard_library.install_aliases()
 from builtins import map
-from builtins import str
 import logging
+import os
 import json
 import sys
 import tempfile
@@ -42,11 +42,15 @@ from metadata.catalog_api import search_entities as metadata_search_entities, _h
 from notebook.connectors.altus import SdxApi, AnalyticDbApi, DataEngApi, DataWarehouse2Api
 from notebook.connectors.base import Notebook, get_interpreter
 
+from desktop import appmanager
+from desktop.auth.backend import is_admin
+from desktop.conf import ENABLE_CONNECTORS, ENABLE_GIST_PREVIEW, get_clusters, IS_K8S_ONLY
+from desktop.lib.conf import BoundContainer, GLOBAL_CONFIG, is_anonymous
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
-from desktop.conf import get_clusters, IS_K8S_ONLY, ENABLE_GIST_PREVIEW
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
+from desktop.lib.paths import get_desktop_root
 from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, \
   UserPreferences, get_user_preferences, set_user_preferences, get_cluster_config, __paginate, _get_gist_document
 
@@ -83,6 +87,56 @@ def get_config(request):
 
   return JsonResponse(config)
 
+@api_error_handler
+def get_hue_config(request):
+  if not is_admin(request.user):
+    raise PopupException(_('You must be a superuser.'))
+
+  show_private = request.GET.get('private', False)
+
+  app_modules = appmanager.DESKTOP_MODULES
+  config_modules = GLOBAL_CONFIG.get().values()
+
+  if ENABLE_CONNECTORS.get():
+    app_modules = [app_module for app_module in app_modules if app_module.name == 'desktop']
+    config_modules = [config_module for config_module in config_modules if config_module.config.key == 'desktop']
+
+  apps = [{
+    'name': app.name,
+    'has_ui': app.menu_index != 999,
+    'display_name': app.display_name
+  } for app in sorted(app_modules, key=lambda app: app.name)]
+
+  def recurse_conf(modules):
+    attrs = []
+    for module in modules:
+      if not show_private and module.config.private:
+        continue
+
+      conf = {
+        'help': module.config.help or _('No help available.'),
+        'key': module.config.key,
+        'is_anonymous': is_anonymous(module.config.key)
+      }
+      if isinstance(module, BoundContainer):
+        conf['values'] = recurse_conf(module.get().values())
+      else:
+        conf['default'] = str(module.config.default)
+        if 'password' in module.config.key:
+          conf['value'] = '*' * 10
+        elif sys.version_info[0] > 2:
+          conf['value'] = str(module.get_raw())
+        else:
+          conf['value'] = str(module.get_raw()).decode('utf-8', 'replace')
+      attrs.append(conf)
+
+    return attrs
+
+  return JsonResponse({
+    'config': sorted(recurse_conf(config_modules), key=lambda conf: conf.get('key')),
+    'conf_dir': os.path.realpath(os.getenv('HUE_CONF_DIR', get_desktop_root('conf'))),
+    'apps': apps
+  })
 
 @api_error_handler
 def get_context_namespaces(request, interface):

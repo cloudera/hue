@@ -48,7 +48,6 @@ from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 
 from dashboard.conf import HAS_SQL_ENABLED
 from desktop.settings import DATABASES
-from beeswax.conf import HIVE_SERVER_HOST
 from useradmin.models import GroupPermission, User
 
 import desktop
@@ -203,93 +202,6 @@ def test_download_log_view():
   # UnicodeDecodeError: 'ascii' codec can't decode byte... should not happen
   response = c.get(URL)
   assert_equal("application/zip", response.get('Content-Type', ''))
-
-def test_dump_config():
-  c = make_logged_in_client()
-
-  CANARY = b"abracadabra"
-
-  # Depending on the order of the conf.initialize() in settings, the set_for_testing() are not seen in the global settings variable
-  clear = HIVE_SERVER_HOST.set_for_testing(CANARY)
-
-  try:
-    response1 = c.get(reverse('desktop.views.dump_config'))
-    assert_true(CANARY in response1.content, response1.content)
-
-    response2 = c.get(reverse('desktop.views.dump_config'), {'private': 'true'})
-    assert_true(CANARY in response2.content)
-
-    # There are more private variables...
-    assert_true(len(response1.content) < len(response2.content))
-  finally:
-    clear()
-
-  CANARY = "(localhost|127\.0\.0\.1):(50030|50070|50060|50075)"
-  clear = proxy.conf.WHITELIST.set_for_testing(CANARY)
-
-  try:
-    response1 = c.get(reverse('desktop.views.dump_config'))
-    if not isinstance(CANARY, bytes):
-      CANARY = CANARY.encode('utf-8')
-    assert_true(CANARY in response1.content)
-  finally:
-    clear()
-
-  # Malformed port per HUE-674
-  CANARY = "asdfoijaoidfjaosdjffjfjaoojosjfiojdosjoidjfoa"
-  clear = HIVE_SERVER_HOST.set_for_testing(CANARY)
-
-  try:
-    response1 = c.get(reverse('desktop.views.dump_config'))
-    if not isinstance(CANARY, bytes):
-      CANARY = CANARY.encode('utf-8')
-    assert_true(CANARY in response1.content, response1.content)
-  finally:
-    clear()
-
-  CANARY = '/tmp/spacé.dat'
-  finish = proxy.conf.WHITELIST.set_for_testing(CANARY)
-  try:
-    response = c.get(reverse('desktop.views.dump_config'))
-    response_content = response.content
-    if not isinstance(response_content, str):
-      response_content = response_content.decode('utf-8')
-    assert_true(CANARY in response_content, response_content)
-  finally:
-    finish()
-
-  # Not showing some passwords
-  response = c.get(reverse('desktop.views.dump_config'))
-  assert_false(b'bind_password' in response.content)
-
-  # Login as someone else
-  client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
-  grant_access("not_me", "test", "desktop")
-
-  response = client_not_me.get(reverse('desktop.views.dump_config'))
-  assert_true(b"You must be a superuser" in response.content, response.content)
-
-  prev_env_conf = os.environ.get("HUE_CONF_DIR")
-  try:
-    os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
-    resp = c.get(reverse('desktop.views.dump_config'))
-    assert_true(b'/tmp/test_hue_conf_dir' in resp.content, resp)
-  finally:
-    if prev_env_conf is None:
-      os.environ.pop("HUE_CONF_DIR", None)
-    else:
-      os.environ["HUE_CONF_DIR"] = prev_env_conf
-
-
-  finish = desktop.conf.ENABLE_CONNECTORS.set_for_testing(True)
-  try:
-    with patch('desktop.lib.fsmanager.has_hdfs_enabled') as has_hdfs_enabled:
-      has_hdfs_enabled.return_value = True
-      response = c.get(reverse('desktop.views.dump_config'))
-      assert_equal(1, len(response.context[0]['apps']), response.context[0])
-  finally:
-    finish()
-
 
 def hue_version():
   global HUE_VERSION

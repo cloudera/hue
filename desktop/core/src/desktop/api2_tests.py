@@ -24,6 +24,8 @@ from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 
 from useradmin.models import get_default_user_group, User
 
+from beeswax.conf import HIVE_SERVER_HOST
+
 from desktop.conf import ENABLE_GIST_PREVIEW
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
@@ -64,6 +66,47 @@ class TestApi2(object):
     finally:
       query.delete()
 
+  def test_get_hue_config(self):
+    client = make_logged_in_client(username="api2_superuser", groupname="default", recreate=True, is_superuser=True)
+    user = User.objects.get(username="api2_superuser")
+    grant_access(user.username, user.username, "desktop")
+    response = client.get('/desktop/api2/get_hue_config', data={})
+
+    # It should have multiple config sections in json
+    config = json.loads(response.content)['config']
+    assert_true(len(config) > 1)
+
+    # It should only allow superusers
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
+    grant_access("not_me", "test", "desktop")
+    response = client_not_me.get('/desktop/api2/get_hue_config', data={})
+    assert_true(b"You must be a superuser" in response.content, response.content)
+
+    # It should contain a config parameter
+    CANARY = b"abracadabra"
+    clear = HIVE_SERVER_HOST.set_for_testing(CANARY)
+    try:
+      response = client.get('/desktop/api2/get_hue_config', data={})
+      assert_true(CANARY in response.content, response.content)
+    finally:
+      clear()
+
+  def test_get_hue_config_private(self):
+    client = make_logged_in_client(username="api2_superuser", groupname="default", recreate=True, is_superuser=True)
+    user = User.objects.get(username="api2_superuser")
+    grant_access(user.username, user.username, "desktop")
+
+    # Not showing private if not asked for
+    response = client.get('/desktop/api2/get_hue_config', data={})
+    assert_false(b'bind_password' in response.content)
+
+    # Masking passwords if private
+    private_response = client.get('/desktop/api2/get_hue_config', data={'private': True})
+    assert_true(b'bind_password' in private_response.content)
+    assert_true(re.search(r'"value":\s*"[*]+"[^}]+"key":\s*"bind_password"', private_response.content))
+
+    # There should be more private than non-private
+    assert_true(len(response.content) < len(private_response.content))
 
 class TestDocumentApiSharingPermissions(object):
 

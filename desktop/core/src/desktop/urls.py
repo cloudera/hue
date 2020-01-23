@@ -164,6 +164,7 @@ dynamic_patterns += [
   url(r'^desktop/api2/doc/share/?$', desktop_api2.share_document),
 
   url(r'^desktop/api2/get_config/?$', desktop_api2.get_config),
+  url(r'^desktop/api2/get_hue_config/?$', desktop_api2.get_hue_config),
   url(r'^desktop/api2/context/namespaces/(?P<interface>[\w\-]+)/?$', desktop_api2.get_context_namespaces),
   url(r'^desktop/api2/context/computes/(?P<interface>[\w\-]+)/?$', desktop_api2.get_context_computes),
   url(r'^desktop/api2/context/clusters/(?P<interface>[\w\-]+)/?$', desktop_api2.get_context_clusters),
