@@ -281,33 +281,10 @@ def status_bar(request):
 
 
 def dump_config(request):
-  show_private = False
-  conf_dir = os.path.realpath(os.getenv("HUE_CONF_DIR", get_desktop_root("conf")))
-
   if not is_admin(request.user):
     return HttpResponse(_("You must be a superuser."))
 
-  if request.GET.get("private"):
-    show_private = True
-
-  app_modules = appmanager.DESKTOP_MODULES
-  config_modules = GLOBAL_CONFIG.get().values()
-  if ENABLE_CONNECTORS.get():
-    app_modules = [app_module for app_module in app_modules if app_module.name == 'desktop']
-    config_modules = [config_module for config_module in config_modules if config_module.config.key == 'desktop']
-
-  apps = sorted(app_modules, key=lambda app: app.name)
-  apps_names = [app.name for app in apps]
-  top_level = sorted(config_modules, key=lambda obj: apps_names.index(obj.config.key))
-
-  return render("dump_config.mako", request, {
-      'show_private': show_private,
-      'top_level': top_level,
-      'conf_dir': conf_dir,
-      'is_embeddable': request.GET.get('is_embeddable', False),
-      'apps': apps
-    }
-  )
+  return render("dump_config.mako", request, {})
 
 
 @access_log_level(logging.WARN)
