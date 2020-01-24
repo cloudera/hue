@@ -29,6 +29,7 @@ const SAMPLE_API_PREFIX = '/notebook/api/sample/';
 const EXECUTE_API_PREFIX = '/notebook/api/execute/';
 const DOCUMENTS_API = '/desktop/api2/doc/';
 const DOCUMENTS_SEARCH_API = '/desktop/api2/docs/';
+const GET_HUE_CONFIG_URL = '/desktop/api2/get_hue_config';
 const FETCH_CONFIG = '/desktop/api2/get_config/';
 const HDFS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('/');
 const ADLS_API_PREFIX = '/filebrowser/view=' + encodeURIComponent('adl:/');
@@ -2903,6 +2904,20 @@ class ApiHelper {
     const self = this;
     const url = '/desktop/api2/context/clusters/' + options.sourceType;
     return self.simpleGet(url, undefined, options);
+  }
+
+  async fetchHueConfigAsync(options) {
+    return new Promise((resolve, reject) => {
+      $.get(GET_HUE_CONFIG_URL)
+        .done(response => {
+          if (!response && response.status === -1) {
+            reject(response.message);
+          } else {
+            resolve(response);
+          }
+        })
+        .fail(reject);
+    });
   }
 
   getClusterConfig(data) {
