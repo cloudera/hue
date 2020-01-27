@@ -40,8 +40,8 @@ categories:
   - Browsing
   - Querying
   - Tutorial
-
 ---
+
 <p id="docs-internal-guid-6762db62-dcbc-201d-e1c6-4f70083f264f">
   <span>The HBase app is an elegant way to visualize and search a lot of data. </span><a href="http://hbase.apache.org/"><span>Apache HBase</span></a><span> tables can be tricky to update as they require lower level API. Some good alternative for simplifying the data management or access is to use Apache Pig or Hive.</span>
 </p>
@@ -50,7 +50,7 @@ categories:
 
 <span>In this post we are going to show how to load our yelp data from the </span>[<span>Oozie Bundles</span>][1] <span>episode into HBase with Hive. Then we will use the </span>[<span>HBase Browser</span>][2] <span>to visualize it and Pig to compute some statistics.</span>
 
-<iframe src="https://player.vimeo.com/video/76700456?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: Use Pig and Hive with HBase" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube Qpll_XbUEf0 >}}
 
 &nbsp;
 
@@ -135,13 +135,13 @@ DUMP counts;</pre>
 
 <span>As usual, if you have questions or feedback, feel free to contact the Hue community on </span>[<span>hue-user</span>][9] <span>or </span>[<span>@gethue.com</span>][10]<span>!</span>
 
- [1]: http://gethue.tumblr.com/post/63988110361/hadoop-tutorial-bundle-oozie-coordinators-with-hue
- [2]: http://gethue.tumblr.com/post/59071544309/the-web-ui-for-hbase-hbase-browser
- [3]: https://cwiki.apache.org/confluence/display/Hive/HBaseIntegration
- [4]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hbase-hive-pig/create_hbase_table.sql
- [5]: http://gethue.tumblr.com/post/60376973455/hadoop-tutorials-ii-1-prepare-the-data-for-analysis
- [6]: http://pig.apache.org/docs/r0.11.1/func.html#HBaseStorage
- [7]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hbase-hive-pig/load_hbase.pig
- [8]: http://gethue.tumblr.com/post/56804308712/hadoop-tutorial-how-to-access-hive-in-pig-with
- [9]: http://groups.google.com/a/cloudera.org/group/hue-user
- [10]: http://twitter.com/gethue
+[1]: http://gethue.tumblr.com/post/63988110361/hadoop-tutorial-bundle-oozie-coordinators-with-hue
+[2]: http://gethue.tumblr.com/post/59071544309/the-web-ui-for-hbase-hbase-browser
+[3]: https://cwiki.apache.org/confluence/display/Hive/HBaseIntegration
+[4]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hbase-hive-pig/create_hbase_table.sql
+[5]: http://gethue.tumblr.com/post/60376973455/hadoop-tutorials-ii-1-prepare-the-data-for-analysis
+[6]: http://pig.apache.org/docs/r0.11.1/func.html#HBaseStorage
+[7]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hbase-hive-pig/load_hbase.pig
+[8]: http://gethue.tumblr.com/post/56804308712/hadoop-tutorial-how-to-access-hive-in-pig-with
+[9]: http://groups.google.com/a/cloudera.org/group/hue-user
+[10]: http://twitter.com/gethue

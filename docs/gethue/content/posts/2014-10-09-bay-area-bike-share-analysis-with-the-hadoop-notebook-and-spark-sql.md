@@ -38,8 +38,8 @@ categories:
   - Browsing
   - Querying
   - Tutorial
-
 ---
+
 _This post was initially published on the Hue project blog <https://gethue.com/bay-area-bike-share-data-analysis-with-spark-notebook-part-2/>_
 
 Apache Spark is [getting popular][1] and Hue contributors are working on making it accessible to even more users. Specifically, by creating a Web interface that allows anyone with a browser to type some Spark code and execute it. A [Spark submission REST API][2] was built for this purpose and can also be leveraged by the developers.
@@ -50,7 +50,7 @@ In this tutorial, we'll use the [Hadoop Notebook][4] to study deeper the peak u
 
 To start, download the latest data set from <http://www.bayareabikeshare.com/datachallenge>. This post uses the data from August 2013 through February 2014.
 
-<iframe src="https://player.vimeo.com/video/140422097?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Bay Area bike share analysis with the Hadoop Notebook and Spark & SQL" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube BaTfXqAidiw >}}
 
 ## Importing CSV Data with the Metastore App
 
@@ -260,7 +260,7 @@ Stay tuned for a number of exciting improvements to the notebook app, and as usu
 
 &nbsp;
 
-* * *
+---
 
 #### Helpful Tips
 
@@ -294,20 +294,20 @@ Then you can go back to the Metastore to import the CSV into the table; note tha
 
 When you create new databases or tables and plan to query them in an Impala snippet, it's a good idea to run an INVALIDATE METADATA; command first to reset the metastore cache. Otherwise, you may encounter an error where the database or table is not recognized.
 
- [1]: http://vision.cloudera.com/one-platform/
- [2]: https://gethue.com/how-to-use-the-livy-spark-rest-job-server-for-interactive-spark/
- [3]: https://gethue.com/bay-area-bikeshare-data-analysis-with-search-and-spark-notebook/
- [4]: https://gethue.com/spark-notebook-and-livy-rest-job-server-improvements/
- [5]: https://gethue.com/hadoop-tutorial-create-hive-tables-with-headers-and/
- [6]: https://cdn.gethue.com/uploads/2015/09/Screenshot-2015-09-20-20.46.00.png
- [7]: https://cdn.gethue.com/uploads/2015/09/Screenshot-2015-09-20-20.46.54.png
- [8]: https://cdn.gethue.com/uploads/2015/09/Screenshot-2015-09-20-20.47.22.png
- [9]: https://cdn.gethue.com/uploads/2015/09/impala_query.png
- [10]: https://cdn.gethue.com/uploads/2015/08/impala_bar_graph.png
- [11]: https://cdn.gethue.com/uploads/2015/08/impala_map.png
- [12]: https://cdn.gethue.com/uploads/2015/08/hive_scatter.png
- [13]: https://cdn.gethue.com/uploads/2015/08/hive_avg.png
- [14]: https://cdn.gethue.com/uploads/2015/09/Screenshot-2015-09-23-23.13.46.png
- [15]: https://spark-summit.org/eu-2015/events/building-a-rest-job-server-for-interactive-spark-as-a-service/
- [16]: http://groups.google.com/a/cloudera.org/group/hue-user
- [17]: https://twitter.com/gethue
+[1]: http://vision.cloudera.com/one-platform/
+[2]: https://gethue.com/how-to-use-the-livy-spark-rest-job-server-for-interactive-spark/
+[3]: https://gethue.com/bay-area-bikeshare-data-analysis-with-search-and-spark-notebook/
+[4]: https://gethue.com/spark-notebook-and-livy-rest-job-server-improvements/
+[5]: https://gethue.com/hadoop-tutorial-create-hive-tables-with-headers-and/
+[6]: https://cdn.gethue.com/uploads/2015/09/Screenshot-2015-09-20-20.46.00.png
+[7]: https://cdn.gethue.com/uploads/2015/09/Screenshot-2015-09-20-20.46.54.png
+[8]: https://cdn.gethue.com/uploads/2015/09/Screenshot-2015-09-20-20.47.22.png
+[9]: https://cdn.gethue.com/uploads/2015/09/impala_query.png
+[10]: https://cdn.gethue.com/uploads/2015/08/impala_bar_graph.png
+[11]: https://cdn.gethue.com/uploads/2015/08/impala_map.png
+[12]: https://cdn.gethue.com/uploads/2015/08/hive_scatter.png
+[13]: https://cdn.gethue.com/uploads/2015/08/hive_avg.png
+[14]: https://cdn.gethue.com/uploads/2015/09/Screenshot-2015-09-23-23.13.46.png
+[15]: https://spark-summit.org/eu-2015/events/building-a-rest-job-server-for-interactive-spark-as-a-service/
+[16]: http://groups.google.com/a/cloudera.org/group/hue-user
+[17]: https://twitter.com/gethue

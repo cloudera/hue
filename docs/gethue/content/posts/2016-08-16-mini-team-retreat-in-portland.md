@@ -38,15 +38,15 @@ sf_remove_promo_bar:
   - 1
 categories:
   - News
-
 ---
+
 Hello!
 
 After a last [retreat in Bloemendaal][1] and a stint in Las Vegas, the team went for a few days on the West coast of the USA: Portland!
 
 There, from a patio in the sun, surrounded by green, craft beers and "ethical" food, the team put the last touch of the upcoming Hue 3.11!
 
-<iframe src="https://player.vimeo.com/video/179052784?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hue Team Retreat - Las Vegas and Portland 2016" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube sEsyGDUbDQw >}}
 
 &nbsp;
 
@@ -62,8 +62,8 @@ Onwards!
 
 [<img src="https://cdn.gethue.com/uploads/2016/08/IMG_4417-1024x768.jpg"  />][5]
 
- [1]: https://gethue.com/mini-team-retreat-in-bloemendaal/
- [2]: https://twitter.com/gethue
- [3]: https://cdn.gethue.com/uploads/2016/08/IMG_4393.jpg
- [4]: https://cdn.gethue.com/uploads/2016/08/IMG_4409.jpg
- [5]: https://cdn.gethue.com/uploads/2016/08/IMG_4417.jpg
+[1]: https://gethue.com/mini-team-retreat-in-bloemendaal/
+[2]: https://twitter.com/gethue
+[3]: https://cdn.gethue.com/uploads/2016/08/IMG_4393.jpg
+[4]: https://cdn.gethue.com/uploads/2016/08/IMG_4409.jpg
+[5]: https://cdn.gethue.com/uploads/2016/08/IMG_4417.jpg

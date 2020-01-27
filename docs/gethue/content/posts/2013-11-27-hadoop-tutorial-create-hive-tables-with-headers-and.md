@@ -41,15 +41,15 @@ slide_template:
 categories:
   - Browsing
   - Querying
-
 ---
+
 <p id="docs-internal-guid-69d034aa-9ae7-82e8-1c00-5068cd66771e">
   Hue makes it easy to create Hive tables.
 </p>
 
 With [HUE-1746][1], Hue guesses the columns names and types (int, string, float…) directly by looking at your data. If your data starts with a header, this one will automatically be used and **skipped** while creating the table.
 
-<iframe src="https://player.vimeo.com/video/80460405?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial - Create Hive tables and load quoted CSV data in Hue" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube RxT0M8JgvOk >}}
 
 Quoted CSV fields are also compatible thanks to [HUE-1747][2].
 
@@ -71,9 +71,9 @@ Here is the data file used:
 
 <span>Now go analyze the data with the </span>[<span>Hive</span>][4]<span>, </span>[<span>Impala</span>][5] <span>or </span>[<span>Pig</span>][6] <span>editors!</span>
 
- [1]: https://issues.cloudera.org/browse/HUE-1746
- [2]: https://issues.cloudera.org/browse/HUE-1747
- [3]: https://cwiki.apache.org/confluence/display/Hive/SerDe
- [4]: http://gethue.tumblr.com/post/64916325309/hadoop-tutorial-hive-query-editor-with-hiveserver2-and
- [5]: http://gethue.tumblr.com/post/62452792255/fast-sql-with-the-impala-query-editor
- [6]: http://gethue.tumblr.com/post/64707633719/hadoop-tutorial-use-pig-and-hive-with-hbase
+[1]: https://issues.cloudera.org/browse/HUE-1746
+[2]: https://issues.cloudera.org/browse/HUE-1747
+[3]: https://cwiki.apache.org/confluence/display/Hive/SerDe
+[4]: http://gethue.tumblr.com/post/64916325309/hadoop-tutorial-hive-query-editor-with-hiveserver2-and
+[5]: http://gethue.tumblr.com/post/62452792255/fast-sql-with-the-impala-query-editor
+[6]: http://gethue.tumblr.com/post/64707633719/hadoop-tutorial-use-pig-and-hive-with-hbase

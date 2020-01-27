@@ -37,8 +37,8 @@ slide_template:
 categories:
   - Administration
   - Querying
-
 ---
+
 <p dir="ltr" id="docs-internal-guid-10fc66ac-2e20-af75-4d45-3e31a62fe3d3">
   The <a href="http://impala.io/">Impala</a> and <a href="https://gethue.com/hadoop-tutorial-hive-query-editor-with-hiveserver2-and/">Hive</a> applications have a new face! In addition to new features, their interfaces in Hue have been redesigned and re-implemented as single page apps.
 </p>
@@ -47,9 +47,9 @@ categories:
   Now:
 </p>
 
-  * Switching between pages is over
-  * Results are asynchronously fetched
-  * Results are graphed
+- Switching between pages is over
+- Results are asynchronously fetched
+- Results are graphed
 
 <p dir="ltr">
   Moreover, the table metadata are now directly accessible from the navigator tab and a smarter auto-completion.
@@ -59,7 +59,7 @@ categories:
   Here is a demo of a typical query execution:
 </p>
 
-<iframe src="https://player.vimeo.com/video/90961050?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: Interactive SQL on Hadoop made easier in Hue" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube y5PONHhpQ5c >}}
 
 <p dir="ltr">
   As usual feel free to comment on the<a href="http://groups.google.com/a/cloudera.org/group/hue-user"> hue-user</a> list or<a href="https://twitter.com/gethue"> @gethue</a>!

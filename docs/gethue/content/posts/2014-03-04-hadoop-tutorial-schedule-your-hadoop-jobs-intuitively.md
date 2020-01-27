@@ -40,15 +40,15 @@ slide_template:
   - default
 categories:
   - Scheduling
-
 ---
+
 <p id="docs-internal-guid-be480bc2-8f87-c4e1-42a3-9789aa72a148">
   Hue is taking advantage of a new way to specify the frequency of a coordinator in Oozie (<a href="https://issues.apache.org/jira/browse/OOZIE-1306">OOZIE-1306</a>). Here is how to put it in practice:
 </p>
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/85922380?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: Oozie crontab scheduling in Hue" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube Nnzd_q6vSHU >}}
 
 The crontab requires Oozie 4. In order to use the previous Frequency drop-down from Oozie 3, the feature can be disabled in [hue.ini][1]:
 
@@ -64,6 +64,6 @@ The crontab requires Oozie 4. In order to use the previous Frequency drop-down f
 
 <span>As usual feel free to comment on the</span>[<span>hue-user</span>][2] <span>list or</span>[<span>@gethue</span>][3]<span>!</span>
 
- [1]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L589
- [2]: http://groups.google.com/a/cloudera.org/group/hue-user
- [3]: https://twitter.com/gethue
+[1]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L589
+[2]: http://groups.google.com/a/cloudera.org/group/hue-user
+[3]: https://twitter.com/gethue

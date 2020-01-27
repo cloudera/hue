@@ -40,14 +40,14 @@ slide_template:
   - default
 categories:
   - Querying
-
 ---
+
 This new feature completed in [Thailand][1] lets you search interactively:
 
-<iframe src="https://player.vimeo.com/video/78887745?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial - Hue - The new search graphical facet" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube QQWSGKsCIsk >}}
 
 As usual feel free to comment on the [hue-user][2] list or [@gethue][3]!
 
- [1]: http://gethue.tumblr.com/post/66661140648/hue-team-retreat-thailand
- [2]: https://groups.google.com/a/cloudera.org/group/hue-user/
- [3]: https://twitter.com/gethue
+[1]: http://gethue.tumblr.com/post/66661140648/hue-team-retreat-thailand
+[2]: https://groups.google.com/a/cloudera.org/group/hue-user/
+[3]: https://twitter.com/gethue

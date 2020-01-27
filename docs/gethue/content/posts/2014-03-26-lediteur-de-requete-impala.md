@@ -39,9 +39,8 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-
-
 ---
+
 Dans les &eacute;pisodes pr&eacute;c&eacute;dents, nous avons pr&eacute;sent&eacute; comment planifier des workflows avec les&nbsp;[coordonnateurs de Oozie][1].&nbsp;Voyons maintenant &nbsp;un moyen rapide pour interroger des donn&eacute;es avec Impala.
 
 <p id="docs-internal-guid-40e7f13f-6181-fb3b-54b1-99253b9abffe">
@@ -52,7 +51,7 @@ Dans les &eacute;pisodes pr&eacute;c&eacute;dents, nous avons pr&eacute;sent&eac
 
 La plupart du SQL de Hive est compatible avec Impala et nous allons comparer les requ&ecirc;tes d'[un &eacute;pisode][2]&nbsp;precedent avec les applications Impala et Hive.&nbsp;Notez que cette comparaison n'est pas 100% scientifique, mais elle montre ce qui se passerait en pratique.</p>
 
-{{< vimeo 75493693 >}}
+{{< youtube FwcVA_pgmNY >}}
 
 Utiliser Impala &agrave; travers l'application de Hue est plus facile &agrave; bien des &eacute;gards que de l'utiliser &agrave; travers la ligne de commande du impala-shell.&nbsp;Par exemple, les noms de tables, bases de donn&eacute;es, des colonnes, des fonctions int&eacute;gr&eacute;es sont auto-completable et la coloration syntaxique montre les fautes de frappe potentielles dans vos requ&ecirc;tes.&nbsp;Plusieurs requ&ecirc;tes ou une partie s&eacute;lectionn&eacute;e d'une requ&ecirc;te peut &ecirc;tre ex&eacute;cut&eacute;e &agrave; partir de l'&eacute;diteur.&nbsp;Les requ&ecirc;tes param&eacute;tr&eacute;es sont pris en charge et l'utilisateur sera invit&eacute; a saisir des valeurs au moment de la soumission.&nbsp;Les requ&ecirc;tes Impala peuvent &ecirc;tre sauvegard&eacute;s et partag&eacute;s entre les utilisateurs ou supprim&eacute;es, puis restaur&eacute;es &agrave; partir de d&eacute;chets en cas d'erreurs.</p>
 
@@ -90,11 +89,11 @@ La&nbsp;[VM de d&eacute;mo de Cloudera][6]&nbsp;avec ses tutoriels Hadoop est un
 
 Comme d'habitude, n'h&eacute;sitez pas &agrave; commenter sur la&nbsp;[mailing list][7]&nbsp;ou sur la Twiter&nbsp;[@gethue][8]!
 
- [1]: http://gethue.tumblr.com/post/61597968730/hadoop-tutorials-ii-3-schedule-hive-queries-with
- [2]: http://gethue.tumblr.com/post/60376973455/hadoop-tutorials-ii-1-prepare-the-data-for-analysis
- [3]: http://gethue.tumblr.com/post/56804308712/hadoop-tutorial-how-to-access-hive-in-pig-with
- [4]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/Impala/latest/Installing-and-Using-Impala/ciiu_concepts.html
- [5]: http://gethue.tumblr.com/post/49882746559/tutorial-executing-hive-or-impala-queries-with-python
- [6]: https://ccp.cloudera.com/display/SUPPORT/Cloudera+QuickStart+VM
- [7]: http://groups.google.com/a/cloudera.org/group/hue-user
- [8]: https://twitter.com/gethue
+[1]: http://gethue.tumblr.com/post/61597968730/hadoop-tutorials-ii-3-schedule-hive-queries-with
+[2]: http://gethue.tumblr.com/post/60376973455/hadoop-tutorials-ii-1-prepare-the-data-for-analysis
+[3]: http://gethue.tumblr.com/post/56804308712/hadoop-tutorial-how-to-access-hive-in-pig-with
+[4]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/Impala/latest/Installing-and-Using-Impala/ciiu_concepts.html
+[5]: http://gethue.tumblr.com/post/49882746559/tutorial-executing-hive-or-impala-queries-with-python
+[6]: https://ccp.cloudera.com/display/SUPPORT/Cloudera+QuickStart+VM
+[7]: http://groups.google.com/a/cloudera.org/group/hue-user
+[8]: https://twitter.com/gethue

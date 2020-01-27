@@ -36,14 +36,14 @@ sf_remove_promo_bar:
   - 1
 categories:
   - Administration
-
 ---
+
 The release of [Hue 3.9][1] and CDH5.5 makes Hue noticeably faster and easy to monitor.
 
 A built-in load balancer can be added in just a few clicks. In the past, setting up a load balancer had still some [manual pieces][2]. These are still valid and recommended if you use your own Hue. However, if you use Cloudera Manager this new load balancer provides theses advantages out of the box:
 
-  * Automatic fail-over to an available healthy Hue in case of crash, network or host glitch
-  * Transparent serving of the static files for [much better request performances][3] and more responsiveness (cut down average number of Web request by page from 60 to 5, that's a lot of saving with many concurrent users!)
+- Automatic fail-over to an available healthy Hue in case of crash, network or host glitch
+- Transparent serving of the static files for [much better request performances][3] and more responsiveness (cut down average number of Web request by page from 60 to 5, that's a lot of saving with many concurrent users!)
 
 <figure><a href="https://cdn.gethue.com/uploads/2015/03/without-nginx.png"><img src="https://cdn.gethue.com/uploads/2015/03/without-nginx.png" /></a><figcaption>Before (without load balancer)</figcaption></figure>
 
@@ -55,7 +55,7 @@ The monitoring of the Hue service was also improved by tracking the number of 
 
 Here is a video explaining and demonstrating the improvements:
 
-<iframe src="https://player.vimeo.com/video/148242514?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial - Automatic High Availability and Load Balancing of Hue in Cloudera Manager with monitoring" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube VLOGvlXrQeM >}}
 
 <figure><a href="https://cdn.gethue.com/uploads/2015/12/hue-cm-monitoring2.png"><img src="https://cdn.gethue.com/uploads/2015/12/hue-cm-monitoring2.png" /></a><figcaption>Monitoring of number of active users and requests</figcaption></figure>
 
@@ -69,10 +69,10 @@ Next versions will continue to focus on stability and performances with more opt
 
 If you have any question, feel free to comment here or on the [hue-user][6] list or [@gethue][7]!
 
- [1]: https://gethue.com/hue-3-9-with-all-its-improvements-is-out/
- [2]: https://gethue.com/automatic-high-availability-with-hue-and-cloudera-manager/
- [3]: https://gethue.com/using-nginx-to-speed-up-hue-3-8-0/
- [4]: https://cdn.gethue.com/uploads/2015/12/hue-cm-1-instance.png
- [5]: https://cdn.gethue.com/uploads/2015/12/hue-cmlb.png
- [6]: http://groups.google.com/a/cloudera.org/group/hue-user
- [7]: https://twitter.com/gethue
+[1]: https://gethue.com/hue-3-9-with-all-its-improvements-is-out/
+[2]: https://gethue.com/automatic-high-availability-with-hue-and-cloudera-manager/
+[3]: https://gethue.com/using-nginx-to-speed-up-hue-3-8-0/
+[4]: https://cdn.gethue.com/uploads/2015/12/hue-cm-1-instance.png
+[5]: https://cdn.gethue.com/uploads/2015/12/hue-cmlb.png
+[6]: http://groups.google.com/a/cloudera.org/group/hue-user
+[7]: https://twitter.com/gethue

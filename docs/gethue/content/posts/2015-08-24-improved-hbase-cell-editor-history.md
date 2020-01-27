@@ -36,13 +36,13 @@ sf_remove_promo_bar:
   - 1
 categories:
   - Browsing
-
 ---
+
 For Hue 3.9 we've made some improvements to the HBase Browser that will make your life easier when editing cell contents.
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/135993114?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: how to revert changes in HBase" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube 62IWxigAyIc >}}
 
 &nbsp;
 
@@ -60,7 +60,7 @@ As usual, feel free to send feedback on the [hue-user][3] list or [@gethue][
 
 &nbsp;
 
- [1]: https://cdn.gethue.com/uploads/2015/08/Screenshot-2015-08-20-16.32.50.png
- [2]: https://cdn.gethue.com/uploads/2015/08/Screenshot-2015-08-20-16.34.44.png
- [3]: http://groups.google.com/a/cloudera.org/group/hue-user
- [4]: https://twitter.com/gethue
+[1]: https://cdn.gethue.com/uploads/2015/08/Screenshot-2015-08-20-16.32.50.png
+[2]: https://cdn.gethue.com/uploads/2015/08/Screenshot-2015-08-20-16.34.44.png
+[3]: http://groups.google.com/a/cloudera.org/group/hue-user
+[4]: https://twitter.com/gethue

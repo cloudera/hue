@@ -39,8 +39,8 @@ slide_template:
 categories:
   - Administration
   - Development
-
 ---
+
 Hue is a lightweight Web server that lets you [use Hadoop][1] directly from your browser. Hue is just a ‘view on top of any Hadoop distribution’ and can be installed on any machine.
 
 There are multiples ways (cf. ‘Download’ section of [gethue.com][2]) to install Hue. The next step is then to configure Hue to point to your [Hadoop cluster][3]. By default Hue assumes a local cluster (i.e. there is only one machine) is present. In order to interact with a real cluster, Hue needs to know on which hosts are distributed the Hadoop services.
@@ -53,14 +53,14 @@ There are multiples ways (cf. ‘Download’ section of [gethue.com][2]) to inst
 
 Hue main configuration happens in a [hue.ini][5] file. It lists a lot of options but essentially what are the addresses and ports of HDFS, YARN, Oozie, Hive… Depending on the distribution you installed the ini file is located:
 
-  * CDH [package][6]: /etc/hue/conf/hue.ini
-  * A tarball [release][7]: /usr/share/desktop/conf/hue.ini
-  * [Development][8] version: desktop/conf/pseudo-distributed.ini
-  * [Cloudera Manager][9]: CM <span style="color: #000000;">generates</span> all the hue.ini for you, so no hassle 😉 /var/run/cloudera-scm-agent/process/\`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE | tail -1 | awk '{print $9}'\`/hue.ini
+- CDH [package][6]: /etc/hue/conf/hue.ini
+- A tarball [release][7]: /usr/share/desktop/conf/hue.ini
+- [Development][8] version: desktop/conf/pseudo-distributed.ini
+- [Cloudera Manager][9]: CM <span style="color: #000000;">generates</span> all the hue.ini for you, so no hassle 😉 /var/run/cloudera-scm-agent/process/\`ls -alrt /var/run/cloudera-scm-agent/process | grep HUE | tail -1 | awk '{print \$9}'\`/hue.ini
 
-**
+\*\*
 
-Note:** To override a value in Cloudera Manager, you need to enter verbatim each mini section from below into the Hue [Safety Valve][10]: Hue Service → Configuration → Service-Wide → Advanced → Hue Service Advanced Configuration Snippet (Safety Valve) for hue_safety_valve.ini
+Note:\*\* To override a value in Cloudera Manager, you need to enter verbatim each mini section from below into the Hue [Safety Valve][10]: Hue Service → Configuration → Service-Wide → Advanced → Hue Service Advanced Configuration Snippet (Safety Valve) for hue_safety_valve.ini
 
 &nbsp;
 
@@ -292,28 +292,28 @@ And that’s it! Now Hue will let you do Big Data directly from your browser wit
 
 As usual feel free to comment and send feedback on the [hue-user][24] list or [@gethue][25]!
 
- [1]: http://vimeo.com/88256132
- [2]: http://gethue.com
- [3]: https://gethue.com/yahoo-hadoop-meetup-integrate-hue-with-your-hadoop-cluster/
- [4]: https://cdn.gethue.com/uploads/2014/10/hue-ecosystem.png
- [5]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini
- [6]: http://archive.cloudera.com/cdh5/one-click-install/
- [7]: https://gethue.com/category/release/
- [8]: https://gethue.com/how-to-build-hue-on-ubuntu-14-04-trusty/
- [9]: https://gethue.com/hadoop-tutorial-how-to-create-a-real-hadoop-cluster-in-10-minutes/
- [10]: http://www.cloudera.com/content/cloudera/en/documentation/cloudera-manager/v5-1-x/Cloudera-Manager-Managing-Clusters/cm5mc_config_snippet.html
- [11]: http://127.0.0.1:8888/desktop/dump_config
- [12]: http://127.0.0.1:8888/about/admin_wizard
- [13]: http://www.cloudera.com/content/cloudera/en/documentation/cdh5/latest/CDH5-Installation-Guide/cdh5ig_cdh_hue_configure.html
- [14]: https://gethue.com/solr-search-ui-only/
- [15]: https://gethue.com/demo-hdfs-file-operations-made-easy-with-hue/
- [16]: https://gethue.com/using-hadoop-mr2-and-yarn-with-an-alternative-job/
- [17]: https://gethue.com/hadoop-tutorial-new-impala-and-hive-editors/
- [18]: https://gethue.com/hadoop-search-dynamic-search-dashboards-with-solr/
- [19]: https://gethue.com/category/oozie/
- [20]: https://gethue.com/hadoop-tutorial-language-assistant-in-pig-editor-with/
- [21]: http://blog.cloudera.com/blog/2014/05/how-to-use-the-sharelib-in-apache-oozie-cdh-5/
- [22]: https://gethue.com/hue-2-5-and-its-hbase-app-is-out/
- [23]: https://gethue.com/category/tutorial/
- [24]: http://groups.google.com/a/cloudera.org/group/hue-user
- [25]: https://twitter.com/gethue
+[1]: https://youtube.com/watch?v=qtg8aqulpWk
+[2]: https://gethue.com
+[3]: https://gethue.com/yahoo-hadoop-meetup-integrate-hue-with-your-hadoop-cluster/
+[4]: https://cdn.gethue.com/uploads/2014/10/hue-ecosystem.png
+[5]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini
+[6]: http://archive.cloudera.com/cdh5/one-click-install/
+[7]: https://gethue.com/category/release/
+[8]: https://gethue.com/how-to-build-hue-on-ubuntu-14-04-trusty/
+[9]: https://gethue.com/hadoop-tutorial-how-to-create-a-real-hadoop-cluster-in-10-minutes/
+[10]: http://www.cloudera.com/content/cloudera/en/documentation/cloudera-manager/v5-1-x/Cloudera-Manager-Managing-Clusters/cm5mc_config_snippet.html
+[11]: http://127.0.0.1:8888/desktop/dump_config
+[12]: http://127.0.0.1:8888/about/admin_wizard
+[13]: http://www.cloudera.com/content/cloudera/en/documentation/cdh5/latest/CDH5-Installation-Guide/cdh5ig_cdh_hue_configure.html
+[14]: https://gethue.com/solr-search-ui-only/
+[15]: https://gethue.com/demo-hdfs-file-operations-made-easy-with-hue/
+[16]: https://gethue.com/using-hadoop-mr2-and-yarn-with-an-alternative-job/
+[17]: https://gethue.com/hadoop-tutorial-new-impala-and-hive-editors/
+[18]: https://gethue.com/hadoop-search-dynamic-search-dashboards-with-solr/
+[19]: https://gethue.com/category/oozie/
+[20]: https://gethue.com/hadoop-tutorial-language-assistant-in-pig-editor-with/
+[21]: http://blog.cloudera.com/blog/2014/05/how-to-use-the-sharelib-in-apache-oozie-cdh-5/
+[22]: https://gethue.com/hue-2-5-and-its-hbase-app-is-out/
+[23]: https://gethue.com/category/tutorial/
+[24]: http://groups.google.com/a/cloudera.org/group/hue-user
+[25]: https://twitter.com/gethue

@@ -36,8 +36,8 @@ sf_remove_promo_bar:
   - 1
 categories:
   - Querying
-
 ---
+
 The Notebook application as well as the REST Spark Job Server are being revamped. These two components goals are to let users execute [Spark][1] in their browser or from anywhere. They are still in beta but next version of Hue will have them graduate. Here are a list of the improvements and a video demo:
 
 <ul class="itemizedlist" type="disc">
@@ -62,7 +62,7 @@ How to play with it?
 
 See in this post how to use the [Notebook UI][2] and on this page on how to use the [REST Spark Job Server][3] named Livy. The architecture of Livy was recently detailed in a [presentation][4] at Big Data Scala by the Bay. Next updates will be at the [Spark meetup][5] before Strata NYC and [Spark Summit][6] in Amsterdam.
 
-<iframe src="https://player.vimeo.com/video/137124722?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: Notebook improvements in Hue 3.9" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube b3nMTJ74H4Y >}}
 
 ###
 
@@ -92,14 +92,14 @@ All the spark-submit, spark-shell, pyspark, sparkR properties of jobs & shells c
 
 So give this new Spark integration a try and feel free to send feedback on the [hue-user][10] list or [@gethue][11]!
 
- [1]: http://spark.apache.org/
- [2]: https://gethue.com/new-notebook-application-for-spark-sql/
- [3]: https://github.com/cloudera/hue/tree/master/apps/spark/java#welcome-to-livy-the-rest-spark-server
- [4]: https://gethue.com/big-data-scala-by-the-bay-interactive-spark-in-your-browser/
- [5]: https://www.eventbrite.com/e/spark-lightning-night-at-shutterstock-nyc-tickets-17590432457
- [6]: https://spark-summit.org/eu-2015/events/building-a-rest-job-server-for-interactive-spark-as-a-service/
- [7]: https://cdn.gethue.com/uploads/2015/08/notebook.png
- [8]: https://cdn.gethue.com/uploads/2015/08/spark-r-snippet.png
- [9]: https://cdn.gethue.com/uploads/2015/08/notebook-sessions.png
- [10]: http://groups.google.com/a/cloudera.org/group/hue-user
- [11]: https://twitter.com/gethue
+[1]: http://spark.apache.org/
+[2]: https://gethue.com/new-notebook-application-for-spark-sql/
+[3]: https://github.com/cloudera/hue/tree/master/apps/spark/java#welcome-to-livy-the-rest-spark-server
+[4]: https://gethue.com/big-data-scala-by-the-bay-interactive-spark-in-your-browser/
+[5]: https://www.eventbrite.com/e/spark-lightning-night-at-shutterstock-nyc-tickets-17590432457
+[6]: https://spark-summit.org/eu-2015/events/building-a-rest-job-server-for-interactive-spark-as-a-service/
+[7]: https://cdn.gethue.com/uploads/2015/08/notebook.png
+[8]: https://cdn.gethue.com/uploads/2015/08/spark-r-snippet.png
+[9]: https://cdn.gethue.com/uploads/2015/08/notebook-sessions.png
+[10]: http://groups.google.com/a/cloudera.org/group/hue-user
+[11]: https://twitter.com/gethue

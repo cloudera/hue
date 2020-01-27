@@ -40,15 +40,15 @@ slide_template:
   - default
 categories:
   - Browsing
-
 ---
+
 <p id="docs-internal-guid-7ca70170-7024-010f-4ab7-0cefc838920c">
   Hue can authenticate with Kerberos in YARN and guarantee than someone cannot access someone else’s MapReduce information.
 </p>
 
 <span id="docs-internal-guid-7ca70170-7024-1355-fdd6-a0994c9c8805">As usual feel free to comment on the </span>[hue-user][1] list or [@gethue][2]!
 
-{{< vimeo 85922379 >}}
+{{< youtube ZKsPpqswlXg >}}
 
- [1]: http://groups.google.com/a/cloudera.org/group/hue-user
- [2]: https://twitter.com/gethue
+[1]: http://groups.google.com/a/cloudera.org/group/hue-user
+[2]: https://twitter.com/gethue

@@ -40,8 +40,8 @@ slide_template:
   - default
 categories:
   - Querying
-
 ---
+
 <p id="docs-internal-guid-2146a2cd-fca2-7325-b82b-68ed6ae64ad9">
   <a href="http://incubator.apache.org/projects/sentry.html">Apache Sentry</a> is the new way to provide security (e.g. privileges on SQL statements SELECT, CREATE…) when querying data in Hadoop. <a href="http://impala.io/">Impala</a> offers <a href="http://gethue.tumblr.com/post/62452792255/fast-sql-with-the-impala-query-editor">fast SQL</a> for Apache Hadoop and can leverage Sentry. Here is how to use configure it:
 </p>
@@ -106,9 +106,9 @@ impersonation_enabled=True
 
 Note: to give a concrete idea, here is video demo that shows the end user interaction in the UI (it is using the <a href="https://gethue.com/hadoop-tutorial-hive-query-editor-with-hiveserver2-and/" target="_blank" rel="noopener noreferrer">Hive App</a> but you will get the exact same result with the Impala app)
 
-{{< vimeo 79883574 >}}
+{{< youtube -Py11X0G6Hs >}}
 
- [1]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini
- [2]: http://gethue.tumblr.com/post/64916325309/hadoop-tutorial-hive-query-editor-with-hiveserver2-and
- [3]: http://groups.google.com/a/cloudera.org/group/hue-user
- [4]: https://twitter.com/gethue
+[1]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini
+[2]: http://gethue.tumblr.com/post/64916325309/hadoop-tutorial-hive-query-editor-with-hiveserver2-and
+[3]: http://groups.google.com/a/cloudera.org/group/hue-user
+[4]: https://twitter.com/gethue

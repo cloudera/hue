@@ -39,13 +39,13 @@ ampforwp-amp-on-off:
 categories:
   - Administration
   - Querying
-
 ---
+
 The [Solr Search App][1] is having a great success and users often wonder if they could use it without the Hadoop related apps. As the app is only using the standard Apache Solr REST API and Hue allows to customize which apps to show, the answer is yes!
 
 **Note**: this is an alternative to configure the [groups and application permissions][2] directly in the User Admin.
 
-{{< vimeo 122319838 >}}
+{{< youtube lZTHhOtmFN4 >}}
 
 &nbsp;
 
@@ -95,17 +95,17 @@ If you want to install the examples you could enable the [indexer][8]
 
 <pre><code class="bash">indexer</code></pre>
 
-**
+\*\*
 
-Note**
+Note\*\*
 
 The app is primarily tested on Solr Cloud mode but works on regular Solr
 
- [1]: https://gethue.com/search-app-enhancements-explore-even-more-data/
- [2]: https://gethue.com/how-to-manage-permissions-in-hue/
- [3]: https://cdn.gethue.com/uploads/2015/03/hue-download.png
- [4]: https://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/
- [5]: https://cdn.gethue.com/uploads/2015/03/search-only.png
- [6]: http://groups.google.com/a/cloudera.org/group/hue-user
- [7]: https://twitter.com/gethue
- [8]: https://gethue.com/analyse-apache-logs-and-build-your-own-web-analytics-dashboard-with-hadoop-and-solr/
+[1]: https://gethue.com/search-app-enhancements-explore-even-more-data/
+[2]: https://gethue.com/how-to-manage-permissions-in-hue/
+[3]: https://cdn.gethue.com/uploads/2015/03/hue-download.png
+[4]: https://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/
+[5]: https://cdn.gethue.com/uploads/2015/03/search-only.png
+[6]: http://groups.google.com/a/cloudera.org/group/hue-user
+[7]: https://twitter.com/gethue
+[8]: https://gethue.com/analyse-apache-logs-and-build-your-own-web-analytics-dashboard-with-hadoop-and-solr/

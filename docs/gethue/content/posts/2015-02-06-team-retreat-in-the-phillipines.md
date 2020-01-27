@@ -38,15 +38,15 @@ slide_template:
   - default
 categories:
   - News
-
 ---
+
 Hello / Kumusta!
 
 After <a href="https://gethue.com/team-retreat-in-nicaragua-and-belize/" target="_blank" rel="noopener noreferrer">Central America</a> at the beginning of winter, it was again the perfect timing for one more exotic location: the Phillipines!
 
 The team flew to the other side of the world on the island of <a href="https://www.google.com/search?q=boracay&rct=j" target="_blank" rel="noopener noreferrer">Boracay</a> for some great tricycle action, kitesurfing and discovering some new culture and food:
 
-<iframe src="https://player.vimeo.com/video/119147915?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="The Hue team retreat - Philippines 2015" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube 92CKMnGMDmE >}}
 
 &nbsp;
 
@@ -72,8 +72,8 @@ Onwards!!
 
 [<img src="https://cdn.gethue.com/uploads/2015/02/2015-01-28-17.17.12-768x1024.jpg"  />][4]  [<img src="https://cdn.gethue.com/uploads/2015/02/2015-01-28-17.52.28-1024x768.jpg"  />][5]
 
- [1]: https://twitter.com/gethue
- [2]: https://cdn.gethue.com/uploads/2015/02/2015-01-26-12.33.39.jpg
- [3]: https://cdn.gethue.com/uploads/2015/02/2015-01-26-18.03.32.jpg
- [4]: https://cdn.gethue.com/uploads/2015/02/2015-01-28-17.17.12.jpg
- [5]: https://cdn.gethue.com/uploads/2015/02/2015-01-28-17.52.28.jpg
+[1]: https://twitter.com/gethue
+[2]: https://cdn.gethue.com/uploads/2015/02/2015-01-26-12.33.39.jpg
+[3]: https://cdn.gethue.com/uploads/2015/02/2015-01-26-18.03.32.jpg
+[4]: https://cdn.gethue.com/uploads/2015/02/2015-01-28-17.17.12.jpg
+[5]: https://cdn.gethue.com/uploads/2015/02/2015-01-28-17.52.28.jpg

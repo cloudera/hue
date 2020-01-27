@@ -36,15 +36,15 @@ sf_remove_promo_bar:
   - 1
 categories:
   - News
-
 ---
+
 Hola / Hallo!
 
 It has been a while since the last [Team Retreat][1]. The [Spark Summit][2] in Amsterdam was a good opportunity for meeting in Europe. A stopover in Spain was added, as a beach / warm weather are required for qualifying as a retreat!
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/145293583?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hue Team Retreat - Tarifa and Amsterdam 2015" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube TnPznq7Uy8c >}}
 
 &nbsp;
 
@@ -78,12 +78,12 @@ Amsterdam
 
 [<img src="https://cdn.gethue.com/uploads/2015/11/2015-10-26-14.46.50-1024x768.jpg"  />][9]
 
- [1]: https://gethue.com/team-retreat-in-israel/
- [2]: https://gethue.com/spark-summit-europe-building-a-rest-job-server-for-interactive-spark-as-a-service/
- [3]: https://twitter.com/gethue
- [4]: https://cdn.gethue.com/uploads/2015/11/IMG_5441.jpg
- [5]: https://cdn.gethue.com/uploads/2015/11/2015-10-13-17.31.41.jpg
- [6]: https://cdn.gethue.com/uploads/2015/11/2015-10-14-20.45.16.jpg
- [7]: https://cdn.gethue.com/uploads/2015/11/2015-10-26-16.48.01.jpg
- [8]: https://cdn.gethue.com/uploads/2015/11/IMG_5690.jpg
- [9]: https://cdn.gethue.com/uploads/2015/11/2015-10-26-14.46.50.jpg
+[1]: https://gethue.com/team-retreat-in-israel/
+[2]: https://gethue.com/spark-summit-europe-building-a-rest-job-server-for-interactive-spark-as-a-service/
+[3]: https://twitter.com/gethue
+[4]: https://cdn.gethue.com/uploads/2015/11/IMG_5441.jpg
+[5]: https://cdn.gethue.com/uploads/2015/11/2015-10-13-17.31.41.jpg
+[6]: https://cdn.gethue.com/uploads/2015/11/2015-10-14-20.45.16.jpg
+[7]: https://cdn.gethue.com/uploads/2015/11/2015-10-26-16.48.01.jpg
+[8]: https://cdn.gethue.com/uploads/2015/11/IMG_5690.jpg
+[9]: https://cdn.gethue.com/uploads/2015/11/2015-10-26-14.46.50.jpg

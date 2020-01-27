@@ -40,8 +40,8 @@ slide_template:
   - default
 categories:
   - Browsing
-
 ---
+
 <p id="docs-internal-guid-63af2251-71ae-f7cf-e3d8-973b2294f38b">
   Hello animal lovers, in <a href="http://gethue.tumblr.com/post/62087732649/hue-3-and-the-new-sqoop-and-zookeeper-apps-are-out">Hue 3</a>, a new application was added in order to make <a href="http://zookeeper.apache.org/">Apache ZooKeeper</a> easier to use: ZooKeeper Browser.
 </p>
@@ -50,12 +50,12 @@ categories:
 
 The app is not totally new: it consists of a rebasing from Hue 1 to Hue 3 of the [ZooKeeper UI][1] made by Andrei during his Google Summer of Code 3 years ago.
 
-<iframe src="https://player.vimeo.com/video/79795356?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial - Hue - The new Zookeeper Browser" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube jvlKiZYf9Ys >}}
 
 The main two features are:
 
-  * Listing of the ZooKeeper cluster stats and clients
-  * Browsing and editing of the ZNode hierarchy
+- Listing of the ZooKeeper cluster stats and clients
+- Browsing and editing of the ZNode hierarchy
 
 &nbsp;
 
@@ -111,9 +111,9 @@ As usual feel free to comment on the [hue-user][5] list or [@gethue][6]!
 
 &nbsp;
 
- [1]: https://github.com/andreisavu/hue/tree/zookeeper-browser/
- [2]: https://github.com/apache/zookeeper/tree/trunk/src/contrib/rest
- [3]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L591
- [4]: http://127.0.0.1:8888/zookeeper/
- [5]: http://groups.google.com/a/cloudera.org/group/hue-user
- [6]: http://twitter.com/gethue
+[1]: https://github.com/andreisavu/hue/tree/zookeeper-browser/
+[2]: https://github.com/apache/zookeeper/tree/trunk/src/contrib/rest
+[3]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L591
+[4]: http://127.0.0.1:8888/zookeeper/
+[5]: http://groups.google.com/a/cloudera.org/group/hue-user
+[6]: http://twitter.com/gethue

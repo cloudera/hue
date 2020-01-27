@@ -42,15 +42,15 @@ categories:
   - Browsing
   - Querying
   - Tutorial
-
 ---
+
 <p id="docs-internal-guid-503f040f-ef67-4b6f-ee8d-c485a06d2c9b">
   Welcome to season 2 of the Hue <a href="https://gethue.com/category/full-tutorial/">video series</a>. In this new chapter we are going to demonstrate how Hue can simplify Hadoop usage and lets you focus on the business and less about the underlying technology. In a real life scenario, we will use various Hadoop tools within the Hue UI and explore some data and extract some competitive advantage insights from it.
 </p>
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/73849021?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: Hue - Preparing the data for analysis with Pig and Python UDF" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube BVY07kj8nU4 >}}
 
 Let’s go surf the Big Data wave, directly from your Browser!
 
@@ -126,16 +126,16 @@ Pig is a powerful tool for processing terabytes of data and Hue Pig Editor makes
 
 In the [next episode][13], let’s see how to query the data and learn more about the restaurant market!
 
- [1]: http://www.yelp.com/dataset_challenge/
- [2]: http://pig.apache.org/
- [3]: http://gethue.tumblr.com/post/51559235973/tutorial-apache-pig-editor-in-hue-2-3
- [4]: https://github.com/romainr/hadoop-tutorials-examples
- [5]: http://pig.apache.org/docs/r0.11.1/func.html#jsonloadstore
- [6]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/pig-json-python-udf/clean_json.pig
- [7]: http://127.0.0.1:8888/filebrowser/#/user/oozie/share/lib/pig
- [8]: http://gethue.tumblr.com/post/48706244836/demo-hdfs-file-operations-made-easy-with-hue
- [9]: http://pig.apache.org/docs/r0.11.1/udf.html#python-udfs
- [10]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/pig-json-python-udf/converter.py
- [11]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/pig-json-python-udf/python_udf.pig
- [12]: https://issues.cloudera.org/browse/HUE-1136
- [13]: https://gethue.com/hadoop-tutorials-ii-2-execute-hive-queries-and/ "Season II: 2. Execute Hive queries and schedule them with Oozie"
+[1]: http://www.yelp.com/dataset_challenge/
+[2]: http://pig.apache.org/
+[3]: http://gethue.tumblr.com/post/51559235973/tutorial-apache-pig-editor-in-hue-2-3
+[4]: https://github.com/romainr/hadoop-tutorials-examples
+[5]: http://pig.apache.org/docs/r0.11.1/func.html#jsonloadstore
+[6]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/pig-json-python-udf/clean_json.pig
+[7]: http://127.0.0.1:8888/filebrowser/#/user/oozie/share/lib/pig
+[8]: http://gethue.tumblr.com/post/48706244836/demo-hdfs-file-operations-made-easy-with-hue
+[9]: http://pig.apache.org/docs/r0.11.1/udf.html#python-udfs
+[10]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/pig-json-python-udf/converter.py
+[11]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/pig-json-python-udf/python_udf.pig
+[12]: https://issues.cloudera.org/browse/HUE-1136
+[13]: https://gethue.com/hadoop-tutorials-ii-2-execute-hive-queries-and/ 'Season II: 2. Execute Hive queries and schedule them with Oozie'

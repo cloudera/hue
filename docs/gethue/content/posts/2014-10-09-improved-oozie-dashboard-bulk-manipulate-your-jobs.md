@@ -38,18 +38,18 @@ slide_template:
   - default
 categories:
   - Scheduling
-
 ---
+
 Hue Oozie Dashboard just got a few improvements in order to make Oozie job management less tedious! Here is a video demo that sums them up:
 
-<iframe src="https://player.vimeo.com/video/108457591?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: Hue's Improved Oozie Dashboard" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube qkEoZiuhCqc >}}
 
 Main new Dashboard features
 
-  * Faster page display
-  * Bulk suspend/kill/resume jobs
-  * Bulk rerun failed coordinator actions
-  * New Metrics section
+- Faster page display
+- Bulk suspend/kill/resume jobs
+- Bulk rerun failed coordinator actions
+- New Metrics section
 
 [<img src="https://cdn.gethue.com/uploads/2014/10/hue-oozie-1024x579.png" />][1]
 
@@ -63,6 +63,6 @@ For example, it is planned to have an even quicker rerun of coordinator actions,
 
 As usual, feel free to send your wish list and feedback to the [hue-user][2] list or [@gethue][3]!
 
- [1]: https://cdn.gethue.com/uploads/2014/10/hue-oozie.png
- [2]: http://groups.google.com/a/cloudera.org/group/hue-user
- [3]: https://twitter.com/gethue
+[1]: https://cdn.gethue.com/uploads/2014/10/hue-oozie.png
+[2]: http://groups.google.com/a/cloudera.org/group/hue-user
+[3]: https://twitter.com/gethue

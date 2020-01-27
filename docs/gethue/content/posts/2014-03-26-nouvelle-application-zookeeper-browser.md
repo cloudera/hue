@@ -39,21 +39,20 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-
-
 ---
+
 <p id="docs-internal-guid-63af2251-71ae-f7cf-e3d8-973b2294f38b">
   Bonjour les amoureux des animaux, dans <a href="http://gethue.tumblr.com/post/62087732649/hue-3-and-the-new-sqoop-and-zookeeper-apps-are-out">Hue 3</a> , une nouvelle amélioration a été ajoutée afin de rendre <a href="http://zookeeper.apache.org/">Apache Zookeeper</a> plus facile à utiliser: ZooKeeper Browser.
 </p>
 
 L'application n'est pas totalement nouvelle: il s'agit de l'upgrade de Hue 1 à Hue 3 de l' [interface utilisateur ZooKeeper][1] faite par Andrei lors de son Google Summer of Code, il ya 3 ans.
 
-{{< vimeo 79795356 >}}
+{{< youtube jvlKiZYf9Ys >}}
 
 Les deux principales caractéristiques sont:
 
-  * Annonce des stats et des clients du cluster ZooKeeper
-  * Navigation et l'édition de la hiérarchie des ZNode
+- Annonce des stats et des clients du cluster ZooKeeper
+- Navigation et l'édition de la hiérarchie des ZNode
 
 ZooKeeper Browser nécessite la [ZooKeeper REST][2] service. Voici comment le configurer:
 
@@ -95,9 +94,9 @@ Et voilà, openez [Navigateur ZooKeeper][4] !
 
 Comme d'habitude n'hésitez pas à commenter sur le [groupe de message][5] ou sur [@gethue][6] !
 
- [1]: https://github.com/andreisavu/hue/tree/zookeeper-browser/
- [2]: https://github.com/apache/zookeeper/tree/trunk/src/contrib/rest
- [3]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L591
- [4]: http://127.0.0.1:8888/zookeeper/
- [5]: http://groups.google.com/a/cloudera.org/group/hue-user
- [6]: http://twitter.com/gethue
+[1]: https://github.com/andreisavu/hue/tree/zookeeper-browser/
+[2]: https://github.com/apache/zookeeper/tree/trunk/src/contrib/rest
+[3]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L591
+[4]: http://127.0.0.1:8888/zookeeper/
+[5]: http://groups.google.com/a/cloudera.org/group/hue-user
+[6]: http://twitter.com/gethue
