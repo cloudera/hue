@@ -210,6 +210,7 @@ ${ hueIcons.symbols() }
         <div id="embeddable_useradmin_groups" class="embeddable"></div>
         <div id="embeddable_useradmin_newgroup" class="embeddable"></div>
         <div id="embeddable_useradmin_editgroup" class="embeddable"></div>
+        <div id="embeddable_useradmin_organizations" class="embeddable"></div>
         <div id="embeddable_useradmin_permissions" class="embeddable"></div>
         <div id="embeddable_useradmin_editpermission" class="embeddable"></div>
         <div id="embeddable_useradmin_configurations" class="embeddable"></div>
@@ -359,7 +360,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     useradmin_permissions: { url: '/useradmin/permissions', title: '${_('User Admin - Permissions')}' },
     useradmin_editpermission: { url: '/useradmin/permissions/edit/*', title: '${_('User Admin - Edit Permission')}' },
     useradmin_configurations: { url: '/useradmin/configurations', title: '${_('User Admin - Configurations')}' },
-    useradmin_organizations: { url: '/useradmin/organizations', title: '${_('User Admin - Organization')}' },
+    useradmin_organizations: { url: '/useradmin/organizations', title: '${_('User Admin - Organizations')}' },
     useradmin_newuser: { url: '/useradmin/users/new', title: '${_('User Admin - New User')}' },
     useradmin_addldapusers: { url: '/useradmin/users/add_ldap_users', title: '${_('User Admin - Add LDAP User')}' },
     useradmin_edituser: { url: '/useradmin/users/edit/:user', title: '${_('User Admin - Edit User')}' },
@@ -387,10 +388,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
   }
 
   window.SKIP_CACHE = [
-    'home', 'oozie_workflow', 'oozie_coordinator', 'oozie_bundle', 'dashboard', 'metastore',
-    'filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_newgroup', 'useradmin_editgroup',
+    'home', 'oozie_workflow', 'oozie_coordinator', 'oozie_bundle', 'dashboard', 'metastore', 'filebrowser',
+    'useradmin_users', 'useradmin_groups', 'useradmin_newgroup', 'useradmin_editgroup',
     'useradmin_permissions', 'useradmin_editpermission', 'useradmin_configurations', 'useradmin_newuser',
-    'useradmin_addldapusers', 'useradmin_addldapgroups', 'useradmin_edituser', 'importer',
+    'useradmin_addldapusers', 'useradmin_addldapgroups', 'useradmin_edituser', 'useradmin_organizations',
+    'importer',
     'security_hive', 'security_hdfs', 'security_hive2', 'security_solr', 'logs',
     % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
       'indexes',

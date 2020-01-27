@@ -23,23 +23,19 @@ from desktop.views import commonheader, commonfooter, antixss
 from useradmin.models import group_permissions
 %>
 
-
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-%if not is_embeddable:
-${ commonheader(_('Groups'), "useradmin", user, request) | n,unicode }
-%endif
+% if not is_embeddable:
+  ${ commonheader(_('Organizations'), "useradmin", user, request) | n,unicode }
+% endif
 
-${layout.menubar(section='groups')}
+${ layout.menubar(section='organizations') }
 
-<div id="groupsComponents" class="useradmin container-fluid">
+<div id="organizationsComponents" class="useradmin container-fluid">
   <div class="card card-small">
     <h1 class="card-heading simple">
-      ${_('Groups')}
-      % if ENABLE_ORGANIZATIONS.get():
-        @ ${ user.organization }
-      % endif
+      ${ _('Organizations') }
     </h1>
 
     <%actionbar:render>
@@ -47,9 +43,11 @@ ${layout.menubar(section='groups')}
           <input type="text" class="input-xlarge search-query filter-input" placeholder="${_('Search for name, members, etc...')}">
       </%def>
       <%def name="actions()">
-        %if is_admin(user):
-            <button class="btn delete-group-btn confirmationModal" title="${_('Delete')}" disabled="disabled"><i class="fa fa-trash-o"></i> ${_('Delete')}</button>
-        %endif
+        % if is_admin(user):
+          <button class="btn delete-group-btn confirmationModal" title="${_('Delete')}" disabled="disabled">
+            <i class="fa fa-trash-o"></i> ${_('Delete')}
+          </button>
+        % endif
       </%def>
       <%def name="creation()">
         %if is_admin(user):
@@ -83,10 +81,10 @@ ${layout.menubar(section='groups')}
       <tbody>
         % for group in groups:
           <tr class="tableRow"
-              data-search="${group.name}${', '.join([group_user.username for group_user in group.organizationuser_set.all()])}">
+              data-search="${group.name}${ ', '.join([group_user.username for group_user in group.organizationuser_set.all()]) }">
           % if is_admin(user):
             <td data-row-selector-exclude="true">
-              <div class="hue-checkbox groupCheck fa" data-name="${group.name}" data-row-selector-exclude="true"></div>
+              <div class="hue-checkbox groupCheck fa" data-name="${ group.name }" data-row-selector-exclude="true"></div>
             </td>
           % endif
           <td>
@@ -103,7 +101,7 @@ ${layout.menubar(section='groups')}
             % endif
           </td>
           <td>${ ', '.join([group_user.username for group_user in group.organizationuser_set.all()]) }</td>
-          <td>{ group.organizationgroup_set.count() } { group.huepermission_set.count() }</td>
+          <td>${ group.organizationgroup_set.count() } ${ group.huepermission_set.count() }</td>
         </tr>
         % endfor
       </tbody>
@@ -118,6 +116,7 @@ ${layout.menubar(section='groups')}
       </tfoot>
     </table>
   </div>
+
   <div class="modal hide fade delete-group">
     <form action="${ url('useradmin.views.delete_group') }" method="POST">
       ${ csrf_token(request) | n,unicode }
@@ -145,17 +144,17 @@ ${layout.menubar(section='groups')}
 <script type="text/javascript">
 
   $(document).ready(function () {
-    var $groupsComponents = $('#groupsComponents');
-    $(document).off('click', '#groupsComponents .groupCheck');
+    var $organizationsComponents = $('#organizationsComponents');
+    $(document).off('click', '#organizationsComponents .groupCheck');
 
     var viewModel = {
       availableGroups: ko.observableArray(${ groups_json | n,antixss }),
       chosenGroups: ko.observableArray([])
     };
 
-    ko.applyBindings(viewModel, $groupsComponents[0]);
+    ko.applyBindings(viewModel, $organizationsComponents[0]);
 
-    var dt = $groupsComponents.find('.datatables').dataTable({
+    var dt = $organizationsComponents.find('.datatables').dataTable({
       "sPaginationType":"bootstrap",
       "iDisplayLength":100,
       "bLengthChange":false,
@@ -164,9 +163,9 @@ ${layout.menubar(section='groups')}
       "bFilter": true,
       "bAutoWidth": false,
       "aoColumns": [
-        %if is_admin(user):
+        % if is_admin(user):
             { "bSortable": false },
-        %endif
+        % endif
         { "sWidth": "20%" },
         { "sWidth": "20%" },
         null
@@ -178,10 +177,10 @@ ${layout.menubar(section='groups')}
     });
 
     % if is_embeddable:
-    $groupsComponents.find('.delete-group form').ajaxForm({
+    $organizationsComponents.find('.delete-group form').ajaxForm({
       dataType:  'json',
       success: function(data) {
-        $groupsComponents.find(".delete-group").modal("hide");
+        $organizationsComponents.find(".delete-group").modal("hide");
         $.jHueNotify.info("${ _('The groups were deleted.') }");
         if (data && data.url){
           huePubSub.publish('open.link', data.url);
@@ -190,32 +189,32 @@ ${layout.menubar(section='groups')}
     });
     % endif
 
-    $groupsComponents.find(".filter-input").jHueDelayedInput(function () {
+    $organizationsComponents.find(".filter-input").jHueDelayedInput(function () {
       if (dt) {
-        dt.fnFilter($groupsComponents.find(".filter-input").val().toLowerCase());
+        dt.fnFilter($organizationsComponents.find(".filter-input").val().toLowerCase());
       }
     });
 
-    $groupsComponents.find('[data-rel="tooltip"]').tooltip({
+    $organizationsComponents.find('[data-rel="tooltip"]').tooltip({
       placement: 'right'
     });
 
-    $groupsComponents.find(".dataTables_wrapper").css("min-height", "0");
-    $groupsComponents.find(".dataTables_filter").hide();
+    $organizationsComponents.find(".dataTables_wrapper").css("min-height", "0");
+    $organizationsComponents.find(".dataTables_filter").hide();
 
-    $groupsComponents.find(".select-all").click(function () {
+    $organizationsComponents.find(".select-all").click(function () {
       if ($(this).attr("checked")) {
         $(this).removeAttr("checked").removeClass("fa-check");
-        $groupsComponents.find(".groupCheck").removeClass("fa-check").removeAttr("checked");
+        $organizationsComponents.find(".groupCheck").removeClass("fa-check").removeAttr("checked");
       }
       else {
         $(this).attr("checked", "checked").addClass("fa-check");
-        $groupsComponents.find(".groupCheck").addClass("fa-check").attr("checked", "checked");
+        $organizationsComponents.find(".groupCheck").addClass("fa-check").attr("checked", "checked");
       }
       toggleActions();
     });
 
-    $(document).on('click', '#groupsComponents .groupCheck', function () {
+    $(document).on('click', '#organizationsComponents .groupCheck', function () {
       if ($(this).attr("checked")) {
         $(this).removeClass("fa-check").removeAttr("checked");
       }
@@ -226,30 +225,30 @@ ${layout.menubar(section='groups')}
     });
 
     function toggleActions() {
-      if ($groupsComponents.find(".groupCheck[checked='checked']").length > 0) {
-        $groupsComponents.find(".delete-group-btn").removeAttr("disabled");
+      if ($organizationsComponents.find(".groupCheck[checked='checked']").length > 0) {
+        $organizationsComponents.find(".delete-group-btn").removeAttr("disabled");
       }
       else {
-        $groupsComponents.find(".delete-group-btn").attr("disabled", "disabled");
+        $organizationsComponents.find(".delete-group-btn").attr("disabled", "disabled");
       }
     }
 
-    $groupsComponents.find(".delete-group-btn").click(function () {
+    $organizationsComponents.find(".delete-group-btn").click(function () {
       viewModel.chosenGroups.removeAll();
 
-      $groupsComponents.find(".hue-checkbox[checked='checked']").each(function (index) {
+      $organizationsComponents.find(".hue-checkbox[checked='checked']").each(function (index) {
         viewModel.chosenGroups.push($(this).data("name").toString()); // needed for numeric group names
       });
 
-      $groupsComponents.find(".delete-group").modal("show");
+      $organizationsComponents.find(".delete-group").modal("show");
     });
 
-    $groupsComponents.find("a[data-row-selector='true']").jHueRowSelector();
+    $organizationsComponents.find("a[data-row-selector='true']").jHueRowSelector();
   });
 </script>
 
-${layout.commons()}
+${ layout.commons() }
 
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif
+% if not is_embeddable:
+  ${ commonfooter(request, messages) | n,unicode }
+% endif
