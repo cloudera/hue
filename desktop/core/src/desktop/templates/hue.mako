@@ -359,6 +359,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     useradmin_permissions: { url: '/useradmin/permissions', title: '${_('User Admin - Permissions')}' },
     useradmin_editpermission: { url: '/useradmin/permissions/edit/*', title: '${_('User Admin - Edit Permission')}' },
     useradmin_configurations: { url: '/useradmin/configurations', title: '${_('User Admin - Configurations')}' },
+    useradmin_organizations: { url: '/useradmin/organizations', title: '${_('User Admin - Organization')}' },
     useradmin_newuser: { url: '/useradmin/users/new', title: '${_('User Admin - New User')}' },
     useradmin_addldapusers: { url: '/useradmin/users/add_ldap_users', title: '${_('User Admin - Add LDAP User')}' },
     useradmin_edituser: { url: '/useradmin/users/edit/:user', title: '${_('User Admin - Edit User')}' },
