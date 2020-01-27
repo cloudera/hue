@@ -113,7 +113,6 @@ def list_organizations(request):
       'groups': Organization.objects.all(),
       'groups_json': json.dumps(list(Organization.objects.values_list('name', flat=True))),
       'is_embeddable': request.GET.get('is_embeddable', False),
-      'is_ldap_setup': is_ldap_setup()
   })
 
 
