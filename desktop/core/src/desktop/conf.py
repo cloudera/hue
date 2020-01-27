@@ -1907,6 +1907,13 @@ ENABLE_CONNECTORS = Config(
   help=_('Turn on the Connector configuration and usage.')
 )
 
+CUSTOM_DASHBOARD_URL = Config(
+  key='custom_dashboard_url',
+  default='',
+  type=coerce_string,
+  help=_('Custom URL to use for the dashboard application and editor result charting')
+)
+
 CONNECTORS_BLACKLIST = Config(
   key='connectors_blacklist',
   default='',

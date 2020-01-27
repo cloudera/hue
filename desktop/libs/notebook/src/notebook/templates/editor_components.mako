@@ -1841,6 +1841,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </a>
     </div>
 
+    <!-- ko if: window.CUSTOM_DASHBOARD_URL -->
+    <a class="snippet-side-btn" href="javascript: void(0)" data-bind="click: dashboardRedirect.bind($data)" title="${ _('Dashboard') }">
+      <i class="hcha fa-fw hcha-bar-chart"></i>
+    </a>
+    <!-- /ko -->
+    <!-- ko ifnot: window.CUSTOM_DASHBOARD_URL -->
     <div class="dropdown">
       <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="css: {'active': $data.showChart }, click: function() { $data.showChart(true); }" >
         <i class="hcha fa-fw hcha-bar-chart" data-bind="visible: chartType() == window.HUE_CHARTS.TYPES.BARCHART" title="${ _('Bars') }"></i>
@@ -1887,6 +1893,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         </li>
       </ul>
     </div>
+    <!-- /ko -->
 
     <div>
       <a class="snippet-side-btn" href="javascript:void(0)" data-bind="click: function(){ huePubSub.publish('chart.hard.reset'); isResultSettingsVisible(! isResultSettingsVisible()) }, css: { 'blue' : isResultSettingsVisible }" title="${ _('Columns') }">

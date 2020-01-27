@@ -360,6 +360,19 @@ class Sidebar {
 
         ['editor', 'dashboard', 'scheduler', 'sdkapps'].forEach(appName => {
           const config = appConfig[appName];
+          if (window.CUSTOM_DASHBOARD_URL && appName === 'dashboard') {
+            appsItems.push(
+              new SidebarItem({
+                displayName: I18n('Dashboard'),
+                click: () => {
+                  window.open(window.CUSTOM_DASHBOARD_URL, '_blank');
+                },
+                icon: 'dashboard',
+                type: 'dashboard'
+              })
+            );
+            return;
+          }
           if (config && config.interpreters.length) {
             if (config.interpreters.length === 1) {
               appsItems.push(

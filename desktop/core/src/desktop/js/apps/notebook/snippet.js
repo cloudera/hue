@@ -2748,6 +2748,21 @@ class Snippet {
     self.refreshHistory = notebook.fetchHistory;
   }
 
+  dashboardRedirect() {
+    const statement =
+      this.selectedStatement() ||
+      (this.positionStatement() && this.positionStatement().statement) ||
+      this.statement_raw();
+    window.open(
+      window.CUSTOM_DASHBOARD_URL +
+        '?db=' +
+        window.encodeURIComponent(this.database()) +
+        '&query=' +
+        window.encodeURIComponent(statement),
+      '_blank'
+    );
+  }
+
   renderMarkdown() {
     return this.statement_raw().replace(/([^$]*)([$]+[^$]*[$]+)?/g, (a, textRepl, code) => {
       return markdown.toHTML(textRepl).replace(/^<p>|<\/p>$/g, '') + (code ? code : '');
