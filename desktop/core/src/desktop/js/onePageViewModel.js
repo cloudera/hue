@@ -774,6 +774,7 @@ class OnePageViewModel {
       { url: '/sqoop', app: 'sqoop' },
       { url: '/jobsub', app: 'jobsub' },
       { url: '/useradmin/configurations/', app: 'useradmin_configurations' },
+      { url: '/useradmin/organizations/', app: 'useradmin_organizations' },
       { url: '/useradmin/groups/', app: 'useradmin_groups' },
       { url: '/useradmin/groups/new', app: 'useradmin_newgroup' },
       { url: '/useradmin/groups/edit/:group', app: 'useradmin_editgroup' },

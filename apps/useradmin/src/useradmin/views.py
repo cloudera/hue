@@ -52,6 +52,7 @@ from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm, AddLdapU
   validate_last_name, PasswordChangeForm
 from useradmin.ldap_access import LdapBindException, LdapSearchException
 from useradmin.models import HuePermission, UserProfile, LdapGroup, get_profile, get_default_user_group, User, Group
+from useradmin.models2 import Organization
 
 if sys.version_info[0] > 2:
   unicode = str
@@ -104,6 +105,15 @@ def list_permissions(request):
 def list_configurations(request):
   return render("list_configurations.mako", request, {
     'is_embeddable': request.GET.get('is_embeddable', False)
+  })
+
+
+def list_organizations(request):
+  return render("list_organizations.mako", request, {
+      'groups': Organization.objects.all(),
+      'groups_json': json.dumps(list(Organization.objects.values_list('name', flat=True))),
+      'is_embeddable': request.GET.get('is_embeddable', False),
+      'is_ldap_setup': is_ldap_setup()
   })
 
 
