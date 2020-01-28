@@ -39,15 +39,15 @@ sf_caption_position:
 categories:
   - Scheduling
   - Tutorial
-
 ---
+
 <p id="docs-internal-guid-4ab313a2-b4f9-6636-ef5e-6ec66cd3ea40">
   <a href="http://gethue.com"><span>Hue</span></a><span> provides a </span><a href="http://gethue.tumblr.com/tagged/oozie"><span>great Oozie UI</span></a><span> in order to use Oozie without typing any XML. In </span><a href="http://gethue.tumblr.com/post/61597968730/hadoop-tutorials-ii-3-schedule-hive-queries-with"><span>Tutorial 3</span></a><span>, we demonstrate how to use an Oozie coordinator for scheduling a daily top 10 of restaurants. Now lets imagine that we also want to compute a top 10 and 100. How can we do this? One solution is to use Oozie bundles.</span>
 </p>
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/76519513?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: Bundle Oozie coordinators with Hue" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube cVS10q9s478 >}}
 
 &nbsp;
 
@@ -57,7 +57,7 @@ categories:
 
 &nbsp;
 
-<span>The first step is to replace 10 by a variable ${n} in our Hive </span>[<span>script</span>][1]<span>:</span>
+<span>The first step is to replace 10 by a variable \${n} in our Hive </span>[<span>script</span>][1]<span>:</span>
 
 <pre class="code">CREATE TABLE top_cool AS
 SELECT r.business_id, name, SUM(cool) AS coolness, '${date}' as `date`
@@ -69,7 +69,7 @@ GROUP BY r.business_id, name
 ORDER BY coolness DESC
 LIMIT ${n}</pre>
 
-<span>Then, in the workflow, we add a parameter in the Hive action: </span><span>n=${n}</span><span>. You can test the workflow by submitting it and providing 10 for the value n.</span>
+<span>Then, in the workflow, we add a parameter in the Hive action: </span><span>n=\${n}</span><span>. You can test the workflow by submitting it and providing 10 for the value n.</span>
 
 &nbsp;
 
@@ -103,9 +103,9 @@ LIMIT ${n}</pre>
 
 <span>Next, we will see how to browse our Yelp data in HBase! As usual feel free to comment on the </span>[<span>hue-user</span>][5] <span>list or </span>[<span>@gethue</span>][6]<span>!</span>
 
- [1]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hive-workflow/select_top_n.sql
- [2]: http://gethue.tumblr.com/post/60937985689/hadoop-tutorials-ii-2-execute-hive-queries-and
- [3]: http://blog.cloudera.com/blog/2013/09/how-to-write-an-el-function-in-apache-oozie/
- [4]: https://issues.cloudera.org/browse/HUE-1546
- [5]: http://groups.google.com/a/cloudera.org/group/hue-user
- [6]: https://twitter.com/gethue
+[1]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hive-workflow/select_top_n.sql
+[2]: http://gethue.tumblr.com/post/60937985689/hadoop-tutorials-ii-2-execute-hive-queries-and
+[3]: http://blog.cloudera.com/blog/2013/09/how-to-write-an-el-function-in-apache-oozie/
+[4]: https://issues.cloudera.org/browse/HUE-1546
+[5]: http://groups.google.com/a/cloudera.org/group/hue-user
+[6]: https://twitter.com/gethue

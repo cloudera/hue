@@ -40,13 +40,13 @@ slide_template:
   - default
 categories:
   - Querying
-
 ---
+
 [In Thailand][1], a brand new application that enables viewing data in MySQL, PostgreSQL, Oracle and Sqlite has been committed.
 
 Inspired from the Beeswax application, it allows you to query a relational database and view it in a table.
 
-<iframe src="https://player.vimeo.com/video/79020016?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial - Hue - The new DB Query app" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube 2-Vh8ITDLvc >}}
 
 Example of configuration in hue.ini:
 
@@ -132,5 +132,5 @@ password=root
 
 &nbsp;
 
- [1]: http://gethue.tumblr.com/post/66661140648/hue-team-retreat-thailand
- [2]: http://www.cloudera.com/content/cloudera/en/documentation/core/latest/topics/cdh_ig_hue_database.html
+[1]: http://gethue.tumblr.com/post/66661140648/hue-team-retreat-thailand
+[2]: http://www.cloudera.com/content/cloudera/en/documentation/core/latest/topics/cdh_ig_hue_database.html

@@ -40,15 +40,15 @@ slide_template:
   - default
 categories:
   - Browsing
-
 ---
+
 <p id="docs-internal-guid-15de28ba-8cb7-247f-caf6-d0f1c5b75f25">
   <span>Hue now defaults to using </span><a href="https://hadoop.apache.org/docs/current2/hadoop-yarn/hadoop-yarn-site/YARN.html"><span>Yarn</span></a><span> since </span><a href="http://gethue.tumblr.com/post/69115755563/hue-3-5-and-its-redesign-are-out"><span>version 3</span></a><span>.</span>
 </p>
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/84027054?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: Using Yarn and Job Browser with Hue" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube BiyUyys85eI >}}
 
 First, it is a bit simpler to configure Hue with MR2 than in MR1 as Hue does not need to use the [Job Tracker plugin][1] since Yarn provides a REST API. Yarn is also going to provide an equivalent of <a href="http://gethue.tumblr.com/post/71637613809/jobtracker-high-availability-ha-in-mr1" target="_blank" rel="noopener noreferrer">Job Tracker HA</a> with [<span>YARN-149</span>][2].
 
@@ -110,8 +110,8 @@ submit_to=False
 
 <span>As usual feel free to comment on the</span>[<span>hue-user</span>][4] <span>list or</span>[<span>@gethue</span>][5]<span>!</span>
 
- [1]: http://cloudera.github.io/hue/docs-3.5.0/manual.html#_configure_mapreduce_0_20_mr1
- [2]: https://issues.apache.org/jira/browse/YARN-149
- [3]: https://github.com/cloudera/hue/blob/master/desktop/conf/pseudo-distributed.ini.tmpl#L433
- [4]: http://groups.google.com/a/cloudera.org/group/hue-user
- [5]: https://twitter.com/gethue
+[1]: http://cloudera.github.io/hue/docs-3.5.0/manual.html#_configure_mapreduce_0_20_mr1
+[2]: https://issues.apache.org/jira/browse/YARN-149
+[3]: https://github.com/cloudera/hue/blob/master/desktop/conf/pseudo-distributed.ini.tmpl#L433
+[4]: http://groups.google.com/a/cloudera.org/group/hue-user
+[5]: https://twitter.com/gethue

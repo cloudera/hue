@@ -36,8 +36,8 @@ slide_template:
   - default
 categories:
   - Administration
-
 ---
+
 <p dir="ltr">
   <em>Last update <span style="color: #ff0000;">February 2nd 2017</span></em>
 </p>
@@ -54,7 +54,7 @@ categories:
   Here is a video demoing how easy it is to boot your own cluster and start crunching data!
 </p>
 
-<iframe src="https://player.vimeo.com/video/91805055?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: how to create a real Hadoop cluster in a few minutes" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube MJYeiPt3r_0 >}}
 
 <h1 dir="ltr">
   Machine setup
@@ -199,6 +199,7 @@ categories:
         </p>
       </td>
     </tr>
+
   </table>
 </div>
 

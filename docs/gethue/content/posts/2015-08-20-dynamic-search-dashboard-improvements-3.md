@@ -36,15 +36,15 @@ sf_remove_promo_bar:
   - 1
 categories:
   - Querying
-
 ---
+
 [Apache Solr][1] is getting easier to use! This new version of the Search app provides a general improved dashboard experience by refreshing only the widgets that changed and integrating better with live indexing. A series of additional new functionalities are detailed below.
 
 See it all in action in the video demo and the [Bike Data analysis with Analytics Facets widgets][2] and [Real time indexing of Tweet with Spark Streaming][3] posts!
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/136827692?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: dynamic Search Dashboard improvements in Hue 3.9!" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube P4uhBLDKbZ0 >}}
 
 &nbsp;
 
@@ -144,14 +144,14 @@ A more comprehensive demo is available on the [BikeShare data visualization][2] 
 
 So it is time to create more [dashboards][9]! Feel free to send feedback on the [hue-user][10] list or [@gethue][11]!
 
- [1]: http://lucene.apache.org/solr/
- [2]: https://gethue.com/bay-area-bikeshare-data-analysis-with-search-and-spark-notebook/
- [3]: https://gethue.com/build-a-real-time-analytic-dashboard-with-solr-search-and-spark-streaming/
- [4]: https://cdn.gethue.com/uploads/2015/08/search-marker-map.png
- [5]: https://gethue.com/hbase-browsing-with-doas-impersonation-and-kerberos/
- [6]: https://gethue.com/category/metastore/
- [7]: https://gethue.com/exporting-and-importing-oozie-workflows/
- [8]: http://yonik.com/solr-subfacets/
- [9]: http://demo.gethue.com/search/new_search
- [10]: http://groups.google.com/a/cloudera.org/group/hue-user
- [11]: https://twitter.com/gethue
+[1]: http://lucene.apache.org/solr/
+[2]: https://gethue.com/bay-area-bikeshare-data-analysis-with-search-and-spark-notebook/
+[3]: https://gethue.com/build-a-real-time-analytic-dashboard-with-solr-search-and-spark-streaming/
+[4]: https://cdn.gethue.com/uploads/2015/08/search-marker-map.png
+[5]: https://gethue.com/hbase-browsing-with-doas-impersonation-and-kerberos/
+[6]: https://gethue.com/category/metastore/
+[7]: https://gethue.com/exporting-and-importing-oozie-workflows/
+[8]: http://yonik.com/solr-subfacets/
+[9]: http://demo.gethue.com/search/new_search
+[10]: http://groups.google.com/a/cloudera.org/group/hue-user
+[11]: https://twitter.com/gethue

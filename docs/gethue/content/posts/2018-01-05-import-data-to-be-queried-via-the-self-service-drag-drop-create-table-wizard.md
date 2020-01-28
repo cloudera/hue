@@ -40,20 +40,20 @@ categories:
   - Browsing
   - Querying
   - Version 4
-
 ---
+
 ## Create table wizard
 
 If you’ve ever struggled with creating new SQL tables from files, you’ll be happy to learn that this is now much easier. With the latest Hue release, you can now create these in an ad hoc way and thereby expedite self-service analytics. The wizard has been revamped to two simple steps and also offers more formats. Now users just need to:
 
-  1. Select a file
-  2. Select the type of table
+1. Select a file
+2. Select the type of table
 
 And that’s it! Files can be dragged & dropped, selected from HDFS or [S3][1] (if configured), and their formats are automatically detected. The wizard also assists when performing advanced functionalities like table partitioning, Kudu tables, and nested types.
 
 To learn more, watch this video:
 
-<iframe src="https://player.vimeo.com/video/215834374?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial - Create a table in Hue" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube RxT0M8JgvOk >}}
 
 &nbsp;
 
@@ -61,7 +61,7 @@ We hope that the new version of Hue makes self-service analytics easier and fast
 
 You can find these improvements on the latest Hue or [demo.gethue.com][4]!
 
- [1]: https://gethue.com/introducing-s3-support-in-hue/
- [2]: http://groups.google.com/a/cloudera.org/group/hue-user
- [3]: https://twitter.com/gethue
- [4]: http://demo.gethue.com
+[1]: https://gethue.com/introducing-s3-support-in-hue/
+[2]: http://groups.google.com/a/cloudera.org/group/hue-user
+[3]: https://twitter.com/gethue
+[4]: http://demo.gethue.com

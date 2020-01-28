@@ -40,15 +40,15 @@ slide_template:
   - default
 categories:
   - Development
-
 ---
+
 <p id="docs-internal-guid-711cc362-37b7-d05c-55d3-ea64d369838b">
   Completed in <a href="http://gethue.tumblr.com/post/66661140648/hue-team-retreat-thailand">Thailand</a>, <a href="https://issues.cloudera.org/browse/HUE-826">HUE-826</a> brings a new way to integrate external Web application into Hue. Java apps or already existing websites can now be shown as a Hue app with little effort.
 </p>
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/79178858?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial - Hue - The new proxy app" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube Y1FT7yAJc7s >}}
 
 &nbsp;
 
@@ -66,5 +66,5 @@ url=http://gethue.com</pre>
 
 <span>As usual feel free to comment on the </span>[<span>hue-user</span>][1] <span>list or </span>[<span>@gethue</span>][2]<span>!</span>
 
- [1]: http://groups.google.com/a/cloudera.org/group/hue-user
- [2]: https://twitter.com/gethue
+[1]: http://groups.google.com/a/cloudera.org/group/hue-user
+[2]: https://twitter.com/gethue

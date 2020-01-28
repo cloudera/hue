@@ -39,13 +39,13 @@ ampforwp-amp-on-off:
 categories:
   - Querying
   - Version 4
-
 ---
+
 [Dashboards][1] are an easy way to quickly explore a new dataset without typing any SQL. It usually complements the analyses before or after the querying activity in the [SQL Editor][2]. In this scenario we are using [Apache Solr][3] as the analytic database backend.
 
 Goal: we are picking a [Wine dataset][4] from the Machine Learning Competition website Kaggle and want to get a feeling of the industry and select some good wines similar to one of our best ranked favorite Pink / "Rosé" wine. Let's continue in the video demo:
 
-<iframe src="https://player.vimeo.com/video/251314005?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hue - Intuitively discovering and exploring a Wine dataset with the Dynamic Dashboards" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube 9iVkVML5vYI >}}
 
 [<img class="wp-image-5185 aligncenter" src="https://cdn.gethue.com/uploads/2018/01/wine-dashboard.png"/>][5]
 
@@ -81,11 +81,11 @@ There are no terms to be shown
 
 A deeper presentation of Solr's Analytic Facet is coming as well as how we could have [Geo-IPed][8] our wine list and visualize it via maps. A revamp of the layout to make the Dashboards even more intuitive and how the SQL Editor and Dashboards are getting tied together will also be on the menu. We wish you some Happy Explorations!
 
- [1]: https://gethue.com/search-dashboards/
- [2]: https://gethue.com/sql-editor/
- [3]: http://lucene.apache.org/solr/
- [4]: https://www.kaggle.com/zynicide/wine-reviews
- [5]: https://cdn.gethue.com/uploads/2018/01/wine-dashboard.png
- [6]: https://gethue.com/the-hue-4-user-interface-in-detail/
- [7]: https://lucene.apache.org/solr/guide/6_6/the-terms-component.html
- [8]: https://gethue.com/easy-indexing-of-data-into-solr/
+[1]: https://gethue.com/search-dashboards/
+[2]: https://gethue.com/sql-editor/
+[3]: http://lucene.apache.org/solr/
+[4]: https://www.kaggle.com/zynicide/wine-reviews
+[5]: https://cdn.gethue.com/uploads/2018/01/wine-dashboard.png
+[6]: https://gethue.com/the-hue-4-user-interface-in-detail/
+[7]: https://lucene.apache.org/solr/guide/6_6/the-terms-component.html
+[8]: https://gethue.com/easy-indexing-of-data-into-solr/

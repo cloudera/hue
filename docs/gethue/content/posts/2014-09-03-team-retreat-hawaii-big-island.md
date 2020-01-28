@@ -38,8 +38,8 @@ slide_template:
   - default
 categories:
   - News
-
 ---
+
 Mahalo!
 
 &nbsp;
@@ -52,7 +52,7 @@ After a lot of work on the last Hue and its [Search App][1], and more to come fo
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/105134010?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="The Hue Team Retreat - Hawai'i 2014" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube 4OzBmGFlaVA >}}
 
 &nbsp;
 
@@ -104,18 +104,18 @@ Volcano land
 
 &nbsp;
 
- [1]: https://gethue.com/hadoop-search-dynamic-search-dashboards-with-solr
- [2]: https://twitter.com/gethue
- [3]: https://cdn.gethue.com/uploads/2014/09/P1040156.jpg
- [4]: https://cdn.gethue.com/uploads/2014/09/P1040287.jpg
- [5]: https://cdn.gethue.com/uploads/2014/09/P1040291.jpg
- [6]: https://cdn.gethue.com/uploads/2014/09/2014-08-25-17.48.49.jpg
- [7]: https://cdn.gethue.com/uploads/2014/09/2014-08-26-14.09.02.jpg
- [8]: https://cdn.gethue.com/uploads/2014/09/2014-08-24-15.05.07-HDR.jpg
- [9]: https://cdn.gethue.com/uploads/2014/09/2014-08-24-15.14.00-HDR.jpg
- [10]: https://cdn.gethue.com/uploads/2014/09/P1040361.jpg
- [11]: https://cdn.gethue.com/uploads/2014/09/P1040366.jpg
- [12]: https://cdn.gethue.com/uploads/2014/09/a28480476806d3936ac95bb8c585613e.jpg
- [13]: https://cdn.gethue.com/uploads/2014/09/2014-08-24-12.13.25-HDR.jpg
- [14]: https://cdn.gethue.com/uploads/2014/09/2014-08-24-13.14.26-HDR.jpg
- [15]: https://cdn.gethue.com/uploads/2014/09/2014-08-24-14.05.23-HDR.jpg
+[1]: https://gethue.com/hadoop-search-dynamic-search-dashboards-with-solr
+[2]: https://twitter.com/gethue
+[3]: https://cdn.gethue.com/uploads/2014/09/P1040156.jpg
+[4]: https://cdn.gethue.com/uploads/2014/09/P1040287.jpg
+[5]: https://cdn.gethue.com/uploads/2014/09/P1040291.jpg
+[6]: https://cdn.gethue.com/uploads/2014/09/2014-08-25-17.48.49.jpg
+[7]: https://cdn.gethue.com/uploads/2014/09/2014-08-26-14.09.02.jpg
+[8]: https://cdn.gethue.com/uploads/2014/09/2014-08-24-15.05.07-HDR.jpg
+[9]: https://cdn.gethue.com/uploads/2014/09/2014-08-24-15.14.00-HDR.jpg
+[10]: https://cdn.gethue.com/uploads/2014/09/P1040361.jpg
+[11]: https://cdn.gethue.com/uploads/2014/09/P1040366.jpg
+[12]: https://cdn.gethue.com/uploads/2014/09/a28480476806d3936ac95bb8c585613e.jpg
+[13]: https://cdn.gethue.com/uploads/2014/09/2014-08-24-12.13.25-HDR.jpg
+[14]: https://cdn.gethue.com/uploads/2014/09/2014-08-24-13.14.26-HDR.jpg
+[15]: https://cdn.gethue.com/uploads/2014/09/2014-08-24-14.05.23-HDR.jpg

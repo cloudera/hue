@@ -37,15 +37,15 @@ sf_thumbnail_link_type:
 categories:
   - Querying
   - Browsing
-
 ---
+
 We've recently made some nice improvements to the autocomplete and assist panel that should really boost the experience when working with the [notebooks][1] or editing SQL queries in the Hive and Impala query [editors][2].
 
 One of the major improvements is support for complex types; structs, maps and arrays, both in the assist and autocomplete. See more of the improvements below or take a look at the following video demo.
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/144737171?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: Even more assist and autocomplete updates!" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube PciZhDY-W5A >}}
 
 A longer more detailed version is available [here][3].
 
@@ -103,14 +103,14 @@ We'll keep improving the assist and autocomplete experience (support for HBase, 
 
 Feel free to send feedback on the [hue-user][10] list or [@gethue][11]!
 
- [1]: https://gethue.com/bay-area-bike-share-data-analysis-with-spark-notebook-part-2/
- [2]: https://gethue.com/hadoop-tutorial-new-impala-and-hive-editors/
- [3]: https://vimeo.com/141070318/
- [4]: https://cdn.gethue.com/uploads/2015/11/Assist_complex.png
- [5]: https://cdn.gethue.com/uploads/2015/11/Autocomplete_join_alias.png
- [6]: https://cdn.gethue.com/uploads/2015/11/Autocomplete_nested_struct.png
- [7]: https://cdn.gethue.com/uploads/2015/11/Autocomplete_exploded.png
- [8]: https://cdn.gethue.com/uploads/2015/11/Autocomplete_sample_values.png
- [9]: https://cdn.gethue.com/uploads/2015/11/Autocomplete_hdfs.png
- [10]: http://groups.google.com/a/cloudera.org/group/hue-user
- [11]: https://twitter.com/gethue
+[1]: https://gethue.com/bay-area-bike-share-data-analysis-with-spark-notebook-part-2/
+[2]: https://gethue.com/hadoop-tutorial-new-impala-and-hive-editors/
+[3]: https://youtube.com/watch?v=XakL87LU0pQ
+[4]: https://cdn.gethue.com/uploads/2015/11/Assist_complex.png
+[5]: https://cdn.gethue.com/uploads/2015/11/Autocomplete_join_alias.png
+[6]: https://cdn.gethue.com/uploads/2015/11/Autocomplete_nested_struct.png
+[7]: https://cdn.gethue.com/uploads/2015/11/Autocomplete_exploded.png
+[8]: https://cdn.gethue.com/uploads/2015/11/Autocomplete_sample_values.png
+[9]: https://cdn.gethue.com/uploads/2015/11/Autocomplete_hdfs.png
+[10]: http://groups.google.com/a/cloudera.org/group/hue-user
+[11]: https://twitter.com/gethue

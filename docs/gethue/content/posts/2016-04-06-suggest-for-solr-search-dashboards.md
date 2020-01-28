@@ -38,15 +38,15 @@ sf_remove_promo_bar:
   - 1
 categories:
   - Querying
-
 ---
+
 Hey Search users,
 
 The upcoming Hue version supports [Solr Suggester][1] and makes your data easier to search! Suggester assists the user by proposing an auto-completable list of queries:
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/161792073?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop mini tutorial - Suggest for Solr Search Dashboards" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube RupOQCy5DdA >}}
 
 &nbsp;
 
@@ -110,7 +110,7 @@ and see the help in the query box:
 
 <img src="https://cdn.gethue.com/uploads/2016/04/search-suggest.png" />
 
- [1]: https://cwiki.apache.org/confluence/display/solr/Suggester
- [2]: http://groups.google.com/a/cloudera.org/group/hue-user
- [3]: https://twitter.com/gethue
- [4]: http://yonik.com/download/
+[1]: https://cwiki.apache.org/confluence/display/solr/Suggester
+[2]: http://groups.google.com/a/cloudera.org/group/hue-user
+[3]: https://twitter.com/gethue
+[4]: http://yonik.com/download/

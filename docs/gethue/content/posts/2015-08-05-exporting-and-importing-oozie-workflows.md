@@ -36,15 +36,15 @@ sf_remove_promo_bar:
   - 1
 categories:
   - Scheduling
-
 ---
+
 Until now Hue did not have a good way to backup or transfer workflows between servers. A [command][1] was added in [Hue 3.8][2] but its usage was still advanced.
 
 In Hue 3.9, the command is directly integrated in the UI.
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/135470163?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: import and export Oozie Workflows" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube JpLMLzUmzaE >}}
 
 [<img src="https://cdn.gethue.com/uploads/2015/08/import-export-documents-1024x569.png" />][3]
 
@@ -56,9 +56,9 @@ Future improvements will make it easier to change the owner of the workflows wit
 
 So it is time to build even more [workflows][4]! Feel free to comment on the [hue-user][5] list or [@gethue][6]!
 
- [1]: https://gethue.com/export-and-import-your-oozie-workflows/
- [2]: https://gethue.com/hue-3-8-with-an-oozie-editor-revamp-better-performances-improved-spark-ui-is-out/
- [3]: https://cdn.gethue.com/uploads/2015/08/import-export-documents.png
- [4]: https://gethue.com/new-apache-oozie-workflow-coordinator-bundle-editors/
- [5]: http://groups.google.com/a/cloudera.org/group/hue-user
- [6]: https://twitter.com/gethue
+[1]: https://gethue.com/export-and-import-your-oozie-workflows/
+[2]: https://gethue.com/hue-3-8-with-an-oozie-editor-revamp-better-performances-improved-spark-ui-is-out/
+[3]: https://cdn.gethue.com/uploads/2015/08/import-export-documents.png
+[4]: https://gethue.com/new-apache-oozie-workflow-coordinator-bundle-editors/
+[5]: http://groups.google.com/a/cloudera.org/group/hue-user
+[6]: https://twitter.com/gethue

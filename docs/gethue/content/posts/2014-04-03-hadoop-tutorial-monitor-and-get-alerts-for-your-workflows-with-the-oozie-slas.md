@@ -36,13 +36,13 @@ slide_template:
   - default
 categories:
   - Scheduling
-
 ---
+
 <p id="docs-internal-guid-99e4a41b-294c-1afb-46e2-ab6223f97bad" dir="ltr">
   Hue now makes <a href="http://oozie.apache.org/docs/4.0.0/DG_SLAMonitoring.html">Oozie SLAs</a> easy to use! With SLAs, you can automatically be alerted when some workflows are not done within a certain window of time. Oozie SLAs have been improved a lot in Oozie 4, hence this new feature requires Oozie 4.x.
 </p>
 
-<iframe src="https://player.vimeo.com/video/90898437?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: Oozie SLA - monitor and get alerts for your workflows" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube 3QBGF1tTEgQ >}}
 
 SLAs can be setup in the Editor in the advanced tabs of:
 

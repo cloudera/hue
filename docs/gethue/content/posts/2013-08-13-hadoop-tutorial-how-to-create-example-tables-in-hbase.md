@@ -42,8 +42,8 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Browsing
-
 ---
+
 <p id="docs-internal-guid-7c74e5e3-7999-5a0b-77ef-ac77803cb105">
   <a href="http://gethue.tumblr.com/post/55581863077/hue-2-5-and-its-hbase-app-is-out">Hue</a> brings another new app for making Apache Hadoop easier to use: HBase Browser. <a href="http://hbase.apache.org/">Apache HBase</a> is the main keyvalue datastore for Hadoop. This post is the first episode describing the new user experience brought by the app. We will start by describing how to create some sample tables with various HBase schemas.
 </p>
@@ -56,7 +56,7 @@ To help getting started with HBase, Hue now comes directly with theses examples!
 
 If you want to see the HBase Browser demo, jump [episode 2][2]!
 
-<iframe src="https://player.vimeo.com/video/72200782?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: how to create example tables in HBase" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube eGcj-o90rvI >}}
 
 # Tutorial
 
@@ -92,10 +92,10 @@ Schema of the table
 
 How to create the HBase table and insert some data:
 
-  1. Generate column names and data with [create_schemas.py][10]. Run it with ./create_schemas.py
-  2. Upload the date data /tmp/hbase-analytics.tsv to HDFS with File Browser
-  3. In HBase Browser create a ‘analytics’ table with 3 column families ‘hour’, ‘day’, ‘total’
-  4. Load the data into the analytics table with the [HBase bulk import command][11].
+1. Generate column names and data with [create_schemas.py][10]. Run it with ./create_schemas.py
+2. Upload the date data /tmp/hbase-analytics.tsv to HDFS with File Browser
+3. In HBase Browser create a ‘analytics’ table with 3 column families ‘hour’, ‘day’, ‘total’
+4. Load the data into the analytics table with the [HBase bulk import command][11].
 
 It will trigger a MapReduce job and display the [progress][12] of the import.
 
@@ -107,10 +107,10 @@ This second tables focus on big data cells, various formats, demonstrating the p
 
 We are re-using the app API for inserting into HBase some cells of various content types, e.g. text, json, pictures, binary…
 
-  1. First create a table ‘events’ with a column family ‘doc’.
-  2. Then cd in the root of Hue
-  3. cd /usr/share/hue
-  4. /opt/cloudera/parcels/CDH-4.X/share/hue (if using parcels)
+1. First create a table ‘events’ with a column family ‘doc’.
+2. Then cd in the root of Hue
+3. cd /usr/share/hue
+4. /opt/cloudera/parcels/CDH-4.X/share/hue (if using parcels)
 
 And start the Hue shell build/env/bin/hue shell and type the content of [locad_binary.py:][14]
 
@@ -139,18 +139,18 @@ These two schemas and data enable the user to easily get started with HBase. Thi
 
 The new HBase Browser app will be demo-ed on these two tables in the upcoming blog posts, so stay tuned!
 
- [1]: http://127.0.0.1:8888/about/
- [2]: https://gethue.com/the-web-ui-for-hbase-hbase-browser/
- [3]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/cdh4ig_topic_20_2.html
- [4]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/cdh4ig_topic_20_5.html#topic_20_5_4_unique_1
- [5]: https://cdn.gethue.com/downloads/releases/hbase/hue-hbase-2.5.0.tgz
- [6]: http://nightly.cloudera.com/cdh4/
- [7]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L505
- [8]: https://github.com/romainr/hadoop-tutorials-examples/tree/master/hbase-tables
- [9]: http://git-scm.com/
- [10]: https://raw.github.com/romainr/hadoop-tutorials-examples/master/hbase-tables/create_schemas.py
- [11]: https://raw.github.com/romainr/hadoop-tutorials-examples/master/hbase-tables/load_data.sh
- [12]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hbase-tables/load_data.log
- [13]: http://127.0.0.1:8888/hbase/#Cluster/analytics
- [14]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hbase-tables/load_binary.py
- [15]: http://127.0.0.1:8888/hbase/#Cluster/events
+[1]: http://127.0.0.1:8888/about/
+[2]: https://gethue.com/the-web-ui-for-hbase-hbase-browser/
+[3]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/cdh4ig_topic_20_2.html
+[4]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/cdh4ig_topic_20_5.html#topic_20_5_4_unique_1
+[5]: https://cdn.gethue.com/downloads/releases/hbase/hue-hbase-2.5.0.tgz
+[6]: http://nightly.cloudera.com/cdh4/
+[7]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L505
+[8]: https://github.com/romainr/hadoop-tutorials-examples/tree/master/hbase-tables
+[9]: http://git-scm.com/
+[10]: https://raw.github.com/romainr/hadoop-tutorials-examples/master/hbase-tables/create_schemas.py
+[11]: https://raw.github.com/romainr/hadoop-tutorials-examples/master/hbase-tables/load_data.sh
+[12]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hbase-tables/load_data.log
+[13]: http://127.0.0.1:8888/hbase/#Cluster/analytics
+[14]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hbase-tables/load_binary.py
+[15]: http://127.0.0.1:8888/hbase/#Cluster/events

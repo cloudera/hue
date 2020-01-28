@@ -40,20 +40,20 @@ slide_template:
   - default
 categories:
   - Querying
-
 ---
+
 In the previous installment of the demo series about [Hue][1] — the open source Web UI that makes [Apache Hadoop][2] easier to use — you learned how to [analyze data with Hue using Apache Hive via Hue’s Beeswax and Catalog applications][3]. In this installment, we’ll focus on using the new editor for [Apache Pig][4] in [Hue 2.3][5].
 
-{{< vimeo 66661052 >}}
+{{< youtube BVY07kj8nU4 >}}
 
 Complementing the editors for Hive and Cloudera Impala, the Pig editor provides a great starting point for exploration and real-time interaction with Hadoop. This new application lets you edit and run Pig scripts interactively in an editor tailored for a great user experience. Features include:
 
-  * UDFs and parameters (with default value) support
-  * Autocompletion of Pig keywords, aliases, and HDFS paths
-  * Syntax highlighting
-  * One-click script submission
-  * Progress, result, and logs display
-  * Interactive single-page application
+- UDFs and parameters (with default value) support
+- Autocompletion of Pig keywords, aliases, and HDFS paths
+- Syntax highlighting
+- One-click script submission
+- Progress, result, and logs display
+- Interactive single-page application
 
 Here’s a short video demoing its capabilities and ease of use:
 
@@ -87,13 +87,13 @@ DUMP top_25;</pre>
 
 New features like support for [Python UDF][8]s and better integration with Apache Oozie and [File Browser][9] are on the way. As usual, we welcome all [feedback][10]!
 
- [1]: http://cloudera.github.com/hue/
- [2]: http://hadoop.apache.org/
- [3]: http://blog.cloudera.com/blog/2013/04/demo-analyzing-data-with-hue-and-hive/
- [4]: http://pig.apache.org/
- [5]: http://cloudera.github.io/hue/docs-2.3.0/release-notes/release-notes-2.3.0.html
- [6]: https://github.com/romainr/yelp-data-analysis#yelp-data-analysis-with-hue
- [7]: http://blog.cloudera.com/2013/04/demo-analyzing-data-with-hue-and-hive/
- [8]: https://issues.cloudera.org/browse/HUE-1136
- [9]: http://blog.cloudera.com/2013/04/demo-hdfs-file-operations-made-easy-with-hue/
- [10]: http://groups.google.com/a/cloudera.org/group/hue-user
+[1]: http://cloudera.github.com/hue/
+[2]: http://hadoop.apache.org/
+[3]: http://blog.cloudera.com/blog/2013/04/demo-analyzing-data-with-hue-and-hive/
+[4]: http://pig.apache.org/
+[5]: http://cloudera.github.io/hue/docs-2.3.0/release-notes/release-notes-2.3.0.html
+[6]: https://github.com/romainr/yelp-data-analysis#yelp-data-analysis-with-hue
+[7]: http://blog.cloudera.com/2013/04/demo-analyzing-data-with-hue-and-hive/
+[8]: https://issues.cloudera.org/browse/HUE-1136
+[9]: http://blog.cloudera.com/2013/04/demo-hdfs-file-operations-made-easy-with-hue/
+[10]: http://groups.google.com/a/cloudera.org/group/hue-user

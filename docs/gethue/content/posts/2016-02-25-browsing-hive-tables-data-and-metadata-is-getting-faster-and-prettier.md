@@ -37,13 +37,13 @@ sf_left_sidebar:
 categories:
   - Browsing
   - Querying
-
 ---
+
 Hue continues to boost the experience of SQL users with its improved autocompletes, smarter assist panel, [SQL notebooks][1]... and now a revamped Hive Metastore Browser.
 
 The app is now single page and offers speed and more accessible statistics and data preview. See more of the improvements below or take a look at the following video demo.
 
-<iframe src="https://player.vimeo.com/video/157369642?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop tutorial - The new Metastore Manager" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube MykO9McaxCk >}}
 
 ### New UI
 
@@ -132,8 +132,8 @@ The Hue team hopes that these new features will make your SQL data search and di
 
 Feel free to send feedback on the [hue-user][4] list or [@gethue][5]!
 
- [1]: https://gethue.com/bay-area-bike-share-data-analysis-with-spark-notebook-part-2/
- [2]: https://issues.apache.org/jira/browse/HIVE-7575
- [3]: https://gethue.com/filter-sort-browse-hive-partitions-with-hues-metastore/
- [4]: http://groups.google.com/a/cloudera.org/group/hue-user
- [5]: https://twitter.com/gethue
+[1]: https://gethue.com/bay-area-bike-share-data-analysis-with-spark-notebook-part-2/
+[2]: https://issues.apache.org/jira/browse/HIVE-7575
+[3]: https://gethue.com/filter-sort-browse-hive-partitions-with-hues-metastore/
+[4]: http://groups.google.com/a/cloudera.org/group/hue-user
+[5]: https://twitter.com/gethue

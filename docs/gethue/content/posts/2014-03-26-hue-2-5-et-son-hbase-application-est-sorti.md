@@ -39,9 +39,8 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-
-
 ---
+
 ### <span>Salut les devoreurs de p&eacute;taoctets!</span> {.subhead}
 
 <span id="docs-internal-guid-0768643e-1223-5a03-20cc-6cb512e36ff6">L'&eacute;quipe de Hue est heureuse de vous apporter Hue 2.5, disponible en&nbsp;</span>[archive][1]{.trackLink}&nbsp;ou comme un paquet avec&nbsp;[CDH nighlty][2].
@@ -52,21 +51,21 @@ Hue 2.5 apporte une nouvelle application pour HBase et plus de 80 modifications.
   Voici un r&eacute;sum&eacute; vid&eacute;o (en anglais) des nouvelles fonctionnalit&eacute;s:
 </p>
 
-{{< vimeo 70955652 >}}
+{{< youtube WwoZUHMrPL4 >}}
 
 Corrections importantes:
 
-  *   * [HUE-1135][3]&nbsp;[pig] Options support
+- - [HUE-1135][3]&nbsp;[pig] Options support
 
-      * [HUE-1115][4]&nbsp;[impala] Support multi db
+  - [HUE-1115][4]&nbsp;[impala] Support multi db
 
-      * [HUE-641][5]&nbsp;[jb] Auto-refresh the Job Browser views
+  - [HUE-641][5]&nbsp;[jb] Auto-refresh the Job Browser views
 
-      * [HUE-1150][6]&nbsp;[pig] Links to inputs/outputs/MR jobs
+  - [HUE-1150][6]&nbsp;[pig] Links to inputs/outputs/MR jobs
 
-      * [HUE-1256][7]&nbsp;[core] Cache the HA jt
+  - [HUE-1256][7]&nbsp;[core] Cache the HA jt
 
-      * [HUE-1321][8]&nbsp;[oozie] Improved import workflow
+  - [HUE-1321][8]&nbsp;[oozie] Improved import workflow
 
 Veuillez voir les&nbsp;[notes de version][9]&nbsp;pour plus d'informations.
 
@@ -78,14 +77,14 @@ Le site github a &eacute;galement &eacute;t&eacute; mis &agrave; jour avec des s
 
 L'&eacute;quipe de Hue</p>
 
- [1]: https://cdn.gethue.com/downloads/releases/2.5.0/hue-2.5.0.tgz
- [2]: http://nightly.cloudera.com/cdh4/
- [3]: https://issues.cloudera.org/browse/HUE-1135
- [4]: https://issues.cloudera.org/browse/HUE-1115
- [5]: https://issues.cloudera.org/browse/HUE-641
- [6]: https://issues.cloudera.org/browse/HUE-1150
- [7]: https://issues.cloudera.org/browse/HUE-1256
- [8]: https://issues.cloudera.org/browse/HUE-1321
- [9]: http://cloudera.github.com/hue/docs-2.5.0/release-notes/release-notes-2.5.0.html
- [10]: https://gethue.com/
- [11]: http://groups.google.com/a/cloudera.org/group/hue-user
+[1]: https://cdn.gethue.com/downloads/releases/2.5.0/hue-2.5.0.tgz
+[2]: http://nightly.cloudera.com/cdh4/
+[3]: https://issues.cloudera.org/browse/HUE-1135
+[4]: https://issues.cloudera.org/browse/HUE-1115
+[5]: https://issues.cloudera.org/browse/HUE-641
+[6]: https://issues.cloudera.org/browse/HUE-1150
+[7]: https://issues.cloudera.org/browse/HUE-1256
+[8]: https://issues.cloudera.org/browse/HUE-1321
+[9]: http://cloudera.github.com/hue/docs-2.5.0/release-notes/release-notes-2.5.0.html
+[10]: https://gethue.com/
+[11]: http://groups.google.com/a/cloudera.org/group/hue-user

@@ -36,8 +36,8 @@ categories:
   - Browsing
   - Querying
   - Version 4
-
 ---
+
 <p class="p1">
   We’re happy to present <a href="https://azure.microsoft.com/en-us/services/data-lake-store/">Microsoft Azure Data Lake Store</a> (ADLS) integration in Hue with Hue 4.2 release. Similarly to the <a href="https://gethue.com/introducing-s3-support-in-hue/">S3 integration</a>, Hue can be setup to read and write to a configured ADLS, and users can directly query from and save data to ADLS without any intermediate moving / copying to HDFS.
 </p>
@@ -46,7 +46,7 @@ categories:
   For a detailed video walkthrough of file manipulation using ADLS in Hue, have a look:
 </p>
 
-{{< vimeo 243281351 >}}
+{{< youtube JKm2bv1CvGQ >}}
 
 <p class="p1">
   In case you missed the one for S3, here is the <a href="https://gethue.com/introducing-s3-support-in-hue/">link to the post</a>.

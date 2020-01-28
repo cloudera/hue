@@ -37,22 +37,22 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-
 ---
+
 Hi Hadoop Sheriffs,
 
 In order to support the growth of the [Apache Sentry][1] project and make it easier to secure your cluster, a new app was added into Hue. Sentry privileges determine which [Hive / Impala][2] databases and tables a user can see or modify. The Security App let’s you create/edit/delete Roles and Privileges directly from your browser (there is no sentry-provider.ini file to edit anymore).
 
 Here is a video showing how the app works:
 
-<iframe src="https://player.vimeo.com/video/108265040?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: the new Sentry app in Hue" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube ZwZWA_nBGDs >}}
 
 Main features:
 
-  * Bulk edit roles and privileges
-  * Visualize/edit roles and privileges on a database tree
-  * WITH GRANT OPTION support
-  * Impersonate a user to see which databases and table he can see
+- Bulk edit roles and privileges
+- Visualize/edit roles and privileges on a database tree
+- WITH GRANT OPTION support
+- Impersonate a user to see which databases and table he can see
 
 [<img src="https://cdn.gethue.com/uploads/2014/10/hue-sentry-1024x541.png" />][3]
 
@@ -102,12 +102,12 @@ To be able to edit roles and privileges in Hue, the logged-in Hue user needs to 
 
 **Notes**
 
-  * Create a role in the Sentry app through Hue
-  * Grant privileges to that role such that the role can see the database in the Sentry app
-  * Create a group in Hue with the same name as the role in Sentry
-  * Grant that role to a user in Hue
-  * Ensure that the user in Hue has an equivalent O/S level
-  * Ensure a user has an O/S level account on all hosts and that user is part of a group with the same name as the group in Hue (this assumes that the default ShellBasedUnixGroupsMapping is set for HDFS in CM)
+- Create a role in the Sentry app through Hue
+- Grant privileges to that role such that the role can see the database in the Sentry app
+- Create a group in Hue with the same name as the role in Sentry
+- Grant that role to a user in Hue
+- Ensure that the user in Hue has an equivalent O/S level
+- Ensure a user has an O/S level account on all hosts and that user is part of a group with the same name as the group in Hue (this assumes that the default ShellBasedUnixGroupsMapping is set for HDFS in CM)
 
 &nbsp;
 
@@ -117,9 +117,9 @@ We are using CDH5.2+ with Kerberos MIT and Sentry configured. The app also works
 
 Our users are:
 
-  * hive (admin) belongs to the hive group
-  * user1_1 belongs to the user_group1 group
-  * user2_1 belongs to the user_group2 group
+- hive (admin) belongs to the hive group
+- user1_1 belongs to the user_group1 group
+- user2_1 belongs to the user_group2 group
 
 We [synced the Unix users/groups][9] into Hue with these commands:
 
@@ -227,12 +227,12 @@ In Sentry 1.5, you will need to specify a ‘entry.store.jdbc.password’ proper
 
 </code></pre>
 
- [1]: http://sentry.incubator.apache.org/
- [2]: https://gethue.com/hadoop-tutorial-new-impala-and-hive-editors/
- [3]: https://cdn.gethue.com/uploads/2014/10/hue-sentry.png
- [4]: https://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/
- [5]: https://gethue.com/hadoop-search-dynamic-search-dashboards-with-solr
- [6]: https://gethue.com/the-web-ui-for-hbase-hbase-browser/
- [7]: http://groups.google.com/a/cloudera.org/group/hue-user
- [8]: https://twitter.com/gethue
- [9]: https://gethue.com/hadoop-tutorial-how-to-integrate-unix-users-and-groups/
+[1]: http://sentry.incubator.apache.org/
+[2]: https://gethue.com/hadoop-tutorial-new-impala-and-hive-editors/
+[3]: https://cdn.gethue.com/uploads/2014/10/hue-sentry.png
+[4]: https://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/
+[5]: https://gethue.com/hadoop-search-dynamic-search-dashboards-with-solr
+[6]: https://gethue.com/the-web-ui-for-hbase-hbase-browser/
+[7]: http://groups.google.com/a/cloudera.org/group/hue-user
+[8]: https://twitter.com/gethue
+[9]: https://gethue.com/hadoop-tutorial-how-to-integrate-unix-users-and-groups/

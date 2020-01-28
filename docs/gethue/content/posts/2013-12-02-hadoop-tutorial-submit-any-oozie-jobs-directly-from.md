@@ -41,24 +41,24 @@ slide_template:
 categories:
   - Browsing
   - Scheduling
-
 ---
+
 <p id="docs-internal-guid-274cce61-b3d2-fe2c-661b-0f56659ca38c">
   <span>With </span><a href="https://issues.cloudera.org/browse/HUE-1476"><span>HUE-1476</span></a><span>, users can submit Oozie jobs directly from HDFS. Just upload your configuration or browse an existing workspace and select a workflow, coordinator or bundle. A submit button will appear and let you execute the job in one click!</span>
 </p>
 
-<iframe src="https://player.vimeo.com/video/80749790?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial - Submit any Oozie jobs directly from HDFS in Hue" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube Un99eIrcdmk >}}
 
 <span>File Browser supports:</span>
 
-  * <span>Parameters from workflow.xml, coordinator.xml, bundle.xml</span>
-  * <span>Parameters from job.properties</span>
+- <span>Parameters from workflow.xml, coordinator.xml, bundle.xml</span>
+- <span>Parameters from job.properties</span>
 
 <span>Oozie Dashboard supports:</span>
 
-  * <span>Dynamic progress and log report</span>
-  * <span>One click MapReduce log access</span>
-  * <span>Stop, Pause, Rerun buttons</span>
+- <span>Dynamic progress and log report</span>
+- <span>One click MapReduce log access</span>
+- <span>Stop, Pause, Rerun buttons</span>
 
 &nbsp;
 
@@ -66,5 +66,5 @@ categories:
 
 <span>Of course, the </span>[<span>Oozie Editor</span>][2] <span>is still recommended if you want to avoid any XML 🙂</span>
 
- [1]: https://github.com/romainr/hadoop-tutorials-examples/tree/master/oozie/workflow_demo
- [2]: http://gethue.tumblr.com/post/60937985689/hadoop-tutorials-ii-2-execute-hive-queries-and
+[1]: https://github.com/romainr/hadoop-tutorials-examples/tree/master/oozie/workflow_demo
+[2]: http://gethue.tumblr.com/post/60937985689/hadoop-tutorials-ii-2-execute-hive-queries-and

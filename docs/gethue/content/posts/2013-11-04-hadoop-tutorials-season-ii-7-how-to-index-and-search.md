@@ -39,15 +39,15 @@ sf_caption_position:
 categories:
   - Querying
   - Tutorial
-
 ---
+
 <p id="docs-internal-guid-6e44f291-2156-8489-431b-b515176c9fec">
   <span>In the previous episode we saw how to use </span><a href="http://gethue.tumblr.com/post/64707633719/hadoop-tutorial-use-pig-and-hive-with-hbase"><span>Pig and Hive with HBase</span></a><span>. This time, let’s see how to make our Yelp data searchable by indexing it and building a customizable UI with the </span><a href="http://gethue.tumblr.com/post/52804483421/tutorial-search-hadoop-in-hue"><span>Hue Search app</span></a><span>.</span>
 </p>
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/76878078?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: How to index and search data with Solr" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube ATldKiiJdqY >}}
 
 &nbsp;
 
@@ -57,9 +57,9 @@ categories:
 
 <span>This tutorial is based on </span>[<span>SolrCloud</span>][1]<span>. Here is a step by step </span>[<span>guide</span>][2] <span>about its installation and a list of required </span>[<span>packages</span>][2]<span>:</span>
 
-  * <span>solr-server</span>
-  * <span>solr-mapreduce</span>
-  * <span>search</span>
+- <span>solr-server</span>
+- <span>solr-mapreduce</span>
+- <span>search</span>
 
 &nbsp;
 
@@ -128,7 +128,7 @@ As usual feel free to comment on the [hue-user][15] list or [@gethue][16]!
 
 1. If you see this error:
 
-org.apache.solr.client.solrj.impl.HttpSolrServer$RemoteSolrException:Error CREATEing SolrCore ‘reviews_shard1_replica1’: Unable to create core: reviews_shard1_replica1 Caused by: Could not find configName for collection reviews found:null</str>
+org.apache.solr.client.solrj.impl.HttpSolrServer\$RemoteSolrException:Error CREATEing SolrCore ‘reviews_shard1_replica1’: Unable to create core: reviews_shard1_replica1 Caused by: Could not find configName for collection reviews found:null</str>
 
 <span>You might have forgotten to create the collection:</span>
 
@@ -157,19 +157,19 @@ org.apache.zookeeper.KeeperException$NoNodeException: KeeperErrorCode = NoNode f
 
 <span>It probably comes from error #2. You might need to re-upload the config and recreate the collection.</span>
 
- [1]: http://wiki.apache.org/solr/SolrCloud
- [2]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/Search/latest/Cloudera-Search-Installation-Guide/csig_install_search.html
- [3]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/Search/latest/Cloudera-Search-Installation-Guide/csig_deploy_search_solrcloud.html
- [4]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/Search/latest/Cloudera-Search-Installation-Guide/csig_runtime_solr_config.html
- [5]: https://github.com/romainr/hadoop-tutorials-examples/tree/master/solr-local-search
- [6]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/solr-local-search/solr_local/conf/schema.xml#L109
- [7]: http://wiki.apache.org/solr/SchemaXml
- [8]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/solr-local-search/data_subset.sql
- [9]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/Search/latest/Cloudera-Search-User-Guide/csug_batch_index_to_solr_servers_using_golive.html
- [10]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/solr-local-search/load_index.sh
- [11]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/solr-local-search/solr_local/reviews.conf
- [12]: http://blog.cloudera.com/blog/2013/09/email-indexing-using-cloudera-search/
- [13]: http://blog.cloudera.com/blog/2013/09/secrets-of-cloudera-support-impala-and-search-make-the-customer-experience-even-better/
- [14]: http://cloudera.github.io/cdk/docs/current/cdk-morphlines/index.html
- [15]: http://groups.google.com/a/cloudera.org/group/hue-user
- [16]: https://twitter.com/gethue
+[1]: http://wiki.apache.org/solr/SolrCloud
+[2]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/Search/latest/Cloudera-Search-Installation-Guide/csig_install_search.html
+[3]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/Search/latest/Cloudera-Search-Installation-Guide/csig_deploy_search_solrcloud.html
+[4]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/Search/latest/Cloudera-Search-Installation-Guide/csig_runtime_solr_config.html
+[5]: https://github.com/romainr/hadoop-tutorials-examples/tree/master/solr-local-search
+[6]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/solr-local-search/solr_local/conf/schema.xml#L109
+[7]: http://wiki.apache.org/solr/SchemaXml
+[8]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/solr-local-search/data_subset.sql
+[9]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/Search/latest/Cloudera-Search-User-Guide/csug_batch_index_to_solr_servers_using_golive.html
+[10]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/solr-local-search/load_index.sh
+[11]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/solr-local-search/solr_local/reviews.conf
+[12]: http://blog.cloudera.com/blog/2013/09/email-indexing-using-cloudera-search/
+[13]: http://blog.cloudera.com/blog/2013/09/secrets-of-cloudera-support-impala-and-search-make-the-customer-experience-even-better/
+[14]: http://cloudera.github.io/cdk/docs/current/cdk-morphlines/index.html
+[15]: http://groups.google.com/a/cloudera.org/group/hue-user
+[16]: https://twitter.com/gethue

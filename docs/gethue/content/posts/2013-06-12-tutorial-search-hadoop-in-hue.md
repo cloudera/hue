@@ -40,8 +40,8 @@ slide_template:
   - default
 categories:
   - Querying
-
 ---
+
 <p id="docs-internal-guid-388e0995-305d-1ff0-9d32-60089c64749b">
   <span>This post talks about Hue, a </span><a href="http://gethue.com">UI</a><span> for making Apache Hadoop easier to use.</span>
 </p>
@@ -50,18 +50,18 @@ Coming in [Hue 2.4][1], on top of more than 150 fixes a new app was added: Searc
 
 <span>Here is a video demoing the querying and the results customization. The demo is based on the </span>[<span>Twitter Streaming</span>][2] <span>data collected with Apache Flume and indexed in real time.</span>
 
-<iframe src="https://player.vimeo.com/video/68257054?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Tutorial: Search Hadoop in Hue 2.4" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube IgOSkGNmEyI >}}
 
 <span>The new Hue Search app is adding an impressive list of features to the already enterprise grade, industry standard list of features Solr provides. More specifically, here are the most significant ones:</span>
 
-  * <span>Based on standard </span>[<span>Solr</span>][3] <span>and </span>[<span>Solr Cloud</span>][4]
-  * <span>Optimized for </span>[<span>Cloudera Search</span>][5] <span>for searching Hadoop</span>
-  * <span>Result snipped editor with live preview</span>
-  * <span>Field, range and date facets</span>
-  * <span>Sorting</span>
-  * <span>Highlighting</span>
-  * <span>Layout and functions templates</span>
-  * <span>Custom CSS/Javascript placeholders</span>
+- <span>Based on standard </span>[<span>Solr</span>][3] <span>and </span>[<span>Solr Cloud</span>][4]
+- <span>Optimized for </span>[<span>Cloudera Search</span>][5] <span>for searching Hadoop</span>
+- <span>Result snipped editor with live preview</span>
+- <span>Field, range and date facets</span>
+- <span>Sorting</span>
+- <span>Highlighting</span>
+- <span>Layout and functions templates</span>
+- <span>Custom CSS/Javascript placeholders</span>
 
 &nbsp;
 
@@ -125,10 +125,10 @@ The release for Hue 2.4 is available <a class="trackLink" href="https://cdn.geth
 
 <span>We welcome any feedback on </span>[hue-user][7] <span>and Solr-specific requests on </span>[search-user][7]<span>!</span>
 
- [1]: http://gethue.tumblr.com/post/52904410987/hue-2-4-is-released "Hue Hadoop UI"
- [2]: https://dev.twitter.com/docs/streaming-apis
- [3]: http://lucene.apache.org/solr/
- [4]: http://wiki.apache.org/solr/SolrCloud
- [5]: http://www.cloudera.com/content/support/en/documentation/cloudera-search/cloudera-search-documentation-v1-latest.html
- [6]: http://blog.cloudera.com/blog/2013/04/demo-hdfs-file-operations-made-easy-with-hue/
- [7]: blank
+[1]: http://gethue.tumblr.com/post/52904410987/hue-2-4-is-released 'Hue Hadoop UI'
+[2]: https://dev.twitter.com/docs/streaming-apis
+[3]: http://lucene.apache.org/solr/
+[4]: http://wiki.apache.org/solr/SolrCloud
+[5]: http://www.cloudera.com/content/support/en/documentation/cloudera-search/cloudera-search-documentation-v1-latest.html
+[6]: http://blog.cloudera.com/blog/2013/04/demo-hdfs-file-operations-made-easy-with-hue/
+[7]: blank

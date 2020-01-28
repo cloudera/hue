@@ -36,8 +36,8 @@ sf_remove_promo_bar:
   - 1
 categories:
   - News
-
 ---
+
 Chào bạn!
 
 After a last [retreat in Europe][1], the team went to the other side of the world in South East Asia: Vietnam!
@@ -46,7 +46,7 @@ There, a bustling Ho Chi Minh City, banh mis, pho bos, warm waters, gorgeous we
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/156917469?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hue Team Retreat - Vietnam 2015" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube QoiIgMQwQrM >}}
 
 &nbsp;
 
@@ -68,11 +68,11 @@ Onwards!
 
 [<img src="https://cdn.gethue.com/uploads/2015/12/2015-11-20-22.30.38-1-1024x768.jpg"  />][8]
 
- [1]: https://gethue.com/team-retreat-in-spain-amsterdam/
- [2]: https://twitter.com/gethue
- [3]: https://cdn.gethue.com/uploads/2015/12/2015-11-14-19.16.19-1.jpg
- [4]: https://cdn.gethue.com/uploads/2015/12/2015-11-15-20.45.11.jpg
- [5]: https://cdn.gethue.com/uploads/2015/12/2015-11-16-05.50.06.jpg
- [6]: https://cdn.gethue.com/uploads/2015/12/2015-11-17-09.30.16.jpg
- [7]: https://cdn.gethue.com/uploads/2015/12/2015-11-20-11.50.09.jpg
- [8]: https://cdn.gethue.com/uploads/2015/12/2015-11-20-22.30.38-1.jpg
+[1]: https://gethue.com/team-retreat-in-spain-amsterdam/
+[2]: https://twitter.com/gethue
+[3]: https://cdn.gethue.com/uploads/2015/12/2015-11-14-19.16.19-1.jpg
+[4]: https://cdn.gethue.com/uploads/2015/12/2015-11-15-20.45.11.jpg
+[5]: https://cdn.gethue.com/uploads/2015/12/2015-11-16-05.50.06.jpg
+[6]: https://cdn.gethue.com/uploads/2015/12/2015-11-17-09.30.16.jpg
+[7]: https://cdn.gethue.com/uploads/2015/12/2015-11-20-11.50.09.jpg
+[8]: https://cdn.gethue.com/uploads/2015/12/2015-11-20-22.30.38-1.jpg
