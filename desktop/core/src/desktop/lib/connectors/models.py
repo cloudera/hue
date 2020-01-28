@@ -85,6 +85,11 @@ else:
 
 
 def _get_installed_connectors(category=None, categories=None, dialect=None, interface=None, user=None):
+  from desktop.auth.backend import is_admin, is_hue_admin
+
+  if not Connector.objects.exists() and user and is_hue_admin(user):
+    _create_connector_examples()
+
   connectors = []
   connector_instances = [
       {
@@ -98,18 +103,6 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
       }
       for connector in Connector.objects.all()
   ]
-  # + [ # TODO move to samples? or auto
-  #     {
-  #       'id': i,
-  #       'nice_name':  CONNECTORS.get()[i].NICE_NAME.get() or i,
-  #       'description': '',
-  #       'dialect': CONNECTORS.get()[i].DIALECT.get(),
-  #       'interface': CONNECTORS.get()[i].INTERFACE.get(),
-  #       'settings': CONNECTORS.get()[i].SETTINGS.get(),
-  #       'is_demo': True,
-  #     }
-  #     for i in CONNECTORS.get()
-  # ]
 
   for connector in connector_instances:
     connector_types = []
@@ -147,8 +140,37 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
     connectors = [connector for connector in connectors if connector['dialect'] == dialect]
   if interface is not None:
     connectors = [connector for connector in connectors if connector['interface'] == interface]
-  if user is not None:
+
+  # Apply Permissions
+  if user is not None and not is_admin(user):
     allowed_connectors = user.get_permissions().values_list('app', flat=True)
     connectors = [connector for connector in connectors if connector['id'] in allowed_connectors]
 
   return connectors
+
+
+def _create_connector_examples():
+  for connector in _get_connector_examples():
+    Connector.objects.create(
+      name=connector['nice_name'],
+      description=connector['description'],
+      dialect=connector['dialect'],
+      settings=json.dumps(connector['settings'])
+    )
+
+  return Connector.objects.all()
+
+
+def _get_connector_examples():
+  return [
+    {
+      'id': i,
+      'nice_name':  CONNECTORS.get()[i].NICE_NAME.get() or i,
+      'description': '',
+      'dialect': CONNECTORS.get()[i].DIALECT.get(),
+      'interface': CONNECTORS.get()[i].INTERFACE.get(),
+      'settings': CONNECTORS.get()[i].SETTINGS.get(),
+      'is_demo': True,
+    }
+    for i in CONNECTORS.get()
+  ]

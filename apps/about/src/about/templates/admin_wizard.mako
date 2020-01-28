@@ -79,7 +79,18 @@ ${ layout.menubar(section='quick_start') }
           <div id="step2" class="stepDetails hide">
             <h3>${ _('Connectors to data services') }</h3>
             % if has_connectors():
-              <a href="${ url('desktop.lib.connectors.views.index') }"><i class="fa fa-exchange"></i> ${ _('Configure') }</a>
+            <ul class="unstyled samples">
+              <li>
+                <a href="${ url('desktop.lib.connectors.views.index') }" title="${ _('Open the connector configuration page') }">
+                  <i class="fa fa-exchange"></i> ${ _('Configuration page') }
+                </a>
+              </li>
+              <li>
+                <a href="${ url('desktop.lib.connectors.views.index') }" title="${ _('Install the connector examples') }">
+                  <i class="fa fa-download"></i> ${ _('Install Examples') }
+                </a>
+              </li>
+            </ul>
             % else:
               <a href="${ url('desktop.views.dump_config') }" target="_blank">${ _('Configuration') }</a>
               <br>
@@ -412,6 +423,6 @@ $(document).ready(function(){
 </script>
 % endif
 
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif
+% if not is_embeddable:
+  ${ commonfooter(request, messages) | n,unicode }
+% endif

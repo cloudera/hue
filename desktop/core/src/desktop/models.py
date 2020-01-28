@@ -1682,15 +1682,17 @@ class ClusterConfig(object):
 
 
   def get_apps(self):
-    apps = OrderedDict([app for app in [
-      ('editor', self._get_editor()),
-      ('dashboard', self._get_dashboard()),
-      ('catalogs', self._get_catalogs()),
-      ('browser', self._get_browser()),
-      ('scheduler', self._get_scheduler()),
-      ('sdkapps', self._get_sdk_apps()),
-      ('home', self._get_home()),
-    ] if app[1]])
+    apps = OrderedDict([
+      app for app in [
+        ('editor', self._get_editor()),
+        ('dashboard', self._get_dashboard()),
+        ('catalogs', self._get_catalogs()),
+        ('browser', self._get_browser()),
+        ('scheduler', self._get_scheduler()),
+        ('sdkapps', self._get_sdk_apps()),
+        ('home', self._get_home()),
+      ] if app[1]
+    ])
 
     return apps
 
