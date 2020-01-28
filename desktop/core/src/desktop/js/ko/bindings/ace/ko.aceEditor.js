@@ -449,8 +449,13 @@ ko.bindingHandlers.aceEditor = {
         $(document).trigger('editorSizeChanged');
       }
       // automagically change snippet type
+      // TODO: Remove completely, check if used in code, '% dialect'
       const firstLine = editor.session.getLine(0);
-      if (firstLine.indexOf('%') === 0 && firstLine.charAt(firstLine.length - 1) === ' ') {
+      if (
+        !window.ENABLE_NOTEBOOK_2 &&
+        firstLine.indexOf('%') === 0 &&
+        firstLine.charAt(firstLine.length - 1) === ' '
+      ) {
         const availableSnippets = snippet.availableSnippets;
         let removeFirstLine = false;
         for (let i = 0; i < availableSnippets.length; i++) {

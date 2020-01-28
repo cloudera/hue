@@ -42,8 +42,8 @@ categories:
   - Version 4
   - Querying
   - Tutorial
-
 ---
+
 <span style="font-weight: 400;">There are exciting new features coming in <a href="https://gethue.com/hue-4-1-is-out/">Hue 4.1</a> and later in CDH 6 next year. One of which is Hue’s brand new tool to import data from relational databases to HDFS file or Hive table using <a href="http://sqoop.apache.org/">Apache Sqoop</a> 1. It enables us to bring large amount of data into the cluster in just few clicks via interactive UI. This Sqoop connector was added to the existing </span>[<span style="font-weight: 400;">import data wizard</span>][1] <span style="font-weight: 400;">of Hue.</span>
 
 &nbsp;
@@ -52,7 +52,7 @@ categories:
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/230737630?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial - The brand new Sqoop importer in Hue" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube c4K6p99TN_g >}}
 
 ## <span style="font-weight: 400;">Tutorial</span>
 
@@ -131,24 +131,24 @@ And to get the MySQL autocomplete would need to configure the Lib RDBMS and note
 
 <span style="font-weight: 400;">We’ll need all the required libraries for the Sqoop import job to execute. The requirement is specific to the database which is being used. The jars needed for some of the popular databases are listed below:</span>
 
-  * **Oracle:** <span style="font-weight: 400;">oracle-connector-java.jar</span>
-  * **MySQL:** <span style="font-weight: 400;">mysql-connector-java.jar</span>
-  * **Teradata:** <span style="font-weight: 400;">teradata-connector-java.jar, sqoop-connector-teradata-1.3c5.jar, tdgssconfig.jar, terajdbc4.jar</span>
-  * **PostgreSQL:** <span style="font-weight: 400;">postgresql-connector-java.jar</span>
+- **Oracle:** <span style="font-weight: 400;">oracle-connector-java.jar</span>
+- **MySQL:** <span style="font-weight: 400;">mysql-connector-java.jar</span>
+- **Teradata:** <span style="font-weight: 400;">teradata-connector-java.jar, sqoop-connector-teradata-1.3c5.jar, tdgssconfig.jar, terajdbc4.jar</span>
+- **PostgreSQL:** <span style="font-weight: 400;">postgresql-connector-java.jar</span>
 
 ### <span style="font-weight: 400;">Settings</span>
 
 <span style="font-weight: 400;">Properties provide many other options to further tune the import operations to suit your specific workload.</span>
 
-  * **Libs:** <span style="font-weight: 400;">Database specific libraries needed by Sqoop 1</span>
-  * **Mappers:** <span style="font-weight: 400;">Uses n map tasks to import in parallel</span>
-  * **Split By:** <span style="font-weight: 400;">Column of the table used to split work units</span>
-  * **Verbose Mode:** <span style="font-weight: 400;">Print more information while working</span>
-  * **Compress Mode:** <span style="font-weight: 400;">Enables compression</span>
-  * **Format:** <span style="font-weight: 400;">Data can be imported in 3 different formats: text, avro, sequence</span>
-  * **Fields:** <span style="font-weight: 400;">Sets the field separator character (enabled only when format is text)</span>
-  * **Line:** <span style="font-weight: 400;">Sets the end-of-line character (enabled only when format is text)</span>
-  * **Optionally Enclosed By:** <span style="font-weight: 400;">Sets a field enclosing character (enabled only when format is text)</span>
+- **Libs:** <span style="font-weight: 400;">Database specific libraries needed by Sqoop 1</span>
+- **Mappers:** <span style="font-weight: 400;">Uses n map tasks to import in parallel</span>
+- **Split By:** <span style="font-weight: 400;">Column of the table used to split work units</span>
+- **Verbose Mode:** <span style="font-weight: 400;">Print more information while working</span>
+- **Compress Mode:** <span style="font-weight: 400;">Enables compression</span>
+- **Format:** <span style="font-weight: 400;">Data can be imported in 3 different formats: text, avro, sequence</span>
+- **Fields:** <span style="font-weight: 400;">Sets the field separator character (enabled only when format is text)</span>
+- **Line:** <span style="font-weight: 400;">Sets the end-of-line character (enabled only when format is text)</span>
+- **Optionally Enclosed By:** <span style="font-weight: 400;">Sets a field enclosing character (enabled only when format is text)</span>
 
 &nbsp;
 
@@ -164,8 +164,8 @@ And to get the MySQL autocomplete would need to configure the Lib RDBMS and note
 
 &nbsp;
 
- [1]: https://gethue.com/sql-autocomplete-popup-revamp-and-new-create-table-wizard/
- [2]: https://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/
- [3]: https://gethue.com/browsers/
- [4]: https://gethue.com/sql-editor/
- [5]: https://sqoop.apache.org/docs/1.4.6/
+[1]: https://gethue.com/sql-autocomplete-popup-revamp-and-new-create-table-wizard/
+[2]: https://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/
+[3]: https://gethue.com/browsers/
+[4]: https://gethue.com/sql-editor/
+[5]: https://sqoop.apache.org/docs/1.4.6/

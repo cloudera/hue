@@ -36,13 +36,13 @@ sf_remove_promo_bar:
   - 1
 categories:
   - Administration
-
 ---
+
 In the upcoming Hue 3.9 release, Hue will support the ability to configure multiple authentication backends.
 
 Hue already allows you to authenticate with several authentication services including [LDAP][1], [OpenID][2], [SAML][3], database, etc. With this latest feature, you can now configure <span style="text-decoration: underline;">multiple authentication sources</span> for Hue to check, in order of priority, when authenticating and authorizing users.
 
-<iframe src="https://player.vimeo.com/video/135654347?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: configuring Hue with Multiple Authentication Backends" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube oGqrVGw9Y20 >}}
 
 For example, to enable Hue to first attempt LDAP directory lookup before falling back to the database-backed user model, we can update the hue.ini configuration file or [Hue safety valve][4] in Cloudera Manager with a list containing first the `LdapBackend` followed by either the `ModelBackend` or custom `AllowFirstUserDjangoBackend` (permits first login and relies on user model for all subsequent authentication):
 
@@ -64,11 +64,11 @@ With the exception of [OAuth][6] authentication, we can continue to add addition
 
 As usual feel free to comment and send feedback on the [hue-user][7] list or [@gethue][8]!
 
- [1]: https://gethue.com/making-hadoop-accessible-to-your-employees-with-ldap/
- [2]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L414
- [3]: https://gethue.com/sso-with-hue-new-saml-backend/
- [4]: http://www.cloudera.com/content/cloudera/en/documentation/cloudera-manager/v4-8-3/Cloudera-Manager-Managing-Clusters/cmmc_safety_valve.html
- [5]: http://www.cloudera.com/content/cloudera/en/documentation/core/latest/topics/cdh_sg_hue_ldap_config.html
- [6]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L433
- [7]: http://groups.google.com/a/cloudera.org/group/hue-user
- [8]: https://twitter.com/gethue
+[1]: https://gethue.com/making-hadoop-accessible-to-your-employees-with-ldap/
+[2]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L414
+[3]: https://gethue.com/sso-with-hue-new-saml-backend/
+[4]: http://www.cloudera.com/content/cloudera/en/documentation/cloudera-manager/v4-8-3/Cloudera-Manager-Managing-Clusters/cmmc_safety_valve.html
+[5]: http://www.cloudera.com/content/cloudera/en/documentation/core/latest/topics/cdh_sg_hue_ldap_config.html
+[6]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L433
+[7]: http://groups.google.com/a/cloudera.org/group/hue-user
+[8]: https://twitter.com/gethue

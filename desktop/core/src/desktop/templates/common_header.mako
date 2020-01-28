@@ -151,7 +151,7 @@ if USE_NEW_EDITOR.get():
     ${ render_bundle('login', config='LOGIN') | n,unicode }
   %else:
     ${ render_bundle('vendors~hue~notebook~tableBrowser') | n,unicode }
-    ${ render_bundle('vendors~hue~tableBrowser') | n,unicode }
+    ${ render_bundle('vendors~hue~notebook') | n,unicode }
     ${ render_bundle('vendors~hue') | n,unicode }
     ${ render_bundle('hue~notebook') | n,unicode }
     ${ render_bundle('hue~notebook~tableBrowser') | n,unicode }
@@ -186,7 +186,6 @@ if USE_NEW_EDITOR.get():
 
 % if user.is_authenticated():
   <script src="${ static('desktop/ext/js/localforage.min.js') }"></script>
-  <script src="${ static('desktop/js/clusterConfig.js') }"></script>
 
   <script type="text/javascript">
     $(document).ready(function () {

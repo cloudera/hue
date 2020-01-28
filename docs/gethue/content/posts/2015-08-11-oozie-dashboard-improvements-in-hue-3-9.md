@@ -36,15 +36,15 @@ sf_remove_promo_bar:
   - 1
 categories:
   - Scheduling
-
 ---
+
 <span style="font-weight: 400;">Hello Oozie users,</span>
 
 <span style="font-weight: 400;">Hue 3.9 release comes with several improvements for Oozie dashboard making it more robust and scalable.</span>
 
 **Here is a video demoing the new features:**
 
-<iframe src="https://player.vimeo.com/video/135854943?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: Oozie Dashboard Improvements in Hue 3.9" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube -wLKCM9Y6_w >}}
 
 **The new feature list:**
 
@@ -81,11 +81,11 @@ categories:
 
 &nbsp;
 
- [1]: https://cdn.gethue.com/uploads/2015/08/paginate-e1439257089272.png
- [2]: https://cdn.gethue.com/uploads/2015/08/coord-actions.png
- [3]: https://cdn.gethue.com/uploads/2015/08/edit-coord.png
- [4]: https://cdn.gethue.com/uploads/2015/08/ignore.png
- [5]: https://issues.cloudera.org/browse/HUE-2551
- [6]: https://issues.cloudera.org/browse/HUE-2421
- [7]: http://groups.google.com/a/cloudera.org/group/hue-user
- [8]: https://twitter.com/gethue
+[1]: https://cdn.gethue.com/uploads/2015/08/paginate-e1439257089272.png
+[2]: https://cdn.gethue.com/uploads/2015/08/coord-actions.png
+[3]: https://cdn.gethue.com/uploads/2015/08/edit-coord.png
+[4]: https://cdn.gethue.com/uploads/2015/08/ignore.png
+[5]: https://issues.cloudera.org/browse/HUE-2551
+[6]: https://issues.cloudera.org/browse/HUE-2421
+[7]: http://groups.google.com/a/cloudera.org/group/hue-user
+[8]: https://twitter.com/gethue

@@ -38,11 +38,11 @@ slide_template:
   - default
 categories:
   - Browsing
-
 ---
+
 A lot of exciting work has been done on File Browser to provide additional features and the best user experience possible. Take a look at the updates below and start using them today!
 
-<iframe src="https://player.vimeo.com/video/108333445?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: what's new in Hue File Browser" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube KYXisq918q0 >}}
 
 **Drag and Drop Uploading**
 
@@ -90,6 +90,6 @@ We hope these new features allow you to be more productive and result in a bette
 
 &nbsp;
 
- [1]: https://cdn.gethue.com/uploads/2014/10/hue-fb.png
- [2]: http://groups.google.com/a/cloudera.org/group/hue-user
- [3]: https://twitter.com/gethue
+[1]: https://cdn.gethue.com/uploads/2014/10/hue-fb.png
+[2]: http://groups.google.com/a/cloudera.org/group/hue-user
+[3]: https://twitter.com/gethue

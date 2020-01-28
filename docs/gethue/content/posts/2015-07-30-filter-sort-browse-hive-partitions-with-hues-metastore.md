@@ -37,8 +37,8 @@ sf_remove_promo_bar:
 categories:
   - Browsing
   - Querying
-
 ---
+
 With the latest Hue release, the metastore offers better controls over partitioned Hive tables. Partitioning Hive tables is a great strategy to [improve query performance][1] for Hive-managed tables by avoiding full-table scans.
 
 However, partitioning is also useful for external tables where the data may already reside in HDFS or be managed by a service other than Hive. In these cases, the partition location may not conform to the default dynamic Hive partition location (which takes the table's base location and appends a name=value path token for each partition), and can take any valid data path as the location for the partition.
@@ -77,9 +77,9 @@ Regardless of a table's partition locations, Hue's metastore now enables you to 
 
 If you're searching for a specific set of partitions however, you can now filter on a partition value by clicking the "Add a filter" link, selecting and specifying the filter parameter, then clicking the "Filter" button! Note that multiple partition filters can be added as needed to refine your query, and you can also disable the default sort order to retrieve partition results in alphabetically ascending order.
 
-<iframe src="https://player.vimeo.com/video/134955921?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Filter, Sort and Browse Hive Partitions with Hue&rsquo;s Metastore" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube phkigNhDzuE >}}
 
-[Filter, Sort and Browse Hive Partitions with Hue’s Metastore][2] from [The Hue Team][3] on [Vimeo][4].
+[Filter, Sort and Browse Hive Partitions with Hue’s Metastore][2] from [The Hue Team][3] on [Youtube][4].
 
 Finally, you can view the data files in any partition by clicking the "View Partition Files" link which will take you to the filebrowser for that partition's location.
 
@@ -89,11 +89,11 @@ Finally, you can view the data files in any partition by clicking the "View Part
 
 Hue offers the flexibility to seamlessly work with your Hive data as-is. Feel free to comment on the [hue-user][7] list or [@gethue][8]!
 
- [1]: http://blog.cloudera.com/blog/2014/08/improving-query-performance-using-partitioning-in-apache-hive/
- [2]: https://vimeo.com/134955921
- [3]: https://vimeo.com/gethue
- [4]: https://vimeo.com
- [5]: https://cdn.gethue.com/uploads/2015/07/Screenshot-2015-07-29-15.44.21.png
- [6]: https://cdn.gethue.com/uploads/2015/07/Screenshot-2015-07-29-15.43.48.png
- [7]: http://groups.google.com/a/cloudera.org/group/hue-user
- [8]: https://twitter.com/gethue
+[1]: http://blog.cloudera.com/blog/2014/08/improving-query-performance-using-partitioning-in-apache-hive/
+[2]: https://youtube.com//watch?v=phkigNhDzuE
+[3]: https://www.youtube.com/channel/UCTuTkR-hLNN59uqT9bqIa_Q
+[4]: https://youtube.com
+[5]: https://cdn.gethue.com/uploads/2015/07/Screenshot-2015-07-29-15.44.21.png
+[6]: https://cdn.gethue.com/uploads/2015/07/Screenshot-2015-07-29-15.43.48.png
+[7]: http://groups.google.com/a/cloudera.org/group/hue-user
+[8]: https://twitter.com/gethue

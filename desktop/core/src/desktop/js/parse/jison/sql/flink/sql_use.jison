@@ -15,23 +15,25 @@
 // limitations under the License.
 
 DataDefinition
- : 'LIST' ListStatement
+ : UseStatement
  ;
 
 DataDefinition_EDIT
- : ListStatement_EDIT
+ : UseStatement_EDIT
  ;
 
-ListStatement
- : 'TABLES'
- | 'STREAMS'
- | 'TOPICS'
- ;
-
-
-ListStatement_EDIT
- : 'LIST' 'CURSOR'
+UseStatement
+ : 'USE' RegularIdentifier
    {
-     parser.suggestKeywords(['TABLES', 'STREAMS', 'TOPICS']);
+     if (! parser.yy.cursorFound) {
+       parser.yy.result.useDatabase = $2;
+     }
+   }
+ ;
+
+UseStatement_EDIT
+ : 'USE' 'CURSOR'
+   {
+     parser.suggestDatabases();
    }
  ;

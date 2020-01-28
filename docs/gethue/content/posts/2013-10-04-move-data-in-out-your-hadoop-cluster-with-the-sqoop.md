@@ -40,13 +40,13 @@ slide_template:
   - default
 categories:
   - Querying
-
 ---
+
 Hi Ice Cream lovers,
 
 Hue, the [open source Big Data UI][1], has a brand new application that enables transferring data between relational databases and [Hadoop][2]. This new application is driven by [Sqoop 2][3] and has several user experience improvements to boot.
 
-<iframe src="https://player.vimeo.com/video/76063637?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: Hue and the new Sqoop 2 app" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube Za5zEgLgxK4 >}}
 
 Sqoop is a batch data migration tool for transferring data between traditional databases and Hadoop. The first version of Sqoop is a heavy client that drives and oversees data transfer via MapReduce. In Sqoop 2, the majority of the work was moved to a server that a thin client communicates with. Also, any client can communicate with the Sqoop 2 server over its JSON-REST protocol. Sqoop 2 was chosen instead of its predecessors because of its client-server design.
 
@@ -56,8 +56,8 @@ The following is the canonical import job example sourced from <http://sqoop.apa
 
 ### Environment
 
-  * CDH 4.4 or <span>Hue 3.0.0</span>
-  * MySQL 5.1
+- CDH 4.4 or <span>Hue 3.0.0</span>
+- MySQL 5.1
 
 First, make sure that Sqoop2 is up and running and the Hue points to it in its hue.ini:
 
@@ -90,15 +90,16 @@ In the Sqoop app, the connection manager is available from the “New Job” wiz
 <div>
   <pre class="code">Connection Parameter                  Value
 
-Name                                  mysql-connection-demo
+Name mysql-connection-demo
 
-JDBC Driver Class                     com.mysql.jdbc.Driver
+JDBC Driver Class com.mysql.jdbc.Driver
 
-JDBC Connection String                jdbc:mysql://hue-demo/demo
+JDBC Connection String jdbc:mysql://hue-demo/demo
 
-Username                              demo
+Username demo
 
-Password                              demo</pre>
+Password demo</pre>
+
 </div>
 
 Connection form values.
@@ -110,19 +111,20 @@ After creating a connection, follow the wizard and fill in the blanks with the i
 <div>
   <pre class="code">Job Wizard Parameter              Value
 
-Name                              mysql-import-job-demo
+Name mysql-import-job-demo
 
-Type                              IMPORT
+Type IMPORT
 
-Connection                        mysql-connection-demo
+Connection mysql-connection-demo
 
-Table name                        test
+Table name test
 
-Storage Type                      HDFS
+Storage Type HDFS
 
-Output format                     TEXT_FILE
+Output format TEXT_FILE
 
-Output directory                  /tmp/mysql-import-job-demo</pre>
+Output directory /tmp/mysql-import-job-demo</pre>
+
 </div>
 
 Job wizard form values.
@@ -139,8 +141,8 @@ I’d like to send out a big thank you to the Sqoop community for the new client
 
 Both projects are undergoing heavy development and are welcoming external contributions! Have any suggestions? Feel free to tell us what you think through [hue-user][4] or [@gethue][5]​!
 
- [1]: http://gethue.com
- [2]: http://hadoop.apache.org/
- [3]: http://sqoop.apache.org/
- [4]: http://groups.google.com/a/cloudera.org/group/hue-user
- [5]: https://twitter.com/gethue
+[1]: http://gethue.com
+[2]: http://hadoop.apache.org/
+[3]: http://sqoop.apache.org/
+[4]: http://groups.google.com/a/cloudera.org/group/hue-user
+[5]: https://twitter.com/gethue

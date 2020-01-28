@@ -36,8 +36,8 @@ sf_remove_promo_bar:
   - 1
 categories:
   - News
-
 ---
+
 Hello / Shalom!
 
 Where was the team? After the [Philippines][1] and a [3.8 release][2], we settled to go in a new part of the world: the Middle East.
@@ -46,7 +46,7 @@ There, quiet beaches, hummus and yogurt, a charming Tel Aviv, kitesurfing as wel
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/126665656?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="The Hue Team Retreat - Israel 2015" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube 9T7RT6eYtHc >}}
 
 &nbsp;
 
@@ -78,12 +78,12 @@ Onwards!!
 
 &nbsp;
 
- [1]: https://gethue.com/team-retreat-in-the-phillipines/
- [2]: https://gethue.com/hue-3-8-with-an-oozie-editor-revamp-better-performances-improved-spark-ui-is-out/
- [3]: https://twitter.com/gethue
- [4]: https://cdn.gethue.com/uploads/2015/05/2015-04-25-16.20.31.jpg
- [5]: https://cdn.gethue.com/uploads/2015/05/2015-04-24-21.07.46.jpg
- [6]: https://cdn.gethue.com/uploads/2015/05/2015-04-20-23.19.57.jpg
- [7]: https://cdn.gethue.com/uploads/2015/05/IMG_2081.jpg
- [8]: https://cdn.gethue.com/uploads/2015/05/2015-04-24-19.37.59.jpg
- [9]: https://cdn.gethue.com/uploads/2015/05/IMG_2182.jpg
+[1]: https://gethue.com/team-retreat-in-the-phillipines/
+[2]: https://gethue.com/hue-3-8-with-an-oozie-editor-revamp-better-performances-improved-spark-ui-is-out/
+[3]: https://twitter.com/gethue
+[4]: https://cdn.gethue.com/uploads/2015/05/2015-04-25-16.20.31.jpg
+[5]: https://cdn.gethue.com/uploads/2015/05/2015-04-24-21.07.46.jpg
+[6]: https://cdn.gethue.com/uploads/2015/05/2015-04-20-23.19.57.jpg
+[7]: https://cdn.gethue.com/uploads/2015/05/IMG_2081.jpg
+[8]: https://cdn.gethue.com/uploads/2015/05/2015-04-24-19.37.59.jpg
+[9]: https://cdn.gethue.com/uploads/2015/05/IMG_2182.jpg

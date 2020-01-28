@@ -36,11 +36,11 @@ sf_remove_promo_bar:
   - 1
 categories:
   - Querying
-
 ---
+
 The [Search dashboards][1] got a series of new options and long awaited features in Hue 3.8. Here is a summary of the major improvements.
 
-<iframe src="https://player.vimeo.com/video/123287698?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: the Hue 3.8 Search app updates" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube T1fPqlWhFiM >}}
 
 &nbsp;
 
@@ -112,19 +112,19 @@ Happy Searching!
 
 As usual feel free to comment on the [hue-user][15] list or [@gethue][16]!
 
- [1]: https://gethue.com/search-app-enhancements-explore-even-more-data/
- [2]: https://cdn.gethue.com/uploads/2015/03/search-create-menu.png
- [3]: https://cdn.gethue.com/uploads/2015/03/search-and-up.png
- [4]: https://cdn.gethue.com/uploads/2015/03/search-2d-map.png
- [5]: https://cdn.gethue.com/uploads/2015/03/search-multi-names.png
- [6]: http://blog.cloudera.com/blog/2013/10/collection-aliasing-near-real-time-search-for-really-big-data/
- [7]: https://cdn.gethue.com/uploads/2015/03/search-aliases.png
- [8]: https://cwiki.apache.org/confluence/display/solr/Searching
- [9]: https://gethue.com/solr-search-ui-only/
- [10]: https://cdn.gethue.com/uploads/2015/03/search-only.png
- [11]: https://issues.cloudera.org/browse/HUE-1660
- [12]: https://gethue.com/export-and-import-your-search-dashboards/
- [13]: https://cdn.gethue.com/uploads/2015/03/search-export.png
- [14]: https://gethue.com/analyse-apache-logs-and-build-your-own-web-analytics-dashboard-with-hadoop-and-solr/
- [15]: http://groups.google.com/a/cloudera.org/group/hue-user
- [16]: https://twitter.com/gethue
+[1]: https://gethue.com/search-app-enhancements-explore-even-more-data/
+[2]: https://cdn.gethue.com/uploads/2015/03/search-create-menu.png
+[3]: https://cdn.gethue.com/uploads/2015/03/search-and-up.png
+[4]: https://cdn.gethue.com/uploads/2015/03/search-2d-map.png
+[5]: https://cdn.gethue.com/uploads/2015/03/search-multi-names.png
+[6]: http://blog.cloudera.com/blog/2013/10/collection-aliasing-near-real-time-search-for-really-big-data/
+[7]: https://cdn.gethue.com/uploads/2015/03/search-aliases.png
+[8]: https://cwiki.apache.org/confluence/display/solr/Searching
+[9]: https://gethue.com/solr-search-ui-only/
+[10]: https://cdn.gethue.com/uploads/2015/03/search-only.png
+[11]: https://issues.cloudera.org/browse/HUE-1660
+[12]: https://gethue.com/export-and-import-your-search-dashboards/
+[13]: https://cdn.gethue.com/uploads/2015/03/search-export.png
+[14]: https://gethue.com/analyse-apache-logs-and-build-your-own-web-analytics-dashboard-with-hadoop-and-solr/
+[15]: http://groups.google.com/a/cloudera.org/group/hue-user
+[16]: https://twitter.com/gethue

@@ -21,6 +21,7 @@ import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import { PigFunctions, SqlFunctions } from 'sql/sqlFunctions';
 import I18n from 'utils/i18n';
+import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'utils/hueConfig';
 
 // prettier-ignore
 const TEMPLATE = `
@@ -171,16 +172,12 @@ class AssistFunctionsPanel {
       updateType(details.type);
     });
 
-    const configSub = huePubSub.subscribe('cluster.config.set.config', clusterConfig => {
+    const configUpdated = config => {
       const lastActiveType =
         this.activeType() || apiHelper.getFromTotalStorage('assist', 'function.panel.active.type');
-      if (
-        clusterConfig.app_config &&
-        clusterConfig.app_config.editor &&
-        clusterConfig.app_config.editor.interpreters
-      ) {
+      if (config.app_config && config.app_config.editor && config.app_config.editor.interpreters) {
         const typesIndex = {};
-        clusterConfig.app_config.editor.interpreters.forEach(interpreter => {
+        config.app_config.editor.interpreters.forEach(interpreter => {
           if (
             interpreter.type === 'hive' ||
             interpreter.type === 'impala' ||
@@ -203,9 +200,10 @@ class AssistFunctionsPanel {
       } else {
         this.availableTypes([]);
       }
-    });
+    };
 
-    huePubSub.publish('cluster.config.get.config');
+    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, configUpdated);
+    const configSub = huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
 
     this.disposals.push(() => {
       activeSnippetTypeSub.remove();

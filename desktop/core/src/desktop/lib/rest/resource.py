@@ -1,4 +1,3 @@
-from __future__ import division
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -25,10 +24,9 @@ import time
 from django.utils.encoding import iri_to_uri, smart_str
 from django.utils.http import urlencode
 
+from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.apputil import WARN_LEVEL_CALL_DURATION_MS, INFO_LEVEL_CALL_DURATION_MS
-
-from desktop import conf
 
 
 LOG = logging.getLogger(__name__)
@@ -65,8 +63,7 @@ class Resource(object):
     if resp.headers.get('location') and resp.headers.get('location').startswith('http://localhost:8080/'):
       return resp.headers.get('location').split('sessions/')[1]
 
-    if len(resp.content) != 0 and resp.headers.get('content-type') and \
-          'application/json' in resp.headers.get('content-type'):
+    if len(resp.content) != 0 and resp.headers.get('content-type') and 'application/json' in resp.headers.get('content-type'):
       try:
         return resp.json()
       except Exception as ex:
@@ -75,57 +72,68 @@ class Resource(object):
     else:
       return resp.content
 
-  def invoke(self, method, relpath=None, params=None, data=None, headers=None, files=None, allow_redirects=False, clear_cookies=False, log_response=True):
-    resp = self._invoke(method=method,
-                        relpath=relpath,
-                        params=params,
-                        data=data,
-                        headers=headers,
-                        files=files,
-                        allow_redirects=allow_redirects,
-                        clear_cookies=clear_cookies,
-                        log_response=log_response)
+  def invoke(self, method, relpath=None, params=None, data=None, headers=None, files=None, allow_redirects=False, clear_cookies=False,
+      log_response=True
+    ):
+    resp = self._invoke(
+        method=method,
+        relpath=relpath,
+        params=params,
+        data=data,
+        headers=headers,
+        files=files,
+        allow_redirects=allow_redirects,
+        clear_cookies=clear_cookies,
+        log_response=log_response
+    )
 
     return self._format_response(resp)
 
-  def _invoke(self, method, relpath=None, params=None, data=None, headers=None, files=None, allow_redirects=False, clear_cookies=False, log_response=True):
+  def _invoke(self, method, relpath=None, params=None, data=None, headers=None, files=None, allow_redirects=False, clear_cookies=False,
+      log_response=True
+    ):
     """
     Invoke an API method.
+    Print trace even when there is an exception.
     @return: Raw body or JSON dictionary (if response content type is JSON).
     """
     path = self._join_uri(relpath)
     start_time = time.time()
     resp = None
+
     try:
-      resp = self._client.execute(method,
-                                  path,
-                                  params=params,
-                                  data=data,
-                                  headers=headers,
-                                  files=files,
-                                  allow_redirects=allow_redirects,
-                                  urlencode=self._urlencode,
-                                  clear_cookies=clear_cookies)
-    finally: # Print even when there's an exception
-      log_length = conf.REST_RESPONSE_SIZE.get() != -1 and conf.REST_RESPONSE_SIZE.get() if log_response else 0 # We want to output duration without content
+      resp = self._client.execute(
+          method,
+          path,
+          params=params,
+          data=data,
+          headers=headers,
+          files=files,
+          allow_redirects=allow_redirects,
+          urlencode=self._urlencode,
+          clear_cookies=clear_cookies
+      )
+    finally:
+      # Output duration without content
+      log_length = conf.REST_RESPONSE_SIZE.get() != -1 and conf.REST_RESPONSE_SIZE.get() if log_response else 0
       duration = time.time() - start_time
       message = '%s %s %s%s%s %s%s returned in %dms %s %s %s%s' % (
         method,
         type(self._client._session.auth) if self._client._session and self._client._session.auth else None,
         self._client._base_url,
-        smart_str(path),
+        smart_str(path, errors='replace'),
         iri_to_uri('?' + urlencode(params)) if params else '',
-        smart_unicode(data, errors='replace')[:log_length] if data else "",
-        log_length and len(data) > log_length and "..." or "" if data else "",
+        smart_str(data, errors='replace')[:log_length] if data else '',
+        log_length and len(data) > log_length and '...' or '' if data else '',
         (duration * 1000),
         resp.status_code if resp else 0,
         len(resp.content) if resp else 0,
-        smart_unicode(resp.content[:log_length], errors='replace') if resp else "",
-        log_length and len(resp.content) > log_length and "..." or "" if resp else ""
+        smart_str(resp.content, errors='replace')[:log_length] if resp else '',
+        log_length and len(resp.content) > log_length and '...' or '' if resp else ''
       )
       self._client.logger.disabled = 0
-      log_if_slow_call(duration=duration, message=message, logger=self._client.logger)
 
+      log_if_slow_call(duration=duration, message=message, logger=self._client.logger)
 
     return resp
 
@@ -156,7 +164,8 @@ class Resource(object):
 
 
   def post(self, relpath=None, params=None, data=None, contenttype=None, headers=None, files=None, allow_redirects=False,
-           clear_cookies=False, log_response=True):
+      clear_cookies=False, log_response=True
+    ):
     """
     Invoke the POST method on a resource.
     @param relpath: Optional. A relative path to this resource's path.
@@ -169,8 +178,10 @@ class Resource(object):
 
     @return: A dictionary of the JSON result.
     """
-    return self.invoke("POST", relpath, params, data, headers=self._make_headers(contenttype, headers), files=files,
-                       allow_redirects=allow_redirects, clear_cookies=clear_cookies, log_response=log_response)
+    return self.invoke(
+      "POST", relpath, params, data, headers=self._make_headers(contenttype, headers), files=files,
+      allow_redirects=allow_redirects, clear_cookies=clear_cookies, log_response=log_response
+    )
 
 
   def put(self, relpath=None, params=None, data=None, contenttype=None, allow_redirects=False, clear_cookies=False, headers=None):
@@ -186,8 +197,8 @@ class Resource(object):
     @return: A dictionary of the JSON result.
     """
     return self.invoke("PUT", relpath, params, data, headers=self._make_headers(contenttype, headers),
-                       allow_redirects=allow_redirects, clear_cookies=clear_cookies)
-
+      allow_redirects=allow_redirects, clear_cookies=clear_cookies
+    )
 
   def _make_headers(self, contenttype=None, headers=None):
     if headers is None:
@@ -198,17 +209,21 @@ class Resource(object):
 
     return headers
 
-  def resolve_redirect_url(self, method="GET", relpath=None, params=None, data=None, headers=None, files=None, allow_redirects=True, clear_cookies=False, log_response=True):
-    resp = self._invoke(method=method,
-                        relpath=relpath,
-                        params=params,
-                        data=data,
-                        headers=headers,
-                        files=files,
-                        allow_redirects=allow_redirects,
-                        clear_cookies=clear_cookies,
-                        log_response=log_response)
+  def resolve_redirect_url(self, method="GET", relpath=None, params=None, data=None, headers=None, files=None, allow_redirects=True,
+      clear_cookies=False, log_response=True
+    ):
 
+    resp = self._invoke(
+        method=method,
+        relpath=relpath,
+        params=params,
+        data=data,
+        headers=headers,
+        files=files,
+        allow_redirects=allow_redirects,
+        clear_cookies=clear_cookies,
+        log_response=log_response
+    )
     return resp.url.encode("utf-8")
 
 
@@ -219,4 +234,7 @@ def log_if_slow_call(duration, message, logger):
   elif duration >= math.floor(INFO_LEVEL_CALL_DURATION_MS / 1000):
     logger.info('SLOW: %.2f - %s' % (duration, message))
   else:
-    logger.debug(message)
+    #Leave this as logging.debug and not logger.
+    #Otherwise we never get these logging messages even with debug enabled.
+    #Review this in the future to find out why.
+    logging.debug(message)

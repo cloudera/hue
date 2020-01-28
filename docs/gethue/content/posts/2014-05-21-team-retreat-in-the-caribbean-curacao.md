@@ -38,15 +38,15 @@ slide_template:
   - default
 categories:
   - News
-
 ---
+
 Bon dia!
 
 A [lot][1] happened in the Hue project since the last <a href="https://gethue.com/hue-team-retreat-thailand/" target="_blank" rel="noopener noreferrer">Thai episode</a>: it was time to have the team fly in a new paradisiac destination and catalyst its imagination!
 
 Terminus <a href="https://www.google.com/maps/place/Cura%C3%A7ao/@15.9354779,-69.9406462,5z/data=!4m2!3m1!1s0x8e849dbe62c7fdc7:0xfc7f9228dbc64723" target="_blank" rel="noopener noreferrer">Curacao</a>: the past corsair island, now iguana territory and country!
 
-<iframe src="https://player.vimeo.com/video/95968075?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="The Hue Team Retreat - Cura&ccedil;ao 2014" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube oAoiBoTgLiE >}}
 
 As usual, the island atmosphere and its beach villa fully fit the team. The warm and blue water, the local food, countless fishes and a scorching sun were not strange to a sudden kick of inspiration.
 
@@ -106,22 +106,22 @@ The team was pumped up by this fantastic environment and could not refrain from 
 
 [<img class="aligncenter  wp-image-1267" src="https://cdn.gethue.com/uploads/2014/05/P1020876-1024x768.jpg"  />][19]
 
- [1]: http://gethue.com
- [2]: https://cdn.gethue.com/uploads/2014/05/P1020701.jpg
- [3]: https://cdn.gethue.com/uploads/2014/05/P1020395.jpg
- [4]: https://cdn.gethue.com/uploads/2014/05/P1020651.jpg
- [5]: https://cdn.gethue.com/uploads/2014/05/P1020365.jpg
- [6]: https://cdn.gethue.com/uploads/2014/05/P1020197-copy.jpg
- [7]: https://cdn.gethue.com/uploads/2014/05/P1020864.jpg
- [8]: https://cdn.gethue.com/uploads/2014/05/P1020302.jpg
- [9]: https://cdn.gethue.com/uploads/2014/05/P1020344.jpg
- [10]: https://cdn.gethue.com/uploads/2014/05/P1020337.jpg
- [11]: https://cdn.gethue.com/uploads/2014/05/P1020904.jpg
- [12]: https://cdn.gethue.com/uploads/2014/05/P1020294.jpg
- [13]: https://cdn.gethue.com/uploads/2014/05/P1020311.jpg
- [14]: https://cdn.gethue.com/uploads/2014/05/P1020501.jpg
- [15]: https://cdn.gethue.com/uploads/2014/05/P1020896.jpg
- [16]: https://cdn.gethue.com/uploads/2014/05/IMG_4234.jpg
- [17]: https://cdn.gethue.com/uploads/2014/05/P1020445.jpg
- [18]: https://twitter.com/gethue
- [19]: https://cdn.gethue.com/uploads/2014/05/P1020876.jpg
+[1]: http://gethue.com
+[2]: https://cdn.gethue.com/uploads/2014/05/P1020701.jpg
+[3]: https://cdn.gethue.com/uploads/2014/05/P1020395.jpg
+[4]: https://cdn.gethue.com/uploads/2014/05/P1020651.jpg
+[5]: https://cdn.gethue.com/uploads/2014/05/P1020365.jpg
+[6]: https://cdn.gethue.com/uploads/2014/05/P1020197-copy.jpg
+[7]: https://cdn.gethue.com/uploads/2014/05/P1020864.jpg
+[8]: https://cdn.gethue.com/uploads/2014/05/P1020302.jpg
+[9]: https://cdn.gethue.com/uploads/2014/05/P1020344.jpg
+[10]: https://cdn.gethue.com/uploads/2014/05/P1020337.jpg
+[11]: https://cdn.gethue.com/uploads/2014/05/P1020904.jpg
+[12]: https://cdn.gethue.com/uploads/2014/05/P1020294.jpg
+[13]: https://cdn.gethue.com/uploads/2014/05/P1020311.jpg
+[14]: https://cdn.gethue.com/uploads/2014/05/P1020501.jpg
+[15]: https://cdn.gethue.com/uploads/2014/05/P1020896.jpg
+[16]: https://cdn.gethue.com/uploads/2014/05/IMG_4234.jpg
+[17]: https://cdn.gethue.com/uploads/2014/05/P1020445.jpg
+[18]: https://twitter.com/gethue
+[19]: https://cdn.gethue.com/uploads/2014/05/P1020876.jpg

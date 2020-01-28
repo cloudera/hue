@@ -38,15 +38,15 @@ sf_remove_promo_bar:
   - 1
 categories:
   - Querying
-
 ---
+
 Hue already integrates with Apache Solr and provide [Dynamic Search Dashboards][1]. With the [new SQL Editor][2] of Hue 3.10, Hue opens up to [any database][3], which is great as Solr 6 now provides a [SQL interface][4].
 
 Here is demo where we query a Solr collection like we would query a regular Hive or Impala table.
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/174334432?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="SQL Editor for Solr SQL" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube u4ctEYl5Mlo >}}
 
 &nbsp;
 
@@ -62,9 +62,9 @@ Here is demo where we query a Solr collection like we would query a regular Hive
 
 As Solr SQL is pretty recent, there are some caveats, notably Solr lacks support of:
 
-  * SELECT *
-  * WHERE close with a LIKE
-  * resultset pagination
+- SELECT \*
+- WHERE close with a LIKE
+- resultset pagination
 
 which prevents a SQL UX experience comparable to the standard other databases (but we track it in [HUE-3686][7]).
 
@@ -72,13 +72,13 @@ which prevents a SQL UX experience comparable to the standard other databases (b
 
 But we still hope that you play around with this new promising feature. If you have any questions, feel free to comment here or on the [hue-user][8] list, [Solr community][9] or [@gethue][10]!
 
- [1]: https://gethue.com/dynamic-search-dashboard-improvements-3/
- [2]: https://gethue.com/new-sql-editor/
- [3]: https://gethue.com/custom-sql-query-editors/
- [4]: http://yonik.com/solr-6/
- [5]: https://cdn.gethue.com/uploads/2016/05/solr-sql-editor.png
- [6]: https://cdn.gethue.com/uploads/2016/05/solr-sql-notebook.png
- [7]: https://issues.cloudera.org/browse/HUE-3686
- [8]: http://groups.google.com/a/cloudera.org/group/hue-user
- [9]: http://lucene.apache.org/solr/resources.html
- [10]: https://twitter.com/gethue
+[1]: https://gethue.com/dynamic-search-dashboard-improvements-3/
+[2]: https://gethue.com/new-sql-editor/
+[3]: https://gethue.com/custom-sql-query-editors/
+[4]: http://yonik.com/solr-6/
+[5]: https://cdn.gethue.com/uploads/2016/05/solr-sql-editor.png
+[6]: https://cdn.gethue.com/uploads/2016/05/solr-sql-notebook.png
+[7]: https://issues.cloudera.org/browse/HUE-3686
+[8]: http://groups.google.com/a/cloudera.org/group/hue-user
+[9]: http://lucene.apache.org/solr/resources.html
+[10]: https://twitter.com/gethue

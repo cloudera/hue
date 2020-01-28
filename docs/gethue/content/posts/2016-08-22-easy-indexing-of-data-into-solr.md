@@ -39,8 +39,8 @@ sf_remove_promo_bar:
 categories:
   - Querying
   - Tutorial
-
 ---
+
 # **Creating Solr Collections from Data files in a few clicks**
 
 <span style="font-weight: 400;">There are exciting new features coming in <a href="https://github.com/cloudera/hue/blob/master/docs/release-notes/release-notes-3.11.0.txt">Hue 3.11</a> week and later in CDH 5.9 this Fall. One of which is Hue’s brand new tool to create <a href="http://lucene.apache.org/solr/">Apache Solr</a> Collections from file data. <a href="https://gethue.com/dynamic-search-dashboard-improvements-3/">Hue’s Solr dashboards</a> are great for visualizing and learning more about your data so being able to easily load data into Solr collections can be really useful. </span>
@@ -49,7 +49,7 @@ categories:
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/179731492?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop tutorial - Easy indexing into Apache Solr with Hue" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube uS0MpzW0ep8 >}}
 
 &nbsp;
 
@@ -107,7 +107,8 @@ If using Cloudera Manager, check how to [add properties in Hue.ini safety valve]
 
 For our data we're going to perform 4 operations to make a very searchable Solr Collection.
 
-  1. Convert Date
+1. Convert Date
+
 
     This operation is implicit. By setting the field type to date we inform Hue that we want to convert this date to a Solr Date. Hue can convert most standard date formats automatically. If we had a unique date format we would have to define it for Hue by explicitly using the convert date operation.
 
@@ -159,25 +160,25 @@ The indexer libs path is where all required libraries for indexing should be. If
 
 1. JAR files required by the [MapReduceIndexerTool][9]
 
-  * All required jar files should have shipped with CDH. Currently the list of required JARs is:
-      * argparse4j-0.4.3.jar
-      * readme.txt
-      * httpmime-4.2.5.jar
-      * search-mr-1.0.0-cdh5.8.0-job.jar
-      * kite-morphlines-core-1.0.0-cdh5.8.0.jar
-      * solr-core-4.10.3-cdh5.8.0.jar
-      * kite-morphlines-solr-core-1.0.0-cdh5.8.0.jar
-      * solr-solrj-4.10.3-cdh5.8.0.jar
-      * noggit-0.5.jar
-  * Should this change and you get a missing class error, you can find whatever jar may be missing by grepping all the jars packaged with CDH for the missing class.
+- All required jar files should have shipped with CDH. Currently the list of required JARs is:
+  - argparse4j-0.4.3.jar
+  - readme.txt
+  - httpmime-4.2.5.jar
+  - search-mr-1.0.0-cdh5.8.0-job.jar
+  - kite-morphlines-core-1.0.0-cdh5.8.0.jar
+  - solr-core-4.10.3-cdh5.8.0.jar
+  - kite-morphlines-solr-core-1.0.0-cdh5.8.0.jar
+  - solr-solrj-4.10.3-cdh5.8.0.jar
+  - noggit-0.5.jar
+- Should this change and you get a missing class error, you can find whatever jar may be missing by grepping all the jars packaged with CDH for the missing class.
 
 2. Maxmind GeoLite2 database
 
-  * This file is required for the GeoIP lookup command and can be found on [MaxMind’s website][10]
+- This file is required for the GeoIP lookup command and can be found on [MaxMind’s website][10]
 
 3. Grok Dictionaries
 
-  * Any grok commands can be defined in text files within the grok_dictionaries sub directory. A good starter set of grok dictionaries can be found [here][11].
+- Any grok commands can be defined in text files within the grok_dictionaries sub directory. A good starter set of grok dictionaries can be found [here][11].
 
 &nbsp;
 
@@ -272,6 +273,7 @@ The indexer libs path is where all required libraries for indexing should be. If
     <li style="font-weight: 400;">
       <span style="font-weight: 400;"><span style="font-weight: 400;">Output: “www.google.com”</span></span>
     </li>
+
   </ul>
 </li>
 
@@ -315,6 +317,7 @@ The indexer libs path is where all required libraries for indexing should be. If
     <li style="font-weight: 400;">
       <span style="font-weight: 400;"><span style="font-weight: 400;">Output: “US”,  “Palo Alto”, “37.3762”, “-122.1826”</span></span>
     </li>
+
   </ul>
 </li>
 
@@ -352,32 +355,32 @@ The indexer libs path is where all required libraries for indexing should be. If
 
 Hue successfully recognized our file as a CSV. The indexer currently supports the following file types:
 
-  *  CSV Files
-  *  Hue Log Files
-  *  Combined Apache Log Files
-  *  Ruby Log File
-  *  Syslog
+- CSV Files
+- Hue Log Files
+- Combined Apache Log Files
+- Ruby Log File
+- Syslog
 
 Beyond files, metastore tables and Hive SQL queries are also supported. Read more about these in an upcoming 3.11 blog post.
 
 &nbsp;
 
-## **Troubleshooting****
+## **Troubleshooting\*\***
 
-**
+\*\*
 
-<span style="font-weight: 400;">During the indexing process records can be dropped if they fail to match the Solr Schema. (e.g., trying to place a string into a long field). If some of your records are missing and you are unsure why you can always check the mapper log for the indexing job to get a better idea on what’s going on.</span>****
+<span style="font-weight: 400;">During the indexing process records can be dropped if they fail to match the Solr Schema. (e.g., trying to place a string into a long field). If some of your records are missing and you are unsure why you can always check the mapper log for the indexing job to get a better idea on what’s going on.</span>\*\*\*\*
 
 &nbsp;
 
- [1]: https://gethue.com/hadoop-tutorials-season-ii-7-how-to-index-and-search/
- [2]: https://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/
- [3]: https://cdn.gethue.com/uploads/2016/08/data-file-indexer.png
- [4]: https://cdn.gethue.com/uploads/2016/08/indxer-menu.png
- [5]: https://cdn.gethue.com/uploads/2016/08/indexer-wizard.png
- [6]: https://cdn.gethue.com/uploads/2016/08/indexer-wizard-fields.png
- [7]: https://cdn.gethue.com/uploads/2016/08/indexer-op-date.png
- [8]: https://cdn.gethue.com/uploads/2016/08/indexer-dash.png
- [9]: http://www.cloudera.com/documentation/enterprise/5-5-x/topics/search_mapreduceindexertool.html
- [10]: https://dev.maxmind.com/geoip/geoip2/geolite2/
- [11]: https://github.com/kite-sdk/kite/tree/master/kite-morphlines/kite-morphlines-core/src/test/resources/grok-dictionaries
+[1]: https://gethue.com/hadoop-tutorials-season-ii-7-how-to-index-and-search/
+[2]: https://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/
+[3]: https://cdn.gethue.com/uploads/2016/08/data-file-indexer.png
+[4]: https://cdn.gethue.com/uploads/2016/08/indxer-menu.png
+[5]: https://cdn.gethue.com/uploads/2016/08/indexer-wizard.png
+[6]: https://cdn.gethue.com/uploads/2016/08/indexer-wizard-fields.png
+[7]: https://cdn.gethue.com/uploads/2016/08/indexer-op-date.png
+[8]: https://cdn.gethue.com/uploads/2016/08/indexer-dash.png
+[9]: http://www.cloudera.com/documentation/enterprise/5-5-x/topics/search_mapreduceindexertool.html
+[10]: https://dev.maxmind.com/geoip/geoip2/geolite2/
+[11]: https://github.com/kite-sdk/kite/tree/master/kite-morphlines/kite-morphlines-core/src/test/resources/grok-dictionaries

@@ -36,18 +36,18 @@ sf_remove_promo_bar:
   - 1
 categories:
   - Browsing
-
 ---
+
 Hue comes with an [HBase App][1] that lets you create table, search for rows, read cell content… in just a few clicks. We are now glad to release the last missing piece of security (available in the upcoming Hue 3.8) for making the app production ready!
 
-<iframe src="https://player.vimeo.com/video/123207797?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: HBase impersonation and security" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube FGDTGmaxvsM >}}
 
 The HBase app talks to HBase through a proxy server (called [Thrift Server V1][2]) which forwards the commands to HBase. Because Hue stands between the proxy server and the actual user, the proxy server thinks that all the operations (e.g. create a table, scan some data...) are coming from the ‘hue’ user and not the actual Web user. This is obviously not very secure!
 
 In order to secure the HBase app for real we need to:
 
-  * make sure that the actual logged in user in Hue performs the operations with his privileges. This is the job of Impersonation.
-  * make sure that the Hue server only sends these calls. This is the job of Kerberos strong authentication.
+- make sure that the actual logged in user in Hue performs the operations with his privileges. This is the job of Impersonation.
+- make sure that the Hue server only sends these calls. This is the job of Kerberos strong authentication.
 
 &nbsp;
 
@@ -173,9 +173,9 @@ Make sure that HBase is configured with [Kerberos][4] and that you have this in 
 
 If using Cloudera Manager or regular Thrift without impersonation, make sure to set the "HBase Thrift Authentication" hbase.thrift.security.qop must be set to one of the following:
 
-  * auth-conf: authentication, integrity and confidentiality checking
-  * auth-int: authentication and integrity checking
-  * auth: authentication only
+- auth-conf: authentication, integrity and confidentiality checking
+- auth-int: authentication and integrity checking
+- auth: authentication only
 
 If using Cloudera Manager, go to "Hbase service > Configuration > Service-Wide / Security : HBase Thrift Authentication " and select one of the following three options.
 
@@ -199,7 +199,7 @@ hbase_conf_dir={{HBASE_CONF_DIR}}
 
 **Note**
 
-If using Impersonation, make sure the HTTP/_HOST principal is in the keytab of for their HBase Thrift Server.
+If using Impersonation, make sure the HTTP/\_HOST principal is in the keytab of for their HBase Thrift Server.
 
 &nbsp;
 
@@ -247,8 +247,8 @@ You might now see permission errors like below.
 
 This is because either:
 
-  * you are using impersonation and your user ‘bob’ does not have enough HBase privileges
-  * you are not using impersonation and the ‘hue’ user does not have enough HBase privileges
+- you are using impersonation and your user ‘bob’ does not have enough HBase privileges
+- you are not using impersonation and the ‘hue’ user does not have enough HBase privileges
 
 &nbsp;
 
@@ -296,18 +296,18 @@ If you are getting this error:
 
 <pre><code class="bash">Caused by: org.apache.hadoop.hbase.thrift.HttpAuthenticationException: Authorization header received from the client is empty.</code></pre>
 
-You are very probably hitting <https://issues.apache.org/jira/browse/HBASE-13069>. Also make sure the HTTP/_HOST principal is in the keytab of for their HBase Thrift Server. Beware that as a follow-up you might get <https://issues.apache.org/jira/browse/HBASE-14471>.
+You are very probably hitting <https://issues.apache.org/jira/browse/HBASE-13069>. Also make sure the HTTP/\_HOST principal is in the keytab of for their HBase Thrift Server. Beware that as a follow-up you might get <https://issues.apache.org/jira/browse/HBASE-14471>.
 
 There is also an issue with **framed** transport which is not supported yet. We recommend to use the **buffered** transport instead.
 
 &nbsp;
 
- [1]: https://gethue.com/the-web-ui-for-hbase-hbase-browser/
- [2]: http://wiki.apache.org/hadoop/Hbase/ThriftApi
- [3]: https://issues.apache.org/jira/browse/HBASE-13115
- [4]: http://www.cloudera.com/content/cloudera/en/documentation/core/latest/topics/cdh_sg_hbase_authentication.html
- [5]: https://gethue.com/hadoop-tutorial-how-to-create-example-tables-in-hbase/
- [6]: https://cdn.gethue.com/uploads/2015/03/hbase.png
- [7]: http://groups.google.com/a/cloudera.org/group/hue-user
- [8]: https://twitter.com/gethue
- [9]: http://hbase.apache.org/0.94/book/hbase.accesscontrol.configuration.html
+[1]: https://gethue.com/the-web-ui-for-hbase-hbase-browser/
+[2]: http://wiki.apache.org/hadoop/Hbase/ThriftApi
+[3]: https://issues.apache.org/jira/browse/HBASE-13115
+[4]: http://www.cloudera.com/content/cloudera/en/documentation/core/latest/topics/cdh_sg_hbase_authentication.html
+[5]: https://gethue.com/hadoop-tutorial-how-to-create-example-tables-in-hbase/
+[6]: https://cdn.gethue.com/uploads/2015/03/hbase.png
+[7]: http://groups.google.com/a/cloudera.org/group/hue-user
+[8]: https://twitter.com/gethue
+[9]: http://hbase.apache.org/0.94/book/hbase.accesscontrol.configuration.html

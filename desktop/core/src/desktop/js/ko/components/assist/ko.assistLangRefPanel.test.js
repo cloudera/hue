@@ -16,6 +16,7 @@
 
 import huePubSub from 'utils/huePubSub';
 import AssistLangRefPanel from './ko.assistLangRefPanel';
+import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 
 describe('ko.assistLangRefPanel.js', () => {
   beforeAll(() => {
@@ -24,23 +25,26 @@ describe('ko.assistLangRefPanel.js', () => {
   });
 
   it('should handle cluster config updates', () => {
-    let clusterConfigGetCalled = false;
-    const configSub = huePubSub.subscribe('cluster.config.get.config', () => {
-      clusterConfigGetCalled = true;
-      huePubSub.publish('cluster.config.set.config', {
-        app_config: {
-          editor: {
-            interpreters: [{ type: 'hive' }, { type: 'impala' }, { type: 'banana' }]
+    const spy = jest.spyOn(huePubSub, 'publish').mockImplementation((topic, cb) => {
+      if (topic === GET_KNOWN_CONFIG_EVENT && cb) {
+        cb({
+          app_config: {
+            editor: {
+              interpreters: [{ type: 'hive' }, { type: 'impala' }, { type: 'banana' }]
+            }
           }
-        }
-      });
+        });
+      }
     });
+
     const subject = new AssistLangRefPanel();
 
-    expect(clusterConfigGetCalled).toBeTruthy();
+    expect(spy).toHaveBeenCalled();
     expect(subject.availableTypes()).toEqual(['hive', 'impala']);
 
-    huePubSub.publish('cluster.config.set.config', {
+    spy.mockRestore();
+
+    huePubSub.publish(CONFIG_REFRESHED_EVENT, {
       app_config: {
         editor: {
           interpreters: [{ type: 'impala' }]
@@ -51,7 +55,7 @@ describe('ko.assistLangRefPanel.js', () => {
     expect(subject.availableTypes()).toEqual(['impala']);
     expect(subject.sourceType()).toEqual('impala');
 
-    huePubSub.publish('cluster.config.set.config', {
+    huePubSub.publish(CONFIG_REFRESHED_EVENT, {
       app_config: {
         editor: {
           interpreters: [{ type: 'banana' }]
@@ -62,7 +66,6 @@ describe('ko.assistLangRefPanel.js', () => {
     expect(subject.availableTypes()).toEqual([]);
     expect(subject.sourceType()).toBeFalsy();
 
-    configSub.remove();
     subject.dispose();
   });
 });

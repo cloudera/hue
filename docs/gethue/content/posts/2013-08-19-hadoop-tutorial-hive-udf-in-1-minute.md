@@ -40,15 +40,15 @@ slide_template:
   - default
 categories:
   - Querying
-
 ---
+
 <p id="docs-internal-guid-7f706b2a-97b5-9a0c-5dff-ae0ff0c1eaad">
   Apache Hive comes with a lot of <a href="https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF#">built-in</a> UDFs, but what happens when you need a “special one”? This post is about how to get started with a custom Hive UDF from compilation to execution in no time.
 </p>
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/72200781?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop tutorial: build and use Hive UDF in 1 minute!" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube Zz60VoMJSAc >}}
 
 &nbsp;
 
@@ -117,11 +117,11 @@ If you did not register the UDF as explained above, you will get this error:
 
 <pre><code class="bash">error while compiling statement: failed: parseexception line 1:0 cannot recognize input near 'myupper' " "</code></pre>
 
- [1]: https://github.com/romainr/hadoop-tutorials-examples
- [2]: https://github.com/romainr/hadoop-tutorials-examples/raw/master/hive-udf/myudfs.jar
- [3]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hive-udf/org/hue/udf/MyUpper.java
- [4]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hive-udf/pom.xml
- [5]: http://gethue.com
- [6]: https://www.inkling.com/read/hadoop-definitive-guide-tom-white-3rd/chapter-12/ch12-section-08
- [7]: http://groups.google.com/a/cloudera.org/group/hue-user
- [8]: https://twitter.com/gethue
+[1]: https://github.com/romainr/hadoop-tutorials-examples
+[2]: https://github.com/romainr/hadoop-tutorials-examples/raw/master/hive-udf/myudfs.jar
+[3]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hive-udf/org/hue/udf/MyUpper.java
+[4]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hive-udf/pom.xml
+[5]: http://gethue.com
+[6]: https://www.inkling.com/read/hadoop-definitive-guide-tom-white-3rd/chapter-12/ch12-section-08
+[7]: http://groups.google.com/a/cloudera.org/group/hue-user
+[8]: https://twitter.com/gethue

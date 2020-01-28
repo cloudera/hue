@@ -43,9 +43,9 @@ ampforwp-amp-on-off:
 categories:
   - Querying
   - Tutorial
-
 ---
-_Note: Sqoop2 is is not replaced by <https://gethue.com/importing-data-from-traditional-databases-into-hdfshive-in-just-a-few-clicks/>_
+
+_Note: Sqoop2 is now replaced by <https://gethue.com/importing-data-from-traditional-databases-into-hdfshive-in-just-a-few-clicks/>_
 
 &nbsp;
 
@@ -55,7 +55,7 @@ _Note: Sqoop2 is is not replaced by <https://gethue.com/importing-data-from-tra
 
 In this final episode (previous one was about [Search][1]) of the season 2 of the Hadoop Tutorial series let’s see how simple it becomes to export our Yelp results into a MySql table!
 
-<iframe src="https://player.vimeo.com/video/78806241?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial - How to transfer data from Hadoop with Sqoop 2 and Hue" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube zCE7N0PV7R4 >}}
 
 Sqoop2 currently only [Comma Separated Values][2] files. Moreover, Sqoop2 currently require on export for String constants to be enclosed in single quotes.
 
@@ -105,12 +105,12 @@ As usual, if you have questions or feedback, feel free to contact the Hue commun
 
 Thank you for watching this [season 2][9]!
 
- [1]: http://gethue.tumblr.com/post/65969470780/hadoop-tutorials-season-ii-7-how-to-index-and-search
- [2]: https://en.wikipedia.org/wiki/Comma-separated_values
- [3]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/sqoop2/stats.pig
- [4]: http://gethue.tumblr.com/post/51559235973/tutorial-apache-pig-editor-in-hue-2-3
- [5]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/sqoop2/create_table.sql
- [6]: http://gethue.tumblr.com/post/64707633719/hadoop-tutorial-use-pig-and-hive-with-hbase
- [7]: http://groups.google.com/a/cloudera.org/group/hue-user
- [8]: http://twitter.com/gethue
- [9]: http://gethue.tumblr.com/tagged/season2
+[1]: http://gethue.tumblr.com/post/65969470780/hadoop-tutorials-season-ii-7-how-to-index-and-search
+[2]: https://en.wikipedia.org/wiki/Comma-separated_values
+[3]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/sqoop2/stats.pig
+[4]: http://gethue.tumblr.com/post/51559235973/tutorial-apache-pig-editor-in-hue-2-3
+[5]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/sqoop2/create_table.sql
+[6]: http://gethue.tumblr.com/post/64707633719/hadoop-tutorial-use-pig-and-hive-with-hbase
+[7]: http://groups.google.com/a/cloudera.org/group/hue-user
+[8]: http://twitter.com/gethue
+[9]: http://gethue.tumblr.com/tagged/season2

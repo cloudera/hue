@@ -47,8 +47,7 @@ from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
 from hadoop.hdfs_site import get_nn_sentry_prefixes, get_umask_mode, get_supergroup, get_webhdfs_ssl
 
 if sys.version_info[0] > 2:
-  from urllib.parse import unquote as urllib_quote
-  from urllib.parse import urlparse
+  from urllib.parse import unquote as urllib_quote, urlparse
 else:
   from urllib import unquote as urllib_quote
   from urlparse import urlparse
@@ -472,8 +471,7 @@ class WebHdfs(Hdfs):
     headers = self._getheaders()
     result = self._root.put(old, params, headers=headers)
     if not result['boolean']:
-      raise IOError(_("Rename failed: %s -> %s") %
-                    (str(smart_str(old)), str(smart_str(new))))
+      raise IOError(_("Rename failed: %s -> %s") % (smart_str(old, errors='replace'), smart_str(new, errors='replace')))
 
   def rename_star(self, old_dir, new_dir):
     """Equivalent to `mv old_dir/* new"""

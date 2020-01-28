@@ -72,6 +72,7 @@ import SqlAutocompleter from 'sql/sqlAutocompleter';
 import sqlStatementsParser from 'parse/sqlStatementsParser'; // In search.ko and notebook.ko
 import HueFileEntry from 'doc/hueFileEntry';
 import HueDocument from 'doc/hueDocument';
+import { REFRESH_CONFIG_EVENT } from 'utils/hueConfig';
 
 // TODO: Migrate away
 window._ = _;
@@ -116,6 +117,8 @@ window.sqlUtils = sqlUtils;
 window.sqlWorkerHandler = sqlWorkerHandler;
 
 $(document).ready(() => {
+  huePubSub.publish(REFRESH_CONFIG_EVENT); // Prefetch the config early
+
   const onePageViewModel = new OnePageViewModel();
   ko.applyBindings(onePageViewModel, $('.page-content')[0]);
 
@@ -135,8 +138,6 @@ $(document).ready(() => {
   if (window.IS_MULTICLUSTER_ONLY) {
     ko.applyBindings(sidebarViewModel, $('.hue-sidebar-container')[0]);
   }
-
-  huePubSub.publish('cluster.config.get.config');
 
   $(document).on('hideHistoryModal', e => {
     $('#clearNotificationHistoryModal').modal('hide');

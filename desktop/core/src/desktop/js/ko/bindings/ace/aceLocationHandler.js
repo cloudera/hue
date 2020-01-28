@@ -24,7 +24,7 @@ import I18n from 'utils/i18n';
 import sqlStatementsParser from 'parse/sqlStatementsParser';
 import sqlUtils from 'sql/sqlUtils';
 import stringDistance from 'sql/stringDistance';
-import { EXECUTABLE_UPDATED_EVENT } from 'apps/notebook2/execution/executable';
+import { DIALECT } from 'apps/notebook2/snippet';
 
 // TODO: depends on Ace, sqlStatementsParser
 
@@ -55,6 +55,8 @@ class AceLocationHandler {
     self.attachStatementLocator();
     self.attachSqlWorker();
     self.attachMouseListeners();
+
+    self.dialect = () => (window.ENABLE_NOTEBOOK_2 ? self.snippet.dialect() : self.snippet.type());
 
     self.verifyThrottle = -1;
 
@@ -180,7 +182,7 @@ class AceLocationHandler {
                     // Note, as cachedOnly is set to true it will call the successCallback right away (or not at all)
                     dataCatalog
                       .getEntry({
-                        sourceType: self.snippet.type(),
+                        sourceType: self.dialect(),
                         namespace: self.snippet.namespace(),
                         compute: self.snippet.compute(),
                         temporaryOnly: self.snippet.autocompleteSettings.temporaryOnly,
@@ -400,7 +402,7 @@ class AceLocationHandler {
             } else {
               huePubSub.publish('context.popover.show', {
                 data: token.parseLocation,
-                sourceType: self.snippet.type(),
+                sourceType: self.dialect(),
                 namespace: self.snippet.namespace(),
                 compute: self.snippet.compute(),
                 defaultDatabase: self.snippet.database(),
@@ -414,7 +416,7 @@ class AceLocationHandler {
               data: token.syntaxError,
               editor: self.editor,
               range: range,
-              sourceType: self.snippet.type(),
+              sourceType: self.dialect(),
               defaultDatabase: self.snippet.database(),
               source: source
             });
@@ -693,7 +695,7 @@ class AceLocationHandler {
     const self = this;
     if (
       self.sqlSyntaxWorkerSub !== null &&
-      (self.snippet.type() === 'impala' || self.snippet.type() === 'hive')
+      (self.dialect() === DIALECT.impala || self.dialect() === DIALECT.hive)
     ) {
       const AceRange = ace.require('ace/range').Range;
       const editorChangeTime = self.editor.lastChangeTime;
@@ -723,7 +725,7 @@ class AceLocationHandler {
         beforeCursor: beforeCursor,
         afterCursor: afterCursor,
         statementLocation: statementLocation,
-        type: self.snippet.type()
+        type: self.dialect()
       });
     }
   }
@@ -848,7 +850,7 @@ class AceLocationHandler {
     const deferred = $.Deferred();
     dataCatalog
       .getChildren({
-        sourceType: self.snippet.type(),
+        sourceType: self.dialect(),
         namespace: self.snippet.namespace(),
         compute: self.snippet.compute(),
         temporaryOnly: self.snippet.autocompleteSettings.temporaryOnly,
@@ -966,7 +968,7 @@ class AceLocationHandler {
           if (typeof nextTable.subQuery === 'undefined') {
             dataCatalog
               .getChildren({
-                sourceType: self.snippet.type(),
+                sourceType: self.dialect(),
                 namespace: self.snippet.namespace(),
                 compute: self.snippet.compute(),
                 temporaryOnly: self.snippet.autocompleteSettings.temporaryOnly,
@@ -1085,7 +1087,7 @@ class AceLocationHandler {
               const uniqueValues = [];
               for (let i = 0; i < possibleValues.length; i++) {
                 possibleValues[i].name = sqlUtils.backTickIfNeeded(
-                  self.snippet.type(),
+                  self.dialect(),
                   possibleValues[i].name
                 );
                 const nameLower = possibleValues[i].name.toLowerCase();
@@ -1200,7 +1202,7 @@ class AceLocationHandler {
 
       lastKnownLocations = {
         id: self.editorId,
-        type: self.snippet.type(),
+        type: self.dialect(),
         namespace: self.snippet.namespace(),
         compute: self.snippet.compute(),
         defaultDatabase: self.snippet.database(),
@@ -1219,7 +1221,7 @@ class AceLocationHandler {
       const tokensToVerify = [];
 
       e.data.locations.forEach(location => {
-        if (location.type === 'statementType' && self.snippet.type() !== 'impala') {
+        if (location.type === 'statementType' && self.dialect() !== DIALECT.impala) {
           // We currently only have a good mapping from statement types to impala topics.
           // TODO: Extract links between Hive topic IDs and statement types
           return;
@@ -1240,7 +1242,7 @@ class AceLocationHandler {
           // The parser isn't aware of the DDL so sometimes it marks complex columns as tables
           // I.e. "Impala SELECT a FROM b.c" Is 'b' a database or a table? If table then 'c' is complex
           if (
-            self.snippet.type() === 'impala' &&
+            self.dialect() === DIALECT.impala &&
             location.identifierChain.length > 2 &&
             (location.type === 'table' || location.type === 'column') &&
             self.isDatabase(location.identifierChain[0].name)
@@ -1313,7 +1315,7 @@ class AceLocationHandler {
         }
       });
 
-      if (self.snippet.type() === 'impala' || self.snippet.type() === 'hive') {
+      if (self.dialect() === DIALECT.impala || self.dialect() === DIALECT.hive) {
         self.verifyExists(tokensToVerify, e.data.activeStatementLocations);
       }
       huePubSub.publish('editor.active.locations', lastKnownLocations);
@@ -1338,7 +1340,7 @@ class AceLocationHandler {
             huePubSub.publish('ace.sql.location.worker.post', {
               id: self.snippet.id(),
               statementDetails: statementDetails,
-              type: self.snippet.type(),
+              type: self.dialect(),
               namespace: self.snippet.namespace(),
               compute: self.snippet.compute(),
               defaultDatabase: self.snippet.database()

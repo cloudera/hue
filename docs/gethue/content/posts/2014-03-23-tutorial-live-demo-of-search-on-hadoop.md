@@ -40,8 +40,8 @@ slide_template:
   - default
 categories:
   - Querying
-
 ---
+
 Edit: This post is deprecated since [Hue 3.6][1], clicking on the install button is the only thing to do now!
 
 Hue comes up with a series of examples (for [Hive][2]/[Impala][2], [HBase][3]...) to help you get started with Hadoop. Recently, some demo Collection/Indexes were added for the [Search Application][4]:
@@ -104,16 +104,16 @@ And that’s it! The above warning message will disappear and you will be able t
 
 Then go create your own Search!
 
-{{< vimeo 76878078 >}}
+{{< youtube ATldKiiJdqY >}}
 
 As usual feel free to comment on the[ hue-user][8] list or [@gethue][9]!
 
- [1]: https://gethue.com/analyse-apache-logs-and-build-your-own-web-analytics-dashboard-with-hadoop-and-solr
- [2]: https://gethue.com/hadoop-tutorial-new-impala-and-hive-editors/
- [3]: https://gethue.com/the-web-ui-for-hbase-hbase-browser/ "The Web UI for HBase: HBase Browser"
- [4]: http://gethue.tumblr.com/post/65969470780/hadoop-tutorials-season-ii-7-how-to-index-and-search
- [5]: http://127.0.0.1:8888/about/
- [6]: https://cdn.gethue.com/uploads/2014/03/Screenshot-from-2014-03-10-161306.png
- [7]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH5/latest/Search/Cloudera-Search-Installation-Guide/csig_deploy_search_solrcloud.html
- [8]: http://groups.google.com/a/cloudera.org/group/hue-user
- [9]: https://twitter.com/gethue
+[1]: https://gethue.com/analyse-apache-logs-and-build-your-own-web-analytics-dashboard-with-hadoop-and-solr
+[2]: https://gethue.com/hadoop-tutorial-new-impala-and-hive-editors/
+[3]: https://gethue.com/the-web-ui-for-hbase-hbase-browser/ 'The Web UI for HBase: HBase Browser'
+[4]: http://gethue.tumblr.com/post/65969470780/hadoop-tutorials-season-ii-7-how-to-index-and-search
+[5]: http://127.0.0.1:8888/about/
+[6]: https://cdn.gethue.com/uploads/2014/03/Screenshot-from-2014-03-10-161306.png
+[7]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH5/latest/Search/Cloudera-Search-Installation-Guide/csig_deploy_search_solrcloud.html
+[8]: http://groups.google.com/a/cloudera.org/group/hue-user
+[9]: https://twitter.com/gethue

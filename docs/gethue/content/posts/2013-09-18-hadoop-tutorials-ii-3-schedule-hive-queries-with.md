@@ -40,13 +40,13 @@ categories:
   - Querying
   - Scheduling
   - Tutorial
-
 ---
+
 <p id="docs-internal-guid-4887476c-320c-a45c-febf-e2e58849f7a2">
   <span>In the previous </span><a href="http://gethue.tumblr.com/post/60937985689/video-series-ii-2-execute-hive-queries-and-schedule"><span>episode</span></a><span> we saw how to create an Hive action in an Oozie workflow. These workflows can then be repeated automatically with an Oozie coordinator. This post describes how to schedule Hadoop jobs (e.g. run this job everyday at midnight).</span>
 </p>
 
-<iframe src="https://player.vimeo.com/video/74378529?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial - Hue: Schedule Hive queries with Oozie coordinators" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube IOF7WMp9VNQ >}}
 
 # <span>Oozie Coordinators</span>
 
@@ -62,7 +62,7 @@ categories:
 
 &nbsp;
 
-<span>As our data is already present, we just need to create an output dataset named ‘</span><span>daily_days</span><span>’ (which contrary to the input dataset won’t check if the input is available). We pick the URI of the data set to be like the date format of the episode one (e.g. </span><span>$YEAR-$MONTH-$DAY</span><span>). These parameters are going to be automatically filled in our workflow by the coordinator. </span>
+<span>As our data is already present, we just need to create an output dataset named ‘</span><span>daily_days</span><span>’ (which contrary to the input dataset won’t check if the input is available). We pick the URI of the data set to be like the date format of the episode one (e.g. </span><span>$YEAR-$MONTH-\$DAY</span><span>). These parameters are going to be automatically filled in our workflow by the coordinator. </span>
 
 &nbsp;
 
@@ -84,6 +84,6 @@ Notice that on Step 5 the  ’Oozie parameters’ list which is the equivalent 
 
 Next, let’s do fast SQL with [Impala][3]!
 
- [1]: http://gethue.tumblr.com/post/60937985689/video-series-ii-2-execute-hive-queries-and-schedule
- [2]: https://issues.cloudera.org/browse/HUE-1389
- [3]: http://gethue.tumblr.com/post/62452792255/fast-sql-with-the-impala-query-editor
+[1]: http://gethue.tumblr.com/post/60937985689/video-series-ii-2-execute-hive-queries-and-schedule
+[2]: https://issues.cloudera.org/browse/HUE-1389
+[3]: http://gethue.tumblr.com/post/62452792255/fast-sql-with-the-impala-query-editor

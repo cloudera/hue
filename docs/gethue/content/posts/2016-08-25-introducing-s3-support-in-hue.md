@@ -37,13 +37,13 @@ sf_remove_promo_bar:
 categories:
   - Browsing
   - Querying
-
 ---
+
 <p class="p1">
   We’re very excited to officially introduce <a href="https://aws.amazon.com/s3/">Amazon S3</a> (Amazon Simple Storage Service) integration in Hue with <a href="https://gethue.com/hue-3-11-with-its-new-s3-browser-and-sql-autocomplete-is-out/">Hue’s 3.11 release</a>. Hue can be setup to read and write to a configured S3 account, and users can directly query from and save data to S3 without any intermediate moving/copying to HDFS.
 </p>
 
-{{< vimeo 243281385 >}}
+{{< youtube P-7XH78aT9s >}}
 
 ## S3 Configuration in Hue {.p3}
 
@@ -135,7 +135,7 @@ region=us-east-1
 
 [<img src="https://cdn.gethue.com/uploads/2016/08/s3_configuration-1024x559.png"  />][1]
 
-##  {.p3}
+## {.p3}
 
 ## Exploring S3 in Hue’s Filebrowser {.p3}
 
@@ -191,8 +191,8 @@ Hue 3.11's seamless support for S3 as an additional filesystem is just the begin
 
 As always, if you have any questions, feel free to comment here or on the [hue-user list][4] or [@gethue][5]!
 
- [1]: https://cdn.gethue.com/uploads/2016/08/s3_configuration.png
- [2]: https://gethue.com/sql-editor/
- [3]: http://blog.cloudera.com/blog/2016/08/analytics-and-bi-on-amazon-s3-with-apache-impala-incubating/
- [4]: http://groups.google.com/a/cloudera.org/group/hue-user
- [5]: https://twitter.com/gethue
+[1]: https://cdn.gethue.com/uploads/2016/08/s3_configuration.png
+[2]: https://gethue.com/sql-editor/
+[3]: http://blog.cloudera.com/blog/2016/08/analytics-and-bi-on-amazon-s3-with-apache-impala-incubating/
+[4]: http://groups.google.com/a/cloudera.org/group/hue-user
+[5]: https://twitter.com/gethue

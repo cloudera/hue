@@ -476,7 +476,7 @@ SchemaQualifiedTableIdentifier_EDIT
  ;
 
 SchemaQualifiedIdentifier
- : RegularOrBacktickedIdentifier                                    -> [{ name: $1 }]
+ : RegularOrBacktickedIdentifier                                       -> [{ name: $1 }]
  | RegularOrBacktickedIdentifier '.' RegularOrBacktickedIdentifier  -> [{ name: $1 }, { name: $2 }]
  ;
 
@@ -658,7 +658,7 @@ DerivedColumnChain_EDIT
  ;
 
 ColumnIdentifier
- : RegularOrBacktickedIdentifier -> { identifier: { name: $1 }, location: @1 }
+ : RegularOrBacktickedIdentifier                                                                               -> { identifier: { name: $1 }, location: @1 }
  ;
 
 PartialBacktickedIdentifierOrPartialCursor

@@ -38,15 +38,15 @@ slide_template:
   - default
 categories:
   - Querying
-
 ---
+
 Hi Big Data Explorers,
 
 Hue [Search dashboards][1] introduced new ways to quickly explore a lot of data by drag & dropping some graphical widgets and leveraging Solr capabilities. The application received a lot of feedback and has been greatly improved.
 
 Here is a short video detailing all the new stuff:
 
-<iframe src="https://player.vimeo.com/video/108381017?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: the Hue Search app update" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube K6YVZq8wymw >}}
 
 &nbsp;
 
@@ -66,9 +66,9 @@ It was re-organized in order to split widgets displaying records or facets.
 
 **Three new widgets**
 
-  * Heatmap
-  * Tree
-  * Marker Map
+- Heatmap
+- Tree
+- Marker Map
 
 Based on the Pivot facet feature of Solr, the Heatmap and Tree let you explore in 2D or nDimensions your data. For example you can plot the distribution of  OS by Browser by country, IP by cities… They are both clickable, meaning you can filter the results by selecting certain values.
 
@@ -110,10 +110,10 @@ We hope that you like the latest additions to the Search App. Feel free to conti
 
 &nbsp;
 
- [1]: https://gethue.com/hadoop-search-dynamic-search-dashboards-with-solr
- [2]: https://cdn.gethue.com/uploads/2014/10/hue-search-v2.1.png
- [3]: https://gethue.com/hadoop-tutorial-kerberos-security-and-sentry-authorization-for-solr-search-app/
- [4]: https://gethue.com/analyse-apache-logs-and-build-your-own-web-analytics-dashboard-with-hadoop-and-solr/
- [5]: http://heliosearch.org/solr-facet-functions/
- [6]: http://groups.google.com/a/cloudera.org/group/hue-user
- [7]: https://twitter.com/gethue
+[1]: https://gethue.com/hadoop-search-dynamic-search-dashboards-with-solr
+[2]: https://cdn.gethue.com/uploads/2014/10/hue-search-v2.1.png
+[3]: https://gethue.com/hadoop-tutorial-kerberos-security-and-sentry-authorization-for-solr-search-app/
+[4]: https://gethue.com/analyse-apache-logs-and-build-your-own-web-analytics-dashboard-with-hadoop-and-solr/
+[5]: http://heliosearch.org/solr-facet-functions/
+[6]: http://groups.google.com/a/cloudera.org/group/hue-user
+[7]: https://twitter.com/gethue

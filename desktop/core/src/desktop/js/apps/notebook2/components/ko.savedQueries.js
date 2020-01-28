@@ -109,7 +109,7 @@ class SavedQueries extends DisposableComponent {
 
     this.currentNotebook = params.currentNotebook;
     this.openFunction = params.openFunction;
-    this.type = params.type;
+    this.dialect = params.dialect;
     this.currentTab = params.currentTab;
 
     this.loading = ko.observable(true);
@@ -174,7 +174,7 @@ class SavedQueries extends DisposableComponent {
       },
       page: this.currentPage(),
       limit: QUERIES_PER_PAGE,
-      type: 'query-' + this.type(),
+      type: 'query-' + this.dialect(),
       query: this.filter(),
       include_trashed: false
     });

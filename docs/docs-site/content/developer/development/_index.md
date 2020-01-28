@@ -546,6 +546,11 @@ Note: on certain OS like Ubuntu, running the tests via a global jest seems to no
 
     npm install jest --global
 
+e.g.
+
+    jest calciteAutocompleteParser.Select.stream.test.js --testPathIgnorePatterns=[]
+    jest calciteAutocompleteParser --testPathIgnorePatterns=[]
+
 How to update snapshot tests:
 
     jest --updateSnapshot

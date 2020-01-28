@@ -39,15 +39,15 @@ sf_caption_position:
 categories:
   - Querying
   - Tutorial
-
 ---
+
 <span>In the previous episodes, we presented how to schedule repetitive worflows on the grid with <a href="http://gethue.tumblr.com/post/61597968730/hadoop-tutorials-ii-3-schedule-hive-queries-with">Oozie Coordinator</a>. Let’s now look at a fast way to query some data with Impala.</span>
 
 <p id="docs-internal-guid-40e7f13f-6181-fb3b-54b1-99253b9abffe">
   <span>Hue, </span><a href="http://gethue.com"><span>the Hadoop UI</span></a><span>, has been supporting </span><a href="https://github.com/cloudera/impala"><span>Impala</span></a><span> closely since its first version and brings fast interactive queries within your browser. If not familiar with </span><a href="http://blog.cloudera.com/blog/2012/10/cloudera-impala-real-time-queries-in-apache-hadoop-for-real/"><span>Impala</span></a><span>, we recommend you to check the documentation of the fastest </span><a href="http://www.cloudera.com/content/support/en/documentation/cloudera-impala/cloudera-impala-documentation-v1-latest.html"><span>SQL engine</span></a><span> for Hadoop.</span>
 </p>
 
-<iframe src="https://player.vimeo.com/video/75493693?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: Hue - The Impala web UI" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube FwcVA_pgmNY >}}
 
 # <span>Impala App</span>
 
@@ -105,12 +105,12 @@ LIMIT 10
 
 As usual feel free to comment on the[<span>hue-user</span>][7] list or [<span>@gethue</span>][8]. Next, we will continue the Hadoop Tutorial season 2 with [Oozie Bundles][9]!
 
- [1]: http://gethue.tumblr.com/post/60376973455/hadoop-tutorials-ii-1-prepare-the-data-for-analysis
- [2]: http://gethue.tumblr.com/post/56804308712/hadoop-tutorial-how-to-access-hive-in-pig-with
- [3]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/Impala/latest/Installing-and-Using-Impala/ciiu_concepts.html
- [4]: http://gethue.tumblr.com/post/49882746559/tutorial-executing-hive-or-impala-queries-with-python
- [5]: https://ccp.cloudera.com/display/SUPPORT/Cloudera+QuickStart+VM
- [6]: http://gethue.tumblr.com/post/64879465564/tutorial-better-file-formats-for-impala-and-quick-sql
- [7]: http://groups.google.com/a/cloudera.org/group/hue-user
- [8]: https://twitter.com/gethue
- [9]: http://gethue.tumblr.com/post/63988110361/hadoop-tutorial-bundle-oozie-coordinators-with-hue
+[1]: http://gethue.tumblr.com/post/60376973455/hadoop-tutorials-ii-1-prepare-the-data-for-analysis
+[2]: http://gethue.tumblr.com/post/56804308712/hadoop-tutorial-how-to-access-hive-in-pig-with
+[3]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/Impala/latest/Installing-and-Using-Impala/ciiu_concepts.html
+[4]: http://gethue.tumblr.com/post/49882746559/tutorial-executing-hive-or-impala-queries-with-python
+[5]: https://ccp.cloudera.com/display/SUPPORT/Cloudera+QuickStart+VM
+[6]: http://gethue.tumblr.com/post/64879465564/tutorial-better-file-formats-for-impala-and-quick-sql
+[7]: http://groups.google.com/a/cloudera.org/group/hue-user
+[8]: https://twitter.com/gethue
+[9]: http://gethue.tumblr.com/post/63988110361/hadoop-tutorial-bundle-oozie-coordinators-with-hue

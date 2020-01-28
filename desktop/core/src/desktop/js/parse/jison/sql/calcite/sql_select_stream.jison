@@ -14,26 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-DataDefinition
- : 'SHOW' ShowStatement
+SelectStatement
+ : 'SELECT' 'STREAM' OptionalAllOrDistinct SelectList
  ;
 
-DataDefinition_EDIT
- : ShowStatement_EDIT
- ;
-
-ShowStatement
- : 'TABLES'
- | 'STREAMS'
- | 'TOPICS'
- | 'QUERIES'
- | 'PROPERTIES'
- ;
-
-
-ShowStatement_EDIT
- : 'SHOW' 'CURSOR'
-   {
-     parser.suggestKeywords(['TABLES', 'STREAMS', 'TOPICS', 'QUERIES', 'PROPERTIES']);
+SelectStatement_EDIT
+ : 'SELECT' 'STREAM' OptionalAllOrDistinct 'CURSOR'
+ {
+   if (!$3) {
+     parser.suggestKeywords(['ALL', 'DISTINCT']);
    }
+ }
  ;

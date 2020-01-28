@@ -306,14 +306,14 @@ class SqlAlchemyApi(Api):
     if table and operation != 'hello':
       columns = assist.get_columns(database, table)
       response['full_headers'] = [{
-        'name': col.get('name'),
-        'type': str(col.get('type')),
-        'comment': ''
-      } for col in columns
-    ]
+          'name': col.get('name'),
+          'type': str(col.get('type')),
+          'comment': ''
+        } for col in columns
+      ]
     elif metadata:
       response['full_headers'] = [{
-        'name': col[0] if type(col) is dict or type(col) is tuple else col,
+        'name': col[0] if type(col) is dict or type(col) is tuple else col.name if hasattr(col, 'name') else col,
         'type': 'STRING_TYPE',
         'comment': ''
       } for col in metadata

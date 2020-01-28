@@ -40,13 +40,13 @@ slide_template:
   - default
 categories:
   - Querying
-
 ---
+
 <p id="docs-internal-guid-2b663878-e805-7a5b-0d8e-b165706741fc">
   <span>Hue provides a Web interface for submitting Hive queries. Hue had its own server to service Hive queries called Beeswax. The more sophisticated and robust service, Apache </span><a href="http://blog.cloudera.com/blog/2013/07/how-hiveserver2-brings-security-and-concurrency-to-apache-hive/"><span>HiveServer2</span></a><span>, is supported as of Hue 2.5.</span>
 </p>
 
-<iframe src="https://player.vimeo.com/video/79883574?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial - Hue - Hive Query editor with HiveServer2 and Sentry" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube -Py11X0G6Hs >}}
 
 # <span>Beeswax Hive Editor</span>
 
@@ -56,13 +56,13 @@ Thanks to HiveServer2 integration, Hue is getting the benefits from [Sentry][1]�
 
 <span>On top of this, the Beeswax Hive UI is a Web editor for increasing the productivity:</span>
 
-  * <span>Syntax highlighting and auto completion</span>
-  * <span>Submit several queries and check they progress later</span>
-  * [<span>UDF</span>][5] <span>integration</span>
-  * <span>Multiple queries execution</span>
-  * <span>Select and send a fraction of a query</span>
-  * <span>Download or save the query results</span>
-  * <span>Navigate through the metadata</span>
+- <span>Syntax highlighting and auto completion</span>
+- <span>Submit several queries and check they progress later</span>
+- [<span>UDF</span>][5] <span>integration</span>
+- <span>Multiple queries execution</span>
+- <span>Select and send a fraction of a query</span>
+- <span>Download or save the query results</span>
+- <span>Navigate through the metadata</span>
 
 ## <span>Hue 2.x</span>
 
@@ -127,9 +127,9 @@ It means that the HADOOP_MAPRED_HOME environment variable is not set to:
 
 <span>HiveServer2 supports 3 authentication modes specified by the ‘hive.server2.authentication’ in hive-site.xml:</span>
 
-  * <span>NOSASL</span>
-  * <span>NONE (default)</span>
-  * <span>KERBEROS</span>
+- <span>NOSASL</span>
+- <span>NONE (default)</span>
+- <span>KERBEROS</span>
 
 Only NOSASL does not require SASL, so you either switch to it or install the missing packages.
 
@@ -165,18 +165,18 @@ The user ‘hue’ is not configured in Sentry and have not the CREATE table per
 
 <span>If you have questions or feedback, feel free to contact the Hue community on </span>[<span>hue-user</span>][14] <span>or </span>[<span>@gethue.com</span>][15]<span>!</span>
 
- [1]: http://cloudera.com/content/cloudera/en/campaign/introducing-sentry.html
- [2]: https://blogs.apache.org/sentry/entry/getting_started
- [3]: http://sentry.incubator.apache.org
- [4]: http://gethue.tumblr.com/tagged/metastore
- [5]: http://gethue.tumblr.com/post/58711590309/hadoop-tutorial-hive-udf-in-1-minute
- [6]: https://github.com/cloudera/hue/blob/branch-2.5.1/desktop/conf.dist/hue.ini#L384
- [7]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L438
- [8]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L450
- [9]: https://issues.cloudera.org/browse/HUE-1561
- [10]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Security-Guide/cdh4sg_topic_9_1.html?scroll=topic_9_1_3_unique_1__title_140_unique_1
- [11]: https://github.com/cloudera/hue#development-prerequisites
- [12]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L471
- [13]: http://gethue.tumblr.com/post/62452792255/fast-sql-with-the-impala-query-editor
- [14]: http://groups.google.com/a/cloudera.org/group/hue-user
- [15]: http://twitter.com/gethue
+[1]: http://cloudera.com/content/cloudera/en/campaign/introducing-sentry.html
+[2]: https://blogs.apache.org/sentry/entry/getting_started
+[3]: http://sentry.incubator.apache.org
+[4]: http://gethue.tumblr.com/tagged/metastore
+[5]: http://gethue.tumblr.com/post/58711590309/hadoop-tutorial-hive-udf-in-1-minute
+[6]: https://github.com/cloudera/hue/blob/branch-2.5.1/desktop/conf.dist/hue.ini#L384
+[7]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L438
+[8]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L450
+[9]: https://issues.cloudera.org/browse/HUE-1561
+[10]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Security-Guide/cdh4sg_topic_9_1.html?scroll=topic_9_1_3_unique_1__title_140_unique_1
+[11]: https://github.com/cloudera/hue#development-prerequisites
+[12]: https://github.com/cloudera/hue/blob/master/desktop/conf.dist/hue.ini#L471
+[13]: http://gethue.tumblr.com/post/62452792255/fast-sql-with-the-impala-query-editor
+[14]: http://groups.google.com/a/cloudera.org/group/hue-user
+[15]: http://twitter.com/gethue

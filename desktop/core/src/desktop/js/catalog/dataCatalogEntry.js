@@ -21,6 +21,7 @@ import apiHelper from 'api/apiHelper';
 import CancellablePromise from 'api/cancellablePromise';
 import catalogUtils from 'catalog/catalogUtils';
 import huePubSub from 'utils/huePubSub';
+import I18n from 'utils/i18n';
 
 /**
  * Helper function to reload the source meta for the given entry
@@ -1196,6 +1197,12 @@ class DataCatalogEntry {
       if (type) {
         title += ' (' + type + ')';
       }
+    } else if (
+      self.definition &&
+      self.definition.type &&
+      self.definition.type.toLowerCase() === 'materialized_view'
+    ) {
+      title += ' (' + I18n('Materialized') + ')';
     }
     if (includeComment && self.hasResolvedComment() && self.getResolvedComment()) {
       title += ' - ' + self.getResolvedComment();
@@ -1302,7 +1309,8 @@ class DataCatalogEntry {
       ((self.sourceMeta && self.sourceMeta.is_view) ||
         (self.definition &&
           self.definition.type &&
-          self.definition.type.toLowerCase() === 'view') ||
+          (self.definition.type.toLowerCase() === 'view' ||
+            self.definition.type.toLowerCase() === 'materialized_view')) ||
         (self.analysis &&
           self.analysis.details &&
           self.analysis.details.properties &&

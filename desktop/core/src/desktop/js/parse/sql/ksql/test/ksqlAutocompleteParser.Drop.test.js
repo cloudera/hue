@@ -39,7 +39,7 @@ describe('ksqlAutocompleteParser.js DROP statements', () => {
     assertAutoComplete({
       beforeCursor: 'DROP ',
       afterCursor: '',
-      containsKeywords: ['DATABASE', 'ROLE', 'SCHEMA', 'TABLE', 'VIEW'],
+      containsKeywords: ['DATABASE', 'SCHEMA', 'TABLE', 'VIEW'],
       expectedResult: {
         lowerCase: false
       }
@@ -98,20 +98,6 @@ describe('ksqlAutocompleteParser.js DROP statements', () => {
         beforeCursor: 'DROP DATABASE foo ',
         afterCursor: '',
         containsKeywords: ['CASCADE'],
-        expectedResult: {
-          lowerCase: false
-        }
-      });
-    });
-  });
-
-  describe('DROP ROLE', () => {
-    it('should handle "DROP ROLE boo;|"', () => {
-      assertAutoComplete({
-        beforeCursor: 'DROP ROLE boo;',
-        afterCursor: '',
-        noErrors: true,
-        containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false
         }
@@ -243,44 +229,6 @@ describe('ksqlAutocompleteParser.js DROP statements', () => {
         expectedResult: {
           lowerCase: false,
           suggestTables: { identifierChain: [{ name: 'boo' }], onlyViews: true }
-        }
-      });
-    });
-  });
-
-  describe('TRUNCATE TABLE', () => {
-    it('should handle "TRUNCATE TABLE baa.boo;"', () => {
-      assertAutoComplete({
-        beforeCursor: 'TRUNCATE TABLE baa.boo;',
-        afterCursor: '',
-        containsKeywords: ['SELECT'],
-        noErrors: true,
-        expectedResult: {
-          lowerCase: false
-        }
-      });
-    });
-
-    it('should suggest keywords for "TRUNCATE |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'truncate ',
-        afterCursor: '',
-        expectedResult: {
-          lowerCase: true,
-          suggestKeywords: ['TABLE']
-        }
-      });
-    });
-
-    it('should suggest tables for "TRUNCATE TABLE |"', () => {
-      assertAutoComplete({
-        beforeCursor: 'TRUNCATE TABLE ',
-        afterCursor: '',
-        expectedResult: {
-          lowerCase: false,
-          suggestTables: {},
-          suggestDatabases: { appendDot: true },
-          suggestKeywords: ['IF EXISTS']
         }
       });
     });

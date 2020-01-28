@@ -116,7 +116,7 @@ describe('ksqlAutocompleteParser.js Error statements', () => {
     assertAutoComplete({
       beforeCursor: 'SELECT * FROM testTable ORDER BY bla bla bla boo ',
       afterCursor: '',
-      containsKeywords: ['LIMIT', 'UNION'],
+      containsKeywords: ['LIMIT'],
       expectedResult: {
         lowerCase: false
       }
@@ -127,7 +127,7 @@ describe('ksqlAutocompleteParser.js Error statements', () => {
     assertAutoComplete({
       beforeCursor: 'SELECT * FROM testTable ORDER BY bla bla bla boo ',
       afterCursor: '',
-      containsKeywords: ['LIMIT', 'UNION'],
+      containsKeywords: ['LIMIT'],
       expectedResult: {
         lowerCase: false
       }

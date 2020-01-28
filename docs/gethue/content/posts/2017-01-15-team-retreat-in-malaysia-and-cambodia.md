@@ -38,15 +38,15 @@ sf_remove_promo_bar:
   - 1
 categories:
   - News
-
 ---
+
 Selamat pagi, ជំរាបសួរ!
 
 After the [cold and beers of Riga][1], the team headed in South-East Asia for its next product development retreat and discovery of other cultures.
 
 There, nice (and humid) temperatures, visits of golden Buddhas, magnificent temples in Angkor Wat, tuk tuk rides, local spicy food were favorable to a lot of creativity and progress on the next parts of Hue!
 
-<iframe src="https://player.vimeo.com/video/199432002?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hue Team Retreat in Kuala Lumpur and Siem Reap" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube 8M88ld7etVA >}}
 
 Onwards!
 
@@ -66,9 +66,9 @@ Onwards!
 
 &nbsp;
 
- [1]: https://gethue.com/team-retreat-in-riga/
- [2]: https://twitter.com/gethue
- [3]: https://cdn.gethue.com/uploads/2016/12/IMG_5609.jpg
- [4]: https://cdn.gethue.com/uploads/2016/12/IMG_5670.jpg
- [5]: https://cdn.gethue.com/uploads/2016/12/IMG_5719.jpg
- [6]: https://cdn.gethue.com/uploads/2016/12/IMG_5638.jpg
+[1]: https://gethue.com/team-retreat-in-riga/
+[2]: https://twitter.com/gethue
+[3]: https://cdn.gethue.com/uploads/2016/12/IMG_5609.jpg
+[4]: https://cdn.gethue.com/uploads/2016/12/IMG_5670.jpg
+[5]: https://cdn.gethue.com/uploads/2016/12/IMG_5719.jpg
+[6]: https://cdn.gethue.com/uploads/2016/12/IMG_5638.jpg

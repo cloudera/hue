@@ -520,7 +520,7 @@ class SuperClient(object):
               raise
         except Exception as e:
           logging.exception("Thrift saw exception (this may be expected).")
-          if "'client_protocol' is unset" in e.message:
+          if "'client_protocol' is unset" in str(e):
             raise StructuredException(
               'OPEN_SESSION',
               'Thrift version configured by property thrift_version might be too high. Request failed with "%s"' % str(e),
@@ -825,4 +825,7 @@ def log_if_slow_call(duration, message):
   elif duration >= math.floor(INFO_LEVEL_CALL_DURATION_MS / 1000):
     LOG.info('SLOW: %.2f - %s' % (duration, message))
   else:
-    LOG.debug(message)
+    #Leave this as logging.debug and not logger.
+    #Otherwise we never get these logging messages even with debug enabled.
+    #Review this in the future to find out why.
+    logging.debug(message)

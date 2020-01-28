@@ -35,9 +35,8 @@ sf_caption_position:
 sf_remove_promo_bar:
   - 1
 categories:
-
-
 ---
+
 Dans ce tutoriel, nous utilisons les données publiques de [Bay Area BikeShare][1] afin de visualiser les déplacements en vélo des utilisateurs et ainsi mieux comprendre l'utilisation de la plate-forme. Nous utiliserons Hue qui fournit un tableau de bord dynamique pour chercher ainsi que son nouveau Spark Notebook pour enrichir les données.
 
 Nous vous recommandons de commencer avec le jeu de données <http://www.bayareabikeshare.com/datachallenge>  mais pour les gens impatients, nous fournir un sous-ensemble des [voyages][2]  prêts à être indexées ainsi que les [données météorologiques][3] à traiter plus tard avec Spark. Le Notebook peut être [téléchargé][4] et importé ou tout simplement [copie collé][5] depuis ici.
@@ -48,7 +47,7 @@ Cette démo combinée avec la présentation [en temps réel en streaming Spark]
 
 Bon Vélo!
 
-{{< vimeo 132834405 >}}
+{{< youtube K5SNB1bSxgk >}}
 
 Video en Anglais, avec un accent Francais 😉
 
@@ -74,14 +73,14 @@ Un moyen rapide pour indexer les données avec Solr:
   </p>
 </div>
 
- [1]: http://www.bayareabikeshare.com/
- [2]: https://www.dropbox.com/s/jw44si1gy26tdhj/bikedataclean.csv?dl=0
- [3]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/spark/bikeshare/201408_weather_data.csv
- [4]: https://www.dropbox.com/s/rv7s28iyw9x47q1/weather-data.spark.hue.json?dl=0
- [5]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/spark/bikeshare/notebook.txt
- [6]: https://gethue.com/build-a-real-time-analytic-dashboard-with-solr-search-and-spark-streaming/
- [7]: https://gethue.com/hadoop-summit-san-jose-2015-interactively-query-and-search-your-big-data/
- [8]: https://gethue.com/big-data-day-la-solr-search-with-spark-for-big-data-analytics-in-action-with-hue/
- [9]: https://cdn.gethue.com/uploads/2015/06/solr-bike-dashboard.png
- [10]: http://groups.google.com/a/cloudera.org/group/hue-user
- [11]: https://twitter.com/gethue
+[1]: http://www.bayareabikeshare.com/
+[2]: https://www.dropbox.com/s/jw44si1gy26tdhj/bikedataclean.csv?dl=0
+[3]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/spark/bikeshare/201408_weather_data.csv
+[4]: https://www.dropbox.com/s/rv7s28iyw9x47q1/weather-data.spark.hue.json?dl=0
+[5]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/spark/bikeshare/notebook.txt
+[6]: https://gethue.com/build-a-real-time-analytic-dashboard-with-solr-search-and-spark-streaming/
+[7]: https://gethue.com/hadoop-summit-san-jose-2015-interactively-query-and-search-your-big-data/
+[8]: https://gethue.com/big-data-day-la-solr-search-with-spark-for-big-data-analytics-in-action-with-hue/
+[9]: https://cdn.gethue.com/uploads/2015/06/solr-bike-dashboard.png
+[10]: http://groups.google.com/a/cloudera.org/group/hue-user
+[11]: https://twitter.com/gethue

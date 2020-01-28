@@ -326,7 +326,13 @@ def get_api(request, snippet):
   if snippet.get('type') == 'report':
     snippet['type'] = 'impala'
 
-  interpreter = get_interpreter(connector_type=snippet['type'], user=request.user)
+  if snippet.get('connector'):
+    connector_name = snippet['connector']['type'] # Ideally unify with name and nice_name
+    snippet['type'] = connector_name
+  else:
+    connector_name = snippet['type']
+
+  interpreter = get_interpreter(connector_type=connector_name, user=request.user)
   interface = interpreter['interface']
 
   if get_cluster_config(request.user)['has_computes']:
@@ -398,7 +404,7 @@ def get_api(request, snippet):
     return HBaseApi(request.user)
   elif interface == 'ksql':
     from notebook.connectors.ksql import KSqlApi
-    return KSqlApi(request.user)
+    return KSqlApi(request.user, interpreter=interpreter)
   elif interface == 'flink':
     from notebook.connectors.flink import FlinkSqlApi
     return FlinkSqlApi(request.user, interpreter=interpreter)

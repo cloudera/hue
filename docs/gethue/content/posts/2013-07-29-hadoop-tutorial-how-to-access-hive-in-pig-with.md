@@ -41,13 +41,13 @@ slide_template:
 categories:
   - Browsing
   - Querying
-
 ---
+
 <p id="docs-internal-guid-058adb35-2bdf-a121-9dad-1fb68e2c56c5">
   <span>This blog post is about accessing the Hive Metastore from Hue, the open source </span><a href="http://gethue.com"><span>Hadoop UI</span></a><span> and clearing up some confusion about HCatalog usage.</span>
 </p>
 
-<iframe src="https://player.vimeo.com/video/71024770?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop tutorial: how to use HCatalog in Hue" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube FgozGP1JdI0 >}}
 
 # <span>What is HCatalog?</span>
 
@@ -138,13 +138,13 @@ sudo chmod 777 -R /var/lib/hive/metastore/metastore_db</pre>
 
 <span>As usual, we welcome any feedback on the </span>[<span>user group</span>][10]<span>!</span>
 
- [1]: http://blog.cloudera.com/blog/2013/04/demo-analyzing-data-with-hue-and-hive/
- [2]: http://blog.cloudera.com/blog/2013/07/how-hiveserver2-brings-security-and-concurrency-to-apache-hive/
- [3]: http://gethue.tumblr.com/post/51559235973/tutorial-apache-pig-editor-in-hue-2-3
- [4]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/cdh4ig_topic_19.html
- [5]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/cdh4ig_hive_metastore_configure.html
- [6]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hcatalog/avg_salary.pig
- [7]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hcatalog/avg_salary.hql
- [8]: http://hive.apache.org/docs/hcat_r0.5.0/loadstore.html#HCatStorer
- [9]: https://issues.cloudera.org/browse/HUE-1409
- [10]: http://groups.google.com/a/cloudera.org/group/hue-user
+[1]: http://blog.cloudera.com/blog/2013/04/demo-analyzing-data-with-hue-and-hive/
+[2]: http://blog.cloudera.com/blog/2013/07/how-hiveserver2-brings-security-and-concurrency-to-apache-hive/
+[3]: http://gethue.tumblr.com/post/51559235973/tutorial-apache-pig-editor-in-hue-2-3
+[4]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/cdh4ig_topic_19.html
+[5]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/cdh4ig_hive_metastore_configure.html
+[6]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hcatalog/avg_salary.pig
+[7]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hcatalog/avg_salary.hql
+[8]: http://hive.apache.org/docs/hcat_r0.5.0/loadstore.html#HCatStorer
+[9]: https://issues.cloudera.org/browse/HUE-1409
+[10]: http://groups.google.com/a/cloudera.org/group/hue-user

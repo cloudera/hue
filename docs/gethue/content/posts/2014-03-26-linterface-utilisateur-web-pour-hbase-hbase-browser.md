@@ -39,9 +39,8 @@ sf_caption_position:
 slide_template:
   - default
 categories:
-
-
 ---
+
 Dans ce post, nous allons jeter un oeil &agrave; la nouvelle application de navigation de HBase ajout&eacute; &agrave; Hue 2.5 et consid&eacute;rablement am&eacute;lior&eacute;e depuis.&nbsp;<span>Pour obtenir Hue navigateur HBase, t</span><span>&eacute;l</span><span>&eacute;charger</span><span>&nbsp;Hue</span><span>&nbsp;</span>[nightly.cloudera.com/cdh4][1]<span>&nbsp;</span><span>ou construisez le directement &agrave; partir de github:&nbsp;</span><https://github.com/cloudera/hue><span>.</span>
 
 Pr&eacute;-requis avant de commencer:
@@ -54,7 +53,7 @@ Pr&eacute;-requis avant de commencer:
 
 Dans cette vid&eacute;o, nous d<span>&eacute;monstons</span><span>&nbsp;deux principales caract&eacute;ristiques de cette application. Let's go!</span></p>
 
-{{< vimeo 72357888 >}}</p>
+{{< youtube jmcwYCxSwq0 >}}
 
 ## SmartView
 
@@ -124,13 +123,13 @@ Cela va multiplier ma requ&ecirc;te sur toutes les familles de la colonne.&nbsp;
 
 <pre class="code">&nbsp;&nbsp;&nbsp; domain.100 [famille: pr&eacute;fixe * +3]</pre>
 
-Cela va me chercher toutes les colonnes qui commencent par le pr&eacute;fixe * dans la limite de 3 r&eacute;sultats.&nbsp;Enfin, je peux filtrer sur une plage:
+Cela va me chercher toutes les colonnes qui commencent par le pr&eacute;fixe \* dans la limite de 3 r&eacute;sultats.&nbsp;Enfin, je peux filtrer sur une plage:
 
 <pre class="code">domain.100 [famille: column1 &agrave; column100]</pre>
 
 Cela va me chercher toutes les colonnes de la &laquo;famille:&laquo; qui sont lexicographique> = column1 mais <= column100.&nbsp;La premi&egrave;re colonne ("column1") doit &ecirc;tre une colonne valide, mais la second peut juste &ecirc;tre une ligne de texte pour la comparaison.
 
-Le Smart Search prend &eacute;galement en charge le filtrage sur les lignes pr&eacute;fix<span>&eacute;</span><span>es.&nbsp;Pour s&eacute;lectionner une ligne pr&eacute;fix&eacute;e, il suffit de taper la cl&eacute; de la ligne suivie par une &eacute;toile *.&nbsp;Le pr&eacute;fixe doit &ecirc;tre soulign&eacute; comme n'importe quel autre mot cl&eacute; searchbar.&nbsp;Une analyse de pr&eacute;fixe est effectu&eacute;e exactement comme un scan r&eacute;gulier, mais avec une rang&eacute;e pr&eacute;fix&eacute;e.</span></p>
+Le Smart Search prend &eacute;galement en charge le filtrage sur les lignes pr&eacute;fix<span>&eacute;</span><span>es.&nbsp;Pour s&eacute;lectionner une ligne pr&eacute;fix&eacute;e, il suffit de taper la cl&eacute; de la ligne suivie par une &eacute;toile \*.&nbsp;Le pr&eacute;fixe doit &ecirc;tre soulign&eacute; comme n'importe quel autre mot cl&eacute; searchbar.&nbsp;Une analyse de pr&eacute;fixe est effectu&eacute;e exactement comme un scan r&eacute;gulier, mais avec une rang&eacute;e pr&eacute;fix&eacute;e.</span></p>
 
 <pre class="code">domain.10 * +10</pre>
 
@@ -146,7 +145,7 @@ N'h&eacute;sitez pas &agrave; essayer l'application &agrave;&nbsp;[gethue.com][3
 
 Les futures fonctionnalit&eacute;s pr<span>&eacute;vues sont</span><span>:&nbsp;</span><span>support de&nbsp;</span><span>Thrift 2, la s&eacute;curit&eacute; Kerberos et le chargement de donn&eacute;es group&eacute;es!</span>
 
- [1]: http://nightly.cloudera.com/cdh4/
- [2]: denied:about:blank
- [3]: https://gethue.com/
- [4]: https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user
+[1]: http://nightly.cloudera.com/cdh4/
+[2]: denied:about:blank
+[3]: https://gethue.com/
+[4]: https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user

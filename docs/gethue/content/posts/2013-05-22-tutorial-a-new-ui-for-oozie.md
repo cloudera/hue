@@ -41,8 +41,8 @@ slide_template:
 categories:
   - Scheduling
   - Release
-
 ---
+
 <p id="docs-internal-guid-49be0c2f-ce57-b599-b202-4938fdfe4c02">
   <a href="http://oozie.apache.org/">Apache Oozie</a> is a great tool for building workflows of Hadoop jobs and scheduling them repeatedly. However, the user experience could be improved. In particular, all the job management happens on the command line and the default UI is readonly and requires a non-Apache licensed javascript library that makes it even more difficult to use.
 </p>
@@ -59,7 +59,7 @@ New Oozie UI
 
 Here is a short video demo:
 
-<iframe src="https://player.vimeo.com/video/66732338?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="New alternative Oozie UI" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube wXJzqMQpssc >}}
 
 The UI just sits on top of Oozie like the current Oozie UI. You can download a [release here][1]{.trackLink}.
 
@@ -69,13 +69,13 @@ The [README][2] is available online as well as the source code on [github][3] an
 
 Feature list
 
-  * Workflows, Coordinators, Bundles dashboards
-  * Built with standard and current Web technologies
-  * Filtering, sorting, progress bars, XML highlighting
-  * Kill, suspend, and re-run jobs from the UI
-  * One click access to Oozie logs or MapReduce launcher logs
-  * One click access to the HDFS outputs of the jobs
-  * Spotlight search about Oozie instrumentation/configuration
+- Workflows, Coordinators, Bundles dashboards
+- Built with standard and current Web technologies
+- Filtering, sorting, progress bars, XML highlighting
+- Kill, suspend, and re-run jobs from the UI
+- One click access to Oozie logs or MapReduce launcher logs
+- One click access to the HDFS outputs of the jobs
+- Spotlight search about Oozie instrumentation/configuration
 
 &nbsp;
 
@@ -85,8 +85,8 @@ We hope that you give a try to this new standalone UI. In the next version, we c
 
 As usual, we are welcoming any [feedback][5]!
 
- [1]: https://cdn.gethue.com/downloads/releases/hue-oozie/hue-oozie-1.1.tgz
- [2]: https://github.com/cloudera/hue/blob/hue-oozie/dist/README
- [3]: https://github.com/cloudera/hue/tree/hue-oozie
- [4]: https://gethue.com/the-dynamic-workflow-builder-in-hue/
- [5]: http://groups.google.com/a/cloudera.org/group/hue-user
+[1]: https://cdn.gethue.com/downloads/releases/hue-oozie/hue-oozie-1.1.tgz
+[2]: https://github.com/cloudera/hue/blob/hue-oozie/dist/README
+[3]: https://github.com/cloudera/hue/tree/hue-oozie
+[4]: https://gethue.com/the-dynamic-workflow-builder-in-hue/
+[5]: http://groups.google.com/a/cloudera.org/group/hue-user

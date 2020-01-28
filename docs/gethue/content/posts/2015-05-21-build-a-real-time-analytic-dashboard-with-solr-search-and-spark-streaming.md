@@ -37,21 +37,21 @@ sf_remove_promo_bar:
 categories:
   - Querying
   - Tutorial
-
 ---
+
 Search is a great way to interactively explore your data. The Search App is [continuously improving][1] and now comes with a better support for real time!
 
 In this video, we are collecting tweets with Spark Streaming and directly indexing them into Solr with the [Spark Solr][2] app. Note that we are using a slightly [modified version][3] that adds more [tweet information][4].
 
-<iframe src="https://player.vimeo.com/video/128371643?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: Build a Real Time Analytic dashboard with Solr Search and Spark Streaming" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube qnGEx-3Refg >}}
 
 &nbsp;
 
 You can see the tweets rolling in! Compared to the previous version:
 
-  * the dashboard updates its widgets only when the data changes without any page jumping
-  * the dashboard can refresh itself automatically every N seconds
-  * a main date filter lets you quickly select a rolling date range for all the dashboard
+- the dashboard updates its widgets only when the data changes without any page jumping
+- the dashboard can refresh itself automatically every N seconds
+- a main date filter lets you quickly select a rolling date range for all the dashboard
 
 &nbsp;
 
@@ -87,14 +87,14 @@ They are other ways to index data in [near real time][8] but we took this approa
 
 As usual feel free to comment on the [hue-user][10] list or [@gethue][11]!
 
- [1]: https://gethue.com/more-solr-search-dashboards-possibilities/
- [2]: https://github.com/LucidWorks/spark-solr
- [3]: https://github.com/romainr/spark-solr
- [4]: https://github.com/romainr/spark-solr/commits/master
- [5]: https://cdn.gethue.com/uploads/2015/05/live-search.png
- [6]: https://builds.apache.org/job/Solr-Artifacts-5.x/lastSuccessfulBuild/artifact/solr/package/
- [7]: https://github.com/romainr/spark-solr#example-applications
- [8]: http://www.cloudera.com/content/cloudera/en/documentation/cloudera-search/v1-latest/Cloudera-Search-User-Guide/csug_flume_nrt_index_ref.html
- [9]: http://yonik.com/solr-facet-functions/
- [10]: http://groups.google.com/a/cloudera.org/group/hue-user
- [11]: https://twitter.com/gethue
+[1]: https://gethue.com/more-solr-search-dashboards-possibilities/
+[2]: https://github.com/LucidWorks/spark-solr
+[3]: https://github.com/romainr/spark-solr
+[4]: https://github.com/romainr/spark-solr/commits/master
+[5]: https://cdn.gethue.com/uploads/2015/05/live-search.png
+[6]: https://builds.apache.org/job/Solr-Artifacts-5.x/lastSuccessfulBuild/artifact/solr/package/
+[7]: https://github.com/romainr/spark-solr#example-applications
+[8]: http://www.cloudera.com/content/cloudera/en/documentation/cloudera-search/v1-latest/Cloudera-Search-User-Guide/csug_flume_nrt_index_ref.html
+[9]: http://yonik.com/solr-facet-functions/
+[10]: http://groups.google.com/a/cloudera.org/group/hue-user
+[11]: https://twitter.com/gethue

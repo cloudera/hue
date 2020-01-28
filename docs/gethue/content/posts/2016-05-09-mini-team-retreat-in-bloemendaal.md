@@ -38,8 +38,8 @@ sf_remove_promo_bar:
   - 1
 categories:
   - News
-
 ---
+
 Hallo!
 
 After a last [retreat in Vietnam][1], the team went for a few days on the coast of the country of the windmills, beer and tulips: Holland!
@@ -48,7 +48,7 @@ There, from a sea view apartment, the team enjoyed the somehow sunny weather and
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/165860141?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hue Team Retreat - North Sea 2016" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube lyX9AAxxcAE >}}
 
 &nbsp;
 
@@ -66,9 +66,9 @@ Onwards!
 
 [<img src="https://cdn.gethue.com/uploads/2016/02/IMG_3480-1024x768.jpg"  />][6]
 
- [1]: https://gethue.com/team-retreat-in-vietnam/
- [2]: https://twitter.com/gethue
- [3]: https://cdn.gethue.com/uploads/2016/02/IMG_3488.jpg
- [4]: https://cdn.gethue.com/uploads/2016/02/IMG_3504.jpg
- [5]: https://cdn.gethue.com/uploads/2016/02/IMG_3467-e1461634388615.jpg
- [6]: https://cdn.gethue.com/uploads/2016/02/IMG_3480.jpg
+[1]: https://gethue.com/team-retreat-in-vietnam/
+[2]: https://twitter.com/gethue
+[3]: https://cdn.gethue.com/uploads/2016/02/IMG_3488.jpg
+[4]: https://cdn.gethue.com/uploads/2016/02/IMG_3504.jpg
+[5]: https://cdn.gethue.com/uploads/2016/02/IMG_3467-e1461634388615.jpg
+[6]: https://cdn.gethue.com/uploads/2016/02/IMG_3480.jpg

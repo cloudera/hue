@@ -39,8 +39,8 @@ slide_template:
 categories:
   - Administration
   - Browsing
-
 ---
+
 You can now view Snappy compressed <a href="http://avro.apache.org/" target="_blank" rel="noopener noreferrer">Avro</a> files in Hue through the [File Browser][1]! Here is a quick guide on how to get setup with Snappy and Avro.
 
 #
@@ -49,22 +49,23 @@ You can now view Snappy compressed <a href="http://avro.apache.org/" target="_bl
 
 ## Installation
 
-  1. Make sure Hue is stopped before installing.
-  2. Install the snappy system packages on your system. They can either be downloaded from <https://code.google.com/p/snappy/> or, preferably, installed via your package management system (e.g. `yum install snappy-devel`).
-  3. Install the python-snappy package via ‘pip’ from the Hue home (cd /usr/lib/hue or /opt/cloudera/parcels/CDH/lib/hue):
-    <pre><code class="bash">yum install gcc gcc-c++ python-devel snappy-devel
+1. Make sure Hue is stopped before installing.
+2. Install the snappy system packages on your system. They can either be downloaded from <https://code.google.com/p/snappy/> or, preferably, installed via your package management system (e.g. `yum install snappy-devel`).
+3. Install the python-snappy package via ‘pip’ from the Hue home (cd /usr/lib/hue or /opt/cloudera/parcels/CDH/lib/hue):
+   <pre><code class="bash">yum install gcc gcc-c++ python-devel snappy-devel
+
 
     build/env/bin/pip install -U setuptools
 
     build/env/bin/pip install python-snappy</code></pre>
 
-  4. Start Hue!
+4. Start Hue!
 
 ## Demo
 
 Once Snappy and python-snappy have been installed, the File Browser will automatically detect and view Snappy compressed Avro files. Here is a quick video demonstrating this!
 
-{{< vimeo 95549710 >}}
+{{< youtube jfoEvwwdZ_Y >}}
 
 Note: In this demo, we are using Avro files found in this [github][2] (1).
 
@@ -126,9 +127,9 @@ We hope this helps you look at the inputs and outputs of MapReduce jobs, Hive qu
 
 # References:
 
-  1. Reading and writing Avro files from the command line - <http://www.michael-noll.com/blog/2013/03/17/reading-and-writing-avro-files-from-the-command-line/>
+1. Reading and writing Avro files from the command line - <http://www.michael-noll.com/blog/2013/03/17/reading-and-writing-avro-files-from-the-command-line/>
 
- [1]: https://gethue.com/category/file-browser/
- [2]: https://github.com/miguno/avro-cli-examples
- [3]: https://groups.google.com/a/cloudera.org/forum/?fromgroups#!forum/hue-user
- [4]: https://twitter.com/gethue
+[1]: https://gethue.com/category/file-browser/
+[2]: https://github.com/miguno/avro-cli-examples
+[3]: https://groups.google.com/a/cloudera.org/forum/?fromgroups#!forum/hue-user
+[4]: https://twitter.com/gethue

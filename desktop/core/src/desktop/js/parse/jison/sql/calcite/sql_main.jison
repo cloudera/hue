@@ -777,6 +777,7 @@ SelectStatement_EDIT
      if ($3.cursorAtStart) {
        var keywords = parser.getSelectListKeywords();
        if (!$2) {
+         keywords.push({ value: 'STREAM', weight: 3 });
          keywords.push({ value: 'ALL', weight: 2 });
          keywords.push({ value: 'DISTINCT', weight: 2 });
        }
@@ -810,6 +811,7 @@ SelectStatement_EDIT
        parser.suggestAnalyticFunctions();
      }
      if (!$2) {
+       keywords.push({ value: 'STREAM', weight: 3 });
        keywords.push({ value: 'ALL', weight: 2 });
        keywords.push({ value: 'DISTINCT', weight: 2 });
      }
@@ -840,6 +842,7 @@ SelectStatement_EDIT
        parser.suggestAnalyticFunctions();
      }
      if (!$2) {
+       keywords.push({ value: 'STREAM', weight: 3 });
        keywords.push({ value: 'ALL', weight: 2 });
        keywords.push({ value: 'DISTINCT', weight: 2 });
      }
