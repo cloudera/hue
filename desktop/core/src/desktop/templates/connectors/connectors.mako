@@ -225,7 +225,7 @@ ${ layout.menubar(section='connectors') }
       <div class="span10">
         <div data-bind="dockable: { scrollable: ${ MAIN_SCROLLABLE }, jumpCorrection: 0, topSnap: '${ TOP_SNAP }', triggerAdjust: 0 }">
           <span class="pull-right">
-            <a href="https://gethue.com" target="_blank">
+            <a href="https://docs.gethue.com/administrator/configuration/" target="_blank">
               <i class="fa fa-question-circle"></i> ${ _('Help') }
             </a>
           </span>
