@@ -36,15 +36,15 @@ sf_remove_promo_bar:
   - 1
 categories:
   - Scheduling
-
 ---
+
 Oozie is one of the [initial major][1] first app in Hue. We are continuously investing in making it better and just did a major jump in its editor (to learn about the improvements in the Dashboard in <a href="https://gethue.com/oozie-dashboard-improvements/" target="_blank" rel="noopener noreferrer">the other post</a>).
 
 This revamp of the Oozie Editor brings a new look and requires much less knowledge of [Oozie][2]! Workflows now support tens of [new functionalities][3] and require just a few clicks to be set up!
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/123416513?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: the Hue Oozie workflow editor version 2" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube ON15jrXpqeI >}}
 
 &nbsp;
 
@@ -64,8 +64,8 @@ In the new interface, only the most important properties of an action are asked 
 
 Two new actions have been added:
 
-  * HiveServer2
-  * Spark
+- HiveServer2
+- Spark
 
 [<img src="https://cdn.gethue.com/uploads/2015/03/new-spark-hs2-actions.png"  />][8]
 
@@ -81,9 +81,9 @@ Decision node support has been improved, copying an existing action is also now 
 
 Coordinators have been vastly improved! The notion of Oozie datasets is not needed anymore. The editor pulls the parameters of your workflow and offers 3 types of inputs:
 
-  * **parameters**: constant or Oozie EL function like time
-  * **input path**: parameterize an input path dependency and wait for it to exist, e.g.
-  * **output path**: like an input path but does not need to exist for starting the job
+- **parameters**: constant or Oozie EL function like time
+- **input path**: parameterize an input path dependency and wait for it to exist, e.g.
+- **output path**: like an input path but does not need to exist for starting the job
 
 [<img src="https://cdn.gethue.com/uploads/2015/03/oozie-new-coordinator-1024x376.png" />][10]
 
@@ -117,20 +117,20 @@ Old workflows are not automatically convert to the new format. Hue will try to i
 
 A new [export and / export][17] is planned for Hue 4. It will let you export workflows in both XML / JSON Hue format and import from Hue’s format.
 
- [1]: https://gethue.com/category/oozie/
- [2]: http://oozie.apache.org/
- [3]: https://issues.cloudera.org/browse/HUE-2180
- [4]: https://github.com/cloudera/hue/tree/master/apps/oozie/examples/workflows
- [5]: https://cdn.gethue.com/uploads/2015/03/new-oozie.png
- [6]: https://cdn.gethue.com/uploads/2015/03/oozie-v2-editor.png
- [7]: https://cdn.gethue.com/uploads/2015/03/old-oozie.png
- [8]: https://cdn.gethue.com/uploads/2015/03/new-spark-hs2-actions.png
- [9]: https://cdn.gethue.com/uploads/2015/03/oozie-avanced-action-options.png
- [10]: https://cdn.gethue.com/uploads/2015/03/oozie-new-coordinator.png
- [11]: https://cdn.gethue.com/uploads/2015/03/oozie-new-submit-popup.png
- [12]: https://gethue.com/export-and-import-your-oozie-workflows/
- [13]: https://issues.cloudera.org/browse/HUE-2644
- [14]: http://groups.google.com/a/cloudera.org/group/hue-user
- [15]: https://twitter.com/gethue
- [16]: https://cdn.gethue.com/uploads/2015/03/oozie-import-try.png
- [17]: https://issues.cloudera.org/browse/HUE-1660
+[1]: https://gethue.com/category/oozie/
+[2]: http://oozie.apache.org/
+[3]: https://issues.cloudera.org/browse/HUE-2180
+[4]: https://github.com/cloudera/hue/tree/master/apps/oozie/examples/workflows
+[5]: https://cdn.gethue.com/uploads/2015/03/new-oozie.png
+[6]: https://cdn.gethue.com/uploads/2015/03/oozie-v2-editor.png
+[7]: https://cdn.gethue.com/uploads/2015/03/old-oozie.png
+[8]: https://cdn.gethue.com/uploads/2015/03/new-spark-hs2-actions.png
+[9]: https://cdn.gethue.com/uploads/2015/03/oozie-avanced-action-options.png
+[10]: https://cdn.gethue.com/uploads/2015/03/oozie-new-coordinator.png
+[11]: https://cdn.gethue.com/uploads/2015/03/oozie-new-submit-popup.png
+[12]: https://gethue.com/export-and-import-your-oozie-workflows/
+[13]: https://issues.cloudera.org/browse/HUE-2644
+[14]: http://groups.google.com/a/cloudera.org/group/hue-user
+[15]: https://twitter.com/gethue
+[16]: https://cdn.gethue.com/uploads/2015/03/oozie-import-try.png
+[17]: https://issues.cloudera.org/browse/HUE-1660

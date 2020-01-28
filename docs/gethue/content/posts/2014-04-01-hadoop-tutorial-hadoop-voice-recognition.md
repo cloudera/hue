@@ -39,12 +39,12 @@ sf_remove_promo_bar:
 slide_template:
   - default
 categories:
-
 ---
+
 In Hue 3.6 (patch 0401) we have introduced a new amazing feature: Hadoop Voice Recognition!
 
 We have implemented the latest NLP features in it so you can naturally speak to Hue and it will try to understand what to do.
 
 Current support includes smart Hive and Impala queries, HDFS commands (list, move, copy, show content, upload), Pig dictation and Oozie reporting and submission. Search is coming up soon!
 
-<iframe src="https://player.vimeo.com/video/90633224?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: Hadoop Voice Recognition (NLP) in Hue" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube Q1lFZs5A2Jc >}}

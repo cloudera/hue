@@ -40,8 +40,8 @@ slide_template:
   - default
 categories:
   - Browsing
-
 ---
+
 <p id="docs-internal-guid-22828246-a92a-294b-6fce-77a2305b7a80">
   In this post, we’ll take a look at the new HBase Browser App added in Hue 2.5.
 </p>
@@ -50,7 +50,7 @@ categories:
 
 If you want to learn how to create various tables in HBase, go look at [episode 1][1]!
 
-<iframe src="https://player.vimeo.com/video/72357888?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop tutorial: an introduction to the new HBase Browser" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube jmcwYCxSwq0 >}}
 
 Prerequisites before starting Hue:
 
@@ -162,7 +162,7 @@ This will multiply my query over all column families. I can also do prefixes and
 
 <pre class="code">    domain.100[family: prefix* +3]</pre>
 
-This will fetch me all columns that start with prefix* limited to 3 results.  Finally, I can filter on range:
+This will fetch me all columns that start with prefix\* limited to 3 results.  Finally, I can filter on range:
 
 &nbsp;
 
@@ -170,7 +170,7 @@ This will fetch me all columns that start with prefix* limited to 3 results.  F
 
 This will fetch me all columns in ‘family:’ that are lexicographically >= column1 but <= column100.  The first column (‘column1’) must be a valid column, but the second can just be any string for comparison.
 
-The Smart Search also supports prefix filtering on rows.  To select a prefixed row, simply type the row key followed by a star *.  The prefix should be highlighted like any other searchbar keyword.  A prefix scan is performed exactly like a regular scan, but with a prefixed row.
+The Smart Search also supports prefix filtering on rows.  To select a prefixed row, simply type the row key followed by a star \*.  The prefix should be highlighted like any other searchbar keyword.  A prefix scan is performed exactly like a regular scan, but with a prefixed row.
 
 &nbsp;
 
@@ -190,7 +190,7 @@ Feel free to try the app at [gethue.com][3].  Let us know what you think on the
 
 Look forward to more features including Thrift 2 support, kerberos security and bulk data upload.
 
- [1]: http://gethue.tumblr.com/post/58181985680/hadoop-tutorial-how-to-create-example-tables-in-hbase
- [2]: blank
- [3]: http://gethue.com
- [4]: https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user
+[1]: http://gethue.tumblr.com/post/58181985680/hadoop-tutorial-how-to-create-example-tables-in-hbase
+[2]: blank
+[3]: http://gethue.com
+[4]: https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user

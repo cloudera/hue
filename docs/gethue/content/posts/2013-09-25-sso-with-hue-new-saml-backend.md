@@ -41,13 +41,13 @@ slide_template:
 categories:
   - Administration
   - Development
-
 ---
+
 <p id="docs-internal-guid-558a4829-570e-2b8d-5785-cc634db2ff02">
   A new <a href="http://en.wikipedia.org/wiki/Security_Assertion_Markup_Language">SAML 2.0</a> backend is under development to provide a better authentication experience in Hue. Rather than signing in using Hue credentials, <a href="https://gethue.com/single-sign-on-in-hue-with-twitter-and-oauth/">single sign-on</a> (SSO) authentication can be achieved with this new backend.
 </p>
 
-<iframe src="https://player.vimeo.com/video/75212274?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: SSO via SAML in Hue" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube VsHEkuMyhB0 >}}
 
 ## The Basics
 
@@ -59,8 +59,8 @@ SAML architecture from <http://en.wikipedia.org/wiki/SAML_2.0.>
 
 Hue acts as a service provider with an assertion consumer service (ACS). It communicates with the IdP to authenticate users. Hue also provides a couple of URLs that enable communication with the IdP:
 
-  * “/saml2/metadata”
-  * “/saml2/acs”
+- “/saml2/metadata”
+- “/saml2/acs”
 
 The IdP will contact the metadata URL for information on the SP. For example, the ACS URL is described in metadata. The ACS URL is the consumer of assertions from the IdP. The IdP will redirect users to the ACS URL once it has authenticated them.
 
@@ -76,18 +76,18 @@ The following is a demo of how to setup Hue to communicate via SAML with a Shibb
 
 This demo is performed on CentOS 6.4 and assumes the following projects have been installed and configured:
 
-  * [Shibboleth 2.4.0][1] - IdP
-  * [OpenDS 2.2.1][2] - Authentication service
-  * [Tomcat 6][3] - Server for IdP
+- [Shibboleth 2.4.0][1] - IdP
+- [OpenDS 2.2.1][2] - Authentication service
+- [Tomcat 6][3] - Server for IdP
 
 Shibboleth IdP is installed to “/opt/shibboleth-idp” and has the following custom configurations:
 
-  * Release the [UID][4] attribute with assertions.
-  * Available over SSL on port [8443][5].
-  * Provide authentication via [LDAP][6] through OpenDS.
-  * Connect to a [relying party][7] that contains metadata about the SP. In this case, the relying party is Hue and its metadata URL is “/saml2/metadata”.
-  * Use the [UsernamePassword][8] handler. It provides very obvious feedback that all components have been configured appropriately.
-  * Available to all [IPs][9].
+- Release the [UID][4] attribute with assertions.
+- Available over SSL on port [8443][5].
+- Provide authentication via [LDAP][6] through OpenDS.
+- Connect to a [relying party][7] that contains metadata about the SP. In this case, the relying party is Hue and its metadata URL is “/saml2/metadata”.
+- Use the [UsernamePassword][8] handler. It provides very obvious feedback that all components have been configured appropriately.
+- Available to all [IPs][9].
 
 OpenDS was installed and 2000 users were automatically generated. Then, a user “test” was added with the password “password”.
 
@@ -101,10 +101,10 @@ build/env/bin/pip install -e git+https://github.com/abec/djangosaml2@HEAD#egg=dj
 
 The above commands will also install:
 
-  * decorator
-  * python-memcached
-  * repoze.who
-  * zope.interface
+- decorator
+- python-memcached
+- repoze.who
+- zope.interface
 
 Note: The SAML libraries are dependent on xmlsec1 being available on the machine. This will be need to be installed and readily available for Hue to use.
 
@@ -171,15 +171,15 @@ Providing SSO support through SAML helps enterprises by enabling centralized aut
 
 Have any suggestions? Feel free to tell us what you think through [hue-user][11] or at [@gethue][12].
 
- [1]: http://shibboleth.net/
- [2]: http://opends.java.net/
- [3]: http://tomcat.apache.org/download-60.cgi
- [4]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hue-saml/shibboleth-conf/attribute-filter.xml#L26
- [5]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hue-saml/tomcat6-conf/server.xml#L94
- [6]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hue-saml/shibboleth-conf/login.config#L25
- [7]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hue-saml/shibboleth-conf/relying-party.xml#L83
- [8]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hue-saml/shibboleth-conf/handler.xml#L134
- [9]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hue-saml/tomcat6-conf/web.xml#L117
- [10]: http://blog.cloudera.com/blog/2012/12/managing-permissions-in-hue/
- [11]: https://groups.google.com/a/cloudera.org/forum/?fromgroups#!forum/hue-user
- [12]: https://twitter.com/gethue/
+[1]: http://shibboleth.net/
+[2]: http://opends.java.net/
+[3]: http://tomcat.apache.org/download-60.cgi
+[4]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hue-saml/shibboleth-conf/attribute-filter.xml#L26
+[5]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hue-saml/tomcat6-conf/server.xml#L94
+[6]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hue-saml/shibboleth-conf/login.config#L25
+[7]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hue-saml/shibboleth-conf/relying-party.xml#L83
+[8]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hue-saml/shibboleth-conf/handler.xml#L134
+[9]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hue-saml/tomcat6-conf/web.xml#L117
+[10]: http://blog.cloudera.com/blog/2012/12/managing-permissions-in-hue/
+[11]: https://groups.google.com/a/cloudera.org/forum/?fromgroups#!forum/hue-user
+[12]: https://twitter.com/gethue/

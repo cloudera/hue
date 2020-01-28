@@ -30,19 +30,19 @@ sf_caption_position:
   - caption-right
 categories:
   - Browsing
-
 ---
+
 [Hue 3.12][1] comes with two significant job browsing improvements that make the navigation among thousands of jobs much simpler. Here is a demo describing the changes in detail.
 
-<iframe src="https://player.vimeo.com/video/212542640?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hue Tutorial - Oozie Dashboards filtering enhancements" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube 8yxtIt77GaY >}}
 
 ### Extended Oozie Dashboard Filtering
 
 With this improvement, you can search for:
 
-  * Jobs with partial match on either the _Name_ or _Submitter_ of the job.
-  * Results across all pages and not just the page you are in.
-  * The one single job among thousands of submitted jobs by entering the complete ID.
+- Jobs with partial match on either the _Name_ or *Submitter* of the job.
+- Results across all pages and not just the page you are in.
+- The one single job among thousands of submitted jobs by entering the complete ID.
 
 ### Job Browser Start Time Filter
 
@@ -56,7 +56,7 @@ This filter allows to user the easily navigate to the older jobs, especially if
 
 As always, feel free to suggest new improvements or comment on the [hue-user][3] list or [@gethue][4]!
 
- [1]: https://gethue.com/hue-3-12-the-improved-editor-for-sql-developers-and-analysts-is-out/
- [2]: https://cdn.gethue.com/uploads/2017/03/new-jb-filter.png
- [3]: http://groups.google.com/a/cloudera.org/group/hue-user
- [4]: https://twitter.com/gethue
+[1]: https://gethue.com/hue-3-12-the-improved-editor-for-sql-developers-and-analysts-is-out/
+[2]: https://cdn.gethue.com/uploads/2017/03/new-jb-filter.png
+[3]: http://groups.google.com/a/cloudera.org/group/hue-user
+[4]: https://twitter.com/gethue

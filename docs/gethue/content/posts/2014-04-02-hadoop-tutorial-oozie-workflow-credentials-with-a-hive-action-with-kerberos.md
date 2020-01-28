@@ -36,8 +36,8 @@ slide_template:
   - default
 categories:
   - Scheduling
-
 ---
+
 When using Hadoop security and scheduling jobs using [Hive][1] (or Pig, [HBase][2]) you might have received this error:
 
 <pre><code class="bash">
@@ -50,12 +50,12 @@ Indeed, in order to use an Oozie Hive action with the Hive metastore server when
 
 Here is a demo, with a kerberized cluster and a MySql Hive metastore showing how it works. We create a Hive script that will list the tables and performs an operation requiring the HCat credential. Please find all the used and generated configurations [here][3].
 
-<iframe src="https://player.vimeo.com/video/85838380?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: Oozie workflow credentials with a Hive action with Kerberos" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube 6meeq7xvj54 >}}
 
 Hue fills up automatically the parameters for you, just check the credentials required on your workflow action and Hue will:
 
-  * Pull dynamically the available credentials details from the cluster
-  * Configure the credentials in workflows for you
+- Pull dynamically the available credentials details from the cluster
+- Configure the credentials in workflows for you
 
 Then don’t forget to check the HCat credential in the Hive action advanced properties. You can check multiple credentials if you ever need to.
 
@@ -181,8 +181,8 @@ To activate the credentials in Oozie itself, update this property in oozie-site.
 
 </code></pre>
 
- [1]: https://gethue.com/hadoop-tutorial-how-to-access-hive-in-pig-with/
- [2]: https://gethue.com/hadoop-tutorial-use-pig-and-hive-with-hbase/
- [3]: https://github.com/romainr/hadoop-tutorials-examples/tree/master/oozie/credentials
- [4]: http://groups.google.com/a/cloudera.org/group/hue-user
- [5]: https://twitter.com/gethue
+[1]: https://gethue.com/hadoop-tutorial-how-to-access-hive-in-pig-with/
+[2]: https://gethue.com/hadoop-tutorial-use-pig-and-hive-with-hbase/
+[3]: https://github.com/romainr/hadoop-tutorials-examples/tree/master/oozie/credentials
+[4]: http://groups.google.com/a/cloudera.org/group/hue-user
+[5]: https://twitter.com/gethue

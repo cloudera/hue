@@ -40,8 +40,8 @@ categories:
   - Querying
   - Browsing
   - Release
-
 ---
+
 Hi Big Data Adventurers,
 
 &nbsp;
@@ -176,7 +176,7 @@ In the past, indexing data into Solr has been quite difficult. [The task][10] in
 
 Read more [about it here...][11]
 
-<iframe src="https://player.vimeo.com/video/179731492?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop tutorial - Easy indexing into Apache Solr with Hue" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube uS0MpzW0ep8 >}}
 
 &nbsp;
 
@@ -188,13 +188,13 @@ Read more [about it here...][11]
 
 It was a pleasure to present at the Hadoop Summit in California:
 
-  * [New SQL Editor and Architecture][12]
+- [New SQL Editor and Architecture][12]
 
 ## Team Retreats
 
 [<img src="https://cdn.gethue.com/uploads/2016/08/IMG_4409-1024x768.jpg"  />][13]
 
-  * [Sun, green, craft beers and tacos in Portland, OR][14]
+- [Sun, green, craft beers and tacos in Portland, OR][14]
 
 &nbsp;
 
@@ -214,19 +214,19 @@ As usual thank you to all the project contributors and for sending feedback a
 
 &nbsp;
 
- [1]: https://cdn.gethue.com/uploads/2015/08/hue-logo-copy.png
- [2]: http://cloudera.github.io/hue/docs-3.11.0/release-notes/release-notes-3.11.0.html
- [3]: https://gethue.com/hue-3-10-with-its-new-sql-editor-is-out/
- [4]: https://cdn.gethue.com/downloads/releases/3.11.0/hue-3.11.0.tgz
- [5]: https://cdn.gethue.com/uploads/2016/08/s3-upload.png
- [6]: https://gethue.com/sql-editor-for-solr-sql/
- [7]: https://cdn.gethue.com/uploads/2016/08/sql-autocomp.png
- [8]: https://gethue.com/sql-editor/
- [9]: https://cdn.gethue.com/uploads/2016/08/result-refine.png
- [10]: https://gethue.com/hadoop-tutorials-season-ii-7-how-to-index-and-search/
- [11]: https://gethue.com/easy-indexing-of-data-into-solr/
- [12]: https://gethue.com/hadoop-summit-san-jose-2016-hue-sql-editor-and-architecture/
- [13]: https://cdn.gethue.com/uploads/2016/08/IMG_4409.jpg
- [14]: https://gethue.com/mini-team-retreat-in-portland/
- [15]: http://groups.google.com/a/cloudera.org/group/hue-user
- [16]: https://twitter.com/gethue
+[1]: https://cdn.gethue.com/uploads/2015/08/hue-logo-copy.png
+[2]: http://cloudera.github.io/hue/docs-3.11.0/release-notes/release-notes-3.11.0.html
+[3]: https://gethue.com/hue-3-10-with-its-new-sql-editor-is-out/
+[4]: https://cdn.gethue.com/downloads/releases/3.11.0/hue-3.11.0.tgz
+[5]: https://cdn.gethue.com/uploads/2016/08/s3-upload.png
+[6]: https://gethue.com/sql-editor-for-solr-sql/
+[7]: https://cdn.gethue.com/uploads/2016/08/sql-autocomp.png
+[8]: https://gethue.com/sql-editor/
+[9]: https://cdn.gethue.com/uploads/2016/08/result-refine.png
+[10]: https://gethue.com/hadoop-tutorials-season-ii-7-how-to-index-and-search/
+[11]: https://gethue.com/easy-indexing-of-data-into-solr/
+[12]: https://gethue.com/hadoop-summit-san-jose-2016-hue-sql-editor-and-architecture/
+[13]: https://cdn.gethue.com/uploads/2016/08/IMG_4409.jpg
+[14]: https://gethue.com/mini-team-retreat-in-portland/
+[15]: http://groups.google.com/a/cloudera.org/group/hue-user
+[16]: https://twitter.com/gethue

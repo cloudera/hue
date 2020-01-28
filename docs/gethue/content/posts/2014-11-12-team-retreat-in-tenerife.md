@@ -38,15 +38,15 @@ slide_template:
   - default
 categories:
   - News
-
 ---
+
 ¡Hola!
 
 The Hue project recently got its <a href="https://gethue.com/hue-3-7-with-sentry-app-and-new-search-widgets-are-out/" target="_blank" rel="noopener noreferrer">biggest release</a>. It was once again time to celebreate and also prepare the next big thing 🙂
 
 For the first time, a European location was picked: <a href="https://www.google.com/maps/place/Tenerife,+Santa+Cruz+de+Tenerife,+Spain/@31.4115533,-12.9432173,6z/data=!4m2!3m1!1s0xc4029effe8682ed:0xb01a4bf1c84baf3c" target="_blank" rel="noopener noreferrer">Tenerife</a>, in the Canary Islands! Similarly to the previous <a href="https://gethue.com/team-retreat-hawaii-big-island/" target="_blank" rel="noopener noreferrer">retreat in Hawaii</a>, the team could enjoy a great island with a Volcano, warm water, sun, sea food, tapas, wind & kitesurfing.
 
-<iframe src="https://player.vimeo.com/video/111582078?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="The Hue Team Retreat - Tenerife 2014" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube CJRBUK_DaFc >}}
 
 At the end of the week, the team was recharged, the core of the new [Oozie App][1] for creating workflows was done, and much more is under way!
 
@@ -84,9 +84,9 @@ Volcano & Nature
 
 [<img src="https://cdn.gethue.com/uploads/2014/11/2014-11-02-14.37.02-1024x768.jpg"  />][6]
 
- [1]: https://www.dropbox.com/s/ru1mm43d0r3ted8/hue-oozie-2.5.png?dl=0
- [2]: https://twitter.com/gethue
- [3]: https://cdn.gethue.com/uploads/2014/11/2014-11-05-07.53.57.jpg
- [4]: https://cdn.gethue.com/uploads/2014/11/2014-11-05-12.36.49.jpg
- [5]: https://cdn.gethue.com/uploads/2014/11/2014-11-02-13.02.50.jpg
- [6]: https://cdn.gethue.com/uploads/2014/11/2014-11-02-14.37.02.jpg
+[1]: https://www.dropbox.com/s/ru1mm43d0r3ted8/hue-oozie-2.5.png?dl=0
+[2]: https://twitter.com/gethue
+[3]: https://cdn.gethue.com/uploads/2014/11/2014-11-05-07.53.57.jpg
+[4]: https://cdn.gethue.com/uploads/2014/11/2014-11-05-12.36.49.jpg
+[5]: https://cdn.gethue.com/uploads/2014/11/2014-11-02-13.02.50.jpg
+[6]: https://cdn.gethue.com/uploads/2014/11/2014-11-02-14.37.02.jpg

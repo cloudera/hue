@@ -39,8 +39,8 @@ slide_template:
 categories:
   - Administration
   - Querying
-
 ---
+
 ## <span style="color: #ff0000;"><em>Note:</em> <em>This post is deprecated as of Hue 3.8 / April 24th 2015</em>. Hue now has a new <a style="color: #ff0000;" href="https://gethue.com/new-notebook-application-for-spark-sql/" target="_blank" rel="noopener noreferrer">Spark Notebook</a> application.</span>
 
 &nbsp;
@@ -51,7 +51,7 @@ The open source [Spark Job Server][3] is used for communicating with Spark (e.g.
 
 Here are more details about how to run the Spark Job server as a service. This is better suited for production, to the contrary of the development mode detailed in the previous [post][1]. We are using CDH5.0 and Spark 0.9.
 
-<iframe src="https://player.vimeo.com/video/98352016?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: Deploy the Spark server and calculate Pi in Hue" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube wU2QcCeBXCg >}}
 
 ## Package and Deploy the server
 
@@ -207,17 +207,17 @@ Happy Sparking!
 
 PS: we hope to see you in person at the [Hue][12] or [Job Server][13] talks at the upcoming [Spark Summit][14]!
 
- [1]: https://gethue.com/a-new-spark-web-ui-spark-app/
- [2]: http://spark.apache.org/
- [3]: https://github.com/ooyala/spark-jobserver
- [4]: https://github.com/ooyala/spark-jobserver#deployment
- [5]: http://localhost:8080/
- [6]: https://github.com/ooyala/spark-jobserver/tree/master/job-server-tests/src/spark.jobserver
- [7]: https://github.com/ooyala/spark-jobserver#wordcountexample-walk-through
- [8]: https://cdn.gethue.com/uploads/2014/06/spark-master-ui.png
- [9]: http://demo.gethue.com/spark/
- [10]: http://groups.google.com/a/cloudera.org/group/hue-user
- [11]: https://twitter.com/gethue
- [12]: https://spark-summit.org/2014/talk/a-web-application-for-interactive-data-analysis-with-spark
- [13]: https://spark-summit.org/2014/talk/spark-job-server-easy-spark-job-management
- [14]: http://spark-summit.org/2014
+[1]: https://gethue.com/a-new-spark-web-ui-spark-app/
+[2]: http://spark.apache.org/
+[3]: https://github.com/ooyala/spark-jobserver
+[4]: https://github.com/ooyala/spark-jobserver#deployment
+[5]: http://localhost:8080/
+[6]: https://github.com/ooyala/spark-jobserver/tree/master/job-server-tests/src/spark.jobserver
+[7]: https://github.com/ooyala/spark-jobserver#wordcountexample-walk-through
+[8]: https://cdn.gethue.com/uploads/2014/06/spark-master-ui.png
+[9]: http://demo.gethue.com/spark/
+[10]: http://groups.google.com/a/cloudera.org/group/hue-user
+[11]: https://twitter.com/gethue
+[12]: https://spark-summit.org/2014/talk/a-web-application-for-interactive-data-analysis-with-spark
+[13]: https://spark-summit.org/2014/talk/spark-job-server-easy-spark-job-management
+[14]: http://spark-summit.org/2014

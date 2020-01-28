@@ -38,15 +38,15 @@ sf_remove_promo_bar:
   - 1
 categories:
   - Querying
-
 ---
+
 The [Sentry app][1] now let's you edit Solr Collection privileges. It previously only support editing permissions of the Hive Tables.
 
 It becomes now much easier to control the authorization of all your Solr indexes (until now privileges had to be set through a flat file with a server restart) and make sure that the powerful [Dynamic Search Dashboards][2] can be accessed securely by only certain group of users.
 
 Here is a video demoing how to configure the access to your Solr data:
 
-<iframe src="https://player.vimeo.com/video/169115361?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop tutorial - Manage Sentry privileges of your SOLR Collections" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube gSNKv5agmTU >}}
 
 Below are screenshots of the main features of the app:
 
@@ -76,11 +76,11 @@ Below are screenshots of the main features of the app:
 
 We hope that you like the ease of use and security, and feel free to send feedback on the [hue-user][7] list or [@gethue][8]!
 
- [1]: https://gethue.com/apache-sentry-made-easy-with-the-new-hue-security-app/
- [2]: https://gethue.com/dynamic-search-dashboard-improvements-3/
- [3]: https://cdn.gethue.com/uploads/2016/05/solr-secu2-e1464909489928.png
- [4]: https://cdn.gethue.com/uploads/2016/06/solr-sentry-all.png
- [5]: https://cdn.gethue.com/uploads/2016/06/solr-sentry-query-error.png
- [6]: https://cdn.gethue.com/uploads/2016/06/solr-sentry-update-error.png
- [7]: http://groups.google.com/a/cloudera.org/group/hue-user
- [8]: https://twitter.com/gethue
+[1]: https://gethue.com/apache-sentry-made-easy-with-the-new-hue-security-app/
+[2]: https://gethue.com/dynamic-search-dashboard-improvements-3/
+[3]: https://cdn.gethue.com/uploads/2016/05/solr-secu2-e1464909489928.png
+[4]: https://cdn.gethue.com/uploads/2016/06/solr-sentry-all.png
+[5]: https://cdn.gethue.com/uploads/2016/06/solr-sentry-query-error.png
+[6]: https://cdn.gethue.com/uploads/2016/06/solr-sentry-update-error.png
+[7]: http://groups.google.com/a/cloudera.org/group/hue-user
+[8]: https://twitter.com/gethue

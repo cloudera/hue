@@ -36,8 +36,8 @@ sf_thumbnail_type:
   - none
 categories:
   - News
-
 ---
+
 Cloudera Enterprise 5.7 brings a lot of changes (more than 1500) to HUE (the Web interface for querying and browsing data). The emphasize on performances and security continues from [5.5][1] as well as the improvement of the SQL user experience.
 
 &nbsp;
@@ -46,7 +46,7 @@ Cloudera Enterprise 5.7 brings a lot of changes (more than 1500) to HUE (the Web
 
 The app is now single page and offers speed and more accessible statistics and data preview. See more of the improvements below or take a look at the following video demo.
 
-<iframe src="https://player.vimeo.com/video/157369642?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop tutorial - The new Metastore Manager" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube MykO9McaxCk >}}
 
 ### New UI
 
@@ -102,10 +102,10 @@ The front-end has been rewritten to be slicker and more user-friendly. More in
 
 The most used app in HUE is getting a
 
-  * Format queries button
-  * Delete history button
-  * Fixed columns and rows headers for a smoother scrolling
-  * Hive on Spark support
+- Format queries button
+- Delete history button
+- Fixed columns and rows headers for a smoother scrolling
+- Hive on Spark support
 
 [<img src="https://cdn.gethue.com/uploads/2014/04/editor-57-1024x499.png"  />][4]
 
@@ -113,13 +113,13 @@ The most used app in HUE is getting a
 
 ## Security
 
-  * A timeout now logs out inactive user after `idle_session_timeout seconds`
-  * Optional custom security splash screen at log-in with `login_splash_html`
-  * [TLS certificate chain][5] support for HUE
-  * SAML
-      * Password for the key_file was introduced with `key_file_password`
-      * Customize your xmlsec1 binary by changing `xmlsec_binary`
-      * Customize your [SAML username mapping][6]. It also supports syncing groups on login
+- A timeout now logs out inactive user after `idle_session_timeout seconds`
+- Optional custom security splash screen at log-in with `login_splash_html`
+- [TLS certificate chain][5] support for HUE
+- SAML
+  - Password for the key_file was introduced with `key_file_password`
+  - Customize your xmlsec1 binary by changing `xmlsec_binary`
+  - Customize your [SAML username mapping][6]. It also supports syncing groups on login
 
 [<img src="https://cdn.gethue.com/uploads/2014/04/hue-splash-login-small.png" />][7]
 
@@ -131,7 +131,7 @@ Result in the Grid Widget can be plotted like in the SQL editor. This is ideal f
 
 Hue supports [Solr Suggesters][9] and makes your data easier to search! Suggester assists the user by proposing an auto-completable list of queries:
 
-<iframe src="https://player.vimeo.com/video/161792073?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop mini tutorial - Suggest for Solr Search Dashboards" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube RupOQCy5DdA >}}
 
 (Read more [here][10]).
 
@@ -145,10 +145,10 @@ Right click on a file or directory to access their disk space consumed, quotas a
 
 ## Oozie Improvements
 
-  * External Workflow Graph: This feature enables us to see the graph for workflows submitted form File-browser as well as the ones submitted from CLI.
-  * Dryrun Oozie job: The <tt>dryrun</tt> option tests running a workflow/coordinator/bundle job with given properties and does not create the job.
-  * Timezone improvements: All the times on the dashboard are now defaulted to browser timezone and submitting a coordinator/bundle no longer need UTC times.
-  * Emailing automatically on failure: Each kill node now embeds an optional email action. Edit a kill node to insert a custom message if case it gets called.
+- External Workflow Graph: This feature enables us to see the graph for workflows submitted form File-browser as well as the ones submitted from CLI.
+- Dryrun Oozie job: The <tt>dryrun</tt> option tests running a workflow/coordinator/bundle job with given properties and does not create the job.
+- Timezone improvements: All the times on the dashboard are now defaulted to browser timezone and submitting a coordinator/bundle no longer need UTC times.
+- Emailing automatically on failure: Each kill node now embeds an optional email action. Edit a kill node to insert a custom message if case it gets called.
 
 (Read more [here][12]).
 
@@ -164,18 +164,18 @@ Next CDH version (5.8) of Hue will be rebased on Hue 3.10 that was released this
 
 If you have any questions or feedback, feel free to comment here, on the [hue-user][14] list or via [@gethue][15]!
 
- [1]: http://blog.cloudera.com/blog/2015/12/new-in-cloudera-enterprise-5-5-improvements-to-hue-for-automatic-ha-setup-and-more/
- [2]: https://issues.apache.org/jira/browse/HIVE-7575
- [3]: https://gethue.com/browsing-hive-tables-data-and-metadata-is-getting-faster-and-prettier/
- [4]: https://cdn.gethue.com/uploads/2014/04/editor-57.png
- [5]: https://issues.cloudera.org/browse/HUE-2582
- [6]: https://github.com/romainr/custom_saml_backend
- [7]: https://cdn.gethue.com/uploads/2014/04/hue-splash-login-small.png
- [8]: https://cdn.gethue.com/uploads/2014/04/search-grid-plot.png
- [9]: https://cwiki.apache.org/confluence/display/solr/Suggester
- [10]: https://gethue.com/suggest-for-solr-search-dashboards/
- [11]: https://cdn.gethue.com/uploads/2014/04/fb-summary-icon.png
- [12]: https://gethue.com/oozie-improvements-in-hue-3-10/
- [13]: https://cdn.gethue.com/uploads/2016/03/timezone.png
- [14]: http://groups.google.com/a/cloudera.org/group/hue-user
- [15]: https://twitter.com/gethue
+[1]: http://blog.cloudera.com/blog/2015/12/new-in-cloudera-enterprise-5-5-improvements-to-hue-for-automatic-ha-setup-and-more/
+[2]: https://issues.apache.org/jira/browse/HIVE-7575
+[3]: https://gethue.com/browsing-hive-tables-data-and-metadata-is-getting-faster-and-prettier/
+[4]: https://cdn.gethue.com/uploads/2014/04/editor-57.png
+[5]: https://issues.cloudera.org/browse/HUE-2582
+[6]: https://github.com/romainr/custom_saml_backend
+[7]: https://cdn.gethue.com/uploads/2014/04/hue-splash-login-small.png
+[8]: https://cdn.gethue.com/uploads/2014/04/search-grid-plot.png
+[9]: https://cwiki.apache.org/confluence/display/solr/Suggester
+[10]: https://gethue.com/suggest-for-solr-search-dashboards/
+[11]: https://cdn.gethue.com/uploads/2014/04/fb-summary-icon.png
+[12]: https://gethue.com/oozie-improvements-in-hue-3-10/
+[13]: https://cdn.gethue.com/uploads/2016/03/timezone.png
+[14]: http://groups.google.com/a/cloudera.org/group/hue-user
+[15]: https://twitter.com/gethue

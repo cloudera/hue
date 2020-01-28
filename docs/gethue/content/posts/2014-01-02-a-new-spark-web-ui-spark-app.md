@@ -40,8 +40,8 @@ slide_template:
   - default
 categories:
   - Querying
-
 ---
+
 ## <span style="color: #ff0000;"><em>Note:</em> <em>This post is deprecated as of Hue 3.8 / April 24th 2015</em>. Hue now have a new <a href="https://gethue.com/new-notebook-application-for-spark-sql/" target="_blank" rel="noopener noreferrer">Spark Notebook</a> application.</span>
 
 Hi Spark Makers!
@@ -50,7 +50,7 @@ A Hue Spark application was recently created. It lets users execute and monitor 
 
 The new application is using the [Spark Job Server][2] contributed by [Ooyala][3] at the last [Spark Summit][4].
 
-<iframe src="https://player.vimeo.com/video/83192197?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial - The new Spark Igniter in Hue" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube lWKxtvUMcGw >}}
 
 We hope to work with the community and have support for Python, Java, direct script submission without compiling/uploading and other improvements in the future!
 
@@ -118,11 +118,11 @@ With the Spark Master URL (you can get it from the Spark Master UI: http://SPARK
 
 Then follow this [walk-through][8] and create the example jar that is used in the video demo.
 
- [1]: http://spark.incubator.apache.org/
- [2]: https://github.com/ooyala/spark-jobserver
- [3]: http://www.ooyala.com/
- [4]: http://spark-summit.org/talk/chan-the-spark-job-server/
- [5]: http://groups.google.com/a/cloudera.org/group/hue-user
- [6]: https://twitter.com/gethue
- [7]: https://github.com/ooyala/spark-jobserver/blob/master/job-server-tests/src/spark.jobserver/WordCountExample.scala
- [8]: https://github.com/ooyala/spark-jobserver#wordcountexample-walk-through
+[1]: http://spark.incubator.apache.org/
+[2]: https://github.com/ooyala/spark-jobserver
+[3]: http://www.ooyala.com/
+[4]: http://spark-summit.org/talk/chan-the-spark-job-server/
+[5]: http://groups.google.com/a/cloudera.org/group/hue-user
+[6]: https://twitter.com/gethue
+[7]: https://github.com/ooyala/spark-jobserver/blob/master/job-server-tests/src/spark.jobserver/WordCountExample.scala
+[8]: https://github.com/ooyala/spark-jobserver#wordcountexample-walk-through

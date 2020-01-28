@@ -39,18 +39,18 @@ sf_remove_promo_bar:
 categories:
   - Querying
   - Scheduling
-
 ---
+
 The Oozie Workflow editor is getting a new generic action that let's you drag & drop any of your Hive query of the SQL Editor. Here it is in action:
 
-<iframe src="https://player.vimeo.com/video/169219934?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop tutorial - Drag and drop saved Hive queries into your Oozie Workflow" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube kRT259DO_2U >}}
 
 &nbsp;
 
-  * Always in sync with the saved query
-  * Autocomplete Hive parameter
-  * Behave like any other actions, can fork, see the logs...
-  * Generates for you the query files in the HDFS workspace
+- Always in sync with the saved query
+- Autocomplete Hive parameter
+- Behave like any other actions, can fork, see the logs...
+- Generates for you the query files in the HDFS workspace
 
 &nbsp;
 
@@ -62,6 +62,6 @@ We hope that you like the ease of use of this new drag & drop. Expect more type 
 
 And feel free to send feedback on the [hue-user][2] list or [@gethue][3]!
 
- [1]: https://cdn.gethue.com/uploads/2016/06/oozie-dd-hive.png
- [2]: http://groups.google.com/a/cloudera.org/group/hue-user
- [3]: https://twitter.com/gethue
+[1]: https://cdn.gethue.com/uploads/2016/06/oozie-dd-hive.png
+[2]: http://groups.google.com/a/cloudera.org/group/hue-user
+[3]: https://twitter.com/gethue

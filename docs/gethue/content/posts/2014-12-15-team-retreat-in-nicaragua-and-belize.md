@@ -38,8 +38,8 @@ slide_template:
   - default
 categories:
   - News
-
 ---
+
 ¡Hola!, Hello!
 
 After a last [escape in Europe][1], the Hue team went for some more exotic locations: Nicaragua & Belize!
@@ -48,7 +48,7 @@ After some "rough" driving from Managua to the coast, the team enjoyed some surf
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/114563244?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="The Hue Team Retreat - Nicaragua & Belize 2014" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube MchMLdqteVY >}}
 
 &nbsp;
 
@@ -84,15 +84,15 @@ Belize
 
 &nbsp;
 
- [1]: https://gethue.com/team-retreat-in-tenerife/
- [2]: https://www.google.com/search?q=Ometepe&oq=Ometepe&aqs=chrome..69i57j0l5.194j0j7&sourceid=chrome&es_sm=93&ie=UTF-8
- [3]: https://gethue.com/team-retreat-in-the-caribbean-curacao/
- [4]: https://www.google.com/maps/place/Caye+Caulker,+Belize/@17.8201555,-87.5333548,9z/data=!4m2!3m1!1s0x8f5c8dc6ad1bc049:0xf823dbc01663d790
- [5]: https://twitter.com/gethue
- [6]: https://cdn.gethue.com/uploads/2014/12/2014-11-27-13.21.13.jpg
- [7]: https://cdn.gethue.com/uploads/2014/12/IMG_7272.jpg
- [8]: https://cdn.gethue.com/uploads/2014/12/2014-12-02-16.56.38.jpg
- [9]: https://cdn.gethue.com/uploads/2014/12/2014-12-02-16.59.27.jpg
- [10]: https://cdn.gethue.com/uploads/2014/12/2014-12-03-12.27.44.jpg
- [11]: https://cdn.gethue.com/uploads/2014/12/2014-12-03-12.31.32.jpg
- [12]: https://cdn.gethue.com/uploads/2014/12/2014-12-04-13.04.42.jpg
+[1]: https://gethue.com/team-retreat-in-tenerife/
+[2]: https://www.google.com/search?q=Ometepe&oq=Ometepe&aqs=chrome..69i57j0l5.194j0j7&sourceid=chrome&es_sm=93&ie=UTF-8
+[3]: https://gethue.com/team-retreat-in-the-caribbean-curacao/
+[4]: https://www.google.com/maps/place/Caye+Caulker,+Belize/@17.8201555,-87.5333548,9z/data=!4m2!3m1!1s0x8f5c8dc6ad1bc049:0xf823dbc01663d790
+[5]: https://twitter.com/gethue
+[6]: https://cdn.gethue.com/uploads/2014/12/2014-11-27-13.21.13.jpg
+[7]: https://cdn.gethue.com/uploads/2014/12/IMG_7272.jpg
+[8]: https://cdn.gethue.com/uploads/2014/12/2014-12-02-16.56.38.jpg
+[9]: https://cdn.gethue.com/uploads/2014/12/2014-12-02-16.59.27.jpg
+[10]: https://cdn.gethue.com/uploads/2014/12/2014-12-03-12.27.44.jpg
+[11]: https://cdn.gethue.com/uploads/2014/12/2014-12-03-12.31.32.jpg
+[12]: https://cdn.gethue.com/uploads/2014/12/2014-12-04-13.04.42.jpg

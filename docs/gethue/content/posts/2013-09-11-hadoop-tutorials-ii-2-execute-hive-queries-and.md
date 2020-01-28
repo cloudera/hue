@@ -43,15 +43,15 @@ categories:
   - Querying
   - Scheduling
   - Tutorial
-
 ---
+
 <p id="docs-internal-guid--8202e43-0da7-b45c-578a-06e670bbcee9">
   In the <a href="https://gethue.com/hadoop-tutorials-ii-1-prepare-the-data-for-analysis/">previous</a> episode, we saw how to to transfer some file data into Apache Hadoop. In order to interrogate easily the data, the next step is to create some Hive tables. This will enable quick interaction with high level languages like SQL and <a href="https://gethue.com/tutorial-apache-pig-editor-in-hue-2-3/">Pig</a>.
 </p>
 
 &nbsp;
 
-<iframe src="https://player.vimeo.com/video/74215175?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop Tutorial: Hue - Execute Hive queries and schedule them with Oozie" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube VYJfM4AQyvo >}}
 
 We experiment with the SQL queries, then parameterize them and insert them into a workflow in order to run them together in parallel. Including Hive queries in an Oozie workflow is a pretty common use case with recurrent pitfalls as seen on the user group. We can do it with [Hue][1] in a few clicks.
 
@@ -147,7 +147,7 @@ LIMIT 10
 
 # Hive action in Apache Oozie
 
-The video also starts <a href="http://vimeo.com/74215175#t=2m53s" target="_blank" rel="noopener noreferrer">here</a>.
+The video also starts <a href="https://youtube.com/watch?v=VYJfM4AQyvo#t=2m53s" target="_blank" rel="noopener noreferrer">here</a>.
 
 First we create a new workflow and add an Oozie action. We need to specify which SQL we want to run. This one needs to be uploaded to HDFS. In our case we open up the ‘workspace’ of the workflow, create a new file and copy paste the query. We we upload and pick the [query file][3] as the ‘Script name’.
 
@@ -208,10 +208,10 @@ Creating a workflow lets you group other scripts together and run them atomicall
 
 This is what we will cover in the [next episode][7]!
 
- [1]: http://gethue.com
- [2]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hive-workflow/create_table.hql
- [3]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hive-workflow/insert_table.hql
- [4]: https://gethue.com/hadoop-tutorial-how-to-access-hive-in-pig-with/
- [5]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/cdh4ig_hive_metastore_configure.html#topic_18_4_1_unique_1__title_508_unique_1
- [6]: https://issues.cloudera.org/browse/HUE-950
- [7]: https://gethue.com/hadoop-tutorials-ii-3-schedule-hive-queries-with/
+[1]: http://gethue.com
+[2]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hive-workflow/create_table.hql
+[3]: https://github.com/romainr/hadoop-tutorials-examples/blob/master/hive-workflow/insert_table.hql
+[4]: https://gethue.com/hadoop-tutorial-how-to-access-hive-in-pig-with/
+[5]: http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/cdh4ig_hive_metastore_configure.html#topic_18_4_1_unique_1__title_508_unique_1
+[6]: https://issues.cloudera.org/browse/HUE-950
+[7]: https://gethue.com/hadoop-tutorials-ii-3-schedule-hive-queries-with/

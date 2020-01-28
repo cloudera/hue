@@ -36,8 +36,8 @@ sf_remove_promo_bar:
   - 1
 categories:
   - Querying
-
 ---
+
 [Hue 3.8][1] brings a new way to directly submit Spark jobs from a Web UI.
 
 Last year we released [Spark Igniter][2] to enable developers to submit Spark jobs through a Web Interface. While this approach worked, the UX left a lot to be desired. Programs had to implement an interface, be compiled beforehand and YARN support was lacking. We also wanted to add support for Python and Scala, focusing on delivering an interactive and iterative programming experience similar to using a REPL.
@@ -54,22 +54,22 @@ This post describes the Web Application part. We are using [Spark 1.3][5] and [H
 
 &nbsp;
 
-<iframe src="http://player.vimeo.com/video/125792752" width="900" height="495" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+{{< youtube kIXBL7u_NOk >}}
 
 &nbsp;
 
 Based on a new:
 
-  * [Spark REST Job Server][4]
-  * Notebook Web UI
+- [Spark REST Job Server][4]
+- Notebook Web UI
 
 Supports:
 
-  * Scala
-  * Python
-  * Java
-  * SQL
-  * YARN
+- Scala
+- Python
+- Java
+- SQL
+- YARN
 
 &nbsp;
 
@@ -149,14 +149,14 @@ We are also interested in getting feedback on the new  [Spark REST Job Server][
 
 As usual feel free to comment on the [hue-user][10] list or [@gethue][11]!
 
- [1]: https://gethue.com/hue-3-8-with-an-oozie-editor-revamp-better-performances-improved-spark-ui-is-out/
- [2]: https://gethue.com/a-new-spark-web-ui-spark-app/
- [3]: https://cdn.gethue.com/uploads/2015/04/notebook-1.png
- [4]: https://github.com/cloudera/hue/tree/master/apps/spark/java#welcome-to-livy-the-rest-spark-server
- [5]: https://spark.apache.org/releases/spark-release-1-3-0.html
- [6]: https://github.com/cloudera/hue
- [7]: https://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/
- [8]: http://www.cloudera.com/content/cloudera/en/documentation/cloudera-manager/v5-1-x/Cloudera-Manager-Managing-Clusters/cm5mc_config_snippet.html
- [9]: https://issues.cloudera.org/browse/HUE-2637
- [10]: http://groups.google.com/a/cloudera.org/group/hue-user
- [11]: https://twitter.com/gethue
+[1]: https://gethue.com/hue-3-8-with-an-oozie-editor-revamp-better-performances-improved-spark-ui-is-out/
+[2]: https://gethue.com/a-new-spark-web-ui-spark-app/
+[3]: https://cdn.gethue.com/uploads/2015/04/notebook-1.png
+[4]: https://github.com/cloudera/hue/tree/master/apps/spark/java#welcome-to-livy-the-rest-spark-server
+[5]: https://spark.apache.org/releases/spark-release-1-3-0.html
+[6]: https://github.com/cloudera/hue
+[7]: https://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/
+[8]: http://www.cloudera.com/content/cloudera/en/documentation/cloudera-manager/v5-1-x/Cloudera-Manager-Managing-Clusters/cm5mc_config_snippet.html
+[9]: https://issues.cloudera.org/browse/HUE-2637
+[10]: http://groups.google.com/a/cloudera.org/group/hue-user
+[11]: https://twitter.com/gethue

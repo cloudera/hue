@@ -38,39 +38,39 @@ sf_remove_promo_bar:
   - 1
 categories:
   - Querying
-
 ---
+
 Here is the new SQL Editor!
 
 Hue now has a generic editor that supports any languages but currently focuses on [SQL][1]. It is a single page app that is much faster than before and simpler to use. Here is a list of some important functionalities and a video demo that show them in action:
 
-  * No page reload when switching between queries
-  * Live history of running and past queries
-  * Enhanced support for Hive and [Impala][2]
-  * Extendable to any programming language
+- No page reload when switching between queries
+- Live history of running and past queries
+- Enhanced support for Hive and [Impala][2]
+- Extendable to any programming language
 
-<iframe src="https://player.vimeo.com/video/172916751?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop tutorial - The new SQL editor in Hue" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube LvTWPgkrdvM >}}
 
 Summary
 
-  * Metadata Browsing
-      * Support listing and filtering thousands of databases or tables
-      * Quick links to table browsers
-      * Statistics
-  * Query edition
-      * Smart autocomplete
-      * Format a query, search and replace
-      * Parameterization
-      * Expanded view, fixed column/row headers, jump to a column..
-      * Bar, pie, marker map, gradient map, scater plots charting
-      * Links to jobs and logs
-      * [Solr SQL support][3]
-      * [JDBC support (beta)][4]
-  * Result manipulation
-      * Share
-      * Excel, csv downloads
-      * Export to an HDFS file or new table
-      * [Drag & Drop a saved query into a workflow][5]
+- Metadata Browsing
+  - Support listing and filtering thousands of databases or tables
+  - Quick links to table browsers
+  - Statistics
+- Query edition
+  - Smart autocomplete
+  - Format a query, search and replace
+  - Parameterization
+  - Expanded view, fixed column/row headers, jump to a column..
+  - Bar, pie, marker map, gradient map, scater plots charting
+  - Links to jobs and logs
+  - [Solr SQL support][3]
+  - [JDBC support (beta)][4]
+- Result manipulation
+  - Share
+  - Excel, csv downloads
+  - Export to an HDFS file or new table
+  - [Drag & Drop a saved query into a workflow][5]
 
 &nbsp;
 
@@ -84,13 +84,13 @@ We hope that this new editor makes you SQL on Hadoop even more productive! If yo
 
 <figure><a href="https://cdn.gethue.com/uploads/2016/06/editor-map-1024x479.png"><img src="https://cdn.gethue.com/uploads/2016/06/editor-map-1024x479.png" /></a><figcaption>Result widget view</figcaption></figure>
 
- [1]: https://gethue.com/category/sql/
- [2]: http://impala.io
- [3]: https://gethue.com/sql-editor-for-solr-sql/
- [4]: https://gethue.com/custom-sql-query-editors/
- [5]: https://gethue.com/drag-drop-saved-hive-queries-into-your-workflows/
- [6]: https://github.com/cloudera/hue/tree/master/desktop/libs/notebook/src/notebook/connectors
- [7]: http://groups.google.com/a/cloudera.org/group/hue-user
- [8]: https://twitter.com/gethue
- [9]: https://cdn.gethue.com/uploads/2016/06/editor-grid.png
- [10]: https://cdn.gethue.com/uploads/2016/06/editor-map.png
+[1]: https://gethue.com/category/sql/
+[2]: http://impala.io
+[3]: https://gethue.com/sql-editor-for-solr-sql/
+[4]: https://gethue.com/custom-sql-query-editors/
+[5]: https://gethue.com/drag-drop-saved-hive-queries-into-your-workflows/
+[6]: https://github.com/cloudera/hue/tree/master/desktop/libs/notebook/src/notebook/connectors
+[7]: http://groups.google.com/a/cloudera.org/group/hue-user
+[8]: https://twitter.com/gethue
+[9]: https://cdn.gethue.com/uploads/2016/06/editor-grid.png
+[10]: https://cdn.gethue.com/uploads/2016/06/editor-map.png

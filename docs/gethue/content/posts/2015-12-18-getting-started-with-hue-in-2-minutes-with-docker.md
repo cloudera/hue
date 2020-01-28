@@ -38,17 +38,17 @@ ampforwp-amp-on-off:
   - default
 categories:
   - Administration
-
 ---
+
 **Update March 2019**: this post was refresh in [Hue in Docker][1]
 
 &nbsp;
 
 The current way to play with Hue is often to go on [demo.gethue.com][2] or download a [Virtual Machine][3]. However, these have some limitations. Using [Docker][4] instead provides a much better experience as it:
 
-  * is lighter and more robust than a VM
-  * gives admin permissions
-  * has much faster execution
+- is lighter and more robust than a VM
+- gives admin permissions
+- has much faster execution
 
 Docker makes it perfect for quick starting on Hue development or pointing Hue to your current cluster and giving it a try. This is for this that we now provide a [Docker image of Hue][5]!
 
@@ -62,7 +62,7 @@ Please find below a video showing how to start Hue with Docker on a Mac and inst
 
 [<img src="https://camo.githubusercontent.com/2de6c7ae1eb50c1c55e14957708f55d775366f62/68747470733a2f2f696d672e736869656c64732e696f2f646f636b65722f70756c6c732f6765746875652f6875652e737667" alt="DockerPulls" data-canonical-src="https://img.shields.io/docker/pulls/gethue/hue.svg" />][6] [<img src="https://camo.githubusercontent.com/83ee62644f39db2bb9faf4cacebc1b64c7a338d5/68747470733a2f2f696d672e736869656c64732e696f2f646f636b65722f73746172732f6765746875652f6875652e737667" alt="DockerStars" data-canonical-src="https://img.shields.io/docker/stars/gethue/hue.svg" />][6]
 
-<iframe src="https://player.vimeo.com/video/149410817?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hadoop tutorial - How to run Hue in no time with Docker and Kitematic" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube ciJgNKjRYvU >}}
 
 # [][7]{#user-content-get-the-docker-image.anchor}Get the docker image
 
@@ -136,18 +136,18 @@ You can then configure Hue and start using it!
 
 Read more about [how to configure][15] Hue. The development version uses the configuration file `desktop/conf/pseudo-distributed.ini`.
 
- [1]: http://hue-in-docker
- [2]: http://demo.gethue.com
- [3]: https://ccp.cloudera.com/display/SUPPORT/Cloudera+QuickStart+VM
- [4]: https://www.docker.com/
- [5]: https://hub.docker.com/u/gethue/
- [6]: https://registry.hub.docker.com/u/gethue/hue/
- [7]: https://github.com/cloudera/hue/tree/master/tools/docker#get-the-docker-image
- [8]: https://github.com/cloudera/hue/tree/master/tools/docker
- [9]: https://github.com/cloudera/hue/tree/master/tools/docker#pull-the-image-from-docker-hub
- [10]: https://github.com/cloudera/hue/tree/master/tools/docker#build-the-image
- [11]: https://github.com/cloudera/hue/tree/master/tools/docker#running-the-image
- [12]: http://192.168.99.100:8888/
- [13]: http://172.17.0.1:8888/
- [14]: https://github.com/cloudera/hue/tree/master/tools/docker#next
- [15]: https://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/
+[1]: http://hue-in-docker
+[2]: http://demo.gethue.com
+[3]: https://ccp.cloudera.com/display/SUPPORT/Cloudera+QuickStart+VM
+[4]: https://www.docker.com/
+[5]: https://hub.docker.com/u/gethue/
+[6]: https://registry.hub.docker.com/u/gethue/hue/
+[7]: https://github.com/cloudera/hue/tree/master/tools/docker#get-the-docker-image
+[8]: https://github.com/cloudera/hue/tree/master/tools/docker
+[9]: https://github.com/cloudera/hue/tree/master/tools/docker#pull-the-image-from-docker-hub
+[10]: https://github.com/cloudera/hue/tree/master/tools/docker#build-the-image
+[11]: https://github.com/cloudera/hue/tree/master/tools/docker#running-the-image
+[12]: http://192.168.99.100:8888/
+[13]: http://172.17.0.1:8888/
+[14]: https://github.com/cloudera/hue/tree/master/tools/docker#next
+[15]: https://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/

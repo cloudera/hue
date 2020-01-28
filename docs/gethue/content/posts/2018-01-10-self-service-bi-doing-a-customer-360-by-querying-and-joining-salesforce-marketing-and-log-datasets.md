@@ -42,8 +42,8 @@ categories:
   - Querying
   - Version 4
   - Tutorial
-
 ---
+
 In this demo we use the [Editor][1] to query credit card transaction data that is saved in an object store in the cloud ([here S3][2]) and in a Kudu table. The demos leverages the Data Catalog search and tagging as well as the Query Assistant.
 
 Note: Do it Yourself! The queries and data are freely available on [demo.gethue.com][3].
@@ -65,7 +65,7 @@ Note: Do it Yourself! The queries and data are freely available on [demo.gethue
 
 <span style="font-weight: 400;">Goal: </span><span style="font-weight: 300;">Build a 360-degree view of your customers to understand the support costs, product usage, time-to-resolution, and current activity in marketing channels</span>
 
-<iframe src="https://player.vimeo.com/video/250289157?dnt=1&app_id=122963" width="640" height="360" frameborder="0" title="Hue - Self Service BI: doing a Customer 360 by querying and joining Salesforce, Marketing and log datasets" allow="autoplay; fullscreen" allowfullscreen></iframe>
+{{< youtube vTqiQIFpFxM >}}
 
 <span style="font-weight: 300;">What we’ll cover:</span>
 
@@ -91,8 +91,8 @@ Note: Do it Yourself! The queries and data are freely available on [demo.gethue
 
 [<img class="aligncenter wp-image-4997" src="https://cdn.gethue.com/uploads/2017/10/customer-360-datasets.png"/>][5]
 
- [1]: https://gethue.com/sql-editor/
- [2]: https://gethue.com/introducing-s3-support-in-hue/
- [3]: http://demo.gethue.com/hue/editor?editor=108020&type=impala
- [4]: https://cdn.gethue.com/uploads/2017/10/360-degrees.png
- [5]: https://cdn.gethue.com/uploads/2017/10/customer-360-datasets.png
+[1]: https://gethue.com/sql-editor/
+[2]: https://gethue.com/introducing-s3-support-in-hue/
+[3]: http://demo.gethue.com/hue/editor?editor=108020&type=impala
+[4]: https://cdn.gethue.com/uploads/2017/10/360-degrees.png
+[5]: https://cdn.gethue.com/uploads/2017/10/customer-360-datasets.png
