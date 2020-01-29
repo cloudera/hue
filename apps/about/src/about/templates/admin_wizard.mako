@@ -34,7 +34,7 @@ from desktop.views import commonheader, commonfooter
 
 ${ layout.menubar(section='quick_start') }
 
-<div class="container-fluid">
+<div class="container-fluid" id="adminWizardComponents">
   <div class="row-fluid" style="margin-bottom: 100px;">
     <div>
       <h1 class="margin-top-20 margin-bottom-30">
@@ -77,7 +77,7 @@ ${ layout.menubar(section='quick_start') }
           </div>
 
           <div id="step2" class="stepDetails hide">
-            <h3>${ _('Connectors to data services') }</h3>
+            <h3>${ _('Add connectors to data services') }</h3>
             <span id="connectorCounts">...</span> ${ _('connectors are installed.') }
 
             % if has_connectors():
@@ -105,84 +105,104 @@ ${ layout.menubar(section='quick_start') }
             <div>
               <h3>${ _('Install some data examples') }</h3>
               <ul class="unstyled samples">
-              % if 'hive' in app_names:
+
+              % if has_connectors():
+              <!-- ko foreach: connectors -->
+                <!-- ko if: ['hive', 'impala'].indexOf(dialect) != -1 -->
+                <li>
+                  <a href="javascript:void(0)" data-bind="click: $root.installConnectorDataExample">
+                    <i class="fa fa-download"></i> <span data-bind="text: name"></span>
+                  </a>
+                </li>
+                <!-- /ko -->
+              <!-- /ko -->
+
+              <div id="check-config-section" class="margin-bottom-20" data-bind="visible: isInstallingSample">
+                <div class="spinner">
+                  <i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i>
+                </div>
+              </div>
+
+              % else:
+                % if 'hive' in app_names:
                   <li>
                     <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                        data-sample-url="${ url('beeswax:install_examples') }">
                       <i class="fa fa-download"></i> ${ apps['beeswax'].nice_name }
                     </a>
                   </li>
-              % endif
-              % if 'impala' in app_names:
+                % endif
+                % if 'impala' in app_names:
                   <li>
                     <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                        data-sample-url="${ url('impala:install_examples') }">
                       <i class="fa fa-download"></i> ${ apps['impala'].nice_name }
                     </a>
                   </li>
-              % endif
-              % if has_optimizer() and OPTIMIZER.QUERY_HISTORY_UPLOAD_LIMIT.get() > 0:
+                % endif
+                % if has_optimizer() and OPTIMIZER.QUERY_HISTORY_UPLOAD_LIMIT.get() > 0:
                   <li>
                     <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Uploading...') }"
                        data-sample-url="${ url('metadata:upload_history') }" title="${ _('Send and analyze past %s executed queries to provide smarter SQL recommendations') % OPTIMIZER.QUERY_HISTORY_UPLOAD_LIMIT.get() }">
                       <i class="fa fa-download"></i> ${ _('SQL Query history') }
                     </a>
                   </li>
-              % endif
-              % if 'search' in app_names:
+                % endif
+                % if 'search' in app_names:
                   <li>
                     <a href="javascript:void(0)" class="installAllBtn" data-loading-text="${ _('Installing...') }"
                        data-sample-url="${ url('search:install_examples') }" data-sample-data='["log_analytics_demo", "twitter_demo", "yelp_demo"]'>
                       <i class="fa fa-download"></i> ${ apps['search'].nice_name }
                     </a>
                   </li>
-              % endif
-              % if 'spark' in app_names:
+                % endif
+                % if 'spark' in app_names:
                   <li>
                     <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                        data-sample-url="${ url('notebook:install_examples') }">
                       <i class="fa fa-download"></i> ${ apps['spark'].nice_name }
                     </a>
                   </li>
-              % endif
-              % if 'oozie' in app_names:
+                % endif
+                % if 'oozie' in app_names:
                   <li>
                     <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                        data-sample-url="${ url('oozie:install_examples') }">
                       <i class="fa fa-download"></i> ${ apps['oozie'].nice_name }
                     </a>
                   </li>
-              % endif
-              % if 'hbase' in app_names:
+                % endif
+                % if 'hbase' in app_names:
                   <li>
                     <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                        data-sample-url="${ url('hbase:install_examples') }">
                       <i class="fa fa-download"></i> ${ apps['hbase'].nice_name }
                     </a>
                   </li>
-              % endif
-              % if 'pig' in app_names:
+                % endif
+                % if 'pig' in app_names:
                   <li>
                     <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                        data-sample-url="${ url('pig:install_examples') }">
                       <i class="fa fa-download"></i> ${ apps['pig'].nice_name }
                     </a>
                   </li>
-              % endif
-              % if 'oozie' in app_names:
+                % endif
+                % if 'oozie' in app_names:
                   <li>
                     <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                        data-sample-url="${ url('oozie:install_examples') }">
                       <i class="fa fa-download"></i> ${ _('Job Editor') }
                     </a>
                   </li>
-              % elif 'jobsub' in app_names:
+                % elif 'jobsub' in app_names:
                   <li>
                     <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                        data-sample-url="${ url('oozie:install_examples') }">
                       <i class="fa fa-download"></i> ${ apps['jobsub'].nice_name }
                     </a>
                   </li>
+                % endif
               % endif
               </ul>
             </div>
@@ -290,34 +310,32 @@ ${ layout.menubar(section='quick_start') }
 
 
 <script type="text/javascript">
+  var AdminWizardViewModel = function () {
+    var self = this;
 
-$(document).ready(function(){
+    self.connectors = ko.observableArray();
+    self.isInstallingSample = ko.observable(false);
 
-  window.setTimeout(function(){
-    $.get("${ url('desktop.views.check_config') }", function(response) {
-      $("#check-config-section .spinner").css({
-        'position': 'absolute',
-        'top': '-100px'
+    self.installConnectorDataExample = function(data, event) {
+      var sampleUrl = data.dialect == 'hive' ? "${ url('beeswax:install_examples') }" : "${ url('impala:install_examples') }";
+
+      self.isInstallingSample(true);
+      $.post(sampleUrl, function(data) {
+        if (data.status == 0) {
+          $(document).trigger('info','${ _("Examples refreshed") }');
+          if ($(button).data("is-connector")) {
+            huePubSub.publish('cluster.config.refresh.config');
+          }
+        } else {
+          $(document).trigger('error', data.message);
+        }
+      }).always(function(data) {
+        self.isInstallingSample(false);
       });
-      $("#check-config-section .info").html(response);
-      $("#check-config-section .info").removeClass('hide');
-    })
-    .fail(function() { $(document).trigger('error', '${ _("Check config failed: ")}'); });
-  }, 100);
+    }
+  }
 
-  $("[rel='popover']").popover();
-
-  % if has_connectors():
-    huePubSub.subscribe('cluster.config.set.config', config => {
-      if (config && config.app_config && config.app_config.editor) {
-        $('#connectorCounts').text(config.app_config.editor.interpreter_names.filter(c => c != 'notebook').length);
-      }
-    });
-
-    huePubSub.publish('cluster.config.refresh.config');
-  % endif
-
-  $(".installBtn").click(function() {
+  function installConnectorDataExample() {
     var button = $(this);
     $(button).button('loading');
     $.post(button.data("sample-url"), function(data) {
@@ -333,107 +351,145 @@ $(document).ready(function(){
     .always(function(data) {
       $(button).button('reset');
     });
-  });
+  }
 
-  $(".installAllBtn").click(function() {
-    var button = $(this);
-    $(button).button('loading');
-    var calls = jQuery.map($(button).data("sample-data"), function(app) {
-      return $.post($(button).data("sample-url"), {data: app}, function(data) {
-        if (data.status != 0) {
-          $(document).trigger('error', data.message);
+  $(document).ready(function(){
+
+    var adminWizardViewModel = new AdminWizardViewModel();
+    ko.applyBindings(adminWizardViewModel, $('#adminWizardComponents')[0]);
+
+    function checkConfig() {
+      $.get("${ url('desktop.views.check_config') }", function(response) {
+        $("#check-config-section .spinner").css({
+          'position': 'absolute',
+          'top': '-100px'
+        });
+        $("#check-config-section .info").html(response);
+        $("#check-config-section .info").removeClass('hide');
+      })
+      .fail(function() {
+        $(document).trigger('error', '${ _("Check config failed: ")}');
+      });
+    }
+
+    $("[rel='popover']").popover();
+
+    % if has_connectors():
+      huePubSub.subscribe('cluster.config.set.config', config => {
+        if (config && config.app_config && config.app_config.editor) {
+          var connectors = config.app_config.editor.interpreters.filter(c => c.name != 'notebook');
+          $('#connectorCounts').text(connectors.length);
+          adminWizardViewModel.connectors(connectors);
+        }
+      });
+
+      huePubSub.publish('cluster.config.refresh.config');
+    % endif
+
+    $(".installBtn").click(installConnectorDataExample);
+
+    $(".installAllBtn").click(function() {
+      var button = $(this);
+      $(button).button('loading');
+      var calls = jQuery.map($(button).data("sample-data"), function(app) {
+        return $.post($(button).data("sample-url"), {data: app}, function(data) {
+          if (data.status != 0) {
+            $(document).trigger('error', data.message);
+          }
+        });
+      });
+      $.when.apply(this, calls)
+      .then(function() {
+        $(document).trigger('info', '${ _("Examples refreshed") }');
+      })
+      .always(function(data) {
+        $(button).button('reset');
+      });
+    });
+
+    var currentStep = "step1";
+
+    routie({
+      "step1": function () {
+        showStep("step1");
+      },
+      "step2": function () {
+        showStep("step2");
+      },
+      "step3": function () {
+        showStep("step3");
+      },
+      "step4": function () {
+        showStep("step4");
+      }
+    });
+
+    function showStep(step) {
+      if (window.location.hash === '#step1' || window.location.hash === '') {
+        checkConfig()
+      }
+
+      currentStep = step;
+      if (step != "step1") {
+        $("#backBtn").removeClass("disabled");
+      } else {
+        $("#backBtn").addClass("disabled");
+      }
+
+      if (step != $(".stepDetails:last").attr("id")) {
+        $("#nextBtn").removeClass("hide");
+        $("#doneBtn").addClass("hide");
+      } else {
+        $("#nextBtn").addClass("hide");
+        $("#doneBtn").removeClass("hide");
+      }
+
+      $("a.step").parent().removeClass("active");
+      $("a.step[href='#" + step + "']").parent().addClass("active");
+      if (step == "step4") {
+        $("#lastStep").parent().addClass("active");
+      }
+      $(".stepDetails").hide();
+      $("#" + step).show();
+    }
+
+    $("#backBtn").click(function () {
+      var nextStep = (currentStep.substr(4) * 1 - 1);
+      if (nextStep >= 1) {
+        routie("step" + nextStep);
+      }
+    });
+
+    $("#nextBtn").click(function () {
+      var nextStep = (currentStep.substr(4) * 1 + 1);
+      if (nextStep <= $(".step").length) {
+        routie("step" + nextStep);
+      }
+    });
+
+    $("#doneBtn").click(function () {
+      huePubSub.publish('open.link', "${ is_embeddable and '/' or url('desktop_views_home2') }");
+    });
+
+    $(".updatePreferences").click(function () {
+      $.post("${ url('about:update_preferences') }", $("input").serialize(), function(data) {
+        if (data.status == 0) {
+          $(document).trigger('info', '${ _("Configuration updated") }');
+        } else {
+          $(document).trigger('error', data.data);
         }
       });
     });
-    $.when.apply(this, calls)
-    .then(function() {
-      $(document).trigger('info', '${ _("Examples refreshed") }');
-    })
-    .always(function(data) {
-      $(button).button('reset');
+
+    $("#updateSkipWizard").prop('checked', $.cookie("hueLandingPage", {path: "/"}) == "home");
+
+    $("#updateSkipWizard").change(function () {
+      $.cookie("hueLandingPage", this.checked ? "home" : "wizard", {
+        path: "/",
+        secure: window.location.protocol.indexOf('https') > -1
+      });
     });
   });
-
-  var currentStep = "step1";
-
-  routie({
-    "step1":function () {
-      showStep("step1");
-    },
-    "step2":function () {
-      showStep("step2");
-    },
-    "step3":function () {
-      showStep("step3");
-    },
-    "step4":function () {
-      showStep("step4");
-    }
-  });
-
-  function showStep(step) {
-    currentStep = step;
-    if (step != "step1") {
-      $("#backBtn").removeClass("disabled");
-    } else {
-      $("#backBtn").addClass("disabled");
-    }
-
-    if (step != $(".stepDetails:last").attr("id")) {
-      $("#nextBtn").removeClass("hide");
-      $("#doneBtn").addClass("hide");
-    } else {
-      $("#nextBtn").addClass("hide");
-      $("#doneBtn").removeClass("hide");
-    }
-
-    $("a.step").parent().removeClass("active");
-    $("a.step[href='#" + step + "']").parent().addClass("active");
-    if (step == "step4") {
-      $("#lastStep").parent().addClass("active");
-    }
-    $(".stepDetails").hide();
-    $("#" + step).show();
-  }
-
-  $("#backBtn").click(function () {
-    var nextStep = (currentStep.substr(4) * 1 - 1);
-    if (nextStep >= 1) {
-      routie("step" + nextStep);
-    }
-  });
-
-  $("#nextBtn").click(function () {
-    var nextStep = (currentStep.substr(4) * 1 + 1);
-    if (nextStep <= $(".step").length) {
-      routie("step" + nextStep);
-    }
-  });
-
-  $("#doneBtn").click(function () {
-    huePubSub.publish('open.link', "${ is_embeddable and '/' or url('desktop_views_home2') }");
-  });
-
-  $(".updatePreferences").click(function () {
-    $.post("${ url('about:update_preferences') }", $("input").serialize(), function(data) {
-      if (data.status == 0) {
-        $(document).trigger('info', '${ _("Configuration updated") }');
-      } else {
-        $(document).trigger('error', data.data);
-      }
-    });
-  });
-
-  $("#updateSkipWizard").prop('checked', $.cookie("hueLandingPage", {path: "/"}) == "home");
-
-  $("#updateSkipWizard").change(function () {
-    $.cookie("hueLandingPage", this.checked ? "home" : "wizard", {
-      path: "/",
-      secure: window.location.protocol.indexOf('https') > -1
-    });
-  });
-
-});
 </script>
 % endif
 
