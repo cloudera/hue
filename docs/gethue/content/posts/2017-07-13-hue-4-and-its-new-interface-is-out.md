@@ -66,139 +66,60 @@ Various applications have been grouped into 4 applications:
   * Dashboard
   * Scheduler
 
-<div class="itemizedlist">
-  <ul class="itemizedlist">
-    <li class="listitem">
-      A top search bar and left assist help quick search and browse any data.
-    </li>
-    <li class="listitem">
-      Each user can set its favorite application as default action / landing page.
-    </li>
-    <li class="listitem">
-      The older Hue 3 UI is still available and Hue 4 is 100% backward compatible.
-    </li>
-    <li class="listitem">
-      The switch to the new Hue 4 UI can be decided at global level or each user can independently flip back and forth with one of the UIs as default.
-    </li>
-    <li class="listitem">
-      All the URLs with the <span class="emphasis"><em>/hue</em></span> prefix point to Hue 4, the one without still points to Hue 3.
-    </li>
-    <li class="listitem">
-      It is possible to just remove the prefix and land on the Hue 3 version of the page, e.g. /hue/editor (Hue 4) → /editor (Hue 3)
-    </li>
-  </ul>
+Also:
 
-  <p>
-    Read more about it in the <a href="https://gethue.com/the-hue-4-user-interface-in-detail/">Hue 4 UI post</a>.
-  </p>
+* A top search bar and left assist help quick search and browse any data.
+* Each user can set its favorite application as default action / landing page.
+* The older Hue 3 UI is still available and Hue 4 is 100% backward compatible.
+* The switch to the new Hue 4 UI can be decided at global level or each user can independently flip back and forth with one of the UIs as default.
+* All the URLs with the <span class="emphasis"><em>/hue</em></span> prefix point to Hue 4, the one without still points to Hue 3.
+* It is possible to just remove the prefix and land on the Hue 3 version of the page, e.g. /hue/editor (Hue 4) → /editor (Hue 3)
 
-  <p>
-    <a href="https://cdn.gethue.com/uploads/2016/04/hue4_editor.png"><img src="https://cdn.gethue.com/uploads/2016/04/hue4_editor.png" /></a>
-  </p>
-</div>
+Read more about it in the <a href="https://gethue.com/the-hue-4-user-interface-in-detail/">Hue 4 UI post</a>.
+
+<a href="https://cdn.gethue.com/uploads/2016/04/hue4_editor.png"><img src="https://cdn.gethue.com/uploads/2016/04/hue4_editor.png" /></a>
 
 # Editors
 
 ## SQL
 
-<div class="itemizedlist">
-  <ul class="itemizedlist">
-    <li class="listitem">
-      If multiple statements are present in the editor, the position of the cursor will determine what is the active statement that will be executed. In order to execute multiple statements (e.g. a series of CREATE tables) in sequence, they need to be manually highlighted or all selected via selected all shortcut (e.g. CTRL/CMD + A).
-    </li>
-    <li>
-      <a href="https://gethue.com/hue-4-sql-editor-improvements/">Read more about it here.</a>
-    </li>
-  </ul>
+If multiple statements are present in the editor, the position of the cursor will determine what is the active statement that will be executed. In order to execute multiple statements (e.g. a series of CREATE tables) in sequence, they need to be manually highlighted or all selected via selected all shortcut (e.g. CTRL/CMD + A).
 
-  <p>
-    <img src="https://cdn.gethue.com/uploads/2017/07/hue_4_assistant_2.gif"/>
-  </p>
-</div>
+<a href="https://gethue.com/hue-4-sql-editor-improvements/">Read more about it here.</a>
+
+<img src="https://cdn.gethue.com/uploads/2017/07/hue_4_assistant_2.gif"/>
 
 ## Pig
 
-<div class="itemizedlist">
-  <ul class="itemizedlist">
-    <li class="listitem">
-      New editor, some advanced use of declare and macros are not supported in the new Editor autocomplete. Past scripts have been converted to the new editor, or can be found in the Hue 3 UI.
-    </li>
-  </ul>
-</div>
+New editor, some advanced use of declare and macros are not supported in the new Editor autocomplete. Past scripts have been converted to the new editor, or can be found in the Hue 3 UI.
 
 ## Job Designer
 
-<div class="itemizedlist">
-  <ul class="itemizedlist">
-    <li class="listitem">
-      Actions like MapReduce, Java, Spark, Sqoop1 now show up in the new editor. Past scripts have been converted to the new editor, or can be found in the Hue 3 UI.
-    </li>
-  </ul>
+Actions like MapReduce, Java, Spark, Sqoop1 now show up in the new editor. Past scripts have been converted to the new editor, or can be found in the Hue 3 UI.
 
-  <h2>
-    Oozie and Scheduling
-  </h2>
+## Oozie and Scheduling
 
-  <div class="itemizedlist">
-    <ul class="itemizedlist">
-      <li class="listitem">
-        Saved queries from the Editor (e.g. Hive query) can be directly dragged and dropped into an action without the need of copying the files on HDFS manually.
-      </li>
-    </ul>
-  </div>
-</div>
+Saved queries from the Editor (e.g. Hive query) can be directly dragged and dropped into an action without the need of copying the files on HDFS manually.
 
 # Browsers
 
 ## Job
 
-<div class="itemizedlist">
-  <ul class="itemizedlist">
-    <li class="listitem">
-      New browser now combining the previous Job Browser and Oozie Dashboard. The app is now single paged and more intuitive to use. A mini-job browser is now available to see jobs without leaving the page.
-    </li>
-  </ul>
-</div>
+New browser now combining the previous Job Browser and Oozie Dashboard. The app is now single paged and more intuitive to use. A mini-job browser is now available to see jobs without leaving the page.
 
 ## S3
 
-<div class="itemizedlist">
-  <ul class="itemizedlist">
-    <li class="listitem">
-      Support V2 regions if your credentials are configured for V2 region. If you are configured for a V4 endpoint, you can only access buckets for that region’s endpoint.
-    </li>
-  </ul>
-</div>
+Support V2 regions if your credentials are configured for V2 region. If you are configured for a V4 endpoint, you can only access buckets for that region’s endpoint.
 
 # Misc
 
-<div class="itemizedlist">
-  <ul class="itemizedlist">
-    <li class="listitem">
-      Create a partitioned table from a file
-    </li>
-    <li class="listitem">
-      Creating a table in the importer now refreshes Impala metadata automatically
-    </li>
-    <li class="listitem">
-      The SQL autocompleter handles more advanced corner cases
-    </li>
-    <li class="listitem">
-      Load balancers on a different host than Hue now work with SSL
-    </li>
-    <li class="listitem">
-      Pagination added to the SQL query history
-    </li>
-    <li class="listitem">
-      Batch operation like create tables now happens as background tasks
-    </li>
-    <li class="listitem">
-      500 bug fixes
-    </li>
-  </ul>
-</div>
-
-&nbsp;
+* Create a partitioned table from a file
+* Creating a table in the importer now refreshes Impala metadata automatically
+* The SQL autocompleter handles more advanced corner cases
+* Load balancers on a different host than Hue now work with SSL
+* Pagination added to the SQL query history
+* Batch operation like create tables now happens as background tasks
+* 500 bug fixes
 
 &nbsp;
 
