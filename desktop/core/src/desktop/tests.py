@@ -632,7 +632,7 @@ def test_error_handling_failure():
   try:
     # Make sure we are showing default 500.html page.
     # See django.test.client#L246
-    assert_raises(AttributeError, c.get, reverse('desktop.views.dump_config'))
+    assert_raises(AttributeError, c.get, reverse('desktop.views.threads'))
   finally:
     # Restore the world
     restore_django_debug()
