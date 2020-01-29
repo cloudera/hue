@@ -317,10 +317,11 @@ ${ layout.menubar(section='quick_start') }
     self.isInstallingSample = ko.observable(false);
 
     self.installConnectorDataExample = function(data, event) {
-      var sampleUrl = data.dialect == 'hive' ? "${ url('beeswax:install_examples') }" : "${ url('impala:install_examples') }";
-
       self.isInstallingSample(true);
-      $.post(sampleUrl, function(data) {
+
+      $.post("${ url('notebook:install_examples') }", {
+          dialect: data.dialect
+        }, function(data) {
         if (data.status == 0) {
           $(document).trigger('info','${ _("Examples refreshed") }');
           if ($(button).data("is-connector")) {
