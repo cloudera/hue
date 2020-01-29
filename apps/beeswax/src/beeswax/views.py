@@ -49,9 +49,9 @@ from useradmin.models import User
 
 import beeswax.forms
 import beeswax.design
-import beeswax.management.commands.beeswax_install_examples
 
 from beeswax import common, data_export, models
+from beeswax.management.commands import beeswax_install_examples
 from beeswax.models import QueryHistory, SavedQuery, Session
 from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException
@@ -614,7 +614,8 @@ def install_examples(request):
     try:
       app_name = get_app_name(request)
       db_name = request.POST.get('db_name', 'default')
-      beeswax.management.commands.beeswax_install_examples.Command().handle(app_name=app_name, db_name=db_name, user=request.user)
+      connector_id = options.get('connector_id')
+      beeswax_install_examples.Command().handle(app_name=app_name, db_name=db_name, user=request.user)
       response['status'] = 0
     except Exception as err:
       LOG.exception(err)

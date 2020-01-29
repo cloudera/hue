@@ -326,7 +326,7 @@ def install_sample_user(django_user=None):
     django_username_short = django_username
 
   try:
-    if User.objects.filter(id=SAMPLE_USER_ID).exists():
+    if User.objects.filter(id=SAMPLE_USER_ID).exists() and not ENABLE_ORGANIZATIONS.get():
       user = User.objects.get(id=SAMPLE_USER_ID)
       LOG.info('Sample user found with username "%s" and User ID: %s' % (user.username, user.id))
     elif User.objects.filter(**lookup).exists():
@@ -336,12 +336,13 @@ def install_sample_user(django_user=None):
       user_attributes = lookup.copy()
       if ENABLE_ORGANIZATIONS.get():
         user_attributes['organization'] = get_organization(email=django_username)
+      else:
+        user_attributes['id'] = SAMPLE_USER_ID
+
       user_attributes.update({
         'password': '!',
         'is_active': False,
         'is_superuser': False,
-        'id': SAMPLE_USER_ID,
-        'pk': SAMPLE_USER_ID
       })
       user, created = User.objects.get_or_create(**user_attributes)
 
@@ -354,19 +355,21 @@ def install_sample_user(django_user=None):
         user = User.objects.get(id=SAMPLE_USER_ID)
         user.username = django_username
         user.save()
-  except Exception as ex:
+  except:
     LOG.exception('Failed to get or create sample user')
 
   # If sample user doesn't belong to default group, add to default group
-  default_group = get_default_user_group()
+  default_group = get_default_user_group(user=user)
   if user is not None and default_group is not None and default_group not in user.groups.all():
     user.groups.add(default_group)
     user.save()
 
-  fs = cluster.get_hdfs()
   # If home directory doesn't exist for sample user, create it
+  fs = cluster.get_hdfs()
   try:
-    if not fs.do_as_user(django_username_short, fs.get_home_dir):
+    if not fs:
+      LOG.info('No fs configured, skipping home directory creation for user: %s' % django_username_short)
+    elif not fs.do_as_user(django_username_short, fs.get_home_dir):
       fs.do_as_user(django_username_short, fs.create_home_dir)
       LOG.info('Created home directory for user: %s' % django_username_short)
     else:

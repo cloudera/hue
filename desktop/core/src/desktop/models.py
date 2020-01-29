@@ -96,7 +96,11 @@ def _version_from_properties(f):
 
 def get_sample_user_install(user):
   if ENABLE_ORGANIZATIONS.get():
-   return SAMPLE_USER_INSTALL + '@' + get_organization(email=user.email).domain
+    organization = get_organization(email=user.email)
+    if organization.is_multi_user:
+      return SAMPLE_USER_INSTALL + '@' + organization.domain
+    else:
+      return organization.domain
   else:
     return SAMPLE_USER_INSTALL
 

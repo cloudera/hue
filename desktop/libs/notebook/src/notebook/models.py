@@ -239,13 +239,13 @@ class MockedDjangoRequest(object):
     self.method = method
 
 
-def import_saved_beeswax_query(bquery):
+def import_saved_beeswax_query(bquery, interpreter=None):
   design = bquery.get_design()
 
   return make_notebook(
       name=bquery.name,
       description=bquery.desc,
-      editor_type=_convert_type(bquery.type, bquery.data),
+      editor_type=interpreter['type'] if interpreter else _convert_type(bquery.type, bquery.data),
       statement=design.hql_query,
       status='ready',
       files=design.file_resources,
