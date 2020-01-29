@@ -316,11 +316,11 @@ ${ layout.menubar(section='quick_start') }
     self.connectors = ko.observableArray();
     self.isInstallingSample = ko.observable(false);
 
-    self.installConnectorDataExample = function(data, event) {
+    self.installConnectorDataExample = function(connector, event) {
       self.isInstallingSample(true);
 
       $.post("${ url('notebook:install_examples') }", {
-          dialect: data.dialect
+          connector: connector.type
         }, function(data) {
         if (data.status == 0) {
           $(document).trigger('info','${ _("Examples refreshed") }');
@@ -427,7 +427,7 @@ ${ layout.menubar(section='quick_start') }
 
     function showStep(step) {
       if (window.location.hash === '#step1' || window.location.hash === '') {
-        checkConfig()
+        checkConfig();
       }
 
       currentStep = step;

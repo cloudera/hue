@@ -207,6 +207,7 @@ def get_query_server_config(name='beeswax', connector=None):
 
 
 def get_query_server_config_via_connector(connector):
+  # TODO: connector is actually a notebook interpreter
   connector_name = full_connector_name = connector['type']
   compute_name = None
   if connector.get('compute'):

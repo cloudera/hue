@@ -791,7 +791,8 @@ def export_result(request):
       response = task.execute(request)
     else:
       notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
-      response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=save_as_table&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
+      response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=save_as_table&notebook=' + str(notebook_id) + \
+          '&snippet=0&destination=' + destination
       response['status'] = 0
     request.audit = {
       'operation': 'EXPORT',
@@ -820,7 +821,8 @@ def export_result(request):
       response = task.execute(request)
     else:
       notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
-      response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=insert_as_query&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
+      response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=insert_as_query&notebook=' + str(notebook_id) + \
+          '&snippet=0&destination=' + destination
       response['status'] = 0
     request.audit = {
       'operation': 'EXPORT',
@@ -834,7 +836,10 @@ def export_result(request):
 
       if data_format == 'dashboard':
         engine = notebook['type'].replace('query-', '')
-        response['watch_url'] = reverse('dashboard:browse', kwargs={'name': notebook_id}) + '?source=query&engine=%(engine)s' % {'engine': engine}
+        response['watch_url'] = reverse(
+            'dashboard:browse',
+            kwargs={'name': notebook_id}
+        ) + '?source=query&engine=%(engine)s' % {'engine': engine}
         response['status'] = 0
       else:
         sample = get_api(request, snippet).fetch_result(notebook, snippet, rows=4, start_over=True)
@@ -853,11 +858,12 @@ def export_result(request):
         ]
     else:
       notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
-      response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=index_query&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
+      response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=index_query&notebook=' + str(notebook_id) + \
+          '&snippet=0&destination=' + destination
       response['status'] = 0
 
     if response.get('status') != 0:
-      response['message'] =  _('Exporting result failed.')
+      response['message'] = _('Exporting result failed.')
 
   return JsonResponse(response)
 
@@ -892,7 +898,12 @@ def statement_compatibility(request):
 
   api = get_api(request, snippet)
 
-  response['query_compatibility'] = api.statement_compatibility(notebook, snippet, source_platform=source_platform, target_platform=target_platform)
+  response['query_compatibility'] = api.statement_compatibility(
+      notebook,
+      snippet,
+      source_platform=source_platform,
+      target_platform=target_platform
+  )
   response['status'] = 0
 
   return JsonResponse(response)

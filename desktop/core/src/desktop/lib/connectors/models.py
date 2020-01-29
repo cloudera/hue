@@ -52,6 +52,17 @@ class BaseConnector(models.Model):
   def __str__(self):
     return '%s (%s)' % (self.name, self.dialect)
 
+  def to_dict(self):
+    return {
+      'id': self.id,
+      'type': str(self.id),
+      'name': self.name,
+      'description': self.description,
+      'dialect': self.dialect,
+      'settings': self.settings,
+      'last_modified': self.last_modified
+    }
+
 
 if ENABLE_ORGANIZATIONS.get():
   class ConnectorManager(models.Manager):

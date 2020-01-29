@@ -26,8 +26,11 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 from beeswax.data_export import DOWNLOAD_COOKIE_AGE
+from beeswax.management.commands import beeswax_install_examples
+from desktop.auth.decorators import admin_required
 from desktop.conf import ENABLE_DOWNLOAD, USE_NEW_EDITOR
 from desktop.lib import export_csvxls
+from desktop.lib.connectors.models import Connector
 from desktop.lib.django_util import render, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
@@ -36,7 +39,7 @@ from desktop.views import serve_403_error
 from metadata.conf import has_optimizer, has_catalog, has_workload_analytics
 
 from notebook.conf import get_ordered_interpreters, SHOW_NOTEBOOKS
-from notebook.connectors.base import Notebook, _get_snippet_name
+from notebook.connectors.base import Notebook, _get_snippet_name, get_interpreter
 from notebook.connectors.spark_shell import SparkApi
 from notebook.decorators import check_editor_access_permission, check_document_access_permission, check_document_modify_permission
 from notebook.management.commands.notebook_setup import Command
@@ -371,13 +374,19 @@ def download(request):
   return response
 
 
+@admin_required
 def install_examples(request):
   response = {'status': -1, 'message': ''}
 
   if request.method == 'POST':
     try:
-      if request.POST.get('dialect') == 'hive':
-        pass
+      connector = Connector.objects.get(id=request.POST.get('connector'))
+      if connector:
+        app_name = 'beeswax' if connector.dialect == 'hive' else 'impala'
+        db_name = request.POST.get('db_name', 'default')
+        interpreter = get_interpreter(connector_type=connector.to_dict()['type'], user=request.user)
+
+        beeswax_install_examples.Command().handle(app_name=app_name, db_name=db_name, user=request.user, interpreter=interpreter)
       else:
         Command().handle(user=request.user)
         response['status'] = 0
