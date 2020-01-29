@@ -376,8 +376,11 @@ def install_examples(request):
 
   if request.method == 'POST':
     try:
-      Command().handle(user=request.user)
-      response['status'] = 0
+      if request.POST.get('dialect') == 'hive':
+        pass
+      else:
+        Command().handle(user=request.user)
+        response['status'] = 0
     except Exception as err:
       LOG.exception(err)
       response['message'] = str(err)

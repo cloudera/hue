@@ -90,7 +90,7 @@ class Command(BaseCommand):
 
   def _install_tables(self, django_user, app_name, db_name, tables):
     data_dir = beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get()
-    table_file = file(os.path.join(data_dir, tables))
+    table_file = open(os.path.join(data_dir, tables))
     table_list = json.load(table_file)
     table_file.close()
 
@@ -102,7 +102,7 @@ class Command(BaseCommand):
         raise InstallException(_('Could not install table: %s') % ex)
 
   def _install_queries(self, django_user, app_name):
-    design_file = file(os.path.join(beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get(), 'designs.json'))
+    design_file = open(os.path.join(beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get(), 'designs.json'))
     design_list = json.load(design_file)
     design_file.close()
 
