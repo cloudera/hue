@@ -86,7 +86,8 @@ ${ layout.menubar(section='quick_start') }
                 </a>
               </li>
               <li>
-                <a href="${ url('desktop.lib.connectors.views.index') }" title="${ _('Install the connector examples') }">
+                <a href="javascript:void(0)" class="installBtn" title="${ _('Install the connector examples') }"
+                  data-loading-text="${ _('Installing...') }" data-sample-url="${ url('connectors.api.install_connector_examples') }">
                   <i class="fa fa-download"></i> ${ _('Install Examples') }
                 </a>
               </li>
@@ -214,9 +215,7 @@ ${ layout.menubar(section='quick_start') }
             <div class="margin-top-30">
               <h3>${ _('Skip wizard next time') }</h3>
               <label class="checkbox">
-                <input id="updateSkipWizard" type="checkbox"
-                       style="margin-right: 10px"
-                       title="${ _('Check to skip this wizard next time.') }"/>
+                <input id="updateSkipWizard" type="checkbox" style="margin-right: 10px" title="${ _('Check to skip this wizard next time.') }"/>
                 ${ _('Skip the Quick Start Wizard at next login and land directly on your starred application.') }
               </label>
             </div>

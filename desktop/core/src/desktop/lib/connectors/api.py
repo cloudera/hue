@@ -25,7 +25,7 @@ from useradmin.models import update_app_permissions
 from desktop.auth.decorators import admin_required
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.connectors.models import _get_installed_connectors, get_connectors_types, Connector
+from desktop.lib.connectors.models import _get_installed_connectors, get_connectors_types, Connector, _create_connector_examples
 from desktop.lib.connectors.types import get_connectors_types, get_connector_categories, get_connector_by_type
 
 
@@ -109,6 +109,19 @@ def delete_connector(request):
   update_app_permissions()
 
   return JsonResponse({})
+
+
+@admin_required
+def install_connector_examples(request):
+  try:
+    _create_connector_examples()
+  except Exception as e:
+    raise PopupException(_('Error installing connector examples: %s') % e)
+
+  update_app_permissions()
+
+  return JsonResponse({})
+
 
 
 def _group_by_category(conns):
