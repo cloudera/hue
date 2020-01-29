@@ -23,6 +23,7 @@ from django.utils.translation import ugettext as _
 from useradmin.models import update_app_permissions
 
 from desktop.auth.decorators import admin_required
+from desktop.decorators import api_error_handler
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.connectors.models import _get_installed_connectors, get_connectors_types, Connector, _create_connector_examples
@@ -112,6 +113,7 @@ def delete_connector(request):
 
 
 @admin_required
+@api_error_handler
 def install_connector_examples(request):
   try:
     _create_connector_examples()
@@ -120,7 +122,7 @@ def install_connector_examples(request):
 
   update_app_permissions()
 
-  return JsonResponse({})
+  return JsonResponse({'status': 0})
 
 
 
