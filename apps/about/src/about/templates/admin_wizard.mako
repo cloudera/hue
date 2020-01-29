@@ -78,17 +78,19 @@ ${ layout.menubar(section='quick_start') }
 
           <div id="step2" class="stepDetails hide">
             <h3>${ _('Connectors to data services') }</h3>
+            <span id="connectorCounts">...</span> ${ _('connectors are installed.') }
+
             % if has_connectors():
-            <ul class="unstyled samples">
+            <ul class="unstyled samples margin-top-20">
               <li>
                 <a href="${ url('desktop.lib.connectors.views.index') }" title="${ _('Open the connector configuration page') }">
                   <i class="fa fa-exchange"></i> ${ _('Configuration page') }
                 </a>
               </li>
               <li>
-                <a href="javascript:void(0)" class="installBtn" title="${ _('Install the connector examples') }"
+                <a href="javascript:void(0)" class="installBtn" title="${ _('Install the connector examples') }" data-is-connector="true"
                   data-loading-text="${ _('Installing...') }" data-sample-url="${ url('connectors.api.install_connector_examples') }">
-                  <i class="fa fa-download"></i> ${ _('Install Examples') }
+                  <i class="fa fa-download"></i> ${ _('Install examples') }
                 </a>
               </li>
             </ul>
@@ -305,12 +307,25 @@ $(document).ready(function(){
 
   $("[rel='popover']").popover();
 
+  % if has_connectors():
+    huePubSub.subscribe('cluster.config.set.config', config => {
+      if (config && config.app_config && config.app_config.editor) {
+        $('#connectorCounts').text(config.app_config.editor.interpreter_names.filter(c => c != 'notebook').length);
+      }
+    });
+
+    huePubSub.publish('cluster.config.refresh.config');
+  % endif
+
   $(".installBtn").click(function() {
     var button = $(this);
     $(button).button('loading');
-    $.post($(this).data("sample-url"), function(data) {
+    $.post(button.data("sample-url"), function(data) {
       if (data.status == 0) {
         $(document).trigger('info','${ _("Examples refreshed") }');
+        if ($(button).data("is-connector")) {
+          huePubSub.publish('cluster.config.refresh.config');
+        }
       } else {
         $(document).trigger('error', data.message);
       }
