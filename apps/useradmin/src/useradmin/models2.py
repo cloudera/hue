@@ -22,6 +22,8 @@ from django.contrib.auth.models import models, AbstractUser, BaseUserManager
 from django.utils.functional import SimpleLazyObject
 from django.utils.translation import ugettext_lazy as _t
 
+from desktop.conf import ENABLE_ORGANIZATIONS
+
 from useradmin.organization import _fitered_queryset, get_user_request_organization, default_organization
 
 LOG = logging.getLogger(__name__)
@@ -56,18 +58,19 @@ class OrganizationManager(models.Manager):
     return self.get(name=name)
 
 
-class Organization(models.Model):
-  name = models.CharField(max_length=200, help_text=_t("The name of the organization"), unique=True)
-  uuid = models.CharField(default=uuid_default, max_length=36, unique=True)
-  domain = models.CharField(max_length=200, help_text=_t("The domain name of the organization, e.g. gethue.com"), unique=True)
-  customer_id = models.CharField(_t('Customer id'), max_length=128, default=None, null=True)
-  is_active = models.BooleanField(default=True)
-  is_multi_user = models.BooleanField(default=True)
+if ENABLE_ORGANIZATIONS.get():
+  class Organization(models.Model):
+    name = models.CharField(max_length=200, help_text=_t("The name of the organization"), unique=True)
+    uuid = models.CharField(default=uuid_default, max_length=36, unique=True)
+    domain = models.CharField(max_length=200, help_text=_t("The domain name of the organization, e.g. gethue.com"), unique=True)
+    customer_id = models.CharField(_t('Customer id'), max_length=128, default=None, null=True)
+    is_active = models.BooleanField(default=True)
+    is_multi_user = models.BooleanField(default=True)
 
-  objects = OrganizationManager()
+    objects = OrganizationManager()
 
-  def __str__(self):
-    return self.name
+    def __str__(self):
+      return self.name
 
 
 class OrganizationGroupManager(models.Manager):
@@ -81,31 +84,32 @@ class OrganizationGroupManager(models.Manager):
     return (self.organization, self.name,)
 
 
-class OrganizationGroup(models.Model):
-  name = models.CharField(_t('name'), max_length=80, unique=False)
-  organization = models.ForeignKey(Organization)
+if ENABLE_ORGANIZATIONS.get():
+  class OrganizationGroup(models.Model):
+    name = models.CharField(_t('name'), max_length=80, unique=False)
+    organization = models.ForeignKey(Organization)
 
-  permissions = models.ManyToManyField(
-      'HuePermission',
-      verbose_name=_t('permissions'),
-      blank=True,
-  )
+    permissions = models.ManyToManyField(
+        'HuePermission',
+        verbose_name=_t('permissions'),
+        blank=True,
+    )
 
-  objects = OrganizationGroupManager()
+    objects = OrganizationGroupManager()
 
-  def __init__(self, *args, **kwargs):
-    if not kwargs.get('organization'):
-      kwargs['organization'] = get_user_request_organization()
+    def __init__(self, *args, **kwargs):
+      if not kwargs.get('organization'):
+        kwargs['organization'] = get_user_request_organization()
 
-    super(OrganizationGroup, self).__init__(*args, **kwargs)
+      super(OrganizationGroup, self).__init__(*args, **kwargs)
 
-  class Meta:
-    verbose_name = _t('organization group')
-    verbose_name_plural = _t('organization groups')
-    unique_together = ('name', 'organization',)
+    class Meta:
+      verbose_name = _t('organization group')
+      verbose_name_plural = _t('organization groups')
+      unique_together = ('name', 'organization',)
 
-  def __str__(self):
-    return '%s @ %s' % (self.name, self.organization)
+    def __str__(self):
+      return '%s @ %s' % (self.name, self.organization)
 
 
 class UserManager(BaseUserManager):
@@ -170,42 +174,43 @@ class UserManager(BaseUserManager):
     return self._create_user(email, password, **extra_fields)
 
 
-class OrganizationUser(AbstractUser):
-  """User model in a multi tenant setup."""
+if ENABLE_ORGANIZATIONS.get():
+  class OrganizationUser(AbstractUser):
+    """User model in a multi tenant setup."""
 
-  username = None
-  email = models.EmailField(_t('Email address'), unique=True)
-  token = models.CharField(_t('Token'), max_length=128, default=None, null=True)
-  organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
-  is_admin = models.BooleanField(default=False)
+    username = None
+    email = models.EmailField(_t('Email address'), unique=True)
+    token = models.CharField(_t('Token'), max_length=128, default=None, null=True)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    is_admin = models.BooleanField(default=False)
 
-  groups = models.ManyToManyField(
-      OrganizationGroup,
-      verbose_name=_t('groups'),
-      blank=True,
-      help_text=_t(
-          'The groups this user belongs to. A user will get all permissions granted to each of their groups.'
-      ),
-      related_name="user_set",
-      related_query_name="user",
-  )
+    groups = models.ManyToManyField(
+        OrganizationGroup,
+        verbose_name=_t('groups'),
+        blank=True,
+        help_text=_t(
+            'The groups this user belongs to. A user will get all permissions granted to each of their groups.'
+        ),
+        related_name="user_set",
+        related_query_name="user",
+    )
 
-  USERNAME_FIELD = 'email'
-  REQUIRED_FIELDS = []
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
 
-  objects = UserManager()
+    objects = UserManager()
 
-  def __str__(self):
-    return '%s @ %s' % (self.email, self.organization)
+    def __str__(self):
+      return '%s @ %s' % (self.email, self.organization)
 
-  @property
-  def username(self):
-    return self.email
+    @property
+    def username(self):
+      return self.email
 
-  @property
-  def username_short(self):
-    return self.email.split('@')[0]
+    @property
+    def username_short(self):
+      return self.email.split('@')[0]
 
-  @username.setter
-  def username(self, value):
-    pass
+    @username.setter
+    def username(self, value):
+      pass
