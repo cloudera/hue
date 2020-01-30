@@ -24,6 +24,7 @@ from django.utils.translation import ugettext_lazy as _t, ugettext as _
 from desktop.conf import default_ssl_validate
 from desktop.lib.conf import Config, coerce_bool
 from spark.settings import NICE_NAME
+from beeswax.conf import get_use_sasl_default
 
 
 LOG = logging.getLogger(__name__)
@@ -86,7 +87,7 @@ SSL_CERT_CA_VERIFY = Config(
 USE_SASL = Config(
   key="use_sasl",
   help=_t("Use SASL framework to establish connection to host."),
-  default=False,
+  dynamic_default=get_use_sasl_default,
   type=coerce_bool
 )
 

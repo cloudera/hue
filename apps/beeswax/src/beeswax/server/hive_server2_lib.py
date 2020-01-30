@@ -30,7 +30,7 @@ from operator import itemgetter
 
 from django.utils.translation import ugettext as _
 
-from desktop.lib import thrift_util
+from desktop.lib import python_util, thrift_util
 from desktop.conf import DEFAULT_USER
 from beeswax import conf
 
@@ -310,7 +310,8 @@ class HiveServerTColumnValue2(object):
     if sys.version_info[0] < 3 or isinstance(bytestring, bytes):
       mask = bytearray(bytestring)
     else:
-      mask = bytearray(bytestring, 'utf-8')
+      bitstring = python_util.from_string_to_bits(bytestring)
+      mask = python_util.get_bytes_from_bits(bitstring)
 
     for n in mask:
       yield n & 0x01
@@ -728,7 +729,7 @@ class HiveServerClient(object):
 
     # Not supported currently in HS2 and Impala: TStatusCode.INVALID_HANDLE_STATUS
     if res.status.statusCode == TStatusCode.ERROR_STATUS and \
-      re.search('Invalid SessionHandle|Invalid session|Client session expired', res.status.errorMessage or '', re.I):
+      re.search('Invalid SessionHandle|Invalid session|Client session expired|Could not connect', res.status.errorMessage or '', re.I):
       if session:
         session.status_code = TStatusCode.INVALID_HANDLE_STATUS
         session.save()

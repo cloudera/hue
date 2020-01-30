@@ -60,6 +60,7 @@ from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
 from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod_whitespace
 from desktop.lib.parameterization import substitute_variables
+from desktop.lib.python_util import from_string_to_bits, get_bytes_from_bits
 from desktop.lib.test_utils import grant_access, add_to_group
 from desktop.lib.security_util import get_localhost_name
 from desktop.lib.test_export_csvxls import _read_xls_sheet_data
@@ -2702,6 +2703,41 @@ class TestHiveServer2API(object):
     assert_false(data is HiveServerTColumnValue2.set_nulls(data, nulls))
     nulls = '\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00'
     assert_false(data is HiveServerTColumnValue2.set_nulls(data, nulls))
+
+
+  def test_bits_to_bytes_conversion(self):
+    if sys.version_info[0] < 3:
+      raise SkipTest
+
+    nulls = '\x00'
+    bitstring = from_string_to_bits(nulls)
+    assert_equal('00000000', bitstring)
+    assert_equal([0, 0], get_bytes_from_bits(bitstring))
+
+    nulls = '\x03'
+    bitstring = from_string_to_bits(nulls)
+    assert_equal('00000011', bitstring)
+    assert_equal([3, 0], get_bytes_from_bits(bitstring))
+
+    nulls = 't'
+    bitstring = from_string_to_bits(nulls)
+    assert_equal('01110100', bitstring)
+    assert_equal([116, 0], get_bytes_from_bits(bitstring))
+
+    nulls = '\xff\xee\x03'
+    bitstring = from_string_to_bits(nulls)
+    assert_equal('111111111110111000000011', bitstring)
+    assert_equal([255, 238, 3, 0], get_bytes_from_bits(bitstring))
+
+    nulls = '\x41'
+    bitstring = from_string_to_bits(nulls)
+    assert_equal('01000001', bitstring)
+    assert_equal([65, 0], get_bytes_from_bits(bitstring))
+
+    nulls = '\x01\x23\x45\x67\x89\xab\xcd\xef'
+    bitstring = from_string_to_bits(nulls)
+    assert_equal('0000000100100011010001010110011110001001101010111100110111101111', bitstring)
+    assert_equal([1, 35, 69, 103, 137, 171, 205, 239, 0], get_bytes_from_bits(bitstring))
 
 
 class MockDbms(object):

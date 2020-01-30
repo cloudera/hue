@@ -23,7 +23,6 @@ import threading
 
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
-
 from beeswax.server.dbms import QueryServerException
 from beeswax.server.hive_server2_lib import HiveServerClient
 
@@ -34,22 +33,9 @@ from impala.conf import DAEMON_API_USERNAME, DAEMON_API_PASSWORD
 
 LOG = logging.getLogger(__name__)
 
-API_CACHE = None
-API_CACHE_LOCK = threading.Lock()
-
 
 def get_api(user, url):
-  global  API_CACHE
-  if API_CACHE is None or API_CACHE.get(url) is None:
-    API_CACHE_LOCK.acquire()
-    try:
-      if API_CACHE is None:
-        API_CACHE = {}
-      if API_CACHE.get(url) is None:
-        API_CACHE[url] = ImpalaDaemonApi(url)
-    finally:
-      API_CACHE_LOCK.release()
-  api = API_CACHE[url]
+  api = ImpalaDaemonApi(url)
   api.set_user(user)
   return api
 
