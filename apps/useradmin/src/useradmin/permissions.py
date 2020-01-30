@@ -27,7 +27,7 @@ from useradmin.organization import _fitered_queryset, get_user_request_organizat
 
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationGroup as Group, Organization
+  from useradmin.organization import OrganizationGroup as Group, Organization
 else:
   from django.contrib.auth.models import Group
 

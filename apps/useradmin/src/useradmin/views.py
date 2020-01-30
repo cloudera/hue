@@ -51,8 +51,7 @@ from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm, AddLdapU
   PermissionsEditForm, GroupEditForm, SuperUserChangeForm, validate_username, validate_first_name, \
   validate_last_name, PasswordChangeForm
 from useradmin.ldap_access import LdapBindException, LdapSearchException
-from useradmin.models import HuePermission, UserProfile, LdapGroup, get_profile, get_default_user_group, User, Group
-from useradmin.models2 import Organization
+from useradmin.models import HuePermission, UserProfile, LdapGroup, get_profile, get_default_user_group, User, Group, Organization
 
 if sys.version_info[0] > 2:
   unicode = str
