@@ -17,6 +17,8 @@
 
 from crequest.middleware import CrequestMiddleware
 
+from desktop.conf import ENABLE_ORGANIZATIONS
+
 
 def default_organization():
   from useradmin.models import Organization
@@ -33,7 +35,9 @@ def _fitered_queryset(queryset, by_owner=False):
   request = CrequestMiddleware.get_request()
 
   # Avoid infinite recursion on very first retrieval of the user
-  if request and hasattr(request, 'user') and hasattr(request.user, '_wrapped') and type(request.user._wrapped) is not object and request.user.is_authenticated():
+  if ENABLE_ORGANIZATIONS.get() and \
+      request and hasattr(request, 'user') and hasattr(request.user, '_wrapped') and type(request.user._wrapped) is not object and \
+      request.user.is_authenticated():
     if by_owner:
       filters = {'owner__organization': request.user.organization}
     else:
