@@ -1219,7 +1219,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <tbody data-bind="foreach: properties['metadata']">
               <tr>
                 <td data-bind="text: name"></td>
-                <td><!-- ko template: { name: 'link-or-text', data: { name: name(), value: value() } } --><!-- /ko --></td>
+                <td><!-- ko template: { name: 'link-or-text', data: { name: name, value: value } } --><!-- /ko --></td>
               </tr>
             </tbody>
           </table>
