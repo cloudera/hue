@@ -1,0 +1,5 @@
+include README.rst
+include AUTHORS.rst
+include ChangeLog.rst
+include LICENSE
+
