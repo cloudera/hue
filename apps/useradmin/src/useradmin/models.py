@@ -59,14 +59,14 @@ from desktop.lib.idbroker.conf import is_idbroker_enabled
 from desktop.monkey_patches import monkey_patch_username_validator
 
 from useradmin.conf import DEFAULT_USER_GROUP
-from useradmin.models2 import Organization
 from useradmin.permissions import HuePermission, GroupPermission, LdapGroup
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group, get_organization
+  from useradmin.models2 import OrganizationUser as User, OrganizationGroup as Group, get_organization, Organization
 else:
   from django.contrib.auth.models import User, Group
   def get_organization(): pass
+  class Organization(): pass
 
   monkey_patch_username_validator()
 
