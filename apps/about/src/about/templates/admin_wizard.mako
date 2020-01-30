@@ -55,7 +55,7 @@ ${ layout.menubar(section='quick_start') }
 
            <div class="span2">
             <ul class="nav nav-pills nav-vertical-pills">
-              <li class="active"><a href="#step1" class="step">${ _('Step 1:') } <i class="fa fa-cogs"></i> ${ _('Checks') }</a></li>
+              <li class="active"><a href="#step1" class="step">${ _('Step 1:') } <i class="fa fa-check"></i> ${ _('Checks') }</a></li>
               <li><a href="#step2" class="step">${ _('Step 2:') } <i class="fa fa-exchange"></i> ${ _('Connectors') }</a></li>
               <li><a href="#step3" class="step">${ _('Step 3:') } <i class="fa fa-book"></i> ${ _('Examples') }</a></li>
               <li><a id="lastStep" href="#step4" class="step">${ _('Step 4:') } <i class="fa fa-group"></i> ${ _('Users') }</a></li>
@@ -78,13 +78,13 @@ ${ layout.menubar(section='quick_start') }
 
           <div id="step2" class="stepDetails hide">
             <h3>${ _('Add connectors to data services') }</h3>
-            <span id="connectorCounts">...</span> ${ _('connectors are installed.') }
+            <span id="connectorCounts">...</span> ${ _('connectors installed') }
 
             % if has_connectors():
             <ul class="unstyled samples margin-top-20">
               <li>
                 <a href="${ url('desktop.lib.connectors.views.index') }" title="${ _('Open the connector configuration page') }">
-                  <i class="fa fa-exchange"></i> ${ _('Configuration page') }
+                  <i class="fa fa-plus-plus"></i> ${ _('Add a Database') }
                 </a>
               </li>
               <li>
