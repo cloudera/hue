@@ -300,6 +300,8 @@ class OozieMockBase(object):
     grant_access("test", "test", "oozie")
     add_to_group("test")
     self.user = User.objects.get(username='test')
+    self.user.email = 'test@localhost'
+    self.user.save()
 
     self.wf = create_workflow(self.c, self.user)
     self.original_fs = originalCluster.FS_CACHE["default"]
