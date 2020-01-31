@@ -22,6 +22,8 @@ from builtins import object
 import logging
 import sys
 
+from useradmin.models import User
+
 from desktop.auth.backend import is_admin
 from desktop.conf import DEFAULT_USER, ENABLE_ORGANIZATIONS
 
