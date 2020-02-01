@@ -22,12 +22,12 @@ import logging
 from django.utils.translation import ugettext as _
 
 from desktop import appmanager
+from desktop.auth.backend import is_admin
+from desktop.auth.decorators import admin_required
 from desktop.lib.django_util import JsonResponse, render, login_notrequired
 from desktop.log.access import access_log_level
 from desktop.models import Settings, hue_version
 from desktop.views import collect_usage
-
-from desktop.auth.backend import is_admin
 
 
 def admin_wizard(request):
@@ -46,14 +46,16 @@ def admin_wizard(request):
   })
 
 
+@admin_required
 def update_preferences(request):
   response = {'status': -1, 'data': ''}
 
   if request.method == 'POST':
     try:
       settings = Settings.get_settings()
-      settings.collect_usage = request.POST.get('collect_usage', False)
+      settings.collect_usage = request.POST.get('collect_usage', 'False').lower() == "true"
       settings.save()
+
       response['status'] = 0
       response['collect_usage'] = settings.collect_usage
     except Exception as e:
