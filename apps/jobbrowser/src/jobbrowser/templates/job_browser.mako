@@ -3917,13 +3917,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         loadHash();
       };
 
-      huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
+      var configUpdated = function (clusterConfig) {
         jobBrowserViewModel.appConfig(clusterConfig && clusterConfig['app_config']);
         jobBrowserViewModel.clusterType(clusterConfig && clusterConfig['cluster_type']);
         loadHash();
-      });
+      }
 
-      huePubSub.publish('cluster.config.get.config');
+      huePubSub.subscribe('cluster.config.set.config', configUpdated);
+      huePubSub.publish('cluster.config.get.config', configUpdated);
+
 
       huePubSub.subscribe('submit.rerun.popup.return${ SUFFIX }', function (data) {
         $.jHueNotify.info('${_("Rerun submitted.")}');
