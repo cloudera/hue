@@ -6,9 +6,9 @@
     <div class="row">
       <div class="col-sm-6">
         <ul class="list-inline list--hover">
-          <li> <a href="mailto:team@gethue.com"><span>Contact</span></a> </li>
-          <li> <a href="https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md"><span>Work with us</span></a> </li>
-          <li> <a href="{{ .Site.BaseURL }}/posts/"><span>Blog</span></a> </li>
+          <li> <a href="mailto:team@gethue.com"><span>{{ i18n "contact" }}</span></a> </li>
+          <li> <a href="https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md"><span>{{ i18n "work" }}</span></a> </li>
+          <li> <a href="{{ .Site.BaseURL }}/posts/"><span>{{ i18n "blog" }}</span></a> </li>
           <li> <a href="https://stackoverflow.com/questions/tagged/hue"><span>Stackoverflow</span></a> </li>
           <li>
             <a href="https://github.com/cloudera/hue" title="GitHub" target="_blank">
@@ -25,7 +25,7 @@
       <div class="col-sm-6 text-right text-center-xs">
         <a class="btn btn--sm btn--primary type--uppercase" href="http://demo.gethue.com" target="_blank">
           <span class="btn__text">
-            Try Hue Now
+            {{ i18n "try" }}
           </span>
         </a>
       </div>

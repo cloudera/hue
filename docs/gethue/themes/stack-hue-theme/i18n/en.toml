@@ -1,0 +1,29 @@
+[product]
+other = "Product"
+
+[user]
+other = "User"
+
+[admin]
+other = "Administrator"
+
+[developer]
+other = "Developer"
+
+[blog]
+other = "Blog"
+
+[forum]
+other = "Forum"
+
+[quickstart]
+other = "Quick Start"
+
+[contact]
+other = "Contact"
+
+[work]
+other = "Work with us"
+
+[try]
+other = "Try Hue Now"
