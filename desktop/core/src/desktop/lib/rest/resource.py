@@ -117,20 +117,25 @@ class Resource(object):
       # Output duration without content
       log_length = conf.REST_RESPONSE_SIZE.get() != -1 and conf.REST_RESPONSE_SIZE.get() if log_response else 0
       duration = time.time() - start_time
-      message = '%s %s %s%s%s %s%s returned in %dms %s %s %s%s' % (
-        method,
-        type(self._client._session.auth) if self._client._session and self._client._session.auth else None,
-        self._client._base_url,
-        smart_str(path, errors='replace'),
-        iri_to_uri('?' + urlencode(params)) if params else '',
-        smart_str(data, errors='replace')[:log_length] if data else '',
-        log_length and len(data) > log_length and '...' or '' if data else '',
-        (duration * 1000),
-        resp.status_code if resp else 0,
-        len(resp.content) if resp else 0,
-        smart_str(resp.content, errors='replace')[:log_length] if resp else '',
-        log_length and len(resp.content) > log_length and '...' or '' if resp else ''
-      )
+      try:
+        message = '%s %s %s%s%s %s%s returned in %dms %s %s %s%s' % (
+          method,
+          type(self._client._session.auth) if self._client._session and self._client._session.auth else None,
+          self._client._base_url,
+          smart_str(path, errors='replace'),
+          iri_to_uri('?' + urlencode(params)) if params else '',
+          smart_str(data, errors='replace')[:log_length] if data else '',
+          log_length and len(data) > log_length and '...' or '' if data else '',
+          (duration * 1000),
+          resp.status_code if resp else 0,
+          len(resp.content) if resp else 0,
+          smart_str(resp.content, errors='replace')[:log_length] if resp else '',
+          log_length and len(resp.content) > log_length and '...' or '' if resp else ''
+        )
+      except:
+        short_call_name = '%s %s' % (method, self._client._base_url)
+        LOG.exception('Error logging return call %s' % short_call_name)
+        message = '%s returned in %dms' % (short_call_name, duration)
       self._client.logger.disabled = 0
 
       log_if_slow_call(duration=duration, message=message, logger=self._client.logger)
