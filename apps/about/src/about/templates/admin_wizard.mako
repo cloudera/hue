@@ -78,9 +78,10 @@ ${ layout.menubar(section='quick_start') }
 
           <div id="step2" class="stepDetails hide">
             <h3>${ _('Add connectors to data services') }</h3>
-            <span id="connectorCounts">...</span> ${ _('connectors installed') }
 
             % if has_connectors():
+            <span id="connectorCounts">...</span> ${ _('connectors installed') }
+
             <ul class="unstyled samples margin-top-20">
               <li>
                 <a href="${ url('desktop.lib.connectors.views.index') }" title="${ _('Open the connector configuration page') }">
@@ -377,15 +378,15 @@ ${ layout.menubar(section='quick_start') }
     $("[rel='popover']").popover();
 
     % if has_connectors():
-      huePubSub.subscribe('cluster.config.set.config', config => {
-        if (config && config.app_config && config.app_config.editor) {
-          var connectors = config.app_config.editor.interpreters.filter(c => c.name != 'notebook');
+      var configUpdated = function (clusterConfig) {
+        if (clusterConfig && clusterConfig.app_config && clusterConfig.app_config.editor) {
+          var connectors = clusterConfig.app_config.editor.interpreters.filter(c => c.name != 'notebook');
           $('#connectorCounts').text(connectors.length);
           adminWizardViewModel.connectors(connectors);
         }
-      });
-
-      huePubSub.publish('cluster.config.refresh.config');
+      };
+      huePubSub.subscribe('cluster.config.set.config', configUpdated);
+      huePubSub.publish('cluster.config.refresh.config', configUpdated);
     % endif
 
     $(".installBtn").click(installConnectorDataExample);
