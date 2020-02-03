@@ -18,12 +18,7 @@
 
 from future import standard_library
 standard_library.install_aliases()
-from builtins import next
-from builtins import map
-from builtins import str
-from builtins import chr
-from builtins import range
-from builtins import object
+from builtins import next, map, str, chr, range, object
 import gzip
 import json
 import logging
@@ -48,13 +43,8 @@ from django.urls import reverse
 from django.db import transaction
 
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.conf import \
-    AUTH_USERNAME as DEFAULT_AUTH_USERNAME, \
-    AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, \
-    AUTH_PASSWORD_SCRIPT as DEFAULT_AUTH_PASSWORD_SCRIPT, \
-    LDAP_USERNAME, \
-    LDAP_PASSWORD, \
-    USE_NEW_EDITOR
+from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, \
+  AUTH_PASSWORD_SCRIPT as DEFAULT_AUTH_PASSWORD_SCRIPT, LDAP_USERNAME, LDAP_PASSWORD, USE_NEW_EDITOR
 from desktop import redaction
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
@@ -81,23 +71,24 @@ from beeswax import conf, hive_site
 from beeswax.common import apply_natural_sort
 from beeswax.conf import HIVE_SERVER_HOST, AUTH_USERNAME, AUTH_PASSWORD, AUTH_PASSWORD_SCRIPT
 from beeswax.views import collapse_whitespace, _save_design, parse_out_jobs, parse_out_queries
-from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server_config,\
-  fetch_query_result_data
+from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server_config, fetch_query_result_data
 from beeswax.design import hql_query
 from beeswax.data_export import upload, download
 from beeswax.models import SavedQuery, QueryHistory, HQL, HIVE_SERVER2
 from beeswax.server import dbms
 from beeswax.server.dbms import QueryServerException
-from beeswax.server.hive_server2_lib import HiveServerClient,\
-  PartitionKeyCompatible, PartitionValueCompatible, HiveServerTable,\
-  HiveServerTColumnValue2
+from beeswax.server.hive_server2_lib import HiveServerClient, PartitionKeyCompatible, PartitionValueCompatible, HiveServerTable, \
+    HiveServerTColumnValue2
 from beeswax.test_base import BeeswaxSampleProvider, is_hive_on_spark, get_available_execution_engines
 from beeswax.hive_site import get_metastore, hiveserver2_jdbc_url
 
+
 if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
   from io import BytesIO as string_io
   open_file = open
 else:
+  from mock import patch, Mock
   from cStringIO import StringIO as string_io
   open_file = file
 
@@ -137,7 +128,13 @@ def get_csv(client, result_response):
   return ''.join(csv_resp.streaming_content)
 
 
-class TestBeeswax(object):
+class TestHive(object):
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test_hive", groupname="default", recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="test_hive")
+
+
   def test_parse_out_queries(self):
     text = """INFO  : Compiling command(queryId=hive_20191029132605_17883ebe-d3d5-41bf-a1e9-01cf207a3c6b): select 1
 INFO  : Semantic Analysis Completed (retrial = false)
@@ -157,8 +154,19 @@ INFO  : OK"""
     assert_true(jobs and jobs[0]['job_id'] == 'hive_20191029132605_17883ebe-d3d5-41bf-a1e9-01cf207a3c6a')
     assert_true(jobs and jobs[0]['started'] == False)
     assert_true(jobs and jobs[0]['finished'] == False)
-    
 
+
+  def test_install_examples(self):
+    with patch('beeswax.management.commands.beeswax_install_examples.Command') as Command:
+      resp = self.client.get('/beeswax/install_examples')
+      assert_true('POST request is required.' in json.loads(resp.content)['message'])
+
+      resp = self.client.post('/beeswax/install_examples', {'db_name': 'default'})
+      data = json.loads(resp.content)
+      assert_equal(0, data['status'])
+
+
+# This test suite is not running currently, to split between integration and unit tests.
 class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
   requires_hadoop = True
   integration = True

@@ -614,7 +614,7 @@ def install_examples(request):
     try:
       app_name = get_app_name(request)
       db_name = request.POST.get('db_name', 'default')
-      connector_id = options.get('connector_id')
+      connector_id = request.POST.get('connector_id')
       beeswax_install_examples.Command().handle(app_name=app_name, db_name=db_name, user=request.user)
       response['status'] = 0
     except Exception as err:
