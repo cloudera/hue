@@ -22,6 +22,7 @@ Checked-in third party dependencies
 |Y|Django|1.6.10|BSD|http://www.djangoproject.com/download/1.6.10/tarball/|
 |Y|django-auth-ldap|1.2.0|BSD|http://bitbucket.org/psagers/django-auth-ldap/|
 |Y|django-axes|1.5.0|MIT|http://github.com/django-pci/django-axes.git|
+|Y|django-crequest|2018.5.11|BSD|https://pypi.org/project/django-crequest/|
 |Y|Django Extensions|1.5.0|New BSD|http://pypi.python.org/pypi/django-extensions/1.5.0|
 |Y|Django_nose (part of basie)|1.3|MIT|http://code.basieproject.org/trunk/apps/django_nose/nose_runner.py|
 |Y|django-webpack-loader|0.5.0|MIT|https://github.com/owais/django-webpack-loader/|

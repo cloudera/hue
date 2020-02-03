@@ -107,22 +107,23 @@ ${ layout.menubar(section='quick_start') }
               <ul class="unstyled samples">
 
               % if has_connectors():
-              <!-- ko foreach: connectors -->
-                <!-- ko if: ['hive', 'impala'].indexOf(dialect) != -1 -->
-                <li>
-                  <a href="javascript:void(0)" data-bind="click: $root.installConnectorDataExample">
-                    <i class="fa fa-download"></i> <span data-bind="text: name"></span>
-                  </a>
-                </li>
+                <!-- ko foreach: connectors -->
+                  <!-- ko if: ['hive', 'impala'].indexOf(dialect) != -1 -->
+                  <li>
+                    <a href="javascript:void(0)" data-bind="click: $root.installConnectorDataExample">
+                      <i class="fa fa-download"></i> <span data-bind="text: name"></span>
+                    </a>
+                  </li>
+                  <!-- /ko -->
                 <!-- /ko -->
-              <!-- /ko -->
 
-              <div id="check-config-section" class="margin-bottom-20" data-bind="visible: isInstallingSample">
-                <div class="spinner">
-                  <i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i>
-                </div>
-              </div>
-
+                <li>
+                  <div id="check-config-section" class="margin-bottom-20" data-bind="visible: isInstallingSample">
+                    <div class="spinner">
+                      <i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i>
+                    </div>
+                  </div>
+                </li>
               % else:
                 % if 'hive' in app_names:
                   <li>
