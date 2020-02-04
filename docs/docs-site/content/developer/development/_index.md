@@ -792,6 +792,18 @@ Then after booting the hugo documentation server, we point to its url. We also b
 
     muffet http://localhost:35741/ --exclude ".*releases.*" -f
 
+### Blog & Website
+
+Like for the [Documentation](#Documentation) install hugo. The content for each language is in its [own directory](https://github.com/cloudera/hue/tree/master/docs/gethue/content).
+
+Build it and see live changes:
+
+    cd docs/gethue
+
+    hugo serve
+
+Will automatically start one server for each language domain.
+
 ### SQL Autocomplete
 
 Install a patched jison:
