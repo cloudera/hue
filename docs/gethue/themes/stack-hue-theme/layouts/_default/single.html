@@ -24,6 +24,13 @@
                             </span>
                             {{ $read := .ReadingTime }}
                             - <span>{{ .ReadingTime }} minute{{ if gt $read 1 }}s{{ end }} read</span>
+                            {{ if .IsTranslated }}
+                            - <span>Read in
+                                {{ range .Translations }}
+                                <a href="{{ .Permalink }}">{{ .Lang }}</a>
+                                {{ end }}
+                            </span>
+                            {{ end }}
                         </div>
                         <!--end article title-->
                         <div class="article__body">
