@@ -9,6 +9,10 @@ website:
   enabled: true
   replicas: 1
   domain: "gethue.com"
+website-jp:
+  enabled: true
+  replicas: 1
+  domain: "jp.gethue.com"
 docs:
   enabled: true
   replicas: 1
