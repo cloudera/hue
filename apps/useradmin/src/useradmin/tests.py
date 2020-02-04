@@ -442,6 +442,8 @@ class TestUserAdmin(BaseUserAdminTests):
     assert_true(b'Is admin' in response.content)
     assert_true(b'fa fa-check' in response.content)
 
+    assert_true(b'Is active' in response.content)
+
 
   def test_default_group(self):
     resets = [
