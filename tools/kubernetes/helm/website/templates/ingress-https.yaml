@@ -37,8 +37,8 @@ spec:
           servicePort: 9002
         path: /
   {{ end }}
-  {{ if .Values.website-jp.enabled }}
-  - host: {{ .Values.website-jp.domain }}
+  {{ if .Values.website.jp.enabled }}
+  - host: {{ .Values.website.jp.domain }}
     http:
       paths:
       - backend:
@@ -54,8 +54,8 @@ spec:
     {{ if .Values.website.enabled }}
     - {{ .Values.website.domain }}
     {{ end }}
-    {{ if .Values.website-jp.enabled }}
-    - {{ .Values.website-jp.domain }}
+    {{ if .Values.website.jp.enabled }}
+    - {{ .Values.website.jp.domain }}
     {{ end }}
     secretName: letsencrypt-website-prod-tls
 {{- end -}}
