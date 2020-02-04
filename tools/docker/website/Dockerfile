@@ -19,7 +19,8 @@ RUN hugo --baseURL ""
 
 
 FROM nginx:1.17-alpine
-COPY --from=build /gethue/public /usr/share/nginx/html
+ARG lang=en
+COPY --from=build /gethue/public/${lang} /usr/share/nginx/html
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
