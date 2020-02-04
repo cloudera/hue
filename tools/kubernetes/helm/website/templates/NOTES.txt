@@ -16,7 +16,12 @@ Run below commands to get the recommended URLs:
 
 {{ else if and .Values.ingress.create (eq .Values.ingress.type "nginx-ssl") }}
 
+  {{- if .Values.website.enabled -}}
   echo https://{{ .Values.website.domain }}
+  {{- end -}}
+   {{- if .Values.website-jp.enabled -}}
+  echo https://{{ .Values.website.domain }}
+  {{- end -}}
   {{- if .Values.docs.enabled -}}
   echo https://{{ .Values.docs.domain }}
   {{- end -}}
