@@ -29,8 +29,8 @@ spec:
           servicePort: 9002
         path: /
   {{ end }}
-  {{ if .Values.website-jp.enabled }}
-  - host: {{ .Values.website-jp.domain }}
+  {{ if .Values.website.jp.enabled }}
+  - host: {{ .Values.website.jp.domain }}
     http:
       paths:
       - backend:
