@@ -427,8 +427,12 @@ ${ layout.menubar(section='quick_start') }
       }
     });
 
+    if (window.location.hash === '') {
+      checkConfig();
+    }
+
     function showStep(step) {
-      if (window.location.hash === '#step1' || window.location.hash === '') {
+      if (window.location.hash === '#step1') {
         checkConfig();
       }
 
