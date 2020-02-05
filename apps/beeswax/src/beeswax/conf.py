@@ -333,9 +333,10 @@ def has_multiple_sessions():
 
 CLOSE_SESSIONS = Config(
   key="close_sessions",
-  help=_t('When set to True, Hue will close sessions created for background queries and open new ones as needed.'
-          'When set to False, Hue will keep sessions created for background queries opened and reuse them as needed.'
-          'This flag is useful when max_number_of_sessions != 1'),
+  help=_t(
+      'When set to True, Hue will close sessions created for background queries and open new ones as needed.'
+      'When set to False, Hue will keep sessions created for background queries opened and reuse them as needed.'
+      'This flag is useful when max_number_of_sessions != 1'),
   type=coerce_bool,
   dynamic_default=has_multiple_sessions
 )

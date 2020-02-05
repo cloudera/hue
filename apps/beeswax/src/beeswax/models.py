@@ -415,8 +415,7 @@ class SessionManager(models.Manager):
     sessions = Session.objects.get_n_sessions(user, n=2 + n_sessions, application=application)
     LOG.debug('%s sessions found' % len(sessions))
     if sessions:
-      # Include trashed documents to keep the query lazy
-      # and avoid retrieving all documents
+      # Include trashed documents to keep the query lazy and avoid retrieving all documents
       docs = Document2.objects.get_history(doc_type='query-hive', user=user, include_trashed=True)
       busy_sessions = set()
 
@@ -431,7 +430,7 @@ class SessionManager(models.Manager):
         session_guid = snippet_data.get('result', {}).get('handle', {}).get('session_guid')
         status = snippet_data.get('status')
 
-        if status in [QueryHistory.STATE.submitted.name, QueryHistory.STATE.running.name]:
+        if status in (QueryHistory.STATE.submitted.name, QueryHistory.STATE.running.name):
           if session_guid is not None and session_guid not in busy_sessions:
             busy_sessions.add(session_guid)
 
