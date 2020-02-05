@@ -354,10 +354,15 @@ class TestHiveServerTable():
       assert_equal(table.primary_keys[1].type, 'NULL')
       assert_equal(table.primary_keys[1].comment, 'NULL')
 
-class SessionTest():
+
+class TestSessionManagement():
+
   def test_call_session_single(self):
-    finish = (MAX_NUMBER_OF_SESSIONS.set_for_testing(1),
-                CLOSE_SESSIONS.set_for_testing(False))
+    finish = (
+        MAX_NUMBER_OF_SESSIONS.set_for_testing(1),
+        CLOSE_SESSIONS.set_for_testing(False)
+    )
+
     try:
       with patch('beeswax.server.hive_server2_lib.thrift_util.get_client') as get_client:
         with patch('beeswax.server.hive_server2_lib.HiveServerClient.open_session') as open_session:
@@ -386,8 +391,11 @@ class SessionTest():
         f()
 
   def test_call_session_pool(self):
-    finish = (MAX_NUMBER_OF_SESSIONS.set_for_testing(2),
-                CLOSE_SESSIONS.set_for_testing(False))
+    finish = (
+        MAX_NUMBER_OF_SESSIONS.set_for_testing(2),
+        CLOSE_SESSIONS.set_for_testing(False)
+    )
+
     try:
       with patch('beeswax.server.hive_server2_lib.thrift_util.get_client') as get_client:
         with patch('beeswax.server.hive_server2_lib.HiveServerClient.open_session') as open_session:
@@ -416,8 +424,11 @@ class SessionTest():
         f()
 
   def test_call_session_pool_limit(self):
-    finish = (MAX_NUMBER_OF_SESSIONS.set_for_testing(2),
-                CLOSE_SESSIONS.set_for_testing(False))
+    finish = (
+        MAX_NUMBER_OF_SESSIONS.set_for_testing(2),
+        CLOSE_SESSIONS.set_for_testing(False)
+    )
+
     try:
       with patch('beeswax.server.hive_server2_lib.thrift_util.get_client') as get_client:
         with patch('beeswax.server.hive_server2_lib.HiveServerClient.open_session') as open_session:
@@ -433,8 +444,11 @@ class SessionTest():
         f()
 
   def test_call_session_close_idle(self):
-    finish = (MAX_NUMBER_OF_SESSIONS.set_for_testing(-1),
-                CLOSE_SESSIONS.set_for_testing(True))
+    finish = (
+        MAX_NUMBER_OF_SESSIONS.set_for_testing(-1),
+        CLOSE_SESSIONS.set_for_testing(True)
+    )
+
     try:
       with patch('beeswax.server.hive_server2_lib.thrift_util.get_client') as get_client:
         with patch('beeswax.server.hive_server2_lib.HiveServerClient.open_session') as open_session:
@@ -461,8 +475,11 @@ class SessionTest():
         f()
 
   def test_call_session_close_idle_managed_queries(self):
-    finish = (MAX_NUMBER_OF_SESSIONS.set_for_testing(-1),
-                CLOSE_SESSIONS.set_for_testing(True))
+    finish = (
+        MAX_NUMBER_OF_SESSIONS.set_for_testing(-1),
+        CLOSE_SESSIONS.set_for_testing(True)
+    )
+
     try:
       with patch('beeswax.server.hive_server2_lib.thrift_util.get_client') as get_client:
         with patch('beeswax.server.hive_server2_lib.HiveServerClient.open_session') as open_session:
@@ -507,8 +524,11 @@ class SessionTest():
         f()
 
   def test_call_session_close_idle_limit(self):
-    finish = (MAX_NUMBER_OF_SESSIONS.set_for_testing(2),
-                CLOSE_SESSIONS.set_for_testing(True))
+    finish = (
+        MAX_NUMBER_OF_SESSIONS.set_for_testing(2),
+        CLOSE_SESSIONS.set_for_testing(True)
+    )
+
     try:
       with patch('beeswax.server.hive_server2_lib.thrift_util.get_client') as get_client:
         with patch('beeswax.server.hive_server2_lib.HiveServerClient.open_session') as open_session:
