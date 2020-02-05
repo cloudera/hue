@@ -85,7 +85,7 @@ ${ layout.menubar(section='quick_start') }
             <ul class="unstyled samples margin-top-20">
               <li>
                 <a href="${ url('desktop.lib.connectors.views.index') }" title="${ _('Open the connector configuration page') }">
-                  <i class="fa fa-plus-plus"></i> ${ _('Add a Database') }
+                  <i class="fa fa-plus"></i> ${ _('Add a Database') }
                 </a>
               </li>
               <li>
