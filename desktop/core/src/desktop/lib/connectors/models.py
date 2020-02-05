@@ -102,6 +102,10 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
     _create_connector_examples()
 
   connectors = []
+  connectors_objects = Connector.objects.all()
+  if user is not None and not is_admin(user):  # Apply Permissions
+    connectors_objects = connectors_objects.filter(huepermission__in=user.get_permissions())
+
   connector_instances = [
       {
         'id': connector.id,
@@ -112,7 +116,7 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
         'settings': json.loads(connector.settings),
         'is_demo': False,
       }
-      for connector in Connector.objects.all()
+      for connector in connectors_objects
   ]
 
   for connector in connector_instances:
@@ -151,11 +155,6 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
     connectors = [connector for connector in connectors if connector['dialect'] == dialect]
   if interface is not None:
     connectors = [connector for connector in connectors if connector['interface'] == interface]
-
-  # Apply Permissions
-  if user is not None and not is_admin(user):
-    allowed_connectors = user.get_permissions().values_list('app', flat=True)
-    connectors = [connector for connector in connectors if connector['id'] in allowed_connectors]
 
   return connectors
 
