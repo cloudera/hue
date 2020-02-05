@@ -121,7 +121,7 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
     for connector_type in get_connectors_types():
       if connector_type['dialect'] == connector['dialect']:
         connector_types.insert(0, connector_type)
-      elif connector_type.get('interface') == connector['interface']:
+      elif connector['interface'] and connector_type.get('interface') == connector['interface']:
         connector_types.append(connector_type)
 
     if not connector_types:
