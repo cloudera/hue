@@ -44,14 +44,14 @@ def is_selected(section, matcher):
                   <a href="${ url('about:admin_wizard') }">${_('Quick start')}</a>
                 </li>
               % endif
-              % if is_hue_admin(user):
-                <li class="${is_selected(section, 'dump_config')}">
-                  <a href="${ url('desktop.views.dump_config') }">${_('Configuration')}</a>
-                </li>
-              % endif
               % if has_connectors() and (is_admin(user) or is_hue_admin(user)):
                 <li class="${is_selected(section, 'connectors')}">
                   <a href="${ url('desktop.lib.connectors.views.index') }">${_('Connectors')}</a>
+                </li>
+              % endif
+              % if is_hue_admin(user):
+                <li class="${is_selected(section, 'dump_config')}">
+                  <a href="${ url('desktop.views.dump_config') }">${_('Configuration')}</a>
                 </li>
               % endif
               % if ANALYTICS.IS_ENABLED.get() and (is_hue_admin(user) or is_admin(user)):
