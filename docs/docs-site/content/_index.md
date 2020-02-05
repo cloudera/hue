@@ -38,6 +38,7 @@ How to extend SQL connectors, reuse the API or build applications is detailed in
 Releases
 --------
 
+* April 10, 2020 --- [Version 4.7.0](releases/release-notes-4.7.0/index.html)
 * December 5, 2019 --- [Version 4.6.0](releases/release-notes-4.6.0/index.html)
 * August 12, 2019 --- [Version 4.5.0](releases/release-notes-4.5.0/index.html)
 * March 28, 2019 --- [Version 4.4.0](releases/release-notes-4.4.0/index.html)
