@@ -67,6 +67,20 @@ const SUPPORT_TEMPLATES = `
         <!-- /ko -->
         <!-- /ko -->
       </div>
+      <!-- ko if: isDocument -->
+        <div class="context-popover-bottom-attributes">
+        <!-- ko with: contents -->
+          <!-- ko if: data && data.owner -->
+          <div><span>${I18n('Owner')}</span> <span data-bind="text: data.owner"></span></div>
+          <!-- /ko -->
+          <!-- ko if: data && data.last_modified -->
+          <div><span>${I18n(
+            'Modified'
+          )}</span> <span data-bind="text: data.last_modified"></span></div>
+          <!-- /ko -->
+        <!-- /ko -->
+        </div>
+      <!-- /ko -->
     </div>
   </script>
 

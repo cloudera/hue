@@ -973,6 +973,8 @@ def search_entities(request):
           'hue_name': _highlight(search_text, escape(e.name)),
           'hue_description': _highlight(search_text, escape(e.description)),
           'type': 'HUE',
+          'last_modified': e.last_modified,
+          'owner': escape(e.owner),
           'doc_type': escape(e.type),
           'originalName': escape(e.name),
           'link': e.get_absolute_url()
@@ -1003,6 +1005,8 @@ def search_entities_interactive(request):
           'hue_description': _highlight(search_text, escape(e.description)),
           'link': e.get_absolute_url(),
           'doc_type': escape(e.type),
+          'last_modified': e.last_modified,
+          'owner': escape(e.owner),
           'type': 'HUE',
           'uuid': e.uuid,
           'parentUuid': e.parent_directory.uuid,
