@@ -512,13 +512,17 @@ To run a specific test in a class, use:
 
     build/env/bin/hue test specific <app><module>:<class><test_func>
 
-e.g.
+Note:
 
-    build/env/bin/hue test specific useradmin.tests:AdminTest.test_login
+When running the tests and seeing an error similar to:
 
-Start up pdb on test failures:
+    ...
+    ValueError: The file 'desktop/js/bundles/hue/vendors~hue~notebook~tableBrowser-chunk-f7c8562ecf79bc8f1f16.js' could not be found with <django.contrib.staticfiles.storage.CachedStaticFilesStorage object at 0x7faf77042630>.
 
-    build/env/bin/hue test <args> --pdb --pdb-failure -s
+
+Re-building the collection of static files should fix it:
+
+    ./build/env/bin/hue collectstatic
 
 ### Running the UI tests
 
