@@ -110,7 +110,10 @@ class UserProfile(models.Model):
     if self.user.is_superuser:
       return True
     if ENABLE_CONNECTORS.get() and app in ('jobbrowser', 'metastore', 'filebrowser', 'indexer', 'useradmin', 'notebook'):
-      return True
+      if app == 'useradmin' and action == 'superuser':
+        return False
+      else:
+        return True
 
     group_ids = self.user.groups.values_list('id', flat=True)
     return GroupPermission.objects.filter(group__id__in=group_ids, hue_permission=perm).exists()

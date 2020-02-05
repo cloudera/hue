@@ -108,25 +108,27 @@ def rewrite_user(user):
 
 def is_admin(user):
   """
-  Admin of the Organization. Typically can edit users, connectors.
+  Admin of the Organization. Typically can edit users, connectors...
   To rename to is_org_admin at some point.
 
   If ENABLE_ORGANIZATIONS is false:
-    - Hue superusers are automaticall also admin
+    - Hue superusers are automatically also admin
 
   If ENABLE_ORGANIZATIONS is true:
     - Hue superusers might not be admin of the organization
   """
   is_admin = False
+
   if hasattr(user, 'is_superuser') and not ENABLE_ORGANIZATIONS.get():
     is_admin = user.is_superuser
+
   if not is_admin and user.is_authenticated():
     try:
       user = rewrite_user(user)
-        # Either via flag or Admin group
       is_admin = user.is_admin if ENABLE_ORGANIZATIONS.get() else user.has_hue_permission(action="superuser", app="useradmin")
     except Exception:
       LOG.exception("Could not validate if %s is a superuser, assuming False." % user)
+
   return is_admin
 
 

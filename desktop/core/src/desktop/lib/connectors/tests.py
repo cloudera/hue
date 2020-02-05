@@ -16,18 +16,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import sys
 import unittest
 
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_false
 
-from desktop.auth.backend import rewrite_user
+from desktop.auth.backend import rewrite_user, is_admin
 from desktop.conf import ENABLE_CONNECTORS
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.django_test_util import make_logged_in_client
 
-from useradmin.models import User, update_app_permissions, get_default_user_group
+from useradmin.models import User, update_app_permissions, get_default_user_group, Connector
+from useradmin.permissions import HuePermission, GroupPermission
 
 
 if sys.version_info[0] > 2:
@@ -100,15 +102,10 @@ class TestConnectorListing(unittest.TestCase):
 
   def test_get_installed_editor_connectors(self):
 
-    with patch('desktop.lib.connectors.models.CONNECTORS.get') as CONNECTORS:
-      CONNECTORS.return_value = {
-        'mysql-1': Mock(
-          NICE_NAME=Mock(get=Mock(return_value='MySql')),
-          DIALECT=Mock(get=Mock(return_value='mysql')),
-          INTERFACE=Mock(get=Mock(return_value='sqlalchemy')),
-          SETTINGS=Mock(get=Mock(return_value=[{"name": "url", "value": "mysql://hue:pwd@hue:3306/hue"}])),
-        )
-      }
+    with patch('desktop.lib.connectors.models.Connector.objects.all') as ConnectorObjectsAll:
+      ConnectorObjectsAll.return_value = [
+        Connector(name='MySql', dialect='mysql', settings=json.dumps([{"name": "url", "value": "mysql://hue:pwd@hue:3306/hue"}]))
+      ]
 
       connectors = _get_installed_connectors()
 
@@ -118,21 +115,18 @@ class TestConnectorListing(unittest.TestCase):
 
 
   def test_get_connectors_for_user(self):
+    connector = Connector.objects.create(name='MySql', dialect='mysql', settings=json.dumps([{"name": "url", "value": "mysql://hue:pwd@hue:3306/hue"}]))
 
-    with patch('desktop.lib.connectors.models.CONNECTORS.get') as CONNECTORS:
-      CONNECTORS.return_value = {
-        'mysql-1': Mock(
-          NICE_NAME=Mock(get=Mock(return_value='MySql')),
-          DIALECT=Mock(get=Mock(return_value='mysql')),
-          INTERFACE=Mock(get=Mock(return_value='sqlalchemy')),
-          SETTINGS=Mock(get=Mock(return_value=[{"name": "url", "value": "mysql://hue:pwd@hue:3306/hue"}])),
-        )
-      }
+    # Could leverate update_app_permissions() instead of adding manually the permission but this is more lightweight for now
+    conn_perm = HuePermission.objects.create(app=connector.name, action='access', description='', connector=connector)
+    default_group = get_default_user_group()
+    GroupPermission.objects.create(group=default_group, hue_permission=conn_perm)
 
-      update_app_permissions()
-
+    try:
       connectors = _get_installed_connectors(user=self.user)
       assert_true(connectors, connectors)
 
       connectors = _get_installed_connectors(user=self.alone_user)
       assert_false(connectors, connectors)
+    finally:
+      connector.delete()
