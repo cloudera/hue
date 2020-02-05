@@ -230,7 +230,7 @@ const SUPPORT_TEMPLATES = `
         <!-- ko with: details -->
         <div class="context-popover-doc-header-link" ><a href="javascript:void(0)" data-bind="hueLink: link, click: function () { $parents[1].close(); }"><!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: false } } --><!-- /ko --> <span data-bind="text:name"></span></a></div>
         <!-- ko if: description -->
-        <div class="context-popover-doc-description" data-bind="html: description"></div>
+        <div class="context-popover-doc-description" data-bind="toggleOverflow: { height: 60 }"><div data-bind="html: description"></div></div>
         <!-- /ko -->
         <!-- /ko -->
         <!-- ko with: documentContents -->
