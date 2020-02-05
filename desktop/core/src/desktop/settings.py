@@ -334,10 +334,6 @@ if desktop.conf.ENABLE_ORGANIZATIONS.get():
   AUTH_USER_MODEL = 'useradmin.OrganizationUser'
   MIGRATION_MODULES = {
     'beeswax': 'beeswax.org_migrations',
-    'jobsub': 'jobsub.org_migrations',
-    'oozie': 'oozie.org_migrations',
-    'pig': 'pig.org_migrations',
-    'search': 'search.org_migrations',
     'useradmin': 'useradmin.org_migrations',
     'desktop': 'desktop.org_migrations',
   }
