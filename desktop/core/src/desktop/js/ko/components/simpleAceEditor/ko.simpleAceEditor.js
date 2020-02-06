@@ -90,6 +90,7 @@ class SimpleAceEditor {
           temporaryOnly: params.temporaryOnly
         },
         type: ko.observable(sourceType),
+        dialect: ko.observable(sourceType),
         id: ko.observable($element.attr('id')),
         namespace: params.namespace,
         compute: params.compute,
