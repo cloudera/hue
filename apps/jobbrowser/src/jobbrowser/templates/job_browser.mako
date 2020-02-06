@@ -2010,6 +2010,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <th>${_('Id')}</th>
               <th>${_('Start time')}</th>
               <th>${_('End time')}</th>
+	      <th>${_('Data')}</th>
             </tr>
             </thead>
             <tbody data-bind="foreach: properties['actions']">
@@ -2026,6 +2027,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <td data-bind="text: id, click: function() {  $root.job().id(id); $root.job().fetchJob(); }, style: { color: '#0B7FAD' }" class="pointer"></td>
                 <td data-bind="moment: {data: startTime, format: 'LLL'}"></td>
                 <td data-bind="moment: {data: endTime, format: 'LLL'}"></td>
+		<td data-bind="text: data"></td>
               </tr>
             </tbody>
           </table>
