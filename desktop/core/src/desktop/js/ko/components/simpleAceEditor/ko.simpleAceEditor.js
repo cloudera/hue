@@ -80,10 +80,11 @@ class SimpleAceEditor {
     self.ace(editor);
 
     if (params.autocomplete) {
+      const autocomplete = ko.unwrap(params.autocomplete);
       const sourceType =
-        params.autocomplete.type.indexOf('Query') !== -1
-          ? params.autocomplete.type.replace('Query', '')
-          : params.autocomplete.type;
+        autocomplete.type.indexOf('Query') !== -1
+          ? autocomplete.type.replace('Query', '')
+          : autocomplete.type;
 
       const snippet = {
         autocompleteSettings: {
@@ -159,11 +160,10 @@ class SimpleAceEditor {
         snippet: snippet,
         fixedPrefix: params.fixedPrefix,
         fixedPostfix: params.fixedPostfix,
-        support: params.autocomplete.support
+        support: autocomplete.support
       };
 
-      const AutocompleterClass =
-        AVAILABLE_AUTOCOMPLETERS[params.autocomplete.type] || SqlAutocompleter;
+      const AutocompleterClass = AVAILABLE_AUTOCOMPLETERS[autocomplete.type] || SqlAutocompleter;
       self.autocompleter = new AutocompleterClass(autocompleteArgs);
     } else {
       self.autocompleter = null;

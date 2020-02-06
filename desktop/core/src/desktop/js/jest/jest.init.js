@@ -27,6 +27,12 @@ import komapping from 'knockout.mapping';
 
 ko.mapping = komapping;
 
+class Tooltip {}
+
+class AceRange {}
+
+class Autocomplete {}
+
 const globalVars = {
   ko: ko,
   AUTOCOMPLETE_TIMEOUT: 1,
@@ -47,6 +53,45 @@ const globalVars = {
   },
   SQL_COLUMNS_KNOWN_FACET_VALUES: {
     type: { array: -1, boolean: -1 }
+  },
+  ace: {
+    edit: () => ({
+      setOptions: () => {},
+      getSession: () => ({
+        setMode: () => {},
+        doc: {
+          createAnchor: () => ({
+            on: () => {},
+            getPosition: () => ({
+              row: 0
+            }),
+            setPosition: () => {},
+            detach: () => {}
+          })
+        },
+        getTextRange: () => {},
+        addGutterDecoration: () => {},
+        removeGutterDecoration: () => {}
+      }),
+      setTheme: () => {},
+      getValue: () => '',
+      getSelectionRange: () => ({ start: { row: 0, column: 0 }, end: { row: 0, column: 0 } }),
+      on: () => {},
+      off: () => {},
+      commands: {
+        on: () => {},
+        off: () => {}
+      },
+      container: {
+        addEventListener: () => {},
+        removeEventListener: () => {}
+      }
+    }),
+    require: () => ({
+      Tooltip: Tooltip,
+      Range: AceRange,
+      Autocomplete: Autocomplete
+    })
   }
 };
 
