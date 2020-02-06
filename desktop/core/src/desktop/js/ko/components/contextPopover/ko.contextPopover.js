@@ -23,12 +23,12 @@ import CollectionContextTabs from './collectionContextTabs';
 import contextCatalog from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
 import DataCatalogContext from './dataCatalogContext';
-import DocumentContext from './documentContext';
-import FunctionContextTabs from './functionContext';
+import DocumentContext, { DOCUMENT_CONTEXT_TEMPLATE } from './documentContext';
+import FunctionContextTabs, { FUNCTION_CONTEXT_TEMPLATE } from './functionContext';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import LangRefContext from './langRefContext';
-import PartitionContext from './partitionContext';
+import PartitionContext, { PARTITION_CONTEXT_TEMPLATE } from './partitionContext';
 import ResizeHelper from './resizeHelper';
 import StorageContext from './storageContext';
 import componentUtils from '../componentUtils';
@@ -174,41 +174,6 @@ const SUPPORT_TEMPLATES = `
     </div>
   </script>
 
-  <script type="text/html" id="context-popover-function-details">
-    <!-- ko if: typeof details === 'undefined' -->
-    <div class="context-popover-flex-fill">
-      <div class="alert">${I18n(
-        'Could not find details for the function'
-      )} <span data-bind="text: $parents[2].title"></span>()</div>
-    </div>
-    <!-- /ko -->
-    <!-- ko if: typeof details !== 'undefined' -->
-    <div class="context-popover-flex-fill" data-bind="with: details">
-      <div style="padding: 8px">
-        <p style="margin: 10px 10px 18px 10px;"><span style="white-space: pre;" class="monospace" data-bind="text: signature"></span></p>
-        <p><span data-bind="text: description"></span></p>
-      </div>
-    </div>
-    <!-- /ko -->
-  </script>
-
-  <script type="text/html" id="generic-document-context-template">
-    <div style="width:100%; text-align: center; margin-top: 40px; font-size: 100px; color: #787878;" data-bind="template: { name: 'document-icon-template', data: { document: { isDirectory: type === 'directory', definition: function() { return $data } } } }"></div>
-    <div style="width: 100%; margin-top: 20px; text-align:center">
-      <!-- ko if: type === 'directory' -->
-      <a style="font-size: 20px;" href="javascript:void(0)" data-bind="text: name, publish: 'context.popover.show.in.assist'"></a>
-      <!-- /ko -->
-      <!-- ko if: type !== 'directory' -->
-      <a style="font-size: 20px;" href="javascript:void(0)" data-bind="text: name, hueLink: link, click: function () { $parents[1].close(); }"></a>
-      <!-- /ko -->
-      <br/>
-      <span data-bind="text: window.DOCUMENT_TYPE_I18n[type] || type"></span>
-      <!-- ko if: description -->
-      <div class="context-popover-doc-description" data-bind="html: description"></div>
-      <!-- /ko -->
-    </div>
-  </script>
-
   <script type="text/html" id="context-hue-app-details">
     <div class="context-popover-flex-fill" style="overflow: auto;" data-bind="with: data">
       <div style="padding: 8px">
@@ -216,67 +181,6 @@ const SUPPORT_TEMPLATES = `
           <div style="width: 100%; margin-top: 20px; text-align:center">
             <a style="font-size: 20px;" href="javascript:void(0)" data-bind="text: interpreter.displayName, hueLink: interpreter.page, click: function () { $parents[1].close(); }, attr: { 'title': interpreter.tooltip }"></a>
           </div>
-      </div>
-    </div>
-  </script>
-
-  <script type="text/html" id="context-document-details">
-    <div class="context-popover-flex-fill" style="overflow: auto;">
-      <div class="context-popover-inner-content">
-        <div style="position: absolute; right: 6px; top: 8px;">
-          <a class="pointer inactive-action" data-bind="visible: !$parent.closeDisabled, click: function () { $parent.close() }"><i class="fa fa-fw fa-times"></i></a>
-        </div>
-        <!-- ko if: typeof documentContents() !== 'undefined' && typeof documentContents().snippets !== 'undefined' -->
-        <!-- ko with: details -->
-        <div class="context-popover-doc-header-link" ><a href="javascript:void(0)" data-bind="hueLink: link, click: function () { $parents[1].close(); }"><!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: false } } --><!-- /ko --> <span data-bind="text:name"></span></a></div>
-        <!-- ko if: description -->
-        <div class="context-popover-doc-description" data-bind="toggleOverflow: { height: 60 }"><div data-bind="html: description"></div></div>
-        <!-- /ko -->
-        <!-- /ko -->
-        <!-- ko with: documentContents -->
-        <!-- ko foreach: snippets -->
-        <div class="context-popover-doc-contents" data-bind="highlight: { value: statement_raw, formatted: true, dialect: type }"></div>
-        <!-- /ko -->
-        <!-- /ko -->
-        <!-- /ko -->
-        <!-- ko if: typeof documentContents() === 'undefined' || typeof documentContents().snippets === 'undefined' -->
-        <div style="width: 100%;" data-bind="template: { name: 'generic-document-context-template', data: details }"></div>
-        <!-- /ko -->
-      </div>
-    </div>
-  </script>
-
-  <script type="text/html" id="context-partition-details">
-    <div class="context-popover-flex-fill" style="overflow: auto;">
-      <div class="context-popover-inner-content">
-        <div style="position: absolute; right: 6px; top: 8px;">
-          <a class="pointer inactive-action" data-bind="visible: !$parent.closeDisabled, click: function () { $parent.close() }"><i class="fa fa-fw fa-times"></i></a>
-        </div>
-        <!-- ko with: data -->
-        <div class="context-popover-flex-header blue"><span data-bind="text: originalName"></span></div>
-        <div class="context-popover-flex-attributes">
-          <div class="context-popover-attribute"><div>${I18n(
-            'Created'
-          )}</div><div data-bind="text: created"></div></div>
-        </div>
-        <!-- ko if: description -->
-        <div class="context-popover-doc-description" data-bind="html: description"></div>
-        <!-- /ko -->
-        <div class="context-popover-flex-fill">
-          <table id="partitionsTable" class="table table-condensed table-nowrap">
-            <thead>
-            <tr>
-              <th>${I18n('Values')}</th>
-            </tr>
-            </thead>
-            <tbody data-bind="foreach: colValues">
-              <tr>
-                <td data-bind="text: $data"></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <!-- /ko -->
       </div>
     </div>
   </script>
@@ -671,6 +575,7 @@ class ContextPopoverViewModel {
 
     self.leftAdjust = ko.observable(0);
     self.topAdjust = ko.observable(0);
+
     self.data = params.data;
     self.sourceType = params.sourceType;
     self.namespace = params.namespace;
@@ -935,7 +840,11 @@ class ContextPopoverViewModel {
 componentUtils.registerComponent(
   'context-popover',
   ContextPopoverViewModel,
-  SUPPORT_TEMPLATES + CONTEXT_POPOVER_TEMPLATE
+  SUPPORT_TEMPLATES +
+    DOCUMENT_CONTEXT_TEMPLATE +
+    FUNCTION_CONTEXT_TEMPLATE +
+    PARTITION_CONTEXT_TEMPLATE +
+    CONTEXT_POPOVER_TEMPLATE
 );
 
 huePubSub.subscribe('context.popover.hide', hidePopover);
