@@ -30,12 +30,12 @@ from TCLIService.ttypes import TStatusCode
 
 from beeswax.conf import MAX_NUMBER_OF_SESSIONS, CLOSE_SESSIONS
 from beeswax.models import Session
+from beeswax.server.dbms import get_query_server_config
 from beeswax.server.hive_server2_lib import HiveServerTable, HiveServerClient
+from useradmin.models import User
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
-from useradmin.models import User
-
 
 
 LOG = logging.getLogger(__name__)
@@ -357,6 +357,10 @@ class TestHiveServerTable():
 
 class TestSessionManagement():
 
+  def setUp(self):
+    self.client = make_logged_in_client(username="test_hive_server2_lib", groupname="default", recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="test_hive_server2_lib")
+
   def test_call_session_single(self):
     finish = (
         MAX_NUMBER_OF_SESSIONS.set_for_testing(1),
@@ -371,8 +375,10 @@ class TestSessionManagement():
             get_session.return_value = None
             fn = MagicMock(attr='test')
             req = MagicMock()
+            server_config = get_query_server_config(name='beeswax')
 
-            client = HiveServerClient(MagicMock(), MagicMock())
+            client = HiveServerClient(server_config, self.user)
+
             (res, session1) = client.call(fn, req, status=None)
             open_session.assert_called_once()
 
@@ -404,8 +410,10 @@ class TestSessionManagement():
             get_session.return_value = None
             fn = MagicMock(return_value=MagicMock(status=MagicMock(statusCode=0)))
             req = MagicMock()
+            server_config = get_query_server_config(name='beeswax')
 
-            client = HiveServerClient(MagicMock(), MagicMock())
+            client = HiveServerClient(server_config, self.user)
+
             (res, session1) = client.call(fn, req, status=None)
             open_session.assert_called_once()
 
@@ -437,7 +445,10 @@ class TestSessionManagement():
             open_session.return_value = MagicMock(status_code=0)
             fn = MagicMock(return_value=MagicMock(status=MagicMock(statusCode=0)))
             req = MagicMock()
-            client = HiveServerClient(MagicMock(), MagicMock())
+            server_config = get_query_server_config(name='beeswax')
+
+            client = HiveServerClient(server_config, self.user)
+
             assert_raises(Exception, client.call, fn, req, status=None)
     finally:
       for f in finish:
@@ -455,8 +466,10 @@ class TestSessionManagement():
           open_session.return_value = MagicMock(status_code=0)
           fn = MagicMock(return_value=MagicMock(status=MagicMock(statusCode=0)))
           req = MagicMock()
+          server_config = get_query_server_config(name='beeswax')
 
-          client = HiveServerClient(MagicMock(), MagicMock())
+          client = HiveServerClient(server_config, self.user)
+
           (res, session1) = client.call(fn, req, status=None)
           open_session.assert_called_once()
 
@@ -487,10 +500,14 @@ class TestSessionManagement():
             with patch('beeswax.server.hive_server2_lib.HiveServerTRowSet') as HiveServerTRowSet:
               status = MagicMock(status=MagicMock(statusCode=0))
               status_return = MagicMock(return_value=status)
-              get_client.return_value = MagicMock(return_value=status, GetSchemas=status_return, FetchResults=status_return, GetResultSetMetadata=status_return, CloseOperation=status_return, ExecuteStatement=status_return, GetTables=status_return, GetColumns=status_return)
-
+              get_client.return_value = MagicMock(
+                  return_value=status, GetSchemas=status_return, FetchResults=status_return, GetResultSetMetadata=status_return,
+                  CloseOperation=status_return, ExecuteStatement=status_return, GetTables=status_return, GetColumns=status_return
+              )
               open_session.return_value = MagicMock(status_code=0)
-              client = HiveServerClient(MagicMock(), MagicMock())
+              server_config = get_query_server_config(name='beeswax')
+
+              client = HiveServerClient(server_config, self.user)
 
               res = client.get_databases()
               assert_equal(open_session.call_count, 1)
@@ -533,14 +550,16 @@ class TestSessionManagement():
       with patch('beeswax.server.hive_server2_lib.thrift_util.get_client') as get_client:
         with patch('beeswax.server.hive_server2_lib.HiveServerClient.open_session') as open_session:
           with patch('beeswax.server.hive_server2_lib.Session.objects.get_n_sessions') as get_n_sessions:
-            get_n_sessions.return_value = [MagicMock(), MagicMock()]
+            get_n_sessions.return_value = MagicMock(count=MagicMock(return_value=2))
             open_session.return_value = MagicMock(status_code=0)
             fn = MagicMock(return_value=MagicMock(status=MagicMock(statusCode=0)))
             req = MagicMock()
-            client = HiveServerClient(MagicMock(), MagicMock())
+            server_config = get_query_server_config(name='beeswax')
+
+            client = HiveServerClient(server_config, self.user)
             assert_raises(Exception, client.call, fn, req, status=None)
 
-            get_n_sessions.return_value = [MagicMock()]
+            get_n_sessions.return_value = MagicMock(count=MagicMock(return_value=1))
             (res, session1) = client.call(fn, req, status=None)
             open_session.assert_called_once()
     finally:

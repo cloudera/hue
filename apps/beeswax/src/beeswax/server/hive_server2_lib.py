@@ -714,7 +714,8 @@ class HiveServerClient(object):
       except InvalidSessionQueryServerException as e:
         LOG.info('Retrying with a new session because for %s of %s' % (self.user, str(e)))
 
-    if self.has_close_sessions and self.max_number_of_sessions > 1 and Session.objects.get_n_sessions(self.user, n=self.max_number_of_sessions, application=self.query_server['server_name']) >= self.max_number_of_sessions:
+    if self.has_close_sessions and self.max_number_of_sessions > 1 and \
+        Session.objects.get_n_sessions(self.user, n=self.max_number_of_sessions, application=self.query_server['server_name']).count() >= self.max_number_of_sessions:
       raise Exception('Too many open sessions. Stop a running query before starting a new one')
 
     session = self.open_session(self.user)
