@@ -518,10 +518,13 @@ const CONTEXT_POPOVER_TEMPLATE = `
       </div>
     </div>
     <!-- /ko -->
+    <!-- ko if: typeof contentsComponent !== 'undefined' -->
+    <!-- ko component: { name: contentsComponent, params: data } --><!-- /ko -->
+    <!-- /ko -->
     <!-- ko if: typeof contentsTemplate !== 'undefined' -->
     <!-- ko template: { name: contentsTemplate, data: contents } --><!-- /ko -->
     <!-- /ko -->
-    <!-- ko if: typeof contentsTemplate === 'undefined' -->
+    <!-- ko if: typeof contentsTemplate === 'undefined' && typeof contentsComponent === 'undefined' -->
     <!-- ko template: 'context-popover-contents' --><!-- /ko -->
     <!-- /ko -->
   </div>
@@ -698,7 +701,12 @@ class ContextPopoverViewModel {
       !self.isStorageEntry &&
       !self.isCatalogEntry;
 
-    if (self.isCatalogEntry) {
+    if (params.data.type === 'quickQuery') {
+      self.contentsComponent = 'quick-query-context';
+      self.title = I18n('Quick Query');
+      self.iconClass = 'fa-play';
+      self.pinEnabled = false;
+    } else if (self.isCatalogEntry) {
       self.contents = new DataCatalogContext({
         popover: self,
         catalogEntry: params.data.catalogEntry
