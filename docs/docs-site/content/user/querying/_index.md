@@ -32,7 +32,7 @@ SQL query execution is the primary use case of the Editor. See the list of most 
     -   To expand a row, click on the row number
     -   To lock a row, click on the lock icon in the row number column
     -   Search either by clicking on the magnifier icon on the results tab, or pressing `Ctrl/Cmd + F`
-    -   [See more how to refine your results](http://gethue.com/new-features-in-the-sql-results-grid-in-hive-and-impala/).
+    -   See more below how to [refine your results](#Refining Results)
 
 3.  If there are **multiple statements** in the query (separated by semi-colons), click Next in the
     multi-statement query pane to execute the remaining statements.
@@ -41,9 +41,41 @@ When you have multiple statements it's enough to put the cursor in the statement
 
 **Note**: Use `CTRL/Cmd + ENTER` to execute queries.
 
-**Note**: On top of the logs panel, there is a link to open the query profile in the [Query Browser](/user/browsing/#impala-queries).
+**Note**: On top of the logs panel, there is a link to open the query profile in the [Query Browser](/user/browsing/#sql-queries).
 
-### Downloading Results
+### Results
+
+#### Refining
+
+Lock some rows: this will help you compare data with other rows. When you hover a row id, you get a new lock icon. If you click on it, the row automatically sticks to the top of the table.
+
+![Result row locking](https://cdn.gethue.com/uploads/2016/08/lock_rows.gif)
+
+The column list follows the result grid, can be filtered by data type and can be resized.
+
+![Smart headers](https://cdn.gethue.com/uploads/2016/08/column_list.gif)
+
+The headers of fields with really long content will follow your scroll position and always be visible.
+
+![Cell content search](https://cdn.gethue.com/uploads/2016/08/headers.gif)
+
+You can now search for certain cell values in the table and the results are highlighted.
+
+You can activate the new search either by clicking on the magnifier icon on the results tab, or pressing `Ctrl/Cmd + F`.
+
+![Virtual cell rendering](https://cdn.gethue.com/uploads/2016/08/search.gif)
+
+The virtual renderer display just the cells you need at that moment.
+
+The table you see here has hundreds of columns
+
+![Many cells](https://cdn.gethue.com/uploads/2016/08/virtual_renderer.gif)
+
+If the download to Excel or CSV takes too long, you will have a nice message now
+
+![Many cells](https://cdn.gethue.com/uploads/2016/08/downloadwait.gif)
+
+#### Downloading
 
 There are several ways you can export results of a query.
 
@@ -499,7 +531,7 @@ To toggle the dark mode you can either press `Ctrl-Alt-T` or `Command-Option-T` 
 
 ### Scheduling
 
-Scheduling is detailed in its [own section](/user/scheduling/).
+Scheduling is detailed in its [own section](/user/scheduling/). One click scheduling of queries is a work in progress in [HUE-3797](https://issues.cloudera.org/browse/HUE-3797).
 
 ## Dashboard
 

@@ -38,9 +38,7 @@ Aloha Big Questions Askers!
 
 The [SQL Editor][1] in [Hue 3.11][2] brings a completely re-written result grid that improves the performances allowing big tables to be displayed without the browser to crash, plus some nifty tools for you.
 
-#### You can now lock some rows: this will help you compare data with other rows
-
-When you hover a row id, you get a new lock icon. If you click on it, the row automatically sticks to the top of the table.
+You can now lock some rows: this will help you compare data with other rows. When you hover a row id, you get a new lock icon. If you click on it, the row automatically sticks to the top of the table.
 
 <img data-gifffer="https://cdn.gethue.com/uploads/2016/08/lock_rows.gif"  />
 
