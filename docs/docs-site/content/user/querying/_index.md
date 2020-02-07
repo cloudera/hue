@@ -517,11 +517,15 @@ Impala has to refetch the metadata from the metastore. Furthermore, we see that 
 
 A new experimental panel when enabled can offer post risk analysis and recommendation on how to tweak the query for better speed.
 
-### Presentation Mode
+### Modes
 
-Turns a list of semi-colon separated queries into an interactive presentation by clicking on the 'Dashboard' icon. It is great for doing demos or reporting.
+#### Presentation
 
-### Dark mode
+Turns a list of semi-colon separated queries into an interactive presentation by clicking on the 'Dashboard' icon. It is great for doing presentations with a scenario and live results to prove a point or executing reports containting a suite of sequential queries in one click.
+
+![Editor Presentation Mode](https://cdn.gethue.com/uploads/2020/02/editor_presentation_mode.png)
+
+#### Dark
 
 Initially this mode is limited to the actual editor area and we’re considering extending this to cover all of Hue.
 
