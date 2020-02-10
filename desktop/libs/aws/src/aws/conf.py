@@ -255,13 +255,20 @@ def is_ec2_instance():
   global IS_EC2_CACHED
   if IS_EC2_CACHED is not None:
     return IS_EC2_CACHED
+
   try:
-    IS_EC2_CACHED = (os.path.exists('/sys/hypervisor/uuid') and open('/sys/hypervisor/uuid', 'r').read()[:3].lower() == 'ec2') or (os.path.exists('/sys/devices/virtual/dmi/id/product_uuid') and open('/sys/devices/virtual/dmi/id/product_uuid', 'r').read()[:3].lower() == 'ec2') 
+    IS_EC2_CACHED = (os.path.exists('/sys/hypervisor/uuid') and open('/sys/hypervisor/uuid', 'r').read()[:3].lower() == 'ec2') or \
+      (
+        os.path.exists('/sys/devices/virtual/dmi/id/product_uuid') and \
+        open('/sys/devices/virtual/dmi/id/product_uuid', 'r').read()[:3].lower() == 'ec2'
+      )
   except IOError as e:
+    # Note: This logic is wrong
     IS_EC2_CACHED = 'Permission denied' in str(e) # If permission is denied, assume cost of network call
   except Exception as e:
     IS_EC2_CACHED = False
     LOG.exception("Failed to read /sys/hypervisor/uuid or /sys/devices/virtual/dmi/id/product_uuid: %s" % e)
+
   return IS_EC2_CACHED
 
 
@@ -270,8 +277,9 @@ def has_iam_metadata():
     global IS_IAM_CACHED
     if IS_IAM_CACHED is not None:
       return IS_IAM_CACHED
-    import boto.utils
+
     if is_ec2_instance():
+      import boto.utils
       metadata = boto.utils.get_instance_metadata(timeout=1, num_retries=1)
       IS_IAM_CACHED = 'iam' in metadata
     else:
