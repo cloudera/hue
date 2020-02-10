@@ -19,11 +19,14 @@ import logging
 import os
 import re
 
+
+import requests
 from django.utils.translation import ugettext_lazy as _, ugettext as _t
 
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool, coerce_password_from_script
 from desktop.lib.idbroker import conf as conf_idbroker
 from hadoop.core_site import get_s3a_access_key, get_s3a_secret_key, get_s3a_session_token
+
 
 LOG = logging.getLogger(__name__)
 
@@ -249,7 +252,7 @@ def is_enabled():
 
 
 def is_ec2_instance():
-  # To avoid unnecessary network call, check if Hue is running on EC2 instance
+  # To avoid unnecessary network call, check if Hue is running on EC2 instance.
   # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/identify_ec2_instances.html
   # /sys/hypervisor/uuid doesn't work on m5/c5, but /sys/devices/virtual/dmi/id/product_uuid does
   global IS_EC2_CACHED
@@ -257,17 +260,22 @@ def is_ec2_instance():
     return IS_EC2_CACHED
 
   try:
+    # Low chance of false positive
     IS_EC2_CACHED = (os.path.exists('/sys/hypervisor/uuid') and open('/sys/hypervisor/uuid', 'r').read()[:3].lower() == 'ec2') or \
       (
         os.path.exists('/sys/devices/virtual/dmi/id/product_uuid') and \
         open('/sys/devices/virtual/dmi/id/product_uuid', 'r').read()[:3].lower() == 'ec2'
       )
-  except IOError as e:
-    # Note: This logic is wrong
-    IS_EC2_CACHED = 'Permission denied' in str(e) # If permission is denied, assume cost of network call
   except Exception as e:
-    IS_EC2_CACHED = False
-    LOG.exception("Failed to read /sys/hypervisor/uuid or /sys/devices/virtual/dmi/id/product_uuid: %s" % e)
+    LOG.info("Detecting if Hue on an EC2 host, error might be expected: %s" % e)
+
+  if IS_EC2_CACHED is None:
+    try:
+      resp = requests.get('http://169.254.169.254/latest/dynamic/instance-identity/')  # Definitive way to check
+      IS_EC2_CACHED = resp.status_code == 200
+    except Exception as e:
+      IS_EC2_CACHED = False
+      LOG.info("Detecting if Hue on an EC2 host, error might be expected: %s" % e)
 
   return IS_EC2_CACHED
 
@@ -279,6 +287,7 @@ def has_iam_metadata():
       return IS_IAM_CACHED
 
     if is_ec2_instance():
+
       import boto.utils
       metadata = boto.utils.get_instance_metadata(timeout=1, num_retries=1)
       IS_IAM_CACHED = 'iam' in metadata
