@@ -15,12 +15,13 @@
 # limitations under the License.
 from __future__ import absolute_import
 
-import boto
+
 import logging
 import gcs_oauth2_boto_plugin
 import json
 
 from aws.s3.s3fs import S3FileSystem
+from boto.auth_handler import AuthHandler, NotReadyToAuthenticate
 from boto.gs.bucket import Bucket
 from boto.gs.connection import GSConnection
 from boto.provider import Provider
@@ -30,19 +31,29 @@ from desktop import conf
 from desktop.lib.idbroker import conf as conf_idbroker
 from desktop.lib.idbroker.client import IDBroker
 
+
 LOG = logging.getLogger(__name__)
 
+
 def get_credential_provider(config, user):
-  return CredentialProviderIDBroker(IDBroker.from_core_site('gs', user)) if conf_idbroker.is_idbroker_enabled('gs') else CredentialProviderConf(config)
+  return CredentialProviderIDBroker(IDBroker.from_core_site('gs', user)) if conf_idbroker.is_idbroker_enabled('gs') else \
+      CredentialProviderConf(config)
 
 
 def _make_client(identifier, user):
   config = conf.GC_ACCOUNTS[identifier] if identifier in list(conf.GC_ACCOUNTS.keys()) else None
   client = Client.from_config(config, get_credential_provider(config, user))
-  return S3FileSystem(client.get_s3_connection(), client.expiration, headers={"x-goog-project-id": client.project}, filebrowser_action=conf.PERMISSION_ACTION_GS) # It would be nice if the connection is lazy loaded
+
+  return S3FileSystem(
+    client.get_s3_connection(),
+    client.expiration,
+    headers={"x-goog-project-id": client.project},
+    filebrowser_action=conf.PERMISSION_ACTION_GS
+  )  # It would be nice if the connection was lazy loaded
 
 
 class Client(object):
+
   def __init__(self, json_credentials=None, expiration=None):
     self.project = json_credentials.get('project_id') if json_credentials else None
     self.json_credentials = json_credentials
@@ -57,51 +68,60 @@ class Client(object):
     return HueGSConnection(provider=HueProvider('google', json_credentials=self.json_credentials))
 
 
-# Boto looks at subclasses of boto.auth_handler.AuthHandler and checks if they can authenticate
-# The subclasses provided by gcs_oauth2_boto_plugin.oauth2_plugin are designed to work with files, but we want to programmatically configure the auth
-class OAuth2JsonServiceAccountClientAuth(boto.auth_handler.AuthHandler):
+# Boto looks at subclasses of boto.auth_handler.AuthHandler and checks if they can authenticate.
+# The subclasses provided by gcs_oauth2_boto_plugin.oauth2_plugin are designed to work with files, but we want to programmatically
+# configure the auth.
+class OAuth2JsonServiceAccountClientAuth(AuthHandler):
   """AuthHandler for working with OAuth2 service account credentials."""
 
   capability = ['google-oauth2', 's3']
 
   def __init__(self, path, config, provider):
-    if (provider.name == 'google'):
+    if provider.name == 'google':
       self.oauth2_client = gcs_oauth2_boto_plugin.oauth2_client.OAuth2JsonServiceAccountClient(provider.get_json_credentials())
       global IS_SERVICE_ACCOUNT
       IS_SERVICE_ACCOUNT = True
     else:
-      raise boto.auth_handler.NotReadyToAuthenticate()
+      raise NotReadyToAuthenticate()
 
   def add_auth(self, http_request):
-    http_request.headers['Authorization'] = (
-        self.oauth2_client.GetAuthorizationHeader())
+    http_request.headers['Authorization'] = (self.oauth2_client.GetAuthorizationHeader())
+
 
 class HueProvider(Provider):
   def __init__(self, name, json_credentials=None, access_key=None, secret_key=None,
-                 security_token=None, profile_name=None):
+      security_token=None, profile_name=None):
     self.json_credentials = json_credentials
-    super(HueProvider, self).__init__(name, access_key=access_key, secret_key=secret_key,
-                 security_token=security_token, profile_name=profile_name)
+    super(HueProvider, self).__init__(
+        name, access_key=access_key, secret_key=secret_key,
+        security_token=security_token, profile_name=profile_name
+    )
 
   def get_json_credentials(self):
     return self.json_credentials
 
-#Custom GSConnection to be able to add our own credential provider. This is missing on GSConnection, but not S3Connection
+
+# Custom GSConnection to be able to add our own credential provider. This is missing on GSConnection, but not S3Connection
 class HueGSConnection(GSConnection):
+
   def __init__(self, gs_access_key_id=None, gs_secret_access_key=None,
-                 is_secure=True, port=None, proxy=None, proxy_port=None,
-                 proxy_user=None, proxy_pass=None,
-                 host=GSConnection.DefaultHost, debug=0, https_connection_factory=None,
-                 calling_format=SubdomainCallingFormat(), path='/',
-                 suppress_consec_slashes=True, provider="google"):
-        super(GSConnection, self).__init__(gs_access_key_id, gs_secret_access_key,
-                 is_secure, port, proxy, proxy_port, proxy_user, proxy_pass,
-                 host, debug, https_connection_factory, calling_format, path,
-                 provider, Bucket,
-                 suppress_consec_slashes=suppress_consec_slashes)
+      is_secure=True, port=None, proxy=None, proxy_port=None,
+      proxy_user=None, proxy_pass=None,
+      host=GSConnection.DefaultHost, debug=0, https_connection_factory=None,
+      calling_format=SubdomainCallingFormat(), path='/',
+      suppress_consec_slashes=True, provider="google"):
+
+    super(GSConnection, self).__init__(
+        gs_access_key_id, gs_secret_access_key,
+        is_secure, port, proxy, proxy_port, proxy_user, proxy_pass,
+        host, debug, https_connection_factory, calling_format, path,
+        provider, Bucket,
+        suppress_consec_slashes=suppress_consec_slashes
+    )
 
 
 class CredentialProviderConf(object):
+
   def __init__(self, conf):
     self._conf=conf
 
@@ -127,6 +147,7 @@ class CredentialProviderConf(object):
 
 
 class CredentialProviderIDBroker(object):
+
   def __init__(self, idbroker):
     self.idbroker=idbroker
     self.credentials = None
@@ -136,4 +157,3 @@ class CredentialProviderIDBroker(object):
 
   def get_credentials(self):
     return self.idbroker.get_cab().get('Credentials')
-
