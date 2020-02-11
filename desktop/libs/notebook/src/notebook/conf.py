@@ -312,8 +312,6 @@ def _default_interpreters(user):
 
 
 def config_validator(user):
-  from notebook.models import _excute_test_query
-
   res = []
 
   if not has_connectors():
@@ -327,10 +325,10 @@ def config_validator(user):
 
   for interpreter in get_ordered_interpreters(user=user):
     if interpreter.get('is_sql'):
-      connector = interpreter['type']
+      connector_id = interpreter['type']
 
       try:
-        response = _excute_test_query(client, connector)
+        response = _excute_test_query(client, connector_id)
         data = json.loads(response.content)
 
         if data['status'] != 0:
@@ -344,9 +342,44 @@ def config_validator(user):
         LOG.exception(msg)
         res.append(
           (
-            '%(nice_name)s - %(dialect)s (%(type)s)' % interpreter,
+            '%(name)s - %(dialect)s (%(type)s)' % interpreter,
             _(msg) + (' %s' % trace[:100] + ('...' if len(trace) > 50 else ''))
           )
         )
 
   return res
+
+
+def _excute_test_query(client, connector_id):
+  '''
+  Helper utils until the API gets simplified.
+  '''
+  notebook_json = """
+    {
+      "selectedSnippet": "hive",
+      "showHistory": false,
+      "description": "Test Hive Query",
+      "name": "Test Hive Query",
+      "sessions": [
+          {
+              "type": "hive",
+              "properties": [],
+              "id": null
+          }
+      ],
+      "type": "hive",
+      "id": null,
+      "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"%(connector_id)s","status":"running","statement":"select * from web_logs","properties":{"settings":[],"variables":[],"files":[],"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"select * from web_logs","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
+      "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a"
+  }
+  """ % {
+    'connector_id': connector_id
+  }
+
+  return client.post(
+    reverse('notebook:api_sample_data', kwargs={'database': 'default', 'table': 'default'}), {
+      'notebook': notebook_json,
+      'snippet': json.dumps(json.loads(notebook_json)['snippets'][0]),
+      'is_async': json.dumps(True),
+      'operation': json.dumps('hello')
+  })
