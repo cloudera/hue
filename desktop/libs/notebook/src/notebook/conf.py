@@ -344,7 +344,7 @@ def config_validator(user):
         LOG.exception(msg)
         res.append(
           (
-            connector,
+            '%(nice_name)s - %(dialect)s (%(type)s)' % interpreter,
             _(msg) + (' %s' % trace[:100] + ('...' if len(trace) > 50 else ''))
           )
         )

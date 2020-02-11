@@ -138,5 +138,5 @@ class TestCheckConfig():
       warnings = config_validator(user=self.user)
 
       assert_true(warnings, warnings)
-      assert_equal('hive-1', warnings[0][0])
+      assert_equal('Hive - hive (hive-1)', warnings[0][0])
       assert_true('Testing the connector connection failed' in warnings[0][1], warnings)
