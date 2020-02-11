@@ -312,7 +312,7 @@ def _default_interpreters(user):
   INTERPRETERS.set_for_testing(OrderedDict(interpreters))
 
 
-def config_validator(user):
+def config_validator(user, connectors=None):
   res = []
 
   if not has_connectors():
@@ -324,7 +324,10 @@ def config_validator(user):
   if not user.is_authenticated():
     res.append(('Editor', _('Could not authenticate with user %s to validate interpreters') % user))
 
-  for interpreter in get_ordered_interpreters(user=user):
+  if connectors is None:
+    connectors = get_ordered_interpreters(user=user)
+
+  for interpreter in connectors:
     if interpreter.get('is_sql'):
       connector_id = interpreter['type']
 
