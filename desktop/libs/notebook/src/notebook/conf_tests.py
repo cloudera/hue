@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import unittest
 import sys
 
@@ -27,7 +28,7 @@ from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User, update_app_permissions, get_default_user_group
 
-from notebook.conf import config_validator, get_ordered_interpreters
+from notebook.conf import config_validator, get_ordered_interpreters, _excute_test_query
 
 
 if sys.version_info[0] > 2:
@@ -123,6 +124,16 @@ class TestCheckConfig():
             'dialect_properties': {'sql_identifier_quote': '`',},
           }
         ]
+        _excute_test_query.return_value = Mock(content=json.dumps({'status': 0}))
+
+        connectors = _get_installed_connectors(user=self.user)
+        assert_true(connectors, connectors)
+
+        warnings = config_validator(user=self.user)
+
+        assert_false(warnings, warnings)
+
+
         _excute_test_query.side_effect = Exception('')
 
         connectors = _get_installed_connectors(user=self.user)
@@ -133,3 +144,9 @@ class TestCheckConfig():
         assert_true(warnings, warnings)
         assert_equal('Hive - hive (hive-1)', warnings[0][0])
         assert_true('Testing the connector connection failed' in warnings[0][1], warnings)
+
+  def test_excute_test_query(self):
+    client = Mock()
+    connector_id = 'hive'
+
+    _excute_test_query(client=client, connector_id=connector_id)
