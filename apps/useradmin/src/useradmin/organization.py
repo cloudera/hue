@@ -156,6 +156,13 @@ class UserManager(BaseUserManager):
     if kwargs.get('username'):
       kwargs['email'] = kwargs.pop('username')
 
+    request = CrequestMiddleware.get_request()
+
+    if request and hasattr(request, 'user') and type(request.user._wrapped) is not object:  # Avoid infinite recursion
+      queryset = queryset.filter(
+        organization=request.user.organization
+      )
+
     return super(UserManager, self).get(*args, **kwargs)
 
   def order_by(self, *args, **kwargs):

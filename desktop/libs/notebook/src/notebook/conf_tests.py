@@ -79,10 +79,7 @@ class TestInterpreterConfig(unittest.TestCase):
       assert_true(interpreters, interpreters)
       assert_true(all(['dialect_properties' in interpreter for interpreter in interpreters]), interpreters)
       assert_true(
-        any([
-          interpreter.get('dialect_properties').get('sql_identifier_quote')
-          for interpreter in interpreters
-        ]),
+        any([interpreter.get('dialect_properties').get('sql_identifier_quote') for interpreter in interpreters]),
         interpreters
       )
 
@@ -101,9 +98,6 @@ class TestCheckConfig():
 
   @classmethod
   def setUpClass(cls):
-    if not ENABLE_CONNECTORS.get():  # Skip for now
-      raise SkipTest
-
     cls._class_resets = [
       ENABLE_CONNECTORS.set_for_testing(True),
     ]
@@ -113,30 +107,29 @@ class TestCheckConfig():
     for reset in cls._class_resets:
       reset()
 
-    update_app_permissions()
-
-
-  @patch('desktop.lib.connectors.models.CONNECTOR_INSTANCES', None)
   @patch('notebook.conf.has_connectors', return_value=True)
   def test_config_validator(self, has_connectors):
 
-    with patch('desktop.lib.connectors.models.CONNECTORS.get') as CONNECTORS:
-      CONNECTORS.return_value = {
-        'hive-1': Mock(
-          NICE_NAME=Mock(get=Mock(return_value='Hive')),
-          DIALECT=Mock(get=Mock(return_value='hive')),
-          INTERFACE=Mock(get=Mock(return_value='hiveserver2')),
-          SETTINGS=Mock(get=Mock(return_value=[{"name": "server_host", "value": "gethue"}, {"name": "server_port", "value": "10000"}])),
-        )
-      }
+    with patch('desktop.lib.connectors.api._get_installed_connectors') as _get_installed_connectors:
+      with patch('notebook.conf._excute_test_query') as _excute_test_query:
+        _get_installed_connectors.return_value = [{
+            'nice_name': 'Hive',
+            'name': 'hive-1',
+            'dialect': 'hive',
+            'category': 'editor',
+            'is_sql': True,
+            'interface': 'hiveserver2',
+            'settings': {},
+            'dialect_properties': {'sql_identifier_quote': '`',},
+          }
+        ]
+        _excute_test_query.side_effect = Exception('')
 
-      update_app_permissions()
+        connectors = _get_installed_connectors(user=self.user)
+        assert_true(connectors, connectors)
 
-      connectors = _get_installed_connectors(user=self.user)
-      assert_true(connectors, connectors)
+        warnings = config_validator(user=self.user)
 
-      warnings = config_validator(user=self.user)
-
-      assert_true(warnings, warnings)
-      assert_equal('Hive - hive (hive-1)', warnings[0][0])
-      assert_true('Testing the connector connection failed' in warnings[0][1], warnings)
+        assert_true(warnings, warnings)
+        assert_equal('Hive - hive (hive-1)', warnings[0][0])
+        assert_true('Testing the connector connection failed' in warnings[0][1], warnings)
