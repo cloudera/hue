@@ -21,6 +21,7 @@ import logging
 from collections import OrderedDict
 
 from django.test.client import Client
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 from desktop import appmanager
