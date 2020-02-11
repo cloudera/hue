@@ -628,9 +628,7 @@ def load_confs(configspecpath, conf_source=None):
   """Loads and merges all of the configurations passed in,
   returning a ConfigObj for the result.
 
-  @param conf_source if not specified, reads conf/ from
-                     desktop/conf/. Otherwise should be a generator
-                     of ConfigObjs
+  @param conf_source if not specified, reads conf/ from desktop/conf/. Otherwise should be a generator of ConfigObjs
   """
   if conf_source is None:
     conf_source = _configs_from_dir(get_desktop_root("conf"))

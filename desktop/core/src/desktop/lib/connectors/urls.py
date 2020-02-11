@@ -30,6 +30,7 @@ urlpatterns = [
   url(r'^api/instance/get/(?P<id>\d+)$', api.get_connector, name='connectors.api.get_connector'),
   url(r'^api/instance/delete/?$', api.delete_connector, name='connectors.api.delete_connector'),
   url(r'^api/instance/update/?$', api.update_connector, name='connectors.api.update_connector'),
+  url(r'^api/instance/test/?$', api.test_connector, name='connectors.api.test_connector'),
 
   url(r'^api/examples/install/?$', api.install_connector_examples, name='connectors.api.install_connector_examples'),
 ]

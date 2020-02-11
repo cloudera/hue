@@ -24,7 +24,7 @@ from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_false
 
 from desktop.auth.backend import rewrite_user, is_admin
-from desktop.conf import ENABLE_CONNECTORS
+from desktop.conf import ENABLE_CONNECTORS, ENABLE_ORGANIZATIONS
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.django_test_util import make_logged_in_client
 
@@ -44,15 +44,33 @@ class TestConnectors(object):
     self.client = make_logged_in_client(username="test_connector", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test_connector")
 
+    self.admin_client = make_logged_in_client(username="admin_test_connector", recreate=True, is_superuser=True)
+    self.admin_user = User.objects.get(username="admin_test_connector")
+
+  @classmethod
+  def setUpClass(cls):
+    cls._class_resets = [
+      ENABLE_CONNECTORS.set_for_testing(True),
+      ENABLE_ORGANIZATIONS.set_for_testing(False),
+    ]
+
+  @classmethod
+  def tearDownClass(cls):
+    for reset in cls._class_resets:
+      reset()
+
+
   def test_page(self):
     response = self.client.get("/desktop/connectors/")
 
     assert_equal(200, response.status_code)
 
+
   def test_get_connector_types(self):
     response = self.client.post("/desktop/connectors/api/types/")
 
     assert_equal(200, response.status_code)
+
 
   def test_create_connector_perm(self):
     response = self.client.post("/desktop/connectors/api/instance/update/")
@@ -60,6 +78,27 @@ class TestConnectors(object):
 
     response = self.client.post("/desktop/connectors/api/instance/delete/")
     assert_equal(401, response.status_code)
+
+
+  def test_test_connector(self):
+    connector = {'connector': json.dumps({'name': 'hive', 'dialect': 'hive', 'is_sql': True, 'type': 'id-1'})}
+
+    response = self.client.post("/desktop/connectors/api/instance/test/", connector)
+    assert_equal(401, response.status_code)
+
+    with patch('desktop.lib.connectors.api.config_validator') as config_validator:
+      config_validator.return_value = []
+
+      response = self.admin_client.post("/desktop/connectors/api/instance/test/", connector)
+      assert_equal(200, response.status_code)
+      assert_false(json.loads(response.content)['warnings'])
+
+    with patch('notebook.conf._excute_test_query') as _excute_test_query:
+      _excute_test_query.side_effect = Exception('')  # Just in case as relying on connector id not existing
+
+      response = self.admin_client.post("/desktop/connectors/api/instance/test/", connector)
+      assert_equal(200, response.status_code)
+      assert_true(json.loads(response.content)['warnings'])
 
 
 class TestConnectorListing(unittest.TestCase):
@@ -115,7 +154,9 @@ class TestConnectorListing(unittest.TestCase):
 
 
   def test_get_connectors_for_user(self):
-    connector = Connector.objects.create(name='MySql', dialect='mysql', settings=json.dumps([{"name": "url", "value": "mysql://hue:pwd@hue:3306/hue"}]))
+    connector = Connector.objects.create(
+        name='MySql', dialect='mysql', settings=json.dumps([{"name": "url", "value": "mysql://hue:pwd@hue:3306/hue"}])
+    )
 
     # Could leverate update_app_permissions() instead of adding manually the permission but this is more lightweight for now
     conn_perm = HuePermission.objects.create(app=connector.name, action='access', description='', connector=connector)

@@ -21,6 +21,7 @@ import logging
 from django.utils.translation import ugettext as _
 
 from useradmin.models import update_app_permissions
+from notebook.conf import config_validator
 
 from desktop.auth.decorators import admin_required
 from desktop.decorators import api_error_handler
@@ -110,6 +111,16 @@ def delete_connector(request):
   update_app_permissions()
 
   return JsonResponse({})
+
+
+@admin_required
+def test_connector(request):
+  connector = json.loads(request.POST.get('connector', '{}'))
+
+  connectors = [connector]
+  warnings = config_validator(user=request.user, connectors=connectors)
+
+  return JsonResponse({'warnings': warnings})
 
 
 @admin_required
