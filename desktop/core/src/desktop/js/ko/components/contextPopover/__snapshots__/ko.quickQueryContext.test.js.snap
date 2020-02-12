@@ -2,26 +2,7 @@
 
 exports[`ko.quickQueryContext.js should render component 1`] = `
 "<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;quick-query-context&quot;, params: params }\\"><div class=\\"context-popover-flex-fill\\" style=\\"overflow: auto;\\">
-  <div style=\\"margin: 10px;\\" data-bind=\\"
-    component: { 
-      name: 'hue-simple-ace-editor-multi',
-      params: {
-        autocomplete: autocomplete,
-        value: statement,
-        lines: 5,
-        aceOptions: {
-          minLines: 10,
-          maxLines: 25
-        },
-        mode: dialect,
-        database: database,
-        namespace: namespace,
-        compute: compute,
-        temporaryOnly: true
-      }
-    }
-  \\" id=\\"uuid-uuid\\"><div class=\\"simple-ace-multi-line\\">
-    <div class=\\"ace-editor\\"></div>
-  </div></div>
+  <!-- ko hueSpinner: { spin: loadingConfig, center: true, size: 'xlarge' } --><!-- /ko -->
+  <!-- ko ifnot: loadingConfig --><!-- /ko -->
 </div></div>"
 `;
