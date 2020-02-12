@@ -57,9 +57,7 @@ class WebHdfsStat(object):
       self.mode |= stat.S_IFREG
 
   def __unicode__(self):
-    return "[WebHdfsStat] %7s %8s %8s %12s %s%s" % \
-        (oct(self.mode), self.user, self.group, self.size, self.path,
-         self.isDir and '/' or "")
+    return "[WebHdfsStat] %7s %8s %8s %12s %s%s" % (oct(self.mode), self.user, self.group, self.size, self.path, self.isDir and '/' or "")
 
   def __repr__(self):
     return smart_str("<WebHdfsStat %s>" % (self.path,))
@@ -75,9 +73,8 @@ class WebHdfsStat(object):
 
   def to_json_dict(self):
     """Returns a dictionary for easy serialization"""
-    KEYS = ('path', 'size', 'atime', 'mtime', 'mode', 'user', 'group',
-            'blockSize', 'replication')
-    res = { }
+    KEYS = ('path', 'size', 'atime', 'mtime', 'mode', 'user', 'group', 'blockSize', 'replication')
+    res = {}
     for k in KEYS:
       res[k] = getattr(self, k)
     return res

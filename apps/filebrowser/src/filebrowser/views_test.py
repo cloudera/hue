@@ -25,8 +25,8 @@ from builtins import object
 import json
 import logging
 import os
-
 import re
+import stat
 import sys
 import tempfile
 
@@ -34,9 +34,7 @@ import urllib.request, urllib.error
 import urllib.parse
 
 from time import sleep, time
-
 from avro import schema, datafile, io
-
 from aws.s3.s3fs import S3FileSystemException
 from aws.s3.s3test_utils import get_test_bucket
 
@@ -68,6 +66,11 @@ else:
   from urllib import unquote as urllib_unquote
   open_file = file
 
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
+else:
+  from mock import patch, Mock
+
 
 LOG = logging.getLogger(__name__)
 
@@ -85,6 +88,44 @@ def cleanup_file(cluster, path):
   except:
     # Don't let cleanup errors mask earlier failures
     LOG.exception('failed to cleanup %s' % path)
+
+
+class TestFileBrowser():
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test_filebrowser", groupname='test_filebrowser', recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="test_filebrowser")
+    grant_access(self.user.username, 'test_filebrowser', 'filebrowser')
+    add_to_group(self.user.username, 'test_filebrowser')
+
+  def test_listdir_paged(self):
+
+    with patch('desktop.middleware.fsmanager.get_filesystem') as get_filesystem:
+      with patch('filebrowser.views.snappy_installed') as snappy_installed:
+        snappy_installed.return_value = False
+        get_filesystem.return_value = Mock(
+          stats=Mock(
+            return_value=Mock(
+              isDir=True,
+              size=1024,
+              path=b'/',
+              mtime=None,
+              mode=stat.S_IFDIR
+            ),
+          ),
+          normpath=Mock(return_value='/'),
+          listdir_stats=Mock(
+            return_value=[]  # Add "Mock files here"
+          ),
+          superuser='hdfs',
+          supergroup='hdfs'
+        )
+
+        response = self.client.get('/filebrowser/view=')
+
+        assert_equal(200, response.status_code)
+        dir_listing = response.context[0]['files']
+        assert_equal(1, len(dir_listing))
 
 
 class TestFileBrowserWithHadoop(object):
@@ -655,9 +696,7 @@ class TestFileBrowserWithHadoop(object):
     """)
 
     f = self.cluster.fs.open(prefix + '/test-view.avro', "w")
-    data_file_writer = datafile.DataFileWriter(f, io.DatumWriter(),
-                                                writers_schema=test_schema,
-                                                codec='deflate')
+    data_file_writer = datafile.DataFileWriter(f, io.DatumWriter(), writers_schema=test_schema, codec='deflate')
     dummy_datum = {
       'name': 'Test',
       'integer': 10,
