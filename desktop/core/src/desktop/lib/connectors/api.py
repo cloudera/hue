@@ -21,13 +21,14 @@ import logging
 from django.utils.translation import ugettext as _
 
 from useradmin.models import update_app_permissions
-from notebook.conf import config_validator
+from notebook.conf import config_validator, _connector_to_iterpreter
 
 from desktop.auth.decorators import admin_required
 from desktop.decorators import api_error_handler
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.connectors.models import _get_installed_connectors, get_connectors_types, Connector, _create_connector_examples
+from desktop.lib.connectors.models import _get_installed_connectors, get_connectors_types, Connector, _create_connector_examples, \
+    _augment_connector_properties
 from desktop.lib.connectors.types import get_connectors_types, get_connector_categories, get_connector_by_type
 
 
@@ -117,10 +118,17 @@ def delete_connector(request):
 def test_connector(request):
   connector = json.loads(request.POST.get('connector', '{}'))
 
-  connectors = [connector]
-  warnings = config_validator(user=request.user, connectors=connectors)
+  # Currently only Editor connectors are supported.
+  interpreter = _connector_to_iterpreter(
+    _augment_connector_properties(connector)
+  )
 
-  return JsonResponse({'warnings': warnings})
+  warnings = ''.join([
+    ''.join(warning)
+    for warning in config_validator(user=request.user, interpreters=[interpreter])
+  ])
+
+  return JsonResponse({'warnings': warnings, 'hasWarnings': bool(warnings)})
 
 
 @admin_required
