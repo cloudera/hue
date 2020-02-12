@@ -101,7 +101,7 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
   if not Connector.objects.exists() and user and is_hue_admin(user):
     _create_connector_examples()
 
-  connectors = []
+
   connectors_objects = Connector.objects.all()
   if user is not None and not is_admin(user):  # Apply Permissions
     connectors_objects = connectors_objects.filter(huepermission__in=user.get_permissions())
@@ -118,34 +118,17 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
       }
       for connector in connectors_objects
   ]
+  connectors = []
 
   for connector in connector_instances:
-    connector_types = []
-
-    for connector_type in get_connectors_types():
-      if connector_type['dialect'] == connector['dialect']:
-        connector_types.insert(0, connector_type)
-      elif connector['interface'] and connector_type.get('interface') == connector['interface']:
-        connector_types.append(connector_type)
-
-    if not connector_types:
+    full_connector = _augment_connector_properties(connector)
+    if full_connector:
+      connectors.append(full_connector)
+    else:
       LOG.warn('Skipping connector %(id)s as connector dialect %(dialect)s or interface %(interface)s are not installed' % (
           {'id': connector['id'], 'dialect': connector['dialect'], 'interface': connector['interface']}
         )
       )
-    else:
-      connector_type = connector_types[0]
-      connectors.append({
-        'nice_name': connector['nice_name'],
-        'name': str(connector['id']),
-        'dialect': connector['dialect'],
-        'interface': connector['interface'] or connector_type['interface'],
-        'settings': connector['settings'],
-        'id': str(connector['id']),
-        'category': connector_type['category'],
-        'description': connector_type['description'],
-        'dialect_properties': connector_type.get('properties', {})
-      })
 
   if categories is not None:
     connectors = [connector for connector in connectors if connector['category'] in categories]
@@ -157,6 +140,35 @@ def _get_installed_connectors(category=None, categories=None, dialect=None, inte
     connectors = [connector for connector in connectors if connector['interface'] == interface]
 
   return connectors
+
+
+def _augment_connector_properties(connector):
+  '''
+  Add the connector properties based on the dialect type to each connector.
+  The connector type must exist in desktop/core/src/desktop/lib/connectors/types.py.
+  '''
+
+  connector_types = []
+
+  for connector_type in get_connectors_types():
+    if connector_type['dialect'] == connector['dialect']:
+      connector_types.insert(0, connector_type)
+    elif connector['interface'] and connector_type.get('interface') == connector['interface']:
+      connector_types.append(connector_type)
+
+  if connector_types:
+    connector_type = connector_types[0]
+    return {
+      'nice_name': connector['nice_name'],
+      'name': str(connector['id']),
+      'dialect': connector['dialect'],
+      'interface': connector['interface'] or connector_type['interface'],
+      'settings': connector['settings'],
+      'id': str(connector['id']),
+      'category': connector_type['category'],
+      'description': connector_type['description'],
+      'dialect_properties': connector_type.get('properties', {})
+    }
 
 
 def _create_connector_examples():
