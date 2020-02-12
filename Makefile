@@ -119,7 +119,9 @@ docs:
 # Install parent POM
 ###################################
 parent-pom:
+ifneq (,$(BUILD_DB_PROXY))
 	cd $(ROOT)/maven && mvn install $(MAVEN_OPTIONS)
+endif
 
 .PHONY: parent-pom
 

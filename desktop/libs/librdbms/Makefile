@@ -63,6 +63,7 @@ else
 $(DB_PROXY_JAR):
 	$(error Cannot build DBProxy plugin without source)
 endif
-else:
+else
+$(DB_PROXY_JAR):
 	@echo 'Skipping DB Proxy Jar build as BUILD_DB_PROXY not set.'
 endif
