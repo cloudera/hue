@@ -79,7 +79,7 @@ class SimpleAceEditor {
     editor.setTheme($.totalStorage('hue.ace.theme') || 'ace/theme/hue');
     self.ace(editor);
 
-    if (params.autocomplete) {
+    if (params.autocomplete && ko.unwrap(params.autocomplete)) {
       const autocomplete = ko.unwrap(params.autocomplete);
       const sourceType =
         autocomplete.type.indexOf('Query') !== -1
