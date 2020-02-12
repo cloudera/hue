@@ -487,13 +487,9 @@ def listdir_paged(request, path):
     descending_param = request.GET.get('descending', None)
     if sortby is not None:
         if sortby not in ('type', 'name', 'atime', 'mtime', 'user', 'group', 'size'):
-            logger.info("Invalid sort attribute '%s' for listdir." %
-                        (sortby,))
+            logger.info("Invalid sort attribute '%s' for listdir." % sortby)
         else:
-            all_stats = sorted(all_stats,
-                               key=operator.attrgetter(sortby),
-                               reverse=coerce_bool(descending_param))
-
+            all_stats = sorted(all_stats, key=operator.attrgetter(sortby), reverse=coerce_bool(descending_param))
 
     # Do pagination
     try:
@@ -520,12 +516,12 @@ def listdir_paged(request, path):
     current_stat = request.fs.stats(path)
     # The 'path' field would be absolute, but we want its basename to be
     # actually '.' for display purposes. Encode it since _massage_stats expects byte strings.
-    current_stat['path'] = path
-    current_stat['name'] = "."
+    current_stat.path = path
+    current_stat.name = "."
     shown_stats.insert(1, current_stat)
 
     if page:
-      page.object_list = [ _massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats ]
+      page.object_list = [_massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats]
 
     is_trash_enabled = request.fs._get_scheme(path) == 'hdfs' and int(get_trash_interval()) > 0
 
@@ -566,7 +562,7 @@ def scheme_absolute_path(root, path):
   return path
 
 def stat_absolute_path(path, stat):
-  stat["path"] = scheme_absolute_path(path, stat["path"])
+  stat.path = scheme_absolute_path(path, stat.path)
   return stat
 
 def _massage_stats(request, stats):
@@ -574,17 +570,17 @@ def _massage_stats(request, stats):
     Massage a stats record as returned by the filesystem implementation
     into the format that the views would like it in.
     """
-    path = stats['path']
+    path = stats.path
     normalized = request.fs.normpath(path)
     return {
         'path': normalized, # Normally this should be quoted, but we only use this in POST request so we're ok. Changing this to quoted causes many issues.
-        'name': stats['name'],
+        'name': stats.name,
         'stats': stats.to_json_dict(),
-        'mtime': datetime.fromtimestamp(stats['mtime']).strftime('%B %d, %Y %I:%M %p') if stats['mtime'] else '',
-        'humansize': filesizeformat(stats['size']),
-        'type': filetype(stats['mode']),
-        'rwx': rwx(stats['mode'], stats['aclBit']),
-        'mode': stringformat(stats['mode'], "o"),
+        'mtime': datetime.fromtimestamp(stats.mtime).strftime('%B %d, %Y %I:%M %p') if stats.mtime else '',
+        'humansize': filesizeformat(stats.size),
+        'type': filetype(stats.mode),
+        'rwx': rwx(stats.mode, stats.aclBit),
+        'mode': stringformat(stats.mode, "o"),
         'url': '/filebrowser/view=' + urllib_quote(normalized.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS),
         'is_sentry_managed': request.fs.is_sentry_managed(path)
     }
@@ -721,11 +717,11 @@ def display(request, path):
         'dirname': dirname,
         'mode': mode,
         'compression': compression,
-        'size': stats['size'],
+        'size': stats.size,
         'max_chunk_size': str(MAX_CHUNK_SIZE_BYTES)
     }
     data["filename"] = os.path.basename(path)
-    data["editable"] = stats['size'] < MAX_FILEEDITOR_SIZE
+    data["editable"] = stats.size < MAX_FILEEDITOR_SIZE
     if mode == "binary":
         # This might be the wrong thing for ?format=json; doing the
         # xxd'ing in javascript might be more compact, or sending a less
@@ -937,8 +933,9 @@ def detect_snappy(contents):
 def detect_parquet(fhandle):
     """
     Detect parquet from magic header bytes.
+    Python 2 only currently.
     """
-    return parquet._check_header_magic_bytes(fhandle)
+    return False if sys.version_info[0] > 2 else parquet._check_header_magic_bytes(fhandle)
 
 
 def snappy_installed():
