@@ -49,39 +49,31 @@ SQLデータ探検家の皆さん、
 
 &nbsp;
 
-Hueチームはすべての貢献者に感謝し、Hue 4.5がリリースできることを嬉しく思います！ [<img class="aligncenter size-full wp-image-2988" src="https://cdn.gethue.com/uploads/2015/08/hue-logo-copy.png" alt="hue-logo (copy)" width="85" height="63" data-wp-pid="2988" />][1]
+Hueチームはすべての貢献者に感謝し、Hue 4.5がリリースできることを嬉しく思います！ 
 
-&nbsp;
+<img class="" src="https://cdn.gethue.com/uploads/2015/08/hue-logo-copy.png" alt="hue-logo" width="85" height="63" />
 
-<div>
-  <div>
-    このリリースの焦点は技術的なスタックをモジュール化し、SQLの統合を改善し、今後の主要機能の準備をすることでした。
-  </div>
+このリリースの焦点は技術的なスタックをモジュール化し、SQLの統合を改善し、今後の主要機能の準備をすることでした。
   
-  <div>
-    <div>
-    </div>
-    
-    <p>
-      <span class="notranslate">このリリースには、660件のコミットと150件以上のバグ修正が含まれています！</span> <span class="notranslate">すべての変更については、 <a href="https://translate.googleusercontent.com/translate_c?depth=1&rurl=translate.google.com&sl=auto&sp=nmt4&tl=ja&u=https://docs.gethue.com/latest/releases/release-notes-4.5.0/&xid=17259,1500004,15700021,15700043,15700186,15700191,15700256,15700259,15700262,15700265&usg=ALkJrhg7zr7TvqvwrM7rJ29y_sVZInj4dg">リリースノートをご覧ください</a> 。</span>
-    </p>
-  </div>
-</div>
-
 このリリースには 660 件のコミットと 150 件以上のバグフィックスが含まれています！全ての変更点は[リリースノート][2]をご覧ください。
 
-tarballまたは[ソース][3]を入手して試してみてください！簡単に試してみるには<span style="font-weight: 400;">&#8216;<a href="https://github.com/cloudera/hue/tree/master/tools/docker">docker pull gethue/4.5.0</a>&#8216;、または起動中の</span>[<span style="font-weight: 400;">demo.gethue.com</span>][4]<span style="font-weight: 400;">が使用できます。</span>Kubernetes クラスターをお持ちの場合:
+簡単に試すにはいくつかの方法があります。
 
-<pre><code class="bash">helm repo add gethue https://helm.gethue.com 
-helm repo update 
-helm install gethue/hue 
-</pre>
 
-<p style="text-align: center;">
-  <a class="sf-button standard accent standard  dropshadow" style="color: #fff!important; font-size: 200%;" title="Click to download the tarball release" href="https://cdn.gethue.com/downloads/hue-4.5.0.tgz" target="_blank" rel="noopener noreferrer"><br /> <span class="text">Download</span><br /> </a>
-</p>
+* [Tarball](https://cdn.gethue.com/downloads/hue-4.5.0.tgz) or [source][3]
+* From <a href="https://github.com/cloudera/hue/tree/master/tools/docker">Docker Hub</a>
+    ```
+    docker pull gethue/4.5.0
+    ```
+* [demo.gethue.com][4]
+* Kubernetes cluster
+    ```
+    helm repo add gethue https://helm.gethue.com
+    helm repo update
+    helm install gethue/hue
+    ```
 
-[<img class="aligncenter size-full wp-image-6044" src="https://cdn.gethue.com/uploads/2019/08/hue_4.5.png" alt="" width="1601" height="902" />][5]
+<a href="https://cdn.gethue.com/uploads/2019/08/hue_4.5.png"><img src="https://cdn.gethue.com/uploads/2019/08/hue_4.5.png" /></a>
 
 これらは主要な改善の一覧です:
 
@@ -157,8 +149,6 @@ helm install gethue/hue
 &nbsp;
 
 <span class="notranslate">製品を使用し、このリリースに貢献したすべての人に感謝します。</span> <span class="notranslate">さあ、次のステップへ！</span> <span class="notranslate">（Python 3サポート、Apache Knoxの統合、その他のSQL / クラウド機能）</span>
-
-As usual thank you to all the project contributors and for sending feedback and participating on the
 
 いつものように、すべてのプロジェクトの貢献者、[フォーラム][6]または [@gethue][7]に参加してフィードバックを送ってくれた皆さんに感謝申し上げます！
 
