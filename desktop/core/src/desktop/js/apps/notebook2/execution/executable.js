@@ -386,6 +386,7 @@ export default class Executable {
       result: {
         handle: this.handle
       },
+      executor: this.executor.toJs(),
       status: this.status,
       id: id || UUID(),
       statement_raw: statement,
