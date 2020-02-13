@@ -81,7 +81,11 @@ class TestConnectors(object):
 
 
   def test_test_connector(self):
-    connector = {'connector': json.dumps({'name': 'hive', 'dialect': 'hive', 'is_sql': True, 'type': 'id-1'})}
+    connector = {
+      'connector': json.dumps({
+        'name': 'hive', 'dialect': 'hive', 'id': 'id-1', 'nice_name': 'Sales DB', 'settings': {}, 'interface': 'hiveserver2'
+      })
+    }
 
     response = self.client.post("/desktop/connectors/api/instance/test/", connector)
     assert_equal(401, response.status_code)
@@ -133,6 +137,8 @@ class TestConnectorListing(unittest.TestCase):
 
   @classmethod
   def tearDownClass(cls):
+    HuePermission.objects.all().delete()
+
     for reset in cls._class_resets:
       reset()
 
@@ -160,10 +166,10 @@ class TestConnectorListing(unittest.TestCase):
 
     # Could leverate update_app_permissions() instead of adding manually the permission but this is more lightweight for now
     conn_perm = HuePermission.objects.create(app=connector.name, action='access', description='', connector=connector)
-    default_group = get_default_user_group()
-    GroupPermission.objects.create(group=default_group, hue_permission=conn_perm)
+    GroupPermission.objects.create(group=self.user.groups.first(), hue_permission=conn_perm)
 
     try:
+      assert_true(self.user.get_permissions())
       connectors = _get_installed_connectors(user=self.user)
       assert_true(connectors, connectors)
 

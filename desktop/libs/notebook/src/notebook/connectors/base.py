@@ -24,6 +24,7 @@ import uuid
 
 from django.utils.translation import ugettext as _
 
+from desktop.auth.backend import is_admin
 from desktop.conf import TASK_SERVER, has_connectors
 from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
@@ -136,7 +137,14 @@ class Notebook(object):
         value = str(variable['value'])
         return p1 + (value if value is not None else variable['meta'].get('placeholder',''))
 
-      return re.sub("([^\\\\])\\$" + ("{(" if hasCurlyBracketParameters else "(") + variablesString + ")(=[^}]*)?" + ("}" if hasCurlyBracketParameters else ""), replace, statement_raw)
+      return re.sub(
+          "([^\\\\])\\$" + (
+            "{(" if hasCurlyBracketParameters else "(") + variablesString + ")(=[^}]*)?" + ("}"
+            if hasCurlyBracketParameters else ""
+          ),
+          replace,
+          statement_raw
+      )
 
     return statement_raw
 
@@ -327,19 +335,23 @@ def get_api(request, snippet):
     snippet['type'] = 'impala'
 
   if snippet.get('connector'):
-    connector_name = snippet['connector']['type'] # Ideally unify with name and nice_name
+    connector_name = snippet['connector']['type']  # Ideally unify with name and nice_name
     snippet['type'] = connector_name
   else:
     connector_name = snippet['type']
 
-  interpreter = get_interpreter(connector_type=connector_name, user=request.user)
+  if has_connectors() and snippet.get('type') == 'hello' and is_admin(request.user):
+    interpreter = snippet.get('interpreter')
+  else:
+    interpreter = get_interpreter(connector_type=connector_name, user=request.user)
+
   interface = interpreter['interface']
 
   if get_cluster_config(request.user)['has_computes']:
-    compute = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API or Notebook create sessions.
+    compute = json.loads(request.POST.get('cluster', '""'))  # Via Catalog autocomplete API or Notebook create sessions.
     if compute == '""' or compute == 'undefined':
       compute = None
-    if not compute and snippet.get('compute'): # Via notebook.ko.js
+    if not compute and snippet.get('compute'):  # Via notebook.ko.js
       interpreter['compute'] = snippet['compute']
 
   LOG.debug('Selected interpreter %s interface=%s compute=%s' % (

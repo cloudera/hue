@@ -120,8 +120,9 @@ def test_connector(request):
 
   # Currently only Editor connectors are supported.
   interpreter = _connector_to_iterpreter(
-    _augment_connector_properties(connector)
+      _augment_connector_properties(connector)
   )
+  interpreter['type'] = 'hello'  # This is the id of the common health check query
 
   warnings = ''.join([
     ''.join(warning)
