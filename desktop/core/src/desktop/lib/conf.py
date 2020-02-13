@@ -79,7 +79,7 @@ import subprocess
 import sys
 
 from django.utils.encoding import smart_str
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _t
 from configobj import ConfigObj, ConfigObjError
 
 from desktop.lib.paths import get_desktop_root, get_build_dir
@@ -148,7 +148,7 @@ class BoundConfig(object):
         data = self.bind_to
     except AttributeError:
       LOG.exception("Error value of key '%s' in configuration." % self.grab_key)
-      data = _("Possible misconfiguration")
+      data = _t("Possible misconfiguration")
       present = True
 
     return data, present
@@ -191,9 +191,7 @@ class BoundConfig(object):
     self.config.print_help(*args, **kwargs)
 
   def __repr__(self):
-    return repr("%s(config=%s, bind_to=%s, grab_key=%s)" %
-                (str(self.__class__),
-                 repr(self.config), repr(self.bind_to), repr(self.grab_key)))
+    return repr("%s(config=%s, bind_to=%s, grab_key=%s)" % (str(self.__class__),  repr(self.config), repr(self.bind_to), repr(self.grab_key)))
 
 
 class Config(object):
