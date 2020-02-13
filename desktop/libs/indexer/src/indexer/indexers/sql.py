@@ -28,6 +28,8 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from azure.abfs.__init__ import abfspath
+from beeswax import hive_site
+from hadoop.fs.exceptions import WebHdfsException
 from notebook.models import make_notebook
 from useradmin.models import User
 
@@ -155,13 +157,17 @@ class SQLIndexer(object):
           self.fs.mkdir(external_path)
           self.fs.rename(source_path, external_path)
     elif load_data: # We'll use load data command
-      parent_path = self.fs.parent_path(source_path)
+      parent_path = self.fs.normpath(self.fs.parent_path(source_path))
       stats = self.fs.stats(parent_path)
       split = urlparse(source_path)
-      # Only for HDFS, import data and non-external table
-      if split.scheme in ('', 'hdfs') and oct(stats["mode"])[-1] != '7':
-        user_scratch_dir = self.fs.get_home_dir() + '/.scratchdir/%s' % str(uuid.uuid4()) # Make sure it's unique.
-        self.fs.do_as_user(self.user, self.fs.mkdir, user_scratch_dir, 0o0777)
+
+      # For import data or non-external table creation, validate that hive has the perms to move the files
+      # Note: the user still needs to upload the data in the same encryption zone as the warehouse."
+      if split.scheme in ('', 'hdfs') and not hive_site.hiveserver2_impersonation_enabled() and not self.check_perm_for_hive(parent_path, source_type):
+        base_dir = parent_path if stats.encBit else self.fs.get_home_dir()
+        user_scratch_dir = base_dir + '/.scratchdir/%s' % str(uuid.uuid4()) # Make sure it's unique.
+        self.fs.do_as_user(self.user, self.fs.mkdir, user_scratch_dir, 0o0770)
+        self.fs.do_as_superuser(self.fs.chown, user_scratch_dir, self.user, 'hive')
         self.fs.do_as_user(self.user, self.fs.rename, source['path'], user_scratch_dir)
         source_path = user_scratch_dir + '/' + source['path'].split('/')[-1]
 
@@ -255,3 +261,11 @@ class SQLIndexer(object):
         last_executed=start_time,
         is_task=True
     )
+
+  def check_perm_for_hive(self, path, source_type='hive'):
+    try:
+      return self.fs.do_as_user(source_type, self.fs.check_access, path, 'rwx')
+    except WebHdfsException as e:
+      LOG.debug(e)
+      return False
+    return True

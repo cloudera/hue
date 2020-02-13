@@ -25,14 +25,22 @@ from nose.tools import assert_equal, assert_true
 from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
 
+from hadoop.fs.exceptions import WebHdfsException
 from indexer.indexers.sql import SQLIndexer
 
 
 if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
+  from unittest.mock import patch, Mock, MagicMock, PropertyMock
 else:
-  from mock import patch, Mock, MagicMock
+  from mock import patch, Mock, MagicMock, PropertyMock
 
+
+def mock_check_access_denied(username, fn, *args, **kwargs):
+  if fn.fn_name == 'check_access':
+    raise WebHdfsException("check access denied!")
+
+def mock_uuid():
+  return '52f840a8-3dde-434d-934a-2d6e06f3687e'
 
 class TestSQLIndexer(object):
 
@@ -40,12 +48,18 @@ class TestSQLIndexer(object):
     self.client = make_logged_in_client(username="test", groupname="empty", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
-
-  def test_create_table_from_a_file_to_csv(self):
-    fs = Mock(
-      stats=Mock(return_value={'mode': 0o0777})
+  def get_fs(self):
+    return Mock(
+      stats=Mock(
+        mode=0o0700
+      ),
+      normpath=Mock(return_value="/enc_zn/upload_dir"),
+      do_as_user=mock_check_access_denied,
+      check_access=Mock(fn_name='check_access'),
+      get_home_dir=Mock(return_value="/user/test"),
     )
 
+  def get_source(self):
     def source_dict(key):
       return {
         'path': 'hdfs:///path/data.csv',
@@ -55,7 +69,9 @@ class TestSQLIndexer(object):
       }.get(key, Mock())
     source = MagicMock()
     source.__getitem__.side_effect = source_dict
+    return source
 
+  def get_destination(self):
     def destination_dict(key):
       return {
         'name': 'default.export_table',
@@ -69,9 +85,15 @@ class TestSQLIndexer(object):
       }.get(key, Mock())
     destination = MagicMock()
     destination.__getitem__.side_effect = destination_dict
+    return destination
+
+  def test_create_table_from_a_file_to_csv(self):
+    fs = Mock(
+      stats=Mock(return_value={'mode': 0o0777})
+    )
 
     with patch('notebook.models.get_interpreter') as get_interpreter:
-      notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(source, destination)
+      notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(self.get_source(), self.get_destination())
 
     assert_equal(
       [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
@@ -90,6 +112,78 @@ ROW FORMAT   SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 ;
 
 LOAD DATA INPATH 'hdfs:///path/data.csv' INTO TABLE `default`.`hue__tmp_export_table` PARTITION (day='20200101');
+
+CREATE TABLE `default`.`export_table` COMMENT "No comment!"
+        STORED AS csv
+TBLPROPERTIES("transactional"="true", "transactional_properties"="insert_only")
+        AS SELECT *
+        FROM `default`.`hue__tmp_export_table`;
+
+DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')],
+    [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')]
+  )
+
+  @patch('uuid.uuid4', mock_uuid)
+  def test_create_table_from_a_file_to_csv_with_security_and_kms_encryption(self):
+    fs = self.get_fs()
+    with patch('beeswax.hive_site.hiveserver2_impersonation_enabled') as hiveserver2_impersonation_enabled:
+      hiveserver2_impersonation_enabled.return_value = False
+      type(fs.stats.return_value).encBit = PropertyMock(return_value=True)
+      notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(self.get_source(), self.get_destination())
+
+    assert_equal(
+      [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
+
+CREATE TABLE `default`.`hue__tmp_export_table`
+(
+  `id` int ) COMMENT "No comment!"
+PARTITIONED BY (
+  `day` date )
+ROW FORMAT   SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+  WITH SERDEPROPERTIES ("separatorChar" = ",",
+    "quoteChar"     = """,
+    "escapeChar"    = "\\\\"
+    )
+  STORED AS TextFile TBLPROPERTIES("skip.header.line.count" = "1", "transactional" = "false")
+;
+
+LOAD DATA INPATH '/enc_zn/upload_dir/.scratchdir/52f840a8-3dde-434d-934a-2d6e06f3687e/data.csv' INTO TABLE `default`.`hue__tmp_export_table` PARTITION (day='20200101');
+
+CREATE TABLE `default`.`export_table` COMMENT "No comment!"
+        STORED AS csv
+TBLPROPERTIES("transactional"="true", "transactional_properties"="insert_only")
+        AS SELECT *
+        FROM `default`.`hue__tmp_export_table`;
+
+DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')],
+    [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')]
+  )
+
+  @patch('uuid.uuid4', mock_uuid)
+  def test_create_table_from_a_file_to_csv_with_security(self):
+    fs = self.get_fs()
+    with patch('beeswax.hive_site.hiveserver2_impersonation_enabled') as hiveserver2_impersonation_enabled:
+      hiveserver2_impersonation_enabled.return_value = False
+      type(fs.stats.return_value).encBit = PropertyMock(return_value=False)
+      notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(self.get_source(), self.get_destination())
+
+    assert_equal(
+      [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
+
+CREATE TABLE `default`.`hue__tmp_export_table`
+(
+  `id` int ) COMMENT "No comment!"
+PARTITIONED BY (
+  `day` date )
+ROW FORMAT   SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+  WITH SERDEPROPERTIES ("separatorChar" = ",",
+    "quoteChar"     = """,
+    "escapeChar"    = "\\\\"
+    )
+  STORED AS TextFile TBLPROPERTIES("skip.header.line.count" = "1", "transactional" = "false")
+;
+
+LOAD DATA INPATH '/user/test/.scratchdir/52f840a8-3dde-434d-934a-2d6e06f3687e/data.csv' INTO TABLE `default`.`hue__tmp_export_table` PARTITION (day='20200101');
 
 CREATE TABLE `default`.`export_table` COMMENT "No comment!"
         STORED AS csv
@@ -130,6 +224,9 @@ class MockFs(object):
 
   def stats(self, path):
     return {"mode": 0o0777}
+
+  def normpath(self, path):
+    return ""
 
 
 def test_generate_create_text_table_with_data_partition():
