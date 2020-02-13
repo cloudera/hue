@@ -19,9 +19,13 @@ import * as ko from 'knockout';
 import 'ko/components/simpleAceEditor/ko.simpleAceEditor';
 import 'ko/components/ko.contextSelector';
 import 'ko/components/ko.dropDown';
+import 'apps/notebook2/components/ko.executableActions';
 
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
+import Executor from 'apps/notebook2/execution/executor';
+import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
+import sqlStatementsParser from 'parse/sqlStatementsParser';
 import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 import huePubSub from 'utils/huePubSub';
 
@@ -43,8 +47,7 @@ const TEMPLATE = `
       }
     "></div>
     <!-- ko if: interpreter() -->
-      <div class="margin-left-10" style="display: inline-block">
-        <!-- ko component: {
+      <div class="margin-left-10" style="display: inline-block" data-bind="component: {
           name: 'hue-context-selector',
           params: {
             sourceType: interpreter().type,
@@ -54,32 +57,34 @@ const TEMPLATE = `
             database: database,
             hideLabels: true
           }
-        } --><!-- /ko -->
-      </div>
+        }
+      "></div>
     <!-- /ko -->
     <!-- ko ifnot: loadingContext -->
-    <div style="margin: 10px;" data-bind="
-      component: { 
-        name: 'hue-simple-ace-editor-multi',
-        params: {
-          autocomplete: autocomplete,
-          value: statement,
-          lines: 5,
-          aceOptions: {
-            minLines: 10,
-            maxLines: 25
-          },
-          mode: dialect,
-          database: database,
-          namespace: namespace,
-          compute: compute,
-          temporaryOnly: true
-        }
-      }
-    "></div>
-    <div>
-      
-    </div>
+      <!-- ko with: interpreter -->
+        <div style="margin: 10px;" data-bind="
+          component: { 
+            name: 'hue-simple-ace-editor-multi',
+            params: {
+              autocomplete: $parent.autocomplete,
+              value: $parent.statement,
+              lines: 5,
+              aceOptions: {
+                minLines: 10,
+                maxLines: 25
+              },
+              mode: dialect,
+              database: $parent.database,
+              availableDatabases: $parent.availableDatabases,
+              namespace: $parent.namespace,
+              compute: $parent.compute,
+              executor: $parent.executor
+            }
+          }
+        "></div>
+        <div data-bind="component: { name: 'executable-actions', params: { activeExecutable: activeExecutable } }"></div>
+        
+      <!-- /ko -->
     <!-- /ko -->
   <!-- /ko -->
 </div>
@@ -95,6 +100,8 @@ class QuickQueryContext extends DisposableComponent {
     this.availableDatabases = ko.observableArray();
     this.database = ko.observable();
 
+    this.activeExecutable = ko.observable();
+
     // TODO: Switch over to connector in ko.simpleAceEditor
     this.namespace = ko.observable();
     this.compute = ko.observable();
@@ -106,16 +113,42 @@ class QuickQueryContext extends DisposableComponent {
     this.loadingContext = ko.pureComputed(
       () => !this.namespace() || !this.compute() || !this.database()
     );
-
-    this.executor = undefined;
-
     this.dialect = ko.pureComputed(() => this.interpreter() && this.interpreter().dialect);
+    this.type = ko.pureComputed(() => this.interpreter() && this.interpreter().type);
+    this.defaultLimit = ko.observable(10);
+
+    this.executor = new Executor({
+      sourceType: this.type,
+      namespace: this.namespace,
+      compute: this.compute,
+      defaultLimit: this.defaultLimit
+    });
+
     this.autocomplete = ko.pureComputed(
       () => this.interpreter() && { type: this.interpreter().dialect }
     );
 
     this.subscribe(CONFIG_REFRESHED_EVENT, this.updateFromConfig.bind(this));
     huePubSub.publish(GET_KNOWN_CONFIG_EVENT, this.updateFromConfig.bind(this));
+
+    let refreshExecutableThrottle = -1;
+    const refreshExecutable = () => {
+      window.clearTimeout(refreshExecutableThrottle);
+      refreshExecutableThrottle = window.setTimeout(() => {
+        const parsedStatement = sqlStatementsParser.parse(this.statement() || '')[0];
+
+        const executable = new SqlExecutable({
+          executor: this.executor,
+          parsedStatement: parsedStatement,
+          database: this.database()
+        });
+        this.activeExecutable(executable);
+        this.executor.setExecutables([executable]);
+      }, 200);
+    };
+
+    this.subscribe(this.statement, refreshExecutable);
+    this.subscribe(this.database, refreshExecutable);
   }
 
   updateFromConfig(config) {
