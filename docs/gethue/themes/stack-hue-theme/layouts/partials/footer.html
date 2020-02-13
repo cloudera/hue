@@ -4,8 +4,18 @@
 <footer class="space--sm footer-2 ">
   <div class="container">
     <div class="row">
-      <div class="col-sm-6">
+      <div class="col-sm-9">
         <ul class="list-inline list--hover">
+          {{ $currentLang := .Lang }}
+          {{ range $.Site.Home.AllTranslations }}
+            {{ if ne .Lang $currentLang }}
+            <li>
+              <a href="{{ .Permalink }}">
+                <img class="icon icon--xs flag" alt="{{ .Language.LanguageName }}" title="{{ .Language.LanguageName }}" src="{{ .Site.BaseURL }}img/flags/{{.Lang}}.png" />
+              </a>
+            </li>
+            {{ end }}
+          {{ end }}
           <li> <a href="mailto:team@gethue.com"><span>{{ i18n "contact" }}</span></a> </li>
           <li> <a href="https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md"><span>{{ i18n "work" }}</span></a> </li>
           <li> <a href="{{ .Site.BaseURL }}/posts/"><span>{{ i18n "blog" }}</span></a> </li>
@@ -22,7 +32,7 @@
           </li>
         </ul>
       </div>
-      <div class="col-sm-6 text-right text-center-xs">
+      <div class="col-sm-3 text-right text-center-xs">
         <a class="btn btn--sm btn--primary type--uppercase" href="http://demo.gethue.com" target="_blank">
           <span class="btn__text">
             {{ i18n "try" }}
