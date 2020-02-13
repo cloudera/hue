@@ -95,12 +95,14 @@ class SimpleAceEditor {
         id: ko.observable($element.attr('id')),
         namespace: params.namespace,
         compute: params.compute,
-        database: ko.observable(
-          params.database && params.database() ? params.database() : 'default'
-        ),
-        availableDatabases: ko.observableArray([
-          params.database && params.database() ? params.database() : 'default'
-        ]),
+        database: ko.isObservable(params.database)
+          ? params.database
+          : ko.observable(params.database || 'default'),
+        availableDatabases: params.availableDatabases
+          ? params.availableDatabases
+          : ko.observableArray([
+              params.database && params.database() ? params.database() : 'default'
+            ]),
         positionStatement: ko.observable({
           location: {
             first_line: 1,
@@ -121,7 +123,7 @@ class SimpleAceEditor {
         inFocus: ko.observable()
       };
 
-      if (sourceType === 'hive' || sourceType === 'impala') {
+      if (ko.unwrap(sourceType) === 'hive' || ko.unwrap(sourceType) === 'impala') {
         sqlWorkerHandler.registerWorkers();
         const aceLocationHandler = new AceLocationHandler({
           editor: editor,

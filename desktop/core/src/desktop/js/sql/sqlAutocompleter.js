@@ -131,11 +131,6 @@ class SqlAutocompleter {
       );
 
       parseResult = await this.parseActiveStatement();
-
-      if (typeof hueDebug !== 'undefined' && hueDebug.showParseResult) {
-        // eslint-disable-next-line no-restricted-syntax
-        console.log(parseResult);
-      }
     } catch (e) {
       if (typeof console.warn !== 'undefined') {
         console.warn(e);
@@ -157,6 +152,10 @@ class SqlAutocompleter {
       // This prevents Ace from inserting garbled text in case of exception
       huePubSub.publish('hue.ace.autocompleter.done');
     } else {
+      if (typeof hueDebug !== 'undefined' && hueDebug.showParseResult) {
+        // eslint-disable-next-line no-restricted-syntax
+        console.log(parseResult);
+      }
       try {
         if (this.lastContextRequest) {
           this.lastContextRequest.dispose();
