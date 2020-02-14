@@ -26,6 +26,9 @@ import SqlAutocompleter from 'sql/sqlAutocompleter';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
 import AceGutterHandler from 'ko/bindings/ace/aceGutterHandler';
 
+export const NAME = 'hue-simple-ace-editor';
+export const MULTI_NAME = 'hue-simple-ace-editor-multi';
+
 const SIMPLE_ACE_TEMPLATE = `
   <div class="simple-ace-single-line">
     <div class="ace-clearable" data-bind="css: { 'visible': value() !== '' }, click: clear"><i class="fa fa-times-circle"></i></div>
@@ -342,7 +345,7 @@ class SimpleAceEditor {
 
 // Ace requires that the child to clone is first child, so we need separate components for single line & multi line
 componentUtils.registerComponent(
-  'hue-simple-ace-editor',
+  NAME,
   {
     createViewModel: function(params, componentInfo) {
       return new SimpleAceEditor(params, componentInfo.element);
@@ -352,7 +355,7 @@ componentUtils.registerComponent(
 );
 
 componentUtils.registerComponent(
-  'hue-simple-ace-editor-multi',
+  MULTI_NAME,
   {
     createViewModel: function(params, componentInfo) {
       return new SimpleAceEditor(params, componentInfo.element);
