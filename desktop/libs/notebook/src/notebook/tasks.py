@@ -18,8 +18,7 @@ from __future__ import absolute_import, unicode_literals
 
 from future import standard_library
 standard_library.install_aliases()
-from builtins import next
-from builtins import object
+from builtins import next, object
 import csv
 import datetime
 import json
@@ -184,11 +183,11 @@ def run_sync_query(doc_id, user):
   return task
 
 
-# TODO: Convert csv to excel if needed
 def download(*args, **kwargs):
   notebook = args[0]
   result = download_to_file.AsyncResult(args[0]['uuid'])
   state = result.state
+
   if state == states.PENDING:
     raise QueryExpired()
   elif state in states.EXCEPTION_STATES:
@@ -196,7 +195,7 @@ def download(*args, **kwargs):
 
   info = result.wait() # TODO: Start returning data even if we're not done
 
-  return export_csvxls.file_reader(storage.open(_result_key(notebook), 'rb'))
+  return export_csvxls.file_reader(storage.open(_result_key(notebook), 'rb'))  # TODO: Convert csv to excel if needed
 
 
 # Why we need this:
@@ -238,6 +237,7 @@ def check_status(*args, **kwargs):
   notebook = args[0]
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
+
   if state == states.PENDING:
     raise QueryExpired()
   elif state in states.EXCEPTION_STATES:
@@ -249,6 +249,7 @@ def check_status(*args, **kwargs):
 def get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id=None):
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
+
   if state == states.PENDING:
     raise QueryExpired()
   elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
@@ -277,6 +278,7 @@ def get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id
 def get_jobs(notebook, snippet, logs, **kwargs): # Re implementation to fetch updated guid in download_to_file from DB
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
+
   if state == states.PENDING:
     raise QueryExpired()
   elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
@@ -296,6 +298,7 @@ def get_jobs(notebook, snippet, logs, **kwargs): # Re implementation to fetch up
 def progress(notebook, snippet, logs=None, **kwargs):
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
+
   if state == states.PENDING:
     raise QueryExpired()
   elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
@@ -322,6 +325,7 @@ def fetch_result(notebook, snippet, rows, start_over, **kwargs):
       'meta': cols,
       'type': 'table'
     }
+
   if state == states.PENDING:
     raise QueryExpired()
   elif state in states.EXCEPTION_STATES:
@@ -377,6 +381,7 @@ def fetch_result_size(*args, **kwargs):
   notebook = args[0]
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
+
   if state == states.PENDING:
     raise QueryExpired()
   elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
@@ -394,6 +399,7 @@ def cancel(*args, **kwargs):
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
   status = 0
+
   if state == states.PENDING:
     raise QueryExpired()
   elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
@@ -408,6 +414,7 @@ def cancel(*args, **kwargs):
 
   result.forget()
   _cleanup(notebook)
+
   return {'status': status}
 
 def close_statement(*args, **kwargs):
@@ -416,6 +423,7 @@ def close_statement(*args, **kwargs):
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
   status = 0
+
   if state == states.PENDING:
     raise QueryExpired()
   elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
@@ -430,6 +438,7 @@ def close_statement(*args, **kwargs):
 
   result.forget()
   _cleanup(notebook)
+
   return {'status': status}
 
 def _cleanup(notebook):
@@ -458,7 +467,9 @@ def _get_request(postdict=None, user_id=None):
   request.fs_ref = 'default'
   request.fs = fsmanager.get_filesystem(request.fs_ref)
   request.jt = None
+
   user = User.objects.get(id=user_id)
   user = rewrite_user(user)
   request.user = user
+
   return request
