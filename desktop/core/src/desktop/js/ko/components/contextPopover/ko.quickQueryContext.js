@@ -20,6 +20,7 @@ import { MULTI_NAME as SIMPLE_ACE_MULTI } from 'ko/components/simpleAceEditor/ko
 import { NAME as CONTEXT_SELECTOR } from 'ko/components/ko.contextSelector';
 import { NAME as DROP_DOWN } from 'ko/components/ko.dropDown';
 import { NAME as EXECUTABLE_ACTIONS } from 'apps/notebook2/components/ko.executableActions';
+import { NAME as SIMPLE_RESULT_GRID } from 'apps/notebook2/components/resultGrid/ko.simpleResultGrid';
 
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
@@ -37,7 +38,7 @@ const TEMPLATE = `
   <!-- ko hueSpinner: { spin: loadingConfig, center: true, size: 'xlarge' } --><!-- /ko -->
   <!-- ko ifnot: loadingConfig -->
     <div style="display: inline-block" data-bind="
-      component: { 
+      component: {
         name: '${ DROP_DOWN }',
         params: {
           value: interpreter,
@@ -65,7 +66,7 @@ const TEMPLATE = `
     <!-- ko ifnot: loadingContext -->
       <!-- ko with: interpreter -->
         <div style="margin: 10px;" data-bind="
-          component: { 
+          component: {
             name: '${ SIMPLE_ACE_MULTI }',
             params: {
               autocomplete: $parent.autocomplete,
@@ -87,7 +88,13 @@ const TEMPLATE = `
         <div data-bind="
           component: {
             name: '${ EXECUTABLE_ACTIONS }',
-            params: { activeExecutable: $parent.activeExecutable } 
+            params: { activeExecutable: $parent.activeExecutable }
+          }
+        "></div>
+        <div data-bind="
+          component: {
+            name: '${ SIMPLE_RESULT_GRID }',
+            params: { activeExecutable: $parent.activeExecutable }
           }
         "></div>
       <!-- /ko -->
