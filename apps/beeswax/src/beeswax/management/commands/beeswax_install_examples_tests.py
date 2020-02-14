@@ -24,17 +24,64 @@ from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
+from desktop.models import Document2
+from useradmin.models import User, install_sample_user
 
-from beeswax.management.commands.beeswax_install_examples import SampleTable, Command
-
-from django.contrib.auth.models import User
+from beeswax.management.commands.beeswax_install_examples import SampleTable, Command, SampleQuery
 
 if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
+  from unittest.mock import patch, Mock, MagicMock
 else:
-  from mock import patch, Mock
+  from mock import patch, Mock, MagicMock
+
 
 LOG = logging.getLogger(__name__)
+
+
+class TestStandardTables():
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="test")
+
+  def test_install_queries(self):
+      design_dict = {
+        "name": "TestStandardTables Query",
+        "desc": "Small query",
+        "type": "0",
+        "dialects": ["postgresql", "mysql", "presto"],
+        "data": {
+          "query": {
+            "query": "SELECT 1",
+            "type": 0,
+            "email_notify": False,
+            "is_parameterized": False,
+            "database": "default"
+          },
+          "functions": [],
+          "VERSION": "0.4.1",
+          "file_resources": [],
+          "settings": []
+        }
+      }
+      interpreter = {'type': 'mysql'}
+
+      design = SampleQuery(design_dict)
+      assert_false(Document2.objects.filter(name='TestStandardTables Query').exists())
+
+      with patch('notebook.models.get_interpreter') as get_interpreter:
+        design.install(django_user=self.user, interpreter=interpreter)
+
+        assert_true(Document2.objects.filter(name='TestStandardTables Query').exists())
+        query = Document2.objects.filter(name='TestStandardTables Query').get()
+        assert_equal('query-hive', query.type)
+
+  # def test_install_queries(self):
+  #     sample_user = install_sample_user()
+  #     cmd = beeswax_install_examples.Command()
+  #     app_nam = 'mysql'
+  #     interpreter = Mock()
+  #     cmd._install_queries(sample_user, app_name, interpreter=interpreter)
 
 
 class TestTransactionalTables():

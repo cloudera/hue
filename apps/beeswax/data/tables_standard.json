@@ -1,0 +1,7 @@
+[
+  {
+    "data_file": "employe_sample.csv",
+    "create_hql": "CREATE TABLE `employe_sample` (\n  `code` string ,\n  `description` string ,\n  `total_emp` int ,\n  `salary` int )\n",
+    "table_name": "sample_sample"
+  }
+]
