@@ -16,10 +16,10 @@
 
 import * as ko from 'knockout';
 
-import 'ko/components/simpleAceEditor/ko.simpleAceEditor';
-import 'ko/components/ko.contextSelector';
-import 'ko/components/ko.dropDown';
-import 'apps/notebook2/components/ko.executableActions';
+import { MULTI_NAME as SIMPLE_ACE_MULTI } from 'ko/components/simpleAceEditor/ko.simpleAceEditor';
+import { NAME as CONTEXT_SELECTOR } from 'ko/components/ko.contextSelector';
+import { NAME as DROP_DOWN } from 'ko/components/ko.dropDown';
+import { NAME as EXECUTABLE_ACTIONS } from 'apps/notebook2/components/ko.executableActions';
 
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
@@ -36,8 +36,9 @@ const TEMPLATE = `
 <div class="context-popover-flex-fill" style="overflow: auto;">
   <!-- ko hueSpinner: { spin: loadingConfig, center: true, size: 'xlarge' } --><!-- /ko -->
   <!-- ko ifnot: loadingConfig -->
-    <div style="display: inline-block" data-bind="component: { 
-        name: 'hue-drop-down',
+    <div style="display: inline-block" data-bind="
+      component: { 
+        name: '${ DROP_DOWN }',
         params: {
           value: interpreter,
           labelAttribute: 'displayName',
@@ -47,8 +48,9 @@ const TEMPLATE = `
       }
     "></div>
     <!-- ko if: interpreter() -->
-      <div class="margin-left-10" style="display: inline-block" data-bind="component: {
-          name: 'hue-context-selector',
+      <div class="margin-left-10" style="display: inline-block" data-bind="
+        component: {
+          name: '${ CONTEXT_SELECTOR }',
           params: {
             sourceType: interpreter().type,
             compute: compute,
@@ -64,14 +66,14 @@ const TEMPLATE = `
       <!-- ko with: interpreter -->
         <div style="margin: 10px;" data-bind="
           component: { 
-            name: 'hue-simple-ace-editor-multi',
+            name: '${ SIMPLE_ACE_MULTI }',
             params: {
               autocomplete: $parent.autocomplete,
               value: $parent.statement,
-              lines: 5,
+              lines: 3,
               aceOptions: {
-                minLines: 10,
-                maxLines: 25
+                minLines: 3,
+                maxLines: 5
               },
               mode: dialect,
               database: $parent.database,
@@ -82,8 +84,12 @@ const TEMPLATE = `
             }
           }
         "></div>
-        <div data-bind="component: { name: 'executable-actions', params: { activeExecutable: activeExecutable } }"></div>
-        
+        <div data-bind="
+          component: {
+            name: '${ EXECUTABLE_ACTIONS }',
+            params: { activeExecutable: $parent.activeExecutable } 
+          }
+        "></div>
       <!-- /ko -->
     <!-- /ko -->
   <!-- /ko -->
