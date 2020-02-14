@@ -29,6 +29,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.conf import USE_NEW_EDITOR
 from desktop.models import Directory, Document, Document2, Document2Permission
 from hadoop import cluster
+
 from notebook.models import import_saved_beeswax_query
 from useradmin.models import get_default_user_group, install_sample_user, User
 
@@ -103,12 +104,12 @@ class Command(BaseCommand):
         raise InstallException(_('Could not install table: %s') % ex)
 
   def _install_queries(self, django_user, app_name, interpreter=None):
-    design_file = open(os.path.join(LOCAL_EXAMPLES_DATA_DIR.get(), 'designs.json'))
+    design_file = open(os.path.join(LOCAL_EXAMPLES_DATA_DIR.get(), 'queries.json'))
     design_list = json.load(design_file)
     design_file.close()
 
     # Filter design list to app-specific designs
-    app_type = HQL if app_name == 'beeswax' else IMPALA
+    app_type = HQL if app_name == 'beeswax' else IMPALA if app_name == 'impala' else 'sql'
     design_list = [d for d in design_list if int(d['type']) == app_type]
 
     for design_dict in design_list:
@@ -368,9 +369,10 @@ class SampleQuery(object):
         name=Document2.EXAMPLES_DIR
       )
 
+      document_type = self._document_type(self.type, interpreter)
       try:
         # Don't overwrite
-        doc2 = Document2.objects.get(owner=django_user, name=self.name, type=self._document_type(self.type), is_history=False)
+        doc2 = Document2.objects.get(owner=django_user, name=self.name, type=document_type, is_history=False)
         # If document exists but has been trashed, recover from Trash
         if doc2.parent_directory != examples_dir:
           doc2.parent_directory = examples_dir
@@ -388,7 +390,7 @@ class SampleQuery(object):
           owner=django_user,
           parent_directory=examples_dir,
           name=self.name,
-          type=self._document_type(self.type),
+          type=document_type,
           description=self.desc,
           data=data
         )
@@ -398,10 +400,12 @@ class SampleQuery(object):
       LOG.info('Successfully installed sample query: %s' % (self.name,))
 
 
-  def _document_type(self, type):
+  def _document_type(self, type, interpreter=None):
     if type == HQL:
       return 'query-hive'
     elif type == IMPALA:
       return 'query-impala'
+    elif interpreter:
+      return 'query-%(dialect)s' % interpreter
     else:
       return None

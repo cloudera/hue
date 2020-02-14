@@ -109,7 +109,7 @@ ${ layout.menubar(section='quick_start') }
 
               % if has_connectors():
                 <!-- ko foreach: connectors -->
-                  <!-- ko if: ['hive', 'impala'].indexOf(dialect) != -1 -->
+                  <!-- ko if: ['hive', 'impala', 'mysql', 'postgresql', 'presto'].indexOf(dialect) != -1 -->
                   <li>
                     <a href="javascript:void(0)" data-bind="click: $root.installConnectorDataExample">
                       <i class="fa fa-download"></i> <span data-bind="text: name"></span>
