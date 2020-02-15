@@ -191,7 +191,7 @@ def download(request, path):
 
 def view(request, path):
     """Dispatches viewing of a path to either index() or fileview(), depending on type."""
-    decoded_path = urllib_unquote(path)
+    decoded_path = unquote_url(path)
     if path != decoded_path:
       path = decoded_path
     # default_to_home is set in bootstrap.js
@@ -256,7 +256,7 @@ def home_relative_view(request, path):
 
 def edit(request, path, form=None):
     """Shows an edit form for the given path. Path does not necessarily have to exist."""
-    decoded_path = urllib_unquote(path)
+    decoded_path = unquote_url(path)
     if path != decoded_path:
       path = decoded_path
     try:
@@ -314,7 +314,7 @@ def save_file(request):
     form = EditorForm(request.POST)
     is_valid = form.is_valid()
     path = form.cleaned_data.get('path')
-    decoded_path = urllib_unquote(path)
+    decoded_path = unquote_url(path)
     if path != decoded_path:
       path = decoded_path
 
@@ -1175,7 +1175,12 @@ def touch(request):
         # No absolute path specification allowed.
         if posixpath.sep in name:
             raise PopupException(_("Could not name file \"%s\": Slashes are not allowed in filenames." % name))
-        request.fs.create(request.fs.join(urllib_unquote(path), urllib_unquote(name)))
+        request.fs.create(
+            request.fs.join(
+                urllib_unquote(path.encode('utf-8') if not isinstance(path, str) else path),
+                urllib_unquote(name.encode('utf-8') if not isinstance(name, str) else name)
+            )
+        )
 
     return generic_op(TouchForm, request, smart_touch, ["path", "name"], "path")
 
@@ -1200,7 +1205,10 @@ def move(request):
         for arg in args:
             if arg['src_path'] == arg['dest_path']:
                 raise PopupException(_('Source path and destination path cannot be same'))
-            request.fs.rename(urllib_unquote(arg['src_path']), urllib_unquote(arg['dest_path']))
+            request.fs.rename(
+                urllib_unquote(arg['src_path'].encode('utf-8') if not isinstance(arg['src_path'], str) else arg['src_path']),
+                urllib_unquote(arg['dest_path'].encode('utf-8') if not isinstance(arg['dest_path'], str) else arg['dest_path'])
+            )
     return generic_op(RenameFormSet, request, bulk_move, ["src_path", "dest_path"], None,
                       data_extractor=formset_data_extractor(recurring, params),
                       arg_extractor=formset_arg_extractor,
@@ -1215,7 +1223,7 @@ def copy(request):
         for arg in args:
             if arg['src_path'] == arg['dest_path']:
                 raise PopupException(_('Source path and destination path cannot be same'))
-            request.fs.copy(urllib_unquote(arg['src_path']), urllib_unquote(arg['dest_path']), recursive=True, owner=request.user)
+            request.fs.copy(unquote_url(arg['src_path']), unquote_url(arg['dest_path']), recursive=True, owner=request.user)
     return generic_op(CopyFormSet, request, bulk_copy, ["src_path", "dest_path"], None,
                       data_extractor=formset_data_extractor(recurring, params),
                       arg_extractor=formset_arg_extractor,
@@ -1319,8 +1327,8 @@ def _upload_file(request):
 
     if form.is_valid():
         uploaded_file = request.FILES['hdfs_file']
-        dest = scheme_absolute_path(urllib_unquote(request.GET['dest']), urllib_unquote(form.cleaned_data['dest']))
-        filepath = request.fs.join(dest, uploaded_file.name)
+        dest = scheme_absolute_path(unquote_url(request.GET['dest']), unquote_url(request.GET['dest']))
+        filepath = request.fs.join(dest, unquote_url(uploaded_file.name))
 
         if request.fs.isdir(dest) and posixpath.sep in uploaded_file.name:
             raise PopupException(_('Sorry, no "%(sep)s" in the filename %(name)s.' % {'sep': posixpath.sep, 'name': uploaded_file.name}))
@@ -1421,6 +1429,9 @@ def truncate(toTruncate, charsToKeep=50):
     else:
         return toTruncate
 
+def unquote_url(url):
+  url = urllib_unquote(url.encode('utf-8') if not isinstance(url, str) else url)
+  return url.decode('utf-8') if isinstance(url, bytes) else url
 
 def _is_hdfs_superuser(request):
   return request.user.username == request.fs.superuser or request.user.groups.filter(name__exact=request.fs.supergroup).exists()

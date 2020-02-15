@@ -122,7 +122,7 @@ class ABFSFileUploadHandler(FileUploadHandler):
   def _get_scheme(self):
     if self.destination:
       dst_parts = self.destination.split('://')
-      if dst_parts > 0:
+      if dst_parts:
         return dst_parts[0].upper()
       else:
         raise ABFSFileSystemException('Destination does not start with a valid scheme.')
