@@ -288,6 +288,44 @@ class Notebook(object):
     return _execute_notebook(request, notebook_data, snippet)
 
 
+  def execute_and_wait(self, request, timeout_sec=30.0, sleep_interval=0.5):
+      """
+      Run query and check status until it finishes or timeouts.
+
+      Check status until it finishes or timeouts.
+      """
+      task = self.execute(request, batch=False)
+      task['uuid'] = task['history_uuid']
+      status = self.check_status(task)
+      curr = time.time()
+      end = curr + timeout_sec
+
+      while curr <= end:
+        if status['status'] not in ('waiting', 'running'):
+          return task
+
+        status = self.check_status(task)
+        time.sleep(sleep_interval)
+        curr = time.time()
+
+      # Query timed out
+      # msg = "The query timed out after %(timeout)d seconds, canceled query." % {'timeout': timeout_sec}
+      # LOG.warning(msg)
+      # try:
+      #   self.cancel_operation(handle)
+      #   # get_api(request, snippet).cancel(notebook, snippet)
+      # except Exception as e:
+      #   msg = "Failed to cancel query."
+      #   LOG.warning(msg)
+      #   self.close_operation(handle)
+      #   raise QueryServerException(e, message=msg)
+
+      raise OperationTimeout()
+
+  def check_status(self, task):
+    pass
+
+
 def get_interpreter(connector_type, user=None):
   interpreter = [
     interpreter for interpreter in get_ordered_interpreters(user) if connector_type == interpreter['type']
