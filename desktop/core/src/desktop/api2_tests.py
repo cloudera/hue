@@ -103,7 +103,16 @@ class TestApi2(object):
     # Masking passwords if private
     private_response = client.get('/desktop/api2/get_hue_config', data={'private': True})
     assert_true(b'bind_password' in private_response.content)
-    assert_true(re.search(r'"value":\s*"[*]+"[^}]+"key":\s*"bind_password"', private_response.content))
+    config_json = json.loads(private_response.content)
+    desktop_config = [conf for conf in config_json['config'] if conf['key'] == 'desktop']
+    ldap_desktop_config = [val for conf in desktop_config for val in conf['values'] if val['key'] == 'ldap']
+    assert_true(  # Note: level 1 might not be hidden, e.g. secret_key_script
+      any(
+        val['value'] == '**********'
+        for conf in ldap_desktop_config for val in conf['values'] if val['key'] == 'bind_password'
+      ),
+      ldap_desktop_config
+    )
 
     # There should be more private than non-private
     assert_true(len(response.content) < len(private_response.content))
