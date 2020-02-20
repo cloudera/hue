@@ -23,7 +23,6 @@ from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false
 
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import add_to_group, grant_access
 from desktop.models import Document2
 from useradmin.models import User, install_sample_user
 
@@ -88,9 +87,7 @@ class TestTransactionalTables():
 
   def setUp(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
-
     self.user = rewrite_user(User.objects.get(username="test"))
-    grant_access("test", "default", "notebook")
 
 
   def test_load_sample_07_with_concurrency_support(self):
