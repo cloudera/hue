@@ -274,6 +274,7 @@ def _check_status(request, notebook=None, snippet=None, operation_id=None):
       status = 'expired'
     else:
       status = 'failed'
+
     if response.get('query_status'):
       has_result_set = response['query_status'].get('has_result_set')
     else:

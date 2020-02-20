@@ -333,16 +333,16 @@ class HS2Api(Api):
     status = HiveServerQueryHistory.STATE_MAP[operation.operationState]
 
     if status.value in (QueryHistory.STATE.failed.value, QueryHistory.STATE.expired.value):
-      if operation.errorMessage and 'transition from CANCELED to ERROR' in operation.errorMessage: # Hive case on canceled query
+      if operation.errorMessage and 'transition from CANCELED to ERROR' in operation.errorMessage:  # Hive case on canceled query
         raise QueryExpired()
-      elif  operation.errorMessage and re.search('Cannot validate serde: org.apache.hive.hcatalog.data.JsonSerDe', str(operation.errorMessage)):
+      elif operation.errorMessage and re.search('Cannot validate serde: org.apache.hive.hcatalog.data.JsonSerDe', str(operation.errorMessage)):
         raise QueryError(message=operation.errorMessage + _('. Is hive-hcatalog-core.jar registered?'))
       else:
         raise QueryError(operation.errorMessage)
 
     response['status'] = 'running' if status.value in (QueryHistory.STATE.running.value, QueryHistory.STATE.submitted.value) else 'available'
     if operation.hasResultSet is not None:
-      response['has_result_set']= operation.hasResultSet # HIVE-12442 - With LLAP & HIVE_CLI_SERVICE_PROTOCOL_V8, hasResultSet can change after get_operation_status
+      response['has_result_set']= operation.hasResultSet  # HIVE-12442 - With LLAP & HIVE_CLI_SERVICE_PROTOCOL_V8, hasResultSet can change after get_operation_status
 
     return response
 

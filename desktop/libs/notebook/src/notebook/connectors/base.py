@@ -279,7 +279,7 @@ class Notebook(object):
     )
 
   def execute(self, request, batch=False):
-    from notebook.api import _execute_notebook # Cyclic dependency
+    from notebook.api import _execute_notebook  # Cyclic dependency
 
     notebook_data = self.get_data()
     snippet = notebook_data['snippets'][0]
@@ -294,17 +294,18 @@ class Notebook(object):
 
       Check status until it finishes or timeouts.
       """
-      task = self.execute(request, batch=False)
-      task['uuid'] = task['history_uuid']
-      status = self.check_status(task)
+      snippet = self.execute(request, batch=False)
+      snippet['uuid'] = snippet['history_uuid']
       curr = time.time()
       end = curr + timeout_sec
 
+      status = self.check_status(request, snippet)
+
       while curr <= end:
         if status['status'] not in ('waiting', 'running'):
-          return task
+          return snippet
 
-        status = self.check_status(task)
+        status = self.check_status(request, snippet)
         time.sleep(sleep_interval)
         curr = time.time()
 
@@ -322,8 +323,10 @@ class Notebook(object):
 
       raise OperationTimeout()
 
-  def check_status(self, task):
-    pass
+  def check_status(self, request, notebook, snippet):
+    from notebook.api import _check_status  # Cyclic dependency
+
+    return _check_status(request, notebook=notebook, snippet=snippet)
 
 
 def get_interpreter(connector_type, user=None):

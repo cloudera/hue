@@ -30,9 +30,9 @@ from useradmin.models import User
 from notebook.connectors.base import Notebook
 
 if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
+  from unittest.mock import patch, Mock, MagicMock
 else:
-  from mock import patch, Mock
+  from mock import patch, Mock, MagicMock
 
 
 class TestNotebook(object):
@@ -44,8 +44,8 @@ class TestNotebook(object):
 
   def test_execute_and_wait(self):
     query = Notebook()
-    query.execute = Mock(return_value={'history_uuid': 1})
 
+    query.execute = Mock(return_value={'history_uuid': 1})
     query.check_status = Mock(
       side_effect=check_status_side_effect
     )
@@ -56,8 +56,41 @@ class TestNotebook(object):
     assert_equal(2, query.check_status.call_count)
 
 
+  def test_check_status(self):
+    query = Notebook()
+
+    notebook = MagicMock()
+    def notebook_side_effect(key):
+      if key == 'type':
+        return 'query-hive'
+      elif key == 'uuid':
+        return 'uuid-1'
+      else:
+        return Mock()
+    notebook.__getitem__.side_effect = notebook_side_effect
+    snippet = MagicMock()
+    def snippet_side_effect(key):
+      if key == 'status':
+        return 0
+      else:
+        return Mock()
+    snippet.__getitem__.side_effect = snippet_side_effect
+    request=Mock()
+
+    with patch('notebook.api.Document2.objects.get_by_uuid') as get_by_uuid:
+      with patch('notebook.api.get_api') as get_api:
+        with patch('notebook.api.Notebook') as Notebook2:
+          get_api.return_value=Mock(
+            check_status=Mock(return_value={'status': 0})
+          )
+          resp = query.check_status(request=request, notebook=notebook, snippet=snippet)
+
+          assert_equal(0, resp['status'])
+          assert_equal(0, resp['query_status']['status'])
+
+
 iteration = 0
-def check_status_side_effect(value):
+def check_status_side_effect(request, snippet):
   """First time query is still running, second time the execution is finished."""
   global iteration
 
