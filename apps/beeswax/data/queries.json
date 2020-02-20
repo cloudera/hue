@@ -2,7 +2,7 @@
   {
     "name": "Sample: Salary Analysis",
     "desc": "Top salary 2007 above $100k, Salary growth (sorted) from 2007-08",
-    "type": "0",
+    "type": "2",
     "dialects": ["postgresql", "mysql", "presto"],
     "data": {
       "query": {
