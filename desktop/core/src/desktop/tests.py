@@ -1347,9 +1347,18 @@ def test_get_data_link():
   assert_equal(None, get_data_link({}))
   assert_equal('gethue.com', get_data_link({'type': 'link', 'link': 'gethue.com'}))
 
-  assert_equal('/hbase/#Cluster/document_demo/query/20150527', get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527'}))
-  assert_equal('/hbase/#Cluster/document_demo/query/20150527[f1]', get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1'}))
-  assert_equal('/hbase/#Cluster/document_demo/query/20150527[f1:c1]', get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1', 'col': 'c1'}))
+  assert_equal(
+    '/hbase/#Cluster/document_demo/query/20150527',
+    get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527'})
+  )
+  assert_equal(
+      '/hbase/#Cluster/document_demo/query/20150527[f1]',
+      get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1'})
+  )
+  assert_equal(
+      '/hbase/#Cluster/document_demo/query/20150527[f1:c1]',
+      get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1', 'col': 'c1'})
+  )
 
   assert_equal('/filebrowser/view=/data/hue/1', get_data_link({'type': 'hdfs', 'path': '/data/hue/1'}))
   assert_equal('/metastore/table/default/sample_07', get_data_link({'type': 'hive', 'database': 'default', 'table': 'sample_07'}))
@@ -1413,7 +1422,10 @@ def test_collect_validation_messages_extras():
   finally:
     os.remove(configspec.name)
   assert_equal(len(error_list), 1)
-  assert_equal(u'Extra section, extrasection in the section: top level, Extra keyvalue, extrakey in the section: [desktop] , Extra section, extrasubsection in the section: [desktop] , Extra section, extrasubsubsection in the section: [desktop] [[auth]] ', error_list[0]['message'])
+  assert_equal(u'Extra section, extrasection in the section: top level, Extra keyvalue, extrakey in the section: [desktop] , '
+      'Extra section, extrasubsection in the section: [desktop] , Extra section, extrasubsubsection in the section: [desktop] [[auth]] ',
+      error_list[0]['message']
+  )
 
 # Test db migration from 5.7,...,5.15 to latest
 def test_db_migrations_sqlite():
@@ -1467,8 +1479,12 @@ def test_db_migrations_mysql():
       'CONN_MAX_AGE': desktop.conf.DATABASE.CONN_MAX_AGE.get(),
     }
     try:
-      subprocess.check_output('mysql -u%(USER)s -p%(PASSWORD)s -e "CREATE DATABASE %(SCHEMA)s"' % DATABASES[name], stderr=subprocess.STDOUT, shell=True) # No way to run this command with django
-      subprocess.check_output('mysql -u%(USER)s -p%(PASSWORD)s %(SCHEMA)s < %(PATH)s' % DATABASES[name], stderr=subprocess.STDOUT, shell=True)
+      subprocess.check_output(
+        'mysql -u%(USER)s -p%(PASSWORD)s -e "CREATE DATABASE %(SCHEMA)s"' % DATABASES[name], stderr=subprocess.STDOUT, shell=True
+      )  # No way to run this command with django
+      subprocess.check_output(
+        'mysql -u%(USER)s -p%(PASSWORD)s %(SCHEMA)s < %(PATH)s' % DATABASES[name], stderr=subprocess.STDOUT, shell=True
+      )
       call_command('migrate', '--fake-initial', '--database=%(SCHEMA)s' % DATABASES[name])
     except subprocess.CalledProcessError as e:
       LOG.warn('stderr: {}'.format(e.output))

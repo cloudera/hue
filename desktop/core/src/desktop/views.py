@@ -634,6 +634,7 @@ def load_confs(configspecpath, conf_source=None):
     conf_source = _configs_from_dir(get_desktop_root("conf"))
 
   conf = ConfigObj(configspec=configspecpath)
+
   for in_conf in conf_source:
     conf.merge(in_conf)
   return conf
@@ -669,6 +670,7 @@ def collect_validation_messages(conf, error_list):
   for sections, name in whitelist_extras:
     the_section = conf
     hierarchy_sections_string = ''
+
     try:
       parent = conf
       for section in sections:
@@ -692,6 +694,7 @@ def collect_validation_messages(conf, error_list):
 
     section_string = hierarchy_sections_string or "top level"
     message.append('Extra %s, %s in the section: %s' % (section_or_value, name, section_string))
+
   if message:
     error = {
       'name': 'ini configuration',
