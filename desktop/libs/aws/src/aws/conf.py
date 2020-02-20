@@ -103,6 +103,7 @@ def get_default_region():
 
 def get_region(conf=None):
   global REGION_CACHED
+
   if REGION_CACHED is not None:
     return REGION_CACHED
   region = ''
@@ -148,6 +149,13 @@ def get_key_expiry():
   else:
     return 86400
 
+
+HAS_IAM_DETECTION=Config(
+  help=_('Enable the detection of an IAM role providing the credentials automatically. It can take a few seconds.'),
+  key='has_iam_detection',
+  default=True,
+  type=coerce_bool
+)
 
 AWS_ACCOUNTS = UnspecifiedConfigSection(
   'aws_accounts',
@@ -241,14 +249,15 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
         key='key_expiry',
         default=14400,
         type=int
-      )
+      ),
     )
   )
 )
 
 
 def is_enabled():
-  return ('default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()) or has_iam_metadata()
+  return ('default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()) or \
+      has_iam_metadata()
 
 
 def is_ec2_instance():
@@ -281,21 +290,24 @@ def is_ec2_instance():
 
 
 def has_iam_metadata():
+  global IS_IAM_CACHED
+
   try:
-    global IS_IAM_CACHED
+    if not HAS_IAM_DETECTION.get():
+      IS_IAM_CACHED = False
+
     if IS_IAM_CACHED is not None:
       return IS_IAM_CACHED
 
     if is_ec2_instance():
-
       import boto.utils
       metadata = boto.utils.get_instance_metadata(timeout=1, num_retries=1)
       IS_IAM_CACHED = 'iam' in metadata
     else:
       IS_IAM_CACHED = False
-  except Exception as e:
+  except:
     IS_IAM_CACHED = False
-    LOG.exception("Encountered error when checking IAM metadata: %s" % e)
+    LOG.exception("Encountered error when checking IAM metadata")
   return IS_IAM_CACHED
 
 
@@ -307,6 +319,7 @@ def has_s3_access(user):
 def config_validator(user):
   res = []
   import desktop.lib.fsmanager # Circular dependecy
+
   if is_enabled():
     try:
       conn = desktop.lib.fsmanager.get_client(name='default', fs='s3a')._s3_connection
