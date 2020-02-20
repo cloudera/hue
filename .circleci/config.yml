@@ -63,6 +63,9 @@ jobs:
             rm /usr/share/hue/desktop/conf/*.ini
             cp desktop/conf/pseudo-distributed.ini.tmpl /usr/share/hue/desktop/conf/pseudo-distributed.ini
 
+            # ini configuration tweaks
+            sed -i 's/## has_iam_detection=true/  has_iam_detection=false/g' /usr/share/hue/desktop/conf/pseudo-distributed.ini
+
             cd /usr/share/hue
             # make npm-install # Not available
             cp ~/repo/.babelrc .
