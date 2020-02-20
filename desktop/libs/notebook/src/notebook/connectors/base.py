@@ -294,18 +294,19 @@ class Notebook(object):
 
       Check status until it finishes or timeouts.
       """
-      snippet = self.execute(request, batch=False)
-      snippet['uuid'] = snippet['history_uuid']
+      handle = self.execute(request, batch=False)
+      operation_id = handle['history_uuid']
+
       curr = time.time()
       end = curr + timeout_sec
 
-      status = self.check_status(request, snippet)
+      status = self.check_status(request, operation_id=operation_id)
 
       while curr <= end:
         if status['status'] not in ('waiting', 'running'):
-          return snippet
+          return handle
 
-        status = self.check_status(request, snippet)
+        status = self.check_status(request, operation_id=operation_id)
         time.sleep(sleep_interval)
         curr = time.time()
 
@@ -323,10 +324,10 @@ class Notebook(object):
 
       raise OperationTimeout()
 
-  def check_status(self, request, notebook, snippet):
+  def check_status(self, request, operation_id):
     from notebook.api import _check_status  # Cyclic dependency
 
-    return _check_status(request, notebook=notebook, snippet=snippet)
+    return _check_status(request, operation_id=operation_id)
 
 
 def get_interpreter(connector_type, user=None):

@@ -1,7 +1,9 @@
 [
   {
     "data_file": "employe_sample.csv",
-    "create_hql": "CREATE TABLE `employe_sample` (\n  `code` string ,\n  `description` string ,\n  `total_emp` int ,\n  `salary` int )\n",
-    "table_name": "sample_sample"
+    "create_sql": "CREATE TABLE `employe_sample` (\n  `code` text ,\n  `description` text ,\n  `total_emp` int ,\n  `salary` int )\n",
+    "insert_sql": "INSERT INTO employe_sample (`code`, `description`, `total_emp`, `salary`)\nVALUES %(values)s",
+    "table_name": "employe_sample",
+    "transactional": true
   }
 ]

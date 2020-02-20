@@ -29,8 +29,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.conf import USE_NEW_EDITOR
 from desktop.models import Directory, Document, Document2, Document2Permission
 from hadoop import cluster
-
-from notebook.models import import_saved_beeswax_query
+from notebook.models import import_saved_beeswax_query, make_notebook
 from useradmin.models import get_default_user_group, install_sample_user, User
 
 from beeswax.design import hql_query
@@ -38,7 +37,6 @@ from beeswax.conf import LOCAL_EXAMPLES_DATA_DIR
 from beeswax.hive_site import has_concurrency_support
 from beeswax.models import SavedQuery, HQL, IMPALA, RDBMS
 from beeswax.server import dbms
-from beeswax.server.dbms import get_query_server_config, QueryServerException
 
 
 LOG = logging.getLogger(__name__)
@@ -49,27 +47,33 @@ class InstallException(Exception):
 
 
 class Command(BaseCommand):
-  args = '<beeswax|impala> <db_name>'
+  args = '<hive|impala> <db_name>'
   help = 'Install examples but do not overwrite them.'
 
   def handle(self, *args, **options):
     if args:
-      app_name = args[0]
+      dialect = args[0]
       db_name = args[1] if len(args) > 1 else 'default'
       user = User.objects.get(username=pwd.getpwuid(os.getuid()).pw_name)
+      request = None
     else:
-      interpreter = options.get('interpreter')
-      app_name = options['app_name']
+      dialect = options['dialect']
       db_name = options.get('db_name', 'default')
+      interpreter = options.get('interpreter')  # Only when connectors are enabled. Later will deprecate `dialect`.
       user = options['user']
+      request = options['request']
 
-    tables = options['tables'] if 'tables' in options else ('tables_transactional.json' if has_concurrency_support() else 'tables.json')
+    if dialect == 'beeswax':
+      dialect = 'hive'
+    tables = 'tables_standard.json' if dialect not in ('hive', 'impala') else (
+        'tables_transactional.json' if has_concurrency_support() else 'tables.json'
+    )
     exception = None
 
     try:
-      sample_user = install_sample_user(user)  # Documents will belong to this user but we run the install as the current user
-      self._install_queries(sample_user, app_name, interpreter=interpreter)
-      self._install_tables(user, app_name, db_name, tables, interpreter=interpreter)
+      sample_user = install_sample_user(user)  # Documents will belong to the sample user but we run the SQL as the current user
+      self._install_queries(sample_user, dialect, interpreter=interpreter)
+      self._install_tables(user, dialect, db_name, tables, interpreter=interpreter, request=request)
     except Exception as ex:
       exception = ex
 
@@ -86,56 +90,60 @@ class Command(BaseCommand):
       else:
         raise exception
 
-  def _install_tables(self, django_user, app_name, db_name, tables, interpreter=None):
+  def _install_tables(self, django_user, dialect, db_name, tables, interpreter=None, request=None):
     data_dir = LOCAL_EXAMPLES_DATA_DIR.get()
     table_file = open(os.path.join(data_dir, tables))
     table_list = json.load(table_file)
     table_file.close()
 
     for table_dict in table_list:
-      table = SampleTable(table_dict, app_name, db_name, interpreter=interpreter)
       try:
+        table = SampleTable(table_dict, dialect, db_name, interpreter=interpreter, request=request)
         table.install(django_user)
       except Exception as ex:
-        raise InstallException(_('Could not install table: %s') % ex)
+        msg = str(ex)
+        LOG.error(msg)
+        raise InstallException(_('Could not install table %s: %s') % (table_dict['table_name'], msg))
 
-  def _install_queries(self, django_user, app_name, interpreter=None):
+  def _install_queries(self, django_user, dialect, interpreter=None):
     design_file = open(os.path.join(LOCAL_EXAMPLES_DATA_DIR.get(), 'queries.json'))
     design_list = json.load(design_file)
     design_file.close()
 
     # Filter design list to app-specific designs
-    app_type = HQL if app_name == 'beeswax' else IMPALA if app_name == 'impala' else RDBMS
+    app_type = HQL if dialect == 'beeswax' else IMPALA if dialect == 'impala' else RDBMS
     design_list = [d for d in design_list if int(d['type']) == app_type]
     if app_type == RDBMS:
-      design_list = [d for d in design_list if app_name in d['dialects']]
+      design_list = [d for d in design_list if dialect in d['dialects']]
 
     if not design_list:
-      raise InstallException(_('No %s queries are available as samples') % app_name)
+      raise InstallException(_('No %s queries are available as samples') % dialect)
 
     for design_dict in design_list:
       design = SampleQuery(design_dict)
       try:
         design.install(django_user, interpreter=interpreter)
       except Exception as ex:
-        raise InstallException(_('Could not install %s query: %s') % (app_name, ex))
+        raise InstallException(_('Could not install %s query: %s') % (dialect, ex))
 
 
 class SampleTable(object):
   """
   Represents a table loaded from the tables.json file
   """
-  def __init__(self, data_dict, app_name, db_name='default', interpreter=None):
+  def __init__(self, data_dict, dialect, db_name='default', interpreter=None, request=None):
     self.name = data_dict['table_name']
     if 'partition_files' in data_dict:
       self.partition_files = data_dict['partition_files']
     else:
       self.partition_files = None
       self.filename = data_dict['data_file']
-    self.hql = data_dict['create_hql']
-    self.query_server = get_query_server_config(app_name, connector=interpreter)
-    self.app_name = app_name
+    self.create_sql = data_dict['create_sql'].strip()
+    self.insert_sql = data_dict.get('insert_sql')
+    self.dialect = dialect
     self.db_name = db_name
+    self.interpreter = interpreter
+    self.request = request
     self.columns = data_dict.get('columns')
     self.is_transactional = data_dict.get('transactional')
 
@@ -152,42 +160,68 @@ class SampleTable(object):
 
 
   def install(self, django_user):
-    if self.create(django_user):
-      if self.partition_files:
-        for partition_spec, filepath in list(self.partition_files.items()):
-          self.load_partition(django_user, partition_spec, filepath, columns=self.columns)
-      else:
-        self.load(django_user)
+    self.create(django_user)
+
+    if self.partition_files:
+      for partition_spec, filepath in list(self.partition_files.items()):
+        self.load_partition(django_user, partition_spec, filepath, columns=self.columns)
+    else:
+      self.load(django_user)
 
 
   def create(self, django_user):
     """
-    Create table in the Hive Metastore.
+    Create SQL sample table.
     """
-    LOG.info('Creating table "%s"' % (self.name,))
-    db = dbms.get(django_user, self.query_server)
+    LOG.info('Creating table "%s"' % self.name)
 
     try:
-      if self.app_name == 'impala':
-        db.invalidate(database=self.db_name, flush_all=False)
-      db.get_table(self.db_name, self.name)
-      msg = _('Table "%(table)s" already exists.') % {'table': self.name}
-      LOG.error(msg)
-      return False
-    except Exception:
-      query = hql_query(self.hql)
-      try:
-        db.use(self.db_name)
-        results = db.execute_and_wait(query)
-        if not results:
-          msg = _('Error creating table %(table)s: Operation timeout.') % {'table': self.name}
-          LOG.error(msg)
-          raise InstallException(msg)
-        return True
-      except Exception as ex:
-        msg = _('Error creating table %(table)s: %(error)s.') % {'table': self.name, 'error': ex}
-        LOG.error(msg)
-        raise InstallException(msg)
+      job = make_notebook(
+          name=_('Create sample table %s') % self.name,
+          editor_type=self.interpreter['type'] if self.interpreter else self.dialect,  # Backward compatibility without connectors
+          statement=self.create_sql,
+          status='ready',
+          database=self.db_name,
+          on_success_url='assist.db.refresh',
+          is_task=False,
+      )
+
+      job.execute_and_wait(self.request)
+    except Exception as ex:
+      if 'already exists' in str(ex):
+        LOG.warn('Table %s already exists' % self.name)
+      else:
+        raise ex
+
+
+  def load(self, django_user):
+    if has_concurrency_support() and self.is_transactional:
+      with open(self._contents_file) as f:
+        if self.insert_sql:
+          hql = self.insert_sql
+        else:
+          hql = """
+            INSERT INTO TABLE %(tablename)s
+            VALUES %(values)s
+            """
+        hql = hql % {
+          'tablename': self.name,
+          'values': self._get_sql_insert_values(f)
+        }
+    else:
+      # Upload data to HDFS home of user then load (aka move) it into the Hive table (in the Hive metastore in HDFS).
+      hdfs_root_destination = self._get_hdfs_root_destination(django_user)
+      hdfs_file_destination = self._upload_to_hdfs(django_user, self._contents_file, hdfs_root_destination)
+      hql = """
+        LOAD DATA INPATH
+        '%(filename)s' OVERWRITE INTO TABLE %(tablename)s
+        """ % {
+          'tablename': self.name,
+          'filename': hdfs_file_destination
+        }
+
+    self._load_data_to_table(django_user, hql)
+
 
   def load_partition(self, django_user, partition_spec, filepath, columns):
     if has_concurrency_support() and self.is_transactional:
@@ -219,33 +253,6 @@ class SampleTable(object):
     self._load_data_to_table(django_user, hql)
 
 
-  def load(self, django_user):
-    if has_concurrency_support() and self.is_transactional:
-      with open(self._contents_file) as f:
-        hql = \
-          """
-          INSERT INTO TABLE %(tablename)s
-          VALUES %(values)s
-          """ % {
-            'tablename': self.name,
-            'values': self._get_sql_insert_values(f)
-          }
-    else:
-      # Upload data to HDFS home of user then load (aka move) it into the Hive table (in the Hive metastore in HDFS).
-      hdfs_root_destination = self._get_hdfs_root_destination(django_user)
-      hdfs_file_destination = self._upload_to_hdfs(django_user, self._contents_file, hdfs_root_destination)
-      hql = \
-        """
-        LOAD DATA INPATH
-        '%(filename)s' OVERWRITE INTO TABLE %(tablename)s
-        """ % {
-          'tablename': self.name,
-          'filename': hdfs_file_destination
-        }
-
-    self._load_data_to_table(django_user, hql)
-
-
   def _check_file_contents(self, filepath):
     if not os.path.isfile(filepath):
       msg = _('Cannot find table data in "%(file)s".') % {'file': filepath}
@@ -266,7 +273,7 @@ class SampleTable(object):
     hdfs_root_destination = None
     can_impersonate_hdfs = False
 
-    if self.app_name == 'impala':
+    if self.dialect == 'impala':
       # Impala can support impersonation, so use home instead of a public destination for the upload
       from impala.conf import IMPERSONATION_ENABLED
       can_impersonate_hdfs = IMPERSONATION_ENABLED.get()
@@ -301,19 +308,17 @@ class SampleTable(object):
 
   def _load_data_to_table(self, django_user, hql):
     LOG.info('Loading data into table "%s"' % (self.name,))
-    query = hql_query(hql)
 
-    try:
-      results = dbms.get(django_user, self.query_server).execute_and_wait(query)
-      if not results:
-        msg = _('Error loading table %(table)s: Operation timeout.') % {'table': self.name}
-        LOG.error(msg)
-        raise InstallException(msg)
-    except QueryServerException as ex:
-      msg = _('Error loading table %(table)s: %(error)s.') % {'table': self.name, 'error': ex}
-      LOG.error(msg)
-      raise InstallException(msg)
-
+    job = make_notebook(
+        name=_('Insert data in sample table %s') % self.name,
+        editor_type=self.interpreter['type'] if self.interpreter else self.dialect,
+        statement=hql,
+        status='ready',
+        database=self.db_name,
+        on_success_url='assist.db.refresh',
+        is_task=False,
+    )
+    job.execute_and_wait(self.request)
 
   def _get_sql_insert_values(self, f, columns=None):
     data = f.read()
