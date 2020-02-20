@@ -36,7 +36,7 @@ from useradmin.models import get_default_user_group, install_sample_user, User
 from beeswax.design import hql_query
 from beeswax.conf import LOCAL_EXAMPLES_DATA_DIR
 from beeswax.hive_site import has_concurrency_support
-from beeswax.models import SavedQuery, HQL, IMPALA
+from beeswax.models import SavedQuery, HQL, IMPALA, RDBMS
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config, QueryServerException
 
@@ -64,18 +64,14 @@ class Command(BaseCommand):
       user = options['user']
 
     tables = options['tables'] if 'tables' in options else ('tables_transactional.json' if has_concurrency_support() else 'tables.json')
-
     exception = None
 
-    # Documents will belong to this user but we run the install as the current user
     try:
-      sample_user = install_sample_user(user)
+      sample_user = install_sample_user(user)  # Documents will belong to this user but we run the install as the current user
       self._install_queries(sample_user, app_name, interpreter=interpreter)
       self._install_tables(user, app_name, db_name, tables, interpreter=interpreter)
     except Exception as ex:
       exception = ex
-
-    Document.objects.sync()
 
     if exception is not None:
       pretty_msg = None
@@ -109,8 +105,13 @@ class Command(BaseCommand):
     design_file.close()
 
     # Filter design list to app-specific designs
-    app_type = HQL if app_name == 'beeswax' else IMPALA if app_name == 'impala' else 'sql'
+    app_type = HQL if app_name == 'beeswax' else IMPALA if app_name == 'impala' else RDBMS
     design_list = [d for d in design_list if int(d['type']) == app_type]
+    if app_type == RDBMS:
+      design_list = [d for d in design_list if app_name in d['dialects']]
+
+    if not design_list:
+      raise InstallException(_('No %s queries are available as samples') % app_name)
 
     for design_dict in design_list:
       design = SampleQuery(design_dict)
@@ -406,6 +407,6 @@ class SampleQuery(object):
     elif type == IMPALA:
       return 'query-impala'
     elif interpreter:
-      return 'query-%(dialect)s' % interpreter
+      return 'query-%(type)s' % interpreter
     else:
       return None

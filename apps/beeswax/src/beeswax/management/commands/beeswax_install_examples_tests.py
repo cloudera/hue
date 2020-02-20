@@ -43,11 +43,11 @@ class TestStandardTables():
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
-  def test_install_queries(self):
+  def test_install_queries_mysql(self):
       design_dict = {
         "name": "TestStandardTables Query",
         "desc": "Small query",
-        "type": "0",
+        "type": "2",
         "dialects": ["postgresql", "mysql", "presto"],
         "data": {
           "query": {
@@ -73,7 +73,7 @@ class TestStandardTables():
 
         assert_true(Document2.objects.filter(name='TestStandardTables Query').exists())
         query = Document2.objects.filter(name='TestStandardTables Query').get()
-        assert_equal('query-hive', query.type)
+        assert_equal('query-mysql', query.type)
 
   # def test_install_queries(self):
   #     sample_user = install_sample_user()
@@ -81,6 +81,45 @@ class TestStandardTables():
   #     app_nam = 'mysql'
   #     interpreter = Mock()
   #     cmd._install_queries(sample_user, app_name, interpreter=interpreter)
+
+
+
+class TestBeswaxHiveTables():
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="test")
+
+  def test_install_queries(self):
+      design_dict = {
+        "name": "TestBeswaxHiveTables Query",
+        "desc": "Small query",
+        "type": "0",
+        "data": {
+          "query": {
+            "query": "SELECT 1",
+            "type": 0,
+            "email_notify": False,
+            "is_parameterized": False,
+            "database": "default"
+          },
+          "functions": [],
+          "VERSION": "0.4.1",
+          "file_resources": [],
+          "settings": []
+        }
+      }
+      interpreter = {'type': 'hive'}
+
+      design = SampleQuery(design_dict)
+      assert_false(Document2.objects.filter(name='TestBeswaxHiveTables Query').exists())
+
+      with patch('notebook.models.get_interpreter') as get_interpreter:
+        design.install(django_user=self.user, interpreter=interpreter)
+
+        assert_true(Document2.objects.filter(name='TestBeswaxHiveTables Query').exists())
+        query = Document2.objects.filter(name='TestBeswaxHiveTables Query').get()
+        assert_equal('query-hive', query.type)
 
 
 class TestTransactionalTables():

@@ -24,6 +24,7 @@ from django.db.models import Q
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
+from django.views.decorators.http import require_POST
 
 from beeswax.data_export import DOWNLOAD_COOKIE_AGE
 from beeswax.management.commands import beeswax_install_examples
@@ -374,26 +375,24 @@ def download(request):
   return response
 
 
+@require_POST
 @admin_required
 def install_examples(request):
   response = {'status': -1, 'message': ''}
 
-  if request.method == 'POST':
-    try:
-      connector = Connector.objects.get(id=request.POST.get('connector'))
-      if connector:
-        app_name = 'beeswax' if connector.dialect == 'hive' else connector.dialect
-        db_name = request.POST.get('db_name', 'default')
-        interpreter = get_interpreter(connector_type=connector.to_dict()['type'], user=request.user)
+  try:
+    connector = Connector.objects.get(id=request.POST.get('connector'))
+    if connector:
+      app_name = 'beeswax' if connector.dialect == 'hive' else connector.dialect
+      db_name = request.POST.get('db_name', 'default')
+      interpreter = get_interpreter(connector_type=connector.to_dict()['type'], user=request.user)
 
-        beeswax_install_examples.Command().handle(app_name=app_name, db_name=db_name, user=request.user, interpreter=interpreter)
-      else:
-        Command().handle(user=request.user)
-        response['status'] = 0
-    except Exception as err:
-      LOG.exception(err)
-      response['message'] = str(err)
-  else:
-    response['message'] = _('A POST request is required.')
+      beeswax_install_examples.Command().handle(app_name=app_name, db_name=db_name, user=request.user, interpreter=interpreter)
+    else:
+      Command().handle(user=request.user)
+    response['status'] = 0
+  except Exception as e:
+    LOG.exception('Error during Editor samples installation.')
+    response['message'] = str(e)
 
   return JsonResponse(response)
