@@ -46,12 +46,10 @@ class TestNotebook(object):
     query = Notebook()
     query.execute = Mock(return_value={'history_uuid': 1})
 
-
     query.check_status = Mock(
       side_effect=check_status_side_effect
     )
     request=Mock()
-
 
     resp = query.execute_and_wait(request=request)
     assert_equal(1, resp['uuid'])
