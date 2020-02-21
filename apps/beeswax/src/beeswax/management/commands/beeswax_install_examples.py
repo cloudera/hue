@@ -97,13 +97,14 @@ class Command(BaseCommand):
     table_file.close()
 
     for table_dict in table_list:
-      try:
-        table = SampleTable(table_dict, dialect, db_name, interpreter=interpreter, request=request)
-        table.install(django_user)
-      except Exception as ex:
-        msg = str(ex)
-        LOG.error(msg)
-        raise InstallException(_('Could not install table %s: %s') % (table_dict['table_name'], msg))
+      if dialect in table_dict.get('dialects', [dialect]):
+        try:
+          table = SampleTable(table_dict, dialect, db_name, interpreter=interpreter, request=request)
+          table.install(django_user)
+        except Exception as ex:
+          msg = str(ex)
+          LOG.error(msg)
+          raise InstallException(_('Could not install table %s: %s') % (table_dict['table_name'], msg))
 
   def _install_queries(self, django_user, dialect, interpreter=None):
     design_file = open(os.path.join(LOCAL_EXAMPLES_DATA_DIR.get(), 'queries.json'))
