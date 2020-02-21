@@ -613,6 +613,8 @@ def install_examples(request):
   if request.method == 'POST':
     try:
       dialect = get_app_name(request)
+      if dialect == 'beeswax':
+        dialect = 'hive'
       db_name = request.POST.get('db_name', 'default')
       connector_id = request.POST.get('connector_id')
       beeswax_install_examples.Command().handle(dialect=dialect, db_name=db_name, user=request.user)

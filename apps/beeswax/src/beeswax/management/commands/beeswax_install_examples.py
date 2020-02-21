@@ -63,8 +63,6 @@ class Command(BaseCommand):
       user = options['user']
       request = options['request']
 
-    if dialect == 'beeswax':
-      dialect = 'hive'
     tables = 'tables_standard.json' if dialect not in ('hive', 'impala') else (
         'tables_transactional.json' if has_concurrency_support() else 'tables.json'
     )
@@ -111,8 +109,8 @@ class Command(BaseCommand):
     design_list = json.load(design_file)
     design_file.close()
 
-    # Filter design list to app-specific designs
-    app_type = HQL if dialect == 'beeswax' else IMPALA if dialect == 'impala' else RDBMS
+    # Filter query list to HiveServer2 vs other interfaces
+    app_type = HQL if dialect == 'hive' else IMPALA if dialect == 'impala' else RDBMS
     design_list = [d for d in design_list if int(d['type']) == app_type]
     if app_type == RDBMS:
       design_list = [d for d in design_list if dialect in d['dialects']]

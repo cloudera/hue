@@ -397,7 +397,7 @@ def install_examples(request):
   try:
     connector = Connector.objects.get(id=request.POST.get('connector'))
     if connector:
-      dialect = 'beeswax' if connector.dialect == 'hive' else connector.dialect
+      dialect = connector.dialect
       db_name = request.POST.get('db_name', 'default')
       interpreter = get_interpreter(connector_type=connector.to_dict()['type'], user=request.user)
 
