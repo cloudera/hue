@@ -20,6 +20,7 @@ from builtins import object
 import json
 import sys
 
+from collections import OrderedDict
 from nose.tools import assert_equal, assert_true
 
 from desktop.lib.django_test_util import make_logged_in_client
@@ -33,9 +34,10 @@ else:
   from mock import patch, Mock, MagicMock
 
 
-table_properties_py2 = '"transactional" = "false", "skip.header.line.count" = "1"'
-table_properties_py3 = '"skip.header.line.count" = "1", "transactional" = "false"'
-is_py3 = sys.version_info[0] > 2
+TABLE_PROPERTIES = [
+  '%s = %s' % (key, val)
+  for key, val in OrderedDict({"transactional": "false", "skip.header.line.count": "1"}).items()
+]
 
 
 class TestSQLIndexer(object):
@@ -158,7 +160,7 @@ ROW FORMAT   DELIMITED
     COLLECTION ITEMS TERMINATED BY '\\002'
     MAP KEYS TERMINATED BY '\\003'
   STORED AS TextFile TBLPROPERTIES(%s)
-;''' % table_properties_py3 if is_py3 else  table_properties_py2
+;''' % TABLE_PROPERTIES
   assert_true(statement in sql, sql)
 
   assert_true('''LOAD DATA INPATH '/user/romain/customer_stats.csv' INTO TABLE `default`.`customer_stats` PARTITION (new_field_1='AAA');''' in  sql, sql)
@@ -196,7 +198,7 @@ def test_generate_create_kudu_table_with_data():
 ROW FORMAT   DELIMITED
     FIELDS TERMINATED BY ','
   STORED AS TextFile LOCATION '/A'
-TBLPROPERTIES(%s)''' % table_properties_py3 if is_py3 else  table_properties_py2
+TBLPROPERTIES(%s)''' % TABLE_PROPERTIES
   assert_true(statement in sql in sql, sql)
 
   assert_true('''CREATE TABLE `default`.`index_data` COMMENT "Big Data"
@@ -234,7 +236,7 @@ def test_generate_create_parquet_table():
     MAP KEYS TERMINATED BY '\\003'
   STORED AS TextFile LOCATION '/user/hue/data'
 TBLPROPERTIES(%s)
-;''' % table_properties_py3 if is_py3 else  table_properties_py2
+;''' % TABLE_PROPERTIES
   assert_true(statement in  sql, sql)
 
   assert_true('''CREATE TABLE `default`.`parquet_table`
@@ -271,7 +273,7 @@ def test_generate_create_orc_table_transactional():
     MAP KEYS TERMINATED BY '\\003'
   STORED AS TextFile LOCATION '/user/hue/data'
 TBLPROPERTIES(%s)
-;''' % table_properties_py3 if is_py3 else  table_properties_py2
+;''' % TABLE_PROPERTIES
   assert_true(statement in sql in  sql, sql)
 
   assert_true('''CREATE TABLE `default`.`parquet_table`
