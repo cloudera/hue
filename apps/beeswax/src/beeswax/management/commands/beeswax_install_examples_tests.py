@@ -84,7 +84,7 @@ class TestStandardTables():
 
 
 
-class TestBeswaxHiveTables():
+class TestHiveServer2():
 
   def setUp(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
@@ -120,6 +120,23 @@ class TestBeswaxHiveTables():
         assert_true(Document2.objects.filter(name='TestBeswaxHiveTables Query').exists())
         query = Document2.objects.filter(name='TestBeswaxHiveTables Query').get()
         assert_equal('query-hive', query.type)
+
+
+  def test_create_table_load_data_but_no_fs(self):
+    table_data =   {
+      "data_file": "sample_07.csv",
+      "create_sql": "CREATE TABLE `sample_07` (\n  `code` string ,\n  `description` string ,\n  `total_emp` int ,\n  `salary` int )\nSTORED AS parquet\nTBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')\n",
+      "table_name": "sample_07",
+    }
+
+    with patch('beeswax.management.commands.beeswax_install_examples.make_notebook') as make_notebook:
+      with patch('beeswax.management.commands.beeswax_install_examples.has_concurrency_support') as has_concurrency_support:
+        has_concurrency_support.return_value = True
+
+        SampleTable(table_data, 'hive', 'default').install(self.user)
+
+        make_notebook.assert_not_called()
+
 
 
 class TestTransactionalTables():

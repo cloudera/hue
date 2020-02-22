@@ -295,8 +295,11 @@ class Notebook(object):
       Check status until it finishes or timeouts.
       """
       handle = self.execute(request, batch=False)
-      operation_id = handle['history_uuid']
 
+      if handle['status'] != 0:
+        raise QueryError(e, message='SQL statement failed.', handle=handle)
+
+      operation_id = handle['history_uuid']
       curr = time.time()
       end = curr + timeout_sec
 
@@ -310,7 +313,7 @@ class Notebook(object):
         time.sleep(sleep_interval)
         curr = time.time()
 
-      # Query timed out
+      # TODO
       # msg = "The query timed out after %(timeout)d seconds, canceled query." % {'timeout': timeout_sec}
       # LOG.warning(msg)
       # try:
