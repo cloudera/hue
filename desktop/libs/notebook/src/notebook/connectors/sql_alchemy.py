@@ -153,11 +153,11 @@ class SqlAlchemyApi(Api):
 
     return {
       'sync': False,
-      'has_result_set': True,
+      'has_result_set': result.cursor != None,
       'modified_row_count': 0,
       'guid': guid,
       'result': {
-        'has_more': True,
+        'has_more': result.cursor != None,
         'data': [],
         'meta': cache['meta'],
         'type': 'table'

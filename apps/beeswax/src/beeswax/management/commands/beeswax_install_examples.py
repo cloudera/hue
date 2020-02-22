@@ -94,15 +94,20 @@ class Command(BaseCommand):
     table_list = json.load(table_file)
     table_file.close()
 
+    table_list = [table_dict for table_dict in table_list if dialect in table_dict.get('dialects', [dialect])]
+
+    if not table_list:
+      raise InstallException(_('No %s tables are available as samples') % dialect)
+
     for table_dict in table_list:
-      if dialect in table_dict.get('dialects', [dialect]):
-        try:
-          table = SampleTable(table_dict, dialect, db_name, interpreter=interpreter, request=request)
-          table.install(django_user)
-        except Exception as ex:
-          msg = str(ex)
-          LOG.error(msg)
-          raise InstallException(_('Could not install table %s: %s') % (table_dict['table_name'], msg))
+      try:
+        table = SampleTable(table_dict, dialect, db_name, interpreter=interpreter, request=request)
+        table.install(django_user)
+      except Exception as ex:
+        msg = str(ex)
+        LOG.error(msg)
+        raise InstallException(_('Could not install table %s: %s') % (table_dict['table_name'], msg))
+
 
   def _install_queries(self, django_user, dialect, interpreter=None):
     design_file = open(os.path.join(LOCAL_EXAMPLES_DATA_DIR.get(), 'queries.json'))
@@ -159,6 +164,10 @@ class SampleTable(object):
 
 
   def install(self, django_user):
+    if not (has_concurrency_support() and self.is_transactional) and not cluster.get_hdfs():
+      LOG.warn('Skipping table %s as requiring a File System to load its data' % self.name)
+      return
+
     self.create(django_user)
 
     if self.partition_files:
@@ -188,7 +197,7 @@ class SampleTable(object):
       job.execute_and_wait(self.request)
     except Exception as ex:
       if 'already exists' in str(ex):
-        LOG.warn('Table %s already exists' % self.name)
+        LOG.warn('Table %s.%s already exists' % (self.db_name, self.name))
       else:
         raise ex
 
