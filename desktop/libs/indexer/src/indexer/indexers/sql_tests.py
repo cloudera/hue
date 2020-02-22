@@ -27,9 +27,83 @@ from useradmin.models import User
 
 from indexer.indexers.sql import SQLIndexer
 
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock, MagicMock
+else:
+  from mock import patch, Mock, MagicMock
+
+
 table_properties_py2 = '"transactional" = "false", "skip.header.line.count" = "1"'
 table_properties_py3 = '"skip.header.line.count" = "1", "transactional" = "false"'
 is_py3 = sys.version_info[0] > 2
+
+
+class TestSQLIndexer(object):
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="empty", recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="test")
+
+
+  def test_create_table_from_a_file_to_csv(self):
+    fs = Mock(
+      stats=Mock(return_value={'mode': 0o0777})
+    )
+
+    def source_dict(key):
+      return {
+        'path': 'hdfs:///path/data.csv',
+        'format': {'quoteChar': '"', 'fieldSeparator': ','},
+        'sampleCols': [{u'operations': [], u'comment': u'', u'name': u'customers.id'}],
+        'sourceType': 'hive'
+      }.get(key, Mock())
+    source = MagicMock()
+    source.__getitem__.side_effect = source_dict
+
+    def destination_dict(key):
+      return {
+        'name': 'default.export_table',
+        'tableFormat': 'csv',
+        'importData': True,
+        'nonDefaultLocation': '/user/hue/customer_stats.csv',
+        'columns': [{'name': 'id', 'type': 'int'}],
+        'partitionColumns': [{'name': 'day', 'type': 'date', 'partitionValue': '20200101'}],
+        'description': 'No comment!',
+        'sourceType': 'hive-1'
+      }.get(key, Mock())
+    destination = MagicMock()
+    destination.__getitem__.side_effect = destination_dict
+
+    with patch('notebook.models.get_interpreter') as get_interpreter:
+      notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(source, destination)
+
+    assert_equal(
+      [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
+
+CREATE TABLE `default`.`hue__tmp_export_table`
+(
+  `id` int ) COMMENT "No comment!"
+PARTITIONED BY (
+  `day` date )
+ROW FORMAT   SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+  WITH SERDEPROPERTIES ("separatorChar" = ",",
+    "quoteChar"     = """,
+    "escapeChar"    = "\\\\"
+    )
+  STORED AS TextFile TBLPROPERTIES("skip.header.line.count" = "1", "transactional" = "false")
+;
+
+LOAD DATA INPATH 'hdfs:///path/data.csv' INTO TABLE `default`.`hue__tmp_export_table` PARTITION (day='20200101');
+
+CREATE TABLE `default`.`export_table` COMMENT "No comment!"
+        STORED AS csv
+TBLPROPERTIES("transactional"="true", "transactional_properties"="insert_only")
+        AS SELECT *
+        FROM `default`.`hue__tmp_export_table`;
+
+DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')],
+    [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')]
+  )
 
 
 class MockRequest(object):
