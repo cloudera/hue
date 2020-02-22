@@ -52,45 +52,30 @@ class TestNotebook(object):
     request=Mock()
 
     resp = query.execute_and_wait(request=request)
-    assert_equal(1, resp['uuid'])
+    assert_equal(1, resp['history_uuid'])
     assert_equal(2, query.check_status.call_count)
 
 
   def test_check_status(self):
     query = Notebook()
 
-    notebook = MagicMock()
-    def notebook_side_effect(key):
-      if key == 'type':
-        return 'query-hive'
-      elif key == 'uuid':
-        return 'uuid-1'
-      else:
-        return Mock()
-    notebook.__getitem__.side_effect = notebook_side_effect
-    snippet = MagicMock()
-    def snippet_side_effect(key):
-      if key == 'status':
-        return 0
-      else:
-        return Mock()
-    snippet.__getitem__.side_effect = snippet_side_effect
     request=Mock()
+    operation_id = Mock()
 
     with patch('notebook.api.Document2.objects.get_by_uuid') as get_by_uuid:
       with patch('notebook.api.get_api') as get_api:
-        with patch('notebook.api.Notebook') as Notebook2:
+        with patch('notebook.api.Notebook') as NotebookMock:
           get_api.return_value=Mock(
             check_status=Mock(return_value={'status': 0})
           )
-          resp = query.check_status(request=request, notebook=notebook, snippet=snippet)
+          resp = query.check_status(request=request, operation_id=operation_id)
 
           assert_equal(0, resp['status'])
           assert_equal(0, resp['query_status']['status'])
 
 
 iteration = 0
-def check_status_side_effect(request, snippet):
+def check_status_side_effect(request, operation_id):
   """First time query is still running, second time the execution is finished."""
   global iteration
 
