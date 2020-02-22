@@ -133,16 +133,17 @@ class TestTransactionalTables():
     table_data =   {
       "data_file": "sample_07.csv",
       "create_sql": "CREATE TABLE `sample_07` (\n  `code` string ,\n  `description` string ,\n  `total_emp` int ,\n  `salary` int )\nSTORED AS parquet\nTBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')\n",
-      "table_name": "sample_07"
+      "table_name": "sample_07",
+      "transactional": True
     }
 
-    with patch('beeswax.server.dbms.get') as get:
+    with patch('beeswax.management.commands.beeswax_install_examples.make_notebook') as make_notebook:
       with patch('beeswax.management.commands.beeswax_install_examples.has_concurrency_support') as has_concurrency_support:
         has_concurrency_support.return_value = True
 
-        SampleTable(table_data, 'beeswax', 'default').install(self.user)
+        SampleTable(table_data, 'hive', 'default').install(self.user)
 
-        get.assert_called()
+        make_notebook.assert_called()
 
 
   def test_load_web_logs_with_concurrency_support(self):
@@ -155,13 +156,14 @@ class TestTransactionalTables():
       },
       "create_sql": "CREATE TABLE `web_logs`  (  `_version_` bigint,   `app` string,   `bytes` int,   `city` string,   `client_ip` string,   `code` smallint,   `country_code` string,   `country_code3` string,   `country_name` string,   `device_family` string,   `extension` string,   `latitude` float,   `longitude` float,   `method` string,   `os_family` string,   `os_major` string,   `protocol` string,   `record` string,   `referer` string,   `region_code` string,   `request` string,   `subapp` string,   `time` string,   `url` string,   `user_agent` string,   `user_agent_family` string,   `user_agent_major` string,   `id` string)\nPARTITIONED BY (  `date` string  )\nSTORED AS parquet\nTBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')",
       "table_name": "web_logs",
-      "columns": [{"name": "_version_", "type": "bigint"}, {"name": "app", "type": "string"}, {"name": "bytes", "type": "int"}, {"name": "city", "type": "string"}, {"name": "client_ip", "type": "string"}, {"name": "code", "type": "smallint"}, {"name": "country_code", "type": "string"}, {"name": "country_code3", "type": "string"}, {"name": "country_name", "type": "string"}, {"name": "device_family", "type": "string"}, {"name": "extension", "type": "string"}, {"name": "latitude", "type": "float"}, {"name": "longitude", "type": "float"}, {"name": "method", "type": "string"}, {"name": "os_family", "type": "string"}, {"name": "os_major", "type": "string"}, {"name": "protocol", "type": "string"}, {"name": "record", "type": "string"}, {"name": "referer", "type": "string"}, {"name": "region_code", "type": "string"}, {"name": "request", "type": "string"}, {"name": "subapp", "type": "string"}, {"name": "time", "type": "string"}, {"name": "url", "type": "string"}, {"name": "user_agent", "type": "string"}, {"name": "user_agent_family", "type": "string"}, {"name": "user_agent_major", "type": "string"}, {"name": "id", "type": "string"}, {"name": "date", "type": "string"}]
+      "columns": [{"name": "_version_", "type": "bigint"}, {"name": "app", "type": "string"}, {"name": "bytes", "type": "int"}, {"name": "city", "type": "string"}, {"name": "client_ip", "type": "string"}, {"name": "code", "type": "smallint"}, {"name": "country_code", "type": "string"}, {"name": "country_code3", "type": "string"}, {"name": "country_name", "type": "string"}, {"name": "device_family", "type": "string"}, {"name": "extension", "type": "string"}, {"name": "latitude", "type": "float"}, {"name": "longitude", "type": "float"}, {"name": "method", "type": "string"}, {"name": "os_family", "type": "string"}, {"name": "os_major", "type": "string"}, {"name": "protocol", "type": "string"}, {"name": "record", "type": "string"}, {"name": "referer", "type": "string"}, {"name": "region_code", "type": "string"}, {"name": "request", "type": "string"}, {"name": "subapp", "type": "string"}, {"name": "time", "type": "string"}, {"name": "url", "type": "string"}, {"name": "user_agent", "type": "string"}, {"name": "user_agent_family", "type": "string"}, {"name": "user_agent_major", "type": "string"}, {"name": "id", "type": "string"}, {"name": "date", "type": "string"}],
+      "transactional": True
     }
 
-    with patch('beeswax.server.dbms.get') as get:
+    with patch('beeswax.management.commands.beeswax_install_examples.make_notebook') as make_notebook:
       with patch('beeswax.management.commands.beeswax_install_examples.has_concurrency_support') as has_concurrency_support:
         has_concurrency_support.return_value = True
 
-        SampleTable(table_data, 'beeswax', 'default').install(self.user)
+        SampleTable(table_data, 'hive', 'default').install(self.user)
 
-        get.assert_called()
+        make_notebook.assert_called()
