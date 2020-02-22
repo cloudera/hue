@@ -171,7 +171,9 @@ class SQLIndexer(object):
     tbl_properties = OrderedDict()
     if skip_header:
       tbl_properties['skip.header.line.count'] = '1'
-    tbl_properties['transactional'] = 'false' # The temp table is not transactional, but final table can be if is_transactional. tbl_properties that don't exist in previous versions can safely be added without error
+    # The temp table is not transactional, but final table can be if is_transactional.
+    # tbl_properties that don't exist in previous versions can safely be added without error.
+    tbl_properties['transactional'] = 'false'
 
     sql += django_mako.render_to_string("gen/create_table_statement.mako", {
         'table': {
