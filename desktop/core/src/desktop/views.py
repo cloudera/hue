@@ -21,6 +21,7 @@ import json
 import logging
 import os
 import re
+import six
 import socket
 import sys
 import tempfile
@@ -590,7 +591,7 @@ def _get_config_errors(request, cache=True):
       try:
         for confvar, error in validator(request.user):
           error = {
-            'name': confvar if isinstance(confvar, str) else confvar.get_fully_qualifying_key(),
+            'name': confvar if isinstance(confvar, six.string_types) else confvar.get_fully_qualifying_key(),
             'message': error,
           }
 
@@ -609,6 +610,7 @@ def _get_config_errors(request, cache=True):
     LOG.warn("Errors in config : %s" % _CONFIG_ERROR_LIST)
 
   return _CONFIG_ERROR_LIST
+
 
 def validate_by_spec(error_list):
   configspec = None

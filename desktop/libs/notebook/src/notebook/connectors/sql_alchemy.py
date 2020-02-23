@@ -137,6 +137,7 @@ class SqlAlchemyApi(Api):
 
     engine = self._create_engine()
     connection = engine.connect()
+
     result = connection.execution_options(stream_results=True).execute(snippet['statement'])
 
     cache = {

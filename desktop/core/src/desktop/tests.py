@@ -71,14 +71,14 @@ from desktop.middleware import DJANGO_VIEW_AUTH_WHITELIST
 from desktop.models import Directory, Document, Document2, get_data_link, _version_from_properties, ClusterConfig, HUE_VERSION
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
-from desktop.views import check_config, home, generate_configspec, load_confs, collect_validation_messages
+from desktop.views import check_config, home, generate_configspec, load_confs, collect_validation_messages, _get_config_errors
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
   from unittest.mock import patch, Mock
 else:
   from cStringIO import StringIO as string_io
-  from mock import patch, Mock, MagicMock
+  from mock import patch, Mock
 
 
 LOG = logging.getLogger(__name__)
@@ -1451,6 +1451,7 @@ def test_db_migrations_sqlite():
     finally:
       del DATABASES[name]
 
+
 def test_db_migrations_mysql():
   if desktop.conf.DATABASE.ENGINE.get().find('mysql') < 0:
     raise SkipTest
@@ -1491,3 +1492,30 @@ def test_db_migrations_mysql():
       raise e
     finally:
       del DATABASES[name]
+
+
+class TestGetConfigErrors():
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="empty", recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="test")
+
+  def test_get_config_errors_unicode(self):
+    """
+    Avoid a Python 2 issue:
+    AttributeError: 'unicode' object has no attribute 'get_fully_qualifying_key'
+    """
+    request = Mock(user=self.user)
+
+    with patch('desktop.views.appmanager') as appmanager:
+      appmanager.DESKTOP_MODULES = [
+        Mock(
+          conf=Mock(
+            config_validator=lambda user: [(u'Connector 1', 'errored because of ...')]
+          )
+        )
+      ]
+      assert_equal(
+        [{'name': 'Connector 1', 'message': 'errored because of ...'}],
+        _get_config_errors(request, cache=False)
+      )
