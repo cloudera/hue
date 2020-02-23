@@ -19,8 +19,7 @@
 from __future__ import absolute_import
 from future import standard_library
 standard_library.install_aliases()
-from builtins import range
-from builtins import object
+from builtins import range, object
 import json
 import logging
 import os
