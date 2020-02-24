@@ -5,11 +5,15 @@ draft: false
 weight: 2
 ---
 
+All of these connectors come out of the box.
+
+Looking at improving or adding a new one? Go check the **[connector API section](/developer/connectors/)**!
+
 ## Databases
 
 Hue connect to any database or warehouse via native connectors or SqlAlchemy.
 
-Read about building some [better autocompletes](/developer/parsers/) or extending the connectors with SQL Alchemy, JDBC or building your own [connectors](/developer/sdk).
+Read about [how to build your own parser](/developer/parsers/) if you are looking at better autocompletes for your own SQL dialects.
 
 ### Apache Impala
 

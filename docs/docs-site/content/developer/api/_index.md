@@ -52,9 +52,9 @@ Once the request is successful then capture headers and cookies for subsequent r
 
 ### Data Catalog
 
-The [metadata API](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata) is powering [Search and Tagging here](/user/browsing/#data-catalogs).
+The [metadata API](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata) is powering the external [Catalog integrations](/user/browsing/#data-catalogs).
 
-See the backends API in the [data catalog connector](/developer/connectors/#data-catalog) section.
+Additional catalogs can be integrated via some [connectors](/developer/connectors/#data-catalog).
 
 #### Searching for entities
 
