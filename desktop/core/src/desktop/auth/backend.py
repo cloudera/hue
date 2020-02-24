@@ -53,8 +53,8 @@ from desktop.conf import AUTH, LDAP, OIDC, ENABLE_ORGANIZATIONS
 from desktop.settings import LOAD_BALANCER_COOKIE
 
 from useradmin import ldap_access
-from useradmin.organization import default_organization
-from useradmin.models import get_profile, get_default_user_group, UserProfile, User, get_organization
+from useradmin.models import get_profile, get_default_user_group, UserProfile, User
+from useradmin.organization import get_organization
 
 
 LOG = logging.getLogger(__name__)
@@ -70,7 +70,7 @@ def load_augmentation_class():
   try:
     class_name = AUTH.USER_AUGMENTOR.get()
     i = class_name.rfind('.')
-    module, attr = class_name[:i], class_name[i+1:]
+    module, attr = class_name[:i], class_name[i + 1:]
     mod = import_module(module)
     klass = getattr(mod, attr)
     LOG.info("Augmenting users with class: %s" % (klass,))
@@ -162,35 +162,30 @@ class DefaultUserAugmentor(object):
 
 
 def find_user(username):
-  lookup = {'email': username} if ENABLE_ORGANIZATIONS.get() else {'username': username}
-
   try:
-    user = User.objects.get(**lookup)
-    LOG.debug("Found user %s in the db" % username)
+    user = User.objects.get(username=username)
+    LOG.debug("Found user %s" % username)
   except User.DoesNotExist:
     user = None
   return user
 
 
 def create_user(username, password, is_superuser=True):
-  if ENABLE_ORGANIZATIONS.get():
-    organization = get_organization(email=username)
-    lookup = {'email': username, 'organization': organization}
-  else:
-    lookup = {'username': username}
-
-  LOG.info("Materializing user %s in the database" % lookup)
-
-  user = User(**lookup)
+  user = User(username=username, is_superuser=is_superuser)
 
   if password is None:
     user.set_unusable_password()
   else:
     user.set_password(password)
 
-  user.is_superuser = is_superuser
+  if ENABLE_ORGANIZATIONS.get():
+    user.email = username
+    organization = get_organization(email=username)
+    user.organization = organization
 
   user.save()
+
+  LOG.info("User %s was created." % username)
 
   if ENABLE_ORGANIZATIONS.get():
     user.is_admin = is_superuser or not organization.organizationuser_set.exists() or not organization.is_multi_user

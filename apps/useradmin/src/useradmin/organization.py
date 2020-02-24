@@ -32,7 +32,7 @@ LOG = logging.getLogger(__name__)
 
 def default_organization():
   from useradmin.models import Organization
-  default_organization, created = Organization.objects.get_or_create(name='default', domain='default')
+  default_organization, created = Organization.objects.get_or_create(name='default', domain='default')  # Used in SyncDb currently
   return default_organization
 
 
@@ -57,10 +57,6 @@ def _fitered_queryset(queryset, by_owner=False):
 
   return queryset
 
-
-"""
-Organizations handle contained sets of setups (user, group, connectors...).
-"""
 
 def get_organization(email, is_multi_user=False):
   domain = email.split('@')[1] if is_multi_user else email
@@ -89,6 +85,14 @@ class OrganizationManager(models.Manager):
 
 if ENABLE_ORGANIZATIONS.get():
   class Organization(models.Model):
+    """
+    Organizations handle contained sets of setups (user, group, connectors...).
+
+    An external user create an account and gets attached to its single user organization and becomes its admin. The organization can
+    be later converted to a multi user organization (if the domain name is owned by the first user).
+
+    An organization admin is not a Hue admin. The later is the true super user and has access to the server logs and metrics.
+    """
     name = models.CharField(max_length=200, help_text=_t("The name of the organization"), unique=True)
     uuid = models.CharField(default=uuid_default, max_length=36, unique=True)
     domain = models.CharField(max_length=200, help_text=_t("The domain name of the organization, e.g. gethue.com"), unique=True)
