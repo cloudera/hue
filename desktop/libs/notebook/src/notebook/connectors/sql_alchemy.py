@@ -169,10 +169,15 @@ class SqlAlchemyApi(Api):
     guid = snippet['result']['handle']['guid']
     connection = CONNECTION_CACHE.get(guid)
 
+    response = {'status': 'canceled'}
+
     if connection:
-      return {'status': 'available'}
-    else:
-      return {'status': 'canceled'}
+      if snippet['result']['handle']['has_result_set']:
+        response['status'] = 'available'
+      else:
+        response['status'] = 'success'
+
+    return response
 
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
