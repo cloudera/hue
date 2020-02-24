@@ -303,11 +303,9 @@ class SqlAlchemyApi(Api):
     response = {'status': -1, 'result': {}}
 
     metadata, sample_data = assist.get_sample_data(database, table, column=column, operation=operation)
-    has_result_set = sample_data is not None
 
-    if sample_data:
-      response['status'] = 0
-      response['rows'] = escape_rows(sample_data)
+    response['status'] = 0
+    response['rows'] = escape_rows(sample_data)
 
     if table and operation != 'hello':
       columns = assist.get_columns(database, table)

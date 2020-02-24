@@ -220,10 +220,7 @@ def execute(request, engine=None):
 
     response = _execute_notebook(request, notebook, snippet)
 
-    span.set_tag(
-      'query-id',
-      response['handle']['guid'] if response.get('handle') and response['handle'].get('guid') else None
-    )
+    span.set_tag('query-id', response.get('handle', {}).get('guid'))
 
   return JsonResponse(response)
 
