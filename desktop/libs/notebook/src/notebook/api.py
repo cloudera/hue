@@ -163,7 +163,8 @@ def _execute_notebook(request, notebook, snippet):
         if 'id' in active_executable: # Editor v2
           # notebook_executable is the 1-to-1 match of active_executable in the notebook structure
           notebook_executable = [e for e in _snippet['executor']['executables'] if e['id'] == active_executable['id']][0]
-          notebook_executable['handle'] = response['handle']
+          if 'handle' in response:
+            notebook_executable['handle'] = response['handle']
           if history:
             notebook_executable['history'] = {
               'id': history.id,
