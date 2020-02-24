@@ -358,7 +358,7 @@ ${ layout.menubar(section='connectors') }
       <tbody data-bind="foreach: settings">
         <tr>
           <td data-bind="text: name"></td>
-          <td><input data-bind="value: value"></td>
+          <td><input data-bind="value: value" class="input-xxlarge"></td>
         </tr>
       </tbody>
     </table>
