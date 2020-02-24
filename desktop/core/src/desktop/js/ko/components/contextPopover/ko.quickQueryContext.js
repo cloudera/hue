@@ -81,7 +81,8 @@ const TEMPLATE = `
               availableDatabases: $parent.availableDatabases,
               namespace: $parent.namespace,
               compute: $parent.compute,
-              executor: $parent.executor
+              executor: $parent.executor,
+              activeExecutable: $parent.activeExecutable
             }
           }
         "></div>

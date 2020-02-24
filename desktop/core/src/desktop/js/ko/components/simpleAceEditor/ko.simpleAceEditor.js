@@ -20,6 +20,7 @@ import * as ko from 'knockout';
 import AceLocationHandler from 'ko/bindings/ace/aceLocationHandler';
 import componentUtils from 'ko/components/componentUtils';
 import hueUtils from 'utils/hueUtils';
+import huePubSub from 'utils/huePubSub';
 import SolrFormulaAutocompleter from './solrFormulaAutocompleter';
 import SolrQueryAutocompleter from './solrQueryAutocompleter';
 import SqlAutocompleter from 'sql/sqlAutocompleter';
@@ -81,6 +82,21 @@ class SimpleAceEditor {
     editor.$blockScrolling = Infinity;
     editor.setTheme($.totalStorage('hue.ace.theme') || 'ace/theme/hue');
     self.ace(editor);
+
+    if (params.activeExecutable) {
+      editor.commands.addCommand({
+        name: 'execute',
+        bindKey: { win: 'Ctrl-Enter', mac: 'Command-Enter|Ctrl-Enter' },
+        exec: async () => {
+          huePubSub.publish('hue.ace.autocompleter.hide');
+          const executable = params.activeExecutable();
+          if (executable) {
+            await executable.reset();
+            executable.execute();
+          }
+        }
+      });
+    }
 
     if (params.autocomplete && ko.unwrap(params.autocomplete)) {
       const autocomplete = ko.unwrap(params.autocomplete);
