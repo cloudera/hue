@@ -127,7 +127,7 @@ class JobBrowserPanel {
     let lastScheduleBrowserRequest = undefined;
     const checkScheduleBrowserStatus = function() {
       return $.post(
-        '/jobbrowser/api/jobs',
+        '/desktop/api/schedule/list',
         {
           interface: ko.mapping.toJSON('schedules'),
           filters: ko.mapping.toJSON([

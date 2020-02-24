@@ -342,7 +342,7 @@ def config_validator(user, interpreters=None):
         data = json.loads(response.content)
 
         if data['status'] != 0:
-          raise Exception(data['message'])
+          raise Exception(data)
       except Exception as e:
         trace = str(e)
         msg = "Testing the connector connection failed."
