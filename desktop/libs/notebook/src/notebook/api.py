@@ -243,7 +243,7 @@ def check_status(request):
     span.set_tag('user-id', request.user.username)
     span.set_tag(
       'query-id',
-      snippet['result']['handle']['guid'] if snippet['result'].get('handle') and snippet['result']['handle'].get('guid') else None
+      snippet.get('result', {}).get('handle', {}).get('guid')
     )
 
     response = _check_status(request, notebook=notebook, snippet=snippet, operation_id=operation_id)
