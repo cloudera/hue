@@ -73,6 +73,7 @@ class SimpleResultGrid extends DisposableComponent {
 
     this.scrollable = params.scrollable || element.parentElement;
     this.contained = typeof params.contained !== 'undefined' ? params.contained : true;
+    this.resultGrayedOut = false;
 
     this.hasMore = ko.observable(false);
     this.status = ko.observable();
@@ -248,6 +249,7 @@ class SimpleResultGrid extends DisposableComponent {
           try {
             await this.fetchRows(100, false);
           } finally {
+            this.showNormalResult();
             fetchingRows = false;
           }
         }
@@ -342,19 +344,27 @@ class SimpleResultGrid extends DisposableComponent {
   }
 
   showGrayedOutResult() {
+    if (this.resultGrayedOut) {
+      return;
+    }
     const $wrapper = this.getWrapperElement();
     $wrapper.find('.fixed-first-column').css({ opacity: '0' });
     $wrapper.find('.fixed-header-row').css({ opacity: '0' });
     $wrapper.find('.fixed-first-cell').css({ opacity: '0' });
     $wrapper.find('.resultTable').css({ opacity: '0.55' });
+    this.resultGrayedOut = true;
   }
 
   showNormalResult() {
+    if (!this.resultGrayedOut) {
+      return;
+    }
     const $wrapper = this.getWrapperElement();
     $wrapper.find('.fixed-first-column').css({ opacity: '1' });
     $wrapper.find('.fixed-header-row').css({ opacity: '1' });
     $wrapper.find('.fixed-first-cell').css({ opacity: '1' });
     $wrapper.find('.resultTable').css({ opacity: '1' });
+    this.resultGrayedOut = false;
   }
 }
 
