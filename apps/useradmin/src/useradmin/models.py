@@ -304,7 +304,8 @@ def update_app_permissions(**kwargs):
       )
 
 
-models.signals.post_migrate.connect(update_app_permissions)
+if not ENABLE_CONNECTORS.get():
+  models.signals.post_migrate.connect(update_app_permissions)
 # models.signals.post_migrate.connect(get_default_user_group)
 
 

@@ -30,15 +30,9 @@ from desktop.conf import ENABLE_ORGANIZATIONS
 LOG = logging.getLogger(__name__)
 
 
-def default_organization():
-  from useradmin.models import Organization
-  default_organization, created = Organization.objects.get_or_create(name='default', domain='default')  # Used in SyncDb currently
-  return default_organization
-
-
 def get_user_request_organization():
   request = CrequestMiddleware.get_request()
-  return request.user.organization if request and hasattr(request, 'user') and request.user.is_authenticated() else default_organization()
+  return request.user.organization if request and hasattr(request, 'user') and request.user.is_authenticated() else None
 
 
 def _fitered_queryset(queryset, by_owner=False):
@@ -66,7 +60,7 @@ def get_organization(email, is_multi_user=False):
     LOG.info("Materializing organization %s in the database, is_multi_user=%s" % (domain, is_multi_user))
   else:
     LOG.warn('No organization domain found for email %s' % email)  # For Backends without emails or when organization enabled by default
-    organization = default_organization()
+    organization = None
 
   return organization
 
@@ -162,8 +156,11 @@ class UserManager(BaseUserManager):
 
     request = CrequestMiddleware.get_request()
 
-    if request and hasattr(request, 'user') and hasattr(request.user, '_wrapped') and type(request.user._wrapped) is not object:  # Avoid infinite recursion
-      kwargs['organization'] = get_user_request_organization()
+    # Avoid infinite recursion
+    if request and hasattr(request, 'user') and hasattr(request.user, '_wrapped') and type(request.user._wrapped) is not object:
+      organization = get_user_request_organization()
+      if organization:
+        kwargs['organization'] = organization
 
     return super(UserManager, self).get(*args, **kwargs)
 
@@ -177,17 +174,14 @@ class UserManager(BaseUserManager):
 
   def filter(self, *args, **kwargs):
     f = super(UserManager, self).filter(*args, **kwargs)
-    # f.values_list = self.values_list  # Patch so that chaining after a filter is backward compatible
+    # f.values_list = self.values_list  # Patch so that chaining after a filter is backward compatible. However creates wrong result.
     return f
 
   def values_list(self, *args, **kwargs):
-    print(args)
-    print(kwargs)
     if 'username' in args:
       args = list(args)
       args.remove('username')
       args.append('email')
-    print(args)
 
     return super(UserManager, self).values_list(*args, **kwargs)
 
