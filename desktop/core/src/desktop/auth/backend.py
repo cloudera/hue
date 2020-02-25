@@ -162,34 +162,41 @@ class DefaultUserAugmentor(object):
 
 
 def find_user(username):
+  lookup = {'email': username} if ENABLE_ORGANIZATIONS.get() else {'username': username}
+
   try:
-    user = User.objects.get(username=username)
-    LOG.debug("Found user %s" % username)
+    user = User.objects.get(**lookup)
+    LOG.debug("Found user %s" % user)
   except User.DoesNotExist:
     user = None
+
   return user
 
 
 def create_user(username, password, is_superuser=True):
-  user = User(username=username, is_superuser=is_superuser)
+  if ENABLE_ORGANIZATIONS.get():
+    organization = get_organization(email=username)
+    attrs = {'email': username, 'organization': organization}
+  else:
+    attrs = {'username': username}
+
+  user = User(**attrs)
 
   if password is None:
     user.set_unusable_password()
   else:
     user.set_password(password)
 
+  user.is_superuser = is_superuser
+
   if ENABLE_ORGANIZATIONS.get():
-    user.email = username
-    organization = get_organization(email=username)
-    user.organization = organization
+    user.is_admin = is_superuser or not organization.organizationuser_set.exists() or not organization.is_multi_user
+    user.save()
+    ensure_has_a_group(user)
 
   user.save()
 
   LOG.info("User %s was created." % username)
-
-  if ENABLE_ORGANIZATIONS.get():
-    user.is_admin = is_superuser or not organization.organizationuser_set.exists() or not organization.is_multi_user
-    ensure_has_a_group(user)
 
   return user
 
@@ -254,6 +261,7 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
       username = email
     username = force_username_case(username)
     request = None
+
     user = super(AllowFirstUserDjangoBackend, self).authenticate(request, username=username, password=password)
 
     if user is not None:
