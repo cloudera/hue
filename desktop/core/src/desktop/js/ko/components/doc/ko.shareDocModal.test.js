@@ -23,7 +23,28 @@ import 'ext/bootstrap.2.3.2.min';
 describe('ko.shareDocModal.js', () => {
   it('should render component', async () => {
     huePubSub.publish(SHOW_EVENT, {
-      document: ko.observable(),
+      document: ko.observable({
+        isShared: () => false,
+        hasErrors: () => false,
+        loading: () => false,
+        selectedPerm: () => undefined,
+        fileEntry: {
+          canModify: () => false
+        },
+        definition: ko.observable({
+          name: 'hello',
+          perms: {
+            read: {
+              groups: [],
+              users: []
+            },
+            write: {
+              groups: [],
+              users: []
+            }
+          }
+        })
+      }),
       loadDocument: () => {}
     });
 

@@ -1480,9 +1480,9 @@ class Document2(models.Model):
     link_write_perm = self.get_permission(perm=Document2Permission.LINK_WRITE_PERM)
 
     if link_read_perm:
-      permissions['link_read'] = True
+      permissions['link_read'] = link_read_perm.is_link_on
     if link_write_perm:
-      permissions['link_write'] = True
+      permissions['link_write'] = link_write_perm.is_link_on
     permissions['link_sharing_on'] = permissions['link_read'] or permissions['link_write']
 
     return permissions
