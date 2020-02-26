@@ -19,6 +19,9 @@ import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import hueUtils from 'utils/hueUtils';
+import huePubSub from 'utils/huePubSub';
+
+export const DOCUMENT_UPDATED_EVENT = 'hue.document.updated';
 
 class HueDocument {
   /**
@@ -42,6 +45,12 @@ class HueDocument {
     this.idToUserMap = {};
     this.groupMap = {};
     this.items = [];
+
+    huePubSub.subscribe(DOCUMENT_UPDATED_EVENT, definition => {
+      if (this.definition() && this.definition().uuid === definition.uuid) {
+        this.definition(definition);
+      }
+    });
   }
 
   isShared() {
@@ -51,7 +60,8 @@ class HueDocument {
       (perms.read.users.length > 0 ||
         perms.read.groups.length > 0 ||
         perms.write.users.length > 0 ||
-        perms.write.groups.length > 0)
+        perms.write.groups.length > 0 ||
+        perms.link_sharing_on)
     );
   }
 
