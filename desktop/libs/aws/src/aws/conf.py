@@ -153,7 +153,7 @@ def get_key_expiry():
 HAS_IAM_DETECTION=Config(
   help=_('Enable the detection of an IAM role providing the credentials automatically. It can take a few seconds.'),
   key='has_iam_detection',
-  default=True,
+  default=False,
   type=coerce_bool
 )
 
