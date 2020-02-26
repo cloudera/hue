@@ -24,6 +24,8 @@ import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { DOCUMENT_TYPES } from 'doc/docSupport';
 
+export const REFRESH_DOC_ASSIST_EVENT = 'assist.document.refresh';
+
 // prettier-ignore
 const TEMPLATE = `
   <script type="text/html" id="document-context-items">
@@ -153,7 +155,7 @@ const TEMPLATE = `
             </li>
           </ul>
       </span>
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.document.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${I18n(
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('${ REFRESH_DOC_ASSIST_EVENT }'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${I18n(
         'Manual refresh'
       )}"></i></a>
     </div>
@@ -293,7 +295,7 @@ class AssistDocumentsPanel {
       );
     };
 
-    huePubSub.subscribe('assist.document.refresh', () => {
+    huePubSub.subscribe(REFRESH_DOC_ASSIST_EVENT, () => {
       huePubSub.publish('assist.clear.document.cache');
       self.reload();
     });
