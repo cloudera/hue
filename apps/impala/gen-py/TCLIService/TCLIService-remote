@@ -16,16 +16,14 @@ else:
 from thrift.transport import TTransport, TSocket, TSSLSocket, THttpClient
 from thrift.protocol.TBinaryProtocol import TBinaryProtocol
 
-from ImpalaService import ImpalaHiveServer2Service
-from ImpalaService.ttypes import *
+from TCLIService import TCLIService
+from TCLIService.ttypes import *
 
 if len(sys.argv) <= 1 or sys.argv[1] == '--help':
     print('')
     print('Usage: ' + sys.argv[0] + ' [-h host[:port]] [-u url] [-f[ramed]] [-s[sl]] [-novalidate] [-ca_certs certs] [-keyfile keyfile] [-certfile certfile] function [arg1 [arg2...]]')
     print('')
     print('Functions:')
-    print('  TGetExecSummaryResp GetExecSummary(TGetExecSummaryReq req)')
-    print('  TGetRuntimeProfileResp GetRuntimeProfile(TGetRuntimeProfileReq req)')
     print('  TOpenSessionResp OpenSession(TOpenSessionReq req)')
     print('  TCloseSessionResp CloseSession(TCloseSessionReq req)')
     print('  TGetInfoResp GetInfo(TGetInfoReq req)')
@@ -122,22 +120,10 @@ else:
     else:
         transport = TTransport.TBufferedTransport(socket)
 protocol = TBinaryProtocol(transport)
-client = ImpalaHiveServer2Service.Client(protocol)
+client = TCLIService.Client(protocol)
 transport.open()
 
-if cmd == 'GetExecSummary':
-    if len(args) != 1:
-        print('GetExecSummary requires 1 args')
-        sys.exit(1)
-    pp.pprint(client.GetExecSummary(eval(args[0]),))
-
-elif cmd == 'GetRuntimeProfile':
-    if len(args) != 1:
-        print('GetRuntimeProfile requires 1 args')
-        sys.exit(1)
-    pp.pprint(client.GetRuntimeProfile(eval(args[0]),))
-
-elif cmd == 'OpenSession':
+if cmd == 'OpenSession':
     if len(args) != 1:
         print('OpenSession requires 1 args')
         sys.exit(1)
