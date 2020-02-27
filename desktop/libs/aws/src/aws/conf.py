@@ -153,7 +153,7 @@ def get_key_expiry():
 HAS_IAM_DETECTION=Config(
   help=_('Enable the detection of an IAM role providing the credentials automatically. It can take a few seconds.'),
   key='has_iam_detection',
-  default=True,
+  default=False,
   type=coerce_bool
 )
 
@@ -265,6 +265,11 @@ def is_ec2_instance():
   # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/identify_ec2_instances.html
   # /sys/hypervisor/uuid doesn't work on m5/c5, but /sys/devices/virtual/dmi/id/product_uuid does
   global IS_EC2_CACHED
+
+  # Detection can be slow and so is disabled by default.
+  if not HAS_IAM_DETECTION.get():
+    IS_EC2_CACHED = False
+
   if IS_EC2_CACHED is not None:
     return IS_EC2_CACHED
 
@@ -293,9 +298,6 @@ def has_iam_metadata():
   global IS_IAM_CACHED
 
   try:
-    if not HAS_IAM_DETECTION.get():
-      IS_IAM_CACHED = False
-
     if IS_IAM_CACHED is not None:
       return IS_IAM_CACHED
 
