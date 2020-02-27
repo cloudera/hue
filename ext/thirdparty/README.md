@@ -98,7 +98,6 @@ Downloaded third party dependencies during build
 |Y|nosetty|0.4|LGPL|http://code.google.com/p/nosetty/|
 |N|pylint|0.19.0|GPL|http://www.logilab.org/project/pylint|
 |Y|Werkzeug|0.6|BSD|http://werkzeug.pocoo.org/|
-|Y|windmill|1.3|Apache2|http://www.getwindmill.com/|
 
 
 ---

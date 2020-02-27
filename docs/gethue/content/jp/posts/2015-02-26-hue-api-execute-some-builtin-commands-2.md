@@ -63,7 +63,7 @@ CMを使用していない場合、通常はHueのホームのルートを追加
 <pre><code class="bash">/usr/lib/hue</pre>
 
 注意：
-  
+
 あなたは、コマンドのログのためにローカルディレクトリへのアクセス権が必要になることがあります。例:
 
 <pre><code class="bash">cd /tmp</pre>
@@ -98,7 +98,6 @@ CMを使用していない場合、通常はHueのホームのルートを追加
  runpylint
  sync_documents
  test
- test_windmill
  version
 
 [django]
