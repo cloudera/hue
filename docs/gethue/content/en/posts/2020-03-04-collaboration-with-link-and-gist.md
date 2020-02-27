@@ -2,8 +2,8 @@
 title: A better collaborative Data Warehouse Experience with SQL query sharing via links or gists
 author: Romain
 type: post
-date: 2019-12-25T02:36:35+00:00
-url: /blog/2019-12-25-collaboration-with-link-and-gist/
+date: 2020-03-04T02:36:35+00:00
+url: /blog/2020-03-04-datawarehouse-database-sql-collaboration-and-sharing-with-link-and-gist/
 sf_thumbnail_type:
   - none
 sf_thumbnail_link_type:
@@ -92,7 +92,7 @@ Answering a question via a query result? Showing some weird data to a slack chan
 * Slack unfurling will show a mini preview (can be turned off globally)
 * Gists are stored in a Gist directory in your home
 
-Here os an example:
+Here is an example:
 
 Select a portion of statements to quick share with a Slack channel:
 
