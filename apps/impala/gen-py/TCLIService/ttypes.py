@@ -24,10 +24,6 @@ class TProtocolVersion(object):
     HIVE_CLI_SERVICE_PROTOCOL_V5 = 4
     HIVE_CLI_SERVICE_PROTOCOL_V6 = 5
     HIVE_CLI_SERVICE_PROTOCOL_V7 = 6
-    HIVE_CLI_SERVICE_PROTOCOL_V8 = 7
-    HIVE_CLI_SERVICE_PROTOCOL_V9 = 8
-    HIVE_CLI_SERVICE_PROTOCOL_V10 = 9
-    HIVE_CLI_SERVICE_PROTOCOL_V11 = 10
 
     _VALUES_TO_NAMES = {
         0: "HIVE_CLI_SERVICE_PROTOCOL_V1",
@@ -37,10 +33,6 @@ class TProtocolVersion(object):
         4: "HIVE_CLI_SERVICE_PROTOCOL_V5",
         5: "HIVE_CLI_SERVICE_PROTOCOL_V6",
         6: "HIVE_CLI_SERVICE_PROTOCOL_V7",
-        7: "HIVE_CLI_SERVICE_PROTOCOL_V8",
-        8: "HIVE_CLI_SERVICE_PROTOCOL_V9",
-        9: "HIVE_CLI_SERVICE_PROTOCOL_V10",
-        10: "HIVE_CLI_SERVICE_PROTOCOL_V11",
     }
 
     _NAMES_TO_VALUES = {
@@ -51,10 +43,6 @@ class TProtocolVersion(object):
         "HIVE_CLI_SERVICE_PROTOCOL_V5": 4,
         "HIVE_CLI_SERVICE_PROTOCOL_V6": 5,
         "HIVE_CLI_SERVICE_PROTOCOL_V7": 6,
-        "HIVE_CLI_SERVICE_PROTOCOL_V8": 7,
-        "HIVE_CLI_SERVICE_PROTOCOL_V9": 8,
-        "HIVE_CLI_SERVICE_PROTOCOL_V10": 9,
-        "HIVE_CLI_SERVICE_PROTOCOL_V11": 10,
     }
 
 
@@ -79,9 +67,6 @@ class TTypeId(object):
     DATE_TYPE = 17
     VARCHAR_TYPE = 18
     CHAR_TYPE = 19
-    INTERVAL_YEAR_MONTH_TYPE = 20
-    INTERVAL_DAY_TIME_TYPE = 21
-    TIMESTAMPLOCALTZ_TYPE = 22
 
     _VALUES_TO_NAMES = {
         0: "BOOLEAN_TYPE",
@@ -104,9 +89,6 @@ class TTypeId(object):
         17: "DATE_TYPE",
         18: "VARCHAR_TYPE",
         19: "CHAR_TYPE",
-        20: "INTERVAL_YEAR_MONTH_TYPE",
-        21: "INTERVAL_DAY_TIME_TYPE",
-        22: "TIMESTAMPLOCALTZ_TYPE",
     }
 
     _NAMES_TO_VALUES = {
@@ -130,9 +112,6 @@ class TTypeId(object):
         "DATE_TYPE": 17,
         "VARCHAR_TYPE": 18,
         "CHAR_TYPE": 19,
-        "INTERVAL_YEAR_MONTH_TYPE": 20,
-        "INTERVAL_DAY_TIME_TYPE": 21,
-        "TIMESTAMPLOCALTZ_TYPE": 22,
     }
 
 
@@ -169,7 +148,6 @@ class TOperationState(object):
     ERROR_STATE = 5
     UKNOWN_STATE = 6
     PENDING_STATE = 7
-    TIMEDOUT_STATE = 8
 
     _VALUES_TO_NAMES = {
         0: "INITIALIZED_STATE",
@@ -180,7 +158,6 @@ class TOperationState(object):
         5: "ERROR_STATE",
         6: "UKNOWN_STATE",
         7: "PENDING_STATE",
-        8: "TIMEDOUT_STATE",
     }
 
     _NAMES_TO_VALUES = {
@@ -192,7 +169,6 @@ class TOperationState(object):
         "ERROR_STATE": 5,
         "UKNOWN_STATE": 6,
         "PENDING_STATE": 7,
-        "TIMEDOUT_STATE": 8,
     }
 
 
@@ -280,7 +256,6 @@ class TGetInfoType(object):
     CLI_CATALOG_NAME = 10003
     CLI_COLLATION_SEQ = 10004
     CLI_MAX_IDENTIFIER_LEN = 10005
-    CLI_ODBC_KEYWORDS = 10006
 
     _VALUES_TO_NAMES = {
         0: "CLI_MAX_DRIVER_CONNECTIONS",
@@ -330,7 +305,6 @@ class TGetInfoType(object):
         10003: "CLI_CATALOG_NAME",
         10004: "CLI_COLLATION_SEQ",
         10005: "CLI_MAX_IDENTIFIER_LEN",
-        10006: "CLI_ODBC_KEYWORDS",
     }
 
     _NAMES_TO_VALUES = {
@@ -381,7 +355,6 @@ class TGetInfoType(object):
         "CLI_CATALOG_NAME": 10003,
         "CLI_COLLATION_SEQ": 10004,
         "CLI_MAX_IDENTIFIER_LEN": 10005,
-        "CLI_ODBC_KEYWORDS": 10006,
     }
 
 
@@ -409,24 +382,6 @@ class TFetchOrientation(object):
         "FETCH_ABSOLUTE": 3,
         "FETCH_FIRST": 4,
         "FETCH_LAST": 5,
-    }
-
-
-class TJobExecutionStatus(object):
-    IN_PROGRESS = 0
-    COMPLETE = 1
-    NOT_AVAILABLE = 2
-
-    _VALUES_TO_NAMES = {
-        0: "IN_PROGRESS",
-        1: "COMPLETE",
-        2: "NOT_AVAILABLE",
-    }
-
-    _NAMES_TO_VALUES = {
-        "IN_PROGRESS": 0,
-        "COMPLETE": 1,
-        "NOT_AVAILABLE": 2,
     }
 
 
@@ -2703,18 +2658,14 @@ class TRowSet(object):
      - startRowOffset
      - rows
      - columns
-     - binaryColumns
-     - columnCount
 
     """
 
 
-    def __init__(self, startRowOffset=None, rows=None, columns=None, binaryColumns=None, columnCount=None,):
+    def __init__(self, startRowOffset=None, rows=None, columns=None,):
         self.startRowOffset = startRowOffset
         self.rows = rows
         self.columns = columns
-        self.binaryColumns = binaryColumns
-        self.columnCount = columnCount
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -2752,16 +2703,6 @@ class TRowSet(object):
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
-            elif fid == 4:
-                if ftype == TType.STRING:
-                    self.binaryColumns = iprot.readBinary()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 5:
-                if ftype == TType.I32:
-                    self.columnCount = iprot.readI32()
-                else:
-                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -2789,14 +2730,6 @@ class TRowSet(object):
             for iter117 in self.columns:
                 iter117.write(oprot)
             oprot.writeListEnd()
-            oprot.writeFieldEnd()
-        if self.binaryColumns is not None:
-            oprot.writeFieldBegin('binaryColumns', TType.STRING, 4)
-            oprot.writeBinary(self.binaryColumns)
-            oprot.writeFieldEnd()
-        if self.columnCount is not None:
-            oprot.writeFieldBegin('columnCount', TType.I32, 5)
-            oprot.writeI32(self.columnCount)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -3171,7 +3104,7 @@ class TOpenSessionReq(object):
     """
 
 
-    def __init__(self, client_protocol=9, username=None, password=None, configuration=None,):
+    def __init__(self, client_protocol=5, username=None, password=None, configuration=None,):
         self.client_protocol = client_protocol
         self.username = username
         self.password = password
@@ -3273,7 +3206,7 @@ class TOpenSessionResp(object):
     """
 
 
-    def __init__(self, status=None, serverProtocolVersion=9, sessionHandle=None, configuration=None,):
+    def __init__(self, status=None, serverProtocolVersion=5, sessionHandle=None, configuration=None,):
         self.status = status
         self.serverProtocolVersion = serverProtocolVersion
         self.sessionHandle = sessionHandle
@@ -3354,147 +3287,6 @@ class TOpenSessionResp(object):
             raise TProtocolException(message='Required field status is unset!')
         if self.serverProtocolVersion is None:
             raise TProtocolException(message='Required field serverProtocolVersion is unset!')
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class TSetClientInfoReq(object):
-    """
-    Attributes:
-     - sessionHandle
-     - configuration
-
-    """
-
-
-    def __init__(self, sessionHandle=None, configuration=None,):
-        self.sessionHandle = sessionHandle
-        self.configuration = configuration
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.sessionHandle = TSessionHandle()
-                    self.sessionHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.MAP:
-                    self.configuration = {}
-                    (_ktype144, _vtype145, _size143) = iprot.readMapBegin()
-                    for _i147 in range(_size143):
-                        _key148 = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                        _val149 = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                        self.configuration[_key148] = _val149
-                    iprot.readMapEnd()
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('TSetClientInfoReq')
-        if self.sessionHandle is not None:
-            oprot.writeFieldBegin('sessionHandle', TType.STRUCT, 1)
-            self.sessionHandle.write(oprot)
-            oprot.writeFieldEnd()
-        if self.configuration is not None:
-            oprot.writeFieldBegin('configuration', TType.MAP, 2)
-            oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.configuration))
-            for kiter150, viter151 in self.configuration.items():
-                oprot.writeString(kiter150.encode('utf-8') if sys.version_info[0] == 2 else kiter150)
-                oprot.writeString(viter151.encode('utf-8') if sys.version_info[0] == 2 else viter151)
-            oprot.writeMapEnd()
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        if self.sessionHandle is None:
-            raise TProtocolException(message='Required field sessionHandle is unset!')
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class TSetClientInfoResp(object):
-    """
-    Attributes:
-     - status
-
-    """
-
-
-    def __init__(self, status=None,):
-        self.status = status
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.status = TStatus()
-                    self.status.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('TSetClientInfoResp')
-        if self.status is not None:
-            oprot.writeFieldBegin('status', TType.STRUCT, 1)
-            self.status.write(oprot)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        if self.status is None:
-            raise TProtocolException(message='Required field status is unset!')
         return
 
     def __repr__(self):
@@ -3895,17 +3687,15 @@ class TExecuteStatementReq(object):
      - statement
      - confOverlay
      - runAsync
-     - queryTimeout
 
     """
 
 
-    def __init__(self, sessionHandle=None, statement=None, confOverlay=None, runAsync=False, queryTimeout=0,):
+    def __init__(self, sessionHandle=None, statement=None, confOverlay=None, runAsync=False,):
         self.sessionHandle = sessionHandle
         self.statement = statement
         self.confOverlay = confOverlay
         self.runAsync = runAsync
-        self.queryTimeout = queryTimeout
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -3930,22 +3720,17 @@ class TExecuteStatementReq(object):
             elif fid == 3:
                 if ftype == TType.MAP:
                     self.confOverlay = {}
-                    (_ktype153, _vtype154, _size152) = iprot.readMapBegin()
-                    for _i156 in range(_size152):
-                        _key157 = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                        _val158 = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                        self.confOverlay[_key157] = _val158
+                    (_ktype144, _vtype145, _size143) = iprot.readMapBegin()
+                    for _i147 in range(_size143):
+                        _key148 = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                        _val149 = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                        self.confOverlay[_key148] = _val149
                     iprot.readMapEnd()
                 else:
                     iprot.skip(ftype)
             elif fid == 4:
                 if ftype == TType.BOOL:
                     self.runAsync = iprot.readBool()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 5:
-                if ftype == TType.I64:
-                    self.queryTimeout = iprot.readI64()
                 else:
                     iprot.skip(ftype)
             else:
@@ -3969,18 +3754,14 @@ class TExecuteStatementReq(object):
         if self.confOverlay is not None:
             oprot.writeFieldBegin('confOverlay', TType.MAP, 3)
             oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.confOverlay))
-            for kiter159, viter160 in self.confOverlay.items():
-                oprot.writeString(kiter159.encode('utf-8') if sys.version_info[0] == 2 else kiter159)
-                oprot.writeString(viter160.encode('utf-8') if sys.version_info[0] == 2 else viter160)
+            for kiter150, viter151 in self.confOverlay.items():
+                oprot.writeString(kiter150.encode('utf-8') if sys.version_info[0] == 2 else kiter150)
+                oprot.writeString(viter151.encode('utf-8') if sys.version_info[0] == 2 else viter151)
             oprot.writeMapEnd()
             oprot.writeFieldEnd()
         if self.runAsync is not None:
             oprot.writeFieldBegin('runAsync', TType.BOOL, 4)
             oprot.writeBool(self.runAsync)
-            oprot.writeFieldEnd()
-        if self.queryTimeout is not None:
-            oprot.writeFieldBegin('queryTimeout', TType.I64, 5)
-            oprot.writeI64(self.queryTimeout)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -4546,10 +4327,10 @@ class TGetTablesReq(object):
             elif fid == 5:
                 if ftype == TType.LIST:
                     self.tableTypes = []
-                    (_etype164, _size161) = iprot.readListBegin()
-                    for _i165 in range(_size161):
-                        _elem166 = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                        self.tableTypes.append(_elem166)
+                    (_etype155, _size152) = iprot.readListBegin()
+                    for _i156 in range(_size152):
+                        _elem157 = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                        self.tableTypes.append(_elem157)
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -4582,8 +4363,8 @@ class TGetTablesReq(object):
         if self.tableTypes is not None:
             oprot.writeFieldBegin('tableTypes', TType.LIST, 5)
             oprot.writeListBegin(TType.STRING, len(self.tableTypes))
-            for iter167 in self.tableTypes:
-                oprot.writeString(iter167.encode('utf-8') if sys.version_info[0] == 2 else iter167)
+            for iter158 in self.tableTypes:
+                oprot.writeString(iter158.encode('utf-8') if sys.version_info[0] == 2 else iter158)
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -5153,381 +4934,16 @@ class TGetFunctionsResp(object):
         return not (self == other)
 
 
-class TGetPrimaryKeysReq(object):
-    """
-    Attributes:
-     - sessionHandle
-     - catalogName
-     - schemaName
-     - tableName
-
-    """
-
-
-    def __init__(self, sessionHandle=None, catalogName=None, schemaName=None, tableName=None,):
-        self.sessionHandle = sessionHandle
-        self.catalogName = catalogName
-        self.schemaName = schemaName
-        self.tableName = tableName
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.sessionHandle = TSessionHandle()
-                    self.sessionHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRING:
-                    self.catalogName = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 3:
-                if ftype == TType.STRING:
-                    self.schemaName = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 4:
-                if ftype == TType.STRING:
-                    self.tableName = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('TGetPrimaryKeysReq')
-        if self.sessionHandle is not None:
-            oprot.writeFieldBegin('sessionHandle', TType.STRUCT, 1)
-            self.sessionHandle.write(oprot)
-            oprot.writeFieldEnd()
-        if self.catalogName is not None:
-            oprot.writeFieldBegin('catalogName', TType.STRING, 2)
-            oprot.writeString(self.catalogName.encode('utf-8') if sys.version_info[0] == 2 else self.catalogName)
-            oprot.writeFieldEnd()
-        if self.schemaName is not None:
-            oprot.writeFieldBegin('schemaName', TType.STRING, 3)
-            oprot.writeString(self.schemaName.encode('utf-8') if sys.version_info[0] == 2 else self.schemaName)
-            oprot.writeFieldEnd()
-        if self.tableName is not None:
-            oprot.writeFieldBegin('tableName', TType.STRING, 4)
-            oprot.writeString(self.tableName.encode('utf-8') if sys.version_info[0] == 2 else self.tableName)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        if self.sessionHandle is None:
-            raise TProtocolException(message='Required field sessionHandle is unset!')
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class TGetPrimaryKeysResp(object):
-    """
-    Attributes:
-     - status
-     - operationHandle
-
-    """
-
-
-    def __init__(self, status=None, operationHandle=None,):
-        self.status = status
-        self.operationHandle = operationHandle
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.status = TStatus()
-                    self.status.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
-                    self.operationHandle = TOperationHandle()
-                    self.operationHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('TGetPrimaryKeysResp')
-        if self.status is not None:
-            oprot.writeFieldBegin('status', TType.STRUCT, 1)
-            self.status.write(oprot)
-            oprot.writeFieldEnd()
-        if self.operationHandle is not None:
-            oprot.writeFieldBegin('operationHandle', TType.STRUCT, 2)
-            self.operationHandle.write(oprot)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        if self.status is None:
-            raise TProtocolException(message='Required field status is unset!')
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class TGetCrossReferenceReq(object):
-    """
-    Attributes:
-     - sessionHandle
-     - parentCatalogName
-     - parentSchemaName
-     - parentTableName
-     - foreignCatalogName
-     - foreignSchemaName
-     - foreignTableName
-
-    """
-
-
-    def __init__(self, sessionHandle=None, parentCatalogName=None, parentSchemaName=None, parentTableName=None, foreignCatalogName=None, foreignSchemaName=None, foreignTableName=None,):
-        self.sessionHandle = sessionHandle
-        self.parentCatalogName = parentCatalogName
-        self.parentSchemaName = parentSchemaName
-        self.parentTableName = parentTableName
-        self.foreignCatalogName = foreignCatalogName
-        self.foreignSchemaName = foreignSchemaName
-        self.foreignTableName = foreignTableName
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.sessionHandle = TSessionHandle()
-                    self.sessionHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRING:
-                    self.parentCatalogName = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 3:
-                if ftype == TType.STRING:
-                    self.parentSchemaName = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 4:
-                if ftype == TType.STRING:
-                    self.parentTableName = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 5:
-                if ftype == TType.STRING:
-                    self.foreignCatalogName = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 6:
-                if ftype == TType.STRING:
-                    self.foreignSchemaName = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 7:
-                if ftype == TType.STRING:
-                    self.foreignTableName = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('TGetCrossReferenceReq')
-        if self.sessionHandle is not None:
-            oprot.writeFieldBegin('sessionHandle', TType.STRUCT, 1)
-            self.sessionHandle.write(oprot)
-            oprot.writeFieldEnd()
-        if self.parentCatalogName is not None:
-            oprot.writeFieldBegin('parentCatalogName', TType.STRING, 2)
-            oprot.writeString(self.parentCatalogName.encode('utf-8') if sys.version_info[0] == 2 else self.parentCatalogName)
-            oprot.writeFieldEnd()
-        if self.parentSchemaName is not None:
-            oprot.writeFieldBegin('parentSchemaName', TType.STRING, 3)
-            oprot.writeString(self.parentSchemaName.encode('utf-8') if sys.version_info[0] == 2 else self.parentSchemaName)
-            oprot.writeFieldEnd()
-        if self.parentTableName is not None:
-            oprot.writeFieldBegin('parentTableName', TType.STRING, 4)
-            oprot.writeString(self.parentTableName.encode('utf-8') if sys.version_info[0] == 2 else self.parentTableName)
-            oprot.writeFieldEnd()
-        if self.foreignCatalogName is not None:
-            oprot.writeFieldBegin('foreignCatalogName', TType.STRING, 5)
-            oprot.writeString(self.foreignCatalogName.encode('utf-8') if sys.version_info[0] == 2 else self.foreignCatalogName)
-            oprot.writeFieldEnd()
-        if self.foreignSchemaName is not None:
-            oprot.writeFieldBegin('foreignSchemaName', TType.STRING, 6)
-            oprot.writeString(self.foreignSchemaName.encode('utf-8') if sys.version_info[0] == 2 else self.foreignSchemaName)
-            oprot.writeFieldEnd()
-        if self.foreignTableName is not None:
-            oprot.writeFieldBegin('foreignTableName', TType.STRING, 7)
-            oprot.writeString(self.foreignTableName.encode('utf-8') if sys.version_info[0] == 2 else self.foreignTableName)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        if self.sessionHandle is None:
-            raise TProtocolException(message='Required field sessionHandle is unset!')
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class TGetCrossReferenceResp(object):
-    """
-    Attributes:
-     - status
-     - operationHandle
-
-    """
-
-
-    def __init__(self, status=None, operationHandle=None,):
-        self.status = status
-        self.operationHandle = operationHandle
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.status = TStatus()
-                    self.status.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.STRUCT:
-                    self.operationHandle = TOperationHandle()
-                    self.operationHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('TGetCrossReferenceResp')
-        if self.status is not None:
-            oprot.writeFieldBegin('status', TType.STRUCT, 1)
-            self.status.write(oprot)
-            oprot.writeFieldEnd()
-        if self.operationHandle is not None:
-            oprot.writeFieldBegin('operationHandle', TType.STRUCT, 2)
-            self.operationHandle.write(oprot)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        if self.status is None:
-            raise TProtocolException(message='Required field status is unset!')
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
 class TGetOperationStatusReq(object):
     """
     Attributes:
      - operationHandle
-     - getProgressUpdate
 
     """
 
 
-    def __init__(self, operationHandle=None, getProgressUpdate=None,):
+    def __init__(self, operationHandle=None,):
         self.operationHandle = operationHandle
-        self.getProgressUpdate = getProgressUpdate
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -5542,11 +4958,6 @@ class TGetOperationStatusReq(object):
                 if ftype == TType.STRUCT:
                     self.operationHandle = TOperationHandle()
                     self.operationHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.BOOL:
-                    self.getProgressUpdate = iprot.readBool()
                 else:
                     iprot.skip(ftype)
             else:
@@ -5563,164 +4974,12 @@ class TGetOperationStatusReq(object):
             oprot.writeFieldBegin('operationHandle', TType.STRUCT, 1)
             self.operationHandle.write(oprot)
             oprot.writeFieldEnd()
-        if self.getProgressUpdate is not None:
-            oprot.writeFieldBegin('getProgressUpdate', TType.BOOL, 2)
-            oprot.writeBool(self.getProgressUpdate)
-            oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
 
     def validate(self):
         if self.operationHandle is None:
             raise TProtocolException(message='Required field operationHandle is unset!')
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class TProgressUpdateResp(object):
-    """
-    Attributes:
-     - headerNames
-     - rows
-     - progressedPercentage
-     - status
-     - footerSummary
-     - startTime
-
-    """
-
-
-    def __init__(self, headerNames=None, rows=None, progressedPercentage=None, status=None, footerSummary=None, startTime=None,):
-        self.headerNames = headerNames
-        self.rows = rows
-        self.progressedPercentage = progressedPercentage
-        self.status = status
-        self.footerSummary = footerSummary
-        self.startTime = startTime
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.LIST:
-                    self.headerNames = []
-                    (_etype171, _size168) = iprot.readListBegin()
-                    for _i172 in range(_size168):
-                        _elem173 = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                        self.headerNames.append(_elem173)
-                    iprot.readListEnd()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 2:
-                if ftype == TType.LIST:
-                    self.rows = []
-                    (_etype177, _size174) = iprot.readListBegin()
-                    for _i178 in range(_size174):
-                        _elem179 = []
-                        (_etype183, _size180) = iprot.readListBegin()
-                        for _i184 in range(_size180):
-                            _elem185 = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                            _elem179.append(_elem185)
-                        iprot.readListEnd()
-                        self.rows.append(_elem179)
-                    iprot.readListEnd()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 3:
-                if ftype == TType.DOUBLE:
-                    self.progressedPercentage = iprot.readDouble()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 4:
-                if ftype == TType.I32:
-                    self.status = iprot.readI32()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 5:
-                if ftype == TType.STRING:
-                    self.footerSummary = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 6:
-                if ftype == TType.I64:
-                    self.startTime = iprot.readI64()
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('TProgressUpdateResp')
-        if self.headerNames is not None:
-            oprot.writeFieldBegin('headerNames', TType.LIST, 1)
-            oprot.writeListBegin(TType.STRING, len(self.headerNames))
-            for iter186 in self.headerNames:
-                oprot.writeString(iter186.encode('utf-8') if sys.version_info[0] == 2 else iter186)
-            oprot.writeListEnd()
-            oprot.writeFieldEnd()
-        if self.rows is not None:
-            oprot.writeFieldBegin('rows', TType.LIST, 2)
-            oprot.writeListBegin(TType.LIST, len(self.rows))
-            for iter187 in self.rows:
-                oprot.writeListBegin(TType.STRING, len(iter187))
-                for iter188 in iter187:
-                    oprot.writeString(iter188.encode('utf-8') if sys.version_info[0] == 2 else iter188)
-                oprot.writeListEnd()
-            oprot.writeListEnd()
-            oprot.writeFieldEnd()
-        if self.progressedPercentage is not None:
-            oprot.writeFieldBegin('progressedPercentage', TType.DOUBLE, 3)
-            oprot.writeDouble(self.progressedPercentage)
-            oprot.writeFieldEnd()
-        if self.status is not None:
-            oprot.writeFieldBegin('status', TType.I32, 4)
-            oprot.writeI32(self.status)
-            oprot.writeFieldEnd()
-        if self.footerSummary is not None:
-            oprot.writeFieldBegin('footerSummary', TType.STRING, 5)
-            oprot.writeString(self.footerSummary.encode('utf-8') if sys.version_info[0] == 2 else self.footerSummary)
-            oprot.writeFieldEnd()
-        if self.startTime is not None:
-            oprot.writeFieldBegin('startTime', TType.I64, 6)
-            oprot.writeI64(self.startTime)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        if self.headerNames is None:
-            raise TProtocolException(message='Required field headerNames is unset!')
-        if self.rows is None:
-            raise TProtocolException(message='Required field rows is unset!')
-        if self.progressedPercentage is None:
-            raise TProtocolException(message='Required field progressedPercentage is unset!')
-        if self.status is None:
-            raise TProtocolException(message='Required field status is unset!')
-        if self.footerSummary is None:
-            raise TProtocolException(message='Required field footerSummary is unset!')
-        if self.startTime is None:
-            raise TProtocolException(message='Required field startTime is unset!')
         return
 
     def __repr__(self):
@@ -5743,28 +5002,16 @@ class TGetOperationStatusResp(object):
      - sqlState
      - errorCode
      - errorMessage
-     - taskStatus
-     - operationStarted
-     - operationCompleted
-     - hasResultSet
-     - progressUpdateResponse
-     - numModifiedRows
 
     """
 
 
-    def __init__(self, status=None, operationState=None, sqlState=None, errorCode=None, errorMessage=None, taskStatus=None, operationStarted=None, operationCompleted=None, hasResultSet=None, progressUpdateResponse=None, numModifiedRows=None,):
+    def __init__(self, status=None, operationState=None, sqlState=None, errorCode=None, errorMessage=None,):
         self.status = status
         self.operationState = operationState
         self.sqlState = sqlState
         self.errorCode = errorCode
         self.errorMessage = errorMessage
-        self.taskStatus = taskStatus
-        self.operationStarted = operationStarted
-        self.operationCompleted = operationCompleted
-        self.hasResultSet = hasResultSet
-        self.progressUpdateResponse = progressUpdateResponse
-        self.numModifiedRows = numModifiedRows
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -5801,37 +5048,6 @@ class TGetOperationStatusResp(object):
                     self.errorMessage = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
                 else:
                     iprot.skip(ftype)
-            elif fid == 6:
-                if ftype == TType.STRING:
-                    self.taskStatus = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 7:
-                if ftype == TType.I64:
-                    self.operationStarted = iprot.readI64()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 8:
-                if ftype == TType.I64:
-                    self.operationCompleted = iprot.readI64()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 9:
-                if ftype == TType.BOOL:
-                    self.hasResultSet = iprot.readBool()
-                else:
-                    iprot.skip(ftype)
-            elif fid == 10:
-                if ftype == TType.STRUCT:
-                    self.progressUpdateResponse = TProgressUpdateResp()
-                    self.progressUpdateResponse.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            elif fid == 11:
-                if ftype == TType.I64:
-                    self.numModifiedRows = iprot.readI64()
-                else:
-                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -5861,30 +5077,6 @@ class TGetOperationStatusResp(object):
         if self.errorMessage is not None:
             oprot.writeFieldBegin('errorMessage', TType.STRING, 5)
             oprot.writeString(self.errorMessage.encode('utf-8') if sys.version_info[0] == 2 else self.errorMessage)
-            oprot.writeFieldEnd()
-        if self.taskStatus is not None:
-            oprot.writeFieldBegin('taskStatus', TType.STRING, 6)
-            oprot.writeString(self.taskStatus.encode('utf-8') if sys.version_info[0] == 2 else self.taskStatus)
-            oprot.writeFieldEnd()
-        if self.operationStarted is not None:
-            oprot.writeFieldBegin('operationStarted', TType.I64, 7)
-            oprot.writeI64(self.operationStarted)
-            oprot.writeFieldEnd()
-        if self.operationCompleted is not None:
-            oprot.writeFieldBegin('operationCompleted', TType.I64, 8)
-            oprot.writeI64(self.operationCompleted)
-            oprot.writeFieldEnd()
-        if self.hasResultSet is not None:
-            oprot.writeFieldBegin('hasResultSet', TType.BOOL, 9)
-            oprot.writeBool(self.hasResultSet)
-            oprot.writeFieldEnd()
-        if self.progressUpdateResponse is not None:
-            oprot.writeFieldBegin('progressUpdateResponse', TType.STRUCT, 10)
-            self.progressUpdateResponse.write(oprot)
-            oprot.writeFieldEnd()
-        if self.numModifiedRows is not None:
-            oprot.writeFieldBegin('numModifiedRows', TType.I64, 11)
-            oprot.writeI64(self.numModifiedRows)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -6881,125 +6073,6 @@ class TRenewDelegationTokenResp(object):
         return not (self == other)
 
 
-class TGetQueryIdReq(object):
-    """
-    Attributes:
-     - operationHandle
-
-    """
-
-
-    def __init__(self, operationHandle=None,):
-        self.operationHandle = operationHandle
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRUCT:
-                    self.operationHandle = TOperationHandle()
-                    self.operationHandle.read(iprot)
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('TGetQueryIdReq')
-        if self.operationHandle is not None:
-            oprot.writeFieldBegin('operationHandle', TType.STRUCT, 1)
-            self.operationHandle.write(oprot)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        if self.operationHandle is None:
-            raise TProtocolException(message='Required field operationHandle is unset!')
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class TGetQueryIdResp(object):
-    """
-    Attributes:
-     - queryId
-
-    """
-
-
-    def __init__(self, queryId=None,):
-        self.queryId = queryId
-
-    def read(self, iprot):
-        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
-            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
-            return
-        iprot.readStructBegin()
-        while True:
-            (fname, ftype, fid) = iprot.readFieldBegin()
-            if ftype == TType.STOP:
-                break
-            if fid == 1:
-                if ftype == TType.STRING:
-                    self.queryId = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
-            else:
-                iprot.skip(ftype)
-            iprot.readFieldEnd()
-        iprot.readStructEnd()
-
-    def write(self, oprot):
-        if oprot._fast_encode is not None and self.thrift_spec is not None:
-            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
-            return
-        oprot.writeStructBegin('TGetQueryIdResp')
-        if self.queryId is not None:
-            oprot.writeFieldBegin('queryId', TType.STRING, 1)
-            oprot.writeString(self.queryId.encode('utf-8') if sys.version_info[0] == 2 else self.queryId)
-            oprot.writeFieldEnd()
-        oprot.writeFieldStop()
-        oprot.writeStructEnd()
-
-    def validate(self):
-        if self.queryId is None:
-            raise TProtocolException(message='Required field queryId is unset!')
-        return
-
-    def __repr__(self):
-        L = ['%s=%r' % (key, value)
-             for key, value in self.__dict__.items()]
-        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
 class TGetLogReq(object):
     """
     Attributes:
@@ -7319,8 +6392,6 @@ TRowSet.thrift_spec = (
     (1, TType.I64, 'startRowOffset', None, None, ),  # 1
     (2, TType.LIST, 'rows', (TType.STRUCT, [TRow, None], False), None, ),  # 2
     (3, TType.LIST, 'columns', (TType.STRUCT, [TColumn, None], False), None, ),  # 3
-    (4, TType.STRING, 'binaryColumns', 'BINARY', None, ),  # 4
-    (5, TType.I32, 'columnCount', None, None, ),  # 5
 )
 all_structs.append(TStatus)
 TStatus.thrift_spec = (
@@ -7353,7 +6424,7 @@ TOperationHandle.thrift_spec = (
 all_structs.append(TOpenSessionReq)
 TOpenSessionReq.thrift_spec = (
     None,  # 0
-    (1, TType.I32, 'client_protocol', None, 9, ),  # 1
+    (1, TType.I32, 'client_protocol', None, 5, ),  # 1
     (2, TType.STRING, 'username', 'UTF8', None, ),  # 2
     (3, TType.STRING, 'password', 'UTF8', None, ),  # 3
     (4, TType.MAP, 'configuration', (TType.STRING, 'UTF8', TType.STRING, 'UTF8', False), None, ),  # 4
@@ -7362,20 +6433,9 @@ all_structs.append(TOpenSessionResp)
 TOpenSessionResp.thrift_spec = (
     None,  # 0
     (1, TType.STRUCT, 'status', [TStatus, None], None, ),  # 1
-    (2, TType.I32, 'serverProtocolVersion', None, 9, ),  # 2
+    (2, TType.I32, 'serverProtocolVersion', None, 5, ),  # 2
     (3, TType.STRUCT, 'sessionHandle', [TSessionHandle, None], None, ),  # 3
     (4, TType.MAP, 'configuration', (TType.STRING, 'UTF8', TType.STRING, 'UTF8', False), None, ),  # 4
-)
-all_structs.append(TSetClientInfoReq)
-TSetClientInfoReq.thrift_spec = (
-    None,  # 0
-    (1, TType.STRUCT, 'sessionHandle', [TSessionHandle, None], None, ),  # 1
-    (2, TType.MAP, 'configuration', (TType.STRING, 'UTF8', TType.STRING, 'UTF8', False), None, ),  # 2
-)
-all_structs.append(TSetClientInfoResp)
-TSetClientInfoResp.thrift_spec = (
-    None,  # 0
-    (1, TType.STRUCT, 'status', [TStatus, None], None, ),  # 1
 )
 all_structs.append(TCloseSessionReq)
 TCloseSessionReq.thrift_spec = (
@@ -7416,7 +6476,6 @@ TExecuteStatementReq.thrift_spec = (
     (2, TType.STRING, 'statement', 'UTF8', None, ),  # 2
     (3, TType.MAP, 'confOverlay', (TType.STRING, 'UTF8', TType.STRING, 'UTF8', False), None, ),  # 3
     (4, TType.BOOL, 'runAsync', None, False, ),  # 4
-    (5, TType.I64, 'queryTimeout', None, 0, ),  # 5
 )
 all_structs.append(TExecuteStatementResp)
 TExecuteStatementResp.thrift_spec = (
@@ -7514,52 +6573,10 @@ TGetFunctionsResp.thrift_spec = (
     (1, TType.STRUCT, 'status', [TStatus, None], None, ),  # 1
     (2, TType.STRUCT, 'operationHandle', [TOperationHandle, None], None, ),  # 2
 )
-all_structs.append(TGetPrimaryKeysReq)
-TGetPrimaryKeysReq.thrift_spec = (
-    None,  # 0
-    (1, TType.STRUCT, 'sessionHandle', [TSessionHandle, None], None, ),  # 1
-    (2, TType.STRING, 'catalogName', 'UTF8', None, ),  # 2
-    (3, TType.STRING, 'schemaName', 'UTF8', None, ),  # 3
-    (4, TType.STRING, 'tableName', 'UTF8', None, ),  # 4
-)
-all_structs.append(TGetPrimaryKeysResp)
-TGetPrimaryKeysResp.thrift_spec = (
-    None,  # 0
-    (1, TType.STRUCT, 'status', [TStatus, None], None, ),  # 1
-    (2, TType.STRUCT, 'operationHandle', [TOperationHandle, None], None, ),  # 2
-)
-all_structs.append(TGetCrossReferenceReq)
-TGetCrossReferenceReq.thrift_spec = (
-    None,  # 0
-    (1, TType.STRUCT, 'sessionHandle', [TSessionHandle, None], None, ),  # 1
-    (2, TType.STRING, 'parentCatalogName', 'UTF8', None, ),  # 2
-    (3, TType.STRING, 'parentSchemaName', 'UTF8', None, ),  # 3
-    (4, TType.STRING, 'parentTableName', 'UTF8', None, ),  # 4
-    (5, TType.STRING, 'foreignCatalogName', 'UTF8', None, ),  # 5
-    (6, TType.STRING, 'foreignSchemaName', 'UTF8', None, ),  # 6
-    (7, TType.STRING, 'foreignTableName', 'UTF8', None, ),  # 7
-)
-all_structs.append(TGetCrossReferenceResp)
-TGetCrossReferenceResp.thrift_spec = (
-    None,  # 0
-    (1, TType.STRUCT, 'status', [TStatus, None], None, ),  # 1
-    (2, TType.STRUCT, 'operationHandle', [TOperationHandle, None], None, ),  # 2
-)
 all_structs.append(TGetOperationStatusReq)
 TGetOperationStatusReq.thrift_spec = (
     None,  # 0
     (1, TType.STRUCT, 'operationHandle', [TOperationHandle, None], None, ),  # 1
-    (2, TType.BOOL, 'getProgressUpdate', None, None, ),  # 2
-)
-all_structs.append(TProgressUpdateResp)
-TProgressUpdateResp.thrift_spec = (
-    None,  # 0
-    (1, TType.LIST, 'headerNames', (TType.STRING, 'UTF8', False), None, ),  # 1
-    (2, TType.LIST, 'rows', (TType.LIST, (TType.STRING, 'UTF8', False), False), None, ),  # 2
-    (3, TType.DOUBLE, 'progressedPercentage', None, None, ),  # 3
-    (4, TType.I32, 'status', None, None, ),  # 4
-    (5, TType.STRING, 'footerSummary', 'UTF8', None, ),  # 5
-    (6, TType.I64, 'startTime', None, None, ),  # 6
 )
 all_structs.append(TGetOperationStatusResp)
 TGetOperationStatusResp.thrift_spec = (
@@ -7569,12 +6586,6 @@ TGetOperationStatusResp.thrift_spec = (
     (3, TType.STRING, 'sqlState', 'UTF8', None, ),  # 3
     (4, TType.I32, 'errorCode', None, None, ),  # 4
     (5, TType.STRING, 'errorMessage', 'UTF8', None, ),  # 5
-    (6, TType.STRING, 'taskStatus', 'UTF8', None, ),  # 6
-    (7, TType.I64, 'operationStarted', None, None, ),  # 7
-    (8, TType.I64, 'operationCompleted', None, None, ),  # 8
-    (9, TType.BOOL, 'hasResultSet', None, None, ),  # 9
-    (10, TType.STRUCT, 'progressUpdateResponse', [TProgressUpdateResp, None], None, ),  # 10
-    (11, TType.I64, 'numModifiedRows', None, None, ),  # 11
 )
 all_structs.append(TCancelOperationReq)
 TCancelOperationReq.thrift_spec = (
@@ -7656,16 +6667,6 @@ all_structs.append(TRenewDelegationTokenResp)
 TRenewDelegationTokenResp.thrift_spec = (
     None,  # 0
     (1, TType.STRUCT, 'status', [TStatus, None], None, ),  # 1
-)
-all_structs.append(TGetQueryIdReq)
-TGetQueryIdReq.thrift_spec = (
-    None,  # 0
-    (1, TType.STRUCT, 'operationHandle', [TOperationHandle, None], None, ),  # 1
-)
-all_structs.append(TGetQueryIdResp)
-TGetQueryIdResp.thrift_spec = (
-    None,  # 0
-    (1, TType.STRING, 'queryId', 'UTF8', None, ),  # 1
 )
 all_structs.append(TGetLogReq)
 TGetLogReq.thrift_spec = (
