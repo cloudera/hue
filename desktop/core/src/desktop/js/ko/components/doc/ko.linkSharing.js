@@ -23,18 +23,22 @@ import DisposableComponent from '../DisposableComponent';
 import { DOCUMENT_UPDATED_EVENT } from 'doc/hueDocument';
 import huePubSub from 'utils/huePubSub';
 
+import 'ko/components/ko.dropDown';
+
+export const NAME = 'link-sharing';
+
 // prettier-ignore
 const TEMPLATE = `
   <!-- ko if: window.HAS_LINK_SHARING && perms() -->
   <div class="hue-link-sharing">
     <div style="float: right">
       <!-- ko ifnot: perms().link_sharing_on -->
-      <a href="javascript:void(0);" data-bind="click: createReadLink" title="${ I18n('Share the query via a link') }" >
+      <a href="javascript:void(0);" data-test="activate" data-bind="click: createReadLink" title="${ I18n('Share the query via a link') }" >
         <i class="fa fa-wf fa-link"></i> ${ I18n('Get link') }
       </a>
       <!-- /ko -->
       <!-- ko if: perms().link_sharing_on -->
-      <a href="javascript:void(0)" data-bind="click: deactivateLink" title="${ I18n('Deactivate the link sharing') }">
+      <a href="javascript:void(0)" data-test="deactivate" data-bind="click: deactivateLink" title="${ I18n('Deactivate the link sharing') }">
         <i class="fa fa-wf fa-link"></i> ${ I18n('Deactivate link') }
       </a>
       <!-- /ko -->
@@ -103,4 +107,4 @@ class LinkSharing extends DisposableComponent {
   }
 }
 
-componentUtils.registerComponent('link-sharing', LinkSharing, TEMPLATE);
+componentUtils.registerComponent(NAME, LinkSharing, TEMPLATE);
