@@ -8,7 +8,7 @@
 Query. Explore. Share.
 ----------------------
 
-Hue is a mature open source SQL Assistant for [querying](https://docs.gethue.com/user/querying/) [Databases & Data Warehouses](https://docs.gethue.com/administrator/configuration/connectors/) and collaborating: [gethue.com](http://gethue.com)
+Hue is a mature open source SQL Assistant for [querying](https://docs.gethue.com/user/querying/) any [Databases & Data Warehouses](https://docs.gethue.com/administrator/configuration/connectors/) and collaborating: [gethue.com](http://gethue.com)
 
 Many companies and organizations use Hue to quickly answer questions via self-service querying e.g.:
 
