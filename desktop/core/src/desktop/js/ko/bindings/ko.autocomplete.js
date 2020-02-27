@@ -54,7 +54,6 @@ ko.bindingHandlers.autocomplete = {
         minLength: 0,
         limitWidthToInput: false,
         minWidth: 200,
-        disabled: true,
         delay: delay,
         search: function() {
           window.clearTimeout(spinThrottle);
@@ -242,16 +241,5 @@ ko.bindingHandlers.autocomplete = {
     }
 
     $element.hueAutocomplete(options);
-
-    const enableAutocomplete = function() {
-      if ($element.data('custom-hueAutocomplete')) {
-        $element.hueAutocomplete('option', 'disabled', false);
-        $element.off('click', enableAutocomplete);
-      } else {
-        window.setTimeout(enableAutocomplete, 200);
-      }
-    };
-    // IE 11 trick to prevent it from being shown on page refresh
-    $element.on('click', enableAutocomplete);
   }
 };
