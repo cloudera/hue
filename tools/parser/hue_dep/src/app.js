@@ -3,7 +3,7 @@ import sqlAutocompleteParser from 'hue/desktop/core/src/desktop/js/parse/sql/hiv
 
 const beforeCursor = 'SELECT col1, col2, tbl2.col3 FROM tbl; '; // Note extra space at end
 const afterCursor = '';
-const dialect = 'impala';
+const dialect = 'hive';
 const debug = false;
 
 console.log(
