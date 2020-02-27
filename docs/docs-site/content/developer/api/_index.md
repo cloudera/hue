@@ -12,7 +12,7 @@ Hue can be accessed directly via a Python Shell or by its REST API. Some compone
 
 The parser is running on the client side and comes with just a few MBs of Javascript that are cached by the browser. This provides a very reactive experience to the end user and allow to import it as a module.
 
-While the dynamic content like the list of tables, columns is obviously fetched via a remote endpoint, all the SQL knowledge of the statements is available.
+While the dynamic content like the list of tables, columns is obviously fetched via a [remote endpoints](#sql-querying), all the SQL knowledge of the statements is available.
 
 See the currently shipped [SQL dialects](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/sql).
 
@@ -291,6 +291,57 @@ Adding/updating a comment with the dummy backend:
     });
 
 ### SQL Querying
+
+#### Listing Databases
+
+    $.post("/notebook/api/autocomplete/", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+#### Listing Tables
+
+    $.post("/notebook/api/autocomplete/<DB>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+#### Table details and Columns
+
+    $.post("/notebook/api/autocomplete/<DB>/<TABLE>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+#### Column details
+
+    $.post("/notebook/api/autocomplete/<DB>/<TABLE>/<COL1>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+For nested columns:
+
+    $.post("/notebook/api/autocomplete/<DB>/<TABLE>/<COL1>/<COL2>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
 ### SQL Risk Optimization
 ### Data Browsing
 ### Workflow scheduling
@@ -300,7 +351,7 @@ Adding/updating a comment with the dummy backend:
 * [Hue API: Execute some builtin or shell commands](http://gethue.com/hue-api-execute-some-builtin-commands/).
 * [How to manage the Hue database with the shell](http://gethue.com/how-to-manage-the-hue-database-with-the-shell/).
 
-### How to count documents of a user
+### Count the documents of a user
 
 On the command line:
 

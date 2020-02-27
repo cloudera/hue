@@ -329,3 +329,7 @@ And cf. above [prerequisites](#prerequisites), any interpreter snippet with `ksq
         interface=ksql
 
 Note: after [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) we will be able to have multiple interpreters on the same dialect (e.g. pointing to two different databases of the same type).
+
+## API
+
+Looking at importing the parser in your own apps? This is described in the [API section](/developer/api/#sql-autocompletion).
