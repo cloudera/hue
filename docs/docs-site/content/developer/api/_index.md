@@ -10,15 +10,15 @@ Hue can be accessed directly via a Python Shell or by its REST API. Some compone
 
 ## SQL autocompletion
 
-The parser is running on the client side and comes with just a few MBs of Javascript that are cached by the browser. This provides a very reactive experience to the end user and allow to import it as a module.
+The parser is running on the client side and comes with just a few megabytes of JavaScript that are cached by the browser. This provides a very reactive experience to the end user and allows to import it as a module.
 
-While the dynamic content like the list of tables, columns is obviously fetched via a [remote endpoints](#sql-querying), all the SQL knowledge of the statements is available.
+While the dynamic content like the list of tables, columns is obviously fetched via [remote endpoints](#sql-querying), all the SQL knowledge of the statements is available.
 
 See the currently shipped [SQL dialects](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/sql).
 
 ### npm package
 
-What if I only want to use only the autocomplete as a Javascript module in my own app?
+What if I only want to use only the autocomplete as a JavaScript module in my own app?
 
 Importing the Parser can be simply done as a npm package. Here is an example on how to use the parser in a node.js app:
 
