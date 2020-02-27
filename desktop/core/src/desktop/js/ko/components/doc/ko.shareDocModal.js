@@ -114,9 +114,9 @@ const TEMPLATE = `
                   value: searchInput,
                   textInput: searchInput
                 }
-              " class="ui-autocomplete-input" autocomplete="off" style="width: 420px">
-            <div class="btn-group" style="overflow:visible">
-              <a id="documentShareAddBtn" class="btn" data-bind="click: function () {  onShareAutocompleteUserEnter() }">
+              " class="ui-autocomplete-input" autocomplete="off" style="width: 476px">
+            <div class="btn-group" style="overflow:visible; margin-left: -4px;">
+              <a id="documentShareAddBtn" class="btn" style="border-radius: 0" data-bind="click: function () {  onShareAutocompleteUserEnter() }">
                 <span data-bind="text: selectedPerm() == 'read' ? '${ I18n('Read') }' : '${ I18n('Modify') }'">
                 </span>
               </a>

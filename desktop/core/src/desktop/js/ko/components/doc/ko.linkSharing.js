@@ -41,7 +41,7 @@ const TEMPLATE = `
     </div>
     <!-- ko if: perms().link_sharing_on -->
     <div>
-      ${ I18n('Anyone logged and with the link can') }
+      ${ I18n('Any logged in user with the link can') }
       <div class="perm-selector" data-bind="component: {
           name: 'hue-drop-down',
           params: {
