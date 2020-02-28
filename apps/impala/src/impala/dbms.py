@@ -41,6 +41,7 @@ def get_query_server_config(connector=None):
   else:
     query_server = {
         'server_name': 'impala',
+        'dialect': 'impala',
         'server_host': conf.SERVER_HOST.get(),
         'server_port': conf.SERVER_PORT.get(),
         'principal': conf.IMPALA_PRINCIPAL.get(),

@@ -216,6 +216,7 @@ def get_query_server_config_via_connector(connector):
   LOG.debug("Query cluster connector %s compute %s" % (connector_name, compute_name))
 
   return {
+      'dialect': connector['dialect'],
       'server_name': full_connector_name,
       'server_host': (connector['compute']['options'] if 'compute' in connector else connector['options'])['server_host'],
       'server_port': int((connector['compute']['options'] if 'compute' in connector else connector['options'])['server_port']),
@@ -223,8 +224,8 @@ def get_query_server_config_via_connector(connector):
       'auth_username': AUTH_USERNAME.get(),
       'auth_password': AUTH_PASSWORD.get(),
 
-      'impersonation_enabled': False, # TODO, Impala only, to add to connector class
-      'use_sasl': connector['dialect'] in ('impala', 'hive'),
+      'impersonation_enabled': connector['dialect'] in ('impala',),
+      'use_sasl': connector['dialect'] in ('hive',),
       'SESSION_TIMEOUT_S': 15 * 60,
       'querycache_rows': 1000,
       'QUERY_TIMEOUT_S': 15 * 60,
