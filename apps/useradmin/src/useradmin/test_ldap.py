@@ -18,12 +18,14 @@
 
 from __future__ import absolute_import
 import ldap
+import sys
 
 from django.conf import settings
+from django.db.utils import DatabaseError
 from django.urls import reverse
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
-from nose.tools import assert_true, assert_equal, assert_false
+from nose.tools import assert_true, assert_equal, assert_false, assert_raises
 
 import desktop.conf
 from desktop.lib.test_utils import grant_access
@@ -628,6 +630,27 @@ class TestUserAdminLdap(BaseUserAdminTests):
     assert_true(user_info[0]['first'] == 'Firstnamehasmorethanthirtychar', user_info[0]['first'])
     assert_true(user_info[0]['last'] == 'Lastnamehasmorethanthirtychara', user_info[0]['last'])
 
+    test_ldap_data = [('uid=thaiuser,ou=people,dc=sec,dc=test,dc=com', {'objectClass': ['inetOrgPerson', 'posixAccount', 'shadowAccount'], 'mail': ['thaiuser@sec.test.com'], 'givenName': ['ดีหรือแย่ อย่าไปแคร์ คนนินทา'], 'uid': ['thaiuser'], 'sn': ['ชมหรือด่า อย่าไปรับ ให้กลับคืนไป']})]
+
+    # Checking if first/last name in Thai truncation works for LDAP imports
+    user_info = ldap_access.LdapConnection._transform_find_user_results(result_data=test_ldap_data, user_name_attr='uid')
+    assert_false(len(user_info[0]['first']) > 30)
+    assert_false(len(user_info[0]['last']) > 30)
+    good_first_name = u'ดีหรือแย่ อย่าไปแคร์ คนนินทา'
+    truncated_last_name = u'ชมหรือด่า อย่าไปรับ ให้กลับคืนไป'[:30]
+    assert_true(user_info[0]['first'], good_first_name)
+    assert_true(user_info[0]['last'], truncated_last_name)
+
+    user, created = ldap_access.get_or_create_ldap_user(username=user_info[0]['username'])
+    user.first_name = user_info[0]['first']
+    user.last_name = 'ชมหรือด่า อย่าไปรับ ให้กลับคืนไป'[:30]
+    if sys.version_info[0] == 2:
+      assert_raises(DatabaseError, user.save) # 'Incorrect string value: '\\xE0\\xB8\\' for column 'last_name' at row 1'
+
+    user.last_name = user_info[0]['last']
+    user.save()
+    assert_true(user.first_name, good_first_name)
+    assert_true(user.last_name, truncated_last_name)
 
   def test_add_ldap_groups(self):
     URL = reverse(add_ldap_groups)
