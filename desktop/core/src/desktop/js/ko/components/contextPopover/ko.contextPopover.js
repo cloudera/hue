@@ -76,7 +76,7 @@ const SUPPORT_TEMPLATES = `
           <!-- ko if: data && data.last_modified -->
           <div><span>${I18n(
             'Modified'
-          )}</span> <span data-bind="text: data.last_modified"></span></div>
+          )}</span> <span data-bind="momentFromNow: { data: data.last_modified, titleFormat: 'LLL Z' }"></span></div>
           <!-- /ko -->
         <!-- /ko -->
         </div>

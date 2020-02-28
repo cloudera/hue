@@ -22,7 +22,7 @@ ko.bindingHandlers.momentFromNow = {
     const options = ko.unwrap(valueAccessor());
     const $element = $(element);
 
-    const value = typeof options.data === 'function' ? options.data() : options.data;
+    const value = ko.unwrap(options.data);
 
     function render() {
       $element.text(moment(value).fromNow());
@@ -35,7 +35,11 @@ ko.bindingHandlers.momentFromNow = {
 
     if (options.interval) {
       window.clearInterval($element.data('momentInterval'));
-      $element.data('momentInterval', window.setInterval(render, options.interval));
+      const interval = window.setInterval(render, options.interval);
+      $element.data('momentInterval', interval);
+      ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
+        window.clearInterval(interval);
+      });
     }
   }
 };
