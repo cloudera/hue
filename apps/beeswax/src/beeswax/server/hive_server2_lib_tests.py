@@ -19,11 +19,6 @@
 import logging
 import sys
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
-
 from nose.tools import assert_equal, assert_true, assert_raises, assert_not_equal
 from nose.plugins.skip import SkipTest
 from TCLIService.ttypes import TStatusCode
@@ -36,6 +31,11 @@ from useradmin.models import User
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
+
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock, MagicMock
+else:
+  from mock import patch, Mock, MagicMock
 
 
 LOG = logging.getLogger(__name__)

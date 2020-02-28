@@ -890,6 +890,7 @@ class HiveServerClient(object):
   def execute_query_statement(self, statement, max_rows=1000, configuration=None, orientation=TFetchOrientation.FETCH_FIRST, close_operation=False, session=None):
     if configuration is None:
       configuration = {}
+
     results, schema, operation_handle, session = self.execute_statement(statement=statement, max_rows=max_rows, configuration=configuration, orientation=orientation, session=session)
 
     if close_operation:
@@ -923,7 +924,10 @@ class HiveServerClient(object):
     if self.query_server['server_name'].startswith('impala') and self.query_server['QUERY_TIMEOUT_S'] > 0:
       configuration['QUERY_TIMEOUT_S'] = str(self.query_server['QUERY_TIMEOUT_S'])
 
-    req = TExecuteStatementReq(statement=statement.encode('utf-8'), confOverlay=configuration)
+    if sys.version_info[0] == 2:
+      statement = statement.encode('utf-8')
+
+    req = TExecuteStatementReq(statement=statement, confOverlay=configuration)
     (res, session) = self.call(self._client.ExecuteStatement, req, session=session)
 
     results, schema = self.fetch_result(res.operationHandle, max_rows=max_rows, orientation=orientation)
@@ -934,7 +938,10 @@ class HiveServerClient(object):
     if self.query_server['server_name'].startswith('impala') and self.query_server['QUERY_TIMEOUT_S'] > 0:
       confOverlay['QUERY_TIMEOUT_S'] = str(self.query_server['QUERY_TIMEOUT_S'])
 
-    req = TExecuteStatementReq(statement=statement.encode('utf-8'), confOverlay=confOverlay, runAsync=True)
+    if sys.version_info[0] == 2:
+      statement = statement.encode('utf-8')
+
+    req = TExecuteStatementReq(statement=statement, confOverlay=confOverlay, runAsync=True)
     (res, session) = self.call_return_result_and_session(self._client.ExecuteStatement, req, session=session)
 
     return HiveServerQueryHandle(
