@@ -28,6 +28,7 @@ import re
 import desktop.conf
 from desktop.lib.python_util import CaseInsensitiveDict
 from useradmin.models import User
+from django.utils.encoding import smart_text
 
 
 LOG = logging.getLogger(__name__)
@@ -238,13 +239,15 @@ class LdapConnection(object):
           }
 
           if 'givenName' in data:
-            if len(data['givenName'][0]) > 30:
+            first_name = smart_text(data['givenName'][0])
+            if len(first_name) > 30:
               LOG.warn('First name is truncated to 30 characters for [<User: %s>].' % ldap_info['username'])
-            ldap_info['first'] = data['givenName'][0][:30]
+            ldap_info['first'] = first_name[:30]
           if 'sn' in data:
-            if len(data['sn'][0]) > 30:
+            last_name = smart_text(data['sn'][0])
+            if len(last_name) > 30:
               LOG.warn('Last name is truncated to 30 characters for [<User: %s>].' % ldap_info['username'])
-            ldap_info['last'] = data['sn'][0][:30]
+            ldap_info['last'] = last_name[:30]
           if 'mail' in data:
             ldap_info['email'] = data['mail'][0]
           # memberOf and isMemberOf should be the same if they both exist
