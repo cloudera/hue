@@ -43,6 +43,7 @@ class TestStandardTables():
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
+
   def test_install_queries_mysql(self):
       design_dict = {
         "name": "TestStandardTables Query",
@@ -74,14 +75,6 @@ class TestStandardTables():
         assert_true(Document2.objects.filter(name='TestStandardTables Query').exists())
         query = Document2.objects.filter(name='TestStandardTables Query').get()
         assert_equal('query-mysql', query.type)
-
-  # def test_install_queries(self):
-  #     sample_user = install_sample_user()
-  #     cmd = beeswax_install_examples.Command()
-  #     app_nam = 'mysql'
-  #     interpreter = Mock()
-  #     cmd._install_queries(sample_user, app_name, interpreter=interpreter)
-
 
 
 class TestHiveServer2():
