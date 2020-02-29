@@ -46,7 +46,7 @@ def assert_ok_response(response):
   return response
 
 
-def make_logged_in_client(username="test", password="test", is_superuser=True, recreate=False, groupname=None):
+def make_logged_in_client(username="test", password="test", is_superuser=True, recreate=False, groupname=None, is_admin=False):
   """
   Create a client with a user already logged in.
 
@@ -61,6 +61,8 @@ def make_logged_in_client(username="test", password="test", is_superuser=True, r
   except User.DoesNotExist:
     user = User.objects.create_user(username=username, password=password)
     user.is_superuser = is_superuser
+    if ENABLE_ORGANIZATIONS.get():
+      user.is_admin = is_admin
     user.save()
   else:
     if user.is_superuser != is_superuser:
