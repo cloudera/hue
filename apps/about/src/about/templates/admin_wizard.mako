@@ -344,7 +344,11 @@ ${ layout.menubar(section='quick_start') }
     $(button).button('loading');
     $.post(button.data("sample-url"), function(data) {
       if (data.status == 0) {
-        $(document).trigger('info','${ _("Examples refreshed") }');
+        if (data.message) {
+          $(document).trigger('info', data.message);
+        } else {
+          $(document).trigger('info', '${ _("Examples refreshed") }');
+        }
         if ($(button).data("is-connector")) {
           huePubSub.publish('cluster.config.refresh.config');
         }
