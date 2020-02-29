@@ -135,15 +135,20 @@ def test_connector(request):
 @admin_required
 @api_error_handler
 def install_connector_examples(request):
+  message = []
+
   try:
-    _create_connector_examples()
+    added, skipped = _create_connector_examples()
+    if added:
+      message.append('Added connectors: ' + ', '.join(added))
+    if skipped:
+      message.append('Already installed connectors: ' + ', '.join(skipped))
   except Exception as e:
     raise PopupException(_('Error installing connector examples: %s') % e)
 
   update_app_permissions()
 
-  return JsonResponse({'status': 0})
-
+  return JsonResponse({'status': 0, 'message': '. '.join(message)})
 
 
 def _group_by_category(conns):

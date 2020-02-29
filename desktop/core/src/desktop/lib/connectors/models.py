@@ -96,13 +96,10 @@ else:
 
 
 def _get_installed_connectors(category=None, categories=None, dialect=None, interface=None, user=None):
-  from desktop.auth.backend import is_admin, is_hue_admin
-
-  if not Connector.objects.exists() and user and is_hue_admin(user):
-    _create_connector_examples()
-
+  from desktop.auth.backend import is_admin
 
   connectors_objects = Connector.objects.all()
+
   if user is not None and not is_admin(user):  # Apply Permissions
     connectors_objects = connectors_objects.filter(huepermission__in=user.get_permissions())
 
@@ -172,15 +169,23 @@ def _augment_connector_properties(connector):
 
 
 def _create_connector_examples():
-  for connector in _get_connector_examples():
-    Connector.objects.create(
-      name=connector['nice_name'],
-      description=connector['description'],
-      dialect=connector['dialect'],
-      settings=json.dumps(connector['settings'])
-    )
+  added = []
+  skipped = []
 
-  return Connector.objects.all()
+  for connector in _get_connector_examples():
+    name ='%(nice_name)s (%(dialect)s)' % connector
+    if not Connector.objects.filter(name=connector['nice_name']).exists():
+      connector = Connector.objects.create(
+        name=connector['nice_name'],
+        description=connector['description'],
+        dialect=connector['dialect'],
+        settings=json.dumps(connector['settings'])
+      )
+      result.append(name)
+    else:
+      skipped.append(name)
+
+  return added, skipped
 
 
 def _get_connector_examples():
