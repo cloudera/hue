@@ -107,8 +107,8 @@ class Command(BaseCommand):
       full_name = '%s.%s' % (db_name, table_dict['table_name'])
       try:
         table = SampleTable(table_dict, dialect, db_name, interpreter=interpreter, request=request)
-        table.install(django_user)
-        self.successes.append(_('Table %s installed.') % full_name)
+        if table.install(django_user):
+          self.successes.append(_('Table %s installed.') % full_name)
       except Exception as ex:
         msg = str(ex)
         LOG.error(msg)
@@ -173,6 +173,9 @@ class SampleTable(object):
 
 
   def install(self, django_user):
+    if has_concurrency_support() and not self.is_transactional:
+      LOG.info('Skipping table %s as non transactional' % self.name)
+      return
     if not (has_concurrency_support() and self.is_transactional) and not cluster.get_hdfs():
       raise PopupException('Requiring a File System to load its data')
 
@@ -184,6 +187,7 @@ class SampleTable(object):
     else:
       self.load(django_user)
 
+    return True
 
   def create(self, django_user):
     """

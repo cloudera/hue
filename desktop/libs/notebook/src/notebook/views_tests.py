@@ -72,7 +72,8 @@ class TestInstallExamples():
 
             assert_equal(0, data['status'], data)
             assert_equal(
-                'Query Sample: Salary Analysis mysql installed. Table default.employe_sample installed.',
+                'Query Sample: Salary Analysis mysql installed. '
+                'Table default.employe_sample installed.',
                 data['message'],
                 data
             )
@@ -109,6 +110,9 @@ class TestInstallExamples():
 
                 has_concurrency_support.return_value = False
 
+                fs = Mock(copyFromLocal=Mock())
+                get_hdfs.return_value = fs
+
                 resp = self.client.post(reverse('notebook:install_examples'), {'db_name': 'default'})
                 data = json.loads(resp.content)
 
@@ -129,6 +133,52 @@ class TestInstallExamples():
 
                 make_notebook.assert_called()
 
+                fs.do_as_user.assert_called()
+
 
   def test_install_via_insert_hive(self):
-    pass
+    with patch('notebook.views.Connector.objects') as ConnectorObjects:
+      with patch('notebook.views.get_interpreter') as get_interpreter:
+        with patch('notebook.connectors.base.get_ordered_interpreters') as get_ordered_interpreters:
+          with patch('beeswax.management.commands.beeswax_install_examples.make_notebook') as make_notebook:
+            with patch('beeswax.management.commands.beeswax_install_examples.has_concurrency_support') as has_concurrency_support:
+
+              ConnectorObjects.get = Mock(
+                return_value=Connector(
+                  id=10,
+                  name='MyHive',
+                  dialect='hive',
+                ),
+              )
+
+              get_interpreter.return_value = {'type': 10, 'dialect': 'hive'}
+              get_ordered_interpreters.return_value = [
+                {
+                  'name': 'MyHive',
+                  'type': 10,
+                  'dialect': 'hive',
+                  'interface': 'hiveserver',
+                }
+              ]
+
+              has_concurrency_support.return_value = True
+
+              resp = self.client.post(reverse('notebook:install_examples'), {'db_name': 'default'})
+              data = json.loads(resp.content)
+
+              assert_equal(0, data['status'], data)
+              assert_equal(
+                  'Query Sample: Top salary hive installed. '
+                  'Query Sample: Salary growth hive installed. '
+                  'Query Sample: Job loss hive installed. '
+                  'Query Sample: Customers hive installed. '  # Ideally should not be installed as table not installed
+                  'Table default.sample_07 installed. '
+                  'Table default.sample_08 installed. '
+                  # 'Table default.customers installed. '  # Not supported via INSERT yet
+                  'Table default.web_logs installed.',
+                  data['message'],
+                  data
+              )
+              assert_equal('', data['errorMessage'], data)
+
+              make_notebook.assert_called()
