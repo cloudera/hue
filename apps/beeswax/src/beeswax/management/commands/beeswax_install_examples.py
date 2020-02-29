@@ -174,8 +174,7 @@ class SampleTable(object):
 
   def install(self, django_user):
     if not (has_concurrency_support() and self.is_transactional) and not cluster.get_hdfs():
-      LOG.warn('Skipping table %s as requiring a File System to load its data' % self.name)
-      return
+      raise PopupException('Requiring a File System to load its data')
 
     self.create(django_user)
 
