@@ -199,8 +199,11 @@ class UserManager(BaseUserManager):
     """Create and save a regular User with the given email and password."""
     if extra_fields.get('username'):
       email = extra_fields.pop('username')
+
     if not extra_fields.get('organization'):
       extra_fields['organization'] = get_user_request_organization()
+      if not extra_fields['organization']:
+        extra_fields['organization'] = get_organization(email=email)
 
     extra_fields.setdefault('is_staff', False)
     extra_fields.setdefault('is_superuser', False)
