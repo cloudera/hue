@@ -68,18 +68,19 @@ class Command(BaseCommand):
     )
     exception = None
 
+
+    self.successes = []
+    self.errors = []
     try:
       sample_user = install_sample_user(user)  # Documents will belong to the sample user but we run the SQL as the current user
-      self._install_queries(sample_user, dialect, interpreter=interpreter)
-      self._install_tables(user, dialect, db_name, tables, interpreter=interpreter, request=request)
+      self.install_queries(sample_user, dialect, interpreter=interpreter)
+      self.install_tables(user, dialect, db_name, tables, interpreter=interpreter, request=request)
     except Exception as ex:
       exception = ex
 
     if exception is not None:
       pretty_msg = None
 
-      if "AlreadyExistsException" in str(exception):
-        pretty_msg = _("SQL table examples already installed.")
       if "Permission denied" in str(exception):
         pretty_msg = _("Permission denied. Please check with your system administrator.")
 
@@ -88,7 +89,10 @@ class Command(BaseCommand):
       else:
         raise exception
 
-  def _install_tables(self, django_user, dialect, db_name, tables, interpreter=None, request=None):
+    return self.successes, self.errors
+
+
+  def install_tables(self, django_user, dialect, db_name, tables, interpreter=None, request=None):
     data_dir = LOCAL_EXAMPLES_DATA_DIR.get()
     table_file = open(os.path.join(data_dir, tables))
     table_list = json.load(table_file)
@@ -100,16 +104,18 @@ class Command(BaseCommand):
       raise InstallException(_('No %s tables are available as samples') % dialect)
 
     for table_dict in table_list:
+      full_name = '%s.%s' % (db_name, table_dict['table_name'])
       try:
         table = SampleTable(table_dict, dialect, db_name, interpreter=interpreter, request=request)
         table.install(django_user)
+        self.successes.append(_('Table %s installed.') % full_name)
       except Exception as ex:
         msg = str(ex)
         LOG.error(msg)
-        raise InstallException(_('Could not install table %s: %s') % (table_dict['table_name'], msg))
+        self.errors.append(_('Could not install table %s: %s') % (full_name, msg))
 
 
-  def _install_queries(self, django_user, dialect, interpreter=None):
+  def install_queries(self, django_user, dialect, interpreter=None):
     design_file = open(os.path.join(LOCAL_EXAMPLES_DATA_DIR.get(), 'queries.json'))
     design_list = json.load(design_file)
     design_file.close()
@@ -127,8 +133,11 @@ class Command(BaseCommand):
       design = SampleQuery(design_dict)
       try:
         design.install(django_user, interpreter=interpreter)
+        self.successes.append(_('Query %s %s installed.') % (design_dict['name'], dialect))
       except Exception as ex:
-        raise InstallException(_('Could not install %s query: %s') % (dialect, ex))
+        msg = str(ex)
+        LOG.error(msg)
+        self.errors.append(_('Could not install %s query: %s') % (dialect, msg))
 
 
 class SampleTable(object):
@@ -196,8 +205,9 @@ class SampleTable(object):
 
       job.execute_and_wait(self.request)
     except Exception as ex:
-      if 'already exists' in str(ex):
-        LOG.warn('Table %s.%s already exists' % (self.db_name, self.name))
+      exception_string = str(ex)
+      if 'already exists' in exception_string or 'AlreadyExistsException' in exception_string:
+        raise PopupException('already exists')
       else:
         raise ex
 

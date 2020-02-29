@@ -392,7 +392,7 @@ def download(request):
 @require_POST
 @admin_required
 def install_examples(request):
-  response = {'status': -1, 'message': ''}
+  response = {'status': -1, 'message': '', 'errorMessage': ''}
 
   try:
     connector = Connector.objects.get(id=request.POST.get('connector'))
@@ -401,15 +401,19 @@ def install_examples(request):
       db_name = request.POST.get('db_name', 'default')
       interpreter = get_interpreter(connector_type=connector.to_dict()['type'], user=request.user)
 
-      beeswax_install_examples.Command().handle(
+      successes, errors = beeswax_install_examples.Command().handle(
           dialect=dialect, db_name=db_name, user=request.user, interpreter=interpreter, request=request
       )
+      response['message'] = ' '.join(successes)
+      response['errorMessage'] = ' '.join(errors)
+      response['status'] = len(errors)
     else:
-      Command().handle(user=request.user)  # Notebook examples
-    response['status'] = 0
+      Command().handle(user=request.user)
+      response['status'] = 0
+      response['message'] = _('Examples refreshed')
   except Exception as e:
-    msg = 'Error during Editor samples installation.'
+    msg = 'Error during Editor samples installation'
     LOG.exception(msg)
-    response['message'] = msg + ': ' + str(e)
+    response['errorMessage'] = msg + ': ' + str(e)
 
   return JsonResponse(response)
