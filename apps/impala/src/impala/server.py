@@ -27,7 +27,7 @@ from beeswax.server.dbms import QueryServerException
 from beeswax.server.hive_server2_lib import HiveServerClient
 
 from ImpalaService import ImpalaHiveServer2Service
-from impala.impala_flags import get_webserver_certificate_file
+from impala.impala_flags import get_webserver_certificate_file, is_webserver_spnego_required, is_kerberos_enabled
 from impala.conf import DAEMON_API_USERNAME, DAEMON_API_PASSWORD
 
 
@@ -137,9 +137,13 @@ class ImpalaDaemonApi(object):
       self._client.set_digest_auth(DAEMON_API_USERNAME.get(), DAEMON_API_PASSWORD.get())
 
     self._root = Resource(self._client)
-    self._security_enabled = False
+    self._security_enabled = is_kerberos_enabled
+    self._webserver_spnego_required = is_webserver_spnego_required()
     self._thread_local = threading.local()
 
+    # Authorized with Kerberos principal when either _security_enabled or _webserver_spnego_required is true
+    if self._webserver_spnego_required or self._security_enabled:
+      self._client.set_kerberos_auth()
 
   def __str__(self):
     return "ImpalaDaemonApi at %s" % self._url
