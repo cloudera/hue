@@ -108,12 +108,20 @@ class SqlAlchemyApi(Api):
 
   def _create_engine(self):
     if '${' in self.options['url']: # URL parameters substitution
+      auth_provided=False
       vars = {'user': self.user.username}
-      for _prop in self.options['session']['properties']:
-        if _prop['name'] == 'user':
-          vars['USER'] = _prop['value']
-        if _prop['name'] == 'password':
-          vars['PASSWORD'] = _prop['value']
+      if 'session' in self.options:
+        for _prop in self.options['session']['properties']:
+          if _prop['name'] == 'user':
+            vars['USER'] = _prop['value']
+            auth_provided = True
+          if _prop['name'] == 'password':
+            vars['PASSWORD'] = _prop['value']
+            auth_provided = True
+
+      if not auth_provided:
+        raise AuthenticationRequired(message='Missing username and/or password')
+
       raw_url = Template(self.options['url'])
       url = raw_url.safe_substitute(**vars)
     else:
