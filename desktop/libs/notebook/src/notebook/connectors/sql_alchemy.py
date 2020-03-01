@@ -141,11 +141,18 @@ class SqlAlchemyApi(Api):
 
     return create_engine(url, **options)
 
+  def _get_session(self, notebook, snippet):
+    for session in notebook['sessions']:
+      if session['type'] == snippet['type']:
+        return session
+
+    return None
+
   @query_error_handler
   def execute(self, notebook, snippet):
     guid = uuid.uuid4().hex
 
-    self.options['session'] = notebook['sessions'][0]
+    self.options['session'] = self._get_session(notebook, snippet)
     engine = self._create_engine()
     connection = engine.connect()
 
