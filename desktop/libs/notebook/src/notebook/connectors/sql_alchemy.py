@@ -152,7 +152,9 @@ class SqlAlchemyApi(Api):
   def execute(self, notebook, snippet):
     guid = uuid.uuid4().hex
 
-    self.options['session'] = self._get_session(notebook, snippet)
+    session = self._get_session(notebook, snippet)
+    if not session is None:
+      self.options['session'] = session
     engine = self._create_engine()
     connection = engine.connect()
 
