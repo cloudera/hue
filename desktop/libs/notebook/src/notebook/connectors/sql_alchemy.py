@@ -111,7 +111,7 @@ class SqlAlchemyApi(Api):
   def _create_engine(self):
     if '${' in self.options['url']: # URL parameters substitution
       auth_provided=False
-      vars = {'user': self.user.username}
+      vars = {'USER': self.user.username}
       if 'session' in self.options:
         for _prop in self.options['session']['properties']:
           if _prop['name'] == 'user':
