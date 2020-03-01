@@ -89,6 +89,8 @@ def query_error_handler(func):
         raise AuthenticationRequired(message=message)
       else:
         raise e
+    except AuthenticationRequired:
+      raise
     except Exception as e:
       message = force_unicode(e)
       if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
@@ -143,6 +145,7 @@ class SqlAlchemyApi(Api):
   def execute(self, notebook, snippet):
     guid = uuid.uuid4().hex
 
+    self.options['session'] = notebook['sessions'][0]
     engine = self._create_engine()
     connection = engine.connect()
 
