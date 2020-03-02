@@ -84,13 +84,22 @@ def get(user, query_server=None, cluster=None):
       if query_server.get('dialect') == 'impala':
         from impala.dbms import ImpalaDbms
         from impala.server import ImpalaServerClient
-        DBMS_CACHE[user.id][query_server['server_name']] = ImpalaDbms(HiveServerClientCompatible(ImpalaServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
+        DBMS_CACHE[user.id][query_server['server_name']] = ImpalaDbms(
+            HiveServerClientCompatible(ImpalaServerClient(query_server, user)),
+            QueryHistory.SERVER_TYPE[1][0]
+        )
       elif query_server['server_name'] == 'hms':
         from beeswax.server.hive_metastore_server import HiveMetastoreClient
-        DBMS_CACHE[user.id][query_server['server_name']] = HiveServer2Dbms(HiveMetastoreClient(query_server, user), QueryHistory.SERVER_TYPE[1][0])
+        DBMS_CACHE[user.id][query_server['server_name']] = HiveServer2Dbms(
+            HiveMetastoreClient(query_server, user),
+            QueryHistory.SERVER_TYPE[1][0]
+        )
       else:
         from beeswax.server.hive_server2_lib import HiveServerClient
-        DBMS_CACHE[user.id][query_server['server_name']] = HiveServer2Dbms(HiveServerClientCompatible(HiveServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
+        DBMS_CACHE[user.id][query_server['server_name']] = HiveServer2Dbms(
+            HiveServerClientCompatible(HiveServerClient(query_server, user)),
+            QueryHistory.SERVER_TYPE[1][0]
+        )
 
     return DBMS_CACHE[user.id][query_server['server_name']]
   finally:
@@ -198,6 +207,9 @@ def get_query_server_config(name='beeswax', connector=None):
           'server_port': SPARK_SERVER_PORT.get(),
           'use_sasl': SPARK_USE_SASL.get()
       })
+
+  if not query_server.get('dialect'):
+    query_server['dialect'] = query_server['server_name']
 
   debug_query_server = query_server.copy()
   debug_query_server['auth_password_used'] = bool(debug_query_server.pop('auth_password', None))
