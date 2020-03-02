@@ -173,11 +173,11 @@ class SqlAlchemyApi(Api):
 
     return {
       'sync': False,
-      'has_result_set': True,
+      'has_result_set': result.cursor != None,
       'modified_row_count': 0,
       'guid': guid,
       'result': {
-        'has_more': True,
+        'has_more': result.cursor != None,
         'data': [],
         'meta': cache['meta'],
         'type': 'table'
@@ -189,10 +189,15 @@ class SqlAlchemyApi(Api):
     guid = snippet['result']['handle']['guid']
     connection = CONNECTION_CACHE.get(guid)
 
+    response = {'status': 'canceled'}
+
     if connection:
-      return {'status': 'available'}
-    else:
-      return {'status': 'canceled'}
+      if snippet['result']['handle']['has_result_set']:
+        response['status'] = 'available'
+      else:
+        response['status'] = 'success'
+
+    return response
 
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
@@ -318,11 +323,9 @@ class SqlAlchemyApi(Api):
     response = {'status': -1, 'result': {}}
 
     metadata, sample_data = assist.get_sample_data(database, table, column=column, operation=operation)
-    has_result_set = sample_data is not None
 
-    if sample_data:
-      response['status'] = 0
-      response['rows'] = escape_rows(sample_data)
+    response['status'] = 0
+    response['rows'] = escape_rows(sample_data)
 
     if table and operation != 'hello':
       columns = assist.get_columns(database, table)

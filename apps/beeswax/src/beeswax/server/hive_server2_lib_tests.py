@@ -19,11 +19,6 @@
 import logging
 import sys
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
-
 from nose.tools import assert_equal, assert_true, assert_raises, assert_not_equal
 from nose.plugins.skip import SkipTest
 from TCLIService.ttypes import TStatusCode
@@ -35,7 +30,11 @@ from beeswax.server.hive_server2_lib import HiveServerTable, HiveServerClient
 from useradmin.models import User
 
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import grant_access
+
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock, MagicMock
+else:
+  from mock import patch, Mock, MagicMock
 
 
 LOG = logging.getLogger(__name__)
@@ -46,8 +45,6 @@ class TestHiveServerClient():
   def setUp(self):
     self.client = make_logged_in_client(username="test_hive_server2_lib", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test_hive_server2_lib")
-
-    grant_access(self.user.username, self.user.username, "beeswax")
 
     self.query_server = {
         'principal': 'hue',
@@ -179,6 +176,37 @@ class TestHiveServerClient():
         session_count + 1,
         Session.objects.filter(owner=self.user, application=self.query_server['server_name']).count()
       )
+
+  def test_get_databases_impala_specific(self):
+    query = Mock(
+      get_query_statement=Mock(return_value=['SELECT 1']),
+      settings=[]
+    )
+
+    with patch('beeswax.server.hive_server2_lib.HiveServerTRowSet') as HiveServerTRowSet:
+
+      client = HiveServerClient(self.query_server, self.user)
+
+      client.call = Mock(return_value=(Mock(), Mock()))
+      client.fetch_result = Mock(return_value=(Mock(), Mock()))
+      client._close = Mock()
+
+      client.get_databases(query)
+
+      assert_not_equal(
+        None,
+        client.call.call_args[0][1].schemaName,
+        client.call.call_args.args
+      )
+
+      with patch.dict(self.query_server, {'dialect': 'impala'}, clear=True):
+        client.get_databases(query)
+
+        assert_equal(
+          None, # Should be empty and not '*' with Impala
+          client.call.call_args[0][1].schemaName,
+          client.call.call_args.args
+        )
 
 
 class TestHiveServerTable():

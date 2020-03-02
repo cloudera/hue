@@ -220,10 +220,7 @@ def execute(request, engine=None):
 
     response = _execute_notebook(request, notebook, snippet)
 
-    span.set_tag(
-      'query-id',
-      response['handle']['guid'] if response.get('handle') and response['handle'].get('guid') else None
-    )
+    span.set_tag('query-id', response.get('handle', {}).get('guid'))
 
   return JsonResponse(response)
 
@@ -238,20 +235,28 @@ def check_status(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  if operation_id or not snippet: # To unify with _get_snippet
+  with opentracing.tracer.start_span('notebook-check_status') as span:
+    span.set_tag('user-id', request.user.username)
+    span.set_tag(
+      'query-id',
+      snippet.get('result', {}).get('handle', {}).get('guid')
+    )
+
+    response = _check_status(request, notebook=notebook, snippet=snippet, operation_id=operation_id)
+
+  return JsonResponse(response)
+
+
+def _check_status(request, notebook=None, snippet=None, operation_id=None):
+  response = {'status': -1}
+
+  if operation_id or not snippet:  # To unify with _get_snippet
     nb_doc = Document2.objects.get_by_uuid(user=request.user, uuid=operation_id or notebook['uuid'])
-    notebook = Notebook(document=nb_doc).get_data() # Used below
+    notebook = Notebook(document=nb_doc).get_data()  # Used below
     snippet = notebook['snippets'][0]
 
   try:
-    with opentracing.tracer.start_span('notebook-check_status') as span:
-      span.set_tag('user-id', request.user.username)
-      span.set_tag(
-        'query-id',
-        snippet['result']['handle']['guid'] if snippet['result'].get('handle') and snippet['result']['handle'].get('guid') else None
-      )
-      response['query_status'] = get_api(request, snippet).check_status(notebook, snippet)
-
+    response['query_status'] = get_api(request, snippet).check_status(notebook, snippet)
     response['status'] = 0
   except SessionExpired:
     response['status'] = 'expired'
@@ -266,6 +271,7 @@ def check_status(request):
       status = 'expired'
     else:
       status = 'failed'
+
     if response.get('query_status'):
       has_result_set = response['query_status'].get('has_result_set')
     else:
@@ -282,7 +288,7 @@ def check_status(request):
           nb_doc.update_data(nb)
           nb_doc.save()
 
-  return JsonResponse(response)
+  return response
 
 
 @require_POST

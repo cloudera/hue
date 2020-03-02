@@ -37,6 +37,10 @@ except Exception as e:
   LOG.warn('Oozie application is not enabled: %s' % e)
 
 
+def list_schedules(request):
+  return JsonResponse({})
+
+
 def new_schedule(request):
   return new_coordinator(request)
 

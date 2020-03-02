@@ -665,10 +665,13 @@ def get_sample_data(request, database, table, column=None):
 
 
 def _get_sample_data(db, database, table, column, is_async=False, cluster=None, operation=None):
-  table_obj = db.get_table(database, table)
-  if table_obj.is_impala_only and db.client.query_server['server_name'] != 'impala':
-    query_server = get_query_server_config('impala', connector=cluster)
-    db = dbms.get(db.client.user, query_server, cluster=cluster)
+  if operation == 'hello':
+    table_obj = None
+  else:
+    table_obj = db.get_table(database, table)
+    if table_obj.is_impala_only and db.client.query_server['server_name'] != 'impala':  # Kudu table, now Hive should support it though
+      query_server = get_query_server_config('impala', connector=cluster)
+      db = dbms.get(db.client.user, query_server, cluster=cluster)
 
   sample_data = db.get_sample(database, table_obj, column, generate_sql_only=is_async, operation=operation)
   response = {'status': -1}

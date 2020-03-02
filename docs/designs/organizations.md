@@ -17,7 +17,7 @@ Which under the cover does the switch between regular users and organizational u
 
 ```
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.models import User, Group, default_organization
+  from useradmin.models import User, Group
 else:
   from django.contrib.auth.models import User, Group
 ```

@@ -30,15 +30,9 @@ from desktop.conf import ENABLE_ORGANIZATIONS
 LOG = logging.getLogger(__name__)
 
 
-def default_organization():
-  from useradmin.models import Organization
-  default_organization, created = Organization.objects.get_or_create(name='default', domain='default')
-  return default_organization
-
-
 def get_user_request_organization():
   request = CrequestMiddleware.get_request()
-  return request.user.organization if request and hasattr(request, 'user') and request.user.is_authenticated() else default_organization()
+  return request.user.organization if request and hasattr(request, 'user') and request.user.is_authenticated() else None
 
 
 def _fitered_queryset(queryset, by_owner=False):
@@ -58,10 +52,6 @@ def _fitered_queryset(queryset, by_owner=False):
   return queryset
 
 
-"""
-Organizations handle contained sets of setups (user, group, connectors...).
-"""
-
 def get_organization(email, is_multi_user=False):
   domain = email.split('@')[1] if is_multi_user else email
 
@@ -70,7 +60,7 @@ def get_organization(email, is_multi_user=False):
     LOG.info("Materializing organization %s in the database, is_multi_user=%s" % (domain, is_multi_user))
   else:
     LOG.warn('No organization domain found for email %s' % email)  # For Backends without emails or when organization enabled by default
-    organization = default_organization()
+    organization = None
 
   return organization
 
@@ -89,6 +79,14 @@ class OrganizationManager(models.Manager):
 
 if ENABLE_ORGANIZATIONS.get():
   class Organization(models.Model):
+    """
+    Organizations handle contained sets of setups (user, group, connectors...).
+
+    An external user create an account and gets attached to its single user organization and becomes its admin. The organization can
+    be later converted to a multi user organization (if the domain name is owned by the first user).
+
+    An organization admin is not a Hue admin. The later is the true super user and has access to the server logs and metrics.
+    """
     name = models.CharField(max_length=200, help_text=_t("The name of the organization"), unique=True)
     uuid = models.CharField(default=uuid_default, max_length=36, unique=True)
     domain = models.CharField(max_length=200, help_text=_t("The domain name of the organization, e.g. gethue.com"), unique=True)
@@ -158,8 +156,11 @@ class UserManager(BaseUserManager):
 
     request = CrequestMiddleware.get_request()
 
-    if request and hasattr(request, 'user') and hasattr(request.user, '_wrapped') and type(request.user._wrapped) is not object:  # Avoid infinite recursion
-      kwargs['organization'] = get_user_request_organization()
+    # Avoid infinite recursion
+    if request and hasattr(request, 'user') and hasattr(request.user, '_wrapped') and type(request.user._wrapped) is not object:
+      organization = get_user_request_organization()
+      if organization:
+        kwargs['organization'] = organization
 
     return super(UserManager, self).get(*args, **kwargs)
 
@@ -173,17 +174,14 @@ class UserManager(BaseUserManager):
 
   def filter(self, *args, **kwargs):
     f = super(UserManager, self).filter(*args, **kwargs)
-    # f.values_list = self.values_list  # Patch so that chaining after a filter is backward compatible
+    # f.values_list = self.values_list  # Patch so that chaining after a filter is backward compatible. However creates wrong result.
     return f
 
   def values_list(self, *args, **kwargs):
-    print(args)
-    print(kwargs)
     if 'username' in args:
       args = list(args)
       args.remove('username')
       args.append('email')
-    print(args)
 
     return super(UserManager, self).values_list(*args, **kwargs)
 
@@ -201,8 +199,11 @@ class UserManager(BaseUserManager):
     """Create and save a regular User with the given email and password."""
     if extra_fields.get('username'):
       email = extra_fields.pop('username')
+
     if not extra_fields.get('organization'):
       extra_fields['organization'] = get_user_request_organization()
+      if not extra_fields['organization']:
+        extra_fields['organization'] = get_organization(email=email)
 
     extra_fields.setdefault('is_staff', False)
     extra_fields.setdefault('is_superuser', False)

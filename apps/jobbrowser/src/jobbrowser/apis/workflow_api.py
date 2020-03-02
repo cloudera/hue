@@ -30,8 +30,8 @@ LOG = logging.getLogger(__name__)
 try:
   from oozie.forms import ParameterForm
   from oozie.conf import OOZIE_JOBS_COUNT, ENABLE_OOZIE_BACKEND_FILTERING
-  from oozie.views.dashboard import get_oozie_job_log, list_oozie_workflow, manage_oozie_jobs, bulk_manage_oozie_jobs, has_dashboard_jobs_access, massaged_oozie_jobs_for_json, \
-      has_job_edition_permission
+  from oozie.views.dashboard import get_oozie_job_log, list_oozie_workflow, manage_oozie_jobs, bulk_manage_oozie_jobs, \
+      has_dashboard_jobs_access, massaged_oozie_jobs_for_json, has_job_edition_permission
   has_oozie_installed = True
 except Exception as e:
   LOG.warn('Some applications are not enabled for Job Browser v2: %s' % e)

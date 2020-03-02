@@ -24,16 +24,17 @@ from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false
 
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import add_to_group, grant_access
 from useradmin.models import User
 from notebook.connectors.base import AuthenticationRequired
 
 from notebook.connectors.sql_alchemy import SqlAlchemyApi
 
+
 if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock, MagicMock
 else:
   from mock import patch, Mock, MagicMock
+
 
 LOG = logging.getLogger(__name__)
 
@@ -44,7 +45,11 @@ class TestApi(object):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
 
     self.user = rewrite_user(User.objects.get(username="test"))
-    grant_access("test", "default", "notebook")
+    self.interpreter = {
+      'options': {
+        'url': 'mysql://hue:localhost@hue:3306/hue'
+      },
+    }
 
 
   def test_column_backticks_escaping(self):
@@ -65,7 +70,7 @@ class TestApi(object):
   def test_create_athena_engine(self):
     interpreter = {
       'options': {
-        'url': 'awsathena+rest://XXXXXXXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?s3_staging_dir=s3://gethue-athena/scratch'
+        'url': 'awsathena+rest://XXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?s3_staging_dir=s3://gethue-athena/scratch'
       }
     }
 
@@ -74,12 +79,6 @@ class TestApi(object):
 
 
   def test_fetch_result_empty(self):
-    interpreter = {
-      'options': {
-        'url': 'mysql://hue:localhost@hue:3306/hue'
-      },
-    }
-
     notebook = Mock()
     snippet = {'result': {'handle': {'guid': 'guid-1'}}}
     rows = 10
@@ -98,7 +97,7 @@ class TestApi(object):
         }
       )
 
-      data = SqlAlchemyApi(self.user, interpreter).fetch_result(notebook, snippet, rows, start_over)
+      data = SqlAlchemyApi(self.user, self.interpreter).fetch_result(notebook, snippet, rows, start_over)
 
       assert_false(data['has_more'])
       assert_not_equal(data['has_more'], [])
@@ -109,12 +108,6 @@ class TestApi(object):
 
 
   def test_fetch_result_rows(self):
-    interpreter = {
-      'options': {
-        'url': 'mysql://hue:localhost@hue:3306/hue'
-      }
-    }
-
     notebook = Mock()
     snippet = {'result': {'handle': {'guid': 'guid-1'}}}
     rows = 10
@@ -133,7 +126,7 @@ class TestApi(object):
         }
       )
 
-      data = SqlAlchemyApi(self.user, interpreter).fetch_result(notebook, snippet, rows, start_over)
+      data = SqlAlchemyApi(self.user, self.interpreter).fetch_result(notebook, snippet, rows, start_over)
 
       assert_false(data['has_more'])
       assert_not_equal(data['has_more'], [])
@@ -177,13 +170,42 @@ class TestApi(object):
       SqlAlchemyApi(self.user, interpreter)._create_engine()
 
 
+  def test_check_status(self):
+    notebook = Mock()
+
+    with patch('notebook.connectors.sql_alchemy.CONNECTION_CACHE') as CONNECTION_CACHE:
+
+      snippet = {'result': {'handle': {'guid': 'guid-1', 'has_result_set': False}}}
+      response = SqlAlchemyApi(self.user, self.interpreter).check_status(notebook, snippet)
+      assert_equal(response['status'], 'success')
+
+      snippet = {'result': {'handle': {'guid': 'guid-1', 'has_result_set': True}}}
+      response = SqlAlchemyApi(self.user, self.interpreter).check_status(notebook, snippet)
+      assert_equal(response['status'], 'available')
+
+
+  def test_get_sample_data(self):
+    snippet = Mock()
+
+    with patch('notebook.connectors.sql_alchemy.Assist.get_sample_data') as get_sample_data:
+      with patch('notebook.connectors.sql_alchemy.inspect') as inspect:
+        get_sample_data.return_value = (['col1'], [[1], [2]])
+
+        response = SqlAlchemyApi(self.user, self.interpreter).get_sample_data(snippet)
+
+        assert_equal(response['rows'], [[1], [2]])
+        assert_equal(
+          response['full_headers'],
+          [{'name': 'col1', 'type': 'STRING_TYPE', 'comment': ''}]
+        )
+
+
 class TestAutocomplete(object):
 
   def setUp(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
 
     self.user = rewrite_user(User.objects.get(username="test"))
-    grant_access("test", "default", "notebook")
 
 
   def test_empty_database_names(self):

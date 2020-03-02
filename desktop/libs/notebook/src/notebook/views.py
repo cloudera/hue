@@ -24,6 +24,7 @@ from django.db.models import Q
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
+from django.views.decorators.http import require_POST
 
 from beeswax.data_export import DOWNLOAD_COOKIE_AGE
 from beeswax.management.commands import beeswax_install_examples
@@ -202,6 +203,7 @@ def browse(request, database, table, partition_spec=None):
         'editor_type': editor_type,
     })
 
+
 # Deprecated in Hue 4
 @check_document_access_permission
 def execute_and_watch(request):
@@ -218,12 +220,25 @@ def execute_and_watch(request):
 
   if action == 'save_as_table':
     sql, success_url = api.export_data_as_table(notebook, snippet, destination)
-    editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute', database=snippet['database'])
+    editor = make_notebook(
+        name='Execute and watch',
+        editor_type=editor_type,
+        statement=sql,
+        status='ready-execute',
+        database=snippet['database']
+    )
   elif action == 'insert_as_query':
     # TODO: checks/workarounds in case of non impersonation or Sentry
     # TODO: keep older simpler way in case of known not many rows?
     sql, success_url = api.export_large_data_to_hdfs(notebook, snippet, destination)
-    editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute', database=snippet['database'], on_success_url=success_url)
+    editor = make_notebook(
+        name='Execute and watch',
+        editor_type=editor_type,
+        statement=sql,
+        status='ready-execute',
+        database=snippet['database'],
+        on_success_url=success_url
+    )
   elif action == 'index_query':
     if destination == '__hue__':
       destination = _get_snippet_name(notebook, unique=True, table_format=True)
@@ -314,7 +329,7 @@ def copy(request):
 
   notebooks = json.loads(request.POST.get('notebooks', '[]'))
 
-  if len(notebooks) == 0:
+  if not notebooks:
     response['message'] = _('No notebooks have been selected for copying.')
   else:
     ctr = 0
@@ -374,26 +389,31 @@ def download(request):
   return response
 
 
+@require_POST
 @admin_required
 def install_examples(request):
-  response = {'status': -1, 'message': ''}
+  response = {'status': -1, 'message': '', 'errorMessage': ''}
 
-  if request.method == 'POST':
-    try:
-      connector = Connector.objects.get(id=request.POST.get('connector'))
-      if connector:
-        app_name = 'beeswax' if connector.dialect == 'hive' else 'impala'
-        db_name = request.POST.get('db_name', 'default')
-        interpreter = get_interpreter(connector_type=connector.to_dict()['type'], user=request.user)
+  try:
+    connector = Connector.objects.get(id=request.POST.get('connector'))
+    if connector:
+      dialect = connector.dialect
+      db_name = request.POST.get('db_name', 'default')
+      interpreter = get_interpreter(connector_type=connector.to_dict()['type'], user=request.user)
 
-        beeswax_install_examples.Command().handle(app_name=app_name, db_name=db_name, user=request.user, interpreter=interpreter)
-      else:
-        Command().handle(user=request.user)
-        response['status'] = 0
-    except Exception as err:
-      LOG.exception(err)
-      response['message'] = str(err)
-  else:
-    response['message'] = _('A POST request is required.')
+      successes, errors = beeswax_install_examples.Command().handle(
+          dialect=dialect, db_name=db_name, user=request.user, interpreter=interpreter, request=request
+      )
+      response['message'] = ' '.join(successes)
+      response['errorMessage'] = ' '.join(errors)
+      response['status'] = len(errors)
+    else:
+      Command().handle(user=request.user)
+      response['status'] = 0
+      response['message'] = _('Examples refreshed')
+  except Exception as e:
+    msg = 'Error during Editor samples installation'
+    LOG.exception(msg)
+    response['errorMessage'] = msg + ': ' + str(e)
 
   return JsonResponse(response)

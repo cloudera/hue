@@ -279,13 +279,58 @@ class Notebook(object):
     )
 
   def execute(self, request, batch=False):
-    from notebook.api import _execute_notebook # Cyclic dependency
+    from notebook.api import _execute_notebook  # Cyclic dependency
 
     notebook_data = self.get_data()
     snippet = notebook_data['snippets'][0]
     snippet['wasBatchExecuted'] = batch
 
     return _execute_notebook(request, notebook_data, snippet)
+
+
+  def execute_and_wait(self, request, timeout_sec=30.0, sleep_interval=0.5):
+      """
+      Run query and check status until it finishes or timeouts.
+
+      Check status until it finishes or timeouts.
+      """
+      handle = self.execute(request, batch=False)
+
+      if handle['status'] != 0:
+        raise QueryError(e, message='SQL statement failed.', handle=handle)
+
+      operation_id = handle['history_uuid']
+      curr = time.time()
+      end = curr + timeout_sec
+
+      status = self.check_status(request, operation_id=operation_id)
+
+      while curr <= end:
+        if status['status'] not in ('waiting', 'running'):
+          return handle
+
+        status = self.check_status(request, operation_id=operation_id)
+        time.sleep(sleep_interval)
+        curr = time.time()
+
+      # TODO
+      # msg = "The query timed out after %(timeout)d seconds, canceled query." % {'timeout': timeout_sec}
+      # LOG.warning(msg)
+      # try:
+      #   self.cancel_operation(handle)
+      #   # get_api(request, snippet).cancel(notebook, snippet)
+      # except Exception as e:
+      #   msg = "Failed to cancel query."
+      #   LOG.warning(msg)
+      #   self.close_operation(handle)
+      #   raise QueryServerException(e, message=msg)
+
+      raise OperationTimeout()
+
+  def check_status(self, request, operation_id):
+    from notebook.api import _check_status  # Cyclic dependency
+
+    return _check_status(request, operation_id=operation_id)
 
 
 def get_interpreter(connector_type, user=None):
