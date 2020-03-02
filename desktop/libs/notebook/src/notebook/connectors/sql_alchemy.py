@@ -158,7 +158,7 @@ class SqlAlchemyApi(Api):
     engine = self._create_engine()
     connection = engine.connect()
 
-    result = connection.execution_options(stream_results=True).execute(snippet['statement'])
+    result = connection.execute(snippet['statement'])
 
     cache = {
       'connection': connection,
@@ -403,7 +403,7 @@ class Assist(object):
 
     connection = self.engine.connect()
     try:
-      result = connection.execution_options(stream_results=True).execute(statement)
+      result = connection.execute(statement)
       return result.cursor.description, result.fetchall()
     finally:
       connection.close()
