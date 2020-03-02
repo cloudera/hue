@@ -63,6 +63,8 @@ def make_logged_in_client(username="test", password="test", is_superuser=True, r
     user.is_superuser = is_superuser
     if ENABLE_ORGANIZATIONS.get():
       user.is_admin = is_admin
+    else:
+      user.is_superuser = user.is_superuser or is_admin
     user.save()
   else:
     if user.is_superuser != is_superuser:
