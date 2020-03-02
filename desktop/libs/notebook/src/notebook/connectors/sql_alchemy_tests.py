@@ -20,11 +20,12 @@ from builtins import object
 import logging
 import sys
 
-from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false
+from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false, raises
 
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
+from notebook.connectors.base import AuthenticationRequired
 
 from notebook.connectors.sql_alchemy import SqlAlchemyApi
 
@@ -65,7 +66,6 @@ class TestApi(object):
       }
     }
     assert_equal(SqlAlchemyApi(self.user, interpreter).backticks, '"')
-
 
   def test_create_athena_engine(self):
     interpreter = {
@@ -134,6 +134,40 @@ class TestApi(object):
 
       assert_equal(data['data'], [['row1'], ['row2']])
       assert_equal(data['meta'](), [{'type': 'BIGINT_TYPE'}])
+
+  @raises(AuthenticationRequired)
+  def test_create_engine_auth_error(self):
+    interpreter = {
+        'options': {
+            'url': 'mysql://${USER}:${PASSWORD}@hue:3306/hue'
+        }
+    }
+
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      SqlAlchemyApi(self.user, interpreter)._create_engine()
+
+
+  def test_create_engine_auth(self):
+    interpreter = {
+      'options': {
+        'url': 'mysql://${USER}:${PASSWORD}@hue:3306/hue',
+        'session': {
+          'properties': [
+            {
+              'name': 'user',
+              'value': 'test_user'
+            },
+            {
+              'name': 'password',
+              'value': 'test_pass'
+            }
+          ]
+        }
+      }
+    }
+
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      SqlAlchemyApi(self.user, interpreter)._create_engine()
 
 
   def test_check_status(self):

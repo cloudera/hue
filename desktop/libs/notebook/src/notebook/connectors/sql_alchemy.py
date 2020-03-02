@@ -89,6 +89,8 @@ def query_error_handler(func):
         raise AuthenticationRequired(message=message)
       else:
         raise e
+    except AuthenticationRequired:
+      raise
     except Exception as e:
       message = force_unicode(e)
       if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
@@ -108,12 +110,20 @@ class SqlAlchemyApi(Api):
 
   def _create_engine(self):
     if '${' in self.options['url']: # URL parameters substitution
-      vars = {'user': self.user.username}
-      for _prop in self.options['session']['properties']:
-        if _prop['name'] == 'user':
-          vars['USER'] = _prop['value']
-        if _prop['name'] == 'password':
-          vars['PASSWORD'] = _prop['value']
+      auth_provided=False
+      vars = {'USER': self.user.username}
+      if 'session' in self.options:
+        for _prop in self.options['session']['properties']:
+          if _prop['name'] == 'user':
+            vars['USER'] = _prop['value']
+            auth_provided = True
+          if _prop['name'] == 'password':
+            vars['PASSWORD'] = _prop['value']
+            auth_provided = True
+
+      if not auth_provided:
+        raise AuthenticationRequired(message='Missing username and/or password')
+
       raw_url = Template(self.options['url'])
       url = raw_url.safe_substitute(**vars)
     else:
@@ -131,10 +141,20 @@ class SqlAlchemyApi(Api):
 
     return create_engine(url, **options)
 
+  def _get_session(self, notebook, snippet):
+    for session in notebook['sessions']:
+      if session['type'] == snippet['type']:
+        return session
+
+    return None
+
   @query_error_handler
   def execute(self, notebook, snippet):
     guid = uuid.uuid4().hex
 
+    session = self._get_session(notebook, snippet)
+    if not session is None:
+      self.options['session'] = session
     engine = self._create_engine()
     connection = engine.connect()
 
