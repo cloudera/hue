@@ -20,9 +20,8 @@ from builtins import object
 import json
 import sys
 
-from nose.tools import assert_equal, assert_true, assert_false
-
 from django.urls import reverse
+from nose.tools import assert_equal, assert_true, assert_false
 
 from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
@@ -45,7 +44,7 @@ class TestNotebook(object):
   def test_execute_and_wait(self):
     query = Notebook()
 
-    query.execute = Mock(return_value={'history_uuid': 1})
+    query.execute = Mock(return_value={'history_uuid': 1, 'status': 0})
     query.check_status = Mock(
       side_effect=check_status_side_effect
     )
