@@ -590,7 +590,7 @@ class HiveServerClient(object):
   def get_security(self):
     principal = self.query_server['principal']
     impersonation_enabled = False
-    auth_username = self.query_server['auth_username'] # Pass-through LDAP/PAM authentication
+    auth_username = self.query_server['auth_username']  # Pass-through LDAP/PAM authentication
     auth_password = self.query_server['auth_password']
 
     if principal:
@@ -598,9 +598,9 @@ class HiveServerClient(object):
     else:
       kerberos_principal_short_name = None
 
-    use_sasl = self.query_server['use_sasl']
+    use_sasl = self.query_server['use_sasl']  # Coming from dialect conf.USE_SASL
     if self.query_server.get('dialect') == 'impala':
-      if auth_password: # Force LDAP/PAM.. auth if auth_password is provided
+      if auth_password:  # Force LDAP/PAM.. auth if auth_password is provided
         mechanism = HiveServerClient.HS2_MECHANISMS['NONE']
       else:
         mechanism = HiveServerClient.HS2_MECHANISMS['KERBEROS']
@@ -608,7 +608,9 @@ class HiveServerClient(object):
     else:
       hive_mechanism = hive_site.get_hiveserver2_authentication()
       if hive_mechanism not in HiveServerClient.HS2_MECHANISMS:
-        raise Exception(_('%s server authentication not supported. Valid are %s.') % (hive_mechanism, list(HiveServerClient.HS2_MECHANISMS.keys())))
+        raise Exception(
+          _('%s server authentication not supported. Valid are %s.') % (hive_mechanism, list(HiveServerClient.HS2_MECHANISMS.keys()))
+        )
       mechanism = HiveServerClient.HS2_MECHANISMS[hive_mechanism]
       impersonation_enabled = hive_site.hiveserver2_impersonation_enabled()
 
@@ -619,14 +621,14 @@ class HiveServerClient(object):
     self.user = user
     kwargs = {
         'client_protocol': beeswax_conf.THRIFT_VERSION.get() - 1,
-        'username': user.username, # If SASL or LDAP, it gets the username from the authentication mechanism" since it dependents on it.
+        'username': user.username,  # If SASL or LDAP, it gets the username from the authentication mechanism since it dependents on it.
         'configuration': {},
     }
 
     if self.impersonation_enabled:
       kwargs.update({'username': DEFAULT_USER})
 
-      if self.query_server.get('dialect') == 'impala': # Only when Impala accepts it
+      if self.query_server.get('dialect') == 'impala':  # Only when Impala accepts it
         kwargs['configuration'].update({'impala.doas.user': user.username})
 
     if self.query_server['server_name'] == 'beeswax': # All the time
