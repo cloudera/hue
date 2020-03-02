@@ -15,6 +15,14 @@ Hue connect to any database or warehouse via native connectors or SqlAlchemy.
 
 Read about [how to build your own parser](/developer/parsers/) if you are looking at better autocompletes for your own SQL dialects.
 
+Note that USER and PASSWORD can be prompted to the user:
+
+    [[[mysql]]]
+       name=MySQL
+       interface=sqlalchemy
+       options='{"url": "mysql://${USER}:${PASSWORD}@localhost:3306/hue"}'
+
+
 ### Apache Impala
 
 Support is native via a dedicated section.
@@ -100,23 +108,23 @@ The dialect should be added to the Python system or Hue Python virtual environme
 Then give Hue the information about the database source:
 
     [[[mysql]]]
-       name = MySQL
-       interface=sqlalchemy
-       options='{"url": "mysql://root:root@localhost:3306/hue"}'
-       ## mysql://${USER}:${PASSWORD}@localhost:3306/hue
+    name=MySQL
+    interface=sqlalchemy
+    options='{"url": "mysql://root:root@localhost:3306/hue"}'
+    ## mysql://${USER}:${PASSWORD}@localhost:3306/hue
 
 Query string options are documented in the [SqlAlchemy MySQL documentation](https://docs.sqlalchemy.org/en/latest/dialects/mysql.html).
 
 Alternative:
 
     [[[mysqljdbc]]]
-       name=MySql JDBC
-      interface=jdbc
-       ## Specific options for connecting to the server.
-       ## The JDBC connectors, e.g. mysql.jar, need to be in the CLASSPATH environment variable.
-       ## If 'user' and 'password' are omitted, they will be prompted in the UI.
-       options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver", "user": "root", "password": "root"}'
-       ## options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver"}'
+    name=MySql JDBC
+    interface=jdbc
+    ## Specific options for connecting to the server.
+    ## The JDBC connectors, e.g. mysql.jar, need to be in the CLASSPATH environment variable.
+    ## If 'user' and 'password' are omitted, they will be prompted in the UI.
+    options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver", "user": "root", "password": "root"}'
+    ## options='{"url": "jdbc:mysql://localhost:3306/hue", "driver": "com.mysql.jdbc.Driver"}'
 
 ### Presto
 
