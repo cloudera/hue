@@ -34,6 +34,12 @@ import StorageContext from './storageContext';
 import componentUtils from '../componentUtils';
 import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 
+export const CONTEXT_POPOVER_CLASS = 'hue-popover';
+export const HIDE_EVENT = 'context.popover.hide';
+export const SHOW_EVENT = 'context.popover.show';
+export const NAME = 'context-popover';
+
+// prettier-ignore
 const SUPPORT_TEMPLATES = `
   <script type="text/html" id="context-popover-footer">
     <div class="context-popover-flex-bottom-links">
@@ -500,8 +506,9 @@ const SUPPORT_TEMPLATES = `
   </script>
 `;
 
+// prettier-ignore
 const CONTEXT_POPOVER_TEMPLATE = `
-  <div class="hue-popover" data-bind="css: orientationClass, style: { 'left': left() + 'px', 'top': top() + 'px', 'width': width() + 'px', height: height() + 'px' }, resizable: { containment: 'document', handles: resizeHelper.resizableHandles, start: resizeHelper.resizeStart, stop: resizeHelper.resizeStop, resize: resizeHelper.resize }">
+  <div class="${ CONTEXT_POPOVER_CLASS }" data-bind="css: orientationClass, style: { 'left': left() + 'px', 'top': top() + 'px', 'width': width() + 'px', height: height() + 'px' }, resizable: { containment: 'document', handles: resizeHelper.resizableHandles, start: resizeHelper.resizeStart, stop: resizeHelper.resizeStop, resize: resizeHelper.resize }">
     <div class="hue-popover-arrow" data-bind="style: { 'margin-left': leftAdjust() + 'px',  'margin-top': topAdjust() + 'px' }"></div>
     <!-- ko if: typeof titleTemplate !== 'undefined' -->
     <!-- ko template: { name: titleTemplate, data: contents } --><!-- /ko -->
@@ -530,6 +537,7 @@ const CONTEXT_POPOVER_TEMPLATE = `
   </div>
 `;
 
+// prettier-ignore
 const GLOBAL_SEARCH_TEMPLATE = `
   <!-- ko if: isCatalogEntry -->
   <!-- ko with: contents -->
@@ -845,27 +853,29 @@ class ContextPopoverViewModel {
   }
 }
 
-componentUtils.registerComponent(
-  'context-popover',
-  ContextPopoverViewModel,
-  SUPPORT_TEMPLATES +
-    DOCUMENT_CONTEXT_TEMPLATE +
-    FUNCTION_CONTEXT_TEMPLATE +
-    PARTITION_CONTEXT_TEMPLATE +
-    CONTEXT_POPOVER_TEMPLATE
-);
+componentUtils
+  .registerComponent(
+    NAME,
+    ContextPopoverViewModel,
+    SUPPORT_TEMPLATES +
+      DOCUMENT_CONTEXT_TEMPLATE +
+      FUNCTION_CONTEXT_TEMPLATE +
+      PARTITION_CONTEXT_TEMPLATE +
+      CONTEXT_POPOVER_TEMPLATE
+  )
+  .then(() => {
+    huePubSub.subscribe(HIDE_EVENT, hidePopover);
 
-huePubSub.subscribe('context.popover.hide', hidePopover);
-
-huePubSub.subscribe('context.popover.show', details => {
-  hidePopover();
-  const $contextPopover = $(
-    '<div id="contextPopover" data-bind="component: { name: \'context-popover\', params: $data }" />'
-  );
-  $('body').append($contextPopover);
-  ko.applyBindings(details, $contextPopover[0]);
-  huePubSub.publish('context.popover.shown');
-});
+    huePubSub.subscribe(SHOW_EVENT, details => {
+      hidePopover();
+      const $contextPopover = $(
+        '<div id="contextPopover" data-bind="component: { name: \'context-popover\', params: $data }" />'
+      );
+      $('body').append($contextPopover);
+      ko.applyBindings(details, $contextPopover[0]);
+      huePubSub.publish('context.popover.shown');
+    });
+  });
 
 class SqlContextContentsGlobalSearch {
   constructor(params) {
