@@ -70,13 +70,13 @@ const SUPPORT_TEMPLATES = `
       <!-- ko if: isDocument -->
         <div class="context-popover-bottom-attributes">
         <!-- ko with: contents -->
-          <!-- ko if: data && data.owner -->
-          <div><span>${I18n('Owner')}</span> <span data-bind="text: data.owner"></span></div>
-          <!-- /ko -->
           <!-- ko if: data && data.last_modified -->
           <div><span>${I18n(
             'Modified'
           )}</span> <span data-bind="momentFromNow: { data: data.last_modified, titleFormat: 'LLL Z' }"></span></div>
+          <!-- /ko -->
+          <!-- ko if: data && data.owner && data.owner !== window.LOGGED_USERNAME -->
+          <div><span>${I18n('Owner')}</span> <span data-bind="text: data.owner"></span></div>
           <!-- /ko -->
         <!-- /ko -->
         </div>
