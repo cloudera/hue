@@ -142,6 +142,7 @@ import 'ko/components/assist/ko.assistStoragePanel';
 import 'ko/components/assist/ko.rightAssistPanel';
 import 'ko/components/contextPopover/ko.contextPopover';
 import 'ko/components/contextPopover/ko.quickQueryContext';
+import 'ko/components/contextPopover/ko.popoverOnHover';
 import 'ko/components/doc/ko.shareDocModal';
 import 'ko/components/simpleAceEditor/ko.simpleAceEditor';
 

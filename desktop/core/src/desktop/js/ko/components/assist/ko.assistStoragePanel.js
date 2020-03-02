@@ -140,7 +140,7 @@ const TEMPLATE = `
       <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 22, container: '.assist-storage-scrollable', fetchMore: $data.fetchMore.bind($data) }">
         <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'storage-context-items', scrollContainer: '.assist-storage-scrollable' }, visibleOnHover: { override: contextPopoverVisible, 'selector': '.assist-actions' }">
           <div class="assist-actions table-actions" style="opacity: 0;" >
-            <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="click: showContextPopover, css: { 'blue': contextPopoverVisible }">
+            <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="popoverOnHover: showContextPopover, css: { 'blue': contextPopoverVisible }">
               <i class='fa fa-info' title="${I18n('Details')}"></i>
             </a>
           </div>
