@@ -384,7 +384,7 @@ class EditorViewModel {
             });
           }
 
-          if (typeof callback !== 'undefined' && callback !== null) {
+          if (callback) {
             callback();
           }
           resolve();
@@ -422,7 +422,7 @@ class EditorViewModel {
           this.changeURL(this.URLS.notebook + '?notebook=' + docData.document.id);
         }
       }
-      if (typeof callback !== 'undefined') {
+      if (callback) {
         callback();
       }
     } catch (err) {

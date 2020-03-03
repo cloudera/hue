@@ -576,7 +576,7 @@ class EditorViewModel {
                 self.changeURL(self.URLS.notebook + '?notebook=' + data.document.id);
               }
             }
-            if (typeof callback !== 'undefined') {
+            if (callback) {
               callback();
             }
             deferredOpen.resolve();
@@ -627,7 +627,7 @@ class EditorViewModel {
             });
           }
 
-          if (typeof callback !== 'undefined' && callback !== null) {
+          if (callback) {
             callback();
           }
         }
