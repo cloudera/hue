@@ -52,7 +52,7 @@ class TestImpalaDaemonApi():
           server = ImpalaDaemonApi('localhost')
 
           server._client.set_digest_auth.assert_called()
-          server._client.set_kerberos_auth().assert_not_called()
+          server._client.set_kerberos_auth.assert_not_called()
 
     with patch('impala.server.DAEMON_API_USERNAME.get') as DAEMON_API_USERNAME_get:
       with patch('impala.server.DAEMON_API_PASSWORD.get') as DAEMON_API_PASSWORD_get:
@@ -63,4 +63,92 @@ class TestImpalaDaemonApi():
           server = ImpalaDaemonApi('localhost')
 
           server._client.set_digest_auth.assert_not_called()
-          server._client.set_kerberos_auth().assert_not_called()
+          server._client.set_kerberos_auth.assert_not_called()
+
+  def test_kerberos_auth(self):
+
+    with patch('impala.server.DAEMON_API_USERNAME.get') as DAEMON_API_USERNAME_get:
+      with patch('impala.server.DAEMON_API_PASSWORD.get') as DAEMON_API_PASSWORD_get:
+        with patch('impala.server.HttpClient') as HttpClient:
+          with patch('impala.server.is_webserver_spnego_enabled') as is_webserver_spnego_enabled:
+
+            DAEMON_API_USERNAME_get.return_value = 'impala'
+            DAEMON_API_PASSWORD_get.return_value = 'impala'
+            is_webserver_spnego_enabled.return_value = True
+
+            server = ImpalaDaemonApi('localhost')
+
+            server._client.set_digest_auth.assert_called()
+            server._client.set_kerberos_auth.assert_not_called()
+
+    with patch('impala.server.DAEMON_API_USERNAME.get') as DAEMON_API_USERNAME_get:
+      with patch('impala.server.DAEMON_API_PASSWORD.get') as DAEMON_API_PASSWORD_get:
+        with patch('impala.server.HttpClient') as HttpClient:
+          with patch('impala.server.is_webserver_spnego_enabled') as is_webserver_spnego_enabled:
+
+
+            DAEMON_API_USERNAME_get.return_value = None
+            DAEMON_API_PASSWORD_get.return_value = 'impala'
+            is_webserver_spnego_enabled.return_value = False
+
+            server = ImpalaDaemonApi('localhost')
+
+            server._client.set_digest_auth.assert_not_called()
+            server._client.set_kerberos_auth.assert_not_called()
+
+    with patch('impala.server.DAEMON_API_USERNAME.get') as DAEMON_API_USERNAME_get:
+      with patch('impala.server.DAEMON_API_PASSWORD.get') as DAEMON_API_PASSWORD_get:
+        with patch('impala.server.HttpClient') as HttpClient:
+          with patch('impala.server.is_kerberos_enabled') as is_kerberos_enabled:
+            DAEMON_API_USERNAME_get.return_value = None
+            DAEMON_API_PASSWORD_get.return_value = None
+            is_kerberos_enabled.return_value = True
+
+            server = ImpalaDaemonApi('localhost')
+
+            server._client.set_digest_auth.assert_not_called()
+            server._client.set_kerberos_auth.assert_called()
+
+    with patch('impala.server.DAEMON_API_USERNAME.get') as DAEMON_API_USERNAME_get:
+      with patch('impala.server.DAEMON_API_PASSWORD.get') as DAEMON_API_PASSWORD_get:
+        with patch('impala.server.HttpClient') as HttpClient:
+          with patch('impala.server.is_webserver_spnego_enabled') as is_webserver_spnego_enabled:
+
+            DAEMON_API_USERNAME_get.return_value = None
+            DAEMON_API_PASSWORD_get.return_value = None
+            is_webserver_spnego_enabled.return_value = True
+
+            server = ImpalaDaemonApi('localhost')
+
+            server._client.set_digest_auth.assert_not_called()
+            server._client.set_kerberos_auth.assert_called()
+
+    with patch('impala.server.DAEMON_API_USERNAME.get') as DAEMON_API_USERNAME_get:
+      with patch('impala.server.DAEMON_API_PASSWORD.get') as DAEMON_API_PASSWORD_get:
+        with patch('impala.server.HttpClient') as HttpClient:
+          with patch('impala.server.is_kerberos_enabled') as is_kerberos_enabled:
+            with patch('impala.server.is_webserver_spnego_enabled') as is_webserver_spnego_enabled:
+              DAEMON_API_USERNAME_get.return_value = None
+              DAEMON_API_PASSWORD_get.return_value = None
+              is_kerberos_enabled.return_value = False
+              is_webserver_spnego_enabled.return_value = False
+
+              server = ImpalaDaemonApi('localhost')
+
+              server._client.set_digest_auth.assert_not_called()
+              server._client.set_kerberos_auth.assert_not_called()
+
+    with patch('impala.server.DAEMON_API_USERNAME.get') as DAEMON_API_USERNAME_get:
+      with patch('impala.server.DAEMON_API_PASSWORD.get') as DAEMON_API_PASSWORD_get:
+        with patch('impala.server.HttpClient') as HttpClient:
+          with patch('impala.server.is_kerberos_enabled') as is_kerberos_enabled:
+            with patch('impala.server.is_webserver_spnego_enabled') as is_webserver_spnego_enabled:
+              DAEMON_API_USERNAME_get.return_value = None
+              DAEMON_API_PASSWORD_get.return_value = None
+              is_kerberos_enabled.return_value = True
+              is_webserver_spnego_enabled.return_value = True
+
+              server = ImpalaDaemonApi('localhost')
+
+              server._client.set_digest_auth.assert_not_called()
+              server._client.set_kerberos_auth.assert_called()

@@ -95,10 +95,10 @@ def is_transactional():
 def is_kerberos_enabled():
   return get_conf().get(_PRINCIPAL) is not None
 
-def is_webserver_spnego_required():
+def is_webserver_spnego_enabled():
   """
-     Returns True if Enable Kerberos Authentication for HTTP Web-Consoles for Impala service is turned on (default: true)
-     -webserver_require_spnego=true  in impalad_flags
+    Returns True if Enable Kerberos Authentication for HTTP Web-Consoles for Impala service is turned on (default: true)
+    -webserver_require_spnego=true  in impalad_flags
    """
   return get_conf().get(_WEBSERVER_REQUIRE_SPNEGO)
 

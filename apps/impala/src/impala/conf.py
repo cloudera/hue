@@ -28,7 +28,7 @@ from desktop.lib.conf import ConfigSection, Config, coerce_bool, coerce_csv, coe
 from desktop.lib.exceptions import StructuredThriftTransportException
 from desktop.lib.paths import get_desktop_root
 
-from impala.impala_flags import get_max_result_cache_size, is_impersonation_enabled, is_kerberos_enabled, is_webserver_spnego_required
+from impala.impala_flags import get_max_result_cache_size, is_impersonation_enabled, is_kerberos_enabled, is_webserver_spnego_enabled
 from impala.settings import NICE_NAME
 
 
@@ -57,12 +57,6 @@ IMPERSONATION_ENABLED=Config(
   help=_t("Turn on/off impersonation mechanism when talking to Impala."),
   type=coerce_bool,
   dynamic_default=is_impersonation_enabled)
-
-WEBSERVER_SPNEGO_REQUIRED=Config(
-  key='webserver_require_spnego',
-  help=_t("Turn on/off spnego-kerberos authentication for http web consoles when communicate with Impala."),
-  type=coerce_bool,
-  dynamic_default=is_webserver_spnego_required)
 
 QUERYCACHE_ROWS=Config(
   key='querycache_rows',
