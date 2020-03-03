@@ -5,23 +5,28 @@ draft: false
 weight: 2
 ---
 
-All of these connectors come out of the box.
-
 Looking at improving or adding a new one? Go check the **[connector API section](/developer/connectors/)**!
 
 ## Databases
 
-Hue connect to any database or warehouse via native connectors or SqlAlchemy.
+Hue connects to any database or warehouse via native or SqlAlchemy connectors. Connections can be configured via a UI after [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) is done, until then they need to be added to the [Hue ini file](/administrator/configuration/). Except [impala] and [beeswax] which have a dedicated section, all the other ones should be appended below the [[interpreters]] of [notebook] e.g.:
 
-Read about [how to build your own parser](/developer/parsers/) if you are looking at better autocompletes for your own SQL dialects.
-
-Note that USER and PASSWORD can be prompted to the user:
+    [notebook]
+    [[interpreters]]
 
     [[[mysql]]]
-       name=MySQL
-       interface=sqlalchemy
-       options='{"url": "mysql://${USER}:${PASSWORD}@localhost:3306/hue"}'
+    name=MySQL
+    interface=sqlalchemy
+    options='{"url": "mysql://${USER}:${PASSWORD}@localhost:3306/hue"}'
 
+    [[[presto]]]
+    name = Presto
+    interface=sqlalchemy
+    options='{"url": "presto://localhost:8080/hive/default"}'
+
+Note that USER and PASSWORD can be prompted to the user like in the MySQL connector above.
+
+Read about [how to build your own parser](/developer/parsers/) if you are looking at better autocompletes for your own SQL dialects.
 
 ### Apache Impala
 
