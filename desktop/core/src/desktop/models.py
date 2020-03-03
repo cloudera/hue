@@ -1407,6 +1407,7 @@ class Document2(models.Model):
   def share_link(self, user, perm='read'):
     if perm == 'read':
       self.share(user, name=Document2Permission.LINK_READ_PERM, is_link_on=True)
+      self.share(user, name=Document2Permission.LINK_WRITE_PERM, is_link_on=False)
     elif perm == 'write':
       self.share(user, name=Document2Permission.LINK_WRITE_PERM, is_link_on=True)
     else:

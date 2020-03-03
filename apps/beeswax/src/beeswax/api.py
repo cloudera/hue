@@ -35,6 +35,9 @@ from desktop.lib.i18n import force_unicode
 from desktop.lib.parameterization import substitute_variables
 from metastore import parser
 from notebook.models import escape_rows, MockedDjangoRequest, make_notebook
+from metastore.conf import FORCE_HS2_METADATA
+from metastore.views import _get_db, _get_servername
+from useradmin.models import User
 
 import beeswax.models
 from beeswax.data_export import upload
@@ -43,13 +46,10 @@ from beeswax.conf import USE_GET_LOG_API
 from beeswax.forms import QueryForm
 from beeswax.models import Session, QueryHistory
 from beeswax.server import dbms
-from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException, QueryServerTimeoutException,\
+from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException, QueryServerTimeoutException, \
     SubQueryTable
-from beeswax.views import authorized_get_design, authorized_get_query_history, make_parameterization_form,\
+from beeswax.views import authorized_get_design, authorized_get_query_history, make_parameterization_form, \
     safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state, parse_out_jobs
-from metastore.conf import FORCE_HS2_METADATA
-from metastore.views import _get_db, _get_servername
-from useradmin.models import User
 
 
 LOG = logging.getLogger(__name__)
