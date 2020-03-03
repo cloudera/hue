@@ -329,9 +329,18 @@ ${ layout.menubar(section='quick_start') }
           if (data.errorMessage) {
             $(document).trigger('error', data.errorMessage);
           }
-          if (data.status == 0 && $(event.target).data("is-connector")) {
-            huePubSub.publish('cluster.config.refresh.config');
-          }
+
+          // huePubSub.publish('cluster.config.refresh.config');
+          // data.sourceType, data.path, data.namespace
+          dataCatalog.getEntry({
+            sourceType: '15',
+            path: 'public.employe_sample',
+            namespace: { id: 'default' }
+          }).then(entry => {
+            entry.getSourceMeta().then(() => {
+              huePubSub.publish('assist.db.highlight', entry);
+            });
+          })
       }).always(function(data) {
         self.isInstallingSample(false);
       });

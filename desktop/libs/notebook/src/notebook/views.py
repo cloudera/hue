@@ -411,6 +411,7 @@ def install_examples(request):
       response['message'] = ' '.join(successes)
       response['errorMessage'] = ' '.join(errors)
       response['status'] = len(errors)
+      # data.sourceType, data.path, data.namespace
     else:
       Command().handle(user=request.user)
       response['status'] = 0
