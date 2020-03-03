@@ -28,7 +28,6 @@ from beeswax.conf import HIVE_SERVER_HOST
 
 from desktop.conf import ENABLE_GIST_PREVIEW
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import grant_access
 from desktop.models import Document2
 
 
@@ -36,10 +35,8 @@ class TestApi2(object):
 
   def setUp(self):
     self.client = make_logged_in_client(username="api2_user", groupname="default", recreate=True, is_superuser=False)
-
     self.user = User.objects.get(username="api2_user")
 
-    grant_access(self.user.username, self.user.username, "desktop")
 
   def test_search_entities_interactive_xss(self):
     query = Document2.objects.create(
@@ -69,7 +66,7 @@ class TestApi2(object):
   def test_get_hue_config(self):
     client = make_logged_in_client(username="api2_superuser", groupname="default", recreate=True, is_superuser=True)
     user = User.objects.get(username="api2_superuser")
-    grant_access(user.username, user.username, "desktop")
+
     response = client.get('/desktop/api2/get_hue_config', data={})
 
     # It should have multiple config sections in json
@@ -78,7 +75,7 @@ class TestApi2(object):
 
     # It should only allow superusers
     client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
-    grant_access("not_me", "test", "desktop")
+
     response = client_not_me.get('/desktop/api2/get_hue_config', data={})
     assert_true(b"You must be a superuser" in response.content, response.content)
 
@@ -94,7 +91,6 @@ class TestApi2(object):
   def test_get_hue_config_private(self):
     client = make_logged_in_client(username="api2_superuser", groupname="default", recreate=True, is_superuser=True)
     user = User.objects.get(username="api2_superuser")
-    grant_access(user.username, user.username, "desktop")
 
     # Not showing private if not asked for
     response = client.get('/desktop/api2/get_hue_config', data={})
@@ -125,9 +121,6 @@ class TestDocumentApiSharingPermissions(object):
 
     self.user = User.objects.get(username="perm_user")
     self.user_not_me = User.objects.get(username="not_perm_user")
-
-    grant_access(self.user.username, self.user.username, "desktop")
-    grant_access(self.user_not_me.username, self.user_not_me.username, "desktop")
 
 
   def _add_doc(self, name):
@@ -556,6 +549,29 @@ class TestDocumentApiSharingPermissions(object):
     response = self.client_not_me.get('/desktop/api2/doc/?uuid=%s' % doc_id)
     assert_equal(0, json.loads(response.content)['status'], response.content)
 
+    # Demote to read link
+    response = self.share_link_doc(doc, perm='read')
+
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    assert_true(doc.can_read(self.user))
+    assert_true(doc.can_write(self.user))
+
+    assert_true(doc.can_read(self.user_not_me))
+    assert_false(doc.can_write(self.user_not_me))  # Back to false
+
+    response = self.client.get('/desktop/api2/docs/?text=test_link_sharing_permissions')
+    assert_true(json.loads(response.content)['documents'])
+
+    response = self.client_not_me.get('/desktop/api2/docs/?text=test_link_sharing_permissions')
+    assert_false(json.loads(response.content)['documents'])  #  Link sharing does not list docs in Home, only provides direct access
+
+    response = self.client.get('/desktop/api2/doc/?uuid=%s' % doc_id)
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    response = self.client_not_me.get('/desktop/api2/doc/?uuid=%s' % doc_id)
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
     # Un-share
     response = self.share_link_doc(doc, perm='off')
 
@@ -587,9 +603,6 @@ class TestDocumentGist(object):
 
     self.user = User.objects.get(username="gist_user")
     self.user_not_me = User.objects.get(username="other_gist_user")
-
-    grant_access(self.user.username, self.user.username, "desktop")
-    grant_access(self.user_not_me.username, self.user_not_me.username, "desktop")
 
 
   def _create_gist(self, statement, doc_type, name='', description='', client=None):
