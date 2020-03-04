@@ -266,7 +266,7 @@ class SqlAlchemyApi(Api):
 
     try:
       guid = snippet['result']['handle']['guid']
-      connection = CONNECTION_CACHE.get('guid')
+      connection = CONNECTION_CACHE.get(guid)
       if connection:
         connection['connection'].close()
         del CONNECTION_CACHE[guid]
