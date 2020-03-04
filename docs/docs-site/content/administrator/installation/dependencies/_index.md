@@ -101,9 +101,19 @@ Fix openssl errors (required for MacOS 10.11+)
 
     export LDFLAGS=-L/usr/local/opt/openssl/lib && export CPPFLAGS=-I/usr/local/opt/openssl/include
 
+On macOS 10.15+, install an older version of openssl
+
+    brew uninstall --ignore-dependencies openssl && brew install https://github.com/tebelorg/Tump/releases/download/v1.0.0/openssl.rb
+
 Fix the possible missing Python headers message by installing the MacOS SDK headers
 
+On macOS 10.14.x
+
     open /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg
+
+On macOS 10.15.x
+
+    sudo ln -s /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/* /usr/local/include/
 
 
 ### Oracle Client lib
