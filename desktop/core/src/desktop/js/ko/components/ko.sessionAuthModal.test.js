@@ -18,6 +18,8 @@ import { SHOWN_EVENT, SHOW_EVENT } from './ko.sessionAuthModal';
 import huePubSub from 'utils/huePubSub';
 
 import 'ext/bootstrap.2.3.2.min';
+import sessionManager from 'apps/notebook2/execution/sessionManager';
+import { simulateInput } from '../../jest/koTestUtils';
 
 describe('ko.sessionAuthModal.js', () => {
   it('should render component', async () => {
@@ -33,5 +35,38 @@ describe('ko.sessionAuthModal.js', () => {
     });
 
     expect(window.document.documentElement.outerHTML).toMatchSnapshot();
+  });
+
+  it('should submit credentials', async () => {
+    huePubSub.publish(SHOW_EVENT, {
+      session: {
+        properties: []
+      },
+      message: 'hello'
+    });
+
+    const element = await new Promise(resolve => {
+      huePubSub.subscribeOnce(SHOWN_EVENT, resolve);
+    });
+
+    const TEST_USER = 'someUser';
+    const TEST_PASS = 'somePass';
+
+    let spyCalled = false;
+    jest.spyOn(sessionManager, 'createDetachedSession').mockImplementation(async options => {
+      expect(
+        options.properties.some(prop => prop.name === 'user' && prop.value === TEST_USER)
+      ).toBeTruthy();
+      expect(
+        options.properties.some(prop => prop.name === 'password' && prop.value === TEST_PASS)
+      ).toBeTruthy();
+      spyCalled = true;
+    });
+
+    simulateInput(element.querySelector('[data-test="usernameInput"]'), TEST_USER);
+    simulateInput(element.querySelector('[data-test="passwordInput"]'), TEST_PASS);
+    element.querySelector('.btn-primary').click();
+
+    expect(spyCalled).toBeTruthy();
   });
 });
