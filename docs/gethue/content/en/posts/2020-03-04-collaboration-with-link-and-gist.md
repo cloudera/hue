@@ -44,9 +44,9 @@ categories:
 
 
 ---
-Hi Data crunchers,
+Hi Data Crunchers,
 
-For the [past 10 years](https://gethue.com/blog/2020-01-28-ten-years-data-querying-ux-evolution/), Hue's SQL Editor has been targeting the [SQL Data Warehouse Experience](https://gethue.com/blog/2020-02-10-sql-query-experience-of-your-cloud-data-warehouse/). It recently got better support for typying SQL queries by showing [column keys](/2019-11-13-sql-column-assist-icons/). The latest improvement is about better collaboration.
+For the [past 10 years](https://gethue.com/blog/2020-01-28-ten-years-data-querying-ux-evolution/), Hue's SQL Editor has been targeting the [SQL Data Warehouse Experience](https://gethue.com/blog/2020-02-10-sql-query-experience-of-your-cloud-data-warehouse/). It recently got better support for typing SQL queries by showing [column keys](/2019-11-13-sql-column-assist-icons/). The latest improvement is about better collaboration.
 
 Via the [document sharing](https://docs.gethue.com/user/concept/#sharing) capabilities and [query parameterization](https://docs.gethue.com/user/querying/#variables), Hue allows teams to build their own query bank of knowledge. To complement this, something quicker and easier is now also available: Public link & Gist sharing.
 
@@ -57,7 +57,7 @@ Goal: quickly sharing parameterized saved reports, customer analyses links.
 
 Public links are the same as in Google documents. They only require the recipient to have a Hue login. People can then reuse the queries on their own by executing them to see the results, fork and adapt them.
 
-* No need to select groups or list of invidual users
+* No need to select groups or list of individual users
 * Read, write permissions
 * Linked documents won't show up in your home
 * Can be turned off globally
@@ -88,7 +88,7 @@ Answering a question via a query result? Showing some weird data to a slack chan
 
 * Works with an SQL snippet: one or more statements
 * The link automatically point to the editor and the SQL content
-* The query is displayed in the friendlier [presentation mode]
+* The query is displayed in the friendlier [presentation mode](https://docs.gethue.com/user/querying/#presentation)
 * Slack unfurling will show a mini preview (can be turned off globally)
 * Gists are stored in a Gist directory in your home
 
