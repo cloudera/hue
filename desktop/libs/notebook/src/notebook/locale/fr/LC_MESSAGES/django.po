@@ -685,7 +685,7 @@ msgid "Error loading my queries"
 msgstr "Erreur de chargement de mes requêtes"
 
 #: src/notebook/templates/editor_components.mako:802
-msgid "You don't have any saved query."
+msgid "You don't have any saved queries."
 msgstr "Vous n'avez aucune requête enregistrée."
 
 #: src/notebook/templates/editor_components.mako:811
