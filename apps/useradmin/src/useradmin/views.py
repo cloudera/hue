@@ -121,14 +121,20 @@ def list_for_autocomplete(request):
   count = int(request.GET.get("count", 100))
 
   if is_admin(request.user):
-    users = User.objects.filter(username__icontains=autocomplete_filter).order_by('username')
+    if ENABLE_ORGANIZATIONS.get():
+      users = User.objects.filter(email__icontains=autocomplete_filter).order_by('email')
+    else:
+      users = User.objects.filter(username__icontains=autocomplete_filter).order_by('username')
     groups = Group.objects.filter(name__icontains=autocomplete_filter).order_by('name')
     if request.GET.get('only_mygroups'):
       groups = request.user.groups.filter(name__icontains=autocomplete_filter).order_by('name')
   else:
     usergroups = request.user.groups.all()
     # Get all users in the usergroups he belongs to and then filter by username
-    users = User.objects.filter(groups__in=usergroups, username__icontains=autocomplete_filter).order_by('username').distinct()
+    if ENABLE_ORGANIZATIONS.get():
+      users = User.objects.filter(groups__in=usergroups, email__icontains=autocomplete_filter).order_by('email').distinct()
+    else:
+      users = User.objects.filter(groups__in=usergroups, username__icontains=autocomplete_filter).order_by('username').distinct()
     groups = usergroups.filter(name__icontains=autocomplete_filter).order_by('name')
 
   # Don't include myself by default
@@ -148,7 +154,7 @@ def list_for_autocomplete(request):
 def get_users_by_id(request):
   userids = json.loads(request.GET.get('userids', "[]"))
   userids = userids[:100]
-  users = User.objects.filter(id__in=userids).order_by('username')
+  users = User.objects.filter(id__in=userids).order_by('email' if ENABLE_ORGANIZATIONS.get() else 'username')
   response = {
     'users': massage_users_for_json(users)
   }
