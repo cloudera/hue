@@ -50,33 +50,30 @@ HueはJDBC、または [SQL Connector documentation][6] に記載されてい�
 
 Hueのホストにて:
 
-<pre><code class="bash">./build/env/bin/pip install pyPhoenix
-</code></pre>
+    ./build/env/bin/pip install pyPhoenix
 
 続いて desktop/conf/hue.ini 設定ファイルセクションにて:
 
-<pre><code class="bash">[notebook]
-  [[interpreters]]
+    [notebook]
+    [[interpreters]]
     [[[phoenix]]]
-      name = phoenix
-      interface=sqlalchemy
-      options='{"url": "phoenix://sql-phoenix.gethue.com:8765/"}'
-</code></pre>
+    name = phoenix
+    interface=sqlalchemy
+    options='{"url": "phoenix://sql-phoenix.gethue.com:8765/"}'
 
 その後 queryserver を開始します:
 
-<pre><code class="bash">phoenix-queryserver
-...
-19/07/24 20:55:13 INFO util.log: Logging initialized @1563ms
-19/07/24 20:55:13 INFO server.Server: jetty-9.2.z-SNAPSHOT
-19/07/24 20:55:14 INFO server.ServerConnector: Started ServerConnector@662b4c69{HTTP/1.1}{0.0.0.0:8765}
-19/07/24 20:55:14 INFO server.Server: Started @1793ms
-19/07/24 20:55:14 INFO server.HttpServer: Service listening on port 8765.
-</code></pre>
+    >phoenix-queryserver
+    ...
+    19/07/24 20:55:13 INFO util.log: Logging initialized @1563ms
+    19/07/24 20:55:13 INFO server.Server: jetty-9.2.z-SNAPSHOT
+    19/07/24 20:55:14 INFO server.ServerConnector: Started ServerConnector@662b4c69{HTTP/1.1}{0.0.0.0:8765}
+    19/07/24 20:55:14 INFO server.Server: Started @1793ms
+    19/07/24 20:55:14 INFO server.HttpServer: Service listening on port 8765.
 
 これで HBase をクエリする準備ができました!
 
-<pre><code class="sql">select * from us_population limit 10</code></pre>
+    select * from us_population limit 10
 
 [<img class="aligncenter wp-image-6025" src="https://cdn.gethue.com/uploads/2019/07/editor_phoenix_select.png" alt="" width="1076" height="580" />][7]
 

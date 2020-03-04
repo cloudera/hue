@@ -54,31 +54,20 @@ If not already running, it is easy to get Druid [downloaded][6] and [started][7
 
 First, let's make sure that Hue can talk to Druid via the [pydruid SqlAlchemy][8] connector. Either make sure it is in the global Python environment via a usual 'pip install' or install it in the Hue virtual environment.
 
-<pre><code class="bash">
-
-./build/env/bin/pip install pydruid
-
-</code></pre>
+    ./build/env/bin/pip install pydruid
 
 **Note:** Make sure the version is equal or more to 0.4.1 if not you will get a "Can't load plugin: sqlalchemy.dialects:druid".
 
 In the hue.ini configuration file, now let's add the interpreter. Here 'druid-host.com' would be the machine where Druid is running.
 
-<pre><code class="bash">
+    [notebook]
+    [[interpreters]]
+    [[[druid]]]
+    name = Druid
+    interface=sqlalchemy
+    options='{"url": "druid://druid-host.com:8082/druid/v2/sql/"}'
 
-[notebook]
 
-[[interpreters]]
-
-[[[druid]]]
-
-name = Druid
-
-interface=sqlalchemy
-
-options='{"url": "druid://druid-host.com:8082/druid/v2/sql/"}'
-
-</code></pre>
 
 And now restart Hue.
 
@@ -86,19 +75,11 @@ And now restart Hue.
 
 And that's it, now open-up <http://127.0.0.1:8000/hue/editor/?type=pydruid> (replace host or port of your actual Hue) and you can start querying!
 
-<pre><code class="sql">
-
-SELECT countryName, count(*) t
-
-FROM druid.wikipedia
-
-GROUP BY countryName
-
-ORDER BY t DESC
-
-LIMIT 100
-
-</code></pre>
+    SELECT countryName, count(*) t
+    FROM druid.wikipedia
+    GROUP BY countryName
+    ORDER BY t DESC
+    LIMIT 100
 
 As usual feel free to comment here or to send feedback to the [hue-user][9] list or [@gethue][10]!
 
