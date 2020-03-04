@@ -169,12 +169,13 @@ class RightAssistPanel {
     });
     this.disposals.push(snippetTypeSub.remove.bind(snippetTypeSub));
 
-    huePubSub.subscribe('set.current.app.name', appName => {
+    const onAppChange = appName => {
       if (appName === 'dashboard') {
         updateContentsForType(appName, false);
       }
-    });
-    huePubSub.publish('get.current.app.name');
+    };
+    huePubSub.publish('get.current.app.name', onAppChange);
+    huePubSub.subscribe('set.current.app.name', onAppChange);
     updateTabs();
   }
 
