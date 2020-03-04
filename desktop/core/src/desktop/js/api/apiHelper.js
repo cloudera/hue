@@ -1979,12 +1979,27 @@ class ApiHelper {
     return this.simplePost('/notebook/api/close_session', data, options);
   }
 
-  // Used by check history status
-  checkStatus(options) {
-    const data = {
-      notebook: options.notebookJson
-    };
-    return this.simplePost('/notebook/api/check_status', data);
+  async checkStatus(options) {
+    return new Promise((resolve, reject) => {
+      const data = {
+        notebook: options.notebookJson
+      };
+      $.post({
+        url: '/notebook/api/check_status',
+        data: data
+      })
+        .done(data => {
+          // 0, -3 and other negative values have meaning for this endpoint
+          if (data && typeof data.status !== 'undefined') {
+            resolve(data);
+          } else if (this.successResponseIsError(data)) {
+            reject(this.assistErrorCallback(options)(data));
+          } else {
+            reject();
+          }
+        })
+        .fail(this.assistErrorCallback(options));
+    });
   }
 
   getExternalStatement(options) {

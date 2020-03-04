@@ -301,42 +301,38 @@ class QueryHistory extends DisposableComponent {
       .filter(item => statusIndex[item.status()])
       .slice(0, 25);
 
-    const refreshStatusForItem = item => {
+    const refreshStatusForItem = async item => {
       if (this.refreshStatusFailed) {
         return;
       }
-      apiHelper
-        .checkStatus({
+      try {
+        const response = await apiHelper.checkStatus({
           notebookJson: JSON.stringify({ uuid: item.uuid }),
           silenceErrors: true
-        })
-        .then(data => {
-          if (data.status === -3) {
-            item.status(EXECUTION_STATUS.expired);
-          } else if (data.status !== 0) {
-            item.status(EXECUTION_STATUS.failed);
-          } else if (data.query_status.status) {
-            item.status(data.query_status.status);
-          }
-        })
-        .fail(() => {
-          items.length = 0;
-          this.refreshStatusFailed = true;
-          console.warn('Failed checking status for the history items.');
-        })
-        .always(async () => {
-          if (items.length) {
-            await sleep(1000);
-            refreshStatusForItem(items.pop());
-          } else if (!this.refreshStatusFailed) {
-            await sleep(interval);
-            this.refreshStatus(statusesToRefresh, interval);
-          }
         });
+        if (response.status === -3) {
+          item.status(EXECUTION_STATUS.expired);
+        } else if (response.status !== 0) {
+          item.status(EXECUTION_STATUS.failed);
+        } else if (response.query_status.status) {
+          item.status(response.query_status.status);
+        }
+      } catch (err) {
+        items.length = 0;
+        this.refreshStatusFailed = true;
+      } finally {
+        if (items.length) {
+          await sleep(1000);
+          await refreshStatusForItem(items.pop());
+        } else if (!this.refreshStatusFailed) {
+          await sleep(interval);
+          this.refreshStatus(statusesToRefresh, interval);
+        }
+      }
     };
 
     if (items.length) {
-      refreshStatusForItem(items.pop());
+      await refreshStatusForItem(items.pop());
     } else if (!this.refreshStatusFailed) {
       await sleep(interval);
       this.refreshStatus(statusesToRefresh, interval);
