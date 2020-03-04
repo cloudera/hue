@@ -39,7 +39,7 @@ import desktop.conf
 
 from desktop import appmanager
 from desktop.auth.backend import is_admin, create_user
-from desktop.conf import APP_BLACKLIST
+from desktop.conf import APP_BLACKLIST, ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from desktop.views import home
@@ -945,6 +945,13 @@ class TestUserAdmin(BaseUserAdminTests):
     assert_equal([u'user_test_list_for_autocomplete2'], users)
     assert_true(u'group_test_list_for_autocomplete' in groups, groups)
     assert_false(u'group_test_list_for_autocomplete_other_group' in groups, groups)
+
+    reset = ENABLE_ORGANIZATIONS.set_for_testing(True)
+    try:
+      response = c1.get(reverse('useradmin_views_list_for_autocomplete'))  # Actually always good as DB created pre-setting flag to True
+      assert_equal(200, response.status_code)
+    finally:
+      reset()
 
     # only_mygroups has no effect if user is not super user
     response = c1.get(reverse('useradmin_views_list_for_autocomplete'), {'include_myself': True})
