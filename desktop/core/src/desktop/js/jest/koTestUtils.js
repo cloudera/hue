@@ -112,3 +112,8 @@ export const waitForObservableChange = async observable =>
       resolve();
     });
   });
+
+export const simulateInput = (element, text) => {
+  element.value = text;
+  element.dispatchEvent(new Event('change'));
+};

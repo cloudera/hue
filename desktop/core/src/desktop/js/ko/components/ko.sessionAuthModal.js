@@ -44,7 +44,7 @@ const TEMPLATE = `
     <div class="span6">
       <div class="input-prepend">
         <span class="add-on muted"><i class="fa fa-user"></i></span>
-        <input name="username" type="text" data-bind="value: $root.authSessionUsername" placeholder="${I18n(
+        <input name="username" data-test="usernameInput" type="text" data-bind="textInput: authSessionUsername" placeholder="${I18n(
           'Username'
         )}"/>
       </div>
@@ -52,7 +52,7 @@ const TEMPLATE = `
     <div class="span6">
       <div class="input-prepend">
         <span class="add-on muted"><i class="fa fa-lock"></i></span>
-        <input name="password" type="password" data-bind="value: $root.authSessionPassword" placeholder="${I18n(
+        <input name="password" data-test="passwordInput" type="password" data-bind="textInput: authSessionPassword" placeholder="${I18n(
           'Password'
         )}"/>
       </div>
@@ -132,7 +132,7 @@ componentUtils.registerComponent('session-auth-modal', undefined, TEMPLATE).then
     const data = {
       params: model,
       descendantsComplete: () => {
-        huePubSub.publish(SHOWN_EVENT);
+        huePubSub.publish(SHOWN_EVENT, $sessionAuthModal[0]);
       }
     };
 
