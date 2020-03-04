@@ -1,15 +1,26 @@
 ---
-title: "SQL Autocompletes"
+title: "Autocompletes"
 date: 2019-03-13T18:28:09-07:00
 draft: false
-weight: 5
+weight: 2
 ---
 
-In this post we’ll guide you through the steps necessary to create an autocompleter for any SQL dialect in Hue.
+This guide goes you through the steps necessary to create an autocompleter for any [SQL dialect](/administrator/configuration/connectors/#databases) in Hue. The major benefits are:
+
+* Proposing only valid syntax in the autocomplete
+* Getting the list of tables, columns, UDFs... automatically
+* Suggesting fixes
 
 ## Parser Theory
 
-There are currently three parsers for this in Hue, one for Impala, one for Hive and a generic SQL parser that is used for other dialects. The parsers are written using a [bison](https://www.gnu.org/software/bison/) grammar and are generated with [jison](https://github.com/zaach/jison). They’re 100% javascript and live on the client side, this gives the performance of a desktop editor in your browser.
+There are several parsers in Hue already (e.g. one for Impala, one for Hive..) and a generic SQL that is used for other dialects. The parsers are written using a [bison](https://www.gnu.org/software/bison/) grammar and are generated with [jison](https://github.com/zaach/jison). They arere 100% Javascript and live on the client side, this gives the performance of a desktop editor in your browser.
+
+Building a dedicated work is more effort but it then allows a very rich end user experience, e.g.:
+
+* Handle invalid/imcomplete queries and propose suggestions/fixes
+* date_column = <Date compatible UDF ...>
+* Language reference or data samples just by pointing the cursor on SQL identifiers
+* Leverage the parser for risk alerts (e.g. adding automatic LIMIT) or proper re-formatting
 
 ### Structure
 
@@ -59,7 +70,7 @@ Here’s a list of some of the different types of suggestions the parser can ide
     suggestTables
     suggestValues
 
-Parsers are generated and added to the repository using our custom cli app generateParsers.js under tools/jison/. To for instance generate all the Impala parsers you would run the following command in the hue folder:
+Parsers are generated and added to the repository using the command generateParsers.js under tools/jison/. To for instance generate all the Impala parsers you would run the following command in the hue folder:
 
     node tools/jison/generateParsers.js impala
 
@@ -68,6 +79,7 @@ In reality two parsers are generated per dialect, one for syntax and one for aut
 All the jison grammar files can be found [here](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/jison/sql) and the generated parsers are also committed together with their tests [here](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/sql).
 
 ### The grammar
+
 In a regular SQL parser you might define the grammar of a select statement like this:
 
     SelectStatement
@@ -79,7 +91,13 @@ In a regular SQL parser you might define the grammar of a select statement like 
       | ColumnList ',' Identifier
       ;
 
-This would be able to parse a statement like 'SELECT a, b, c FROM some_table' (depending on lexer definitions of course). To turn this into an autocompleter we add the notion of a cursor to the mix, it’s defined as an obscure character that’s unlikely to be used in a statement. We went for '\u2020', the dagger, identified as 'CURSOR' in the lexer. The actual parsed string is therefore beforeCursor + ‘\u2020’ + afterCursor.
+This would be able to parse a statement like 'SELECT a, b, c FROM some_table' (depending on lexer definitions of course).
+
+### Notion of cursor
+
+To turn this into an autocompleter we add the notion of a cursor. Often, the user has the cursor somewhere in the statement. In the previous section, we were assuming that the query was already typed and the user had not mouse cursor within it.
+
+The cursor is represented as an obscure character that is unlikely to be used in a statement. Currently '\u2020' was picked, the dagger, identified as 'CURSOR' in the lexer. The actual parsed string is therefore beforeCursor + ‘\u2020’ + afterCursor.
 
 For the statement above we’d add an extra rule with an _EDIT postfix like this:
 
@@ -95,13 +113,13 @@ For the statement above we’d add an extra rule with an _EDIT postfix like this
       | 'SELECT' ColumnList_EDIT 'FROM' Identifier --> { suggestColumns: { table: $4 } }
       ;
 
-So if a “lonely” cursor is encountered it will tell us to suggest the ‘SELECT’ keyword etc.
+So for example if a cursor without any text is encountered, it will tell us to suggest the ‘SELECT’ keyword etc.
 
-## Tutorial: Creating a basic PostgreSQL parser
+## Tutorial: Creating a PostgreSQL parser
 
 ### Prerequisites
 
-Make sure you have [jison]({{% param baseURL %}}developer/development/#sql-autocomplete) installed and a [development]({{% param baseURL %}}administrator/installation/dependencies/) Hue. Then configure a [PostgreSQL interpreter]({{% param baseURL %}}administrator/configuration/editor/#postgresql).
+Make sure you have [jison](/developer/development/#sql-autocomplete) installed and a [development](/administrator/installation/dependencies/) Hue. Then configure a [PostgreSQL interpreter](/administrator/configuration/connectors/#postgresql).
 
 In the Hue folder:
 
@@ -109,21 +127,22 @@ In the Hue folder:
 
 and edit your hue config desktop/conf/pseudo-distributed.ini to contain:
 
-  [notebook]
-  [[interpreters]]
-    [[[postgresql]]]
-      name = postgresql
-      interface=sqlalchemy
-      options='"postgresql://hue:hue@host:31335/hue"'
+    [notebook]
+    [[interpreters]]
+      [[[postgresql]]]
+        name = postgresql
+        interface=sqlalchemy
+        options='{"url": "postgresql://hue:hue@host:31335/hue"}'
 
 Our generateParsers tool can take an existing dialect and setup the source code for a new parsers based on that.
 
 In the hue folder run:
 
     node tools/jison/generateParsers.js -new generic postgresql
+
 After the -new argument you specify an existing dialect to clone first and then the name of the new parser.
 
-Once executed the tool has cloned the generic parser with tests and generated a new postgresql parsers. The jison files can be found under desktop/core/src/desktop/js/parse/jison/sql/postgresql/ and the jasmine specs can be found in desktop/core/src/desktop/js/parse/sql/postgresql/spec
+Once executed the tool has cloned the generic parser with tests and generated a new postgresql parsers. The jison files can be found under `desktop/core/src/desktop/js/parse/jison/sql/postgresql/` and the testscan be found in `desktop/core/src/desktop/js/parse/sql/postgresql/test`.
 
 To regenerate the parsers after changes to the jison files run:
 
@@ -137,9 +156,9 @@ This gives you an idea on how to add custom syntax to the newly generated postgr
 
     REINDEX { INDEX | TABLE | DATABASE | SYSTEM } name [ FORCE ]
 
-We’ll start by adding a test, in postgresqlAutocompleteParserSpec.js in the specs folder inside the main describe function before the first ‘it(“should …’:
+We’ll start by adding a test, in `postgresqlAutocompleteParser.test.js` in the test folder inside the main describe function before the first `it('should...`:
 
-    fdescribe('REINDEX', () => {
+    describe('REINDEX', () => {
       it('should handle "REINDEX TABLE foo FORCE; |"', () => {
         assertAutoComplete({
           beforeCursor: 'REINDEX TABLE foo FORCE;  ',
@@ -165,16 +184,21 @@ We’ll start by adding a test, in postgresqlAutocompleteParserSpec.js in the sp
       });
     });
 
-When we now run npm run test there should be two failing tests.
+When we now run `npm run test -- postgresqlAutocompleteParser.test.js` there should be two failing tests.
 
-Next we’ll have to add the keyword to the lexer, let’s open sql.jisonlex in the jison folder for postgresql and add the following new tokens:
+Alternatively, if using Jest directly and working on parsers currently being skipped in the CI, provide matching file names and an empty blacklist file pattern. e.g.:
+
+    jest calciteAutocompleteParser.Select.stream.test.js --testPathIgnorePatterns=[]
+    jest calciteAutocompleteParser --testPathIgnorePatterns=[]
+
+Next we’ll have to add the keyword to the lexer, let’s open `sql.jisonlex` in the jison folder for postgresql and add the following new tokens:
 
     'REINDEX'                                  { parser.determineCase(yytext); return 'REINDEX'; }
     'INDEX'                                    { return 'INDEX'; }
     'SYSTEM'                                   { return 'SYSTEM'; }
     'FORCE'                                    { return 'FORCE'; }
 
-Now let’s add the grammar, starting with the complete specification. For simplicity we’ll add it in sql_main.jison, at the bottom of the file add:
+Now let’s add the grammar, starting with the complete specification. For simplicity we’ll add it in `sql_main.jison`, at the bottom of the file add:
 
     DataDefinition
     : ReindexStatement
@@ -195,11 +219,12 @@ Now let’s add the grammar, starting with the complete specification. For simpl
     :
     | 'FORCE'
     ;
-    “DataDefinition” is an existing rule and this extends that rule with “ReindexStatement”.
 
-Save the file(s) and first run node tools/jison/generateParsers.js postgresql then npm run test and we should be down to one failing test.
+"DataDefinition" is an existing rule and this extends that rule with "ReindexStatement".
 
-For the next one we’ll add some keyword suggestions after the user has typed REINDEX, we’ll continue below the ReindexStatement in sql_main.jison:
+Save the files and first run `node tools/jison/generateParsers.js postgresql` then `npm run test -- postgresqlAutocompleteParser.test.js` and we should be down to one failing test.
+
+For the next one we’ll add some keyword suggestions after the user has typed REINDEX, we’ll continue below the ReindexStatement in `sql_main.jison`:
 
     DataDefinition_EDIT
     : ReindexStatement_EDIT
@@ -212,9 +237,9 @@ For the next one we’ll add some keyword suggestions after the user has typed R
       }
     ;
 
-Again, run node tools/jison/generateParsers.js postgresql then npm run test and the tests should both be green.
+Again, run `node tools/jison/generateParsers.js postgresql` then `npm run test -- postgresqlAutocompleteParser.test.js` and the tests should both be green.
 
-We also want the autocompleter to suggest the keyword REINDEX when the user hasn’t typed anything, to do that let’s first add the following test with the other new ones in postgresqlAutocompleteParserSpec.js:
+We also want the autocompleter to suggest the keyword REINDEX when the user hasn’t typed anything, to do that let’s first add the following test with the other new ones in `postgresqlAutocompleteParser.test.js`:
 
     it('should suggest REINDEX for "|"', () => {
       assertAutoComplete({
@@ -228,15 +253,83 @@ We also want the autocompleter to suggest the keyword REINDEX when the user hasn
       });
     });
 
-For this to pass we need to add REINDEX to the list of DDL and DML keywords in the file sqlParseSupport.js next to the generated parser (`desktop/core/src/desktop/js/parse/sql/postgresql/sqlParseSupport.js/`). Find the function parser.suggestDdlAndDmlKeywords and add ‘REINDEX’ to the keywords array. Now run npm run test and the three tests should pass.
+For this to pass we need to add REINDEX to the list of DDL and DML keywords in the file `sqlParseSupport.js` next to the generated parser (`desktop/core/src/desktop/js/parse/sql/postgresql/sqlParseSupport.js/`). Find the function `parser.suggestDdlAndDmlKeywords` and add ‘REINDEX’ to the keywords array. Now run `npm run test -- postgresqlAutocompleteParser.test.js` and the three tests should pass.
 
-Before you continue further be sure to remove the ‘f’ from ‘fdescribe’ in the spec to allow all other jasmine tests to run. Note that in this case there will be two new failing tests where the keyword ‘REINDEX’ has to be added.
+Before you continue further, note that in this case there will be two new failing tests where the keyword ‘REINDEX’ has to be added.
 
 In order to use the newly generated parsers we have to add them to the webpack bundles:
 
     npm run webpack
     npm run webpack-workers
 
-While developing it will speed up if the webpack bundling runs in the background, for this open two terminal sessions and run on npm run dev in one and npm run dev-workers in the other. It will then monitor changes to the files and build a lot quicker.
+While developing it will speed up if the webpack bundling runs in the background, for this open two terminal sessions and run `npm run dev` in one and `npm run dev-workers` in the other. It will then monitor changes to the files and build a lot quicker.
 
 After the bundling you can now test it directly in the editor!
+
+## Syntax highlighting
+
+New keywords might not be properly colored highlighted in the editor. This is especially true when adding a new language. Here is how to fix that.
+
+![Missing highlighting](https://cdn.gethue.com/docs/dev/syntax_highlighting_missing.png)
+
+Missing highlighting for 'REINDEX' keyword
+
+![With highlighting](https://cdn.gethue.com/docs/dev/syntax_highlighting_updated.png)
+
+With correct highlighting
+
+### Updating keywords
+
+The Editor is currently visually powered by [Ace](https://ace.c9.io). The list of supported languages is found in the [mode](https://github.com/cloudera/hue/tree/master/tools/ace-editor/lib/ace/mode) directory.
+
+For each dialect, we have two files. e.g. with PostgreSQL:
+
+    pgsql.js
+    pgsql_highlight_rules.js
+
+The list of keywords is present in `*_highlight_rules.js` and can be updated there.
+
+    var keywords = (
+        "ALL|ALTER|REINDEX|..."
+    )
+
+Afterwards, run:
+
+    make ace
+
+And after refreshing the editor page, the updated mode will be activated.
+
+### Adding new dialect
+
+To add a new dialect, it is recommended to copy the two files of the closest mode and rename all the names inside. For example, if we were creating a new `ksql` mode, `pgsql_highlight_rules.js` would become `ksql_highlight_rules.js` and we would rename all the references inside to `psql` to `ksql`. Same with `pgsql.js` to `ksql.js`. In particular, the name of the mode to be referenced later is in:
+
+    KsqlHighlightRules.metaData = {
+      fileTypes: ["ksql"],
+      name: "ksql",
+      scopeName: "source.ksql"
+    };
+
+Tip: inheritance of modes is supported by Ace, which make it handy for avoiding potential duplications.
+
+In the Editor, the mapping between Ace's modes and the type of snippets is happening in [editor_components.mako](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/templates/editor_components.mako#L2118).
+
+In the KSQL case we have:
+
+    ksql: {
+      placeHolder: '${ _("Example: SELECT * FROM stream, or press CTRL + space") }',
+      aceMode: 'ace/mode/ksql',
+      snippetIcon: 'fa-database',
+      sqlDialect: true
+    },
+
+And cf. above [prerequisites](#prerequisites), any interpreter snippet with `ksql` will pick-up the new highlighter:
+
+      [[[ksql]]]
+        name = KSQL Analytics
+        interface=ksql
+
+Note: after [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) we will be able to have multiple interpreters on the same dialect (e.g. pointing to two different databases of the same type).
+
+## API
+
+Looking at importing the parser in your own apps? This is described in the [API section](/developer/api/#sql-autocompletion).

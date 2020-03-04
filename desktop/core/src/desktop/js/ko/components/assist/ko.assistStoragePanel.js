@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import apiHelper from '../../../api/apiHelper';
 import AssistStorageEntry from './assistStorageEntry';
@@ -22,6 +22,7 @@ import componentUtils from 'ko/components/componentUtils';
 import huePubSub from '../../../utils/huePubSub';
 import I18n from 'utils/i18n';
 
+// prettier-ignore
 const TEMPLATE = `
   <script type="text/html" id="storage-context-items">
     <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: -15, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${I18n(
@@ -127,7 +128,7 @@ const TEMPLATE = `
       <form autocomplete="off">
         <input class="clearable" type="text" placeholder="${I18n(
           'Filter...'
-        )}" autocorrect="off" autocomplete="do-not-autocomplete" autocapitalize="off" spellcheck="false"
+        )}" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS }
         data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/>
       </form>
     </div>
@@ -139,7 +140,7 @@ const TEMPLATE = `
       <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 22, container: '.assist-storage-scrollable', fetchMore: $data.fetchMore.bind($data) }">
         <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'storage-context-items', scrollContainer: '.assist-storage-scrollable' }, visibleOnHover: { override: contextPopoverVisible, 'selector': '.assist-actions' }">
           <div class="assist-actions table-actions" style="opacity: 0;" >
-            <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="click: showContextPopover, css: { 'blue': contextPopoverVisible }">
+            <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="popoverOnHover: showContextPopover, css: { 'blue': contextPopoverVisible }">
               <i class='fa fa-info' title="${I18n('Details')}"></i>
             </a>
           </div>

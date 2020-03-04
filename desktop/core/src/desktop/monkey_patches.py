@@ -17,10 +17,10 @@
 
 import re
 
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.core.validators import RegexValidator
-
-from desktop.lib.django_util import get_username_re_rule
+from django.template.context import RequestContext
+from django.utils.module_loading import import_string
 
 
 def monkey_patch_username_validator():
@@ -32,6 +32,9 @@ def monkey_patch_username_validator():
   regular expression inside the username validator.
   """
 
+  from useradmin.models import User
+  from desktop.lib.django_util import get_username_re_rule
+
   username = User._meta.get_field("username")
 
   regex = re.compile('^%s$' % get_username_re_rule())
@@ -41,4 +44,33 @@ def monkey_patch_username_validator():
       validator.regex = regex
 
 
-monkey_patch_username_validator()
+_standard_context_processors = None
+_builtin_context_processors = ('django.template.context_processors.csrf',)
+
+# This is a function rather than module-level procedural code because we only
+# want it to execute if somebody uses RequestContext.
+def get_standard_processors():
+    global _standard_context_processors
+    if _standard_context_processors is None:
+        processors = []
+        collect = []
+        collect.extend(_builtin_context_processors)
+        collect.extend(settings.GTEMPLATE_CONTEXT_PROCESSORS)
+        for path in collect:
+            func = import_string(path)
+            processors.append(func)
+        _standard_context_processors = tuple(processors)
+    return _standard_context_processors
+
+def monkey_patch_request_context_init(self, request, dict_=None, processors=None, use_l10n=None, use_tz=None, autoescape=True):
+  super(RequestContext, self).__init__(
+    dict_, use_l10n=use_l10n, use_tz=use_tz, autoescape=autoescape)
+  self.request = request
+  self._processors = () if processors is None else tuple(processors)
+  self._processors_index = len(self.dicts)
+
+  updates = dict()
+  # @TODO@ Prakash to Implement context processor
+  for processor in get_standard_processors():
+    updates.update(processor(request))
+  self.update(updates)

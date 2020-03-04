@@ -14,12 +14,17 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+    import sys
     import time
     from django.template.defaultfilters import timesince
-    from django.utils.encoding import force_unicode
     from django.utils.translation import ugettext as _
 
     from desktop.views import commonheader, commonfooter
+
+    if sys.version_info[0] > 2:
+      from django.utils.encoding import force_text as force_unicode
+    else:
+      from django.utils.encoding import force_unicode
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />

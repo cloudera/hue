@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import dataCatalog from 'catalog/dataCatalog';
@@ -25,6 +25,7 @@ import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import sqlUtils from 'sql/sqlUtils';
 import { SqlSetOptions, SqlFunctions } from 'sql/sqlFunctions';
+import { DIALECT } from 'apps/notebook2/snippet';
 
 const normalizedColors = HueColors.getNormalizedColors();
 
@@ -273,6 +274,7 @@ class AutocompleteResults {
   constructor(options) {
     const self = this;
     self.snippet = options.snippet;
+    self.dialect = () => (window.ENABLE_NOTEBOOK_2 ? self.snippet.dialect() : self.snippet.type());
     self.editor = options.editor;
     self.temporaryOnly =
       options.snippet.autocompleteSettings && options.snippet.autocompleteSettings.temporaryOnly;
@@ -545,7 +547,7 @@ class AutocompleteResults {
     const databasesDeferred = $.Deferred();
     dataCatalog
       .getEntry({
-        sourceType: self.snippet.type(),
+        sourceType: self.dialect(),
         namespace: self.snippet.namespace(),
         compute: self.snippet.compute(),
         path: [],
@@ -588,11 +590,7 @@ class AutocompleteResults {
         const colRefKeywordSuggestions = [];
         Object.keys(self.parseResult.suggestColRefKeywords).forEach(typeForKeywords => {
           if (
-            SqlFunctions.matchesType(
-              self.snippet.type(),
-              [typeForKeywords],
-              [colRef.type.toUpperCase()]
-            )
+            SqlFunctions.matchesType(self.dialect(), [typeForKeywords], [colRef.type.toUpperCase()])
           ) {
             self.parseResult.suggestColRefKeywords[typeForKeywords].forEach(keyword => {
               colRefKeywordSuggestions.push({
@@ -684,7 +682,7 @@ class AutocompleteResults {
     const self = this;
     if (self.parseResult.suggestSetOptions) {
       const suggestions = [];
-      SqlSetOptions.suggestOptions(self.snippet.type(), suggestions, CATEGORIES.OPTION);
+      SqlSetOptions.suggestOptions(self.dialect(), suggestions, CATEGORIES.OPTION);
       self.appendEntries(suggestions);
     }
   }
@@ -701,7 +699,7 @@ class AutocompleteResults {
 
         colRefDeferred.done(colRef => {
           const functionsToSuggest = SqlFunctions.getFunctionsWithReturnTypes(
-            self.snippet.type(),
+            self.dialect(),
             [colRef.type.toUpperCase()],
             self.parseResult.suggestAggregateFunctions || false,
             self.parseResult.suggestAnalyticFunctions || false
@@ -729,7 +727,7 @@ class AutocompleteResults {
       } else {
         const types = self.parseResult.suggestFunctions.types || ['T'];
         const functionsToSuggest = SqlFunctions.getFunctionsWithReturnTypes(
-          self.snippet.type(),
+          self.dialect(),
           types,
           self.parseResult.suggestAggregateFunctions || false,
           self.parseResult.suggestAnalyticFunctions || false
@@ -773,7 +771,7 @@ class AutocompleteResults {
           databaseSuggestions.push({
             value:
               prefix +
-              sqlUtils.backTickIfNeeded(self.snippet.type(), dbEntry.name) +
+              sqlUtils.backTickIfNeeded(self.dialect(), dbEntry.name) +
               (suggestDatabases.appendDot ? '.' : ''),
             filterValue: dbEntry.name,
             meta: META_I18n.database,
@@ -810,7 +808,7 @@ class AutocompleteResults {
 
         dataCatalog
           .getEntry({
-            sourceType: self.snippet.type(),
+            sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
             path: [database],
@@ -831,8 +829,7 @@ class AutocompleteResults {
                       return;
                     }
                     tableSuggestions.push({
-                      value:
-                        prefix + sqlUtils.backTickIfNeeded(self.snippet.type(), tableEntry.name),
+                      value: prefix + sqlUtils.backTickIfNeeded(self.dialect(), tableEntry.name),
                       filterValue: tableEntry.name,
                       tableName: tableEntry.name,
                       meta: META_I18n[tableEntry.getType().toLowerCase()],
@@ -851,7 +848,7 @@ class AutocompleteResults {
       };
 
       if (
-        self.snippet.type() === 'impala' &&
+        self.dialect() === DIALECT.impala &&
         self.parseResult.suggestTables.identifierChain &&
         self.parseResult.suggestTables.identifierChain.length === 1
       ) {
@@ -872,7 +869,7 @@ class AutocompleteResults {
           }
         });
       } else if (
-        self.snippet.type() === 'impala' &&
+        self.dialect() === DIALECT.impala &&
         self.parseResult.suggestTables.identifierChain &&
         self.parseResult.suggestTables.identifierChain.length > 1
       ) {
@@ -908,7 +905,7 @@ class AutocompleteResults {
           $.when.apply($, columnDeferrals).always(() => {
             AutocompleteResults.mergeColumns(columnSuggestions);
             if (
-              self.snippet.type() === 'hive' &&
+              self.dialect() === DIALECT.hive &&
               /[^.]$/.test(self.editor().getTextBeforeCursor())
             ) {
               columnSuggestions.push({
@@ -975,7 +972,7 @@ class AutocompleteResults {
                 typeof column.type !== 'undefined' && column.type !== 'COLREF' ? column.type : 'T';
               if (typeof column.alias !== 'undefined') {
                 columnSuggestions.push({
-                  value: sqlUtils.backTickIfNeeded(self.snippet.type(), column.alias),
+                  value: sqlUtils.backTickIfNeeded(self.dialect(), column.alias),
                   filterValue: column.alias,
                   meta: type,
                   category: CATEGORIES.COLUMN,
@@ -991,7 +988,7 @@ class AutocompleteResults {
               ) {
                 columnSuggestions.push({
                   value: sqlUtils.backTickIfNeeded(
-                    self.snippet.type(),
+                    self.dialect(),
                     column.identifierChain[column.identifierChain.length - 1].name
                   ),
                   filterValue: column.identifierChain[column.identifierChain.length - 1].name,
@@ -1027,7 +1024,7 @@ class AutocompleteResults {
               typeof column.type !== 'undefined' && column.type !== 'COLREF' ? column.type : 'T';
             if (column.alias) {
               columnSuggestions.push({
-                value: sqlUtils.backTickIfNeeded(self.snippet.type(), column.alias),
+                value: sqlUtils.backTickIfNeeded(self.dialect(), column.alias),
                 filterValue: column.alias,
                 meta: type,
                 category: CATEGORIES.COLUMN,
@@ -1038,7 +1035,7 @@ class AutocompleteResults {
             } else if (column.identifierChain && column.identifierChain.length > 0) {
               columnSuggestions.push({
                 value: sqlUtils.backTickIfNeeded(
-                  self.snippet.type(),
+                  self.dialect(),
                   column.identifierChain[column.identifierChain.length - 1].name
                 ),
                 filterValue: column.identifierChain[column.identifierChain.length - 1].name,
@@ -1072,19 +1069,19 @@ class AutocompleteResults {
                   .getChildren({ silenceErrors: true, cancellable: true })
                   .done(childEntries => {
                     childEntries.forEach(childEntry => {
-                      let name = sqlUtils.backTickIfNeeded(self.snippet.type(), childEntry.name);
+                      let name = sqlUtils.backTickIfNeeded(self.dialect(), childEntry.name);
                       if (
-                        self.snippet.type() === 'hive' &&
+                        self.dialect() === DIALECT.hive &&
                         (childEntry.isArray() || childEntry.isMap())
                       ) {
                         name += '[]';
                       }
                       if (
-                        SqlFunctions.matchesType(self.snippet.type(), types, [
+                        SqlFunctions.matchesType(self.dialect(), types, [
                           childEntry.getType().toUpperCase()
                         ]) ||
                         SqlFunctions.matchesType(
-                          self.snippet.type(),
+                          self.dialect(),
                           [childEntry.getType().toUpperCase()],
                           types
                         ) ||
@@ -1110,7 +1107,7 @@ class AutocompleteResults {
                       }
                     });
                     if (
-                      self.snippet.type() === 'hive' &&
+                      self.dialect() === DIALECT.hive &&
                       (dataCatalogEntry.isArray() || dataCatalogEntry.isMap())
                     ) {
                       // Remove 'item' or 'value' and 'key' for Hive
@@ -1124,7 +1121,7 @@ class AutocompleteResults {
                       (sourceMeta.value && sourceMeta.value.fields) ||
                       (sourceMeta.item && sourceMeta.item.fields);
                     if (
-                      (self.snippet.type() === 'impala' || self.snippet.type() === 'hive') &&
+                      (self.dialect() === DIALECT.impala || self.dialect() === DIALECT.hive) &&
                       complexExtras
                     ) {
                       complexExtras.forEach(field => {
@@ -1412,7 +1409,7 @@ class AutocompleteResults {
       if (paths.length) {
         dataCatalog
           .getMultiTableEntry({
-            sourceType: self.snippet.type(),
+            sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
             paths: paths
@@ -1475,13 +1472,13 @@ class AutocompleteResults {
                             self.convertNavOptQualifiedIdentifier(
                               joinColPair.columns[0],
                               suggestJoins.tables,
-                              self.snippet.type()
+                              self.dialect()
                             ) +
                             ' = ' +
                             self.convertNavOptQualifiedIdentifier(
                               joinColPair.columns[1],
                               suggestJoins.tables,
-                              self.snippet.type()
+                              self.dialect()
                             );
                           first = false;
                         });
@@ -1532,7 +1529,7 @@ class AutocompleteResults {
       if (paths.length) {
         dataCatalog
           .getMultiTableEntry({
-            sourceType: self.snippet.type(),
+            sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
             paths: paths
@@ -1621,7 +1618,7 @@ class AutocompleteResults {
       if (paths.length) {
         dataCatalog
           .getMultiTableEntry({
-            sourceType: self.snippet.type(),
+            sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
             paths: paths
@@ -1684,7 +1681,7 @@ class AutocompleteResults {
                       });
                       totalCount += value.totalQueryCount;
                       value.function = SqlFunctions.findFunction(
-                        self.snippet.type(),
+                        self.dialect(),
                         value.aggregateFunction
                       );
                       aggregateFunctionsSuggestions.push({
@@ -1739,7 +1736,7 @@ class AutocompleteResults {
 
     self.cancellablePromises.push(
       dataCatalog
-        .getCatalog(self.snippet.type())
+        .getCatalog(self.dialect())
         .loadNavOptPopularityForTables({
           namespace: self.snippet.namespace(),
           compute: self.snippet.compute(),
@@ -1848,7 +1845,7 @@ class AutocompleteResults {
       if (paths.length) {
         dataCatalog
           .getMultiTableEntry({
-            sourceType: self.snippet.type(),
+            sourceType: self.dialect(),
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
             paths: paths
@@ -1939,7 +1936,7 @@ class AutocompleteResults {
 
       dataCatalog
         .getEntry({
-          sourceType: self.snippet.type(),
+          sourceType: self.dialect(),
           namespace: self.snippet.namespace(),
           compute: self.snippet.compute(),
           path: [db],
@@ -2025,7 +2022,7 @@ class AutocompleteResults {
 
       self.cancellablePromises.push(
         dataCatalog
-          .getCatalog(self.snippet.type())
+          .getCatalog(self.dialect())
           .loadNavOptPopularityForTables({
             namespace: self.snippet.namespace(),
             compute: self.snippet.compute(),
@@ -2244,7 +2241,7 @@ class AutocompleteResults {
 
       dataCatalog
         .getEntry({
-          sourceType: self.snippet.type(),
+          sourceType: self.dialect(),
           namespace: self.snippet.namespace(),
           compute: self.snippet.compute(),
           path: fetchedPath,
@@ -2256,7 +2253,7 @@ class AutocompleteResults {
               .getSourceMeta({ silenceErrors: true, cancellable: true })
               .done(sourceMeta => {
                 if (
-                  self.snippet.type() === 'hive' &&
+                  self.dialect() === DIALECT.hive &&
                   typeof sourceMeta.extended_columns !== 'undefined' &&
                   sourceMeta.extended_columns.length === 1 &&
                   /^(?:map|array|struct)/i.test(sourceMeta.extended_columns[0].type)
@@ -2287,10 +2284,10 @@ class AutocompleteResults {
 
     // For Hive it could be either:
     // SELECT col.struct FROM db.tbl -or- SELECT col.struct FROM tbl
-    if (path.length > 1 && (self.snippet.type() === 'impala' || self.snippet.type() === 'hive')) {
+    if (path.length > 1 && (self.dialect() === DIALECT.impala || self.dialect() === DIALECT.hive)) {
       dataCatalog
         .getEntry({
-          sourceType: self.snippet.type(),
+          sourceType: self.dialect(),
           namespace: self.snippet.namespace(),
           compute: self.snippet.compute(),
           path: [],

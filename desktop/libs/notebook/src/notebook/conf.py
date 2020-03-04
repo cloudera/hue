@@ -15,14 +15,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
+import logging
+
 from collections import OrderedDict
 
-from django.utils.translation import ugettext_lazy as _t
-
+from django.test.client import Client
+from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 from desktop import appmanager
 from desktop.conf import is_oozie_enabled, has_connectors
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_json_dict, coerce_bool, coerce_csv
+
+
+LOG = logging.getLogger(__name__)
 
 
 SHOW_NOTEBOOKS = Config(
@@ -36,8 +43,9 @@ def _remove_duplications(a_list):
   return list(OrderedDict.fromkeys(a_list))
 
 def check_permissions(user, interpreter, user_apps=None):
+  # TODO: port to cluster config
   if user_apps is None:
-    user_apps = appmanager.get_apps_dict(user) # Expensive method
+    user_apps = appmanager.get_apps_dict(user)  # Expensive method
   return (interpreter == 'hive' and 'hive' not in user_apps) or \
          (interpreter == 'impala' and 'impala' not in user_apps) or \
          (interpreter == 'pig' and 'pig' not in user_apps) or \
@@ -46,40 +54,48 @@ def check_permissions(user, interpreter, user_apps=None):
          (interpreter in ('java', 'spark2', 'mapreduce', 'shell', 'sqoop1', 'distcp') and 'oozie' not in user_apps)
 
 
+def _connector_to_iterpreter(connector):
+  return {
+      'name': connector['nice_name'],
+      'type': connector['name'],  # Aka id
+      'dialect': connector['dialect'],
+      'category': connector['category'],
+      'is_sql': connector['dialect_properties']['is_sql'],
+      'interface': connector['interface'],
+      'options': {setting['name']: setting['value'] for setting in connector['settings']},
+      'dialect_properties': connector['dialect_properties'],
+  }
+
+
 def get_ordered_interpreters(user=None):
-  if not INTERPRETERS.get():
-    _default_interpreters(user)
-
-  interpreters = INTERPRETERS.get()
-  interpreters_shown_on_wheel = _remove_duplications(INTERPRETERS_SHOWN_ON_WHEEL.get())
-
-  user_apps = appmanager.get_apps_dict(user)
-  user_interpreters = []
-  for interpreter in interpreters:
-    if check_permissions(user, interpreter, user_apps=user_apps):
-      pass # Not allowed
-    else:
-      user_interpreters.append(interpreter)
-
-  unknown_interpreters = set(interpreters_shown_on_wheel) - set(user_interpreters)
-  if unknown_interpreters:
-    raise ValueError("Interpreters from interpreters_shown_on_wheel is not in the list of Interpreters %s" % unknown_interpreters)
-
   if has_connectors():
     from desktop.lib.connectors.api import _get_installed_connectors
-    reordered_interpreters = [{
-        'name': i['nice_name'],
-        'type': i['name'],
-        'dialect': i['dialect'],
-        'category': i['category'],
-        'is_sql': i['is_sql'],
-        'interface': i['interface'],
-        'options': {setting['name']: setting['value'] for setting in i['settings']}
-      } for i in _get_installed_connectors()
+    interpreters = [
+      _connector_to_iterpreter(connector)
+      for connector in _get_installed_connectors(categories=['editor', 'catalogs'], user=user)
     ]
   else:
+    if not INTERPRETERS.get():
+      _default_interpreters(user)
+    interpreters = INTERPRETERS.get()
+
+    user_apps = appmanager.get_apps_dict(user)
+    user_interpreters = []
+    for interpreter in interpreters:
+      if check_permissions(user, interpreter, user_apps=user_apps):
+        pass  # Not allowed
+      else:
+        user_interpreters.append(interpreter)
+
+    interpreters_shown_on_wheel = _remove_duplications(INTERPRETERS_SHOWN_ON_WHEEL.get())
+    unknown_interpreters = set(interpreters_shown_on_wheel) - set(user_interpreters)
+    if unknown_interpreters:
+      # Just filtering it out might be better than failing for this user
+      raise ValueError("Interpreters from interpreters_shown_on_wheel is not in the list of Interpreters %s" % unknown_interpreters)
+
     reordered_interpreters = interpreters_shown_on_wheel + [i for i in user_interpreters if i not in interpreters_shown_on_wheel]
-    reordered_interpreters = [{
+
+    interpreters = [{
         'name': interpreters[i].NAME.get(),
         'type': i,
         'interface': interpreters[i].INTERFACE.get(),
@@ -93,11 +109,12 @@ def get_ordered_interpreters(user=None):
       "interface": i['interface'],
       "options": i['options'],
       'dialect': i.get('dialect', i['name']).lower(),
+      'dialect_properties': i.get('dialect_properties'),
       'category': i.get('category', 'editor'),
-      "is_sql": i.get('is_sql') or i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy"],
+      "is_sql": i.get('is_sql') or i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy", "ksql", "flink"],
       "is_catalog": i['interface'] in ["hms",],
     }
-    for i in reordered_interpreters
+    for i in interpreters
   ]
 
 # cf. admin wizard too
@@ -137,6 +154,13 @@ INTERPRETERS_SHOWN_ON_WHEEL = Config(
           "Only the first 5 interpreters will appear on the wheel."),
   type=coerce_csv,
   default=[]
+)
+
+DEFAULT_LIMIT = Config(
+  "default_limit",
+  help="Default limit to use in SELECT statements if not present. Set to 0 to disable.",
+  default=5000,
+  type=int
 )
 
 ENABLE_DBPROXY_SERVER = Config(
@@ -292,3 +316,82 @@ def _default_interpreters(user):
     ))
 
   INTERPRETERS.set_for_testing(OrderedDict(interpreters))
+
+
+def config_validator(user, interpreters=None):
+  res = []
+
+  if not has_connectors():
+    return res
+
+  client = Client()
+  client.force_login(user=user)
+
+  if not user.is_authenticated():
+    res.append(('Editor', _('Could not authenticate with user %s to validate interpreters') % user))
+
+  if interpreters is None:
+    interpreters = get_ordered_interpreters(user=user)
+
+  for interpreter in interpreters:
+    if interpreter.get('is_sql'):
+      connector_id = interpreter['type']
+
+      try:
+        response = _excute_test_query(client, connector_id, interpreter=interpreter)
+        data = json.loads(response.content)
+
+        if data['status'] != 0:
+          raise Exception(data)
+      except Exception as e:
+        trace = str(e)
+        msg = "Testing the connector connection failed."
+        if 'Error validating the login' in trace or 'TSocket read 0 bytes' in trace:
+          msg += ' Failed to authenticate, check authentication configurations.'
+
+        LOG.exception(msg)
+        res.append(
+          (
+            '%(name)s - %(dialect)s (%(type)s)' % interpreter,
+            _(msg) + (' %s' % trace[:100] + ('...' if len(trace) > 50 else ''))
+          )
+        )
+
+  return res
+
+
+def _excute_test_query(client, connector_id, interpreter=None):
+  '''
+  Helper utils until the API gets simplified.
+  '''
+  notebook_json = """
+    {
+      "selectedSnippet": "hive",
+      "showHistory": false,
+      "description": "Test Query",
+      "name": "Test Query",
+      "sessions": [
+          {
+              "type": "hive",
+              "properties": [],
+              "id": null
+          }
+      ],
+      "type": "hive",
+      "id": null,
+      "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"%(connector_id)s","status":"running","statement":"select * from web_logs","properties":{"settings":[],"variables":[],"files":[],"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"select * from web_logs","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
+      "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a"
+  }
+  """ % {
+    'connector_id': connector_id,
+  }
+  snippet = json.loads(notebook_json)['snippets'][0]
+  snippet['interpreter'] = interpreter
+
+  return client.post(
+    reverse('notebook:api_sample_data', kwargs={'database': 'default', 'table': 'default'}), {
+      'notebook': notebook_json,
+      'snippet': json.dumps(snippet),
+      'is_async': json.dumps(True),
+      'operation': json.dumps('hello')
+  })

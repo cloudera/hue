@@ -1,0 +1,228 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.sidebar.js should render component 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;hue-sidebar&quot;, params: params }\\" class=\\"collapsed\\"><script type=\\"text/html\\" id=\\"sidebar-inner-item\\">
+    <!-- ko if: iconHtml -->
+    <div class=\\"icon\\" data-bind=\\"html: iconHtml\\"></div><span data-bind=\\"text: displayName\\"></span>
+    <!-- /ko -->
+    <!-- ko ifnot: iconHtml -->
+    <div class=\\"icon\\" data-bind=\\"hueAppIcon: icon\\"></div><span data-bind=\\"text: displayName\\"></span>
+    <!-- /ko -->
+  </script><script type=\\"text/html\\" id=\\"sidebar-sub-menu\\">
+    <div class=\\"sidebar-menu\\" data-bind=\\"
+        css: {
+          'open' : open() || hoverOpen(),
+          'fixed-bottom': fixedBottom
+        },
+        event: {
+          mouseenter: mouseEnter
+        }
+      \\">
+      <div class=\\"inner\\">
+        <div class=\\"menu\\">
+          <!-- ko if: headerTemplate -->
+          <div class=\\"menu-header\\" data-bind=\\"template: headerTemplate\\"></div>
+          <!-- /ko -->
+
+          <ul class=\\"sidebar-nav-list\\" data-bind=\\"foreach: children\\">
+            <li data-bind=\\"css: { 'divider': isDivider }\\">
+              <!-- ko if: isDivider -->
+                &nbsp;
+              <!-- /ko -->
+              <!-- ko ifnot: isDivider -->
+                <!-- ko if: children && children.length -->
+                  <a href=\\"javascript:void(0);\\" data-bind=\\"toggle: open, text: displayName\\"></a>
+                  <!-- ko template: { name: 'sidebar-sub-menu' } --><!-- /ko -->
+                <!-- /ko -->
+                <!-- ko if: !children && url -->
+                  <a href=\\"javascript:void(0);\\" data-bind=\\"hueLink: url, text: displayName\\"></a>
+                <!-- /ko -->
+                <!-- ko if: !children && href -->
+                  <a href=\\"javascript:void(0);\\" target=\\"_blank\\" data-bind=\\"attr: { 'href': href }, text: displayName\\"></a>
+                <!-- /ko -->
+                <!-- ko if: !children && click -->
+                  <a href=\\"javascript:void(0);\\" target=\\"_blank\\" data-bind=\\"click: click.bind($data), text: displayName\\"></a>
+                <!-- /ko -->
+              <!-- /ko -->
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </script><script type=\\"text/html\\" id=\\"sidebar-item\\">
+    <div class=\\"item-wrapper\\" data-bind=\\"css: itemClass, event: { mouseenter: mouseEnter, mouseleave: mouseLeave }\\">
+      <!-- ko if: children && children.length -->
+        <a href=\\"javascript: void(0);\\" data-bind=\\"
+            toggle: open,
+            css: { 'active': active },
+            template: 'sidebar-inner-item'
+          \\" class=\\"item\\"></a>
+          <!-- ko template: 'sidebar-sub-menu' --><!-- /ko -->
+      <!-- /ko -->
+      <!-- ko if: !children || !children.length -->
+        <!-- ko if: click -->
+          <a href=\\"javascript: void(0);\\" data-bind=\\"
+              click: click,
+              attr: { 'aria-label': displayName, 'data-tooltip': displayName },
+              css: { 'active': active },
+              template: 'sidebar-inner-item'
+            \\" class=\\"item\\"></a>
+        <!-- /ko -->
+        <!-- ko ifnot: click -->
+          <a href=\\"javascript: void(0);\\" data-bind=\\"
+              hueLink: url,
+              publish: 'hue.sidebar.update.active',
+              attr: { 'aria-label': displayName, 'data-tooltip': displayName },
+              css: { 'active': active },
+              template: 'sidebar-inner-item'
+            \\" class=\\"item\\"></a>
+        <!-- /ko -->
+      <!-- /ko -->
+    </div>
+  </script><script type=\\"text/html\\" id=\\"user-header-template\\">
+    <div class=\\"user-icon\\" style=\\"background-color: #fff\\">F</div>
+    <div>
+      <div>foo</div>
+    </div>
+  </script><div class=\\"hue-sidebar-header\\" data-bind=\\"css: { 'hue-sidebar-custom-logo' : window.CUSTOM_LOGO }\\">
+    <a data-bind=\\"hueLink: '/home/'\\" href=\\"javascript: void(0);\\" title=\\"Documents\\">
+      <div class=\\"hue-sidebar-logo\\"><svg><use xlink:href=\\"#hi-sidebar-logo\\"></use></svg></div>
+    </a>
+  </div><div class=\\"hue-sidebar-body\\">
+    <!-- ko foreach: items --><!-- /ko -->
+  </div><div class=\\"hue-sidebar-footer\\">
+    <!-- ko foreach: footerItems -->
+    <!-- ko template: { name: 'sidebar-item' } -->
+    <div class=\\"item-wrapper\\" data-bind=\\"css: itemClass, event: { mouseenter: mouseEnter, mouseleave: mouseLeave }\\">
+      <!-- ko if: children && children.length -->
+        <a href=\\"javascript: void(0);\\" data-bind=\\"
+            toggle: open,
+            css: { 'active': active },
+            template: 'sidebar-inner-item'
+          \\" class=\\"item\\">
+    <!-- ko if: iconHtml --><!-- /ko -->
+    <!-- ko ifnot: iconHtml -->
+    <div class=\\"icon\\" data-bind=\\"hueAppIcon: icon\\"></div><span data-bind=\\"text: displayName\\">Support</span>
+    <!-- /ko -->
+  </a>
+          <!-- ko template: 'sidebar-sub-menu' -->
+    <div class=\\"sidebar-menu fixed-bottom\\" data-bind=\\"
+        css: {
+          'open' : open() || hoverOpen(),
+          'fixed-bottom': fixedBottom
+        },
+        event: {
+          mouseenter: mouseEnter
+        }
+      \\">
+      <div class=\\"inner\\">
+        <div class=\\"menu\\">
+          <!-- ko if: headerTemplate --><!-- /ko -->
+
+          <ul class=\\"sidebar-nav-list\\" data-bind=\\"foreach: children\\">
+            <li data-bind=\\"css: { 'divider': isDivider }\\">
+              <!-- ko if: isDivider --><!-- /ko -->
+              <!-- ko ifnot: isDivider -->
+                <!-- ko if: children && children.length --><!-- /ko -->
+                <!-- ko if: !children && url --><!-- /ko -->
+                <!-- ko if: !children && href -->
+                  <a href=\\"https://docs.gethue.com\\" target=\\"_blank\\" data-bind=\\"attr: { 'href': href }, text: displayName\\">Documentation</a>
+                <!-- /ko -->
+                <!-- ko if: !children && click --><!-- /ko -->
+              <!-- /ko -->
+            </li>
+          
+            <li data-bind=\\"css: { 'divider': isDivider }\\">
+              <!-- ko if: isDivider --><!-- /ko -->
+              <!-- ko ifnot: isDivider -->
+                <!-- ko if: children && children.length --><!-- /ko -->
+                <!-- ko if: !children && url --><!-- /ko -->
+                <!-- ko if: !children && href --><!-- /ko -->
+                <!-- ko if: !children && click -->
+                  <a href=\\"javascript:void(0);\\" target=\\"_blank\\" data-bind=\\"click: click.bind($data), text: displayName\\">Welcome Tour</a>
+                <!-- /ko -->
+              <!-- /ko -->
+            </li>
+          
+            <li data-bind=\\"css: { 'divider': isDivider }\\">
+              <!-- ko if: isDivider --><!-- /ko -->
+              <!-- ko ifnot: isDivider -->
+                <!-- ko if: children && children.length --><!-- /ko -->
+                <!-- ko if: !children && url --><!-- /ko -->
+                <!-- ko if: !children && href -->
+                  <a href=\\"https://gethue.com\\" target=\\"_blank\\" data-bind=\\"attr: { 'href': href }, text: displayName\\">Gethue.com</a>
+                <!-- /ko -->
+                <!-- ko if: !children && click --><!-- /ko -->
+              <!-- /ko -->
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  <!-- /ko -->
+      <!-- /ko -->
+      <!-- ko if: !children || !children.length --><!-- /ko -->
+    </div>
+  <!-- /ko -->
+    
+    <!-- ko template: { name: 'sidebar-item' } -->
+    <div class=\\"item-wrapper shepherd-user-menu\\" data-bind=\\"css: itemClass, event: { mouseenter: mouseEnter, mouseleave: mouseLeave }\\">
+      <!-- ko if: children && children.length -->
+        <a href=\\"javascript: void(0);\\" data-bind=\\"
+            toggle: open,
+            css: { 'active': active },
+            template: 'sidebar-inner-item'
+          \\" class=\\"item\\">
+    <!-- ko if: iconHtml -->
+    <div class=\\"icon\\" data-bind=\\"html: iconHtml\\"><div class=\\"user-icon\\">F</div></div><span data-bind=\\"text: displayName\\">foo</span>
+    <!-- /ko -->
+    <!-- ko ifnot: iconHtml --><!-- /ko -->
+  </a>
+          <!-- ko template: 'sidebar-sub-menu' -->
+    <div class=\\"sidebar-menu fixed-bottom\\" data-bind=\\"
+        css: {
+          'open' : open() || hoverOpen(),
+          'fixed-bottom': fixedBottom
+        },
+        event: {
+          mouseenter: mouseEnter
+        }
+      \\">
+      <div class=\\"inner\\">
+        <div class=\\"menu\\">
+          <!-- ko if: headerTemplate -->
+          <div class=\\"menu-header\\" data-bind=\\"template: headerTemplate\\">
+    <div class=\\"user-icon\\" style=\\"background-color: #fff\\">F</div>
+    <div>
+      <div>foo</div>
+    </div>
+  </div>
+          <!-- /ko -->
+
+          <ul class=\\"sidebar-nav-list\\" data-bind=\\"foreach: children\\">
+            <li data-bind=\\"css: { 'divider': isDivider }\\">
+              <!-- ko if: isDivider --><!-- /ko -->
+              <!-- ko ifnot: isDivider -->
+                <!-- ko if: children && children.length --><!-- /ko -->
+                <!-- ko if: !children && url -->
+                  <a href=\\"javascript:void(0);\\" data-bind=\\"hueLink: url, text: displayName\\">Sign out</a>
+                <!-- /ko -->
+                <!-- ko if: !children && href --><!-- /ko -->
+                <!-- ko if: !children && click --><!-- /ko -->
+              <!-- /ko -->
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  <!-- /ko -->
+      <!-- /ko -->
+      <!-- ko if: !children || !children.length --><!-- /ko -->
+    </div>
+  <!-- /ko -->
+    <!-- /ko -->
+    <a class=\\"hue-sidebar-trigger\\" data-bind=\\"toggle: collapsed\\">
+      <svg><use xlink:href=\\"#hi-collapse-nav\\"></use></svg>
+    </a>
+  </div></div>"
+`;

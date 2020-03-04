@@ -103,8 +103,12 @@ dynamic_patterns += [
   url(r'^desktop/debug/check_config_ajax$', desktop_views.check_config_ajax),
   url(r'^desktop/log_frontend_event$', desktop_views.log_frontend_event),
 
+  # Catch-up gist
+  url(r'^hue/gist/?$', desktop_api2.gist_get),
+
   # Mobile
   url(r'^assist_m', desktop_views.assist_m),
+
   # Hue 4
   url(r'^hue.*/?$', desktop_views.hue, name='desktop_views_hue'),
   url(r'^403$', desktop_views.path_forbidden),
@@ -156,9 +160,11 @@ dynamic_patterns += [
   url(r'^desktop/api2/doc/delete/?$', desktop_api2.delete_document),
   url(r'^desktop/api2/doc/copy/?$', desktop_api2.copy_document),
   url(r'^desktop/api2/doc/restore/?$', desktop_api2.restore_document),
+  url(r'^desktop/api2/doc/share/link/?$', desktop_api2.share_document_link),
   url(r'^desktop/api2/doc/share/?$', desktop_api2.share_document),
 
   url(r'^desktop/api2/get_config/?$', desktop_api2.get_config),
+  url(r'^desktop/api2/get_hue_config/?$', desktop_api2.get_hue_config),
   url(r'^desktop/api2/context/namespaces/(?P<interface>[\w\-]+)/?$', desktop_api2.get_context_namespaces),
   url(r'^desktop/api2/context/computes/(?P<interface>[\w\-]+)/?$', desktop_api2.get_context_computes),
   url(r'^desktop/api2/context/clusters/(?P<interface>[\w\-]+)/?$', desktop_api2.get_context_clusters),
@@ -166,6 +172,10 @@ dynamic_patterns += [
 
   url(r'^desktop/api2/doc/export/?$', desktop_api2.export_documents),
   url(r'^desktop/api2/doc/import/?$', desktop_api2.import_documents),
+
+  url(r'^desktop/api2/gist/create/?$', desktop_api2.gist_create),
+  url(r'^desktop/api2/gist/open/?$', desktop_api2.gist_get),
+
 
   url(r'^desktop/api/search/entities/?$', desktop_api2.search_entities),
   url(r'^desktop/api/search/entities_interactive/?$', desktop_api2.search_entities_interactive),
@@ -198,10 +208,9 @@ if METRICS.ENABLE_WEB_METRICS.get():
     url(r'^desktop/metrics/?', include('desktop.lib.metrics.urls'))
   ]
 
-if has_connectors():
-  dynamic_patterns += [
-    url(r'^desktop/connectors/?', include('desktop.lib.connectors.urls'))
-  ]
+dynamic_patterns += [
+  url(r'^desktop/connectors/?', include('desktop.lib.connectors.urls'))
+]
 
 if ANALYTICS.IS_ENABLED.get():
   dynamic_patterns += [
@@ -228,9 +237,6 @@ static_patterns = []
 if settings.SAML_AUTHENTICATION:
   static_patterns.append(url(r'^saml2/', include('libsaml.urls')))
 
-# OpenId specific
-if settings.OPENID_AUTHENTICATION:
-    static_patterns.append(url(r'^openid/', include('libopenid.urls')))
 
 if settings.OAUTH_AUTHENTICATION:
   static_patterns.append(url(r'^oauth/', include('liboauth.urls')))

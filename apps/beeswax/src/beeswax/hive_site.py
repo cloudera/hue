@@ -25,13 +25,18 @@ import logging
 import os.path
 import re
 import socket
+import sys
 
 from desktop.lib import security_util
 from hadoop import confparse
-from hadoop.ssl_client_site import get_trustore_location
+from hadoop.ssl_client_site import get_trustore_location, get_trustore_password
 
 import beeswax.conf
 
+if sys.version_info[0] > 2:
+  open_file = open
+else:
+  open_file = file
 
 LOG = logging.getLogger(__name__)
 
@@ -53,6 +58,7 @@ _CNF_HIVESERVER2_TRUSTSTORE_PATH = 'hive.server2.truststore.path'
 _CNF_HIVESERVER2_TRUSTSTORE_PASSWORD = 'hive.server2.truststore.password'
 
 _CNF_HIVESERVER2_TRANSPORT_MODE = 'hive.server2.transport.mode'
+_CNF_HIVESERVER2_THRIFT_BINARY_PORT = 'hive.server2.thrift.port'
 _CNF_HIVESERVER2_THRIFT_HTTP_PORT = 'hive.server2.thrift.http.port'
 _CNF_HIVESERVER2_THRIFT_HTTP_PATH = 'hive.server2.thrift.http.path'
 _CNF_HIVESERVER2_THRIFT_SASL_QOP = 'hive.server2.thrift.sasl.qop'
@@ -60,6 +66,8 @@ _CNF_HIVESERVER2_THRIFT_SASL_QOP = 'hive.server2.thrift.sasl.qop'
 _CNF_HIVESERVER2_USE_SASL = 'hive.metastore.sasl.enabled'
 
 _CNF_HIVE_SUPPORT_CONCURRENCY = 'hive.support.concurrency'
+_CNF_HIVE_HOOK_PROTO_BASE_DIR = 'hive.hook.proto.base-directory'
+_CNF_HIVE_EXECUTION_MODE = 'hive.execution.mode'
 
 
 # Host is whatever up to the colon. Allow and ignore a trailing slash.
@@ -143,7 +151,7 @@ def hiveserver2_impersonation_enabled():
 
 def hiveserver2_jdbc_url():
   is_transport_mode_http = hiveserver2_transport_mode() == 'HTTP'
-  urlbase = 'jdbc:hive2://%s:%s/default' % (beeswax.conf.HIVE_SERVER_HOST.get(), hiveserver2_thrift_http_port() if is_transport_mode_http else beeswax.conf.HIVE_SERVER_PORT.get())
+  urlbase = 'jdbc:hive2://%s:%s/default' % (beeswax.conf.HIVE_SERVER_HOST.get(), beeswax.conf.HIVE_HTTP_THRIFT_PORT.get() if is_transport_mode_http else beeswax.conf.HIVE_SERVER_PORT.get())
 
   if get_conf().get(_CNF_HIVESERVER2_USE_SSL, 'FALSE').upper() == 'TRUE':
     urlbase += ';ssl=true'
@@ -155,6 +163,8 @@ def hiveserver2_jdbc_url():
 
     if get_conf().get(_CNF_HIVESERVER2_TRUSTSTORE_PASSWORD):
       urlbase += ';trustStorePassword=%s' % get_conf().get(_CNF_HIVESERVER2_TRUSTSTORE_PASSWORD)
+    elif get_trustore_password():
+      urlbase += ';trustStorePassword=%s' % get_trustore_password()
 
   if is_transport_mode_http:
     urlbase += ';transportMode=http'
@@ -169,8 +179,11 @@ def hiveserver2_use_ssl():
 def hiveserver2_transport_mode():
   return get_conf().get(_CNF_HIVESERVER2_TRANSPORT_MODE, 'TCP').upper()
 
+def hiveserver2_thrift_binary_port():
+  return get_conf().get(_CNF_HIVESERVER2_THRIFT_BINARY_PORT)
+
 def hiveserver2_thrift_http_port():
-  return get_conf().get(_CNF_HIVESERVER2_THRIFT_HTTP_PORT, '10001')
+  return get_conf().get(_CNF_HIVESERVER2_THRIFT_HTTP_PORT)
 
 def hiveserver2_thrift_http_path():
   return get_conf().get(_CNF_HIVESERVER2_THRIFT_HTTP_PATH, 'cliservice')
@@ -181,9 +194,14 @@ def get_use_sasl():
 
 
 def has_concurrency_support():
-  '''For SQL transactions like INSERT, DELETE, UPDATE since Hive 3.'''
+  '''For SQL transactions like INSERT, DELETE, UPDATE since Hive 3. Possibly use set -v in future to obtain properties hive.create.as.acid=true & hive.create.as.insert.only=true'''
   return get_conf().get(_CNF_HIVE_SUPPORT_CONCURRENCY, 'TRUE').upper() == 'TRUE'
 
+def get_hive_hook_proto_base_directory():
+  return get_conf().get(_CNF_HIVE_HOOK_PROTO_BASE_DIR)
+
+def get_hive_execution_mode():
+  return get_conf().get(_CNF_HIVE_EXECUTION_MODE)
 
 def _parse_hive_site():
   """
@@ -194,7 +212,7 @@ def _parse_hive_site():
 
   _HIVE_SITE_PATH = os.path.join(beeswax.conf.HIVE_CONF_DIR.get(), 'hive-site.xml')
   try:
-    data = file(_HIVE_SITE_PATH, 'r').read()
+    data = open_file(_HIVE_SITE_PATH, 'r').read()
   except IOError as err:
     if err.errno != errno.ENOENT:
       LOG.error('Cannot read from "%s": %s' % (_HIVE_SITE_PATH, err))
@@ -209,4 +227,4 @@ def get_hive_site_content():
   if not os.path.exists(hive_site_path):
     return ''
   else:
-    return file(hive_site_path, 'r').read()
+    return open_file(hive_site_path, 'r').read()

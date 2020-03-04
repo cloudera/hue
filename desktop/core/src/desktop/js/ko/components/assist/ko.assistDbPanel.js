@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import AssistDbSource from 'ko/components/assist/assistDbSource';
@@ -23,6 +23,7 @@ import componentUtils from 'ko/components/componentUtils';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT } from '../../../utils/hueConfig';
 
 const ASSIST_TABLE_TEMPLATES = `
   <script type="text/html" id="assist-no-database-entries">
@@ -139,7 +140,7 @@ const ASSIST_TABLE_TEMPLATES = `
   <script type="text/html" id="assist-table-entry">
     <li class="assist-table" data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { override: statsVisible() || navigationSettings.rightAssist, selector: '.table-actions' }">
       <div class="assist-actions table-actions" data-bind="css: { 'assist-actions-left': navigationSettings.rightAssist }" style="opacity: 0">
-        <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
+        <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, popoverOnHover: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
           'Show details'
         )}"></i></a>
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${I18n(
@@ -158,18 +159,18 @@ const ASSIST_TABLE_TEMPLATES = `
   <script type="text/html" id="assist-column-entry">
     <li data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visible: ! hasErrors(), visibleOnHover: { childrenOnly: true, override: statsVisible, selector: catalogEntry.isView() ? '.table-actions' : '.column-actions' }, css: { 'assist-table': catalogEntry.isView(), 'assist-column': catalogEntry.isField() }">
       <div class="assist-actions column-actions" data-bind="css: { 'assist-actions-left': navigationSettings.rightAssist }" style="opacity: 0">
-        <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
+        <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, popoverOnHover: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
           'Show details'
         )}"></i></a>
       </div>
       <!-- ko if: expandable -->
       <a class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': catalogEntry.getTitle(true) }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
-        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName }, text: catalogEntry.getDisplayName(), draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName } }"></span><!-- ko if: catalogEntry.isPrimaryKey() --> <i class="fa fa-key"></i><!-- /ko -->
+        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName }, text: catalogEntry.getDisplayName(), draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName } }"></span><!-- ko if: catalogEntry.isKey() --> <i class="fa fa-key"></i><!-- /ko -->
       </a>
       <!-- /ko -->
       <!-- ko ifnot: expandable -->
       <div class="assist-entry assist-field-link default-cursor" href="javascript:void(0)" data-bind="event: { dblclick: dblClick }, attr: {'title': catalogEntry.getTitle(true) }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
-        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: catalogEntry.getDisplayName(), draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: catalogEntry.isPrimaryKey()  --> <i class="fa fa-key"></i><!-- /ko -->
+        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: catalogEntry.getDisplayName(), draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: catalogEntry.isKey()  --> <i class="fa fa-key"></i><!-- /ko -->
       </div>
       <!-- /ko -->
       <div class="center assist-spinner" data-bind="visible: loading"><i class="fa fa-spinner fa-spin"></i></div>
@@ -180,20 +181,20 @@ const ASSIST_TABLE_TEMPLATES = `
   <script type="text/html" id="assist-column-entry-assistant">
     <li data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visible: ! hasErrors(), visibleOnHover: { childrenOnly: true, override: statsVisible, selector: catalogEntry.isView() ? '.table-actions' : '.column-actions' }, css: { 'assist-table': catalogEntry.isView(), 'assist-column': catalogEntry.isField() }">
       <div class="assist-actions column-actions assist-actions-left" style="opacity: 0">
-        <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
+        <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, popoverOnHover: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
           'Show details'
         )}"></i></a>
       </div>
       <!-- ko if: expandable -->
       <a class="assist-entry assist-field-link assist-field-link-dark assist-entry-left-action assist-ellipsis" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': catalogEntry.getTitle(true) }">
         <span data-bind="text: catalogEntry.getType()" class="muted pull-right margin-right-20"></span>
-        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName }, text: catalogEntry.name, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName } }"></span><!-- ko if: catalogEntry.isPrimaryKey() --> <i class="fa fa-key"></i><!-- /ko -->
+        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName }, text: catalogEntry.name, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName } }"></span><!-- ko if: catalogEntry.isKey() --> <i class="fa fa-key"></i><!-- /ko -->
       </a>
       <!-- /ko -->
       <!-- ko ifnot: expandable -->
       <div class="assist-entry assist-field-link assist-field-link-dark default-cursor assist-ellipsis" href="javascript:void(0)" data-bind="event: { dblclick: dblClick }, attr: {'title': catalogEntry.getTitle(true) }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
         <span data-bind="text: catalogEntry.getType()" class="muted pull-right margin-right-20"></span>
-        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: catalogEntry.name, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: catalogEntry.isPrimaryKey() --> <i class="fa fa-key"></i><!-- /ko -->
+        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: catalogEntry.name, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: catalogEntry.isKey() --> <i class="fa fa-key"></i><!-- /ko -->
       </div>
       <!-- /ko -->
       <div class="center assist-spinner" data-bind="visible: loading"><i class="fa fa-spinner fa-spin"></i></div>
@@ -243,7 +244,7 @@ const TEMPLATE =
   <script type="text/html" id="assist-database-actions">
     <div class="assist-actions database-actions" style="opacity: 0">
       <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
-      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: function (data, event) { showContextPopover(data, event); }, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
+      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, popoverOnHover: function (data, event) { showContextPopover(data, event); }, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
         'Show details'
       )}"></i></a>
       <!-- /ko -->
@@ -581,71 +582,40 @@ class AssistDbPanel {
     const self = this;
     self.options = options;
     self.i18n = options.i18n;
-    self.initialized = false;
-    self.initalizing = false;
 
     self.isStreams = options.isStreams;
     self.isSolr = options.isSolr;
     self.nonSqlType = self.isSolr || self.isStreams;
 
-    if (typeof options.sourceTypes === 'undefined') {
-      options.sourceTypes = [];
-
-      if (self.isSolr) {
-        options.sourceTypes = [{ type: 'solr', name: 'solr' }];
-      } else if (self.isStreams) {
-        options.sourceTypes = [{ type: 'kafka', name: 'kafka' }];
-      } else {
-        window.ASSIST_SQL_INTERPRETERS.forEach(interpreter => {
-          options.sourceTypes.push(interpreter);
-        });
-      }
-    }
-
     self.sources = ko.observableArray();
     self.sourceIndex = {};
     self.selectedSource = ko.observable(null);
 
-    options.sourceTypes.forEach(sourceType => {
-      self.sourceIndex[sourceType.type] = new AssistDbSource({
-        i18n: self.i18n,
-        type: sourceType.type,
-        name: sourceType.name,
-        nonSqlType: sourceType.type === 'solr' || sourceType.type === 'kafka',
-        navigationSettings: options.navigationSettings
-      });
-      self.sources.push(self.sourceIndex[sourceType.type]);
-    });
-
-    if (self.sources().length === 1) {
-      self.selectedSource(self.sources()[0]);
-    }
-
-    if (self.sourceIndex['solr']) {
-      huePubSub.subscribe('assist.collections.refresh', () => {
-        const solrSource = self.sourceIndex['solr'];
-        const doRefresh = () => {
-          if (solrSource.selectedNamespace()) {
-            const assistDbNamespace = solrSource.selectedNamespace();
-            dataCatalog
-              .getEntry({
-                sourceType: 'solr',
-                namespace: assistDbNamespace.namespace,
-                compute: assistDbNamespace.compute(),
-                path: []
-              })
-              .done(entry => {
-                entry.clearCache({ cascade: true });
-              });
+    self.breadcrumb = ko.pureComputed(() => {
+      if (self.isStreams && self.selectedSource()) {
+        return self.selectedSource().name;
+      }
+      if (!self.isSolr && self.selectedSource()) {
+        if (self.selectedSource().selectedNamespace()) {
+          if (
+            self
+              .selectedSource()
+              .selectedNamespace()
+              .selectedDatabase()
+          ) {
+            return self
+              .selectedSource()
+              .selectedNamespace()
+              .selectedDatabase().catalogEntry.name;
           }
-        };
-        if (!solrSource.hasNamespaces()) {
-          solrSource.loadNamespaces(true).done(doRefresh);
-        } else {
-          doRefresh();
+          if (window.HAS_MULTI_CLUSTER) {
+            return self.selectedSource().selectedNamespace().name;
+          }
         }
-      });
-    }
+        return self.selectedSource().name;
+      }
+      return null;
+    });
 
     huePubSub.subscribe('assist.db.highlight', catalogEntry => {
       huePubSub.publish('left.assist.show');
@@ -672,7 +642,31 @@ class AssistDbPanel {
       }, 0);
     });
 
-    if (!self.isSolr && !self.isStreams) {
+    if (self.isSolr) {
+      huePubSub.subscribe('assist.collections.refresh', () => {
+        const solrSource = self.sourceIndex['solr'];
+        const doRefresh = () => {
+          if (solrSource.selectedNamespace()) {
+            const assistDbNamespace = solrSource.selectedNamespace();
+            dataCatalog
+              .getEntry({
+                sourceType: 'solr',
+                namespace: assistDbNamespace.namespace,
+                compute: assistDbNamespace.compute(),
+                path: []
+              })
+              .done(entry => {
+                entry.clearCache({ cascade: true });
+              });
+          }
+        };
+        if (!solrSource.hasNamespaces()) {
+          solrSource.loadNamespaces(true).done(doRefresh);
+        } else {
+          doRefresh();
+        }
+      });
+    } else if (!self.isSolr && !self.isStreams) {
       huePubSub.subscribe('assist.set.database', databaseDef => {
         if (!databaseDef.source || !self.sourceIndex[databaseDef.source]) {
           return;
@@ -695,11 +689,13 @@ class AssistDbPanel {
                     name: assistDbSource.selectedNamespace().selectedDatabase().name
                   });
                 } else {
-                  const lastSelectedDb = apiHelper.getFromTotalStorage(
+                  let lastSelectedDb = apiHelper.getFromTotalStorage(
                     'assist_' + source + '_' + assistDbSource.selectedNamespace().namespace.id,
-                    'lastSelectedDb',
-                    'default'
+                    'lastSelectedDb'
                   );
+                  if (!lastSelectedDb && lastSelectedDb !== '') {
+                    lastSelectedDb = 'default';
+                  }
                   deferred.resolve({
                     sourceType: source,
                     namespace: assistDbSource.selectedNamespace().namespace,
@@ -745,12 +741,6 @@ class AssistDbPanel {
         }
       });
 
-      huePubSub.publish('assist.db.panel.ready');
-
-      huePubSub.subscribe('assist.is.db.panel.ready', () => {
-        huePubSub.publish('assist.db.panel.ready');
-      });
-
       self.selectedSource.subscribe(newSource => {
         if (newSource) {
           if (newSource.namespaces().length === 0) {
@@ -763,51 +753,13 @@ class AssistDbPanel {
       });
     }
 
-    if (self.isSolr || self.isStreams) {
-      if (self.sources().length === 1) {
-        self.selectedSource(self.sources()[0]);
-        self
-          .selectedSource()
-          .loadNamespaces()
-          .done(() => {
-            const solrNamespace = self.selectedSource().selectedNamespace();
-            if (solrNamespace) {
-              solrNamespace.initDatabases();
-              solrNamespace.whenLoaded(() => {
-                solrNamespace.setDatabase('default');
-              });
-            }
-          });
-      }
-    }
+    self.init(options.navigationSettings, options.activeSourceType).then(() => {
+      huePubSub.publish('assist.db.panel.ready');
 
-    self.breadcrumb = ko.pureComputed(() => {
-      if (self.isStreams && self.selectedSource()) {
-        return self.selectedSource().name;
-      }
-      if (!self.isSolr && self.selectedSource()) {
-        if (self.selectedSource().selectedNamespace()) {
-          if (
-            self
-              .selectedSource()
-              .selectedNamespace()
-              .selectedDatabase()
-          ) {
-            return self
-              .selectedSource()
-              .selectedNamespace()
-              .selectedDatabase().catalogEntry.name;
-          }
-          if (window.HAS_MULTI_CLUSTER) {
-            return self.selectedSource().selectedNamespace().name;
-          }
-        }
-        return self.selectedSource().name;
-      }
-      return null;
+      huePubSub.subscribe('assist.is.db.panel.ready', () => {
+        huePubSub.publish('assist.db.panel.ready');
+      });
     });
-
-    self.init();
   }
 
   setDatabaseWhenLoaded(namespace, databaseName) {
@@ -857,6 +809,9 @@ class AssistDbPanel {
           this.selectedSource()
             .selectedNamespace()
             .selectedDatabase(null);
+          this.selectedSource()
+            .selectedNamespace()
+            .selectedDatabaseChanged();
         } else if (window.HAS_MULTI_CLUSTER) {
           this.selectedSource().selectedNamespace(null);
         } else {
@@ -868,25 +823,89 @@ class AssistDbPanel {
     }
   }
 
-  init() {
-    if (this.initialized) {
-      return;
-    }
-    if (this.isSolr) {
-      this.selectedSource(this.sourceIndex['solr']);
-    } else if (this.isStreams) {
-      this.selectedSource(this.sourceIndex['kafka']);
-    } else {
-      const storageSourceType = apiHelper.getFromTotalStorage('assist', 'lastSelectedSource');
-      if (!this.selectedSource()) {
-        if (this.options.activeSourceType) {
-          this.selectedSource(this.sourceIndex[this.options.activeSourceType]);
-        } else if (storageSourceType && this.sourceIndex[storageSourceType]) {
-          this.selectedSource(this.sourceIndex[storageSourceType]);
-        }
+  setSingleSource(type, navigationSettings, nonSqlType) {
+    this.sourceIndex = {};
+    const source = new AssistDbSource({
+      i18n: self.i18n,
+      type: type,
+      name: type,
+      nonSqlType: nonSqlType,
+      navigationSettings: navigationSettings
+    });
+    this.sourceIndex[type] = source;
+    this.sources([source]);
+    this.selectedSource(source);
+
+    source.loadNamespaces().done(() => {
+      const namespace = self.selectedSource().selectedNamespace();
+      if (namespace) {
+        namespace.initDatabases();
+        namespace.whenLoaded(() => {
+          namespace.setDatabase('default');
+        });
       }
-    }
-    this.initialized = true;
+    });
+  }
+
+  async init(navigationSettings, activeSourceType) {
+    return new Promise(resolve => {
+      if (self.isSolr) {
+        this.setSingleSource('solr', navigationSettings, true);
+        resolve();
+        return;
+      }
+
+      if (self.isStreams) {
+        this.setSingleSource('kafka', navigationSettings, true);
+        resolve();
+        return;
+      }
+
+      const updateFromConfig = config => {
+        const sources = [];
+        if (
+          config &&
+          config.app_config &&
+          config.app_config.editor &&
+          config.app_config.editor.interpreters
+        ) {
+          const interpreters = config.app_config.editor.interpreters;
+          interpreters.forEach(interpreter => {
+            if (interpreter.is_sql) {
+              const source =
+                this.sourceIndex[interpreter.type] ||
+                new AssistDbSource({
+                  i18n: self.i18n,
+                  type: interpreter.type,
+                  name: interpreter.name,
+                  nonSqlType: false,
+                  navigationSettings: navigationSettings
+                });
+              sources.push(source);
+            }
+          });
+        }
+        this.sourceIndex = {};
+        sources.forEach(source => {
+          this.sourceIndex[source.sourceType] = source;
+        });
+
+        if (sources.indexOf(this.selectedSource()) === -1) {
+          const storageSourceType =
+            activeSourceType || apiHelper.getFromTotalStorage('assist', 'lastSelectedSource');
+          this.selectedSource(
+            this.sourceIndex[storageSourceType] || (sources.length ? sources[0] : null)
+          );
+        }
+        this.sources(sources);
+      };
+
+      huePubSub.subscribe(CONFIG_REFRESHED_EVENT, updateFromConfig);
+      huePubSub.publish(GET_KNOWN_CONFIG_EVENT, config => {
+        updateFromConfig(config);
+        resolve();
+      });
+    });
   }
 }
 

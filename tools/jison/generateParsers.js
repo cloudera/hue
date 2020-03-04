@@ -327,21 +327,21 @@ const identifySqlParsers = () =>
     });
   });
 
-const copySpecs = (source, target) =>
+const copyTests = (source, target) =>
   new Promise((resolve, reject) => {
     const replaceRegexp = new RegExp(source + '(Autocomplete|Syntax)Parser', 'g');
     mkdir(PARSER_FOLDER + target)
       .then(() => {
-        mkdir(PARSER_FOLDER + target + '/spec')
+        mkdir(PARSER_FOLDER + target + '/test')
           .then(() => {
-            listDir(PARSER_FOLDER + source + '/spec')
-              .then(specFiles => {
+            listDir(PARSER_FOLDER + source + '/test')
+              .then(testFiles => {
                 const copyPromises = [];
-                specFiles.forEach(specFile => {
+                testFiles.forEach(testFile => {
                   copyPromises.push(
                     copyFile(
-                      PARSER_FOLDER + source + '/spec/' + specFile,
-                      PARSER_FOLDER + target + '/spec/' + specFile.replace(source, target),
+                      PARSER_FOLDER + source + '/test/' + testFile,
+                      PARSER_FOLDER + target + '/test/' + testFile.replace(source, target),
                       contents => contents.replace(replaceRegexp, target + '$1Parser')
                     )
                   );
@@ -369,7 +369,7 @@ const prepareForNewParser = () =>
       if (
         !Object.keys(parserDefinitions).some(key => {
           if (key.indexOf(source) === 0) {
-            copySpecs(source, target)
+            copyTests(source, target)
               .then(() => {
                 mkdir(JISON_FOLDER + 'sql/' + target)
                   .then(() => {

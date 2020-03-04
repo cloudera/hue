@@ -16,18 +16,24 @@
 
 from __future__ import absolute_import
 
+import sys
+
 from builtins import object
-from mock import MagicMock, patch
 from nose.plugins.attrib import attr
 from nose.tools import assert_raises, assert_false, eq_
 from nose import SkipTest
 
-from django.contrib.auth.models import User
-from desktop.auth.backend import rewrite_user
+from useradmin.models import User
 
+from desktop.auth.backend import rewrite_user
 from desktop.lib.fs import ProxyFS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_permission, remove_from_group
+
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, MagicMock
+else:
+  from mock import patch, MagicMock
 
 
 def test_fs_selection():

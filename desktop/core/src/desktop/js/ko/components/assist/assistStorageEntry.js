@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
@@ -349,7 +349,18 @@ class AssistStorageEntry {
       apiHelper: apiHelper
     });
 
-    path = (typeMatch ? typeMatch[2] : path).replace(/(?:^\/)|(?:\/$)/g, '').split('/');
+    if (type == 'abfs' || type == 'adls') {
+      // ABFS / ADLS can have domain name in path. To prevent regression with s3 which allow periods in bucket name handle separately.
+      const azureMatch = path.match(
+        /^([^:]+):\/(\/((\w+)@)?[\w]+([\-\.]{1}\w+)*\.[\w]*)?(\/.*)?\/?/i
+      );
+      path = (azureMatch ? azureMatch[6] || '' : path).replace(/(?:^\/)|(?:\/$)/g, '').split('/');
+      if (azureMatch && azureMatch[4]) {
+        path.unshift(azureMatch[4]);
+      }
+    } else {
+      path = (typeMatch ? typeMatch[2] : path).replace(/(?:^\/)|(?:\/$)/g, '').split('/');
+    }
 
     rootEntry.loadDeep(path, deferred.resolve);
 

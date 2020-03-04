@@ -33,10 +33,8 @@ from metadata.metadata_sites import get_navigator_audit_log_dir, get_navigator_a
 
 from desktop import appmanager
 from desktop.redaction.engine import parse_redaction_policy_from_file
-from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection,\
-                             coerce_bool, coerce_csv, coerce_json_dict,\
-                             validate_path, list_of_compiled_res, coerce_str_lowercase, \
-                             coerce_password_from_script, coerce_string
+from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection, coerce_bool, coerce_csv, coerce_json_dict, \
+    validate_path, list_of_compiled_res, coerce_str_lowercase, coerce_password_from_script, coerce_string
 from desktop.lib.i18n import force_unicode
 from desktop.lib.paths import get_desktop_root, get_run_root
 
@@ -44,6 +42,7 @@ if sys.version_info[0] > 2:
   from builtins import str as new_str
 else:
   new_str = unicode
+
 
 LOG = logging.getLogger(__name__)
 
@@ -249,6 +248,18 @@ SSL_CIPHER_LIST = Config(
     '!EDH-RSA-DES-CBC3-SHA',
     '!KRB5-DES-CBC3-SHA',
   ]))
+
+def has_ssl_no_renegotiation():
+  return sys.version_info[:2] >= (3, 7)
+
+SSL_NO_RENEGOTIATION = Config(
+  key="ssl_no_renegotiation",
+  type=coerce_bool,
+  default=has_ssl_no_renegotiation(),
+  help=_(
+    "Disable all renegotiation in TLSv1.2 and earlier. Do not send HelloRequest messages, and ignore renegotiation requests"
+    " via ClientHello. This option is only available with OpenSSL 1.1.0h and later and python 3.7")
+  )
 
 SSL_PASSWORD = Config(
   key="ssl_password",
@@ -808,6 +819,12 @@ SESSION = ConfigSection(
       help=_("If set, limits the number of concurrent user sessions. 1 represents 1 session per user. Default: 0 (unlimited sessions per user)"),
       type=int,
       default=0,
+    ),
+    TRUSTED_ORIGINS = Config(
+      key="trusted_origins",
+      help=_("A list of hosts which are trusted origins for unsafe requests. See django's CSRF_TRUSTED_ORIGINS for more information"),
+      type=coerce_csv,
+      default='.cloudera.com',
     )
   )
 )
@@ -818,14 +835,20 @@ KNOX = ConfigSection(
   members=dict(
     KNOX_PRINCIPAL=Config(
       key='knox_principal',
-      help=_("Kerberos principal name for Hue. Typically 'knox/hostname.foo.com'."),
-      type=str,
+      help=_("Comma separated list of Kerberos principal name for Hue. Typically 'knox/hostname.foo.com'."),
+      type=coerce_csv,
       default="knox/%s" % socket.getfqdn()),
     KNOX_PROXYHOSTS = Config(
       key='knox_proxyhosts',
       default="%s" % socket.getfqdn(),
-      type=str,
+      type=coerce_csv,
       help=_('Comma separated list of strings representing the host names that the Hue server can trust as knox hosts.')
+    ),
+    KNOX_PORTS = Config(
+      key='knox_ports',
+      default=['80', '8443'],
+      type=coerce_csv,
+      help=_('Comma separated list of strings representing the ports that the Hue server can trust as knox port.')
     ),
   )
 )
@@ -1533,12 +1556,6 @@ HTTP_500_DEBUG_MODE = Config(
   default=True
 )
 
-MEMORY_PROFILER = Config(
-  key='memory_profiler',
-  help=_('Enable or disable memory profiling.'),
-  type=coerce_bool,
-  default=False)
-
 def get_instrumentation_default():
   """If django_debug_mode is True, this is automatically enabled"""
   return DJANGO_DEBUG_MODE.get()
@@ -1655,6 +1672,13 @@ IS_K8S_ONLY = Config(
   help=_('Choose whether to pick configs only from [desktop] [[cluster]]')
 )
 
+ENABLE_ORGANIZATIONS = Config(
+  key='enable_organizations',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether to allow multi tenancy or not.')
+)
+
 
 ENABLE_PROMETHEUS = Config(
   key='enable_prometheus',
@@ -1752,6 +1776,35 @@ TASK_SERVER = ConfigSection(
 ))
 
 
+def has_channels():
+  return sys.version_info[0] > 2 and WEBSOCKETS.ENABLED.get()
+
+
+WEBSOCKETS = ConfigSection(
+  key="websockets",
+  help=_("Django channels Websockets configuration. Requires Python 3."),
+  members=dict(
+    ENABLED= Config(
+      key='enabled',
+      default=False,
+      type=coerce_bool,
+      help=_('If websockets channels are to be used for communicating with clients.')
+    ),
+    LAYER_HOST = Config(
+      key='layer_host',
+      default='127.0.0.1',
+      help=_('Layer backend host.')
+    ),
+    LAYER_PORT = Config(
+      key='layer_port',
+      type=int,
+      default=6379,
+      help=_('Layer backend port.')
+    ),
+  )
+)
+
+
 def get_clusters(user):
   clusters = []
   cluster_config = CLUSTERS.get()
@@ -1820,6 +1873,31 @@ CLUSTERS = UnspecifiedConfigSection(
   )
 )
 
+ENABLE_GIST = Config(
+  key='enable_gist',
+  default=False,
+  type=coerce_bool,
+  help=_('Turn on the Gist snippet sharing.')
+)
+
+def default_gist_preview():
+  """Gist preview only enabled automatically in private setups."""
+  return not ENABLE_ORGANIZATIONS.get()
+
+ENABLE_GIST_PREVIEW = Config(
+  key='enable_gist_preview',
+  dynamic_default=default_gist_preview,
+  type=coerce_bool,
+  help=_('Add public description so that the link can be unfurled in a preview by websites like Slack.')
+)
+
+ENABLE_LINK_SHARING = Config(
+  key='enable_link_sharing',
+  default=False,
+  type=coerce_bool,
+  help=_('Turn on the direct link sharing of saved document.')
+)
+
 ENABLE_CONNECTORS = Config(
   key='enable_connectors',
   default=False,
@@ -1827,9 +1905,30 @@ ENABLE_CONNECTORS = Config(
   help=_('Turn on the Connector configuration and usage.')
 )
 
+CUSTOM_DASHBOARD_URL = Config(
+  key='custom_dashboard_url',
+  default='',
+  type=coerce_string,
+  help=_('Custom URL to use for the dashboard application and editor result charting')
+)
+
+CONNECTORS_BLACKLIST = Config(
+  key='connectors_blacklist',
+  default='',
+  type=coerce_csv,
+  help=_('Comma separated list of connector types to hide.')
+)
+
+CONNECTORS_WHITELIST = Config(
+  key='connectors_whitelist',
+  default=[],
+  type=coerce_csv,
+  help=_('If not empty, comma separated list of connector types to keep.')
+)
+
 CONNECTORS = UnspecifiedConfigSection(
   key='connectors',
-  help=_("""Configuration options for connectors to external services"""),
+  help=_("""Configuration options for connectors instances to external services"""),
   each=ConfigSection(
     help=_("Id of the connector."),
     members=dict(
@@ -1847,7 +1946,7 @@ CONNECTORS = UnspecifiedConfigSection(
       ),
       INTERFACE=Config(
           "interface",
-          help=_("The class of connector to use to connect to the service."),
+          help=_("The class of connector to use to connect to the service (optional)."),
           default=None,
           type=str,
       ),

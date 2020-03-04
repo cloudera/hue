@@ -15,13 +15,14 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import MetastoreViewModel from 'apps/table_browser/metastoreViewModel';
 import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
+import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'utils/hueConfig';
 
 const HUE_PUB_SUB_EDITOR_ID = 'metastore';
 
@@ -130,11 +131,12 @@ huePubSub.subscribe('app.dom.loaded', app => {
 
   ko.applyBindings(viewModel, $('#metastoreComponents')[0]);
 
-  huePubSub.subscribe('cluster.config.set.config', clusterConfig => {
-    viewModel.appConfig(clusterConfig && clusterConfig['app_config']);
-  });
+  const configUpdated = config => {
+    viewModel.appConfig(config && config['app_config']);
+  };
 
-  huePubSub.publish('cluster.config.get.config');
+  huePubSub.publish(GET_KNOWN_CONFIG_EVENT, configUpdated);
+  huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
 
   if (location.getParameter('refresh') === 'true') {
     dataCatalog

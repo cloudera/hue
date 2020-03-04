@@ -1,0 +1,60 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+@import (reference) "../cui/colors.less";
+@import (reference) "../cui/extra-variables.less";
+@import (reference) "../hue-mixins.less";
+
+.hue-link-sharing {
+  min-height: 16px;
+
+  .perm-selector {
+    display: inline-block;
+
+    .hue-drop-down-selected {
+      font-weight: 800;
+    }
+  }
+
+  .shared-link {
+    position: relative;
+    background: @cui-gray-040;
+    border: 1px solid @cui-gray-300;
+    border-radius: @hue-panel-border-radius;
+    margin: 5px 0 20px 0;
+
+    > div {
+      display: inline-block;
+      padding: 5px 10px;
+      color: @cui-gray-700;
+    }
+
+    > button {
+      border: 1px solid @cui-gray-300;
+      background-color: @cui-gray-100;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-top-right-radius: @hue-panel-border-radius;
+      border-bottom-right-radius: @hue-panel-border-radius;
+      position: absolute;
+      top: -1px;
+      right: -1px;
+      padding: 5px 10px;
+    }
+  }
+}

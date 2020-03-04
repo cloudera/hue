@@ -14,32 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { EXECUTION_STATUS, ExecutableStatement } from './executableStatement';
-import sqlStatementsParser from 'parse/sqlStatementsParser';
-import huePubSub from 'utils/huePubSub';
-import sessionManager from './sessionManager';
+import sessionManager from 'apps/notebook2/execution/sessionManager';
+import { syncExecutables } from 'apps/notebook2/execution/utils';
 
 // TODO: Remove, debug var
 window.sessionManager = sessionManager;
-
-const EXECUTION_FLOW = {
-  step: 'step',
-  batch: 'batch'
-  // batchNoBreak: 'batchNoBreak'
-};
-
-const BATCHABLE_STATEMENT_TYPES = /ALTER|CREATE|DELETE|DROP|GRANT|INSERT|INVALIDATE|LOAD|SET|TRUNCATE|UPDATE|UPSERT|USE/i;
 
 class Executor {
   /**
    * @param options
    * @param {boolean} [options.isSqlEngine] (default false)
-   * @param {string} options.sourceType
-   * @param {ContextCompute} options.compute
-   * @param {ContextNamespace} options.namespace
-   * @param {EXECUTION_FLOW} [options.executionFlow] (default EXECUTION_FLOW.batch)
-   * @param {string} options.statement
+   * @param {observable<string>} options.sourceType
+   * @param {observable<ContextCompute>} options.compute
+   * @param {observable<ContextNamespace>} options.namespace
    * @param {string} [options.database]
+   * @param {function} [options.defaultLimit]
+   * @param {boolean} [options.isOptimizerEnabled] - Default false
+   * @param {Snippet} [options.snippet] - Optional snippet for history
    */
   constructor(options) {
     this.sourceType = options.sourceType;
@@ -47,106 +38,58 @@ class Executor {
     this.namespace = options.namespace;
     this.database = options.database;
     this.isSqlEngine = options.isSqlEngine;
-    this.executionFlow = this.isSqlEngine
-      ? options.executionFlow || EXECUTION_FLOW.batch
-      : EXECUTION_FLOW.step;
+    this.isOptimizerEnabled = options.isOptimizerEnabled;
+    this.executables = [];
+    this.defaultLimit = options.defaultLimit || (() => {});
 
-    this.toExecute = [];
-    this.currentExecutable = undefined;
-    this.executed = [];
+    this.snippet = options.snippet;
+  }
 
-    if (this.isSqlEngine) {
-      let database = options.database;
-      sqlStatementsParser.parse(options.statement).forEach(parsedStatement => {
-        // If there's no first token it's a trailing comment
-        if (parsedStatement.firstToken) {
-          let skip = false;
-          // TODO: Do we want to send USE statements separately or do we want to send database as param instead?
-          if (/USE/i.test(parsedStatement.firstToken)) {
-            const dbMatch = parsedStatement.statement.match(/use\s+([^;]+)/i);
-            if (dbMatch) {
-              database = dbMatch[1];
-              skip = this.sourceType === 'impala' || this.sourceType === 'hive';
-            }
-          }
-          if (!skip) {
-            this.toExecute.push(
-              new ExecutableStatement({
-                sourceType: options.sourceType,
-                compute: options.compute,
-                namespace: options.namespace,
-                database: database,
-                parsedStatement: parsedStatement
-              })
-            );
-          }
+  toJs() {
+    return {
+      executables: this.executables.map(executable => executable.toJs())
+    };
+  }
+
+  cancelAll() {
+    this.executables.forEach(existingExecutable => existingExecutable.cancelBatchChain());
+  }
+
+  setExecutables(executables) {
+    this.cancelAll();
+    this.executables = executables;
+    this.executables.forEach(executable => executable.notify());
+  }
+
+  update(statementDetails, beforeExecute) {
+    const executables = syncExecutables(this, statementDetails);
+
+    // Cancel any "lost" executables and any batch chain it's part of
+    executables.lost.forEach(lostExecutable => {
+      lostExecutable.lost = true;
+      lostExecutable.cancelBatchChain();
+    });
+
+    // Cancel any intersecting batch chains and create a new chain if just before execute
+    if (beforeExecute) {
+      executables.selected.forEach(executable => executable.cancelBatchChain());
+
+      let previous = undefined;
+      executables.selected.forEach(executable => {
+        if (previous) {
+          executable.previousExecutable = previous;
+          previous.nextExecutable = executable;
         }
+        previous = executable;
       });
-    } else {
-      this.toExecute.push(new ExecutableStatement(options));
     }
 
-    huePubSub.subscribe('hue.executable.updated', executable => {
-      if (
-        executable === this.currentExecutable ||
-        this.executed.some(executed => executed === executable)
-      ) {
-        huePubSub.publish('hue.executor.updated', {
-          executable: executable,
-          executor: this
-        });
-      }
-    });
-  }
+    // Update the executables list
+    this.executables = executables.all;
 
-  isRunning() {
-    return this.currentExecutable && this.currentExecutable.status === EXECUTION_STATUS.running;
-  }
+    this.executables.forEach(executable => executable.notify());
 
-  async cancel() {
-    if (this.isRunning()) {
-      return await this.currentExecutable.cancel();
-    }
-  }
-
-  async executeNext() {
-    return new Promise((resolve, reject) => {
-      const executeBatch = () => {
-        if (this.toExecute.length === 0) {
-          reject();
-        } else {
-          this.currentExecutable = this.toExecute.shift();
-          this.currentExecutable
-            .execute()
-            .then(executionResult => {
-              this.executed.push(this.currentExecutable);
-              this.currentExecutable = undefined;
-
-              if (this.canExecuteNextInBatch()) {
-                this.executeNext()
-                  .then(executeBatch)
-                  .catch(reject);
-              } else {
-                resolve(executionResult);
-              }
-            })
-            .catch(reject);
-        }
-      };
-
-      executeBatch();
-    });
-  }
-
-  canExecuteNextInBatch() {
-    return (
-      !this.executed.length ||
-      (this.isSqlEngine &&
-        this.executionFlow !== EXECUTION_FLOW.step &&
-        this.currentExecutable &&
-        this.currentExecutable.parsedStatement &&
-        BATCHABLE_STATEMENT_TYPES.test(this.currentExecutable.parsedStatement.firstToken))
-    );
+    return executables.selected[0];
   }
 }
 

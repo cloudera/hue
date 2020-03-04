@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import next
 import json
 import logging
 import re
@@ -54,20 +55,20 @@ def error_handler(view_fn):
         return view_fn(*args, **kwargs)
       else:
         raise MetadataApiException('Catalog API is not configured.')
-    except Http404, e:
+    except Http404 as e:
       raise e
-    except CatalogEntityDoesNotExistException, e:
+    except CatalogEntityDoesNotExistException as e:
       response['message'] = e.message
       status = 404
-    except CatalogAuthException, e:
+    except CatalogAuthException as e:
       response['message'] = force_unicode(e.message)
       status = 403
-    except CatalogApiException, e:
+    except CatalogApiException as e:
       try:
         response['message'] = json.loads(e.message)
       except Exception:
         response['message'] = force_unicode(e.message)
-    except Exception, e:
+    except Exception as e:
       message = force_unicode(e)
       response['message'] = message
       LOG.exception(message)
@@ -106,12 +107,12 @@ def search_entities_interactive(request):
   )
 
   if response.get('facets'): # Remove empty facets
-    for fname, fvalues in response['facets'].items():
+    for fname, fvalues in list(response['facets'].items()):
       # Should be a CATALOG option at some point for hidding table with no access / asking for access.
       if interface == 'navigator' and NAVIGATOR.APPLY_SENTRY_PERMISSIONS.get():
         fvalues = []
       else:
-        fvalues = sorted([(k, v) for k, v in fvalues.items() if v > 0], key=lambda n: n[1], reverse=True)
+        fvalues = sorted([(k, v) for k, v in list(fvalues.items()) if v > 0], key=lambda n: n[1], reverse=True)
       response['facets'][fname] = OrderedDict(fvalues)
       if ':' in query_s and not response['facets'][fname]:
         del response['facets'][fname]
@@ -190,7 +191,7 @@ def _augment_highlighting(query_s, records):
       name = _highlight(term, name)
       if record.get('tags'):
         _highlight_tags(record, term)
-    for fname, fval in fs.iteritems(): # e.g. owner:<em>hu</em>e
+    for fname, fval in fs.items(): # e.g. owner:<em>hu</em>e
       if record.get(fname, ''):
         if fname == 'tags':
           _highlight_tags(record, fval)
@@ -513,7 +514,8 @@ def create_namespace_property(request):
   "enumValues" : null,
   "type" : "TEXT",
   "createdDate" : "2018-04-02T22:36:19.001Z"
-}"""
+  }
+  """
   interface = request.POST.get('interface', CATALOG.INTERFACE.get())
   namespace = request.POST.get('namespace')
   properties = json.loads(request.POST.get('properties', '{}'))
@@ -531,7 +533,8 @@ def map_namespace_property(request):
   {
   namespace: "huecatalog",
   name: "relatedEntities"
-  }"""
+  }
+  """
   interface = request.POST.get('interface', CATALOG.INTERFACE.get())
   clazz = request.POST.get('class')
   properties = json.loads(request.POST.get('properties', '[]'))

@@ -19,6 +19,27 @@
 @import (reference) "hue-mixins.less";
 
 .oozie_workflowComponents {
+  .workflow-editor-container {
+    .display-flex;
+    .flex-direction(column);
+
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    .workflow-actions {
+      .flex(0 0 auto);
+    }
+
+    .workflow-widgets {
+      .flex(1 1 100%);
+
+      position: relative;
+      overflow: scroll;
+    }
+  }
 
   .card-toolbar {
     text-align: center;

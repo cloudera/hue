@@ -19,7 +19,6 @@ from __future__ import print_function
 from builtins import object
 import logging
 
-from django.contrib.auth.models import User
 from nose.plugins.attrib import attr
 from nose.tools import assert_equal, assert_true, assert_not_equal, assert_raises
 
@@ -31,6 +30,7 @@ from hadoop.conf import HDFS_CLUSTERS, MR_CLUSTERS, YARN_CLUSTERS
 from desktop.lib.test_utils import clear_sys_caches
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.exceptions_renderable import PopupException
+from useradmin.models import User
 from useradmin.views import ensure_home_directory
 from oozie.models2 import Node
 from oozie.tests import OozieMockBase

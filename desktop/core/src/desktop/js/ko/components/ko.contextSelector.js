@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import componentUtils from './componentUtils';
@@ -23,6 +23,8 @@ import contextCatalog from 'catalog/contextCatalog';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+
+export const NAME = 'hue-context-selector';
 
 const TEMPLATE = `
   <!-- ko if: loadingContext -->
@@ -432,18 +434,24 @@ HueContextSelector.prototype.reloadDatabases = function() {
                   self.availableDatabases([]);
                 })
                 .always(() => {
+                  let lastSelectedDb = apiHelper.getFromTotalStorage(
+                    'assist_' +
+                      ko.unwrap(self.sourceType) +
+                      '_' +
+                      self[TYPES_INDEX.namespace.name]().id,
+                    'lastSelectedDb'
+                  );
+
+                  const updateAssist = lastSelectedDb !== '';
+
                   if (
                     !self.database() ||
                     self.availableDatabases().indexOf(self.database()) === -1
                   ) {
-                    const lastSelectedDb = apiHelper.getFromTotalStorage(
-                      'assist_' +
-                        ko.unwrap(self.sourceType) +
-                        '_' +
-                        self[TYPES_INDEX.namespace.name]().id,
-                      'lastSelectedDb',
-                      'default'
-                    );
+                    if (!lastSelectedDb) {
+                      lastSelectedDb = 'default';
+                    }
+
                     if (
                       self.availableDatabases().length === 0 ||
                       self.availableDatabases().indexOf(lastSelectedDb) !== -1
@@ -455,11 +463,13 @@ HueContextSelector.prototype.reloadDatabases = function() {
                   }
                   self.loadingDatabases(false);
 
-                  huePubSub.publish('assist.set.database', {
-                    source: ko.unwrap(self.sourceType),
-                    namespace: self[TYPES_INDEX.namespace.name](),
-                    name: self.database()
-                  });
+                  if (updateAssist) {
+                    huePubSub.publish('assist.set.database', {
+                      source: ko.unwrap(self.sourceType),
+                      namespace: self[TYPES_INDEX.namespace.name](),
+                      name: self.database()
+                    });
+                  }
                 });
             });
         }, 10);
@@ -478,4 +488,4 @@ HueContextSelector.prototype.dispose = function() {
   }
 };
 
-componentUtils.registerComponent('hue-context-selector', HueContextSelector, TEMPLATE);
+componentUtils.registerComponent(NAME, HueContextSelector, TEMPLATE);

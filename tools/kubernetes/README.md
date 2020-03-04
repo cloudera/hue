@@ -8,6 +8,7 @@ Assuming you have a Kubernetes cluster configured with Helm installed and images
 
 * [Helm](helm)
    * [Hue](helm/hue)
+   * [Website](helm/website)
 * [YAML](yaml)
    * [Hue](yaml/hue)
    * [Postgres](yaml/postgres)
@@ -45,7 +46,7 @@ Upgrade or delete:
 
 * OS: Ubuntu 16.04 or 18.04
 * Nodes: 1 primary instance of m3.medium (1CPU 3GB)
-* Quick start with [microk8s](https://microk8s.io/#quick-start)
+* Quick start with [MicroK8s](https://microk8s.io/#quick-start)
 
 ```
 sudo snap install microk8s --classic
@@ -58,7 +59,8 @@ microk8s.enable dns ingress storage
 And
 
 ```
-sudo snap install helm --classic
+sudo microk8s.enable helm
+sudo snap alias microk8s.kubectl kubectl
 
 helm init
 ```

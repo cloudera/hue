@@ -18,9 +18,10 @@
 
 import logging
 
-from django.contrib.auth.models import User
 from django.core.management.base import CommandError, BaseCommand
 from django.utils.translation import ugettext_lazy as _
+
+from useradmin.models import User
 
 from desktop.models import Document2
 

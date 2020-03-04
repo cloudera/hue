@@ -65,16 +65,16 @@ PARTITIONED BY ${column_list(partition_columns)|n}
 ## TODO: CLUSTERED BY here
 ## TODO: SORTED BY...INTO...BUCKETS here
 ROW FORMAT \
-% if table.has_key('row_format'):
+% if 'row_format' in table:
 %   if table["row_format"] == "Delimited":
   DELIMITED
-%     if table.has_key('field_terminator'):
+%     if 'field_terminator' in table:
     FIELDS TERMINATED BY '${table["field_terminator"] | n}'
 %     endif
-%     if table.has_key('collection_terminator'):
+%     if 'collection_terminator' in table:
     COLLECTION ITEMS TERMINATED BY '${table["collection_terminator"] | n}'
 %     endif
-%     if table.has_key('map_key_terminator'):
+%     if 'map_key_terminator' in table:
     MAP KEYS TERMINATED BY '${table["map_key_terminator"] | n}'
 %     endif
 %   else:
@@ -84,7 +84,7 @@ ROW FORMAT \
 %     endif
 %   endif
 % endif
-% if table.has_key('file_format'):
+% if 'file_format' in table:
   STORED AS ${table["file_format"] | n} \
 % endif
 % if table.get("file_format") == "InputFormat":

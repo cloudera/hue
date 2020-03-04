@@ -43,7 +43,7 @@ def get_address():
 
 def get_api_url():
   address = get_address()
-  return address + 'api/atlas/' if address else None
+  return address if address else None
 
 def is_kerberos_enabled():
   return get_conf().get(_KERBEROS,'').upper() == 'TRUE'

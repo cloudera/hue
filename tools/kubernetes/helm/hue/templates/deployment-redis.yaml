@@ -1,5 +1,5 @@
 {{- if .Values.workers.enabled -}}
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: redis
@@ -18,8 +18,8 @@ spec:
         image: redis
         resources:
           requests:
-            cpu: 100m
-            memory: 100Mi
+            cpu: 30m
+            # memory: 100Mi
         ports:
         - containerPort: 6379
 {{- end -}}

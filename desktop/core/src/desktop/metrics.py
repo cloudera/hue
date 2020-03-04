@@ -24,7 +24,7 @@ import logging
 import multiprocessing
 import threading
 
-from django.contrib.auth.models import User
+from useradmin.models import User
 
 from desktop.lib.metrics import global_registry
 

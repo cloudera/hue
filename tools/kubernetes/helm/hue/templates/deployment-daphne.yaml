@@ -1,0 +1,41 @@
+{{- if .Values.websocket.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: daphne-websocket
+  labels:
+    deployment: daphne-websocket
+spec:
+  replicas: {{ .Values.websocket.replicas }}
+  selector:
+    matchLabels:
+      pod: daphne-websocket
+  template:
+    metadata:
+      labels:
+        pod: daphne-websocket
+    spec:
+      containers:
+        - name: daphne-websocket
+          image: {{ .Values.image.registry }}/hue:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ['./build/env/bin/daphne', '-p', '8001', 'core.asgi:application']
+          resources:
+            requests:
+              # memory: "64Mi"
+              cpu: "30m"
+          volumeMounts:
+          - name: config-volume
+            mountPath: /usr/share/hue/desktop/conf/z-hue.ini
+            subPath: hue-ini
+          - name: config-volume-extra
+            mountPath: /usr/share/hue/desktop/conf/zz-hue.ini
+            subPath: hue-ini
+      volumes:
+        - name: config-volume
+          configMap:
+            name: hue-config
+        - name: config-volume-extra
+          configMap:
+            name: hue-config-extra
+{{- end -}}

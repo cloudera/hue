@@ -24,22 +24,23 @@ import sys
 import urllib.request, urllib.error
 
 from django import forms
-from django.contrib.auth.models import User, Group
 from django.forms import FileField, CharField, BooleanField, Textarea
 from django.forms.formsets import formset_factory, BaseFormSet
+from django.utils.translation import ugettext_lazy as _
 
 from aws.s3 import S3A_ROOT, normpath as s3_normpath
 from azure.abfs.__init__ import ABFS_ROOT, normpath as abfs_normpath
 from desktop.lib import i18n
 from hadoop.fs import normpath
-from filebrowser.lib import rwx
+from useradmin.models import User, Group
 
-from django.utils.translation import ugettext_lazy as _
+from filebrowser.lib import rwx
 
 if sys.version_info[0] > 2:
   from urllib.parse import unquote as urllib_unquote
 else:
   from urllib import unquote as urllib_unquote
+
 
 logger = logging.getLogger(__name__)
 

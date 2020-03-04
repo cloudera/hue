@@ -15,13 +15,15 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import dataCatalog from 'catalog/dataCatalog';
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+
+export const NAME = 'hue-global-search';
 
 const TEMPLATE = `
   <script type="text/html" id="top-search-autocomp-item">
@@ -596,4 +598,4 @@ class GlobalSearch {
   }
 }
 
-componentUtils.registerComponent('hue-global-search', GlobalSearch, TEMPLATE);
+componentUtils.registerComponent(NAME, GlobalSearch, TEMPLATE);

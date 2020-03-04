@@ -18,13 +18,12 @@
 
 from builtins import object
 import json
+import sys
 
 from collections import OrderedDict
-from mock import patch, Mock, MagicMock
 from nose.plugins.attrib import attr
 from nose.tools import assert_equal, assert_true, assert_false
 
-from django.contrib.auth.models import User
 from django.urls import reverse
 from azure.conf import is_adls_enabled
 
@@ -34,6 +33,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_permission
 from desktop.models import Directory, Document, Document2
 from hadoop import cluster as originalCluster
+from useradmin.models import User
 
 import notebook.connectors.hiveserver2
 
@@ -42,6 +42,11 @@ from notebook.connectors.base import Notebook, QueryError, Api
 from notebook.decorators import api_error_handler
 from notebook.conf import get_ordered_interpreters, INTERPRETERS_SHOWN_ON_WHEEL, INTERPRETERS
 from notebook.models import Analytics
+
+if sys.version_info[0] > 2:
+  from unittest.mock import patch
+else:
+  from mock import patch
 
 
 class TestNotebookApi(object):
@@ -343,7 +348,14 @@ class MockFs(object):
     return ''
 
   def exists(self, path):
+    if path == '/user/hue/non_exists_directory':
+      return False
     return True
+
+  def listdir_stats(self, path):
+    if path == '/user/hue/non_empty_directory':
+      return ['mock_dir', 'mock_file']
+    return []
 
   def isdir(self, path):
     return path == '/user/hue'
@@ -451,6 +463,19 @@ class TestNotebookApiMocked(object):
       assert_equal('adl:/user/hue/path.csv', data['watch_url']['destination'], data)
 
 
+    response = self.client.post(reverse('notebook:export_result'), {
+      'notebook': notebook_json,
+      'snippet': json.dumps(json.loads(notebook_json)['snippets'][0]),
+      'format': json.dumps('hdfs-directory'),
+      'destination': json.dumps('/user/hue/non_empty_directory'),
+      'overwrite': json.dumps(False)
+    })
+
+    data = json.loads(response.content)
+    assert_equal(-1, data['status'], data)
+    assert_equal('The destination is not a empty directory!', data['message'], data)
+
+
   def test_download_result(self):
     notebook_json = """
       {
@@ -476,38 +501,38 @@ class TestNotebookApiMocked(object):
         'snippet': json.dumps(json.loads(notebook_json)['snippets'][0]),
         'format': 'csv'
     })
-    content = "".join(response)
+    content = b"".join(response)
     assert_true(len(content) > 0)
 
 
 def test_get_interpreters_to_show():
   default_interpreters = OrderedDict((
       ('hive', {
-          'name': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'is_sql': True, 'options': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
+          'name': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'is_sql': True, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
       }),
       ('spark', {
-          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
+          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
       }),
       ('pig', {
-          'name': 'Pig', 'interface': 'pig', 'type': 'pig', 'is_sql': False, 'options': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
+          'name': 'Pig', 'interface': 'pig', 'type': 'pig', 'is_sql': False, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
       }),
       ('java', {
-          'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'java'
+          'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'java'
       })
     ))
 
   expected_interpreters = OrderedDict((
       ('java', {
-        'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'java'
+        'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'java'
       }),
       ('pig', {
-        'name': 'Pig', 'interface': 'pig', 'is_sql': False, 'type': 'pig', 'options': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
+        'name': 'Pig', 'interface': 'pig', 'is_sql': False, 'type': 'pig', 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'pig'
       }),
       ('hive', {
-          'name': 'Hive', 'interface': 'hiveserver2', 'is_sql': True, 'type': 'hive', 'options': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
+          'name': 'Hive', 'interface': 'hiveserver2', 'is_sql': True, 'type': 'hive', 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'hive'
       }),
       ('spark', {
-          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
+          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}, 'dialect_properties': None, 'is_catalog': False, 'category': 'editor', 'dialect': 'scala'
       })
     ))
 
@@ -527,9 +552,13 @@ def test_get_interpreters_to_show():
     )
 
     resets.append(INTERPRETERS_SHOWN_ON_WHEEL.set_for_testing('java,pig'))
-    assert_equal(list(expected_interpreters.values()), get_ordered_interpreters(),
-                 'get_interpreters_to_show did not return interpreters in the correct order expected: %s, actual: %s'
-                 % (list(expected_interpreters.values()), get_ordered_interpreters()))
+    assert_equal(
+      list(expected_interpreters.values()),
+      get_ordered_interpreters(),
+      'get_interpreters_to_show did not return interpreters in the correct order expected: %s, actual: %s' % (
+          list(expected_interpreters.values()), get_ordered_interpreters()
+      )
+    )
   finally:
     for reset in resets:
       reset()
@@ -566,7 +595,12 @@ class TestEditor(object):
 
   def test_open_saved_impala_query_when_no_hive_interepreter(self):
     try:
-      doc, created = Document2.objects.get_or_create(name='open_saved_query_with_hive_not_present', type='query-impala', owner=self.user, data={})
+      doc, created = Document2.objects.get_or_create(
+          name='open_saved_query_with_hive_not_present',
+          type='query-impala',
+          owner=self.user,
+          data={}
+      )
 
       with patch('desktop.middleware.fsmanager') as fsmanager:
         response = self.client.get(reverse('notebook:editor'), {'editor': doc.id, 'is_embeddable': True})

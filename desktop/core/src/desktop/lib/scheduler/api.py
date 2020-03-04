@@ -17,9 +17,14 @@
 
 import logging
 
+from django.forms.formsets import formset_factory
+from django.urls import reverse
+
 from desktop.auth.backend import is_admin
 from desktop.conf import TASK_SERVER
-from desktop.lib.django_util import JsonResponse
+from desktop.models import Document2
+from desktop.lib.django_util import JsonResponse, render
+from desktop.lib.i18n import force_unicode
 from desktop.lib.scheduler.lib.api import get_api
 
 LOG = logging.getLogger(__name__)
@@ -27,9 +32,13 @@ LOG = logging.getLogger(__name__)
 try:
   from oozie.decorators import check_document_access_permission
   from oozie.forms import ParameterForm
-  from oozie.views.editor2 import edit_coordinator, new_coordinator
+  from oozie.views.editor2 import edit_coordinator, new_coordinator, Coordinator
 except Exception as e:
-  LOG.exception('Oozie application is not enabled: %s' % e)
+  LOG.warn('Oozie application is not enabled: %s' % e)
+
+
+def list_schedules(request):
+  return JsonResponse({})
 
 
 def new_schedule(request):
@@ -42,7 +51,8 @@ def get_schedule(request):
 # To move to lib in case oozie is blacklisted
 #@check_document_access_permission()
 def submit_schedule(request, doc_id):
-  interface = request.GET.get('interface', request.POST.get('interface'), 'oozie')
+  interface = request.GET.get('interface', request.POST.get('interface', 'beat'))
+
   if doc_id.isdigit():
     coordinator = Coordinator(document=Document2.objects.get(id=doc_id))
   else:
@@ -63,14 +73,15 @@ def submit_schedule(request, doc_id):
         message = force_unicode(str(e))
         return JsonResponse({'status': -1, 'message': message}, safe=False)
       if jsonify:
-        return JsonResponse({'status': 0, 'job_id': job_id, 'type': 'schedule'}, safe=False)
+        schedule_type = 'celery-beat' if interface == 'beat' else 'schedule'
+        return JsonResponse({'status': 0, 'job_id': job_id, 'type': schedule_type}, safe=False)
       else:
         request.info(_('Schedule submitted.'))
         return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
     else:
       request.error(_('Invalid submission form: %s') % params_form.errors)
   else:
-    parameters = coordinator.find_all_parameters()
+    parameters = coordinator.find_all_parameters() if interface == 'oozie' else []
     initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
     params_form = ParametersFormSet(initial=initial_params)
 
@@ -79,8 +90,8 @@ def submit_schedule(request, doc_id):
       request, {
           'params_form': params_form,
           'name': coordinator.name,
-          'action': reverse('oozie:editor_submit_coordinator',  kwargs={'doc_id': coordinator.id}),
-          'show_dryrun': True,
+          'action': '/scheduler/api/schedule/submit/%s' % coordinator.id,
+          'show_dryrun': False,
           'return_json': request.GET.get('format') == 'json',
           'interface': interface
       },

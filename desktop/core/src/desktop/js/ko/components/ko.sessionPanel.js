@@ -14,22 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ko from 'knockout';
+import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
 
 import 'ko/bindings/ko.slideVisible';
 import 'ko/bindings/ko.toggle';
-import apiHelper from '../../api/apiHelper';
-import componentUtils from './componentUtils';
+
+import apiHelper from 'api/apiHelper';
+import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import sessionManager from 'apps/notebook2/execution/sessionManager';
 
 export const NAME = 'session-panel';
-export const SHOW_EVENT_NAME = 'session.panel.show';
+export const SESSION_PANEL_SHOW_EVENT = 'session.panel.show';
 
 const TEMPLATE = `
-<div class="session-panel" data-bind="slideVisible: visible">
+<div class="session-panel" data-test="${NAME}" data-bind="slideVisible: visible">
   <div class="margin-top-10 padding-left-10 padding-right-10">
     <h4 class="margin-bottom-10"><i class="fa fa-cogs"></i> ${I18n('Sessions')}</h4>
     <div class="session-panel-content">
@@ -133,7 +134,7 @@ class SessionPanel {
     this.visible = ko.observable(false);
     this.sessions = ko.observableArray();
     this.activeTypeFilter = undefined;
-    huePubSub.subscribe(SHOW_EVENT_NAME, type => this.showSessions(type));
+    huePubSub.subscribe(SESSION_PANEL_SHOW_EVENT, type => this.showSessions(type));
   }
 
   /**

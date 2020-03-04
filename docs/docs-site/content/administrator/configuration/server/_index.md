@@ -238,10 +238,10 @@ Note: When using direct bind, set LDAP Search Base, not for authentication (you 
 
 #### Troubleshooting
 
-##### Issue: 
+##### Issue:
 Hue is not able to sync the LDAP group in Hue and it reports the following error : Could not get LDAP details for groups in pattern <group_name>
 
-##### Solution: 
+##### Solution:
 check your configuration if 'subgroups' is set under [[ldap]] and remove it.
 
 
@@ -655,7 +655,7 @@ Read more about it in [Hue with a custom logo](http://gethue.com/hue-with-a-cust
 
 ## Source Version Control
 
-By default Hue stores the [saved documents]({{% param baseURL %}}user/concept/#documents) in its database. This features aims at pointing to any source versioning systems like GitHub, BitBucket... to open and save queries.
+By default Hue stores the [saved documents](/user/concept/#documents) in its database. This features aims at pointing to any source versioning systems like GitHub, BitBucket... to open and save queries.
 
 **Note** This feature is experiemental and tracked in [HUE-951](https://issues.cloudera.org/browse/HUE-951).
 

@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
@@ -85,9 +85,9 @@ class AssistSchedulePanel {
 
     const setSelectedNotebookSub = huePubSub.subscribe('jobbrowser.schedule.data', jobs => {
       if (this.selectedNotebook() && this.selectedNotebook().viewSchedulerId()) {
-        const jobs = jobs.filter(job => this.selectedNotebook().viewSchedulerId() === job.id);
+        const job = jobs.filter(job => this.selectedNotebook().viewSchedulerId() === job.id);
         this.selectedNotebook().isSchedulerJobRunning(
-          jobs.length > 0 && jobs[0].apiStatus === 'RUNNING'
+          job.length > 0 && job[0].apiStatus === 'RUNNING'
         );
       }
     });

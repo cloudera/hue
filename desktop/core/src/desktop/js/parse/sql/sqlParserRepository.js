@@ -19,14 +19,28 @@
  * AUTOCOMPLETE_MODULES and SYNTAX_MODULES are generated, do not edit manually, see tools/jison/generateParsers.js
  */
 const AUTOCOMPLETE_MODULES = {
+  calcite: () => import(/* webpackChunkName: "calcite-parser" */ 'parse/sql/calcite/calciteAutocompleteParser'),
+  druid: () => import(/* webpackChunkName: "druid-parser" */ 'parse/sql/druid/druidAutocompleteParser'),
+  elasticsearch: () => import(/* webpackChunkName: "elasticsearch-parser" */ 'parse/sql/elasticsearch/elasticsearchAutocompleteParser'),
+  flink: () => import(/* webpackChunkName: "flink-parser" */ 'parse/sql/flink/flinkAutocompleteParser'),
   generic: () => import(/* webpackChunkName: "generic-parser" */ 'parse/sql/generic/genericAutocompleteParser'),
   hive: () => import(/* webpackChunkName: "hive-parser" */ 'parse/sql/hive/hiveAutocompleteParser'),
-  impala: () => import(/* webpackChunkName: "impala-parser" */ 'parse/sql/impala/impalaAutocompleteParser')
+  impala: () => import(/* webpackChunkName: "impala-parser" */ 'parse/sql/impala/impalaAutocompleteParser'),
+  ksql: () => import(/* webpackChunkName: "ksql-parser" */ 'parse/sql/ksql/ksqlAutocompleteParser'),
+  phoenix: () => import(/* webpackChunkName: "phoenix-parser" */ 'parse/sql/phoenix/phoenixAutocompleteParser'),
+  presto: () => import(/* webpackChunkName: "presto-parser" */ 'parse/sql/presto/prestoAutocompleteParser')
 };
 const SYNTAX_MODULES = {
+  calcite: () => import(/* webpackChunkName: "calcite-parser" */ 'parse/sql/calcite/calciteSyntaxParser'),
+  druid: () => import(/* webpackChunkName: "druid-parser" */ 'parse/sql/druid/druidSyntaxParser'),
+  elasticsearch: () => import(/* webpackChunkName: "elasticsearch-parser" */ 'parse/sql/elasticsearch/elasticsearchSyntaxParser'),
+  flink: () => import(/* webpackChunkName: "flink-parser" */ 'parse/sql/flink/flinkSyntaxParser'),
   generic: () => import(/* webpackChunkName: "generic-parser" */ 'parse/sql/generic/genericSyntaxParser'),
   hive: () => import(/* webpackChunkName: "hive-parser" */ 'parse/sql/hive/hiveSyntaxParser'),
-  impala: () => import(/* webpackChunkName: "impala-parser" */ 'parse/sql/impala/impalaSyntaxParser')
+  impala: () => import(/* webpackChunkName: "impala-parser" */ 'parse/sql/impala/impalaSyntaxParser'),
+  ksql: () => import(/* webpackChunkName: "ksql-parser" */ 'parse/sql/ksql/ksqlSyntaxParser'),
+  phoenix: () => import(/* webpackChunkName: "phoenix-parser" */ 'parse/sql/phoenix/phoenixSyntaxParser'),
+  presto: () => import(/* webpackChunkName: "presto-parser" */ 'parse/sql/presto/prestoSyntaxParser')
 };
 /* eslint-enable */
 

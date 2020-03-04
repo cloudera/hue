@@ -2,48 +2,47 @@
 [![DockerPulls](https://img.shields.io/docker/pulls/gethue/hue.svg)](https://registry.hub.docker.com/u/gethue/hue/)
 ![GitHub contributors](https://img.shields.io/github/contributors-anon/cloudera/hue.svg)
 
-![alt text](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/hue_logo.png "Hue Logo")
+![Hue Logo](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/hue_logo.png)
 
 
-Query. Explore. Repeat.
------------------------
+Query. Explore. Share.
+----------------------
 
-Hue is an open source SQL Workbench for browsing, querying and visualizing data in cloud/on-prem Data Warehouses: [gethue.com](http://gethue.com)
+Hue is a mature open source SQL Assistant for [querying](https://docs.gethue.com/user/querying/) any [Databases & Data Warehouses](https://docs.gethue.com/administrator/configuration/connectors/) and collaborating: [gethue.com](http://gethue.com)
 
-It features:
+Many companies and organizations use Hue to quickly answer questions via self-service querying e.g.:
 
-   * [Editors](http://gethue.com/sql-editor/) to query with SQL [any database](https://docs.gethue.com/latest/administrator/configuration/editor/#connectors) and submit jobs
-   * [Dashboards](http://gethue.com/search-dashboards/) to dynamically interact and visualize data
-   * [Scheduler](http://gethue.com/scheduling/) of jobs and workflows
-   * [Browsers](http://gethue.com/browsers/) for data and a Data Catalog
+* 1000+ customers
+* Top Fortune 500
+
+are executing 100s of 1000s of queries daily. It also [ships](https://docs.gethue.com/administrator/installation/) in Cloudera Data Platform, Amazon AWS, Open Data Hub...
+
+Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/parsers/) and any [contributions](CONTRIBUTING.md) are welcome.
 
 
-![alt text](docs/images/sql-editor.png "Hue Editor")
-
-
-Who is using Hue
-----------------
-Thousands of companies and organizations use Hue to open-up their data and provide self service querying in order to make smarter decisions. Just at Cloudera, Hue is heavily used by thousand of customers executing millions of queries daily. Hue directly ships in Cloudera, Amazon, MapR, BigTop and is compatible with the other distributions.
+![Hue Editor](https://cdn.gethue.com/uploads/2019/12/hue4.6.png)
 
 
 Getting Started
 ---------------
-Add the development packages, build and get the development server running:
+The [Forum](https://discourse.gethue.com/) is here in case you are looking for help.
+
+First, add the development packages, build and get the development server running:
 ```
 git clone https://github.com/cloudera/hue.git
 cd hue
 make apps
 build/env/bin/hue runserver
 ```
-Now Hue should be running on [http://localhost:8000](http://localhost:8000) ! The configuration in development mode is `desktop/conf/pseudo-distributed.ini`.
-
-Read more in the [installation documentation](http://cloudera.github.io/hue/latest/administrator/installation/).
+Now Hue should be running on [http://localhost:8000](http://localhost:8000) ! The configuration in development mode is `desktop/conf/pseudo-distributed.ini`. Read more in the [installation documentation](https://docs.gethue.com/administrator/installation/).
 
 
 Docker
 ------
-Start Hue in a single click with the [Docker Guide](https://github.com/cloudera/hue/tree/master/tools/docker) or the
+Start Hue in a single click with the [Docker Guide](https://github.com/cloudera/hue/tree/master/tools/docker/hue) or the
 [video blog post](http://gethue.com/getting-started-with-hue-in-2-minutes-with-docker/).
+
+    docker run -it -p 8888:8888 gethue/hue:latest
 
 
 Kubernetes
@@ -58,8 +57,8 @@ Read more about configurations at [``tools/kubernetes``](tools/kubernetes/).
 
 Community
 -----------
-   * Contributing [guidelines](CONTRIBUTING.md)
-   * Help Forum: https://discourse.gethue.com/ ([previous mailing list](http://groups.google.com/a/cloudera.org/group/hue-user))
+   * How to [contribute](CONTRIBUTING.md)
+   * Help Forum: https://discourse.gethue.com/
    * High level [roadmap](docs/ROADMAP.md)
    * Jira: https://issues.cloudera.org/browse/HUE
 

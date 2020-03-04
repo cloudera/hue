@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
 
 import apiHelper from 'api/apiHelper';
@@ -23,101 +23,101 @@ import ChartTransformers from 'apps/notebook/chartTransformers';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 
-import { Notebook } from 'apps/notebook2/notebook';
-import { Snippet } from 'apps/notebook2/snippet';
+import Notebook from 'apps/notebook2/notebook';
+import Snippet from 'apps/notebook2/snippet';
+import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
+import { UPDATE_HISTORY_EVENT } from 'apps/notebook2/components/ko.queryHistory';
+import { ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT } from 'apps/notebook2/events';
 
 class EditorViewModel {
   constructor(editorId, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
-    const self = this;
-
     // eslint-disable-next-line no-restricted-syntax
     console.log('Notebook 2 enabled.');
 
-    self.editorId = editorId;
-    self.snippetViewSettings = options.snippetViewSettings;
-    self.notebooks = notebooks;
+    this.editorId = editorId;
+    this.snippetViewSettings = options.snippetViewSettings;
+    this.notebooks = notebooks;
 
-    self.URLS = {
+    this.URLS = {
       editor: '/hue/editor',
       notebook: '/hue/notebook',
       report: '/hue/dashboard/new_search?engine=report'
     };
 
-    self.huePubSubId = options.huePubSubId || 'editor';
-    self.user = options.user;
-    self.userId = options.userId;
-    self.suffix = options.suffix;
-    self.isMobile = ko.observable(options.mobile);
-    self.isNotificationManager = ko.observable(!!options.is_notification_manager);
-    self.editorType = ko.observable(options.editor_type);
-    self.editorType.subscribe(newVal => {
-      self.editorMode(newVal !== 'notebook');
+    this.huePubSubId = options.huePubSubId || 'editor';
+    this.user = options.user;
+    this.userId = options.userId;
+    this.suffix = options.suffix;
+    this.isMobile = ko.observable(options.mobile);
+    this.isNotificationManager = ko.observable(!!options.is_notification_manager);
+    this.editorType = ko.observable(options.editor_type);
+    this.editorType.subscribe(newVal => {
+      this.editorMode(newVal !== 'notebook');
       hueUtils.changeURLParameter('type', newVal);
-      if (self.editorMode()) {
-        self.selectedNotebook().fetchHistory(); // Js error if notebook did not have snippets
+      if (this.editorMode()) {
+        huePubSub.publish(UPDATE_HISTORY_EVENT);
       }
     });
-    self.preEditorTogglingSnippet = ko.observable();
+    this.preEditorTogglingSnippet = ko.observable();
 
-    self.editorTypeTitle = ko.pureComputed(() => {
+    this.editorTypeTitle = ko.pureComputed(() => {
       const foundInterpreters = options.languages.filter(
-        interpreter => interpreter.type === self.editorType()
+        interpreter => interpreter.type === this.editorType()
       );
-      return foundInterpreters.length > 0 ? foundInterpreters[0].name : self.editorType();
+      return foundInterpreters.length > 0 ? foundInterpreters[0].name : this.editorType();
     });
 
-    self.autocompleteTimeout = options.autocompleteTimeout;
-    self.selectedNotebook = ko.observable();
+    this.autocompleteTimeout = options.autocompleteTimeout;
+    this.selectedNotebook = ko.observable();
 
-    self.combinedContent = ko.observable();
-    self.isPresentationModeEnabled = ko.pureComputed(
+    this.combinedContent = ko.observable();
+    this.isPresentationModeEnabled = ko.pureComputed(
       () =>
-        self.selectedNotebook() &&
-        self.selectedNotebook().snippets().length === 1 &&
-        self
-          .selectedNotebook()
+        this.selectedNotebook() &&
+        this.selectedNotebook().snippets().length === 1 &&
+        this.selectedNotebook()
           .snippets()[0]
           .isSqlDialect()
     );
-    self.isResultFullScreenMode = ko.observable(false);
-    self.isPresentationMode = ko.pureComputed(
-      () => self.selectedNotebook() && self.selectedNotebook().isPresentationMode()
+    this.isResultFullScreenMode = ko.observable(false);
+    this.isPresentationMode = ko.pureComputed(
+      () => this.selectedNotebook() && this.selectedNotebook().isPresentationMode()
     );
-    self.isHidingCode = ko.pureComputed(
-      () => self.selectedNotebook() && self.selectedNotebook().isHidingCode()
+    this.isHidingCode = ko.pureComputed(
+      () => this.selectedNotebook() && this.selectedNotebook().isHidingCode()
     );
-    self.successUrl = ko.observable(options.success_url); // Deprecated
-    self.isOptimizerEnabled = ko.observable(options.is_optimizer_enabled);
-    self.isNavigatorEnabled = ko.observable(options.is_navigator_enabled);
+    this.successUrl = ko.observable(options.success_url); // Deprecated
+    this.isOptimizerEnabled = ko.observable(options.is_optimizer_enabled);
+    this.isNavigatorEnabled = ko.observable(options.is_navigator_enabled);
 
-    self.CoordinatorEditorViewModel = CoordinatorEditorViewModel;
-    self.RunningCoordinatorModel = RunningCoordinatorModel;
+    this.CoordinatorEditorViewModel = CoordinatorEditorViewModel; // TODO: Remove usage of global variables
+    this.RunningCoordinatorModel = RunningCoordinatorModel; // TODO: Remove usage of global variables
 
     // Saved query or history but history coming from a saved query
-    self.canSave = ko.pureComputed(
+    this.canSave = ko.pureComputed(
       () =>
-        self.selectedNotebook() &&
-        self.selectedNotebook().canWrite() &&
-        (self.selectedNotebook().isSaved() ||
-          (self.selectedNotebook().isHistory() && self.selectedNotebook().parentSavedQueryUuid()))
+        this.selectedNotebook() &&
+        this.selectedNotebook().canWrite() &&
+        (this.selectedNotebook().isSaved() ||
+          (this.selectedNotebook().isHistory() && this.selectedNotebook().parentSavedQueryUuid()))
     );
 
-    self.ChartTransformers = ChartTransformers;
+    this.ChartTransformers = ChartTransformers;
 
     // TODO: Drop the SQL source types from the notebook. They're now set in AssistDbPanel.
-    self.sqlSourceTypes = [];
-    self.availableLanguages = [];
+    this.sqlSourceTypes = [];
+    this.availableLanguages = [];
 
-    if (options.languages && self.snippetViewSettings) {
+    if (options.languages && this.snippetViewSettings) {
       options.languages.forEach(language => {
-        self.availableLanguages.push({
+        this.availableLanguages.push({
           type: language.type,
           name: language.name,
           interface: language.interface
         });
-        const viewSettings = self.snippetViewSettings[language.type];
+        const viewSettings = this.snippetViewSettings[language.type];
         if (viewSettings && viewSettings.sqlDialect) {
-          self.sqlSourceTypes.push({
+          this.sqlSourceTypes.push({
             type: language.type,
             name: language.name
           });
@@ -125,48 +125,48 @@ class EditorViewModel {
       });
     }
 
-    const sqlSourceTypes = self.sqlSourceTypes.filter(
-      language => language.type === self.editorType()
+    const sqlSourceTypes = this.sqlSourceTypes.filter(
+      language => language.type === this.editorType()
     );
     if (sqlSourceTypes.length > 0) {
-      self.activeSqlSourceType = sqlSourceTypes[0].type;
+      this.activeSqlSourceType = sqlSourceTypes[0].type;
     } else {
-      self.activeSqlSourceType = null;
+      this.activeSqlSourceType = null;
     }
 
-    self.isEditing = ko.observable(false);
-    self.isEditing.subscribe(() => {
+    this.isEditing = ko.observable(false);
+    this.isEditing.subscribe(() => {
       $(document).trigger('editingToggled');
     });
 
-    self.removeSnippetConfirmation = ko.observable();
+    this.removeSnippetConfirmation = ko.observable();
 
-    self.assistAvailable = ko.observable(options.assistAvailable);
+    this.assistAvailable = ko.observable(options.assistAvailable);
 
-    self.assistWithoutStorage = ko.observable(false);
+    this.assistWithoutStorage = ko.observable(false);
 
-    self.isLeftPanelVisible = ko.observable(
+    this.isLeftPanelVisible = ko.observable(
       apiHelper.getFromTotalStorage('assist', 'assist_panel_visible', true)
     );
-    self.isLeftPanelVisible.subscribe(val => {
-      if (!self.assistWithoutStorage()) {
+    this.isLeftPanelVisible.subscribe(val => {
+      if (!this.assistWithoutStorage()) {
         apiHelper.setInTotalStorage('assist', 'assist_panel_visible', val);
       }
     });
 
-    self.isRightPanelAvailable = ko.observable(options.assistAvailable && HAS_OPTIMIZER);
-    self.isRightPanelVisible = ko.observable(
+    this.isRightPanelAvailable = ko.observable(options.assistAvailable && HAS_OPTIMIZER);
+    this.isRightPanelVisible = ko.observable(
       apiHelper.getFromTotalStorage('assist', 'right_assist_panel_visible', true)
     );
-    self.isRightPanelVisible.subscribe(val => {
-      if (!self.assistWithoutStorage()) {
+    this.isRightPanelVisible.subscribe(val => {
+      if (!this.assistWithoutStorage()) {
         apiHelper.setInTotalStorage('assist', 'right_assist_panel_visible', val);
       }
     });
 
     huePubSub.subscribe('assist.highlight.risk.suggestions', () => {
-      if (self.isRightPanelAvailable() && !self.isRightPanelVisible()) {
-        self.isRightPanelVisible(true);
+      if (this.isRightPanelAvailable() && !this.isRightPanelVisible()) {
+        this.isRightPanelVisible(true);
       }
     });
 
@@ -175,13 +175,13 @@ class EditorViewModel {
       callback => {
         this.withActiveSnippet(activeSnippet => {
           if (callback) {
-            callback(activeSnippet.type());
+            callback(activeSnippet.dialect());
           } else {
-            huePubSub.publish('set.active.snippet.type', activeSnippet.type());
+            huePubSub.publish('set.active.snippet.type', activeSnippet.dialect());
           }
         });
       },
-      self.huePubSubId
+      this.huePubSubId
     );
 
     huePubSub.subscribe(
@@ -196,15 +196,13 @@ class EditorViewModel {
             successCallback: function(result) {
               if (result && result.exists) {
                 $(document).trigger('info', result.path + ' saved successfully.');
-              } else {
-                self._ajaxError(result);
               }
             }
           };
           apiHelper.saveSnippetToFile(data, options);
         });
       },
-      self.huePubSubId
+      this.huePubSubId
     );
 
     huePubSub.subscribe(
@@ -216,7 +214,7 @@ class EditorViewModel {
           activeSnippet.currentQueryTab(contextData.tabId);
         });
       },
-      self.huePubSubId
+      this.huePubSubId
     );
 
     huePubSub.subscribe(
@@ -226,7 +224,7 @@ class EditorViewModel {
           activeSnippet.handleAssistSelection(databaseDef);
         });
       },
-      self.huePubSubId
+      this.huePubSubId
     );
 
     huePubSub.subscribe(
@@ -236,29 +234,26 @@ class EditorViewModel {
           activeSnippet.handleAssistSelection(databaseDef);
         });
       },
-      self.huePubSubId
+      this.huePubSubId
     );
 
-    self.availableSnippets = komapping.fromJS(options.languages);
+    this.availableSnippets = komapping.fromJS(options.languages);
 
-    self.editorMode = ko.observable(options.mode === 'editor');
+    this.editorMode = ko.observable(options.mode === 'editor');
   }
 
   changeURL(url) {
-    const self = this;
-    if (!self.isNotificationManager()) {
+    if (!this.isNotificationManager()) {
       hueUtils.changeURL(url);
     }
   }
 
   displayCombinedContent() {
-    const self = this;
-    if (!self.selectedNotebook()) {
-      self.combinedContent('');
+    if (!this.selectedNotebook()) {
+      this.combinedContent('');
     } else {
       let statements = '';
-      self
-        .selectedNotebook()
+      this.selectedNotebook()
         .snippets()
         .forEach(snippet => {
           if (snippet.statement()) {
@@ -268,36 +263,15 @@ class EditorViewModel {
             statements += snippet.statement();
           }
         });
-      self.combinedContent(statements);
+      this.combinedContent(statements);
     }
-    $('#combinedContentModal' + self.suffix).modal('show');
-  }
-
-  getPreviousChartOptions(snippet) {
-    return {
-      chartLimit: snippet.chartLimit() || snippet.previousChartOptions.chartLimit,
-      chartX: snippet.chartX() || snippet.previousChartOptions.chartX,
-      chartXPivot: snippet.chartXPivot() || snippet.previousChartOptions.chartXPivot,
-      chartYSingle: snippet.chartYSingle() || snippet.previousChartOptions.chartYSingle,
-      chartMapType: snippet.chartMapType() || snippet.previousChartOptions.chartMapType,
-      chartMapLabel: snippet.chartMapLabel() || snippet.previousChartOptions.chartMapLabel,
-      chartMapHeat: snippet.chartMapHeat() || snippet.previousChartOptions.chartMapHeat,
-      chartYMulti: snippet.chartYMulti() || snippet.previousChartOptions.chartYMulti,
-      chartScope: snippet.chartScope() || snippet.previousChartOptions.chartScope,
-      chartTimelineType:
-        snippet.chartTimelineType() || snippet.previousChartOptions.chartTimelineType,
-      chartSorting: snippet.chartSorting() || snippet.previousChartOptions.chartSorting,
-      chartScatterGroup:
-        snippet.chartScatterGroup() || snippet.previousChartOptions.chartScatterGroup,
-      chartScatterSize: snippet.chartScatterSize() || snippet.previousChartOptions.chartScatterSize
-    };
+    $('#combinedContentModal' + this.suffix).modal('show');
   }
 
   getSnippetName(snippetType) {
-    const self = this;
-    const availableSnippets = self.availableSnippets();
+    const availableSnippets = this.availableSnippets();
     for (let i = 0; i < availableSnippets.length; i++) {
-      if (availableSnippets[i].type() === snippetType) {
+      if (availableSnippets[i].dialect() === snippetType) {
         return availableSnippets[i].name();
       }
     }
@@ -305,181 +279,166 @@ class EditorViewModel {
   }
 
   getSnippetViewSettings(snippetType) {
-    const self = this;
-    if (self.snippetViewSettings[snippetType]) {
-      return self.snippetViewSettings[snippetType];
+    if (this.snippetViewSettings[snippetType]) {
+      return this.snippetViewSettings[snippetType];
     }
-    return self.snippetViewSettings.default;
+    return this.snippetViewSettings.default;
   }
 
   init() {
-    const self = this;
-    if (self.editorId) {
-      self.openNotebook(self.editorId);
+    if (this.editorId) {
+      this.openNotebook(this.editorId);
+    } else if (
+      window.location.getParameter('gist') !== '' ||
+      window.location.getParameter('type') !== ''
+    ) {
+      this.newNotebook(window.location.getParameter('type'));
     } else if (window.location.getParameter('editor') !== '') {
-      self.openNotebook(window.location.getParameter('editor'));
-    } else if (self.notebooks.length > 0) {
-      self.loadNotebook(self.notebooks[0]); // Old way of loading json for /browse
-    } else if (window.location.getParameter('type') !== '') {
-      self.newNotebook(window.location.getParameter('type'));
+      this.openNotebook(window.location.getParameter('editor'));
+    } else if (this.notebooks.length > 0) {
+      this.loadNotebook(this.notebooks[0]); // Old way of loading json for /browse
     } else {
-      self.newNotebook();
+      this.newNotebook();
     }
   }
 
   loadNotebook(notebookRaw, queryTab) {
-    const self = this;
-    let currentQueries;
-    if (self.selectedNotebook() != null) {
-      currentQueries = self.selectedNotebook().unload();
-    }
-
-    const notebook = new Notebook(self, notebookRaw);
+    const notebook = new Notebook(this, notebookRaw);
 
     if (notebook.snippets().length > 0) {
       huePubSub.publish('detach.scrolls', notebook.snippets()[0]);
-      notebook.selectedSnippet(notebook.snippets()[notebook.snippets().length - 1].type());
-      if (currentQueries != null) {
-        notebook.snippets()[0].queries(currentQueries);
-      }
+      notebook.selectedSnippet(notebook.snippets()[notebook.snippets().length - 1].dialect());
       notebook.snippets().forEach(snippet => {
         snippet.aceAutoExpand = false;
         snippet.statement_raw.valueHasMutated();
-        if (
-          snippet.result.handle().statements_count > 1 &&
-          snippet.result.handle().start != null &&
-          snippet.result.handle().end != null
-        ) {
-          const aceLineOffset = snippet.result.handle().aceLineOffset || 0;
-          snippet.result.statement_range({
-            start: {
-              row: snippet.result.handle().start.row + aceLineOffset,
-              column: snippet.result.handle().start.column
-            },
-            end: {
-              row: snippet.result.handle().end.row + aceLineOffset,
-              column: snippet.result.handle().end.column
-            }
-          });
-          snippet.result.statement_range.valueHasMutated();
-        }
-
-        snippet.previousChartOptions = self.getPreviousChartOptions(snippet);
+        // if (
+        //   snippet.result.handle().statements_count > 1 &&
+        //   snippet.result.handle().start != null &&
+        //   snippet.result.handle().end != null
+        // ) {
+        //   const aceLineOffset = snippet.result.handle().aceLineOffset || 0;
+        //   snippet.result.statement_range({
+        //     start: {
+        //       row: snippet.result.handle().start.row + aceLineOffset,
+        //       column: snippet.result.handle().start.column
+        //     },
+        //     end: {
+        //       row: snippet.result.handle().end.row + aceLineOffset,
+        //       column: snippet.result.handle().end.column
+        //     }
+        //   });
+        //   snippet.result.statement_range.valueHasMutated();
+        // }
       });
 
-      if (notebook.snippets()[0].result.data().length > 0) {
-        $(document).trigger('redrawResults');
-      } else if (queryTab) {
+      // if (notebook.snippets()[0].result.data().length > 0) {
+      //   $(document).trigger('redrawResults');
+      // } else
+      if (queryTab) {
         notebook.snippets()[0].currentQueryTab(queryTab);
       }
 
       if (notebook.isSaved()) {
         notebook.snippets()[0].currentQueryTab('savedQueries');
-        if (notebook.snippets()[0].queries().length === 0) {
-          notebook.snippets()[0].fetchQueries(); // Subscribe not updating yet
-        }
       }
     }
 
-    self.selectedNotebook(notebook);
+    this.selectedNotebook(notebook);
     huePubSub.publish('check.job.browser');
     huePubSub.publish('recalculate.name.description.width');
   }
 
-  newNotebook(editorType, callback, queryTab) {
-    const self = this;
-    huePubSub.publish('active.snippet.type.changed', {
-      type: editorType,
-      isSqlDialect: editorType ? self.getSnippetViewSettings(editorType).sqlDialect : undefined
-    });
-    $.post(
-      '/notebook/api/create_notebook',
-      {
-        type: editorType || self.editorType(),
-        directory_uuid: window.location.getParameter('directory_uuid')
-      },
-      data => {
-        self.loadNotebook(data.notebook);
-        if (self.editorMode() && !self.isNotificationManager()) {
-          const snippet = self.selectedNotebook().newSnippet(self.editorType());
-          if (
-            queryTab &&
-            ['queryHistory', 'savedQueries', 'queryBuilderTab'].indexOf(queryTab) > -1
-          ) {
-            snippet.currentQueryTab(queryTab);
-          }
-          huePubSub.publish('detach.scrolls', self.selectedNotebook().snippets()[0]);
-          if (window.location.getParameter('type') === '') {
-            hueUtils.changeURLParameter('type', self.editorType());
-          }
-          huePubSub.publish('active.snippet.type.changed', {
-            type: editorType,
-            isSqlDialect: editorType
-              ? self.getSnippetViewSettings(editorType).sqlDialect
-              : undefined
-          });
-        }
-
-        if (typeof callback !== 'undefined' && callback !== null) {
-          callback();
-        }
-      }
-    );
-  }
-
-  openNotebook(uuid, queryTab, skipUrlChange, callback) {
-    const self = this;
-    const deferredOpen = new $.Deferred();
-    $.get(
-      '/desktop/api2/doc/',
-      {
-        uuid: uuid,
-        data: true,
-        dependencies: true
-      },
-      data => {
-        if (data.status === 0) {
-          data.data.dependents = data.dependents;
-          data.data.can_write = data.user_perms.can_write;
-          const notebook = data.data;
-          self.loadNotebook(notebook, queryTab);
-          if (typeof skipUrlChange === 'undefined' && !self.isNotificationManager()) {
-            if (self.editorMode()) {
-              self.editorType(data.document.type.substring('query-'.length));
-              huePubSub.publish('active.snippet.type.changed', {
-                type: self.editorType(),
-                isSqlDialect: self.getSnippetViewSettings(self.editorType()).sqlDialect
-              });
-              self.changeURL(
-                self.URLS.editor + '?editor=' + data.document.id + '&type=' + self.editorType()
-              );
-            } else {
-              self.changeURL(self.URLS.notebook + '?notebook=' + data.document.id);
+  async newNotebook(editorType, callback, queryTab) {
+    return new Promise((resolve, reject) => {
+      huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
+        type: editorType,
+        isSqlDialect: editorType ? this.getSnippetViewSettings(editorType).sqlDialect : undefined
+      });
+      $.post('/notebook/api/create_notebook', {
+        type: editorType || this.editorType(),
+        directory_uuid: window.location.getParameter('directory_uuid'),
+        gist: this.isNotificationManager() ? undefined : window.location.getParameter('gist')
+      })
+        .then(data => {
+          this.loadNotebook(data.notebook);
+          if (this.editorMode() && !this.isNotificationManager()) {
+            const snippet =
+              this.selectedNotebook().snippets().length == 0
+                ? this.selectedNotebook().newSnippet(this.editorType())
+                : this.selectedNotebook().snippets()[0];
+            if (
+              queryTab &&
+              ['queryHistory', 'savedQueries', 'queryBuilderTab'].indexOf(queryTab) > -1
+            ) {
+              snippet.currentQueryTab(queryTab);
             }
+            huePubSub.publish('detach.scrolls', this.selectedNotebook().snippets()[0]);
+            if (window.location.getParameter('type') === '') {
+              hueUtils.changeURLParameter('type', this.editorType());
+            }
+            huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
+              type: editorType,
+              isSqlDialect: editorType
+                ? this.getSnippetViewSettings(editorType).sqlDialect
+                : undefined
+            });
           }
-          if (typeof callback !== 'undefined') {
+
+          if (callback) {
             callback();
           }
-          deferredOpen.resolve();
+          resolve();
+        })
+        .catch(reject);
+    });
+  }
+
+  async openNotebook(uuid, queryTab, skipUrlChange, callback) {
+    try {
+      const docData = await apiHelper.fetchDocumentAsync({
+        uuid: uuid,
+        fetchContents: true,
+        dependencies: true
+      });
+
+      docData.data.dependents = docData.dependents;
+      docData.data.can_write = docData.user_perms.can_write;
+
+      const notebookRaw = docData.data;
+
+      this.loadNotebook(notebookRaw, queryTab);
+
+      if (typeof skipUrlChange === 'undefined' && !this.isNotificationManager()) {
+        if (this.editorMode()) {
+          this.editorType(docData.document.type.substring('query-'.length));
+          huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
+            type: this.editorType(),
+            isSqlDialect: this.getSnippetViewSettings(this.editorType()).sqlDialect
+          });
+          this.changeURL(
+            this.URLS.editor + '?editor=' + docData.document.id + '&type=' + this.editorType()
+          );
         } else {
-          $(document).trigger('error', data.message);
-          deferredOpen.reject();
-          self.newNotebook();
+          this.changeURL(this.URLS.notebook + '?notebook=' + docData.document.id);
         }
       }
-    );
-    return deferredOpen.promise();
+      if (callback) {
+        callback();
+      }
+    } catch (err) {
+      console.error(err);
+      await this.newNotebook();
+    }
   }
 
   prepareShareModal() {
-    const self = this;
-    const selectedNotebookUuid = self.selectedNotebook() && self.selectedNotebook().uuid();
-    window.shareViewModel.setDocUuid(selectedNotebookUuid);
-    window.openShareModal();
+    const selectedNotebookUuid = this.selectedNotebook() && this.selectedNotebook().uuid();
+    if (selectedNotebookUuid) {
+      huePubSub.publish('doc.show.share.modal', selectedNotebookUuid);
+    }
   }
 
   removeSnippet(notebook, snippet) {
-    const self = this;
     let hasContent = snippet.statement_raw().length > 0;
     if (!hasContent) {
       Object.keys(snippet.properties()).forEach(key => {
@@ -488,8 +447,8 @@ class EditorViewModel {
       });
     }
     if (hasContent) {
-      self.removeSnippetConfirmation({ notebook: notebook, snippet: snippet });
-      $('#removeSnippetModal' + self.suffix).modal('show');
+      this.removeSnippetConfirmation({ notebook: notebook, snippet: snippet });
+      $('#removeSnippetModal' + this.suffix).modal('show');
     } else {
       notebook.snippets.remove(snippet);
       window.setTimeout(() => {
@@ -499,22 +458,19 @@ class EditorViewModel {
   }
 
   saveAsNotebook() {
-    const self = this;
-    self.selectedNotebook().id(null);
-    self.selectedNotebook().uuid(hueUtils.UUID());
-    self.selectedNotebook().parentSavedQueryUuid(null);
-    self.selectedNotebook().save(() => {
+    this.selectedNotebook().id(null);
+    this.selectedNotebook().uuid(hueUtils.UUID());
+    this.selectedNotebook().parentSavedQueryUuid(null);
+    this.selectedNotebook().save(() => {
       huePubSub.publish('assist.document.refresh');
     });
   }
 
-  saveNotebook() {
-    const self = this;
-    self.selectedNotebook().save();
+  async saveNotebook() {
+    await this.selectedNotebook().save();
   }
 
   showContextPopover(field, event) {
-    const self = this;
     const $source = $(
       event.target && event.target.nodeName !== 'A' ? event.target.parentElement : event.target
     );
@@ -526,7 +482,7 @@ class EditorViewModel {
       },
       onSampleClick: field.value,
       showInAssistEnabled: true,
-      sourceType: self.editorType(),
+      sourceType: this.editorType(),
       orientation: 'bottom',
       defaultDatabase: 'default',
       pinEnabled: false,
@@ -543,7 +499,7 @@ class EditorViewModel {
   showSessionPanel() {
     this.withActiveSnippet(
       snippet => {
-        huePubSub.publish('session.panel.show', snippet.type());
+        huePubSub.publish('session.panel.show', snippet.dialect());
       },
       () => {
         huePubSub.publish('session.panel.show');
@@ -552,79 +508,106 @@ class EditorViewModel {
   }
 
   toggleEditing() {
-    const self = this;
-    self.isEditing(!self.isEditing());
+    this.isEditing(!this.isEditing());
   }
 
   toggleEditorMode() {
-    const self = this;
-    const _notebook = self.selectedNotebook();
-    const _newSnippets = [];
+    const notebook = this.selectedNotebook();
+    const newSnippets = [];
 
-    if (self.editorType() !== 'notebook') {
-      self.editorType('notebook');
-      self.preEditorTogglingSnippet(_notebook.snippets()[0]);
-      const _variables = _notebook.snippets()[0].variables();
-      const _statementKeys = [];
+    const toPresentationMode = this.editorType() !== 'notebook';
+
+    if (toPresentationMode) {
+      this.editorType('notebook');
+      const sourceSnippet = notebook.snippets()[0];
+      this.preEditorTogglingSnippet(sourceSnippet);
+      const variables = sourceSnippet.variables();
+      const statementKeys = {};
       // Split statements
-      _notebook.type('notebook');
-      _notebook
-        .snippets()[0]
-        .statementsList()
-        .forEach(sql_statement => {
-          let _snippet;
-          if (sql_statement.hashCode() in _notebook.presentationSnippets()) {
-            _snippet = _notebook.presentationSnippets()[sql_statement.hashCode()]; // Persist result
-            _snippet.variables(_variables);
-          } else {
-            const _title = [];
-            const _statement = [];
-            sql_statement
-              .trim()
-              .split('\n')
-              .forEach(line => {
-                if (line.trim().startsWith('--') && _statement.length === 0) {
-                  _title.push(line.substr(2));
-                } else {
-                  _statement.push(line);
-                }
-              });
-            _snippet = new Snippet(self, _notebook, {
-              type: _notebook.initialType,
-              statement_raw: _statement.join('\n'),
-              result: {},
-              name: _title.join('\n'),
-              variables: komapping.toJS(_variables)
+      notebook.type('notebook');
+
+      const database = sourceSnippet.database();
+
+      sourceSnippet.executor.executables.forEach(executable => {
+        const sqlStatement = executable.parsedStatement.statement;
+        const statementKey = sqlStatement.hashCode() + database;
+
+        let presentationSnippet;
+
+        if (!notebook.presentationSnippets()[statementKey]) {
+          const titleLines = [];
+          const statementLines = [];
+          sqlStatement
+            .trim()
+            .split('\n')
+            .forEach(line => {
+              if (line.trim().startsWith('--') && statementLines.length === 0) {
+                titleLines.push(line.substr(2));
+              } else {
+                statementLines.push(line);
+              }
             });
-            _snippet.variables = _notebook.snippets()[0].variables;
-            _snippet.init();
-            _notebook.presentationSnippets()[sql_statement.hashCode()] = _snippet;
-          }
-          _statementKeys.push(sql_statement.hashCode());
-          _newSnippets.push(_snippet);
-        });
-      $.each(_notebook.presentationSnippets(), key => {
+          presentationSnippet = new Snippet(this, notebook, {
+            type: notebook.initialType,
+            statement_raw: statementLines.join('\n'),
+            database: database,
+            name: titleLines.join('\n'),
+            variables: komapping.toJS(variables)
+          });
+          window.setTimeout(() => {
+            const executableRaw = executable.toJs();
+            const reattachedExecutable = SqlExecutable.fromJs(
+              presentationSnippet.executor,
+              executableRaw
+            );
+            reattachedExecutable.result = executable.result;
+            presentationSnippet.executor.executables = [reattachedExecutable];
+            presentationSnippet.activeExecutable(reattachedExecutable);
+          }, 1000); // TODO: Make it possible to set activeSnippet on Snippet creation
+          presentationSnippet.init();
+          notebook.presentationSnippets()[statementKey] = presentationSnippet;
+        } else {
+          presentationSnippet = notebook.presentationSnippets()[statementKey];
+        }
+        presentationSnippet.variables(sourceSnippet.variables());
+        statementKeys[statementKey] = true;
+        newSnippets.push(presentationSnippet);
+      });
+
+      Object.keys(notebook.presentationSnippets()).forEach(key => {
         // Dead statements
-        if (!key in _statementKeys) {
-          delete _notebook.presentationSnippets()[key];
+        if (!statementKeys[key]) {
+          notebook.presentationSnippets()[key].executor.executables.forEach(executable => {
+            executable.cancelBatchChain();
+          });
+          delete notebook.presentationSnippets()[key];
         }
       });
     } else {
-      self.editorType(_notebook.initialType);
+      this.editorType(notebook.initialType);
       // Revert to one statement
-      _newSnippets.push(self.preEditorTogglingSnippet());
-      _notebook.type('query-' + _notebook.initialType);
+      newSnippets.push(this.preEditorTogglingSnippet());
+      notebook.type('query-' + notebook.initialType);
     }
-    _notebook.snippets(_newSnippets);
-    _newSnippets.forEach(snippet => {
+    notebook.snippets(newSnippets);
+    newSnippets.forEach(snippet => {
       huePubSub.publish('editor.redraw.data', { snippet: snippet });
+      if (toPresentationMode) {
+        window.setTimeout(() => {
+          snippet.executor.executables.forEach(executable => {
+            executable.notify();
+            if (executable.result) {
+              executable.result.notify();
+            }
+          });
+        }, 1000); // TODO: Make it possible to set activeSnippet on Snippet creation
+      }
     });
   }
 
   togglePresentationMode() {
-    const self = this;
-    if (self.selectedNotebook().initialType !== 'notebook') {
-      self.toggleEditorMode();
+    if (this.selectedNotebook().initialType !== 'notebook') {
+      this.toggleEditorMode();
     }
   }
 

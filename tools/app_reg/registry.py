@@ -19,6 +19,7 @@
 Registry for the applications
 """
 
+from builtins import object
 import glob
 import logging
 import os
@@ -26,12 +27,14 @@ import sys
 import json
 
 import common
+from common import cmp
 
 if sys.version_info[0] > 2:
   from builtins import object
-  from past.builtins import cmp
+
 
 LOG = logging.getLogger(__name__)
+
 
 class AppRegistry(object):
   """
@@ -47,7 +50,10 @@ class AppRegistry(object):
   def _open(self):
     """Open the registry file. May raise OSError"""
     if os.path.exists(self._reg_path):
-      reg_file = file(self._reg_path)
+      if sys.version_info[0] > 2:
+        reg_file = open(self._reg_path)
+      else:
+        reg_file = file(self._reg_path)
       app_list = json.load(reg_file)
       reg_file.close()
 
@@ -60,7 +66,10 @@ class AppRegistry(object):
 
   def _write(self, path):
     """Write out the registry to the given path"""
-    outfile = file(path, 'w')
+    if sys.version_info[0] > 2:
+      outfile = open(path, 'w')
+    else:
+      outfile = file(path, 'w')
     json.dump(list(self._apps.values()), outfile, cls=AppJsonEncoder, indent=2)
     outfile.close()
 

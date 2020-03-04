@@ -31,7 +31,6 @@ import time
 
 from nose.tools import assert_true, assert_false
 from django.urls import reverse
-from django.contrib.auth.models import User
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.paths import get_run_root
@@ -41,9 +40,9 @@ from desktop.lib.security_util import get_localhost_name
 from desktop.lib.test_utils import add_to_group, grant_access
 from hadoop import cluster, pseudo_hdfs4
 from hadoop.pseudo_hdfs4 import is_live_cluster, get_db_prefix
+from useradmin.models import User
 
 import beeswax.conf
-
 from beeswax.server.dbms import get_query_server_config
 from beeswax.server import dbms
 

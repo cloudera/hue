@@ -35,8 +35,10 @@ from desktop.log.formatter import MessageOnlyFormatter
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
+  open_file = open
 else:
   from cStringIO import StringIO as string_io
+  open_file = file
 
 DEFAULT_LOG_DIR = 'logs'
 LOG_FORMAT = '[%(asctime)s] %(module)-12s %(levelname)-8s %(message)s'
@@ -65,7 +67,7 @@ def _read_log_conf(proc_name, log_dir):
     return None
 
   try:
-    raw = file(log_conf).read()
+    raw = open_file(log_conf).read()
     sio = string_io(CONF_RE.sub(_repl, raw))
     return sio
   except IOError as ex:
@@ -187,10 +189,10 @@ def basic_logging(proc_name, log_dir=None):
     handler.setLevel(lvl)
 
     # Set all loggers but error.log to the same logging level
-    error_handler = logging.getLogger('handler_errorlog')
-    for h in root_logger.handlers:
-      if isinstance(h, (FileHandler, RotatingFileHandler)) and h != error_handler:
-        h.setLevel(lvl)
+    for h in root_logger.__dict__['handlers']:
+      if isinstance(h, (FileHandler, RotatingFileHandler)):
+        if os.path.basename(h.baseFilename) != 'error.log':
+          h.setLevel(lvl)
 
 
 def fancy_logging():

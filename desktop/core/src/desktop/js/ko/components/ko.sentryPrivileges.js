@@ -15,11 +15,14 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
+import koMapping from 'knockout.mapping';
 
 import componentUtils from './componentUtils';
 import I18n from 'utils/i18n';
 import hueUtils from 'utils/hueUtils';
+
+export const NAME = 'hue-sentry-privileges';
 
 const TEMPLATE = `
   <script type="text/html" id="sentry-privileges-component-role">
@@ -470,7 +473,7 @@ class Role {
       $.post(
         '/security/api/hive/update_role_groups',
         {
-          role: ko.mapping.toJSON(self)
+          role: koMapping.toJSON(self)
         },
         data => {
           if (data.status === 0) {
@@ -495,7 +498,7 @@ class Role {
         $.post(
           '/security/api/hive/create_role',
           {
-            role: ko.mapping.toJSON(self)
+            role: koMapping.toJSON(self)
           },
           data => {
             if (data.status === 0) {
@@ -528,7 +531,7 @@ class Role {
         $.post(
           '/security/api/hive/save_privileges',
           {
-            role: ko.mapping.toJSON(self)
+            role: koMapping.toJSON(self)
           },
           data => {
             if (data.status === 0) {
@@ -581,7 +584,7 @@ class Role {
       $.post(
         '/security/api/hive/save_privileges',
         {
-          role: ko.mapping.toJSON(role)
+          role: koMapping.toJSON(role)
         },
         data => {
           if (data.status === 0) {
@@ -710,8 +713,8 @@ class SentryPrivilegesViewModel {
         url: '/security/api/hive/list_sentry_privileges_by_authorizable',
         data: {
           groupName: '',
-          roleSet: ko.mapping.toJSON({ all: true, roles: [] }),
-          authorizableHierarchy: ko.mapping.toJSON(
+          roleSet: koMapping.toJSON({ all: true, roles: [] }),
+          authorizableHierarchy: koMapping.toJSON(
             _create_authorizable_from_ko(self.server(), self.path())
           )
         },
@@ -765,4 +768,4 @@ class SentryPrivilegesViewModel {
   }
 }
 
-componentUtils.registerComponent('hue-sentry-privileges', SentryPrivilegesViewModel, TEMPLATE);
+componentUtils.registerComponent(NAME, SentryPrivilegesViewModel, TEMPLATE);

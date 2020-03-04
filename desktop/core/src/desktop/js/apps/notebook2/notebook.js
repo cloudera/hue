@@ -15,200 +15,128 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
 
 import apiHelper from 'api/apiHelper';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
+import sessionManager from 'apps/notebook2/execution/sessionManager';
 
-import { Snippet, STATUS as SNIPPET_STATUS } from 'apps/notebook2/snippet';
+import Snippet, { STATUS as SNIPPET_STATUS } from 'apps/notebook2/snippet';
+import { HISTORY_CLEARED_EVENT } from 'apps/notebook2/components/ko.queryHistory';
+import { UPDATE_SAVED_QUERIES_EVENT } from 'apps/notebook2/components/ko.savedQueries';
 
-const NOTEBOOK_MAPPING = {
-  ignore: [
-    'ace',
-    'aceEditor',
-    'aceMode',
-    'autocompleter',
-    'availableDatabases',
-    'availableSnippets',
-    'avoidClosing',
-    'canWrite',
-    'cleanedDateTimeMeta',
-    'cleanedMeta',
-    'cleanedNumericMeta',
-    'cleanedStringMeta',
-    'dependents',
-    'errorLoadingQueries',
-    'hasProperties',
-    'history',
-    'images',
-    'inFocus',
-    'parentNotebook',
-    'parentVm',
-    'queries',
-    'saveResultsModalVisible',
-    'selectedStatement',
-    'snippetImage',
-    'user',
-    'positionStatement',
-    'lastExecutedStatement',
-    'downloadResultViewModel'
-  ]
-};
-
-class Notebook {
-  constructor(vm, notebook) {
-    const self = this;
-
-    self.parentVm = vm;
-
-    self.id = ko.observable(notebook.id);
-    self.uuid = ko.observable(notebook.uuid || hueUtils.UUID());
-    self.name = ko.observable(notebook.name || 'My Notebook');
-    self.description = ko.observable(notebook.description || '');
-    self.type = ko.observable(notebook.type || 'notebook');
-    self.initialType = self.type().replace('query-', '');
-    self.coordinatorUuid = ko.observable(notebook.coordinatorUuid);
-    self.isHistory = ko.observable(!!notebook.is_history);
-    self.isManaged = ko.observable(!!notebook.isManaged);
-    self.parentSavedQueryUuid = ko.observable(notebook.parentSavedQueryUuid); // History parent
-    self.isSaved = ko.observable(!!notebook.isSaved);
-    self.canWrite = ko.observable(notebook.can_write !== false);
-    self.onSuccessUrl = ko.observable(notebook.onSuccessUrl);
-    self.pubSubUrl = ko.observable(notebook.pubSubUrl);
-    self.isPresentationModeDefault = ko.observable(!!notebook.isPresentationModeDefault);
-    self.isPresentationMode = ko.observable(false);
-    self.isPresentationModeInitialized = ko.observable(false);
-    self.isPresentationMode.subscribe(newValue => {
-      if (!newValue) {
-        self.cancelExecutingAll();
-      }
+export default class Notebook {
+  constructor(vm, notebookRaw) {
+    this.parentVm = vm;
+    this.id = ko.observable(notebookRaw.id);
+    this.uuid = ko.observable(notebookRaw.uuid || hueUtils.UUID());
+    this.name = ko.observable(notebookRaw.name || '');
+    this.description = ko.observable(notebookRaw.description || '');
+    this.type = ko.observable(notebookRaw.type || 'notebook');
+    this.initialType = this.type().replace('query-', '');
+    this.coordinatorUuid = ko.observable(notebookRaw.coordinatorUuid);
+    this.isHistory = ko.observable(!!notebookRaw.is_history);
+    this.isManaged = ko.observable(!!notebookRaw.isManaged);
+    this.parentSavedQueryUuid = ko.observable(notebookRaw.parentSavedQueryUuid); // History parent
+    this.isSaved = ko.observable(!!notebookRaw.isSaved);
+    this.canWrite = ko.observable(notebookRaw.can_write !== false);
+    this.onSuccessUrl = ko.observable(notebookRaw.onSuccessUrl);
+    this.pubSubUrl = ko.observable(notebookRaw.pubSubUrl);
+    this.isPresentationModeDefault = ko.observable(!!notebookRaw.isPresentationModeDefault);
+    this.isPresentationMode = ko.observable(false);
+    this.isPresentationModeInitialized = ko.observable(false);
+    this.isPresentationMode.subscribe(newValue => {
       huePubSub.publish('editor.presentation.operate.toggle', newValue); // Problem with headers / row numbers redraw on full screen results
       vm.togglePresentationMode();
       if (newValue) {
         hueAnalytics.convert('editor', 'presentation');
       }
     });
-    self.presentationSnippets = ko.observable({});
-    self.isHidingCode = ko.observable(!!notebook.isHidingCode);
+    this.presentationSnippets = ko.observable({});
+    this.isHidingCode = ko.observable(!!notebookRaw.isHidingCode);
 
-    self.snippets = ko.observableArray();
-    self.selectedSnippet = ko.observable(vm.editorType()); // Aka selectedSnippetType
-    self.directoryUuid = ko.observable(notebook.directoryUuid);
-    self.dependents = komapping.fromJS(notebook.dependents || []);
-    self.dependentsCoordinator = ko.pureComputed(() =>
-      self.dependents().filter(doc => doc.type() === 'oozie-coordinator2' && doc.is_managed())
+    this.snippets = ko.observableArray();
+    this.selectedSnippet = ko.observable(vm.editorType()); // Aka selectedSnippetType
+    this.directoryUuid = ko.observable(notebookRaw.directoryUuid);
+    this.dependents = komapping.fromJS(notebookRaw.dependents || []);
+    this.dependentsCoordinator = ko.pureComputed(() =>
+      this.dependents().filter(doc => doc.type() === 'oozie-coordinator2' && doc.is_managed())
     );
-    if (self.dependentsCoordinator().length > 0 && !self.coordinatorUuid()) {
-      self.coordinatorUuid(self.dependentsCoordinator()[0].uuid());
+    if (this.dependentsCoordinator().length > 0 && !this.coordinatorUuid()) {
+      this.coordinatorUuid(this.dependentsCoordinator()[0].uuid());
     }
-    self.history = ko.observableArray(
+    this.history = ko.observableArray(
       vm.selectedNotebook() &&
         vm.selectedNotebook().history().length > 0 &&
-        vm.selectedNotebook().history()[0].type === self.type()
+        vm.selectedNotebook().history()[0].type === this.type()
         ? vm.selectedNotebook().history()
         : []
     );
 
-    // This is to keep the "Saved Query" tab selected when opening a doc from the left assist
-    // TODO: Refactor code to reflect purpose
-    self.history.subscribe(val => {
-      if (
-        self.id() == null &&
-        val.length == 0 &&
-        self.historyFilter() === '' &&
-        !vm.isNotificationManager()
-      ) {
-        self.snippets()[0].currentQueryTab('savedQueries');
-      }
-    });
-
-    self.historyFilter = ko.observable('');
-    self.historyFilterVisible = ko.observable(false);
-    self.historyFilter.extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 900 } });
-    self.historyFilter.subscribe(() => {
-      if (self.historyCurrentPage() !== 1) {
-        self.historyCurrentPage(1);
-      } else {
-        self.fetchHistory();
-      }
-    });
-    self.loadingHistory = ko.observable(self.history().length === 0);
-    self.historyInitialHeight = ko.observable(0).extend({ throttle: 1000 });
-    self.forceHistoryInitialHeight = ko.observable(false);
-    self.historyCurrentPage = ko.observable(
-      vm.selectedNotebook() ? vm.selectedNotebook().historyCurrentPage() : 1
-    );
-    self.historyCurrentPage.subscribe(() => {
-      self.fetchHistory();
-    });
-    self.historyTotalPages = ko.observable(
-      vm.selectedNotebook() ? vm.selectedNotebook().historyTotalPages() : 1
+    this.schedulerViewModel = null;
+    this.schedulerViewModelIsLoaded = ko.observable(false);
+    this.schedulerViewerViewModel = ko.observable();
+    this.isBatchable = ko.pureComputed(
+      () => this.snippets().length > 0 && this.snippets().every(snippet => snippet.isBatchable())
     );
 
-    self.schedulerViewModel = null;
-    self.schedulerViewModelIsLoaded = ko.observable(false);
-    self.schedulerViewerViewModel = ko.observable();
-    self.isBatchable = ko.pureComputed(
-      () => self.snippets().length > 0 && self.snippets().every(snippet => snippet.isBatchable())
-    );
+    this.isExecutingAll = ko.observable(!!notebookRaw.isExecutingAll);
 
-    self.isExecutingAll = ko.observable(!!notebook.isExecutingAll);
+    this.executingAllIndex = ko.observable(notebookRaw.executingAllIndex || 0);
 
-    self.executingAllIndex = ko.observable(notebook.executingAllIndex || 0);
+    this.retryModalConfirm = null;
+    this.retryModalCancel = null;
 
-    self.retryModalConfirm = null;
-    self.retryModalCancel = null;
+    this.avoidClosing = false;
 
-    self.avoidClosing = false;
+    this.canSave = vm.canSave;
 
-    self.canSave = vm.canSave;
+    this.unloaded = ko.observable(false);
 
-    self.unloaded = ko.observable(false);
-    self.updateHistoryFailed = false;
-
-    self.viewSchedulerId = ko.observable(notebook.viewSchedulerId || '');
-    self.viewSchedulerId.subscribe(() => {
-      self.save();
+    this.viewSchedulerId = ko.observable(notebookRaw.viewSchedulerId || '');
+    this.viewSchedulerId.subscribe(() => {
+      this.save();
     });
-    self.isSchedulerJobRunning = ko.observable();
-    self.loadingScheduler = ko.observable(false);
+    this.isSchedulerJobRunning = ko.observable();
+    this.loadingScheduler = ko.observable(false);
 
     // Init
-    if (notebook.snippets) {
-      notebook.snippets.forEach(snippet => {
-        self.addSnippet(snippet);
+    if (notebookRaw.snippets) {
+      notebookRaw.snippets.forEach(snippetRaw => {
+        this.addSnippet(snippetRaw);
       });
       if (
-        typeof notebook.presentationSnippets != 'undefined' &&
-        notebook.presentationSnippets != null
+        typeof notebookRaw.presentationSnippets != 'undefined' &&
+        notebookRaw.presentationSnippets != null
       ) {
         // Load
-        $.each(notebook.presentationSnippets, (key, snippet) => {
+        $.each(notebookRaw.presentationSnippets, (key, snippet) => {
           snippet.status = 'ready'; // Protect from storm of check_statuses
-          const _snippet = new Snippet(vm, self, snippet);
+          const _snippet = new Snippet(vm, this, snippet);
           _snippet.init();
-          _snippet.previousChartOptions = vm.getPreviousChartOptions(_snippet);
-          self.presentationSnippets()[key] = _snippet;
-        });
-      }
-      if (vm.editorMode() && self.history().length === 0) {
-        self.fetchHistory(() => {
-          self.updateHistory(['starting', 'running'], 30000);
-          self.updateHistory(['available'], 60000 * 5);
+          this.presentationSnippets()[key] = _snippet;
         });
       }
     }
 
+    huePubSub.subscribe(HISTORY_CLEARED_EVENT, () => {
+      if (this.isHistory()) {
+        this.id(null);
+        this.uuid(hueUtils.UUID());
+        this.parentVm.changeURL(this.parentVm.URLS.editor + '?type=' + this.parentVm.editorType());
+      }
+    });
+
     huePubSub.subscribeOnce(
       'assist.db.panel.ready',
       () => {
-        if (self.type().indexOf('query') === 0) {
+        if (this.type().indexOf('query') === 0) {
           const whenDatabaseAvailable = function(snippet) {
             huePubSub.publish('assist.set.database', {
-              source: snippet.type(),
+              source: snippet.dialect(),
               namespace: snippet.namespace(),
               name: snippet.database()
             });
@@ -236,10 +164,10 @@ class Notebook {
             }
           };
 
-          if (self.snippets().length === 1) {
-            whenSnippetAvailable(self.snippets()[0]);
+          if (this.snippets().length === 1) {
+            whenSnippetAvailable(this.snippets()[0]);
           } else {
-            const snippetsSub = self.snippets.subscribe(snippets => {
+            const snippetsSub = this.snippets.subscribe(snippets => {
               if (snippets.length === 1) {
                 whenSnippetAvailable(snippets[0]);
               }
@@ -254,141 +182,47 @@ class Notebook {
     huePubSub.publish('assist.is.db.panel.ready');
   }
 
-  addSnippet(snippet) {
-    const self = this;
-    const newSnippet = new Snippet(self.parentVm, self, snippet);
-    self.snippets.push(newSnippet);
+  addSnippet(snippetRaw) {
+    const newSnippet = new Snippet(this.parentVm, this, snippetRaw);
+    this.snippets.push(newSnippet);
     newSnippet.init();
     return newSnippet;
   }
 
-  cancelExecutingAll() {
-    const self = this;
-    const index = self.executingAllIndex();
-    if (self.isExecutingAll() && self.snippets()[index]) {
-      self.snippets()[index].cancel();
-    }
-  }
-
-  clearHistory() {
-    const self = this;
-    hueAnalytics.log('notebook', 'clearHistory');
-    apiHelper
-      .clearNotebookHistory({
-        notebookJson: komapping.toJSON(self.getContext(), NOTEBOOK_MAPPING),
-        docType: self.selectedSnippet(),
-        isNotificationManager: self.parentVm.isNotificationManager()
-      })
-      .then(() => {
-        self.history.removeAll();
-        if (self.isHistory()) {
-          self.id(null);
-          self.uuid(hueUtils.UUID());
-          self.parentVm.changeURL(
-            self.parentVm.URLS.editor + '?type=' + self.parentVm.editorType()
-          );
-        }
-      })
-      .fail(xhr => {
-        if (xhr.status !== 502) {
-          $(document).trigger('error', xhr.responseText);
-        }
-      });
-    $(document).trigger('hideHistoryModal');
-  }
-
   clearResults() {
-    const self = this;
-    self.snippets().forEach(snippet => {
+    this.snippets().forEach(snippet => {
       snippet.result.clear();
       snippet.status(SNIPPET_STATUS.ready);
     });
   }
 
-  close() {
-    const self = this;
+  async close() {
     hueAnalytics.log('notebook', 'close');
     apiHelper.closeNotebook({
-      notebookJson: komapping.toJSON(self, NOTEBOOK_MAPPING),
-      editorMode: self.parentVm.editorMode()
+      notebookJson: await this.toJson(),
+      editorMode: this.parentVm.editorMode()
     });
   }
 
   executeAll() {
-    const self = this;
-    if (self.isExecutingAll() || self.snippets().length === 0) {
+    if (this.isExecutingAll() || this.snippets().length === 0) {
       return;
     }
 
-    self.isExecutingAll(true);
-    self.executingAllIndex(0);
+    this.isExecutingAll(true);
+    this.executingAllIndex(0);
 
-    self.snippets()[self.executingAllIndex()].execute();
-  }
-
-  fetchHistory(callback) {
-    const self = this;
-    const QUERIES_PER_PAGE = 50;
-    self.loadingHistory(true);
-
-    $.get(
-      '/notebook/api/get_history',
-      {
-        doc_type: self.selectedSnippet(),
-        limit: QUERIES_PER_PAGE,
-        page: self.historyCurrentPage(),
-        doc_text: self.historyFilter(),
-        is_notification_manager: self.parentVm.isNotificationManager()
-      },
-      data => {
-        const parsedHistory = [];
-        if (data && data.history) {
-          data.history.forEach(nbk => {
-            parsedHistory.push(
-              self.makeHistoryRecord(
-                nbk.absoluteUrl,
-                nbk.data.statement,
-                nbk.data.lastExecuted,
-                nbk.data.status,
-                nbk.name,
-                nbk.uuid
-              )
-            );
-          });
-        }
-        self.history(parsedHistory);
-        self.historyTotalPages(Math.ceil(data.count / QUERIES_PER_PAGE));
-      }
-    ).always(() => {
-      self.loadingHistory(false);
-      if (callback) {
-        callback();
-      }
-    });
-  }
-
-  getContext() {
-    const self = this;
-    return {
-      id: self.id,
-      uuid: self.uuid,
-      parentSavedQueryUuid: self.parentSavedQueryUuid,
-      isSaved: self.isSaved,
-      type: self.type,
-      name: self.name
-    };
+    this.snippets()[this.executingAllIndex()].execute();
   }
 
   getSnippets(type) {
-    const self = this;
-    return self.snippets().filter(snippet => snippet.type() === type);
+    return this.snippets().filter(snippet => snippet.dialect() === type);
   }
 
   loadScheduler() {
-    const self = this;
-    if (typeof self.parentVm.CoordinatorEditorViewModel !== 'undefined' && self.isBatchable()) {
+    if (typeof this.parentVm.CoordinatorEditorViewModel !== 'undefined' && this.isBatchable()) {
       let action;
-      if (self.coordinatorUuid()) {
+      if (this.coordinatorUuid()) {
         action = 'edit';
       } else {
         action = 'new';
@@ -400,8 +234,8 @@ class Notebook {
           '/scheduler/api/schedule/' + action + '/',
           {
             format: 'json',
-            document: self.uuid(),
-            coordinator: self.coordinatorUuid()
+            document: this.uuid(),
+            coordinator: this.coordinatorUuid()
           },
           data => {
             if ($('#schedulerEditor').length > 0) {
@@ -411,7 +245,7 @@ class Notebook {
                   const $schedulerEditor = $('#schedulerEditor');
                   $schedulerEditor.html(r);
 
-                  self.schedulerViewModel = new self.parentVm.CoordinatorEditorViewModel(
+                  this.schedulerViewModel = new this.parentVm.CoordinatorEditorViewModel(
                     data.coordinator,
                     data.credentials,
                     data.workflows,
@@ -419,7 +253,7 @@ class Notebook {
                   );
 
                   ko.cleanNode($schedulerEditor[0]);
-                  ko.applyBindings(self.schedulerViewModel, $schedulerEditor[0]);
+                  ko.applyBindings(this.schedulerViewModel, $schedulerEditor[0]);
                   $(document).off('showSubmitPopup');
                   $(document).on('showSubmitPopup', (event, data) => {
                     const $submitModalEditor = $('.submit-modal-editor');
@@ -437,14 +271,14 @@ class Notebook {
 
                   huePubSub.publish('render.jqcron');
 
-                  self.schedulerViewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
-                  self.schedulerViewModel.coordinator.tracker().markCurrentStateAsClean();
-                  self.schedulerViewModel.isEditing(true);
+                  this.schedulerViewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
+                  this.schedulerViewModel.coordinator.tracker().markCurrentStateAsClean();
+                  this.schedulerViewModel.isEditing(true);
 
-                  self.schedulerViewModelIsLoaded(true);
+                  this.schedulerViewModelIsLoaded(true);
 
                   if (action === 'new') {
-                    self.schedulerViewModel.coordinator.properties.document(self.uuid()); // Expected for triggering the display
+                    this.schedulerViewModel.coordinator.properties.document(this.uuid()); // Expected for triggering the display
                   }
                 }
               });
@@ -461,24 +295,12 @@ class Notebook {
     }
   }
 
-  makeHistoryRecord(url, statement, lastExecuted, status, name, uuid) {
-    return komapping.fromJS({
-      url: url,
-      query: statement.substring(0, 1000) + (statement.length > 1000 ? '...' : ''),
-      lastExecuted: lastExecuted,
-      status: status,
-      name: name,
-      uuid: uuid
-    });
-  }
-
   newSnippet(type) {
-    const self = this;
     if (type) {
-      self.selectedSnippet(type);
+      this.selectedSnippet(type);
     }
-    const snippet = self.addSnippet({
-      type: self.selectedSnippet(),
+    const snippet = this.addSnippet({
+      type: this.selectedSnippet(),
       result: {}
     });
 
@@ -489,152 +311,104 @@ class Notebook {
       }
     }, 100);
 
-    hueAnalytics.log('notebook', 'add_snippet/' + (type ? type : self.selectedSnippet()));
+    hueAnalytics.log('notebook', 'add_snippet/' + (type ? type : this.selectedSnippet()));
     return snippet;
   }
 
   newSnippetAbove(id) {
-    const self = this;
-    self.newSnippet();
+    this.newSnippet();
     let idx = 0;
-    self.snippets().forEach((snippet, cnt) => {
+    this.snippets().forEach((snippet, cnt) => {
       if (snippet.id() === id) {
         idx = cnt;
       }
     });
-    self.snippets(self.snippets().move(self.snippets().length - 1, idx));
+    this.snippets(this.snippets().move(this.snippets().length - 1, idx));
   }
 
-  nextHistoryPage() {
-    const self = this;
-    if (self.historyCurrentPage() < self.historyTotalPages()) {
-      self.historyCurrentPage(self.historyCurrentPage() + 1);
-    }
-  }
-
-  prevHistoryPage() {
-    const self = this;
-    if (self.historyCurrentPage() !== 1) {
-      self.historyCurrentPage(self.historyCurrentPage() - 1);
-    }
-  }
-
-  save(callback) {
-    const self = this;
+  async save(callback) {
     hueAnalytics.log('notebook', 'save');
 
-    // Remove the result data from the snippets
-    // Also do it for presentation mode
-    const cp = komapping.toJS(self, NOTEBOOK_MAPPING);
-    cp.snippets
-      .concat(Object.keys(cp.presentationSnippets).map(key => cp.presentationSnippets[key]))
-      .forEach(snippet => {
-        snippet.result.data.length = 0; // snippet.result.clear() does not work for some reason
-        snippet.result.meta.length = 0;
-        snippet.result.logs = '';
-        snippet.result.fetchedOnce = false;
-        snippet.progress = 0; // Remove progress
-        snippet.jobs.length = 0;
-      });
-    if (cp.schedulerViewModel) {
-      cp.schedulerViewModel.availableTimezones = [];
-    }
     const editorMode =
-      self.parentVm.editorMode() ||
-      (self.isPresentationMode() && self.parentVm.editorType() !== 'notebook'); // Editor should not convert to Notebook in presentation mode
+      this.parentVm.editorMode() ||
+      (this.isPresentationMode() && this.parentVm.editorType() !== 'notebook'); // Editor should not convert to Notebook in presentation mode
 
-    apiHelper
-      .saveNotebook({
-        notebookJson: komapping.toJSON(cp, NOTEBOOK_MAPPING),
+    try {
+      const data = await apiHelper.saveNotebook({
+        notebookJson: await this.toJson(),
         editorMode: editorMode
-      })
-      .then(data => {
-        if (data.status === 0) {
-          self.id(data.id);
-          self.isSaved(true);
-          const wasHistory = self.isHistory();
-          self.isHistory(false);
-          $(document).trigger('info', data.message);
-          if (editorMode) {
-            if (!data.save_as) {
-              const existingQuery = self
-                .snippets()[0]
-                .queries()
-                .filter(item => item.uuid() === data.uuid);
-              if (existingQuery.length > 0) {
-                existingQuery[0].name(data.name);
-                existingQuery[0].description(data.description);
-                existingQuery[0].last_modified(data.last_modified);
-              }
-            } else if (self.snippets()[0].queries().length > 0) {
-              // Saved queries tab already loaded
-              self.snippets()[0].queries.unshift(komapping.fromJS(data));
-            }
+      });
 
-            if (self.coordinatorUuid() && self.schedulerViewModel) {
-              self.saveScheduler();
-              self.schedulerViewModel.coordinator.refreshParameters();
-            }
-            if (wasHistory || data.save_as) {
-              self.loadScheduler();
-            }
+      if (data.status === 0) {
+        this.id(data.id);
+        this.isSaved(true);
+        const wasHistory = this.isHistory();
+        this.isHistory(false);
+        $(document).trigger('info', data.message);
+        if (editorMode) {
+          huePubSub.publish(UPDATE_SAVED_QUERIES_EVENT, data);
 
-            if (
-              self.snippets()[0].downloadResultViewModel &&
-              self
-                .snippets()[0]
-                .downloadResultViewModel()
-                .saveTarget() === 'dashboard'
-            ) {
-              huePubSub.publish(
-                'open.link',
-                self.parentVm.URLS.report +
-                  '&uuid=' +
-                  data.uuid +
-                  '&statement=' +
-                  self.snippets()[0].result.handle().statement_id
-              );
-            } else {
-              self.parentVm.changeURL(self.parentVm.URLS.editor + '?editor=' + data.id);
-            }
-          } else {
-            self.parentVm.changeURL(self.parentVm.URLS.notebook + '?notebook=' + data.id);
+          if (this.coordinatorUuid() && this.schedulerViewModel) {
+            this.saveScheduler();
+            this.schedulerViewModel.coordinator.refreshParameters();
           }
-          if (typeof callback == 'function') {
-            callback();
+          if (wasHistory || data.save_as) {
+            this.loadScheduler();
+          }
+
+          if (
+            this.snippets()[0].downloadResultViewModel &&
+            this.snippets()[0]
+              .downloadResultViewModel()
+              .saveTarget() === 'dashboard'
+          ) {
+            huePubSub.publish(
+              'open.link',
+              this.parentVm.URLS.report +
+                '&uuid=' +
+                data.uuid +
+                '&statement=' +
+                this.snippets()[0].result.handle().statement_id
+            );
+          } else {
+            this.parentVm.changeURL(this.parentVm.URLS.editor + '?editor=' + data.id);
           }
         } else {
-          $(document).trigger('error', data.message);
+          this.parentVm.changeURL(this.parentVm.URLS.notebook + '?notebook=' + data.id);
         }
-      })
-      .fail(xhr => {
-        if (xhr.status !== 502) {
-          $(document).trigger('error', xhr.responseText);
+        if (typeof callback == 'function') {
+          callback();
         }
-      });
+      } else {
+        $(document).trigger('error', data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      if (err && err.status !== 502) {
+        $(document).trigger('error', err.responseText);
+      }
+    }
   }
 
   saveScheduler() {
-    const self = this;
     if (
-      self.isBatchable() &&
-      (!self.coordinatorUuid() || self.schedulerViewModel.coordinator.isDirty())
+      this.isBatchable() &&
+      (!this.coordinatorUuid() || this.schedulerViewModel.coordinator.isDirty())
     ) {
-      self.schedulerViewModel.coordinator.isManaged(true);
-      self.schedulerViewModel.coordinator.properties.document(self.uuid());
-      self.schedulerViewModel.save(data => {
-        if (!self.coordinatorUuid()) {
-          self.coordinatorUuid(data.uuid);
-          self.save();
+      this.schedulerViewModel.coordinator.isManaged(true);
+      this.schedulerViewModel.coordinator.properties.document(this.uuid());
+      this.schedulerViewModel.save(data => {
+        if (!this.coordinatorUuid()) {
+          this.coordinatorUuid(data.uuid);
+          this.save();
         }
       });
     }
   }
 
   showSubmitPopup() {
-    const self = this;
     $.get(
-      '/scheduler/api/submit/' + self.coordinatorUuid(),
+      '/scheduler/api/submit/' + this.coordinatorUuid(),
       {
         format: 'json'
       },
@@ -648,11 +422,56 @@ class Notebook {
     });
   }
 
+  async toContextJson() {
+    return JSON.stringify({
+      id: this.id(),
+      isSaved: this.isSaved(),
+      name: this.name(),
+      parentSavedQueryUuid: this.parentSavedQueryUuid(),
+      sessions: await sessionManager.getAllSessions(),
+      type: this.type(),
+      uuid: this.uuid()
+    });
+  }
+
+  async toJs() {
+    return {
+      coordinatorUuid: this.coordinatorUuid(),
+      description: this.description(),
+      directoryUuid: this.directoryUuid(),
+      executingAllIndex: this.executingAllIndex(),
+      id: this.id(),
+      isExecutingAll: this.isExecutingAll(),
+      isHidingCode: this.isHidingCode(),
+      isHistory: this.isHistory(),
+      isManaged: this.isManaged(),
+      isPresentationModeDefault: this.isPresentationModeDefault(),
+      isSaved: this.isSaved(),
+      name: this.name(),
+      onSuccessUrl: this.onSuccessUrl(),
+      parentSavedQueryUuid: this.parentSavedQueryUuid(),
+      presentationSnippets: Object.keys(this.presentationSnippets()).reduce((result, key) => {
+        result[key] = this.presentationSnippets()[key].toJs();
+        return result;
+      }, {}),
+      pubSubUrl: this.pubSubUrl(),
+      result: {}, // TODO: Moved to executor but backend requires it
+      sessions: await sessionManager.getAllSessions(),
+      snippets: this.snippets().map(snippet => snippet.toJs()),
+      type: this.type(),
+      uuid: this.uuid(),
+      viewSchedulerId: this.viewSchedulerId()
+    };
+  }
+
+  async toJson() {
+    return JSON.stringify(await this.toJs());
+  }
+
   unload() {
-    const self = this;
-    self.unloaded(true);
+    this.unloaded(true);
     let currentQueries = null;
-    self.snippets().forEach(snippet => {
+    this.snippets().forEach(snippet => {
       if (snippet.checkStatusTimeout != null) {
         clearTimeout(snippet.checkStatusTimeout);
         snippet.checkStatusTimeout = null;
@@ -663,54 +482,4 @@ class Notebook {
     });
     return currentQueries;
   }
-
-  updateHistory(statuses, interval) {
-    const self = this;
-    let items = self
-      .history()
-      .filter(item => statuses.indexOf(item.status()) !== -1)
-      .slice(0, 25);
-
-    const updateHistoryCall = item => {
-      apiHelper
-        .checkStatus({ notebookJson: komapping.toJSON({ id: item.uuid() }) })
-        .then(data => {
-          const status =
-            data.status === -3
-              ? 'expired'
-              : data.status === 0
-              ? data.query_status.status
-              : 'failed';
-          if (status && item.status() !== status) {
-            item.status(status);
-          }
-        })
-        .fail(() => {
-          items = [];
-          self.updateHistoryFailed = true;
-          console.warn('Lost connectivity to the Hue history refresh backend.');
-        })
-        .always(() => {
-          if (items.length > 0) {
-            window.setTimeout(() => {
-              updateHistoryCall(items.pop());
-            }, 1000);
-          } else if (!self.updateHistoryFailed) {
-            window.setTimeout(() => {
-              self.updateHistory(statuses, interval);
-            }, interval);
-          }
-        });
-    };
-
-    if (items.length > 0) {
-      updateHistoryCall(items.pop());
-    } else if (!self.updateHistoryFailed) {
-      window.setTimeout(() => {
-        self.updateHistory(statuses, interval);
-      }, interval);
-    }
-  }
 }
-
-export { Notebook, NOTEBOOK_MAPPING };

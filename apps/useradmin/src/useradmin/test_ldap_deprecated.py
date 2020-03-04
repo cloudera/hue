@@ -19,6 +19,8 @@
 from __future__ import absolute_import
 import ldap
 
+from django.conf import settings
+from django.urls import reverse
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false
@@ -26,19 +28,15 @@ from nose.tools import assert_true, assert_equal, assert_false
 import desktop.conf
 from desktop.lib.test_utils import grant_access
 from desktop.lib.django_test_util import make_logged_in_client
-from django.conf import settings
-from django.contrib.auth.models import User, Group
-from django.urls import reverse
-
-from useradmin.models import LdapGroup, UserProfile, get_profile
-
 from hadoop import pseudo_hdfs4
 from hadoop.pseudo_hdfs4 import is_live_cluster
+from useradmin.models import LdapGroup, UserProfile, get_profile, User, Group
 from useradmin.views import sync_ldap_users, sync_ldap_groups, import_ldap_users, import_ldap_groups, \
-                  add_ldap_users, add_ldap_groups, sync_ldap_users_groups
+    add_ldap_users, add_ldap_groups, sync_ldap_users_groups
 
 from useradmin import ldap_access
 from useradmin.tests import BaseUserAdminTests, LdapTestConnection, reset_all_groups, reset_all_users
+
 
 class TestUserAdminLdapDeprecated(BaseUserAdminTests):
   def test_useradmin_ldap_user_group_membership_sync(self):
@@ -479,9 +477,12 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
 
       # Test dn with spaces in username and dn (should fail)
       response = c.post(URL, dict(username_pattern='uid=user with space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True))
-      assert_true("Could not get LDAP details for users in pattern" in response.content, response)
+      assert_true(b"Could not get LDAP details for users in pattern" in response.content, response)
       response = c.get(reverse(desktop.views.log_view))
-      assert_true("{username}: Username must not contain whitespaces".format(username='user with space') in response.content, response.content)
+      whitespaces_message = "{username}: Username must not contain whitespaces".format(username='user with space')
+      if not isinstance(whitespaces_message, bytes):
+        whitespaces_message = whitespaces_message.encode('utf-8')
+      assert_true(whitespaces_message in response.content, response.content)
 
       # Test dn with spaces in dn, but not username (should succeed)
       response = c.post(URL, dict(username_pattern='uid=user without space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True))
@@ -586,7 +587,7 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
     c = make_logged_in_client('test', is_superuser=True)
 
     response = c.post(reverse(add_ldap_users), dict(username_pattern='moe', password1='test', password2='test'), follow=True)
-    assert_true('There was an error when communicating with LDAP' in response.content, response)
+    assert_true(b'There was an error when communicating with LDAP' in response.content, response)
 
 class TestUserAdminLdapDeprecatedWithHadoop(BaseUserAdminTests):
   requires_hadoop = True

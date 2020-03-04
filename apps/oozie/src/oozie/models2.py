@@ -18,12 +18,13 @@
 from __future__ import division
 from builtins import str
 from past.builtins import basestring
-from past.utils import old_div
 from builtins import object
 import json
 import logging
+import math
 import os
 import re
+import sys
 import time
 import uuid
 
@@ -34,7 +35,6 @@ from xml.sax.saxutils import escape
 
 from django.urls import reverse
 from django.db.models import Q
-from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
 from desktop.conf import USE_DEFAULT_CONFIGURATION
@@ -56,6 +56,11 @@ from notebook.models import Notebook
 from oozie.conf import REMOTE_SAMPLE_DIR
 from oozie.utils import utc_datetime_format, UTC_TIME_FORMAT, convert_to_server_timezone
 from oozie.importlib.workflows import generate_v2_graph_nodes, MalformedWfDefException, InvalidTagWithNamespaceException
+
+if sys.version_info[0] > 2:
+    from django.utils.encoding import force_text as force_unicode
+else:
+    from django.utils.encoding import force_unicode
 
 WORKFLOW_DEPTH_LIMIT = 24
 LOG = logging.getLogger(__name__)
@@ -691,14 +696,14 @@ def _create_workflow_layout(nodes, adj_list, nodes_uuid_set, size=12):
           "columns":[
              {
                 "id": str(uuid.uuid4()),
-                "size": (old_div(size, len(node[1]))),
+                "size": (math.floor(size / len(node[1]))),
                 "rows":
                    [{
                       "id": str(uuid.uuid4()),
                       "widgets": c['widgets'],
                       "columns":c.get('columns') or []
                     } for c in col],
-                "klass":"card card-home card-column span%s" % (old_div(size, len(node[1])))
+                "klass":"card card-home card-column span%s" % (math.floor(size / len(node[1])))
              }
              for col in [_create_workflow_layout(item, adj_list, nodes_uuid_set, size) for item in node[1]]
           ]
@@ -964,7 +969,7 @@ class Node(object):
 #             'archives': [],
 #             'capture_output': True
 #             #       <ok to="${ node_mapping[node['children'][0]['to']].name }"/>
-# 
+#
 #             #  Node(dict(AltusAction().get_fields()))
 #           }
 #         }
@@ -3122,7 +3127,7 @@ def import_workflow_from_hue_3_7(old_wf):
             "columns":[
                {
                   "id": str(uuid.uuid4()),
-                  "size": (old_div(size, len(node[1]))),
+                  "size": (math.floor(size / len(node[1]))),
                   "rows":
                      [{
                         "id": str(uuid.uuid4()),
@@ -3136,7 +3141,7 @@ def import_workflow_from_hue_3_7(old_wf):
                       }
                    ]
                   ,
-                  "klass":"card card-home card-column span%s" % (old_div(size, len(node[1])))
+                  "klass":"card card-home card-column span%s" % (math.floor(size / len(node[1])))
                }
                for col in _create_layout(node[1], size)
             ]
@@ -3514,12 +3519,12 @@ class Coordinator(Job):
     if self.data['properties']['document']:
       document = Document2.objects.get_by_uuid(user=self.document.owner, uuid=self.data['properties']['document'])
       wf_doc = WorkflowBuilder().create_workflow(document=document, user=self.document.owner, managed=True)
-      wf = Workflow(data=wf_doc.data,user=self.document.owner)
+      wf = Workflow(data=wf_doc.data, user=self.document.owner)
       wf_doc.delete()
       return wf
     else:
       wf_doc = Document2.objects.get_by_uuid(user=self.document.owner, uuid=self.data['properties']['workflow'])
-      return Workflow(document=wf_doc,user=self.document.owner)
+      return Workflow(document=wf_doc, user=self.document.owner)
 
   def get_absolute_url(self):
     return reverse('oozie:edit_coordinator') + '?coordinator=%s' % self.id
@@ -3660,7 +3665,7 @@ class Bundle(Job):
 
   @property
   def data(self):
-    if type(self._data['properties']['kickoff']) == str:
+    if type(self._data['properties']['kickoff']) == str and sys.version_info[2] == 2:
       self._data['properties']['kickoff'] = parse(self._data['properties']['kickoff'])
 
     if self.document is not None:

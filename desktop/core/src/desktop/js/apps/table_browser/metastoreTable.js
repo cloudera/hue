@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
@@ -352,7 +352,7 @@ class MetastoreTable {
         cluster: JSON.stringify(this.database.catalogEntry.compute)
       }).done(resp => {
         if (resp.history_uuid) {
-          huePubSub.publish('notebook.task.submitted', resp.history_uuid);
+          huePubSub.publish('notebook.task.submitted', resp);
         } else {
           $(document).trigger('error', resp.message);
         }

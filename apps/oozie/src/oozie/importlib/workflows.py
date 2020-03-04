@@ -498,7 +498,10 @@ def _prepare_nodes(workflow, root):
   - Deserialize
   - Automatically skip undefined nodes.
   """
-  objs = serializers.deserialize('xml', etree.tostring(root))
+  xml_str = etree.tostring(root)
+  if not isinstance(xml_str, str):
+    xml_str = xml_str.decode('utf-8')
+  objs = serializers.deserialize('xml', xml_str)
 
   # First pass is a list of nodes and their types respectively.
   # Must link up nodes with their respective full nodes.

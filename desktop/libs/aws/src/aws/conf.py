@@ -19,11 +19,14 @@ import logging
 import os
 import re
 
+
+import requests
 from django.utils.translation import ugettext_lazy as _, ugettext as _t
 
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool, coerce_password_from_script
 from desktop.lib.idbroker import conf as conf_idbroker
 from hadoop.core_site import get_s3a_access_key, get_s3a_secret_key, get_s3a_session_token
+
 
 LOG = logging.getLogger(__name__)
 
@@ -34,28 +37,41 @@ HYPHEN_ENDPOINT_RE = 's3-(?P<region>[a-z0-9-]+).amazonaws.com'
 DUALSTACK_ENDPOINT_RE = 's3.dualstack.(?P<region>[a-z0-9-]+).amazonaws.com'
 AWS_ACCOUNT_REGION_DEFAULT = 'us-east-1' # Location.USEast
 PERMISSION_ACTION_S3 = "s3_access"
+REGION_CACHED = None
+IS_IAM_CACHED = None
+IS_EC2_CACHED = None
 
+def clear_cache():
+  global REGION_CACHED, IS_IAM_CACHED, IS_EC2_CACHED
+  REGION_CACHED = None
+  IS_IAM_CACHED = None
+  IS_EC2_CACHED = None
 
 def get_locations():
   return ('EU',  # Ireland
-    'eu-central-1',  # Frankfurt
-    'eu-west-1',
-    'eu-west-2',
-    'eu-west-3',
-    'ca-central-1',
-    'us-east-1',
-    'us-east-2',
-    'us-west-1',
-    'us-west-2',
-    'sa-east-1',
+    'ap-east-1',
     'ap-northeast-1',
     'ap-northeast-2',
     'ap-northeast-3',
     'ap-southeast-1',
     'ap-southeast-2',
     'ap-south-1',
+    'ca-central-1',
     'cn-north-1',
-    'cn-northwest-1')
+    'cn-northwest-1',
+    'eu-central-1',  # Frankfurt
+    'eu-north-1',
+    'eu-west-1',
+    'eu-west-2',
+    'eu-west-3',
+    'me-south-1',
+    'sa-east-1',
+    'us-east-1',
+    'us-east-2',
+    'us-gov-east-1',
+    'us-gov-west-1',
+    'us-west-1',
+    'us-west-2')
 
 
 def get_default_access_key_id():
@@ -82,27 +98,50 @@ def get_default_session_token():
 
 
 def get_default_region():
+  return get_region(conf=AWS_ACCOUNTS['default']) if 'default' in AWS_ACCOUNTS else get_region()
+
+
+def get_region(conf=None):
+  global REGION_CACHED
+
+  if REGION_CACHED is not None:
+    return REGION_CACHED
   region = ''
 
-  if 'default' in AWS_ACCOUNTS:
+  if conf:
     # First check the host/endpoint configuration
-    if AWS_ACCOUNTS['default'].HOST.get():
-      endpoint = AWS_ACCOUNTS['default'].HOST.get()
+    if conf.HOST.get():
+      endpoint = conf.HOST.get()
       if re.search(SUBDOMAIN_ENDPOINT_RE, endpoint, re.IGNORECASE):
         region = re.search(SUBDOMAIN_ENDPOINT_RE, endpoint, re.IGNORECASE).group('region')
       elif re.search(HYPHEN_ENDPOINT_RE, endpoint, re.IGNORECASE):
         region = re.search(HYPHEN_ENDPOINT_RE, endpoint, re.IGNORECASE).group('region')
       elif re.search(DUALSTACK_ENDPOINT_RE, endpoint, re.IGNORECASE):
         region = re.search(DUALSTACK_ENDPOINT_RE, endpoint, re.IGNORECASE).group('region')
-    elif AWS_ACCOUNTS['default'].REGION.get():
-      region = AWS_ACCOUNTS['default'].REGION.get()
+    elif conf.REGION.get():
+      region = conf.REGION.get()
 
-    # If the parsed out region is not in the list of supported regions, fallback to the default
-    if region not in get_locations():
-      LOG.warn("Region, %s, not found in the list of supported regions: %s" % (region, ', '.join(get_locations())))
-      region = ''
+  if not region and is_ec2_instance():
+    try:
+      import boto.utils
+      data = boto.utils.get_instance_identity(timeout=1, num_retries=1)
+      if data:
+        region = data['document']['region']
+    except Exception as e:
+      LOG.exception("Encountered error when fetching instance identity: %s" % e)
+
+  if not region:
+    region = AWS_ACCOUNT_REGION_DEFAULT
+
+  # If the parsed out region is not in the list of supported regions, fallback to the default
+  if region not in get_locations():
+    LOG.warn("Region, %s, not found in the list of supported regions: %s" % (region, ', '.join(get_locations())))
+    region = ''
+
+  REGION_CACHED = region
 
   return region
+
 
 def get_key_expiry():
   if 'default' in AWS_ACCOUNTS:
@@ -110,6 +149,13 @@ def get_key_expiry():
   else:
     return 86400
 
+
+HAS_IAM_DETECTION=Config(
+  help=_('Enable the detection of an IAM role providing the credentials automatically. It can take a few seconds.'),
+  key='has_iam_detection',
+  default=False,
+  type=coerce_bool
+)
 
 AWS_ACCOUNTS = UnspecifiedConfigSection(
   'aws_accounts',
@@ -155,7 +201,7 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
       ),
       REGION=Config(
         key='region',
-        default=AWS_ACCOUNT_REGION_DEFAULT,
+        default=None,
         type=str
       ),
       HOST=Config(
@@ -203,27 +249,68 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
         key='key_expiry',
         default=14400,
         type=int
-      )
+      ),
     )
   )
 )
 
 
 def is_enabled():
-  return ('default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()) or has_iam_metadata() or conf_idbroker.is_idbroker_enabled('s3a')
+  return ('default' in list(AWS_ACCOUNTS.keys()) and AWS_ACCOUNTS['default'].get_raw() and AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()) or \
+      has_iam_metadata()
+
+
+def is_ec2_instance():
+  # To avoid unnecessary network call, check if Hue is running on EC2 instance.
+  # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/identify_ec2_instances.html
+  # /sys/hypervisor/uuid doesn't work on m5/c5, but /sys/devices/virtual/dmi/id/product_uuid does
+  global IS_EC2_CACHED
+
+  # Detection can be slow and so is disabled by default.
+  if not HAS_IAM_DETECTION.get():
+    IS_EC2_CACHED = False
+
+  if IS_EC2_CACHED is not None:
+    return IS_EC2_CACHED
+
+  try:
+    # Low chance of false positive
+    IS_EC2_CACHED = (os.path.exists('/sys/hypervisor/uuid') and open('/sys/hypervisor/uuid', 'r').read()[:3].lower() == 'ec2') or \
+      (
+        os.path.exists('/sys/devices/virtual/dmi/id/product_uuid') and \
+        open('/sys/devices/virtual/dmi/id/product_uuid', 'r').read()[:3].lower() == 'ec2'
+      )
+  except Exception as e:
+    LOG.info("Detecting if Hue on an EC2 host, error might be expected: %s" % e)
+
+  if IS_EC2_CACHED is None:
+    try:
+      resp = requests.get('http://169.254.169.254/latest/dynamic/instance-identity/')  # Definitive way to check
+      IS_EC2_CACHED = resp.status_code == 200
+    except Exception as e:
+      IS_EC2_CACHED = False
+      LOG.info("Detecting if Hue on an EC2 host, error might be expected: %s" % e)
+
+  return IS_EC2_CACHED
 
 
 def has_iam_metadata():
+  global IS_IAM_CACHED
+
   try:
-    import boto.utils
-    # To avoid unnecessary network call, check if Hue is running on EC2 instance
-    # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/identify_ec2_instances.html
-    if os.path.exists('/sys/hypervisor/uuid') and open('/sys/hypervisor/uuid', 'read').read()[:3] == 'ec2':
+    if IS_IAM_CACHED is not None:
+      return IS_IAM_CACHED
+
+    if is_ec2_instance():
+      import boto.utils
       metadata = boto.utils.get_instance_metadata(timeout=1, num_retries=1)
-      return 'iam' in metadata
-  except Exception as e:
-    LOG.exception("Encountered error when checking IAM metadata: %s" % e)
-  return False
+      IS_IAM_CACHED = 'iam' in metadata
+    else:
+      IS_IAM_CACHED = False
+  except:
+    IS_IAM_CACHED = False
+    LOG.exception("Encountered error when checking IAM metadata")
+  return IS_IAM_CACHED
 
 
 def has_s3_access(user):
@@ -233,10 +320,11 @@ def has_s3_access(user):
 
 def config_validator(user):
   res = []
-  from aws.client import get_client # Circular dependecy
+  import desktop.lib.fsmanager # Circular dependecy
+
   if is_enabled():
     try:
-      conn = get_client('default')._s3_connection
+      conn = desktop.lib.fsmanager.get_client(name='default', fs='s3a')._s3_connection
       conn.get_canonical_user_id()
     except Exception as e:
       LOG.exception('AWS failed configuration check.')

@@ -15,12 +15,16 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import HueFileEntry from '../../doc/hueFileEntry';
+
+export const HIDE_EVENT = 'hide.import.documents.modal';
+export const SHOW_EVENT = 'show.import.documents.modal';
+export const SHOWN_EVENT = 'import.documents.modal.shown';
 
 const TEMPLATE = `
 <div class="modal-header">
@@ -160,15 +164,22 @@ class ImportDocumentsModal {
 }
 
 componentUtils.registerComponent('import-documents-modal', undefined, TEMPLATE).then(() => {
-  huePubSub.subscribe('show.import.documents.modal', params => {
-    huePubSub.publish('hide.import.documents.modal');
+  huePubSub.subscribe(SHOW_EVENT, params => {
+    huePubSub.publish(HIDE_EVENT);
 
     const $importDocumentsModal = $(
-      '<div id="importDocumentsModal" data-bind="component: { name: \'import-documents-modal\', params: $data }" data-keyboard="true" class="modal hide fade fileupload-modal" tabindex="-1"/>'
+      '<div id="importDocumentsModal" data-bind="descendantsComplete: descendantsComplete, component: { name: \'import-documents-modal\', params: params }" data-keyboard="true" class="modal hide fade fileupload-modal" tabindex="-1"/>'
     );
     $('body').append($importDocumentsModal);
 
-    ko.applyBindings(new ImportDocumentsModal(params), $importDocumentsModal[0]);
+    const data = {
+      params: new ImportDocumentsModal(params),
+      descendantsComplete: () => {
+        huePubSub.publish(SHOWN_EVENT);
+      }
+    };
+
+    ko.applyBindings(data, $importDocumentsModal[0]);
     $importDocumentsModal.modal('show');
   });
 

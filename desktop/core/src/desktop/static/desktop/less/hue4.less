@@ -32,6 +32,7 @@
 
 .main-page {
   .flex(1 1 auto);
+
   position: relative;
   .display-flex;
   .flex-direction(column);
@@ -78,7 +79,7 @@
 
 .top-nav-left {
   padding-top: 3px;
-  .flex(0 0 340px);
+  .flex(0 0 275px);
 }
 
 .top-nav-middle {
@@ -89,7 +90,7 @@
 }
 
 .top-nav-right {
-  .flex(0 0 340px);
+  .flex(0 0 275px);
 }
 
 .top-nav-left .btn-group {
@@ -287,7 +288,7 @@
   position: relative;
   margin-left: auto;
   margin-right: auto;
-  max-width: 700px;
+  max-width: 1000px;
 }
 
 .search-container-top-old,
@@ -457,11 +458,10 @@
   background-color: @cui-gray-050;
 
   .navbar-inner {
-    background-color: transparent !important;
+    background: none;
     margin: 0 !important;
     padding-top: 0;
     padding-bottom: 0;
-    background: none;
     min-height: 49px;
   }
 }

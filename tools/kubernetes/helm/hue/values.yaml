@@ -3,7 +3,7 @@ image:
    tag: "latest"
    pullPolicy: "IfNotPresent"
 hue:
-  replicas: 1
+  replicas: 2
   database:
     create: true
     persist: true
@@ -13,6 +13,7 @@ hue:
     user: "hue"
     password: "hue"
     name: "hue"
+    storageName: "microk8s-hostpath"
   interpreters: |
     [[[postgresql]]]
       name = postgresql
@@ -20,6 +21,7 @@ hue:
       options='{"url": "postgresql://hue:hue@postgres-hue:5432/hue"}'
   ini: |
     [desktop]
+    secret_key=hue123
     app_blacklist=filebrowser,search,hbase,security,jobbrowser,oozie
     django_debug_mode=false
     gunicorn_work_class=gevent
@@ -37,20 +39,27 @@ workers:
   replicas: 1
 scheduler:
   enabled: false
+websocket:
+  enabled: false
+  replicas: 1
+monitoring:
+  enabled: true
+tracing:
+  enabled: true
 cron:
   enabled: false
   emailStats: "0 13 * * WED,SUN"
-aws:
-  accessKeyId: ""
-  secretAccessKey: ""
-  region: "us-east-1"
 ingress:
   create: false
+  hasAuth: false
   type: "nginx"
   # type: "nginx-ssl"
+  # type: "nginx-ssl-staging"
   # type: "traefik"
   domain: "demo.gethue.com"
   email: "team@gethue.com"
   loadBalancerIp: "127.0.0.1"
-monitoring:
-  enabled: true
+aws:
+  accessKeyId: ""
+  secretAccessKey: ""
+  region: "us-east-1"

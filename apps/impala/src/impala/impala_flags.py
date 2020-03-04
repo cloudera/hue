@@ -24,10 +24,13 @@ LOG = logging.getLogger(__name__)
 _IMPALA_FLAGS = None
 
 _WEBSERVER_CERTIFICATE_FILE = '-webserver_certificate_file'
+_WEBSERVER_REQUIRE_SPNEGO = '-webserver_require_spnego'
 _SSL_SERVER_CERTIFICATE = '-ssl_server_certificate'
 _MAX_RESULT_CACHE_SIZE = '-max_result_cache_size'
 _AUTHORIZED_PROXY_USER_CONFIG = '-authorized_proxy_user_config'
 _PRINCIPAL = '-principal'
+_DEFAULT_QUERY_OPTIONS = '-default_query_options'
+_DEFAULT_TRANSACTIONAL_TYPE = 'default_transactional_type'
 
 
 def reset():
@@ -76,8 +79,28 @@ def is_impersonation_enabled():
   user_config = get_conf().get(_AUTHORIZED_PROXY_USER_CONFIG)
   return True if user_config and 'hue=' in user_config else False
 
+def default_query_option(option_name):
+  query_options = get_conf().get(_DEFAULT_QUERY_OPTIONS)
+  if not query_options:
+    return query_options
+  options = dict([option.split('=') for option in query_options.split(',')])
+  return options.get(option_name)
+
+def default_transactional_type():
+  return default_query_option(_DEFAULT_TRANSACTIONAL_TYPE)
+
+def is_transactional():
+  return default_transactional_type() is not None
+
 def is_kerberos_enabled():
   return get_conf().get(_PRINCIPAL) is not None
+
+def is_webserver_spnego_enabled():
+  """
+    Returns True if Enable Kerberos Authentication for HTTP Web-Consoles for Impala service is turned on (default: true)
+    -webserver_require_spnego=true  in impalad_flags
+   """
+  return get_conf().get(_WEBSERVER_REQUIRE_SPNEGO)
 
 def _parse_impala_flags():
   from impala import conf # Cyclic dependency
@@ -91,5 +114,5 @@ def _parse_impala_flags():
       LOG.error('Cannot read from "%s": %s' % (impala_flags_path, err))
     _IMPALA_FLAGS = {}
   except Exception as ex:
-    LOG.error('Failed to parse Impala config from "%s": %s' % (impala_flags_path, ex))
+    LOG.error('Failed to parse Impala flag file %s' % ex)
     _IMPALA_FLAGS = {}

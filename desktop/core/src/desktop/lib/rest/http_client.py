@@ -26,12 +26,12 @@ import sys
 from django.utils.encoding import iri_to_uri, smart_str
 from django.utils.http import urlencode
 
-from desktop import conf
-
 from requests import exceptions
 from requests.auth import AuthBase ,HTTPBasicAuth, HTTPDigestAuth
 from requests_kerberos import HTTPKerberosAuth, REQUIRED, OPTIONAL, DISABLED
 from urllib3.contrib import pyopenssl
+
+from desktop import conf
 
 if sys.version_info[0] > 2:
   import urllib.request, urllib.error
@@ -39,6 +39,7 @@ if sys.version_info[0] > 2:
 else:
   from urllib import quote as urllib_quote
   from urlparse import urlparse as lib_urlparse
+
 
 pyopenssl.DEFAULT_SSL_CIPHER_LIST = conf.SSL_CIPHER_LIST.get()
 
@@ -123,17 +124,17 @@ class HttpClient(object):
     short_url = '%(scheme)s://%(netloc)s' % {'scheme': parsed_uri.scheme, 'netloc': parsed_uri.netloc}
     return short_url
 
-  def set_kerberos_auth(self):
+  def set_kerberos_auth(self, service="HTTP"):
     """Set up kerberos auth for the client, based on the current ticket."""
     mutual_auth = conf.KERBEROS.MUTUAL_AUTHENTICATION.get().upper()
     if mutual_auth == 'OPTIONAL':
-      self._session.auth = HTTPKerberosAuth(mutual_authentication=OPTIONAL)
+      self._session.auth = HTTPKerberosAuth(mutual_authentication=OPTIONAL, service=service)
     elif mutual_auth == 'REQUIRED':
-      self._session.auth = HTTPKerberosAuth(mutual_authentication=REQUIRED)
+      self._session.auth = HTTPKerberosAuth(mutual_authentication=REQUIRED, service=service)
     elif mutual_auth == 'DISABLED':
-      self._session.auth = HTTPKerberosAuth(mutual_authentication=DISABLED)
+      self._session.auth = HTTPKerberosAuth(mutual_authentication=DISABLED, service=service)
     else:
-      self._session.auth = HTTPKerberosAuth(mutual_authentication=OPTIONAL)
+      self._session.auth = HTTPKerberosAuth(mutual_authentication=OPTIONAL, service=service)
     return self
 
   def set_basic_auth(self, username, password):

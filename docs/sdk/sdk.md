@@ -650,7 +650,15 @@ and possibly fix any issues it might report.
 
 After changing the CSS in a .less file, rebuilding with:
 
-    make css
+    npm run less
+    
+Or run in watch mode that will generate the .css on any change to the .less files:
+
+    npm run less-dev
+
+After less changes make sure linting is run with:
+
+    npm run less-lint
 
 ### SQL Autocomplete
 
@@ -949,7 +957,7 @@ namespace. See ``apps/about/src/about/urls.py`` for an example.
 
 ### Dependencies
 
-* The OS specific dependencies listed [here](http://cloudera.github.io/hue/latest/admin-manual/manual.html)
+* The OS specific dependencies listed [here](https://docs.gethue.com/admin-manual/manual.html)
 * Python 2.7
 * Django (1.11 included with our distribution)
 * Hadoop (Apache Hadoop 2+)
@@ -1180,7 +1188,7 @@ Or just some parts of the tests, e.g.:
     build/env/bin/hue test specific impala.tests:TestMockedImpala
     build/env/bin/hue test specific impala.tests:TestMockedImpala.test_basic_flow
 
-Jasmine tests:
+Jest tests:
 
     npm run test
 
@@ -1231,23 +1239,85 @@ Point to an Impalad and trigger the Impala tests:
     build/env/bin/hue test impala impalad-01.gethue.com
 
 
-### Create and run the Jasmine tests
+### Create and run the Jest tests
 
-Add them in a "spec" subfolder relative to the file under test and the filename of the test has to end with "Spec.js".
+Add them next to the file under test and the filename of the test has to end with ".test.js".
 
-    someFile.js              <- File under test
-    ├── spec/
-    │   ├── someFileSpec.js  <- File containing tests
+    someFile.js         <- File under test
+    someFile.test.js    <- File containing tests
 
 Run all the tests once with:
 
     npm run test
 
-Optionally to use Karma and headless chrome for the tests you can run
+To run the tests in watch mode:
 
-    npm run test-karma
+    npm run test-dev
 
-See ```desktop/core/src/desktop/js/spec/karma.config.js``` for various options
+While in watch mode Jest will detect changes to files and re-run related tests. There are
+also options to target specific files or tests. Press 'w' in the console to see the options.
+
+#### Testing KO components and bindings
+
+koSetup provides utilities to test knockout components and bindings using jsdom from jest.
+
+An example of component test:
+
+```
+import { koSetup } from 'jest/koTestUtils';
+
+import 'ko/someComponent';
+
+describe('ko.someComponent.js', () => {
+  const setup = koSetup(); // Adds the necessary setup and teardown
+
+  it('should render component', async () => {
+    const someParams = {}
+
+    const element = await setup.renderComponent('someComponent', someParams);
+
+    expect(element.innerHTML).toMatchSnapshot();
+  });
+
+  it('should change after observable update', async () => {
+    const someParams = { visible: ko.observable(false) };
+    const wrapper = await setup.renderComponent('someComponent', someParams);
+    expect(wrapper.querySelector('[data-test="some-test-id"]').style['display']).toEqual('none');
+
+    someParams.visible(true); // Or trigger some event on an elmement etc.
+    await setup.waitForKoUpdate(); // Waits for re-render
+
+    expect(wrapper.querySelector('[data-test="some-test-id"]').style['display']).toEqual('inline-block');
+  });
+});
+```
+
+An example of a binding test:
+
+```
+import ko from 'knockout';
+import { koSetup } from 'jest/koTestUtils';
+import './ko.myBinding';
+
+describe('ko.myBinding.js', () => {
+  const setup = koSetup();
+
+  it('should toggle observable', async () => {
+    const viewModel = { testObservable: ko.observable(false) };
+    const wrapper = await setup.renderKo(
+      '<div class="click-test" data-bind="myBinding: testObservable"></div>',
+      viewModel
+    );
+
+    expect(viewModel.testObservable()).toBeFalsy();
+
+    wrapper.querySelector('.click-test').click();
+    await setup.waitForKoUpdate();
+
+    expect(viewModel.testObservable()).toBeTruthy();
+  });
+});
+```
 
 
 ### Special environment variables

@@ -15,10 +15,12 @@
 ## limitations under the License.
 <%!
 from django.utils.translation import ugettext as _
-from useradmin.models import group_permissions
-from desktop.auth.backend import is_admin
 
+from desktop.auth.backend import is_admin
+from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.views import commonheader, commonfooter, antixss
+
+from useradmin.models import group_permissions
 %>
 
 
@@ -26,14 +28,19 @@ from desktop.views import commonheader, commonfooter, antixss
 <%namespace name="layout" file="layout.mako" />
 
 %if not is_embeddable:
-${ commonheader(_('Hue Groups'), "useradmin", user, request) | n,unicode }
+${ commonheader(_('Groups'), "useradmin", user, request) | n,unicode }
 %endif
 
 ${layout.menubar(section='groups')}
 
 <div id="groupsComponents" class="useradmin container-fluid">
   <div class="card card-small">
-    <h1 class="card-heading simple">${_('Hue Groups')}</h1>
+    <h1 class="card-heading simple">
+      ${_('Groups')}
+      % if ENABLE_ORGANIZATIONS.get():
+        @ ${ user.organization }
+      % endif
+    </h1>
 
     <%actionbar:render>
       <%def name="search()">
@@ -64,9 +71,9 @@ ${layout.menubar(section='groups')}
       <thead>
       <tr>
         %if is_admin(user):
-            <th width="1%">
-              <div class="select-all hue-checkbox fa"></div>
-            </th>
+          <th width="1%">
+            <div class="select-all hue-checkbox fa"></div>
+          </th>
         %endif
         <th>${_('Group Name')}</th>
         <th>${_('Members')}</th>
@@ -74,27 +81,27 @@ ${layout.menubar(section='groups')}
       </tr>
       </thead>
       <tbody>
-          % for group in groups:
+        % for group in groups:
           <tr class="tableRow"
               data-search="${group.name}${', '.join([group_user.username for group_user in group.user_set.all()])}">
-          %if is_admin(user):
+          % if is_admin(user):
             <td data-row-selector-exclude="true">
               <div class="hue-checkbox groupCheck fa" data-name="${group.name}" data-row-selector-exclude="true"></div>
             </td>
-          %endif
+          % endif
           <td>
-            %if is_admin(user):
+            % if is_admin(user):
               <strong><a title="${ _('Edit %(groupname)s') % dict(groupname=group.name) }"
-                         href="${ url('useradmin.views.edit_group', name=group.name) }"
-                         data-row-selector="true">${group.name}</a></strong>
-            %else:
+                        href="${ url('useradmin.views.edit_group', name=group.name) }"
+                        data-row-selector="true">${group.name}</a></strong>
+            % else:
               <strong>${group.name}</strong>
-            %endif
+            % endif
           </td>
-            <td>${', '.join([group_user.username for group_user in group.user_set.all()])}</td>
-            <td>${', '.join([perm.app + "." + perm.action for perm in group_permissions(group)])}</td>
-          </tr>
-          % endfor
+          <td>${', '.join([group_user.username for group_user in group.user_set.all()])}</td>
+          <td>${', '.join([perm.app + "." + perm.action for perm in group_permissions(group)])}</td>
+        </tr>
+        % endfor
       </tbody>
       <tfoot class="hide">
       <tr>

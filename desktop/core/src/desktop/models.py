@@ -30,39 +30,39 @@ import uuid
 from collections import OrderedDict
 from itertools import chain
 
-from django.contrib.auth import models as auth_models
+from django.db import connection, models, transaction
+from django.db.models import Q
+from django.db.models.query import QuerySet
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse, NoReverseMatch
-from django.db import connection, models, transaction
-from django.db.models import Q
-from django.db.models.query import QuerySet
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
-
-from desktop.settings import HUE_DESKTOP_VERSION
 
 from dashboard.conf import get_engines, HAS_REPORT_ENABLED
 from kafka.conf import has_kafka
-from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
+from notebook.conf import DEFAULT_LIMIT, SHOW_NOTEBOOKS, get_ordered_interpreters
+from useradmin.models import User, Group, get_organization
+from useradmin.organization import _fitered_queryset
 
 from desktop import appmanager
 from desktop.auth.backend import is_admin
-from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_K8S_ONLY
+from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_K8S_ONLY, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS,\
+    has_connectors, TASK_SERVER, ENABLE_GIST, APP_BLACKLIST
 from desktop.lib import fsmanager
+from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paths import get_run_root, SAFE_CHARACTERS_URI_COMPONENTS
 from desktop.redaction import global_redaction_engine
-from desktop.settings import DOCUMENT2_SEARCH_MAX_LENGTH
-from desktop.auth.backend import is_admin
+from desktop.settings import DOCUMENT2_SEARCH_MAX_LENGTH, HUE_DESKTOP_VERSION
 
 if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
   from urllib.parse import quote as urllib_quote
 else:
   from urllib import quote as urllib_quote
+
 
 LOG = logging.getLogger(__name__)
 
@@ -94,6 +94,16 @@ def hue_version():
 def _version_from_properties(f):
   return dict(line.strip().split('=') for line in f.readlines() if len(line.strip().split('=')) == 2).get('cloudera.cdh.release')
 
+def get_sample_user_install(user):
+  if ENABLE_ORGANIZATIONS.get():
+    organization = get_organization(email=user.email)
+    if organization.is_multi_user:
+      return SAMPLE_USER_INSTALL + '@' + organization.domain
+    else:
+      return organization.domain
+  else:
+    return SAMPLE_USER_INSTALL
+
 
 ###################################################################################################
 # Custom Settings
@@ -101,24 +111,24 @@ def _version_from_properties(f):
 
 PREFERENCE_IS_WELCOME_TOUR_SEEN = 'is_welcome_tour_seen'
 
-class HueUser(auth_models.User):
-  class Meta(object):
-    proxy = True
 
-  def __init__(self, *args, **kwargs):
-    self._meta.get_field(
-      'username'
-    ).validators[0] = UnicodeUsernameValidator()
-    super(auth_models.User, self).__init__(*args, **kwargs)
+if not ENABLE_ORGANIZATIONS.get():
+  class HueUser(User):
+    class Meta(object):
+      proxy = True
+
+    def __init__(self, *args, **kwargs):
+      self._meta.get_field(
+        'username'
+      ).validators[0] = UnicodeUsernameValidator()
+      super(User, self).__init__(*args, **kwargs)
 
 
 class UserPreferences(models.Model):
   """Holds arbitrary key/value strings."""
-  user = models.ForeignKey(auth_models.User)
+  user = models.ForeignKey(User)
   key = models.CharField(max_length=20)
   value = models.TextField(max_length=4096)
-
-
 
 
 class Settings(models.Model):
@@ -165,8 +175,8 @@ class DefaultConfiguration(models.Model):
   properties = models.TextField(default='[]', help_text=_t('JSON-formatted default properties values.'))
 
   is_default = models.BooleanField(default=False, db_index=True)
-  groups = models.ManyToManyField(auth_models.Group, db_index=True, db_table='defaultconfiguration_groups')
-  user = models.ForeignKey(auth_models.User, blank=True, null=True, db_index=True)
+  groups = models.ManyToManyField(Group, db_index=True, db_table='defaultconfiguration_groups')
+  user = models.ForeignKey(User, blank=True, null=True, db_index=True)
 
   objects = DefaultConfigurationManager()
 
@@ -290,7 +300,7 @@ class DocumentTag(models.Model):
   """
   Reserved tags can't be manually removed by the user.
   """
-  owner = models.ForeignKey(auth_models.User, db_index=True)
+  owner = models.ForeignKey(User, db_index=True)
   tag = models.SlugField()
 
   DEFAULT = 'default' # Always there
@@ -618,7 +628,7 @@ class DocumentManager(models.Manager):
 
 class Document(models.Model):
 
-  owner = models.ForeignKey(auth_models.User, db_index=True, verbose_name=_t('Owner'), help_text=_t('User who can own the job.'), related_name='doc_owner')
+  owner = models.ForeignKey(User, db_index=True, verbose_name=_t('Owner'), help_text=_t('User who can own the job.'), related_name='doc_owner')
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
 
@@ -781,12 +791,12 @@ class Document(models.Model):
     for name, perm in perms_dict.items():
       users = groups = None
       if perm.get('user_ids'):
-        users = auth_models.User.objects.in_bulk(perm.get('user_ids'))
+        users = User.objects.in_bulk(perm.get('user_ids'))
       else:
         users = []
 
       if perm.get('group_ids'):
-        groups = auth_models.Group.objects.in_bulk(perm.get('group_ids'))
+        groups = Group.objects.in_bulk(perm.get('group_ids'))
       else:
         groups = []
 
@@ -883,8 +893,8 @@ class DocumentPermission(models.Model):
 
   doc = models.ForeignKey(Document)
 
-  users = models.ManyToManyField(auth_models.User, db_index=True, db_table='documentpermission_users')
-  groups = models.ManyToManyField(auth_models.Group, db_index=True, db_table='documentpermission_groups')
+  users = models.ManyToManyField(User, db_index=True, db_table='documentpermission_users')
+  groups = models.ManyToManyField(Group, db_index=True, db_table='documentpermission_groups')
   perms = models.CharField(default=READ_PERM, max_length=10, choices=( # one perm
     (READ_PERM, 'read'),
     (WRITE_PERM, 'write'),
@@ -905,25 +915,29 @@ class FilesystemException(Exception):
 
 class Document2QueryMixin(object):
 
-  def documents(self, user, perms='both', include_history=False, include_trashed=False, include_managed=False):
+  def documents(self, user, perms='both', include_history=False, include_trashed=False, include_managed=False, include_shared_links=False):
     """
     Returns all documents that are owned or shared with the user.
     :param perms: both, shared, owned. Defaults to both.
     :param include_history: boolean flag to return history documents. Defaults to False.
     :param include_trashed: boolean flag to return trashed documents. Defaults to True.
+    :param include_managed: boolean flag to return documents generated by Hue. Defaults to False.
+    :param include_shared_links: boolean flag to include documents shared by links. Defaults to False.
     """
     if perms == 'both':
       docs = self.filter(
         Q(owner=user) |
         Q(document2permission__users=user) |
-        Q(document2permission__groups__in=user.groups.all())
+        Q(document2permission__groups__in=user.groups.all()) |
+        (Q(document2permission__is_link_on=include_shared_links) & Q(document2permission__is_link_on=True))
       )
     elif perms == 'shared':
       docs = self.filter(
         Q(document2permission__users=user) |
-        Q(document2permission__groups__in=user.groups.all())
+        Q(document2permission__groups__in=user.groups.all()) |
+        (Q(document2permission__is_link_on=include_shared_links) & Q(document2permission__is_link_on=True))
       )
-    else:  # only return documents owned by the user
+    else:  # Only return documents owned by the user
       docs = self.filter(owner=user)
 
     if not include_history:
@@ -966,19 +980,24 @@ class Document2QuerySet(QuerySet, Document2QueryMixin):
 class Document2Manager(models.Manager, Document2QueryMixin):
 
   def get_queryset(self):
-    return Document2QuerySet(self.model, using=self._db)
+    """Make sure to restrict to only organization's documents"""
+
+    return _fitered_queryset(
+      Document2QuerySet(self.model, using=self._db),
+      by_owner=True
+    )
 
   # TODO prevent get() in favor of this
   def document(self, user, doc_id):
-    return self.documents(user, include_trashed=True, include_history=True).get(id=doc_id)
+    return self.documents(user, include_trashed=True, include_history=True, include_shared_links=True).get(id=doc_id)
 
   def get_by_natural_key(self, uuid, version, is_history):
     return self.get(uuid=uuid, version=version, is_history=is_history)
 
   def get_by_uuid(self, user, uuid, perm_type='read'):
     """
-    Since UUID is not a unique field, but part of a composite unique key, this returns the latest version by UUID
-    This should always be used in place of Document2.objects.get(uuid=) when a single document is expected
+    Since UUID is not a unique field, but part of a composite unique key, this returns the latest version by UUID.
+    This should always be used in place of Document2.objects.get(uuid=) when a single document is expected.
 
     :param user: User to check permissions against
     :param uuid
@@ -1019,6 +1038,13 @@ class Document2Manager(models.Manager, Document2QueryMixin):
         dir.delete()
 
       return parent_home_dir
+
+  def get_gist_directory(self, user):
+    home_dir = self.get_home_directory(user)
+    gist_dir, created = Directory.objects.get_or_create(name=Document2.GIST_DIR, owner=user, parent_directory=home_dir)
+    if created:
+      LOG.info('Successfully created gist directory for user: %s' % user.username)
+    return gist_dir
 
   def get_by_path(self, user, path):
     """
@@ -1074,10 +1100,11 @@ class Document2Manager(models.Manager, Document2QueryMixin):
 class Document2(models.Model):
 
   HOME_DIR = ''
+  GIST_DIR = 'Gist'
   TRASH_DIR = '.Trash'
   EXAMPLES_DIR = 'examples'
 
-  owner = models.ForeignKey(auth_models.User, db_index=True, verbose_name=_t('Owner'), help_text=_t('Creator.'), related_name='doc2_owner')
+  owner = models.ForeignKey(User, db_index=True, verbose_name=_t('Owner'), help_text=_t('Creator.'), related_name='doc2_owner')
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
   uuid = models.CharField(default=uuid_default, max_length=36, db_index=True)
@@ -1173,6 +1200,8 @@ class Document2(models.Model):
         url = '/editor' + '?editor=' + str(self.id)
       elif self.type == 'directory':
         url = '/home2' + '?uuid=' + self.uuid
+      elif self.type == 'gist':
+        url = '/hue/gist?uuid=' + str(self.uuid)
       elif self.type == 'notebook':
         url = reverse('notebook:notebook') + '?notebook=' + str(self.id)
       elif self.type == 'search-dashboard':
@@ -1319,9 +1348,11 @@ class Document2(models.Model):
     return children_ids
 
   def can_read(self, user):
-    perm = self.get_permission('read')
-    has_read_permissions = perm.user_has_access(user) if perm else False
-    return is_admin(user) or self.owner == user or self.can_write(user) or has_read_permissions
+    return \
+        self.owner == user \
+        or is_admin(user) \
+        or any([perm.user_has_access(user) for perm in self.get_permissions('read')]) \
+        or self.can_write(user)
 
   def can_read_or_exception(self, user):
     if self.can_read(user):
@@ -1330,9 +1361,11 @@ class Document2(models.Model):
       raise PopupException(_("Document does not exist or you don't have the permission to access it."), error_code=401)
 
   def can_write(self, user):
-    perm = self.get_permission('write')
-    has_write_permissions = perm.user_has_access(user) if perm else False
-    return is_admin(user) or self.owner == user or has_write_permissions or (self.parent_directory and self.parent_directory.can_write(user))
+    return \
+        self.owner == user \
+        or is_admin(user) \
+        or any([perm.user_has_access(user) for perm in self.get_permissions('write')]) \
+        or (self.parent_directory and self.parent_directory.can_write(user))
 
   def can_write_or_exception(self, user):
     if self.can_write(user):
@@ -1346,23 +1379,47 @@ class Document2(models.Model):
     except Document2Permission.DoesNotExist:
       return None
 
-  def share(self, user, name='read', users=None, groups=None):
+  def get_permissions(self, perm='read'):
+    '''
+    Return the sub permissions that make one of the two top privileges.
+    e.g. 'read' and 'link_read' perms give the global 'read' privilege.
+    '''
+    if perm == 'read':
+      perms = Q(perms=Document2Permission.READ_PERM) | (Q(perms=Document2Permission.LINK_READ_PERM) & Q(is_link_on=True))
+    elif perm == 'write':
+      perms = Q(perms=Document2Permission.WRITE_PERM) | (Q(perms=Document2Permission.LINK_WRITE_PERM) & Q(is_link_on=True))
+    else:
+      raise PopupException(_("Permission name %s is invalid.") % perm)
+
+    return Document2Permission.objects.filter(Q(doc=self) & perms)
+
+  def share(self, user, name='read', users=None, groups=None, is_link_on=False):
     try:
       with transaction.atomic():
-        self.update_permission(user, name, users, groups)
+        self.update_permission(user, name, users, groups, is_link_on)
         # For directories, update all children recursively with same permissions
         for child in self.children.all():
-          child.share(user, name, users, groups)
+          child.share(user, name, users, groups, is_link_on)
     except Exception as e:
       raise PopupException(_("Failed to share document: %s") % e)
     return self
 
-  def update_permission(self, user, name='read', users=None, groups=None):
+  def share_link(self, user, perm='read'):
+    if perm == 'read':
+      self.share(user, name=Document2Permission.LINK_READ_PERM, is_link_on=True)
+    elif perm == 'write':
+      self.share(user, name=Document2Permission.LINK_WRITE_PERM, is_link_on=True)
+    else:
+      self.share(user, name=Document2Permission.LINK_READ_PERM, is_link_on=False)
+      self.share(user, name=Document2Permission.LINK_WRITE_PERM, is_link_on=False)
+    return self
+
+  def update_permission(self, user, name='read', users=None, groups=None, is_link_on=False):
     # Check if user has access to grant permissions
     if users or groups:
-      if name == 'read':
+      if name == 'read' or name == 'link_read':
         self.can_read_or_exception(user)
-      elif name == 'write':
+      elif name == 'write' or name == 'link_write':
         self.can_write_or_exception(user)
       else:
         raise ValueError(_('Invalid permission type: %s') % name)
@@ -1376,6 +1433,8 @@ class Document2(models.Model):
     perm.groups = []
     if groups is not None:
       perm.groups = groups
+
+    perm.is_link_on = is_link_on
 
     perm.save()
 
@@ -1403,16 +1462,28 @@ class Document2(models.Model):
     """
     permissions = {
       'read': {'users': [], 'groups': []},
-      'write': {'users': [], 'groups': []}
+      'write': {'users': [], 'groups': []},
+      'link_sharing_on': False,
+      'link_read': False,
+      'link_write': False,
     }
 
-    read_perms = self.get_permission(perm='read')
-    write_perms = self.get_permission(perm='write')
+    read_perm = self.get_permission(perm='read')
+    write_perm = self.get_permission(perm='write')
 
-    if read_perms:
-      permissions.update(read_perms.to_dict())
-    if write_perms:
-      permissions.update(write_perms.to_dict())
+    if read_perm:
+      permissions.update(read_perm.to_dict())
+    if write_perm:
+      permissions.update(write_perm.to_dict())
+
+    link_read_perm = self.get_permission(perm=Document2Permission.LINK_READ_PERM)
+    link_write_perm = self.get_permission(perm=Document2Permission.LINK_WRITE_PERM)
+
+    if link_read_perm:
+      permissions['link_read'] = link_read_perm.is_link_on
+    if link_write_perm:
+      permissions['link_write'] = link_write_perm.is_link_on
+    permissions['link_sharing_on'] = permissions['link_read'] or permissions['link_write']
 
     return permissions
 
@@ -1529,23 +1600,31 @@ class Document2Permission(models.Model):
   READ_PERM = 'read'
   WRITE_PERM = 'write'
   COMMENT_PERM = 'comment'
+  LINK_READ_PERM = 'link_read'
+  LINK_WRITE_PERM = 'link_write'
 
   doc = models.ForeignKey(Document2)
 
-  users = models.ManyToManyField(auth_models.User, db_index=True, db_table='documentpermission2_users')
-  groups = models.ManyToManyField(auth_models.Group, db_index=True, db_table='documentpermission2_groups')
+  users = models.ManyToManyField(User, db_index=True, db_table='documentpermission2_users')
+  groups = models.ManyToManyField(Group, db_index=True, db_table='documentpermission2_groups')
 
-  perms = models.CharField(default=READ_PERM, max_length=10, db_index=True, choices=( # one perm
+  perms = models.CharField(default=READ_PERM, max_length=10, db_index=True, choices=( # One perm
     (READ_PERM, 'read'),
     (WRITE_PERM, 'write'),
-    (COMMENT_PERM, 'comment'), # PLAYER PERM?
+    (COMMENT_PERM, 'comment'), # Unused
+    (LINK_READ_PERM, 'link read'),
+    (LINK_WRITE_PERM, 'link write'),
   ))
 
-  # link = models.CharField(default=uuid_default, max_length=255, unique=True) # Short link like dropbox
-  # embed
+  is_link_on = models.BooleanField(default=False)
 
   class Meta(object):
     unique_together = ('doc', 'perms')
+
+  def __str__(self):
+    return force_unicode('Document: %s, Name: %s, Users: %s, Groups: %s, is_link_on: %s') % (
+      self.doc, self.perms, self.users, self.groups, self.is_link_on
+    )
 
   def to_dict(self):
     return {
@@ -1557,9 +1636,9 @@ class Document2Permission(models.Model):
 
   def user_has_access(self, user):
     """
-    Returns true if the given user has permissions based on users, groups, or all flag
+    Returns true if the given user has permissions based on users, groups or all flag.
     """
-    return self.groups.filter(id__in=user.groups.all()).exists() or user in self.users.all()
+    return self.is_link_on or user in self.users.all() or self.groups.filter(id__in=user.groups.all()).exists()
 
 
 def get_cluster_config(user):
@@ -1578,10 +1657,6 @@ class ClusterConfig(object):
     self.user = user
     self.apps = appmanager.get_apps_dict(self.user) if apps is None else apps
     self.cluster_type = cluster_type
-
-  def refreshConfig(self):
-    # TODO: reload "some ini sections"
-    pass
 
 
   def get_config(self):
@@ -1611,15 +1686,17 @@ class ClusterConfig(object):
 
 
   def get_apps(self):
-    apps = OrderedDict([app for app in [
-      ('editor', self._get_editor()),
-      ('dashboard', self._get_dashboard()),
-      ('catalogs', self._get_catalogs()),
-      ('browser', self._get_browser()),
-      ('scheduler', self._get_scheduler()),
-      ('sdkapps', self._get_sdk_apps()),
-      ('home', self._get_home()),
-    ] if app[1]])
+    apps = OrderedDict([
+      app for app in [
+        ('editor', self._get_editor()),
+        ('dashboard', self._get_dashboard()),
+        ('catalogs', self._get_catalogs()),
+        ('browser', self._get_browser()),
+        ('scheduler', self._get_scheduler()),
+        ('sdkapps', self._get_sdk_apps()),
+        ('home', self._get_home()),
+      ] if app[1]
+    ])
 
     return apps
 
@@ -1655,7 +1732,7 @@ class ClusterConfig(object):
     return {
       'name': 'home',
       'displayName': _('Home'),
-      'buttonName': _('Documents'),
+      'buttonName': _('Saved Queries') if has_connectors() else _('Documents'),
       'interpreters': [],
       'page': '/home'
     }
@@ -1677,6 +1754,7 @@ class ClusterConfig(object):
           'page': '/editor/?type=%(type)s' % interpreter,
           'is_sql': interpreter['is_sql'],
           'dialect': interpreter['dialect'],
+          'dialect_properties': interpreter.get('dialect_properties'),
         })
 
     if SHOW_NOTEBOOKS.get():
@@ -1701,6 +1779,7 @@ class ClusterConfig(object):
         'displayName': _('Editor'),
         'buttonName': _('Query'),
         'interpreters': interpreters,
+        'default_limit': None if DEFAULT_LIMIT.get() == 0 else DEFAULT_LIMIT.get(),
         'interpreter_names': [interpreter['type'] for interpreter in interpreters],
         'page': interpreters[0]['page'],
         'default_sql_interpreter': next((interpreter['type'] for interpreter in interpreters if interpreter.get('is_sql')), 'hive')
@@ -1709,12 +1788,16 @@ class ClusterConfig(object):
       return None
 
   def _get_catalogs(self):
+    '''
+    Any connector implementing Notebook Assist API.
+    Currently SQL connectors, Hive Metastore. Possibly Metadata Catalogs later.
+    '''
     interpreters = []
 
     _interpreters = get_ordered_interpreters(self.user)
 
     for interpreter in _interpreters:
-      if interpreter['interface'] == 'hms':
+      if interpreter['is_sql'] or interpreter['interface'] == 'hms':
         interpreters.append({
           'name': interpreter['name'],
           'type': interpreter['type'],
@@ -1723,7 +1806,7 @@ class ClusterConfig(object):
           'tooltip': _('%s Query') % interpreter['type'].title(),
           'page': '/editor/?type=%(type)s' % interpreter,
           'is_sql': interpreter['is_sql'],
-          'is_catalog': interpreter['is_catalog'],
+          'is_catalog': True,
         })
 
     return interpreters if interpreters else None
@@ -1766,13 +1849,24 @@ class ClusterConfig(object):
   def _get_browser(self):
     interpreters = []
 
-    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('hdfs', self.user):
+    hdfs_connectors = []
+    if has_connectors():
+      hdfs_connectors = [
+        connector['nice_name'] for connector in _get_installed_connectors(category='browsers', dialect='hdfs', interface='rest')
+      ]
+    elif 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('hdfs', self.user):
+      hdfs_connectors.append(_('Files'))
+
+    for hdfs_connector in hdfs_connectors:
       interpreters.append({
         'type': 'hdfs',
-        'displayName': _('Files'),
+        'displayName': hdfs_connector,
         'buttonName': _('Browse'),
-        'tooltip': _('Files'),
-        'page': '/filebrowser/' + (not self.user.is_anonymous() and 'view=' + urllib_quote(self.user.get_home_directory().encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) or '')
+        'tooltip': hdfs_connector,
+        'page': '/filebrowser/' + (
+          not self.user.is_anonymous() and
+          'view=' + urllib_quote(self.user.get_home_directory().encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS) or ''
+        )
       })
 
     if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('s3a', self.user):
@@ -1795,7 +1889,7 @@ class ClusterConfig(object):
 
     if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('abfs', self.user):
       from azure.abfs.__init__ import get_home_dir_for_ABFS
-      
+
       interpreters.append({
         'type': 'abfs',
         'displayName': _('ABFS'),
@@ -1861,7 +1955,8 @@ class ClusterConfig(object):
         'page': '/security/hive'
       })
 
-    if 'indexer' in self.apps and 'filebrowser' in self.apps and self.user.has_hue_permission(action="access:importer", app="indexer"):
+    if 'indexer' in self.apps and 'filebrowser' in self.apps and self.user.has_hue_permission(action="access:importer", app="indexer") \
+        and 'importer' not in APP_BLACKLIST.get():
       interpreters.append({
         'type': 'importer',
         'displayName': _('Importer'),
@@ -1894,26 +1989,7 @@ class ClusterConfig(object):
 
 
   def _get_scheduler(self):
-    interpreters = [{
-        'type': 'oozie-workflow',
-        'displayName': _('Workflow'),
-        'buttonName': _('Schedule'),
-        'tooltip': _('Workflow'),
-        'page': '/oozie/editor/workflow/new/'
-      }, {
-        'type': 'oozie-coordinator',
-        'displayName': _('Schedule'),
-        'buttonName': _('Schedule'),
-        'tooltip': _('Schedule'),
-        'page': '/oozie/editor/coordinator/new/'
-      }, {
-        'type': 'oozie-bundle',
-        'displayName': _('Bundle'),
-        'buttonName': _('Schedule'),
-        'tooltip': _('Bundle'),
-        'page': '/oozie/editor/bundle/new/'
-      }
-    ]
+    interpreters = []
 
     if 'oozie' in self.apps and not (self.user.has_hue_permission(action="disable_editor_access", app="oozie") and not is_admin(self.user)):
       interpreters.extend([{
@@ -1937,11 +2013,23 @@ class ClusterConfig(object):
         }
       ])
 
+    if TASK_SERVER.BEAT_ENABLED.get():
+      interpreters.append({
+          'type': 'celery-beat',
+          'displayName': _('Scheduled Tasks'),
+          'buttonName': _('Scheduled Tasks'),
+          'tooltip': _('Scheduled Tasks'),
+          'page': '/jobbrowser/'
+        }
+      )
+
+    if interpreters:
       return {
           'name': 'oozie',
           'displayName': _('Scheduler'),
           'buttonName': _('Schedule'),
           'interpreters': interpreters,
+          'interpreter_names': [interpreter['type'] for interpreter in interpreters],
           'page': interpreters[0]['page']
         }
     else:
@@ -1974,6 +2062,7 @@ class ClusterConfig(object):
 
   def get_hive_metastore_interpreters(self):
     return [interpreter['type'] for interpreter in get_ordered_interpreters(self.user) if interpreter['type'] == 'hive' or interpreter['type'] == 'hms']
+
 
 class Cluster(object):
 
@@ -2056,3 +2145,20 @@ def get_data_link(meta):
     link = '/metastore/table/%(database)s/%(table)s' % meta # Could also add col=val
 
   return link
+
+
+def _get_gist_document(uuid):
+  return Document2.objects.get(uuid=uuid, type='gist') # Workaround until there is a share to all permission
+
+
+def __paginate(page, limit, queryset):
+  if limit > 0:
+    offset = (page - 1) * limit
+    last = offset + limit
+    queryset = queryset.all()[offset:last]
+
+  return {
+    'documents': queryset,
+    'page': page,
+    'limit': limit
+  }

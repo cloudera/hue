@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
 
 import apiHelper from 'api/apiHelper';
@@ -52,65 +52,66 @@ class EditorViewModel {
     });
     self.preEditorTogglingSnippet = ko.observable();
     self.toggleEditorMode = function() {
-      const _notebook = self.selectedNotebook();
-      const _newSnippets = [];
+      const notebook = self.selectedNotebook();
+      const newSnippets = [];
 
-      if (self.editorType() != 'notebook') {
+      if (self.editorType() !== 'notebook') {
         self.editorType('notebook');
-        self.preEditorTogglingSnippet(_notebook.snippets()[0]);
-        const _variables = _notebook.snippets()[0].variables();
-        const _statementKeys = [];
+        const sourceSnippet = notebook.snippets()[0];
+        self.preEditorTogglingSnippet(sourceSnippet);
+        const variables = sourceSnippet.variables();
+        const statementKeys = [];
         // Split statements
-        _notebook.type('notebook');
-        _notebook
-          .snippets()[0]
-          .statementsList()
-          .forEach(sql_statement => {
-            let _snippet;
-            if (sql_statement.hashCode() in _notebook.presentationSnippets()) {
-              _snippet = _notebook.presentationSnippets()[sql_statement.hashCode()]; // Persist result
-              _snippet.variables(_variables);
-            } else {
-              const _title = [];
-              const _statement = [];
-              sql_statement
-                .trim()
-                .split('\n')
-                .forEach(line => {
-                  if (line.trim().startsWith('--') && _statement.length === 0) {
-                    _title.push(line.substr(2));
-                  } else {
-                    _statement.push(line);
-                  }
-                });
-              _snippet = new Snippet(self, _notebook, {
-                type: _notebook.initialType,
-                statement_raw: _statement.join('\n'),
-                result: {},
-                name: _title.join('\n'),
-                variables: komapping.toJS(_variables)
+        notebook.type('notebook');
+        const database = sourceSnippet.database();
+        sourceSnippet.statementsList().forEach(sql_statement => {
+          let presentationSnippet;
+          const statementKey = sql_statement.hashCode() + database;
+          if (statementKey in notebook.presentationSnippets()) {
+            presentationSnippet = notebook.presentationSnippets()[statementKey]; // Persist result
+            presentationSnippet.variables(variables);
+          } else {
+            const titleLines = [];
+            const statementLines = [];
+            sql_statement
+              .trim()
+              .split('\n')
+              .forEach(line => {
+                if (line.trim().startsWith('--') && statementLines.length === 0) {
+                  titleLines.push(line.substr(2));
+                } else {
+                  statementLines.push(line);
+                }
               });
-              _snippet.variables = _notebook.snippets()[0].variables;
-              _snippet.init();
-              _notebook.presentationSnippets()[sql_statement.hashCode()] = _snippet;
-            }
-            _statementKeys.push(sql_statement.hashCode());
-            _newSnippets.push(_snippet);
-          });
-        $.each(_notebook.presentationSnippets(), key => {
+            presentationSnippet = new Snippet(self, notebook, {
+              type: notebook.initialType,
+              database: database,
+              statement_raw: statementLines.join('\n'),
+              result: {},
+              name: titleLines.join('\n'),
+              variables: komapping.toJS(variables)
+            });
+            presentationSnippet.variables = sourceSnippet.variables;
+            presentationSnippet.init();
+            notebook.presentationSnippets()[statementKey] = presentationSnippet;
+          }
+          statementKeys.push(statementKey);
+          newSnippets.push(presentationSnippet);
+        });
+        $.each(notebook.presentationSnippets(), key => {
           // Dead statements
-          if (!key in _statementKeys) {
-            delete _notebook.presentationSnippets()[key];
+          if (!key in statementKeys) {
+            delete notebook.presentationSnippets()[key];
           }
         });
       } else {
-        self.editorType(_notebook.initialType);
+        self.editorType(notebook.initialType);
         // Revert to one statement
-        _newSnippets.push(self.preEditorTogglingSnippet());
-        _notebook.type('query-' + _notebook.initialType);
+        newSnippets.push(self.preEditorTogglingSnippet());
+        notebook.type('query-' + notebook.initialType);
       }
-      _notebook.snippets(_newSnippets);
-      _newSnippets.forEach(snippet => {
+      notebook.snippets(newSnippets);
+      newSnippets.forEach(snippet => {
         huePubSub.publish('editor.redraw.data', { snippet: snippet });
       });
     };
@@ -413,6 +414,8 @@ class EditorViewModel {
     self.init = function() {
       if (editor_id) {
         self.openNotebook(editor_id);
+      } else if (window.location.getParameter('gist') !== '') {
+        self.newNotebook(window.location.getParameter('type'));
       } else if (window.location.getParameter('editor') !== '') {
         self.openNotebook(window.location.getParameter('editor'));
       } else if (notebooks.length > 0) {
@@ -427,6 +430,7 @@ class EditorViewModel {
     self.loadNotebook = function(notebookRaw, queryTab) {
       let currentQueries;
       if (self.selectedNotebook() != null) {
+        self.selectedNotebook().close();
         currentQueries = self.selectedNotebook().unload();
       }
 
@@ -539,7 +543,7 @@ class EditorViewModel {
       };
     };
 
-    self.openNotebook = function(uuid, queryTab, skipUrlChange, callback) {
+    self.openNotebook = function(uuid, queryTab, skipUrlChange, callback, session) {
       const deferredOpen = new $.Deferred();
       $.get(
         '/desktop/api2/doc/',
@@ -552,6 +556,10 @@ class EditorViewModel {
           if (data.status == 0) {
             data.data.dependents = data.dependents;
             data.data.can_write = data.user_perms.can_write;
+            if (session) {
+              // backend doesn't store session, but can reuse an opened one.
+              data.data.sessions = [session];
+            }
             const notebook = data.data;
             self.loadNotebook(notebook, queryTab);
             if (typeof skipUrlChange === 'undefined' && !self.isNotificationManager()) {
@@ -568,7 +576,7 @@ class EditorViewModel {
                 self.changeURL(self.URLS.notebook + '?notebook=' + data.document.id);
               }
             }
-            if (typeof callback !== 'undefined') {
+            if (callback) {
               callback();
             }
             deferredOpen.resolve();
@@ -591,12 +599,16 @@ class EditorViewModel {
         '/notebook/api/create_notebook',
         {
           type: editorType || options.editor_type,
-          directory_uuid: window.location.getParameter('directory_uuid')
+          directory_uuid: window.location.getParameter('directory_uuid'),
+          gist: self.isNotificationManager() ? undefined : window.location.getParameter('gist')
         },
         data => {
           self.loadNotebook(data.notebook);
           if (self.editorMode() && !self.isNotificationManager()) {
-            const snippet = self.selectedNotebook().newSnippet(self.editorType());
+            const snippet =
+              self.selectedNotebook().snippets().length == 0
+                ? self.selectedNotebook().newSnippet(self.editorType())
+                : self.selectedNotebook().snippets()[0];
             if (
               queryTab &&
               ['queryHistory', 'savedQueries', 'queryBuilderTab'].indexOf(queryTab) > -1
@@ -615,7 +627,7 @@ class EditorViewModel {
             });
           }
 
-          if (typeof callback !== 'undefined' && callback !== null) {
+          if (callback) {
             callback();
           }
         }
@@ -664,8 +676,9 @@ class EditorViewModel {
 
   prepareShareModal() {
     const selectedNotebookUuid = this.selectedNotebook() && this.selectedNotebook().uuid();
-    window.shareViewModel.setDocUuid(selectedNotebookUuid);
-    window.openShareModal();
+    if (selectedNotebookUuid) {
+      huePubSub.publish('doc.show.share.modal', selectedNotebookUuid);
+    }
   }
 }
 

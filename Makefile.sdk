@@ -110,6 +110,18 @@ $(EXT_PY_CLEAN_TARGETS): CUR_EXT_PY=$(notdir $(@D))
 $(EXT_PY_ENV_INSTALL_TARGETS): CUR_EXT_PY=$(notdir $(@D))
 
 #
+# ext-env-pip-install
+#   	Pip install any 3rd party package that are based on requirements_py3.txt
+#
+.PHONY: ext-env-pip-install
+ext-env-pip-install:
+	@echo '--- Installing requirement.txt into virtual-env via $(ENV_PIP) command to file $(REQUIREMENT_FILE).'
+	@$(ENV_PIP) install -r $(REQUIREMENT_FILE)
+	@echo '--- Finished requirement.txt into virtual-env'
+	@$(ENV_PIP) install $(NAVOPTAPI_WHL)
+	@echo '--- Finished $(NAVOPTAPI_WHL) into virtual-env'
+
+#
 # ext-eggs
 #   	Builds a binary egg for any 3rd party package that are based on the
 #   	earlier distutils (rather than setuptools).

@@ -15,7 +15,7 @@
 ## limitations under the License.
 
 <%!
-  from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
+  from desktop.views import commonheader, commonfooter, commonimportexport, _ko
   from django.utils.translation import ugettext as _
 %>
 <%namespace name="actionbar" file="actionbar.mako" />
@@ -162,13 +162,9 @@ ${ commonheader(_("Notebooks"), "spark", user, request, "60px") | n,unicode }
 </div>
 </div>
 
-
 ${ commonimportexport(request) | n,unicode }
-${ commonshare() | n,unicode }
-
 
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/share2.vm.js') }"></script>
 
 <script type="text/javascript">
   var Editor = function () {
@@ -228,20 +224,15 @@ ${ commonshare() | n,unicode }
     };
 
     self.prepareShareModal = function() {
-      shareViewModel.setDocUuid(self.selectedJobs()[0].uuid());
-      openShareModal();
+      huePubSub.publish('doc.show.share.modal', self.selectedJobs()[0].uuid());
     };
-  }
+  };
 
   var viewModel;
-  var shareViewModel;
 
   $(document).ready(function () {
     viewModel = new Editor();
     ko.applyBindings(viewModel, $("#editor")[0]);
-
-    shareViewModel = initSharing("#documentShareModal");
-    shareViewModel.setDocUuid('');
 
     $(document).on("showSubmitPopup", function(event, data){
       $('#submit-notebook-modal').html(data);

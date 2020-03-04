@@ -15,15 +15,20 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
-import AceLocationHandler from 'sql/aceLocationHandler';
+import AceLocationHandler from 'ko/bindings/ace/aceLocationHandler';
 import componentUtils from 'ko/components/componentUtils';
 import hueUtils from 'utils/hueUtils';
+import huePubSub from 'utils/huePubSub';
 import SolrFormulaAutocompleter from './solrFormulaAutocompleter';
 import SolrQueryAutocompleter from './solrQueryAutocompleter';
 import SqlAutocompleter from 'sql/sqlAutocompleter';
 import sqlWorkerHandler from 'sql/sqlWorkerHandler';
+import AceGutterHandler from 'ko/bindings/ace/aceGutterHandler';
+
+export const NAME = 'hue-simple-ace-editor';
+export const MULTI_NAME = 'hue-simple-ace-editor-multi';
 
 const SIMPLE_ACE_TEMPLATE = `
   <div class="simple-ace-single-line">
@@ -78,26 +83,45 @@ class SimpleAceEditor {
     editor.setTheme($.totalStorage('hue.ace.theme') || 'ace/theme/hue');
     self.ace(editor);
 
-    if (params.autocomplete) {
+    if (params.activeExecutable) {
+      editor.commands.addCommand({
+        name: 'execute',
+        bindKey: { win: 'Ctrl-Enter', mac: 'Command-Enter|Ctrl-Enter' },
+        exec: async () => {
+          huePubSub.publish('hue.ace.autocompleter.hide');
+          const executable = params.activeExecutable();
+          if (executable) {
+            await executable.reset();
+            executable.execute();
+          }
+        }
+      });
+    }
+
+    if (params.autocomplete && ko.unwrap(params.autocomplete)) {
+      const autocomplete = ko.unwrap(params.autocomplete);
       const sourceType =
-        params.autocomplete.type.indexOf('Query') !== -1
-          ? params.autocomplete.type.replace('Query', '')
-          : params.autocomplete.type;
+        autocomplete.type.indexOf('Query') !== -1
+          ? autocomplete.type.replace('Query', '')
+          : autocomplete.type;
 
       const snippet = {
         autocompleteSettings: {
           temporaryOnly: params.temporaryOnly
         },
         type: ko.observable(sourceType),
+        dialect: ko.observable(sourceType),
         id: ko.observable($element.attr('id')),
         namespace: params.namespace,
         compute: params.compute,
-        database: ko.observable(
-          params.database && params.database() ? params.database() : 'default'
-        ),
-        availableDatabases: ko.observableArray([
-          params.database && params.database() ? params.database() : 'default'
-        ]),
+        database: ko.isObservable(params.database)
+          ? params.database
+          : ko.observable(params.database || 'default'),
+        availableDatabases: params.availableDatabases
+          ? params.availableDatabases
+          : ko.observableArray([
+              params.database && params.database() ? params.database() : 'default'
+            ]),
         positionStatement: ko.observable({
           location: {
             first_line: 1,
@@ -118,15 +142,21 @@ class SimpleAceEditor {
         inFocus: ko.observable()
       };
 
-      if (sourceType === 'hive' || sourceType === 'impala') {
+      if (ko.unwrap(sourceType) === 'hive' || ko.unwrap(sourceType) === 'impala') {
         sqlWorkerHandler.registerWorkers();
         const aceLocationHandler = new AceLocationHandler({
           editor: editor,
           editorId: $element.attr('id'),
           snippet: snippet
         });
+        const aceGutterHandler = new AceGutterHandler({
+          editor: editor,
+          editorId: $element.attr('id'),
+          executor: snippet.executor
+        });
         self.disposeFunctions.push(() => {
           aceLocationHandler.dispose();
+          aceGutterHandler.dispose();
         });
         aceLocationHandler.attachSqlSyntaxWorker();
       }
@@ -151,11 +181,10 @@ class SimpleAceEditor {
         snippet: snippet,
         fixedPrefix: params.fixedPrefix,
         fixedPostfix: params.fixedPostfix,
-        support: params.autocomplete.support
+        support: autocomplete.support
       };
 
-      const AutocompleterClass =
-        AVAILABLE_AUTOCOMPLETERS[params.autocomplete.type] || SqlAutocompleter;
+      const AutocompleterClass = AVAILABLE_AUTOCOMPLETERS[autocomplete.type] || SqlAutocompleter;
       self.autocompleter = new AutocompleterClass(autocompleteArgs);
     } else {
       self.autocompleter = null;
@@ -332,7 +361,7 @@ class SimpleAceEditor {
 
 // Ace requires that the child to clone is first child, so we need separate components for single line & multi line
 componentUtils.registerComponent(
-  'hue-simple-ace-editor',
+  NAME,
   {
     createViewModel: function(params, componentInfo) {
       return new SimpleAceEditor(params, componentInfo.element);
@@ -342,7 +371,7 @@ componentUtils.registerComponent(
 );
 
 componentUtils.registerComponent(
-  'hue-simple-ace-editor-multi',
+  MULTI_NAME,
   {
     createViewModel: function(params, componentInfo) {
       return new SimpleAceEditor(params, componentInfo.element);

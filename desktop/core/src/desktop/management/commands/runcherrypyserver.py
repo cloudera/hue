@@ -45,7 +45,8 @@ CPSERVER_OPTIONS = {
   'ssl_certificate': conf.SSL_CERTIFICATE.get(),
   'ssl_private_key': conf.SSL_PRIVATE_KEY.get(),
   'ssl_certificate_chain': conf.SSL_CERTIFICATE_CHAIN.get(),
-  'ssl_cipher_list': conf.SSL_CIPHER_LIST.get()
+  'ssl_cipher_list': conf.SSL_CIPHER_LIST.get(),
+  'ssl_no_renegotiation': conf.SSL_NO_RENEGOTIATION.get()
 }
 
 
@@ -90,7 +91,8 @@ def start_server(options):
         if options['ssl_certificate_chain']:
             server.ssl_certificate_chain = options['ssl_certificate_chain']
         server.ssl_cipher_list = options['ssl_cipher_list']
-
+        server.ssl_no_renegotiation = options['ssl_no_renegotiation']
+        
         ssl_password = conf.get_ssl_password()
         if ssl_password:
             server.ssl_password_cb = lambda *unused: ssl_password

@@ -54,7 +54,7 @@ def is_selected(section, matcher):
           <div class="nav-collapse">
             <ul class="nav">
               <li class="app-header">
-                <a href="/${app_name}">
+                <a href="/security">
                   <i class="fa fa-lock"></i>
                   ${ _('Security Browser') if is_embeddable else _('Hadoop Security') }
                 </a>

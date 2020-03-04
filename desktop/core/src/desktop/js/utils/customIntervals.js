@@ -36,7 +36,7 @@ window.getIntervals = function(app) {
  * @param {string} [app] - context for the interval
  */
 window.setInterval = function(fn, timeout, app) {
-  const id = originalSetInterval(fn, timeout);
+  const id = originalSetInterval.call(window, fn, timeout);
   hueIntervals.push({
     fn: fn,
     timeout: timeout,
@@ -57,9 +57,9 @@ window.clearInterval = function(id) {
     return obj.originalId === id;
   });
   if (foundIntervals && foundIntervals.length > 0) {
-    originalClearInterval(foundIntervals[0].id);
+    originalClearInterval.call(window, foundIntervals[0].id);
   } else {
-    originalClearInterval(id);
+    originalClearInterval.call(window, id);
   }
   hueIntervals = hueIntervals.filter(obj => {
     return obj.originalId !== id;
@@ -77,7 +77,7 @@ window.pauseAppIntervals = function(app) {
       (interval.app === app || (interval.app.split('-') && interval.app.split('-')[0] === app))
     ) {
       interval.status = 'paused';
-      originalClearInterval(interval.id);
+      originalClearInterval.call(window, interval.id);
     }
   });
 };
@@ -94,7 +94,7 @@ window.resumeAppIntervals = function(app) {
       interval.status === 'paused'
     ) {
       interval.status = 'running';
-      interval.id = originalSetInterval(interval.fn, interval.timeout);
+      interval.id = originalSetInterval.call(window, interval.fn, interval.timeout);
     }
   });
 };

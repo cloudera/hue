@@ -22,9 +22,9 @@ Checked-in third party dependencies
 |Y|Django|1.6.10|BSD|http://www.djangoproject.com/download/1.6.10/tarball/|
 |Y|django-auth-ldap|1.2.0|BSD|http://bitbucket.org/psagers/django-auth-ldap/|
 |Y|django-axes|1.5.0|MIT|http://github.com/django-pci/django-axes.git|
+|Y|django-crequest|2018.5.11|BSD|https://pypi.org/project/django-crequest/|
 |Y|Django Extensions|1.5.0|New BSD|http://pypi.python.org/pypi/django-extensions/1.5.0|
 |Y|Django_nose (part of basie)|1.3|MIT|http://code.basieproject.org/trunk/apps/django_nose/nose_runner.py|
-|Y|django-openid-auth|0.5| |http://openidenabled.com/python-openid/|
 |Y|django-webpack-loader|0.5.0|MIT|https://github.com/owais/django-webpack-loader/|
 |Y|djangosaml2|0.16.4|Apache ||
 |Y|dnspython|1.15.0|ISC|https://pypi.org/project/dnspython/1.15.0/|
@@ -86,7 +86,6 @@ Checked-in third party dependencies
 |Y|ssl|1.15|Python|http://pypi.python.org/pypi/ssl/1.15|
 |Y|tablib|0.10.0|MIT|http://docs.python-tablib.org/en/latest/|
 |Y|Thrift|0.9.1|Apache|http://incubator.apache.org/thrift/download/|
-|Y|thriftpy|0.3.9|Apache|https://github.com/eleme/thriftpy|
 |Y|urllib2_kerberos|0.1.6|ASL2|http://pypi.python.org/pypi/urllib2_kerberos|
 
 ---
@@ -99,7 +98,6 @@ Downloaded third party dependencies during build
 |Y|nosetty|0.4|LGPL|http://code.google.com/p/nosetty/|
 |N|pylint|0.19.0|GPL|http://www.logilab.org/project/pylint|
 |Y|Werkzeug|0.6|BSD|http://werkzeug.pocoo.org/|
-|Y|windmill|1.3|Apache2|http://www.getwindmill.com/|
 
 
 ---

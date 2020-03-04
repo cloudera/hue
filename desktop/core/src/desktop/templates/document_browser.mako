@@ -32,79 +32,6 @@ from desktop.views import _ko
       <i class="fa fa-fw"></i><span class="drag-text">4 entries</span>
     </div>
 
-    <div id="shareDocumentModal"  class="modal hide fade">
-      <!-- ko with: activeEntry -->
-      <!-- ko with: selectedEntry -->
-      <!-- ko with: document -->
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-        <h2 class="modal-title">${_('Sharing')} - <span data-bind="text: $parent.definition().name"></span></h2>
-      </div>
-      <div class="modal-body" style="overflow: visible; height: 240px">
-        <!-- ko with: definition -->
-        <div class="row-fluid" data-bind="visible: !$parent.hasErrors()" style="max-height: 114px;" id="scrolldiv">
-          <div class="span6">
-            <h4 class="muted" style="margin-top:0px">${_('Read')}</h4>
-            <div data-bind="visible: (perms.read.users.length == 0 && perms.read.groups.length == 0)">${_('The document is not shared for read.')}</div>
-            <ul class="unstyled airy" data-bind="foreach: perms.read.users">
-              <li>
-                <span class="badge badge-info" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }"><i class="fa fa-user"></i> <span data-bind="text: $parents[1].prettifyUsernameById(id), attr:{'data-id': id}"></span></span><span class="badge badge-right trash-share" data-bind="visible: $parents[1].fileEntry.canModify(), click: function() { $parents[1].removeUserReadShare($data) }"> <i class="fa fa-times"></i></span>
-              </li>
-            </ul>
-            <ul class="unstyled airy" data-bind="foreach: perms.read.groups">
-              <li>
-                <span class="badge badge-info" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }"><i class="fa fa-users"></i> ${ _('Group') } &quot;<span data-bind="text: name"></span>&quot;</span><span class="badge badge-right trash-share" data-bind="visible: $parents[1].fileEntry.canModify(), click: function() { $parents[1].removeGroupReadShare($data) }"> <i class="fa fa-times"></i></span>
-              </li>
-            </ul>
-          </div>
-
-          <div class="span6">
-            <h4 class="muted" style="margin-top: 0">${_('Modify')}</h4>
-            <div data-bind="visible: (perms.write.users.length == 0 && perms.write.groups.length == 0)">${_('The document is not shared for modify.')}</div>
-            <ul class="unstyled airy" data-bind="foreach: perms.write.users">
-              <li>
-                <span class="badge badge-info badge-left" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }"><i class="fa fa-user"></i> <span data-bind="text: $parents[1].prettifyUsernameById(id), attr:{'data-id': id}"></span></span><span class="badge badge-right trash-share" data-bind="visible: $parents[1].fileEntry.canModify(), click: function() { $parents[1].removeUserWriteShare($data) }"> <i class="fa fa-times"></i></span>
-              </li>
-            </ul>
-            <ul class="unstyled airy" data-bind="foreach: perms.write.groups">
-              <li>
-                <span class="badge badge-info badge-left" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }"><i class="fa fa-users"></i> ${ _('Group') } &quot;<span data-bind="text: name"></span>&quot;</span><span class="badge badge-right trash-share" data-bind="visible: $parents[1].fileEntry.canModify(), click: function() { $parents[1].removeGroupWriteShare($data) }"> <i class="fa fa-times"></i></span>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <!-- /ko -->
-        <div class="doc-browser-empty animated" style="display: none;" data-bind="visible: loading">
-          <i class="fa fa-spinner fa-spin fa-2x" style="color: #999;"></i>
-        </div>
-        <div class="doc-browser-empty animated" style="display: none;" data-bind="visible: hasErrors() && ! loading()">
-          ${ _('There was an error loading the document.')}
-        </div>
-        <div style="margin-top: 20px" data-bind="visible: fileEntry.canModify() && ! hasErrors() && ! loading()">
-          <div class="input-append" style="font-size: inherit">
-            <div id="menu"></div>
-            <input id="userSearchAutocomp" placeholder="${_('Type a username or a group name')}" type="text" data-bind="autocomplete: { source: shareAutocompleteUserSource.bind($data), itemTemplate: 'user-search-autocomp-item', noMatchTemplate: 'user-search-autocomp-no-match', valueObservable: searchInput, showSpinner: true, classPrefix: 'hue-', onEnter: onShareAutocompleteUserEnter.bind($data), appendTo: $('#menu') }, clearable: { value: searchInput, textInput: searchInput }" class="ui-autocomplete-input" autocomplete="off" style="width: 420px">
-            <div class="btn-group" style="overflow:visible">
-              <a id="documentShareAddBtn" class="btn" data-bind="click: function () {  onShareAutocompleteUserEnter() }"><span data-bind="text: selectedPerm() == 'read' ? '${ _('Read') }' : '${ _('Modify') }'"></span></a>
-              <a id="documentShareCaret" class="btn dropdown-toggle" data-toggle="dropdown">
-               <span class="caret"></span>
-              </a>
-              <ul class="dropdown-menu">
-                <li><a data-bind="click: function () { selectedPerm('read'); onShareAutocompleteUserEnter() }" href="javascript:void(0)"><i class="fa fa-plus"></i> ${ _('Read') }</a></li>
-                <li><a data-bind="click: function () { selectedPerm('write'); onShareAutocompleteUserEnter() }" href="javascript:void(0)"><i class="fa fa-plus"></i> ${ _('Modify') }</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <a href="#" data-dismiss="modal" class="btn disable-feedback disable-enter">${_('Close')}</a>
-      </div>
-      <!-- /ko -->
-      <!-- /ko -->
-      <!-- /ko -->
-    </div>
-
     <div id="renameDirectoryModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
       <!-- ko with: activeEntry -->
       <form class="form-horizontal">
@@ -232,7 +159,7 @@ from desktop.views import _ko
                 <!-- /ko -->
 
                 <!-- ko if: app === 'documents' -->
-                <a class="btn" title="${_('Share')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function() { showSharingModal(null) }, css: { 'disabled': selectedEntries().length !== 1 || (selectedEntries().length === 1 && selectedEntries()[0].isTrashed) }"><i class="fa fa-fw fa-users"></i></a>
+                <a class="btn" title="${_('Share')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function() { showSharingModal() }, css: { 'disabled': selectedEntries().length !== 1 || (selectedEntries().length === 1 && selectedEntries()[0].isTrashed) }"><i class="fa fa-fw fa-users"></i></a>
                 <!-- /ko -->
 
                 <!-- ko if: app === 'documents' -->

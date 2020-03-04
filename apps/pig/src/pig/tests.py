@@ -20,7 +20,6 @@ from builtins import object
 import json
 import time
 
-from django.contrib.auth.models import User
 from django.urls import reverse
 
 from nose.plugins.skip import SkipTest
@@ -28,12 +27,11 @@ from nose.tools import assert_true, assert_equal, assert_false
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
-from desktop.models import SAMPLE_USER_ID
+from desktop.models import SAMPLE_USER_ID, User
 from hadoop import pseudo_hdfs4
 from hadoop.pseudo_hdfs4 import is_live_cluster
 from liboozie.oozie_api_tests import OozieServerProvider
 from liboozie.conf import SECURITY_ENABLED
-
 from oozie.tests import OozieBase
 
 from pig.models import create_or_update_script, PigScript
@@ -131,7 +129,7 @@ class TestMock(TestPigBase):
 
   def test_editor_view(self):
     response = self.c.get(reverse('pig:app'))
-    assert_true('Unsaved script' in response.content)
+    assert_true(b'Unsaved script' in response.content)
 
   def test_save(self):
     attrs = {'user': self.user,}

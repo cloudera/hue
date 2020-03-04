@@ -18,25 +18,21 @@
 from future import standard_library
 standard_library.install_aliases()
 from builtins import object
-from builtins import str
 import errno
 import logging
 import mimetypes
 import operator
 import os
-import parquet
 import posixpath
 import re
 import stat as stat_module
 import sys
 import urllib.request, urllib.error
-from urllib.parse import urlparse
 
 from bz2 import decompress
 from datetime import datetime
 from gzip import GzipFile
 
-from django.contrib.auth.models import User, Group
 from django.core.paginator import EmptyPage, Paginator, Page, InvalidPage
 from django.urls import reverse
 from django.template.defaultfilters import stringformat, filesizeformat
@@ -50,8 +46,8 @@ from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
 from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException
-from avro import datafile, io
 from desktop import appmanager
+from desktop.auth.backend import is_admin
 from desktop.lib import i18n
 from desktop.lib.conf import coerce_bool
 from desktop.lib.django_util import render, format_preserving_redirect
@@ -64,31 +60,36 @@ from desktop.lib.paths import SAFE_CHARACTERS_URI, SAFE_CHARACTERS_URI_COMPONENT
 from desktop.lib.tasks.compress_files.compress_utils import compress_files_in_hdfs
 from desktop.lib.tasks.extract_archive.extract_utils import extract_archive_in_hdfs
 from desktop.views import serve_403_error
-
 from hadoop.core_site import get_trash_interval
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.fsutils import do_overwrite_save
+from useradmin.models import User, Group
 
 from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE, SHOW_DOWNLOAD_BUTTON, SHOW_UPLOAD_BUTTON, REDIRECT_DOWNLOAD
 from filebrowser.lib.archives import archive_factory
 from filebrowser.lib.rwx import filetype, rwx
 from filebrowser.lib import xxd
 from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkDirForm, EditorForm, TouchForm,\
-                              RenameFormSet, RmTreeFormSet, ChmodFormSet, ChownFormSet, CopyFormSet, RestoreFormSet,\
-                              TrashPurgeForm, SetReplicationFactorForm
-
-
-from desktop.auth.backend import is_admin
+    RenameFormSet, RmTreeFormSet, ChmodFormSet, ChownFormSet, CopyFormSet, RestoreFormSet,\
+    TrashPurgeForm, SetReplicationFactorForm
 
 if sys.version_info[0] > 2:
-  from io import string_io as string_io
+  import io
+  from io import StringIO as string_io
   from urllib.parse import quote as urllib_quote
   from urllib.parse import unquote as urllib_unquote
+  from urllib.parse import urlparse as lib_urlparse
+  from builtins import str as new_str
 else:
   from cStringIO import StringIO as string_io
   from urllib import quote as urllib_quote
   from urllib import unquote as urllib_unquote
+  from urlparse import urlparse as lib_urlparse
+  new_str = unicode
+  import parquet
+  from avro import datafile, io
+
 
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB
 MAX_CHUNK_SIZE_BYTES = 1024 * 1024 # 1MB
@@ -101,9 +102,11 @@ BYTES_PER_SENTENCE = 2
 # The maximum size the file editor will allow you to edit
 MAX_FILEEDITOR_SIZE = 256 * 1024
 
-INLINE_DISPLAY_MIMETYPE = re.compile('video/|image/|audio/|application/pdf|application/msword|application/excel|'
-                                     'application/vnd\.ms|'
-                                     'application/vnd\.openxmlformats')
+INLINE_DISPLAY_MIMETYPE = re.compile(
+    'video/|image/|audio/|application/pdf|application/msword|application/excel|'
+    'application/vnd\.ms|'
+    'application/vnd\.openxmlformats'
+)
 
 INLINE_DISPLAY_MIMETYPE_EXCEPTIONS = re.compile('image/svg\+xml')
 
@@ -188,7 +191,7 @@ def download(request, path):
 
 def view(request, path):
     """Dispatches viewing of a path to either index() or fileview(), depending on type."""
-    decoded_path = urllib_unquote(path)
+    decoded_path = unquote_url(path)
     if path != decoded_path:
       path = decoded_path
     # default_to_home is set in bootstrap.js
@@ -224,7 +227,7 @@ def view(request, path):
     except (IOError, WebHdfsException) as e:
         msg = _("Cannot access: %(path)s. ") % {'path': escape(path)}
 
-        if "Connection refused" in e.message:
+        if "Connection refused" in str(e):
             msg += _(" The HDFS REST service is not available. ")
 
         if request.is_ajax():
@@ -253,7 +256,7 @@ def home_relative_view(request, path):
 
 def edit(request, path, form=None):
     """Shows an edit form for the given path. Path does not necessarily have to exist."""
-    decoded_path = urllib_unquote(path)
+    decoded_path = unquote_url(path)
     if path != decoded_path:
       path = decoded_path
     try:
@@ -279,7 +282,7 @@ def edit(request, path, form=None):
             f = request.fs.open(path)
             try:
                 try:
-                    current_contents = str(f.read(), encoding)
+                    current_contents = new_str(f.read(), encoding)
                 except UnicodeDecodeError:
                     raise PopupException(_("File is not encoded in %(encoding)s; cannot be edited: %(path)s.") % {'encoding': encoding, 'path': path})
             finally:
@@ -311,7 +314,7 @@ def save_file(request):
     form = EditorForm(request.POST)
     is_valid = form.is_valid()
     path = form.cleaned_data.get('path')
-    decoded_path = urllib_unquote(path)
+    decoded_path = unquote_url(path)
     if path != decoded_path:
       path = decoded_path
 
@@ -484,13 +487,9 @@ def listdir_paged(request, path):
     descending_param = request.GET.get('descending', None)
     if sortby is not None:
         if sortby not in ('type', 'name', 'atime', 'mtime', 'user', 'group', 'size'):
-            logger.info("Invalid sort attribute '%s' for listdir." %
-                        (sortby,))
+            logger.info("Invalid sort attribute '%s' for listdir." % sortby)
         else:
-            all_stats = sorted(all_stats,
-                               key=operator.attrgetter(sortby),
-                               reverse=coerce_bool(descending_param))
-
+            all_stats = sorted(all_stats, key=operator.attrgetter(sortby), reverse=coerce_bool(descending_param))
 
     # Do pagination
     try:
@@ -517,12 +516,12 @@ def listdir_paged(request, path):
     current_stat = request.fs.stats(path)
     # The 'path' field would be absolute, but we want its basename to be
     # actually '.' for display purposes. Encode it since _massage_stats expects byte strings.
-    current_stat['path'] = path
-    current_stat['name'] = "."
+    current_stat.path = path
+    current_stat.name = "."
     shown_stats.insert(1, current_stat)
 
     if page:
-      page.object_list = [ _massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats ]
+      page.object_list = [_massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats]
 
     is_trash_enabled = request.fs._get_scheme(path) == 'hdfs' and int(get_trash_interval()) > 0
 
@@ -556,14 +555,14 @@ def listdir_paged(request, path):
     return render('listdir.mako', request, data)
 
 def scheme_absolute_path(root, path):
-  splitPath = urlparse(path)
-  splitRoot = urlparse(root)
+  splitPath = lib_urlparse(path)
+  splitRoot = lib_urlparse(root)
   if splitRoot.scheme and not splitPath.scheme:
     path = splitPath._replace(scheme=splitRoot.scheme).geturl()
   return path
 
 def stat_absolute_path(path, stat):
-  stat["path"] = scheme_absolute_path(path, stat["path"])
+  stat.path = scheme_absolute_path(path, stat.path)
   return stat
 
 def _massage_stats(request, stats):
@@ -571,17 +570,17 @@ def _massage_stats(request, stats):
     Massage a stats record as returned by the filesystem implementation
     into the format that the views would like it in.
     """
-    path = stats['path']
+    path = stats.path
     normalized = request.fs.normpath(path)
     return {
         'path': normalized, # Normally this should be quoted, but we only use this in POST request so we're ok. Changing this to quoted causes many issues.
-        'name': stats['name'],
+        'name': stats.name,
         'stats': stats.to_json_dict(),
-        'mtime': datetime.fromtimestamp(stats['mtime']).strftime('%B %d, %Y %I:%M %p') if stats['mtime'] else '',
-        'humansize': filesizeformat(stats['size']),
-        'type': filetype(stats['mode']),
-        'rwx': rwx(stats['mode'], stats['aclBit']),
-        'mode': stringformat(stats['mode'], "o"),
+        'mtime': datetime.fromtimestamp(stats.mtime).strftime('%B %d, %Y %I:%M %p') if stats.mtime else '',
+        'humansize': filesizeformat(stats.size),
+        'type': filetype(stats.mode),
+        'rwx': rwx(stats.mode, stats.aclBit),
+        'mode': stringformat(stats.mode, "o"),
         'url': '/filebrowser/view=' + urllib_quote(normalized.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS),
         'is_sentry_managed': request.fs.is_sentry_managed(path)
     }
@@ -694,7 +693,7 @@ def display(request, path):
     # Get contents as string for text mode, or at least try
     uni_contents = None
     if not mode or mode == 'text':
-        uni_contents = str(contents, encoding, errors='replace')
+        uni_contents = new_str(contents, encoding, errors='replace')
         is_binary = uni_contents.find(i18n.REPLACEMENT_CHAR) != -1
         # Auto-detect mode
         if not mode:
@@ -718,11 +717,11 @@ def display(request, path):
         'dirname': dirname,
         'mode': mode,
         'compression': compression,
-        'size': stats['size'],
+        'size': stats.size,
         'max_chunk_size': str(MAX_CHUNK_SIZE_BYTES)
     }
     data["filename"] = os.path.basename(path)
-    data["editable"] = stats['size'] < MAX_FILEEDITOR_SIZE
+    data["editable"] = stats.size < MAX_FILEEDITOR_SIZE
     if mode == "binary":
         # This might be the wrong thing for ?format=json; doing the
         # xxd'ing in javascript might be more compact, or sending a less
@@ -934,8 +933,9 @@ def detect_snappy(contents):
 def detect_parquet(fhandle):
     """
     Detect parquet from magic header bytes.
+    Python 2 only currently.
     """
-    return parquet._check_header_magic_bytes(fhandle)
+    return False if sys.version_info[0] > 2 else parquet._check_header_magic_bytes(fhandle)
 
 
 def snappy_installed():
@@ -1175,7 +1175,12 @@ def touch(request):
         # No absolute path specification allowed.
         if posixpath.sep in name:
             raise PopupException(_("Could not name file \"%s\": Slashes are not allowed in filenames." % name))
-        request.fs.create(request.fs.join(urllib_unquote(path), urllib_unquote(name)))
+        request.fs.create(
+            request.fs.join(
+                urllib_unquote(path.encode('utf-8') if not isinstance(path, str) else path),
+                urllib_unquote(name.encode('utf-8') if not isinstance(name, str) else name)
+            )
+        )
 
     return generic_op(TouchForm, request, smart_touch, ["path", "name"], "path")
 
@@ -1200,7 +1205,10 @@ def move(request):
         for arg in args:
             if arg['src_path'] == arg['dest_path']:
                 raise PopupException(_('Source path and destination path cannot be same'))
-            request.fs.rename(urllib_unquote(arg['src_path']), urllib_unquote(arg['dest_path']))
+            request.fs.rename(
+                urllib_unquote(arg['src_path'].encode('utf-8') if not isinstance(arg['src_path'], str) else arg['src_path']),
+                urllib_unquote(arg['dest_path'].encode('utf-8') if not isinstance(arg['dest_path'], str) else arg['dest_path'])
+            )
     return generic_op(RenameFormSet, request, bulk_move, ["src_path", "dest_path"], None,
                       data_extractor=formset_data_extractor(recurring, params),
                       arg_extractor=formset_arg_extractor,
@@ -1215,7 +1223,7 @@ def copy(request):
         for arg in args:
             if arg['src_path'] == arg['dest_path']:
                 raise PopupException(_('Source path and destination path cannot be same'))
-            request.fs.copy(urllib_unquote(arg['src_path']), urllib_unquote(arg['dest_path']), recursive=True, owner=request.user)
+            request.fs.copy(unquote_url(arg['src_path']), unquote_url(arg['dest_path']), recursive=True, owner=request.user)
     return generic_op(CopyFormSet, request, bulk_copy, ["src_path", "dest_path"], None,
                       data_extractor=formset_data_extractor(recurring, params),
                       arg_extractor=formset_arg_extractor,
@@ -1295,7 +1303,8 @@ def upload_file(request):
         resp = _upload_file(request)
         response.update(resp)
     except Exception as ex:
-        response['data'] = str(ex).split('\n', 1)[0]
+        logger.exception('Upload failure')
+        response['data'] = smart_str(ex).split('\n', 1)[0]
         hdfs_file = request.FILES.get('hdfs_file')
         if hdfs_file and hasattr(hdfs_file, 'remove'):  # TODO: Call from proxyFS
             hdfs_file.remove()
@@ -1318,8 +1327,8 @@ def _upload_file(request):
 
     if form.is_valid():
         uploaded_file = request.FILES['hdfs_file']
-        dest = scheme_absolute_path(urllib_unquote(request.GET['dest']), urllib_unquote(form.cleaned_data['dest']))
-        filepath = request.fs.join(dest, uploaded_file.name)
+        dest = scheme_absolute_path(unquote_url(request.GET['dest']), unquote_url(request.GET['dest']))
+        filepath = request.fs.join(dest, unquote_url(uploaded_file.name))
 
         if request.fs.isdir(dest) and posixpath.sep in uploaded_file.name:
             raise PopupException(_('Sorry, no "%(sep)s" in the filename %(name)s.' % {'sep': posixpath.sep, 'name': uploaded_file.name}))
@@ -1327,7 +1336,6 @@ def _upload_file(request):
         try:
             request.fs.upload(file=uploaded_file, path=dest, username=request.user.username)
             response['status'] = 0
-
         except IOError as ex:
             already_exists = False
             try:
@@ -1345,7 +1353,7 @@ def _upload_file(request):
           'result': _massage_stats(request, stat_absolute_path(filepath, request.fs.stats(filepath))),
           'next': request.GET.get("next")
         })
- 
+
         return response
     else:
         raise PopupException(_("Error in upload form: %s") % (form.errors,))
@@ -1421,6 +1429,9 @@ def truncate(toTruncate, charsToKeep=50):
     else:
         return toTruncate
 
+def unquote_url(url):
+  url = urllib_unquote(url.encode('utf-8') if not isinstance(url, str) else url)
+  return url.decode('utf-8') if isinstance(url, bytes) else url
 
 def _is_hdfs_superuser(request):
   return request.user.username == request.fs.superuser or request.user.groups.filter(name__exact=request.fs.supergroup).exists()

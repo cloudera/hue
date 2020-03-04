@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import ASSIST_TABLE_TEMPLATES from 'ko/components/assist/ko.assistDbPanel';
 import AssistDbEntry from 'ko/components/assist/assistDbEntry';
@@ -128,8 +128,8 @@ const TEMPLATE =
           <!-- ko hueSpinner: { spin: uploadingTableStats, inline: true} --><!-- /ko -->
           <!-- ko ifnot: uploadingTableStats -->
           <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: function() { uploadTableStats(true) }, attr: { 'title': ('${I18n(
-            'Add table '
-          )}'  + (isMissingDDL() ? 'DDL' : '') + (isMissingDDL() && isMissingStats() ? ' ${I18n(
+            'Add table'
+          )} '  + (isMissingDDL() ? 'DDL' : '') + (isMissingDDL() && isMissingStats() ? ' ${I18n(
     'and'
   )} ' : '') + (isMissingStats() ? 'stats' : '')) }">
             <i class="fa fa-fw fa-plus-circle"></i> ${I18n('Improve Analysis')}

@@ -14,18 +14,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-Common utilities for testing Desktop django apps.
-"""
 
 import logging
 import re
 import json
 
 import django.test.client
-from django.contrib.auth.models import User, Group
-
 import nose.tools
+
+from useradmin.models import User, Group, Organization
+
+from desktop.conf import ENABLE_ORGANIZATIONS
 
 
 class Client(django.test.client.Client):
@@ -36,6 +35,7 @@ class Client(django.test.client.Client):
     response = self.get(*args, **kwargs)
     return json.JSONDecoder().decode(response.content)
 
+
 def assert_ok_response(response):
   """
   Checks that the response returned successfully.
@@ -45,12 +45,13 @@ def assert_ok_response(response):
   nose.tools.assert_true(200, response.status_code)
   return response
 
-def make_logged_in_client(username="test", password="test", is_superuser=True, recreate=False, groupname=None):
+
+def make_logged_in_client(username="test", password="test", is_superuser=True, recreate=False, groupname=None, is_admin=False):
   """
   Create a client with a user already logged in.
 
-  Sometimes we recreate the user, because some tests like to
-  mess with is_active and such.
+  Sometimes we recreate the user, because some tests like to mess with is_active and such.
+  Note: could be combined with backend.create_user and other standart utils.
   """
   try:
     user = User.objects.get(username=username)
@@ -58,8 +59,12 @@ def make_logged_in_client(username="test", password="test", is_superuser=True, r
       user.delete()
       raise User.DoesNotExist
   except User.DoesNotExist:
-    user = User.objects.create_user(username, username + '@localhost', password)
+    user = User.objects.create_user(username=username, password=password)
     user.is_superuser = is_superuser
+    if ENABLE_ORGANIZATIONS.get():
+      user.is_admin = is_admin
+    else:
+      user.is_superuser = user.is_superuser or is_admin
     user.save()
   else:
     if user.is_superuser != is_superuser:
@@ -67,8 +72,13 @@ def make_logged_in_client(username="test", password="test", is_superuser=True, r
       user.save()
 
   if groupname is not None:
-    group, created = Group.objects.get_or_create(name=groupname)
-    if not user.groups.filter(name=group.name).exists():
+    attributes = {'name': groupname}
+
+    if ENABLE_ORGANIZATIONS.get():
+      attributes['organization'] = user.organization
+
+    group, created = Group.objects.get_or_create(**attributes)
+    if not user.groups.filter(**attributes).exists():
       user.groups.add(group)
       user.save()
 
@@ -77,6 +87,7 @@ def make_logged_in_client(username="test", password="test", is_superuser=True, r
 
   assert ret, "Login failed (user '%s')." % username
   return c
+
 
 _MULTI_WHITESPACE = re.compile("\s+", flags=re.MULTILINE)
 
@@ -99,8 +110,8 @@ def assert_similar_pages(first, second, ratio=0.9, msg=None):
   Asserts that most of the lines (90% by default) in the two pages are identical,
   ignoring leading/trailing spaces.
   """
-  lines_a = set([ l.strip() for l in first.split('\n') ])
-  lines_b = set([ l.strip() for l in second.split('\n') ])
+  lines_a = set([l.strip() for l in first.split('\n')])
+  lines_b = set([l.strip() for l in second.split('\n')])
   common = lines_a.intersection(lines_b)
   similarity = 1.0 * len(common) / max(len(lines_a), len(lines_b))
   nose.tools.assert_true(similarity >= ratio, msg)
@@ -116,14 +127,13 @@ def configure_django_for_test():
   # This must be run before importing models
   # Be sure not to include any INSTALLED_APPS, since then the models
   # code will try very hard to load it.
-  settings.configure(DATABASE_ENGINE="sqlite3", DATABASE_NAME=":memory:",
-    INSTALLED_APPS=())
+  settings.configure(DATABASE_ENGINE="sqlite3", DATABASE_NAME=":memory:", INSTALLED_APPS=())
 
 
 def create_tables(model):
   """ Create all tables for the given model.
 
-  This is a subset of django.core.management.commands.syncdb
+  This is a subset of django.core.management.commands.migrate
   """
   from django.db import connection
   from django.db.models import Model

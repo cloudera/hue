@@ -45,7 +45,10 @@ module.exports = {
   },
   optimization: {
     //minimize: true
-    minimize: false
+    minimize: false,
+    splitChunks: {
+      automaticNameMaxLength: 90
+    }
   },
   output: {
     path: __dirname + '/desktop/core/src/desktop/static/desktop/js/bundles/workers',

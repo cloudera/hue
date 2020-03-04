@@ -20,19 +20,15 @@ from builtins import map
 import pwd
 import grp
 import logging
-import threading
 import subprocess
+import sys
 import json
 
 from axes.decorators import FAILURE_LIMIT, LOCK_OUT_AT_FAILURE
 from axes.models import AccessAttempt
 from axes.utils import reset
-
 import ldap
-from useradmin import ldap_access
-from useradmin.ldap_access import LdapBindException, LdapSearchException
 
-from django.contrib.auth.models import User, Group
 from django.urls import reverse
 from django.forms import ValidationError
 from django.forms.utils import ErrorList
@@ -42,32 +38,38 @@ from django.utils.encoding import smart_str
 from django.utils.translation import get_language, ugettext as _
 
 import desktop.conf
-from desktop.conf import LDAP
+from desktop.auth.backend import is_admin
+from desktop.conf import LDAP, ENABLE_ORGANIZATIONS, ENABLE_CONNECTORS
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import _get_apps
 from desktop.views import antixss
-
 from hadoop.fs.exceptions import WebHdfsException
-from useradmin.models import HuePermission, UserProfile, LdapGroup
-from useradmin.models import get_profile, get_default_user_group
-from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm, AddLdapUsersForm,\
-  PermissionsEditForm, GroupEditForm, SuperUserChangeForm, UserChangeForm, validate_username, validate_first_name, \
-  validate_last_name, PasswordChangeForm
 
-from desktop.auth.backend import is_admin
+from useradmin import ldap_access
+from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm, AddLdapUsersForm, \
+  PermissionsEditForm, GroupEditForm, SuperUserChangeForm, validate_username, validate_first_name, \
+  validate_last_name, PasswordChangeForm
+from useradmin.ldap_access import LdapBindException, LdapSearchException
+from useradmin.models import HuePermission, UserProfile, LdapGroup, get_profile, get_default_user_group, User, Group, Organization
+
+if sys.version_info[0] > 2:
+  unicode = str
+
+if ENABLE_ORGANIZATIONS.get():
+  from useradmin.forms import OrganizationUserChangeForm as UserChangeForm, OrganizationSuperUserChangeForm as SuperUserChangeForm
+else:
+  from useradmin.forms import UserChangeForm, SuperUserChangeForm
+
 
 LOG = logging.getLogger(__name__)
-
-__users_lock = threading.Lock()
-__groups_lock = threading.Lock()
 
 
 def is_ldap_setup():
   return bool(LDAP.LDAP_SERVERS.get()) or LDAP.LDAP_URL.get() is not None
 
-def list_users(request):
 
+def list_users(request):
   return render("list_users.mako", request, {
       'users': User.objects.all(),
       'users_json': json.dumps(list(User.objects.values_list('id', flat=True))),
@@ -78,7 +80,6 @@ def list_users(request):
 
 
 def list_groups(request):
-
   return render("list_groups.mako", request, {
       'groups': Group.objects.all(),
       'groups_json': json.dumps(list(Group.objects.values_list('name', flat=True))),
@@ -88,10 +89,14 @@ def list_groups(request):
 
 
 def list_permissions(request):
-  current_app, other_apps, apps_list = _get_apps(request.user)
+  if ENABLE_CONNECTORS.get():
+    permissions = HuePermission.objects.all()
+  else:
+    current_app, other_apps, apps_list = _get_apps(request.user)
+    permissions = HuePermission.objects.filter(app__in=apps_list)
 
   return render("list_permissions.mako", request, {
-    'permissions': HuePermission.objects.filter(app__in=apps_list),
+    'permissions': permissions,
     'is_embeddable': request.GET.get('is_embeddable', False)
   })
 
@@ -99,6 +104,14 @@ def list_permissions(request):
 def list_configurations(request):
   return render("list_configurations.mako", request, {
     'is_embeddable': request.GET.get('is_embeddable', False)
+  })
+
+
+def list_organizations(request):
+  return render("list_organizations.mako", request, {
+      'groups': Organization.objects.all(),
+      'groups_json': json.dumps(list(Organization.objects.values_list('name', flat=True))),
+      'is_embeddable': request.GET.get('is_embeddable', False),
   })
 
 
@@ -131,6 +144,7 @@ def list_for_autocomplete(request):
   }
   return JsonResponse(response)
 
+
 def get_users_by_id(request):
   userids = json.loads(request.GET.get('userids', "[]"))
   userids = userids[:100]
@@ -139,6 +153,7 @@ def get_users_by_id(request):
     'users': massage_users_for_json(users)
   }
   return JsonResponse(response)
+
 
 def massage_users_for_json(users, extended=False):
   simple_users = []
@@ -186,31 +201,33 @@ def delete_user(request):
     raise PopupException(_('A POST request is required.'))
 
   ids = request.POST.getlist('user_ids')
-  global __users_lock
-  __users_lock.acquire()
-  try:
-    if str(request.user.id) in ids:
-      raise PopupException(_("You cannot remove yourself."), error_code=401)
+  is_delete = request.POST.get('is_delete')
+  action_text = _('deleted') if is_delete else _('deactivated')
 
-    usernames = list(User.objects.filter(id__in=ids).values_list('username', flat=True))
+  if str(request.user.id) in ids:
+    raise PopupException(_("You cannot remove yourself."), error_code=401)
+
+  users = User.objects.filter(id__in=ids)
+  usernames = list(users.values_list('username', flat=True))
+
+  if is_delete:
     UserProfile.objects.filter(user__id__in=ids).delete()
-    User.objects.filter(id__in=ids).delete()
+    users.delete()
+  else:
+    users.update(is_active=False)
 
-    request.audit = {
-      'operation': 'DELETE_USER',
-      'operationText': 'Deleted User(s): %s' % ', '.join(usernames)
-    }
-  finally:
-    __users_lock.release()
+  request.audit = {
+    'operation': 'DELETE_USER',
+    'operationText': '%s User(s): %s' % (action_text.title(), ', '.join(usernames))
+  }
 
   is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
 
   if is_embeddable:
     return JsonResponse({'url': '/hue' + reverse(list_users)})
   else:
-    request.info(_('The users were deleted.'))
+    request.info(_('The users were %s.') % action_text)
     return redirect(reverse(list_users))
-
 
 
 def delete_group(request):
@@ -295,7 +312,8 @@ def edit_user(request, username=None):
     form = form_class(request.POST, instance=instance)
     if is_admin(request.user) and request.user.username != username:
       form.fields.pop("password_old")
-    if form.is_valid(): # All validation rules pass
+
+    if form.is_valid():
       if instance is None:
         instance = form.save()
         get_profile(instance)
@@ -305,36 +323,33 @@ def edit_user(request, username=None):
         if request.user.username == username and not form.instance.is_active:
           raise PopupException(_("You cannot make yourself inactive."), error_code=401)
 
-        # user changing his own information, form.changed_data=['ensure_home_directory', 'language'] or changing information about another user, form.changed_data=['ensure_home_directory']
-        updated = (request.user.username == username and len(form.changed_data) > 2) or (request.user.username != username and len(form.changed_data) > 1)
+        # User changing his own information, form.changed_data=['ensure_home_directory', 'language']
+        # or changing information about another user, form.changed_data=['ensure_home_directory']
+        updated = (
+          request.user.username == username and len(form.changed_data) > 2) or (
+          request.user.username != username and len(form.changed_data) > 1
+        )
 
-        global __users_lock
-        __users_lock.acquire()
-        try:
-          # form.instance (and instance) now carry the new data
-          orig = User.objects.get(username=username)
-          if orig.is_superuser:
-            if not form.instance.is_superuser or not form.instance.is_active:
-              _check_remove_last_super(orig)
-          else:
-            if form.instance.is_superuser and not is_admin(request.user):
-              raise PopupException(_("You cannot make yourself a superuser."), error_code=401)
+        # form.instance (and instance) now carry the new data
+        orig = User.objects.get(username=username)
+        if orig.is_superuser:
+          if not form.instance.is_superuser or not form.instance.is_active:
+            _check_remove_last_super(orig)
+        else:
+          if form.instance.is_superuser and not is_admin(request.user):
+            raise PopupException(_("You cannot make yourself a superuser."), error_code=401)
 
-          # All ok
-          form.save()
+        form.save()
 
-          # Unlock account if selected
-          if form.cleaned_data.get('unlock_account'):
-            if not is_admin(request.user):
-              raise PopupException(_('You must be a superuser to reset users.'), error_code=401)
+        if form.cleaned_data.get('unlock_account'):
+          if not is_admin(request.user):
+            raise PopupException(_('You must be a superuser to reset users.'), error_code=401)
 
-            try:
-              reset(username=username)
-              request.info(_('Successfully unlocked account for user: %s') % username)
-            except Exception as e:
-              raise PopupException(_('Failed to reset login attempts for %s: %s') % (username, str(e)))
-        finally:
-          __users_lock.release()
+          try:
+            reset(username=username)
+            request.info(_('Successfully unlocked account for user: %s') % username)
+          except Exception as e:
+            raise PopupException(_('Failed to reset login attempts for %s: %s') % (username, str(e)))
 
       # Ensure home directory is created, if necessary.
       if form.cleaned_data.get('ensure_home_directory'):
@@ -444,15 +459,17 @@ def edit_group(request, name=None):
 
   if request.method == 'POST':
     form = GroupEditForm(request.POST, instance=instance)
+
     if form.is_valid():
       form.save()
 
-      # Audit log
       if name is not None:
         usernames = instance.user_set.all().values_list('username', flat=True)
         request.audit = {
           'operation': 'EDIT_GROUP',
-          'operationText': 'Edited Group: %s, with member(s): %s' % (name, ', '.join([user.username for diffs in form._compute_diff("members") for user in diffs]) )
+          'operationText': 'Edited Group: %s, with member(s): %s' % (
+            name, ', '.join([user.username for diffs in form._compute_diff("members") for user in diffs])
+          )
         }
       else:
         user_ids = request.POST.getlist('members', [])
@@ -471,8 +488,10 @@ def edit_group(request, name=None):
     form = GroupEditForm(instance=instance)
 
   if request.method == 'POST' and is_embeddable:
-    return JsonResponse(
-      {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
+    return JsonResponse({
+      'status': -1,
+      'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]
+    })
   else:
     return render('edit_group.mako', request, {
       'form': form,
@@ -524,7 +543,8 @@ def edit_permission(request, app=None, priv=None):
     form = PermissionsEditForm(instance=instance)
   if request.method == 'POST' and is_embeddable:
     return JsonResponse(
-      {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
+        {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]}
+    )
   else:
     return render('edit_permissions.mako', request, {
       'form': form,
@@ -683,7 +703,8 @@ def add_ldap_groups(request):
 
   if request.method == 'POST' and is_embeddable:
     return JsonResponse(
-      {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
+        {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]}
+    )
   else:
     return render('edit_group.mako', request, dict(form=form, action=request.path, ldap=True, is_embeddable=is_embeddable))
 
@@ -719,8 +740,7 @@ def sync_ldap_users_groups(request):
 
       failed_ldap_users = []
 
-      sync_ldap_users_and_groups(connection, is_ensuring_home_directory, request.fs,
-                                 failed_users=failed_ldap_users)
+      sync_ldap_users_and_groups(connection, is_ensuring_home_directory, request.fs, failed_users=failed_ldap_users)
 
       request.audit = {
         'operation': 'SYNC_LDAP_USERS_GROUPS',
@@ -740,7 +760,8 @@ def sync_ldap_users_groups(request):
 
   if request.method == 'POST' and is_embeddable:
     return JsonResponse(
-      {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
+        {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]}
+    )
   else:
     return render("sync_ldap_users_groups.mako", request, dict(path=request.path, form=form, is_embeddable=is_embeddable))
 
@@ -763,14 +784,15 @@ def sync_ldap_users_and_groups(connection, is_ensuring_home_directory=False, fs=
 
 
 def import_ldap_users(connection, user_pattern, sync_groups, import_by_dn, server=None, failed_users=None):
-  return _import_ldap_users(connection, user_pattern, sync_groups=sync_groups, import_by_dn=import_by_dn, server=server,
-                            failed_users=failed_users)
+  return _import_ldap_users(
+      connection, user_pattern, sync_groups=sync_groups, import_by_dn=import_by_dn, server=server, failed_users=failed_users
+  )
 
 
-def import_ldap_groups(connection, group_pattern, import_members, import_members_recursive, sync_users, import_by_dn,
-                       failed_users=None):
-  return _import_ldap_groups(connection, group_pattern, import_members, import_members_recursive, sync_users,
-                             import_by_dn, failed_users=failed_users)
+def import_ldap_groups(connection, group_pattern, import_members, import_members_recursive, sync_users, import_by_dn, failed_users=None):
+  return _import_ldap_groups(
+      connection, group_pattern, import_members, import_members_recursive, sync_users, import_by_dn, failed_users=failed_users
+  )
 
 
 def get_find_groups_filter(ldap_info, server=None):
@@ -809,6 +831,10 @@ def ensure_home_directory(fs, user):
 
   Throws IOError, WebHdfsException.
   """
+  if fs is None:
+    LOG.warn("Not creating home directory of %s as no file system connector is configured" % user)
+    return
+
   userprofile = get_profile(user)
   username = user.username
   home_directory = userprofile.home_directory
@@ -818,7 +844,7 @@ def ensure_home_directory(fs, user):
     home_directory = userprofile.home_directory.split('@')[0]
 
   if userprofile is not None and userprofile.home_directory:
-    if not isinstance(home_directory, str):
+    if not isinstance(home_directory, unicode):
       home_directory = home_directory.decode("utf-8")
     fs.do_as_user(username, fs.create_home_dir, home_directory)
   else:
@@ -830,14 +856,10 @@ def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
   groups from 'getent passwd' and 'getent groups'. This should also pull in
   users who are accessible via NSS.
   """
-  global __users_lock, __groups_lock
-
   hadoop_groups = dict((group.gr_name, group) for group in grp.getgrall() \
       if (group.gr_gid >= min_gid and group.gr_gid < max_gid) or group.gr_name == 'hadoop')
   user_groups = dict()
 
-  __users_lock.acquire()
-  __groups_lock.acquire()
   # Import groups
   for name, group in hadoop_groups.items():
     try:
@@ -881,9 +903,6 @@ def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
     hue_user.save()
     LOG.info(_("Synced user %s from Unix") % hue_user.username)
 
-  __users_lock.release()
-  __groups_lock.release()
-
 
 def _check_remove_last_super(user_obj):
   """Raise an error if we're removing the last superuser"""
@@ -892,9 +911,9 @@ def _check_remove_last_super(user_obj):
     return
 
   # Is there any other active superuser left?
-  all_active_su = User.objects.filter(is_superuser__exact = True,
-                                      is_active__exact = True)
+  all_active_su = User.objects.filter(is_superuser__exact = True, is_active__exact = True)
   num_active_su = all_active_su.count()
+
   if num_active_su < 1:
     raise PopupException(_("No active superuser configured."))
   if num_active_su == 1:
@@ -995,8 +1014,10 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
           # Add only if user isn't part of group.
             current_ldap_groups.add(Group.objects.get(name=group_info['name']))
             if not user.groups.filter(name=group_info['name']).exists():
-              groups = import_ldap_groups(connection, group_info['dn'], import_members=False, import_members_recursive=False,
-                                          sync_users=True, import_by_dn=True, failed_users=failed_users)
+              groups = import_ldap_groups(
+                  connection, group_info['dn'], import_members=False, import_members_recursive=False,
+                  sync_users=True, import_by_dn=True, failed_users=failed_users
+              )
               if groups:
                 new_groups.update(groups)
         # Remove out of date groups

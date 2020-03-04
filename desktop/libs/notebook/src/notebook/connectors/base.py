@@ -24,6 +24,7 @@ import uuid
 
 from django.utils.translation import ugettext as _
 
+from desktop.auth.backend import is_admin
 from desktop.conf import TASK_SERVER, has_connectors
 from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
@@ -106,8 +107,14 @@ class Notebook(object):
     return _data
 
   def get_str(self, from_oozie_action=False):
-    return '\n\n\n'.join(['USE %s;\n\n%s' % (snippet['database'], snippet['statement_raw'] if from_oozie_action else Notebook.statement_with_variables(snippet))
-                          for snippet in self.get_data()['snippets']])
+    return '\n\n\n'.join([
+        'USE %s;\n\n%s' % (
+          snippet['database'],
+          snippet['statement_raw'] if from_oozie_action else Notebook.statement_with_variables(snippet)
+        )
+        for snippet in self.get_data()['snippets']
+      ]
+    )
 
   @staticmethod
   def statement_with_variables(snippet):
@@ -130,7 +137,14 @@ class Notebook(object):
         value = str(variable['value'])
         return p1 + (value if value is not None else variable['meta'].get('placeholder',''))
 
-      return re.sub("([^\\\\])\\$" + ("{(" if hasCurlyBracketParameters else "(") + variablesString + ")(=[^}]*)?" + ("}" if hasCurlyBracketParameters else ""), replace, statement_raw)
+      return re.sub(
+          "([^\\\\])\\$" + (
+            "{(" if hasCurlyBracketParameters else "(") + variablesString + ")(=[^}]*)?" + ("}"
+            if hasCurlyBracketParameters else ""
+          ),
+          replace,
+          statement_raw
+      )
 
     return statement_raw
 
@@ -265,13 +279,58 @@ class Notebook(object):
     )
 
   def execute(self, request, batch=False):
-    from notebook.api import _execute_notebook # Cyclic dependency
+    from notebook.api import _execute_notebook  # Cyclic dependency
 
     notebook_data = self.get_data()
     snippet = notebook_data['snippets'][0]
     snippet['wasBatchExecuted'] = batch
 
     return _execute_notebook(request, notebook_data, snippet)
+
+
+  def execute_and_wait(self, request, timeout_sec=30.0, sleep_interval=0.5):
+      """
+      Run query and check status until it finishes or timeouts.
+
+      Check status until it finishes or timeouts.
+      """
+      handle = self.execute(request, batch=False)
+
+      if handle['status'] != 0:
+        raise QueryError(e, message='SQL statement failed.', handle=handle)
+
+      operation_id = handle['history_uuid']
+      curr = time.time()
+      end = curr + timeout_sec
+
+      status = self.check_status(request, operation_id=operation_id)
+
+      while curr <= end:
+        if status['status'] not in ('waiting', 'running'):
+          return handle
+
+        status = self.check_status(request, operation_id=operation_id)
+        time.sleep(sleep_interval)
+        curr = time.time()
+
+      # TODO
+      # msg = "The query timed out after %(timeout)d seconds, canceled query." % {'timeout': timeout_sec}
+      # LOG.warning(msg)
+      # try:
+      #   self.cancel_operation(handle)
+      #   # get_api(request, snippet).cancel(notebook, snippet)
+      # except Exception as e:
+      #   msg = "Failed to cancel query."
+      #   LOG.warning(msg)
+      #   self.close_operation(handle)
+      #   raise QueryServerException(e, message=msg)
+
+      raise OperationTimeout()
+
+  def check_status(self, request, operation_id):
+    from notebook.api import _check_status  # Cyclic dependency
+
+    return _check_status(request, operation_id=operation_id)
 
 
 def get_interpreter(connector_type, user=None):
@@ -317,17 +376,27 @@ def get_api(request, snippet):
   if snippet.get('wasBatchExecuted') and not TASK_SERVER.ENABLED.get():
     return OozieApi(user=request.user, request=request)
 
-  if snippet['type'] == 'report':
+  if snippet.get('type') == 'report':
     snippet['type'] = 'impala'
 
-  interpreter = get_interpreter(connector_type=snippet['type'], user=request.user)
+  if snippet.get('connector'):
+    connector_name = snippet['connector']['type']  # Ideally unify with name and nice_name
+    snippet['type'] = connector_name
+  else:
+    connector_name = snippet['type']
+
+  if has_connectors() and snippet.get('type') == 'hello' and is_admin(request.user):
+    interpreter = snippet.get('interpreter')
+  else:
+    interpreter = get_interpreter(connector_type=connector_name, user=request.user)
+
   interface = interpreter['interface']
 
   if get_cluster_config(request.user)['has_computes']:
-    compute = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API or Notebook create sessions.
+    compute = json.loads(request.POST.get('cluster', '""'))  # Via Catalog autocomplete API or Notebook create sessions.
     if compute == '""' or compute == 'undefined':
       compute = None
-    if not compute and snippet.get('compute'): # Via notebook.ko.js
+    if not compute and snippet.get('compute'):  # Via notebook.ko.js
       interpreter['compute'] = snippet['compute']
 
   LOG.debug('Selected interpreter %s interface=%s compute=%s' % (
@@ -336,7 +405,7 @@ def get_api(request, snippet):
     interpreter.get('compute') and interpreter['compute']['name'])
   )
 
-  if interface == 'hiveserver2':
+  if interface == 'hiveserver2' or interface == 'hms':
     from notebook.connectors.hiveserver2 import HS2Api
     return HS2Api(user=request.user, request=request, interpreter=interpreter)
   elif interface == 'oozie':
@@ -390,6 +459,12 @@ def get_api(request, snippet):
   elif interface == 'hbase':
     from notebook.connectors.hbase import HBaseApi
     return HBaseApi(request.user)
+  elif interface == 'ksql':
+    from notebook.connectors.ksql import KSqlApi
+    return KSqlApi(request.user, interpreter=interpreter)
+  elif interface == 'flink':
+    from notebook.connectors.flink import FlinkSqlApi
+    return FlinkSqlApi(request.user, interpreter=interpreter)
   elif interface == 'kafka':
     from notebook.connectors.kafka import KafkaApi
     return KafkaApi(request.user)
@@ -460,7 +535,7 @@ class Api(object):
   def get_jobs(self, notebook, snippet, logs):
     return []
 
-  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False, operation=None): raise NotImplementedError()
+  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None): raise NotImplementedError()
 
   def export_data_as_hdfs_file(self, snippet, target_file, overwrite): raise NotImplementedError()
 
@@ -517,6 +592,8 @@ class Api(object):
 
   def describe_database(self, notebook, snippet, database=None):
     return {}
+
+  def close_statement(self, notebook, snippet): pass
 
   def _get_current_statement(self, notebook, snippet):
     should_close, resp = get_current_statement(snippet)

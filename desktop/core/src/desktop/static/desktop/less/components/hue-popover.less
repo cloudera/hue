@@ -286,8 +286,9 @@
 
 .context-popover-doc-description {
   .flex(1);
-
+  font-size: 13px;
   margin-top: 5px;
+  white-space: pre-wrap;
 
   > em {
     font-style: normal;
@@ -322,6 +323,27 @@
 
 .context-popover-link-row a {
   margin-left: 10px;
+}
+
+.context-popover-bottom-attributes {
+  padding: 7px 0 0 7px;
+  .nowrap-ellipsis;
+
+  > div {
+    display: inline-block;
+    font-size: 12px;
+    margin-right: 5px;
+
+    > span:first-child {
+      color: @cui-gray-700;
+      margin-right: 3px;
+    }
+
+    > span:last-child {
+      font-weight: 300;
+      color: @cui-gray-900;
+    }
+  }
 }
 
 .context-popover-inline-search {

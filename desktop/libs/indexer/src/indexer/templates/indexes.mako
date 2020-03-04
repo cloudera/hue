@@ -88,7 +88,7 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
         <div class="nav-collapse">
           <ul class="nav">
             <li class="app-header">
-              <a href="/${app_name}">
+              <a href="/indexer">
                 ${ _('Index Browser') }
               </a>
             </li>

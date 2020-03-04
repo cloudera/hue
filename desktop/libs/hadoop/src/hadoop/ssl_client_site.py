@@ -19,15 +19,21 @@ from __future__ import absolute_import
 import errno
 import logging
 import os.path
+import sys
 
 from hadoop import conf
 from hadoop import confparse
 
+if sys.version_info[0] > 2:
+  open_file = open
+else:
+  open_file = file
 
 _SSL_SITE_PATH = None                  # Path to ssl-client.xml
 _SSL_SITE_DICT = None                  # A dictionary of name/value config options
 
 _CNF_TRUSTORE_LOCATION = 'ssl.client.truststore.location'
+_CNF_TRUSTORE_PASSWORD = 'ssl.client.truststore.password'
 
 LOG = logging.getLogger(__name__)
 
@@ -50,7 +56,7 @@ def _parse_ssl_client_site():
   for indentifier in conf.HDFS_CLUSTERS.get():
     try:
       _SSL_SITE_PATH = os.path.join(conf.HDFS_CLUSTERS[indentifier].HADOOP_CONF_DIR.get(), 'ssl-client.xml')
-      data = file(_SSL_SITE_PATH, 'r').read()
+      data = open_file(_SSL_SITE_PATH, 'r').read()
       break
     except KeyError:
       data = ""
@@ -66,3 +72,7 @@ def _parse_ssl_client_site():
 
 def get_trustore_location():
   return get_conf().get(_CNF_TRUSTORE_LOCATION)
+
+
+def get_trustore_password():
+  return get_conf().get(_CNF_TRUSTORE_PASSWORD)

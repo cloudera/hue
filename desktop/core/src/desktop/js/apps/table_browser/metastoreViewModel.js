@@ -15,12 +15,13 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 import MetastoreSource from 'apps/table_browser/metastoreSource';
+import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 
 class MetastoreViewModel {
   /**
@@ -66,26 +67,12 @@ class MetastoreViewModel {
 
     this.loading = ko.pureComputed(() => !this.source() || this.source().loading());
 
-    huePubSub.publish('cluster.config.get.config', clusterConfig => {
+    // TODO: Support dynamic config changes
+    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, clusterConfig => {
       const initialSourceType = options.sourceType || 'hive';
-      if (
-        clusterConfig &&
-        clusterConfig.app_config &&
-        ((clusterConfig.app_config.editor && clusterConfig.app_config.editor.interpreters) ||
-          clusterConfig.app_config.catalogs)
-      ) {
+
+      if (clusterConfig && clusterConfig.app_config && clusterConfig.app_config.catalogs) {
         const sources = [];
-        clusterConfig.app_config.editor.interpreters.forEach(interpreter => {
-          if (interpreter.is_sql) {
-            sources.push(
-              new MetastoreSource({
-                metastoreViewModel: this,
-                name: interpreter.name,
-                type: interpreter.type
-              })
-            );
-          }
-        });
         if (clusterConfig.app_config.catalogs) {
           clusterConfig.app_config.catalogs.forEach(interpreter => {
             sources.push(

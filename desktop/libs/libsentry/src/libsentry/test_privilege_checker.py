@@ -19,11 +19,11 @@
 from builtins import object
 import pickle
 
-from django.contrib.auth.models import User
 from nose.tools import assert_equal, assert_false, assert_true
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
+from useradmin.models import User
 
 from libsentry.privilege_checker import PrivilegeChecker
 

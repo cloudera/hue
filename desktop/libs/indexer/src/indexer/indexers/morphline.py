@@ -20,7 +20,6 @@ import os
 
 from collections import deque
 
-from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from mako.lookup import TemplateLookup
@@ -28,9 +27,9 @@ from mako.lookup import TemplateLookup
 from desktop.models import Document2
 from notebook.connectors.base import get_api
 from notebook.models import Notebook, make_notebook
+from useradmin.models import User
 
-from indexer.conf import CONFIG_INDEXING_TEMPLATES_PATH
-from indexer.conf import CONFIG_INDEXER_LIBS_PATH
+from indexer.conf import CONFIG_INDEXING_TEMPLATES_PATH, CONFIG_INDEXER_LIBS_PATH
 from indexer.fields import get_field_type
 from indexer.file_format import get_file_format_instance, get_file_format_class
 from indexer.indexers.morphline_operations import get_checked_args

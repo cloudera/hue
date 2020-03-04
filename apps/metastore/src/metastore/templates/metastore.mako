@@ -22,10 +22,9 @@ from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter, _ko
 from beeswax.conf import LIST_PARTITIONS_LIMIT
+from webpack_loader.templatetags.webpack_loader import render_bundle
 
 from metastore.conf import ENABLE_NEW_CREATE_TABLE
-
-from webpack_loader.templatetags.webpack_loader import render_bundle
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
@@ -66,7 +65,6 @@ ${ commonheader(_("Metastore"), app_name, user, request) | n,unicode }
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-wysihtml5-0.0.2.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 
-## ${ render_bundle('vendors~tableBrowser') | n,unicode }
 ${ render_bundle('tableBrowser') | n,unicode }
 
 <span class="notebook">
@@ -78,7 +76,9 @@ ${ components.menubar(is_embeddable) }
 <script type="text/html" id="metastore-breadcrumbs">
   <div style="font-size: 14px; margin: 0 12px; line-height: 27px;">
     <!-- ko if: sources().length >= 2 -->
-    <div data-bind="component: { name: 'hue-drop-down', params: { value: source, entries: sources, onSelect: sourceChanged, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Source') }' } }" style="display: inline-block"></div>
+    <div data-bind="component: { name: 'hue-drop-down', params: { value: source, entries: sources, onSelect: sourceChanged, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Source') }' } }"
+      style="display: inline-block">
+    </div>
     <!-- /ko -->
     <!-- ko with: source -->
     <!-- ko if: window.HAS_MULTI_CLUSTER -->
@@ -86,7 +86,9 @@ ${ components.menubar(is_embeddable) }
     <i class="margin-left-10 fa fa-warning"></i> ${ _('No namespaces found') }
     <!-- /ko -->
     <!-- ko if: namespaces().length > 0 -->
-    <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: namespaces, onSelect: namespaceChanged, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Namespace') }' } }" style="display: inline-block"></div>
+    <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { value: namespace, entries: namespaces, onSelect: namespaceChanged, labelAttribute: 'name', searchable: true, linkTitle: '${ _ko('Namespace') }' } }"
+      style="display: inline-block">
+    </div>
     <!-- /ko -->
     <!-- /ko -->
     <!-- /ko -->
@@ -988,7 +990,7 @@ ${ components.menubar(is_embeddable) }
       dataType: 'json',
       success: function(resp) {
         if (resp.history_uuid) {
-          huePubSub.publish('notebook.task.submitted', resp.history_uuid);
+          huePubSub.publish('notebook.task.submitted', resp);
           huePubSub.publish('metastore.clear.selection');
         } else if (resp && resp.message) {
           $(document).trigger("error", resp.message);
@@ -1026,7 +1028,7 @@ ${ components.menubar(is_embeddable) }
       cluster: compute
     },function(resp) {
       if (resp.history_uuid) {
-        huePubSub.publish('open.editor.query', resp.history_uuid);
+        huePubSub.publish('open.editor.query', resp);
       } else if (resp.message) {
         $(document).trigger("error", resp.message);
       }

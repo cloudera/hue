@@ -25,14 +25,13 @@ import ldap.filter
 import logging
 import re
 
-from django.contrib.auth.models import User
-
 import desktop.conf
 from desktop.lib.python_util import CaseInsensitiveDict
+from useradmin.models import User
+from django.utils.encoding import smart_text
 
 
 LOG = logging.getLogger(__name__)
-
 CACHED_LDAP_CONN = None
 
 
@@ -52,7 +51,7 @@ def get_connection_from_server(server=None):
     ldap_config = ldap_servers[server]
   else:
     ldap_config = desktop.conf.LDAP
-     
+
   return get_connection(ldap_config)
 
 def get_connection(ldap_config):
@@ -211,7 +210,7 @@ class LdapConnection(object):
     """
     :param result_data: List of dictionaries that have ldap attributes and their associated values. Generally the result list from an ldapsearch request.
     :param user_name_attr: The ldap attribute that is returned by the server to map to ``username`` in the return dictionary.
-    
+
     :returns list of dictionaries that take on the following form: {
       'dn': <distinguished name of entry>,
       'username': <ldap attribute associated with user_name_attr>
@@ -240,13 +239,15 @@ class LdapConnection(object):
           }
 
           if 'givenName' in data:
-            if len(data['givenName'][0]) > 30:
+            first_name = smart_text(data['givenName'][0])
+            if len(first_name) > 30:
               LOG.warn('First name is truncated to 30 characters for [<User: %s>].' % ldap_info['username'])
-            ldap_info['first'] = data['givenName'][0][:30]
+            ldap_info['first'] = first_name[:30]
           if 'sn' in data:
-            if len(data['sn'][0]) > 30:
+            last_name = smart_text(data['sn'][0])
+            if len(last_name) > 30:
               LOG.warn('Last name is truncated to 30 characters for [<User: %s>].' % ldap_info['username'])
-            ldap_info['last'] = data['sn'][0][:30]
+            ldap_info['last'] = last_name[:30]
           if 'mail' in data:
             ldap_info['email'] = data['mail'][0]
           # memberOf and isMemberOf should be the same if they both exist
@@ -310,7 +311,7 @@ class LdapConnection(object):
     :param user_name_attr: The ldap attribute that is returned by the server to map to ``username`` in the return dictionary.
     :param find_by_dn: Search by distinguished name.
     :param scope: ldapsearch scope.
-    
+
     :returns: List of dictionaries that take on the following form: {
       'dn': <distinguished name of entry>,
       'username': <ldap attribute associated with user_name_attr>
@@ -372,7 +373,7 @@ class LdapConnection(object):
     :param group_name_attr: The ldap attribute that is returned by the server to map to ``name`` in the return dictionary.
     :param find_by_dn: Search by distinguished name.
     :param scope: ldapsearch scope.
-    
+
     :returns: List of dictionaries that take on the following form: {
       'dn': <distinguished name of entry>,
       'name': <ldap attribute associated with group_name_attr>

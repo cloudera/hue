@@ -51,12 +51,12 @@ def error_handler(view_fn):
         return view_fn(*args, **kwargs)
       else:
         raise CatalogApiException('Navigator API is not configured.')
-    except CatalogApiException, e:
+    except CatalogApiException as e:
       try:
         response['message'] = json.loads(e.message)
       except Exception:
         response['message'] = force_unicode(e.message)
-    except Exception, e:
+    except Exception as e:
       message = force_unicode(e)
       response['message'] = message
       LOG.exception(message)

@@ -1,0 +1,19 @@
+{{- if .Values.balancer.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: hue-balancer
+spec:
+  type: NodePort
+  # type: LoadBalancer
+  selector:
+    pod: hue
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 86400
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+{{- end -}}

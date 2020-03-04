@@ -21,11 +21,11 @@ standard_library.install_aliases()
 from builtins import map
 from builtins import range
 from past.builtins import basestring
-from past.utils import old_div
 from builtins import object
 import base64
 import queue
 import logging
+import math
 import socket
 import threading
 import time
@@ -36,8 +36,7 @@ import sys
 
 from thrift.Thrift import TType, TApplicationException
 from thrift.transport.TSocket import TSocket
-from thrift.transport.TTransport import TBufferedTransport, TFramedTransport, TMemoryBuffer,\
-                                        TTransportException
+from thrift.transport.TTransport import TBufferedTransport, TFramedTransport, TMemoryBuffer, TTransportException
 from thrift.protocol.TBinaryProtocol import TBinaryProtocol
 from thrift.protocol.TMultiplexedProtocol import TMultiplexedProtocol
 
@@ -317,7 +316,7 @@ def connect_to_thrift(conf):
 
   if conf.transport_mode == 'http':
     if conf.use_sasl and conf.mechanism != 'PLAIN':
-      mode.set_kerberos_auth()
+      mode.set_kerberos_auth(service=conf.kerberos_principal)
     else:
       mode.set_basic_auth(conf.username, conf.password)
 
@@ -471,7 +470,10 @@ class SuperClient(object):
       while tries_left:
         # clear exception state so our re-raise can't reraise something
         # old. This isn't strictly necessary, but feels safer.
-        sys.exc_clear()
+        # py3 doesn't have this
+        if sys.version_info[0] == 2:
+          sys.exc_clear()
+
         try:
           if not self.transport.isOpen():
             self.transport.open()
@@ -495,29 +497,39 @@ class SuperClient(object):
           duration = time.time() - st
 
           # Log the duration at different levels, depending on how long it took.
-          logmsg = "Thrift call: %s.%s(args=%s, kwargs=%s) returned in %dms: %s" % (str(self.wrapped.__class__), attr, str_args, repr(kwargs), duration * 1000, log_msg)
+          logmsg = "Thrift call: %s.%s(args=%s, kwargs=%s) returned in %dms: %s" % (
+            str(self.wrapped.__class__),
+            attr, str_args, repr(kwargs), duration * 1000, log_msg
+          )
           log_if_slow_call(duration=duration, message=logmsg)
 
           return ret
-        except socket.error as e:
-          pass
-        except TTransportException as e:
-          pass
+        except (socket.error, socket.timeout, TTransportException) as e:
+          self.transport.close()
+
+          if isinstance(e, socket.timeout) or 'read operation timed out' in str(e): # Can come from ssl.SSLError
+            logging.warn("Not retrying thrift call %s due to socket timeout" % attr)
+            raise
+          else:
+            tries_left -= 1
+            if tries_left:
+              logging.info("Thrift exception; retrying: " + str(e), exc_info=0)
+              if 'generic failure: Unable to find a callback: 32775' in str(e):
+                logging.warn("Increase the sasl_max_buffer value in hue.ini")
+            else:
+              raise
         except Exception as e:
           logging.exception("Thrift saw exception (this may be expected).")
-          raise
+          if "'client_protocol' is unset" in str(e):
+            raise StructuredException(
+              'OPEN_SESSION',
+              'Thrift version configured by property thrift_version might be too high. Request failed with "%s"' % str(e),
+              data=None,
+              error_code=502
+            )
+          else:
+            raise
 
-        self.transport.close()
-
-        if isinstance(e, socket.timeout) or 'read operation timed out' in str(e): # Can come from ssl.SSLError
-          logging.warn("Not retrying thrift call %s due to socket timeout" % attr)
-          raise
-        else:
-          tries_left -= 1
-          if tries_left:
-            logging.info("Thrift exception; retrying: " + str(e), exc_info=0)
-            if 'generic failure: Unable to find a callback: 32775' in str(e):
-              logging.warn("Increase the sasl_max_buffer value in hue.ini")
       logging.warn("Out of retries for thrift call: " + attr)
       raise
     return wrapper
@@ -533,8 +545,12 @@ class SuperClient(object):
 
 def _unpack_guid_secret_in_handle(str_args):
   if 'operationHandle' in str_args or 'sessionHandle' in str_args:
-    secret = re.search('secret=(\".*\"), guid', str_args) or re.search('secret=(\'.*\'), guid', str_args)
-    guid = re.search('guid=(\".*\")\)\)', str_args) or re.search('guid=(\'.*\')\)\)', str_args)
+    if sys.version_info[0] > 2:
+      guid = re.search('guid=(b".*"), secret', str_args) or re.search('guid=(b\'.*\'), secret', str_args)
+      secret = re.search('secret=(b".+?")\)', str_args) or re.search('secret=(b\'.+?\')\)', str_args)
+    else:
+      secret = re.search('secret=(".*"), guid', str_args) or re.search('secret=(\'.*\'), guid', str_args)
+      guid = re.search('guid=(".*")\)\)', str_args) or re.search('guid=(\'.*\')\)\)', str_args)
 
     if secret and guid:
       try:
@@ -804,9 +820,12 @@ def is_thrift_struct(o):
 
 # Same in resource.py for not losing the trace class
 def log_if_slow_call(duration, message):
-  if duration >= old_div(WARN_LEVEL_CALL_DURATION_MS, 1000):
+  if duration >= math.floor(WARN_LEVEL_CALL_DURATION_MS / 1000):
     LOG.warn('SLOW: %.2f - %s' % (duration, message))
-  elif duration >= old_div(INFO_LEVEL_CALL_DURATION_MS, 1000):
+  elif duration >= math.floor(INFO_LEVEL_CALL_DURATION_MS / 1000):
     LOG.info('SLOW: %.2f - %s' % (duration, message))
   else:
-    LOG.debug(message)
+    #Leave this as logging.debug and not logger.
+    #Otherwise we never get these logging messages even with debug enabled.
+    #Review this in the future to find out why.
+    logging.debug(message)

@@ -15,10 +15,12 @@
 ## limitations under the License.
 
 <%!
-  from desktop import conf
   from django.utils.translation import ugettext as _
-  from desktop.views import commonheader, commonfooter
+
   from useradmin.hue_password_policy import is_password_policy_enabled, get_password_hint
+
+  from desktop.conf import CUSTOM, ENABLE_ORGANIZATIONS
+  from desktop.views import commonheader, commonfooter
 %>
 
 <%namespace name="hueIcons" file="/hue_icons.mako" />
@@ -55,95 +57,116 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
     <div class="logo">
       <svg style="height: 80px; width: 200px;"><use xlink:href="#hi-logo"></use></svg>
     </div>
+
     <h3>Query. Explore. Repeat.</h3>
 
-    %if 'OIDCBackend' in backend_names:
+    % if 'OIDCBackend' in backend_names:
       <button title="${ _('Single Sign-on') }" class="btn btn-primary" onclick="location.href='/oidc/authenticate/'">${ _('Single Sign-on') }</button>
-
       <hr class="separator-line"/>
-    %endif
+    % endif
 
-    %if first_login_ever:
+    % if first_login_ever:
       <div class="alert alert-info center">
-        ${_('Since this is your first time logging in, pick any username and password. Be sure to remember these, as')}
-        <strong>${_('they will become your Hue superuser credentials.')}</strong>
-        %if is_password_policy_enabled():
-        <p>${get_password_hint()}</p>
-        %endif
+        ${ _('Since this is your first time logging in, pick any username and password. Be sure to remember these, as') }
+        <strong>${ _('they will become your Hue superuser credentials.') }</strong>
+        % if is_password_policy_enabled():
+        <p>${ get_password_hint() }</p>
+        % endif
       </div>
-    %endif
+    % endif
 
-    <div class="text-input
-      %if backend_names == ['OAuthBackend']:
-        hide
-      %endif
-      %if form['username'].errors or (not form['username'].errors and not form['password'].errors and login_errors):
-        error
-      %endif
-    ">
-      ${ form['username'] | n,unicode }
-    </div>
+    % if ENABLE_ORGANIZATIONS.get():
+      <div class="text-input
+        % if form['email'].errors or (not form['email'].errors and not form['email'].errors and login_errors):
+          error
+        % endif
+      ">
+        ${ form['email'] | n,unicode }
+      </div>
 
-    ${ form['username'].errors | n,unicode }
+      ${ form['email'].errors | n,unicode }
+    % else:
+      % if 'username' in form.fields:
+        <div class="text-input
+          % if backend_names == ['OAuthBackend']:
+            hide
+          % endif
+          % if form['username'].errors or (login_errors and not form['username'].errors and not form['password'].errors):
+            error
+          % endif
+        ">
+          ${ form['username'] | n,unicode }
+        </div>
 
-    <div class="text-input
-      %if 'AllowAllBackend' in backend_names or backend_names == ['OAuthBackend']:
-        hide
-      %endif
-      %if form['password'].errors or (not form['username'].errors and not form['password'].errors and login_errors):
-        error
-      %endif
-    ">
-      ${ form['password'] | n,unicode }
-    </div>
+        ${ form['username'].errors | n,unicode }
+      % endif
+    % endif
 
-    ${ form['password'].errors | n,unicode }
+    % if 'password' in form.fields:
+      <div class="text-input
+        % if 'AllowAllBackend' in backend_names or backend_names == ['OAuthBackend']:
+          hide
+        % endif
+        % if form['password'].errors or (login_errors and ('username' in form and not form['username'].errors) and not form['password'].errors):
+          error
+        % endif
+      ">
+        ${ form['password'] | n,unicode }
+      </div>
 
-    %if active_directory:
+      ${ form['password'].errors | n,unicode }
+    % endif
+
+    % if active_directory:
     <div
       %if 'server' in form.fields and len(form.fields['server'].choices) == 1:
         class="hide"
       %endif
       >
-      %if 'server' in form.fields:
+      % if 'server' in form.fields:
         ${ form['server'] | n,unicode }
-      %endif
+      % endif
     </div>
-    %endif
+    % endif
 
-    %if 'ImpersonationBackend' in backend_names:
+    % if 'ImpersonationBackend' in backend_names:
     <div class="text-input">
       ${ form['login_as'] | n,unicode }
     </div>
-    %endif
+    % endif
 
-    %if login_errors and not form['username'].errors and not form['password'].errors:
-      %if form.errors:
+    % if login_errors and ('username' in form and not form['username'].errors) and not form['password'].errors:
+      % if form.errors:
         % for error in form.errors:
-         ${ form.errors[error]|unicode,n }
+         ${ form.errors[error] | unicode,n }
         % endfor
-      %endif
-    %endif
+      % endif
+    % endif
 
-    %if first_login_ever:
-      <input type="submit" class="btn btn-primary" value="${_('Create Account')}"/>
-    %else:
-      <input type="submit" class="btn btn-primary" value="${_('Sign In')}"/>
-    %endif
+    % if 'username' in form.fields or 'email' in form.fields:
+      % if first_login_ever:
+        <input type="submit" class="btn btn-primary" value="${ _('Create Account') }"/>
+      % else:
+        <input type="submit" class="btn btn-primary" value="${ _('Sign In') }"/>
+      % endif
+      % if ENABLE_ORGANIZATIONS.get():
+        <input type="submit" class="btn btn-primary" value="${ _('Create Account') }"/>
+      % endif
+    % endif
+
     <input type="hidden" name="next" value="${next}"/>
 
   </form>
 
-  %if conf.CUSTOM.LOGIN_SPLASH_HTML.get():
+  % if CUSTOM.LOGIN_SPLASH_HTML.get():
   <div class="alert alert-info" id="login-splash">
-    ${ conf.CUSTOM.LOGIN_SPLASH_HTML.get() | n,unicode }
+    ${ CUSTOM.LOGIN_SPLASH_HTML.get() | n,unicode }
   </div>
-  %endif
+  % endif
 </div>
 
-
 <div class="trademark center muted">
-  % if conf.CUSTOM.LOGO_SVG.get():
+  % if CUSTOM.LOGO_SVG.get():
     ${ _('Powered by') } <img src="${ static('desktop/art/hue-login-logo.png') }" width="40" style="vertical-align: middle"  alt="${ _('Hue logo') }"> -
   % endif
   ${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }

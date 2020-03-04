@@ -6,22 +6,18 @@ chapter = false
 pre = "<b>3. </b>"
 +++
 
-Hue service integration is generic and lets you integrate with other analytics systems. Here is a list of the main APIs:
+Hue services are generic and let you integrate with other analytics systems for [querying](/user/querying/) and [browsing](/user/browsing/). Here is a list of the main APIs:
 
-* Connect or create SQL connectors to any database (Impala, MySQL, Presto...)
-* List any files from any filesytem (HDFS, S3, ADLS...)
-* List any job or query list (YARN, SQL queries, Kubernetes...)
-* Integrate with a Data Catalog (Cloudera Navigator, Apache Atlas...)
+* Connect or create SQL [autocompletes](/developer/parsers/) or connectors to [any database](/administrator/configuration/connectors/#databases) (Impala, MySQL, Presto...)
+* Browse additional storage systems (HDFS, S3, ADLS, GS...)
+* List any jobs or queries (YARN, SQL queries, Kubernetes...)
+* Integrate with a [Data Catalog](user/browsing/#data-catalog) (Cloudera Navigator, Apache Atlas...) or a Query Optimization service
 
 In addition, whole new apps can also be created in order to provide end to end solutions.
 
-Upcoming & Contribution ideas
+Majoritively, this section would be useful for learning about:
 
-* How to add new SQL grammar and highlighting
-* Improved Query Builder
-* Improved Dashboard & Reporting
-* Framework to add new/embed vizualizations
-* How to integrate smart query troubleshooting/recommendation systems (Cloudera Navigator Optimizer...)
-* Generic workflow system (Apache Oozie, Apache Airflow, Celery Tasks...)
-* ADLS gen2, Google FS integrations
-* Check the [Roadmap](https://github.com/cloudera/hue/blob/master/docs/ROADMAP.md)
+* Ramping-up with the overall Hue [development](/developer/development) project
+* How to improve the [SQL autocomplete](/developer/parsers/) for your own database
+* How SqlAlchemy is becoming the [standard API](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/sql_alchemy.py) for databases other than Hive and Impala
+* Checking and getting started on other [contribution ideas](https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md)

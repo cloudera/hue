@@ -36,39 +36,38 @@ from django.db import models, transaction
 from django.db.models import Q
 from django.urls import reverse
 from django.core.validators import RegexValidator
-from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.forms.models import inlineformset_factory
-from django.utils.encoding import force_unicode, smart_str
+from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 import django.utils.timezone as dtz
 
+from desktop.auth.backend import is_admin
 from desktop.log.access import access_warn
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document
 from hadoop.fs.exceptions import WebHdfsException
-
 from hadoop.fs.hadoopfs import Hdfs
 from liboozie.submittion import Submission
 from liboozie.submittion import create_directories
+from useradmin.models import User
 
 from oozie.conf import REMOTE_SAMPLE_DIR
 from oozie.utils import utc_datetime_format
 from oozie.timezones import TIMEZONES
 
-from desktop.auth.backend import is_admin
-
 if sys.version_info[0] > 2:
-  from io import StringIO as string_io
+  from io import BytesIO as string_io
+  from django.utils.encoding import force_text as force_unicode
 else:
   from cStringIO import StringIO as string_io
+  from django.utils.encoding import force_unicode
 
 
 LOG = logging.getLogger(__name__)
-
 
 PATH_MAX = 512
 name_validator = RegexValidator(regex='^[a-zA-Z_][\-_a-zA-Z0-9]{1,39}$',
@@ -604,7 +603,7 @@ class Workflow(Job):
 
     zfile = zipfile.ZipFile(fp, 'w')
     zfile.writestr("workflow.xml", smart_str(xml))
-    zfile.writestr("workflow-metadata.json", smart_str(json.dumps(metadata)))
+    zfile.writestr("workflow-metadata.json", smart_str(json.dumps(metadata, sort_keys=True)))
     zfile.close()
 
     return fp
@@ -636,6 +635,9 @@ class Link(models.Model):
 
   name = models.CharField(max_length=40)
   comment = models.CharField(max_length=1024, default='', blank=True)
+
+  def __str__(self):
+    return self.__unicode__()
 
   def __unicode__(self):
     return '%s %s %s' % (self.parent, self.child, self.name)
@@ -712,6 +714,9 @@ class Node(models.Model):
 
   def find_parameters(self):
     return find_parameters(self, self.PARAM_FIELDS)
+
+  def __str__(self):
+    return self.__unicode__()
 
   def __unicode__(self):
     if self.name != '':

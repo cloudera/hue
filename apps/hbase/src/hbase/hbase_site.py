@@ -18,10 +18,15 @@
 import errno
 import logging
 import os.path
+import sys
 
 from hadoop import confparse
 from desktop.lib.security_util import get_components
 
+if sys.version_info[0] > 2:
+  open_file = open
+else:
+  open_file = file
 
 LOG = logging.getLogger(__name__)
 
@@ -30,6 +35,7 @@ SITE_PATH = None
 SITE_DICT = None
 
 _CNF_HBASE_THRIFT_KERBEROS_PRINCIPAL = 'hbase.thrift.kerberos.principal'
+_CNF_HBASE_THRIFT_SPNEGO_PRINCIPAL = 'hbase.thrift.spnego.principal'
 _CNF_HBASE_AUTHENTICATION = 'hbase.security.authentication'
 _CNF_HBASE_REGIONSERVER_THRIFT_FRAMED = 'hbase.regionserver.thrift.framed'
 
@@ -51,7 +57,8 @@ def get_conf():
 
 
 def get_server_principal():
-  principal = get_conf().get(_CNF_HBASE_THRIFT_KERBEROS_PRINCIPAL, None)
+  thrift_principal = get_conf().get(_CNF_HBASE_THRIFT_KERBEROS_PRINCIPAL, None)
+  principal = get_conf().get(_CNF_HBASE_THRIFT_SPNEGO_PRINCIPAL, thrift_principal)
   components = get_components(principal)
   if components is not None:
     return components[0]
@@ -94,7 +101,7 @@ def _parse_site():
   from hbase.conf import HBASE_CONF_DIR
   SITE_PATH = os.path.join(HBASE_CONF_DIR.get(), 'hbase-site.xml')
   try:
-    data = file(SITE_PATH, 'r').read()
+    data = open_file(SITE_PATH, 'r').read()
   except IOError as err:
     if err.errno != errno.ENOENT:
       LOG.error('Cannot read from "%s": %s' % (SITE_PATH, err))

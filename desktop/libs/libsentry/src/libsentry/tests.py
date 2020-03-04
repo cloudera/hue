@@ -24,14 +24,12 @@ import tempfile
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_false, assert_not_equal, assert_raises
 
-from django.contrib.auth.models import User
-
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.exceptions import StructuredThriftTransportException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.test_utils import add_to_group, grant_access
-
 from hadoop.pseudo_hdfs4 import is_live_cluster
+from useradmin.models import User
 
 from libsentry import sentry_site
 from libsentry.api import get_api, clear_api_cache

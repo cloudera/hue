@@ -21,7 +21,6 @@ standard_library.install_aliases()
 from builtins import oct
 from builtins import zip
 from past.builtins import basestring
-import chardet
 import json
 import logging
 import urllib.request, urllib.error
@@ -37,6 +36,7 @@ from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
+from desktop.lib.python_util import check_encoding
 from desktop.models import Document2
 from kafka.kafka_api import get_topics
 from metadata.manager_client import ManagerApi
@@ -56,12 +56,13 @@ from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
 from indexer.indexers.flume import FlumeIndexer
 
 if sys.version_info[0] > 2:
-  from io import string_io as string_io
+  from io import StringIO as string_io
   from urllib.parse import urlparse, unquote as urllib_unquote
 else:
   from StringIO import StringIO as string_io
   from urllib import unquote as urllib_unquote
   from urlparse import urlparse
+
 
 LOG = logging.getLogger(__name__)
 
@@ -176,7 +177,7 @@ def guess_field_types(request):
     indexer = MorphlineIndexer(request.user, request.fs)
     path = urllib_unquote(file_format["path"])
     stream = request.fs.open(path)
-    encoding = chardet.detect(stream.read(10000)).get('encoding')
+    encoding = check_encoding(stream.read(10000))
     stream.seek(0)
     _convert_format(file_format["format"], inverse=True)
 
@@ -362,15 +363,6 @@ def importer_submit(request):
     if source['path']:
       path = urllib_unquote(source['path'])
       source['path'] = request.fs.netnormpath(path)
-      parent_path = request.fs.parent_path(path)
-      stats = request.fs.stats(parent_path)
-      split = urlparse(path)
-      # Only for HDFS, import data and non-external table
-      if split.scheme in ('', 'hdfs') and destination['importData'] and destination['useDefaultLocation'] and oct(stats["mode"])[-1] != '7' and not request.POST.get('show_command'):
-        user_scratch_dir = request.fs.get_home_dir() + '/.scratchdir'
-        request.fs.do_as_user(request.user, request.fs.mkdir, user_scratch_dir, 0o0777)
-        request.fs.do_as_user(request.user, request.fs.rename, source['path'], user_scratch_dir)
-        source['path'] = user_scratch_dir + '/' + source['path'].split('/')[-1]
 
   if destination['ouputFormat'] in ('database', 'table'):
     destination['nonDefaultLocation'] = request.fs.netnormpath(destination['nonDefaultLocation']) if destination['nonDefaultLocation'] else destination['nonDefaultLocation']

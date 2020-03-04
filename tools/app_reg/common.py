@@ -21,8 +21,6 @@ import os
 import sys
 from posixpath import curdir, sep, pardir, join
 
-if sys.version_info[0] > 2:
-  from past.builtins import cmp
 
 # The root of the Hue installation
 INSTALL_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -31,7 +29,7 @@ INSTALL_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '.
 APPS_ROOT = os.path.join(INSTALL_ROOT, 'apps')
 
 # Directory holding app.reg
-HUE_APP_REG_DIR = os.environ.get("HUE_APP_REG_DIR", INSTALL_ROOT) 
+HUE_APP_REG_DIR = os.environ.get("HUE_APP_REG_DIR", INSTALL_ROOT)
 
 # Directory holding hue.pth
 HUE_PTH_DIR = os.environ.get('HUE_PTH_DIR', None)
@@ -62,3 +60,14 @@ def _get_python_lib_dir():
 
 def _get_python_site_packages_dir():
   return os.path.join(_get_python_lib_dir(), 'site-packages')
+
+def cmp(x, y):
+  """
+  Replacement for built-in function cmp that was removed in Python 3
+
+  Compare the two objects x and y and return an integer according to
+  the outcome. The return value is negative if x < y, zero if x == y
+  and strictly positive if x > y.
+  """
+
+  return (x > y) - (x < y)

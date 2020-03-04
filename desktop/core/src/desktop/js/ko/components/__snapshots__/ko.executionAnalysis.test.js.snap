@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.executionAnalysis.js should render component 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;hue-execution-analysis&quot;, params: params }\\"><div class=\\"hue-execution-analysis\\">
+    <!-- ko hueSpinner: { spin: loading, inline: true } --><!-- /ko -->
+    <!-- ko ifnot: loading -->
+      <!-- ko if: analysisPossible() && !analysis() -->
+      <div class=\\"no-analysis\\">Execute a query to get query execution analysis.</div>
+      <!-- /ko -->
+      <!-- ko ifnot: analysisPossible --><!-- /ko -->
+      <!-- ko with: analysis --><!-- /ko -->
+    <!-- /ko -->
+  </div></div>"
+`;

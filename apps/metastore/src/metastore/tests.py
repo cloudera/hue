@@ -21,21 +21,20 @@ standard_library.install_aliases()
 from builtins import object
 import json
 import logging
+import sys
 import urllib.request, urllib.parse, urllib.error
 
-from mock import patch, Mock
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false
 
 from django.utils.encoding import smart_str
-from django.contrib.auth.models import User, Group
 from django.urls import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod_whitespace
 from desktop.lib.test_utils import add_permission, grant_access
 from hadoop.pseudo_hdfs4 import is_live_cluster
 from metastore import parser
-from useradmin.models import HuePermission, GroupPermission
+from useradmin.models import HuePermission, GroupPermission, User, Group
 
 from beeswax.conf import LIST_PARTITIONS_LIMIT
 from beeswax.views import collapse_whitespace
@@ -44,6 +43,10 @@ from beeswax.models import QueryHistory
 from beeswax.server import dbms
 from beeswax.test_base import BeeswaxSampleProvider
 
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
+else:
+  from mock import patch, Mock
 
 LOG = logging.getLogger(__name__)
 

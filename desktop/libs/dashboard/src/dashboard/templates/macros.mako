@@ -15,11 +15,16 @@
 ## limitations under the License.
 <%!
 import re
-import urllib
+import sys
 
 from itertools import izip
 
 from django.utils.translation import ugettext as _
+
+if sys.version_info[0] > 2:
+  from urllib.parse import quote as urllib_quote
+else:
+  from urllib import quote as urllib_quote
 
 
 # <http://github.com/mzsanford/twitter-text-java>
@@ -131,7 +136,7 @@ def shorten_url(text):
 
 def format_tag(tag, text):
     return '<a href="http://search.twitter.com/search?q=%s" target="_blank">%s%s</a>' \
-              % (urllib.quote('#' + text.encode('utf-8')), tag, text)
+              % (urllib_quote('#' + text.encode('utf-8')), tag, text)
 
 def format_username(at_char, user):
     return '<a href="http://twitter.com/%s" target="_blank">%s%s</a>' \

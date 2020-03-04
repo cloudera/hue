@@ -19,20 +19,19 @@
 from builtins import object
 import logging
 
-from django.contrib.auth.models import User
-
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_false, assert_not_equal, assert_true
-
-from desktop.auth.backend import rewrite_user
-from desktop.lib.django_test_util import make_logged_in_client
 
 from indexer.conf import ENABLE_SQOOP
 from indexer.indexers.rdbms import _get_api
 from librdbms.server import dbms as rdbms
+from useradmin.models import User
 
+from desktop.auth.backend import rewrite_user
+from desktop.lib.django_test_util import make_logged_in_client
 
 LOG = logging.getLogger(__name__)
+
 
 class TestRdbmsIndexer(object):
 

@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import componentUtils from 'ko/components/componentUtils';
@@ -24,6 +24,9 @@ import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { DOCUMENT_TYPES } from 'doc/docSupport';
 
+export const REFRESH_DOC_ASSIST_EVENT = 'assist.document.refresh';
+
+// prettier-ignore
 const TEMPLATE = `
   <script type="text/html" id="document-context-items">
     <!-- ko if: definition().type === 'directory' -->
@@ -42,6 +45,9 @@ const TEMPLATE = `
       'Delete document'
     )}</a></li>
     <!-- /ko -->
+    <li><a href="javascript: void(0);" data-bind="publish: { 'doc.show.share.modal': $data }"><i class="fa fa-fw fa-users"></i> ${I18n(
+      'Share'
+    )}</a></li>
   </script>
   
   <script type="text/html" id="assist-document-header-actions">
@@ -149,7 +155,7 @@ const TEMPLATE = `
             </li>
           </ul>
       </span>
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.document.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${I18n(
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('${ REFRESH_DOC_ASSIST_EVENT }'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${I18n(
         'Manual refresh'
       )}"></i></a>
     </div>
@@ -173,9 +179,13 @@ const TEMPLATE = `
     <!-- ko template: 'assist-document-header-actions' --><!-- /ko -->
   </div>
   <div class="assist-flex-search">
-    <div class="assist-filter"><input class="clearable" type="text" placeholder="${I18n(
-      'Filter...'
-    )}" data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/></div>
+    <div class="assist-filter">
+      <form autocomplete="off">
+        <input class="clearable" type="text" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } placeholder="${I18n(
+          'Filter...'
+        )}" data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/>
+      </form>
+    </div>
   </div>
   <div class="assist-flex-fill assist-file-scrollable" data-bind="delayedOverflow">
     <div data-bind="visible: ! loading() && ! hasErrors() && entries().length > 0">
@@ -189,12 +199,12 @@ const TEMPLATE = `
       <ul class="assist-tables" data-bind="foreachVisible: { data: filteredEntries, minHeight: 27, container: '.assist-file-scrollable' }">
         <li class="assist-entry assist-file-entry" data-bind="appAwareTemplateContextMenu: { template: 'document-context-items', scrollContainer: '.assist-file-scrollable', beforeOpen: beforeContextOpen }, assistFileDroppable, assistFileDraggable, visibleOnHover: { 'selector': '.assist-file-actions' }">
           <div class="assist-file-actions table-actions">
-            <a class="inactive-action" href="javascript:void(0)" data-bind="click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
+            <a class="inactive-action" href="javascript:void(0)" data-bind="popoverOnHover: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
               'Show details'
             )}"></i></a>
           </div>
           <a href="javascript:void(0)" class="assist-entry assist-document-link" data-bind="click: open, attr: {'title': name }">
-            <!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: false } } --><!-- /ko -->
+            <!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: true } } --><!-- /ko -->
             <span class="highlightable" data-bind="css: { 'highlight': highlight }, text: definition().name"></span>
           </a>
         </li>
@@ -285,7 +295,7 @@ class AssistDocumentsPanel {
       );
     };
 
-    huePubSub.subscribe('assist.document.refresh', () => {
+    huePubSub.subscribe(REFRESH_DOC_ASSIST_EVENT, () => {
       huePubSub.publish('assist.clear.document.cache');
       self.reload();
     });

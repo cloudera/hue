@@ -14,106 +14,175 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import apiHelper from 'api/apiHelper';
+import * as ko from 'knockout';
 
-/**
- *  available +----> fetching +----> done
- *      ^                     |
- *      |                     +----> fail
- *      |                     |
- *      +---------------------+
- *
- * If the handle indidcates that there's no result set available the ExecutionResult will have initial status set to
- * RESULT_STATUS.done
- *
- * @type { { canceling: string, canceled: string, fail: string, ready: string, executing: string, done: string } }
- */
-const RESULT_STATUS = {
-  ready: 'ready',
-  available: 'available',
-  fetching: 'fetching',
-  done: 'done',
-  fail: 'fail'
+import apiHelper from 'api/apiHelper';
+import huePubSub from 'utils/huePubSub';
+import { sleep } from 'utils/hueUtils';
+import { EXECUTION_STATUS } from './executable';
+
+export const RESULT_UPDATED_EVENT = 'hue.executable.result.updated';
+
+export const RESULT_TYPE = {
+  TABLE: 'table'
 };
 
-class ExecutionResult {
+const META_TYPE_TO_CSS = {
+  bigint: 'sort-numeric',
+  date: 'sort-date',
+  datetime: 'sort-date',
+  decimal: 'sort-numeric',
+  double: 'sort-numeric',
+  float: 'sort-numeric',
+  int: 'sort-numeric',
+  real: 'sort-numeric',
+  smallint: 'sort-numeric',
+  timestamp: 'sort-date',
+  tinyint: 'sort-numeric'
+};
+
+const NUMERIC_TYPES = {
+  bigint: true,
+  decimal: true,
+  double: true,
+  float: true,
+  int: true,
+  real: true,
+  smallint: true,
+  tinyint: true
+};
+
+const DATE_TIME_TYPES = {
+  date: true,
+  datetime: true,
+  timestamp: true
+};
+
+const COMPLEX_TYPES = {
+  array: true,
+  map: true,
+  struct: true
+};
+
+export default class ExecutionResult {
   /**
    *
-   * @param {ExecutableStatement} executable
+   * @param {Executable} executable
    */
   constructor(executable) {
     this.executable = executable;
-    this.status = executable.handle.has_result_set ? RESULT_STATUS.available : RESULT_STATUS.done;
+
+    this.type = RESULT_TYPE.TABLE;
+    this.rows = [];
+    this.meta = [];
+
+    this.cleanedMeta = [];
+    this.cleanedDateTimeMeta = [];
+    this.cleanedStringMeta = [];
+    this.cleanedNumericMeta = [];
+    this.koEnrichedMeta = [];
+
+    this.lastRows = [];
+    this.images = [];
+    this.type = undefined;
+    this.hasMore = true;
+    this.isEscaped = false;
+    this.fetchedOnce = false;
   }
 
-  async fetchResultSize(options) {
-    return new Promise((resolve, reject) => {
-      if (this.status === RESULT_STATUS.fail) {
-        reject();
-        return;
-      }
+  async fetchResultSize() {
+    if (this.executable.status === EXECUTION_STATUS.failed) {
+      return;
+    }
 
-      let attempts = 0;
-      const waitForRows = () => {
-        attempts++;
-        if (attempts < 10) {
-          apiHelper
-            .fetchResultSize({
-              executable: this.executable
-            })
-            .then(resultSizeResponse => {
-              if (resultSizeResponse.rows !== null) {
-                resolve(resultSizeResponse);
-              } else {
-                window.setTimeout(waitForRows, 1000);
-              }
-            })
-            .catch(reject);
+    let attempts = 0;
+    const waitForRows = async () => {
+      attempts++;
+      if (attempts < 10) {
+        const resultSizeResponse = await apiHelper.fetchResultSize2({
+          executable: this.executable,
+          silenceErrors: true
+        });
+
+        if (resultSizeResponse.rows !== null) {
+          return resultSizeResponse;
         } else {
-          reject();
+          await sleep(1000);
+          return await waitForRows();
         }
-      };
+      } else {
+        return Promise.reject();
+      }
+    };
 
-      waitForRows();
-    });
+    return await waitForRows();
   }
 
   /**
    * Fetches additional rows
    *
-   * @param {Object} options
-   * @param {number} options.rows
+   * @param {Object} [options]
+   * @param {number} [options.rows]
    * @param {boolean} [options.startOver]
    *
    * @return {Promise}
    */
   async fetchRows(options) {
-    return new Promise((resolve, reject) => {
-      if (this.status !== RESULT_STATUS.available) {
-        reject();
-        return;
-      }
-      this.status = RESULT_STATUS.fetching;
-      apiHelper
-        .fetchResults({
-          executable: this.executable,
-          rows: options.rows,
-          startOver: !!options.startOver
-        })
-        .then(resultResponse => {
-          if (resultResponse.has_more) {
-            this.status = RESULT_STATUS.available;
-          } else {
-            this.status = RESULT_STATUS.done;
-          }
-          resolve(resultResponse);
-        })
-        .catch(error => {
-          this.status = RESULT_STATUS.fail;
-          reject(error);
-        });
+    if (this.executable.status !== EXECUTION_STATUS.available) {
+      return Promise.reject();
+    }
+
+    const resultResponse = await apiHelper.fetchResults({
+      executable: this.executable,
+      rows: (options && options.rows) || 100,
+      startOver: options && options.startOver
     });
+
+    this.handleResultResponse(resultResponse);
+  }
+
+  handleResultResponse(resultResponse) {
+    const initialIndex = this.rows.length;
+    resultResponse.data.forEach((row, index) => {
+      row.unshift(initialIndex + index + 1);
+    });
+
+    this.rows.push(...resultResponse.data);
+    this.lastRows = resultResponse.data;
+    if (!this.meta.length) {
+      this.meta = resultResponse.meta;
+      this.meta.unshift({ type: 'INT_TYPE', name: '', comment: null });
+
+      this.meta.forEach((item, index) => {
+        const cleanedType = item.type.replace(/_type/i, '').toLowerCase();
+        if (index) {
+          this.cleanedMeta.push(item);
+          if (NUMERIC_TYPES[cleanedType]) {
+            this.cleanedNumericMeta.push(item);
+          } else if (DATE_TIME_TYPES[cleanedType]) {
+            this.cleanedDateTimeMeta.push(item);
+          } else if (!COMPLEX_TYPES[cleanedType]) {
+            this.cleanedStringMeta.push(item);
+          }
+        }
+        this.koEnrichedMeta.push({
+          name: item.name,
+          type: cleanedType,
+          comment: item.comment,
+          cssClass: META_TYPE_TO_CSS[cleanedType] || 'sort-string',
+          checked: ko.observable(true),
+          originalIndex: index
+        });
+      });
+    }
+    this.hasMore = resultResponse.has_more;
+    this.isEscaped = resultResponse.isEscaped;
+    this.type = resultResponse.type;
+    this.fetchedOnce = true;
+    this.notify();
+  }
+
+  notify() {
+    huePubSub.publish(RESULT_UPDATED_EVENT, this);
   }
 }
-
-export { RESULT_STATUS, ExecutionResult };

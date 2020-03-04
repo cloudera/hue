@@ -17,16 +17,16 @@
 
 import logging
 
-from django.contrib.auth.models import User
 from nose.tools import assert_equal
-
-import desktop.conf as desktop_conf
-from desktop.lib.test_utils import reformat_xml
 
 from liboozie import conf
 from liboozie.types import WorkflowAction, Coordinator
 from liboozie.utils import config_gen
 from oozie.tests import MockOozieApi
+from useradmin.models import User
+
+import desktop.conf as desktop_conf
+from desktop.lib.test_utils import reformat_xml
 
 
 LOG = logging.getLogger(__name__)
@@ -64,7 +64,7 @@ def test_config_gen():
     'user.name': 'hue',
     'test.1': 'http://localhost/test?test1=test&test2=test'
   }
-  assert_equal(reformat_xml("""<configuration>
+  assert_equal(reformat_xml(b"""<configuration>
 <property>
   <name>test.1</name>
   <value><![CDATA[http://localhost/test?test1=test&test2=test]]></value>
@@ -80,7 +80,7 @@ def test_config_gen_negative():
     'user.name': 'hue<foo>bar</foo>',
     'test.1': 'http://localhost/test?test1=test&test2=test]]>&test3=test'
   }
-  assert_equal(reformat_xml("""<configuration>
+  assert_equal(reformat_xml(b"""<configuration>
 <property>
   <name>test.1</name>
   <value><![CDATA[http://localhost/test?test1=test&test2=test&test3=test]]></value>

@@ -1,15 +1,15 @@
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: ClusterIssuer
 metadata:
-  name: letsencrypt-prod
+  name: letsencrypt-hue-prod
 spec:
   acme:
     # The ACME server URL
     server: https://acme-v02.api.letsencrypt.org/directory
     # Email address used for ACME registration
-    email: romain.rigaux@gmail.com
+    email: team@gethue.com
     # Name of a secret used to store the ACME account private key
     privateKeySecretRef:
-      name: letsencrypt-prod
+      name: letsencrypt-hue-prod
     # Enable the HTTP-01 challenge provider
     http01: {}

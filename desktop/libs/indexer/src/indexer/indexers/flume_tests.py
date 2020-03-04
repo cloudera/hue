@@ -16,10 +16,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.contrib.auth.models import User
-
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true
+
+from useradmin.models import User
 
 from indexer.indexers.flume import FlumeIndexer
 
@@ -154,7 +154,7 @@ morphlines : [
     ,
     configs[0][1].strip() # 'agent_morphlines_conf_file'
   )
-  
+
   assert_equal(
     ('agent_config_file', 'tier1.sources = source1\n  tier1.channels = channel1\n  tier1.sinks = sink1\n\n\n  tier1.channels.channel1.type = memory\n  tier1.channels.channel1.capacity = 10000\n  tier1.channels.channel1.transactionCapacity = 1000\n\n  \n  tier1.sinks.sink1.type          = org.apache.flume.sink.solr.morphline.MorphlineSolrSink\n  tier1.sinks.sink1.morphlineFile = morphlines.conf\n  tier1.sinks.sink1.morphlineId = hue_accesslogs_no_geo\n  tier1.sinks.sink1.channel       = channel1')
     ,

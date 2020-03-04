@@ -211,7 +211,7 @@ class YarnApi(Api):
         try:
           response = kill_job(MockDjangoRequest(self.user), job=app_id)
           if isinstance(response, JsonResponse) and json.loads(response.content).get('status') == 0:
-             kills.append(app_id)
+            kills.append(app_id)
         except MessageException:
           kills.append(app_id)
       return {'kills': kills, 'status': len(app_ids) - len(kills), 'message': _('Stop signal sent to %s') % kills}

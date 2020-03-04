@@ -17,11 +17,11 @@
 
 import logging
 
-from django.contrib.auth.models import User, Group
-
 from desktop.decorators import check_superuser_permission
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import smart_unicode
+
+from useradmin.models import User, Group
 
 
 LOG = logging.getLogger(__name__)

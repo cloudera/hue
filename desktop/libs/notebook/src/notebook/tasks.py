@@ -18,8 +18,7 @@ from __future__ import absolute_import, unicode_literals
 
 from future import standard_library
 standard_library.install_aliases()
-from builtins import next
-from builtins import object
+from builtins import next, object
 import csv
 import datetime
 import json
@@ -29,10 +28,8 @@ import time
 
 from celery.utils.log import get_task_logger
 from celery import states
-
 from django.core.cache import caches
 from django.core.files.storage import get_storage_class
-from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import FileResponse, HttpRequest
 
@@ -40,17 +37,20 @@ from beeswax import data_export
 from desktop.auth.backend import rewrite_user
 from desktop.celery import app
 from desktop.conf import TASK_SERVER
-from desktop.lib import export_csvxls
-from desktop.lib import fsmanager
+from desktop.lib import export_csvxls, fsmanager
+from desktop.models import Document2
 from desktop.settings import CACHES_CELERY_KEY, CACHES_CELERY_QUERY_RESULT_KEY
 
+from notebook.api import _get_statement
 from notebook.connectors.base import get_api, QueryExpired, ExecutionWrapper
+from notebook.models import make_notebook, MockedDjangoRequest, Notebook
 from notebook.sql_utils import get_current_statement
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
 else:
   from StringIO import StringIO as string_io
+
 
 LOG_TASK = get_task_logger(__name__)
 LOG = logging.getLogger(__name__)
@@ -145,29 +145,29 @@ def close_statement_async(notebook, snippet, **kwargs):
 
 @app.task(ignore_result=True)
 def run_sync_query(doc_id, user):
-  '''Independently run a query as a user and insert the result into another table.'''
-  # get SQL
-  # Add INSERT INTO table
-  # Add variables?
-  # execute query
-  # return when done. send email notification. get taskid.
-  # see in Flower API for listing runs?
-  from django.contrib.auth.models import User
-  from notebook.models import make_notebook, MockedDjangoRequest
+  '''Independently run a query as a user.'''
+  # Add INSERT INTO table if persist result
+  # Add variable substitution
+  # Send notifications: done/on failure
+  if type(user) is str:
+    user = User.objects.get(username=user)
+    user = rewrite_user(user)
 
-  from desktop.auth.backend import rewrite_user
+  query_document = Document2.objects.get_by_uuid(user=user, uuid=doc_id)
+  notebook = Notebook(document=query_document).get_data()
+  snippet = notebook['snippets'][0]
 
-  editor_type = 'impala'
-  sql = 'INSERT into customer_scheduled SELECT * FROM default.customers LIMIT 100;'
-  request = MockedDjangoRequest(user=rewrite_user(User.objects.get(username='romain')))
+  editor_type = snippet['type']
+  sql = _get_statement(notebook)
+  request = MockedDjangoRequest(user=user)
+  last_executed=time.mktime(datetime.datetime.now().timetuple()) * 1000
 
   notebook = make_notebook(
-      name='Scheduler query N',
+      name='Scheduled query %s at %s' % (query_document.name, last_executed),
       editor_type=editor_type,
       statement=sql,
       status='ready',
-      #on_success_url=on_success_url,
-      last_executed=time.mktime(datetime.datetime.now().timetuple()) * 1000,
+      last_executed=last_executed,
       is_task=True
   )
 
@@ -182,11 +182,12 @@ def run_sync_query(doc_id, user):
 
   return task
 
-# TODO: Convert csv to excel if needed
+
 def download(*args, **kwargs):
   notebook = args[0]
   result = download_to_file.AsyncResult(args[0]['uuid'])
   state = result.state
+
   if state == states.PENDING:
     raise QueryExpired()
   elif state in states.EXCEPTION_STATES:
@@ -194,7 +195,7 @@ def download(*args, **kwargs):
 
   info = result.wait() # TODO: Start returning data even if we're not done
 
-  return export_csvxls.file_reader(storage.open(_result_key(notebook), 'rb'))
+  return export_csvxls.file_reader(storage.open(_result_key(notebook), 'rb'))  # TODO: Convert csv to excel if needed
 
 
 # Why we need this:
@@ -236,6 +237,7 @@ def check_status(*args, **kwargs):
   notebook = args[0]
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
+
   if state == states.PENDING:
     raise QueryExpired()
   elif state in states.EXCEPTION_STATES:
@@ -247,6 +249,7 @@ def check_status(*args, **kwargs):
 def get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id=None):
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
+
   if state == states.PENDING:
     raise QueryExpired()
   elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
@@ -275,6 +278,7 @@ def get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id
 def get_jobs(notebook, snippet, logs, **kwargs): # Re implementation to fetch updated guid in download_to_file from DB
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
+
   if state == states.PENDING:
     raise QueryExpired()
   elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
@@ -294,6 +298,7 @@ def get_jobs(notebook, snippet, logs, **kwargs): # Re implementation to fetch up
 def progress(notebook, snippet, logs=None, **kwargs):
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
+
   if state == states.PENDING:
     raise QueryExpired()
   elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
@@ -320,6 +325,7 @@ def fetch_result(notebook, snippet, rows, start_over, **kwargs):
       'meta': cols,
       'type': 'table'
     }
+
   if state == states.PENDING:
     raise QueryExpired()
   elif state in states.EXCEPTION_STATES:
@@ -375,6 +381,7 @@ def fetch_result_size(*args, **kwargs):
   notebook = args[0]
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
+
   if state == states.PENDING:
     raise QueryExpired()
   elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
@@ -392,6 +399,7 @@ def cancel(*args, **kwargs):
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
   status = 0
+
   if state == states.PENDING:
     raise QueryExpired()
   elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
@@ -406,6 +414,7 @@ def cancel(*args, **kwargs):
 
   result.forget()
   _cleanup(notebook)
+
   return {'status': status}
 
 def close_statement(*args, **kwargs):
@@ -414,6 +423,7 @@ def close_statement(*args, **kwargs):
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
   status = 0
+
   if state == states.PENDING:
     raise QueryExpired()
   elif state == 'SUBMITTED' or states.state(state) < states.state('PROGRESS'):
@@ -428,6 +438,7 @@ def close_statement(*args, **kwargs):
 
   result.forget()
   _cleanup(notebook)
+
   return {'status': status}
 
 def _cleanup(notebook):
@@ -456,7 +467,9 @@ def _get_request(postdict=None, user_id=None):
   request.fs_ref = 'default'
   request.fs = fsmanager.get_filesystem(request.fs_ref)
   request.jt = None
+
   user = User.objects.get(id=user_id)
   user = rewrite_user(user)
   request.user = user
+
   return request

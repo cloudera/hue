@@ -13,33 +13,46 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+
 <%!
 from django.utils.translation import ugettext as _
-%>
-    ${_('Configuration files located in')} <code style="color: #0B7FAD">${conf_dir}</code>
 
-    <br/><br/>
-    % if error_list:
-      <div class="alert alert-warn">${_('Potential misconfiguration detected. Fix and restart Hue.')}</div>
-      <br/>
-        <table class="table table-condensed">
-      % for error in error_list:
-        <tr>
-            <td width="15%">
-                <code>
-                ${error['name'] | n}
-              </code>
-            </td>
-            <td>
-              ## Doesn't make sense to print the value of a BoundContainer
-              % if 'value' in error:
-                ${_('Current value:')} <code>${error['value']}</code><br/>
-              % endif
-              ${error['message'] | n}
-            </td>
-        </tr>
-      % endfor
-    </table>
-    % else:
-      <h5>${_('All OK. Configuration check passed.')}</h5>
+from desktop.conf import has_connectors
+from desktop.auth.backend import is_hue_admin
+%>
+
+% if is_hue_admin(user):
+  ${ _('Configuration files located in') } <code style="color: #0B7FAD">${ conf_dir }</code>
+% endif
+
+<br/><br/>
+
+% if error_list:
+  <div class="alert alert-warn">
+    ${ _('Potential misconfiguration detected.') }
+    % if not has_connectors():
+      ${ _('Fix and restart Hue.') }
     % endif
+  </div>
+  <br/>
+  <table class="table table-condensed">
+  % for error in error_list:
+    <tr>
+      <td width="15%">
+        <code>
+          ${ error['name'] | n }
+        </code>
+      </td>
+      <td>
+        ## Doesn't make sense to print the value of a BoundContainer
+        % if 'value' in error:
+          ${ _('Current value:') } <code>${ error['value'] }</code><br/>
+        % endif
+        ${ error['message'] | n }
+      </td>
+    </tr>
+  % endfor
+  </table>
+% else:
+  <h5>${ _('All OK. Configuration check passed.') }</h5>
+% endif

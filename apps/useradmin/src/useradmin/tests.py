@@ -18,7 +18,6 @@
 
 from future import standard_library
 standard_library.install_aliases()
-from builtins import str
 from builtins import object
 import json
 import ldap
@@ -30,17 +29,16 @@ import urllib.request, urllib.parse, urllib.error
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false, assert_not_equal
 from datetime import datetime
-from django.contrib.auth.models import User, Group
 from django.contrib.sessions.models import Session
 from django.db.models import Q
-from django.utils.encoding import smart_unicode
 from django.urls import reverse
+from django.test import override_settings
 from django.test.client import Client
 
 import desktop.conf
 
 from desktop import appmanager
-from desktop.auth.backend import is_admin
+from desktop.auth.backend import is_admin, create_user
 from desktop.conf import APP_BLACKLIST
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
@@ -52,9 +50,13 @@ import useradmin.conf
 import useradmin.ldap_access
 from useradmin.forms import UserChangeForm
 from useradmin.middleware import ConcurrentUserSessionMiddleware
-from useradmin.models import HuePermission, GroupPermission, UserProfile
-from useradmin.models import get_profile, get_default_user_group
+from useradmin.models import HuePermission, GroupPermission, UserProfile, get_profile, get_default_user_group, User, Group
 from useradmin.hue_password_policy import reset_password_policy
+
+if sys.version_info[0] > 2:
+  from django.utils.encoding import smart_text as smart_unicode
+else:
+  from django.utils.encoding import smart_unicode
 
 
 def reset_all_users():
@@ -65,7 +67,6 @@ def reset_all_users():
 
 def reset_all_groups():
   """Reset to a clean state by deleting all groups"""
-
   useradmin.conf.DEFAULT_USER_GROUP.set_for_testing(None)
   for grp in Group.objects.all():
     grp.delete()
@@ -167,63 +168,65 @@ class LdapTestConnection(object):
 
   class Data(object):
     def __init__(self):
-      self.users = {'moe': {'dn': 'uid=moe,ou=People,dc=example,dc=com', 'username':'moe', 'first':'Moe', 'email':'moe@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com']},
-                    'lårry': {'dn': 'uid=lårry,ou=People,dc=example,dc=com', 'username':'lårry', 'first':'Larry', 'last':'Stooge', 'email':'larry@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com', 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
-                    'curly': {'dn': 'uid=curly,ou=People,dc=example,dc=com', 'username':'curly', 'first':'Curly', 'last':'Stooge', 'email':'curly@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com', 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
-                    'Rock': {'dn': 'uid=Rock,ou=People,dc=example,dc=com', 'username':'Rock', 'first':'rock', 'last':'man', 'email':'rockman@stooges.com', 'groups': ['cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
-                    'nestedguy': {'dn': 'uid=nestedguy,ou=People,dc=example,dc=com', 'username':'nestedguy', 'first':'nested', 'last':'guy', 'email':'nestedguy@stooges.com', 'groups': ['cn=NestedGroup,ou=Groups,dc=example,dc=com']},
-                    'otherguy': {'dn': 'uid=otherguy,ou=People,dc=example,dc=com', 'username':'otherguy', 'first':'Other', 'last':'Guy', 'email':'other@guy.com'},
-                    'posix_person': {'dn': 'uid=posix_person,ou=People,dc=example,dc=com', 'username': 'posix_person', 'first': 'pos', 'last': 'ix', 'email': 'pos@ix.com'},
-                    'posix_person2': {'dn': 'uid=posix_person2,ou=People,dc=example,dc=com', 'username': 'posix_person2', 'first': 'pos', 'last': 'ix', 'email': 'pos@ix.com'},
-                    'user with space': {'dn': 'uid=user with space,ou=People,dc=example,dc=com', 'username': 'user with space', 'first': 'user', 'last': 'space', 'email': 'user@space.com'},
-                    'spaceless': {'dn': 'uid=user without space,ou=People,dc=example,dc=com', 'username': 'spaceless', 'first': 'user', 'last': 'space', 'email': 'user@space.com'},
-                    'test_toolongusernametoolongusername': {'dn': 'uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com', 'username': 'test_toolongusernametoolongusername', 'first': 'toolong', 'last': 'username', 'email': 'toolong@username.com'},
-                    'test_longfirstname': {'dn': 'uid=test_longfirstname,ou=People,dc=example,dc=com', 'username': 'test_longfirstname', 'first': 'test_longfirstname_test_longfirstname', 'last': 'username', 'email': 'toolong@username.com'},}
+      self.users = {
+        'moe': {'dn': 'uid=moe,ou=People,dc=example,dc=com', 'username':'moe', 'first':'Moe', 'email':'moe@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com']},
+        'lårry': {'dn': 'uid=lårry,ou=People,dc=example,dc=com', 'username':'lårry', 'first':'Larry', 'last':'Stooge', 'email':'larry@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com', 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
+        'curly': {'dn': 'uid=curly,ou=People,dc=example,dc=com', 'username':'curly', 'first':'Curly', 'last':'Stooge', 'email':'curly@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com', 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
+        'Rock': {'dn': 'uid=Rock,ou=People,dc=example,dc=com', 'username':'Rock', 'first':'rock', 'last':'man', 'email':'rockman@stooges.com', 'groups': ['cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
+        'nestedguy': {'dn': 'uid=nestedguy,ou=People,dc=example,dc=com', 'username':'nestedguy', 'first':'nested', 'last':'guy', 'email':'nestedguy@stooges.com', 'groups': ['cn=NestedGroup,ou=Groups,dc=example,dc=com']},
+        'otherguy': {'dn': 'uid=otherguy,ou=People,dc=example,dc=com', 'username':'otherguy', 'first':'Other', 'last':'Guy', 'email':'other@guy.com'},
+        'posix_person': {'dn': 'uid=posix_person,ou=People,dc=example,dc=com', 'username': 'posix_person', 'first': 'pos', 'last': 'ix', 'email': 'pos@ix.com'},
+        'posix_person2': {'dn': 'uid=posix_person2,ou=People,dc=example,dc=com', 'username': 'posix_person2', 'first': 'pos', 'last': 'ix', 'email': 'pos@ix.com'},
+        'user with space': {'dn': 'uid=user with space,ou=People,dc=example,dc=com', 'username': 'user with space', 'first': 'user', 'last': 'space', 'email': 'user@space.com'},
+        'spaceless': {'dn': 'uid=user without space,ou=People,dc=example,dc=com', 'username': 'spaceless', 'first': 'user', 'last': 'space', 'email': 'user@space.com'},
+        'test_toolongusernametoolongusername': {'dn': 'uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com', 'username': 'test_toolongusernametoolongusername', 'first': 'toolong', 'last': 'username', 'email': 'toolong@username.com'},
+        'test_longfirstname': {'dn': 'uid=test_longfirstname,ou=People,dc=example,dc=com', 'username': 'test_longfirstname', 'first': 'test_longfirstname_test_longfirstname', 'last': 'username', 'email': 'toolong@username.com'},}
 
-      self.groups = {'TestUsers': {
-                        'dn': 'cn=TestUsers,ou=Groups,dc=example,dc=com',
-                        'name':'TestUsers',
-                        'members':['uid=moe,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com','uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com'],
-                        'posix_members':[]},
-                      'Test Administrators': {
-                        'dn': 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com',
-                        'name':'Test Administrators',
-                        'members':['uid=Rock,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com','uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com'],
-                        'posix_members':[]},
-                      'OtherGroup': {
-                        'dn': 'cn=OtherGroup,cn=TestUsers,ou=Groups,dc=example,dc=com',
-                        'name':'OtherGroup',
-                        'members':[],
-                        'posix_members':[]},
-                      'NestedGroups': {
-                        'dn': 'cn=NestedGroups,ou=Groups,dc=example,dc=com',
-                        'name':'NestedGroups',
-                        'members':['cn=NestedGroup,ou=Groups,dc=example,dc=com'],
-                        'posix_members':[]
-                      },
-                      'NestedGroup': {
-                        'dn': 'cn=NestedGroup,ou=Groups,dc=example,dc=com',
-                        'name':'NestedGroup',
-                        'members':['uid=nestedguy,ou=People,dc=example,dc=com'],
-                        'posix_members':[]
-                      },
-                      'NestedPosixGroups': {
-                        'dn': 'cn=NestedPosixGroups,ou=Groups,dc=example,dc=com',
-                        'name':'NestedPosixGroups',
-                        'members':['cn=PosixGroup,ou=Groups,dc=example,dc=com'],
-                        'posix_members':[]
-                      },
-                      'PosixGroup': {
-                        'dn': 'cn=PosixGroup,ou=Groups,dc=example,dc=com',
-                        'name':'PosixGroup',
-                        'members':[],
-                        'posix_members':['posix_person','lårry']},
-                      'PosixGroup1': {
-                        'dn': 'cn=PosixGroup1,cn=PosixGroup,ou=Groups,dc=example,dc=com',
-                        'name':'PosixGroup1',
-                        'members':[],
-                        'posix_members':['posix_person2']},
-                     }
+      self.groups = {
+        'TestUsers': {
+          'dn': 'cn=TestUsers,ou=Groups,dc=example,dc=com',
+          'name':'TestUsers',
+          'members':['uid=moe,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com','uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com'],
+          'posix_members':[]},
+        'Test Administrators': {
+          'dn': 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com',
+          'name':'Test Administrators',
+          'members':['uid=Rock,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com','uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com'],
+          'posix_members':[]},
+        'OtherGroup': {
+          'dn': 'cn=OtherGroup,cn=TestUsers,ou=Groups,dc=example,dc=com',
+          'name':'OtherGroup',
+          'members':[],
+          'posix_members':[]},
+        'NestedGroups': {
+          'dn': 'cn=NestedGroups,ou=Groups,dc=example,dc=com',
+          'name':'NestedGroups',
+          'members':['cn=NestedGroup,ou=Groups,dc=example,dc=com'],
+          'posix_members':[]
+        },
+        'NestedGroup': {
+          'dn': 'cn=NestedGroup,ou=Groups,dc=example,dc=com',
+          'name':'NestedGroup',
+          'members':['uid=nestedguy,ou=People,dc=example,dc=com'],
+          'posix_members':[]
+        },
+        'NestedPosixGroups': {
+          'dn': 'cn=NestedPosixGroups,ou=Groups,dc=example,dc=com',
+          'name':'NestedPosixGroups',
+          'members':['cn=PosixGroup,ou=Groups,dc=example,dc=com'],
+          'posix_members':[]
+        },
+        'PosixGroup': {
+          'dn': 'cn=PosixGroup,ou=Groups,dc=example,dc=com',
+          'name':'PosixGroup',
+          'members':[],
+          'posix_members':['posix_person','lårry']},
+        'PosixGroup1': {
+          'dn': 'cn=PosixGroup1,cn=PosixGroup,ou=Groups,dc=example,dc=com',
+          'name':'PosixGroup1',
+          'members':[],
+          'posix_members':['posix_person2']},
+        }
 
 
 def test_invalid_username():
@@ -242,7 +245,7 @@ class BaseUserAdminTests(object):
   @classmethod
   def setUpClass(cls):
     cls._class_resets = [
-        useradmin.conf.DEFAULT_USER_GROUP.set_for_testing(None),
+      useradmin.conf.DEFAULT_USER_GROUP.set_for_testing(None),
     ]
 
   @classmethod
@@ -258,6 +261,41 @@ class BaseUserAdminTests(object):
     pass
 
 
+class TestUserProfile(BaseUserAdminTests):
+
+  @override_settings(AUTHENTICATION_BACKENDS=['desktop.auth.backend.AllowFirstUserDjangoBackend'])
+  def test_get_profile(self):
+    '''Ensure profiles are created after get_profile is called.'''
+    user = create_user(username='test', password='test', is_superuser=False)
+
+    assert_equal(0, UserProfile.objects.filter(user=user).count())
+
+    p = get_profile(user)
+
+    assert_equal(1, UserProfile.objects.filter(user=user).count())
+
+
+  @override_settings(AUTHENTICATION_BACKENDS=['desktop.auth.backend.AllowFirstUserDjangoBackend'])
+  def test_get_and_update_profile(self):
+    c = make_logged_in_client(username='test', password='test', is_superuser=False, recreate=True)
+
+    user = User.objects.get(username='test')
+    userprofile = get_profile(user)
+    assert_false(userprofile.data.get('language_preference'))
+
+    userprofile.update_data({'language_preference': 'en'})
+    userprofile.save()
+    assert_equal('en', userprofile.data['language_preference'])
+
+    userprofile.update_data({'language_preference': 'es'})
+    userprofile.save()
+    assert_equal('es', userprofile.data['language_preference'])
+
+    user = User.objects.get(username='test')
+    userprofile = get_profile(user)
+    assert_equal('es', userprofile.data['language_preference'])
+
+
 class TestUserAdmin(BaseUserAdminTests):
 
   def test_group_permissions(self):
@@ -270,24 +308,30 @@ class TestUserAdmin(BaseUserAdminTests):
 
     # Make sure that a superuser can always access applications
     response = c.get('/useradmin/users')
-    assert_true('Hue Users' in response.content)
+    assert_true(b'Users' in response.content)
 
     assert_true(len(GroupPermission.objects.all()) == 0)
-    c.post('/useradmin/groups/edit/test-group',
-           dict(name="test-group",
-           members=[User.objects.get(username="test").pk],
-           permissions=[HuePermission.objects.get(app='useradmin',action='access').pk],
-           save="Save"), follow=True)
+    c.post('/useradmin/groups/edit/test-group', dict(
+        name="test-group",
+        members=[User.objects.get(username="test").pk],
+        permissions=[HuePermission.objects.get(app='useradmin',action='access').pk],
+        save="Save"
+      ),
+      follow=True
+    )
     assert_true(len(GroupPermission.objects.all()) == 1)
 
     # Get ourselves set up with a user and a group with superuser group priv
     cadmin = make_logged_in_client(username="supertest", is_superuser=True)
     Group.objects.create(name="super-test-group")
-    cadmin.post('/useradmin/groups/edit/super-test-group',
-                dict(name="super-test-group",
-                     members=[User.objects.get(username="supertest").pk],
-                     permissions=[HuePermission.objects.get(app='useradmin', action='superuser').pk],
-                     save="Save"), follow=True)
+    cadmin.post('/useradmin/groups/edit/super-test-group', {
+        'name': "super-test-group",
+        'members': [User.objects.get(username="supertest").pk],
+        'permissions': [HuePermission.objects.get(app='useradmin', action='superuser').pk],
+        "save": "Save"
+      },
+      follow=True
+    )
     assert_equal(len(GroupPermission.objects.all()), 2)
 
     supertest = User.objects.get(username="supertest")
@@ -303,11 +347,12 @@ class TestUserAdmin(BaseUserAdminTests):
     # Create user to try to edit
     notused = User.objects.get_or_create(username="notused", is_superuser=False)
     response = cadmin.get('/useradmin/users/edit/notused?is_embeddable=true')
-    assert_true('Hue Users - Edit user: notused' in response.content)
+    assert_true(b'User notused' in response.content)
 
     # Make sure we can modify permissions
     response = cadmin.get('/useradmin/permissions/edit/useradmin/access/?is_embeddable=true')
-    assert_true('Hue Permissions - Edit app: useradmin' in response.content)
+    assert_true(b'Permissions' in response.content)
+    assert_true(b'Edit useradmin' in response.content, response.content)
 
     # Revoke superuser privilege from groups
     c.post('/useradmin/permissions/edit/useradmin/superuser', dict(
@@ -318,12 +363,12 @@ class TestUserAdmin(BaseUserAdminTests):
       ),
       follow=True
     )
-    assert_equal(len(GroupPermission.objects.all()), 1)
+    assert_equal(GroupPermission.objects.count(), 1)
 
     # Now test that we have limited access
     c1 = make_logged_in_client(username="nonadmin", is_superuser=False)
     response = c1.get('/useradmin/users')
-    assert_true('You do not have permission to access the Useradmin application.' in response.content)
+    assert_true(b'You do not have permission to access the Useradmin application.' in response.content)
 
     # Add the non-admin to a group that should grant permissions to the app
     test_user = User.objects.get(username="nonadmin")
@@ -332,19 +377,19 @@ class TestUserAdmin(BaseUserAdminTests):
 
     # Make sure that a user of nonadmin fails where supertest succeeds
     response = c1.get("/useradmin/users/edit/notused?is_embeddable=true")
-    assert_true('You must be a superuser to add or edit another user' in response.content)
+    assert_true(b'You must be a superuser to add or edit another user' in response.content)
 
     response = c1.get("/useradmin/permissions/edit/useradmin/access/?is_embeddable=true")
-    assert_true('You must be a superuser to change permissions' in response.content)
+    assert_true(b'You must be a superuser to change permissions' in response.content)
 
     # Check that we have access now
     response = c1.get('/useradmin/users')
     assert_true(get_profile(test_user).has_hue_permission('access','useradmin'))
-    assert_true('Hue Users' in response.content)
+    assert_true(b'Users' in response.content)
 
     # Make sure we can't modify permissions
     response = c1.get('/useradmin/permissions/edit/useradmin/access')
-    assert_true('must be a superuser to change permissions' in response.content)
+    assert_true(b'must be a superuser to change permissions' in response.content)
 
     # And revoke access from the group
     c.post('/useradmin/permissions/edit/useradmin/access', dict(
@@ -360,7 +405,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
     # We should no longer have access to the app
     response = c1.get('/useradmin/users')
-    assert_true('You do not have permission to access the Useradmin application.' in response.content)
+    assert_true(b'You do not have permission to access the Useradmin application.' in response.content)
 
 
   def test_list_permissions(self):
@@ -389,6 +434,17 @@ class TestUserAdmin(BaseUserAdminTests):
       appmanager.load_apps(APP_BLACKLIST.get())
 
 
+  def test_list_users(self):
+    c = make_logged_in_client(username="test", is_superuser=True)
+
+    response = c.get('/useradmin/users')
+
+    assert_true(b'Is admin' in response.content)
+    assert_true(b'fa fa-check' in response.content)
+
+    assert_true(b'Is active' in response.content)
+
+
   def test_default_group(self):
     resets = [
       useradmin.conf.DEFAULT_USER_GROUP.set_for_testing('test_default')
@@ -405,7 +461,7 @@ class TestUserAdmin(BaseUserAdminTests):
       # Try deleting the default group
       assert_true(Group.objects.filter(name='test_default').exists())
       response = c.post('/useradmin/groups/delete', {'group_names': ['test_default']})
-      assert_true('default user group may not be deleted' in response.content)
+      assert_true(b'default user group may not be deleted' in response.content)
       assert_true(Group.objects.filter(name='test_default').exists())
 
       # Change the name of the default group, and try deleting again
@@ -419,20 +475,12 @@ class TestUserAdmin(BaseUserAdminTests):
         reset()
 
 
-  def test_get_profile(self):
-    # Ensure profiles are created after get_profile is called.
-    c = make_logged_in_client(username='test', password='test', is_superuser=True)
-    assert_equal(0, UserProfile.objects.count())
-    p = get_profile(User.objects.get(username='test'))
-    assert_equal(1, UserProfile.objects.count())
-
-
   def test_group_admin(self):
     c = make_logged_in_client(username="test", is_superuser=True)
     response = c.get('/useradmin/groups')
     # No groups just yet
     assert_true(len(response.context[0]["groups"]) == 0)
-    assert_true("Hue Groups" in response.content)
+    assert_true(b"Groups" in response.content)
 
     # Create a group
     response = c.get('/useradmin/groups/new')
@@ -465,17 +513,17 @@ class TestUserAdmin(BaseUserAdminTests):
 
     # Make sure non-superusers can't do bad things
     response = c2.get('/useradmin/groups/new')
-    assert_true("You must be a superuser" in response.content)
+    assert_true(b"You must be a superuser" in response.content)
     response = c2.get('/useradmin/groups/edit/testgroup')
-    assert_true("You must be a superuser" in response.content)
+    assert_true(b"You must be a superuser" in response.content)
 
     response = c2.post('/useradmin/groups/new', dict(name="nonsuperuser"))
-    assert_true("You must be a superuser" in response.content)
+    assert_true(b"You must be a superuser" in response.content)
     response = c2.post('/useradmin/groups/edit/testgroup',
                       dict(name="nonsuperuser",
                       members=[User.objects.get(username="test").pk],
                       save="Save"), follow=True)
-    assert_true("You must be a superuser" in response.content)
+    assert_true(b"You must be a superuser" in response.content)
 
     # Should be one group left, because we created the other group
     response = c.post('/useradmin/groups/delete', {'group_names': ['testgroup']})
@@ -526,7 +574,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
       # Test password hint is displayed
       response = c.get('/useradmin/users/edit/superuser')
-      assert_true(password_hint in response.content)
+      assert_true(password_hint in (response.content if isinstance(response.content, str) else response.content.decode()))
 
       # Password is less than 8 characters
       response = c.post('/useradmin/users/edit/superuser',
@@ -627,53 +675,91 @@ class TestUserAdmin(BaseUserAdminTests):
       # Test basic output.
       response = c.get('/useradmin/')
       assert_true(len(response.context[0]["users"]) > 0)
-      assert_true("Hue Users" in response.content)
+      assert_true(b"Users" in response.content)
 
       # Test editing a superuser
       # Just check that this comes back
       response = c.get('/useradmin/users/edit/test')
       # Edit it, to add a first and last name
-      response = c.post('/useradmin/users/edit/test',
-                        dict(username="test",
-                             first_name=u"Inglés",
-                             last_name=u"Español",
-                             is_superuser=True,
-                             is_active=True),
-                        follow=True)
-      assert_true("User information updated" in response.content,
+      response = c.post('/useradmin/users/edit/test', dict(
+          username="test",
+          first_name=u"Inglés",
+          last_name=u"Español",
+          is_superuser=True,
+          is_active=True
+        ),
+        follow=True
+      )
+      assert_true(b"User information updated" in response.content,
                   "Notification should be displayed in: %s" % response.content)
       # Edit it, can't change username
-      response = c.post('/useradmin/users/edit/test',
-                        dict(username="test2",
-                             first_name=u"Inglés",
-                             last_name=u"Español",
-                             is_superuser=True,
-                             is_active=True),
-                        follow=True)
-      assert_true("You cannot change a username" in response.content)
+      response = c.post('/useradmin/users/edit/test', dict(
+          username="test2",
+          first_name=u"Inglés",
+          last_name=u"Español",
+          is_superuser=True,
+          is_active=True
+        ),
+        follow=True
+      )
+      assert_true(b"You cannot change a username" in response.content)
       # Now make sure that those were materialized
       response = c.get('/useradmin/users/edit/test')
       assert_equal(smart_unicode("Inglés"), response.context[0]["form"].instance.first_name)
-      assert_true("Español" in response.content)
+      assert_true(("Español" if isinstance(response.content, str) else "Español".encode('utf-8')) in response.content)
       # Shouldn't be able to demote to non-superuser
-      response = c.post('/useradmin/users/edit/test', dict(username="test",
-                            first_name=u"Inglés", last_name=u"Español",
-                            is_superuser=False, is_active=True))
-      assert_true("You cannot remove" in response.content,
-                  "Shouldn't be able to remove the last superuser")
+      response = c.post('/useradmin/users/edit/test', dict(
+          username="test",
+          first_name=u"Inglés",
+          last_name=u"Español",
+          is_superuser=False,
+          is_active=True
+        )
+      )
+      assert_true(b"You cannot remove" in response.content,  "Shouldn't be able to remove the last superuser")
       # Shouldn't be able to delete oneself
-      response = c.post('/useradmin/users/delete', {u'user_ids': [user.id]})
-      assert_true("You cannot remove yourself" in response.content,
-                  "Shouldn't be able to delete the last superuser")
+      response = c.post('/useradmin/users/delete', {u'user_ids': [user.id], 'is_delete': True})
+      assert_true(b"You cannot remove yourself" in response.content, "Shouldn't be able to delete the last superuser")
 
       # Let's try changing the password
-      response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", is_superuser=True, password1="foo", password2="foobar"))
-      assert_equal(["Passwords do not match."], response.context[0]["form"]["password2"].errors, "Should have complained about mismatched password")
+      response = c.post('/useradmin/users/edit/test', dict(
+          username="test",
+          first_name="Tom",
+          last_name="Tester",
+          is_superuser=True,
+          password1="foo",
+          password2="foobar"
+        )
+      )
+      assert_equal(
+        ["Passwords do not match."], response.context[0]["form"]["password2"].errors, "Should have complained about mismatched password"
+      )
       # Old password not confirmed
-      response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", password1="foo", password2="foo", is_active=True, is_superuser=True))
-      assert_equal([UserChangeForm.GENERIC_VALIDATION_ERROR], response.context[0]["form"]["password_old"].errors, "Should have complained about old password")
+      response = c.post('/useradmin/users/edit/test', dict(
+          username="test",
+          first_name="Tom",
+          last_name="Tester",
+          password1="foo",
+          password2="foo",
+          is_active=True,
+          is_superuser=True
+        )
+      )
+      assert_equal(
+        [UserChangeForm.GENERIC_VALIDATION_ERROR], response.context[0]["form"]["password_old"].errors, "Should have complained about old password"
+      )
       # Good now
-      response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", password1="foo", password2="foo", password_old="test", is_active=True, is_superuser=True))
+      response = c.post('/useradmin/users/edit/test', dict(
+          username="test",
+          first_name="Tom",
+          last_name="Tester",
+          password1="foo",
+          password2="foo",
+          password_old="test",
+          is_active=True,
+          is_superuser=True
+        )
+      )
       assert_true(User.objects.get(username="test").is_superuser)
       assert_true(User.objects.get(username="test").check_password("foo"))
       # Change it back!
@@ -689,23 +775,30 @@ class TestUserAdmin(BaseUserAdminTests):
       group = get_default_user_group()
       response = c.get('/useradmin/users/new')
       assert_true(response)
-      assert_true(('<option value="%s" selected>%s</option>' % (group.id, group.name)) in str(response))
+      assert_true(('<option value="%s" selected>%s</option>' % (group.id, group.name)) in (response.content if isinstance(response.content, str) else response.content.decode()))
 
       # Create a new regular user (duplicate name)
       response = c.post('/useradmin/users/new', dict(username="test", password1="test", password2="test"))
-      assert_equal({ 'username': ['Username already exists.']}, response.context[0]["form"].errors)
+      assert_equal({'username': ['Username already exists.']}, response.context[0]["form"].errors)
 
       # Create a new regular user (for real)
-      response = c.post('/useradmin/users/new', dict(username=FUNNY_NAME,
-                                               password1="test",
-                                               password2="test",
-                                               is_superuser=True,
-                                               is_active=True))
-      response = c.get('/useradmin/')
+      response = c.post('/useradmin/users/new', dict(
+          username=FUNNY_NAME,
+          password1="test",
+          password2="test",
+          is_superuser=True,
+          is_active=True
+        ),
+        follow=True
+      )
+      if response.status_code != 200:
+        assert_false(response.context[0]["form"].errors)
+      assert_equal(response.status_code, 200, response.content)
 
-      assert_true(FUNNY_NAME in response.content)
+      response = c.get('/useradmin/')
+      assert_true(FUNNY_NAME in (response.content if isinstance(response.content, str) else response.content.decode()), response.content)
       assert_true(len(response.context[0]["users"]) > 1)
-      assert_true("Hue Users" in response.content)
+      assert_true(b"Users" in response.content)
       # Validate profile is created.
       assert_true(UserProfile.objects.filter(user__username=FUNNY_NAME).exists())
 
@@ -728,48 +821,63 @@ class TestUserAdmin(BaseUserAdminTests):
       test_user.save()
 
       # Regular user should be able to modify oneself
-      response = c_reg.post('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,),
-                            dict(username = FUNNY_NAME,
-                                 first_name = "Hello",
-                                 is_active = True,
-                                 groups=[group.id for group in test_user.groups.all()]), follow=True)
+      response = c_reg.post('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,), dict(
+          username = FUNNY_NAME,
+          first_name = "Hello",
+          is_active = True,
+          groups=[group.id for group in test_user.groups.all()]
+          ),
+          follow=True
+      )
       assert_equal(response.status_code, 200)
       response = c_reg.get('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,), follow=True)
       assert_equal(response.status_code, 200)
       assert_equal("Hello", response.context[0]["form"].instance.first_name)
       funny_user = User.objects.get(username=FUNNY_NAME)
       # Can't edit other people.
-      response = c_reg.post("/useradmin/users/delete", {u'user_ids': [funny_user.id]})
-      assert_true("You must be a superuser" in response.content,
-                  "Regular user can't edit other people")
+      response = c_reg.post("/useradmin/users/delete", {u'user_ids': [funny_user.id], 'is_delete': True})
+      assert_true(b"You must be a superuser" in response.content, "Regular user can't edit other people")
 
       # Revert to regular "test" user, that has superuser powers.
       c_su = make_logged_in_client()
       # Inactivate FUNNY_NAME
-      c_su.post('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,),
-                            dict(username = FUNNY_NAME,
-                                 first_name = "Hello",
-                                 is_active = False))
+      c_su.post('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,), dict(
+          username = FUNNY_NAME,
+          first_name = "Hello",
+          is_active = False)
+      )
       # Now make sure FUNNY_NAME can't log back in
       response = c_reg.get('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,))
-      assert_true(response.status_code == 302 and "login" in response["location"],
-                  "Inactivated user gets redirected to login page")
+      assert_true(
+          response.status_code == 302 and "login" in response["location"],
+          "Inactivated user gets redirected to login page"
+      )
 
       # Create a new user with unicode characters
-      response = c.post('/useradmin/users/new', dict(username='christian_häusler',
-                                                     password1="test",
-                                                     password2="test",
-                                                     is_active=True))
+      response = c.post('/useradmin/users/new', dict(
+          username='christian_häusler',
+          password1="test",
+          password2="test",
+          is_active=True
+        )
+      )
       response = c.get('/useradmin/')
-      assert_true('christian_häusler' in response.content)
+      assert_true('christian_häusler' in (response.content if isinstance(response.content, str) else response.content.decode()))
       assert_true(len(response.context[0]["users"]) > 1)
 
       # Validate profile is created.
       assert_true(UserProfile.objects.filter(user__username='christian_häusler').exists())
 
-      # Delete that regular user
+      # Deactivate that regular user
       funny_profile = get_profile(test_user)
       response = c_su.post('/useradmin/users/delete', {u'user_ids': [funny_user.id]})
+      assert_equal(302, response.status_code)
+      assert_true(User.objects.filter(username=FUNNY_NAME).exists())
+      assert_true(UserProfile.objects.filter(id=funny_profile.id).exists())
+      assert_false(User.objects.get(username=FUNNY_NAME).is_active)
+
+      # Delete for real
+      response = c_su.post('/useradmin/users/delete', {u'user_ids': [funny_user.id], 'is_delete': True})
       assert_equal(302, response.status_code)
       assert_false(User.objects.filter(username=FUNNY_NAME).exists())
       assert_false(UserProfile.objects.filter(id=funny_profile.id).exists())
@@ -778,25 +886,46 @@ class TestUserAdmin(BaseUserAdminTests):
       u1 = User.objects.create(username='u1', password="u1")
       u2 = User.objects.create(username='u2', password="u2")
       assert_equal(User.objects.filter(username__in=['u1', 'u2']).count(), 2)
-      response = c_su.post('/useradmin/users/delete', {u'user_ids': [u1.id, u2.id]})
+      response = c_su.post('/useradmin/users/delete', {u'user_ids': [u1.id, u2.id], 'is_delete': True})
       assert_equal(User.objects.filter(username__in=['u1', 'u2']).count(), 0)
 
       # Make sure that user deletion works if the user has never performed a request.
       funny_user = User.objects.create(username=FUNNY_NAME, password='test')
       assert_true(User.objects.filter(username=FUNNY_NAME).exists())
       assert_false(UserProfile.objects.filter(user__username=FUNNY_NAME).exists())
-      response = c_su.post('/useradmin/users/delete', {u'user_ids': [funny_user.id]})
+      response = c_su.post('/useradmin/users/delete', {u'user_ids': [funny_user.id], 'is_delete': True})
       assert_equal(302, response.status_code)
       assert_false(User.objects.filter(username=FUNNY_NAME).exists())
       assert_false(UserProfile.objects.filter(user__username=FUNNY_NAME).exists())
 
       # You shouldn't be able to create a user without a password
       response = c_su.post('/useradmin/users/new', dict(username="test"))
-      assert_true("You must specify a password when creating a new user." in response.content)
+      assert_true(b"You must specify a password when creating a new user." in response.content)
     finally:
       for reset in resets:
         reset()
 
+  def test_deactivate_users(self):
+    c = make_logged_in_client('test', is_superuser=True)
+
+    regular_username = 'regular_user'
+    regular_user_client = make_logged_in_client(regular_username, is_superuser=True, recreate=True)
+    regular_user = User.objects.get(username=regular_username)
+
+    try:
+      # Deactivate that regular user
+      response = c.post('/useradmin/users/delete', {u'user_ids': [regular_user.id]})
+      assert_equal(302, response.status_code)
+      assert_true(User.objects.filter(username=regular_username).exists())
+      assert_false(User.objects.get(username=regular_username).is_active)
+
+      # Delete for real
+      response = c.post('/useradmin/users/delete', {u'user_ids': [regular_user.id], 'is_delete': True})
+      assert_equal(302, response.status_code)
+      assert_false(User.objects.filter(username=regular_username).exists())
+      assert_false(UserProfile.objects.filter(id=regular_user.id).exists())
+    finally:
+      regular_user.delete()
 
   def test_list_for_autocomplete(self):
 
@@ -866,55 +995,65 @@ class TestUserAdmin(BaseUserAdminTests):
     grant_access('test', 'test', 'useradmin')
 
     response = client.get('/useradmin/users/edit/test')
-    assert_true("Language Preference" in response.content)
+    assert_true(b"Language Preference" in response.content)
 
     # Does not appear for superuser editing other profiles
     other_client = make_logged_in_client('test_super', is_superuser=True, groupname='test')
     superuser = User.objects.get(username='test_super')
 
     response = other_client.get('/useradmin/users/edit/test')
-    assert_false("Language Preference" in response.content, response.content)
+    assert_false(b"Language Preference" in response.content, response.content)
 
     # Changing language preference will change language setting
     response = client.post('/useradmin/users/edit/test', dict(language='ko'))
-    assert_true('<option value="ko" selected>Korean</option>' in response.content)
+    assert_true(b'<option value="ko" selected>Korean</option>' in response.content)
 
   def test_edit_user_xss(self):
     # Hue 3 Admin
     edit_user = make_logged_in_client('admin', is_superuser=True)
-    response = edit_user.post('/useradmin/users/edit/admin', dict(username="admin",
-                                                                      is_superuser=True,
-                                                                      password1="foo",
-                                                                      password2="foo",
-                                                                      language="en-us><script>alert('Hacked')</script>"
-                                                                      ))
-    assert_true('Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; is not one of the available choices.' in response.content)
+    response = edit_user.post('/useradmin/users/edit/admin', dict(
+        username="admin",
+        is_superuser=True,
+        password1="foo",
+        password2="foo",
+        language="en-us><script>alert('Hacked')</script>"
+        )
+    )
+    assert_true(b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; is not one of the available choices.' in response.content)
     # Hue 4 Admin
-    response = edit_user.post('/useradmin/users/edit/admin', dict(username="admin",
-                                                                      is_superuser=True,
-                                                                      language="en-us><script>alert('Hacked')</script>",
-                                                                      is_embeddable=True))
+    response = edit_user.post('/useradmin/users/edit/admin', dict(
+        username="admin",
+        is_superuser=True,
+        language="en-us><script>alert('Hacked')</script>",
+        is_embeddable=True)
+    )
     content = json.loads(response.content)
     assert_true('Select a valid choice. en-us>alert(\'Hacked\') is not one of the available choices.', content['errors'][0]['message'][0])
 
     # Hue 3, User with access to useradmin app
     edit_user = make_logged_in_client('edit_user', is_superuser=False)
     grant_access('edit_user', 'edit_user', 'useradmin')
-    response = edit_user.post('/useradmin/users/edit/edit_user', dict(username="edit_user",
-                                                                      is_superuser=False,
-                                                                      password1="foo",
-                                                                      password2="foo",
-                                                                      language="en-us><script>alert('Hacked')</script>"
-                                                                      ))
-    assert_true('Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; is not one of the available choices.' in response.content)
+    response = edit_user.post('/useradmin/users/edit/edit_user', dict(
+        username="edit_user",
+        is_superuser=False,
+        password1="foo",
+        password2="foo",
+        language="en-us><script>alert('Hacked')</script>"
+        )
+    )
+    assert_true(b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; is not one of the available choices.' in response.content)
     # Hue 4, User with access to useradmin app
-    response = edit_user.post('/useradmin/users/edit/edit_user', dict(username="edit_user",
-                                                                      is_superuser=False,
-                                                                      language="en-us><script>alert('Hacked')</script>",
-                                                                      is_embeddable=True))
+    response = edit_user.post('/useradmin/users/edit/edit_user', dict(
+        username="edit_user",
+        is_superuser=False,
+        language="en-us><script>alert('Hacked')</script>",
+        is_embeddable=True)
+    )
     content = json.loads(response.content)
-    assert_true('Select a valid choice. en-us>alert(\'Hacked\') is not one of the available choices.',
-                content['errors'][0]['message'][0])
+    assert_true(
+        'Select a valid choice. en-us>alert(\'Hacked\') is not one of the available choices.',
+        content['errors'][0]['message'][0]
+    )
 
 
 class TestUserAdminWithHadoop(BaseUserAdminTests):
@@ -1040,20 +1179,20 @@ def test_get_connection_bind_password_script():
   # Unfortunately our tests leak a cached test ldap connection across functions, so we need to clear it out.
   useradmin.ldap_access.CACHED_LDAP_CONN = None
 
-  SCRIPT = '%s -c "print \'\\n password from script \\n\'"' % sys.executable
+  SCRIPT = '%s -c "print(\'\\n password from script \\n\')"' % sys.executable
 
   # Monkey patch the LdapConnection class as we don't want to make a real connection.
   OriginalLdapConnection = useradmin.ldap_access.LdapConnection
   reset = [
       desktop.conf.LDAP.LDAP_URL.set_for_testing('default.example.com'),
       desktop.conf.LDAP.BIND_PASSWORD_SCRIPT.set_for_testing(
-        '%s -c "print \'\\n default password \\n\'"' % sys.executable
+        '%s -c "print(\'\\n default password \\n\')"' % sys.executable
       ),
       desktop.conf.LDAP.LDAP_SERVERS.set_for_testing({
         'test': {
           'ldap_url': 'test.example.com',
           'bind_password_script':
-            '%s -c "print \'\\n test password \\n\'"' % sys.executable,
+            '%s -c "print(\'\\n test password \\n\')"' % sys.executable,
         }
       })
   ]

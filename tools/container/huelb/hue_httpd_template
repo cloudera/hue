@@ -1,0 +1,49 @@
+LoadModule proxy_module /etc/httpd/modules/mod_proxy.so
+LoadModule proxy_balancer_module /etc/httpd/modules/mod_proxy_balancer.so
+LoadModule proxy_http_module /etc/httpd/modules/mod_proxy_http.so
+LoadModule slotmem_shm_module /etc/httpd/modules/mod_slotmem_shm.so
+LoadModule unixd_module /etc/httpd/modules/mod_unixd.so
+LoadModule lbmethod_byrequests_module /etc/httpd/modules/mod_lbmethod_byrequests.so
+LoadModule authz_core_module /etc/httpd/modules/mod_authz_core.so
+LoadModule log_config_module /etc/httpd/modules/mod_log_config.so
+LoadModule mime_module /etc/httpd/modules/mod_mime.so
+
+ErrorLog "${HUE_LOG_DIR}/httpd_error_log"
+LogLevel warn
+
+<IfModule log_config_module>
+  LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+  LogFormat "%h %l %u %t \"%r\" %>s %b" common
+  CustomLog "${HUE_LOG_DIR}/httpd_access_log" common
+</IfModule>
+
+<IfModule mime_module>
+  TypesConfig /etc/mime.types
+  AddType application/x-compress .Z
+  AddType application/x-gzip .gz .tgz
+</IfModule>
+
+<Directory />
+  Options FollowSymlinks
+  AllowOverride none
+</Directory>
+
+<Directory ${HUE_HOME}/build/static>
+  Options -Indexes
+  Require all granted
+</Directory>
+
+Alias /static ${HUE_HOME}/build/static
+
+Header add Set-Cookie "ROUTEID=.%{BALANCER_WORKER_ROUTE}e; path=/" env=BALANCER_ROUTE_CHANGED
+ProxyPreserveHost Off
+ProxyPass /static !
+ProxyPass / balancer://hue/ stickysession=ROUTEID
+
+SetEnv proxy-initial-not-pooled 1
+ProxyTimeout 900
+
+AllowEncodedSlashes NoDecode
+User ${HUE_USER}
+Group ${HUE_USER}
+Include /etc/httpd/conf.d/hue.conf

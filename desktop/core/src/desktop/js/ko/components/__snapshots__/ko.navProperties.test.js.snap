@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.navProperties.js should render component 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;nav-properties&quot;, params: params }\\"><script type=\\"text/html\\" id=\\"nav-property-edit-popover-content\\">
+    <div class=\\"hue-nav-property-edit-content\\">
+      <a href=\\"javascript: void(0);\\" class=\\"close-popover\\"><i class=\\"fa fa-times\\"></i></a>
+      <div class=\\"control-group\\" data-bind=\\"css: { 'error': keyInvalid }\\">
+        <label class=\\"control-label\\">Key</label>
+        <div class=\\"controls\\">
+          <input type=\\"text\\" placeholder=\\"Key\\" data-bind=\\"textInput: key\\">
+        </div>
+      </div>
+      <div class=\\"control-group\\" data-bind=\\"css: { 'error': valueInvalid }\\">
+        <label class=\\"control-label\\">Value</label>
+        <div class=\\"controls\\">
+          <input type=\\"text\\" placeholder=\\"Value\\" data-bind=\\"textInput: value\\">
+        </div>
+      </div>
+    </div>
+  </script><div class=\\"hue-nav-properties\\"><div data-bind=\\"hueSpinner: { spin: loading, inline: true }\\"></div></div><div class=\\"hue-nav-properties\\" data-bind=\\"click: startEdit, visibleOnHover: { selector: '.editable-inline-action' }\\">
+    <!-- ko if: !properties().length --><!-- /ko -->
+    <!-- ko foreach: properties -->
+    <div class=\\"hue-nav-property\\"><div class=\\"hue-nav-property-key\\" data-bind=\\"text: key, attr: { 'title': key }\\" title=\\"testProp\\">testProp</div><div class=\\"hue-nav-property-value\\" data-bind=\\"text: value, attr: { 'title': value }\\" title=\\"testVal\\">testVal</div></div>
+    <!-- /ko -->
+    <div class=\\"editable-inline-action\\" title=\\"Edit\\"><a href=\\"javascript: void(0);\\" data-bind=\\"click: startEdit\\"><i class=\\"fa fa-pencil\\"></i></a></div>
+  </div><div class=\\"hue-nav-properties\\">
+    <!-- ko foreach: properties -->
+    <div class=\\"hue-nav-property\\" data-bind=\\"tooltip: { placement: 'bottom' }, attr: { title: title }\\"><div class=\\"hue-nav-property-key\\" data-bind=\\"text: key\\">testProp</div><div class=\\"hue-nav-property-value\\" data-bind=\\"text: value\\">testVal</div></div>
+    <!-- /ko -->
+  </div><div class=\\"hue-nav-properties hue-nav-properties-edit\\">
+    <!-- ko foreach: editProperties --><!-- /ko -->
+    <div class=\\"hue-nav-property-add\\"><a href=\\"javascript: void(0);\\" title=\\"Add\\" data-bind=\\"click: addProperty\\"><i class=\\"fa fa-plus\\"></i></a></div>
+    <div class=\\"hue-nav-properties-edit-actions\\">
+      <a href=\\"javascript: void(0);\\" title=\\"Save\\" data-bind=\\"click: saveEdit\\"><i class=\\"fa fa-check\\"></i></a>
+      <a href=\\"javascript: void(0);\\" title=\\"Cancel\\" data-bind=\\"click: cancelEdit\\"><i class=\\"fa fa-close\\"></i></a>
+    </div>
+  </div></div>"
+`;

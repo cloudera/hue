@@ -28,6 +28,9 @@ import common
 
 if sys.version_info[0] > 2:
   from builtins import object
+  open_file = open
+else:
+  open_file = file
 
 LOG = logging.getLogger(__name__)
 PTH_FILE = 'hue.pth'
@@ -58,7 +61,7 @@ class PthFile(object):
 
   def _read(self):
     if os.path.exists(self._path):
-      self._entries = set(file(self._path).read().split('\n'))
+      self._entries = set(open_file(self._path).read().split('\n'))
 
   def add(self, app):
     """

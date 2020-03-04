@@ -28,11 +28,10 @@ from nose.tools import assert_equal, assert_true
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 
-from django.contrib.auth.models import User
-
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group
 from hadoop.pseudo_hdfs4 import is_live_cluster, shared_cluster
+from useradmin.models import User
 
 from indexer.conf import ENABLE_SCALABLE_INDEXER
 from indexer.controller import CollectionManagerController
@@ -47,6 +46,7 @@ if sys.version_info[0] > 2:
   from io import StringIO as string_io
 else:
   from StringIO import StringIO as string_io
+
 
 LOG = logging.getLogger(__name__)
 

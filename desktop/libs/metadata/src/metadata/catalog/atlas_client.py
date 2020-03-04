@@ -61,7 +61,7 @@ class AtlasApi(Api):
   def __init__(self, user=None):
     super(AtlasApi, self).__init__(user)
 
-    self._api_url = CATALOG.API_URL.get().strip('/')
+    self._api_url = CATALOG.API_URL.get().strip('/') + "/api/atlas"
     self._username = CATALOG.SERVER_USER.get()
     self._password = CATALOG.SERVER_PASSWORD.get()
 
@@ -127,7 +127,7 @@ class AtlasApi(Api):
       nav_entity['classifications'] = atlas_entity['classifications']
       for atlas_classification in atlas_entity['classifications']:
         if 'attributes' in atlas_classification:
-          for key, value in atlas_classification['attributes'].iteritems():
+          for key, value in atlas_classification['attributes'].items():
             nav_entity['properties'][key] = value
 
     return nav_entity

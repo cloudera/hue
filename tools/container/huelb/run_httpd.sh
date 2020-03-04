@@ -1,11 +1,6 @@
 #!/bin/sh
-
-export HUE_LOG_DIR="/var/log/hue"
-mkdir -p ${HUE_LOG_DIR}
-
 set -e
+mkdir -p ${HUE_LOG_DIR}
+ip_address=$(hostname -i)
 
-# Apache gets grumpy about PID files pre-existing
-rm -f /usr/local/apache2/logs/httpd.pid
-
-exec httpd -DFOREGROUND "$@"
+exec /usr/sbin/httpd -DFOREGROUND "$@"

@@ -15,13 +15,15 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import componentUtils from 'ko/components/componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { GET_KNOWN_CONFIG_EVENT, CONFIG_REFRESHED_EVENT } from 'utils/hueConfig';
 
+// prettier-ignore
 const TEMPLATE = `
   <script type="text/html" id="language-reference-topic-tree">
     <!-- ko if: $data.length -->
@@ -50,7 +52,9 @@ const TEMPLATE = `
       </div>
       <div class="assist-flex-search">
         <div class="assist-filter">
-          <input class="clearable" type="text" placeholder="Filter..." data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
+          <form autocomplete="off">
+            <input class="clearable" type="text" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } placeholder="Filter..." data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
+          </form>
         </div>
       </div>
       <div class="assist-docs-topics" data-bind="css: { 'assist-flex-fill': !selectedTopic(), 'assist-flex-40': selectedTopic() }">
@@ -146,15 +150,11 @@ class AssistLangRefPanel {
       updateType(details.type);
     });
 
-    const configSub = huePubSub.subscribe('cluster.config.set.config', clusterConfig => {
+    const configUpdated = config => {
       const lastActiveType = this.sourceType();
-      if (
-        clusterConfig.app_config &&
-        clusterConfig.app_config.editor &&
-        clusterConfig.app_config.editor.interpreters
-      ) {
+      if (config.app_config && config.app_config.editor && config.app_config.editor.interpreters) {
         const typesIndex = {};
-        clusterConfig.app_config.editor.interpreters.forEach(interpreter => {
+        config.app_config.editor.interpreters.forEach(interpreter => {
           if (interpreter.type === 'hive' || interpreter.type === 'impala') {
             typesIndex[interpreter.type] = true;
           }
@@ -169,9 +169,10 @@ class AssistLangRefPanel {
       } else {
         this.availableTypes([]);
       }
-    });
+    };
 
-    huePubSub.publish('cluster.config.get.config');
+    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, configUpdated);
+    const configSub = huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
 
     this.disposals.push(() => {
       configSub.remove();

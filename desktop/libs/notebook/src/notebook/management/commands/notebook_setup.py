@@ -19,13 +19,12 @@ import logging
 import os
 import pwd
 
-from django.contrib.auth.models import User
 from django.core import management
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from desktop.models import Directory, Document, Document2, Document2Permission, SAMPLE_USER_OWNERS
-from useradmin.models import get_default_user_group, install_sample_user
+from useradmin.models import get_default_user_group, install_sample_user, User
 
 
 LOG = logging.getLogger(__name__)

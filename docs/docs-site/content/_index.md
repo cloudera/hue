@@ -5,26 +5,31 @@ weight = 1
 chapter = false
 pre = "<b>1. </b>"
 +++
-![Hue Logo Back-end]({{% param baseURL %}}images/hue_logo.png)
+![Hue Logo Back-end](/images/hue_logo.png)
 
-<span style="font-size:52px; text-align:center; display: block">Documentation</span>
+<h1>Documentation</h1>
 
-The manual to install, use and develop Hue.
+Hue is a mature open source SQL Assistant for [querying](/user/querying/) [Databases & Data Warehouses](https://docs.gethue.com/administrator/configuration/connectors/) and collaborating: [gethue.com](http://gethue.com)
 
-Hue is a mature open source workbench for self-service operation and development of SQL applications
-in a Data Warehouse: [gethue.com](http://gethue.com).
+Many companies and organizations use Hue to quickly answer questions via self-service querying e.g.:
 
-Thousands of companies and organizations use Hue to open-up and query their data and make smarter decisions. Hue is heavily
-used by hundreds of Cloudera customers and community users executing millions of queries daily.
+* 1000+ customers
+* Top Fortune 500
+
+are executing 100s of 1000s of queries daily. It also [ships](/administrator/installation/) in Cloudera Data Platform, Amazon AWS, Open Data Hub...
+
+Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/parsers/) and any [contributions](https://github.com/cloudera/hue/blob/master/CONTRIBUTING.md) are welcome.
+
+!["Hue Editor"](https://cdn.gethue.com/uploads/2019/12/hue4.6.png)
 
 
 Administrate
 ------------
-The [Administrator guide](administrator/index.html) describes how to install and configure.
+The [Administrator guide](administrator/index.html) describes how to install and manage the server and configure connectors to your [Databases, Warehouses, Storages](/administrator/configuration/connectors/).
 
 Use
 ---
-The [User guide](user/index.html) has instructions about how to leverage functionalities.
+The [User guide](user/index.html) has instructions about how to leverage Querying and Sharing functionalities.
 
 Develop
 -------
@@ -33,6 +38,7 @@ How to extend SQL connectors, reuse the API or build applications is detailed in
 Releases
 --------
 
+* December 5, 2019 --- [Version 4.6.0](releases/release-notes-4.6.0/index.html)
 * August 12, 2019 --- [Version 4.5.0](releases/release-notes-4.5.0/index.html)
 * March 28, 2019 --- [Version 4.4.0](releases/release-notes-4.4.0/index.html)
 * October 17, 2018 --- [Version 4.3.0](releases/release-notes-4.3.0/index.html)

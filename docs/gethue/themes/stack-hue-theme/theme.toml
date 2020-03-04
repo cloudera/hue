@@ -1,0 +1,10 @@
+name = "Stack Hue Theme"
+license = "MIT"
+licenselink = "https://github.com/"
+description = "The Hue Website Hugo Theme"
+homepage = "https://github.com/"
+features = ["blog"]
+
+[author]
+  name = "Hue Team"
+  homepage = "https://gethue.com"

@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 const PigFunctions = (function() {
   const EVAL_FUNCTIONS = {
@@ -1926,7 +1926,7 @@ const SqlFunctions = (function() {
         signature: 'date_format(DATE|TIMESTAMP|STRING ts, STRING fmt)',
         draggable: 'date_format()',
         description:
-          "Converts a date/timestamp/string to a value of string in the format specified by the date format fmt (as of Hive 1.2.0). Supported formats are Java SimpleDateFormat formats – https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html. The second argument fmt should be constant. Example: date_format('2015-04-08', 'y') = '2015'."
+          "Converts a date/timestamp/string to a value of string in the format specified by the date format fmt (as of Hive 1.2.0). Supported formats are Java SimpleDateFormat formats - https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html. The second argument fmt should be constant. Example: date_format('2015-04-08', 'y') = '2015'."
       },
       date_sub: {
         returnTypes: ['T'],
@@ -1966,7 +1966,7 @@ const SqlFunctions = (function() {
         signature: 'from_unixtime(BIGINT unixtime [, STRING format])',
         draggable: 'from_unixtime()',
         description:
-          "Converts time string in format yyyy-MM-dd HH:mm:ss to Unix timestamp (in seconds), using the default timezone and the default locale, return 0 if fail: unix_timestamp('2009-03-20 11:30:01') = 1237573801"
+          "Converts the number of seconds from unix epoch (1970-01-01 00:00:00 UTC) to a string representing the timestamp of that moment in the current system time zone in the format of '1970-01-01 00:00:00'"
       },
       from_utc_timestamp: {
         returnTypes: ['TIMESTAMP'],
@@ -4175,6 +4175,7 @@ const SqlFunctions = (function() {
         TINYINT: false,
         SMALLINT: false,
         INT: false,
+        INTEGER: false,
         BIGINT: false,
         FLOAT: false,
         DOUBLE: false,
@@ -4193,6 +4194,7 @@ const SqlFunctions = (function() {
         TINYINT: false,
         SMALLINT: false,
         INT: false,
+        INTEGER: false,
         BIGINT: false,
         FLOAT: false,
         DOUBLE: false,
@@ -4211,6 +4213,7 @@ const SqlFunctions = (function() {
         TINYINT: false,
         SMALLINT: false,
         INT: false,
+        INTEGER: false,
         BIGINT: false,
         FLOAT: false,
         DOUBLE: false,
@@ -4229,6 +4232,7 @@ const SqlFunctions = (function() {
         TINYINT: false,
         SMALLINT: false,
         INT: false,
+        INTEGER: false,
         BIGINT: false,
         FLOAT: false,
         DOUBLE: false,
@@ -4247,6 +4251,7 @@ const SqlFunctions = (function() {
         TINYINT: true,
         SMALLINT: false,
         INT: false,
+        INTEGER: false,
         BIGINT: false,
         FLOAT: false,
         DOUBLE: false,
@@ -4265,6 +4270,7 @@ const SqlFunctions = (function() {
         TINYINT: true,
         SMALLINT: true,
         INT: false,
+        INTEGER: false,
         BIGINT: false,
         FLOAT: false,
         DOUBLE: false,
@@ -4283,6 +4289,7 @@ const SqlFunctions = (function() {
         TINYINT: true,
         SMALLINT: true,
         INT: true,
+        INTEGER: true,
         BIGINT: false,
         FLOAT: false,
         DOUBLE: false,
@@ -4301,6 +4308,7 @@ const SqlFunctions = (function() {
         TINYINT: true,
         SMALLINT: true,
         INT: true,
+        INTEGER: true,
         BIGINT: true,
         FLOAT: false,
         DOUBLE: false,
@@ -4319,6 +4327,7 @@ const SqlFunctions = (function() {
         TINYINT: true,
         SMALLINT: true,
         INT: true,
+        INTEGER: true,
         BIGINT: true,
         FLOAT: true,
         DOUBLE: false,
@@ -4337,6 +4346,7 @@ const SqlFunctions = (function() {
         TINYINT: true,
         SMALLINT: true,
         INT: true,
+        INTEGER: true,
         BIGINT: true,
         FLOAT: true,
         DOUBLE: true,
@@ -4355,6 +4365,7 @@ const SqlFunctions = (function() {
         TINYINT: true,
         SMALLINT: true,
         INT: true,
+        INTEGER: true,
         BIGINT: true,
         FLOAT: true,
         DOUBLE: true,
@@ -4373,6 +4384,7 @@ const SqlFunctions = (function() {
         TINYINT: true,
         SMALLINT: true,
         INT: true,
+        INTEGER: true,
         BIGINT: true,
         FLOAT: true,
         DOUBLE: true,
@@ -4391,6 +4403,7 @@ const SqlFunctions = (function() {
         TINYINT: true,
         SMALLINT: true,
         INT: true,
+        INTEGER: true,
         BIGINT: true,
         FLOAT: true,
         DOUBLE: true,
@@ -4409,6 +4422,7 @@ const SqlFunctions = (function() {
         TINYINT: true,
         SMALLINT: true,
         INT: true,
+        INTEGER: true,
         BIGINT: true,
         FLOAT: true,
         DOUBLE: true,
@@ -4427,6 +4441,7 @@ const SqlFunctions = (function() {
         TINYINT: true,
         SMALLINT: true,
         INT: true,
+        INTEGER: true,
         BIGINT: true,
         FLOAT: true,
         DOUBLE: true,
@@ -4445,6 +4460,7 @@ const SqlFunctions = (function() {
         TINYINT: true,
         SMALLINT: true,
         INT: true,
+        INTEGER: true,
         BIGINT: true,
         FLOAT: true,
         DOUBLE: true,

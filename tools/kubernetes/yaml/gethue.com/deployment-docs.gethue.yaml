@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gethue-docs
+  labels:
+    deployment: gethue-docs
+spec:
+  selector:
+    matchLabels:
+      pod: gethue-docs
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        pod: gethue-docs
+    spec:
+      containers:
+      - name: gethue-docs
+        image: gethue/documentation:latest
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 60
+          failureThreshold: 30

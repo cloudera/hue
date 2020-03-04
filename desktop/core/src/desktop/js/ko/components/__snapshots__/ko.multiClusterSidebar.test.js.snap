@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.multiClusterSidebar.js should render component 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;hue-multi-cluster-sidebar&quot;, params: params }\\"><div class=\\"sidebar-content\\" data-bind=\\"foreach: categories\\">
+    <!-- ko if: typeof label !== 'undefined' --><!-- /ko -->
+    <!-- ko foreach: items -->
+    <!-- ko if: typeof items == 'undefined' -->
+    <a role=\\"button\\" class=\\"sidebar-item\\" data-bind=\\"css: { 'active': false }, hueLink: url, attr: { 'title': label }\\" title=\\"Data Warehouse\\">
+      <span class=\\"sidebar-icon without-tooltip\\">
+        <span data-bind=\\"css: icon\\" class=\\"altus-icon altus-adb-query\\"></span>
+      </span>
+      <span class=\\"sidebar-item-name\\" data-bind=\\"text: label\\">Data Warehouse</span>
+    </a>
+    <!-- /ko -->
+    <!-- ko if: typeof items !== 'undefined' --><!-- /ko -->
+    
+    <!-- ko if: typeof items == 'undefined' -->
+    <a role=\\"button\\" class=\\"sidebar-item\\" data-bind=\\"css: { 'active': false }, hueLink: url, attr: { 'title': label }\\" title=\\"Data Science\\">
+      <span class=\\"sidebar-icon without-tooltip\\">
+        <span data-bind=\\"css: icon\\" class=\\"altus-icon altus-ds\\"></span>
+      </span>
+      <span class=\\"sidebar-item-name\\" data-bind=\\"text: label\\">Data Science</span>
+    </a>
+    <!-- /ko -->
+    <!-- ko if: typeof items !== 'undefined' --><!-- /ko -->
+    
+    <!-- ko if: typeof items == 'undefined' -->
+    <a role=\\"button\\" class=\\"sidebar-item\\" data-bind=\\"css: { 'active': false }, hueLink: url, attr: { 'title': label }\\" title=\\"Admin\\">
+      <span class=\\"sidebar-icon without-tooltip\\">
+        <span data-bind=\\"css: icon\\" class=\\"altus-icon altus-de\\"></span>
+      </span>
+      <span class=\\"sidebar-item-name\\" data-bind=\\"text: label\\">Admin</span>
+    </a>
+    <!-- /ko -->
+    <!-- ko if: typeof items !== 'undefined' --><!-- /ko -->
+    <!-- /ko -->
+  </div></div>"
+`;

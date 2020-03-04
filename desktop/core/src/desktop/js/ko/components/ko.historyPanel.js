@@ -15,13 +15,15 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import dataCatalog from 'catalog/dataCatalog';
 import EditorViewModel from 'apps/notebook/editorViewModel';
 import componentUtils from './componentUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+
+export const NAME = 'hue-history-panel';
 
 const TEMPLATE = `
   <button class="btn btn-flat pull-right btn-toggle-jobs-panel" title="${I18n(
@@ -229,68 +231,84 @@ class HistoryPanel {
       }
     });
 
-    huePubSub.subscribe('notebook.task.submitted', history_id => {
-      self.editorViewModel.openNotebook(history_id, null, true, () => {
-        const notebook = self.editorViewModel.selectedNotebook();
-        notebook.snippets()[0].progress.subscribe(val => {
-          if (val === 100) {
-            //self.indexingStarted(false);
-            //self.isIndexing(false);
-            //self.indexingSuccess(true);
-          }
-        });
-
-        notebook.snippets()[0].status.subscribe(val => {
-          if (val === 'failed') {
-            //self.isIndexing(false);
-            //self.indexingStarted(false);
-            //self.indexingError(true);
-          } else if (val === 'available') {
-            const snippet = notebook.snippets()[0];
-            if (!snippet.result.handle().has_more_statements) {
-              // TODO: Show finish notification and clicking on it does onSuccessUrl
-              // or if still on initial spinner we redirect automatically to onSuccessUrl
-              if (notebook.onSuccessUrl() && notebook.onSuccessUrl() !== 'assist.db.refresh') {
-                // TODO: Similar if in in FB directory, also refresh FB dir
-                huePubSub.publish('open.link', notebook.onSuccessUrl());
-              }
-
-              if (notebook.onSuccessUrl() === 'assist.db.refresh') {
-                dataCatalog
-                  .getEntry({
-                    sourceType: snippet.type(),
-                    namespace: snippet.namespace(),
-                    compute: snippet.compute(),
-                    path: []
-                  })
-                  .done(entry => {
-                    entry.clearCache({ invalidate: 'cache', cascade: true, silenceErrors: true });
-                  });
-              } else if (notebook.onSuccessUrl()) {
-                huePubSub.publish(notebook.pubSubUrl());
-              }
-            } else {
-              // Perform last DROP statement execute
-              snippet.execute();
+    huePubSub.subscribe('notebook.task.submitted', resp => {
+      const data = { uuid: resp.history_uuid };
+      if (resp.handle && resp.handle.session_id) {
+        data['session'] = {
+          type: resp.handle.session_type,
+          id: resp.handle.session_id,
+          session_id: resp.handle.session_guid,
+          properties: []
+        };
+      }
+      self.editorViewModel.openNotebook(
+        data.uuid,
+        null,
+        true,
+        () => {
+          const notebook = self.editorViewModel.selectedNotebook();
+          notebook.snippets()[0].progress.subscribe(val => {
+            if (val === 100) {
+              //self.indexingStarted(false);
+              //self.isIndexing(false);
+              //self.indexingSuccess(true);
             }
-          }
-        });
-        notebook.snippets()[0].checkStatus();
+          });
 
-        // Add to history
-        notebook.history.unshift(
-          notebook.makeHistoryRecord(
-            notebook.onSuccessUrl(),
-            notebook.description(),
-            new Date().getTime(),
-            notebook.snippets()[0].status(),
-            notebook.name(),
-            notebook.uuid()
-          )
-        );
+          notebook.snippets()[0].status.subscribe(val => {
+            if (val === 'failed') {
+              //self.isIndexing(false);
+              //self.indexingStarted(false);
+              //self.indexingError(true);
+            } else if (val === 'available') {
+              const snippet = notebook.snippets()[0];
+              if (!snippet.result.handle().has_more_statements) {
+                // TODO: Show finish notification and clicking on it does onSuccessUrl
+                // or if still on initial spinner we redirect automatically to onSuccessUrl
+                if (notebook.onSuccessUrl() && notebook.onSuccessUrl() !== 'assist.db.refresh') {
+                  // TODO: Similar if in in FB directory, also refresh FB dir
+                  huePubSub.publish('open.link', notebook.onSuccessUrl());
+                }
 
-        self.historyPanelVisible(true);
-      });
+                if (notebook.onSuccessUrl() === 'assist.db.refresh') {
+                  dataCatalog
+                    .getEntry({
+                      sourceType: snippet.type(),
+                      namespace: snippet.namespace(),
+                      compute: snippet.compute(),
+                      path: []
+                    })
+                    .done(entry => {
+                      entry.clearCache({ invalidate: 'cache', cascade: true, silenceErrors: true });
+                    });
+                } else if (notebook.onSuccessUrl()) {
+                  huePubSub.publish(notebook.pubSubUrl());
+                }
+                notebook.close(); // TODO: Don't close when onSuccessUrl is editor?
+              } else {
+                // Perform last DROP statement execute
+                snippet.execute();
+              }
+            }
+          });
+          notebook.snippets()[0].checkStatus();
+
+          // Add to history
+          notebook.history.unshift(
+            notebook.makeHistoryRecord(
+              notebook.onSuccessUrl(),
+              notebook.description(),
+              new Date().getTime(),
+              notebook.snippets()[0].status(),
+              notebook.name(),
+              notebook.uuid()
+            )
+          );
+
+          self.historyPanelVisible(true);
+        },
+        data.session
+      );
     });
   }
 
@@ -315,4 +333,4 @@ class HistoryPanel {
   }
 }
 
-componentUtils.registerComponent('hue-history-panel', HistoryPanel, TEMPLATE);
+componentUtils.registerComponent(NAME, HistoryPanel, TEMPLATE);

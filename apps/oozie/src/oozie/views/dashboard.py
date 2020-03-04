@@ -454,7 +454,7 @@ def list_oozie_workflow(request, job_id):
 @show_oozie_error
 def list_oozie_coordinator(request, job_id):
   kwargs = {'cnt': 50, 'filters': []}
-  kwargs['offset'] = request.GET.get('offset', 1)
+  kwargs['offset'] = request.GET.get('offset', default=1)
   if request.GET.getlist('status'):
       kwargs['filters'].extend([('status', status) for status in request.GET.getlist('status')])
 
@@ -484,9 +484,16 @@ def list_oozie_coordinator(request, job_id):
       'progress': oozie_coordinator.get_progress(),
       'nextTime': format_time(oozie_coordinator.nextMaterializedTime),
       'endTime': format_time(oozie_coordinator.endTime),
+      'endTimeDateUI': get_date_ui_picker(oozie_coordinator.endTime),
+      'endTimeTimeUI': get_time_ui_picker(oozie_coordinator.endTime),
+      'pauseTimeDateUI': get_date_ui_picker(oozie_coordinator.pauseTime),
+      'pauseTimeTimeUI': get_time_ui_picker(oozie_coordinator.pauseTime),
+      'clearPauseTime': True,
+      'concurrency': oozie_coordinator.concurrency,
       'actions': actions,
       'total_actions': oozie_coordinator.total,
       'doc_url': coordinator.get_absolute_url() if coordinator else '',
+      'has_job_edition_permission': has_job_edition_permission(oozie_coordinator, request.user),
     }
     return JsonResponse(return_obj, encoder=JSONEncoderForHTML)
 
@@ -714,30 +721,37 @@ def sync_coord_workflow(request, job_id):
   properties = hue_coord and hue_coord.properties and dict([(param['name'], param['value']) for param in hue_coord.properties]) or None
 
   if request.method == 'POST':
+    response = {'status': -1, 'message': ''}
     params_form = ParametersFormSet(request.POST)
     if params_form.is_valid():
-      mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
+      try:
+        mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
 
-      # Update workflow params in coordinator
-      hue_coord.clear_workflow_params()
-      properties = dict([(param['name'], param['value']) for param in hue_coord.properties])
+        # Update workflow params in coordinator
+        hue_coord.clear_workflow_params()
+        properties = dict([(param['name'], param['value']) for param in hue_coord.properties])
 
-      # Deploy WF XML
-      submission = Submission(user=request.user, job=hue_wf, fs=request.fs, jt=request.jt, properties=properties)
-      submission.deploy(deployment_dir=wf_application_path)
-      submission._create_file(wf_application_path, hue_wf.XML_FILE_NAME, hue_wf.to_xml(mapping=properties), do_as=True)
+        # Deploy WF XML
+        submission = Submission(user=request.user, job=hue_wf, fs=request.fs, jt=request.jt, properties=properties)
+        submission.deploy(deployment_dir=wf_application_path)
+        submission._create_file(wf_application_path, hue_wf.XML_FILE_NAME, hue_wf.to_xml(mapping=properties), do_as=True)
 
-      # Deploy Coordinator XML
-      job.conf_dict.update(mapping)
-      submission = Submission(user=request.user, job=hue_coord, fs=request.fs, jt=request.jt, properties=job.conf_dict, oozie_id=job.id)
-      submission._create_file(coord_application_path, hue_coord.XML_FILE_NAME, hue_coord.to_xml(mapping=job.conf_dict), do_as=True)
-      # Server picks up deployed Coordinator XML changes after running 'update' action
-      submission.update_coord()
+        # Deploy Coordinator XML
+        job.conf_dict.update(mapping)
+        submission = Submission(user=request.user, job=hue_coord, fs=request.fs, jt=request.jt, properties=job.conf_dict, oozie_id=job.id)
+        submission._create_file(coord_application_path, hue_coord.XML_FILE_NAME, hue_coord.to_xml(mapping=job.conf_dict), do_as=True)
+        # Server picks up deployed Coordinator XML changes after running 'update' action
+        submission.update_coord()
 
-      request.info(_('Successfully updated Workflow definition'))
-      return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
+        response['status'] = 0
+        response['message'] = _('Successfully updated Workflow definition')
+      except Exception as e:
+        response['message'] = e.message
+
     else:
-      request.error(_('Invalid submission form: %s' % params_form.errors))
+      response['message'] = _('Invalid submission form: %s' % params_form.errors)
+
+    return JsonResponse(response)
   else:
     new_params = hue_wf and hue_wf.find_all_parameters() or []
     new_params = dict([(param['name'], param['value']) for param in new_params])
@@ -755,6 +769,8 @@ def sync_coord_workflow(request, job_id):
              'header': _('Sync Workflow definition?'),
              'action': reverse('oozie:sync_coord_workflow', kwargs={'job_id': job_id})
            }, force_template=True).content
+  if not isinstance(popup, str):
+    popup = popup.decode('utf-8')
   return JsonResponse(popup, safe=False)
 
 @show_oozie_error
@@ -1098,6 +1114,26 @@ def format_time(st_time):
     return time.strftime("%a, %d %b %Y %H:%M:%S", st_time)
   else:
     return st_time
+
+
+def format_time_ui_picker(str_time):
+  if str_time:
+    return time.strftime('%Y-%m-%dT%H:%M', str_time)
+  return None
+
+
+def get_date_ui_picker(st_time):
+  str_time = format_time_ui_picker(st_time)
+  if str_time and 'T' in str_time:
+    return str_time[:str_time.index("T")]
+  return ''
+
+
+def get_time_ui_picker(st_time):
+  str_time = format_time_ui_picker(st_time)
+  if str_time and 'T' in str_time:
+    return str_time[(str_time.index("T") + 1):]
+  return ''
 
 
 def massaged_oozie_jobs_for_json(oozie_jobs, user, just_sla=False):

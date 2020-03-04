@@ -1,0 +1,539 @@
+#!/usr/bin/env python
+# Licensed to Cloudera, Inc. under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  Cloudera, Inc. licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import json
+import logging
+
+from django.utils.translation import ugettext as _
+
+from desktop.conf import CONNECTORS_BLACKLIST, CONNECTORS_WHITELIST
+from desktop.lib.exceptions_renderable import PopupException
+
+
+LOG = logging.getLogger(__name__)
+
+
+CONNECTOR_TYPES = [
+  {
+    'id': 'hive',
+    'dialect': 'hive',
+    'nice_name': 'Hive',
+    'description': '',
+    'category': 'editor',
+    'interface': 'hiveserver2',
+    'settings': [
+      {'name': 'server_host', 'value': ''},
+      {'name': 'server_port', 'value': ''},
+    ],
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "Impala",
+    'dialect': 'impala',
+    'interface': 'hiveserver2',
+    'settings': [
+      {'name': 'server_host', 'value': ''},
+      {'name': 'server_port', 'value': ''},
+    ],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "Hive Tez",
+    'dialect': 'hive',
+    'interface': 'hiveserver2',
+    'settings': [
+      {'name': 'server_host', 'value': ''},
+      {'name': 'server_port', 'value': ''},
+    ],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "Hive LLAP",
+    'dialect': 'hive',
+    'interface': 'hiveserver2',
+    'settings': [
+      {'name': 'server_host', 'value': ''},
+      {'name': 'server_port', 'value': ''},
+    ],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "Druid",
+    'dialect': 'druid',
+    'interface': 'sqlalchemy',
+    'settings': [
+      {'name': 'url', 'value': 'druid://druid-host.com:8082/druid/v2/sql/'}
+    ],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "Kafka SQL",
+    'dialect': 'ksql',
+    'interface': 'ksql',
+    'settings': [
+      {'name': 'url', 'value': 'http://localhost:8088'}
+    ],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': False,
+      'has_table': True,
+      'has_live_queries': True,
+      'has_optimizer_risks': False,
+      'has_optimizer_values': False,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "Flink SQL",
+    'dialect': 'flink',
+    'interface': 'flink',
+    'settings': [
+      {'name': 'api_url', 'value': 'http://flink:10000'}
+    ],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': False,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "SparkSQL",
+    'dialect': 'sparksql',
+    'interface': 'sqlalchemy',
+    'settings': [],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "MySQL",
+    'dialect': 'mysql',
+    'interface': 'sqlalchemy',
+    'settings': [
+      {'name': 'url', 'value': 'mysql://username:password@mysq-host:3306/hue'}
+    ],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': True,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': False,
+      'has_optimizer_values': False,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "PostgreSQL",
+    'dialect': 'postgresql',
+    'interface': 'sqlalchemy',
+    'settings': [
+      {'name': 'url', 'value': 'postgresql://username:password@host:5432/hue'}
+    ],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '"',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': True,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': False,
+      'has_optimizer_values': False,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "Presto",
+    'dialect': 'presto',
+    'interface': 'sqlalchemy',
+    'settings': [],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': True,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': False,
+      'has_optimizer_values': False,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "Elastic Search",
+    'dialect': 'elasticsearch',
+    'interface': 'sqlalchemy',
+    'settings': [
+      {'name': 'url', 'value': 'elasticsearch+http://localhost:9200/'}
+    ],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '"',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': False,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': False,
+      'has_optimizer_values': False,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "Calcite",
+    'dialect': 'calcite',
+    'interface': 'sqlalchemy',
+    'settings': [
+      {'name': 'server_host', 'value': ''},
+      {'name': 'server_port', 'value': ''},
+    ],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': False,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': True,
+      'has_optimizer_values': True,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "Athena",
+    'dialect': 'athena',
+    'interface': 'sqlalchemy',
+    'settings': [],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '"',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': True,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': False,
+      'has_optimizer_values': False,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "Redshift",
+    'dialect': 'redshift',
+    'interface': 'sqlalchemy',
+    'settings': [],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': True,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': False,
+      'has_optimizer_values': False,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "Snowflake",
+    'dialect': 'snowflake',
+    'interface': 'sqlalchemy',
+    'settings': [],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': True,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': False,
+      'has_optimizer_values': False,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "Big Query",
+    'dialect': 'bigquery',
+    'interface': 'sqlalchemy',
+    'settings': [],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': True,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': False,
+      'has_optimizer_values': False,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "Oracle",
+    'dialect': 'oracle',
+    'interface': 'sqlalchemy',
+    'settings': [],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': True,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': False,
+      'has_optimizer_values': False,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "Solr SQL",
+    'dialect': 'solr',
+    'interface': 'solr',
+    'settings': [],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': True,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': False,
+      'has_optimizer_values': False,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name':
+    "SQL Database",
+    'dialect': 'sql',
+    'interface': 'sqlalchemy',
+    'settings': [],
+    'category': 'editor',
+    'description': '',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': True,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': False,
+      'has_optimizer_values': False,
+      'has_auto_limit': False,
+    }
+  },
+  {
+    'nice_name': "SQL Database (JDBC)",
+    'dialect': 'sql',
+    'interface': 'sqlalchemy',
+    'settings': [],
+    'category': 'editor',
+    'description': 'Deprecated: older way to connect to any database.',
+    'properties': {
+      'is_sql': True,
+      'sql_identifier_quote': '`',
+      'sql_identifier_comment_single': '--',
+      'has_catalog': True,
+      'has_database': True,
+      'has_table': True,
+      'has_live_queries': False,
+      'has_optimizer_risks': False,
+      'has_optimizer_values': False,
+      'has_auto_limit': False,
+    }
+  },
+  # solr
+
+  {'nice_name': "PySpark", 'dialect': 'pyspark', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
+  {'nice_name': "Spark", 'dialect': 'spark', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
+  {'nice_name': "Pig", 'dialect': 'pig', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
+  {'nice_name': "Java", 'dialect': 'java', 'settings': [], 'category': 'editor', 'description': '', 'properties': {}},
+
+  {'nice_name': "HDFS", 'dialect': 'hdfs', 'interface': 'rest', 'settings': [{'name': 'server_url', 'value': 'http://localhost:9870/webhdfs/v1'}, {'name': 'default_fs', 'value': 'fs_defaultfs=hdfs://localhost:8020'}], 'category': 'browsers', 'description': '', 'properties': {}},
+  {'nice_name': "YARN", 'dialect': 'yarn', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
+  {'nice_name': "S3", 'dialect': 's3', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
+  {'nice_name': "ADLS", 'dialect': 'adls-v1', 'settings': [], 'category': 'browsers', 'description': '', 'properties': {}},
+  # HBase
+
+  {
+    'nice_name': "Hive Metastore",
+    'dialect': 'hms',
+    'interface': 'hiveserver2',
+    'settings': [{'name': 'server_host', 'value': ''}, {'name': 'server_port', 'value': ''},],
+    'category': 'catalogs',
+    'description': '',
+    'properties': {}
+  },
+  {'nice_name': "Atlas", 'dialect': 'atlas', 'interface': 'rest', 'settings': [], 'category': 'catalogs', 'description': '', 'properties': {}},
+  {'nice_name': "Navigator", 'dialect': 'navigator', 'interface': 'rest', 'settings': [], 'category': 'catalogs', 'description': '', 'properties': {}},
+
+  {'nice_name': "Optimizer", 'dialect': 'optimizer', 'settings': [], 'category': 'optimizers', 'description': '', 'properties': {}},
+
+  {'nice_name': "Oozie", 'dialect': 'oozie', 'settings': [], 'category': 'schedulers', 'description': '', 'properties': {}},
+  {'nice_name': "Celery", 'dialect': 'celery', 'settings': [], 'category': 'schedulers', 'description': '', 'properties': {}},
+]
+
+CONNECTOR_TYPES = [connector for connector in CONNECTOR_TYPES if connector['dialect'] not in CONNECTORS_BLACKLIST.get()]
+
+if CONNECTORS_WHITELIST.get():
+  CONNECTOR_TYPES = [connector for connector in CONNECTOR_TYPES if connector['dialect'] in CONNECTORS_WHITELIST.get()]
+
+
+CATEGORIES = [
+  {"name": "Editor", 'type': 'editor', 'description': ''},
+  {"name": "Browsers", 'type': 'browsers', 'description': ''},
+  {"name": "Catalogs", 'type': 'catalogs', 'description': ''},
+  {"name": "Optimizers", 'type': 'optimizers', 'description': ''},
+  {"name": "Schedulers", 'type': 'schedulers', 'description': ''},
+  {"name": "Plugins", 'type': 'plugins', 'description': ''},
+]
+
+
+def get_connectors_types():
+  return CONNECTOR_TYPES
+
+def get_connector_categories():
+  return CATEGORIES
+
+def get_connector_by_type(dialect):
+  instance = [connector for connector in get_connectors_types() if connector['dialect'] == dialect]
+
+  if instance:
+    return instance[0]
+  else:
+    raise PopupException(_('No connector with the type %s found.') % type)

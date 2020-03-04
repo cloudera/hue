@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.toggle.js should render binding 1`] = `"<div class=\\"toggle-test\\" data-bind=\\"toggle: testObservable\\"></div>"`;

@@ -17,7 +17,6 @@
 """Utilities for views (text and number formatting, etc)"""
 from __future__ import division
 
-from past.utils import old_div
 import datetime
 import logging
 import math
@@ -44,7 +43,7 @@ def big_filesizeformat(bytes):
   index = int(math.floor(math.log(bytes, 1024)))
   index = min(len(units) - 1, index)
 
-  return( "%.1f %s" % (old_div(bytes, math.pow(1024, index)), units[index]) )
+  return( "%.1f %s" % ((bytes / math.pow(1024, index)), units[index]) )
 
 def format_time_diff(start=None, end=None):
   """

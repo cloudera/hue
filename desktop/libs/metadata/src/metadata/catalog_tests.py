@@ -16,26 +16,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 import json
 
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true
 
-from django.contrib.auth.models import User
 from django.urls import reverse
 
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 from hadoop.pseudo_hdfs4 import is_live_cluster
+from useradmin.models import User
 
 from metadata import conf
 from metadata.conf import has_catalog, NAVIGATOR, get_navigator_auth_password, get_navigator_auth_username
 from metadata.catalog_api import _augment_highlighting
 from metadata.catalog.navigator_client import NavigatorApi
 from metadata.catalog.atlas_client import AtlasApi
-
 
 
 LOG = logging.getLogger(__name__)
@@ -277,7 +277,7 @@ class TestNavigator(object):
 
   def _format_json_body(self, post_dict):
     json_dict = {}
-    for key, value in post_dict.items():
+    for key, value in list(post_dict.items()):
       json_dict[key] = json.dumps(value)
     return json_dict
 

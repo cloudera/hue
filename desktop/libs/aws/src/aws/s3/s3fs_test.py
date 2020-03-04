@@ -20,12 +20,11 @@ import os
 import tempfile
 import string
 
-from django.contrib.auth.models import User
 from nose.tools import assert_equal, assert_false, assert_true, assert_raises, eq_
 
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import grant_access, add_to_group
 from desktop.lib.test_utils import grant_access, add_to_group, add_permission, remove_from_group
+from useradmin.models import User
 
 from aws.s3 import join, parse_uri
 from aws.s3.s3fs import S3FileSystem, S3FileSystemException
@@ -288,7 +287,7 @@ class S3FSTest(S3TestBase):
   def test_mkdir(self):
     dir_path = self.get_test_path('test_mkdir')
     assert_false(self.fs.exists(dir_path))
-    
+
     self.fs.mkdir(dir_path)
     assert_true(self.fs.exists(dir_path))
 

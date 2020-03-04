@@ -18,11 +18,17 @@
 from __future__ import absolute_import
 import errno
 import logging
+import sys
 
 from hadoop import conf
 from hadoop import confparse
 
 from desktop.lib.paths import get_config_root_hadoop
+
+if sys.version_info[0] > 2:
+  open_file = open
+else:
+  open_file = file
 
 __all = ['get_conf', 'get_trash_interval', 'get_s3a_access_key', 'get_s3a_secret_key']
 
@@ -38,9 +44,12 @@ _CNF_S3A_SESSION_TOKEN = 'fs.s3a.session.token'
 
 _CNF_ADLS_CLIENT_ID = 'dfs.adls.oauth2.client.id'
 _CNF_ADLS_AUTHENTICATION_CODE = 'dfs.adls.oauth2.credential'
-_CNF_ADLS_SECRET_KEY = 'dfs.adls.oauth2.credential'
 _CNF_ADLS_REFRESH_URL = 'dfs.adls.oauth2.refresh.url'
 _CNF_ADLS_GRANT_TYPE = 'dfs.adls.oauth2.access.token.provider.type'
+
+_CNF_AZURE_CLIENT_ID = 'fs.azure.account.oauth2.client.id'
+_CNF_AZURE_CLIENT_SECRET = 'fs.azure.account.oauth2.client.secret'
+_CNF_AZURE_CLIENT_ENDPOINT = 'fs.azure.account.oauth2.client.endpoint'
 
 _CNF_SECURITY = 'hadoop.security.authentication'
 
@@ -66,7 +75,7 @@ def _parse_core_site():
 
   try:
     _CORE_SITE_PATH = get_config_root_hadoop('core-site.xml')
-    data = file(_CORE_SITE_PATH, 'r').read()
+    data = open_file(_CORE_SITE_PATH, 'r').read()
   except IOError as err:
     if err.errno != errno.ENOENT:
       LOG.error('Cannot read from "%s": %s' % (_CORE_SITE_PATH, err))
@@ -132,3 +141,12 @@ def get_adls_grant_type():
 
 def is_kerberos_enabled():
   return get_conf().get(_CNF_SECURITY) == 'kerberos'
+
+def get_azure_client_id():
+  return get_conf().get(_CNF_AZURE_CLIENT_ID)
+
+def get_azure_client_secret():
+  return get_conf().get(_CNF_AZURE_CLIENT_SECRET)
+
+def get_azure_client_endpoint():
+  return get_conf().get(_CNF_AZURE_CLIENT_ENDPOINT)

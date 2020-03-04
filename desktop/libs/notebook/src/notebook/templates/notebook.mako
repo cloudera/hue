@@ -14,8 +14,10 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-  from desktop.views import commonheader, commonfooter, commonshare
-  from desktop import conf
+  from desktop.auth.backend import is_admin
+  from desktop.conf import ENABLE_CONNECTORS
+  from desktop.views import commonfooter, commonshare
+
   from django.utils.translation import ugettext as _
   from notebook.conf import ENABLE_NOTEBOOK_2
 %>
@@ -27,16 +29,28 @@
 <%namespace name="hueAceAutocompleter" file="/hue_ace_autocompleter.mako" />
 
 
-<span id="notebookComponents" class="notebook">
-%if ENABLE_NOTEBOOK_2.get():
+<div id="notebookComponents" class="notebook">
+% if ENABLE_NOTEBOOK_2.get():
   ${ editorComponents2.includes(is_embeddable=is_embeddable, suffix='notebook') }
   ${ editorComponents2.topBar(suffix='notebook') }
+
   <%editorComponents2:commonHTML is_embeddable="${is_embeddable}" suffix="notebook">
     <%def name="addSnippetHTML()">
-      <h1 class="empty" data-bind="visible: $root.availableSnippets().length == 0">${ _('There are no snippets configured.') }</h1>
+      <h1 class="empty" data-bind="visible: $root.availableSnippets().length == 0">
+        ${ _('There are no snippets configured.') }
+
+        % if ENABLE_CONNECTORS.get() and is_admin(request.user):
+          <br>
+          <a data-bind="hueLink: '${ url('desktop.lib.connectors.views.index') }'" title="${ _('Open the connector configuration page') }">
+            <i class="fa fa-plus-circle"></i> ${ _('Add a Database connector') }
+          </a>
+        % endif
+      </h1>
 
       <!-- ko if: $root.availableSnippets().length > 0 -->
-    <h1 class="empty" data-bind="visible: snippets().length == 0">${ _('Add a snippet to start your new notebook') }</h1>
+    <h1 class="empty" data-bind="visible: snippets().length == 0">
+      ${ _('Add a snippet to start your new notebook') }
+    </h1>
 
     <div class="add-snippet" data-bind="component: {
       name: 'add-snippet-menu',
@@ -53,7 +67,7 @@
   ${ notebookKoComponents.addSnippetMenu() }
 
   ${ editorComponents2.commonJS(is_embeddable=is_embeddable, bindableElement='notebookComponents', suffix='notebook') }
-%else:
+% else:
   ${ editorComponents.includes(is_embeddable=is_embeddable, suffix='notebook') }
   ${ editorComponents.topBar(suffix='notebook') }
   <%editorComponents:commonHTML is_embeddable="${is_embeddable}" suffix="notebook">
@@ -78,5 +92,5 @@
   ${ notebookKoComponents.addSnippetMenu() }
 
   ${ editorComponents.commonJS(is_embeddable=is_embeddable, bindableElement='notebookComponents', suffix='notebook') }
-%endif
-</span>
+% endif
+</div>

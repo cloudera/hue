@@ -15,15 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import zip
+from builtins import object
 import logging
 
 from nose.tools import assert_equal, assert_true, assert_false
 
-from django.contrib.auth.models import User
-
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
+from useradmin.models import User
 
 from metadata.optimizer_api import _convert_queries
 

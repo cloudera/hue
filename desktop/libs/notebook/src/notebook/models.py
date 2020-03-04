@@ -17,8 +17,7 @@
 
 from future import standard_library
 standard_library.install_aliases()
-from builtins import str
-from builtins import object
+from builtins import str, object
 import datetime
 import json
 import logging
@@ -29,25 +28,27 @@ import uuid
 
 from datetime import timedelta
 
-from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.db.models import Count
 from django.db.models.functions import Trunc
+from django.urls import reverse
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
-from desktop.conf import has_connectors
+
+from desktop.conf import has_connectors, TASK_SERVER
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.paths import SAFE_CHARACTERS_URI
 from desktop.models import Document2
+from useradmin.models import User
 
-from notebook.connectors.base import Notebook, get_interpreter
+from notebook.connectors.base import Notebook, get_api as _get_api, get_interpreter
 
 if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
   from urllib.parse import quote as urllib_quote
 else:
   from urllib import quote as urllib_quote
+
 
 LOG = logging.getLogger(__name__)
 
@@ -80,7 +81,7 @@ def make_notebook(
     name='Browse', description='', editor_type='hive', statement='', status='ready',
     files=None, functions=None, settings=None, is_saved=False, database='default', snippet_properties=None, batch_submit=False,
     on_success_url=None, skip_historify=False, is_task=False, last_executed=-1, is_notebook=False, pub_sub_url=None, result_properties={},
-    namespace=None, compute=None):
+    namespace=None, compute=None, is_presentation_mode=False):
   '''
   skip_historify: do not add the task to the query history. e.g. SQL Dashboard
   is_task / isManaged: true when being a managed by Hue operation (include_managed=True in document), e.g. exporting query result, dropping some tables
@@ -135,6 +136,7 @@ def make_notebook(
     'onSuccessUrl': urllib_quote(on_success_url.encode('utf-8'), safe=SAFE_CHARACTERS_URI) if on_success_url else None,
     'pubSubUrl': pub_sub_url,
     'skipHistorify': skip_historify,
+    'isPresentationModeDefault': is_presentation_mode,
     'isManaged': is_task,
     'snippets': [
       {
@@ -237,13 +239,13 @@ class MockedDjangoRequest(object):
     self.method = method
 
 
-def import_saved_beeswax_query(bquery):
+def import_saved_beeswax_query(bquery, interpreter=None):
   design = bquery.get_design()
 
   return make_notebook(
       name=bquery.name,
       description=bquery.desc,
-      editor_type=_convert_type(bquery.type, bquery.data),
+      editor_type=interpreter['type'] if interpreter else _convert_type(bquery.type, bquery.data),
       statement=design.hql_query,
       status='ready',
       files=design.file_resources,
@@ -488,6 +490,40 @@ def _update_property_value(properties, key, value):
 def _get_editor_type(editor_id):
   document = Document2.objects.get(id=editor_id)
   return document.type.rsplit('-', 1)[-1]
+
+
+class ApiWrapper(object):
+  def __init__(self, request, snippet):
+    self.request = request
+    self.api = _get_api(request, snippet)
+
+  def __getattr__(self, name):
+    from notebook import tasks as ntasks
+    if TASK_SERVER.ENABLED.get() and hasattr(ntasks, name):
+      attr = object.__getattribute__(ntasks, name)
+      def _method(*args, **kwargs):
+        return attr(*args, **dict(kwargs, postdict=self.request.POST, user_id=self.request.user.id))
+      return _method
+    else:
+      return object.__getattribute__(self.api, name)
+
+
+def get_api(request, snippet):
+  return ApiWrapper(request, snippet)
+
+
+def upgrade_session_properties(request, notebook):
+  # Upgrade session data if using old format
+  data = notebook.get_data()
+
+  for session in data.get('sessions', []):
+    api = get_api(request, session)
+    if 'type' in session and hasattr(api, 'upgrade_properties'):
+      properties = session.get('properties', None)
+      session['properties'] = api.upgrade_properties(session['type'], properties)
+
+  notebook.data = json.dumps(data)
+  return notebook
 
 
 class Analytics(object):

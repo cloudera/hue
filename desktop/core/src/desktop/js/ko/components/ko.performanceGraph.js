@@ -15,11 +15,13 @@
 // limitations under the License.
 
 import * as d3 from 'd3';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import componentUtils from './componentUtils';
 import I18n from 'utils/i18n';
+
+export const NAME = 'performance-graph';
 
 const TEMPLATE = `
 <script type="text/html" id="performance-graph-d3-template">
@@ -793,4 +795,4 @@ class PerformanceGraph {
   }
 }
 
-componentUtils.registerComponent('performance-graph', PerformanceGraph, TEMPLATE);
+componentUtils.registerComponent(NAME, PerformanceGraph, TEMPLATE);

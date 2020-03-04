@@ -12,7 +12,7 @@ purpose, and should require no configuration or management by the administrator.
 However, MySQL is the recommended database to use. This section contains
 instructions for configuring Hue to access MySQL and other databases.
 
-### Inspecting the Database
+### Inspecting
 
 The default SQLite database used by Hue is located in: `/usr/share/hue/desktop/desktop.db`.
 You can inspect this database from the command line using the `sqlite3`
@@ -32,14 +32,14 @@ It is strongly recommended that you avoid making any modifications to the
 database directly using SQLite, though this trick can be useful for management
 or troubleshooting.
 
-### Backing up the Database
+### Backing up
 
 If you use the default SQLite database, then copy the `desktop.db` file to
 another node for backup. It is recommended that you back it up on a regular
 schedule, and also that you back it up before any upgrade to a new version of
 Hue.
 
-### Clean up the database
+### Clean up
 
 When the database has too many entries in certain tables, it will cause performance issue. Now Hue config check will help superuser to find this issue. Login as superuser and go to “Hue Administration”, this sample screenshot will be displayed in the quick start wizard when the tables have too many entries.
 
@@ -101,18 +101,15 @@ To configure Hue to store data in MySQL:
     name=hue
     </pre>
 
-5. As the Hue user, configure Hue to load the existing data and create the
-   necessary database tables:
+5. As the Hue user, configure Hue to load the existing data and create the database tables:
 
-    <pre>
-    /usr/share/hue/build/env/bin/hue syncdb --noinput
+    /usr/share/hue/build/env/bin/hue migrate
     mysql -uhue -psecretpassword -e "DELETE FROM hue.django_content_type;"
     /usr/share/hue/build/env/bin/hue loaddata $temporary-file-containing-dumped-data.json
-    </pre>
 
 Your system is now configured and you can start the Hue server as normal.
 
-### Migrate the Hue Database
+### Migrating
 Note: Hue Custom Databases includes database-specific pages on how to migrate from an old to a new database. This page summarizes across supported database types.
 When you change Hue databases, you can migrate the existing data to your new database. If the data is dispensable, there is no need to migrate.
 

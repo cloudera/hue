@@ -108,18 +108,44 @@
   box-shadow: none !important;
 }
 
-@keyframes fadein {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.animation(@params) {
+  -webkit-animation: @params;
+  -moz-animation: @params;
+  -ms-animation: @params;
+  animation: @params;
 }
 
-.hue-fade-in {
-  -webkit-animation: fadein 2s; /* Safari, Chrome and Opera > 12.1 */
-  -moz-animation: fadein 2s; /* Firefox < 16 */
-  -ms-animation: fadein 2s; /* Internet Explorer */
-  -o-animation: fadein 2s; /* Opera < 12.1 */
-  animation: fadein 2s;
+.keyframes(@name,@rules) {
+  @-webkit-keyframes @name {
+    @rules();
+  }
+
+  @-moz-keyframes @name {
+    @rules();
+  }
+
+  @-ms-keyframes @name {
+    @rules();
+  }
+
+  @-o-keyframes @name {
+    @rules();
+  }
+
+  @keyframes @name {
+    @rules();
+  }
 }
+
+.keyframes(hue-fade-in-frames, {
+  from { opacity: 0; }
+  to { opacity: 1; }
+});
+
+.hue-fade-in {
+  .animation(hue-fade-in-frames 2s);
+}
+
 // Flexbox mixins
 
 .display-flex() {
@@ -151,19 +177,19 @@
 .flex-box-flex(@flex) {
   -webkit-box-flex: @flex;
   -moz-box-flex: @flex;
-  box-flex: @flex;
+  box-flex: @flex; /* stylelint-disable-line */
 }
 
 .flex-box-align(@align) {
   -webkit-box-align: @align;
   -moz-box-align: @align;
-  box-align: @align;
+  box-align: @align; /* stylelint-disable-line */
 }
 
 .flex-box-pack(@pack) {
   -webkit-box-pack: @pack;
   -moz-box-pack: @pack;
-  box-pack: @pack;
+  box-pack: @pack; /* stylelint-disable-line */
 }
 
 .flex-shrink(@shrink) {

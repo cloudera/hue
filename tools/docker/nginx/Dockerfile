@@ -1,9 +1,14 @@
 # Welcome to Hue NGINX (http://gethue.com) Dockerfile
+ARG registry=gethue
+ARG tag=latest
+
+FROM ${registry}/hue:${tag} as base
+
 
 FROM nginx
-LABEL description="Image for Webserver"
+LABEL description="Static files of Hue service"
 
-COPY --from=gethue/hue:latest /usr/share/hue/build/static/ /usr/share/nginx/html/hue/static
+COPY --from=base /usr/share/hue/build/static/ /usr/share/nginx/html/hue/static
 
 RUN rm /etc/nginx/conf.d/default.conf
 

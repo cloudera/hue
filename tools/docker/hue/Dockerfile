@@ -1,9 +1,9 @@
 # Welcome to Hue (http://gethue.com) Dockerfile
-# Build an image from a remote github or local cloned Hue repository.
 
 FROM ubuntu:18.04
-LABEL description="Hue Project https://github.com/cloudera/hue"
+LABEL description="Hue SQL Assistant - gethue.com"
 
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && apt-get install -y \
   build-essential \
   libkrb5-dev \
@@ -33,7 +33,8 @@ RUN apt-get update -y && apt-get install -y \
   # openssl \ # Breaks build
   xmlsec1 \
   libxmlsec1-openssl \
-  hugo \
+  krb5-config \
+  krb5-user \
   && rm -rf /var/lib/apt/lists/*
 
 ADD . /hue
@@ -50,19 +51,23 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | sudo bash - \
 RUN PREFIX=/usr/share make install
 RUN useradd -ms /bin/bash hue && chown -R hue /usr/share/hue
 
-# Build the docs (not in Makefile yet)
-# RUN hugo --source docs/docs-site
-
 # Only keep install dir
+# Note: get more minimal image by pulling install dir in a stage 2 image
 WORKDIR /usr/share/hue
-RUN rm -rf /hue
+RUN rm -rf /hue \
+  && rm -rf node_modules
 
 # Install DB connectors
-RUN ./build/env/bin/pip install psycopg2-binary
-RUN ./build/env/bin/pip install redis==2.10.6
-RUN ./build/env/bin/pip install django_redis
-RUN ./build/env/bin/pip install flower
-RUN ./build/env/bin/pip install gevent
+RUN ./build/env/bin/pip install \
+  psycopg2-binary \
+  redis==2.10.6 \
+  django_redis \
+  flower \
+  pyhive \
+  gevent \
+  # Needed for Jaeger
+  threadloop \
+  thrift-sasl==0.2.1
 
 COPY tools/docker/hue/conf desktop/conf
 COPY tools/docker/hue/startup.sh .

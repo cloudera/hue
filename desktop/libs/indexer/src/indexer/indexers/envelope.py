@@ -18,16 +18,16 @@ from builtins import object
 import logging
 import os
 
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
-from desktop.lib.exceptions_renderable import PopupException
 from hadoop.fs.hadoopfs import Hdfs
-from notebook.models import make_notebook
-
 from indexer.conf import CONFIG_JARS_LIBS_PATH, config_morphline_path
 from libzookeeper.conf import zkensemble
+from notebook.models import make_notebook
+from useradmin.models import User
+
+from desktop.lib.exceptions_renderable import PopupException
 
 
 LOG = logging.getLogger(__name__)

@@ -15,12 +15,14 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import componentUtils from './componentUtils';
 import dataCatalog from 'catalog/dataCatalog';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+
+export const NAME = 'nav-tags';
 
 const TEMPLATE = `
   <!-- ko if: loading -->
@@ -174,4 +176,4 @@ class NavTags {
   }
 }
 
-componentUtils.registerComponent('nav-tags', NavTags, TEMPLATE);
+componentUtils.registerComponent(NAME, NavTags, TEMPLATE);

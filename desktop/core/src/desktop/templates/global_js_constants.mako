@@ -18,18 +18,22 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
-  from desktop.auth.backend import is_admin;
-  from desktop.conf import APP_SWITCHER_ALTUS_BASE_URL, APP_SWITCHER_MOW_BASE_URL, DISPLAY_APP_SWITCHER, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_DEFAULT_CONFIGURATION, USE_NEW_SIDE_PANELS, VCS
+  from desktop.auth.backend import is_admin, is_hue_admin
+  from desktop.conf import APP_SWITCHER_ALTUS_BASE_URL, APP_SWITCHER_MOW_BASE_URL, CUSTOM_DASHBOARD_URL, \
+      DISPLAY_APP_SWITCHER, IS_K8S_ONLY, IS_MULTICLUSTER_ONLY, USE_DEFAULT_CONFIGURATION, USE_NEW_SIDE_PANELS, \
+      VCS, ENABLE_GIST, ENABLE_LINK_SHARING
   from desktop.models import hue_version, _get_apps, get_cluster_config
 
-  from beeswax.conf import LIST_PARTITIONS_LIMIT
+  from beeswax.conf import DOWNLOAD_BYTES_LIMIT, DOWNLOAD_ROW_LIMIT, LIST_PARTITIONS_LIMIT, CLOSE_SESSIONS
   from dashboard.conf import HAS_SQL_ENABLED
   from filebrowser.conf import SHOW_UPLOAD_BUTTON
   from indexer.conf import ENABLE_NEW_INDEXER
-  from metadata.conf import has_catalog, has_readonly_catalog, has_optimizer, has_workload_analytics, OPTIMIZER, get_optimizer_url, get_catalog_url
+  from metadata.conf import has_catalog, has_readonly_catalog, has_optimizer, has_workload_analytics, OPTIMIZER, get_optimizer_url, \
+      get_catalog_url
   from metastore.conf import ENABLE_NEW_CREATE_TABLE
   from metastore.views import has_write_access
-  from notebook.conf import ENABLE_NOTEBOOK_2, ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ordered_interpreters, SHOW_NOTEBOOKS
+  from notebook.conf import ENABLE_NOTEBOOK_2, ENABLE_QUERY_ANALYSIS, ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_SQL_INDEXER, \
+      get_ordered_interpreters, SHOW_NOTEBOOKS
 %>
 
 <%namespace name="sqlDocIndex" file="/sql_doc_index.mako" />
@@ -44,7 +48,7 @@
 
   window.CACHEABLE_TTL = {
     default: ${ conf.CUSTOM.CACHEABLE_TTL.get() },
-    optimizer: ${ hasattr(OPTIMIZER, 'ConfigSection') and OPTIMIZER.CACHEABLE_TTL.get() or 0 }
+    optimizer: ${ OPTIMIZER.CACHEABLE_TTL.get() or 0 }
   };
 
   window.DEV = '${ conf.DEV.get() }' === 'True';
@@ -55,10 +59,14 @@
     window.CSRF_TOKEN = '';
   %endif
 
+  window.PREVENT_AUTOFILL_INPUT_ATTRS = 'autocorrect="off" autocomplete="do-not-autocomplete" autocapitalize="off" spellcheck="false"';
+
   window.APP_SWITCHER_ALTUS_BASE_URL = '${ APP_SWITCHER_ALTUS_BASE_URL.get() }';
   window.APP_SWITCHER_MOW_BASE_URL = '${ APP_SWITCHER_MOW_BASE_URL.get() }';
   window.DISPLAY_APP_SWITCHER = '${ DISPLAY_APP_SWITCHER.get() }' === 'True';
+  window.CUSTOM_LOGO = '${ conf.CUSTOM.LOGO_SVG.get() }' !== '';
 
+  window.HAS_JOB_BROWSER = '${ 'jobbrowser' in apps }' === 'True';
   window.KNOX_BASE_PATH_HUE = '/KNOX_BASE_PATH_HUE';
   window._KNOX_BASE_PATH = '/KNOX_BASE_PATH_KNOX';
   window._KNOX_BASE_URL = '/KNOX_BASE_URL';
@@ -70,15 +78,21 @@
   window.HAS_MULTI_CLUSTER = '${ get_cluster_config(user)['has_computes'] }' === 'True';
 
   window.HAS_SQL_DASHBOARD = '${ HAS_SQL_ENABLED.get() }' === 'True';
+  window.CUSTOM_DASHBOARD_URL = '${ CUSTOM_DASHBOARD_URL.get() }';
 
   window.DROPZONE_HOME_DIR = '${ user.get_home_directory() if not user.is_anonymous() else "" }';
+
+  window.DOWNLOAD_ROW_LIMIT = ${ DOWNLOAD_ROW_LIMIT.get() if hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get() >= 0 else 'undefined' };
+  window.DOWNLOAD_BYTES_LIMIT = ${ DOWNLOAD_BYTES_LIMIT.get() if hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get() >= 0 else 'undefined' };
 
   window.USE_DEFAULT_CONFIGURATION = '${ USE_DEFAULT_CONFIGURATION.get() }' === 'True';
 
   window.USER_HAS_METADATA_WRITE_PERM = '${ user.has_hue_permission(action="write", app="metadata") }' === 'True';
 
+  window.ENABLE_DOWNLOAD = '${ conf.ENABLE_DOWNLOAD.get() }' === 'True';
   window.ENABLE_NEW_CREATE_TABLE = '${ hasattr(ENABLE_NEW_CREATE_TABLE, 'get') and ENABLE_NEW_CREATE_TABLE.get()}' === 'True';
   window.ENABLE_NOTEBOOK_2 = '${ ENABLE_NOTEBOOK_2.get() }' === 'True';
+  window.ENABLE_SQL_INDEXER = '${ ENABLE_SQL_INDEXER.get() }' === 'True';
 
   window.ENABLE_QUERY_BUILDER = '${ ENABLE_QUERY_BUILDER.get() }' === 'True';
   window.ENABLE_QUERY_SCHEDULING = '${ ENABLE_QUERY_SCHEDULING.get() }' === 'True';
@@ -93,6 +107,9 @@
   window.OPTIMIZER_URL = '${ get_optimizer_url() }'
   window.AUTO_UPLOAD_OPTIMIZER_STATS = '${ OPTIMIZER.AUTO_UPLOAD_STATS.get() }' === 'True';
 
+  window.HAS_GIST = '${ ENABLE_GIST.get() }' === 'True';
+  window.HAS_LINK_SHARING = '${ ENABLE_LINK_SHARING.get() }' === 'True';
+
   ## In the past was has_workload_analytics()
   window.HAS_WORKLOAD_ANALYTICS = '${ ENABLE_QUERY_ANALYSIS.get() }' === 'True';
 
@@ -104,6 +121,7 @@
   window.JB_HEADER_CHECK_INTERVAL_IN_MILLIS = 30000;
   window.JB_SINGLE_CHECK_INTERVAL_IN_MILLIS = 5000;
   window.JB_MULTI_CHECK_INTERVAL_IN_MILLIS = 20000;
+  window.CLOSE_SESSIONS = {'hive': '${ CLOSE_SESSIONS.get() }' === 'True'};
 
   window.HUE_URLS = {
     IMPORTER_CREATE_TABLE: '${ 'indexer' in apps and url('indexer:importer_prefill', source_type = 'all', target_type = 'table')}',
@@ -153,33 +171,52 @@
     'Assist': '${ _('Assist') }',
     'Assistant': '${ _('Assistant') }',
     'at cursor': '${ _('at cursor') }',
+    'Australia': '${ _('Australia') }',
     'Back': '${_('Back')}',
+    'Bar Chart': '${ _('Bar Chart') }',
+    'Bars': '${ _('Bars') }',
+    'Brazil': '${ _('Brazil') }',
     'Browse column privileges': '${_('Browse column privileges')}',
+    'Browse db privileges': '${ _('Browse db privileges') }',
     'Browse DB privileges': '${_('Browse DB privileges')}',
     'Browse table privileges': '${_('Browse table privileges')}',
     'Browsers': '${ _('Browsers') }',
+    'Bundle': '${ _('Bundle') }',
+    'Canada': '${ _('Canada') }',
     'Cancel upload': '${ _('Cancel upload') }',
     'Cancel': '${_('Cancel')}',
+    'Change': '${ _('Change') }',
+    'Chart': '${ _('Chart') }',
+    'Check compatibility': '${ _('Check compatibility') }',
+    'China': '${ _('China') }',
+    'Choose a column to pivot...': '${ _('Choose a column to pivot...') }',
+    'Choose a column...': '${ _('Choose a column...') }',
+    'Choose a scope...': '${ _('Choose a scope...') }',
+    'Choose a type...': '${ _('Choose a type...') }',
     'Choose...': '${ _('Choose...') }',
     'Clear cache': '${ _('Clear cache') }',
+    'Clear the current editor': '${ _('Clear the current editor') }',
     'Clear the query history': '${ _('Clear the query history') }',
+    'Clear': '${ _('Clear') }',
     'Click for more details': '${ _('Click for more details') }',
-    'Close': '${_('Close')}',
     'Close session': '${_('Close session')}',
+    'Close': '${_('Close')}',
     'Cluster': '${ _('Cluster') }',
     'Clusters': '${ _('Clusters') }',
     'CodeGen': '${ _('CodeGen') }',
+    'Collapse': '${ _('Collapse') }',
     'Collection': '${ _('Collection') }',
     'column name...': '${_('column name...')}',
     'Column': '${ _('Column') }',
     'Columns': '${ _('Columns') }',
+    'columns': '${ _('columns') }',
     'Compilation': '${ _('Compilation') }',
     'Compute': '${ _('Compute') }',
-    'Connect': '${ _('Connect') }',
     'condition': '${ _('condition') }',
     'Confirm History Clearing': '${ _('Confirm History Clearing') }',
     'Confirm the deletion?': '${ _('Confirm the deletion?') }',
     'Connect to the data source': '${ _('Connect to the data source') }',
+    'Connect': '${ _('Connect') }',
     'Could not find details for the function': '${_('Could not find details for the function')}',
     'Could not find': '${_('Could not find')}',
     'CPU': '${ _('CPU') }',
@@ -190,6 +227,7 @@
     'Create table': '${_('Create table')}',
     'Create': '${ _('Create') }',
     'Created': '${ _('Created') }',
+    'Created: ': '${ _('Created: ') }',
     'cte': '${ _('cte') }',
     'CTEs': '${ _('CTEs') }',
     'Dashboard': '${ _('Dashboard') }',
@@ -212,7 +250,10 @@
     'distinct': '${ _('distinct') }',
     'Do you really want to delete the following document(s)?': '${ _('Do you really want to delete the following document(s)?') }',
     'Document type': '${ _('Document type') }',
+    'Documentation': '${ _('Documentation') }',
     'Documents': '${ _('Documents') }',
+    'Done. 0 results.': '${ _('Done. 0 results.') }',
+    'Done.': '${ _('Done.') }',
     'Drop a SQL file here': '${_('Drop a SQL file here')}',
     'Drop iPython/Zeppelin notebooks here': '${_('Drop iPython/Zeppelin notebooks here')}',
     'Edit Profile': '${ _('Edit Profile') }',
@@ -233,17 +274,23 @@
     'Error loading table details.': '${ _('Error loading table details.') }',
     'Error loading tables.': '${ _('Error loading tables.') }',
     'Error while copying results.': '${ _('Error while copying results.') }',
+    'Europe': '${ _('Europe') }',
     'Example: SELECT * FROM tablename, or press CTRL + space': '${ _('Example: SELECT * FROM tablename, or press CTRL + space') }',
     'Execute a query to get query execution analysis.': '${ _('Execute a query to get query execution analysis.') }',
+    'Execute': '${ _('Execute') }',
     'Execution': '${ _('Execution') }',
     'Expand to all columns': '${ _('Expand to all columns') }',
     'Expand to selected columns': '${ _('Expand to selected columns') }',
+    'Expand': '${ _('Expand') }',
     'Expected end of statement': '${_('Expected end of statement')}',
+    'Explain the current SQL query': '${ _('Explain the current SQL query') }',
+    'Explain': '${ _('Explain') }',
     'Failed': '${_('Failed')}',
     'Field': '${ _('Field') }',
     'Fields': '${ _('Fields') }',
     'File Browser': '${ _('File Browser') }',
     'Files': '${ _('Files') }',
+    'Filter columns...': '${ _('Filter columns...') }',
     'Filter databases...': '${ _('Filter databases...') }',
     'Filter sources...': '${ _('Filter sources...') }',
     'filter': '${ _('filter') }',
@@ -253,27 +300,52 @@
     'Folder name': '${_('Folder name')}',
     'Foreign key': '${_('Foreign key')}',
     'Foreign keys': '${_('Foreign keys')}',
+    'Format the current SQL query': '${ _('Format the current SQL query') }',
+    'Share the query selection via a link': '${ _('Share the query selection via a link') }',
+    'Share link': '${ _('Share link') }',
+    'Share as a gist': '${ _('Share as a gist') }',
+    'Format': '${ _('Format') }',
+    'France': '${ _('France') }',
     'Functions': '${ _('Functions') }',
+    'Germany': '${ _('Germany') }',
+    'Get hints on how to port SQL from other databases': '${ _('Get hints on how to port SQL from other databases') }',
     'Go Home': '${_('Go Home')}',
     'Go to column:': '${_('Go to column:')}',
+    'Gradient Map': '${ _('Gradient Map') }',
+    'Grid': '${ _('Grid') }',
     'group by': '${ _('group by') }',
+    'Group': '${ _('Group') }',
+    'group': '${ _('group') }',
+    'HBase': '${ _('HBase') }',
     'Heatmap': '${ _('Heatmap') }',
     'Help': '${ _('Help') }',
     'Hide advanced': '${_('Hide advanced')}',
+    'Hide Details': '${ _('Hide Details') }',
     'Hive Query': '${_('Hive Query')}',
     'Identifiers': '${ _('Identifiers') }',
     'Ignore this type of error': '${_('Ignore this type of error')}',
     'Impala Query': '${_('Impala Query')}',
+    'Import complete!': '${ _('Import complete!') }',
+    'Import failed!': '${ _('Import failed!') }',
+    'Import Hue Documents': '${ _('Import Hue Documents') }',
     'Import Job': '${_('Import Job')}',
+    'Import Query History': '${ _('Import Query History') }',
+    'Import': '${ _('Import') }',
+    'Imported: ': '${ _('Imported: ') }',
+    'Importing...': '${ _('Importing...') }',
     'Improve Analysis': '${_('Improve Analysis')}',
     'Indexes': '${ _('Indexes') }',
+    'Insert ': '${ _('Insert ') }',
     'Insert at cursor': '${_('Insert at cursor')}',
     'Insert in the editor': '${ _('Insert in the editor') }',
     'Insert value here': '${ _('Insert value here') }',
     'Insert': '${ _('Insert') }',
+    'intensity': '${ _('intensity') }',
     'Invalidate all metadata and rebuild index.': '${ _('Invalidate all metadata and rebuild index.') }',
     'IO': '${ _('IO') }',
     'It looks like you are offline or an unknown error happened. Please refresh the page.': '${ _('It looks like you are offline or an unknown error happened. Please refresh the page.') }',
+    'Italy': '${ _('Italy') }',
+    'Japan': '${ _('Japan') }',
     'Java Job': '${_('Java Job')}',
     'Job browser': '${_('Job browser')}',
     'Job Design': '${_('Job Design')}',
@@ -283,12 +355,23 @@
     'Key': '${ _('Key') }',
     'keyword': '${ _('keyword') }',
     'Keywords': '${ _('Keywords') }',
+    'label': '${ _('label') }',
     'Language Reference': '${ _('Language Reference') }',
+    'latitude': '${ _('latitude') }',
+    'legend': '${ _('legend') }',
+    'Limit the number of results to...': '${ _('Limit the number of results to...') }',
+    'limit': '${ _('limit') }',
+    'Lines': '${ _('Lines') }',
+    'Load recent queries in order to improve recommendations': '${ _('Load recent queries in order to improve recommendations') }',
     'Loading metrics...': '${ _('Loading metrics...') }',
+    'Loading...': '${ _('Loading...') }',
     'Lock this row': '${_('Lock this row')}',
-    'MapReduce Job': '${_('MapReduce Job')}',
+    'longitude': '${ _('longitude') }',
     'Manage Users': '${ _('Manage Users') }',
     'Manual refresh': '${_('Manual refresh')}',
+    'MapReduce Job': '${_('MapReduce Job')}',
+    'Marker Map': '${ _('Marker Map') }',
+    'Markers': '${ _('Markers') }',
     'max': '${ _('max') }',
     'Memory': '${ _('Memory') }',
     'Metrics': '${ _('Metrics') }',
@@ -301,6 +384,8 @@
     'Missing value configuration.': '${ _('Missing value configuration.') }',
     'Missing x axis configuration.': '${ _('Missing x axis configuration.') }',
     'Missing y axis configuration.': '${ _('Missing y axis configuration.') }',
+    'Modify': '${ _('Modify') }',
+    'More': '${ _('More') }',
     'My Profile': '${ _('My Profile') }',
     'Name': '${ _('Name') }',
     'Namespace': '${ _('Namespace') }',
@@ -308,6 +393,7 @@
     'New document': '${ _('New document') }',
     'New folder': '${ _('New folder') }',
     'No clusters available': '${ _('No clusters available') }',
+    'No clusters available.': '${ _('No clusters available.') }',
     'No clusters found': '${ _('No clusters found') }',
     'No columns found': '${ _('No columns found') }',
     'No computes found': '${ _('No computes found') }',
@@ -325,14 +411,15 @@
     'No namespaces found.': '${ _('No namespaces found.') }',
     'No optimizations identified.': '${ _('No optimizations identified.') }',
     'No privileges found for the selected object.': '${ _('No privileges found for the selected object.') }',
+    'No related computes': '${_('No related computes')}',
     'No results found': '${_('No results found')}',
     'No results found.': '${_('No results found.')}',
+    'No sorting': '${ _('No sorting') }',
     'No tables available.': '${ _('No tables available.') }',
     'No tables found': '${ _('No tables found') }',
     'No tables identified.': '${ _('No tables identified.') }',
     'No task history.': '${_('Not task history.')}',
     'No': '${ _('No') }',
-    'No related computes': '${_('No related computes')}',
     'Not available': '${_('Not available')}',
     'Notebook': '${_('Notebook')}',
     'of': '${_('of')}',
@@ -346,14 +433,14 @@
     'Open in Dashboard': '${_('Open in Dashboard')}',
     'Open in Dashboard...': '${ _('Open in Dashboard...') }',
     'Open in Editor': '${_('Open in Editor')}',
+    'Open in File Browser...': '${ _('Open in File Browser...') }',
     'Open in HBase': '${_('Open in HBase')}',
     'Open in Importer': '${_('Open in Importer')}',
-    'Open in File Browser...': '${ _('Open in File Browser...') }',
     'Open in Table Browser...': '${ _('Open in Table Browser...') }',
     'Open': '${ _('Open') }',
     'Options': '${ _('Options') }',
-    'Order': '${ _('Order') }',
     'order by': '${ _('order by') }',
+    'Order': '${ _('Order') }',
     'other': '${ _('other') }',
     'Output': '${ _('Output') }',
     'Overview': '${ _('Overview') }',
@@ -363,6 +450,7 @@
     'Password': '${ _('Password') }',
     'Perform incremental metadata update.': '${ _('Perform incremental metadata update.') }',
     'Permissions': '${ _('Permissions') }',
+    'Pie Chart': '${ _('Pie Chart') }',
     'Pig Design': '${_('Pig Design')}',
     'Pig Script': '${_('Pig Script')}',
     'Pin': '${_('Pin')}',
@@ -379,29 +467,42 @@
     'Query needs to be saved.': '${ _('Query needs to be saved.') }',
     'Query requires a select or aggregate.': '${ _('Query requires a select or aggregate.') }',
     'Query running': '${ _('Query running') }',
+    'Query settings': '${ _('Query settings') }',
     'queued': '${ _('queued') }',
-    'Re-create': '${ _('Re-create') }',
     'Re-create session': '${ _('Re-create session') }',
+    'Re-create': '${ _('Re-create') }',
+    'Read': '${ _('Read') }',
     'Refresh': '${ _('Refresh') }',
+    'region': '${ _('region') }',
     'Remove': '${ _('Remove') }',
     'Replace the editor content...': '${ _('Replace the editor content...') }',
     'Result available': '${ _('Result available') }',
     'Result expired': '${ _('Result expired') }',
+    'Result image': '${ _('Result image') }',
     'result(s) copied to the clipboard' : '${ _('result(s) copied to the clipboard') }',
+    'Results have expired, rerun the query if needed.': '${ _('Results have expired, rerun the query if needed.') }',
     'Risks': '${ _('Risks') }',
     'Running': '${ _('Running') }',
     'sample query': '${ _('sample query') }',
     'Sample': '${ _('Sample') }',
     'sample': '${ _('sample') }',
     'Samples': '${ _('Samples') }',
-    'Save': '${ _('Save') }',
     'Save changes': '${ _('Save changes') }',
     'Save session settings as default': '${ _('Save session settings as default') }',
+    'Save': '${ _('Save') }',
+    'scatter group': '${ _('scatter group') }',
+    'Scatter Plot': '${ _('Scatter Plot') }',
+    'scatter size': '${ _('scatter size') }',
     'Schedule': '${ _('Schedule') }',
+    'scope': '${ _('scope') }',
     'Search Dashboard': '${_('Search Dashboard')}',
     'Search data and saved documents...': '${ _('Search data and saved documents...') }',
     'Search saved documents...': '${_('Search saved documents...')}',
+    'Search': '${ _('Search') }',
     'Select a query or start typing to get optimization hints.': '${_('Select a query or start typing to get optimization hints')}',
+    'Select and execute a query to see the result.': '${ _('Select and execute a query to see the result.') }',
+    'Select json file': '${ _('Select json file') }',
+    'Select the chart parameters on the left': '${ _('Select the chart parameters on the left') }',
     'Select this folder': '${_('Select this folder')}',
     'Selected dialect': '${_('Selected dialect')}',
     'Selected entry': '${_('Selected entry')}',
@@ -410,10 +511,14 @@
     'Sessions': '${ _('Sessions') }',
     'Set as default application': '${_('Set as default application')}',
     'Set as default settings': '${_('Set as default settings')}',
+    'Settings': '${ _('Settings') }',
+    'Share': '${ _('Share') }',
+    'Sharing': '${ _('Sharing') }',
     'Shell Script': '${_('Shell Script')}',
     'Show 50 more...': '${_('Show 50 more...')}',
     'Show advanced': '${_('Show advanced')}',
     'Show columns': '${_('Show columns')}',
+    'Show Details': '${ _('Show Details') }',
     'Show details': '${_('Show details')}',
     'Show in Assist...': '${_('Show in Assist...')}',
     'Show more...': '${_('Show more...')}',
@@ -423,13 +528,22 @@
     'Sign out': '${ _('Sign out') }',
     'Size': '${ _('Size') }',
     'Solr Search': '${ _('Solr Search') }',
+    'Sort ascending': '${ _('Sort ascending') }',
+    'Sort descending': '${ _('Sort descending') }',
+    'sorting': '${ _('sorting') }',
     'Sources': '${ _('Sources') }',
-    'Statement': '${ _('Statement') }',
     'Spark Job': '${_('Spark Job')}',
+    'SQL': '${ _('SQL') }',
     'Start': '${_('Start')}',
     'Starting': '${_('Starting')}',
+    'Statement': '${ _('Statement') }',
     'Stats': '${_('Stats')}',
+    'Stop batch': '${ _('Stop batch') }',
+    'Stop': '${ _('Stop') }',
     'Stopped': '${_('Stopped')}',
+    'Stopping': '${ _('Stopping') }',
+    'Streams': '${ _('Streams') }',
+    'Success.': '${ _('Success.') }',
     'Summary': '${_('Summary')}',
     'Table Browser': '${ _('Table Browser') }',
     'table': '${ _('table') }',
@@ -439,30 +553,46 @@
     'Tags could not be loaded.': '${ _('Tags could not be loaded.') }',
     'Task History': '${ _('Task History') }',
     'Terms': '${ _('Terms') }',
+    'The document is not shared for modify.': '${ _('The document is not shared for modify.') }',
+    'The document is not shared for read.': '${ _('The document is not shared for read.') }',
     'The file has not been found': '${_('The file has not been found')}',
     'The table has no columns': '${_('The table has no columns')}',
     'The trash is empty': '${_('The trash is empty')}',
     'The upload has been canceled': '${ _('The upload has been canceled') }',
+    'There are currently no information about the sessions.': '${ _('There are currently no information about the sessions.') }',
     'There are no stats to be shown': '${ _('There are no stats to be shown') }',
     'There are no terms to be shown': '${ _('There are no terms to be shown') }',
     'There is currently no information about the sessions.': '${ _('There is currently no information about the sessions.') }',
+    'There was a problem loading the databases': '${ _('There was a problem loading the databases') }',
+    'There was a problem loading the index preview': '${ _('There was a problem loading the index preview') }',
+    'There was a problem loading the indexes': '${ _('There was a problem loading the indexes') }',
+    'There was a problem loading the table preview': '${ _('There was a problem loading the table preview') }',
+    'There was an error loading the document.': '${ _('There was an error loading the document.') }',
     'This field does not support stats': '${ _('This field does not support stats') }',
     'This will sync missing tables.': '${ _('This will sync missing tables.') }',
+    'Timeline Chart': '${ _('Timeline Chart') }',
     'Timeline': '${ _('Timeline') }',
     'Top down analysis': '${ _('Top down analysis') }',
     'Top Nodes': '${ _('Top Nodes') }',
     'Topics': '${ _('Topics') }',
+    'Type a username or a group name': '${ _('Type a username or a group name') }',
     'Type': '${ _('Type') }',
+    'type': '${ _('type') }',
     'UDFs': '${ _('UDFs') }',
+    'UK': '${ _('UK') }',
     'Undo': '${ _('Undo') }',
     'Unlock this row': '${_('Unlock this row')}',
     'Unset from default application': '${_('Unset from default application')}',
+    'Updated: ': '${ _('Updated: ') }',
     'Upload a file': '${_('Upload a file')}',
     'Upload file': '${_('Upload file')}',
+    'Upload optimizer history': '${ _('Upload optimizer history') }',
     'uploaded successfully': '${ _('uploaded successfully') }',
+    'USA': '${ _('USA') }',
     'used by': '${ _('used by') }',
     'Username': '${ _('Username') }',
     'Value': '${ _('Value') }',
+    'value': '${ _('value') }',
     'Values': '${ _('Values') }',
     'variable': '${ _('variable') }',
     'Variables': '${ _('Variables') }',
@@ -475,6 +605,9 @@
     'With grant option': '${ _('With grant option') }',
     'With grant': '${ _('With grant') }',
     'Workflow': '${ _('Workflow') }',
+    'World': '${ _('World') }',
+    'x-axis': '${ _('x-axis') }',
+    'y-axis': '${ _('y-axis') }',
     'Yes': '${ _('Yes') }',
     'Yes, delete': '${ _('Yes, delete') }',
   };
@@ -509,6 +642,8 @@
 
   window.USER_VIEW_EDIT_USER_ENABLED = '${ user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or is_admin(user) }' === 'True';
   window.USER_IS_ADMIN = '${ is_admin(user) }' === 'True';
+  window.USER_IS_HUE_ADMIN = '${ is_hue_admin(user) }' === 'True';
+  window.DJANGO_DEBUG_MODE = '${ conf.DJANGO_DEBUG_MODE.get() }' === 'True';
   window.IS_LDAP_SETUP = '${ 'desktop.auth.backend.LdapBackend' in conf.AUTH.BACKEND.get() }' === 'True';
   window.LOGGED_USERNAME = '${ user.username }';
   window.LOGGED_USER_ID = ${ user.id };
@@ -526,17 +661,6 @@
 
   window.USE_NEW_SIDE_PANELS = '${ USE_NEW_SIDE_PANELS.get() }' === 'True'
   window.USER_HOME_DIR = '${ home_dir }';
-
-  // TODO: Refactor assist to fetch from config.
-  window.ASSIST_SQL_INTERPRETERS = [];
-  % for interpreter in get_ordered_interpreters(request.user):
-    % if interpreter["is_sql"]:
-      ASSIST_SQL_INTERPRETERS.push({
-        type: '${ interpreter["type"] }',
-        name: '${ interpreter["name"] }'
-      });
-    % endif
-  % endfor
 
   var userGroups = [];
   % for group in user.groups.all():

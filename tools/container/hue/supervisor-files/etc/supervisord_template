@@ -1,0 +1,31 @@
+[unix_http_server]
+file=/var/log/${USER}/supervisord.sock
+username=${UUID_GEN}
+password=${UUID_GEN}
+
+[supervisord]
+pidfile=/var/log/${USER}/supervisord.pid
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
+loglevel=info
+nodaemon=true
+identifier=agent-${UUID_GEN}
+
+# These two (unix_http_server, rpcinterface) are needed for supervisorctl to work
+[inet_http_server]
+port=127.0.0.1:9111
+username=${UUID_GEN}
+password=${UUID_GEN}
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory=supervisor.rpcinterface:make_main_rpcinterface
+
+[supervisorctl]
+serverurl=http://localhost:9111
+username=${UUID_GEN}
+password=${UUID_GEN}
+
+[include]
+files = /etc/supervisor.d/*.conf

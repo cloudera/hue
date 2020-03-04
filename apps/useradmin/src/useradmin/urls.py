@@ -22,6 +22,7 @@ from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule
 from useradmin import views as useradmin_views
 from useradmin import api as useradmin_api
 
+
 username_re = get_username_re_rule()
 groupname_re = get_groupname_re_rule()
 
@@ -32,6 +33,7 @@ urlpatterns = [
   url(r'^groups/?$', useradmin_views.list_groups, name="useradmin.views.list_groups"),
   url(r'^permissions/?$', useradmin_views.list_permissions, name="useradmin.views.list_permissions"),
   url(r'^configurations/?$', useradmin_views.list_configurations, name="useradmin.views.list_configurations"),
+  url(r'^organizations/?$', useradmin_views.list_organizations, name="useradmin.views.list_organizations"),
   url(r'^users/edit/(?P<username>%s)$' % (username_re,), useradmin_views.edit_user, name="useradmin.views.edit_user"),
   url(r'^users/add_ldap_users$', useradmin_views.add_ldap_users, name="useradmin.views.add_ldap_users"),
   url(r'^users/add_ldap_groups$', useradmin_views.add_ldap_groups, name="useradmin.views.add_ldap_groups"),

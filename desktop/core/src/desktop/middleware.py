@@ -27,6 +27,7 @@ import re
 import socket
 import tempfile
 import time
+import traceback
 
 import kerberos
 import django.db
@@ -37,7 +38,6 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME, BACKEND_SESSION_KEY, authenticate, load_backend, login
 from django.contrib.auth.middleware import RemoteUserMiddleware
-from django.contrib.auth.models import User
 from django.core import exceptions, urlresolvers
 from django.http import HttpResponseNotAllowed, HttpResponseForbidden
 from django.urls import resolve
@@ -46,10 +46,13 @@ from django.utils.translation import ugettext as _
 from django.utils.http import urlquote, is_safe_url
 
 from hadoop import cluster
+from useradmin.models import User
 
 import desktop.views
-import desktop.conf
+from desktop import appmanager, metrics
 from desktop.auth.backend import is_admin
+from desktop.conf import AUTH, HTTP_ALLOWED_METHODS, ENABLE_PROMETHEUS, KNOX, DJANGO_DEBUG_MODE, AUDIT_EVENT_LOG_DIR, \
+    SERVER_USER, REDIRECT_WHITELIST, SECURE_CONTENT_SECURITY_POLICY, ENABLE_CONNECTORS
 from desktop.context_processors import get_app_name
 from desktop.lib import apputil, i18n, fsmanager
 from desktop.lib.django_util import JsonResponse, render, render_json
@@ -57,9 +60,6 @@ from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.log import get_audit_logger
 from desktop.log.access import access_log, log_page_hit, access_warn
-from desktop import appmanager
-from desktop import metrics
-from desktop.auth.backend import is_admin
 
 
 LOG = logging.getLogger(__name__)
@@ -73,7 +73,7 @@ DJANGO_VIEW_AUTH_WHITELIST = [
   desktop.views.is_alive,
 ]
 
-if desktop.conf.ENABLE_PROMETHEUS.get():
+if ENABLE_PROMETHEUS.get():
   DJANGO_VIEW_AUTH_WHITELIST.append(django_prometheus.exports.ExportToDjangoView)
 
 
@@ -93,10 +93,10 @@ class ExceptionMiddleware(object):
   If exceptions know how to render themselves, use that.
   """
   def process_exception(self, request, exception):
-    import traceback
     tb = traceback.format_exc()
-    logging.info("Processing exception: %s: %s" % (i18n.smart_unicode(exception),
-                                                   i18n.smart_unicode(tb)))
+    logging.info("Processing exception: %s: %s" % (
+      i18n.smart_unicode(exception), i18n.smart_unicode(tb))
+    )
 
     if isinstance(exception, PopupException):
       return exception.response(request)
@@ -124,16 +124,17 @@ class ClusterMiddleware(object):
   """
   def process_view(self, request, view_func, view_args, view_kwargs):
     """
-    Sets request.fs and request.jt on every request to point to the
-    configured filesystem.
+    Sets request.fs and request.jt on every request to point to the configured filesystem.
     """
     request.fs_ref = request.GET.get('fs', view_kwargs.get('fs', 'default'))
     if "fs" in view_kwargs:
       del view_kwargs["fs"]
 
-    request.fs = fsmanager.get_filesystem(request.fs_ref)
+    request.fs = None
 
     if request.user.is_authenticated():
+      request.fs = fsmanager.get_filesystem(request.fs_ref)
+
       if request.fs is not None:
         request.fs.setuser(request.user.username)
 
@@ -171,7 +172,7 @@ class NotificationMiddleware(object):
 class AppSpecificMiddleware(object):
   @classmethod
   def augment_request_with_app(cls, request, view_func):
-    """ Stuff the app into the request for use in later-stage middleware """
+    """Inject the app name into the request for use in later-stage middleware"""
     if not hasattr(request, "_desktop_app"):
       module = inspect.getmodule(view_func)
       request._desktop_app = apputil.get_app_for_module(module)
@@ -187,7 +188,6 @@ class AppSpecificMiddleware(object):
     return self.middlewares_by_app.get(app, {}).get(type, [])
 
   def process_view(self, request, view_func, view_args, view_kwargs):
-    """View middleware"""
     self.augment_request_with_app(request, view_func)
     if not request._desktop_app:
       return None
@@ -196,11 +196,10 @@ class AppSpecificMiddleware(object):
     ret = None
     for middleware in self._get_middlewares(request._desktop_app, 'view'):
       ret = middleware(request, view_func, view_args, view_kwargs)
-      if ret: return ret # short circuit
+      if ret: return ret  # Short circuit
     return ret
 
   def process_response(self, request, response):
-    """Response middleware"""
     # We have the app that we stuffed in there
     if not hasattr(request, '_desktop_app'):
       logging.debug("No desktop_app known for request.")
@@ -211,7 +210,6 @@ class AppSpecificMiddleware(object):
     return response
 
   def process_exception(self, request, exception):
-    """Exception middleware"""
     # We have the app that we stuffed in there
     if not hasattr(request, '_desktop_app'):
       logging.debug("No desktop_app known for exception.")
@@ -268,15 +266,16 @@ class AppSpecificMiddleware(object):
 
 
 class LoginAndPermissionMiddleware(object):
-  def process_request(self, request):
-    # When local user login, oidc middleware refresh token if oidc_id_token_expiration doesn't exists!
-    if request.session.get('_auth_user_backend', '') == 'desktop.auth.backend.AllowFirstUserDjangoBackend'\
-            and 'desktop.auth.backend.OIDCBackend' in desktop.conf.AUTH.BACKEND.get():
-      request.session['oidc_id_token_expiration'] = time.time() + 300
-
   """
   Middleware that forces all views (except those that opt out) through authentication.
   """
+
+  def process_request(self, request):
+    # When local user login, oidc middleware refresh token if oidc_id_token_expiration doesn't exists!
+    if request.session.get('_auth_user_backend', '') == 'desktop.auth.backend.AllowFirstUserDjangoBackend' \
+        and 'desktop.auth.backend.OIDCBackend' in AUTH.BACKEND.get():
+      request.session['oidc_id_token_expiration'] = time.time() + 300
+
   def process_view(self, request, view_func, view_args, view_kwargs):
     """
     We also perform access logging in ``process_view()`` since we have the view function,
@@ -286,11 +285,12 @@ class LoginAndPermissionMiddleware(object):
     request.ts = time.time()
     request.view_func = view_func
     access_log_level = getattr(view_func, 'access_log_level', None)
-    # skip loop for oidc
+
+    # Skip loop for oidc
     if request.path in ['/oidc/authenticate/', '/oidc/callback/', '/oidc/logout/', '/hue/oidc_failed/']:
       return None
 
-    # First, skip views not requiring login
+    # Skip views not requiring login
 
     # If the view has "opted out" of login required, skip
     if hasattr(view_func, "login_notrequired"):
@@ -303,34 +303,39 @@ class LoginAndPermissionMiddleware(object):
       log_page_hit(request, view_func, level=access_log_level or logging.DEBUG)
       return None
 
-    # If user is logged in, check that he has permissions to access the
-    # app.
+    # If user is logged in, check that he has permissions to access the app
     if request.user.is_active and request.user.is_authenticated():
       AppSpecificMiddleware.augment_request_with_app(request, view_func)
 
-      # Until we get Django 1.3 and resolve returning the URL name, we just do a match of the name of the view
+      # Until Django 1.3 which resolves returning the URL name, just do a match of the name of the view
       try:
         access_view = 'access_view:%s:%s' % (request._desktop_app, resolve(request.path)[0].__name__)
       except Exception as e:
         access_log(request, 'error checking view perm: %s' % e, level=access_log_level)
         access_view = ''
 
+      app_accessed = request._desktop_app
+      app_libs_whitelist = ("desktop", "home", "home2", "about", "hue", "editor", "notebook", "indexer", "404", "500", "403")
       # Accessing an app can access an underlying other app.
       # e.g. impala or spark uses code from beeswax and so accessing impala shows up as beeswax here.
       # Here we trust the URL to be the real app we need to check the perms.
-      app_accessed = request._desktop_app
       ui_app_accessed = get_app_name(request)
       if app_accessed != ui_app_accessed and ui_app_accessed not in ('logs', 'accounts', 'login'):
         app_accessed = ui_app_accessed
 
       if app_accessed and \
-          app_accessed not in ("desktop", "home", "home2", "about", "hue", "editor", "notebook", "indexer", "404", "500", "403") and \
-          not (is_admin(request.user) or request.user.has_hue_permission(action="access", app=app_accessed) or
-               request.user.has_hue_permission(action=access_view, app=app_accessed)) and \
-          not (app_accessed == '__debug__' and desktop.conf.DJANGO_DEBUG_MODE):
+          app_accessed not in app_libs_whitelist and \
+          not (
+              is_admin(request.user) or
+              request.user.has_hue_permission(action="access", app=app_accessed) or
+              request.user.has_hue_permission(action=access_view, app=app_accessed)
+          ) and \
+          not (app_accessed == '__debug__' and DJANGO_DEBUG_MODE.get()):
         access_log(request, 'permission denied', level=access_log_level)
         return PopupException(
-            _("You do not have permission to access the %(app_name)s application.") % {'app_name': app_accessed.capitalize()}, error_code=401).response(request)
+            _("You do not have permission to access the %(app_name)s application.") % {'app_name': app_accessed.capitalize()},
+            error_code=401
+        ).response(request)
       else:
         if not hasattr(request, 'view_func'):
           log_page_hit(request, view_func, level=access_log_level)
@@ -338,10 +343,12 @@ class LoginAndPermissionMiddleware(object):
 
     logging.info("Redirecting to login page: %s", request.get_full_path())
     access_log(request, 'login redirection', level=access_log_level)
-    no_idle_backends = ("libsaml.backend.SAML2Backend",
-                        "desktop.auth.backend.SpnegoDjangoBackend",
-                        "desktop.auth.backend.KnoxSpnegoDjangoBackend")
-    if request.ajax and all(no_idle_backend not in desktop.conf.AUTH.BACKEND.get() for no_idle_backend in no_idle_backends):
+    no_idle_backends = (
+        "libsaml.backend.SAML2Backend",
+        "desktop.auth.backend.SpnegoDjangoBackend",
+        "desktop.auth.backend.KnoxSpnegoDjangoBackend"
+    )
+    if request.ajax and all(no_idle_backend not in AUTH.BACKEND.get() for no_idle_backend in no_idle_backends):
       # Send back a magic header which causes Hue.Request to interpose itself
       # in the ajax request and make the user login before resubmitting the
       # request.
@@ -356,7 +363,7 @@ class LoginAndPermissionMiddleware(object):
 
   def process_response(self, request, response):
     if hasattr(request, 'ts') and hasattr(request, 'view_func'):
-      log_page_hit(request, request.view_func, level=logging.INFO, start_time=request.ts)
+      log_page_hit(request, request.view_func, level=logging.INFO, start_time=request.ts, response=response)
     return response
 
 
@@ -371,8 +378,6 @@ class JsonMessage(object):
 class AuditLoggingMiddleware(object):
 
   def __init__(self):
-    from desktop.conf import AUDIT_EVENT_LOG_DIR, SERVER_USER
-
     self.impersonator = SERVER_USER.get()
 
     if not AUDIT_EVENT_LOG_DIR.get():
@@ -445,8 +450,7 @@ class HtmlValidationMiddleware(object):
     self._logger = logging.getLogger('HtmlValidationMiddleware')
 
     if not _has_tidylib:
-      logging.error("HtmlValidationMiddleware not activatived: "
-                    "Failed to import tidylib.")
+      logging.error("HtmlValidationMiddleware not activatived: Failed to import tidylib.")
       return
 
     # Things that we don't care about
@@ -536,7 +540,7 @@ class HtmlValidationMiddleware(object):
 class ProxyMiddleware(object):
 
   def __init__(self):
-    if not 'desktop.auth.backend.AllowAllBackend' in desktop.conf.AUTH.BACKEND.get():
+    if not 'desktop.auth.backend.AllowAllBackend' in AUTH.BACKEND.get():
       LOG.info('Unloading ProxyMiddleware')
       raise exceptions.MiddlewareNotUsed
 
@@ -598,9 +602,9 @@ class SpnegoMiddleware(object):
   """
 
   def __init__(self):
-    if not set(desktop.conf.AUTH.BACKEND.get()).intersection(
-            set(['desktop.auth.backend.SpnegoDjangoBackend', 'desktop.auth.backend.KnoxSpnegoDjangoBackend'])
-            ):
+    if not set(AUTH.BACKEND.get()).intersection(
+        set(['desktop.auth.backend.SpnegoDjangoBackend', 'desktop.auth.backend.KnoxSpnegoDjangoBackend'])
+      ):
       LOG.info('Unloading SpnegoMiddleware')
       raise exceptions.MiddlewareNotUsed
 
@@ -671,20 +675,21 @@ class SpnegoMiddleware(object):
           # In Trusted knox proxy, Hue must expect following:
           #   Trusted knox user: KNOX_PRINCIPAL
           #   Trusted knox proxy host: KNOX_PROXYHOSTS
-          if 'desktop.auth.backend.KnoxSpnegoDjangoBackend' in \
-                desktop.conf.AUTH.BACKEND.get():
+          if 'desktop.auth.backend.KnoxSpnegoDjangoBackend' in AUTH.BACKEND.get():
             knox_verification = False
-            if desktop.conf.KNOX.KNOX_PRINCIPAL.get() in username:
+            principals = self.clean_principal(KNOX.KNOX_PRINCIPAL.get())
+            principal = self.clean_principal(username)
+            if principal.intersection(principals):
               # This may contain chain of reverse proxies, e.g. knox proxy, hue load balancer
               # Compare hostname on both HTTP_X_FORWARDED_HOST & KNOX_PROXYHOSTS. Both of these can be configured to use either hostname or IPs and we have to normalize to one or the other
               req_hosts = self.clean_host(request.META['HTTP_X_FORWARDED_HOST'])
-              knox_proxy = self.clean_host(desktop.conf.KNOX.KNOX_PROXYHOSTS.get())
+              knox_proxy = self.clean_host(KNOX.KNOX_PROXYHOSTS.get())
               if req_hosts.intersection(knox_proxy):
                 knox_verification = True
               else:
                 access_warn(request, 'Failed to verify provided host %s with %s ' % (req_hosts, knox_proxy))
             else:
-              access_warn(request, 'Failed to verify provided username %s with %s ' % (username, desktop.conf.KNOX.KNOX_PRINCIPAL.get()))
+              access_warn(request, 'Failed to verify provided username %s with %s ' % (principal, principals))
             # If knox authentication failed then generate 401 (Unauthorized error)
             if not knox_verification:
               request.META['Return-401'] = ''
@@ -720,9 +725,26 @@ class SpnegoMiddleware(object):
       return
 
   def clean_host(self, pattern):
+    hosts = []
     if pattern:
-      return set([socket.gethostbyaddr(hostport.split(':')[0].strip())[0] for hostport in pattern.split(',')])
-    return set([])
+      pattern_list = pattern if isinstance(pattern, list) else pattern.split(',')
+      for hostport in pattern_list:
+        host = hostport.split(':')[0].strip()
+        try:
+          hosts.append(socket.gethostbyaddr(host)[0])
+        except Exception:
+          LOG.exception('Could not resolve host addr %s' % host)
+          hosts.append(host)
+    return set(hosts)
+
+  def clean_principal(self, pattern):
+    principals = []
+    if pattern:
+      pattern_list = pattern if isinstance(pattern, list) else pattern.split(',')
+      for principal_host in pattern_list:
+        principal = principal_host.split('/')[0].strip()
+      principals.append(principal)
+    return set(principals)
 
   def clean_username(self, username, request):
     """
@@ -748,10 +770,10 @@ class HueRemoteUserMiddleware(RemoteUserMiddleware):
   in use.
   """
   def __init__(self):
-    if not 'desktop.auth.backend.RemoteUserDjangoBackend' in desktop.conf.AUTH.BACKEND.get():
+    if not 'desktop.auth.backend.RemoteUserDjangoBackend' in AUTH.BACKEND.get():
       LOG.info('Unloading HueRemoteUserMiddleware')
       raise exceptions.MiddlewareNotUsed
-    self.header = desktop.conf.AUTH.REMOTE_USER_HEADER.get()
+    self.header = AUTH.REMOTE_USER_HEADER.get()
 
 
 class EnsureSafeMethodMiddleware(object):
@@ -759,8 +781,8 @@ class EnsureSafeMethodMiddleware(object):
   Middleware to white list configured HTTP request methods.
   """
   def process_request(self, request):
-    if request.method not in desktop.conf.HTTP_ALLOWED_METHODS.get():
-      return HttpResponseNotAllowed(desktop.conf.HTTP_ALLOWED_METHODS.get())
+    if request.method not in HTTP_ALLOWED_METHODS.get():
+      return HttpResponseNotAllowed(HTTP_ALLOWED_METHODS.get())
 
 
 class EnsureSafeRedirectURLMiddleware(object):
@@ -769,7 +791,7 @@ class EnsureSafeRedirectURLMiddleware(object):
   """
   def process_response(self, request, response):
     if response.status_code in (301, 302, 303, 305, 307, 308) and response.get('Location') and not hasattr(response, 'redirect_override'):
-      redirection_patterns = desktop.conf.REDIRECT_WHITELIST.get()
+      redirection_patterns = REDIRECT_WHITELIST.get()
       location = response['Location']
 
       if any(regexp.match(location) for regexp in redirection_patterns):
@@ -812,7 +834,7 @@ class MetricsMiddleware(object):
 
 class ContentSecurityPolicyMiddleware(object):
   def __init__(self, get_response=None):
-    self.secure_content_security_policy = desktop.conf.SECURE_CONTENT_SECURITY_POLICY.get()
+    self.secure_content_security_policy = SECURE_CONTENT_SECURITY_POLICY.get()
     if not self.secure_content_security_policy:
       LOG.info('Unloading ContentSecurityPolicyMiddleware')
       raise exceptions.MiddlewareNotUsed

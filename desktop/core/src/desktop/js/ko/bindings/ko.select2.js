@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 // TODO: Depends on Role
 
@@ -199,6 +199,11 @@ ko.bindingHandlers.select2 = {
             }
           });
       });
+    $element
+      .data('select2')
+      .search.prop('readOnly', true)
+      .attr('onfocus', 'this.removeAttribute("readonly");')
+      .wrap('<form autocomplete="off">');
   },
   update: function(element, valueAccessor, allBindingsAccessor) {
     if (typeof allBindingsAccessor().visible != 'undefined') {

@@ -15,19 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import logging
 
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal
 
 from django.core.cache import cache
-from django.contrib.auth.models import User
 
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 from libsentry.privilege_checker import SENTRY_PRIVILEGE_CACHE_KEY, PrivilegeChecker
 from libsentry.test_privilege_checker import MockSentryApiV2
+from useradmin.models import User
 
 from metadata.conf import NAVIGATOR
 from metadata.metadata_sites import get_navigator_hue_server_name
@@ -37,7 +38,7 @@ from metadata.catalog.navigator_client import NavigatorApi
 LOG = logging.getLogger(__name__)
 
 
-class MockedRoot():
+class MockedRoot(object):
   def get(self, relpath=None, params=None, headers=None, clear_cookies=False):
     if relpath == 'entities' and params and params[0] and params[0][0] == 'query' and params[0][1] and params[0][1].startswith('clusterName:'):
       return [{'sourceId': 1}, {'identity': 2}]
@@ -45,7 +46,7 @@ class MockedRoot():
       return params
 
 
-class NavigatorClientTest:
+class NavigatorClientTest(object):
   integration = True
 
   @classmethod

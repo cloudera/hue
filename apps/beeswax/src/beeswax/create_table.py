@@ -20,11 +20,11 @@ from __future__ import division
 from builtins import str
 from builtins import range
 from builtins import object
-from past.utils import old_div
 import csv
 import gzip
 import json
 import logging
+import math
 import re
 
 from django.urls import reverse
@@ -287,7 +287,7 @@ def import_wizard(request, database='default'):
   })
 
 
-def _submit_create_and_load(request, create_hql, table_name, path, load_data, database):
+def _submit_create_and_load(request, create_sql, table_name, path, load_data, database):
   """
   Submit the table creation, and setup the load to happen (if ``load_data`` == IMPORT).
   """
@@ -301,7 +301,7 @@ def _submit_create_and_load(request, create_hql, table_name, path, load_data, da
   else:
     on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
 
-  query = hql_query(create_hql, database=database)
+  query = hql_query(create_sql, database=database)
   return execute_directly(request, query,
                                 on_success_url=on_success_url,
                                 on_success_params=on_success_params)
@@ -401,11 +401,11 @@ def _readfields(lines, delimiters):
     if min(len_list) == 1:
       return 0
 
-    avg_n_fields = old_div(sum(len_list), n_lines)
+    avg_n_fields = math.floor(sum(len_list) / n_lines)
     sq_of_exp = avg_n_fields * avg_n_fields
 
     len_list_sq = [l * l for l in len_list]
-    exp_of_sq = old_div(sum(len_list_sq), n_lines)
+    exp_of_sq = math.floor(sum(len_list_sq) / n_lines)
     var = exp_of_sq - sq_of_exp
     # Favour more fields
     return (1000.0 / (var + 1)) + avg_n_fields

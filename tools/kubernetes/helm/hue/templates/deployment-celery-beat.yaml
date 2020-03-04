@@ -1,5 +1,5 @@
 {{- if .Values.scheduler.enabled -}}
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: celery-beat
@@ -20,6 +20,10 @@ spec:
           image: {{ .Values.image.registry }}/hue:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ['./build/env/bin/celery', 'beat', '-A', 'desktop', '-l', 'info']
+          resources:
+            requests:
+              # memory: "64Mi"
+              cpu: "5m"
           volumeMounts:
           - name: config-volume
             mountPath: /usr/share/hue/desktop/conf/z-hue.ini

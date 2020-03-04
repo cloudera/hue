@@ -19,12 +19,11 @@ from builtins import object
 import json
 import logging
 import re
+import sys
 
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false, assert_raises
-from mock import patch, Mock
 
-from django.contrib.auth.models import User
 from django.urls import reverse
 
 import desktop.conf as desktop_conf
@@ -32,20 +31,23 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.test_utils import add_to_group
 from desktop.models import Document
-from hadoop.pseudo_hdfs4 import get_db_prefix, is_live_cluster
-
 from beeswax import data_export
 from beeswax.design import hql_query
-
 from beeswax.data_export import download
 from beeswax.models import SavedQuery, QueryHistory
 from beeswax.server import dbms
 from beeswax.test_base import get_query_server_config, wait_for_query_to_finish, fetch_query_result_data
 from beeswax.tests import _make_query
+from hadoop.pseudo_hdfs4 import get_db_prefix, is_live_cluster
+from useradmin.models import User
 
 from impala import conf
 from impala.dbms import ImpalaDbms
 
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
+else:
+  from mock import patch, Mock
 
 LOG = logging.getLogger(__name__)
 
@@ -74,11 +76,11 @@ class TestMockedImpala(object):
 
   def test_basic_flow(self):
     response = self.client.get("/impala/")
-    assert_true(re.search('Impala', response.content), response.content)
-    assert_true('Query Editor' in response.content)
+    assert_true(re.search(b'Impala', response.content), response.content)
+    assert_true(b'Query Editor' in response.content)
 
     response = self.client.get("/impala/execute/")
-    assert_true('Query Editor' in response.content)
+    assert_true(b'Query Editor' in response.content)
 
   def test_saved_queries(self):
     user = User.objects.get(username='test')
@@ -516,4 +518,3 @@ class TestImpalaDbms(object):
                  ('order_date', '`default`.`customers`.`orders`'))
     assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'orders', 'item/items/item/product_id'),
                  ('product_id', '`default`.`customers`.`orders`.`items`'))
-

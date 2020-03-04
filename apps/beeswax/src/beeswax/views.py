@@ -26,7 +26,6 @@ import time
 from django import forms
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.contrib import messages
-from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import HttpResponse, QueryDict
 from django.shortcuts import redirect
@@ -46,12 +45,13 @@ from desktop.models import Document, _get_apps
 from desktop.lib.parameterization import find_variables
 from desktop.views import serve_403_error
 from notebook.models import escape_rows
+from useradmin.models import User
 
 import beeswax.forms
 import beeswax.design
-import beeswax.management.commands.beeswax_install_examples
 
 from beeswax import common, data_export, models
+from beeswax.management.commands import beeswax_install_examples
 from beeswax.models import QueryHistory, SavedQuery, Session
 from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException
@@ -65,6 +65,8 @@ LOG = logging.getLogger(__name__)
 HADOOP_JOBS_RE = re.compile("Starting Job = ([a-z0-9_]+?),")
 SPARK_APPLICATION_RE = re.compile("Running with YARN Application = (?P<application_id>application_\d+_\d+)")
 TEZ_APPLICATION_RE = re.compile("Executing on YARN cluster with App id ([a-z0-9_]+?)\)")
+TEZ_QUERY_RE = re.compile("\(queryId=([a-z0-9_-]+?)\)")
+
 
 
 def index(request):
@@ -610,9 +612,12 @@ def install_examples(request):
 
   if request.method == 'POST':
     try:
-      app_name = get_app_name(request)
+      dialect = get_app_name(request)
+      if dialect == 'beeswax':
+        dialect = 'hive'
       db_name = request.POST.get('db_name', 'default')
-      beeswax.management.commands.beeswax_install_examples.Command().handle(app_name=app_name, db_name=db_name, user=request.user)
+      connector_id = request.POST.get('connector_id')
+      beeswax_install_examples.Command().handle(dialect=dialect, db_name=db_name, user=request.user)
       response['status'] = 0
     except Exception as err:
       LOG.exception(err)
@@ -650,12 +655,14 @@ def query_done_cb(request, server_id):
     if design:
       subject += ": %s" % (design.name,)
 
-    link = "%s%s" % \
-              (get_desktop_uri_prefix(),
-               reverse(get_app_name(request) + ':watch_query_history', kwargs={'query_history_id': query_history.id}))
-    body = _("%(subject)s. See the results here: %(link)s\n\nQuery:\n%(query)s") % {
-               'subject': subject, 'link': link, 'query': query_history.query
-             }
+    link = "%s%s" % (
+        get_desktop_uri_prefix(),
+        reverse(get_app_name(request) + ':watch_query_history', kwargs={'query_history_id': query_history.id})
+    )
+    body = _(
+      "%(subject)s. See the results here: %(link)s\n\nQuery:\n%(query)s") % {
+          'subject': subject, 'link': link, 'query': query_history.query
+      }
 
     user.email_user(subject, body)
     message['message'] = 'sent'
@@ -953,6 +960,46 @@ def parse_out_jobs(log, engine='mr', with_state=False):
 
   return ret
 
+def parse_out_queries(log, engine=None, with_state=False):
+  """
+  Ideally, Hive would tell us what jobs it has run directly from the Thrift interface.
+
+  with_state: If True, will return a list of dict items with 'job_id', 'started', 'finished'
+  """
+  ret = []
+
+  if engine.lower() == 'tez':
+    start_pattern = TEZ_QUERY_RE
+  else:
+    return ret
+
+  for match in start_pattern.finditer(log):
+    job_id = match.group(1)
+
+    if with_state:
+      if job_id not in list(job['job_id'] for job in ret):
+        ret.append({'job_id': job_id, 'started': False, 'finished': False})
+      start_pattern = 'Executing command(queryId=%s' % job_id
+      end_pattern = 'Completed executing command(queryId=%s' % job_id
+
+      if start_pattern in log:
+        job = next((job for job in ret if job['job_id'] == job_id), None)
+        if job is not None:
+          job['started'] = True
+        else:
+          ret.append({'job_id': job_id, 'started': True, 'finished': False})
+
+      if end_pattern in log:
+        job = next((job for job in ret if job['job_id'] == job_id), None)
+        if job is not None:
+          job['finished'] = True
+        else:
+          ret.append({'job_id': job_id, 'started': True, 'finished': True})
+    else:
+      if job_id not in ret:
+        ret.append(job_id)
+
+  return ret
 
 def _copy_prefix(prefix, base_dict):
   """Copy keys starting with ``prefix``"""

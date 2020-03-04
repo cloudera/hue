@@ -21,13 +21,12 @@ from builtins import object
 import json
 import logging
 import re
+import sys
 import time
 
-from mock import patch, Mock
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true
 
-from django.contrib.auth.models import User
 from django.urls import reverse
 from TCLIService.ttypes import TStatusCode, TProtocolVersion, TOperationType
 
@@ -36,15 +35,19 @@ from desktop.conf import has_connectors
 from desktop.lib.i18n import smart_str
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
+from beeswax.server import dbms
+from beeswax.test_base import BeeswaxSampleProvider, get_query_server_config, is_hive_on_spark
 from hadoop.pseudo_hdfs4 import is_live_cluster
+from useradmin.models import User
 
 from notebook.api import _save_notebook
 from notebook.connectors.hiveserver2 import HS2Api
 from notebook.models import make_notebook, Notebook
 
-from beeswax.server import dbms
-from beeswax.test_base import BeeswaxSampleProvider, get_query_server_config, is_hive_on_spark
-
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
+else:
+  from mock import patch, Mock
 
 LOG = logging.getLogger(__name__)
 

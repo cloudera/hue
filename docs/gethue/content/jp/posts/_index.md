@@ -1,0 +1,6 @@
++++
+aliases = [
+    "/posts/",
+    "/blog/"
+]
++++

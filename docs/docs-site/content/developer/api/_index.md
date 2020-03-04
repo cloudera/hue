@@ -1,11 +1,118 @@
 ---
-title: "APIs"
+title: "API"
 date: 2019-03-13T18:28:09-07:00
 draft: false
-weight: 6
+weight: 5
 ---
 
-Hue can be accessed directly via a Django Python Shell or by its REST API.
+Hue can be accessed directly via a Python Shell or by its REST API. Some components of Hue like the SQL parsers can also be imported independently.
+
+
+## SQL autocompletion
+
+The parser is running on the client side and comes with just a few megabytes of JavaScript that are cached by the browser. This provides a very reactive experience to the end user and allows to import it as a module.
+
+While the dynamic content like the list of tables, columns is obviously fetched via [remote endpoints](#sql-querying), all the SQL knowledge of the statements is available.
+
+See the currently shipped [SQL dialects](https://github.com/cloudera/hue/tree/master/desktop/core/src/desktop/js/parse/sql).
+
+### npm package
+
+What if I only want to use only the autocomplete as a JavaScript module in my own app?
+
+Importing the Parser can be simply done as a npm package. Here is an example on how to use the parser in a node.js app:
+
+    cd tools/parser/hue_dep
+    npm install
+    npm run webpack
+    npm run app
+
+In `package.json` there’s a dependency on Hue:
+
+    "dependencies": {
+      "hue": "file:../../.."
+    },
+
+Note that it can also be a GitHub link, e.g. "hue": "git://github.com/cloudera/hue.git” but it takes a bit longer to do `npm install`.
+
+Now let's import the Hive parser and run it on an SQL statement:
+
+    import sqlAutocompleteParser from 'hue/desktop/core/src/desktop/js/parse/sql/hive/hiveAutocompleteParser';
+
+    const beforeCursor = 'SELECT col1, col2, tbl2.col3 FROM tbl; '; // Note extra space at end
+    const afterCursor = '';
+    const dialect = 'hive';
+    const debug = false;
+
+    console.log(
+      JSON.stringify(
+        sqlAutocompleteParser.parseSql(beforeCursor, afterCursor, dialect, debug),
+        null,
+        2
+      )
+    );
+
+Which then will output keywords suggestions and all the known locations:
+
+    { locations:
+      [ { type: 'statement', location: [Object] },
+        { type: 'statementType',
+          location: [Object],
+          identifier: 'SELECT' },
+        { type: 'selectList', missing: false, location: [Object] },
+        { type: 'column',
+          location: [Object],
+          identifierChain: [Array],
+          qualified: false,
+          tables: [Array] },
+        { type: 'column',
+          location: [Object],
+          identifierChain: [Array],
+          qualified: false,
+          tables: [Array] },
+        { type: 'column',
+          location: [Object],
+          identifierChain: [Array],
+          qualified: false,
+          tables: [Array] },
+        { type: 'table', location: [Object], identifierChain: [Array] },
+        { type: 'whereClause', missing: true, location: [Object] },
+        { type: 'limitClause', missing: true, location: [Object] } ],
+      lowerCase: false,
+      suggestKeywords:
+      [ { value: 'ABORT', weight: -1 },
+        { value: 'ALTER', weight: -1 },
+        { value: 'ANALYZE TABLE', weight: -1 },
+        { value: 'CREATE', weight: -1 },
+        { value: 'DELETE', weight: -1 },
+        { value: 'DESCRIBE', weight: -1 },
+        { value: 'DROP', weight: -1 },
+        { value: 'EXPLAIN', weight: -1 },
+        { value: 'EXPORT', weight: -1 },
+        { value: 'FROM', weight: -1 },
+        { value: 'GRANT', weight: -1 },
+        { value: 'IMPORT', weight: -1 },
+        { value: 'INSERT', weight: -1 },
+        { value: 'LOAD', weight: -1 },
+        { value: 'MERGE', weight: -1 },
+        { value: 'MSCK', weight: -1 },
+        { value: 'RELOAD FUNCTION', weight: -1 },
+        { value: 'RESET', weight: -1 },
+        { value: 'REVOKE', weight: -1 },
+        { value: 'SELECT', weight: -1 },
+        { value: 'SET', weight: -1 },
+        { value: 'SHOW', weight: -1 },
+        { value: 'TRUNCATE', weight: -1 },
+        { value: 'UPDATE', weight: -1 },
+        { value: 'USE', weight: -1 },
+        { value: 'WITH', weight: -1 } ],
+      definitions: [] }
+
+### SQL scratchpad
+
+The lightweight SQL Editor also called "Quick Query" comes as a [Web component](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/js/ko/components/contextPopover/ko.quickQueryContext.js).
+
+!["Mini SQL Editor component"](https://cdn.gethue.com/uploads/2020/02/quick-query-component.jpg)
 
 
 ## REST
@@ -28,39 +135,34 @@ Once the request is successful then capture headers and cookies for subsequent r
 
     import requests
 
-    def login_djangosite():
     next_url = "/"
-    login_url = "http://localhost:8888/accounts/login?next=/"
+    login_url = "http://localhost:8888/accounts/login"
 
     session = requests.Session()
-    r = session.get(login_url)
-    form_data = dict(username="[your hue username]",password="[your hue password]",
-                      csrfmiddlewaretoken=session.cookies['csrftoken'],next=next_url)
-    r = session.post(login_url, data=form_data, cookies=dict(), headers=dict(Referer=login_url))
+    response = session.get(login_url)
 
-    # check if request executed successfully?
-    print r.status_code
+    form_data = {
+        'username': '[your Hue username]',
+        'password': '[your Hue password]',
+        'csrfmiddlewaretoken': session.cookies['csrftoken'],
+        'next': next_url
+    }
+    response = session.post(login_url, data=form_data, cookies={}, headers={'Referer': login_url})
+
+    print('Logged in successfully: %s %s' % (response.status_code == 200, response.status_code))
 
     cookies = session.cookies
     headers = session.headers
 
-    r=session.get('http://localhost:8888/metastore/databases/default/metadata',
-    cookies=session.cookies, headers=session.headers)
-    print r.status_code
-
-    # check metadata output
-    print r.text
-
+    response = session.get('http://localhost:8888/metastore/databases/default/metadata')
+    print(response.status_code)
+    print(response.text)
 
 ### Data Catalog
 
-The [metadata API](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata) is powering [Search and Tagging here](http://gethue.com/improved-sql-exploration-in-hue-4-3/) and the [Query Assistant with Navigator Optimizer Integration](http://gethue.com/hue-4-sql-editor-improvements/).
+The [metadata API](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata) is powering the external [Catalog integrations](/user/browsing/#data-catalogs).
 
-The backends is pluggable by providing alternative [client interfaces](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata/catalog):
-
-* Cloudera Navigator (default)
-* Apache Atlas ([HUE-8749](https://issues.cloudera.org/browse/HUE-8749))
-* Dummy (skeleton for integrating new catalogs)
+Additional catalogs can be integrated via some [connectors](/developer/connectors/#data-catalog).
 
 #### Searching for entities
 
@@ -73,8 +175,7 @@ The backends is pluggable by providing alternative [client interfaces](https://g
         console.log(ko.mapping.toJSON(data));
     });
 
-
-#### Searching for entities with the dummy backend
+Searching for entities with the dummy backend:
 
     $.post("/metadata/api/catalog/search_entities_interactive/", {
         query_s: ko.mapping.toJSON("*sample"),
@@ -94,7 +195,7 @@ The backends is pluggable by providing alternative [client interfaces](https://g
         console.log(ko.mapping.toJSON(data));
     });
 
-#### Adding/updating a comment with the dummy backend
+Adding/updating a comment with the dummy backend:
 
     $.post("/metadata/api/catalog/update_properties/", {
         id: "22",
@@ -133,7 +234,7 @@ The backends is pluggable by providing alternative [client interfaces](https://g
     });
 
 
-#### Getting the model mapping of custom metadata
+#### Getting the model mapping
 
     $.get("/metadata/api/catalog/models/properties/mappings/", function(data) {
       console.log(ko.mapping.toJSON(data));
@@ -177,7 +278,7 @@ The backends is pluggable by providing alternative [client interfaces](https://g
     });
 
 
-#### Map a namespace property to a class entity
+#### Map a namespace property to a class
 
     $.post("/metadata/api/catalog/namespace/property/map/", {
       "class": "hv_view",
@@ -189,13 +290,68 @@ The backends is pluggable by providing alternative [client interfaces](https://g
       console.log(ko.mapping.toJSON(data));
     });
 
+### SQL Querying
+
+#### Listing Databases
+
+    $.post("/notebook/api/autocomplete/", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+#### Listing Tables
+
+    $.post("/notebook/api/autocomplete/<DB>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+#### Table details and Columns
+
+    $.post("/notebook/api/autocomplete/<DB>/<TABLE>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+#### Column details
+
+    $.post("/notebook/api/autocomplete/<DB>/<TABLE>/<COL1>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+For nested columns:
+
+    $.post("/notebook/api/autocomplete/<DB>/<TABLE>/<COL1>/<COL2>", {
+      "snippet": ko.mapping.toJSON({
+          type: "hive"
+      })
+    }, function(data) {
+      console.log(ko.mapping.toJSON(data));
+    });
+
+### SQL Risk Optimization
+### Data Browsing
+### Workflow scheduling
 
 ## Python
 
 * [Hue API: Execute some builtin or shell commands](http://gethue.com/hue-api-execute-some-builtin-commands/).
 * [How to manage the Hue database with the shell](http://gethue.com/how-to-manage-the-hue-database-with-the-shell/).
 
-### How to count documents of a user
+### Count the documents of a user
 
 On the command line:
 
@@ -269,3 +425,201 @@ Then use the Python code to access a certain user information:
       u'desktop.DocumentPermission_groups': 0L,
       u'desktop.DocumentPermission_users': 0L,
       u'desktop.Document_tags': 18524L})
+
+
+### Creating an App
+
+Building a brand new application is more work but is ideal for creating a custom solution.
+
+**Note** It is now more recommended to integrate external services (e.g. integrate a new SQL Datatase with the Editor, add a new visualization...) to the core Hue APIs instead of building brand new application. This page gives good content in both cases. Feel free to contact the community for advice.
+
+#### Overview
+
+Hue leverages the browser to provide users with an environment for exploring
+and analyzing data.
+
+Build on top of the Hue SDK to enable your application to interact efficiently with
+Hadoop and the other Hue services.
+
+By building on top of Hue SDK, you get, out of the box:
+
++ Configuration Management
++ Hadoop interoperability
++ Supervision of subprocesses
++ A collaborative UI
++ Basic user administration and authorization
+
+This document will orient you with the general structure of Hue
+and will walk you through adding a new application using the SDK.
+
+#### Creating the app
+
+Run "create_desktop_app" to Set up a New Source Tree
+
+    ./build/env/bin/hue create_desktop_app calculator
+    find calculator -type f
+    calculator/setup.py                                 # distutils setup file
+    calculator/src/calculator/__init__.py               # main src module
+    calculator/src/calculator/forms.py
+    calculator/src/calculator/models.py
+    calculator/src/calculator/settings.py               # app metadata setting
+    calculator/src/calculator/urls.py                   # url mapping
+    calculator/src/calculator/views.py                  # app business logic
+    calculator/src/calculator/templates/index.mako
+    calculator/src/calculator/templates/shared_components.mako
+
+    # Static resources
+    calculator/src/static/calculator/art/calculator.png # logo
+    calculator/src/static/calculator/css/calculator.css
+    calculator/src/static/calculator/js/calculator.js
+
+
+<div class="note">
+  Some apps are blacklisted on certain versions of CDH (such as the 'Spark' app) due to
+  certain incompatibilities, which prevent them loading from in Hue.
+  Check the hue.ini 'app_blacklist' parameter for details.
+</div>
+
+#### Install SDK Application
+
+As you'll discover if you look at calculator's <tt>setup.py</tt>,
+Hue uses a distutils <tt>entrypoint</tt> to
+register applications.  By installing the calculator
+package into Hue's python virtual environment,
+you'll install a new app.  The "app_reg.py" tool manages
+the applications that are installed. Note that in the following example, the value after the
+"--install" option is the path to the root directory of the application you want to install. In this
+example, it is a relative path to "/Users/philip/src/hue/calculator".
+
+        ./build/env/bin/python tools/app_reg/app_reg.py --install calculator --relative-paths
+        === Installing app at calculator
+        Updating registry with calculator (version 0.1)
+        --- Making egg-info for calculator
+
+
+<div class="note">
+  If you'd like to customize the build process, you can modify (or even complete
+  rewrite) your own `Makefile`, as long as it supports the set of required
+  targets. Please see `Makefile.sdk` for the required targets and their
+  semantics.
+</div>
+
+Congrats, you've added a new app!
+
+<div class="note">
+  What was that all about?
+  <a href="http://pypi.python.org/pypi/virtualenv">virtualenv</a>
+  is a way to isolate python environments in your system, and isolate
+  incompatible versions of dependencies.  Hue uses the system python, and
+  that's about all.  It installs its own versions of dependencies.
+
+  <a href="http://peak.telecommunity.com/DevCenter/PkgResources#entry-points">Entry Points</a>
+  are a way for packages to optionally hook up with other packages.
+</div>
+
+You can now browse the new application.
+
+    # If you haven't killed the old process, do so now.
+    build/env/bin/hue runserver
+
+And then visit <a href="http://localhost:8000">http://localhost:8000/</a> to check it out!
+You should see the app in the left menu.
+
+#### Customizing
+
+Now that your app has been installed, you'll want to customize it.
+As you may have guessed, we're going to build a small calculator
+application.  Edit `calculator/src/calculator/templates/index.mako`
+to include a simple form and a Knockout viewmodel:
+
+
+    <%!from desktop.views import commonheader, commonfooter %>
+    <%namespace name="shared" file="shared_components.mako" />
+
+    %if not is_embeddable:
+    ${commonheader("Calculator", "calculator", user, "100px") | n,unicode}
+    %endif
+
+    ## Main body
+    <div class="container-fluid calculator-components">
+      <div class="row">
+        <div class="span6 offset3 margin-top-30 text-center">
+          <form class="form-inline">
+            <input type="text" class="input-mini margin-right-10" placeholder="A" data-bind="value: a">
+            <!-- ko foreach: operations -->
+            <label class="radio margin-left-5">
+              <input type="radio" name="op" data-bind="checkedValue: $data, checked: $parent.chosenOperation" /><span data-bind="text: $data"></span>
+            </label>
+            <!-- /ko -->
+            <input type="text" class="input-mini margin-left-10" placeholder="B" data-bind="value: b">
+            <button class="btn" data-bind="click: calculate">Calculate</button>
+          </form>
+
+          <h2 data-bind="visible: result() !== null">The result is <strong data-bind="text: result"></strong></h2>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function() {
+        var CalculatorViewModel = function () {
+          var self = this;
+
+          self.operations = ko.observableArray(['+', '-', '*', '/']);
+
+          self.a = ko.observable();
+          self.b = ko.observable();
+          self.chosenOperation = ko.observable('+');
+          self.result = ko.observable(null);
+
+          self.calculate = function () {
+            var a = parseFloat(self.a());
+            var b = parseFloat(self.b());
+            var result = null;
+            switch (self.chosenOperation()) {
+              case '+':
+                result = a + b;
+                break;
+              case '-':
+                result = a - b;
+                break;
+              case '*':
+                result = a * b;
+                break;
+              case '/':
+                result = a / b;
+            }
+            self.result(result);
+          }
+        };
+        $(document).ready(function () {
+          ko.applyBindings(new CalculatorViewModel(), $('.calculator-components')[0]);
+        });
+      })();
+    </script>
+
+    %if not is_embeddable:
+    ${commonfooter(messages) | n,unicode}
+    %endif
+
+The template language here is <a href="http://www.makotemplates.org/docs/">Mako</a>,
+which is flexible and powerful.  If you use the "`.html`" extension, Hue
+will render your page using
+<a href="https://docs.djangoproject.com/en/1.11/#the-template-layer">Django templates</a>
+instead.
+
+Note that we use Knockout.js to do the heavy lifting of this app.
+
+Let's edit `calculator/src/calculator/views.py` to simply render the page:
+
+    #!/usr/bin/env python
+
+    from desktop.lib.django_util import render
+
+    def index(request):
+      return render('index.mako', request, {
+        'is_embeddable': request.GET.get('is_embeddable', False),
+      })
+
+
+You can now go and try the calculator.

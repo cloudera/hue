@@ -1,0 +1,5 @@
+{{ partial "header.html" . }}
+
+{{ partial (printf "home.%s.html" .Lang) . }}
+
+{{ partial "footer.html" . }}

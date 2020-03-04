@@ -312,9 +312,9 @@ class CSVFormat(FileFormat):
   _extensions = ["csv", "tsv"]
 
   def __init__(self, delimiter=',', line_terminator='\n', quote_char='"', has_header=False, sample="", fields=None):
-    self._delimiter = delimiter
-    self._line_terminator = line_terminator
-    self._quote_char = quote_char
+    self._delimiter = delimiter if isinstance(delimiter, str) else delimiter.decode('utf-8')
+    self._line_terminator = line_terminator if isinstance(line_terminator, str) else line_terminator.decode('utf-8')
+    self._quote_char = quote_char if isinstance(quote_char, str) else quote_char.decode('utf-8')
     self._has_header = has_header
 
     # sniffer insists on \r\n even when \n. This is safer and good enough for a preview
@@ -346,7 +346,7 @@ class CSVFormat(FileFormat):
   @classmethod
   def _guess_dialect(cls, sample):
     sniffer = csv.Sniffer()
-    dialect = sniffer.sniff(sample)
+    dialect = sniffer.sniff(sample if isinstance(sample, str) else sample.decode('utf-8'))
     has_header = cls._hasHeader(sniffer, sample, dialect)
     return dialect, has_header
 

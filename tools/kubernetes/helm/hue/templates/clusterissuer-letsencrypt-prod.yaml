@@ -1,8 +1,8 @@
 {{- if and .Values.ingress.create (eq .Values.ingress.type "nginx-ssl") -}}
-apiVersion: certmanager.k8s.io/v1alpha1
+apiVersion: cert-manager.io/v1alpha2
 kind: ClusterIssuer
 metadata:
-  name: letsencrypt-prod
+  name: letsencrypt-hue-prod
 spec:
   acme:
     # The ACME server URL
@@ -11,7 +11,10 @@ spec:
     email: {{ .Values.ingress.email }}
     # Name of a secret used to store the ACME account private key
     privateKeySecretRef:
-      name: letsencrypt-prod
+      name: letsencrypt-hue-prod
     # Enable the HTTP-01 challenge provider
-    http01: {}
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
 {{- end -}}

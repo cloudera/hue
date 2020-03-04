@@ -17,44 +17,46 @@ from __future__ import absolute_import
 
 import logging
 
-
 from django.utils.translation import ugettext_lazy as _, ugettext as _t
 
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_password_from_script
-from hadoop.core_site import get_adls_client_id, get_adls_authentication_code, get_adls_refresh_url
+from desktop.lib.idbroker import conf as conf_idbroker
+
+from hadoop import core_site
 
 LOG = logging.getLogger(__name__)
 
 PERMISSION_ACTION_ABFS = "abfs_access"
 PERMISSION_ACTION_ADLS = "adls_access"
 REFRESH_URL = 'https://login.microsoftonline.com/<tenant_id>/oauth2/<version>token'
-
+META_DATA_URL = 'http://169.254.169.254/metadata/instance'
+AZURE_METADATA = None
 
 def get_default_client_id():
   """
   Attempt to set AWS client id from script, else core-site, else None
   """
   client_id_script = AZURE_ACCOUNTS['default'].CLIENT_ID_SCRIPT.get()
-  return client_id_script or get_adls_client_id()
+  return client_id_script or core_site.get_adls_client_id() or core_site.get_azure_client_id()
 
 def get_default_secret_key():
   """
   Attempt to set AWS secret key from script, else core-site, else None
   """
   client_secret_script = AZURE_ACCOUNTS['default'].CLIENT_SECRET_SCRIPT.get()
-  return client_secret_script or get_adls_authentication_code()
+  return client_secret_script or core_site.get_adls_authentication_code() or core_site.get_azure_client_secret()
 
 def get_default_tenant_id():
   """
   Attempt to set AWS tenant id from script, else core-site, else None
   """
-  tenant_id_script = AZURE_ACCOUNTS['default'].TENANT_ID_SCRIPT.get()
-  return tenant_id_script or get_adls_refresh_url()
+  return AZURE_ACCOUNTS['default'].TENANT_ID_SCRIPT.get()
 
-def get_default_refresh_url(version):
-  refresh_url = REFRESH_URL.replace('<tenant_id>', AZURE_ACCOUNTS['default'].TENANT_ID.get()).replace('<version>', version + '/' if version else '')
-  refresh_url = refresh_url if refresh_url else get_adls_refresh_url()
-  return refresh_url or get_adls_refresh_url()
+def get_refresh_url(conf, version):
+  refresh_url = core_site.get_adls_refresh_url() or core_site.get_azure_client_endpoint()
+  if not refresh_url:
+    refresh_url = REFRESH_URL.replace('<tenant_id>', conf.TENANT_ID.get()).replace('<version>', version + '/' if version else '')
+  return refresh_url
 
 def get_default_region():
   return ""
@@ -144,10 +146,10 @@ ABFS_CLUSTERS = UnspecifiedConfigSection(
 )
 
 def is_adls_enabled():
-  return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() is not None and 'default' in list(ADLS_CLUSTERS.keys()) and ADLS_CLUSTERS['default'].get_raw())
+  return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() or (conf_idbroker.is_idbroker_enabled('azure') and has_azure_metadata())) and 'default' in list(ADLS_CLUSTERS.keys())
 
 def is_abfs_enabled():
-  return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() is not None and 'default' in list(ABFS_CLUSTERS.keys()) and ABFS_CLUSTERS['default'].get_raw())
+  return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() or (conf_idbroker.is_idbroker_enabled('azure') and has_azure_metadata())) and 'default' in list(ABFS_CLUSTERS.keys())
 
 def has_adls_access(user):
   from desktop.auth.backend import is_admin
@@ -157,14 +159,29 @@ def has_abfs_access(user):
   from desktop.auth.backend import is_admin
   return user.is_authenticated() and user.is_active and (is_admin(user) or user.has_hue_permission(action="abfs_access", app="filebrowser"))
 
+def azure_metadata():
+  global AZURE_METADATA
+  if AZURE_METADATA is None:
+    from desktop.lib.rest import http_client, resource
+    client = http_client.HttpClient(META_DATA_URL, logger=LOG)
+    root = resource.Resource(client)
+    try:
+      AZURE_METADATA = root.get('/compute', params={'api-version':'2019-06-04', 'format':'json'}, headers={'Metadata': 'true'})
+    except Exception as e:
+      AZURE_METADATA = False
+  return AZURE_METADATA
+
+def has_azure_metadata():
+  return azure_metadata() is not None
+
 def config_validator(user):
   res = []
 
-  import azure.client # Avoid cyclic loop
+  import desktop.lib.fsmanager # Avoid cyclic loop
 
   if is_adls_enabled() or is_abfs_enabled():
     try:
-      headers = azure.client.get_client('default')._getheaders()
+      headers = desktop.lib.fsmanager.get_client(name='default', fs='abfs')._getheaders()
       if not headers.get('Authorization'):
         raise ValueError('Failed to obtain Azure authorization token')
     except Exception as e:

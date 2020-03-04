@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.pollingCatalogEntriesList.js should render component 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;polling-catalog-entries-list&quot;, params: params }\\"><div>
+    <!-- ko hueSpinner: { spin: !catalogEntryExists(), inline: true } --><!-- /ko -->
+    <!-- ko if: catalogEntryExists --><!-- /ko -->
+  </div></div>"
+`;

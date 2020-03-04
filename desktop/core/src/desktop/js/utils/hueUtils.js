@@ -16,7 +16,7 @@
 
 import $ from 'jquery';
 
-const bootstrapRatios = {
+export const bootstrapRatios = {
   span3() {
     const windowWidth = $(window).width();
     if (windowWidth >= 1200) {
@@ -49,7 +49,7 @@ const bootstrapRatios = {
  * @param selectors
  * @return {default}
  */
-const text2Url = selectors => {
+export const text2Url = selectors => {
   let i = 0;
   const len = selectors.length;
 
@@ -83,20 +83,20 @@ const text2Url = selectors => {
  * @param value
  * @return {*|jQuery}
  */
-const htmlEncode = value => {
+export const htmlEncode = value => {
   return $('<div/>')
     .text(value)
     .html();
 };
 
-const html2text = value => {
+export const html2text = value => {
   return $('<div/>')
     .html(value)
     .text()
     .replace(/\u00A0/g, ' ');
 };
 
-const goFullScreen = () => {
+export const goFullScreen = () => {
   if (
     !document.fullscreenElement &&
     !document.mozFullScreenElement &&
@@ -115,7 +115,7 @@ const goFullScreen = () => {
   }
 };
 
-const exitFullScreen = () => {
+export const exitFullScreen = () => {
   if (
     document.fullscreenElement ||
     document.mozFullScreenElement ||
@@ -134,7 +134,7 @@ const exitFullScreen = () => {
   }
 };
 
-const changeURL = (newURL, params) => {
+export const changeURL = (newURL, params) => {
   let extraSearch = '';
   if (params) {
     const newSearchKeys = Object.keys(params);
@@ -166,11 +166,11 @@ const changeURL = (newURL, params) => {
   window.history.pushState(null, null, url);
 };
 
-const replaceURL = newURL => {
+export const replaceURL = newURL => {
   window.history.replaceState(null, null, newURL);
 };
 
-const changeURLParameter = (param, value) => {
+export const changeURLParameter = (param, value) => {
   let newSearch = '';
   if (window.location.getParameter(param, true) !== null) {
     newSearch += '?';
@@ -198,11 +198,11 @@ const changeURLParameter = (param, value) => {
   changeURL(window.location.pathname + newSearch);
 };
 
-const removeURLParameter = param => {
+export const removeURLParameter = param => {
   changeURLParameter(param, null);
 };
 
-const parseHivePseudoJson = pseudoJson => {
+export const parseHivePseudoJson = pseudoJson => {
   // Hive returns a pseudo-json with parameters, like
   // "{Lead Developer=John Foo, Lead Developer Email=jfoo@somewhere.com, date=2013-07-11 }"
   const parsedParams = {};
@@ -217,14 +217,14 @@ const parseHivePseudoJson = pseudoJson => {
   return parsedParams;
 };
 
-const isOverflowing = element => {
+export const isOverflowing = element => {
   if (element instanceof $) {
     element = element[0];
   }
   return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
 };
 
-const waitForRendered = (selector, condition, callback, timeout) => {
+export const waitForRendered = (selector, condition, callback, timeout) => {
   const $el = selector instanceof $ ? selector : $(selector);
   if (condition($el)) {
     callback($el);
@@ -237,7 +237,7 @@ const waitForRendered = (selector, condition, callback, timeout) => {
   }
 };
 
-const waitForObservable = (observable, callback) => {
+export const waitForObservable = (observable, callback) => {
   if (observable()) {
     callback(observable);
   } else {
@@ -250,7 +250,7 @@ const waitForObservable = (observable, callback) => {
   }
 };
 
-const waitForVariable = (variable, callback, timeout) => {
+export const waitForVariable = (variable, callback, timeout) => {
   if (variable) {
     callback(variable);
   } else {
@@ -260,7 +260,7 @@ const waitForVariable = (variable, callback, timeout) => {
   }
 };
 
-const scrollbarWidth = () => {
+export const scrollbarWidth = () => {
   const $parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo(
     'body'
   );
@@ -270,7 +270,7 @@ const scrollbarWidth = () => {
   return width;
 };
 
-const getSearchParameter = (search, name, returnNull) => {
+export const getSearchParameter = (search, name, returnNull) => {
   name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
   const regex = new RegExp('[\\?&]' + name + '=([^&#]*)'),
     results = regex.exec(search);
@@ -286,7 +286,7 @@ if (!window.location.getParameter) {
   };
 }
 
-const logError = error => {
+export const logError = error => {
   if (typeof window.console !== 'undefined' && typeof window.console.error !== 'undefined') {
     if (typeof error !== 'undefined') {
       console.error(error);
@@ -295,7 +295,7 @@ const logError = error => {
   }
 };
 
-const equalIgnoreCase = (a, b) => a && b && a.toLowerCase() === b.toLowerCase();
+export const equalIgnoreCase = (a, b) => a && b && a.toLowerCase() === b.toLowerCase();
 
 const deXSS = str => {
   if (typeof str !== 'undefined' && str !== null && typeof str === 'string') {
@@ -304,7 +304,7 @@ const deXSS = str => {
   return str;
 };
 
-const getStyleFromCSSClass = cssClass => {
+export const getStyleFromCSSClass = cssClass => {
   for (let i = 0; i < document.styleSheets.length; i++) {
     const cssClasses = document.styleSheets[i].rules || document.styleSheets[i].cssRules;
     for (let x = 0; x < cssClasses.length; x++) {
@@ -315,7 +315,7 @@ const getStyleFromCSSClass = cssClass => {
   }
 };
 
-const highlight = (text, searchTerm) => {
+export const highlight = (text, searchTerm) => {
   if (searchTerm === '' || text === '') {
     return text;
   }
@@ -343,7 +343,7 @@ const highlight = (text, searchTerm) => {
   return highLightedText;
 };
 
-const dfs = (node, callback) => {
+export const dfs = (node, callback) => {
   if (!node || typeof node !== 'object') {
     return;
   }
@@ -353,7 +353,7 @@ const dfs = (node, callback) => {
   });
 };
 
-const deleteAllEmptyStringKey = node => {
+export const deleteAllEmptyStringKey = node => {
   const fDeleteEmptyStringKey = function(node, key) {
     if (node[key] || typeof node[key] !== 'string') {
       return;
@@ -368,15 +368,16 @@ const s4 = () =>
     .toString(16)
     .substring(1);
 
-const UUID = () => s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+export const UUID = () =>
+  s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 
-const escapeOutput = str =>
+export const escapeOutput = str =>
   $('<span>')
     .text(str)
     .html()
     .trim();
 
-const getFileBrowseButton = (
+export const getFileBrowseButton = (
   inputElement,
   selectFolder,
   valueAccessor,
@@ -562,7 +563,7 @@ const stripHtml = html => {
   return tmp.textContent || tmp.innerText;
 };
 
-const stripHtmlFromFunctions = template => {
+export const stripHtmlFromFunctions = template => {
   // strips HTML from inside the functions
   let _tmpl = template;
   const _mustacheFunctions = _tmpl.match(/{{#(.[\s\S]*?){{\//g);
@@ -577,6 +578,13 @@ const stripHtmlFromFunctions = template => {
     });
   }
   return _tmpl;
+};
+
+export const sleep = async timeout => new Promise(resolve => setTimeout(resolve, timeout));
+
+export const defer = async callback => {
+  await sleep(0);
+  callback();
 };
 
 export default {

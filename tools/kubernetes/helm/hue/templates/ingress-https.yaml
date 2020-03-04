@@ -2,12 +2,21 @@
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: hue-ingress
+  name: hue
   annotations:
     kubernetes.io/ingress.class: nginx
-    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
-    certmanager.k8s.io/acme-challenge-type: http01
+    cert-manager.io/cluster-issuer: letsencrypt-hue-prod
+    cert-manager.io/acme-challenge-type: http01
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "hue-balancer"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+    {{ if .Values.ingress.hasAuth }}
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: basic-auth-hue
+    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
+    {{ end }}
 spec:
   rules:
   - host: {{ .Values.ingress.domain }}
@@ -20,5 +29,5 @@ spec:
   tls:
   - hosts:
     - {{ .Values.ingress.domain }}
-    secretName: letsencrypt-pro
+    secretName: letsencrypt-hue-prod-tls
 {{- end -}}

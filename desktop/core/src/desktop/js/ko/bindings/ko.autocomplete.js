@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import huePubSub from 'utils/huePubSub';
 
@@ -23,6 +23,12 @@ ko.bindingHandlers.autocomplete = {
   init: function(element, valueAccessor) {
     let options = valueAccessor();
     const $element = $(element);
+    const getMenuElement = () => {
+      if (typeof options.appendTo === 'string') {
+        return $(options.appendTo);
+      }
+      return options.appendTo;
+    };
 
     const delay = 400;
 
@@ -48,7 +54,6 @@ ko.bindingHandlers.autocomplete = {
         minLength: 0,
         limitWidthToInput: false,
         minWidth: 200,
-        disabled: true,
         delay: delay,
         search: function() {
           window.clearTimeout(spinThrottle);
@@ -82,7 +87,7 @@ ko.bindingHandlers.autocomplete = {
             $('<div>')
               .addClass('autocomplete-count')
               .text('(' + count + ')')
-              .appendTo($menu);
+              .appendTo(getMenuElement());
           }
         });
       };
@@ -236,16 +241,5 @@ ko.bindingHandlers.autocomplete = {
     }
 
     $element.hueAutocomplete(options);
-
-    const enableAutocomplete = function() {
-      if ($element.data('custom-hueAutocomplete')) {
-        $element.hueAutocomplete('option', 'disabled', false);
-        $element.off('click', enableAutocomplete);
-      } else {
-        window.setTimeout(enableAutocomplete, 200);
-      }
-    };
-    // IE 11 trick to prevent it from being shown on page refresh
-    $element.on('click', enableAutocomplete);
   }
 };

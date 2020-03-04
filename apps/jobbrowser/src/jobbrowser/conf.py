@@ -58,7 +58,14 @@ MAX_JOB_FETCH = Config(
 
 ENABLE_QUERY_BROWSER = Config(
   key="enable_query_browser",
-  help=_("Show the query section for listing and showing more troubleshooting information."),
+  help=_("Show the Impala query section for listing and showing more troubleshooting information."),
   type=coerce_bool,
   default=True
 )
+
+ENABLE_HIVE_QUERY_BROWSER = Config(
+  key="enable_hive_query_browser",
+  help=_("# Show the Hive query section for listing and showing more troubleshooting information."),
+  type=coerce_bool,
+  default=False
+) 

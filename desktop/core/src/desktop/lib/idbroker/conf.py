@@ -28,33 +28,34 @@ _CNF_CAB_ADDRESS_DT_PATH='fs.%s.ext.cab.dt.path' # dt
 _CNF_CAB_ADDRESS_PATH='fs.%s.ext.cab.path' # aws-cab
 _CNF_CAB_USERNAME='fs.%s.ext.cab.username' # when not using kerberos
 _CNF_CAB_PASSWORD='fs.%s.ext.cab.password'
-SUPPORTED_FS = ['s3a', 'azure', 'gs']
+SUPPORTED_FS = {'s3a': 's3a', 'adl': 'azure', 'abfs': 'azure', 'azure': 'azure', 'gs': 'gs'}
 
 def validate_fs(fs=None):
   if fs in SUPPORTED_FS:
-    return True
+    return SUPPORTED_FS[fs]
   else:
-    raise ValueError('Selected FS %s is not supported by Hue IDBroker client' % fs)
+    LOG.warn('Selected FS %s is not supported by Hue IDBroker client' % fs)
+    return None
 
 def get_cab_address(fs=None):
-  validate_fs(fs)
-  return get_conf().get(_CNF_CAB_ADDRESS % fs)
+  fs = validate_fs(fs)
+  return get_conf().get(_CNF_CAB_ADDRESS % fs) if fs else None
 
 def get_cab_dt_path(fs=None):
-  validate_fs(fs)
-  return get_conf().get(_CNF_CAB_ADDRESS_DT_PATH % fs)
+  fs = validate_fs(fs)
+  return get_conf().get(_CNF_CAB_ADDRESS_DT_PATH % fs) if fs else None
 
 def get_cab_path(fs=None):
-  validate_fs(fs)
-  return get_conf().get(_CNF_CAB_ADDRESS_PATH % fs)
+  fs = validate_fs(fs)
+  return get_conf().get(_CNF_CAB_ADDRESS_PATH % fs) if fs else None
 
 def get_cab_username(fs=None):
-  validate_fs(fs)
-  return get_conf().get(_CNF_CAB_USERNAME % fs)
+  fs = validate_fs(fs)
+  return get_conf().get(_CNF_CAB_USERNAME % fs) if fs else None
 
 def get_cab_password(fs=None):
-  validate_fs(fs)
-  return get_conf().get(_CNF_CAB_PASSWORD % fs)
+  fs = validate_fs(fs)
+  return get_conf().get(_CNF_CAB_PASSWORD % fs) if fs else None
 
 def is_idbroker_enabled(fs=None):
   return get_cab_address(fs) is not None

@@ -8,12 +8,6 @@ pre = "<b>1. </b>"
 
 ### Guide
 
-The following instructions describe how to install Hue and configure it to points to external services
-(e.g. Databases, Hadoop, S3, ...).
+The following instructions describe how to [install](/administrator/installation/) Hue and [configure it](/administrator/configuration/server/) to point to external services (e.g. Databases, Hadoop, S3, ...) via [connectors](/administrator/configuration/connectors/).
 
-Hue consists of a web service that runs on a special node in your cluster.
-Choose one node where you want to run Hue. For optimal performance, this should be one of the nodes
-within your cluster, though it can be a remote node as long as there are no
-overly restrictive firewalls.
-
-You can download the [Hue tarballs](https://github.com/cloudera/hue/releases) here.
+Then find more details about [administrating](/administrator/administration/reference/) the service.

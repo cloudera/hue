@@ -14,10 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 
 class SideBarViewModel {
   constructor(onePageViewModel, topNavViewModel) {
@@ -27,7 +28,7 @@ class SideBarViewModel {
 
     self.pocClusterMode = topNavViewModel.pocClusterMode;
 
-    huePubSub.subscribe('cluster.config.set.config', clusterConfig => {
+    const configUpdated = clusterConfig => {
       const items = [];
 
       if (clusterConfig && clusterConfig['app_config']) {
@@ -131,7 +132,10 @@ class SideBarViewModel {
       }
 
       self.items(items);
-    });
+    };
+
+    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, configUpdated);
+    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, configUpdated);
 
     self.leftNavVisible = topNavViewModel.leftNavVisible;
     self.onePageViewModel = onePageViewModel;

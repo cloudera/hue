@@ -25,8 +25,8 @@ from builtins import object
 import json
 import logging
 import os
-
 import re
+import stat
 import sys
 import tempfile
 
@@ -34,15 +34,14 @@ import urllib.request, urllib.error
 import urllib.parse
 
 from time import sleep, time
-
 from avro import schema, datafile, io
-
 from aws.s3.s3fs import S3FileSystemException
 from aws.s3.s3test_utils import get_test_bucket
+
 from azure.conf import is_abfs_enabled, is_adls_enabled
-from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.encoding import smart_str
+from django.utils.translation import ugettext_lazy as _
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises,\
@@ -51,20 +50,28 @@ from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group, add_permission, remove_from_group
 from desktop.lib.view_util import location_to_url
+from desktop.conf import is_oozie_enabled
 from hadoop import pseudo_hdfs4
 from hadoop.conf import UPLOAD_CHUNK_SIZE
+from hadoop.fs.webhdfs import WebHdfs
+from useradmin.models import User, Group
 
 from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE
 from filebrowser.lib.rwx import expand_mode
 from filebrowser.views import snappy_installed
-from desktop.conf import is_oozie_enabled
-
-
 
 if sys.version_info[0] > 2:
-  from urllib.parse import unquote as urllib_unquote
+  from urllib.parse import unquote as urllib_unquote, urlparse
+  open_file = open
 else:
   from urllib import unquote as urllib_unquote
+  from urlparse import urlparse
+  open_file = file
+
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
+else:
+  from mock import patch, Mock
 
 
 LOG = logging.getLogger(__name__)
@@ -84,6 +91,150 @@ def cleanup_file(cluster, path):
     # Don't let cleanup errors mask earlier failures
     LOG.exception('failed to cleanup %s' % path)
 
+
+class TestFileBrowser():
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test_filebrowser", groupname='test_filebrowser', recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="test_filebrowser")
+    grant_access(self.user.username, 'test_filebrowser', 'filebrowser')
+    add_to_group(self.user.username, 'test_filebrowser')
+
+  def test_listdir_paged(self):
+
+    with patch('desktop.middleware.fsmanager.get_filesystem') as get_filesystem:
+      with patch('filebrowser.views.snappy_installed') as snappy_installed:
+        snappy_installed.return_value = False
+        get_filesystem.return_value = Mock(
+          stats=Mock(
+            return_value=Mock(
+              isDir=True,
+              size=1024,
+              path=b'/',
+              mtime=None,
+              mode=stat.S_IFDIR
+            ),
+          ),
+          normpath=Mock(return_value='/'),
+          listdir_stats=Mock(
+            return_value=[]  # Add "Mock files here"
+          ),
+          superuser='hdfs',
+          supergroup='hdfs'
+        )
+
+        response = self.client.get('/filebrowser/view=')
+
+        assert_equal(200, response.status_code)
+        dir_listing = response.context[0]['files']
+        assert_equal(1, len(dir_listing))
+
+
+  def test_listdir_paged_with_non_ascii(self):
+    parent_dir = Mock(
+      isDir=True,
+      size=0,
+      path=u'/user/systest/test5/Tжейкоб/..',
+      mtime=1581717441.0,
+      mode=16877,
+      user=u'systest',
+      type=u'DIRECTORY',
+      to_json_dict=Mock(
+        return_value={'size': 0, 'group': u'supergroup', 'blockSize': 0, 'replication': 0, 'user': u'systest',
+                      'mtime': 1581717441.0, 'path': u'/user/systest/test5/T\u0436\u0435\u0439\u043a\u043e\u0431/..',
+                      'atime': 0.0, 'mode': 16877}
+      )
+    )
+    parent_dir.name = u'..'
+    self_dir = Mock(
+      isDir=True,
+      size=0,
+      path=u'/user/systest/test5/Tжейкоб',
+      mtime=1581717441.0,
+      mode=16877,
+      user=u'systest',
+      type=u'DIRECTORY',
+      to_json_dict=Mock(
+        return_value={'size': 0, 'group': u'supergroup', 'blockSize': 0, 'replication': 0, 'user': u'systest',
+                      'mtime': 1581717441.0, 'path': u'/user/systest/test5/T\u0436\u0435\u0439\u043a\u043e\u0431',
+                      'atime': 0.0, 'mode': 16877}
+      )
+    )
+    self_dir.name = u'Tжейкоб'
+    file_1 = Mock(
+      isDir=False,
+      size=9,
+      path=u'/user/systest/test5/Tжейкоб/file_1.txt',
+      mtime=1581670301.0, mode=33279,
+      user=u'systest',
+      type=u'FILE',
+      to_json_dict=Mock(
+        return_value={'size': 9, 'group': u'supergroup', 'blockSize': 134217728, 'replication': 1, 'user': u'systest',
+                      'mtime': 1581670301.0,
+                      'path': u'/user/systest/test5/T\u0436\u0435\u0439\u043a\u043e\u0431/file_1.txt',
+                      'atime': 1581708019.0, 'mode': 33279}
+      )
+    )
+    file_1.name = u'file_1.txt'
+    file_2 = Mock(
+      isDir=False,
+      size=0,
+      path=u'/user/systest/test5/Tжейкоб/文件_2.txt',
+      mtime=1581707672.0,
+      mode=33188,
+      user=u'systest',
+      type=u'FILE',
+      to_json_dict=Mock(
+        return_value={'size': 18, 'group': u'supergroup', 'blockSize': 134217728, 'replication': 1, 'user': u'systest',
+                      'mtime': 1581707672.0,
+                      'path': u'/user/systest/test5/T\u0436\u0435\u0439\u043a\u043e\u0431/\u6587\u4ef6_2.txt',
+                      'atime': 1581707672.0, 'mode': 33188}
+      )
+    )
+    file_2.name = u'文件_2.txt'
+    file_3 = Mock(
+      isDir=False,
+      size=0,
+      path=u'/user/systest/test5/Tжейкоб/employés_file.txt',
+      mtime=1581039792.0,
+      mode=33188,
+      user=u'systest',
+      type=u'FILE',
+      to_json_dict=Mock(
+        return_value={'size': 0, 'group': u'supergroup', 'blockSize': 134217728, 'replication': 1, 'user': u'systest',
+                      'mtime': 1581039792.0,
+                      'path': u'/user/systest/test5/T\u0436\u0435\u0439\u043a\u043e\u0431/employ\xe9s_file.txt',
+                      'atime': 1581708003.0, 'mode': 33188}
+      )
+    )
+    file_3.name = u'employés_file.txt'
+
+    with patch('desktop.middleware.fsmanager.get_filesystem') as get_filesystem:
+      with patch('filebrowser.views.snappy_installed') as snappy_installed:
+        snappy_installed.return_value = False
+        get_filesystem.return_value = Mock(
+          stats=Mock(
+            return_value=self_dir
+          ),
+          normpath=WebHdfs.norm_path,
+          is_sentry_managed=Mock(return_value=False),
+          listdir_stats=Mock(
+            return_value=[parent_dir, file_1, file_2, file_3]
+          ),
+          superuser='hdfs',
+          supergroup='hdfs'
+        )
+
+        response = self.client.get('/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1?pagesize=45&pagenum=1&filter=&sortby=name&descending=false&format=json&_=1581670214204')
+
+        assert_equal(200, response.status_code)
+        dir_listing = json.loads(response.content)['files']
+        assert_equal(5, len(dir_listing))
+        assert_true(b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5",' in response.content, response.content)
+        assert_true(b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1",' in response.content, response.content)
+        assert_true(b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1%2Ffile_1.txt",' in response.content, response.content)
+        assert_true(b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1%2F%E6%96%87%E4%BB%B6_2.txt",' in response.content, response.content)
+        assert_true(b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1%2Femploy%C3%A9s_file.txt",' in response.content, response.content)
 
 class TestFileBrowserWithHadoop(object):
   requires_hadoop = True
@@ -653,9 +804,7 @@ class TestFileBrowserWithHadoop(object):
     """)
 
     f = self.cluster.fs.open(prefix + '/test-view.avro', "w")
-    data_file_writer = datafile.DataFileWriter(f, io.DatumWriter(),
-                                                writers_schema=test_schema,
-                                                codec='deflate')
+    data_file_writer = datafile.DataFileWriter(f, io.DatumWriter(), writers_schema=test_schema, codec='deflate')
     dummy_datum = {
       'name': 'Test',
       'integer': 10,
@@ -915,7 +1064,7 @@ alert("XSS")
 
       # Just upload the current python file
       resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR, # GET param avoids infinite looping
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+                         dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(LOCAL_FILE)))
       response = json.loads(resp.content)
 
       assert_equal(0, response['status'], response)
@@ -925,12 +1074,12 @@ alert("XSS")
 
       f = self.cluster.fs.open(HDFS_FILE)
       actual = f.read(file_size)
-      expected = file(LOCAL_FILE).read()
+      expected = open_file(LOCAL_FILE).read()
       assert_equal(actual, expected, 'files do not match: %s != %s' % (len(actual), len(expected)))
 
       # Upload again and so fails because file already exits
       resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+                         dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(LOCAL_FILE)))
       response = json.loads(resp.content)
       assert_equal(-1, response['status'], response)
       assert_true('already exists' in response['data'], response)
@@ -940,7 +1089,7 @@ alert("XSS")
       grant_access("not_me", "not_me", "filebrowser")
       try:
         resp = not_me.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                           dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+                           dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(LOCAL_FILE)))
         response = json.loads(resp.content)
         assert_equal(-1, response['status'], response)
         assert_true('User not_me does not have permissions' in response['data'], response)
@@ -965,7 +1114,7 @@ alert("XSS")
 
       # Upload archive
       resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=file(ZIP_FILE)))
+                         dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(ZIP_FILE)))
       response = json.loads(resp.content)
       assert_equal(0, response['status'], response)
       assert_true(self.cluster.fs.exists(HDFS_ZIP_FILE))
@@ -982,22 +1131,22 @@ alert("XSS")
   def test_compress_hdfs_files(self):
     if not is_oozie_enabled():
       raise SkipTest
-    
+
     def make_and_test_dir(pre, test_direct):
       test_dir = pre + "/" + test_direct
       test_file = test_dir + '/test.txt'
       self.cluster.fs.mkdir(test_dir)
       self.cluster.fs.chown(test_dir, 'test')
-      self.cluster.fs.chmod(test_dir, 0700)
+      self.cluster.fs.chmod(test_dir, 0o700)
       for i in range(3):
         f = self.cluster.fs.open(test_file + "%s" %i, "w")
         f.close()
-        
+
       resp = self.c.post('/filebrowser/compress_files', {'upload_path': pre, 'files[]': [test_direct], 'archive_name': 'test_compress.zip'})
       response = json.loads(resp.content)
       assert_equal(0, response['status'], response)
       assert_true('handle' in response and response['handle']['id'], response)
-      responseid = '"' + response['handle']['id'] + '"' 
+      responseid = '"' + response['handle']['id'] + '"'
       timeout_time = time() + 25
       end_time = time()
       while timeout_time > end_time:
@@ -1005,16 +1154,16 @@ alert("XSS")
         response2 = json.loads(resp2.content)
         if response2['app']['status'] != 'RUNNING':
           assert_equal(response2['app']['status'] , 'SUCCEEDED', response2)
-          break 
+          break
         sleep(3)
         end_time = time()
       assert_greater(timeout_time, end_time, response)
-        
-        
+
+
     ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(True)
     prefix = self.cluster.fs_prefix + '/test_compress_files'
     self.cluster.fs.mkdir(prefix)
-    
+
     try:
       make_and_test_dir(prefix, 'testdir')
       make_and_test_dir(prefix, 'test dir1')
@@ -1023,7 +1172,7 @@ alert("XSS")
     finally:
       ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(False)
       cleanup_tree(self.cluster, prefix)
-      
+
 
   def test_extract_tgz(self):
     ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(True)
@@ -1042,7 +1191,7 @@ alert("XSS")
     try:
       # Upload archive
       resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=file(TGZ_FILE)))
+                         dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(TGZ_FILE)))
       response = json.loads(resp.content)
       assert_equal(0, response['status'], response)
       assert_true(self.cluster.fs.exists(HDFS_TGZ_FILE))
@@ -1070,7 +1219,7 @@ alert("XSS")
     try:
       # Upload archive
       resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=file(BZ2_FILE)))
+                         dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(BZ2_FILE)))
       response = json.loads(resp.content)
       assert_equal(0, response['status'], response)
       assert_true(self.cluster.fs.exists(HDFS_BZ2_FILE))
@@ -1243,10 +1392,12 @@ class TestS3AccessPermissions(object):
       assert_equal(200, response.status_code)
     finally:
       remove_from_group(self.user.username, 'has_s3')
-      
+
 class TestABFSAccessPermissions(object):
 
   def setUp(self):
+    if not is_abfs_enabled():
+      raise SkipTest
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     grant_access('test', 'test', 'filebrowser')
     add_to_group('test')
@@ -1254,8 +1405,6 @@ class TestABFSAccessPermissions(object):
     self.user = User.objects.get(username="test")
 
   def test_no_default_permissions(self):
-    if not is_abfs_enabled():
-      raise SkipTest
     response = self.client.get('/filebrowser/view=ABFS://')
     assert_equal(500, response.status_code)
 
@@ -1266,8 +1415,6 @@ class TestABFSAccessPermissions(object):
 #       assert_raises(S3FileSystemException, self.client.post, '/filebrowser/upload/file?dest=%s' % DEST_DIR, dict(dest=DEST_DIR, hdfs_file=file(LOCAL_FILE)))
 
   def test_has_default_permissions(self):
-    if not is_abfs_enabled():
-      raise SkipTest
     add_permission(self.user.username, 'has_abfs', permname='abfs_access', appname='filebrowser')
 
     try:
@@ -1275,10 +1422,12 @@ class TestABFSAccessPermissions(object):
       assert_equal(200, response.status_code)
     finally:
       remove_from_group(self.user.username, 'has_abfs')
-      
+
 class TestADLSAccessPermissions(object):
 
   def setUp(self):
+    if not is_adls_enabled():
+      raise SkipTest
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     grant_access('test', 'test', 'filebrowser')
     add_to_group('test')
@@ -1286,11 +1435,9 @@ class TestADLSAccessPermissions(object):
     self.user = User.objects.get(username="test")
 
   def test_no_default_permissions(self):
-    if not is_adls_enabled():
-      raise SkipTest
     response = self.client.get('/filebrowser/view=ADL://')
     assert_equal(500, response.status_code)
-    
+
     response = self.client.get('/filebrowser/view=ADL://hue_adls_testing')
     assert_equal(500, response.status_code)
 
@@ -1313,8 +1460,6 @@ class TestADLSAccessPermissions(object):
 #       assert_raises(S3FileSystemException, self.client.post, '/filebrowser/upload/file?dest=%s' % DEST_DIR, dict(dest=DEST_DIR, hdfs_file=file(LOCAL_FILE)))
 
   def test_has_default_permissions(self):
-    if not is_adls_enabled():
-      raise SkipTest
     add_permission(self.user.username, 'has_adls', permname='adls_access', appname='filebrowser')
 
     try:

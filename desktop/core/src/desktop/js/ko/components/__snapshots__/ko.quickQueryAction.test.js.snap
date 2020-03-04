@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.quickQueryAction.js should render component 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;quick-query-action&quot;, params: params }\\"><div style=\\"display: inline-block; margin-left: 20px; margin-top: 5px;\\">
+  <button class=\\"btn btn-mini disable-feedback\\" data-bind=\\"click: showQuickQuery\\">
+    <i class=\\"fa fa-play fa-fw\\"></i> Quick Query
+  </button>
+</div></div>"
+`;

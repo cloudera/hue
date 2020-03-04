@@ -15,7 +15,8 @@
 // limitations under the License.
 
 import 'utils/publicPath';
-import '@babel/polyfill';
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 import _ from 'lodash';
 import $ from 'jquery/jquery.common';
 import 'ext/bootstrap.2.3.2.min';
@@ -71,6 +72,7 @@ import SqlAutocompleter from 'sql/sqlAutocompleter';
 import sqlStatementsParser from 'parse/sqlStatementsParser'; // In search.ko and notebook.ko
 import HueFileEntry from 'doc/hueFileEntry';
 import HueDocument from 'doc/hueDocument';
+import { REFRESH_CONFIG_EVENT } from 'utils/hueConfig';
 
 // TODO: Migrate away
 window._ = _;
@@ -115,6 +117,8 @@ window.sqlUtils = sqlUtils;
 window.sqlWorkerHandler = sqlWorkerHandler;
 
 $(document).ready(() => {
+  huePubSub.publish(REFRESH_CONFIG_EVENT); // Prefetch the config early
+
   const onePageViewModel = new OnePageViewModel();
   ko.applyBindings(onePageViewModel, $('.page-content')[0]);
 
@@ -135,8 +139,6 @@ $(document).ready(() => {
     ko.applyBindings(sidebarViewModel, $('.hue-sidebar-container')[0]);
   }
 
-  huePubSub.publish('cluster.config.get.config');
-
   $(document).on('hideHistoryModal', e => {
     $('#clearNotificationHistoryModal').modal('hide');
   });
@@ -150,7 +152,7 @@ $(document).ready(() => {
       },
       resp => {
         if (resp.history_uuid) {
-          huePubSub.publish('open.editor.query', resp.history_uuid);
+          huePubSub.publish('open.editor.query', resp);
         } else if (resp.message) {
           $(document).trigger('error', resp.message);
         }

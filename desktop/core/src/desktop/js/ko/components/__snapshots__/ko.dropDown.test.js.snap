@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.dropDown.js should render component 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;hue-drop-down&quot;, params: params }\\"><a class=\\"inactive-action hue-drop-down-active\\" href=\\"javascript:void(0)\\" data-bind=\\"toggle: dropDownVisible, css: { 'blue': dropDownVisible }\\">
+    <!-- ko if: icon --><!-- /ko -->
+    <!-- ko if: !noLabel && value --><!-- /ko -->
+    <i class=\\"fa fa-caret-down\\"></i>
+  </a><input class=\\"hue-drop-down-input\\" type=\\"text\\" data-bind=\\"textInput: filter, attr: { 'placeHolder': inputPlaceHolder }, visible: dropDownVisible, style: { color: filterEdited() ? '#000' : '#AAA', 'min-height': '22px', 'margin-left': '10px' }\\" style=\\"display: none; color: rgb(170, 170, 170); min-height: 22px; margin-left: 10px;\\"><i class=\\"fa fa-caret-down\\"></i><div class=\\"hue-drop-down-container\\" data-bind=\\"css: { 'open' : dropDownVisible, 'hue-drop-down-fixed': fixedPosition, 'hue-drop-down-container-searchable': searchable }, dropDownKeyUp: { onEsc: onEsc, onEnter: onEnter, dropDownVisible: dropDownVisible }\\">
+    <div style=\\"overflow-y: auto; display: none;\\" class=\\"dropdown-menu\\" data-bind=\\"visible: filteredEntries().length > 0\\">
+      <!-- ko if: foreachVisible --><!-- /ko -->
+      <!-- ko ifnot: foreachVisible -->
+      <ul class=\\"hue-inner-drop-down\\" data-bind=\\"foreach: filteredEntries\\"></ul>
+      <!-- /ko -->
+    </div>
+  </div></div>"
+`;

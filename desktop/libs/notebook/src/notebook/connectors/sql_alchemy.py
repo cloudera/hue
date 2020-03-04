@@ -69,11 +69,11 @@ from notebook.connectors.base import Api, QueryError, QueryExpired, _get_snippet
 from notebook.models import escape_rows
 
 if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
   from urllib.parse import quote_plus as urllib_quote_plus
   from past.builtins import long
 else:
   from urllib import quote_plus as urllib_quote_plus
+
 
 CONNECTION_CACHE = {}
 LOG = logging.getLogger(__name__)
@@ -89,6 +89,8 @@ def query_error_handler(func):
         raise AuthenticationRequired(message=message)
       else:
         raise e
+    except AuthenticationRequired:
+      raise
     except Exception as e:
       message = force_unicode(e)
       if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
@@ -104,16 +106,24 @@ class SqlAlchemyApi(Api):
   def __init__(self, user, interpreter):
     self.user = user
     self.options = interpreter['options']
-    self.backticks = '"' if re.match('^(postgresql://|awsathena)', self.options.get('url', '')) else '`'
+    self.backticks = '"' if re.match('^(postgresql://|awsathena|elasticsearch)', self.options.get('url', '')) else '`'
 
   def _create_engine(self):
     if '${' in self.options['url']: # URL parameters substitution
-      vars = {'user': self.user.username}
-      for _prop in self.options['session']['properties']:
-        if _prop['name'] == 'user':
-          vars['USER'] = _prop['value']
-        if _prop['name'] == 'password':
-          vars['PASSWORD'] = _prop['value']
+      auth_provided=False
+      vars = {'USER': self.user.username}
+      if 'session' in self.options:
+        for _prop in self.options['session']['properties']:
+          if _prop['name'] == 'user':
+            vars['USER'] = _prop['value']
+            auth_provided = True
+          if _prop['name'] == 'password':
+            vars['PASSWORD'] = _prop['value']
+            auth_provided = True
+
+      if not auth_provided:
+        raise AuthenticationRequired(message='Missing username and/or password')
+
       raw_url = Template(self.options['url'])
       url = raw_url.safe_substitute(**vars)
     else:
@@ -131,13 +141,24 @@ class SqlAlchemyApi(Api):
 
     return create_engine(url, **options)
 
+  def _get_session(self, notebook, snippet):
+    for session in notebook['sessions']:
+      if session['type'] == snippet['type']:
+        return session
+
+    return None
+
   @query_error_handler
   def execute(self, notebook, snippet):
     guid = uuid.uuid4().hex
 
+    session = self._get_session(notebook, snippet)
+    if not session is None:
+      self.options['session'] = session
     engine = self._create_engine()
     connection = engine.connect()
-    result = connection.execution_options(stream_results=True).execute(snippet['statement'])
+
+    result = connection.execute(snippet['statement'])
 
     cache = {
       'connection': connection,
@@ -146,17 +167,17 @@ class SqlAlchemyApi(Api):
           'name': col[0] if (type(col) is tuple or type(col) is dict) else col.name if hasattr(col, 'name') else col,
           'type': 'STRING_TYPE',
           'comment': ''
-        } for col in result.cursor.description]
+        } for col in result.cursor.description] if result.cursor else []
     }
     CONNECTION_CACHE[guid] = cache
 
     return {
       'sync': False,
-      'has_result_set': True,
+      'has_result_set': result.cursor != None,
       'modified_row_count': 0,
       'guid': guid,
       'result': {
-        'has_more': True,
+        'has_more': result.cursor != None,
         'data': [],
         'meta': cache['meta'],
         'type': 'table'
@@ -168,10 +189,15 @@ class SqlAlchemyApi(Api):
     guid = snippet['result']['handle']['guid']
     connection = CONNECTION_CACHE.get(guid)
 
+    response = {'status': 'canceled'}
+
     if connection:
-      return {'status': 'available'}
-    else:
-      return {'status': 'canceled'}
+      if snippet['result']['handle']['has_result_set']:
+        response['status'] = 'available'
+      else:
+        response['status'] = 'success'
+
+    return response
 
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
@@ -289,33 +315,33 @@ class SqlAlchemyApi(Api):
 
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False, operation=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
     engine = self._create_engine()
     inspector = inspect(engine)
 
     assist = Assist(inspector, engine, backticks=self.backticks)
     response = {'status': -1, 'result': {}}
 
-    metadata, sample_data = assist.get_sample_data(database, table, column)
-    has_result_set = sample_data is not None
+    metadata, sample_data = assist.get_sample_data(database, table, column=column, operation=operation)
 
-    if sample_data:
-      response['status'] = 0
-      response['rows'] = escape_rows(sample_data)
+    response['status'] = 0
+    response['rows'] = escape_rows(sample_data)
 
-    if table:
+    if table and operation != 'hello':
       columns = assist.get_columns(database, table)
       response['full_headers'] = [{
-        'name': col.get('name'),
-        'type': str(col.get('type')),
-        'comment': ''
-      } for col in columns]
+          'name': col.get('name'),
+          'type': str(col.get('type')),
+          'comment': ''
+        } for col in columns
+      ]
     elif metadata:
       response['full_headers'] = [{
-        'name': col[0] if type(col) is dict or type(col) is tuple else col,
+        'name': col[0] if type(col) is dict or type(col) is tuple else col.name if hasattr(col, 'name') else col,
         'type': 'STRING_TYPE',
         'comment': ''
-      } for col in metadata]
+      } for col in metadata
+    ]
 
     return response
 
@@ -358,22 +384,26 @@ class Assist(object):
   def get_columns(self, database, table):
     return self.db.get_columns(table, database)
 
-  def get_sample_data(self, database, table, column=None):
-    column = '%(backticks)s%(column)s%(backticks)s' % {'backticks': self.backticks, 'column': column} if column else '*'
-    statement = textwrap.dedent('''\
-      SELECT %(column)s
-      FROM %(backticks)s%(database)s%(backticks)s.%(backticks)s%(table)s%(backticks)s
-      LIMIT %(limit)s
-      ''' % {
-        'database': database,
-        'table': table,
-        'column': column,
-        'limit': 100,
-        'backticks': self.backticks
-    })
+  def get_sample_data(self, database, table, column=None, operation=None):
+    if operation == 'hello':
+      statement = "SELECT 'Hello World!'"
+    else:
+      column = '%(backticks)s%(column)s%(backticks)s' % {'backticks': self.backticks, 'column': column} if column else '*'
+      statement = textwrap.dedent('''\
+        SELECT %(column)s
+        FROM %(backticks)s%(database)s%(backticks)s.%(backticks)s%(table)s%(backticks)s
+        LIMIT %(limit)s
+        ''' % {
+          'database': database,
+          'table': table,
+          'column': column,
+          'limit': 100,
+          'backticks': self.backticks
+      })
+
     connection = self.engine.connect()
     try:
-      result = connection.execution_options(stream_results=True).execute(statement)
+      result = connection.execute(statement)
       return result.cursor.description, result.fetchall()
     finally:
       connection.close()

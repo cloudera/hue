@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.verticalSlide.js should render binding 1`] = `"<div data-bind=\\"verticalSlide: slide\\" style=\\"display: none;\\"></div>"`;

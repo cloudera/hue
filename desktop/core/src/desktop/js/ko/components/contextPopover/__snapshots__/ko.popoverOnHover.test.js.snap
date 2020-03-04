@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.popoverOnHover.js should render binding 1`] = `"<div id=\\"foo\\" data-bind=\\"popoverOnHover: () => {}\\"></div>"`;

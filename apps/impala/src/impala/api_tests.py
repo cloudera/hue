@@ -18,15 +18,19 @@
 from builtins import object
 import json
 import logging
+import sys
 
 from django.urls import reverse
 from nose.tools import assert_true, assert_equal, assert_false, assert_raises
-from mock import patch, Mock
 
 from desktop.lib.django_test_util import make_logged_in_client
 
 from impala import conf
 
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock
+else:
+  from mock import patch, Mock
 
 LOG = logging.getLogger(__name__)
 

@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import contextCatalog from 'catalog/contextCatalog';
@@ -55,11 +55,13 @@ class MetastoreSource {
 
     huePubSub.subscribe('assist.db.panel.ready', () => {
       this.lastLoadNamespacesDeferred.done(() => {
-        const lastSelectedDb = apiHelper.getFromTotalStorage(
+        let lastSelectedDb = apiHelper.getFromTotalStorage(
           'assist_' + this.sourceType + '_' + this.namespace.id,
-          'lastSelectedDb',
-          'default'
+          'lastSelectedDb'
         );
+        if (!lastSelectedDb && lastSelectedDb !== '') {
+          lastSelectedDb = 'default';
+        }
         huePubSub.publish('assist.set.database', {
           source: this.type,
           namespace: this.namespace().namespace,

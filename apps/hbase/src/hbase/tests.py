@@ -19,21 +19,26 @@ from builtins import object
 import json
 import os
 import shutil
+import sys
 import tempfile
 
 from nose.tools import assert_true, assert_equal
-
-from django.contrib.auth.models import User
+from nose.plugins.skip import SkipTest
+from django.urls import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group
+from hadoop.pseudo_hdfs4 import is_live_cluster
+from useradmin.models import User
 
 from hbase.api import HbaseApi
 from hbase.conf import HBASE_CONF_DIR
 from hbase.hbase_site import get_server_authentication, get_server_principal, get_conf, reset, _CNF_HBASE_IMPERSONATION_ENABLED, is_impersonation_enabled
-from hadoop.pseudo_hdfs4 import is_live_cluster
-from nose.plugins.skip import SkipTest
-from django.urls import reverse
+
+if sys.version_info[0] > 2:
+  open_file = open
+else:
+  open_file = file
 
 
 def test_security_plain():
@@ -42,7 +47,7 @@ def test_security_plain():
 
   try:
     xml = hbase_site_xml()
-    file(os.path.join(tmpdir, 'hbase-site.xml'), 'w').write(xml)
+    open_file(os.path.join(tmpdir, 'hbase-site.xml'), 'w').write(xml)
     reset()
 
     assert_equal('NOSASL', get_server_authentication())
@@ -64,7 +69,7 @@ def test_security_kerberos():
 
   try:
     xml = hbase_site_xml(authentication='kerberos')
-    file(os.path.join(tmpdir, 'hbase-site.xml'), 'w').write(xml)
+    open_file(os.path.join(tmpdir, 'hbase-site.xml'), 'w').write(xml)
     reset()
 
     assert_equal('KERBEROS', get_server_authentication())

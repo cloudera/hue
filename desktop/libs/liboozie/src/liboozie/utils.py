@@ -83,7 +83,7 @@ def config_gen(dic):
   print('<?xml version="1.0" encoding="UTF-8"?>', file=sio)
   print("<configuration>", file=sio)
   # if dic's key contains <,>,& then it will be escaped and if dic's value contains ']]>' then ']]>' will be stripped
-  for k, v in dic.items():
+  for k, v in sorted(dic.items()):
     print("<property>\n  <name>%s</name>\n  <value><![CDATA[%s]]></value>\n</property>\n" \
         % (escape(k), v.replace(']]>', '') if isinstance(v, basestring) else v), file=sio)
   print("</configuration>", file=sio)

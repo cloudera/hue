@@ -687,7 +687,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </ul>
 
       <div class="tab-content" style="border: none; overflow-x: hidden">
-        <div class="tab-pane" id="queryHistory" data-bind="css: {'active': currentQueryTab() == 'queryHistory'}, style: { 'height' : $parent.historyInitialHeight() > 0 ? Math.max($parent.historyInitialHeight(), 40) + 'px' : '' }">
+        <div class="tab-pane" style="min-height:80px;" id="queryHistory" data-bind="css: {'active': currentQueryTab() == 'queryHistory'}, style: { 'height' : $parent.historyInitialHeight() > 0 ? Math.max($parent.historyInitialHeight(), 40) + 'px' : '' }">
           <!-- ko if: $parent.loadingHistory -->
           <div class="margin-top-10 margin-left-10">
             <i class="fa fa-spinner fa-spin muted"></i>
@@ -1793,6 +1793,13 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <i class="fa fa-fw fa-map-o"></i> ${_('Explain')}
           </a>
         </li>
+        % if conf.ENABLE_GIST.get():
+        <li>
+          <a href="javascript:void(0)" data-bind="click: createGist, css: {'disabled': ! isReady() }" title="${ _('Share the query selection via a link') }">
+            <i class="fa fa-fw fa-link"></i> ${_('Get shareable link')}
+          </a>
+        </li>
+        % endif
         <!-- ko if: formatEnabled -->
         <li>
           <a href="javascript:void(0)" data-bind="click: format, css: {'disabled': ! isReady() }" title="${ _('Format the current SQL query') }">
@@ -1834,6 +1841,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </a>
     </div>
 
+    <!-- ko if: window.CUSTOM_DASHBOARD_URL -->
+    <a class="snippet-side-btn" href="javascript: void(0)" data-bind="click: dashboardRedirect.bind($data)" title="${ _('Dashboard') }">
+      <i class="hcha fa-fw hcha-bar-chart"></i>
+    </a>
+    <!-- /ko -->
+    <!-- ko ifnot: window.CUSTOM_DASHBOARD_URL -->
     <div class="dropdown">
       <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="css: {'active': $data.showChart }, click: function() { $data.showChart(true); }" >
         <i class="hcha fa-fw hcha-bar-chart" data-bind="visible: chartType() == window.HUE_CHARTS.TYPES.BARCHART" title="${ _('Bars') }"></i>
@@ -1880,6 +1893,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         </li>
       </ul>
     </div>
+    <!-- /ko -->
 
     <div>
       <a class="snippet-side-btn" href="javascript:void(0)" data-bind="click: function(){ huePubSub.publish('chart.hard.reset'); isResultSettingsVisible(! isResultSettingsVisible()) }, css: { 'blue' : isResultSettingsVisible }" title="${ _('Columns') }">
@@ -2087,6 +2101,48 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
         aceMode: 'ace/mode/impala',
         snippetImage: '${ static("impala/art/icon_impala_48.png") }',
+        sqlDialect: true
+      },
+      presto: {
+        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+        aceMode: 'ace/mode/presto',
+        snippetIcon: 'fa-database',
+        sqlDialect: true
+      },
+      elasticsearch: {
+        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+        aceMode: 'ace/mode/elasticsearch',
+        snippetIcon: 'fa-database',
+        sqlDialect: true
+      },
+      druid: {
+        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+        aceMode: 'ace/mode/druid',
+        snippetIcon: 'fa-database',
+        sqlDialect: true
+      },
+      bigquery: {
+        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+        aceMode: 'ace/mode/bigquery',
+        snippetIcon: 'fa-database',
+        sqlDialect: true
+      },
+      phoenix: {
+        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+        aceMode: 'ace/mode/phoenix',
+        snippetIcon: 'fa-database',
+        sqlDialect: true
+      },
+      ksql: {
+        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+        aceMode: 'ace/mode/ksql',
+        snippetIcon: 'fa-database',
+        sqlDialect: true
+      },
+      flink: {
+        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+        aceMode: 'ace/mode/flink',
+        snippetIcon: 'fa-database',
         sqlDialect: true
       },
       jar : {

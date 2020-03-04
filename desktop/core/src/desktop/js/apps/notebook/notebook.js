@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
 
 import apiHelper from 'api/apiHelper';
@@ -324,14 +324,17 @@ class Notebook {
       const _snippet = new Snippet(vm, self, snippet);
       self.snippets.push(_snippet);
 
+      const deferred = $.Deferred().done(() => {
+        _snippet.init();
+      });
       if (self.getSession(_snippet.type()) == null && typeof skipSession == 'undefined') {
-        window.setTimeout(() => {
-          _snippet.status('loading');
-          self.createSession(new Session(vm, { type: _snippet.type() }));
-        }, 200);
+        self.createSession(new Session(vm, { type: _snippet.type() }), () => {
+          deferred.resolve();
+        });
+      } else {
+        deferred.resolve();
       }
 
-      _snippet.init();
       return _snippet;
     };
 
@@ -679,7 +682,7 @@ class Notebook {
 
       function updateHistoryCall(item) {
         $.post('/notebook/api/check_status', {
-          notebook: komapping.toJSON({ id: item.uuid() })
+          notebook: komapping.toJSON({ uuid: item.uuid() })
         })
           .done(data => {
             const status =
@@ -904,10 +907,15 @@ class Notebook {
       () => {
         if (self.type().indexOf('query') === 0) {
           const whenDatabaseAvailable = function(snippet) {
+            const lastSelectedDb = apiHelper.getFromTotalStorage(
+              'assist_' + snippet.type() + '_' + snippet.namespace().id,
+              'lastSelectedDb'
+            );
+
             huePubSub.publish('assist.set.database', {
               source: snippet.type(),
               namespace: snippet.namespace(),
-              name: snippet.database()
+              name: lastSelectedDb === '' ? '' : snippet.database()
             });
           };
 

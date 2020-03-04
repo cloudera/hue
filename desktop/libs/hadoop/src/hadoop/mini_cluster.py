@@ -63,10 +63,12 @@ if sys.version_info[0] > 2:
   from urllib.request import Request as lib_Request
   from urllib.error import URLError as lib_URLError
   from urllib.request import urlopen as lib_urlopen
+  open_file = open
 else:
   from urllib2 import Request as lib_Request
   from urllib2 import URLError as lib_URLError
   from urllib2 import urlopen as lib_urlopen
+  open_file = file
 
 # Starts mini cluster suspended until a debugger attaches to it.
 DEBUG_HADOOP=False
@@ -124,7 +126,7 @@ class MiniHadoopCluster(object):
     os.mkdir(in_conf_dir)
     self.log_dir = tmppath("logs")
     os.mkdir(self.log_dir)
-    f = file(os.path.join(in_conf_dir, "hadoop-metrics.properties"), "w")
+    f = open_file(os.path.join(in_conf_dir, "hadoop-metrics.properties"), "w")
     try:
       f.write("""
 dfs.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
@@ -159,7 +161,7 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
       hadoop_policy_config['security.' + policy + '.protocol.acl'] = '*'
     write_config(hadoop_policy_config, tmppath('in-conf/hadoop-policy.xml'))
 
-    details_file = file(tmppath("details.json"), "w+")
+    details_file = open_file(tmppath("details.json"), "w+")
     try:
       args = [ os.path.join(hadoop.conf.HADOOP_MR1_HOME.get(), 'bin', 'hadoop'),
         "jar",
@@ -229,11 +231,11 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
       if USE_STDERR:
         stderr=sys.stderr
       else:
-        stderr=file(tmppath("stderr"), "w")
+        stderr=open_file(tmppath("stderr"), "w")
       LOGGER.debug("Starting minicluster: %s env: %s" % (repr(args), repr(env)))
       self.clusterproc = subprocess.Popen(
         args=args,
-        stdout=file(tmppath("stdout"), "w"),
+        stdout=open_file(tmppath("stdout"), "w"),
         stderr=stderr,
         env=env)
 
@@ -249,9 +251,9 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
         except ValueError:
           pass
         if self.clusterproc.poll() is not None or (not DEBUG_HADOOP and (time.time() - start) > MAX_CLUSTER_STARTUP_TIME):
-          LOGGER.debug("stdout:" + file(tmppath("stdout")).read())
+          LOGGER.debug("stdout:" + open_file(tmppath("stdout")).read())
           if not USE_STDERR:
-            LOGGER.debug("stderr:" + file(tmppath("stderr")).read())
+            LOGGER.debug("stderr:" + open_file(tmppath("stderr")).read())
           self.stop()
           raise Exception("Cluster process quit or is taking too long to start.  Aborting.")
     finally:
@@ -297,8 +299,8 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
 
     self.secondary_proc = subprocess.Popen(
       args=args,
-      stdout=file(tmppath("stdout.2nn"), "w"),
-      stderr=file(tmppath("stderr.2nn"), "w"),
+      stdout=open_file(tmppath("stdout.2nn"), "w"),
+      stderr=open_file(tmppath("stderr.2nn"), "w"),
       env=env)
 
     while True:
@@ -308,9 +310,9 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
       except lib_URLError:
         # If we should abort startup.
         if self.secondary_proc.poll() is not None or (not DEBUG_HADOOP and (time.time() - start) > MAX_CLUSTER_STARTUP_TIME):
-          LOGGER.debug("stdout:" + file(tmppath("stdout")).read())
+          LOGGER.debug("stdout:" + open_file(tmppath("stdout")).read())
           if not USE_STDERR:
-            LOGGER.debug("stderr:" + file(tmppath("stderr")).read())
+            LOGGER.debug("stderr:" + open_file(tmppath("stderr")).read())
           self.stop()
           raise Exception("2nn process quit or is taking too long to start. Aborting.")
           break
@@ -442,7 +444,7 @@ def write_config(config, path, variables=None):
   from a configuration map (config), into a new file
   called path.
   """
-  f = file(path, "w")
+  f = open_file(path, "w")
   try:
     f.write("""<?xml version="1.0"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
@@ -464,7 +466,7 @@ def _write_static_group_mapping(user_group_mapping, path):
   Create a Java-style .properties file to contain the static user -> group
   mapping used by tests.
   """
-  f = file(path, 'w')
+  f = open_file(path, 'w')
   try:
     for user, groups in user_group_mapping.items():
       f.write('%s = %s\n' % (user, ','.join(groups)))

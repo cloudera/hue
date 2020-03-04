@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import huePubSub from 'utils/huePubSub';
 
@@ -35,20 +35,23 @@ ko.bindingHandlers.splitFlexDraggable = {
 
     const onPosition = options.onPosition || function() {};
 
+    let containerWidth = $container.width();
     $sidePanel.css('flex-basis', sidePanelWidth + 'px');
     $resizer.draggable({
       axis: 'x',
       containment: $container,
       start: function() {
         sidePanelWidth = $sidePanel.width();
+        containerWidth = $container.width();
       },
       drag: function(event, ui) {
-        if (isLeft) {
-          $sidePanel.css('flex-basis', Math.max(sidePanelWidth + ui.position.left, 200) + 'px');
-        } else {
-          $sidePanel.css('flex-basis', Math.max(sidePanelWidth - ui.position.left, 200) + 'px');
-        }
-        onPosition();
+        const flexBasis =
+          Math.min(
+            Math.max(sidePanelWidth + (isLeft ? ui.position.left : -ui.position.left), 200),
+            containerWidth
+          ) + 'px';
+        $sidePanel.css('flex-basis', flexBasis);
+        onPosition(flexBasis);
         ui.position.left = 0;
       },
       stop: function() {

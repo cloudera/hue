@@ -15,12 +15,13 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import CancellablePromise from 'api/cancellablePromise';
 import catalogUtils from 'catalog/catalogUtils';
 import huePubSub from 'utils/huePubSub';
+import I18n from 'utils/i18n';
 
 /**
  * Helper function to reload the source meta for the given entry
@@ -420,6 +421,12 @@ class DataCatalogEntry {
             partitionKeys[partitionKey.name] = true;
           });
         }
+        const primaryKeys = {};
+        if (sourceMeta.primary_keys) {
+          sourceMeta.primary_keys.forEach(primaryKey => {
+            primaryKeys[primaryKey.name] = true;
+          });
+        }
 
         const entities =
           sourceMeta.databases ||
@@ -455,6 +462,9 @@ class DataCatalogEntry {
                       }
                       if (sourceMeta.partition_keys) {
                         definition.partitionKey = !!partitionKeys[entity.name];
+                      }
+                      if (sourceMeta.primary_keys) {
+                        definition.primaryKey = !!primaryKeys[entity.name];
                       }
                       definition.index = index++;
                       catalogEntry.definition = definition;
@@ -1187,6 +1197,12 @@ class DataCatalogEntry {
       if (type) {
         title += ' (' + type + ')';
       }
+    } else if (
+      self.definition &&
+      self.definition.type &&
+      self.definition.type.toLowerCase() === 'materialized_view'
+    ) {
+      title += ' (' + I18n('Materialized') + ')';
     }
     if (includeComment && self.hasResolvedComment() && self.getResolvedComment()) {
       title += ' - ' + self.getResolvedComment();
@@ -1230,7 +1246,7 @@ class DataCatalogEntry {
    */
   isPrimaryKey() {
     const self = this;
-    return self.isColumn() && self.definition && /true/i.test(self.definition.primary_key);
+    return self.isColumn() && self.definition && !!self.definition.primaryKey;
   }
 
   /**
@@ -1242,6 +1258,16 @@ class DataCatalogEntry {
   isPartitionKey() {
     const self = this;
     return self.definition && !!self.definition.partitionKey;
+  }
+
+  /**
+   * Returns true if the entry is either a partition or primary key. Note that the definition has to come from a parent entry, i.e.
+   * getChildren().
+   *
+   * @return {boolean}
+   */
+  isKey() {
+    return this.isPartitionKey() || this.isPrimaryKey();
   }
 
   /**
@@ -1283,7 +1309,8 @@ class DataCatalogEntry {
       ((self.sourceMeta && self.sourceMeta.is_view) ||
         (self.definition &&
           self.definition.type &&
-          self.definition.type.toLowerCase() === 'view') ||
+          (self.definition.type.toLowerCase() === 'view' ||
+            self.definition.type.toLowerCase() === 'materialized_view')) ||
         (self.analysis &&
           self.analysis.details &&
           self.analysis.details.properties &&

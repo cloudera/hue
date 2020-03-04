@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import ko from 'knockout';
+import * as ko from 'knockout';
 
 import hueUtils from 'utils/hueUtils';
 
@@ -28,7 +28,7 @@ ko.bindingHandlers.toggleOverflow = {
         .appendTo($element);
       $element.on('click', () => {
         if ($element.find('.toggle-overflow-toggle i').hasClass('fa-caret-down')) {
-          $element.find('.toggle-overflow').css('height', '');
+          $element.find('.toggle-overflow').css('max-height', '');
           $element.css('cursor', 'n-resize');
           $element
             .find('.toggle-overflow-toggle')
@@ -61,10 +61,7 @@ ko.bindingHandlers.toggleOverflow = {
     const options = valueAccessor() || {};
     $element.wrapInner('<div class="toggle-overflow"></div>');
     if (options.height) {
-      $element.find('.toggle-overflow').height(options.height);
-    }
-    if (options.width) {
-      $element.find('.toggle-overflow').width(options.width);
+      $element.find('.toggle-overflow').css('max-height', options.height + 'px');
     }
   },
 

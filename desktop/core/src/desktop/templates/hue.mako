@@ -43,9 +43,13 @@
   <meta charset="utf-8">
   <title>Hue</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="icon" type="image/x-icon" href="${ static('desktop/art/favicon.ico') }"/>
-  <meta name="description" content="">
-  <meta name="author" content="">
+  % if conf.CUSTOM.LOGO_SVG.get():
+    <link rel="icon" type="image/x-icon" href="${ static('desktop/art/custom-branding/favicon.ico') }"/>
+  % else:
+    <link rel="icon" type="image/x-icon" href="${ static('desktop/art/favicon.ico') }"/>
+  % endif
+  <meta name="description" content="Open source SQL Query Assistant for Databases/Warehouses.">
+  <meta name="author" content="Hue Team">
 
   <link href="${ static('desktop/css/roboto.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
@@ -123,57 +127,7 @@ ${ hueIcons.symbols() }
 
     <nav class="navbar navbar-default">
       <div class="navbar-inner top-nav">
-        <div class="top-nav-left">
-          % if not (IS_MULTICLUSTER_ONLY.get() and get_cluster_config(user)['has_computes']):
-          <a class="hamburger hamburger-hue pull-left" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
-            <span class="hamburger-box"><span class="hamburger-inner"></span></span>
-          </a>
-          % endif
-
-          % if not IS_MULTICLUSTER_ONLY.get():
-          <div class="btn-group" data-bind="visible: true" style="display:none; margin-top: 8px">
-            <!-- ko if: mainQuickCreateAction -->
-            <!-- ko with: mainQuickCreateAction -->
-            <a class="btn btn-primary disable-feedback hue-main-create-btn" data-bind="hueLink: url, attr: {title: tooltip}, style: { borderBottomRightRadius: $parent.quickCreateActions().length > 1 ? '0px' : '4px', borderTopRightRadius: $parent.quickCreateActions().length > 1 ? '0px' : '4px' }">
-              <span data-bind="text: displayName"></span>
-            </a>
-            <!-- /ko -->
-            <!-- /ko -->
-            <button class="btn btn-primary dropdown-toggle hue-main-create-btn-dropdown" data-toggle="dropdown" data-bind="visible: quickCreateActions().length > 1 || (quickCreateActions().length == 1 && quickCreateActions()[0].children && quickCreateActions()[0].children.length > 1)">
-              <!-- ko ifnot: mainQuickCreateAction -->${ _('More') } <!-- /ko -->
-              <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu hue-main-create-dropdown" data-bind="foreach: { data: quickCreateActions, as: 'item' }">
-              <!-- ko template: 'quick-create-item-template' --><!-- /ko -->
-            </ul>
-          </div>
-          % endif
-
-          <script type="text/html" id="quick-create-item-template">
-            <!-- ko if: item.dividerAbove -->
-            <li class="divider"></li>
-            <!-- /ko -->
-            <li data-bind="css: { 'dropdown-submenu': item.isCategory && item.children.length > 1 }">
-              <!-- ko if: item.url -->
-                <a href="javascript: void(0);" data-bind="hueLink: item.url">
-                  <!-- ko if: item.icon -->
-                  <!-- ko template: { name: 'app-icon-template', data: item } --><!-- /ko -->
-                  <!-- /ko -->
-                  <span data-bind="css: { 'dropdown-no-icon': !item.icon }, text: item.displayName"></span>
-                </a>
-              <!-- /ko -->
-              <!-- ko if: item.href -->
-                <a data-bind="attr: { href: item.href }, text: item.displayName" target="_blank"></a>
-              <!-- /ko -->
-              <!-- ko if: item.isCategory && item.children.length > 1 -->
-              <ul class="dropdown-menu" data-bind="foreach: { data: item.children, as: 'item' }">
-                <!-- ko template: 'quick-create-item-template' --><!-- /ko -->
-              </ul>
-              <!-- /ko -->
-            </li>
-          </script>
-        </div>
-
+        <div class="top-nav-left"></div>
 
         <div class="top-nav-middle">
           <div class="search-container-top" data-bind="component: 'hue-global-search'"></div>
@@ -184,6 +138,9 @@ ${ hueIcons.symbols() }
             <select data-bind="options: clusters, optionsText: 'name', value: 'id'" class="input-small" style="margin-top:8px">
             </select>
           % endif
+          <!-- ko if: window.ENABLE_NOTEBOOK_2 -->
+            <!-- ko component: 'quick-query-action' --><!-- /ko -->
+          <!-- /ko -->
           <!-- ko component: 'hue-history-panel' --><!-- /ko -->
           <!-- ko if: hasJobBrowser -->
             <!-- ko component: { name: 'hue-job-browser-links', params: { onePageViewModel: onePageViewModel }} --><!-- /ko -->
@@ -256,6 +213,7 @@ ${ hueIcons.symbols() }
         <div id="embeddable_useradmin_groups" class="embeddable"></div>
         <div id="embeddable_useradmin_newgroup" class="embeddable"></div>
         <div id="embeddable_useradmin_editgroup" class="embeddable"></div>
+        <div id="embeddable_useradmin_organizations" class="embeddable"></div>
         <div id="embeddable_useradmin_permissions" class="embeddable"></div>
         <div id="embeddable_useradmin_editpermission" class="embeddable"></div>
         <div id="embeddable_useradmin_configurations" class="embeddable"></div>
@@ -320,7 +278,7 @@ ${ hueIcons.symbols() }
 ${ commonshare() | n,unicode }
 
 ${ render_bundle('vendors~hue~notebook~tableBrowser') | n,unicode }
-${ render_bundle('vendors~hue~tableBrowser') | n,unicode }
+${ render_bundle('vendors~hue~notebook') | n,unicode }
 ${ render_bundle('vendors~hue') | n,unicode }
 ${ render_bundle('hue~notebook') | n,unicode }
 ${ render_bundle('hue~notebook~tableBrowser') | n,unicode }
@@ -362,9 +320,6 @@ ${ notebookKoComponents.downloadSnippetResults() }
 ${ hueAceAutocompleter.hueAceAutocompleter() }
 
 ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
-
-## clusterConfig makes an Ajax call so it needs to be after commonHeaderFooterComponents
-<script src="${ static('desktop/js/clusterConfig.js') }"></script>
 
 % if request is not None:
 ${ smart_unicode(login_modal(request).content) | n,unicode }
@@ -408,6 +363,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     useradmin_permissions: { url: '/useradmin/permissions', title: '${_('User Admin - Permissions')}' },
     useradmin_editpermission: { url: '/useradmin/permissions/edit/*', title: '${_('User Admin - Edit Permission')}' },
     useradmin_configurations: { url: '/useradmin/configurations', title: '${_('User Admin - Configurations')}' },
+    useradmin_organizations: { url: '/useradmin/organizations', title: '${_('User Admin - Organizations')}' },
     useradmin_newuser: { url: '/useradmin/users/new', title: '${_('User Admin - New User')}' },
     useradmin_addldapusers: { url: '/useradmin/users/add_ldap_users', title: '${_('User Admin - Add LDAP User')}' },
     useradmin_edituser: { url: '/useradmin/users/edit/:user', title: '${_('User Admin - Edit User')}' },
@@ -435,10 +391,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
   }
 
   window.SKIP_CACHE = [
-    'home', 'oozie_workflow', 'oozie_coordinator', 'oozie_bundle', 'dashboard', 'metastore',
-    'filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_newgroup', 'useradmin_editgroup',
+    'home', 'oozie_workflow', 'oozie_coordinator', 'oozie_bundle', 'dashboard', 'metastore', 'filebrowser',
+    'useradmin_users', 'useradmin_groups', 'useradmin_newgroup', 'useradmin_editgroup',
     'useradmin_permissions', 'useradmin_editpermission', 'useradmin_configurations', 'useradmin_newuser',
-    'useradmin_addldapusers', 'useradmin_addldapgroups', 'useradmin_edituser', 'importer',
+    'useradmin_addldapusers', 'useradmin_addldapgroups', 'useradmin_edituser', 'useradmin_organizations',
+    'importer',
     'security_hive', 'security_hdfs', 'security_hive2', 'security_solr', 'logs',
     % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
       'indexes',

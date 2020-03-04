@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.inlineAutocomplete.js should render component 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;inline-autocomplete&quot;, params: params }\\"><div class=\\"inline-autocomp-container\\">
+    <div>
+      <!-- ko if: showMagnify --><!-- /ko-->
+      <form autocomplete=\\"off\\">
+        <input class=\\"inline-autocomp-input\\" autocorrect=\\"off\\" autocomplete=\\"do-not-autocomplete\\" autocapitalize=\\"off\\" spellcheck=\\"false\\" type=\\"text\\" data-bind=\\"
+          attr: { 'placeHolder' : hasFocus() ? '' : placeHolder },
+          textInput: searchInput,
+          hasFocus: hasFocus,
+          clearable: { value: searchInput, onClear: onClear },
+          css: { 'inline-autocomp-magnify-input': showMagnify }\\" placeholder=\\"Filter...\\">
+        <input class=\\"inline-autocomp-autocomp\\" disabled=\\"\\" type=\\"text\\" autocomplete=\\"do-not-autocomplete\\" data-bind=\\"
+          value: inlineAutocomplete,
+          css: { 'inline-autocomp-magnify-input': showMagnify }\\">
+      </form>
+    </div>
+  </div><div class=\\"hue-drop-down-container hue-drop-down-fixed\\" data-bind=\\"event: { 'mousedown': facetDropDownMouseDown }, css: { 'open' : facetDropDownVisible() }, dropDownKeyUp: { onEsc: facetDropDownOnEsc, onEnter: facetDropDownOnEnter, onSelected: facetDropDownOnSelected, dropDownVisible: facetDropDownVisible }\\">
+    <div class=\\"dropdown-menu\\" style=\\"overflow-y: auto; display: none;\\" data-bind=\\"visible: facetSuggestions().length > 0\\">
+      <ul class=\\"hue-inner-drop-down\\" data-bind=\\"foreach: facetSuggestions\\"></ul>
+    </div>
+  </div></div>"
+`;

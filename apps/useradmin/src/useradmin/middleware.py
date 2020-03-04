@@ -18,13 +18,12 @@
 from __future__ import division
 from __future__ import absolute_import
 from builtins import next
-from past.utils import old_div
 from builtins import object
 import logging
+import math
 from datetime import datetime
 
 from django.contrib import messages
-from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.db import DatabaseError
 from django.db.models import Q
@@ -33,10 +32,9 @@ from django.utils.translation import ugettext as _
 from desktop.auth.views import dt_logout
 from desktop.conf import AUTH, LDAP, SESSION
 
-from useradmin.models import UserProfile, get_profile
-from useradmin.views import import_ldap_users
-
 from useradmin import ldap_access
+from useradmin.models import UserProfile, get_profile, User
+from useradmin.views import import_ldap_users
 
 
 LOG = logging.getLogger(__name__)
@@ -116,7 +114,7 @@ class LastActivityMiddleware(object):
     if hasattr(dt, 'total_seconds'):
       return dt.total_seconds()
     else:
-      return old_div((dt.microseconds + (dt.seconds + dt.days * 24 * 3600) * 10**6), 10**6)
+      return math.floor((dt.microseconds + (dt.seconds + dt.days * 24 * 3600) * 10**6) / 10**6)
 
 class ConcurrentUserSessionMiddleware(object):
   """
@@ -131,10 +129,10 @@ class ConcurrentUserSessionMiddleware(object):
     if request.user.is_authenticated() and request.session.modified and request.user.id: # request.session.modified checks if a user just logged in
       limit = SESSION.CONCURRENT_USER_SESSION_LIMIT.get()
       if limit:
-        count = 1;
+        count = 1
         for session in Session.objects.filter(~Q(session_key=request.session.session_key), expire_date__gte=datetime.now()).order_by('-expire_date'):
           data = session.get_decoded()
-          if data.get('_auth_user_id') == request.user.id:
+          if data.get('_auth_user_id') == str(request.user.id):
             if count >= limit:
               LOG.info('Expiring concurrent user session %s' % request.user.username)
               session.expire_date = datetime.now()

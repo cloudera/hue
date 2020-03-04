@@ -18,8 +18,8 @@
 from future import standard_library
 standard_library.install_aliases()
 from builtins import map
-from builtins import str
 import logging
+import os
 import json
 import sys
 import tempfile
@@ -41,15 +41,18 @@ from metadata.conf import has_catalog
 from metadata.catalog_api import search_entities as metadata_search_entities, _highlight, search_entities_interactive as metadata_search_entities_interactive
 from notebook.connectors.altus import SdxApi, AnalyticDbApi, DataEngApi, DataWarehouse2Api
 from notebook.connectors.base import Notebook, get_interpreter
-from notebook.views import upgrade_session_properties
 
-from desktop.lib.django_util import JsonResponse
-from desktop.conf import get_clusters, IS_K8S_ONLY
+from desktop import appmanager
+from desktop.auth.backend import is_admin
+from desktop.conf import ENABLE_CONNECTORS, ENABLE_GIST_PREVIEW, get_clusters, IS_K8S_ONLY
+from desktop.lib.conf import BoundContainer, GLOBAL_CONFIG, is_anonymous
+from desktop.lib.django_util import JsonResponse, login_notrequired, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
+from desktop.lib.paths import get_desktop_root
 from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, \
-  UserPreferences, get_user_preferences, set_user_preferences, get_cluster_config
+  UserPreferences, get_user_preferences, set_user_preferences, get_cluster_config, __paginate, _get_gist_document
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
@@ -84,6 +87,56 @@ def get_config(request):
 
   return JsonResponse(config)
 
+@api_error_handler
+def get_hue_config(request):
+  if not is_admin(request.user):
+    raise PopupException(_('You must be a superuser.'))
+
+  show_private = request.GET.get('private', False)
+
+  app_modules = appmanager.DESKTOP_MODULES
+  config_modules = GLOBAL_CONFIG.get().values()
+
+  if ENABLE_CONNECTORS.get():
+    app_modules = [app_module for app_module in app_modules if app_module.name == 'desktop']
+    config_modules = [config_module for config_module in config_modules if config_module.config.key == 'desktop']
+
+  apps = [{
+    'name': app.name,
+    'has_ui': app.menu_index != 999,
+    'display_name': app.display_name
+  } for app in sorted(app_modules, key=lambda app: app.name)]
+
+  def recurse_conf(modules):
+    attrs = []
+    for module in modules:
+      if not show_private and module.config.private:
+        continue
+
+      conf = {
+        'help': module.config.help or _('No help available.'),
+        'key': module.config.key,
+        'is_anonymous': is_anonymous(module.config.key)
+      }
+      if isinstance(module, BoundContainer):
+        conf['values'] = recurse_conf(module.get().values())
+      else:
+        conf['default'] = str(module.config.default)
+        if 'password' in module.config.key:
+          conf['value'] = '*' * 10
+        elif sys.version_info[0] > 2:
+          conf['value'] = str(module.get_raw())
+        else:
+          conf['value'] = str(module.get_raw()).decode('utf-8', 'replace')
+      attrs.append(conf)
+
+    return attrs
+
+  return JsonResponse({
+    'config': sorted(recurse_conf(config_modules), key=lambda conf: conf.get('key')),
+    'conf_dir': os.path.realpath(os.getenv('HUE_CONF_DIR', get_desktop_root('conf'))),
+    'apps': apps
+  })
 
 @api_error_handler
 def get_context_namespaces(request, interface):
@@ -372,6 +425,7 @@ def _get_document_helper(request, uuid, with_data, with_dependencies, path):
     data = json.loads(document.data)
     # Upgrade session properties for Hive and Impala
     if document.type.startswith('query'):
+      from notebook.models import upgrade_session_properties
       notebook = Notebook(document=document)
       notebook = upgrade_session_properties(request, notebook)
       data = json.loads(notebook.data)
@@ -522,7 +576,7 @@ def delete_document(request):
 @api_error_handler
 @require_POST
 def copy_document(request):
-  uuid = json.loads(request.POST.get('uuid'), '""')
+  uuid = json.loads(request.POST.get('uuid', '""'))
 
   if not uuid:
     raise PopupException(_('copy_document requires uuid'))
@@ -618,8 +672,8 @@ def share_document(request):
 
   Example of input: {'read': {'user_ids': [1, 2, 3], 'group_ids': [1, 2, 3]}}
   """
-  perms_dict = request.POST.get('data')
   uuid = request.POST.get('uuid')
+  perms_dict = request.POST.get('data')
 
   if not uuid or not perms_dict:
     raise PopupException(_('share_document requires uuid and perms_dict'))
@@ -642,6 +696,32 @@ def share_document(request):
       groups = []
 
     doc = doc.share(request.user, name=name, users=users, groups=groups)
+
+  return JsonResponse({
+    'status': 0,
+    'document': doc.to_dict()
+  })
+
+
+@api_error_handler
+@require_POST
+def share_document_link(request):
+  """
+  Globally activate of de-activate access to a document for logged-in users.
+
+  Example of input: {"uuid": "xxxx", "perm": "read" / "write" / "off"}
+  """
+  uuid = request.POST.get('uuid')
+  perm = request.POST.get('perm')
+
+  if not uuid or not perm:
+    raise PopupException(_('share_document_link requires uuid and permission data'))
+  else:
+    uuid = json.loads(uuid)
+    perm = json.loads(perm)
+
+  doc = Document2.objects.get_by_uuid(user=request.user, uuid=uuid)
+  doc = doc.share_link(request.user, perm=perm)
 
   return JsonResponse({
     'status': 0,
@@ -698,7 +778,7 @@ def export_documents(request):
     zfile.close()
     response = HttpResponse(content_type="application/zip")
     response["Content-Length"] = len(f.getvalue())
-    response['Content-Disposition'] = 'attachment; filename="%s".zip' % filename
+    response['Content-Disposition'] = b'attachment; filename="%s".zip' % filename
     response.write(f.getvalue())
     return response
   else:
@@ -821,6 +901,67 @@ def user_preferences(request, key=None):
   return JsonResponse(response)
 
 
+@api_error_handler
+def gist_create(request):
+  '''
+  Only supporting Editor App currently.
+  '''
+  response = {'status': 0}
+
+  statement = request.POST.get('statement', '')
+  gist_type = request.POST.get('doc_type', 'hive')
+  name = request.POST.get('name', '')
+  description = request.POST.get('description', '')
+
+  if not name:
+    name = _('%s Query') % gist_type.capitalize()
+  statement_raw = statement
+  if not statement.strip().startswith('--'):
+    statement = '-- Created by %s\n\n%s' % (request.user.get_full_name() or request.user.username, statement)
+
+  gist_doc = Document2.objects.create(
+    name=name,
+    type='gist',
+    owner=request.user,
+    data=json.dumps({'statement': statement, 'statement_raw': statement_raw}),
+    extra=gist_type,
+    parent_directory=Document2.objects.get_gist_directory(request.user)
+  )
+
+  response['id'] = gist_doc.id
+  response['uuid'] = gist_doc.uuid
+  response['link'] = '%(scheme)s://%(host)s/hue/gist?uuid=%(uuid)s' % {
+    'scheme': 'https' if request.is_secure() else 'http',
+    'host': request.get_host(),
+    'uuid': gist_doc.uuid,
+  }
+
+  return JsonResponse(response)
+
+
+@login_notrequired
+def gist_get(request):
+  gist_uuid = request.GET.get('uuid')
+
+  gist_doc = _get_gist_document(uuid=gist_uuid)
+
+  if ENABLE_GIST_PREVIEW.get() and 'Slackbot-LinkExpanding' in request.META.get('HTTP_USER_AGENT', ''):
+    statement = json.loads(gist_doc.data)['statement_raw']
+    return render(
+      'unfurl_link.mako',
+      request, {
+        'title': _('SQL gist from %s') % (gist_doc.owner.get_full_name() or gist_doc.owner.username),
+        'description': statement if len(statement) < 30 else (statement[:70] + '...'),
+        'image_link': None
+      }
+    )
+  else:
+    return redirect('/hue/editor?gist=%(uuid)s&type=%(type)s' % {
+      'uuid': gist_doc.uuid,
+      'type': gist_doc.extra
+    })
+
+
 def search_entities(request):
   sources = json.loads(request.POST.get('sources')) or []
 
@@ -832,6 +973,8 @@ def search_entities(request):
           'hue_name': _highlight(search_text, escape(e.name)),
           'hue_description': _highlight(search_text, escape(e.description)),
           'type': 'HUE',
+          'last_modified': e.last_modified,
+          'owner': escape(e.owner),
           'doc_type': escape(e.type),
           'originalName': escape(e.name),
           'link': e.get_absolute_url()
@@ -862,6 +1005,8 @@ def search_entities_interactive(request):
           'hue_description': _highlight(search_text, escape(e.description)),
           'link': e.get_absolute_url(),
           'doc_type': escape(e.type),
+          'last_modified': e.last_modified,
+          'owner': escape(e.owner),
           'type': 'HUE',
           'uuid': e.uuid,
           'parentUuid': e.parent_directory.uuid,
@@ -1058,17 +1203,3 @@ def _paginate(request, queryset):
   limit = int(request.GET.get('limit', 0))
 
   return __paginate(page, limit, queryset)
-
-
-def __paginate(page, limit, queryset):
-
-  if limit > 0:
-    offset = (page - 1) * limit
-    last = offset + limit
-    queryset = queryset.all()[offset:last]
-
-  return {
-    'documents': queryset,
-    'page': page,
-    'limit': limit
-  }

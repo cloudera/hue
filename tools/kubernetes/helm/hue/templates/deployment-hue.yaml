@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hue
+  labels:
+    deployment: hue
+{{ if .Values.monitoring.enabled }}
+  annotations:
+    "sidecar.jaegertracing.io/inject": "true"
+{{ end }}
+spec:
+  selector:
+    matchLabels:
+      pod: hue
+  replicas: {{ .Values.hue.replicas }}
+  template:
+    metadata:
+      labels:
+        pod: hue
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap-hue-extra.yaml") . | sha256sum }}
+    spec:
+      containers:
+      - name: hue
+        image: {{ .Values.image.registry }}/hue:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+          - containerPort: 8888
+        resources:
+          requests:
+            # memory: "350Mi"
+            cpu: "50m"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/share/hue/desktop/conf/z-hue.ini
+          subPath: hue-ini
+        - name: config-volume-extra
+          mountPath: /usr/share/hue/desktop/conf/zz-hue.ini
+          subPath: hue-ini
+        readinessProbe:
+          httpGet:
+            path: /desktop/debug/is_alive
+            port: 8888
+          initialDelaySeconds: 3
+          periodSeconds: 3
+          failureThreshold: 30
+{{ if .Values.balancer.enabled }}
+      - name: nginx
+        image: {{ .Values.image.registry }}/nginx:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+          - containerPort: 80
+        resources:
+          requests:
+            # memory: "64Mi"
+            cpu: "20m"
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/sites-available/hue
+          subPath: hue
+{{ end }}
+      volumes:
+        - name: config-volume
+          configMap:
+            name: hue-config
+        - name: config-volume-extra
+          configMap:
+            name: hue-config-extra
+{{ if .Values.balancer.enabled }}
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+{{ end }}

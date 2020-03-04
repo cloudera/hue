@@ -26,6 +26,7 @@
 @import "components/hue-filechooser.less";
 @import "components/hue-gridster.less";
 @import "components/hue-inputautocomplete.less";
+@import "components/hue-link-sharing.less";
 @import "components/hue-nav-properties.less";
 @import "components/hue-notify.less";
 @import "components/hue-performance-graph.less";
@@ -39,6 +40,8 @@
 @import "components/hue-selector.less";
 @import "components/hue-shepherd.less";
 @import "components/hue-simple-ace.less";
+@import "components/hue-snippet-editor-actions.less";
+@import "components/hue-snippet-execute-actions.less";
 @import "components/hue-spinner.less";
 @import "components/hue-tables.less";
 @import "components/hue-wizard.less";
@@ -249,6 +252,31 @@ input[type='password']::-ms-reveal {
       border-right: 1px solid @hue-primary-color-dark;
     }
 
+    &.ace-executing-gutter-decoration {
+      background-color: @hue-primary-color-light;
+      border-right: 1px solid @hue-primary-color-dark;
+      .animation(execute-pulse 2s infinite ease-in-out);
+    }
+
+    .keyframes(execute-pulse, {
+      0% { background-color: rgba(0, 140, 255, 0.1); }
+      50% {
+        background-color: rgba(0, 140, 255, 0.4);
+        color: #505050;
+      }
+      100% { background-color: rgba(0, 140, 255, 0.1); }
+    });
+
+    &.ace-failed-gutter-decoration {
+      background-color: @cui-pink-010;
+      border-right: 1px solid @cui-red-700;
+    }
+
+    &.ace-completed-gutter-decoration {
+      background-color: @cui-green-050;
+      border-right: 1px solid @cui-green-400;
+    }
+
     &.ace_error {
       background-color: @cui-pink-010;
       border-right: 1px solid @cui-red-700;
@@ -266,6 +294,13 @@ input[type='password']::-ms-reveal {
   }
 
   .ace_marker-layer {
+    .ace-failed-marker {
+      position: absolute;
+      width: 100% !important;
+      margin-left: -3px;
+    }
+
+    .ace-failed-marker,
     .ace_error-line {
       background-color: @cui-pink-050 !important;
       opacity: 0.5;
@@ -301,6 +336,13 @@ input[type='password']::-ms-reveal {
   }
 
   .ace_marker-layer {
+    .ace-failed-marker {
+      position: absolute;
+      width: 100% !important;
+      margin-left: -3px;
+    }
+
+    .ace-failed-marker,
     .ace_error-line {
       background-color: @cui-pink-050 !important;
       opacity: 0.5;
@@ -639,7 +681,6 @@ ul.errorlist {
   z-index: 2;
   height: 10px;
   line-height: 10px;
-  background-color: @cui-gray-050;
   cursor: s-resize;
   text-align: center;
 }
@@ -653,7 +694,7 @@ ul.errorlist {
 }
 
 .toggle-overflow-toggle:hover {
-  background-color: @cui-gray-100;
+  background-color: @cui-gray-050;
 }
 
 .datepicker {

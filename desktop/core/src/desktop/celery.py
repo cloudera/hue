@@ -50,7 +50,7 @@ def debug_task(self):
   return 'Hello'
 
 
-if 'django_celery_beat' in INSTALLED_APPS:
+if 'django_celery_beat' in INSTALLED_APPS and False: # Config not available yet
   app.conf.beat_schedule = {}
 
   if TASK_SERVER.BEAT_SCHEDULES_FILE.get():

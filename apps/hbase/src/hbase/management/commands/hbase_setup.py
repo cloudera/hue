@@ -20,13 +20,11 @@ import os
 
 from datetime import datetime, timedelta
 
-from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from django.utils.translation import ugettext as _
 
 from desktop.lib.paths import get_apps_root
-
-from useradmin.models import install_sample_user
+from useradmin.models import install_sample_user, User
 
 from hbased.ttypes import AlreadyExists
 from hbase.api import HbaseApi

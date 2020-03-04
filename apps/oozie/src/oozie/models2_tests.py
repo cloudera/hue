@@ -16,13 +16,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import str
-from builtins import object
+from builtins import str, object
 import json
 import logging
 import re
+import sys
 
-from django.contrib.auth.models import User
 from django.urls import reverse
 from django.db.models import Q
 
@@ -35,6 +34,7 @@ from desktop.lib.test_utils import add_permission, add_to_group, grant_access, r
 from desktop.models import DefaultConfiguration, Document, Document2
 from notebook.models import make_notebook, make_notebook2
 from notebook.api import _save_notebook
+from useradmin.models import User
 
 from oozie.conf import ENABLE_V2
 from oozie.importlib.workflows import generate_v2_graph_nodes
@@ -52,8 +52,7 @@ class TestEditor(OozieMockBase):
     super(TestEditor, self).setUp()
     self.wf = Workflow()
 
-    self.client_not_me = make_logged_in_client(username="not_perm_user", groupname="default", recreate=True,
-                                               is_superuser=False)
+    self.client_not_me = make_logged_in_client(username="not_perm_user", groupname="default", recreate=True, is_superuser=False)
     self.user_not_me = User.objects.get(username="not_perm_user")
 
 
@@ -91,13 +90,13 @@ LIMIT $limit"""))
 
 
   def test_hive_script_parsing(self):
-    assert_equal(['field', 'tablename', 'LIMIT'], find_dollar_braced_variables("""
+    assert_equal(sorted(['field', 'tablename', 'LIMIT']), sorted(find_dollar_braced_variables("""
     SELECT ${field}
     FROM ${hivevar:tablename}
     LIMIT ${hiveconf:LIMIT}
-    """))
+    """)))
 
-    assert_equal(['field', 'tablename', 'LIMIT'], find_dollar_braced_variables("SELECT ${field} FROM ${hivevar:tablename} LIMIT ${hiveconf:LIMIT}"))
+    assert_equal(sorted(['field', 'tablename', 'LIMIT']), sorted(find_dollar_braced_variables("SELECT ${field} FROM ${hivevar:tablename} LIMIT ${hiveconf:LIMIT}")))
 
 
   def test_workflow_gen_xml(self):
@@ -199,6 +198,7 @@ LIMIT $limit"""))
   def test_workflow_submission_on_email_notification(self):
     workflow = """{"history": {"oozie_id": "0000013-151015155856463-oozie-oozi-W", "properties": {"oozie.use.system.libpath": "True", "security_enabled": false, "dryrun": false, "jobTracker": "localhost:8032", "oozie.wf.application.path": "hdfs://localhost:8020/user/hue/oozie/workspaces/hue-oozie-1445431078.26", "email_checkbox": "True", "hue-id-w": 6, "nameNode": "hdfs://localhost:8020"}}, "layout": [{"oozieRows": [], "rows": [{"enableOozieDropOnBefore": true, "enableOozieDropOnSide": true, "enableOozieDrop": false, "widgets": [{"status": "", "logsURL": "", "name": "Start", "widgetType": "start-widget", "oozieMovable": false, "ooziePropertiesExpanded": false, "properties": {}, "isLoading": true, "offset": 0, "actionURL": "", "progress": 0, "klass": "card card-widget span12", "oozieExpanded": false, "id": "3f107997-04cc-8733-60a9-a4bb62cebffc", "size": 12}], "id": "9cf57679-292c-d980-8053-1180a84eaa54", "columns": []}, {"enableOozieDropOnBefore": true, "enableOozieDropOnSide": true, "enableOozieDrop": false, "widgets": [{"status": "", "logsURL": "", "name": "End", "widgetType": "end-widget", "oozieMovable": false, "ooziePropertiesExpanded": false, "properties": {}, "isLoading": true, "offset": 0, "actionURL": "", "progress": 0, "klass": "card card-widget span12", "oozieExpanded": false, "id": "33430f0f-ebfa-c3ec-f237-3e77efa03d0a", "size": 12}], "id": "f8f22c81-a9eb-5138-64cf-014ae588d0ca", "columns": []}, {"enableOozieDropOnBefore": true, "enableOozieDropOnSide": true, "enableOozieDrop": false, "widgets": [{"status": "", "logsURL": "", "name": "Kill", "widgetType": "kill-widget", "oozieMovable": true, "ooziePropertiesExpanded": false, "properties": {}, "isLoading": true, "offset": 0, "actionURL": "", "progress": 0, "klass": "card card-widget span12", "oozieExpanded": false, "id": "17c9c895-5a16-7443-bb81-f34b30b21548", "size": 12}], "id": "31f194ff-cd4f-faef-652d-0c5f66a80f97", "columns": []}], "oozieEndRow": {"enableOozieDropOnBefore": true, "enableOozieDropOnSide": true, "enableOozieDrop": false, "widgets": [{"status": "", "logsURL": "", "name": "End", "widgetType": "end-widget", "oozieMovable": false, "ooziePropertiesExpanded": false, "properties": {}, "isLoading": true, "offset": 0, "actionURL": "", "progress": 0, "klass": "card card-widget span12", "oozieExpanded": false, "id": "33430f0f-ebfa-c3ec-f237-3e77efa03d0a", "size": 12}], "id": "f8f22c81-a9eb-5138-64cf-014ae588d0ca", "columns": []}, "oozieKillRow": {"enableOozieDropOnBefore": true, "enableOozieDropOnSide": true, "enableOozieDrop": false, "widgets": [{"status": "", "logsURL": "", "name": "Kill", "widgetType": "kill-widget", "oozieMovable": true, "ooziePropertiesExpanded": false, "properties": {}, "isLoading": true, "offset": 0, "actionURL": "", "progress": 0, "klass": "card card-widget span12", "oozieExpanded": false, "id": "17c9c895-5a16-7443-bb81-f34b30b21548", "size": 12}], "id": "31f194ff-cd4f-faef-652d-0c5f66a80f97", "columns": []}, "enableOozieDropOnAfter": true, "oozieStartRow": {"enableOozieDropOnBefore": true, "enableOozieDropOnSide": true, "enableOozieDrop": false, "widgets": [{"status": "", "logsURL": "", "name": "Start", "widgetType": "start-widget", "oozieMovable": false, "ooziePropertiesExpanded": false, "properties": {}, "isLoading": true, "offset": 0, "actionURL": "", "progress": 0, "klass": "card card-widget span12", "oozieExpanded": false, "id": "3f107997-04cc-8733-60a9-a4bb62cebffc", "size": 12}], "id": "9cf57679-292c-d980-8053-1180a84eaa54", "columns": []}, "klass": "card card-home card-column span12", "enableOozieDropOnBefore": true, "drops": ["temp"], "id": "1920900a-a735-7e66-61d4-23de384e8f62", "size": 12}], "workflow": {"properties": {"job_xml": "", "description": "", "wf1_id": null, "sla_enabled": false, "deployment_dir": "/user/hue/oozie/workspaces/hue-oozie-1445431078.26", "schema_version": "uri:oozie:workflow:0.5", "properties": [], "show_arrows": true, "parameters": [{"name": "oozie.use.system.libpath", "value": true}], "sla": [{"value": false, "key": "enabled"}, {"value": "${nominal_time}", "key": "nominal-time"}, {"value": "", "key": "should-start"}, {"value": "${30 * MINUTES}", "key": "should-end"}, {"value": "", "key": "max-duration"}, {"value": "", "key": "alert-events"}, {"value": "", "key": "alert-contact"}, {"value": "", "key": "notification-msg"}, {"value": "", "key": "upstream-apps"}]}, "name": "My real Workflow 1", "versions": ["uri:oozie:workflow:0.4", "uri:oozie:workflow:0.4.5", "uri:oozie:workflow:0.5"], "isDirty": false, "movedNode": null, "linkMapping": {"33430f0f-ebfa-c3ec-f237-3e77efa03d0a": [], "3f107997-04cc-8733-60a9-a4bb62cebffc": ["33430f0f-ebfa-c3ec-f237-3e77efa03d0a"], "17c9c895-5a16-7443-bb81-f34b30b21548": []}, "nodeIds": ["3f107997-04cc-8733-60a9-a4bb62cebffc", "33430f0f-ebfa-c3ec-f237-3e77efa03d0a", "17c9c895-5a16-7443-bb81-f34b30b21548"], "nodes": [{"properties": {}, "name": "Start", "children": [{"to": "33430f0f-ebfa-c3ec-f237-3e77efa03d0a"}], "actionParametersFetched": false, "type": "start-widget", "id": "3f107997-04cc-8733-60a9-a4bb62cebffc", "actionParameters": []}, {"properties": {}, "name": "End", "children": [], "actionParametersFetched": false, "type": "end-widget", "id": "33430f0f-ebfa-c3ec-f237-3e77efa03d0a", "actionParameters": []}, {"properties": {"body": "", "cc": "", "to": "hue@gethue.com", "enableMail": true, "message": "Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]", "subject": "Error on workflow"}, "name": "Kill", "children": [], "actionParametersFetched": false, "type": "kill-widget", "id": "17c9c895-5a16-7443-bb81-f34b30b21548", "actionParameters": []}], "id": 50020, "nodeNamesMapping": {"33430f0f-ebfa-c3ec-f237-3e77efa03d0a": "End", "3f107997-04cc-8733-60a9-a4bb62cebffc": "Start", "17c9c895-5a16-7443-bb81-f34b30b21548": "Kill"}, "uuid": "330c70c8-33fb-16e1-68fb-c42582c7d178"}}"""
     wf = Workflow(data=workflow, user=self.user)
+
     assert_equal([
         u'<workflow-app', u'name="My', u'real', u'Workflow', u'1"', u'xmlns="uri:oozie:workflow:0.5">',
         u'<start', u'to="End"/>',
@@ -220,8 +220,9 @@ LIMIT $limit"""))
           u'<error', u'to="End-kill"/>',
         u'</action>',
         u'<end', u'name="End-kill"/>',
-        u'</workflow-app>'],
-       wf.to_xml({'output': '/path', 'send_email': 'True'}).split()
+        u'</workflow-app>'
+      ],
+      wf.to_xml({'output': '/path', 'send_email': 'True'}).split()
     )
 
 
@@ -487,7 +488,7 @@ LIMIT $limit"""))
 
       # other user can access document
       response = self.client_not_me.get(reverse('oozie:edit_workflow'), {'workflow': wf_doc.uuid})
-      assert_false('Document does not exist or you don&#39;t have the permission to access it.' in response.content, response.content)
+      assert_false(b'Document does not exist or you don&#39;t have the permission to access it.' in response.content, response.content)
     finally:
       wf_doc.delete()
 
@@ -683,7 +684,9 @@ class TestExternalWorkflowGraph(object):
     node_hierarchy = ['start']
     _get_hierarchy_from_adj_list(adj_list, adj_list['start']['ok_to'], node_hierarchy)
 
-    assert_equal(node_hierarchy, ['start', [u'fork-fe93', [[u'shell-bd90'], [u'shell-d64c'], [u'shell-5429'], [u'shell-d8cc']], u'join-7f80'], ['Kill'], ['End']])
+    expected_node_hierarchy_py2 = ['start', [u'fork-fe93', [[u'shell-bd90'], [u'shell-d64c'], [u'shell-5429'], [u'shell-d8cc']], u'join-7f80'], ['Kill'], ['End']]
+    expected_node_hierarchy_py3 = ['start', [u'fork-fe93', [[u'shell-5429'], [u'shell-bd90'], [u'shell-d64c'], [u'shell-d8cc']], u'join-7f80'], ['Kill'], ['End']]
+    assert_equal(node_hierarchy, expected_node_hierarchy_py3 if sys.version_info[0] > 2 else expected_node_hierarchy_py2)
 
   def test_gen_workflow_data_from_xml(self):
     self.wf.definition = """<workflow-app name="fork-fork-test" xmlns="uri:oozie:workflow:0.5">
@@ -1124,7 +1127,7 @@ class TestExternalWorkflowGraph(object):
                 workflow_data_02['workflow']['nodes'][7]['type'] ==
                 workflow_data_03['workflow']['nodes'][7]['type'] ==
                 workflow_data_04['workflow']['nodes'][7]['type'] ==
-                'hive-widget')
+                'hive-widget' if sys.version_info[0] == 2 else 'spark-widget')
     assert_true(len(workflow_data_01['workflow']['nodes'][7]['children']) ==
                 len(workflow_data_02['workflow']['nodes'][7]['children']) ==
                 len(workflow_data_03['workflow']['nodes'][7]['children']) ==

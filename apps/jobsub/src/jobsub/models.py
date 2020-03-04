@@ -18,12 +18,12 @@
 from builtins import str
 import logging
 
-from django.db import models
 from django.core import urlresolvers
-from django.contrib.auth.models import User
-from desktop.lib.parameterization import find_parameters, bind_parameters
-
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
+
+from desktop.lib.parameterization import find_parameters, bind_parameters
+from useradmin.models import User
 
 
 LOG = logging.getLogger(__name__)

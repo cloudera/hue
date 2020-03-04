@@ -1,8 +1,7 @@
-baseUrl = 'https://docs.gethue.com/latest/' # Note: also in [params]
-# baseURL = '/' # Flip both to see images in developement mode
+baseUrl = 'https://docs.gethue.com/'
 
 languageCode = "en-us"
-title = "Hue Documentation"
+title = "Hue SQL Assistant Documentation"
 
 # Change the default theme to be use when building the site with Hugo
 theme = "hugo-theme-learn"
@@ -12,10 +11,6 @@ theme = "hugo-theme-learn"
 home = [ "HTML", "RSS", "JSON"]
 
 [params]
-  # For logo and favicon partials
-  baseUrl = 'https://docs.gethue.com/latest/'
-  # baseURL = '/'
-
   # Prefix URL to edit current page. Will display an "Edit this page" button on top right hand corner of every page.
   # Useful to give opportunity to people to create merge request for your doc.
   editURL = "https://github.com/cloudera/hue/blob/master/docs/docs-site/content/"

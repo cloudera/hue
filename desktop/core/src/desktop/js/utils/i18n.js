@@ -14,6 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const I18n = identifier => HUE_I18n[identifier] || identifier;
+const I18n = (identifier, ...replacements) => {
+  if (window.DJANGO_DEBUG_MODE && !HUE_I18n[identifier]) {
+    if (!window.missing_I18n) {
+      window.missing_I18n = [];
+    }
+    window.missing_I18n.push(`'${identifier}': '\${ _('${identifier}') }',`);
+  }
+  let result = HUE_I18n[identifier] || identifier;
+  replacements.forEach(replacement => {
+    result = result.replace('%s', replacement);
+  });
+  return result;
+};
 
 export default I18n;

@@ -7,8 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
-      # - image: circleci/python:3.6.1
+      # - image: circleci/python:3.8.0
       - image: gethue/hue:latest
 
       # Specify service dependencies here if necessary
@@ -64,13 +63,18 @@ jobs:
             rm /usr/share/hue/desktop/conf/*.ini
             cp desktop/conf/pseudo-distributed.ini.tmpl /usr/share/hue/desktop/conf/pseudo-distributed.ini
 
+            # ini configuration tweaks
+            ## Very slow if on, cuts time in two and does not skip tests
+            sed -i 's/## has_iam_detection=true/  has_iam_detection=false/g' /usr/share/hue/desktop/conf/pseudo-distributed.ini
+
             cd /usr/share/hue
             # make npm-install # Not available
             cp ~/repo/.babelrc .
+            cp ~/repo/jest.config.js .
 
             cp ~/repo/webpack.config*.js .
             npm install
-            npm i eslint-plugin-jasmine@latest --save-dev # Seems to not be found otherwise
+            npm i eslint-plugin-jest@latest --save-dev # Seems to not be found otherwise
             npm run webpack
             npm run webpack-login
             npm run webpack-workers
@@ -80,20 +84,14 @@ jobs:
             # make doc
             # hugo --source docs/docs-site
 
-      # Run tests
+      # Run code analyses
       - run:
-          name: run python API tests
+          name: run python lints
           command: |
-            cd /usr/share/hue
-            ./build/env/bin/hue test unit --with-xunit --with-cover
+            cd ~/repo
 
-      - run:
-          name: run js tests
-          command: |
-            cd /usr/share/hue
-            npm run test
+            ./tools/ci/check_for_invalid_characters.sh
 
-      # Code analyses
       - run:
           name: run js lint
           command: |
@@ -101,7 +99,25 @@ jobs:
             cp ~/repo/.prettierrc .
             cp ~/repo/.eslint* .
             cp ~/repo/tools . -r
+
             npm run lint
+
+      # Run tests
+      - run:
+          name: run python API tests
+          command: |
+            cd /usr/share/hue
+
+            ./build/env/bin/hue test unit --with-xunit --with-cover
+
+      - run:
+          name: run js tests
+          command: |
+            cd /usr/share/hue
+
+            # https://jestjs.io/docs/en/troubleshooting.html#tests-are-extremely-slow-on-docker-andor-continuous-integration-ci-server
+            sed -i 's/"test": "jest"/"test": "jest --runInBand"/g' package.json
+            npm run test
 
       - store_artifacts:
           path: test-reports
@@ -109,7 +125,7 @@ jobs:
 
   commit:
     docker:
-      - image: circleci/python:3.6.1
+      - image: circleci/python:3.8.0
 
     working_directory: ~/repo
 
@@ -126,6 +142,70 @@ jobs:
             git push origin HEAD:master
 
 
+  build-py3.6:
+    docker:
+      - image: gethue/hue:latest # Should be circleci/python:3.6 at some point
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      # - restore_cache:
+      #     keys:
+      #       - v1-dependencies-{{ checksum "desktop/core/requirements_py3.txt" }}
+      #       # fallback to using the latest cache if no exact match is found
+      #       - v1-dependencies-
+
+      - run:
+          name: compile
+          command: |
+            apt-get install -y python3.6-dev libsnappy-dev # This should not be needed as some point
+
+            export PYTHON_VER=python3.6
+            make apps
+
+      - run:
+          name: run tests
+          command: |
+            ./build/env/bin/hue test unit --with-xunit --with-cover
+
+      # - run:
+      #     name: install dependencies
+      #     command: |
+      #       python -m venv venv
+      #       make apps
+
+      # - save_cache:
+      #     paths:
+      #       - ./build/venv
+      #     key: v1-dependencies-{{ checksum "esktop/core/requirements_py3.txt" }}
+
+
+  build-py3.8:
+    docker:
+      - image: gethue/hue:latest # Should be circleci/python:3.x at some point
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - run:
+          name: compile
+          command: |
+            apt-get install -y python3.8-dev python3.8-venv python3.8-distutils libsnappy-dev # This should not be needed as some point
+
+            export PYTHON_VER=python3.8
+            make apps
+
+      - run:
+          name: run tests
+          command: |
+            ./build/env/bin/hue test unit --with-xunit --with-cover
+
+
 workflows:
   version: 2
   run-tests-and-rebase-master:
@@ -135,10 +215,30 @@ workflows:
             branches:
               ignore:
                 - master
+                - py3-ci
+      - build-py3.6:
+          filters:
+            branches:
+              ignore:
+                - master
+                - py3-ci
       - commit:
           requires:
             - build
+            - build-py3.6
           filters:
             branches:
               only:
                 - /.*ci-commit-master.*/
+  build-python3:
+    jobs:
+      - build-py3.8:
+          filters:
+            branches:
+              only:
+                - py3-ci
+      - build-py3.6:
+          filters:
+            branches:
+              only:
+                - py3-ci

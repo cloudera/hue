@@ -32,31 +32,30 @@ import django.contrib.auth.views
 from django.core import urlresolvers
 from django.core.exceptions import SuspiciousOperation
 from django.contrib.auth import login, get_backends, authenticate
-from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 
+from hadoop.fs.exceptions import WebHdfsException
+from notebook.connectors.base import get_api
+from useradmin.models import get_profile, UserProfile, User, Group
+from useradmin.views import ensure_home_directory, require_change_password
+
 from desktop.auth import forms as auth_forms
 from desktop.auth.backend import OIDCBackend
-from desktop.auth.forms import ImpersonationAuthenticationForm
-from desktop.lib.django_util import render
-from desktop.lib.django_util import login_notrequired
-from desktop.lib.django_util import JsonResponse
+from desktop.auth.forms import ImpersonationAuthenticationForm, OrganizationUserCreationForm, OrganizationAuthenticationForm
+from desktop.conf import OAUTH, ENABLE_ORGANIZATIONS
+from desktop.lib.django_util import render, login_notrequired, JsonResponse
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.log.access import access_log, access_warn, last_access_map
-from desktop.conf import OAUTH
 from desktop.settings import LOAD_BALANCER_COOKIE
 
-from hadoop.fs.exceptions import WebHdfsException
-from useradmin.models import get_profile, UserProfile
-from useradmin.views import ensure_home_directory, require_change_password
-from notebook.connectors.base import get_api
 
 if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
   from urllib.parse import urlencode as urllib_urlencode
 else:
   from urllib import urlencode as urllib_urlencode
+
 
 LOG = logging.getLogger(__name__)
 
@@ -75,7 +74,7 @@ def get_current_users():
     if uid is not None:
       try:
         userobj = User.objects.get(pk=uid)
-        current_users[userobj] = last_access_map.get(userobj.username, { })
+        current_users[userobj] = last_access_map.get(userobj.username, {})
       except User.DoesNotExist:
         LOG.debug("User with id=%d does not exist" % uid)
 
@@ -89,10 +88,13 @@ def first_login_ever():
       return True
   return False
 
-# We want unique method name to represent HUE-3 vs HUE-4 method call. This is required because of urlresolvers.reverse('desktop.auth.views.dt_login') below which needs uniqueness to work correctly
+
+# We want unique method name to represent HUE-3 vs HUE-4 method call.
+# This is required because of urlresolvers.reverse('desktop.auth.views.dt_login') below which needs uniqueness to work correctly.
 @login_notrequired
 def dt_login_old(request, from_modal=False):
   return dt_login(request, from_modal)
+
 
 @login_notrequired
 @watch_login
@@ -104,8 +106,8 @@ def dt_login(request, from_modal=False):
   is_first_login_ever = first_login_ever()
   backend_names = auth_forms.get_backend_names()
   is_active_directory = auth_forms.is_active_directory()
-  is_ldap_option_selected = 'server' not in request.POST or request.POST.get('server') == 'LDAP' \
-                            or request.POST.get('server') in auth_forms.get_ldap_server_keys()
+  is_ldap_option_selected = 'server' not in request.POST or request.POST.get('server') == 'LDAP' or \
+      request.POST.get('server') in auth_forms.get_ldap_server_keys()
 
   if is_active_directory and is_ldap_option_selected:
     UserCreationForm = auth_forms.LdapUserCreationForm
@@ -116,11 +118,14 @@ def dt_login(request, from_modal=False):
       AuthenticationForm = ImpersonationAuthenticationForm
     else:
       AuthenticationForm = auth_forms.AuthenticationForm
+    if ENABLE_ORGANIZATIONS.get():
+      UserCreationForm = OrganizationUserCreationForm
+      AuthenticationForm = OrganizationAuthenticationForm
 
   if request.method == 'POST':
     request.audit = {
       'operation': 'USER_LOGIN',
-      'username': request.POST.get('username')
+      'username': request.POST.get('username', request.POST.get('email'))
     }
 
     # For first login, need to validate user info!
@@ -131,7 +136,7 @@ def dt_login(request, from_modal=False):
       auth_form = AuthenticationForm(data=request.POST)
 
       if auth_form.is_valid():
-        # Must login by using the AuthenticationForm. It provides 'backends' on the User object.
+        # Must login by using the AuthenticationForm. It provides 'backend' on the User object.
         user = auth_form.get_user()
         userprofile = get_profile(user)
 
@@ -150,9 +155,9 @@ def dt_login(request, from_modal=False):
 
         userprofile.first_login = False
         userprofile.last_activity = datetime.now()
-        # This is to fix a bug in Hue 4.3
-        if userprofile.creation_method == UserProfile.CreationMethod.EXTERNAL:
+        if userprofile.creation_method == UserProfile.CreationMethod.EXTERNAL: # This is to fix a bug in Hue 4.3
           userprofile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
+        userprofile.update_data({'auth_backend': user.backend})
         userprofile.save()
 
         msg = 'Successful login for user: %s' % user.username
@@ -164,17 +169,19 @@ def dt_login(request, from_modal=False):
           return HttpResponseRedirect(redirect_to)
       else:
         request.audit['allowed'] = False
-        msg = 'Failed login for user: %s' % request.POST.get('username')
+        msg = 'Failed login for user: %s' % request.POST.get('username', request.POST.get('email'))
         request.audit['operationText'] = msg
         access_warn(request, msg)
         if from_modal or request.GET.get('fromModal', 'false') == 'true':
           return JsonResponse({'auth': False})
-
   else:
     first_user_form = None
     auth_form = AuthenticationForm()
     # SAML/OIDC user is already authenticated in djangosaml2.views.login
-    if hasattr(request,'fs') and ('KnoxSpnegoDjangoBackend' in backend_names or 'SpnegoDjangoBackend' in backend_names or 'OIDCBackend' in backend_names or 'SAML2Backend' in backend_names) and request.user.is_authenticated():
+    if hasattr(request,'fs') and (
+        'KnoxSpnegoDjangoBackend' in backend_names or 'SpnegoDjangoBackend' in backend_names or 'OIDCBackend' in backend_names or
+        'SAML2Backend' in backend_names
+      ) and request.user.is_authenticated():
       try:
         ensure_home_directory(request.fs, request.user)
       except (IOError, WebHdfsException) as e:
@@ -183,7 +190,7 @@ def dt_login(request, from_modal=False):
       return HttpResponseRedirect(redirect_to)
 
   if is_active_directory and not is_ldap_option_selected and \
-                  request.method == 'POST' and request.user.username != request.POST.get('username'):
+      request.method == 'POST' and request.user.username != request.POST.get('username'):
     # local user login failed, give the right auth_form with 'server' field
     auth_form = auth_forms.LdapAuthenticationForm()
 
@@ -223,11 +230,13 @@ def dt_logout(request, next_page=None):
   # Close Impala session on logout
   session_app = "impala"
   if request.user.has_hue_permission(action='access', app=session_app):
-    session = {"type":session_app,"sourceMethod":"dt_logout"}
+    session = {"type": session_app, "sourceMethod":" dt_logout"}
     try:
       get_api(request, session).close_session(session)
+    except PopupException as e:
+      LOG.warn("Error closing %s session: %s" % (session_app, e.message.encode('utf-8')))
     except Exception as e:
-      LOG.warn("Error closing Impala session: %s" % e)
+      LOG.warn("Error closing %s session: %s" % (session_app, e))
 
   backends = get_backends()
   if backends:
@@ -260,7 +269,8 @@ def _profile_dict(user):
     first_name=user.first_name,
     last_name=user.last_name,
     last_login=str(user.last_login), # datetime object needs to be converted
-    email=user.email)
+    email=user.email
+  )
 
 
 # OAuth is based on Twitter as example.
@@ -271,9 +281,10 @@ def oauth_login(request):
 
   consumer = oauth.Consumer(OAUTH.CONSUMER_KEY.get(), OAUTH.CONSUMER_SECRET.get())
   client = oauth.Client(consumer)
-  resp, content = client.request(OAUTH.REQUEST_TOKEN_URL.get(), "POST", body=urllib_urlencode({
-                      'oauth_callback': 'http://' + request.get_host() + '/login/oauth_authenticated/'
-                  }))
+  resp, content = client.request(
+      OAUTH.REQUEST_TOKEN_URL.get(), "POST", body=urllib_urlencode({
+      'oauth_callback': 'http://' + request.get_host() + '/login/oauth_authenticated/'
+  }))
 
   if resp['status'] != '200':
     raise Exception(_("Invalid response from OAuth provider: %s") % resp)
@@ -303,10 +314,10 @@ def oauth_authenticated(request):
   redirect_to = request.GET.get('next', '/')
   return HttpResponseRedirect(redirect_to)
 
+
 @login_notrequired
 def oidc_failed(request):
   if request.user.is_authenticated():
     return HttpResponseRedirect('/')
   access_warn(request, "401 Unauthorized by oidc")
   return render("oidc_failed.mako", request, dict(uri=request.build_absolute_uri()), status=401)
-

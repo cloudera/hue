@@ -1,0 +1,41 @@
+{{- if and .Values.ingress.create (eq .Values.ingress.type "nginx") -}}
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: gethue
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "gethue"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+spec:
+  rules:
+  {{ if .Values.docs.enabled }}
+  - host: {{ .Values.docs.domain }}
+    http:
+      paths:
+      - backend:
+          serviceName: docs
+          servicePort: 9001
+        path: /
+  {{ end }}
+  {{ if .Values.website.enabled }}
+  - host: {{ .Values.website.domain }}
+    http:
+      paths:
+      - backend:
+          serviceName: website
+          servicePort: 9002
+        path: /
+  {{ end }}
+  {{ if .Values.website.jp.enabled }}
+  - host: {{ .Values.website.jp.domain }}
+    http:
+      paths:
+      - backend:
+          serviceName: website-jp
+          servicePort: 9002
+        path: /
+  {{ end }}
+{{- end -}}

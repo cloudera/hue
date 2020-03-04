@@ -34,6 +34,10 @@ import urllib.request, urllib.error
 
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
+
+import hadoop.conf
+import desktop.conf
+
 from desktop.lib.rest import http_client, resource
 from past.builtins import long
 from hadoop.fs import normpath as fs_normpath, SEEK_SET, SEEK_CUR, SEEK_END
@@ -42,21 +46,17 @@ from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
 from hadoop.hdfs_site import get_nn_sentry_prefixes, get_umask_mode, get_supergroup, get_webhdfs_ssl
 
-
-import hadoop.conf
-import desktop.conf
-
 if sys.version_info[0] > 2:
-  from urllib.parse import unquote as urllib_quote
-  from urllib.parse import urlparse
+  from urllib.parse import unquote as urllib_quote, urlparse
 else:
   from urllib import unquote as urllib_quote
   from urlparse import urlparse
 
+
 DEFAULT_HDFS_SUPERUSER = desktop.conf.DEFAULT_HDFS_SUPERUSER.get()
 
 # The number of bytes to read if not specified
-DEFAULT_READ_SIZE = 1024*1024 # 1MB
+DEFAULT_READ_SIZE = 1024 * 1024 # 1MB
 
 LOG = logging.getLogger(__name__)
 
@@ -65,18 +65,20 @@ class WebHdfs(Hdfs):
   """
   WebHdfs implements the filesystem interface via the WebHDFS rest protocol.
   """
-  DEFAULT_USER = desktop.conf.DEFAULT_USER.get()        # This should be the user running Hue
+  DEFAULT_USER = desktop.conf.DEFAULT_USER.get()
   TRASH_CURRENT = 'Current'
 
-  def __init__(self, url,
-               fs_defaultfs,
-               logical_name=None,
-               hdfs_superuser=None,
-               security_enabled=False,
-               ssl_cert_ca_verify=True,
-               temp_dir="/tmp",
-               umask=0o1022,
-               hdfs_supergroup=None):
+  def __init__(
+      self,
+      url,
+      fs_defaultfs,
+      logical_name=None,
+      hdfs_superuser=None,
+      security_enabled=False,
+      ssl_cert_ca_verify=True,
+      temp_dir="/tmp",
+      umask=0o1022,
+      hdfs_supergroup=None):
     self._url = url
     self._superuser = hdfs_superuser
     self._security_enabled = security_enabled
@@ -90,6 +92,7 @@ class WebHdfs(Hdfs):
     self._netloc = "";
     self._is_remote = False
     self._has_trash_support = True
+    self.expiration = None
 
     self._client = self._make_client(url, security_enabled, ssl_cert_ca_verify)
     self._root = resource.Resource(self._client)
@@ -103,14 +106,16 @@ class WebHdfs(Hdfs):
   def from_config(cls, hdfs_config):
     fs_defaultfs = hdfs_config.FS_DEFAULTFS.get()
 
-    return cls(url=_get_service_url(hdfs_config),
-               fs_defaultfs=fs_defaultfs,
-               logical_name=hdfs_config.LOGICAL_NAME.get(),
-               security_enabled=hdfs_config.SECURITY_ENABLED.get(),
-               ssl_cert_ca_verify=hdfs_config.SSL_CERT_CA_VERIFY.get(),
-               temp_dir=hdfs_config.TEMP_DIR.get(),
-               umask=get_umask_mode(),
-               hdfs_supergroup=get_supergroup())
+    return cls(
+        url=_get_service_url(hdfs_config),
+        fs_defaultfs=fs_defaultfs,
+        logical_name=hdfs_config.LOGICAL_NAME.get(),
+        security_enabled=hdfs_config.SECURITY_ENABLED.get(),
+        ssl_cert_ca_verify=hdfs_config.SSL_CERT_CA_VERIFY.get(),
+        temp_dir=hdfs_config.TEMP_DIR.get(),
+        umask=get_umask_mode(),
+        hdfs_supergroup=get_supergroup()
+    )
 
   def __str__(self):
     return "WebHdfs at %s" % self._url
@@ -233,6 +238,10 @@ class WebHdfs(Hdfs):
     """
     Return normalized path but ignore leading scheme prefix if it exists
     """
+    return WebHdfs.norm_path(path)
+
+  @staticmethod
+  def norm_path(path):
     path = fs_normpath(path)
     #fs_normpath clears scheme:/ to scheme: which doesn't make sense
     split = urlparse(path)
@@ -244,7 +253,7 @@ class WebHdfs(Hdfs):
     path = self.normpath(path)
     if not self._is_remote:
       return path
-  
+
     split = urlparse(path)
     if not split.netloc:
       path = split._replace(netloc=self._netloc).geturl()
@@ -466,8 +475,7 @@ class WebHdfs(Hdfs):
     headers = self._getheaders()
     result = self._root.put(old, params, headers=headers)
     if not result['boolean']:
-      raise IOError(_("Rename failed: %s -> %s") %
-                    (str(smart_str(old)), str(smart_str(new))))
+      raise IOError(_("Rename failed: %s -> %s") % (smart_str(old, errors='replace'), smart_str(new, errors='replace')))
 
   def rename_star(self, old_dir, new_dir):
     """Equivalent to `mv old_dir/* new"""
@@ -1029,8 +1037,7 @@ def _get_service_url(hdfs_config):
 
 def test_fs_configuration(fs_config):
   """
-  This is a config validation method. Returns a list of
-    [ (config_variable, error_message) ]
+  This is a config validation method. Returns a list of [(config_variable, error_message)].
   """
   fs = WebHdfs.from_config(fs_config)
   fs.setuser(fs.superuser)
