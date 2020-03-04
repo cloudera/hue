@@ -61,19 +61,18 @@ class SidePanelViewModel {
       }
     });
 
-    huePubSub.subscribe('set.current.app.name', appName => {
-      if (appName === 'dashboard') {
-        self.rightAssistAvailable(true);
-      } else if (appName !== 'editor' && appName !== 'notebook') {
-        self.rightAssistAvailable(false);
-      }
-    });
+    const onAppChange = appName => {
+      self.rightAssistAvailable(
+        appName === 'dashboard' || appName === 'editor' || appName === 'notebook'
+      );
+    };
+
+    huePubSub.subscribe('set.current.app.name', onAppChange);
+    huePubSub.publish('get.current.app.name', onAppChange);
 
     huePubSub.subscribe('active.snippet.type.changed', details => {
       self.rightAssistAvailable(details.isSqlDialect || details.type === 'pig');
     });
-
-    huePubSub.publish('get.current.app.name');
 
     self.activeAppViewModel = ko.observable();
     self.currentApp = ko.observable('');
