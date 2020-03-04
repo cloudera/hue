@@ -141,8 +141,12 @@ class HiveServerTable(Table):
     rows = self.describe
     try:
       col_row_index = list(map(itemgetter('col_name'), rows)).index('# Primary Key') + 3
-      keys = rows[col_row_index:]
-    except:
+      try:
+        end_cols_index = list(map(itemgetter('col_name'), rows[col_row_index:])).index('')
+        keys = rows[col_row_index:][:end_cols_index]
+      except ValueError:
+        keys = rows[col_row_index:]  # There was no other constraints afterwards
+    except Exception:
       # No info (e.g. IMPALA-8291)
       keys = []
 
