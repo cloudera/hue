@@ -941,6 +941,7 @@ def gist_create(request):
 
 
 @login_notrequired
+@api_error_handler
 def gist_get(request):
   gist_uuid = request.GET.get('uuid')
 
@@ -952,7 +953,7 @@ def gist_get(request):
       'unfurl_link.mako',
       request, {
         'title': _('SQL gist from %s') % (gist_doc.owner.get_full_name() or gist_doc.owner.username),
-        'description': statement if len(statement) < 30 else (statement[:70] + '...'),
+        'description': statement if len(statement) < 150 else (statement[:150] + '...'),
         'image_link': None
       }
     )
