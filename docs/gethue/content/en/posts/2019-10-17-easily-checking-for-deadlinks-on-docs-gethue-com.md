@@ -89,7 +89,7 @@ http://localhost:35741/developer/development/
 404 http://docs.python.org/library/hotshot.html
 404 https://en.wikipedia.org/wiki/Hue_(Software
 404 https://twitter.com/gethue!
-lookup developer on 127.0.0.53:53: server misbehaving http://developer/development/#javascript </code></pre>
+lookup developer on 127.0.0.53:53: server misbehaving</code></pre>
 
 <a href="https://cdn.gethue.com/uploads/2019/10/website_link_checker.png"><img src="https://cdn.gethue.com/uploads/2019/10/website_link_checker.png" /></a>
 

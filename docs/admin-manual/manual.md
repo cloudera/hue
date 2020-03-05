@@ -270,14 +270,14 @@ The download feature in the file browser can be disabled separately with the fol
                 [[[llap]]]
                 #   name=LLAP
                 #   interface=hiveserver2
-        
+
         [beeswax]
         # When the LLAP interpreter is added, there are 2 ways to enable connectivity (direct configuration or service discovery)
             # Direct Configuration
             ## llap_server_host = localhost
             ## llap_server_port = 10500
             ## llap_server_thrift_port = 10501
-        
+
             # Service Discovery
             ## hive_discovery_llap = true
             ## hive_discovery_llap_ha = false
@@ -429,7 +429,7 @@ Microsoft’s SQL Server JDBC drivers can be downloaded from the official site: 
 
 ### Vertica
 
-Vertica’s JDBC client drivers can be downloaded here: [Vertica JDBC Client Drivers](https://my.vertica.com/download/vertica/client-drivers/). Be sure to download the driver for the right version and OS.
+Vertica’s JDBC client drivers can be downloaded here: [Vertica JDBC Client Drivers](http://my.vertica.com/download/vertica/client-drivers/). Be sure to download the driver for the right version and OS.
 
     [[[vertica]]]
     name=Vertica JDBC

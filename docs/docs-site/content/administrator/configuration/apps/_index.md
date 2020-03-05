@@ -233,7 +233,7 @@ Then make sure the `hive` interpreter is present in the `[[interpreters]]` list.
 
 ### Custom
 
-A series of native connectors (e.g. Livy, ksql...) interacting with the editor have been developed and are listed in the [developer section](/developer/sdk/#sql-connectors).
+A series of native connectors (e.g. Livy, ksql...) interacting with the editor have been developed and are listed in the [developer section](/developer/connectors/#databases).
 
 ### JDBC
 

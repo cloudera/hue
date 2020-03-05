@@ -52,7 +52,7 @@ The backends is pluggable by providing alternative [client interfaces](https://g
 
 ### Apache Atlas
 
-* [Client API](desktop/libs/metadata/src/metadata/catalog/atlas_client.py)
+* [Client API](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata/src/metadata/catalog/atlas_client.py)
 
 ### Potential connectors
 
