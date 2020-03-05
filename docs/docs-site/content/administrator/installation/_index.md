@@ -12,7 +12,7 @@ Follow the [Container](/administrator/installation/cloud/) or [Dev Quick Start](
 
 ## Installation
 
-Continue to the [next sections](/administrator/installation/dependencies/) for detailed instructions about how to install & run the service.
+Continue to the [next sections](/administrator/installation/dependencies/) for detailed instructions on how to install & run the service.
 
 You can also find distributions of Hue via these companies:
 
