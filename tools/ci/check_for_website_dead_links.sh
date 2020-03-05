@@ -16,21 +16,41 @@
 # limitations under the License.
 
 # arg is path to website root source directory
-# docs/docs-site
-# docs/gethue
+# e.g.
+#   docs/docs-site
+#   docs/gethue
+#
+# https://github.com/raviqqe/muffet
+# go get -u github.com/raviqqe/muffet
+#
+# We lower the concurrency and whitelist Jiras to avoid hammering the external sites.
 
-# git diff --name-only origin/master --diff-filter=b | egrep "^docs/(docs-site|gethue)"
 
-# cd docs/docs-site
+SOURCE=${1:-"docs/docs-site"}
+LINT_EXIT_CODE=1
 
-# boot hugo
+git diff --name-only origin/master --diff-filter=b | egrep "^$SOURCE"
 
-# sudo snap install muffet
+if [ "$?" -eq "0" ];
+  then
+    cd $1
+    echo $PATH
 
-muffet http://localhost:1313/ \
-    --exclude "https://issues.cloudera.org*|http://localhost:5555*|https://issues.apache.org/jira*" \
-    --ignore-fragments \
-    --timeout 15 \
-    --concurrency 10
+    hugo serve&
+    HUGO_PID=$!
 
-exit $?
+    sleep 5
+
+    muffet http://localhost:1313/ \
+        --exclude "https://issues.cloudera.org*|http://localhost:5555*|https://issues.apache.org/jira*" \
+        --ignore-fragments \
+        --timeout 15 \
+        --concurrency 10
+    LINT_EXIT_CODE=$?
+
+    kill $HUGO_PID
+  else
+    echo "No documentation change"
+fi
+
+exit $LINT_EXIT_CODE
