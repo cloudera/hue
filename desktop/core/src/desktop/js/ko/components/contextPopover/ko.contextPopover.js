@@ -972,5 +972,9 @@ class SqlContextContentsGlobalSearch {
 componentUtils.registerComponent(
   'context-popover-contents-global-search',
   SqlContextContentsGlobalSearch,
-  SUPPORT_TEMPLATES + GLOBAL_SEARCH_TEMPLATE
+  SUPPORT_TEMPLATES +
+    DOCUMENT_CONTEXT_TEMPLATE +
+    FUNCTION_CONTEXT_TEMPLATE +
+    PARTITION_CONTEXT_TEMPLATE +
+    GLOBAL_SEARCH_TEMPLATE
 );
