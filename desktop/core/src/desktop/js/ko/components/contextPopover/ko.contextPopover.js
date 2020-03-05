@@ -293,6 +293,9 @@ const SUPPORT_TEMPLATES = `
           <i class="fa fa-key" title="${I18n(
             'Partition key'
           )}" data-bind="visible: isPartitionKey()"></i>
+          <i class="fa fa-key" title="${I18n(
+            'Foreign key'
+          )}" data-bind="visible: isForeignKey()"></i>
           <!-- /ko -->
           <!-- /ko -->
         </div>
@@ -338,7 +341,7 @@ const SUPPORT_TEMPLATES = `
               'Show columns'
             )}' : '${I18n('Show view SQL')}'"></a>
             <!-- /ko -->
-  
+
             <!-- ko if: $parent.viewSqlVisible -->
             <div class="context-popover-sql" data-bind="highlight: { value: $parent.viewSql, enableOverflow: true, formatted: true, dialect: getSourceType() }"></div>
             <!-- /ko -->
@@ -400,7 +403,7 @@ const SUPPORT_TEMPLATES = `
       </div>
     </div>
   </script>
-  
+
   <script type="text/html" id="context-storage-entry-contents">
     <div class="context-popover-content" data-bind="with: storageEntry">
       <!-- ko if: !loading() && hasErrors() -->
@@ -408,9 +411,9 @@ const SUPPORT_TEMPLATES = `
         <div class="alert" data-bind="text: errorText"></div>
       </div>
       <!-- /ko -->
-  
+
       <div class="context-popover-flex-fill" data-bind="visible: loading"><!-- ko hueSpinner: { spin: loading, center: true, size: 'xlarge' } --><!-- /ko --></div>
-  
+
       <!-- ko if: !loading() && !hasErrors() -->
       <!-- ko with: definition -->
       <div class="context-popover-flex-attributes">
@@ -483,7 +486,7 @@ const SUPPORT_TEMPLATES = `
       </div>
       <!-- /ko -->
       <!-- /ko -->
-  
+
       <div class="context-popover-flex-bottom-links">
         <div class="context-popover-link-row">
           <!-- ko ifnot: loading -->

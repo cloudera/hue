@@ -689,6 +689,9 @@ from desktop.views import _ko
     <!-- ko if: catalogEntry.isPrimaryKey() -->
     <div class="details-attribute" ><i class="fa fa-key fa-fw"></i> ${ _('Primary key') }</div>
     <!-- /ko -->
+    <!-- ko if: catalogEntry.isForeignKey() -->
+    <div class="details-attribute" ><i class="fa fa-key fa-fw"></i> ${ _('Foreign key') }</div>
+    <!-- /ko -->
     <!-- /ko -->
     <!-- ko if: loading -->
     <div class="details-comment" ><!-- ko hueSpinner: { spin: loading, size: 'small', inline: true } --><!-- /ko --></div>

@@ -144,7 +144,7 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
       response['is_view'] = table.is_view
       response['partition_keys'] = [{'name': part.name, 'type': part.type} for part in table.partition_keys]
       response['primary_keys'] = [{'name': pk} for pk in primary_keys]
-      response['foreign_keys'] = [{'name': pk.name, 'to': pk.type} for pk in primary_keys]
+      response['foreign_keys'] = [{'name': fk.name, 'to': fk.type} for fk in foreign_keys]
     else:
       col = db.get_column(database, table, column)
       if col:
