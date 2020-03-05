@@ -311,7 +311,7 @@ Hue's new query editors are a huge leap forward in enriching and unifying the SQ
  [5]: https://gethue.com/bay-area-bike-share-data-analysis-with-spark-notebook-part-2/
  [6]: https://phoenix.apache.org
  [7]: https://msdn.microsoft.com/en-us/sqlserver/aa937724.aspx
- [8]: https://my.vertica.com/download/vertica/client-drivers/
+ [8]: http://my.vertica.com/download/vertica/client-drivers/
  [9]: https://phoenix.apache.org/download.html
  [10]: http://Presto JDBC Driver Download
  [11]: http://maprdocs.mapr.com/home/Hue/ConfigureHuewithDrill.html

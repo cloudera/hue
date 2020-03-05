@@ -9,9 +9,9 @@ pre = "<b>3. </b>"
 Hue services are generic and let you integrate with other analytics systems for [querying](/user/querying/) and [browsing](/user/browsing/). Here is a list of the main APIs:
 
 * Connect or create SQL [autocompletes](/developer/parsers/) or connectors to [any database](/administrator/configuration/connectors/#databases) (Impala, MySQL, Presto...)
-* Browse additional storage systems (HDFS, S3, ADLS, GS...)
+* Browse additional storage systems (HDFS, S3, ADLS/ABFS, GS...)
 * List any jobs or queries (YARN, SQL queries, Kubernetes...)
-* Integrate with a [Data Catalog](user/browsing/#data-catalog) (Cloudera Navigator, Apache Atlas...) or a Query Optimization service
+* Integrate with a [Data Catalog](/user/browsing/#data-catalogs) (Apache Atlas, Cloudera Navigator...) or a Query Optimization service
 
 In addition, whole new apps can also be created in order to provide end to end solutions.
 

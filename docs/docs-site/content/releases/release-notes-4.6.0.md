@@ -32,7 +32,7 @@ Download the [tarball](https://cdn.gethue.com/downloads/hue-4.6.0.tgz) or [sour
   * Apache Hive Tez improvements
   * Apache Hive LLAP improvements
   * Autocompletes
-    * Tutorial on how to [improve/create a new SQL parser](/developer/parsers/) with [Highlighter](/how-to-improve-or-add-your-own-sql-syntax-highlighter/)
+    * Tutorial on how to [improve/create a new SQL parser](/developer/parsers/) with [Highlighter](https://gethue.com/how-to-improve-or-add-your-own-sql-syntax-highlighter/)
     * Skeletons of dedicated parsers for Apache Druid, Phoenix, Elastic Serch, Presto, KSQL, Calcite are present
   * [Primary Keys, Partition Keys icons showing in the assists](https://gethue.com/2019-11-13-sql-column-assist-icons/)
 * Collaboration
