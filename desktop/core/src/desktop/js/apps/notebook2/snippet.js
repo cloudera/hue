@@ -267,11 +267,8 @@ export default class Snippet {
     this.inFocus = ko.observable(false);
 
     this.inFocus.subscribe(newValue => {
-      if (newValue) {
-        huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
-          type: this.dialect(),
-          isSqlDialect: this.isSqlDialect()
-        });
+      if (newValue && this.dialect()) {
+        this.parentVm.notifyDialectChange(this.dialect(), this.isSqlDialect());
       }
     });
 
