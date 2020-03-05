@@ -69,6 +69,7 @@ class EditorViewModel {
 
     this.autocompleteTimeout = options.autocompleteTimeout;
     this.selectedNotebook = ko.observable();
+    this.lastNotifiedDialect = undefined;
 
     this.combinedContent = ko.observable();
     this.isPresentationModeEnabled = ko.pureComputed(
@@ -350,10 +351,9 @@ class EditorViewModel {
 
   async newNotebook(editorType, callback, queryTab) {
     return new Promise((resolve, reject) => {
-      huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
-        type: editorType,
-        isSqlDialect: editorType ? this.getSnippetViewSettings(editorType).sqlDialect : undefined
-      });
+      if (editorType) {
+        this.notifyDialectChange(editorType, this.getSnippetViewSettings(editorType).sqlDialect);
+      }
       $.post('/notebook/api/create_notebook', {
         type: editorType || this.editorType(),
         directory_uuid: window.location.getParameter('directory_uuid'),
@@ -376,12 +376,12 @@ class EditorViewModel {
             if (window.location.getParameter('type') === '') {
               hueUtils.changeURLParameter('type', this.editorType());
             }
-            huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
-              type: editorType,
-              isSqlDialect: editorType
-                ? this.getSnippetViewSettings(editorType).sqlDialect
-                : undefined
-            });
+            if (editorType) {
+              this.notifyDialectChange(
+                editorType,
+                this.getSnippetViewSettings(editorType).sqlDialect
+              );
+            }
           }
 
           if (callback) {
@@ -411,10 +411,10 @@ class EditorViewModel {
       if (typeof skipUrlChange === 'undefined' && !this.isNotificationManager()) {
         if (this.editorMode()) {
           this.editorType(docData.document.type.substring('query-'.length));
-          huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
-            type: this.editorType(),
-            isSqlDialect: this.getSnippetViewSettings(this.editorType()).sqlDialect
-          });
+          this.notifyDialectChange(
+            this.editorType(),
+            this.getSnippetViewSettings(this.editorType()).sqlDialect
+          );
           this.changeURL(
             this.URLS.editor + '?editor=' + docData.document.id + '&type=' + this.editorType()
           );
@@ -428,6 +428,16 @@ class EditorViewModel {
     } catch (err) {
       console.error(err);
       await this.newNotebook();
+    }
+  }
+
+  notifyDialectChange(dialect, isSqlDialect) {
+    if (dialect && this.lastNotifiedDialect !== dialect) {
+      huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
+        type: dialect,
+        isSqlDialect: isSqlDialect
+      });
+      this.lastNotifiedDialect = dialect;
     }
   }
 

@@ -504,10 +504,10 @@ export const initNotebook2 = () => {
           if (app === 'editor') {
             huePubSub.publish(REDRAW_FIXED_HEADERS_EVENT);
             huePubSub.publish('hue.scrollleft.show');
-            huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
-              type: viewModel.editorType(),
-              isSqlDialect: viewModel.getSnippetViewSettings(viewModel.editorType()).sqlDialect
-            });
+            viewModel.notifyDialectChange(
+              viewModel.editorType(),
+              viewModel.getSnippetViewSettings(viewModel.editorType()).sqlDialect
+            );
           }
         },
         HUE_PUB_SUB_EDITOR_ID
