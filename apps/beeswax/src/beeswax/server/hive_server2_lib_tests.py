@@ -426,7 +426,7 @@ class TestHiveServerTable():
           Mock(
             stringVal=Mock(values=['# col_name', '', 'code', 'description', 'total_emp', 'salary', '', '# Partition Information', '# col_name', 'date', '', '# Detailed Table Information', 'Database:', 'OwnerType:', 'Owner:', 'CreateTime:', 'LastAccessTime:', 'Retention:', 'Location:', 'Table Type:', 'Table Parameters:', '', '', '', '', '', '', '', '', '', '', '# Storage Information', 'SerDe Library:', 'InputFormat:', 'OutputFormat:', 'Compressed:', 'Num Buckets:', 'Bucket Columns:', 'Sort Columns:', 'Storage Desc Params:', '', '', '# Constraints', '',
                 '# Primary Key', 'Table:', 'Constraint Name:', 'Column Name:', '',
-                '# Foreign Key', 'Table:', 'Constraint Name:', 'Parent Column Name:default.persons.id', ''
+                '# Foreign Keys', 'Table:', 'Constraint Name:', 'Parent Column Name:default.persons.id', ''
               ],
               nulls=''
             )

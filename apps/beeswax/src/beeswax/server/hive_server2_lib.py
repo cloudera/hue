@@ -168,7 +168,7 @@ class HiveServerTable(Table):
         row['col_name'].strip().split(':', 1)[1],  # to: Parent Column Name:default.persons.id
         row['comment']
       )
-      for row in self._parse_keys(key_name='# Foreign Key')
+      for row in self._parse_keys(key_name='# Foreign Keys')
     ]
 
   @property
