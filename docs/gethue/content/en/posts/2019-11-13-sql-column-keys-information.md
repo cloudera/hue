@@ -52,6 +52,7 @@ Here is a tutorial demoing how Hue's SQL Editor helps you quickly visualize and 
 
 ![Assist All Keys](https://cdn.gethue.com/uploads/2019/11/sql_column_pk.png)
 
+*Updated March 2020*
 
 ## Primary Keys
 
@@ -79,6 +80,32 @@ Here is an example of SQL for using them:
     STORED AS KUDU
     TBLPROPERTIES ('kudu.num_tablet_replicas' = '1')
     ;
+
+## Foreign Keys
+
+When a column value points to another column in another table. e.g. The head of the business unit must exist in the person table:
+
+![Assist Foreign Keys](https://cdn.gethue.com/uploads/2020/03/assist_foreign_keys_icons.png)
+
+    CREATE TABLE person (
+      id INT NOT NULL,
+      name STRING NOT NULL,
+      age INT,
+      creator STRING DEFAULT CURRENT_USER(),
+      created_date DATE DEFAULT CURRENT_DATE(),
+
+      PRIMARY KEY (id) DISABLE NOVALIDATE
+    );
+
+    CREATE TABLE business_unit (
+      id INT NOT NULL,
+      head INT NOT NULL,
+      creator STRING DEFAULT CURRENT_USER(),
+      created_date DATE DEFAULT CURRENT_DATE(),
+
+      PRIMARY KEY (id) DISABLE NOVALIDATE,
+      CONSTRAINT fk FOREIGN KEY (head) REFERENCES person(id) DISABLE NOVALIDATE
+    );
 
 ## Partition Keys
 
