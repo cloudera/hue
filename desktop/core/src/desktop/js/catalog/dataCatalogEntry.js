@@ -427,6 +427,12 @@ class DataCatalogEntry {
             primaryKeys[primaryKey.name] = true;
           });
         }
+        const foreignKeys = {};
+        if (sourceMeta.foreign_keys) {
+          sourceMeta.foreign_keys.forEach(foreignKey => {
+            foreignKeys[foreignKey.name] = true;
+          });
+        }
 
         const entities =
           sourceMeta.databases ||
@@ -465,6 +471,9 @@ class DataCatalogEntry {
                       }
                       if (sourceMeta.primary_keys) {
                         definition.primaryKey = !!primaryKeys[entity.name];
+                      }
+                      if (sourceMeta.foreign_keys) {
+                        definition.foreignKey = !!foreignKeys[entity.name];
                       }
                       definition.index = index++;
                       catalogEntry.definition = definition;
@@ -1261,13 +1270,24 @@ class DataCatalogEntry {
   }
 
   /**
+   * Returns true if the entry is a foreign key. Note that the definition has to come from a parent entry, i.e.
+   * getChildren().
+   *
+   * @return {boolean}
+   */
+  isForeignKey() {
+    const self = this;
+    return self.definition && !!self.definition.foreignKey;
+  }
+
+  /**
    * Returns true if the entry is either a partition or primary key. Note that the definition has to come from a parent entry, i.e.
    * getChildren().
    *
    * @return {boolean}
    */
   isKey() {
-    return this.isPartitionKey() || this.isPrimaryKey();
+    return this.isPartitionKey() || this.isPrimaryKey() || this.isForeignKey();
   }
 
   /**
