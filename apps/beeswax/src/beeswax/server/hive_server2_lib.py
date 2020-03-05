@@ -136,11 +136,11 @@ class HiveServerTable(Table):
       # Not partitioned
       return []
 
-  @property
-  def primary_keys(self):
+  def _parse_keys(self, key_name):
     rows = self.describe
+
     try:
-      col_row_index = list(map(itemgetter('col_name'), rows)).index('# Primary Key') + 3
+      col_row_index = list(map(itemgetter('col_name'), rows)).index(key_name) + 3
       try:
         end_cols_index = list(map(itemgetter('col_name'), rows[col_row_index:])).index('')
         keys = rows[col_row_index:][:end_cols_index]
@@ -150,7 +150,26 @@ class HiveServerTable(Table):
       # No info (e.g. IMPALA-8291)
       keys = []
 
-    return [PartitionKeyCompatible(row['data_type'].strip(), 'NULL', row['comment']) for row in keys]
+    return keys
+
+  @property
+  def primary_keys(self):
+    # Note: Thrift has GetPrimaryKeys() API
+    return [
+      PartitionKeyCompatible(row['data_type'].strip(), 'NULL', row['comment']) for row in self._parse_keys(key_name='# Primary Key')
+    ]
+
+  @property
+  def foreign_keys(self):
+    # Note: Thrift has GetCrossReference() API
+    return [
+      PartitionKeyCompatible(
+        row['data_type'].strip().split(':', 1)[1],  # from: Column Name:head
+        row['col_name'].strip().split(':', 1)[1],  # to: Parent Column Name:default.persons.id
+        row['comment']
+      )
+      for row in self._parse_keys(key_name='# Foreign Key')
+    ]
 
   @property
   def comment(self):
