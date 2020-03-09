@@ -30,7 +30,6 @@ class Executor {
    * @param {string} [options.database]
    * @param {function} [options.defaultLimit]
    * @param {boolean} [options.isOptimizerEnabled] - Default false
-   * @param {Snippet} [options.snippet] - Optional snippet for history
    */
   constructor(options) {
     this.sourceType = options.sourceType;
@@ -41,8 +40,6 @@ class Executor {
     this.isOptimizerEnabled = options.isOptimizerEnabled;
     this.executables = [];
     this.defaultLimit = options.defaultLimit || (() => {});
-
-    this.snippet = options.snippet;
   }
 
   toJs() {
@@ -61,8 +58,8 @@ class Executor {
     this.executables.forEach(executable => executable.notify());
   }
 
-  update(statementDetails, beforeExecute) {
-    const executables = syncExecutables(this, statementDetails);
+  update(statementDetails, beforeExecute, snippet) {
+    const executables = syncExecutables(this, statementDetails, snippet);
 
     // Cancel any "lost" executables and any batch chain it's part of
     executables.lost.forEach(lostExecutable => {
