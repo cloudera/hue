@@ -27,6 +27,7 @@ import sessionManager from 'apps/notebook2/execution/sessionManager';
 import Snippet, { STATUS as SNIPPET_STATUS } from 'apps/notebook2/snippet';
 import { HISTORY_CLEARED_EVENT } from 'apps/notebook2/components/ko.queryHistory';
 import { UPDATE_SAVED_QUERIES_EVENT } from 'apps/notebook2/components/ko.savedQueries';
+import SqlExecutable from './execution/sqlExecutable';
 
 export default class Notebook {
   constructor(vm, notebookRaw) {
@@ -45,17 +46,14 @@ export default class Notebook {
     this.canWrite = ko.observable(notebookRaw.can_write !== false);
     this.onSuccessUrl = ko.observable(notebookRaw.onSuccessUrl);
     this.pubSubUrl = ko.observable(notebookRaw.pubSubUrl);
+
     this.isPresentationModeDefault = ko.observable(!!notebookRaw.isPresentationModeDefault);
     this.isPresentationMode = ko.observable(false);
     this.isPresentationModeInitialized = ko.observable(false);
-    this.isPresentationMode.subscribe(newValue => {
-      huePubSub.publish('editor.presentation.operate.toggle', newValue); // Problem with headers / row numbers redraw on full screen results
-      vm.togglePresentationMode();
-      if (newValue) {
-        hueAnalytics.convert('editor', 'presentation');
-      }
-    });
+    this.isPresentationMode.subscribe(this.onPresentationModeChange.bind(this));
     this.presentationSnippets = ko.observable({});
+    this.prePresentationModeSnippet = undefined;
+
     this.isHidingCode = ko.observable(!!notebookRaw.isHidingCode);
 
     this.snippets = ko.observableArray();
@@ -421,6 +419,99 @@ export default class Notebook {
     ).fail(xhr => {
       if (xhr.status !== 502) {
         $(document).trigger('error', xhr.responseText);
+      }
+    });
+  }
+
+  onPresentationModeChange(isPresentationMode) {
+    if (isPresentationMode) {
+      hueAnalytics.convert('editor', 'presentation');
+    }
+
+    // Problem with headers / row numbers redraw on full screen results
+    huePubSub.publish('editor.presentation.operate.toggle', isPresentationMode);
+    const newSnippets = [];
+
+    if (isPresentationMode) {
+      const sourceSnippet = this.snippets()[0];
+      this.prePresentationModeSnippet = sourceSnippet;
+      const variables = sourceSnippet.variables();
+      const statementKeys = {};
+
+      const database = sourceSnippet.database();
+
+      sourceSnippet.executor.executables.forEach(executable => {
+        const sqlStatement = executable.parsedStatement.statement;
+        const statementKey = sqlStatement.hashCode() + database;
+
+        let presentationSnippet;
+
+        if (!this.presentationSnippets()[statementKey]) {
+          const titleLines = [];
+          const statementLines = [];
+          sqlStatement
+            .trim()
+            .split('\n')
+            .forEach(line => {
+              if (line.trim().startsWith('--') && statementLines.length === 0) {
+                titleLines.push(line.substr(2));
+              } else {
+                statementLines.push(line);
+              }
+            });
+          presentationSnippet = new Snippet(this.parentVm, this, {
+            connector: sourceSnippet.connector(),
+            statement_raw: statementLines.join('\n'),
+            database: database,
+            name: titleLines.join('\n'),
+            variables: komapping.toJS(variables)
+          });
+          window.setTimeout(() => {
+            const executableRaw = executable.toJs();
+            const reattachedExecutable = SqlExecutable.fromJs(
+              presentationSnippet.executor,
+              executableRaw
+            );
+            reattachedExecutable.result = executable.result;
+            presentationSnippet.executor.executables = [reattachedExecutable];
+            presentationSnippet.activeExecutable(reattachedExecutable);
+          }, 1000); // TODO: Make it possible to set activeSnippet on Snippet creation
+          presentationSnippet.init();
+          this.presentationSnippets()[statementKey] = presentationSnippet;
+        } else {
+          presentationSnippet = this.presentationSnippets()[statementKey];
+        }
+        presentationSnippet.variables(variables);
+        statementKeys[statementKey] = true;
+        newSnippets.push(presentationSnippet);
+      });
+
+      Object.keys(this.presentationSnippets()).forEach(key => {
+        // Dead statements
+        if (!statementKeys[key]) {
+          this.presentationSnippets()[key].executor.executables.forEach(executable => {
+            executable.cancelBatchChain();
+          });
+          delete this.presentationSnippets()[key];
+        }
+      });
+    } else {
+      newSnippets.push(this.prePresentationModeSnippet);
+    }
+    this.parentVm.editorMode(!isPresentationMode);
+    this.snippets(newSnippets);
+
+    newSnippets.forEach(snippet => {
+      huePubSub.publish('editor.redraw.data', { snippet: snippet });
+      if (this.isPresentationMode()) {
+        window.setTimeout(() => {
+          snippet.executor.executables.forEach(executable => {
+            executable.notify();
+            if (executable.result) {
+              executable.result.notify();
+            }
+          });
+        }, 1000); // TODO: Make it possible to set activeSnippet on Snippet creation
       }
     });
   }
