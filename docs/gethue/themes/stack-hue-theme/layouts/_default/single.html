@@ -12,7 +12,9 @@
                     <article>
                         <div class="article__title text-center">
                             <h1 class="h2">{{ .Title }}</h1>
-                            <span>{{ .Date.Format "02 January 2006" }} in</span>
+                            {{ $pub := .Date.Format "02 January 2006" }}
+                            {{ $last := .Lastmod.Format "02 January 2006" }}
+                            <span>Published on {{ $pub }} in</span>
                             <span>
                                 {{ $categories := .Params.categories }}
                                 {{ range $index, $element := $categories }}
@@ -24,6 +26,10 @@
                             </span>
                             {{ $read := .ReadingTime }}
                             - <span>{{ .ReadingTime }} minute{{ if gt $read 1 }}s{{ end }} read</span>
+
+                            {{ if and (ne $pub $last) (.Lastmod.After .Date) }}
+                            <span> - Last modified on {{ $last }}</span>
+                            {{ end }}
                             {{ if .IsTranslated }}
                             - <span>Read in
                                 {{ range .Translations }}
