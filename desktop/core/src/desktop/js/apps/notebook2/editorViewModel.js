@@ -24,8 +24,6 @@ import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 
 import Notebook from 'apps/notebook2/notebook';
-import Snippet from 'apps/notebook2/snippet';
-import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
 import { UPDATE_HISTORY_EVENT } from 'apps/notebook2/components/ko.queryHistory';
 import { ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT } from 'apps/notebook2/events';
 
@@ -515,110 +513,6 @@ class EditorViewModel {
         huePubSub.publish('session.panel.show');
       }
     );
-  }
-
-  toggleEditing() {
-    this.isEditing(!this.isEditing());
-  }
-
-  toggleEditorMode() {
-    const notebook = this.selectedNotebook();
-    const newSnippets = [];
-
-    const toPresentationMode = this.editorType() !== 'notebook';
-
-    if (toPresentationMode) {
-      this.editorType('notebook');
-      const sourceSnippet = notebook.snippets()[0];
-      this.preEditorTogglingSnippet(sourceSnippet);
-      const variables = sourceSnippet.variables();
-      const statementKeys = {};
-      // Split statements
-      notebook.type('notebook');
-
-      const database = sourceSnippet.database();
-
-      sourceSnippet.executor.executables.forEach(executable => {
-        const sqlStatement = executable.parsedStatement.statement;
-        const statementKey = sqlStatement.hashCode() + database;
-
-        let presentationSnippet;
-
-        if (!notebook.presentationSnippets()[statementKey]) {
-          const titleLines = [];
-          const statementLines = [];
-          sqlStatement
-            .trim()
-            .split('\n')
-            .forEach(line => {
-              if (line.trim().startsWith('--') && statementLines.length === 0) {
-                titleLines.push(line.substr(2));
-              } else {
-                statementLines.push(line);
-              }
-            });
-          presentationSnippet = new Snippet(this, notebook, {
-            type: notebook.initialType,
-            statement_raw: statementLines.join('\n'),
-            database: database,
-            name: titleLines.join('\n'),
-            variables: komapping.toJS(variables)
-          });
-          window.setTimeout(() => {
-            const executableRaw = executable.toJs();
-            const reattachedExecutable = SqlExecutable.fromJs(
-              presentationSnippet.executor,
-              executableRaw
-            );
-            reattachedExecutable.result = executable.result;
-            presentationSnippet.executor.executables = [reattachedExecutable];
-            presentationSnippet.activeExecutable(reattachedExecutable);
-          }, 1000); // TODO: Make it possible to set activeSnippet on Snippet creation
-          presentationSnippet.init();
-          notebook.presentationSnippets()[statementKey] = presentationSnippet;
-        } else {
-          presentationSnippet = notebook.presentationSnippets()[statementKey];
-        }
-        presentationSnippet.variables(sourceSnippet.variables());
-        statementKeys[statementKey] = true;
-        newSnippets.push(presentationSnippet);
-      });
-
-      Object.keys(notebook.presentationSnippets()).forEach(key => {
-        // Dead statements
-        if (!statementKeys[key]) {
-          notebook.presentationSnippets()[key].executor.executables.forEach(executable => {
-            executable.cancelBatchChain();
-          });
-          delete notebook.presentationSnippets()[key];
-        }
-      });
-    } else {
-      this.editorType(notebook.initialType);
-      // Revert to one statement
-      newSnippets.push(this.preEditorTogglingSnippet());
-      notebook.type('query-' + notebook.initialType);
-    }
-    notebook.snippets(newSnippets);
-    newSnippets.forEach(snippet => {
-      huePubSub.publish('editor.redraw.data', { snippet: snippet });
-      if (toPresentationMode) {
-        window.setTimeout(() => {
-          snippet.executor.executables.forEach(executable => {
-            executable.notify();
-            if (executable.result) {
-              executable.result.notify();
-            }
-          });
-        }, 1000); // TODO: Make it possible to set activeSnippet on Snippet creation
-      }
-    });
-  }
-
-  togglePresentationMode() {
-    if (this.selectedNotebook().initialType !== 'notebook') {
-      this.toggleEditorMode();
-    }
   }
 
   withActiveSnippet(callback, notFoundCallback) {
