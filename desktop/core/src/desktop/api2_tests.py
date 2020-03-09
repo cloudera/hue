@@ -22,13 +22,12 @@ import re
 
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises
 
-from useradmin.models import get_default_user_group, User
-
 from beeswax.conf import HIVE_SERVER_HOST
+from useradmin.models import get_default_user_group, User
 
 from desktop.conf import ENABLE_GIST_PREVIEW
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.models import Document2
+from desktop.models import Document2, Directory
 
 
 class TestApi2(object):
@@ -621,6 +620,7 @@ class TestDocumentGist(object):
   def _get_gist(self, uuid, client=None, is_crawler_bot=False):
     if client is None:
       client = self.client
+
     if is_crawler_bot:
       headers = {'HTTP_USER_AGENT': 'Slackbot-LinkExpanding 1.0 (+https://api.slack.com/robots)'}
     else:
@@ -682,23 +682,38 @@ class TestDocumentGist(object):
     assert_equal('/hue/editor?gist=%(uuid)s&type=hive-query' % gist, response.url)
 
 
+  def test_gist_directory_creation(self):
+    home_dir = Directory.objects.get_home_directory(self.user)
+
+    assert_false(home_dir.children.filter(name='Gist').exists())
+
+    Document2.objects.get_gist_directory(self.user)
+
+    assert_true(home_dir.children.filter(name='Gist').exists())
+
+
   def test_get_unfurl(self):
     # Unfurling on
-    response = self._create_gist(
-        statement='SELECT 1',
-        doc_type='hive-query',
-        name='test_gist_get',
-    )
-    gist = json.loads(response.content)
+    f = ENABLE_GIST_PREVIEW.set_for_testing(True)
 
-    response = self._get_gist(
-      uuid=gist['uuid'],
-      is_crawler_bot=True
-    )
+    try:
+      response = self._create_gist(
+          statement='SELECT 1',
+          doc_type='hive-query',
+          name='test_gist_get',
+      )
+      gist = json.loads(response.content)
 
-    assert_equal(200, response.status_code)
-    assert_true(b'<meta name="twitter:card" content="summary">' in response.content, response.content)
-    assert_true(b'<meta property="og:description" content="SELECT 1"/>' in response.content, response.content)
+      response = self._get_gist(
+        uuid=gist['uuid'],
+        is_crawler_bot=True
+      )
+
+      assert_equal(200, response.status_code)
+      assert_true(b'<meta name="twitter:card" content="summary">' in response.content, response.content)
+      assert_true(b'<meta property="og:description" content="SELECT 1"/>' in response.content, response.content)
+    finally:
+      f()
 
     # Unfurling off
     f = ENABLE_GIST_PREVIEW.set_for_testing(False)

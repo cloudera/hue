@@ -133,8 +133,10 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
           col_props.update(extra_col_options.get(col_props['name'], {}))
 
         primary_keys = [col['name'] for col in extra_col_options.values() if col.get('primary_key') == 'true'] # Until IMPALA-8291
+        foreign_keys = []  # Not supported yet
       else:
         primary_keys = [pk.name for pk in table.primary_keys]
+        foreign_keys = table.foreign_keys
 
       response['support_updates'] = table.is_impala_only
       response['columns'] = [column.name for column in table.cols]
@@ -142,6 +144,7 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
       response['is_view'] = table.is_view
       response['partition_keys'] = [{'name': part.name, 'type': part.type} for part in table.partition_keys]
       response['primary_keys'] = [{'name': pk} for pk in primary_keys]
+      response['foreign_keys'] = [{'name': pk.name, 'to': pk.type} for pk in primary_keys]
     else:
       col = db.get_column(database, table, column)
       if col:

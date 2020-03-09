@@ -1875,7 +1875,7 @@ CLUSTERS = UnspecifiedConfigSection(
 
 ENABLE_GIST = Config(
   key='enable_gist',
-  default=False,
+  default=True,
   type=coerce_bool,
   help=_('Turn on the Gist snippet sharing.')
 )
@@ -1893,7 +1893,7 @@ ENABLE_GIST_PREVIEW = Config(
 
 ENABLE_LINK_SHARING = Config(
   key='enable_link_sharing',
-  default=False,
+  default=True,
   type=coerce_bool,
   help=_('Turn on the direct link sharing of saved document.')
 )
