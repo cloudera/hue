@@ -80,11 +80,29 @@ jobs:
             npm run webpack-workers
             ./build/env/bin/hue collectstatic --noinput
 
-            # cp -r ~/repo/docs .
-            # make doc
-            # hugo --source docs/docs-site
+            cp -r ~/repo/docs .
 
-      # Run code analyses
+      # Run documentation lint
+      - run:
+          name: run documentation lints
+          command: |
+            cd ~/repo
+
+            # Installs to move to image building
+            curl -O https://dl.google.com/go/go1.11.linux-amd64.tar.gz
+            tar -xvf go1.11.linux-amd64.tar.gz
+            go/bin/go get -u github.com/raviqqe/muffet
+
+            curl --output hugo_0.66.0_Linux-64bit.tar.gz -L https://github.com/gohugoio/hugo/releases/download/v0.66.0/hugo_0.66.0_Linux-64bit.tar.gz
+            tar -xvf hugo_0.66.0_Linux-64bit.tar.gz
+
+            export PATH=$PWD:$HOME/go/bin:$PATH
+
+            # Trigger linting if documentation changes
+            ./tools/ci/check_for_website_dead_links.sh docs/docs-site
+            # ./tools/ci/check_for_website_dead_links.sh docs/gethue
+
+      # Run code lints
       - run:
           name: run python lints
           command: |
@@ -122,6 +140,7 @@ jobs:
       - store_artifacts:
           path: test-reports
           destination: test-reports
+
 
   commit:
     docker:

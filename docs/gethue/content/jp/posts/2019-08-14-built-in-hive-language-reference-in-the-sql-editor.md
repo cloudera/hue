@@ -55,7 +55,7 @@ Apache Impalaの[方言][1]と同様に、[Editor][2]は右側のパネルで[Hi
 </div>
 
 <div>
-  フィードバックや質問はありますか？コメントなどありましたら、コメント欄あるいは<a href="https://discourse.gethue.com/">フォーラム</a>、または<a href="https://twitter.com/gethue">@gethue</a>まで。SQLクエリの<a href="https://docs.gethue.com/latest/quickstart/">クイックスタート（英語）</a>はこちらから!
+  フィードバックや質問はありますか？コメントなどありましたら、コメント欄あるいは<a href="https://discourse.gethue.com/">フォーラム</a>、または<a href="https://twitter.com/gethue">@gethue</a>まで。SQLクエリの<a href="https://docs.gethue.com//quickstart/">クイックスタート（英語）</a>はこちらから!
 </div>
 
 <div>

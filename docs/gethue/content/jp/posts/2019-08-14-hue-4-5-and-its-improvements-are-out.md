@@ -54,7 +54,7 @@ Hueチームはすべての貢献者に感謝し、Hue 4.5がリリースでき�
 <img class="" src="https://cdn.gethue.com/uploads/2015/08/hue-logo-copy.png" alt="hue-logo" width="85" height="63" />
 
 このリリースの焦点は技術的なスタックをモジュール化し、SQLの統合を改善し、今後の主要機能の準備をすることでした。
-  
+
 このリリースには 660 件のコミットと 150 件以上のバグフィックスが含まれています！全ての変更点は[リリースノート][2]をご覧ください。
 
 簡単に試すにはいくつかの方法があります。
@@ -81,13 +81,13 @@ Hueチームはすべての貢献者に感謝し、Hue 4.5がリリースでき�
   <h2>
     SQL
   </h2>
-  
+
   <ul>
     <li>
       <a href="https://gethue.com/realtime-catalog-search-with-hue-and-apache-atlas/">Apache Atlasの統合とカタログAPI（英語）</a>
     </li>
     <li>
-      <a href="https://docs.gethue.com/latest/administrator/configuration/editor/#hiv">Hive LLAP + Service discovery（英語）</a>
+      <a href="https://docs.gethue.com//administrator/configuration/editor/#hiv">Hive LLAP + Service discovery（英語）</a>
     </li>
     <li>
       <a href="http://jp.gethue.com/built-in-hive-language-reference-in-the-sql-editor/">SQLエディタでの組み込みHive言語リファレンス</a>
@@ -96,11 +96,11 @@ Hueチームはすべての貢献者に感謝し、Hue 4.5がリリースでき�
       <a href="http://jp.gethue.com/sql-querying-apache-hbase-with-apache-phoenix/">HBase Phoenix クエリの例</a>
     </li>
   </ul>
-  
+
   <h2>
     インターフェース
   </h2>
-  
+
   <ul>
     <li>
       左側のメニューの刷新
@@ -112,27 +112,27 @@ Hueチームはすべての貢献者に感謝し、Hue 4.5がリリースでき�
       <a href="https://gethue.com/2x-faster-page-load-time-with-the-new-bundling-of-javascript-files/">Webpackの統合（英語）</a>
     </li>
   </ul>
-  
+
   <h2>
     ドキュメントの刷新
   </h2>
-  
+
   <ul>
     <li>
       <a href="https://gethue.com/build-your-own-autocompleter/">Building SQL Autocompletes（英語）</a>
     </li>
     <li>
-      <a href="https://docs.gethue.com/latest/administrator/administration/reference/">Architecture（英語）</a>
+      <a href="https://docs.gethue.com//administrator/administration/reference/">Architecture（英語）</a>
     </li>
     <li>
-      <a href="https://docs.gethue.com/latest/administrator/configuration/editor/">SQL connectors refresh（英語）</a>
+      <a href="https://docs.gethue.com//administrator/configuration/editor/">SQL connectors refresh（英語）</a>
     </li>
   </ul>
-  
+
   <h2>
     クラウド
   </h2>
-  
+
   <ul>
     <li>
       <a href="http://jp.gethue.com/hue-in-kubernetes/">Kubernetes Helm</a>
@@ -157,7 +157,7 @@ Hueチームはすべての貢献者に感謝し、Hue 4.5がリリースでき�
 &nbsp;
 
  [1]: https://cdn.gethue.com/uploads/2015/08/hue-logo-copy.png
- [2]: https://docs.gethue.com/latest/releases/release-notes-4.5.0/
+ [2]: https://docs.gethue.com//releases/release-notes-4.5.0/
  [3]: https://github.com/cloudera/hue/archive/release-4.5.0.zip
  [4]: http://demo.gethue.com/
  [5]: https://cdn.gethue.com/uploads/2019/08/hue_4.5.png

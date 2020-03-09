@@ -409,7 +409,7 @@ Then give Hue the information about the database source:
 
 Alternative:
 
-Vertica’s JDBC client drivers can be downloaded here: [Vertica JDBC Client Drivers](https://my.vertica.com/download/vertica/client-drivers/). Be sure to download the driver for the right version and OS.
+Vertica’s JDBC client drivers can be downloaded here: [Vertica JDBC Client Drivers](http://my.vertica.com/download/vertica/client-drivers/). Be sure to download the driver for the right version and OS.
 
     [[[vertica]]]
     name=Vertica JDBC

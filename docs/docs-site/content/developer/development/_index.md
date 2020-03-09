@@ -775,7 +775,7 @@ Note: code updates won’t be seen after the Docker container runs. For this Hue
 
     ./build/env/bin/hue runserver 0.0.0.0:8888
 
-and recompiling the Docker image. It will then auto-restart on Python code changes. For JavaScript, those would need to be [compiled](//developer/development/#javascript).
+and recompiling the Docker image. It will then auto-restart on Python code changes. For JavaScript, those would need to be [compiled](/developer/development/#javascript).
 
 
 ### Documentation

@@ -118,9 +118,9 @@ Error: ERROR 505 (42000): Table is read only. (state=42000,code=505)
  [3]: https://gethue.com/improved-hbase-cell-editor-history/
  [4]: https://gethue.com/sql-editor/
  [5]: https://phoenix.apache.org/Phoenix-in-15-minutes-or-less.html
- [6]: https://docs.gethue.com/latest/administrator/configuration/editor/#phoenix
+ [6]: https://docs.gethue.com//administrator/configuration/editor/#phoenix
  [7]: https://cdn.gethue.com/uploads/2019/07/editor_phoenix_select.png
  [8]: https://cdn.gethue.com/uploads/2019/07/phonix_select_shell.png
- [9]: https://docs.gethue.com/latest/developer/parsers/
+ [9]: https://docs.gethue.com//developer/parsers/
  [10]: https://github.com/Pirionfr/pyPhoenix
  [11]: https://blog.cloudera.com/blog/2019/07/apache-phoenix-for-cdh/
