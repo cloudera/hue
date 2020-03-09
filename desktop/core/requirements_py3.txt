@@ -56,7 +56,6 @@ lockfile==0.12.2
 lxml==4.4.2
 Mako==1.0.7
 Markdown==3.1
-MarkupSafe==0.9.3
 monotonic==1.5
 mozilla-django-oidc==1.0.0
 mysqlclient==1.4.2.post1
