@@ -15,8 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import next
-from builtins import str
+from builtins import next, str
 import json
 import logging
 import re
@@ -617,7 +616,7 @@ def install_examples(request):
         dialect = 'hive'
       db_name = request.POST.get('db_name', 'default')
       connector_id = request.POST.get('connector_id')
-      beeswax_install_examples.Command().handle(dialect=dialect, db_name=db_name, user=request.user)
+      beeswax_install_examples.Command().handle(dialect=dialect, db_name=db_name, user=request.user, request=request)
       response['status'] = 0
     except Exception as err:
       LOG.exception(err)
