@@ -22,13 +22,12 @@ import re
 
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises
 
-from useradmin.models import get_default_user_group, User
-
 from beeswax.conf import HIVE_SERVER_HOST
+from useradmin.models import get_default_user_group, User
 
 from desktop.conf import ENABLE_GIST_PREVIEW
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.models import Document2
+from desktop.models import Document2, Directory
 
 
 class TestApi2(object):
@@ -681,6 +680,16 @@ class TestDocumentGist(object):
     response = self._get_gist(uuid=gist['uuid'], client=self.client_not_me)
     assert_equal(302, response.status_code)
     assert_equal('/hue/editor?gist=%(uuid)s&type=hive-query' % gist, response.url)
+
+
+  def test_gist_directory_creation(self):
+    home_dir = Directory.objects.get_home_directory(self.user)
+
+    assert_false(home_dir.children.filter(name='Gist').exists())
+
+    Document2.objects.get_gist_directory(self.user)
+
+    assert_true(home_dir.children.filter(name='Gist').exists())
 
 
   def test_get_unfurl(self):
