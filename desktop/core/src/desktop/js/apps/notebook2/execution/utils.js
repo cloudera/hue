@@ -16,7 +16,13 @@
 
 import SqlExecutable from 'apps/notebook2/execution/sqlExecutable';
 
-export const syncExecutables = (executor, statementDetails) => {
+/**
+ * @param executor
+ * @param statementDetails
+ * @param [Snippet] snippet - Optional Snippet for history
+ * @return {{all: [], edited: [], lost: [], selected: []}}
+ */
+export const syncExecutables = (executor, statementDetails, snippet) => {
   const allNewStatements = statementDetails.precedingStatements.concat(
     statementDetails.activeStatement,
     statementDetails.followingStatements
@@ -56,7 +62,8 @@ export const syncExecutables = (executor, statementDetails) => {
       executable = new SqlExecutable({
         parsedStatement: parsedStatement,
         database: activeDatabase,
-        executor: executor
+        executor: executor,
+        snippet: snippet
       });
     }
     result.all.push(executable);
