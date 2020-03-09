@@ -72,7 +72,7 @@ ${ commonheader_m(editor_type, editor_type, user, request, "68px") | n,unicode }
 <!-- ko with: selectedNotebook -->
 
   <!-- ko foreach: snippets  -->
-  <div class="ace-editor" data-bind="attr: { id: id() }, aceEditor: {
+  <div class="ace-editor" data-bind="attr: { id: id }, aceEditor: {
         snippet: $data,
         contextTooltip: '${ _ko("Right-click for details") }',
         expandStar: '${ _ko("Shift + Click to replace with all columns") }',

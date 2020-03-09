@@ -44,7 +44,7 @@ ko.bindingHandlers.aceEditor = {
 
     $el.text(snippet.statement_raw());
 
-    const editor = ace.edit($el.attr('id'));
+    const editor = ace.edit(snippet.id());
     const AceRange = ace.require('ace/range').Range;
 
     const resizeAce = function() {

@@ -1541,7 +1541,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   <!-- ko ifnot: $root.isPresentationMode() -->
   <div class="row-fluid">
     <div class="span6" data-bind="clickForAceFocus: ace">
-      <div class="ace-editor" data-bind="attr: { id: id() }, aceEditor: {
+      <div class="ace-editor" data-bind="attr: { id: id }, aceEditor: {
         snippet: $data,
         updateOnInput: true
       }"></div>
