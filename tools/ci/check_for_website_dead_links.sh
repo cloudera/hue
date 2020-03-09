@@ -51,6 +51,7 @@ if [ "$?" -eq "0" ];
     kill $HUGO_PID
   else
     echo "No documentation change"
+    LINT_EXIT_CODE=0
 fi
 
 exit $LINT_EXIT_CODE
