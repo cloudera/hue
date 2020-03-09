@@ -371,11 +371,11 @@ export default class Executable {
   }
 
   async toContext(id) {
-    if (this.executor.snippet) {
+    if (this.snippet) {
       return {
         operationId: this.operationId,
-        snippet: this.executor.snippet.toContextJson(),
-        notebook: await this.executor.snippet.parentNotebook.toContextJson()
+        snippet: this.snippet.toContextJson(),
+        notebook: await this.snippet.parentNotebook.toContextJson()
       };
     }
 

@@ -387,7 +387,7 @@ export default class Snippet {
             }
           }
           this.positionStatement(statementDetails.activeStatement);
-          this.activeExecutable(this.executor.update(statementDetails, beforeExecute));
+          this.activeExecutable(this.executor.update(statementDetails, beforeExecute, this));
           beforeExecute = false;
           if (statementDetails.activeStatement) {
             const statementsList = [];
