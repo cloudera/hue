@@ -195,24 +195,23 @@ class SnippetResults extends DisposableComponent {
     });
 
     let lastRenderedResult = undefined;
-    this.subscribe(RESULT_UPDATED_EVENT, executionResult => {
-      if (this.activeExecutable() === executionResult.executable) {
-        const refresh = lastRenderedResult !== executionResult;
-        this.updateFromExecutionResult(executionResult, refresh);
-        lastRenderedResult = executionResult;
-      }
-    });
-
-    this.subscribe(this.activeExecutable, executable => {
-      if (executable && executable.result) {
-        if (executable !== lastRenderedResult) {
-          this.updateFromExecutionResult(executable.result, true);
-          lastRenderedResult = executable;
-        }
+    const handleResultChange = () => {
+      if (this.activeExecutable() && this.activeExecutable().result) {
+        const refresh = lastRenderedResult !== this.activeExecutable().result;
+        this.updateFromExecutionResult(this.activeExecutable().result, refresh);
+        lastRenderedResult = this.activeExecutable().result;
       } else {
         this.resetResultData();
       }
+    };
+
+    this.subscribe(RESULT_UPDATED_EVENT, executionResult => {
+      if (this.activeExecutable() === executionResult.executable) {
+        handleResultChange();
+      }
     });
+
+    this.subscribe(this.activeExecutable, handleResultChange);
   }
 
   resetResultData() {
@@ -246,7 +245,12 @@ class SnippetResults extends DisposableComponent {
         this.cleanedNumericMeta(executionResult.cleanedNumericMeta);
       }
 
-      if (executionResult.lastRows.length) {
+      if (refresh) {
+        this.data(executionResult.rows);
+      } else if (
+        executionResult.lastRows.length &&
+        this.data().length !== executionResult.rows.length
+      ) {
         this.data.push(...executionResult.lastRows);
       }
       this.lastFetchedRows(executionResult.lastRows);
