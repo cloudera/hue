@@ -905,7 +905,7 @@
               'active-editor': inFocus
             },
             attr: {
-              id: id()
+              id: id
             },
             delayedOverflow: 'slow',
             aceEditor: {
@@ -1040,7 +1040,7 @@
     <!-- ko ifnot: $root.isPresentationMode() -->
     <div class="row-fluid">
       <div class="span6" data-bind="clickForAceFocus: ace.bind($data)">
-        <div class="ace-editor" data-bind="attr: { id: id() }, aceEditor: {
+        <div class="ace-editor" data-bind="attr: { id: id }, aceEditor: {
         snippet: $data,
         updateOnInput: true
       }"></div>
