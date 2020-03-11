@@ -49,14 +49,17 @@ from hadoop.pseudo_hdfs4 import is_live_cluster
 import useradmin.conf
 import useradmin.ldap_access
 from useradmin.forms import UserChangeForm
+from useradmin.metrics import active_users, active_users_per_instance
 from useradmin.middleware import ConcurrentUserSessionMiddleware
 from useradmin.models import HuePermission, GroupPermission, UserProfile, get_profile, get_default_user_group, User, Group
 from useradmin.hue_password_policy import reset_password_policy
 
 if sys.version_info[0] > 2:
   from django.utils.encoding import smart_text as smart_unicode
+  from unittest.mock import patch, Mock
 else:
   from django.utils.encoding import smart_unicode
+  from mock import patch, Mock
 
 
 def reset_all_users():
@@ -294,6 +297,46 @@ class TestUserProfile(BaseUserAdminTests):
     user = User.objects.get(username='test')
     userprofile = get_profile(user)
     assert_equal('es', userprofile.data['language_preference'])
+
+
+class TestUserAdminMetrics(BaseUserAdminTests):
+
+  @override_settings(AUTHENTICATION_BACKENDS=['desktop.auth.backend.AllowFirstUserDjangoBackend'])
+  def test_active_users(self):
+    with patch('useradmin.middleware.get_localhost_name') as get_hostname:
+      get_hostname.return_value = 'host1'
+
+      c = make_logged_in_client(username='test1', password='test', is_superuser=False, recreate=True)
+      userprofile1 = get_profile(User.objects.get(username='test1'))
+      userprofile1.last_activity = datetime.now()
+      userprofile1.hostname = 'host1'
+      userprofile1.save()
+
+      c = make_logged_in_client(username='test2', password='test', is_superuser=False, recreate=True)
+      userprofile2 = get_profile(User.objects.get(username='test2'))
+      userprofile2.last_activity = datetime.now()
+      userprofile2.hostname = 'host1'
+      userprofile2.save()
+
+    with patch('useradmin.middleware.get_localhost_name') as get_hostname:
+      get_hostname.return_value = 'host2'
+
+      c = make_logged_in_client(username='test3', password='test', is_superuser=False, recreate=True)
+      userprofile3 = get_profile(User.objects.get(username='test3'))
+      userprofile3.last_activity = datetime.now()
+      userprofile3.hostname = 'host2'
+      userprofile3.save()
+
+    with patch('useradmin.metrics.get_localhost_name') as get_hostname:
+      get_hostname.return_value = 'host1'
+      assert_equal(3, active_users())
+      assert_equal(2, active_users_per_instance())
+
+      c = Client()
+      response = c.get('/desktop/metrics/', dict(format='json'))
+      metric = json.loads(response.content)['metric']
+      assert_equal(3, metric['users.active'])
+      assert_equal(2, metric['users.active.instance'])
 
 
 class TestUserAdmin(BaseUserAdminTests):

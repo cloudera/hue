@@ -87,6 +87,7 @@ class UserProfile(models.Model):
   creation_method = models.CharField(editable=True, null=False, max_length=64, default=CreationMethod.HUE.name)
   first_login = models.BooleanField(default=True, verbose_name=_t('First Login'), help_text=_t('If this is users first login.'))
   last_activity = models.DateTimeField(auto_now=True, db_index=True)
+  hostname = models.CharField(editable=True, max_length=255, null=True)
   json_data = models.TextField(default='{}')
 
   def get_groups(self):
