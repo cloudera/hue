@@ -59,6 +59,7 @@ from string import Template
 from django.utils.translation import ugettext as _
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.types import NullType
 
 from desktop.lib import export_csvxls
 from desktop.lib.i18n import force_unicode
@@ -296,6 +297,7 @@ class SqlAlchemyApi(Api):
       database = self._fix_phoenix_empty_database(database)
       columns = assist.get_columns(database, table)
       response['columns'] = [col['name'] for col in columns]
+
       response['extended_columns'] = [{
           'autoincrement': col.get('autoincrement'),
           'comment': col.get('comment'),
@@ -303,7 +305,7 @@ class SqlAlchemyApi(Api):
           'name': col.get('name'),
           'nullable': col.get('nullable'),
           'type': str(col.get('type'))
-        } for col in columns
+        } for col in columns if not isinstance(col.get('type'), NullType)
       ]
     else:
       columns = assist.get_columns(database, table)
