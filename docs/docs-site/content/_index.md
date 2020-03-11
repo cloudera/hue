@@ -9,9 +9,9 @@ pre = "<b>1. </b>"
 
 <h1>Documentation</h1>
 
-Hue is a mature open source SQL Assistant for [querying](/user/querying/) [Databases & Data Warehouses](https://docs.gethue.com/administrator/configuration/connectors/) and collaborating: [gethue.com](http://gethue.com)
+Hue is a mature open source SQL Assistant for querying [Databases & Data Warehouses](https://docs.gethue.com/administrator/configuration/connectors/) and collaborating: [gethue.com](http://gethue.com)
 
-Many companies and organizations use Hue to quickly answer questions via self-service querying e.g.:
+Many companies and organizations use Hue to quickly answer questions via [self-service querying](/user/querying/) e.g.:
 
 * 1000+ customers
 * Top Fortune 500
