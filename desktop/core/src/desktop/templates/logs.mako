@@ -23,10 +23,12 @@ import re
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="about_layout.mako" />
-%if not is_embeddable:
+
+% if not is_embeddable:
 ${ commonheader(_('Server Logs'), "about", user, request) | n,unicode }
-%endif
-${layout.menubar(section='log_view')}
+% endif
+
+${ layout.menubar(section='log_view') }
 
 <style type="text/css">
   pre {
@@ -67,7 +69,7 @@ ${layout.menubar(section='log_view')}
   <div class="card card-small">
     <%actionbar:render>
       <%def name="search()">
-        <input type="text" class="input-xlarge" id="hue-logs-search-query" placeholder="${_('Search in the logs')}" value="${query}">
+        <input type="text" class="input-xlarge" id="hue-logs-search-query" placeholder="${ _('Search in the logs') }" value="${ query }">
       </%def>
       <%def name="creation()">
         <form class="form-inline">
@@ -76,13 +78,15 @@ ${layout.menubar(section='log_view')}
             </label>
             <label class="checkbox margin-right-10">
               <input type="checkbox" id="forcedDebug" data-bind="checked: forcedDebug">
-              ${_('Force DEBUG level')}
+              ${ _('Force DEBUG level') }
             </label>
             <label class="checkbox margin-right-10">
               <input id="wrapLogs" id="wrap" type="checkbox" checked="checked">
-              ${_('Wrap logs')}
+              ${ _('Wrap logs') }
             </label>
-            <a href="javascript:void(0)" onclick="huePubSub.publish('open.link', '/desktop/download_logs');" class="btn"><i class="fa fa-download"></i> ${_('Download entire log as zip')}</a>
+            <a href="javascript:void(0)" onclick="huePubSub.publish('open.link', '/desktop/download_logs');" class="btn">
+              <i class="fa fa-download"></i> ${ _('Download entire log as zip') }
+            </a>
         </form>
       </%def>
     </%actionbar:render>
@@ -90,9 +94,9 @@ ${layout.menubar(section='log_view')}
     <% log.reverse() %>
 
     <div id="hue-logs">
-        % for l in log:
-          <pre>${smart_unicode(l, errors='ignore')}</pre>
-        % endfor
+      % for l in log:
+        <pre>${ smart_unicode(l, errors='ignore') }</pre>
+      % endfor
     </div>
 
   </div>
@@ -206,6 +210,6 @@ ${layout.menubar(section='log_view')}
   });
 </script>
 
-%if not is_embeddable:
+% if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
-%endif
+% endif
