@@ -333,10 +333,11 @@ class TestUserAdminMetrics(BaseUserAdminTests):
       assert_equal(2, active_users_per_instance())
 
       c = Client()
-      response = c.get('/desktop/metrics/', dict(format='json'))
+      response = c.get('/desktop/metrics/', {'format': 'json'})
+
       metric = json.loads(response.content)['metric']
-      assert_equal(3, metric['users.active'])
-      assert_equal(2, metric['users.active.instance'])
+      assert_equal(3, metric['users.active']['value'])
+      assert_equal(2, metric['users.active.instance']['value'])
 
 
 class TestUserAdmin(BaseUserAdminTests):
