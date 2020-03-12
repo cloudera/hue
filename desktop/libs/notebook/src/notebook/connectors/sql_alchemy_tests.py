@@ -201,11 +201,43 @@ class TestApi(object):
         )
 
 
+class TestDialects(object):
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    self.user = rewrite_user(User.objects.get(username="test"))
+
+
+  def test_backticks_with_connectors(self):
+    interpreter = {'options': {'url': 'dialect://'}, 'dialect_properties': {'sql_identifier_quote': '`'}}
+    data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
+
+    assert_equal(data, 'SELECT *\nFROM `db1`.`table1`\nLIMIT 1000\n')
+
+
+    interpreter = {'options': {'url': 'dialect://'}, 'dialect_properties': {'sql_identifier_quote': '"'}}
+    data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
+
+    assert_equal(data, 'SELECT *\nFROM "db1"."table1"\nLIMIT 1000\n')
+
+
+  def test_backticks_without_connectors(self):
+    interpreter = {'options': {'url': 'phoenix://'}}
+    data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
+
+    assert_equal(data, 'SELECT *\nFROM `db1`.`table1`\nLIMIT 1000\n')
+
+
+    interpreter = {'options': {'url': 'postgresql://'}}
+    data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
+
+    assert_equal(data, 'SELECT *\nFROM "db1"."table1"\nLIMIT 1000\n')
+
+
 class TestAutocomplete(object):
 
   def setUp(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
-
     self.user = rewrite_user(User.objects.get(username="test"))
 
 
@@ -237,6 +269,7 @@ class TestAutocomplete(object):
           def col1_dict(key):
             return {
               'name': 'col1',
+              'type': 'string'
             }.get(key, Mock())
           col1 = MagicMock()
           col1.__getitem__.side_effect = col1_dict
@@ -255,4 +288,4 @@ class TestAutocomplete(object):
           data = SqlAlchemyApi(self.user, interpreter).autocomplete(snippet, database='database', table='table')
 
           assert_equal(data['columns'], ['col1', 'col2'])
-          assert_equal([col['name'] for col in data['extended_columns']], ['col1'])  # Skip col2
+          assert_equal([col['type'] for col in data['extended_columns']], ['string', 'Null'])
