@@ -107,7 +107,11 @@ class SqlAlchemyApi(Api):
   def __init__(self, user, interpreter):
     self.user = user
     self.options = interpreter['options']
-    self.backticks = '"' if re.match('^(postgresql://|awsathena|elasticsearch)', self.options.get('url', '')) else '`'
+
+    if interpreter.get('dialect_properties'):
+      self.backticks = interpreter['dialect_properties']['sql_identifier_quote']
+    else:
+      self.backticks = '"' if re.match('^(postgresql://|awsathena|elasticsearch)', self.options.get('url', '')) else '`'
 
   def _create_engine(self):
     if '${' in self.options['url']: # URL parameters substitution
@@ -304,8 +308,8 @@ class SqlAlchemyApi(Api):
           'default': col.get('default'),
           'name': col.get('name'),
           'nullable': col.get('nullable'),
-          'type': str(col.get('type'))
-        } for col in columns if not isinstance(col.get('type'), NullType)
+          'type': str(col.get('type')) if not isinstance(col.get('type'), NullType) else 'Null'
+        } for col in columns
       ]
     else:
       columns = assist.get_columns(database, table)
@@ -333,7 +337,7 @@ class SqlAlchemyApi(Api):
       columns = assist.get_columns(database, table)
       response['full_headers'] = [{
           'name': col.get('name'),
-          'type': str(col.get('type')),
+          'type': str(col.get('type')) if not isinstance(col.get('type'), NullType) else 'Null',
           'comment': ''
         } for col in columns
       ]
