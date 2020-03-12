@@ -5,20 +5,16 @@ LABEL description="Hue SQL Assistant - gethue.com"
 
 # TODO: run as hue from the start to avoid the long chmod
 
-ENV DEBIAN_FRONTEND=noninteractive
 RUN export PYTHON_VER=python3.6
 
 RUN apt-get update -y && apt-get install -y \
-  python3-pip \
-  #libmariadb-dev-compat \
-  # python3.6-dev \
-
-  #libsasl2-modules-gssapi-mit \
-  libkrb5-dev \
+  python3-pip  #libmariadb-dev-compat  # python3.6-dev \
+  libkrb5-dev  \
+  libsasl2-modules-gssapi-mit \
   libsasl2-dev \
+  libkrb5-dev \
   libxml2-dev \
-  libxslt-dev \
-  #libssl-dev \
+  libxslt-dev \ #libssl-dev \
   libmysqlclient-dev \
   libldap2-dev \
   libsnappy-dev \
@@ -27,11 +23,11 @@ RUN apt-get update -y && apt-get install -y \
 ADD . /hue
 WORKDIR /hue
 
-RUN pip3 install virtualenv
-RUN python3.6 -m venv python_env
+#RUN pip3 install virtualenv
+#RUN python3.6 -m venv python_env
 
-SHELL ["/bin/bash", "-c"]
-RUN source python_env/bin/activate
+#SHELL ["/bin/bash", "-c"]
+#RUN source python_env/bin/activate
 
 RUN pip3 install -r desktop/core/requirements.txt
 
@@ -60,11 +56,11 @@ RUN ./build/env/bin/pip install \
   redis==2.10.6 \
   django_redis \
   flower \
-  pyhive \
+  git+https://github.com/gethue/PyHive #pyhive \
   gevent \
-  # Needed for Jaeger
-  threadloop \
+  threadloop  # Needed for Jaeger \
   thrift-sasl==0.2.1
+
 
 COPY tools/docker/hue/conf desktop/conf
 COPY tools/docker/hue/startup.sh .
