@@ -15,9 +15,13 @@
 # limitations under the License.
 from __future__ import absolute_import
 
-
 import logging
-import gcs_oauth2_boto_plugin
+LOG = logging.getLogger(__name__)
+
+try:
+  import gcs_oauth2_boto_plugin
+except ImportError:
+  LOG.warn('gcs_oauth2_boto_plugin module not found')
 import json
 
 from aws.s3.s3fs import S3FileSystem
@@ -30,9 +34,6 @@ from boto.s3.connection import SubdomainCallingFormat
 from desktop import conf
 from desktop.lib.idbroker import conf as conf_idbroker
 from desktop.lib.idbroker.client import IDBroker
-
-
-LOG = logging.getLogger(__name__)
 
 
 def get_credential_provider(config, user):

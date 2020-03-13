@@ -27,7 +27,10 @@ import json
 from axes.decorators import FAILURE_LIMIT, LOCK_OUT_AT_FAILURE
 from axes.models import AccessAttempt
 from axes.utils import reset
-import ldap
+try:
+  import ldap
+except ImportError:
+  LOG.warn('ldap module not found')
 
 from django.urls import reverse
 from django.forms import ValidationError

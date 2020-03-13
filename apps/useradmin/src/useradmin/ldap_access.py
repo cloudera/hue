@@ -18,20 +18,28 @@
 This module provides access to LDAP servers, along with some basic functionality required for Hue and
 User Admin to work seamlessly with LDAP.
 """
-from builtins import str
-from builtins import object
-import ldap
-import ldap.filter
+from builtins import str, object
+
 import logging
+
+LOG = logging.getLogger(__name__)
+
+try:
+  import ldap
+  import ldap.filter
+  from ldap import SCOPE_SUBTREE
+except ImportError:
+  LOG.warn('ldap module not found')
+  SCOPE_SUBTREE = None
 import re
+
+from django.utils.encoding import smart_text
 
 import desktop.conf
 from desktop.lib.python_util import CaseInsensitiveDict
+
 from useradmin.models import User
-from django.utils.encoding import smart_text
 
-
-LOG = logging.getLogger(__name__)
 CACHED_LDAP_CONN = None
 
 
@@ -301,7 +309,7 @@ class LdapConnection(object):
 
     return group_info
 
-  def find_users(self, username_pattern, search_attr=None, user_name_attr=None, user_filter=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
+  def find_users(self, username_pattern, search_attr=None, user_name_attr=None, user_filter=None, find_by_dn=False, scope=SCOPE_SUBTREE):
     """
     LDAP search helper method finding users. This supports searching for users
     by distinguished name, or the configured username attribute.
@@ -364,7 +372,7 @@ class LdapConnection(object):
 
     return None
 
-  def find_groups(self, groupname_pattern, search_attr=None, group_name_attr=None, group_member_attr=None, group_filter=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
+  def find_groups(self, groupname_pattern, search_attr=None, group_name_attr=None, group_member_attr=None, group_filter=None, find_by_dn=False, scope=SCOPE_SUBTREE):
     """
     LDAP search helper method for finding groups
 
@@ -418,7 +426,7 @@ class LdapConnection(object):
     else:
       return []
 
-  def find_members_of_group(self, dn, search_attr, ldap_filter, scope=ldap.SCOPE_SUBTREE):
+  def find_members_of_group(self, dn, search_attr, ldap_filter, scope=SCOPE_SUBTREE):
     if ldap_filter and not ldap_filter.startswith('('):
       ldap_filter = '(' + ldap_filter + ')'
 
