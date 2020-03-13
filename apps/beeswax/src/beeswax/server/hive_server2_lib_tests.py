@@ -19,11 +19,6 @@
 import logging
 import sys
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
-
 from nose.tools import assert_equal, assert_true, assert_raises, assert_not_equal
 from nose.plugins.skip import SkipTest
 from TCLIService.ttypes import TStatusCode
@@ -35,7 +30,11 @@ from beeswax.server.hive_server2_lib import HiveServerTable, HiveServerClient
 from useradmin.models import User
 
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import grant_access
+
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock, MagicMock
+else:
+  from mock import patch, Mock, MagicMock
 
 
 LOG = logging.getLogger(__name__)
@@ -46,8 +45,6 @@ class TestHiveServerClient():
   def setUp(self):
     self.client = make_logged_in_client(username="test_hive_server2_lib", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test_hive_server2_lib")
-
-    grant_access(self.user.username, self.user.username, "beeswax")
 
     self.query_server = {
         'principal': 'hue',
@@ -179,6 +176,37 @@ class TestHiveServerClient():
         session_count + 1,
         Session.objects.filter(owner=self.user, application=self.query_server['server_name']).count()
       )
+
+  def test_get_databases_impala_specific(self):
+    query = Mock(
+      get_query_statement=Mock(return_value=['SELECT 1']),
+      settings=[]
+    )
+
+    with patch('beeswax.server.hive_server2_lib.HiveServerTRowSet') as HiveServerTRowSet:
+
+      client = HiveServerClient(self.query_server, self.user)
+
+      client.call = Mock(return_value=(Mock(), Mock()))
+      client.fetch_result = Mock(return_value=(Mock(), Mock()))
+      client._close = Mock()
+
+      client.get_databases(query)
+
+      assert_not_equal(
+        None,
+        client.call.call_args[0][1].schemaName,
+        client.call.call_args.args
+      )
+
+      with patch.dict(self.query_server, {'dialect': 'impala'}, clear=True):
+        client.get_databases(query)
+
+        assert_equal(
+          None, # Should be empty and not '*' with Impala
+          client.call.call_args[0][1].schemaName,
+          client.call.call_args.args
+        )
 
 
 class TestHiveServerTable():
@@ -318,7 +346,40 @@ class TestHiveServerTable():
       assert_equal(table.partition_keys[0].comment, '')
 
 
-  def test_primary_keys_hive(self):
+  def test_single_primary_key_hive(self):
+
+      table_results = Mock()
+      table_schema = Mock()
+      desc_results = Mock(
+        columns=[
+          # Dump of `DESCRIBE FORMATTED table`
+          Mock(stringVal=Mock(values=['# col_name', '', 'code', 'description', 'total_emp', 'salary', '', '# Partition Information', '# col_name', 'date', '', '# Detailed Table Information', 'Database:', 'OwnerType:', 'Owner:', 'CreateTime:', 'LastAccessTime:', 'Retention:', 'Location:', 'Table Type:', 'Table Parameters:', '', '', '', '', '', '', '', '', '', '', '# Storage Information', 'SerDe Library:', 'InputFormat:', 'OutputFormat:', 'Compressed:', 'Num Buckets:', 'Bucket Columns:', 'Sort Columns:', 'Storage Desc Params:', '', '', '# Constraints', '', '# Primary Key', 'Table:', 'Constraint Name:', 'Column Name:', ''], nulls='')),
+          Mock(stringVal=Mock(values=['data_type', 'NULL', 'string', 'string', 'int', 'int', 'NULL', 'NULL', 'data_type', 'string', 'NULL', 'NULL', 'default', 'USER', 'hive', 'Mon Nov 04 07:44:10 PST 2019', 'UNKNOWN', '0', 'hdfs://nightly7x-unsecure-1.vpc.cloudera.com:8020/warehouse/tablespace/managed/hive/sample_07', 'MANAGED_TABLE', 'NULL', 'COLUMN_STATS_ACCURATE', 'bucketing_version', 'numFiles', 'numRows', 'rawDataSize', 'totalSize', 'transactional', 'transactional_properties', 'transient_lastDdlTime', 'NULL', 'NULL', 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe', 'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat', 'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat', 'No', '-1', '[]', '[]', 'NULL', 'serialization.format', 'NULL', 'NULL', 'NULL', 'NULL', 'default.pk', 'pk_165400321_1572980510006_0', 'id1 ', 'NULL'], nulls='')),
+          Mock(stringVal=Mock(values=['comment', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'comment', '', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"code\":\"true\",\"description\":\"true\",\"salary\":\"true\",\"total_emp\":\"true\"}}', '2', '1', '822', '3288', '48445', 'true', 'insert_only', '1572882268', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '1', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL'], nulls='')),
+        ]
+      )
+      desc_schema = Mock(
+        columns=[
+          Mock(columnName='col_name'),
+          Mock(columnName='data_type'),
+          Mock(columnName='comment')
+        ]
+      )
+
+      table = HiveServerTable(
+        table_results=table_results,
+        table_schema=table_schema,
+        desc_results=desc_results,
+        desc_schema=desc_schema
+      )
+
+      assert_equal(len(table.primary_keys), 1)
+      assert_equal(table.primary_keys[0].name, 'id1')
+      assert_equal(table.primary_keys[0].type, 'NULL')
+      assert_equal(table.primary_keys[0].comment, 'NULL')
+
+
+  def test_multi_primary_keys_hive(self):
 
       table_results = Mock()
       table_schema = Mock()
@@ -353,6 +414,61 @@ class TestHiveServerTable():
       assert_equal(table.primary_keys[1].name, 'id2')
       assert_equal(table.primary_keys[1].type, 'NULL')
       assert_equal(table.primary_keys[1].comment, 'NULL')
+
+
+  def test_foreign_keys_hive(self):
+
+      table_results = Mock()
+      table_schema = Mock()
+      desc_results = Mock(
+        columns=[
+          # Dump of `DESCRIBE FORMATTED table`
+          Mock(
+            stringVal=Mock(values=['# col_name', '', 'code', 'description', 'total_emp', 'salary', '', '# Partition Information', '# col_name', 'date', '', '# Detailed Table Information', 'Database:', 'OwnerType:', 'Owner:', 'CreateTime:', 'LastAccessTime:', 'Retention:', 'Location:', 'Table Type:', 'Table Parameters:', '', '', '', '', '', '', '', '', '', '', '# Storage Information', 'SerDe Library:', 'InputFormat:', 'OutputFormat:', 'Compressed:', 'Num Buckets:', 'Bucket Columns:', 'Sort Columns:', 'Storage Desc Params:', '', '', '# Constraints', '',
+                '# Primary Key', 'Table:', 'Constraint Name:', 'Column Name:', '',
+                '# Foreign Keys', 'Table:', 'Constraint Name:', 'Parent Column Name:default.persons.id', ''
+              ],
+              nulls=''
+            )
+          ),
+          Mock(
+            stringVal=Mock(values=['data_type', 'NULL', 'string', 'string', 'int', 'int', 'NULL', 'NULL', 'data_type', 'string', 'NULL', 'NULL', 'default', 'USER', 'hive', 'Mon Nov 04 07:44:10 PST 2019', 'UNKNOWN', '0', 'hdfs://nightly7x-unsecure-1.vpc.cloudera.com:8020/warehouse/tablespace/managed/hive/sample_07', 'MANAGED_TABLE', 'NULL', 'COLUMN_STATS_ACCURATE', 'bucketing_version', 'numFiles', 'numRows', 'rawDataSize', 'totalSize', 'transactional', 'transactional_properties', 'transient_lastDdlTime', 'NULL', 'NULL', 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe', 'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat', 'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat', 'No', '-1', '[]', '[]', 'NULL', 'serialization.format', 'NULL', 'NULL', 'NULL',
+                'NULL', 'default.pk', 'pk_165400321_1572980510006_0', 'id1 ', 'NULL',
+                'NULL', 'default.businessunit', 'fk', 'Column Name:head', 'NULL'
+              ],
+              nulls=''
+            )
+          ),
+          Mock(
+            stringVal=Mock(values=['comment', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'comment', '', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"code\":\"true\",\"description\":\"true\",\"salary\":\"true\",\"total_emp\":\"true\"}}', '2', '1', '822', '3288', '48445', 'true', 'insert_only', '1572882268', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '1', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL',
+                'NULL', 'NULL', 'NULL', 'NULL', 'NULL',
+                'NULL', 'NULL', 'NULL', 'Key Sequence:1', 'NULL',
+              ],
+              nulls=''
+            )
+          ),
+        ]
+      )
+      desc_schema = Mock(
+        columns=[
+          Mock(columnName='col_name'),
+          Mock(columnName='data_type'),
+          Mock(columnName='comment')
+        ]
+      )
+
+      table = HiveServerTable(
+        table_results=table_results,
+        table_schema=table_schema,
+        desc_results=desc_results,
+        desc_schema=desc_schema
+      )
+
+      assert_equal(len(table.foreign_keys), 1)
+      assert_equal(table.foreign_keys[0].name, 'head')  # 'from' column
+      assert_equal(table.foreign_keys[0].type, 'default.persons.id')  # 'to' column
+      assert_equal(table.foreign_keys[0].comment, 'NULL')
+
 
 
 class TestSessionManagement():

@@ -15,14 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from past.builtins import basestring
 import json
+
+from past.builtins import basestring
 from lxml import objectify, etree
 
-from django.contrib.auth.models import Group, User
-from useradmin.models import HuePermission, GroupPermission, get_default_user_group
-
 from hadoop import cluster
+from useradmin.models import Group, User, HuePermission, GroupPermission, get_default_user_group
+
 from desktop.lib import fsmanager
 
 

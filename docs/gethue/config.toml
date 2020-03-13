@@ -5,6 +5,7 @@ theme = "stack-hue-theme"
 pygmentsStyle = "monokailight"
 disqusShortname = "gethue"
 DefaultContentLanguage = "en"
+enableGitInfo = true
 
 [languages]
   [languages.en]

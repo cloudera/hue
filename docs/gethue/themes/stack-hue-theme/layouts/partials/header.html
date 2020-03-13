@@ -80,14 +80,20 @@
                         <div class="row">
                           <div class="dropdown__content col-lg-2">
                             <ul class="menu-vertical">
-                              <li><a href="{{ .Site.Params.docsHost }}/user/querying/">{{ i18n "user" }}</a></li>
+                              <li>
+                                <a href="{{ .Site.Params.docsHost }}/user/querying/"
+                                  >{{ i18n "user" }}</a
+                                >
+                              </li>
                               <li>
                                 <a href="{{ .Site.Params.docsHost }}/administrator/"
                                   >{{ i18n "admin" }}</a
                                 >
                               </li>
                               <li>
-                                <a href="{{ .Site.Params.docsHost }}/developer/">{{ i18n "developer" }}</a>
+                                <a href="{{ .Site.Params.docsHost }}/developer/"
+                                  >{{ i18n "developer" }}</a
+                                >
                               </li>
                             </ul>
                           </div>
@@ -104,24 +110,6 @@
                     <a href="https://discourse.gethue.com/">
                       {{ i18n "forum" }}
                     </a>
-                  </li>
-                  <li class="dropdown">
-                    <span class="dropdown__trigger">
-                      {{ .Site.Language.LanguageName }}
-                    </span>
-                    <div class="dropdown__container">
-                      <div class="container">
-                        <div class="row">
-                          <div class="dropdown__content col-lg-2">
-                            <ul>
-                              {{ range $.Site.Home.AllTranslations }}
-                              <li><a href="{{ .Permalink }}">{{ .Language.LanguageName }}</a></li>
-                              {{ end }}
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
                   </li>
                   <li>
                     <a href="https://github.com/cloudera/hue" title="GitHub" target="_blank">

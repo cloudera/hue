@@ -662,17 +662,6 @@
   window.USE_NEW_SIDE_PANELS = '${ USE_NEW_SIDE_PANELS.get() }' === 'True'
   window.USER_HOME_DIR = '${ home_dir }';
 
-  // TODO: Refactor assist to fetch from config.
-  window.ASSIST_SQL_INTERPRETERS = [];
-  % for interpreter in get_ordered_interpreters(request.user):
-    % if interpreter["is_sql"]:
-      ASSIST_SQL_INTERPRETERS.push({
-        type: '${ interpreter["type"] }',
-        name: '${ interpreter["name"] }'
-      });
-    % endif
-  % endfor
-
   var userGroups = [];
   % for group in user.groups.all():
     userGroups.push('${ group }');

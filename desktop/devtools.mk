@@ -24,8 +24,7 @@ DEVTOOLS += \
 	nose[1.3.7] \
 	coverage[4.4.2] \
 	nosetty[0.4] \
-	werkzeug[0.14.1] \
-	windmill[1.6]
+	werkzeug[0.14.1]
 
 PYPI_MIRROR ?= https://pypi.python.org/simple/
 

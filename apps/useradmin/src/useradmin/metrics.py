@@ -19,6 +19,7 @@ import logging
 from datetime import datetime, timedelta
 
 from desktop.lib.metrics import global_registry
+from desktop.lib.security_util import get_localhost_name
 
 LOG = logging.getLogger(__name__)
 
@@ -36,5 +37,22 @@ global_registry().gauge_callback(
     callback=active_users,
     label='Active Users',
     description='Number of users that were active in the last hour',
+    numerator='users',
+)
+
+def active_users_per_instance():
+  from useradmin.models import UserProfile
+  try:
+    count = UserProfile.objects.filter(last_activity__gt=datetime.now() - timedelta(hours=1), hostname=get_localhost_name()).count()
+  except:
+    LOG.exception('Could not get active_users per instance')
+    count = 0
+  return count
+
+global_registry().gauge_callback(
+    name='users.active.instance',
+    callback=active_users_per_instance,
+    label='Active Users per Instance',
+    description='Number of users that were active in the last hour on specific instance',
     numerator='users',
 )

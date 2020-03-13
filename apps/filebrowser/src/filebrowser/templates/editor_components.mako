@@ -14,7 +14,14 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+  import sys
+
   from desktop.lib.django_util import extract_field_data
+
+  if sys.version_info[0] > 2:
+    from builtins import str as new_str
+  else:
+    new_str = unicode
 %>
 
 <%def name="render_field(
@@ -45,10 +52,10 @@
     if attributes is None:
       attributes = {}
     ret_str = ""
-    for key, value in attributes.iteritems():
+    for key, value in attributes.items():
       if key == "klass":
         key = "class"
-      ret_str += "%s='%s'" % (key.replace("_", "-"), unicode(value))
+      ret_str += "%s='%s'" % (key.replace("_", "-"), new_str(value))
     return ret_str
 
   if not attrs:

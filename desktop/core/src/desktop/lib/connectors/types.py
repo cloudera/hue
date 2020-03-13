@@ -255,12 +255,14 @@ CONNECTOR_TYPES = [
     'nice_name': "Presto",
     'dialect': 'presto',
     'interface': 'sqlalchemy',
-    'settings': [],
+    'settings': [
+      {'name': 'url', 'value': 'presto://host:8080/tpch'}
+    ],
     'category': 'editor',
     'description': '',
     'properties': {
       'is_sql': True,
-      'sql_identifier_quote': '`',
+      'sql_identifier_quote': '"',
       'sql_identifier_comment_single': '--',
       'has_catalog': True,
       'has_database': True,
@@ -320,7 +322,9 @@ CONNECTOR_TYPES = [
     'nice_name': "Athena",
     'dialect': 'athena',
     'interface': 'sqlalchemy',
-    'settings': [],
+    'settings': [
+      {'name': 'url', 'value': 'awsathena+rest://XXXXXXXXXXXXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@athena.us-west-2.amazonaws.com:443/default?s3_staging_dir=s3://gethue-athena/scratch'}
+    ],
     'category': 'editor',
     'description': '',
     'properties': {
@@ -340,7 +344,9 @@ CONNECTOR_TYPES = [
     'nice_name': "Redshift",
     'dialect': 'redshift',
     'interface': 'sqlalchemy',
-    'settings': [],
+    'settings': [
+      {'name': 'url', 'value': 'edshift+psycopg2://username@host.amazonaws.com:5439/database'}
+    ],
     'category': 'editor',
     'description': '',
     'properties': {
@@ -360,7 +366,9 @@ CONNECTOR_TYPES = [
     'nice_name': "Snowflake",
     'dialect': 'snowflake',
     'interface': 'sqlalchemy',
-    'settings': [],
+    'settings': [
+      {'name': 'url', 'value': 'snowflake://{user}:{password}@{account}/{database}'}
+    ],
     'category': 'editor',
     'description': '',
     'properties': {
@@ -380,7 +388,9 @@ CONNECTOR_TYPES = [
     'nice_name': "Big Query",
     'dialect': 'bigquery',
     'interface': 'sqlalchemy',
-    'settings': [],
+    'settings': [
+      {'name': 'url', 'value': 'bigquery://projectName/datasetName'}
+    ],
     'category': 'editor',
     'description': '',
     'properties': {
@@ -400,7 +410,9 @@ CONNECTOR_TYPES = [
     'nice_name': "Oracle",
     'dialect': 'oracle',
     'interface': 'sqlalchemy',
-    'settings': [],
+    'settings': [
+      {'name': 'url', 'value': 'oracle://scott:tiger@dsn'}
+    ],
     'category': 'editor',
     'description': '',
     'properties': {
@@ -420,7 +432,9 @@ CONNECTOR_TYPES = [
     'nice_name': "Solr SQL",
     'dialect': 'solr',
     'interface': 'solr',
-    'settings': [],
+    'settings': [
+      {'name': 'url', 'value': 'solr://<username>:<password>@<host>:<port>/solr/<collection>[?use_ssl=true|false]'}
+    ],
     'category': 'editor',
     'description': '',
     'properties': {
@@ -441,7 +455,9 @@ CONNECTOR_TYPES = [
     "SQL Database",
     'dialect': 'sql',
     'interface': 'sqlalchemy',
-    'settings': [],
+    'settings': [
+      {'name': 'url', 'value': 'name://projectName/datasetName'}
+    ],
     'category': 'editor',
     'description': '',
     'properties': {
@@ -461,7 +477,13 @@ CONNECTOR_TYPES = [
     'nice_name': "SQL Database (JDBC)",
     'dialect': 'sql',
     'interface': 'sqlalchemy',
-    'settings': [],
+    'settings': [{
+        "url": "jdbc:db2://gethue.com:50000/SQOOP",
+        "driver": "com.ibm.db2.jcc.DB2Driver",
+        "user": "hue",
+        "password": "hue"
+      }
+    ],
     'category': 'editor',
     'description': 'Deprecated: older way to connect to any database.',
     'properties': {

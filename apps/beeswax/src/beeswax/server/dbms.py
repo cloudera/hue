@@ -81,16 +81,25 @@ def get(user, query_server=None, cluster=None):
       # Avoid circular dependency
       from beeswax.server.hive_server2_lib import HiveServerClientCompatible
 
-      if query_server['server_name'].startswith('impala'):
+      if query_server.get('dialect') == 'impala':
         from impala.dbms import ImpalaDbms
         from impala.server import ImpalaServerClient
-        DBMS_CACHE[user.id][query_server['server_name']] = ImpalaDbms(HiveServerClientCompatible(ImpalaServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
+        DBMS_CACHE[user.id][query_server['server_name']] = ImpalaDbms(
+            HiveServerClientCompatible(ImpalaServerClient(query_server, user)),
+            QueryHistory.SERVER_TYPE[1][0]
+        )
       elif query_server['server_name'] == 'hms':
         from beeswax.server.hive_metastore_server import HiveMetastoreClient
-        DBMS_CACHE[user.id][query_server['server_name']] = HiveServer2Dbms(HiveMetastoreClient(query_server, user), QueryHistory.SERVER_TYPE[1][0])
+        DBMS_CACHE[user.id][query_server['server_name']] = HiveServer2Dbms(
+            HiveMetastoreClient(query_server, user),
+            QueryHistory.SERVER_TYPE[1][0]
+        )
       else:
         from beeswax.server.hive_server2_lib import HiveServerClient
-        DBMS_CACHE[user.id][query_server['server_name']] = HiveServer2Dbms(HiveServerClientCompatible(HiveServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
+        DBMS_CACHE[user.id][query_server['server_name']] = HiveServer2Dbms(
+            HiveServerClientCompatible(HiveServerClient(query_server, user)),
+            QueryHistory.SERVER_TYPE[1][0]
+        )
 
     return DBMS_CACHE[user.id][query_server['server_name']]
   finally:
@@ -199,6 +208,9 @@ def get_query_server_config(name='beeswax', connector=None):
           'use_sasl': SPARK_USE_SASL.get()
       })
 
+  if not query_server.get('dialect'):
+    query_server['dialect'] = query_server['server_name']
+
   debug_query_server = query_server.copy()
   debug_query_server['auth_password_used'] = bool(debug_query_server.pop('auth_password', None))
   LOG.debug("Query Server: %s" % debug_query_server)
@@ -216,6 +228,7 @@ def get_query_server_config_via_connector(connector):
   LOG.debug("Query cluster connector %s compute %s" % (connector_name, compute_name))
 
   return {
+      'dialect': connector['dialect'],
       'server_name': full_connector_name,
       'server_host': (connector['compute']['options'] if 'compute' in connector else connector['options'])['server_host'],
       'server_port': int((connector['compute']['options'] if 'compute' in connector else connector['options'])['server_port']),
@@ -223,8 +236,8 @@ def get_query_server_config_via_connector(connector):
       'auth_username': AUTH_USERNAME.get(),
       'auth_password': AUTH_PASSWORD.get(),
 
-      'impersonation_enabled': False, # TODO, Impala only, to add to connector class
-      'use_sasl': connector['dialect'] in ('impala', 'hive'),
+      'impersonation_enabled': connector['dialect'] in ('impala',),
+      'use_sasl': connector['dialect'] in ('hive',),
       'SESSION_TIMEOUT_S': 15 * 60,
       'querycache_rows': 1000,
       'QUERY_TIMEOUT_S': 15 * 60,
@@ -470,7 +483,7 @@ class HiveServer2Dbms(object):
 
   def cancel_operation(self, query_handle):
     resp = self.client.cancel_operation(query_handle)
-    if self.client.query_server['server_name'].startswith('impala'):
+    if self.client.query_server.get('dialect') == 'impala':
       resp = self.client.close_operation(query_handle)
     return resp
 

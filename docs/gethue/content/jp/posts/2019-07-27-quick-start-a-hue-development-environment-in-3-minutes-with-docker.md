@@ -88,7 +88,7 @@ name=huedb
 
 &nbsp;
 
- [1]: https://docs.gethue.com/latest/developer/
+ [1]: https://docs.gethue.com//developer/
  [2]: https://cdn.gethue.com/uploads/2017/12/Screen-Shot-2017-11-15-at-3.34.20-PM.png
  [3]: https://github.com/cloudera/hue/blob/master/tools/docker/hue/startup.sh#L5
- [4]: https://docs.gethue.com/latest/developer/development/#javascript
+ [4]: https://docs.gethue.com/developer/development/#javascript

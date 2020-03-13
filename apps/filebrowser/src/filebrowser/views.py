@@ -191,7 +191,7 @@ def download(request, path):
 
 def view(request, path):
     """Dispatches viewing of a path to either index() or fileview(), depending on type."""
-    decoded_path = urllib_unquote(path)
+    decoded_path = unquote_url(path)
     if path != decoded_path:
       path = decoded_path
     # default_to_home is set in bootstrap.js
@@ -256,7 +256,7 @@ def home_relative_view(request, path):
 
 def edit(request, path, form=None):
     """Shows an edit form for the given path. Path does not necessarily have to exist."""
-    decoded_path = urllib_unquote(path)
+    decoded_path = unquote_url(path)
     if path != decoded_path:
       path = decoded_path
     try:
@@ -314,7 +314,7 @@ def save_file(request):
     form = EditorForm(request.POST)
     is_valid = form.is_valid()
     path = form.cleaned_data.get('path')
-    decoded_path = urllib_unquote(path)
+    decoded_path = unquote_url(path)
     if path != decoded_path:
       path = decoded_path
 
@@ -487,13 +487,9 @@ def listdir_paged(request, path):
     descending_param = request.GET.get('descending', None)
     if sortby is not None:
         if sortby not in ('type', 'name', 'atime', 'mtime', 'user', 'group', 'size'):
-            logger.info("Invalid sort attribute '%s' for listdir." %
-                        (sortby,))
+            logger.info("Invalid sort attribute '%s' for listdir." % sortby)
         else:
-            all_stats = sorted(all_stats,
-                               key=operator.attrgetter(sortby),
-                               reverse=coerce_bool(descending_param))
-
+            all_stats = sorted(all_stats, key=operator.attrgetter(sortby), reverse=coerce_bool(descending_param))
 
     # Do pagination
     try:
@@ -520,12 +516,12 @@ def listdir_paged(request, path):
     current_stat = request.fs.stats(path)
     # The 'path' field would be absolute, but we want its basename to be
     # actually '.' for display purposes. Encode it since _massage_stats expects byte strings.
-    current_stat['path'] = path
-    current_stat['name'] = "."
+    current_stat.path = path
+    current_stat.name = "."
     shown_stats.insert(1, current_stat)
 
     if page:
-      page.object_list = [ _massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats ]
+      page.object_list = [_massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats]
 
     is_trash_enabled = request.fs._get_scheme(path) == 'hdfs' and int(get_trash_interval()) > 0
 
@@ -566,7 +562,7 @@ def scheme_absolute_path(root, path):
   return path
 
 def stat_absolute_path(path, stat):
-  stat["path"] = scheme_absolute_path(path, stat["path"])
+  stat.path = scheme_absolute_path(path, stat.path)
   return stat
 
 def _massage_stats(request, stats):
@@ -574,17 +570,17 @@ def _massage_stats(request, stats):
     Massage a stats record as returned by the filesystem implementation
     into the format that the views would like it in.
     """
-    path = stats['path']
+    path = stats.path
     normalized = request.fs.normpath(path)
     return {
         'path': normalized, # Normally this should be quoted, but we only use this in POST request so we're ok. Changing this to quoted causes many issues.
-        'name': stats['name'],
+        'name': stats.name,
         'stats': stats.to_json_dict(),
-        'mtime': datetime.fromtimestamp(stats['mtime']).strftime('%B %d, %Y %I:%M %p') if stats['mtime'] else '',
-        'humansize': filesizeformat(stats['size']),
-        'type': filetype(stats['mode']),
-        'rwx': rwx(stats['mode'], stats['aclBit']),
-        'mode': stringformat(stats['mode'], "o"),
+        'mtime': datetime.fromtimestamp(stats.mtime).strftime('%B %d, %Y %I:%M %p') if stats.mtime else '',
+        'humansize': filesizeformat(stats.size),
+        'type': filetype(stats.mode),
+        'rwx': rwx(stats.mode, stats.aclBit),
+        'mode': stringformat(stats.mode, "o"),
         'url': '/filebrowser/view=' + urllib_quote(normalized.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS),
         'is_sentry_managed': request.fs.is_sentry_managed(path)
     }
@@ -721,11 +717,11 @@ def display(request, path):
         'dirname': dirname,
         'mode': mode,
         'compression': compression,
-        'size': stats['size'],
+        'size': stats.size,
         'max_chunk_size': str(MAX_CHUNK_SIZE_BYTES)
     }
     data["filename"] = os.path.basename(path)
-    data["editable"] = stats['size'] < MAX_FILEEDITOR_SIZE
+    data["editable"] = stats.size < MAX_FILEEDITOR_SIZE
     if mode == "binary":
         # This might be the wrong thing for ?format=json; doing the
         # xxd'ing in javascript might be more compact, or sending a less
@@ -937,8 +933,9 @@ def detect_snappy(contents):
 def detect_parquet(fhandle):
     """
     Detect parquet from magic header bytes.
+    Python 2 only currently.
     """
-    return parquet._check_header_magic_bytes(fhandle)
+    return False if sys.version_info[0] > 2 else parquet._check_header_magic_bytes(fhandle)
 
 
 def snappy_installed():
@@ -1178,7 +1175,12 @@ def touch(request):
         # No absolute path specification allowed.
         if posixpath.sep in name:
             raise PopupException(_("Could not name file \"%s\": Slashes are not allowed in filenames." % name))
-        request.fs.create(request.fs.join(urllib_unquote(path), urllib_unquote(name)))
+        request.fs.create(
+            request.fs.join(
+                urllib_unquote(path.encode('utf-8') if not isinstance(path, str) else path),
+                urllib_unquote(name.encode('utf-8') if not isinstance(name, str) else name)
+            )
+        )
 
     return generic_op(TouchForm, request, smart_touch, ["path", "name"], "path")
 
@@ -1203,7 +1205,10 @@ def move(request):
         for arg in args:
             if arg['src_path'] == arg['dest_path']:
                 raise PopupException(_('Source path and destination path cannot be same'))
-            request.fs.rename(urllib_unquote(arg['src_path']), urllib_unquote(arg['dest_path']))
+            request.fs.rename(
+                urllib_unquote(arg['src_path'].encode('utf-8') if not isinstance(arg['src_path'], str) else arg['src_path']),
+                urllib_unquote(arg['dest_path'].encode('utf-8') if not isinstance(arg['dest_path'], str) else arg['dest_path'])
+            )
     return generic_op(RenameFormSet, request, bulk_move, ["src_path", "dest_path"], None,
                       data_extractor=formset_data_extractor(recurring, params),
                       arg_extractor=formset_arg_extractor,
@@ -1218,7 +1223,7 @@ def copy(request):
         for arg in args:
             if arg['src_path'] == arg['dest_path']:
                 raise PopupException(_('Source path and destination path cannot be same'))
-            request.fs.copy(urllib_unquote(arg['src_path']), urllib_unquote(arg['dest_path']), recursive=True, owner=request.user)
+            request.fs.copy(unquote_url(arg['src_path']), unquote_url(arg['dest_path']), recursive=True, owner=request.user)
     return generic_op(CopyFormSet, request, bulk_copy, ["src_path", "dest_path"], None,
                       data_extractor=formset_data_extractor(recurring, params),
                       arg_extractor=formset_arg_extractor,
@@ -1322,8 +1327,8 @@ def _upload_file(request):
 
     if form.is_valid():
         uploaded_file = request.FILES['hdfs_file']
-        dest = scheme_absolute_path(urllib_unquote(request.GET['dest']), urllib_unquote(form.cleaned_data['dest']))
-        filepath = request.fs.join(dest, uploaded_file.name)
+        dest = scheme_absolute_path(unquote_url(request.GET['dest']), unquote_url(request.GET['dest']))
+        filepath = request.fs.join(dest, unquote_url(uploaded_file.name))
 
         if request.fs.isdir(dest) and posixpath.sep in uploaded_file.name:
             raise PopupException(_('Sorry, no "%(sep)s" in the filename %(name)s.' % {'sep': posixpath.sep, 'name': uploaded_file.name}))
@@ -1424,6 +1429,9 @@ def truncate(toTruncate, charsToKeep=50):
     else:
         return toTruncate
 
+def unquote_url(url):
+  url = urllib_unquote(url.encode('utf-8') if not isinstance(url, str) else url)
+  return url.decode('utf-8') if isinstance(url, bytes) else url
 
 def _is_hdfs_superuser(request):
   return request.user.username == request.fs.superuser or request.user.groups.filter(name__exact=request.fs.supergroup).exists()

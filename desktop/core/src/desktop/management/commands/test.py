@@ -107,8 +107,6 @@ class Command(BaseCommand):
                        test specific useradmin.tests:test_user_admin
                     All additional arguments are passed directly to nose.
 
-      windmill      Runs windmill tests
-
       list_modules  List test modules for all desktop applications and libraries
 
     Common useful extra arguments for nose:
@@ -148,10 +146,6 @@ class Command(BaseCommand):
       nose_args = args + all_apps + ["-a", "!requires_hadoop"]
     elif args[0] == "unit":
       nose_args = args + all_apps + ["-a", "!integration"]
-    elif args[0] == "windmill":
-      from desktop.management.commands import test_windmill
-      args = args[1:]
-      ret = test_windmill.Command().handle(*args)
     elif args[0] in ("specific", "nose"):
       nose_args = args
     elif args[0] == "list_modules":

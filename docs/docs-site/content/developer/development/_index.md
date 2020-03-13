@@ -16,7 +16,7 @@ This section goes into greater detail on how to build and reuse the components o
 * Python 2.7+ (Python 3 support tracked in [HUE-8737](https://issues.cloudera.org/browse/HUE-8737))
 * Django (1.11 already included in the distribution)
 * Java (Java 1.8) (should go away after [HUE-8740](https://issues.cloudera.org/browse/HUE-8740))
-* npm ([10.0+](https://deb.nodesource.com/setup_10.x))
+* Node.js ([10.0+](https://deb.nodesource.com/setup_10.x))
 
 ### Build & Start
 
@@ -775,7 +775,7 @@ Note: code updates won’t be seen after the Docker container runs. For this Hue
 
     ./build/env/bin/hue runserver 0.0.0.0:8888
 
-and recompiling the Docker image. It will then auto-restart on Python code changes. For JavaScript, those would need to be [compiled](//developer/development/#javascript).
+and recompiling the Docker image. It will then auto-restart on Python code changes. For JavaScript, those would need to be [compiled](/developer/development/#javascript).
 
 
 ### Documentation

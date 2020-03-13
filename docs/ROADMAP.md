@@ -3,6 +3,10 @@
 High Level Roadmap
 ------------------
 
+* Connectors
+  * Better [connectors](https://docs.gethue.com/administrator/configuration/connectors/)
+  * Potential [connectors ideas](https://docs.gethue.com/developer/connectors/)
+
 * Editor
   * [ ] Editor v2 [HUE-8768](https://issues.cloudera.org/browse/HUE-8768)
   * [ ] Query Browser v2
@@ -21,7 +25,6 @@ High Level Roadmap
   * [ ] Configuration of connectors via UI [HUE-8758](https://issues.cloudera.org/browse/HUE-8758)
   * [ ] Multi clusters [HUE-8330](https://issues.cloudera.org/browse/HUE-8330)
   * [ ] Multi tenants [HUE-8530](https://issues.cloudera.org/browse/HUE-8530)
-  * [ ] Modernize CI/CD [HUE-8888](https://issues.cloudera.org/browse/HUE-8888)
   * [ ] SQL queries and requests tracing [HUE-8936](https://issues.cloudera.org/browse/HUE-8936)
   * [ ] Productionize metrics [HUE-9021](https://issues.cloudera.org/browse/HUE-9021)
   * [ ] Google Storage connector [HUE-8978](https://issues.cloudera.org/browse/HUE-8978)
@@ -51,6 +54,7 @@ Done
 * [x] Documentation refresh [HUE-8741](https://issues.cloudera.org/browse/HUE-8741)
 * [x] Frontend moved to Webpack [HUE-8687](https://issues.cloudera.org/browse/HUE-8687)
 * [x] SQL Alchemy full support [HUE-8740](https://issues.cloudera.org/browse/HUE-8740)
+* [x] Modernize CI/CD [HUE-8888](https://issues.cloudera.org/browse/HUE-8888)
 
 Links
 

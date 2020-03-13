@@ -24,10 +24,9 @@ class Executor {
   /**
    * @param options
    * @param {boolean} [options.isSqlEngine] (default false)
-   * @param {string} options.sourceType
-   * @param {ContextCompute} options.compute
-   * @param {ContextNamespace} options.namespace
-   * @param {string} options.statement
+   * @param {observable<string>} options.sourceType
+   * @param {observable<ContextCompute>} options.compute
+   * @param {observable<ContextNamespace>} options.namespace
    * @param {string} [options.database]
    * @param {function} [options.defaultLimit]
    * @param {boolean} [options.isOptimizerEnabled] - Default false
@@ -50,6 +49,16 @@ class Executor {
     return {
       executables: this.executables.map(executable => executable.toJs())
     };
+  }
+
+  cancelAll() {
+    this.executables.forEach(existingExecutable => existingExecutable.cancelBatchChain());
+  }
+
+  setExecutables(executables) {
+    this.cancelAll();
+    this.executables = executables;
+    this.executables.forEach(executable => executable.notify());
   }
 
   update(statementDetails, beforeExecute) {

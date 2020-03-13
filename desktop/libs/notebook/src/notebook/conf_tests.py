@@ -68,10 +68,9 @@ class TestInterpreterConfig(unittest.TestCase):
           'name': 'hive-1',
           'dialect': 'hive',
           'category': 'editor',
-          'is_sql': True,
           'interface': 'hiveserver2',
           'settings': {},
-          'dialect_properties': {'sql_identifier_quote': '`',},
+          'dialect_properties': {'sql_identifier_quote': '`', 'is_sql': True},
         }
       ]
 
@@ -118,10 +117,9 @@ class TestCheckConfig():
             'name': 'hive-1',
             'dialect': 'hive',
             'category': 'editor',
-            'is_sql': True,
             'interface': 'hiveserver2',
             'settings': {},
-            'dialect_properties': {'sql_identifier_quote': '`',},
+            'dialect_properties': {'sql_identifier_quote': '`', 'is_sql': True},
           }
         ]
         _excute_test_query.return_value = Mock(content=json.dumps({'status': 0}))

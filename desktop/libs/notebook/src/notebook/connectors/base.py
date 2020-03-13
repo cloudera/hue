@@ -24,6 +24,7 @@ import uuid
 
 from django.utils.translation import ugettext as _
 
+from desktop.auth.backend import is_admin
 from desktop.conf import TASK_SERVER, has_connectors
 from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
@@ -136,7 +137,14 @@ class Notebook(object):
         value = str(variable['value'])
         return p1 + (value if value is not None else variable['meta'].get('placeholder',''))
 
-      return re.sub("([^\\\\])\\$" + ("{(" if hasCurlyBracketParameters else "(") + variablesString + ")(=[^}]*)?" + ("}" if hasCurlyBracketParameters else ""), replace, statement_raw)
+      return re.sub(
+          "([^\\\\])\\$" + (
+            "{(" if hasCurlyBracketParameters else "(") + variablesString + ")(=[^}]*)?" + ("}"
+            if hasCurlyBracketParameters else ""
+          ),
+          replace,
+          statement_raw
+      )
 
     return statement_raw
 
@@ -271,13 +279,58 @@ class Notebook(object):
     )
 
   def execute(self, request, batch=False):
-    from notebook.api import _execute_notebook # Cyclic dependency
+    from notebook.api import _execute_notebook  # Cyclic dependency
 
     notebook_data = self.get_data()
     snippet = notebook_data['snippets'][0]
     snippet['wasBatchExecuted'] = batch
 
     return _execute_notebook(request, notebook_data, snippet)
+
+
+  def execute_and_wait(self, request, timeout_sec=30.0, sleep_interval=0.5):
+      """
+      Run query and check status until it finishes or timeouts.
+
+      Check status until it finishes or timeouts.
+      """
+      handle = self.execute(request, batch=False)
+
+      if handle['status'] != 0:
+        raise QueryError(e, message='SQL statement failed.', handle=handle)
+
+      operation_id = handle['history_uuid']
+      curr = time.time()
+      end = curr + timeout_sec
+
+      status = self.check_status(request, operation_id=operation_id)
+
+      while curr <= end:
+        if status['status'] not in ('waiting', 'running'):
+          return handle
+
+        status = self.check_status(request, operation_id=operation_id)
+        time.sleep(sleep_interval)
+        curr = time.time()
+
+      # TODO
+      # msg = "The query timed out after %(timeout)d seconds, canceled query." % {'timeout': timeout_sec}
+      # LOG.warning(msg)
+      # try:
+      #   self.cancel_operation(handle)
+      #   # get_api(request, snippet).cancel(notebook, snippet)
+      # except Exception as e:
+      #   msg = "Failed to cancel query."
+      #   LOG.warning(msg)
+      #   self.close_operation(handle)
+      #   raise QueryServerException(e, message=msg)
+
+      raise OperationTimeout()
+
+  def check_status(self, request, operation_id):
+    from notebook.api import _check_status  # Cyclic dependency
+
+    return _check_status(request, operation_id=operation_id)
 
 
 def get_interpreter(connector_type, user=None):
@@ -327,19 +380,23 @@ def get_api(request, snippet):
     snippet['type'] = 'impala'
 
   if snippet.get('connector'):
-    connector_name = snippet['connector']['type'] # Ideally unify with name and nice_name
+    connector_name = snippet['connector']['type']  # Ideally unify with name and nice_name
     snippet['type'] = connector_name
   else:
     connector_name = snippet['type']
 
-  interpreter = get_interpreter(connector_type=connector_name, user=request.user)
+  if has_connectors() and snippet.get('type') == 'hello' and is_admin(request.user):
+    interpreter = snippet.get('interpreter')
+  else:
+    interpreter = get_interpreter(connector_type=connector_name, user=request.user)
+
   interface = interpreter['interface']
 
   if get_cluster_config(request.user)['has_computes']:
-    compute = json.loads(request.POST.get('cluster', '""')) # Via Catalog autocomplete API or Notebook create sessions.
+    compute = json.loads(request.POST.get('cluster', '""'))  # Via Catalog autocomplete API or Notebook create sessions.
     if compute == '""' or compute == 'undefined':
       compute = None
-    if not compute and snippet.get('compute'): # Via notebook.ko.js
+    if not compute and snippet.get('compute'):  # Via notebook.ko.js
       interpreter['compute'] = snippet['compute']
 
   LOG.debug('Selected interpreter %s interface=%s compute=%s' % (

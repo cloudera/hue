@@ -22,6 +22,8 @@ import sys
 import urllib.request, urllib.error
 import uuid
 
+from collections import OrderedDict
+
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
@@ -166,10 +168,12 @@ class SQLIndexer(object):
     if external_path.lower().startswith("abfs"): #this is to check if its using an ABFS path
       external_path = abfspath(external_path)
 
-    tbl_properties={}
+    tbl_properties = OrderedDict()
     if skip_header:
       tbl_properties['skip.header.line.count'] = '1'
-    tbl_properties['transactional'] = 'false' # The temp table is not transactional, but final table can be if is_transactional. tbl_properties that don't exist in previous versions can safely be added without error
+    # The temp table is not transactional, but final table can be if is_transactional.
+    # tbl_properties that don't exist in previous versions can safely be added without error.
+    tbl_properties['transactional'] = 'false'
 
     sql += django_mako.render_to_string("gen/create_table_statement.mako", {
         'table': {

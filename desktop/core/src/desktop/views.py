@@ -21,6 +21,7 @@ import json
 import logging
 import os
 import re
+import six
 import socket
 import sys
 import tempfile
@@ -252,7 +253,9 @@ def bootstrap(request):
   """Concatenates bootstrap.js files from all installed Hue apps."""
 
   # Has some None's for apps that don't have bootsraps.
-  all_bootstraps = [(app, app.get_bootstrap_file()) for app in appmanager.DESKTOP_APPS if request.user.has_hue_permission(action="access", app=app.name)]
+  all_bootstraps = [
+    (app, app.get_bootstrap_file()) for app in appmanager.DESKTOP_APPS if request.user.has_hue_permission(action="access", app=app.name)
+  ]
 
   # Iterator over the streams.
   concatenated = ["\n/* %s */\n%s" % (app.name, b.read()) for app, b in all_bootstraps if b is not None]
@@ -454,8 +457,10 @@ def log_frontend_event(request):
   _LOG_FRONTEND_LOGGER.log(level, msg)
   return HttpResponse("")
 
+
 def commonheader_m(title, section, user, request=None, padding="90px", skip_topbar=False, skip_idle_timeout=False):
   return commonheader(title, section, user, request, padding, skip_topbar, skip_idle_timeout, True)
+
 
 def commonheader(title, section, user, request=None, padding="90px", skip_topbar=False, skip_idle_timeout=False, is_mobile=False):
   """
@@ -590,7 +595,7 @@ def _get_config_errors(request, cache=True):
       try:
         for confvar, error in validator(request.user):
           error = {
-            'name': confvar if isinstance(confvar, str) else confvar.get_fully_qualifying_key(),
+            'name': confvar if isinstance(confvar, six.string_types) else confvar.get_fully_qualifying_key(),
             'message': error,
           }
 
@@ -610,6 +615,7 @@ def _get_config_errors(request, cache=True):
 
   return _CONFIG_ERROR_LIST
 
+
 def validate_by_spec(error_list):
   configspec = None
   try:
@@ -628,14 +634,13 @@ def load_confs(configspecpath, conf_source=None):
   """Loads and merges all of the configurations passed in,
   returning a ConfigObj for the result.
 
-  @param conf_source if not specified, reads conf/ from
-                     desktop/conf/. Otherwise should be a generator
-                     of ConfigObjs
+  @param conf_source if not specified, reads conf/ from desktop/conf/. Otherwise should be a generator of ConfigObjs
   """
   if conf_source is None:
     conf_source = _configs_from_dir(get_desktop_root("conf"))
 
   conf = ConfigObj(configspec=configspecpath)
+
   for in_conf in conf_source:
     conf.merge(in_conf)
   return conf
@@ -671,6 +676,7 @@ def collect_validation_messages(conf, error_list):
   for sections, name in whitelist_extras:
     the_section = conf
     hierarchy_sections_string = ''
+
     try:
       parent = conf
       for section in sections:
@@ -694,6 +700,7 @@ def collect_validation_messages(conf, error_list):
 
     section_string = hierarchy_sections_string or "top level"
     message.append('Extra %s, %s in the section: %s' % (section_or_value, name, section_string))
+
   if message:
     error = {
       'name': 'ini configuration',

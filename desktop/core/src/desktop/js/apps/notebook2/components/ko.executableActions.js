@@ -17,9 +17,10 @@
 import * as ko from 'knockout';
 
 import componentUtils from 'ko/components/componentUtils';
+import DisposableComponent from 'ko/components/DisposableComponent';
+import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import { EXECUTABLE_UPDATED_EVENT, EXECUTION_STATUS } from 'apps/notebook2/execution/executable';
-import DisposableComponent from 'ko/components/DisposableComponent';
 
 export const NAME = 'executable-actions';
 
@@ -126,6 +127,7 @@ class ExecutableActions extends DisposableComponent {
   }
 
   async execute() {
+    huePubSub.publish('hue.ace.autocompleter.hide');
     if (this.beforeExecute) {
       await this.beforeExecute();
     }

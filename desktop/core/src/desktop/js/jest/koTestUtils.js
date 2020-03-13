@@ -98,10 +98,17 @@ export const koSetup = () => {
         ko.applyBindings(data, setupContainer);
       }),
 
-    waitForKoUpdate: async () => {
-      return new Promise(resolve => {
+    waitForKoUpdate: async () =>
+      new Promise(resolve => {
         window.setTimeout(resolve, 0);
-      });
-    }
+      })
   };
 };
+
+export const waitForObservableChange = async observable =>
+  new Promise(resolve => {
+    const sub = observable.subscribe(() => {
+      sub.dispose();
+      resolve();
+    });
+  });

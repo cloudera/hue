@@ -55,8 +55,6 @@ done;
 
 if [ "$1" == "slow" ]; then
   make test-slow
-elif [ "$1" == "windmill" ]; then
-  xvfb-run -a -s '-screen 0 1024x768x16' tools/hudson/hudson_windmill_in_X.sh
 else
   make test docs
 fi
