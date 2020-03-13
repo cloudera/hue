@@ -17,11 +17,12 @@ function prepare_huedb() {
 }
 
 function db_connectivity_check() {
-  i="0"
+  i=3
   ret="fail"
 
-  # perform db connectivity check for 5 times
-  while [[ $i -lt 5 ]]; do
+  # perform db connectivity check for at least 60 times,
+  # before give up
+  while [[ $i -lt 61 ]]; do
     echo "Running db connectivity check"
 
     status=$(echo quit|$HUE_BIN/hue dbshell 2>&1|wc -l)
@@ -31,10 +32,11 @@ function db_connectivity_check() {
       break
     fi
 
-    sleep 1
-    i=$[$i+1]
+    i=$((i+1))
+    # gradually increase sleep time
+    sleep $i
 
-    echo "Failing db connectivity check: $i"
+    echo "Failing db connectivity check: " $i
   done
 
   echo "$ret"
