@@ -11,9 +11,12 @@ export PYTHON_EGG_CACHE=$HUE_CONF_DIR/.python-eggs
 export SERVER_SOFTWARE="apache"
 
 function prepare_huedb() {
+  (
+  flock -x 124
   $HUE_BIN/hue syncdb --noinput
   $HUE_BIN/hue makemigrations --noinput --merge
   $HUE_BIN/hue migrate
+  ) 124>$HUE_CONF_DIR/hue.lock
 }
 
 function db_connectivity_check() {
@@ -46,7 +49,7 @@ if [[ $ret == "fail" ]];  then
   exit 1
 fi
 
-# prepare db schema
+# prepare db schema, run it in single instance flock mode
 prepare_huedb
 
 if [[ $1 == kt_renewer ]]; then
