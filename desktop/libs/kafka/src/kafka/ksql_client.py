@@ -111,9 +111,10 @@ class KSqlApi(object):
     data = []
     metadata = []
 
-    is_select = statement.strip().lower().startswith('select')
-    if is_select or statement.strip().lower().startswith('print'):
+    is_select = statement.strip().lower().startswith('select')  # TODO via parser
+    is_print = statement.strip().lower().startswith('print')
 
+    if is_select or is_print:
       result = self.client.query(statement)
 
       metadata = [['Row', 'STRING']]
@@ -128,11 +129,18 @@ class KSqlApi(object):
       for line in result:
         # columns = line.keys()
         # data.append([line[col] for col in columns])
-        if is_select and line: # Empty first 2 lines?
+        if 'finalMessage' in line:
+          break
+        elif 'header' in line:
+          continue
+        else:
+          line = line.strip()[:-1]
+
+        if is_select:
           data_line = json.loads(line)
           if data_line.get('@type') == 'statement_error':
             raise KSqlApiException(data_line['message'])
-          if data_line['row']: # If limit not reached
+          if data_line['row']:  # If limit not reached
             data.append(data_line['row']['columns'])
         else:
           data.append([line])
