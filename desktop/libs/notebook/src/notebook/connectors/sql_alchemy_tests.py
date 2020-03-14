@@ -21,12 +21,13 @@ import logging
 import sys
 
 from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false, raises
+from sqlalchemy.types import NullType
 
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
-from notebook.connectors.base import AuthenticationRequired
 
+from notebook.connectors.base import AuthenticationRequired
 from notebook.connectors.sql_alchemy import SqlAlchemyApi
 
 
@@ -200,11 +201,43 @@ class TestApi(object):
         )
 
 
+class TestDialects(object):
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+    self.user = rewrite_user(User.objects.get(username="test"))
+
+
+  def test_backticks_with_connectors(self):
+    interpreter = {'options': {'url': 'dialect://'}, 'dialect_properties': {'sql_identifier_quote': '`'}}
+    data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
+
+    assert_equal(data, 'SELECT *\nFROM `db1`.`table1`\nLIMIT 1000\n')
+
+
+    interpreter = {'options': {'url': 'dialect://'}, 'dialect_properties': {'sql_identifier_quote': '"'}}
+    data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
+
+    assert_equal(data, 'SELECT *\nFROM "db1"."table1"\nLIMIT 1000\n')
+
+
+  def test_backticks_without_connectors(self):
+    interpreter = {'options': {'url': 'phoenix://'}}
+    data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
+
+    assert_equal(data, 'SELECT *\nFROM `db1`.`table1`\nLIMIT 1000\n')
+
+
+    interpreter = {'options': {'url': 'postgresql://'}}
+    data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
+
+    assert_equal(data, 'SELECT *\nFROM "db1"."table1"\nLIMIT 1000\n')
+
+
 class TestAutocomplete(object):
 
   def setUp(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
-
     self.user = rewrite_user(User.objects.get(username="test"))
 
 
@@ -222,3 +255,37 @@ class TestAutocomplete(object):
           data = SqlAlchemyApi(self.user, interpreter).autocomplete(snippet)
 
           assert_equal(data['databases'], ['SYSTEM', 'NULL'])
+
+
+  def test_columns_with_null_type(self):
+    interpreter = {
+      'options': {'url': 'phoenix://'}
+    }
+
+    snippet = Mock()
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      with patch('notebook.connectors.sql_alchemy.inspect') as inspect:
+        with patch('notebook.connectors.sql_alchemy.Assist') as Assist:
+          def col1_dict(key):
+            return {
+              'name': 'col1',
+              'type': 'string'
+            }.get(key, Mock())
+          col1 = MagicMock()
+          col1.__getitem__.side_effect = col1_dict
+          col1.get = col1_dict
+          def col2_dict(key):
+            return {
+              'name': 'col2',
+              'type': NullType()
+            }.get(key, Mock())
+          col2 = MagicMock()
+          col2.__getitem__.side_effect = col2_dict
+          col2.get = col2_dict
+
+          Assist.return_value=Mock(get_columns=Mock(return_value=[col1, col2]))
+
+          data = SqlAlchemyApi(self.user, interpreter).autocomplete(snippet, database='database', table='table')
+
+          assert_equal(data['columns'], ['col1', 'col2'])
+          assert_equal([col['type'] for col in data['extended_columns']], ['string', 'Null'])

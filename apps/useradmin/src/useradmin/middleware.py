@@ -31,6 +31,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.auth.views import dt_logout
 from desktop.conf import AUTH, LDAP, SESSION
+from desktop.lib.security_util import get_localhost_name
 
 from useradmin import ldap_access
 from useradmin.models import UserProfile, get_profile, User
@@ -101,6 +102,7 @@ class LastActivityMiddleware(object):
         and not (request.path.strip('/').startswith('oozie/list_oozie_')):
       try:
         profile.last_activity = datetime.now()
+        profile.hostname = get_localhost_name()
         profile.save()
       except DatabaseError:
         LOG.exception('Error saving profile information')

@@ -52,7 +52,6 @@ Here is a tutorial demoing how Hue's SQL Editor helps you quickly visualize and 
 
 ![Assist All Keys](https://cdn.gethue.com/uploads/2019/11/sql_column_pk.png)
 
-*Updated March 2020*
 
 ## Primary Keys
 

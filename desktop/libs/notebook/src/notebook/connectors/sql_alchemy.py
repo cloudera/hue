@@ -59,6 +59,7 @@ from string import Template
 from django.utils.translation import ugettext as _
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.types import NullType
 
 from desktop.lib import export_csvxls
 from desktop.lib.i18n import force_unicode
@@ -106,7 +107,11 @@ class SqlAlchemyApi(Api):
   def __init__(self, user, interpreter):
     self.user = user
     self.options = interpreter['options']
-    self.backticks = '"' if re.match('^(postgresql://|awsathena|elasticsearch)', self.options.get('url', '')) else '`'
+
+    if interpreter.get('dialect_properties'):
+      self.backticks = interpreter['dialect_properties']['sql_identifier_quote']
+    else:
+      self.backticks = '"' if re.match('^(postgresql://|awsathena|elasticsearch)', self.options.get('url', '')) else '`'
 
   def _create_engine(self):
     if '${' in self.options['url']: # URL parameters substitution
@@ -296,13 +301,14 @@ class SqlAlchemyApi(Api):
       database = self._fix_phoenix_empty_database(database)
       columns = assist.get_columns(database, table)
       response['columns'] = [col['name'] for col in columns]
+
       response['extended_columns'] = [{
           'autoincrement': col.get('autoincrement'),
           'comment': col.get('comment'),
           'default': col.get('default'),
           'name': col.get('name'),
           'nullable': col.get('nullable'),
-          'type': str(col.get('type'))
+          'type': str(col.get('type')) if not isinstance(col.get('type'), NullType) else 'Null'
         } for col in columns
       ]
     else:
@@ -331,7 +337,7 @@ class SqlAlchemyApi(Api):
       columns = assist.get_columns(database, table)
       response['full_headers'] = [{
           'name': col.get('name'),
-          'type': str(col.get('type')),
+          'type': str(col.get('type')) if not isinstance(col.get('type'), NullType) else 'Null',
           'comment': ''
         } for col in columns
       ]
