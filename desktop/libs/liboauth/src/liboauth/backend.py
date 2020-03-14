@@ -20,11 +20,12 @@ See desktop/auth/backend.py
 
 from future import standard_library
 standard_library.install_aliases()
-import httplib2
 import json
 import cgi
 import logging
 import sys
+
+LOG = logging.getLogger(__name__)
 
 from django.utils.translation import ugettext as _
 
@@ -36,17 +37,19 @@ import liboauth.conf
 import liboauth.metrics
 
 try:
+  import httplib2
+except ImportError:
+  LOG.warn('httplib2 module not found')
+try:
   import oauth2 as oauth
-except:
+except ImportError:
+  LOG.warn('oauth2 module not found')
   oauth = None
 
 if sys.version_info[0] > 2:
   from urllib.parse import urlencode as lib_urlencode
 else:
   from urllib import urlencode as lib_urlencode
-
-
-LOG = logging.getLogger(__name__)
 
 
 class OAuthBackend(DesktopBackendBase):
