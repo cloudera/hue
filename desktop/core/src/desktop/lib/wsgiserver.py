@@ -111,7 +111,7 @@ import os
 import queue
 import re
 quoted_slash = re.compile("(?i)%2F")
-import rfc822
+from email.utils import formatdate
 import socket
 try:
     import io as StringIO
@@ -734,7 +734,7 @@ class HTTPRequest(object):
                 self.rfile.read(size)
 
         if "date" not in hkeys:
-            self.outheaders.append(("Date", rfc822.formatdate()))
+            self.outheaders.append(("Date", formatdate()))
 
         if "server" not in hkeys:
             self.outheaders.append(("Server", self.environ['SERVER_SOFTWARE']))
