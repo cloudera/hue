@@ -17,14 +17,16 @@
 
 from future import standard_library
 standard_library.install_aliases()
-try:
-  import oauth2 as oauth
-except:
-  oauth = None
 
 import logging
+
+LOG = logging.getLogger(__name__)
+
 import urllib.request, urllib.parse, urllib.error
-import httplib2
+try:
+  import httplib2
+except ImportError:
+  LOG.warn('httplib2 module not found')
 
 import django.contrib.auth.views
 from django.core import urlresolvers
@@ -69,21 +71,21 @@ def show_login_page(request, login_errors=False):
 
 @login_notrequired
 def oauth_login(request):
-
   if 'social' not in request.GET:
-      raise Exception(_("Invalid request: %s") % resp)
+    raise Exception(_("Invalid request: %s") % resp)
   else:
-      url = OAuthBackend.handleLoginRequest(request)
+    url = OAuthBackend.handleLoginRequest(request)
 
   return HttpResponseRedirect(url)
 
 
 @login_notrequired
 def oauth_authenticated(request):
-
   access_token, next = OAuthBackend.handleAuthenticationRequest(request)
   if access_token == "":
-      return show_login_page(request, True)
+    return show_login_page(request, True)
+
   user = authenticate(access_token = access_token)
   login(request, user)
+
   return HttpResponseRedirect(next)

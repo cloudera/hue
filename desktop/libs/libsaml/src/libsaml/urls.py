@@ -15,10 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import url
-from djangosaml2 import views as djangosaml2_views
-from libsaml import views as libsaml_views
+import logging
 
+from django.conf.urls import url
+
+LOG = logging.getLogger(__name__)
+
+try:
+  from djangosaml2 import views as djangosaml2_views
+  from libsaml import views as libsaml_views
+except ImportError:
+  LOG.warn('djangosaml2 module not found')
+  djangosaml2_views = None
 
 try:
   from djangosaml2.views import logout_service_post
@@ -27,17 +35,20 @@ except ImportError:
   logout_service_post = None
 
 
-urlpatterns = [
+if djangosaml2_views is not None:
+  urlpatterns = [
     url(r'^logout/$', djangosaml2_views.logout, name='saml2_logout')
-]
+  ]
 
-urlpatterns += [
-                        url(r'^ls/$', libsaml_views.logout_service, name='saml2_ls'),
-                        url(r'^acs/$', libsaml_views.assertion_consumer_service, name='saml2_acs'),
-                        url(r'^login/$', libsaml_views.login, name='saml2_login'),
-                        url(r'^metadata/$', libsaml_views.metadata, name='saml2_metadata'),
-                        url(r'^test/$', libsaml_views.echo_attributes)]
-
-if logout_service_post is not None:
   urlpatterns += [
-                          url(r'^ls/post/$', libsaml_views.logout_service_post, name='saml2_ls_post')]
+    url(r'^ls/$', libsaml_views.logout_service, name='saml2_ls'),
+    url(r'^acs/$', libsaml_views.assertion_consumer_service, name='saml2_acs'),
+    url(r'^login/$', libsaml_views.login, name='saml2_login'),
+    url(r'^metadata/$', libsaml_views.metadata, name='saml2_metadata'),
+    url(r'^test/$', libsaml_views.echo_attributes)
+  ]
+
+  if logout_service_post is not None:
+    urlpatterns += [
+      url(r'^ls/post/$', libsaml_views.logout_service_post, name='saml2_ls_post')
+    ]

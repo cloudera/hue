@@ -27,11 +27,10 @@ from notebook.connectors.base import AuthenticationRequired
 
 LOG = logging.getLogger(__name__)
 
-
 try:
   from py4j.java_gateway import JavaGateway, JavaObject
-except ImportError as e:
-  LOG.exception('Failed to import py4j')
+except:
+  LOG.warn('Failed to import py4j')
 
 
 def query_and_fetch(db, statement, n=None):
