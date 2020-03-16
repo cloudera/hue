@@ -67,7 +67,7 @@ RUN ./build/env/bin/pip install \
   thrift-sasl==0.2.1
 
 
-COPY tools/docker/hue/conf desktop/conf
+COPY tools/docker/hue/conf3 desktop/conf
 COPY tools/docker/hue/startup.sh .
 
 USER hue
