@@ -54,7 +54,7 @@
     "localforage": "1.7.3",
     "lodash": "4.17.13",
     "medium-editor": "5.23.3",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.2",
     "page": "1.8.6",
     "plotly.js-dist": "1.45.3",
     "removeNPMAbsolutePaths": "^1.0.4",
