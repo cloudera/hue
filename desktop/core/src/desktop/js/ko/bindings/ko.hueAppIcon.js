@@ -18,6 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 const APP_ICON_INDEX = {
+  abfs: `<svg class="hi hi-fw"><use xlink:href="#hi-adls"></use></svg>`,
   adls: `<svg class="hi hi-fw"><use xlink:href="#hi-adls"></use></svg>`,
   dashboard: `<svg class="hi hi-fw"><use xlink:href="#hi-dashboard"></use></svg>`,
   default: `<i class="fa fa-fw fa-database"></i>`,
