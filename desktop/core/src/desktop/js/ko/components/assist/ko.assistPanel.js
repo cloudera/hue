@@ -124,13 +124,13 @@ class AssistPanel {
         }
 
         if (self.tabsEnabled) {
-          if (appConfig.browser && appConfig.browser.interpreter_names) {
-            const storageBrowsers = appConfig.browser.interpreter_names.filter(
+          if (appConfig.browser && appConfig.browser.interpreters) {
+            const storageBrowsers = appConfig.browser.interpreters.filter(
               interpreter =>
-                interpreter === 'adls' ||
-                interpreter === 'hdfs' ||
-                interpreter === 's3' ||
-                interpreter === 'abfs'
+                interpreter.type === 'adls' ||
+                interpreter.type === 'hdfs' ||
+                interpreter.type === 's3' ||
+                interpreter.type === 'abfs'
             );
 
             if (storageBrowsers.length) {
