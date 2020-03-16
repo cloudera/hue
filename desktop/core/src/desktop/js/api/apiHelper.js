@@ -737,7 +737,6 @@ class ApiHelper {
    */
   fetchAbfsPath(options) {
     const self = this;
-    options.pathParts.shift();
     let url =
       ABFS_API_PREFIX +
       encodeURI(options.pathParts.join('/')) +
