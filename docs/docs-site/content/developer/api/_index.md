@@ -5,12 +5,12 @@ draft: false
 weight: 5
 ---
 
-Hue can be accessed directly via a Python Shell or by its REST API. Some components of Hue like the SQL parsers can also be imported independently.
+Hue can easily be extended to natively support other databases or be enriched via other data catalogs. Some components of Hue like the SQL parsers or Editor Scratchpad can also be imported independently as dependencies into your own apps.
 
 
 ## SQL autocompletion
 
-The parser is running on the client side and comes with just a few megabytes of JavaScript that are cached by the browser. This provides a very reactive experience to the end user and allows to import it as a module.
+The [parsers](/developer/parsers/) are the flagship part of the Hue and power extremely advanced autocompletes or other [SQL functionalities](/user/querying/#autocomplete). They are running on the client side and comes with just a few megabytes of JavaScript that are cached by the browser. This provides a very reactive experience to the end user and allows to import them as classic JavaScript modules for your own development needs.
 
 While the dynamic content like the list of tables, columns is obviously fetched via [remote endpoints](#sql-querying), all the SQL knowledge of the statements is available.
 

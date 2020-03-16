@@ -207,13 +207,9 @@ class TestApi(object):
       with patch('notebook.connectors.sql_alchemy.inspect') as inspect:
         get_sample_data.return_value = (['col1'], [[1], [2]])
 
-        response = SqlAlchemyApi(self.user, self.interpreter).get_sample_data(snippet, table='table1')
+        response = SqlAlchemyApi(self.user, self.interpreter).get_sample_data(snippet, database='database1', table='table1')
 
         assert_equal(response['rows'], [[1], [2]])
-        assert_equal(
-          response['full_headers'],
-          [{'name': 'col1', 'type': 'STRING_TYPE', 'comment': ''}]
-        )
 
 
 class TestDialects(object):

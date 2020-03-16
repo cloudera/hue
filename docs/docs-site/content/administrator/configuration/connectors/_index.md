@@ -845,6 +845,8 @@ Alternatively (but not recommended for production or secure environments), you c
 
 The region should be set to the AWS region corresponding to the S3 account. By default, this region will be set to 'us-east-1'.
 
+**Using Ozone**
+Apache Ozone should work out of the box.
 
 **Using Ceph**
 New end points have been added in [HUE-5420](https://issues.cloudera.org/browse/HUE-5420)
@@ -857,15 +859,6 @@ Read more about it in the [ADLS User Documentation](/user/browsing#adls-abfs).
 
 In order to add an Azure account to Hue, you'll need to configure Hue with valid Azure credentials, including the client ID, client secret and tenant ID.
 These keys can securely stored in a script that outputs the actual access key and secret key to stdout to be read by Hue (this is similar to how Hue reads password scripts). In order to use script files, add the following section to your hue.ini configuration file:
-
-    [azure]
-    [[azure_accounts]]
-    [[[default]]]
-    client_id_script=/path/to/client_id_script.sh
-    client_secret_script=/path/to/client_secret_script.sh
-    tenant_id_script=/path/to/tenant_id_script.sh
-
-Alternatively (but not recommended for production or secure environments), you can set the client_secret value in plain-text:
 
     [azure]
     [[azure_account]]
@@ -883,7 +876,7 @@ The account name used by ADLS / ABFS will need to be configured via the followin
 
     [[abfs_clusters]]
     [[[default]]]
-    fs_defaultfs=abfss://<container_name>@<account_name>.dfs.core.windows.net
+    fs_defaultfs=abfs://<container_name>@<account_name>.dfs.core.windows.net
     webhdfs_url=https://<container_name>@<account_name>.dfs.core.windows.net
 
 ### GCS
