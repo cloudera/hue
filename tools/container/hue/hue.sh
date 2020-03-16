@@ -20,17 +20,18 @@ function prepare_huedb() {
 }
 
 function db_connectivity_check() {
-  i=3
+  i=1
   ret="fail"
 
   # perform db connectivity check for at least 60 times,
   # before give up
   while [[ $i -lt 61 ]]; do
-    echo "Running db connectivity check"
-
-    status=$(echo quit|$HUE_BIN/hue dbshell 2>&1|wc -l)
-    # check if db connection is successful
-    if [[ $status -gt 1 ]]; then
+    # Run hue dbshell, if successful then one should not see
+    # psql in the output.
+    dbshell_output=$(echo "\q"|$HUE_BIN/hue dbshell 2>&1)
+    error_line=$(echo $dbshell_output|grep psql)
+    if [[ $error_line -eq 0 ]]; then
+      echo "Successful db connectivity check"
       ret="success"
       break
     fi
@@ -39,7 +40,7 @@ function db_connectivity_check() {
     # gradually increase sleep time
     sleep $i
 
-    echo "Failing db connectivity check: " $i
+    echo "Failing db connectivity error: " $i " " $dbshell_output
   done
 
   echo "$ret"
