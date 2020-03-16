@@ -301,14 +301,14 @@
   ## enable_prometheus=false
 
   # Turn on the Gist snippet sharing.
-  ## enable_gist=false
+  ## enable_gist=true
 
   # Add public description so that the link can be unfurled in a preview by websites like Slack.
   # Only enabled automatically in private setups.
   ## enable_gist_preview=true
 
   # Turn on the direct link sharing of saved document.
-  ## enable_link_sharing=false
+  ## enable_link_sharing=true
 
   # Administrators
   # ----------------
@@ -1679,6 +1679,9 @@
 ###########################################################################
 
 [aws]
+  # Enable the detection of an IAM role providing the credentials automatically. It can take a few seconds.
+  ## has_iam_detection=false
+
   [[aws_accounts]]
     # Default AWS account
     ## [[[default]]]
@@ -1719,6 +1722,7 @@
 
       # The time in seconds before a delegate key is expired. Used when filebrowser/redirect_download is used. Default to 4 Hours.
       ## key_expiry=14400
+
 
 ###########################################################################
 # Settings for the Azure lib

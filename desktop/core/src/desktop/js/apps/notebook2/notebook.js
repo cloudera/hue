@@ -348,6 +348,9 @@ export default class Notebook {
         if (editorMode) {
           huePubSub.publish(UPDATE_SAVED_QUERIES_EVENT, data);
 
+          if (data.save_as) {
+            huePubSub.publish('assist.document.refresh');
+          }
           if (this.coordinatorUuid() && this.schedulerViewModel) {
             this.saveScheduler();
             this.schedulerViewModel.coordinator.refreshParameters();

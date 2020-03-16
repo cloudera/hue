@@ -47,7 +47,8 @@ BLD_DIR_PLUGINS := $(PLUGIN_DIR)/java/target
 
 compile: $(DB_PROXY_JAR)
 
-# Build the plugin jar iff the source is present
+# Build the plugin jar iff BUILD_DB_PROXY is set and the source is present
+ifneq (,$(BUILD_DB_PROXY))
 ifneq (,$(wildcard $(PLUGIN_JAVA_DIR)))
 $(DB_PROXY_JAR): $(shell find $(PLUGIN_JAVA_DIR) -type f)
 	mkdir -p $(PLUGIN_JAVA_LIB)
@@ -61,4 +62,8 @@ clean::
 else
 $(DB_PROXY_JAR):
 	$(error Cannot build DBProxy plugin without source)
+endif
+else
+$(DB_PROXY_JAR):
+	@echo 'Skipping DB Proxy Jar build as BUILD_DB_PROXY not set.'
 endif

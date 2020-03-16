@@ -384,7 +384,7 @@ class EditorViewModel {
             });
           }
 
-          if (typeof callback !== 'undefined' && callback !== null) {
+          if (callback) {
             callback();
           }
           resolve();
@@ -422,7 +422,7 @@ class EditorViewModel {
           this.changeURL(this.URLS.notebook + '?notebook=' + docData.document.id);
         }
       }
-      if (typeof callback !== 'undefined') {
+      if (callback) {
         callback();
       }
     } catch (err) {
@@ -512,43 +512,46 @@ class EditorViewModel {
   }
 
   toggleEditorMode() {
-    const selectedNotebook = this.selectedNotebook();
+    const notebook = this.selectedNotebook();
     const newSnippets = [];
 
     const toPresentationMode = this.editorType() !== 'notebook';
 
     if (toPresentationMode) {
       this.editorType('notebook');
-      const sourceSnippet = selectedNotebook.snippets()[0];
+      const sourceSnippet = notebook.snippets()[0];
       this.preEditorTogglingSnippet(sourceSnippet);
       const variables = sourceSnippet.variables();
       const statementKeys = {};
       // Split statements
-      selectedNotebook.type('notebook');
+      notebook.type('notebook');
+
+      const database = sourceSnippet.database();
 
       sourceSnippet.executor.executables.forEach(executable => {
         const sqlStatement = executable.parsedStatement.statement;
-        const sqlStatementHash = sqlStatement.hashCode();
+        const statementKey = sqlStatement.hashCode() + database;
 
         let presentationSnippet;
 
-        if (!selectedNotebook.presentationSnippets()[sqlStatementHash]) {
-          const titleParts = [];
-          const statementParts = [];
+        if (!notebook.presentationSnippets()[statementKey]) {
+          const titleLines = [];
+          const statementLines = [];
           sqlStatement
             .trim()
             .split('\n')
             .forEach(line => {
-              if (line.trim().startsWith('--') && statementParts.length === 0) {
-                titleParts.push(line.substr(2));
+              if (line.trim().startsWith('--') && statementLines.length === 0) {
+                titleLines.push(line.substr(2));
               } else {
-                statementParts.push(line);
+                statementLines.push(line);
               }
             });
-          presentationSnippet = new Snippet(this, selectedNotebook, {
-            type: selectedNotebook.initialType,
-            statement_raw: statementParts.join('\n'),
-            name: titleParts.join('\n'),
+          presentationSnippet = new Snippet(this, notebook, {
+            type: notebook.initialType,
+            statement_raw: statementLines.join('\n'),
+            database: database,
+            name: titleLines.join('\n'),
             variables: komapping.toJS(variables)
           });
           window.setTimeout(() => {
@@ -562,30 +565,31 @@ class EditorViewModel {
             presentationSnippet.activeExecutable(reattachedExecutable);
           }, 1000); // TODO: Make it possible to set activeSnippet on Snippet creation
           presentationSnippet.init();
-          selectedNotebook.presentationSnippets()[sqlStatementHash] = presentationSnippet;
+          notebook.presentationSnippets()[statementKey] = presentationSnippet;
         } else {
-          presentationSnippet = selectedNotebook.presentationSnippets()[sqlStatementHash];
+          presentationSnippet = notebook.presentationSnippets()[statementKey];
         }
         presentationSnippet.variables(sourceSnippet.variables());
-        statementKeys[sqlStatement.hashCode()] = true;
+        statementKeys[statementKey] = true;
         newSnippets.push(presentationSnippet);
       });
 
-      Object.keys(selectedNotebook.presentationSnippets()).forEach(key => {
+      Object.keys(notebook.presentationSnippets()).forEach(key => {
         // Dead statements
         if (!statementKeys[key]) {
-          selectedNotebook.presentationSnippets()[key].executor.executables.forEach(executable => {
+          notebook.presentationSnippets()[key].executor.executables.forEach(executable => {
             executable.cancelBatchChain();
           });
+          delete notebook.presentationSnippets()[key];
         }
       });
     } else {
-      this.editorType(selectedNotebook.initialType);
+      this.editorType(notebook.initialType);
       // Revert to one statement
       newSnippets.push(this.preEditorTogglingSnippet());
-      selectedNotebook.type('query-' + selectedNotebook.initialType);
+      notebook.type('query-' + notebook.initialType);
     }
-    selectedNotebook.snippets(newSnippets);
+    notebook.snippets(newSnippets);
     newSnippets.forEach(snippet => {
       huePubSub.publish('editor.redraw.data', { snippet: snippet });
       if (toPresentationMode) {

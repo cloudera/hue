@@ -70,6 +70,12 @@ const NAV_OPT_URLS = {
   TABLE_DETAILS: '/metadata/api/optimizer/table_details'
 };
 
+export const LINK_SHARING_PERMS = {
+  READ: 'read',
+  WRITE: 'write',
+  OFF: 'off'
+};
+
 /**
  *
  * @param {Object} options
@@ -1312,7 +1318,7 @@ class ApiHelper {
 
   /**
    * @param {Object} options
-   * @param {number} options.uuid
+   * @param {string} options.uuid
    * @param {boolean} [options.silenceErrors]
    * @param {boolean} [options.dependencies]
    * @param {boolean} [options.fetchContents]
@@ -1323,6 +1329,26 @@ class ApiHelper {
   async fetchDocumentAsync(options) {
     return new Promise((resolve, reject) => {
       this.fetchDocument(options)
+        .done(resolve)
+        .fail(reject);
+    });
+  }
+
+  /**
+   * @param {Object} options
+   * @param {string} options.uuid
+   * @param {string} options.perm - See LINK_SHARING_PERMS
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param options
+   * @return {Promise<unknown>}
+   */
+  async setLinkSharingPermsAsync(options) {
+    return new Promise((resolve, reject) => {
+      this.simplePost('/desktop/api2/doc/share/link', {
+        uuid: JSON.stringify(options.uuid),
+        perm: JSON.stringify(options.perm)
+      })
         .done(resolve)
         .fail(reject);
     });

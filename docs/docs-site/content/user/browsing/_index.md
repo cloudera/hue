@@ -5,9 +5,9 @@ draft: false
 weight: 3
 ---
 
-Browsers power the Data Catalog. They let you easily search, glance and perform actions on data or jobs in Cloud or on premise clusters.
+Browsers power the Data Catalog. They let you easily search, glance, import datasets or jobs.
 
-The browsers can be "enriched" with [Search and Tagging](http://gethue.com/improved-sql-exploration-in-hue-4-3/) by metadata services.
+The browsers can be "enriched" with external [catalog/metadata services](/administrator/configuration/connectors/#storage/).
 
 ## Catalogs
 
@@ -15,7 +15,7 @@ The browsers can be "enriched" with [Search and Tagging](http://gethue.com/impro
 
 The Table Browser enables you to manage the databases, tables, and partitions of the metastore shared by the Hive and Impala. You can perform the following operations:
 
--   Search and display metadata like tags and additional description from [Catalog backends](/administrator/configuration/connectors/#storage/).
+-   Search and display metadata like tags and additional description
 
 -   Databases
     -   Select a database
@@ -32,11 +32,9 @@ The Table Browser enables you to manage the databases, tables, and partitions of
 
 ### Data Catalogs
 
-[Apache Atlas](https://atlas.apache.org/) is powering the Search and Commenting of tables, columns. New Catalogs can be integrated via [connectors](/developer/connectors/).
+Before typing any query to get insights, users need to find and explore the correct datasets.  It is accessible from the top bar of the interface and offers free text search of SQL tables, columns, tags and saved queries. This is particularly useful for quickly looking up a table among thousands or finding existing queries already analyzing a certain dataset.
 
 Existing tags, descriptions and indexed objects show up automatically, any additional tags you add appear back in metadata server, and the familiar metadata server search syntax is supported.
-
-Before typing any query to get insights, users need to find and explore the correct datasets. The Data Catalog search usability experience has been improved in each release since. It is accessible from the top bar of the interface and offers free text search of SQL tables, columns, tags and saved queries. This is particularly useful for quickly looking up a table among thousands or finding existing queries already analyzing a certain dataset.
 
 ![Data Catalog top search](https://cdn.gethue.com/uploads/2018/04/blog_top_search_.png)
 

@@ -29,19 +29,19 @@ from django.db.utils import OperationalError
 from beeswax.models import SavedQuery
 from beeswax.design import hql_query
 from notebook.models import import_saved_beeswax_query
-try:
-  from oozie.models2 import Workflow
-  has_oozie = True
-except RuntimeError:
-  has_oozie = False
 from useradmin.models import get_default_user_group, User
 
-from desktop.conf import ENABLE_GIST
 from desktop.converters import DocumentConverter
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.fs import ProxyFS
 from desktop.lib.test_utils import grant_access
 from desktop.models import Directory, Document2, Document, Document2Permission
+
+try:
+  from oozie.models2 import Workflow
+  has_oozie = True
+except RuntimeError:
+  has_oozie = False
 
 
 class MockFs(object):
@@ -286,13 +286,13 @@ class TestDocument2(object):
     response = self.client.get('/desktop/api2/doc', {'path': '/'})
     data = json.loads(response.content)
     assert_true('children' in data)
-    assert_equal(6 if ENABLE_GIST.get() else 5, data['count'])  # This includes the 4 docs and .Trash and Gist
+    assert_equal(5, data['count'])  # This includes the 4 docs and .Trash and Gist
 
     # Test filter type
     response = self.client.get('/desktop/api2/doc', {'path': '/', 'type': ['directory']})
     data = json.loads(response.content)
     assert_equal(['directory'], data['types'])
-    assert_equal(4 if ENABLE_GIST.get() else 3, data['count'])
+    assert_equal(3, data['count'])
     assert_true(all(doc['type'] == 'directory' for doc in data['children']))
 
     # Test search text
@@ -308,7 +308,7 @@ class TestDocument2(object):
     # Test pagination with limit
     response = self.client.get('/desktop/api2/doc', {'path': '/', 'page': 2, 'limit': 2})
     data = json.loads(response.content)
-    assert_equal(6 if ENABLE_GIST.get() else 5, data['count'])
+    assert_equal(5, data['count'])
     assert_equal(2, len(data['children']))
 
 
@@ -396,7 +396,7 @@ class TestDocument2(object):
     response = self.client.get('/desktop/api2/doc', {'path': '/'})
     data = json.loads(response.content)
     assert_true('children' in data)
-    assert_equal(2 if ENABLE_GIST.get() else 1, data['count'])
+    assert_equal(1, data['count'])
     assert_true(Document2.TRASH_DIR in [f['name'] for f in data['children']])
 
 

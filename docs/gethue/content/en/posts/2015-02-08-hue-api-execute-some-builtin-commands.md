@@ -211,8 +211,6 @@ sync_documents
 
 test
 
-test_windmill
-
 version
 
 [django]

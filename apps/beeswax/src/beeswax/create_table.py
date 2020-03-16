@@ -287,7 +287,7 @@ def import_wizard(request, database='default'):
   })
 
 
-def _submit_create_and_load(request, create_hql, table_name, path, load_data, database):
+def _submit_create_and_load(request, create_sql, table_name, path, load_data, database):
   """
   Submit the table creation, and setup the load to happen (if ``load_data`` == IMPORT).
   """
@@ -301,7 +301,7 @@ def _submit_create_and_load(request, create_hql, table_name, path, load_data, da
   else:
     on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
 
-  query = hql_query(create_hql, database=database)
+  query = hql_query(create_sql, database=database)
   return execute_directly(request, query,
                                 on_success_url=on_success_url,
                                 on_success_params=on_success_params)

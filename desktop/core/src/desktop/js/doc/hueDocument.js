@@ -19,6 +19,9 @@ import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
 import hueUtils from 'utils/hueUtils';
+import huePubSub from 'utils/huePubSub';
+
+export const DOCUMENT_UPDATED_EVENT = 'hue.document.updated';
 
 class HueDocument {
   /**
@@ -42,6 +45,12 @@ class HueDocument {
     this.idToUserMap = {};
     this.groupMap = {};
     this.items = [];
+
+    huePubSub.subscribe(DOCUMENT_UPDATED_EVENT, definition => {
+      if (this.definition() && this.definition().uuid === definition.uuid) {
+        this.definition(definition);
+      }
+    });
   }
 
   isShared() {
@@ -51,7 +60,8 @@ class HueDocument {
       (perms.read.users.length > 0 ||
         perms.read.groups.length > 0 ||
         perms.write.users.length > 0 ||
-        perms.write.groups.length > 0)
+        perms.write.groups.length > 0 ||
+        perms.link_sharing_on)
     );
   }
 
@@ -186,7 +196,7 @@ class HueDocument {
     });
   }
 
-  load(callback) {
+  load(successCallback, errorCallback) {
     const self = this;
     if (self.loading()) {
       return;
@@ -195,43 +205,49 @@ class HueDocument {
     self.loading(true);
     self.hasErrors(false);
 
-    const fetchDocumentsSuccessCallback = data => {
-      const readUsers = data.document.perms.read.users.map(user => user.id);
-      const writeUsers = data.document.perms.write.users.map(user => user.id);
-      const allUsers = readUsers.concat(writeUsers);
-      if (allUsers.length > 0) {
-        apiHelper.fetchUsersByIds({
-          userids: JSON.stringify(allUsers),
-          successCallback: response => {
-            response.users.forEach(user => {
-              // Needed for getting prettyusername of already shared users
-              self.idToUserMap[user.id] = user;
-            });
-            self.definition(data.document);
-          },
-          errorCallback: () => {}
-        });
-      } else {
-        self.definition(data.document);
-      }
-    };
+    const fetchDocumentsSuccessCallback = async data =>
+      new Promise(resolve => {
+        const readUsers = data.document.perms.read.users.map(user => user.id);
+        const writeUsers = data.document.perms.write.users.map(user => user.id);
+        const allUsers = readUsers.concat(writeUsers);
+        if (allUsers.length > 0) {
+          apiHelper.fetchUsersByIds({
+            userids: JSON.stringify(allUsers),
+            successCallback: response => {
+              response.users.forEach(user => {
+                // Needed for getting prettyusername of already shared users
+                self.idToUserMap[user.id] = user;
+              });
+              self.definition(data.document);
+              resolve();
+            },
+            errorCallback: () => {}
+          });
+        } else {
+          self.definition(data.document);
+          resolve();
+        }
+      });
 
     apiHelper
       .fetchDocument({
         uuid: self.fileEntry.definition().uuid
       })
-      .done(data => {
-        fetchDocumentsSuccessCallback(data);
+      .done(async data => {
+        await fetchDocumentsSuccessCallback(data);
         self.loading(false);
         self.loaded(true);
-        if (callback) {
-          callback();
+        if (successCallback) {
+          successCallback(this);
         }
       })
       .fail(() => {
         self.hasErrors(true);
         self.loading(false);
         self.loaded(true);
+        if (errorCallback) {
+          errorCallback();
+        }
       });
   }
 

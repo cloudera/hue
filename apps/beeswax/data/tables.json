@@ -1,17 +1,17 @@
 [
   {
-    "data_file": "sample_07.csv", 
-    "create_hql": "CREATE TABLE `sample_07` (\n  `code` string ,\n  `description` string ,\n  `total_emp` int ,\n  `salary` int )\nROW FORMAT DELIMITED\n  FIELDS TERMINATED BY '\t'\nSTORED AS TextFile\n", 
+    "data_file": "sample_07.csv",
+    "create_sql": "CREATE TABLE `sample_07` (\n  `code` string ,\n  `description` string ,\n  `total_emp` int ,\n  `salary` int )\nROW FORMAT DELIMITED\n  FIELDS TERMINATED BY '\t'\nSTORED AS TextFile\n",
     "table_name": "sample_07"
-  }, 
+  },
   {
-    "data_file": "sample_08.csv", 
-    "create_hql": "CREATE TABLE `sample_08` (\n  `code` string ,\n  `description` string ,\n  `total_emp` int ,\n  `salary` int )\nROW FORMAT DELIMITED\n  FIELDS TERMINATED BY '\t'\nSTORED AS TextFile\n", 
+    "data_file": "sample_08.csv",
+    "create_sql": "CREATE TABLE `sample_08` (\n  `code` string ,\n  `description` string ,\n  `total_emp` int ,\n  `salary` int )\nROW FORMAT DELIMITED\n  FIELDS TERMINATED BY '\t'\nSTORED AS TextFile\n",
     "table_name": "sample_08"
   },
   {
     "data_file": "customers.parquet",
-    "create_hql": "CREATE TABLE `customers` (\n `id` INT,\n `name` STRING,\n `email_preferences` STRUCT<`email_format`:STRING, `frequency`:STRING, `categories`:STRUCT<`promos`:BOOLEAN, `surveys`:BOOLEAN>>,\n `addresses` MAP<STRING, STRUCT<`street_1`:STRING, `street_2`:STRING, `city`:STRING, `state`:STRING, `zip_code`:STRING>>,\n `orders` ARRAY<STRUCT<`order_id`:STRING, `order_date`:STRING, `items`:ARRAY<STRUCT<`product_id`:INT, `sku`:STRING, `name`:STRING, `price`:DOUBLE, `qty`:INT>>>>)\nSTORED AS PARQUET",
+    "create_sql": "CREATE TABLE `customers` (\n `id` INT,\n `name` STRING,\n `email_preferences` STRUCT<`email_format`:STRING, `frequency`:STRING, `categories`:STRUCT<`promos`:BOOLEAN, `surveys`:BOOLEAN>>,\n `addresses` MAP<STRING, STRUCT<`street_1`:STRING, `street_2`:STRING, `city`:STRING, `state`:STRING, `zip_code`:STRING>>,\n `orders` ARRAY<STRUCT<`order_id`:STRING, `order_date`:STRING, `items`:ARRAY<STRUCT<`product_id`:INT, `sku`:STRING, `name`:STRING, `price`:DOUBLE, `qty`:INT>>>>)\nSTORED AS PARQUET",
     "table_name": "customers"
   },
   {
@@ -21,7 +21,7 @@
       "`date`='2015-11-20'": "web_logs_3.csv",
       "`date`='2015-11-21'": "web_logs_4.csv"
     },
-    "create_hql": "CREATE TABLE `web_logs`  (  `_version_` bigint,   `app` string,   `bytes` smallint,   `city` string,   `client_ip` string,   `code` tinyint,   `country_code` string,   `country_code3` string,   `country_name` string,   `device_family` string,   `extension` string,   `latitude` float,   `longitude` float,   `method` string,   `os_family` string,   `os_major` string,   `protocol` string,   `record` string,   `referer` string,   `region_code` bigint,   `request` string,   `subapp` string,   `time` string,   `url` string,   `user_agent` string,   `user_agent_family` string,   `user_agent_major` string,   `id` string)\nPARTITIONED BY (  `date` string  )\nROW FORMAT DELIMITED \n FIELDS TERMINATED BY ','",
+    "create_sql": "CREATE TABLE `web_logs`  (  `_version_` bigint,   `app` string,   `bytes` smallint,   `city` string,   `client_ip` string,   `code` tinyint,   `country_code` string,   `country_code3` string,   `country_name` string,   `device_family` string,   `extension` string,   `latitude` float,   `longitude` float,   `method` string,   `os_family` string,   `os_major` string,   `protocol` string,   `record` string,   `referer` string,   `region_code` bigint,   `request` string,   `subapp` string,   `time` string,   `url` string,   `user_agent` string,   `user_agent_family` string,   `user_agent_major` string,   `id` string)\nPARTITIONED BY (  `date` string  )\nROW FORMAT DELIMITED \n FIELDS TERMINATED BY ','",
     "table_name": "web_logs"
   }
 ]

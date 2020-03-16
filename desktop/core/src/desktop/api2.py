@@ -27,7 +27,6 @@ import zipfile
 
 from datetime import datetime
 
-from django.contrib.auth.models import Group, User
 from django.core import management
 from django.db import transaction
 from django.http import HttpResponse
@@ -41,6 +40,8 @@ from metadata.conf import has_catalog
 from metadata.catalog_api import search_entities as metadata_search_entities, _highlight, search_entities_interactive as metadata_search_entities_interactive
 from notebook.connectors.altus import SdxApi, AnalyticDbApi, DataEngApi, DataWarehouse2Api
 from notebook.connectors.base import Notebook, get_interpreter
+from notebook.models import Analytics
+from useradmin.models import User, Group
 
 from desktop import appmanager
 from desktop.auth.backend import is_admin
@@ -940,6 +941,7 @@ def gist_create(request):
 
 
 @login_notrequired
+@api_error_handler
 def gist_get(request):
   gist_uuid = request.GET.get('uuid')
 
@@ -951,7 +953,7 @@ def gist_get(request):
       'unfurl_link.mako',
       request, {
         'title': _('SQL gist from %s') % (gist_doc.owner.get_full_name() or gist_doc.owner.username),
-        'description': statement if len(statement) < 30 else (statement[:70] + '...'),
+        'description': statement if len(statement) < 150 else (statement[:150] + '...'),
         'image_link': None
       }
     )

@@ -41,7 +41,13 @@ def index(request):
       'metric': global_registry().dump_metrics(),
   }
 
-  if request.is_ajax():
+  if request.is_ajax() or request.GET.get("format") == "json":
     return JsonResponse(rep, json_dumps_params={'indent': indent})
   else:
-    return render("metrics.mako", request, {'metrics': json.dumps(rep['metric']), 'is_embeddable': request.GET.get('is_embeddable', False)})
+    return render(
+        "metrics.mako",
+        request, {
+          'metrics': json.dumps(rep['metric']),
+          'is_embeddable': request.GET.get('is_embeddable', False)
+        }
+    )

@@ -11,17 +11,21 @@ export PYTHON_EGG_CACHE=$HUE_CONF_DIR/.python-eggs
 export SERVER_SOFTWARE="apache"
 
 function prepare_huedb() {
+  (
+  flock -x 124
   $HUE_BIN/hue syncdb --noinput
   $HUE_BIN/hue makemigrations --noinput --merge
   $HUE_BIN/hue migrate
+  ) 124>$HUE_CONF_DIR/hue.lock
 }
 
 function db_connectivity_check() {
-  i="0"
+  i=3
   ret="fail"
 
-  # perform db connectivity check for 5 times
-  while [[ $i -lt 5 ]]; do
+  # perform db connectivity check for at least 60 times,
+  # before give up
+  while [[ $i -lt 61 ]]; do
     echo "Running db connectivity check"
 
     status=$(echo quit|$HUE_BIN/hue dbshell 2>&1|wc -l)
@@ -31,10 +35,11 @@ function db_connectivity_check() {
       break
     fi
 
-    sleep 1
-    i=$[$i+1]
+    i=$((i+1))
+    # gradually increase sleep time
+    sleep $i
 
-    echo "Failing db connectivity check: $i"
+    echo "Failing db connectivity check: " $i
   done
 
   echo "$ret"
@@ -46,7 +51,7 @@ if [[ $ret == "fail" ]];  then
   exit 1
 fi
 
-# prepare db schema
+# prepare db schema, run it in single instance flock mode
 prepare_huedb
 
 if [[ $1 == kt_renewer ]]; then

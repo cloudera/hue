@@ -19,6 +19,27 @@ import * as ko from 'knockout';
 import I18n from 'utils/i18n';
 import { SqlFunctions } from 'sql/sqlFunctions';
 
+const TEMPLATE_NAME = 'context-popover-function-details';
+
+// prettier-ignore
+export const FUNCTION_CONTEXT_TEMPLATE = `
+<script type="text/html" id="context-popover-function-details">
+  <!-- ko if: typeof details === 'undefined' -->
+  <div class="context-popover-flex-fill">
+    <div class="alert">${ I18n('Could not find details for the function') } <span data-bind="text: $parents[2].title"></span>()</div>
+  </div>
+  <!-- /ko -->
+  <!-- ko if: typeof details !== 'undefined' -->
+  <div class="context-popover-flex-fill" data-bind="with: details">
+    <div style="padding: 8px">
+      <p style="margin: 10px 10px 18px 10px;"><span style="white-space: pre;" class="monospace" data-bind="text: signature"></span></p>
+      <p><span data-bind="text: description"></span></p>
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+`;
+
 class FunctionContextTabs {
   constructor(data, sourceType) {
     const self = this;
@@ -32,7 +53,7 @@ class FunctionContextTabs {
       {
         id: 'details',
         label: I18n('Details'),
-        template: 'context-popover-function-details',
+        template: TEMPLATE_NAME,
         templateData: self.func
       }
     ];

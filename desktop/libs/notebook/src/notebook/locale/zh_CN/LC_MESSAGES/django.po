@@ -659,7 +659,7 @@ msgid "Error loading my queries"
 msgstr "加载我的查询时出错"
 
 #: src/notebook/templates/editor_components.mako:802
-msgid "You don't have any saved query."
+msgid "You don't have any saved queries."
 msgstr "您没有保存的查询。"
 
 #: src/notebook/templates/editor_components.mako:811

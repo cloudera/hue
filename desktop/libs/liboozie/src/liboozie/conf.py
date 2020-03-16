@@ -15,15 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import oct
-from builtins import object
+from builtins import oct, object
 import logging
 import sys
 
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
+from desktop import appmanager
 from desktop.conf import default_ssl_validate
 from desktop.lib.conf import Config, coerce_bool, validate_path
+
 
 LOG = logging.getLogger(__name__)
 
@@ -32,32 +33,41 @@ OOZIE_URL = Config(
   key='oozie_url',
   help=_t('URL of Oozie server. This is required for job submission. Empty value disables the config check.'),
   default='http://localhost:11000/oozie',
-  type=str)
+  type=str
+)
 
 SECURITY_ENABLED = Config(
   key="security_enabled",
   help=_t("Whether Oozie requires client to perform Kerberos authentication."),
   default=False,
-  type=coerce_bool)
+  type=coerce_bool
+)
 
 REMOTE_DEPLOYMENT_DIR = Config(
   key="remote_deployement_dir",
   default="/user/hue/oozie/deployments/_$USER_-oozie-$JOBID-$TIME",
-  help=_t("Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner."
-          " Parameters are $TIME, $USER and $JOBID, e.g. /user/$USER/hue/deployments/$JOBID-$TIME"))
+  help=_t(
+    "Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner."
+    " Parameters are $TIME, $USER and $JOBID, e.g. /user/$USER/hue/deployments/$JOBID-$TIME"
+  )
+)
 
 SSL_CERT_CA_VERIFY=Config(
   key="ssl_cert_ca_verify",
   help="In secure mode (HTTPS), if SSL certificates from Oozie Rest APIs have to be verified against certificate authority",
   dynamic_default=default_ssl_validate,
-  type=coerce_bool)
+  type=coerce_bool
+)
 
 USE_LIBPATH_FOR_JARS = Config(
   key="use_libpath_for_jars",
-  help=_t("Whether Hue append jar paths to the oozie.libpath instead of copying them into the workspace."
-          " This makes submissions faster and less prone to HDFS permission errors"),
+  help=_t(
+    "Whether Hue append jar paths to the oozie.libpath instead of copying them into the workspace."
+    " This makes submissions faster and less prone to HDFS permission errors"
+  ),
   default=False,
-  type=coerce_bool)
+  type=coerce_bool
+)
 
 
 def get_oozie_status(user):
@@ -66,7 +76,7 @@ def get_oozie_status(user):
   status = 'down'
 
   try:
-    if not 'test' in sys.argv: # Avoid tests hanging
+    if not 'test' in sys.argv:  # Avoid tests hanging
       status = str(get_oozie(user).get_oozie_status())
   except:
     LOG.exception('failed to get oozie status')
@@ -93,13 +103,19 @@ def config_validator(user):
     LOG.warn('Config check failed because Oozie app not installed: %s' % e)
     return res
 
+  apps = appmanager.get_apps_dict(user)
+
+  if 'oozie' not in apps:
+    return res
+
   if OOZIE_URL.get():
     status = get_oozie_status(user)
     if 'NORMAL' not in status:
       res.append((status, _('The Oozie server is not available')))
+
     fs = get_filesystem()
-    NICE_NAME = 'Oozie'
-    if fs.do_as_superuser(fs.exists, REMOTE_SAMPLE_DIR.get()):
+
+    if fs and fs.do_as_superuser(fs.exists, REMOTE_SAMPLE_DIR.get()):
       stats = fs.do_as_superuser(fs.stats, REMOTE_SAMPLE_DIR.get())
       mode = oct(stats.mode)
       # if neither group nor others have write permission
@@ -107,7 +123,7 @@ def config_validator(user):
       others_has_write = int(mode[-1]) & 2
 
       if not group_has_write and not others_has_write:
-        res.append((NICE_NAME, "The permissions of workspace '%s' are too restrictive" % REMOTE_SAMPLE_DIR.get()))
+        res.append(('Oozie', "The permissions of workspace '%s' are too restrictive" % REMOTE_SAMPLE_DIR.get()))
 
     api = get_oozie(user, api_version="v2")
 
@@ -117,7 +133,9 @@ def config_validator(user):
       sharelib_url = 'gauges' in metrics and 'libs.sharelib.system.libpath' in metrics['gauges'] and [metrics['gauges']['libs.sharelib.system.libpath']['value']] or []
     else:
       intrumentation = api.get_instrumentation()
-      sharelib_url = [param['value'] for group in intrumentation['variables'] for param in group['data'] if param['name'] == 'sharelib.system.libpath']
+      sharelib_url = [
+        param['value'] for group in intrumentation['variables'] for param in group['data'] if param['name'] == 'sharelib.system.libpath'
+      ]
 
     if sharelib_url:
       sharelib_url = Hdfs.urlsplit(sharelib_url[0])[2]
@@ -131,7 +149,10 @@ def config_validator(user):
       def get_fully_qualifying_key(self): return self.value
 
     for cluster in list(get_all_hdfs().values()):
-      res.extend(validate_path(ConfigMock(sharelib_url), is_dir=True, fs=cluster,
-                               message=_('Oozie Share Lib not installed in default location.')))
+      res.extend(
+        validate_path(
+          ConfigMock(sharelib_url), is_dir=True, fs=cluster, message=_('Oozie Share Lib not installed in default location.')
+        )
+      )
 
   return res

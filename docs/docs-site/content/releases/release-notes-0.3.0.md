@@ -29,7 +29,7 @@ NEW FEATURES
   administrators to create and remove accounts for the members of their
   organization. Additionally, the default authentication mechanism now checks
   logins against this built in user database.
-  
+
 - hadoop-0.20-conf-pseudo-desktop RPM and Debian packages
 
   Cloudera now distributes a new package called
@@ -37,7 +37,7 @@ NEW FEATURES
   pseudo-distributed Hadoop cluster as well as Cloudera Desktop on a single
   node.
 
-  Please see http://archive.cloudera.com/desktop/ for more information.
+  Please see http://archive.cloudera.com for more information.
 
 
 IMPROVEMENTS

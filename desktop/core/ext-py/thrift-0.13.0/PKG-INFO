@@ -1,0 +1,49 @@
+Metadata-Version: 2.1
+Name: thrift
+Version: 0.13.0
+Summary: Python bindings for the Apache Thrift RPC system
+Home-page: https://thrift.apache.org
+Author: Apache Thrift Developers
+Author-email: dev@thrift.apache.org
+License: Apache Software License, Version 2
+Description: Thrift Python Software Library
+        
+        Thrift is a lightweight, language-independent software stack for
+        point-to-point RPC implementation.
+        Thrift provides clean abstractions and implementations for data transport,
+        data serialization, and application level processing. The code generation
+        system takes a simple definition language as input and generates code
+        across programming languages that uses the abstracted stack to build
+        interoperable RPC clients and servers.
+        
+        Thrift is provided as a set of Python packages. The top level package is
+        thrift, and there are subpackages for the protocol, transport, and server
+        code. Each package contains modules using standard Thrift naming conventions
+        (i.e. TProtocol, TTransport) and implementations in corresponding modules
+        (i.e. TSocket).  There is also a subpackage reflection, which contains
+        the generated code for the reflection structures.
+        
+        The Python libraries can be installed manually using the provided setup.py
+        file, or automatically using the install hook provided via autoconf/automake.
+        To use the latter, become superuser and do make install.
+        
+        For more information:
+        
+        https://thrift.apache.org/
+        https://www.github.com/apache/thrift/
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Software Development :: Code Generators
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: System :: Networking
+Description-Content-Type: text/markdown
+Provides-Extra: ssl
+Provides-Extra: tornado
+Provides-Extra: twisted
+Provides-Extra: all

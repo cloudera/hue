@@ -19,8 +19,7 @@
 from __future__ import absolute_import
 from future import standard_library
 standard_library.install_aliases()
-from builtins import range
-from builtins import object
+from builtins import range, object
 import json
 import logging
 import os
@@ -58,7 +57,6 @@ import desktop.views as views
 
 from desktop.auth.backend import rewrite_user
 from desktop.appmanager import DESKTOP_APPS
-from desktop.conf import ENABLE_GIST
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.conf import validate_path
 from desktop.lib.django_util import TruncatingModel
@@ -71,14 +69,14 @@ from desktop.middleware import DJANGO_VIEW_AUTH_WHITELIST
 from desktop.models import Directory, Document, Document2, get_data_link, _version_from_properties, ClusterConfig, HUE_VERSION
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
-from desktop.views import check_config, home, generate_configspec, load_confs, collect_validation_messages
+from desktop.views import check_config, home, generate_configspec, load_confs, collect_validation_messages, _get_config_errors
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
   from unittest.mock import patch, Mock
 else:
   from cStringIO import StringIO as string_io
-  from mock import patch, Mock, MagicMock
+  from mock import patch, Mock
 
 
 LOG = logging.getLogger(__name__)
@@ -1139,7 +1137,7 @@ class TestDocument(object):
         parent_directory=home_dir
     )
 
-    assert_equal(home_dir.children.count(), 4 if ENABLE_GIST.get() else 3)
+    assert_equal(home_dir.children.count(), 3)
 
     # Cannot create second trash directory directly as it will fail in Document2.validate()
     Document2.objects.create(owner=self.user, parent_directory=home_dir, name='second_trash_dir', type='directory')
@@ -1154,11 +1152,11 @@ class TestDocument(object):
         description='',
         parent_directory=home_dir
     )
-    assert_equal(home_dir.children.count(), 6 if ENABLE_GIST.get() else 5) # Including the second trash
+    assert_equal(home_dir.children.count(), 5) # Including the second trash
     assert_raises(Document2.MultipleObjectsReturned, Directory.objects.get, name=Document2.TRASH_DIR)
 
     test_doc1.trash()
-    assert_equal(home_dir.children.count(), 4 if ENABLE_GIST.get() else 3) # As trash documents are merged count is back to 3
+    assert_equal(home_dir.children.count(), 3) # As trash documents are merged count is back to 3
     merged_trash_dir = Directory.objects.get(name=Document2.TRASH_DIR, owner=self.user)
 
     test_doc2.trash()
@@ -1347,9 +1345,18 @@ def test_get_data_link():
   assert_equal(None, get_data_link({}))
   assert_equal('gethue.com', get_data_link({'type': 'link', 'link': 'gethue.com'}))
 
-  assert_equal('/hbase/#Cluster/document_demo/query/20150527', get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527'}))
-  assert_equal('/hbase/#Cluster/document_demo/query/20150527[f1]', get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1'}))
-  assert_equal('/hbase/#Cluster/document_demo/query/20150527[f1:c1]', get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1', 'col': 'c1'}))
+  assert_equal(
+    '/hbase/#Cluster/document_demo/query/20150527',
+    get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527'})
+  )
+  assert_equal(
+      '/hbase/#Cluster/document_demo/query/20150527[f1]',
+      get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1'})
+  )
+  assert_equal(
+      '/hbase/#Cluster/document_demo/query/20150527[f1:c1]',
+      get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1', 'col': 'c1'})
+  )
 
   assert_equal('/filebrowser/view=/data/hue/1', get_data_link({'type': 'hdfs', 'path': '/data/hue/1'}))
   assert_equal('/metastore/table/default/sample_07', get_data_link({'type': 'hive', 'database': 'default', 'table': 'sample_07'}))
@@ -1375,7 +1382,7 @@ def test_collect_validation_messages_default():
     # This is for the hue.ini file only
     error_list = []
     collect_validation_messages(conf, error_list)
-    assert_equal(len(error_list), 0)
+    assert_equal(len(error_list), 0, error_list)
   finally:
     os.remove(configspec.name)
 
@@ -1413,7 +1420,10 @@ def test_collect_validation_messages_extras():
   finally:
     os.remove(configspec.name)
   assert_equal(len(error_list), 1)
-  assert_equal(u'Extra section, extrasection in the section: top level, Extra keyvalue, extrakey in the section: [desktop] , Extra section, extrasubsection in the section: [desktop] , Extra section, extrasubsubsection in the section: [desktop] [[auth]] ', error_list[0]['message'])
+  assert_equal(u'Extra section, extrasection in the section: top level, Extra keyvalue, extrakey in the section: [desktop] , '
+      'Extra section, extrasubsection in the section: [desktop] , Extra section, extrasubsubsection in the section: [desktop] [[auth]] ',
+      error_list[0]['message']
+  )
 
 # Test db migration from 5.7,...,5.15 to latest
 def test_db_migrations_sqlite():
@@ -1438,6 +1448,7 @@ def test_db_migrations_sqlite():
       call_command('migrate', '--fake-initial', '--database=' + name)
     finally:
       del DATABASES[name]
+
 
 def test_db_migrations_mysql():
   if desktop.conf.DATABASE.ENGINE.get().find('mysql') < 0:
@@ -1467,11 +1478,42 @@ def test_db_migrations_mysql():
       'CONN_MAX_AGE': desktop.conf.DATABASE.CONN_MAX_AGE.get(),
     }
     try:
-      subprocess.check_output('mysql -u%(USER)s -p%(PASSWORD)s -e "CREATE DATABASE %(SCHEMA)s"' % DATABASES[name], stderr=subprocess.STDOUT, shell=True) # No way to run this command with django
-      subprocess.check_output('mysql -u%(USER)s -p%(PASSWORD)s %(SCHEMA)s < %(PATH)s' % DATABASES[name], stderr=subprocess.STDOUT, shell=True)
+      subprocess.check_output(
+        'mysql -u%(USER)s -p%(PASSWORD)s -e "CREATE DATABASE %(SCHEMA)s"' % DATABASES[name], stderr=subprocess.STDOUT, shell=True
+      )  # No way to run this command with django
+      subprocess.check_output(
+        'mysql -u%(USER)s -p%(PASSWORD)s %(SCHEMA)s < %(PATH)s' % DATABASES[name], stderr=subprocess.STDOUT, shell=True
+      )
       call_command('migrate', '--fake-initial', '--database=%(SCHEMA)s' % DATABASES[name])
     except subprocess.CalledProcessError as e:
       LOG.warn('stderr: {}'.format(e.output))
       raise e
     finally:
       del DATABASES[name]
+
+
+class TestGetConfigErrors():
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="empty", recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="test")
+
+  def test_get_config_errors_unicode(self):
+    """
+    Avoid a Python 2 issue:
+    AttributeError: 'unicode' object has no attribute 'get_fully_qualifying_key'
+    """
+    request = Mock(user=self.user)
+
+    with patch('desktop.views.appmanager') as appmanager:
+      appmanager.DESKTOP_MODULES = [
+        Mock(
+          conf=Mock(
+            config_validator=lambda user: [(u'Connector 1', 'errored because of ...')]
+          )
+        )
+      ]
+      assert_equal(
+        [{'name': 'Connector 1', 'message': 'errored because of ...'}],
+        _get_config_errors(request, cache=False)
+      )

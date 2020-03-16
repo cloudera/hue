@@ -14,10 +14,53 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import * as ko from 'knockout';
+import { RESULT_UPDATED_EVENT } from 'apps/notebook2/execution/executionResult';
+import huePubSub from 'utils/huePubSub';
+
+export const trackResult = (activeExecutable, onChange) => {
+  if (!activeExecutable) {
+    return { dispose: () => {} };
+  }
+
+  const disposals = [];
+
+  let executable = ko.unwrap(activeExecutable);
+
+  if (ko.isObservable(activeExecutable)) {
+    const koSub = activeExecutable.subscribe(newExecutable => {
+      executable = newExecutable;
+      onChange(executable.result);
+    });
+    disposals.push(() => {
+      koSub.dispose();
+    });
+  } else if (!executable) {
+    return { dispose: () => {} };
+  }
+
+  const updateSub = huePubSub.subscribe(RESULT_UPDATED_EVENT, executionResult => {
+    if (executionResult === executable.result) {
+      onChange(executionResult);
+    }
+  });
+  disposals.push(() => {
+    updateSub.remove();
+  });
+
+  return {
+    dispose: () => {
+      while (disposals.length) {
+        disposals.pop()();
+      }
+    }
+  };
+};
+
 export const attachTracker = (activeExecutable, id, target, trackedObservables) => {
   const disposals = [];
   if (!activeExecutable) {
-    return;
+    return { dispose: () => {} };
   }
 
   let ignoreObservableChange = false;

@@ -1,0 +1,69 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ko.linkSharing.js should render component activated 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;link-sharing&quot;, params: params }\\"><div class=\\"hue-link-sharing\\">
+    <div style=\\"float: right\\">
+      <!-- ko ifnot: perms().link_sharing_on --><!-- /ko -->
+      <!-- ko if: perms().link_sharing_on -->
+      <a href=\\"javascript:void(0)\\" data-test=\\"deactivate\\" data-bind=\\"click: deactivateLink\\" title=\\"Deactivate the link sharing\\">
+        <i class=\\"fa fa-wf fa-link\\"></i> Deactivate link
+      </a>
+      <!-- /ko -->
+    </div>
+    <!-- ko if: perms().link_sharing_on -->
+    <div>
+      Any logged in user with the link can
+      <div class=\\"perm-selector\\" data-bind=\\"component: {
+          name: 'hue-drop-down',
+          params: {
+            value: selectedPerm,
+            entries: availablePerms,
+            onSelect: changePerm.bind($data)
+          }
+        }
+      \\"><a class=\\"inactive-action hue-drop-down-active\\" href=\\"javascript:void(0)\\" data-bind=\\"toggle: dropDownVisible, css: { 'blue': dropDownVisible }\\">
+    <!-- ko if: icon --><!-- /ko -->
+    <!-- ko if: !noLabel && value -->
+    <span class=\\"hue-drop-down-selected\\" data-bind=\\"text: value() &amp;&amp; typeof value()[labelAttribute] !== 'undefined' ? value()[labelAttribute] : value(), visible: ! dropDownVisible() || !searchable, attr: { 'title': value() &amp;&amp; typeof value()[labelAttribute] !== 'undefined' ? value()[labelAttribute] : value() }\\" title=\\"read\\">read</span>
+    <!-- /ko -->
+    <i class=\\"fa fa-caret-down\\"></i>
+  </a><input class=\\"hue-drop-down-input\\" type=\\"text\\" data-bind=\\"textInput: filter, attr: { 'placeHolder': inputPlaceHolder }, visible: dropDownVisible, style: { color: filterEdited() ? '#000' : '#AAA', 'min-height': '22px', 'margin-left': '10px' }\\" placeholder=\\"read\\" style=\\"display: none; color: rgb(170, 170, 170); min-height: 22px; margin-left: 10px;\\"><i class=\\"fa fa-caret-down\\"></i><div class=\\"hue-drop-down-container\\" data-bind=\\"css: { 'open' : dropDownVisible, 'hue-drop-down-fixed': fixedPosition, 'hue-drop-down-container-searchable': searchable }, dropDownKeyUp: { onEsc: onEsc, onEnter: onEnter, dropDownVisible: dropDownVisible }\\">
+    <div style=\\"overflow-y: auto;\\" class=\\"dropdown-menu\\" data-bind=\\"visible: filteredEntries().length > 0\\">
+      <!-- ko if: foreachVisible --><!-- /ko -->
+      <!-- ko ifnot: foreachVisible -->
+      <ul class=\\"hue-inner-drop-down\\" data-bind=\\"foreach: filteredEntries\\">
+        <!-- ko if: typeof $data.divider !== 'undefined' && $data.divider --><!-- /ko -->
+        <!-- ko if: typeof $data.divider === 'undefined' || !$data.divider -->
+        <li><a href=\\"javascript:void(0)\\" data-bind=\\"text: $data &amp;&amp; typeof $data[$parent.labelAttribute] !== 'undefined' ? $data[$parent.labelAttribute] : $data, click: function () { let previous = $parent.value(); $parent.value($data); $parent.onSelect($data, previous); }\\">read</a></li>
+        <!-- /ko -->
+      
+        <!-- ko if: typeof $data.divider !== 'undefined' && $data.divider --><!-- /ko -->
+        <!-- ko if: typeof $data.divider === 'undefined' || !$data.divider -->
+        <li><a href=\\"javascript:void(0)\\" data-bind=\\"text: $data &amp;&amp; typeof $data[$parent.labelAttribute] !== 'undefined' ? $data[$parent.labelAttribute] : $data, click: function () { let previous = $parent.value(); $parent.value($data); $parent.onSelect($data, previous); }\\">write</a></li>
+        <!-- /ko -->
+      </ul>
+      <!-- /ko -->
+    </div>
+  </div></div>
+    </div>
+    <div class=\\"shared-link\\">
+      <div id=\\"sharedLinkInput\\" data-bind=\\"text: link\\">https://www.gethue.com/hueundefined</div>
+      <button class=\\"btn\\" data-clipboard-target=\\"#sharedLinkInput\\" data-bind=\\"clipboard\\"><i class=\\"fa fa-clipboard\\"></i></button>
+    </div>
+    <!-- /ko -->
+  </div></div>"
+`;
+
+exports[`ko.linkSharing.js should render component deactivated 1`] = `
+"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;link-sharing&quot;, params: params }\\"><div class=\\"hue-link-sharing\\">
+    <div style=\\"float: right\\">
+      <!-- ko ifnot: perms().link_sharing_on -->
+      <a href=\\"javascript:void(0);\\" data-test=\\"activate\\" data-bind=\\"click: createReadLink\\" title=\\"Share the query via a link\\">
+        <i class=\\"fa fa-wf fa-link\\"></i> Get link
+      </a>
+      <!-- /ko -->
+      <!-- ko if: perms().link_sharing_on --><!-- /ko -->
+    </div>
+    <!-- ko if: perms().link_sharing_on --><!-- /ko -->
+  </div></div>"
+`;

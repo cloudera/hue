@@ -59,6 +59,7 @@ from string import Template
 from django.utils.translation import ugettext as _
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.types import NullType
 
 from desktop.lib import export_csvxls
 from desktop.lib.i18n import force_unicode
@@ -89,6 +90,8 @@ def query_error_handler(func):
         raise AuthenticationRequired(message=message)
       else:
         raise e
+    except AuthenticationRequired:
+      raise
     except Exception as e:
       message = force_unicode(e)
       if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
@@ -104,16 +107,28 @@ class SqlAlchemyApi(Api):
   def __init__(self, user, interpreter):
     self.user = user
     self.options = interpreter['options']
-    self.backticks = '"' if re.match('^(postgresql://|awsathena|elasticsearch)', self.options.get('url', '')) else '`'
+
+    if interpreter.get('dialect_properties'):
+      self.backticks = interpreter['dialect_properties']['sql_identifier_quote']
+    else:
+      self.backticks = '"' if re.match('^(postgresql://|awsathena|elasticsearch)', self.options.get('url', '')) else '`'
 
   def _create_engine(self):
     if '${' in self.options['url']: # URL parameters substitution
-      vars = {'user': self.user.username}
-      for _prop in self.options['session']['properties']:
-        if _prop['name'] == 'user':
-          vars['USER'] = _prop['value']
-        if _prop['name'] == 'password':
-          vars['PASSWORD'] = _prop['value']
+      auth_provided=False
+      vars = {'USER': self.user.username}
+      if 'session' in self.options:
+        for _prop in self.options['session']['properties']:
+          if _prop['name'] == 'user':
+            vars['USER'] = _prop['value']
+            auth_provided = True
+          if _prop['name'] == 'password':
+            vars['PASSWORD'] = _prop['value']
+            auth_provided = True
+
+      if not auth_provided:
+        raise AuthenticationRequired(message='Missing username and/or password')
+
       raw_url = Template(self.options['url'])
       url = raw_url.safe_substitute(**vars)
     else:
@@ -131,13 +146,24 @@ class SqlAlchemyApi(Api):
 
     return create_engine(url, **options)
 
+  def _get_session(self, notebook, snippet):
+    for session in notebook['sessions']:
+      if session['type'] == snippet['type']:
+        return session
+
+    return None
+
   @query_error_handler
   def execute(self, notebook, snippet):
     guid = uuid.uuid4().hex
 
+    session = self._get_session(notebook, snippet)
+    if not session is None:
+      self.options['session'] = session
     engine = self._create_engine()
     connection = engine.connect()
-    result = connection.execution_options(stream_results=True).execute(snippet['statement'])
+
+    result = connection.execute(snippet['statement'])
 
     cache = {
       'connection': connection,
@@ -152,11 +178,11 @@ class SqlAlchemyApi(Api):
 
     return {
       'sync': False,
-      'has_result_set': True,
+      'has_result_set': result.cursor != None,
       'modified_row_count': 0,
       'guid': guid,
       'result': {
-        'has_more': True,
+        'has_more': result.cursor != None,
         'data': [],
         'meta': cache['meta'],
         'type': 'table'
@@ -168,10 +194,15 @@ class SqlAlchemyApi(Api):
     guid = snippet['result']['handle']['guid']
     connection = CONNECTION_CACHE.get(guid)
 
+    response = {'status': 'canceled'}
+
     if connection:
-      return {'status': 'available'}
-    else:
-      return {'status': 'canceled'}
+      if snippet['result']['handle']['has_result_set']:
+        response['status'] = 'available'
+      else:
+        response['status'] = 'success'
+
+    return response
 
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
@@ -240,7 +271,7 @@ class SqlAlchemyApi(Api):
 
     try:
       guid = snippet['result']['handle']['guid']
-      connection = CONNECTION_CACHE.get('guid')
+      connection = CONNECTION_CACHE.get(guid)
       if connection:
         connection['connection'].close()
         del CONNECTION_CACHE[guid]
@@ -270,13 +301,14 @@ class SqlAlchemyApi(Api):
       database = self._fix_phoenix_empty_database(database)
       columns = assist.get_columns(database, table)
       response['columns'] = [col['name'] for col in columns]
+
       response['extended_columns'] = [{
           'autoincrement': col.get('autoincrement'),
           'comment': col.get('comment'),
           'default': col.get('default'),
           'name': col.get('name'),
           'nullable': col.get('nullable'),
-          'type': str(col.get('type'))
+          'type': str(col.get('type')) if not isinstance(col.get('type'), NullType) else 'Null'
         } for col in columns
       ]
     else:
@@ -297,17 +329,15 @@ class SqlAlchemyApi(Api):
     response = {'status': -1, 'result': {}}
 
     metadata, sample_data = assist.get_sample_data(database, table, column=column, operation=operation)
-    has_result_set = sample_data is not None
 
-    if sample_data:
-      response['status'] = 0
-      response['rows'] = escape_rows(sample_data)
+    response['status'] = 0
+    response['rows'] = escape_rows(sample_data)
 
     if table and operation != 'hello':
       columns = assist.get_columns(database, table)
       response['full_headers'] = [{
           'name': col.get('name'),
-          'type': str(col.get('type')),
+          'type': str(col.get('type')) if not isinstance(col.get('type'), NullType) else 'Null',
           'comment': ''
         } for col in columns
       ]
@@ -379,7 +409,7 @@ class Assist(object):
 
     connection = self.engine.connect()
     try:
-      result = connection.execution_options(stream_results=True).execute(statement)
+      result = connection.execute(statement)
       return result.cursor.description, result.fetchall()
     finally:
       connection.close()

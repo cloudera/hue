@@ -27,9 +27,79 @@ from useradmin.models import User
 
 from indexer.indexers.sql import SQLIndexer
 
-table_properties_py2 = '"transactional" = "false", "skip.header.line.count" = "1"'
-table_properties_py3 = '"skip.header.line.count" = "1", "transactional" = "false"'
-is_py3 = sys.version_info[0] > 2
+
+if sys.version_info[0] > 2:
+  from unittest.mock import patch, Mock, MagicMock
+else:
+  from mock import patch, Mock, MagicMock
+
+
+class TestSQLIndexer(object):
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="empty", recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="test")
+
+
+  def test_create_table_from_a_file_to_csv(self):
+    fs = Mock(
+      stats=Mock(return_value={'mode': 0o0777})
+    )
+
+    def source_dict(key):
+      return {
+        'path': 'hdfs:///path/data.csv',
+        'format': {'quoteChar': '"', 'fieldSeparator': ','},
+        'sampleCols': [{u'operations': [], u'comment': u'', u'name': u'customers.id'}],
+        'sourceType': 'hive'
+      }.get(key, Mock())
+    source = MagicMock()
+    source.__getitem__.side_effect = source_dict
+
+    def destination_dict(key):
+      return {
+        'name': 'default.export_table',
+        'tableFormat': 'csv',
+        'importData': True,
+        'nonDefaultLocation': '/user/hue/customer_stats.csv',
+        'columns': [{'name': 'id', 'type': 'int'}],
+        'partitionColumns': [{'name': 'day', 'type': 'date', 'partitionValue': '20200101'}],
+        'description': 'No comment!',
+        'sourceType': 'hive-1'
+      }.get(key, Mock())
+    destination = MagicMock()
+    destination.__getitem__.side_effect = destination_dict
+
+    with patch('notebook.models.get_interpreter') as get_interpreter:
+      notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(source, destination)
+
+    assert_equal(
+      [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
+
+CREATE TABLE `default`.`hue__tmp_export_table`
+(
+  `id` int ) COMMENT "No comment!"
+PARTITIONED BY (
+  `day` date )
+ROW FORMAT   SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+  WITH SERDEPROPERTIES ("separatorChar" = ",",
+    "quoteChar"     = """,
+    "escapeChar"    = "\\\\"
+    )
+  STORED AS TextFile TBLPROPERTIES("skip.header.line.count" = "1", "transactional" = "false")
+;
+
+LOAD DATA INPATH 'hdfs:///path/data.csv' INTO TABLE `default`.`hue__tmp_export_table` PARTITION (day='20200101');
+
+CREATE TABLE `default`.`export_table` COMMENT "No comment!"
+        STORED AS csv
+TBLPROPERTIES("transactional"="true", "transactional_properties"="insert_only")
+        AS SELECT *
+        FROM `default`.`hue__tmp_export_table`;
+
+DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')],
+    [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')]
+  )
 
 
 class MockRequest(object):
@@ -69,7 +139,7 @@ def test_generate_create_text_table_with_data_partition():
 
   sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
 
-  assert_true('''USE default;''' in  sql, sql)
+  assert_true('''USE default;''' in sql, sql)
 
   statement = '''CREATE TABLE `default`.`customer_stats`
 (
@@ -83,11 +153,11 @@ ROW FORMAT   DELIMITED
     FIELDS TERMINATED BY ','
     COLLECTION ITEMS TERMINATED BY '\\002'
     MAP KEYS TERMINATED BY '\\003'
-  STORED AS TextFile TBLPROPERTIES(%s)
-;''' % table_properties_py3 if is_py3 else  table_properties_py2
+  STORED AS TextFile TBLPROPERTIES("skip.header.line.count" = "1", "transactional" = "false")
+;'''
   assert_true(statement in sql, sql)
 
-  assert_true('''LOAD DATA INPATH '/user/romain/customer_stats.csv' INTO TABLE `default`.`customer_stats` PARTITION (new_field_1='AAA');''' in  sql, sql)
+  assert_true('''LOAD DATA INPATH '/user/romain/customer_stats.csv' INTO TABLE `default`.`customer_stats` PARTITION (new_field_1='AAA');''' in sql, sql)
 
 
 def test_generate_create_kudu_table_with_data():
@@ -97,7 +167,7 @@ def test_generate_create_kudu_table_with_data():
 
   sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
 
-  assert_true('''DROP TABLE IF EXISTS `default`.`hue__tmp_index_data`;''' in  sql, sql)
+  assert_true('''DROP TABLE IF EXISTS `default`.`hue__tmp_index_data`;''' in sql, sql)
 
   statement = '''CREATE EXTERNAL TABLE `default`.`hue__tmp_index_data`
 (
@@ -122,8 +192,8 @@ def test_generate_create_kudu_table_with_data():
 ROW FORMAT   DELIMITED
     FIELDS TERMINATED BY ','
   STORED AS TextFile LOCATION '/A'
-TBLPROPERTIES(%s)''' % table_properties_py3 if is_py3 else  table_properties_py2
-  assert_true(statement in sql in sql, sql)
+TBLPROPERTIES("skip.header.line.count" = "1", "transactional" = "false")'''
+  assert_true(statement in sql, sql)
 
   assert_true('''CREATE TABLE `default`.`index_data` COMMENT "Big Data"
         PRIMARY KEY (id)
@@ -133,7 +203,7 @@ TBLPROPERTIES(%s)''' % table_properties_py3 if is_py3 else  table_properties_py2
         'kudu.num_tablet_replicas' = '1'
         )
         AS SELECT `id`, `business_id`, `date`, `funny`, `stars`, `text`, `type`, `useful`, `user_id`, `name`, `full_address`, `latitude`, `longitude`, `neighborhoods`, `open`, `review_count`, `state`
-        FROM `default`.`hue__tmp_index_data`;''' in  sql, sql)
+        FROM `default`.`hue__tmp_index_data`;''' in sql, sql)
 
 
 def test_generate_create_parquet_table():
@@ -145,7 +215,7 @@ def test_generate_create_parquet_table():
 
   sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
 
-  assert_true('''USE default;''' in  sql, sql)
+  assert_true('''USE default;''' in sql, sql)
 
   statement = '''CREATE EXTERNAL TABLE `default`.`hue__tmp_parquet_table`
 (
@@ -159,18 +229,17 @@ def test_generate_create_parquet_table():
     COLLECTION ITEMS TERMINATED BY '\\002'
     MAP KEYS TERMINATED BY '\\003'
   STORED AS TextFile LOCATION '/user/hue/data'
-TBLPROPERTIES(%s)
-;''' % table_properties_py3 if is_py3 else  table_properties_py2
-  assert_true(statement in  sql, sql)
+TBLPROPERTIES("skip.header.line.count" = "1", "transactional" = "false")
+;'''
+  assert_true(statement in sql, sql)
 
   assert_true('''CREATE TABLE `default`.`parquet_table`
         STORED AS parquet
         AS SELECT *
         FROM `default`.`hue__tmp_parquet_table`;
-''' in  sql, sql)
+''' in sql, sql)
 
-  assert_true('''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;
-''' in  sql, sql)
+  assert_true('''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;''' in sql, sql)
 
 
 def test_generate_create_orc_table_transactional():
@@ -182,7 +251,7 @@ def test_generate_create_orc_table_transactional():
 
   sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
 
-  assert_true('''USE default;''' in  sql, sql)
+  assert_true('''USE default;''' in sql, sql)
 
   statement = '''CREATE EXTERNAL TABLE `default`.`hue__tmp_parquet_table`
 (
@@ -196,19 +265,19 @@ def test_generate_create_orc_table_transactional():
     COLLECTION ITEMS TERMINATED BY '\\002'
     MAP KEYS TERMINATED BY '\\003'
   STORED AS TextFile LOCATION '/user/hue/data'
-TBLPROPERTIES(%s)
-;''' % table_properties_py3 if is_py3 else  table_properties_py2
-  assert_true(statement in sql in  sql, sql)
+TBLPROPERTIES("skip.header.line.count" = "1", "transactional" = "false")
+;'''
+  assert_true(statement in sql, sql)
 
   assert_true('''CREATE TABLE `default`.`parquet_table`
         STORED AS orc
 TBLPROPERTIES("transactional"="true", "transactional_properties"="insert_only")
         AS SELECT *
         FROM `default`.`hue__tmp_parquet_table`;
-''' in  sql, sql)
+''' in sql, sql)
 
   assert_true('''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;
-''' in  sql, sql)
+''' in sql, sql)
 
 
 def test_generate_create_empty_kudu_table():
@@ -229,4 +298,4 @@ def test_generate_create_empty_kudu_table():
   `vrfcn_city_lat` double ,
   `vrfcn_city_lon` double , PRIMARY KEY (acct_client)
 )   STORED AS kudu TBLPROPERTIES("transactional" = "false")
-;''' in  sql, sql)
+;''' in sql, sql)

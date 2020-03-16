@@ -15,8 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import next
-from builtins import str
+from builtins import next, str
 import json
 import logging
 import re
@@ -612,10 +611,12 @@ def install_examples(request):
 
   if request.method == 'POST':
     try:
-      app_name = get_app_name(request)
+      dialect = get_app_name(request)
+      if dialect == 'beeswax':
+        dialect = 'hive'
       db_name = request.POST.get('db_name', 'default')
       connector_id = request.POST.get('connector_id')
-      beeswax_install_examples.Command().handle(app_name=app_name, db_name=db_name, user=request.user)
+      beeswax_install_examples.Command().handle(dialect=dialect, db_name=db_name, user=request.user, request=request)
       response['status'] = 0
     except Exception as err:
       LOG.exception(err)
@@ -653,12 +654,14 @@ def query_done_cb(request, server_id):
     if design:
       subject += ": %s" % (design.name,)
 
-    link = "%s%s" % \
-              (get_desktop_uri_prefix(),
-               reverse(get_app_name(request) + ':watch_query_history', kwargs={'query_history_id': query_history.id}))
-    body = _("%(subject)s. See the results here: %(link)s\n\nQuery:\n%(query)s") % {
-               'subject': subject, 'link': link, 'query': query_history.query
-             }
+    link = "%s%s" % (
+        get_desktop_uri_prefix(),
+        reverse(get_app_name(request) + ':watch_query_history', kwargs={'query_history_id': query_history.id})
+    )
+    body = _(
+      "%(subject)s. See the results here: %(link)s\n\nQuery:\n%(query)s") % {
+          'subject': subject, 'link': link, 'query': query_history.query
+      }
 
     user.email_user(subject, body)
     message['message'] = 'sent'

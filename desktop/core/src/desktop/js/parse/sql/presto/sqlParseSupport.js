@@ -14,8 +14,408 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { SqlFunctions } from 'sql/sqlFunctions';
-import stringDistance from 'sql/stringDistance';
+const IMPLICIT_TYPE_CONVERSION = {
+  BOOLEAN: {
+    BOOLEAN: true,
+    TIMESTAMP: false,
+    TIME: false,
+    DATE: false,
+    VARBINARY: false,
+    TINYINT: false,
+    SMALLINT: false,
+    INTEGER: false,
+    BIGINT: false,
+    DOUBLE: false,
+    DECIMAL: false,
+    REAL: false,
+    NUMBER: false,
+    CHAR: false,
+    VARCHAR: false,
+    T: true
+  },
+  TIMESTAMP: {
+    BOOLEAN: false,
+    TIMESTAMP: true,
+    TIME: true,
+    DATE: false,
+    VARBINARY: false,
+    TINYINT: false,
+    SMALLINT: false,
+    INTEGER: false,
+    BIGINT: false,
+    DOUBLE: false,
+    DECIMAL: false,
+    REAL: false,
+    NUMBER: false,
+    CHAR: false,
+    VARCHAR: false,
+    T: true
+  },
+  TIME: {
+    BOOLEAN: false,
+    TIMESTAMP: true,
+    TIME: true,
+    DATE: false,
+    VARBINARY: false,
+    TINYINT: false,
+    SMALLINT: false,
+    INTEGER: false,
+    BIGINT: false,
+    DOUBLE: false,
+    DECIMAL: false,
+    REAL: false,
+    NUMBER: false,
+    CHAR: false,
+    VARCHAR: false,
+    T: true
+  },
+  DATE: {
+    BOOLEAN: false,
+    TIMESTAMP: false,
+    TIME: false,
+    DATE: true,
+    VARBINARY: false,
+    TINYINT: false,
+    SMALLINT: false,
+    INTEGER: false,
+    BIGINT: false,
+    DOUBLE: false,
+    DECIMAL: false,
+    REAL: false,
+    NUMBER: false,
+    CHAR: false,
+    VARCHAR: false,
+    T: true
+  },
+  VARBINARY: {
+    BOOLEAN: false,
+    TIMESTAMP: false,
+    TIME: false,
+    DATE: false,
+    VARBINARY: true,
+    TINYINT: false,
+    SMALLINT: false,
+    INTEGER: false,
+    BIGINT: false,
+    DOUBLE: false,
+    DECIMAL: false,
+    REAL: false,
+    NUMBER: false,
+    CHAR: false,
+    VARCHAR: false,
+    T: true
+  },
+  TINYINT: {
+    BOOLEAN: false,
+    TIMESTAMP: false,
+    TIME: false,
+    DATE: false,
+    VARBINARY: false,
+    TINYINT: true,
+    SMALLINT: false,
+    INTEGER: false,
+    BIGINT: false,
+    DOUBLE: false,
+    DECIMAL: false,
+    REAL: false,
+    NUMBER: true,
+    CHAR: false,
+    VARCHAR: false,
+    T: true
+  },
+  SMALLINT: {
+    BOOLEAN: false,
+    TIMESTAMP: false,
+    TIME: false,
+    DATE: false,
+    VARBINARY: false,
+    TINYINT: true,
+    SMALLINT: true,
+    INTEGER: false,
+    BIGINT: false,
+    DOUBLE: false,
+    DECIMAL: false,
+    REAL: false,
+    NUMBER: true,
+    CHAR: false,
+    VARCHAR: false,
+    T: true
+  },
+  INTEGER: {
+    BOOLEAN: false,
+    TIMESTAMP: false,
+    TIME: false,
+    DATE: false,
+    VARBINARY: false,
+    TINYINT: true,
+    SMALLINT: true,
+    INTEGER: true,
+    BIGINT: false,
+    DOUBLE: false,
+    DECIMAL: false,
+    REAL: false,
+    NUMBER: true,
+    CHAR: false,
+    VARCHAR: false,
+    T: true
+  },
+  BIGINT: {
+    BOOLEAN: false,
+    TIMESTAMP: false,
+    TIME: false,
+    DATE: false,
+    VARBINARY: false,
+    TINYINT: true,
+    SMALLINT: true,
+    INTEGER: true,
+    BIGINT: true,
+    DOUBLE: false,
+    DECIMAL: false,
+    REAL: false,
+    NUMBER: true,
+    CHAR: false,
+    VARCHAR: false,
+    T: true
+  },
+  DOUBLE: {
+    BOOLEAN: false,
+    TIMESTAMP: false,
+    TIME: false,
+    DATE: false,
+    VARBINARY: false,
+    TINYINT: true,
+    SMALLINT: true,
+    INTEGER: true,
+    BIGINT: true,
+    DOUBLE: true,
+    DECIMAL: false,
+    REAL: false,
+    NUMBER: true,
+    CHAR: true,
+    VARCHAR: true,
+    T: true
+  },
+  DECIMAL: {
+    BOOLEAN: false,
+    TIMESTAMP: false,
+    TIME: false,
+    DATE: false,
+    VARBINARY: false,
+    TINYINT: true,
+    SMALLINT: true,
+    INTEGER: true,
+    BIGINT: true,
+    DOUBLE: true,
+    DECIMAL: true,
+    REAL: true,
+    NUMBER: true,
+    CHAR: true,
+    VARCHAR: true,
+    T: true
+  },
+  REAL: {
+    BOOLEAN: false,
+    TIMESTAMP: false,
+    TIME: false,
+    DATE: false,
+    VARBINARY: false,
+    TINYINT: true,
+    SMALLINT: true,
+    INTEGER: true,
+    BIGINT: true,
+    DOUBLE: true,
+    DECIMAL: true,
+    REAL: true,
+    NUMBER: true,
+    CHAR: true,
+    VARCHAR: true,
+    T: true
+  },
+  NUMBER: {
+    BOOLEAN: false,
+    TIMESTAMP: false,
+    TIME: false,
+    DATE: false,
+    VARBINARY: false,
+    TINYINT: true,
+    SMALLINT: true,
+    INTEGER: true,
+    BIGINT: true,
+    DOUBLE: true,
+    DECIMAL: true,
+    REAL: true,
+    NUMBER: true,
+    CHAR: true,
+    VARCHAR: true,
+    T: true
+  },
+  CHAR: {
+    BOOLEAN: false,
+    TIMESTAMP: true,
+    TIME: true,
+    DATE: true,
+    VARBINARY: false,
+    TINYINT: true,
+    SMALLINT: true,
+    INTEGER: true,
+    BIGINT: true,
+    DOUBLE: true,
+    DECIMAL: true,
+    REAL: true,
+    NUMBER: true,
+    CHAR: true,
+    VARCHAR: true,
+    T: true
+  },
+  VARCHAR: {
+    BOOLEAN: false,
+    TIMESTAMP: true,
+    TIME: true,
+    DATE: true,
+    VARBINARY: false,
+    TINYINT: true,
+    SMALLINT: true,
+    INTEGER: true,
+    BIGINT: true,
+    DOUBLE: true,
+    DECIMAL: true,
+    REAL: true,
+    NUMBER: true,
+    CHAR: true,
+    VARCHAR: true,
+    T: true
+  },
+  T: {
+    BOOLEAN: true,
+    TIMESTAMP: true,
+    TIME: true,
+    DATE: true,
+    VARBINARY: true,
+    TINYINT: true,
+    SMALLINT: true,
+    INTEGER: true,
+    BIGINT: true,
+    DOUBLE: true,
+    DECIMAL: true,
+    REAL: true,
+    NUMBER: true,
+    CHAR: true,
+    VARCHAR: true,
+    T: true
+  }
+};
+
+const stripPrecision = types => {
+  const result = [];
+  types.forEach(type => {
+    if (type.indexOf('(') > -1) {
+      result.push(type.substring(0, type.indexOf('(')));
+    } else {
+      result.push(type);
+    }
+  });
+  return result;
+};
+
+/**
+ * Matches types based on implicit conversion i.e. if you expect a BIGINT then INT is ok but not BOOLEAN etc.
+ *
+ * @param expectedTypes
+ * @param actualRawTypes
+ * @returns {boolean}
+ */
+const matchesType = function(expectedTypes, actualRawTypes) {
+  if (expectedTypes.length === 1 && expectedTypes[0] === 'T') {
+    return true;
+  }
+  const actualTypes = stripPrecision(actualRawTypes);
+  if (
+    actualTypes.indexOf('ARRAY') !== -1 ||
+    actualTypes.indexOf('MAP') !== -1 ||
+    actualTypes.indexOf('STRUCT') !== -1 ||
+    actualTypes.indexOf('ROW') !== -1
+  ) {
+    return true;
+  }
+  for (let i = 0; i < expectedTypes.length; i++) {
+    for (let j = 0; j < actualTypes.length; j++) {
+      // To support future unknown types
+      if (
+        typeof IMPLICIT_TYPE_CONVERSION[expectedTypes[i]] === 'undefined' ||
+        typeof IMPLICIT_TYPE_CONVERSION[expectedTypes[i]][actualTypes[j]] == 'undefined'
+      ) {
+        return true;
+      }
+      if (
+        IMPLICIT_TYPE_CONVERSION[expectedTypes[i]] &&
+        IMPLICIT_TYPE_CONVERSION[expectedTypes[i]][actualTypes[j]]
+      ) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+
+/**
+ * Calculates the Optimal String Alignment distance between two strings. Returns 0 when the strings are equal and the
+ * distance when not, distances is less than or equal to the length of the longest string.
+ *
+ * @param strA
+ * @param strB
+ * @param [ignoreCase]
+ * @returns {number} The similarity
+ */
+const stringDistance = (strA, strB, ignoreCase) => {
+  if (ignoreCase) {
+    strA = strA.toLowerCase();
+    strB = strB.toLowerCase();
+  }
+
+  // TODO: Consider other algorithms for performance
+  const strALength = strA.length;
+  const strBLength = strB.length;
+  if (strALength === 0) {
+    return strBLength;
+  }
+  if (strBLength === 0) {
+    return strALength;
+  }
+
+  const distances = new Array(strALength);
+
+  let cost, deletion, insertion, substitution, transposition;
+  for (let i = 0; i <= strALength; i++) {
+    distances[i] = new Array(strBLength);
+    distances[i][0] = i;
+    for (let j = 1; j <= strBLength; j++) {
+      if (!i) {
+        distances[0][j] = j;
+      } else {
+        cost = strA[i - 1] === strB[j - 1] ? 0 : 1;
+        deletion = distances[i - 1][j] + 1;
+        insertion = distances[i][j - 1] + 1;
+        substitution = distances[i - 1][j - 1] + cost;
+        if (deletion <= insertion && deletion <= substitution) {
+          distances[i][j] = deletion;
+        } else if (insertion <= deletion && insertion <= substitution) {
+          distances[i][j] = insertion;
+        } else {
+          distances[i][j] = substitution;
+        }
+
+        if (i > 1 && j > 1 && strA[i] === strB[j - 1] && strA[i - 1] === strB[j]) {
+          transposition = distances[i - 2][j - 2] + cost;
+          if (transposition < distances[i][j]) {
+            distances[i][j] = transposition;
+          }
+        }
+      }
+    }
+  }
+
+  return distances[strALength][strBLength];
+};
 
 const identifierEquals = (a, b) =>
   a &&
@@ -212,26 +612,17 @@ const initSqlParser = function(parser) {
         suggestColRefKeywords: {
           BOOLEAN: ['AND', 'OR'],
           NUMBER: ['+', '-', '*', '/', '%', 'DIV'],
-          STRING: ['LIKE', 'NOT LIKE', 'REGEXP', 'RLIKE']
+          VARCHAR: ['LIKE', 'NOT LIKE', 'REGEXP', 'RLIKE']
         }
       };
     }
-    if (
-      typeof SqlFunctions === 'undefined' ||
-      SqlFunctions.matchesType(parser.yy.activeDialect, ['BOOLEAN'], types)
-    ) {
+    if (matchesType(['BOOLEAN'], types)) {
       keywords = keywords.concat(['AND', 'OR']);
     }
-    if (
-      typeof SqlFunctions === 'undefined' ||
-      SqlFunctions.matchesType(parser.yy.activeDialect, ['NUMBER'], types)
-    ) {
+    if (matchesType(['NUMBER'], types)) {
       keywords = keywords.concat(['+', '-', '*', '/', '%', 'DIV']);
     }
-    if (
-      typeof SqlFunctions === 'undefined' ||
-      SqlFunctions.matchesType(parser.yy.activeDialect, ['STRING'], types)
-    ) {
+    if (matchesType(['VARCHAR'], types)) {
       keywords = keywords.concat(['LIKE', 'NOT LIKE', 'REGEXP', 'RLIKE']);
     }
     return { suggestKeywords: keywords };
@@ -240,19 +631,18 @@ const initSqlParser = function(parser) {
   parser.getTypeKeywords = function() {
     return [
       'BIGINT',
-      'BINARY',
+      'VARBINARY',
       'BOOLEAN',
       'CHAR',
       'DATE',
       'DECIMAL',
       'DOUBLE',
       'DOUBLE PRECISION',
-      'FLOAT',
-      'INT',
       'INTEGER',
+      'REAL',
       'SMALLINT',
       'TIMESTAMP',
-      'STRING',
+      'TIME',
       'TINYINT',
       'VARCHAR'
     ];
@@ -350,21 +740,11 @@ const initSqlParser = function(parser) {
   };
 
   parser.findReturnTypes = function(functionName) {
-    return typeof SqlFunctions === 'undefined'
-      ? ['T']
-      : SqlFunctions.getReturnTypes(parser.yy.activeDialect, functionName.toLowerCase());
+    return ['T'];
   };
 
   parser.applyArgumentTypesToSuggestions = function(functionName, position) {
-    const foundArguments =
-      typeof SqlFunctions === 'undefined'
-        ? ['T']
-        : SqlFunctions.getArgumentTypes(
-            parser.yy.activeDialect,
-            functionName.toLowerCase(),
-            position
-          );
-    if (foundArguments.length === 0 && parser.yy.result.suggestColumns) {
+    if (parser.yy.result.suggestColumns) {
       delete parser.yy.result.suggestColumns;
       delete parser.yy.result.suggestKeyValues;
       delete parser.yy.result.suggestValues;
@@ -372,7 +752,7 @@ const initSqlParser = function(parser) {
       delete parser.yy.result.suggestIdentifiers;
       delete parser.yy.result.suggestKeywords;
     } else {
-      parser.applyTypeToSuggestions(foundArguments);
+      parser.applyTypeToSuggestions(['T']);
     }
   };
 

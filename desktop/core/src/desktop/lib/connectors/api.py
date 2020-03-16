@@ -21,12 +21,14 @@ import logging
 from django.utils.translation import ugettext as _
 
 from useradmin.models import update_app_permissions
+from notebook.conf import config_validator, _connector_to_iterpreter
 
 from desktop.auth.decorators import admin_required
 from desktop.decorators import api_error_handler
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.connectors.models import _get_installed_connectors, get_connectors_types, Connector, _create_connector_examples
+from desktop.lib.connectors.models import _get_installed_connectors, get_connectors_types, Connector, _create_connector_examples, \
+    _augment_connector_properties
 from desktop.lib.connectors.types import get_connectors_types, get_connector_categories, get_connector_by_type
 
 
@@ -113,17 +115,40 @@ def delete_connector(request):
 
 
 @admin_required
+def test_connector(request):
+  connector = json.loads(request.POST.get('connector', '{}'))
+
+  # Currently only Editor connectors are supported.
+  interpreter = _connector_to_iterpreter(
+      _augment_connector_properties(connector)
+  )
+  interpreter['type'] = 'hello'  # This is the id of the common health check query
+
+  warnings = ''.join([
+    ''.join(warning)
+    for warning in config_validator(user=request.user, interpreters=[interpreter])
+  ])
+
+  return JsonResponse({'warnings': warnings, 'hasWarnings': bool(warnings)})
+
+
+@admin_required
 @api_error_handler
 def install_connector_examples(request):
+  message = []
+
   try:
-    _create_connector_examples()
+    added, skipped = _create_connector_examples()
+    if added:
+      message.append('Added connectors: ' + ', '.join(added))
+    if skipped:
+      message.append('Already installed connectors: ' + ', '.join(skipped))
   except Exception as e:
     raise PopupException(_('Error installing connector examples: %s') % e)
 
   update_app_permissions()
 
-  return JsonResponse({'status': 0})
-
+  return JsonResponse({'status': 0, 'message': '. '.join(message)})
 
 
 def _group_by_category(conns):

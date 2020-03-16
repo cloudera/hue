@@ -44,6 +44,9 @@ else:
       self.selectedConnectorCategory = ko.observable('All');
       self.connectorsFilter = ko.observable();
 
+      self.testConnectionExecuted = ko.observable(false);
+      self.testConnectionErrors = ko.observable('');
+
       // Handle two types of objects are being listed: connector instances and types
       self.instances = ko.observableArray(); // Connector instances (e.g. connector to a MySql DB on a certain host)
       self.instance = ko.observable();
@@ -83,6 +86,8 @@ else:
       });
 
       self.addNewConnector = function () {
+        self.testConnectionExecuted(false);
+        self.testConnectionErrors('');
         self.section('add-connector-page');
       };
 
@@ -145,6 +150,19 @@ else:
           successCallback: function (data) {
             self.connectors(data.connectors);
             self.categories(data.categories);
+          }
+        });
+      };
+      self.testConnector = function (connector) {
+        self.testConnectionExecuted(false);
+        self.testConnectionErrors('');
+
+        self.apiHelper.simplePost('/desktop/connectors/api/instance/test', {
+            'connector': ko.mapping.toJSON(connector)
+          }, {
+          successCallback: function (data) {
+            self.testConnectionExecuted(true);
+            self.testConnectionErrors(data.warnings);
           }
         });
       };
@@ -320,9 +338,16 @@ ${ layout.menubar(section='connectors') }
         </a>
       <!-- /ko -->
     <!-- /ko -->
-    <a href="javascript:void(0)">
+    <a href="javascript:void(0)" data-bind="click: $root.testConnector">
       ${ _('Test connection') }
     </a>
+    <span>
+      <i class="fa fa-question" data-bind="visible: !$root.testConnectionExecuted()"></i>
+      <i class="fa fa-check" data-bind="visible: $root.testConnectionExecuted() && $root.testConnectionErrors().length == 0"></i>
+      <i class="fa fa-exclamation" data-bind="visible: $root.testConnectionExecuted() && $root.testConnectionErrors().length != 0"></i>
+      <span data-bind="visible: $root.testConnectionExecuted() && $root.testConnectionErrors().length != 0, text: $root.testConnectionErrors">
+      </span>
+    </span>
     <table class="table table-condensed">
       <thead>
         <tr>
@@ -333,7 +358,7 @@ ${ layout.menubar(section='connectors') }
       <tbody data-bind="foreach: settings">
         <tr>
           <td data-bind="text: name"></td>
-          <td><input data-bind="value: value"></td>
+          <td><input data-bind="value: value" class="input-xxlarge"></td>
         </tr>
       </tbody>
     </table>

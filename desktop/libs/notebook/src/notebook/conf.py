@@ -54,19 +54,25 @@ def check_permissions(user, interpreter, user_apps=None):
          (interpreter in ('java', 'spark2', 'mapreduce', 'shell', 'sqoop1', 'distcp') and 'oozie' not in user_apps)
 
 
+def _connector_to_iterpreter(connector):
+  return {
+      'name': connector['nice_name'],
+      'type': connector['name'],  # Aka id
+      'dialect': connector['dialect'],
+      'category': connector['category'],
+      'is_sql': connector['dialect_properties']['is_sql'],
+      'interface': connector['interface'],
+      'options': {setting['name']: setting['value'] for setting in connector['settings']},
+      'dialect_properties': connector['dialect_properties'],
+  }
+
+
 def get_ordered_interpreters(user=None):
   if has_connectors():
     from desktop.lib.connectors.api import _get_installed_connectors
-    interpreters = [{
-        'name': connector['nice_name'],
-        'type': connector['name'],
-        'dialect': connector['dialect'],
-        'category': connector['category'],
-        'is_sql': connector.get('is_sql', False),
-        'interface': connector['interface'],
-        'options': {setting['name']: setting['value'] for setting in connector['settings']},
-        'dialect_properties': connector['dialect_properties'],
-      } for connector in _get_installed_connectors(categories=['editor', 'catalogs'], user=user)
+    interpreters = [
+      _connector_to_iterpreter(connector)
+      for connector in _get_installed_connectors(categories=['editor', 'catalogs'], user=user)
     ]
   else:
     if not INTERPRETERS.get():
@@ -312,7 +318,7 @@ def _default_interpreters(user):
   INTERPRETERS.set_for_testing(OrderedDict(interpreters))
 
 
-def config_validator(user):
+def config_validator(user, interpreters=None):
   res = []
 
   if not has_connectors():
@@ -324,16 +330,19 @@ def config_validator(user):
   if not user.is_authenticated():
     res.append(('Editor', _('Could not authenticate with user %s to validate interpreters') % user))
 
-  for interpreter in get_ordered_interpreters(user=user):
+  if interpreters is None:
+    interpreters = get_ordered_interpreters(user=user)
+
+  for interpreter in interpreters:
     if interpreter.get('is_sql'):
       connector_id = interpreter['type']
 
       try:
-        response = _excute_test_query(client, connector_id)
+        response = _excute_test_query(client, connector_id, interpreter=interpreter)
         data = json.loads(response.content)
 
         if data['status'] != 0:
-          raise Exception(data['message'])
+          raise Exception(data)
       except Exception as e:
         trace = str(e)
         msg = "Testing the connector connection failed."
@@ -351,7 +360,7 @@ def config_validator(user):
   return res
 
 
-def _excute_test_query(client, connector_id):
+def _excute_test_query(client, connector_id, interpreter=None):
   '''
   Helper utils until the API gets simplified.
   '''
@@ -359,8 +368,8 @@ def _excute_test_query(client, connector_id):
     {
       "selectedSnippet": "hive",
       "showHistory": false,
-      "description": "Test Hive Query",
-      "name": "Test Hive Query",
+      "description": "Test Query",
+      "name": "Test Query",
       "sessions": [
           {
               "type": "hive",
@@ -374,13 +383,15 @@ def _excute_test_query(client, connector_id):
       "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a"
   }
   """ % {
-    'connector_id': connector_id
+    'connector_id': connector_id,
   }
+  snippet = json.loads(notebook_json)['snippets'][0]
+  snippet['interpreter'] = interpreter
 
   return client.post(
     reverse('notebook:api_sample_data', kwargs={'database': 'default', 'table': 'default'}), {
       'notebook': notebook_json,
-      'snippet': json.dumps(json.loads(notebook_json)['snippets'][0]),
+      'snippet': json.dumps(snippet),
       'is_async': json.dumps(True),
       'operation': json.dumps('hello')
   })

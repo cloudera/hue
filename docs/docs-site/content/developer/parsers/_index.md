@@ -7,13 +7,20 @@ weight: 2
 
 This guide goes you through the steps necessary to create an autocompleter for any [SQL dialect](/administrator/configuration/connectors/#databases) in Hue. The major benefits are:
 
-* Showing only valid syntax in the autocomplete
-* Getting the list of tables, columns automatically
-* Proper syntax highlighting of the keywords
+* Proposing only valid syntax in the autocomplete
+* Getting the list of tables, columns, UDFs... automatically
+* Suggesting fixes
 
 ## Parser Theory
 
 There are several parsers in Hue already (e.g. one for Impala, one for Hive..) and a generic SQL that is used for other dialects. The parsers are written using a [bison](https://www.gnu.org/software/bison/) grammar and are generated with [jison](https://github.com/zaach/jison). They arere 100% Javascript and live on the client side, this gives the performance of a desktop editor in your browser.
+
+Building a dedicated work is more effort but it then allows a very rich end user experience, e.g.:
+
+* Handle invalid/imcomplete queries and propose suggestions/fixes
+* date_column = <Date compatible UDF ...>
+* Language reference or data samples just by pointing the cursor on SQL identifiers
+* Leverage the parser for risk alerts (e.g. adding automatic LIMIT) or proper re-formatting
 
 ### Structure
 
@@ -322,3 +329,7 @@ And cf. above [prerequisites](#prerequisites), any interpreter snippet with `ksq
         interface=ksql
 
 Note: after [HUE-8758](https://issues.cloudera.org/browse/HUE-8758) we will be able to have multiple interpreters on the same dialect (e.g. pointing to two different databases of the same type).
+
+## API
+
+Looking at importing the parser in your own apps? This is described in the [API section](/developer/api/#sql-autocompletion).

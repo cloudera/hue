@@ -19,6 +19,54 @@ import * as ko from 'knockout';
 import apiHelper from 'api/apiHelper';
 import huePubSub from 'utils/huePubSub';
 
+const TEMPLATE_NAME = 'context-document-details';
+
+// prettier-ignore
+export const DOCUMENT_CONTEXT_TEMPLATE = `
+<script type="text/html" id="${ TEMPLATE_NAME }">
+  <div class="context-popover-flex-fill" style="overflow: auto;">
+    <div class="context-popover-inner-content">
+      <div style="position: absolute; right: 6px; top: 8px;">
+        <a class="pointer inactive-action" data-bind="visible: !$parent.closeDisabled, click: function () { $parent.close() }"><i class="fa fa-fw fa-times"></i></a>
+      </div>
+      <!-- ko if: typeof documentContents() !== 'undefined' && typeof documentContents().snippets !== 'undefined' -->
+      <!-- ko with: details -->
+      <div class="context-popover-doc-header-link" ><a href="javascript:void(0)" data-bind="hueLink: link, click: function () { $parents[1].close(); }"><!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: false } } --><!-- /ko --> <span data-bind="text:name"></span></a></div>
+      <!-- ko if: description -->
+      <div class="context-popover-doc-description" data-bind="toggleOverflow: { height: 60 }"><div data-bind="html: description"></div></div>
+      <!-- /ko -->
+      <!-- /ko -->
+      <!-- ko with: documentContents -->
+      <!-- ko foreach: snippets -->
+      <div class="context-popover-doc-contents" data-bind="highlight: { value: statement_raw, formatted: true, dialect: type }"></div>
+      <!-- /ko -->
+      <!-- /ko -->
+      <!-- /ko -->
+      <!-- ko if: typeof documentContents() === 'undefined' || typeof documentContents().snippets === 'undefined' -->
+      <div style="width: 100%;" data-bind="template: { name: 'generic-document-context-template', data: details }"></div>
+      <!-- /ko -->
+    </div>
+  </div>
+</script>
+
+<script type="text/html" id="generic-document-context-template">
+  <div style="width:100%; text-align: center; margin-top: 40px; font-size: 100px; color: #787878;" data-bind="template: { name: 'document-icon-template', data: { document: { isDirectory: type === 'directory', definition: function() { return $data } } } }"></div>
+  <div style="width: 100%; margin-top: 20px; text-align:center">
+    <!-- ko if: type === 'directory' -->
+    <a style="font-size: 20px;" href="javascript:void(0)" data-bind="text: name, publish: 'context.popover.show.in.assist'"></a>
+    <!-- /ko -->
+    <!-- ko if: type !== 'directory' -->
+    <a style="font-size: 20px;" href="javascript:void(0)" data-bind="text: name, hueLink: link, click: function () { $parents[1].close(); }"></a>
+    <!-- /ko -->
+    <br/>
+    <span data-bind="text: window.DOCUMENT_TYPE_I18n[type] || type"></span>
+    <!-- ko if: description -->
+    <div class="context-popover-doc-description" data-bind="html: description"></div>
+    <!-- /ko -->
+  </div>
+</script>
+`;
+
 class DocumentContext {
   constructor(data) {
     const self = this;
@@ -39,7 +87,7 @@ class DocumentContext {
     self.loading = ko.observable(true);
     self.hasErrors = ko.observable(false);
     self.errorText = ko.observable();
-    self.template = 'context-document-details';
+    self.template = TEMPLATE_NAME;
 
     self.documentContents = ko.observable();
     self.loadDocument();

@@ -1340,7 +1340,7 @@ class AceLocationHandler {
             huePubSub.publish('ace.sql.location.worker.post', {
               id: self.snippet.id(),
               statementDetails: statementDetails,
-              type: self.dialect(),
+              type: self.snippet && self.snippet.dialect ? self.snippet.dialect() : self.dialect(),
               namespace: self.snippet.namespace(),
               compute: self.snippet.compute(),
               defaultDatabase: self.snippet.database()

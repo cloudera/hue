@@ -238,6 +238,10 @@ class WebHdfs(Hdfs):
     """
     Return normalized path but ignore leading scheme prefix if it exists
     """
+    return WebHdfs.norm_path(path)
+
+  @staticmethod
+  def norm_path(path):
     path = fs_normpath(path)
     #fs_normpath clears scheme:/ to scheme: which doesn't make sense
     split = urlparse(path)

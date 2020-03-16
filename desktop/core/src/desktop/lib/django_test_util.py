@@ -24,6 +24,8 @@ import nose.tools
 
 from useradmin.models import User, Group, Organization
 
+from desktop.conf import ENABLE_ORGANIZATIONS
+
 
 class Client(django.test.client.Client):
   """
@@ -44,12 +46,12 @@ def assert_ok_response(response):
   return response
 
 
-def make_logged_in_client(username="test", password="test", is_superuser=True, recreate=False, groupname=None):
+def make_logged_in_client(username="test", password="test", is_superuser=True, recreate=False, groupname=None, is_admin=False):
   """
   Create a client with a user already logged in.
 
-  Sometimes we recreate the user, because some tests like to
-  mess with is_active and such.
+  Sometimes we recreate the user, because some tests like to mess with is_active and such.
+  Note: could be combined with backend.create_user and other standart utils.
   """
   try:
     user = User.objects.get(username=username)
@@ -59,6 +61,10 @@ def make_logged_in_client(username="test", password="test", is_superuser=True, r
   except User.DoesNotExist:
     user = User.objects.create_user(username=username, password=password)
     user.is_superuser = is_superuser
+    if ENABLE_ORGANIZATIONS.get():
+      user.is_admin = is_admin
+    else:
+      user.is_superuser = user.is_superuser or is_admin
     user.save()
   else:
     if user.is_superuser != is_superuser:
@@ -66,8 +72,13 @@ def make_logged_in_client(username="test", password="test", is_superuser=True, r
       user.save()
 
   if groupname is not None:
-    group, created = Group.objects.get_or_create(name=groupname)
-    if not user.groups.filter(name=group.name).exists():
+    attributes = {'name': groupname}
+
+    if ENABLE_ORGANIZATIONS.get():
+      attributes['organization'] = user.organization
+
+    group, created = Group.objects.get_or_create(**attributes)
+    if not user.groups.filter(**attributes).exists():
       user.groups.add(group)
       user.save()
 
