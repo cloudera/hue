@@ -50,6 +50,7 @@ RUN set -eux; \
         readline-devel \
         sqlite-devel \
         sudo \
+        which \
         xmlsec1 \
         zlib-devel
 
