@@ -66,7 +66,7 @@ The backends is pluggable by providing alternative [client interfaces](https://g
 
 Various storage systems can be interacted with. The [`fsmanager.py`](https://github.com/cloudera/hue/blob/master/desktop/core/src/desktop/lib/fsmanager.py) is the main router to each API.
 
-**Note** Ceph can be used via the S3 browser.
+**Note** Apache Ozone as well as Ceph can be used via the S3 browser.
 
 ### Hadoop HDFS
 
