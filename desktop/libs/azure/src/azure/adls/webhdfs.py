@@ -41,18 +41,20 @@ UPLOAD_CHUCK_SIZE = 30 * 1000 * 1000
 
 class WebHdfs(HadoopWebHdfs):
 
-  def __init__(self, url,
-               fs_defaultfs,
-               logical_name=None,
-               hdfs_superuser=None,
-               security_enabled=False,
-               ssl_cert_ca_verify=True,
-               temp_dir="/tmp",
-               umask=0o1022,
-               hdfs_supergroup=None,
-               access_token=None,
-               token_type=None,
-               expiration=None):
+  def __init__(
+      self, url,
+      fs_defaultfs,
+      logical_name=None,
+      hdfs_superuser=None,
+      security_enabled=False,
+      ssl_cert_ca_verify=True,
+      temp_dir="/tmp",
+      umask=0o1022,
+      hdfs_supergroup=None,
+      access_token=None,
+      token_type=None,
+      expiration=None
+    ):
     self._url = url
     self._superuser = hdfs_superuser
     self._security_enabled = security_enabled
@@ -84,17 +86,20 @@ class WebHdfs(HadoopWebHdfs):
     credentials = auth_provider.get_credentials()
     fs_defaultfs = get_default_adls_fs()
     url = get_default_adls_url()
-    return cls(url=url,
-               fs_defaultfs=fs_defaultfs,
-               logical_name=None,
-               security_enabled=False,
-               ssl_cert_ca_verify=False,
-               temp_dir=None,
-               umask=get_umask_mode(),
-               hdfs_supergroup=None,
-               access_token=credentials.get('access_token'),
-               token_type=credentials.get('token_type'),
-               expiration=int(credentials.get('expires_on')) * 1000 if credentials.get('expires_on')  is not None else None)
+
+    return cls(
+        url=url,
+        fs_defaultfs=fs_defaultfs,
+        logical_name=None,
+        security_enabled=False,
+        ssl_cert_ca_verify=False,
+        temp_dir=None,
+        umask=get_umask_mode(),
+        hdfs_supergroup=None,
+        access_token=credentials.get('access_token'),
+        token_type=credentials.get('token_type'),
+        expiration=int(credentials.get('expires_on')) * 1000 if credentials.get('expires_on')  is not None else None
+    )
 
   def get_client(self, url):
     return resource.Resource(http_client.HttpClient(url, exc_class=WebHdfsException, logger=LOG))
