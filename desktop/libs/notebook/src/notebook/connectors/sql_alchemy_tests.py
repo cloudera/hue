@@ -188,28 +188,30 @@ class TestApi(object):
   def test_get_sample_data(self):
     snippet = Mock()
 
-    with patch('notebook.connectors.sql_alchemy.Assist.get_sample_data') as get_sample_data:
-      with patch('notebook.connectors.sql_alchemy.inspect') as inspect:
-        get_sample_data.return_value = (['col1'], [[1], [2]])
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      with patch('notebook.connectors.sql_alchemy.Assist.get_sample_data') as get_sample_data:
+        with patch('notebook.connectors.sql_alchemy.inspect') as inspect:
+          get_sample_data.return_value = (['col1'], [[1], [2]])
 
-        response = SqlAlchemyApi(self.user, self.interpreter).get_sample_data(snippet)
+          response = SqlAlchemyApi(self.user, self.interpreter).get_sample_data(snippet)
 
-        assert_equal(response['rows'], [[1], [2]])
-        assert_equal(
-          response['full_headers'],
-          [{'name': 'col1', 'type': 'STRING_TYPE', 'comment': ''}]
-        )
+          assert_equal(response['rows'], [[1], [2]])
+          assert_equal(
+            response['full_headers'],
+            [{'name': 'col1', 'type': 'STRING_TYPE', 'comment': ''}]
+          )
 
   def test_get_sample_data_table(self):
     snippet = Mock()
 
-    with patch('notebook.connectors.sql_alchemy.Assist.get_sample_data') as get_sample_data:
-      with patch('notebook.connectors.sql_alchemy.inspect') as inspect:
-        get_sample_data.return_value = (['col1'], [[1], [2]])
+    with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
+      with patch('notebook.connectors.sql_alchemy.Assist.get_sample_data') as get_sample_data:
+        with patch('notebook.connectors.sql_alchemy.inspect') as inspect:
+          get_sample_data.return_value = (['col1'], [[1], [2]])
 
-        response = SqlAlchemyApi(self.user, self.interpreter).get_sample_data(snippet, database='database1', table='table1')
+          response = SqlAlchemyApi(self.user, self.interpreter).get_sample_data(snippet, database='database1', table='table1')
 
-        assert_equal(response['rows'], [[1], [2]])
+          assert_equal(response['rows'], [[1], [2]])
 
 
 class TestDialects(object):
