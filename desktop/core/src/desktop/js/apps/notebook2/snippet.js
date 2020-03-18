@@ -193,6 +193,7 @@ export default class Snippet {
     this.connector = ko.observable();
 
     this.dialect = ko.pureComputed(() => this.connector() && this.connector().dialect);
+    this.connectorType = ko.pureComputed(() => this.connector() && this.connector().type);
 
     this.isSqlDialect = ko.pureComputed(() => this.connector() && this.connector().is_sql);
     this.defaultLimit = ko.observable(snippetRaw.defaultLimit);
@@ -1006,7 +1007,7 @@ export default class Snippet {
     this.executor = new Executor({
       compute: this.compute,
       database: this.database,
-      sourceType: this.dialect,
+      connector: this.connector,
       namespace: this.namespace,
       defaultLimit: this.defaultLimit,
       isOptimizerEnabled: this.parentVm.isOptimizerEnabled(),

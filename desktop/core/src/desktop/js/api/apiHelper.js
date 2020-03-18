@@ -2115,7 +2115,7 @@ class ApiHelper {
    */
   async executeStatement(options) {
     const executable = options.executable;
-    const url = EXECUTE_API_PREFIX + executable.executor.sourceType();
+    const url = EXECUTE_API_PREFIX + executable.executor.connector().type;
 
     const promise = new Promise(async (resolve, reject) => {
       let data = {};

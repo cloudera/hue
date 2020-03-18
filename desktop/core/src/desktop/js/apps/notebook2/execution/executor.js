@@ -24,7 +24,7 @@ class Executor {
   /**
    * @param options
    * @param {boolean} [options.isSqlEngine] (default false)
-   * @param {observable<string>} options.sourceType
+   * @param {observable<Connector>} options.connector
    * @param {observable<ContextCompute>} options.compute
    * @param {observable<ContextNamespace>} options.namespace
    * @param {string} [options.database]
@@ -32,7 +32,7 @@ class Executor {
    * @param {boolean} [options.isOptimizerEnabled] - Default false
    */
   constructor(options) {
-    this.sourceType = options.sourceType;
+    this.connector = options.connector;
     this.compute = options.compute;
     this.namespace = options.namespace;
     this.database = options.database;

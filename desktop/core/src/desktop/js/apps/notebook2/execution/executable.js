@@ -167,7 +167,10 @@ export default class Executable {
     this.setProgress(0);
 
     try {
-      hueAnalytics.log('notebook', 'execute/' + this.executor.sourceType());
+      hueAnalytics.log(
+        'notebook',
+        'execute/' + (this.executor.connector() ? this.executor.connector().type : '')
+      );
       try {
         const response = await this.internalExecute();
         this.handle = response.handle;
@@ -309,7 +312,10 @@ export default class Executable {
 
   async cancel() {
     if (this.cancellables.length && this.status === EXECUTION_STATUS.running) {
-      hueAnalytics.log('notebook', 'cancel/' + this.executor.sourceType());
+      hueAnalytics.log(
+        'notebook',
+        'cancel/' + (this.executor.connector() ? this.executor.connector().type : '')
+      );
       this.setStatus(EXECUTION_STATUS.canceling);
       while (this.cancellables.length) {
         await this.cancellables.pop().cancel();
@@ -379,10 +385,10 @@ export default class Executable {
       };
     }
 
-    const session = await sessionManager.getSession({ type: this.executor.sourceType() });
+    const session = await sessionManager.getSession({ type: this.executor.connector().type });
     const statement = this.getStatement();
     const snippet = {
-      type: this.executor.sourceType(),
+      type: this.executor.connector().type,
       result: {
         handle: this.handle
       },
@@ -399,7 +405,7 @@ export default class Executable {
     };
 
     const notebook = {
-      type: this.executor.sourceType(),
+      type: this.executor.connector().type,
       snippets: [snippet],
       id: this.notebookId,
       uuid: hueUtils.UUID(),
