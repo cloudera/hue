@@ -4,7 +4,6 @@ author: Romain
 type: post
 date: 2020-02-10T00:00:00+00:00
 url: /blog/2020-02-10-sql-query-experience-of-your-cloud-data-warehouse/
-isCJKLanguage: true
 sf_thumbnail_type:
   - none
 sf_thumbnail_link_type:
