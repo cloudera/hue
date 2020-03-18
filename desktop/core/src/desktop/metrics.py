@@ -24,6 +24,9 @@ import logging
 import multiprocessing
 import threading
 
+from datetime import datetime, timedelta
+from prometheus_client import Gauge
+
 from useradmin.models import User
 
 from desktop.lib.metrics import global_registry
@@ -157,3 +160,25 @@ spnego_authentication_time = global_registry().timer(
     counter_numerator='authentications',
     rate_denominator='seconds',
 )
+
+# ------------------------------------------------------------------------------
+
+def num_of_queries():
+  from desktop.models import Document2 # Avoid circular dependency
+  try:
+    count = Document2.objects.filter(type__istartswith='query-', is_history=True, last_modified__gt=datetime.now() - timedelta(minutes=10)).count()
+  except:
+    LOG.exception('Could not get num_of_queries')
+    count = 0
+  return count
+
+global_registry().gauge_callback(
+    name='queries.number',
+    callback=num_of_queries,
+    label='number of queries',
+    description='Number of queries were executed in last 10 minutes',
+    numerator='users',
+)
+
+prometheus_queries_numbers = Gauge('hue_queries_numbers', 'Hue - numbers of queries')
+prometheus_queries_numbers.set_function(num_of_queries)
