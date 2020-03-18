@@ -21,17 +21,20 @@ import json
 import sys
 
 from collections import OrderedDict
+from datetime import datetime
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_false
 
+from django.test.client import Client
 from django.urls import reverse
 from azure.conf import is_adls_enabled
 
 from desktop import appmanager
-from desktop.conf import APP_BLACKLIST, ENABLE_CONNECTORS
+from desktop.conf import APP_BLACKLIST, ENABLE_CONNECTORS, ENABLE_PROMETHEUS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_permission
+from desktop.metrics import num_of_queries
 from desktop.models import Directory, Document, Document2
 from hadoop import cluster as originalCluster
 from useradmin.models import User
@@ -583,6 +586,22 @@ def test_get_interpreters_to_show():
     appmanager.DESKTOP_MODULES = []
     appmanager.DESKTOP_APPS = None
     appmanager.load_apps(APP_BLACKLIST.get())
+
+
+class TestQueriesMetrics(object):
+
+  def test_queries_num(self):
+    with patch('desktop.models.Document2.objects') as doc2_value_mock:
+      doc2_value_mock.filter.return_value.count.return_value = 12500
+      count = num_of_queries()
+      assert_equal(12500, count)
+
+      if not ENABLE_PROMETHEUS.get():
+        raise SkipTest
+
+      c = Client()
+      response = c.get('/metrics')
+      assert_true(b'hue_queries_numbers 12500.0' in response.content, response.content)
 
 
 class TestAnalytics(object):
