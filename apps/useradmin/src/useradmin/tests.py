@@ -39,7 +39,7 @@ import desktop.conf
 
 from desktop import appmanager
 from desktop.auth.backend import is_admin, create_user
-from desktop.conf import APP_BLACKLIST, ENABLE_ORGANIZATIONS
+from desktop.conf import APP_BLACKLIST, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from desktop.views import home
@@ -73,6 +73,12 @@ def reset_all_groups():
   useradmin.conf.DEFAULT_USER_GROUP.set_for_testing(None)
   for grp in Group.objects.all():
     grp.delete()
+
+
+def reset_all_user_profile():
+  """Reset to a clean state by deleting all user profiles"""
+  for up in UserProfile.objects.all():
+    up.delete()
 
 
 class LdapTestConnection(object):
@@ -301,8 +307,10 @@ class TestUserProfile(BaseUserAdminTests):
 
 class TestUserAdminMetrics(BaseUserAdminTests):
 
-  @override_settings(AUTHENTICATION_BACKENDS=['desktop.auth.backend.AllowFirstUserDjangoBackend'])
-  def test_active_users(self):
+  def setUp(self):
+    super(TestUserAdminMetrics, self).setUp()
+    reset_all_user_profile()
+
     with patch('useradmin.middleware.get_localhost_name') as get_hostname:
       get_hostname.return_value = 'host1'
 
@@ -327,6 +335,14 @@ class TestUserAdminMetrics(BaseUserAdminTests):
       userprofile3.hostname = 'host2'
       userprofile3.save()
 
+
+  def tearDown(self):
+    reset_all_user_profile()
+    super(TestUserAdminMetrics, self).tearDown()
+
+
+  @override_settings(AUTHENTICATION_BACKENDS=['desktop.auth.backend.AllowFirstUserDjangoBackend'])
+  def test_active_users(self):
     with patch('useradmin.metrics.get_localhost_name') as get_hostname:
       get_hostname.return_value = 'host1'
       assert_equal(3, active_users())
@@ -338,6 +354,19 @@ class TestUserAdminMetrics(BaseUserAdminTests):
       metric = json.loads(response.content)['metric']
       assert_equal(3, metric['users.active']['value'])
       assert_equal(2, metric['users.active.instance']['value'])
+
+
+  @override_settings(AUTHENTICATION_BACKENDS=['desktop.auth.backend.AllowFirstUserDjangoBackend'])
+  def test_active_users_prometheus(self):
+    if not ENABLE_PROMETHEUS.get():
+      raise SkipTest
+
+    with patch('useradmin.metrics.get_localhost_name') as get_hostname:
+      get_hostname.return_value = 'host1'
+      c = Client()
+      response = c.get('/metrics')
+      assert_true(b'hue_active_users 3.0' in response.content, response.content)
+      assert_true(b'hue_local_active_users 2.0' in response.content, response.content)
 
 
 class TestUserAdmin(BaseUserAdminTests):

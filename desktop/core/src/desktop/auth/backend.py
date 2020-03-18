@@ -31,9 +31,17 @@ User to remain a django.contrib.auth.models.User object.
 from builtins import object
 from importlib import import_module
 
-import ldap
 import logging
-import pam
+LOG = logging.getLogger(__name__)
+
+try:
+  import ldap
+except ImportError:
+  LOG.warn('ldap module not found')
+try:
+  import pam
+except ImportError:
+  LOG.warn('pam module not found')
 import requests
 
 import django.contrib.auth.backends
@@ -42,11 +50,20 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import HttpResponseRedirect
 from django.forms import ValidationError
-from django_auth_ldap.backend import LDAPBackend
-from django_auth_ldap.config import LDAPSearch
+try:
+  from django_auth_ldap.backend import LDAPBackend
+  from django_auth_ldap.config import LDAPSearch
+except ImportError:
+  LOG.warn('django_auth_ldap module not found')
+  class LDAPSearch: pass
+  class LDAPSearch: pass
 from liboauth.metrics import oauth_authentication_time
-from mozilla_django_oidc.auth import OIDCAuthenticationBackend, default_username_algo
-from mozilla_django_oidc.utils import absolutify, import_from_settings
+try:
+  from mozilla_django_oidc.auth import OIDCAuthenticationBackend, default_username_algo
+  from mozilla_django_oidc.utils import absolutify, import_from_settings
+except ImportError:
+  LOG.warn('mozilla_django_oidc module not found')
+  class OIDCAuthenticationBackend: pass
 
 from desktop import metrics
 from desktop.conf import AUTH, LDAP, OIDC, ENABLE_ORGANIZATIONS
@@ -55,9 +72,6 @@ from desktop.settings import LOAD_BALANCER_COOKIE
 from useradmin import ldap_access
 from useradmin.models import get_profile, get_default_user_group, UserProfile, User
 from useradmin.organization import get_organization
-
-
-LOG = logging.getLogger(__name__)
 
 
 # TODO: slowly move those utils to the useradmin module

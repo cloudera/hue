@@ -17,7 +17,7 @@ Many companies and organizations use Hue to quickly answer questions via self-se
 
 are executing 100s of 1000s of queries daily. It also [ships](https://docs.gethue.com/administrator/installation/) in Cloudera Data Platform, Amazon AWS, Open Data Hub...
 
-Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/parsers/) and any [contributions](CONTRIBUTING.md) are welcome.
+Hue is also ideal for building your own [Cloud SQL Editor](https://docs.gethue.com/developer/api/) and any [contributions](CONTRIBUTING.md) are welcome.
 
 
 ![Hue Editor](https://cdn.gethue.com/uploads/2019/12/hue4.6.png)

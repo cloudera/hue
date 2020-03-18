@@ -27,11 +27,11 @@ Luke Arno can be found at http://lukearno.com/
 """
 
 import mimetypes
-import rfc822
 import time
 import string
 import sys
 from os import path, stat, getcwd
+from email.utils import formatdate, parsedate
 from fnmatch import fnmatch
 from wsgiref import util
 from wsgiref.validate import validator
@@ -130,12 +130,12 @@ class Cling(object):
         content_type = self._guess_type(full_path)
         try:
             etag, last_modified = self._conditions(full_path, environ)
-            headers = [('Date', rfc822.formatdate(time.time())),
+            headers = [('Date', formatdate(time.time())),
                        ('Last-Modified', last_modified),
                        ('ETag', etag)]
             if_modified = environ.get('HTTP_IF_MODIFIED_SINCE')
-            if if_modified and (rfc822.parsedate(if_modified)
-                                >= rfc822.parsedate(last_modified)):
+            if if_modified and (parsedate(if_modified)
+                                >= parsedate(last_modified)):
                 return self.not_modified(environ, start_response, headers)
             if_none = environ.get('HTTP_IF_NONE_MATCH')
             if if_none and (if_none == '*' or etag in if_none):
@@ -170,7 +170,7 @@ class Cling(object):
     def _conditions(self, full_path, environ):
         """Return a tuple of etag, last_modified by mtime from stat."""
         mtime = stat(full_path).st_mtime
-        return str(mtime), rfc822.formatdate(mtime)
+        return str(mtime), formatdate(mtime)
 
     def _file_like(self, full_path):
         """Return the appropriate file object."""
@@ -295,4 +295,3 @@ def command():
 
 if __name__ == '__main__':
     command()
-

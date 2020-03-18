@@ -18,13 +18,13 @@ exports[`ko.sessionAuthModal.js should render component 1`] = `
     <div class=\\"span6\\">
       <div class=\\"input-prepend\\">
         <span class=\\"add-on muted\\"><i class=\\"fa fa-user\\"></i></span>
-        <input name=\\"username\\" type=\\"text\\" data-bind=\\"value: $root.authSessionUsername\\" placeholder=\\"Username\\">
+        <input name=\\"username\\" data-test=\\"usernameInput\\" type=\\"text\\" data-bind=\\"textInput: authSessionUsername\\" placeholder=\\"Username\\">
       </div>
     </div>
     <div class=\\"span6\\">
       <div class=\\"input-prepend\\">
         <span class=\\"add-on muted\\"><i class=\\"fa fa-lock\\"></i></span>
-        <input name=\\"password\\" type=\\"password\\" data-bind=\\"value: $root.authSessionPassword\\" placeholder=\\"Password\\">
+        <input name=\\"password\\" data-test=\\"passwordInput\\" type=\\"password\\" data-bind=\\"textInput: authSessionPassword\\" placeholder=\\"Password\\">
       </div>
     </div>
   </div>

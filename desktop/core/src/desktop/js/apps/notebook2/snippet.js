@@ -267,11 +267,8 @@ export default class Snippet {
     this.inFocus = ko.observable(false);
 
     this.inFocus.subscribe(newValue => {
-      if (newValue) {
-        huePubSub.publish(ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT, {
-          type: this.dialect(),
-          isSqlDialect: this.isSqlDialect()
-        });
+      if (newValue && this.dialect()) {
+        this.parentVm.notifyDialectChange(this.dialect(), this.isSqlDialect());
       }
     });
 
@@ -390,7 +387,7 @@ export default class Snippet {
             }
           }
           this.positionStatement(statementDetails.activeStatement);
-          this.activeExecutable(this.executor.update(statementDetails, beforeExecute));
+          this.activeExecutable(this.executor.update(statementDetails, beforeExecute, this));
           beforeExecute = false;
           if (statementDetails.activeStatement) {
             const statementsList = [];

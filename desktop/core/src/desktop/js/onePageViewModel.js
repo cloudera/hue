@@ -76,8 +76,8 @@ class OnePageViewModel {
       });
     });
 
-    huePubSub.subscribe('get.current.app.name', () => {
-      huePubSub.publish('set.current.app.name', self.currentApp());
+    huePubSub.subscribe('get.current.app.name', callback => {
+      callback(self.currentApp());
     });
 
     huePubSub.subscribe('open.editor.query', resp => {

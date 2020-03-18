@@ -686,13 +686,13 @@
   <script type="text/html" id="snippet${ suffix }">
     <div data-bind="visibleOnHover: { override: inFocus() || settingsVisible() || dbSelectionVisible() || $root.editorMode() || saveResultsModalVisible(), selector: '.hover-actions' }">
       <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: $root.editorMode() || inFocus() || saveResultsModalVisible(), selector: '.snippet-actions' }">
-        <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode(), 'editor-mode': $root.editorMode(), 'active-editor': inFocus, 'snippet-text' : dialect() === 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
+        <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode(), 'editor-mode': $root.editorMode(), 'active-editor': inFocus, 'snippet-text' : dialect() === 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace.bind($data)">
           <div style="position: relative;">
             <div class="snippet-row" style="position: relative;">
-              <div class="snippet-body" data-bind="clickForAceFocus: ace, visible: ! $root.isResultFullScreenMode()">
+              <div class="snippet-body" data-bind="clickForAceFocus: ace.bind($data), visible: ! $root.isResultFullScreenMode()">
                 <h5 class="card-heading-print" data-bind="text: name, css: {'visible': name() != ''}"></h5>
 
-                <h2 style="margin-left:5px;padding: 3px 0" class="card-heading simple" data-bind="dblclick: function(){ if (!$root.editorMode() && !$root.isPresentationMode()) { $parent.newSnippetAbove(id()) } }, clickForAceFocus: ace">
+                <h2 style="margin-left:5px;padding: 3px 0" class="card-heading simple" data-bind="dblclick: function(){ if (!$root.editorMode() && !$root.isPresentationMode()) { $parent.newSnippetAbove(id()) } }, clickForAceFocus: ace.bind($data)">
                   <!-- ko template: { if: $root.editorMode(), name: 'editor-snippet-header${ suffix }' } --><!-- /ko -->
                   <!-- ko template: { if: ! $root.editorMode(), name: 'notebook-snippet-header${ suffix }' } --><!-- /ko -->
                 </h2>
@@ -860,7 +860,7 @@
 
     <div class="row-fluid" style="margin-bottom: 5px">
 
-      <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode() }, clickForAceFocus: ace, visible: ! $root.isResultFullScreenMode() && ! ($root.isPresentationMode() && $root.isHidingCode())">
+      <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode() }, clickForAceFocus: ace.bind($data), visible: ! $root.isResultFullScreenMode() && ! ($root.isPresentationMode() && $root.isHidingCode())">
         <!-- ko if: statementType() == 'file' -->
         <div class="margin-top-10">
           <label class="pull-left" style="margin-top: 6px;margin-right: 10px;">${_('Query File')}</label>
@@ -905,7 +905,7 @@
               'active-editor': inFocus
             },
             attr: {
-              id: id()
+              id: id
             },
             delayedOverflow: 'slow',
             aceEditor: {
@@ -1039,8 +1039,8 @@
   <script type="text/html" id="markdown-snippet-body${ suffix }">
     <!-- ko ifnot: $root.isPresentationMode() -->
     <div class="row-fluid">
-      <div class="span6" data-bind="clickForAceFocus: ace">
-        <div class="ace-editor" data-bind="attr: { id: id() }, aceEditor: {
+      <div class="span6" data-bind="clickForAceFocus: ace.bind($data)">
+        <div class="ace-editor" data-bind="attr: { id: id }, aceEditor: {
         snippet: $data,
         updateOnInput: true
       }"></div>
@@ -1159,7 +1159,7 @@
   </script>
 
   <script type="text/html" id="snippet-execution-status${ suffix }">
-    <div class="snippet-execution-status" data-bind="clickForAceFocus: ace">
+    <div class="snippet-execution-status" data-bind="clickForAceFocus: ace.bind($data)">
       <a class="inactive-action pull-left snippet-logs-btn" href="javascript:void(0)" data-bind="
           visible: status() === 'running' && errors().length == 0,
           click: function() {
