@@ -137,13 +137,6 @@ class ExecutableActions extends DisposableComponent {
       executable.execute();
     }
   }
-
-  executeNext() {
-    if (this.activeExecutable() && this.activeExecutable().nextExecutable) {
-      this.activeExecutable(this.activeExecutable().nextExecutable);
-    }
-    this.execute();
-  }
 }
 
 componentUtils.registerComponent(NAME, ExecutableActions, TEMPLATE);

@@ -227,7 +227,6 @@ export default class Executable {
       this.logs.fetchLogs();
     } catch (err) {
       this.setStatus(EXECUTION_STATUS.failed);
-      throw err;
     }
   }
 
