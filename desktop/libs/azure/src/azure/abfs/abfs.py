@@ -61,24 +61,28 @@ class ABFSFileSystemException(IOError):
 
 class ABFS(object):
 
-  def __init__(self, url,
-               fs_defaultfs,
-               logical_name=None,
-               hdfs_superuser=None,
-               security_enabled=False,
-               ssl_cert_ca_verify=True,
-               temp_dir="/tmp",
-               umask=0o1022,
-               hdfs_supergroup=None,
-               access_token=None,
-               token_type=None,
-               expiration=None):
+  def __init__(
+      self,
+      url,
+      fs_defaultfs,
+      logical_name=None,
+      hdfs_superuser=None,
+      security_enabled=False,
+      ssl_cert_ca_verify=True,
+      temp_dir="/tmp",
+      umask=0o1022,
+      hdfs_supergroup=None,
+      access_token=None,
+      token_type=None,
+      expiration=None
+    ):
     self._url = url
     self._superuser = hdfs_superuser
     self._security_enabled = security_enabled
     self._ssl_cert_ca_verify = ssl_cert_ca_verify
     self._temp_dir = temp_dir
     self._umask = umask
+    self.is_sentry_managed = lambda path: False
     self._fs_defaultfs = fs_defaultfs
     self._logical_name = logical_name
     self._supergroup = hdfs_supergroup
@@ -102,17 +106,19 @@ class ABFS(object):
   @classmethod
   def from_config(cls, hdfs_config, auth_provider):
     credentials = auth_provider.get_credentials()
-    return cls(url=hdfs_config.WEBHDFS_URL.get(),
-               fs_defaultfs=hdfs_config.FS_DEFAULTFS.get(),
-               logical_name=None,
-               security_enabled=False,
-               ssl_cert_ca_verify=False,
-               temp_dir=None,
-               umask=get_umask_mode(),
-               hdfs_supergroup=None,
-               access_token=credentials.get('access_token'),
-               token_type=credentials.get('token_type'),
-               expiration=int(credentials.get('expires_on')) * 1000 if credentials.get('expires_on') is not None else None)
+    return cls(
+        url=hdfs_config.WEBHDFS_URL.get(),
+        fs_defaultfs=hdfs_config.FS_DEFAULTFS.get(),
+        logical_name=None,
+        security_enabled=False,
+        ssl_cert_ca_verify=False,
+        temp_dir=None,
+        umask=get_umask_mode(),
+        hdfs_supergroup=None,
+        access_token=credentials.get('access_token'),
+        token_type=credentials.get('token_type'),
+        expiration=int(credentials.get('expires_on')) * 1000 if credentials.get('expires_on') is not None else None
+    )
 
   def get_client(self, url):
     return resource.Resource(http_client.HttpClient(url, exc_class=WebHdfsException, logger=LOG))
@@ -122,6 +128,14 @@ class ABFS(object):
       "Authorization": self._token_type + " " + self._access_token,
       "x-ms-version" : "2019-02-02" #note this is required for setaccesscontrols
     }
+
+  @property
+  def superuser(self):
+    return self._superuser
+
+  @property
+  def supergroup(self):
+    return self._supergroup
 
   # Parse info about filesystems, directories, and files
   # --------------------------------

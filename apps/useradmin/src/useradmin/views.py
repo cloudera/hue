@@ -24,10 +24,15 @@ import subprocess
 import sys
 import json
 
+LOG = logging.getLogger(__name__)
+
 from axes.decorators import FAILURE_LIMIT, LOCK_OUT_AT_FAILURE
 from axes.models import AccessAttempt
 from axes.utils import reset
-import ldap
+try:
+  import ldap
+except ImportError:
+  LOG.warn('ldap module not found')
 
 from django.urls import reverse
 from django.forms import ValidationError
@@ -60,9 +65,6 @@ if ENABLE_ORGANIZATIONS.get():
   from useradmin.forms import OrganizationUserChangeForm as UserChangeForm, OrganizationSuperUserChangeForm as SuperUserChangeForm
 else:
   from useradmin.forms import UserChangeForm, SuperUserChangeForm
-
-
-LOG = logging.getLogger(__name__)
 
 
 def is_ldap_setup():

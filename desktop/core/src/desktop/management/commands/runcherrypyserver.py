@@ -25,7 +25,6 @@ from django.core.management.base import BaseCommand
 
 from desktop import conf
 from desktop.lib.daemon_utils import drop_privileges_if_necessary
-from django.utils.translation import ugettext as _
 
 
 CPSERVER_HELP = r"""
@@ -51,7 +50,7 @@ CPSERVER_OPTIONS = {
 
 
 class Command(BaseCommand):
-    help = _("CherryPy Server for Desktop.")
+    help = "CherryPy Server for Desktop."
     args = ""
 
     def handle(self, *args, **options):
@@ -68,7 +67,7 @@ class Command(BaseCommand):
         except AttributeError:
             pass
         runcpserver(args)
-        
+
     def usage(self, subcommand):
         return CPSERVER_HELP
 
@@ -77,12 +76,13 @@ def start_server(options):
     Start CherryPy server
     """
     from desktop.lib.wsgiserver import CherryPyWSGIServer as Server
+    from desktop.lib.wsgiserver import SSLConnection
     from django.core.handlers.wsgi import WSGIHandler
     # Translogger wraps a WSGI app with Apache-style combined logging.
     server = Server(
         (options['host'], int(options['port'])),
         WSGIHandler(),
-        int(options['threads']), 
+        int(options['threads']),
         options['server_name']
     )
     if options['ssl_certificate'] and options['ssl_private_key']:
@@ -92,7 +92,7 @@ def start_server(options):
             server.ssl_certificate_chain = options['ssl_certificate_chain']
         server.ssl_cipher_list = options['ssl_cipher_list']
         server.ssl_no_renegotiation = options['ssl_no_renegotiation']
-        
+
         ssl_password = conf.get_ssl_password()
         if ssl_password:
             server.ssl_password_cb = lambda *unused: ssl_password
@@ -100,6 +100,11 @@ def start_server(options):
     try:
         server.bind_server()
         drop_privileges_if_necessary(options)
+
+        if isinstance(server.socket, SSLConnection):
+          ciphers = server.socket.get_cipher_list()
+          logging.info("List of enabled ciphers: {}".format(':'.join(ciphers)))
+
         server.listen_and_loop()
     except KeyboardInterrupt:
         server.stop()
@@ -115,14 +120,13 @@ def runcpserver(argset=[], **kwargs):
         else:
             k, v = x, True
         options[k.lower()] = v
-    
+
     if "help" in options:
         print(CPSERVER_HELP)
         return
 
     # Start the webserver
-    print(_('starting server with options:'))
-    pprint.pprint(options)
+    logging.info("Starting server with options:\n{}".format(pprint.pformat(options)))
 
     start_server(options)
 
