@@ -29,17 +29,27 @@ So overall moving everything to connectors, handy for storing their custom prope
 
 ### API
 
-Editor document type: if not a 'notebook', 'query-[dialect-name]' like in v1.
+Editor document type:
 
-    /notebook/api/get_history?doc_type=mysql&...
-    /notebook/api/execute/9 [connector id]
+* if a 'query': 'query-[dialect name]'
+* else 'notebook'
 
-    /desktop/api2/docs/?type=query-mysql&...
+Using connector id instead of dialect for history, saved queries, query execution (can keep dialect name for friendliness):
 
-Document2
+    /notebook/api/get_history?connector=9&...
+
+    /desktop/api2/docs/?connector=9&...
+
+    /notebook/api/execute/hive/9
+
+Document model gets an optional foreign key on the connectors:
 
     type: query-impala
-    connector: FK to connector ID [to add]
+    connector: FK to connector 'x' for dialect 'impala'
+
+For backward compatibibility, we should keep the listing via dialect name. Also to potentially support saved queries post connector deletion/change (connector id does not exist anymore), or listing all queries of a certain dialect 'mysql':
+
+    /desktop/api2/docs/?type=query-mysql&...
 
 ### Examples
 
@@ -68,6 +78,11 @@ Document2
 
 **Saved Query**
 
+* "compute" is removed
+* "namespace" is still there
+* "connector" is "duplicated" (as also present soon as FK in Document object)
+* notebook["type"] == "query-" + "notebook["snippets"][0]["connector"]["dialect"]
+
     {
       "description": "",
       "directoryUuid": "",
@@ -79,7 +94,7 @@ Document2
       "isManaged": false,
       "isPresentationModeDefault": false,
       "isSaved": false,
-      "name": "Abc",
+      "name": "Hello World",
       "parentSavedQueryUuid": null,
       "presentationSnippets": {},
       "result": {},
@@ -119,14 +134,14 @@ Document2
                 "database": "default",
                 "parsedStatement": {
                   "type": "statement",
-                  "statement": "sss",
+                  "statement": "SHOW TABLES",
                   "location": {
                     "first_line": 1,
                     "last_line": 1,
                     "first_column": 0,
                     "last_column": 3
                   },
-                  "firstToken": "sss"
+                  "firstToken": "SHOW"
                 }
               }
             ]
