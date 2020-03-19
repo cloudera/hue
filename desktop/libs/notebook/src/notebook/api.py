@@ -445,7 +445,11 @@ def get_logs(request):
   return JsonResponse(response)
 
 def _save_notebook(notebook, user):
-  notebook_type = notebook.get('type', 'notebook')
+  if notebook['snippets'][0].get('connector'):
+    notebook_type = 'query-%(dialect)s' % notebook['snippets'][0]['connector']
+  else:
+    notebook_type = notebook.get('type', 'notebook')
+
   save_as = False
 
   if notebook.get('parentSavedQueryUuid'): # We save into the original saved query, not into the query history
