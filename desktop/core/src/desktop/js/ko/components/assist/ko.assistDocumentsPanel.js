@@ -49,7 +49,7 @@ const TEMPLATE = `
       'Share'
     )}</a></li>
   </script>
-  
+
   <script type="text/html" id="assist-document-header-actions">
     <div class="assist-db-header-actions">
       <!-- ko if: !loading() -->
