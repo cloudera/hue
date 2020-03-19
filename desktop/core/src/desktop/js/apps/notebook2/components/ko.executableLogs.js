@@ -29,7 +29,10 @@ export const NAME = 'executable-logs';
 
 // prettier-ignore
 const TEMPLATE = `
-<div class="snippet-error-container alert alert-error" data-bind="visible: errors().length" style="display: none;">
+<div class="snippet-error-container alert alert-error snippet-error-log" data-bind="visible: errors().length" style="display: none;">
+  <div class="clear-container" data-bind="with: activeExecutable">
+    <button type="button" class="close" data-bind="click: reset" aria-label="${I18n('Clear')}"><span aria-hidden="true">&times;</span></button>
+  </div>
   <ul class="unstyled" data-bind="foreach: errors">
     <li data-bind="text: $data"></li>
   </ul>
