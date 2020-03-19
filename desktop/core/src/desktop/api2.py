@@ -84,9 +84,13 @@ def api_error_handler(func):
 def get_config(request):
   config = get_cluster_config(request.user)
   config['clusters'] = list(get_clusters(request.user).values())
+  config['documents'] = {
+    'types': list(Document2.objects.documents(user=request.user).distinct().values_list('type', flat=True))
+  }
   config['status'] = 0
 
   return JsonResponse(config)
+
 
 @api_error_handler
 def get_hue_config(request):
@@ -582,7 +586,6 @@ def copy_document(request):
   if not uuid:
     raise PopupException(_('copy_document requires uuid'))
 
-
   # Document2 and Document model objects are linked and both are saved when saving
   document = Document2.objects.get_by_uuid(user=request.user, uuid=uuid)
   # Document model object
@@ -642,6 +645,7 @@ def copy_document(request):
     'status': 0,
     'document': copy_document.to_dict()
   })
+
 
 @api_error_handler
 @require_POST
@@ -1013,7 +1017,8 @@ def search_entities_interactive(request):
           'uuid': e.uuid,
           'parentUuid': e.parent_directory.uuid,
           'originalName': escape(e.name)
-        } for e in entities['documents']
+        }
+        for e in entities['documents']
       ],
       'count': len(entities['documents']),
       'status': 0
@@ -1177,7 +1182,8 @@ def __filter_documents(type_filters, sort, search_text, queryset, flatten=True):
   documents = queryset.search_documents(
       types=type_filters,
       search_text=search_text,
-      order_by=sort)
+      order_by=sort
+  )
 
   # Roll up documents to common directory
   if not flatten:

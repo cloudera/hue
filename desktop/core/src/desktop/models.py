@@ -1484,6 +1484,7 @@ class Document2(models.Model):
       permissions['link_read'] = link_read_perm.is_link_on
     if link_write_perm:
       permissions['link_write'] = link_write_perm.is_link_on
+
     permissions['link_sharing_on'] = permissions['link_read'] or permissions['link_write']
 
     return permissions
@@ -1518,6 +1519,7 @@ class Document2(models.Model):
 
     slow = self
     fast = self
+
     while True:
       slow = slow.parent_directory
       if slow and slow.uuid == self.uuid:
