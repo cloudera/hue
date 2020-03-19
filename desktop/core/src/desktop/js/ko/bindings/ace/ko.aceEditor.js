@@ -20,12 +20,15 @@ import * as ko from 'knockout';
 import apiHelper from 'api/apiHelper';
 import AceLocationHandler from 'ko/bindings/ace/aceLocationHandler';
 import huePubSub from 'utils/huePubSub';
-import sqlUtils from 'sql/sqlUtils';
 import AceGutterHandler from 'ko/bindings/ace/aceGutterHandler';
+import { registerBinding } from '../bindingUtils';
 
 // TODO: Depends on Ace
 
-ko.bindingHandlers.aceEditor = {
+export const NAME = 'aceEditor';
+export const INSERT_AT_CURSOR_EVENT = 'editor.insert.at.cursor';
+
+registerBinding(NAME, {
   init: function(element, valueAccessor) {
     const $el = $(element);
     const options = ko.unwrap(valueAccessor());
@@ -623,9 +626,12 @@ ko.bindingHandlers.aceEditor = {
       }
     );
 
-    const insertAtCursorSub = huePubSub.subscribe('editor.insert.at.cursor', text => {
-      if ($el.data('last-active-editor')) {
-        insertSqlAtCursor(text + ' ', 0);
+    const insertAtCursorSub = huePubSub.subscribe(INSERT_AT_CURSOR_EVENT, details => {
+      if (
+        (details.targetEditor && details.targetEditor === editor) ||
+        $el.data('last-active-editor')
+      ) {
+        insertSqlAtCursor(details.text + ' ', details.cursorEndAdjust || 0);
       }
     });
 
@@ -693,164 +699,6 @@ ko.bindingHandlers.aceEditor = {
 
     disposeFunctions.push(() => {
       sampleErrorInsertSub.remove();
-    });
-
-    const $tableDropMenu = $el.next('.table-drop-menu');
-    const $identifierDropMenu = $tableDropMenu.find('.editor-drop-identifier');
-
-    const hideDropMenu = function() {
-      $tableDropMenu.css('opacity', 0);
-      window.setTimeout(() => {
-        $tableDropMenu.hide();
-      }, 300);
-    };
-
-    const documentClickListener = function(event) {
-      if ($tableDropMenu.find($(event.target)).length === 0) {
-        hideDropMenu();
-      }
-    };
-
-    $(document).on('click', documentClickListener);
-
-    disposeFunctions.push(() => {
-      $(document).off('click', documentClickListener);
-    });
-
-    let lastMeta = {};
-    const draggableTextSub = huePubSub.subscribe('draggable.text.meta', meta => {
-      lastMeta = meta;
-      if (meta.isView) {
-        $tableDropMenu.find('.editor-drop-update').hide();
-        $tableDropMenu.find('.editor-drop-insert').hide();
-        $tableDropMenu.find('.editor-drop-drop').hide();
-        $tableDropMenu.find('.editor-drop-view').show();
-      } else {
-        $tableDropMenu.find('.editor-drop-update').show();
-        $tableDropMenu.find('.editor-drop-insert').show();
-        $tableDropMenu.find('.editor-drop-drop').show();
-        $tableDropMenu.find('.editor-drop-view').hide();
-      }
-      if (
-        typeof meta !== 'undefined' &&
-        typeof meta.database !== 'undefined' &&
-        typeof meta.table !== 'undefined'
-      ) {
-        $identifierDropMenu.text(meta.database + '.' + meta.table);
-      }
-    });
-
-    disposeFunctions.push(() => {
-      draggableTextSub.remove();
-    });
-
-    const menu = ko.bindingHandlers.contextMenu.initContextMenu(
-      $tableDropMenu,
-      $('.content-panel')
-    );
-
-    $tableDropMenu.find('.editor-drop-value').click(() => {
-      insertSqlAtCursor(
-        sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.database) +
-          '.' +
-          sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.table) +
-          ' ',
-        0,
-        menu
-      );
-    });
-
-    $tableDropMenu.find('.editor-drop-select').click(() => {
-      insertSqlAtCursor(
-        'SELECT * FROM ' +
-          sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.database) +
-          '.' +
-          sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.table) +
-          ' LIMIT 100;',
-        -1,
-        menu
-      );
-      $tableDropMenu.hide();
-    });
-
-    $tableDropMenu.find('.editor-drop-insert').click(() => {
-      insertSqlAtCursor(
-        'INSERT INTO ' +
-          sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.database) +
-          '.' +
-          sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.table) +
-          ' VALUES ();',
-        -2,
-        menu
-      );
-    });
-
-    $tableDropMenu.find('.editor-drop-update').click(() => {
-      insertSqlAtCursor(
-        'UPDATE ' +
-          sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.database) +
-          '.' +
-          sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.table) +
-          ' SET ',
-        0,
-        menu
-      );
-    });
-
-    $tableDropMenu.find('.editor-drop-view').click(() => {
-      insertSqlAtCursor(
-        'DROP VIEW ' +
-          sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.database) +
-          '.' +
-          sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.table) +
-          ';',
-        -1,
-        menu
-      );
-    });
-
-    $tableDropMenu.find('.editor-drop-drop').click(() => {
-      insertSqlAtCursor(
-        'DROP TABLE ' +
-          sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.database) +
-          '.' +
-          sqlUtils.backTickIfNeeded(lastMeta.type, lastMeta.table) +
-          ';',
-        -1,
-        menu
-      );
-    });
-
-    $el.droppable({
-      accept: '.draggableText',
-      drop: function(e, ui) {
-        const position = editor.renderer.screenToTextCoordinates(e.clientX, e.clientY);
-        let text = ui.helper.text();
-        if (
-          lastMeta.type === 's3' ||
-          lastMeta.type === 'hdfs' ||
-          lastMeta.type === 'adls' ||
-          lastMeta.type === 'abfs'
-        ) {
-          text = "'" + lastMeta.definition.path + "'";
-        }
-        editor.moveCursorToPosition(position);
-        const before = editor.getTextBeforeCursor();
-        if (lastMeta.database && lastMeta.table && !lastMeta.column && /.*;|^\s*$/.test(before)) {
-          menu.show(e);
-        } else {
-          if (/\S+$/.test(before) && before.charAt(before.length - 1) !== '.') {
-            text = ' ' + text;
-          }
-          const after = editor.getTextAfterCursor();
-          if (after.length > 0 && after.charAt(0) !== ' ' && text.charAt(text.length - 1) !== ' ') {
-            text += ' ';
-          }
-          editor.session.insert(position, text);
-          position.column += text.length;
-          editor.clearSelection();
-        }
-      }
     });
 
     let autocompleteTemporarilyDisabled = false;
@@ -1017,4 +865,4 @@ ko.bindingHandlers.aceEditor = {
       } catch (e) {}
     }
   }
-};
+});

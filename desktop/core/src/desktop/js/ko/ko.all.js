@@ -151,6 +151,7 @@ import 'ko/components/ko.contextSelector';
 import 'ko/components/ko.createDirectoryModal';
 import 'ko/components/ko.deleteDocModal';
 import 'ko/components/ko.dropDown';
+import 'ko/components/ko.editorDroppableMenu';
 import 'ko/components/ko.executionAnalysis';
 import 'ko/components/ko.favoriteApp';
 import 'ko/components/ko.fieldSamples';
