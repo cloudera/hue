@@ -22,13 +22,14 @@ import sys
 
 from collections import OrderedDict
 from nose.plugins.attrib import attr
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_false
 
 from django.urls import reverse
 from azure.conf import is_adls_enabled
 
 from desktop import appmanager
-from desktop.conf import APP_BLACKLIST
+from desktop.conf import APP_BLACKLIST, ENABLE_CONNECTORS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_permission
 from desktop.models import Directory, Document, Document2
@@ -57,9 +58,6 @@ class TestNotebookApi(object):
 
     self.user = User.objects.get(username="test")
     self.user_not_me = User.objects.get(username="not_perm_user")
-
-    grant_access("test", "default", "notebook")
-    grant_access("not_perm_user", "default", "notebook")
 
     self.notebook_json = """
       {
@@ -138,6 +136,26 @@ class TestNotebookApi(object):
 
     # Test that saving a notebook will save the search field to the first statement text
     assert_equal(doc.search, "select * from default.web_logs where app = 'metastore';")
+
+
+  def test_save_notebook_with_connector(self):
+    if not ENABLE_CONNECTORS.get():
+      raise SkipTest
+
+    notebook_cp = self.notebook.copy()
+    notebook_cp.pop('id')
+    notebook_cp['snippets'][0]['connector'] = {
+      "name": "MySql",
+      "dialect": "mysql"
+    }
+    notebook_json = json.dumps(notebook_cp)
+
+    response = self.client.post(reverse('notebook:save_notebook'), {'notebook': notebook_json})
+    data = json.loads(response.content)
+
+    assert_equal(0, data['status'], data)
+    doc = Document2.objects.get(pk=data['id'])
+    assert_equal('query-mysql', doc.type)
 
 
   def test_historify(self):
