@@ -50,7 +50,7 @@ else:
   from mock import patch
 
 
-class TestNotebookApi(object):
+class TestApi(object):
 
   def setUp(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
