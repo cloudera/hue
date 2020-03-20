@@ -48,6 +48,7 @@ class MockFs(object):
   def __init__(self):
     pass
 
+
 class TestDocument2(object):
 
   def setUp(self):
@@ -400,6 +401,24 @@ class TestDocument2(object):
     assert_true(Document2.TRASH_DIR in [f['name'] for f in data['children']])
 
 
+  def test_get_history(self):
+    history = Document2.objects.get_history(user=self.user, doc_type='query-hive')
+    assert_false(history.filter(name='test_get_history').exists())
+
+    query = Document2.objects.create(
+        name='test_get_history',
+        type='query-hive',
+        owner=self.user,
+        is_history=True
+    )
+
+    try:
+      history = Document2.objects.get_history(user=self.user, doc_type='query-hive')
+      assert_true(history.filter(name='test_get_history').exists())
+    finally:
+      query.delete()
+
+
   def test_validate_immutable_user_directories(self):
     # Test that home and Trash directories cannot be recreated or modified
     test_dir = Directory.objects.create(name='test_dir', owner=self.user, parent_directory=self.home_dir)
@@ -474,6 +493,7 @@ class TestDocument2(object):
 
     assert_true('data' in data, data)
     assert_equal(data['data'], doc_data)
+
 
   def test_is_trashed_migration(self):
 
