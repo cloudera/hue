@@ -27,7 +27,11 @@ LOG = logging.getLogger(__name__)
 def active_users():
   from useradmin.models import UserProfile
   try:
-    count = UserProfile.objects.filter(last_activity__gt=datetime.now() - timedelta(hours=1)).count()
+    count = UserProfile.objects.filter(
+        last_activity__gt=datetime.now() - timedelta(hours=1),
+        first_login=False,
+        hostname__isnull=False
+    ).count()
   except:
     LOG.exception('Could not get active_users')
     count = 0
