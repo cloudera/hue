@@ -740,10 +740,15 @@ class HiveServerClient(object):
         LOG.info('Retrying with a new session because for %s of %s' % (self.user, str(e)))
 
     if self.has_close_sessions and self.max_number_of_sessions > 1 and \
-        Session.objects.get_n_sessions(self.user, n=self.max_number_of_sessions, application=self.query_server['server_name']).count() >= self.max_number_of_sessions:
+        Session.objects.get_n_sessions(
+            self.user,
+            n=self.max_number_of_sessions,
+            application=self.query_server['server_name']
+        ).count() >= self.max_number_of_sessions:
       raise Exception('Too many open sessions. Stop a running query before starting a new one')
 
     session = self.open_session(self.user)
+
     return self._call_return_result_and_session(fn, req, status=status, session=session)
 
 
@@ -766,8 +771,8 @@ class HiveServerClient(object):
       if hasattr(res.status, 'errorMessage') and res.status.errorMessage:
         message = res.status.errorMessage
       else:
-        message = ''
-      raise QueryServerException(Exception('Bad status for request %s:\n%s' % (req, res)), message=message)
+        message = 'Bad status for request %s:\n%s' % (req, res)
+      raise QueryServerException(Exception(message))
     else:
       return (res, session)
 
@@ -860,7 +865,12 @@ class HiveServerClient(object):
       query = 'DESCRIBE FORMATTED `%s`.`%s`' % (database, table_name)
 
     try:
-      desc_results, desc_schema, operation_handle, session = self.execute_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT, session=session)
+      desc_results, desc_schema, operation_handle, session = self.execute_statement(
+          query,
+          max_rows=10000,
+          orientation=TFetchOrientation.FETCH_NEXT,
+          session=session
+      )
       self.close_operation(operation_handle)
     except Exception as e:
       ex_string = str(e)
@@ -871,11 +881,22 @@ class HiveServerClient(object):
           query = 'DESCRIBE FORMATTED `%s` PARTITION(%s)' % (table_name, partition_spec)
         else:
           query = 'DESCRIBE FORMATTED `%s`' % table_name
-        desc_results, desc_schema, operation_handle, session = self.execute_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT, session=session)
+        desc_results, desc_schema, operation_handle, session = self.execute_statement(
+            query,
+            max_rows=10000,
+            orientation=TFetchOrientation.FETCH_NEXT,
+            session=session
+        )
         self.close_operation(operation_handle)
-      elif 'not have privileges for DESCTABLE' in ex_string or 'AuthorizationException' in ex_string: # HUE-5608: No table permission but some column permissions
+      elif 'not have privileges for DESCTABLE' in ex_string \
+          or 'AuthorizationException' in ex_string:  # HUE-5608: No table permission but some column permissions
         query = 'DESCRIBE `%s`.`%s`' % (database, table_name)
-        desc_results, desc_schema, operation_handle, session = self.execute_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT, session=session)
+        desc_results, desc_schema, operation_handle, session = self.execute_statement(
+            query,
+            max_rows=10000,
+            orientation=TFetchOrientation.FETCH_NEXT,
+            session=session
+        )
         self.close_operation(operation_handle)
 
         desc_results.results.columns[0].stringVal.values.insert(0, '# col_name')
@@ -1005,7 +1026,7 @@ class HiveServerClient(object):
     else:
       res = TFetchResultsResp(results=TRowSet(startRowOffset=0, rows=[], columns=[]))
 
-    if operation_handle.hasResultSet and TFetchOrientation.FETCH_FIRST: # Only fetch for the first call that should be with start_over
+    if operation_handle.hasResultSet and TFetchOrientation.FETCH_FIRST:  # Only fetch for the first call that should be with start_over
       meta_req = TGetResultSetMetadataReq(operationHandle=operation_handle)
       (schema, session) = self.call(self._client.GetResultSetMetadata, meta_req)
     else:

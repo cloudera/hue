@@ -23,13 +23,13 @@ from nose.tools import assert_equal, assert_true, assert_raises, assert_not_equa
 from nose.plugins.skip import SkipTest
 from TCLIService.ttypes import TStatusCode
 
-from beeswax.conf import MAX_NUMBER_OF_SESSIONS, CLOSE_SESSIONS
-from beeswax.models import Session
-from beeswax.server.dbms import get_query_server_config
-from beeswax.server.hive_server2_lib import HiveServerTable, HiveServerClient
+from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
 
-from desktop.lib.django_test_util import make_logged_in_client
+from beeswax.conf import MAX_NUMBER_OF_SESSIONS, CLOSE_SESSIONS
+from beeswax.models import Session
+from beeswax.server.dbms import get_query_server_config, QueryServerException
+from beeswax.server.hive_server2_lib import HiveServerTable, HiveServerClient
 
 if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock, MagicMock
@@ -208,6 +208,82 @@ class TestHiveServerClient():
           client.call.call_args.args
         )
 
+
+  def test_get_table_with_error(self):
+    query = Mock(
+      get_query_statement=Mock(return_value=['SELECT 1']),
+      settings=[]
+    )
+
+    with patch('beeswax.server.hive_server2_lib.thrift_util.get_client') as get_client:
+      get_client.return_value = Mock(
+        OpenSession=Mock(
+          return_value=Mock(
+            status=Mock(
+              statusCode=TStatusCode.SUCCESS_STATUS
+            ),
+            configuration={},
+            sessionHandle=Mock(
+              sessionId=Mock(
+                secret=b'1',
+                guid=b'1'
+              )
+            ),
+            serverProtocolVersion=11
+          )
+        ),
+        ExecuteStatement=Mock(
+          return_value=Mock(
+            status=Mock(
+              statusCode=TStatusCode.SUCCESS_STATUS
+            ),
+          )
+        ),
+        get_coordinator_host=Mock(return_value='hive-host')
+      )
+
+      client = HiveServerClient(self.query_server, self.user)
+
+      # Non empty error message from HS2
+      client._client.GetTables = Mock(
+        return_value=Mock(
+          status=Mock(
+            errorMessage='Error while compiling statement: FAILED: HiveAccessControlException Permission denied'
+          )
+        )
+      )
+
+      assert_raises(QueryServerException, client.get_table, database='database', table_name='table_name')
+
+      try:
+        client.get_table(database='database', table_name='table_name')
+      except QueryServerException as e:
+        assert_equal(
+          'Error while compiling statement: FAILED: HiveAccessControlException Permission denied',
+          str(e)
+        )
+
+      # Empty error message from HS2
+      get_tables_res = Mock(
+          status=Mock(
+            errorMessage=None
+          )
+      )
+      client._client.GetTables = Mock(
+        return_value=get_tables_res
+      )
+
+      try:
+        client.get_table(database='database', table_name='table_name')
+      except QueryServerException as e:
+        if sys.version_info[0] > 2:
+          req_string = "TGetTablesReq(sessionHandle=TSessionHandle(sessionId=THandleIdentifier(guid=b'1', secret=b'1')), catalogName=None, schemaName='database', tableName='table_name', tableTypes=None)"
+        else:
+          req_string = "TGetTablesReq(schemaName='database', sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret='1', guid='1')), tableName='table_name', tableTypes=None, catalogName=None)"
+        assert_equal(
+          "Bad status for request %s:\n%s" % (req_string, get_tables_res),
+          str(e)
+        )
 
 class TestHiveServerTable():
 
