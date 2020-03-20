@@ -1017,11 +1017,29 @@ class Document2Manager(models.Manager, Document2QueryMixin):
 
     return latest_doc
 
-  def get_history(self, user, doc_type, include_trashed=False):
-    return self.documents(user, perms='owned', include_history=True, include_trashed=include_trashed).filter(type=doc_type, is_history=True)
+  def get_history(self, user, doc_type=None, connector_id=None, include_trashed=False):
+    history = self.documents(
+        user,
+        perms='owned',
+        include_history=True,
+        include_trashed=include_trashed
+    ).filter(is_history=True)
+
+    if doc_type is not None:
+      history = history.filter(type=doc_type)
+    if connector_id is not None:
+      history = history.filter(connector__id=connector_id)
+
+    return history
 
   def get_tasks_history(self, user):
-    return self.documents(user, perms='owned', include_history=True, include_trashed=False, include_managed=True).filter(is_history=True, is_managed=True).exclude(name='pig-app-hue-script').exclude(type='oozie-workflow2')
+    return self.documents(
+        user,
+        perms='owned',
+        include_history=True,
+        include_trashed=False,
+        include_managed=True
+    ).filter(is_history=True, is_managed=True).exclude(name='pig-app-hue-script').exclude(type='oozie-workflow2')
 
   def get_home_directory(self, user):
     try:
@@ -1108,7 +1126,12 @@ class Document2(models.Model):
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
   uuid = models.CharField(default=uuid_default, max_length=36, db_index=True)
-  type = models.CharField(default='', max_length=32, db_index=True, help_text=_t('Type of document, e.g. Hive query, Oozie workflow, Search Dashboard...'))
+  type = models.CharField(
+      default='',
+      max_length=32,
+      db_index=True,
+      help_text=_t('Type of document, e.g. Hive query, Oozie workflow, Search Dashboard...')
+  )
 
   data = models.TextField(default='{}')
   extra = models.TextField(default='')
@@ -1118,7 +1141,11 @@ class Document2(models.Model):
   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))
   version = models.SmallIntegerField(default=1, verbose_name=_t('Document version'), db_index=True)
   is_history = models.BooleanField(default=False, db_index=True)
-  is_managed = models.BooleanField(default=False, db_index=True, verbose_name=_t('If managed under the cover by Hue and never by the user')) # Aka isTask
+  is_managed = models.BooleanField(  # Aka isTask
+      default=False,
+      db_index=True,
+      verbose_name=_t('If managed under the cover by Hue and never by the user')
+  )
   is_trashed = models.NullBooleanField(default=False, db_index=True, verbose_name=_t('True if trashed'))
 
   dependencies = models.ManyToManyField('self', symmetrical=False, related_name='dependents', db_index=True)
