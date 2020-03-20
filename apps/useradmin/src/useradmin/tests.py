@@ -317,14 +317,22 @@ class TestUserAdminMetrics(BaseUserAdminTests):
       c = make_logged_in_client(username='test1', password='test', is_superuser=False, recreate=True)
       userprofile1 = get_profile(User.objects.get(username='test1'))
       userprofile1.last_activity = datetime.now()
+      userprofile1.first_login = False
       userprofile1.hostname = 'host1'
       userprofile1.save()
 
       c = make_logged_in_client(username='test2', password='test', is_superuser=False, recreate=True)
       userprofile2 = get_profile(User.objects.get(username='test2'))
       userprofile2.last_activity = datetime.now()
+      userprofile2.first_login = False
       userprofile2.hostname = 'host1'
       userprofile2.save()
+
+      User.objects.create_user(username='new_user', password='password')
+      new_userprofile = get_profile(User.objects.get(username='new_user'))
+      new_userprofile.last_activity = datetime.now()
+      new_userprofile.first_login = True
+      new_userprofile.save()
 
     with patch('useradmin.middleware.get_localhost_name') as get_hostname:
       get_hostname.return_value = 'host2'
@@ -332,6 +340,7 @@ class TestUserAdminMetrics(BaseUserAdminTests):
       c = make_logged_in_client(username='test3', password='test', is_superuser=False, recreate=True)
       userprofile3 = get_profile(User.objects.get(username='test3'))
       userprofile3.last_activity = datetime.now()
+      userprofile3.first_login = False
       userprofile3.hostname = 'host2'
       userprofile3.save()
 
