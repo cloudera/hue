@@ -135,6 +135,7 @@ class QuickQueryContext extends DisposableComponent {
       sourceType: this.type,
       namespace: this.namespace,
       compute: this.compute,
+      connector: this.interpreter,
       defaultLimit: this.defaultLimit
     });
 
