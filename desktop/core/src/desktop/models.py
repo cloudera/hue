@@ -52,6 +52,7 @@ from desktop.conf import get_clusters, CLUSTER_ID, IS_MULTICLUSTER_ONLY, IS_K8S_
     has_connectors, TASK_SERVER, ENABLE_GIST, APP_BLACKLIST
 from desktop.lib import fsmanager
 from desktop.lib.connectors.api import _get_installed_connectors
+from desktop.lib.connectors.models import Connector
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paths import get_run_root, SAFE_CHARACTERS_URI_COMPONENTS
@@ -1131,6 +1132,14 @@ class Document2(models.Model):
       max_length=32,
       db_index=True,
       help_text=_t('Type of document, e.g. Hive query, Oozie workflow, Search Dashboard...')
+  )
+  connector = models.ForeignKey(
+      Connector,
+      verbose_name=_t('Connector'),
+      help_text=_t('Connector.'),
+      blank=True,
+      null=True,
+      db_index=True
   )
 
   data = models.TextField(default='{}')
