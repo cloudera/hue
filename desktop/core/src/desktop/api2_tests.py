@@ -88,6 +88,7 @@ class TestApi2(object):
     finally:
       clear()
 
+
   def test_get_hue_config_private(self):
     client = make_logged_in_client(username="api2_superuser", groupname="default", recreate=True, is_superuser=True)
     user = User.objects.get(username="api2_superuser")
