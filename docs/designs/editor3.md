@@ -1,4 +1,5 @@
 
+# Editor v3
 
 * Component with sub components
 * More than one query running at same time in same editor
@@ -34,11 +35,11 @@ Editor document type:
 * if a 'query': 'query-[dialect name]'
 * else 'notebook'
 
-Using connector id instead of dialect for history, saved queries, query execution (can keep dialect name for friendliness):
+It still assumes we get the dialect type. Also easier and backward compatible automatically (if no connector id, or no connector for the id found, use the dialect filter. Using connector id in addition of dialect:
 
-    /notebook/api/get_history?connector=9&...
+    /notebook/api/get_history?connector=9&type=query-mysql&...
 
-    /desktop/api2/docs/?connector=9&...
+    /desktop/api2/docs/?connector=9&type=query-mysql&...
 
     /notebook/api/execute/hive/9
 
@@ -47,9 +48,6 @@ Document model gets an optional foreign key on the connectors:
     type: query-impala
     connector: FK to connector 'x' for dialect 'impala'
 
-For backward compatibibility, we should keep the listing via dialect name. Also to potentially support saved queries post connector deletion/change (connector id does not exist anymore), or listing all queries of a certain dialect 'mysql':
-
-    /desktop/api2/docs/?type=query-mysql&...
 
 ### Examples
 
@@ -83,6 +81,7 @@ For backward compatibibility, we should keep the listing via dialect name. Also 
 * "connector" is "duplicated" (as also present soon as FK in Document object)
 * notebook["type"] == "query-" + "notebook["snippets"][0]["connector"]["dialect"]
 
+<pre>
     {
       "description": "",
       "directoryUuid": "",
@@ -205,3 +204,4 @@ For backward compatibibility, we should keep the listing via dialect name. Also 
       "uuid": "51eac6cf-6df8-ecab-5089-927c0287718a",
       "viewSchedulerId": ""
     }
+<pre>
