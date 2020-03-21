@@ -40,6 +40,7 @@ from desktop.conf import TASK_SERVER
 from desktop.lib import export_csvxls, fsmanager
 from desktop.models import Document2
 from desktop.settings import CACHES_CELERY_KEY, CACHES_CELERY_QUERY_RESULT_KEY
+from useradmin.models import User
 
 from notebook.api import _get_statement
 from notebook.connectors.base import get_api, QueryExpired, ExecutionWrapper
@@ -112,7 +113,7 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
     content_generator = data_export.DataAdapter(result_wrapper, max_rows=max_rows, store_data_type_in_header=True) # TODO: Move FETCH_RESULT_LIMIT to front end
     response = export_csvxls.create_generator(content_generator, file_format)
 
-    with storage.open(_result_key(notebook), 'wb') as f:
+    with storage.open(_result_key(notebook), 'w') as f:
       for chunk in response:
         f.write(chunk)
         meta['row_counter'] = content_generator.row_counter
@@ -120,8 +121,8 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
         download_to_file.update_state(task_id=notebook['uuid'], state='AVAILABLE', meta=meta)
 
     if TASK_SERVER.RESULT_CACHE.get():
-      with storage.open(_result_key(notebook)) as f:
-        csv_reader = csv.reader(f, delimiter=','.encode('utf-8'))
+      with storage.open(_result_key(notebook), 'r') as f:
+        csv_reader = csv.reader(f, delimiter=',')
         caches[CACHES_CELERY_QUERY_RESULT_KEY].set(_result_key(notebook), [row for row in csv_reader], 60 * 5)
 
   return meta
@@ -193,9 +194,14 @@ def download(*args, **kwargs):
   elif state in states.EXCEPTION_STATES:
     result.maybe_reraise()
 
-  info = result.wait() # TODO: Start returning data even if we're not done
+  info = result.wait()  # TODO: Start returning data even if we're not done
 
-  return export_csvxls.file_reader(storage.open(_result_key(notebook), 'rb'))  # TODO: Convert csv to excel if needed
+  return export_csvxls.file_reader(  # TODO: Convert csv to excel if needed
+    storage.open(
+      _result_key(notebook),
+      'r'
+    )
+  )
 
 
 # Why we need this:
@@ -214,9 +220,10 @@ def execute(*args, **kwargs):
 
   task = download_to_file.apply_async(args=args, kwargs=kwargs, task_id=notebook['uuid'])
 
-  should_close, resp = get_current_statement(snippet) # This redoes some of the work in api.execute. Other option is to pass statement, but then we'd have to modify notebook.api.
+  # This redoes some of the work in api.execute. Other option is to pass statement, but then we'd have to modify notebook.api.
   # if should_close: #front end already calls close_statement for multi statement execution no need to do here.
   # In addition, we'd have to figure out what was the previous guid.
+  should_close, resp = get_current_statement(snippet)
 
   resp.update({
       'sync': False,
@@ -315,6 +322,9 @@ def progress(notebook, snippet, logs=None, **kwargs):
 
 
 def fetch_result(notebook, snippet, rows, start_over, **kwargs):
+  print('================================================')
+  import time
+  time.sleep(1)
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
   data = []
@@ -325,7 +335,7 @@ def fetch_result(notebook, snippet, rows, start_over, **kwargs):
       'meta': cols,
       'type': 'table'
     }
-
+  print(state)
   if state == states.PENDING:
     raise QueryExpired()
   elif state in states.EXCEPTION_STATES:
@@ -339,11 +349,11 @@ def fetch_result(notebook, snippet, rows, start_over, **kwargs):
   if not start_over:
     skip = caches[CACHES_CELERY_KEY].get(_fetch_progress_key(notebook), default=0)
   target = skip + rows
-
+  print(11111111111111)
   if info.get('handle', {}).get('has_result_set', False):
     csv.field_size_limit(sys.maxsize)
     count = 0
-
+    print(9999999999999999999)
     headers, csv_reader = _get_data(notebook)
 
     for col in headers:
