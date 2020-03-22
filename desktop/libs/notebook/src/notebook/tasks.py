@@ -43,7 +43,8 @@ from desktop.settings import CACHES_CELERY_KEY, CACHES_CELERY_QUERY_RESULT_KEY
 from useradmin.models import User
 
 from notebook.api import _get_statement
-from notebook.connectors.base import get_api, QueryExpired, ExecutionWrapper
+from notebook.conf import  ENABLE_NOTEBOOK_2
+from notebook.connectors.base import get_api, QueryExpired, ExecutionWrapper, QueryError
 from notebook.models import make_notebook, MockedDjangoRequest, Notebook
 from notebook.sql_utils import get_current_statement
 
@@ -100,30 +101,45 @@ class ExecutionWrapperCallback(object):
 
 # TODO: Add periodic cleanup task
 # TODO: UI should be able to close a query that is available, but not expired
+# TODO: use cache for editor 1000 rows and storage for result export
+# TODO: Move FETCH_RESULT_LIMIT to front end
 @app.task()
 def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs):
-  download_to_file.update_state(task_id=notebook['uuid'], state='STARTED', meta={})
+  task_id = notebook['uuid']
+  result_key = _result_key(task_id)
+
+  download_to_file.update_state(task_id=task_id, state='STARTED', meta={})
   request = _get_request(**kwargs)
   api = get_api(request, snippet)
 
   meta = {'row_counter': 0, 'handle': {}, 'status': '', 'truncated': False}
 
-  with storage.open(_log_key(notebook), 'wb') as f_log: # TODO: use cache for editor 1000 rows and storage for result export
-    result_wrapper = ExecutionWrapper(api, notebook, snippet, ExecutionWrapperCallback(notebook['uuid'], meta, f_log))
-    content_generator = data_export.DataAdapter(result_wrapper, max_rows=max_rows, store_data_type_in_header=True) # TODO: Move FETCH_RESULT_LIMIT to front end
+  with storage.open(_log_key(notebook, snippet), 'w') as f_log:
+    result_wrapper = ExecutionWrapper(
+        api,
+        notebook,
+        snippet,
+        ExecutionWrapperCallback(notebook['uuid'], meta, f_log)
+    )
+    content_generator = data_export.DataAdapter(
+        result_wrapper,
+        max_rows=max_rows,
+        store_data_type_in_header=True
+    )
     response = export_csvxls.create_generator(content_generator, file_format)
 
-    with storage.open(_result_key(notebook), 'w') as f:
+    with storage.open(result_key, 'w') as f:
       for chunk in response:
         f.write(chunk)
-        meta['row_counter'] = content_generator.row_counter
-        meta['truncated'] = content_generator.is_truncated
-        download_to_file.update_state(task_id=notebook['uuid'], state='AVAILABLE', meta=meta)
 
     if TASK_SERVER.RESULT_CACHE.get():
-      with storage.open(_result_key(notebook), 'r') as f:
+      with storage.open(result_key, 'r') as f:
         csv_reader = csv.reader(f, delimiter=',')
-        caches[CACHES_CELERY_QUERY_RESULT_KEY].set(_result_key(notebook), [row for row in csv_reader], 60 * 5)
+        caches[CACHES_CELERY_QUERY_RESULT_KEY].set(result_key, [row for row in csv_reader], 60 * 5)
+
+    meta['row_counter'] = content_generator.row_counter
+    meta['truncated'] = content_generator.is_truncated
+    download_to_file.update_state(task_id=task_id, state='AVAILABLE', meta=meta)
 
   return meta
 
@@ -185,8 +201,9 @@ def run_sync_query(doc_id, user):
 
 
 def download(*args, **kwargs):
+  task_id = args[0]['uuid']
   notebook = args[0]
-  result = download_to_file.AsyncResult(args[0]['uuid'])
+  result = download_to_file.AsyncResult(task_id)
   state = result.state
 
   if state == states.PENDING:
@@ -198,7 +215,7 @@ def download(*args, **kwargs):
 
   return export_csvxls.file_reader(  # TODO: Convert csv to excel if needed
     storage.open(
-      _result_key(notebook),
+      _result_key(task_id),
       'r'
     )
   )
@@ -268,12 +285,12 @@ def get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id
     return ''
   else:
     if not startFrom:
-      with storage.open(_log_key(notebook), 'r') as f:
+      with storage.open(_log_key(notebook, snippet), 'r') as f:
         return f.read()
     else:
       count = 0
       output = string_io()
-      with storage.open(_log_key(notebook), 'r') as f:
+      with storage.open(_log_key(notebook, snippet), 'r') as f:
         for line in f:
           count += 1
           if count <= startFrom:
@@ -322,10 +339,8 @@ def progress(notebook, snippet, logs=None, **kwargs):
 
 
 def fetch_result(notebook, snippet, rows, start_over, **kwargs):
-  print('================================================')
-  import time
-  time.sleep(1)
-  result = download_to_file.AsyncResult(notebook['uuid'])
+  task_id = _get_query_key(notebook, snippet)
+  result = download_to_file.AsyncResult(task_id)
   state = result.state
   data = []
   cols = []
@@ -335,7 +350,7 @@ def fetch_result(notebook, snippet, rows, start_over, **kwargs):
       'meta': cols,
       'type': 'table'
     }
-  print(state)
+
   if state == states.PENDING:
     raise QueryExpired()
   elif state in states.EXCEPTION_STATES:
@@ -347,14 +362,13 @@ def fetch_result(notebook, snippet, rows, start_over, **kwargs):
   info = result.info
   skip = 0
   if not start_over:
-    skip = caches[CACHES_CELERY_KEY].get(_fetch_progress_key(notebook), default=0)
+    skip = caches[CACHES_CELERY_KEY].get(_fetch_progress_key(notebook, snippet), default=0)
   target = skip + rows
-  print(11111111111111)
+
   if info.get('handle', {}).get('has_result_set', False):
     csv.field_size_limit(sys.maxsize)
     count = 0
-    print(9999999999999999999)
-    headers, csv_reader = _get_data(notebook)
+    headers, csv_reader = _get_data(task_id)
 
     for col in headers:
       split = col.split('|')
@@ -362,28 +376,33 @@ def fetch_result(notebook, snippet, rows, start_over, **kwargs):
       cols.append({'name': split[0], 'type': split_type, 'comment': None})
     for row in csv_reader:
       count += 1
-      if count <= skip: # TODO: seek(skip) or [skip:]
+      if count <= skip:  # TODO: seek(skip) or [skip:]
         continue
       data.append(row)
       if count >= target:
         break
 
-    caches[CACHES_CELERY_KEY].set(_fetch_progress_key(notebook), count, timeout=None)
+    caches[CACHES_CELERY_KEY].set(_fetch_progress_key(notebook, snippet), count, timeout=None)
 
     results['has_more'] = count < info.get('row_counter') or state == states.state('PROGRESS')
 
   return results
 
 
-def _get_data(notebook):
+def _get_data(task_id):
+  result_key = _result_key(task_id)
+
   if TASK_SERVER.RESULT_CACHE.get():
-    csv_reader = caches[CACHES_CELERY_QUERY_RESULT_KEY].get(_result_key(notebook)) # TODO check if expired
-    headers = csv_reader[0] # TODO check size
+    csv_reader = caches[CACHES_CELERY_QUERY_RESULT_KEY].get(result_key)  # TODO check if expired
+    if not csv_reader:
+      raise QueryError('Cached results %s not found.' % result_key)
+    headers = csv_reader[0]  # TODO check size
     csv_reader = csv_reader[1:]
   else:
-    f = storage.open(_result_key(notebook))
+    f = storage.open(result_key)
     csv_reader = csv.reader(f, delimiter=','.encode('utf-8'))
     headers = next(csv_reader, [])
+
   return headers, csv_reader
 
 
@@ -420,10 +439,10 @@ def cancel(*args, **kwargs):
   if status == 0:
     info = result.info
     snippet['result']['handle'] = info.get('handle', {}).copy()
-    cancel_async.apply_async(args=args, kwargs=kwargs, task_id=_cancel_statement_async_id(notebook))
+    cancel_async.apply_async(args=args, kwargs=kwargs, task_id=_cancel_statement_async_id(notebook, snippet))
 
   result.forget()
-  _cleanup(notebook)
+  _cleanup(notebook, snippet)
 
   return {'status': status}
 
@@ -444,32 +463,35 @@ def close_statement(*args, **kwargs):
   if status == 0:
     info = result.info
     snippet['result']['handle'] = info.get('handle', {}).copy()
-    close_statement_async.apply_async(args=args, kwargs=kwargs, task_id=_close_statement_async_id(notebook))
+    close_statement_async.apply_async(args=args, kwargs=kwargs, task_id=_close_statement_async_id(notebook, snippet))
 
   result.forget()
-  _cleanup(notebook)
+  _cleanup(notebook, snippet)
 
   return {'status': status}
 
-def _cleanup(notebook):
-  storage.delete(_result_key(notebook)) # TODO: abstract storage + caches
-  storage.delete(_log_key(notebook))
-  caches[CACHES_CELERY_KEY].delete(_fetch_progress_key(notebook))
+def _cleanup(notebook, snippet):
+  storage.delete(_result_key(notebook, snippet)) # TODO: abstract storage + caches
+  storage.delete(_log_key(notebook, snippet))
+  caches[CACHES_CELERY_KEY].delete(_fetch_progress_key(notebook, snippet))
 
-def _log_key(notebook):
-  return notebook['uuid'] + '_log'
+def _get_query_key(notebook, snippet):
+  return snippet['executor']['executables'][0]['history']['uuid'] if ENABLE_NOTEBOOK_2.get() else notebook['uuid']
 
-def _result_key(notebook):
-  return notebook['uuid'] + '_result'
+def _log_key(notebook, snippet):
+  return _get_query_key(notebook, snippet) + '_log'
 
-def _fetch_progress_key(notebook):
-  return notebook['uuid'] + '_fetch_progress'
+def _result_key(task_id):
+  return task_id + '_result'
 
-def _cancel_statement_async_id(notebook):
-  return notebook['uuid'] + '_cancel'
+def _fetch_progress_key(notebook, snippet):
+  return _get_query_key(notebook, snippet) + '_fetch_progress'
 
-def _close_statement_async_id(notebook):
-  return notebook['uuid'] + '_close'
+def _cancel_statement_async_id(notebook, snippet):
+  return _get_query_key(notebook, snippet) + '_cancel'
+
+def _close_statement_async_id(notebook, snippet):
+  return _get_query_key(notebook, snippet) + '_close'
 
 def _get_request(postdict=None, user_id=None):
   request = HttpRequest()
