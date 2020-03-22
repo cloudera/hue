@@ -20,7 +20,7 @@ See the currently shipped [SQL dialects](https://github.com/cloudera/hue/tree/ma
 
 What if I only want to use only the autocomplete as a JavaScript module in my own app?
 
-Importing the Parser can be simply done as a npm package. Here is an example on how to use the parser in a node.js app:
+Importing the Parser can be simply done as a npm package. Here is an example on how to use the parser in a [node.js app](https://github.com/cloudera/hue/tree/master/tools/parser/hue_dep):
 
     cd tools/parser/hue_dep
     npm install
