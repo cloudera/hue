@@ -40,10 +40,10 @@ const TEMPLATE = `
       <button class="btn btn-danger btn-mini btn-execute disable-feedback" data-test="stop" data-bind="click: stop"><i class="fa fa-stop fa-fw"></i>
       <!-- ko ifnot: waiting -->
         ${ I18n('Stop') }
-      <!-- /ko --> 
+      <!-- /ko -->
       <!-- ko if: waiting -->
         ${ I18n('Stop batch') }
-      <!-- /ko --> 
+      <!-- /ko -->
       </button>
       <!-- /ko -->
       <!-- ko if: stopping -->
@@ -52,7 +52,7 @@ const TEMPLATE = `
     <!-- /ko -->
   </div>
   <form autocomplete="off" class="inline-block margin-left-10">
-    <input class="input-small limit-input" type="text" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } placeholder="${ I18n('Limit') }" data-bind="textInput: limit">
+    <input class="input-small limit-input" type="number" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } placeholder="${ I18n('Limit') }" data-bind="textInput: limit, autogrowInput: { minWidth: 50, maxWidth: 80, comfortZone: 25 }">
   </form>
 </div>
 `;
