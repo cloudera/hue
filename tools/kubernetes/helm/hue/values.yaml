@@ -62,4 +62,7 @@ ingress:
 aws:
   accessKeyId: ""
   secretAccessKey: ""
-  region: "us-east-1"
+  awsRegion: "us-east-1"
+
+## Pod Annotations
+# podAnnotations: {}

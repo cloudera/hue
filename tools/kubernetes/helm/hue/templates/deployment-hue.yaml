@@ -19,6 +19,9 @@ spec:
         pod: hue
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap-hue-extra.yaml") . | sha256sum }}
+{{- with .Values.podAnnotations }}
+{{ toYaml . | indent 8 }}
+{{- end }}
     spec:
       containers:
       - name: hue
