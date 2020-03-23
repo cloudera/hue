@@ -56,7 +56,7 @@ class KSqlApi(Api):
 
     data, description = self.db.query(
         snippet['statement'],
-        channel_name=snippet.get('editorWsChannel')
+        channel_name=notebook.get('editorWsChannel')
     )
     has_result_set = data is not None
 
@@ -94,8 +94,11 @@ class KSqlApi(Api):
         elif database == 'topics':
           response['tables_meta'] = self.db.show_topics()
         elif database == 'streams':
-          response['tables_meta'] = [
-            {'name': t['name'], 'type': t['type'], 'comment': 'Topic: %(topic)s Format: %(format)s' % t}
+          response['tables_meta'] = [{
+              'name': t['name'],
+              'type': t['type'],
+              'comment': 'Topic: %(topic)s Format: %(format)s' % t
+            }
             for t in self.db.show_streams()
           ]
       elif column is None:
@@ -105,7 +108,8 @@ class KSqlApi(Api):
             'comment': col.get('comment'),
             'name': col.get('name'),
             'type': str(col['schema'].get('type'))
-          } for col in columns
+          }
+          for col in columns
         ]
       else:
         response = {}

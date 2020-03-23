@@ -376,7 +376,7 @@ export default class Executable {
   }
 
   async toContext(id) {
-    if (this.snippet) {
+    if (this.snippet) {  // V1
       return {
         operationId: this.operationId,
         snippet: this.snippet.toContextJson(),
@@ -410,7 +410,8 @@ export default class Executable {
       uuid: hueUtils.UUID(),
       name: '',
       isSaved: false,
-      sessions: [session]
+      sessions: [session],
+      editorWsChannel: window.WS_CHANNEL
     };
 
     return {
