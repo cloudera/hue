@@ -123,7 +123,7 @@ class KSqlApi(object):
         _send_to_channel(
             channel_name,
             message_type='task.progress',
-            message_data={'status': 'running', 'query_id': 1111}
+            message_data={'status': 'running', 'query_id': 1}
         )
 
       for line in result:
@@ -144,19 +144,18 @@ class KSqlApi(object):
             data.append(data_line['row']['columns'])
         else:
           data.append([line])
-
-        if has_channels() and channel_name:
-          _send_to_channel(
-              channel_name,
-              message_type='task.result',
-              message_data={'data': data, 'metadata': metadata, 'query_id': 1111}
-          )
-          # TODO: special message when end of stream
-          data = []
     else:
       data, metadata = self._decode_result(
         self.ksql(statement)
       )
+
+    if has_channels() and channel_name:  # Send results via WS and empty results
+      _send_to_channel(
+          channel_name,
+          message_type='task.result',
+          message_data={'data': data, 'metadata': metadata, 'query_id': 1}
+      )
+      data = []  # TODO: special message when end of stream
 
     return data, metadata
 
