@@ -169,7 +169,7 @@ export default class Executable {
     try {
       hueAnalytics.log(
         'notebook',
-        'execute/' + (this.executor.connector() ? this.executor.connector().type : '')
+        'execute/' + (this.executor.connector() ? this.executor.connector().dialect : '')
       );
       try {
         const response = await this.internalExecute();
@@ -313,7 +313,7 @@ export default class Executable {
     if (this.cancellables.length && this.status === EXECUTION_STATUS.running) {
       hueAnalytics.log(
         'notebook',
-        'cancel/' + (this.executor.connector() ? this.executor.connector().type : '')
+        'cancel/' + (this.executor.connector() ? this.executor.connector().dialect : '')
       );
       this.setStatus(EXECUTION_STATUS.canceling);
       while (this.cancellables.length) {
@@ -376,7 +376,8 @@ export default class Executable {
   }
 
   async toContext(id) {
-    if (this.snippet) {  // V1
+    if (this.snippet) {
+      // V1
       return {
         operationId: this.operationId,
         snippet: this.snippet.toContextJson(),
