@@ -1866,11 +1866,12 @@ class ApiHelper {
    */
   async executeStatement(options) {
     const executable = options.executable;
-    const url = EXECUTE_API_PREFIX + executable.executor.connector().type;
+    const url = EXECUTE_API_PREFIX + executable.executor.connector().dialect;
 
     const promise = new Promise(async (resolve, reject) => {
       let data = {};
-      if (executable.executor.snippet) {  // V1
+      if (executable.executor.snippet) {
+        // V1
         // TODO: Refactor away the snippet, it currently works because snippet.statement is a computed from
         // the active executable, but we n
         data = {
