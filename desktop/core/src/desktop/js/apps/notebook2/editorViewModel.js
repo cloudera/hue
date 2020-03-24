@@ -24,8 +24,8 @@ import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 
 import Notebook from 'apps/notebook2/notebook';
-import { UPDATE_HISTORY_EVENT } from 'apps/notebook2/components/ko.queryHistory';
 import { ACTIVE_SNIPPET_DIALECT_CHANGED_EVENT } from 'apps/notebook2/events';
+import { CONFIG_REFRESHED_EVENT, GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
 
 class EditorViewModel {
   constructor(editorId, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
@@ -46,27 +46,42 @@ class EditorViewModel {
     this.user = options.user;
     this.userId = options.userId;
     this.suffix = options.suffix;
-    this.isMobile = ko.observable(options.mobile);
     this.isNotificationManager = ko.observable(!!options.is_notification_manager);
-    this.editorType = ko.observable(options.editor_type);
-    this.editorType.subscribe(newVal => {
-      this.editorMode(newVal !== 'notebook');
-      hueUtils.changeURLParameter('type', newVal);
+    this.selectedNotebook = ko.observable();
+
+    this.editorMode = ko.observable(options.mode === 'editor');
+    this.config = ko.observable();
+
+    huePubSub.publish(GET_KNOWN_CONFIG_EVENT, this.config);
+    huePubSub.subscribe(CONFIG_REFRESHED_EVENT, this.config);
+
+    this.activeConnector = ko.pureComputed(() => {
       if (this.editorMode()) {
-        huePubSub.publish(UPDATE_HISTORY_EVENT);
+        const snippet = this.getActiveSnippet();
+        if (snippet) {
+          return snippet.connector();
+        }
+      } else if (this.config() && this.config().app_config && this.config().app_config.editor) {
+        const interpreters = this.config().app_config.editor.interpreters;
+        return interpreters.find(interpreter => interpreter.dialect === 'notebook');
       }
     });
-    this.preEditorTogglingSnippet = ko.observable();
 
-    this.editorTypeTitle = ko.pureComputed(() => {
-      const foundInterpreters = options.languages.filter(
-        interpreter => interpreter.type === this.editorType()
-      );
-      return foundInterpreters.length > 0 ? foundInterpreters[0].name : this.editorType();
+    this.editorType = ko.pureComputed(() => this.activeConnector() && this.activeConnector().type);
+    this.editorTitle = ko.pureComputed(
+      () => this.activeConnector() && this.activeConnector().displayName
+    );
+
+    this.activeConnector.subscribe(connector => {
+      if (connector) {
+        if (window.location.getParameter('type') !== connector.type) {
+          hueUtils.changeURLParameter('type', connector.type);
+        }
+        this.notifyDialectChange(connector.dialect, connector.is_sql);
+      }
     });
 
     this.autocompleteTimeout = options.autocompleteTimeout;
-    this.selectedNotebook = ko.observable();
     this.lastNotifiedDialect = undefined;
 
     this.combinedContent = ko.observable();
@@ -237,8 +252,6 @@ class EditorViewModel {
     );
 
     this.availableSnippets = komapping.fromJS(options.languages);
-
-    this.editorMode = ko.observable(options.mode === 'editor');
   }
 
   changeURL(url) {
@@ -310,29 +323,8 @@ class EditorViewModel {
       notebook.snippets().forEach(snippet => {
         snippet.aceAutoExpand = false;
         snippet.statement_raw.valueHasMutated();
-        // if (
-        //   snippet.result.handle().statements_count > 1 &&
-        //   snippet.result.handle().start != null &&
-        //   snippet.result.handle().end != null
-        // ) {
-        //   const aceLineOffset = snippet.result.handle().aceLineOffset || 0;
-        //   snippet.result.statement_range({
-        //     start: {
-        //       row: snippet.result.handle().start.row + aceLineOffset,
-        //       column: snippet.result.handle().start.column
-        //     },
-        //     end: {
-        //       row: snippet.result.handle().end.row + aceLineOffset,
-        //       column: snippet.result.handle().end.column
-        //     }
-        //   });
-        //   snippet.result.statement_range.valueHasMutated();
-        // }
       });
 
-      // if (notebook.snippets()[0].result.data().length > 0) {
-      //   $(document).trigger('redrawResults');
-      // } else
       if (queryTab) {
         notebook.snippets()[0].currentQueryTab(queryTab);
       }
@@ -349,11 +341,8 @@ class EditorViewModel {
 
   async newNotebook(editorType, callback, queryTab) {
     return new Promise((resolve, reject) => {
-      if (editorType) {
-        this.notifyDialectChange(editorType, this.getSnippetViewSettings(editorType).sqlDialect);
-      }
       $.post('/notebook/api/create_notebook', {
-        type: editorType || this.editorType(),
+        type: editorType,
         directory_uuid: window.location.getParameter('directory_uuid'),
         gist: this.isNotificationManager() ? undefined : window.location.getParameter('gist')
       })
@@ -361,8 +350,8 @@ class EditorViewModel {
           this.loadNotebook(data.notebook);
           if (this.editorMode() && !this.isNotificationManager()) {
             const snippet =
-              this.selectedNotebook().snippets().length == 0
-                ? this.selectedNotebook().newSnippet(this.editorType())
+              this.selectedNotebook().snippets().length === 0
+                ? this.selectedNotebook().newSnippet(editorType)
                 : this.selectedNotebook().snippets()[0];
             if (
               queryTab &&
@@ -371,15 +360,6 @@ class EditorViewModel {
               snippet.currentQueryTab(queryTab);
             }
             huePubSub.publish('detach.scrolls', this.selectedNotebook().snippets()[0]);
-            if (window.location.getParameter('type') === '') {
-              hueUtils.changeURLParameter('type', this.editorType());
-            }
-            if (editorType) {
-              this.notifyDialectChange(
-                editorType,
-                this.getSnippetViewSettings(editorType).sqlDialect
-              );
-            }
           }
 
           if (callback) {
@@ -408,11 +388,6 @@ class EditorViewModel {
 
       if (typeof skipUrlChange === 'undefined' && !this.isNotificationManager()) {
         if (this.editorMode()) {
-          this.editorType(docData.document.type.substring('query-'.length));
-          this.notifyDialectChange(
-            this.editorType(),
-            this.getSnippetViewSettings(this.editorType()).sqlDialect
-          );
           this.changeURL(
             this.URLS.editor + '?editor=' + docData.document.id + '&type=' + this.editorType()
           );
@@ -515,22 +490,26 @@ class EditorViewModel {
     );
   }
 
-  withActiveSnippet(callback, notFoundCallback) {
+  getActiveSnippet() {
     const notebook = this.selectedNotebook();
     let foundSnippet;
     if (notebook) {
       if (notebook.snippets().length === 1) {
         foundSnippet = notebook.snippets()[0];
       } else {
-        notebook.snippets().every(snippet => {
+        notebook.snippets().some(snippet => {
           if (snippet.inFocus()) {
             foundSnippet = snippet;
-            return false;
+            return true;
           }
-          return true;
         });
       }
     }
+    return foundSnippet;
+  }
+
+  withActiveSnippet(callback, notFoundCallback) {
+    const foundSnippet = this.getActiveSnippet();
     if (foundSnippet) {
       callback(foundSnippet);
     } else if (notFoundCallback) {
