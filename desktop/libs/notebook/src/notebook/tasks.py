@@ -33,7 +33,7 @@ from django.core.files.storage import get_storage_class
 from django.db import transaction
 from django.http import FileResponse, HttpRequest
 
-from beeswax import data_export
+from beeswax.data_export import DataAdapter
 from desktop.auth.backend import rewrite_user
 from desktop.celery import app
 from desktop.conf import TASK_SERVER
@@ -121,7 +121,7 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
         snippet,
         ExecutionWrapperCallback(notebook['uuid'], meta, f_log)
     )
-    content_generator = data_export.DataAdapter(
+    content_generator = DataAdapter(
         result_wrapper,
         max_rows=max_rows,
         store_data_type_in_header=True
