@@ -118,30 +118,6 @@ class EditorViewModel {
 
     this.ChartTransformers = ChartTransformers;
 
-    // TODO: Drop the SQL source types from the notebook. They're now set in AssistDbPanel.
-    this.sqlSourceTypes = [];
-
-    if (options.languages && this.snippetViewSettings) {
-      options.languages.forEach(language => {
-        const viewSettings = this.snippetViewSettings[language.type];
-        if (viewSettings && viewSettings.sqlDialect) {
-          this.sqlSourceTypes.push({
-            type: language.type,
-            name: language.name
-          });
-        }
-      });
-    }
-
-    const sqlSourceTypes = this.sqlSourceTypes.filter(
-      language => language.type === this.editorType()
-    );
-    if (sqlSourceTypes.length > 0) {
-      this.activeSqlSourceType = sqlSourceTypes[0].type;
-    } else {
-      this.activeSqlSourceType = null;
-    }
-
     this.isEditing = ko.observable(false);
     this.isEditing.subscribe(() => {
       $(document).trigger('editingToggled');
