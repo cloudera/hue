@@ -64,10 +64,6 @@ class AssistPanel {
    * @param {boolean} params.onlySql - For the old query editors
    * @param {string[]} params.visibleAssistPanels - Panels that will initially be shown regardless of total storage
    * @param {Object} params.sql
-   * @param {Object[]} params.sql.sourceTypes - All the available SQL source types
-   * @param {string} params.sql.sourceTypes[].name - Example: Hive SQL
-   * @param {string} params.sql.sourceTypes[].type - Example: hive
-   * @param {string} [params.sql.activeSourceType] - Example: hive
    * @param {Object} params.sql.navigationSettings - enable/disable the links
    * @param {boolean} params.sql.navigationSettings.openItem - Example: true
    * @param {boolean} params.sql.navigationSettings.showStats - Example: true

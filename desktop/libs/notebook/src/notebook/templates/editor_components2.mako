@@ -407,8 +407,6 @@
         params: {
           user: user,
           sql: {
-            sourceTypes: sqlSourceTypes,
-            activeSourceType: activeSqlSourceType,
             navigationSettings: {
               openDatabase: false,
               openItem: false,
