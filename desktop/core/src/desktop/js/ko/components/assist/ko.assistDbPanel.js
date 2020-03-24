@@ -566,10 +566,6 @@ class AssistDbPanel {
   /**
    * @param {Object} options
    * @param {Object} options.i18n
-   * @param {Object[]} options.sourceTypes - All the available SQL source types
-   * @param {string} options.sourceTypes[].name - Example: Hive SQL
-   * @param {string} options.sourceTypes[].type - Example: hive
-   * @param {string} [options.activeSourceType] - Example: hive
    * @param {Object} options.navigationSettings - enable/disable the links
    * @param {boolean} options.navigationSettings.openItem
    * @param {boolean} options.navigationSettings.showStats
@@ -753,7 +749,7 @@ class AssistDbPanel {
       });
     }
 
-    self.init(options.navigationSettings, options.activeSourceType).then(() => {
+    self.init(options.navigationSettings).then(() => {
       huePubSub.publish('assist.db.panel.ready');
 
       huePubSub.subscribe('assist.is.db.panel.ready', () => {
@@ -847,7 +843,7 @@ class AssistDbPanel {
     });
   }
 
-  async init(navigationSettings, activeSourceType) {
+  async init(navigationSettings) {
     return new Promise(resolve => {
       if (self.isSolr) {
         this.setSingleSource('solr', navigationSettings, true);
@@ -891,11 +887,12 @@ class AssistDbPanel {
         });
 
         if (sources.indexOf(this.selectedSource()) === -1) {
-          const storageSourceType =
-            activeSourceType || apiHelper.getFromTotalStorage('assist', 'lastSelectedSource');
-          this.selectedSource(
-            this.sourceIndex[storageSourceType] || (sources.length ? sources[0] : null)
-          );
+          if (sources.length) {
+            const storageSourceType = apiHelper.getFromTotalStorage('assist', 'lastSelectedSource');
+            this.selectedSource(this.sourceIndex[storageSourceType] || sources[0]);
+          } else {
+            this.selectedSource(undefined);
+          }
         }
         this.sources(sources);
       };
