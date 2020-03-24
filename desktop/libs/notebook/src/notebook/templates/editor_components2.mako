@@ -135,7 +135,7 @@
           <ul class="nav editor-nav">
             <li class="app-header" style="display:none" data-bind="visible: true">
               <!-- ko if: editorMode -->
-              <a data-bind="hueLink: '${ url('notebook:editor') }?type=' + editorType(), attr: { 'title': editorTypeTitle() + '${ _(' Editor') }'}" style="cursor: pointer">
+              <a data-bind="hueLink: '${ url('notebook:editor') }?type=' + editorType(), attr: { 'title': editorTitle() + '${ _(' Editor') }'}" style="cursor: pointer">
                 <!-- ko template: { name: 'app-icon-template', data: { icon: editorType() } } --><!-- /ko -->
 
                 <!-- ko switch: editorType() -->
@@ -160,7 +160,7 @@
                 <!-- ko case: 'markdown' -->Markdown<!-- /ko -->
                 <!-- ko case: 'text' -->Text<!-- /ko -->
                 <!-- ko case: 'clickhouse' -->ClickHouse<!-- /ko -->
-                <!-- ko case: $default --><span data-bind="text: editorTypeTitle()"></span><!-- /ko -->
+                <!-- ko case: $default --><span data-bind="text: editorTitle()"></span><!-- /ko -->
                 <!-- /ko -->
                 <!-- ko component: { name: 'hue-favorite-app', params: { app: 'editor', interpreter: editorType() }} --><!-- /ko -->
               </a>
@@ -266,7 +266,7 @@
         <ul class="dropdown-menu pull-right">
           <li>
             <!-- ko if: editorMode -->
-            <a href="javascript:void(0)" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
+            <a href="javascript:void(0)" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTitle() + '${ _(' Query') }' }">
               <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
             </a>
             <!-- /ko -->

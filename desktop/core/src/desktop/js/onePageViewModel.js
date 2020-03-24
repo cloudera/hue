@@ -55,7 +55,9 @@ class OnePageViewModel {
           hueUtils.waitForObservable(viewModel.selectedNotebook, () => {
             if (viewModel.editorType() !== type) {
               viewModel.selectedNotebook().selectedSnippet(type);
-              viewModel.editorType(type);
+              if (!window.ENABLE_NOTEBOOK_2) {
+                viewModel.editorType(type);
+              }
               viewModel.newNotebook(type);
             }
           });
