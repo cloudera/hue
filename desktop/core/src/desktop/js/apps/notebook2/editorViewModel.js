@@ -120,15 +120,9 @@ class EditorViewModel {
 
     // TODO: Drop the SQL source types from the notebook. They're now set in AssistDbPanel.
     this.sqlSourceTypes = [];
-    this.availableLanguages = [];
 
     if (options.languages && this.snippetViewSettings) {
       options.languages.forEach(language => {
-        this.availableLanguages.push({
-          type: language.type,
-          name: language.name,
-          interface: language.interface
-        });
         const viewSettings = this.snippetViewSettings[language.type];
         if (viewSettings && viewSettings.sqlDialect) {
           this.sqlSourceTypes.push({

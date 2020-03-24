@@ -232,16 +232,7 @@ export default class Snippet {
       }
     });
 
-    this.isBatchable = ko.pureComputed(
-      () =>
-        this.dialect() === DIALECT.hive ||
-        this.dialect() === DIALECT.impala ||
-        this.parentVm.availableLanguages.some(
-          language =>
-            language.type === this.dialect() && // TODO: language.type = dialect ?
-            (language.interface === 'oozie' || language.interface === 'sqlalchemy')
-        )
-    );
+    this.isBatchable = ko.pureComputed(() => this.connector() && this.connector().is_batchable);
 
     this.autocompleteSettings = {
       temporaryOnly: false
