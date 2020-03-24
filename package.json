@@ -1,6 +1,6 @@
 {
   "name": "gethue",
-  "version": "4.6.0",
+  "version": "4.6.3",
   "description": "Hue is an Open source SQL Query Editor for Databases/Warehouses",
   "homepage": "http://gethue.com",
   "repository": {
@@ -117,5 +117,8 @@
     "test-dev": "jest --watch",
     "test-clearCache": "jest --clearCache"
   },
-  "files": []
+  "files": [
+    "desktop/core/src/desktop/js/parse",
+    "desktop/core/src/desktop/js/sql"
+  ]
 }
