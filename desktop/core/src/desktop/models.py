@@ -1792,6 +1792,7 @@ class ClusterConfig(object):
           'tooltip': _('%s Query') % interpreter['type'].title(),
           'page': '/editor/?type=%(type)s' % interpreter,
           'is_sql': interpreter['is_sql'],
+          'is_batchable': interpreter['dialect'] in ['hive', 'impala'] or interpreter['interface'] in ['oozie', 'sqlalchemy'],
           'dialect': interpreter['dialect'],
           'dialect_properties': interpreter.get('dialect_properties'),
         })
