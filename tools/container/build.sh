@@ -9,7 +9,7 @@ HUE_DIR=$WORK_DIR/hue
 APACHE_DIR=$WORK_DIR/huelb
 BASEHUE_DIR=$WORK_DIR/base/hue
 BASEHUELB_DIR=$WORK_DIR/base/huelb
-HUEBASE_VERSION=huebase_centos:7.6
+HUEBASE_VERSION=huebase_centos:7.6.0.1
 HUELBBASE_VERSION=huelb_httpd:2.4.7.6
 HUEUSER="hive"
 
