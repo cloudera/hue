@@ -24,10 +24,10 @@ from desktop.lib.i18n import smart_unicode
 
 def get_api(request, interface):
 
-  if interface == 'optimizer':
+  if interface == 'navopt':
     from metadata.optimizer.optimizer_client import OptimizerClient
     return OptimizerClient(request.user)
-  elif interface == 'optimizer_rest':
+  elif interface == 'optimizer':
     from metadata.optimizer.optimizer_rest_client import OptimizerRestClient
     return OptimizerRestClient(request.user)
   elif interface == 'dummy':
@@ -58,17 +58,29 @@ def check_privileges(view_func):
 
       if kwargs.get('db_tables'):
         for db_table in kwargs['db_tables']:
-          objects.append({'server': get_hive_sentry_provider(), 'db': _get_table_name(db_table)['database'], 'table': _get_table_name(db_table)['table']})
+          objects.append({
+              'server': get_hive_sentry_provider(),
+              'db': _get_table_name(db_table)['database'],
+              'table': _get_table_name(db_table)['table']
+            }
+          )
       else:
         objects = [{'server': get_hive_sentry_provider()}]
+
         if kwargs.get('database_name'):
           objects[0]['db'] = kwargs['database_name']
         if kwargs.get('table_name'):
           objects[0]['table'] = kwargs['table_name']
 
       filtered = list(checker.filter_objects(objects, action))
+
       if len(filtered) != len(objects):
-        raise MissingSentryPrivilegeException({'pre_filtering': objects, 'post_filtering': filtered, 'diff': len(objects) - len(filtered)})
+        raise MissingSentryPrivilegeException({
+            'pre_filtering': objects,
+            'post_filtering': filtered,
+            'diff': len(objects) - len(filtered)
+          }
+        )
 
     return view_func(*args, **kwargs)
   return wraps(view_func)(decorate)
@@ -98,4 +110,5 @@ def _get_table_name(path):
   name = {'database': database, 'table': table}
   if column:
     name['column'] = column
+
   return name
