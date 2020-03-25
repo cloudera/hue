@@ -65,7 +65,7 @@ def get_optimizer_url():
   return OPTIMIZER.HOSTNAME.get() and OPTIMIZER.HOSTNAME.get().strip('/')
 
 def has_optimizer():
-  return bool(OPTIMIZER.AUTH_KEY_ID.get())
+  return OPTIMIZER.INTERFACE.get() != 'navopt' or bool(OPTIMIZER.AUTH_KEY_ID.get())
 
 def has_workload_analytics():
   # Note: unused
@@ -96,7 +96,7 @@ OPTIMIZER = ConfigSection(
     INTERFACE=Config(
       key='interface',
       help=_t('Type of Optimizer connector to query, e.g. optimizer, dummy'),
-      default='optimizer'
+      default='navopt'
     ),
     HOSTNAME=Config(
       key='hostname',
