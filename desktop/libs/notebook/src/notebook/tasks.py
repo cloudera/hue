@@ -446,10 +446,13 @@ def cancel(*args, **kwargs):
 
   return {'status': status}
 
+
 def close_statement(*args, **kwargs):
   notebook = args[0]
   snippet = args[1]
-  result = download_to_file.AsyncResult(notebook['uuid'])
+  task_id = _get_query_key(notebook, snippet)
+
+  result = download_to_file.AsyncResult(task_id)
   state = result.state
   status = 0
 
@@ -466,12 +469,16 @@ def close_statement(*args, **kwargs):
     close_statement_async.apply_async(args=args, kwargs=kwargs, task_id=_close_statement_async_id(notebook, snippet))
 
   result.forget()
+
   _cleanup(notebook, snippet)
 
   return {'status': status}
 
+
 def _cleanup(notebook, snippet):
-  storage.delete(_result_key(notebook, snippet)) # TODO: abstract storage + caches
+  task_id = _get_query_key(notebook, snippet)
+
+  storage.delete(_result_key(task_id))  # TODO: abstract storage + caches
   storage.delete(_log_key(notebook, snippet))
   caches[CACHES_CELERY_KEY].delete(_fetch_progress_key(notebook, snippet))
 

@@ -2148,7 +2148,13 @@ class ApiHelper {
    */
   async closeStatement(options) {
     return new Promise(async (resolve, reject) => {
-      simplePost('/notebook/api/close_statement', await options.executable.toContext(), options)
+      simplePost(
+        '/notebook/api/close_statement',
+        {
+          operationId: options.executable.operationId
+        },
+        options
+      )
         .done(resolve)
         .fail(reject);
     });

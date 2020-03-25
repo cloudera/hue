@@ -26,7 +26,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
 
 from notebook.connectors.sql_alchemy import SqlAlchemyApi
-from notebook.tasks import run_sync_query, download_to_file
+from notebook.tasks import run_sync_query, download_to_file, close_statement
 
 if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock, MagicMock
@@ -63,11 +63,32 @@ class TestRunAsyncQueryTask():
               }.get(key, Mock())
             notebook = MagicMock()
             notebook.__getitem__.side_effect = notebook_dict
-
             snippet = MagicMock()
+
             meta = download_to_file(notebook, snippet)
 
             assert_equal(meta['row_counter'], 2, meta)
+
+
+  def test_close_statement(self):
+    with patch('notebook.tasks._get_request') as _get_request:
+      with patch('notebook.tasks.download_to_file') as download_to_file:
+
+        download_to_file.AsyncResult.return_value = Mock(
+          state=states.SUCCESS
+        )
+
+        def notebook_dict(key):
+          return {
+            'uuid': '1ca47e0d-4708-4709-82c1-a9280e15452b',
+          }.get(key, Mock())
+        notebook = MagicMock()
+        notebook.__getitem__.side_effect = notebook_dict
+        snippet = MagicMock()
+
+        response = close_statement(notebook, snippet)
+
+        assert_equal(response, {'status': 0})
 
 
 class TestRunSyncQueryTask():

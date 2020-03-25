@@ -665,7 +665,10 @@ def close_statement(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = None
-  operation_id = request.POST.get('operationId') or notebook['uuid']
+  operation_id = request.POST.get('operationId')
+
+  if operation_id and not notebook.get('uuid'):
+    notebook['uuid'] = operation_id
 
   snippet = _get_snippet(request.user, notebook, snippet, operation_id)
 
