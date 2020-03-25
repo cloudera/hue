@@ -413,6 +413,9 @@ def get_logs(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
+  if operation_id:
+    notebook['uuid'] = operation_id
+
   startFrom = request.POST.get('from')
   startFrom = int(startFrom) if startFrom else None
   size = request.POST.get('size')
