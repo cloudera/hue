@@ -157,12 +157,12 @@ class MetastoreTable {
           );
 
           this.catalogEntry
-            .getNavOptMeta()
-            .done(navOptMeta => {
-              this.optimizerDetails(navOptMeta);
+            .getOptimizerMeta()
+            .done(optimizerMeta => {
+              this.optimizerDetails(optimizerMeta);
 
               const topColIndex = {};
-              navOptMeta.topCols.forEach(topCol => {
+              optimizerMeta.topCols.forEach(topCol => {
                 topColIndex[topCol.name] = topCol;
               });
 
