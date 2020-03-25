@@ -47,6 +47,7 @@ import {
 import { EXECUTE_ACTIVE_EXECUTABLE_EVENT } from 'apps/notebook2/components/ko.executableActions';
 import { UPDATE_HISTORY_EVENT } from 'apps/notebook2/components/ko.queryHistory';
 import { GET_KNOWN_CONFIG_EVENT } from 'utils/hueConfig';
+import { cancelActiveRequest } from 'api/apiUtils';
 
 // TODO: Remove for ENABLE_NOTEBOOK_2. Temporary here for debug
 window.SqlExecutable = SqlExecutable;
@@ -892,14 +893,14 @@ export default class Snippet {
           return;
         }
 
-        apiHelper.cancelActiveRequest(lastComplexityRequest);
+        cancelActiveRequest(lastComplexityRequest);
 
         hueAnalytics.log('notebook', 'get_query_risk');
         clearActiveRisks();
 
         const changeSubscription = this.statement.subscribe(() => {
           changeSubscription.dispose();
-          apiHelper.cancelActiveRequest(lastComplexityRequest);
+          cancelActiveRequest(lastComplexityRequest);
         });
 
         const hash = this.statement().hashCode();
@@ -1344,7 +1345,7 @@ export default class Snippet {
   }
 
   async queryCompatibility(targetPlatform) {
-    apiHelper.cancelActiveRequest(this.lastCompatibilityRequest);
+    cancelActiveRequest(this.lastCompatibilityRequest);
 
     hueAnalytics.log('notebook', 'compatibility');
     this.compatibilityCheckRunning(targetPlatform !== this.dialect());
