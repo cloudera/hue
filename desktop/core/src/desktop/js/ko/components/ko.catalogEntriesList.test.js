@@ -35,7 +35,7 @@ describe('ko.catalogEntriesList.js', () => {
         getSample: () => $.Deferred().reject(),
         getSourceType: () => 'impala',
         loadNavigatorMetaForChildren: () => $.Deferred().reject(),
-        loadNavOptPopularityForChildren: () => $.Deferred().reject(),
+        loadOptimizerPopularityForChildren: () => $.Deferred().reject(),
         isTableOrView: () => false,
         isSource: () => false
       }
