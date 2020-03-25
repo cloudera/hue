@@ -14,42 +14,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import apiHelper from './apiHelper';
+import { successResponseIsError } from './apiUtils';
 
-describe('apiHelper.js', () => {
-  const subject = apiHelper;
-
+describe('apiUtils.js', () => {
   describe('success response that is actually an error', () => {
     it('should not determine that a success response is an error response if status is 0', () => {
-      expect(subject.successResponseIsError({ status: 0 })).toBeFalsy();
+      expect(successResponseIsError({ status: 0 })).toBeFalsy();
     });
 
     it('should determine that a success response is an error response if status is 1', () => {
-      expect(subject.successResponseIsError({ status: 1 })).toBeTruthy();
+      expect(successResponseIsError({ status: 1 })).toBeTruthy();
     });
 
     it('should determine that a success response is an error response if status is -1', () => {
-      expect(subject.successResponseIsError({ status: -1 })).toBeTruthy();
+      expect(successResponseIsError({ status: -1 })).toBeTruthy();
     });
 
     it('should determine that a success response is an error response if status is -3', () => {
-      expect(subject.successResponseIsError({ status: -3 })).toBeTruthy();
+      expect(successResponseIsError({ status: -3 })).toBeTruthy();
     });
 
-    it('should determine that a success response is an error response if status is 500', () => {
-      expect(subject.successResponseIsError({ status: 500 })).toBeTruthy();
+    it('determine that a success response is an error response if status is 500', () => {
+      expect(successResponseIsError({ status: 500 })).toBeTruthy();
     });
 
     it('should determine that a success response is an error response if code is 500', () => {
-      expect(subject.successResponseIsError({ code: 500 })).toBeTruthy();
+      expect(successResponseIsError({ code: 500 })).toBeTruthy();
     });
 
     it('should determine that a success response is an error response if code is 503', () => {
-      expect(subject.successResponseIsError({ code: 503 })).toBeTruthy();
+      expect(successResponseIsError({ code: 503 })).toBeTruthy();
     });
 
     it('should determine that a success response is an error response if it contains traceback', () => {
-      expect(subject.successResponseIsError({ traceback: {} })).toBeTruthy();
+      expect(successResponseIsError({ traceback: {} })).toBeTruthy();
     });
   });
 });
