@@ -535,7 +535,7 @@ class CatalogEntriesList {
       self.cancellablePromises.push(
         self
           .catalogEntry()
-          .loadNavOptPopularityForChildren({ silenceErrors: true, cancellable: true })
+          .loadOptimizerPopularityForChildren({ silenceErrors: true, cancellable: true })
           .done(popularEntries => {
             if (popularEntries.length) {
               childPromise.done(() => {
@@ -549,15 +549,15 @@ class CatalogEntriesList {
                 popularEntries.forEach(popularEntry => {
                   if (
                     entryIndex[popularEntry.name] &&
-                    popularEntry.navOptPopularity &&
-                    popularEntry.navOptPopularity.selectColumn &&
-                    popularEntry.navOptPopularity.selectColumn.columnCount > 0
+                    popularEntry.optimizerPopularity &&
+                    popularEntry.optimizerPopularity.selectColumn &&
+                    popularEntry.optimizerPopularity.selectColumn.columnCount > 0
                   ) {
-                    totalCount += popularEntry.navOptPopularity.selectColumn.columnCount;
+                    totalCount += popularEntry.optimizerPopularity.selectColumn.columnCount;
                     popularityToApply.push(() => {
                       entryIndex[popularEntry.name].popularity(
                         Math.round(
-                          (100 * popularEntry.navOptPopularity.selectColumn.columnCount) /
+                          (100 * popularEntry.optimizerPopularity.selectColumn.columnCount) /
                             totalCount
                         )
                       );

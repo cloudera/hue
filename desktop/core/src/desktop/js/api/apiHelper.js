@@ -131,7 +131,7 @@ const fetchCached = function(options) {
  * @param {string} url
  * @return {CancellablePromise}
  */
-const genericNavOptMultiTableFetch = function(apiHelper, options, url) {
+const genericOptimizerMultiTableFetch = function(apiHelper, options, url) {
   const deferred = $.Deferred();
 
   const dbTables = {};
@@ -2673,14 +2673,14 @@ class ApiHelper {
   }
 
   /**
-   * Fetches navOpt popularity for the children of the given path
+   * Fetches optimizer popularity for the children of the given path
    *
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
    * @param {string[][]} options.paths
    * @return {CancellablePromise}
    */
-  fetchNavOptPopularity(options) {
+  fetchOptimizerPopularity(options) {
     const self = this;
     const deferred = $.Deferred();
     let url, data;
@@ -2721,8 +2721,8 @@ class ApiHelper {
    * @param {string[][]} options.paths
    * @return {CancellablePromise}
    */
-  fetchNavOptTopAggs(options) {
-    return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_AGGS);
+  fetchOptimizerTopAggs(options) {
+    return genericOptimizerMultiTableFetch(this, options, NAV_OPT_URLS.TOP_AGGS);
   }
 
   /**
@@ -2733,8 +2733,8 @@ class ApiHelper {
    * @param {string[][]} options.paths
    * @return {CancellablePromise}
    */
-  fetchNavOptTopColumns(options) {
-    return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_COLUMNS);
+  fetchOptimizerTopColumns(options) {
+    return genericOptimizerMultiTableFetch(this, options, NAV_OPT_URLS.TOP_COLUMNS);
   }
 
   /**
@@ -2745,8 +2745,8 @@ class ApiHelper {
    * @param {string[][]} options.paths
    * @return {CancellablePromise}
    */
-  fetchNavOptTopFilters(options) {
-    return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_FILTERS);
+  fetchOptimizerTopFilters(options) {
+    return genericOptimizerMultiTableFetch(this, options, NAV_OPT_URLS.TOP_FILTERS);
   }
 
   /**
@@ -2757,12 +2757,12 @@ class ApiHelper {
    * @param {string[][]} options.paths
    * @return {CancellablePromise}
    */
-  fetchNavOptTopJoins(options) {
-    return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_JOINS);
+  fetchOptimizerTopJoins(options) {
+    return genericOptimizerMultiTableFetch(this, options, NAV_OPT_URLS.TOP_JOINS);
   }
 
   /**
-   * Fetches navOpt meta for the given path, only possible for tables atm.
+   * Fetches optimizer meta for the given path, only possible for tables atm.
    *
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
@@ -2770,7 +2770,7 @@ class ApiHelper {
    *
    * @return {CancellablePromise}
    */
-  fetchNavOptMeta(options) {
+  fetchOptimizerMeta(options) {
     const self = this;
     const deferred = $.Deferred();
 

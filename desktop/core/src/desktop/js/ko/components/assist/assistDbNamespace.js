@@ -108,14 +108,14 @@ class AssistDbNamespace {
     self.selectedDatabase.subscribe(() => {
       const db = self.selectedDatabase();
       if (window.HAS_OPTIMIZER && db && !db.popularityIndexSet && !self.nonSqlType) {
-        db.catalogEntry.loadNavOptPopularityForChildren({ silenceErrors: true }).done(() => {
+        db.catalogEntry.loadOptimizerPopularityForChildren({ silenceErrors: true }).done(() => {
           const applyPopularity = () => {
             db.entries().forEach(entry => {
               if (
-                entry.catalogEntry.navOptPopularity &&
-                entry.catalogEntry.navOptPopularity.popularity >= 5
+                entry.catalogEntry.optimizerPopularity &&
+                entry.catalogEntry.optimizerPopularity.popularity >= 5
               ) {
-                entry.popularity(entry.catalogEntry.navOptPopularity.popularity);
+                entry.popularity(entry.catalogEntry.optimizerPopularity.popularity);
               }
             });
           };

@@ -150,15 +150,15 @@ const reloadSample = function(dataCatalogEntry, apiOptions) {
  *
  * @return {CancellablePromise}
  */
-const reloadNavOptMeta = function(dataCatalogEntry, apiOptions) {
-  if (dataCatalogEntry.dataCatalog.canHaveNavOptMetadata()) {
+const reloadOptimizerMeta = function(dataCatalogEntry, apiOptions) {
+  if (dataCatalogEntry.dataCatalog.canHaveOptimizerMeta()) {
     return dataCatalogEntry.trackedPromise(
-      'navOptMetaPromise',
-      catalogUtils.fetchAndSave('fetchNavOptMeta', 'navOptMeta', dataCatalogEntry, apiOptions)
+      'optimizerMetaPromise',
+      catalogUtils.fetchAndSave('fetchOptimizerMeta', 'optimizerMeta', dataCatalogEntry, apiOptions)
     );
   }
-  dataCatalogEntry.navOptMetaPromise = $.Deferred.reject().promise();
-  return dataCatalogEntry.navOptMetaPromise;
+  dataCatalogEntry.optimizerMetaPromise = $.Deferred.reject().promise();
+  return dataCatalogEntry.optimizerMetaPromise;
 };
 
 /**
@@ -256,12 +256,12 @@ class DataCatalogEntry {
     self.sample = undefined;
     self.samplePromise = undefined;
 
-    self.navOptPopularity = undefined;
-    self.navOptMeta = undefined;
-    self.navOptMetaPromise = undefined;
+    self.optimizerPopularity = undefined;
+    self.optimizerMeta = undefined;
+    self.optimizerMetaPromise = undefined;
 
     self.navigatorMetaForChildrenPromise = undefined;
-    self.navOptPopularityForChildrenPromise = undefined;
+    self.optimizerPopularityForChildrenPromise = undefined;
 
     self.childrenPromise = undefined;
 
@@ -273,7 +273,7 @@ class DataCatalogEntry {
       });
       if (parent) {
         parent.navigatorMetaForChildrenPromise = undefined;
-        parent.navOptPopularityForChildrenPromise = undefined;
+        parent.optimizerPopularityForChildrenPromise = undefined;
       }
     }
   }
@@ -339,8 +339,8 @@ class DataCatalogEntry {
         .promise();
     }
 
-    if (self.definition && self.definition.navOptLoaded) {
-      delete self.definition.navOptLoaded;
+    if (self.definition && self.definition.optimizerLoaded) {
+      delete self.definition.optimizerLoaded;
     }
 
     self.reset();
@@ -651,13 +651,13 @@ class DataCatalogEntry {
    *
    * @return {CancellablePromise}
    */
-  applyNavOptResponseToChildren(response, options) {
+  applyOptimizerResponseToChildren(response, options) {
     const self = this;
     const deferred = $.Deferred();
     if (!self.definition) {
       self.definition = {};
     }
-    self.definition.navOptLoaded = true;
+    self.definition.optimizerLoaded = true;
     self.saveLater();
 
     const childPromise = self
@@ -673,21 +673,21 @@ class DataCatalogEntry {
           response.top_tables.forEach(topTable => {
             const matchingChild = entriesByName[topTable.name.toLowerCase()];
             if (matchingChild) {
-              matchingChild.navOptPopularity = topTable;
+              matchingChild.optimizerPopularity = topTable;
               matchingChild.saveLater();
               updatedIndex[matchingChild.getQualifiedPath()] = matchingChild;
             }
           });
         } else if (self.isTableOrView() && response.values) {
-          const addNavOptPopularity = function(columns, type) {
+          const addOptimizerPopularity = function(columns, type) {
             if (columns) {
               columns.forEach(column => {
                 const matchingChild = entriesByName[column.columnName.toLowerCase()];
                 if (matchingChild) {
-                  if (!matchingChild.navOptPopularity) {
-                    matchingChild.navOptPopularity = {};
+                  if (!matchingChild.optimizerPopularity) {
+                    matchingChild.optimizerPopularity = {};
                   }
-                  matchingChild.navOptPopularity[type] = column;
+                  matchingChild.optimizerPopularity[type] = column;
                   matchingChild.saveLater();
                   updatedIndex[matchingChild.getQualifiedPath()] = matchingChild;
                 }
@@ -695,11 +695,11 @@ class DataCatalogEntry {
             }
           };
 
-          addNavOptPopularity(response.values.filterColumns, 'filterColumn');
-          addNavOptPopularity(response.values.groupbyColumns, 'groupByColumn');
-          addNavOptPopularity(response.values.joinColumns, 'joinColumn');
-          addNavOptPopularity(response.values.orderbyColumns, 'orderByColumn');
-          addNavOptPopularity(response.values.selectColumns, 'selectColumn');
+          addOptimizerPopularity(response.values.filterColumns, 'filterColumn');
+          addOptimizerPopularity(response.values.groupbyColumns, 'groupByColumn');
+          addOptimizerPopularity(response.values.joinColumns, 'joinColumn');
+          addOptimizerPopularity(response.values.orderbyColumns, 'orderByColumn');
+          addOptimizerPopularity(response.values.selectColumns, 'selectColumn');
         }
         const popularEntries = [];
         Object.keys(updatedIndex).forEach(path => {
@@ -722,29 +722,29 @@ class DataCatalogEntry {
    *
    * @return {CancellablePromise}
    */
-  loadNavOptPopularityForChildren(options) {
+  loadOptimizerPopularityForChildren(options) {
     const self = this;
 
     options = catalogUtils.setSilencedErrors(options);
 
-    if (!self.dataCatalog.canHaveNavOptMetadata()) {
+    if (!self.dataCatalog.canHaveOptimizerMeta()) {
       return $.Deferred()
         .reject()
         .promise();
     }
-    if (self.navOptPopularityForChildrenPromise && (!options || !options.refreshCache)) {
-      return catalogUtils.applyCancellable(self.navOptPopularityForChildrenPromise, options);
+    if (self.optimizerPopularityForChildrenPromise && (!options || !options.refreshCache)) {
+      return catalogUtils.applyCancellable(self.optimizerPopularityForChildrenPromise, options);
     }
     const deferred = $.Deferred();
     const cancellablePromises = [];
-    if (self.definition && self.definition.navOptLoaded && (!options || !options.refreshCache)) {
+    if (self.definition && self.definition.optimizerLoaded && (!options || !options.refreshCache)) {
       cancellablePromises.push(
         self
           .getChildren(options)
           .done(childEntries => {
             deferred.resolve(
               childEntries.filter(entry => {
-                return entry.navOptPopularity;
+                return entry.optimizerPopularity;
               })
             );
           })
@@ -753,7 +753,7 @@ class DataCatalogEntry {
     } else if (self.isDatabase() || self.isTableOrView()) {
       cancellablePromises.push(
         apiHelper
-          .fetchNavOptPopularity({
+          .fetchOptimizerPopularity({
             silenceErrors: options && options.silenceErrors,
             refreshCache: options && options.refreshCache,
             paths: [self.path]
@@ -761,7 +761,7 @@ class DataCatalogEntry {
           .done(data => {
             cancellablePromises.push(
               self
-                .applyNavOptResponseToChildren(data, options)
+                .applyOptimizerResponseToChildren(data, options)
                 .done(deferred.resolve)
                 .fail(deferred.reject)
             );
@@ -774,7 +774,7 @@ class DataCatalogEntry {
 
     return catalogUtils.applyCancellable(
       self.trackedPromise(
-        'navOptPopularityForChildrenPromise',
+        'optimizerPopularityForChildrenPromise',
         new CancellablePromise(deferred, undefined, cancellablePromises)
       ),
       options
@@ -1588,29 +1588,29 @@ class DataCatalogEntry {
    *
    * @return {CancellablePromise}
    */
-  getNavOptMeta(options) {
+  getOptimizerMeta(options) {
     const self = this;
 
     options = catalogUtils.setSilencedErrors(options);
 
-    if (!self.dataCatalog.canHaveNavOptMetadata() || !self.isTableOrView()) {
+    if (!self.dataCatalog.canHaveOptimizerMeta() || !self.isTableOrView()) {
       return $.Deferred()
         .reject()
         .promise();
     }
     if (options && options.cachedOnly) {
       return (
-        catalogUtils.applyCancellable(self.navOptMetaPromise, options) ||
+        catalogUtils.applyCancellable(self.optimizerMetaPromise, options) ||
         $.Deferred()
           .reject(false)
           .promise()
       );
     }
     if (options && options.refreshCache) {
-      return catalogUtils.applyCancellable(reloadNavOptMeta(self, options), options);
+      return catalogUtils.applyCancellable(reloadOptimizerMeta(self, options), options);
     }
     return catalogUtils.applyCancellable(
-      self.navOptMetaPromise || reloadNavOptMeta(self, options),
+      self.optimizerMetaPromise || reloadOptimizerMeta(self, options),
       options
     );
   }

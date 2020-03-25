@@ -88,8 +88,8 @@ const mergeEntry = function(dataCatalogEntry, storeEntry) {
   mergeAttribute('partitions', CACHEABLE_TTL.default, 'partitionsPromise');
   mergeAttribute('sample', CACHEABLE_TTL.default, 'samplePromise');
   mergeAttribute('navigatorMeta', CACHEABLE_TTL.default, 'navigatorMetaPromise');
-  mergeAttribute('navOptMeta', CACHEABLE_TTL.optimizer, 'navOptMetaPromise');
-  mergeAttribute('navOptPopularity', CACHEABLE_TTL.optimizer);
+  mergeAttribute('optimizerMeta', CACHEABLE_TTL.optimizer, 'optimizerMetaPromise');
+  mergeAttribute('optimizerPopularity', CACHEABLE_TTL.optimizer);
 };
 
 /**
@@ -156,11 +156,11 @@ class DataCatalog {
   }
 
   /**
-   * Returns true if the catalog can have NavOpt metadata
+   * Returns true if the catalog can have Optimizer metadata
    *
    * @return {boolean}
    */
-  canHaveNavOptMetadata() {
+  canHaveOptimizerMeta() {
     const self = this;
     return HAS_OPTIMIZER && (self.sourceType === 'hive' || self.sourceType === 'impala');
   }
@@ -243,8 +243,8 @@ class DataCatalog {
         partitions: dataCatalogEntry.partitions,
         sample: dataCatalogEntry.sample,
         navigatorMeta: dataCatalogEntry.navigatorMeta,
-        navOptMeta: dataCatalogEntry.navOptMeta,
-        navOptPopularity: dataCatalogEntry.navOptPopularity
+        optimizerMeta: dataCatalogEntry.optimizerMeta,
+        optimizerPopularity: dataCatalogEntry.optimizerPopularity
       })
       .then(deferred.resolve)
       .catch(deferred.reject);
@@ -264,7 +264,7 @@ class DataCatalog {
    *
    * @return {CancellablePromise}
    */
-  loadNavOptPopularityForTables(options) {
+  loadOptimizerPopularityForTables(options) {
     const self = this;
     const deferred = $.Deferred();
     const cancellablePromises = [];
@@ -279,20 +279,20 @@ class DataCatalog {
       self
         .getEntry({ namespace: options.namespace, compute: options.compute, path: path })
         .done(tableEntry => {
-          if (tableEntry.navOptPopularityForChildrenPromise) {
-            tableEntry.navOptPopularityForChildrenPromise
+          if (tableEntry.optimizerPopularityForChildrenPromise) {
+            tableEntry.optimizerPopularityForChildrenPromise
               .done(existingPopularEntries => {
                 popularEntries = popularEntries.concat(existingPopularEntries);
                 existingDeferred.resolve();
               })
               .fail(existingDeferred.reject);
-          } else if (tableEntry.definition && tableEntry.definition.navOptLoaded) {
+          } else if (tableEntry.definition && tableEntry.definition.optimizerLoaded) {
             cancellablePromises.push(
               tableEntry
                 .getChildren(options)
                 .done(childEntries => {
                   childEntries.forEach(childEntry => {
-                    if (childEntry.navOptPopularity) {
+                    if (childEntry.optimizerPopularity) {
                       popularEntries.push(childEntry);
                     }
                   });
@@ -314,14 +314,14 @@ class DataCatalog {
       if (pathsToLoad.length) {
         cancellablePromises.push(
           apiHelper
-            .fetchNavOptPopularity({
+            .fetchOptimizerPopularity({
               silenceErrors: options.silenceErrors,
               paths: pathsToLoad
             })
             .done(data => {
               const perTable = {};
 
-              const splitNavOptValuesPerTable = function(listName) {
+              const splitOptimizerValuesPerTable = function(listName) {
                 if (data.values[listName]) {
                   data.values[listName].forEach(column => {
                     let tableMeta = perTable[column.dbName + '.' + column.tableName];
@@ -338,11 +338,11 @@ class DataCatalog {
               };
 
               if (data.values) {
-                splitNavOptValuesPerTable('filterColumns');
-                splitNavOptValuesPerTable('groupbyColumns');
-                splitNavOptValuesPerTable('joinColumns');
-                splitNavOptValuesPerTable('orderbyColumns');
-                splitNavOptValuesPerTable('selectColumns');
+                splitOptimizerValuesPerTable('filterColumns');
+                splitOptimizerValuesPerTable('groupbyColumns');
+                splitOptimizerValuesPerTable('joinColumns');
+                splitOptimizerValuesPerTable('orderbyColumns');
+                splitOptimizerValuesPerTable('selectColumns');
               }
 
               const tablePromises = [];
@@ -354,9 +354,9 @@ class DataCatalog {
                   .done(entry => {
                     cancellablePromises.push(
                       entry.trackedPromise(
-                        'navOptPopularityForChildrenPromise',
+                        'optimizerPopularityForChildrenPromise',
                         entry
-                          .applyNavOptResponseToChildren(perTable[path], options)
+                          .applyOptimizerResponseToChildren(perTable[path], options)
                           .done(entries => {
                             popularEntries = popularEntries.concat(entries);
                             tableDeferred.resolve();
@@ -464,7 +464,7 @@ class DataCatalog {
         path: [],
         definition: {
           index: 0,
-          navOptLoaded: true,
+          optimizerLoaded: true,
           type: 'source'
         }
       });
@@ -494,7 +494,7 @@ class DataCatalog {
             path: ['default'],
             definition: {
               index: 0,
-              navOptLoaded: true,
+              optimizerLoaded: true,
               type: 'database'
             }
           });
@@ -526,7 +526,7 @@ class DataCatalog {
                 comment: '',
                 index: 0,
                 name: options.name,
-                navOptLoaded: true,
+                optimizerLoaded: true,
                 type: 'table'
               }
             });
