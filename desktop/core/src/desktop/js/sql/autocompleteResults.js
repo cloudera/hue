@@ -26,6 +26,7 @@ import I18n from 'utils/i18n';
 import sqlUtils from 'sql/sqlUtils';
 import { SqlSetOptions, SqlFunctions } from 'sql/sqlFunctions';
 import { DIALECT } from 'apps/notebook2/snippet';
+import { cancelActiveRequest } from 'api/apiUtils';
 
 const normalizedColors = HueColors.getNormalizedColors();
 
@@ -417,7 +418,7 @@ class AutocompleteResults {
     const self = this;
 
     while (self.lastKnownRequests.length) {
-      apiHelper.cancelActiveRequest(self.lastKnownRequests.pop());
+      cancelActiveRequest(self.lastKnownRequests.pop());
     }
 
     while (self.cancellablePromises.length) {

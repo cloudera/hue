@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import apiHelper from 'api/apiHelper';
+import { cancelActiveRequest } from './apiUtils';
 
 class CancellablePromise {
   constructor(deferred, request, otherCancellables) {
@@ -53,7 +53,7 @@ class CancellablePromise {
 
     self.cancelled = true;
     if (self.request) {
-      apiHelper.cancelActiveRequest(self.request);
+      cancelActiveRequest(self.request);
     }
 
     if (self.state && self.state() === 'pending' && self.deferred.reject) {

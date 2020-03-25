@@ -18,6 +18,7 @@ import $ from 'jquery';
 
 import ApiHelper from 'api/apiHelper';
 import sessionManager from './sessionManager';
+import * as ApiUtils from 'api/apiUtils';
 
 describe('sessionManager.js', () => {
   let spy;
@@ -104,7 +105,7 @@ describe('sessionManager.js', () => {
     expect(sessionManager.hasSession('impala')).toBeTruthy();
 
     // Close the session
-    const postSpy = jest.spyOn(ApiHelper, 'simplePost').mockImplementation((url, data, options) => {
+    const postSpy = jest.spyOn(ApiUtils, 'simplePost').mockImplementation((url, data, options) => {
       expect(JSON.parse(data.session).session_id).toEqual(session.session_id);
       expect(options.silenceErrors).toBeTruthy();
       expect(url).toEqual('/notebook/api/close_session');
@@ -114,7 +115,7 @@ describe('sessionManager.js', () => {
 
     expect(sessionManager.hasSession('impala')).toBeFalsy();
     expect(ApiHelper.createSession).toHaveBeenCalledTimes(1);
-    expect(ApiHelper.simplePost).toHaveBeenCalledTimes(1);
+    expect(ApiUtils.simplePost).toHaveBeenCalledTimes(1);
     postSpy.mockClear();
   });
 
@@ -129,7 +130,7 @@ describe('sessionManager.js', () => {
 
     // Restart the session
     const postSpy = jest
-      .spyOn(ApiHelper, 'simplePost')
+      .spyOn(ApiUtils, 'simplePost')
       .mockReturnValue(new $.Deferred().resolve().promise());
     session = await sessionManager.restartSession(session);
 
@@ -137,7 +138,7 @@ describe('sessionManager.js', () => {
     expect(sessionManager.hasSession('impala')).toBeTruthy();
 
     expect(ApiHelper.createSession).toHaveBeenCalledTimes(2);
-    expect(ApiHelper.simplePost).toHaveBeenCalledTimes(1);
+    expect(ApiUtils.simplePost).toHaveBeenCalledTimes(1);
     postSpy.mockClear();
   });
 });
