@@ -1801,7 +1801,8 @@ class ApiHelper {
       snippet: options.snippetJson,
       from: options.from,
       jobs: options.jobsJson,
-      full_log: options.fullLog
+      full_log: options.fullLog,
+      operationId: options.executable.operationId
     };
     return simplePost('/notebook/api/get_logs', data);
   }
@@ -2021,6 +2022,7 @@ class ApiHelper {
       data.full_log = options.fullLog;
       data.jobs = options.jobs && JSON.stringify(options.jobs);
       data.from = options.from || 0;
+      data.operationId = options.executable.operationId;
       const request = simplePost('/notebook/api/get_logs', data, options)
         .done(response => {
           resolve({

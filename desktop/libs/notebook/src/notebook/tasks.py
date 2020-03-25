@@ -333,6 +333,7 @@ def progress(notebook, snippet, logs=None, **kwargs):
   info = result.info
   snippet['result']['handle'] = info.get('handle', {}).copy()
   request = _get_request(**kwargs)
+
   api = get_api(request, snippet)
 
   return api.progress(notebook, snippet, logs=logs)
