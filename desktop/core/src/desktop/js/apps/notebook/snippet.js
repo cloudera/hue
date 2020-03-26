@@ -182,7 +182,7 @@ class Snippet {
     self.connector = ko.pureComputed(() => {
       // To support optimizer changes in editor v2
       if (self.type() === 'hive' || self.type() === 'impala') {
-        return { optimizer: 'api' };
+        return { optimizer: 'api', type: self.type() };
       }
       return {};
     });
