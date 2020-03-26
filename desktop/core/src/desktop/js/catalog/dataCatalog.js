@@ -17,12 +17,12 @@
 import $ from 'jquery';
 import localforage from 'localforage';
 
-import apiHelper from 'api/apiHelper';
 import CancellablePromise from 'api/cancellablePromise';
 import catalogUtils from 'catalog/catalogUtils';
 import DataCatalogEntry from 'catalog/dataCatalogEntry';
 import GeneralDataCatalog from 'catalog/generalDataCatalog';
 import MultiTableEntry from 'catalog/multiTableEntry';
+import { fetchPopularity } from './optimizer/optimizerApiHelper';
 
 const STORAGE_POSTFIX = window.LOGGED_USERNAME;
 const DATA_CATALOG_VERSION = 5;
@@ -313,11 +313,10 @@ class DataCatalog {
       const loadDeferred = $.Deferred();
       if (pathsToLoad.length) {
         cancellablePromises.push(
-          apiHelper
-            .fetchOptimizerPopularity({
-              silenceErrors: options.silenceErrors,
-              paths: pathsToLoad
-            })
+          fetchPopularity({
+            silenceErrors: options.silenceErrors,
+            paths: pathsToLoad
+          })
             .done(data => {
               const perTable = {};
 

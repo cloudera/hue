@@ -17,6 +17,12 @@
 import $ from 'jquery';
 
 import catalogUtils from 'catalog/catalogUtils';
+import {
+  fetchTopAggs,
+  fetchTopColumns,
+  fetchTopFilters,
+  fetchTopJoins
+} from './optimizer/optimizerApiHelper';
 
 /**
  * Helper function to reload a Optimizer multi table attribute, like topAggs or topFilters
@@ -26,7 +32,7 @@ import catalogUtils from 'catalog/catalogUtils';
  * @param {boolean} [options.silenceErrors] - Default true
  * @param {string} promiseAttribute
  * @param {string} dataAttribute
- * @param {string} apiHelperFunction
+ * @param {Function} apiHelperFunction
  * @return {CancellablePromise}
  */
 const genericOptimizerReload = function(
@@ -57,7 +63,7 @@ const genericOptimizerReload = function(
  * @param {boolean} [options.cancellable] - Default false
  * @param {string} promiseAttribute
  * @param {string} dataAttribute
- * @param {string} apiHelperFunction
+ * @param {Function} apiHelperFunction
  * @return {CancellablePromise}
  */
 const genericOptimizerGet = function(
@@ -180,7 +186,7 @@ class MultiTableEntry {
    */
   getTopAggs(options) {
     const self = this;
-    return genericOptimizerGet(self, options, 'topAggsPromise', 'topAggs', 'fetchOptimizerTopAggs');
+    return genericOptimizerGet(self, options, 'topAggsPromise', 'topAggs', fetchTopAggs);
   }
 
   /**
@@ -196,13 +202,7 @@ class MultiTableEntry {
    */
   getTopColumns(options) {
     const self = this;
-    return genericOptimizerGet(
-      self,
-      options,
-      'topColumnsPromise',
-      'topColumns',
-      'fetchOptimizerTopColumns'
-    );
+    return genericOptimizerGet(self, options, 'topColumnsPromise', 'topColumns', fetchTopColumns);
   }
 
   /**
@@ -218,13 +218,7 @@ class MultiTableEntry {
    */
   getTopFilters(options) {
     const self = this;
-    return genericOptimizerGet(
-      self,
-      options,
-      'topFiltersPromise',
-      'topFilters',
-      'fetchOptimizerTopFilters'
-    );
+    return genericOptimizerGet(self, options, 'topFiltersPromise', 'topFilters', fetchTopFilters);
   }
 
   /**
@@ -240,13 +234,7 @@ class MultiTableEntry {
    */
   getTopJoins(options) {
     const self = this;
-    return genericOptimizerGet(
-      self,
-      options,
-      'topJoinsPromise',
-      'topJoins',
-      'fetchOptimizerTopJoins'
-    );
+    return genericOptimizerGet(self, options, 'topJoinsPromise', 'topJoins', fetchTopJoins);
   }
 }
 

@@ -22,6 +22,7 @@ import CancellablePromise from 'api/cancellablePromise';
 import catalogUtils from 'catalog/catalogUtils';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
+import { fetchOptimizerMeta, fetchPopularity } from './optimizer/optimizerApiHelper';
 
 /**
  * Helper function to reload the source meta for the given entry
@@ -154,7 +155,7 @@ const reloadOptimizerMeta = function(dataCatalogEntry, apiOptions) {
   if (dataCatalogEntry.dataCatalog.canHaveOptimizerMeta()) {
     return dataCatalogEntry.trackedPromise(
       'optimizerMetaPromise',
-      catalogUtils.fetchAndSave('fetchOptimizerMeta', 'optimizerMeta', dataCatalogEntry, apiOptions)
+      catalogUtils.fetchAndSave(fetchOptimizerMeta, 'optimizerMeta', dataCatalogEntry, apiOptions)
     );
   }
   dataCatalogEntry.optimizerMetaPromise = $.Deferred.reject().promise();
@@ -752,12 +753,11 @@ class DataCatalogEntry {
       );
     } else if (self.isDatabase() || self.isTableOrView()) {
       cancellablePromises.push(
-        apiHelper
-          .fetchOptimizerPopularity({
-            silenceErrors: options && options.silenceErrors,
-            refreshCache: options && options.refreshCache,
-            paths: [self.path]
-          })
+        fetchPopularity({
+          silenceErrors: options && options.silenceErrors,
+          refreshCache: options && options.refreshCache,
+          paths: [self.path]
+        })
           .done(data => {
             cancellablePromises.push(
               self
