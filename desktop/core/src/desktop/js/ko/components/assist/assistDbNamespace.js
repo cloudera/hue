@@ -27,6 +27,7 @@ class AssistDbNamespace {
    * @param {Object} options
    * @param {Object} options.i18n
    * @param {string} options.sourceType
+   * @param {Connector} options.connector
    * @param {ContextNamespace} options.namespace
    * @param {boolean} options.nonSqlType - Optional, default false
    * @param {Object} options.navigationSettings
@@ -38,6 +39,7 @@ class AssistDbNamespace {
     self.i18n = options.i18n;
     self.navigationSettings = options.navigationSettings;
     self.sourceType = options.sourceType;
+    self.connector = options.connector;
     self.nonSqlType = options.nonSqlType;
 
     self.namespace = options.namespace;
@@ -218,6 +220,7 @@ class AssistDbNamespace {
           sourceType: self.sourceType,
           namespace: self.namespace,
           compute: self.compute(),
+          connector: self.connector,
           path: [],
           definition: { type: 'source' }
         })

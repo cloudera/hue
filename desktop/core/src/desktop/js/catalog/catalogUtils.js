@@ -27,7 +27,9 @@ import apiHelper from 'api/apiHelper';
  */
 const fetchAndSave = (apiHelperFunction, attributeName, entry, apiOptions) => {
   const func =
-    typeof apiHelperFunction === 'string' ? apiHelper[apiHelperFunction] : apiHelperFunction;
+    typeof apiHelperFunction === 'string'
+      ? apiHelper[apiHelperFunction].bind(apiHelper)
+      : apiHelperFunction;
 
   return func({
     sourceType: entry.dataCatalog.sourceType,

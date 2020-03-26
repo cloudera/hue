@@ -143,6 +143,7 @@ class PollingCatalogEntriesList {
         sourceType: ko.unwrap(self.sourceType),
         namespace: ko.unwrap(self.namespace),
         compute: ko.unwrap(self.compute),
+        connector: {}, // TODO: Use connectors in polling catalog entries list
         path: ko.unwrap(self.path)
       })
       .done(catalogEntry => {
