@@ -338,6 +338,7 @@ def get_interpreter(connector_type, user=None):
   interpreter = [
     interpreter for interpreter in get_ordered_interpreters(user) if connector_type == interpreter['type']
   ]
+
   if not interpreter:
     if connector_type == 'hbase': # TODO move to connectors
       interpreter = [{

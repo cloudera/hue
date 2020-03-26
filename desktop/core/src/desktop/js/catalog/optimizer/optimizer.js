@@ -16,16 +16,18 @@
 
 import ApiStrategy from './apiStrategy';
 import BaseStrategy from './baseStrategy';
+import LocalStrategy from './localStrategy';
 
 const OPTIMIZER_STRATEGIES = {
   api: ApiStrategy,
-  off: BaseStrategy
+  off: BaseStrategy,
+  local: LocalStrategy
 };
 
 export const getOptimizer = connector => {
   // Can remove window.OPTIMIZER_MODE and hardcoded { optimizer: 'api' } when 'connector.optimizer_mode' works.
   const strategy =
-    connector && connector.optimizer && OPTIMIZER_STRATEGIES[window.OPTIMIZER_MODE]
+    window.OPTIMIZER_MODE && OPTIMIZER_STRATEGIES[window.OPTIMIZER_MODE]
       ? OPTIMIZER_STRATEGIES[window.OPTIMIZER_MODE]
       : OPTIMIZER_STRATEGIES.off;
 
