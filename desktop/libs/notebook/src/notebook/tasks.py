@@ -134,7 +134,8 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
 
     if TASK_SERVER.RESULT_CACHE.get():
       with storage.open(result_key, 'r') as f:
-        csv_reader = csv.reader(f, delimiter=',')
+        delimiter = ',' if sys.version_info[0] > 2 else ','.encode('utf-8')
+        csv_reader = csv.reader(f, delimiter=delimiter)
         caches[CACHES_CELERY_QUERY_RESULT_KEY].set(result_key, [row for row in csv_reader], 60 * 5)
 
     meta['row_counter'] = content_generator.row_counter
@@ -401,7 +402,8 @@ def _get_data(task_id):
     csv_reader = csv_reader[1:]
   else:
     f = storage.open(result_key)
-    csv_reader = csv.reader(f, delimiter=','.encode('utf-8'))
+    delimiter = ',' if sys.version_info[0] > 2 else ','.encode('utf-8')
+    csv_reader = csv.reader(f, delimiter=delimiter)
     headers = next(csv_reader, [])
 
   return headers, csv_reader
