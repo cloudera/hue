@@ -361,8 +361,8 @@ class TestUserAdminMetrics(BaseUserAdminTests):
       response = c.get('/desktop/metrics/', {'format': 'json'})
 
       metric = json.loads(response.content)['metric']
-      assert_equal(3, metric['users.active']['value'])
-      assert_equal(2, metric['users.active.instance']['value'])
+      assert_equal(3, metric['users.active.total']['value'])
+      assert_equal(2, metric['users.active']['value'])
 
 
   @override_settings(AUTHENTICATION_BACKENDS=['desktop.auth.backend.AllowFirstUserDjangoBackend'])
