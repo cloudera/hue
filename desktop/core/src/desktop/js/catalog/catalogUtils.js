@@ -30,13 +30,13 @@ const fetchAndSave = (apiHelperFunction, attributeName, entry, apiOptions) => {
     typeof apiHelperFunction === 'string'
       ? apiHelper[apiHelperFunction].bind(apiHelper)
       : apiHelperFunction;
-
   return func({
     sourceType: entry.dataCatalog.sourceType,
     compute: entry.compute,
     path: entry.path, // Set for DataCatalogEntry
     paths: entry.paths, // Set for MultiTableEntry
     silenceErrors: apiOptions && apiOptions.silenceErrors,
+    connector: entry.dataCatalog.connector,
     isView: entry.isView && entry.isView() // MultiTable entries don't have this property
   }).done(data => {
     entry[attributeName] = data;
