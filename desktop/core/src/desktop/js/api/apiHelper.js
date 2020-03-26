@@ -84,39 +84,6 @@ export const LINK_SHARING_PERMS = {
 };
 
 /**
- * Fetches the popularity for various aspects of the given tables
- *
- * @param {ApiHelper} apiHelper
- * @param {Object} options
- * @param {boolean} [options.silenceErrors]
- * @param {string[][]} options.paths
- * @param {string} url
- * @return {CancellablePromise}
- */
-const genericOptimizerMultiTableFetch = (apiHelper, options, url) => {
-  const deferred = $.Deferred();
-
-  const dbTables = {};
-  options.paths.forEach(path => {
-    dbTables[path.join('.')] = true;
-  });
-  const data = {
-    dbTables: ko.mapping.toJSON(Object.keys(dbTables))
-  };
-
-  const request = simplePost(url, data, {
-    silenceErrors: options.silenceErrors,
-    successCallback: data => {
-      data.hueTimestamp = Date.now();
-      deferred.resolve(data);
-    },
-    errorCallback: deferred.reject
-  });
-
-  return new CancellablePromise(deferred, request);
-};
-
-/**
  * Wrapper around the response from the Query API
  *
  * @param {string} sourceType
@@ -1828,14 +1795,6 @@ class ApiHelper {
     return simplePost('/notebook/api/fetch_result_size', data);
   }
 
-  statementRisk(options) {
-    const data = {
-      notebook: options.notebookJson,
-      snippet: options.snippetJson
-    };
-    return simplePost('/notebook/api/optimizer/statement/risk', data);
-  }
-
   getLogs(options) {
     const data = {
       notebook: options.notebookJson,
@@ -1845,25 +1804,6 @@ class ApiHelper {
       full_log: options.fullLog
     };
     return simplePost('/notebook/api/get_logs', data);
-  }
-
-  statementCompatibility(options) {
-    const data = {
-      notebook: options.notebookJson,
-      snippet: options.snippetJson,
-      sourcePlatform: options.sourcePlatform,
-      targetPlatform: options.targetPlatform
-    };
-    return simplePost('/notebook/api/optimizer/statement/compatibility', data);
-  }
-
-  statementSimilarity(options) {
-    const data = {
-      notebook: options.notebookJson,
-      snippet: options.snippetJson,
-      sourcePlatform: options.sourcePlatform
-    };
-    return simplePost('/notebook/api/optimizer/statement/similarity', data);
   }
 
   async saveNotebook(options) {
@@ -2463,129 +2403,6 @@ class ApiHelper {
       id: ko.mapping.toJSON(entityId),
       tags: ko.mapping.toJSON(tags)
     });
-  }
-
-  /**
-   * Fetches optimizer popularity for the children of the given path
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {string[][]} options.paths
-   * @return {CancellablePromise}
-   */
-  fetchOptimizerPopularity(options) {
-    const deferred = $.Deferred();
-    let url, data;
-
-    if (options.paths.length === 1 && options.paths[0].length === 1) {
-      url = NAV_OPT_URLS.TOP_TABLES;
-      data = {
-        database: options.paths[0][0]
-      };
-    } else {
-      url = NAV_OPT_URLS.TOP_COLUMNS;
-      const dbTables = [];
-      options.paths.forEach(path => {
-        dbTables.push(path.join('.'));
-      });
-      data = {
-        dbTables: ko.mapping.toJSON(dbTables)
-      };
-    }
-
-    const request = simplePost(url, data, {
-      silenceErrors: options.silenceErrors,
-      successCallback: data => {
-        data.hueTimestamp = Date.now();
-        deferred.resolve(data);
-      },
-      errorCallback: deferred.reject
-    });
-
-    return new CancellablePromise(deferred, request);
-  }
-
-  /**
-   * Fetches the popular aggregate functions for the given tables
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {string[][]} options.paths
-   * @return {CancellablePromise}
-   */
-  fetchOptimizerTopAggs(options) {
-    return genericOptimizerMultiTableFetch(this, options, NAV_OPT_URLS.TOP_AGGS);
-  }
-
-  /**
-   * Fetches the popular columns for the given tables
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {string[][]} options.paths
-   * @return {CancellablePromise}
-   */
-  fetchOptimizerTopColumns(options) {
-    return genericOptimizerMultiTableFetch(this, options, NAV_OPT_URLS.TOP_COLUMNS);
-  }
-
-  /**
-   * Fetches the popular filters for the given tables
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {string[][]} options.paths
-   * @return {CancellablePromise}
-   */
-  fetchOptimizerTopFilters(options) {
-    return genericOptimizerMultiTableFetch(this, options, NAV_OPT_URLS.TOP_FILTERS);
-  }
-
-  /**
-   * Fetches the popular joins for the given tables
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {string[][]} options.paths
-   * @return {CancellablePromise}
-   */
-  fetchOptimizerTopJoins(options) {
-    return genericOptimizerMultiTableFetch(this, options, NAV_OPT_URLS.TOP_JOINS);
-  }
-
-  /**
-   * Fetches optimizer meta for the given path, only possible for tables atm.
-   *
-   * @param {Object} options
-   * @param {boolean} [options.silenceErrors]
-   * @param {string[]} options.path
-   *
-   * @return {CancellablePromise}
-   */
-  fetchOptimizerMeta(options) {
-    const deferred = $.Deferred();
-
-    const request = simplePost(
-      NAV_OPT_URLS.TABLE_DETAILS,
-      {
-        databaseName: options.path[0],
-        tableName: options.path[1]
-      },
-      {
-        silenceErrors: options.silenceErrors,
-        successCallback: response => {
-          if (response.status === 0 && response.details) {
-            response.details.hueTimestamp = Date.now();
-            deferred.resolve(response.details);
-          } else {
-            deferred.reject();
-          }
-        },
-        errorCallback: deferred.reject
-      }
-    );
-
-    return new CancellablePromise(deferred, request);
   }
 
   /**
